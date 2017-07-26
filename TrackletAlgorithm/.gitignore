@@ -9,11 +9,6 @@
 
 *.wcfg
 
-# eyescan subsystem
-*.dump
-*.csv
-*.png
-
 
 
 # Prerequisites
