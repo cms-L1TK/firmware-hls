@@ -30,48 +30,53 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
               ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
 {
   // Declare variables
-  FullZ_Layer_PS curZ;
-  FullPhi_Layer_PS curPhi;
-  FullR_Layer_PS curR;
-  FullPt_Layer_PS curPt;
+//  FullZ_Layer_PS curZ;
+//  FullPhi_Layer_PS curPhi;
+//  FullR_Layer_PS curR;
+//  FullPt_Layer_PS curPt;
 
-  ReducedZ_Layer redZ;
-  ReducedPhi_Layer redPhi;
-  ReducedR_Layer redR;
-  ReducedPt_Layer redPt;
+//  ReducedZ_Layer redZ;
+//  ReducedPhi_Layer redPhi;
+//  ReducedR_Layer redR;
+//  ReducedPt_Layer redPt;
 
-  ReducedIndex index;
+  ReducedIndex index = 0;
 
-  ap_uint<2> routePhi;
-  ap_uint<1> routeZ;
+//  ap_uint<2> routePhi;
+//  ap_uint<1> routeZ;
 
-  index = 0;
-  for (int i=0; i<MAX_nSTUBS; i++)
+//  index = 0;
+  STUBLOOP: for (int i=0; i<MAX_nSTUBS; i++)
   {
   #pragma HLS PIPELINE II=1
     if (i < nStubs)
     {
       // Extract stub parameters
-      curZ = stubsInLayer[i].GetZ();
-      curPhi = stubsInLayer[i].GetPhi();
-      curR = stubsInLayer[i].GetR();
-      curPt = stubsInLayer[i].GetPt();
+      FullZ_Layer_PS curZ = stubsInLayer[i].GetZ();
+      FullPhi_Layer_PS curPhi = stubsInLayer[i].GetPhi();
+      FullR_Layer_PS curR = stubsInLayer[i].GetR();
+      FullPt_Layer_PS curPt = stubsInLayer[i].GetPt();
 
       // Rewrite stub parameters to new stub in allStubs
       allStubs[i].AddStub(curZ,curPhi,curR,curPt);
 
       // Calculate reduced-format parameters. A more efficient way of doing this may exist
-      redZ.set_bit(0,curZ.get_bit(5));
-      redZ.set_bit(1,curZ.get_bit(6));
-      redZ.set_bit(2,curZ.get_bit(7));
-      redZ.set_bit(3,curZ.get_bit(8));
-      redPhi.set_bit(0,curPhi.get_bit(9));
-      redPhi.set_bit(1,curPhi.get_bit(10));
-      redPhi.set_bit(2,curPhi.get_bit(11));
-      redR.set_bit(0,curR.get_bit(5));
-      redR.set_bit(1,curR.get_bit(6));
-      redPt = curPt;
+      ReducedZ_Layer redZ = (curZ << 4) & 0xFU;
+//      redZ.set_bit(0,curZ.get_bit(5));
+//      redZ.set_bit(1,curZ.get_bit(6));
+//      redZ.set_bit(2,curZ.get_bit(7));
+//      redZ.set_bit(3,curZ.get_bit(8));
+      ReducedPhi_Layer redPhi = (curPhi << 6) & 0x7U;
+//      redPhi.set_bit(0,curPhi.get_bit(9));
+//      redPhi.set_bit(1,curPhi.get_bit(10));
+//      redPhi.set_bit(2,curPhi.get_bit(11));
+      ReducedR_Layer redR = (curR << 5) & 0x3U;
+//      redR.set_bit(0,curR.get_bit(5));
+//      redR.set_bit(1,curR.get_bit(6));
+      ReducedPt_Layer redPt = curPt;
 
+      ap_uint<2> routePhi;
+      ap_uint<1> routeZ;
       // Calculate routing parameters (only works for even layers for now)
       routePhi.set_bit(0,curPhi.get_bit(12));
       routePhi.set_bit(1,curPhi.get_bit(13));
