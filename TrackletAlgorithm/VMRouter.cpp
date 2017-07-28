@@ -14,15 +14,15 @@
 using namespace std;
 
 void VMRouter(HLSFullStubLayerPS *stubsInLayer,
-              HLSFullStubLayerPS allStubs[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH1Z1[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH2Z1[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH3Z1[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH4Z1[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH1Z2[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH2Z2[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH3Z2[MAX_nSTUBS],
-              HLSReducedStubLayer vmStubsPH4Z2[MAX_nSTUBS],
+              HLSFullStubLayerPS *allStubs,
+              HLSReducedStubLayer *vmStubsPH1Z1,
+              HLSReducedStubLayer *vmStubsPH2Z1,
+              HLSReducedStubLayer *vmStubsPH3Z1,
+              HLSReducedStubLayer *vmStubsPH4Z1,
+              HLSReducedStubLayer *vmStubsPH1Z2,
+              HLSReducedStubLayer *vmStubsPH2Z2,
+              HLSReducedStubLayer *vmStubsPH3Z2,
+              HLSReducedStubLayer *vmStubsPH4Z2,
               int nStubs,
 	      ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
               ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
@@ -49,8 +49,6 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
   for (int i=0; i<MAX_nSTUBS; i++)
   {
   #pragma HLS PIPELINE II=1
-  //#pragma HLS UNROLL
-  //#pragma HLS UNROLL factor=3
     if (i < nStubs)
     {
       // Extract stub parameters
@@ -107,7 +105,7 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
           switch (routePhi)
           {
             case 0:
-              vmStubsPH1Z2[nPH1Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+             vmStubsPH1Z2[nPH1Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
               *nPH1Z2 = *nPH1Z2 + 1;
               break;
             case 1:
@@ -119,7 +117,7 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
               *nPH3Z2 = *nPH3Z2 + 1;
               break;
             case 3:
-              vmStubsPH4Z2[nPH4Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+             vmStubsPH4Z2[nPH4Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
               *nPH4Z2 = *nPH4Z2 + 1;
               break;
           }

@@ -24,8 +24,13 @@ void PrintRouted(HLSReducedStubLayer vmStubsPHXZX[MAX_nSTUBS*MAX_nROUTERS*MAX_nE
   string strZ, strPhi, strR, strPt, strIndex;
   ofstream fout[MAX_nROUTERS];
   char curFile[128];
-  string regionList[MAX_nROUTERS] = {"L1D3","L2D3","L3D3","L4D3","L5D3","L6D3","L1D4","L2D4","L3D4","L4D4","L5D4","L6D4",
-                                     "L1D5","L2D5","L3D5","L4D5","L5D5","L6D5","L1D6","L2D6","L3D6","L4D6","L5D6","L6D6"};
+  string regionListFull[24] = {"L1D3","L2D3","L3D3","L4D3","L5D3","L6D3","L1D4","L2D4","L3D4","L4D4","L5D4","L6D4",
+                               "L1D5","L2D5","L3D5","L4D5","L5D5","L6D5","L1D6","L2D6","L3D6","L4D6","L5D6","L6D6"};
+  string regionList[MAX_nROUTERS];
+  for (int i=0; i<MAX_nROUTERS; i++)
+  {
+    regionList[i] = regionListFull[i];
+  }
   for (int i=0; i<MAX_nROUTERS; i++)
   {
     sprintf(curFile,"VMStubs_VMS_%s%sn1_03_new.dat", regionList[i].c_str(), outFileString.c_str());
@@ -146,8 +151,13 @@ int main()
   // ****** READ IN DATA FOR ALL EVENTS AND DETECTOR REGIONS ******
   ifstream fin[MAX_nROUTERS];
   char curFile[128];
-  string regionList[MAX_nROUTERS] = {"L1D3","L2D3","L3D3","L4D3","L5D3","L6D3","L1D4","L2D4","L3D4","L4D4","L5D4","L6D4",
-                                     "L1D5","L2D5","L3D5","L4D5","L5D5","L6D5","L1D6","L2D6","L3D6","L4D6","L5D6","L6D6"};
+  string regionListFull[24] = {"L1D3","L2D3","L3D3","L4D3","L5D3","L6D3","L1D4","L2D4","L3D4","L4D4","L5D4","L6D4",
+                               "L1D5","L2D5","L3D5","L4D5","L5D5","L6D5","L1D6","L2D6","L3D6","L4D6","L5D6","L6D6"};
+  string regionList[MAX_nROUTERS];
+  for (int i=0; i<MAX_nROUTERS; i++)
+  {
+    regionList[i] = regionListFull[i];
+  }
   string token;
   int curEvent;
   int curStub = 0;
@@ -187,7 +197,7 @@ int main()
 
   // ****** LOOP OVER ALL EVENTS, SENDING EACH EVENT TO VMROUTERDISPATCHER ******
   int curnStubs[MAX_nROUTERS];
-  for (int i=0; i<MAX_nEVENTS; i++)
+  for (int i=0; i<1; i++)
   {
     copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS, stubsInLayer + (i+1)*MAX_nSTUBS*MAX_nROUTERS,curStubsInLayer);
     copy(nStubs + i*MAX_nROUTERS, nStubs + (i+1)*MAX_nROUTERS, curnStubs);
@@ -247,7 +257,7 @@ int main()
 
   // ****** COMPARE ALL OUTPUT FILES TO THE OUTPUT FILES FROM THE EMULATOR ******
   int allPass = 0;
-  string routeList[8] = {"PHI1X1", "PHI2X1", "PHI3X1", "PHI4X1", "PHI1X2", "PHI2X2", "PHI3X2", "PHI4X2"};
+/*  string routeList[8] = {"PHI1X1", "PHI2X1", "PHI3X1", "PHI4X1", "PHI1X2", "PHI2X2", "PHI3X2", "PHI4X2"};
   char curCommand[128];
   for (int i=0; i<MAX_nROUTERS; i++)
   {
@@ -258,7 +268,7 @@ int main()
       if (system(curCommand)) { allPass = i*8+j; }
     }
   }
-  return allPass;
+*/  return allPass;
 
 }
 
