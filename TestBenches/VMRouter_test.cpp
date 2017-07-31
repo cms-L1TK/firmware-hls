@@ -6,8 +6,11 @@
 #include "VMRouterDispatcher.hh"
 #include "ap_int.h"
 #include <vector>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cerrno>
+#include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -166,6 +169,15 @@ int main()
     curEvent = 0;
     sprintf(curFile,"emData/LayerStubs_SL1_%s_03.dat",regionList[i].c_str());
     fin[i].open(curFile);
+    if ( ! fin[i] ) {
+    	char cwd[1024]; getcwd(cwd, 1024);
+    	std::cerr << "Problem opening file " << curFile
+    			  << ": " << strerror(errno) << "," << std::endl
+				  << "in directory " << cwd
+    			  << std::endl;
+    	std::cerr << "Aborting test." << std::endl;
+    	return -1;
+    }
     getline(fin[i],token);
     while (getline(fin[i],token,' '))
     {
@@ -197,7 +209,7 @@ int main()
 
   // ****** LOOP OVER ALL EVENTS, SENDING EACH EVENT TO VMROUTERDISPATCHER ******
   int curnStubs[MAX_nROUTERS];
-  for (int i=0; i<1; i++)
+  for (int i=0; i<MAX_nEVENTS; i++)
   {
     copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS, stubsInLayer + (i+1)*MAX_nSTUBS*MAX_nROUTERS,curStubsInLayer);
     copy(nStubs + i*MAX_nROUTERS, nStubs + (i+1)*MAX_nROUTERS, curnStubs);
@@ -257,18 +269,20 @@ int main()
 
   // ****** COMPARE ALL OUTPUT FILES TO THE OUTPUT FILES FROM THE EMULATOR ******
   int allPass = 0;
-/*  string routeList[8] = {"PHI1X1", "PHI2X1", "PHI3X1", "PHI4X1", "PHI1X2", "PHI2X2", "PHI3X2", "PHI4X2"};
+  string routeList[8] = {"PHI1X1", "PHI2X1", "PHI3X1", "PHI4X1", "PHI1X2", "PHI2X2", "PHI3X2", "PHI4X2"};
   char curCommand[128];
   for (int i=0; i<MAX_nROUTERS; i++)
   {
     for (int j=0; j<8; j++)
     {
-      sprintf(curCommand,"diff -w emData/VMStubs_VMS_%s%sn1_03.dat VMStubs_VMS_%s%sn1_03_new.dat", regionList[i].c_str(),
+      sprintf(curCommand,"sdiff  -w 80 emData/VMStubs_VMS_%s%sn1_03.dat VMStubs_VMS_%s%sn1_03_new.dat", regionList[i].c_str(),
                                                        routeList[j].c_str(), regionList[i].c_str(), routeList[j].c_str());
-      if (system(curCommand)) { allPass = i*8+j; }
+      if (system(curCommand)) {
+    	  allPass = i*8+j;
+      }
     }
   }
-*/  return allPass;
+  return allPass;
 
 }
 

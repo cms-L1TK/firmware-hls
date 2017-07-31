@@ -25,10 +25,10 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
 		 HLSReducedStubLayer *vmStubsPH3Z2,
 		 HLSReducedStubLayer *vmStubsPH4Z2,
 		 const int nStubs,
-	      ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
-              ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
-              ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
-              ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
+	     ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
+         ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
+         ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
+         ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
 {
   ReducedIndex index = 0;
 
@@ -46,27 +46,15 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
       // Rewrite stub parameters to new stub in allStubs
       allStubs[i].AddStub(curZ,curPhi,curR,curPt);
 
-      // Calculate reduced-format parameters. A more efficient way of doing this may exist
-      ReducedZ_Layer redZ = (curZ << 4) & 0xFU;
-//      redZ.set_bit(0,curZ.get_bit(5));
-//      redZ.set_bit(1,curZ.get_bit(6));
-//      redZ.set_bit(2,curZ.get_bit(7));
-//      redZ.set_bit(3,curZ.get_bit(8));
-      ReducedPhi_Layer redPhi = (curPhi << 9) & 0x7U;
-//      redPhi.set_bit(0,curPhi.get_bit(9));
-//      redPhi.set_bit(1,curPhi.get_bit(10));
-//      redPhi.set_bit(2,curPhi.get_bit(11));
-      ReducedR_Layer redR = (curR << 5) & 0x3U;
-//      redR.set_bit(0,curR.get_bit(5));
-//      redR.set_bit(1,curR.get_bit(6));
+      // Calculate reduced-format parameters.
+      ReducedZ_Layer redZ = (curZ >> 5) & 0xFU;
+      ReducedPhi_Layer redPhi = (curPhi >> 9) & 0x7U;
+      ReducedR_Layer redR = (curR >> 5) & 0x3U;
       ReducedPt_Layer redPt = curPt;
 
-      ap_uint<2> routePhi;
-      ap_uint<1> routeZ;
       // Calculate routing parameters (only works for even layers for now)
-      routePhi.set_bit(0,curPhi.get_bit(12));
-      routePhi.set_bit(1,curPhi.get_bit(13));
-      routeZ.set_bit(0,curZ.get_bit(9));
+      ap_uint<2> routePhi = (curPhi >> 12 ) & 0x3U;
+      ap_uint<1> routeZ = (curZ>>9) & 0x1U;
 
       // Route stubs
       switch (routeZ)
@@ -76,19 +64,19 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
           {
             case 0:
               vmStubsPH1Z1[nPH1Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH1Z1 = *nPH1Z1 + 1;
+              ++(*nPH1Z1);
               break;
             case 1:
               vmStubsPH2Z1[nPH2Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH2Z1 = *nPH2Z1 + 1;
+              ++(*nPH2Z1);
               break;
             case 2:
               vmStubsPH3Z1[nPH3Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH3Z1 = *nPH3Z1 + 1;
+              ++(*nPH3Z1);
               break;
             case 3:
               vmStubsPH4Z1[nPH4Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH4Z1 = *nPH4Z1 + 1;
+              ++(*nPH4Z1);
               break;
           }
           break;
@@ -97,19 +85,19 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
           {
             case 0:
              vmStubsPH1Z2[nPH1Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH1Z2 = *nPH1Z2 + 1;
+              ++(*nPH1Z2);
               break;
             case 1:
               vmStubsPH2Z2[nPH2Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH2Z2 = *nPH2Z2 + 1;
+              ++(*nPH2Z2);
               break;
             case 2:
               vmStubsPH3Z2[nPH3Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH3Z2 = *nPH3Z2 + 1;
+              ++(*nPH3Z2);
               break;
             case 3:
              vmStubsPH4Z2[nPH4Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
-              *nPH4Z2 = *nPH4Z2 + 1;
+              ++(*nPH4Z2);
               break;
           }
           break;
