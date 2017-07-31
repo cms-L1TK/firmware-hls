@@ -9,6 +9,8 @@
 
 *.wcfg
 
+*.hprof
+
 # eyescan subsystem
 *.dump
 *.csv

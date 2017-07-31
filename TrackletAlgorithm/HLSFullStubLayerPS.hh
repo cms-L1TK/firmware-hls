@@ -13,42 +13,42 @@ public:
     r = 0;
     pt = 0;
   }
-  void AddStub(FullZ_Layer_PS newZ, FullPhi_Layer_PS newPhi, FullR_Layer_PS newR, FullPt_Layer_PS newPt)
+  void AddStub(const FullZ_Layer_PS newZ, const FullPhi_Layer_PS newPhi, const FullR_Layer_PS newR, const FullPt_Layer_PS newPt)
   {
     z = newZ;
     phi = newPhi;
     r = newR;
     pt = newPt;
   }
-  FullZ_Layer_PS GetZ()
+  FullZ_Layer_PS GetZ() const
   {
     return z;
   }
-  FullPhi_Layer_PS GetPhi()
+  FullPhi_Layer_PS GetPhi()  const
   {
     return phi;
   }
-  FullR_Layer_PS GetR()
+  FullR_Layer_PS GetR()  const
   {
     return r;
   }
-  FullPt_Layer_PS GetPt()
+  FullPt_Layer_PS GetPt()  const
   {
     return pt;
   }
-  void SetZ(FullZ_Layer_PS newZ)
+  void SetZ(const FullZ_Layer_PS newZ)
   {
     z = newZ;
   }
-  void SetPhi(FullPhi_Layer_PS newPhi)
+  void SetPhi(const FullPhi_Layer_PS newPhi)
   {
     phi = newPhi;
   }
-  void SetR(FullR_Layer_PS newR)
+  void SetR(const FullR_Layer_PS newR)
   {
     r = newR;
   }
-  void SetPt(FullPt_Layer_PS newPt)
+  void SetPt(const FullPt_Layer_PS newPt)
   {
     pt = newPt;
   }

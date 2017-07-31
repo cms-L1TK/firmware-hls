@@ -21,43 +21,43 @@ public:
     pt = newPt;
     index = newIndex;
   }
-  ReducedZ_Layer GetZ()
+  ReducedZ_Layer GetZ() const
   {
     return z;
   }
-  ReducedPhi_Layer GetPhi()
+  ReducedPhi_Layer GetPhi() const
   {
     return phi;
   }
-  ReducedR_Layer GetR()
+  ReducedR_Layer GetR() const
   {
     return r;
   }
-  ReducedPt_Layer GetPt()
+  ReducedPt_Layer GetPt() const
   {
     return pt;
   }
-  ReducedIndex GetIndex()
+  ReducedIndex GetIndex() const
   {
     return index;
   }
-  void SetZ(ReducedZ_Layer newZ)
+  void SetZ(const ReducedZ_Layer newZ)
   {
     z = newZ;
   }
-  void SetPhi(ReducedPhi_Layer newPhi)
+  void SetPhi(const ReducedPhi_Layer newPhi)
   {
     phi = newPhi;
   }
-  void SetR(ReducedR_Layer newR)
+  void SetR(const ReducedR_Layer newR)
   {
     r = newR;
   }
-  void SetPt(ReducedPt_Layer newPt)
+  void SetPt(const ReducedPt_Layer newPt)
   {
     pt = newPt;
   }
-  void SetIndex(ReducedIndex newIndex)
+  void SetIndex(const ReducedIndex newIndex)
   {
     index = newIndex;
   }

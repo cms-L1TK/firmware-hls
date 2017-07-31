@@ -13,49 +13,35 @@
 
 using namespace std;
 
+
 void VMRouter(HLSFullStubLayerPS *stubsInLayer,
-              HLSFullStubLayerPS *allStubs,
-              HLSReducedStubLayer *vmStubsPH1Z1,
-              HLSReducedStubLayer *vmStubsPH2Z1,
-              HLSReducedStubLayer *vmStubsPH3Z1,
-              HLSReducedStubLayer *vmStubsPH4Z1,
-              HLSReducedStubLayer *vmStubsPH1Z2,
-              HLSReducedStubLayer *vmStubsPH2Z2,
-              HLSReducedStubLayer *vmStubsPH3Z2,
-              HLSReducedStubLayer *vmStubsPH4Z2,
-              int nStubs,
+		HLSFullStubLayerPS *allStubs,
+		 HLSReducedStubLayer *vmStubsPH1Z1,
+		 HLSReducedStubLayer *vmStubsPH2Z1,
+		 HLSReducedStubLayer *vmStubsPH3Z1,
+		 HLSReducedStubLayer *vmStubsPH4Z1,
+		 HLSReducedStubLayer *vmStubsPH1Z2,
+		 HLSReducedStubLayer *vmStubsPH2Z2,
+		 HLSReducedStubLayer *vmStubsPH3Z2,
+		 HLSReducedStubLayer *vmStubsPH4Z2,
+		 const int nStubs,
 	      ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
               ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
               ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
               ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
 {
-  // Declare variables
-//  FullZ_Layer_PS curZ;
-//  FullPhi_Layer_PS curPhi;
-//  FullR_Layer_PS curR;
-//  FullPt_Layer_PS curPt;
-
-//  ReducedZ_Layer redZ;
-//  ReducedPhi_Layer redPhi;
-//  ReducedR_Layer redR;
-//  ReducedPt_Layer redPt;
-
   ReducedIndex index = 0;
 
-//  ap_uint<2> routePhi;
-//  ap_uint<1> routeZ;
-
-//  index = 0;
-  STUBLOOP: for (int i=0; i<MAX_nSTUBS; i++)
+  STUBLOOP: for (int i=0; i<MAX_nSTUBS; ++i)
   {
   #pragma HLS PIPELINE II=1
     if (i < nStubs)
     {
       // Extract stub parameters
-      FullZ_Layer_PS curZ = stubsInLayer[i].GetZ();
-      FullPhi_Layer_PS curPhi = stubsInLayer[i].GetPhi();
-      FullR_Layer_PS curR = stubsInLayer[i].GetR();
-      FullPt_Layer_PS curPt = stubsInLayer[i].GetPt();
+      const FullZ_Layer_PS curZ = stubsInLayer[i].GetZ();
+      const FullPhi_Layer_PS curPhi = stubsInLayer[i].GetPhi();
+      const FullR_Layer_PS curR = stubsInLayer[i].GetR();
+      const FullPt_Layer_PS curPt = stubsInLayer[i].GetPt();
 
       // Rewrite stub parameters to new stub in allStubs
       allStubs[i].AddStub(curZ,curPhi,curR,curPt);
@@ -66,7 +52,7 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
 //      redZ.set_bit(1,curZ.get_bit(6));
 //      redZ.set_bit(2,curZ.get_bit(7));
 //      redZ.set_bit(3,curZ.get_bit(8));
-      ReducedPhi_Layer redPhi = (curPhi << 6) & 0x7U;
+      ReducedPhi_Layer redPhi = (curPhi << 9) & 0x7U;
 //      redPhi.set_bit(0,curPhi.get_bit(9));
 //      redPhi.set_bit(1,curPhi.get_bit(10));
 //      redPhi.set_bit(2,curPhi.get_bit(11));
@@ -128,7 +114,7 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
           }
           break;
       }
-      index ++;
+      ++index;
     } else
     {
       break;
