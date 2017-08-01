@@ -39,24 +39,7 @@ ROUTERLOOP: for (int i=0; i<MAX_nROUTERS; ++i)
   {
   // These #pragmas are suppose to explicitly tell HLS that, for each loop iteration, all the data being
   // operated on are independent. This #pragma is specifically designed to allow loops to be pipelined or unrolled
-//  #pragma HLS DEPENDENCE variable=stubsInLayer inter false
-//  #pragma HLS DEPENDENCE variable=allStubs inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH1Z1 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH2Z1 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH3Z1 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH4Z1 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH1Z2 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH2Z2 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH3Z2 inter false
-//  #pragma HLS DEPENDENCE variable=vmStubsPH4Z2 inter false
-//  #pragma HLS DEPENDENCE variable=nPH1Z1 inter false
-//  #pragma HLS DEPENDENCE variable=nPH2Z1 inter false
-//  #pragma HLS DEPENDENCE variable=nPH3Z1 inter false
-//  #pragma HLS DEPENDENCE variable=nPH4Z1 inter false
-//  #pragma HLS DEPENDENCE variable=nPH1Z2 inter false
-//  #pragma HLS DEPENDENCE variable=nPH2Z2 inter false
-//  #pragma HLS DEPENDENCE variable=nPH3Z2 inter false
-//  #pragma HLS DEPENDENCE variable=nPH4Z2 inter false
+  // PW: moved to directives to allow exploration of different solutions
 #pragma HLS UNROLL
     VMRouter(&stubsInLayer[i*MAX_nSTUBS], &allStubs[i*MAX_nSTUBS],
              &vmStubsPH1Z1[i*MAX_nSTUBS], &vmStubsPH2Z1[i*MAX_nSTUBS],

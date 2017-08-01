@@ -47,14 +47,14 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
       allStubs[i].AddStub(curZ,curPhi,curR,curPt);
 
       // Calculate reduced-format parameters.
-      ReducedZ_Layer redZ = (curZ >> 5) & 0xFU;
-      ReducedPhi_Layer redPhi = (curPhi >> 9) & 0x7U;
-      ReducedR_Layer redR = (curR >> 5) & 0x3U;
-      ReducedPt_Layer redPt = curPt;
+      const ReducedZ_Layer redZ ( (curZ >> 5) & 0xFU);
+      const ReducedPhi_Layer redPhi( (curPhi >> 9) & 0x7U);
+      const ReducedR_Layer redR( (curR >> 5) & 0x3U);
+      const ReducedPt_Layer redPt(curPt);
 
       // Calculate routing parameters (only works for even layers for now)
-      ap_uint<2> routePhi = (curPhi >> 12 ) & 0x3U;
-      ap_uint<1> routeZ = (curZ>>9) & 0x1U;
+      const ap_uint<2> routePhi((curPhi >> 12 ) & 0x3U);
+      const ap_uint<1> routeZ((curZ>>9) & 0x1U);
 
       // Route stubs
       switch (routeZ)

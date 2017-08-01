@@ -4,7 +4,7 @@
 
 // Define max number of stubs an individual module can take
 const int MAX_nSTUBS = 64;
-const int MAX_nROUTERS = 2;
+const int MAX_nROUTERS = 5;
 const int MAX_nEVENTS = 100;
 
 // Define bit widths for full stub parameters (for both PS & 2S)
