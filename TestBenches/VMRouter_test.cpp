@@ -275,8 +275,7 @@ int main()
   {
     for (int j=0; j<8; j++)
     {
-      sprintf(curCommand,"sdiff  -w 80 emData/VMStubs_VMS_%s%sn1_03.dat VMStubs_VMS_%s%sn1_03_new.dat", regionList[i].c_str(),
-                                                       routeList[j].c_str(), regionList[i].c_str(), routeList[j].c_str());
+      sprintf(curCommand,"diff  -s emData/VMStubs_VMS_%s%sn1_03.dat VMStubs_VMS_%s%sn1_03_new.dat", regionList[i].c_str(), routeList[j].c_str(), regionList[i].c_str(), routeList[j].c_str());
       if (system(curCommand)) {
     	  allPass = i*8+j;
       }
