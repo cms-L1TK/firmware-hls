@@ -86,16 +86,86 @@ int main()
   HLSReducedStubLayer vmStubsPH3Z2[MAX_nSTUBS*MAX_nROUTERS*MAX_nEVENTS];
   HLSReducedStubLayer vmStubsPH4Z2[MAX_nSTUBS*MAX_nROUTERS*MAX_nEVENTS];
 
-  HLSFullStubLayerPS curStubsInLayer[MAX_nSTUBS*MAX_nROUTERS];
-  HLSFullStubLayerPS curAllStubs[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH1Z1[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH2Z1[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH3Z1[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH4Z1[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH1Z2[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH2Z2[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH3Z2[MAX_nSTUBS*MAX_nROUTERS];
-  HLSReducedStubLayer curvmStubsPH4Z2[MAX_nSTUBS*MAX_nROUTERS];
+  HLSFullStubLayerPS curStubsInLayer_1[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_1[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_1[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_2[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_2[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_2[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_3[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_3[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_3[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_4[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_4[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_4[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_5[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_5[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_5[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_6[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_6[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_6[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_7[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_7[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_7[MAX_nSTUBS];
+  HLSFullStubLayerPS curStubsInLayer_8[MAX_nSTUBS];
+  HLSFullStubLayerPS curAllStubs_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z1_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z1_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z1_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z1_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH1Z2_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH2Z2_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH3Z2_8[MAX_nSTUBS];
+  HLSReducedStubLayer curvmStubsPH4Z2_8[MAX_nSTUBS];
 
   ReducedIndex nPH1Z1[MAX_nROUTERS*MAX_nEVENTS];
   ReducedIndex nPH2Z1[MAX_nROUTERS*MAX_nEVENTS];
@@ -117,25 +187,70 @@ int main()
     nPH4Z2[i] = 0;
   }
 
-  ReducedIndex curnPH1Z1[MAX_nROUTERS];
-  ReducedIndex curnPH2Z1[MAX_nROUTERS];
-  ReducedIndex curnPH3Z1[MAX_nROUTERS];
-  ReducedIndex curnPH4Z1[MAX_nROUTERS];
-  ReducedIndex curnPH1Z2[MAX_nROUTERS];
-  ReducedIndex curnPH2Z2[MAX_nROUTERS];
-  ReducedIndex curnPH3Z2[MAX_nROUTERS];
-  ReducedIndex curnPH4Z2[MAX_nROUTERS];
-  for (int i=0; i<MAX_nROUTERS; i++)
-  {
-    curnPH1Z1[i] = 0;
-    curnPH2Z1[i] = 0;
-    curnPH3Z1[i] = 0;
-    curnPH4Z1[i] = 0;
-    curnPH1Z2[i] = 0;
-    curnPH2Z2[i] = 0;
-    curnPH3Z2[i] = 0;
-    curnPH4Z2[i] = 0;
-  }
+  ReducedIndex curnPH1Z1_1 = 0;
+  ReducedIndex curnPH2Z1_1 = 0;
+  ReducedIndex curnPH3Z1_1 = 0;
+  ReducedIndex curnPH4Z1_1 = 0;
+  ReducedIndex curnPH1Z2_1 = 0;
+  ReducedIndex curnPH2Z2_1 = 0;
+  ReducedIndex curnPH3Z2_1 = 0;
+  ReducedIndex curnPH4Z2_1 = 0;
+  ReducedIndex curnPH1Z1_2 = 0;
+  ReducedIndex curnPH2Z1_2 = 0;
+  ReducedIndex curnPH3Z1_2 = 0;
+  ReducedIndex curnPH4Z1_2 = 0;
+  ReducedIndex curnPH1Z2_2 = 0;
+  ReducedIndex curnPH2Z2_2 = 0;
+  ReducedIndex curnPH3Z2_2 = 0;
+  ReducedIndex curnPH4Z2_2 = 0;
+  ReducedIndex curnPH1Z1_3 = 0;
+  ReducedIndex curnPH2Z1_3 = 0;
+  ReducedIndex curnPH3Z1_3 = 0;
+  ReducedIndex curnPH4Z1_3 = 0;
+  ReducedIndex curnPH1Z2_3 = 0;
+  ReducedIndex curnPH2Z2_3 = 0;
+  ReducedIndex curnPH3Z2_3 = 0;
+  ReducedIndex curnPH4Z2_3 = 0;
+  ReducedIndex curnPH1Z1_4 = 0;
+  ReducedIndex curnPH2Z1_4 = 0;
+  ReducedIndex curnPH3Z1_4 = 0;
+  ReducedIndex curnPH4Z1_4 = 0;
+  ReducedIndex curnPH1Z2_4 = 0;
+  ReducedIndex curnPH2Z2_4 = 0;
+  ReducedIndex curnPH3Z2_4 = 0;
+  ReducedIndex curnPH4Z2_4 = 0;
+  ReducedIndex curnPH1Z1_5 = 0;
+  ReducedIndex curnPH2Z1_5 = 0;
+  ReducedIndex curnPH3Z1_5 = 0;
+  ReducedIndex curnPH4Z1_5 = 0;
+  ReducedIndex curnPH1Z2_5 = 0;
+  ReducedIndex curnPH2Z2_5 = 0;
+  ReducedIndex curnPH3Z2_5 = 0;
+  ReducedIndex curnPH4Z2_5 = 0;
+  ReducedIndex curnPH1Z1_6 = 0;
+  ReducedIndex curnPH2Z1_6 = 0;
+  ReducedIndex curnPH3Z1_6 = 0;
+  ReducedIndex curnPH4Z1_6 = 0;
+  ReducedIndex curnPH1Z2_6 = 0;
+  ReducedIndex curnPH2Z2_6 = 0;
+  ReducedIndex curnPH3Z2_6 = 0;
+  ReducedIndex curnPH4Z2_6 = 0;
+  ReducedIndex curnPH1Z1_7 = 0;
+  ReducedIndex curnPH2Z1_7 = 0;
+  ReducedIndex curnPH3Z1_7 = 0;
+  ReducedIndex curnPH4Z1_7 = 0;
+  ReducedIndex curnPH1Z2_7 = 0;
+  ReducedIndex curnPH2Z2_7 = 0;
+  ReducedIndex curnPH3Z2_7 = 0;
+  ReducedIndex curnPH4Z2_7 = 0;
+  ReducedIndex curnPH1Z1_8 = 0;
+  ReducedIndex curnPH2Z1_8 = 0;
+  ReducedIndex curnPH3Z1_8 = 0;
+  ReducedIndex curnPH4Z1_8 = 0;
+  ReducedIndex curnPH1Z2_8 = 0;
+  ReducedIndex curnPH2Z2_8 = 0;
+  ReducedIndex curnPH3Z2_8 = 0;
+  ReducedIndex curnPH4Z2_8 = 0;
 
   int nStubs[MAX_nROUTERS*MAX_nEVENTS];
 
@@ -208,54 +323,307 @@ int main()
 
 
   // ****** LOOP OVER ALL EVENTS, SENDING EACH EVENT TO VMROUTERDISPATCHER ******
-  int curnStubs[MAX_nROUTERS];
+  int curnStubs_1;
+  int curnStubs_2;
+  int curnStubs_3;
+  int curnStubs_4;
+  int curnStubs_5;
+  int curnStubs_6;
+  int curnStubs_7;
+  int curnStubs_8;
   for (int i=0; i<MAX_nEVENTS; i++)
   {
-    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS, stubsInLayer + (i+1)*MAX_nSTUBS*MAX_nROUTERS,curStubsInLayer);
-    copy(nStubs + i*MAX_nROUTERS, nStubs + (i+1)*MAX_nROUTERS, curnStubs);
-    VMRouterDispatcher(curStubsInLayer, curAllStubs,
-           curvmStubsPH1Z1, curvmStubsPH2Z1,
-           curvmStubsPH3Z1, curvmStubsPH4Z1,
-           curvmStubsPH1Z2, curvmStubsPH2Z2,
-           curvmStubsPH3Z2, curvmStubsPH4Z2,
-           curnStubs,
-           curnPH1Z1, curnPH2Z1,
-           curnPH3Z1, curnPH4Z1,
-           curnPH1Z2, curnPH2Z2,
-           curnPH3Z2, curnPH4Z2);
-    copy(curAllStubs, curAllStubs + MAX_nSTUBS*MAX_nROUTERS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH1Z1, curvmStubsPH1Z1 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH2Z1, curvmStubsPH2Z1 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH3Z1, curvmStubsPH3Z1 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH4Z1, curvmStubsPH4Z1 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH1Z2, curvmStubsPH1Z2 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH2Z2, curvmStubsPH2Z2 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH3Z2, curvmStubsPH3Z2 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curvmStubsPH4Z2, curvmStubsPH4Z2 + MAX_nSTUBS*MAX_nROUTERS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS);
-    copy(curnPH1Z1, curnPH1Z1 + MAX_nROUTERS, nPH1Z1 + i*MAX_nROUTERS);
-    copy(curnPH2Z1, curnPH2Z1 + MAX_nROUTERS, nPH2Z1 + i*MAX_nROUTERS);
-    copy(curnPH3Z1, curnPH3Z1 + MAX_nROUTERS, nPH3Z1 + i*MAX_nROUTERS);
-    copy(curnPH4Z1, curnPH4Z1 + MAX_nROUTERS, nPH4Z1 + i*MAX_nROUTERS);
-    copy(curnPH1Z2, curnPH1Z2 + MAX_nROUTERS, nPH1Z2 + i*MAX_nROUTERS);
-    copy(curnPH2Z2, curnPH2Z2 + MAX_nROUTERS, nPH2Z2 + i*MAX_nROUTERS);
-    copy(curnPH3Z2, curnPH3Z2 + MAX_nROUTERS, nPH3Z2 + i*MAX_nROUTERS);
-    copy(curnPH4Z2, curnPH4Z2 + MAX_nROUTERS, nPH4Z2 + i*MAX_nROUTERS);
-    for (int j=0; j<MAX_nROUTERS; j++)
-    {
-      curnPH1Z1[j] = 0;
-      curnPH2Z1[j] = 0;
-      curnPH3Z1[j] = 0;
-      curnPH4Z1[j] = 0;
-      curnPH1Z2[j] = 0;
-      curnPH2Z2[j] = 0;
-      curnPH3Z2[j] = 0;
-      curnPH4Z2[j] = 0;
-    }
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS,curStubsInLayer_1);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS,curStubsInLayer_2);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS,curStubsInLayer_3);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS,curStubsInLayer_4);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS,curStubsInLayer_5);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS,curStubsInLayer_6);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS,curStubsInLayer_7);
+    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS, stubsInLayer + i*MAX_nSTUBS*MAX_nROUTERS + 8*MAX_nSTUBS,curStubsInLayer_8);
+
+    curnStubs_1 = nStubs[i*MAX_nROUTERS + 0];
+    curnStubs_2 = nStubs[i*MAX_nROUTERS + 1];
+    curnStubs_3 = nStubs[i*MAX_nROUTERS + 2];
+    curnStubs_4 = nStubs[i*MAX_nROUTERS + 3];
+    curnStubs_5 = nStubs[i*MAX_nROUTERS + 4];
+    curnStubs_6 = nStubs[i*MAX_nROUTERS + 5];
+    curnStubs_7 = nStubs[i*MAX_nROUTERS + 6];
+    curnStubs_8 = nStubs[i*MAX_nROUTERS + 7];
+
+    VMRouterDispatcher(curStubsInLayer_1, curStubsInLayer_2, curStubsInLayer_3, curStubsInLayer_4,
+                       curStubsInLayer_5, curStubsInLayer_6, curStubsInLayer_7, curStubsInLayer_8,
+		       curAllStubs_1, curAllStubs_2, curAllStubs_3, curAllStubs_4,
+		       curAllStubs_5, curAllStubs_6, curAllStubs_7, curAllStubs_8,
+		       curvmStubsPH1Z1_1, curvmStubsPH1Z1_2, curvmStubsPH1Z1_3, curvmStubsPH1Z1_4,
+		       curvmStubsPH1Z1_5, curvmStubsPH1Z1_6, curvmStubsPH1Z1_7, curvmStubsPH1Z1_8,
+		       curvmStubsPH2Z1_1, curvmStubsPH2Z1_2, curvmStubsPH2Z1_3, curvmStubsPH2Z1_4,
+       		       curvmStubsPH2Z1_5, curvmStubsPH2Z1_6, curvmStubsPH2Z1_7, curvmStubsPH2Z1_8,
+		       curvmStubsPH3Z1_1, curvmStubsPH3Z1_2, curvmStubsPH3Z1_3, curvmStubsPH3Z1_4,
+       		       curvmStubsPH3Z1_5, curvmStubsPH3Z1_6, curvmStubsPH3Z1_7, curvmStubsPH3Z1_8,
+		       curvmStubsPH4Z1_1, curvmStubsPH4Z1_2, curvmStubsPH4Z1_3, curvmStubsPH4Z1_4,
+       		       curvmStubsPH4Z1_5, curvmStubsPH4Z1_6, curvmStubsPH4Z1_7, curvmStubsPH4Z1_8,
+		       curvmStubsPH1Z2_1, curvmStubsPH1Z2_2, curvmStubsPH1Z2_3, curvmStubsPH1Z2_4,
+       		       curvmStubsPH1Z2_5, curvmStubsPH1Z2_6, curvmStubsPH1Z2_7, curvmStubsPH1Z2_8,
+		       curvmStubsPH2Z2_1, curvmStubsPH2Z2_2, curvmStubsPH2Z2_3, curvmStubsPH2Z2_4,
+       		       curvmStubsPH2Z2_5, curvmStubsPH2Z2_6, curvmStubsPH2Z2_7, curvmStubsPH2Z2_8,
+		       curvmStubsPH3Z2_1, curvmStubsPH3Z2_2, curvmStubsPH3Z2_3, curvmStubsPH3Z2_4,
+       		       curvmStubsPH3Z2_5, curvmStubsPH3Z2_6, curvmStubsPH3Z2_7, curvmStubsPH3Z2_8,
+		       curvmStubsPH4Z2_1, curvmStubsPH4Z2_2, curvmStubsPH4Z2_3, curvmStubsPH4Z2_4,
+       		       curvmStubsPH4Z2_5, curvmStubsPH4Z2_6, curvmStubsPH4Z2_7, curvmStubsPH4Z2_8,
+		       curnStubs_1, curnStubs_2, curnStubs_3, curnStubs_4,
+		       curnStubs_5, curnStubs_6, curnStubs_7, curnStubs_8,
+		       &curnPH1Z1_1, &curnPH1Z1_2, &curnPH1Z1_3, &curnPH1Z1_4,
+		       &curnPH1Z1_5, &curnPH1Z1_6, &curnPH1Z1_7, &curnPH1Z1_8,
+		       &curnPH2Z1_1, &curnPH2Z1_2, &curnPH2Z1_3, &curnPH2Z1_4,
+       		       &curnPH2Z1_5, &curnPH2Z1_6, &curnPH2Z1_7, &curnPH2Z1_8,
+		       &curnPH3Z1_1, &curnPH3Z1_2, &curnPH3Z1_3, &curnPH3Z1_4,
+       		       &curnPH3Z1_5, &curnPH3Z1_6, &curnPH3Z1_7, &curnPH3Z1_8,
+		       &curnPH4Z1_1, &curnPH4Z1_2, &curnPH4Z1_3, &curnPH4Z1_4,
+       		       &curnPH4Z1_5, &curnPH4Z1_6, &curnPH4Z1_7, &curnPH4Z1_8,
+		       &curnPH1Z2_1, &curnPH1Z2_2, &curnPH1Z2_3, &curnPH1Z2_4,
+       		       &curnPH1Z2_5, &curnPH1Z2_6, &curnPH1Z2_7, &curnPH1Z2_8,
+		       &curnPH2Z2_1, &curnPH2Z2_2, &curnPH2Z2_3, &curnPH2Z2_4,
+       		       &curnPH2Z2_5, &curnPH2Z2_6, &curnPH2Z2_7, &curnPH2Z2_8,
+		       &curnPH3Z2_1, &curnPH3Z2_2, &curnPH3Z2_3, &curnPH3Z2_4,
+       		       &curnPH3Z2_5, &curnPH3Z2_6, &curnPH3Z2_7, &curnPH3Z2_8,
+		       &curnPH4Z2_1, &curnPH4Z2_2, &curnPH4Z2_3, &curnPH4Z2_4,
+       		       &curnPH4Z2_5, &curnPH4Z2_6, &curnPH4Z2_7, &curnPH4Z2_8);
+
+    copy(curAllStubs_1, curAllStubs_1 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curAllStubs_2, curAllStubs_2 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curAllStubs_3, curAllStubs_3 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curAllStubs_4, curAllStubs_4 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curAllStubs_5, curAllStubs_5 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curAllStubs_6, curAllStubs_6 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curAllStubs_7, curAllStubs_7 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curAllStubs_8, curAllStubs_8 + MAX_nSTUBS, allStubs + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH1Z1_1, curvmStubsPH1Z1_1 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_2, curvmStubsPH1Z1_2 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_3, curvmStubsPH1Z1_3 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_4, curvmStubsPH1Z1_4 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_5, curvmStubsPH1Z1_5 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_6, curvmStubsPH1Z1_6 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_7, curvmStubsPH1Z1_7 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH1Z1_8, curvmStubsPH1Z1_8 + MAX_nSTUBS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    //printf("curvmStubsPH1Z1_1: %d\n", curvmStubsPH1Z1_1[1].GetIndex().to_int());
+
+    copy(curvmStubsPH2Z1_1, curvmStubsPH2Z1_1 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_2, curvmStubsPH2Z1_2 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_3, curvmStubsPH2Z1_3 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_4, curvmStubsPH2Z1_4 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_5, curvmStubsPH2Z1_5 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_6, curvmStubsPH2Z1_6 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_7, curvmStubsPH2Z1_7 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH2Z1_8, curvmStubsPH2Z1_8 + MAX_nSTUBS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH3Z1_1, curvmStubsPH3Z1_1 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_2, curvmStubsPH3Z1_2 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_3, curvmStubsPH3Z1_3 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_4, curvmStubsPH3Z1_4 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_5, curvmStubsPH3Z1_5 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_6, curvmStubsPH3Z1_6 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_7, curvmStubsPH3Z1_7 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH3Z1_8, curvmStubsPH3Z1_8 + MAX_nSTUBS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH4Z1_1, curvmStubsPH4Z1_1 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_2, curvmStubsPH4Z1_2 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_3, curvmStubsPH4Z1_3 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_4, curvmStubsPH4Z1_4 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_5, curvmStubsPH4Z1_5 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_6, curvmStubsPH4Z1_6 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_7, curvmStubsPH4Z1_7 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH4Z1_8, curvmStubsPH4Z1_8 + MAX_nSTUBS, vmStubsPH4Z1 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH1Z2_1, curvmStubsPH1Z2_1 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_2, curvmStubsPH1Z2_2 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_3, curvmStubsPH1Z2_3 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_4, curvmStubsPH1Z2_4 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_5, curvmStubsPH1Z2_5 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_6, curvmStubsPH1Z2_6 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_7, curvmStubsPH1Z2_7 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH1Z2_8, curvmStubsPH1Z2_8 + MAX_nSTUBS, vmStubsPH1Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH2Z2_1, curvmStubsPH2Z2_1 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_2, curvmStubsPH2Z2_2 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_3, curvmStubsPH2Z2_3 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_4, curvmStubsPH2Z2_4 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_5, curvmStubsPH2Z2_5 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_6, curvmStubsPH2Z2_6 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_7, curvmStubsPH2Z2_7 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH2Z2_8, curvmStubsPH2Z2_8 + MAX_nSTUBS, vmStubsPH2Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH3Z2_1, curvmStubsPH3Z2_1 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_2, curvmStubsPH3Z2_2 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_3, curvmStubsPH3Z2_3 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_4, curvmStubsPH3Z2_4 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_5, curvmStubsPH3Z2_5 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_6, curvmStubsPH3Z2_6 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_7, curvmStubsPH3Z2_7 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH3Z2_8, curvmStubsPH3Z2_8 + MAX_nSTUBS, vmStubsPH3Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    copy(curvmStubsPH4Z2_1, curvmStubsPH4Z2_1 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 0*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_2, curvmStubsPH4Z2_2 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 1*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_3, curvmStubsPH4Z2_3 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 2*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_4, curvmStubsPH4Z2_4 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 3*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_5, curvmStubsPH4Z2_5 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 4*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_6, curvmStubsPH4Z2_6 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 5*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_7, curvmStubsPH4Z2_7 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 6*MAX_nSTUBS);
+    copy(curvmStubsPH4Z2_8, curvmStubsPH4Z2_8 + MAX_nSTUBS, vmStubsPH4Z2 + i*MAX_nSTUBS*MAX_nROUTERS + 7*MAX_nSTUBS);
+
+    //printf("curnPH1Z1_1: %d\n", curnPH1Z1_1.to_int());
+    nPH1Z1[i*MAX_nROUTERS + 0] = curnPH1Z1_1;
+    nPH1Z1[i*MAX_nROUTERS + 1] = curnPH1Z1_2;
+    nPH1Z1[i*MAX_nROUTERS + 2] = curnPH1Z1_3;
+    nPH1Z1[i*MAX_nROUTERS + 3] = curnPH1Z1_4;
+    nPH1Z1[i*MAX_nROUTERS + 4] = curnPH1Z1_5;
+    nPH1Z1[i*MAX_nROUTERS + 5] = curnPH1Z1_6;
+    nPH1Z1[i*MAX_nROUTERS + 6] = curnPH1Z1_7;
+    nPH1Z1[i*MAX_nROUTERS + 7] = curnPH1Z1_8;
+
+    nPH2Z1[i*MAX_nROUTERS + 0] = curnPH2Z1_1;
+    nPH2Z1[i*MAX_nROUTERS + 1] = curnPH2Z1_2;
+    nPH2Z1[i*MAX_nROUTERS + 2] = curnPH2Z1_3;
+    nPH2Z1[i*MAX_nROUTERS + 3] = curnPH2Z1_4;
+    nPH2Z1[i*MAX_nROUTERS + 4] = curnPH2Z1_5;
+    nPH2Z1[i*MAX_nROUTERS + 5] = curnPH2Z1_6;
+    nPH2Z1[i*MAX_nROUTERS + 6] = curnPH2Z1_7;
+    nPH2Z1[i*MAX_nROUTERS + 7] = curnPH2Z1_8;
+
+    nPH3Z1[i*MAX_nROUTERS + 0] = curnPH3Z1_1;
+    nPH3Z1[i*MAX_nROUTERS + 1] = curnPH3Z1_2;
+    nPH3Z1[i*MAX_nROUTERS + 2] = curnPH3Z1_3;
+    nPH3Z1[i*MAX_nROUTERS + 3] = curnPH3Z1_4;
+    nPH3Z1[i*MAX_nROUTERS + 4] = curnPH3Z1_5;
+    nPH3Z1[i*MAX_nROUTERS + 5] = curnPH3Z1_6;
+    nPH3Z1[i*MAX_nROUTERS + 6] = curnPH3Z1_7;
+    nPH3Z1[i*MAX_nROUTERS + 7] = curnPH3Z1_8;
+
+    nPH4Z1[i*MAX_nROUTERS + 0] = curnPH4Z1_1;
+    nPH4Z1[i*MAX_nROUTERS + 1] = curnPH4Z1_2;
+    nPH4Z1[i*MAX_nROUTERS + 2] = curnPH4Z1_3;
+    nPH4Z1[i*MAX_nROUTERS + 3] = curnPH4Z1_4;
+    nPH4Z1[i*MAX_nROUTERS + 4] = curnPH4Z1_5;
+    nPH4Z1[i*MAX_nROUTERS + 5] = curnPH4Z1_6;
+    nPH4Z1[i*MAX_nROUTERS + 6] = curnPH4Z1_7;
+    nPH4Z1[i*MAX_nROUTERS + 7] = curnPH4Z1_8;
+
+    nPH1Z2[i*MAX_nROUTERS + 0] = curnPH1Z2_1;
+    nPH1Z2[i*MAX_nROUTERS + 1] = curnPH1Z2_2;
+    nPH1Z2[i*MAX_nROUTERS + 2] = curnPH1Z2_3;
+    nPH1Z2[i*MAX_nROUTERS + 3] = curnPH1Z2_4;
+    nPH1Z2[i*MAX_nROUTERS + 4] = curnPH1Z2_5;
+    nPH1Z2[i*MAX_nROUTERS + 5] = curnPH1Z2_6;
+    nPH1Z2[i*MAX_nROUTERS + 6] = curnPH1Z2_7;
+    nPH1Z2[i*MAX_nROUTERS + 7] = curnPH1Z2_8;
+
+    nPH2Z2[i*MAX_nROUTERS + 0] = curnPH2Z2_1;
+    nPH2Z2[i*MAX_nROUTERS + 1] = curnPH2Z2_2;
+    nPH2Z2[i*MAX_nROUTERS + 2] = curnPH2Z2_3;
+    nPH2Z2[i*MAX_nROUTERS + 3] = curnPH2Z2_4;
+    nPH2Z2[i*MAX_nROUTERS + 4] = curnPH2Z2_5;
+    nPH2Z2[i*MAX_nROUTERS + 5] = curnPH2Z2_6;
+    nPH2Z2[i*MAX_nROUTERS + 6] = curnPH2Z2_7;
+    nPH2Z2[i*MAX_nROUTERS + 7] = curnPH2Z2_8;
+
+    nPH3Z2[i*MAX_nROUTERS + 0] = curnPH3Z2_1;
+    nPH3Z2[i*MAX_nROUTERS + 1] = curnPH3Z2_2;
+    nPH3Z2[i*MAX_nROUTERS + 2] = curnPH3Z2_3;
+    nPH3Z2[i*MAX_nROUTERS + 3] = curnPH3Z2_4;
+    nPH3Z2[i*MAX_nROUTERS + 4] = curnPH3Z2_5;
+    nPH3Z2[i*MAX_nROUTERS + 5] = curnPH3Z2_6;
+    nPH3Z2[i*MAX_nROUTERS + 6] = curnPH3Z2_7;
+    nPH3Z2[i*MAX_nROUTERS + 7] = curnPH3Z2_8;
+
+    nPH4Z2[i*MAX_nROUTERS + 0] = curnPH4Z2_1;
+    nPH4Z2[i*MAX_nROUTERS + 1] = curnPH4Z2_2;
+    nPH4Z2[i*MAX_nROUTERS + 2] = curnPH4Z2_3;
+    nPH4Z2[i*MAX_nROUTERS + 3] = curnPH4Z2_4;
+    nPH4Z2[i*MAX_nROUTERS + 4] = curnPH4Z2_5;
+    nPH4Z2[i*MAX_nROUTERS + 5] = curnPH4Z2_6;
+    nPH4Z2[i*MAX_nROUTERS + 6] = curnPH4Z2_7;
+    nPH4Z2[i*MAX_nROUTERS + 7] = curnPH4Z2_8;
+
+    curnPH1Z1_1 = 0;
+    curnPH1Z1_2 = 0;
+    curnPH1Z1_3 = 0;
+    curnPH1Z1_4 = 0;
+    curnPH1Z1_5 = 0;
+    curnPH1Z1_6 = 0;
+    curnPH1Z1_7 = 0;
+    curnPH1Z1_8 = 0;
+
+    curnPH2Z1_1 = 0;
+    curnPH2Z1_2 = 0;
+    curnPH2Z1_3 = 0;
+    curnPH2Z1_4 = 0;
+    curnPH2Z1_5 = 0;
+    curnPH2Z1_6 = 0;
+    curnPH2Z1_7 = 0;
+    curnPH2Z1_8 = 0;
+
+    curnPH3Z1_1 = 0;
+    curnPH3Z1_2 = 0;
+    curnPH3Z1_3 = 0;
+    curnPH3Z1_4 = 0;
+    curnPH3Z1_5 = 0;
+    curnPH3Z1_6 = 0;
+    curnPH3Z1_7 = 0;
+    curnPH3Z1_8 = 0;
+
+    curnPH4Z1_1 = 0;
+    curnPH4Z1_2 = 0;
+    curnPH4Z1_3 = 0;
+    curnPH4Z1_4 = 0;
+    curnPH4Z1_5 = 0;
+    curnPH4Z1_6 = 0;
+    curnPH4Z1_7 = 0;
+    curnPH4Z1_8 = 0;
+
+    curnPH1Z2_1 = 0;
+    curnPH1Z2_2 = 0;
+    curnPH1Z2_3 = 0;
+    curnPH1Z2_4 = 0;
+    curnPH1Z2_5 = 0;
+    curnPH1Z2_6 = 0;
+    curnPH1Z2_7 = 0;
+    curnPH1Z2_8 = 0;
+
+    curnPH2Z2_1 = 0;
+    curnPH2Z2_2 = 0;
+    curnPH2Z2_3 = 0;
+    curnPH2Z2_4 = 0;
+    curnPH2Z2_5 = 0;
+    curnPH2Z2_6 = 0;
+    curnPH2Z2_7 = 0;
+    curnPH2Z2_8 = 0;
+
+    curnPH3Z2_1 = 0;
+    curnPH3Z2_2 = 0;
+    curnPH3Z2_3 = 0;
+    curnPH3Z2_4 = 0;
+    curnPH3Z2_5 = 0;
+    curnPH3Z2_6 = 0;
+    curnPH3Z2_7 = 0;
+    curnPH3Z2_8 = 0;
+
+    curnPH4Z2_1 = 0;
+    curnPH4Z2_2 = 0;
+    curnPH4Z2_3 = 0;
+    curnPH4Z2_4 = 0;
+    curnPH4Z2_5 = 0;
+    curnPH4Z2_6 = 0;
+    curnPH4Z2_7 = 0;
+    curnPH4Z2_8 = 0;
   }
 
 
 
   // ****** WRITE OUT ALL THE ROUTED STUBS TO THE APPROPRIATE FILES ******
+  //printf("vmStubsPH1Z1: %d\n", vmStubsPH1Z1[1].GetIndex().to_int());
+  //printf("nPH2Z1: %d\n", nPH2Z1[0].to_int());
   PrintRouted(vmStubsPH1Z1,nPH1Z1,"PHI1X1");
   PrintRouted(vmStubsPH2Z1,nPH2Z1,"PHI2X1");
   PrintRouted(vmStubsPH3Z1,nPH3Z1,"PHI3X1");
