@@ -7,6 +7,10 @@ const int MAX_nSTUBS = 64;
 const int MAX_nROUTERS = 5;
 const int MAX_nEVENTS = 100;
 
+// Raw Stub Data
+typedef ap_uint<36> StubData;
+typedef ap_uint<18> ReducedStubData;
+
 // Define bit widths for full stub parameters (for both PS & 2S)
 typedef ap_uint<12> FullZ_Layer_PS;
 typedef ap_uint<14> FullPhi_Layer_PS;
