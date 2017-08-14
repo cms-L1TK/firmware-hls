@@ -12,15 +12,7 @@ set_top VMRouterDispatcher
 # source files
 add_files ../TrackletAlgorithm/VMRouterDispatcher.cpp
 add_files ../TrackletAlgorithm/VMRouter.cpp
-add_files -tb ../TestBenches/VMRouter_test.cpp
-
-# should figure out how to add header files right
-add_files ../TrackletAlgorithm/HLSConstants.hh
-add_files ../TrackletAlgorithm/HLSFullStubLayerPS.hh
-add_files ../TrackletAlgorithm/HLSReducedStubLayer.hh
-add_files ../TrackletAlgorithm/VMRouter.hh
-add_files ../TrackletAlgorithm/VMRouterDispatcher.hh
-
+add_files -tb -cflags "-I../TrackletAlgorithm" ../TestBenches/VMRouter_test.cpp
 
 # add data files
 add_files -tb emData
@@ -29,10 +21,56 @@ add_files -tb emData
 
 # solutions
 ############################################################
+# solution 2
+open_solution "solution2-nodependencies"
+set_directive_inline "VMRouter"
+set_directive_pipeline -II 1 "VMRouter/STUBLOOP"
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z2
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z2
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z2
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z2
+
+set_part  $part 
+create_clock -period $clockperiod -name default
+csim_design -O
+csynth_design
+
+
+############################################################
+#
+# solution 3
+open_solution "solution3-noinline"
+
+set_directive_pipeline -II 1 "VMRouter/STUBLOOP"
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z2
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z2
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z2
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z1
+set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z2
+
+
+
+set_part  $part 
+create_clock -period $clockperiod -name default
+
+csim_design -O
+csynth_design
+exit
+#cosim_design
+
+############################################################
 # solution 1
 open_solution "solution1-dependencies"
 
 set_directive_inline "VMRouter"
+set_directive_pipeline -II 1 "VMRouter/STUBLOOP"
 set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z2
 set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z1
 set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z2
@@ -65,49 +103,10 @@ create_clock -period $clockperiod -name default
 
 csim_design -O
 csynth_design
+exit
 #cosim_design
 
 
-############################################################
-# solution 2
-open_solution "solution2-nodependencies"
-set_directive_inline "VMRouter"
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z2
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z2
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z2
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z2
-
-set_part  $part 
-create_clock -period $clockperiod -name default
-csim_design -O
-csynth_design
-#cosim_design
-
-############################################################
-#
-# solution 3
-open_solution "solution3-noinline"
-
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z2
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH3Z2
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH4Z2
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH1Z1
-set_directive_array_partition -type complete -dim 1 "VMRouterDispatcher" nPH2Z2
-
-
-
-set_part  $part 
-create_clock -period $clockperiod -name default
-
-csim_design -O
-csynth_design
 #cosim_design
 #export_design -format ip_catalog
 
