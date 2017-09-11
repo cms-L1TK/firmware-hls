@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
+  <source>
+    <originFiles name="VMRouterDispatcher.cpp" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/VMRouterDispatcher.cpp"/>
+    <originFiles name="VMRouter.cpp" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/VMRouter.cpp"/>
+    <originFiles name="HLSConstants.hh" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/HLSConstants.hh"/>
+    <originFiles name="HLSFullStubLayerPS.hh" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/HLSFullStubLayerPS.hh"/>
+    <originFiles name="HLSReducedStubLayer.hh" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/HLSReducedStubLayer.hh"/>
+    <originFiles name="VMRouter.hh" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/VMRouter.hh"/>
+    <originFiles name="VMRouterDispatcher.hh" path="/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/VMRouterDispatcher.hh"/>
+  </source>
+  <testbench>
+    <originFiles name="VMRouter_test.cpp" path="/mnt/scratch/djc448/firmware-hls/TestBenches/VMRouter_test.cpp"/>
+    <originFiles name="emData" path="/mnt/scratch/djc448/firmware-hls/project/emData"/>
+  </testbench>
+</autopilotfilemapping:AutoPilotFileMapping>

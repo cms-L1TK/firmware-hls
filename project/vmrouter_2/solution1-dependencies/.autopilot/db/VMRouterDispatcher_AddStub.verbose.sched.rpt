@@ -1,0 +1,138 @@
+
+
+================================================================
+== Vivado HLS Report for 'VMRouterDispatcher_AddStub'
+================================================================
+* Date:           Fri Sep  1 16:13:00 2017
+
+* Version:        2016.1 (Build 1538259 on Fri Apr 08 16:12:49 MDT 2016)
+* Project:        vmrouter_2
+* Solution:       solution1-dependencies
+* Product family: virtex7
+* Target device:  xc7vx690tffg1927-2
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing (ns): 
+    * Summary: 
+    +--------+-------+----------+------------+
+    |  Clock | Target| Estimated| Uncertainty|
+    +--------+-------+----------+------------+
+    |ap_clk  |   4.00|      1.33|        0.50|
+    +--------+-------+----------+------------+
+
++ Latency (clock cycles): 
+    * Summary: 
+    +-----+-----+-----+-----+----------+
+    |  Latency  |  Interval | Pipeline |
+    | min | max | min | max |   Type   |
+    +-----+-----+-----+-----+----------+
+    |    0|    0|    1|    1| function |
+    +-----+-----+-----+-----+----------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        N/A
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 0
+ResetActiveHigh: 1
+IsCombinational: 0
+IsDatapathOnly: 0
+HasWiredReturn: 1
+HasMFsm: 2
+HasVarLatency: 0
+IsPipeline: 1
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
++ Individual pipeline summary: 
+  * Pipeline-0: initiation interval (II) = 1, depth = 1
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states: 1
+* Pipeline: 1
+  Pipeline-0: II = 1, D = 1, States = { 1 }
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 
+* FSM state operations: 
+
+ <State 1>: 1.33ns
+ST_1: HLSReducedStubLayer_index_V_wr [1/1] 1.33ns
+:0  %HLSReducedStubLayer_index_V_wr = call i6 @_ssdm_op_Read.ap_auto.i6(i6 %HLSReducedStubLayer_index_V_write)
+
+ST_1: HLSReducedStubLayer_pt_V_write_1 [1/1] 1.33ns
+:1  %HLSReducedStubLayer_pt_V_write_1 = call i3 @_ssdm_op_Read.ap_auto.i3(i3 %HLSReducedStubLayer_pt_V_write)
+
+ST_1: HLSReducedStubLayer_r_V_write_s [1/1] 1.33ns
+:2  %HLSReducedStubLayer_r_V_write_s = call i2 @_ssdm_op_Read.ap_auto.i2(i2 %HLSReducedStubLayer_r_V_write)
+
+ST_1: HLSReducedStubLayer_phi_V_writ [1/1] 1.33ns
+:3  %HLSReducedStubLayer_phi_V_writ = call i3 @_ssdm_op_Read.ap_auto.i3(i3 %HLSReducedStubLayer_phi_V_write)
+
+ST_1: HLSReducedStubLayer_z_V_write_s [1/1] 1.33ns
+:4  %HLSReducedStubLayer_z_V_write_s = call i4 @_ssdm_op_Read.ap_auto.i4(i4 %HLSReducedStubLayer_z_V_write)
+
+ST_1: mrv [1/1] 0.00ns
+:5  %mrv = insertvalue { i4, i3, i2, i3, i6 } undef, i4 %HLSReducedStubLayer_z_V_write_s, 0
+
+ST_1: mrv_1 [1/1] 0.00ns
+:6  %mrv_1 = insertvalue { i4, i3, i2, i3, i6 } %mrv, i3 %HLSReducedStubLayer_phi_V_writ, 1
+
+ST_1: mrv_2 [1/1] 0.00ns
+:7  %mrv_2 = insertvalue { i4, i3, i2, i3, i6 } %mrv_1, i2 %HLSReducedStubLayer_r_V_write_s, 2
+
+ST_1: mrv_3 [1/1] 0.00ns
+:8  %mrv_3 = insertvalue { i4, i3, i2, i3, i6 } %mrv_2, i3 %HLSReducedStubLayer_pt_V_write_1, 3
+
+ST_1: mrv_4 [1/1] 0.00ns
+:9  %mrv_4 = insertvalue { i4, i3, i2, i3, i6 } %mrv_3, i6 %HLSReducedStubLayer_index_V_wr, 4
+
+ST_1: stg_12 [1/1] 0.00ns
+:10  ret { i4, i3, i2, i3, i6 } %mrv_4
+
+
+
+============================================================
++ Verbose Summary: Timing violations
+============================================================
+Target clock period: 4ns, clock uncertainty: 0.5ns.
+
+ No timing violations. 
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+N/A
+* FSMD analyzer results:
+  - Output states:
+ - Input state : 
+  - Chain level:
+	State 1
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+N/A

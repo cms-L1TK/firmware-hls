@@ -30,6 +30,7 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
          ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
          ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
 {
+  //#pragma HLS INLINE
   ReducedIndex index = 0;
 
   STUBLOOP: for (int i=0; i<MAX_nSTUBS; ++i)
