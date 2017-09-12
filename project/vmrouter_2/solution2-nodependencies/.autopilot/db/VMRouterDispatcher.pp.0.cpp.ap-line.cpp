@@ -39870,8 +39870,12 @@ struct ap_ufixed: ap_fixed_base<_AP_W, _AP_I, false, _AP_Q, _AP_O, _AP_N> {
 #pragma empty_line
 // Define max number of stubs an individual module can take
 const int MAX_nSTUBS = 64;
-const int MAX_nROUTERS = 19;
+const int MAX_nROUTERS = 5;
 const int MAX_nEVENTS = 100;
+#pragma empty_line
+// Raw Stub Data
+typedef ap_uint<36> StubData;
+typedef ap_uint<18> ReducedStubData;
 #pragma empty_line
 // Define bit widths for full stub parameters (for both PS & 2S)
 typedef ap_uint<12> FullZ_Layer_PS;
@@ -39894,134 +39898,1511 @@ typedef ap_uint<6> ReducedIndex;
 // This is the HLSFullStubLayer class, which contains, in essence the 36 bits of a full stub, with few other functions
 //using namespace std;
 #pragma empty_line
+#pragma line 1 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 1 3
+// -*- C++ -*- forwarding header.
 #pragma empty_line
+// Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+// 2006, 2007, 2008, 2009, 2010
+// Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+#pragma empty_line
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+#pragma empty_line
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+#pragma empty_line
+// You should have received a copy of the GNU General Public License and
+// a copy of the GCC Runtime Library Exception along with this program;
+// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+// <http://www.gnu.org/licenses/>.
+#pragma empty_line
+/** @file include/cstdio
+ *  This is a Standard C++ Library file.  You should @c \#include this file
+ *  in your programs, rather than any of the @a *.h implementation files.
+ *
+ *  This is the C++ version of the Standard C Library header @c stdio.h,
+ *  and its contents are (mostly) the same as that header, but are all
+ *  contained in the namespace @c std (except for names which are defined
+ *  as macros in C).
+ */
+#pragma empty_line
+//
+// ISO C++ 14882: 27.8.2  C Library files
+//
+#pragma empty_line
+#pragma empty_line
+#pragma line 41 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 3
+#pragma empty_line
+#pragma empty_line
+#pragma line 1 "/usr/include/stdio.h" 1 3 4
+/* Define ISO C stdio on top of C++ iostreams.
+   Copyright (C) 1991, 1994-2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+#pragma empty_line
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+#pragma empty_line
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+#pragma empty_line
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+#pragma empty_line
+/*
+ *	ISO C99 Standard: 7.19 Input/output	<stdio.h>
+ */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+extern "C" {
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma line 1 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/clang/bin/../lib/clang/3.1/include/stddef.h" 1 3 4
+/*===---- stddef.h - Basic type definitions --------------------------------===
+ *
+ * Copyright (c) 2008 Eli Friedman
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ *===-----------------------------------------------------------------------===
+ */
+#pragma line 56 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/clang/bin/../lib/clang/3.1/include/stddef.h" 3 4
+/* Some C libraries expect to see a wint_t here. Others (notably MinGW) will use
+__WINT_TYPE__ directly; accommodate both by requiring __need_wint_t */
+#pragma line 34 "/usr/include/stdio.h" 2 3 4
+#pragma line 74 "/usr/include/stdio.h" 3 4
+#pragma line 1 "/usr/include/libio.h" 1 3 4
+/* Copyright (C) 1991-1995,1997-2007,2009,2011,2012
+   Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+   Written by Per Bothner <bothner@cygnus.com>.
+#pragma empty_line
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+#pragma empty_line
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+#pragma empty_line
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.
+#pragma empty_line
+   As a special exception, if you link the code in this file with
+   files compiled with a GNU compiler to produce an executable,
+   that does not cause the resulting executable to be covered by
+   the GNU Lesser General Public License.  This exception does not
+   however invalidate any other reasons why the executable file
+   might be covered by the GNU Lesser General Public License.
+   This exception applies to code released by its copyright holders
+   in files containing the exception.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma line 1 "/usr/include/_G_config.h" 1 3 4
+/* This file is needed by libio to define various configuration parameters.
+   These are always the same in the GNU C library.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Define types for libio in terms of the standard internal type names.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma line 1 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/clang/bin/../lib/clang/3.1/include/stddef.h" 1 3 4
+/*===---- stddef.h - Basic type definitions --------------------------------===
+ *
+ * Copyright (c) 2008 Eli Friedman
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ *===-----------------------------------------------------------------------===
+ */
+#pragma line 56 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/clang/bin/../lib/clang/3.1/include/stddef.h" 3 4
+/* Some C libraries expect to see a wint_t here. Others (notably MinGW) will use
+__WINT_TYPE__ directly; accommodate both by requiring __need_wint_t */
+#pragma line 16 "/usr/include/_G_config.h" 2 3 4
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma line 1 "/usr/include/wchar.h" 1 3 4
+/* Copyright (C) 1995-2008, 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+#pragma empty_line
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+#pragma empty_line
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+#pragma empty_line
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+#pragma empty_line
+/*
+ *      ISO C99 Standard: 7.24
+ *	Extended multibyte and wide character utilities	<wchar.h>
+ */
+#pragma line 897 "/usr/include/wchar.h" 3 4
+/* Undefine all __need_* constants in case we are included to get those
+   constants but the whole file was already read.  */
+#pragma line 21 "/usr/include/_G_config.h" 2 3 4
+typedef struct
+{
+  __off_t __pos;
+  __mbstate_t __state;
+} _G_fpos_t;
+typedef struct
+{
+  __off64_t __pos;
+  __mbstate_t __state;
+} _G_fpos64_t;
+#pragma line 45 "/usr/include/_G_config.h" 3 4
+/* These library features are always available in the GNU C library.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* This is defined by <bits/stat.h> if `st_blksize' exists.  */
+#pragma line 33 "/usr/include/libio.h" 2 3 4
+/* ALL of these should be defined in _G_config.h */
+#pragma line 48 "/usr/include/libio.h" 3 4
+/* This define avoids name pollution if we're using GNU stdarg.h */
+#pragma line 87 "/usr/include/libio.h" 3 4
+/* Magic numbers and bits for the _flags field.
+   The magic numbers use the high-order bits of _flags;
+   the remaining bits are available for variable flags.
+   Note: The magic numbers must all be negative if stdio
+   emulation is desired. */
+#pragma line 125 "/usr/include/libio.h" 3 4
+/* These are "formatting flags" matching the iostream fmtflags enum values. */
+#pragma line 145 "/usr/include/libio.h" 3 4
+struct _IO_jump_t; struct _IO_FILE;
+#pragma empty_line
+/* Handle lock.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+typedef void _IO_lock_t;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* A streammarker remembers a position in a buffer. */
+#pragma empty_line
+struct _IO_marker {
+  struct _IO_marker *_next;
+  struct _IO_FILE *_sbuf;
+  /* If _pos >= 0
+ it points to _buf->Gbase()+_pos. FIXME comment */
+  /* if _pos < 0, it points to _buf->eBptr()+_pos. FIXME comment */
+  int _pos;
+#pragma line 178 "/usr/include/libio.h" 3 4
+};
+#pragma empty_line
+/* This is the structure from the libstdc++ codecvt class.  */
+enum __codecvt_result
+{
+  __codecvt_ok,
+  __codecvt_partial,
+  __codecvt_error,
+  __codecvt_noconv
+};
+#pragma line 246 "/usr/include/libio.h" 3 4
+struct _IO_FILE {
+  int _flags; /* High-order word is _IO_MAGIC; rest is flags. */
+#pragma empty_line
+#pragma empty_line
+  /* The following pointers correspond to the C++ streambuf protocol. */
+  /* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */
+  char* _IO_read_ptr; /* Current read pointer */
+  char* _IO_read_end; /* End of get area. */
+  char* _IO_read_base; /* Start of putback+get area. */
+  char* _IO_write_base; /* Start of put area. */
+  char* _IO_write_ptr; /* Current put pointer. */
+  char* _IO_write_end; /* End of put area. */
+  char* _IO_buf_base; /* Start of reserve area. */
+  char* _IO_buf_end; /* End of reserve area. */
+  /* The following fields are used to support backing up and undo. */
+  char *_IO_save_base; /* Pointer to start of non-current get area. */
+  char *_IO_backup_base; /* Pointer to first valid character of backup area */
+  char *_IO_save_end; /* Pointer to end of non-current get area. */
+#pragma empty_line
+  struct _IO_marker *_markers;
+#pragma empty_line
+  struct _IO_FILE *_chain;
+#pragma empty_line
+  int _fileno;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+  int _flags2;
+#pragma empty_line
+  __off_t _old_offset; /* This used to be _offset but it's too small.  */
+#pragma empty_line
+#pragma empty_line
+  /* 1+column number of pbase(); 0 is unknown. */
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
+#pragma empty_line
+  /*  char* _save_gptr;  char* _save_egptr; */
+#pragma empty_line
+  _IO_lock_t *_lock;
+#pragma line 294 "/usr/include/libio.h" 3 4
+  __off64_t _offset;
+#pragma line 303 "/usr/include/libio.h" 3 4
+  void *__pad1;
+  void *__pad2;
+  void *__pad3;
+  void *__pad4;
+  size_t __pad5;
+#pragma empty_line
+  int _mode;
+  /* Make sure we don't get into trouble again.  */
+  char _unused2[15 * sizeof (int) - 4 * sizeof (void *) - sizeof (size_t)];
+#pragma empty_line
+};
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+struct _IO_FILE_plus;
+#pragma empty_line
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+#pragma line 335 "/usr/include/libio.h" 3 4
+/* Functions to do I/O and file management for a stream.  */
+#pragma empty_line
+/* Read NBYTES bytes from COOKIE into a buffer pointed to by BUF.
+   Return number of bytes read.  */
+typedef __ssize_t __io_read_fn (void *__cookie, char *__buf, size_t __nbytes);
+#pragma empty_line
+/* Write N bytes pointed to by BUF to COOKIE.  Write all N bytes
+   unless there is an error.  Return number of bytes written.  If
+   there is an error, return 0 and do not write anything.  If the file
+   has been opened for append (__mode.__append set), then set the file
+   pointer to the end of the file and then do the write; if not, just
+   write at the current file pointer.  */
+typedef __ssize_t __io_write_fn (void *__cookie, const char *__buf,
+     size_t __n);
+#pragma empty_line
+/* Move COOKIE's file position to *POS bytes from the
+   beginning of the file (if W is SEEK_SET),
+   the current position (if W is SEEK_CUR),
+   or the end of the file (if W is SEEK_END).
+   Set *POS to the new file position.
+   Returns zero if successful, nonzero if not.  */
+typedef int __io_seek_fn (void *__cookie, __off64_t *__pos, int __w);
+#pragma empty_line
+/* Close COOKIE.  */
+typedef int __io_close_fn (void *__cookie);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* User-visible names for the above.  */
+typedef __io_read_fn cookie_read_function_t;
+typedef __io_write_fn cookie_write_function_t;
+typedef __io_seek_fn cookie_seek_function_t;
+typedef __io_close_fn cookie_close_function_t;
+#pragma empty_line
+/* The structure with the cookie function pointers.  */
+typedef struct
+{
+  __io_read_fn *read; /* Read bytes.  */
+  __io_write_fn *write; /* Write bytes.  */
+  __io_seek_fn *seek; /* Seek/tell file position.  */
+  __io_close_fn *close; /* Close file.  */
+} _IO_cookie_io_functions_t;
+typedef _IO_cookie_io_functions_t cookie_io_functions_t;
+#pragma empty_line
+struct _IO_cookie_file;
+#pragma empty_line
+/* Initialize one of those.  */
+extern void _IO_cookie_init (struct _IO_cookie_file *__cfile, int __read_write,
+        void *__cookie, _IO_cookie_io_functions_t __fns);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+extern "C" {
+#pragma empty_line
+#pragma empty_line
+extern int __underflow (_IO_FILE *);
+extern int __uflow (_IO_FILE *);
+extern int __overflow (_IO_FILE *, int);
+#pragma line 435 "/usr/include/libio.h" 3 4
+extern int _IO_getc (_IO_FILE *__fp);
+extern int _IO_putc (int __c, _IO_FILE *__fp);
+extern int _IO_feof (_IO_FILE *__fp) throw ();
+extern int _IO_ferror (_IO_FILE *__fp) throw ();
+#pragma empty_line
+extern int _IO_peekc_locked (_IO_FILE *__fp);
+#pragma empty_line
+/* This one is for Emacs. */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+extern void _IO_flockfile (_IO_FILE *) throw ();
+extern void _IO_funlockfile (_IO_FILE *) throw ();
+extern int _IO_ftrylockfile (_IO_FILE *) throw ();
+#pragma line 465 "/usr/include/libio.h" 3 4
+extern int _IO_vfscanf (_IO_FILE * __restrict, const char * __restrict,
+   __gnuc_va_list, int *__restrict);
+extern int _IO_vfprintf (_IO_FILE *__restrict, const char *__restrict,
+    __gnuc_va_list);
+extern __ssize_t _IO_padn (_IO_FILE *, int, __ssize_t);
+extern size_t _IO_sgetn (_IO_FILE *, void *, size_t);
+#pragma empty_line
+extern __off64_t _IO_seekoff (_IO_FILE *, __off64_t, int, int);
+extern __off64_t _IO_seekpos (_IO_FILE *, __off64_t, int);
+#pragma empty_line
+extern void _IO_free_backup_area (_IO_FILE *) throw ();
+#pragma line 527 "/usr/include/libio.h" 3 4
+}
+#pragma line 75 "/usr/include/stdio.h" 2 3 4
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+typedef __gnuc_va_list va_list;
+#pragma line 107 "/usr/include/stdio.h" 3 4
+/* The type of the second argument to `fgetpos' and `fsetpos'.  */
+#pragma empty_line
+#pragma empty_line
+typedef _G_fpos_t fpos_t;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+typedef _G_fpos64_t fpos64_t;
+#pragma empty_line
+#pragma empty_line
+/* The possibilities for the third argument to `setvbuf'.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Default buffer size.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* End of file character.
+   Some things throughout the library rely on this being -1.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* The possibilities for the third argument to `fseek'.
+   These values should not be changed.  */
+#pragma line 150 "/usr/include/stdio.h" 3 4
+/* Default path prefix for `tempnam' and `tmpnam'.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Get the values:
+   L_tmpnam	How long an array of chars must be to be passed to `tmpnam'.
+   TMP_MAX	The minimum number of unique filenames generated by tmpnam
+		(and tempnam when it uses tmpnam's name space),
+		or tempnam (the two are separate).
+   L_ctermid	How long an array to pass to `ctermid'.
+   L_cuserid	How long an array to pass to `cuserid'.
+   FOPEN_MAX	Minimum number of files that can be open at once.
+   FILENAME_MAX	Maximum length of a filename.  */
+#pragma empty_line
+#pragma line 1 "/usr/include/bits/stdio_lim.h" 1 3 4
+/* Copyright (C) 1994, 1997, 1998, 1999, 2009 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+#pragma empty_line
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+#pragma empty_line
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+#pragma empty_line
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+#pragma line 165 "/usr/include/stdio.h" 2 3 4
+#pragma empty_line
+#pragma empty_line
+/* Standard streams.  */
+extern struct _IO_FILE *stdin; /* Standard input stream.  */
+extern struct _IO_FILE *stdout; /* Standard output stream.  */
+extern struct _IO_FILE *stderr; /* Standard error output stream.  */
+/* C89/C99 say they're macros.  Make them happy.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Remove file FILENAME.  */
+extern int remove (const char *__filename) throw ();
+/* Rename file OLD to NEW.  */
+extern int rename (const char *__old, const char *__new) throw ();
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Rename file OLD relative to OLDFD to NEW relative to NEWFD.  */
+extern int renameat (int __oldfd, const char *__old, int __newfd,
+       const char *__new) throw ();
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Create a temporary file and open it read/write.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+#pragma empty_line
+extern FILE *tmpfile (void) /* Ignore */;
+#pragma line 205 "/usr/include/stdio.h" 3 4
+extern FILE *tmpfile64 (void) /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+/* Generate a temporary filename.  */
+extern char *tmpnam (char *__s) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* This is the reentrant variant of `tmpnam'.  The only difference is
+   that it does not allow S to be NULL.  */
+extern char *tmpnam_r (char *__s) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Generate a unique temporary filename using up to five characters of PFX
+   if it is not NULL.  The directory to put this file in is searched for
+   as follows: First the environment variable "TMPDIR" is checked.
+   If it contains the name of a writable directory, that directory is used.
+   If not and if DIR is not NULL, that value is checked.  If that fails,
+   P_tmpdir is tried and finally "/tmp".  The storage for the filename
+   is allocated by `malloc'.  */
+extern char *tempnam (const char *__dir, const char *__pfx)
+     throw () __attribute__ ((__malloc__)) /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Close STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fclose (FILE *__stream);
+/* Flush STREAM, or all streams if STREAM is NULL.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fflush (FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Faster versions when locking is not required.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fflush_unlocked (FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Close all streams.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fcloseall (void);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Open a file and create a new stream for it.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern FILE *fopen (const char *__restrict __filename,
+      const char *__restrict __modes) /* Ignore */;
+/* Open a file, replacing an existing stream with it.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern FILE *freopen (const char *__restrict __filename,
+        const char *__restrict __modes,
+        FILE *__restrict __stream) /* Ignore */;
+#pragma line 297 "/usr/include/stdio.h" 3 4
+extern FILE *fopen64 (const char *__restrict __filename,
+        const char *__restrict __modes) /* Ignore */;
+extern FILE *freopen64 (const char *__restrict __filename,
+   const char *__restrict __modes,
+   FILE *__restrict __stream) /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Create a new stream that refers to an existing system file descriptor.  */
+extern FILE *fdopen (int __fd, const char *__modes) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Create a new stream that refers to the given magic cookie,
+   and uses the given functions for input and output.  */
+extern FILE *fopencookie (void *__restrict __magic_cookie,
+     const char *__restrict __modes,
+     _IO_cookie_io_functions_t __io_funcs) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Create a new stream that refers to a memory buffer.  */
+extern FILE *fmemopen (void *__s, size_t __len, const char *__modes)
+  throw () /* Ignore */;
+#pragma empty_line
+/* Open a stream that writes into a malloc'd buffer that is expanded as
+   necessary.  *BUFLOC and *SIZELOC are updated with the buffer's location
+   and the number of characters written on fflush or fclose.  */
+extern FILE *open_memstream (char **__bufloc, size_t *__sizeloc) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* If BUF is NULL, make STREAM unbuffered.
+   Else make it use buffer BUF, of size BUFSIZ.  */
+extern void setbuf (FILE *__restrict __stream, char *__restrict __buf) throw ();
+/* Make STREAM use buffering mode MODE.
+   If BUF is not NULL, use N bytes of it for buffering;
+   else allocate an internal buffer N bytes long.  */
+extern int setvbuf (FILE *__restrict __stream, char *__restrict __buf,
+      int __modes, size_t __n) throw ();
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* If BUF is NULL, make STREAM unbuffered.
+   Else make it use SIZE bytes of BUF for buffering.  */
+extern void setbuffer (FILE *__restrict __stream, char *__restrict __buf,
+         size_t __size) throw ();
+#pragma empty_line
+/* Make STREAM line-buffered.  */
+extern void setlinebuf (FILE *__stream) throw ();
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Write formatted output to STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fprintf (FILE *__restrict __stream,
+      const char *__restrict __format, ...);
+/* Write formatted output to stdout.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int printf (const char *__restrict __format, ...);
+/* Write formatted output to S.  */
+extern int sprintf (char *__restrict __s,
+      const char *__restrict __format, ...) throw ();
+#pragma empty_line
+/* Write formatted output to S from argument list ARG.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int vfprintf (FILE *__restrict __s, const char *__restrict __format,
+       __gnuc_va_list __arg);
+/* Write formatted output to stdout from argument list ARG.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int vprintf (const char *__restrict __format, __gnuc_va_list __arg);
+/* Write formatted output to S from argument list ARG.  */
+extern int vsprintf (char *__restrict __s, const char *__restrict __format,
+       __gnuc_va_list __arg) throw ();
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Maximum chars of output to write in MAXLEN.  */
+extern int snprintf (char *__restrict __s, size_t __maxlen,
+       const char *__restrict __format, ...)
+     throw () __attribute__ ((__format__ (__printf__, 3, 4)));
+#pragma empty_line
+extern int vsnprintf (char *__restrict __s, size_t __maxlen,
+        const char *__restrict __format, __gnuc_va_list __arg)
+     throw () __attribute__ ((__format__ (__printf__, 3, 0)));
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Write formatted output to a string dynamically allocated with `malloc'.
+   Store the address of the string in *PTR.  */
+extern int vasprintf (char **__restrict __ptr, const char *__restrict __f,
+        __gnuc_va_list __arg)
+     throw () __attribute__ ((__format__ (__printf__, 2, 0))) /* Ignore */;
+extern int __asprintf (char **__restrict __ptr,
+         const char *__restrict __fmt, ...)
+     throw () __attribute__ ((__format__ (__printf__, 2, 3))) /* Ignore */;
+extern int asprintf (char **__restrict __ptr,
+       const char *__restrict __fmt, ...)
+     throw () __attribute__ ((__format__ (__printf__, 2, 3))) /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Write formatted output to a file descriptor.  */
+extern int vdprintf (int __fd, const char *__restrict __fmt,
+       __gnuc_va_list __arg)
+     __attribute__ ((__format__ (__printf__, 2, 0)));
+extern int dprintf (int __fd, const char *__restrict __fmt, ...)
+     __attribute__ ((__format__ (__printf__, 2, 3)));
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Read formatted input from STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fscanf (FILE *__restrict __stream,
+     const char *__restrict __format, ...) /* Ignore */;
+/* Read formatted input from stdin.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int scanf (const char *__restrict __format, ...) /* Ignore */;
+/* Read formatted input from S.  */
+extern int sscanf (const char *__restrict __s,
+     const char *__restrict __format, ...) throw ();
+#pragma line 467 "/usr/include/stdio.h" 3 4
+/* Read formatted input from S into argument list ARG.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int vfscanf (FILE *__restrict __s, const char *__restrict __format,
+      __gnuc_va_list __arg)
+     __attribute__ ((__format__ (__scanf__, 2, 0))) /* Ignore */;
+#pragma empty_line
+/* Read formatted input from stdin into argument list ARG.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int vscanf (const char *__restrict __format, __gnuc_va_list __arg)
+     __attribute__ ((__format__ (__scanf__, 1, 0))) /* Ignore */;
+#pragma empty_line
+/* Read formatted input from S into argument list ARG.  */
+extern int vsscanf (const char *__restrict __s,
+      const char *__restrict __format, __gnuc_va_list __arg)
+     throw () __attribute__ ((__format__ (__scanf__, 2, 0)));
+#pragma line 527 "/usr/include/stdio.h" 3 4
+/* Read a character from STREAM.
+#pragma empty_line
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int fgetc (FILE *__stream);
+extern int getc (FILE *__stream);
+#pragma empty_line
+/* Read a character from stdin.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int getchar (void);
+#pragma empty_line
+#pragma empty_line
+/* The C standard explicitly says this is a macro, so we always do the
+   optimization for it.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* These are defined in POSIX.1:1996.
+#pragma empty_line
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int getc_unlocked (FILE *__stream);
+extern int getchar_unlocked (void);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Faster version when locking is not necessary.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fgetc_unlocked (FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Write a character to STREAM.
+#pragma empty_line
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.
+#pragma empty_line
+   These functions is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fputc (int __c, FILE *__stream);
+extern int putc (int __c, FILE *__stream);
+#pragma empty_line
+/* Write a character to stdout.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int putchar (int __c);
+#pragma empty_line
+#pragma empty_line
+/* The C standard explicitly says this can be a macro,
+   so we always do the optimization for it.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Faster version when locking is not necessary.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fputc_unlocked (int __c, FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* These are defined in POSIX.1:1996.
+#pragma empty_line
+   These functions are possible cancellation points and therefore not
+   marked with __THROW.  */
+extern int putc_unlocked (int __c, FILE *__stream);
+extern int putchar_unlocked (int __c);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Get a word (int) from STREAM.  */
+extern int getw (FILE *__stream);
+#pragma empty_line
+/* Write a word (int) to STREAM.  */
+extern int putw (int __w, FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Get a newline-terminated string of finite length from STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern char *fgets (char *__restrict __s, int __n, FILE *__restrict __stream)
+     /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Get a newline-terminated string from stdin, removing the newline.
+   DO NOT USE THIS FUNCTION!!  There is no limit on how much it will read.
+#pragma empty_line
+   The function has been officially removed in ISO C11.  This opportunity
+   is used to also remove it from the GNU feature list.  It is now only
+   available when explicitly using an old ISO C, Unix, or POSIX standard.
+   GCC defines _GNU_SOURCE when building C++ code and the function is still
+   in C++11, so it is also available for C++.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern char *gets (char *__s) /* Ignore */ __attribute__ ((__deprecated__));
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* This function does the same as `fgets' but does not lock the stream.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern char *fgets_unlocked (char *__restrict __s, int __n,
+        FILE *__restrict __stream) /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Read up to (and including) a DELIMITER from STREAM into *LINEPTR
+   (and null-terminate it). *LINEPTR is a pointer returned from malloc (or
+   NULL), pointing to *N characters of space.  It is realloc'd as
+   necessary.  Returns the number of characters read (not including the
+   null terminator), or -1 on error or EOF.
+#pragma empty_line
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+extern __ssize_t __getdelim (char **__restrict __lineptr,
+          size_t *__restrict __n, int __delimiter,
+          FILE *__restrict __stream) /* Ignore */;
+extern __ssize_t getdelim (char **__restrict __lineptr,
+        size_t *__restrict __n, int __delimiter,
+        FILE *__restrict __stream) /* Ignore */;
+#pragma empty_line
+/* Like `getdelim', but reads up to a newline.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern __ssize_t getline (char **__restrict __lineptr,
+       size_t *__restrict __n,
+       FILE *__restrict __stream) /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Write a string to STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fputs (const char *__restrict __s, FILE *__restrict __stream);
+#pragma empty_line
+/* Write a string, followed by a newline, to stdout.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int puts (const char *__s);
+#pragma empty_line
+#pragma empty_line
+/* Push a character back onto the input buffer of STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int ungetc (int __c, FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+/* Read chunks of generic data from STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern size_t fread (void *__restrict __ptr, size_t __size,
+       size_t __n, FILE *__restrict __stream) /* Ignore */;
+/* Write chunks of generic data to STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern size_t fwrite (const void *__restrict __ptr, size_t __size,
+        size_t __n, FILE *__restrict __s);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* This function does the same as `fputs' but does not lock the stream.
+#pragma empty_line
+   This function is not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation it is a cancellation point and
+   therefore not marked with __THROW.  */
+extern int fputs_unlocked (const char *__restrict __s,
+      FILE *__restrict __stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Faster versions when locking is not necessary.
+#pragma empty_line
+   These functions are not part of POSIX and therefore no official
+   cancellation point.  But due to similarity with an POSIX interface
+   or due to the implementation they are cancellation points and
+   therefore not marked with __THROW.  */
+extern size_t fread_unlocked (void *__restrict __ptr, size_t __size,
+         size_t __n, FILE *__restrict __stream) /* Ignore */;
+extern size_t fwrite_unlocked (const void *__restrict __ptr, size_t __size,
+          size_t __n, FILE *__restrict __stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Seek to a certain position on STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fseek (FILE *__stream, long int __off, int __whence);
+/* Return the current position of STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern long int ftell (FILE *__stream) /* Ignore */;
+/* Rewind to the beginning of STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern void rewind (FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+/* The Single Unix Specification, Version 2, specifies an alternative,
+   more adequate interface for the two functions above which deal with
+   file offset.  `long int' is not the right type.  These definitions
+   are originally defined in the Large File Support API.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Seek to a certain position on STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fseeko (FILE *__stream, __off_t __off, int __whence);
+/* Return the current position of STREAM.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern __off_t ftello (FILE *__stream) /* Ignore */;
+#pragma line 794 "/usr/include/stdio.h" 3 4
+/* Get STREAM's position.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fgetpos (FILE *__restrict __stream, fpos_t *__restrict __pos);
+/* Set STREAM's position.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int fsetpos (FILE *__stream, const fpos_t *__pos);
+#pragma line 818 "/usr/include/stdio.h" 3 4
+extern int fseeko64 (FILE *__stream, __off64_t __off, int __whence);
+extern __off64_t ftello64 (FILE *__stream) /* Ignore */;
+extern int fgetpos64 (FILE *__restrict __stream, fpos64_t *__restrict __pos);
+extern int fsetpos64 (FILE *__stream, const fpos64_t *__pos);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Clear the error and EOF indicators for STREAM.  */
+extern void clearerr (FILE *__stream) throw ();
+/* Return the EOF indicator for STREAM.  */
+extern int feof (FILE *__stream) throw () /* Ignore */;
+/* Return the error indicator for STREAM.  */
+extern int ferror (FILE *__stream) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Faster versions when locking is not required.  */
+extern void clearerr_unlocked (FILE *__stream) throw ();
+extern int feof_unlocked (FILE *__stream) throw () /* Ignore */;
+extern int ferror_unlocked (FILE *__stream) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Print a message describing the meaning of the value of errno.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern void perror (const char *__s);
+#pragma empty_line
+#pragma empty_line
+/* Provide the declarations for `sys_errlist' and `sys_nerr' if they
+   are available on this system.  Even if available, these variables
+   should not be used directly.  The `strerror' function provides
+   all the necessary functionality.  */
+#pragma empty_line
+#pragma line 1 "/usr/include/bits/sys_errlist.h" 1 3 4
+/* Declare sys_errlist and sys_nerr, or don't.  Compatibility (do) version.
+   Copyright (C) 2002, 2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+#pragma empty_line
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+#pragma empty_line
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+#pragma empty_line
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* sys_errlist and sys_nerr are deprecated.  Use strerror instead.  */
+#pragma empty_line
+#pragma empty_line
+extern int sys_nerr;
+extern const char *const sys_errlist[];
+#pragma empty_line
+#pragma empty_line
+extern int _sys_nerr;
+extern const char *const _sys_errlist[];
+#pragma line 854 "/usr/include/stdio.h" 2 3 4
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Return the system file descriptor for STREAM.  */
+extern int fileno (FILE *__stream) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Faster version when locking is not required.  */
+extern int fileno_unlocked (FILE *__stream) throw () /* Ignore */;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Create a new stream connected to a pipe running the given command.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern FILE *popen (const char *__command, const char *__modes) /* Ignore */;
+#pragma empty_line
+/* Close a stream opened by popen and return the status of its child.
+#pragma empty_line
+   This function is a possible cancellation point and therefore not
+   marked with __THROW.  */
+extern int pclose (FILE *__stream);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Return the name of the controlling terminal.  */
+extern char *ctermid (char *__s) throw ();
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* Return the name of the current user.  */
+extern char *cuserid (char *__s);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+struct obstack; /* See <obstack.h>.  */
+#pragma empty_line
+/* Write formatted output to an obstack.  */
+extern int obstack_printf (struct obstack *__restrict __obstack,
+      const char *__restrict __format, ...)
+     throw () __attribute__ ((__format__ (__printf__, 2, 3)));
+extern int obstack_vprintf (struct obstack *__restrict __obstack,
+       const char *__restrict __format,
+       __gnuc_va_list __args)
+     throw () __attribute__ ((__format__ (__printf__, 2, 0)));
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+/* These are defined in POSIX.1:1996.  */
+#pragma empty_line
+/* Acquire ownership of STREAM.  */
+extern void flockfile (FILE *__stream) throw ();
+#pragma empty_line
+/* Try to acquire ownership of STREAM but do not block if it is not
+   possible.  */
+extern int ftrylockfile (FILE *__stream) throw () /* Ignore */;
+#pragma empty_line
+/* Relinquish the ownership granted for STREAM.  */
+extern void funlockfile (FILE *__stream) throw ();
+#pragma line 931 "/usr/include/stdio.h" 3 4
+/* If we are compiling with optimizing read this file.  It contains
+   several optimizing inline functions and macros.  */
+#pragma line 943 "/usr/include/stdio.h" 3 4
+}
+#pragma line 44 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 2 3
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+// Get rid of those macros defined in <stdio.h> in lieu of real functions.
+#pragma line 91 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 3
+namespace std
+{
+  using ::FILE;
+  using ::fpos_t;
+#pragma empty_line
+  using ::clearerr;
+  using ::fclose;
+  using ::feof;
+  using ::ferror;
+  using ::fflush;
+  using ::fgetc;
+  using ::fgetpos;
+  using ::fgets;
+  using ::fopen;
+  using ::fprintf;
+  using ::fputc;
+  using ::fputs;
+  using ::fread;
+  using ::freopen;
+  using ::fscanf;
+  using ::fseek;
+  using ::fsetpos;
+  using ::ftell;
+  using ::fwrite;
+  using ::getc;
+  using ::getchar;
+  using ::gets;
+  using ::perror;
+  using ::printf;
+  using ::putc;
+  using ::putchar;
+  using ::puts;
+  using ::remove;
+  using ::rename;
+  using ::rewind;
+  using ::scanf;
+  using ::setbuf;
+  using ::setvbuf;
+  using ::sprintf;
+  using ::sscanf;
+  using ::tmpfile;
+  using ::tmpnam;
+  using ::ungetc;
+  using ::vfprintf;
+  using ::vprintf;
+  using ::vsprintf;
+} // namespace
+#pragma line 147 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 3
+namespace __gnu_cxx
+{
+#pragma line 165 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 3
+  using ::snprintf;
+  using ::vfscanf;
+  using ::vscanf;
+  using ::vsnprintf;
+  using ::vsscanf;
+#pragma empty_line
+} // namespace __gnu_cxx
+#pragma empty_line
+namespace std
+{
+  using ::__gnu_cxx::snprintf;
+  using ::__gnu_cxx::vfscanf;
+  using ::__gnu_cxx::vscanf;
+  using ::__gnu_cxx::vsnprintf;
+  using ::__gnu_cxx::vsscanf;
+} // namespace std
+#pragma line 4 "../TrackletAlgorithm/HLSFullStubLayerPS.hh" 2
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+//#define FAT_CLASS
 #pragma empty_line
 class HLSFullStubLayerPS
 {
+private:
+  StubData data_;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
 public:
-  HLSFullStubLayerPS()
+  HLSFullStubLayerPS(StubData newdata):
+    data_(newdata)
+  {}
+  HLSFullStubLayerPS():
+    data_(0)
   {
-    z = 0;
-    phi = 0;
-    r = 0;
-    pt = 0;
   }
-  void AddStub(const FullZ_Layer_PS newZ, const FullPhi_Layer_PS newPhi, const FullR_Layer_PS newR, const FullPt_Layer_PS newPt)
+  StubData raw() const
   {
-    z = newZ;
-    phi = newPhi;
-    r = newR;
-    pt = newPt;
+    return data_;
+  }
+  HLSFullStubLayerPS(const FullZ_Layer_PS newZ, const FullPhi_Layer_PS newPhi,
+       const FullR_Layer_PS newR, const FullPt_Layer_PS newPt)
+  {
+    AddStub(newZ, newPhi, newR, newPt);
+  }
+  void AddStub(const StubData newStub)
+  {
+ data_ = newStub;
+  }
+  void AddStub(const FullZ_Layer_PS newZ, const FullPhi_Layer_PS newPhi,
+        const FullR_Layer_PS newR, const FullPt_Layer_PS newPt)
+  {
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    // without the to_long these variables truncate at their current bit width.
+    data_ = newZ | (newPhi.to_long()<<12) | (newR.to_long()<<(14+12)) | (newPt.to_long()<<(14+12+7));
+//    printf("data_ is %09lx, %09lx\n", data_.to_long(),(newPhi.to_long()<<12));
   }
   FullZ_Layer_PS GetZ() const
   {
-    return z;
+    FullZ_Layer_PS tz = (data_&0xFFFUL);
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tz;
   }
   FullPhi_Layer_PS GetPhi() const
   {
-    return phi;
+    FullPhi_Layer_PS tPhi = (data_>>12)& 0x3FFFUL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tPhi;
   }
   FullR_Layer_PS GetR() const
   {
-    return r;
+    FullR_Layer_PS tR = (data_>> (12+14))&0x7FUL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tR;
   }
   FullPt_Layer_PS GetPt() const
   {
-    return pt;
+    FullPt_Layer_PS tPt = (data_ >> (12+14+7)) & 0x7UL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tPt;
+    //return pt;
   }
+  // --------------------------------------------------
+  // NOTA BENE -- THESE SETTERS HAVE NOT BEEN DEBUGGED
+  // --------------------------------------------------
   void SetZ(const FullZ_Layer_PS newZ)
   {
-    z = newZ;
+    // 36 bit mask: 0x3FFFFFFFFU
+    const long int maskZ = 0x3FFFFFF000UL; // bottom 12 bits
+    const int zShift = 0;
+    data_ = (data_ & maskZ) | (newZ.to_long() << zShift);
+//    z = newZ;
   }
   void SetPhi(const FullPhi_Layer_PS newPhi)
   {
-    phi = newPhi;
+    const long int maskPhi = 0x3FFC000FFFUL; // 14 bits, shifted up 12 bits
+    const int phiShift = 12;
+    data_ = ( data_ & maskPhi) | ( newPhi.to_long() << phiShift);
+//    phi = newPhi;
   }
   void SetR(const FullR_Layer_PS newR)
   {
-    r = newR;
+//    r = newR;
+    const long int maskR = 0x3E03FFFFFFUL;
+    const int rShift = 12+14;
+    data_ = (data_ & maskR ) | ( newR.to_long() << rShift);
   }
   void SetPt(const FullPt_Layer_PS newPt)
   {
-    pt = newPt;
+    const long int maskPt = 0x0FFFFFFFFUL;
+    const int ptShift = 12+14+7;
+    data_ = (data_ & maskPt ) | ( newPt.to_long() << ptShift);
+//    pt = newPt;
   }
-private:
-  FullZ_Layer_PS z;
-  FullPhi_Layer_PS phi;
-  FullR_Layer_PS r;
-  FullPt_Layer_PS pt;
 };
 #pragma line 4 "../TrackletAlgorithm/VMRouterDispatcher.cpp" 2
 #pragma line 1 "../TrackletAlgorithm/HLSReducedStubLayer.hh" 1
 // This is the HLSReducedStubLayer class, which contains, in essence the 18 bits of a reduced stub, after it has been routed
 #pragma empty_line
 #pragma empty_line
+//#define FAT_CLASS
+#pragma empty_line
+#pragma empty_line
 #pragma empty_line
 class HLSReducedStubLayer
 {
+private:
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+  ReducedStubData data_; // 18 bits
 public:
-  HLSReducedStubLayer()
+  HLSReducedStubLayer():
+    data_(0)
   {
-    z = 0;
-    phi = 0;
-    r = 0;
-    pt = 0;
-    index = 0;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
   }
+  // default copy constructor is ok
+#pragma empty_line
   void AddStub(ReducedZ_Layer newZ, ReducedPhi_Layer newPhi, ReducedR_Layer newR, ReducedPt_Layer newPt, ReducedIndex newIndex)
   {
-    z = newZ;
-    phi = newPhi;
-    r = newR;
-    pt = newPt;
-    index = newIndex;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    data_ = newZ | (newPhi.to_long()<< 4) | (newR.to_long() << (4+3)) |
+      (newPt.to_long() << (4+3+2)) | (newIndex.to_long() << (4+3+2+3));
   }
   ReducedZ_Layer GetZ() const
   {
-    return z;
+    ReducedZ_Layer tz = data_ & 0xFUL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tz;
   }
   ReducedPhi_Layer GetPhi() const
   {
-    return phi;
+    ReducedPhi_Layer tphi = ( data_>> 4 ) & 0x7UL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tphi;
   }
   ReducedR_Layer GetR() const
   {
-    return r;
+    ReducedR_Layer tr = (data_ >> (4+3)) & 0x3UL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tr;
   }
   ReducedPt_Layer GetPt() const
   {
-    return pt;
+    ReducedPt_Layer tpt = (data_ >> (4+3+2) ) & 0x7UL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tpt;
   }
   ReducedIndex GetIndex() const
   {
-    return index;
+    ReducedIndex tindex = ( data_ >> (4+3+2+3) ) & 0x3FUL;
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+#pragma empty_line
+    return tindex;
   }
-  void SetZ(const ReducedZ_Layer newZ)
-  {
-    z = newZ;
-  }
-  void SetPhi(const ReducedPhi_Layer newPhi)
-  {
-    phi = newPhi;
-  }
-  void SetR(const ReducedR_Layer newR)
-  {
-    r = newR;
-  }
-  void SetPt(const ReducedPt_Layer newPt)
-  {
-    pt = newPt;
-  }
-  void SetIndex(const ReducedIndex newIndex)
-  {
-    index = newIndex;
-  }
-private:
-  ReducedZ_Layer z;
-  ReducedPhi_Layer phi;
-  ReducedR_Layer r;
-  ReducedPt_Layer pt;
-  ReducedIndex index;
+  // void SetZ(const ReducedZ_Layer newZ)
+  // {
+  //   z = newZ;
+  // }
+  // void SetPhi(const ReducedPhi_Layer newPhi)
+  // {
+  //   phi = newPhi;
+  // }
+  // void SetR(const ReducedR_Layer newR)
+  // {
+  //   r = newR;
+  // }
+  // void SetPt(const ReducedPt_Layer newPt)
+  // {
+  //   pt = newPt;
+  // }
+  // void SetIndex(const ReducedIndex newIndex)
+  // {
+  //   index = newIndex;
+  // }
 };
 #pragma line 5 "../TrackletAlgorithm/VMRouterDispatcher.cpp" 2
 #pragma line 1 "../TrackletAlgorithm/VMRouter.hh" 1

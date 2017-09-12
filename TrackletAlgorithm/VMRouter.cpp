@@ -13,24 +13,22 @@
 
 using namespace std;
 
-
 void VMRouter(HLSFullStubLayerPS *stubsInLayer,
-		HLSFullStubLayerPS *allStubs,
-		 HLSReducedStubLayer *vmStubsPH1Z1,
-		 HLSReducedStubLayer *vmStubsPH2Z1,
-		 HLSReducedStubLayer *vmStubsPH3Z1,
-		 HLSReducedStubLayer *vmStubsPH4Z1,
-		 HLSReducedStubLayer *vmStubsPH1Z2,
-		 HLSReducedStubLayer *vmStubsPH2Z2,
-		 HLSReducedStubLayer *vmStubsPH3Z2,
-		 HLSReducedStubLayer *vmStubsPH4Z2,
-		 const int nStubs,
-	     ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
-         ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
-         ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
-         ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
+              HLSFullStubLayerPS *allStubs,
+              HLSReducedStubLayer *vmStubsPH1Z1,
+              HLSReducedStubLayer *vmStubsPH2Z1,
+              HLSReducedStubLayer *vmStubsPH3Z1,
+              HLSReducedStubLayer *vmStubsPH4Z1,
+              HLSReducedStubLayer *vmStubsPH1Z2,
+              HLSReducedStubLayer *vmStubsPH2Z2,
+              HLSReducedStubLayer *vmStubsPH3Z2,
+              HLSReducedStubLayer *vmStubsPH4Z2,
+              const int nStubs,
+              ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
+              ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
+              ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
+              ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
 {
-  //#pragma HLS INLINE
   ReducedIndex index = 0;
 
   STUBLOOP: for (int i=0; i<MAX_nSTUBS; ++i)

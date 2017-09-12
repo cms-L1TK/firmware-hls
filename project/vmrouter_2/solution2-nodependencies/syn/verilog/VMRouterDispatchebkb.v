@@ -17,224 +17,170 @@ parameter
     din3_WIDTH       = 32,
     din4_WIDTH       = 32,
     din5_WIDTH       = 32,
-    din6_WIDTH       = 32,
-    din7_WIDTH       = 32,
-    din8_WIDTH       = 32,
-    din9_WIDTH       = 32,
-    din10_WIDTH       = 32,
-    din11_WIDTH       = 32,
-    din12_WIDTH       = 32,
-    din13_WIDTH       = 32,
-    din14_WIDTH       = 32,
-    din15_WIDTH       = 32,
-    din16_WIDTH       = 32,
-    din17_WIDTH       = 32,
-    din18_WIDTH       = 32,
-    din19_WIDTH       = 32,
-    din20_WIDTH         = 32,
+    din6_WIDTH         = 32,
     dout_WIDTH            = 32
 )(
-    input  [11 : 0]     din1,
-    input  [11 : 0]     din2,
-    input  [11 : 0]     din3,
-    input  [11 : 0]     din4,
-    input  [11 : 0]     din5,
-    input  [11 : 0]     din6,
-    input  [11 : 0]     din7,
-    input  [11 : 0]     din8,
-    input  [11 : 0]     din9,
-    input  [11 : 0]     din10,
-    input  [11 : 0]     din11,
-    input  [11 : 0]     din12,
-    input  [11 : 0]     din13,
-    input  [11 : 0]     din14,
-    input  [11 : 0]     din15,
-    input  [11 : 0]     din16,
-    input  [11 : 0]     din17,
-    input  [11 : 0]     din18,
-    input  [11 : 0]     din19,
-    input  [63 : 0]    din20,
-    output [11 : 0]   dout);
+    input  [35 : 0]     din1,
+    input  [35 : 0]     din2,
+    input  [35 : 0]     din3,
+    input  [35 : 0]     din4,
+    input  [35 : 0]     din5,
+    input  [63 : 0]    din6,
+    output [35 : 0]   dout);
 
 // puts internal signals
 wire [63 : 0]     sel;
 // level 1 signals
-wire [11 : 0]         mux_1_0;
-wire [11 : 0]         mux_1_1;
-wire [11 : 0]         mux_1_2;
-wire [11 : 0]         mux_1_3;
-wire [11 : 0]         mux_1_4;
-wire [11 : 0]         mux_1_5;
-wire [11 : 0]         mux_1_6;
-wire [11 : 0]         mux_1_7;
-wire [11 : 0]         mux_1_8;
-wire [11 : 0]         mux_1_9;
+wire [35 : 0]         mux_1_0;
+wire [35 : 0]         mux_1_1;
+wire [35 : 0]         mux_1_2;
 // level 2 signals
-wire [11 : 0]         mux_2_0;
-wire [11 : 0]         mux_2_1;
-wire [11 : 0]         mux_2_2;
-wire [11 : 0]         mux_2_3;
-wire [11 : 0]         mux_2_4;
+wire [35 : 0]         mux_2_0;
+wire [35 : 0]         mux_2_1;
 // level 3 signals
-wire [11 : 0]         mux_3_0;
-wire [11 : 0]         mux_3_1;
-wire [11 : 0]         mux_3_2;
+wire [35 : 0]         mux_3_0;
 // level 4 signals
-wire [11 : 0]         mux_4_0;
-wire [11 : 0]         mux_4_1;
+wire [35 : 0]         mux_4_0;
 // level 5 signals
-wire [11 : 0]         mux_5_0;
+wire [35 : 0]         mux_5_0;
 // level 6 signals
-wire [11 : 0]         mux_6_0;
+wire [35 : 0]         mux_6_0;
 // level 7 signals
-wire [11 : 0]         mux_7_0;
+wire [35 : 0]         mux_7_0;
 // level 8 signals
-wire [11 : 0]         mux_8_0;
+wire [35 : 0]         mux_8_0;
 // level 9 signals
-wire [11 : 0]         mux_9_0;
+wire [35 : 0]         mux_9_0;
 // level 10 signals
-wire [11 : 0]         mux_10_0;
+wire [35 : 0]         mux_10_0;
 // level 11 signals
-wire [11 : 0]         mux_11_0;
+wire [35 : 0]         mux_11_0;
 // level 12 signals
-wire [11 : 0]         mux_12_0;
+wire [35 : 0]         mux_12_0;
 // level 13 signals
-wire [11 : 0]         mux_13_0;
+wire [35 : 0]         mux_13_0;
 // level 14 signals
-wire [11 : 0]         mux_14_0;
+wire [35 : 0]         mux_14_0;
 // level 15 signals
-wire [11 : 0]         mux_15_0;
+wire [35 : 0]         mux_15_0;
 // level 16 signals
-wire [11 : 0]         mux_16_0;
+wire [35 : 0]         mux_16_0;
 // level 17 signals
-wire [11 : 0]         mux_17_0;
+wire [35 : 0]         mux_17_0;
 // level 18 signals
-wire [11 : 0]         mux_18_0;
+wire [35 : 0]         mux_18_0;
 // level 19 signals
-wire [11 : 0]         mux_19_0;
+wire [35 : 0]         mux_19_0;
 // level 20 signals
-wire [11 : 0]         mux_20_0;
+wire [35 : 0]         mux_20_0;
 // level 21 signals
-wire [11 : 0]         mux_21_0;
+wire [35 : 0]         mux_21_0;
 // level 22 signals
-wire [11 : 0]         mux_22_0;
+wire [35 : 0]         mux_22_0;
 // level 23 signals
-wire [11 : 0]         mux_23_0;
+wire [35 : 0]         mux_23_0;
 // level 24 signals
-wire [11 : 0]         mux_24_0;
+wire [35 : 0]         mux_24_0;
 // level 25 signals
-wire [11 : 0]         mux_25_0;
+wire [35 : 0]         mux_25_0;
 // level 26 signals
-wire [11 : 0]         mux_26_0;
+wire [35 : 0]         mux_26_0;
 // level 27 signals
-wire [11 : 0]         mux_27_0;
+wire [35 : 0]         mux_27_0;
 // level 28 signals
-wire [11 : 0]         mux_28_0;
+wire [35 : 0]         mux_28_0;
 // level 29 signals
-wire [11 : 0]         mux_29_0;
+wire [35 : 0]         mux_29_0;
 // level 30 signals
-wire [11 : 0]         mux_30_0;
+wire [35 : 0]         mux_30_0;
 // level 31 signals
-wire [11 : 0]         mux_31_0;
+wire [35 : 0]         mux_31_0;
 // level 32 signals
-wire [11 : 0]         mux_32_0;
+wire [35 : 0]         mux_32_0;
 // level 33 signals
-wire [11 : 0]         mux_33_0;
+wire [35 : 0]         mux_33_0;
 // level 34 signals
-wire [11 : 0]         mux_34_0;
+wire [35 : 0]         mux_34_0;
 // level 35 signals
-wire [11 : 0]         mux_35_0;
+wire [35 : 0]         mux_35_0;
 // level 36 signals
-wire [11 : 0]         mux_36_0;
+wire [35 : 0]         mux_36_0;
 // level 37 signals
-wire [11 : 0]         mux_37_0;
+wire [35 : 0]         mux_37_0;
 // level 38 signals
-wire [11 : 0]         mux_38_0;
+wire [35 : 0]         mux_38_0;
 // level 39 signals
-wire [11 : 0]         mux_39_0;
+wire [35 : 0]         mux_39_0;
 // level 40 signals
-wire [11 : 0]         mux_40_0;
+wire [35 : 0]         mux_40_0;
 // level 41 signals
-wire [11 : 0]         mux_41_0;
+wire [35 : 0]         mux_41_0;
 // level 42 signals
-wire [11 : 0]         mux_42_0;
+wire [35 : 0]         mux_42_0;
 // level 43 signals
-wire [11 : 0]         mux_43_0;
+wire [35 : 0]         mux_43_0;
 // level 44 signals
-wire [11 : 0]         mux_44_0;
+wire [35 : 0]         mux_44_0;
 // level 45 signals
-wire [11 : 0]         mux_45_0;
+wire [35 : 0]         mux_45_0;
 // level 46 signals
-wire [11 : 0]         mux_46_0;
+wire [35 : 0]         mux_46_0;
 // level 47 signals
-wire [11 : 0]         mux_47_0;
+wire [35 : 0]         mux_47_0;
 // level 48 signals
-wire [11 : 0]         mux_48_0;
+wire [35 : 0]         mux_48_0;
 // level 49 signals
-wire [11 : 0]         mux_49_0;
+wire [35 : 0]         mux_49_0;
 // level 50 signals
-wire [11 : 0]         mux_50_0;
+wire [35 : 0]         mux_50_0;
 // level 51 signals
-wire [11 : 0]         mux_51_0;
+wire [35 : 0]         mux_51_0;
 // level 52 signals
-wire [11 : 0]         mux_52_0;
+wire [35 : 0]         mux_52_0;
 // level 53 signals
-wire [11 : 0]         mux_53_0;
+wire [35 : 0]         mux_53_0;
 // level 54 signals
-wire [11 : 0]         mux_54_0;
+wire [35 : 0]         mux_54_0;
 // level 55 signals
-wire [11 : 0]         mux_55_0;
+wire [35 : 0]         mux_55_0;
 // level 56 signals
-wire [11 : 0]         mux_56_0;
+wire [35 : 0]         mux_56_0;
 // level 57 signals
-wire [11 : 0]         mux_57_0;
+wire [35 : 0]         mux_57_0;
 // level 58 signals
-wire [11 : 0]         mux_58_0;
+wire [35 : 0]         mux_58_0;
 // level 59 signals
-wire [11 : 0]         mux_59_0;
+wire [35 : 0]         mux_59_0;
 // level 60 signals
-wire [11 : 0]         mux_60_0;
+wire [35 : 0]         mux_60_0;
 // level 61 signals
-wire [11 : 0]         mux_61_0;
+wire [35 : 0]         mux_61_0;
 // level 62 signals
-wire [11 : 0]         mux_62_0;
+wire [35 : 0]         mux_62_0;
 // level 63 signals
-wire [11 : 0]         mux_63_0;
+wire [35 : 0]         mux_63_0;
 // level 64 signals
-wire [11 : 0]         mux_64_0;
+wire [35 : 0]         mux_64_0;
 
-assign sel = din20;
+assign sel = din6;
 
 // Generate level 1 logic
 assign mux_1_0 = (sel[0] == 0)? din1 : din2;
 assign mux_1_1 = (sel[0] == 0)? din3 : din4;
-assign mux_1_2 = (sel[0] == 0)? din5 : din6;
-assign mux_1_3 = (sel[0] == 0)? din7 : din8;
-assign mux_1_4 = (sel[0] == 0)? din9 : din10;
-assign mux_1_5 = (sel[0] == 0)? din11 : din12;
-assign mux_1_6 = (sel[0] == 0)? din13 : din14;
-assign mux_1_7 = (sel[0] == 0)? din15 : din16;
-assign mux_1_8 = (sel[0] == 0)? din17 : din18;
-assign mux_1_9 = din19;
+assign mux_1_2 = din5;
 
 // Generate level 2 logic
 assign mux_2_0 = (sel[1] == 0)? mux_1_0 : mux_1_1;
-assign mux_2_1 = (sel[1] == 0)? mux_1_2 : mux_1_3;
-assign mux_2_2 = (sel[1] == 0)? mux_1_4 : mux_1_5;
-assign mux_2_3 = (sel[1] == 0)? mux_1_6 : mux_1_7;
-assign mux_2_4 = (sel[1] == 0)? mux_1_8 : mux_1_9;
+assign mux_2_1 = mux_1_2;
 
 // Generate level 3 logic
 assign mux_3_0 = (sel[2] == 0)? mux_2_0 : mux_2_1;
-assign mux_3_1 = (sel[2] == 0)? mux_2_2 : mux_2_3;
-assign mux_3_2 = mux_2_4;
 
 // Generate level 4 logic
-assign mux_4_0 = (sel[3] == 0)? mux_3_0 : mux_3_1;
-assign mux_4_1 = mux_3_2;
+assign mux_4_0 = mux_3_0;
 
 // Generate level 5 logic
-assign mux_5_0 = (sel[4] == 0)? mux_4_0 : mux_4_1;
+assign mux_5_0 = mux_4_0;
 
 // Generate level 6 logic
 assign mux_6_0 = mux_5_0;

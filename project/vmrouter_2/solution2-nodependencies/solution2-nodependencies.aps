@@ -65,7 +65,7 @@
         <library name="DefaultPlatform" value="xilinx/virtex7/virtex7_fpv6"/>
     </libraryList>
     <clockList>
-        <clock default="false" name="default" period="4"/>
+        <clock name="default" default="false" period="4"/>
     </clockList>
 </solution>
 
