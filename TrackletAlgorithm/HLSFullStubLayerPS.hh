@@ -5,7 +5,7 @@
 #include "ap_int.h"
 #include "HLSConstants.hh"
 
-#define FAT_CLASS
+//#define FAT_CLASS
 
 class HLSFullStubLayerPS
 {
@@ -88,8 +88,8 @@ public:
     if ( tPt != pt ) {
       printf("tpt = 0x%03x, pt = 0x%03lx\n", tPt.to_int(), pt.to_int());
     }
-    return tPt;
 #endif // FAT_CLASS
+    return tPt;
     //return pt;
   }
   // --------------------------------------------------
