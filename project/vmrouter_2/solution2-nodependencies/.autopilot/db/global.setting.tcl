@@ -41,8 +41,8 @@ set SCTraceFileName "mytrace"
 set SCTraceFileFormat "vcd"
 set SCTraceOption "all"
 set TargetInfo "xc7vx690t:ffg1927:-2"
-set SourceFiles {sc {} c {../../../TrackletAlgorithm/VMRouter.cpp ../../../TrackletAlgorithm/VMRouterDispatcher.cpp}}
-set SourceFlags {sc {} c {{} {}}}
+set SourceFiles {sc {} c ../../../TrackletAlgorithm/VMRouterDispatcher.cpp}
+set SourceFlags {sc {} c {{}}}
 set DirectiveFile {/mnt/scratch/djc448/firmware-hls/project/vmrouter_2/solution2-nodependencies/solution2-nodependencies.directive}
 set TBFiles {verilog {../../emData ../../../TestBenches/VMRouter_test.cpp} bc {../../emData ../../../TestBenches/VMRouter_test.cpp} sc {../../emData ../../../TestBenches/VMRouter_test.cpp} vhdl {../../emData ../../../TestBenches/VMRouter_test.cpp} c {} cas {../../emData ../../../TestBenches/VMRouter_test.cpp}}
 set SpecLanguage "C"

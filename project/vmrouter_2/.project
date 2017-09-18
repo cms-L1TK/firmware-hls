@@ -67,11 +67,6 @@
 			<location>/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/HLSReducedStubLayer.hh</location>
 		</link>
 		<link>
-			<name>source/VMRouter.cpp</name>
-			<type>1</type>
-			<location>/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/VMRouter.cpp</location>
-		</link>
-		<link>
 			<name>source/VMRouter.hh</name>
 			<type>1</type>
 			<location>/mnt/scratch/djc448/firmware-hls/TrackletAlgorithm/VMRouter.hh</location>

@@ -5,12 +5,12 @@
 ############################################################
 open_project vmrouter_2
 set_top VMRouterDispatcher
-add_files ../TrackletAlgorithm/VMRouterDispatcher.cpp
-add_files ../TrackletAlgorithm/VMRouter.cpp
 add_files ../TrackletAlgorithm/HLSConstants.hh
 add_files ../TrackletAlgorithm/HLSFullStubLayerPS.hh
 add_files ../TrackletAlgorithm/HLSReducedStubLayer.hh
+add_files VMRouter.cpp
 add_files ../TrackletAlgorithm/VMRouter.hh
+add_files ../TrackletAlgorithm/VMRouterDispatcher.cpp
 add_files ../TrackletAlgorithm/VMRouterDispatcher.hh
 add_files -tb ../TestBenches/VMRouter_test.cpp
 add_files -tb emData

@@ -39868,10 +39868,17 @@ struct ap_ufixed: ap_fixed_base<_AP_W, _AP_I, false, _AP_Q, _AP_O, _AP_N> {
 // 67d7842dbbe25473c3c32b93c0da8047785f30d78e8a024de1b57352245f9689
 #pragma line 4 "../TrackletAlgorithm/HLSConstants.hh" 2
 #pragma empty_line
+using namespace std;
+#pragma empty_line
 // Define max number of stubs an individual module can take
 const int MAX_nSTUBS = 64;
-const int MAX_nROUTERS = 5;
+const int MAX_nSECTORS = 3;
+const int MAX_nREGIONS = 3;
 const int MAX_nEVENTS = 100;
+#pragma empty_line
+// Define list of detector regions to run algorithm over
+const string regionList[MAX_nREGIONS] = {"L1D3","L2D3","L3D3"};
+const int nroutes[MAX_nREGIONS] = {6,8,6};
 #pragma empty_line
 // Raw Stub Data
 typedef ap_uint<36> StubData;
@@ -39897,6 +39904,7 @@ typedef ap_uint<6> ReducedIndex;
 #pragma line 1 "../TrackletAlgorithm/HLSFullStubLayerPS.hh" 1
 // This is the HLSFullStubLayer class, which contains, in essence the 36 bits of a full stub, with few other functions
 //using namespace std;
+#pragma empty_line
 #pragma empty_line
 #pragma line 1 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/cstdio" 1 3
 // -*- C++ -*- forwarding header.
@@ -41157,8 +41165,7 @@ namespace std
   using ::__gnu_cxx::vsnprintf;
   using ::__gnu_cxx::vsscanf;
 } // namespace std
-#pragma line 4 "../TrackletAlgorithm/HLSFullStubLayerPS.hh" 2
-#pragma empty_line
+#pragma line 5 "../TrackletAlgorithm/HLSFullStubLayerPS.hh" 2
 #pragma empty_line
 #pragma empty_line
 #pragma empty_line
@@ -41406,7 +41413,12 @@ public:
 };
 #pragma line 5 "../TrackletAlgorithm/VMRouterDispatcher.cpp" 2
 #pragma line 1 "../TrackletAlgorithm/VMRouter.hh" 1
-// VMRouter header file.
+// First attempt at the VMRouter module
+//
+// Assumptions:
+// Must be even-number layer
+// Must be PS-layer
+//
 #pragma empty_line
 #pragma empty_line
 #pragma empty_line
@@ -44719,10 +44731,12 @@ namespace std __attribute__ ((__visibility__ ("default")))
 #pragma empty_line
 } // namespace std
 #pragma line 70 "/nfs/opt/Xilinx/Vivado_HLS/2017.2/lnx64/tools/gcc/lib/gcc/x86_64-unknown-linux-gnu/4.6.3/../../../../include/c++/4.6.3/vector" 2 3
-#pragma line 7 "../TrackletAlgorithm/VMRouter.hh" 2
+#pragma line 12 "../TrackletAlgorithm/VMRouter.hh" 2
+#pragma empty_line
 #pragma empty_line
 using namespace std;
 #pragma empty_line
+template <int N>
 void VMRouter(HLSFullStubLayerPS *stubsInLayer,
               HLSFullStubLayerPS *allStubs,
               HLSReducedStubLayer *vmStubsPH1Z1,
@@ -44737,51 +44751,145 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
               ReducedIndex *nPH1Z1, ReducedIndex *nPH2Z1,
               ReducedIndex *nPH3Z1, ReducedIndex *nPH4Z1,
               ReducedIndex *nPH1Z2, ReducedIndex *nPH2Z2,
-              ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2);
+              ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
+{
+  ReducedIndex index = 0;
+#pragma empty_line
+  STUBLOOP: for (int i=0; i<MAX_nSTUBS; ++i)
+  {
+#pragma HLS PIPELINE II=1
+ if (i < nStubs)
+    {
+      // Extract stub parameters
+      const FullZ_Layer_PS curZ = stubsInLayer[i].GetZ();
+      const FullPhi_Layer_PS curPhi = stubsInLayer[i].GetPhi();
+      const FullR_Layer_PS curR = stubsInLayer[i].GetR();
+      const FullPt_Layer_PS curPt = stubsInLayer[i].GetPt();
+#pragma empty_line
+      // Rewrite stub parameters to new stub in allStubs
+      allStubs[i].AddStub(curZ,curPhi,curR,curPt);
+#pragma empty_line
+      // Calculate reduced-format parameters.
+      // (&ing with hex is to fix correct number if bit width is messed up.
+      //  will leave it in for now but it doesn't appear to be needed).
+      const ReducedZ_Layer redZ ( (curZ >> 5) & 0xFU);
+#pragma empty_line
+      ReducedPhi_Layer redPhi;
+      if (N==1 || N==3) {
+        redPhi = (curPhi >> 9) ^ 0x4U;
+      } else {
+        redPhi = (curPhi >> 9) & 0x7U;
+      }
+      const ReducedR_Layer redR( (curR >> 5) & 0x3U);
+      const ReducedPt_Layer redPt(curPt);
+#pragma empty_line
+      // Calculate routing parameters (only works for even layers for now)
+      ap_uint<2>routePhi;
+      if (N==1 || N==3) {
+        routePhi = (((curPhi >> 11) - 1) >> 1) & 0x3U;
+      } else {
+        routePhi = (curPhi >> 12 ) & 0x3U;
+      }
+      const ap_uint<1> routeZ((curZ>>9) & 0x1U);
+#pragma empty_line
+      // Route stubs
+      switch (routeZ)
+      {
+        case 0:
+          switch (routePhi)
+          {
+            case 0:
+              vmStubsPH1Z1[nPH1Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH1Z1);
+              break;
+            case 1:
+              vmStubsPH2Z1[nPH2Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH2Z1);
+              break;
+            case 2:
+              vmStubsPH3Z1[nPH3Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH3Z1);
+              break;
+            case 3:
+              vmStubsPH4Z1[nPH4Z1->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH4Z1);
+              break;
+          }
+          break;
+        case 1:
+          switch (routePhi)
+          {
+            case 0:
+             vmStubsPH1Z2[nPH1Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH1Z2);
+              break;
+            case 1:
+              vmStubsPH2Z2[nPH2Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH2Z2);
+              break;
+            case 2:
+              vmStubsPH3Z2[nPH3Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH3Z2);
+              break;
+            case 3:
+             vmStubsPH4Z2[nPH4Z2->to_int()].AddStub(redZ, redPhi, redR, redPt, index);
+              ++(*nPH4Z2);
+              break;
+          }
+          break;
+      }
+      if (index==63) { index--; };
+      ++index;
+    } else
+    {
+      break;
+    }
+  }
+}
 #pragma line 6 "../TrackletAlgorithm/VMRouterDispatcher.cpp" 2
 #pragma empty_line
 #pragma empty_line
 //using namespace std;
 #pragma empty_line
-void VMRouterDispatcher(HLSFullStubLayerPS curStubsInLayer[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSFullStubLayerPS curAllStubs[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH1Z1[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH2Z1[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH3Z1[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH4Z1[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH1Z2[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH2Z2[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH3Z2[MAX_nSTUBS*MAX_nROUTERS],
-                        HLSReducedStubLayer curvmStubsPH4Z2[MAX_nSTUBS*MAX_nROUTERS],
-                        int curnStubs[MAX_nROUTERS],
-                        ReducedIndex curnPH1Z1[MAX_nROUTERS],
-                        ReducedIndex curnPH2Z1[MAX_nROUTERS],
-                        ReducedIndex curnPH3Z1[MAX_nROUTERS],
-                        ReducedIndex curnPH4Z1[MAX_nROUTERS],
-                        ReducedIndex curnPH1Z2[MAX_nROUTERS],
-                        ReducedIndex curnPH2Z2[MAX_nROUTERS],
-                        ReducedIndex curnPH3Z2[MAX_nROUTERS],
-                        ReducedIndex curnPH4Z2[MAX_nROUTERS])
+void VMRouterDispatcher(HLSFullStubLayerPS curStubsInLayer[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSFullStubLayerPS curAllStubs[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH1Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH2Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH3Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH4Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH1Z2[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH2Z2[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH3Z2[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        HLSReducedStubLayer curvmStubsPH4Z2[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS],
+                        int curnStubs[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH1Z1[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH2Z1[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH3Z1[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH4Z1[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH1Z2[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH2Z2[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH3Z2[MAX_nSECTORS*MAX_nREGIONS],
+                        ReducedIndex curnPH4Z2[MAX_nSECTORS*MAX_nREGIONS])
 {
-#pragma HLS ARRAY_PARTITION variable=curStubsInLayer block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curStubsInLayer block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curStubsInLayer inter false
-#pragma HLS ARRAY_PARTITION variable=curAllStubs block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curAllStubs block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curAllStubs inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH1Z1 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH1Z1 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH1Z1 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH2Z1 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH2Z1 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH2Z1 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH3Z1 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH3Z1 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH3Z1 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH4Z1 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH4Z1 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH4Z1 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH1Z2 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH1Z2 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH1Z2 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH2Z2 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH2Z2 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH2Z2 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH3Z2 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH3Z2 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH3Z2 inter false
-#pragma HLS ARRAY_PARTITION variable=curvmStubsPH4Z2 block factor=MAX_nROUTERS
+#pragma HLS ARRAY_PARTITION variable=curvmStubsPH4Z2 block factor=MAX_nSECTORS*MAX_nREGIONS
 #pragma HLS DEPENDENCE variable=curvmStubsPH4Z2 inter false
 #pragma HLS ARRAY_PARTITION variable=curnStubs complete
 #pragma HLS ARRAY_PARTITION variable=curnPH1Z1 complete
@@ -44793,12 +44901,35 @@ void VMRouterDispatcher(HLSFullStubLayerPS curStubsInLayer[MAX_nSTUBS*MAX_nROUTE
 #pragma HLS ARRAY_PARTITION variable=curnPH3Z2 complete
 #pragma HLS ARRAY_PARTITION variable=curnPH4Z2 complete
 #pragma empty_line
- for (int i=0; i<MAX_nROUTERS; i++)
+ for (int j=0; j<MAX_nSECTORS; j++)
   {
 #pragma HLS UNROLL
- VMRouter(&curStubsInLayer[i*MAX_nSTUBS], &curAllStubs[i*MAX_nSTUBS],
-             &curvmStubsPH1Z1[i*MAX_nSTUBS], &curvmStubsPH2Z1[i*MAX_nSTUBS], &curvmStubsPH3Z1[i*MAX_nSTUBS], &curvmStubsPH4Z1[i*MAX_nSTUBS],
-             &curvmStubsPH1Z2[i*MAX_nSTUBS], &curvmStubsPH2Z2[i*MAX_nSTUBS], &curvmStubsPH3Z2[i*MAX_nSTUBS], &curvmStubsPH4Z2[i*MAX_nSTUBS],
-             curnStubs[i], &curnPH1Z1[i], &curnPH2Z1[i], &curnPH3Z1[i], &curnPH4Z1[i], &curnPH1Z2[i], &curnPH2Z2[i], &curnPH3Z2[i], &curnPH4Z2[i]);
+ VMRouter<1>(&curStubsInLayer[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS], &curAllStubs[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH1Z1[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH2Z1[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH3Z1[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH4Z1[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH1Z2[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH2Z2[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH3Z2[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH4Z2[j*MAX_nSTUBS+0*MAX_nSTUBS*MAX_nSECTORS],
+                curnStubs[j+0*MAX_nSECTORS],
+                &curnPH1Z1[j+0*MAX_nSECTORS], &curnPH2Z1[j+0*MAX_nSECTORS], &curnPH3Z1[j+0*MAX_nSECTORS], &curnPH4Z1[j+0*MAX_nSECTORS],
+                &curnPH1Z2[j+0*MAX_nSECTORS], &curnPH2Z2[j+0*MAX_nSECTORS], &curnPH3Z2[j+0*MAX_nSECTORS], &curnPH4Z2[j+0*MAX_nSECTORS]);
+#pragma empty_line
+    VMRouter<2>(&curStubsInLayer[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS], &curAllStubs[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH1Z1[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH2Z1[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH3Z1[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH4Z1[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH1Z2[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH2Z2[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH3Z2[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH4Z2[j*MAX_nSTUBS+1*MAX_nSTUBS*MAX_nSECTORS],
+                curnStubs[j+1*MAX_nSECTORS],
+                &curnPH1Z1[j+1*MAX_nSECTORS], &curnPH2Z1[j+1*MAX_nSECTORS], &curnPH3Z1[j+1*MAX_nSECTORS], &curnPH4Z1[j+1*MAX_nSECTORS],
+                &curnPH1Z2[j+1*MAX_nSECTORS], &curnPH2Z2[j+1*MAX_nSECTORS], &curnPH3Z2[j+1*MAX_nSECTORS], &curnPH4Z2[j+1*MAX_nSECTORS]);
+#pragma empty_line
+    VMRouter<3>(&curStubsInLayer[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS], &curAllStubs[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH1Z1[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH2Z1[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH3Z1[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH4Z1[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH1Z2[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH2Z2[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS],
+                &curvmStubsPH3Z2[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS], &curvmStubsPH4Z2[j*MAX_nSTUBS+2*MAX_nSTUBS*MAX_nSECTORS],
+                curnStubs[j+2*MAX_nSECTORS],
+                &curnPH1Z1[j+2*MAX_nSECTORS], &curnPH2Z1[j+2*MAX_nSECTORS], &curnPH3Z1[j+2*MAX_nSECTORS], &curnPH4Z1[j+2*MAX_nSECTORS],
+                &curnPH1Z2[j+2*MAX_nSECTORS], &curnPH2Z2[j+2*MAX_nSECTORS], &curnPH3Z2[j+2*MAX_nSECTORS], &curnPH4Z2[j+2*MAX_nSECTORS]);
+#pragma empty_line
   }
 }

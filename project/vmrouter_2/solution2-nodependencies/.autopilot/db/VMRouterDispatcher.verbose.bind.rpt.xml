@@ -1,7 +1,7 @@
 <profile>
 
 <section name = "Vivado HLS Report for 'VMRouterDispatcher'" level="0">
-<item name = "Date">Tue Sep 12 10:23:48 2017
+<item name = "Date">Mon Sep 18 17:38:55 2017
 </item>
 <item name = "Version">2017.2 (Build 1909853 on Thu Jun 15 18:55:24 MDT 2017)</item>
 <item name = "Project">vmrouter_2</item>
@@ -15,7 +15,7 @@
 <section name = "" level="1">
 <item name = "Summary"><table name="" hasTotal="0">
 <keys size="4">Clock, Target, Estimated, Uncertainty</keys>
-<column name="ap_clk">4.00, 3.31, 0.50</column>
+<column name="ap_clk">4.00, 3.42, 0.50</column>
 </table>
 </item>
 </section>
@@ -24,18 +24,22 @@
 <section name = "" level="1">
 <item name = "Summary"><table name="" hasTotal="0">
 <keys size="6">, min, max, min, max, Type</keys>
-<column name="">6, 69, 7, 70, none</column>
+<column name="">7, 70, 8, 71, none</column>
 </table>
 </item>
 <item name = "Detail">
 <section name = "" level="1">
 <item name = "Instance"><table name="" hasTotal="0">
 <keys size="7">Instance, Module, min, max, min, max, Type</keys>
-<column name="grp_VMRouter_fu_764">VMRouter, 5, 68, 5, 68, none</column>
-<column name="grp_VMRouter_fu_906">VMRouter, 5, 68, 5, 68, none</column>
-<column name="grp_VMRouter_fu_1048">VMRouter, 5, 68, 5, 68, none</column>
-<column name="grp_VMRouter_fu_1190">VMRouter, 5, 68, 5, 68, none</column>
-<column name="grp_VMRouter_fu_1332">VMRouter, 5, 68, 5, 68, none</column>
+<column name="grp_VMRouter_3_s_fu_1368">VMRouter_3_s, 6, 69, 6, 69, none</column>
+<column name="grp_VMRouter_3_s_fu_1590">VMRouter_3_s, 6, 69, 6, 69, none</column>
+<column name="grp_VMRouter_3_s_fu_1812">VMRouter_3_s, 6, 69, 6, 69, none</column>
+<column name="grp_VMRouter_2_s_fu_2034">VMRouter_2_s, 5, 68, 5, 68, none</column>
+<column name="grp_VMRouter_2_s_fu_2256">VMRouter_2_s, 5, 68, 5, 68, none</column>
+<column name="grp_VMRouter_2_s_fu_2478">VMRouter_2_s, 5, 68, 5, 68, none</column>
+<column name="grp_VMRouter_1_s_fu_2700">VMRouter_1_s, 6, 69, 6, 69, none</column>
+<column name="grp_VMRouter_1_s_fu_2850">VMRouter_1_s, 6, 69, 6, 69, none</column>
+<column name="grp_VMRouter_1_s_fu_3000">VMRouter_1_s, 6, 69, 6, 69, none</column>
 </table>
 </item>
 <item name = "Loop"><table name="" hasTotal="0">

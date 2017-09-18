@@ -5,5 +5,202 @@
 <option name="II" value="1"/>
 </pragma>
 </directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curStubsInLayer"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curStubsInLayer"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curAllStubs"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curAllStubs"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH1Z1"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH1Z1"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH2Z1"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH2Z1"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH3Z1"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH3Z1"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH4Z1"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH4Z1"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH1Z2"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH1Z2"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH2Z2"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH2Z2"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH3Z2"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH3Z2"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curvmStubsPH4Z2"/>
+<option name="block" positionalBoolean="type" value=""/>
+<option name="factor" value="MAX_nSECTORS*MAX_nREGIONS"/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="DEPENDENCE">
+<option name="variable" value="curvmStubsPH4Z2"/>
+<option name="inter" positionalBoolean="type" value=""/>
+<option name="false" positionalBoolean="dependent" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnStubs"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH1Z1"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH2Z1"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH3Z1"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH4Z1"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH1Z2"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH2Z2"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH3Z2"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="ARRAY_PARTITION">
+<option name="variable" positionalBoolean="4" value="curnPH4Z2"/>
+<option name="complete" positionalBoolean="type" value=""/>
+</pragma>
+</directive>
+<directive functionLabel="" functionName="VMRouterDispatcher" label="">
+<pragma name="UNROLL"/>
+</directive>
 </sourceFile>
 </AutoPilot:ProjectResources>

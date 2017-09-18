@@ -1,7 +1,7 @@
 // This is the HLSFullStubLayer class, which contains, in essence the 36 bits of a full stub, with few other functions
 //using namespace std;
-#include <cstdio>
 #pragma once
+#include <cstdio>
 #include "ap_int.h"
 #include "HLSConstants.hh"
 

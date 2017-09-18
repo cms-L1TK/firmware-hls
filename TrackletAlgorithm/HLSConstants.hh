@@ -2,10 +2,17 @@
 #pragma once
 #include "ap_int.h"
 
+using namespace std;
+
 // Define max number of stubs an individual module can take
 const int MAX_nSTUBS = 64;
-const int MAX_nROUTERS = 5;
+const int MAX_nSECTORS = 3;
+const int MAX_nREGIONS = 3;
 const int MAX_nEVENTS = 100;
+
+// Define list of detector regions to run algorithm over
+const string regionList[MAX_nREGIONS] = {"L1D3","L2D3","L3D3"};
+const int nroutes[MAX_nREGIONS] = {6,8,6};
 
 // Raw Stub Data
 typedef ap_uint<36> StubData;

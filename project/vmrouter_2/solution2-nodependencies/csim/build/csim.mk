@@ -19,7 +19,7 @@ __SIM_DDS__ = 1
 
 ObjDir = obj
 
-HLS_SOURCES = ../../../../../TestBenches/VMRouter_test.cpp ../../../../../TrackletAlgorithm/VMRouterDispatcher.cpp ../../../../../TrackletAlgorithm/VMRouter.cpp
+HLS_SOURCES = ../../../../../TestBenches/VMRouter_test.cpp ../../../../../TrackletAlgorithm/VMRouterDispatcher.cpp
 
 TARGET := csim.exe
 
@@ -79,9 +79,3 @@ $(ObjDir)/VMRouterDispatcher.o: ../../../../../TrackletAlgorithm/VMRouterDispatc
 	$(Verb)  $(CC) ${CCFLAG} -c -MMD  $(IFLAG) $(DFLAG) -DNDEBUG $< -o $@ ; \
 
 -include $(ObjDir)/VMRouterDispatcher.d
-
-$(ObjDir)/VMRouter.o: ../../../../../TrackletAlgorithm/VMRouter.cpp $(ObjDir)/.dir
-	$(Echo) "   Compiling ../../../../../TrackletAlgorithm/VMRouter.cpp in $(BuildMode) mode" $(AVE_DIR_DLOG)
-	$(Verb)  $(CC) ${CCFLAG} -c -MMD  $(IFLAG) $(DFLAG) -DNDEBUG $< -o $@ ; \
-
--include $(ObjDir)/VMRouter.d
