@@ -6,16 +6,18 @@
 //
 #pragma once
 #include "HLSFullStubLayerPS.hh"
+#include "HLSFullStubLayer2S.hh"
 #include "HLSConstants.hh"
 #include "ap_int.h"
 #include <vector>
 #include <stdio.h>
+#include <bitset>
 
 using namespace std;
 
-template <int N>
-void VMRouter(HLSFullStubLayerPS *stubsInLayer,
-              HLSFullStubLayerPS *allStubs,
+template <class T, int N>
+void VMRouter(T *stubsInLayer,
+              T *allStubs,
               HLSReducedStubLayer *vmStubsPH1Z1,
               HLSReducedStubLayer *vmStubsPH2Z1,
               HLSReducedStubLayer *vmStubsPH3Z1,
@@ -31,43 +33,61 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
               ReducedIndex *nPH3Z2, ReducedIndex *nPH4Z2)
 {
   ReducedIndex index = 0;
-
   STUBLOOP: for (int i=0; i<MAX_nSTUBS; ++i)
   {
   #pragma HLS PIPELINE II=1
     if (i < nStubs)
     {
       // Extract stub parameters
-      const FullZ_Layer_PS curZ = stubsInLayer[i].GetZ();
-      const FullPhi_Layer_PS curPhi = stubsInLayer[i].GetPhi();
-      const FullR_Layer_PS curR = stubsInLayer[i].GetR();
-      const FullPt_Layer_PS curPt = stubsInLayer[i].GetPt();
-
-      // Rewrite stub parameters to new stub in allStubs
-      allStubs[i].AddStub(curZ,curPhi,curR,curPt);
-
       // Calculate reduced-format parameters.
       // (&ing with hex is to fix correct number if bit width is messed up.
       //  will leave it in for now but it doesn't appear to be needed).
-      const ReducedZ_Layer redZ ( (curZ >> 5) & 0xFU);
-
+      // Calculate routing parameters
+      ReducedZ_Layer redZ;
       ReducedPhi_Layer redPhi;
-      if (N==1 || N==3) {
-        redPhi = (curPhi >> 9) ^ 0x4U;
-      } else {
-        redPhi = (curPhi >> 9) & 0x7U;
+      ReducedR_Layer redR;
+      ReducedPt_Layer redPt;
+      ap_uint<2> routePhi;
+      ap_uint<1> routeZ;
+      if (N==1 || N==2 || N==3)
+      {
+        FullZ_Layer_PS curZ = stubsInLayer[i].GetZ();
+        FullPhi_Layer_PS curPhi = stubsInLayer[i].GetPhi();
+        FullR_Layer_PS curR = stubsInLayer[i].GetR();
+        FullPt_Layer_PS curPt = stubsInLayer[i].GetPt();
+        redPt = curPt;
+        redZ = (curZ >> 5) & 0xFU;
+        redR = (curR >> 5) & 0x3U;
+        routeZ = (curZ >> 9) & 0x1U;
+        if (N==2){
+          redPhi = (curPhi >> 9) & 0x7U;
+          routePhi = (curPhi >> 12 ) & 0x3U;
+        } else {
+          redPhi = (curPhi >> 9) ^ 0x4U;
+          routePhi = (((curPhi >> 11) - 1) >> 1) & 0x3U;
+        }
       }
-      const ReducedR_Layer redR( (curR >> 5) & 0x3U);
-      const ReducedPt_Layer redPt(curPt);
+      else if (N==4 || N==5 || N==6)
+      {
+        FullZ_Layer_2S curZ = stubsInLayer[i].GetZ();
+        FullPhi_Layer_2S curPhi = stubsInLayer[i].GetPhi();
+        FullR_Layer_2S curR = stubsInLayer[i].GetR();
+        FullPt_Layer_2S curPt = stubsInLayer[i].GetPt();
+        redPt = curPt;
+        redZ = (curZ >> 1) & 0xFU;
+        redR = (curR >> 6) & 0x3U;
+        routeZ = (curZ >> 5) & 0x1U;
+        if (N==5){
+          redPhi = (curPhi >> 12) ^ 0x4U;
+          routePhi = (((curPhi >> 14) - 1) >> 1) & 0x3U;
+        } else {
+          redPhi = (curPhi >> 12) & 0x7U;
+          routePhi = (curPhi >> 15 ) & 0x3U;
+        }
+      }
 
-      // Calculate routing parameters (only works for even layers for now)
-      ap_uint<2>routePhi;
-      if (N==1 || N==3) {
-        routePhi = (((curPhi >> 11) - 1) >> 1) & 0x3U;
-      } else {
-        routePhi = (curPhi >> 12 ) & 0x3U;
-      }
-      const ap_uint<1> routeZ((curZ>>9) & 0x1U);
+      // Rewrite stub parameters to new stub in allStubs
+      allStubs[i].AddStub(stubsInLayer[i].raw());
 
       // Route stubs
       switch (routeZ)
@@ -123,3 +143,7 @@ void VMRouter(HLSFullStubLayerPS *stubsInLayer,
     }
   }
 }
+
+
+
+

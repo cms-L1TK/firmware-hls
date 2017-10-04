@@ -1,6 +1,7 @@
 // VMRouter test bench
 #include "HLSConstants.hh"
 #include "HLSFullStubLayerPS.hh"
+#include "HLSFullStubLayer2S.hh"
 #include "HLSReducedStubLayer.hh"
 #include "VMRouterDispatcher.hh"
 #include "ap_int.h"
@@ -76,8 +77,10 @@ void PrintRouted(HLSReducedStubLayer vmStubsPHXZX[MAX_nSTUBS*MAX_nSECTORS*MAX_nE
 int main()
 {
   // ****** DECLARE ALL ARRAY VARIABLES ******
-  HLSFullStubLayerPS stubsInLayer[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
-  HLSFullStubLayerPS allStubs[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
+  HLSFullStubLayerPS stubsInLayerPS[MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS*MAX_nEVENTS];
+  HLSFullStubLayerPS allStubsPS[MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS*MAX_nEVENTS];
+  HLSFullStubLayer2S stubsInLayer2S[MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS*MAX_nEVENTS];
+  HLSFullStubLayer2S allStubs2S[MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS*MAX_nEVENTS];
   HLSReducedStubLayer vmStubsPH1Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
   HLSReducedStubLayer vmStubsPH2Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
   HLSReducedStubLayer vmStubsPH3Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
@@ -87,8 +90,10 @@ int main()
   HLSReducedStubLayer vmStubsPH3Z2[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
   HLSReducedStubLayer vmStubsPH4Z2[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
 
-  HLSFullStubLayerPS curStubsInLayer[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS];
-  HLSFullStubLayerPS curAllStubs[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS];
+  HLSFullStubLayerPS curStubsInLayerPS[MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS];
+  HLSFullStubLayerPS curAllStubsPS[MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS];
+  HLSFullStubLayer2S curStubsInLayer2S[MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS];
+  HLSFullStubLayer2S curAllStubs2S[MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS];
   HLSReducedStubLayer curvmStubsPH1Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS];
   HLSReducedStubLayer curvmStubsPH2Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS];
   HLSReducedStubLayer curvmStubsPH3Z1[MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS];
@@ -138,15 +143,15 @@ int main()
   }
   int nStubs[MAX_nSECTORS*MAX_nREGIONS*MAX_nEVENTS];
 
-  FullZ_Layer_PS inZ;
-  FullPhi_Layer_PS inPhi;
-  FullR_Layer_PS inR;
-  FullPt_Layer_PS inPt;
+  FullZ_Layer_PS inZ_PS;
+  FullPhi_Layer_PS inPhi_PS;
+  FullR_Layer_PS inR_PS;
+  FullPt_Layer_PS inPt_PS;
 
-  FullZ_Layer_PS allZ;
-  FullPhi_Layer_PS allPhi;
-  FullR_Layer_PS allR;
-  FullPt_Layer_PS allPt;
+  FullZ_Layer_2S inZ_2S;
+  FullPhi_Layer_2S inPhi_2S;
+  FullR_Layer_2S inR_2S;
+  FullPt_Layer_2S inPt_2S;
 
 
 
@@ -186,19 +191,24 @@ int main()
           nStubs[j + i*MAX_nSECTORS + curEvent*MAX_nSECTORS*MAX_nREGIONS] = curStub;
           curStub = 0;
           curEvent ++;
+          if (curEvent >= MAX_nEVENTS){ break; };
           getline(fin,token);
         }
         else
         {
           getline(fin,token,'|');
-          inPt.set_VAL(strtol(token.c_str(),NULL,2));
+          if (i<3) { inPt_PS.set_VAL(strtol(token.c_str(),NULL,2)); } else { inPt_2S.set_VAL(strtol(token.c_str(),NULL,2)); };
           getline(fin,token,'|');
-          inR.set_VAL(strtol(token.c_str(),NULL,2));
+          if (i<3) { inR_PS.set_VAL(strtol(token.c_str(),NULL,2)); } else { inR_2S.set_VAL(strtol(token.c_str(),NULL,2)); };
           getline(fin,token,'|');
-          inZ.set_VAL(strtol(token.c_str(),NULL,2));
+          if (i<3) { inZ_PS.set_VAL(strtol(token.c_str(),NULL,2)); } else { inZ_2S.set_VAL(strtol(token.c_str(),NULL,2)); };
           getline(fin,token,'\n');
-          inPhi.set_VAL(strtol(token.c_str(),NULL,2));
-          stubsInLayer[curStub + j*MAX_nSTUBS + i*MAX_nSTUBS*MAX_nSECTORS + curEvent*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS].AddStub(inZ, inPhi, inR, inPt);
+          if (i<3) { inPhi_PS.set_VAL(strtol(token.c_str(),NULL,2)); } else { inPhi_2S.set_VAL(strtol(token.c_str(),NULL,2)); };
+          if (i<3) {
+            stubsInLayerPS[curStub + j*MAX_nSTUBS + i*MAX_nSTUBS*MAX_nSECTORS + curEvent*MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS].AddStub(inZ_PS, inPhi_PS, inR_PS, inPt_PS);
+          } else {
+            stubsInLayer2S[curStub + j*MAX_nSTUBS + (i-3)*MAX_nSTUBS*MAX_nSECTORS + curEvent*MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS].AddStub(inZ_2S, inPhi_2S, inR_2S, inPt_2S);
+          }
           curStub++;
         }
       }
@@ -208,20 +218,24 @@ int main()
 
 
 
+
   // ****** LOOP OVER ALL EVENTS, SENDING EACH EVENT TO VMROUTERDISPATCHER ******
   int curnStubs[MAX_nSECTORS*MAX_nREGIONS];
   for (int i=0; i<MAX_nEVENTS; i++)
   {
-    copy(stubsInLayer + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS, stubsInLayer + (i+1)*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS, curStubsInLayer);
+    copy(stubsInLayerPS + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS, stubsInLayerPS + (i+1)*MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS, curStubsInLayerPS);
+    copy(stubsInLayer2S + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS, stubsInLayer2S + (i+1)*MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS, curStubsInLayer2S);
     for (int j=0; j<MAX_nSECTORS*MAX_nREGIONS; j++)
     {
       curnStubs[j] = nStubs[j + i*MAX_nSECTORS*MAX_nREGIONS];
     }
-    VMRouterDispatcher(curStubsInLayer, curAllStubs, curvmStubsPH1Z1, curvmStubsPH2Z1, curvmStubsPH3Z1,
+
+    VMRouterDispatcher(curStubsInLayerPS, curAllStubsPS, curStubsInLayer2S, curAllStubs2S, curvmStubsPH1Z1, curvmStubsPH2Z1, curvmStubsPH3Z1,
                        curvmStubsPH4Z1, curvmStubsPH1Z2, curvmStubsPH2Z2, curvmStubsPH3Z2, curvmStubsPH4Z2,
                        curnStubs, curnPH1Z1, curnPH2Z1, curnPH3Z1, curnPH4Z1, curnPH1Z2, curnPH2Z2, curnPH3Z2, curnPH4Z2);
 
-    copy(curAllStubs, curAllStubs + MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS, allStubs + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS);
+    copy(curAllStubsPS, curAllStubsPS + MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS, allStubsPS + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nINNERRS);
+    copy(curAllStubs2S, curAllStubs2S + MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS, allStubs2S + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nOUTERRS);
     copy(curvmStubsPH1Z1, curvmStubsPH1Z1 + MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS, vmStubsPH1Z1 + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS);
     copy(curvmStubsPH2Z1, curvmStubsPH2Z1 + MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS, vmStubsPH2Z1 + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS);
     copy(curvmStubsPH3Z1, curvmStubsPH3Z1 + MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS, vmStubsPH3Z1 + i*MAX_nSTUBS*MAX_nSECTORS*MAX_nREGIONS);
@@ -289,7 +303,7 @@ int main()
   }
   return allPass;
 
-
+//return 0;
 }
 
 
