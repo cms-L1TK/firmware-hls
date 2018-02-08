@@ -4,6 +4,8 @@
 *~
 *.str
 *.dat
+#*#
+.#*
 
 *.DS_Store
 *._.DS_Store
