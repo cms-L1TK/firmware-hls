@@ -13,6 +13,16 @@ void TwoToOne(
 	      )
 {
 
-  return;
+	for(int i = 0; i < n_in1; i++){
+
+		const GenericData avg = 0;
+		*avg = (*in1[i] + *in2[i])/2;
+
+		*out[i] = *avg;
+
+	}
+
+	return;
 }
+
 	     

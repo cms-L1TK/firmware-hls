@@ -13,8 +13,19 @@ void OneToThree(
 	      int & n_out2, // number of second output
 	      int & n_out3  // number of third input
 	      )
+//notes: * = deference pointer: value pointed to by
+//		 & = address of pointer: address of
 {
+	for(int i = 0; i < n_in; i++){
 
-  return;
+		*out1[i] = 4 * *input[i];
+		n_out1 += 1;
+		*out2[i] = 2 * *input[i];
+		n_out2 += 1;
+		*n_out3 = 3 * *input[i];
+		n_out3 += 1;
+
+	}
+
+	return;
 }
-	     
