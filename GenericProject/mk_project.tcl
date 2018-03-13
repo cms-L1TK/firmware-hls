@@ -1,7 +1,7 @@
 # generate project, run with vivado_hls -f <filename>
 # warning, this will wipe out the original project by the same name
 
-set part "xc7vx690tffg1927-2"
+#set part "xc7vx690tffg1927-2"
 #set part "xcku115-flvb2104-1-i"
 
 set clockperiod 4
