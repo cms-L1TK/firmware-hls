@@ -16,13 +16,16 @@ void OneToThree(
 //notes: * = deference pointer: value pointed to by
 //		 & = address of pointer: address of
 {
+	n_out1 = 0;
+	n_out2 = 0;
+	n_out3 = 0;
 	for(int i = 0; i < n_in; i++){
 
-		*out1[i] = 4 * *input[i];
+		out1[i] = 4 * input[i];
 		n_out1 += 1;
-		*out2[i] = 2 * *input[i];
+		out2[i] = 2 * input[i];
 		n_out2 += 1;
-		*n_out3 = 3 * *input[i];
+		out3[i] = 3 * input[i];
 		n_out3 += 1;
 
 	}

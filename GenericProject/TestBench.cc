@@ -10,7 +10,7 @@
 // reads data from input file named fname into
 // arrays, with n_in entries
 void get_data(const char* fname, int & n_in,
-	      GenericData & input[MAX_SIZE] );
+	      GenericData  input[MAX_SIZE] );
 
 
 // this function needs to be written. Return 0 on success,
