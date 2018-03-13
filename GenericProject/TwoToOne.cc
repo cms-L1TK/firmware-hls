@@ -1,4 +1,6 @@
-// a generic module going one to two
+// a generic module going two to one
+
+#include <algorithm>
 
 #include "Constants.hh"
 
@@ -12,15 +14,15 @@ void TwoToOne(
 	      int & n_out // number of output 
 	      )
 {
+	int cnt = std::min(n_in1, n_in2);
 
-	for(int i = 0; i < n_in1; i++){
+//#pragma HLS pipeline II=1
+	LOOP_2_1: for(int i = 0; i < MAX_SIZE; ++i){
+		if ( i == cnt) break;
 
-		const GenericData avg = (in1[i] + in2[i])/2;
-
-		out[i] = avg;
-
+		out[i] = (in1[i] + in2[i])/2;
 	}
-	n_out = n_in1;
+	n_out = cnt;
 
 	return;
 }

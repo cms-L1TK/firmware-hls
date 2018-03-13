@@ -26,7 +26,7 @@ int get_data(const char* fname, int & n_in,
 	while ( infile ) {
 		int val ;
 		infile >> val;
-		std::cout << "val is " << val << std::endl;
+		//std::cout << "val is " << val << std::endl;
 		input[n_in] = val;
 		++n_in;
 		if ( n_in == MAX_SIZE) {
@@ -82,13 +82,27 @@ int main(int argc, char **argv, char **envp)
   GenericData exp_output1[MAX_SIZE]; int nexp_out1;
   GenericData exp_output2[MAX_SIZE]; int nexp_out2;
 
-  get_data("expected_output1.dat", nexp_out1, exp_output1);
-  get_data("expected_output2.dat", nexp_out2, exp_output2);
+  get_data("../../../../expected_output1.dat", nexp_out1, exp_output1);
+  get_data("../../../../expected_output2.dat", nexp_out2, exp_output2);
 
   int c1  = compare_output(nexp_out1, exp_output1,
 			   nout1, output1);
   int c2  = compare_output(nexp_out2, exp_output2,
 			   nout2, output2);
+
+  // dump output 1
+  std::cout << "Output 1:" << std::endl;
+  for ( int i = 0; i < nout1; ++i ) {
+	  std::cout << output1[i] << std::endl;
+
+  }
+
+  // dump output 2
+  std::cout << "Output 2:" << std::endl;
+  for ( int i = 0; i < nout1; ++i ) {
+	  std::cout << output2[i] << std::endl;
+
+  }
 
   // close and return
   return c1+c2;

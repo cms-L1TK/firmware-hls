@@ -1,4 +1,4 @@
-// a generic module going one to two
+// a generic module going one to three
 
 #include "Constants.hh"
 
@@ -16,10 +16,13 @@ void OneToThree(
 //notes: * = deference pointer: value pointed to by
 //		 & = address of pointer: address of
 {
+//#pragma HLS pipeline II=1
 	n_out1 = 0;
 	n_out2 = 0;
 	n_out3 = 0;
-	for(int i = 0; i < n_in; i++){
+	LOOP_3_1: for(int i = 0; i < MAX_SIZE; ++i){
+
+		if ( i == n_in) break;
 
 		out1[i] = 4 * input[i];
 		n_out1 += 1;
