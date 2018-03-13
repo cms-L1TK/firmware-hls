@@ -4,11 +4,11 @@
 
 
 void OneToThree(
-	      const GenericData *input, // input
+	      const GenericData input[MAX_SIZE], // input
 	      const int n_in, // number of input data 
-	      GenericData *out1,  // first output
-	      GenericData *out2,  // second output
-	      GenericData *out3,   // third output
+	      GenericData out1[MAX_SIZE],  // first output
+	      GenericData out2[MAX_SIZE],  // second output
+	      GenericData out3[MAX_SIZE],   // third output
 	      int & n_out1, // number of first output
 	      int & n_out2, // number of second output
 	      int & n_out3  // number of third input

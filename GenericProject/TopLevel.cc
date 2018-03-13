@@ -28,4 +28,6 @@ int TopLevel(int n_in1, GenericData input1[MAX_SIZE],
 
   TwoToOne(f1, f2, n_f1, n_f2, out1, n_out1); // final output 1
   TwoToOne(d5, d6, n_d5, n_d6, out2, n_out2); // final output 2
+
+  return 0;
 }
