@@ -1,12 +1,14 @@
 # generate project, run with vivado_hls -f <filename>
 # warning, this will wipe out the original project by the same name
 
-set part "xc7vx690tffg1927-2"
+#set part "xc7vx690tffg1927-2"
+#set part "xcku115-flvb2104-1-i"
+
 set clockperiod 4
 
 # better to delete to remove stale csim output
-delete_project GenericProject
-open_project -reset GenericProject
+delete_project GenProj
+open_project -reset GenProj
 set_top TopLevel
 
 # source files
