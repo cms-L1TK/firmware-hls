@@ -8,7 +8,6 @@ int TopLevel(int n_in1, GenericData input1[MAX_SIZE],
 	     int & n_out2, GenericData out2[MAX_SIZE]
 	     )
 {
-#pragma HLS dataflow
   GenericData d1[MAX_SIZE]; int n_d1;
   GenericData d2[MAX_SIZE]; int n_d2;
   GenericData d3[MAX_SIZE]; int n_d3;

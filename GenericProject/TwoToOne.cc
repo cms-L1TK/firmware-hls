@@ -16,11 +16,14 @@ void TwoToOne(
 {
 	int cnt = std::min(n_in1, n_in2);
 
-//#pragma HLS pipeline II=1
 	LOOP_2_1: for(int i = 0; i < MAX_SIZE; ++i){
-		if ( i == cnt) break;
-
-		out[i] = (in1[i] + in2[i])/2;
+		// alternative: BREAK out of loop. This means shorter latency
+		// possible, but variable latency.
+		if ( i < cnt ) {
+			out[i] = (in1[i] + in2[i])/2;
+		}
+		else
+			out[i] = 0;
 	}
 	n_out = cnt;
 
