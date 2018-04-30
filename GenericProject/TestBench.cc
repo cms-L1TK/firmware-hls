@@ -50,8 +50,11 @@ int compare_output(int d1, GenericData data1[MAX_SIZE],
 	else {
 		ret = 0;
 		for ( int i = 0; i < d2; ++i ) {
-			if ( data1[i] != data2[i])
+			if ( data1[i] != data2[i]) {
+				std::cerr << "Line " << i << ": MISMATCH: "
+						  << data1[i] << " <-> " << data2[i] << std::endl;
 				++ret;
+			}
 		}
 	}
 	return ret;
@@ -89,6 +92,14 @@ int main(int argc, char **argv, char **envp)
 			   nout1, output1);
   int c2  = compare_output(nexp_out2, exp_output2,
 			   nout2, output2);
+  if ( c1 ) {
+	  std::cerr << "test of output one failed, return value " << c1
+			    << std::endl;
+  }
+  if ( c2 ) {
+	  std::cerr << "test of output two failed, return value " << c2
+			    << std::endl;
+  }
 
   // dump output 1
   std::cout << "Output 1:" << std::endl;
@@ -105,6 +116,7 @@ int main(int argc, char **argv, char **envp)
   }
 
   // close and return
+  std::cerr << "Exiting with return value " << (c1+c2) << std::endl;
   return c1+c2;
 
 }
