@@ -291,11 +291,6 @@ int main()
   {
     for (int j=0; j<MAX_nSECTORS; j++)
     {
-<<<<<<< HEAD
-      sprintf(curCommand,"diff  -cb emData/VMStubs_VMS_%s%sn1_03.dat VMStubs_VMS_%s%sn1_03_new.dat", regionList[i].c_str(), routeList[j].c_str(), regionList[i].c_str(), routeList[j].c_str());
-      if (system(curCommand)) {
-    	  allPass += i*8+j+1;
-=======
       for (int k=0; k<nroutes[i]; k++)
       {
         sprintf(curCommand,"diff  -s emData/VMStubs_VMS_%s%sn1_%02d.dat VMStubs_VMS_%s%sn1_%02d_new.dat", regionList[i].c_str(), routeList[k].c_str(), sectorList[j], regionList[i].c_str(), routeList[k].c_str(), sectorList[j]);
@@ -303,7 +298,6 @@ int main()
         {
     	  allPass = i*8+j;
         }
->>>>>>> separateArrays
       }
     }
   }
