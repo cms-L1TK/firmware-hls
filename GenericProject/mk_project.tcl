@@ -40,6 +40,7 @@ csynth_design
 open_solution "solution2"
 
 set_directive_dataflow TopLevel
+config_dataflow -depth 64
 
 set_part  $part 
 create_clock -period $clockperiod -name default
@@ -71,6 +72,21 @@ csynth_design
 # create_clock -period $clockperiod -name default
 # csim_design -O
 # csynth_design
+#
+#
+############################################################
+# solution 5
+open_solution "solution5"
+
+#set_directive_pipeline TopLevel
+set_directive_pipeline OneToThree
+set_directive_pipeline TwoToOne
+
+set_part  $part 
+create_clock -period $clockperiod -name default
+csim_design -O
+csynth_design
+
 
 
 #cosim_design
