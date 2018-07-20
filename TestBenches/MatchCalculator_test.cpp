@@ -1,5 +1,7 @@
 // MatchCalculator test bench
 #include "HLSCandidateMatch.hh"
+#include "HLSAllStubs.hh"
+#include "HLSProjection.hh"
 #include "MatchCalculator.hh"
 #include <iostream>
 #include <fstream>
@@ -13,12 +15,15 @@ int main()
 {
   
 	// declare all arrays
+	HLSCandidateMatch inData[nevents][MAX_nCM];
+    HLSAllStubs       inStub[nevents][MAX_nSTUB];
+    HLSProjection     inProj[nevents][MAX_nPROJ];
 
-	HLSCandidateMatch inData1[nevents-1][MAX_nCM-1];
+    // initialize
 	for (int i = 0; i < nevents; i++){
-		for (int j = 0; j < MAX_nCM; j++){
-			inData1[i][j] = HLSCandidateMatch();
-		}
+		for (int j = 0; j < MAX_nCM; j++)   inData[i][j] = HLSCandidateMatch();
+		for (int j = 0; j < MAX_nSTUB; j++) inStub[i][j] = HLSAllStubs();
+		for (int j = 0; j < MAX_nPROJ; j++) inProj[i][j] = HLSProjection();
 	}
 
 	CM_proj_index in_p_index;
@@ -30,16 +35,17 @@ int main()
 	int cur_CM = 0;
 
 	// read in files
-	ifstream fin;
+	ifstream fin_CM;
 	string token;
 	string str_p_index;
 	string str_s_index;
-    fin.open("emData_MC/test_CM.dat");
-    if (!fin){
+    fin_CM.open("emData_MC/test_CM.dat");
+    if (!fin_CM){
     	std::cerr << "ERROR opening file" << std::endl;
     	return -1; // abort test
     }
-    while (getline(fin,token)){
+    while (getline(fin_CM,token)){
+
         if (cur_CM < MAX_nCM){
             // read in lines
 			std::cout << "Reading in file" << std::endl;
@@ -54,23 +60,30 @@ int main()
 			in_s_index = CM_stub_index(str_s_index.c_str(),2);
 
 			// make the CM
-			inData1[0][cur_CM].AddCM(in_p_index,in_s_index);
+			inData[0][cur_CM].AddCM(in_p_index,in_s_index);
 
-			// increment counter of CMs
-			//cur_CM++;
         }
-        else{
+        else{ // cur_CM >= MAX_nCM
         	std::cout << "Hit max number of CMs allowed" << std::endl;
         	break;
         }
+
+        //increment counter of CMs
         cur_CM++;
     }
-    fin.close();
+    fin_CM.close();
+
+    // hack to get a stub and projection in more quickly
+    ap_uint<nBITS_STUB> stub = 0xA81E3ACE0UL;
+    ap_uint<nBITS_PROJ> proj = 0xA06B7E1F807010UL;
+
+    inStub[0][0].AddStub(stub);
+	inProj[0][0].AddProj(proj);
 
 	// loop over events
 	for (int i = 0; i < nevents; i++){
 		// run the MatchCalculator
-		MatchCalculator( inData1[i], cur_CM );
+		MatchCalculator( inData[i], cur_CM, inStub[i], inProj[i] );
 	}
 
 	// must return 0 otherwise vivado_hls will think it crashed
