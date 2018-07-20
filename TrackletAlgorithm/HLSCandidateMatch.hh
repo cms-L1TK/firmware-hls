@@ -28,12 +28,14 @@ private:
 public:
    // constructors
    HLSCandidateMatch(CandidateMatch newdata):
-     data_(newdata)
+	   data_(newdata)
    {
    }
    HLSCandidateMatch():
-     data_(0)
+	   data_(0)
    {
+	   p_index = 0;
+	   s_index = 0;
    }  
    HLSCandidateMatch(const CM_proj_index new_p_index,
                      const CM_stub_index new_s_index)
@@ -62,7 +64,7 @@ public:
      // setup full CM by concatenating p_index and s_index
      // data_ is the or of p_index (shifted by size of s_index) and s_index
      // need "to_long" otherwise data will truncate at its current size
-     data_   = (new_p_index.to_long() << nBITS_INDEX) | new_s_index;
+     data_   = ((new_p_index.to_long() << (nBITS_INDEX-1)) | new_s_index) & ((1<<(2*nBITS_INDEX))-1);
    }
    
    // return values
@@ -70,13 +72,14 @@ public:
    {
      // get projection index by shifting data to remove stub index
      // then doing and of 1<<NBITS to ensure only picking up the NBITS of interest
-     CM_proj_index p = (data_ >> nBITS_INDEX)&(1<<nBITS_INDEX+1); 
+     //CM_proj_index p = (data_ >> (nBITS_INDEX-1));
+     CM_proj_index p = ((data_ >> (nBITS_INDEX-1)) & ((1<<nBITS_INDEX)-1));
      return p; 
    }
    CM_stub_index GetSIndex() const
    { 
      // get stub index by doing and of 1<<NBITS to ensure only picking up the NBITS of interest
-     CM_proj_index s = (data_&(1<<nBITS_INDEX+1));
+     CM_proj_index s = (data_ & ((1<<nBITS_INDEX-1)-1));
      return s;
    }
 

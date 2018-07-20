@@ -9,7 +9,7 @@
 #include "ap_int.h"
 
 void MatchCalculator(
-    HLSCandidateMatch * CM_PHI1_PHI1[MAX_nCM],
+    HLSCandidateMatch CM_PHI1_PHI1[MAX_nCM],
     const int n_CM_PHI1_PHI1
     //HLSCandidateMatch * CM_PHI1_PHI2,
     //HLSCandidateMatch * CM_PHI1_PHI3,
@@ -27,12 +27,9 @@ void MatchCalculator(
      if (i < n_CM_PHI1_PHI1) // up to the number that are coming in
      {
 
-       std::cout << " i : " << i << std::endl;
-  	   std::cout << "Data: " << hex << CM_PHI1_PHI1[i]->raw() << std::endl;
-
        // extract the CM parameters
-       const CM_proj_index p_index = CM_PHI1_PHI1[i]->GetPIndex();
-       const CM_stub_index s_index = CM_PHI1_PHI1[i]->GetSIndex();
+       const CM_proj_index p_index = CM_PHI1_PHI1[i].GetPIndex();
+       const CM_stub_index s_index = CM_PHI1_PHI1[i].GetSIndex();
        
        std::cout << "Proj index = " << p_index << std::endl;
        std::cout << "Stub index = " << s_index << std::endl;

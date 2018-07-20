@@ -12,7 +12,7 @@ using namespace std;
 
 //template< int S, int N >
 void MatchCalculator(
-    HLSCandidateMatch * CM_PHI1_PHI1[MAX_nCM],
+    HLSCandidateMatch CM_PHI1_PHI1[MAX_nCM],
     const int n_CM_PHI1_PHI1
     //HLSCandidateMatch * CM_PHI1_PHI2,
     //HLSCandidateMatch * CM_PHI1_PHI3,
