@@ -2,6 +2,7 @@
 #include "HLSCandidateMatch.hh"
 #include "HLSAllStubs.hh"
 #include "HLSProjection.hh"
+#include "HLSFullMatch.hh"
 #include "MatchCalculator.hh"
 #include <iostream>
 #include <fstream>
@@ -16,14 +17,24 @@ int main()
   
 	// declare all arrays
 	HLSCandidateMatch inData[nevents][MAX_nCM];
+	HLSCandidateMatch inPHI2[nevents][MAX_nCM];
+	HLSCandidateMatch inPHI3[nevents][MAX_nCM];
+	HLSCandidateMatch inPHI4[nevents][MAX_nCM];
     HLSAllStubs       inStub[nevents][MAX_nSTUB];
     HLSProjection     inProj[nevents][MAX_nPROJ];
+    HLSFullMatch	  outMatch[nevents][MAX_nFM];
+    int nMatches[nevents];
+
 
     // initialize
 	for (int i = 0; i < nevents; i++){
-		for (int j = 0; j < MAX_nCM; j++)   inData[i][j] = HLSCandidateMatch();
-		for (int j = 0; j < MAX_nSTUB; j++) inStub[i][j] = HLSAllStubs();
-		for (int j = 0; j < MAX_nPROJ; j++) inProj[i][j] = HLSProjection();
+		for (int j = 0; j < MAX_nCM;   j++) inData[i][j]   = HLSCandidateMatch();
+		for (int j = 0; j < MAX_nCM;   j++) inPHI2[i][j]   = HLSCandidateMatch();
+		for (int j = 0; j < MAX_nCM;   j++) inPHI3[i][j]   = HLSCandidateMatch();
+		for (int j = 0; j < MAX_nCM;   j++) inPHI4[i][j]   = HLSCandidateMatch();
+		for (int j = 0; j < MAX_nSTUB; j++) inStub[i][j]   = HLSAllStubs();
+		for (int j = 0; j < MAX_nPROJ; j++) inProj[i][j]   = HLSProjection();
+		for (int j = 0; j < MAX_nFM;   j++) outMatch[i][j] = HLSFullMatch();
 	}
 
 	CM_proj_index in_p_index;
@@ -76,6 +87,9 @@ int main()
     // hack to get a stub and projection in more quickly
     ap_uint<nBITS_STUB> stub = 0xA81E3ACE0UL;
     ap_uint<nBITS_PROJ> proj = 0xA06B7E1F807010UL;
+    int num2 = 0;
+    int num3 = 0;
+    int num4 = 0;
 
     inStub[0][0].AddStub(stub);
 	inProj[0][0].AddProj(proj);
@@ -83,7 +97,12 @@ int main()
 	// loop over events
 	for (int i = 0; i < nevents; i++){
 		// run the MatchCalculator
-		MatchCalculator( inData[i], cur_CM, inStub[i], inProj[i] );
+		// MatchCalculator (SEED, LAYER, CM1, CM2, CM3, CM4, nCM1, nCM2, nCM3, nCM4, AS, PROJ, FM out, nFM out)
+		MatchCalculator( 0, 2,
+				        inData[i], inPHI2[i], inPHI3[i], inPHI4[i],
+				        cur_CM, num2, num3, num4,
+						inStub[i], inProj[i] , outMatch[i], nMatches[i]
+					   );
 	}
 
 	// must return 0 otherwise vivado_hls will think it crashed
