@@ -19,10 +19,10 @@ const int nBITS_BEND  = 3;
 typedef ap_uint<nBITS_STUB> AllStub;
 
 // Define bit width for all stub memories
-typedef ap_uint<nBITS_R>		AS_r;
-typedef ap_uint<nBITS_Z>		AS_z;
-typedef ap_uint<nBITS_PHI>		AS_phi;
-typedef ap_uint<nBITS_BEND> 	AS_bend;
+typedef ap_int<nBITS_R>			AS_r;         // signed
+typedef ap_int<nBITS_Z>			AS_z;         // signed
+typedef ap_uint<nBITS_PHI>		AS_phi;       // unsigned
+typedef ap_uint<nBITS_BEND> 	AS_bend;      // unsigned
 
 class HLSAllStubs
 {

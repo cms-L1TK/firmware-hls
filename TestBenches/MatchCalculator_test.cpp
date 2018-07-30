@@ -85,14 +85,18 @@ int main()
     fin_CM.close();
 
     // hack to get a stub and projection in more quickly
-    ap_uint<nBITS_STUB> stub = 0xA81E3ACE0UL;
-    ap_uint<nBITS_PROJ> proj = 0xA06B7E1F807010UL;
+    ap_uint<nBITS_STUB> stub  = 0xA81E3ACE0UL;
+    ap_uint<nBITS_PROJ> proj1 = 0xA06B7E1F807010UL;
+    ap_uint<nBITS_PROJ> proj2 = 0x2A06B781F006C0EUL;
+    ap_uint<nBITS_PROJ> proj3 = 0x2A0EB6E1080701AUL;
     int num2 = 0;
     int num3 = 0;
     int num4 = 0;
 
     inStub[0][0].AddStub(stub);
-	inProj[0][0].AddProj(proj);
+	inProj[0][0].AddProj(proj1);
+	inProj[0][1].AddProj(proj2);
+	inProj[0][2].AddProj(proj3);
 
 	// loop over events
 	for (int i = 0; i < nevents; i++){

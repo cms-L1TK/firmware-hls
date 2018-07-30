@@ -100,6 +100,15 @@ const int matchcut_z[6][7] = {
 		{cut_z_L1L2_L6, cut_z_L3L4_L6, -1,            -1,            -1,            -1, -1}
 };
 
+//template< int layer >
+//void SetupShifts(int & fact, int & phi0_shift, int & phi_corr_shift, int & z_corr_shift)
+//{
+//	// Setup the r and z correction shifts
+//	fact           = (layer < 3)? fact_L123           : fact_L456;
+//	phi0_shift     = (layer < 3)? phi0_shift_L123     : phi0_shift_L456;
+//	phi_corr_shift = (layer < 3)? phi_corr_shift_L123 : phi_corr_shift_L456;
+//	z_corr_shift   = (layer < 3)? z_corr_shift_L123   : z_corr_shift_L456;
+//}
 
 void MatchCalculator(
 	const int seed,
@@ -117,3 +126,12 @@ void MatchCalculator(
 	HLSFullMatch FM_PHI1[MAX_nFM],
 	int n_FM_PHI1
     );
+
+template< int width >
+ap_uint<width> iabs( ap_int<width> value )
+{
+	ap_uint<width> absval;
+	if (value < 0) absval = -value;
+	else           absval = value;
+	return absval;
+}

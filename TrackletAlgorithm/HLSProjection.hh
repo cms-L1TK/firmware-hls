@@ -17,12 +17,12 @@ const int nBITS_PROJ_ZD   = 10; // bits for z derivative
 typedef ap_uint<nBITS_PROJ> Projection;
 
 // define bit width for projection variables
-typedef ap_uint<nBITS_PROJ_TCID> PROJ_TCID;
-typedef ap_uint<nBITS_PROJ_NUM>  PROJ_TCNUM;
-typedef ap_uint<nBITS_PROJ_PHI>  PROJ_PHI;
-typedef ap_uint<nBITS_PROJ_Z>    PROJ_Z;
-typedef ap_uint<nBITS_PROJ_PHID> PROJ_PHID;
-typedef ap_uint<nBITS_PROJ_ZD>   PROJ_ZD;
+typedef ap_uint<nBITS_PROJ_TCID> PROJ_TCID;		// unsigned
+typedef ap_uint<nBITS_PROJ_NUM>  PROJ_TCNUM;	// unsigned
+typedef ap_uint<nBITS_PROJ_PHI>  PROJ_PHI;		// unsigned
+typedef ap_int<nBITS_PROJ_Z>     PROJ_Z;		// signed
+typedef ap_uint<nBITS_PROJ_PHID> PROJ_PHID;		// signed
+typedef ap_uint<nBITS_PROJ_ZD>   PROJ_ZD;		// signed
 
 class HLSProjection
 {
