@@ -100,16 +100,6 @@ const int matchcut_z[6][7] = {
 		{cut_z_L1L2_L6, cut_z_L3L4_L6, -1,            -1,            -1,            -1, -1}
 };
 
-//template< int layer >
-//void SetupShifts(int & fact, int & phi0_shift, int & phi_corr_shift, int & z_corr_shift)
-//{
-//	// Setup the r and z correction shifts
-//	fact           = (layer < 3)? fact_L123           : fact_L456;
-//	phi0_shift     = (layer < 3)? phi0_shift_L123     : phi0_shift_L456;
-//	phi_corr_shift = (layer < 3)? phi_corr_shift_L123 : phi_corr_shift_L456;
-//	z_corr_shift   = (layer < 3)? z_corr_shift_L123   : z_corr_shift_L456;
-//}
-
 void MatchCalculator(
 	const int seed,
 	const int layer,
@@ -117,14 +107,14 @@ void MatchCalculator(
 	HLSCandidateMatch CM_PHI1_PHI2[MAX_nCM],
 	HLSCandidateMatch CM_PHI1_PHI3[MAX_nCM],
 	HLSCandidateMatch CM_PHI1_PHI4[MAX_nCM],
-    const int n_CM_PHI1_PHI1,
-	const int n_CM_PHI1_PHI2,
-	const int n_CM_PHI1_PHI3,
-	const int n_CM_PHI1_PHI4,
-	HLSAllStubs AS_PHI1[MAX_nSTUB],
-	HLSProjection Proj_PHI1[MAX_nPROJ],
-	HLSFullMatch FM_PHI1[MAX_nFM],
-	int n_FM_PHI1
+    const ap_uint<7>  n_CM_PHI1_PHI1,
+	const ap_uint<7>  n_CM_PHI1_PHI2,
+	const ap_uint<7>  n_CM_PHI1_PHI3,
+	const ap_uint<7>  n_CM_PHI1_PHI4,
+	HLSAllStubs       AS_PHI1[MAX_nSTUB],
+	HLSProjection     Proj_PHI1[MAX_nPROJ],
+	HLSFullMatch      FM_PHI1[MAX_nFM],
+	ap_uint<7>        n_FM_PHI1
     );
 
 template< int width >
@@ -134,4 +124,22 @@ ap_uint<width> iabs( ap_int<width> value )
 	if (value < 0) absval = -value;
 	else           absval = value;
 	return absval;
+}
+
+
+template< int layer >
+void setup_shifts(int & fact, int & phi0_shift, int & phi_corr_shift, int & z_corr_shift)
+{
+	// Setup the r and z correction shifts
+	fact           = (layer < 3)? fact_L123           : fact_L456;
+	phi0_shift     = (layer < 3)? phi0_shift_L123     : phi0_shift_L456;
+    phi_corr_shift = (layer < 3)? phi_corr_shift_L123 : phi_corr_shift_L456;
+	z_corr_shift   = (layer < 3)? z_corr_shift_L123   : z_corr_shift_L456;
+}
+
+template< int seed, int layer >
+void setup_cuts(ap_int<17> & phicut, ap_int<13> & zcut)
+{
+	phicut = matchcut_phi[layer][seed];
+	zcut   = matchcut_z[layer][seed];
 }

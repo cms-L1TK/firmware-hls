@@ -21,8 +21,8 @@ typedef ap_uint<nBITS_PROJ_TCID> PROJ_TCID;		// unsigned
 typedef ap_uint<nBITS_PROJ_NUM>  PROJ_TCNUM;	// unsigned
 typedef ap_uint<nBITS_PROJ_PHI>  PROJ_PHI;		// unsigned
 typedef ap_int<nBITS_PROJ_Z>     PROJ_Z;		// signed
-typedef ap_uint<nBITS_PROJ_PHID> PROJ_PHID;		// signed
-typedef ap_uint<nBITS_PROJ_ZD>   PROJ_ZD;		// signed
+typedef ap_int<nBITS_PROJ_PHID>  PROJ_PHID;		// signed
+typedef ap_int<nBITS_PROJ_ZD>    PROJ_ZD;		// signed
 
 class HLSProjection
 {

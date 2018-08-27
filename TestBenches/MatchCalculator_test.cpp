@@ -16,14 +16,14 @@ int main()
 {
   
 	// declare all arrays
-	HLSCandidateMatch inData[nevents][MAX_nCM];
-	HLSCandidateMatch inPHI2[nevents][MAX_nCM];
-	HLSCandidateMatch inPHI3[nevents][MAX_nCM];
-	HLSCandidateMatch inPHI4[nevents][MAX_nCM];
-    HLSAllStubs       inStub[nevents][MAX_nSTUB];
-    HLSProjection     inProj[nevents][MAX_nPROJ];
-    HLSFullMatch	  outMatch[nevents][MAX_nFM];
-    int nMatches[nevents];
+	HLSCandidateMatch inData[nevents][MAX_nCM];   // input CM
+	HLSCandidateMatch inPHI2[nevents][MAX_nCM];   // input CM
+	HLSCandidateMatch inPHI3[nevents][MAX_nCM];   // input CM
+	HLSCandidateMatch inPHI4[nevents][MAX_nCM];   // input CM
+    HLSAllStubs       inStub[nevents][MAX_nSTUB]; // input stubs
+    HLSProjection     inProj[nevents][MAX_nPROJ]; // input projections
+    HLSFullMatch	  outMatch[nevents][MAX_nFM]; // output FMs
+    ap_int<7>         nMatches[nevents];          // output num of FMs (7b allow for up to 64)
 
 
     // initialize
@@ -40,10 +40,9 @@ int main()
 	CM_proj_index in_p_index;
 	CM_stub_index in_s_index;
 
-	// total number CM in
-	int num_CM = 3;
+
 	// counter for which CM in the event is being read in
-	int cur_CM = 0;
+	ap_uint<7> cur_CM = 0;
 
 	// read in files
 	ifstream fin_CM;
@@ -89,9 +88,9 @@ int main()
     ap_uint<nBITS_PROJ> proj1 = 0xA06B7E1F807010UL;
     ap_uint<nBITS_PROJ> proj2 = 0x2A06B781F006C0EUL;
     ap_uint<nBITS_PROJ> proj3 = 0x2A0EB6E1080701AUL;
-    int num2 = 0;
-    int num3 = 0;
-    int num4 = 0;
+    ap_uint<7> num2 = 0;
+    ap_uint<7> num3 = 0;
+    ap_uint<7> num4 = 0;
 
     inStub[0][0].AddStub(stub);
 	inProj[0][0].AddProj(proj1);
@@ -109,6 +108,42 @@ int main()
 					   );
 	}
 
+	// setup hw and sw outputs for comparison
+	ap_uint<nBITS_FM> hw_result[nevents][MAX_nFM];
+	for (int i = 0; i < nevents; i++){
+		for (int j = 0; j < nMatches[i]; j++){
+			hw_result[i][j] = outMatch[i][j].raw();
+		}
+	}
+
+	// hardcode the output expected
+	ap_uint<nBITS_FM> sw_result[nevents][MAX_nFM];
+	sw_result[0][0] = 16384;
+	sw_result[0][1] = 1073766403;
+
+	// check output between hw and sw
+	int err_cnt = 0;
+	FILE * fp; // file to store results
+	fp = fopen("results.dat","w");
+	printf("Testing DUT results");
+	for (int i = 0; i < nevents; i++){
+		for (int j = 0; j < nMatches[i]; j++){
+			// FIXME: can't print ap_ints directly. is there a better way to do the comparison w/o using to_long?
+			fprintf(fp,"%d %d \n",hw_result[i][j].to_long(),sw_result[i][j].to_long());
+			if (hw_result[i][j] != sw_result[i][j]){
+				err_cnt++; // increase error counter if they don't match
+				printf("\n!!! ERROR at Event %d and FM %d -- expected %d , observed %d !!!\n",
+						i, j, sw_result[i][j].to_long(), hw_result[i][j].to_long());
+			}
+		}
+	}
+	fclose(fp);
+	printf("\n");
+
+	// print final status message
+	if (err_cnt) printf("!!! TEST FAILED : %d errors detected !!!\n",err_cnt);
+	else         printf("*** Test Passed ***\n");
+
 	// must return 0 otherwise vivado_hls will think it crashed
-	return 0;
+	return err_cnt;
 }

@@ -1,9 +1,13 @@
 // First attempt at the MatchCalculator module
 // 
 // Assumptions:
+//   Only working for LAYER 3 (this affects the bit size of various parameters)
 //
-//
-//
+// FIXME :
+//   * Allow for other layers / disk calculations
+//   * counters for CMs in and FMs out should be shortened (right now 32b ints)
+//   * Setup the constants at compile instead of during running
+
 #include "HLSCandidateMatch.hh"
 #include "HLSAllStubs.hh"
 #include "HLSProjection.hh"
@@ -12,20 +16,20 @@
 #include "ap_int.h"
 
 void MatchCalculator(
-	const int seed,
-	const int layer,
-    HLSCandidateMatch CM_PHI1_PHI1[MAX_nCM],
-	HLSCandidateMatch CM_PHI1_PHI2[MAX_nCM],
-	HLSCandidateMatch CM_PHI1_PHI3[MAX_nCM],
-	HLSCandidateMatch CM_PHI1_PHI4[MAX_nCM],
-    const int n_CM_PHI1_PHI1,
-	const int n_CM_PHI1_PHI2,
-	const int n_CM_PHI1_PHI3,
-	const int n_CM_PHI1_PHI4,
-	HLSAllStubs   AS_PHI1[MAX_nSTUB],
-	HLSProjection Proj_PHI1[MAX_nPROJ],
-	HLSFullMatch  FM_PHI1[MAX_nFM],
-	int n_FM_PHI1
+	const int seed,                            // make parameter ?
+	const int layer,                           // make parameter ?
+    HLSCandidateMatch CM_PHI1_PHI1[MAX_nCM],   // input
+	HLSCandidateMatch CM_PHI1_PHI2[MAX_nCM],   // input
+	HLSCandidateMatch CM_PHI1_PHI3[MAX_nCM],   // input
+	HLSCandidateMatch CM_PHI1_PHI4[MAX_nCM],   // input
+    const ap_uint<7> n_CM_PHI1_PHI1,           // input
+	const ap_uint<7> n_CM_PHI1_PHI2,           // input
+	const ap_uint<7> n_CM_PHI1_PHI3,           // input
+	const ap_uint<7> n_CM_PHI1_PHI4,           // input
+	HLSAllStubs   AS_PHI1[MAX_nSTUB],          // input
+	HLSProjection Proj_PHI1[MAX_nPROJ],        // input
+	HLSFullMatch  FM_PHI1[MAX_nFM],            // output
+	ap_uint<7> n_FM_PHI1                       // output (7b allows for up to 64 FMs)
 ){
 
 	// tmp_CM setup by the priority encoder
@@ -35,27 +39,26 @@ void MatchCalculator(
     bool newtracklet = true;
 
 	// Current FM counter -- used to write out n_FM made
-	int curr_FM = 0;
+	ap_uint<7> curr_FM = 0;
 
 	// Total number of CMs
-	int start1 = 0;
-	int start2 = n_CM_PHI1_PHI1;
-	int start3 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
-	int start4 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3;
-	int n_CM   = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
+	ap_uint<7> start1 = 0;
+	ap_uint<7> start2 = n_CM_PHI1_PHI1;
+	ap_uint<7> start3 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
+	ap_uint<7> start4 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3;
+	ap_uint<7> n_CM   = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
 
-	//int fact = 0;
-	//int phi0_shift = 0;
-	//int phi_corr_shift = 0;
-	//int z_corr_shift = 0;
-	//SetupShifts<layer>(fact,phi0_shift,phi_corr_shift,z_corr_shift);
+	// Setup the phi and z correction shifts
+	int fact = 0;
+	int phi0_shift = 0;
+	int phi_corr_shift = 0;
+	int z_corr_shift = 0;
+	setup_shifts<2>(fact,phi0_shift,phi_corr_shift,z_corr_shift);
 
-	// Setup the r and z correction shifts
-	int fact           = (layer < 3)? fact_L123           : fact_L456;
-	int phi0_shift     = (layer < 3)? phi0_shift_L123     : phi0_shift_L456;
-	int phi_corr_shift = (layer < 3)? phi_corr_shift_L123 : phi_corr_shift_L456;
-	int z_corr_shift   = (layer < 3)? z_corr_shift_L123   : z_corr_shift_L456;
-
+	//int fact           = (layer < 3)? fact_L123           : fact_L456;
+	//int phi0_shift     = (layer < 3)? phi0_shift_L123     : phi0_shift_L456;
+	//int phi_corr_shift = (layer < 3)? phi_corr_shift_L123 : phi_corr_shift_L456;
+	//int z_corr_shift   = (layer < 3)? z_corr_shift_L123   : z_corr_shift_L456;
 
 	//----- Priority encoder for deciding which CM to use
     //
@@ -69,7 +72,7 @@ void MatchCalculator(
 		if (i < n_CM) // up to the number that are coming in
 		{
 
-			int which_CM  = 0;
+			ap_uint<3> which_CM  = 0;
 			if (start1 <= i < start2)      which_CM = 1;
 			else if (start2 <= i < start3) which_CM = 2;
 			else if (start3 <= i < start4) which_CM = 3;
@@ -92,6 +95,9 @@ void MatchCalculator(
 					break;
 				case (4):
 					tmp_CM[i] = CM_PHI1_PHI4[i-start4];
+					break;
+				default:
+					tmp_CM[i] = HLSCandidateMatch();
 					break;
 			}// end case
 
@@ -178,7 +184,11 @@ void MatchCalculator(
 			//----- Apply cuts
 
 			bool pass_match = false;
+			// For all matches (not just best) :
 			//if (abs_delta_phi <= matchcut_phi[layer][seed] && abs_delta_z <= matchcut_z[layer][seed]) pass_match = true;
+
+			// FIXME : Cuts are negative if the seed & layer combination is not allowed -- so should not be used
+			//         but here they are set unsigned, so if they are called, cuts are set at 1 (instead of -1).
 			ap_uint<13> best_delta_z   = matchcut_z[layer][seed];
 			ap_uint<17> best_delta_phi = matchcut_phi[layer][seed];
 
@@ -203,11 +213,11 @@ void MatchCalculator(
 				fm_s_index = s_index;
 				fm_phi     = delta_phi;
 				fm_z       = delta_z;
-                std::cout << "FM residuals (phi,z): " << fm_phi << " " << fm_z << std::endl;
 
 				FM_PHI1[curr_FM].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z);
 				curr_FM++;
 				std::cout << "Full Match out : " << FM_PHI1[curr_FM-1].raw() << std::endl;
+				std::cout << "Parameters     : " << FM_PHI1[curr_FM-1].GetPIndex() << " " << FM_PHI1[curr_FM-1].GetSIndex() << " " << FM_PHI1[curr_FM-1].GetPhi() << " " << FM_PHI1[curr_FM-1].GetZ() << std::endl;
 			}
 
 		}// end if (i < n_CM_PHI1_PHI1)
