@@ -16,7 +16,7 @@ int main()
 {
   
 	// declare all arrays
-	HLSCandidateMatch inData[nevents][MAX_nCM];   // input CM
+	HLSCandidateMatch inPHI1[nevents][MAX_nCM];   // input CM
 	HLSCandidateMatch inPHI2[nevents][MAX_nCM];   // input CM
 	HLSCandidateMatch inPHI3[nevents][MAX_nCM];   // input CM
 	HLSCandidateMatch inPHI4[nevents][MAX_nCM];   // input CM
@@ -28,7 +28,7 @@ int main()
 
     // initialize
 	for (int i = 0; i < nevents; i++){
-		for (int j = 0; j < MAX_nCM;   j++) inData[i][j]   = HLSCandidateMatch();
+		for (int j = 0; j < MAX_nCM;   j++) inPHI1[i][j]   = HLSCandidateMatch();
 		for (int j = 0; j < MAX_nCM;   j++) inPHI2[i][j]   = HLSCandidateMatch();
 		for (int j = 0; j < MAX_nCM;   j++) inPHI3[i][j]   = HLSCandidateMatch();
 		for (int j = 0; j < MAX_nCM;   j++) inPHI4[i][j]   = HLSCandidateMatch();
@@ -70,7 +70,7 @@ int main()
 			in_s_index = CM_stub_index(str_s_index.c_str(),2);
 
 			// make the CM
-			inData[0][cur_CM].AddCM(in_p_index,in_s_index);
+			inPHI1[0][cur_CM].AddCM(in_p_index,in_s_index);
 
         }
         else{ // cur_CM >= MAX_nCM
@@ -88,10 +88,11 @@ int main()
     ap_uint<nBITS_PROJ> proj1 = 0xA06B7E1F807010UL;
     ap_uint<nBITS_PROJ> proj2 = 0x2A06B781F006C0EUL;
     ap_uint<nBITS_PROJ> proj3 = 0x2A0EB6E1080701AUL;
-    ap_uint<7> num2 = 0;
+    ap_uint<7> num2 = 1;
     ap_uint<7> num3 = 0;
     ap_uint<7> num4 = 0;
 
+    inPHI2[0][0].AddCM(0,0);
     inStub[0][0].AddStub(stub);
 	inProj[0][0].AddProj(proj1);
 	inProj[0][1].AddProj(proj2);
@@ -102,7 +103,7 @@ int main()
 		// run the MatchCalculator
 		// MatchCalculator (SEED, LAYER, CM1, CM2, CM3, CM4, nCM1, nCM2, nCM3, nCM4, AS, PROJ, FM out, nFM out)
 		MatchCalculator( 0, 2,
-				        inData[i], inPHI2[i], inPHI3[i], inPHI4[i],
+				        inPHI1[i], inPHI2[i], inPHI3[i], inPHI4[i],
 				        cur_CM, num2, num3, num4,
 						inStub[i], inProj[i] , outMatch[i], nMatches[i]
 					   );
