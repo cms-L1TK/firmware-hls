@@ -3,7 +3,7 @@
 #pragma once
 #include "ap_int.h"
 
-const int MAX_nFM = 5;  // max number of FMs that can be processed
+const int MAX_nFM = 36;  // max number of FMs that can be processed
 
 const int nBITS_FM     = 40;
 const int nBITS_FM_PID = 10; // 3b SEEDING + 7b INDEX

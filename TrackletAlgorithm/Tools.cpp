@@ -286,16 +286,18 @@ void basicmerger(
 
 
 void merger(
-		HLSCandidateMatch in1,  // input data1
-		ap_uint<7> n1,          // number in input1
-		ap_uint<7> & subindex1, // read addr1
-		HLSCandidateMatch in2,  // input data2
-		ap_uint<7> n2,          // number in input2
-		ap_uint<7> & subindex2, // read addr2
-		HLSCandidateMatch & out,  // output data
-		ap_uint<7> & nout       // number output
+		HLSCandidateMatch in1,   // input data1
+		ap_uint<7> n1,           // number in input1
+		ap_uint<7> & subindex1,  // read addr1
+		HLSCandidateMatch in2,   // input data2
+		ap_uint<7> n2,           // number in input2
+		ap_uint<7> & subindex2,  // read addr2
+		HLSCandidateMatch & out, // output data
+		ap_uint<7> & nout        // number output
 	)
 {
+
+	//#pragma HLS INLINE
 
     HLSCandidateMatch a = in1;           // full data word from input 1
     HLSCandidateMatch b = in2;           // full data word from input 2
@@ -341,5 +343,160 @@ void merger(
 			out = HLSCandidateMatch();
 			break;
 	}
+};
+
+void stream_merger_v2(
+	hls::stream< ap_uint<12> > &in1, // input stream 1
+	hls::stream< ap_uint<12> > &in2, // input stream 2
+	bool & read1,
+	bool & read2,
+	ap_uint<7> n1,                      // number of inputs in 1
+	ap_uint<7> n2,                      // number of inputs in 2
+	ap_uint<7> & subindex1,				// index of input 1
+	ap_uint<7> & subindex2,				// index of input 2
+	hls::stream< ap_uint<nBITS> > &out,  // merged output stream
+	bool finallayer
+	)
+{
+
+	ap_uint<7> n = n1 + n2;
+
+	ap_uint<12> a = 0;
+	ap_uint<12> b = 0;
+	if (read1 && !in1.empty()){ std::cout << "Reading in 1" << std::endl; in1.read(a); }
+	if (read2 && !in2.empty()){ std::cout << "Reading in 2" << std::endl; in2.read(b); }
+	ap_uint<6> inA = a.range(11,6);
+	ap_uint<6> inB = b.range(11,6);
+
+	std::cout << "Data in : " << a << " " << inA << " , " << b << " " << inB << std::endl;
+
+	// setup states in FSM
+	ap_uint<3> state = 0;
+	if (subindex1 >= n1 && subindex2 >= n2) state = 0; // BOTH DONE
+	else if (subindex1 >= n1)               state = 1; // 1 DONE
+	else if (subindex2 >= n2)               state = 2; // 2 DONE
+	else if (inA <= inB)                    state = 3; // 1 SMALLER
+	else if (inA > inB)                     state = 4; // 2 SMALLER
+	else                                    state = 0; // CATCHALL
+
+	if (state==0) std::cout << "State: " << state << " = Nothing to do " << std::endl;
+	if (state==1) std::cout << "State: " << state << " = in1 is done " << std::endl;
+	if (state==2) std::cout << "State: " << state << " = in2 is done " << std::endl;
+	if (state==3) std::cout << "State: " << state << " = in1 is smaller " << std::endl;
+	if (state==4) std::cout << "State: " << state << " = in2 is smaller " << std::endl;
+
+	// case statements
+	switch(state)
+	{
+	default:
+		//out << 0;
+		read1 = false;
+		read2 = false;
+		break;
+	case (0): // catchall
+		//out << 0;
+		read1 = false;
+		read2 = false;
+		break;
+	case (1): // 1 is done
+		out << b;
+		read1 = false;
+		read2 = true;
+		subindex2++;
+		break;
+	case (2): // 2 is done
+		out << a;
+		read1 = true;
+		read2 = false;
+		subindex1++;
+		break;
+	case (3): // 1 is smaller
+		out << a;
+		read1 = true;
+		read2 = false;
+		subindex1++;
+		break;
+	case (4): // 2 is smaller
+		out << b;
+		read1 = false;
+		read2 = true;
+		subindex2++;
+		break;
+	}
+
+	if (!out.empty()) std::cout << "Output: " << out.read() << std::endl;
+	else              std::cout << "Output: EMPTY" << std::endl;
+
+};
+
+
+
+void stream_merger(
+    hls::stream< ap_uint<nBITS> > &in1, // input stream 1
+    hls::stream< ap_uint<nBITS> > &in2, // input stream 2
+    int n1,                             // number of inputs in 1
+    int n2,                             // number of inputs in 2
+	//ap_uint<7> & subindex1,             // read number 1
+	//ap_uint<7> & subindex2,				// read number 2
+    hls::stream< ap_uint<nBITS> > &out  // merged output stream
+    )
+{
+
+    ap_uint<7> n = n1 + n2;   // total number of inputs
+    ap_uint<12> a = 0;     // full data word from input 1
+    ap_uint<12> b = 0;     // full data word from input 2
+    ap_uint<6> inA = 0;     // part of input 1 word for comparison
+    ap_uint<6> inB = 0;     // part of input 2 word for comparison
+    ap_uint<7> subindex1 = 1; // counter for the reading of input 1
+    ap_uint<7> subindex2 = 1; // counter for the reading of input 2
+
+    // read inputs
+    if (!in1.empty()) in1.read(a);
+    if (!in2.empty()) in2.read(b);
+
+    // loop up to number of inputs in
+    for (int i = 0; i < n; i++)
+    {
+
+    	inA = a.range(11,6);
+    	inB = b.range(11,6);
+
+        if (subindex1 > n1 && subindex2 > n2) // if read out everything
+        {
+        	out << 0;
+        }
+        else if (subindex1 > n1) // if read out all of in1, only read in2
+        {
+			out << b;
+			if (!in2.empty()) in2.read(b);
+			subindex2++;
+        }
+        else if (subindex2 > n2) // if read out all of in2, only read in1
+        {
+			out << a;
+			if (!in1.empty()) in1.read(a);
+			subindex1++;
+        }
+        // if data in both in1 and in2, read smaller data first
+        else if (inA <= inB) // a is smaller
+        {
+			out << a;
+			if (!in1.empty()) in1.read(a);
+			subindex1++;
+        }
+        else if (inB <= inA)// b is smaller
+        {
+			out << b;
+			if (!in2.empty()) in2.read(b);
+			subindex2++;
+        }
+        else // catchall
+        {
+        	out << 0;
+        }
+
+        std::cout << "OUT: " << out.read() << " " << out.empty() << std::endl;
+    }
+
 };
 

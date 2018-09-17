@@ -22,8 +22,8 @@ int main()
 	HLSCandidateMatch inPHI4[nevents][MAX_nCM];   // input CM
     HLSAllStubs       inStub[nevents][MAX_nSTUB]; // input stubs
     HLSProjection     inProj[nevents][MAX_nPROJ]; // input projections
-    HLSFullMatch	  outMatch[nevents][MAX_nFM]; // output FMs
-    ap_int<7>         nMatches[nevents];          // output num of FMs (7b allow for up to 64)
+    HLSFullMatch      outMatch[nevents][MAX_nFM]; // output FMs
+    ap_uint<7>        nMatches[nevents];          // output num of FMs (7b allow for up to 64)
 
 
     // initialize

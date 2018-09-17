@@ -46,8 +46,9 @@ void MatchCalculator(
 	ap_uint<7> start3 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
 	ap_uint<7> start4 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3;
 	ap_uint<7> n_CM   = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
-	//ap_uint<7> n_CM_1_2 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
-	//ap_uint<7> n_CM_3_4 = n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
+
+	ap_uint<7> n_CM_12 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
+	ap_uint<7> n_CM_34 = n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
 
 	// Setup the phi and z correction shifts
 	int fact = 0;
@@ -56,9 +57,58 @@ void MatchCalculator(
 	int z_corr_shift = 0;
 	setup_shifts<2>(fact,phi0_shift,phi_corr_shift,z_corr_shift);
 
+	//----- Merge and sort the incoming CMs
+    //
+	// Functionally working, but not pipelined
+	// Use counters to setup the read indexing
+
+	// Set up addressing and output memories for the merged memories
+	ap_uint<7> addr_CM_PHI1_PHI1 = 0;
+	ap_uint<7> addr_CM_PHI1_PHI2 = 0;
+	ap_uint<7> addr_CM_PHI1_PHI3 = 0;
+	ap_uint<7> addr_CM_PHI1_PHI4 = 0;
+	ap_uint<7> addr_CM_merge1    = 0;
+	ap_uint<7> addr_CM_merge2    = 0;
+	static HLSCandidateMatch tmp_merge1[MAX_nCM];
+	static HLSCandidateMatch tmp_merge2[MAX_nCM];
+	static HLSCandidateMatch tmp_CM[MAX_nCM];
+	static ap_uint<7> n_tmp_merge1      = 0;
+	static ap_uint<7> n_tmp_merge2      = 0;
+	static ap_uint<7> n_tmp_CM          = 0;
+
+	SORT_L1: for (int i = 0; i < MAX_nFM; ++i)
+	{
+		if (n_tmp_CM < n_CM){
+			// merge PHI1 and PHI2
+			merger( CM_PHI1_PHI1[addr_CM_PHI1_PHI1], n_CM_PHI1_PHI1, addr_CM_PHI1_PHI1,
+					CM_PHI1_PHI2[addr_CM_PHI1_PHI2], n_CM_PHI1_PHI2, addr_CM_PHI1_PHI2,
+					tmp_merge1[i], n_tmp_merge1);
+
+			// merge PHI3 and PHI4
+			merger( CM_PHI1_PHI3[addr_CM_PHI1_PHI3], n_CM_PHI1_PHI3, addr_CM_PHI1_PHI3,
+					CM_PHI1_PHI4[addr_CM_PHI1_PHI4], n_CM_PHI1_PHI4, addr_CM_PHI1_PHI4,
+					tmp_merge2[i], n_tmp_merge2);
+		}
+		else break;
+	}
+	SORT_L2: for (int i = 0; i < MAX_nFM; ++i)
+	{
+		if (i < n_CM){
+			// merge streams from above
+			merger( tmp_merge1[addr_CM_merge1], n_CM_12, addr_CM_merge1,
+					tmp_merge2[addr_CM_merge1], n_CM_34, addr_CM_merge2,
+					tmp_CM[i],n_tmp_CM);
+			std::cout << "OUTPUT: " << tmp_CM[i].raw() << std::endl;
+		}
+		else break;
+	}
+
+
 	/*
-	 * Sort closest to original firmware implementation (not yet working)
-	 *
+	//----- Merge and sort the incoming CMs
+	// Sort closest to original firmware implementation (not yet working)
+	//
+
 	ap_uint<7> addr_CM_PHI1_PHI1 = 0;
 	ap_uint<7> addr_CM_PHI1_PHI2 = 0;
 	ap_uint<7> addr_CM_PHI1_PHI3 = 0;
@@ -76,7 +126,6 @@ void MatchCalculator(
 	bool valid_tmp_CM = false;
 	for (int i = 0; i < MAX_nFM; ++i)
 	{
-
 
 		std::cout << "---------- i = " << i << std::endl;
 
@@ -103,80 +152,40 @@ void MatchCalculator(
 	}
 	*/
 
-
-	// Set up addressing and output memories for the merged memories
-	ap_uint<7> addr_CM_PHI1_PHI1 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI2 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI3 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI4 = 0;
-	ap_uint<7> addr_CM_merge1    = 0;
-	ap_uint<7> addr_CM_merge2    = 0;
-	static HLSCandidateMatch tmp_merge1;
-	static HLSCandidateMatch tmp_merge2;
-	//HLSCandidateMatch tmp_CM;
-	//HLSCandidateMatch tmp_merge1[MAX_nFM];
-	//HLSCandidateMatch tmp_merge2[MAX_nFM];
-	static HLSCandidateMatch tmp_CM[MAX_nCM];
-	//static HLSCandidateMatch tmp_CM;
-	static ap_uint<7> n_tmp_merge1      = 0;
-	static ap_uint<7> n_tmp_merge2      = 0;
-	static ap_uint<7> n_tmp_CM          = 0;
-
-	//----- Merge and sort the incoming CMs
-	// closest to working but doesn't like dataflow pragma
-	//
-	SORT: for (int i = 0; i < MAX_nFM; ++i)
-	{
-		// merge PHI1 and PHI2
-		merger( CM_PHI1_PHI1[addr_CM_PHI1_PHI1], n_CM_PHI1_PHI1, addr_CM_PHI1_PHI1,
-				CM_PHI1_PHI2[addr_CM_PHI1_PHI2], n_CM_PHI1_PHI2, addr_CM_PHI1_PHI2,
-				tmp_merge1, n_tmp_merge1);
-
-		// merge PHI3 and PHI4
-		merger( CM_PHI1_PHI3[addr_CM_PHI1_PHI3], n_CM_PHI1_PHI3, addr_CM_PHI1_PHI3,
-				CM_PHI1_PHI4[addr_CM_PHI1_PHI4], n_CM_PHI1_PHI4, addr_CM_PHI1_PHI4,
-				tmp_merge2, n_tmp_merge2);
-
-		// merge streams from above
-		merger( tmp_merge1, n_tmp_merge1, addr_CM_merge1,
-				tmp_merge2, n_tmp_merge2, addr_CM_merge2,
-				tmp_CM[i],n_tmp_CM);
-	}
-
-	/*
-	//----- Merge and sort the incoming CMs
-	//
-	HLSCandidateMatch tmp_merge1[MAX_nCM];//= HLSCandidateMatch();
-	HLSCandidateMatch tmp_merge2[MAX_nCM];// = HLSCandidateMatch();
-	//HLSCandidateMatch tmp_CM[MAX_nCM]     = HLSCandidateMatch();
-	merger(CM_PHI1_PHI1,CM_PHI1_PHI2,n_CM_PHI1_PHI1,n_CM_PHI1_PHI2,tmp_merge1);
-	merger(CM_PHI1_PHI3,CM_PHI1_PHI4,n_CM_PHI1_PHI3,n_CM_PHI1_PHI4,tmp_merge2);
-	merger(tmp_merge1,tmp_merge2,n_CM_1_2,n_CM_3_4,tmp_CM);
-	*/
-
 	/*
 	//----- Merge and sort the incoming CMs (using hls streams)
-	//
 	// convert the input CMs into hls streams (by default think streams are FIFOs)
+	//
 	hls::stream< ap_uint<nBITS_CM> > tmp_CM1("stream_CM1");
 	hls::stream< ap_uint<nBITS_CM> > tmp_CM2("stream_CM2");
 	hls::stream< ap_uint<nBITS_CM> > tmp_CM3("stream_CM3");
 	hls::stream< ap_uint<nBITS_CM> > tmp_CM4("stream_CM4");
+	ap_uint<7> n_CM_1_2 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
+	ap_uint<7> n_CM_3_4 = n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
 	MAKE_STREAMS: for (int i = 0; i < MAX_nCM; ++i){
 		if (i < n_CM_PHI1_PHI1) tmp_CM1.write_nb(CM_PHI1_PHI1[i].raw());
 		if (i < n_CM_PHI1_PHI2) tmp_CM2.write_nb(CM_PHI1_PHI2[i].raw());
 		if (i < n_CM_PHI1_PHI3) tmp_CM3.write_nb(CM_PHI1_PHI3[i].raw());
 		if (i < n_CM_PHI1_PHI4) tmp_CM4.write_nb(CM_PHI1_PHI4[i].raw());
+
 	}
 	// temp streams to keep merged results
-	hls::stream< ap_uint<nBITS_CM> > tmp_CM_1_2("stream_1_2");
-	hls::stream< ap_uint<nBITS_CM> > tmp_CM_3_4("stream_3_4");
-	hls::stream< ap_uint<nBITS_CM> > merged_CMs("stream_merged");
-	// merge the streams= (function inputs: stream_in1, stream_in2, number_in1, number_in2, output_stream)
+	static hls::stream< ap_uint<nBITS_CM> > tmp_CM_1_2("stream_1_2");
+	static hls::stream< ap_uint<nBITS_CM> > tmp_CM_3_4("stream_3_4");
+	static hls::stream< ap_uint<nBITS_CM> > merged_CMs("stream_merged");
+	HLSCandidateMatch tmp_CM[MAX_nCM];
+	ap_uint<12> tmp;
+	// merge streams (fnct inputs: stream_in1, stream_in2, number_in1, number_in2, output_stream)
 	stream_merger(tmp_CM1,tmp_CM2,n_CM_PHI1_PHI1,n_CM_PHI1_PHI2,tmp_CM_1_2);  // merge streams 1 and 2
 	stream_merger(tmp_CM3,tmp_CM4,n_CM_PHI1_PHI3,n_CM_PHI1_PHI4,tmp_CM_3_4);  // merge streams 3 and 4
 	stream_merger(tmp_CM_1_2,tmp_CM_3_4,n_CM_1_2,n_CM_3_4,merged_CMs);        // final merge
+
+	merged_CMs.read_nb(tmp);
+	for (int i = 0; i < MAX_nCM; ++i){
+		tmp_CM[i] = tmp;
+	}
 	*/
+
 
 	/*
 	//----- Priority encoder for deciding which CM to use
@@ -234,7 +243,6 @@ void MatchCalculator(
 	// check that residuals pass the cuts
 	// and save the final match
 	//
-
 
 	CM_LOOP: for (int i = 0; i < MAX_nCM; ++i)
 	{

@@ -25,11 +25,11 @@ add_files -tb emData_MC
 open_solution "solution1"
 set_part $part -tool vivado
 create_clock -period $clockperiod -name default
-
+source "directives_MC.tcl"
 
 #set_part {xcku115-flvb2104-2-e} -tool vivado
 #create_clock -period 10 -name default
-##source "./match_calc/solution1/directives.tcl"
+#source "./match_calc/solution1/directives.tcl"
 #csim_design
 #csynth_design
 #cosim_design

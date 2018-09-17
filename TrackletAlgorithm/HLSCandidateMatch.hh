@@ -7,7 +7,7 @@
 #pragma once
 #include "ap_int.h"
 
-const int MAX_nCM     = 5; // max number of CMs an individual module can handle (truncate)
+const int MAX_nCM     = 36; // max number of CMs an individual module can handle (truncate)
 
 
 const int nBITS_CM    = 12; // total number of bits for CM
