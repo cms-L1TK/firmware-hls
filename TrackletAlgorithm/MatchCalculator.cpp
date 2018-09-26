@@ -34,21 +34,18 @@ void MatchCalculator(
 	ap_uint<7> n_FM_PHI1                       // output (7b allows for up to 64 FMs)
 ){
 
+#pragma HLS PIPELINE II=36
+#pragma HLS latency max=60
+
 	// Bool to keep track if working on a new tracklet (for best match logic)
     bool newtracklet = true;
 
 	// Current FM counter -- used to write out n_FM made
 	ap_uint<7> curr_FM = 0;
 
-	// Total number of CMs
-	ap_uint<7> start1 = 0;
-	ap_uint<7> start2 = n_CM_PHI1_PHI1;
-	ap_uint<7> start3 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
-	ap_uint<7> start4 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3;
+	// Total number of CMs coming in
 	ap_uint<7> n_CM   = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
-
-	ap_uint<7> n_CM_12 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
-	ap_uint<7> n_CM_34 = n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
+	//#pragma HLS RESOURCE variable=n_CM core=AddSub
 
 	// Setup the phi and z correction shifts
 	int fact = 0;
@@ -57,208 +54,100 @@ void MatchCalculator(
 	int z_corr_shift = 0;
 	setup_shifts<2>(fact,phi0_shift,phi_corr_shift,z_corr_shift);
 
+	ap_uint<12> data1 = 0;
+	ap_uint<12> data2 = 0;
+	ap_uint<12> data3 = 0;
+	ap_uint<12> data4 = 0;
+
+	ap_uint<7> addr1 = 0;
+	ap_uint<7> addr2 = 0;
+	ap_uint<7> addr3 = 0;
+	ap_uint<7> addr4 = 0;
+
+	ap_uint<12> dataout = -1;
+	ap_uint<12> dumby   = 0;
+	ap_uint<6>  dumbyid = -1;
+
+	ap_uint<6> id[MAX_nCM];
+
+	hls::stream< ap_uint<12> > out;
+	ap_uint<3> state = 0;
+	#pragma HLS STREAM depth=1 variable=out
+	//#pragma HLS RESOURCE variable=out latency=2
+
 	//----- Merge and sort the incoming CMs
-    //
-	// Functionally working, but not pipelined
-	// Use counters to setup the read indexing
-
-	// Set up addressing and output memories for the merged memories
-	ap_uint<7> addr_CM_PHI1_PHI1 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI2 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI3 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI4 = 0;
-	ap_uint<7> addr_CM_merge1    = 0;
-	ap_uint<7> addr_CM_merge2    = 0;
-	static HLSCandidateMatch tmp_merge1[MAX_nCM];
-	static HLSCandidateMatch tmp_merge2[MAX_nCM];
-	static HLSCandidateMatch tmp_CM[MAX_nCM];
-	static ap_uint<7> n_tmp_merge1      = 0;
-	static ap_uint<7> n_tmp_merge2      = 0;
-	static ap_uint<7> n_tmp_CM          = 0;
-
-	SORT_L1: for (int i = 0; i < MAX_nFM; ++i)
+	LOOP: for (int i = 0; i < MAX_nCM; ++i)
 	{
-		if (n_tmp_CM < n_CM){
-			// merge PHI1 and PHI2
-			merger( CM_PHI1_PHI1[addr_CM_PHI1_PHI1], n_CM_PHI1_PHI1, addr_CM_PHI1_PHI1,
-					CM_PHI1_PHI2[addr_CM_PHI1_PHI2], n_CM_PHI1_PHI2, addr_CM_PHI1_PHI2,
-					tmp_merge1[i], n_tmp_merge1);
+	#pragma HLS PIPELINE II=1
 
-			// merge PHI3 and PHI4
-			merger( CM_PHI1_PHI3[addr_CM_PHI1_PHI3], n_CM_PHI1_PHI3, addr_CM_PHI1_PHI3,
-					CM_PHI1_PHI4[addr_CM_PHI1_PHI4], n_CM_PHI1_PHI4, addr_CM_PHI1_PHI4,
-					tmp_merge2[i], n_tmp_merge2);
-		}
-		else break;
-	}
-	SORT_L2: for (int i = 0; i < MAX_nFM; ++i)
-	{
 		if (i < n_CM){
-			// merge streams from above
-			merger( tmp_merge1[addr_CM_merge1], n_CM_12, addr_CM_merge1,
-					tmp_merge2[addr_CM_merge1], n_CM_34, addr_CM_merge2,
-					tmp_CM[i],n_tmp_CM);
-			std::cout << "OUTPUT: " << tmp_CM[i].raw() << std::endl;
-		}
-		else break;
-	}
 
+			// pick up the data
+			data1 = CM_PHI1_PHI1[addr1].raw(); //(addr1 < n_CM_PHI1_PHI1) ? CM_PHI1_PHI1[addr1].raw() : dumby;
+			data2 = CM_PHI1_PHI2[addr2].raw(); //(addr2 < n_CM_PHI1_PHI2) ? CM_PHI1_PHI2[addr2].raw() : dumby;
+			data3 = CM_PHI1_PHI2[addr2].raw(); //(addr3 < n_CM_PHI1_PHI3) ? CM_PHI1_PHI3[addr3].raw() : dumby;
+			data4 = CM_PHI1_PHI2[addr2].raw(); //(addr4 < n_CM_PHI1_PHI4) ? CM_PHI1_PHI4[addr4].raw() : dumby;
 
-	/*
-	//----- Merge and sort the incoming CMs
-	// Sort closest to original firmware implementation (not yet working)
-	//
+			// pick up the indices
+			ap_uint<6> id1 = data1.range(11,6);
+			ap_uint<6> id2 = data2.range(11,6);
+			ap_uint<6> id3 = data3.range(11,6);
+			ap_uint<6> id4 = data4.range(11,6);
 
-	ap_uint<7> addr_CM_PHI1_PHI1 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI2 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI3 = 0;
-	ap_uint<7> addr_CM_PHI1_PHI4 = 0;
+			// indices for comparison
+			ap_uint<6> index1 = (addr1 < n_CM_PHI1_PHI1) ? id1 : dumbyid;
+			ap_uint<6> index2 = (addr2 < n_CM_PHI1_PHI2) ? id2 : dumbyid;
+			ap_uint<6> index3 = (addr3 < n_CM_PHI1_PHI3) ? id3 : dumbyid;
+			ap_uint<6> index4 = (addr4 < n_CM_PHI1_PHI4) ? id4 : dumbyid;
 
-	HLSCandidateMatch test;
-
-	bool read1 = false;
-	bool read2 = false;
-	bool read3 = false;
-	bool read4 = false;
-
-	HLSCandidateMatch tmp_CM[MAX_nFM];
-	ap_uint<7> n_tmp_CM = 0;
-	bool valid_tmp_CM = false;
-	for (int i = 0; i < MAX_nFM; ++i)
-	{
-
-		std::cout << "---------- i = " << i << std::endl;
-
-		mergertop(CM_PHI1_PHI1[addr_CM_PHI1_PHI1], n_CM_PHI1_PHI1, addr_CM_PHI1_PHI1,
-				  CM_PHI1_PHI2[addr_CM_PHI1_PHI2], n_CM_PHI1_PHI2, addr_CM_PHI1_PHI2,
-				  CM_PHI1_PHI3[addr_CM_PHI1_PHI3], n_CM_PHI1_PHI3, addr_CM_PHI1_PHI3,
-				  CM_PHI1_PHI4[addr_CM_PHI1_PHI4], n_CM_PHI1_PHI4, addr_CM_PHI1_PHI4,
-				  test, valid_tmp_CM, read1, read2, read3, read4);
-
-		if (valid_tmp_CM) n_tmp_CM++;
-
-		std::cout << "--- READ: " << read1 << " " << read2 << " " << read3 << " " << read4 << std::endl;
-        std::cout << "--- ADDR: " << addr_CM_PHI1_PHI1 << " " << addr_CM_PHI1_PHI2 << " " << addr_CM_PHI1_PHI3 << " " << addr_CM_PHI1_PHI4 << std::endl;
-
-		std::cout << "--- Input1: " << CM_PHI1_PHI1[addr_CM_PHI1_PHI1].raw() << " " << addr_CM_PHI1_PHI1 << std::endl;
-		std::cout << "--- Input2: " << CM_PHI1_PHI2[addr_CM_PHI1_PHI2].raw() << " " << addr_CM_PHI1_PHI2 << std::endl;
-
-		if (read1) addr_CM_PHI1_PHI1++;
-		if (read2) addr_CM_PHI1_PHI2++;
-		if (read3) addr_CM_PHI1_PHI3++;
-		if (read4) addr_CM_PHI1_PHI4++;
-
-		std::cout << "-------- Merged CM: " << test.raw() << " vld: " << valid_tmp_CM << " cnt: " << n_tmp_CM << std::endl;
-	}
-	*/
-
-	/*
-	//----- Merge and sort the incoming CMs (using hls streams)
-	// convert the input CMs into hls streams (by default think streams are FIFOs)
-	//
-	hls::stream< ap_uint<nBITS_CM> > tmp_CM1("stream_CM1");
-	hls::stream< ap_uint<nBITS_CM> > tmp_CM2("stream_CM2");
-	hls::stream< ap_uint<nBITS_CM> > tmp_CM3("stream_CM3");
-	hls::stream< ap_uint<nBITS_CM> > tmp_CM4("stream_CM4");
-	ap_uint<7> n_CM_1_2 = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2;
-	ap_uint<7> n_CM_3_4 = n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
-	MAKE_STREAMS: for (int i = 0; i < MAX_nCM; ++i){
-		if (i < n_CM_PHI1_PHI1) tmp_CM1.write_nb(CM_PHI1_PHI1[i].raw());
-		if (i < n_CM_PHI1_PHI2) tmp_CM2.write_nb(CM_PHI1_PHI2[i].raw());
-		if (i < n_CM_PHI1_PHI3) tmp_CM3.write_nb(CM_PHI1_PHI3[i].raw());
-		if (i < n_CM_PHI1_PHI4) tmp_CM4.write_nb(CM_PHI1_PHI4[i].raw());
-
-	}
-	// temp streams to keep merged results
-	static hls::stream< ap_uint<nBITS_CM> > tmp_CM_1_2("stream_1_2");
-	static hls::stream< ap_uint<nBITS_CM> > tmp_CM_3_4("stream_3_4");
-	static hls::stream< ap_uint<nBITS_CM> > merged_CMs("stream_merged");
-	HLSCandidateMatch tmp_CM[MAX_nCM];
-	ap_uint<12> tmp;
-	// merge streams (fnct inputs: stream_in1, stream_in2, number_in1, number_in2, output_stream)
-	stream_merger(tmp_CM1,tmp_CM2,n_CM_PHI1_PHI1,n_CM_PHI1_PHI2,tmp_CM_1_2);  // merge streams 1 and 2
-	stream_merger(tmp_CM3,tmp_CM4,n_CM_PHI1_PHI3,n_CM_PHI1_PHI4,tmp_CM_3_4);  // merge streams 3 and 4
-	stream_merger(tmp_CM_1_2,tmp_CM_3_4,n_CM_1_2,n_CM_3_4,merged_CMs);        // final merge
-
-	merged_CMs.read_nb(tmp);
-	for (int i = 0; i < MAX_nCM; ++i){
-		tmp_CM[i] = tmp;
-	}
-	*/
-
-
-	/*
-	//----- Priority encoder for deciding which CM to use
-    //
-	// loop over candidate matches
-	// up to the max number MAX_nCM the module can handle
-	// and setup tmp_CM which has the array of all CMs to read
-	//
-
-	PRIO_LOOP: for (int i = 0; i < MAX_nCM; ++i)
-	{
-		if (i < n_CM) // up to the number that are coming in
-		{
-
-			ap_uint<3> which_CM  = 0;
-			if (start1 <= i < start2)      which_CM = 1;
-			else if (start2 <= i < start3) which_CM = 2;
-			else if (start3 <= i < start4) which_CM = 3;
-			else if (start4 <= i < n_CM)   which_CM = 4;
-
-			// pick up which CM to use
-			switch(which_CM)
-			{
-				case (0):
-					tmp_CM[i] = HLSCandidateMatch();
-					break;
-				case (1):
-					tmp_CM[i] = CM_PHI1_PHI1[i-start1];
-					break;
-				case (2):
-					tmp_CM[i] = CM_PHI1_PHI2[i-start2];
-					break;
-				case (3):
-					tmp_CM[i] = CM_PHI1_PHI3[i-start3];
-					break;
-				case (4):
-					tmp_CM[i] = CM_PHI1_PHI4[i-start4];
-					break;
-				default:
-					tmp_CM[i] = HLSCandidateMatch();
-					break;
-			}// end case
-
-		}// end if (i < n_CM)
-		else break;
-	}// end PRIO_LOOP
-	*/
-
-	//----- Calculate matches (using the tmp_CM array from above)
-	//
-	// loop over candidate matches
-	// up to the max number MAX_nCM the module can handle
-	// pick up corresponding stub and projection
-	// calculate z and phi corrections
-	// check that residuals pass the cuts
-	// and save the final match
-	//
-
-	CM_LOOP: for (int i = 0; i < MAX_nCM; ++i)
-	{
-		if (i < n_CM)  // up to the number that are coming in
-		{
-
-			//----- Extract the CM parameters (indices of stub & projection)
-			const CM_proj_index p_index = tmp_CM[i].GetPIndex(); // use the priority encoder output
-			const CM_stub_index s_index = tmp_CM[i].GetSIndex(); // use the priority encoder output
+			// do comparison to decide which data to send out
+			// increment the address of which data
+			if (index1 <= index2 and index1 <= index3 and index1 <= index4){
+				dataout = data1;
+				addr1++;
+			}
+			else if (index2 <= index1 and index2 <= index3 and index2 <= index4){
+				dataout = data2;
+				addr2++;
+			}
+			else if (index2 <= index1 and index2 <= index3 and index2 <= index4){
+				dataout = data3;
+				addr3++;
+			}
+			else if (index4 <= index1 and index4 <= index2 and index4 <= index3){
+				dataout = data4;
+				addr4++;
+			}
+			else{
+				dataout = 0;
+			}
 
 			//----- Check if processing a new tracklet or not (needed for determining best match)
-			if (i == 0) newtracklet = true;
-			else{
-				if (p_index == tmp_CM[i-1].GetPIndex()) newtracklet = false;
-				else newtracklet = true;
-			}
+			id[i] = dataout.range(11,6);
+			if (i==0){ newtracklet = true; }
+			else if (id[i]!=id[i-1]){ newtracklet = true; }
+			else {  newtracklet = false; }
+
+			//----- Merged data stream
+			out.write(dataout);
+
+			//----- Calculate matches (using the tmp_CM array from above)
+			//
+			// loop over candidate matches
+			// up to the max number MAX_nCM the module can handle
+			// pick up corresponding stub and projection
+			// calculate z and phi corrections
+			// check that residuals pass the cuts
+			// and save the final match
+			//
+
+			ap_uint<12> outraw;
+			out.read_nb(outraw);
+			HLSCandidateMatch streamed = HLSCandidateMatch(outraw);
+
+			//----- Extract the CM parameters (indices of stub & projection)
+			CM_proj_index p_index     = streamed.GetPIndex();
+			CM_stub_index s_index     = streamed.GetSIndex();
        
 			//----- Use the indices to pick up the stub and projection
 			HLSAllStubs     stub      = AS_PHI1[s_index];
@@ -277,8 +166,8 @@ void MatchCalculator(
 			const PROJ_ZD   proj_zd   = proj.GetZDeriv();
 
 			// write out parameters for debugging
-			std::cout << "Stub: " << stub.raw() << " " << stub_r   << " " << stub_z << " " << stub_phi  << " " << stub_bend << std::endl;
-			std::cout << "Proj: " << proj.raw() << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd   << std::endl;
+			//std::cout << "Stub: " << stub.raw() << " " << stub_r   << " " << stub_z << " " << stub_phi  << " " << stub_bend << std::endl;
+			//std::cout << "Proj: " << proj.raw() << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd   << std::endl;
 
 			//----- Do the full match calculations
 
@@ -343,13 +232,15 @@ void MatchCalculator(
 				fm_phi     = delta_phi;
 				fm_z       = delta_z;
 
+
+				//FM_PHI1[curr_FM] = (((p_index,s_index),delta_phi),delta_z);
 				FM_PHI1[curr_FM].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z);
 				curr_FM++;
-				std::cout << "Full Match out : " << FM_PHI1[curr_FM-1].raw() << std::endl;
-				std::cout << "Parameters     : " << FM_PHI1[curr_FM-1].GetPIndex() << " " << FM_PHI1[curr_FM-1].GetSIndex() << " " << FM_PHI1[curr_FM-1].GetPhi() << " " << FM_PHI1[curr_FM-1].GetZ() << std::endl;
+				//std::cout << "Full Match out : " << FM_PHI1[curr_FM-1].raw() << std::endl;
+				//std::cout << "Parameters     : " << FM_PHI1[curr_FM-1].GetPIndex() << " " << FM_PHI1[curr_FM-1].GetSIndex() << " " << FM_PHI1[curr_FM-1].GetPhi() << " " << FM_PHI1[curr_FM-1].GetZ() << std::endl;
 			}
 
-		}// end if (i < n_CM_PHI1_PHI1)
+		}// end if (i < n_CM)
 		else break; // don't process more CMs than you have
 	}// end CM_LOOP
 

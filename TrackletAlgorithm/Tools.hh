@@ -125,3 +125,16 @@ void stream_merger_v2(
 		hls::stream< ap_uint<nBITS> > &out,  // merged output stream
 		bool finallayer
     );
+
+void new_merger(
+		HLSCandidateMatch in1[MAX_nCM],
+		HLSCandidateMatch in2[MAX_nCM],
+		HLSCandidateMatch in3[MAX_nCM],
+		HLSCandidateMatch in4[MAX_nCM],
+		ap_uint<7>        nin1,
+		ap_uint<7>        nin2,
+		ap_uint<7>        nin3,
+		ap_uint<7>        nin4,
+		hls::stream< ap_uint<12> > & out,
+		bool              newtracklet
+	);

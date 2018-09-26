@@ -298,6 +298,8 @@ void merger(
 {
 
 	//#pragma HLS INLINE
+#pragma HLS PIPELINE II=1
+//#pragma HLS DATAFLOW
 
     HLSCandidateMatch a = in1;           // full data word from input 1
     HLSCandidateMatch b = in2;           // full data word from input 2
@@ -436,67 +438,157 @@ void stream_merger(
     hls::stream< ap_uint<nBITS> > &in2, // input stream 2
     int n1,                             // number of inputs in 1
     int n2,                             // number of inputs in 2
-	//ap_uint<7> & subindex1,             // read number 1
-	//ap_uint<7> & subindex2,				// read number 2
     hls::stream< ap_uint<nBITS> > &out  // merged output stream
     )
 {
 
+	#pragma HLS PIPELINE II=1
+	#pragma HLS DATAFLOW
+
     ap_uint<7> n = n1 + n2;   // total number of inputs
-    ap_uint<12> a = 0;     // full data word from input 1
-    ap_uint<12> b = 0;     // full data word from input 2
-    ap_uint<6> inA = 0;     // part of input 1 word for comparison
-    ap_uint<6> inB = 0;     // part of input 2 word for comparison
+    ap_uint<12> a = 0;        // full data word from input 1
+    ap_uint<12> b = 0;        // full data word from input 2
+    ap_uint<6> inA = 0;       // part of input 1 word for comparison
+    ap_uint<6> inB = 0;       // part of input 2 word for comparison
     ap_uint<7> subindex1 = 1; // counter for the reading of input 1
     ap_uint<7> subindex2 = 1; // counter for the reading of input 2
 
+    bool read1 = true;
+    bool read2 = true;
+
     // read inputs
-    if (!in1.empty()) in1.read(a);
-    if (!in2.empty()) in2.read(b);
+    //if (!in1.empty()) in1.read_nb(a);
+    //if (!in2.empty()) in2.read_nb(b);
 
-    // loop up to number of inputs in
-    for (int i = 0; i < n; i++)
+    // loop up to max number allowed
+    for (int i = 0; i < 37; i++) // need a fixed trip count
     {
+	#pragma HLS PIPELINE II=1
 
-    	inA = a.range(11,6);
-    	inB = b.range(11,6);
+    	    if (read1 && !in1.empty()) in1.read_nb(a);
+    	    if (read2 && !in2.empty()) in2.read_nb(b);
+			inA = a.range(11,6);
+			inB = b.range(11,6);
 
-        if (subindex1 > n1 && subindex2 > n2) // if read out everything
-        {
-        	out << 0;
-        }
-        else if (subindex1 > n1) // if read out all of in1, only read in2
-        {
-			out << b;
-			if (!in2.empty()) in2.read(b);
-			subindex2++;
-        }
-        else if (subindex2 > n2) // if read out all of in2, only read in1
-        {
-			out << a;
-			if (!in1.empty()) in1.read(a);
-			subindex1++;
-        }
-        // if data in both in1 and in2, read smaller data first
-        else if (inA <= inB) // a is smaller
-        {
-			out << a;
-			if (!in1.empty()) in1.read(a);
-			subindex1++;
-        }
-        else if (inB <= inA)// b is smaller
-        {
-			out << b;
-			if (!in2.empty()) in2.read(b);
-			subindex2++;
-        }
-        else // catchall
-        {
-        	out << 0;
-        }
-
-        std::cout << "OUT: " << out.read() << " " << out.empty() << std::endl;
-    }
+			if (subindex1 > n1 && subindex2 > n2) // if read out everything
+			{
+				read1 = false;
+				read2 = false;
+				out.write_nb(0);
+			}
+			else if (subindex1 > n1) // if read out all of in1, only read in2
+			{
+				out.write_nb(b);
+				read1 = false;
+				read2 = true;
+				//if (!in2.empty()) in2.read_nb(b);
+				subindex2++;
+			}
+			else if (subindex2 > n2) // if read out all of in2, only read in1
+			{
+				out.write_nb(a);
+				read1 = true;
+				read2 = false;
+				//if (!in1.empty()) in1.read_nb(a);
+				subindex1++;
+			}
+			// if data in both in1 and in2, read smaller data first
+			else if (inA <= inB) // a is smaller
+			{
+				out.write_nb(a);
+				read1 = true;
+				read2 = false;
+				//if (!in1.empty()) in1.read_nb(a);
+				subindex1++;
+			}
+			else if (inB <= inA)// b is smaller
+			{
+				out.write_nb(b);
+				read1 = false;
+				read2 = false;
+				//if (!in2.empty()) in2.read_nb(b);
+				subindex2++;
+			}
+			else // catchall
+			{
+				read1 = false;
+				read2 = false;
+				out.write_nb(0);
+			}
+    }// end for loop
 
 };
+
+void new_merger(
+		HLSCandidateMatch in1[MAX_nCM],
+		HLSCandidateMatch in2[MAX_nCM],
+		HLSCandidateMatch in3[MAX_nCM],
+		HLSCandidateMatch in4[MAX_nCM],
+		ap_uint<7>        nin1,
+		ap_uint<7>        nin2,
+		ap_uint<7>        nin3,
+		ap_uint<7>        nin4,
+		hls::stream< ap_uint<12> > & out,
+		bool              newtracklet
+		)
+{
+
+	#pragma HLS PIPELINE II=1
+
+	ap_uint<7> addr1 = 0;
+	ap_uint<7> addr2 = 0;
+	ap_uint<7> addr3 = 0;
+	ap_uint<7> addr4 = 0;
+
+	ap_uint<12> dataout = -1;
+	ap_uint<12> dumby   = -1;
+
+	ap_uint<7> id[MAX_nCM];
+
+
+	for (int i = 0; i < MAX_nCM; ++i)
+	{
+
+		if (i==0){ newtracklet = true; }
+		else if (id[i]!=id[i-1]){ newtracklet = true; }
+		else { newtracklet = false; }
+
+		ap_uint<12> data1 = (addr1 < nin1) ? in1[addr1].raw() : dumby;
+		ap_uint<12> data2 = (addr2 < nin2) ? in2[addr2].raw() : dumby;
+		ap_uint<12> data3 = (addr3 < nin3) ? in3[addr3].raw() : dumby;
+		ap_uint<12> data4 = (addr4 < nin4) ? in4[addr4].raw() : dumby;
+
+		ap_uint<6> index1 = data1.range(11,6);
+		ap_uint<6> index2 = data2.range(11,6);
+		ap_uint<6> index3 = data3.range(11,6);
+		ap_uint<6> index4 = data4.range(11,6);
+
+		if (index1 <= index2 and index1 <= index3 and index1 <= index4){
+			dataout = data1;
+			addr1++;
+		}
+		else if (index2 <= index1 and index2 <= index3 and index2 <= index4){
+			dataout = data2;
+			addr2++;
+		}
+		else if (index3 <= index1 and index3 <= index2 and index3 <= index4){
+			dataout = data3;
+			addr3++;
+		}
+		else if (index4 <= index1 and index4 <= index2 and index4 <= index3){
+			dataout = data4;
+			addr4++;
+		}
+		else{
+			dataout = -1;
+		}
+
+		id[i] = dataout.range(11,6);
+		out.write_nb(dataout);
+	}
+
+
+};
+
+
 
