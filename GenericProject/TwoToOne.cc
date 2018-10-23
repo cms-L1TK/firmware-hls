@@ -14,9 +14,9 @@ void TwoToOne(
 	      int & n_out // number of output 
 	      )
 {
-	int cnt = std::min(n_in1, n_in2);
+	auto const cnt = std::min(n_in1, n_in2);
 
-	LOOP_2_1: for(int i = 0; i < MAX_SIZE; ++i){
+	LOOP_2_1: for(auto i = 0; i < MAX_SIZE; ++i){
 		// alternative: BREAK out of loop. This means shorter latency
 		// possible, but variable latency.
 		if ( i < cnt ) {
