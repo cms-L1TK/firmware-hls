@@ -51,8 +51,8 @@ csynth_design
 open_solution "solution3"
 
 set_directive_pipeline TopLevel
-set_directive_pipeline OneToThree
-set_directive_pipeline TwoToOne
+set_directive_pipeline -II 1 "OneToThree/LOOP_1_3"
+set_directive_pipeline -II 1 "TwoToOne/LOOP_2_1"
 
 set_part  $part 
 create_clock -period $clockperiod -name default
@@ -78,9 +78,10 @@ csynth_design
 # solution 5
 open_solution "solution5"
 
-#set_directive_pipeline TopLevel
-set_directive_pipeline OneToThree
-set_directive_pipeline TwoToOne
+set_directive_dataflow "TopLevel"
+set_directive_pipeline -II 1 "OneToThree/LOOP_1_3"
+set_directive_pipeline -II 1 "TwoToOne/LOOP_2_1"
+
 
 set_part  $part 
 create_clock -period $clockperiod -name default
