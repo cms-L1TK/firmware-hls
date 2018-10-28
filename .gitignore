@@ -3,7 +3,6 @@
 *.bak
 *~
 *.str
-*.dat
 #*#
 .#*
 
@@ -29,7 +28,6 @@
 *.obj
 
 # Directories in project
-emData
 vmrouter_1
 vmrouter_2
 
