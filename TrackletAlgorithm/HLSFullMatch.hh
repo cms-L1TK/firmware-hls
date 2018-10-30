@@ -21,11 +21,6 @@ class HLSFullMatch
 {
 private:
 	FullMatch 		data_;
-	FM_PROJ_INDEX	p_index;
-	FM_STUB_INDEX	s_index;
-	FM_PHI			FM_phi;
-	FM_Z			FM_z;
-
 public:
 	// constructors
 	HLSFullMatch(FullMatch newdata):
@@ -49,20 +44,9 @@ public:
 	void AddFM(const FM_PROJ_INDEX newpindex, const FM_STUB_INDEX newsindex,
 			   const FM_PHI        newphi,    const FM_Z newz)
 	{
-		p_index = newpindex;
-		s_index = newsindex;
-		FM_phi  = newphi;
-		FM_z    = newz;
-		std::cout << " FM : " << newphi << " " << newz <<  " " << std::endl;
-
 		// setup full stub data by concatenating variables above
 		// data_ = {proj index, stub index, phi residual, z residual}
-		// need "to_long" for shifts otherwise data will truncate at current size
-		data_   = (((newpindex.to_long() << (nBITS_FM_SID + nBITS_FM_PHI + nBITS_FM_Z) ) |
-				  (newsindex.to_long()   << (nBITS_FM_PHI + nBITS_FM_Z) ) |
-				  (newphi.to_long()      << (nBITS_FM_Z) ) |
-				  (newz))
-				  & ((1<<nBITS_FM)-1)); // protect to keep length at nBITS_FM
+		data_   = (((newpindex,newsindex),newphi),newz);
 	}
 
 	// other functions
@@ -73,22 +57,22 @@ public:
 
 	FM_PROJ_INDEX GetPIndex() const
 	{
-		FM_PROJ_INDEX pid = ((data_ >> (nBITS_FM_SID+nBITS_FM_PHI+nBITS_FM_Z)) & 0x3FFUL);
+		FM_PROJ_INDEX pid = data_.range(39,30);
 		return pid;
 	}
 	FM_STUB_INDEX GetSIndex() const
 	{
-		FM_STUB_INDEX sid = ((data_ >> (nBITS_FM_PHI+nBITS_FM_Z)) & 0x1FFUL);
+		FM_STUB_INDEX sid = data_.range(29,21);
 		return sid;
 	}
 	FM_PHI GetPhi() const
 	{
-		FM_PHI phi = ((data_ >> (nBITS_FM_Z)) & 0xFFFUL);
+		FM_PHI phi = data_.range(20,9);
 		return phi;
 	}
 	FM_Z GetZ() const
 	{
-		FM_Z z = (data_ & 0x1FFUL);
+		FM_Z z = data_.range(8,0);
 		return z;
 	}
 

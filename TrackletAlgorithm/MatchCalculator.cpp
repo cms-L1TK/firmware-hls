@@ -18,7 +18,6 @@
 #include "Tools.hh"
 
 void MatchCalculator(
-	const int seed,                            // make parameter ?
 	const int layer,                           // make parameter ?
     HLSCandidateMatch CM_PHI1_PHI1[MAX_nCM],   // input
 	HLSCandidateMatch CM_PHI1_PHI2[MAX_nCM],   // input
@@ -30,8 +29,20 @@ void MatchCalculator(
 	const ap_uint<7> n_CM_PHI1_PHI4,           // input
 	HLSAllStubs   AS_PHI1[MAX_nSTUB],          // input
 	HLSProjection Proj_PHI1[MAX_nPROJ],        // input
-	HLSFullMatch  FM_PHI1[MAX_nFM],            // output
-	ap_uint<7> n_FM_PHI1                       // output (7b allows for up to 64 FMs)
+	HLSFullMatch  FM_seed0[MAX_nFM],           // output
+	HLSFullMatch  FM_seed1[MAX_nFM],           // output
+	HLSFullMatch  FM_seed2[MAX_nFM],           // output
+	HLSFullMatch  FM_seed3[MAX_nFM],           // output
+	HLSFullMatch  FM_seed4[MAX_nFM],           // output
+	HLSFullMatch  FM_seed5[MAX_nFM],           // output
+	HLSFullMatch  FM_seed6[MAX_nFM],           // output
+	ap_uint<7> & n_FM_seed0,                   // output (7b allows for up to 64 FMs)
+	ap_uint<7> & n_FM_seed1,                   // output (7b allows for up to 64 FMs)
+	ap_uint<7> & n_FM_seed2,                   // output (7b allows for up to 64 FMs)
+	ap_uint<7> & n_FM_seed3,                   // output (7b allows for up to 64 FMs)
+	ap_uint<7> & n_FM_seed4,                   // output (7b allows for up to 64 FMs)
+	ap_uint<7> & n_FM_seed5,                   // output (7b allows for up to 64 FMs)
+	ap_uint<7> & n_FM_seed6                    // output (7b allows for up to 64 FMs)
 ){
 
 #pragma HLS PIPELINE II=36
@@ -42,6 +53,13 @@ void MatchCalculator(
 
 	// Current FM counter -- used to write out n_FM made
 	ap_uint<7> curr_FM = 0;
+	ap_uint<7> curr_FM0 = 0;
+	ap_uint<7> curr_FM1 = 0;
+	ap_uint<7> curr_FM2 = 0;
+	ap_uint<7> curr_FM3 = 0;
+	ap_uint<7> curr_FM4 = 0;
+	ap_uint<7> curr_FM5 = 0;
+	ap_uint<7> curr_FM6 = 0;
 
 	// Total number of CMs coming in
 	ap_uint<7> n_CM   = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
@@ -53,6 +71,9 @@ void MatchCalculator(
 	int phi_corr_shift = 0;
 	int z_corr_shift = 0;
 	setup_shifts<2>(fact,phi0_shift,phi_corr_shift,z_corr_shift);
+
+	ap_uint<13> best_delta_z;
+	ap_uint<17> best_delta_phi;
 
 	ap_uint<12> data1 = 0;
 	ap_uint<12> data2 = 0;
@@ -160,14 +181,20 @@ void MatchCalculator(
 			const AS_bend   stub_bend = stub.GetBend();
 
 			//----- Projection parameters
-			const PROJ_PHI  proj_phi  = proj.GetPhi();
-			const PROJ_Z    proj_z    = proj.GetZ();
-			const PROJ_PHID proj_phid = proj.GetPhiDeriv();
-			const PROJ_ZD   proj_zd   = proj.GetZDeriv();
+			// FIXME: Projection format here is OLD!!! Seed
+			const PROJ_TCID  proj_tcid = proj.GetTCID();
+			const ap_uint<3> proj_seed = proj_tcid.range(5,4); // old definition of tcid should be (6,4)
+			const ap_uint<4> proj_vm   = proj_tcid.range(3,0);
+			const PROJ_TCNUM proj_num  = proj.GetIndex();
+			const PROJ_PHI  proj_phi   = proj.GetPhi();
+			const PROJ_Z    proj_z     = proj.GetZ();
+			const PROJ_PHID proj_phid  = proj.GetPhiDeriv();
+			const PROJ_ZD   proj_zd    = proj.GetZDeriv();
 
 			// write out parameters for debugging
-			//std::cout << "Stub: " << stub.raw() << " " << stub_r   << " " << stub_z << " " << stub_phi  << " " << stub_bend << std::endl;
-			//std::cout << "Proj: " << proj.raw() << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd   << std::endl;
+			std::cout << "Stub: " << stub.raw() << " " << stub_r   << " " << stub_z << " " << stub_phi  << " " << stub_bend << std::endl;
+		    std::cout << "Proj: " << proj.raw() << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd   << std::endl;
+		    std::cout << "PROJ (ID,SEED,VM,NUM): " << proj_tcid << " " << proj_seed << " " << proj_vm << " " << proj_num << std::endl;
 
 			//----- Do the full match calculations
 
@@ -205,10 +232,13 @@ void MatchCalculator(
 			// For all matches (not just best) :
 			//if (abs_delta_phi <= matchcut_phi[layer][seed] && abs_delta_z <= matchcut_z[layer][seed]) pass_match = true;
 
-			// FIXME : Cuts are negative if the seed & layer combination is not allowed -- so should not be used
-			//         but here they are set unsigned, so if they are called, cuts are set at 1 (instead of -1).
-			ap_uint<13> best_delta_z   = matchcut_z[layer][seed];
-			ap_uint<17> best_delta_phi = matchcut_phi[layer][seed];
+			// If the seed and layer combination is not valid then cut is 0
+			//ap_uint<13> best_delta_z   = matchcut_z[layer][proj_seed];
+			//ap_uint<17> best_delta_phi = matchcut_phi[layer][proj_seed];
+			if (newtracklet){
+				best_delta_z   = matchcut_z[layer][proj_seed];
+				best_delta_phi = matchcut_phi[layer][proj_seed];
+			}
 
 			if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= abs_delta_phi)){
 				pass_match     = true;
@@ -232,12 +262,18 @@ void MatchCalculator(
 				fm_phi     = delta_phi;
 				fm_z       = delta_z;
 
-
-				//FM_PHI1[curr_FM] = (((p_index,s_index),delta_phi),delta_z);
-				FM_PHI1[curr_FM].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z);
+				// FIXME: Not all of these seeding combinations are valid for each layer make extra ones synthesize away.
+				// For L3 only L1L2 and L5L6 seeding are valid combinations -- make others null pointers so go away?
+				if (proj_seed==0){ FM_seed0[curr_FM0].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM0++;} // seed L1L2
+				if (proj_seed==1){ FM_seed1[curr_FM1].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM1++;} // seed L3L4
+				if (proj_seed==2){ FM_seed2[curr_FM2].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM2++;} // seed L5L6
+				if (proj_seed==3){ FM_seed3[curr_FM3].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM3++;} // seed D1D2
+				if (proj_seed==4){ FM_seed4[curr_FM4].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM4++;} // seed D3D4
+				if (proj_seed==5){ FM_seed5[curr_FM5].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM5++;} // seed L1D1
+				if (proj_seed==6){ FM_seed6[curr_FM6].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM6++;} // seed L2D1
 				curr_FM++;
-				//std::cout << "Full Match out : " << FM_PHI1[curr_FM-1].raw() << std::endl;
-				//std::cout << "Parameters     : " << FM_PHI1[curr_FM-1].GetPIndex() << " " << FM_PHI1[curr_FM-1].GetSIndex() << " " << FM_PHI1[curr_FM-1].GetPhi() << " " << FM_PHI1[curr_FM-1].GetZ() << std::endl;
+				std::cout << "Full Match out : " << FM_seed0[curr_FM0-1].raw() << std::endl;
+				std::cout << "Parameters     : " << FM_seed0[curr_FM0-1].GetPIndex() << " " << FM_seed0[curr_FM0-1].GetSIndex() << " " << FM_seed0[curr_FM0-1].GetPhi() << " " << FM_seed0[curr_FM0-1].GetZ() << std::endl;
 			}
 
 		}// end if (i < n_CM)
@@ -245,6 +281,12 @@ void MatchCalculator(
 	}// end CM_LOOP
 
 	//---- Write out the number of FMs made (needed for next module)
-	n_FM_PHI1 = curr_FM;
+	n_FM_seed0 = curr_FM0;
+	n_FM_seed1 = curr_FM1;
+	n_FM_seed2 = curr_FM2;
+	n_FM_seed3 = curr_FM3;
+	n_FM_seed4 = curr_FM4;
+	n_FM_seed5 = curr_FM5;
+	n_FM_seed6 = curr_FM6;
 
 };
