@@ -14,7 +14,7 @@ public:
   
   MemoryBase()
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	clear();
   }
 
@@ -36,6 +36,7 @@ public:
 
   void clear()
   {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	for (ap_uint<3> ibx=0; ibx<NBX; ++ibx) {
 #pragma HLS UNROLL
 	  nentries_[ibx%NBX] = 0;
@@ -47,7 +48,10 @@ public:
   unsigned int getDepth() const {return DEPTH;}
   unsigned int getnBX() const {return NBX;}
   
-  unsigned int getEntries(ap_uint<3> bx) const {return nentries_[bx%NBX];}
+  unsigned int getEntries(ap_uint<3> bx) const {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+    return nentries_[bx%NBX];
+  }
 
   DataType* get_mem(ap_uint<3> bx) {return dataarray_[bx%NBX];}
   
