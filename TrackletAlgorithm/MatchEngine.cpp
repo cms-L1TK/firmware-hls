@@ -52,6 +52,7 @@ void MatchEngine(const ap_uint<3> bx,
   ap_uint<3> zbin=0;
   VMPID projindex;
   VMPFINEZ projfinez;
+  ap_int<5> projfinezadj;
   VMPBEND projbend;
   bool isPSseed;
   ap_uint<4> nstubs;
@@ -61,38 +62,56 @@ void MatchEngine(const ap_uint<3> bx,
   //bool wrotefirst=false;
 
   ap_uint<7> nproj=inprojdata.getEntries(bx);
+
+  bool moreproj=iproj<nproj;
   
   for (unsigned int istep=0;istep<108;istep++) {
 #pragma HLS PIPELINE II=1 
-    bool moreproj=iproj<nproj;
     bool queuenotfull=(writeindex+1!=readindex)&&(writeindex+2!=readindex);
-    bool queuenotempty=writeindex!=readindex;
+    bool queuenotempty=(writeindex!=readindex);
+    VMProj projdata=inprojdata.read_mem(bx,iproj);
+    VMPZBIN projzbin=VMProjections::get_zbin(projdata);
     if (moreproj&&queuenotfull){
-      VMProj projdata=inprojdata.read_mem(bx,iproj++);
-      VMPZBIN projzbin=VMProjections::get_zbin(projdata);
       ap_uint<3> zfirst=projzbin.range(3,1);
       ap_uint<3> zlast=zfirst+projzbin.range(0,0);
       assert(zlast<8);
       ap_uint<4> nstubfirst=instubdata.getEntries(bx,zfirst);
       ap_uint<4> nstublast=instubdata.getEntries(bx,zlast);
       bool savefirst=nstubfirst!=0;
-      bool savelast=nstublast!=0;
+      bool savelast=nstublast!=0&&projzbin.range(0,0);
+      ap_uint<3> writeindextmp=writeindex;
+      iproj++;
+      moreproj=iproj<nproj;
+
+      if (savefirst) {
+	if (savelast) {
+	  writeindex+=2;
+	} else {
+	  writeindex++;
+	}
+      } else {
+	if (savelast) {
+	  writeindex++;
+	}
+      }
+
       //bool wroteonce=false;
       if (savefirst) {
 	//std::cout << "Save in queue iproj="<<iproj<<" at index ="<<writeindex<<" zbin="<<zfirst<<std::endl;
 	ap_uint<1> zero=0;
 	ap_uint<4> tmp=zfirst.concat(zero);
 	ap_uint<26> tmp2=projdata.concat(tmp);
-	queue[writeindex]=nstubfirst.concat(tmp2);
-	if (savelast) {
+	queue[writeindextmp]=nstubfirst.concat(tmp2);
+      }
+      if (savelast) {
 	//std::cout << "Save in queue iproj="<<iproj<<" at index ="<<writeindex<<" zbin="<<zlast<<std::endl;
-	  ap_uint<1> one=1;
-	  ap_uint<4> tmp=zlast.concat(one);
-	  ap_uint<26> tmp2=projdata.concat(tmp);
-	  queue[writeindex+1]=nstublast.concat(tmp2);
-	  writeindex+=2;
+	ap_uint<1> one=1;
+	ap_uint<4> tmp=zlast.concat(one);
+	ap_uint<26> tmp2=projdata.concat(tmp);
+	if (savefirst) {
+	  queue[writeindextmp+1]=nstublast.concat(tmp2);
 	} else {
-	  writeindex++;
+	  queue[writeindextmp]=nstublast.concat(tmp2);
 	}
       }
     }
@@ -113,6 +132,12 @@ void MatchEngine(const ap_uint<3> bx,
 
 	second=qdata.range(0,0);	
 
+	if (second) {
+	  projfinezadj=projfinez-8;
+	} else {
+	  projfinezadj=projfinez;
+	}
+
 	istub++;
 
       } else {
@@ -127,24 +152,24 @@ void MatchEngine(const ap_uint<3> bx,
       VMStubs::VMStub stubdata=instubdata.read_mem(bx,stubadd);
       VMPID stubindex=VMStubs::get_index(stubdata);
       VMPFINEZ stubfinez=VMStubs::get_finez(stubdata);
-      VMPBEND stubbend=VMStubs::get_bend(stubdata);
+      VMStubs::VMSBEND stubbend=VMStubs::get_bend(stubdata);
       //std::cout << "istub zbin nstub second "<<istub<<" "<<zbin<<" "<<instubdata.getEntries(bx,zbin)<<" "<<second<<std::endl;
 
-      int idz=stubfinez-projfinez;
-      if (second!=0) idz+=8;
+      //std::cout << "projfinez projfinezadj second : "<<projfinez<<" "<<projfinezadj<<" "<<second<<endl;
+      ap_int<5> idz=stubfinez-projfinezadj;
+      //if (second!=0) idz+=8;
       bool pass;
       if (isPSseed) {
 	pass=idz>=-2&&idz<=2;
       } else {
 	pass=idz>=-5&&idz<=5;
       }
-      int index=stubbend+projbend*8;
+      ap_uint<8> index=projbend.concat(stubbend);
       
       //std::cout << "projindex stubindex index pass "<<projindex<<" "<<stubindex<<" "<<index<<" "<<pass<<std::endl;
 
       if (pass&&table[index]) {
-	CandidateMatch cmatch=projindex;
-	cmatch=(cmatch<<7)+stubindex;
+	CandidateMatch cmatch=projindex.concat(stubindex);
 	outcandmatch.write_mem(bx,cmatch);
       }
       

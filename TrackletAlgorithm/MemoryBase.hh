@@ -63,14 +63,20 @@ public:
 
   bool write_mem(ap_uint<3> ibx, DataType data)
   {
-	//assert(ibx < NBX);
-	
-	if (nentries_[ibx%NBX] <= DEPTH) {
-	  dataarray_[ibx%NBX][nentries_[ibx%NBX]++] = data;
-	  return true;
-	}
-	else
-	  return false;
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS dependence variable=nentries_ intra WAR true
+    
+    unsigned int nentry_ibx = nentries_[ibx%NBX];
+    
+    if (nentry_ibx <= DEPTH) {
+      dataarray_[ibx%NBX][nentry_ibx] = data;
+      nentries_[ibx%NBX] = nentry_ibx + 1;
+      return true;
+    }
+    else {
+      return false;
+    }	
+
   }
   
   bool write_mem_line(ap_uint<3> bx, const std::string& line, int base = 16)
