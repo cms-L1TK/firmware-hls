@@ -58,6 +58,8 @@ void MatchEngine(const ap_uint<3> bx,
   ap_uint<4> nstubs;
   ap_uint<4> istub=0;
 
+#pragma HLS dependence variable=istub intra WAR true
+
   bool second=false;
   //bool wrotefirst=false;
 
@@ -141,10 +143,11 @@ void MatchEngine(const ap_uint<3> bx,
 	istub++;
 
       } else {
-	istub++;
-	if (istub>=nstubs){
+	if (istub>=nstubs-1){
 	  istub=0;
 	  readindex++;
+	} else {
+	  istub++;
 	}
       }
       //std::cout << "zbin nstubs "<<zbin<<" "<<nstubs<<std::endl;
