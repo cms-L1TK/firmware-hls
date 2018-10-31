@@ -28,11 +28,7 @@ class HLSAllStubs
 {
 private: 
 	AllStub		data_;
-	AS_r		stub_r;
-	AS_z		stub_z;
-	AS_phi		stub_phi;
-	AS_bend		stub_bend;
-	
+
 public:
 	// constructors
 	HLSAllStubs(AllStub newdata):
@@ -42,10 +38,6 @@ public:
 	HLSAllStubs():
 		data_(0)
 	{
-		stub_r    = 0;
-		stub_z    = 0;
-		stub_phi  = 0;
-		stub_bend = 0;
 	}
 	HLSAllStubs(const AS_r   new_stub_r,   const AS_z    new_stub_z,
 			    const AS_phi new_stub_phi, const AS_bend new_stub_bend)
@@ -63,23 +55,23 @@ public:
 	// return values
 	AS_r GetR() const
 	{
-		AS_r r = ((data_ >> (nBITS_Z+nBITS_PHI+nBITS_BEND)) & 0x7FUL);//((1<<nBITS_R-1)-1));
+		AS_r r = data_.range(35,29);
 		return r;
 	}
 	AS_z GetZ() const
 	{
-		AS_z z = ((data_ >> (nBITS_PHI+nBITS_BEND)) & 0xFFFUL); //((1<<nBITS_Z-1)-1));
+		AS_z z = data_.range(28,17);
 		return z;
 
 	}
 	AS_phi GetPhi() const
 	{
-		AS_phi phi = ((data_ >> nBITS_BEND) & 0x3FFFUL);//((1<<nBITS_PHI)-1));
+		AS_phi phi = data_.range(16,3);
 		return phi;
 	}
 	AS_bend GetBend() const
 	{
-		AS_bend bend = (data_ & 0x7UL); //(data_ & ((1 << nBITS_BEND)-1));
+		AS_bend bend = data_.range(2,0);
 		return bend;
 	}
 
@@ -91,18 +83,9 @@ public:
 	void AddStub(const AS_r   new_stub_r,   const AS_z    new_stub_z,
 				 const AS_phi new_stub_phi, const AS_bend new_stub_bend)
 	{
-		stub_r    = new_stub_r;
-		stub_z    = new_stub_z;
-		stub_phi  = new_stub_phi;
-		stub_bend = new_stub_bend;
 		// setup full stub data by concatenating variables above
 		// data_ = {r, z, phi, bend}
-		// need "to_long" for shifts otherwise data will truncate at current size
-		data_     = (((new_stub_r.to_long()  << (nBITS_Z + nBITS_PHI + nBITS_BEND -1)) |
-					 (new_stub_z.to_long()   << (nBITS_PHI + nBITS_BEND -1)) |
-					 (new_stub_phi.to_long() << (nBITS_BEND -1)) |
-					 (new_stub_bend))
-					 & ((1<<nBITS_STUB)-1));  // protect to keep length at nBITS_STUB
+		data_  = (((new_stub_r,new_stub_z),new_stub_phi),new_stub_bend);
 	}
 
 };
