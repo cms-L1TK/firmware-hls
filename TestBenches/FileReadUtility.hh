@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include <vector>
 
 template<class DataType>
 void readEventFromFile(DataType& memarray, std::ifstream& fin, int ievt){
@@ -23,7 +23,7 @@ void readEventFromFile(DataType& memarray, std::ifstream& fin, int ievt){
       return;
     }
 
-    if (line.find("Event") != string::npos) {
+    if (line.find("Event") != std::string::npos) {
 	return;
     }
     else {
@@ -33,8 +33,94 @@ void readEventFromFile(DataType& memarray, std::ifstream& fin, int ievt){
   }
 }
 
+std::vector<std::string> split(const std::string& s, char delimiter)
+{
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream sstream(s);
+  
+  while (getline(sstream, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  
+  return tokens;
+}
 
+template<class MemType>
+void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16)
+{
+  std::string line;
 
+  if (ievt==0) {
+    getline(fin, line);
+  }
+  
+  memory.clear();
+  
+  while (getline(fin, line)) {
+    
+    if (!fin.good()) {
+      return;
+    }
+    
+    if (line.find("Event") != std::string::npos) {
+      return;
+    }
+    else {
+      const std::string datastr = split(line, ' ').back();
+      memory.write_mem(ievt, datastr.c_str(), base);
+    }	
+  }
+  
+}
 
+// TODO: FIXME or write a new one for binned memories
+template<class MemType>
+unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout, int ievt,
+                        int base=16)
+{
+  unsigned int err_count = 0;
+
+  ////////////////////////////////////////
+  // Read from file
+  MemType memory_ref;
+  writeMemFromFile<MemType>(memory_ref, fout, ievt, base);
+
+  ////////////////////////////////////////
+  // compare expected data with those computed and stored in the output memory
+  if (memory.getEntries(ievt)!=0 or memory_ref.getEntries(ievt)!=0)
+    std::cout << "reference" << "\t" << "computed" << std::endl;
+  
+  for (int i = 0; i < memory_ref.getEntries(ievt); ++i) {
+    
+    auto data_ref = memory_ref.read_mem(ievt,i).raw();
+    std::cout << std::hex << data_ref << "\t";
+    
+    if (i >= memory.getEntries(ievt) ) {
+      // missing entries in the computed memory
+      err_count++;
+      std::cout << "missing" << std::endl;
+      continue;
+    }
+
+    auto data_com = memory.read_mem(ievt,i).raw();
+    std::cout << std::hex << data_com << std::endl;
+
+    if (data_com != data_ref) err_count++;
+  }
+  
+  // in case computed memory has extra contents...
+  if (memory.getEntries(ievt) >  memory_ref.getEntries(ievt)) {
+    
+    for (int i = memory_ref.getEntries(ievt); i < memory.getEntries(ievt); ++i) {
+      auto data_extra = memory.read_mem(ievt, i).raw();   
+      std::cout << "missing" << "\t" << std::hex << data_extra << std::endl;
+      err_count++;
+    }
+  }
+
+  return err_count;
+  
+}
 
 #endif
