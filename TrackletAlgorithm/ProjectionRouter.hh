@@ -154,9 +154,9 @@ void ProjectionRouter(BXType bx, // FIXME
         break;
       }
     
-    TrackletProjection::TProjPHI iphiproj = tproj.GetPhi();
-    TrackletProjection::TProjZ izproj = tproj.GetZ();
-    TrackletProjection::TProjPHIDER iphider = tproj.GetPhiDer();
+    auto iphiproj = tproj.GetPhi();
+    auto izproj = tproj.GetZ();
+    auto iphider = tproj.GetPhiDer();
 
     // routing
     auto iphi5 = iphiproj>>(iphiproj.length()-5);  // top 5 bits of phi
