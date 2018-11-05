@@ -6,15 +6,15 @@
 //#include <cmath>
 //#include "hls_math.h"
 
-static const int kTMUX = 6;
-static const int kMaxProc = kTMUX * 6;
+constexpr int kTMUX = 6;
+constexpr int kMaxProc = kTMUX * 6;
 
 // Memory
-static const int kNBits_MemAddr = 7;
-static const int kMemDepth = (1<<kNBits_MemAddr);
-static const int kNBits_BX = 3;
+constexpr int kNBits_MemAddr = 7;
+constexpr int kMemDepth = (1<<kNBits_MemAddr);
+constexpr int kNBits_BX = 3;
 
-const int MEBinsBits = 3;
-const int TEBinsBits = 3;
+constexpr int MEBinsBits = 3;
+constexpr int TEBinsBits = 3;
 
 #endif
