@@ -6,6 +6,19 @@
 #include <string>
 #include <vector>
 
+bool openDataFile(std::ifstream& file_in, const std::string& file_name)
+{
+  file_in.open(file_name);
+
+  bool success = file_in.good();
+  if (not success) {
+    std::cerr << "Open of file " << file_name << " failed with error!";
+    std::cerr << std::endl;
+  }
+
+  return success;
+}
+
 template<class DataType>
 void readEventFromFile(DataType& memarray, std::ifstream& fin, int ievt){
 
@@ -75,9 +88,9 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
 }
 
 // TODO: FIXME or write a new one for binned memories
-template<class MemType>
-unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout, int ievt,
-                        int base=16)
+template<class MemType, int base=16>
+unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
+                                int ievt, const std::string& label)
 {
   unsigned int err_count = 0;
 
@@ -85,6 +98,12 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout, int 
   // Read from file
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, base);
+
+  // Check if at least one of the memories in comparison is non empty
+  // before spamming the screen
+  if (memory_ref.getEntries(ievt) or memory.getEntries(ievt)) {
+    std::cout << label << ":" << std::endl;
+  }
 
   ////////////////////////////////////////
   // compare expected data with those computed and stored in the output memory

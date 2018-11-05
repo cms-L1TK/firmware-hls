@@ -15,6 +15,7 @@ int main()
   // error counts
   int err = 0;
 
+  ///////////////////////////
   // input memories
   static TrackletProjectionMemory tproj1;
   static TrackletProjectionMemory tproj2;
@@ -29,36 +30,58 @@ int main()
   static VMProjectionMemory vmproj2;
   static VMProjectionMemory vmproj3;
   static VMProjectionMemory vmproj4;
-  
+
+  ///////////////////////////
   // open input files
   cout << "Open files..." << endl;
-  ifstream fin_tproj1("PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4C_L1PHI3_04.dat");
-  ifstream fin_tproj2("PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4D_L1PHI3_04.dat");
-  ifstream fin_tproj3("PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4E_L1PHI3_04.dat");
-  ifstream fin_tproj4("PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4F_L1PHI3_04.dat");
-  ifstream fin_tproj5("PR_L3L4_L1PHI3/TrackletProjections_TPROJ_D1L2B_L1PHI3_04.dat");
-  ifstream fin_tproj6("PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4_L1PHI3FromPlus_04.dat");
 
-  assert(fin_tproj1.good());
-  assert(fin_tproj2.good());
-  assert(fin_tproj3.good());
-  assert(fin_tproj4.good());
-  assert(fin_tproj5.good());
-  assert(fin_tproj6.good());
+  ifstream fin_tproj1;
+  bool validin1 = openDataFile(fin_tproj1, "PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4C_L1PHI3_04.dat");
+  if (not validin1) return -1;
 
+  ifstream fin_tproj2;
+  bool validin2 = openDataFile(fin_tproj2, "PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4D_L1PHI3_04.dat");
+  if (not validin2) return -1;
+
+  ifstream fin_tproj3;
+  bool validin3 = openDataFile(fin_tproj3, "PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4E_L1PHI3_04.dat");
+  if (not validin3) return -1;
+
+  ifstream fin_tproj4;
+  bool validin4 = openDataFile(fin_tproj4, "PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4F_L1PHI3_04.dat");
+  if (not validin4) return -1;
+
+  ifstream fin_tproj5;
+  bool validin5 = openDataFile(fin_tproj5, "PR_L3L4_L1PHI3/TrackletProjections_TPROJ_D1L2B_L1PHI3_04.dat");
+  if (not validin5) return -1;
+
+  ifstream fin_tproj6;
+  bool validin6 = openDataFile(fin_tproj6, "PR_L3L4_L1PHI3/TrackletProjections_TPROJ_L3L4_L1PHI3FromPlus_04.dat");
+  if (not validin6) return -1;
+
+  ///////////////////////////
   // open output files
-  ifstream fout_aproj("PR_L3L4_L1PHI3/AllProj_AP_L3L4_L1PHI3_04.dat");
-  ifstream fout_vmproj1("PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI9_04.dat");
-  ifstream fout_vmproj2("PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI10_04.dat");
-  ifstream fout_vmproj3("PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI11_04.dat");
-  ifstream fout_vmproj4("PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI12_04.dat");
+  ifstream fout_aproj;
+  bool valid_aproj = openDataFile(fout_aproj, "PR_L3L4_L1PHI3/AllProj_AP_L3L4_L1PHI3_04.dat");
+  if (not valid_aproj) return -1;
 
-  assert(fout_aproj.good());
-  assert(fout_vmproj1.good());
-  assert(fout_vmproj2.good());
-  assert(fout_vmproj3.good());
-  assert(fout_vmproj4.good());
+  ifstream fout_vmproj1;
+  bool valid_vmproj1 =  openDataFile(fout_vmproj1, "PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI9_04.dat");
+  if (not valid_vmproj1) return -1;
 
+  ifstream fout_vmproj2;
+  bool valid_vmproj2 = openDataFile(fout_vmproj2, "PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI10_04.dat");
+  if (not valid_vmproj2) return -1;
+
+  ifstream fout_vmproj3;
+  bool valid_vmproj3 = openDataFile(fout_vmproj3, "PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI11_04.dat");
+  if (not valid_vmproj3) return -1;
+
+  ifstream fout_vmproj4;
+  bool valid_vmproj4 = openDataFile(fout_vmproj4, "PR_L3L4_L1PHI3/VMProjections_VMPROJ_L3L4_L1PHI12_04.dat");
+  if (not valid_vmproj4) return -1;
+
+  ///////////////////////////  
   // loop over events
   cout << "Start event loop ..." << endl;
   for (int ievt = 0; ievt < nevents; ++ievt) {
@@ -83,20 +106,24 @@ int main()
                         &allproj, &vmproj1, &vmproj2, &vmproj3, &vmproj4);
 
     // compare the computed outputs with the expected ones
-    cout << "AllProjection:" << endl;
-    err += compareMemWithFile<AllProjectionMemory>(allproj, fout_aproj, ievt);
+    // AllProjection
+    err += compareMemWithFile<AllProjectionMemory>(allproj, fout_aproj, ievt,
+                                                   "AllProjection");
+    // VMProjection1
+    err += compareMemWithFile<VMProjectionMemory>(vmproj1, fout_vmproj1, ievt,
+                                                  "VMProjection1");
 
-    cout << "VMProjection1:" << endl;
-    err += compareMemWithFile<VMProjectionMemory>(vmproj1, fout_vmproj1, ievt);
+    // VMProjection2
+    err += compareMemWithFile<VMProjectionMemory>(vmproj2, fout_vmproj2, ievt,
+                                                  "VMProjection2");
 
-    cout << "VMProjection2:" << endl;
-    err += compareMemWithFile<VMProjectionMemory>(vmproj2, fout_vmproj2, ievt);
+    // VMProjection3
+    err += compareMemWithFile<VMProjectionMemory>(vmproj3, fout_vmproj3, ievt,
+                                                  "VMProjection3");
 
-    cout << "VMProjection3:" << endl;
-    err += compareMemWithFile<VMProjectionMemory>(vmproj3, fout_vmproj3, ievt);
-
-    cout << "VMProjection4:" << endl;
-    err += compareMemWithFile<VMProjectionMemory>(vmproj4, fout_vmproj4, ievt);
+    // VMProjection4
+    err += compareMemWithFile<VMProjectionMemory>(vmproj4, fout_vmproj4, ievt,
+                                                  "VMProjection4");
     
   } // end of event loop
   
