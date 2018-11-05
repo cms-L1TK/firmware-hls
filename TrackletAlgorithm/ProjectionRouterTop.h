@@ -3,14 +3,14 @@
 
 #include "ProjectionRouter.hh"
 
-void ProjectionRouterTop(ap_uint<3> bx,
+void ProjectionRouterTop(BXType bx,
                          TrackletProjectionMemory *const,
                          TrackletProjectionMemory *const,
                          TrackletProjectionMemory *const,
                          TrackletProjectionMemory *const,
                          TrackletProjectionMemory *const,
                          TrackletProjectionMemory *const,
-                         ap_uint<3>&,
+                         BXType&,
                          AllProjectionMemory *const,
                          VMProjectionMemory *const,
                          VMProjectionMemory *const,

@@ -5,6 +5,7 @@
 #include <iterator>
 
 #include "FileReadUtility.hh"
+#include "Constants.hh"
 
 const int nevents = 100;  //number of events to run
 
@@ -84,7 +85,7 @@ int main()
   ///////////////////////////  
   // loop over events
   cout << "Start event loop ..." << endl;
-  for (int ievt = 0; ievt < nevents; ++ievt) {
+  for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
@@ -96,8 +97,8 @@ int main()
     writeMemFromFile<TrackletProjectionMemory>(tproj6, fin_tproj6, ievt);
     
     // bx
-    ap_uint<3> bx = ievt&0x7;
-    ap_uint<3> bx_out;
+    BXType bx = ievt;
+    BXType bx_out;
 
     // Unit Under Test
     ProjectionRouterTop(bx,

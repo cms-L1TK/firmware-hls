@@ -17,4 +17,7 @@ constexpr int kNBits_BX = 3;
 constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
 
+// Global BX type
+typedef ap_uint <3> BXType;  // temporary definition. need to be revisited
+
 #endif

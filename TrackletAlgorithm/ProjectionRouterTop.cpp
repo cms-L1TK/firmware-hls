@@ -1,6 +1,6 @@
 #include "ProjectionRouterTop.h"
 
-void ProjectionRouterTop(ap_uint<3> bx,
+void ProjectionRouterTop(BXType bx,
                          TrackletProjectionMemory *const tproj1,
                          TrackletProjectionMemory *const tproj2,
                          TrackletProjectionMemory *const tproj3,
@@ -9,7 +9,7 @@ void ProjectionRouterTop(ap_uint<3> bx,
                          TrackletProjectionMemory *const tproj6,
                          //TrackletProjectionMemory *const tproj7,
                          //TrackletProjectionMemory *const tproj8,
-                         ap_uint<3>& bx_o,
+                         BXType& bx_o,
                          AllProjectionMemory *const allproj,
                          VMProjectionMemory *const vmproj1,
                          VMProjectionMemory *const vmproj2,

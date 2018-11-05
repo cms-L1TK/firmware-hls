@@ -34,7 +34,7 @@ bool get_mem_read_addr(ap_uint<nbits_nMEM>& imem, ap_uint<nbits_MemAddr>& addr,
 //////////////////////////////
 // ProjectionRouter
 template<unsigned int nINMEM>
-void ProjectionRouter(ap_uint<3> bx, // FIXME
+void ProjectionRouter(BXType bx, // FIXME
                       TrackletProjectionMemory *const tproj1,
                       TrackletProjectionMemory *const tproj2,
                       TrackletProjectionMemory *const tproj3,
@@ -43,7 +43,7 @@ void ProjectionRouter(ap_uint<3> bx, // FIXME
                       TrackletProjectionMemory *const tproj6,
                       TrackletProjectionMemory *const tproj7,
                       TrackletProjectionMemory *const tproj8,
-                      ap_uint<3>& bx_o, // FIXME
+                      BXType& bx_o, // FIXME
                       AllProjectionMemory* allproj,
                       VMProjectionMemory* vmproj1,
                       VMProjectionMemory* vmproj2,
