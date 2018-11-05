@@ -43,3 +43,6 @@
 *.exe
 *.out
 *.app
+
+# Emacs
+.dir-locals.el
