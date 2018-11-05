@@ -7,7 +7,7 @@
 #include "AllProjectionMemory.hh"
 #include "VMProjectionMemory.hh"
 
-#include <assert.h>
+//#include <assert.h>
 
 //////////////////////////////
 // Input memory reading logic
@@ -52,7 +52,7 @@ void ProjectionRouter(ap_uint<3> bx, // FIXME
 ){
 #pragma HLS inline off
 
-  assert(nINMEM <= 8); // maximum number of input ports is 8
+  //assert(nINMEM <= 8); // maximum number of input ports is 8
   
   // reset
   allproj->clear();
@@ -115,17 +115,17 @@ void ProjectionRouter(ap_uint<3> bx, // FIXME
   // 3 here for 8 input tprojs
   ap_uint<3> imem = 0;
   ap_uint<kNBits_MemAddr> addr_next = 0;
-
+  
  PROC_LOOP: for (int i = 0; i < kMaxProc; ++i) {
 #pragma HLS PIPELINE II=1
-    // read inputs
+    // read inputs3
     ap_uint<kNBits_MemAddr> addr = addr_next;
     bool validin = get_mem_read_addr<3, kNBits_MemAddr>(imem, addr_next, mem_hasdata, numbersin);
-
+    
     if (not validin) continue;
 
-	TrackletProjection tproj;
-     // read input memories
+    TrackletProjection tproj;
+    // read input memories
     switch (imem)
       {
       case 0:
@@ -153,54 +153,59 @@ void ProjectionRouter(ap_uint<3> bx, // FIXME
         tproj = tproj8->read_mem(bx, addr);
         break;
       }
-
+    
     TrackletProjection::TProjPHI iphiproj = tproj.GetPhi();
-	TrackletProjection::TProjZ izproj = tproj.GetZ();
-	TrackletProjection::TProjPHIDER iphider = tproj.GetPhiDer();
+    TrackletProjection::TProjZ izproj = tproj.GetZ();
+    TrackletProjection::TProjPHIDER iphider = tproj.GetPhiDer();
 
     // routing
-    ap_uint<5> iphi5 = iphiproj>>(iphiproj.length()-5);  // top 5 bits of phi
+    auto iphi5 = iphiproj>>(iphiproj.length()-5);  // top 5 bits of phi
 
     // FIXME
     // inner barrel non-hourglass for now
-    assert(iphi5>=4 and iphi5<=27);
-	ap_uint<2> iphi = ((iphi5-4)>>1)&3;
-	assert(iphi>=0 and iphi<=3);
+    //assert(iphi5>=4 and iphi5<=27);
+    ap_uint<2> iphi = ((iphi5-4)>>1)&3;
+    //assert(iphi>=0 and iphi<=3);
 
     // vmproj index
     VMProjection::VMPID index = i;
 
     // vmproj z
-	ap_uint<MEBinsBits> zbin1 = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
-	ap_uint<MEBinsBits> zbin2 = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
-	if (zbin1 >= (1<<MEBinsBits)) zbin1 = 0;
-	if (zbin2 >= (1<<MEBinsBits)) zbin2 = (1<<MEBinsBits)-1;
-	
-	if (zbin1>=(1<<MEBinsBits)) zbin1=0; //note that zbin1 is unsigned
-	if (zbin2>=(1<<MEBinsBits)) zbin2=(1<<MEBinsBits)-1;
-	assert(zbin1<=zbin2);
-	assert(zbin2-zbin1<=1);
+    // Separate the vm projections into zbins
+    // The central bin e.g.: zbin=4+(zproj.value()>>(zproj.nbits()-3));
+    // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
+    // But we need some range (particularly for L5L6 seed projecting to L1-L3):
+    // Lower bound
+    ap_uint<MEBinsBits> zbin1 = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
+    // Upper bound
+    ap_uint<MEBinsBits> zbin2 = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
+    if (zbin1 >= (1<<MEBinsBits)) zbin1 = 0;
+    if (zbin2 >= (1<<MEBinsBits)) zbin2 = (1<<MEBinsBits)-1;
+
+    if (zbin1>=(1<<MEBinsBits)) zbin1=0; //note that zbin1 is unsigned
+    if (zbin2>=(1<<MEBinsBits)) zbin2=(1<<MEBinsBits)-1;
+    //assert(zbin1<=zbin2);
+    //assert(zbin2-zbin1<=1);
 	  
     VMProjection::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
-	//fine vm z bits. Use 4 bits for fine position. starting at zbin 1
-	// need to be careful about left shift of ap_(u)int
-	VMProjection::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
-	
-	// vmproj irinv
-	VMProjection::VMPRINV rinv = 16 + (iphider>>(iphider.length()-5));
-	assert(rinv >=0 and rinv < 32);
-	
-	// PS seed
-	bool psseed = false;  // FIXME
+    //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
+    // need to be careful about left shift of ap_(u)int
+    VMProjection::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
+
+    // vmproj irinv
+    VMProjection::VMPRINV rinv = 16 + (iphider>>(iphider.length()-5));
+    //assert(rinv >=0 and rinv < 32);
+    // PS seed
+    bool psseed = false;  // FIXME
 
     // VM Projection
-	VMProjection vmproj(index, zbin, finez, rinv, psseed);
+    VMProjection vmproj(index, zbin, finez, rinv, psseed);
 
     // All Projection
     AllProjection aproj(tproj.raw());
 
     // write outputs
-    assert(iphi>=0 and iphi<4);
+    //assert(iphi>=0 and iphi<4);
     switch(iphi) {
     case 0:
       vmproj1->write_mem(bx, vmproj);
