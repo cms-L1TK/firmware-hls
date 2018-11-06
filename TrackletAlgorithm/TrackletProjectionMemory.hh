@@ -4,20 +4,26 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-
+constexpr int NBits_tptcid = 13;
+constexpr int NBits_tpphi = 14;
+constexpr int NBits_tpz = 12;
+constexpr int NBits_tpphid = 11;
+constexpr int NBits_tpzd = 10;
+constexpr int NBits_tpdata =
+  1 + 1 + NBits_tptcid + NBits_tpphi + NBits_tpz + NBits_tpphid + NBits_tpzd;
 
 // Data object definition
 class TrackletProjection
 {
 public:
+
+  typedef ap_uint<NBits_tptcid> TProjTCID;
+  typedef ap_uint<NBits_tpphi> TProjPHI;
+  typedef ap_int<NBits_tpz> TProjZ;
+  typedef ap_int<NBits_tpphid> TProjPHIDER;
+  typedef ap_int<NBits_tpzd> TProjZDER;
   
-  typedef ap_uint<13> TProjTCID;
-  typedef ap_uint<14> TProjPHI;
-  typedef ap_int<12> TProjZ;
-  typedef ap_int<11> TProjPHIDER;
-  typedef ap_int<10> TProjZDER;
-  
-  typedef ap_uint<1+1+13+14+12+11+10> TProjData;
+  typedef ap_uint<NBits_tpdata> TProjData;
 
   // Constructors
   TrackletProjection(TProjData newdata):
