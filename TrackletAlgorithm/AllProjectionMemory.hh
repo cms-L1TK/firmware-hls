@@ -4,18 +4,26 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+constexpr int NBits_aptcid = 13;
+constexpr int NBits_apphi = 14;
+constexpr int NBits_apz = 12;
+constexpr int NBits_apphid = 11;
+constexpr int NBits_apzd = 10;
+constexpr int NBits_apdata =
+  1 + 1 + NBits_aptcid + NBits_apphi + NBits_apz + NBits_apphid + NBits_apzd;
+
 // Data object definition
 class AllProjection
 {
 public:
+
+  typedef ap_uint<NBits_aptcid> AProjTCID;
+  typedef ap_uint<NBits_apphi> AProjPHI;
+  typedef ap_int<NBits_apz> AProjZ;
+  typedef ap_int<NBits_apphid> AProjPHIDER;
+  typedef ap_int<NBits_apzd> AProjZDER;
   
-  typedef ap_uint<13> AProjTCID;
-  typedef ap_uint<14> AProjPHI;
-  typedef ap_int<12> AProjZ;
-  typedef ap_int<11> AProjPHIDER;
-  typedef ap_int<10> AProjZDER;
-  
-  typedef ap_uint<1+1+13+14+12+11+10> AllProjData;
+  typedef ap_uint<NBits_apdata> AllProjData;
   
   // Constructors
   AllProjection(AllProjData newdata):
