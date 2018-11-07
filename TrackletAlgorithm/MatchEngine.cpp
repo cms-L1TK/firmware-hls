@@ -41,13 +41,27 @@ void MatchEngine(const ap_uint<3> bx,
 
   //Read projections and check that there are stubs in memories
   ap_uint<3> writeindex=0;
+#pragma HLS dependence variable=writeindex intra WAR true
+#pragma HLS dependence variable=writeindex intra RAW true
+#pragma HLS dependence variable=writeindex intra WAW true
+  ap_uint<3> writeindexa=0;
+  ap_uint<3> writeindex1=0;
+#pragma HLS dependence variable=writeindex1 intra WAR true
+  //#pragma HLS dependence variable=writeindex1 intra RAW true
+    //#pragma HLS dependence variable=writeindex1 intra WAW true
+
   ap_uint<3> readindex=0;
   ap_uint<30> queue[8];
+  //  ap_uint<30> queuer[8];
 
 #pragma HLS ARRAY_PARTITION variable=queue complete dim=0
+  //#pragma HLS ARRAY_PARTITION variable=queuer complete dim=0
 
-
-  unsigned int iproj=0;
+  
+  ap_uint<7> iproj=0;
+#pragma HLS dependence variable=iproj intra WAR true
+#pragma HLS dependence variable=iproj intra RAW true
+#pragma HLS dependence variable=iproj intra WAW true
 
   ap_uint<3> zbin=0;
   VMPID projindex;
@@ -55,25 +69,38 @@ void MatchEngine(const ap_uint<3> bx,
   ap_int<5> projfinezadj;
   VMPBEND projbend;
   bool isPSseed;
-  ap_uint<4> nstubs;
+  ap_uint<4> nstubs=0;
   ap_uint<4> istub=0;
 
 #pragma HLS dependence variable=istub intra WAR true
+  //#pragma HLS dependence variable=nstubs inter WAR true
 
   bool second=false;
   //bool wrotefirst=false;
 
   ap_uint<7> nproj=inprojdata.getEntries(bx);
-
   bool moreproj=iproj<nproj;
   
   for (unsigned int istep=0;istep<108;istep++) {
-#pragma HLS PIPELINE II=1 
+#pragma HLS PIPELINE II=1
+
+    //#pragma HLS dependence variable=queue intra false
+    //#pragma HLS dependence variable=queue inter false
+    
+
+
+    writeindex=writeindexa;
+    writeindexa=writeindex1;
+    ap_uint<7> writeindexplus=writeindex1+1;
+    ap_uint<7> writeindexplusplus=writeindex1+2;
     bool queuenotfull=(writeindex+1!=readindex)&&(writeindex+2!=readindex);
     bool queuenotempty=(writeindex!=readindex);
-    VMProj projdata=inprojdata.read_mem(bx,iproj);
-    VMPZBIN projzbin=VMProjections::get_zbin(projdata);
     if (moreproj&&queuenotfull){
+      ap_uint<7> iprojtmp=iproj;
+      VMProj projdata=inprojdata.read_mem(bx,iprojtmp);
+      VMPZBIN projzbin=VMProjections::get_zbin(projdata);
+      iproj++;
+      moreproj=iproj<nproj;
       ap_uint<3> zfirst=projzbin.range(3,1);
       ap_uint<3> zlast=zfirst+projzbin.range(0,0);
       assert(zlast<8);
@@ -81,19 +108,17 @@ void MatchEngine(const ap_uint<3> bx,
       ap_uint<4> nstublast=instubdata.getEntries(bx,zlast);
       bool savefirst=nstubfirst!=0;
       bool savelast=nstublast!=0&&projzbin.range(0,0);
-      ap_uint<3> writeindextmp=writeindex;
-      iproj++;
-      moreproj=iproj<nproj;
+      ap_uint<3> writeindextmp=writeindex1;
 
       if (savefirst) {
 	if (savelast) {
-	  writeindex+=2;
+	  writeindex1=writeindexplusplus;
 	} else {
-	  writeindex++;
+	  writeindex1=writeindexplus;
 	}
       } else {
 	if (savelast) {
-	  writeindex++;
+	  writeindex1=writeindexplus;
 	}
       }
 
@@ -123,9 +148,9 @@ void MatchEngine(const ap_uint<3> bx,
       if (istub==0) {
 
 	ap_uint<30> qdata=queue[readindex];
+        nstubs=qdata.range(29,26);
 	zbin=qdata.range(3,1);
 	VMProj data=qdata.range(25,4);
-        nstubs=qdata.range(29,26);
 
 	projindex=VMProjections::get_index(data);
 	projfinez=VMProjections::get_finez(data);
@@ -143,7 +168,7 @@ void MatchEngine(const ap_uint<3> bx,
 	istub++;
 
       } else {
-	if (istub>=nstubs-1){
+	if (istub+1>=nstubs){
 	  istub=0;
 	  readindex++;
 	} else {
