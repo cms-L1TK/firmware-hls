@@ -62,10 +62,15 @@ void MatchEngine(const ap_uint<3> bx,
 
   ap_uint<3> readindex=0;
   ap_uint<30> queue[8];
-  //  ap_uint<30> queuer[8];
 
 #pragma HLS ARRAY_PARTITION variable=queue complete dim=0
-  //#pragma HLS ARRAY_PARTITION variable=queuer complete dim=0
+
+#pragma HLS dependence variable=queue intra false
+#pragma HLS dependence variable=queue inter false
+
+
+  //  ap_uint<30> queuer[8];
+//#pragma HLS ARRAY_PARTITION variable=queuer complete dim=0
 
   
   ap_uint<7> iproj=0;
@@ -98,6 +103,7 @@ void MatchEngine(const ap_uint<3> bx,
     //#pragma HLS dependence variable=queue inter false
     
 
+    ap_uint<30> qdata=queue[readindex];
 
     writeindex=writeindexa;
     writeindexa=writeindex1;
@@ -157,7 +163,6 @@ void MatchEngine(const ap_uint<3> bx,
       ap_uint<4> istubtmp=istub;
       if (istub==0) {
 
-	ap_uint<30> qdata=queue[readindex];
         nstubs=qdata.range(29,26);
 	zbin=qdata.range(3,1);
 	VMProjection data(qdata.range(25,4));
