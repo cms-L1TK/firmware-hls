@@ -24,7 +24,7 @@ void readTable(bool table[256]){
 // 2 - This version flattens the loops to one loop. Loop is pipelined
 //     with II=4
 // 3 - Version 2 has been modified to use a queue for the projections.
-//     It reaches II=3
+//     It reaches II=1
 //
 #define CODEVERSION 3
 
