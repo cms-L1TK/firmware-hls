@@ -18,12 +18,13 @@ void readTable(bool table[256]){
 
 // There are three different implementations of the MatchEngine. 
 // By selecting 'CODEVERSION' on the line below you select which
-// implemenation to use:
-// 1 - Version of code closest to emulation. Tripple nested loop
+// implementation to use:
+// 1 - Version of code closest to emulation. Triple nested loop
 //     which can not be pipelined
 // 2 - This version flattens the loops to one loop. Loop is pipelined
 //     with II=4
 // 3 - Version 2 has been modified to use a queue for the projections.
+//     It reaches II=3
 //
 #define CODEVERSION 3
 
@@ -317,6 +318,11 @@ void MatchEngine(const ap_uint<3> bx,
 
 #if CODEVERSION==1
 
+//
+// This version closely follows the code in the emulations. This version can
+// not be pipelined
+//
+
 void MatchEngine(const ap_uint<3> bx,
 		 const VMStubMemory* instubdata,
 		 const VMProjectionMemory* inprojdata,
@@ -328,50 +334,59 @@ void MatchEngine(const ap_uint<3> bx,
   }
   std::cout<<std::dec<<std::endl;
 
+  // Initialize the pt-bend lookup table
   bool table[256];
-
   readTable(table);
 
   outcandmatch->clear();
 
   ap_uint<7> nproj=inprojdata->getEntries(bx);
 
+  //Outermost loop is over the projections
   for (ap_uint<7> iproj=0;iproj<nproj;iproj++) {
-      VMProjection proj=inprojdata->read_mem(bx,iproj);
-      VMProjection::VMPID projindex=proj.GetIndex();
-      VMProjection::VMPZBIN projzbin=proj.GetZBin();
-      VMProjection::VMPFINEZ projfinez=proj.GetFineZ();
-      VMProjection::VMPRINV projrinv=proj.GetRInv();
-      bool isPSseed=proj.GetIsPSSeed();
+    //Read projection from memory and extract the elements of the projection
+    VMProjection proj=inprojdata->read_mem(bx,iproj);
+    VMProjection::VMPID projindex=proj.GetIndex();
+    VMProjection::VMPZBIN projzbin=proj.GetZBin();
+    VMProjection::VMPFINEZ projfinez=proj.GetFineZ();
+    VMProjection::VMPRINV projrinv=proj.GetRInv();
+    bool isPSseed=proj.GetIsPSSeed();
+    
+    //Calculate first and last zbin that need to searched for stubs
+    int zfirst=projzbin.range(3,1);
+    int zlast=zfirst+projzbin.range(0,0);
+    assert(zlast<8);
 
-      int zfirst=projzbin.range(3,1);
-      int zlast=zfirst+projzbin.range(0,0);
-      assert(zlast<8);
+    //Loop over the zbins. There are at most two zbins that needs to be searched
+    for (int zbin=zfirst;zbin<=zlast;zbin++){
+      int nstub=instubdata->getEntries(bx,zbin);
 
-      for (int zbin=zfirst;zbin<=zlast;zbin++){
-	int nstub=instubdata->getEntries(bx,zbin);
-	for (int istub=0;istub<nstub;istub++) {
-	  VMStub stubdata=instubdata->read_mem(bx,istub+16*zbin);
-	  VMStub::VMSID stubindex=stubdata.GetIndex();
-	  VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
-	  VMStub::VMSBEND stubbend=stubdata.GetBend();
-
-	  int idz=stubfinez-projfinez;
-	  if (zbin!=zfirst) idz+=8;
-
-	  bool pass=hls::abs(idz)<=5;
-	  if (isPSseed) {
-	    pass=hls::abs(idz)<=2;
-	  }
-	  int index=stubbend+projrinv*8;
-
-	  if (pass&&table[index]) {
-	    CandidateMatch cmatch(projindex.concat(stubindex));
-	    outcandmatch->write_mem(bx,cmatch);
-	  }
-
+      //Loop over the stubs in the bin
+      for (int istub=0;istub<nstub;istub++) {
+	//Read the stub memory and extract the elements of the projection
+	VMStub stubdata=instubdata->read_mem(bx,istub+16*zbin);
+	VMStub::VMSID stubindex=stubdata.GetIndex();
+	VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
+	VMStub::VMSBEND stubbend=stubdata.GetBend();
+	
+	//Check is stub and projection satisfies the z cut 
+	int idz=stubfinez-projfinez;
+	if (zbin!=zfirst) idz+=8;
+	bool pass=hls::abs(idz)<=5;
+	if (isPSseed) {
+	  pass=hls::abs(idz)<=2;
 	}
+
+	//Use lookup table for pt-bend matchcing and if stub passes
+	//the cut save the projection-stub pair as a candidate match
+	int index=stubbend+projrinv*8;	
+	if (pass&&table[index]) {
+	  CandidateMatch cmatch(projindex.concat(stubindex));
+	  outcandmatch->write_mem(bx,cmatch);
+	}
+
       }
+    }
   }
 }
 
