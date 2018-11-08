@@ -11,7 +11,7 @@ public:
   
   typedef ap_uint<7> VMPID;
   typedef ap_uint<MEBinsBits+1> VMPZBIN;
-  typedef ap_int<4> VMPFINEZ;
+  typedef ap_uint<4> VMPFINEZ;
   typedef ap_uint<5> VMPRINV;
 	
   typedef ap_uint<7+MEBinsBits+1+4+5+1> VMProjData;
