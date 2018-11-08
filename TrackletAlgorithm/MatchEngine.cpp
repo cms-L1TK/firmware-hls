@@ -51,32 +51,17 @@ void MatchEngine(const ap_uint<3> bx,
 
   //Read projections and check that there are stubs in memories
   ap_uint<3> writeindex=0;
-#pragma HLS dependence variable=writeindex intra WAR true
-#pragma HLS dependence variable=writeindex intra RAW true
-#pragma HLS dependence variable=writeindex intra WAW true
-  ap_uint<3> writeindexa=0;
+
+
   ap_uint<3> writeindex1=0;
-#pragma HLS dependence variable=writeindex1 intra WAR true
-  //#pragma HLS dependence variable=writeindex1 intra RAW true
-    //#pragma HLS dependence variable=writeindex1 intra WAW true
 
   ap_uint<3> readindex=0;
   ap_uint<30> queue[8];
 
 #pragma HLS ARRAY_PARTITION variable=queue complete dim=0
 
-#pragma HLS dependence variable=queue intra false
-#pragma HLS dependence variable=queue inter false
 
-
-  //  ap_uint<30> queuer[8];
-//#pragma HLS ARRAY_PARTITION variable=queuer complete dim=0
-
-  
   ap_uint<7> iproj=0;
-#pragma HLS dependence variable=iproj intra WAR true
-#pragma HLS dependence variable=iproj intra RAW true
-#pragma HLS dependence variable=iproj intra WAW true
 
   ap_uint<3> zbin=0;
   VMProjection::VMPID projindex;
@@ -88,10 +73,8 @@ void MatchEngine(const ap_uint<3> bx,
   ap_uint<4> istub=0;
 
 #pragma HLS dependence variable=istub intra WAR true
-  //#pragma HLS dependence variable=nstubs inter WAR true
 
   bool second=false;
-  //bool wrotefirst=false;
 
   ap_uint<7> nproj=inprojdata->getEntries(bx);
   bool moreproj=iproj<nproj;
@@ -99,14 +82,9 @@ void MatchEngine(const ap_uint<3> bx,
   for (unsigned int istep=0;istep<108;istep++) {
 #pragma HLS PIPELINE II=1
 
-    //#pragma HLS dependence variable=queue intra false
-    //#pragma HLS dependence variable=queue inter false
-    
-
     ap_uint<30> qdata=queue[readindex];
 
-    writeindex=writeindexa;
-    writeindexa=writeindex1;
+    writeindex=writeindex1;
     ap_uint<7> writeindexplus=writeindex1+1;
     ap_uint<7> writeindexplusplus=writeindex1+2;
     bool queuenotfull=(writeindex+1!=readindex)&&(writeindex+2!=readindex);
@@ -138,16 +116,13 @@ void MatchEngine(const ap_uint<3> bx,
 	}
       }
 
-      //bool wroteonce=false;
       if (savefirst) {
-	//std::cout << "Save in queue iproj="<<iproj<<" at index ="<<writeindex<<" zbin="<<zfirst<<std::endl;
 	ap_uint<1> zero=0;
 	ap_uint<4> tmp=zfirst.concat(zero);
 	ap_uint<26> tmp2=projdata.raw().concat(tmp);
 	queue[writeindextmp]=nstubfirst.concat(tmp2);
       }
       if (savelast) {
-	//std::cout << "Save in queue iproj="<<iproj<<" at index ="<<writeindex<<" zbin="<<zlast<<std::endl;
 	ap_uint<1> one=1;
 	ap_uint<4> tmp=zlast.concat(one);
 	ap_uint<26> tmp2=projdata.raw().concat(tmp);
@@ -190,17 +165,13 @@ void MatchEngine(const ap_uint<3> bx,
 	  istub++;
 	}
       }
-      //std::cout << "zbin nstubs "<<zbin<<" "<<nstubs<<std::endl;
       ap_uint<7> stubadd=zbin.concat(istubtmp);
       VMStub stubdata=instubdata->read_mem(bx,stubadd);
       VMStub::VMSID stubindex=stubdata.GetIndex();
       VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
       VMStub::VMSBEND stubbend=stubdata.GetBend();
-      //std::cout << "istub zbin nstub second "<<istub<<" "<<zbin<<" "<<instubdata.getEntries(bx,zbin)<<" "<<second<<std::endl;
 
-      //std::cout << "projfinez projfinezadj second : "<<projfinez<<" "<<projfinezadj<<" "<<second<<endl;
       ap_int<5> idz=stubfinez-projfinezadj;
-      //if (second!=0) idz+=8;
       bool pass;
       if (isPSseed) {
 	pass=idz>=-2&&idz<=2;
@@ -208,8 +179,6 @@ void MatchEngine(const ap_uint<3> bx,
 	pass=idz>=-5&&idz<=5;
       }
       ap_uint<8> index=projbend.concat(stubbend);
-      
-      //std::cout << "projindex stubindex index pass "<<projindex<<" "<<stubindex<<" "<<index<<" "<<pass<<std::endl;
 
       if (pass&&table[index]) {
 	CandidateMatch cmatch(projindex.concat(stubindex));
