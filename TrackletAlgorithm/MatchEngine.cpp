@@ -21,121 +21,119 @@ void readTable(bool table[256]){
 // implementation to use:
 // 1 - Version of code closest to emulation. Triple nested loop
 //     which can not be pipelined
-// 2 - This version flattens the loops to one loop. Loop is pipelined
-//     with II=4
-// 3 - Version 2 has been modified to use a queue for the projections.
-//     It reaches II=1
+// 2 - Loop structure has been flattend and code modified to use 
+//     a buffer for the projections. It reaches II=1 for the loop
 //
-#define CODEVERSION 3
+#define CODEVERSION 2
 
-#if CODEVERSION==3
+#if CODEVERSION==2
 
 //Attempt at new version of code
 void MatchEngine(const ap_uint<3> bx,
-		 const VMStubMemory *instubdata,
-		 const VMProjectionMemory* inprojdata,
-		 CandidateMatchMemory* outcandmatch){
+		 const VMStubMemory* const instubdata,
+		 const VMProjectionMemory* const inprojdata,
+		 CandidateMatchMemory* const outcandmatch){
 
 
+#ifndef __SYNTHESIS__
+  //Prinout of number of projections and stubs
   std::cout << "In MatchEngine #proj ="<<std::hex<<inprojdata->getEntries(bx)<<" #stubs=";
   for (unsigned int zbin=0;zbin<8;zbin++){
     std::cout <<" "<<instubdata->getEntries(bx,zbin);
   }
   std::cout<<std::dec<<std::endl;
+#endif
 
-  bool table[256];
-
+  //Initialize table for bend-rinv consistency
+  bool table[256]; //FIXME Need to figure out how to replace 256 with meaningful const.
   readTable(table);
 
   outcandmatch->clear();
 
-  //Read projections and check that there are stubs in memories
-  ap_uint<3> writeindex=0;
+  //Buffer of projections. Projection memory is read and if projections points
+  //to nonempty zbin for the stubs it is stored on this buffer. The buffer is 
+  //circular, and the projection reading will stop if buffer is full and continue 
+  //after the buffer is drained
 
+  constexpr unsigned int kNBitsBuffer=3;  
 
-  ap_uint<3> writeindex1=0;
+  ap_uint<kNBitsBuffer> writeindex=0;
+  ap_uint<kNBitsBuffer> readindex=0;
+  ap_uint<30> projbuffer[1<<kNBitsBuffer];  //FIXME How to replace 30 with const?
+#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
 
-  ap_uint<3> readindex=0;
-  ap_uint<30> queue[8];
+  //The next projection to read, the number of projections and flag if we have
+  //more projections to read
+  ap_uint<kNBits_MemAddr> iproj=0;
+  auto const nproj=inprojdata->getEntries(bx);
+  bool moreproj=iproj<nproj;
 
-#pragma HLS ARRAY_PARTITION variable=queue complete dim=0
-
-
-  ap_uint<7> iproj=0;
-
-  ap_uint<3> zbin=0;
+  //Projection that is read from the buffer and compared to stubs  
+  ap_uint<TEBinsBits> zbin=0;
   VMProjection::VMPID projindex;
   VMProjection::VMPFINEZ projfinez;
-  ap_int<5> projfinezadj;
+  ap_int<5> projfinezadj; //FIXME Need replace 5 with const
   VMProjection::VMPRINV projbend;
   bool isPSseed;
-  ap_uint<4> nstubs=0;
-  ap_uint<4> istub=0;
+  bool second;
 
+  //Number of stubs for current zbin and the stub being processed on this clock
+  ap_uint<kNBits_MemAddrBinned> nstubs=0;
+  ap_uint<kNBits_MemAddrBinned> istub=0;
 #pragma HLS dependence variable=istub intra WAR true
 
-  bool second=false;
 
-  ap_uint<7> nproj=inprojdata->getEntries(bx);
-  bool moreproj=iproj<nproj;
   
-  for (unsigned int istep=0;istep<108;istep++) {
+  for (ap_uint<kNBits_MemAddr> istep=0;istep<kMaxProc;istep++) {
 #pragma HLS PIPELINE II=1
 
-    ap_uint<30> qdata=queue[readindex];
+    auto const qdata=projbuffer[readindex];
 
-    writeindex=writeindex1;
-    ap_uint<7> writeindexplus=writeindex1+1;
-    ap_uint<7> writeindexplusplus=writeindex1+2;
-    bool queuenotfull=(writeindex+1!=readindex)&&(writeindex+2!=readindex);
-    bool queuenotempty=(writeindex!=readindex);
-    if (moreproj&&queuenotfull){
-      ap_uint<7> iprojtmp=iproj;
-      VMProjection projdata=inprojdata->read_mem(bx,iprojtmp);
-      VMProjection::VMPZBIN projzbin=projdata.GetZBin();
+    ap_uint<kNBitsBuffer> writeindexplus=writeindex+1;
+    ap_uint<kNBitsBuffer> writeindexplusplus=writeindex+2;
+    bool buffernotfull=(writeindex+1!=readindex)&&(writeindex+2!=readindex);
+    bool buffernotempty=(writeindex!=readindex);
+    if (moreproj&&buffernotfull){
+      auto const iprojtmp=iproj;
+      auto const projdata=inprojdata->read_mem(bx,iprojtmp);
+      auto const projzbin=projdata.GetZBin();
       iproj++;
       moreproj=iproj<nproj;
-      ap_uint<3> zfirst=projzbin.range(3,1);
-      ap_uint<3> zlast=zfirst+projzbin.range(0,0);
-      assert(zlast<8);
-      ap_uint<4> nstubfirst=instubdata->getEntries(bx,zfirst);
-      ap_uint<4> nstublast=instubdata->getEntries(bx,zlast);
+      ap_uint<TEBinsBits> zfirst=projzbin.range(3,1);
+      ap_uint<TEBinsBits> zlast=zfirst+projzbin.range(0,0);
+      //assert(zlast<8);
+      auto const nstubfirst=instubdata->getEntries(bx,zfirst);
+      auto const  nstublast=instubdata->getEntries(bx,zlast);
       bool savefirst=nstubfirst!=0;
       bool savelast=nstublast!=0&&projzbin.range(0,0);
-      ap_uint<3> writeindextmp=writeindex1;
+      auto const writeindextmp=writeindex;
 
-      if (savefirst) {
-	if (savelast) {
-	  writeindex1=writeindexplusplus;
-	} else {
-	  writeindex1=writeindexplus;
-	}
-      } else {
-	if (savelast) {
-	  writeindex1=writeindexplus;
-	}
+      if (savefirst&&savelast) {
+	writeindex=writeindexplusplus;
+      } else if (savefirst||savelast) {
+	writeindex=writeindexplus;
       }
 
-      if (savefirst) {
+      if (savefirst) { //FIXME code needs to be cleaner
 	ap_uint<1> zero=0;
 	ap_uint<4> tmp=zfirst.concat(zero);
 	ap_uint<26> tmp2=projdata.raw().concat(tmp);
-	queue[writeindextmp]=nstubfirst.concat(tmp2);
+	projbuffer[writeindextmp]=nstubfirst.concat(tmp2);
       }
       if (savelast) {
 	ap_uint<1> one=1;
 	ap_uint<4> tmp=zlast.concat(one);
 	ap_uint<26> tmp2=projdata.raw().concat(tmp);
 	if (savefirst) {
-	  queue[writeindextmp+1]=nstublast.concat(tmp2);
+	  projbuffer[writeindextmp+1]=nstublast.concat(tmp2);
 	} else {
-	  queue[writeindextmp]=nstublast.concat(tmp2);
+	  projbuffer[writeindextmp]=nstublast.concat(tmp2);
 	}
       }
     }
 
-    if (queuenotempty) {
-      ap_uint<4> istubtmp=istub;
+    if (buffernotempty) {
+      ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
       if (istub==0) {
 
         nstubs=qdata.range(29,26);
@@ -165,7 +163,7 @@ void MatchEngine(const ap_uint<3> bx,
 	  istub++;
 	}
       }
-      ap_uint<7> stubadd=zbin.concat(istubtmp);
+      auto const  stubadd=zbin.concat(istubtmp);
       VMStub stubdata=instubdata->read_mem(bx,stubadd);
       VMStub::VMSID stubindex=stubdata.GetIndex();
       VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
@@ -178,7 +176,7 @@ void MatchEngine(const ap_uint<3> bx,
       } else {
 	pass=idz>=-5&&idz<=5;
       }
-      ap_uint<8> index=projbend.concat(stubbend);
+      auto const index=projbend.concat(stubbend);
 
       if (pass&&table[index]) {
 	CandidateMatch cmatch(projindex.concat(stubindex));
@@ -193,101 +191,6 @@ void MatchEngine(const ap_uint<3> bx,
 
 #endif
 
-#if CODEVERSION==2
-
-void MatchEngine(const ap_uint<3> bx,
-		 const VMStubMemory* instubdata,
-		 const VMProjectionMemory* inprojdata,
-		 CandidateMatchMemory* outcandmatch){
-
-  std::cout << "In MatchEngine #proj ="<<std::hex<<inprojdata->getEntries(bx)<<" #stubs=";
-  for (unsigned int zbin=0;zbin<8;zbin++){
-    std::cout <<" "<<instubdata->getEntries(bx,zbin);
-  }
-  std::cout<<std::dec<<std::endl;
-
-  bool table[256];
-
-  readTable(table);
-
-  outcandmatch->clear();
-
-  unsigned int iproj=0;
-  int istub=0;
-  int zbin=0;
-  VMProjection::VMPID projindex;
-  VMProjection::VMPZBIN projzbin;
-  VMProjection::VMPFINEZ projfinez;
-  VMProjection::VMPRINV projbend;
-  bool isPSseed;
-  int zfirst;
-  int zlast;
-  int nstubs;
-
-  for (unsigned int istep=0;istep<108;istep++) {
-#pragma HLS PIPELINE II=1
-    if (istep==0||(istep>0&&zbin>zlast)) {
-      if (istep>0&&zbin>zlast) {
-	iproj++;
-	if (iproj>=inprojdata->getEntries(bx)) continue;
-      }
-      VMProjection proj=inprojdata->read_mem(bx,iproj);
-      projindex=proj.GetIndex();
-      projzbin=proj.GetZBin();
-      projfinez=proj.GetFineZ();
-      projbend=proj.GetRInv();
-      isPSseed=proj.GetIsPSSeed();
-      //std::cout << "proj : "<<inprojdata[iproj]<<" "<<projindex<<" "<<projzbin 
-    //      <<" "<<projfinez<<" "<<projbend<<" "<<isPSseed<< std::endl;
-      zfirst=projzbin.range(3,1);
-      zlast=zfirst+projzbin.range(0,0);
-      assert(zlast<8);
-      zbin=zfirst;
-      nstubs=instubdata->getEntries(bx,zbin);
-      //std::cout << "zfirst zlast : "<<zfirst<<" "<<zlast<<std::endl;
-    }
-    if (nstubs>0) {
-      //std::cout << "zbin nstubs "<<zbin<<" "<<nstubs<<std::endl;
-      VMStub stubdata=instubdata->read_mem(bx,istub+16*zbin);
-      VMStub::VMSID stubindex=stubdata.GetIndex();
-      VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
-      VMStub::VMSBEND stubbend=stubdata.GetBend();
-
-      int idz=stubfinez-projfinez;
-      if (zbin!=zfirst) idz+=8;
-      //std::cout << "isPSseed idz "<<isPSseed<<" "<<idz<<" "<<stubfinez<<" "<<projfinez<<std::endl;
-      bool pass=hls::abs(idz)<=5;
-      if (isPSseed) {
-	pass=hls::abs(idz)<=2;
-      }
-      int index=stubbend+projbend*8;
-
-      //if (pass){
-      //std::cout << "index table[index] : "<<index<<" "<<table[index]<<std::endl;
-      //}
-
-      //std::cout << "projindex stubindex index pass "<<projindex<<" "<<stubindex<<" "<<index<<" "<<pass<<std::endl;
-
-      if (pass&&table[index]) {
-	CandidateMatch cmatch(projindex.concat(stubindex));
-	outcandmatch->write_mem(bx,cmatch);
-      }
-
-      //std::cout << "Cand match "<<projindex<<" "<<stubindex<<" "
-      //	  <<pass<<" "<<table[index]<<" "<<projbend<<std::endl;
-      //std::cout << "stubfinez projfinez "<<stubfinez<<" "<<projfinez<<endl;
-    }
-    if ((++istub)>=nstubs) {
-      istub=0;
-      if ((zbin++)<=zlast) {
-	nstubs=instubdata->getEntries(bx,zbin);
-      }
-    }
-  }
-
-}
-
-#endif
 
 
 #if CODEVERSION==1
@@ -309,12 +212,13 @@ void MatchEngine(const ap_uint<3> bx,
   std::cout<<std::dec<<std::endl;
 
   // Initialize the pt-bend lookup table
-  bool table[256];
+  bool table[256]; //Need to figure out how to replace 256 with some 
+                   //meaning full constant
   readTable(table);
 
   outcandmatch->clear();
 
-  ap_uint<7> nproj=inprojdata->getEntries(bx);
+  ap_uint<kNBits_MemAddr> nproj=inprojdata->getEntries(bx);
 
   //Outermost loop is over the projections
   for (ap_uint<7> iproj=0;iproj<nproj;iproj++) {

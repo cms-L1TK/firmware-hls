@@ -8,9 +8,9 @@
 
 
 void MatchEngine(const BXType  bx,
-		 const VMStubMemory *instubdata, 
-		 const VMProjectionMemory *inprojdata,
-		 CandidateMatchMemory *outcanddata
+		 const VMStubMemory* const instubdata, 
+		 const VMProjectionMemory* const inprojdata,
+		 CandidateMatchMemory* const outcanddata
 		 );
 
 #endif
