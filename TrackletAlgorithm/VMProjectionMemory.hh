@@ -4,17 +4,25 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+constexpr int NBits_vmpid = 7;
+constexpr int NBits_vmpzbin = MEBinsBits+1;
+constexpr int NBits_vmpfinez = 4;
+constexpr int NBits_vmprinv = 5;
+constexpr int NBits_vmpdata =
+  NBits_vmpid + NBits_vmpzbin + NBits_vmpfinez + NBits_vmprinv + 1;
+
 // Data object definition
 class VMProjection
 {
 public:
   
-  typedef ap_uint<7> VMPID;
-  typedef ap_uint<MEBinsBits+1> VMPZBIN;
-  typedef ap_uint<4> VMPFINEZ;
-  typedef ap_uint<5> VMPRINV;
+
+  typedef ap_uint<NBits_vmpid> VMPID;
+  typedef ap_uint<NBits_vmpzbin> VMPZBIN;
+  typedef ap_int<NBits_vmpfinez> VMPFINEZ;
+  typedef ap_uint<NBits_vmprinv> VMPRINV;
 	
-  typedef ap_uint<7+MEBinsBits+1+4+5+1> VMProjData;
+  typedef ap_uint<NBits_vmpdata> VMProjData;
 	
   // Constructors
   VMProjection(VMProjData newdata):
