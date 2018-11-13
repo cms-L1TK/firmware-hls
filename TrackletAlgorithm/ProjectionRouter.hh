@@ -34,21 +34,21 @@ bool get_mem_read_addr(ap_uint<nbits_nMEM>& imem, ap_uint<nbits_MemAddr>& addr,
 //////////////////////////////
 // ProjectionRouter
 template<unsigned int nINMEM>
-void ProjectionRouter(BXType bx, // FIXME
-                      TrackletProjectionMemory *const tproj1,
-                      TrackletProjectionMemory *const tproj2,
-                      TrackletProjectionMemory *const tproj3,
-                      TrackletProjectionMemory *const tproj4,
-                      TrackletProjectionMemory *const tproj5,
-                      TrackletProjectionMemory *const tproj6,
-                      TrackletProjectionMemory *const tproj7,
-                      TrackletProjectionMemory *const tproj8,
-                      BXType& bx_o, // FIXME
-                      AllProjectionMemory* allproj,
-                      VMProjectionMemory* vmproj1,
-                      VMProjectionMemory* vmproj2,
-                      VMProjectionMemory* vmproj3,
-                      VMProjectionMemory* vmproj4    
+void ProjectionRouter(BXType bx,
+                      const TrackletProjectionMemory* const tproj1,
+                      const TrackletProjectionMemory* const tproj2,
+                      const TrackletProjectionMemory* const tproj3,
+                      const TrackletProjectionMemory* const tproj4,
+                      const TrackletProjectionMemory* const tproj5,
+                      const TrackletProjectionMemory* const tproj6,
+                      const TrackletProjectionMemory* const tproj7,
+                      const TrackletProjectionMemory* const tproj8,
+                      BXType& bx_o,
+                      AllProjectionMemory* const allproj,
+                      VMProjectionMemory* const vmproj1,
+                      VMProjectionMemory* const vmproj2,
+                      VMProjectionMemory* const vmproj3,
+                      VMProjectionMemory* const vmproj4    
 ){
 #pragma HLS inline off
 

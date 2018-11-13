@@ -4,18 +4,18 @@
 #include "ProjectionRouter.hh"
 
 void ProjectionRouterTop(BXType bx,
-                         TrackletProjectionMemory *const,
-                         TrackletProjectionMemory *const,
-                         TrackletProjectionMemory *const,
-                         TrackletProjectionMemory *const,
-                         TrackletProjectionMemory *const,
-                         TrackletProjectionMemory *const,
+                         const TrackletProjectionMemory* const,
+                         const TrackletProjectionMemory* const,
+                         const TrackletProjectionMemory* const,
+                         const TrackletProjectionMemory* const,
+                         const TrackletProjectionMemory* const,
+                         const TrackletProjectionMemory* const,
                          BXType&,
-                         AllProjectionMemory *const,
-                         VMProjectionMemory *const,
-                         VMProjectionMemory *const,
-                         VMProjectionMemory *const,
-                         VMProjectionMemory *const
+                         AllProjectionMemory* const,
+                         VMProjectionMemory* const,
+                         VMProjectionMemory* const,
+                         VMProjectionMemory* const,
+                         VMProjectionMemory* const
                          );
 
 #endif
