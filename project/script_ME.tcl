@@ -5,8 +5,8 @@
 ############################################################
 open_project -reset matchengine
 set_top MatchEngine
-add_files ../TrackletAlgorithm/MatchEngine.cpp
-add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "-I../TrackletAlgorithm"
+add_files ../TrackletAlgorithm/MatchEngine.cpp -cflags "-std=c++11"
+add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/ME
 open_solution -reset "solution1"
 set_part {xcku115-flvb2104-2-e} -tool vivado
