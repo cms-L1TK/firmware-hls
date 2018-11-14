@@ -37,19 +37,21 @@ public:
     data_(rhs.raw())
   {}
   
-  CandidateMatch(const char* datastr, int base=16)
-  {
-    CandidateMatchData newdata(datastr, base);
-    data_ = newdata;
-  }
-
+  CandidateMatch(const char* datastr, int base=16):
+    data_(datastr, base)
+  {}
 
   // Getter
   CandidateMatchData raw() const {return data_;}
   
-  CMProjIndex GetProjIndex() const {return data_.range(13,7);}
-  CMStubIndex GetStubIndex() const {return data_.range(6,0);}
-  
+  CMProjIndex GetProjIndex() const {
+    return data_.range(kProjIndexStart+kNBits_MemAddr-1,kProjIndexStart);
+  }
+
+  CMStubIndex GetStubIndex() const {
+    return data_.range(kStubIndexStart+kNBits_MemAddr-1,kStubIndexStart);
+  }
+
 private:
   
   CandidateMatchData data_;

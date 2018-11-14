@@ -78,8 +78,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
     
     if (line.find("Event") != std::string::npos) {
       return;
-    }
-    else {
+    } else {
       if (split(line,' ').size()==4) {
 	memory.write_mem(ievt, line.c_str(), base);	
       } else {

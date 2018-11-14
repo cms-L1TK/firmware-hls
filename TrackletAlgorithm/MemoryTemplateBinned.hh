@@ -2,10 +2,11 @@
 #ifndef MEMORYTEMPLATEBINNED_HH
 #define MEMORYTEMPLATEBINNED_HH
 
+#ifndef __SYNTHESIS__
 #include <iostream>
 #include <sstream>
-#include <assert.h>
 #include <vector>
+#endif
 
 
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
@@ -59,17 +60,6 @@ public:
   unsigned int getNBX() const {return (1<<NBIT_BX);}
   unsigned int getNBins() const {return (1<<NBIT_BIN);}
 
-  /*
-  void getEntries(BunchXingT bx, NEntryT nentries[(1<<NBIT_BIN)]) const
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	for (unsigned int ibin = 0; ibin < 8; ibin++) {  
-#pragma HLS UNROLL
-	  nentries[ibin] = nentries_[bx][ibin]
-	}
-  }
-  */
-  
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> ibin) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	return nentries_[bx][ibin];
@@ -98,7 +88,9 @@ public:
 	  return true;
 	}
 	else {
+#ifndef __SYNTHESIS__
 	  std::cout << "Warning out of range" << std::endl;
+#endif
 	  return false;
 	}
   }
@@ -124,9 +116,6 @@ public:
   bool write_mem(BunchXingT bx, const std::string& line, int base=16)
   {
 
-    //std::cout<<"line: "<<line<<std::endl;
-
-    assert(split(line, ' ').size()==4);
     std::string datastr = split(line, ' ').back();
 
     int slot=atoi(split(line, ' ').front().c_str());

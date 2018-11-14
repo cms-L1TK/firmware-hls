@@ -21,6 +21,11 @@ constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
 constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
 
+// Candidate Matches
+
+constexpr unsigned int kStubIndexStart=0;
+constexpr unsigned int kProjIndexStart=kNBits_MemAddr;
+
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
 

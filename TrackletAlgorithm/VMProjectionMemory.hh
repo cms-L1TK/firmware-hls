@@ -9,12 +9,12 @@ class VMProjection
 {
 public:
   
-  typedef ap_uint<7> VMPID;
+  typedef ap_uint<kNBits_MemAddr> VMPID;
   typedef ap_uint<MEBinsBits+1> VMPZBIN;
   typedef ap_uint<4> VMPFINEZ;
   typedef ap_uint<5> VMPRINV;
 	
-  typedef ap_uint<7+MEBinsBits+1+4+5+1> VMProjData;
+  typedef ap_uint<kNBits_MemAddr+MEBinsBits+1+4+5+1> VMProjData;
 	
   // Constructors
   VMProjection(VMProjData newdata):
