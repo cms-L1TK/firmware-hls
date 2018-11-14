@@ -9,15 +9,12 @@ class CandidateMatch
 {
 public:
   
-  static const int nBITS_INDEX = 7;  // number of bits used for indexing
-  static const int nBITS_CM    = 2*nBITS_INDEX; // total number of bits for CM
+  // Define bit widths for CM parameters
+  typedef ap_uint<kNBits_MemAddr> CMProjIndex; // projection (tracklet) index
+  typedef ap_uint<kNBits_MemAddr> CMStubIndex; // stub index
 
   // Raw candidate match data
-  typedef ap_uint<nBITS_CM> CandidateMatchData;
-
-  // Define bit widths for CM parameters
-  typedef ap_uint<nBITS_INDEX>   CMProjIndex; // projection (tracklet) index
-  typedef ap_uint<nBITS_INDEX>   CMStubIndex; // stub index
+  typedef ap_uint<kCandidateMatchSize> CandidateMatchData;
 
   // Constructors
   CandidateMatch(CandidateMatchData newdata):
@@ -45,11 +42,11 @@ public:
   CandidateMatchData raw() const {return data_;}
   
   CMProjIndex GetProjIndex() const {
-    return data_.range(kProjIndexStart+kNBits_MemAddr-1,kProjIndexStart);
+    return data_.range(kProjIndexLSB+kNBits_MemAddr-1,kProjIndexLSB);
   }
 
   CMStubIndex GetStubIndex() const {
-    return data_.range(kStubIndexStart+kNBits_MemAddr-1,kStubIndexStart);
+    return data_.range(kStubIndexLSB+kNBits_MemAddr-1,kStubIndexLSB);
   }
 
 private:

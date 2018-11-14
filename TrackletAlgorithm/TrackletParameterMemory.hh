@@ -14,9 +14,8 @@ public:
   typedef ap_int<kZ0Size> Z0PAR;
   typedef ap_int<kTSize> TPAR;
   typedef ap_uint<kNBits_MemAddr> STUBINDEX;
-
 	
-  typedef ap_uint<kRinvSize+kPhi0Size+kZ0Size+kTSize+2*kNBits_MemAddr> TrackletParameterData;
+  typedef ap_uint<kTrackletParameterSize> TrackletParameterData;
 	
   // Constructors
   TrackletParameters(const TrackletParameterData& newdata):
@@ -46,52 +45,52 @@ public:
   TrackletParameterData raw() const {return data_;}
 
   STUBINDEX GetStubIndexOuter() const {
-    return data_.range(kStubIndexOuterStart+kNBits_MemAddr-1,kStubIndexOuterStart);
+    return data_.range(kStubIndexOuterLSB+kNBits_MemAddr-1,kStubIndexOuterLSB);
   }
 
   STUBINDEX GetStubIndexInner() const {
-    return data_.range(kStubIndexInnerStart+kNBits_MemAddr-1,kStubIndexInnerStart);
+    return data_.range(kStubIndexInnerLSB+kNBits_MemAddr-1,kStubIndexInnerLSB);
   }
 
   TPAR GetT() const {
-    return data_.range(kTStart+kTSize-1,kTStart);
+    return data_.range(kTLSB+kTSize-1,kTLSB);
   }
 
   Z0PAR GetZ0() const {
-    return data_.range(kZ0Start+kZ0Size-1,kZ0Start);
+    return data_.range(kZ0LSB+kZ0Size-1,kZ0LSB);
   }
 
   PHI0PAR GetPhi0() const {
-    return data_.range(kPhi0Start+kPhi0Size-1,kPhi0Start);
+    return data_.range(kPhi0LSB+kPhi0Size-1,kPhi0LSB);
   }
 
   RINVPAR GetRinv() const {
-    return data_.range(kRinvStart+kRinvSize-1,kRinvStart);
+    return data_.range(kRinvLSB+kRinvSize-1,kRinvLSB);
   }
   
   // Setter
   void SetStubIndexInner(const STUBINDEX id) {
-    data_.range(kStubIndexInnerStart+kNBits_MemAddr-1,kStubIndexInnerStart) = id;
+    data_.range(kStubIndexInnerLSB+kNBits_MemAddr-1,kStubIndexInnerLSB) = id;
   }
 
   void SetStubIndexOuter(const STUBINDEX id) {
-    data_.range(kStubIndexOuterStart+kNBits_MemAddr-1,kStubIndexOuterStart) = id;
+    data_.range(kStubIndexOuterLSB+kNBits_MemAddr-1,kStubIndexOuterLSB) = id;
   }
   
   void SetT(const TPAR t) {
-    data_.range(kTStart+kTSize-1,kTStart) = t;
+    data_.range(kTLSB+kTSize-1,kTLSB) = t;
   }
   
   void SetZ0(const Z0PAR z0) {
-    data_.range(kZ0Start+kZ0Size-1,kZ0Start) = z0;
+    data_.range(kZ0LSB+kZ0Size-1,kZ0LSB) = z0;
   }
 
   void SetPhi0(const PHI0PAR phi0) {
-    data_.range(kPhi0Start+kPhi0Size-1,kPhi0Start) = phi0;
+    data_.range(kPhi0LSB+kPhi0Size-1,kPhi0LSB) = phi0;
   }
   
   void SetRinv(const RINVPAR rinv) {
-    data_.range(kRinvStart+kRinvSize-1,kRinvStart) = rinv;
+    data_.range(kRinvLSB+kRinvSize-1,kRinvLSB) = rinv;
   }
   
 private:
