@@ -1,3 +1,6 @@
+// Utilities used only in test bench for C simulation
+#ifndef __SYNTHESIS__
+
 #ifndef FILEREADUTILITY
 #define FILEREADUTILITY
 
@@ -145,4 +148,6 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   
 }
 
-#endif
+#endif  // FILEREADUTILITY
+
+#endif  // __SYNTHESIS__

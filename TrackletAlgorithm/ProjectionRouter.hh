@@ -23,9 +23,9 @@ bool get_mem_read_addr(ap_uint<nbits_nMEM>& imem, ap_uint<nbits_MemAddr>& addr,
 	  
   if (addr >= *(numbersin+imem)) {
     // All entries have been read out in memory[imem]
-	// Prepare to read the next non-empty memory
-	addr = 0;  // reset read address
-	mem_hasdata -= (1<<imem);  // flip the lowest 1 bit to 0
+    // Prepare to read the next non-empty memory
+    addr = 0;  // reset read address
+    mem_hasdata -= (1<<imem);  // flip the lowest 1 bit to 0
   }
   
   return true;
@@ -52,7 +52,8 @@ void ProjectionRouter(BXType bx, // FIXME
 ){
 #pragma HLS inline off
 
-  //assert(nINMEM <= 8); // maximum number of input ports is 8
+  //maximum number of input ports is 8 for now
+  static_assert(nINMEM<=8, "Incorrect nINMEM passed in.");
   
   // reset
   allproj->clear();
@@ -172,7 +173,7 @@ void ProjectionRouter(BXType bx, // FIXME
 
     // vmproj z
     // Separate the vm projections into zbins
-    // The central bin e.g.: zbin=4+(zproj.value()>>(zproj.nbits()-3));
+    // The central bin e.g. zbin=4+(zproj.value()>>(zproj.nbits()-3));
     // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
     // But we need some range (particularly for L5L6 seed projecting to L1-L3):
     // Lower bound
