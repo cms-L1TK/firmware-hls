@@ -1,3 +1,6 @@
+// Utilities used only in test bench for C simulation
+#ifndef __SYNTHESIS__
+
 #ifndef FILEREADUTILITY
 #define FILEREADUTILITY
 
@@ -78,10 +81,13 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
     
     if (line.find("Event") != std::string::npos) {
       return;
-    }
-    else {
-      const std::string datastr = split(line, ' ').back();
-      memory.write_mem(ievt, datastr.c_str(), base);
+    } else {
+      if (split(line,' ').size()==4) {
+	memory.write_mem(ievt, line.c_str(), base);	
+      } else {
+	const std::string datastr = split(line, ' ').back();
+	memory.write_mem(ievt, datastr.c_str(), base);
+      }
     }	
   }
   
@@ -142,4 +148,6 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   
 }
 
-#endif
+#endif  // FILEREADUTILITY
+
+#endif  // __SYNTHESIS__

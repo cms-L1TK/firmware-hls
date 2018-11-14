@@ -2,7 +2,12 @@
 #ifndef MEMORYTEMPLATEBINNED_HH
 #define MEMORYTEMPLATEBINNED_HH
 
+#ifndef __SYNTHESIS__
 #include <iostream>
+#include <sstream>
+#include <vector>
+#endif
+
 
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 		 unsigned int NBIT_BIN>
@@ -12,8 +17,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 // NBIT_ADDR: number of bits for memory address space per BX
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
-class MemoryTemplateBinned
-{
+class MemoryTemplateBinned{
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR-NBIT_BIN+1> NEntryT;
   
@@ -56,17 +60,6 @@ public:
   unsigned int getNBX() const {return (1<<NBIT_BX);}
   unsigned int getNBins() const {return (1<<NBIT_BIN);}
 
-  /*
-  void getEntries(BunchXingT bx, NEntryT nentries[(1<<NBIT_BIN)]) const
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	for (unsigned int ibin = 0; ibin < 8; ibin++) {  
-#pragma HLS UNROLL
-	  nentries[ibin] = nentries_[bx][ibin]
-	}
-  }
-  */
-  
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> ibin) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	return nentries_[bx][ibin];
@@ -95,7 +88,9 @@ public:
 	  return true;
 	}
 	else {
+#ifndef __SYNTHESIS__
 	  std::cout << "Warning out of range" << std::endl;
+#endif
 	  return false;
 	}
   }
@@ -104,16 +99,12 @@ public:
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
   
-#include <sstream>
-#include <assert.h>
-#include <vector>
   ///////////////////////////////////
-  
   std::vector<std::string> split(const std::string& s, char delimiter)
   {
-	std::vector<std::string> tokens;
-	std::string token;
-    istringstream sstream(s);
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream sstream(s);
     while (getline(sstream, token, delimiter))
       {
 	tokens.push_back(token);
@@ -122,10 +113,10 @@ public:
   }
 
   // write memory from text file
-  bool write_mem_line(BunchXingT bx, const std::string& line, int base=16)
+  bool write_mem(BunchXingT bx, const std::string& line, int base=16)
   {
-	assert(split(line, ' ').size()==4);
-	std::string datastr = split(line, ' ').back();
+
+    std::string datastr = split(line, ' ').back();
 
     int slot=atoi(split(line, ' ').front().c_str());
 
@@ -133,6 +124,7 @@ public:
     //std::cout << "write_mem slot data : " << slot<<" "<<data << std::endl;
     return write_mem(bx, slot, data);
   }
+
 
   // print memory contents
   void print_data(const DataType data) const

@@ -5,8 +5,9 @@
 ############################################################
 open_project -reset trackletengine
 set_top TrackletEngine
-add_files ../TrackletAlgorithm/TrackletEngine.cpp
-add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "-I../TrackletAlgorithm"
+add_files ../TrackletAlgorithm/TrackletEngine.cpp -cflags "-std=c++11"
+
+add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/TE
 open_solution -reset "solution1"
 set_part {xcku115-flvb2104-2-e} -tool vivado
