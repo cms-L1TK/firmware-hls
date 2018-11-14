@@ -18,10 +18,11 @@ public:
   
   typedef ap_uint<NBits_vmpid> VMPID;
   typedef ap_uint<NBits_vmpzbin> VMPZBIN;
-  typedef ap_int<NBits_vmpfinez> VMPFINEZ;
+  typedef ap_uint<NBits_vmpfinez> VMPFINEZ;
   typedef ap_uint<NBits_vmprinv> VMPRINV;
 	
   typedef ap_uint<NBits_vmpdata> VMProjData;
+
 	
   // Constructors
   VMProjection(VMProjData newdata):
