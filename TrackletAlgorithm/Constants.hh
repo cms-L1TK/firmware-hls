@@ -32,8 +32,8 @@ constexpr unsigned int kRinvStart=0;
 constexpr unsigned int kPhi0Start=kRinvStart+kRinvSize;
 constexpr unsigned int kZ0Start=kPhi0Start+kPhi0Size;
 constexpr unsigned int kTStart=kZ0Start+kZ0Size;
-constexpr unsigned int kStubInnerStart=kTStart+kTSize;
-constexpr unsigned int kStubOuterStart=kStubInnerStart+kNBits_MemAddr;
+constexpr unsigned int kStubIndexInnerStart=kTStart+kTSize;
+constexpr unsigned int kStubIndexOuterStart=kStubIndexInnerStart+kNBits_MemAddr;
 
 // Candidate Matches
 

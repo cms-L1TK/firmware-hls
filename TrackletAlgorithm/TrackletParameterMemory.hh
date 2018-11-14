@@ -19,7 +19,7 @@ public:
   typedef ap_uint<kRinvSize+kPhi0Size+kZ0Size+kTSize+2*kNBits_MemAddr> TrackletParameterData;
 	
   // Constructors
-  TrackletParameters(TrackletParameters newdata):
+  TrackletParameters(const TrackletParameterData& newdata):
     data_(newdata)
   {}
   
