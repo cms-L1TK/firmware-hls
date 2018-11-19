@@ -17,36 +17,47 @@ public:
   typedef ap_uint<kCandidateMatchSize> CandidateMatchData;
 
   // Constructors
-  CandidateMatch(CandidateMatchData newdata):
+  CandidateMatch(const CandidateMatchData& newdata):
     data_(newdata)
   {}
   
-  CandidateMatch(CMProjIndex projindex, CMStubIndex stubindex):
+  CandidateMatch(const CMProjIndex projindex, const CMStubIndex stubindex):
     data_( (projindex,stubindex) )
   {}
   
   CandidateMatch():
     data_(0)
   {}
-  
+
+  CandidateMatch(const char* datastr, int base=16)
+  {
+    CandidateMatchData newdata(datastr, base);
+    data_ = newdata;
+  }
+
   // copy constructor
   CandidateMatch(const CandidateMatch& rhs):
     data_(rhs.raw())
   {}
   
-  CandidateMatch(const char* datastr, int base=16):
-    data_(datastr, base)
-  {}
-
   // Getter
   CandidateMatchData raw() const {return data_;}
   
   CMProjIndex GetProjIndex() const {
-    return data_.range(kProjIndexLSB+kNBits_MemAddr-1,kProjIndexLSB);
+    return data_.range(kCMProjIndexLSB+kNBits_MemAddr-1,kCMProjIndexLSB);
   }
 
   CMStubIndex GetStubIndex() const {
-    return data_.range(kStubIndexLSB+kNBits_MemAddr-1,kStubIndexLSB);
+    return data_.range(kCMStubIndexLSB+kNBits_MemAddr-1,kCMStubIndexLSB);
+  }
+
+  // Setter
+  void SetProjIndex(const CMProjIndex id) {
+    data_.range(kCMProjIndexLSB+kNBits_MemAddr-1,kCMProjIndexLSB) = id;
+  }
+
+  void SetStubIndex(const CMStubIndex id) {
+    data_.range(kCMStubIndexLSB+kNBits_MemAddr-1,kCMStubIndexLSB) = id;
   }
 
 private:

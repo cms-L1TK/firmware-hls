@@ -1,47 +1,38 @@
-#ifndef ALLPROJECTION_HH
-#define ALLPROJECTION_HH
+#ifndef ALLPROJECTIONMEMORY_HH
+#define ALLPROJECTIONMEMORY_HH
 
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
-
-constexpr int NBits_aptcid = 13;
-constexpr int NBits_apphi = 14;
-constexpr int NBits_apz = 12;
-constexpr int NBits_apphid = 11;
-constexpr int NBits_apzd = 10;
-constexpr int NBits_apdata =
-  1 + 1 + NBits_aptcid + NBits_apphi + NBits_apz + NBits_apphid + NBits_apzd;
 
 // Data object definition
 class AllProjection
 {
 public:
 
-  typedef ap_uint<NBits_aptcid> AProjTCID;
-  typedef ap_uint<NBits_apphi> AProjPHI;
-  typedef ap_int<NBits_apz> AProjZ;
-  typedef ap_int<NBits_apphid> AProjPHIDER;
-  typedef ap_int<NBits_apzd> AProjZDER;
+  typedef ap_uint<kAProjTCIndexSize> AProjTCID;
+  typedef ap_uint<kAProjPhiSize> AProjPHI;
+  typedef ap_int<kAProjZSize> AProjZ;
+  typedef ap_int<kAProjPhiDSize> AProjPHIDER;
+  typedef ap_int<kAProjZDSize> AProjZDER;
   
-  typedef ap_uint<NBits_apdata> AllProjData;
+  typedef ap_uint<kTrackletProjectionSize> AllProjectionData;
   
   // Constructors
-  AllProjection(AllProjData newdata):
+  AllProjection(const AllProjectionData& newdata):
     data_(newdata)
   {}
 
-  AllProjection(bool plusneighbor, bool minusneighbor, AProjTCID tcid,
-                AProjPHI phi, AProjZ z, AProjPHIDER phider, AProjZDER zder):
-    data_(((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder))
+  AllProjection(const bool plusneighbor, const bool minusneighbor, const AProjTCID tcid, const AProjPHI phi, const AProjZ z, const AProjPHIDER phider, const AProjZDER zder):
+    data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
   {}
   
   AllProjection():
     data_(0)
   {}
 
-  AllProjection(const char* datastr, int base = 16)
+  AllProjection(const char* datastr, int base=16)
   {
-    AllProjData newdata(datastr, base);
+    AllProjectionData newdata(datastr, base);
     data_ = newdata;
   }
   
@@ -51,55 +42,68 @@ public:
   {}
 
   // Getter
-  AllProjData raw() const {return data_;}
+  AllProjectionData raw() const {return data_;}
   
-  bool IsPlusNeighbor() const {return data_.range(61,61);}
-  bool IsMinusNeighbor() const {return data_.range(60,60);}
-  AProjTCID GetTrackletIndex() const {return data_.range(59,47);}
-  AProjPHI GetPhi() const {return data_.range(46,33);}
-  AProjZ GetZ() const {return data_.range(32,21);}
-  AProjPHIDER GetPhiDer() {return data_.range(20,10);}
-  AProjZDER GetZDer() {return data_.range(9,0);}
+  bool IsPlusNeighbor() const {
+    return data_.range(kAProjIsPlusNeighbourLSB,kAProjIsPlusNeighbourLSB);
+  }
+  
+  bool IsMinusNeighbor() const {
+    return data_.range(kAProjIsMinusNeighbourLSB,kAProjIsMinusNeighbourLSB);
+  }
+
+  AProjTCID GetTrackletIndex() const {
+    return data_.range(kAProjTCIndexLSB+kAProjTCIndexSize-1,kAProjTCIndexLSB);
+  }
+  
+  AProjPHI GetPhi() const {
+    return data_.range(kAProjPhiLSB+kAProjPhiSize-1,kAProjPhiLSB);
+  }
+  
+  AProjZ GetZ() const {
+    return data_.range(kAProjZLSB+kAProjZSize-1,kAProjZLSB);
+  }
+  
+  AProjPHIDER GetPhiDer() const { 
+    return data_.range(kAProjPhiDLSB+kAProjPhiDSize-1,kAProjPhiDLSB);
+  }
+  
+  AProjZDER GetZDer() const {
+    return data_.range(kAProjZDLSB+kAProjZDSize-1,kAProjZDLSB);
+  }
 
   // Setter
-  void SetIsPlusNeighbor(bool isplusneighbor)
-  {
-    data_.range(61,61) = isplusneighbor;
+  void SetIsPlusNeighbor(const bool isplusneighbor) {
+    data_.range(kAProjIsPlusNeighbourLSB,kAProjIsPlusNeighbourLSB) = isplusneighbor;
   }
 
-  void SetIsMinusNeighbor(bool isminusneighbor)
-  {
-    data_.range(60,60) = isminusneighbor;
+  void SetIsMinusNeighbor(const bool isminusneighbor) {
+    data_.range(kAProjIsMinusNeighbourLSB,kAProjIsMinusNeighbourLSB) = isminusneighbor;
   }
 
-  void SetTrackletIndex(AProjTCID id)
-  {
-    data_.range(59,47) = id;
+  void SetTrackletIndex(const AProjTCID id) {
+    data_.range(kAProjTCIndexLSB+kAProjTCIndexSize-1,kAProjTCIndexLSB) = id;
   }
 
-  void SetPhi(AProjPHI phi)
-  {
-    data_.range(46,33) = phi;
+  void SetPhi(const AProjPHI phi) {
+    data_.range(kAProjPhiLSB+kAProjPhiSize-1,kAProjPhiLSB) = phi;
   }
 
-  void SetZ(AProjZ z)
-  {
-    data_.range(32,21) = z;
+  void SetZ(const AProjZ z) {
+    data_.range(kAProjZLSB+kAProjZSize-1,kAProjZLSB) = z;
   }
 
-  void SetPhiDer(AProjPHIDER phider)
-  {
-    data_.range(20,10) = phider;
+  void SetPhiDer(const AProjPHIDER phider) {
+    data_.range(kAProjPhiDLSB+kAProjPhiDSize-1,kAProjPhiDLSB) = phider;
   }
 
-  void SetZDer(AProjZDER zder)
-  {
-    data_.range(9,0) = zder;
+  void SetZDer(const AProjZDER zder) {
+    data_.range(kAProjZDLSB+kAProjZDSize-1,kAProjZDLSB) = zder;
   }
 
 private:
 
-  AllProjData data_;
+  AllProjectionData data_;
   
 };
 
