@@ -56,6 +56,7 @@ std::vector<std::string> split(const std::string& s, char delimiter)
   std::istringstream sstream(s);
   
   while (getline(sstream, token, delimiter)) {
+    if (token=="") continue;
     tokens.push_back(token);
   }
   
