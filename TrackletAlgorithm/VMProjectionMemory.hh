@@ -4,6 +4,25 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit sizes for VMProjectionMemory fields
+constexpr unsigned int kVMProjRinvSize = 5;
+constexpr unsigned int kVMProjFineZSize = 4;
+constexpr unsigned int kVMProjZBinSize = MEBinsBits+1;
+constexpr unsigned int kVMProjIndexSize = 7;
+// Bit size for full VMProjectionMemory
+constexpr unsigned int kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize + 1;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the VMProjectionMemory word for different fields
+constexpr unsigned int kVMProjIsPSSeedLSB = 0;
+constexpr unsigned int kVMProjRinvLSB = 1;
+constexpr unsigned int kVMProjRinvMSB = kVMProjRinvLSB + kVMProjRinvSize - 1;
+constexpr unsigned int kVMProjFineZLSB = kVMProjRinvMSB + 1;
+constexpr unsigned int kVMProjFineZMSB = kVMProjFineZLSB + kVMProjFineZSize - 1;
+constexpr unsigned int kVMProjZBinLSB = kVMFineZMSB + 1;
+constexpr unsigned int kVMProjZBinMSB = kVMProjZBinLSB + kVMProjZBinSize - 1;
+constexpr unsigned int kVMProjIndexLSB = kVMProjZBinMSB + 1;
+constexpr unsigned int kVMProjIndexMSB = kVMProjIndexLSB + kVMProjIndexSize - 1;
+
 // Data object definition
 class VMProjection
 {
@@ -36,53 +55,48 @@ public:
     data_ = newdata;
   }
   
-  // copy constructor
-  VMProjection(const VMProjection& rhs):
-    data_(rhs.raw())
-  {}
-  
   // Getter
   VMProjData raw() const {return data_;}
   
   VMPID GetIndex() const {
-    return data_.range(kVMProjIndexLSB+kVMProjIndexSize-1,kVMProjIndexLSB);
+    return data_.range(kVMProjIndexMSB,kVMProjIndexLSB);
   }
 
   VMPZBIN GetZBin() const {
-    return data_.range(kVMProjZbinLSB+kVMProjZbinSize-1,kVMProjZbinLSB);
+    return data_.range(kVMProjZbinMSB,kVMProjZbinLSB);
   }
 
   VMPFINEZ GetFineZ() const {
-    return data_.range(kVMProjFineZLSB+kVMProjFineZSize-1,kVMProjFineZLSB);
+    return data_.range(kVMProjFineZMSB,kVMProjFineZLSB);
   }
   
   VMPRINV GetRInv() const {
-    return data_.range(kVMProjRinvLSB+kVMProjRinvSize-1,kVMProjRinvLSB);
+    return data_.range(kVMProjRinvMSB,kVMProjRinvLSB);
   }
 
   bool GetIsPSSeed() const {
-    return data_.range(0,0);
+    return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedLSB);
   }
   
   // Setter
   void SetIndex(const VMPID id) {
-    data_.range(kVMProjIndexLSB+kVMProjIndexSize-1,kVMProjIndexLSB) = id;
+    data_.range(kVMProjIndexMSB,kVMProjIndexLSB) = id;
   }
   
   void SetZBin(const VMPZBIN zbin) {
-    data_.range(kVMProjZbinLSB+kVMProjZbinSize-1,kVMProjZbinLSB) = zbin;
+    data_.range(kVMProjZbinMSB,kVMProjZbinLSB) = zbin;
   }
   
   void SetFineZ(const VMPFINEZ finez) {
-    data_.range(kVMProjFineZLSB+kVMProjFineZSize-1,kVMProjFineZLSB) = finez;
+    data_.range(kVMProjFineZMSB,kVMProjFineZLSB) = finez;
   }
   
   void SetRInv(const VMPRINV rinv) {
-    data_.range(kVMProjRinvLSB+kVMProjRinvSize-1,kVMProjRinvLSB) = rinv;
+    data_.range(kVMProjRinvMSB,kVMProjRinvLSB) = rinv;
   }
   
   void SetIsPSSeed(const bool psseed) {
-    data_.range(0,0) = psseed;
+    data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedLSB) = psseed;
   }
   
 private:

@@ -4,6 +4,37 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for FitTrackMemory fields
+constexpr unsigned int kFTStubIndexSize = 10;
+constexpr unsigned int kFTZ0Size = 10;
+constexpr unsigned int kFTtSize = 14;
+constexpr unsigned int kFTPhi0Size = 19;
+constexpr unsigned int kFTpTSize = 15;
+// Bit size for full FitTrackMemory
+constexpr unsigned int kFitTrackSize = kFTpTSize + kFTPhi0Size + kFTtSize + kFTZ0Size + 6*kFTStubIndexSize;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the FitTrackMemory word for different fields
+constexpr unsigned int kFTStubIndex6LSB = 0;
+constexpr unsigned int kFTStubIndex6MSB = kFTStubIndex6LSB + kFTStubIndex6Size - 1;
+constexpr unsigned int kFTStubIndex5LSB = kFTStubIndex6MSB + 1;
+constexpr unsigned int kFTStubIndex5MSB = kFTStubIndex5LSB + kFTStubIndex5Size - 1;
+constexpr unsigned int kFTStubIndex4LSB = kFTStubIndex5MSB + 1;
+constexpr unsigned int kFTStubIndex4MSB = kFTStubIndex4LSB + kFTStubIndex4Size - 1;
+constexpr unsigned int kFTStubIndex3LSB = kFTStubIndex4MSB + 1;
+constexpr unsigned int kFTStubIndex3MSB = kFTStubIndex3LSB + kFTStubIndex3Size - 1;
+constexpr unsigned int kFTStubIndex2LSB = kFTStubIndex3MSB + 1;
+constexpr unsigned int kFTStubIndex2MSB = kFTStubIndex2LSB + kFTStubIndex2Size - 1;
+constexpr unsigned int kFTStubIndex1LSB = kFTStubIndex2MSB + 1;
+constexpr unsigned int kFTStubIndex1MSB = kFTStubIndex1LSB + kFTStubIndex1Size - 1;
+constexpr unsigned int kFTZ0LSB = kFTStubIndex1MSB + 1;
+constexpr unsigned int kFTZ0MSB = kFTZ0LSB + kFTZ0Size - 1;
+constexpr unsigned int kFTTLSB = kFTZ0MSB + 1;
+constexpr unsigned int kFTTMSB = kFTTLSB + kFTTSize - 1;
+constexpr unsigned int kFTPhi0LSB = kFTTMSB + 1;
+constexpr unsigned int kFTPhi0MSB = kFTPhi0LSB + kFTPhi0Size - 1;
+constexpr unsigned int kFTpTLSB = kFTPhi0MSB + 1;
+constexpr unsigned int kFTpTMSB = kFTpTLSB + kFTpTSize - 1;
+
 // Data object definition
 class FitTracks
 {
@@ -36,93 +67,88 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  FitTracks(const FitTracks& rhs):
-    data_(rhs.raw())
-  {}
-
   // Getter
   FitTrackData raw() const {return data_;}
 
   FTPT GetPt() const {
-    return data_.range(kFTpTLSB+kFTpTSize-1,kFTpTLSB);
+    return data_.range(kFTpTMSB,kFTpTLSB);
   }
 
   FTPHI0 GetPhi0() const {
-    return data_.range(kFTPhi0LSB+kFTPhi0Size-1,kFTPhi0LSB);
+    return data_.range(kFTPhi0MSB,kFTPhi0LSB);
   }
 
   FTT GetT() const {
-    return data_.range(kFTTLSB+kFTTSize-1,kFTTLSB);
+    return data_.range(kFTTMSB,kFTTLSB);
   }
 
   FTZ0 GetZ0() const {
-    return data_.range(kFTZ0LSB+kFTZ0Size-1,kFTZ0LSB);
+    return data_.range(kFTZ0MSB,kFTZ0LSB);
   }
 
   FTSTUBINDEX GetStubIndex1() const {
-    return data_.range(kFTStubIndex1LSB+kFTStubIndexSize-1,kFTStubIndex1LSB);
+    return data_.range(kFTStubIndex1MSB,kFTStubIndex1LSB);
   }
 
   FTSTUBINDEX GetStubIndex2() const {
-    return data_.range(kFTStubIndex2LSB+kFTStubIndexSize-1,kFTStubIndex2LSB);
+    return data_.range(kFTStubIndex2MSB,kFTStubIndex2LSB);
   }
 
   FTSTUBINDEX GetStubIndex3() const {
-    return data_.range(kFTStubIndex3LSB+kFTStubIndexSize-1,kFTStubIndex3LSB);
+    return data_.range(kFTStubIndex3MSB,kFTStubIndex3LSB);
   }
 
   FTSTUBINDEX GetStubIndex4() const {
-    return data_.range(kFTStubIndex4LSB+kFTStubIndexSize-1,kFTStubIndex4LSB);
+    return data_.range(kFTStubIndex4MSB,kFTStubIndex4LSB);
   }
 
   FTSTUBINDEX GetStubIndex5() const {
-    return data_.range(kFTStubIndex5LSB+kFTStubIndexSize-1,kFTStubIndex5LSB);
+    return data_.range(kFTStubIndex5MSB,kFTStubIndex5LSB);
   }
 
   FTSTUBINDEX GetStubIndex6() const {
-    return data_.range(kFTStubIndex6LSB+kFTStubIndexSize-1,kFTStubIndex6LSB);
+    return data_.range(kFTStubIndex6MSB,kFTStubIndex6LSB);
   }
 
   // Setter
   void SetPt(const FTPT pt) {
-    data_.range(kFTpTLSB+kFTpTSize-1,kFTpTLSB) = pt;
+    data_.range(kFTpTMSB,kFTpTLSB) = pt;
   }
 
   void SetPhi0(const FTPHI0 phi0) {
-    data_.range(kFTPhi0LSB+kFTPhi0Size-1,kFTPhi0LSB) = phi0;
+    data_.range(kFTPhi0MSB,kFTPhi0LSB) = phi0;
   }
 
   void SetT(const FTT t) {
-    data_.range(kFTTLSB+kFTTSize-1,kFTTLSB) = t;
+    data_.range(kFTTMSB,kFTTLSB) = t;
   }
 
   void SetZ0(const FTZ0 z0) {
-    data_.range(kFTZ0LSB+kFTZ0Size-1,kFTZ0LSB) = z0;
+    data_.range(kFTZ0MSB,kFTZ0LSB) = z0;
   }
 
   void SetStubIndex1(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex1LSB+kFTStubIndexSize-1,kFTStubIndex1LSB) = id;
+    data_.range(kFTStubIndex1MSB,kFTStubIndex1LSB) = id;
   }
 
   void SetStubIndex2(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex2LSB+kFTStubIndexSize-1,kFTStubIndex2LSB) = id;
+    data_.range(kFTStubIndex2MSB,kFTStubIndex2LSB) = id;
   }
 
   void SetStubIndex3(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex3LSB+kFTStubIndexSize-1,kFTStubIndex3LSB) = id;
+    data_.range(kFTStubIndex3MSB,kFTStubIndex3LSB) = id;
   }
 
   void SetStubIndex4(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex4LSB+kFTStubIndexSize-1,kFTStubIndex4LSB) = id;
+    data_.range(kFTStubIndex4MSB,kFTStubIndex4LSB) = id;
   }
 
   void SetStubIndex5(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex5LSB+kFTStubIndexSize-1,kFTStubIndex5LSB) = id;
+    data_.range(kFTStubIndex5MSB,kFTStubIndex5LSB) = id;
   }
 
   void SetStubIndex6(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex6LSB+kFTStubIndexSize-1,kFTStubIndex6LSB) = id;
+    data_.range(kFTStubIndex6MSB,kFTStubIndex6LSB) = id;
   }
 
 private:

@@ -4,6 +4,15 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for full StubPairMemory
+constexpr unsigned int kStubPairSize = 2*kNBits_MemAddr;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the StubPairMemory word for different fields
+constexpr unsigned int kSPOuterIndexLSB = 0;
+constexpr unsigned int kSPOuterIndexMSB = kSPOuterIndexLSB + kNBits_MemAddr - 1;
+constexpr unsigned int kSPInnerIndexLSB = kSPOuterIndexMSB + 1;
+constexpr unsigned int kSPInnerIndexMSB = kSPInnerIndexLSB + kNBits_MemAddr - 1;
+
 // Data object definition
 class StubPair
 {
@@ -33,29 +42,24 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  StubPair(const StubPair& rhs):
-    data_(rhs.raw())
-  {}
-  
   // Getter
   StubPairData raw() const {return data_;}
   
   SPInnerIndex GetInnerIndex() const {
-    return data_.range(kSPInnerIndexLSB+kNBits_MemAddr-1,kSPInnerIndexLSB);
+    return data_.range(kSPInnerIndexMSB,kSPInnerIndexLSB);
   }
 
   SPOuterIndex GetOuterIndex() const {
-    return data_.range(kSPOuterIndexLSB+kNBits_MemAddr-1,kSPOuterIndexLSB);
+    return data_.range(kSPOuterIndexMSB,kSPOuterIndexLSB);
   }
 
   // Setter
   void SetInnerIndex(const SPInnerIndex id) {
-    data_.range(kSPInnerIndexLSB+kNBits_MemAddr-1,kSPInnerIndexLSB) = id;
+    data_.range(kSPInnerIndexMSB,kSPInnerIndexLSB) = id;
   }
 
   void SetOuterIndex(const SPOuterIndex id) {
-    data_.range(kSPOuterIndexLSB+kNBits_MemAddr-1,kSPOuterIndexLSB) = id;
+    data_.range(kSPOuterIndexMSB,kSPOuterIndexLSB) = id;
   }
 
 private:

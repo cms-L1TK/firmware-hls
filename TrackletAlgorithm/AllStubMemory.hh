@@ -4,6 +4,24 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for AllStubMemory fields
+constexpr unsigned int kASBendSize = 3;
+constexpr unsigned int kASPhiSize = 14;
+constexpr unsigned int kASZSize = 12;
+constexpr unsigned int kASRSize = 7;
+// Bit size for full AllStubMemory
+constexpr unsigned int kAllStubSize = kASBendSize + kASPhiSize + kASZSize + kASRSize;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubMemory word for different fields
+constexpr unsigned int kASBendLSB = 0;
+constexpr unsigned int kASBendMSB = kASBendLSB + kASBendSize - 1;
+constexpr unsigned int kASPhiLSB = kASBendMSB + 1;
+constexpr unsigned int kASPhiMSB = kASPhiLSB + kASPhiSize - 1;
+constexpr unsigned int kASZLSB = kASPhiMSB + 1;
+constexpr unsigned int kASZMSB = kASZLSB + kASZSize - 1;
+constexpr unsigned int kASRLSB = kASZMSB + 1;
+constexpr unsigned int kASRMSB = kASRLSB + kASRSize - 1;
+
 // Data object definition
 class AllStub
 {
@@ -35,45 +53,40 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  AllStub(const AllStub& rhs):
-    data_(rhs.raw())
-  {}
-
   // Getter
   AllStubData raw() const {return data_; }
 
   ASR GetR() const {
-    return data_.range(kASRLSB+kASRSize-1,kASRLSB);
+    return data_.range(kASRMSB,kASRLSB);
   }
 
   ASZ GetZ() const {
-    return data_.range(kASZLSB+kASZSize-1,kASZLSB);
+    return data_.range(kASZMSB,kASZLSB);
   }
 
   ASPHI GetPhi() const {
-    return data_.range(kASPhiLSB+kASPhiSize-1,kASPhiLSB);
+    return data_.range(kASPhiMSB,kASPhiLSB);
   }
 
   ASBEND GetBend() const {
-    return data_.range(kASBendLSB+kASBendSize-1,kASBendLSB);
+    return data_.range(kASBendMSB,kASBendLSB);
   }
 
   // Setter
   void SetR(const ASR r) {
-    data_.range(kASRLSB+kASRSize-1,kASRLSB) = r;
+    data_.range(kASRMSB,kASRLSB) = r;
   }
 
   void SetZ(const ASZ z) {
-    data_.range(kSZLSB+kASZSize-1,kASZLSB) = z;
+    data_.range(kSZMSB,kASZLSB) = z;
   }
 
   void SetPhi(const ASPHI phi) {
-    data_.range(kASPhiLSB+kASPhiSize-1,kASPhiLSB) = phi;
+    data_.range(kASPhiMSB,kASPhiLSB) = phi;
   }
 
   void SetBend(const ASBEND bend) {
-    data_.range(kASBendLSB+kASBendSize-1,kASBendLSB) = bend;
+    data_.range(kASBendMSB,kASBendLSB) = bend;
   }
 
 private:

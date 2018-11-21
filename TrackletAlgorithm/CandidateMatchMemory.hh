@@ -4,6 +4,15 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for full CandidateMatchMemory
+constexpr unsigned int kCandidateMatchSize = 2*kNBits_MemAddr;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the CandidateMatchMemory word for different fields
+constexpr unsigned int kCMStubIndexLSB = 0;
+constexpr unsigned int kCMStubIndexMSB = kCMStubIndexLSB + kNBits_MemAddr - 1;
+constexpr unsigned int kCMProjIndexLSB = kCMStubIndexMSB + 1;
+constexpr unsigned int kCMProjIndexMSB = kCMProjIndexLSB + kNBits_MemAddr - 1;
+
 // Data object definition
 class CandidateMatch
 {
@@ -35,29 +44,24 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  CandidateMatch(const CandidateMatch& rhs):
-    data_(rhs.raw())
-  {}
-  
   // Getter
   CandidateMatchData raw() const {return data_;}
   
   CMProjIndex GetProjIndex() const {
-    return data_.range(kCMProjIndexLSB+kNBits_MemAddr-1,kCMProjIndexLSB);
+    return data_.range(kCMProjIndexMSB,kCMProjIndexLSB);
   }
 
   CMStubIndex GetStubIndex() const {
-    return data_.range(kCMStubIndexLSB+kNBits_MemAddr-1,kCMStubIndexLSB);
+    return data_.range(kCMStubIndexMSB,kCMStubIndexLSB);
   }
 
   // Setter
   void SetProjIndex(const CMProjIndex id) {
-    data_.range(kCMProjIndexLSB+kNBits_MemAddr-1,kCMProjIndexLSB) = id;
+    data_.range(kCMProjIndexMSB,kCMProjIndexLSB) = id;
   }
 
   void SetStubIndex(const CMStubIndex id) {
-    data_.range(kCMStubIndexLSB+kNBits_MemAddr-1,kCMStubIndexLSB) = id;
+    data_.range(kCMStubIndexMSB,kCMStubIndexLSB) = id;
   }
 
 private:

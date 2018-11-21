@@ -4,6 +4,24 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for FullMatchMemory fields
+constexpr unsigned int kFMZResSize = 9;
+constexpr unsigned int kFMPhiResSize = 12;
+constexpr unsigned int kFMStubIndexSize = 10;
+constexpr unsigned int kFMTCIndexSize = 13;
+// Bit size for full FullMatchMemory
+constexpr unsigned int kFullMatchSize = kFMTCIndexSize + kFMStubIndexSize + kFMPhiResSize + kFMZResSize;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the FullMatchMemory word for different fields
+constexpr unsigned int kFMZResLSB = 0;
+constexpr unsigned int kFMZResMSB = kFMZResLSB + kFMZResSize - 1;
+constexpr unsigned int kFMPhiResLSB = kFMZResMSB + 1;
+constexpr unsigned int kFMPhiResMSB = kFMPhiResLSB + kFMPhiResSize - 1;
+constexpr unsigned int kFMStubIndexLSB = kFMPhiResMSB + 1;
+constexpr unsigned int kFMStubIndexMSB = kFMStubIndexLSB + kFMStubIndexSize - 1;
+constexpr unsigned int kFMTCIndexLSB = kFMStubIndexMSB + 1;
+constexpr unsigned int kFMTCIndexMSB = kFMTCIndexLSB + kFMTCIndexSize - 1;
+
 // Data object definition
 class FullMatch
 {
@@ -35,45 +53,40 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  FullMatch(const FullMatch& rhs):
-    data_(rhs.raw())
-  {}
-
   // Getter
   FullMatchData raw() const {return data_;}
 
   FMTCID GetTrackletIndex() const {
-    return data_.range(kFMTCIndexLSB+kFMTCIndexSize-1,kFMTCIndexLSB);
+    return data_.range(kFMTCIndexMSB,kFMTCIndexLSB);
   }
 
   FMSTUBINDEX GetStubIndex() const {
-    return data_.range(kFMStubIndexLSB+kFMStubIndexSize-1,kFMStubIndexLSB);
+    return data_.range(kFMStubIndexMSB,kFMStubIndexLSB);
   }
 
   FMPHIRES GetPhiRes() const {
-    return data_.range(kFMPhiResLSB+kFMPhiResSize-1,kFMPhiResLSB);
+    return data_.range(kFMPhiResMSB,kFMPhiResLSB);
   }
 
   FMZRES GetZRes() const {
-    return data.range(kFMZResLSB+kFMZResSize-1,kFMZResLSB);
+    return data.range(kFMZResMSB,kFMZResLSB);
   }
 
   // Setter
   void SetTrackletIndex(const FMTCID tcid) {
-    data_.range(kFMTCIndexLSB+kFMTCIndexSize-1,kFMTCIndexLSB) = tcid;
+    data_.range(kFMTCIndexMSB,kFMTCIndexLSB) = tcid;
   }
 
   void SetStubIndex(const FMSTUBINDEX stid) {
-    data_.range(kFMStubIndexLSB+kFMStubIndexSize-1,kFMStubIndexLSB) = stid;
+    data_.range(kFMStubIndexMSB,kFMStubIndexLSB) = stid;
   }
 
   void SetPhiRes(const FMPHIRES phires) {
-    data_.range(kFMPhiResLSB+kFMPhiResSize-1,kFMPhiResLSB) = phires;
+    data_.range(kFMPhiResMSB,kFMPhiResLSB) = phires;
   }
 
   void SetZRes(const FMZRES zres) {
-    data_.range(kFMZResLSB+kFMZResSize-1,kFMZResLSB) = zres;
+    data_.range(kFMZResMSB,kFMZResLSB) = zres;
   }
 
 private:

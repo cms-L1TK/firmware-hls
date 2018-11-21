@@ -4,6 +4,28 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit sizes for TrackletParameterMemory fields
+constexpr unsigned int kTParRinvSize = 14; //rinv
+constexpr unsigned int kTParPhi0Size = 17; //phi0
+constexpr unsigned int kTParZ0Size = 12; //z0
+constexpr unsigned int kTParTSize = 14; //t
+// Bit size for full TrackletParameterMemory
+constexpr unsigned int kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletParameterMemory word for different fields
+constexpr unsigned int kTParRinvLSB = 0;
+constexpr unsigned int kTParRinvMSB = kTParRinvLSB + kTParRinvSize - 1;
+constexpr unsigned int kTParPhi0LSB = kTParRinvMSB + 1;
+constexpr unsigned int kTParPhi0MSB = kTParPhi0LSB + kTParPhi0Size - 1;
+constexpr unsigned int kTParZ0LSB = kTParPhi0MSB + 1;
+constexpr unsigned int kTParZ0MSB = kTParZ0LSB + kTParZ0Size - 1;
+constexpr unsigned int kTParTLSB = kTParZ0MSB + 1;
+constexpr unsigned int kTParTMSB = kTParTLSB + kTParTSize - 1;
+constexpr unsigned int kTParStubIndexInnerLSB = kTParTLSB + 1;
+constexpr unsigned int kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1;
+constexpr unsigned int kTParStubIndexOuterLSB = kTParStubIndexInnerMSB + 1;
+constexpr unsigned int kTParStubIndexOuterMSB = kTParStubIndexOuterLSB + kNBits_MemAddr - 1;
+
 // Data object definition
 class TrackletParameters
 {
@@ -36,61 +58,56 @@ public:
     data_ = newdata;
   }
   
-  // copy constructor
-  TrackletParameters(const TrackletParameters& rhs):
-    data_(rhs.raw())
-  {}
-  
   // Getter
   TrackletParameterData raw() const {return data_;}
 
   STUBINDEX GetStubIndexOuter() const {
-    return data_.range(kTParStubIndexOuterLSB+kNBits_MemAddr-1,kTParStubIndexOuterLSB);
+    return data_.range(kTParStubIndexOuterMSB,kTParStubIndexOuterLSB);
   }
 
   STUBINDEX GetStubIndexInner() const {
-    return data_.range(kTParStubIndexInnerLSB+kNBits_MemAddr-1,kTParStubIndexInnerLSB);
+    return data_.range(kTParStubIndexInnerMSB,kTParStubIndexInnerLSB);
   }
 
   TPAR GetT() const {
-    return data_.range(kTParTLSB+kTParTSize-1,kTParTLSB);
+    return data_.range(kTParTMSB,kTParTLSB);
   }
 
   Z0PAR GetZ0() const {
-    return data_.range(kTParZ0LSB+kTParZ0Size-1,kTParZ0LSB);
+    return data_.range(kTParZ0MSB,kTParZ0LSB);
   }
 
   PHI0PAR GetPhi0() const {
-    return data_.range(kTParPhi0LSB+kTParPhi0Size-1,kTParPhi0LSB);
+    return data_.range(kTParPhi0MSB,kTParPhi0LSB);
   }
 
   RINVPAR GetRinv() const {
-    return data_.range(kTParRinvLSB+kTParRinvSize-1,kTParRinvLSB);
+    return data_.range(kTParRinvMSB,kTParRinvLSB);
   }
   
   // Setter
   void SetStubIndexInner(const STUBINDEX id) {
-    data_.range(kTParStubIndexInnerLSB+kNBits_MemAddr-1,kTParStubIndexInnerLSB) = id;
+    data_.range(kTParStubIndexInnerMSB,kTParStubIndexInnerLSB) = id;
   }
 
   void SetStubIndexOuter(const STUBINDEX id) {
-    data_.range(kTParStubIndexOuterLSB+kNBits_MemAddr-1,kTParStubIndexOuterLSB) = id;
+    data_.range(kTParStubIndexOuterMSB,kTParStubIndexOuterLSB) = id;
   }
   
   void SetT(const TPAR t) {
-    data_.range(kTParTLSB+kTParTSize-1,kTParTLSB) = t;
+    data_.range(kTParTMSB,kTParTLSB) = t;
   }
   
   void SetZ0(const Z0PAR z0) {
-    data_.range(kTParZ0LSB+kTParZ0Size-1,kTParZ0LSB) = z0;
+    data_.range(kTParZ0MSB,kTParZ0LSB) = z0;
   }
 
   void SetPhi0(const PHI0PAR phi0) {
-    data_.range(kTParPhi0LSB+kTParPhi0Size-1,kTParPhi0LSB) = phi0;
+    data_.range(kTParPhi0MSB,kTParPhi0LSB) = phi0;
   }
   
   void SetRinv(const RINVPAR rinv) {
-    data_.range(kTParRinvLSB+kTParRinvSize-1,kTParRinvLSB) = rinv;
+    data_.range(kTParRinvMSB,kTParRinvLSB) = rinv;
   }
   
 private:

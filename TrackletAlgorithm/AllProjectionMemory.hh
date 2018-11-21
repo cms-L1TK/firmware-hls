@@ -4,6 +4,29 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for AllProjectionMemory fields
+constexpr unsigned int kAProjZDSize = 10;
+constexpr unsigned int kAProjPhiDSize = 11;
+constexpr unsigned int kAProjZSize = 12;
+constexpr unsigned int kAProjPhiSize = 14;
+constexpr unsigned int kAProjTCIndexSize = 13;
+//Bit size for full AllProjectionMemory
+constexpr unsigned int kAllProjectionSize = 1 + 1 +kAProjTCIndexSize + kAProjPhiSize + kAProjZSize + kAProjPhiDSize + kAProjZDSize;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the AllProjectionMemory word for different fields
+constexpr unsigned int kAProjZDLSB = 0;
+constexpr unsigned int kAProjZDMSB = kAProjZDLSB + kAProjZDSize - 1;
+constexpr unsigned int kAProjPhiDLSB = kAProjZDMSB + 1;
+constexpr unsigned int kAProjPhiDMSB = kAProjPhiDLSB + kAProjPhiDSize - 1;
+constexpr unsigned int kAProjZLSB = kAProjPhiDMSB + 1;
+constexpr unsigned int kAProjZMSB = kAProjZLSB + kAProjZSize - 1;
+constexpr unsigned int kAProjPhiLSB = kAProjZMSB + 1;
+constexpr unsigned int kAProjPhiMSB = kAProjPhiLSB + kAProjPhiSize - 1;
+constexpr unsigned int kAProjTCIndexLSB = kAProjPhiMSB + 1;
+constexpr unsigned int kAProjTCIndexMSB = kAProjTCIndexLSB + kAProjTCIndexSize - 1;
+constexpr unsigned int kAProjIsMinusNeighborLSB = kAProjTCIndexMSB + 1;
+constexpr unsigned int kAProjIsPlusNeighborLSB = kAProjIsMinusNeighborLSB + 1;
+
 // Data object definition
 class AllProjection
 {
@@ -35,70 +58,65 @@ public:
     AllProjectionData newdata(datastr, base);
     data_ = newdata;
   }
-  
-  // copy constructor
-  AllProjection(const AllProjection& rhs):
-    data_(rhs.raw())
-  {}
 
   // Getter
   AllProjectionData raw() const {return data_;}
   
   bool IsPlusNeighbor() const {
-    return data_.range(kAProjIsPlusNeighbourLSB,kAProjIsPlusNeighbourLSB);
+    return data_.range(kAProjIsPlusNeighborLSB,kAProjIsPlusNeighborLSB);
   }
   
   bool IsMinusNeighbor() const {
-    return data_.range(kAProjIsMinusNeighbourLSB,kAProjIsMinusNeighbourLSB);
+    return data_.range(kAProjIsMinusNeighborLSB,kAProjIsMinusNeighborLSB);
   }
 
   AProjTCID GetTrackletIndex() const {
-    return data_.range(kAProjTCIndexLSB+kAProjTCIndexSize-1,kAProjTCIndexLSB);
+    return data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB);
   }
   
   AProjPHI GetPhi() const {
-    return data_.range(kAProjPhiLSB+kAProjPhiSize-1,kAProjPhiLSB);
+    return data_.range(kAProjPhiMSB,kAProjPhiLSB);
   }
   
   AProjZ GetZ() const {
-    return data_.range(kAProjZLSB+kAProjZSize-1,kAProjZLSB);
+    return data_.range(kAProjZMSB,kAProjZLSB);
   }
   
   AProjPHIDER GetPhiDer() const { 
-    return data_.range(kAProjPhiDLSB+kAProjPhiDSize-1,kAProjPhiDLSB);
+    return data_.range(kAProjPhiDMSB,kAProjPhiDLSB);
   }
   
   AProjZDER GetZDer() const {
-    return data_.range(kAProjZDLSB+kAProjZDSize-1,kAProjZDLSB);
+    return data_.range(kAProjZDMSB,kAProjZDLSB);
   }
 
   // Setter
   void SetIsPlusNeighbor(const bool isplusneighbor) {
-    data_.range(kAProjIsPlusNeighbourLSB,kAProjIsPlusNeighbourLSB) = isplusneighbor;
+    data_.range(kAProjIsPlusNeighborLSB,kAProjIsPlusNeighborLSB) = isplusneighbor;
   }
 
   void SetIsMinusNeighbor(const bool isminusneighbor) {
-    data_.range(kAProjIsMinusNeighbourLSB,kAProjIsMinusNeighbourLSB) = isminusneighbor;
+    data_.range(kAProjIsMinusNeighborLSB,kAProjIsMinusNeighborLSB) = isminusneighbor;
   }
 
   void SetTrackletIndex(const AProjTCID id) {
-    data_.range(kAProjTCIndexLSB+kAProjTCIndexSize-1,kAProjTCIndexLSB) = id;
+    data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB) = id;
   }
 
   void SetPhi(const AProjPHI phi) {
-    data_.range(kAProjPhiLSB+kAProjPhiSize-1,kAProjPhiLSB) = phi;
+    data_.range(kAProjPhiMSB,kAProjPhiLSB) = phi;
   }
 
   void SetZ(const AProjZ z) {
-    data_.range(kAProjZLSB+kAProjZSize-1,kAProjZLSB) = z;
+    data_.range(kAProjZMSB,kAProjZLSB) = z;
   }
 
   void SetPhiDer(const AProjPHIDER phider) {
-    data_.range(kAProjPhiDLSB+kAProjPhiDSize-1,kAProjPhiDLSB) = phider;
+    data_.range(kAProjPhiDMSB,kAProjPhiDLSB) = phider;
   }
 
   void SetZDer(const AProjZDER zder) {
-    data_.range(kAProjZDLSB+kAProjZDSize-1,kAProjZDLSB) = zder;
+    data_.range(kAProjZDMSB,kAProjZDLSB) = zder;
   }
 
 private:

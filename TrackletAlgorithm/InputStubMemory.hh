@@ -4,6 +4,24 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for InputStubMemory fields
+constexpr unsigned int kISBendSize = 3;
+constexpr unsigned int kISPhiSize = 14;
+constexpr unsigned int kISZSize = 12;
+constexpr unsigned int kISRSize = 7;
+// Bit size for full InputStubMemory
+constexpr unsigned int kInputStubSize = kISBendSize + kISPhiSize + kISZSize + kISRSize;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
+constexpr unsigned int kISBendLSB = 0;
+constexpr unsigned int kISBendMSB = kISBendLSB + kISBendSize - 1;
+constexpr unsigned int kISPhiLSB = kISBendMSB + 1;
+constexpr unsigned int kISPhiMSB = kISPhiLSB + kISPhiSize - 1;
+constexpr unsigned int kISZLSB = kISPhiMSB + 1;
+constexpr unsigned int kISZMSB = kISZLSB + kISZSize - 1;
+constexpr unsigned int kISRLSB = kISZMSB + 1;
+constexpr unsigned int kISRMSB = kISRLSB + kISRSize - 1;
+
 // Data object definition
 class InputStub
 {
@@ -35,45 +53,40 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  InputStub(const InputStub& rhs):
-    data_(rhs.raw())
-  {}
-
   // Getter
   InputStubData raw() const {return data_; }
 
   ISR GetR() const {
-    return data_.range(kISRLSB+kISRSize-1,kISRLSB);
+    return data_.range(kISRMSB,kISRLSB);
   }
 
   ISZ GetZ() const {
-    return data_.range(kISZLSB+kISZSize-1,kISZLSB);
+    return data_.range(kISZMSB,kISZLSB);
   }
 
   ISPHI GetPhi() const {
-    return data_.range(kISPhiLSB+kISPhiSize-1,kISPhiLSB);
+    return data_.range(kISPhiMSB,kISPhiLSB);
   }
 
   ISBEND GetBend() const {
-    return data_.range(kISBendLSB+kISBendSize-1,kISBendLSB);
+    return data_.range(kISBendMSB,kISBendLSB);
   }
 
   // Setter
   void SetR(const ISR r) {
-    data_.range(kISRLSB+kISRSize-1,kISRLSB) = r;
+    data_.range(kISRMSB,kISRLSB) = r;
   }
 
   void SetZ(const ISZ z) {
-    data_.range(kISZLSB+kISZSize-1,kISZLSB) = z;
+    data_.range(kISZMSB,kISZLSB) = z;
   }
 
   void SetPhi(const ISPHI phi) {
-    data_.range(kISPhiLSB+kISPhiSize-1,kISPhiLSB) = phi;
+    data_.range(kISPhiMSB,kISPhiLSB) = phi;
   }
 
   void SetBend(const ISBEND bend) {
-    data_.range(kISBendLSB+kISBendSize-1,kISBendLSB) = bend;
+    data_.range(kISBendMSB,kISBendLSB) = bend;
   }
 
 private:

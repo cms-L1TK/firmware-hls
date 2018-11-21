@@ -4,6 +4,21 @@
 #include "Constants.hh"
 #include "MemoryTemplateBinned.hh"
 
+// Bit size for VMStubMemory fields
+constexpr unsigned int kVMSFineZSize = 4;
+constexpr unsigned int kVMSBendSize = 3;
+constexpr unsigned int kVMSIndexSize = 7;
+// Bit size for full VMStubMemory
+constexpr unsigned int kVMStubSize = kVMSFineZSize + kVMSBendSize + kVMSIndexSize;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubMemory word for different fields
+constexpr unsigned int kVMSFineZLSB = 0;
+constexpr unsigned int kVMSFineZMSB = kVMSFineZLSB + kVMSFineZSize - 1;
+constexpr unsigned int kVMSBendLSB = kVMSFineZMSB + 1;
+constexpr unsigned int kVMSBendMSB = kVMSBendLSB + kVMSBendSize - 1;
+constexpr unsigned int kVMSIndexLSB = kVMSBendMSB + 1;
+constexpr unsigned int kVMSIndexMSB = kVMSIndexLSB + kVMSIndexSize - 1;
+
 // Data object definition
 class VMStub 
 {
@@ -34,37 +49,32 @@ public:
     data_ = newdata;
   }
 
-  // copy constructor
-  VMStub(const VMStub& rhs):
-    data_(rhs.raw())
-  {}
-
   // Getter
   VMStubData raw() const {return data_;}
 
   VMSID GetIndex() const {
-    return data_.range(kVMSIndexLSB+kVMSIndexSize-1,kVMSIndexLSB);
+    return data_.range(kVMSIndexMSB,kVMSIndexLSB);
   }
 
   VMSBEND GetBend() const {
-    return data_.range(kVMSBendLSB+kVMSBendSize-1,kVMSBendLSB);
+    return data_.range(kVMSBendMSB,kVMSBendLSB);
   }
 
   VMSFINEZ GetFineZ() const {
-    return data_.range(kVMSFineZLSB+kVMSFineZSize-1,kVMSFineZLSB);
+    return data_.range(kVMSFineZMSB,kVMSFineZLSB);
   }
 
   // Setter
   void SetIndex(const VMSID index) {
-    data_.range(kVMSIndexLSB+kVMSIndexSize-1,kVMSIndexLSB) = index;
+    data_.range(kVMSIndexMSB,kVMSIndexLSB) = index;
   }
 
   void SetBend(const VMSBEND bend) {
-    data_.range(kVMSBendLSB+kVMSBendSize-1,kVMSBendLSB) = bend;
+    data_.range(kVMSBendMSB,kVMSBendLSB) = bend;
   }
 
   void SetFineZ(const VMSFINEZ finez) {
-    data_.range(kVMSFineZLSB+kVMSFineZSize-1,kVMSFineZLSB) = finez;
+    data_.range(kVMSFineZMSB,kVMSFineZLSB) = finez;
   }
 
 private:
