@@ -35,10 +35,6 @@ public:
   typedef ap_uint<kFullMatchSize> FullMatchData;
 
   // Constructors
-  FullMatch(const FullMatchData& newdata):
-    data_(newdata)
-  {}
-
   FullMatch(const FMTCID tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
     data_( (((tcid,stub),phires),zres) )
   {}
@@ -47,45 +43,47 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   FullMatch(const char* datastr, int base = 16)
   {
     FullMatchData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   FullMatchData raw() const {return data_;}
 
-  FMTCID GetTrackletIndex() const {
+  FMTCID getTrackletIndex() const {
     return data_.range(kFMTCIndexMSB,kFMTCIndexLSB);
   }
 
-  FMSTUBINDEX GetStubIndex() const {
+  FMSTUBINDEX getStubIndex() const {
     return data_.range(kFMStubIndexMSB,kFMStubIndexLSB);
   }
 
-  FMPHIRES GetPhiRes() const {
+  FMPHIRES getPhiRes() const {
     return data_.range(kFMPhiResMSB,kFMPhiResLSB);
   }
 
-  FMZRES GetZRes() const {
+  FMZRES getZRes() const {
     return data.range(kFMZResMSB,kFMZResLSB);
   }
 
   // Setter
-  void SetTrackletIndex(const FMTCID tcid) {
+  void setTrackletIndex(const FMTCID tcid) {
     data_.range(kFMTCIndexMSB,kFMTCIndexLSB) = tcid;
   }
 
-  void SetStubIndex(const FMSTUBINDEX stid) {
+  void setStubIndex(const FMSTUBINDEX stid) {
     data_.range(kFMStubIndexMSB,kFMStubIndexLSB) = stid;
   }
 
-  void SetPhiRes(const FMPHIRES phires) {
+  void setPhiRes(const FMPHIRES phires) {
     data_.range(kFMPhiResMSB,kFMPhiResLSB) = phires;
   }
 
-  void SetZRes(const FMZRES zres) {
+  void setZRes(const FMZRES zres) {
     data_.range(kFMZResMSB,kFMZResLSB) = zres;
   }
 

@@ -41,10 +41,6 @@ public:
   typedef ap_uint<kTrackletProjectionSize> AllProjectionData;
   
   // Constructors
-  AllProjection(const AllProjectionData& newdata):
-    data_(newdata)
-  {}
-
   AllProjection(const bool plusneighbor, const bool minusneighbor, const AProjTCID tcid, const AProjPHI phi, const AProjZ z, const AProjPHIDER phider, const AProjZDER zder):
     data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
   {}
@@ -53,69 +49,71 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   AllProjection(const char* datastr, int base=16)
   {
     AllProjectionData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   AllProjectionData raw() const {return data_;}
   
-  bool IsPlusNeighbor() const {
+  bool getIsPlusNeighbor() const {
     return data_.range(kAProjIsPlusNeighborLSB,kAProjIsPlusNeighborLSB);
   }
   
-  bool IsMinusNeighbor() const {
+  bool getIsMinusNeighbor() const {
     return data_.range(kAProjIsMinusNeighborLSB,kAProjIsMinusNeighborLSB);
   }
 
-  AProjTCID GetTrackletIndex() const {
+  AProjTCID getTrackletIndex() const {
     return data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB);
   }
   
-  AProjPHI GetPhi() const {
+  AProjPHI getPhi() const {
     return data_.range(kAProjPhiMSB,kAProjPhiLSB);
   }
   
-  AProjZ GetZ() const {
+  AProjZ getZ() const {
     return data_.range(kAProjZMSB,kAProjZLSB);
   }
   
-  AProjPHIDER GetPhiDer() const { 
+  AProjPHIDER getPhiDer() const { 
     return data_.range(kAProjPhiDMSB,kAProjPhiDLSB);
   }
   
-  AProjZDER GetZDer() const {
+  AProjZDER getZDer() const {
     return data_.range(kAProjZDMSB,kAProjZDLSB);
   }
 
   // Setter
-  void SetIsPlusNeighbor(const bool isplusneighbor) {
+  void setIsPlusNeighbor(const bool isplusneighbor) {
     data_.range(kAProjIsPlusNeighborLSB,kAProjIsPlusNeighborLSB) = isplusneighbor;
   }
 
-  void SetIsMinusNeighbor(const bool isminusneighbor) {
+  void setIsMinusNeighbor(const bool isminusneighbor) {
     data_.range(kAProjIsMinusNeighborLSB,kAProjIsMinusNeighborLSB) = isminusneighbor;
   }
 
-  void SetTrackletIndex(const AProjTCID id) {
+  void setTrackletIndex(const AProjTCID id) {
     data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB) = id;
   }
 
-  void SetPhi(const AProjPHI phi) {
+  void setPhi(const AProjPHI phi) {
     data_.range(kAProjPhiMSB,kAProjPhiLSB) = phi;
   }
 
-  void SetZ(const AProjZ z) {
+  void setZ(const AProjZ z) {
     data_.range(kAProjZMSB,kAProjZLSB) = z;
   }
 
-  void SetPhiDer(const AProjPHIDER phider) {
+  void setPhiDer(const AProjPHIDER phider) {
     data_.range(kAProjPhiDMSB,kAProjPhiDLSB) = phider;
   }
 
-  void SetZDer(const AProjZDER zder) {
+  void setZDer(const AProjZDER zder) {
     data_.range(kAProjZDMSB,kAProjZDLSB) = zder;
   }
 

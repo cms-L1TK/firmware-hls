@@ -41,10 +41,6 @@ public:
   typedef ap_uint<kTrackletProjectionSize> TrackletProjectionData;
 
   // Constructors
-  TrackletProjection(const TrackletProjectionData& newdata):
-    data_(newdata)
-  {}
-
   TrackletProjection(const bool plusneighbor, const bool minusneighbor, const TProjTCID tcid, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjZDER zder):
     data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
   {}
@@ -53,69 +49,71 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   TrackletProjection(const char* datastr, int base=16)
   {
     TrackletProjectionData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   TrackletProjectionData raw() const {return data_;}
 
-  bool IsPlusNeighbor() const {
+  bool getIsPlusNeighbor() const {
     return data_.range(kTProjIsPlusNeighborLSB,kTProjIsPlusNeighborLSB);
   }
   
-  bool IsMinusNeighbor() const {
+  bool getIsMinusNeighbor() const {
     return data_.range(kTProjIsMinusNeighborLSB,kTProjIsMinusNeighborLSB);
   }
   
-  TProjTCID GetTrackletIndex() const {
+  TProjTCID getTrackletIndex() const {
     return data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB);
   }
 
-  TProjPHI GetPhi() const {
+  TProjPHI getPhi() const {
     return data_.range(kTProjPhiMSB,kTProjPhiLSB);
   }
 
-  TProjZ GetZ() const {
+  TProjZ getZ() const {
     return data_.range(kTProjZMSB,kTProjZLSB);
   }
 
-  TProjPHIDER GetPhiDer() {
+  TProjPHIDER getPhiDer() {
     return data_.range(kTProjPhiDMSB,kTProjPhiDLSB);
   }
 
-  TProjZDER GetZDer() {
+  TProjZDER getZDer() {
     return data_.range(kTProjZDMSB,kTProjZDLSB);
   }
 
   // Setter
-  void SetIsPlusNeighbor(const bool isplusneighbor) {
+  void setIsPlusNeighbor(const bool isplusneighbor) {
     data_.range(kTProjIsPlusNeighborLSB,kTProjIsPlusNeighborLSB) = isplusneighbor;
   }
 
-  void SetIsMinusNeighbor(const bool isminusneighbor) {
+  void setIsMinusNeighbor(const bool isminusneighbor) {
     data_.range(kTProjIsMinusNeighborLSB,kTProjIsMinusNeighborLSB) = isminusneighbor;
   }
 
-  void SetTrackletIndex(const TProjTCID id) {
+  void setTrackletIndex(const TProjTCID id) {
     data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB) = id;
   }
 
-  void SetPhi(const TProjPHI phi) {
+  void setPhi(const TProjPHI phi) {
     data_.range(kTProjPhiMSB,kTProjPhiLSB) = phi;
   }
 
-  void SetZ(const TProjZ z) {
+  void setZ(const TProjZ z) {
     data_.range(kTProjZMSB,kTProjZLSB) = z;
   }
 
-  void SetPhiDer(const TProjPHIDER phider) {
+  void setPhiDer(const TProjPHIDER phider) {
     data_.range(kTProjPhiDMSB,kTProjPhiDLSB) = phider;
   }
 
-  void SetZDer(const TProjZDER zder) {
+  void setZDer(const TProjZDER zder) {
     data_.range(kTProjZDMSB,kTProjZDLSB) = zder;
   }
   

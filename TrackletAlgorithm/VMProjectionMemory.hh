@@ -37,10 +37,6 @@ public:
 
 	
   // Constructors
-  VMProjection(const VMProjData& newdata):
-    data_(newdata)
-  {}
-  
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPRINV rinv, const bool ps):
     data_( ((((id,zbin),finez),rinv),ps) )
   {}
@@ -48,54 +44,56 @@ public:
   VMProjection():
     data_(0)
   {}
-  
+
+  #ifndef __SYNTHESIS__
   VMProjection(const char* datastr, int base=16)
   {
     VMProjData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
   
   // Getter
   VMProjData raw() const {return data_;}
   
-  VMPID GetIndex() const {
+  VMPID getIndex() const {
     return data_.range(kVMProjIndexMSB,kVMProjIndexLSB);
   }
 
-  VMPZBIN GetZBin() const {
+  VMPZBIN getZBin() const {
     return data_.range(kVMProjZbinMSB,kVMProjZbinLSB);
   }
 
-  VMPFINEZ GetFineZ() const {
+  VMPFINEZ getFineZ() const {
     return data_.range(kVMProjFineZMSB,kVMProjFineZLSB);
   }
   
-  VMPRINV GetRInv() const {
+  VMPRINV getRInv() const {
     return data_.range(kVMProjRinvMSB,kVMProjRinvLSB);
   }
 
-  bool GetIsPSSeed() const {
+  bool getIsPSSeed() const {
     return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedLSB);
   }
   
   // Setter
-  void SetIndex(const VMPID id) {
+  void setIndex(const VMPID id) {
     data_.range(kVMProjIndexMSB,kVMProjIndexLSB) = id;
   }
   
-  void SetZBin(const VMPZBIN zbin) {
+  void setZBin(const VMPZBIN zbin) {
     data_.range(kVMProjZbinMSB,kVMProjZbinLSB) = zbin;
   }
   
-  void SetFineZ(const VMPFINEZ finez) {
+  void setFineZ(const VMPFINEZ finez) {
     data_.range(kVMProjFineZMSB,kVMProjFineZLSB) = finez;
   }
   
-  void SetRInv(const VMPRINV rinv) {
+  void setRInv(const VMPRINV rinv) {
     data_.range(kVMProjRinvMSB,kVMProjRinvLSB) = rinv;
   }
   
-  void SetIsPSSeed(const bool psseed) {
+  void setIsPSSeed(const bool psseed) {
     data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedLSB) = psseed;
   }
   

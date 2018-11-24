@@ -49,10 +49,6 @@ public:
   typedef ap_uint<kFitTrackSize> FitTrackData;
 
   // Constructors
-  FitTracks(const FitTrackData& newdata):
-    data_(newdata)
-  {}
-
   FitTracks(const FTPT pt, const FTPHI0 phi0, const FTT t, const FTZ0 z0, const FTSTUBINDEX id1, const FTSTUBINDEX id2, const FTSTUBINDEX id3, const FTSTUBINDEX id4, const FTSTUBINDEX id5, const FTSTUBINDEX id6):
     data_( (((((((((pt,phi0),t),z0),id1),id2),id3),id4),id5),id6) )
   {}
@@ -61,93 +57,95 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   FitTracks(const char* datastr, int base=16)
   {
     FitTrackData = newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   FitTrackData raw() const {return data_;}
 
-  FTPT GetPt() const {
+  FTPT getPt() const {
     return data_.range(kFTpTMSB,kFTpTLSB);
   }
 
-  FTPHI0 GetPhi0() const {
+  FTPHI0 getPhi0() const {
     return data_.range(kFTPhi0MSB,kFTPhi0LSB);
   }
 
-  FTT GetT() const {
+  FTT getT() const {
     return data_.range(kFTTMSB,kFTTLSB);
   }
 
-  FTZ0 GetZ0() const {
+  FTZ0 getZ0() const {
     return data_.range(kFTZ0MSB,kFTZ0LSB);
   }
 
-  FTSTUBINDEX GetStubIndex1() const {
+  FTSTUBINDEX getStubIndex1() const {
     return data_.range(kFTStubIndex1MSB,kFTStubIndex1LSB);
   }
 
-  FTSTUBINDEX GetStubIndex2() const {
+  FTSTUBINDEX getStubIndex2() const {
     return data_.range(kFTStubIndex2MSB,kFTStubIndex2LSB);
   }
 
-  FTSTUBINDEX GetStubIndex3() const {
+  FTSTUBINDEX getStubIndex3() const {
     return data_.range(kFTStubIndex3MSB,kFTStubIndex3LSB);
   }
 
-  FTSTUBINDEX GetStubIndex4() const {
+  FTSTUBINDEX getStubIndex4() const {
     return data_.range(kFTStubIndex4MSB,kFTStubIndex4LSB);
   }
 
-  FTSTUBINDEX GetStubIndex5() const {
+  FTSTUBINDEX getStubIndex5() const {
     return data_.range(kFTStubIndex5MSB,kFTStubIndex5LSB);
   }
 
-  FTSTUBINDEX GetStubIndex6() const {
+  FTSTUBINDEX getStubIndex6() const {
     return data_.range(kFTStubIndex6MSB,kFTStubIndex6LSB);
   }
 
   // Setter
-  void SetPt(const FTPT pt) {
+  void setPt(const FTPT pt) {
     data_.range(kFTpTMSB,kFTpTLSB) = pt;
   }
 
-  void SetPhi0(const FTPHI0 phi0) {
+  void setPhi0(const FTPHI0 phi0) {
     data_.range(kFTPhi0MSB,kFTPhi0LSB) = phi0;
   }
 
-  void SetT(const FTT t) {
+  void setT(const FTT t) {
     data_.range(kFTTMSB,kFTTLSB) = t;
   }
 
-  void SetZ0(const FTZ0 z0) {
+  void setZ0(const FTZ0 z0) {
     data_.range(kFTZ0MSB,kFTZ0LSB) = z0;
   }
 
-  void SetStubIndex1(const FTSTUBINDEX id) const {
+  void setStubIndex1(const FTSTUBINDEX id) const {
     data_.range(kFTStubIndex1MSB,kFTStubIndex1LSB) = id;
   }
 
-  void SetStubIndex2(const FTSTUBINDEX id) const {
+  void setStubIndex2(const FTSTUBINDEX id) const {
     data_.range(kFTStubIndex2MSB,kFTStubIndex2LSB) = id;
   }
 
-  void SetStubIndex3(const FTSTUBINDEX id) const {
+  void setStubIndex3(const FTSTUBINDEX id) const {
     data_.range(kFTStubIndex3MSB,kFTStubIndex3LSB) = id;
   }
 
-  void SetStubIndex4(const FTSTUBINDEX id) const {
+  void setStubIndex4(const FTSTUBINDEX id) const {
     data_.range(kFTStubIndex4MSB,kFTStubIndex4LSB) = id;
   }
 
-  void SetStubIndex5(const FTSTUBINDEX id) const {
+  void setStubIndex5(const FTSTUBINDEX id) const {
     data_.range(kFTStubIndex5MSB,kFTStubIndex5LSB) = id;
   }
 
-  void SetStubIndex6(const FTSTUBINDEX id) const {
+  void setStubIndex6(const FTSTUBINDEX id) const {
     data_.range(kFTStubIndex6MSB,kFTStubIndex6LSB) = id;
   }
 

@@ -35,10 +35,6 @@ public:
   typedef ap_uint<kAllStubSize> AllStubData;
 
   // Constructors
-  AllStub(const AllStubData& newdata):
-    data_(newdata)
-  {}
-
   AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend):
     data_( (((r,z),phi),bend) )
   {}
@@ -47,45 +43,47 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   AllStub(const char* datastr, int base=16)
   {
     AllStubData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   AllStubData raw() const {return data_; }
 
-  ASR GetR() const {
+  ASR getR() const {
     return data_.range(kASRMSB,kASRLSB);
   }
 
-  ASZ GetZ() const {
+  ASZ getZ() const {
     return data_.range(kASZMSB,kASZLSB);
   }
 
-  ASPHI GetPhi() const {
+  ASPHI getPhi() const {
     return data_.range(kASPhiMSB,kASPhiLSB);
   }
 
-  ASBEND GetBend() const {
+  ASBEND getBend() const {
     return data_.range(kASBendMSB,kASBendLSB);
   }
 
   // Setter
-  void SetR(const ASR r) {
+  void setR(const ASR r) {
     data_.range(kASRMSB,kASRLSB) = r;
   }
 
-  void SetZ(const ASZ z) {
+  void setZ(const ASZ z) {
     data_.range(kSZMSB,kASZLSB) = z;
   }
 
-  void SetPhi(const ASPHI phi) {
+  void setPhi(const ASPHI phi) {
     data_.range(kASPhiMSB,kASPhiLSB) = phi;
   }
 
-  void SetBend(const ASBEND bend) {
+  void setBend(const ASBEND bend) {
     data_.range(kASBendMSB,kASBendLSB) = bend;
   }
 

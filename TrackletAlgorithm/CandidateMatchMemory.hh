@@ -26,10 +26,6 @@ public:
   typedef ap_uint<kCandidateMatchSize> CandidateMatchData;
 
   // Constructors
-  CandidateMatch(const CandidateMatchData& newdata):
-    data_(newdata)
-  {}
-  
   CandidateMatch(const CMProjIndex projindex, const CMStubIndex stubindex):
     data_( (projindex,stubindex) )
   {}
@@ -38,29 +34,31 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   CandidateMatch(const char* datastr, int base=16)
   {
     CandidateMatchData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   CandidateMatchData raw() const {return data_;}
   
-  CMProjIndex GetProjIndex() const {
+  CMProjIndex getProjIndex() const {
     return data_.range(kCMProjIndexMSB,kCMProjIndexLSB);
   }
 
-  CMStubIndex GetStubIndex() const {
+  CMStubIndex getStubIndex() const {
     return data_.range(kCMStubIndexMSB,kCMStubIndexLSB);
   }
 
   // Setter
-  void SetProjIndex(const CMProjIndex id) {
+  void setProjIndex(const CMProjIndex id) {
     data_.range(kCMProjIndexMSB,kCMProjIndexLSB) = id;
   }
 
-  void SetStubIndex(const CMStubIndex id) {
+  void setStubIndex(const CMStubIndex id) {
     data_.range(kCMStubIndexMSB,kCMStubIndexLSB) = id;
   }
 

@@ -24,10 +24,6 @@ public:
   typedef ap_uint<kStubPairSize> StubPairData;
 
   // Constructors
-  StubPair(const StubPairData& newdata):
-    data_(newdata)
-  {}
-  
   StubPair(const SPInnerIndex innerindex, const SPOuterIndex outerindex):
     data_( (innerindex,outerindex) )
   {}
@@ -36,29 +32,31 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   StubPair(const char* datastr, int base=16)
   {
     StubPairData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   StubPairData raw() const {return data_;}
   
-  SPInnerIndex GetInnerIndex() const {
+  SPInnerIndex getInnerIndex() const {
     return data_.range(kSPInnerIndexMSB,kSPInnerIndexLSB);
   }
 
-  SPOuterIndex GetOuterIndex() const {
+  SPOuterIndex getOuterIndex() const {
     return data_.range(kSPOuterIndexMSB,kSPOuterIndexLSB);
   }
 
   // Setter
-  void SetInnerIndex(const SPInnerIndex id) {
+  void setInnerIndex(const SPInnerIndex id) {
     data_.range(kSPInnerIndexMSB,kSPInnerIndexLSB) = id;
   }
 
-  void SetOuterIndex(const SPOuterIndex id) {
+  void setOuterIndex(const SPOuterIndex id) {
     data_.range(kSPOuterIndexMSB,kSPOuterIndexLSB) = id;
   }
 

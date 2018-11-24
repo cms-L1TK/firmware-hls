@@ -40,10 +40,6 @@ public:
   typedef ap_uint<kTrackletParameterSize> TrackletParameterData;
 	
   // Constructors
-  TrackletParameters(const TrackletParameterData& newdata):
-    data_(newdata)
-  {}
-  
   TrackletParameters(const STUBINDEX id1, const STUBINDEX id2, const TPAR t, const Z0PAR z0, const PHI0PAR phi0, const RINVPAR rinv):
     data_( (((((id1,id2),t),z0),phi0), rinv ) )
   {}
@@ -51,62 +47,64 @@ public:
   TrackletParameters():
     data_(0)
   {}
-  
+
+  #ifndef __SYNTHESIS__
   TrackletParameters(const char* datastr, int base=16)
   {
     TrackletParameterData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
   
   // Getter
   TrackletParameterData raw() const {return data_;}
 
-  STUBINDEX GetStubIndexOuter() const {
+  STUBINDEX getStubIndexOuter() const {
     return data_.range(kTParStubIndexOuterMSB,kTParStubIndexOuterLSB);
   }
 
-  STUBINDEX GetStubIndexInner() const {
+  STUBINDEX getStubIndexInner() const {
     return data_.range(kTParStubIndexInnerMSB,kTParStubIndexInnerLSB);
   }
 
-  TPAR GetT() const {
+  TPAR getT() const {
     return data_.range(kTParTMSB,kTParTLSB);
   }
 
-  Z0PAR GetZ0() const {
+  Z0PAR getZ0() const {
     return data_.range(kTParZ0MSB,kTParZ0LSB);
   }
 
-  PHI0PAR GetPhi0() const {
+  PHI0PAR getPhi0() const {
     return data_.range(kTParPhi0MSB,kTParPhi0LSB);
   }
 
-  RINVPAR GetRinv() const {
+  RINVPAR getRinv() const {
     return data_.range(kTParRinvMSB,kTParRinvLSB);
   }
   
   // Setter
-  void SetStubIndexInner(const STUBINDEX id) {
+  void setStubIndexInner(const STUBINDEX id) {
     data_.range(kTParStubIndexInnerMSB,kTParStubIndexInnerLSB) = id;
   }
 
-  void SetStubIndexOuter(const STUBINDEX id) {
+  void setStubIndexOuter(const STUBINDEX id) {
     data_.range(kTParStubIndexOuterMSB,kTParStubIndexOuterLSB) = id;
   }
   
-  void SetT(const TPAR t) {
+  void setT(const TPAR t) {
     data_.range(kTParTMSB,kTParTLSB) = t;
   }
   
-  void SetZ0(const Z0PAR z0) {
+  void setZ0(const Z0PAR z0) {
     data_.range(kTParZ0MSB,kTParZ0LSB) = z0;
   }
 
-  void SetPhi0(const PHI0PAR phi0) {
+  void setPhi0(const PHI0PAR phi0) {
     data_.range(kTParPhi0MSB,kTParPhi0LSB) = phi0;
   }
   
-  void SetRinv(const RINVPAR rinv) {
+  void setRinv(const RINVPAR rinv) {
     data_.range(kTParRinvMSB,kTParRinvLSB) = rinv;
   }
   

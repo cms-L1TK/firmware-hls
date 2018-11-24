@@ -35,10 +35,6 @@ public:
   typedef ap_uint<kInputStubSize> InputStubData;
 
   // Constructors
-  InputStub(const InputStubData& newdata):
-    data_(newdata)
-  {}
-
   InputStub(const ISR r, const ISZ z, const ISPHI phi, const ISBEND bend):
     data_( (((r,z),phi),bend) )
   {}
@@ -47,45 +43,47 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   InputStub(const char* datastr, int base=16)
   {
     InputStubData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   InputStubData raw() const {return data_; }
 
-  ISR GetR() const {
+  ISR getR() const {
     return data_.range(kISRMSB,kISRLSB);
   }
 
-  ISZ GetZ() const {
+  ISZ getZ() const {
     return data_.range(kISZMSB,kISZLSB);
   }
 
-  ISPHI GetPhi() const {
+  ISPHI getPhi() const {
     return data_.range(kISPhiMSB,kISPhiLSB);
   }
 
-  ISBEND GetBend() const {
+  ISBEND getBend() const {
     return data_.range(kISBendMSB,kISBendLSB);
   }
 
   // Setter
-  void SetR(const ISR r) {
+  void setR(const ISR r) {
     data_.range(kISRMSB,kISRLSB) = r;
   }
 
-  void SetZ(const ISZ z) {
+  void setZ(const ISZ z) {
     data_.range(kISZMSB,kISZLSB) = z;
   }
 
-  void SetPhi(const ISPHI phi) {
+  void setPhi(const ISPHI phi) {
     data_.range(kISPhiMSB,kISPhiLSB) = phi;
   }
 
-  void SetBend(const ISBEND bend) {
+  void setBend(const ISBEND bend) {
     data_.range(kISBendMSB,kISBendLSB) = bend;
   }
 

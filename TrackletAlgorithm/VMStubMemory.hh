@@ -31,10 +31,6 @@ public:
   typedef ap_uint<kVMStubSize> VMStubData;
 
   // Constructors
-  VMStub(const VMStubData& newdata):
-    data_(newdata)
-  {}
-
   VMStub(const VMSID id, const VMSBEND bend, const VMSFINEZ finez):
     data_( ((id, bend), finez) )
   {}
@@ -43,37 +39,39 @@ public:
     data_(0)
   {}
 
+  #ifndef __SYNTHESIS__
   VMStub(const char* datastr, int base=16)
   {
     VMStubData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   VMStubData raw() const {return data_;}
 
-  VMSID GetIndex() const {
+  VMSID getIndex() const {
     return data_.range(kVMSIndexMSB,kVMSIndexLSB);
   }
 
-  VMSBEND GetBend() const {
+  VMSBEND getBend() const {
     return data_.range(kVMSBendMSB,kVMSBendLSB);
   }
 
-  VMSFINEZ GetFineZ() const {
+  VMSFINEZ getFineZ() const {
     return data_.range(kVMSFineZMSB,kVMSFineZLSB);
   }
 
   // Setter
-  void SetIndex(const VMSID index) {
+  void setIndex(const VMSID index) {
     data_.range(kVMSIndexMSB,kVMSIndexLSB) = index;
   }
 
-  void SetBend(const VMSBEND bend) {
+  void setBend(const VMSBEND bend) {
     data_.range(kVMSBendMSB,kVMSBendLSB) = bend;
   }
 
-  void SetFineZ(const VMSFINEZ finez) {
+  void setFineZ(const VMSFINEZ finez) {
     data_.range(kVMSFineZMSB,kVMSFineZLSB) = finez;
   }
 
