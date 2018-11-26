@@ -4,6 +4,15 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+// Bit size for full CandidateMatchMemory
+constexpr unsigned int kCandidateMatchSize = 2*kNBits_MemAddr;
+
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the CandidateMatchMemory word for different fields
+constexpr unsigned int kCMStubIndexLSB = 0;
+constexpr unsigned int kCMStubIndexMSB = kCMStubIndexLSB + kNBits_MemAddr - 1;
+constexpr unsigned int kCMProjIndexLSB = kCMStubIndexMSB + 1;
+constexpr unsigned int kCMProjIndexMSB = kCMProjIndexLSB + kNBits_MemAddr - 1;
+
 // Data object definition
 class CandidateMatch
 {
@@ -17,36 +26,40 @@ public:
   typedef ap_uint<kCandidateMatchSize> CandidateMatchData;
 
   // Constructors
-  CandidateMatch(CandidateMatchData newdata):
-    data_(newdata)
-  {}
-  
-  CandidateMatch(CMProjIndex projindex, CMStubIndex stubindex):
+  CandidateMatch(const CMProjIndex projindex, const CMStubIndex stubindex):
     data_( (projindex,stubindex) )
   {}
   
   CandidateMatch():
     data_(0)
   {}
-  
-  // copy constructor
-  CandidateMatch(const CandidateMatch& rhs):
-    data_(rhs.raw())
-  {}
-  
-  CandidateMatch(const char* datastr, int base=16):
-    data_(datastr, base)
-  {}
+
+  #ifndef __SYNTHESIS__
+  CandidateMatch(const char* datastr, int base=16)
+  {
+    CandidateMatchData newdata(datastr, base);
+    data_ = newdata;
+  }
+  #endif
 
   // Getter
   CandidateMatchData raw() const {return data_;}
   
-  CMProjIndex GetProjIndex() const {
-    return data_.range(kProjIndexLSB+kNBits_MemAddr-1,kProjIndexLSB);
+  CMProjIndex getProjIndex() const {
+    return data_.range(kCMProjIndexMSB,kCMProjIndexLSB);
   }
 
-  CMStubIndex GetStubIndex() const {
-    return data_.range(kStubIndexLSB+kNBits_MemAddr-1,kStubIndexLSB);
+  CMStubIndex getStubIndex() const {
+    return data_.range(kCMStubIndexMSB,kCMStubIndexLSB);
+  }
+
+  // Setter
+  void setProjIndex(const CMProjIndex id) {
+    data_.range(kCMProjIndexMSB,kCMProjIndexLSB) = id;
+  }
+
+  void setStubIndex(const CMStubIndex id) {
+    data_.range(kCMStubIndexMSB,kCMStubIndexLSB) = id;
   }
 
 private:

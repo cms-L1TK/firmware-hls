@@ -4,48 +4,76 @@
 #include "Constants.hh"
 #include "MemoryTemplateBinned.hh"
 
+// Bit size for VMStubMemory fields
+constexpr unsigned int kVMSFineZSize = 4;
+constexpr unsigned int kVMSBendSize = 3;
+constexpr unsigned int kVMSIndexSize = 7;
+// Bit size for full VMStubMemory
+constexpr unsigned int kVMStubSize = kVMSFineZSize + kVMSBendSize + kVMSIndexSize;
 
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubMemory word for different fields
+constexpr unsigned int kVMSFineZLSB = 0;
+constexpr unsigned int kVMSFineZMSB = kVMSFineZLSB + kVMSFineZSize - 1;
+constexpr unsigned int kVMSBendLSB = kVMSFineZMSB + 1;
+constexpr unsigned int kVMSBendMSB = kVMSBendLSB + kVMSBendSize - 1;
+constexpr unsigned int kVMSIndexLSB = kVMSBendMSB + 1;
+constexpr unsigned int kVMSIndexMSB = kVMSIndexLSB + kVMSIndexSize - 1;
 
-//template<unsigned int bx=2, unsigned int memdepth=kMemDepth>
-class VMStub {
+// Data object definition
+class VMStub 
+{
 public:
 
-  typedef ap_uint<7> VMSID;
-  typedef ap_uint<3> VMSBEND;
-  typedef ap_uint<4> VMSFINEZ;
+  typedef ap_uint<kVMSIndexSize> VMSID;
+  typedef ap_uint<kVMSBendSize> VMSBEND;
+  typedef ap_uint<kVMSFineZSize> VMSFINEZ;
 
-  typedef ap_uint<7+3+4> VMStubData;
+  typedef ap_uint<kVMStubSize> VMStubData;
 
   // Constructors
-  VMStub(VMStubData newdata):
-    data_(newdata)
-  {}
-
-  VMStub(VMSID id, VMSBEND bend, VMSFINEZ finez):
-    data_( ((id, bend), id) )
+  VMStub(const VMSID id, const VMSBEND bend, const VMSFINEZ finez):
+    data_( ((id, bend), finez) )
   {}
   
   VMStub():
     data_(0)
   {}
 
-  // copy constructor
-  VMStub(const VMStub& rhs):
-    data_(rhs.raw())
-  {}
-
+  #ifndef __SYNTHESIS__
   VMStub(const char* datastr, int base=16)
   {
     VMStubData newdata(datastr, base);
     data_ = newdata;
   }
+  #endif
 
   // Getter
   VMStubData raw() const {return data_;}
 
-  VMSID GetIndex() const {return data_.range(13,7);}
-  VMSBEND GetBend() const {return data_.range(6,4);}
-  VMSFINEZ GetFineZ() const {return data_.range(3,0);}
+  VMSID getIndex() const {
+    return data_.range(kVMSIndexMSB,kVMSIndexLSB);
+  }
+
+  VMSBEND getBend() const {
+    return data_.range(kVMSBendMSB,kVMSBendLSB);
+  }
+
+  VMSFINEZ getFineZ() const {
+    return data_.range(kVMSFineZMSB,kVMSFineZLSB);
+  }
+
+  // Setter
+  void setIndex(const VMSID index) {
+    data_.range(kVMSIndexMSB,kVMSIndexLSB) = index;
+  }
+
+  void setBend(const VMSBEND bend) {
+    data_.range(kVMSBendMSB,kVMSBendLSB) = bend;
+  }
+
+  void setFineZ(const VMSFINEZ finez) {
+    data_.range(kVMSFineZMSB,kVMSFineZLSB) = finez;
+  }
 
 private:
 
@@ -55,7 +83,6 @@ private:
 
 // Memory definition
 typedef MemoryTemplateBinned<VMStub, 2, kNBits_MemAddr,3> VMStubMemory;
-
 
 
 #endif
