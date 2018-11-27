@@ -49,6 +49,10 @@ public:
   typedef ap_uint<kFitTrackSize> FitTrackData;
 
   // Constructors
+  FitTracks(const FitTrackData& newdata):
+    data_(newdata)
+  {}
+
   FitTracks(const FTPT pt, const FTPHI0 phi0, const FTT t, const FTZ0 z0, const FTSTUBINDEX id1, const FTSTUBINDEX id2, const FTSTUBINDEX id3, const FTSTUBINDEX id4, const FTSTUBINDEX id5, const FTSTUBINDEX id6):
     data_( (((((((((pt,phi0),t),z0),id1),id2),id3),id4),id5),id6) )
   {}

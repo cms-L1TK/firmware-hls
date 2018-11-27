@@ -35,6 +35,10 @@ public:
   typedef ap_uint<kFullMatchSize> FullMatchData;
 
   // Constructors
+  FullMatch(const FullMatchData& newdata):
+    data_(newdata)
+  {}
+
   FullMatch(const FMTCID tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
     data_( (((tcid,stub),phires),zres) )
   {}

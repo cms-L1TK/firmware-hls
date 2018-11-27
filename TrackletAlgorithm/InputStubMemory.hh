@@ -35,6 +35,10 @@ public:
   typedef ap_uint<kInputStubSize> InputStubData;
 
   // Constructors
+  InputStub(const InputStubData& newdata):
+    data_(newdata)
+  {}
+
   InputStub(const ISR r, const ISZ z, const ISPHI phi, const ISBEND bend):
     data_( (((r,z),phi),bend) )
   {}

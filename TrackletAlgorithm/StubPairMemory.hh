@@ -24,6 +24,10 @@ public:
   typedef ap_uint<kStubPairSize> StubPairData;
 
   // Constructors
+  StubPair(const StubPairData& newdata):
+    data_(newdata)
+  {}
+
   StubPair(const SPInnerIndex innerindex, const SPOuterIndex outerindex):
     data_( (innerindex,outerindex) )
   {}

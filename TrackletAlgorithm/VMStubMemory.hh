@@ -31,6 +31,10 @@ public:
   typedef ap_uint<kVMStubSize> VMStubData;
 
   // Constructors
+  VMStub(const VMStubData& newdata):
+    data_(newdata)
+  {}
+
   VMStub(const VMSID id, const VMSBEND bend, const VMSFINEZ finez):
     data_( ((id, bend), finez) )
   {}
