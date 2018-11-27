@@ -18,7 +18,7 @@ constexpr unsigned int kVMProjRinvLSB = 1;
 constexpr unsigned int kVMProjRinvMSB = kVMProjRinvLSB + kVMProjRinvSize - 1;
 constexpr unsigned int kVMProjFineZLSB = kVMProjRinvMSB + 1;
 constexpr unsigned int kVMProjFineZMSB = kVMProjFineZLSB + kVMProjFineZSize - 1;
-constexpr unsigned int kVMProjZBinLSB = kVMFineZMSB + 1;
+constexpr unsigned int kVMProjZBinLSB = kVMProjFineZMSB + 1;
 constexpr unsigned int kVMProjZBinMSB = kVMProjZBinLSB + kVMProjZBinSize - 1;
 constexpr unsigned int kVMProjIndexLSB = kVMProjZBinMSB + 1;
 constexpr unsigned int kVMProjIndexMSB = kVMProjIndexLSB + kVMProjIndexSize - 1;
@@ -65,7 +65,7 @@ public:
   }
 
   VMPZBIN getZBin() const {
-    return data_.range(kVMProjZbinMSB,kVMProjZbinLSB);
+    return data_.range(kVMProjZBinMSB,kVMProjZBinLSB);
   }
 
   VMPFINEZ getFineZ() const {
@@ -86,7 +86,7 @@ public:
   }
   
   void setZBin(const VMPZBIN zbin) {
-    data_.range(kVMProjZbinMSB,kVMProjZbinLSB) = zbin;
+    data_.range(kVMProjZBinMSB,kVMProjZBinLSB) = zbin;
   }
   
   void setFineZ(const VMPFINEZ finez) {
