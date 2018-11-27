@@ -155,9 +155,9 @@ void ProjectionRouter(BXType bx,
         break;
       }
     
-    auto iphiproj = tproj.GetPhi();
-    auto izproj = tproj.GetZ();
-    auto iphider = tproj.GetPhiDer();
+    auto iphiproj = tproj.getPhi();
+    auto izproj = tproj.getZ();
+    auto iphider = tproj.getPhiDer();
 
     // routing
     auto iphi5 = iphiproj>>(iphiproj.length()-5);  // top 5 bits of phi
