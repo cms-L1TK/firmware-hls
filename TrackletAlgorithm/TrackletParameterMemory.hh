@@ -6,25 +6,25 @@
 
 // Bit sizes for TrackletParameterMemory fields
 constexpr unsigned int kTParRinvSize = 14; //rinv
-constexpr unsigned int kTParPhi0Size = 17; //phi0
-constexpr unsigned int kTParZ0Size = 12; //z0
+constexpr unsigned int kTParPhi0Size = 18; //phi0
+constexpr unsigned int kTParZ0Size = 10; //z0
 constexpr unsigned int kTParTSize = 14; //t
 // Bit size for full TrackletParameterMemory
 constexpr unsigned int kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr;
 
 // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletParameterMemory word for different fields
-constexpr unsigned int kTParRinvLSB = 0;
-constexpr unsigned int kTParRinvMSB = kTParRinvLSB + kTParRinvSize - 1;
-constexpr unsigned int kTParPhi0LSB = kTParRinvMSB + 1;
-constexpr unsigned int kTParPhi0MSB = kTParPhi0LSB + kTParPhi0Size - 1;
-constexpr unsigned int kTParZ0LSB = kTParPhi0MSB + 1;
-constexpr unsigned int kTParZ0MSB = kTParZ0LSB + kTParZ0Size - 1;
-constexpr unsigned int kTParTLSB = kTParZ0MSB + 1;
+constexpr unsigned int kTParTLSB = 0;
 constexpr unsigned int kTParTMSB = kTParTLSB + kTParTSize - 1;
-constexpr unsigned int kTParStubIndexInnerLSB = kTParTLSB + 1;
-constexpr unsigned int kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1;
-constexpr unsigned int kTParStubIndexOuterLSB = kTParStubIndexInnerMSB + 1;
+constexpr unsigned int kTParZ0LSB = kTParTMSB + 1;
+constexpr unsigned int kTParZ0MSB = kTParZ0LSB + kTParZ0Size - 1;
+constexpr unsigned int kTParPhi0LSB = kTParZ0MSB + 1;
+constexpr unsigned int kTParPhi0MSB = kTParPhi0LSB + kTParPhi0Size - 1;
+constexpr unsigned int kTParRinvLSB = kTParPhi0MSB + 1;
+constexpr unsigned int kTParRinvMSB = kTParRinvLSB + kTParRinvSize - 1;
+constexpr unsigned int kTParStubIndexOuterLSB = kTParRinvMSB + 1;
 constexpr unsigned int kTParStubIndexOuterMSB = kTParStubIndexOuterLSB + kNBits_MemAddr - 1;
+constexpr unsigned int kTParStubIndexInnerLSB = kTParStubIndexOuterLSB + 1;
+constexpr unsigned int kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1;
 
 // Data object definition
 class TrackletParameters
@@ -40,12 +40,8 @@ public:
   typedef ap_uint<kTrackletParameterSize> TrackletParameterData;
 	
   // Constructors
-  TrackletParameters(const TrackletParameterData& newdata):
-    data_(newdata)
-  {}
-
-  TrackletParameters(const STUBINDEX id1, const STUBINDEX id2, const TPAR t, const Z0PAR z0, const PHI0PAR phi0, const RINVPAR rinv):
-    data_( (((((id1,id2),t),z0),phi0), rinv ) )
+  TrackletParameters(const STUBINDEX id1, const STUBINDEX id2, const RINVPAR rinv, const PHI0PAR phi0, const Z0PAR z0, const TPAR t):
+    data_( (((((id1,id2),rinv),phi0),z0),t) )
   {}
   
   TrackletParameters():
