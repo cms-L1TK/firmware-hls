@@ -41,6 +41,10 @@ public:
   typedef ap_uint<kTrackletProjectionSize> AllProjectionData;
   
   // Constructors
+  AllProjection(const AllProjectionData& newdata):
+    data_(newdata)
+  {}
+
   AllProjection(const bool plusneighbor, const bool minusneighbor, const AProjTCID tcid, const AProjPHI phi, const AProjZ z, const AProjPHIDER phider, const AProjZDER zder):
     data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
   {}

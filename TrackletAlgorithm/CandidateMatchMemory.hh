@@ -26,6 +26,10 @@ public:
   typedef ap_uint<kCandidateMatchSize> CandidateMatchData;
 
   // Constructors
+  CandidateMatch(const CandidateMatchData& newdata):
+    data_(newdata)
+  {}
+
   CandidateMatch(const CMProjIndex projindex, const CMStubIndex stubindex):
     data_( (projindex,stubindex) )
   {}

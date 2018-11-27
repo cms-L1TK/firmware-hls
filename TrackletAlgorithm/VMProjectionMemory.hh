@@ -37,6 +37,10 @@ public:
 
 	
   // Constructors
+  VMProjection(const VMProjData& newdata):
+    data_(newdata)
+  {}
+
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPRINV rinv, const bool ps):
     data_( ((((id,zbin),finez),rinv),ps) )
   {}

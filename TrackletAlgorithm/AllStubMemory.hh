@@ -35,6 +35,10 @@ public:
   typedef ap_uint<kAllStubSize> AllStubData;
 
   // Constructors
+  AllStub(const AllStubData& newdata):
+    data_(newdata)
+  {}
+
   AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend):
     data_( (((r,z),phi),bend) )
   {}
