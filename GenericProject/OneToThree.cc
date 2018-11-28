@@ -17,20 +17,21 @@ void OneToThree(
 //notes: * = deference pointer: value pointed to by
 //		 & = address of pointer: address of
 {
-	const int par1 = 2;
-	const int par2 = 3;
-	const int par3 = 4;
+	constexpr int par1 = 2;
+	constexpr int par2 = 3;
+	constexpr int par3 = 4;
 	n_out1 = 0;
 	n_out2 = 0;
 	n_out3 = 0;
-	LOOP_1_3: for(int i = 0; i < MAX_SIZE; ++i){
+	LOOP_1_3: for(auto i = 0; i < MAX_SIZE; ++i){
 
 		if ( i < n_in) {
-			out1[i] = par1 * input[i];
+			auto tmp = input[i];
+			out1[i] = par1 * tmp;
 			n_out1 += 1;
-			out2[i] = par2 * input[i];
+			out2[i] = par2 * tmp;
 			n_out2 += 1;
-			out3[i] = par3 * input[i];
+			out3[i] = par3 * tmp;
 			n_out3 += 1;
 		}
 		else {
