@@ -108,7 +108,7 @@ const ap_int<13> r2abs = r2 + r2mean;
 // STEP 2
 
 static const ap_int<18> LUT_drinv[512] = {
-#include "L1L2_drinv.hh"
+#include "../emData/TC/TC_L1L2E/TC_L1L2_drinv.tab"
 };
 const ap_uint<9> addr_drinv = dr & 511; // address for the LUT
 const ap_int<18> drinv = LUT_drinv[addr_drinv];
@@ -1088,7 +1088,7 @@ const ap_int<18> x7 = x7_tmp >> 17;
 // STEP 11
 
 static const ap_int<18> LUT_invt[4096] = {
-#include "L1L2_tinv.hh"
+#include "../emData/TC/TC_L1L2E/TC_L1L2_invt.tab"
 };
 const ap_uint<12> addr_invt = (t_final>>1) & 4095; // address for the LUT
 const ap_int<18> invt = LUT_invt[addr_invt];
