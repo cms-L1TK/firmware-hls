@@ -80,7 +80,7 @@ public:
   }
 
   void setZ(const ASZ z) {
-    data_.range(kSZMSB,kASZLSB) = z;
+    data_.range(kASZMSB,kASZLSB) = z;
   }
 
   void setPhi(const ASPHI phi) {
