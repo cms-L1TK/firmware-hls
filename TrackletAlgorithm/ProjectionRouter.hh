@@ -9,32 +9,278 @@
 
 //#include <assert.h>
 
-//////////////////////////////
-// Input memory reading logic
-template<int nbits_nMEM, int nbits_MemAddr>
-bool get_mem_read_addr(ap_uint<nbits_nMEM>& imem, ap_uint<nbits_MemAddr>& addr,
-					   ap_uint<(1<<nbits_nMEM)>& mem_hasdata, ap_uint<nbits_MemAddr>* numbersin)
+namespace PR
 {
-  if (mem_hasdata == 0) return false;
+
+  //////////////////////////////
+  // Initialization
+  template<class MemType, int nMEM, int NBits_Entries>
+  void init(BXType bx,
+            // bitmasks to indicate if memories are empty
+            ap_uint<nMEM>& mem_hasdata,
+            // number of entries for each memory
+            ap_uint<NBits_Entries> nentries[nMEM],
+            // memory pointers
+            const MemType* const mem0, const MemType* const mem1,
+            const MemType* const mem2, const MemType* const mem3,
+            const MemType* const mem4, const MemType* const mem5,
+            const MemType* const mem6, const MemType* const mem7,
+            const MemType* const mem8, const MemType* const mem9,
+            const MemType* const mem10, const MemType* const mem11,
+            const MemType* const mem12, const MemType* const mem13,
+            const MemType* const mem14, const MemType* const mem15,
+            const MemType* const mem16, const MemType* const mem17,
+            const MemType* const mem18, const MemType* const mem19,
+            const MemType* const mem20, const MemType* const mem21,
+            const MemType* const mem22, const MemType* const mem23
+            )
+  {
+    static_assert(nMEM<=24, "PR: maximum number of input memory allowed in 24.");
+    
+    mem_hasdata = 0;
+    
+    if (nMEM > 0) {
+      ap_uint<NBits_Entries> num0 = mem0->getEntries(bx);
+      nentries[0] = num0;
+      if (num0 > 0) mem_hasdata.set(0);
+    }
+    if (nMEM > 1) {
+      ap_uint<NBits_Entries> num1 = mem1->getEntries(bx);
+      nentries[1] = num1;
+      if (num1 > 0) mem_hasdata.set(1);
+    }
+    if (nMEM > 2) {
+      ap_uint<NBits_Entries> num2 = mem2->getEntries(bx);
+      nentries[2] = num2;
+      if (num2 > 0) mem_hasdata.set(2);
+    }
+    if (nMEM > 3) {
+      ap_uint<NBits_Entries> num3 = mem3->getEntries(bx);
+      nentries[3] = num3;
+      if (num3 > 0) mem_hasdata.set(3);
+    }
+    if (nMEM > 4) {
+      ap_uint<NBits_Entries> num4 = mem4->getEntries(bx);
+      nentries[4] = num4;
+      if (num4 > 0) mem_hasdata.set(4);
+    }
+    if (nMEM > 5) {
+      ap_uint<NBits_Entries> num5 = mem5->getEntries(bx);
+      nentries[5] = num5;
+      if (num5 > 0) mem_hasdata.set(5);
+    }
+    if (nMEM > 6) {
+      ap_uint<NBits_Entries> num6 = mem6->getEntries(bx);
+      nentries[6] = num6;
+      if (num6 > 0) mem_hasdata.set(6);
+    }
+    if (nMEM > 7) {
+      ap_uint<NBits_Entries> num7 = mem7->getEntries(bx);
+      nentries[7] = num7;
+      if (num7 > 0) mem_hasdata.set(7);
+    }
+    if (nMEM > 8) {
+      ap_uint<NBits_Entries> num8 = mem8->getEntries(bx);
+      nentries[8] = num8;
+      if (num8 > 0) mem_hasdata.set(8);
+    }
+    if (nMEM > 9) {
+      ap_uint<NBits_Entries> num9 = mem9->getEntries(bx);
+      nentries[9] = num9;
+      if (num9 > 0) mem_hasdata.set(9);
+    }
+    if (nMEM > 10) {
+      ap_uint<NBits_Entries> num10 = mem10->getEntries(bx);
+      nentries[10] = num10;
+      if (num10 > 0) mem_hasdata.set(10);
+    }
+    if (nMEM > 11) {
+      ap_uint<NBits_Entries> num11 = mem11->getEntries(bx);
+      nentries[11] = num11;
+      if (num11 > 0) mem_hasdata.set(11);
+    }
+    if (nMEM > 12) {
+      ap_uint<NBits_Entries> num12 = mem12->getEntries(bx);
+      nentries[12] = num12;
+      if (num12 > 0) mem_hasdata.set(12);
+    }
+    if (nMEM > 13) {
+      ap_uint<NBits_Entries> num13 = mem13->getEntries(bx);
+      nentries[13] = num13;
+      if (num13 > 0) mem_hasdata.set(13);
+    }
+    if (nMEM > 14) {
+      ap_uint<NBits_Entries> num14 = mem14->getEntries(bx);
+      nentries[14] = num14;
+      if (num14 > 0) mem_hasdata.set(14);
+    }
+    if (nMEM > 15) {
+      ap_uint<NBits_Entries> num15 = mem15->getEntries(bx);
+      nentries[15] = num15;
+      if (num15 > 0) mem_hasdata.set(15);
+    }
+    if (nMEM > 16) {
+      ap_uint<NBits_Entries> num16 = mem16->getEntries(bx);
+      nentries[16] = num16;
+      if (num16 > 0) mem_hasdata.set(16);
+    }
+    if (nMEM > 17) {
+      ap_uint<NBits_Entries> num17 = mem17->getEntries(bx);
+      nentries[17] = num17;
+      if (num17 > 0) mem_hasdata.set(17);
+    }
+    if (nMEM > 18) {
+      ap_uint<NBits_Entries> num18 = mem18->getEntries(bx);
+      nentries[18] = num18;
+      if (num18 > 0) mem_hasdata.set(18);
+    }
+    if (nMEM > 19) {
+      ap_uint<NBits_Entries> num19 = mem19->getEntries(bx);
+      nentries[19] = num19;
+      if (num19 > 0) mem_hasdata.set(19);
+    }
+    if (nMEM > 20) {
+      ap_uint<NBits_Entries> num20 = mem20->getEntries(bx);
+      nentries[20] = num20;
+      if (num20 > 0) mem_hasdata.set(20);
+    }
+    if (nMEM > 21) {
+      ap_uint<NBits_Entries> num21 = mem21->getEntries(bx);
+      nentries[21] = num21;
+      if (num21 > 0) mem_hasdata.set(21);
+    }
+    if (nMEM > 22) {
+      ap_uint<NBits_Entries> num22 = mem22->getEntries(bx);
+      nentries[22] = num22;
+      if (num22 > 0) mem_hasdata.set(22);
+    }
+    if (nMEM > 23) {
+      ap_uint<NBits_Entries> num23 = mem23->getEntries(bx);
+      nentries[23] = num23;
+      if (num23 > 0) mem_hasdata.set(23);
+    }
+    
+  } // init
+
+  //////////////////////////////
+  // Priority encoder based input memory reading logic
+  template<class DataType, class MemType, int nMEM, int NBits_Entries>
+  bool read_input_mems(BXType bx,
+                       ap_uint<nMEM>& mem_hasdata,
+                       ap_uint<NBits_Entries> nentries[nMEM],
+                       ap_uint<kNBits_MemAddr>& read_addr,
+                       // memory pointers
+                       const MemType* const mem0, const MemType* const mem1,
+                       const MemType* const mem2, const MemType* const mem3,
+                       const MemType* const mem4, const MemType* const mem5,
+                       const MemType* const mem6, const MemType* const mem7,
+                       const MemType* const mem8, const MemType* const mem9,
+                       const MemType* const mem10, const MemType* const mem11,
+                       const MemType* const mem12, const MemType* const mem13,
+                       const MemType* const mem14, const MemType* const mem15,
+                       const MemType* const mem16, const MemType* const mem17,
+                       const MemType* const mem18, const MemType* const mem19,
+                       const MemType* const mem20, const MemType* const mem21,
+                       const MemType* const mem22, const MemType* const mem23,
+                       DataType& data)
+  {
+    if (mem_hasdata == 0) return false;
+
+    // 5 bits memory index for up to 32 input memories
+    // priority encoder
+    ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
+
+    // read the memory "read_imem" with the address "read_addr"
+    switch (read_imem) {
+    case 0:
+      data = mem0->read_mem(bx, read_addr); break;
+    case 1:
+      data = mem1->read_mem(bx, read_addr); break;
+    case 2:
+      data = mem2->read_mem(bx, read_addr); break;
+    case 3:
+      data = mem3->read_mem(bx, read_addr); break;
+    case 4:
+      data = mem4->read_mem(bx, read_addr); break;
+    case 5:
+      data = mem5->read_mem(bx, read_addr); break;
+    case 6:
+      data = mem6->read_mem(bx, read_addr); break;
+    case 7:
+      data = mem7->read_mem(bx, read_addr); break;
+    case 8:
+      data = mem8->read_mem(bx, read_addr); break;
+    case 9:
+      data = mem9->read_mem(bx, read_addr); break;
+    case 10:
+      data = mem10->read_mem(bx, read_addr); break;
+    case 11:
+      data = mem11->read_mem(bx, read_addr); break;
+    case 12:
+      data = mem12->read_mem(bx, read_addr); break;
+    case 13:
+      data = mem13->read_mem(bx, read_addr); break;
+    case 14:
+      data = mem14->read_mem(bx, read_addr); break;
+    case 15:
+      data = mem15->read_mem(bx, read_addr); break;
+    case 16:
+      data = mem16->read_mem(bx, read_addr); break;
+    case 17:
+      data = mem17->read_mem(bx, read_addr); break;
+    case 18:
+      data = mem18->read_mem(bx, read_addr); break;
+    case 19:
+      data = mem19->read_mem(bx, read_addr); break;
+    case 20:
+      data = mem20->read_mem(bx, read_addr); break;
+    case 21:
+      data = mem21->read_mem(bx, read_addr); break;
+    case 22:
+      data = mem22->read_mem(bx, read_addr); break;
+    case 23:
+      data = mem23->read_mem(bx, read_addr); break;      
+    }
+
+    // Increase the read address
+    ++read_addr;
+
+    if (read_addr >= nentries[read_imem]) {
+      // All entries in the memory[read_imem] have been read out
+      // Prepare to move to the next non-empty memory
+      read_addr = 0;
+      mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
+    }
+
+    return true;
+    
+  } // read_input_mems
+
+  /////////////////////////////////////////////////////
+  // FIXME
+  // Should move the following to Constants.hh
+  // how to deal with these with enum?
+
+  // number of allstub memories for each layer
+  constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
+  // number of VMs in one allstub block for each layer
+  constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
+
+  // number of allstub memories for each disk
+  constexpr unsigned int nallstubsdisks[5]={4,4,4,4,4};
   
-  // priority encoder
-  imem = __builtin_ctz(mem_hasdata);
-  ++addr;
-	  
-  if (addr >= *(numbersin+imem)) {
-    // All entries have been read out in memory[imem]
-    // Prepare to read the next non-empty memory
-    addr = 0;  // reset read address
-    mem_hasdata -= (1<<imem);  // flip the lowest 1 bit to 0
-  }
+  // number of VMs in one allstub block for each disk
+  constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
   
-  return true;
-}
+} // namesapce PR
 
 //////////////////////////////
 // ProjectionRouter
-template<unsigned int nINMEM>
+template<unsigned int nINMEM, int LAYER=0, int DISK=0>
 void ProjectionRouter(BXType bx,
+                      // because Vivado HLS cannot synthesize an array of
+                      // pointers that point to stuff other than scalar or
+                      // array of scalar ...
                       const TrackletProjectionMemory* const tproj1,
                       const TrackletProjectionMemory* const tproj2,
                       const TrackletProjectionMemory* const tproj3,
@@ -43,133 +289,110 @@ void ProjectionRouter(BXType bx,
                       const TrackletProjectionMemory* const tproj6,
                       const TrackletProjectionMemory* const tproj7,
                       const TrackletProjectionMemory* const tproj8,
+                      const TrackletProjectionMemory* const tproj9,
+                      const TrackletProjectionMemory* const tproj10,
+                      const TrackletProjectionMemory* const tproj11,
+                      const TrackletProjectionMemory* const tproj12,
+                      const TrackletProjectionMemory* const tproj13,
+                      const TrackletProjectionMemory* const tproj14,
+                      const TrackletProjectionMemory* const tproj15,
+                      const TrackletProjectionMemory* const tproj16,
+                      const TrackletProjectionMemory* const tproj17,
+                      const TrackletProjectionMemory* const tproj18,
+                      const TrackletProjectionMemory* const tproj19,
+                      const TrackletProjectionMemory* const tproj20,
+                      const TrackletProjectionMemory* const tproj21,
+                      const TrackletProjectionMemory* const tproj22,
+                      const TrackletProjectionMemory* const tproj23,
+                      const TrackletProjectionMemory* const tproj24,
                       BXType& bx_o,
                       AllProjectionMemory* const allproj,
                       VMProjectionMemory* const vmproj1,
                       VMProjectionMemory* const vmproj2,
                       VMProjectionMemory* const vmproj3,
-                      VMProjectionMemory* const vmproj4    
+                      VMProjectionMemory* const vmproj4,
+                      VMProjectionMemory* const vmproj5,
+                      VMProjectionMemory* const vmproj6,
+                      VMProjectionMemory* const vmproj7,
+                      VMProjectionMemory* const vmproj8
 ){
 #pragma HLS inline off
 
-  //maximum number of input ports is 8 for now
-  static_assert(nINMEM<=8, "Incorrect nINMEM passed in.");
+  using namespace PR;
   
-  // reset
-  allproj->clear();
-  vmproj1->clear();
-  vmproj2->clear();
-  vmproj3->clear();
-  vmproj4->clear();
+  // reset output memories
+  allproj->clear(bx);
+  vmproj1->clear(bx);
+  vmproj2->clear(bx);
+  vmproj3->clear(bx);
+  vmproj4->clear(bx);
+  vmproj5->clear(bx);
+  vmproj6->clear(bx);
+  vmproj7->clear(bx);
+  vmproj8->clear(bx);
 
   // logic for reading inputs
   // check the number of entries in the input memories
-  ap_uint<8> mem_hasdata = 0;
-  ap_uint<kNBits_MemAddr> numbersin[8] = {0,0,0,0,0,0,0,0};
+  ap_uint<nINMEM> mem_hasdata = 0;
+  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM] = {0};
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
-  if (nINMEM > 0) {
-    ap_uint<kNBits_MemAddr> num1 = tproj1->getEntries(bx);
-    numbersin[0] = num1;
-    if (num1 > 0) mem_hasdata += (1<<0);
-  }
-  if (nINMEM > 1) {
-    ap_uint<kNBits_MemAddr> num2 = tproj2->getEntries(bx);
-    numbersin[1] = num2;
-    if (num2 > 0) mem_hasdata += (1<<1);
-  }
-  if (nINMEM > 2) {
-    ap_uint<kNBits_MemAddr> num3 = tproj3->getEntries(bx);
-    numbersin[2] = num3;
-    if (num3 > 0) mem_hasdata += (1<<2);
-  }
-  if (nINMEM > 3) {
-    ap_uint<kNBits_MemAddr> num4 = tproj4->getEntries(bx);
-    numbersin[3] = num4;
-    if (num4 > 0) mem_hasdata += (1<<3);
-  }
-  if (nINMEM > 4) {
-    ap_uint<kNBits_MemAddr> num5 = tproj5->getEntries(bx);
-    numbersin[4] = num5;
-    if (num5 > 0) mem_hasdata += (1<<4);
-  }
-  if (nINMEM > 5) {
-    ap_uint<kNBits_MemAddr> num6 = tproj6->getEntries(bx);
-    numbersin[5] = num6;
-    if (num6 > 0) mem_hasdata += (1<<5);
-  }
-  if (nINMEM > 6) {
-    ap_uint<kNBits_MemAddr> num7 = tproj7->getEntries(bx);
-    numbersin[6] = num7;
-    if (num7 > 0) mem_hasdata += (1<<6);
-  }
-  if (nINMEM > 7) {
-    ap_uint<kNBits_MemAddr> num8 = tproj8->getEntries(bx);
-    numbersin[7] = num8;
-    if (num8 > 0) mem_hasdata += (1<<7);
-  }
-
-  // TODO: package the prio encoder reading logic better
+  // initialization
+  init<TrackletProjectionMemory, nINMEM, kNBits_MemAddr+1>
+    (bx, mem_hasdata, numbersin,
+     tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
+     tproj9, tproj10, tproj11, tproj12, tproj13, tproj14, tproj15, tproj16,
+     tproj17, tproj18, tproj19, tproj20, tproj21, tproj22, tproj23, tproj24);
   
-  // Input memory index
-  // The number of bits for imem depends on the max number of input ports.
-  // 3 here for 8 input tprojs
-  ap_uint<3> imem = 0;
-  ap_uint<kNBits_MemAddr> addr_next = 0;
+  // declare index of input memory to be read
+  //ap_uint<5> imem = 0;  // 5 bits for up to 32 input memories
+  ap_uint<kNBits_MemAddr> mem_read_addr = 0;
   
- PROC_LOOP: for (int i = 0; i < kMaxProc; ++i) {
+  PROC_LOOP: for (int i = 0; i < kMaxProc; ++i) {
+  //PROC_LOOP: for (int i = 0; i < 2; ++i) {
 #pragma HLS PIPELINE II=1
-    // read inputs3
-    ap_uint<kNBits_MemAddr> addr = addr_next;
-    bool validin = get_mem_read_addr<3, kNBits_MemAddr>(imem, addr_next, mem_hasdata, numbersin);
-    
-    if (not validin) continue;
 
+    // read inputs
     TrackletProjection tproj;
-    // read input memories
-    switch (imem)
-      {
-      case 0:
-        tproj = tproj1->read_mem(bx, addr);
-        break;
-      case 1:
-        tproj = tproj2->read_mem(bx, addr);
-        break;
-      case 2:
-        tproj = tproj3->read_mem(bx, addr);
-        break;
-      case 3:
-        tproj = tproj4->read_mem(bx, addr);
-        break;
-      case 4:
-        tproj = tproj5->read_mem(bx, addr);
-        break;
-      case 5:
-        tproj = tproj6->read_mem(bx, addr);
-        break;
-      case 6:
-        tproj = tproj7->read_mem(bx, addr);
-        break;
-      case 7:
-        tproj = tproj8->read_mem(bx, addr);
-        break;
-      }
+    bool validin = read_input_mems<TrackletProjection, TrackletProjectionMemory,
+                                   nINMEM, kNBits_MemAddr+1>
+      (bx, mem_hasdata, numbersin, mem_read_addr,
+       tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
+       tproj9, tproj10, tproj11, tproj12, tproj13, tproj14, tproj15, tproj16,
+       tproj17, tproj18, tproj19, tproj20, tproj21, tproj22, tproj23, tproj24,
+       tproj);
+
+    if (not validin) continue;
     
     auto iphiproj = tproj.getPhi();
     auto izproj = tproj.getZ();
     auto iphider = tproj.getPhiDer();
+    auto trackletid = tproj.getTrackletIndex();
+
+    //////////////////////////
+    // hourglass configuration
+   
+    // top 5 bits of phi
+    auto iphi5 = iphiproj>>(iphiproj.length()-5);
+    
+    // total number of VMs
+    auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
+      nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
+    //assert(nvm>0);
+    
+    // number of VMs per module
+    auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
 
     // routing
-    auto iphi5 = iphiproj>>(iphiproj.length()-5);  // top 5 bits of phi
-
-    // FIXME
-    // inner barrel non-hourglass for now
-    //assert(iphi5>=4 and iphi5<=27);
-    ap_uint<2> iphi = ((iphi5-4)>>1)&3;
-    //assert(iphi>=0 and iphi<=3);
-
+    ap_uint<3> iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
+    
+    ///////////////
+    // VMProjection
+    static_assert(not DISK, "PR: Layer only for now.");
+    
     // vmproj index
     VMProjection::VMPID index = i;
+    //assert(i < (1<<index.length()));
 
     // vmproj z
     // Separate the vm projections into zbins
@@ -177,51 +400,82 @@ void ProjectionRouter(BXType bx,
     // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
     // But we need some range (particularly for L5L6 seed projecting to L1-L3):
     // Lower bound
-    ap_uint<MEBinsBits> zbin1 = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
+    ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
     // Upper bound
-    ap_uint<MEBinsBits> zbin2 = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
-    if (zbin1 >= (1<<MEBinsBits)) zbin1 = 0;
-    if (zbin2 >= (1<<MEBinsBits)) zbin2 = (1<<MEBinsBits)-1;
+    ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
+    if (zbin1tmp >= (1<<MEBinsBits)) zbin1tmp = 0; //note that zbin1 is unsigned
+    if (zbin2tmp >= (1<<MEBinsBits)) zbin2tmp = (1<<MEBinsBits)-1;
 
-    if (zbin1>=(1<<MEBinsBits)) zbin1=0; //note that zbin1 is unsigned
-    if (zbin2>=(1<<MEBinsBits)) zbin2=(1<<MEBinsBits)-1;
+    // One extra bit was used in the above calculation. Now take it away.
+    ap_uint<MEBinsBits> zbin1 = zbin1tmp;
+    ap_uint<MEBinsBits> zbin2 = zbin2tmp;
     //assert(zbin1<=zbin2);
     //assert(zbin2-zbin1<=1);
-	  
+    
     VMProjection::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
+    //std::cout << "zbin: " << zbin << std::endl;
     //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
     // need to be careful about left shift of ap_(u)int
     VMProjection::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
 
+    //std::cout << "finez: " << finez << std::endl;
+    
     // vmproj irinv
-    VMProjection::VMPRINV rinv = 16 + (iphider>>(iphider.length()-5));
+    // phider = -irinv/2
+    // Note: auto does not work here
+    ap_uint<kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
+    //std::cout << "iphider " << iphider << std::endl;
+    //std::cout << "iphider nbits " << iphider.length() << std::endl;
+    //std::cout << "irinv_tmp " << irinv_tmp << std::endl;
+    //std::cout << "irinv_tmp nbits " << irinv_tmp.length() << std::endl;
+
+    // rinv in VMProjection takes only the top 5 bits
+    // and is shifted to be positive
+    VMProjection::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
+    
     //assert(rinv >=0 and rinv < 32);
+
+    //std::cout << "rinv: " << rinv << std::endl;
+    
     // PS seed
-    bool psseed = false;  // FIXME
+    // top 3 bits of tracklet index indicate the seeding pair
+    ap_uint<3> iseed = trackletid >> (trackletid.length()-3);
+    // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
+    // and here?
+    // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
+    // NOTE: emulation fw_synch branch does not include L2L3 seeding, while the master branch does
+
+    // All seeding pairs are PS modules except L3L4 and L5L6
+    bool psseed = not(iseed==1 or iseed==2); 
 
     // VM Projection
     VMProjection vmproj(index, zbin, finez, rinv, psseed);
-
-    // All Projection
-    AllProjection aproj(tproj.raw());
 
     // write outputs
     //assert(iphi>=0 and iphi<4);
     switch(iphi) {
     case 0:
-      vmproj1->write_mem(bx, vmproj);
-      break;
+      vmproj1->write_mem(bx, vmproj); break;
     case 1:
-      vmproj2->write_mem(bx, vmproj);
-      break;
+      vmproj2->write_mem(bx, vmproj); break;
     case 2:
-      vmproj3->write_mem(bx, vmproj);
-      break;
+      vmproj3->write_mem(bx, vmproj); break;
     case 3:
-      vmproj4->write_mem(bx, vmproj);
-      break;
+      vmproj4->write_mem(bx, vmproj); break;
+    case 4:
+      vmproj5->write_mem(bx, vmproj); break;
+    case 5:
+      vmproj6->write_mem(bx, vmproj); break;
+    case 6:
+      vmproj7->write_mem(bx, vmproj); break;
+    case 7:
+      vmproj8->write_mem(bx, vmproj); break;
     }
 
+    /////////////////
+    // AllProjection
+    AllProjection aproj(tproj.raw());
+    // write output
     allproj->write_mem(bx, aproj);
 
     bx_o = bx;
