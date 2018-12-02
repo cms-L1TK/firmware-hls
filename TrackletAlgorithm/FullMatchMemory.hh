@@ -28,7 +28,7 @@ class FullMatch
 public:
 
   typedef ap_uint<kFMTCIndexSize> FMTCID;
-  typedef ap_unit<kFMStubIndexSize> FMSTUBINDEX;
+  typedef ap_uint<kFMStubIndexSize> FMSTUBINDEX;
   typedef ap_int<kFMPhiResSize> FMPHIRES;
   typedef ap_int<kFMZResSize> FMZRES;
 
@@ -71,7 +71,7 @@ public:
   }
 
   FMZRES getZRes() const {
-    return data.range(kFMZResMSB,kFMZResLSB);
+    return data_.range(kFMZResMSB,kFMZResLSB);
   }
 
   // Setter

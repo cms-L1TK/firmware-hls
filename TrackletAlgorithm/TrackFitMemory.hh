@@ -1,165 +1,165 @@
-#ifndef FITTRACKMEMORY_HH
-#define FITTRACKMEMORY_HH
+#ifndef TRACKFITMEMORY_HH
+#define TRACKFITMEMORY_HH
 
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for FitTrackMemory fields
-constexpr unsigned int kFTStubIndexSize = 10;
-constexpr unsigned int kFTZ0Size = 10;
-constexpr unsigned int kFTtSize = 14;
-constexpr unsigned int kFTPhi0Size = 19;
-constexpr unsigned int kFTpTSize = 15;
-// Bit size for full FitTrackMemory
-constexpr unsigned int kFitTrackSize = kFTpTSize + kFTPhi0Size + kFTtSize + kFTZ0Size + 6*kFTStubIndexSize;
+// Bit size for TrackFitMemory fields
+constexpr unsigned int kTFStubIndexSize = 10;
+constexpr unsigned int kTFZ0Size = 10;
+constexpr unsigned int kTFTSize = 14;
+constexpr unsigned int kTFPhi0Size = 19;
+constexpr unsigned int kTFpTSize = 15;
+// Bit size for full TrackFitMemory
+constexpr unsigned int kTrackFitSize = kTFpTSize + kTFPhi0Size + kTFTSize + kTFZ0Size + 6*kTFStubIndexSize;
 
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the FitTrackMemory word for different fields
-constexpr unsigned int kFTStubIndex6LSB = 0;
-constexpr unsigned int kFTStubIndex6MSB = kFTStubIndex6LSB + kFTStubIndex6Size - 1;
-constexpr unsigned int kFTStubIndex5LSB = kFTStubIndex6MSB + 1;
-constexpr unsigned int kFTStubIndex5MSB = kFTStubIndex5LSB + kFTStubIndex5Size - 1;
-constexpr unsigned int kFTStubIndex4LSB = kFTStubIndex5MSB + 1;
-constexpr unsigned int kFTStubIndex4MSB = kFTStubIndex4LSB + kFTStubIndex4Size - 1;
-constexpr unsigned int kFTStubIndex3LSB = kFTStubIndex4MSB + 1;
-constexpr unsigned int kFTStubIndex3MSB = kFTStubIndex3LSB + kFTStubIndex3Size - 1;
-constexpr unsigned int kFTStubIndex2LSB = kFTStubIndex3MSB + 1;
-constexpr unsigned int kFTStubIndex2MSB = kFTStubIndex2LSB + kFTStubIndex2Size - 1;
-constexpr unsigned int kFTStubIndex1LSB = kFTStubIndex2MSB + 1;
-constexpr unsigned int kFTStubIndex1MSB = kFTStubIndex1LSB + kFTStubIndex1Size - 1;
-constexpr unsigned int kFTZ0LSB = kFTStubIndex1MSB + 1;
-constexpr unsigned int kFTZ0MSB = kFTZ0LSB + kFTZ0Size - 1;
-constexpr unsigned int kFTTLSB = kFTZ0MSB + 1;
-constexpr unsigned int kFTTMSB = kFTTLSB + kFTTSize - 1;
-constexpr unsigned int kFTPhi0LSB = kFTTMSB + 1;
-constexpr unsigned int kFTPhi0MSB = kFTPhi0LSB + kFTPhi0Size - 1;
-constexpr unsigned int kFTpTLSB = kFTPhi0MSB + 1;
-constexpr unsigned int kFTpTMSB = kFTpTLSB + kFTpTSize - 1;
+// The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackFitMemory word for different fields
+constexpr unsigned int kTFStubIndex6LSB = 0;
+constexpr unsigned int kTFStubIndex6MSB = kTFStubIndex6LSB + kTFStubIndexSize - 1;
+constexpr unsigned int kTFStubIndex5LSB = kTFStubIndex6MSB + 1;
+constexpr unsigned int kTFStubIndex5MSB = kTFStubIndex5LSB + kTFStubIndexSize - 1;
+constexpr unsigned int kTFStubIndex4LSB = kTFStubIndex5MSB + 1;
+constexpr unsigned int kTFStubIndex4MSB = kTFStubIndex4LSB + kTFStubIndexSize - 1;
+constexpr unsigned int kTFStubIndex3LSB = kTFStubIndex4MSB + 1;
+constexpr unsigned int kTFStubIndex3MSB = kTFStubIndex3LSB + kTFStubIndexSize - 1;
+constexpr unsigned int kTFStubIndex2LSB = kTFStubIndex3MSB + 1;
+constexpr unsigned int kTFStubIndex2MSB = kTFStubIndex2LSB + kTFStubIndexSize - 1;
+constexpr unsigned int kTFStubIndex1LSB = kTFStubIndex2MSB + 1;
+constexpr unsigned int kTFStubIndex1MSB = kTFStubIndex1LSB + kTFStubIndexSize - 1;
+constexpr unsigned int kTFZ0LSB = kTFStubIndex1MSB + 1;
+constexpr unsigned int kTFZ0MSB = kTFZ0LSB + kTFZ0Size - 1;
+constexpr unsigned int kTFTLSB = kTFZ0MSB + 1;
+constexpr unsigned int kTFTMSB = kTFTLSB + kTFTSize - 1;
+constexpr unsigned int kTFPhi0LSB = kTFTMSB + 1;
+constexpr unsigned int kTFPhi0MSB = kTFPhi0LSB + kTFPhi0Size - 1;
+constexpr unsigned int kTFpTLSB = kTFPhi0MSB + 1;
+constexpr unsigned int kTFpTMSB = kTFpTLSB + kTFpTSize - 1;
 
 // Data object definition
-class FitTracks
+class TrackFit
 {
 public:
 
-  typedef ap_int<kFTpTSize> FTPT;
-  typedef ap_int<kFTPhi0Size> FTPHI0;
-  typedef ap_int<kFTTSize> FTT;
-  typedef ap_int<kDTZ0Size> FTZ0;
-  typedef ap_uint<kFTStubIndexSize FTSTUBINDEX;
+  typedef ap_int<kTFpTSize> TFPT;
+  typedef ap_int<kTFPhi0Size> TFPHI0;
+  typedef ap_int<kTFTSize> TFT;
+  typedef ap_int<kTFZ0Size> TFZ0;
+  typedef ap_uint<kTFStubIndexSize> TFSTUBINDEX;
 
-  typedef ap_uint<kFitTrackSize> FitTrackData;
+  typedef ap_uint<kTrackFitSize> TrackFitData;
 
   // Constructors
-  FitTracks(const FitTrackData& newdata):
+  TrackFit(const TrackFitData& newdata):
     data_(newdata)
   {}
 
-  FitTracks(const FTPT pt, const FTPHI0 phi0, const FTT t, const FTZ0 z0, const FTSTUBINDEX id1, const FTSTUBINDEX id2, const FTSTUBINDEX id3, const FTSTUBINDEX id4, const FTSTUBINDEX id5, const FTSTUBINDEX id6):
+  TrackFit(const TFPT pt, const TFPHI0 phi0, const TFT t, const TFZ0 z0, const TFSTUBINDEX id1, const TFSTUBINDEX id2, const TFSTUBINDEX id3, const TFSTUBINDEX id4, const TFSTUBINDEX id5, const TFSTUBINDEX id6):
     data_( (((((((((pt,phi0),t),z0),id1),id2),id3),id4),id5),id6) )
   {}
 
-  FitTracks():
+  TrackFit():
     data_(0)
   {}
 
   #ifndef __SYNTHESIS__
-  FitTracks(const char* datastr, int base=16)
+  TrackFit(const char* datastr, int base=16)
   {
-    FitTrackData = newdata(datastr, base);
+    TrackFitData newdata(datastr, base);
     data_ = newdata;
   }
   #endif
 
   // Getter
-  FitTrackData raw() const {return data_;}
+  TrackFitData raw() const {return data_;}
 
-  FTPT getPt() const {
-    return data_.range(kFTpTMSB,kFTpTLSB);
+  TFPT getPt() const {
+    return data_.range(kTFpTMSB,kTFpTLSB);
   }
 
-  FTPHI0 getPhi0() const {
-    return data_.range(kFTPhi0MSB,kFTPhi0LSB);
+  TFPHI0 getPhi0() const {
+    return data_.range(kTFPhi0MSB,kTFPhi0LSB);
   }
 
-  FTT getT() const {
-    return data_.range(kFTTMSB,kFTTLSB);
+  TFT getT() const {
+    return data_.range(kTFTMSB,kTFTLSB);
   }
 
-  FTZ0 getZ0() const {
-    return data_.range(kFTZ0MSB,kFTZ0LSB);
+  TFZ0 getZ0() const {
+    return data_.range(kTFZ0MSB,kTFZ0LSB);
   }
 
-  FTSTUBINDEX getStubIndex1() const {
-    return data_.range(kFTStubIndex1MSB,kFTStubIndex1LSB);
+  TFSTUBINDEX getStubIndex1() const {
+    return data_.range(kTFStubIndex1MSB,kTFStubIndex1LSB);
   }
 
-  FTSTUBINDEX getStubIndex2() const {
-    return data_.range(kFTStubIndex2MSB,kFTStubIndex2LSB);
+  TFSTUBINDEX getStubIndex2() const {
+    return data_.range(kTFStubIndex2MSB,kTFStubIndex2LSB);
   }
 
-  FTSTUBINDEX getStubIndex3() const {
-    return data_.range(kFTStubIndex3MSB,kFTStubIndex3LSB);
+  TFSTUBINDEX getStubIndex3() const {
+    return data_.range(kTFStubIndex3MSB,kTFStubIndex3LSB);
   }
 
-  FTSTUBINDEX getStubIndex4() const {
-    return data_.range(kFTStubIndex4MSB,kFTStubIndex4LSB);
+  TFSTUBINDEX getStubIndex4() const {
+    return data_.range(kTFStubIndex4MSB,kTFStubIndex4LSB);
   }
 
-  FTSTUBINDEX getStubIndex5() const {
-    return data_.range(kFTStubIndex5MSB,kFTStubIndex5LSB);
+  TFSTUBINDEX getStubIndex5() const {
+    return data_.range(kTFStubIndex5MSB,kTFStubIndex5LSB);
   }
 
-  FTSTUBINDEX getStubIndex6() const {
-    return data_.range(kFTStubIndex6MSB,kFTStubIndex6LSB);
+  TFSTUBINDEX getStubIndex6() const {
+    return data_.range(kTFStubIndex6MSB,kTFStubIndex6LSB);
   }
 
   // Setter
-  void setPt(const FTPT pt) {
-    data_.range(kFTpTMSB,kFTpTLSB) = pt;
+  void setPt(const TFPT pt) {
+    data_.range(kTFpTMSB,kTFpTLSB) = pt;
   }
 
-  void setPhi0(const FTPHI0 phi0) {
-    data_.range(kFTPhi0MSB,kFTPhi0LSB) = phi0;
+  void setPhi0(const TFPHI0 phi0) {
+    data_.range(kTFPhi0MSB,kTFPhi0LSB) = phi0;
   }
 
-  void setT(const FTT t) {
-    data_.range(kFTTMSB,kFTTLSB) = t;
+  void setT(const TFT t) {
+    data_.range(kTFTMSB,kTFTLSB) = t;
   }
 
-  void setZ0(const FTZ0 z0) {
-    data_.range(kFTZ0MSB,kFTZ0LSB) = z0;
+  void setZ0(const TFZ0 z0) {
+    data_.range(kTFZ0MSB,kTFZ0LSB) = z0;
   }
 
-  void setStubIndex1(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex1MSB,kFTStubIndex1LSB) = id;
+  void setStubIndex1(const TFSTUBINDEX id) const {
+    data_.range(kTFStubIndex1MSB,kTFStubIndex1LSB) = id;
   }
 
-  void setStubIndex2(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex2MSB,kFTStubIndex2LSB) = id;
+  void setStubIndex2(const TFSTUBINDEX id) const {
+    data_.range(kTFStubIndex2MSB,kTFStubIndex2LSB) = id;
   }
 
-  void setStubIndex3(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex3MSB,kFTStubIndex3LSB) = id;
+  void setStubIndex3(const TFSTUBINDEX id) const {
+    data_.range(kTFStubIndex3MSB,kTFStubIndex3LSB) = id;
   }
 
-  void setStubIndex4(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex4MSB,kFTStubIndex4LSB) = id;
+  void setStubIndex4(const TFSTUBINDEX id) const {
+    data_.range(kTFStubIndex4MSB,kTFStubIndex4LSB) = id;
   }
 
-  void setStubIndex5(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex5MSB,kFTStubIndex5LSB) = id;
+  void setStubIndex5(const TFSTUBINDEX id) const {
+    data_.range(kTFStubIndex5MSB,kTFStubIndex5LSB) = id;
   }
 
-  void setStubIndex6(const FTSTUBINDEX id) const {
-    data_.range(kFTStubIndex6MSB,kFTStubIndex6LSB) = id;
+  void setStubIndex6(const TFSTUBINDEX id) const {
+    data_.range(kTFStubIndex6MSB,kTFStubIndex6LSB) = id;
   }
 
 private:
 
-  FitTrackData data_;
+  TrackFitData data_;
 
 };
 
 // Memory definition
-typedef MemoryTemplate<FitTracks, 1, kNBits_MemAddr> FitTrackMemory;
+typedef MemoryTemplate<TrackFit, 1, kNBits_MemAddr> TrackFitMemory;
 
 #endif
