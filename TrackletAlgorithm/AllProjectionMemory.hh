@@ -5,13 +5,16 @@
 #include "MemoryTemplate.hh"
 
 // Bit size for AllProjectionMemory fields
-constexpr unsigned int kAProjZDSize = 10;
-constexpr unsigned int kAProjPhiDSize = 11;
+constexpr unsigned int kAProjZDSize = 8;
+constexpr unsigned int kAProjPhiDSize = 7;
 constexpr unsigned int kAProjZSize = 12;
 constexpr unsigned int kAProjPhiSize = 14;
-constexpr unsigned int kAProjTCIndexSize = 13;
+constexpr unsigned int kAProjTCIndexSize = 14;
+constexpr unsigned int kAProjTCSeedSize = 3;        // sub division of TCIndex
+constexpr unsigned int kAProjTCVMSize = 4;          // sub division of TCIndex
+constexpr unsigned int kAProjTCNumSize = 7;   // sub division of TCIndex
 //Bit size for full AllProjectionMemory
-constexpr unsigned int kAllProjectionSize = 1 + 1 +kAProjTCIndexSize + kAProjPhiSize + kAProjZSize + kAProjPhiDSize + kAProjZDSize;
+constexpr unsigned int kAllProjectionSize = kAProjTCIndexSize + kAProjPhiSize + kAProjZSize + kAProjPhiDSize + kAProjZDSize;
 
 // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllProjectionMemory word for different fields
 constexpr unsigned int kAProjZDLSB = 0;
@@ -24,8 +27,12 @@ constexpr unsigned int kAProjPhiLSB = kAProjZMSB + 1;
 constexpr unsigned int kAProjPhiMSB = kAProjPhiLSB + kAProjPhiSize - 1;
 constexpr unsigned int kAProjTCIndexLSB = kAProjPhiMSB + 1;
 constexpr unsigned int kAProjTCIndexMSB = kAProjTCIndexLSB + kAProjTCIndexSize - 1;
-constexpr unsigned int kAProjIsMinusNeighborLSB = kAProjTCIndexMSB + 1;
-constexpr unsigned int kAProjIsPlusNeighborLSB = kAProjIsMinusNeighborLSB + 1;
+constexpr unsigned int kAProjTCNumLSB = kAProjPhiMSB + 1;
+constexpr unsigned int kAProjTCNumMSB = kAProjTCNumLSB + kAProjTCNumSize - 1;
+constexpr unsigned int kAProjTCVMLSB = kAProjTCNumMSB + 1;
+constexpr unsigned int kAProjTCVMMSB = kAProjTCVMLSB + kAProjTCVMSize - 1;
+constexpr unsigned int kAProjTCSeedLSB = kAProjTCVMMSB + 1;
+constexpr unsigned int kAProjTCSeedMSB = kAProjTCSeedLSB + kAProjTCSeedSize - 1;
 
 // Data object definition
 class AllProjection
@@ -33,22 +40,29 @@ class AllProjection
 public:
 
   typedef ap_uint<kAProjTCIndexSize> AProjTCID;
+  typedef ap_uint<kAProjTCSeedSize> AProjTCSEED; // sub division of TCID
+  typedef ap_uint<kAProjTCVMSize> AProjTCVM;     // sub division of TCID
+  typedef ap_uint<kAProjTCNumSize> AProjTCNUM;   // sub division of TCID
   typedef ap_uint<kAProjPhiSize> AProjPHI;
   typedef ap_int<kAProjZSize> AProjZ;
   typedef ap_int<kAProjPhiDSize> AProjPHIDER;
   typedef ap_int<kAProjZDSize> AProjZDER;
   
-  typedef ap_uint<kTrackletProjectionSize> AllProjectionData;
+  typedef ap_uint<kAllProjectionSize> AllProjectionData;
   
   // Constructors
   AllProjection(const AllProjectionData& newdata):
     data_(newdata)
   {}
 
-  AllProjection(const bool plusneighbor, const bool minusneighbor, const AProjTCID tcid, const AProjPHI phi, const AProjZ z, const AProjPHIDER phider, const AProjZDER zder):
-    data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
+  AllProjection(const AProjTCID tcid, const AProjPHI phi, const AProjZ z, const AProjPHIDER phider, const AProjZDER zder):
+    data_( ((((tcid,phi),z),phider),zder) )
   {}
   
+  AllProjection(const AProjTCSEED seed, const AProjTCVM vm, const AProjTCNUM num, const AProjPHI phi, const AProjZ z, const AProjPHIDER phider, const AProjZDER zder):
+    data_( ((((((seed,vm),num),phi),z),phider),zder) )
+  {}
+
   AllProjection():
     data_(0)
   {}
@@ -64,18 +78,22 @@ public:
   // Getter
   AllProjectionData raw() const {return data_;}
   
-  bool getIsPlusNeighbor() const {
-    return data_.range(kAProjIsPlusNeighborLSB,kAProjIsPlusNeighborLSB);
-  }
-  
-  bool getIsMinusNeighbor() const {
-    return data_.range(kAProjIsMinusNeighborLSB,kAProjIsMinusNeighborLSB);
-  }
-
   AProjTCID getTrackletIndex() const {
     return data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB);
   }
+
+  AProjTCSEED getSeed() const {
+	return data_.range(kAProjTCSeedMSB,kAProjTCSeedLSB);
+  }
   
+  AProjTCVM getVM() const {
+	return data_.range(kAProjTCVMMSB,kAProjTCVMLSB);
+  }
+
+  AProjTCNUM getTrackletNumber() const {
+	return data_.range(kAProjTCNumMSB,kAProjTCNumLSB);
+  }
+
   AProjPHI getPhi() const {
     return data_.range(kAProjPhiMSB,kAProjPhiLSB);
   }
@@ -93,16 +111,20 @@ public:
   }
 
   // Setter
-  void setIsPlusNeighbor(const bool isplusneighbor) {
-    data_.range(kAProjIsPlusNeighborLSB,kAProjIsPlusNeighborLSB) = isplusneighbor;
-  }
-
-  void setIsMinusNeighbor(const bool isminusneighbor) {
-    data_.range(kAProjIsMinusNeighborLSB,kAProjIsMinusNeighborLSB) = isminusneighbor;
-  }
-
   void setTrackletIndex(const AProjTCID id) {
     data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB) = id;
+  }
+
+  void setTrackletNumber(const AProjTCNUM num) {
+	data_.range(kAProjTCNumMSB,kAProjTCNumLSB) = num;
+  }
+
+  void setSeed(const AProjTCSEED seed) {
+	data_.range(kAProjTCSeedMSB,kAProjTCSeedLSB) = seed;
+  }
+
+  void setVM(const AProjTCVM vm) {
+	data_.range(kAProjTCVMMSB,kAProjTCVMLSB) = vm;
   }
 
   void setPhi(const AProjPHI phi) {
