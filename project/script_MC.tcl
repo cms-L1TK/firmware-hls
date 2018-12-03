@@ -11,26 +11,27 @@ set clockperiod 4.1667
 delete_project match_calc
 # make new project
 open_project match_calc
-set_top MatchCalculator
+set_top MC
 
 # source files
-add_files ../TrackletAlgorithm/MatchCalculator.cpp
-add_files ../TrackletAlgorithm/Tools.cpp
-add_files -tb -cflags "-I ../TrackletAlgorithm" ../TestBenches/MatchCalculator_test.cpp
+#add_files ../TrackletAlgorithm/MatchCalculator.cpp
+#add_files ../TrackletAlgorithm/Tools.cpp
+add_files ../TrackletAlgorithm/MC.cpp -cflags "-std=c++11"
+add_files -tb -cflags "-I ../TrackletAlgorithm -std=c++11" ../TestBenches/MatchCalculator_test.cpp
 
 # data files
-add_files -tb emData_MC
+add_files -tb ../emData/MC/
 
 # solutions
 open_solution "solution1"
 set_part $part -tool vivado
 create_clock -period $clockperiod -name default
-source "directives_MC.tcl"
+#source "directives_MC.tcl"
 
 #set_part {xcku115-flvb2104-2-e} -tool vivado
 #create_clock -period 10 -name default
 #source "./match_calc/solution1/directives.tcl"
-#csim_design
+csim_design
 #csynth_design
 #cosim_design
 #export_design -format ip_catalog
