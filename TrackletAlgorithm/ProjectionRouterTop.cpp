@@ -22,7 +22,9 @@ void ProjectionRouterTop(BXType bx,
                          )
 {
   // PR_L3PHIC
- PR_L3PHIC: ProjectionRouter<8,3,0>
+ PR_L3PHIC: ProjectionRouter<TrackletProjectionMemory, AllProjectionMemory,
+                             VMProjectionMemory, TrackletProjection,
+                             AllProjection, VMProjection, 8, 3, 0>
     (bx,
      tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

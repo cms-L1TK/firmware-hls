@@ -258,8 +258,8 @@ namespace PR
 
   /////////////////////////////////////////////////////
   // FIXME
-  // Should move the following to Constants.hh
-  // how to deal with these with enum?
+  // Move the following to Constants.hh?
+  // How to deal with these using enum?
 
   // number of allstub memories for each layer
   constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
@@ -276,45 +276,48 @@ namespace PR
 
 //////////////////////////////
 // ProjectionRouter
-template<unsigned int nINMEM, int LAYER=0, int DISK=0>
+template<class MemTypeTProj, class MemTypeAProj, class MemTypeVMProj,
+         class DataTypeTProj, class DataTypeAProj, class DataTypeVMProj,
+         // Is there a way to infer data type from memory type?
+         unsigned int nINMEM, int LAYER=0, int DISK=0>
 void ProjectionRouter(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
                       // array of scalar ...
-                      const TrackletProjectionMemory* const tproj1,
-                      const TrackletProjectionMemory* const tproj2,
-                      const TrackletProjectionMemory* const tproj3,
-                      const TrackletProjectionMemory* const tproj4,
-                      const TrackletProjectionMemory* const tproj5,
-                      const TrackletProjectionMemory* const tproj6,
-                      const TrackletProjectionMemory* const tproj7,
-                      const TrackletProjectionMemory* const tproj8,
-                      const TrackletProjectionMemory* const tproj9,
-                      const TrackletProjectionMemory* const tproj10,
-                      const TrackletProjectionMemory* const tproj11,
-                      const TrackletProjectionMemory* const tproj12,
-                      const TrackletProjectionMemory* const tproj13,
-                      const TrackletProjectionMemory* const tproj14,
-                      const TrackletProjectionMemory* const tproj15,
-                      const TrackletProjectionMemory* const tproj16,
-                      const TrackletProjectionMemory* const tproj17,
-                      const TrackletProjectionMemory* const tproj18,
-                      const TrackletProjectionMemory* const tproj19,
-                      const TrackletProjectionMemory* const tproj20,
-                      const TrackletProjectionMemory* const tproj21,
-                      const TrackletProjectionMemory* const tproj22,
-                      const TrackletProjectionMemory* const tproj23,
-                      const TrackletProjectionMemory* const tproj24,
+                      const MemTypeTProj* const tproj1,
+                      const MemTypeTProj* const tproj2,
+                      const MemTypeTProj* const tproj3,
+                      const MemTypeTProj* const tproj4,
+                      const MemTypeTProj* const tproj5,
+                      const MemTypeTProj* const tproj6,
+                      const MemTypeTProj* const tproj7,
+                      const MemTypeTProj* const tproj8,
+                      const MemTypeTProj* const tproj9,
+                      const MemTypeTProj* const tproj10,
+                      const MemTypeTProj* const tproj11,
+                      const MemTypeTProj* const tproj12,
+                      const MemTypeTProj* const tproj13,
+                      const MemTypeTProj* const tproj14,
+                      const MemTypeTProj* const tproj15,
+                      const MemTypeTProj* const tproj16,
+                      const MemTypeTProj* const tproj17,
+                      const MemTypeTProj* const tproj18,
+                      const MemTypeTProj* const tproj19,
+                      const MemTypeTProj* const tproj20,
+                      const MemTypeTProj* const tproj21,
+                      const MemTypeTProj* const tproj22,
+                      const MemTypeTProj* const tproj23,
+                      const MemTypeTProj* const tproj24,
                       BXType& bx_o,
-                      AllProjectionMemory* const allproj,
-                      VMProjectionMemory* const vmproj1,
-                      VMProjectionMemory* const vmproj2,
-                      VMProjectionMemory* const vmproj3,
-                      VMProjectionMemory* const vmproj4,
-                      VMProjectionMemory* const vmproj5,
-                      VMProjectionMemory* const vmproj6,
-                      VMProjectionMemory* const vmproj7,
-                      VMProjectionMemory* const vmproj8
+                      MemTypeAProj* const allproj,
+                      MemTypeVMProj* const vmproj1,
+                      MemTypeVMProj* const vmproj2,
+                      MemTypeVMProj* const vmproj3,
+                      MemTypeVMProj* const vmproj4,
+                      MemTypeVMProj* const vmproj5,
+                      MemTypeVMProj* const vmproj6,
+                      MemTypeVMProj* const vmproj7,
+                      MemTypeVMProj* const vmproj8
 ){
 #pragma HLS inline off
 
@@ -331,30 +334,28 @@ void ProjectionRouter(BXType bx,
   vmproj7->clear(bx);
   vmproj8->clear(bx);
 
-  // logic for reading inputs
+  // initialization:
   // check the number of entries in the input memories
+  // fill the bit mask indicating if memories are empty or not
   ap_uint<nINMEM> mem_hasdata = 0;
-  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM] = {0};
+  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
-  // initialization
-  init<TrackletProjectionMemory, nINMEM, kNBits_MemAddr+1>
+  init<MemTypeTProj, nINMEM, kNBits_MemAddr+1>
     (bx, mem_hasdata, numbersin,
      tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
      tproj9, tproj10, tproj11, tproj12, tproj13, tproj14, tproj15, tproj16,
      tproj17, tproj18, tproj19, tproj20, tproj21, tproj22, tproj23, tproj24);
   
   // declare index of input memory to be read
-  //ap_uint<5> imem = 0;  // 5 bits for up to 32 input memories
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
   
   PROC_LOOP: for (int i = 0; i < kMaxProc; ++i) {
-  //PROC_LOOP: for (int i = 0; i < 2; ++i) {
 #pragma HLS PIPELINE II=1
 
     // read inputs
-    TrackletProjection tproj;
-    bool validin = read_input_mems<TrackletProjection, TrackletProjectionMemory,
+    DataTypeTProj tproj;
+    bool validin = read_input_mems<DataTypeTProj, MemTypeTProj,
                                    nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
        tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
@@ -391,7 +392,7 @@ void ProjectionRouter(BXType bx,
     static_assert(not DISK, "PR: Layer only for now.");
     
     // vmproj index
-    VMProjection::VMPID index = i;
+    typename DataTypeVMProj::VMPID index = i;
     //assert(i < (1<<index.length()));
 
     // vmproj z
@@ -412,30 +413,22 @@ void ProjectionRouter(BXType bx,
     //assert(zbin1<=zbin2);
     //assert(zbin2-zbin1<=1);
     
-    VMProjection::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
-    //std::cout << "zbin: " << zbin << std::endl;
+    typename DataTypeVMProj::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
+    
     //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
     // need to be careful about left shift of ap_(u)int
-    VMProjection::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
+    typename DataTypeVMProj::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
 
-    //std::cout << "finez: " << finez << std::endl;
-    
     // vmproj irinv
     // phider = -irinv/2
-    // Note: auto does not work here
+    // Note: auto does not work well here
+    // auto infers 42 bits because -2 is treated as a 32-bit int
     ap_uint<kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
-    //std::cout << "iphider " << iphider << std::endl;
-    //std::cout << "iphider nbits " << iphider.length() << std::endl;
-    //std::cout << "irinv_tmp " << irinv_tmp << std::endl;
-    //std::cout << "irinv_tmp nbits " << irinv_tmp.length() << std::endl;
 
     // rinv in VMProjection takes only the top 5 bits
     // and is shifted to be positive
-    VMProjection::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
-    
+    typename DataTypeVMProj::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
     //assert(rinv >=0 and rinv < 32);
-
-    //std::cout << "rinv: " << rinv << std::endl;
     
     // PS seed
     // top 3 bits of tracklet index indicate the seeding pair
@@ -443,13 +436,13 @@ void ProjectionRouter(BXType bx,
     // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
     // and here?
     // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
-    // NOTE: emulation fw_synch branch does not include L2L3 seeding, while the master branch does
+    // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
 
     // All seeding pairs are PS modules except L3L4 and L5L6
     bool psseed = not(iseed==1 or iseed==2); 
 
     // VM Projection
-    VMProjection vmproj(index, zbin, finez, rinv, psseed);
+    DataTypeVMProj vmproj(index, zbin, finez, rinv, psseed);
 
     // write outputs
     //assert(iphi>=0 and iphi<4);
@@ -474,7 +467,7 @@ void ProjectionRouter(BXType bx,
 
     /////////////////
     // AllProjection
-    AllProjection aproj(tproj.raw());
+    DataTypeAProj aproj(tproj.raw());
     // write output
     allproj->write_mem(bx, aproj);
 
