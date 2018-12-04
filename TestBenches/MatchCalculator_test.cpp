@@ -1,4 +1,4 @@
-// ProjectionRouter test bench
+// MatchCalculator test bench
 #include "MC.h"
 #include "AllStubMemory.hh"
 #include "AllProjectionMemory.hh"

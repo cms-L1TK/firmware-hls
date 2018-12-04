@@ -6,9 +6,6 @@
 //-----------------------------------------------------------------------------------------
 // --------------------------------- FIXME ------------------------------------------------
 // Best match logic allows for more than one best match to go through 
-// Add LUTs for matchcut_phi and matchcut_z
-// Values of: fact, phi_corr_shift, z_corr_shift, fact, phi0_shift, shift_phi0bit
-// Setup templated iabs function 
 // More output FM memories? and have null pointers for ones not needed in each instance 
 //-----------------------------------------------------------------------------------------
 
@@ -67,6 +64,14 @@ void MatchCalculator(const BXType bx,
   // Bool and ID needed for determining if processing a new tracklet
   bool newtracklet = true;
   CandidateMatch::CMProjIndex id[kMaxProc];
+ 
+  // Initialize MC cut variables 
+  ap_uint<13> best_delta_z;
+  ap_uint<17> best_delta_phi;
+ 
+  // Write addresses for output full matches
+  ap_uint<kNBits_MemAddr> wraddr1 = -1;
+  ap_uint<kNBits_MemAddr> wraddr2 = -1;
 
   // Processing starts
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
@@ -161,12 +166,11 @@ void MatchCalculator(const BXType bx,
        AllProjection::AProjZDER   proj_zd   = proj.getZDer(); 
 
        // Calculate residuals
-       
        // Get phi and z correction
        ap_int<18> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
        ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
-       ap_int<13> phi_corr      = full_phi_corr >> phi_corr_shift; // only keep needed bits 
-       ap_int<12> z_corr        = full_z_corr >> z_corr_shift;     // only keep needed bits
+       ap_int<13> phi_corr      = full_phi_corr >> kPhi_corr_shift; // only keep needed bits 
+       ap_int<12> z_corr        = full_z_corr >> kZ_corr_shift;     // only keep needed bits
         
        // Apply the corrections
        ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
@@ -174,28 +178,29 @@ void MatchCalculator(const BXType bx,
 
        // Get phi and z difference between the projection and stub
        ap_int<13> delta_z        = stub_z - proj_z_corr;
-       ap_int<13> delta_z_fact   = delta_z * fact;
-       ap_int<13> delta_phi      = (stub_phi << phi0_shift) - (proj_phi_corr << (shift_phi0bit - 1 + phi0_shift));
-       ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
-       ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
+       ap_int<13> delta_z_fact   = delta_z * kFact;
+       ap_int<13> delta_phi      = (stub_phi << kPhi0_shift) - (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift));
+       //ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
+       //ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
-
-       // For first tracklet, pick up the cut values
+       /*
+       // For first tracklet, pick up the cut values and set write address
        if (newtracklet){
-         best_delta_z   = matchcut_z[layer][proj_seed];
-         best_delta_phi = matchut_phi[layer][proj_seed]; 
+         best_delta_z   = 11; //LUT_matchcut_z[proj_seed];
+         best_delta_phi = 242; //LUT_matchcut_phi[proj_seed];
+         if (proj_seed==0) wraddr1++;
+         if (proj_seed==1) wraddr2++; 
        }
        // Check that matches fall within the selection window of the projection 
        bool pass_sel = false;
        if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= abs_delta_phi)){
          pass_sel       = true;
-         // Update values of best parameters, so 
-         // Next match will be compared to these values instead of the original selection cuts
+         // Update values of best parameters, so that the next match 
+         // will be compared to these values instead of the original selection cuts
          best_delta_z   = abs_delta_z;
          best_delta_phi = abs_delta_phi;
        }
        else pass_sel = false; 
-     
 
        // Store full matches that pass the cuts
        if (pass_sel){
@@ -206,9 +211,12 @@ void MatchCalculator(const BXType bx,
          FullMatch::FMZRES      fm_z    = delta_phi;
          FullMatch fm(fm_tcid,fm_asid,fm_phi,fm_z);
          // Write out full match based on the seeding
+         // Keep writing to the same address (only overwriting when a better match passes)
+         // until process a new tracklet, then the write address is updated 
          if (proj_seed==0) outfmdata1->write_mem(bx,fm);
-         if (proj_seed==1) outfmdata2->write_mem(bx,fm); 
+         if (proj_seed==2) outfmdata2->write_mem(bx,fm);
        }
+       */
 
      }// end if (i < ncm)
      else break; // end processing of CMs 
@@ -217,16 +225,3 @@ void MatchCalculator(const BXType bx,
 
 }
 
-
-/*
-void readTable(bool table[256]){
-
-  bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
-
-  for (int i=0;i<256;i++){
-    table[i]=tmp[i];
-  }
-
-}
-*/

@@ -7,6 +7,12 @@
 #include "AllProjectionMemory.hh"
 #include "FullMatchMemory.hh"
 
+const int kFact           = 1;
+const int kPhi0_shift     = 3; 
+const int kShift_phi0bit  = 1;
+const int kPhi_corr_shift = 5;
+const int kZ_corr_shift   = 6;
+
 void MatchCalculator(const BXType  bx,
                      const CandidateMatchMemory* const incmdata1,
                      const CandidateMatchMemory* const incmdata2,
@@ -21,4 +27,37 @@ void MatchCalculator(const BXType  bx,
                      FullMatchMemory* const outfmdata1,
                      FullMatchMemory* const outfmdata2);
 
+/*
+template< int width >
+ap_uint<width> iabs( ap_int<width> value )
+{
+	ap_uint<width> absval;
+	if (value < 0) absval = -value;
+	else           absval = value;
+	return absval;
+};
+
+
+static const ap_int<17> LUT_matchcut_phi[7] = {
+#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab" 
+};
+
+static const ap_int<13> LUT_matchcut_z[7] = {
+#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_zcut.tab"
+};
+*/
+
 #endif
+
+/*
+void readTable(bool table[256]){
+
+  bool tmp[256]=
+  #include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
+
+  for (int i=0;i<256;i++){
+    table[i]=tmp[i];
+  }
+
+}
+*/
