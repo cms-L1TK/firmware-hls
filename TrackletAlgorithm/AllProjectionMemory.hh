@@ -5,8 +5,8 @@
 #include "MemoryTemplate.hh"
 
 // Bit size for AllProjectionMemory fields
-constexpr unsigned int kAProjZDSize = 8;
-constexpr unsigned int kAProjPhiDSize = 7;
+constexpr unsigned int kAProjZDSize = 10;
+constexpr unsigned int kAProjPhiDSize = 10;
 constexpr unsigned int kAProjZSize = 12;
 constexpr unsigned int kAProjPhiSize = 14;
 constexpr unsigned int kAProjTCIndexSize = 14;
