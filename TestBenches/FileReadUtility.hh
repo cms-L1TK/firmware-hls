@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "../TrackletAlgorithm/Constants.hh"
+
 bool openDataFile(std::ifstream& file_in, const std::string& file_name)
 {
   file_in.open(file_name);
@@ -97,7 +99,8 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
 // TODO: FIXME or write a new one for binned memories
 template<class MemType, int base=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
-                                int ievt, const std::string& label)
+                                int ievt, const std::string& label,
+                                bool& truncated = false)
 {
   unsigned int err_count = 0;
 
@@ -118,21 +121,34 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
     std::cout << "reference" << "\t" << "computed" << std::endl;
   
   for (int i = 0; i < memory_ref.getEntries(ievt); ++i) {
+
+    // Maximum processing steps per event is kMaxProc
+    if (i >= kMaxProc) {
+      std::cout << "WARNING: Extra data in the reference memory!" << std::endl;
+      std::cout << "Truncation due to maximum number of processing steps per event kMaxProc = " << std::dec << kMaxProc << std::endl;
+      truncated = true;
+      break;
+    }
     
     auto data_ref = memory_ref.read_mem(ievt,i).raw();
     std::cout << std::hex << data_ref << "\t";
     
     if (i >= memory.getEntries(ievt) ) {
       // missing entries in the computed memory
-      err_count++;
+      if (not truncated) err_count++;
       std::cout << "missing" << std::endl;
       continue;
     }
 
     auto data_com = memory.read_mem(ievt,i).raw();
-    std::cout << std::hex << data_com << std::endl;
+    std::cout << std::hex << data_com; // << std::endl;
 
-    if (data_com != data_ref) err_count++;
+    if (data_com != data_ref) {
+      std::cout << "\t" << "<=== INCONSISTENT";
+      err_count++;
+    }
+
+    std::cout << std::endl;
   }
   
   // in case computed memory has extra contents...
