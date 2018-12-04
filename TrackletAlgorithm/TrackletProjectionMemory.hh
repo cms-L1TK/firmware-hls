@@ -6,12 +6,12 @@
 
 // Bit size for TrackletProjectionMemory fields
 constexpr unsigned int kTProjZDSize = 10;
-constexpr unsigned int kTProjPhiDSize = 11;
+constexpr unsigned int kTProjPhiDSize = 10;
 constexpr unsigned int kTProjZSize = 12;
 constexpr unsigned int kTProjPhiSize = 14;
-constexpr unsigned int kTProjTCIndexSize = 13;
+constexpr unsigned int kTProjTCIndexSize = 14;
 // Bit size for full TrackletProjectionMemory
-constexpr unsigned int kTrackletProjectionSize = 1 + 1 +kTProjTCIndexSize + kTProjPhiSize + kTProjZSize + kTProjPhiDSize + kTProjZDSize;
+constexpr unsigned int kTrackletProjectionSize = kTProjTCIndexSize + kTProjPhiSize + kTProjZSize + kTProjPhiDSize + kTProjZDSize;
 
 // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletProjectionMemory word for different fields
 constexpr unsigned int kTProjZDLSB = 0;
@@ -24,8 +24,6 @@ constexpr unsigned int kTProjPhiLSB = kTProjZMSB + 1;
 constexpr unsigned int kTProjPhiMSB = kTProjPhiLSB + kTProjPhiSize - 1;
 constexpr unsigned int kTProjTCIndexLSB = kTProjPhiMSB + 1;
 constexpr unsigned int kTProjTCIndexMSB = kTProjTCIndexLSB + kTProjTCIndexSize - 1;
-constexpr unsigned int kTProjIsMinusNeighborLSB = kTProjTCIndexMSB + 1;
-constexpr unsigned int kTProjIsPlusNeighborLSB = kTProjIsMinusNeighborLSB + 1;
 
 // Data object definition
 class TrackletProjection
@@ -45,8 +43,14 @@ public:
     data_(newdata)
   {}
 
+  /*
   TrackletProjection(const bool plusneighbor, const bool minusneighbor, const TProjTCID tcid, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjZDER zder):
     data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
+  {}
+  */
+
+  TrackletProjection(const TProjTCID tcid, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjZDER zder):
+    data_( ((((tcid,phi),z),phider),zder) )
   {}
   
   TrackletProjection():
@@ -64,6 +68,7 @@ public:
   // Getter
   TrackletProjectionData raw() const {return data_;}
 
+  /*
   bool getIsPlusNeighbor() const {
     return data_.range(kTProjIsPlusNeighborLSB,kTProjIsPlusNeighborLSB);
   }
@@ -71,7 +76,8 @@ public:
   bool getIsMinusNeighbor() const {
     return data_.range(kTProjIsMinusNeighborLSB,kTProjIsMinusNeighborLSB);
   }
-  
+  */  
+
   TProjTCID getTrackletIndex() const {
     return data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB);
   }
@@ -93,6 +99,7 @@ public:
   }
 
   // Setter
+  /*
   void setIsPlusNeighbor(const bool isplusneighbor) {
     data_.range(kTProjIsPlusNeighborLSB,kTProjIsPlusNeighborLSB) = isplusneighbor;
   }
@@ -100,6 +107,7 @@ public:
   void setIsMinusNeighbor(const bool isminusneighbor) {
     data_.range(kTProjIsMinusNeighborLSB,kTProjIsMinusNeighborLSB) = isminusneighbor;
   }
+  */
 
   void setTrackletIndex(const TProjTCID id) {
     data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB) = id;
