@@ -16,7 +16,7 @@ It would create a project directory \<project> ("projrouter" in case of the abov
 
 This is intended to be the HLS implementation of this repository:
 https://github.com/cms-tracklet/fpga_emulation_longVM/tree/fw_synch, specifically this tag:
-https://github.com/cms-tracklet/fpga_emulation_longVM/tree/AH_181201
+https://github.com/cms-tracklet/fpga_emulation_longVM/tree/ZT_181203
 
 This is the fw_synch branch. See readme in that area. The emulation repository is dependent on imath, which should be checked out with this tag:
 https://github.com/cms-tracklet/imath/tree/AH_181201
@@ -29,5 +29,5 @@ The correct versions of imath and fpga_emulation_longVM can be checked out and b
 	git checkout AH_181201
 	make -j5
 	cd ../fpga_emulation_longVM/
-	git checkout AH_181201
+	git checkout ZT_181203
 	make fpga
