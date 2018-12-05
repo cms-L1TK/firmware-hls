@@ -8,7 +8,11 @@
 constexpr unsigned int kFMZResSize = 9;
 constexpr unsigned int kFMPhiResSize = 12;
 constexpr unsigned int kFMStubIndexSize = 10;
-constexpr unsigned int kFMTCIndexSize = 13;
+constexpr unsigned int kFMStubPhiIDSize = 3;   // sub division of StubIndex
+constexpr unsigned int kFMStubIDSize = 7;      // sub division of StubIndex
+constexpr unsigned int kFMTCIndexSize = 14;
+constexpr unsigned int kFMTCIDSize = 7;        // sub division of TCIndex
+constexpr unsigned int kFMTrackletNumSize = 7; // sub division of TCIndex
 // Bit size for full FullMatchMemory
 constexpr unsigned int kFullMatchSize = kFMTCIndexSize + kFMStubIndexSize + kFMPhiResSize + kFMZResSize;
 
@@ -21,14 +25,26 @@ constexpr unsigned int kFMStubIndexLSB = kFMPhiResMSB + 1;
 constexpr unsigned int kFMStubIndexMSB = kFMStubIndexLSB + kFMStubIndexSize - 1;
 constexpr unsigned int kFMTCIndexLSB = kFMStubIndexMSB + 1;
 constexpr unsigned int kFMTCIndexMSB = kFMTCIndexLSB + kFMTCIndexSize - 1;
+constexpr unsigned int kFMTrackletNumLSB = kFMStubIndexMSB + 1;
+constexpr unsigned int kFMTrackletNumMSB = kFMTrackletNumLSB + kFMTrackletNumSize - 1;
+constexpr unsigned int kFMTCIDLSB = kFMTrackletNumMSB + 1;
+constexpr unsigned int kFMTCIDMSB = kFMTCIDLSB + kFMTCIDSize - 1;
+constexpr unsigned int kFMStubIDLSB = kFMPhiResMSB + 1;
+constexpr unsigned int kFMStubIDMSB = kFMStubIDLSB + kFMStubIDSize - 1;
+constexpr unsigned int kFMStubPhiIDLSB = kFMStubIDMSB + 1;
+constexpr unsigned int kFMStubPhiIDMSB = kFMStubPhiIDLSB + kFMStubPhiIDSize - 1;
 
 // Data object definition
 class FullMatch
 {
 public:
 
-  typedef ap_uint<kFMTCIndexSize> FMTCID;
+  typedef ap_uint<kFMTCIndexSize> FMTCINDEX;
+  typedef ap_uint<kFMTCIDSize> FMTCID;
+  typedef ap_uint<kFMTrackletNumSize> FMTCNUM;
   typedef ap_uint<kFMStubIndexSize> FMSTUBINDEX;
+  typedef ap_uint<kFMStubIDSize> FMSTUBID;
+  typedef ap_uint<kFMStubPhiIDSize> FMSTUBPHIID;
   typedef ap_int<kFMPhiResSize> FMPHIRES;
   typedef ap_int<kFMZResSize> FMZRES;
 
@@ -39,8 +55,16 @@ public:
     data_(newdata)
   {}
 
-  FullMatch(const FMTCID tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
+  FullMatch(const FMTCINDEX tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
     data_( (((tcid,stub),phires),zres) )
+  {}
+
+  FullMatch(const FMTCNUM num, const FMTCID tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
+	data_( ((((num,tcid),stub),phires),zres) )
+  {}
+
+  FullMatch(const FMTCINDEX tcid, const FMSTUBPHIID stubphiid, const FMSTUBID stubid, const FMPHIRES phires, const FMZRES zres):
+	data_( ((((tcid,stubphiid),stubid),phires),zres) )
   {}
 
   FullMatch():
@@ -58,8 +82,16 @@ public:
   // Getter
   FullMatchData raw() const {return data_;}
 
-  FMTCID getTrackletIndex() const {
+  FMTCINDEX getTCIndex() const {
     return data_.range(kFMTCIndexMSB,kFMTCIndexLSB);
+  }
+
+  FMTCID getTCID() const {
+	return data_.range(kFMTCIDMSB,kFMTCIDLSB);
+  }
+
+  FMTCNUM getTrackletNumber() const {
+	return data_.range(kFMTrackletNumMSB,kFMTrackletNumLSB);
   }
 
   FMSTUBINDEX getStubIndex() const {
@@ -75,8 +107,16 @@ public:
   }
 
   // Setter
-  void setTrackletIndex(const FMTCID tcid) {
+  void setTCIndex(const FMTCINDEX tcid) {
     data_.range(kFMTCIndexMSB,kFMTCIndexLSB) = tcid;
+  }
+
+  void setTCID(const FMTCID tcid) {
+	data_.range(kFMTCIDMSB,kFMTCIDLSB) = tcid;
+  }
+
+  void setTrackletNumber(const FMTCNUM num) {
+	data_.range(kFMTrackletNumMSB,kFMTrackletNumLSB) = num;
   }
 
   void setStubIndex(const FMSTUBINDEX stid) {

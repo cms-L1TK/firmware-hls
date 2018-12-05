@@ -151,6 +151,9 @@ void MatchCalculator(const BXType bx,
        else if (id[istep] != id[istep-1]) newtracklet = true;
        else newtracklet = false; 
 
+       if (newtracklet) std::cout << "Processing new tracklet" << std::endl;
+       std::cout << "Datastream : " << datastream.raw() << " CM params(ProjID,StubID): " << projid << " " << stubid << std::endl;
+
        // Stub parameters
        AllStub::ASR    stub_r    = stub.getR();
        AllStub::ASZ    stub_z    = stub.getZ();
@@ -177,17 +180,16 @@ void MatchCalculator(const BXType bx,
        ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
        // Get phi and z difference between the projection and stub
-       ap_int<13> delta_z        = stub_z - proj_z_corr;
+       ap_int<9> delta_z         = stub_z - proj_z_corr;
        ap_int<13> delta_z_fact   = delta_z * kFact;
-       ap_int<13> delta_phi      = (stub_phi << kPhi0_shift) - (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift));
-       //ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
-       //ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
+       ap_int<12> delta_phi      = (stub_phi << kPhi0_shift) - (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift));
+       ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
+       ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
-       /*
        // For first tracklet, pick up the cut values and set write address
        if (newtracklet){
-         best_delta_z   = 11; //LUT_matchcut_z[proj_seed];
-         best_delta_phi = 242; //LUT_matchcut_phi[proj_seed];
+         best_delta_z   = LUT_matchcut_z[proj_seed];
+         best_delta_phi = LUT_matchcut_phi[proj_seed];
          if (proj_seed==0) wraddr1++;
          if (proj_seed==1) wraddr2++; 
        }
@@ -205,18 +207,19 @@ void MatchCalculator(const BXType bx,
        // Store full matches that pass the cuts
        if (pass_sel){
          // Full match parameters
-         FullMatch::FMTCID      fm_tcid = proj_tcid;
-         FullMatch::FMSTUBINDEX fm_asid = stubid;
-         FullMatch::FMPHIRES    fm_phi  = delta_z;
-         FullMatch::FMZRES      fm_z    = delta_phi;
-         FullMatch fm(fm_tcid,fm_asid,fm_phi,fm_z);
+         FullMatch::FMTCINDEX   fm_tcid  = proj_tcid;
+         FullMatch::FMSTUBPHIID fm_asphi = 2;         // constant to label which phi sector
+         FullMatch::FMSTUBID    fm_asid  = stubid;
+         FullMatch::FMPHIRES    fm_phi   = delta_z;
+         FullMatch::FMZRES      fm_z     = delta_phi;
+         FullMatch fm(fm_tcid,fm_asphi,fm_asid,fm_phi,fm_z);
+         std::cout << "FM parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
          // Write out full match based on the seeding
          // Keep writing to the same address (only overwriting when a better match passes)
          // until process a new tracklet, then the write address is updated 
          if (proj_seed==0) outfmdata1->write_mem(bx,fm);
          if (proj_seed==2) outfmdata2->write_mem(bx,fm);
        }
-       */
 
      }// end if (i < ncm)
      else break; // end processing of CMs 

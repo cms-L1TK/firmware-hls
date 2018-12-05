@@ -27,7 +27,7 @@ void MatchCalculator(const BXType  bx,
                      FullMatchMemory* const outfmdata1,
                      FullMatchMemory* const outfmdata2);
 
-/*
+
 template< int width >
 ap_uint<width> iabs( ap_int<width> value )
 {
@@ -45,7 +45,7 @@ static const ap_int<17> LUT_matchcut_phi[7] = {
 static const ap_int<13> LUT_matchcut_z[7] = {
 #include "../emData/MC/MC_L3PHIC/MC_L3PHIC_zcut.tab"
 };
-*/
+
 
 #endif
 

@@ -14,7 +14,8 @@
 #include <iterator>
 
 
-const int nevents = 1;  // number of events to run
+const int nevents = 1; // number of events to run
+bool truncation = false; // compare results to truncated emulation
 
 using namespace std;
 
@@ -42,8 +43,8 @@ int main() {
 
   // read in input files
   ifstream fin_as;
-  bool validas = openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn3_04.dat");
-  if (not validas) return -1;              // exit if file not found 
+  bool validas = openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn4_04.dat");
+  if (not validas) return -1;              // exit if file not found
 
   ifstream fin_ap;
   bool validap = openDataFile(fin_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat");
@@ -115,10 +116,9 @@ int main() {
                     &inputcandmatch5, &inputcandmatch6, &inputcandmatch7, &inputcandmatch8,
                     &inputproj, &inputstub, &outputfullmatch_seed1, &outputfullmatch_seed2);
 
- 
     // compare the computed outputs with the expected ones 
-    err_count += compareMemWithFile<FullMatchMemory>(outputfullmatch_seed1, fin_fm_seed1, ievt, "FullMatch");
-    err_count += compareMemWithFile<FullMatchMemory>(outputfullmatch_seed2, fin_fm_seed2, ievt, "FullMatch");
+    err_count += compareMemWithFile<FullMatchMemory>(outputfullmatch_seed1, fin_fm_seed1, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory>(outputfullmatch_seed2, fin_fm_seed2, ievt, "FullMatch", truncation);
 
   }  // end of event loop
   
