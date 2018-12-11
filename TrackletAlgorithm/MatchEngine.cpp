@@ -30,7 +30,7 @@ void readTable(bool table[256]){
 
 //Attempt at new version of code
 void MatchEngine(const ap_uint<3> bx,
-		 const VMStubMemory* const instubdata,
+		 const VMStubMEMemory* const instubdata,
 		 const VMProjectionMemory* const inprojdata,
 		 CandidateMatchMemory* const outcandmatch){
 
@@ -104,7 +104,7 @@ void MatchEngine(const ap_uint<3> bx,
     if (moreproj&&buffernotfull){
       auto const iprojtmp=iproj;
       auto const projdata=inprojdata->read_mem(bx,iprojtmp);
-      auto const projzbin=projdata.GetZBin();
+      auto const projzbin=projdata.getZBin();
       iproj++;
       moreproj=iproj<nproj;
 
@@ -158,10 +158,10 @@ void MatchEngine(const ap_uint<3> bx,
 	zbin=qdata.range(3,1);
 	VMProjection data(qdata.range(25,4));
 
-	projindex=data.GetIndex();
-	projfinez=data.GetFineZ();
-	projrinv=data.GetRInv();
-	isPSseed=data.GetIsPSSeed();
+	projindex=data.getIndex();
+	projfinez=data.getFineZ();
+	projrinv=data.getRInv();
+	isPSseed=data.getIsPSSeed();
 
 	second=qdata.range(0,0);	
 
@@ -183,13 +183,13 @@ void MatchEngine(const ap_uint<3> bx,
 	  istub++;
 	}
       }
-      
+
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
-      VMStub stubdata=instubdata->read_mem(bx,stubadd);
-      VMStub::VMSID stubindex=stubdata.GetIndex();
-      VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
-      VMStub::VMSBEND stubbend=stubdata.GetBend();
+      VMStubME stubdata=instubdata->read_mem(bx,stubadd);
+      VMStubME::VMSMEID stubindex=stubdata.getIndex();
+      VMStubME::VMSMEFINEZ stubfinez=stubdata.getFineZ();
+      VMStubME::VMSMEBEND stubbend=stubdata.getBend();
 
       //Check if stub z position consistent
       ap_int<5> idz=stubfinez-projfinezadj;
@@ -225,7 +225,7 @@ void MatchEngine(const ap_uint<3> bx,
 //
 
 void MatchEngine(const ap_uint<3> bx,
-		 const VMStubMemory* const instubdata,
+		 const VMStubMEMemory* const instubdata,
 		 const VMProjectionMemory* const inprojdata,
 		 CandidateMatchMemory* const outcandmatch){
 
@@ -251,11 +251,11 @@ void MatchEngine(const ap_uint<3> bx,
   for (ap_uint<kNBits_MemAddr> iproj=0;iproj<nproj;iproj++) {
     //Read projection from memory and extract the elements of the projection
     VMProjection proj=inprojdata->read_mem(bx,iproj);
-    VMProjection::VMPID projindex=proj.GetIndex();
-    VMProjection::VMPZBIN projzbin=proj.GetZBin();
-    VMProjection::VMPFINEZ projfinez=proj.GetFineZ();
-    VMProjection::VMPRINV projrinv=proj.GetRInv();
-    bool isPSseed=proj.GetIsPSSeed();
+    VMProjection::VMPID projindex=proj.getIndex();
+    VMProjection::VMPZBIN projzbin=proj.getZBin();
+    VMProjection::VMPFINEZ projfinez=proj.getFineZ();
+    VMProjection::VMPRINV projrinv=proj.getRInv();
+    bool isPSseed=proj.getIsPSSeed();
     
     //Calculate first and last zbin that need to searched for stubs
     ap_uint<TEBinsBits> zfirst=projzbin.range(3,1);
@@ -269,15 +269,15 @@ void MatchEngine(const ap_uint<3> bx,
       //Loop over the stubs in the bin
       for (ap_uint<kNBits_MemAddrBinned> istub=0;istub<nstub;istub++) {
         //Read the stub memory and extract the elements of the projection
-        //VMStub stubdata=instubdata->read_mem(bx,zbin.concat(istub));
-	//VMStub::VMSID stubindex=stubdata.GetIndex();
-	//VMStub::VMSFINEZ stubfinez=stubdata.GetFineZ();
-	//VMStub::VMSBEND stubbend=stubdata.GetBend();
+        //VMStubME stubdata=instubdata->read_mem(bx,zbin.concat(istub));
+	//VMStubME::VMSMEID stubindex=stubdata.getIndex();
+	//VMStubME::VMSMEFINEZ stubfinez=stubdata.getFineZ();
+	//VMStubME::VMSMEBEND stubbend=stubdata.getBend();
 
         auto const stubdata=instubdata->read_mem(bx,zbin.concat(istub));
-	auto const stubindex=stubdata.GetIndex();
-	auto const stubfinez=stubdata.GetFineZ();
-	auto const stubbend=stubdata.GetBend();
+	auto const stubindex=stubdata.getIndex();
+	auto const stubfinez=stubdata.getFineZ();
+	auto const stubbend=stubdata.getBend();
 	
 	//Check is stub and projection satisfies the z cut 
 	ap_int<5> idz=stubfinez-projfinez;

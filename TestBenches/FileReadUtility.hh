@@ -99,8 +99,18 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
 // TODO: FIXME or write a new one for binned memories
 template<class MemType, int base=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
+                                int ievt, const std::string& label)
+{
+  bool truncated = false;
+  unsigned int err_count;
+  err_count = compareMemWithFile<MemType>(memory,fout,ievt,label,truncated);
+  return err_count;
+}
+
+template<class MemType, int base=16>
+unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
-                                bool& truncated = false)
+                                bool& truncated)
 {
   unsigned int err_count = 0;
 
