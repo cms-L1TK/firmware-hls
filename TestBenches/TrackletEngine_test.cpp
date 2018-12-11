@@ -1,8 +1,8 @@
 // ProjectionRouter test bench
 #include "TrackletEngine.h"
-#include "StubPairs.hh"
-#include "VMStubsTEInner.hh"
-#include "VMStubsTEOuter.hh"
+#include "StubPairMemory.hh"
+#include "VMStubTEInnerMemory.hh"
+#include "VMStubTEOuterMemory.hh"
 #include "FileReadUtility.hh"
 #include "hls_math.h"
 
@@ -23,12 +23,12 @@ int main(){
   int err_count = 0;
   
   // declare input memory arrays to be read from emulations files
-  VMStubsTEInner inputvmstubsinner;
-  VMStubsTEOuter inputvmstubsouter;
-  StubPairs inputstubpairs;
+  VMStubTEInnerMemory inputvmstubsinner;
+  VMStubTEOuterMemory inputvmstubsouter;
+  //StubPairMemory inputstubpairs;
 
   // declare the output memory array for the sub pairs
-  StubPairs outputstubpairs; //produced by hls simulation
+  StubPairMemory outputstubpairs; //produced by hls simulation
 
 
   // open input files from emulation
@@ -45,9 +45,8 @@ int main(){
     cout << "Event: " << dec << ievt << endl;
 
     //read next event from the input files
-    readEventFromFile<VMStubsTEInner>(inputvmstubsinner, fin_vmstubsinner,ievt);
-    readEventFromFile<VMStubsTEOuter>(inputvmstubsouter, fin_vmstubsouter,ievt);
-    readEventFromFile<StubPairs>(inputstubpairs, fin_stubpairs,ievt);
+    writeMemFromFile<VMStubTEInnerMemory>(inputvmstubsinner, fin_vmstubsinner,ievt);
+    writeMemFromFile<VMStubTEOuterMemory>(inputvmstubsouter, fin_vmstubsouter,ievt);
 
     //set the bunch crossing
     ap_uint<3> bx=ievt&0x7;
@@ -62,7 +61,7 @@ int main(){
 		   );
     
     // compare calculated outputs with those read from emulation printout
-    err_count+=inputstubpairs.compare(outputstubpairs,bx);
+    err_count += compareMemWithFile<StubPairMemory>(outputstubpairs,fin_stubpairs,ievt,"StubPair");
 
   }  // end of event loop
 
