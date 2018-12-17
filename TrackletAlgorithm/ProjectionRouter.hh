@@ -423,7 +423,7 @@ void ProjectionRouter(BXType bx,
     // phider = -irinv/2
     // Note: auto does not work well here
     // auto infers 42 bits because -2 is treated as a 32-bit int
-    ap_uint<kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
+    ap_uint<TrackletProjection::BitWidths::kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
 
     // rinv in VMProjection takes only the top 5 bits
     // and is shifted to be positive

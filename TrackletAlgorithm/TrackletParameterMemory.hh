@@ -4,32 +4,35 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit sizes for TrackletParameterMemory fields
-constexpr unsigned int kTParRinvSize = 14; //rinv
-constexpr unsigned int kTParPhi0Size = 18; //phi0
-constexpr unsigned int kTParZ0Size = 10; //z0
-constexpr unsigned int kTParTSize = 14; //t
-// Bit size for full TrackletParameterMemory
-constexpr unsigned int kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletParameterMemory word for different fields
-constexpr unsigned int kTParTLSB = 0;
-constexpr unsigned int kTParTMSB = kTParTLSB + kTParTSize - 1;
-constexpr unsigned int kTParZ0LSB = kTParTMSB + 1;
-constexpr unsigned int kTParZ0MSB = kTParZ0LSB + kTParZ0Size - 1;
-constexpr unsigned int kTParPhi0LSB = kTParZ0MSB + 1;
-constexpr unsigned int kTParPhi0MSB = kTParPhi0LSB + kTParPhi0Size - 1;
-constexpr unsigned int kTParRinvLSB = kTParPhi0MSB + 1;
-constexpr unsigned int kTParRinvMSB = kTParRinvLSB + kTParRinvSize - 1;
-constexpr unsigned int kTParStubIndexOuterLSB = kTParRinvMSB + 1;
-constexpr unsigned int kTParStubIndexOuterMSB = kTParStubIndexOuterLSB + kNBits_MemAddr - 1;
-constexpr unsigned int kTParStubIndexInnerLSB = kTParStubIndexOuterLSB + 1;
-constexpr unsigned int kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1;
-
 // Data object definition
 class TrackletParameters
 {
 public:
+
+  enum BitWidths {
+    // Bit sizes for TrackletParameterMemory fields
+    kTParRinvSize = 14, //rinv
+    kTParPhi0Size = 18, //phi0
+    kTParZ0Size = 10, //z0
+    kTParTSize = 14, //t
+    // Bit size for full TrackletParameterMemory
+    kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletParameterMemory word for different fields
+    kTParTLSB = 0,
+    kTParTMSB = kTParTLSB + kTParTSize - 1,
+    kTParZ0LSB = kTParTMSB + 1,
+    kTParZ0MSB = kTParZ0LSB + kTParZ0Size - 1,
+    kTParPhi0LSB = kTParZ0MSB + 1,
+    kTParPhi0MSB = kTParPhi0LSB + kTParPhi0Size - 1,
+    kTParRinvLSB = kTParPhi0MSB + 1,
+    kTParRinvMSB = kTParRinvLSB + kTParRinvSize - 1,
+    kTParStubIndexOuterLSB = kTParRinvMSB + 1,
+    kTParStubIndexOuterMSB = kTParStubIndexOuterLSB + kNBits_MemAddr - 1,
+    kTParStubIndexInnerLSB = kTParStubIndexOuterLSB + 1,
+    kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1
+  };
 
   typedef ap_uint<kNBits_MemAddr> STUBINDEX;
   typedef ap_int<kTParTSize> TPAR;

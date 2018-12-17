@@ -4,29 +4,32 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for AllStubMemory fields
-constexpr unsigned int kASBendSize = 3;
-constexpr unsigned int kASPhiSize = 14;
-constexpr unsigned int kASZSize = 12;
-constexpr unsigned int kASRSize = 7;
-// Bit size for full AllStubMemory
-constexpr unsigned int kAllStubSize = kASBendSize + kASPhiSize + kASZSize + kASRSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubMemory word for different fields
-constexpr unsigned int kASBendLSB = 0;
-constexpr unsigned int kASBendMSB = kASBendLSB + kASBendSize - 1;
-constexpr unsigned int kASPhiLSB = kASBendMSB + 1;
-constexpr unsigned int kASPhiMSB = kASPhiLSB + kASPhiSize - 1;
-constexpr unsigned int kASZLSB = kASPhiMSB + 1;
-constexpr unsigned int kASZMSB = kASZLSB + kASZSize - 1;
-constexpr unsigned int kASRLSB = kASZMSB + 1;
-constexpr unsigned int kASRMSB = kASRLSB + kASRSize - 1;
-
 // Data object definition
 class AllStub
 {
 public:
 
+  enum BitWidths {
+    // Bit size for AllStubMemory fields
+    kASBendSize = 3,
+    kASPhiSize = 14,
+    kASZSize = 12,
+    kASRSize = 7,
+    // Bit size for full AllStubMemory
+    kAllStubSize = kASBendSize + kASPhiSize + kASZSize + kASRSize
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubMemory word for different fields
+    kASBendLSB = 0,
+    kASBendMSB = kASBendLSB + kASBendSize - 1,
+    kASPhiLSB = kASBendMSB + 1,
+    kASPhiMSB = kASPhiLSB + kASPhiSize - 1,
+    kASZLSB = kASPhiMSB + 1,
+    kASZMSB = kASZLSB + kASZSize - 1,
+    kASRLSB = kASZMSB + 1,
+    kASRMSB = kASRLSB + kASRSize - 1
+  };
+  
   typedef ap_uint<kASRSize> ASR;
   typedef ap_int<kASZSize> ASZ;
   typedef ap_uint<kASPhiSize> ASPHI;

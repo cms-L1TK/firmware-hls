@@ -4,28 +4,31 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for InputStubMemory fields
-constexpr unsigned int kISBendSize = 3;
-constexpr unsigned int kISPhiSize = 14;
-constexpr unsigned int kISZSize = 12;
-constexpr unsigned int kISRSize = 7;
-// Bit size for full InputStubMemory
-constexpr unsigned int kInputStubSize = kISBendSize + kISPhiSize + kISZSize + kISRSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
-constexpr unsigned int kISBendLSB = 0;
-constexpr unsigned int kISBendMSB = kISBendLSB + kISBendSize - 1;
-constexpr unsigned int kISPhiLSB = kISBendMSB + 1;
-constexpr unsigned int kISPhiMSB = kISPhiLSB + kISPhiSize - 1;
-constexpr unsigned int kISZLSB = kISPhiMSB + 1;
-constexpr unsigned int kISZMSB = kISZLSB + kISZSize - 1;
-constexpr unsigned int kISRLSB = kISZMSB + 1;
-constexpr unsigned int kISRMSB = kISRLSB + kISRSize - 1;
-
 // Data object definition
 class InputStub
 {
 public:
+
+  enum BitWidths {
+    // Bit size for InputStubMemory fields
+    kISBendSize = 3,
+    kISPhiSize = 14,
+    kISZSize = 12,
+    kISRSize = 7,
+    // Bit size for full InputStubMemory
+    kInputStubSize = kISBendSize + kISPhiSize + kISZSize + kISRSize
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
+    kISBendLSB = 0,
+    kISBendMSB = kISBendLSB + kISBendSize - 1,
+    kISPhiLSB = kISBendMSB + 1,
+    kISPhiMSB = kISPhiLSB + kISPhiSize - 1,
+    kISZLSB = kISPhiMSB + 1,
+    kISZMSB = kISZLSB + kISZSize - 1,
+    kISRLSB = kISZMSB + 1,
+    kISRMSB = kISRLSB + kISRSize - 1
+  };
 
   typedef ap_uint<kISRSize> ISR;
   typedef ap_int<kISZSize> ISZ;
