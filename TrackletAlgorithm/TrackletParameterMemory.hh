@@ -43,6 +43,10 @@ public:
   typedef ap_uint<kTrackletParameterSize> TrackletParameterData;
 	
   // Constructors
+  TrackletParameters(const TrackletParameterData& newdata):
+    data_(newdata)
+  {}
+
   TrackletParameters(const STUBINDEX id1, const STUBINDEX id2, const RINVPAR rinv, const PHI0PAR phi0, const Z0PAR z0, const TPAR t):
     data_( (((((id1,id2),rinv),phi0),z0),t) )
   {}
