@@ -17,9 +17,8 @@ void TC_L1L2 (
   const TC_zmean zproj1_wire,
   const TC_zmean zproj2_wire,
   const TC_zmean zproj3_wire,
-  const TC_zmean zproj4_wire,
 
-  TrackletParameters::RINVPAR * const rinv_final_wire,
+  TC_rinv * const rinv_final_wire,
   TrackletParameters::PHI0PAR * const phi0_final_wire,
   TrackletParameters::TPAR * const t_final_wire,
   TrackletParameters::Z0PAR * const z0_final_wire,
@@ -37,41 +36,17 @@ void TC_L1L2 (
   TC_phiD * const phiD_1_final_wire,
   TC_phiD * const phiD_2_final_wire,
   TC_phiD * const phiD_3_final_wire,
-  TC_phiD * const phiD_4_final_wire,
   TC_rD * const rD_0_final_wire,
   TC_rD * const rD_1_final_wire,
   TC_rD * const rD_2_final_wire,
   TC_rD * const rD_3_final_wire,
-  TC_rD * const rD_4_final_wire,
   TC_der_phiD * const der_phiD_final_wire,
-  TC_der_rD * const der_rD_final_wire,
-  TC_flag * const valid_trackpar_wire,
-  TC_flag * const valid_phiL_0_wire,
-  TC_flag * const valid_phiL_1_wire,
-  TC_flag * const valid_phiL_2_wire,
-  TC_flag * const valid_phiL_3_wire,
-  TC_flag * const valid_zL_0_wire,
-  TC_flag * const valid_zL_1_wire,
-  TC_flag * const valid_zL_2_wire,
-  TC_flag * const valid_zL_3_wire,
-  TC_flag * const valid_der_phiL_wire,
-  TC_flag * const valid_der_zL_wire,
-  TC_flag * const valid_phiD_0_wire,
-  TC_flag * const valid_phiD_1_wire,
-  TC_flag * const valid_phiD_2_wire,
-  TC_flag * const valid_phiD_3_wire,
-  TC_flag * const valid_phiD_4_wire,
-  TC_flag * const valid_rD_0_wire,
-  TC_flag * const valid_rD_1_wire,
-  TC_flag * const valid_rD_2_wire,
-  TC_flag * const valid_rD_3_wire,
-  TC_flag * const valid_rD_4_wire,
-  TC_flag * const valid_der_phiD_wire,
-  TC_flag * const valid_der_rD_wire
+  TC_der_rD * const der_rD_final_wire
 )
 {
 #pragma HLS pipeline II=1
 #pragma HLS latency max=25 min=25
+
 
 //
 // calculating rinv_final
@@ -157,14 +132,14 @@ const ap_int<18> a2n = -a2;
 //
 // STEP 10
 
-// 18 bits 	 2^(-11)Kphi^(1)Kr^(-1)	1.30472e-07
+// 18 bits 	 2^(-12)Kphi^(1)Kr^(-1)	6.52359e-08
 const ap_int<34> rinv_tmp = a2n * delta0;
-const ap_int<18> rinv = rinv_tmp >> 15;
+const ap_int<19> rinv = rinv_tmp >> 15;
 //
 // STEP 11
 
-// 13 bits 	 2^(-6)Kphi^(1)Kr^(-1)	4.1751e-06
-const ap_int<14> rinv_final = rinv >> 4;
+// 14 bits 	 2^(-8)Kphi^(1)Kr^(-1)	1.04377e-06
+const ap_int<15> rinv_final = rinv >> 4;
 
 //
 // calculating phi0_final
@@ -200,21 +175,21 @@ const ap_int<18> x4 = x4_tmp >> 14;
 //
 // STEP 6
 
-// 18 bits 	 2^(13)Kphi^(2)Kr^(0)	5.02025e-07
-const ap_int<30> x6a_tmp = delta2 * x4;
-const ap_int<18> x6a = x6a_tmp >> 12;
+// 18 bits 	 2^(12)Kphi^(2)Kr^(0)	2.51012e-07
+const ap_int<29> x6a_tmp = delta2 * x4;
+const ap_int<18> x6a = x6a_tmp >> 11;
 //
 // STEP 7
 
-// 18 bits 	 2^(-20)	9.53674e-07
+// 18 bits 	 2^(-21)	4.76837e-07
 const ap_int<35> x6b_tmp = (x6a * 68997);
 const ap_int<18> x6b = x6b_tmp >> 17;
 //
 // STEP 8
 
 // 18 bits 	 2^(-15)	3.05176e-05
-const ap_int<23> x6m_tmp = (ap_int<23>(minus1)<<12) + x6b;
-const ap_int<18> x6m = x6m_tmp >> 5;
+const ap_int<24> x6m_tmp = (ap_int<24>(minus1)<<13) + x6b;
+const ap_int<18> x6m = x6m_tmp >> 6;
 //
 // STEP 9
 
@@ -314,13 +289,13 @@ const ap_int<18> z0a = z0a_tmp >> 8;
 //
 // STEP 6
 
-// 16 bits 	 2^(-5)Kz^(1)	0.00183105
-const ap_int<16> z0 = (ap_int<16>(z1)<<5) - z0a;
+// 15 bits 	 2^(-5)Kz^(1)	0.00183105
+const ap_int<15> z0 = (ap_int<15>(z1)<<5) - z0a;
 //
 // STEP 7
 
-// 11 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<11> z0_final = ( (z0>>4)+1)>>1;
+// 10 bits 	 2^(0)Kz^(1)	0.0585938
+const ap_int<10> z0_final = ( (z0>>4)+1)>>1;
 
 //
 // calculating phiL_0_final
@@ -398,15 +373,15 @@ const ap_int<18> x10_0 = x10_0_tmp >> 2;
 //
 // STEP 15
 
-// 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.8283e-06
-const ap_int<33> x22_0_tmp = x8_0 * x10_0;
-const ap_int<18> x22_0 = x22_0_tmp >> 15;
+// 18 bits 	 2^(-1)Kphi^(1)Kr^(0)	3.91415e-06
+const ap_int<32> x22_0_tmp = x8_0 * x10_0;
+const ap_int<18> x22_0 = x22_0_tmp >> 14;
 //
 // STEP 16
 
 // 19 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<20> phiL_0_tmp = (ap_int<20>(phi0_final)<<1) - x22_0;
-const ap_int<19> phiL_0 = phiL_0_tmp >> 1;
+const ap_int<21> phiL_0_tmp = (ap_int<21>(phi0_final)<<2) - x22_0;
+const ap_int<19> phiL_0 = phiL_0_tmp >> 2;
 //
 // STEP 17
 
@@ -484,15 +459,15 @@ const ap_int<18> x10_1 = x10_1_tmp >> 2;
 //
 // STEP 15
 
-// 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.8283e-06
-const ap_int<33> x22_1_tmp = x8_1 * x10_1;
-const ap_int<18> x22_1 = x22_1_tmp >> 15;
+// 18 bits 	 2^(-1)Kphi^(1)Kr^(0)	3.91415e-06
+const ap_int<32> x22_1_tmp = x8_1 * x10_1;
+const ap_int<18> x22_1 = x22_1_tmp >> 14;
 //
 // STEP 16
 
 // 19 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<20> phiL_1_tmp = (ap_int<20>(phi0_final)<<1) - x22_1;
-const ap_int<19> phiL_1 = phiL_1_tmp >> 1;
+const ap_int<21> phiL_1_tmp = (ap_int<21>(phi0_final)<<2) - x22_1;
+const ap_int<19> phiL_1 = phiL_1_tmp >> 2;
 //
 // STEP 17
 
@@ -570,15 +545,15 @@ const ap_int<18> x10_2 = x10_2_tmp >> 2;
 //
 // STEP 15
 
-// 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.8283e-06
-const ap_int<33> x22_2_tmp = x8_2 * x10_2;
-const ap_int<18> x22_2 = x22_2_tmp >> 15;
+// 18 bits 	 2^(-1)Kphi^(1)Kr^(0)	3.91415e-06
+const ap_int<32> x22_2_tmp = x8_2 * x10_2;
+const ap_int<18> x22_2 = x22_2_tmp >> 14;
 //
 // STEP 16
 
 // 19 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<20> phiL_2_tmp = (ap_int<20>(phi0_final)<<1) - x22_2;
-const ap_int<19> phiL_2 = phiL_2_tmp >> 1;
+const ap_int<21> phiL_2_tmp = (ap_int<21>(phi0_final)<<2) - x22_2;
+const ap_int<19> phiL_2 = phiL_2_tmp >> 2;
 //
 // STEP 17
 
@@ -656,15 +631,15 @@ const ap_int<18> x10_3 = x10_3_tmp >> 2;
 //
 // STEP 15
 
-// 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.8283e-06
-const ap_int<33> x22_3_tmp = x8_3 * x10_3;
-const ap_int<18> x22_3 = x22_3_tmp >> 15;
+// 18 bits 	 2^(-1)Kphi^(1)Kr^(0)	3.91415e-06
+const ap_int<32> x22_3_tmp = x8_3 * x10_3;
+const ap_int<18> x22_3 = x22_3_tmp >> 14;
 //
 // STEP 16
 
 // 19 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<20> phiL_3_tmp = (ap_int<20>(phi0_final)<<1) - x22_3;
-const ap_int<19> phiL_3 = phiL_3_tmp >> 1;
+const ap_int<21> phiL_3_tmp = (ap_int<21>(phi0_final)<<2) - x22_3;
+const ap_int<19> phiL_3 = phiL_3_tmp >> 2;
 //
 // STEP 17
 
@@ -725,20 +700,20 @@ const ap_int<18> x11_0 = x11_0_tmp >> 13;
 //
 // STEP 15
 
-// 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
+// 18 bits 	 2^(-5)Kr^(0)Kz^(1)	0.00183105
 const ap_int<31> x23_0_tmp = x11_0 * x10_0;
-const ap_int<18> x23_0 = x23_0_tmp >> 13;
+const ap_int<19> x23_0 = x23_0_tmp >> 12;
 //
 // STEP 16
 
-// 18 bits 	 2^(-3)Kz^(1)	0.00732422
-const ap_int<20> zL_0_tmp = z0 + (ap_int<20>(x23_0)<<1);
-const ap_int<18> zL_0 = zL_0_tmp >> 2;
+// 18 bits 	 2^(-4)Kz^(1)	0.00366211
+const ap_int<19> zL_0_tmp = z0 + x23_0;
+const ap_int<18> zL_0 = zL_0_tmp >> 1;
 //
 // STEP 17
 
-// 15 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<15> zL_0_final = ( (zL_0>>2)+1)>>1;
+// 14 bits 	 2^(0)Kz^(1)	0.0585938
+const ap_int<14> zL_0_final = ( (zL_0>>3)+1)>>1;
 
 //
 // calculating zL_1_final
@@ -794,20 +769,20 @@ const ap_int<18> x11_1 = x11_1_tmp >> 13;
 //
 // STEP 15
 
-// 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
+// 18 bits 	 2^(-5)Kr^(0)Kz^(1)	0.00183105
 const ap_int<31> x23_1_tmp = x11_1 * x10_1;
-const ap_int<18> x23_1 = x23_1_tmp >> 13;
+const ap_int<19> x23_1 = x23_1_tmp >> 12;
 //
 // STEP 16
 
-// 18 bits 	 2^(-3)Kz^(1)	0.00732422
-const ap_int<20> zL_1_tmp = z0 + (ap_int<20>(x23_1)<<1);
-const ap_int<18> zL_1 = zL_1_tmp >> 2;
+// 18 bits 	 2^(-4)Kz^(1)	0.00366211
+const ap_int<19> zL_1_tmp = z0 + x23_1;
+const ap_int<18> zL_1 = zL_1_tmp >> 1;
 //
 // STEP 17
 
-// 15 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<15> zL_1_final = ( (zL_1>>2)+1)>>1;
+// 14 bits 	 2^(0)Kz^(1)	0.0585938
+const ap_int<14> zL_1_final = ( (zL_1>>3)+1)>>1;
 
 //
 // calculating zL_2_final
@@ -863,20 +838,20 @@ const ap_int<18> x11_2 = x11_2_tmp >> 13;
 //
 // STEP 15
 
-// 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
+// 18 bits 	 2^(-5)Kr^(0)Kz^(1)	0.00183105
 const ap_int<31> x23_2_tmp = x11_2 * x10_2;
-const ap_int<18> x23_2 = x23_2_tmp >> 13;
+const ap_int<19> x23_2 = x23_2_tmp >> 12;
 //
 // STEP 16
 
-// 18 bits 	 2^(-3)Kz^(1)	0.00732422
-const ap_int<20> zL_2_tmp = z0 + (ap_int<20>(x23_2)<<1);
-const ap_int<18> zL_2 = zL_2_tmp >> 2;
+// 18 bits 	 2^(-4)Kz^(1)	0.00366211
+const ap_int<19> zL_2_tmp = z0 + x23_2;
+const ap_int<18> zL_2 = zL_2_tmp >> 1;
 //
 // STEP 17
 
-// 15 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<15> zL_2_final = ( (zL_2>>2)+1)>>1;
+// 14 bits 	 2^(0)Kz^(1)	0.0585938
+const ap_int<14> zL_2_final = ( (zL_2>>3)+1)>>1;
 
 //
 // calculating zL_3_final
@@ -932,20 +907,20 @@ const ap_int<18> x11_3 = x11_3_tmp >> 13;
 //
 // STEP 15
 
-// 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
+// 18 bits 	 2^(-5)Kr^(0)Kz^(1)	0.00183105
 const ap_int<31> x23_3_tmp = x11_3 * x10_3;
-const ap_int<18> x23_3 = x23_3_tmp >> 13;
+const ap_int<19> x23_3 = x23_3_tmp >> 12;
 //
 // STEP 16
 
-// 18 bits 	 2^(-3)Kz^(1)	0.00732422
-const ap_int<20> zL_3_tmp = z0 + (ap_int<20>(x23_3)<<1);
-const ap_int<18> zL_3 = zL_3_tmp >> 2;
+// 18 bits 	 2^(-4)Kz^(1)	0.00366211
+const ap_int<19> zL_3_tmp = z0 + x23_3;
+const ap_int<18> zL_3 = zL_3_tmp >> 1;
 //
 // STEP 17
 
-// 15 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<15> zL_3_final = ( (zL_3>>2)+1)>>1;
+// 14 bits 	 2^(0)Kz^(1)	0.0585938
+const ap_int<14> zL_3_final = ( (zL_3>>3)+1)>>1;
 
 //
 // calculating der_phiL_final
@@ -980,23 +955,14 @@ const ap_int<15> zL_3_final = ( (zL_3>>2)+1)>>1;
 //
 // STEP 9
 
+// 18 bits 	 2^(-10)Kphi^(1)Kr^(-1)	2.60943e-07
+const ap_int<35> der_phiL_tmp = x2 * a2;
+const ap_int<18> der_phiL = der_phiL_tmp >> 17;
 //
 // STEP 10
 
-//
-// STEP 11
-
-// 17 bits 	 2^(-11)Kphi^(1)Kr^(-1)	1.30472e-07
-const ap_int<17> x3 = rinv>>1;
-;
-// 17 bits 	 2^(-11)Kphi^(1)Kr^(-1)	1.30472e-07
-const ap_int<17> der_phiL = -x3;
-;
-//
-// STEP 12
-
-// 9 bits 	 2^(-3)Kphi^(1)Kr^(-1)	3.34008e-05
-const ap_int<9> der_phiL_final = der_phiL >> 8;
+// 13 bits 	 2^(-5)Kphi^(1)Kr^(-1)	8.35019e-06
+const ap_int<13> der_phiL_final = der_phiL >> 5;
 
 //
 // calculating der_zL_final
@@ -1047,7 +1013,7 @@ const ap_int<10> der_zL_final = t_final >> 3;
 // STEP 0
 
 // units 2^(0)Kz^(1)	0.0585938
-const ap_int<14> zproj0 = zproj0_wire;
+const ap_int<14> zproj0 = t > 0 ? ap_int<14>(zproj0_wire) : ap_int<14>(-zproj0_wire+1);
 //
 // STEP 1
 
@@ -1087,11 +1053,11 @@ const ap_int<18> x7 = x7_tmp >> 17;
 //
 // STEP 11
 
-static const ap_int<18> LUT_invt[4096] = {
+static const ap_int<20> LUT_invt[4096] = {
 #include "../emData/TC/TC_L1L2E/TC_L1L2_invt.tab"
 };
 const ap_uint<12> addr_invt = (t_final>>1) & 4095; // address for the LUT
-const ap_int<18> invt = LUT_invt[addr_invt];
+const ap_int<20> invt = LUT_invt[addr_invt];
 //
 // STEP 12
 
@@ -1099,19 +1065,20 @@ const ap_int<18> invt = LUT_invt[addr_invt];
 // STEP 13
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
-const ap_int<34> x13_0_tmp = x5_0 * invt;
-const ap_int<18> x13_0 = x13_0_tmp >> 16;
+const ap_int<36> x13_0_tmp = x5_0 * invt;
+const ap_int<18> x13_0 = x13_0_tmp >> 18;
 //
 // STEP 14
 
-// 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56566e-05
-const ap_int<32> x25_0_tmp = x13_0 * x7;
-const ap_int<18> x25_0 = x25_0_tmp >> 14;
+// 18 bits 	 2^(0)Kphi^(1)Kr^(0)Kz^(0)	7.8283e-06
+const ap_int<31> x25_0_tmp = x13_0 * x7;
+const ap_int<18> x25_0 = x25_0_tmp >> 13;
 //
 // STEP 15
 
 // 18 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<18> phiD_0 = phi0 + x25_0;
+const ap_int<19> phiD_0_tmp = (ap_int<19>(phi0)<<1) + x25_0;
+const ap_int<18> phiD_0 = phiD_0_tmp >> 1;
 //
 // STEP 16
 
@@ -1125,7 +1092,7 @@ const ap_int<16> phiD_0_final = phiD_0 >> 2;
 // STEP 0
 
 // units 2^(0)Kz^(1)	0.0585938
-const ap_int<14> zproj1 = zproj1_wire;
+const ap_int<14> zproj1 = t > 0 ? ap_int<14>(zproj1_wire) : ap_int<14>(-zproj1_wire+1);
 //
 // STEP 1
 
@@ -1169,19 +1136,20 @@ const ap_int<18> x5_1 = x5_1_tmp >> 2;
 // STEP 13
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
-const ap_int<34> x13_1_tmp = x5_1 * invt;
-const ap_int<18> x13_1 = x13_1_tmp >> 16;
+const ap_int<36> x13_1_tmp = x5_1 * invt;
+const ap_int<18> x13_1 = x13_1_tmp >> 18;
 //
 // STEP 14
 
-// 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56566e-05
-const ap_int<32> x25_1_tmp = x13_1 * x7;
-const ap_int<18> x25_1 = x25_1_tmp >> 14;
+// 18 bits 	 2^(0)Kphi^(1)Kr^(0)Kz^(0)	7.8283e-06
+const ap_int<31> x25_1_tmp = x13_1 * x7;
+const ap_int<18> x25_1 = x25_1_tmp >> 13;
 //
 // STEP 15
 
 // 18 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<18> phiD_1 = phi0 + x25_1;
+const ap_int<19> phiD_1_tmp = (ap_int<19>(phi0)<<1) + x25_1;
+const ap_int<18> phiD_1 = phiD_1_tmp >> 1;
 //
 // STEP 16
 
@@ -1195,7 +1163,7 @@ const ap_int<16> phiD_1_final = phiD_1 >> 2;
 // STEP 0
 
 // units 2^(0)Kz^(1)	0.0585938
-const ap_int<14> zproj2 = zproj2_wire;
+const ap_int<14> zproj2 = t > 0 ? ap_int<14>(zproj2_wire) : ap_int<14>(-zproj2_wire+1);
 //
 // STEP 1
 
@@ -1239,19 +1207,20 @@ const ap_int<18> x5_2 = x5_2_tmp >> 2;
 // STEP 13
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
-const ap_int<34> x13_2_tmp = x5_2 * invt;
-const ap_int<18> x13_2 = x13_2_tmp >> 16;
+const ap_int<36> x13_2_tmp = x5_2 * invt;
+const ap_int<18> x13_2 = x13_2_tmp >> 18;
 //
 // STEP 14
 
-// 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56566e-05
-const ap_int<32> x25_2_tmp = x13_2 * x7;
-const ap_int<18> x25_2 = x25_2_tmp >> 14;
+// 18 bits 	 2^(0)Kphi^(1)Kr^(0)Kz^(0)	7.8283e-06
+const ap_int<31> x25_2_tmp = x13_2 * x7;
+const ap_int<18> x25_2 = x25_2_tmp >> 13;
 //
 // STEP 15
 
 // 18 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<18> phiD_2 = phi0 + x25_2;
+const ap_int<19> phiD_2_tmp = (ap_int<19>(phi0)<<1) + x25_2;
+const ap_int<18> phiD_2 = phiD_2_tmp >> 1;
 //
 // STEP 16
 
@@ -1265,7 +1234,7 @@ const ap_int<16> phiD_2_final = phiD_2 >> 2;
 // STEP 0
 
 // units 2^(0)Kz^(1)	0.0585938
-const ap_int<14> zproj3 = zproj3_wire;
+const ap_int<14> zproj3 = t > 0 ? ap_int<14>(zproj3_wire) : ap_int<14>(-zproj3_wire+1);
 //
 // STEP 1
 
@@ -1309,94 +1278,25 @@ const ap_int<18> x5_3 = x5_3_tmp >> 2;
 // STEP 13
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
-const ap_int<34> x13_3_tmp = x5_3 * invt;
-const ap_int<18> x13_3 = x13_3_tmp >> 16;
+const ap_int<36> x13_3_tmp = x5_3 * invt;
+const ap_int<18> x13_3 = x13_3_tmp >> 18;
 //
 // STEP 14
 
-// 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56566e-05
-const ap_int<32> x25_3_tmp = x13_3 * x7;
-const ap_int<18> x25_3 = x25_3_tmp >> 14;
+// 18 bits 	 2^(0)Kphi^(1)Kr^(0)Kz^(0)	7.8283e-06
+const ap_int<31> x25_3_tmp = x13_3 * x7;
+const ap_int<18> x25_3 = x25_3_tmp >> 13;
 //
 // STEP 15
 
 // 18 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<18> phiD_3 = phi0 + x25_3;
+const ap_int<19> phiD_3_tmp = (ap_int<19>(phi0)<<1) + x25_3;
+const ap_int<18> phiD_3 = phiD_3_tmp >> 1;
 //
 // STEP 16
 
 // 16 bits 	 2^(3)Kphi^(1)	6.26264e-05
 const ap_int<16> phiD_3_final = phiD_3 >> 2;
-
-//
-// calculating phiD_4_final
-//
-//
-// STEP 0
-
-// units 2^(0)Kz^(1)	0.0585938
-const ap_int<14> zproj4 = zproj4_wire;
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-// 18 bits 	 2^(-3)Kz^(1)	0.00732422
-const ap_int<20> x5_4_tmp = (ap_int<20>(zproj4)<<5) - z0;
-const ap_int<18> x5_4 = x5_4_tmp >> 2;
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-// 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
-const ap_int<34> x13_4_tmp = x5_4 * invt;
-const ap_int<18> x13_4 = x13_4_tmp >> 16;
-//
-// STEP 14
-
-// 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56566e-05
-const ap_int<32> x25_4_tmp = x13_4 * x7;
-const ap_int<18> x25_4 = x25_4_tmp >> 14;
-//
-// STEP 15
-
-// 18 bits 	 2^(1)Kphi^(1)	1.56566e-05
-const ap_int<18> phiD_4 = phi0 + x25_4;
-//
-// STEP 16
-
-// 16 bits 	 2^(3)Kphi^(1)	6.26264e-05
-const ap_int<16> phiD_4_final = phiD_4 >> 2;
 
 //
 // calculating rD_0_final
@@ -1449,38 +1349,38 @@ const ap_int<16> phiD_4_final = phiD_4 >> 2;
 //
 // STEP 15
 
-// 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.42592e-05
+// 18 bits 	 2^(18)Kphi^(2)Kr^(0)Kz^(0)	1.60648e-05
 const ap_int<36> x26_0_tmp = x25_0 * x25_0;
 const ap_int<18> x26_0 = x26_0_tmp >> 18;
 //
 // STEP 16
 
-// 18 bits 	 2^(-13)	0.00012207
+// 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x26A_0_tmp = (x26_0 * 68997);
 const ap_int<18> x26A_0 = x26A_0_tmp >> 17;
 //
 // STEP 17
 
-// 18 bits 	 2^(-15)	3.05176e-05
+// 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x9_0_tmp = (x26A_0 * 87381);
 const ap_int<18> x9_0 = x9_0_tmp >> 17;
 //
 // STEP 18
 
-// 18 bits 	 2^(-14)	6.10352e-05
-const ap_int<19> x27_0_tmp = (ap_int<19>(plus1)<<7) - x9_0;
-const ap_int<18> x27_0 = x27_0_tmp >> 1;
+// 18 bits 	 2^(-15)	3.05176e-05
+const ap_int<20> x27_0_tmp = (ap_int<20>(plus1)<<9) - x9_0;
+const ap_int<18> x27_0 = x27_0_tmp >> 2;
 //
 // STEP 19
 
-// 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
+// 18 bits 	 2^(-4)Kr^(1)Kz^(0)	0.00183105
 const ap_int<32> rD_0_tmp = x13_0 * x27_0;
 const ap_int<18> rD_0 = rD_0_tmp >> 14;
 //
 // STEP 20
 
-// 14 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
-const ap_int<14> rD_0_final = rD_0 >> 4;
+// 13 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
+const ap_int<13> rD_0_final = rD_0 >> 5;
 
 //
 // calculating rD_1_final
@@ -1533,38 +1433,38 @@ const ap_int<14> rD_0_final = rD_0 >> 4;
 //
 // STEP 15
 
-// 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.42592e-05
+// 18 bits 	 2^(18)Kphi^(2)Kr^(0)Kz^(0)	1.60648e-05
 const ap_int<36> x26_1_tmp = x25_1 * x25_1;
 const ap_int<18> x26_1 = x26_1_tmp >> 18;
 //
 // STEP 16
 
-// 18 bits 	 2^(-13)	0.00012207
+// 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x26A_1_tmp = (x26_1 * 68997);
 const ap_int<18> x26A_1 = x26A_1_tmp >> 17;
 //
 // STEP 17
 
-// 18 bits 	 2^(-15)	3.05176e-05
+// 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x9_1_tmp = (x26A_1 * 87381);
 const ap_int<18> x9_1 = x9_1_tmp >> 17;
 //
 // STEP 18
 
-// 18 bits 	 2^(-14)	6.10352e-05
-const ap_int<19> x27_1_tmp = (ap_int<19>(plus1)<<7) - x9_1;
-const ap_int<18> x27_1 = x27_1_tmp >> 1;
+// 18 bits 	 2^(-15)	3.05176e-05
+const ap_int<20> x27_1_tmp = (ap_int<20>(plus1)<<9) - x9_1;
+const ap_int<18> x27_1 = x27_1_tmp >> 2;
 //
 // STEP 19
 
-// 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
+// 18 bits 	 2^(-4)Kr^(1)Kz^(0)	0.00183105
 const ap_int<32> rD_1_tmp = x13_1 * x27_1;
 const ap_int<18> rD_1 = rD_1_tmp >> 14;
 //
 // STEP 20
 
-// 14 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
-const ap_int<14> rD_1_final = rD_1 >> 4;
+// 13 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
+const ap_int<13> rD_1_final = rD_1 >> 5;
 
 //
 // calculating rD_2_final
@@ -1617,38 +1517,38 @@ const ap_int<14> rD_1_final = rD_1 >> 4;
 //
 // STEP 15
 
-// 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.42592e-05
+// 18 bits 	 2^(18)Kphi^(2)Kr^(0)Kz^(0)	1.60648e-05
 const ap_int<36> x26_2_tmp = x25_2 * x25_2;
 const ap_int<18> x26_2 = x26_2_tmp >> 18;
 //
 // STEP 16
 
-// 18 bits 	 2^(-13)	0.00012207
+// 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x26A_2_tmp = (x26_2 * 68997);
 const ap_int<18> x26A_2 = x26A_2_tmp >> 17;
 //
 // STEP 17
 
-// 18 bits 	 2^(-15)	3.05176e-05
+// 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x9_2_tmp = (x26A_2 * 87381);
 const ap_int<18> x9_2 = x9_2_tmp >> 17;
 //
 // STEP 18
 
-// 18 bits 	 2^(-14)	6.10352e-05
-const ap_int<19> x27_2_tmp = (ap_int<19>(plus1)<<7) - x9_2;
-const ap_int<18> x27_2 = x27_2_tmp >> 1;
+// 18 bits 	 2^(-15)	3.05176e-05
+const ap_int<20> x27_2_tmp = (ap_int<20>(plus1)<<9) - x9_2;
+const ap_int<18> x27_2 = x27_2_tmp >> 2;
 //
 // STEP 19
 
-// 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
+// 18 bits 	 2^(-4)Kr^(1)Kz^(0)	0.00183105
 const ap_int<32> rD_2_tmp = x13_2 * x27_2;
 const ap_int<18> rD_2 = rD_2_tmp >> 14;
 //
 // STEP 20
 
-// 14 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
-const ap_int<14> rD_2_final = rD_2 >> 4;
+// 13 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
+const ap_int<13> rD_2_final = rD_2 >> 5;
 
 //
 // calculating rD_3_final
@@ -1701,122 +1601,38 @@ const ap_int<14> rD_2_final = rD_2 >> 4;
 //
 // STEP 15
 
-// 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.42592e-05
+// 18 bits 	 2^(18)Kphi^(2)Kr^(0)Kz^(0)	1.60648e-05
 const ap_int<36> x26_3_tmp = x25_3 * x25_3;
 const ap_int<18> x26_3 = x26_3_tmp >> 18;
 //
 // STEP 16
 
-// 18 bits 	 2^(-13)	0.00012207
+// 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x26A_3_tmp = (x26_3 * 68997);
 const ap_int<18> x26A_3 = x26A_3_tmp >> 17;
 //
 // STEP 17
 
-// 18 bits 	 2^(-15)	3.05176e-05
+// 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x9_3_tmp = (x26A_3 * 87381);
 const ap_int<18> x9_3 = x9_3_tmp >> 17;
 //
 // STEP 18
 
-// 18 bits 	 2^(-14)	6.10352e-05
-const ap_int<19> x27_3_tmp = (ap_int<19>(plus1)<<7) - x9_3;
-const ap_int<18> x27_3 = x27_3_tmp >> 1;
+// 18 bits 	 2^(-15)	3.05176e-05
+const ap_int<20> x27_3_tmp = (ap_int<20>(plus1)<<9) - x9_3;
+const ap_int<18> x27_3 = x27_3_tmp >> 2;
 //
 // STEP 19
 
-// 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
+// 18 bits 	 2^(-4)Kr^(1)Kz^(0)	0.00183105
 const ap_int<32> rD_3_tmp = x13_3 * x27_3;
 const ap_int<18> rD_3 = rD_3_tmp >> 14;
 //
 // STEP 20
 
-// 14 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
-const ap_int<14> rD_3_final = rD_3 >> 4;
-
-//
-// calculating rD_4_final
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-// 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.42592e-05
-const ap_int<36> x26_4_tmp = x25_4 * x25_4;
-const ap_int<18> x26_4 = x26_4_tmp >> 18;
-//
-// STEP 16
-
-// 18 bits 	 2^(-13)	0.00012207
-const ap_int<35> x26A_4_tmp = (x26_4 * 68997);
-const ap_int<18> x26A_4 = x26A_4_tmp >> 17;
-//
-// STEP 17
-
-// 18 bits 	 2^(-15)	3.05176e-05
-const ap_int<35> x9_4_tmp = (x26A_4 * 87381);
-const ap_int<18> x9_4 = x9_4_tmp >> 17;
-//
-// STEP 18
-
-// 18 bits 	 2^(-14)	6.10352e-05
-const ap_int<19> x27_4_tmp = (ap_int<19>(plus1)<<7) - x9_4;
-const ap_int<18> x27_4 = x27_4_tmp >> 1;
-//
-// STEP 19
-
-// 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
-const ap_int<32> rD_4_tmp = x13_4 * x27_4;
-const ap_int<18> rD_4 = rD_4_tmp >> 14;
-//
-// STEP 20
-
-// 14 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
-const ap_int<14> rD_4_final = rD_4 >> 4;
+// 13 bits 	 2^(1)Kr^(1)Kz^(0)	0.0585938
+const ap_int<13> rD_3_final = rD_3 >> 5;
 
 //
 // calculating der_phiD_final
@@ -1863,14 +1679,14 @@ const ap_int<14> rD_4_final = rD_4 >> 4;
 //
 // STEP 13
 
-// 18 bits 	 2^(-11)Kphi^(1)Kr^(0)Kz^(-1)	6.52359e-08
-const ap_int<33> der_phiD_tmp = x7 * invt;
-const ap_int<18> der_phiD = der_phiD_tmp >> 15;
+// 18 bits 	 2^(-13)Kphi^(1)Kr^(0)Kz^(-1)	1.6309e-08
+const ap_int<34> der_phiD_tmp = x7 * invt;
+const ap_int<19> der_phiD = der_phiD_tmp >> 15;
 //
 // STEP 14
 
-// 10 bits 	 2^(-3)Kphi^(1)Kr^(0)Kz^(-1)	1.67004e-05
-const ap_int<10> der_phiD_final = der_phiD >> 8;
+// 8 bits 	 2^(-3)Kphi^(1)Kr^(0)Kz^(-1)	1.67004e-05
+const ap_int<10> der_phiD_final = der_phiD >> 10;
 
 //
 // calculating der_rD_final
@@ -1918,1313 +1734,7 @@ const ap_int<10> der_phiD_final = der_phiD >> 8;
 // STEP 13
 
 // 8 bits 	 2^(-6)Kr^(1)Kz^(-1)	0.0078125
-const ap_int<8> der_rD_final = invt >> 10;
-
-//
-// calculating valid_trackpar
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-const ap_int<1> valid_trackpar = (((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((z0a > -65536 && z0a < 65536)) && ((phi0 > -89180 && phi0 < 89180)) && ((rinv > -45986 && rinv < 45986)) && ((t > -40960 && t < 40960) || (t > -65536 && t < -16384) || (t > -65536 && t < 65536) || (t > 16384 && t < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((rinv_final > -1429 && rinv_final < 1429)) && ((z0_final > -256 && z0_final < 256)));
-//
-// calculating valid_phiL_0
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-const ap_int<1> valid_phiL_0 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((phi0 > -89180 && phi0 < 89180)) && ((x8_0 > -127741 && x8_0 < 127741)) && ((x22_0 > -38322 && x22_0 < 38322)));
-//
-// calculating valid_phiL_1
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-const ap_int<1> valid_phiL_1 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((phi0 > -89180 && phi0 < 89180)) && ((x8_1 > -127741 && x8_1 < 127741)) && ((x22_1 > -38322 && x22_1 < 38322)));
-//
-// calculating valid_phiL_2
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-const ap_int<1> valid_phiL_2 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((phi0 > -89180 && phi0 < 89180)) && ((x8_2 > -127741 && x8_2 < 127741)) && ((x22_2 > -38322 && x22_2 < 38322)));
-//
-// calculating valid_phiL_3
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-const ap_int<1> valid_phiL_3 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((phi0 > -89180 && phi0 < 89180)) && ((x8_3 > -127741 && x8_3 < 127741)) && ((x22_3 > -38322 && x22_3 < 38322)));
-//
-// calculating valid_zL_0
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-const ap_int<1> valid_zL_0 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x8_0 > -127741 && x8_0 < 127741)) && ((x23_0 > -54613 && x23_0 < 54613)));
-//
-// calculating valid_zL_1
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-const ap_int<1> valid_zL_1 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x8_1 > -127741 && x8_1 < 127741)) && ((x23_1 > -54613 && x23_1 < 54613)));
-//
-// calculating valid_zL_2
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-const ap_int<1> valid_zL_2 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x8_2 > -127741 && x8_2 < 127741)) && ((x23_2 > -54613 && x23_2 < 54613)));
-//
-// calculating valid_zL_3
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-const ap_int<1> valid_zL_3 = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x8_3 > -127741 && x8_3 < 127741)) && ((x23_3 > -54613 && x23_3 < 54613)));
-//
-// calculating valid_der_phiL
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-const ap_int<1> valid_der_phiL = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((rinv > -45986 && rinv < 45986)));
-//
-// calculating valid_der_zL
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-const ap_int<1> valid_der_zL = (((t > -40960 && t < 40960)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)));
-//
-// calculating valid_phiD_0
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-const ap_int<1> valid_phiD_0 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((z0a > -65536 && z0a < 65536)) && ((phi0 > -89180 && phi0 < 89180)) && ((z0 > -10922 && z0 < 10922)) && ((x13_0 > -81920 && x13_0 < 81920)) && ((x25_0 > -44590 && x25_0 < 44590)) && ((phiD_0 > -89180 && phiD_0 < 89180)));
-//
-// calculating valid_phiD_1
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-const ap_int<1> valid_phiD_1 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((z0a > -65536 && z0a < 65536)) && ((phi0 > -89180 && phi0 < 89180)) && ((z0 > -10922 && z0 < 10922)) && ((x13_1 > -81920 && x13_1 < 81920)) && ((x25_1 > -44590 && x25_1 < 44590)) && ((phiD_1 > -89180 && phiD_1 < 89180)));
-//
-// calculating valid_phiD_2
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-const ap_int<1> valid_phiD_2 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((z0a > -65536 && z0a < 65536)) && ((phi0 > -89180 && phi0 < 89180)) && ((z0 > -10922 && z0 < 10922)) && ((x13_2 > -81920 && x13_2 < 81920)) && ((x25_2 > -44590 && x25_2 < 44590)) && ((phiD_2 > -89180 && phiD_2 < 89180)));
-//
-// calculating valid_phiD_3
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-const ap_int<1> valid_phiD_3 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((z0a > -65536 && z0a < 65536)) && ((phi0 > -89180 && phi0 < 89180)) && ((z0 > -10922 && z0 < 10922)) && ((x13_3 > -81920 && x13_3 < 81920)) && ((x25_3 > -44590 && x25_3 < 44590)) && ((phiD_3 > -89180 && phiD_3 < 89180)));
-//
-// calculating valid_phiD_4
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-const ap_int<1> valid_phiD_4 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((x6a > -39838 && x6a < 39838)) && ((x6m > -65536 && x6m < 65536)) && ((phi0a > -89180 && phi0a < 89180)) && ((z0a > -65536 && z0a < 65536)) && ((phi0 > -89180 && phi0 < 89180)) && ((z0 > -10922 && z0 < 10922)) && ((x13_4 > -81920 && x13_4 < 81920)) && ((x25_4 > -44590 && x25_4 < 44590)) && ((phiD_4 > -89180 && phiD_4 < 89180)));
-//
-// calculating valid_rD_0
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-//
-// STEP 19
-
-//
-// STEP 20
-
-const ap_int<1> valid_rD_0 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x13_0 > -81920 && x13_0 < 81920)) && ((x25_0 > -44590 && x25_0 < 44590)) && ((rD_0 > -32768 && rD_0 < 32768)));
-//
-// calculating valid_rD_1
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-//
-// STEP 19
-
-//
-// STEP 20
-
-const ap_int<1> valid_rD_1 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x13_1 > -81920 && x13_1 < 81920)) && ((x25_1 > -44590 && x25_1 < 44590)) && ((rD_1 > -32768 && rD_1 < 32768)));
-//
-// calculating valid_rD_2
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-//
-// STEP 19
-
-//
-// STEP 20
-
-const ap_int<1> valid_rD_2 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x13_2 > -81920 && x13_2 < 81920)) && ((x25_2 > -44590 && x25_2 < 44590)) && ((rD_2 > -32768 && rD_2 < 32768)));
-//
-// calculating valid_rD_3
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-//
-// STEP 19
-
-//
-// STEP 20
-
-const ap_int<1> valid_rD_3 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x13_3 > -81920 && x13_3 < 81920)) && ((x25_3 > -44590 && x25_3 < 44590)) && ((rD_3 > -32768 && rD_3 < 32768)));
-//
-// calculating valid_rD_4
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-//
-// STEP 15
-
-//
-// STEP 16
-
-//
-// STEP 17
-
-//
-// STEP 18
-
-//
-// STEP 19
-
-//
-// STEP 20
-
-const ap_int<1> valid_rD_4 = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((z0a > -65536 && z0a < 65536)) && ((z0 > -10922 && z0 < 10922)) && ((x13_4 > -81920 && x13_4 < 81920)) && ((x25_4 > -44590 && x25_4 < 44590)) && ((rD_4 > -32768 && rD_4 < 32768)));
-//
-// calculating valid_der_phiD
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-//
-// STEP 14
-
-const ap_int<1> valid_der_phiD = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)) && ((der_phiD > -30657 && der_phiD < 30657)));
-//
-// calculating valid_der_rD
-//
-//
-// STEP 0
-
-//
-// STEP 1
-
-//
-// STEP 2
-
-//
-// STEP 3
-
-//
-// STEP 4
-
-//
-// STEP 5
-
-//
-// STEP 6
-
-//
-// STEP 7
-
-//
-// STEP 8
-
-//
-// STEP 9
-
-//
-// STEP 10
-
-//
-// STEP 11
-
-//
-// STEP 12
-
-//
-// STEP 13
-
-const ap_int<1> valid_der_rD = (((t > -65536 && t < -16384) || (t > 16384 && t < 65536)) && ((r1abs > -3911 && r1abs < 3911)) && ((r2abs > -3911 && r2abs < 3911)) && ((dphi > -22295 && dphi < 22295)) && ((dz > -853 && dz < 853)) && ((delta0 > -76644 && delta0 < 76644)) && ((a2a > -99596 && a2a < 99596)) && ((a2 > -98304 && a2 < 98304)));
-
+const ap_int<10> der_rD_final = invt >> 12;
 
 //
 // wiring the outputs 
@@ -3247,35 +1757,11 @@ const ap_int<1> valid_der_rD = (((t > -65536 && t < -16384) || (t > 16384 && t <
 *phiD_1_final_wire = phiD_1_final;
 *phiD_2_final_wire = phiD_2_final;
 *phiD_3_final_wire = phiD_3_final;
-*phiD_4_final_wire = phiD_4_final;
 *rD_0_final_wire = rD_0_final;
 *rD_1_final_wire = rD_1_final;
 *rD_2_final_wire = rD_2_final;
 *rD_3_final_wire = rD_3_final;
-*rD_4_final_wire = rD_4_final;
 *der_phiD_final_wire = der_phiD_final;
 *der_rD_final_wire = der_rD_final;
-*valid_trackpar_wire = valid_trackpar;
-*valid_phiL_0_wire = valid_phiL_0;
-*valid_phiL_1_wire = valid_phiL_1;
-*valid_phiL_2_wire = valid_phiL_2;
-*valid_phiL_3_wire = valid_phiL_3;
-*valid_zL_0_wire = valid_zL_0;
-*valid_zL_1_wire = valid_zL_1;
-*valid_zL_2_wire = valid_zL_2;
-*valid_zL_3_wire = valid_zL_3;
-*valid_der_phiL_wire = valid_der_phiL;
-*valid_der_zL_wire = valid_der_zL;
-*valid_phiD_0_wire = valid_phiD_0;
-*valid_phiD_1_wire = valid_phiD_1;
-*valid_phiD_2_wire = valid_phiD_2;
-*valid_phiD_3_wire = valid_phiD_3;
-*valid_phiD_4_wire = valid_phiD_4;
-*valid_rD_0_wire = valid_rD_0;
-*valid_rD_1_wire = valid_rD_1;
-*valid_rD_2_wire = valid_rD_2;
-*valid_rD_3_wire = valid_rD_3;
-*valid_rD_4_wire = valid_rD_4;
-*valid_der_phiD_wire = valid_der_phiD;
-*valid_der_rD_wire = valid_der_rD;
+
 }
