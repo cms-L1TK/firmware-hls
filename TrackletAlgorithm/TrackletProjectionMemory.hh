@@ -4,31 +4,34 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for TrackletProjectionMemory fields
-constexpr unsigned int kTProjZDSize = 10;
-constexpr unsigned int kTProjPhiDSize = 10;
-constexpr unsigned int kTProjZSize = 12;
-constexpr unsigned int kTProjPhiSize = 14;
-constexpr unsigned int kTProjTCIndexSize = 14;
-// Bit size for full TrackletProjectionMemory
-constexpr unsigned int kTrackletProjectionSize = kTProjTCIndexSize + kTProjPhiSize + kTProjZSize + kTProjPhiDSize + kTProjZDSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletProjectionMemory word for different fields
-constexpr unsigned int kTProjZDLSB = 0;
-constexpr unsigned int kTProjZDMSB = kTProjZDLSB + kTProjZDSize - 1;
-constexpr unsigned int kTProjPhiDLSB = kTProjZDMSB + 1;
-constexpr unsigned int kTProjPhiDMSB = kTProjPhiDLSB + kTProjPhiDSize - 1;
-constexpr unsigned int kTProjZLSB = kTProjPhiDMSB + 1;
-constexpr unsigned int kTProjZMSB = kTProjZLSB + kTProjZSize - 1;
-constexpr unsigned int kTProjPhiLSB = kTProjZMSB + 1;
-constexpr unsigned int kTProjPhiMSB = kTProjPhiLSB + kTProjPhiSize - 1;
-constexpr unsigned int kTProjTCIndexLSB = kTProjPhiMSB + 1;
-constexpr unsigned int kTProjTCIndexMSB = kTProjTCIndexLSB + kTProjTCIndexSize - 1;
-
 // Data object definition
 class TrackletProjection
 {
 public:
+
+  enum BitWidths {
+    // Bit size for TrackletProjectionMemory fields
+    kTProjZDSize = 10,
+    kTProjPhiDSize = 10,
+    kTProjZSize = 12,
+    kTProjPhiSize = 14,
+    kTProjTCIndexSize = 14,
+    // Bit size for full TrackletProjectionMemory
+    kTrackletProjectionSize = kTProjTCIndexSize + kTProjPhiSize + kTProjZSize + kTProjPhiDSize + kTProjZDSize
+  };
+  enum BitProjections {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletProjectionMemory word for different fields
+    kTProjZDLSB = 0,
+    kTProjZDMSB = kTProjZDLSB + kTProjZDSize - 1,
+    kTProjPhiDLSB = kTProjZDMSB + 1,
+    kTProjPhiDMSB = kTProjPhiDLSB + kTProjPhiDSize - 1,
+    kTProjZLSB = kTProjPhiDMSB + 1,
+    kTProjZMSB = kTProjZLSB + kTProjZSize - 1,
+    kTProjPhiLSB = kTProjZMSB + 1,
+    kTProjPhiMSB = kTProjPhiLSB + kTProjPhiSize - 1,
+    kTProjTCIndexLSB = kTProjPhiMSB + 1,
+    kTProjTCIndexMSB = kTProjTCIndexLSB + kTProjTCIndexSize - 1
+  };
 
   typedef ap_uint<kTProjTCIndexSize> TProjTCID;
   typedef ap_uint<kTProjPhiSize> TProjPHI;
@@ -42,12 +45,6 @@ public:
   TrackletProjection(const TrackletProjectionData& newdata):
     data_(newdata)
   {}
-
-  /*
-  TrackletProjection(const bool plusneighbor, const bool minusneighbor, const TProjTCID tcid, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjZDER zder):
-    data_( ((((((plusneighbor,minusneighbor),tcid),phi),z),phider),zder) )
-  {}
-  */
 
   TrackletProjection(const TProjTCID tcid, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjZDER zder):
     data_( ((((tcid,phi),z),phider),zder) )
@@ -68,16 +65,6 @@ public:
   // Getter
   TrackletProjectionData raw() const {return data_;}
 
-  /*
-  bool getIsPlusNeighbor() const {
-    return data_.range(kTProjIsPlusNeighborLSB,kTProjIsPlusNeighborLSB);
-  }
-  
-  bool getIsMinusNeighbor() const {
-    return data_.range(kTProjIsMinusNeighborLSB,kTProjIsMinusNeighborLSB);
-  }
-  */  
-
   TProjTCID getTrackletIndex() const {
     return data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB);
   }
@@ -97,17 +84,6 @@ public:
   TProjZDER getZDer() {
     return data_.range(kTProjZDMSB,kTProjZDLSB);
   }
-
-  // Setter
-  /*
-  void setIsPlusNeighbor(const bool isplusneighbor) {
-    data_.range(kTProjIsPlusNeighborLSB,kTProjIsPlusNeighborLSB) = isplusneighbor;
-  }
-
-  void setIsMinusNeighbor(const bool isminusneighbor) {
-    data_.range(kTProjIsMinusNeighborLSB,kTProjIsMinusNeighborLSB) = isminusneighbor;
-  }
-  */
 
   void setTrackletIndex(const TProjTCID id) {
     data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB) = id;

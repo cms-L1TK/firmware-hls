@@ -4,20 +4,23 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for full StubPairMemory
-constexpr unsigned int kStubPairSize = 2*kNBits_MemAddr;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the StubPairMemory word for different fields
-constexpr unsigned int kSPOuterIndexLSB = 0;
-constexpr unsigned int kSPOuterIndexMSB = kSPOuterIndexLSB + kNBits_MemAddr - 1;
-constexpr unsigned int kSPInnerIndexLSB = kSPOuterIndexMSB + 1;
-constexpr unsigned int kSPInnerIndexMSB = kSPInnerIndexLSB + kNBits_MemAddr - 1;
-
 // Data object definition
 class StubPair
 {
 public:
-  
+
+  enum BitWidths {
+    // Bit size for full StubPairMemory
+    kStubPairSize = 2*kNBits_MemAddr
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the StubPairMemory word for different fields
+    kSPOuterIndexLSB = 0,
+    kSPOuterIndexMSB = kSPOuterIndexLSB + kNBits_MemAddr - 1,
+    kSPInnerIndexLSB = kSPOuterIndexMSB + 1,
+    kSPInnerIndexMSB = kSPInnerIndexLSB + kNBits_MemAddr - 1
+  };
+    
   typedef ap_uint<kNBits_MemAddr> SPInnerIndex;
   typedef ap_uint<kNBits_MemAddr> SPOuterIndex;
 
