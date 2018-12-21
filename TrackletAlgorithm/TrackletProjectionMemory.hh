@@ -4,50 +4,116 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Data object definition
-class TrackletProjection
+enum tProjType {INNER, OUTER, DISK};
+
+// TrackletProjectionBase is where we define the bit widths, which depend on
+// the class template parameter.
+template<tProjType TProjType>
+class TrackletProjectionBase
 {
 public:
-
   enum BitWidths {
     // Bit size for TrackletProjectionMemory fields
-    kTProjZDSize = 10,
-    kTProjPhiDSize = 10,
-    kTProjZSize = 12,
-    kTProjPhiSize = 14,
-    kTProjTCIndexSize = 14,
+    kTProjRZDSize = 0,
+    kTProjPhiDSize = 0,
+    kTProjRZSize = 0,
+    kTProjPhiSize = 0,
+    kTProjTCIDSize = 0,
+    kTProjTrackletIndexSize = 0,
     // Bit size for full TrackletProjectionMemory
-    kTrackletProjectionSize = kTProjTCIndexSize + kTProjPhiSize + kTProjZSize + kTProjPhiDSize + kTProjZDSize
+    kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
   };
+};
+
+template<>
+class TrackletProjectionBase<INNER>
+{
+public:
+  enum BitWidths {
+    // Bit size for TrackletProjectionMemory fields
+    kTProjRZDSize = 10,
+    kTProjPhiDSize = 10,
+    kTProjRZSize = 12,
+    kTProjPhiSize = 14,
+    kTProjTCIDSize = 7,
+    kTProjTrackletIndexSize = 7,
+    // Bit size for full TrackletProjectionMemory
+    kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
+  };
+};
+
+template<>
+class TrackletProjectionBase<OUTER>
+{
+public:
+  enum BitWidths {
+    // Bit size for TrackletProjectionMemory fields
+    kTProjRZDSize = 9,
+    kTProjPhiDSize = 10,
+    kTProjRZSize = 8,
+    kTProjPhiSize = 17,
+    kTProjTCIDSize = 7,
+    kTProjTrackletIndexSize = 7,
+    // Bit size for full TrackletProjectionMemory
+    kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
+  };
+};
+
+template<>
+class TrackletProjectionBase<DISK>
+{
+public:
+  enum BitWidths {
+    // Bit size for TrackletProjectionMemory fields
+    kTProjRZDSize = 9,
+    kTProjPhiDSize = 10,
+    kTProjRZSize = 12,
+    kTProjPhiSize = 14,
+    kTProjTCIDSize = 7,
+    kTProjTrackletIndexSize = 7,
+    // Bit size for full TrackletProjectionMemory
+    kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
+  };
+};
+
+
+// Data object definition
+template<tProjType TProjType>
+class TrackletProjection : public TrackletProjectionBase<TProjType>
+{
+public:
   enum BitProjections {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletProjectionMemory word for different fields
-    kTProjZDLSB = 0,
-    kTProjZDMSB = kTProjZDLSB + kTProjZDSize - 1,
-    kTProjPhiDLSB = kTProjZDMSB + 1,
-    kTProjPhiDMSB = kTProjPhiDLSB + kTProjPhiDSize - 1,
-    kTProjZLSB = kTProjPhiDMSB + 1,
-    kTProjZMSB = kTProjZLSB + kTProjZSize - 1,
-    kTProjPhiLSB = kTProjZMSB + 1,
-    kTProjPhiMSB = kTProjPhiLSB + kTProjPhiSize - 1,
-    kTProjTCIndexLSB = kTProjPhiMSB + 1,
-    kTProjTCIndexMSB = kTProjTCIndexLSB + kTProjTCIndexSize - 1
+    kTProjRZDLSB = 0,
+    kTProjRZDMSB = kTProjRZDLSB + TrackletProjectionBase<TProjType>::kTProjRZDSize - 1,
+    kTProjPhiDLSB = kTProjRZDMSB + 1,
+    kTProjPhiDMSB = kTProjPhiDLSB + TrackletProjectionBase<TProjType>::kTProjPhiDSize - 1,
+    kTProjRZLSB = kTProjPhiDMSB + 1,
+    kTProjRZMSB = kTProjRZLSB + TrackletProjectionBase<TProjType>::kTProjRZSize - 1,
+    kTProjPhiLSB = kTProjRZMSB + 1,
+    kTProjPhiMSB = kTProjPhiLSB + TrackletProjectionBase<TProjType>::kTProjPhiSize - 1,
+    kTProjTrackletIndexLSB = kTProjPhiMSB + 1,
+    kTProjTrackletIndexMSB = kTProjTrackletIndexLSB + TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize - 1,
+    kTProjTCIDLSB = kTProjTrackletIndexMSB + 1,
+    kTProjTCIDMSB = kTProjTCIDLSB + TrackletProjectionBase<TProjType>::kTProjTCIDSize - 1
   };
 
-  typedef ap_uint<kTProjTCIndexSize> TProjTCID;
-  typedef ap_uint<kTProjPhiSize> TProjPHI;
-  typedef ap_int<kTProjZSize> TProjZ;
-  typedef ap_int<kTProjPhiDSize> TProjPHIDER;
-  typedef ap_int<kTProjZDSize> TProjZDER;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTCIDSize> TProjTCID;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize> TProjTrackletIndex;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjPhiSize> TProjPHI;
+  typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZSize> TProjRZ;
+  typedef ap_int<TrackletProjectionBase<TProjType>::kTProjPhiDSize> TProjPHIDER;
+  typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZDSize> TProjRZDER;
   
-  typedef ap_uint<kTrackletProjectionSize> TrackletProjectionData;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTrackletProjectionSize> TrackletProjectionData;
 
   // Constructors
   TrackletProjection(const TrackletProjectionData& newdata):
     data_(newdata)
   {}
 
-  TrackletProjection(const TProjTCID tcid, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjZDER zder):
-    data_( ((((tcid,phi),z),phider),zder) )
+  TrackletProjection(const TProjTCID tcid, const TProjTrackletIndex trackletIndex, const TProjPHI phi, const TProjRZ z, const TProjPHIDER phider, const TProjRZDER zder):
+    data_( (((((tcid,trackletIndex),phi),z),phider),zder) )
   {}
   
   TrackletProjection():
@@ -65,44 +131,52 @@ public:
   // Getter
   TrackletProjectionData raw() const {return data_;}
 
+  TProjTCID getTCID() const {
+    return data_.range(kTProjTCIDMSB,kTProjTCIDLSB);
+  }
+
   TProjTCID getTrackletIndex() const {
-    return data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB);
+    return data_.range(kTProjTrackletIndexMSB,kTProjTrackletIndexLSB);
   }
 
   TProjPHI getPhi() const {
     return data_.range(kTProjPhiMSB,kTProjPhiLSB);
   }
 
-  TProjZ getZ() const {
-    return data_.range(kTProjZMSB,kTProjZLSB);
+  TProjRZ getRZ() const {
+    return data_.range(kTProjRZMSB,kTProjRZLSB);
   }
 
   TProjPHIDER getPhiDer() {
     return data_.range(kTProjPhiDMSB,kTProjPhiDLSB);
   }
 
-  TProjZDER getZDer() {
-    return data_.range(kTProjZDMSB,kTProjZDLSB);
+  TProjRZDER getRZDer() {
+    return data_.range(kTProjRZDMSB,kTProjRZDLSB);
+  }
+
+  void setTCID(const TProjTCID id) {
+    data_.range(kTProjTCIDMSB,kTProjTCIDLSB) = id;
   }
 
   void setTrackletIndex(const TProjTCID id) {
-    data_.range(kTProjTCIndexMSB,kTProjTCIndexLSB) = id;
+    data_.range(kTProjTrackletIndexMSB,kTProjTrackletIndexLSB) = id;
   }
 
   void setPhi(const TProjPHI phi) {
     data_.range(kTProjPhiMSB,kTProjPhiLSB) = phi;
   }
 
-  void setZ(const TProjZ z) {
-    data_.range(kTProjZMSB,kTProjZLSB) = z;
+  void setRZ(const TProjRZ z) {
+    data_.range(kTProjRZMSB,kTProjRZLSB) = z;
   }
 
   void setPhiDer(const TProjPHIDER phider) {
     data_.range(kTProjPhiDMSB,kTProjPhiDLSB) = phider;
   }
 
-  void setZDer(const TProjZDER zder) {
-    data_.range(kTProjZDMSB,kTProjZDLSB) = zder;
+  void setRZDer(const TProjRZDER zder) {
+    data_.range(kTProjRZDMSB,kTProjRZDLSB) = zder;
   }
   
 private:
@@ -112,7 +186,7 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplate<TrackletProjection, 1, kNBits_MemAddr> TrackletProjectionMemory;
+template<tProjType TProjType> using TrackletProjectionMemory = MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif

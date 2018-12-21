@@ -18,14 +18,14 @@ int main()
 
   ///////////////////////////
   // input memories
-  static TrackletProjectionMemory tproj1;
-  static TrackletProjectionMemory tproj2;
-  static TrackletProjectionMemory tproj3;
-  static TrackletProjectionMemory tproj4;
-  static TrackletProjectionMemory tproj5;
-  static TrackletProjectionMemory tproj6;
-  static TrackletProjectionMemory tproj7;
-  static TrackletProjectionMemory tproj8;
+  static TrackletProjectionMemory<INNER> tproj1;
+  static TrackletProjectionMemory<INNER> tproj2;
+  static TrackletProjectionMemory<INNER> tproj3;
+  static TrackletProjectionMemory<INNER> tproj4;
+  static TrackletProjectionMemory<INNER> tproj5;
+  static TrackletProjectionMemory<INNER> tproj6;
+  static TrackletProjectionMemory<INNER> tproj7;
+  static TrackletProjectionMemory<INNER> tproj8;
 
   // output memories
   static AllProjectionMemory allproj;
@@ -119,14 +119,14 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    writeMemFromFile<TrackletProjectionMemory>(tproj1, fin_tproj1, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj2, fin_tproj2, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj3, fin_tproj3, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj4, fin_tproj4, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj5, fin_tproj5, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj6, fin_tproj6, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj7, fin_tproj7, ievt);
-    writeMemFromFile<TrackletProjectionMemory>(tproj8, fin_tproj8, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj1, fin_tproj1, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj2, fin_tproj2, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj3, fin_tproj3, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj4, fin_tproj4, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj5, fin_tproj5, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj6, fin_tproj6, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj7, fin_tproj7, ievt);
+    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj8, fin_tproj8, ievt);
     
     // bx
     BXType bx = ievt;
