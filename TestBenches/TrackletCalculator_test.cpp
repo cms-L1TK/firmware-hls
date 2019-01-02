@@ -210,7 +210,7 @@ int main()
     BXType bx = ievt;
 
     // Unit Under Test
-    TrackletCalculator_L1L2(bx, 4,
+    TrackletCalculator_L1L2<5, 8>(bx, 4,
                         innerStubs, outerStubs, stubPairs00, stubPairs10,
                         &tpar,
                         &tproj_L3PHIA,
