@@ -4,10 +4,10 @@
 //
 //
 #include "ap_int.h"
-#include "HLSCandidateMatch.hh"
-#include "HLSAllStubs.hh"
-#include "HLSProjection.hh"
-#include "HLSFullMatch.hh"
+#include "CandidateMatchMemory.hh"
+#include "AllStubMemory.hh"
+//#include "ProjectionMemory.hh"
+#include "FullMatchMemory.hh"
 
 using namespace std;
 
