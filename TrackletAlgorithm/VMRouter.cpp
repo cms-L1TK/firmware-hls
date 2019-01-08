@@ -201,7 +201,17 @@ void VMRouter(
 #include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
     ;
   size_t count=0;
-  int write_addr = 0;
+
+  // reset address counters in output memories
+  allstub->clear(bx);
+  m0->clear(bx);
+  m1->clear(bx);
+  m2->clear(bx);
+  m3->clear(bx);
+  m4->clear(bx);
+  m5->clear(bx);
+  m6->clear(bx);
+  m7->clear(bx);
 
   // see how much data we have from each of the memories
   InputStubMemory::NEntryT zero(0);
@@ -209,8 +219,8 @@ void VMRouter(
   auto n_A0 =            a0->getEntries(bx);
   auto n_A1 =            a1->getEntries(bx);
   auto n_A2 =            a2->getEntries(bx);
-  auto n_A3 =            a3->getEntries(bx);
-  auto n_A4 =            a4->getEntries(bx);
+  auto n_A3 =  zero;//          a3->getEntries(bx);
+  auto n_A4 =  zero;//          a4->getEntries(bx);
   // auto n_A0 = a0==0?zero:a0->getEntries(bx);
   // auto n_A1 = a1==0?zero:a1->getEntries(bx);
   // auto n_A2 = a2==0?zero:a2->getEntries(bx);
@@ -275,7 +285,6 @@ void VMRouter(
     AllStub allstubd(stub.raw());
     // END HACK
     allstub->write_mem(bx, allstubd);
-    ++write_addr;
 
 
     count++;
@@ -284,6 +293,10 @@ void VMRouter(
     VMStubME stubme; stubme.setBend(stub.getBend());
     auto layer = layer_; // hack
     auto disk  = disk_; // hack --these are mutually exclusive so ...
+    // total number of VMs
+    auto nvm = layer!=-1 ? nallstubslayers[layer]*nvmmelayers[layer] :
+    		nallstubsdisks[disk-1]*nvmmedisks[disk-1];
+/*
     int nvm=-1;
     if (layer!=-1) {
       nvm=nallstubslayers[layer]*nvmmelayers[layer];
@@ -291,6 +304,7 @@ void VMRouter(
     if (disk!=0){
       nvm=nallstubsdisks[disk-1]*nvmmedisks[disk-1];
     }
+*/
     auto iphiRaw = iphivmRaw(stub.getPhi());
     auto iphiRawPlus = iphivmRawPlus(stub.getPhi());
     auto iphiRawMinus = iphivmRawMinus(stub.getPhi());

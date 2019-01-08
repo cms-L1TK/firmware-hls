@@ -43,15 +43,15 @@ int main()
   cout << "Open files..." << endl;
 
   ifstream fin_ilink1;
-  bool validin1 = openDataFile(fin_ilink1, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
+  bool validin1 = openDataFile(fin_ilink1, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
   if (not validin1) return -1;
 
   ifstream fin_ilink2;
-  bool validin2 = openDataFile(fin_ilink2, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
+  bool validin2 = openDataFile(fin_ilink2, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
   if (not validin2) return -1;
 
   ifstream fin_ilink3;
-  bool validin3 = openDataFile(fin_ilink3, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
+  bool validin3 = openDataFile(fin_ilink3, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
   if (not validin3) return -1;
 
   // ifstream fin_ilink4;
