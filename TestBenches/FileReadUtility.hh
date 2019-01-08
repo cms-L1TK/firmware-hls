@@ -7,6 +7,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
+#include <cerrno>
+#include <unistd.h>
 #include <vector>
 
 #include "../TrackletAlgorithm/Constants.hh"
@@ -17,8 +20,10 @@ bool openDataFile(std::ifstream& file_in, const std::string& file_name)
 
   bool success = file_in.good();
   if (not success) {
-    std::cerr << "Open of file " << file_name << " failed with error!";
+    std::cerr << "Open of file " << file_name << " failed with error: ";
+    std::cerr << std::strerror(errno);
     std::cerr << std::endl;
+    std::cerr << "running from directory " << getcwd(NULL,0) << std::endl;
   }
 
   return success;
