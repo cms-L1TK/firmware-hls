@@ -4,40 +4,43 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for AllProjectionMemory fields
-constexpr unsigned int kAProjZDSize = 10;
-constexpr unsigned int kAProjPhiDSize = 10;
-constexpr unsigned int kAProjZSize = 12;
-constexpr unsigned int kAProjPhiSize = 14;
-constexpr unsigned int kAProjTCIndexSize = 14;
-constexpr unsigned int kAProjTCSeedSize = 3;        // sub division of TCIndex
-constexpr unsigned int kAProjTCVMSize = 4;          // sub division of TCIndex
-constexpr unsigned int kAProjTCNumSize = 7;   // sub division of TCIndex
-//Bit size for full AllProjectionMemory
-constexpr unsigned int kAllProjectionSize = kAProjTCIndexSize + kAProjPhiSize + kAProjZSize + kAProjPhiDSize + kAProjZDSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the AllProjectionMemory word for different fields
-constexpr unsigned int kAProjZDLSB = 0;
-constexpr unsigned int kAProjZDMSB = kAProjZDLSB + kAProjZDSize - 1;
-constexpr unsigned int kAProjPhiDLSB = kAProjZDMSB + 1;
-constexpr unsigned int kAProjPhiDMSB = kAProjPhiDLSB + kAProjPhiDSize - 1;
-constexpr unsigned int kAProjZLSB = kAProjPhiDMSB + 1;
-constexpr unsigned int kAProjZMSB = kAProjZLSB + kAProjZSize - 1;
-constexpr unsigned int kAProjPhiLSB = kAProjZMSB + 1;
-constexpr unsigned int kAProjPhiMSB = kAProjPhiLSB + kAProjPhiSize - 1;
-constexpr unsigned int kAProjTCIndexLSB = kAProjPhiMSB + 1;
-constexpr unsigned int kAProjTCIndexMSB = kAProjTCIndexLSB + kAProjTCIndexSize - 1;
-constexpr unsigned int kAProjTCNumLSB = kAProjPhiMSB + 1;
-constexpr unsigned int kAProjTCNumMSB = kAProjTCNumLSB + kAProjTCNumSize - 1;
-constexpr unsigned int kAProjTCVMLSB = kAProjTCNumMSB + 1;
-constexpr unsigned int kAProjTCVMMSB = kAProjTCVMLSB + kAProjTCVMSize - 1;
-constexpr unsigned int kAProjTCSeedLSB = kAProjTCVMMSB + 1;
-constexpr unsigned int kAProjTCSeedMSB = kAProjTCSeedLSB + kAProjTCSeedSize - 1;
-
 // Data object definition
 class AllProjection
 {
 public:
+
+  enum BitWidths {
+    // Bit size for AllProjectionMemory fields
+    kAProjZDSize = 10,
+    kAProjPhiDSize = 10,
+    kAProjZSize = 12,
+    kAProjPhiSize = 14,
+    kAProjTCIndexSize = 14,
+    kAProjTCSeedSize = 3,        // sub division of TCIndex
+    kAProjTCVMSize = 4,          // sub division of TCIndex
+    kAProjTCNumSize = 7,   // sub division of TCIndex
+    //Bit size for full AllProjectionMemory
+    kAllProjectionSize = kAProjTCIndexSize + kAProjPhiSize + kAProjZSize + kAProjPhiDSize + kAProjZDSize
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllProjectionMemory word for different fields
+    kAProjZDLSB = 0,
+    kAProjZDMSB = kAProjZDLSB + kAProjZDSize - 1,
+    kAProjPhiDLSB = kAProjZDMSB + 1,
+    kAProjPhiDMSB = kAProjPhiDLSB + kAProjPhiDSize - 1,
+    kAProjZLSB = kAProjPhiDMSB + 1,
+    kAProjZMSB = kAProjZLSB + kAProjZSize - 1,
+    kAProjPhiLSB = kAProjZMSB + 1,
+    kAProjPhiMSB = kAProjPhiLSB + kAProjPhiSize - 1,
+    kAProjTCIndexLSB = kAProjPhiMSB + 1,
+    kAProjTCIndexMSB = kAProjTCIndexLSB + kAProjTCIndexSize - 1,
+    kAProjTCNumLSB = kAProjPhiMSB + 1,
+    kAProjTCNumMSB = kAProjTCNumLSB + kAProjTCNumSize - 1,
+    kAProjTCVMLSB = kAProjTCNumMSB + 1,
+    kAProjTCVMMSB = kAProjTCVMLSB + kAProjTCVMSize - 1,
+    kAProjTCSeedLSB = kAProjTCVMMSB + 1,
+    kAProjTCSeedMSB = kAProjTCSeedLSB + kAProjTCSeedSize - 1
+  };
 
   typedef ap_uint<kAProjTCIndexSize> AProjTCID;
   typedef ap_uint<kAProjTCSeedSize> AProjTCSEED; // sub division of TCID

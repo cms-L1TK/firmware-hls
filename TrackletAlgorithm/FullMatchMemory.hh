@@ -4,28 +4,31 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for FullMatchMemory fields
-constexpr unsigned int kFMZResSize = 9;
-constexpr unsigned int kFMPhiResSize = 12;
-constexpr unsigned int kFMStubIndexSize = 10;
-constexpr unsigned int kFMTCIndexSize = 13;
-// Bit size for full FullMatchMemory
-constexpr unsigned int kFullMatchSize = kFMTCIndexSize + kFMStubIndexSize + kFMPhiResSize + kFMZResSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the FullMatchMemory word for different fields
-constexpr unsigned int kFMZResLSB = 0;
-constexpr unsigned int kFMZResMSB = kFMZResLSB + kFMZResSize - 1;
-constexpr unsigned int kFMPhiResLSB = kFMZResMSB + 1;
-constexpr unsigned int kFMPhiResMSB = kFMPhiResLSB + kFMPhiResSize - 1;
-constexpr unsigned int kFMStubIndexLSB = kFMPhiResMSB + 1;
-constexpr unsigned int kFMStubIndexMSB = kFMStubIndexLSB + kFMStubIndexSize - 1;
-constexpr unsigned int kFMTCIndexLSB = kFMStubIndexMSB + 1;
-constexpr unsigned int kFMTCIndexMSB = kFMTCIndexLSB + kFMTCIndexSize - 1;
-
 // Data object definition
 class FullMatch
 {
 public:
+
+  enum BitWidths {
+    // Bit size for FullMatchMemory fields
+    kFMZResSize = 9,
+    kFMPhiResSize = 12,
+    kFMStubIndexSize = 10,
+    kFMTCIndexSize = 13,
+    // Bit size for full FullMatchMemory
+    kFullMatchSize = kFMTCIndexSize + kFMStubIndexSize + kFMPhiResSize + kFMZResSize
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the FullMatchMemory word for different fields
+    kFMZResLSB = 0,
+    kFMZResMSB = kFMZResLSB + kFMZResSize - 1,
+    kFMPhiResLSB = kFMZResMSB + 1,
+    kFMPhiResMSB = kFMPhiResLSB + kFMPhiResSize - 1,
+    kFMStubIndexLSB = kFMPhiResMSB + 1,
+    kFMStubIndexMSB = kFMStubIndexLSB + kFMStubIndexSize - 1,
+    kFMTCIndexLSB = kFMStubIndexMSB + 1,
+    kFMTCIndexMSB = kFMTCIndexLSB + kFMTCIndexSize - 1
+  };
 
   typedef ap_uint<kFMTCIndexSize> FMTCID;
   typedef ap_uint<kFMStubIndexSize> FMSTUBINDEX;

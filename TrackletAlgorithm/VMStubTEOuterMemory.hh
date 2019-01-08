@@ -4,28 +4,31 @@
 #include "Constants.hh"
 #include "MemoryTemplateBinned.hh"
 
-// Bit sizes for VMStubTEOuterMemory fields
-constexpr unsigned int kVMSTEOFineZSize = 3;
-constexpr unsigned int kVMSTEOFinePhiSize = 3;
-constexpr unsigned int kVMSTEOBendSize = 3;
-constexpr unsigned int kVMSTEOIDSize = 7;
-// Bit size for full VMStubTEOuterMemory
-constexpr unsigned int kVMStubTEOuterSize = kVMSTEOFineZSize + kVMSTEOFinePhiSize + kVMSTEOBendSize + kVMSTEOIDSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubTEOuterMemory word for different fields
-constexpr unsigned int kVMSTEOFineZLSB = 0;
-constexpr unsigned int kVMSTEOFineZMSB = kVMSTEOFineZLSB + kVMSTEOFineZSize - 1;
-constexpr unsigned int kVMSTEOFinePhiLSB = kVMSTEOFineZMSB + 1;
-constexpr unsigned int kVMSTEOFinePhiMSB = kVMSTEOFinePhiLSB + kVMSTEOFinePhiSize - 1;
-constexpr unsigned int kVMSTEOBendLSB = kVMSTEOFinePhiMSB + 1;
-constexpr unsigned int kVMSTEOBendMSB = kVMSTEOBendLSB + kVMSTEOBendSize - 1;
-constexpr unsigned int kVMSTEOIDLSB = kVMSTEOBendMSB + 1;
-constexpr unsigned int kVMSTEOIDMSB = kVMSTEOIDLSB + kVMSTEOIDSize - 1;
-
 // Data object definition
 class VMStubTEOuter
 {
 public:
+
+  enum BitWidths {
+    // Bit sizes for VMStubTEOuterMemory fields
+    kVMSTEOFineZSize = 3,
+    kVMSTEOFinePhiSize = 3,
+    kVMSTEOBendSize = 3,
+    kVMSTEOIDSize = 7,
+    // Bit size for full VMStubTEOuterMemory
+    kVMStubTEOuterSize = kVMSTEOFineZSize + kVMSTEOFinePhiSize + kVMSTEOBendSize + kVMSTEOIDSize
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubTEOuterMemory word for different fields
+    kVMSTEOFineZLSB = 0,
+    kVMSTEOFineZMSB = kVMSTEOFineZLSB + kVMSTEOFineZSize - 1,
+    kVMSTEOFinePhiLSB = kVMSTEOFineZMSB + 1,
+    kVMSTEOFinePhiMSB = kVMSTEOFinePhiLSB + kVMSTEOFinePhiSize - 1,
+    kVMSTEOBendLSB = kVMSTEOFinePhiMSB + 1,
+    kVMSTEOBendMSB = kVMSTEOBendLSB + kVMSTEOBendSize - 1,
+    kVMSTEOIDLSB = kVMSTEOBendMSB + 1,
+    kVMSTEOIDMSB = kVMSTEOIDLSB + kVMSTEOIDSize - 1
+  };
 
   typedef ap_uint<kVMSTEOIDSize> VMSTEOID;
   typedef ap_uint<kVMSTEOBendSize> VMSTEOBEND;

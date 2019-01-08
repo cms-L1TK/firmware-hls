@@ -1,14 +1,14 @@
 #include "ProjectionRouterTop.h"
 
 void ProjectionRouterTop(BXType bx,
-                         const TrackletProjectionMemory* const tproj1,
-                         const TrackletProjectionMemory* const tproj2,
-                         const TrackletProjectionMemory* const tproj3,
-                         const TrackletProjectionMemory* const tproj4,
-                         const TrackletProjectionMemory* const tproj5,
-                         const TrackletProjectionMemory* const tproj6,
-                         const TrackletProjectionMemory* const tproj7,
-                         const TrackletProjectionMemory* const tproj8,
+                         const TrackletProjectionMemory<INNER>* const tproj1,
+                         const TrackletProjectionMemory<INNER>* const tproj2,
+                         const TrackletProjectionMemory<INNER>* const tproj3,
+                         const TrackletProjectionMemory<INNER>* const tproj4,
+                         const TrackletProjectionMemory<INNER>* const tproj5,
+                         const TrackletProjectionMemory<INNER>* const tproj6,
+                         const TrackletProjectionMemory<INNER>* const tproj7,
+                         const TrackletProjectionMemory<INNER>* const tproj8,
                          BXType& bx_o,
                          AllProjectionMemory* const allproj,
                          VMProjectionMemory* const vmproj1,
@@ -22,8 +22,8 @@ void ProjectionRouterTop(BXType bx,
                          )
 {
   // PR_L3PHIC
- PR_L3PHIC: ProjectionRouter<TrackletProjectionMemory, AllProjectionMemory,
-                             VMProjectionMemory, TrackletProjection,
+ PR_L3PHIC: ProjectionRouter<TrackletProjectionMemory<INNER>, AllProjectionMemory,
+                             VMProjectionMemory, TrackletProjection<INNER>,
                              AllProjection, VMProjection, 8, 3, 0>
     (bx,
      tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,

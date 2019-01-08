@@ -4,41 +4,44 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for TrackFitMemory fields
-constexpr unsigned int kTFStubIndexSize = 10;
-constexpr unsigned int kTFZ0Size = 10;
-constexpr unsigned int kTFTSize = 14;
-constexpr unsigned int kTFPhi0Size = 19;
-constexpr unsigned int kTFpTSize = 15;
-// Bit size for full TrackFitMemory
-constexpr unsigned int kTrackFitSize = kTFpTSize + kTFPhi0Size + kTFTSize + kTFZ0Size + 6*kTFStubIndexSize;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackFitMemory word for different fields
-constexpr unsigned int kTFStubIndex6LSB = 0;
-constexpr unsigned int kTFStubIndex6MSB = kTFStubIndex6LSB + kTFStubIndexSize - 1;
-constexpr unsigned int kTFStubIndex5LSB = kTFStubIndex6MSB + 1;
-constexpr unsigned int kTFStubIndex5MSB = kTFStubIndex5LSB + kTFStubIndexSize - 1;
-constexpr unsigned int kTFStubIndex4LSB = kTFStubIndex5MSB + 1;
-constexpr unsigned int kTFStubIndex4MSB = kTFStubIndex4LSB + kTFStubIndexSize - 1;
-constexpr unsigned int kTFStubIndex3LSB = kTFStubIndex4MSB + 1;
-constexpr unsigned int kTFStubIndex3MSB = kTFStubIndex3LSB + kTFStubIndexSize - 1;
-constexpr unsigned int kTFStubIndex2LSB = kTFStubIndex3MSB + 1;
-constexpr unsigned int kTFStubIndex2MSB = kTFStubIndex2LSB + kTFStubIndexSize - 1;
-constexpr unsigned int kTFStubIndex1LSB = kTFStubIndex2MSB + 1;
-constexpr unsigned int kTFStubIndex1MSB = kTFStubIndex1LSB + kTFStubIndexSize - 1;
-constexpr unsigned int kTFZ0LSB = kTFStubIndex1MSB + 1;
-constexpr unsigned int kTFZ0MSB = kTFZ0LSB + kTFZ0Size - 1;
-constexpr unsigned int kTFTLSB = kTFZ0MSB + 1;
-constexpr unsigned int kTFTMSB = kTFTLSB + kTFTSize - 1;
-constexpr unsigned int kTFPhi0LSB = kTFTMSB + 1;
-constexpr unsigned int kTFPhi0MSB = kTFPhi0LSB + kTFPhi0Size - 1;
-constexpr unsigned int kTFpTLSB = kTFPhi0MSB + 1;
-constexpr unsigned int kTFpTMSB = kTFpTLSB + kTFpTSize - 1;
-
 // Data object definition
 class TrackFit
 {
 public:
+
+  enum BitWidths {
+    // Bit size for TrackFitMemory fields
+    kTFStubIndexSize = 10,
+    kTFZ0Size = 10,
+    kTFTSize = 14,
+    kTFPhi0Size = 19,
+    kTFpTSize = 15,
+    // Bit size for full TrackFitMemory
+    kTrackFitSize = kTFpTSize + kTFPhi0Size + kTFTSize + kTFZ0Size + 6*kTFStubIndexSize
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackFitMemory word for different fields
+    kTFStubIndex6LSB = 0,
+    kTFStubIndex6MSB = kTFStubIndex6LSB + kTFStubIndexSize - 1,
+    kTFStubIndex5LSB = kTFStubIndex6MSB + 1,
+    kTFStubIndex5MSB = kTFStubIndex5LSB + kTFStubIndexSize - 1,
+    kTFStubIndex4LSB = kTFStubIndex5MSB + 1,
+    kTFStubIndex4MSB = kTFStubIndex4LSB + kTFStubIndexSize - 1,
+    kTFStubIndex3LSB = kTFStubIndex4MSB + 1,
+    kTFStubIndex3MSB = kTFStubIndex3LSB + kTFStubIndexSize - 1,
+    kTFStubIndex2LSB = kTFStubIndex3MSB + 1,
+    kTFStubIndex2MSB = kTFStubIndex2LSB + kTFStubIndexSize - 1,
+    kTFStubIndex1LSB = kTFStubIndex2MSB + 1,
+    kTFStubIndex1MSB = kTFStubIndex1LSB + kTFStubIndexSize - 1,
+    kTFZ0LSB = kTFStubIndex1MSB + 1,
+    kTFZ0MSB = kTFZ0LSB + kTFZ0Size - 1,
+    kTFTLSB = kTFZ0MSB + 1,
+    kTFTMSB = kTFTLSB + kTFTSize - 1,
+    kTFPhi0LSB = kTFTMSB + 1,
+    kTFPhi0MSB = kTFPhi0LSB + kTFPhi0Size - 1,
+    kTFpTLSB = kTFPhi0MSB + 1,
+    kTFpTMSB = kTFpTLSB + kTFpTSize - 1
+  };
 
   typedef ap_int<kTFpTSize> TFPT;
   typedef ap_int<kTFPhi0Size> TFPHI0;
