@@ -21,7 +21,8 @@ void VMRouterTop(BXType bx,
 		)
 {
 
-	VMRouter<0,-1,true>(bx,i0,i1,i2,i3,i4,//i5,i6,i7,
+//	VMRouter<0,-1,true>(0, -1, true, bx,i0,i1,i2,i3,i4,//i5,i6,i7,
+	VMRouter(1, 0, true, bx,i0,i1,i2,i3,i4,//i5,i6,i7,
 			allStub,
 			m0,m1,m2,m3,m4,m5,m6,m7);
 

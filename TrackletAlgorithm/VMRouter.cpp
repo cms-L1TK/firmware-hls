@@ -44,8 +44,9 @@ constexpr int kMaxFineBinTable = 256;
 // functions
 // need to ensure this is recognized as a ROM
 void init_finebintable(const int layer_, const int disk_,
-		       int finebintable_[kMaxFineBinTable], int nbitsfinebintable_)
+                       int finebintable_[kMaxFineBinTable], int & nbitsfinebintable_)
 {
+ #ifndef __SYNTHESIS__
   // initialize
   for(auto i=0;i<kMaxFineBinTable;i++) {
     finebintable_[i] = -1;
@@ -58,18 +59,18 @@ void init_finebintable(const int layer_, const int disk_,
       
     for(unsigned int i=0;i<nbins;i++) {
       int ibin=(i>>(nbitsfinebintable_-3));
-	
+        
       int zfine=(i>>(nbitsfinebintable_-6))-(ibin<<3);
-	
+        
       //awkward bit manipulations since the index is from a signed number...
       int index=i+(1<<(nbitsfinebintable_-1));
-	
+        
       if (index>=(1<<nbitsfinebintable_)){
-	index-=(1<<nbitsfinebintable_);
+        index-=(1<<nbitsfinebintable_);
       }
-	
+        
       finebintable_[index]=zfine;
-	
+        
     }
   }
 
@@ -81,29 +82,37 @@ void init_finebintable(const int layer_, const int disk_,
     for(unsigned int i=0;i<nbins;i++) {
 
       double rstub=0.0;
-	
+        
       if (i<10) {
-	if (disk_<=2) {
-	  rstub=rDSSinner[i];
-	} else {
-	  rstub=rDSSouter[i];
-	}
+        if (disk_<=2) {
+          rstub=rDSSinner[i];
+        } else {
+          rstub=rDSSouter[i];
+        }
       } else {
-	rstub=kr*(i<<(nrbitsdisk-nbitsfinebintable_));
+        rstub=kr*(i<<(nrbitsdisk-nbitsfinebintable_));
       }
 
       if (rstub<rmindiskvm) {
-	finebintable_[i] = -1;
-      } else {	
-	int bin=8.0*(rstub-rmindiskvm)/(rmaxdisk-rmindiskvm);
-	assert(bin>=0);
-	//assert(bin<MEBinsDisks);
-	int rfine=64*((rstub-rmindiskvm)-bin*(rmaxdisk-rmindiskvm)/8.0)/(rmaxdisk-rmindiskvm);
-	finebintable_[i] = rfine;
+        finebintable_[i] = -1;
+      } else {  
+        int bin=8.0*(rstub-rmindiskvm)/(rmaxdisk-rmindiskvm);
+        assert(bin>=0);
+        //assert(bin<MEBinsDisks);
+        int rfine=64*((rstub-rmindiskvm)-bin*(rmaxdisk-rmindiskvm)/8.0)/(rmaxdisk-rmindiskvm);
+        finebintable_[i] = rfine;
       }
     }
   }
-  
+#else // __SYNTHESIS__
+  int tmp[256]=
+#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
+
+  for (int i=0;i<256;i++){
+    finebintable_[i]=tmp[i];
+  }
+  nbitsfinebintable_ = 256;
+#endif // __SYNTHESIS__
 }
 
 
@@ -112,7 +121,7 @@ void init_finebintable(const int layer_, const int disk_,
 inline ap_uint<5> iphivmRaw(const AllStub::ASPHI phi)
 {
   // TODO: get rid of hard-coded values
-  ap_uint<5> iphivm=phi.range(phi.length(), (phi.length()-5));
+  ap_uint<5> iphivm=phi.range((phi.length()-5), phi.length()-1);
   assert(iphivm>=0 && iphivm<32); // get rid of this
   return iphivm;
 }
@@ -123,9 +132,12 @@ inline ap_uint<5> iphivmRaw(const AllStub::ASPHI phi)
 inline int iphivmFineBins(const AllStub::ASPHI phi, const int VMbits,
   const int finebits)
   {
-
-    return (phi>>(phi.length()-VMbits-finebits))&((1<<finebits)-1);
-
+    auto length= phi.length() - VMbits - finebits;
+    //    return ap_uint<5>.range(phi.length()-length, phi.length()-1);
+    auto v1 = ap_uint<5>(phi.range(phi.length()-length, phi.length()-1));
+    auto v2 = (phi>>(phi.length()-VMbits-finebits))&((1<<finebits)-1);
+    assert(v1 == v2);
+    return (phi>>(phi.length()-VMbits-finebits))&((1<<finebits)-1);;
   }
 
 
@@ -157,44 +169,106 @@ ap_uint<5> iphivmRawMinus(const AllStub::ASPHI phi)
 
 constexpr int MAXVMROUTER = 64; // TODO need right symbol here
 
-template <int layer_, int disk_, bool isPSmodule>
-void VMRouter(const BXType bx,
-	      const InputStubMemory* const a0,
-	      const InputStubMemory* const a1,
-	      const InputStubMemory* const a2,
-	      const InputStubMemory* const a3,
-	      const InputStubMemory* const a4,
-	      AllStubMemory* allstub,
-	      VMStubMEMemory *m0,
-	      VMStubMEMemory *m1,
-	      VMStubMEMemory *m2,
-	      VMStubMEMemory *m3,
-	      VMStubMEMemory *m4,
-	      VMStubMEMemory *m5,
-	      VMStubMEMemory *m6,
-	      VMStubMEMemory *m7)
+//template <int layer_, int disk_, bool isPSmodule>
+void VMRouter(
+              const int layer_, const int disk_, const bool isPSmodule,
+              const BXType bx,
+              const InputStubMemory* const a0,
+              const InputStubMemory* const a1,
+              const InputStubMemory* const a2,
+              const InputStubMemory* const a3,
+              const InputStubMemory* const a4,
+              AllStubMemory* allstub,
+              VMStubMEMemory *m0,
+              VMStubMEMemory *m1,
+              VMStubMEMemory *m2,
+              VMStubMEMemory *m3,
+              VMStubMEMemory *m4,
+              VMStubMEMemory *m5,
+              VMStubMEMemory *m6,
+              VMStubMEMemory *m7)
 {
 
-  // size of array here is the max possible value
-  static int finebintable_[kMaxFineBinTable]; // lookup table - 2^nbinsfinbinetable entries actually filled
+  // // size of array here is the max possible value
+  // static int finebintable_[kMaxFineBinTable]; // lookup table - 2^nbinsfinbinetable entries actually filled
   static int nbitsfinebintable_ = 8; // this appears to always be 8
-  static bool table_initialized = false;
-  if ( ! table_initialized ) {
-    init_finebintable(layer_,disk_,finebintable_,nbitsfinebintable_);
-    table_initialized = true;
-  }
-
+  // static bool table_initialized = false;
+  // if ( ! table_initialized ) {
+  //   init_finebintable(layer_,disk_,finebintable_,nbitsfinebintable_);
+  //   table_initialized = true;
+  // }
+  const int finebintable_[kMaxFineBinTable] =  // lookup table - 2^nbinsfinbinetable entries actually filled
+#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
+    ;
   size_t count=0;
   int write_addr = 0;
 
-  const auto n_A0 = a0->getEntries(bx);
+  // see how much data we have from each of the memories
+  InputStubMemory::NEntryT zero(0);
+  
+  auto n_A0 =            a0->getEntries(bx);
+  auto n_A1 =            a1->getEntries(bx);
+  auto n_A2 =            a2->getEntries(bx);
+  auto n_A3 =            a3->getEntries(bx);
+  auto n_A4 =            a4->getEntries(bx);
+  // auto n_A0 = a0==0?zero:a0->getEntries(bx);
+  // auto n_A1 = a1==0?zero:a1->getEntries(bx);
+  // auto n_A2 = a2==0?zero:a2->getEntries(bx);
+  // auto n_A3 = a3==0?zero:a3->getEntries(bx);
+  // auto n_A4 = a4==0?zero:a4->getEntries(bx);
   // need to figure out how to get the accurate total count of loop
   // iterations here for nested loops. Count in innermost loop?
-  for(auto i = 0; i < kMaxProc; ++i ) {
-    if ((count>MAXVMROUTER) || (i>n_A0 ))
+  ap_uint<kNBits_MemAddr> read_addr(0);
+
+ TOPLEVEL: for(auto i = 0; i < kMaxProc; ++i ) {
+#pragma HLS PIPELINE II=1
+    const bool haveData = (n_A0>0)||(n_A1>0)||(n_A2>0)||(n_A3>0)||(n_A4>0);
+    if ((count>MAXVMROUTER) || !haveData )
       continue;
-    ap_uint<kNBits_MemAddr> read_addr = i; // ??
-    auto stub=a0->read_mem(bx, read_addr);
+    //const InputStubMemory *next; // this method makes vivado crash
+    bool resetNext = false;
+    InputStub stub;
+    if ( n_A0 ) {
+      //next = a0;
+      stub = a0->read_mem(bx, read_addr);
+      --n_A0;
+      if ( n_A0 == 0 )
+        resetNext = true;
+    }
+    else if ( n_A1 ) {
+      //next = a1;
+      stub = a1->read_mem(bx, read_addr);
+      --n_A1;
+      if ( n_A1 == 0 )
+        resetNext = true;
+    }
+    else if ( n_A2 ) {
+      //next = a2;
+      stub = a2->read_mem(bx, read_addr);
+      --n_A2;
+      if ( n_A2 == 0 )
+        resetNext = true;
+    }
+    else if ( n_A3 ) {
+      //next = a3;
+      stub = a3->read_mem(bx, read_addr);
+      --n_A3;
+      if ( n_A3 == 0 )
+        resetNext = true;
+    }
+    else  { // if ( n_A4 ) 
+      //next = a4;
+      stub = a4->read_mem(bx, read_addr);
+      --n_A4;
+      if ( n_A4 == 0 )
+        resetNext = true;
+    }
+
+    //auto stub=next->read_mem(bx, read_addr); // this caused vivado to crash
+    if ( resetNext )
+      read_addr = 0;
+    else
+      ++read_addr;
 
     // add stub to all stub memory (memories?)
     // HACK fix me
@@ -256,31 +330,36 @@ void VMRouter(const BXType bx,
     // now actually update the stubs in the new memories
     // based on the Verilog version by MEZ
     if ( iphiRaw == 0 || iphiRawMinus == 0 || iphiRawPlus == 0 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m0)
+        m0->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 1 || iphiRawMinus == 1 || iphiRawPlus == 1 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m1 ) 
+        m1->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m2 ) 
+        m2->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m3) 
+        m3->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m4 ) 
+        m4->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m5 )
+        m5->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m6 ) 
+        m6->write_mem(bx,0, stubme);
     }
     if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 ) {
-    	m0->write_mem(bx,0, stubme);
-    }
-    if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 ) {
-    	m0->write_mem(bx,0, stubme);
+      // if ( m7 ) 
+        m7->write_mem(bx,0, stubme);
     }
     // executeME() END   ------------------------------
 
