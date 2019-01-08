@@ -12,6 +12,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 // (1<<NBIT_ADDR): depth of the memory for each BX
 class MemoryTemplate
 {
+public:
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR+1> NEntryT;
   
