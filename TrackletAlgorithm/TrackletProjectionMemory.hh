@@ -8,22 +8,7 @@ enum tProjType {INNER, OUTER, DISK};
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
-template<tProjType TProjType>
-class TrackletProjectionBase
-{
-public:
-  enum BitWidths {
-    // Bit size for TrackletProjectionMemory fields
-    kTProjRZDSize = 0,
-    kTProjPhiDSize = 0,
-    kTProjRZSize = 0,
-    kTProjPhiSize = 0,
-    kTProjTCIDSize = 0,
-    kTProjTrackletIndexSize = 0,
-    // Bit size for full TrackletProjectionMemory
-    kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
-  };
-};
+template<tProjType TProjType> class TrackletProjectionBase {};
 
 template<>
 class TrackletProjectionBase<INNER>

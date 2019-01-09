@@ -1,6 +1,6 @@
 open_project -reset trackletCalculator
 
-set_top TrackletCalculator_L1L2
+set_top TrackletCalculator_L1L2_5_8
 add_files ../TrackletAlgorithm/TrackletCalculator.cpp -cflags "-std=c++11"
 add_files ../TrackletAlgorithm/TC_L1L2.cpp            -cflags "-std=c++11"
 add_files -tb ../TestBenches/TrackletCalculator_test.cpp -cflags "-I../TrackletAlgorithm -I../emData -std=c++11"
