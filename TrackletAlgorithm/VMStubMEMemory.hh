@@ -4,11 +4,13 @@
 #include "Constants.hh"
 #include "MemoryTemplateBinned.hh"
 
-// Data object definition
-class VMStubME
+// VMStubMEBase is where we define the bit widths, which depend on the class template parameter
+template<regionType VMSMEType> class VMStubMEBase {};
+
+template<>
+class VMStubMEBase<BARRELPS>
 {
 public:
-
   enum BitWidths {
     // Bit size for VMStubMEMemory fields
     kVMSMEFineZSize = 4,
@@ -17,21 +19,57 @@ public:
     // Bit size for full VMStubMEMemory
     kVMStubMESize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIndexSize
   };
+};
+
+template<>
+class VMStubMEBase<BARREL2S>
+{
+public:
+  enum BitWidths {
+    // Bit size for VMStubMEMemory fields
+    kVMSMEFineZSize = 4,
+    kVMSMEBendSize = 4,
+    kVMSMEIndexSize = 7,
+    // Bit size for full VMStubMEMemory
+    kVMStubMESize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIndexSize
+  };
+};
+
+template<>
+class VMStubMEBase<DISK>
+{
+public:
+  enum BitWidths {
+    // Bit size for VMStubMEMemory fields
+    kVMSMEFineZSize = 4,
+    kVMSMEBendSize = 4,
+    kVMSMEIndexSize = 7,
+    // Bit size for full VMStubMEMemory
+    kVMStubMESize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIndexSize
+  };
+};
+
+
+// Data object definition
+template<regionType VMSMEType>
+class VMStubME : public VMStubMEBase<VMSMEType>
+{
+public:
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubMEMemory word for different fields
     kVMSMEFineZLSB = 0,
-    kVMSMEFineZMSB = kVMSMEFineZLSB + kVMSMEFineZSize - 1,
+    kVMSMEFineZMSB = kVMSMEFineZLSB + VMStubMEBase<VMSMEType>::kVMSMEFineZSize - 1,
     kVMSMEBendLSB = kVMSMEFineZMSB + 1,
-    kVMSMEBendMSB = kVMSMEBendLSB + kVMSMEBendSize - 1,
+    kVMSMEBendMSB = kVMSMEBendLSB + VMStubMEBase<VMSMEType>::kVMSMEBendSize - 1,
     kVMSMEIndexLSB = kVMSMEBendMSB + 1,
-    kVMSMEIndexMSB = kVMSMEIndexLSB + kVMSMEIndexSize - 1
+    kVMSMEIndexMSB = kVMSMEIndexLSB + VMStubMEBase<VMSMEType>::kVMSMEIndexSize - 1
   };
 
-  typedef ap_uint<kVMSMEIndexSize> VMSMEID;
-  typedef ap_uint<kVMSMEBendSize> VMSMEBEND;
-  typedef ap_uint<kVMSMEFineZSize> VMSMEFINEZ;
+  typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> VMSMEID;
+  typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
+  typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
 
-  typedef ap_uint<kVMStubMESize> VMStubMEData;
+  typedef ap_uint<VMStubMEBase<VMSMEType>::kVMStubMESize> VMStubMEData;
 
   // Constructors
   VMStubME(const VMStubMEData& newdata):
@@ -89,7 +127,7 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplateBinned<VMStubME, 2, kNBits_MemAddr,3> VMStubMEMemory;
+template<regionType VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,3>;
 
 
 #endif

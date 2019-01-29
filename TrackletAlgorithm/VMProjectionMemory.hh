@@ -4,39 +4,68 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Data object definition
-class VMProjection
+// VMProjectionBase is where we define the bit widths, which depend on the class template parameter.
+template<regionType VMProjType> class VMProjectionBase {};
+
+template<>
+class VMProjectionBase<BARREL>
 {
 public:
-
   enum BitWidths {
     // Bit sizes for VMProjectionMemory fields
+    kVMProjIsPSSeedSize = 1,
     kVMProjRinvSize = 5,
     kVMProjFineZSize = 4,
     kVMProjZBinSize = MEBinsBits+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
-    kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize + 1
+    kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize
   };
+};
+
+template<>
+class VMProjectionBase<DISK>
+{
+public:
+  enum BitWidths {
+    // Bit sizes for VMProjectionMemory fields
+    kVMProjIsPSSeedSize = 0,
+    kVMProjRinvSize = 5,
+    kVMProjFineZSize = 4,
+    kVMProjZBinSize = MEBinsBits+1+1,
+    kVMProjIndexSize = 7,
+    // Bit size for full VMProjectionMemory
+    kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize
+  };
+};
+
+
+// Data object definition
+template<regionType VMProjType>
+class VMProjection : public VMProjectionBase<VMProjType>
+{
+public:
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMProjectionMemory word for different fields
     kVMProjIsPSSeedLSB = 0,
-    kVMProjRinvLSB = 1,
-    kVMProjRinvMSB = kVMProjRinvLSB + kVMProjRinvSize - 1,
+    kVMProjIsPSSeedMSB = kVMProjIsPSSeedLSB + VMProjectionBase<VMProjType>::kVMProjIsPSSeedSize - 1,
+    
+    kVMProjRinvLSB = kVMProjIsPSSeedMSB + 1,
+    kVMProjRinvMSB = kVMProjRinvLSB + VMProjectionBase<VMProjType>::kVMProjRinvSize - 1,
     kVMProjFineZLSB = kVMProjRinvMSB + 1,
-    kVMProjFineZMSB = kVMProjFineZLSB + kVMProjFineZSize - 1,
+    kVMProjFineZMSB = kVMProjFineZLSB + VMProjectionBase<VMProjType>::kVMProjFineZSize - 1,
     kVMProjZBinLSB = kVMProjFineZMSB + 1,
-    kVMProjZBinMSB = kVMProjZBinLSB + kVMProjZBinSize - 1,
+    kVMProjZBinMSB = kVMProjZBinLSB + VMProjectionBase<VMProjType>::kVMProjZBinSize - 1,
     kVMProjIndexLSB = kVMProjZBinMSB + 1,
-    kVMProjIndexMSB = kVMProjIndexLSB + kVMProjIndexSize - 1
+    kVMProjIndexMSB = kVMProjIndexLSB + VMProjectionBase<VMProjType>::kVMProjIndexSize - 1
   };
   
-  typedef ap_uint<kVMProjIndexSize> VMPID;
-  typedef ap_uint<kVMProjZBinSize> VMPZBIN;
-  typedef ap_uint<kVMProjFineZSize> VMPFINEZ;
-  typedef ap_uint<kVMProjRinvSize> VMPRINV;
+  typedef ap_uint<VMProjectionBase<VMProjType>::kVMProjIndexSize> VMPID;
+  typedef ap_uint<VMProjectionBase<VMProjType>::kVMProjZBinSize> VMPZBIN;
+  typedef ap_uint<VMProjectionBase<VMProjType>::kVMProjFineZSize> VMPFINEZ;
+  typedef ap_uint<VMProjectionBase<VMProjType>::kVMProjRinvSize> VMPRINV;
 	
-  typedef ap_uint<kVMProjectionSize> VMProjData;
+  typedef ap_uint<VMProjectionBase<VMProjType>::kVMProjectionSize> VMProjData;
 
   // Constructors
   VMProjection(const VMProjData& newdata):
@@ -45,6 +74,10 @@ public:
 
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPRINV rinv, const bool ps):
     data_( ((((id,zbin),finez),rinv),ps) )
+  {}
+
+  VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPRINV rinv):
+    data_( (((id,zbin),finez),rinv) )
   {}
   
   VMProjection():
@@ -79,7 +112,7 @@ public:
   }
 
   bool getIsPSSeed() const {
-    return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedLSB);
+    return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
   }
   
   // Setter
@@ -100,7 +133,7 @@ public:
   }
   
   void setIsPSSeed(const bool psseed) {
-    data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedLSB) = psseed;
+    data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB) = psseed;
   }
   
 private:
@@ -110,7 +143,7 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplate<VMProjection, 1, kNBits_MemAddr> VMProjectionMemory;
+template<regionType VMProjType> using VMProjectionMemory = MemoryTemplate<VMProjection<VMProjType>, 1, kNBits_MemAddr>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif
