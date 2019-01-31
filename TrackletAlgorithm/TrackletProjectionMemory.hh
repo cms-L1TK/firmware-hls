@@ -138,6 +138,7 @@ public:
     return data_.range(kTProjRZDMSB,kTProjRZDLSB);
   }
 
+ // Setter
   void setTCID(const TProjTCID id) {
     data_.range(kTProjTCIDMSB,kTProjTCIDLSB) = id;
   }

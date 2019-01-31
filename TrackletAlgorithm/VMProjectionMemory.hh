@@ -19,7 +19,7 @@ public:
     kVMProjZBinSize = MEBinsBits+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
-    kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize
+    kVMProjectionSize = kVMProjIsPSSeedSize + kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize
   };
 };
 
@@ -35,7 +35,7 @@ public:
     kVMProjZBinSize = MEBinsBits+1+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
-    kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize
+    kVMProjectionSize = kVMProjIsPSSeedSize + kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize
   };
 };
 

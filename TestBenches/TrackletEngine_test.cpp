@@ -23,8 +23,8 @@ int main(){
   int err_count = 0;
   
   // declare input memory arrays to be read from emulations files
-  VMStubTEInnerMemory inputvmstubsinner;
-  VMStubTEOuterMemory inputvmstubsouter;
+  VMStubTEInnerMemory<BARRELPS> inputvmstubsinner;
+  VMStubTEOuterMemory<BARRELPS> inputvmstubsouter;
   //StubPairMemory inputstubpairs;
 
   // declare the output memory array for the sub pairs
@@ -45,8 +45,8 @@ int main(){
     cout << "Event: " << dec << ievt << endl;
 
     //read next event from the input files
-    writeMemFromFile<VMStubTEInnerMemory>(inputvmstubsinner, fin_vmstubsinner,ievt);
-    writeMemFromFile<VMStubTEOuterMemory>(inputvmstubsouter, fin_vmstubsouter,ievt);
+    writeMemFromFile<VMStubTEInnerMemory<BARRELPS> >(inputvmstubsinner, fin_vmstubsinner,ievt);
+    writeMemFromFile<VMStubTEOuterMemory<BARRELPS> >(inputvmstubsouter, fin_vmstubsouter,ievt);
 
     //set the bunch crossing
     ap_uint<3> bx=ievt&0x7;

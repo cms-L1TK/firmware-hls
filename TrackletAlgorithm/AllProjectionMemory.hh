@@ -17,12 +17,12 @@ public:
     kAProjPhiDSize = 10,
     kAProjRZSize = 12,
     kAProjPhiSize = 14,
-    kAProjTCIndexSize = 7,
-    kAProjTCSeedSize = 3,        // sub division of TCIndex
-    kAProjTCVMSize = 4,          // sub division of TCIndex
-    kAProjTCNumSize = 7,   // sub division of TCIndex
+    kAProjTrackletIndexSize = 7,
+    kAProjTCSeedSize = 3,        // sub division of TCID
+    kAProjTCVMSize = 4,          // sub division of TCID
+    kAProjTCIDSize = 7,
     //Bit size for full AllProjectionMemory
-    kAllProjectionSize = kAProjTCIndexSize + kAProjPhiSize + kAProjRZSize + kAProjPhiDSize + kAProjRZDSize
+    kAllProjectionSize = kAProjRZDSize + kAProjPhiDSize + kAProjRZSize + kAProjPhiSize + kAProjTrackletIndexSize + kAProjTCIDSize
   };
 };
 
@@ -36,12 +36,12 @@ public:
     kAProjPhiDSize = 10,
     kAProjRZSize = 8,
     kAProjPhiSize = 17,
-    kAProjTCIndexSize = 7,
-    kAProjTCSeedSize = 3,        // sub division of TCIndex
-    kAProjTCVMSize = 4,          // sub division of TCIndex
-    kAProjTCNumSize = 7,   // sub division of TCIndex
+    kAProjTrackletIndexSize = 7,
+    kAProjTCSeedSize = 3,        // sub division of TCID
+    kAProjTCVMSize = 4,          // sub division of TCID
+    kAProjTCIDSize = 7,
     //Bit size for full AllProjectionMemory
-    kAllProjectionSize = kAProjTCIndexSize + kAProjPhiSize + kAProjRZSize + kAProjPhiDSize + kAProjRZDSize
+    kAllProjectionSize = kAProjRZDSize + kAProjPhiDSize + kAProjRZSize + kAProjPhiSize + kAProjTrackletIndexSize + kAProjTCIDSize
   };
 };
 
@@ -55,12 +55,12 @@ public:
     kAProjPhiDSize = 10,
     kAProjRZSize = 12,
     kAProjPhiSize = 14,
-    kAProjTCIndexSize = 7,
-    kAProjTCSeedSize = 3,        // sub division of TCIndex
-    kAProjTCVMSize = 4,          // sub division of TCIndex
-    kAProjTCNumSize = 7,   // sub division of TCIndex
+    kAProjTrackletIndexSize = 7,
+    kAProjTCSeedSize = 3,        // sub division of TCID
+    kAProjTCVMSize = 4,          // sub division of TCID
+    kAProjTCIDSize = 7,
     //Bit size for full AllProjectionMemory
-    kAllProjectionSize = kAProjTCIndexSize + kAProjPhiSize + kAProjRZSize + kAProjPhiDSize + kAProjRZDSize
+    kAllProjectionSize = kAProjRZDSize + kAProjPhiDSize + kAProjRZSize + kAProjPhiSize + kAProjTrackletIndexSize + kAProjTCIDSize
   };
 };
 
@@ -80,20 +80,20 @@ public:
     kAProjRZMSB = kAProjRZLSB + AllProjectionBase<AProjType>::kAProjRZSize - 1,
     kAProjPhiLSB = kAProjRZMSB + 1,
     kAProjPhiMSB = kAProjPhiLSB + AllProjectionBase<AProjType>::kAProjPhiSize - 1,
-    kAProjTCIndexLSB = kAProjPhiMSB + 1,
-    kAProjTCIndexMSB = kAProjTCIndexLSB + AllProjectionBase<AProjType>::kAProjTCIndexSize - 1,
-    kAProjTCNumLSB = kAProjPhiMSB + 1,
-    kAProjTCNumMSB = kAProjTCNumLSB + AllProjectionBase<AProjType>::kAProjTCNumSize - 1,
-    kAProjTCVMLSB = kAProjTCNumMSB + 1,
+    kAProjTrackletIndexLSB = kAProjPhiMSB + 1,
+    kAProjTrackletIndexMSB = kAProjTrackletIndexLSB + AllProjectionBase<AProjType>::kAProjTrackletIndexSize - 1,
+    kAProjTCVMLSB = kAProjTrackletIndexMSB + 1,
     kAProjTCVMMSB = kAProjTCVMLSB + AllProjectionBase<AProjType>::kAProjTCVMSize - 1,
     kAProjTCSeedLSB = kAProjTCVMMSB + 1,
-    kAProjTCSeedMSB = kAProjTCSeedLSB + AllProjectionBase<AProjType>::kAProjTCSeedSize - 1
+    kAProjTCSeedMSB = kAProjTCSeedLSB + AllProjectionBase<AProjType>::kAProjTCSeedSize - 1,
+    kAProjTCIDLSB = kAProjTrackletIndexMSB + 1,
+    kAProjTCIDMSB = kAProjTCIDLSB + AllProjectionBase<AProjType>::kAProjTCIDSize - 1
   };
 
-  typedef ap_uint<AllProjectionBase<AProjType>::kAProjTCIndexSize> AProjTCID;
+  typedef ap_uint<AllProjectionBase<AProjType>::kAProjTCIDSize> AProjTCID;
   typedef ap_uint<AllProjectionBase<AProjType>::kAProjTCSeedSize> AProjTCSEED; // sub division of TCID
   typedef ap_uint<AllProjectionBase<AProjType>::kAProjTCVMSize> AProjTCVM;     // sub division of TCID
-  typedef ap_uint<AllProjectionBase<AProjType>::kAProjTCNumSize> AProjTCNUM;   // sub division of TCID
+  typedef ap_uint<AllProjectionBase<AProjType>::kAProjTrackletIndexSize> AProjTrackletIndex;
   typedef ap_uint<AllProjectionBase<AProjType>::kAProjPhiSize> AProjPHI;
   typedef ap_int<AllProjectionBase<AProjType>::kAProjRZSize> AProjRZ;
   typedef ap_int<AllProjectionBase<AProjType>::kAProjPhiDSize> AProjPHIDER;
@@ -106,12 +106,12 @@ public:
     data_(newdata)
   {}
 
-  AllProjection(const AProjTCID tcid, const AProjPHI phi, const AProjRZ rz, const AProjPHIDER phider, const AProjRZDER rzder):
-    data_( ((((tcid,phi),rz),phider),rzder) )
+  AllProjection(const AProjTCID tcid, const AProjTrackletIndex trackletindex, const AProjPHI phi, const AProjRZ rz, const AProjPHIDER phider, const AProjRZDER rzder):
+    data_( (((((tcid,trackletindex),phi),rz),phider),rzder) )
   {}
   
-  AllProjection(const AProjTCSEED seed, const AProjTCVM vm, const AProjTCNUM num, const AProjPHI phi, const AProjRZ rz, const AProjPHIDER phider, const AProjRZDER rzder):
-    data_( ((((((seed,vm),num),phi),rz),phider),rzder) )
+  AllProjection(const AProjTCSEED seed, const AProjTCVM vm, const AProjTrackletIndex trackletindex, const AProjPHI phi, const AProjRZ rz, const AProjPHIDER phider, const AProjRZDER rzder):
+    data_( ((((((seed,vm),trackletindex),phi),rz),phider),rzder) )
   {}
 
   AllProjection():
@@ -129,8 +129,8 @@ public:
   // Getter
   AllProjectionData raw() const {return data_;}
   
-  AProjTCID getTrackletIndex() const {
-    return data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB);
+  AProjTCID getTCID() const {
+    return data_.range(kAProjTCIDMSB,kAProjTCIDLSB);
   }
 
   AProjTCSEED getSeed() const {
@@ -141,8 +141,8 @@ public:
 	return data_.range(kAProjTCVMMSB,kAProjTCVMLSB);
   }
 
-  AProjTCNUM getTrackletNumber() const {
-	return data_.range(kAProjTCNumMSB,kAProjTCNumLSB);
+  AProjTrackletIndex getTrackletIndex() const {
+	return data_.range(kAProjTrackletIndexMSB,kAProjTrackletIndexLSB);
   }
 
   AProjPHI getPhi() const {
@@ -162,12 +162,8 @@ public:
   }
 
   // Setter
-  void setTrackletIndex(const AProjTCID id) {
-    data_.range(kAProjTCIndexMSB,kAProjTCIndexLSB) = id;
-  }
-
-  void setTrackletNumber(const AProjTCNUM num) {
-	data_.range(kAProjTCNumMSB,kAProjTCNumLSB) = num;
+  void setTCID(const AProjTCID id) {
+    data_.range(kAProjTCIDMSB,kAProjTCIDLSB) = id;
   }
 
   void setSeed(const AProjTCSEED seed) {
@@ -176,6 +172,10 @@ public:
 
   void setVM(const AProjTCVM vm) {
 	data_.range(kAProjTCVMMSB,kAProjTCVMLSB) = vm;
+  }
+
+  void setTrackletIndex(const AProjTrackletIndex trackletindex) {
+        data_.range(kAProjTrackletIndexMSB,kAProjTrackletIndexLSB) = trackletindex;
   }
 
   void setPhi(const AProjPHI phi) {
