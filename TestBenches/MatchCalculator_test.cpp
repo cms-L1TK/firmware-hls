@@ -1,5 +1,5 @@
 // MatchCalculator test bench
-#include "MatchCalculator.h"
+#include "MatchCalculator.hh"
 #include "AllStubMemory.hh"
 #include "AllProjectionMemory.hh"
 #include "CandidateMatchMemory.hh"

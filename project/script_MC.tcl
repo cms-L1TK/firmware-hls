@@ -14,9 +14,7 @@ open_project match_calc
 set_top MC
 
 # source files
-#add_files ../TrackletAlgorithm/MatchCalculator.cpp
-#add_files ../TrackletAlgorithm/Tools.cpp
-add_files ../TrackletAlgorithm/MC.cpp -cflags "-std=c++11"
+add_files ../TrackletAlgorithm/MatchCalculator.cpp -cflags "-std=c++11"
 add_files -tb -cflags "-I ../TrackletAlgorithm -std=c++11" ../TestBenches/MatchCalculator_test.cpp
 
 # data files

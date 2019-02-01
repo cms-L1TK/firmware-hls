@@ -29,7 +29,7 @@ public:
     kFMStubIndexLSB = kFMPhiResMSB + 1,
     kFMStubIndexMSB = kFMStubIndexLSB + kFMStubIndexSize - 1,
     kFMStubPhiIDLSB = kFMPhiResMSB + 1,
-    kFMStubPHIIDMSB = kFMStubPhiIDLSB + kFMStubPhiIDSize - 1,
+    kFMStubPhiIDMSB = kFMStubPhiIDLSB + kFMStubPhiIDSize - 1,
     kFMStubIDLSB = kFMStubPhiIDMSB + 1,
     kFMStubIDMSB = kFMStubIDLSB + kFMStubIDSize - 1,
     kFMTCIndexLSB = kFMStubIndexMSB + 1,
@@ -50,11 +50,11 @@ public:
     data_(newdata)
   {}
 
-  FullMatch(const FMTCINDEX tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
+  FullMatch(const FMTCID tcid, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
     data_( (((tcid,stub),phires),zres) )
   {}
 
-  FullMatch(const FMTCINDEX tcid, const FMSTUBPHIID stubphiid, const FMSTUBID stubid, const FMPHIRES phires, const FMZRES zres):
+  FullMatch(const FMTCID tcid, const FMSTUBPHIID stubphiid, const FMSTUBID stubid, const FMPHIRES phires, const FMZRES zres):
 	data_( ((((tcid,stubphiid),stubid),phires),zres) )
   {}
 
@@ -73,7 +73,7 @@ public:
   // Getter
   FullMatchData raw() const {return data_;}
 
-  FMTCINDEX getTCIndex() const {
+  FMTCID getTrackletIndex() const {
     return data_.range(kFMTCIndexMSB,kFMTCIndexLSB);
   }
 
@@ -98,7 +98,7 @@ public:
   }
 
   // Setter
-  void setTCIndex(const FMTCINDEX tcid) {
+  void setTrackletIndex(const FMTCID tcid) {
     data_.range(kFMTCIndexMSB,kFMTCIndexLSB) = tcid;
   }
 

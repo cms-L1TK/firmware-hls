@@ -209,7 +209,7 @@ void MatchCalculator(const BXType bx,
        // Store full matches that pass the cuts
        if (pass_sel){
          // Full match parameters
-         FullMatch::FMTCINDEX   fm_tcid  = proj_tcid;
+         FullMatch::FMTCID      fm_tcid  = proj_tcid;
          FullMatch::FMSTUBPHIID fm_asphi = kPhiSector;
          FullMatch::FMSTUBID    fm_asid  = stubid;
          FullMatch::FMPHIRES    fm_phi   = delta_z;
