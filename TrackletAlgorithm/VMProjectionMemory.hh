@@ -4,29 +4,32 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit sizes for VMProjectionMemory fields
-constexpr unsigned int kVMProjRinvSize = 5;
-constexpr unsigned int kVMProjFineZSize = 4;
-constexpr unsigned int kVMProjZBinSize = MEBinsBits+1;
-constexpr unsigned int kVMProjIndexSize = 7;
-// Bit size for full VMProjectionMemory
-constexpr unsigned int kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize + 1;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the VMProjectionMemory word for different fields
-constexpr unsigned int kVMProjIsPSSeedLSB = 0;
-constexpr unsigned int kVMProjRinvLSB = 1;
-constexpr unsigned int kVMProjRinvMSB = kVMProjRinvLSB + kVMProjRinvSize - 1;
-constexpr unsigned int kVMProjFineZLSB = kVMProjRinvMSB + 1;
-constexpr unsigned int kVMProjFineZMSB = kVMProjFineZLSB + kVMProjFineZSize - 1;
-constexpr unsigned int kVMProjZBinLSB = kVMProjFineZMSB + 1;
-constexpr unsigned int kVMProjZBinMSB = kVMProjZBinLSB + kVMProjZBinSize - 1;
-constexpr unsigned int kVMProjIndexLSB = kVMProjZBinMSB + 1;
-constexpr unsigned int kVMProjIndexMSB = kVMProjIndexLSB + kVMProjIndexSize - 1;
-
 // Data object definition
 class VMProjection
 {
 public:
+
+  enum BitWidths {
+    // Bit sizes for VMProjectionMemory fields
+    kVMProjRinvSize = 5,
+    kVMProjFineZSize = 4,
+    kVMProjZBinSize = MEBinsBits+1,
+    kVMProjIndexSize = 7,
+    // Bit size for full VMProjectionMemory
+    kVMProjectionSize = kVMProjRinvSize + kVMProjFineZSize + kVMProjZBinSize + kVMProjIndexSize + 1
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMProjectionMemory word for different fields
+    kVMProjIsPSSeedLSB = 0,
+    kVMProjRinvLSB = 1,
+    kVMProjRinvMSB = kVMProjRinvLSB + kVMProjRinvSize - 1,
+    kVMProjFineZLSB = kVMProjRinvMSB + 1,
+    kVMProjFineZMSB = kVMProjFineZLSB + kVMProjFineZSize - 1,
+    kVMProjZBinLSB = kVMProjFineZMSB + 1,
+    kVMProjZBinMSB = kVMProjZBinLSB + kVMProjZBinSize - 1,
+    kVMProjIndexLSB = kVMProjZBinMSB + 1,
+    kVMProjIndexMSB = kVMProjIndexLSB + kVMProjIndexSize - 1
+  };
   
   typedef ap_uint<kVMProjIndexSize> VMPID;
   typedef ap_uint<kVMProjZBinSize> VMPZBIN;
@@ -35,7 +38,6 @@ public:
 	
   typedef ap_uint<kVMProjectionSize> VMProjData;
 
-	
   // Constructors
   VMProjection(const VMProjData& newdata):
     data_(newdata)

@@ -24,7 +24,7 @@ int main() {
 
   // declare input memory arrays to be read from the emulation files
   VMProjectionMemory inputvmprojs;
-  VMStubMemory inputvmstubs;
+  VMStubMEMemory inputvmstubs;
   //CandidateMatchMemory inputcandmatches;
 
   // declare output memory array to be filled by hls simulation
@@ -49,7 +49,7 @@ int main() {
     cout << "Event: " << dec << ievt << endl;
 
     writeMemFromFile<VMProjectionMemory>(inputvmprojs, fin_vmproj, ievt);
-    writeMemFromFile<VMStubMemory>(inputvmstubs, fin_vmstub, ievt);
+    writeMemFromFile<VMStubMEMemory>(inputvmstubs, fin_vmstub, ievt);
 
     //set bunch crossing
     BXType bx=ievt&0x7;

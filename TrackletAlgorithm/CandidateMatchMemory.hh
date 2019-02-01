@@ -4,19 +4,22 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-// Bit size for full CandidateMatchMemory
-constexpr unsigned int kCandidateMatchSize = 2*kNBits_MemAddr;
-
-// The location of the least significant bit (LSB) and most significant bit (MSB) in the CandidateMatchMemory word for different fields
-constexpr unsigned int kCMStubIndexLSB = 0;
-constexpr unsigned int kCMStubIndexMSB = kCMStubIndexLSB + kNBits_MemAddr - 1;
-constexpr unsigned int kCMProjIndexLSB = kCMStubIndexMSB + 1;
-constexpr unsigned int kCMProjIndexMSB = kCMProjIndexLSB + kNBits_MemAddr - 1;
-
 // Data object definition
 class CandidateMatch
 {
 public:
+
+  enum BitWidths {
+    // Bit size for full CandidateMatchMemory
+    kCandidateMatchSize = 2*kNBits_MemAddr
+  };
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the CandidateMatchMemory word for different fields
+    kCMStubIndexLSB = 0,
+    kCMStubIndexMSB = kCMStubIndexLSB + kNBits_MemAddr - 1,
+    kCMProjIndexLSB = kCMStubIndexMSB + 1,
+    kCMProjIndexMSB = kCMProjIndexLSB + kNBits_MemAddr - 1
+  };
   
   // Define bit widths for CM parameters
   typedef ap_uint<kNBits_MemAddr> CMProjIndex; // projection (tracklet) index
