@@ -1,5 +1,5 @@
 // MatchCalculator test bench
-#include "MC.h"
+#include "MatchCalculator.h"
 #include "AllStubMemory.hh"
 #include "AllProjectionMemory.hh"
 #include "CandidateMatchMemory.hh"
@@ -111,7 +111,7 @@ int main() {
     BXType bx=ievt&0x7;
 
     // Unit Under Test
-    MC(bx,
+    MatchCalculator(bx,
                     &inputcandmatch1, &inputcandmatch2, &inputcandmatch3, &inputcandmatch4,
                     &inputcandmatch5, &inputcandmatch6, &inputcandmatch7, &inputcandmatch8,
                     &inputproj, &inputstub, &outputfullmatch_seed1, &outputfullmatch_seed2);

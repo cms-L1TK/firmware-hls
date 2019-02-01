@@ -1,292 +1,232 @@
-// First attempt at the MatchCalculator module
-// 
-// Assumptions:
-//   Only working for LAYER 3 (this affects the bit size of various parameters)
-//
-// FIXME :
-//   * Allow for other layers / disk calculations
-//   * counters for CMs in and FMs out should be shortened (right now 32b ints)
-//   * Setup the constants at compile instead of during running
-
-#include "HLSCandidateMatch.hh"
-#include "HLSAllStubs.hh"
-#include "HLSProjection.hh"
-#include "HLSFullMatch.hh"
 #include "MatchCalculator.hh"
-#include "ap_int.h"
-#include "hls_stream.h"
-#include "Tools.hh"
+#include "hls_math.h"
+#include <iostream>
+#include <fstream>
 
-void MatchCalculator(
-	const int layer,                           // make parameter ?
-    HLSCandidateMatch CM_PHI1_PHI1[MAX_nCM],   // input
-	HLSCandidateMatch CM_PHI1_PHI2[MAX_nCM],   // input
-	HLSCandidateMatch CM_PHI1_PHI3[MAX_nCM],   // input
-	HLSCandidateMatch CM_PHI1_PHI4[MAX_nCM],   // input
-    const ap_uint<7> n_CM_PHI1_PHI1,           // input
-	const ap_uint<7> n_CM_PHI1_PHI2,           // input
-	const ap_uint<7> n_CM_PHI1_PHI3,           // input
-	const ap_uint<7> n_CM_PHI1_PHI4,           // input
-	HLSAllStubs   AS_PHI1[MAX_nSTUB],          // input
-	HLSProjection Proj_PHI1[MAX_nPROJ],        // input
-	HLSFullMatch  FM_seed0[MAX_nFM],           // output
-	HLSFullMatch  FM_seed1[MAX_nFM],           // output
-	HLSFullMatch  FM_seed2[MAX_nFM],           // output
-	HLSFullMatch  FM_seed3[MAX_nFM],           // output
-	HLSFullMatch  FM_seed4[MAX_nFM],           // output
-	HLSFullMatch  FM_seed5[MAX_nFM],           // output
-	HLSFullMatch  FM_seed6[MAX_nFM],           // output
-	ap_uint<7> & n_FM_seed0,                   // output (7b allows for up to 64 FMs)
-	ap_uint<7> & n_FM_seed1,                   // output (7b allows for up to 64 FMs)
-	ap_uint<7> & n_FM_seed2,                   // output (7b allows for up to 64 FMs)
-	ap_uint<7> & n_FM_seed3,                   // output (7b allows for up to 64 FMs)
-	ap_uint<7> & n_FM_seed4,                   // output (7b allows for up to 64 FMs)
-	ap_uint<7> & n_FM_seed5,                   // output (7b allows for up to 64 FMs)
-	ap_uint<7> & n_FM_seed6                    // output (7b allows for up to 64 FMs)
+//-----------------------------------------------------------------------------------------
+// --------------------------------- FIXME ------------------------------------------------
+// Best match logic allows for more than one best match to go through 
+// More output FM memories? and have null pointers for ones not needed in each instance 
+//-----------------------------------------------------------------------------------------
+
+void MatchCalculator(const BXType bx,
+                     const CandidateMatchMemory* const incmdata1,
+                     const CandidateMatchMemory* const incmdata2,
+                     const CandidateMatchMemory* const incmdata3,
+                     const CandidateMatchMemory* const incmdata4,
+                     const CandidateMatchMemory* const incmdata5,
+                     const CandidateMatchMemory* const incmdata6,
+                     const CandidateMatchMemory* const incmdata7,
+                     const CandidateMatchMemory* const incmdata8,
+                     const AllProjectionMemory* const inprojdata, 
+                     const AllStubMemory* const instubdata,
+                     FullMatchMemory* const outfmdata1,
+                     FullMatchMemory* const outfmdata2
 ){
 
-#pragma HLS PIPELINE II=36
-#pragma HLS latency max=60
+  #pragma HLS PIPELINE II=36
+  #pragma HLS latency max=60
 
-	// Bool to keep track if working on a new tracklet (for best match logic)
-    bool newtracklet = true;
+  // Clear memory for each BX
+  outfmdata1->clear();
+  outfmdata2->clear();     
 
-	// Current FM counter -- used to write out n_FM made
-	ap_uint<7> curr_FM = 0;
-	ap_uint<7> curr_FM0 = 0;
-	ap_uint<7> curr_FM1 = 0;
-	ap_uint<7> curr_FM2 = 0;
-	ap_uint<7> curr_FM3 = 0;
-	ap_uint<7> curr_FM4 = 0;
-	ap_uint<7> curr_FM5 = 0;
-	ap_uint<7> curr_FM6 = 0;
+  // Pick up number of candidate matches for each CM memory
+  ap_uint<kNBits_MemAddr> ncm1 = incmdata1->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm2 = incmdata2->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm3 = incmdata3->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm4 = incmdata4->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm5 = incmdata5->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm6 = incmdata6->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm7 = incmdata7->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm8 = incmdata8->getEntries(bx);
+  ap_uint<kNBits_MemAddr> ncm  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8;
+   
+  std::cout << "Number CM in each: " << ncm1 << " " << ncm2 << " " << ncm3 << " " << ncm4 << " "
+		    << ncm5 << " " << ncm6 << " " << ncm7 << " " << ncm8 << std::endl;
 
-	// Total number of CMs coming in
-	ap_uint<7> n_CM   = n_CM_PHI1_PHI1 + n_CM_PHI1_PHI2 + n_CM_PHI1_PHI3 + n_CM_PHI1_PHI4;
-	//#pragma HLS RESOURCE variable=n_CM core=AddSub
+  // Initialize read addresses for candidate matches
+  ap_uint<kNBits_MemAddr> addr1 = 0;  
+  ap_uint<kNBits_MemAddr> addr2 = 0;  
+  ap_uint<kNBits_MemAddr> addr3 = 0;  
+  ap_uint<kNBits_MemAddr> addr4 = 0;  
+  ap_uint<kNBits_MemAddr> addr5 = 0;  
+  ap_uint<kNBits_MemAddr> addr6 = 0;  
+  ap_uint<kNBits_MemAddr> addr7 = 0;  
+  ap_uint<kNBits_MemAddr> addr8 = 0; 
 
-	// Setup the phi and z correction shifts
-	int fact = 0;
-	int phi0_shift = 0;
-	int phi_corr_shift = 0;
-	int z_corr_shift = 0;
-	setup_shifts<2>(fact,phi0_shift,phi_corr_shift,z_corr_shift);
+  // Setup candidate match data stream that goes into match calculations
+  CandidateMatch datastream = CandidateMatch();
 
-	ap_uint<13> best_delta_z;
-	ap_uint<17> best_delta_phi;
+  // Setup dummy indice to be used in the comparison
+  CandidateMatch::CMProjIndex dummy = -1; 
 
-	ap_uint<12> data1 = 0;
-	ap_uint<12> data2 = 0;
-	ap_uint<12> data3 = 0;
-	ap_uint<12> data4 = 0;
+  // Bool and ID needed for determining if processing a new tracklet
+  bool newtracklet = true;
+  CandidateMatch::CMProjIndex id[kMaxProc];
+ 
+  // Initialize MC cut variables 
+  ap_uint<13> best_delta_z;
+  ap_uint<17> best_delta_phi;
+ 
+  // Write addresses for output full matches
+  ap_uint<kNBits_MemAddr> wraddr1 = -1;
+  ap_uint<kNBits_MemAddr> wraddr2 = -1;
 
-	ap_uint<7> addr1 = 0;
-	ap_uint<7> addr2 = 0;
-	ap_uint<7> addr3 = 0;
-	ap_uint<7> addr4 = 0;
+  // Processing starts
+  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
+  {
+     if (istep < ncm){
+ 
+       // Read in each candidate match
+       const CandidateMatch &cm1 = incmdata1->read_mem(bx,addr1); 
+       const CandidateMatch &cm2 = incmdata2->read_mem(bx,addr2); 
+       const CandidateMatch &cm3 = incmdata3->read_mem(bx,addr3); 
+       const CandidateMatch &cm4 = incmdata4->read_mem(bx,addr4); 
+       const CandidateMatch &cm5 = incmdata5->read_mem(bx,addr5); 
+       const CandidateMatch &cm6 = incmdata6->read_mem(bx,addr6); 
+       const CandidateMatch &cm7 = incmdata7->read_mem(bx,addr7); 
+       const CandidateMatch &cm8 = incmdata8->read_mem(bx,addr8); 
 
-	ap_uint<12> dataout = -1;
-	ap_uint<12> dumby   = 0;
-	ap_uint<6>  dumbyid = -1;
+       // Pick up the projection indices
+       CandidateMatch::CMProjIndex id1 = (addr1 < ncm1) ? cm1.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id2 = (addr2 < ncm2) ? cm2.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id3 = (addr3 < ncm3) ? cm3.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id4 = (addr4 < ncm4) ? cm4.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id5 = (addr5 < ncm5) ? cm5.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id6 = (addr6 < ncm6) ? cm6.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id7 = (addr7 < ncm7) ? cm7.getProjIndex() : dummy; 
+       CandidateMatch::CMProjIndex id8 = (addr8 < ncm8) ? cm8.getProjIndex() : dummy; 
 
-	ap_uint<6> id[MAX_nCM];
+       // Sorted merge of incomming candidate matches
+       // Do comparison of projection (ie. tracklet) indices to decide which data to send first
+       // Then increment the address of which ever data has just been read
+       if (id1 <= id2 and id1 <= id3 and id1 <= id4 and id1 <= id5 and id1 <= id6 and id1 <= id7 and id1 <= id8){
+         datastream = cm1;
+         addr1++; 
+       }
+       else if (id2 <= id1 and id2 <= id3 and id2 <= id4 and id2 <= id5 and id2 <= id6 and id2 <= id7 and id2 <= id8){
+         datastream = cm2;
+         addr2++; 
+       }
+       else if (id3 <= id1 and id3 <= id2 and id3 <= id4 and id3 <= id5 and id3 <= id6 and id3 <= id7 and id3 <= id8){
+         datastream = cm3;
+         addr3++; 
+       }
+       else if (id4 <= id1 and id4 <= id2 and id4 <= id3 and id4 <= id5 and id4 <= id6 and id4 <= id7 and id4 <= id8){
+         datastream = cm4;
+         addr4++; 
+       }
+       else if (id5 <= id1 and id5 <= id2 and id5 <= id3 and id5 <= id4 and id5 <= id6 and id5 <= id7 and id5 <= id8){
+         datastream = cm5;
+         addr5++; 
+       }
+       else if (id6 <= id1 and id6 <= id2 and id6 <= id3 and id6 <= id4 and id6 <= id5 and id6 <= id7 and id6 <= id8){
+         datastream = cm6;
+         addr6++; 
+       }
+       else if (id7 <= id1 and id7 <= id2 and id7 <= id3 and id7 <= id4 and id7 <= id5 and id7 <= id6 and id7 <= id8){
+         datastream = cm7;
+         addr7++; 
+       }
+       else if (id8 <= id1 and id8 <= id2 and id8 <= id3 and id8 <= id4 and id8 <= id5 and id8 <= id6 and id8 <= id7){
+         datastream = cm8;
+         addr8++; 
+       }
+       else {
+         datastream = CandidateMatch();
+       }
 
-	hls::stream< ap_uint<12> > out;
-	ap_uint<3> state = 0;
-	#pragma HLS STREAM depth=1 variable=out
-	//#pragma HLS RESOURCE variable=out latency=2
+       // Extract the stub and projection indices from the candidate match
+       CandidateMatch::CMProjIndex projid = datastream.getProjIndex();
+       CandidateMatch::CMStubIndex stubid = datastream.getStubIndex();
+       // Use the stub and projection indices to pick up the stub and projection
+       const AllProjection &proj = inprojdata->read_mem(bx,projid);
+       const AllStub       &stub = instubdata->read_mem(bx,stubid); 
 
-	//----- Merge and sort the incoming CMs
-	LOOP: for (int i = 0; i < MAX_nCM; ++i)
-	{
-	#pragma HLS PIPELINE II=1
+       // Check if processing a new tracklet or not 
+       // Later we only want to store the single best match per tracklet
+       id[istep] = projid;
+       if (istep==0) newtracklet = true;
+       else if (id[istep] != id[istep-1]) newtracklet = true;
+       else newtracklet = false; 
 
-		if (i < n_CM){
+       if (newtracklet) std::cout << "Processing new tracklet" << std::endl;
+       std::cout << "Datastream : " << datastream.raw() << " CM params(ProjID,StubID): " << projid << " " << stubid << std::endl;
 
-			// pick up the data
-			data1 = CM_PHI1_PHI1[addr1].raw(); //(addr1 < n_CM_PHI1_PHI1) ? CM_PHI1_PHI1[addr1].raw() : dumby;
-			data2 = CM_PHI1_PHI2[addr2].raw(); //(addr2 < n_CM_PHI1_PHI2) ? CM_PHI1_PHI2[addr2].raw() : dumby;
-			data3 = CM_PHI1_PHI2[addr2].raw(); //(addr3 < n_CM_PHI1_PHI3) ? CM_PHI1_PHI3[addr3].raw() : dumby;
-			data4 = CM_PHI1_PHI2[addr2].raw(); //(addr4 < n_CM_PHI1_PHI4) ? CM_PHI1_PHI4[addr4].raw() : dumby;
+       // Stub parameters
+       AllStub::ASR    stub_r    = stub.getR();
+       AllStub::ASZ    stub_z    = stub.getZ();
+       AllStub::ASPHI  stub_phi  = stub.getPhi();
+       AllStub::ASBEND stub_bend = stub.getBend();       
 
-			// pick up the indices
-			ap_uint<6> id1 = data1.range(11,6);
-			ap_uint<6> id2 = data2.range(11,6);
-			ap_uint<6> id3 = data3.range(11,6);
-			ap_uint<6> id4 = data4.range(11,6);
+       // Projection parameters
+       AllProjection::AProjTCID   proj_tcid = proj.getTrackletIndex();
+       AllProjection::AProjTCSEED proj_seed = proj.getSeed();
+       AllProjection::AProjPHI    proj_phi  = proj.getPhi();
+       AllProjection::AProjZ      proj_z    = proj.getZ();
+       AllProjection::AProjPHIDER proj_phid = proj.getPhiDer();
+       AllProjection::AProjZDER   proj_zd   = proj.getZDer(); 
 
-			// indices for comparison
-			ap_uint<6> index1 = (addr1 < n_CM_PHI1_PHI1) ? id1 : dumbyid;
-			ap_uint<6> index2 = (addr2 < n_CM_PHI1_PHI2) ? id2 : dumbyid;
-			ap_uint<6> index3 = (addr3 < n_CM_PHI1_PHI3) ? id3 : dumbyid;
-			ap_uint<6> index4 = (addr4 < n_CM_PHI1_PHI4) ? id4 : dumbyid;
+       // Calculate residuals
+       // Get phi and z correction
+       ap_int<18> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
+       ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
+       ap_int<13> phi_corr      = full_phi_corr >> kPhi_corr_shift; // only keep needed bits 
+       ap_int<12> z_corr        = full_z_corr >> kZ_corr_shift;     // only keep needed bits
+        
+       // Apply the corrections
+       ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
+       ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
-			// do comparison to decide which data to send out
-			// increment the address of which data
-			if (index1 <= index2 and index1 <= index3 and index1 <= index4){
-				dataout = data1;
-				addr1++;
-			}
-			else if (index2 <= index1 and index2 <= index3 and index2 <= index4){
-				dataout = data2;
-				addr2++;
-			}
-			else if (index2 <= index1 and index2 <= index3 and index2 <= index4){
-				dataout = data3;
-				addr3++;
-			}
-			else if (index4 <= index1 and index4 <= index2 and index4 <= index3){
-				dataout = data4;
-				addr4++;
-			}
-			else{
-				dataout = 0;
-			}
+       // Get phi and z difference between the projection and stub
+       ap_int<9> delta_z         = stub_z - proj_z_corr;
+       ap_int<13> delta_z_fact   = delta_z * kFact;
+       ap_int<12> delta_phi      = (stub_phi << kPhi0_shift) - (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift));
+       ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
+       ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
-			//----- Check if processing a new tracklet or not (needed for determining best match)
-			id[i] = dataout.range(11,6);
-			if (i==0){ newtracklet = true; }
-			else if (id[i]!=id[i-1]){ newtracklet = true; }
-			else {  newtracklet = false; }
+       std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
 
-			//----- Merged data stream
-			out.write(dataout);
+       // For first tracklet, pick up the cut values and set write address
+       if (newtracklet){
+         best_delta_z   = LUT_matchcut_z[proj_seed];
+         best_delta_phi = LUT_matchcut_phi[proj_seed];
+         if (proj_seed==0) wraddr1++;
+         if (proj_seed==1) wraddr2++; 
+       }
+       // Check that matches fall within the selection window of the projection 
+       bool pass_sel = false;
+       if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= abs_delta_phi)){
+         pass_sel       = true;
+         // Update values of best parameters, so that the next match 
+         // will be compared to these values instead of the original selection cuts
+         best_delta_z   = abs_delta_z;
+         best_delta_phi = abs_delta_phi;
+       }
+       else pass_sel = false; 
 
-			//----- Calculate matches (using the tmp_CM array from above)
-			//
-			// loop over candidate matches
-			// up to the max number MAX_nCM the module can handle
-			// pick up corresponding stub and projection
-			// calculate z and phi corrections
-			// check that residuals pass the cuts
-			// and save the final match
-			//
+       // Store full matches that pass the cuts
+       if (pass_sel){
+         // Full match parameters
+         FullMatch::FMTCINDEX   fm_tcid  = proj_tcid;
+         FullMatch::FMSTUBPHIID fm_asphi = kPhiSector;
+         FullMatch::FMSTUBID    fm_asid  = stubid;
+         FullMatch::FMPHIRES    fm_phi   = delta_z;
+         FullMatch::FMZRES      fm_z     = delta_phi;
+         FullMatch fm(fm_tcid,fm_asphi,fm_asid,fm_phi,fm_z);
+         std::cout << "FM parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
+         // Write out full match based on the seeding
+         // Keep writing to the same address (only overwriting when a better match passes)
+         // until process a new tracklet, then the write address is updated 
+         if (proj_seed==0) outfmdata1->write_mem(bx,fm);
+         if (proj_seed==2) outfmdata2->write_mem(bx,fm);
+       }
 
-			ap_uint<12> outraw;
-			out.read_nb(outraw);
-			HLSCandidateMatch streamed = HLSCandidateMatch(outraw);
+     }// end if (i < ncm)
+     else break; // end processing of CMs 
+  }// end MC_LOOP 
 
-			//----- Extract the CM parameters (indices of stub & projection)
-			CM_proj_index p_index     = streamed.GetPIndex();
-			CM_stub_index s_index     = streamed.GetSIndex();
-       
-			//----- Use the indices to pick up the stub and projection
-			HLSAllStubs     stub      = AS_PHI1[s_index];
-			HLSProjection   proj      = Proj_PHI1[p_index];
 
-			//----- Stub parameters
-			const AS_r      stub_r    = stub.GetR();
-			const AS_z      stub_z    = stub.GetZ();
-			const AS_phi    stub_phi  = stub.GetPhi();
-			const AS_bend   stub_bend = stub.GetBend();
+}
 
-			//----- Projection parameters
-			// FIXME: Projection format here is OLD!!! Seed
-			const PROJ_TCID  proj_tcid = proj.GetTCID();
-			const ap_uint<3> proj_seed = proj_tcid.range(5,4); // old definition of tcid should be (6,4)
-			const ap_uint<4> proj_vm   = proj_tcid.range(3,0);
-			const PROJ_TCNUM proj_num  = proj.GetIndex();
-			const PROJ_PHI  proj_phi   = proj.GetPhi();
-			const PROJ_Z    proj_z     = proj.GetZ();
-			const PROJ_PHID proj_phid  = proj.GetPhiDeriv();
-			const PROJ_ZD   proj_zd    = proj.GetZDeriv();
-
-			// write out parameters for debugging
-			std::cout << "Stub: " << stub.raw() << " " << stub_r   << " " << stub_z << " " << stub_phi  << " " << stub_bend << std::endl;
-		    std::cout << "Proj: " << proj.raw() << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd   << std::endl;
-		    std::cout << "PROJ (ID,SEED,VM,NUM): " << proj_tcid << " " << proj_seed << " " << proj_vm << " " << proj_num << std::endl;
-
-			//----- Do the full match calculations
-
-			// get full phi and z corrections
-			// corrections are signed (both stub_r and proj_phid / proj_zd are signed)
-			// For L3:  stub_r (7b), proj_phid  (11 b), proj_zd (10b) -> 18b for multiplication
-			ap_int<18> full_phi_corr = stub_r * proj_phid;
-			ap_int<18> full_z_corr   = stub_r * proj_zd;
-
-			// shift full corrections by appropriate number of bits (still signed)
-			// For L3: phi_corr_shift = 5, z_corr_shift = 6 -> phi_corr (18-5 = 13b), z_corr (18-6 = 12b)
-			ap_int<13> phi_corr      = full_phi_corr >> phi_corr_shift;
-			ap_int<12> z_corr        = full_z_corr >> z_corr_shift;
-
-			// corrected values for comparisons (signed because corrections are signed)
-			// For L3: proj_phi (14b), phi_corr (13b) -> stub_phi_corr (15b)
-			// For L3: proj_z (12b), z_corr (12b)     -> proj_z_corr (13b)
-			ap_int<15> proj_phi_corr = proj_phi + phi_corr; // original stub phi plus the phi correction
-			ap_int<13> proj_z_corr   = proj_z + z_corr;     // original projection z plus the z correction
-
-			// get differences between projection and stub values (signed)
-			// For L3: delta_z (12b - 13b)
-			// For L3: delta_phi (14b << 3) - (14b << (1-1+3)) = 17b - 17b;
-			// For L3: dz_fact (13b * 1)
-			// absolute value of deltas have same number of bits, but unsigned
-			ap_int<13> delta_z        = stub_z - proj_z_corr;
-			ap_int<13> delta_z_fact   = delta_z*fact;
-			ap_int<17> delta_phi      = (stub_phi << phi0_shift) - (proj_phi_corr << (shift_phi0bit -1 + phi0_shift));
-			ap_uint<13> abs_delta_z   = iabs< 13 >( delta_z_fact );
-			ap_uint<17> abs_delta_phi = iabs< 17 >( delta_phi );
-
-			//----- Apply cuts
-
-			bool pass_match = false;
-			// For all matches (not just best) :
-			//if (abs_delta_phi <= matchcut_phi[layer][seed] && abs_delta_z <= matchcut_z[layer][seed]) pass_match = true;
-
-			// If the seed and layer combination is not valid then cut is 0
-			//ap_uint<13> best_delta_z   = matchcut_z[layer][proj_seed];
-			//ap_uint<17> best_delta_phi = matchcut_phi[layer][proj_seed];
-			if (newtracklet){
-				best_delta_z   = matchcut_z[layer][proj_seed];
-				best_delta_phi = matchcut_phi[layer][proj_seed];
-			}
-
-			if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= abs_delta_phi)){
-				pass_match     = true;
-				best_delta_z   = abs_delta_z;
-				best_delta_phi = abs_delta_phi;
-			}
-			else pass_match = false;
-
-			//----- Write out the FullMatch
-
-			// initialize the output full match values
-			FM_STUB_INDEX fm_s_index = 0;
-			FM_PROJ_INDEX fm_p_index = 0;
-			FM_PHI        fm_phi     = 0;
-			FM_Z          fm_z       = 0;
-
-			// store full matches that pass cuts
-			if (pass_match){
-				fm_p_index = p_index;
-				fm_s_index = s_index;
-				fm_phi     = delta_phi;
-				fm_z       = delta_z;
-
-				// FIXME: Not all of these seeding combinations are valid for each layer make extra ones synthesize away.
-				// For L3 only L1L2 and L5L6 seeding are valid combinations -- make others null pointers so go away?
-				if (proj_seed==0){ FM_seed0[curr_FM0].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM0++;} // seed L1L2
-				if (proj_seed==1){ FM_seed1[curr_FM1].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM1++;} // seed L3L4
-				if (proj_seed==2){ FM_seed2[curr_FM2].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM2++;} // seed L5L6
-				if (proj_seed==3){ FM_seed3[curr_FM3].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM3++;} // seed D1D2
-				if (proj_seed==4){ FM_seed4[curr_FM4].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM4++;} // seed D3D4
-				if (proj_seed==5){ FM_seed5[curr_FM5].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM5++;} // seed L1D1
-				if (proj_seed==6){ FM_seed6[curr_FM6].AddFM(fm_p_index,fm_s_index,fm_phi,fm_z); curr_FM6++;} // seed L2D1
-				curr_FM++;
-				std::cout << "Full Match out : " << FM_seed0[curr_FM0-1].raw() << std::endl;
-				std::cout << "Parameters     : " << FM_seed0[curr_FM0-1].GetPIndex() << " " << FM_seed0[curr_FM0-1].GetSIndex() << " " << FM_seed0[curr_FM0-1].GetPhi() << " " << FM_seed0[curr_FM0-1].GetZ() << std::endl;
-			}
-
-		}// end if (i < n_CM)
-		else break; // don't process more CMs than you have
-	}// end CM_LOOP
-
-	//---- Write out the number of FMs made (needed for next module)
-	n_FM_seed0 = curr_FM0;
-	n_FM_seed1 = curr_FM1;
-	n_FM_seed2 = curr_FM2;
-	n_FM_seed3 = curr_FM3;
-	n_FM_seed4 = curr_FM4;
-	n_FM_seed5 = curr_FM5;
-	n_FM_seed6 = curr_FM6;
-
-};
