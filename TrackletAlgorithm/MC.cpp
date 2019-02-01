@@ -9,7 +9,7 @@
 // More output FM memories? and have null pointers for ones not needed in each instance 
 //-----------------------------------------------------------------------------------------
 
-void MatchCalculator(const BXType bx,
+void MC(const BXType bx,
                      const CandidateMatchMemory* const incmdata1,
                      const CandidateMatchMemory* const incmdata2,
                      const CandidateMatchMemory* const incmdata3,
@@ -186,6 +186,8 @@ void MatchCalculator(const BXType bx,
        ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
        ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
+       std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
+
        // For first tracklet, pick up the cut values and set write address
        if (newtracklet){
          best_delta_z   = LUT_matchcut_z[proj_seed];
@@ -208,7 +210,7 @@ void MatchCalculator(const BXType bx,
        if (pass_sel){
          // Full match parameters
          FullMatch::FMTCINDEX   fm_tcid  = proj_tcid;
-         FullMatch::FMSTUBPHIID fm_asphi = 2;         // constant to label which phi sector
+         FullMatch::FMSTUBPHIID fm_asphi = kPhiSector;
          FullMatch::FMSTUBID    fm_asid  = stubid;
          FullMatch::FMPHIRES    fm_phi   = delta_z;
          FullMatch::FMZRES      fm_z     = delta_phi;

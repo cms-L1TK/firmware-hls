@@ -12,8 +12,9 @@ const int kPhi0_shift     = 3;
 const int kShift_phi0bit  = 1;
 const int kPhi_corr_shift = 5;
 const int kZ_corr_shift   = 6;
+const int kPhiSector      = 2; // PHI Sector C = 2
 
-void MatchCalculator(const BXType  bx,
+void MC(const BXType  bx,
                      const CandidateMatchMemory* const incmdata1,
                      const CandidateMatchMemory* const incmdata2,
                      const CandidateMatchMemory* const incmdata3,

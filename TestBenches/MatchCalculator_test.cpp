@@ -111,7 +111,7 @@ int main() {
     BXType bx=ievt&0x7;
 
     // Unit Under Test
-    MatchCalculator(bx,
+    MC(bx,
                     &inputcandmatch1, &inputcandmatch2, &inputcandmatch3, &inputcandmatch4,
                     &inputcandmatch5, &inputcandmatch6, &inputcandmatch7, &inputcandmatch8,
                     &inputproj, &inputstub, &outputfullmatch_seed1, &outputfullmatch_seed2);
