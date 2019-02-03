@@ -284,55 +284,55 @@ void ProjectionRouter(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
                       // array of scalar ...
-                      const MemTypeTProj* const tproj1,
-                      const MemTypeTProj* const tproj2,
-                      const MemTypeTProj* const tproj3,
-                      const MemTypeTProj* const tproj4,
-                      const MemTypeTProj* const tproj5,
-                      const MemTypeTProj* const tproj6,
-                      const MemTypeTProj* const tproj7,
-                      const MemTypeTProj* const tproj8,
-                      const MemTypeTProj* const tproj9,
-                      const MemTypeTProj* const tproj10,
-                      const MemTypeTProj* const tproj11,
-                      const MemTypeTProj* const tproj12,
-                      const MemTypeTProj* const tproj13,
-                      const MemTypeTProj* const tproj14,
-                      const MemTypeTProj* const tproj15,
-                      const MemTypeTProj* const tproj16,
-                      const MemTypeTProj* const tproj17,
-                      const MemTypeTProj* const tproj18,
-                      const MemTypeTProj* const tproj19,
-                      const MemTypeTProj* const tproj20,
-                      const MemTypeTProj* const tproj21,
-                      const MemTypeTProj* const tproj22,
-                      const MemTypeTProj* const tproj23,
-                      const MemTypeTProj* const tproj24,
+                      const MemTypeTProj* const proj1in,
+                      const MemTypeTProj* const proj2in,
+                      const MemTypeTProj* const proj3in,
+                      const MemTypeTProj* const proj4in,
+                      const MemTypeTProj* const proj5in,
+                      const MemTypeTProj* const proj6in,
+                      const MemTypeTProj* const proj7in,
+                      const MemTypeTProj* const proj8in,
+                      const MemTypeTProj* const proj9in,
+                      const MemTypeTProj* const proj10in,
+                      const MemTypeTProj* const proj11in,
+                      const MemTypeTProj* const proj12in,
+                      const MemTypeTProj* const proj13in,
+                      const MemTypeTProj* const proj14in,
+                      const MemTypeTProj* const proj15in,
+                      const MemTypeTProj* const proj16in,
+                      const MemTypeTProj* const proj17in,
+                      const MemTypeTProj* const proj18in,
+                      const MemTypeTProj* const proj19in,
+                      const MemTypeTProj* const proj20in,
+                      const MemTypeTProj* const proj21in,
+                      const MemTypeTProj* const proj22in,
+                      const MemTypeTProj* const proj23in,
+                      const MemTypeTProj* const proj24in,
                       BXType& bx_o,
-                      MemTypeAProj* const allproj,
-                      MemTypeVMProj* const vmproj1,
-                      MemTypeVMProj* const vmproj2,
-                      MemTypeVMProj* const vmproj3,
-                      MemTypeVMProj* const vmproj4,
-                      MemTypeVMProj* const vmproj5,
-                      MemTypeVMProj* const vmproj6,
-                      MemTypeVMProj* const vmproj7,
-                      MemTypeVMProj* const vmproj8
+                      MemTypeAProj* const allprojout,
+                      MemTypeVMProj* const vmprojout1,
+                      MemTypeVMProj* const vmprojout2,
+                      MemTypeVMProj* const vmprojout3,
+                      MemTypeVMProj* const vmprojout4,
+                      MemTypeVMProj* const vmprojout5,
+                      MemTypeVMProj* const vmprojout6,
+                      MemTypeVMProj* const vmprojout7,
+                      MemTypeVMProj* const vmprojout8
 ){
 #pragma HLS inline off
 
   using namespace PR;
   
   // reset output memories
-  allproj->clear(bx);
-  vmproj1->clear(bx);
-  vmproj2->clear(bx);
-  vmproj3->clear(bx);
-  vmproj4->clear(bx);
-  vmproj5->clear(bx);
-  vmproj6->clear(bx);
-  vmproj7->clear(bx);
-  vmproj8->clear(bx);
+  allprojout->clear(bx);
+  vmprojout1->clear(bx);
+  vmprojout2->clear(bx);
+  vmprojout3->clear(bx);
+  vmprojout4->clear(bx);
+  vmprojout5->clear(bx);
+  vmprojout6->clear(bx);
+  vmprojout7->clear(bx);
+  vmprojout8->clear(bx);
 
   // initialization:
   // check the number of entries in the input memories
@@ -343,9 +343,9 @@ void ProjectionRouter(BXType bx,
 
   init<MemTypeTProj, nINMEM, kNBits_MemAddr+1>
     (bx, mem_hasdata, numbersin,
-     tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
-     tproj9, tproj10, tproj11, tproj12, tproj13, tproj14, tproj15, tproj16,
-     tproj17, tproj18, tproj19, tproj20, tproj21, tproj22, tproj23, tproj24);
+     proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
+     proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
+     proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in);
   
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
@@ -358,9 +358,9 @@ void ProjectionRouter(BXType bx,
     bool validin = read_input_mems<DataTypeTProj, MemTypeTProj,
                                    nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
-       tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
-       tproj9, tproj10, tproj11, tproj12, tproj13, tproj14, tproj15, tproj16,
-       tproj17, tproj18, tproj19, tproj20, tproj21, tproj22, tproj23, tproj24,
+       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
+       proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
+       proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in,
        tproj);
 
     if (not validin) continue;
@@ -448,28 +448,28 @@ void ProjectionRouter(BXType bx,
     //assert(iphi>=0 and iphi<4);
     switch(iphi) {
     case 0:
-      vmproj1->write_mem(bx, vmproj); break;
+      vmprojout1->write_mem(bx, vmproj); break;
     case 1:
-      vmproj2->write_mem(bx, vmproj); break;
+      vmprojout2->write_mem(bx, vmproj); break;
     case 2:
-      vmproj3->write_mem(bx, vmproj); break;
+      vmprojout3->write_mem(bx, vmproj); break;
     case 3:
-      vmproj4->write_mem(bx, vmproj); break;
+      vmprojout4->write_mem(bx, vmproj); break;
     case 4:
-      vmproj5->write_mem(bx, vmproj); break;
+      vmprojout5->write_mem(bx, vmproj); break;
     case 5:
-      vmproj6->write_mem(bx, vmproj); break;
+      vmprojout6->write_mem(bx, vmproj); break;
     case 6:
-      vmproj7->write_mem(bx, vmproj); break;
+      vmprojout7->write_mem(bx, vmproj); break;
     case 7:
-      vmproj8->write_mem(bx, vmproj); break;
+      vmprojout8->write_mem(bx, vmproj); break;
     }
 
     /////////////////
     // AllProjection
     DataTypeAProj aproj(tproj.raw());
     // write output
-    allproj->write_mem(bx, aproj);
+    allprojout->write_mem(bx, aproj);
 
     bx_o = bx;
     
