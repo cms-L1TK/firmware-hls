@@ -106,11 +106,16 @@ public:
 
   AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend):
     data_( (((r,z),phi),bend) )
-  {}
+  {
+    static_assert(ASType != DISK2S, "Constructor should not be used for Disk 2S stubs");
+  }
 
+  // This constructor is only used for stubs in DISK2S
   AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASALPHA alpha, const ASBEND bend):
     data_( ((((r,z),phi),alpha),bend) )
-  {}
+  {
+    static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
+  }
 
   AllStub():
     data_(0)
@@ -139,7 +144,9 @@ public:
     return data_.range(kASPhiMSB,kASPhiLSB);
   }
 
+  // This getter is only used for stubs in DISK2S
   ASALPHA getAlpha() const {
+    static_assert(ASType == DISK2S, "Getter should only be used for Disk 2S stubs");
     return data_.range(kASAlphaMSB,kASAlphaLSB);
   }
 
@@ -160,7 +167,9 @@ public:
     data_.range(kASPhiMSB,kASPhiLSB) = phi;
   }
 
+  // This setter is only used for stubs in DISK2S
   void setAlpha(const ASALPHA alpha) {
+    static_assert(ASType == DISK2S, "Setter should only be used for Disk 2S stubs");
     data_.range(kASAlphaMSB,kASAlphaLSB) = alpha;
   }
 
