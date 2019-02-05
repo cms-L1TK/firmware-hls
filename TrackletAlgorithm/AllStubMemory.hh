@@ -30,7 +30,7 @@ public:
     kASRMSB = kASRLSB + kASRSize - 1
   };
   
-  typedef ap_uint<kASRSize> ASR;
+  typedef ap_int<kASRSize> ASR;
   typedef ap_int<kASZSize> ASZ;
   typedef ap_uint<kASPhiSize> ASPHI;
   typedef ap_uint<kASBendSize> ASBEND;

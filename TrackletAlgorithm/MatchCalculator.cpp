@@ -42,8 +42,8 @@ void MatchCalculator(const BXType bx,
   ap_uint<kNBits_MemAddr> ncm8 = incmdata8->getEntries(bx);
   ap_uint<kNBits_MemAddr> ncm  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8;
    
-  std::cout << "Number CM in each: " << ncm1 << " " << ncm2 << " " << ncm3 << " " << ncm4 << " "
-		    << ncm5 << " " << ncm6 << " " << ncm7 << " " << ncm8 << std::endl;
+  //std::cout << "Number CM in each: " << ncm1 << " " << ncm2 << " " << ncm3 << " " << ncm4 << " "
+  //		    << ncm5 << " " << ncm6 << " " << ncm7 << " " << ncm8 << std::endl;
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
@@ -151,8 +151,8 @@ void MatchCalculator(const BXType bx,
        else if (id[istep] != id[istep-1]) newtracklet = true;
        else newtracklet = false; 
 
-       if (newtracklet) std::cout << "Processing new tracklet" << std::endl;
-       std::cout << "Datastream : " << datastream.raw() << " CM params(ProjID,StubID): " << projid << " " << stubid << std::endl;
+       if (newtracklet) std::cout << "----- New tracklet -----" << std::endl;
+       std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
 
        // Stub parameters
        AllStub::ASR    stub_r    = stub.getR();
@@ -168,16 +168,26 @@ void MatchCalculator(const BXType bx,
        AllProjection::AProjPHIDER proj_phid = proj.getPhiDer();
        AllProjection::AProjZDER   proj_zd   = proj.getZDer(); 
 
+       std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
+       std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
+
        // Calculate residuals
        // Get phi and z correction
        ap_int<18> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
        ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
-       ap_int<13> phi_corr      = full_phi_corr >> kPhi_corr_shift; // only keep needed bits 
-       ap_int<12> z_corr        = full_z_corr >> kZ_corr_shift;     // only keep needed bits
+       ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift; // only keep needed bits
+       ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
         
+       //std::cout << "zcorr shift           " << kZ_corr_shift << std::endl;
+       //std::cout << "zcorr (full,trunk)  : " << full_z_corr << " " << z_corr << std::endl;
+       //std::cout << "phicorr (full,trunk): " << full_phi_corr << " " << phi_corr << std::endl;
+
        // Apply the corrections
        ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
        ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
+
+       //std::cout << "corr proj phi: " << proj_phi_corr << std::endl;
+       //std::cout << "corr proj z  : " << proj_z_corr << std::endl;
 
        // Get phi and z difference between the projection and stub
        ap_int<9> delta_z         = stub_z - proj_z_corr;
@@ -186,7 +196,9 @@ void MatchCalculator(const BXType bx,
        ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
        ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
-       std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
+       //std::cout << "Shifted stub_phi " << stub_phi << " " << (stub_phi << kPhi0_shift) << std::endl;
+       //std::cout << "Shifted proj_phi " << proj_phi_corr << " " << (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift)) << std::endl;
+       //std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
 
        // For first tracklet, pick up the cut values and set write address
        if (newtracklet){
@@ -195,6 +207,7 @@ void MatchCalculator(const BXType bx,
          if (proj_seed==0) wraddr1++;
          if (proj_seed==1) wraddr2++; 
        }
+       //std::cout << "Cuts (phi,z) : " <<  best_delta_phi << " " << best_delta_z << std::endl;
        // Check that matches fall within the selection window of the projection 
        bool pass_sel = false;
        if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= abs_delta_phi)){
@@ -212,10 +225,10 @@ void MatchCalculator(const BXType bx,
          FullMatch::FMTCID      fm_tcid  = proj_tcid;
          FullMatch::FMSTUBPHIID fm_asphi = kPhiSector;
          FullMatch::FMSTUBID    fm_asid  = stubid;
-         FullMatch::FMPHIRES    fm_phi   = delta_z;
-         FullMatch::FMZRES      fm_z     = delta_phi;
+         FullMatch::FMPHIRES    fm_phi   = delta_phi;
+         FullMatch::FMZRES      fm_z     = delta_z;
          FullMatch fm(fm_tcid,fm_asphi,fm_asid,fm_phi,fm_z);
-         std::cout << "FM parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
+         std::cout << "*************** FULL MATCH parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
          // Write out full match based on the seeding
          // Keep writing to the same address (only overwriting when a better match passes)
          // until process a new tracklet, then the write address is updated 

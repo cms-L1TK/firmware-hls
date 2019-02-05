@@ -8,9 +8,9 @@
 #include "FullMatchMemory.hh"
 
 const int kFact           = 1;
-const int kPhi0_shift     = 3; 
+const int kPhi0_shift     = 3;
 const int kShift_phi0bit  = 1;
-const int kPhi_corr_shift = 5;
+const int kPhi_corr_shift = 7;
 const int kZ_corr_shift   = 6;
 const int kPhiSector      = 2; // PHI Sector C = 2
 
