@@ -4,13 +4,29 @@
 #include <fstream>
 
 
+template<int L>
 void readTable(bool table[256]){
 
-  bool tmp[256]=
+  if (L==1) {
+    bool tmp[256]=
 #include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
-
-  for (int i=0;i<256;i++){
-    table[i]=tmp[i];
+    for (int i=0;i<256;i++){
+      table[i]=tmp[i];
+    }
+  }
+  if (L==3) {
+    bool tmp[256]=
+#include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
+    for (int i=0;i<256;i++){
+      table[i]=tmp[i];
+    }
+  }
+  if (L==5) {
+    bool tmp[256]=
+#include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
+    for (int i=0;i<256;i++){
+      table[i]=tmp[i];
+    }
   }
 
 }
@@ -29,6 +45,7 @@ void readTable(bool table[256]){
 #if CODEVERSION==2
 
 //Attempt at new version of code
+template<int L>
 void MatchEngine(const ap_uint<3> bx,
 		 const VMStubMEMemory* const instubdata,
 		 const VMProjectionMemory* const inprojdata,
@@ -46,7 +63,7 @@ void MatchEngine(const ap_uint<3> bx,
 
   //Initialize table for bend-rinv consistency
   bool table[256]; //FIXME Need to figure out how to replace 256 with meaningful const.
-  readTable(table);
+  readTable<L>(table);
 
   outcandmatch->clear();
 

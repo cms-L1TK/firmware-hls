@@ -12,7 +12,7 @@
 #include <iterator>
 
 
-const int nevents = 1;  // number of events to run
+const int nevents = 3;  // number of events to run
 
 using namespace std;
 
@@ -55,7 +55,7 @@ int main() {
     BXType bx=ievt&0x7;
 
     // Unit Under Test
-    MatchEngine(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
+    MatchEngine<1>(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches

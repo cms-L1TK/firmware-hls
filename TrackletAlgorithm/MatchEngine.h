@@ -7,6 +7,7 @@
 #include "VMStubMEMemory.hh"
 
 
+template<int L>
 void MatchEngine(const BXType  bx,
 		 const VMStubMEMemory* const instubdata, 
 		 const VMProjectionMemory* const inprojdata,
