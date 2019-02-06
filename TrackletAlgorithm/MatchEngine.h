@@ -8,8 +8,8 @@
 
 
 void MatchEngine(const BXType  bx,
-		 const VMStubMEMemory* const instubdata, 
-		 const VMProjectionMemory* const inprojdata,
+		 const VMStubMEMemory<BARRELPS>* const instubdata, 
+		 const VMProjectionMemory<BARREL>* const inprojdata,
 		 CandidateMatchMemory* const outcanddata
 		 );
 

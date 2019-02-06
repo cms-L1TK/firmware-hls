@@ -4,14 +4,12 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
-enum tProjType {INNER, OUTER, DISK};
-
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
-template<tProjType TProjType> class TrackletProjectionBase {};
+template<regionType TProjType> class TrackletProjectionBase {};
 
 template<>
-class TrackletProjectionBase<INNER>
+class TrackletProjectionBase<BARRELPS>
 {
 public:
   enum BitWidths {
@@ -28,7 +26,7 @@ public:
 };
 
 template<>
-class TrackletProjectionBase<OUTER>
+class TrackletProjectionBase<BARREL2S>
 {
 public:
   enum BitWidths {
@@ -63,7 +61,7 @@ public:
 
 
 // Data object definition
-template<tProjType TProjType>
+template<regionType TProjType>
 class TrackletProjection : public TrackletProjectionBase<TProjType>
 {
 public:
@@ -140,6 +138,7 @@ public:
     return data_.range(kTProjRZDMSB,kTProjRZDLSB);
   }
 
+ // Setter
   void setTCID(const TProjTCID id) {
     data_.range(kTProjTCIDMSB,kTProjTCIDLSB) = id;
   }
@@ -171,7 +170,7 @@ private:
 };
 
 // Memory definition
-template<tProjType TProjType> using TrackletProjectionMemory = MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>;
+template<regionType TProjType> using TrackletProjectionMemory = MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif

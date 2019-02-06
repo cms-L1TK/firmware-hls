@@ -2,6 +2,7 @@
 #include "MatchEngine.h"
 #include "CandidateMatchMemory.hh"
 #include "VMProjectionMemory.hh"
+#include "VMStubMEMemory.hh"
 #include "FileReadUtility.hh"
 #include "hls_math.h"
 
@@ -23,8 +24,8 @@ int main() {
   int err_count = 0;
 
   // declare input memory arrays to be read from the emulation files
-  VMProjectionMemory inputvmprojs;
-  VMStubMEMemory inputvmstubs;
+  VMProjectionMemory<BARREL> inputvmprojs;
+  VMStubMEMemory<BARRELPS> inputvmstubs;
   //CandidateMatchMemory inputcandmatches;
 
   // declare output memory array to be filled by hls simulation
@@ -48,8 +49,8 @@ int main() {
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    writeMemFromFile<VMProjectionMemory>(inputvmprojs, fin_vmproj, ievt);
-    writeMemFromFile<VMStubMEMemory>(inputvmstubs, fin_vmstub, ievt);
+    writeMemFromFile<VMProjectionMemory<BARREL> >(inputvmprojs, fin_vmproj, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs, fin_vmstub, ievt);
 
     //set bunch crossing
     BXType bx=ievt&0x7;
