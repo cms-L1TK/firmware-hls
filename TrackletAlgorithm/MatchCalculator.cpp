@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------------------
 // --------------------------------- FIXME ------------------------------------------------
 // Best match logic allows for more than one best match to go through 
+// Merger needs to be re-thought
 // More output FM memories? and have null pointers for ones not needed in each instance 
 //-----------------------------------------------------------------------------------------
 
@@ -68,10 +69,11 @@ void MatchCalculator(const BXType bx,
   // Initialize MC cut variables 
   ap_uint<13> best_delta_z;
   ap_uint<17> best_delta_phi;
- 
-  // Write addresses for output full matches
-  ap_uint<kNBits_MemAddr> wraddr1 = -1;
-  ap_uint<kNBits_MemAddr> wraddr2 = -1;
+
+  // Full match shift register to store best match
+  bool goodmatch[kMaxProc];
+  AllProjection::AProjTCSEED projseed[kMaxProc];
+  FullMatch bestmatch[kMaxProc];
 
   // Processing starts
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
@@ -151,8 +153,8 @@ void MatchCalculator(const BXType bx,
        else if (id[istep] != id[istep-1]) newtracklet = true;
        else newtracklet = false; 
 
-       if (newtracklet) std::cout << "----- New tracklet -----" << std::endl;
-       std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
+       //if (newtracklet) std::cout << "----- New tracklet -----" << std::endl;
+       //std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
 
        // Stub parameters
        AllStub::ASR    stub_r    = stub.getR();
@@ -168,12 +170,12 @@ void MatchCalculator(const BXType bx,
        AllProjection::AProjPHIDER proj_phid = proj.getPhiDer();
        AllProjection::AProjZDER   proj_zd   = proj.getZDer(); 
 
-       std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
-       std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
+       //std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
+       //std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
 
        // Calculate residuals
        // Get phi and z correction
-       ap_int<18> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
+       ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
        ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
        ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift; // only keep needed bits
        ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
@@ -186,31 +188,42 @@ void MatchCalculator(const BXType bx,
        ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
        ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
+       // Make longer for shifting
+       //ap_int<18> proj_phi_long = proj_phi_corr;
+       //ap_int<18> stub_phi_long = stub_phi;
+
        //std::cout << "corr proj phi: " << proj_phi_corr << std::endl;
        //std::cout << "corr proj z  : " << proj_z_corr << std::endl;
 
        // Get phi and z difference between the projection and stub
        ap_int<9> delta_z         = stub_z - proj_z_corr;
        ap_int<13> delta_z_fact   = delta_z * kFact;
-       ap_int<12> delta_phi      = (stub_phi << kPhi0_shift) - (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift));
+       ap_int<18> stub_phi_long  = stub_phi;
+       ap_int<18> proj_phi_long  = proj_phi_corr;
+       ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;
+       ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift);
+       ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
        ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
        ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
+       //std::cout << "Shifts           " << kPhi0_shift << " " << kShift_phi0bit << std::endl;
+       //ap_uint<18> shiftstubphi = stub_phi_long << kPhi0_shift;
+       //ap_uint<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift);
+       //std::cout << "Shifts again     " << shiftstubphi << " " << shiftprojphi << std::endl;
        //std::cout << "Shifted stub_phi " << stub_phi << " " << (stub_phi << kPhi0_shift) << std::endl;
        //std::cout << "Shifted proj_phi " << proj_phi_corr << " " << (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift)) << std::endl;
        //std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
+       //std::cout << "AbsDelta(Phi,Z): " << abs_delta_phi << " " << abs_delta_z << std::endl;
 
        // For first tracklet, pick up the cut values and set write address
        if (newtracklet){
          best_delta_z   = LUT_matchcut_z[proj_seed];
          best_delta_phi = LUT_matchcut_phi[proj_seed];
-         if (proj_seed==0) wraddr1++;
-         if (proj_seed==1) wraddr2++; 
        }
        //std::cout << "Cuts (phi,z) : " <<  best_delta_phi << " " << best_delta_z << std::endl;
        // Check that matches fall within the selection window of the projection 
        bool pass_sel = false;
-       if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= abs_delta_phi)){
+       if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= best_delta_phi)){
          pass_sel       = true;
          // Update values of best parameters, so that the next match 
          // will be compared to these values instead of the original selection cuts
@@ -219,6 +232,7 @@ void MatchCalculator(const BXType bx,
        }
        else pass_sel = false; 
 
+       goodmatch[istep] = false;
        // Store full matches that pass the cuts
        if (pass_sel){
          // Full match parameters
@@ -228,12 +242,18 @@ void MatchCalculator(const BXType bx,
          FullMatch::FMPHIRES    fm_phi   = delta_phi;
          FullMatch::FMZRES      fm_z     = delta_z;
          FullMatch fm(fm_tcid,fm_asphi,fm_asid,fm_phi,fm_z);
-         std::cout << "*************** FULL MATCH parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
+         //std::cout << "*************** FULL MATCH parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
+         //std::cout << "*************** FULL MATCH = " << fm.raw() << std::endl;
+         bestmatch[istep] = fm.raw();
+         goodmatch[istep] = true;
+         projseed[istep]  = proj_seed;
+       }
+
+       // Write out only the best match
+       if (newtracklet && goodmatch[istep-1] == true){
          // Write out full match based on the seeding
-         // Keep writing to the same address (only overwriting when a better match passes)
-         // until process a new tracklet, then the write address is updated 
-         if (proj_seed==0) outfmdata1->write_mem(bx,fm);
-         if (proj_seed==2) outfmdata2->write_mem(bx,fm);
+         if (projseed[istep-1]==0) outfmdata1->write_mem(bx,bestmatch[istep-1]);
+         if (projseed[istep-1]==2) outfmdata2->write_mem(bx,bestmatch[istep-1]);
        }
 
      }// end if (i < ncm)
