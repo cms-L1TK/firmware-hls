@@ -14,4 +14,6 @@ void MatchEngine(const BXType  bx,
 		 CandidateMatchMemory* const outcanddata
 		 );
 
+#include "MatchEngine.icpp"
+
 #endif
