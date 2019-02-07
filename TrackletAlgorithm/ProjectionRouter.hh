@@ -276,48 +276,46 @@ namespace PR
 
 //////////////////////////////
 // ProjectionRouter
-template<class MemTypeTProj, class MemTypeAProj, class MemTypeVMProj,
-         class DataTypeTProj, class DataTypeAProj, class DataTypeVMProj,
-         // Is there a way to infer data type from memory type?
-         unsigned int nINMEM, int LAYER=0, int DISK=0>
+template<regionType PROJTYPE, regionType VMPTYPE, unsigned int nINMEM,
+         int LAYER=0, int DISK=0>
 void ProjectionRouter(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
                       // array of scalar ...
-                      const MemTypeTProj* const proj1in,
-                      const MemTypeTProj* const proj2in,
-                      const MemTypeTProj* const proj3in,
-                      const MemTypeTProj* const proj4in,
-                      const MemTypeTProj* const proj5in,
-                      const MemTypeTProj* const proj6in,
-                      const MemTypeTProj* const proj7in,
-                      const MemTypeTProj* const proj8in,
-                      const MemTypeTProj* const proj9in,
-                      const MemTypeTProj* const proj10in,
-                      const MemTypeTProj* const proj11in,
-                      const MemTypeTProj* const proj12in,
-                      const MemTypeTProj* const proj13in,
-                      const MemTypeTProj* const proj14in,
-                      const MemTypeTProj* const proj15in,
-                      const MemTypeTProj* const proj16in,
-                      const MemTypeTProj* const proj17in,
-                      const MemTypeTProj* const proj18in,
-                      const MemTypeTProj* const proj19in,
-                      const MemTypeTProj* const proj20in,
-                      const MemTypeTProj* const proj21in,
-                      const MemTypeTProj* const proj22in,
-                      const MemTypeTProj* const proj23in,
-                      const MemTypeTProj* const proj24in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj1in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj2in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj3in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj4in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj5in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj6in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj7in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj8in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj9in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj10in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj11in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj12in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj13in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj14in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj15in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj16in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj17in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj18in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj19in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj20in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj21in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj22in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj23in,
+                      const TrackletProjectionMemory<PROJTYPE>* const proj24in,
                       BXType& bx_o,
-                      MemTypeAProj* const allprojout,
-                      MemTypeVMProj* const vmprojout1,
-                      MemTypeVMProj* const vmprojout2,
-                      MemTypeVMProj* const vmprojout3,
-                      MemTypeVMProj* const vmprojout4,
-                      MemTypeVMProj* const vmprojout5,
-                      MemTypeVMProj* const vmprojout6,
-                      MemTypeVMProj* const vmprojout7,
-                      MemTypeVMProj* const vmprojout8
+                      AllProjectionMemory<PROJTYPE>* const allprojout,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout1,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout2,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout3,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout4,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout5,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout6,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout7,
+                      VMProjectionMemory<VMPTYPE>* const vmprojout8
 ){
 #pragma HLS inline off
 
@@ -341,7 +339,7 @@ void ProjectionRouter(BXType bx,
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
-  init<MemTypeTProj, nINMEM, kNBits_MemAddr+1>
+  init<TrackletProjectionMemory<PROJTYPE>, nINMEM, kNBits_MemAddr+1>
     (bx, mem_hasdata, numbersin,
      proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
      proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
@@ -354,8 +352,9 @@ void ProjectionRouter(BXType bx,
 #pragma HLS PIPELINE II=1
 
     // read inputs
-    DataTypeTProj tproj;
-    bool validin = read_input_mems<DataTypeTProj, MemTypeTProj,
+    TrackletProjection<PROJTYPE> tproj;
+    bool validin = read_input_mems<TrackletProjection<PROJTYPE>,
+                                   TrackletProjectionMemory<PROJTYPE>,
                                    nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
        proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
@@ -392,7 +391,7 @@ void ProjectionRouter(BXType bx,
     static_assert(not DISK, "PR: Layer only for now.");
     
     // vmproj index
-    typename DataTypeVMProj::VMPID index = i;
+    typename VMProjection<VMPTYPE>::VMPID index = i;
     //assert(i < (1<<index.length()));
 
     // vmproj z
@@ -413,21 +412,21 @@ void ProjectionRouter(BXType bx,
     //assert(zbin1<=zbin2);
     //assert(zbin2-zbin1<=1);
     
-    typename DataTypeVMProj::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
+    typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
     //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
     // need to be careful about left shift of ap_(u)int
-    typename DataTypeVMProj::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
+    typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
 
     // vmproj irinv
     // phider = -irinv/2
     // Note: auto does not work well here
     // auto infers 42 bits because -2 is treated as a 32-bit int
-    ap_uint<DataTypeTProj::BitWidths::kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
+    ap_uint<TrackletProjection<PROJTYPE>::BitWidths::kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
 
     // rinv in VMProjection takes only the top 5 bits
     // and is shifted to be positive
-    typename DataTypeVMProj::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
+    typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
     //assert(rinv >=0 and rinv < 32);
     
     // PS seed
@@ -442,7 +441,7 @@ void ProjectionRouter(BXType bx,
     bool psseed = not(iseed==1 or iseed==2); 
 
     // VM Projection
-    DataTypeVMProj vmproj(index, zbin, finez, rinv, psseed);
+    VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);
 
     // write outputs
     //assert(iphi>=0 and iphi<4);
@@ -467,7 +466,7 @@ void ProjectionRouter(BXType bx,
 
     /////////////////
     // AllProjection
-    DataTypeAProj aproj(tproj.raw());
+    AllProjection<PROJTYPE> aproj(tproj.raw());
     // write output
     allprojout->write_mem(bx, aproj);
 
