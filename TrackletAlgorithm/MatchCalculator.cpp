@@ -232,6 +232,9 @@ void MatchCalculator(const BXType bx,
        }
        else pass_sel = false; 
 
+       //FullMatch tmp(proj_tcid,kPhiSector,stubid,delta_phi,delta_z);
+       //std::cout << "Match would be : " << tmp.raw() << std::endl;
+
        goodmatch[istep] = false;
        // Store full matches that pass the cuts
        if (pass_sel){
@@ -248,16 +251,32 @@ void MatchCalculator(const BXType bx,
          goodmatch[istep] = true;
          projseed[istep]  = proj_seed;
        }
+       else{ // if current is not the best match
+    	    if (newtracklet){ // if is a new tracklet, don't make a match
+    		   goodmatch[istep] = false;
+    		   bestmatch[istep] = FullMatch();
+    		   projseed[istep]  = 0;
+    	    }
+		    else { // if current doesn't pass, but not a new tracklet, take the previous iteration
+    		   goodmatch[istep] = goodmatch[istep-1];
+    		   bestmatch[istep] = bestmatch[istep-1].raw();
+    		   projseed[istep]  = projseed[istep-1];
+    	   }
+       }
+
+       //std::cout << "Best match: " << goodmatch[istep] << " " << bestmatch[istep].raw() << std::endl;
+       //std::cout << "New tracklet: " << newtracklet << std::endl;
+       //std::cout << "istep = " << istep << std::endl;
 
        // Write out only the best match
-       if (newtracklet && goodmatch[istep-1] == true){
+       if (newtracklet || istep==kMaxProc-1){
          // Write out full match based on the seeding
-         if (projseed[istep-1]==0) outfmdata1->write_mem(bx,bestmatch[istep-1]);
-         if (projseed[istep-1]==2) outfmdata2->write_mem(bx,bestmatch[istep-1]);
+         if (goodmatch[istep-1]==true && projseed[istep-1]==0) outfmdata1->write_mem(bx,bestmatch[istep-1]);
+         if (goodmatch[istep-1]==true && projseed[istep-1]==2) outfmdata2->write_mem(bx,bestmatch[istep-1]);
        }
 
      }// end if (i < ncm)
-     else break; // end processing of CMs 
+     else break; // end processing of CMs
   }// end MC_LOOP 
 
 
