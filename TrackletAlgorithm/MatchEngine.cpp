@@ -9,25 +9,53 @@ void readTable(bool table[256]){
 
   if (L==1) {
     bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
+#include "../emData/ME/ME_L1PHIE20/METable_L1.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
   }
+
+  if (L==2) {
+    bool tmp[256]=
+#include "../emData/ME/ME_L1PHIE20/METable_L2.tab"
+    for (int i=0;i<256;i++){
+      table[i]=tmp[i];
+    }
+  }
+
   if (L==3) {
     bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
+#include "../emData/ME/ME_L1PHIE20/METable_L3.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
   }
+
+  if (L==4) {
+    bool tmp[512]=
+#include "../emData/ME/ME_L1PHIE20/METable_L4.tab"
+    for (int i=0;i<512;i++){
+      table[i]=tmp[i];
+    }
+  }
+
   if (L==5) {
-    bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_ME_L1PHIE20.tab"
-    for (int i=0;i<256;i++){
+    bool tmp[512]=
+#include "../emData/ME/ME_L1PHIE20/METable_L5.tab"
+    for (int i=0;i<512;i++){
       table[i]=tmp[i];
     }
   }
+
+  if (L==6) {
+    bool tmp[512]=
+#include "../emData/ME/ME_L1PHIE20/METable_L6.tab"
+    for (int i=0;i<512;i++){
+      table[i]=tmp[i];
+    }
+  }
+
+
 
 }
 
