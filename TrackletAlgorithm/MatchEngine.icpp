@@ -75,8 +75,8 @@ void readTable(bool table[256]){
 //Attempt at new version of code
 template<int L>
 void MatchEngine(const ap_uint<3> bx,
-		 const VMStubMEMemory* const instubdata,
-		 const VMProjectionMemory* const inprojdata,
+		 const VMStubMEMemory<BARRELPS>* const instubdata,
+		 const VMProjectionMemory<BARREL>* const inprojdata,
 		 CandidateMatchMemory* const outcandmatch){
 
 
@@ -115,10 +115,10 @@ void MatchEngine(const ap_uint<3> bx,
 
   //Projection that is read from the buffer and compared to stubs  
   ap_uint<TEBinsBits> zbin=0;
-  VMProjection::VMPID projindex;
-  VMProjection::VMPFINEZ projfinez;
+  VMProjection<BARREL>::VMPID projindex;
+  VMProjection<BARREL>::VMPFINEZ projfinez;
   ap_int<5> projfinezadj; //FIXME Need replace 5 with const
-  VMProjection::VMPRINV projrinv;
+  VMProjection<BARREL>::VMPRINV projrinv;
   bool isPSseed;
   bool second;
 
@@ -201,7 +201,7 @@ void MatchEngine(const ap_uint<3> bx,
 	//Need to read the information about the proj in the buffer
         nstubs=qdata.range(29,26);
 	zbin=qdata.range(3,1);
-	VMProjection data(qdata.range(25,4));
+	VMProjection<BARREL> data(qdata.range(25,4));
 
 	projindex=data.getIndex();
 	projfinez=data.getFineZ();
@@ -231,10 +231,10 @@ void MatchEngine(const ap_uint<3> bx,
 
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
-      VMStubME stubdata=instubdata->read_mem(bx,stubadd);
-      VMStubME::VMSMEID stubindex=stubdata.getIndex();
-      VMStubME::VMSMEFINEZ stubfinez=stubdata.getFineZ();
-      VMStubME::VMSMEBEND stubbend=stubdata.getBend();
+      VMStubME<BARRELPS> stubdata=instubdata->read_mem(bx,stubadd);
+      VMStubME<BARRELPS>::VMSMEID stubindex=stubdata.getIndex();
+      VMStubME<BARRELPS>::VMSMEFINEZ stubfinez=stubdata.getFineZ();
+      VMStubME<BARRELPS>::VMSMEBEND stubbend=stubdata.getBend();
 
       //Check if stub z position consistent
       ap_int<5> idz=stubfinez-projfinezadj;
@@ -267,7 +267,7 @@ void MatchEngine(const ap_uint<3> bx,
 //
 // This version closely follows the code in the emulations. This version can
 // not be pipelined
-//
+// This version has not been updated to be compatible with the new memory formats
 
 void MatchEngine(const ap_uint<3> bx,
 		 const VMStubMEMemory* const instubdata,

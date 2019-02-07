@@ -18,29 +18,29 @@ int main()
 
   ///////////////////////////
   // input memories
-  static AllStubMemory innerStubs[2];
-  static AllStubMemory outerStubs[1];
+  static AllStubMemory<BARRELPS> innerStubs[2];
+  static AllStubMemory<BARRELPS> outerStubs[1];
   static StubPairMemory stubPairs00[13];
   static StubPairMemory stubPairs10[13];
 
   // output memories
   static TrackletParameterMemory tpar;
-  static TrackletProjectionMemory<INNER> tproj_L3PHIA;
-  static TrackletProjectionMemory<INNER> tproj_L3PHIB;
-  static TrackletProjectionMemory<INNER> tproj_L3PHIC;
-  static TrackletProjectionMemory<INNER> tproj_L3PHID;
-  static TrackletProjectionMemory<OUTER> tproj_L4PHIA;
-  static TrackletProjectionMemory<OUTER> tproj_L4PHIB;
-  static TrackletProjectionMemory<OUTER> tproj_L4PHIC;
-  static TrackletProjectionMemory<OUTER> tproj_L4PHID;
-  static TrackletProjectionMemory<OUTER> tproj_L5PHIA;
-  static TrackletProjectionMemory<OUTER> tproj_L5PHIB;
-  static TrackletProjectionMemory<OUTER> tproj_L5PHIC;
-  static TrackletProjectionMemory<OUTER> tproj_L5PHID;
-  static TrackletProjectionMemory<OUTER> tproj_L6PHIA;
-  static TrackletProjectionMemory<OUTER> tproj_L6PHIB;
-  static TrackletProjectionMemory<OUTER> tproj_L6PHIC;
-  static TrackletProjectionMemory<OUTER> tproj_L6PHID;
+  static TrackletProjectionMemory<BARRELPS> tproj_L3PHIA;
+  static TrackletProjectionMemory<BARRELPS> tproj_L3PHIB;
+  static TrackletProjectionMemory<BARRELPS> tproj_L3PHIC;
+  static TrackletProjectionMemory<BARRELPS> tproj_L3PHID;
+  static TrackletProjectionMemory<BARREL2S> tproj_L4PHIA;
+  static TrackletProjectionMemory<BARREL2S> tproj_L4PHIB;
+  static TrackletProjectionMemory<BARREL2S> tproj_L4PHIC;
+  static TrackletProjectionMemory<BARREL2S> tproj_L4PHID;
+  static TrackletProjectionMemory<BARREL2S> tproj_L5PHIA;
+  static TrackletProjectionMemory<BARREL2S> tproj_L5PHIB;
+  static TrackletProjectionMemory<BARREL2S> tproj_L5PHIC;
+  static TrackletProjectionMemory<BARREL2S> tproj_L5PHID;
+  static TrackletProjectionMemory<BARREL2S> tproj_L6PHIA;
+  static TrackletProjectionMemory<BARREL2S> tproj_L6PHIB;
+  static TrackletProjectionMemory<BARREL2S> tproj_L6PHIC;
+  static TrackletProjectionMemory<BARREL2S> tproj_L6PHID;
   static TrackletProjectionMemory<DISK> tproj_D1PHIA;
   static TrackletProjectionMemory<DISK> tproj_D1PHIB;
   static TrackletProjectionMemory<DISK> tproj_D1PHIC;
@@ -189,9 +189,9 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    writeMemFromFile<AllStubMemory>(innerStubs[0], fin_innerStubs0, ievt);
-    writeMemFromFile<AllStubMemory>(innerStubs[1], fin_innerStubs1, ievt);
-    writeMemFromFile<AllStubMemory>(outerStubs[0], fin_outerStubs, ievt);
+    writeMemFromFile<AllStubMemory<BARRELPS> >(innerStubs[0], fin_innerStubs0, ievt);
+    writeMemFromFile<AllStubMemory<BARRELPS> >(innerStubs[1], fin_innerStubs1, ievt);
+    writeMemFromFile<AllStubMemory<BARRELPS> >(outerStubs[0], fin_outerStubs, ievt);
     writeMemFromFile<StubPairMemory>(stubPairs00[0], fin_stubPairs0, ievt);
     writeMemFromFile<StubPairMemory>(stubPairs00[1], fin_stubPairs1, ievt);
     writeMemFromFile<StubPairMemory>(stubPairs00[2], fin_stubPairs2, ievt);
@@ -250,25 +250,25 @@ int main()
     // compare the computed outputs with the expected ones
     err += compareMemWithFile<TrackletParameterMemory>(tpar, fout_tpar, ievt,
                                                    "\nTrackletParameter");
-    err += compareMemWithFile<TrackletProjectionMemory<INNER> >(tproj_L3PHIB, fout_tproj0, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_L3PHIB, fout_tproj0, ievt,
                                                    "\nTrackletProjection (L3PHIB)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L4PHIA, fout_tproj1, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L4PHIA, fout_tproj1, ievt,
                                                    "\nTrackletProjection (L4PHIA)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L4PHIB, fout_tproj2, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L4PHIB, fout_tproj2, ievt,
                                                    "\nTrackletProjection (L4PHIB)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L4PHIC, fout_tproj3, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L4PHIC, fout_tproj3, ievt,
                                                    "\nTrackletProjection (L4PHIC)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L5PHIA, fout_tproj4, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L5PHIA, fout_tproj4, ievt,
                                                    "\nTrackletProjection (L5PHIA)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L5PHIB, fout_tproj5, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L5PHIB, fout_tproj5, ievt,
                                                    "\nTrackletProjection (L5PHIB)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L5PHIC, fout_tproj6, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L5PHIC, fout_tproj6, ievt,
                                                    "\nTrackletProjection (L5PHIC)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L6PHIA, fout_tproj7, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L6PHIA, fout_tproj7, ievt,
                                                    "\nTrackletProjection (L6PHIA)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L6PHIB, fout_tproj8, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L6PHIB, fout_tproj8, ievt,
                                                    "\nTrackletProjection (L6PHIB)");
-    err += compareMemWithFile<TrackletProjectionMemory<OUTER> >(tproj_L6PHIC, fout_tproj9, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_L6PHIC, fout_tproj9, ievt,
                                                    "\nTrackletProjection (L6PHIC)");
     err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_D1PHIA, fout_tproj10, ievt,
                                                    "\nTrackletProjection (D1PHIA)");

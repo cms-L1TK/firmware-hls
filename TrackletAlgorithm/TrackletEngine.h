@@ -9,8 +9,8 @@ class CandMatch;
 
 void TrackletEngine(
 		    const ap_uint<3> bx,
-		    const VMStubTEInnerMemory& instubinnerdata, 
-		    const VMStubTEOuterMemory& instubouterdata,
+		    const VMStubTEInnerMemory<BARRELPS>& instubinnerdata, 
+		    const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
 		    StubPairMemory& outstubpairdata
 		    );
 
