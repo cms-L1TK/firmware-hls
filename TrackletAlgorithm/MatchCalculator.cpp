@@ -5,10 +5,10 @@
 
 //-----------------------------------------------------------------------------------------
 // --------------------------------- FIXME ------------------------------------------------
-// Best match logic allows for more than one best match to go through 
 // Merger needs to be re-thought
 // More output FM memories? and have null pointers for ones not needed in each instance 
 //-----------------------------------------------------------------------------------------
+bool debug = false;
 
 void MatchCalculator(const BXType bx,
                      const CandidateMatchMemory* const incmdata1,
@@ -41,10 +41,11 @@ void MatchCalculator(const BXType bx,
   ap_uint<kNBits_MemAddr> ncm6 = incmdata6->getEntries(bx);
   ap_uint<kNBits_MemAddr> ncm7 = incmdata7->getEntries(bx);
   ap_uint<kNBits_MemAddr> ncm8 = incmdata8->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8;
-   
-  //std::cout << "Number CM in each: " << ncm1 << " " << ncm2 << " " << ncm3 << " " << ncm4 << " "
-  //		    << ncm5 << " " << ncm6 << " " << ncm7 << " " << ncm8 << std::endl;
+
+  // Count up total number of CMs *and protect incase of overflow)
+  ap_uint<7> ncm;
+  if (ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8 > kMaxProc) ncm = kMaxProc;
+  else ncm = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8;
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
@@ -66,8 +67,7 @@ void MatchCalculator(const BXType bx,
   bool newtracklet = true;
   CandidateMatch::CMProjIndex id[kMaxProc];
  
-  // Initialize MC cut variables 
-  ap_uint<13> best_delta_z;
+  // Initialize MC delta phi cut variables
   ap_uint<17> best_delta_phi;
 
   // Full match shift register to store best match
@@ -75,11 +75,17 @@ void MatchCalculator(const BXType bx,
   AllProjection::AProjTCSEED projseed[kMaxProc];
   FullMatch bestmatch[kMaxProc];
 
+  // Bool to signal last processing
+  bool last = false;
+
   // Processing starts
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
   {
+
+	 if (istep==(kMaxProc-1) || istep==(ncm-1)) last = true;
+	 else last = false;
+
      if (istep < ncm){
- 
        // Read in each candidate match
        const CandidateMatch &cm1 = incmdata1->read_mem(bx,addr1); 
        const CandidateMatch &cm2 = incmdata2->read_mem(bx,addr2); 
@@ -153,9 +159,6 @@ void MatchCalculator(const BXType bx,
        else if (id[istep] != id[istep-1]) newtracklet = true;
        else newtracklet = false; 
 
-       //if (newtracklet) std::cout << "----- New tracklet -----" << std::endl;
-       //std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
-
        // Stub parameters
        AllStub::ASR    stub_r    = stub.getR();
        AllStub::ASZ    stub_z    = stub.getZ();
@@ -170,74 +173,51 @@ void MatchCalculator(const BXType bx,
        AllProjection::AProjPHIDER proj_phid = proj.getPhiDer();
        AllProjection::AProjZDER   proj_zd   = proj.getZDer(); 
 
-       //std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
-       //std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
+       if (debug){
+         std::cout << "i " << istep << std::endl;
+      	 if (newtracklet) std::cout << "----- New tracklet -----" << std::endl;
+         std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
+    	 std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
+    	 std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
+       }
 
        // Calculate residuals
        // Get phi and z correction
        ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
        ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
-       ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift; // only keep needed bits
+       ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
        ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
         
-       //std::cout << "zcorr shift           " << kZ_corr_shift << std::endl;
-       //std::cout << "zcorr (full,trunk)  : " << full_z_corr << " " << z_corr << std::endl;
-       //std::cout << "phicorr (full,trunk): " << full_phi_corr << " " << phi_corr << std::endl;
-
        // Apply the corrections
        ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
        ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
-       // Make longer for shifting
-       //ap_int<18> proj_phi_long = proj_phi_corr;
-       //ap_int<18> stub_phi_long = stub_phi;
-
-       //std::cout << "corr proj phi: " << proj_phi_corr << std::endl;
-       //std::cout << "corr proj z  : " << proj_z_corr << std::endl;
-
        // Get phi and z difference between the projection and stub
        ap_int<9> delta_z         = stub_z - proj_z_corr;
        ap_int<13> delta_z_fact   = delta_z * kFact;
-       ap_int<18> stub_phi_long  = stub_phi;
-       ap_int<18> proj_phi_long  = proj_phi_corr;
-       ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;
-       ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift);
+       ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
+       ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
+       ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
+       ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
        ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
        ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
        ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
-       //std::cout << "Shifts           " << kPhi0_shift << " " << kShift_phi0bit << std::endl;
-       //ap_uint<18> shiftstubphi = stub_phi_long << kPhi0_shift;
-       //ap_uint<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift);
-       //std::cout << "Shifts again     " << shiftstubphi << " " << shiftprojphi << std::endl;
-       //std::cout << "Shifted stub_phi " << stub_phi << " " << (stub_phi << kPhi0_shift) << std::endl;
-       //std::cout << "Shifted proj_phi " << proj_phi_corr << " " << (proj_phi_corr << (kShift_phi0bit - 1 + kPhi0_shift)) << std::endl;
-       //std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
-       //std::cout << "AbsDelta(Phi,Z): " << abs_delta_phi << " " << abs_delta_z << std::endl;
-
-       // For first tracklet, pick up the cut values and set write address
-       if (newtracklet){
-         best_delta_z   = LUT_matchcut_z[proj_seed];
-         best_delta_phi = LUT_matchcut_phi[proj_seed];
+       if (debug){
+    	 std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
+         std::cout << "AbsDelta(Phi,Z): " << abs_delta_phi << " " << abs_delta_z << std::endl;
        }
-       //std::cout << "Cuts (phi,z) : " <<  best_delta_phi << " " << best_delta_z << std::endl;
-       // Check that matches fall within the selection window of the projection 
-       bool pass_sel = false;
-       if ((abs_delta_z <= best_delta_z) && (abs_delta_phi <= best_delta_phi)){
-         pass_sel       = true;
-         // Update values of best parameters, so that the next match 
-         // will be compared to these values instead of the original selection cuts
-         best_delta_z   = abs_delta_z;
-         best_delta_phi = abs_delta_phi;
-       }
-       else pass_sel = false; 
 
-       //FullMatch tmp(proj_tcid,kPhiSector,stubid,delta_phi,delta_z);
-       //std::cout << "Match would be : " << tmp.raw() << std::endl;
-
+       // Best match logic block
        goodmatch[istep] = false;
-       // Store full matches that pass the cuts
-       if (pass_sel){
+       // For first tracklet, pick up the phi cut value
+       if (newtracklet) best_delta_phi = LUT_matchcut_phi[proj_seed];
+       // Check that matches fall within the selection window of the projection 
+       if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+    	 // Update values of best phi parameters, so that the next match
+         // will be compared to this value instead of the original selection cut
+         best_delta_phi = abs_delta_phi;
+
          // Full match parameters
          FullMatch::FMTCID      fm_tcid  = proj_tcid;
          FullMatch::FMSTUBPHIID fm_asphi = kPhiSector;
@@ -245,37 +225,40 @@ void MatchCalculator(const BXType bx,
          FullMatch::FMPHIRES    fm_phi   = delta_phi;
          FullMatch::FMZRES      fm_z     = delta_z;
          FullMatch fm(fm_tcid,fm_asphi,fm_asid,fm_phi,fm_z);
-         //std::cout << "*************** FULL MATCH parameters (TCID,ASID,PHI,Z): " << fm_tcid << " " << fm_asid << " " << fm_phi << " " << fm_z << std::endl;
-         //std::cout << "*************** FULL MATCH = " << fm.raw() << std::endl;
+
+         // Store bestmatch
          bestmatch[istep] = fm.raw();
          goodmatch[istep] = true;
          projseed[istep]  = proj_seed;
        }
-       else{ // if current is not the best match
-    	    if (newtracklet){ // if is a new tracklet, don't make a match
-    		   goodmatch[istep] = false;
-    		   bestmatch[istep] = FullMatch();
-    		   projseed[istep]  = 0;
-    	    }
-		    else { // if current doesn't pass, but not a new tracklet, take the previous iteration
-    		   goodmatch[istep] = goodmatch[istep-1];
-    		   bestmatch[istep] = bestmatch[istep-1].raw();
-    		   projseed[istep]  = projseed[istep-1];
-    	   }
+       else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
+    	 goodmatch[istep] = false;
+    	 bestmatch[istep] = FullMatch();
+    	 projseed[istep]  = 0;
+       }
+	   else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
+		 goodmatch[istep] = goodmatch[istep-1];
+		 bestmatch[istep] = bestmatch[istep-1].raw();
+		 projseed[istep]  = projseed[istep-1];
        }
 
-       //std::cout << "Best match: " << goodmatch[istep] << " " << bestmatch[istep].raw() << std::endl;
-       //std::cout << "New tracklet: " << newtracklet << std::endl;
-       //std::cout << "istep = " << istep << std::endl;
+       if (debug){
+         std::cout << "Best match: " << goodmatch[istep] << " " << projseed[istep] << " " << bestmatch[istep].raw() << std::endl;
+         std::cout << "FM params (TCID,ASID,phi,z): " << bestmatch[istep].getTrackletIndex() << " " << bestmatch[istep].getStubIndex()
+           << " " << bestmatch[istep].getPhiRes() << " " << bestmatch[istep].getZRes() << std::endl;
+       }
 
-       // Write out only the best match
-       if (newtracklet || istep==kMaxProc-1){
-         // Write out full match based on the seeding
+       // Write out only the best match, based on the seeding
+       if (newtracklet){ // if there is a new tracklet write out the best match for the previous tracklet
          if (goodmatch[istep-1]==true && projseed[istep-1]==0) outfmdata1->write_mem(bx,bestmatch[istep-1]);
          if (goodmatch[istep-1]==true && projseed[istep-1]==2) outfmdata2->write_mem(bx,bestmatch[istep-1]);
+	   }
+       if (last){ // if this is the last iteration of loop, write out the current best also
+    	 if (goodmatch[istep]==true && projseed[istep]==0) outfmdata1->write_mem(bx,bestmatch[istep]);
+    	 if (goodmatch[istep]==true && projseed[istep]==2) outfmdata2->write_mem(bx,bestmatch[istep]);
        }
 
-     }// end if (i < ncm)
+     }
      else break; // end processing of CMs
   }// end MC_LOOP 
 
