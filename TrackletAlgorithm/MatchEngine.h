@@ -145,7 +145,7 @@ void MatchEngine(const ap_uint<3> bx,
 
     //Determine if buffere is full - or near full as a projection
     //can point to two z bins we might fill two slots in the buffer
-    bool buffernotfull=(writeindex+1!=readindex)&&(writeindex+2!=readindex);
+    bool buffernotfull=(writeindexplus!=readindex)&&(writeindexplusplus!=readindex);
     //Determin if buffere is empty
     bool buffernotempty=(writeindex!=readindex);
 
@@ -187,7 +187,8 @@ void MatchEngine(const ap_uint<3> bx,
 	ap_uint<4> tmp=zlast.concat(one);
 	ap_uint<26> tmp2=projdata.raw().concat(tmp);
 	if (savefirst) {
-	  projbuffer[writeindextmp+1]=nstublast.concat(tmp2);
+	  ap_uint<kNBitsBuffer> writeindextmpplus=writeindextmp+1;
+	  projbuffer[writeindextmpplus]=nstublast.concat(tmp2);
 	} else {
 	  projbuffer[writeindextmp]=nstublast.concat(tmp2);
 	}
@@ -223,16 +224,13 @@ void MatchEngine(const ap_uint<3> bx,
 	  projfinezadj=projfinez;
 	}
 
-	istub++;
-
+      } 
+      //Check if last stub, if so, go to next buffer entry 
+      if (istub+1>=nstubs){
+	istub=0;
+	readindex++;
       } else {
-	//Check if last stub, if so, go to next buffer entry 
-	if (istub+1>=nstubs){
-	  istub=0;
-	  readindex++;
-	} else {
-	  istub++;
-	}
+	istub++;
       }
 
       //Read stub memory and extract data fields

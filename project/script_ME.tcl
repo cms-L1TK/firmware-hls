@@ -5,7 +5,7 @@
 ############################################################
 open_project -reset matchengine
 set_top MatchEngine
-add_files ../TrackletAlgorithm/MatchEngine.cpp -cflags "-std=c++11"
+add_files ../TrackletAlgorithm/MatchEngine.h -cflags "-std=c++11"
 add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/ME
 open_solution -reset "solution1"

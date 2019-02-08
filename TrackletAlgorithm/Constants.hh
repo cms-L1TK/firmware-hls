@@ -8,7 +8,7 @@
 
 constexpr int kMaxStubsFromLink = 256;
 
-constexpr int kTMUX = 12;   //For hourglass project
+constexpr int kTMUX = 18;   //For hourglass project
 constexpr int kMaxProc = kTMUX * 6;
 
 // Memory
