@@ -1,5 +1,5 @@
 // ProjectionRouter test bench
-#include "MatchEngineTopL1.h"
+#include "MatchEngineTopL4.h"
 #include "CandidateMatchMemory.hh"
 #include "VMProjectionMemory.hh"
 #include "VMStubMEMemory.hh"
@@ -25,24 +25,24 @@ int main() {
 
   // declare input memory arrays to be read from the emulation files
   VMProjectionMemory<BARREL> inputvmprojs;
-  VMStubMEMemory<BARRELPS> inputvmstubs;
+  VMStubMEMemory<BARREL2S> inputvmstubs;
   //CandidateMatchMemory inputcandmatches;
 
   // declare output memory array to be filled by hls simulation
   CandidateMatchMemory outputcandmatches;
 
   ifstream fin_vmproj;
-  bool validvmproj = openDataFile(fin_vmproj,"ME/ME_L1PHIE20/VMProjections_VMPROJ_L1PHIE20_04.dat");
+  bool validvmproj = openDataFile(fin_vmproj,"ME/ME_L4PHIB12/VMProjections_VMPROJ_L4PHIB12_04.dat");
   if (not validvmproj) return -1;
 
   ifstream fin_vmstub;
-  bool validvmstub = openDataFile(fin_vmstub,"ME/ME_L1PHIE20/VMStubs_VMSME_L1PHIE20n1_04.dat");
+  bool validvmstub = openDataFile(fin_vmstub,"ME/ME_L4PHIB12/VMStubs_VMSME_L4PHIB12n1_04.dat");
   if (not validvmstub) return -1;
 
   // open file(s) with reference results
 
   ifstream fin_candmatch;
-  bool validcandmatch = openDataFile(fin_candmatch,"ME/ME_L1PHIE20/CandidateMatches_CM_L1PHIE20_04.dat");
+  bool validcandmatch = openDataFile(fin_candmatch,"ME/ME_L4PHIB12/CandidateMatches_CM_L4PHIB12_04.dat");
   if (not validcandmatch) return -1;
 
   // loop over events
@@ -50,13 +50,13 @@ int main() {
     cout << "Event: " << dec << ievt << endl;
 
     writeMemFromFile<VMProjectionMemory<BARREL> >(inputvmprojs, fin_vmproj, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs, fin_vmstub, ievt);
+    writeMemFromFile<VMStubMEMemory<BARREL2S> >(inputvmstubs, fin_vmstub, ievt);
 
     //set bunch crossing
     BXType bx=ievt&0x7;
 
     // Unit Under Test
-    MatchEngineTopL1(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
+    MatchEngineTopL4(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches

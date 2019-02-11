@@ -79,9 +79,9 @@ void readTable(bool table[256]){
 #if CODEVERSION==2
 
 //Attempt at new version of code
-template<int L>
+template<int L, regionType VMSMEType>
 void MatchEngine(const ap_uint<3> bx,
-		 const VMStubMEMemory<BARRELPS>* const instubdata,
+		 const VMStubMEMemory<VMSMEType>* const instubdata,
 		 const VMProjectionMemory<BARREL>* const inprojdata,
 		 CandidateMatchMemory* const outcandmatch){
 
@@ -96,7 +96,7 @@ void MatchEngine(const ap_uint<3> bx,
 #endif
 
   //Initialize table for bend-rinv consistency
-  bool table[256]; //FIXME Need to figure out how to replace 256 with meaningful const.
+  bool table[(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
   readTable<L>(table);
 
   outcandmatch->clear();
@@ -224,21 +224,34 @@ void MatchEngine(const ap_uint<3> bx,
 	  projfinezadj=projfinez;
 	}
 
-      } 
-      //Check if last stub, if so, go to next buffer entry 
-      if (istub+1>=nstubs){
-	istub=0;
-	readindex++;
+	if (nstubs==1) {
+	  istub=0;
+	  readindex++;
+	} else {
+	  istub++;
+	}
       } else {
-	istub++;
+	//Check if last stub, if so, go to next buffer entry 
+	if (istub+1>=nstubs){
+	  istub=0;
+	  readindex++;
+	} else {
+	  istub++;
+	}
       }
 
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
-      VMStubME<BARRELPS> stubdata=instubdata->read_mem(bx,stubadd);
-      VMStubME<BARRELPS>::VMSMEID stubindex=stubdata.getIndex();
-      VMStubME<BARRELPS>::VMSMEFINEZ stubfinez=stubdata.getFineZ();
-      VMStubME<BARRELPS>::VMSMEBEND stubbend=stubdata.getBend();
+      //typename VMStubME<VMSMEType> stubdata=instubdata->read_mem(bx,stubadd);
+      //typename VMStubME<VMSMEType>::VMSMEID stubindex=stubdata.getIndex();
+      //typename VMStubME<VMSMEType>::VMSMEFINEZ stubfinez=stubdata.getFineZ();
+      //typename VMStubME<VMSMEType>::VMSMEBEND stubbend=stubdata.getBend();
+      auto stubdata=instubdata->read_mem(bx,stubadd);
+      auto stubindex=stubdata.getIndex();
+      auto stubfinez=stubdata.getFineZ();
+      auto stubbend=stubdata.getBend();
+
+      //std::cout << "projindex stubindex "<<projindex<<" "<<stubindex<<std::endl;
 
       //Check if stub z position consistent
       ap_int<5> idz=stubfinez-projfinezadj;
@@ -251,6 +264,9 @@ void MatchEngine(const ap_uint<3> bx,
 
       //Check if stub bend and proj rinv consistent
       auto const index=projrinv.concat(stubbend);
+      //if (pass) {
+      //	std::cout << "index "<<index<<" "<<table[index]<<std::endl;
+      //}
       if (pass&&table[index]) {
 	CandidateMatch cmatch(projindex.concat(stubindex));
 	outcandmatch->write_mem(bx,cmatch);
