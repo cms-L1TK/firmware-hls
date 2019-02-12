@@ -121,7 +121,7 @@ void init_finebintable(const int layer_, const int disk_,
 inline ap_uint<5> iphivmRaw(const AllStub::ASPHI phi)
 {
   // TODO: get rid of hard-coded values
-  ap_uint<5> iphivm=phi.range((phi.length()-5), phi.length()-1);
+  ap_uint<5> iphivm=phi.range(phi.length()-1,phi.length()-5);
   assert(iphivm>=0 && iphivm<32); // get rid of this
   return iphivm;
 }
@@ -134,7 +134,7 @@ inline int iphivmFineBins(const AllStub::ASPHI phi, const int VMbits,
   {
     auto length= phi.length() - VMbits - finebits;
     //    return ap_uint<5>.range(phi.length()-length, phi.length()-1);
-    auto v1 = ap_uint<5>(phi.range(phi.length()-length, phi.length()-1));
+    auto v1 = ap_uint<5>(phi.range(phi.length()-1, phi.length()-length));
     auto v2 = (phi>>(phi.length()-VMbits-finebits))&((1<<finebits)-1);
     assert(v1 == v2);
     return (phi>>(phi.length()-VMbits-finebits))&((1<<finebits)-1);;
@@ -147,11 +147,14 @@ inline int iphivmFineBins(const AllStub::ASPHI phi, const int VMbits,
 inline
 ap_uint<5> iphivmRawPlus(const AllStub::ASPHI phi)
 {
-  // TODO: get rid of hard-coded values
-  auto iphivm=((phi+(1<<(phi.length()-7)))>>(phi.length()-5));
-  if (iphivm<0) iphivm=0;
-  else if (iphivm>31) iphivm=0;
-  return ap_uint<5>(iphivm);
+  // // TODO: get rid of hard-coded values
+  // ap_uint<7> tmp = phi.range(phi.length()-1,phi.length()-7);
+  // auto iphivmp = ++tmp;
+  // return ap_uint<5>(iphivmp(2,6));
+  ap_uint<7> tmp(phi.range(phi.length()-1, phi.length()-7));
+  ++tmp;
+  ap_uint<5> plus(tmp.range(tmp.length()-1,2));
+  return plus;
 
 }
 
@@ -159,11 +162,14 @@ ap_uint<5> iphivmRawPlus(const AllStub::ASPHI phi)
 inline
 ap_uint<5> iphivmRawMinus(const AllStub::ASPHI phi)
 {
-  // TODO: get rid of hard-coded values
-  auto iphivm=((phi-(1<<(phi.length()-7)))>>(phi.length()-5));
-  if (iphivm<0) iphivm=0;
-  else if (iphivm>31) iphivm=0;
-  return ap_uint<5>(iphivm);
+  ap_uint<7> tmp(phi.range(phi.length()-1,phi.length()-7));
+  auto iphivmp = --tmp;
+  return ap_uint<5>(iphivmp(6,2));
+//  // TODO: get rid of hard-coded values
+//  auto iphivm=((phi-(1<<(phi.length()-7)))>>(phi.length()-5));
+//  if (iphivm<0) iphivm=0;
+//  else if (iphivm>31) iphivm=0;
+//  return ap_uint<5>(iphivm);
 
 }
 
@@ -179,6 +185,7 @@ void VMRouter(
               const InputStubMemory* const a3,
               const InputStubMemory* const a4,
               AllStubMemory* allstub,
+	      ap_uint<32> memask,
               VMStubMEMemory *m0,
               VMStubMEMemory *m1,
               VMStubMEMemory *m2,
@@ -186,7 +193,32 @@ void VMRouter(
               VMStubMEMemory *m4,
               VMStubMEMemory *m5,
               VMStubMEMemory *m6,
-              VMStubMEMemory *m7)
+              VMStubMEMemory *m7,
+              VMStubMEMemory *m8,
+              VMStubMEMemory *m9,
+              VMStubMEMemory *m10,
+              VMStubMEMemory *m11,
+              VMStubMEMemory *m12,
+              VMStubMEMemory *m13,
+              VMStubMEMemory *m14,
+              VMStubMEMemory *m15,
+              VMStubMEMemory *m16,
+              VMStubMEMemory *m17,
+              VMStubMEMemory *m18,
+              VMStubMEMemory *m19,
+              VMStubMEMemory *m20,
+              VMStubMEMemory *m21,
+              VMStubMEMemory *m22,
+              VMStubMEMemory *m23,
+              VMStubMEMemory *m24,
+              VMStubMEMemory *m25,
+              VMStubMEMemory *m26,
+              VMStubMEMemory *m27,
+              VMStubMEMemory *m28,
+              VMStubMEMemory *m29,
+              VMStubMEMemory *m30,
+              VMStubMEMemory *m31
+			  )
 {
 
   // // size of array here is the max possible value
@@ -197,21 +229,46 @@ void VMRouter(
   //   init_finebintable(layer_,disk_,finebintable_,nbitsfinebintable_);
   //   table_initialized = true;
   // }
-  const int finebintable_[kMaxFineBinTable] =  // lookup table - 2^nbinsfinbinetable entries actually filled
+  static const  int finebintable_[kMaxFineBinTable] =  // lookup table - 2^nbinsfinbinetable entries actually filled
 #include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
     ;
   size_t count=0;
-
+  //std::cout << std::hex << memask << std::endl;
   // reset address counters in output memories
   allstub->clear(bx);
-  m0->clear(bx);
-  m1->clear(bx);
-  m2->clear(bx);
-  m3->clear(bx);
-  m4->clear(bx);
-  m5->clear(bx);
-  m6->clear(bx);
-  m7->clear(bx);
+  if ( memask[0] ) m0->clear(bx);
+  if ( memask[1] ) m1->clear(bx);
+  if ( memask[2] ) m2->clear(bx);
+  if ( memask[3] ) m3->clear(bx);
+  if ( memask[4] ) m4->clear(bx);
+  if ( memask[5] ) m5->clear(bx);
+  if ( memask[6] ) m6->clear(bx);
+  if ( memask[7] ) m7->clear(bx);
+  if ( memask[8] ) m8->clear(bx);
+  if ( memask[9] ) m9->clear(bx);
+  if ( memask[10] ) m10->clear(bx);
+  if ( memask[11] ) m11->clear(bx);
+  if ( memask[12] ) m12->clear(bx);
+  if ( memask[13] ) m13->clear(bx);
+  if ( memask[14] ) m14->clear(bx);
+  if ( memask[15] ) m15->clear(bx);
+  if ( memask[16] ) m16->clear(bx);
+  if ( memask[17] ) m17->clear(bx);
+  if ( memask[18] ) m18->clear(bx);
+  if ( memask[19] ) m19->clear(bx);
+  if ( memask[20] ) m20->clear(bx);
+  if ( memask[21] ) m21->clear(bx);
+  if ( memask[22] ) m22->clear(bx);
+  if ( memask[23] ) m23->clear(bx);
+  if ( memask[24] ) m24->clear(bx);
+  if ( memask[25] ) m25->clear(bx);
+  if ( memask[26] ) m26->clear(bx);
+  if ( memask[27] ) m27->clear(bx);
+  if ( memask[28] ) m28->clear(bx);
+  if ( memask[29] ) m29->clear(bx);
+  if ( memask[30] ) m30->clear(bx);
+  if ( memask[31] ) m31->clear(bx);
+
 
   // see how much data we have from each of the memories
   InputStubMemory::NEntryT zero(0);
@@ -316,8 +373,14 @@ void VMRouter(
     else if (iphiRawPlus>=nvm) iphiRawPlus=nvm-1;
     if (iphiRawMinus<0) iphiRawMinus=0;
     else if (iphiRawMinus>=nvm) iphiRawMinus=nvm-1;
+    // if (! (std::abs(iphiRaw-iphiRawPlus) <= 1 )) {
+    //   std::cout << "XXX+: " << iphiRaw << " " << iphiRawPlus << std::endl;
+    // }
+    assert(std::abs(iphiRaw-iphiRawPlus) <= 1 );
+    assert(std::abs(iphiRaw-iphiRawMinus) <= 1 ) ;
 
     if ( disk ) {
+      assert(1==0);
       VMStubME::VMSMEID index=stub.getR();
       // how to check this?
       if (isPSmodule) {
@@ -343,39 +406,192 @@ void VMRouter(
 
     // now actually update the stubs in the new memories
     // based on the Verilog version by MEZ
-    if ( iphiRaw == 0 || iphiRawMinus == 0 || iphiRawPlus == 0 ) {
-      // if ( m0)
-        m0->write_mem(bx,0, stubme);
+#ifdef DEBUG
+    std::cout << "iPhiRaw,Minus,Plus = "  << std::dec
+	      << iphiRaw << " " << iphiRawMinus << " "
+	      << iphiRawPlus << " "
+	      << "\t0x" << std::setfill('0') << std::setw(4)  
+	      << std::hex << stubme.raw().to_int() << std::dec 
+	      << std::endl;
+    if ( ! memask[iphiRaw] ) {
+      std::cerr << "Trying to write to non-existent memory for iphiRaw = "
+		<< iphiRaw << std::endl;
     }
-    if ( iphiRaw == 1 || iphiRawMinus == 1 || iphiRawPlus == 1 ) {
-      // if ( m1 ) 
-        m1->write_mem(bx,0, stubme);
+    if ( ! memask[iphiRawPlus] ) {
+      std::cerr << "Trying to write to non-existent memory for iphiRawPlus = "
+		<< iphiRawPlus << std::endl;
+    }
+    if ( ! memask[iphiRaw] ) {
+      std::cerr << "Trying to write to non-existent memory for iphiRawMinus = "
+		<< iphiRawMinus << std::endl;
+    }
+#endif // DEBUG
+    ap_uint<3> bin;
+    if ( ! disk ) { // barrel
+      auto z = stub.getZ();
+      constexpr int meslotbits = 3;
+      bin = (1<<(meslotbits-1)) + (z>>(z.length()-meslotbits)); // hack
+    }
+    else { // disk
+      assert(1==0);
+    }
+    // 0-9
+    if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) ) {
+      if ( m0)
+        m0->write_mem(bx, bin, stubme);
+    }
+    if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) ) {
+      if ( memask[1] )
+        m1->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 ) {
-      // if ( m2 ) 
-        m2->write_mem(bx,0, stubme);
+      if ( memask[2] )
+        m2->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 ) {
-      // if ( m3) 
-        m3->write_mem(bx,0, stubme);
+      if ( memask[3] )
+        m3->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 ) {
-      // if ( m4 ) 
-        m4->write_mem(bx,0, stubme);
+      if ( memask[4] )
+        m4->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 ) {
-      // if ( m5 )
-        m5->write_mem(bx,0, stubme);
+      if ( memask[5] )
+        m5->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 ) {
-      // if ( m6 ) 
-        m6->write_mem(bx,0, stubme);
+      if ( memask[6] ) 
+        m6->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 ) {
-      // if ( m7 ) 
-        m7->write_mem(bx,0, stubme);
+      if ( memask[7] ) 
+        m7->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 ) {
+      if ( memask[8] ) 
+        m8->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 ) {
+      if ( memask[9] ) 
+        m9->write_mem(bx, bin, stubme);
+    }
+    // 10-19
+    if ( (iphiRaw == 10) || (iphiRawMinus == 10) || (iphiRawPlus == 10) ) {
+      if ( memask[10] )
+        m10->write_mem(bx, bin, stubme);
+    }
+    if ( (iphiRaw == 11) || (iphiRawMinus == 11) || (iphiRawPlus == 11) ) {
+      if ( memask[11] )
+        m11->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12 ) {
+      if ( memask[12] )
+        m12->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13 ) {
+      if ( memask[13] )
+        m13->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14 ) {
+      if ( memask[14] )
+        m14->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15 ) {
+      if ( memask[15] )
+        m15->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16 ) {
+      if ( memask[16] ) 
+        m16->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17 ) {
+      if ( memask[17] ) 
+        m17->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18 ) {
+      if ( memask[18] ) 
+        m18->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19 ) {
+      if ( memask[19] ) 
+        m19->write_mem(bx, bin, stubme);
+    }
+    // 20-29
+    if ( (iphiRaw == 20) || (iphiRawMinus == 20) || (iphiRawPlus == 20) ) {
+      if ( memask[20] )
+        m20->write_mem(bx, bin, stubme);
+    }
+    if ( (iphiRaw == 21) || (iphiRawMinus == 21) || (iphiRawPlus == 21) ) {
+      if ( memask[21] )
+        m21->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22 ) {
+      if ( memask[22] )
+        m22->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23 ) {
+      if ( memask[23] )
+        m23->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24 ) {
+      if ( memask[24] )
+        m24->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25 ) {
+      if ( memask[25] )
+        m25->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26 ) {
+      if ( memask[26] ) 
+        m26->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27 ) {
+      if ( memask[27] ) 
+        m27->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28 ) {
+      if ( memask[28] ) 
+        m28->write_mem(bx, bin, stubme);
+    }
+    if ( iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29 ) {
+      if ( memask[29] ) 
+        m29->write_mem(bx, bin, stubme);
+    }
+    // 30-31
+    if ( (iphiRaw == 30) || (iphiRawMinus == 30) || (iphiRawPlus == 30) ) {
+      if ( memask[30] )
+        m30->write_mem(bx, bin, stubme);
+    }
+    if ( (iphiRaw == 31) || (iphiRawMinus == 31) || (iphiRawPlus == 31) ) {
+      if ( memask[31] )
+        m31->write_mem(bx, bin, stubme);
     }
     // executeME() END   ------------------------------
+
+    // executeTE() START ------------------------------
+    // BARREL -- LAYER
+    if ( layer_ != -1 ) {
+    	// INNER OVERLAP
+    	// not yet
+
+    	// layer non-overlap
+    	if ( layer_ == 1 || layer_ == 3 || layer_ == 5 ) {
+        	// INNER regular
+        	VMStubTEInner stubTeInner;
+    	}
+    	else { // layers 2, 4 and 6
+    		// OUTER
+        	VMStubTEOuter stubTeOuter;
+
+    	}
+    }
+    // DISK
+    else if ( disk != 0 ) {
+    	assert(1==0); // not yet
+    }
+    // executeTE() END   ------------------------------
+
 
 #ifdef NOTDEF
     if (disk_!=5) {
