@@ -5,7 +5,7 @@
 #include "MemoryTemplate.hh"
 
 // AllProjectionBase is where we define the bit widths, which depend on the class template parameter.
-template<regionType AProjType> class AllProjectionBase {};
+template<int AProjType> class AllProjectionBase {};
 
 template<>
 class AllProjectionBase<BARRELPS>
@@ -66,7 +66,7 @@ public:
 
 
 // Data object definition
-template<regionType AProjType>
+template<int AProjType>
 class AllProjection : public AllProjectionBase<AProjType>
 {
 public:
@@ -201,7 +201,7 @@ private:
 };
 
 // Memory definition
-template<regionType AProjType> using AllProjectionMemory = MemoryTemplate<AllProjection<AProjType>, 3, kNBits_MemAddr>;
+template<int AProjType> using AllProjectionMemory = MemoryTemplate<AllProjection<AProjType>, 3, kNBits_MemAddr>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif

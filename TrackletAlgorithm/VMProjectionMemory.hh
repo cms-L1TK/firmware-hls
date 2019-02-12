@@ -5,7 +5,7 @@
 #include "MemoryTemplate.hh"
 
 // VMProjectionBase is where we define the bit widths, which depend on the class template parameter.
-template<regionType VMProjType> class VMProjectionBase {};
+template<int VMProjType> class VMProjectionBase {};
 
 template<>
 class VMProjectionBase<BARREL>
@@ -41,7 +41,7 @@ public:
 
 
 // Data object definition
-template<regionType VMProjType>
+template<int VMProjType>
 class VMProjection : public VMProjectionBase<VMProjType>
 {
 public:
@@ -153,7 +153,7 @@ private:
 };
 
 // Memory definition
-template<regionType VMProjType> using VMProjectionMemory = MemoryTemplate<VMProjection<VMProjType>, 1, kNBits_MemAddr>;
+template<int VMProjType> using VMProjectionMemory = MemoryTemplate<VMProjection<VMProjType>, 1, kNBits_MemAddr>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif
