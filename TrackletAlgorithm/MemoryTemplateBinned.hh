@@ -22,9 +22,14 @@ class MemoryTemplateBinned{
   typedef ap_uint<NBIT_ADDR-NBIT_BIN+1> NEntryT;
   
 protected:
+  enum BitWidths {
+    kNBxBins = 1<<NBIT_BX,
+    kNSlots = 1<<NBIT_BIN,
+    kNMemDepth = 1<<NBIT_ADDR
+  };
 
-  DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
-  NEntryT nentries_[1<<NBIT_BX][1<<NBIT_BIN];     // number of entries
+  DataType dataarray_[kNBxBins][kNMemDepth];  // data array
+  NEntryT nentries_[kNBxBins][kNSlots];     // number of entries
   
 public:
 
@@ -40,7 +45,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	
-	for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
+	for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
 #pragma HLS UNROLL
 	  clear(ibx);
 	}
@@ -50,20 +55,29 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	
-	for (unsigned int ibin = 0; ibin < (1<<NBIT_BIN); ++ibin) {
+	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
 #pragma HLS UNROLL
 	  nentries_[bx][ibin] = 0;
 	}
   }
 
-  unsigned int getDepth() const {return (1<<NBIT_ADDR);}
-  unsigned int getNBX() const {return (1<<NBIT_BX);}
-  unsigned int getNBins() const {return (1<<NBIT_BIN);}
+  unsigned int getDepth() const {return kNMemDepth;}
+  unsigned int getNBX() const {return kNBxBins;}
+  unsigned int getNBins() const {return kNSlots;}
 
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> ibin) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	return nentries_[bx][ibin];
   }
+
+  NEntryT getEntries(BunchXingT bx) const {
+    NEntryT val = 0;
+    for ( auto i = 0; i < getDepth(); ++i ) {
+      val += getEntries(bx, i);
+    }
+    return val;
+  }
+
 
   DataType* get_mem(BunchXingT ibx) {return dataarray_[ibx];}
 
@@ -73,6 +87,14 @@ public:
 	// TODO: check if valid
 	return dataarray_[ibx][index];
   }
+  
+  DataType read_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot,
+		    ap_uint<NBIT_ADDR> index) const
+  {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+    // TODO: check if valid
+    return dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+index];
+  }
 
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data)
   {
@@ -81,7 +103,7 @@ public:
 
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
-	if (nentry_ibx <= (1<<NBIT_ADDR)) {
+	if (nentry_ibx <= (kNMemDepth)) {
 	  // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+nentry_ibx] = data;
 	  nentries_[ibx][slot] = nentry_ibx + 1;
@@ -140,7 +162,7 @@ public:
 
   void print_mem(BunchXingT bx) const
   {
-	for(int slot=0;slot<(1<<NBIT_BIN);slot++) {
+	for(int slot=0;slot<(kNSlots);slot++) {
       //std::cout << "slot "<<slot<<" entries "
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
       for (int i = 0; i < nentries_[bx][slot]; ++i) {
@@ -152,7 +174,7 @@ public:
 
   void print_mem() const
   {
-	for (int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
+	for (int ibx = 0; ibx < (kNBxBins); ++ibx) {
 	  for (int i = 0; i < nentries_[ibx]; ++i) {
 		std::cout << ibx << " " << i << " ";
 		print_entry(ibx,i);
