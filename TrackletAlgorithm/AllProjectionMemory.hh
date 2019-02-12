@@ -67,7 +67,7 @@ public:
 
 // Data object definition
 template<regionType AProjType>
-class AllProjection
+class AllProjection : public AllProjectionBase<AProjType>
 {
 public:
   enum BitLocations {
