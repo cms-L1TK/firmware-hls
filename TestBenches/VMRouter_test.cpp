@@ -7,7 +7,7 @@
 #include "FileReadUtility.hh"
 #include "Constants.hh"
 
-const int nevents = 100;  //number of events to run
+const int nevents = 2;  //number of events to run
 
 using namespace std;
 
@@ -96,21 +96,21 @@ int main()
   bool valid_vmstubme4 = openDataFile(fout_vmstubme4, "VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE20n1_04.dat");
   if (not valid_vmstubme4) return -1;
 
-  ifstream fout_vmstubme5;
-  bool valid_vmstubme5 =  openDataFile(fout_vmstubme5, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n1_04.dat");
-  if (not valid_vmstubme5) return -1;
-
-  ifstream fout_vmstubme6;
-  bool valid_vmstubme6 = openDataFile(fout_vmstubme6, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n2_04.dat");
-  if (not valid_vmstubme6) return -1;
-
-  ifstream fout_vmstubme7;
-  bool valid_vmstubme7 = openDataFile(fout_vmstubme7, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n3_04.dat");
-  if (not valid_vmstubme7) return -1;
-
-  ifstream fout_vmstubme8;
-  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n4_04.dat");
-  if (not valid_vmstubme8) return -1;
+//  ifstream fout_vmstubme5;
+//  bool valid_vmstubme5 =  openDataFile(fout_vmstubme5, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n1_04.dat");
+//  if (not valid_vmstubme5) return -1;
+//
+//  ifstream fout_vmstubme6;
+//  bool valid_vmstubme6 = openDataFile(fout_vmstubme6, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n2_04.dat");
+//  if (not valid_vmstubme6) return -1;
+//
+//  ifstream fout_vmstubme7;
+//  bool valid_vmstubme7 = openDataFile(fout_vmstubme7, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n3_04.dat");
+//  if (not valid_vmstubme7) return -1;
+//
+//  ifstream fout_vmstubme8;
+//  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n4_04.dat");
+//  if (not valid_vmstubme8) return -1;
 
   ///////////////////////////  
   // loop over events
@@ -137,47 +137,46 @@ int main()
     		&ilink1, &ilink2, &ilink3, 0,0,//&ilink4, &ilink5,
 		//&ilink6, &ilink7, &ilink8,
 			&allstub,
-			&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
-			&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8);
+		&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
+		&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8
+		);
 
     // compare the computed outputs with the expected ones
     bool truncation = false;
     // AllStub
     err += compareMemWithFile<AllStubMemory>(allstub, fout_aproj, ievt,
                                                    "AllStub", truncation);
-#ifdef NOTDEFPPP
     // VMStubME1
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme1, fout_vmstubme1, ievt,
-                                                  "VMStubME1", truncation);
+    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme1, fout_vmstubme1, ievt,
+                                                  "VMStubME17", truncation);
 
     // VMStubME2
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme2, fout_vmstubme2, ievt,
-                                                  "VMStubME2", truncation);
+    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme2, fout_vmstubme2, ievt,
+                                                  "VMStubME18", truncation);
 
     // VMStubME3
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme3, fout_vmstubme3, ievt,
-                                                  "VMStubME3", truncation);
+    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme3, fout_vmstubme3, ievt,
+                                                  "VMStubME19", truncation);
 
     // VMStubME4
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme4, fout_vmstubme4, ievt,
-                                                  "VMStubME4", truncation);
+    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme4, fout_vmstubme4, ievt,
+                                                  "VMStubME20", truncation);
 
-    // VMStubME5
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme5, fout_vmstubme5, ievt,
-                                                  "VMStubME5", truncation);
-
-    // VMStubME6
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme6, fout_vmstubme6, ievt,
-                                                  "VMStubME6", truncation);
-
-    // VMStubME7
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme7, fout_vmstubme7, ievt,
-                                                  "VMStubME7", truncation);
-
-    // VMStubME8
-    err += compareMemWithFile<VMStubMEMemory>(vmstubme8, fout_vmstubme8, ievt,
-                                                  "VMStubME8", truncation);
-#endif // NOTDEF
+//    // VMStubME5
+//    err += compareMemWithFile<VMStubMEMemory>(vmstubme5, fout_vmstubme5, ievt,
+//                                                  "VMStubME5", truncation);
+//
+//    // VMStubME6
+//    err += compareMemWithFile<VMStubMEMemory>(vmstubme6, fout_vmstubme6, ievt,
+//                                                  "VMStubME6", truncation);
+//
+//    // VMStubME7
+//    err += compareMemWithFile<VMStubMEMemory>(vmstubme7, fout_vmstubme7, ievt,
+//                                                  "VMStubME7", truncation);
+//
+//    // VMStubME8
+//    err += compareMemWithFile<VMStubMEMemory>(vmstubme8, fout_vmstubme8, ievt,
+//                                                  "VMStubME8", truncation);
   } // end of event loop
   std::cerr << "Exiting with return value " << err << std::endl;
   return err;
