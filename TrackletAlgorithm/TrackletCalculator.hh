@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "StubPairMemory.hh"
 #include "AllStubMemory.hh"
 #include "TrackletParameterMemory.hh"
@@ -10,7 +12,6 @@ namespace TC {
 // Typedefs, enums, and constants needed by TrackletCalculator.
 ////////////////////////////////////////////////////////////////////////////////
   namespace Types {
-    typedef ap_uint<4> iTC;
     typedef ap_uint<2> nASMem;
     typedef ap_uint<4> nSPMem;
     typedef ap_uint<11> nSP; // this should be large enough to index the entire list of stub pairs, across all memories
@@ -30,11 +31,9 @@ namespace TC {
   }
 
   enum seed {UNDEF_SEED, L1L2 = 0, L3L4 = 1, L5L6 = 2, D1D2 = 3, D3D4 = 4, L1D1 = 5, L2D1 = 6};
+  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
   enum layer {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5};
   enum disk {D1 = 0, D2 = 1, D3 = 2, D4 = 3, D5 = 4};
-
-  static const uint8_t kNInnerStubMems = 2;
-  static const uint8_t kNOuterStubMems = 1;
 
   static const ap_uint<13> rinvcut = 5718;
   static const ap_uint<9> z0cut = 256;
@@ -91,19 +90,16 @@ namespace TC {
 
   template<seed Seed> bool barrelSeeding(const AllStub<BARRELPS> &innerStub, const AllStub<BARRELPS> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TrackletParameters::Z0PAR * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
-  template<seed Seed> const TrackletProjection<BARRELPS>::TProjTCID ID(const Types::iTC iTC);
+  template<seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
   template<regionType TProjType> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID);
 
-  template<uint8_t NSPMem00, uint8_t NSPMem10> void
+  template<uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11> void
   getIndices(
       const BXType bx,
-      const StubPairMemory stubPairs00[NSPMem00],
-      const StubPairMemory stubPairs10[NSPMem10],
-      Types::nASMem &iASMemInner,
-      Types::nASMem &iASMemOuter,
-      Types::nSPMem &iSPMem,
-      Types::nSP &iSP,
+      const StubPairMemory stubPairs00[NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11],
+      TC::Types::nSPMem &iSPMem,
+      TC::Types::nSP &iSP,
       bool &done
   );
 
@@ -151,14 +147,12 @@ namespace TC {
   ) {}
 }
 
-template<uint8_t NSPMem00, uint8_t NSPMem10> void
+template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint16_t N> void
 TrackletCalculator_L1L2(
     const BXType bx,
-    const TC::Types::iTC iTC,
-    const AllStubMemory<BARRELPS> innerStubs[TC::kNInnerStubMems],
-    const AllStubMemory<BARRELPS> outerStubs[TC::kNOuterStubMems],
-    const StubPairMemory stubPairs00[NSPMem00],
-    const StubPairMemory stubPairs10[NSPMem10],
+    const AllStubMemory<BARRELPS> innerStubs[NASMemInner],
+    const AllStubMemory<BARRELPS> outerStubs[NASMemOuter],
+    const StubPairMemory stubPairs[NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11],
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> * const projout_L3PHIA,
     TrackletProjectionMemory<BARRELPS> * const projout_L3PHIB,
@@ -194,13 +188,11 @@ TrackletCalculator_L1L2(
     TrackletProjectionMemory<DISK> * const projout_D4PHID
 );
 
-void TrackletCalculator_L1L2_5_8(
+void TrackletCalculator_L1L2E(
     const BXType bx,
-    const TC::Types::iTC iTC,
-    const AllStubMemory<BARRELPS> innerStubs[TC::kNInnerStubMems],
-    const AllStubMemory<BARRELPS> outerStubs[TC::kNOuterStubMems],
-    const StubPairMemory stubPairs00[5],
-    const StubPairMemory stubPairs10[8],
+    const AllStubMemory<BARRELPS> innerStubs[2],
+    const AllStubMemory<BARRELPS> outerStubs[1],
+    const StubPairMemory stubPairs[13],
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> * const projout_L3PHIA,
     TrackletProjectionMemory<BARRELPS> * const projout_L3PHIB,
