@@ -8,7 +8,6 @@
 // Merger needs to be re-thought
 // More output FM memories? and have null pointers for ones not needed in each instance 
 //-----------------------------------------------------------------------------------------
-bool debug = false;
 
 void MatchCalculator(const BXType bx,
                      const CandidateMatchMemory* const incmdata1,
@@ -25,8 +24,8 @@ void MatchCalculator(const BXType bx,
                      FullMatchMemory* const outfmdata2
 ){
 
-  #pragma HLS PIPELINE II=36
-  #pragma HLS latency max=60
+  //#pragma HLS PIPELINE II=72
+  //#pragma HLS latency max=90
 
   // Clear memory for each BX
   outfmdata1->clear();
@@ -42,7 +41,7 @@ void MatchCalculator(const BXType bx,
   ap_uint<kNBits_MemAddr> ncm7 = incmdata7->getEntries(bx);
   ap_uint<kNBits_MemAddr> ncm8 = incmdata8->getEntries(bx);
 
-  // Count up total number of CMs *and protect incase of overflow)
+  // Count up total number of CMs and protect in the case of overflow)
   ap_uint<7> ncm;
   if (ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8 > kMaxProc) ncm = kMaxProc;
   else ncm = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8;
@@ -60,7 +59,7 @@ void MatchCalculator(const BXType bx,
   // Setup candidate match data stream that goes into match calculations
   CandidateMatch datastream = CandidateMatch();
 
-  // Setup dummy indice to be used in the comparison
+  // Setup dummy index to be used in the comparison
   CandidateMatch::CMProjIndex dummy = -1; 
 
   // Bool and ID needed for determining if processing a new tracklet
@@ -74,6 +73,9 @@ void MatchCalculator(const BXType bx,
   bool goodmatch[kMaxProc];
   AllProjection::AProjTCSEED projseed[kMaxProc];
   FullMatch bestmatch[kMaxProc];
+  #pragma HLS ARRAY_PARTITION variable=goodmatch complete dim=1
+  #pragma HLS ARRAY_PARTITION variable=projseed  complete dim=1
+  #pragma HLS ARRAY_PARTITION variable=bestmatch complete dim=1
 
   // Bool to signal last processing
   bool last = false;
@@ -82,8 +84,10 @@ void MatchCalculator(const BXType bx,
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
   {
 
-	 if (istep==(kMaxProc-1) || istep==(ncm-1)) last = true;
-	 else last = false;
+  #pragma HLS PIPELINE II=1
+
+	 if (istep==(kMaxProc-1)) last = true;
+	 else                     last = false;
 
      if (istep < ncm){
        // Read in each candidate match
@@ -253,15 +257,20 @@ void MatchCalculator(const BXType bx,
          if (goodmatch[istep-1]==true && projseed[istep-1]==0) outfmdata1->write_mem(bx,bestmatch[istep-1]);
          if (goodmatch[istep-1]==true && projseed[istep-1]==2) outfmdata2->write_mem(bx,bestmatch[istep-1]);
 	   }
-       if (last){ // if this is the last iteration of loop, write out the current best also
-    	 if (goodmatch[istep]==true && projseed[istep]==0) outfmdata1->write_mem(bx,bestmatch[istep]);
-    	 if (goodmatch[istep]==true && projseed[istep]==2) outfmdata2->write_mem(bx,bestmatch[istep]);
-       }
-
+     }
+     // Write out the match from the last CM
+     else if (istep==ncm){
+       if (goodmatch[istep-1]==true && projseed[istep-1]==0) outfmdata1->write_mem(bx,bestmatch[istep-1]);
+       if (goodmatch[istep-1]==true && projseed[istep-1]==2) outfmdata2->write_mem(bx,bestmatch[istep-1]);
      }
      else break; // end processing of CMs
-  }// end MC_LOOP 
+  }// end MC_LOOP
 
+  // Write out the match from the last possible output
+  if (last){
+    if (goodmatch[kMaxProc-1]==true && projseed[kMaxProc-1]==0) outfmdata1->write_mem(bx,bestmatch[kMaxProc-1]);
+    if (goodmatch[kMaxProc-1]==true && projseed[kMaxProc-1]==2) outfmdata2->write_mem(bx,bestmatch[kMaxProc-1]);
+  }
 
 }
 

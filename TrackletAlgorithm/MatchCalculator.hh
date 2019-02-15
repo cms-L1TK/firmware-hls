@@ -7,6 +7,8 @@
 #include "AllProjectionMemory.hh"
 #include "FullMatchMemory.hh"
 
+const bool debug = false;
+
 const int kFact           = 1;
 const int kPhi0_shift     = 3;
 const int kShift_phi0bit  = 1;

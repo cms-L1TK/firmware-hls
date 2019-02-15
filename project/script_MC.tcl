@@ -11,7 +11,7 @@ set clockperiod 4.1667
 delete_project match_calc
 # make new project
 open_project match_calc
-set_top MC
+set_top MatchCalculator
 
 # source files
 add_files ../TrackletAlgorithm/MatchCalculator.cpp -cflags "-std=c++11"
