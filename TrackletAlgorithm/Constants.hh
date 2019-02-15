@@ -8,7 +8,7 @@
 
 constexpr int kMaxStubsFromLink = 256;
 
-constexpr int kTMUX = 12;   //For hourglass project
+constexpr int kTMUX = 18;   //For hourglass project
 constexpr int kMaxProc = kTMUX * 6;
 
 // Memory
@@ -22,6 +22,9 @@ constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
 
 constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
+
+// List of regions for memory template parameters
+enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK};
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited

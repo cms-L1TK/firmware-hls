@@ -4,11 +4,13 @@
 #include "Constants.hh"
 #include "MemoryTemplateBinned.hh"
 
-// Data object definition
-class VMStubTEOuter
+// VMStubTEOuterBase is where we define the bit widths, which depend on the class template parameter.
+template<regionType VMSTEOType> class VMStubTEOuterBase {};
+
+template<>
+class VMStubTEOuterBase<BARRELPS>
 {
 public:
-
   enum BitWidths {
     // Bit sizes for VMStubTEOuterMemory fields
     kVMSTEOFineZSize = 3,
@@ -18,24 +20,61 @@ public:
     // Bit size for full VMStubTEOuterMemory
     kVMStubTEOuterSize = kVMSTEOFineZSize + kVMSTEOFinePhiSize + kVMSTEOBendSize + kVMSTEOIDSize
   };
+};
+
+template<>
+class VMStubTEOuterBase<BARREL2S>
+{
+public:
+  enum BitWidths {
+    // Bit sizes for VMStubTEOuterMemory fields
+    kVMSTEOFineZSize = 3,
+    kVMSTEOFinePhiSize = 3,
+    kVMSTEOBendSize = 4,
+    kVMSTEOIDSize = 7,
+    // Bit size for full VMStubTEOuterMemory
+    kVMStubTEOuterSize = kVMSTEOFineZSize + kVMSTEOFinePhiSize + kVMSTEOBendSize + kVMSTEOIDSize
+  };
+};
+
+template<>
+class VMStubTEOuterBase<DISK>
+{
+public:
+  enum BitWidths {
+    // Bit sizes for VMStubTEOuterMemory fields
+    kVMSTEOFineZSize = 3,
+    kVMSTEOFinePhiSize = 2,
+    kVMSTEOBendSize = 3,
+    kVMSTEOIDSize = 7,
+    // Bit size for full VMStubTEOuterMemory
+    kVMStubTEOuterSize = kVMSTEOFineZSize + kVMSTEOFinePhiSize + kVMSTEOBendSize + kVMSTEOIDSize
+  };
+};
+
+// Data object definition
+template<regionType VMSTEOType>
+class VMStubTEOuter : public VMStubTEOuterBase<VMSTEOType>
+{
+public:
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubTEOuterMemory word for different fields
     kVMSTEOFineZLSB = 0,
-    kVMSTEOFineZMSB = kVMSTEOFineZLSB + kVMSTEOFineZSize - 1,
+    kVMSTEOFineZMSB = kVMSTEOFineZLSB + VMStubTEOuterBase<VMSTEOType>::kVMSTEOFineZSize - 1,
     kVMSTEOFinePhiLSB = kVMSTEOFineZMSB + 1,
-    kVMSTEOFinePhiMSB = kVMSTEOFinePhiLSB + kVMSTEOFinePhiSize - 1,
+    kVMSTEOFinePhiMSB = kVMSTEOFinePhiLSB + VMStubTEOuterBase<VMSTEOType>::kVMSTEOFinePhiSize - 1,
     kVMSTEOBendLSB = kVMSTEOFinePhiMSB + 1,
-    kVMSTEOBendMSB = kVMSTEOBendLSB + kVMSTEOBendSize - 1,
+    kVMSTEOBendMSB = kVMSTEOBendLSB + VMStubTEOuterBase<VMSTEOType>::kVMSTEOBendSize - 1,
     kVMSTEOIDLSB = kVMSTEOBendMSB + 1,
-    kVMSTEOIDMSB = kVMSTEOIDLSB + kVMSTEOIDSize - 1
+    kVMSTEOIDMSB = kVMSTEOIDLSB + VMStubTEOuterBase<VMSTEOType>::kVMSTEOIDSize - 1
   };
 
-  typedef ap_uint<kVMSTEOIDSize> VMSTEOID;
-  typedef ap_uint<kVMSTEOBendSize> VMSTEOBEND;
-  typedef ap_uint<kVMSTEOFinePhiSize> VMSTEOFINEPHI;
-  typedef ap_uint<kVMSTEOFineZSize> VMSTEOFINEZ;
+  typedef ap_uint<VMStubTEOuterBase<VMSTEOType>::kVMSTEOIDSize> VMSTEOID;
+  typedef ap_uint<VMStubTEOuterBase<VMSTEOType>::kVMSTEOBendSize> VMSTEOBEND;
+  typedef ap_uint<VMStubTEOuterBase<VMSTEOType>::kVMSTEOFinePhiSize> VMSTEOFINEPHI;
+  typedef ap_uint<VMStubTEOuterBase<VMSTEOType>::kVMSTEOFineZSize> VMSTEOFINEZ;
 
-  typedef ap_uint<kVMStubTEOuterSize> VMStubTEOuterData;
+  typedef ap_uint<VMStubTEOuterBase<VMSTEOType>::kVMStubTEOuterSize> VMStubTEOuterData;
 
   // Constructors
   VMStubTEOuter(const VMStubTEOuterData& newdata):
@@ -101,6 +140,6 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplateBinned<VMStubTEOuter, 2, kNBits_MemAddr, 3> VMStubTEOuterMemory;
+template<regionType VMSTEOType> using VMStubTEOuterMemory = MemoryTemplateBinned<VMStubTEOuter<VMSTEOType>, 2, kNBits_MemAddr, 3>;
 
 #endif
