@@ -1,12 +1,10 @@
-// MatchCalculator test bench
-#include "MatchCalculator.hh"
-#include "AllStubMemory.hh"
-#include "AllProjectionMemory.hh"
-#include "CandidateMatchMemory.hh"
-#include "FullMatchMemory.hh"
-#include "FileReadUtility.hh"
-#include "hls_math.h"
+// Test bench for the MatchCalculator 
+#include "MatchCalculatorTop.h"
 
+#include "FileReadUtility.hh"
+#include "Constants.hh"
+
+#include "hls_math.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -15,7 +13,7 @@
 
 
 const int nevents = 100; // number of events to run
-bool truncation = false; // compare results to truncated emulation
+bool truncation = true; // compare results to truncated emulation
 
 using namespace std;
 
@@ -26,20 +24,20 @@ int main() {
   int err_count = 0;
 
   // declare input memory arrays to be read from the emulation files
-  AllStubMemory        inputstub;
-  AllProjectionMemory  inputproj;
-  CandidateMatchMemory inputcandmatch1;
-  CandidateMatchMemory inputcandmatch2;
-  CandidateMatchMemory inputcandmatch3;
-  CandidateMatchMemory inputcandmatch4;
-  CandidateMatchMemory inputcandmatch5;
-  CandidateMatchMemory inputcandmatch6;
-  CandidateMatchMemory inputcandmatch7;
-  CandidateMatchMemory inputcandmatch8;
+  static CandidateMatchMemory           match1;
+  static CandidateMatchMemory           match2;
+  static CandidateMatchMemory           match3;
+  static CandidateMatchMemory           match4;
+  static CandidateMatchMemory           match5;
+  static CandidateMatchMemory           match6;
+  static CandidateMatchMemory           match7;
+  static CandidateMatchMemory           match8;
+  static AllStubMemory<BARRELPS>        allstub;
+  static AllProjectionMemory<BARRELPS>  allproj;
 
   // declare output memory array to be filled by hls simulation
-  FullMatchMemory      outputfullmatch_seed1;  
-  FullMatchMemory      outputfullmatch_seed2;  
+  static FullMatchMemory<BARREL>      fullmatch1;  
+  static FullMatchMemory<BARREL>      fullmatch2;  
 
   // read in input files
   ifstream fin_as;
@@ -96,29 +94,29 @@ int main() {
     cout << "Event: " << dec << ievt << endl;
 
     // make memories from the input text files
-    writeMemFromFile<AllStubMemory>(inputstub, fin_as, ievt);
-    writeMemFromFile<AllProjectionMemory>(inputproj, fin_ap, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch1, fin_cm1, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch2, fin_cm2, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch3, fin_cm3, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch4, fin_cm4, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch5, fin_cm5, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch6, fin_cm6, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch7, fin_cm7, ievt);
-    writeMemFromFile<CandidateMatchMemory>(inputcandmatch8, fin_cm8, ievt);
+    writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
+    writeMemFromFile<AllProjectionMemory<BARRELPS> >(allproj, fin_ap, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match1, fin_cm1, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match2, fin_cm2, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match3, fin_cm3, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match4, fin_cm4, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match5, fin_cm5, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match6, fin_cm6, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match7, fin_cm7, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match8, fin_cm8, ievt);
 
     //set bunch crossing
-    BXType bx=ievt&0x7;
+    BXType bx = ievt;
+    BXType bx_out;
 
     // Unit Under Test
-    MatchCalculator(bx,
-                    &inputcandmatch1, &inputcandmatch2, &inputcandmatch3, &inputcandmatch4,
-                    &inputcandmatch5, &inputcandmatch6, &inputcandmatch7, &inputcandmatch8,
-                    &inputproj, &inputstub, &outputfullmatch_seed1, &outputfullmatch_seed2);
+    MatchCalculatorTop(bx,
+                    &match1, &match2, &match3, &match4, &match5, &match6, &match7, &match8,
+                    &allstub, &allproj, bx_out, &fullmatch1, &fullmatch2);
 
     // compare the computed outputs with the expected ones 
-    err_count += compareMemWithFile<FullMatchMemory>(outputfullmatch_seed1, fin_fm_seed1, ievt, "FullMatch", truncation);
-    err_count += compareMemWithFile<FullMatchMemory>(outputfullmatch_seed2, fin_fm_seed2, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch1, fin_fm_seed1, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch2, fin_fm_seed2, ievt, "FullMatch", truncation);
 
   }  // end of event loop
   
