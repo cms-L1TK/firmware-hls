@@ -27,54 +27,88 @@ ap_uint<width> iabs( ap_int<width> value )
 
 // Template to get look up tables
 
-//template< int L >
-//void readTable_PhiCuts(ap_int<17> table[7]){
-//  if (L==1){
-//    table = { 
-//#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-//    }
-//  }
-//  if (L==2){
-//    table = { 
-//#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-//    }
-//  }
-//  if (L==3){
-//    table = { 
-//#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-//    }
-//  }
-//  if (L==4){
-//    table = { 
-//#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-//    }
-//  }
-//  if (L==5){
-//    table = { 
-//#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-//    }
-//  }
-//  if (L==6){
-//    table = { 
-//#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-//    }
-//  }
-//} // end readTable_PhiCuts
-
-static const ap_int<17> LUT_matchcut_phi[7] = {
+// Table for phi or z cuts
+template<bool phi, int L, int width, int depth>
+void readTable_Cuts(ap_uint<width> table[depth]){
+  if (phi){ // phi cuts
+    if (L==1){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L1PHIC_phicut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==2){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L2PHIC_phicut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==3){
+      ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-};
-
-static const ap_int<13> LUT_matchcut_z[7] = {
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==4){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L4PHIC_phicut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==5){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L5PHIC_phicut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==6){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L6PHIC_phicut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only LAYERS 1 to 6 are valid");
+    }
+  } // end phi cuts
+  else { // z cuts
+    if (L==1){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L1PHIC_zcut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==2){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L2PHIC_zcut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==3){
+      ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L3PHIC_zcut.tab"
-};
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==4){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L4PHIC_zcut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==5){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L5PHIC_zcut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==6){
+      ap_uint<width> tmp[depth] =
+#include "../emData/MC/MC_L3PHIC/MC_L6PHIC_zcut.tab"
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only LAYERS 1 to 6 are valid");
+    }
+ 
+  }
+
+} // end readTable_Cuts
+
 
 //////////////////////////////////////////////////////////////
 
 // MatchCalculator
 
-//template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE,
-//         int LAYER=0, int DISK=0, typename FullMatch<FMTYPE>::kFMSTUBPHIID PHISEC=0>
 template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE,
          int LAYER=0, int DISK=0, int PHISEC=0>
 void MatchCalculator(BXType bx,
@@ -101,17 +135,15 @@ void MatchCalculator(BXType bx,
  
   // Setup constants depending on which layer/disk working on
   // probably should move these to constants file
-  ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation defined in constants 
-  ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation defined in constants
-  ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation defined in constants
-  ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation defined in constants
-  ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation defined in constants
-  ap_uint<3> kNbitsrL123 = 7;      // nbitsrL123     in emulation defined in constants
-  ap_uint<3> kNbitsrL456 = 7;      // nbitsrL456     in emulation defined in constants 
-  ap_int<4>  kShift_PS_zderL = -7; // PS_zderL_shift in emulation defined in constants
-  ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation defined in constants
-
-  std::cout << "LAYER = " << LAYER << " PHISEC = " << PHISEC << std::endl;
+  ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
+  ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
+  ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
+  ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
+  ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
+  ap_uint<3> kNbitsrL123 = 7;      // nbitsrL123     in emulation (defined in constants)
+  ap_uint<3> kNbitsrL456 = 7;      // nbitsrL456     in emulation (defined in constants) 
+  ap_int<4>  kShift_PS_zderL = -7; // PS_zderL_shift in emulation (defined in constants)
+  ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation (defined in constants)
 
   auto kFact               = (1 <= LAYER <= 3)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456));                             // fact_ in emulation defined in MC
   auto kPhi0_shift         = (1 <= LAYER <= 3)? 3 : 0;                                                                  // phi0shift_ in emulation defined in MC
@@ -123,9 +155,11 @@ void MatchCalculator(BXType bx,
   ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
-  //// Setup look up tables for 
-  //static const ap_int<17> LUT_matchcut_phi[7];
-  //readTable_PhiCuts<LAYER>(LUT_matchcut_phi);
+  // Setup look up tables for match cuts
+  ap_uint<17> LUT_matchcut_phi[7];
+  readTable_Cuts<true,LAYER,17,7>(LUT_matchcut_phi);
+  ap_uint<13> LUT_matchcut_z[7];
+  readTable_Cuts<false,LAYER,13,7>(LUT_matchcut_z);
 
   // Pick up number of candidate matches for each CM memory
   ap_uint<kNBits_MemAddr> ncm1 = match1->getEntries(bx);
@@ -155,7 +189,7 @@ void MatchCalculator(BXType bx,
    // Setup candidate match data stream that goes into match calculations
   CandidateMatch datastream = CandidateMatch();
 
-  // Setup dummy indice to be used in the comparison
+  // Setup dummy index to be used in the comparison
   CandidateMatch::CMProjIndex dummy = -1; 
 
   // Bool and ID needed for determining if processing a new tracklet
@@ -192,14 +226,6 @@ void MatchCalculator(BXType bx,
       const CandidateMatch &cm8 = match8->read_mem(bx,addr8); 
 
       // Pick up the projection indices
-      //CandidateMatch::CMProjIndex id1 = (addr1 < ncm1) ? cm1.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id2 = (addr2 < ncm2) ? cm2.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id3 = (addr3 < ncm3) ? cm3.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id4 = (addr4 < ncm4) ? cm4.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id5 = (addr5 < ncm5) ? cm5.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id6 = (addr6 < ncm6) ? cm6.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id7 = (addr7 < ncm7) ? cm7.getProjIndex() : dummy; 
-      //CandidateMatch::CMProjIndex id8 = (addr8 < ncm8) ? cm8.getProjIndex() : dummy; 
       auto id1 = (addr1 < ncm1) ? cm1.getProjIndex() : dummy; 
       auto id2 = (addr2 < ncm2) ? cm2.getProjIndex() : dummy; 
       auto id3 = (addr3 < ncm3) ? cm3.getProjIndex() : dummy; 
@@ -249,8 +275,6 @@ void MatchCalculator(BXType bx,
       }
 
        // Extract the stub and projection indices from the candidate match
-       //CandidateMatch::CMProjIndex projid = datastream.getProjIndex();
-       //CandidateMatch::CMStubIndex stubid = datastream.getStubIndex();
        auto projid = datastream.getProjIndex();
        auto stubid = datastream.getStubIndex();
        // Use the stub and projection indices to pick up the stub and projection
@@ -273,24 +297,11 @@ void MatchCalculator(BXType bx,
        // Projection parameters
        typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
        typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
-       typename AllProjection<APTYPE>::AProjTCSEED proj_seed = proj.getSeed();
-       typename AllProjection<APTYPE>::AProjPHI    proj_phi  = proj.getPhi();
-       typename AllProjection<APTYPE>::AProjRZ     proj_z    = proj.getRZ();
-       typename AllProjection<APTYPE>::AProjPHIDER proj_phid = proj.getPhiDer();
-       typename AllProjection<APTYPE>::AProjRZDER  proj_zd   = proj.getRZDer(); 
-
-       //if (debugMC){
-       //  std::cout << "i " << istep << std::endl;
-       //  if (newtracklet) std::cout << "----- New tracklet -----" << std::endl;
-       //  std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
-       //  std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
-       //  std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
-       //}
-       std::cout << "CM params (ProjID,StubID): " << projid << " " << stubid << std::endl;
-       std::cout << "AS params (r,z,phi,bend): " << stub_r << " " << stub_z << " " << stub_phi << " " << stub_bend << " " << std::endl;
-       std::cout << "AP params (TCID,seed,phi,z,phid,zd): " << proj_tcid << " " << proj_tkid << " " << proj_seed << " " << proj_phi << " " << proj_z << " " << proj_phid << " " << proj_zd << std::endl;
-       std::cout << "AS = " << stub.raw() << std::endl;
-       std::cout << "AP = " << proj.raw() << std::endl;
+       typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
+       typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
+       typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
+       typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
+       typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
 
        // Calculate residuals
        // Get phi and z correction
@@ -314,17 +325,10 @@ void MatchCalculator(BXType bx,
        ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
        ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
-       //if (debugMC){
-         std::cout << "Deltas (Phi, Z): " << delta_phi << " " << delta_z << std::endl;
-         std::cout << "AbsDelta(Phi,Z): " << abs_delta_phi << " " << abs_delta_z << std::endl;
-       //}
-
        // Best match logic block
        goodmatch[istep] = false;
        // For first tracklet, pick up the phi cut value
        if (newtracklet) best_delta_phi = LUT_matchcut_phi[proj_seed];
-
-       std::cout << " Cuts (phi,z) = " << best_delta_phi << " " << LUT_matchcut_z[proj_seed] << std::endl;
 
        // Check that matches fall within the selection window of the projection 
        if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
@@ -333,15 +337,13 @@ void MatchCalculator(BXType bx,
          best_delta_phi = abs_delta_phi;
 
          // Full match parameters
-         typename FullMatch<FMTYPE>::FMTCID          fm_tcid = proj_tcid;
-         typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid = proj_tkid;
-         typename FullMatch<FMTYPE>::FMSTUBPHIID fm_asphi = PHISEC; //kPhiSector;
-         typename FullMatch<FMTYPE>::FMSTUBID    fm_asid  = stubid;
-         typename FullMatch<FMTYPE>::FMPHIRES    fm_phi   = delta_phi;
-         typename FullMatch<FMTYPE>::FMZRES      fm_z     = delta_z;
+         typename FullMatch<FMTYPE>::FMTCID          fm_tcid  = proj_tcid;
+         typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid  = proj_tkid;
+         typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
+         typename FullMatch<FMTYPE>::FMSTUBID        fm_asid  = stubid;
+         typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
+         typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
          FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
-         std::cout << "FMTCID,STUBPHI,STUBID = " << fm_tcid << " " << fm_asphi << " " << fm_asid << std::endl;
-         std::cout << "HERE FULL MATCH = " << fm.raw() << std::endl;
 
          // Store bestmatch
          bestmatch[istep] = fm.raw();
@@ -359,13 +361,6 @@ void MatchCalculator(BXType bx,
 		 projseed[istep]  = projseed[istep-1];
        }
 
-       //if (debugMC){
-       //  std::cout << "Best match: " << goodmatch[istep] << " " << projseed[istep] << " " << bestmatch[istep].raw() << std::endl;
-       std::cout << "FM params (TCID,ASID,phi,z): " << bestmatch[istep].getTrackletIndex() << " " << bestmatch[istep].getStubIndex()
-                 << " " << bestmatch[istep].getPhiRes() << " " << bestmatch[istep].getZRes() << std::endl;
-       std::cout << "FM: " << goodmatch[istep] << std::endl;
-       //}
-
        // Write out only the best match, based on the seeding
        if (newtracklet){ // if there is a new tracklet write out the best match for the previous tracklet
          if (goodmatch[istep-1]==true && projseed[istep-1]==0) fullmatch1->write_mem(bx,bestmatch[istep-1]);
@@ -379,8 +374,6 @@ void MatchCalculator(BXType bx,
      }
      else break; // end processing of CMs
   }// end MC_LOOP 
-
-
 
 }// end MatchCalculator
 
