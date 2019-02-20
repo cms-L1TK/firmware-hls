@@ -16,6 +16,8 @@ public:
     kFMZResSize = 9,
     kFMPhiResSize = 12,
     kFMStubIndexSize = 10,
+    kFMStubPhiIDSize = 3,   // subdivision of StubIndex
+    kFMStubIDSize = 7,      // subdivision of StubIndex
     kFMTrackletIndexSize = 7,
     kFMTCIDSize = 7,
     // Bit size for full FullMatchMemory
@@ -32,6 +34,8 @@ public:
     kFMZResSize = 7,
     kFMPhiResSize = 12,
     kFMStubIndexSize = 10,
+    kFMStubPhiIDSize = 3,   // subdivision of StubIndex
+    kFMStubIDSize = 7,      // subdivision of StubIndex
     kFMTrackletIndexSize = 7,
     kFMTCIDSize = 7,
     // Bit size for full FullMatchMemory
@@ -52,6 +56,10 @@ public:
     kFMPhiResMSB = kFMPhiResLSB + FullMatchBase<FMType>::kFMPhiResSize - 1,
     kFMStubIndexLSB = kFMPhiResMSB + 1,
     kFMStubIndexMSB = kFMStubIndexLSB + FullMatchBase<FMType>::kFMStubIndexSize - 1,
+    kFMStubPhiIDLSB = kFMPhiResMSB + 1,
+    kFMStubPhiIDMSB = kFMStubPhiIDLSB + FullMatchBase<FMType>::kFMStubPhiIDSize - 1,
+    kFMStubIDLSB = kFMStubPhiIDMSB + 1,
+    kFMStubIDMSB = kFMStubIDLSB + FullMatchBase<FMType>::kFMStubIDSize - 1,
     kFMTrackletIndexLSB = kFMStubIndexMSB + 1,
     kFMTrackletIndexMSB = kFMTrackletIndexLSB + FullMatchBase<FMType>::kFMTrackletIndexSize - 1,
     kFMTCIDLSB = kFMTrackletIndexMSB + 1,
@@ -61,6 +69,8 @@ public:
   typedef ap_int<FullMatchBase<FMType>::kFMZResSize> FMZRES;
   typedef ap_int<FullMatchBase<FMType>::kFMPhiResSize> FMPHIRES;
   typedef ap_uint<FullMatchBase<FMType>::kFMStubIndexSize> FMSTUBINDEX;
+  typedef ap_uint<FullMatchBase<FMType>::kFMStubIDSize> FMSTUBID;        // subdivision of StubIndex 
+  typedef ap_uint<FullMatchBase<FMType>::kFMStubPhiIDSize> FMSTUBPHIID;  // subdivision of StubIndex
   typedef ap_uint<FullMatchBase<FMType>::kFMTrackletIndexSize> FMTrackletIndex;
   typedef ap_uint<FullMatchBase<FMType>::kFMTCIDSize> FMTCID;
 
@@ -73,6 +83,10 @@ public:
 
   FullMatch(const FMTCID tcid, const FMTrackletIndex trackletindex, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
     data_( ((((tcid,trackletindex),stub),phires),zres) )
+  {}
+
+  FullMatch(const FMTCID tcid, const FMTrackletIndex trackletindex, const FMSTUBPHIID stubphiid, const FMSTUBID stubid, const FMPHIRES phires, const FMZRES zres):
+	data_( (((((tcid,trackletindex),stubphiid),stubid),phires),zres) )
   {}
 
   FullMatch():
@@ -102,6 +116,14 @@ public:
     return data_.range(kFMStubIndexMSB,kFMStubIndexLSB);
   }
 
+  FMSTUBID getStubID() const {
+    return data_.range(kFMStubIDMSB,kFMStubIDLSB);
+  }
+
+  FMSTUBPHIID getStubPhiID() const {
+    return data_.range(kFMStubPhiIDMSB,kFMStubPhiIDLSB);
+  }
+
   FMPHIRES getPhiRes() const {
     return data_.range(kFMPhiResMSB,kFMPhiResLSB);
   }
@@ -121,6 +143,14 @@ public:
 
   void setStubIndex(const FMSTUBINDEX stid) {
     data_.range(kFMStubIndexMSB,kFMStubIndexLSB) = stid;
+  }
+
+  void setStubPhiID(const FMSTUBPHIID stphiid) {
+    data_.range(kFMStubPhiIDMSB,kFMStubPhiIDLSB) = stphiid;
+  }
+
+  void setStubID(const FMSTUBID stid) {
+    data_.range(kFMStubIDMSB,kFMStubIDLSB) = stid;
   }
 
   void setPhiRes(const FMPHIRES phires) {

@@ -91,12 +91,11 @@ public:
     kASRMSB = kASRLSB + AllStubBase<ASType>::kASRSize - 1
   };
   
-  typedef ap_uint<AllStubBase<ASType>::kASRSize> ASR;
+  typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
   typedef ap_uint<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
   typedef ap_uint<AllStubBase<ASType>::kASBendSize> ASBEND;
-  
   typedef ap_uint<AllStubBase<ASType>::kAllStubSize> AllStubData;
 
   // Constructors
