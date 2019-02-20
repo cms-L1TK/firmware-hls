@@ -6,7 +6,7 @@
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
-template<regionType TProjType> class TrackletProjectionBase {};
+template<int TProjType> class TrackletProjectionBase {};
 
 template<>
 class TrackletProjectionBase<BARRELPS>
@@ -61,7 +61,7 @@ public:
 
 
 // Data object definition
-template<regionType TProjType>
+template<int TProjType>
 class TrackletProjection : public TrackletProjectionBase<TProjType>
 {
 public:
@@ -170,7 +170,7 @@ private:
 };
 
 // Memory definition
-template<regionType TProjType> using TrackletProjectionMemory = MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>;
+template<int TProjType> using TrackletProjectionMemory = MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif
