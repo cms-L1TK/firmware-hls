@@ -340,6 +340,8 @@ void VMRouter(
     // add stub to all stub memory (memories?)
     // HACK fix me
     AllStub allstubd(stub.raw());
+    std::cout << "Out put stub: " << std::hex << allstubd.raw()
+    		  << std::dec << std::endl;
     // END HACK
     allstub->write_mem(bx, allstubd);
 
@@ -347,7 +349,7 @@ void VMRouter(
     count++;
     // executeME() START ------------------------------
     // hourglass only
-    VMStubME stubme; stubme.setBend(stub.getBend());
+    VMStubME stubme; stubme.setBend(stub.getBend()); stubme.setIndex(VMStubME::VMSMEID(i));
     auto layer = layer_; // hack
     auto disk  = disk_; // hack --these are mutually exclusive so ...
     // total number of VMs
@@ -390,7 +392,6 @@ void VMRouter(
       auto rfine=finebintable_[index.to_int()];
 
       //assert(rfine>=0);
-      stubme.setIndex(index);
       //stubme.setFineR(rfine); not yet
     }
     else { // layer
@@ -399,45 +400,38 @@ void VMRouter(
       VMStubME::VMSMEFINEZ zfine=finebintable_[index.to_int()];
 
       stubme.setFineZ(zfine);
-      stubme.setIndex(index);
     }
     // put in a bunch of enables to decide which memories to write
     // to.
 
     // now actually update the stubs in the new memories
     // based on the Verilog version by MEZ
-#ifdef DEBUG
+    ap_uint<MEBinsBits> bin;
+    if ( ! disk ) { // barrel
+      auto z = stub.getZ();
+      bin = (1<<(MEBinsBits-1)) + (z>>(z.length()-MEBinsBits));
+    }
+    else { // disk
+      assert(1==0);
+    }
+#ifndef __SYNTHESIS__
+    std::cout << "ME stub " << std::hex << stubme.raw() << std::endl;
+
     std::cout << "iPhiRaw,Minus,Plus = "  << std::dec
 	      << iphiRaw << " " << iphiRawMinus << " "
 	      << iphiRawPlus << " "
 	      << "\t0x" << std::setfill('0') << std::setw(4)  
-	      << std::hex << stubme.raw().to_int() << std::dec 
+	      << std::hex << stubme.raw().to_int() << std::dec << ", to bin " << bin
 	      << std::endl;
     if ( ! memask[iphiRaw] ) {
       std::cerr << "Trying to write to non-existent memory for iphiRaw = "
 		<< iphiRaw << std::endl;
     }
-    if ( ! memask[iphiRawPlus] ) {
-      std::cerr << "Trying to write to non-existent memory for iphiRawPlus = "
-		<< iphiRawPlus << std::endl;
-    }
-    if ( ! memask[iphiRaw] ) {
-      std::cerr << "Trying to write to non-existent memory for iphiRawMinus = "
-		<< iphiRawMinus << std::endl;
-    }
+
 #endif // DEBUG
-    ap_uint<3> bin;
-    if ( ! disk ) { // barrel
-      auto z = stub.getZ();
-      constexpr int meslotbits = 3;
-      bin = (1<<(meslotbits-1)) + (z>>(z.length()-meslotbits)); // hack
-    }
-    else { // disk
-      assert(1==0);
-    }
     // 0-9
     if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) ) {
-      if ( m0)
+      if ( memask[0] )
         m0->write_mem(bx, bin, stubme);
     }
     if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) ) {
