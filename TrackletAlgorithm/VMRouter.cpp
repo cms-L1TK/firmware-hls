@@ -118,7 +118,7 @@ void init_finebintable(const int layer_, const int disk_,
 
 // local files
 // returns top 5 bits of phi
-inline ap_uint<5> iphivmRaw(const AllStub::ASPHI phi)
+inline ap_uint<5> iphivmRaw(const AllStub<BARRELPS>::ASPHI phi)
 {
   // TODO: get rid of hard-coded values
   ap_uint<5> iphivm=phi.range(phi.length()-1,phi.length()-5);
@@ -129,7 +129,7 @@ inline ap_uint<5> iphivmRaw(const AllStub::ASPHI phi)
 // VMbits is the number of bits for the fine bins.
 // E.g. 32 bins would use VMbits=5
 // finebits is the number of bits within the VM
-inline int iphivmFineBins(const AllStub::ASPHI phi, const int VMbits,
+inline int iphivmFineBins(const AllStub<BARRELPS>::ASPHI phi, const int VMbits,
   const int finebits)
   {
     auto length= phi.length() - VMbits - finebits;
@@ -145,7 +145,7 @@ inline int iphivmFineBins(const AllStub::ASPHI phi, const int VMbits,
 // we add a small amount to the raw value; if it's not the same
 // as the central value we copy the data to the adjacent memory as well.
 inline
-ap_uint<5> iphivmRawPlus(const AllStub::ASPHI phi)
+ap_uint<5> iphivmRawPlus(const AllStub<BARRELPS>::ASPHI phi)
 {
   // // TODO: get rid of hard-coded values
   // ap_uint<7> tmp = phi.range(phi.length()-1,phi.length()-7);
@@ -160,7 +160,7 @@ ap_uint<5> iphivmRawPlus(const AllStub::ASPHI phi)
 
 // see above
 inline
-ap_uint<5> iphivmRawMinus(const AllStub::ASPHI phi)
+ap_uint<5> iphivmRawMinus(const AllStub<BARRELPS>::ASPHI phi)
 {
   ap_uint<7> tmp(phi.range(phi.length()-1,phi.length()-7));
   auto iphivmp = --tmp;
@@ -177,48 +177,47 @@ constexpr int MAXVMROUTER = 64; // TODO need right symbol here
 
 //template <int layer_, int disk_, bool isPSmodule>
 void VMRouter(
-              const int layer_, const int disk_, const bool isPSmodule,
-              const BXType bx,
-              const InputStubMemory* const a0,
-              const InputStubMemory* const a1,
-              const InputStubMemory* const a2,
-              const InputStubMemory* const a3,
-              const InputStubMemory* const a4,
-              AllStubMemory* allstub,
-	      ap_uint<32> memask,
-              VMStubMEMemory *m0,
-              VMStubMEMemory *m1,
-              VMStubMEMemory *m2,
-              VMStubMEMemory *m3,
-              VMStubMEMemory *m4,
-              VMStubMEMemory *m5,
-              VMStubMEMemory *m6,
-              VMStubMEMemory *m7,
-              VMStubMEMemory *m8,
-              VMStubMEMemory *m9,
-              VMStubMEMemory *m10,
-              VMStubMEMemory *m11,
-              VMStubMEMemory *m12,
-              VMStubMEMemory *m13,
-              VMStubMEMemory *m14,
-              VMStubMEMemory *m15,
-              VMStubMEMemory *m16,
-              VMStubMEMemory *m17,
-              VMStubMEMemory *m18,
-              VMStubMEMemory *m19,
-              VMStubMEMemory *m20,
-              VMStubMEMemory *m21,
-              VMStubMEMemory *m22,
-              VMStubMEMemory *m23,
-              VMStubMEMemory *m24,
-              VMStubMEMemory *m25,
-              VMStubMEMemory *m26,
-              VMStubMEMemory *m27,
-              VMStubMEMemory *m28,
-              VMStubMEMemory *m29,
-              VMStubMEMemory *m30,
-              VMStubMEMemory *m31
-			  )
+		const int layer_, const int disk_, const bool isPSmodule,
+		const BXType bx,
+		const InputStubMemory<BARRELPS>* const a0,
+		const InputStubMemory<BARRELPS>* const a1,
+		const InputStubMemory<BARRELPS>* const a2,
+		const InputStubMemory<BARRELPS>* const a3,
+		const InputStubMemory<BARRELPS>* const a4,
+		AllStubMemory<BARRELPS>* allstub,
+		ap_uint<32> memask,
+              VMStubMEMemory<BARRELPS> *m0,
+              VMStubMEMemory<BARRELPS> *m1,
+              VMStubMEMemory<BARRELPS> *m2,
+              VMStubMEMemory<BARRELPS> *m3,
+              VMStubMEMemory<BARRELPS> *m4,
+              VMStubMEMemory<BARRELPS> *m5,
+              VMStubMEMemory<BARRELPS> *m6,
+              VMStubMEMemory<BARRELPS> *m7,
+              VMStubMEMemory<BARRELPS> *m8,
+              VMStubMEMemory<BARRELPS> *m9,
+              VMStubMEMemory<BARRELPS> *m10,
+              VMStubMEMemory<BARRELPS> *m11,
+              VMStubMEMemory<BARRELPS> *m12,
+              VMStubMEMemory<BARRELPS> *m13,
+              VMStubMEMemory<BARRELPS> *m14,
+              VMStubMEMemory<BARRELPS> *m15,
+              VMStubMEMemory<BARRELPS> *m16,
+              VMStubMEMemory<BARRELPS> *m17,
+              VMStubMEMemory<BARRELPS> *m18,
+              VMStubMEMemory<BARRELPS> *m19,
+              VMStubMEMemory<BARRELPS> *m20,
+              VMStubMEMemory<BARRELPS> *m21,
+              VMStubMEMemory<BARRELPS> *m22,
+              VMStubMEMemory<BARRELPS> *m23,
+              VMStubMEMemory<BARRELPS> *m24,
+              VMStubMEMemory<BARRELPS> *m25,
+              VMStubMEMemory<BARRELPS> *m26,
+              VMStubMEMemory<BARRELPS> *m27,
+              VMStubMEMemory<BARRELPS> *m28,
+              VMStubMEMemory<BARRELPS> *m29,
+              VMStubMEMemory<BARRELPS> *m30,
+              VMStubMEMemory<BARRELPS> *m31)
 {
 
   // // size of array here is the max possible value
@@ -271,7 +270,7 @@ void VMRouter(
 
 
   // see how much data we have from each of the memories
-  InputStubMemory::NEntryT zero(0);
+  InputStubMemory<BARRELPS>::NEntryT zero(0);
   
   auto n_A0 =            a0->getEntries(bx);
   auto n_A1 =            a1->getEntries(bx);
@@ -294,7 +293,7 @@ void VMRouter(
       continue;
     //const InputStubMemory *next; // this method makes vivado crash
     bool resetNext = false;
-    InputStub stub;
+    InputStub<BARRELPS>stub;
     if ( n_A0 ) {
       //next = a0;
       stub = a0->read_mem(bx, read_addr);
@@ -339,7 +338,7 @@ void VMRouter(
 
     // add stub to all stub memory (memories?)
     // HACK fix me
-    AllStub allstubd(stub.raw());
+    AllStub<BARRELPS> allstubd(stub.raw());
     std::cout << "Out put stub: " << std::hex << allstubd.raw()
     		  << std::dec << std::endl;
     // END HACK
@@ -349,7 +348,8 @@ void VMRouter(
     count++;
     // executeME() START ------------------------------
     // hourglass only
-    VMStubME stubme; stubme.setBend(stub.getBend()); stubme.setIndex(VMStubME::VMSMEID(i));
+    VMStubME<BARRELPS> stubme;
+    stubme.setBend(stub.getBend()); stubme.setIndex(VMStubME<BARRELPS>::VMSMEID(i));
     auto layer = layer_; // hack
     auto disk  = disk_; // hack --these are mutually exclusive so ...
     // total number of VMs
@@ -383,7 +383,7 @@ void VMRouter(
 
     if ( disk ) {
       assert(1==0);
-      VMStubME::VMSMEID index=stub.getR();
+      VMStubME<BARRELPS>::VMSMEID index=stub.getR();
       // how to check this?
       if (isPSmodule) {
         index=stub.getR()>>(stub.getR().length()-nbitsfinebintable_);
@@ -395,9 +395,9 @@ void VMRouter(
       //stubme.setFineR(rfine); not yet
     }
     else { // layer
-      VMStubME::VMSMEID index=(stub.getZ()>>(stub.getZ().length()-nbitsfinebintable_))&((1<<nbitsfinebintable_)-1);
+      VMStubME<BARRELPS>::VMSMEID index=(stub.getZ()>>(stub.getZ().length()-nbitsfinebintable_))&((1<<nbitsfinebintable_)-1);
 
-      VMStubME::VMSMEFINEZ zfine=finebintable_[index.to_int()];
+      VMStubME<BARRELPS>::VMSMEFINEZ zfine=finebintable_[index.to_int()];
 
       stubme.setFineZ(zfine);
     }
@@ -572,11 +572,11 @@ void VMRouter(
     	// layer non-overlap
     	if ( layer_ == 1 || layer_ == 3 || layer_ == 5 ) {
         	// INNER regular
-        	VMStubTEInner stubTeInner;
+        	VMStubTEInner<BARRELPS> stubTeInner;
     	}
     	else { // layers 2, 4 and 6
     		// OUTER
-        	VMStubTEOuter stubTeOuter;
+        	VMStubTEOuter<BARRELPS> stubTeOuter;
 
     	}
     }

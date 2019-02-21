@@ -18,25 +18,25 @@ int main()
 
   ///////////////////////////
   // input memories
-  static InputStubMemory ilink1;
-  static InputStubMemory ilink2;
-  static InputStubMemory ilink3;
-  static InputStubMemory ilink4;
-  static InputStubMemory ilink5;
-  // static InputStubMemory ilink6;
-  // static InputStubMemory ilink7;
-  // static InputStubMemory ilink8;
+  static InputStubMemory<BARRELPS> ilink1;
+  static InputStubMemory<BARRELPS> ilink2;
+  static InputStubMemory<BARRELPS> ilink3;
+  static InputStubMemory<BARRELPS> ilink4;
+  static InputStubMemory<BARRELPS> ilink5;
+  // static InputStubMemory<BARRELPS> ilink6;
+  // static InputStubMemory<BARRELPS> ilink7;
+  // static InputStubMemory<BARRELPS> ilink8;
 
   // output memories
-  static AllStubMemory allstub;
-  static VMStubMEMemory vmstubme1;
-  static VMStubMEMemory vmstubme2;
-  static VMStubMEMemory vmstubme3;
-  static VMStubMEMemory vmstubme4;
-  static VMStubMEMemory vmstubme5;
-  static VMStubMEMemory vmstubme6;
-  static VMStubMEMemory vmstubme7;
-  static VMStubMEMemory vmstubme8;
+  static AllStubMemory<BARRELPS> allstub;
+  static VMStubMEMemory<BARRELPS> vmstubme1;
+  static VMStubMEMemory<BARRELPS> vmstubme2;
+  static VMStubMEMemory<BARRELPS> vmstubme3;
+  static VMStubMEMemory<BARRELPS> vmstubme4;
+  static VMStubMEMemory<BARRELPS> vmstubme5;
+  static VMStubMEMemory<BARRELPS> vmstubme6;
+  static VMStubMEMemory<BARRELPS> vmstubme7;
+  static VMStubMEMemory<BARRELPS> vmstubme8;
 
   ///////////////////////////
   // open input files
@@ -119,9 +119,9 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    writeMemFromFile<InputStubMemory>(ilink1, fin_ilink1, ievt);
-    writeMemFromFile<InputStubMemory>(ilink2, fin_ilink2, ievt);
-    writeMemFromFile<InputStubMemory>(ilink3, fin_ilink3, ievt);
+    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink1, fin_ilink1, ievt);
+    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink2, fin_ilink2, ievt);
+    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink3, fin_ilink3, ievt);
     // writeMemFromFile<InputStubMemory>(ilink4, fin_ilink4, ievt);
     // writeMemFromFile<InputStubMemory>(ilink5, fin_ilink5, ievt);
     // writeMemFromFile<InputStubMemory>(ilink6, fin_ilink6, ievt);
@@ -144,38 +144,38 @@ int main()
     // compare the computed outputs with the expected ones
     bool truncation = false;
     // AllStub
-    err += compareMemWithFile<AllStubMemory>(allstub, fout_aproj, ievt,
+    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub, fout_aproj, ievt,
                                                    "AllStub", truncation);
     // VMStubME1
-    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme1, fout_vmstubme1, ievt,
+    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme1, fout_vmstubme1, ievt,
                                                   "VMStubME17", truncation);
 
     // VMStubME2
-    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme2, fout_vmstubme2, ievt,
+    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme2, fout_vmstubme2, ievt,
                                                   "VMStubME18", truncation);
 
     // VMStubME3
-    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme3, fout_vmstubme3, ievt,
+    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme3, fout_vmstubme3, ievt,
                                                   "VMStubME19", truncation);
 
     // VMStubME4
-    err += compareBinnedMemWithFile<VMStubMEMemory>(vmstubme4, fout_vmstubme4, ievt,
+    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme4, fout_vmstubme4, ievt,
                                                   "VMStubME20", truncation);
 
 //    // VMStubME5
-//    err += compareMemWithFile<VMStubMEMemory>(vmstubme5, fout_vmstubme5, ievt,
+//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme5, fout_vmstubme5, ievt,
 //                                                  "VMStubME5", truncation);
 //
 //    // VMStubME6
-//    err += compareMemWithFile<VMStubMEMemory>(vmstubme6, fout_vmstubme6, ievt,
+//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme6, fout_vmstubme6, ievt,
 //                                                  "VMStubME6", truncation);
 //
 //    // VMStubME7
-//    err += compareMemWithFile<VMStubMEMemory>(vmstubme7, fout_vmstubme7, ievt,
+//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme7, fout_vmstubme7, ievt,
 //                                                  "VMStubME7", truncation);
 //
 //    // VMStubME8
-//    err += compareMemWithFile<VMStubMEMemory>(vmstubme8, fout_vmstubme8, ievt,
+//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme8, fout_vmstubme8, ievt,
 //                                                  "VMStubME8", truncation);
   } // end of event loop
   std::cerr << "Exiting with return value " << err << std::endl;
