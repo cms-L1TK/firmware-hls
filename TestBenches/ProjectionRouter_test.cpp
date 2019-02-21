@@ -18,25 +18,25 @@ int main()
 
   ///////////////////////////
   // input memories
-  static TrackletProjectionMemory<INNER> tproj1;
-  static TrackletProjectionMemory<INNER> tproj2;
-  static TrackletProjectionMemory<INNER> tproj3;
-  static TrackletProjectionMemory<INNER> tproj4;
-  static TrackletProjectionMemory<INNER> tproj5;
-  static TrackletProjectionMemory<INNER> tproj6;
-  static TrackletProjectionMemory<INNER> tproj7;
-  static TrackletProjectionMemory<INNER> tproj8;
+  static TrackletProjectionMemory<BARRELPS> tproj1;
+  static TrackletProjectionMemory<BARRELPS> tproj2;
+  static TrackletProjectionMemory<BARRELPS> tproj3;
+  static TrackletProjectionMemory<BARRELPS> tproj4;
+  static TrackletProjectionMemory<BARRELPS> tproj5;
+  static TrackletProjectionMemory<BARRELPS> tproj6;
+  static TrackletProjectionMemory<BARRELPS> tproj7;
+  static TrackletProjectionMemory<BARRELPS> tproj8;
 
   // output memories
-  static AllProjectionMemory allproj;
-  static VMProjectionMemory vmproj1;
-  static VMProjectionMemory vmproj2;
-  static VMProjectionMemory vmproj3;
-  static VMProjectionMemory vmproj4;
-  static VMProjectionMemory vmproj5;
-  static VMProjectionMemory vmproj6;
-  static VMProjectionMemory vmproj7;
-  static VMProjectionMemory vmproj8;
+  static AllProjectionMemory<BARRELPS> allproj;
+  static VMProjectionMemory<BARREL> vmproj1;
+  static VMProjectionMemory<BARREL> vmproj2;
+  static VMProjectionMemory<BARREL> vmproj3;
+  static VMProjectionMemory<BARREL> vmproj4;
+  static VMProjectionMemory<BARREL> vmproj5;
+  static VMProjectionMemory<BARREL> vmproj6;
+  static VMProjectionMemory<BARREL> vmproj7;
+  static VMProjectionMemory<BARREL> vmproj8;
 
   ///////////////////////////
   // open input files
@@ -119,14 +119,14 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj1, fin_tproj1, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj2, fin_tproj2, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj3, fin_tproj3, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj4, fin_tproj4, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj5, fin_tproj5, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj6, fin_tproj6, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj7, fin_tproj7, ievt);
-    writeMemFromFile<TrackletProjectionMemory<INNER> >(tproj8, fin_tproj8, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj1, fin_tproj1, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj2, fin_tproj2, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj3, fin_tproj3, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj4, fin_tproj4, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj5, fin_tproj5, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj6, fin_tproj6, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj7, fin_tproj7, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj8, fin_tproj8, ievt);
     
     // bx
     BXType bx = ievt;
@@ -144,39 +144,39 @@ int main()
     // compare the computed outputs with the expected ones
     bool truncation = false;
     // AllProjection
-    err += compareMemWithFile<AllProjectionMemory>(allproj, fout_aproj, ievt,
-                                                   "AllProjection", truncation);
+    err += compareMemWithFile<AllProjectionMemory<BARRELPS> >
+      (allproj,fout_aproj, ievt, "AllProjection", truncation);
     // VMProjection1
-    err += compareMemWithFile<VMProjectionMemory>(vmproj1, fout_vmproj1, ievt,
-                                                  "VMProjection1", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj1, fout_vmproj1, ievt, "VMProjection1", truncation);
 
     // VMProjection2
-    err += compareMemWithFile<VMProjectionMemory>(vmproj2, fout_vmproj2, ievt,
-                                                  "VMProjection2", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj2, fout_vmproj2, ievt, "VMProjection2", truncation);
 
     // VMProjection3
-    err += compareMemWithFile<VMProjectionMemory>(vmproj3, fout_vmproj3, ievt,
-                                                  "VMProjection3", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj3, fout_vmproj3, ievt, "VMProjection3", truncation);
 
     // VMProjection4
-    err += compareMemWithFile<VMProjectionMemory>(vmproj4, fout_vmproj4, ievt,
-                                                  "VMProjection4", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj4, fout_vmproj4, ievt, "VMProjection4", truncation);
 
     // VMProjection5
-    err += compareMemWithFile<VMProjectionMemory>(vmproj5, fout_vmproj5, ievt,
-                                                  "VMProjection5", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj5, fout_vmproj5, ievt, "VMProjection5", truncation);
 
     // VMProjection6
-    err += compareMemWithFile<VMProjectionMemory>(vmproj6, fout_vmproj6, ievt,
-                                                  "VMProjection6", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj6, fout_vmproj6, ievt, "VMProjection6", truncation);
 
     // VMProjection7
-    err += compareMemWithFile<VMProjectionMemory>(vmproj7, fout_vmproj7, ievt,
-                                                  "VMProjection7", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj7, fout_vmproj7, ievt, "VMProjection7", truncation);
 
     // VMProjection8
-    err += compareMemWithFile<VMProjectionMemory>(vmproj8, fout_vmproj8, ievt,
-                                                  "VMProjection8", truncation);
+    err += compareMemWithFile<VMProjectionMemory<BARREL> >
+      (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation);
     
   } // end of event loop
   

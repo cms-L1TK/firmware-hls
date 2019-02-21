@@ -4,24 +4,24 @@
 #include "ProjectionRouter.hh"
 
 void ProjectionRouterTop(BXType bx,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
-                         const TrackletProjectionMemory<INNER>* const,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
+                         const TrackletProjectionMemory<BARRELPS>*,
                          BXType&,
-                         AllProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const,
-                         VMProjectionMemory* const
+                         AllProjectionMemory<BARRELPS>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*,
+                         VMProjectionMemory<BARREL>*
                          );
 
 #endif

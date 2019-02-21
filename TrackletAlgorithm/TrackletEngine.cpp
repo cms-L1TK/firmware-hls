@@ -42,8 +42,8 @@ void readBendOuterTable(bool table[256]){
 
 void TrackletEngine(
 		    const ap_uint<3> bx,
-		    const VMStubTEInnerMemory& instubinnerdata,
-		    const VMStubTEOuterMemory& instubouterdata,
+		    const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
+		    const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
 		    StubPairMemory& outstubpair) {
 
 
@@ -65,11 +65,11 @@ void TrackletEngine(
   outstubpair.clear(bx);
 
   for (unsigned int istubinner=0;istubinner<instubinnerdata.getEntries(bx);istubinner++) {
-    VMStubTEInner innerstubdata = instubinnerdata.read_mem(bx,istubinner);
-    VMStubTEInner::VMSTEIID innerstubindex=innerstubdata.getIndex();
-    VMStubTEInner::VMSTEIBEND innerstubbend=innerstubdata.getBend();
-    VMStubTEInner::VMSTEIFINEPHI innerstubfinephi=innerstubdata.getFinePhi();
-    VMStubTEInner::VMSTEIZBITS innerstubzbits=innerstubdata.getZBits();
+    VMStubTEInner<BARRELPS> innerstubdata = instubinnerdata.read_mem(bx,istubinner);
+    VMStubTEInner<BARRELPS>::VMSTEIID innerstubindex=innerstubdata.getIndex();
+    VMStubTEInner<BARRELPS>::VMSTEIBEND innerstubbend=innerstubdata.getBend();
+    VMStubTEInner<BARRELPS>::VMSTEIFINEPHI innerstubfinephi=innerstubdata.getFinePhi();
+    VMStubTEInner<BARRELPS>::VMSTEIZBITS innerstubzbits=innerstubdata.getZBits();
     int zdiffmax=innerstubzbits.range(9,7);
     int zbinfirst=innerstubzbits.range(2,0);
     int start=innerstubzbits.range(6,4);
@@ -81,11 +81,11 @@ void TrackletEngine(
     for (unsigned int ibin=start;ibin<=last;ibin++) {
       int nstubs=instubouterdata.getEntries(bx,ibin);
       for (unsigned int istubouter=0;istubouter<nstubs;istubouter++) {
-        VMStubTEOuter outerstubdata = instubouterdata.read_mem(bx,istubouter+16*ibin);
-        VMStubTEOuter::VMSTEOID outerstubindex=outerstubdata.getIndex();
-	VMStubTEOuter::VMSTEOFINEPHI outerstubfinephi=outerstubdata.getFinePhi();
-	VMStubTEOuter::VMSTEOBEND outerstubbend=outerstubdata.getBend();
-	VMStubTEOuter::VMSTEOFINEZ outerstubfinez=outerstubdata.getFineZ();
+        VMStubTEOuter<BARRELPS> outerstubdata = instubouterdata.read_mem(bx,istubouter+16*ibin);
+        VMStubTEOuter<BARRELPS>::VMSTEOID outerstubindex=outerstubdata.getIndex();
+	VMStubTEOuter<BARRELPS>::VMSTEOFINEPHI outerstubfinephi=outerstubdata.getFinePhi();
+	VMStubTEOuter<BARRELPS>::VMSTEOBEND outerstubbend=outerstubdata.getBend();
+	VMStubTEOuter<BARRELPS>::VMSTEOFINEZ outerstubfinez=outerstubdata.getFineZ();
 
 	int zbin=outerstubfinez;
 

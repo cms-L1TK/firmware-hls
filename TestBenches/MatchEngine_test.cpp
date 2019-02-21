@@ -1,7 +1,8 @@
 // ProjectionRouter test bench
-#include "MatchEngine.h"
+#include "MatchEngineTopL1.h"
 #include "CandidateMatchMemory.hh"
 #include "VMProjectionMemory.hh"
+#include "VMStubMEMemory.hh"
 #include "FileReadUtility.hh"
 #include "hls_math.h"
 
@@ -12,7 +13,7 @@
 #include <iterator>
 
 
-const int nevents = 1;  // number of events to run
+const int nevents = 100;  // number of events to run
 
 using namespace std;
 
@@ -23,8 +24,8 @@ int main() {
   int err_count = 0;
 
   // declare input memory arrays to be read from the emulation files
-  VMProjectionMemory inputvmprojs;
-  VMStubMEMemory inputvmstubs;
+  VMProjectionMemory<BARREL> inputvmprojs;
+  VMStubMEMemory<BARRELPS> inputvmstubs;
   //CandidateMatchMemory inputcandmatches;
 
   // declare output memory array to be filled by hls simulation
@@ -48,14 +49,14 @@ int main() {
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    writeMemFromFile<VMProjectionMemory>(inputvmprojs, fin_vmproj, ievt);
-    writeMemFromFile<VMStubMEMemory>(inputvmstubs, fin_vmstub, ievt);
+    writeMemFromFile<VMProjectionMemory<BARREL> >(inputvmprojs, fin_vmproj, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs, fin_vmstub, ievt);
 
     //set bunch crossing
     BXType bx=ievt&0x7;
 
     // Unit Under Test
-    MatchEngine(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
+    MatchEngineTopL1(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches
