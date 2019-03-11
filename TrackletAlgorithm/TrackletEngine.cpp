@@ -64,17 +64,17 @@ void TrackletEngine(
 
   outstubpair.clear(bx);
 
+  // istubinner is incremented whenever a new inner stub is to be processed
+  // curstubinner keeps track of the current stub being processed
+  unsigned int istubinner = 0, curstubinner=0;
+  unsigned int nstubinner = instubinnerdata.getEntries(bx);
+
   // variables for inner stubs info
   VMStubTEInner<BARRELPS>                innerstubdata    = instubinnerdata.read_mem(bx,istubinner);
   VMStubTEInner<BARRELPS>::VMSTEIID      innerstubindex   = innerstubdata.getIndex();
   VMStubTEInner<BARRELPS>::VMSTEIBEND    innerstubbend    = innerstubdata.getBend();
   VMStubTEInner<BARRELPS>::VMSTEIFINEPHI innerstubfinephi = innerstubdata.getFinePhi();
   VMStubTEInner<BARRELPS>::VMSTEIZBITS   innerstubzbits   = innerstubdata.getZBits();
-
-  // istubinner is incremented whenever a new inner stub is to be processed
-  // curstubinner keeps track of the current stub being processed
-  unsigned int istubinner = 0, curstubinner=0;
-  unsigned int nstubinner = instubinnerdata.getEntries(bx);
 
   // variables for z info
   ap_uint<3> zdiffmax  = innerstubzbits.range(9,7);
