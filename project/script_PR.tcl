@@ -5,7 +5,8 @@ add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "-I../TrackletAlg
 add_files -tb ../emData/PR/PR_L3PHIC
 #add_files -tb ../emData/PR/PR_L3L4_L1PHI3
 open_solution -reset "solution1"
-set_part {xcku115-flvb2104-2-e} -tool vivado
+#set_part {xcku115-flvb2104-2-e} -tool vivado
+set_part {xcvu7p-flvb2104-2-e} -tool vivado
 create_clock -period 4 -name default
 #source "./projrouter/solution1/directives.tcl"
 #csim_design -compiler gcc
