@@ -9,7 +9,7 @@ add_files -tb ../emData/TC/TC_L1L2E
 add_files -tb ../emData/TC/TC_L1L2E_truncated
 
 open_solution -reset "solution_250MHz"
-set_part {xcku115-flvb2104-2-e} -tool vivado
+source set_fpga.tcl
 create_clock -period 4
 
 # Truncation: ON

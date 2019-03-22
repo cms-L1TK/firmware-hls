@@ -9,8 +9,7 @@ add_files ../TrackletAlgorithm/MatchEngineTopL1.cpp -cflags "-std=c++11"
 add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/ME
 open_solution -reset "solution1"
-#set_part {xcku115-flvb2104-2-e} -tool vivado
-set_part {xcvu7p-flvb2104-2-e} -tool vivado
+source set_fpga.tcl
 create_clock -period 4 -name default
 #source "./projrouter/solution1/directives.tcl"
 #csim_design -compiler gcc
