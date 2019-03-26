@@ -105,11 +105,11 @@ namespace TC {
 
   // This is copied from the emulation for now, but should probably be made more
   // FPGA-friendly.
-    double dPhi0 = phi0->to_long() * 1.56566e-05,
+    /*double dPhi0 = phi0->to_long() * 1.56566e-05,
            dRinv = rinv->to_long() * 1.04377e-06;
     double phicrit=dPhi0-asin(0.5*55.0*dRinv);
     bool keep=(phicrit>0.15897)&&(phicrit<0.867102);
-    success = success && keep;
+    success = success && keep;*/
 
     return success;
   }
