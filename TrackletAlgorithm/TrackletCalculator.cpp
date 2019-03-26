@@ -204,6 +204,7 @@ namespace TC {
       const StubPair::SPOuterIndex outerIndex,
       const AllStub<BARRELPS> &outerStub,
       const TrackletProjection<BARRELPS>::TProjTCID TCID,
+      TrackletProjection<BARRELPS>::TProjTrackletIndex &trackletIndex,
       TrackletParameterMemory * const trackletParameters,
       TrackletProjectionMemory<BARRELPS> * const projout_L3PHIA,
       TrackletProjectionMemory<BARRELPS> * const projout_L3PHIB,
@@ -379,6 +380,7 @@ TrackletCalculator_L1L2(
   projout_D4PHIB->clear(bx);
   projout_D4PHIC->clear(bx);
   projout_D4PHID->clear(bx);
+  TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0;
 
   TC::Types::nSPMem iSPMem;
   TC::Types::nSP iSP;
@@ -407,7 +409,7 @@ TrackletCalculator_L1L2(
       const AllStub<BARRELPS> &innerStub = (iSPMem < NSPMem00 + NSPMem01 ? innerStubs[0].read_mem(bx, innerIndex) : innerStubs[1].read_mem(bx, innerIndex));
       const AllStub<BARRELPS> &outerStub = (iSPMem < NSPMem00 || (iSPMem >= NSPMem00 + NSPMem01 && iSPMem < NSPMem00 + NSPMem01 + NSPMem10) ? outerStubs[0].read_mem(bx, outerIndex) : outerStubs[1].read_mem(bx, outerIndex));
 
-      TC::processStubPair<TC::L1L2>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletParameters, projout_L3PHIA, projout_L3PHIB, projout_L3PHIC, projout_L3PHID, projout_L4PHIA, projout_L4PHIB, projout_L4PHIC, projout_L4PHID, projout_L5PHIA, projout_L5PHIB, projout_L5PHIC, projout_L5PHID, projout_L6PHIA, projout_L6PHIB, projout_L6PHIC, projout_L6PHID, projout_D1PHIA, projout_D1PHIB, projout_D1PHIC, projout_D1PHID, projout_D2PHIA, projout_D2PHIB, projout_D2PHIC, projout_D2PHID, projout_D3PHIA, projout_D3PHIB, projout_D3PHIC, projout_D3PHID, projout_D4PHIA, projout_D4PHIB, projout_D4PHIC, projout_D4PHID);
+      TC::processStubPair<TC::L1L2>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_L3PHIA, projout_L3PHIB, projout_L3PHIC, projout_L3PHID, projout_L4PHIA, projout_L4PHIB, projout_L4PHIC, projout_L4PHID, projout_L5PHIA, projout_L5PHIB, projout_L5PHIC, projout_L5PHID, projout_L6PHIA, projout_L6PHIB, projout_L6PHIC, projout_L6PHID, projout_D1PHIA, projout_D1PHIB, projout_D1PHIC, projout_D1PHID, projout_D2PHIA, projout_D2PHIB, projout_D2PHIC, projout_D2PHID, projout_D3PHIA, projout_D3PHIB, projout_D3PHIC, projout_D3PHID, projout_D4PHIA, projout_D4PHIB, projout_D4PHIC, projout_D4PHID);
     }
   }
 }

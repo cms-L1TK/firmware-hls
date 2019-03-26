@@ -111,6 +111,7 @@ namespace TC {
       const StubPair::SPOuterIndex outerIndex,
       const AllStub<BARRELPS> &outerStub,
       const TrackletProjection<BARRELPS>::TProjTCID TCID,
+      TrackletProjection<BARRELPS>::TProjTrackletIndex &trackletIndex,
       TrackletParameterMemory * const trackletParameters,
       TrackletProjectionMemory<BARRELPS> * const projout_L3PHIA,
       TrackletProjectionMemory<BARRELPS> * const projout_L3PHIB,
