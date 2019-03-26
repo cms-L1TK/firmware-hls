@@ -146,6 +146,9 @@ namespace TC {
       TrackletProjectionMemory<DISK> * const projout_D4PHIC,
       TrackletProjectionMemory<DISK> * const projout_D4PHID
   ) {}
+
+  template<class T> void clearMemories(const BXType bx, T mem);
+  template<class T, class... Args> void clearMemories(const BXType bx, T mem, Args... args);
 }
 
 template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint16_t N> void

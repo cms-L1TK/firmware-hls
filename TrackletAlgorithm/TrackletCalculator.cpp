@@ -304,6 +304,19 @@ namespace TC {
   }
 }
 
+template<class T> void
+TC::clearMemories(const BXType bx, T mem)
+{
+  mem->clear(bx);
+}
+
+template<class T, class... Args> void
+TC::clearMemories(const BXType bx, T mem, Args... args)
+{
+  mem->clear(bx);
+  clearMemories(bx, args...);
+}
+
 // This is the primary interface for the TrackletCalculator.
 template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint16_t N> void
 TrackletCalculator_L1L2(
@@ -347,39 +360,8 @@ TrackletCalculator_L1L2(
 )
 {
 // Clear all output memories before starting.
-  trackletParameters->clear(bx);
-  projout_L3PHIA->clear(bx);
-  projout_L3PHIB->clear(bx);
-  projout_L3PHIC->clear(bx);
-  projout_L3PHID->clear(bx);
-  projout_L4PHIA->clear(bx);
-  projout_L4PHIB->clear(bx);
-  projout_L4PHIC->clear(bx);
-  projout_L4PHID->clear(bx);
-  projout_L5PHIA->clear(bx);
-  projout_L5PHIB->clear(bx);
-  projout_L5PHIC->clear(bx);
-  projout_L5PHID->clear(bx);
-  projout_L6PHIA->clear(bx);
-  projout_L6PHIB->clear(bx);
-  projout_L6PHIC->clear(bx);
-  projout_L6PHID->clear(bx);
-  projout_D1PHIA->clear(bx);
-  projout_D1PHIB->clear(bx);
-  projout_D1PHIC->clear(bx);
-  projout_D1PHID->clear(bx);
-  projout_D2PHIA->clear(bx);
-  projout_D2PHIB->clear(bx);
-  projout_D2PHIC->clear(bx);
-  projout_D2PHID->clear(bx);
-  projout_D3PHIA->clear(bx);
-  projout_D3PHIB->clear(bx);
-  projout_D3PHIC->clear(bx);
-  projout_D3PHID->clear(bx);
-  projout_D4PHIA->clear(bx);
-  projout_D4PHIB->clear(bx);
-  projout_D4PHIC->clear(bx);
-  projout_D4PHID->clear(bx);
+  TC::clearMemories(bx, trackletParameters, projout_L3PHIA, projout_L3PHIB, projout_L3PHIC, projout_L3PHID, projout_L4PHIA, projout_L4PHIB, projout_L4PHIC, projout_L4PHID, projout_L5PHIA, projout_L5PHIB, projout_L5PHIC, projout_L5PHID, projout_L6PHIA, projout_L6PHIB, projout_L6PHIC, projout_L6PHID, projout_D1PHIA, projout_D1PHIB, projout_D1PHIC, projout_D1PHID, projout_D2PHIA, projout_D2PHIB, projout_D2PHIC, projout_D2PHID, projout_D3PHIA, projout_D3PHIB, projout_D3PHIC, projout_D3PHID, projout_D4PHIA, projout_D4PHIB, projout_D4PHIC, projout_D4PHID);
+
   TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0;
 
   TC::Types::nSPMem iSPMem;
