@@ -261,47 +261,32 @@ namespace TC {
     success = barrelSeeding<L1L2>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
 
   // Write the tracklet parameters and projections to the output memories.
-    if (success) {
-      TrackletParameters tpar(innerIndex, outerIndex, rinv, phi0, z0, t);
-      trackletParameters->write_mem(bx, tpar);
-      const TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = trackletParameters->getEntries(bx) - 1;
+    const TrackletParameters tpar(innerIndex, outerIndex, rinv, phi0, z0, t);
+    trackletParameters->write_mem(bx, tpar, success);
 
-      bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
+    bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 
-      if (valid_proj[0]) {
-        TrackletProjection<BARRELPS> tproj(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
-        addL3 = addProj<BARRELPS>(tproj, bx, projout_L3PHIA, projout_L3PHIB, projout_L3PHIC, projout_L3PHID);
-      }
-      if (valid_proj[1]) {
-        TrackletProjection<BARREL2S> tproj(TCID, trackletIndex, phiL[1], zL[1], der_phiL, der_zL);
-        addL4 = addProj<BARREL2S>(tproj, bx, projout_L4PHIA, projout_L4PHIB, projout_L4PHIC, projout_L4PHID);
-      }
-      if (valid_proj[2]) {
-        TrackletProjection<BARREL2S> tproj(TCID, trackletIndex, phiL[2], zL[2], der_phiL, der_zL);
-        addL5 = addProj<BARREL2S>(tproj, bx, projout_L5PHIA, projout_L5PHIB, projout_L5PHIC, projout_L5PHID);
-      }
-      if (valid_proj[3]) {
-        TrackletProjection<BARREL2S> tproj(TCID, trackletIndex, phiL[3], zL[3], der_phiL, der_zL);
-        addL6 = addProj<BARREL2S>(tproj, bx, projout_L6PHIA, projout_L6PHIB, projout_L6PHIC, projout_L6PHID);
-      }
+    const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
+    const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL[1], zL[1], der_phiL, der_zL);
+    const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL[2], zL[2], der_phiL, der_zL);
+    const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL[3], zL[3], der_phiL, der_zL);
 
-      if (valid_proj_disk[0] && !addL6) {
-        TrackletProjection<DISK> tproj(TCID, trackletIndex, phiD[0], rD[0], der_phiD, der_rD);
-        addProj<DISK>(tproj, bx, projout_D1PHIA, projout_D1PHIB, projout_D1PHIC, projout_D1PHID);
-      }
-      if (valid_proj_disk[1] && !addL5) {
-        TrackletProjection<DISK> tproj(TCID, trackletIndex, phiD[1], rD[1], der_phiD, der_rD);
-        addProj<DISK>(tproj, bx, projout_D2PHIA, projout_D2PHIB, projout_D2PHIC, projout_D2PHID);
-      }
-      if (valid_proj_disk[2] && !addL4) {
-        TrackletProjection<DISK> tproj(TCID, trackletIndex, phiD[2], rD[2], der_phiD, der_rD);
-        addProj<DISK>(tproj, bx, projout_D3PHIA, projout_D3PHIB, projout_D3PHIC, projout_D3PHID);
-      }
-      if (valid_proj_disk[3] && !addL3) {
-        TrackletProjection<DISK> tproj(TCID, trackletIndex, phiD[3], rD[3], der_phiD, der_rD);
-        addProj<DISK>(tproj, bx, projout_D4PHIA, projout_D4PHIB, projout_D4PHIC, projout_D4PHID);
-      }
-    }
+    addL3 = addProj<BARRELPS>(tproj_L3, bx, projout_L3PHIA, projout_L3PHIB, projout_L3PHIC, projout_L3PHID, success && valid_proj[0]);
+    addL4 = addProj<BARREL2S>(tproj_L4, bx, projout_L4PHIA, projout_L4PHIB, projout_L4PHIC, projout_L4PHID, success && valid_proj[1]);
+    addL5 = addProj<BARREL2S>(tproj_L5, bx, projout_L5PHIA, projout_L5PHIB, projout_L5PHIC, projout_L5PHID, success && valid_proj[2]);
+    addL6 = addProj<BARREL2S>(tproj_L6, bx, projout_L6PHIA, projout_L6PHIB, projout_L6PHIC, projout_L6PHID, success && valid_proj[3]);
+
+    TrackletProjection<DISK> tproj_D1(TCID, trackletIndex, phiD[0], rD[0], der_phiD, der_rD);
+    TrackletProjection<DISK> tproj_D2(TCID, trackletIndex, phiD[1], rD[1], der_phiD, der_rD);
+    TrackletProjection<DISK> tproj_D3(TCID, trackletIndex, phiD[2], rD[2], der_phiD, der_rD);
+    TrackletProjection<DISK> tproj_D4(TCID, trackletIndex, phiD[3], rD[3], der_phiD, der_rD);
+
+    addProj<DISK>(tproj_D1, bx, projout_D1PHIA, projout_D1PHIB, projout_D1PHIC, projout_D1PHID, success && valid_proj_disk[0] && !addL6);
+    addProj<DISK>(tproj_D2, bx, projout_D2PHIA, projout_D2PHIB, projout_D2PHIC, projout_D2PHID, success && valid_proj_disk[1] && !addL5);
+    addProj<DISK>(tproj_D3, bx, projout_D3PHIA, projout_D3PHIB, projout_D3PHIC, projout_D3PHID, success && valid_proj_disk[2] && !addL4);
+    addProj<DISK>(tproj_D4, bx, projout_D4PHIA, projout_D4PHIB, projout_D4PHIC, projout_D4PHID, success && valid_proj_disk[3] && !addL3);
+
+    if (success) trackletIndex++;
   }
 }
 
