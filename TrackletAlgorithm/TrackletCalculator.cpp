@@ -240,6 +240,7 @@ namespace TC {
       TrackletProjectionMemory<DISK> * const projout_D4PHID
   )
   {
+#pragma HLS inline
     Types::rinv rinv;
     TrackletParameters::PHI0PAR phi0;
     TrackletParameters::Z0PAR z0;
