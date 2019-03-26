@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
 
     // The last parameter is how many stub pairs to process.
     if (truncate)
-      TC = &TrackletCalculator_L1L2<TC::E, NASMemInner, NASMemOuter, NSPMem00, NSPMem01, NSPMem10, NSPMem11, kMaxProc>;
+      TC = &TrackletCalculator_L1L2E;
     else
       TC = &TrackletCalculator_L1L2<TC::E, NASMemInner, NASMemOuter, NSPMem00, NSPMem01, NSPMem10, NSPMem11, N>;
 
