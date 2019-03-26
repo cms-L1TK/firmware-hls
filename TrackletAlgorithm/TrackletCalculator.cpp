@@ -122,70 +122,50 @@ TC::ID()
 }
 
 template<regionType TProjType> bool
-TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID)
+TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID, const bool success)
 {
-  bool success = true;
+#pragma HLS inline
+  bool proj_success = true;
 
 // Reject projections with extreme r/z values.
   if ((proj.getRZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getRZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
-    success = false;
+    proj_success = false;
   if (abs(proj.getRZ()) > 2048)
-    success = false;
+    proj_success = false;
 
 // Fill correct TrackletProjectionMemory according to phi bin of projection.
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
   phi >>= 3;
-  if (success) {
-    switch (phi) {
-      case 0:
-        projout_PHIA->write_mem(bx, proj);
-        break;
-      case 1:
-        projout_PHIB->write_mem(bx, proj);
-        break;
-      case 2:
-        projout_PHIC->write_mem(bx, proj);
-        break;
-      case 3:
-        projout_PHID->write_mem(bx, proj);
-        break;
-    }
-  }
 
-  return success;
+  projout_PHIA->write_mem(bx, proj, success && proj_success && phi == 0);
+  projout_PHIB->write_mem(bx, proj, success && proj_success && phi == 1);
+  projout_PHIC->write_mem(bx, proj, success && proj_success && phi == 2);
+  projout_PHID->write_mem(bx, proj, success && proj_success && phi == 3);
+
+  return (success && proj_success);
 }
 
 namespace TC {
   template<> bool
-  addProj<DISK>(const TrackletProjection<DISK> &proj, const BXType bx, TrackletProjectionMemory<DISK> * const projout_PHIA, TrackletProjectionMemory<DISK> * const projout_PHIB, TrackletProjectionMemory<DISK> * const projout_PHIC, TrackletProjectionMemory<DISK> * const projout_PHID)
+  addProj<DISK>(const TrackletProjection<DISK> &proj, const BXType bx, TrackletProjectionMemory<DISK> * const projout_PHIA, TrackletProjectionMemory<DISK> * const projout_PHIB, TrackletProjectionMemory<DISK> * const projout_PHIC, TrackletProjectionMemory<DISK> * const projout_PHID, const bool success)
   {
-    bool success = true;
+#pragma HLS inline
+    bool proj_success = true;
 
   // Reject projections with extreme r/z values.
     if (proj.getRZ() < 205 || proj.getRZ() > 1911)
-      success = false;
+      proj_success = false;
 
   // Fill correct TrackletProjectionMemory according to phi bin of projection.
     Types::phiL phi = proj.getPhi() >> (TrackletProjection<DISK>::kTProjPhiSize - 5);
     phi >>= 3;
-    if (success) {
-      switch (phi) {
-        case 0:
-          projout_PHIA->write_mem(bx, proj);
-          break;
-        case 1:
-          projout_PHIB->write_mem(bx, proj);
-          break;
-        case 2:
-          projout_PHIC->write_mem(bx, proj);
-          break;
-        case 3:
-          projout_PHID->write_mem(bx, proj);
-          break;
-      }
-    }
 
-    return success;
+    projout_PHIA->write_mem(bx, proj, success && proj_success && phi == 0);
+    projout_PHIB->write_mem(bx, proj, success && proj_success && phi == 1);
+    projout_PHIC->write_mem(bx, proj, success && proj_success && phi == 2);
+    projout_PHID->write_mem(bx, proj, success && proj_success && phi == 3);
+
+    return (success && proj_success);
   }
 }
 
