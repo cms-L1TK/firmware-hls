@@ -92,7 +92,7 @@ namespace TC {
 
   template<seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
-  template<regionType TProjType> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID, const bool success);
+  template<regionType TProjType, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID, const bool success);
 
   template<uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11> void
   getIndices(
@@ -103,7 +103,7 @@ namespace TC {
       bool &done
   );
 
-  template<seed Seed> void
+  template<seed Seed, uint32_t TPROJMask> void
   processStubPair(
       const BXType bx,
       const StubPair::SPInnerIndex innerIndex,
@@ -145,13 +145,13 @@ namespace TC {
       TrackletProjectionMemory<DISK> * const projout_D4PHIB,
       TrackletProjectionMemory<DISK> * const projout_D4PHIC,
       TrackletProjectionMemory<DISK> * const projout_D4PHID
-  ) {}
+  );
 
-  template<class T> void clearMemories(const BXType bx, T mem);
-  template<class T, class... Args> void clearMemories(const BXType bx, T mem, Args... args);
+  template<uint32_t TPROJMask, class T> void clearMemories(const BXType bx, T mem);
+  template<uint32_t TPROJMask, class T, class... Args> void clearMemories(const BXType bx, T mem, Args... args);
 }
 
-template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint16_t N> void
+template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint32_t TPROJMask, uint16_t N> void
 TrackletCalculator_L1L2(
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[NASMemInner],

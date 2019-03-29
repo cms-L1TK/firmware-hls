@@ -29,38 +29,28 @@ int main(int argc, char *argv[])
 
   // output memories
   static TrackletParameterMemory tpar;
-  static TrackletProjectionMemory<BARRELPS> tproj_L3PHIA;
   static TrackletProjectionMemory<BARRELPS> tproj_L3PHIB;
-  static TrackletProjectionMemory<BARRELPS> tproj_L3PHIC;
-  static TrackletProjectionMemory<BARRELPS> tproj_L3PHID;
   static TrackletProjectionMemory<BARREL2S> tproj_L4PHIA;
   static TrackletProjectionMemory<BARREL2S> tproj_L4PHIB;
   static TrackletProjectionMemory<BARREL2S> tproj_L4PHIC;
-  static TrackletProjectionMemory<BARREL2S> tproj_L4PHID;
   static TrackletProjectionMemory<BARREL2S> tproj_L5PHIA;
   static TrackletProjectionMemory<BARREL2S> tproj_L5PHIB;
   static TrackletProjectionMemory<BARREL2S> tproj_L5PHIC;
-  static TrackletProjectionMemory<BARREL2S> tproj_L5PHID;
   static TrackletProjectionMemory<BARREL2S> tproj_L6PHIA;
   static TrackletProjectionMemory<BARREL2S> tproj_L6PHIB;
   static TrackletProjectionMemory<BARREL2S> tproj_L6PHIC;
-  static TrackletProjectionMemory<BARREL2S> tproj_L6PHID;
   static TrackletProjectionMemory<DISK> tproj_D1PHIA;
   static TrackletProjectionMemory<DISK> tproj_D1PHIB;
   static TrackletProjectionMemory<DISK> tproj_D1PHIC;
-  static TrackletProjectionMemory<DISK> tproj_D1PHID;
   static TrackletProjectionMemory<DISK> tproj_D2PHIA;
   static TrackletProjectionMemory<DISK> tproj_D2PHIB;
   static TrackletProjectionMemory<DISK> tproj_D2PHIC;
-  static TrackletProjectionMemory<DISK> tproj_D2PHID;
   static TrackletProjectionMemory<DISK> tproj_D3PHIA;
   static TrackletProjectionMemory<DISK> tproj_D3PHIB;
   static TrackletProjectionMemory<DISK> tproj_D3PHIC;
-  static TrackletProjectionMemory<DISK> tproj_D3PHID;
   static TrackletProjectionMemory<DISK> tproj_D4PHIA;
   static TrackletProjectionMemory<DISK> tproj_D4PHIB;
   static TrackletProjectionMemory<DISK> tproj_D4PHIC;
-  static TrackletProjectionMemory<DISK> tproj_D4PHID;
 
   ///////////////////////////
   // open input files
@@ -270,43 +260,43 @@ int main(int argc, char *argv[])
     if (truncate)
       TC = &TrackletCalculator_L1L2E;
     else
-      TC = &TrackletCalculator_L1L2<TC::E, NASMemInner, NASMemOuter, NSPMem00, NSPMem01, NSPMem10, NSPMem11, N>;
+      TC = &TrackletCalculator_L1L2<TC::E, NASMemInner, NASMemOuter, NSPMem00, NSPMem01, NSPMem10, NSPMem11, 0x77777772, N>;
 
     // Unit Under Test
     TC(bx, innerStubs, outerStubs, stubPairs,
        &tpar,
-       &tproj_L3PHIA,
+       NULL,
        &tproj_L3PHIB,
-       &tproj_L3PHIC,
-       &tproj_L3PHID,
+       NULL,
+       NULL,
        &tproj_L4PHIA,
        &tproj_L4PHIB,
        &tproj_L4PHIC,
-       &tproj_L4PHID,
+       NULL,
        &tproj_L5PHIA,
        &tproj_L5PHIB,
        &tproj_L5PHIC,
-       &tproj_L5PHID,
+       NULL,
        &tproj_L6PHIA,
        &tproj_L6PHIB,
        &tproj_L6PHIC,
-       &tproj_L6PHID,
+       NULL,
        &tproj_D1PHIA,
        &tproj_D1PHIB,
        &tproj_D1PHIC,
-       &tproj_D1PHID,
+       NULL,
        &tproj_D2PHIA,
        &tproj_D2PHIB,
        &tproj_D2PHIC,
-       &tproj_D2PHID,
+       NULL,
        &tproj_D3PHIA,
        &tproj_D3PHIB,
        &tproj_D3PHIC,
-       &tproj_D3PHID,
+       NULL,
        &tproj_D4PHIA,
        &tproj_D4PHIB,
        &tproj_D4PHIC,
-       &tproj_D4PHID
+       NULL
     );
 
     // compare the computed outputs with the expected ones
