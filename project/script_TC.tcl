@@ -17,7 +17,7 @@ create_clock -period 4
 # Truncation: OFF
 #csim_design -compiler gcc -O -mflags "-j9 -k" -argv "0"
 #csynth_design
-#cosim_design
+#cosim_design -O -mflags "-j9 -k"
 #export_design -rtl verilog -format ip_catalog
 
 exit
