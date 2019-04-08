@@ -5,7 +5,7 @@
 #include "MemoryTemplate.hh"
 
 // AllStubBase is where we define the bit widths, which depend on the class template parameter
-template<regionType ASType> class AllStubBase {};
+template<int ASType> class AllStubBase {};
 
 template<>
 class AllStubBase<BARRELPS>
@@ -73,7 +73,7 @@ public:
 
 
 // Data object definition
-template<regionType ASType>
+template<int ASType>
 class AllStub : public AllStubBase<ASType>
 {
 public:
@@ -183,6 +183,6 @@ private:
 };
 
 // Memory definition
-template<regionType ASType> using AllStubMemory = MemoryTemplate<AllStub<ASType>, 3, kNBits_MemAddr>;
+template<int ASType> using AllStubMemory = MemoryTemplate<AllStub<ASType>, 3, kNBits_MemAddr>;
 
 #endif

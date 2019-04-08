@@ -3,10 +3,8 @@
 # vivado_hls -p match_calc
 # WARNING: this will wipe out the original project by the same name
 
-# set part (KU115) and clock 250 MHz
-#set part "xcku115-flvb2104-2-e"
-set part "xcvu7p-flvb2104-2-e"
-set clockperiod "4"        
+# set clock 250 MHz
+set clockperiod 4         
 
 # delete old project
 delete_project match_calc
@@ -24,7 +22,8 @@ add_files -tb ../emData/MC/
 
 # solutions
 open_solution "solution1"
-set_part $part -tool vivado
+#set_part $part -tool vivado
+source set_fpga.tcl
 create_clock -period $clockperiod -name default
 #source "directives_MC.tcl"
 

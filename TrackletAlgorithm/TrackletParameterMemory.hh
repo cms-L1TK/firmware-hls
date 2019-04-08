@@ -30,7 +30,7 @@ public:
     kTParRinvMSB = kTParRinvLSB + kTParRinvSize - 1,
     kTParStubIndexOuterLSB = kTParRinvMSB + 1,
     kTParStubIndexOuterMSB = kTParStubIndexOuterLSB + kNBits_MemAddr - 1,
-    kTParStubIndexInnerLSB = kTParStubIndexOuterLSB + 1,
+    kTParStubIndexInnerLSB = kTParStubIndexOuterMSB + 1,
     kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1
   };
 

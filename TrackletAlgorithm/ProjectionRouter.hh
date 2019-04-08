@@ -14,156 +14,57 @@ namespace PR
 
   //////////////////////////////
   // Initialization
-  template<class MemType, int nMEM, int NBits_Entries>
-  void init(BXType bx,
-            // bitmasks to indicate if memories are empty
-            ap_uint<nMEM>& mem_hasdata,
-            // number of entries for each memory
-            ap_uint<NBits_Entries> nentries[nMEM],
-            // memory pointers
-            const MemType* const mem0, const MemType* const mem1,
-            const MemType* const mem2, const MemType* const mem3,
-            const MemType* const mem4, const MemType* const mem5,
-            const MemType* const mem6, const MemType* const mem7,
-            const MemType* const mem8, const MemType* const mem9,
-            const MemType* const mem10, const MemType* const mem11,
-            const MemType* const mem12, const MemType* const mem13,
-            const MemType* const mem14, const MemType* const mem15,
-            const MemType* const mem16, const MemType* const mem17,
-            const MemType* const mem18, const MemType* const mem19,
-            const MemType* const mem20, const MemType* const mem21,
-            const MemType* const mem22, const MemType* const mem23
-            )
-  {
-    static_assert(nMEM<=24, "PR: maximum number of input memory allowed in 24.");
-    
-    mem_hasdata = 0;
-    
-    if (nMEM > 0) {
-      ap_uint<NBits_Entries> num0 = mem0->getEntries(bx);
-      nentries[0] = num0;
-      if (num0 > 0) mem_hasdata.set(0);
-    }
-    if (nMEM > 1) {
-      ap_uint<NBits_Entries> num1 = mem1->getEntries(bx);
-      nentries[1] = num1;
-      if (num1 > 0) mem_hasdata.set(1);
-    }
-    if (nMEM > 2) {
-      ap_uint<NBits_Entries> num2 = mem2->getEntries(bx);
-      nentries[2] = num2;
-      if (num2 > 0) mem_hasdata.set(2);
-    }
-    if (nMEM > 3) {
-      ap_uint<NBits_Entries> num3 = mem3->getEntries(bx);
-      nentries[3] = num3;
-      if (num3 > 0) mem_hasdata.set(3);
-    }
-    if (nMEM > 4) {
-      ap_uint<NBits_Entries> num4 = mem4->getEntries(bx);
-      nentries[4] = num4;
-      if (num4 > 0) mem_hasdata.set(4);
-    }
-    if (nMEM > 5) {
-      ap_uint<NBits_Entries> num5 = mem5->getEntries(bx);
-      nentries[5] = num5;
-      if (num5 > 0) mem_hasdata.set(5);
-    }
-    if (nMEM > 6) {
-      ap_uint<NBits_Entries> num6 = mem6->getEntries(bx);
-      nentries[6] = num6;
-      if (num6 > 0) mem_hasdata.set(6);
-    }
-    if (nMEM > 7) {
-      ap_uint<NBits_Entries> num7 = mem7->getEntries(bx);
-      nentries[7] = num7;
-      if (num7 > 0) mem_hasdata.set(7);
-    }
-    if (nMEM > 8) {
-      ap_uint<NBits_Entries> num8 = mem8->getEntries(bx);
-      nentries[8] = num8;
-      if (num8 > 0) mem_hasdata.set(8);
-    }
-    if (nMEM > 9) {
-      ap_uint<NBits_Entries> num9 = mem9->getEntries(bx);
-      nentries[9] = num9;
-      if (num9 > 0) mem_hasdata.set(9);
-    }
-    if (nMEM > 10) {
-      ap_uint<NBits_Entries> num10 = mem10->getEntries(bx);
-      nentries[10] = num10;
-      if (num10 > 0) mem_hasdata.set(10);
-    }
-    if (nMEM > 11) {
-      ap_uint<NBits_Entries> num11 = mem11->getEntries(bx);
-      nentries[11] = num11;
-      if (num11 > 0) mem_hasdata.set(11);
-    }
-    if (nMEM > 12) {
-      ap_uint<NBits_Entries> num12 = mem12->getEntries(bx);
-      nentries[12] = num12;
-      if (num12 > 0) mem_hasdata.set(12);
-    }
-    if (nMEM > 13) {
-      ap_uint<NBits_Entries> num13 = mem13->getEntries(bx);
-      nentries[13] = num13;
-      if (num13 > 0) mem_hasdata.set(13);
-    }
-    if (nMEM > 14) {
-      ap_uint<NBits_Entries> num14 = mem14->getEntries(bx);
-      nentries[14] = num14;
-      if (num14 > 0) mem_hasdata.set(14);
-    }
-    if (nMEM > 15) {
-      ap_uint<NBits_Entries> num15 = mem15->getEntries(bx);
-      nentries[15] = num15;
-      if (num15 > 0) mem_hasdata.set(15);
-    }
-    if (nMEM > 16) {
-      ap_uint<NBits_Entries> num16 = mem16->getEntries(bx);
-      nentries[16] = num16;
-      if (num16 > 0) mem_hasdata.set(16);
-    }
-    if (nMEM > 17) {
-      ap_uint<NBits_Entries> num17 = mem17->getEntries(bx);
-      nentries[17] = num17;
-      if (num17 > 0) mem_hasdata.set(17);
-    }
-    if (nMEM > 18) {
-      ap_uint<NBits_Entries> num18 = mem18->getEntries(bx);
-      nentries[18] = num18;
-      if (num18 > 0) mem_hasdata.set(18);
-    }
-    if (nMEM > 19) {
-      ap_uint<NBits_Entries> num19 = mem19->getEntries(bx);
-      nentries[19] = num19;
-      if (num19 > 0) mem_hasdata.set(19);
-    }
-    if (nMEM > 20) {
-      ap_uint<NBits_Entries> num20 = mem20->getEntries(bx);
-      nentries[20] = num20;
-      if (num20 > 0) mem_hasdata.set(20);
-    }
-    if (nMEM > 21) {
-      ap_uint<NBits_Entries> num21 = mem21->getEntries(bx);
-      nentries[21] = num21;
-      if (num21 > 0) mem_hasdata.set(21);
-    }
-    if (nMEM > 22) {
-      ap_uint<NBits_Entries> num22 = mem22->getEntries(bx);
-      nentries[22] = num22;
-      if (num22 > 0) mem_hasdata.set(22);
-    }
-    if (nMEM > 23) {
-      ap_uint<NBits_Entries> num23 = mem23->getEntries(bx);
-      nentries[23] = num23;
-      if (num23 > 0) mem_hasdata.set(23);
-    }
-    
-  } // init
+  // check the number of entries in the input memories
+  // fill the bit mask indicating if memories are empty or not
+  template<int nMEM, int NBits_Entries, class MemType>
+  inline void init(BXType bx,
+                   // bitmasks to indicate if memories are empty
+                   ap_uint<nMEM>& mem_hasdata,
+                   // number of entries for each memory
+                   ap_uint<NBits_Entries> nentries[nMEM],
+                   const int i,
+                   const MemType* const mem)
+  {    
+    ap_uint<kNBits_MemAddr+1> num = mem->getEntries(bx);
+    nentries[i] = num;
+    if (num > 0) mem_hasdata.set(i);
+  }
+  
+  // recursive case
+  template<int nMEM, int NBits_Entries, class MemType, class... Args>
+  inline void init(BXType bx, ap_uint<nMEM>& mem_hasdata,
+                   ap_uint<NBits_Entries> nentries[nMEM],
+                   const int i,
+                   const MemType* const mem, Args... args)
+  { 
+    ap_uint<kNBits_MemAddr+1> num = mem->getEntries(bx);
+    nentries[i] = num;
+    if (num > 0) mem_hasdata.set(i);
+
+    if (i+1 < nMEM) init(bx, mem_hasdata, nentries, i+1, args...);
+  }
 
   //////////////////////////////
   // Priority encoder based input memory reading logic
+  template<class DataType, class MemType>
+  void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
+                  ap_uint<kNBits_MemAddr>& read_addr,
+                  const int i, const MemType* const inmem)
+  {
+    if (read_imem == i) data = inmem->read_mem(bx, read_addr);
+  }
+
+  template<class DataType, class MemType, class... Args>
+  void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
+                  ap_uint<kNBits_MemAddr>& read_addr,
+                  const int i,
+                  const MemType* const inmem, Args... args)
+  {
+    if (read_imem == i) data = inmem->read_mem(bx, read_addr);
+    read_inmem(data, bx, read_imem, read_addr, i+1, args...);
+  }
+
+  
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
   bool read_input_mems(BXType bx,
                        ap_uint<nMEM>& mem_hasdata,
@@ -191,56 +92,10 @@ namespace PR
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
     // read the memory "read_imem" with the address "read_addr"
-    switch (read_imem) {
-    case 0:
-      data = mem0->read_mem(bx, read_addr); break;
-    case 1:
-      data = mem1->read_mem(bx, read_addr); break;
-    case 2:
-      data = mem2->read_mem(bx, read_addr); break;
-    case 3:
-      data = mem3->read_mem(bx, read_addr); break;
-    case 4:
-      data = mem4->read_mem(bx, read_addr); break;
-    case 5:
-      data = mem5->read_mem(bx, read_addr); break;
-    case 6:
-      data = mem6->read_mem(bx, read_addr); break;
-    case 7:
-      data = mem7->read_mem(bx, read_addr); break;
-    case 8:
-      data = mem8->read_mem(bx, read_addr); break;
-    case 9:
-      data = mem9->read_mem(bx, read_addr); break;
-    case 10:
-      data = mem10->read_mem(bx, read_addr); break;
-    case 11:
-      data = mem11->read_mem(bx, read_addr); break;
-    case 12:
-      data = mem12->read_mem(bx, read_addr); break;
-    case 13:
-      data = mem13->read_mem(bx, read_addr); break;
-    case 14:
-      data = mem14->read_mem(bx, read_addr); break;
-    case 15:
-      data = mem15->read_mem(bx, read_addr); break;
-    case 16:
-      data = mem16->read_mem(bx, read_addr); break;
-    case 17:
-      data = mem17->read_mem(bx, read_addr); break;
-    case 18:
-      data = mem18->read_mem(bx, read_addr); break;
-    case 19:
-      data = mem19->read_mem(bx, read_addr); break;
-    case 20:
-      data = mem20->read_mem(bx, read_addr); break;
-    case 21:
-      data = mem21->read_mem(bx, read_addr); break;
-    case 22:
-      data = mem22->read_mem(bx, read_addr); break;
-    case 23:
-      data = mem23->read_mem(bx, read_addr); break;      
-    }
+    read_inmem(data, bx, read_imem, read_addr, 0,
+               mem0,mem1,mem2,mem3,mem4,mem5,mem6,mem7,
+               mem8,mem9,mem10,mem11,mem12,mem13,mem14,mem15,
+               mem16,mem17,mem18,mem19,mem20,mem21,mem22,mem23);
 
     // Increase the read address
     ++read_addr;
@@ -339,11 +194,12 @@ void ProjectionRouter(BXType bx,
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
-  init<TrackletProjectionMemory<PROJTYPE>, nINMEM, kNBits_MemAddr+1>
-    (bx, mem_hasdata, numbersin,
-     proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
-     proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
-     proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in);
+  //init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
+  init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
+    (bx, mem_hasdata, numbersin,0,
+     proj1in,proj2in,proj3in,proj4in,proj5in,proj6in,proj7in,proj8in,
+     proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
+     proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;

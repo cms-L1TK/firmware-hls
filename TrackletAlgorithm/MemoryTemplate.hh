@@ -12,6 +12,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 // (1<<NBIT_ADDR): depth of the memory for each BX
 class MemoryTemplate
 {
+public:
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR+1> NEntryT;
   
@@ -58,7 +59,7 @@ public:
 	return dataarray_[ibx][index];
   }
 
-  bool write_mem(BunchXingT ibx, DataType data)
+  bool write_mem(BunchXingT ibx, DataType data, const bool enable = true)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS dependence variable=nentries_ intra WAR true
@@ -67,7 +68,7 @@ public:
 
 	if (nentry_ibx <= (1<<NBIT_ADDR)) {
 	  dataarray_[ibx][nentry_ibx] = data;
-	  nentries_[ibx] = nentry_ibx + 1;
+	  if (enable) nentries_[ibx] = nentry_ibx + 1;
 	  return true;
 	}
 	else {
