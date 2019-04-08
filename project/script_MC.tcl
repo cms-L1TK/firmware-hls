@@ -3,18 +3,20 @@
 # vivado_hls -p match_calc
 # WARNING: this will wipe out the original project by the same name
 
-# set part (KU115) and clock 240 MHz
-set part "xcku115-flvb2104-2-e"
-set clockperiod 4.1667         
+# set part (KU115) and clock 250 MHz
+#set part "xcku115-flvb2104-2-e"
+set part "xcvu7p-flvb2104-2-e"
+set clockperiod "4"        
 
 # delete old project
 delete_project match_calc
 # make new project
 open_project match_calc
-set_top MatchCalculator
+set_top MatchCalculatorTop
 
 # source files
 add_files ../TrackletAlgorithm/MatchCalculatorTop.cpp -cflags "-std=c++11"
+#add_files ../TrackletAlgorithm/merger.cpp -cflags "-std=c++11"
 add_files -tb -cflags "-I ../TrackletAlgorithm -std=c++11" ../TestBenches/MatchCalculator_test.cpp
 
 # data files
