@@ -7,7 +7,7 @@
 void readPtTable(ap_uint<1> table[32]){
 
   ap_uint<1> tmp[]=
-#include "TE_L1PHIE18_L2PHIC17_ptcut.tab"//"../emData/TE/TE_L1PHIE18_L2PHIC17/TE_L1PHIE18_L2PHIC17_ptcut.tab"
+#include "../emData/TE/TE_L1PHIE18_L2PHIC17/TE_L1PHIE18_L2PHIC17_ptcut.tab"
 
   for (unsigned int i=0;i<32;i++){
     table[i]=tmp[i];
@@ -19,7 +19,7 @@ void readPtTable(ap_uint<1> table[32]){
 void readBendInnerTable(ap_uint<1> table[256]){
 
   ap_uint<1> tmp[]=
-#include "TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"//"../emData/TE/TE_L1PHIE18_L2PHIC17/TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"
+#include "../emData/TE/TE_L1PHIE18_L2PHIC17/TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"
 
   for (unsigned int i=0;i<256;i++){
     table[i]=tmp[i];
@@ -30,7 +30,7 @@ void readBendInnerTable(ap_uint<1> table[256]){
 void readBendOuterTable(ap_uint<1> table[256]){
 
   ap_uint<1> tmp[]=
-#include "TE_L1PHIE18_L2PHIC17_stubptoutercut.tab"//"../emData/TE/TE_L1PHIE18_L2PHIC17/TE_L1PHIE18_L2PHIC17_stubptoutercut.tab"
+#include "../emData/TE/TE_L1PHIE18_L2PHIC17/TE_L1PHIE18_L2PHIC17_stubptoutercut.tab"
 
   for (int i=0;i<256;i++){
     table[i]=tmp[i];
