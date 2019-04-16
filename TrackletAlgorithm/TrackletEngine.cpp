@@ -111,7 +111,7 @@ void TrackletEngine(
 	  // buffer is not empty when current write index and read index are different
 	  ap_uint<1> buffernotempty = (writeindex!=readindex);
 
-	  // if buffer is not full and there are more inner stubs to re
+	  // buffer is not full and there are more inner stubs to read in...
 	  if(morestubinner && buffernotfull) {
 		  auto const innerstubdatatmp  = instubinnerdata.read_mem(bx,istubinner);
 		  istubinner++;
@@ -133,7 +133,7 @@ void TrackletEngine(
 			  teBuffer[writeindex] = nstubsstart.concat(tmp2);
 		  }
 		  if(savelast) {
-			  ap_uint<1> one  = 1;
+			  ap_uint<1> one = 1;
 			  ap_uint<TEBinsBits+1> tmp1 = zbinlast.concat(one);
 			  ap_uint<VMStubTEInner<BARRELPS>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
 			  if(savestart) {
@@ -150,7 +150,7 @@ void TrackletEngine(
 		  }
 	  }
 
-	  // buffer has elements to process
+	  // buffer has elements to process...
 	  if(buffernotempty) {
 		  ap_uint<kNBits_MemAddrBinned> istuboutertmp = istubouter;
 		  ap_uint<TEBinsBits> ibin;
@@ -193,25 +193,25 @@ void TrackletEngine(
 		  int zbin = (second) ? (tmpz+8) : tmpz;
 		  ap_uint<1> z_tmp = (zbin>=zbinfirst) && (zbin-zbinfirst<=zdiffmax);
 
-          // pT cut
-          ap_uint<5> ptindex1=innerstubfinephi.concat(outerstubfinephi);
-          ap_uint<5> ptindex2=ptindex1;
-          ap_uint<1> pt_tmp = pttable[ptindex1];
+          	  // pT cut
+          	  ap_uint<5> ptindex1=innerstubfinephi.concat(outerstubfinephi);
+          	  ap_uint<5> ptindex2=ptindex1;
+          	  ap_uint<1> pt_tmp = pttable[ptindex1];
 
-          // inner stub bend consistency
-          ap_uint<8> bendinnerindex=ptindex1.concat(innerstubbend);
-          ap_uint<1> bi_tmp = bendinnertable[bendinnerindex];
+          	  // inner stub bend consistency
+          	  ap_uint<8> bendinnerindex=ptindex1.concat(innerstubbend);
+          	  ap_uint<1> bi_tmp = bendinnertable[bendinnerindex];
 
-          ap_uint<8> bendouterindex=ptindex2.concat(outerstubbend);
-          ap_uint<1> bo_tmp = bendoutertable[bendouterindex];
+          	  ap_uint<8> bendouterindex=ptindex2.concat(outerstubbend);
+          	  ap_uint<1> bo_tmp = bendoutertable[bendouterindex];
 
-          ap_uint<1> ifskip = (!z_tmp) || (!pt_tmp) || (!bi_tmp) || (!bo_tmp);
+          	  ap_uint<1> ifskip = (!z_tmp) || (!pt_tmp) || (!bi_tmp) || (!bo_tmp);
 
-          if(!ifskip) {
-                  // good stub pair, so write it!
-                  StubPair spair(innerstubindex.concat(outerstubindex));
-                  outstubpair.write_mem(bx,spair);
-          }
-	  }
+          	  if(!ifskip) {
+                 	// good stub pair, so write it!
+                  	StubPair spair(innerstubindex.concat(outerstubindex));
+                  	outstubpair.write_mem(bx,spair);
+          	  }
+      	 }
   }
 }
