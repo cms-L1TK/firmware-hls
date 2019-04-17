@@ -5,7 +5,7 @@
 #include "MemoryTemplate.hh"
 
 // FullMatchBase is where we define the bit widths, which depend on the class template parameter.
-template<regionType FMType> class FullMatchBase {};
+template<int FMType> class FullMatchBase {};
 
 template<>
 class FullMatchBase<BARREL>
@@ -44,7 +44,7 @@ public:
 };
 
 // Data object definition
-template<regionType FMType>
+template<int FMType>
 class FullMatch : public FullMatchBase<FMType>
 {
 public:
@@ -168,6 +168,6 @@ private:
 };
 
 // Memory definition
-template<regionType FMType> using FullMatchMemory = MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>;
+template<int FMType> using FullMatchMemory = MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>;
 
 #endif

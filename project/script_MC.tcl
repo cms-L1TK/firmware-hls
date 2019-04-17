@@ -14,7 +14,6 @@ set_top MatchCalculatorTop
 
 # source files
 add_files ../TrackletAlgorithm/MatchCalculatorTop.cpp -cflags "-std=c++11"
-#add_files ../TrackletAlgorithm/merger.cpp -cflags "-std=c++11"
 add_files -tb -cflags "-I ../TrackletAlgorithm -std=c++11" ../TestBenches/MatchCalculator_test.cpp
 
 # data files
@@ -31,8 +30,9 @@ create_clock -period $clockperiod -name default
 #create_clock -period 10 -name default
 #source "./match_calc/solution1/directives.tcl"
 csim_design
-#csynth_design
-#cosim_design
+csynth_design
+cosim_design 
+#cosim design -O -mflags "-j9 -k"
 #export_design -format ip_catalog
 
 
