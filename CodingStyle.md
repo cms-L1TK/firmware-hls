@@ -18,7 +18,7 @@ In this document let's try to collect our best practices.
 
 ## HLS specific practice
 
-* General constants start with k. e.g. kNumEvents and are declared `constexpr`
+* General constants start with k. e.g. `kNumEvents` and are declared `constexpr`
 * Constants specifying number of bits are defined in the relevant memory header file, start with 'k' and end with 'Size', i.e., `kChi2Size`
    * alternate proposal: start with B & capitalized. e.g `BCHI2` ?
 * Size constants are declared via enum
@@ -26,4 +26,25 @@ In this document let's try to collect our best practices.
 * Use setters and getters to hide implementation;
    * Follow CMSSW standards such that the setter for quantity Q has 'set' prepended and the getter is just the quantity, i.e., `setQ()` and `Q()` 
 * Use of class templates can avoid code duplication.
-* Inter-processing module RAMS inherit from common class (MemoryBase) and follow a specific model (details to be added here)
+
+### RAMs
+We use the following model for the inter-module RAMs in the project. 
+* In a header file we define both the data that the RAM contains as well as the particular template instantiation that defines the RAM. For instance, following the `StubPairMemory.h` example. In the header file we define a class `StubPair` that is the data stored in a `StubPairMemory`, which in turn is just the instantiation of the template `MemoryBase` with a `StubPair` data member. 
+
+For the data types:
+* data is stored in aggregate types (packed)
+* getters and setters provide access to the physically meaningful quantities from these bitpacked types.
+
+The data types follow a strict convention and were all written by the same person (Derek). The header file first defines via enums the bit sizes of each piece of information, for example from the `TrackletParameters` data type:
+````c++
+  enum BitWidths {
+    // Bit sizes for TrackletParameterMemory fields
+    kTParRinvSize = 14, //rinv
+    kTParPhi0Size = 18, //phi0
+    kTParZ0Size = 10, //z0
+    kTParTSize = 14, //t
+    // Bit size for full TrackletParameterMemory
+    kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr
+  };
+  ````
+From these definitions the LSB and MSB of the packed bitword is calculated by the compiler and then used in the getter and setter routines, so if bit sizes change only this enum needs to be updated. 
