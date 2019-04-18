@@ -18,8 +18,7 @@ void MatchCalculatorTop(BXType bx,
                         FullMatchMemory<BARREL>* fullmatch4,
                         FullMatchMemory<BARREL>* fullmatch5,
                         FullMatchMemory<BARREL>* fullmatch6,
-                        FullMatchMemory<BARREL>* fullmatch7,
-                        hls::stream<char> & debug
+                        FullMatchMemory<BARREL>* fullmatch7
                         )
 {
 
@@ -28,7 +27,7 @@ void MatchCalculatorTop(BXType bx,
       bx,
       match1, match2, match3, match4, match5, match6, match7, match8,
       allstub, allproj, bx_o,
-      fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, debug
+      fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7
     );
 
 } 

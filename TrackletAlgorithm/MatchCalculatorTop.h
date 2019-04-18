@@ -32,8 +32,7 @@ void MatchCalculatorTop(BXType bx,
                         FullMatchMemory<BARREL>*,
                         FullMatchMemory<BARREL>*,
                         FullMatchMemory<BARREL>*,
-                        FullMatchMemory<BARREL>*,
-                        hls::stream<char> & debug
+                        FullMatchMemory<BARREL>*
                        );
 
 #endif

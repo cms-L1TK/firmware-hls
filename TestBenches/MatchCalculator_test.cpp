@@ -104,12 +104,11 @@ int main() {
     BXType bx = ievt;
     BXType bx_out;
 
-    hls::stream<char> debug;
-
     // Unit Under Test
-    MatchCalculatorTop(bx,
-                       &match1, &match2, &match3, &match4, &match5, &match6, &match7, &match8, &allstub, &allproj, bx_out,
-                       &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4, &fullmatch5, &fullmatch6, &fullmatch7, debug);
+    MatchCalculatorTop(
+      bx, &match1, &match2, &match3, &match4, &match5, &match6, &match7, &match8, &allstub, &allproj, bx_out,
+      &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4, &fullmatch5, &fullmatch6, &fullmatch7
+    );
 
     // compare the computed outputs with the expected ones 
     std::cout << "FM: L1L2 seeding" << std::endl;
@@ -126,14 +125,6 @@ int main() {
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch6, fout_fm6, ievt, "FullMatch", truncation);
     //std::cout << "FM: L2D1 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch7, fout_fm7, ievt, "FullMatch", truncation);
-
-    std::cout << "============================= Debug stream ==========================" << std::endl;
-    while (!debug.empty()) {
-      char a; 
-      debug >> a; 
-      cout << a;
-    }
-    std::cout << "=====================================================================" << std::endl; 
 
   }  // end of event loop
   
