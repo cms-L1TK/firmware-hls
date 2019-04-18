@@ -24,7 +24,7 @@ In this document let's try to collect our best practices.
 * Size constants are declared via enum
 * Class data members end with underscore. e.g. `raw_`.
 * Use setters and getters to hide implementation;
-   * Follow CMSSW standards such that the setter for quantity Q has 'set' prepended and the getter is just the quantity, i.e., `setQ()` and `Q()` 
+   * Follow CMSSW standards such that the setter for quantity Q has 'set' prepended and the getter is just the quantity, i.e., `setQ()` and `q()` (note lower case first letter for the getter). 
 * Use of class templates can avoid code duplication.
 
 ### RAMs
