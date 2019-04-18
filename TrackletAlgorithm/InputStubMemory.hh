@@ -5,7 +5,7 @@
 #include "MemoryTemplate.hh"
 
 // InputStubBase is where we define the bit widths, which depend on the class template parameter
-template<regionType ISType> class InputStubBase {};
+template<int ISType> class InputStubBase {};
 
 template<>
 class InputStubBase<BARRELPS>
@@ -73,7 +73,7 @@ public:
 
 
 // Data object definition
-template<regionType ISType>
+template<int ISType>
 class InputStub : public InputStubBase<ISType>
 {
 public:
@@ -184,6 +184,6 @@ private:
 };
 
 // Memory definition
-template<regionType ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 1, kNBits_MemAddr>;
+template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 1, kNBits_MemAddr>;
 
 #endif

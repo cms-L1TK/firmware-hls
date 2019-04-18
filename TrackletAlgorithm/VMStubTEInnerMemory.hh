@@ -5,7 +5,7 @@
 #include "MemoryTemplate.hh"
 
 // VMStubTEInnerBase is where we define the bit widths, which depend on the class template parameter.
-template<regionType VMSTEIType> class VMStubTEInnerBase {};
+template<int VMSTEIType> class VMStubTEInnerBase {};
 
 template<>
 class VMStubTEInnerBase<BARRELPS>
@@ -68,7 +68,7 @@ public:
 };
 
 // Data object definition
-template<regionType VMSTEIType>
+template<int VMSTEIType>
 class VMStubTEInner : public VMStubTEInnerBase<VMSTEIType>
 {
 public:
@@ -155,6 +155,6 @@ private:
 };
 
 // Memory definition
-template<regionType VMSTEIType> using VMStubTEInnerMemory =  MemoryTemplate<VMStubTEInner<VMSTEIType>, 1, kNBits_MemAddr>;
+template<int VMSTEIType> using VMStubTEInnerMemory =  MemoryTemplate<VMStubTEInner<VMSTEIType>, 1, kNBits_MemAddr>;
 
 #endif

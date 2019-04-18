@@ -5,7 +5,7 @@
 #include "MemoryTemplateBinned.hh"
 
 // VMStubMEBase is where we define the bit widths, which depend on the class template parameter
-template<regionType VMSMEType> class VMStubMEBase {};
+template<int VMSMEType> class VMStubMEBase {};
 
 template<>
 class VMStubMEBase<BARRELPS>
@@ -51,7 +51,7 @@ public:
 
 
 // Data object definition
-template<regionType VMSMEType>
+template<int VMSMEType>
 class VMStubME : public VMStubMEBase<VMSMEType>
 {
 public:
@@ -127,7 +127,7 @@ private:
 };
 
 // Memory definition
-template<regionType VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,3>;
+template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,3>;
 
 
 #endif
