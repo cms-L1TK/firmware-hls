@@ -289,25 +289,25 @@ void MatchCalculator(BXType bx,
  
   // Setup constants depending on which layer/disk working on
   // probably should move these to constants file
-  ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
-  ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
-  ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
-  ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
-  ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
-  ap_uint<3> kNbitsrL123 = 7;      // nbitsrL123     in emulation (defined in constants)
-  ap_uint<3> kNbitsrL456 = 7;      // nbitsrL456     in emulation (defined in constants) 
-  ap_int<4>  kShift_PS_zderL = -7; // PS_zderL_shift in emulation (defined in constants)
-  ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation (defined in constants)
+  const ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
+  const ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
+  const ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
+  const ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
+  const ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
+  const ap_uint<3> kNbitsrL123 = 7;      // nbitsrL123     in emulation (defined in constants)
+  const ap_uint<3> kNbitsrL456 = 7;      // nbitsrL456     in emulation (defined in constants) 
+  const ap_int<4>  kShift_PS_zderL = -7; // PS_zderL_shift in emulation (defined in constants)
+  const ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation (defined in constants)
 
-  auto kFact               = (1 <= LAYER <= 3)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456));                             // fact_ in emulation defined in MC
-  auto kPhi0_shift         = (1 <= LAYER <= 3)? 3 : 0;                                                                  // phi0shift_ in emulation defined in MC
-  auto kShift_phi0bit      = 1;                                                                                         // phi0bitshift in emulation defined in constants
-  ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
-  ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456;                                           // icorrshift for L456
-  auto kPhi_corr_shift     = (1 <= LAYER <= 3)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
-  ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
-  ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
-  auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
+  const auto kFact               = (1 <= LAYER <= 3)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456)); // fact_ in emulation defined in MC
+  const auto kPhi0_shift         = (1 <= LAYER <= 3)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
+  const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
+  const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
+  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456;                                           // icorrshift for L456
+  const auto kPhi_corr_shift     = (1 <= LAYER <= 3)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
+  const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
+  const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
+  const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
   // Setup look up tables for match cuts
   ap_uint<17> LUT_matchcut_phi[7];
@@ -361,25 +361,63 @@ void MatchCalculator(BXType bx,
 
   // Variables for the merger
   // layer 1 variables
-  CandidateMatch cm_L1[4];
-  CandidateMatch tmpA_L1[4];
-  CandidateMatch tmpB_L1[4];
-  bool valid_L1[4] = {false,false,false,false};
-  bool read_L1[4] = {false,false,false,false};
-  bool vA_L1[4] = {false,false,false,false};
-  bool vB_L1[4] = {false,false,false,false};
-  bool sA_L1[4] = {false,false,false,false};
-  bool sB_L1[4] = {false,false,false,false};
+  bool read_L1_1 = false;
+  bool read_L1_2 = false;
+  bool read_L1_3 = false;
+  bool read_L1_4 = false;
+  CandidateMatch cm_L1_1 = CandidateMatch();
+  CandidateMatch cm_L1_2 = CandidateMatch();
+  CandidateMatch cm_L1_3 = CandidateMatch();
+  CandidateMatch cm_L1_4 = CandidateMatch();
+  CandidateMatch tmpA_L1_1 = CandidateMatch();
+  CandidateMatch tmpA_L1_2 = CandidateMatch();
+  CandidateMatch tmpA_L1_3 = CandidateMatch();
+  CandidateMatch tmpA_L1_4 = CandidateMatch();
+  CandidateMatch tmpB_L1_1 = CandidateMatch();
+  CandidateMatch tmpB_L1_2 = CandidateMatch();
+  CandidateMatch tmpB_L1_3 = CandidateMatch();
+  CandidateMatch tmpB_L1_4 = CandidateMatch();
+  bool valid_L1_1 = false; 
+  bool valid_L1_2 = false; 
+  bool valid_L1_3 = false; 
+  bool valid_L1_4 = false; 
+  bool vA_L1_1 = false; 
+  bool vA_L1_2 = false; 
+  bool vA_L1_3 = false; 
+  bool vA_L1_4 = false; 
+  bool vB_L1_1 = false; 
+  bool vB_L1_2 = false; 
+  bool vB_L1_3 = false; 
+  bool vB_L1_4 = false; 
+  bool sA_L1_1 = false; 
+  bool sA_L1_2 = false; 
+  bool sA_L1_3 = false; 
+  bool sA_L1_4 = false; 
+  bool sB_L1_1 = false; 
+  bool sB_L1_2 = false; 
+  bool sB_L1_3 = false; 
+  bool sB_L1_4 = false; 
+
   // layer 2 variables
-  CandidateMatch cm_L2[2];
-  CandidateMatch tmpA_L2[2];
-  CandidateMatch tmpB_L2[2];
-  bool valid_L2[2] = {false,false};
-  bool read_L2[2] = {false,false};
-  bool vA_L2[2] = {false,false};
-  bool vB_L2[2] = {false,false};
-  bool sA_L2[2] = {false,false};
-  bool sB_L2[2] = {false,false};
+  bool read_L2_1 = false;
+  bool read_L2_2 = false;
+  CandidateMatch cm_L2_1 = CandidateMatch();
+  CandidateMatch cm_L2_2 = CandidateMatch();
+  CandidateMatch tmpA_L2_1 = CandidateMatch();
+  CandidateMatch tmpA_L2_2 = CandidateMatch();
+  CandidateMatch tmpB_L2_1 = CandidateMatch();
+  CandidateMatch tmpB_L2_2 = CandidateMatch();
+  bool valid_L2_1 = false; 
+  bool valid_L2_2 = false; 
+  bool vA_L2_1 = false; 
+  bool vA_L2_2 = false; 
+  bool vB_L2_1 = false; 
+  bool vB_L2_2 = false; 
+  bool sA_L2_1 = false; 
+  bool sA_L2_2 = false; 
+  bool sB_L2_1 = false; 
+  bool sB_L2_2 = false; 
+
   // layer 3 variables
   CandidateMatch tmpA_L3;
   CandidateMatch tmpB_L3;
@@ -389,73 +427,7 @@ void MatchCalculator(BXType bx,
   bool sA_L3 = false;
   bool sB_L3 = false;
   
-  // pipeline variables
-  bool read_L1_next[4] = {false,false,false,false};
-  bool read_L2_next[2] = {false,false};
-
-  bool read_L1_1 = false;
-  bool read_L1_2 = false;
-  bool read_L1_3 = false;
-  bool read_L1_4 = false;
-  bool read_L1_1_next = false;
-  bool read_L1_2_next = false;
-  bool read_L1_3_next = false;
-  bool read_L1_4_next = false;
-  bool read_L2_1 = false;
-  bool read_L2_2 = false;
-  bool read_L2_1_next = false;
-  bool read_L2_2_next = false;
-
-  CandidateMatch cm_L1_next[4];
-  CandidateMatch tmpA_L1_next[4];
-  CandidateMatch tmpB_L1_next[4];
-  bool valid_L1_next[4] = {false,false,false,false};
-  bool vA_L1_next[4] = {false,false,false,false};
-  bool vB_L1_next[4] = {false,false,false,false};
-  bool sA_L1_next[4] = {false,false,false,false};
-  bool sB_L1_next[4] = {false,false,false,false};
-  CandidateMatch cm_L2_next[2];
-  CandidateMatch tmpA_L2_next[2];
-  CandidateMatch tmpB_L2_next[2];
-  bool valid_L2_next[2] = {false,false};
-  bool vA_L2_next[2] = {false,false};
-  bool vB_L2_next[2] = {false,false};
-  bool sA_L2_next[2] = {false,false};
-  bool sB_L2_next[2] = {false,false};
-  CandidateMatch cm_L3_next;
-  CandidateMatch tmpA_L3_next;
-  CandidateMatch tmpB_L3_next; 
-  bool valid_L3_next = false;
-  bool vA_L3_next = false;
-  bool vB_L3_next = false;
-  bool sA_L3_next = false;
-  bool sB_L3_next = false;
-  bool read1_next = false;
-  bool read2_next = false;
-  bool read3_next = false;
-  bool read4_next = false;
-  bool read5_next = false;
-  bool read6_next = false;
-  bool read7_next = false;
-  bool read8_next = false;
-
-#pragma HLS ARRAY_PARTITION variable=cm_L1,cm_L2,tmpA_L1,tmpB_L1,tmpA_L2,tmpB_L2 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=valid_L1,read_L1,vA_L1,vB_L1,sA_L1,sB_L1 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=valid_L2,read_L2,vA_L2,vB_L2,sA_L2,sB_L2 complete dim=0
-#pragma HLS ARRAY_PARTITION variable=read_L1_next,read_L2_next complete dim=0
-#pragma HLS ARRAY_PARTITION variable=tmpA_L1_next,tmpB_L1_next,tmpA_L2_next,tmpB_L2_next complete dim=0
-#pragma HLS ARRAY_PARTITION variable=vA_L1_next,vB_L1_next,sA_L1_next,sB_L1_next complete dim=0
-#pragma HLS ARRAY_PARTITION variable=vA_L2_next,vB_L2_next,sA_L2_next,sB_L2_next complete dim=0
-#pragma HLS ARRAY_PARTITION variable=cm_L1_next,cm_L2_next,valid_L1_next,valid_L2_next complete dim=0
-
-#pragma HLS resource variable=read_L1,read_L2,read_L1_next,read_L2_next core=register
-
-//#pragma HLS resource variable=read_L1,read_L2 register
-
-
-//#pragma HLS RESOURCE variable=cm_L1,cm_L2,tmpA_L1,tmpB_L1,tmpA_L2,tmpB_L2,valid_L1,read_L1,vA_L1,vB_L1,sA_L1,sB_L1,valid_L2,read_L2,vA_L2,vB_L2,sA_L2,sB_L2,read_L1_next,read_L2_next,tmpA_L1_next,tmpB_L1_next,tmpA_L2_next,tmpB_L2_next,vA_L1_next,vB_L1_next,sA_L1_next,sB_L1_next,vA_L2_next,vB_L2_next,sA_L2_next,sB_L2_next,valid_L1_next,valid_L2_next,cm_L1_next,cm_L2_next core=register
-
-   // Setup candidate match data stream that goes into match calculations
+  // Setup candidate match data stream that goes into match calculations
   CandidateMatch datastream = CandidateMatch();
 
   // Setup dummy index to be used in the comparison
@@ -463,27 +435,93 @@ void MatchCalculator(BXType bx,
 
 
   // Full match shift register to store best match
-  FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
-  FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
-  bool goodmatch                   = false;
-  bool goodmatch_next              = false;
   typename AllProjection<APTYPE>::AProjTCSEED projseed;
-  typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
+  FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
+  bool goodmatch                   = false;
+  //typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
+  //FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
+  //bool goodmatch_next              = false;
 
   // Processing starts
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc+3; istep++)
   {
 
 #pragma HLS PIPELINE II=1
-//#pragma HLS latency max=140
 
-// no inter-loop dependencies between variables that are just written
-#pragma HLS dependence variable=cm1,cm2,cm3,cm4,cm5,cm6,cm7,cm8 inter false
-#pragma HLS dependence variable=cm_L1_next,tmpA_L1_next,tmpB_L1_next,vA_L1_next,vB_L1_next,sA_L1_next,sB_L1_next,valid_L1_next inter false
-#pragma HLS dependence variable=cm_L2_next,tmpA_L2_next,tmpB_L2_next,vA_L2_next,vB_L2_next,sA_L2_next,sB_L2_next,valid_L2_next inter false
-#pragma HLS dependence variable=cm_L3_next,tmpA_L3_next,tmpB_L3_next,vA_L3_next,vB_L3_next,sA_L3_next,sB_L3_next,valid_L3_next inter false
-#pragma HLS dependence variable=read1_next,read2_next,read3_next,read4_next,read5_next,read6_next,read7_next,read8_next inter false
-//#pragma HLS resource variable=bestmatch,projseed,goodmatch,bestmatch_next,projseed_next,goodmatch_next core=register
+    // pipeline variables
+    bool read_L1_1_next = false;
+    bool read_L1_2_next = false;
+    bool read_L1_3_next = false;
+    bool read_L1_4_next = false;
+    CandidateMatch cm_L1_1_next = CandidateMatch();
+    CandidateMatch cm_L1_2_next = CandidateMatch();
+    CandidateMatch cm_L1_3_next = CandidateMatch();
+    CandidateMatch cm_L1_4_next = CandidateMatch();
+    CandidateMatch tmpA_L1_1_next = CandidateMatch();
+    CandidateMatch tmpA_L1_2_next = CandidateMatch();
+    CandidateMatch tmpA_L1_3_next = CandidateMatch();
+    CandidateMatch tmpA_L1_4_next = CandidateMatch();
+    CandidateMatch tmpB_L1_1_next = CandidateMatch();
+    CandidateMatch tmpB_L1_2_next = CandidateMatch();
+    CandidateMatch tmpB_L1_3_next = CandidateMatch();
+    CandidateMatch tmpB_L1_4_next = CandidateMatch();
+    bool valid_L1_1_next = false;
+    bool valid_L1_2_next = false;
+    bool valid_L1_3_next = false;
+    bool valid_L1_4_next = false;
+    bool vA_L1_1_next = false; 
+    bool vA_L1_2_next = false; 
+    bool vA_L1_3_next = false; 
+    bool vA_L1_4_next = false; 
+    bool vB_L1_1_next = false; 
+    bool vB_L1_2_next = false; 
+    bool vB_L1_3_next = false; 
+    bool vB_L1_4_next = false; 
+    bool sA_L1_1_next = false; 
+    bool sA_L1_2_next = false; 
+    bool sA_L1_3_next = false; 
+    bool sA_L1_4_next = false; 
+    bool sB_L1_1_next = false; 
+    bool sB_L1_2_next = false; 
+    bool sB_L1_3_next = false; 
+    bool sB_L1_4_next = false; 
+
+    bool read_L2_1_next = false;
+    bool read_L2_2_next = false;
+    CandidateMatch cm_L2_1_next = CandidateMatch();
+    CandidateMatch cm_L2_2_next = CandidateMatch();
+    CandidateMatch tmpA_L2_1_next = CandidateMatch();
+    CandidateMatch tmpA_L2_2_next = CandidateMatch();
+    CandidateMatch tmpB_L2_1_next = CandidateMatch();
+    CandidateMatch tmpB_L2_2_next = CandidateMatch();
+    bool valid_L2_1_next = false; 
+    bool valid_L2_2_next = false; 
+    bool vA_L2_1_next = false; 
+    bool vA_L2_2_next = false; 
+    bool vB_L2_1_next = false; 
+    bool vB_L2_2_next = false; 
+    bool sA_L2_1_next = false; 
+    bool sA_L2_2_next = false; 
+    bool sB_L2_1_next = false; 
+    bool sB_L2_2_next = false; 
+
+    CandidateMatch cm_L3_next;
+    CandidateMatch tmpA_L3_next;
+    CandidateMatch tmpB_L3_next; 
+    bool valid_L3_next = false;
+    bool vA_L3_next = false;
+    bool vB_L3_next = false;
+    bool sA_L3_next = false;
+    bool sB_L3_next = false;
+    bool read1_next = false;
+    bool read2_next = false;
+    bool read3_next = false;
+    bool read4_next = false;
+    bool read5_next = false;
+    bool read6_next = false;
+    bool read7_next = false;
+    bool read8_next = false;
+
 
     // Bool to signal last processing
     bool last = (istep==(kMaxProc-1) || istep==(ncm-1))? true : false;
@@ -493,6 +531,7 @@ void MatchCalculator(BXType bx,
     //-----------------------------------------------------------------------------------------------------------
 
     // Increment the read addresses for the candidate matches
+
     if (read1) addr1++;
     if (read2) addr2++;
     if (read3) addr3++;
@@ -524,95 +563,89 @@ void MatchCalculator(BXType bx,
 
     // merger Layer 1 Part 1
     cleanmerger<1,1>(
-      cm1, valid1, cm2, valid2,                         // inputs: inA, validA, inB, validB
-      //cm_L1[0], valid_L1[0], read_L1[0],                // inputs: out, vout, inread from L2_1
-      cm_L1[0], valid_L1[0], read_L1_1,                // inputs: out, vout, inread from L2_1
-      tmpA_L1[0], vA_L1[0], sA_L1[0],                   // tmp variables internal to L1_1 merger
-      tmpB_L1[0], vB_L1[0], sB_L1[0],                   // tmp variables internal to L1_1 merger
-      &tmpA_L1_next[0], &vA_L1_next[0], &sA_L1_next[0], // tmp variables internal to L1_1 merger
-      &tmpB_L1_next[0], &vB_L1_next[0], &sB_L1_next[0], // tmp variables internal to L1_1 merger
-      &cm_L1_next[0], &valid_L1_next[0],                // outputs: out, vout
-      &read1_next, &read2_next                          // outputs: read1, read2 
+      cm1, valid1, cm2, valid2,                      // inputs: inA, validA, inB, validB
+      cm_L1_1, valid_L1_1, read_L1_1,                // inputs: out, vout, inread from L2_1
+      tmpA_L1_1, vA_L1_1, sA_L1_1,                   // tmp variables internal to L1_1 merger
+      tmpB_L1_1, vB_L1_1, sB_L1_1,                   // tmp variables internal to L1_1 merger
+      &tmpA_L1_1_next, &vA_L1_1_next, &sA_L1_1_next, // tmp variables internal to L1_1 merger
+      &tmpB_L1_1_next, &vB_L1_1_next, &sB_L1_1_next, // tmp variables internal to L1_1 merger
+      &cm_L1_1_next, &valid_L1_1_next,               // outputs: out, vout
+      &read1_next, &read2_next                       // outputs: read1, read2 
     );
 
     // merger Layer 1 Part 2
     cleanmerger<1,2>(
-      cm3, valid3, cm4, valid4,                         // inputs: inA, validA, inB, validB
-      //cm_L1[1], valid_L1[1], read_L1[1],                // inputs: out, vout, inread from L2_1
-      cm_L1[1], valid_L1[1], read_L1_2,                // inputs: out, vout, inread from L2_1
-      tmpA_L1[1], vA_L1[1], sA_L1[1],                   // tmp variables internal to L1_2 merger
-      tmpB_L1[1], vB_L1[1], sB_L1[1],                   // tmp variables internal to L1_2 merger
-      &tmpA_L1_next[1], &vA_L1_next[1], &sA_L1_next[1], // tmp variables internal to L1_2 merger
-      &tmpB_L1_next[1], &vB_L1_next[1], &sB_L1_next[1], // tmp variables internal to L1_2 merger
-      &cm_L1_next[1], &valid_L1_next[1],                // outputs: out, vout
-      &read3_next, &read4_next                          // outputs: read3, read4 
+      cm3, valid3, cm4, valid4,                      // inputs: inA, validA, inB, validB
+      cm_L1_2, valid_L1_2, read_L1_2,                // inputs: out, vout, inread from L2_1
+      tmpA_L1_2, vA_L1_2, sA_L1_2,                   // tmp variables internal to L1_2 merger
+      tmpB_L1_2, vB_L1_2, sB_L1_2,                   // tmp variables internal to L1_2 merger
+      &tmpA_L1_2_next, &vA_L1_2_next, &sA_L1_2_next, // tmp variables internal to L1_2 merger
+      &tmpB_L1_2_next, &vB_L1_2_next, &sB_L1_2_next, // tmp variables internal to L1_2 merger
+      &cm_L1_2_next, &valid_L1_2_next,               // outputs: out, vout
+      &read3_next, &read4_next                       // outputs: read3, read4 
     );
 
     // merger Layer 1 Part 3 
     cleanmerger<1,3>(
-      cm5, valid5, cm6, valid6,                         // inputs: inA, validA, inB, validB
-      //cm_L1[2], valid_L1[2], read_L1[2],                // inputs: out, vout, inread from L2_1
-      cm_L1[2], valid_L1[2], read_L1_3,                // inputs: out, vout, inread from L2_1
-      tmpA_L1[2], vA_L1[2], sA_L1[2],                   // tmp variables internal to L1_3 merger
-      tmpB_L1[2], vB_L1[2], sB_L1[2],                   // tmp variables internal to L1_3 merger
-      &tmpA_L1_next[2], &vA_L1_next[2], &sA_L1_next[2], // tmp variables internal to L1_3 merger
-      &tmpB_L1_next[2], &vB_L1_next[2], &sB_L1_next[2], // tmp variables internal to L1_3 merger
-      &cm_L1_next[2], &valid_L1_next[2],                // outputs: out, vout
-      &read5_next, &read6_next                          // outputs: read5, read6 
+      cm5, valid5, cm6, valid6,                      // inputs: inA, validA, inB, validB
+      cm_L1_3, valid_L1_3, read_L1_3,                // inputs: out, vout, inread from L2_1
+      tmpA_L1_3, vA_L1_3, sA_L1_3,                   // tmp variables internal to L1_3 merger
+      tmpB_L1_3, vB_L1_3, sB_L1_3,                   // tmp variables internal to L1_3 merger
+      &tmpA_L1_3_next, &vA_L1_3_next, &sA_L1_3_next, // tmp variables internal to L1_3 merger
+      &tmpB_L1_3_next, &vB_L1_3_next, &sB_L1_3_next, // tmp variables internal to L1_3 merger
+      &cm_L1_3_next, &valid_L1_3_next,               // outputs: out, vout
+      &read5_next, &read6_next                       // outputs: read5, read6 
     );
 
     // merger Layer 1 Part 4  
     cleanmerger<1,4>(
-      cm7, valid7, cm8, valid8,                         // inputs: inA, validA, inB, validB
-      //cm_L1[3], valid_L1[3], read_L1[3],                // inputs: out, vout, inread from L2_1
-      cm_L1[3], valid_L1[3], read_L1_4,               // inputs: out, vout, inread from L2_1
-      tmpA_L1[3], vA_L1[3], sA_L1[3],                   // tmp variables internal to L1_4 merger
-      tmpB_L1[3], vB_L1[3], sB_L1[3],                   // tmp variables internal to L1_4 merger
-      &tmpA_L1_next[3], &vA_L1_next[3], &sA_L1_next[3], // tmp variables internal to L1_4 merger
-      &tmpB_L1_next[3], &vB_L1_next[3], &sB_L1_next[3], // tmp variables internal to L1_4 merger
-      &cm_L1_next[3], &valid_L1_next[3],                // outputs: out, vout
-      &read7_next, &read8_next                          // outputs: read7, read8 
+      cm7, valid7, cm8, valid8,                      // inputs: inA, validA, inB, validB
+      cm_L1_4, valid_L1_4, read_L1_4,                // inputs: out, vout, inread from L2_1
+      tmpA_L1_4, vA_L1_4, sA_L1_4,                   // tmp variables internal to L1_4 merger
+      tmpB_L1_4, vB_L1_4, sB_L1_4,                   // tmp variables internal to L1_4 merger
+      &tmpA_L1_4_next, &vA_L1_4_next, &sA_L1_4_next, // tmp variables internal to L1_4 merger
+      &tmpB_L1_4_next, &vB_L1_4_next, &sB_L1_4_next, // tmp variables internal to L1_4 merger
+      &cm_L1_4_next, &valid_L1_4_next,               // outputs: out, vout
+      &read7_next, &read8_next                       // outputs: read7, read8 
     );
 
     // merger Layer 2 Part 1
     cleanmerger<2,1>(
-      cm_L1_next[0], valid_L1_next[0], cm_L1_next[1], valid_L1_next[1], // inputs: inA, validA, inB, validB
-      //cm_L2[0], valid_L2[0], read_L2[0],                // inputs: out, vout, inread from L3_1
-      cm_L2[0], valid_L2[0], read_L2_1,                // inputs: out, vout, inread from L3_1
-      tmpA_L2[0], vA_L2[0], sA_L2[0],                   // tmp variables internal to L2_1 merger
-      tmpB_L2[0], vB_L2[0], sB_L2[0],                   // tmp variables internal to L2_1 merger
-      &tmpA_L2_next[0], &vA_L2_next[0], &sA_L2_next[0], // tmp variables internal to L2_1 merger
-      &tmpB_L2_next[0], &vB_L2_next[0], &sB_L2_next[0], // tmp variables internal to L2_1 merger
-      &cm_L2_next[0], &valid_L2_next[0],                // outputs: out, vout
-      //&read_L1_next[0], &read_L1_next[1]                // outputs: read_L1_1, read_L1_2
-      &read_L1_1_next, &read_L1_2_next                // outputs: read_L1_1, read_L1_2
+      cm_L1_1_next, valid_L1_1_next,                 // inputs: inA, validA
+      cm_L1_2_next, valid_L1_2_next,                 // inputs: inB, validB
+      cm_L2_1, valid_L2_1, read_L2_1,                // inputs: out, vout, inread from L3_1
+      tmpA_L2_1, vA_L2_1, sA_L2_1,                   // tmp variables internal to L2_1 merger
+      tmpB_L2_1, vB_L2_1, sB_L2_1,                   // tmp variables internal to L2_1 merger
+      &tmpA_L2_1_next, &vA_L2_1_next, &sA_L2_1_next, // tmp variables internal to L2_1 merger
+      &tmpB_L2_1_next, &vB_L2_1_next, &sB_L2_1_next, // tmp variables internal to L2_1 merger
+      &cm_L2_1_next, &valid_L2_1_next,               // outputs: out, vout
+      &read_L1_1_next, &read_L1_2_next               // outputs: read_L1_1, read_L1_2
     );
 
     // merger Layer 2 Part 2
     cleanmerger<2,2>(
-      cm_L1_next[2], valid_L1_next[2], cm_L1_next[3], valid_L1_next[3], // inputs: inA, validA, inB, validB
-      //cm_L2[1], valid_L2[1], read_L2[1],                // inputs: out, vout, inread from L3_1
-      cm_L2[1], valid_L2[1], read_L2_2,                // inputs: out, vout, inread from L3_1
-      tmpA_L2[1], vA_L2[1], sA_L2[1],                   // tmp variables internal to L2_2 merger
-      tmpB_L2[1], vB_L2[1], sB_L2[1],                   // tmp variables internal to L2_2 merger
-      &tmpA_L2_next[1], &vA_L2_next[1], &sA_L2_next[1], // tmp variables internal to L2_2 merger
-      &tmpB_L2_next[1], &vB_L2_next[1], &sB_L2_next[1], // tmp variables internal to L2_2 merger
-      &cm_L2_next[1], &valid_L2_next[1],                // outputs: out, vout
-      //&read_L1_next[2], &read_L1_next[3]                // outputs: read_L1_3, read_L1_4
-      &read_L1_3_next, &read_L1_4_next                // outputs: read_L1_3, read_L1_4
+      cm_L1_3_next, valid_L1_3_next,                 // inputs: inA, validA 
+      cm_L1_4_next, valid_L1_4_next,                 // inputs: inB, validB
+      cm_L2_2, valid_L2_2, read_L2_2,                // inputs: out, vout, inread from L3_1
+      tmpA_L2_2, vA_L2_2, sA_L2_2,                   // tmp variables internal to L2_2 merger
+      tmpB_L2_2, vB_L2_2, sB_L2_2,                   // tmp variables internal to L2_2 merger
+      &tmpA_L2_2_next, &vA_L2_2_next, &sA_L2_2_next, // tmp variables internal to L2_2 merger
+      &tmpB_L2_2_next, &vB_L2_2_next, &sB_L2_2_next, // tmp variables internal to L2_2 merger
+      &cm_L2_2_next, &valid_L2_2_next,               // outputs: out, vout
+      &read_L1_3_next, &read_L1_4_next               // outputs: read_L1_3, read_L1_4
     );
 
     // merger Layer 3 Part 1
     cleanmerger<3,1>(
-      cm_L2_next[0], valid_L2_next[0], cm_L2_next[1], valid_L2_next[1], // inputs: inA, validA, inB, validB
-      datastream, valid_L3, true,                       // inputs: out, vout, true inread because last layer
-      tmpA_L3, vA_L3, sA_L3,                            // tmp variables internal to L3_1 merger
-      tmpB_L3, vB_L3, sB_L3,                            // tmp variables internal to L3_1 merger
-      &tmpA_L3_next, &vA_L3_next, &sA_L3_next,          // tmp variables internal to L3_1 merger
-      &tmpB_L3_next, &vB_L3_next, &sB_L3_next,          // tmp variables internal to L3_1 merger
-      &cm_L3_next, &valid_L3_next,                      // outputs: out, vout
-      //&read_L2_next[0], &read_L2_next[1]                // outputs: read_L2_1, read_L2_2
-      &read_L2_1_next, &read_L2_2_next                // outputs: read_L2_1, read_L2_2
+      cm_L2_1_next, valid_L2_1_next,           // inputs: inA, validA 
+      cm_L2_2_next, valid_L2_2_next,           // inputs: inB, validB
+      datastream, valid_L3, true,              // inputs: out, vout, true inread because last layer
+      tmpA_L3, vA_L3, sA_L3,                   // tmp variables internal to L3_1 merger
+      tmpB_L3, vB_L3, sB_L3,                   // tmp variables internal to L3_1 merger
+      &tmpA_L3_next, &vA_L3_next, &sA_L3_next, // tmp variables internal to L3_1 merger
+      &tmpB_L3_next, &vB_L3_next, &sB_L3_next, // tmp variables internal to L3_1 merger
+      &cm_L3_next, &valid_L3_next,             // outputs: out, vout
+      &read_L2_1_next, &read_L2_2_next         // outputs: read_L2_1, read_L2_2
     );
 
     // pipeline the variables
@@ -627,80 +660,74 @@ void MatchCalculator(BXType bx,
     read7      = read7_next;
     read8      = read8_next;
 
-    //read_L1[0] = read_L1_next[0];
-    //read_L1[1] = read_L1_next[1];
-    //read_L1[2] = read_L1_next[2];
-    //read_L1[3] = read_L1_next[3];
-    //read_L2[0] = read_L2_next[0];
-    //read_L2[1] = read_L2_next[1];
+    read_L1_1  = read_L1_1_next;
+    read_L1_2  = read_L1_2_next;
+    read_L1_3  = read_L1_3_next;
+    read_L1_4  = read_L1_4_next;
+    read_L2_1  = read_L2_1_next;
+    read_L2_2  = read_L2_2_next;
 
-    read_L1_1 = read_L1_1_next;
-    read_L1_2 = read_L1_2_next;
-    read_L1_3 = read_L1_3_next;
-    read_L1_4 = read_L1_4_next;
-    read_L2_1 = read_L2_1_next;
-    read_L2_2 = read_L2_2_next;
+    cm_L1_1    = cm_L1_1_next;
+    cm_L1_2    = cm_L1_2_next;
+    cm_L1_3    = cm_L1_3_next;
+    cm_L1_4    = cm_L1_4_next;
+    cm_L2_1    = cm_L2_1_next;
+    cm_L2_2    = cm_L2_2_next;
+    datastream = cm_L3_next;
 
-    cm_L1[0]    = cm_L1_next[0];
-    cm_L1[1]    = cm_L1_next[1];
-    cm_L1[2]    = cm_L1_next[2];
-    cm_L1[3]    = cm_L1_next[3];
-    cm_L2[0]    = cm_L2_next[0];
-    cm_L2[1]    = cm_L2_next[1];
-    datastream  = cm_L3_next;
+    valid_L1_1 = valid_L1_1_next;
+    valid_L1_2 = valid_L1_2_next;
+    valid_L1_3 = valid_L1_3_next;
+    valid_L1_4 = valid_L1_4_next;
+    valid_L2_1 = valid_L2_1_next;
+    valid_L2_2 = valid_L2_2_next;
+    valid_L3   = valid_L3_next;
 
-    valid_L1[0] = valid_L1_next[0];
-    valid_L1[1] = valid_L1_next[1];
-    valid_L1[2] = valid_L1_next[2];
-    valid_L1[3] = valid_L1_next[3];
-    valid_L2[0] = valid_L2_next[0];
-    valid_L2[1] = valid_L2_next[1];
-    valid_L3    = valid_L3_next;
+    tmpA_L1_1 = tmpA_L1_1_next;
+    tmpA_L1_2 = tmpA_L1_2_next;
+    tmpA_L1_3 = tmpA_L1_3_next;
+    tmpA_L1_4 = tmpA_L1_4_next;
+    tmpB_L1_1 = tmpB_L1_1_next;
+    tmpB_L1_2 = tmpB_L1_2_next;
+    tmpB_L1_3 = tmpB_L1_3_next;
+    tmpB_L1_4 = tmpB_L1_4_next;
 
-    tmpA_L1[0] = tmpA_L1_next[0];
-    tmpA_L1[1] = tmpA_L1_next[1];
-    tmpA_L1[2] = tmpA_L1_next[2];
-    tmpA_L1[3] = tmpA_L1_next[3];
-    tmpB_L1[0] = tmpB_L1_next[0];
-    tmpB_L1[1] = tmpB_L1_next[1];
-    tmpB_L1[2] = tmpB_L1_next[2];
-    tmpB_L1[3] = tmpB_L1_next[3];
-    tmpA_L2[0] = tmpA_L2_next[0];
-    tmpA_L2[1] = tmpA_L2_next[1];
-    tmpB_L2[0] = tmpB_L2_next[0];
-    tmpB_L2[1] = tmpB_L2_next[1];
-    tmpA_L3    = tmpA_L3_next;
-    tmpB_L3    = tmpB_L3_next;
+    tmpA_L2_1 = tmpA_L2_1_next;
+    tmpA_L2_2 = tmpA_L2_2_next;
+    tmpB_L2_1 = tmpB_L2_1_next;
+    tmpB_L2_2 = tmpB_L2_2_next;
+    tmpA_L3   = tmpA_L3_next;
+    tmpB_L3   = tmpB_L3_next;
     
-    vA_L1[0]   = vA_L1_next[0]; 
-    vA_L1[1]   = vA_L1_next[1]; 
-    vA_L1[2]   = vA_L1_next[2]; 
-    vA_L1[3]   = vA_L1_next[3]; 
-    vB_L1[0]   = vB_L1_next[0]; 
-    vB_L1[1]   = vB_L1_next[1]; 
-    vB_L1[2]   = vB_L1_next[2]; 
-    vB_L1[3]   = vB_L1_next[3]; 
-    vA_L2[0]   = vA_L2_next[0]; 
-    vA_L2[1]   = vA_L2_next[1]; 
-    vB_L2[0]   = vB_L2_next[0]; 
-    vB_L2[1]   = vB_L2_next[1];
-    vA_L3      = vA_L3_next;
-    vB_L3      = vB_L3_next; 
+    vA_L1_1   = vA_L1_1_next; 
+    vA_L1_2   = vA_L1_2_next; 
+    vA_L1_3   = vA_L1_3_next; 
+    vA_L1_4   = vA_L1_4_next; 
+    vB_L1_1   = vB_L1_1_next; 
+    vB_L1_2   = vB_L1_2_next; 
+    vB_L1_3   = vB_L1_3_next; 
+    vB_L1_4   = vB_L1_4_next; 
+    vA_L2_1   = vA_L2_1_next; 
+    vA_L2_2   = vA_L2_2_next; 
+    vB_L2_1   = vB_L2_1_next; 
+    vB_L2_2   = vB_L2_2_next;
+    vA_L3     = vA_L3_next;
+    vB_L3     = vB_L3_next; 
 
-    sA_L1[0]   = sA_L1_next[0]; 
-    sA_L1[1]   = sA_L1_next[1]; 
-    sA_L1[2]   = sA_L1_next[2]; 
-    sA_L1[3]   = sA_L1_next[3]; 
-    sB_L1[0]   = sB_L1_next[0]; 
-    sB_L1[1]   = sB_L1_next[1]; 
-    sB_L1[2]   = sB_L1_next[2]; 
-    sB_L1[3]   = sB_L1_next[3]; 
-    sA_L2[0]   = sA_L2_next[0]; 
-    sA_L2[1]   = sA_L2_next[1]; 
-    sB_L2[0]   = sB_L2_next[0]; 
-    sB_L2[1]   = sB_L2_next[1];
-    sA_L3      = sA_L3_next;
-    sB_L3      = sB_L3_next; 
+    sA_L1_1   = sA_L1_1_next; 
+    sA_L1_2   = sA_L1_2_next; 
+    sA_L1_3   = sA_L1_3_next; 
+    sA_L1_4   = sA_L1_4_next; 
+    sB_L1_1   = sB_L1_1_next; 
+    sB_L1_2   = sB_L1_2_next; 
+    sB_L1_3   = sB_L1_3_next; 
+    sB_L1_4   = sB_L1_4_next; 
+    sA_L2_1   = sA_L2_1_next; 
+    sA_L2_2   = sA_L2_2_next; 
+    sB_L2_1   = sB_L2_1_next; 
+    sB_L2_2   = sB_L2_2_next;
+    sA_L3     = sA_L3_next;
+    sB_L3     = sB_L3_next; 
 
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
@@ -771,13 +798,12 @@ void MatchCalculator(BXType bx,
     //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
     //-----------------------------------------------------------------------------------------------------------
  
-    // pipeline the bestmatch registers 
-    bestmatch      = bestmatch_next;
-    goodmatch      = goodmatch_next;
-    projseed       = projseed_next;
+    typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
+    FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
+    bool goodmatch_next              = false;
 
     // For first tracklet, pick up the phi cut value
-    if (newtracklet) best_delta_phi = LUT_matchcut_phi[proj_seed];
+    best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
 
     // Check that matches fall within the selection window of the projection 
     if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
@@ -810,16 +836,11 @@ void MatchCalculator(BXType bx,
     fullmatch6->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
     fullmatch7->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
 
-    //// Write out only the best match, based on the seeding
-    //if (newtracklet && goodmatch==true){ // if there is a new tracklet write out the best match for the previous tracklet
-    //  if (projseed==0) fullmatch1->write_mem(bx,bestmatch,true); // L1L2 seed
-    //  if (projseed==1) fullmatch2->write_mem(bx,bestmatch,true); // L3L4 seed
-    //  if (projseed==2) fullmatch3->write_mem(bx,bestmatch,true); // L5L6 seed
-    //  if (projseed==3) fullmatch4->write_mem(bx,bestmatch,true); // D1D2 seed
-    //  if (projseed==4) fullmatch5->write_mem(bx,bestmatch,true); // D3D4 seed
-    //  if (projseed==5) fullmatch6->write_mem(bx,bestmatch,true); // L1D1 seed
-    //  if (projseed==6) fullmatch7->write_mem(bx,bestmatch,true); // L2D1 seed
-    //}
+    // pipeline the bestmatch registers 
+    bestmatch      = bestmatch_next;
+    goodmatch      = goodmatch_next;
+    projseed       = projseed_next;
+
 
     /*
     if (last){ // if this is the last iteration of loop, write out the current best also
