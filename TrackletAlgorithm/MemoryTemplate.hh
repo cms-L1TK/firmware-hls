@@ -34,13 +34,17 @@ public:
   void clear()
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS inline
   MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
 #pragma HLS UNROLL
 	  nentries_[ibx] = 0;
 	}
   }
 
-  void clear(BunchXingT bx) {nentries_[bx] = 0;}
+  void clear(BunchXingT bx) {
+#pragma HLS inline
+    nentries_[bx] = 0;
+  }
 
   unsigned int getDepth() const {return (1<<NBIT_ADDR);}
   unsigned int getNBX() const {return (1<<NBIT_BX);}
@@ -63,6 +67,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS dependence variable=nentries_ intra WAR true
+#pragma HLS inline
 
 	NEntryT nentry_ibx = nentries_[ibx];
 
