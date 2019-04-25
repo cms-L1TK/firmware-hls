@@ -66,9 +66,9 @@ public:
 
 	NEntryT nentry_ibx = nentries_[ibx];
 
-	if (nentry_ibx <= (1<<NBIT_ADDR)) {
+	if (enable && (nentry_ibx <= (1<<NBIT_ADDR))) {
 	  dataarray_[ibx][nentry_ibx] = data;
-	  if (enable) nentries_[ibx] = nentry_ibx + 1;
+	  nentries_[ibx] = nentry_ibx + 1;
 	  return true;
 	}
 	else {

@@ -13,7 +13,7 @@
 //////////////////////////////////////////////////////////////
 
 template<int layer, int part>
-void cleanmerger(
+void merger(
      // inputs
      CandidateMatch inA,
      bool validA,
@@ -333,11 +333,9 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> ncm8 = match8->getEntries(bx);
 
   // Count up total number of CMs *and protect incase of overflow)
-  //ap_uint<7> max   = kMaxProc;
-  //ap_uint<7> ncm = (ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8 > max)? max : ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
-  ap_uint<7> ncm;
-  if (ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8 > kMaxProc) ncm = kMaxProc;
-  else ncm = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8;
+  ap_uint<7> maximum = kMaxProc;
+  ap_uint<14> total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
+  ap_uint<7> ncm     = (total > maximum)? maximum : total.range(7,0);
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
@@ -446,7 +444,7 @@ void MatchCalculator(BXType bx,
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc+3; istep++)
   {
 
-#pragma HLS PIPELINE II=1
+#pragma HLS PIPELINE II=1 //rewind
 
     // pipeline variables
     bool read_L1_1_next = false;
@@ -523,9 +521,6 @@ void MatchCalculator(BXType bx,
     bool read8_next = false;
 
 
-    // Bool to signal last processing
-    bool last = (istep==(kMaxProc-1) || istep==(ncm-1))? true : false;
-
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------- MERGE INPUT CANDIDATE MATCHES --------------------------------------------
     //-----------------------------------------------------------------------------------------------------------
@@ -562,7 +557,7 @@ void MatchCalculator(BXType bx,
     bool valid8 = (addr8 < ncm8) && (ncm8 > 0);
 
     // merger Layer 1 Part 1
-    cleanmerger<1,1>(
+    merger<1,1>(
       cm1, valid1, cm2, valid2,                      // inputs: inA, validA, inB, validB
       cm_L1_1, valid_L1_1, read_L1_1,                // inputs: out, vout, inread from L2_1
       tmpA_L1_1, vA_L1_1, sA_L1_1,                   // tmp variables internal to L1_1 merger
@@ -574,7 +569,7 @@ void MatchCalculator(BXType bx,
     );
 
     // merger Layer 1 Part 2
-    cleanmerger<1,2>(
+    merger<1,2>(
       cm3, valid3, cm4, valid4,                      // inputs: inA, validA, inB, validB
       cm_L1_2, valid_L1_2, read_L1_2,                // inputs: out, vout, inread from L2_1
       tmpA_L1_2, vA_L1_2, sA_L1_2,                   // tmp variables internal to L1_2 merger
@@ -586,7 +581,7 @@ void MatchCalculator(BXType bx,
     );
 
     // merger Layer 1 Part 3 
-    cleanmerger<1,3>(
+    merger<1,3>(
       cm5, valid5, cm6, valid6,                      // inputs: inA, validA, inB, validB
       cm_L1_3, valid_L1_3, read_L1_3,                // inputs: out, vout, inread from L2_1
       tmpA_L1_3, vA_L1_3, sA_L1_3,                   // tmp variables internal to L1_3 merger
@@ -598,7 +593,7 @@ void MatchCalculator(BXType bx,
     );
 
     // merger Layer 1 Part 4  
-    cleanmerger<1,4>(
+    merger<1,4>(
       cm7, valid7, cm8, valid8,                      // inputs: inA, validA, inB, validB
       cm_L1_4, valid_L1_4, read_L1_4,                // inputs: out, vout, inread from L2_1
       tmpA_L1_4, vA_L1_4, sA_L1_4,                   // tmp variables internal to L1_4 merger
@@ -610,7 +605,7 @@ void MatchCalculator(BXType bx,
     );
 
     // merger Layer 2 Part 1
-    cleanmerger<2,1>(
+    merger<2,1>(
       cm_L1_1_next, valid_L1_1_next,                 // inputs: inA, validA
       cm_L1_2_next, valid_L1_2_next,                 // inputs: inB, validB
       cm_L2_1, valid_L2_1, read_L2_1,                // inputs: out, vout, inread from L3_1
@@ -623,7 +618,7 @@ void MatchCalculator(BXType bx,
     );
 
     // merger Layer 2 Part 2
-    cleanmerger<2,2>(
+    merger<2,2>(
       cm_L1_3_next, valid_L1_3_next,                 // inputs: inA, validA 
       cm_L1_4_next, valid_L1_4_next,                 // inputs: inB, validB
       cm_L2_2, valid_L2_2, read_L2_2,                // inputs: out, vout, inread from L3_1
@@ -636,7 +631,7 @@ void MatchCalculator(BXType bx,
     );
 
     // merger Layer 3 Part 1
-    cleanmerger<3,1>(
+    merger<3,1>(
       cm_L2_1_next, valid_L2_1_next,           // inputs: inA, validA 
       cm_L2_2_next, valid_L2_2_next,           // inputs: inB, validB
       datastream, valid_L3, true,              // inputs: out, vout, true inread because last layer
@@ -804,7 +799,7 @@ void MatchCalculator(BXType bx,
 
     // For first tracklet, pick up the phi cut value
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-
+  
     // Check that matches fall within the selection window of the projection 
     if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
       // Update values of best phi parameters, so that the next match
@@ -819,7 +814,7 @@ void MatchCalculator(BXType bx,
     else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
       bestmatch_next = FullMatch<FMTYPE>();
       goodmatch_next = false;
-      projseed_next  = 0;
+      projseed_next  = -1;
     }
     else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
       bestmatch_next = bestmatch;
@@ -841,20 +836,16 @@ void MatchCalculator(BXType bx,
     goodmatch      = goodmatch_next;
     projseed       = projseed_next;
 
-
-    /*
-    if (last){ // if this is the last iteration of loop, write out the current best also
-      if (goodmatch[istep]==true && projseed[istep]==0) fullmatch1->write_mem(bx,bestmatch[istep]); // L1L2 seed
-      if (goodmatch[istep]==true && projseed[istep]==1) fullmatch2->write_mem(bx,bestmatch[istep]); // L3L4 seed
-      if (goodmatch[istep]==true && projseed[istep]==2) fullmatch3->write_mem(bx,bestmatch[istep]); // L5L6 seed
-      if (goodmatch[istep]==true && projseed[istep]==3) fullmatch4->write_mem(bx,bestmatch[istep]); // D1D2 seed
-      if (goodmatch[istep]==true && projseed[istep]==4) fullmatch5->write_mem(bx,bestmatch[istep]); // D3D4 seed
-      if (goodmatch[istep]==true && projseed[istep]==5) fullmatch6->write_mem(bx,bestmatch[istep]); // L1D1 seed
-      if (goodmatch[istep]==true && projseed[istep]==6) fullmatch7->write_mem(bx,bestmatch[istep]); // L2D1 seed
-    }
-    */
-
   }// end MC_LOOP 
+
+  // finish by writing out the last match made (to minimize truncation)
+  fullmatch1->write_mem(bx,bestmatch,(goodmatch=true && projseed==0)); // L1L2 seed
+  fullmatch2->write_mem(bx,bestmatch,(goodmatch=true && projseed==1)); // L3L4 seed
+  fullmatch3->write_mem(bx,bestmatch,(goodmatch=true && projseed==2)); // L5L6 seed
+  fullmatch4->write_mem(bx,bestmatch,(goodmatch=true && projseed==3)); // D1D2 seed
+  fullmatch5->write_mem(bx,bestmatch,(goodmatch=true && projseed==4)); // D3D4 seed
+  fullmatch6->write_mem(bx,bestmatch,(goodmatch=true && projseed==5)); // L1D1 seed
+  fullmatch7->write_mem(bx,bestmatch,(goodmatch=true && projseed==6)); // L2D1 seed
 
 }// end MatchCalculator
 
