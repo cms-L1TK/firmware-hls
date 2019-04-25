@@ -86,7 +86,7 @@ int main() {
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
-    cout << "Event: " << dec << ievt << endl;
+    //cout << "Event: " << dec << ievt << endl;
 
     // make memories from the input text files
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);

@@ -8,7 +8,6 @@
 #include "AllStubMemory.hh"
 #include "AllProjectionMemory.hh"
 #include "FullMatchMemory.hh"
-//#include "merger.hh"
 
 //////////////////////////////////////////////////////////////
 
@@ -46,7 +45,6 @@ void merger(
 #pragma HLS interface ap_ctrl_none port=return 
 #pragma HLS interface ap_ctrl_none port=inA,validA,inB,validB,out,vout,inread,A,vA,sA,B,vB,sB 
 #pragma HLS interface ap_ctrl_none port=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,voutnext 
-//#pragma HLS dependence variable=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,outnext,voutnext,readA,readB intra false
 
     // Set read enables for A and B
     *readA = (((inread || !vout) && sA) || !vA) && validA;
@@ -127,29 +125,7 @@ void merger(
         break;
     }
 
-  //std::cout << "Layer: " << layer << " " << part << " , state: " << state << std::endl;
-  //std::cout << "---Reads: (A,B,vout,inread) " << readA << " " << readB << " " << vout << " " << inread << std::endl; 
-  //std::cout << "---In: " << inA.raw() << " " << validA << " " << inB.raw() << " " << validB << std::endl;
-  //std::cout << "---Out: " << out.raw() << " " << *voutnext << std::endl;
-
 }
-
-//////////////////////////////////////////////////////////////
-
-// Pipeline reads
-
-template<typename T>
-T pipeline_read(T in)
-{
-
-#pragma HLS inline off
-//#pragma HLS interface register port=in
-//#pragma HLS interface register port=return
-
-  T out = in;
-  return out;
-
-};
 
 //////////////////////////////////////////////////////////////
 
@@ -271,10 +247,6 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch6,
                      FullMatchMemory<FMTYPE>* fullmatch7
 ){
-
-//#pragma HLS pipeline II=108
-//#pragma HLS latency max=140
-
 
   // Reset output memories
   fullmatch1->clear(bx);
@@ -428,17 +400,10 @@ void MatchCalculator(BXType bx,
   // Setup candidate match data stream that goes into match calculations
   CandidateMatch datastream = CandidateMatch();
 
-  // Setup dummy index to be used in the comparison
-  CandidateMatch::CMProjIndex dummy = -1; 
-
-
   // Full match shift register to store best match
   typename AllProjection<APTYPE>::AProjTCSEED projseed;
   FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
   bool goodmatch                   = false;
-  //typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
-  //FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
-  //bool goodmatch_next              = false;
 
   // Processing starts
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc+3; istep++)

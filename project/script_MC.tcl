@@ -21,20 +21,13 @@ add_files -tb ../emData/MC/
 
 # solutions
 open_solution "solution1"
-#set_part $part -tool vivado
 source set_fpga.tcl
 create_clock -period $clockperiod -name default
-#source "directives_MC.tcl"
 
-#set_part {xcku115-flvb2104-2-e} -tool vivado
-#create_clock -period 10 -name default
-#source "./match_calc/solution1/directives.tcl"
 csim_design
 csynth_design
 cosim_design 
-#cosim design -O -mflags "-j9 -k"
 #export_design -format ip_catalog
-
 
 # exit vivado_hls
 quit
