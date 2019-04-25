@@ -44,6 +44,7 @@ public:
   void clear()
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS inline
 	
 	for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
 #pragma HLS UNROLL
@@ -54,6 +55,7 @@ public:
   void clear(BunchXingT bx)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS inline
 	
 	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
 #pragma HLS UNROLL
@@ -100,6 +102,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS dependence variable=nentries_ intra WAR true
+#pragma HLS inline
 
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
