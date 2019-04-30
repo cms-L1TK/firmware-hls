@@ -248,15 +248,6 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch7
 ){
 
-  // Reset output memories
-  fullmatch1->clear(bx);
-  fullmatch2->clear(bx);
-  fullmatch3->clear(bx);
-  fullmatch4->clear(bx);
-  fullmatch5->clear(bx);
-  fullmatch6->clear(bx);
-  fullmatch7->clear(bx);
-
   // Initialization
  
   // Setup constants depending on which layer/disk working on
@@ -294,20 +285,17 @@ void MatchCalculator(BXType bx,
   CandidateMatch::CMProjIndex id;
   CandidateMatch::CMProjIndex id_next;
 
-  // Pick up number of candidate matches for each CM memory
-  ap_uint<kNBits_MemAddr> ncm1 = match1->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm2 = match2->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm3 = match3->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm4 = match4->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm5 = match5->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm6 = match6->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm7 = match7->getEntries(bx);
-  ap_uint<kNBits_MemAddr> ncm8 = match8->getEntries(bx);
-
-  // Count up total number of CMs *and protect incase of overflow)
+  ap_uint<kNBits_MemAddr> ncm1 = 0; 
+  ap_uint<kNBits_MemAddr> ncm2 = 0;
+  ap_uint<kNBits_MemAddr> ncm3 = 0;
+  ap_uint<kNBits_MemAddr> ncm4 = 0;
+  ap_uint<kNBits_MemAddr> ncm5 = 0;
+  ap_uint<kNBits_MemAddr> ncm6 = 0;
+  ap_uint<kNBits_MemAddr> ncm7 = 0;
+  ap_uint<kNBits_MemAddr> ncm8 = 0;
   ap_uint<7> maximum = kMaxProc;
-  ap_uint<14> total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
-  ap_uint<7> ncm     = (total > maximum)? maximum : total.range(7,0);
+  ap_uint<14> total  = 0;
+  ap_uint<7> ncm = 0;
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
@@ -405,11 +393,28 @@ void MatchCalculator(BXType bx,
   FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
   bool goodmatch                   = false;
 
-  // Processing starts
-  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc+3; istep++)
+
+  //-----------------------------------------------------------------------------------------------------------
+  //-------------------------------- DATA PROCESSING STARTS ---------------------------------------------------
+  //-----------------------------------------------------------------------------------------------------------
+  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
   {
 
-#pragma HLS PIPELINE II=1 //rewind
+#pragma HLS PIPELINE II=1 rewind
+
+    // Pick up number of candidate matches for each CM memory
+    ncm1 = match1->getEntries(bx);
+    ncm2 = match2->getEntries(bx);
+    ncm3 = match3->getEntries(bx);
+    ncm4 = match4->getEntries(bx);
+    ncm5 = match5->getEntries(bx);
+    ncm6 = match6->getEntries(bx);
+    ncm7 = match7->getEntries(bx);
+    ncm8 = match8->getEntries(bx);
+
+    // Count up total number of CMs *and protect incase of overflow)
+    total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
+    ncm    = (total > maximum)? maximum : total.range(7,0);
 
     // pipeline variables
     bool read_L1_1_next = false;
@@ -787,14 +792,25 @@ void MatchCalculator(BXType bx,
       projseed_next  = projseed;
     }
 
-    // Write out only the best match, based on the seeding
-    fullmatch1->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-    fullmatch2->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
-    fullmatch3->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
-    fullmatch4->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
-    fullmatch5->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
-    fullmatch6->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
-    fullmatch7->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+    if (istep==0){
+      // Reset output memories
+      fullmatch1->clear(bx);
+      fullmatch2->clear(bx);
+      fullmatch3->clear(bx);
+      fullmatch4->clear(bx);
+      fullmatch5->clear(bx);
+      fullmatch6->clear(bx);
+      fullmatch7->clear(bx);
+    }
+    else{ // Write out only the best match, based on the seeding 
+      fullmatch1->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      fullmatch2->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
+      fullmatch3->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
+      fullmatch4->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
+      fullmatch5->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
+      fullmatch6->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
+      fullmatch7->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+    }
 
     // pipeline the bestmatch registers 
     bestmatch      = bestmatch_next;
@@ -803,7 +819,8 @@ void MatchCalculator(BXType bx,
 
   }// end MC_LOOP 
 
-  // finish by writing out the last match made (to minimize truncation)
+  /*
+  // finish by writing out the last match made (to minimize truncation) -- can't do this because not in the loop 
   fullmatch1->write_mem(bx,bestmatch,(goodmatch=true && projseed==0)); // L1L2 seed
   fullmatch2->write_mem(bx,bestmatch,(goodmatch=true && projseed==1)); // L3L4 seed
   fullmatch3->write_mem(bx,bestmatch,(goodmatch=true && projseed==2)); // L5L6 seed
@@ -811,6 +828,7 @@ void MatchCalculator(BXType bx,
   fullmatch5->write_mem(bx,bestmatch,(goodmatch=true && projseed==4)); // D3D4 seed
   fullmatch6->write_mem(bx,bestmatch,(goodmatch=true && projseed==5)); // L1D1 seed
   fullmatch7->write_mem(bx,bestmatch,(goodmatch=true && projseed==6)); // L2D1 seed
+  */
 
 }// end MatchCalculator
 
