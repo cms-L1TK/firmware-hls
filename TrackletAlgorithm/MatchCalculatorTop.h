@@ -4,19 +4,24 @@
 #include "MatchCalculator.hh"
 
 void MatchCalculatorTop(BXType bx,
-                        const CandidateMatchMemory* const,
-                        const CandidateMatchMemory* const, 
-                        const CandidateMatchMemory* const, 
-                        const CandidateMatchMemory* const, 
-                        const CandidateMatchMemory* const, 
-                        const CandidateMatchMemory* const, 
-                        const CandidateMatchMemory* const, 
-                        const CandidateMatchMemory* const,
-                        const AllStubMemory<BARRELPS>* const,
-                        const AllProjectionMemory<BARRELPS>* const,
+                        const CandidateMatchMemory*,
+                        const CandidateMatchMemory*, 
+                        const CandidateMatchMemory*, 
+                        const CandidateMatchMemory*, 
+                        const CandidateMatchMemory*, 
+                        const CandidateMatchMemory*, 
+                        const CandidateMatchMemory*, 
+                        const CandidateMatchMemory*,
+                        const AllStubMemory<BARRELPS>*,
+                        const AllProjectionMemory<BARRELPS>*,
                         BXType&,
-                        FullMatchMemory<BARREL>* const,
-                        FullMatchMemory<BARREL>* const
+                        FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*
                        );
 
 #endif
