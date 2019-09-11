@@ -1,5 +1,5 @@
-// ProjectionRouter test bench
-#include "TrackletEngine.h"
+// TrackletEngine test bench
+#include "TrackletEngineTop.h"
 #include "StubPairMemory.hh"
 #include "VMStubTEInnerMemory.hh"
 #include "VMStubTEOuterMemory.hh"
@@ -53,12 +53,7 @@ int main(){
 
 
     // Unit Under Test
-    TrackletEngine(
-		   bx,
-		   inputvmstubsinner,
-		   inputvmstubsouter,
-		   outputstubpairs
-		   );
+    TrackletEngineTop(bx, inputvmstubsinner, inputvmstubsouter, outputstubpairs);
     
     // compare calculated outputs with those read from emulation printout
     err_count += compareMemWithFile<StubPairMemory>(outputstubpairs,fin_stubpairs,ievt,"StubPair");

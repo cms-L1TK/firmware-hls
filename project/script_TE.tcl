@@ -1,16 +1,20 @@
-############################################################
-## This file is generated automatically by Vivado HLS.
-## Please DO NOT edit it.
-## Copyright (C) 1986-2017 Xilinx, Inc. All Rights Reserved.
-############################################################
+# WARNING: this will wipe out the original project by the same name
+
+# set clock 250 MHz
+set clockperiod 4
+
+# delete old project
+delete_project trackletengine
+
+# make new project
 open_project -reset trackletengine
-set_top TrackletEngine
-add_files ../TrackletAlgorithm/TrackletEngine.cpp -cflags "-std=c++11"
+set_top TrackletEngineTop
+add_files ../TrackletAlgorithm/TrackletEngineTop.cpp -cflags "-std=c++11"
 
 add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/TE
 open_solution -reset "solution1"
 source set_fpga.tcl
-create_clock -period 4 -name default
+create_clock -period $clockperiod -name default
 
 #exit
