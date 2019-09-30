@@ -95,10 +95,10 @@ namespace TC {
 
   template<regionType TProjType, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID, const bool success);
 
-  template<uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11> void
+  template<uint8_t NSPMem> void
   getIndices(
       const BXType bx,
-      const StubPairMemory stubPairs00[NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11],
+      const StubPairMemory stubPairs[NSPMem],
       TC::Types::nSPMem &iSPMem,
       TC::Types::nSP &iSP,
       bool &done
@@ -152,12 +152,12 @@ namespace TC {
   template<uint32_t TPROJMask, class T, class... Args> void clearMemories(const BXType bx, T mem, Args... args);
 }
 
-template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint32_t TPROJMask, uint16_t N> void
+template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem, uint16_t ASInnerMask, uint16_t ASOuterMask, uint32_t TPROJMask, uint16_t N> void
 TrackletCalculator_L1L2(
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[NASMemInner],
     const AllStubMemory<BARRELPS> outerStubs[NASMemOuter],
-    const StubPairMemory stubPairs[NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11],
+    const StubPairMemory stubPairs[NSPMem],
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> * const projout_L3PHIA,
     TrackletProjectionMemory<BARRELPS> * const projout_L3PHIB,
@@ -380,10 +380,10 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
   return (success && proj_success);
 }
 
-template<uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11> void
+template<uint8_t NSPMem> void
 TC::getIndices(
     const BXType bx,
-    const StubPairMemory stubPairs[NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11],
+    const StubPairMemory stubPairs[NSPMem],
     TC::Types::nSPMem &iSPMem,
     TC::Types::nSP &iSP,
     bool &done
@@ -396,14 +396,14 @@ TC::getIndices(
 
 // Determine the correct stub-pair memory and stub-pair index given the global
 // index initially stored in iSP.
-  index: for (TC::Types::nSPMem j = 0; j < NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11; j++) {
+  index: for (TC::Types::nSPMem j = 0; j < NSPMem; j++) {
     if (!set && iSP >= stubPairs[j].getEntries(bx))
       iSP -= stubPairs[j].getEntries(bx), iSPMem++;
     else
       set = true;
   }
 
-  done = !set || iSPMem >= NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11;
+  done = !set || iSPMem >= NSPMem;
 }
 
 template<TC::seed Seed, uint32_t TPROJMask> void
@@ -513,12 +513,12 @@ TC::clearMemories(const BXType bx, T mem, Args... args)
 }
 
 // This is the primary interface for the TrackletCalculator.
-template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem00, uint8_t NSPMem01, uint8_t NSPMem10, uint8_t NSPMem11, uint32_t TPROJMask, uint16_t N> void
+template<TC::itc iTC, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem, uint16_t ASInnerMask, uint16_t ASOuterMask, uint32_t TPROJMask, uint16_t N> void
 TrackletCalculator_L1L2(
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[NASMemInner],
     const AllStubMemory<BARRELPS> outerStubs[NASMemOuter],
-    const StubPairMemory stubPairs[NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11],
+    const StubPairMemory stubPairs[NSPMem],
     TrackletParameterMemory * const trackletParameters,
 
 // The validity of each of the TPROJ memories is determined by TPROJMask. The
@@ -580,22 +580,17 @@ TrackletCalculator_L1L2(
 #pragma HLS pipeline II=1
 
     iSP = i;
-    TC::getIndices<NSPMem00, NSPMem01, NSPMem10, NSPMem11>(bx, stubPairs, iSPMem, iSP, done);
+    TC::getIndices<NSPMem>(bx, stubPairs, iSPMem, iSP, done);
 
     if (!done) {
 // Retrieve the inner and outer stubs for this stub pair, determining which
 // all-stubs memory to use based on iSPMem:
-//   [0, NSPMem00):        inner stub from innerStubs[0], outer stub from outerStubs[0]
-//   [NSPMem00, NSPMem01): inner stub from innerStubs[1], outer stub from outerStubs[0]
-//   [NSPMem01, NSPMem10): inner stub from innerStubs[0], outer stub from outerStubs[1]
-//   [NSPMem10, NSPMem11): inner stub from innerStubs[1], outer stub from outerStubs[1]
       innerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getInnerIndex();
       outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
-      const AllStub<BARRELPS> &innerStub = (iSPMem < NSPMem00 + NSPMem01 ? innerStubs[0].read_mem(bx, innerIndex) : innerStubs[1].read_mem(bx, innerIndex));
-      const AllStub<BARRELPS> &outerStub = (iSPMem < NSPMem00 || (iSPMem >= NSPMem00 + NSPMem01 && iSPMem < NSPMem00 + NSPMem01 + NSPMem10) ? outerStubs[0].read_mem(bx, outerIndex) : outerStubs[1].read_mem(bx, outerIndex));
+      const AllStub<BARRELPS> &innerStub = innerStubs[(ASInnerMask & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
+      const AllStub<BARRELPS> &outerStub = outerStubs[(ASOuterMask & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
 
       TC::processStubPair<TC::L1L2, TPROJMask>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_L3PHIA, projout_L3PHIB, projout_L3PHIC, projout_L3PHID, projout_L4PHIA, projout_L4PHIB, projout_L4PHIC, projout_L4PHID, projout_L5PHIA, projout_L5PHIB, projout_L5PHIC, projout_L5PHID, projout_L6PHIA, projout_L6PHIB, projout_L6PHIC, projout_L6PHID, projout_D1PHIA, projout_D1PHIB, projout_D1PHIC, projout_D1PHID, projout_D2PHIA, projout_D2PHIB, projout_D2PHIC, projout_D2PHID, projout_D3PHIA, projout_D3PHIB, projout_D3PHIC, projout_D3PHID, projout_D4PHIA, projout_D4PHIB, projout_D4PHIC, projout_D4PHID);
     }
   }
 }
-
