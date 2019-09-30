@@ -12,12 +12,8 @@ const int nevents = 100;  //number of events to run
 
 using namespace std;
 
-int main(int argc, char *argv[])
+int main()
 {
-  // toggle truncation
-  bool truncate = argc < 2 || strcmp(argv[1], "0");
-  cout << "Truncation: " << (truncate ? "ON" : "OFF") << endl;
-
   // error counts
   int err = 0;
 
@@ -56,7 +52,7 @@ int main(int argc, char *argv[])
   // open input files
   cout << "Open files..." << endl;
 
-  const string dir = (truncate ? "TC_L1L2E_truncated" : "TC_L1L2E");
+  const string dir = "TC_L1L2E";
 
   ifstream fin_innerStubs0;
   if (not openDataFile(fin_innerStubs0, dir + "/AllStubs_AS_L1PHICn3_04.dat")) return -1;
@@ -205,99 +201,34 @@ int main(int argc, char *argv[])
     // bx
     BXType bx = ievt;
 
-    const uint8_t NASMemInner = 2;
-    const uint8_t NASMemOuter = 1;
-    const uint8_t NSPMem00 = 5;
-    const uint8_t NSPMem01 = 0;
-    const uint8_t NSPMem10 = 8;
-    const uint8_t NSPMem11 = 0;
-
-    // This is the maximum number of stub pairs, if every stub pair memory is
-    // filled to capacity.
-    const uint16_t N = (NSPMem00 + NSPMem01 + NSPMem10 + NSPMem11) * (1 << kNBits_MemAddr);
-
-    void (*TC) (
-        const BXType,
-        const AllStubMemory<BARRELPS> [],
-        const AllStubMemory<BARRELPS> [],
-        const StubPairMemory [],
-        TrackletParameterMemory * const,
-        TrackletProjectionMemory<BARRELPS> * const,
-        TrackletProjectionMemory<BARRELPS> * const,
-        TrackletProjectionMemory<BARRELPS> * const,
-        TrackletProjectionMemory<BARRELPS> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<BARREL2S> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const,
-        TrackletProjectionMemory<DISK> * const
-    );
-
-    // The last parameter is how many stub pairs to process.
-    if (truncate)
-      TC = &TrackletCalculator_L1L2E;
-    else
-      TC = &TrackletCalculator_L1L2<TC::E, NASMemInner, NASMemOuter, NSPMem00, NSPMem01, NSPMem10, NSPMem11, 0x77777772, N>;
-
     // Unit Under Test
-    TC(bx, innerStubs, outerStubs, stubPairs,
+    TrackletCalculator_L1L2E(bx, innerStubs, outerStubs, stubPairs,
        &tpar,
-       NULL,
        &tproj_L3PHIB,
-       NULL,
-       NULL,
        &tproj_L4PHIA,
        &tproj_L4PHIB,
        &tproj_L4PHIC,
-       NULL,
        &tproj_L5PHIA,
        &tproj_L5PHIB,
        &tproj_L5PHIC,
-       NULL,
        &tproj_L6PHIA,
        &tproj_L6PHIB,
        &tproj_L6PHIC,
-       NULL,
        &tproj_D1PHIA,
        &tproj_D1PHIB,
        &tproj_D1PHIC,
-       NULL,
        &tproj_D2PHIA,
        &tproj_D2PHIB,
        &tproj_D2PHIC,
-       NULL,
        &tproj_D3PHIA,
        &tproj_D3PHIB,
        &tproj_D3PHIC,
-       NULL,
        &tproj_D4PHIA,
        &tproj_D4PHIB,
-       &tproj_D4PHIC,
-       NULL
+       &tproj_D4PHIC
     );
+
+    bool truncate;
 
     // compare the computed outputs with the expected ones
     err += compareMemWithFile<TrackletParameterMemory>(tpar, fout_tpar, ievt,
