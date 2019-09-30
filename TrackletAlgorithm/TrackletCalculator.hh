@@ -473,6 +473,9 @@ TC::processStubPair(
 )
 {
 #pragma HLS inline
+
+  static_assert(Seed == TC::L1L2, "Only L1L2 has been implemented so far.");
+
   TC::Types::rinv rinv;
   TrackletParameters::PHI0PAR phi0;
   TrackletParameters::Z0PAR z0;
