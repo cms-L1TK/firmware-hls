@@ -29,5 +29,5 @@ The correct versions of imath and fpga_emulation_longVM can be checked out and b
 	git checkout AH_181201
 	make -j5
 	cd ../fpga_emulation_longVM/
-	git checkout ZT_181203
+	git checkout AH_190930
 	make fpga
