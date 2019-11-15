@@ -81,6 +81,19 @@ public:
 	}
   }
 
+  bool write_mem(BunchXingT ibx, DataType data, int addr_index)
+  {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS inline
+    if (addr_index <= (1<<NBIT_ADDR)) {
+      dataarray_[ibx][addr_index] = data;
+      nentries_[ibx] = addr_index + 1;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
   

@@ -138,7 +138,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   for (int i = 0; i < memory_ref.getEntries(ievt); ++i) {
 
     // Maximum processing steps per event is kMaxProc
-    if (i >= kMaxProc) {
+    if (i >= kMaxProc-10) {
       std::cout << "WARNING: Extra data in the reference memory!" << std::endl;
       std::cout << "Truncation due to maximum number of processing steps per event kMaxProc = " << std::dec << kMaxProc << std::endl;
       truncated = true;
