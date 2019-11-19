@@ -62,7 +62,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L1L2G_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L1L2G_L3PHIC_04_mod.dat")
 ) TPROJ_L1L2XXG_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -109,7 +109,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L1L2H_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L1L2H_L3PHIC_04_mod.dat")
 ) TPROJ_L1L2XXH_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -156,7 +156,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L5L6B_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L5L6B_L3PHIC_04_mod.dat")
 ) TPROJ_L5L6XXB_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -203,7 +203,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L5L6C_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L5L6C_L3PHIC_04_mod.dat")
 ) TPROJ_L5L6XXC_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -250,7 +250,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L5L6D_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L5L6D_L3PHIC_04_mod.dat")
 ) TPROJ_L5L6XXD_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -297,7 +297,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L1L2F_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L1L2F_L3PHIC_04_mod.dat")
 ) TPROJ_L1L2XXF_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -344,7 +344,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L1L2J_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L1L2J_L3PHIC_04_mod.dat")
 ) TPROJ_L1L2XXJ_L3PHIC (
   .clka(clk),
   .clkb(clk),
@@ -391,7 +391,7 @@ Memory #(
   .RAM_DEPTH(256),
   .RAM_PERFORMANCE("HIGH_PERFORMANCE"),
   .HEX(0),
-  .INIT_FILE("/mnt/scratch/djc448/firmware-tests/PR_Test/sourceFiles/TrackletProjections_TPROJ_L1L2I_L3PHIC_04_mod.dat")
+  .INIT_FILE("/mnt/scratch/djc448/firmware-hls/IntegrationTests/PR_Test/emData/TrackletProjections_TPROJ_L1L2I_L3PHIC_04_mod.dat")
 ) TPROJ_L1L2XXI_L3PHIC (
   .clka(clk),
   .clkb(clk),
