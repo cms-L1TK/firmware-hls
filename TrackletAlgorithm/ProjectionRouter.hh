@@ -130,6 +130,11 @@ namespace PR
   
   // number of VMs in one allstub block for each disk
   constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
+
+  // Number of loop iterations subtracted from the full 108 so that the function
+  // stays synchronized with other functions in the chain. Once we get these
+  // functions to rewind correctly, this can be set to zero (or simply removed)
+  constexpr unsigned int LoopItersCut = 7; 
   
 } // namesapce PR
 
@@ -219,7 +224,7 @@ void ProjectionRouter(BXType bx,
   int nvmprojout8 = 0;  
   int nallproj = 0;
 
-  PROC_LOOP: for (int i = 0; i < kMaxProc-7; ++i) {
+  PROC_LOOP: for (int i = 0; i < kMaxProc-LoopItersCut; ++i) {
 #pragma HLS PIPELINE II=1
 
     // read inputs
@@ -359,7 +364,7 @@ void ProjectionRouter(BXType bx,
       nallproj ++;
     }
 
-    if (i==kMaxProc-8) bx_o = bx;
+    if (i==kMaxProc-LoopItersCut-1) bx_o = bx;
  
   } // end of PROC_LOOP
   
