@@ -63,24 +63,6 @@ public:
 	return dataarray_[ibx][index];
   }
 
-//  bool write_mem(BunchXingT ibx, DataType data, const bool enable = true)
-//  {
-//#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-//#pragma HLS dependence variable=nentries_ intra WAR true
-//#pragma HLS inline
-//
-//	NEntryT nentry_ibx = nentries_[ibx];
-//
-//	if (enable && (nentry_ibx <= (1<<NBIT_ADDR))) {
-//	  dataarray_[ibx][nentry_ibx] = data;
-//	  nentries_[ibx] = nentry_ibx + 1;
-//	  return true;
-//	}
-//	else {
-//	  return false;
-//	}
-//  }
-
   bool write_mem(BunchXingT ibx, DataType data, int addr_index)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
