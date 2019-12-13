@@ -334,8 +334,8 @@ initial begin
   TPROJ_L1L2XXG_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_0 = 8'b00001001; // 13
-reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_1 = 8'b00001101; // 9
+reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_0 = 8'b00001110; // 14
+reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_1 = 8'b00001001; // 9
 assign TPROJ_L1L2XXG_L3PHIC_nentries_0_V_din = TPROJ_L1L2XXG_L3PHIC_nentreg_0;
 assign TPROJ_L1L2XXG_L3PHIC_nentries_1_V_din = TPROJ_L1L2XXG_L3PHIC_nentreg_1;
 
