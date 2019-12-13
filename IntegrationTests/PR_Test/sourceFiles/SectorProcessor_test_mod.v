@@ -52,8 +52,8 @@ initial begin
   TPROJ_L1L2XXH_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L1L2XXH_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L1L2XXH_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L1L2XXH_L3PHIC_nentreg_0 = 8'b00001010; // 10
+reg[7:0] TPROJ_L1L2XXH_L3PHIC_nentreg_1 = 8'b00000100; // 4
 assign TPROJ_L1L2XXH_L3PHIC_nentries_0_V_din = TPROJ_L1L2XXH_L3PHIC_nentreg_0;
 assign TPROJ_L1L2XXH_L3PHIC_nentries_1_V_din = TPROJ_L1L2XXH_L3PHIC_nentreg_1;
 
@@ -99,8 +99,8 @@ initial begin
   TPROJ_L5L6XXC_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L5L6XXC_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L5L6XXC_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L5L6XXC_L3PHIC_nentreg_0 = 8'b00000000; // 0
+reg[7:0] TPROJ_L5L6XXC_L3PHIC_nentreg_1 = 8'b00000000; // 0
 assign TPROJ_L5L6XXC_L3PHIC_nentries_0_V_din = TPROJ_L5L6XXC_L3PHIC_nentreg_0;
 assign TPROJ_L5L6XXC_L3PHIC_nentries_1_V_din = TPROJ_L5L6XXC_L3PHIC_nentreg_1;
 
@@ -146,8 +146,8 @@ initial begin
   TPROJ_L1L2XXI_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L1L2XXI_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L1L2XXI_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L1L2XXI_L3PHIC_nentreg_0 = 8'b00000010; // 2
+reg[7:0] TPROJ_L1L2XXI_L3PHIC_nentreg_1 = 8'b00000000; // 0
 assign TPROJ_L1L2XXI_L3PHIC_nentries_0_V_din = TPROJ_L1L2XXI_L3PHIC_nentreg_0;
 assign TPROJ_L1L2XXI_L3PHIC_nentries_1_V_din = TPROJ_L1L2XXI_L3PHIC_nentreg_1;
 
@@ -193,8 +193,8 @@ initial begin
   TPROJ_L5L6XXB_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L5L6XXB_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L5L6XXB_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L5L6XXB_L3PHIC_nentreg_0 = 8'b00000000; // 0
+reg[7:0] TPROJ_L5L6XXB_L3PHIC_nentreg_1 = 8'b00000000; // 0
 assign TPROJ_L5L6XXB_L3PHIC_nentries_0_V_din = TPROJ_L5L6XXB_L3PHIC_nentreg_0;
 assign TPROJ_L5L6XXB_L3PHIC_nentries_1_V_din = TPROJ_L5L6XXB_L3PHIC_nentreg_1;
 
@@ -240,8 +240,8 @@ initial begin
   TPROJ_L5L6XXD_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L5L6XXD_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L5L6XXD_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L5L6XXD_L3PHIC_nentreg_0 = 8'b00000001; // 1
+reg[7:0] TPROJ_L5L6XXD_L3PHIC_nentreg_1 = 8'b00000001; // 1
 assign TPROJ_L5L6XXD_L3PHIC_nentries_0_V_din = TPROJ_L5L6XXD_L3PHIC_nentreg_0;
 assign TPROJ_L5L6XXD_L3PHIC_nentries_1_V_din = TPROJ_L5L6XXD_L3PHIC_nentreg_1;
 
@@ -287,8 +287,8 @@ initial begin
   TPROJ_L1L2XXJ_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L1L2XXJ_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L1L2XXJ_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L1L2XXJ_L3PHIC_nentreg_0 = 8'b00000001; // 1
+reg[7:0] TPROJ_L1L2XXJ_L3PHIC_nentreg_1 = 8'b00000000; // 0
 assign TPROJ_L1L2XXJ_L3PHIC_nentries_0_V_din = TPROJ_L1L2XXJ_L3PHIC_nentreg_0;
 assign TPROJ_L1L2XXJ_L3PHIC_nentries_1_V_din = TPROJ_L1L2XXJ_L3PHIC_nentreg_1;
 
@@ -334,8 +334,8 @@ initial begin
   TPROJ_L1L2XXG_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_0 = 8'b00001001; // 13
+reg[7:0] TPROJ_L1L2XXG_L3PHIC_nentreg_1 = 8'b00001101; // 9
 assign TPROJ_L1L2XXG_L3PHIC_nentries_0_V_din = TPROJ_L1L2XXG_L3PHIC_nentreg_0;
 assign TPROJ_L1L2XXG_L3PHIC_nentries_1_V_din = TPROJ_L1L2XXG_L3PHIC_nentreg_1;
 
@@ -381,8 +381,8 @@ initial begin
   TPROJ_L1L2XXF_L3PHIC_nentries_1_V_we = 1'b1;
 end
 
-reg[7:0] TPROJ_L1L2XXF_L3PHIC_nentreg_0 = 8'b00001001; // FIX
-reg[7:0] TPROJ_L1L2XXF_L3PHIC_nentreg_1 = 8'b00001001; // FIX
+reg[7:0] TPROJ_L1L2XXF_L3PHIC_nentreg_0 = 8'b00000000; // 0
+reg[7:0] TPROJ_L1L2XXF_L3PHIC_nentreg_1 = 8'b00000000; // 0
 assign TPROJ_L1L2XXF_L3PHIC_nentries_0_V_din = TPROJ_L1L2XXF_L3PHIC_nentreg_0;
 assign TPROJ_L1L2XXF_L3PHIC_nentries_1_V_din = TPROJ_L1L2XXF_L3PHIC_nentreg_1;
 
