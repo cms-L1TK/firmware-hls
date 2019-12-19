@@ -8,9 +8,9 @@ open_solution -reset "solution1"
 source set_fpga.tcl
 create_clock -period 4 -name default
 #source "./projrouter/solution1/directives.tcl"
-#csim_design -compiler gcc
-#csynth_design
-#cosim_design
-#export_design -rtl verilog -format ip_catalog
+csim_design -compiler gcc
+csynth_design
+cosim_design
+export_design -rtl verilog -format ip_catalog
 
-#exit
+exit

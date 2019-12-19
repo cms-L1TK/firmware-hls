@@ -21,6 +21,16 @@ void ProjectionRouterTop(BXType bx,
                          VMProjectionMemory<BARREL>* vmproj8
                          )
 {
+ #pragma HLS inline off
+ #pragma HLS interface register port=bx_o
+ #pragma HLS resource variable=tproj1 latency=2
+ #pragma HLS resource variable=tproj2 latency=2
+ #pragma HLS resource variable=tproj3 latency=2
+ #pragma HLS resource variable=tproj4 latency=2
+ #pragma HLS resource variable=tproj5 latency=2
+ #pragma HLS resource variable=tproj6 latency=2
+ #pragma HLS resource variable=tproj7 latency=2
+ #pragma HLS resource variable=tproj8 latency=2
   // PR_L3PHIC
  PR_L3PHIC: ProjectionRouter<BARRELPS, BARREL, 8, 3, 0>
     (bx,

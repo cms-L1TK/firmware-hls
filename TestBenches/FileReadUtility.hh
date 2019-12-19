@@ -115,7 +115,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
 template<class MemType, int base=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
-                                bool& truncated)
+                                bool& truncated, int maxProc = kMaxProc)
 {
   unsigned int err_count = 0;
 
@@ -138,9 +138,9 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   for (int i = 0; i < memory_ref.getEntries(ievt); ++i) {
 
     // Maximum processing steps per event is kMaxProc
-    if (i >= kMaxProc) {
+    if (i >= maxProc) {
       std::cout << "WARNING: Extra data in the reference memory!" << std::endl;
-      std::cout << "Truncation due to maximum number of processing steps per event kMaxProc = " << std::dec << kMaxProc << std::endl;
+      std::cout << "Truncation due to maximum number of processing steps per event maxProc = " << std::dec << maxProc << std::endl;
       truncated = true;
       break;
     }
@@ -184,7 +184,7 @@ template<class MemType, int base=16>
 unsigned int compareBinnedMemWithFile(const MemType& memory, 
                                       std::ifstream& fout,
                                       int ievt, const std::string& label,
-                                      bool& truncated)
+                                      bool& truncated, int maxProc = kMaxProc)
 {
   unsigned int err_count = 0;
 
@@ -212,9 +212,9 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
     for (int i = 0; i < val ; ++i) {
 
       // Maximum processing steps per event is kMaxProc
-      if (i >= kMaxProc) {
+      if (i >= maxProc) {
 	std::cout << "WARNING: Extra data in the reference memory!" << std::endl;
-	std::cout << "Truncation due to maximum number of processing steps per event kMaxProc = " << std::dec << kMaxProc << std::endl;
+	std::cout << "Truncation due to maximum number of processing steps per event maxProc = " << std::dec << maxProc << std::endl;
 	truncated = true;
 	break;
       }

@@ -80,7 +80,7 @@ void readTable(bool table[256]){
 
 //Attempt at new version of code
 template<int L, regionType VMSMEType>
-void MatchEngine(const ap_uint<3> bx,
+void MatchEngine(const BXType bx, BXType& bx_o,
 		 const VMStubMEMemory<VMSMEType>* const instubdata,
 		 const VMProjectionMemory<BARREL>* const inprojdata,
 		 CandidateMatchMemory* const outcandmatch){
@@ -289,7 +289,7 @@ void MatchEngine(const ap_uint<3> bx,
 // not be pipelined
 // This version has not been updated to be compatible with the new memory formats
 
-void MatchEngine(const ap_uint<3> bx,
+void MatchEngine(const BXType bx, BXType& bx_o,
 		 const VMStubMEMemory* const instubdata,
 		 const VMProjectionMemory* const inprojdata,
 		 CandidateMatchMemory* const outcandmatch){

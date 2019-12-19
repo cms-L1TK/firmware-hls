@@ -145,38 +145,38 @@ int main()
     bool truncation = false;
     // AllProjection
     err += compareMemWithFile<AllProjectionMemory<BARRELPS> >
-      (allproj,fout_aproj, ievt, "AllProjection", truncation);
+      (allproj,fout_aproj, ievt, "AllProjection", truncation, kMaxProc-10);
     // VMProjection1
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj1, fout_vmproj1, ievt, "VMProjection1", truncation);
+      (vmproj1, fout_vmproj1, ievt, "VMProjection1", truncation, kMaxProc-10);
 
     // VMProjection2
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj2, fout_vmproj2, ievt, "VMProjection2", truncation);
+      (vmproj2, fout_vmproj2, ievt, "VMProjection2", truncation, kMaxProc-10);
 
     // VMProjection3
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj3, fout_vmproj3, ievt, "VMProjection3", truncation);
+      (vmproj3, fout_vmproj3, ievt, "VMProjection3", truncation, kMaxProc-10);
 
     // VMProjection4
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj4, fout_vmproj4, ievt, "VMProjection4", truncation);
+      (vmproj4, fout_vmproj4, ievt, "VMProjection4", truncation, kMaxProc-10);
 
     // VMProjection5
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj5, fout_vmproj5, ievt, "VMProjection5", truncation);
+      (vmproj5, fout_vmproj5, ievt, "VMProjection5", truncation, kMaxProc-10);
 
     // VMProjection6
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj6, fout_vmproj6, ievt, "VMProjection6", truncation);
+      (vmproj6, fout_vmproj6, ievt, "VMProjection6", truncation, kMaxProc-10);
 
     // VMProjection7
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj7, fout_vmproj7, ievt, "VMProjection7", truncation);
+      (vmproj7, fout_vmproj7, ievt, "VMProjection7", truncation, kMaxProc-10);
 
     // VMProjection8
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation);
+      (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
     
   } // end of event loop
   
