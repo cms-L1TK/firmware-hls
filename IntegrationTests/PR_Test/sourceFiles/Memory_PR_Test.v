@@ -1,21 +1,12 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 09/28/2014 01:08:52 PM
-// Design Name: 
+// Create Date: 11/19/2019
 // Module Name: Memory
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name: L1 Tracking
+// Target Devices: xcvu7p-flvb2104-1-e 
+// Description: Memory modules which store data between the algorithm steps in the Hybrid L1 Tracking algorithm
 // Revision:
-// Revision 0.01 - File Created
-// Revision 0.01 - File Created
+// Revision 0.01 - File imported from Tracklet 1.0, n_ent ports added.
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
