@@ -15,9 +15,65 @@ using namespace std;
 int main()
 {
 
+  InputStub<BARREL2S> cBarrel2S;
+  InputStub<BARRELPS> cBarrelPS;
+  std::cout << "Total number of bits in barrel PS : " << cBarrelPS.kInputStubSize << std::endl;
+  std::cout << "Total number of bits in barrel 2S : " << cBarrel2S.kInputStubSize << std::endl;
+
+  InputStub<DISKPS> cDiskPS;
+  InputStub<DISK2S> cDisk2S;
+  std::cout << "Total number of bits in disk PS : " << cDiskPS.kInputStubSize << std::endl;
+  std::cout << "Total number of bits in disk 2S : " << cDisk2S.kInputStubSize << std::endl;
+
+  // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
+  std::ifstream fin_il;
+  std::string cInputFile = "IL/IL_PS10G_1_B/Link_PS10G_1_B.dat";
+  bool validil = openDataFile(fin_il,cInputFile); // what does this do? 
+  if (not validil) 
+  {
+    std::cout << "Could not find file " << cInputFile << std::endl;
+    return 0;
+  }
+  std::cout << "Read-back stubs from file : " << cInputFile << std::endl;
+
+  // hls variables start with h 
+  BXType hBxCounter;
+  // declare input stream to be used in hls simulation
+  // note : By default, array variables are implemented as RAM [General arrays are implemented as RAMs for read-write access]
+  // but this is not in the test bench 
+  //If the data stored in the array is consumed or produced in a sequential manner, a more efficient communication mechanism is to use streaming data as specified by the STREAM pragma, where FIFOs are used instead of RAMs.
+  hls::stream<ap_uint<38> > hIputLink;
+  
+  // process the text file .. just regular c++ here 
+  char cStubDelimeter = '|';
+  char cStubEnd = ' ';
+  int  cEventCounter=-1;
+  std::string cBxLabel = "BX ";
+  int cNevents = 1; 
+  for(std::string cInputLine; getline( fin_il, cInputLine ); )
+  {
+    if( cEventCounter == cNevents)
+      continue;
+
+    if( cInputLine.find("Event") != std::string::npos ) 
+    {
+      auto cBxString = cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) ;
+      hBxCounter = BXType(cBxString.c_str(),2);
+      cEventCounter++;
+    }
+    else
+    {
+      // clean up string to access stub from this event 
+      cInputLine.erase( std::remove(cInputLine.begin(), cInputLine.end(), cStubDelimeter), cInputLine.end() );
+      auto cStubString = cInputLine.substr(0, cInputLine.find(cStubEnd));
+      std::cout << "Event " << cEventCounter << " -- read stub from Bx " <<  hBxCounter << " from text file : " << cStubString << " \n"; 
+      //hIputLink.write_nb( ap_uint<38>( cInputLine.substr(0, cInputLine.find(cStubEnd)).c_str() ,2) );
+    }
+  }
+
   // Barrel : A, B, C, D 
   // Regions : 0, 1 , 2 ,3 
-  std::vector<std::vector<InputStubMemory>> cStubs(4,vector<int>(20));
+  //std::vector<std::vector<InputStubMemory>> cStubs(4,vector<int>(20));
   //std::vector<InputStubMemory<BARRELPS>> cStubs; 
   
   // // define nevents

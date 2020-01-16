@@ -12,33 +12,33 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 // (1<<NBIT_ADDR): depth of the memory for each BX
 class MemoryTemplate
 {
-public:
-  typedef ap_uint<NBIT_BX> BunchXingT;
-  typedef ap_uint<NBIT_ADDR+1> NEntryT;
+  public:
+    typedef ap_uint<NBIT_BX> BunchXingT;
+    typedef ap_uint<NBIT_ADDR+1> NEntryT;
   
-protected:
+  protected:
 
-  DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
-  NEntryT nentries_[1<<NBIT_BX];                  // number of entries
+    DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
+    NEntryT nentries_[1<<NBIT_BX];                  // number of entries
   
-public:
+  public:
 
-  MemoryTemplate()
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	clear();
-  }
+    MemoryTemplate()
+    {
+      #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+     clear();
+    }
+    ~MemoryTemplate(){}
 
-  ~MemoryTemplate(){}
-
-  void clear()
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS inline
-  MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
-#pragma HLS UNROLL
-	  nentries_[ibx] = 0;
-	}
+    void clear()
+    {
+      #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+      #pragma HLS inline
+        MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) 
+        {
+          #pragma HLS UNROLL
+      	  nentries_[ibx] = 0;
+  	   }
   }
 
   void clear(BunchXingT bx) {

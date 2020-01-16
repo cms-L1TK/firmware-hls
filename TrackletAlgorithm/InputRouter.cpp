@@ -21,50 +21,39 @@ void InputRouter(const BXType bx, hls::stream<ap_uint<38> >& IL, InputStubMemory
 //     if (IL.read_nb(din))
 //     {
 //       region = din.range(37,36);
-//       if (fromL1 && region==0) 
-//       {
+//       if (fromL1 && region==0) {
 //         phiDivision = din.range(15,14);
-//       } 
-//       else 
-//       {
+//       } else {
 //         phiDivision = din.range(15,15);
 //       }
 //       dout = InputStub<BARRELPS>(din.range(35,0));
-//       if (region == 0) 
-//       {
-//         if (phiDivision == 0) 
-//         {
-//           R0PhiA->write_mem(bx,dout,0);
-//         } 
-//         else if (phiDivision == 1) 
-//         {
-//           R0PhiB->write_mem(bx,dout,0);
-//         } 
-//         else if (phiDivision == 2) 
-//         {
-//           R0PhiC->write_mem(bx,dout,0);
-//         } 
-//         else if (phiDivision == 3) 
-//         {
-//           R0PhiD->write_mem(bx,dout,0);
+//       if (region == 0) {
+//         if (phiDivision == 0) {
+//           R0PhiA->write_mem(bx,dout);
+//         } else if (phiDivision == 1) {
+//           R0PhiB->write_mem(bx,dout);
+//         } else if (phiDivision == 2) {
+//           R0PhiC->write_mem(bx,dout);
+//         } else if (phiDivision == 3) {
+//           R0PhiD->write_mem(bx,dout);
 //         }
 //       } else if (region == 1) {
 //         if (phiDivision == 0) {
-//           R1PhiA->write_mem(bx,dout,0);
+//           R1PhiA->write_mem(bx,dout);
 //         } else if (phiDivision == 1) {
-//           R1PhiB->write_mem(bx,dout,0);
+//           R1PhiB->write_mem(bx,dout);
 //         }
 //       } else if (region == 2) {
 //         if (phiDivision == 0) {
-//           R2PhiA->write_mem(bx,dout,0);
+//           R2PhiA->write_mem(bx,dout);
 //         } else if (phiDivision == 1) {
-//           R2PhiB->write_mem(bx,dout,0);
+//           R2PhiB->write_mem(bx,dout);
 //         }
 //       } else if (region == 3) {
 //         if (phiDivision == 0) {
-//           R3PhiA->write_mem(bx,dout,0);
+//           R3PhiA->write_mem(bx,dout);
 //         } else if (phiDivision == 1) {
-//           R3PhiB->write_mem(bx,dout,0);
+//           R3PhiB->write_mem(bx,dout);
 //         } // inner switch
 //       } // outer switch
 //     } // read if
