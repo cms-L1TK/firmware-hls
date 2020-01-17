@@ -782,7 +782,7 @@ Memory #(
 
 
 
-testfixture testfixture_inst (
+uut uut_inst (
   .clk(clk),
   .reset(reset),
   .en_proc(en_proc),

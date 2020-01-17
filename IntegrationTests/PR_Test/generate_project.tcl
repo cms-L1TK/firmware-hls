@@ -183,7 +183,7 @@ add_files -norecurse -fileset $obj $files
 
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
-set_property -name "top" -value "SectorProcessor" -objects $obj
+set_property -name "top" -value "uut" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Set 'sources_1' fileset object
@@ -289,7 +289,7 @@ set_property -name "file_type" -value "Data Files" -objects $file_obj
 
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
-set_property -name "top" -value "SectorProcessor_test" -objects $obj
+set_property -name "top" -value "testfixture" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 set_property -name "xsim.simulate.runtime" -value "3000ns" -objects $obj
