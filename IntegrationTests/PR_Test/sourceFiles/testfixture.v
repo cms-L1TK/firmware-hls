@@ -2,7 +2,7 @@
 
 `timescale 1ns / 1ps
 
-module SectorProcessor_test();
+module testfixture();
 
 reg clk;
 reg reset;
@@ -782,7 +782,7 @@ Memory #(
 
 
 
-SectorProcessor SectorProcessor_inst (
+testfixture testfixture_inst (
   .clk(clk),
   .reset(reset),
   .en_proc(en_proc),
