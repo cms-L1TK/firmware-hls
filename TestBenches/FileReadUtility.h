@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <unistd.h>
 #include <vector>
+#include <bitset>
 
 #include "../TrackletAlgorithm/Constants.h"
 
@@ -102,17 +103,17 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
 }
 
 // TODO: FIXME or write a new one for binned memories
-template<class MemType, int base=16>
+template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label)
 {
   bool truncated = false;
   unsigned int err_count;
-  err_count = compareMemWithFile<MemType>(memory,fout,ievt,label,truncated);
+  err_count = compareMemWithFile<MemType,InputBase,OutputBase>(memory,fout,ievt,label,truncated);
   return err_count;
 }
 
-template<class MemType, int base=16>
+template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
                                 bool& truncated, int maxProc = kMaxProc)
@@ -122,7 +123,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   ////////////////////////////////////////
   // Read from file
   MemType memory_ref;
-  writeMemFromFile<MemType>(memory_ref, fout, ievt, base);
+  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
   // Check if at least one of the memories in comparison is non empty
   // before spamming the screen
@@ -133,7 +134,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   ////////////////////////////////////////
   // compare expected data with those computed and stored in the output memory
   if (memory.getEntries(ievt)!=0 or memory_ref.getEntries(ievt)!=0)
-    std::cout << "reference" << "\t" << "computed" << std::endl;
+    std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
   
   for (int i = 0; i < memory_ref.getEntries(ievt); ++i) {
 
@@ -145,8 +146,11 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
       break;
     }
     
+    std::cout << i << "\t";
+
     auto data_ref = memory_ref.read_mem(ievt,i).raw();
-    std::cout << std::hex << data_ref << "\t";
+    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_ref) << "\t";
+    else                 std::cout << std::hex << data_ref << "\t";
     
     if (i >= memory.getEntries(ievt) ) {
       // missing entries in the computed memory
@@ -156,7 +160,8 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
     }
 
     auto data_com = memory.read_mem(ievt,i).raw();
-    std::cout << std::hex << data_com; // << std::endl;
+    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_com);
+    else                 std::cout << std::hex << data_com; // << std::endl;
 
     if (data_com != data_ref) {
       std::cout << "\t" << "<=== INCONSISTENT";
@@ -180,7 +185,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   
 }
 
-template<class MemType, int base=16>
+template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemWithFile(const MemType& memory, 
                                       std::ifstream& fout,
                                       int ievt, const std::string& label,
@@ -191,7 +196,7 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   ////////////////////////////////////////
   // Read from file
   MemType memory_ref;
-  writeMemFromFile<MemType>(memory_ref, fout, ievt, base);
+  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
   // Check if at least one of the memories in comparison is non empty
   // before spamming the screen
@@ -203,7 +208,7 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
 
   ////////////////////////////////////////
   // compare expected data with those computed and stored in the output memory
-  std::cout << "reference" << "\t" << "computed" << std::endl;
+  std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
   for ( int j = 0; j < memory_ref.getNBins(); ++j ) {
     auto val = memory_ref.getEntries(ievt,j);
     std::cout << "Bin " << std::dec << j
@@ -218,9 +223,12 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
 	truncated = true;
 	break;
       }
-    
+      
+      std::cout << i << "\t";
+
       auto data_ref = memory_ref.read_mem(ievt,j,i).raw();
-      std::cout << std::hex << data_ref << "\t";
+      if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_ref) << "\t";
+      else                 std::cout << std::hex << data_ref << "\t";
     
       if (i >= memory.getEntries(ievt,j) ) {
 	// missing entries in the computed memory
@@ -230,7 +238,8 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
       }
 
       auto data_com = memory.read_mem(ievt,j,i).raw();
-      std::cout << std::hex << data_com; // << std::endl;
+      if (OutputBase ==2) std::cout << std::bitset<MemType::getWidth()>(data_com);
+      else                std::cout << std::hex << data_com; // << std::endl;
 
       if (data_com != data_ref) {
 	std::cout << "\t" << "<=== INCONSISTENT";

@@ -4,7 +4,7 @@ env:
 
 on: # Controls when the action will run.
   push: # Please add your branch down here if wanted. A build will be triggerd for each push.
-    branches: [master, feat_actions, fw_synch_update] 
+    branches: [master, feat_actions, fw_synch_update, MEUpdate] 
 jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
   hls-build: # Job name
     runs-on: self-hosted # The type of runner that the job will run on
@@ -32,7 +32,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: ME
-        path: project/matchengine/solution1/syn/report/MatchEngineTopL3_csynth.rpt
+        path: project/matchengine/solution1/syn/report/MatchEngineTop_csynth.rpt
     - name: PR # Script name
       run: |
         cd project

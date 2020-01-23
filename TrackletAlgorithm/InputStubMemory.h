@@ -130,6 +130,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return InputStubBase<ISType>::kInputStubSize;}
+
   InputStubData raw() const {return data_; }
 
   ISR getR() const {
