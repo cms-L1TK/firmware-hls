@@ -99,6 +99,8 @@ public:
   #endif
   
   // Getter
+  static constexpr int getWidth() {return VMProjectionBase<VMProjType>::kVMProjectionSize;}
+
   VMProjData raw() const {return data_;}
   
   VMPID getIndex() const {

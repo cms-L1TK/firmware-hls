@@ -15,6 +15,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 class MemoryTemplate
 {
 public:
+  typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR+1> NEntryT;
   
@@ -133,6 +134,8 @@ public:
 	  }
 	}
   }
+
+  static constexpr int getWidth() {return DataType::getWidth();}
   
 #endif
   

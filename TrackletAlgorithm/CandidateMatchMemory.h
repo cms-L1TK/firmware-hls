@@ -50,6 +50,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return kCandidateMatchSize;}
+  
   CandidateMatchData raw() const {return data_;}
   
   CMProjIndex getProjIndex() const {

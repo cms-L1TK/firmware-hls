@@ -112,6 +112,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return TrackletProjectionBase<TProjType>::kTrackletProjectionSize;}
+
   TrackletProjectionData raw() const {return data_;}
 
   // TCID is a unique identifier assigned to each TC. It is a concatenation of
