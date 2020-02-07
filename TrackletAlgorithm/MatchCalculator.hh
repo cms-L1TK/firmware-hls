@@ -397,10 +397,20 @@ void MatchCalculator(BXType bx,
   //-----------------------------------------------------------------------------------------------------------
   //-------------------------------- DATA PROCESSING STARTS ---------------------------------------------------
   //-----------------------------------------------------------------------------------------------------------
+  // declare counters for each of the 8 output VMProj // !!!
+  int nmcout1 = 0;
+  int nmcout2 = 0;
+  int nmcout3 = 0;
+  int nmcout4 = 0;
+  int nmcout5 = 0;
+  int nmcout6 = 0;
+  int nmcout7 = 0;
+  int nmcout8 = 0;  
+  int nallproj = 0;
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
   {
 
-#pragma HLS PIPELINE II=1 rewind
+#pragma HLS PIPELINE II=1 
 
     // Pick up number of candidate matches for each CM memory
     ncm1 = match1->getEntries(bx);
@@ -802,20 +812,45 @@ void MatchCalculator(BXType bx,
       fullmatch6->clear(bx);
       fullmatch7->clear(bx);
     }
-    else{ // Write out only the best match, based on the seeding 
-      fullmatch1->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-      fullmatch2->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
-      fullmatch3->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
-      fullmatch4->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
-      fullmatch5->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
-      fullmatch6->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
-      fullmatch7->write_mem(bx,bestmatch,(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+    else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+      switch (projseed) {
+      case 0:
+      fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      nmcout1++;
+      break;
+      case 1:
+      fullmatch2->write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
+      nmcout2++;
+      break;
+      case 2:
+      fullmatch3->write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
+      nmcout3++;
+      break;
+      case 3:
+      fullmatch4->write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
+      nmcout4++;
+      break;
+      case 4:
+      fullmatch5->write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
+      nmcout5++;
+      break;
+      case 5:
+      fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
+      nmcout5++;
+      break;
+      case 6:
+      fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+      nmcout6++;
+      break;
+      }
     }
 
-    // pipeline the bestmatch registers 
+    // pipeline the bestmatch registers
     bestmatch      = bestmatch_next;
     goodmatch      = goodmatch_next;
     projseed       = projseed_next;
+
+    bx_o = bx;
 
   }// end MC_LOOP 
 
