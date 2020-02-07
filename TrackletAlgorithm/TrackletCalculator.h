@@ -2,10 +2,10 @@
 
 #include <cmath>
 
-#include "StubPairMemory.hh"
-#include "AllStubMemory.hh"
-#include "TrackletParameterMemory.hh"
-#include "TrackletProjectionMemory.hh"
+#include "StubPairMemory.h"
+#include "AllStubMemory.h"
+#include "TrackletParameterMemory.h"
+#include "TrackletProjectionMemory.h"
 
 namespace TC {
 ////////////////////////////////////////////////////////////////////////////////

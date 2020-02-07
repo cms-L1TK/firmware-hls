@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include "FileReadUtility.hh"
-#include "Constants.hh"
+#include "FileReadUtility.h"
+#include "Constants.h"
 
 const int nevents = 100;  //number of events to run
 

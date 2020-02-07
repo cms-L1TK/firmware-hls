@@ -1,4 +1,4 @@
-#include "InputRouter.hh"
+#include "InputRouter.h"
 #include "hls_math.h"
 #include "ap_int.h"
 #include "hls_stream.h"
