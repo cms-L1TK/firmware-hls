@@ -1,8 +1,8 @@
 // Test bench for the MatchCalculator 
 #include "MatchCalculatorTop.h"
 
-#include "FileReadUtility.hh"
-#include "Constants.hh"
+#include "FileReadUtility.h"
+#include "Constants.h"
 
 #include "hls_math.h"
 #include <iostream>
@@ -43,6 +43,7 @@ int main() {
   static FullMatchMemory<BARREL> fullmatch5;
   static FullMatchMemory<BARREL> fullmatch6;
   static FullMatchMemory<BARREL> fullmatch7;
+  static FullMatchMemory<BARREL> fullmatch8;
 
   // read in input files
   ifstream fin_as;
@@ -75,10 +76,12 @@ int main() {
   ifstream fout_fm5;
   ifstream fout_fm6;
   ifstream fout_fm7;
+  ifstream fout_fm8;
 
   if (not openDataFile(fout_fm1,"MC/MC_L3PHIC/FullMatches_FM_L1L2_L3PHIC_04.dat")) return -1;
-  //if (not openDataFile(fout_fm2,"MC/MC_L1PHIC/FullMatches_FM_L3L4_L1PHIC_04.dat")) return -1;
-  if (not openDataFile(fout_fm3,"MC/MC_L3PHIC/FullMatches_FM_L5L6_L3PHIC_04.dat")) return -1;
+  //if (not openDataFile(fout_fm2,"MC/MC_L1PHIC/FullMatches_FM_L2L3_L1PHIC_04.dat")) return -1;
+  //if (not openDataFile(fout_fm3,"MC/MC_L1PHIC/FullMatches_FM_L3L4_L1PHIC_04.dat")) return -1;
+  if (not openDataFile(fout_fm4,"MC/MC_L3PHIC/FullMatches_FM_L5L6_L3PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm4,"MC/MC_L1PHIC/FullMatches_FM_D1D2_L1PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm5,"MC/MC_L1PHIC/FullMatches_FM_D3D4_L1PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm6,"")) return -1;
@@ -107,24 +110,26 @@ int main() {
     // Unit Under Test
     MatchCalculatorTop(
       bx, &match1, &match2, &match3, &match4, &match5, &match6, &match7, &match8, &allstub, &allproj, bx_out,
-      &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4, &fullmatch5, &fullmatch6, &fullmatch7
+      &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4, &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8
     );
 
     // compare the computed outputs with the expected ones 
     //std::cout << "FM: L1L2 seeding" << std::endl;
     err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch1, fout_fm1, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L3L4 seeding" << std::endl;
+    //std::cout << "FM: L2L3 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch2, fout_fm2, ievt, "FullMatch", truncation);
+    //std::cout << "FM: L3L4 seeding" << std::endl;
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch3, fout_fm3, ievt, "FullMatch", truncation);
     //std::cout << "FM: L5L6 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch3, fout_fm3, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch4, fout_fm4, ievt, "FullMatch", truncation);
     //std::cout << "FM: D1D2 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch4, fout_fm4, ievt, "FullMatch", truncation);
-    //std::cout << "FM: D3D4 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch5, fout_fm5, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L1D1 seeding" << std::endl;
+    //std::cout << "FM: D3D4 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch6, fout_fm6, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L2D1 seeding" << std::endl;
+    //std::cout << "FM: L1D1 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch7, fout_fm7, ievt, "FullMatch", truncation);
+    //std::cout << "FM: L2D1 seeding" << std::endl;
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch8, fout_fm8, ievt, "FullMatch", truncation);
 
   }  // end of event loop
   
@@ -145,6 +150,7 @@ int main() {
   fout_fm4.close();
   fout_fm5.close();
   fout_fm6.close();
+  fout_fm7.close();
   fout_fm7.close();
 
   return err_count;

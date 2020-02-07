@@ -1,8 +1,8 @@
 // Layer Router
 // [wittich 8/10/2017]
-#include "HLSConstants.hh"
+#include "HLSConstants.h"
 #include "ap_int.h"
-#include "HLSFullStubLayerPS.hh"
+#include "HLSFullStubLayerPS.h"
 
 void LayerRouter(
 		 HLSFullStubLayerPS StubIn[64],

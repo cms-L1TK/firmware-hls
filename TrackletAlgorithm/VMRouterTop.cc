@@ -1,4 +1,4 @@
-#include "VMRouterTop.hh"
+#include "VMRouterTop.h"
 
 // VMRouter Top Function for Layer 1, AllStub region E
 
@@ -27,12 +27,12 @@ void VMRouterTop(BXType bx,
 // Variables that are specified with regards to the test TestBenches
 	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	const int disk(0); // Which disk number the data is coming from, 0 if not disk
-	const int ninputs(3);  // The number of input memories
+	const int ninputs(4);  // The number of input memories
 	const uint32_t meMask(0x000F0000UL); // Mask of which memories that are being used. Note: did not work when using ap_uint<31>... why?
 
 	// The main function
 	VMRouter<BARRELPS, BARRELPS, layer, disk, ninputs, meMask>(
-		 bx, i0, i1, i2, 0, 0, 0, //i6, i7,
+		 bx, i0, i1, i2, i3, 0, 0, //i6, i7,
 		 allStub,
 		 0, 0, 0, 0, 0, 0, 0, 0, // 0-7
 		 0, 0, 0, 0, 0, 0, 0, 0, // 8-15
