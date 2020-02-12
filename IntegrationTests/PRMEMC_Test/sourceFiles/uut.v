@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module SectorProcessor(
+module uut(
   input 	clk,
   input 	reset,
 // For PR		       
