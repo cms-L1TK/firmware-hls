@@ -29,7 +29,7 @@ constexpr unsigned int nvmmedisks[5]={4,4,4,4,4};
 constexpr double rmindiskvm=22.5;
 constexpr double rmaxdiskvm=67.0;
 
-// ... 
+// ...
 // need separate lookup values for inner two vs outer three disks for 2S modules
 // these assume D11 geometry!
 constexpr double rDSSinner[10] = {66.7728, 71.7967, 77.5409, 82.5584, 84.8736, 89.8953, 95.7791, 100.798, 102.495, 107.52};  // <=== these 10 are for inner 2 disks
@@ -56,21 +56,21 @@ void init_finebintable(const int layer_, const int disk_,
     nbitsfinebintable_=8;
     unsigned int nbins=1<<nbitsfinebintable_;
 
-      
+
     for(unsigned int i=0;i<nbins;i++) {
       int ibin=(i>>(nbitsfinebintable_-3));
-        
+
       int zfine=(i>>(nbitsfinebintable_-6))-(ibin<<3);
-        
+
       //awkward bit manipulations since the index is from a signed number...
       int index=i+(1<<(nbitsfinebintable_-1));
-        
+
       if (index>=(1<<nbitsfinebintable_)){
         index-=(1<<nbitsfinebintable_);
       }
-        
+
       finebintable_[index]=zfine;
-        
+
     }
   }
 
@@ -78,11 +78,11 @@ void init_finebintable(const int layer_, const int disk_,
 
     nbitsfinebintable_=8;
     unsigned int nbins=1<<nbitsfinebintable_;
-      
+
     for(unsigned int i=0;i<nbins;i++) {
 
       double rstub=0.0;
-        
+
       if (i<10) {
         if (disk_<=2) {
           rstub=rDSSinner[i];
@@ -95,7 +95,7 @@ void init_finebintable(const int layer_, const int disk_,
 
       if (rstub<rmindiskvm) {
         finebintable_[i] = -1;
-      } else {  
+      } else {
         int bin=8.0*(rstub-rmindiskvm)/(rmaxdisk-rmindiskvm);
         assert(bin>=0);
         //assert(bin<MEBinsDisks);
@@ -173,7 +173,8 @@ ap_uint<5> iphivmRawMinus(const AllStub<BARRELPS>::ASPHI phi)
 
 }
 
-constexpr int MAXVMROUTER = 64; // TODO need right symbol here
+// Uncomment the following line to use an upper limit for the number of stubs processed in each event
+// constexpr int MAXVMROUTER = 64; // TODO need right symbol here
 
 //template <int layer_, int disk_, bool isPSmodule>
 void VMRouter(
@@ -271,7 +272,7 @@ void VMRouter(
 
   // see how much data we have from each of the memories
   InputStubMemory<BARRELPS>::NEntryT zero(0);
-  
+
   auto n_A0 =            a0->getEntries(bx);
   auto n_A1 =            a1->getEntries(bx);
   auto n_A2 =            a2->getEntries(bx);
@@ -289,11 +290,12 @@ void VMRouter(
  TOPLEVEL: for(auto i = 0; i < kMaxProc; ++i ) {
 #pragma HLS PIPELINE II=1
     const bool haveData = (n_A0>0)||(n_A1>0)||(n_A2>0)||(n_A3>0)||(n_A4>0);
-    if ((count>MAXVMROUTER) || !haveData )
+    if (!haveData) //((count>MAXVMROUTER) || !haveData ) // No limit on how many stubs to process
       continue;
     //const InputStubMemory *next; // this method makes vivado crash
     bool resetNext = false;
-    InputStub<BARRELPS>stub;
+    InputStub<BARRELPS> stub;
+    
     if ( n_A0 ) {
       //next = a0;
       stub = a0->read_mem(bx, read_addr);
@@ -322,7 +324,7 @@ void VMRouter(
       if ( n_A3 == 0 )
         resetNext = true;
     }
-    else  { // if ( n_A4 ) 
+    else  { // if ( n_A4 )
       //next = a4;
       stub = a4->read_mem(bx, read_addr);
       --n_A4;
@@ -339,13 +341,12 @@ void VMRouter(
     // add stub to all stub memory (memories?)
     // HACK fix me
     AllStub<BARRELPS> allstubd(stub.raw());
-    std::cout << "Out put stub: " << std::hex << allstubd.raw()
+    std::cout << "Output stub: " << std::hex << allstubd.raw()
     		  << std::dec << std::endl;
     // END HACK
-    allstub->write_mem(bx, allstubd);
-
-
+    allstub->write_mem(bx, allstubd, count); //Added "count" as the third memory adress index argument
     count++;
+
     // executeME() START ------------------------------
     // hourglass only
     VMStubME<BARRELPS> stubme;
@@ -420,7 +421,7 @@ void VMRouter(
     std::cout << "iPhiRaw,Minus,Plus = "  << std::dec
 	      << iphiRaw << " " << iphiRawMinus << " "
 	      << iphiRawPlus << " "
-	      << "\t0x" << std::setfill('0') << std::setw(4)  
+	      << "\t0x" << std::setfill('0') << std::setw(4)
 	      << std::hex << stubme.raw().to_int() << std::dec << ", to bin " << bin
 	      << std::endl;
     if ( ! memask[iphiRaw] ) {
@@ -455,19 +456,19 @@ void VMRouter(
         m5->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 ) {
-      if ( memask[6] ) 
+      if ( memask[6] )
         m6->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 ) {
-      if ( memask[7] ) 
+      if ( memask[7] )
         m7->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 ) {
-      if ( memask[8] ) 
+      if ( memask[8] )
         m8->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 ) {
-      if ( memask[9] ) 
+      if ( memask[9] )
         m9->write_mem(bx, bin, stubme);
     }
     // 10-19
@@ -496,19 +497,19 @@ void VMRouter(
         m15->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16 ) {
-      if ( memask[16] ) 
+      if ( memask[16] )
         m16->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17 ) {
-      if ( memask[17] ) 
+      if ( memask[17] )
         m17->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18 ) {
-      if ( memask[18] ) 
+      if ( memask[18] )
         m18->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19 ) {
-      if ( memask[19] ) 
+      if ( memask[19] )
         m19->write_mem(bx, bin, stubme);
     }
     // 20-29
@@ -537,19 +538,19 @@ void VMRouter(
         m25->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26 ) {
-      if ( memask[26] ) 
+      if ( memask[26] )
         m26->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27 ) {
-      if ( memask[27] ) 
+      if ( memask[27] )
         m27->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28 ) {
-      if ( memask[28] ) 
+      if ( memask[28] )
         m28->write_mem(bx, bin, stubme);
     }
     if ( iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29 ) {
-      if ( memask[29] ) 
+      if ( memask[29] )
         m29->write_mem(bx, bin, stubme);
     }
     // 30-31

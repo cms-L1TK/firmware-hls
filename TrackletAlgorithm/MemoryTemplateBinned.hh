@@ -20,7 +20,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 class MemoryTemplateBinned{
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR-NBIT_BIN+1> NEntryT;
-  
+
 protected:
   enum BitWidths {
     kNBxBins = 1<<NBIT_BX,
@@ -30,7 +30,7 @@ protected:
 
   DataType dataarray_[kNBxBins][kNMemDepth];  // data array
   NEntryT nentries_[kNBxBins][kNSlots];     // number of entries
-  
+
 public:
 
   MemoryTemplateBinned()
@@ -38,14 +38,14 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	clear();
   }
-  
+
   ~MemoryTemplateBinned(){}
-  
+
   void clear()
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-	
+
 	for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
 #pragma HLS UNROLL
 	  clear(ibx);
@@ -56,10 +56,10 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-	
+
 	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
 #pragma HLS UNROLL
-	  nentries_[bx][ibin] = 0;
+	  nentries_[bx][ibin] -= nentries_[bx][ibin]; // MEI: was = 0; before but that did not work (Constant null has an unsynthesizable type...)
 	}
   }
 
@@ -89,7 +89,7 @@ public:
 	// TODO: check if valid
 	return dataarray_[ibx][index];
   }
-  
+
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot,
 		    ap_uint<NBIT_ADDR> index) const
   {
@@ -123,7 +123,7 @@ public:
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
-  
+
   ///////////////////////////////////
   std::vector<std::string> split(const std::string& s, char delimiter)
   {
@@ -184,9 +184,9 @@ public:
 	  }
 	}
   }
-  
+
 #endif
-  
+
 };
 
 #endif
