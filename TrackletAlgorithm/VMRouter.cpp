@@ -179,7 +179,7 @@ ap_uint<5> iphivmRawMinus(const AllStub<BARRELPS>::ASPHI phi)
 //template <int layer_, int disk_, bool isPSmodule>
 void VMRouter(
 		const int layer_, const int disk_, const bool isPSmodule,
-		const BXType bx,
+		const BXType bx, // Specifies which bunch crossing/event
 		const InputStubMemory<BARRELPS>* const a0,
 		const InputStubMemory<BARRELPS>* const a1,
 		const InputStubMemory<BARRELPS>* const a2,
@@ -285,17 +285,21 @@ void VMRouter(
   // auto n_A4 = a4==0?zero:a4->getEntries(bx);
   // need to figure out how to get the accurate total count of loop
   // iterations here for nested loops. Count in innermost loop?
-  ap_uint<kNBits_MemAddr> read_addr(0);
 
+  ap_uint<kNBits_MemAddr> read_addr(0); // Which address of the memory that is going to be read
+
+  // Why do we loop over kMaxProc? The maximum number of processes?
  TOPLEVEL: for(auto i = 0; i < kMaxProc; ++i ) {
 #pragma HLS PIPELINE II=1
     const bool haveData = (n_A0>0)||(n_A1>0)||(n_A2>0)||(n_A3>0)||(n_A4>0);
     if (!haveData) //((count>MAXVMROUTER) || !haveData ) // No limit on how many stubs to process
       continue;
     //const InputStubMemory *next; // this method makes vivado crash
-    bool resetNext = false;
+
+    bool resetNext = false; // Used to manage read_addr
     InputStub<BARRELPS> stub;
-    
+
+    // Read stubs from the different input memories
     if ( n_A0 ) {
       //next = a0;
       stub = a0->read_mem(bx, read_addr);
@@ -333,6 +337,8 @@ void VMRouter(
     }
 
     //auto stub=next->read_mem(bx, read_addr); // this caused vivado to crash
+
+    // Reset read_addr if we have finished reading from one of the memories
     if ( resetNext )
       read_addr = 0;
     else
@@ -344,7 +350,7 @@ void VMRouter(
     std::cout << "Output stub: " << std::hex << allstubd.raw()
     		  << std::dec << std::endl;
     // END HACK
-    allstub->write_mem(bx, allstubd, count); //Added "count" as the third memory adress index argument
+    allstub->write_mem(bx, allstubd, count); // Added "count" as the third memory adress index argument
     count++;
 
     // executeME() START ------------------------------
@@ -415,6 +421,8 @@ void VMRouter(
     else { // disk
       assert(1==0);
     }
+
+    // Print values for debugging purposes
 #ifndef __SYNTHESIS__
     std::cout << "ME stub " << std::hex << stubme.raw() << std::endl;
 
@@ -428,8 +436,10 @@ void VMRouter(
       std::cerr << "Trying to write to non-existent memory for iphiRaw = "
 		<< iphiRaw << std::endl;
     }
-
 #endif // DEBUG
+
+  // Decide which bin the stubme is going to be written to, depending on its iphiRaw values.
+  // If the central value is not the same as iphiRawPlus/Minus, copy the data to the adjacent memory as well.
     // 0-9
     if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) ) {
       if ( memask[0] )
