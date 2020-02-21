@@ -1,43 +1,43 @@
 #include "ProjectionRouterTop.h"
 
 void ProjectionRouterTop(BXType bx,
-                         const TrackletProjectionMemory<BARRELPS>* tproj1,
-                         const TrackletProjectionMemory<BARRELPS>* tproj2,
-                         const TrackletProjectionMemory<BARRELPS>* tproj3,
-                         const TrackletProjectionMemory<BARRELPS>* tproj4,
-                         const TrackletProjectionMemory<BARRELPS>* tproj5,
-                         const TrackletProjectionMemory<BARRELPS>* tproj6,
-                         const TrackletProjectionMemory<BARRELPS>* tproj7,
-                         const TrackletProjectionMemory<BARRELPS>* tproj8,
+                         const TrackletProjectionMemory<BARRELPS>* proj1in,
+                         const TrackletProjectionMemory<BARRELPS>* proj2in,
+                         const TrackletProjectionMemory<BARRELPS>* proj3in,
+                         const TrackletProjectionMemory<BARRELPS>* proj4in,
+                         const TrackletProjectionMemory<BARRELPS>* proj5in,
+                         const TrackletProjectionMemory<BARRELPS>* proj6in,
+                         const TrackletProjectionMemory<BARRELPS>* proj7in,
+                         const TrackletProjectionMemory<BARRELPS>* proj8in,
                          BXType& bx_o,
-                         AllProjectionMemory<BARRELPS>* allproj,
-                         VMProjectionMemory<BARREL>* vmproj1,
-                         VMProjectionMemory<BARREL>* vmproj2,
-                         VMProjectionMemory<BARREL>* vmproj3,
-                         VMProjectionMemory<BARREL>* vmproj4,
-                         VMProjectionMemory<BARREL>* vmproj5,
-                         VMProjectionMemory<BARREL>* vmproj6,
-                         VMProjectionMemory<BARREL>* vmproj7,
-                         VMProjectionMemory<BARREL>* vmproj8
+                         AllProjectionMemory<BARRELPS>* allprojout,
+                         VMProjectionMemory<BARREL>* vmprojout1,
+                         VMProjectionMemory<BARREL>* vmprojout2,
+                         VMProjectionMemory<BARREL>* vmprojout3,
+                         VMProjectionMemory<BARREL>* vmprojout4,
+                         VMProjectionMemory<BARREL>* vmprojout5,
+                         VMProjectionMemory<BARREL>* vmprojout6,
+                         VMProjectionMemory<BARREL>* vmprojout7,
+                         VMProjectionMemory<BARREL>* vmprojout8
                          )
 {
  #pragma HLS inline off
  #pragma HLS interface register port=bx_o
- #pragma HLS resource variable=tproj1 latency=2
- #pragma HLS resource variable=tproj2 latency=2
- #pragma HLS resource variable=tproj3 latency=2
- #pragma HLS resource variable=tproj4 latency=2
- #pragma HLS resource variable=tproj5 latency=2
- #pragma HLS resource variable=tproj6 latency=2
- #pragma HLS resource variable=tproj7 latency=2
- #pragma HLS resource variable=tproj8 latency=2
+ #pragma HLS resource variable=proj1in->get_mem() latency=2
+ #pragma HLS resource variable=proj2in->get_mem() latency=2
+ #pragma HLS resource variable=proj3in->get_mem() latency=2
+ #pragma HLS resource variable=proj4in->get_mem() latency=2
+ #pragma HLS resource variable=proj5in->get_mem() latency=2
+ #pragma HLS resource variable=proj6in->get_mem() latency=2
+ #pragma HLS resource variable=proj7in->get_mem() latency=2
+ #pragma HLS resource variable=proj8in->get_mem() latency=2
   // PR_L3PHIC
  PR_L3PHIC: ProjectionRouter<BARRELPS, BARREL, 8, 3, 0>
     (bx,
-     tproj1, tproj2, tproj3, tproj4, tproj5, tproj6, tproj7, tproj8,
+     proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
      bx_o,
-     allproj,
-     vmproj1, vmproj2, vmproj3, vmproj4, vmproj5, vmproj6, vmproj7, vmproj8
+     allprojout,
+     vmprojout1, vmprojout2, vmprojout3, vmprojout4, vmprojout5, vmprojout6, vmprojout7, vmprojout8
      );
 }
