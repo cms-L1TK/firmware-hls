@@ -32,6 +32,7 @@ constexpr double rmaxdiskvm=67.0;
 // ...
 // need separate lookup values for inner two vs outer three disks for 2S modules
 // these assume D11 geometry!
+// what are these values and why is it using such an old geometry...
 constexpr double rDSSinner[10] = {66.7728, 71.7967, 77.5409, 82.5584, 84.8736, 89.8953, 95.7791, 100.798, 102.495, 107.52};  // <=== these 10 are for inner 2 disks
 constexpr double rDSSouter[10] = {65.1694, 70.1936, 75.6641, 80.6908, 83.9581, 88.9827, 94.6539, 99.6772, 102.494, 107.519}; // <=== these 10 are for outer 3 disks
 
@@ -173,13 +174,14 @@ ap_uint<5> iphivmRawMinus(const AllStub<BARRELPS>::ASPHI phi)
 
 }
 
-// Uncomment the following line to use an upper limit for the number of stubs processed in each event
-// constexpr int MAXVMROUTER = 64; // TODO need right symbol here
+// Maximum number of stubs that can be processed (memory depth)
+// originally 64, but then it won't pass test bench as it contains more than 64 stubs
+constexpr int MAXVMROUTER = 1000; // TODO need right symbol here
 
 //template <int layer_, int disk_, bool isPSmodule>
 void VMRouter(
 		const int layer_, const int disk_, const bool isPSmodule,
-		const BXType bx, // Specifies which bunch crossing/event
+		const BXType bx,
 		const InputStubMemory<BARRELPS>* const a0,
 		const InputStubMemory<BARRELPS>* const a1,
 		const InputStubMemory<BARRELPS>* const a2,
@@ -285,21 +287,16 @@ void VMRouter(
   // auto n_A4 = a4==0?zero:a4->getEntries(bx);
   // need to figure out how to get the accurate total count of loop
   // iterations here for nested loops. Count in innermost loop?
+  ap_uint<kNBits_MemAddr> read_addr(0);
 
-  ap_uint<kNBits_MemAddr> read_addr(0); // Which address of the memory that is going to be read
-
-  // Why do we loop over kMaxProc? The maximum number of processes?
  TOPLEVEL: for(auto i = 0; i < kMaxProc; ++i ) {
 #pragma HLS PIPELINE II=1
     const bool haveData = (n_A0>0)||(n_A1>0)||(n_A2>0)||(n_A3>0)||(n_A4>0);
-    if (!haveData) //((count>MAXVMROUTER) || !haveData ) // No limit on how many stubs to process
+    if ((count>MAXVMROUTER) || !haveData )
       continue;
     //const InputStubMemory *next; // this method makes vivado crash
-
-    bool resetNext = false; // Used to manage read_addr
-    InputStub<BARRELPS> stub;
-
-    // Read stubs from the different input memories
+    bool resetNext = false;
+    InputStub<BARRELPS>stub;
     if ( n_A0 ) {
       //next = a0;
       stub = a0->read_mem(bx, read_addr);
@@ -337,8 +334,6 @@ void VMRouter(
     }
 
     //auto stub=next->read_mem(bx, read_addr); // this caused vivado to crash
-
-    // Reset read_addr if we have finished reading from one of the memories
     if ( resetNext )
       read_addr = 0;
     else
@@ -347,12 +342,13 @@ void VMRouter(
     // add stub to all stub memory (memories?)
     // HACK fix me
     AllStub<BARRELPS> allstubd(stub.raw());
-    std::cout << "Output stub: " << std::hex << allstubd.raw()
+    std::cout << "Out put stub: " << std::hex << allstubd.raw()
     		  << std::dec << std::endl;
     // END HACK
-    allstub->write_mem(bx, allstubd, count); // Added "count" as the third memory adress index argument
-    count++;
+    allstub->write_mem(bx, allstubd, i);
 
+
+    count++;
     // executeME() START ------------------------------
     // hourglass only
     VMStubME<BARRELPS> stubme;
@@ -421,8 +417,6 @@ void VMRouter(
     else { // disk
       assert(1==0);
     }
-
-    // Print values for debugging purposes
 #ifndef __SYNTHESIS__
     std::cout << "ME stub " << std::hex << stubme.raw() << std::endl;
 
@@ -436,10 +430,8 @@ void VMRouter(
       std::cerr << "Trying to write to non-existent memory for iphiRaw = "
 		<< iphiRaw << std::endl;
     }
-#endif // DEBUG
 
-  // Decide which bin the stubme is going to be written to, depending on its iphiRaw values.
-  // If the central value is not the same as iphiRawPlus/Minus, copy the data to the adjacent memory as well.
+#endif // DEBUG
     // 0-9
     if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) ) {
       if ( memask[0] )
