@@ -41,7 +41,7 @@ void merger(
 ){
 
 #pragma HLS inline 
-#pragma HLS pipeline II=1
+#pragma HLS pipeline II=1 rewind
 #pragma HLS interface ap_ctrl_none port=return 
 #pragma HLS interface ap_ctrl_none port=inA,validA,inB,validB,out,vout,inread,A,vA,sA,B,vB,sB 
 #pragma HLS interface ap_ctrl_none port=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,voutnext 
@@ -247,7 +247,7 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch6,
                      FullMatchMemory<FMTYPE>* fullmatch7
 ){
-
+#pragma HLS inline
   // Initialization
  
   // Setup constants depending on which layer/disk working on
@@ -410,7 +410,7 @@ void MatchCalculator(BXType bx,
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
   {
 
-#pragma HLS PIPELINE II=1 
+#pragma HLS PIPELINE II=1 rewind
 
     // Pick up number of candidate matches for each CM memory
     ncm1 = match1->getEntries(bx);
@@ -850,7 +850,8 @@ void MatchCalculator(BXType bx,
     goodmatch      = goodmatch_next;
     projseed       = projseed_next;
 
-    bx_o = bx;
+    //    bx_o = bx;
+    if (istep==kMaxProc-1) bx_o = bx;
 
   }// end MC_LOOP 
 
