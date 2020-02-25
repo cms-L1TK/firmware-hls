@@ -23,15 +23,13 @@ constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
 constexpr unsigned int nallstubsdisks[5]={4,4,4,4,4};
 constexpr unsigned int nvmmedisks[5]={4,4,4,4,4};
 
-
-
-// from FPGAConstants
 constexpr double rmindiskvm=22.5;
 constexpr double rmaxdiskvm=67.0;
 
 // ...
 // need separate lookup values for inner two vs outer three disks for 2S modules
 // these assume D11 geometry!
+// what are these values and why is it using such an old geometry...
 constexpr double rDSSinner[10] = {66.7728, 71.7967, 77.5409, 82.5584, 84.8736, 89.8953, 95.7791, 100.798, 102.495, 107.52};  // <=== these 10 are for inner 2 disks
 constexpr double rDSSouter[10] = {65.1694, 70.1936, 75.6641, 80.6908, 83.9581, 88.9827, 94.6539, 99.6772, 102.494, 107.519}; // <=== these 10 are for outer 3 disks
 
@@ -43,7 +41,7 @@ constexpr int kMaxFineBinTable = 256;
 // since we need to have different tables for different templated
 // functions
 // need to ensure this is recognized as a ROM
-void init_finebintable(const int layer_, const int disk_,
+void init_finebintable(const int layer, const int disk,
                        int finebintable_[kMaxFineBinTable], int & nbitsfinebintable_)
 {
  #ifndef __SYNTHESIS__
@@ -52,7 +50,7 @@ void init_finebintable(const int layer_, const int disk_,
     finebintable_[i] = -1;
   }
 
-  if (layer_!=0) {
+  if (layer!=0) {
     nbitsfinebintable_=8;
     unsigned int nbins=1<<nbitsfinebintable_;
 
@@ -74,7 +72,7 @@ void init_finebintable(const int layer_, const int disk_,
     }
   }
 
-  if (disk_!=0) {
+  if (disk!=0) {
 
     nbitsfinebintable_=8;
     unsigned int nbins=1<<nbitsfinebintable_;
@@ -84,7 +82,7 @@ void init_finebintable(const int layer_, const int disk_,
       double rstub=0.0;
 
       if (i<10) {
-        if (disk_<=2) {
+        if (disk<=2) {
           rstub=rDSSinner[i];
         } else {
           rstub=rDSSouter[i];
@@ -117,12 +115,11 @@ void init_finebintable(const int layer_, const int disk_,
 
 
 // local files
-// returns top 5 bits of phi
+// returns top 5 bits of phi, i.e. max 31 in decimal
 inline ap_uint<5> iphivmRaw(const AllStub<BARRELPS>::ASPHI phi)
 {
   // TODO: get rid of hard-coded values
   ap_uint<5> iphivm=phi.range(phi.length()-1,phi.length()-5);
-  assert(iphivm>=0 && iphivm<32); // get rid of this
   return iphivm;
 }
 
@@ -173,18 +170,19 @@ ap_uint<5> iphivmRawMinus(const AllStub<BARRELPS>::ASPHI phi)
 
 }
 
-// Maximum number of stubs that can be processed, originally 64
-constexpr int MAXVMROUTER = 164; // TODO need right symbol here
+// Maximum number of stubs that can be processed (memory depth)
+// originally 64, but then it won't pass test bench as it contains more than 64 stubs
+constexpr int MAXVMROUTER = kMaxProc; // TODO need right symbol here
 
-//template <int layer_, int disk_, bool isPSmodule>
+//template <int layer, int disk, bool isPSmodule>
 void VMRouter(
-		const int layer_, const int disk_, const bool isPSmodule,
+		const int layer, const int disk, const bool isPSmodule,
 		const BXType bx,
-		const InputStubMemory<BARRELPS>* const a0,
-		const InputStubMemory<BARRELPS>* const a1,
-		const InputStubMemory<BARRELPS>* const a2,
-		const InputStubMemory<BARRELPS>* const a3,
-		const InputStubMemory<BARRELPS>* const a4,
+		const InputStubMemory<BARRELPS>* const i0,
+		const InputStubMemory<BARRELPS>* const i1,
+		const InputStubMemory<BARRELPS>* const i2,
+		const InputStubMemory<BARRELPS>* const i3,
+		const InputStubMemory<BARRELPS>* const i4,
 		AllStubMemory<BARRELPS>* allstub,
 		ap_uint<32> memask,
               VMStubMEMemory<BARRELPS> *m0,
@@ -226,13 +224,12 @@ void VMRouter(
   static int nbitsfinebintable_ = 8; // this appears to always be 8
   // static bool table_initialized = false;
   // if ( ! table_initialized ) {
-  //   init_finebintable(layer_,disk_,finebintable_,nbitsfinebintable_);
+  //   init_finebintable(layer,disk,finebintable_,nbitsfinebintable_);
   //   table_initialized = true;
   // }
   static const  int finebintable_[kMaxFineBinTable] =  // lookup table - 2^nbinsfinbinetable entries actually filled
 #include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
     ;
-  size_t count=0;
   //std::cout << std::hex << memask << std::endl;
   // reset address counters in output memories
   allstub->clear(bx);
@@ -270,74 +267,82 @@ void VMRouter(
   if ( memask[31] ) m31->clear(bx);
 
 
-  // see how much data we have from each of the memories
+  // Number of data in each input memory
   InputStubMemory<BARRELPS>::NEntryT zero(0);
 
-  auto n_A0 =            a0->getEntries(bx);
-  auto n_A1 =            a1->getEntries(bx);
-  auto n_A2 =            a2->getEntries(bx);
-  auto n_A3 =  zero;//          a3->getEntries(bx);
-  auto n_A4 =  zero;//          a4->getEntries(bx);
-  // auto n_A0 = a0==0?zero:a0->getEntries(bx);
-  // auto n_A1 = a1==0?zero:a1->getEntries(bx);
-  // auto n_A2 = a2==0?zero:a2->getEntries(bx);
-  // auto n_A3 = a3==0?zero:a3->getEntries(bx);
-  // auto n_A4 = a4==0?zero:a4->getEntries(bx);
+  auto n_i0 =            i0->getEntries(bx);
+  auto n_i1 =            i1->getEntries(bx);
+  auto n_i2 =            i2->getEntries(bx);
+  auto n_i3 =  zero;//          i3->getEntries(bx);
+  auto n_i4 =  zero;//          i4->getEntries(bx);
+  // auto n_i0 = i0==0?zero:i0->getEntries(bx);
+  // auto n_i1 = i1==0?zero:i1->getEntries(bx);
+  // auto n_i2 = i2==0?zero:i2->getEntries(bx);
+  // auto n_i3 = i3==0?zero:i3->getEntries(bx);
+  // auto n_i4 = i4==0?zero:i4->getEntries(bx);
+
   // need to figure out how to get the accurate total count of loop
   // iterations here for nested loops. Count in innermost loop?
-  ap_uint<kNBits_MemAddr> read_addr(0);
+
+  ap_uint<kNBits_MemAddr> read_addr(0); // Determines which memory address to be read
+
 
  TOPLEVEL: for(auto i = 0; i < kMaxProc; ++i ) {
 #pragma HLS PIPELINE II=1
-    const bool haveData = (n_A0>0)||(n_A1>0)||(n_A2>0)||(n_A3>0)||(n_A4>0);
-    if ((count>MAXVMROUTER) || !haveData )
+    const bool haveData = (n_i0>0)||(n_i1>0)||(n_i2>0)||(n_i3>0)||(n_i4>0);
+
+    if ((i > MAXVMROUTER) || !haveData )
       continue;
     //const InputStubMemory *next; // this method makes vivado crash
     bool resetNext = false;
     InputStub<BARRELPS>stub;
-    if ( n_A0 ) {
-      //next = a0;
-      stub = a0->read_mem(bx, read_addr);
-      --n_A0;
-      if ( n_A0 == 0 )
+
+    // Read stub from memory in turn
+    if ( n_i0 ) {
+      //next = i0;
+      stub = i0->read_mem(bx, read_addr);
+      --n_i0;
+      if ( n_i0 == 0 )
         resetNext = true;
     }
-    else if ( n_A1 ) {
-      //next = a1;
-      stub = a1->read_mem(bx, read_addr);
-      --n_A1;
-      if ( n_A1 == 0 )
+    else if ( n_i1 ) {
+      //next = i1;
+      stub = i1->read_mem(bx, read_addr);
+      --n_i1;
+      if ( n_i1 == 0 )
         resetNext = true;
     }
-    else if ( n_A2 ) {
-      //next = a2;
-      stub = a2->read_mem(bx, read_addr);
-      --n_A2;
-      if ( n_A2 == 0 )
+    else if ( n_i2 ) {
+      //next = i2;
+      stub = i2->read_mem(bx, read_addr);
+      --n_i2;
+      if ( n_i2 == 0 )
         resetNext = true;
     }
-    else if ( n_A3 ) {
-      //next = a3;
-      stub = a3->read_mem(bx, read_addr);
-      --n_A3;
-      if ( n_A3 == 0 )
+    else if ( n_i3 ) {
+      //next = i3;
+      stub = i3->read_mem(bx, read_addr);
+      --n_i3;
+      if ( n_i3 == 0 )
         resetNext = true;
     }
-    else  { // if ( n_A4 )
-      //next = a4;
-      stub = a4->read_mem(bx, read_addr);
-      --n_A4;
-      if ( n_A4 == 0 )
+    else  { // if ( n_i4 )
+      //next = i4;
+      stub = i4->read_mem(bx, read_addr);
+      --n_i4;
+      if ( n_i4 == 0 )
         resetNext = true;
     }
 
     //auto stub=next->read_mem(bx, read_addr); // this caused vivado to crash
+
+    // Increment the read address, or reset it to zero
     if ( resetNext )
       read_addr = 0;
     else
       ++read_addr;
 
-    // add stub to all stub memory (memories?)
+    // add stub to AllStub memory (memories?)
     // HACK fix me
     AllStub<BARRELPS> allstubd(stub.raw());
     std::cout << "Out put stub: " << std::hex << allstubd.raw()
@@ -345,44 +350,37 @@ void VMRouter(
     // END HACK
     allstub->write_mem(bx, allstubd, i);
 
-
-    count++;
     // executeME() START ------------------------------
     // hourglass only
     VMStubME<BARRELPS> stubme;
     stubme.setBend(stub.getBend()); stubme.setIndex(VMStubME<BARRELPS>::VMSMEID(i));
-    auto layer = layer_; // hack
-    auto disk  = disk_; // hack --these are mutually exclusive so ...
-    // total number of VMs
+
+    //WHY ARE THESE HACKS? THEY ARE NOT NEEDED
+    //auto layer_ = layer; // hack.
+    //auto disk_  = disk; // hack --these are mutually exclusive so ...
+
+    // Total number of VMs
     auto nvm = layer!=-1 ? nallstubslayers[layer]*nvmmelayers[layer] :
     		nallstubsdisks[disk-1]*nvmmedisks[disk-1];
-/*
-    int nvm=-1;
-    if (layer!=-1) {
-      nvm=nallstubslayers[layer]*nvmmelayers[layer];
-    }
-    if (disk!=0){
-      nvm=nallstubsdisks[disk-1]*nvmmedisks[disk-1];
-    }
-*/
-    auto iphiRaw = iphivmRaw(stub.getPhi());
-    auto iphiRawPlus = iphivmRawPlus(stub.getPhi());
-    auto iphiRawMinus = iphivmRawMinus(stub.getPhi());
+
+    auto stubPhi = stub.getPhi();
+    auto iphiRaw = iphivmRaw(stubPhi);
+    auto iphiRawPlus = iphivmRawPlus(stubPhi);
+    auto iphiRawMinus = iphivmRawMinus(stubPhi);
+    auto d = nvm/32; // Some sort of normalisation thing
     // TODO: comment this
-    iphiRaw=iphiRaw/(32/nvm);
-    iphiRawPlus=iphiRawPlus/(32/nvm);
-    iphiRawMinus=iphiRawMinus/(32/nvm);
-    if (iphiRawPlus<0) iphiRawPlus=0; // these are unsigned...
-    else if (iphiRawPlus>=nvm) iphiRawPlus=nvm-1;
-    if (iphiRawMinus<0) iphiRawMinus=0;
-    else if (iphiRawMinus>=nvm) iphiRawMinus=nvm-1;
+    iphiRaw = iphiRaw*d;
+    iphiRawPlus = iphiRawPlus*d;
+    iphiRawMinus = iphiRawMinus*d;
+    if (iphiRawPlus >= nvm) iphiRawPlus = nvm-1;
+    if (iphiRawMinus >= nvm) iphiRawMinus = nvm-1;
     // if (! (std::abs(iphiRaw-iphiRawPlus) <= 1 )) {
     //   std::cout << "XXX+: " << iphiRaw << " " << iphiRawPlus << std::endl;
     // }
     assert(std::abs(iphiRaw-iphiRawPlus) <= 1 );
     assert(std::abs(iphiRaw-iphiRawMinus) <= 1 ) ;
 
-    if ( disk ) {
+    if ( disk ) { // Not implemented
       assert(1==0);
       VMStubME<BARRELPS>::VMSMEID index=stub.getR();
       // how to check this?
@@ -415,6 +413,7 @@ void VMRouter(
     else { // disk
       assert(1==0);
     }
+
 #ifndef __SYNTHESIS__
     std::cout << "ME stub " << std::hex << stubme.raw() << std::endl;
 
@@ -566,12 +565,12 @@ void VMRouter(
 
     // executeTE() START ------------------------------
     // BARREL -- LAYER
-    if ( layer_ != -1 ) {
+    if ( layer != -1 ) {
     	// INNER OVERLAP
     	// not yet
 
     	// layer non-overlap
-    	if ( layer_ == 1 || layer_ == 3 || layer_ == 5 ) {
+    	if ( layer == 1 || layer == 3 || layer == 5 ) {
         	// INNER regular
         	VMStubTEInner<BARRELPS> stubTeInner;
     	}
@@ -589,10 +588,10 @@ void VMRouter(
 
 
 #ifdef NOTDEF
-    if (disk_!=5) {
+    if (disk!=5) {
       executeTE(false); // TEOuter -- no overlap
     }
-    if (layer_==1||layer_==2||disk_==1) {
+    if (layer==1||layer==2||disk==1) {
       executeTE(true); // TEInner -- overlap
     }
 #endif //
@@ -612,7 +611,7 @@ void executeTE(bool overlap)
   unsigned int count=0;
 
 
-  if (layer_!=0){  //First handle layer stubs
+  if (layer!=0){  //First handle layer stubs
 
     for(unsigned int j=0;j<stubinputs_.size();j++){ // loop over layer stub inputs
       for(unsigned int i=0;i<stubinputs_[j]->nStubs();i++){ // loop over stubs in input
@@ -628,10 +627,10 @@ void executeTE(bool overlap)
 
         int binlookup=-1;
         if (overlap) {
-          static_assert(layer_==1||layer_==2);
+          static_assert(layer==1||layer==2);
           binlookup=lookupInnerOverlapLayer(stub);
         } else {
-          switch (layer_) {
+          switch (layer) {
             case 2 :
             case 4 :
             case 6 :
@@ -673,7 +672,7 @@ void executeTE(bool overlap)
 
   }
 
-  if (disk_!=0) {
+  if (disk!=0) {
     for(unsigned int j=0;j<stubinputs_.size();j++){
       for(unsigned int i=0;i<stubinputs_[j]->nStubs();i++){
         std::pair<FPGAStub*,L1TStub*> stub=stubinputs_[j]->getStub(i);
@@ -705,7 +704,7 @@ void executeTE(bool overlap)
           int binlookup=-1;
 
           if (!overlap) {
-            switch (disk_) {
+            switch (disk) {
               case 2 :
               case 4 :
               binlookup=lookupOuterDisk(stub);
@@ -718,7 +717,7 @@ void executeTE(bool overlap)
               assert(0);
             }
           } else {
-            static_assert(disk_==1, "incorrect disk");
+            static_assert(disk==1, "incorrect disk");
             binlookup=lookupOuterOverlapD1(stub);
           }
 
@@ -817,7 +816,7 @@ void executeME()
         }
 
         // disk code
-        if (disk_!=0) {
+        if (disk!=0) {
 
           auto r = stub.getR();
           auto index=r;
@@ -833,7 +832,7 @@ void executeME()
 
         }
 
-        if (layer_!=0) {
+        if (layer!=0) {
 
           int index=(stub.z().value()>>(stub.z().nbits()-nbitsfinebintable_))&((1<<nbitsfinebintable_)-1);
 

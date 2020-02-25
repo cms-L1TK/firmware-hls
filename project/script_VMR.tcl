@@ -10,7 +10,7 @@ add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "-std=c++11"
 
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/VMR
-open_solution -reset "solution1"
+open_solution -reset "solution2"
 source set_fpga.tcl
 create_clock -period 4 -name default
 
