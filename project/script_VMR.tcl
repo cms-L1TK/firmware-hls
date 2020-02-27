@@ -5,12 +5,11 @@
 ############################################################
 open_project -reset vmrouter
 set_top VMRouterTop
-add_files ../TrackletAlgorithm/VMRouter.cpp -cflags "-std=c++11"
+#add_files ../TrackletAlgorithm/VMRouter.hh -cflags "-std=c++11"
 add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "-std=c++11"
-
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
 add_files -tb ../emData/VMR
-open_solution -reset "solution2"
+open_solution -reset "solution3"
 source set_fpga.tcl
 create_clock -period 4 -name default
 
@@ -19,5 +18,5 @@ csim_design -clean -compiler gcc -mflags "-j8"
 csynth_design
 cosim_design -trace_level all -rtl vhdl
 #export_design -rtl vhdl -format ip_catalog
-export_design -flow impl -rtl vhdl -format ip_catalog
+#export_design -flow impl -rtl vhdl -format ip_catalog
 exit

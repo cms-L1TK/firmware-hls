@@ -1,3 +1,6 @@
+#ifndef VMROUTERTOP_HH
+#define VMROUTERTOP_HH
+
 #pragma once
 #include "VMRouter.hh"
 
@@ -21,3 +24,5 @@ void VMRouterTop(BXType bx,
 		VMStubMEMemory<BARRELPS> *m6,
 		VMStubMEMemory<BARRELPS> *m7
 		);
+
+#endif // VMROUTERTOP_HH
