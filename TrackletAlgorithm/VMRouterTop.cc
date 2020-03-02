@@ -22,13 +22,13 @@ void VMRouterTop(BXType bx,
 {
 
 // Variables for that are specified with regards to the test bench, should be set somewhere else
-int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
-int disk(0); // Which disk number the data is coming from, 0 if not disk
-bool isPSmodule(true); // If the module is of the PS type, otherwise it's 2S
+const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
+const int disk(0); // Which disk number the data is coming from, 0 if not disk
+const bool isPSmodule(true); // If the module is of the PS type, otherwise it's 2S
 ap_uint<32> meMask(0x000F00F0UL); // Mask of which memories that are being used. Remove UL?
 
 //	VMRouter<0,-1,true>(0, -1, true, bx,i0,i1,i2,i3,i4,//i5,i6,i7,
-	VMRouter(layer, disk, isPSmodule, bx,i0,i1,i2,i3,i4,//i5,i6,i7,
+	VMRouter<BARRELPS, BARRELPS, layer, disk, isPSmodule>(bx,i0,i1,i2,i3,i4,//i5,i6,i7,
 		 allStub, meMask,
 		 0,0,0,0,m4,m5,m6,m7, // 0-7
 		 0,0,0,0,0,0,0,0, // 8-15
