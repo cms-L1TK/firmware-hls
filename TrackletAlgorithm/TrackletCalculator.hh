@@ -375,7 +375,6 @@ TC::ID()
 template<regionType TProjType, uint32_t TPROJMask> bool
 TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> * const projout_PHIA, TrackletProjectionMemory<TProjType> * const projout_PHIB, TrackletProjectionMemory<TProjType> * const projout_PHIC, TrackletProjectionMemory<TProjType> * const projout_PHID, const bool success)
 {
-#pragma HLS inline
   bool proj_success = true;
 
 // Reject projections with extreme r/z values.
@@ -472,7 +471,6 @@ TC::processStubPair(
     TrackletProjectionMemory<DISK> * const projout_D4PHID
 )
 {
-#pragma HLS inline
 
   static_assert(Seed == TC::L1L2, "Only L1L2 has been implemented so far.");
 
