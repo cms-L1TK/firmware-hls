@@ -1,20 +1,31 @@
-############################################################
-## This file is generated automatically by Vivado HLS.
-## Please DO NOT edit it.
-## Copyright (C) 1986-2017 Xilinx, Inc. All Rights Reserved.
-############################################################
+# Script to generate project for ME
+#   vivado_hls -f script_ME.tcl
+#   vivado_hls -p matchengine
+# WARNING: this will wipe out the original project by the same name
+
+# create new project (deleting any existing one of same name)
 open_project -reset matchengine
+
+# source files
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top MatchEngineTopL3
-add_files ../TrackletAlgorithm/MatchEngineTopL3.cpp -cflags "-std=c++11"
-add_files -tb ../TestBenches/MatchEngineL3_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
-add_files -tb ../emData/ME
-open_solution -reset "solution1"
+add_files ../TrackletAlgorithm/MatchEngineTopL3.cpp -cflags "$CFLAGS"
+add_files -tb ../TestBenches/MatchEngineL3_test.cpp -cflags "$CFLAGS"
+
+# data files
+add_files -tb ../emData/ME/
+
+# solutions
+open_solution "solution1"
+source settings_hls.tcl
 source set_fpga.tcl
-create_clock -period 4 -name default
-#source "./projrouter/solution1/directives.tcl"
-csim_design -compiler gcc
+create_clock -period 250MHz -name default
+
+csim_design -compiler gcc -mflags "-j8"
 csynth_design
-cosim_design
-export_design -rtl verilog -format ip_catalog
-#export_design -rtl verilog -format ip_catalog -evaluate verilog
+cosim_design 
+export_design -format ip_catalog
+# Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
+#export_design -format ip_catalog -flow impl
+
 exit
