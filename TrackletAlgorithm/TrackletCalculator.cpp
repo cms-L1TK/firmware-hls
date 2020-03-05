@@ -104,6 +104,7 @@ void TrackletCalculator_L1L2G(
     TrackletProjectionMemory<DISK> * projout_D4PHIC,
     TrackletProjectionMemory<DISK> * projout_D4PHID
 ) {
+#pragma HLS inline recursive
 #pragma HLS resource variable=innerStubs.get_mem() latency=2
 #pragma HLS resource variable=outerStubs.get_mem() latency=2
 #pragma HLS resource variable=stubPairs.get_mem() latency=2
