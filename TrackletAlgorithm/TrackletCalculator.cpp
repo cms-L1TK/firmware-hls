@@ -104,6 +104,10 @@ void TrackletCalculator_L1L2G(
     TrackletProjectionMemory<DISK> * projout_D4PHIC,
     TrackletProjectionMemory<DISK> * projout_D4PHID
 ) {
+#pragma HLS resource variable=innerStubs.get_mem() latency=2
+#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=stubPairs.get_mem() latency=2
+
   TC_L1L2G: TrackletCalculator_L1L2<TC::G, 1, 2, 13, 0x0000, 0x1FEE, 0xEEEEEEE6, kMaxProc>(
     bx,
     innerStubs,
