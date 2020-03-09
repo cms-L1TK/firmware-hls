@@ -491,7 +491,7 @@ end
 MC_L3PHIC MC_L3PHIC(
   .ap_clk(clk),
   .ap_rst(reset),
-  .ap_start(en_proc),
+  .ap_start(MatchCalculator_start),
   .ap_done(MatchCalculator_done),
   .bx_V(bx_out_MatchEngine[0]),
   .match1_dataarray_data_V_ce0(CM_L3PHIC17to24_dataarray_data_V_enb[0]),
