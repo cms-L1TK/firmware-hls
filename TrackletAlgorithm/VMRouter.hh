@@ -15,7 +15,7 @@
 #include "VMStubTEInnerMemory.hh"
 #include "VMStubTEOuterMemory.hh"
 #include <assert.h>
-
+#include <bitset> // For debugging purposes
 
 // I include this to get the constants. we should figure out if this is
 // the right way to go.
@@ -40,7 +40,7 @@ constexpr double rmaxdiskvm=67.0;
 
 // need separate lookup values for inner two vs outer three disks for 2S modules
 // these assume D11 geometry!
-// WHAT ARE THESE VALUES AND SHOULDN'T THEY BE UPDATED IF D11 GEOMETRY
+// Encoded r values for 2S disk modules? They are not used...
 constexpr double rDSSinner[10] = {66.7728, 71.7967, 77.5409, 82.5584, 84.8736, 89.8953, 95.7791, 100.798, 102.495, 107.52};  // <=== these 10 are for inner 2 disks
 constexpr double rDSSouter[10] = {65.1694, 70.1936, 75.6641, 80.6908, 83.9581, 88.9827, 94.6539, 99.6772, 102.494, 107.519}; // <=== these 10 are for outer 3 disks
 
@@ -128,8 +128,8 @@ constexpr int kMaxFineBinTable = 256;
 
 // local files
 // returns top 5 bits of phi, i.e. max 31 in decimal
-template <regionType ASTYPE>
-inline ap_uint<5> iphivmRaw(const typename AllStub<ASTYPE>::ASPHI phi)
+template <regionType INTYPE>
+inline ap_uint<5> iphivmRaw(const typename AllStub<INTYPE>::ASPHI phi)
 {
 	// TODO: get rid of hard-coded values
 	ap_uint<5> iphivm=phi.range(phi.length()-1,phi.length()-5);
@@ -140,8 +140,8 @@ inline ap_uint<5> iphivmRaw(const typename AllStub<ASTYPE>::ASPHI phi)
 // E.g. 32 bins would use VMbits=5
 // finebits is the number of bits within the VM
 // NEVER USED?!?!?
-template <regionType ASTYPE>
-inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int VMbits,
+template <regionType INTYPE>
+inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int VMbits,
 	const int finebits)
 	{
 		auto length= phi.length() - VMbits - finebits;
@@ -156,8 +156,8 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 	// Returns a number from 0 to 31. for both the plus and the minus:
 	// we add a small amount to the raw value; if it's not the same
 	// as the central value we copy the data to the adjacent memory as well.
-	template <regionType ASTYPE>
-	inline ap_uint<5> iphivmRawPlus(const typename AllStub<ASTYPE>::ASPHI phi)
+	template <regionType INTYPE>
+	inline ap_uint<5> iphivmRawPlus(const typename AllStub<INTYPE>::ASPHI phi)
 	{
 		// // TODO: get rid of hard-coded values
 		// ap_uint<7> tmp = phi.range(phi.length()-1,phi.length()-7);
@@ -171,8 +171,8 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 	}
 
 	// see above
-	template <regionType ASTYPE>
-	inline ap_uint<5> iphivmRawMinus(const typename AllStub<ASTYPE>::ASPHI phi)
+	template <regionType INTYPE>
+	inline ap_uint<5> iphivmRawMinus(const typename AllStub<INTYPE>::ASPHI phi)
 	{
 		ap_uint<7> tmp(phi.range(phi.length()-1,phi.length()-7));
 		auto iphivmp = --tmp;
@@ -190,14 +190,14 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 	constexpr int MAXVMROUTER = kMaxProc; // TODO need right symbol here
 
 	//template <int layer, int disk, bool isPSmodule>
-	template <regionType ASTYPE, regionType METYPE, int LAYER, int DISK, bool PSMODULE>
+	template <regionType INTYPE, regionType METYPE, int LAYER, int DISK, bool PSMODULE>
 	void VMRouter(const BXType bx,
-		const InputStubMemory<ASTYPE>* const i0,
-		const InputStubMemory<ASTYPE>* const i1,
-		const InputStubMemory<ASTYPE>* const i2,
-		const InputStubMemory<ASTYPE>* const i3,
-		const InputStubMemory<ASTYPE>* const i4,
-		AllStubMemory<ASTYPE>* allstub,
+		const InputStubMemory<INTYPE>* const i0,
+		const InputStubMemory<INTYPE>* const i1,
+		const InputStubMemory<INTYPE>* const i2,
+		const InputStubMemory<INTYPE>* const i3,
+		const InputStubMemory<INTYPE>* const i4,
+		AllStubMemory<INTYPE>* allstub,
 		ap_uint<32> memask,
 		VMStubMEMemory<METYPE> *m0,
 		VMStubMEMemory<METYPE> *m1,
@@ -287,7 +287,7 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 
 
 			// Number of data in each input memory
-			typename InputStubMemory<ASTYPE>::NEntryT zero(0);
+			typename InputStubMemory<INTYPE>::NEntryT zero(0);
 
 			auto n_i0 =            i0->getEntries(bx);
 			auto n_i1 =            i1->getEntries(bx);
@@ -316,7 +316,7 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 				//const InputStubMemory *next; // this method makes vivado crash
 
 				bool resetNext = false; // Used to reset read_addr
-				InputStub<ASTYPE>stub;
+				InputStub<INTYPE> stub;
 
 				// Read stub from memory in turn
 				if ( n_i0 ) {
@@ -365,7 +365,7 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 
 				// add stub to AllStub memory (memories?)
 				// HACK fix me
-				AllStub<ASTYPE> allstubd(stub.raw());
+				AllStub<INTYPE> allstubd(stub.raw());
 				std::cout << "Out put stub: " << std::hex << allstubd.raw()
 				<< std::dec << std::endl;
 				// END HACK
@@ -387,9 +387,9 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 				nallstubsdisks[DISK-1]*nvmmedisks[DISK-1];
 
 				auto stubPhi = stub.getPhi();
-				auto iphiRaw = iphivmRaw<ASTYPE>(stubPhi); // Top 5 bits of phi
-				auto iphiRawPlus = iphivmRawPlus<ASTYPE>(stubPhi);
-				auto iphiRawMinus = iphivmRawMinus<ASTYPE>(stubPhi);
+				auto iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
+				auto iphiRawPlus = iphivmRawPlus<INTYPE>(stubPhi); // Top 5 bits of phi after adding a small number
+				auto iphiRawMinus = iphivmRawMinus<INTYPE>(stubPhi); // Top 5 bits of phi after subtracting a small number
 				auto d = nvm/32; // Some sort of normalisation thing
 				// TODO: comment this
 				iphiRaw = iphiRaw*d; // The VM number
@@ -401,7 +401,7 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 				//   std::cout << "XXX+: " << iphiRaw << " " << iphiRawPlus << std::endl;
 				// }
 
-				// Stubs can only end up in the neighbouring VM after
+				// Stubs can only end up in the neighbouring VM after calculating iphivmrawplus/minus
 				assert(std::abs(iphiRaw-iphiRawPlus) <= 1 );
 				assert(std::abs(iphiRaw-iphiRawMinus) <= 1 ) ;
 
@@ -430,8 +430,19 @@ inline int iphivmFineBins(const typename AllStub<ASTYPE>::ASPHI phi, const int V
 					// Ignoring the sign (MSB): the top 7 MSBs of z
 					typename VMStubME<METYPE>::VMSMEID index = (z>>(z.length()-nbitsfinebintable_))&((1<<nbitsfinebintable_)-1);
 					// Set zfine: the z position within a bin
-					typename VMStubME<METYPE>::VMSMEFINEZ zfine = finebintable_[index]; //Takes time
+					typename VMStubME<METYPE>::VMSMEFINEZ zfine = finebintable_[index]; // Using the bits 5 down to 2?
 					stubme.setFineZ(zfine);
+
+					// If you want to print out the bits...
+					// auto bajs = (z>>(z.length()-nbitsfinebintable_))&((1<<nbitsfinebintable_)-1);
+					// std::bitset<12> bitindex(index);
+					// std::bitset<12> bitbajs(bajs);
+					// std::bitset<12> bitz(z);
+					// #ifndef __SYNTHESIS__
+					// std::cout << "INDEX " << index << "  " << bitindex << std::endl;
+					// std::cout << "GREJ  "  << bajs << "  " << bitbajs << std::endl;
+					// std::cout << "Z     " << z << " " << bitz << std::endl;
+					// #endif // DEBUG
 
 				}
 				// put in a bunch of enables to decide which memories to write
