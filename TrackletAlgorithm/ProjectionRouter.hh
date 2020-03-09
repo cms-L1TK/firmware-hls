@@ -134,7 +134,7 @@ namespace PR
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
   // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 7; 
+  constexpr unsigned int LoopItersCut = 6; 
   
 } // namesapce PR
 

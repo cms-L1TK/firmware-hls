@@ -80,10 +80,10 @@ void readTable(bool table[256]){
 
 //Attempt at new version of code
 template<int L, regionType VMSMEType>
-void MatchEngine(const BXType bx, BXType& bx_o,
-		 const VMStubMEMemory<VMSMEType>* const instubdata,
-		 const VMProjectionMemory<BARREL>* const inprojdata,
-		 CandidateMatchMemory* const outcandmatch){
+void MatchEngine(BXType bx, BXType& bx_o,
+		 const VMStubMEMemory<VMSMEType>* instubdata,
+		 const VMProjectionMemory<BARREL>* inprojdata,
+		 CandidateMatchMemory* outcandmatch){
 
 
 #ifndef __SYNTHESIS__
@@ -106,16 +106,17 @@ void MatchEngine(const BXType bx, BXType& bx_o,
   //circular, and the projection reading will stop if buffer is full and continue 
   //after the buffer is drained
 
-  constexpr unsigned int kNBitsBuffer=3;  
+  constexpr unsigned int kNBitsBuffer=3;
+  constexpr int kNBits_ProjBuffer =kNBits_MemAddrBinned + VMProjectionBase<BARREL>::kVMProjectionSize + 1 +kNBits_z +1;
 
   ap_uint<kNBitsBuffer> writeindex=0;
   ap_uint<kNBitsBuffer> readindex=0;
-  ap_uint<30> projbuffer[1<<kNBitsBuffer];  //FIXME How to replace 30 with const?
+  ap_uint<kNBits_ProjBuffer> projbuffer[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
-  ap_uint<kNBits_MemAddr> iproj=0;
+  ap_uint<kNBits_MemAddr> iproj=0; //counter
   auto const nproj=inprojdata->getEntries(bx);
   bool moreproj=iproj<nproj;
 
@@ -132,10 +133,12 @@ void MatchEngine(const BXType bx, BXType& bx_o,
   ap_uint<kNBits_MemAddrBinned> nstubs=0;
   ap_uint<kNBits_MemAddrBinned> istub=0;
 #pragma HLS dependence variable=istub intra WAR true
-
+  
+// declare counter for output to CandidateMatch // !!!                                                                                                                                                       
+  int ncmatchout = 0;
 
   //Main processing loops starts here  
-  for (ap_uint<kNBits_MemAddr> istep=0;istep<kMaxProc;istep++) {
+  for (ap_uint<kNBits_MemAddr> istep=0;istep<kMaxProc-8;istep++) {
 #pragma HLS PIPELINE II=1
 
     //prefetch and calculate write pointers for buffer
@@ -239,7 +242,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	  istub++;
 	}
       }
-
+      
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
       //typename VMStubME<VMSMEType> stubdata=instubdata->read_mem(bx,stubadd);
@@ -269,14 +272,16 @@ void MatchEngine(const BXType bx, BXType& bx_o,
       //}
       if (pass&&table[index]) {
 	CandidateMatch cmatch(projindex.concat(stubindex));
-	outcandmatch->write_mem(bx,cmatch);
-      }
+	outcandmatch->write_mem(bx,cmatch,ncmatchout);
+	ncmatchout ++;
+      } // if(pass&&table[index])
       
-    }
+    } // if(buffernotempty)
 
-  }
+    if (istep==kMaxProc-1-8) bx_o = bx;
+  } // for (ap_uint<kNBits_MemAddr> istep=0;istep<kMaxProc;istep++) 
 
-}
+} // void MatchEngine()
 
 #endif
 
@@ -290,9 +295,9 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 // This version has not been updated to be compatible with the new memory formats
 
 void MatchEngine(const BXType bx, BXType& bx_o,
-		 const VMStubMEMemory* const instubdata,
-		 const VMProjectionMemory* const inprojdata,
-		 CandidateMatchMemory* const outcandmatch){
+		 const VMStubMEMemory* instubdata,
+		 const VMProjectionMemory* inprojdata,
+		 CandidateMatchMemory* outcandmatch){
 
 
 #ifndef __SYNTHESIS__
@@ -312,6 +317,8 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 
   auto const nproj=inprojdata->getEntries(bx);
 
+  // declare counter for output to CandidateMatch // !!!
+  int ncmatchout = 0;
   //Outermost loop is over the projections
   for (ap_uint<kNBits_MemAddr> iproj=0;iproj<nproj;iproj++) {
     //Read projection from memory and extract the elements of the projection
@@ -357,7 +364,8 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	auto const index=projrinv.concat(stubbend);
 	if (pass&&table[index]) {
 	  CandidateMatch cmatch(projindex.concat(stubindex));
-	  outcandmatch->write_mem(bx,cmatch);
+	  outcandmatch->write_mem(bx,cmatch,ncmatchout);
+	  ncmatchout ++;
 	}
 
       }
