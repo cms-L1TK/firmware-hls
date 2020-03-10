@@ -15,11 +15,10 @@ add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "CFLAGS"
 # data files
 add_files -tb ../emData/IL/
 
-# solutions
 open_solution "solution1"
+
+# Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
-source set_fpga.tcl
-create_clock -period 250MHz -name default
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

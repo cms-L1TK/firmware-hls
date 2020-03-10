@@ -16,11 +16,10 @@ add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "$CFLAGS"
 add_files -tb ../emData/PR_L3PHIC/
 #add_files -tb ../emData/PR/PR_L3L4_L1PHI3/
 
-# solutions
 open_solution "solution1"
+
+# Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
-source set_fpga.tcl
-create_clock -period 250MHz -name default
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

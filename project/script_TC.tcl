@@ -17,11 +17,10 @@ add_files -tb ../TestBenches/TrackletCalculator_L1L2G_test.cpp -cflags "$CFLAGS"
 add_files -tb ../emData/TC/tables/
 add_files -tb ../emData/TC/TC_L1L2G/
 
-# solutions
 open_solution "solution1"
+
+# Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
-source set_fpga.tcl
-create_clock -period 250MHz -name default
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

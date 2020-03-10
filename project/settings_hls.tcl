@@ -1,3 +1,10 @@
+# Set FPGA
+set_part {xcvu7p-flvb2104-1-e} -tool vivado
+#set_part {xcku115-flvb2104-1-e} -tool vivado
+
+# Set clock frequency
+create_clock -period 250MHz -name default
+
 # Allow HLS to use longer (easier to understand) names in resource/latency usage profiles.
 config_compile -name_max_length 100
 
