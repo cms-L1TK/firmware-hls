@@ -56,10 +56,11 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-
+	NEntryT nentry = nentries_[bx][0]; // Ugly hack...
+	nentry = 0;
 	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
 #pragma HLS UNROLL
-	  nentries_[bx][ibin] -= nentries_[bx][ibin]; // doesn't work to set it to 0
+		nentries_[bx][ibin] = nentry; // HACK: Did not work to directly set it to 0. HLS synthesis error "Constant 'null' has an unsynthesizable type..."
 	}
   }
 
