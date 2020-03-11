@@ -9,7 +9,8 @@
 
 //typedef ap_uint<kInputLinkSize> InputLinkData;
 
-void InputRouter(LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& IL);
+template<int ISType>
+void InputRouter(LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& IL, InputStubMemory<ISType>* hMemory );
 
 void WriteMap(int address, ap_uint<kLINKMAPwidth>  encodedMap , DTCMapMemory *Map );
 

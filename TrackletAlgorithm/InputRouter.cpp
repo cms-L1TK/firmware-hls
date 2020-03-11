@@ -6,20 +6,30 @@
 //constexpr unsigned int kInputLinkSize = 38;
 //typedef ap_uint<kInputLinkSize> InputLinkData;
 // template this .. for now its just PS barrel 
-void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink)
+
+template<int ISType>
+void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink, InputStubMemory<ISType>* hMemory )
 {
   ap_uint<kNBits_DTC> hInputStub;
   ap_uint<kLINKMAPwidth> hDTCMapEncoded = Map.read_mem(1, linkId).raw();
 
+  // input stubs per region/type of module 
   InputStub<BARRELPS> cBarrelPSstub;
   InputStub<BARREL2S> cBarrel2Sstub;
   InputStub<DISKPS> cDiskPSstub;
   InputStub<DISK2S>  cDisk2Sstub;
+  // memories per disk 1
+  InputStubMemory<DISKPS> D1PhiA_PS;
+  InputStubMemory<DISKPS> D1PhiB_PS;
+  InputStubMemory<DISKPS> D1PhiC_PS;
+  InputStubMemory<DISKPS> D1PhiD_PS;
+  // memories per barrel layer
+
   //std::cout << std::hex << (hDTCMapEncoded&0xFFFF) << std::dec << "\n";
   for (int cStubCounter=0; cStubCounter<kMaxStubsFromLink; cStubCounter++)
   {
 
-    //#pragma HLS PIPELINE II=1
+    #pragma HLS PIPELINE II=1
     //the non-blocking version of the read 
     if (hIputLink.read_nb(hInputStub)) // if data is available the function will update the reference in the argument with the values and return “true” 
     {

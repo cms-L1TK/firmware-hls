@@ -208,7 +208,7 @@ int main()
         }
       }
       // unit under test
-      InputRouter(cLinkId, hLinkMap, bx, hIputLink);
+      //InputRouter(cLinkId, hLinkMap, bx, hIputLink);
     }
     cIterator++;
   }
