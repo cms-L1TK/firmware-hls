@@ -62,6 +62,8 @@ void TrackletEngine(
   ap_uint<1> bendoutertable[stubptouterdepth];
   readBendOuterTable<seed, innerphi, outerphi, stubptouterdepth>(bendoutertable);
 
+  int nstubpairs = 0;
+
   outstubpair.clear(bx);
 
   //
@@ -218,7 +220,7 @@ void TrackletEngine(
           	  if(!ifskip) {
                  	// good stub pair, so write it!
                   	StubPair spair(innerstubindex.concat(outerstubindex));
-                  	outstubpair.write_mem(bx,spair);
+                  	outstubpair.write_mem(bx,spair,nstubpairs++);
           	  }
       	 }
   }
