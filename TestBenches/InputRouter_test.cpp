@@ -1,4 +1,5 @@
 // InputRouter Test
+// Sarah.Storey@cern.ch for questions/comments 
 #include "hls_stream.h"
 #include "InputStubMemory.hh"
 #include "InputRouter.hh"
@@ -9,12 +10,18 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <map>
+#include <bitset> 
 
 using namespace std;
 
 int main()
 {
+  #ifndef __SYNTHESIS__
+    std::cout << "SYNTHESIS" << std::endl;
+  #endif
 
+  /*
   InputStub<BARREL2S> cBarrel2S;
   InputStub<BARRELPS> cBarrelPS;
   std::cout << "Total number of bits in barrel PS : " << cBarrelPS.kInputStubSize << std::endl;
@@ -24,10 +31,99 @@ int main()
   InputStub<DISK2S> cDisk2S;
   std::cout << "Total number of bits in disk PS : " << cDiskPS.kInputStubSize << std::endl;
   std::cout << "Total number of bits in disk 2S : " << cDisk2S.kInputStubSize << std::endl;
+  */
 
+  
+
+  // name is  : DTCtype[PS10G_PS5G_2S]_[DTC_number]_[which tracking nonant: each DTC reads out 2 tracking nonants]
+  std::string cInputFile_LinkMap = "IL/dtclinklayerdisk.dat";
+  std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>>   cInputMap;
+  // memory to store LUT for mapping of DTCs to layers/disks/etc. 
+  // 3 bits for layer/disk id  --> 3 bits 
+  // 1 bit for barrel/disk --> 4 bits  
+  // 1 bit for PS/2S --> 5 bits  
+  // up-to 4 layers/disks per DTC
+  // 20 bits per link
+  // 48 links to TF   
+  // memory depth of 12 to store mapping for all input links 
+  std::cout << "Loading link map into memory .. will be used later" << std::endl;
+  std::ifstream fin_il_map;
+  if (not openDataFile(fin_il_map,cInputFile_LinkMap)) 
+  {
+    std::cout << "Could not find file " << cInputFile_LinkMap << std::endl;
+    return 0;
+  }
+  std::cout << "Reading link map from file : " << cInputFile_LinkMap << std::endl;
+  size_t cLinkCounter=0;
+  // parse link map 
+  for(std::string cInputLine; getline( fin_il_map, cInputLine ); )
+  {
+    auto cStream = std::istringstream{cInputLine};
+    std::string cToken;
+    while (cStream >> cToken) 
+    {
+      bool cIsAlNum =true;
+      for( auto cChar : cToken )
+        cIsAlNum = cIsAlNum && std::isalnum(cChar);
+      if( !cIsAlNum ) // input link name 
+      {
+        if( cToken.find("2S") != std::string::npos || cToken.find("PS") != std::string::npos ) 
+        {
+          if( cToken[0] == 'n')
+            cInputMap[cLinkCounter].first = "IL/Link_" + cToken.substr(4, cToken.length()-3) + "_B.dat"; //Link_PS10G_1_A.dat
+          else
+            cInputMap[cLinkCounter].first = "IL/Link_" + cToken + "_A.dat" ; //Link_PS10G_1_A.dat
+          std::cout << "Link name : " << cInputMap[cLinkCounter].first << "\n";
+        }
+      }
+      else
+      {
+        auto cLayerId = std::stoi( cToken);
+        if(cLayerId != -1 )
+          cInputMap[cLinkCounter].second.push_back( cLayerId );
+      }
+    }
+    cLinkCounter++;
+  }
+  std::cout << "Mapped out " << +cInputMap.size() << " links." << std::endl;
+  auto cLinkIterator = cInputMap.begin();
+  // store link map in memory
+  // declare output memory arrays to be filled by hls simulation
+  DTCMapMemory hLinkMap;
+  size_t cIncrement=1;
+  for(size_t cIndex=0; cIndex < cInputMap.size(); cIndex++)
+  {
+    ap_uint<kLINKMAPwidth> cMemoryWord = 0x0000;
+    cLinkCounter = std::distance( cInputMap.begin(), cLinkIterator ); 
+    uint32_t cWord = 0x00000000; 
+    size_t cLayerCounter=0;
+    bool cIs2S = ( cLinkIterator->second.first.find("2S") != std::string::npos  ); 
+    for( auto cLayerId : cLinkIterator->second.second ) // layer id is either layer number or disk number 
+    {
+      auto cIsBarrel = (cLayerId<10); 
+      cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
+      cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
+      cLayerCounter++;
+    }
+    //std::cout << "Link " << +cLinkCounter << " encoded word is " << std::bitset<kLINKMAPwidth>(cWord) << "\n";
+    // for( size_t cLayerIndex=0 ; cLayerIndex < cLinkIterator->second.second.size(); cLayerIndex++ )
+    // {
+    //   ap_uint<5> cLayerEncoding = ( (cWord & (0x1F << cLayerIndex*5)) >> cLayerIndex*5 ); 
+    //   ap_uint<1> cIsBarrel = ( cLayerEncoding & 0x01)  ; 
+    //   ap_uint<1> cIs2S = ( cLayerEncoding & 0x02) >> 1; 
+    //   ap_uint<3> cLayer = ( cLayerEncoding & 0x1C) >> 2;
+    //   std::cout << "\t.. layer index " << +cLayerIndex << " word is " << std::bitset<5>(cLayerEncoding) << " ... which is layer " << +cLayer << " 2S bit is " << +cIs2S << " barrel bit is " << +cIsBarrel << "\n";
+    // }  
+    cMemoryWord = ap_uint<kLINKMAPwidth>( cWord);
+    WriteMap(static_cast<int>(cIndex), cMemoryWord, &hLinkMap);
+    cLinkIterator++;
+  }
+  
+  
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
+  LINK cLinkId = 6;
+  std::string cInputFile = cInputMap[static_cast<int>(cLinkId)].first;//"IL/Link_PS10G_1_A.dat";
   std::ifstream fin_il;
-  std::string cInputFile = "IL/IL_PS10G_1_B/Link_PS10G_1_B.dat";
   bool validil = openDataFile(fin_il,cInputFile); // what does this do? 
   if (not validil) 
   {
@@ -36,13 +132,6 @@ int main()
   }
   std::cout << "Read-back stubs from file : " << cInputFile << std::endl;
 
-  // hls variables start with h 
-  BXType hBxCounter;
-  // declare input stream to be used in hls simulation
-  // note : By default, array variables are implemented as RAM [General arrays are implemented as RAMs for read-write access]
-  // but this is not in the test bench 
-  //If the data stored in the array is consumed or produced in a sequential manner, a more efficient communication mechanism is to use streaming data as specified by the STREAM pragma, where FIFOs are used instead of RAMs.
-  hls::stream<ap_uint<38> > hIputLink;
   
   // process the text file .. just regular c++ here 
   char cStubDelimeter = '|';
@@ -50,26 +139,97 @@ int main()
   int  cEventCounter=-1;
   std::string cBxLabel = "BX ";
   int cNevents = 1; 
+
+  int cBxCounter;
+  std::map<int, std::vector<std::string>>   cInputStubs;
   for(std::string cInputLine; getline( fin_il, cInputLine ); )
   {
-    if( cEventCounter == cNevents)
-      continue;
-
     if( cInputLine.find("Event") != std::string::npos ) 
     {
-      auto cBxString = cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) ;
-      hBxCounter = BXType(cBxString.c_str(),2);
+      //cStubString.first = cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) ;
+      cBxCounter = std::stoi( cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) , nullptr,2 );
       cEventCounter++;
     }
     else
     {
       // clean up string to access stub from this event 
       cInputLine.erase( std::remove(cInputLine.begin(), cInputLine.end(), cStubDelimeter), cInputLine.end() );
-      auto cStubString = cInputLine.substr(0, cInputLine.find(cStubEnd));
-      std::cout << "Event " << cEventCounter << " -- read stub from Bx " <<  hBxCounter << " from text file : " << cStubString << " \n"; 
-      //hIputLink.write_nb( ap_uint<38>( cInputLine.substr(0, cInputLine.find(cStubEnd)).c_str() ,2) );
+      cInputStubs[cBxCounter].push_back( cInputLine.substr(0, cInputLine.find(cStubEnd)) );
+      //cStubString.second = cInputLine.substr(0, cInputLine.find(cStubEnd));
+      //cInputStubs.push_back( cStubString );
     }
   }
+
+
+
+  // loop over stubs read from file 
+  // hls variables start with h 
+  BXType hBxCounter;
+  // declare input stream to be used in hls simulation
+  // note : By default, array variables are implemented as RAM [General arrays are implemented as RAMs for read-write access]
+  // but this is not in the test bench 
+  //If the data stored in the array is consumed or produced in a sequential manner, a more efficient communication mechanism is to use streaming data as specified by the STREAM pragma, where FIFOs are used instead of RAMs.
+  hls::stream<ap_uint<kNBits_DTC> > hIputLink("InputLink_DTC");
+  std::cout << "Maximum  number of stubs from one link : " << kMaxStubsFromLink << "\n";
+  std::cout << "Encoding into memory connections for LinkId " << +(cLinkId) << " . The DTC connected to this link reads out " << +((cInputMap[cLinkId].second).size()) << " layers." << "\n";
+  DTCMap cEncodedMap;
+  ReadMap(cLinkId, hLinkMap, cEncodedMap);
+  std::cout << "\nMemory word for this link is " << std::bitset<kLINKMAPwidth>(cEncodedMap.raw()) << "\n";
+
+  auto cIterator = cInputStubs.begin();
+  while( cIterator != cInputStubs.end() )
+  {
+    auto cEventCounter = std::distance( cInputStubs.begin(), cIterator ); 
+    cBxCounter = cIterator->first;
+    auto& cStubs = cIterator->second;
+
+    if( cEventCounter < cNevents )
+    {
+      std::cout << " Event " << +cEventCounter << " [Bx = " << cBxCounter << "] found " << cStubs.size() << " stubs in input file.\n" ;
+      BXType bx = cBxCounter&0x7;
+      auto cStubIterator = cStubs.begin(); 
+      for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.end(); cStubIterator++)
+      {
+        auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
+        auto& cStub = *cStubIterator;
+        if( cStubCounter < kMaxStubsFromLink )
+        {
+          //if( cStubCounter%250 == 0 )
+          std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << cStub << "\n";
+          //non blocking write into input stream 
+          // I think  the string is inverted .. so reverse the string to get the bits in the correct order 
+          //std::reverse(cStub.begin(), cStub.end());
+          hIputLink.write_nb( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
+        }
+        else
+        {
+          if( cStubCounter == kMaxStubsFromLink) 
+            std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
+        }
+      }
+      // unit under test
+      InputRouter(cLinkId, hLinkMap, bx, hIputLink);
+    }
+    cIterator++;
+  }
+    
+  
+
+  // for(auto cIterator = cInputStubs.begin(); cIterator < cInputStubs.end() ; cIterator++)
+  // //for(auto cInputStub : cInputStubs )
+  // {
+  //   //auto cEventCounter = std::distance( cInputStubs.begin(), cIterator );
+  //   //auto& cInputStub = *cIterator; 
+  //   //std::cout << "Event " << cEventCounter << " -- read stub from Bx " <<  cInputStub.first << " from text file : " << cInputStub.second << " \n"; 
+    
+  //   //hBxCounter = BXType(cInputStub.first.c_str(),2);
+  //   // non blocking write into input stream 
+  //   //hIputLink.write_nb( ap_uint<38>( cInputStub.second.c_str() ,2) );
+  // }
+
+  // unit under test
+  /*InputRouter(bx,inputlink,&inputstubs0,&inputstubs1,&inputstubs2,&inputstubs3,&inputstubs4,
+                 &inputstubs5,&inputstubs6,&inputstubs7,&inputstubs8,&inputstubs9, true);*/
 
   // Barrel : A, B, C, D 
   // Regions : 0, 1 , 2 ,3 

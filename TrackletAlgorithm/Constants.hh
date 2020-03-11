@@ -6,7 +6,12 @@
 //#include <cmath>
 //#include "hls_math.h"
 
+
+constexpr unsigned int kNBits_DTC = 38; 
 constexpr int kMaxStubsFromLink = 256;
+
+constexpr int kBRAMwidth = 36; 
+constexpr int kLINKMAPwidth = 20;
 
 constexpr int kTMUX = 18;   //For hourglass project
 constexpr int kMaxProc = kTMUX * 6;
@@ -15,6 +20,7 @@ constexpr int kMaxProc = kTMUX * 6;
 constexpr int kNBits_MemAddr = 7;
 constexpr int kMemDepth = (1<<kNBits_MemAddr);
 constexpr int kNBits_BX = 3;
+constexpr int kNBits_LINK = 4;
 
 constexpr int kNBits_MemAddrBinned = 4;
 constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
@@ -28,6 +34,10 @@ enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK};
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
+typedef ap_uint<kNBits_LINK> LINK;  // temporary definition. need to be revisited
 
-
+// data format 
+constexpr unsigned int kNBits_Valid = 0;
+constexpr unsigned int kNBits_LayerId = 2;
+constexpr unsigned int kNBits_Debug = kNBits_Valid + kNBits_LayerId;
 #endif

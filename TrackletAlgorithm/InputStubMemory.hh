@@ -4,6 +4,8 @@
 #include "Constants.hh"
 #include "MemoryTemplate.hh"
 
+
+
 // InputStubBase is where we define the bit widths, which depend on the class template parameter
 template<int ISType> class InputStubBase {};
 
@@ -70,6 +72,7 @@ public:
     kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize
   };
 };
+
 
 
 // Data object definition
@@ -186,4 +189,37 @@ private:
 // Memory definition
 template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 1, kNBits_MemAddr>;
 
+// Data object definition
+class DTCMap 
+{
+  public:
+    typedef ap_uint<kLINKMAPwidth> DTCInfo;
+
+    // Constructors
+    DTCMap(const DTCInfo& newdata):
+      data_(newdata)
+    {}
+
+    DTCMap():
+      data_(0)
+    {}
+
+    #ifndef __SYNTHESIS__
+    DTCMap(const char* datastr, int base=16)
+    {
+      DTCInfo newdata(datastr, base);
+      data_ = newdata;
+    }
+    #endif
+
+    // Getter
+    DTCInfo raw() const {return data_; }
+
+
+  private:
+    DTCInfo data_;
+
+};
+
+using DTCMapMemory = MemoryTemplate<DTCMap, 1, kNBits_MemAddr>;
 #endif

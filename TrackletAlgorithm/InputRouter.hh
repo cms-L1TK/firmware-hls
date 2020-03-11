@@ -7,9 +7,11 @@
 #include "hls_stream.h"
 #include "InputStubMemory.hh"
 
-//constexpr unsigned int kInputLinkSize = 38;
 //typedef ap_uint<kInputLinkSize> InputLinkData;
-void InputRouter(const BXType bx, hls::stream<ap_uint<38> >& IL, InputStubMemory<BARRELPS> *R0PhiA, InputStubMemory<BARRELPS> *R0PhiB,
-               InputStubMemory<BARRELPS> *R0PhiC, InputStubMemory<BARRELPS> *R0PhiD, InputStubMemory<BARRELPS> *R1PhiA, InputStubMemory<BARRELPS> *R1PhiB,
-               InputStubMemory<BARRELPS> *R2PhiA, InputStubMemory<BARRELPS> *R2PhiB, InputStubMemory<BARRELPS> *R3PhiA, InputStubMemory<BARRELPS> *R3PhiB, bool fromL1);
+
+void InputRouter(LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& IL);
+
+void WriteMap(int address, ap_uint<kLINKMAPwidth>  encodedMap , DTCMapMemory *Map );
+
+void ReadMap(int address, DTCMapMemory Map, DTCMap&  encodedMap);
 #endif
