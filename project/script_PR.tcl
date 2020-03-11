@@ -13,7 +13,7 @@ add_files ../TrackletAlgorithm/ProjectionRouterTop.cpp -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/PR_L3PHIC/
+add_files -tb ../emData/PR/PR_L3PHIC/
 #add_files -tb ../emData/PR/PR_L3L4_L1PHI3/
 
 open_solution "solution1"
