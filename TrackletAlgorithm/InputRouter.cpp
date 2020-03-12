@@ -82,14 +82,6 @@ void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stre
 			hMemory_D4.write_mem(bx, cDiskStub,  hMemory_D4.getEntries(bx) );
 		else if( cLayerOrDiskId == 5 )
 			hMemory_D5.write_mem(bx, cDiskStub,  hMemory_D5.getEntries(bx) );
-
-		#ifndef __SYNTHESIS__
-			std::cout << ".... " << +hMemory_D1.getEntries(bx) << " in D1\n";
-			std::cout << ".... " << +hMemory_D2.getEntries(bx) << " in D2\n";
-			std::cout << ".... " << +hMemory_D3.getEntries(bx) << " in D3\n";
-			std::cout << ".... " << +hMemory_D4.getEntries(bx) << " in D4\n";
-			std::cout << ".... " << +hMemory_D5.getEntries(bx) << " in D5\n";
-		#endif
 	}
 	else 
 	{

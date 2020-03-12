@@ -144,7 +144,7 @@ int main()
   
   
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
-  LINK cLinkId = 6;
+  LINK cLinkId = 0;
   std::string cInputFile = cInputMap[static_cast<int>(cLinkId)].first;//"IL/Link_PS10G_1_A.dat";
   bool cIs2SDTC = ( cInputFile.find("2S") != std::string::npos  ); 
   std::ifstream fin_il;
@@ -239,6 +239,7 @@ int main()
           std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D3 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D4 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D5 memory\n";
+          
           InputRouter(cLinkId, hLinkMap, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
           
           std::cout << "After the input router there are : ";
