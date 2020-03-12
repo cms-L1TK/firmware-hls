@@ -234,12 +234,12 @@ int main()
           std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in D1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in D2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D3 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D4 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D5 memory\n";
-          
+          std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(bx) << " in D1 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(bx) << " in D2 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(bx) << " in D3 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
+
           InputRouter(cLinkId, hLinkMap, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
           
           std::cout << "After the input router there are : ";
