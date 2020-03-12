@@ -2,9 +2,9 @@
 // Sarah.Storey@cern.ch for questions/comments 
 #include "hls_stream.h"
 #include "InputStubMemory.hh"
-#include "InputRouter.hh"
 #include "FileReadUtility.hh"
 
+#include "InputRouter.hh"
 #include <iostream>
 #include <fstream>
 #include <vector>

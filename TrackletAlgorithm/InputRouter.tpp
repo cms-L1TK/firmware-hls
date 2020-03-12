@@ -1,13 +1,3 @@
-#include "InputRouter.hh"
-#include "Constants.hh"
-#include "hls_math.h"
-#include "ap_int.h"
-#include "hls_stream.h"
-#include "InputStubMemory.hh"
-
-// implementation of input router 
-//#include "InputRouter.tpp"
-
 template<int ISTypeBarrel, int ISTypeDisk>
 void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
 				  InputStubMemory<ISTypeBarrel> *hMemory_L1 ,InputStubMemory<ISTypeBarrel> *hMemory_L2, InputStubMemory<ISTypeBarrel> *hMemory_L3,
@@ -42,6 +32,7 @@ void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stre
 	{
 		// phi region
 		cBarrelStub =  InputStub<ISTypeBarrel>(hStub); 
+		cPhiRegion = ( cBarrelStub.getPhi() & (0xF << (cBarrelStub.kISPhiSize-4+1)) ) >> (cBarrelStub.kISPhiSize-4+1);
 		// 3 layers for each of barrel and disk - so make sure that the layer we're checking starts from 1 
 		ap_uint<3> cLayer;
 		if (cIs2S) 
@@ -49,7 +40,6 @@ void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stre
 		else 
 			cLayer = cLayerOrDiskId;
 		#ifndef __SYNTHESIS__
-			cPhiRegion = ( cBarrelStub.getPhi() & (0xF << (cBarrelStub.kISPhiSize-4+1)) ) >> (cBarrelStub.kISPhiSize-4+1);
 			if( !cIs2S )
 				std::cout << "PS Stub from layer " << +cLayerOrDiskId << "  of barrel. Phi region is " << +cPhiRegion << "\n";
 			else 
@@ -67,8 +57,8 @@ void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stre
 	{
 		// phi region
 		cDiskStub =  InputStub<ISTypeDisk>(hStub); 
+		cPhiRegion = ( cDiskStub.getPhi() & (0xF << (cDiskStub.kISPhiSize-4+1)) ) >> (cDiskStub.kISPhiSize-4+1);
 		#ifndef __SYNTHESIS__
-			cPhiRegion = ( cDiskStub.getPhi() & (0xF << (cDiskStub.kISPhiSize-4+1)) ) >> (cDiskStub.kISPhiSize-4+1);
 			if( !cIs2S )
 				std::cout << "PS Stub from disk " << +cLayerOrDiskId << "  of end-cap. Phi region is " << +cPhiRegion << "\n";
 			else 
@@ -90,31 +80,3 @@ void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stre
 	}
   }
 }// input router 
-
-void WriteMap(int address, ap_uint<kLINKMAPwidth>  encodedMap , DTCMapMemory *Map )
-{
-  Map->write_mem(1, encodedMap, address);
-} // link map function 
-
-void ReadMap(int address, DTCMapMemory Map, DTCMap&  encodedMap)
-{
-  encodedMap = Map.read_mem(1, address);
-} // read map function 
-
-// barrel 2S input router 
-void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<BARRELPS> *hMemory_L1 ,InputStubMemory<BARRELPS> *hMemory_L2, InputStubMemory<BARRELPS> *hMemory_L3,
-				  InputStubMemory<DISKPS> *hMemory_D1, InputStubMemory<DISKPS> *hMemory_D2, InputStubMemory<DISKPS> *hMemory_D3 )
-{
-	ap_uint<kLINKMAPwidth> hDTCMapEncoded = Map.read_mem(1, linkId).raw();
-	RouteStub<BARRELPS,DISKPS>(hDTCMapEncoded, bx, hIputLink,hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3);
-}
-
-// disk 2S input router 
-void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<BARREL2S> *hMemory_L1 ,InputStubMemory<BARREL2S> *hMemory_L2, InputStubMemory<BARREL2S> *hMemory_L3,
-				  InputStubMemory<DISK2S> *hMemory_D1, InputStubMemory<DISK2S> *hMemory_D2, InputStubMemory<DISK2S> *hMemory_D3 )
-{
-	ap_uint<kLINKMAPwidth> hDTCMapEncoded = Map.read_mem(1, linkId).raw();
-	RouteStub<BARREL2S,DISK2S>(hDTCMapEncoded, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3);
-}
