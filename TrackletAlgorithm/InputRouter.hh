@@ -7,30 +7,109 @@
 #include "hls_stream.h"
 #include "InputStubMemory.hh"
 
-void LayerEncoding(ap_uint<kNBits_LayerId> cLayerId, ap_uint<kLINKMAPwidth>  encodedMap, ap_uint<4>& cLayer);
-
-void WriteMap(int address, ap_uint<kLINKMAPwidth>  encodedMap , DTCMapMemory *Map );
-
-void ReadMap(int address, DTCMapMemory Map, DTCMap&  encodedMap);
-
-// DTC (and therefore input link) is either PS or 2S .. 
-// so a templated input router might make sense? 
 template<int ISTypeBarrel, int ISTypeDisk>
-void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<ISTypeBarrel> &hMemory_L1 ,InputStubMemory<ISTypeBarrel> &hMemory_L2, InputStubMemory<ISTypeBarrel> &hMemory_L3,
-				  InputStubMemory<ISTypeDisk> &hMemory_D1, InputStubMemory<ISTypeDisk> &hMemory_D2, InputStubMemory<ISTypeDisk> &hMemory_D3 , InputStubMemory<ISTypeDisk> &hMemory_D4, InputStubMemory<ISTypeDisk> &hMemory_D5 );
-// implementation of input router 
-// #include "InputRouter.tpp"
+void InputRouter(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
+				  InputStubMemory<ISTypeBarrel>& hMemory_L1 ,InputStubMemory<ISTypeBarrel> &hMemory_L2, InputStubMemory<ISTypeBarrel> &hMemory_L3,
+				  InputStubMemory<ISTypeDisk>& hMemory_D1, InputStubMemory<ISTypeDisk> &hMemory_D2, InputStubMemory<ISTypeDisk> &hMemory_D3 , InputStubMemory<ISTypeDisk> &hMemory_D4, InputStubMemory<ISTypeDisk> &hMemory_D5 )
+{
+  ap_uint<kNBits_DTC> hInputStub;
+  #pragma HLS ARRAY_PARTITION variable hInputStub complete dim=0
 
+  
+  #pragma HLS pipeline II=1
+  //the non-blocking version of the read 
+  if (hIputLink.read_nb(hInputStub)) // if data is available the function will update the reference in the argument with the values and return “true” 
+  {
+	//std::cout << " \t\t\t... Stub " << std::hex << hInputStub << std::dec << "\n";
+	ap_uint<kNBits_Debug> cDebugWord = hInputStub.range(kNBits_DTC-1,kNBits_DTC-kNBits_Debug);
+	ap_uint<kNBits_LayerId> cLayerId  = cDebugWord.range(kNBits_Debug-kNBits_Valid-1,kNBits_Debug-kNBits_Valid-kNBits_LayerId);
 
-void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<BARRELPS> &hMemory_L1 ,InputStubMemory<BARRELPS> &hMemory_L2, InputStubMemory<BARRELPS> &hMemory_L3,
-				  InputStubMemory<DISKPS> &hMemory_D1, InputStubMemory<DISKPS> &hMemory_D2, InputStubMemory<DISKPS> &hMemory_D3 , InputStubMemory<DISKPS> &hMemory_D4, InputStubMemory<DISKPS> &hMemory_D5 );
+	// encoded layer id 
+	ap_uint<5> cLayerEncoding; 
+	if( cLayerId == 0 )
+		cLayerEncoding = hDTCMapEncoded.range(4,0);
+	else if( cLayerId == 1 )
+		cLayerEncoding = hDTCMapEncoded.range(9,5);
+	else if( cLayerId == 2 )
+		cLayerEncoding = hDTCMapEncoded.range(14,10);
+	else 
+		cLayerEncoding = hDTCMapEncoded.range(19,15);
 
+	ap_uint<1> cIsBarrel = cLayerEncoding.range(0,0) ; 
+	ap_uint<1> cIs2S =  cLayerEncoding.range(1,1) ;
+	ap_uint<3> cLayerOrDiskId = cLayerEncoding.range(4,2);
+	#ifndef __SYNTHESIS__
+	  std::cout << "\t.. layer index " << +cLayerId << " ... which is layer " << +cLayerOrDiskId << " 2S bit is " << +cIs2S << " barrel bit is " << +cIsBarrel << "\n";
+    #endif
+	
+	// for now assuming one memory per layer .. no phi segmentation here 
+	// can do this once I know what the phi segmentation is here ..   
+	ap_uint<4> cPhiRegion; 
+	if( cIsBarrel == 1  )
+	{
+		// input stubs per region/type of module 
+		InputStub<ISTypeBarrel> hBarrelStub;
+		hBarrelStub =  InputStub<ISTypeBarrel>(hInputStub.range(kBRAMwidth-1,0));
+		
+		if( cLayerOrDiskId == 1 || cLayerOrDiskId == 4 ) 
+		{	
+			auto const nEntries = hMemory_L1.getEntries(bx);
+			hMemory_L1.write_mem(bx, hBarrelStub, nEntries );
+		}
+		else if( cLayerOrDiskId == 2 || cLayerOrDiskId == 5 ) 
+		{
+			auto const nEntries = hMemory_L2.getEntries(bx);
+			hMemory_L2.write_mem(bx, hBarrelStub, nEntries );
+		}
+		else if( cLayerOrDiskId == 3 || cLayerOrDiskId == 6 )
+		{ 
+			auto const nEntries = hMemory_L3.getEntries(bx);
+			hMemory_L3.write_mem(bx, hBarrelStub, nEntries );
+		}
+		#ifndef __SYNTHESIS__
+			//cPhiRegion = ( cDiskStub.getPhi() & (0xF << (cDiskStub.kISPhiSize-4+1)) ) >> (cDiskStub.kISPhiSize-4+1);
+		#endif
+	}
+	else if( cIsBarrel == 0  )
+	{
+		InputStub<ISTypeDisk> hDiskStub;
+		hDiskStub =  InputStub<ISTypeDisk>(hInputStub.range(kBRAMwidth-1,0)); 
+		#ifndef __SYNTHESIS__
+			//cPhiRegion = ( cDiskStub.getPhi() & (0xF << (cDiskStub.kISPhiSize-4+1)) ) >> (cDiskStub.kISPhiSize-4+1);
+		#endif
 
-void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<BARREL2S> &hMemory_L1 ,InputStubMemory<BARREL2S> &hMemory_L2, InputStubMemory<BARREL2S> &hMemory_L3,
-				  InputStubMemory<DISK2S> &hMemory_D1, InputStubMemory<DISK2S> &hMemory_D2, InputStubMemory<DISK2S> &hMemory_D3, InputStubMemory<DISK2S> &hMemory_D4, InputStubMemory<DISK2S> &hMemory_D5 );
-
-
+		if( cLayerOrDiskId == 1 ) 
+		{
+			auto const nEntries = hMemory_D1.getEntries(bx);
+			hMemory_D1.write_mem(bx, hDiskStub, nEntries );
+		}
+		else if( cLayerOrDiskId == 2 ) 
+		{
+			auto const nEntries = hMemory_D2.getEntries(bx);
+			hMemory_D2.write_mem(bx, hDiskStub,  nEntries );
+		}
+		else if( cLayerOrDiskId == 3 )
+		{
+			auto const nEntries = hMemory_D3.getEntries(bx);
+			hMemory_D3.write_mem(bx, hDiskStub,  nEntries );
+		}
+		else if( cLayerOrDiskId == 4 )
+		{
+			auto const nEntries = hMemory_D4.getEntries(bx);
+			hMemory_D4.write_mem(bx, hDiskStub,  nEntries );
+		}
+		else if( cLayerOrDiskId == 5 )
+		{
+			auto const nEntries = hMemory_D5.getEntries(bx);
+			hMemory_D5.write_mem(bx, hDiskStub,  nEntries );
+		}
+	}
+	else 
+	{
+	  #ifndef __SYNTHESIS__
+	    std::cout << "Something has gone wrong.. stub is from an invalid layer/disk/region\n";
+	  #endif
+	}
+  }
+}// input router 
 #endif

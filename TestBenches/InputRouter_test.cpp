@@ -4,7 +4,7 @@
 #include "InputStubMemory.hh"
 #include "FileReadUtility.hh"
 
-#include "InputRouter.hh"
+#include "InputRouterTop.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -128,23 +128,31 @@ int main()
       cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
       cLayerCounter++;
     }
-    // std::cout << "Link " << +cLinkCounter << " encoded word is " << std::bitset<kLINKMAPwidth>(cWord) << "\n";
-    // for( size_t cLayerIndex=0 ; cLayerIndex < cLinkIterator->second.second.size(); cLayerIndex++ )
-    // {
-    //   ap_uint<5> cLayerEncoding = ( (cWord & (0x1F << cLayerIndex*5)) >> cLayerIndex*5 ); 
-    //   ap_uint<1> cIsBarrel = ( cLayerEncoding & 0x01)  ; 
-    //   ap_uint<1> cIs2S = ( cLayerEncoding & 0x02) >> 1; 
-    //   ap_uint<3> cLayer = ( cLayerEncoding & 0x1C) >> 2;
-    //   std::cout << "\t.. layer index " << +cLayerIndex << " word is " << std::bitset<5>(cLayerEncoding) << " ... which is layer " << +cLayer << " 2S bit is " << +cIs2S << " barrel bit is " << +cIsBarrel << "\n";
-    // }  
     cMemoryWord = ap_uint<kLINKMAPwidth>( cWord);
-    WriteMap(static_cast<int>(cIndex), cMemoryWord, &hLinkMap);
+    //WriteMap(static_cast<int>(cIndex), cMemoryWord, &hLinkMap);
     cLinkIterator++;
   }
   
   
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
+  // figure out DTC map encoding for this link 
   LINK cLinkId = 0;
+  ap_uint<kLINKMAPwidth> cLinkWord = 0x0000;
+  uint32_t cWord = 0x00000000; 
+  bool cIs2S = ( cInputMap[static_cast<int>(cLinkId)].first.find("2S") != std::string::npos  ); 
+  auto cLayerIterator = cInputMap[static_cast<int>(cLinkId)].second.begin();
+  while( cLayerIterator <  cInputMap[static_cast<int>(cLinkId)].second.end() ) // layer id is either layer number or disk number 
+  {
+    auto cLayerCounter = std::distance( cInputMap[static_cast<int>(cLinkId)].second.begin(), cLayerIterator ); 
+    size_t cLayerId =  *cLayerIterator;
+    auto cIsBarrel = (cLayerId<10); 
+    cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
+    cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
+    cLayerIterator++;
+  }
+  cLinkWord = ap_uint<kLINKMAPwidth>( cWord);
+  std::cout  << "Link " << +cLinkId << " -- DTC map encoded word is " << std::bitset<kLINKMAPwidth>(cLinkWord) << "\n";
+
   std::string cInputFile = cInputMap[static_cast<int>(cLinkId)].first;//"IL/Link_PS10G_1_A.dat";
   bool cIs2SDTC = ( cInputFile.find("2S") != std::string::npos  ); 
   std::ifstream fin_il;
@@ -196,7 +204,7 @@ int main()
   std::cout << "Maximum  number of stubs from one link : " << kMaxStubsFromLink << "\n";
   std::cout << "Encoding into memory connections for LinkId " << +(cLinkId) << " . The DTC connected to this link reads out " << +((cInputMap[cLinkId].second).size()) << " layers." << "\n";
   DTCMap cEncodedMap;
-  ReadMap(cLinkId, hLinkMap, cEncodedMap);
+  //ReadMap(cLinkId, hLinkMap, cEncodedMap);
   std::cout << "\nMemory word for this link is " << std::bitset<kLINKMAPwidth>(cEncodedMap.raw()) << "\n";
 
   auto cIterator = cInputStubs.begin();
@@ -230,7 +238,7 @@ int main()
         // unit under test
         if( !cIs2SDTC )
         {  
-          std::cout << "Before input router there are : ";
+          std::cout << "Before input router there are : \n";
           std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
@@ -240,9 +248,9 @@ int main()
           std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
           std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
 
-          InputRouter(cLinkId, hLinkMap, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
+          InputRouterTop(cLinkWord, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
           
-          std::cout << "After the input router there are : ";
+          std::cout << "After the input router there are : \n";
           std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
           std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
@@ -254,23 +262,23 @@ int main()
         }
         else
         {
-          std::cout << "Before input router there are : ";
-          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L3 memory\n";
+          std::cout << "Before input router there are : \n";
+          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L4 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L5 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L6 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
           
-          InputRouter(cLinkId, hLinkMap, bx, hIputLink, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+          InputRouterTop(cLinkWord, bx, hIputLink, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
 
 
-          std::cout << "After the input router there are : ";
-          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L3 memory\n";
+          std::cout << "After the input router there are : \n";
+          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L4 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L5 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L6 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
           std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
