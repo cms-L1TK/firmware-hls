@@ -46,6 +46,25 @@ int main()
   // 20 bits per link
   // 48 links to TF   
   // memory depth of 12 to store mapping for all input links 
+
+  // memories for stubs 
+  // PS barrel 
+  InputStubMemory<BARRELPS> hMemory_L1; 
+  InputStubMemory<BARRELPS> hMemory_L2;
+  InputStubMemory<BARRELPS> hMemory_L3;
+  // 2S barrel 
+  InputStubMemory<BARREL2S> hMemory_L4; 
+  InputStubMemory<BARREL2S> hMemory_L5;
+  InputStubMemory<BARREL2S> hMemory_L6; 
+  // PS endcap
+  InputStubMemory<DISKPS> hMemoryPS_D1; 
+  InputStubMemory<DISKPS> hMemoryPS_D2;
+  InputStubMemory<DISKPS> hMemoryPS_D3; 
+  // 2S endcap  
+  InputStubMemory<DISK2S> hMemory2S_D1; 
+  InputStubMemory<DISK2S> hMemory2S_D2;
+  InputStubMemory<DISK2S> hMemory2S_D3; 
+  
   std::cout << "Loading link map into memory .. will be used later" << std::endl;
   std::ifstream fin_il_map;
   if (not openDataFile(fin_il_map,cInputFile_LinkMap)) 
@@ -123,6 +142,7 @@ int main()
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
   LINK cLinkId = 6;
   std::string cInputFile = cInputMap[static_cast<int>(cLinkId)].first;//"IL/Link_PS10G_1_A.dat";
+  bool cIs2SDTC = ( cInputFile.find("2S") != std::string::npos  ); 
   std::ifstream fin_il;
   bool validil = openDataFile(fin_il,cInputFile); // what does this do? 
   if (not validil) 
@@ -161,7 +181,6 @@ int main()
   }
 
 
-
   // loop over stubs read from file 
   // hls variables start with h 
   BXType hBxCounter;
@@ -195,10 +214,8 @@ int main()
         if( cStubCounter < kMaxStubsFromLink )
         {
           //if( cStubCounter%250 == 0 )
-          std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << cStub << "\n";
+          //std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
           //non blocking write into input stream 
-          // I think  the string is inverted .. so reverse the string to get the bits in the correct order 
-          //std::reverse(cStub.begin(), cStub.end());
           hIputLink.write_nb( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
         }
         else
@@ -206,27 +223,16 @@ int main()
           if( cStubCounter == kMaxStubsFromLink) 
             std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
         }
+        // unit under test
+        if( !cIs2SDTC )
+          InputRouter(cLinkId, hLinkMap, bx, hIputLink, &hMemory_L1, &hMemory_L2, &hMemory_L3, &hMemoryPS_D1, &hMemoryPS_D2, &hMemoryPS_D3);
+        else
+          InputRouter(cLinkId, hLinkMap, bx, hIputLink, &hMemory_L4, &hMemory_L5, &hMemory_L6, &hMemory2S_D1, &hMemory2S_D2, &hMemory2S_D3);
       }
-      // unit under test
-      //InputRouter(cLinkId, hLinkMap, bx, hIputLink);
     }
     cIterator++;
   }
-    
   
-
-  // for(auto cIterator = cInputStubs.begin(); cIterator < cInputStubs.end() ; cIterator++)
-  // //for(auto cInputStub : cInputStubs )
-  // {
-  //   //auto cEventCounter = std::distance( cInputStubs.begin(), cIterator );
-  //   //auto& cInputStub = *cIterator; 
-  //   //std::cout << "Event " << cEventCounter << " -- read stub from Bx " <<  cInputStub.first << " from text file : " << cInputStub.second << " \n"; 
-    
-  //   //hBxCounter = BXType(cInputStub.first.c_str(),2);
-  //   // non blocking write into input stream 
-  //   //hIputLink.write_nb( ap_uint<38>( cInputStub.second.c_str() ,2) );
-  // }
-
   // unit under test
   /*InputRouter(bx,inputlink,&inputstubs0,&inputstubs1,&inputstubs2,&inputstubs3,&inputstubs4,
                  &inputstubs5,&inputstubs6,&inputstubs7,&inputstubs8,&inputstubs9, true);*/
