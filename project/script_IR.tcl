@@ -13,9 +13,9 @@ source set_fpga.tcl
 create_clock -period 4 -name default
 #source "./projrouter/solution1/directives.tcl"
 # simulate 
-#csim_design -compiler gcc
+csim_design -compiler gcc
 # synthesize 
-csynth_design
+# csynth_design
 #cosim_design
 #export_design -rtl verilog -format ip_catalog -evaluate verilog
 exit

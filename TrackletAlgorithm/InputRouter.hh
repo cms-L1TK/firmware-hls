@@ -7,6 +7,8 @@
 #include "hls_stream.h"
 #include "InputStubMemory.hh"
 
+void LayerEncoding(ap_uint<kNBits_LayerId> cLayerId, ap_uint<kLINKMAPwidth>  encodedMap, ap_uint<4>& cLayer);
+
 void WriteMap(int address, ap_uint<kLINKMAPwidth>  encodedMap , DTCMapMemory *Map );
 
 void ReadMap(int address, DTCMapMemory Map, DTCMap&  encodedMap);
@@ -15,20 +17,20 @@ void ReadMap(int address, DTCMapMemory Map, DTCMap&  encodedMap);
 // so a templated input router might make sense? 
 template<int ISTypeBarrel, int ISTypeDisk>
 void RouteStub(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<ISTypeBarrel> *hMemory_L1 ,InputStubMemory<ISTypeBarrel> *hMemory_L2, InputStubMemory<ISTypeBarrel> *hMemory_L3,
-				  InputStubMemory<ISTypeDisk> *hMemory_D1, InputStubMemory<ISTypeDisk> *hMemory_D2, InputStubMemory<ISTypeDisk> *hMemory_D3 );
+				  InputStubMemory<ISTypeBarrel> &hMemory_L1 ,InputStubMemory<ISTypeBarrel> &hMemory_L2, InputStubMemory<ISTypeBarrel> &hMemory_L3,
+				  InputStubMemory<ISTypeDisk> &hMemory_D1, InputStubMemory<ISTypeDisk> &hMemory_D2, InputStubMemory<ISTypeDisk> &hMemory_D3 , InputStubMemory<ISTypeDisk> &hMemory_D4, InputStubMemory<ISTypeDisk> &hMemory_D5 );
 // implementation of input router 
 // #include "InputRouter.tpp"
 
 
 void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<BARRELPS> *hMemory_L1 ,InputStubMemory<BARRELPS> *hMemory_L2, InputStubMemory<BARRELPS> *hMemory_L3,
-				  InputStubMemory<DISKPS> *hMemory_D1, InputStubMemory<DISKPS> *hMemory_D2, InputStubMemory<DISKPS> *hMemory_D3 );
+				  InputStubMemory<BARRELPS> &hMemory_L1 ,InputStubMemory<BARRELPS> &hMemory_L2, InputStubMemory<BARRELPS> &hMemory_L3,
+				  InputStubMemory<DISKPS> &hMemory_D1, InputStubMemory<DISKPS> &hMemory_D2, InputStubMemory<DISKPS> &hMemory_D3 , InputStubMemory<DISKPS> &hMemory_D4, InputStubMemory<DISKPS> &hMemory_D5 );
 
 
 void InputRouter(const LINK linkId, DTCMapMemory Map, const BXType bx, hls::stream<ap_uint<kNBits_DTC> >& hIputLink,
-				  InputStubMemory<BARREL2S> *hMemory_L1 ,InputStubMemory<BARREL2S> *hMemory_L2, InputStubMemory<BARREL2S> *hMemory_L3,
-				  InputStubMemory<DISK2S> *hMemory_D1, InputStubMemory<DISK2S> *hMemory_D2, InputStubMemory<DISK2S> *hMemory_D3 );
+				  InputStubMemory<BARREL2S> &hMemory_L1 ,InputStubMemory<BARREL2S> &hMemory_L2, InputStubMemory<BARREL2S> &hMemory_L3,
+				  InputStubMemory<DISK2S> &hMemory_D1, InputStubMemory<DISK2S> &hMemory_D2, InputStubMemory<DISK2S> &hMemory_D3, InputStubMemory<DISK2S> &hMemory_D4, InputStubMemory<DISK2S> &hMemory_D5 );
 
 
 #endif

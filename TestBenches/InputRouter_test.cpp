@@ -49,21 +49,25 @@ int main()
 
   // memories for stubs 
   // PS barrel 
-  InputStubMemory<BARRELPS> hMemory_L1; 
-  InputStubMemory<BARRELPS> hMemory_L2;
-  InputStubMemory<BARRELPS> hMemory_L3;
+  static InputStubMemory<BARRELPS> hMemory_L1; 
+  static InputStubMemory<BARRELPS> hMemory_L2;
+  static InputStubMemory<BARRELPS> hMemory_L3;
   // 2S barrel 
-  InputStubMemory<BARREL2S> hMemory_L4; 
-  InputStubMemory<BARREL2S> hMemory_L5;
-  InputStubMemory<BARREL2S> hMemory_L6; 
+  static InputStubMemory<BARREL2S> hMemory_L4; 
+  static InputStubMemory<BARREL2S> hMemory_L5;
+  static InputStubMemory<BARREL2S> hMemory_L6; 
   // PS endcap
-  InputStubMemory<DISKPS> hMemoryPS_D1; 
-  InputStubMemory<DISKPS> hMemoryPS_D2;
-  InputStubMemory<DISKPS> hMemoryPS_D3; 
+  static InputStubMemory<DISKPS> hMemoryPS_D1; 
+  static InputStubMemory<DISKPS> hMemoryPS_D2;
+  static InputStubMemory<DISKPS> hMemoryPS_D3;  
+  static InputStubMemory<DISKPS> hMemoryPS_D4;
+  static InputStubMemory<DISKPS> hMemoryPS_D5; 
   // 2S endcap  
-  InputStubMemory<DISK2S> hMemory2S_D1; 
-  InputStubMemory<DISK2S> hMemory2S_D2;
-  InputStubMemory<DISK2S> hMemory2S_D3; 
+  static InputStubMemory<DISK2S> hMemory2S_D1; 
+  static InputStubMemory<DISK2S> hMemory2S_D2;
+  static InputStubMemory<DISK2S> hMemory2S_D3; 
+  static InputStubMemory<DISK2S> hMemory2S_D4;
+  static InputStubMemory<DISK2S> hMemory2S_D5; 
   
   std::cout << "Loading link map into memory .. will be used later" << std::endl;
   std::ifstream fin_il_map;
@@ -124,7 +128,7 @@ int main()
       cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
       cLayerCounter++;
     }
-    //std::cout << "Link " << +cLinkCounter << " encoded word is " << std::bitset<kLINKMAPwidth>(cWord) << "\n";
+    // std::cout << "Link " << +cLinkCounter << " encoded word is " << std::bitset<kLINKMAPwidth>(cWord) << "\n";
     // for( size_t cLayerIndex=0 ; cLayerIndex < cLinkIterator->second.second.size(); cLayerIndex++ )
     // {
     //   ap_uint<5> cLayerEncoding = ( (cWord & (0x1F << cLayerIndex*5)) >> cLayerIndex*5 ); 
@@ -207,7 +211,7 @@ int main()
       std::cout << " Event " << +cEventCounter << " [Bx = " << cBxCounter << "] found " << cStubs.size() << " stubs in input file.\n" ;
       BXType bx = cBxCounter&0x7;
       auto cStubIterator = cStubs.begin(); 
-      for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.end(); cStubIterator++)
+      for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.begin()+1; cStubIterator++)
       {
         auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
         auto& cStub = *cStubIterator;
@@ -225,9 +229,54 @@ int main()
         }
         // unit under test
         if( !cIs2SDTC )
-          InputRouter(cLinkId, hLinkMap, bx, hIputLink, &hMemory_L1, &hMemory_L2, &hMemory_L3, &hMemoryPS_D1, &hMemoryPS_D2, &hMemoryPS_D3);
+        {  
+          std::cout << "Before input router there are : ";
+          std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in D1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in D2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D3 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D4 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in D5 memory\n";
+          InputRouter(cLinkId, hLinkMap, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
+          
+          std::cout << "After the input router there are : ";
+          std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(bx) << " in D1 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(bx) << " in D2 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(bx) << " in D3 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
+          std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
+        }
         else
-          InputRouter(cLinkId, hLinkMap, bx, hIputLink, &hMemory_L4, &hMemory_L5, &hMemory_L6, &hMemory2S_D1, &hMemory2S_D2, &hMemory2S_D3);
+        {
+          std::cout << "Before input router there are : ";
+          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L3 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
+          
+          InputRouter(cLinkId, hLinkMap, bx, hIputLink, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+
+
+          std::cout << "After the input router there are : ";
+          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L3 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
+          std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
+        
+        }
       }
     }
     cIterator++;
