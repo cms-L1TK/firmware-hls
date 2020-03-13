@@ -63,6 +63,7 @@ void TrackletEngine(
   readBendOuterTable<seed, innerphi, outerphi, stubptouterdepth>(bendoutertable);
 
   int nstubpairs = 0;
+#pragma HLS dependence variable=nstubpairs intra WAR true
 
   outstubpair.clear(bx);
 
@@ -135,28 +136,30 @@ void TrackletEngine(
 		  auto const nstubslast  = instubouterdata.getEntries(bx,zbinlast);
 		  ap_uint<1> savestart = (nstubsstart != 0);
 		  ap_uint<1> savelast  = (nstubslast  != 0) && innerstubzbitstmp.range(3,3);
+		  auto const writeindextmp = writeindex;
+
+		  if(savestart && savelast) {
+			  writeindex = writeindexplusplus;
+		  } else if (savestart || savelast){
+			  writeindex = writeindexplus;
+		  }
 
 		  if(savestart) {
 			  ap_uint<1> zero = 0;
 			  ap_uint<TEBinsBits+1> tmp1 = zbinstart.concat(zero);
 			  ap_uint<VMStubTEInner<innertype>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
-			  teBuffer[writeindex] = nstubsstart.concat(tmp2);
+			  teBuffer[writeindextmp] = nstubsstart.concat(tmp2);
 		  }
 		  if(savelast) {
 			  ap_uint<1> one = 1;
 			  ap_uint<TEBinsBits+1> tmp1 = zbinlast.concat(one);
 			  ap_uint<VMStubTEInner<innertype>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
 			  if(savestart) {
-				  teBuffer[writeindexplus] = nstubslast.concat(tmp2);
+				  ap_uint<kNBits_BufferAddr> writeindextmpplus = writeindextmp+1;
+				  teBuffer[writeindextmpplus] = nstubslast.concat(tmp2);
 			  } else {
-				  teBuffer[writeindex] = nstubslast.concat(tmp2);
+				  teBuffer[writeindextmp] = nstubslast.concat(tmp2);
 			  }
-		  }
-
-		  if(savestart && savelast) {
-			  writeindex = writeindexplusplus;
-		  } else if (savestart || savelast){
-			  writeindex = writeindexplus;
 		  }
 	  }
 
