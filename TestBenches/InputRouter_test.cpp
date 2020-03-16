@@ -4,6 +4,7 @@
 #include "InputStubMemory.hh"
 #include "FileReadUtility.hh"
 
+#include "InputRouter.cc"
 #include "InputRouterTop.h"
 #include <iostream>
 #include <fstream>
@@ -15,26 +16,81 @@
 
 using namespace std;
 
+using LinkMap = std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>> ; // map of input links  [per DTC ]
+
+// get link information 
+bool getLinkInfo(LinkMap pInputMap, LINK pLinkId, ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
+{
+  // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
+  // figure out DTC map encoding for this link 
+  pLinkWord = 0x0000;
+  uint32_t cWord = 0x00000000; 
+  bool cIs2S = ( pInputMap[static_cast<int>(pLinkId)].first.find("2S") != std::string::npos  ); 
+  auto cLayerIterator = pInputMap[static_cast<int>(pLinkId)].second.begin();
+  while( cLayerIterator <  pInputMap[static_cast<int>(pLinkId)].second.end() ) // layer id is either layer number or disk number 
+  {
+    auto cLayerCounter = std::distance( pInputMap[static_cast<int>(pLinkId)].second.begin(), cLayerIterator ); 
+    size_t cLayerId =  *cLayerIterator;
+    auto cIsBarrel = (cLayerId<10); 
+    cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
+    cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
+    cLayerIterator++;
+  }
+  pLinkWord = ap_uint<kLINKMAPwidth>( cWord);
+  std::cout  << "Link " << +pLinkId << " -- DTC map encoded word is " << std::bitset<kLINKMAPwidth>(pLinkWord) << "\n";
+  pLinkName = pInputMap[static_cast<int>(pLinkId)].first;//"IL/Link_PS10G_1_A.dat";
+  return cIs2S;
+}
+
+using InputStubs = std::map<int, std::vector<std::string>> ; //map of input stubs [ per Bx ]
+// get stubs from file 
+bool getStubs(std::string pInputFile , InputStubs& pInputStubs)
+{
+  std::ifstream fin_il;
+  bool validil = openDataFile(fin_il,pInputFile); // what does this do? 
+  if (not validil) 
+  {
+    std::cout << "Could not find file " << pInputFile << std::endl;
+    return false;
+  }
+  std::cout << "Read-back stubs from file : " << pInputFile << std::endl;
+
+  
+  // process the text file .. just regular c++ here 
+  char cStubDelimeter = '|';
+  char cStubEnd = ' ';
+  int  cEventCounter=-1;
+  std::string cBxLabel = "BX ";
+  int cNevents = 1; 
+
+  int cBxCounter;
+  for(std::string cInputLine; getline( fin_il, cInputLine ); )
+  {
+    if( cInputLine.find("Event") != std::string::npos ) 
+    {
+      //cStubString.first = cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) ;
+      cBxCounter = std::stoi( cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) , nullptr,2 );
+      cEventCounter++;
+    }
+    else
+    {
+      // clean up string to access stub from this event 
+      cInputLine.erase( std::remove(cInputLine.begin(), cInputLine.end(), cStubDelimeter), cInputLine.end() );
+      pInputStubs[cBxCounter].push_back( cInputLine.substr(0, cInputLine.find(cStubEnd)) );
+      //cStubString.second = cInputLine.substr(0, cInputLine.find(cStubEnd));
+      //cInputStubs.push_back( cStubString );
+    }
+  }
+  return true;
+}
+
 int main()
 {
   #ifndef __SYNTHESIS__
     std::cout << "SYNTHESIS" << std::endl;
   #endif
 
-  /*
-  InputStub<BARREL2S> cBarrel2S;
-  InputStub<BARRELPS> cBarrelPS;
-  std::cout << "Total number of bits in barrel PS : " << cBarrelPS.kInputStubSize << std::endl;
-  std::cout << "Total number of bits in barrel 2S : " << cBarrel2S.kInputStubSize << std::endl;
-
-  InputStub<DISKPS> cDiskPS;
-  InputStub<DISK2S> cDisk2S;
-  std::cout << "Total number of bits in disk PS : " << cDiskPS.kInputStubSize << std::endl;
-  std::cout << "Total number of bits in disk 2S : " << cDisk2S.kInputStubSize << std::endl;
-  */
-
-  
-
+ 
   // name is  : DTCtype[PS10G_PS5G_2S]_[DTC_number]_[which tracking nonant: each DTC reads out 2 tracking nonants]
   std::string cInputFile_LinkMap = "IL/dtclinklayerdisk.dat";
   std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>>   cInputMap;
@@ -49,25 +105,25 @@ int main()
 
   // memories for stubs 
   // PS barrel 
-  static InputStubMemory<BARRELPS> hMemory_L1; 
-  static InputStubMemory<BARRELPS> hMemory_L2;
-  static InputStubMemory<BARRELPS> hMemory_L3;
+  InputStubMemory<BARRELPS> hMemory_L1; 
+  InputStubMemory<BARRELPS> hMemory_L2;
+  InputStubMemory<BARRELPS> hMemory_L3;
   // 2S barrel 
-  static InputStubMemory<BARREL2S> hMemory_L4; 
-  static InputStubMemory<BARREL2S> hMemory_L5;
-  static InputStubMemory<BARREL2S> hMemory_L6; 
+  InputStubMemory<BARREL2S> hMemory_L4; 
+  InputStubMemory<BARREL2S> hMemory_L5;
+  InputStubMemory<BARREL2S> hMemory_L6; 
   // PS endcap
-  static InputStubMemory<DISKPS> hMemoryPS_D1; 
-  static InputStubMemory<DISKPS> hMemoryPS_D2;
-  static InputStubMemory<DISKPS> hMemoryPS_D3;  
-  static InputStubMemory<DISKPS> hMemoryPS_D4;
-  static InputStubMemory<DISKPS> hMemoryPS_D5; 
+  InputStubMemory<DISKPS> hMemoryPS_D1; 
+  InputStubMemory<DISKPS> hMemoryPS_D2;
+  InputStubMemory<DISKPS> hMemoryPS_D3;  
+  InputStubMemory<DISKPS> hMemoryPS_D4;
+  InputStubMemory<DISKPS> hMemoryPS_D5; 
   // 2S endcap  
-  static InputStubMemory<DISK2S> hMemory2S_D1; 
-  static InputStubMemory<DISK2S> hMemory2S_D2;
-  static InputStubMemory<DISK2S> hMemory2S_D3; 
-  static InputStubMemory<DISK2S> hMemory2S_D4;
-  static InputStubMemory<DISK2S> hMemory2S_D5; 
+  InputStubMemory<DISK2S> hMemory2S_D1; 
+  InputStubMemory<DISK2S> hMemory2S_D2;
+  InputStubMemory<DISK2S> hMemory2S_D3; 
+  InputStubMemory<DISK2S> hMemory2S_D4;
+  InputStubMemory<DISK2S> hMemory2S_D5; 
   
   std::cout << "Loading link map into memory .. will be used later" << std::endl;
   std::ifstream fin_il_map;
@@ -136,160 +192,188 @@ int main()
   
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
   // figure out DTC map encoding for this link 
-  LINK cLinkId = 0;
-  ap_uint<kLINKMAPwidth> cLinkWord = 0x0000;
-  uint32_t cWord = 0x00000000; 
-  bool cIs2S = ( cInputMap[static_cast<int>(cLinkId)].first.find("2S") != std::string::npos  ); 
-  auto cLayerIterator = cInputMap[static_cast<int>(cLinkId)].second.begin();
-  while( cLayerIterator <  cInputMap[static_cast<int>(cLinkId)].second.end() ) // layer id is either layer number or disk number 
+  int cBxSelected = 0 ;
+  for( size_t cLink = 0 ; cLink < 1 ; cLink++)
   {
-    auto cLayerCounter = std::distance( cInputMap[static_cast<int>(cLinkId)].second.begin(), cLayerIterator ); 
-    size_t cLayerId =  *cLayerIterator;
-    auto cIsBarrel = (cLayerId<10); 
-    cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
-    cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
-    cLayerIterator++;
-  }
-  cLinkWord = ap_uint<kLINKMAPwidth>( cWord);
-  std::cout  << "Link " << +cLinkId << " -- DTC map encoded word is " << std::bitset<kLINKMAPwidth>(cLinkWord) << "\n";
-
-  std::string cInputFile = cInputMap[static_cast<int>(cLinkId)].first;//"IL/Link_PS10G_1_A.dat";
-  bool cIs2SDTC = ( cInputFile.find("2S") != std::string::npos  ); 
-  std::ifstream fin_il;
-  bool validil = openDataFile(fin_il,cInputFile); // what does this do? 
-  if (not validil) 
-  {
-    std::cout << "Could not find file " << cInputFile << std::endl;
-    return 0;
-  }
-  std::cout << "Read-back stubs from file : " << cInputFile << std::endl;
-
-  
-  // process the text file .. just regular c++ here 
-  char cStubDelimeter = '|';
-  char cStubEnd = ' ';
-  int  cEventCounter=-1;
-  std::string cBxLabel = "BX ";
-  int cNevents = 1; 
-
-  int cBxCounter;
-  std::map<int, std::vector<std::string>>   cInputStubs;
-  for(std::string cInputLine; getline( fin_il, cInputLine ); )
-  {
-    if( cInputLine.find("Event") != std::string::npos ) 
+    LINK cLinkId = cLink;
+    ap_uint<kLINKMAPwidth> cLinkWord = 0x0000;
+    std::string cInputFile = "";
+    bool cIs2SDTC  = getLinkInfo(cInputMap, cLinkId, cLinkWord, cInputFile);
+    // get stubs 
+    InputStubs cInputStubs;
+    getStubs(cInputFile , cInputStubs);
+    // push stubs into stub word vector for this bx 
+    
+    std::vector<ap_uint<kNBits_DTC>> cStubWords;
+    BXType hBxCounter = cBxSelected&0x7;
+    auto& cStubs = cInputStubs[cBxSelected];
+    auto cStubIterator = cStubs.begin(); 
+    for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.end(); cStubIterator++)
     {
-      //cStubString.first = cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) ;
-      cBxCounter = std::stoi( cInputLine.substr(cInputLine.find(cBxLabel)+cBxLabel.length(), 3 ) , nullptr,2 );
-      cEventCounter++;
+      auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
+      auto& cStub = *cStubIterator;
+      if( cStubCounter < kMaxStubsFromLink )
+      {
+        if( cStubCounter%25 == 0 )
+          std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
+        cStubWords.push_back( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
+      }
+      else
+      {
+        if( cStubCounter == kMaxStubsFromLink) 
+          std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
+      }
+    }
+    // unit under test
+    if( !cIs2SDTC )
+    {  
+      std::cout << "Before input router there are : \n";
+      std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
+
+      InputRouterTop(cLinkWord, hBxCounter, cStubWords.data(), hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
+      
+      std::cout << "After the input router there are : \n";
+      std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
     }
     else
     {
-      // clean up string to access stub from this event 
-      cInputLine.erase( std::remove(cInputLine.begin(), cInputLine.end(), cStubDelimeter), cInputLine.end() );
-      cInputStubs[cBxCounter].push_back( cInputLine.substr(0, cInputLine.find(cStubEnd)) );
-      //cStubString.second = cInputLine.substr(0, cInputLine.find(cStubEnd));
-      //cInputStubs.push_back( cStubString );
+      std::cout << "Before input router there are : \n";
+      std::cout << "\t... entries in  " << +hMemory_L4.getEntries(hBxCounter) << " in L4 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L5.getEntries(hBxCounter) << " in L5 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L6.getEntries(hBxCounter) << " in L6 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(hBxCounter) << " in D1 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(hBxCounter) << " in D2 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(hBxCounter) << " in D3 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
+      
+      InputRouterTop(cLinkWord, hBxCounter, cStubWords.data(), hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+
+
+      std::cout << "After the input router there are : \n";
+      std::cout << "\t... entries in  " << +hMemory_L4.getEntries(hBxCounter) << " in L4 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L5.getEntries(hBxCounter) << " in L5 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L6.getEntries(hBxCounter) << " in L6 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(hBxCounter) << " in D1 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(hBxCounter) << " in D2 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(hBxCounter) << " in D3 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
+      std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
     }
+
   }
+    
+  // // loop over stubs read from file 
+  // // hls variables start with h 
+  // BXType hBxCounter;
+  // // declare input stream to be used in hls simulation
+  // // note : By default, array variables are implemented as RAM [General arrays are implemented as RAMs for read-write access]
+  // // but this is not in the test bench 
+  // //If the data stored in the array is consumed or produced in a sequential manner, a more efficient communication mechanism is to use streaming data as specified by the STREAM pragma, where FIFOs are used instead of RAMs.
+  // hls::stream<ap_uint<kNBits_DTC> > hIputLink("InputLink_DTC");
+  // std::cout << "Maximum  number of stubs from one link : " << kMaxStubsFromLink << "\n";
+  // std::cout << "Encoding into memory connections for LinkId " << +(cLinkId) << " . The DTC connected to this link reads out " << +((cInputMap[cLinkId].second).size()) << " layers." << "\n";
+  // DTCMap cEncodedMap;
+  // //ReadMap(cLinkId, hLinkMap, cEncodedMap);
+  // std::cout << "\nMemory word for this link is " << std::bitset<kLINKMAPwidth>(cEncodedMap.raw()) << "\n";
 
+  // auto cIterator = cInputStubs.begin();
+  // while( cIterator != cInputStubs.end() )
+  // {
+  //   auto cEventCounter = std::distance( cInputStubs.begin(), cIterator ); 
+  //   cBxCounter = cIterator->first;
+  //   auto& cStubs = cIterator->second;
 
-  // loop over stubs read from file 
-  // hls variables start with h 
-  BXType hBxCounter;
-  // declare input stream to be used in hls simulation
-  // note : By default, array variables are implemented as RAM [General arrays are implemented as RAMs for read-write access]
-  // but this is not in the test bench 
-  //If the data stored in the array is consumed or produced in a sequential manner, a more efficient communication mechanism is to use streaming data as specified by the STREAM pragma, where FIFOs are used instead of RAMs.
-  hls::stream<ap_uint<kNBits_DTC> > hIputLink("InputLink_DTC");
-  std::cout << "Maximum  number of stubs from one link : " << kMaxStubsFromLink << "\n";
-  std::cout << "Encoding into memory connections for LinkId " << +(cLinkId) << " . The DTC connected to this link reads out " << +((cInputMap[cLinkId].second).size()) << " layers." << "\n";
-  DTCMap cEncodedMap;
-  //ReadMap(cLinkId, hLinkMap, cEncodedMap);
-  std::cout << "\nMemory word for this link is " << std::bitset<kLINKMAPwidth>(cEncodedMap.raw()) << "\n";
+  //   if( cEventCounter < cNevents )
+  //   {
+  //     std::cout << " Event " << +cEventCounter << " [Bx = " << cBxCounter << "] found " << cStubs.size() << " stubs in input file.\n" ;
+  //     BXType bx = cBxCounter&0x7;
+  //     auto cStubIterator = cStubs.begin(); 
+  //     for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.end(); cStubIterator++)
+  //     {
+  //       auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
+  //       auto& cStub = *cStubIterator;
+  //       if( cStubCounter < kMaxStubsFromLink )
+  //       {
+  //         //if( cStubCounter%250 == 0 )
+  //         //std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
+  //         //non blocking write into input stream 
+  //         hIputLink.write_nb( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
+  //       }
+  //       else
+  //       {
+  //         if( cStubCounter == kMaxStubsFromLink) 
+  //           std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
+  //       }
+  //     }
+  //     // unit under test
+  //     if( !cIs2SDTC )
+  //     {  
+  //       std::cout << "Before input router there are : \n";
+  //       std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(bx) << " in D1 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(bx) << " in D2 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(bx) << " in D3 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
 
-  auto cIterator = cInputStubs.begin();
-  while( cIterator != cInputStubs.end() )
-  {
-    auto cEventCounter = std::distance( cInputStubs.begin(), cIterator ); 
-    cBxCounter = cIterator->first;
-    auto& cStubs = cIterator->second;
-
-    if( cEventCounter < cNevents )
-    {
-      std::cout << " Event " << +cEventCounter << " [Bx = " << cBxCounter << "] found " << cStubs.size() << " stubs in input file.\n" ;
-      BXType bx = cBxCounter&0x7;
-      auto cStubIterator = cStubs.begin(); 
-      for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.begin()+1; cStubIterator++)
-      {
-        auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
-        auto& cStub = *cStubIterator;
-        if( cStubCounter < kMaxStubsFromLink )
-        {
-          //if( cStubCounter%250 == 0 )
-          //std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
-          //non blocking write into input stream 
-          hIputLink.write_nb( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
-        }
-        else
-        {
-          if( cStubCounter == kMaxStubsFromLink) 
-            std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
-        }
-        // unit under test
-        if( !cIs2SDTC )
-        {  
-          std::cout << "Before input router there are : \n";
-          std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(bx) << " in D1 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(bx) << " in D2 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(bx) << " in D3 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
-
-          InputRouterTop(cLinkWord, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
-          
-          std::cout << "After the input router there are : \n";
-          std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(bx) << " in D1 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(bx) << " in D2 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(bx) << " in D3 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
-          std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
-        }
-        else
-        {
-          std::cout << "Before input router there are : \n";
-          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L4 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L5 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L6 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
-          
-          InputRouterTop(cLinkWord, bx, hIputLink, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
-
-
-          std::cout << "After the input router there are : \n";
-          std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L4 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L5 memory\n";
-          std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L6 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
-          std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
+  //       InputRouterTop(cLinkWord, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
         
-        }
-      }
-    }
-    cIterator++;
-  }
+  //       std::cout << "After the input router there are : \n";
+  //       std::cout << "\t... entries in  " << +hMemory_L1.getEntries(bx) << " in L1 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L2.getEntries(bx) << " in L2 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L3.getEntries(bx) << " in L3 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(bx) << " in D1 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(bx) << " in D2 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(bx) << " in D3 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(bx) << " in D4 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(bx) << " in D5 memory\n";
+  //     }
+  //     else
+  //     {
+  //       std::cout << "Before input router there are : \n";
+  //       std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L4 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L5 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L6 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
+        
+  //       InputRouterTop(cLinkWord, bx, hIputLink, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+
+
+  //       std::cout << "After the input router there are : \n";
+  //       std::cout << "\t... entries in  " << +hMemory_L4.getEntries(bx) << " in L4 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L5.getEntries(bx) << " in L5 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory_L6.getEntries(bx) << " in L6 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(bx) << " in D1 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(bx) << " in D2 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(bx) << " in D3 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(bx) << " in D4 memory\n";
+  //       std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(bx) << " in D5 memory\n";
+      
+  //     }
+  //   }
+  //   cIterator++;
+  // }
   
   // unit under test
   /*InputRouter(bx,inputlink,&inputstubs0,&inputstubs1,&inputstubs2,&inputstubs3,&inputstubs4,

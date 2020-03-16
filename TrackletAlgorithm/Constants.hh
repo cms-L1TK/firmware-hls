@@ -35,6 +35,7 @@ enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK};
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
 
 // link map word
+constexpr int kLINKS = 24; 
 constexpr int kLINKMAPwidth = 20;
 constexpr int kNBits_LINK = 4;
 typedef ap_uint<kNBits_LINK> LINK;  // temporary definition. need to be revisited
