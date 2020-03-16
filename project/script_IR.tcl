@@ -23,7 +23,7 @@ source settings_hls.tcl
 
 # simulate 
 set nProc [exec nproc]
-# csim_design -compiler gcc -mflags "-j$nProc"
+csim_design -compiler gcc -mflags "-j$nProc"
 config_rtl -reset all -reset_async -reset_level low
 # synthesize 
 csynth_design

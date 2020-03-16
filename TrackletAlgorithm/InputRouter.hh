@@ -24,7 +24,7 @@ void InputRouter(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint
 {
 	// input port as a fifo 
 	#pragma HLS interface ap_none port=hDTCMapEncoded
-	#pragma HLS INTERFACE ap_fifo port=hStubs 
+	// #pragma HLS INTERFACE ap_fifo port=hStubs 
 	// memories as BRAMS
 	#pragma HLS INTERFACE bram port=hMemory_L1
 	#pragma HLS INTERFACE bram port=hMemory_L2

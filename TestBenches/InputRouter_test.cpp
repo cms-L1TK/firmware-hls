@@ -4,7 +4,7 @@
 #include "InputStubMemory.hh"
 #include "FileReadUtility.hh"
 
-#include "InputRouter.cc"
+// #include "InputRouter.cc"
 #include "InputRouterTop.h"
 #include <iostream>
 #include <fstream>
