@@ -17,24 +17,25 @@
 
 void ProcessLink(const BXType bx, ap_uint<kNBits_DTC>* cStub , int cNstubs);
 
+// to-do .. template array size to improve efficiency here 
 template<int ISTypeBarrel, int ISTypeDisk>
-void InputRouter(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC>* hStubs,
+void InputRouter(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hStubs[kMaxStubsFromLink],
 				  InputStubMemory<ISTypeBarrel>& hMemory_L1 ,InputStubMemory<ISTypeBarrel> &hMemory_L2, InputStubMemory<ISTypeBarrel> &hMemory_L3,
 				  InputStubMemory<ISTypeDisk>& hMemory_D1, InputStubMemory<ISTypeDisk> &hMemory_D2, InputStubMemory<ISTypeDisk> &hMemory_D3 , InputStubMemory<ISTypeDisk> &hMemory_D4, InputStubMemory<ISTypeDisk> &hMemory_D5 )
 {
 	// input port as a fifo 
 	#pragma HLS interface ap_none port=hDTCMapEncoded
-	// #pragma HLS INTERFACE ap_fifo port=hStubs 
+	//#pragma HLS INTERFACE ap_fifo port=hStubs 
 	// memories as BRAMS
-	#pragma HLS INTERFACE bram port=hMemory_L1
-	#pragma HLS INTERFACE bram port=hMemory_L2
-	#pragma HLS INTERFACE bram port=hMemory_L3
-	//
-	#pragma HLS INTERFACE bram port=hMemory_D1
-	#pragma HLS INTERFACE bram port=hMemory_D2
-	#pragma HLS INTERFACE bram port=hMemory_D3
-	#pragma HLS INTERFACE bram port=hMemory_D4
-	#pragma HLS INTERFACE bram port=hMemory_D5
+	// #pragma HLS INTERFACE bram port=hMemory_L1
+	// #pragma HLS INTERFACE bram port=hMemory_L2
+	// #pragma HLS INTERFACE bram port=hMemory_L3
+	// //
+	// #pragma HLS INTERFACE bram port=hMemory_D1
+	// #pragma HLS INTERFACE bram port=hMemory_D2
+	// #pragma HLS INTERFACE bram port=hMemory_D3
+	// #pragma HLS INTERFACE bram port=hMemory_D4
+	// #pragma HLS INTERFACE bram port=hMemory_D5
 
 	ap_uint<kNBits_DTC> hInputStub;
 

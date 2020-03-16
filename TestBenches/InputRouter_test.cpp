@@ -207,7 +207,8 @@ int main()
     std::vector<ap_uint<kNBits_DTC>> cStubWords;
     BXType hBxCounter = cBxSelected&0x7;
     auto& cStubs = cInputStubs[cBxSelected];
-    auto cStubIterator = cStubs.begin(); 
+    size_t cSize = kMaxStubsFromLink; //std::min( static_cast<size_t>(kMaxStubsFromLink), cInputStubs[cBxSelected].size() );
+    ap_uint<kNBits_DTC> *cStubArray = new ap_uint<kNBits_DTC>[cSize];
     for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.end(); cStubIterator++)
     {
       auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
@@ -216,7 +217,8 @@ int main()
       {
         if( cStubCounter%25 == 0 )
           std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
-        cStubWords.push_back( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
+        //cStubWords.push_back( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
+        cStubArray[cStubCounter] = ap_uint<kNBits_DTC>( cStub.c_str() ,2) ; 
       }
       else
       {
@@ -224,6 +226,8 @@ int main()
           std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
       }
     }
+
+
     // unit under test
     if( !cIs2SDTC )
     {  
@@ -237,7 +241,7 @@ int main()
       std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
       std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
 
-      InputRouterTop(cLinkWord, hBxCounter, cStubWords.data(), hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
+      InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
       
       std::cout << "After the input router there are : \n";
       std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
@@ -261,7 +265,7 @@ int main()
       std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
       std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
       
-      InputRouterTop(cLinkWord, hBxCounter, cStubWords.data(), hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+      InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
 
 
       std::cout << "After the input router there are : \n";
