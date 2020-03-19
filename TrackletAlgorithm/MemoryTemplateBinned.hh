@@ -55,11 +55,13 @@ public:
   void clear(BunchXingT bx)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS inline
+//#pragma HLS inline
 
+	//NEntryT nentry = nentries_[bx][0]; // Ugly hack...
+	//nentry = 0;
 	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
 #pragma HLS UNROLL
-	  nentries_[bx][ibin] -= nentries_[bx][ibin]; // MEI: was = 0; before but that did not work (Constant null has an unsynthesizable type...)
+		nentries_[bx][ibin] = 0;//nentry; // HACK: Did not work to directly set it to 0. HLS synthesis error "Constant 'null' has an unsynthesizable type..."
 	}
   }
 

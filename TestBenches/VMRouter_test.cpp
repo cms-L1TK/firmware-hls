@@ -7,12 +7,13 @@
 #include "FileReadUtility.hh"
 #include "Constants.hh"
 
-const int nevents = 2;  //number of events to run
+const int nevents = 1;  //number of events to run
 
 using namespace std;
 
+
 int main()
-{ 
+{
   // error counts
   int err = 0;
 
@@ -23,12 +24,13 @@ int main()
   static InputStubMemory<BARRELPS> ilink3;
   static InputStubMemory<BARRELPS> ilink4;
   static InputStubMemory<BARRELPS> ilink5;
-  // static InputStubMemory<BARRELPS> ilink6;
+  static InputStubMemory<BARRELPS> ilink6;
   // static InputStubMemory<BARRELPS> ilink7;
   // static InputStubMemory<BARRELPS> ilink8;
 
   // output memories
   static AllStubMemory<BARRELPS> allstub;
+  // ME
   static VMStubMEMemory<BARRELPS> vmstubme1;
   static VMStubMEMemory<BARRELPS> vmstubme2;
   static VMStubMEMemory<BARRELPS> vmstubme3;
@@ -37,6 +39,15 @@ int main()
   static VMStubMEMemory<BARRELPS> vmstubme6;
   static VMStubMEMemory<BARRELPS> vmstubme7;
   static VMStubMEMemory<BARRELPS> vmstubme8;
+  // TE Inner
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei1;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei2;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei3;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei4;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei5;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei6;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei7;
+  static VMStubTEInnerMemory<BARRELPS> vmstubtei8;
 
   ///////////////////////////
   // open input files
@@ -77,15 +88,15 @@ int main()
   ///////////////////////////
   // open output files
   ifstream fout_aproj;
-  bool valid_aproj = openDataFile(fout_aproj, "VMR/VMR_L1PHIE/AllStubs_AS_L1PHIEn1_04.dat");
+  bool valid_aproj = openDataFile(fout_aproj, "VMR/Stubs/AllStubs_AS_L1PHIEn1_04.dat");
   if (not valid_aproj) return -1;
 
   ifstream fout_vmstubme1;
-  bool valid_vmstubme1 =  openDataFile(fout_vmstubme1, "VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE17n1_04.dat");
+  bool valid_vmstubme1 =  openDataFile(fout_vmstubme1, "VMR/VMStubsME/VMStubs_VMSME_L1PHIE17n1_04.dat");
   if (not valid_vmstubme1) return -1;
 
   ifstream fout_vmstubme2;
-  bool valid_vmstubme2 = openDataFile(fout_vmstubme2, "VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE18n1_04.dat");
+  bool valid_vmstubme2 = openDataFile(fout_vmstubme2, "VMR/VMStubsME/VMStubs_VMSME_L1PHIE18n1_04.dat");
   if (not valid_vmstubme2) return -1;
 
   ifstream fout_vmstubme3;
@@ -112,7 +123,22 @@ int main()
 //  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n4_04.dat");
 //  if (not valid_vmstubme8) return -1;
 
-  ///////////////////////////  
+ifstream fout_vmstubtei1;
+bool valid_vmstubtei1 =  openDataFile(fout_vmstubtei1, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIE17n1_04.dat");
+if (not valid_vmstubtei1) return -1;
+
+ifstream fout_vmstubtei2;
+bool valid_vmstubtei2 = openDataFile(fout_vmstubtei2, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIE18n1_04.dat");
+if (not valid_vmstubtei2) return -1;
+
+ifstream fout_vmstubtei3;
+bool valid_vmstubtei3 = openDataFile(fout_vmstubtei3, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIE19n1_04.dat");
+if (not valid_vmstubtei3) return -1;
+
+ifstream fout_vmstubtei4;
+bool valid_vmstubtei4 = openDataFile(fout_vmstubtei4, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIE20n1_04.dat");
+if (not valid_vmstubtei4) return -1;
+  ///////////////////////////
   // loop over events
   cout << "Start event loop ..." << endl;
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
@@ -127,18 +153,20 @@ int main()
     // writeMemFromFile<InputStubMemory>(ilink6, fin_ilink6, ievt);
     // writeMemFromFile<InputStubMemory>(ilink7, fin_ilink7, ievt);
     // writeMemFromFile<InputStubMemory>(ilink8, fin_ilink8, ievt);
-    
+
     // bx
     BXType bx = ievt;
     BXType bx_out;
 
     // Unit Under Test
     VMRouterTop(bx,
-    		&ilink1, &ilink2, &ilink3, 0,0,//&ilink4, &ilink5,
-		//&ilink6, &ilink7, &ilink8,
+    		&ilink1, &ilink2, &ilink3, 0,0, 0,
+		//&ilink7, &ilink8,
 			&allstub,
 		&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
-		&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8
+		&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8,
+    &vmstubtei1, &vmstubtei2, &vmstubtei3, &vmstubtei4,
+		&vmstubtei5, &vmstubtei6, &vmstubtei7, &vmstubtei8
 		);
 
     // compare the computed outputs with the expected ones
@@ -177,8 +205,24 @@ int main()
 //    // VMStubME8
 //    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme8, fout_vmstubme8, ievt,
 //                                                  "VMStubME8", truncation);
+
+    // VMStubTEInner1
+    // err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei1, fout_vmstubtei1, ievt,
+    //                                               "VMStubTEInner17", truncation);
+    //
+    // // VMStubTEInner2
+    // err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei2, fout_vmstubtei2, ievt,
+    //                                               "VMStubTEInner18", truncation);
+    //
+    // // VMStubTEInner3
+    // err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei3, fout_vmstubtei3, ievt,
+    //                                               "VMStubTEInner19", truncation);
+    //
+    // // VMStubTEInner4
+    // err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei4, fout_vmstubtei4, ievt,
+    //                                               "VMStubTEInner20", truncation);
   } // end of event loop
   std::cerr << "Exiting with return value " << err << std::endl;
   return err;
-  
+
 }

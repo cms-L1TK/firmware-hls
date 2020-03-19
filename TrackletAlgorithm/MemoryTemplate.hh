@@ -15,12 +15,12 @@ class MemoryTemplate
 public:
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR+1> NEntryT;
-  
+
 protected:
 
   DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
   NEntryT nentries_[1<<NBIT_BX];                  // number of entries
-  
+
 public:
 
   MemoryTemplate()
@@ -42,8 +42,10 @@ public:
   }
 
   void clear(BunchXingT bx) {
-#pragma HLS inline
-    nentries_[bx] = 0;
+//#pragma HLS inline
+    //NEntryT zero = nentries_[bx];
+    //zero = 0;
+    nentries_[bx] = 0;//-= nentries_[bx];//zero;
   }
 
   unsigned int getDepth() const {return (1<<NBIT_ADDR);}
@@ -78,7 +80,7 @@ public:
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
-  
+
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
   {
@@ -117,9 +119,9 @@ public:
 	  }
 	}
   }
-  
+
 #endif
-  
+
 };
 
 #endif
