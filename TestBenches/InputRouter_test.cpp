@@ -19,7 +19,7 @@ using namespace std;
 using LinkMap = std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>> ; // map of input links  [per DTC ]
 
 // get link information 
-bool getLinkInfo(LinkMap pInputMap, LINK pLinkId, ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
+void getLinkInfo(LinkMap pInputMap, LINK pLinkId, ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
 {
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
   // figure out DTC map encoding for this link 
@@ -27,19 +27,24 @@ bool getLinkInfo(LinkMap pInputMap, LINK pLinkId, ap_uint<kLINKMAPwidth>& pLinkW
   uint32_t cWord = 0x00000000; 
   bool cIs2S = ( pInputMap[static_cast<int>(pLinkId)].first.find("2S") != std::string::npos  ); 
   auto cLayerIterator = pInputMap[static_cast<int>(pLinkId)].second.begin();
+  bool cFirstLayer=false;
   while( cLayerIterator <  pInputMap[static_cast<int>(pLinkId)].second.end() ) // layer id is either layer number or disk number 
   {
     auto cLayerCounter = std::distance( pInputMap[static_cast<int>(pLinkId)].second.begin(), cLayerIterator ); 
     size_t cLayerId =  *cLayerIterator;
+
     auto cIsBarrel = (cLayerId<10); 
     cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
-    cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
+    cWord  = cWord | ( ( (cLayerId << 1) | cIsBarrel ) << 4*cLayerCounter );  
+    if( cLayerId == 1 && cIsBarrel == 1) // first barrel layer is special ...
+      cFirstLayer = true;
+    
     cLayerIterator++;
   }
+  cWord = cWord | (cFirstLayer << 17) | (cIs2S << 16);
   pLinkWord = ap_uint<kLINKMAPwidth>( cWord);
-  std::cout  << "Link " << +pLinkId << " -- DTC map encoded word is " << std::bitset<kLINKMAPwidth>(pLinkWord) << "\n";
+  std::cout  << "DTC " << pInputMap[static_cast<int>(pLinkId)].first << " Link " << +pLinkId << " -- DTC map encoded word is " << std::bitset<kLINKMAPwidth>(pLinkWord) << "\n";
   pLinkName = pInputMap[static_cast<int>(pLinkId)].first;//"IL/Link_PS10G_1_A.dat";
-  return cIs2S;
 }
 
 using InputStubs = std::map<int, std::vector<std::string>> ; //map of input stubs [ per Bx ]
@@ -90,7 +95,12 @@ int main()
     std::cout << "SYNTHESIS" << std::endl;
   #endif
 
- 
+  ap_uint<kBRAMwidth> cStub; 
+  cStub = 0xEEA7EEDDE;
+  TFStub hTFstub (cStub);
+  hTFstub.setBitLocations<BARRELPS>();
+  auto cR = hTFstub.getR<BARRELPS>();
+
   // name is  : DTCtype[PS10G_PS5G_2S]_[DTC_number]_[which tracking nonant: each DTC reads out 2 tracking nonants]
   std::string cInputFile_LinkMap = "IL/dtclinklayerdisk.dat";
   std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>>   cInputMap;
@@ -105,25 +115,25 @@ int main()
 
   // memories for stubs 
   // PS barrel 
-  InputStubMemory<BARRELPS> hMemory_L1; 
-  InputStubMemory<BARRELPS> hMemory_L2;
-  InputStubMemory<BARRELPS> hMemory_L3;
+  TFStubMemory hMemory_L1; 
+  TFStubMemory hMemory_L2;
+  TFStubMemory hMemory_L3;
   // 2S barrel 
-  InputStubMemory<BARREL2S> hMemory_L4; 
-  InputStubMemory<BARREL2S> hMemory_L5;
-  InputStubMemory<BARREL2S> hMemory_L6; 
+  TFStubMemory hMemory_L4; 
+  TFStubMemory hMemory_L5;
+  TFStubMemory hMemory_L6; 
   // PS endcap
-  InputStubMemory<DISKPS> hMemoryPS_D1; 
-  InputStubMemory<DISKPS> hMemoryPS_D2;
-  InputStubMemory<DISKPS> hMemoryPS_D3;  
-  InputStubMemory<DISKPS> hMemoryPS_D4;
-  InputStubMemory<DISKPS> hMemoryPS_D5; 
+  TFStubMemory hMemoryPS_D1; 
+  TFStubMemory hMemoryPS_D2;
+  TFStubMemory hMemoryPS_D3;  
+  TFStubMemory hMemoryPS_D4;
+  TFStubMemory hMemoryPS_D5; 
   // 2S endcap  
-  InputStubMemory<DISK2S> hMemory2S_D1; 
-  InputStubMemory<DISK2S> hMemory2S_D2;
-  InputStubMemory<DISK2S> hMemory2S_D3; 
-  InputStubMemory<DISK2S> hMemory2S_D4;
-  InputStubMemory<DISK2S> hMemory2S_D5; 
+  TFStubMemory hMemory2S_D1; 
+  TFStubMemory hMemory2S_D2;
+  TFStubMemory hMemory2S_D3; 
+  TFStubMemory hMemory2S_D4;
+  TFStubMemory hMemory2S_D5; 
   
   std::cout << "Loading link map into memory .. will be used later" << std::endl;
   std::ifstream fin_il_map;
@@ -165,40 +175,17 @@ int main()
     cLinkCounter++;
   }
   std::cout << "Mapped out " << +cInputMap.size() << " links." << std::endl;
-  auto cLinkIterator = cInputMap.begin();
-  // store link map in memory
-  // declare output memory arrays to be filled by hls simulation
-  DTCMapMemory hLinkMap;
-  size_t cIncrement=1;
-  for(size_t cIndex=0; cIndex < cInputMap.size(); cIndex++)
-  {
-    ap_uint<kLINKMAPwidth> cMemoryWord = 0x0000;
-    cLinkCounter = std::distance( cInputMap.begin(), cLinkIterator ); 
-    uint32_t cWord = 0x00000000; 
-    size_t cLayerCounter=0;
-    bool cIs2S = ( cLinkIterator->second.first.find("2S") != std::string::npos  ); 
-    for( auto cLayerId : cLinkIterator->second.second ) // layer id is either layer number or disk number 
-    {
-      auto cIsBarrel = (cLayerId<10); 
-      cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
-      cWord  = cWord | ( ( (cLayerId << 2) | (cIs2S << 1 ) | cIsBarrel ) << 5*cLayerCounter );  
-      cLayerCounter++;
-    }
-    cMemoryWord = ap_uint<kLINKMAPwidth>( cWord);
-    //WriteMap(static_cast<int>(cIndex), cMemoryWord, &hLinkMap);
-    cLinkIterator++;
-  }
-  
   
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
   // figure out DTC map encoding for this link 
   int cBxSelected = 0 ;
-  for( size_t cLink = 0 ; cLink < 1 ; cLink++)
+  for( size_t cLink = 6 ; cLink < 7 ; cLink++)
   {
     LINK cLinkId = cLink;
     ap_uint<kLINKMAPwidth> cLinkWord = 0x0000;
     std::string cInputFile = "";
-    bool cIs2SDTC  = getLinkInfo(cInputMap, cLinkId, cLinkWord, cInputFile);
+    getLinkInfo(cInputMap, cLinkId, cLinkWord, cInputFile);
+
     // get stubs 
     InputStubs cInputStubs;
     getStubs(cInputFile , cInputStubs);
@@ -226,36 +213,38 @@ int main()
           std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
       }
     }
-
-
-    // unit under test
-    if( !cIs2SDTC )
-    {  
-      std::cout << "Before input router there are : \n";
-      std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
-      std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
-      std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
-
-      InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
-      
-      std::cout << "After the input router there are : \n";
-      std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
-      std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
-      std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
-      std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
-    }
-    else
+    ap_uint<1> cIs2SDTC;
+    is2S(cLinkWord, cIs2SDTC); // check if this is a 2S or a PS DTC 
+    if( !cIs2SDTC ) // PS 
     {
       std::cout << "Before input router there are : \n";
+      std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
+
+
+      InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
+    
+      std::cout << "After the input router there are : \n";
+      std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
+      std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
+      std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
+
+    } 
+    else // 2S 
+    {
+
+      std::cout << "Before input router there are : \n";
       std::cout << "\t... entries in  " << +hMemory_L4.getEntries(hBxCounter) << " in L4 memory\n";
       std::cout << "\t... entries in  " << +hMemory_L5.getEntries(hBxCounter) << " in L5 memory\n";
       std::cout << "\t... entries in  " << +hMemory_L6.getEntries(hBxCounter) << " in L6 memory\n";
@@ -265,9 +254,9 @@ int main()
       std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
       std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
       
+
       InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
-
-
+    
       std::cout << "After the input router there are : \n";
       std::cout << "\t... entries in  " << +hMemory_L4.getEntries(hBxCounter) << " in L4 memory\n";
       std::cout << "\t... entries in  " << +hMemory_L5.getEntries(hBxCounter) << " in L5 memory\n";
@@ -277,7 +266,59 @@ int main()
       std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(hBxCounter) << " in D3 memory\n";
       std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
       std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
+
     }
+
+    // // unit under test
+    // if( !cIs2SDTC )
+    // {  
+    //   std::cout << "Before input router there are : \n";
+    //   std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
+
+    //   InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L1, hMemory_L2, hMemory_L3, hMemoryPS_D1, hMemoryPS_D2, hMemoryPS_D3, hMemoryPS_D4, hMemoryPS_D5);
+      
+    //   std::cout << "After the input router there are : \n";
+    //   std::cout << "\t... entries in  " << +hMemory_L1.getEntries(hBxCounter) << " in L1 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L2.getEntries(hBxCounter) << " in L2 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L3.getEntries(hBxCounter) << " in L3 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D1.getEntries(hBxCounter) << " in D1 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D2.getEntries(hBxCounter) << " in D2 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D3.getEntries(hBxCounter) << " in D3 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D4.getEntries(hBxCounter) << " in D4 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemoryPS_D5.getEntries(hBxCounter) << " in D5 memory\n";
+    // }
+    // else
+    // {
+    //   std::cout << "Before input router there are : \n";
+    //   std::cout << "\t... entries in  " << +hMemory_L4.getEntries(hBxCounter) << " in L4 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L5.getEntries(hBxCounter) << " in L5 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L6.getEntries(hBxCounter) << " in L6 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(hBxCounter) << " in D1 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(hBxCounter) << " in D2 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(hBxCounter) << " in D3 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
+      
+    //   InputRouterTop(cLinkWord, hBxCounter, cStubArray, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+
+
+    //   std::cout << "After the input router there are : \n";
+    //   std::cout << "\t... entries in  " << +hMemory_L4.getEntries(hBxCounter) << " in L4 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L5.getEntries(hBxCounter) << " in L5 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory_L6.getEntries(hBxCounter) << " in L6 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D1.getEntries(hBxCounter) << " in D1 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D2.getEntries(hBxCounter) << " in D2 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D3.getEntries(hBxCounter) << " in D3 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D4.getEntries(hBxCounter) << " in D4 memory\n";
+    //   std::cout << "\t... entries in  " << +hMemory2S_D5.getEntries(hBxCounter) << " in D5 memory\n";
+    // }
 
   }
     
