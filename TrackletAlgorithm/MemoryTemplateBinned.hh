@@ -55,7 +55,7 @@ public:
   void clear(BunchXingT bx)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-//#pragma HLS inline
+#pragma HLS inline
 
 	//NEntryT nentry = nentries_[bx][0]; // Ugly hack...
 	//nentry = 0;

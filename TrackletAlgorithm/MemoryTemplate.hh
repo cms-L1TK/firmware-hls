@@ -42,7 +42,7 @@ public:
   }
 
   void clear(BunchXingT bx) {
-//#pragma HLS inline
+#pragma HLS inline
     //NEntryT zero = nentries_[bx];
     //zero = 0;
     nentries_[bx] = 0;//-= nentries_[bx];//zero;

@@ -34,24 +34,26 @@ void VMRouterTop(BXType bx,
 	// Variables for that are specified with regards to the test bench, should be set somewhere else
 	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	const int disk(0); // Which disk number the data is coming from, 0 if not disk
-	const bool isPSmodule(true); // If the module is of the PS type, otherwise it's 2S
+	//const bool isPSmodule(true); // If the module is of the PS type, otherwise it's 2S
+	const int ninputs(3);  // The number of input memories
+	//ap_uint<6> imask(7); // Mask of which inputs are being used
+	const uint32_t MEMask(0x000F0000UL); // Mask of which memories that are being used.
+	const uint32_t TEIMask(0x000F0000UL); // Mask of which TE Inner memories that are used
 
-	ap_uint<32> memask(0x000F00F0); // Mask of which memories that are being used. What is UL?
-	ap_uint<6> imask(7); // Mask of which inputs are being used
-	ap_uint<32> teimask(0x000F00F0); // Mask of which TE Inner memories that are used
 
-	VMRouter<BARRELPS, BARRELPS, layer, disk, isPSmodule>
-		 (bx,imask, i0,i1,i2,i3,i4,i5,//i5,i6,i7,
-		 allStub, memask,
-		 0,0,0,0,m4,m5,m6,m7, // 0-7
-		 0,0,0,0,0,0,0,0, // 8-15
-		 m0,m1,m2,m3,0,0,0,0, // 16-23
-		 0,0,0,0,0,0,0,0, // 24-31
-		 teimask,
-		 0,0,0,0,mtei4,mtei5,mtei6,mtei7, // 0-7
-		 0,0,0,0,0,0,0,0, // 8-15
-		 mtei0,mtei1,mtei2,mtei3,0,0,0,0, // 16-23
-		 0,0,0,0,0,0,0,0 // 24-31
+	VMRouter<BARRELPS, BARRELPS, layer, disk, ninputs, MEMask, TEIMask>
+		 (bx,i0,i1,i2,nullptr,nullptr,nullptr,//i5,i6,i7,
+		 allStub,
+		 // ME memories
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
+		 m0,m1,m2,m3,nullptr,nullptr,nullptr,nullptr, // 16-23
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 24-31
+		 // TEInner memories
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
+		 mtei0,mtei1,mtei2,mtei3,nullptr,nullptr,nullptr,nullptr, // 16-23
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr // 24-31
 		 );
 
 	return;
