@@ -125,7 +125,7 @@ module uut(
   reg VMPROJ_L3PHIC17to24_nentries_1_V_we [7:0];
   wire[7:0] VMPROJ_L3PHIC17to24_nentries_1_V_din [7:0];
   reg ProjectionRouter_done;
-wire AP_L3PHIC_dataarray_data_V_wea;
+  wire AP_L3PHIC_dataarray_data_V_wea;
   wire[9:0] AP_L3PHIC_dataarray_data_V_writeaddr;
   wire[59:0] AP_L3PHIC_dataarray_data_V_din;
   wire AP_L3PHIC_nentries_0_V_we;
@@ -478,10 +478,20 @@ Memory #(
 end
 endgenerate
 
+reg MatchCalculator_start;
+
+initial begin
+   MatchCalculator_start = 1'b0;
+
+end
+always @(MatchEngine_done[0]) begin
+   if (MatchEngine_done[0]) MatchCalculator_start = 1'b1;
+end
+   
 MC_L3PHIC MC_L3PHIC(
   .ap_clk(clk),
   .ap_rst(reset),
-  .ap_start(en_proc),
+  .ap_start(MatchCalculator_start),
   .ap_done(MatchCalculator_done),
   .bx_V(bx_out_MatchEngine[0]),
   .match1_dataarray_data_V_ce0(CM_L3PHIC17to24_dataarray_data_V_enb[0]),

@@ -1,33 +1,30 @@
-# generate project script
-# vivado_hls -f <filename>
-# vivado_hls -p match_calc
+# Script to generate project for MC
+#   vivado_hls -f script_MC.tcl
+#   vivado_hls -p match_calc
 # WARNING: this will wipe out the original project by the same name
 
-# set clock 250 MHz
-set clockperiod 4         
-
-# delete old project
-delete_project match_calc
-# make new project
-open_project match_calc
-set_top MatchCalculatorTop
+# create new project (deleting any existing one of same name)
+open_project -reset match_calc
 
 # source files
-add_files ../TrackletAlgorithm/MatchCalculatorTop.cpp -cflags "-std=c++11"
-add_files -tb -cflags "-I ../TrackletAlgorithm -std=c++11" ../TestBenches/MatchCalculator_test.cpp
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set_top MatchCalculatorTop
+add_files ../TrackletAlgorithm/MatchCalculatorTop.cpp -cflags "$CFLAGS"
+add_files -tb ../TestBenches/MatchCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files
 add_files -tb ../emData/MC/
 
-# solutions
 open_solution "solution1"
-source set_fpga.tcl
-create_clock -period $clockperiod -name default
 
-csim_design
+# Define FPGA, clock frequency & common HLS settings.
+source settings_hls.tcl
+
+csim_design -compiler gcc -mflags "-j8"
 csynth_design
 cosim_design 
 export_design -format ip_catalog
+# Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
+#export_design -format ip_catalog -flow impl
 
-# exit vivado_hls
-quit
+exit
