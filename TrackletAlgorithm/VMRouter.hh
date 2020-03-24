@@ -782,10 +782,12 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 						if ( LAYER==3) nphireg=4;
 						if ( LAYER==5) nphireg=4;
 						auto nfinephi = nfinephibarrelinner; // Number of bits for finephi?
+						auto z = stub.getZ();
+						auto nzbits = stubTeInner.getZBits().length();
 
 						stubTeInner.setBend(bend);
 						stubTeInner.setIndex(typename VMStubTEInner<METYPE>::VMSTEIID(i));
-						stubTeInner.setZBits(stub.getZ()>>2); // Maybe change so that we don't call getZ etc so many times? Remove hardcoded value
+						stubTeInner.setZBits(z>>(z.length()-nzbits)); // Maybe change so that we don't call getZ etc so many times? Remove hardcoded value
 						stubTeInner.setFinePhi(iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi));  // is this the right nphireg
 
 						std::cout << "TEInner stub " << std::hex << stubTeInner.raw() << std::endl;
@@ -989,77 +991,86 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 								addrCount[31] += 1;
 							}
 						}
+					}
 
-						//  Overlap stuff
-						auto overlap(0);
+					//  Overlap stuff
+					if (LAYER == 1  || LAYER == 2) {// Make sure that only layer 1 and 2 are overlapped
+						auto z = stub.getZ();
+						auto r = stub.getR();
+						int zbin = (z+(1<<(z.length()-1)))>>(z.length()-7); // Make z positive and take the 5 MSBs
+						int rbin = (r+(1<<(r.length()-1)))>>(r.length()-3); // What is this doing... r already positive?! 4 MSBs??
+						int index = zbin * rbin + rbin;
+						//auto overlap = overlap_table[index];
+						auto overlap(0); // use binlookup?
+						if (overlap != -1) {
+								VMStubTEInner<BARRELOL> stubTeOl;
+								auto nzbits = stubTeOl.getZBits().length;
+								nphireg = 4; // What is this still
+								nfinephi = 1; // or nfinephioverlapinner???
 
-						if (overlap) {
-							assert(LAYER == 1  || LAYER == 2); // Make sure that only layer 1 and 2 are overlapped
+								stubTeOl.setBend(bend);  //move so we don't call it all the time
+								stubTeOl.setIndex(typename VMStubTEInner<BARRELOL>::VMSTEIID(i));
+								stubTeOl.setZBits(z >> (z.length()-nzbits)); // Maybe change so that we don't call getZ etc so many times? Manipulate bits?
+								stubTeOl.setFinePhi(iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi));  // is this the right nphireg
+							}
+					}
 
-							VMStubTEInner<BARRELOL> stubTeOl;
+					// Outer stuff
+					if ( LAYER  ==  2 || LAYER == 4 || LAYER == 6) { // layers 2, 4 and 6
+							// OUTER
+							VMStubTEOuter<INTYPE> stubTeOuter;
 
-							nphireg = 4; // What is this still
-							nfinephi = 1; // or nfinephioverlapinner???
+							auto nphireg = 4;  // What value...
+							auto nfinephi = nfinephibarrelouter;
 
-							stubTeOl.setBend(bend);  //move so we don't call it all the time
-							stubTeOl.setIndex(typename VMStubTEInner<BARRELOL>::VMSTEIID(i));
-							stubTeOl.setZBits(stub.getZ()); // Maybe change so that we don't call getZ etc so many times? Manipulate bits?
-							stubTeOl.setFinePhi(iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi));  // is this the right nphireg
+							stubTeOuter.setBend(bend);
+							stubTeOuter.setIndex(typename VMStubTEOuter<INTYPE>::VMSTEOID(i));
+							stubTeOuter.setFinePhi(iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi));  // is this the right nphireg
+
+							// TODO Set fine z/r, using binlookup?
+
+							// bin lookup stuff
+							auto binlookup(0);
+							auto binlookupextra(-1); // -1 if no overlap
+							auto overlap(0); //
+
+							// Why are they in a weird order
+							switch (LAYER) {
+							case 2 : // used for both inner and outer stubs
+								// binlookup=lookupOuterLayer(stub);
+								// binlookupextra=lookupInnerLayer(stub);
+								break;
+							case 4 :
+								// binlookup=lookupOuterLayer(stub);
+								break;
+							case 6 :
+								// binlookup=lookupOuterLayer(stub);
+								break;
+							case 1 :
+								// binlookup=lookupInnerLayer(stub);
+								break;
+							case 3 : // used for both inner and outer stubs
+								// binlookup=lookupInnerLayer(stub);
+								// binlookupextra=lookupOuterLayer(stub);
+								break;
+							case 5 :
+								// binlookup=lookupInnerLayer(stub);
+								break;
+							default : assert(0);
+							}
+
+							// non overlap stuff
+							auto iphiRawTmp = iphiRaw*nvm/32; // Which VM?
+
+							// save stubs
+							if (binlookup != -1) { // only time it is -1 is when we're looking at overlap and it's not in the overlap region?
+								// overlap stuff
 						}
 					}
+
 				}
 
-				if ( LAYER  ==  2 || LAYER == 4 || LAYER == 6) { // layers 2, 4 and 6
-						// OUTER
-						VMStubTEOuter<INTYPE> stubTeOuter;
 
-						auto nphireg = 4;  // What value...
-						auto nfinephi = nfinephibarrelouter;
-
-						stubTeOuter.setBend(bend);
-						stubTeOuter.setIndex(typename VMStubTEOuter<INTYPE>::VMSTEOID(i));
-						stubTeOuter.setFinePhi(iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi));  // is this the right nphireg
-
-						// TODO Set fine z/r, using binlookup?
-
-						// bin lookup stuff
-						auto binlookup(0);
-						auto binlookupextra(-1); // -1 if no overlap
-						auto overlap(0); //
-
-						// Why are they in a weird order
-						switch (LAYER) {
-						case 2 : // used for both inner and outer stubs
-							// binlookup=lookupOuterLayer(stub);
-							// binlookupextra=lookupInnerLayer(stub);
-							break;
-						case 4 :
-							// binlookup=lookupOuterLayer(stub);
-							break;
-						case 6 :
-							// binlookup=lookupOuterLayer(stub);
-							break;
-						case 1 :
-							// binlookup=lookupInnerLayer(stub);
-							break;
-						case 3 : // used for both inner and outer stubs
-							// binlookup=lookupInnerLayer(stub);
-							// binlookupextra=lookupOuterLayer(stub);
-							break;
-						case 5 :
-							// binlookup=lookupInnerLayer(stub);
-							break;
-						default : assert(0);
-						}
-
-						// non overlap stuff
-						auto iphiRawTmp = iphiRaw*nvm/32; // Which VM?
-
-						// save stubs
-						if (binlookup != -1) { // only time it is -1 is when we're looking at overlap and it's not in the overlap region?
-							// overlap stuff
-					}
-				}
 				// DISK
 				else if ( DISK != 0 ) {
 					assert(1==0); // not yet
