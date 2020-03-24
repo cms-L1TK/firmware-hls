@@ -2,6 +2,11 @@
 #define INPUTROUTERTOP_HH
 
 
+// input router constants 
+
+constexpr int kNRegionsLayer1 = 8;
+constexpr int kNRegions = 4;  
+
 #include "InputRouter.hh"
 #include "Constants.hh"
 #include "hls_math.h"
@@ -9,28 +14,26 @@
 #include "hls_stream.h"
 #include "InputStubMemory.hh"
 
-// void InputRouterTopPS(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-// 				  InputStubMemory<BARRELPS> &hMemory_L1 ,InputStubMemory<BARRELPS> &hMemory_L2, InputStubMemory<BARRELPS> &hMemory_L3,
-// 				  InputStubMemory<DISKPS> &hMemory_D1, InputStubMemory<DISKPS> &hMemory_D2, InputStubMemory<DISKPS> &hMemory_D3 , InputStubMemory<DISKPS> &hMemory_D4, InputStubMemory<DISKPS> &hMemory_D5 );
-
-
-// void InputRouterTop2S(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-// 				  InputStubMemory<BARREL2S> &hMemory_L1 ,InputStubMemory<BARREL2S> &hMemory_L2, InputStubMemory<BARREL2S> &hMemory_L3,
-				  // InputStubMemory<DISK2S> &hMemory_D1, InputStubMemory<DISK2S> &hMemory_D2, InputStubMemory<DISK2S> &hMemory_D3, InputStubMemory<DISK2S> &hMemory_D4, InputStubMemory<DISK2S> &hMemory_D5 );
 
 
 void is2S(ap_uint<kLINKMAPwidth> hDTCMapEncoded, ap_uint<1>& hIs2S);
 void isFirst(ap_uint<kLINKMAPwidth> hDTCMapEncoded, ap_uint<1>& hIsFirst);
 
+void InputRouterPS(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+				  InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L1[kNRegionsLayer1], InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L2[kNRegions], 
+				  InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L3[kNRegions],
+				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D1[kNRegions], InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D2[kNRegions], 
+				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D3[kNRegions], InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D4[kNRegions], 
+				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D5[kNRegions]) ;	
 
-void InputRouterGeneric(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-				  TFStubMemory &hMemory_L1 ,TFStubMemory &hMemory_L2, TFStubMemory &hMemory_L3,
-				  TFStubMemory &hMemory_D1, TFStubMemory &hMemory_D2, TFStubMemory &hMemory_D3, TFStubMemory &hMemory_D4, TFStubMemory &hMemory_D5 );
+void InputRouter2S(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+				  InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L1[kNRegions], InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L2[kNRegions], 
+				  InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L3[kNRegions],
+				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D1[kNRegions], InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D2[kNRegions], 
+				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D3[kNRegions], InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D4[kNRegions], 
+				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D5[kNRegions]) ;	
 
-
-void InputRouterTop(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-				  TFStubMemory &hMemory_L1 ,TFStubMemory &hMemory_L2, TFStubMemory &hMemory_L3,
-				  TFStubMemory &hMemory_D1, TFStubMemory &hMemory_D2, TFStubMemory &hMemory_D3, TFStubMemory &hMemory_D4, TFStubMemory &hMemory_D5 );
-
+void InputRouterGeneric(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+				  MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemoriesPS[kTotalPSmemories], MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemories2S[kTotal2Smemories]);	
 
 #endif

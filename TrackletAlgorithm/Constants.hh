@@ -45,4 +45,8 @@ constexpr unsigned int kNBits_Valid = 0;
 constexpr unsigned int kNBits_LayerId = 2;
 constexpr unsigned int kNBits_Debug = kNBits_Valid + kNBits_LayerId;
 
+
+// input stub memories 
+constexpr unsigned int kTotalPSmemories = 36;
+constexpr unsigned int kTotal2Smemories = 32;
 #endif

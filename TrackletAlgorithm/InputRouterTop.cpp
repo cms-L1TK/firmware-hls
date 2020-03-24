@@ -1,59 +1,166 @@
 #include "InputRouterTop.h"
+#include "InputRouter.cc"
 
-// barrel 2S input router 
-// void InputRouterTopPS(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-// 				  InputStubMemory<BARRELPS>& hMemory_L1 ,InputStubMemory<BARRELPS>& hMemory_L2, InputStubMemory<BARRELPS>& hMemory_L3,
-// 				  InputStubMemory<DISKPS>& hMemory_D1, InputStubMemory<DISKPS>& hMemory_D2, InputStubMemory<DISKPS>& hMemory_D3 , InputStubMemory<DISKPS>& hMemory_D4, InputStubMemory<DISKPS>& hMemory_D5 )
-// {
-// 	InputRouter<BARRELPS,DISKPS>(hDTCMapEncoded, bx, hIputLink,hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
-// }
 
-// // disk 2S input router 
-// void InputRouterTop2S(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-// 				  InputStubMemory<BARREL2S>& hMemory_L1 ,InputStubMemory<BARREL2S>& hMemory_L2, InputStubMemory<BARREL2S>& hMemory_L3,
-// 				  InputStubMemory<DISK2S>& hMemory_D1, InputStubMemory<DISK2S>& hMemory_D2, InputStubMemory<DISK2S>& hMemory_D3 , InputStubMemory<DISK2S>& hMemory_D4, InputStubMemory<DISK2S>& hMemory_D5 )
-// {
-// 	InputRouter<BARREL2S,DISK2S>(hDTCMapEncoded, bx, hIputLink, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
-// }
 
-void is2S(ap_uint<kLINKMAPwidth> hDTCMapEncoded, ap_uint<1>& hIs2S)
+// route stubs for PS memories only 
+void InputRouterPS(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+				  InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L1[kNRegionsLayer1], InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L2[kNRegions], 
+				  InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L3[kNRegions],
+				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D1[kNRegions], InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D2[kNRegions], 
+				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D3[kNRegions], InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D4[kNRegions], 
+				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D5[kNRegions])
 {
-	hIs2S  =  hDTCMapEncoded.range(kLINKMAPwidth-2,kLINKMAPwidth-2);
-}
-void isFirst(ap_uint<kLINKMAPwidth> hDTCMapEncoded, ap_uint<1>& hIsFirst)
-{
-	hIsFirst  =  hDTCMapEncoded.range(kLINKMAPwidth-1,kLINKMAPwidth-1);
-}
-
-// now this could have all the possible memories 
-void InputRouterGeneric(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink])
-{
-	
-	ap_uint<1> cIsFirstLayer; isFirst(hDTCMapEncoded, cIsFirstLayer);
-	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
-	#ifndef __SYNTHESIS__
-	  std::cout << "\t.. First layer bit is set to " << +cIsFirstLayer << " ... 2S bit is set to " << +cIs2S << "\n";
-	#endif
-}
-
-
-// generic input router 
-void InputRouterTop(ap_uint<kLINKMAPwidth> hDTCMapEncoded, const BXType bx, ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink],
-				  TFStubMemory &hMemory_L1 ,TFStubMemory &hMemory_L2, TFStubMemory &hMemory_L3,
-				  TFStubMemory &hMemory_D1, TFStubMemory &hMemory_D2, TFStubMemory &hMemory_D3, TFStubMemory &hMemory_D4, TFStubMemory &hMemory_D5 )
-{
-	
-	ap_uint<1> cIsFirstLayer; isFirst(hDTCMapEncoded, cIsFirstLayer);
-	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
-	#ifndef __SYNTHESIS__
-	  std::cout << "\t.. First layer bit is set to " << +cIsFirstLayer << " ... 2S bit is set to " << +cIs2S << "\n";
-	#endif
-	if( !cIs2S )
+	#pragma HLS interface ap_none port=hDTCMapEncoded
+	// clear memories for this bunch crossing 
+	for( int cPhiRegion=0; cPhiRegion<kNRegionsLayer1; cPhiRegion++)
 	{
-		InputRouter<BARRELPS,DISKPS>(hDTCMapEncoded, bx, hIputLink,hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
+		if( cPhiRegion < 4 )
+		{
+			(&hMemory_L2[cPhiRegion])->clear(bx);
+			(&hMemory_L3[cPhiRegion])->clear(bx);
+			(&hMemory_D1[cPhiRegion])->clear(bx);
+			(&hMemory_D2[cPhiRegion])->clear(bx);
+			(&hMemory_D3[cPhiRegion])->clear(bx);
+			(&hMemory_D4[cPhiRegion])->clear(bx);
+			(&hMemory_D5[cPhiRegion])->clear(bx);
+		}		
+		(&hMemory_L1[cPhiRegion])->clear(bx);
 	}
-	else
+
+	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
+	ap_uint<3> cLayerOrDiskId;
+	ap_uint<1> cIsBarrel;
+	for (int cStubCounter=0; cStubCounter<nStubs; cStubCounter++)
 	{
-		InputRouter<BARREL2S,DISK2S>(hDTCMapEncoded, bx, hIputLink,hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
+		#pragma HLS pipeline II=1
+			ap_uint<kNBits_DTC> hInputStub = hIputLink[cStubCounter];
+			DecodeMap( hInputStub, hDTCMapEncoded , cLayerOrDiskId, cIsBarrel);
+			assert( cIs2S == 0 ); // this should only be for PS modules 
+				
+			if( cIsBarrel == 1 ) // stub is from a barrel module 
+			{
+				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 3 ); // only three layers in the barrel
+				#ifndef __SYNTHESIS__
+					std::cout << "\t.. Routing stub from PS barrel. Tracker layer " << +cLayerOrDiskId << "\n";
+				#endif
+				
+				if( cLayerOrDiskId == 1 ) 
+					WriteMemories<InputStub<BARRELPS>,3,kNRegionsLayer1>(bx, hInputStub, hMemory_L1);
+				else if( cLayerOrDiskId == 2 )
+					WriteMemories<InputStub<BARRELPS>,2,kNRegions>(bx, hInputStub, hMemory_L2);
+				else
+					WriteMemories<InputStub<BARRELPS>,2,kNRegions>(bx, hInputStub, hMemory_L3);
+			}
+			else
+			{
+				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 5 ); // only five disks in the endcap
+				#ifndef __SYNTHESIS__
+					std::cout << "\t.. Routing stub from PS endcap. Endcap disk " << +cLayerOrDiskId << "\n";
+				#endif
+
+				if( cLayerOrDiskId == 1 ) 
+					WriteMemories<InputStub<DISKPS>,2,kNRegions>(bx, hInputStub, hMemory_D1);
+				else if( cLayerOrDiskId == 2 )
+					WriteMemories<InputStub<DISKPS>,2,kNRegions>(bx, hInputStub, hMemory_D2);
+				else if( cLayerOrDiskId == 3 )
+					WriteMemories<InputStub<DISKPS>,2,kNRegions>(bx, hInputStub, hMemory_D3);
+				else if( cLayerOrDiskId == 4 )
+					WriteMemories<InputStub<DISKPS>,2,kNRegions>(bx, hInputStub, hMemory_D4);
+				else if( cLayerOrDiskId == 5 )
+					WriteMemories<InputStub<DISKPS>,2,kNRegions>(bx, hInputStub, hMemory_D5);
+			}
 	}
+}
+
+
+// route stubs for 2S memories only 
+void InputRouter2S(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+				  InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L1[kNRegions], InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L2[kNRegions], 
+				  InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L3[kNRegions],
+				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D1[kNRegions], InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D2[kNRegions], 
+				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D3[kNRegions], InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D4[kNRegions], 
+				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D5[kNRegions])
+{
+	#pragma HLS interface ap_none port=hDTCMapEncoded
+	// clear memories for this bunch crossing 
+	for( int cPhiRegion=0; cPhiRegion<kNRegions; cPhiRegion++)
+	{
+		(&hMemory_L1[cPhiRegion])->clear(bx);
+		(&hMemory_L2[cPhiRegion])->clear(bx);
+		(&hMemory_L3[cPhiRegion])->clear(bx);
+		(&hMemory_D1[cPhiRegion])->clear(bx);
+		(&hMemory_D2[cPhiRegion])->clear(bx);
+		(&hMemory_D3[cPhiRegion])->clear(bx);
+		(&hMemory_D4[cPhiRegion])->clear(bx);
+		(&hMemory_D5[cPhiRegion])->clear(bx);
+	}
+
+	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
+	ap_uint<3> cLayerOrDiskId;
+	ap_uint<1> cIsBarrel;
+	for (int cStubCounter=0; cStubCounter<nStubs; cStubCounter++)
+	{
+		#pragma HLS pipeline II=1
+			ap_uint<kNBits_DTC> hInputStub = hIputLink[cStubCounter];
+			DecodeMap( hInputStub, hDTCMapEncoded , cLayerOrDiskId, cIsBarrel);
+			assert( cIs2S == 1 ); // this should only be for 2S modules 
+			if( cIsBarrel == 1 ) // stub is from a barrel module 
+			{
+
+				assert( cLayerOrDiskId >=4 && cLayerOrDiskId <= 6 ); // only three layers in the barrel
+				#ifndef __SYNTHESIS__
+					std::cout << "\t.. Routing stub from 2S barrel. Tracker layer " << +cLayerOrDiskId << "\n";
+				#endif
+
+				if( cLayerOrDiskId == 3 ) 
+					WriteMemories<InputStub<BARREL2S>,3,kNRegionsLayer1>(bx, hInputStub, hMemory_L1);
+				else if( cLayerOrDiskId == 4 )
+					WriteMemories<InputStub<BARREL2S>,2,kNRegionsLayer1>(bx, hInputStub, hMemory_L2);
+				else
+					WriteMemories<InputStub<BARREL2S>,2,kNRegionsLayer1>(bx, hInputStub, hMemory_L3);
+			}
+			else
+			{
+				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 5 ); // only five disks in the endcap
+				#ifndef __SYNTHESIS__
+					std::cout << "\t.. Routing stub from 2S endcap. Endcap disk " << +cLayerOrDiskId << "\n";
+				#endif
+
+				if( cLayerOrDiskId == 1 ) 
+					WriteMemories<InputStub<DISK2S>,2,kNRegions>(bx, hInputStub, hMemory_D1);
+				else if( cLayerOrDiskId == 2 )
+					WriteMemories<InputStub<DISK2S>,2,kNRegions>(bx, hInputStub, hMemory_D2);
+				else if( cLayerOrDiskId == 3 )
+					WriteMemories<InputStub<DISK2S>,2,kNRegions>(bx, hInputStub, hMemory_D3);
+				else if( cLayerOrDiskId == 4 )
+					WriteMemories<InputStub<DISK2S>,2,kNRegions>(bx, hInputStub, hMemory_D4);
+				else 
+					WriteMemories<InputStub<DISK2S>,2,kNRegions>(bx, hInputStub, hMemory_D5);
+			}
+	}
+	
+}
+
+
+// route stubs to any memory 
+void InputRouterGeneric(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+				  MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemoriesPS[kTotalPSmemories], MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemories2S[kTotal2Smemories])
+{
+	#pragma HLS interface ap_none port=hDTCMapEncoded
+	// clear memories for this bunch crossing 
+	for( int cMemoryIndex=0; cMemoryIndex<kTotalPSmemories; cMemoryIndex++)
+	{
+		(&hMemoriesPS[cMemoryIndex])->clear(bx);
+		if( cMemoryIndex < kTotal2Smemories )
+			(&hMemories2S[cMemoryIndex])->clear(bx);
+	}
+	
+	for (int cStubCounter=0; cStubCounter<nStubs; cStubCounter++)
+	{
+		#pragma HLS pipeline II=1
+			RouteStub(bx, hIputLink[cStubCounter], hDTCMapEncoded, hMemoriesPS, hMemories2S );
+
+	}
+
 }

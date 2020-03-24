@@ -73,107 +73,152 @@ public:
   };
 };
 
-class TFStub 
-{
-  typedef ap_uint<kBRAMwidth> TFStubData;
-public:
+// class TFStub 
+// {
+//   typedef ap_uint<kBRAMwidth> TFStubData;
+// public:
   
-  // Constructors
-  TFStub(const TFStubData& newdata):
-    data_(newdata)
-  {}
+//   // Constructors
+//   TFStub(const TFStubData& newdata):
+//     data_(newdata)
+//   {}
   
-  template<int ISType> 
-  TFStub(const ap_uint<InputStubBase<ISType>::kInputStubSize>& newStub):
-    data_(newStub)
-  {
-    setBitLocations<ISType>();
-  }
+//   template<int ISType> 
+//   TFStub(const ap_uint<InputStubBase<ISType>::kInputStubSize>& newStub):
+//     data_(newStub)
+//   {
+//     setBitLocations<ISType>();
+//   }
 
-  TFStub():
-    data_(0)
-  {}
+//   TFStub():
+//     data_(0)
+//   {}
 
-  // templated assignment of bit locations 
-  template<int ISType> 
-  void setBitLocations()
-  {
-    kISBendLSB = 0;
-    kISBendMSB = kISBendLSB + InputStubBase<ISType>::kISBendSize - 1;
-    kISAlphaLSB = kISBendMSB + 1;
-    kISAlphaMSB = kISAlphaLSB + InputStubBase<ISType>::kISAlphaSize - 1;
-    kISPhiLSB = kISAlphaMSB + 1;
-    kISPhiMSB = kISPhiLSB + InputStubBase<ISType>::kISPhiSize - 1;
-    kISZLSB = kISPhiMSB + 1;
-    kISZMSB = kISZLSB + InputStubBase<ISType>::kISZSize - 1;
-    kISRLSB = kISZMSB + 1;
-    kISRMSB = kISRLSB + InputStubBase<ISType>::kISRSize - 1;
-  }
+//   // templated assignment of bit locations 
+//   template<int ISType> 
+//   void setBitLocations()
+//   {
+//     kISBendLSB = 0;
+//     kISBendMSB = kISBendLSB + InputStubBase<ISType>::kISBendSize - 1;
+//     kISAlphaLSB = kISBendMSB + 1;
+//     kISAlphaMSB = kISAlphaLSB + InputStubBase<ISType>::kISAlphaSize - 1;
+//     kISPhiLSB = kISAlphaMSB + 1;
+//     kISPhiMSB = kISPhiLSB + InputStubBase<ISType>::kISPhiSize - 1;
+//     kISZLSB = kISPhiMSB + 1;
+//     kISZMSB = kISZLSB + InputStubBase<ISType>::kISZSize - 1;
+//     kISRLSB = kISZMSB + 1;
+//     kISRMSB = kISRLSB + InputStubBase<ISType>::kISRSize - 1;
+//   }
 
-  // Getters 
-  TFStubData raw() const {return data_; }
+//   // Getters 
+//   TFStubData raw() const {return data_; }
 
-  // templated getter 
-  template<int ISType> 
-  ap_uint<InputStubBase<ISType>::kISRSize> getR() const { return data_.range(kISRMSB,kISRLSB); }
+//   // templated getter 
+//   template<int ISType> 
+//   ap_uint<InputStubBase<ISType>::kISRSize> getR() const { return data_.range(kISRMSB,kISRLSB); }
   
-  template<int ISType> 
-  ap_uint<InputStubBase<ISType>::kISZSize> getZ() const { return data_.range(kISZMSB,kISZLSB); }
+//   template<int ISType> 
+//   ap_uint<InputStubBase<ISType>::kISZSize> getZ() const { return data_.range(kISZMSB,kISZLSB); }
 
-  template<int ISType> 
-  ap_uint<InputStubBase<ISType>::kISPhiSize> getPhi() const { return data_.range(kISPhiMSB,kISPhiLSB); }
+//   template<int ISType> 
+//   ap_uint<InputStubBase<ISType>::kISPhiSize> getPhi() const { return data_.range(kISPhiMSB,kISPhiLSB); }
 
-
-  template<int ISType>
-  ap_uint<3> getCoarsePhiRegion(int cNbits=2) const { return data_.range(kISPhiMSB-1,kISPhiMSB-(cNbits-1)); }
-
-  // This getter is only used for stubs in DISK2S
-  template<int ISType> 
-  ap_uint<InputStubBase<ISType>::kISAlphaSize> getAlpha() const 
-  {
-    static_assert(ISType == DISKPS, "Getter should only be used for Disk 2S stubs");
-    return data_.range(kISAlphaMSB,kISAlphaLSB);
-  }
+//   // This getter is only used for stubs in DISK2S
+//   template<int ISType> 
+//   ap_uint<InputStubBase<ISType>::kISAlphaSize> getAlpha() const 
+//   {
+//     static_assert(ISType == DISKPS, "Getter should only be used for Disk 2S stubs");
+//     return data_.range(kISAlphaMSB,kISAlphaLSB);
+//   }
   
-  template<int ISType> 
-  ap_uint<InputStubBase<ISType>::kISBendSize> getBend() const { return data_.range(kISBendMSB,kISBendLSB); }
+//   template<int ISType> 
+//   ap_uint<InputStubBase<ISType>::kISBendSize> getBend() const { return data_.range(kISBendMSB,kISBendLSB); }
 
-  // Setters 
-  template<int ISType> 
-  void setR(const ap_uint<InputStubBase<ISType>::kISRSize> r){ data_.range(kISRMSB,kISRLSB) = r; }
+//   // Setters 
+//   template<int ISType> 
+//   void setR(const ap_uint<InputStubBase<ISType>::kISRSize> r){ data_.range(kISRMSB,kISRLSB) = r; }
 
-  template<int ISType> 
-  void setZ(const ap_uint<InputStubBase<ISType>::kISZSize> z) { data_.range(kISZMSB,kISZLSB) = z; }
+//   template<int ISType> 
+//   void setZ(const ap_uint<InputStubBase<ISType>::kISZSize> z) { data_.range(kISZMSB,kISZLSB) = z; }
 
-  template<int ISType> 
-  void setPhi(const ap_uint<InputStubBase<ISType>::kISPhiSize> phi) { data_.range(kISPhiMSB,kISPhiLSB) = phi; }
+//   template<int ISType> 
+//   void setPhi(const ap_uint<InputStubBase<ISType>::kISPhiSize> phi) { data_.range(kISPhiMSB,kISPhiLSB) = phi; }
 
-  // This setter is only used for stubs in DISK2S
-  template<int ISType> 
-  void setAlpha(const ap_uint<InputStubBase<ISType>::kISAlphaSize> alpha) {
-    static_assert(ISType == DISKPS, "Setter should only be used for Disk 2S stubs");
-    data_.range(kISAlphaMSB,kISAlphaLSB) = alpha;
-  }
+//   // This setter is only used for stubs in DISK2S
+//   template<int ISType> 
+//   void setAlpha(const ap_uint<InputStubBase<ISType>::kISAlphaSize> alpha) {
+//     static_assert(ISType == DISKPS, "Setter should only be used for Disk 2S stubs");
+//     data_.range(kISAlphaMSB,kISAlphaLSB) = alpha;
+//   }
 
-  template<int ISType> 
-  void setBend(const ap_uint<InputStubBase<ISType>::kISBendSize> bend) { data_.range(kISBendMSB,kISBendLSB) = bend; }
+//   template<int ISType> 
+//   void setBend(const ap_uint<InputStubBase<ISType>::kISBendSize> bend) { data_.range(kISBendMSB,kISBendLSB) = bend; }
 
-  private:
-    TFStubData data_;
-    // The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
-    ap_uint<8> kISBendLSB =0;
-    ap_uint<8> kISBendMSB =0;
-    ap_uint<8> kISAlphaLSB =0;
-    ap_uint<8> kISAlphaMSB =0;
-    ap_uint<8> kISPhiLSB =0;
-    ap_uint<8> kISPhiMSB =0;
-    ap_uint<8> kISZLSB =0;
-    ap_uint<8> kISZMSB =0;
-    ap_uint<8> kISRLSB =0;
-    ap_uint<8> kISRMSB =0;
-};
+//   ap_uint<3> getCoarsePhiRegion(int cNbits=2) const { return data_.range(kISPhiMSB-1,kISPhiMSB-(cNbits-1));}
+
+//   private:
+//     TFStubData data_;
+//     // The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
+//     ap_uint<8> kISBendLSB =0;
+//     ap_uint<8> kISBendMSB =0;
+//     ap_uint<8> kISAlphaLSB =0;
+//     ap_uint<8> kISAlphaMSB =0;
+//     ap_uint<8> kISPhiLSB =0;
+//     ap_uint<8> kISPhiMSB =0;
+//     ap_uint<8> kISZLSB =0;
+//     ap_uint<8> kISZMSB =0;
+//     ap_uint<8> kISRLSB =0;
+//     ap_uint<8> kISRMSB =0;
+
+// };
 // Memory definition
-using TFStubMemory = MemoryTemplate<TFStub, 1, kNBits_MemAddr>;
+//using TFStubMemory = MemoryTemplate<TFStub, 1, kNBits_MemAddr>;
+
+template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
+class InputRouterMemory : public MemoryTemplate<DataType, NBIT_BX, NBIT_ADDR>
+{
+  public:
+    //default constructor 
+    InputRouterMemory(): 
+    MemoryTemplate< DataType, NBIT_BX, NBIT_ADDR>(), 
+    kIsPS{0}, kIsBarrel{0}, kLayerId{0}, kPhiRegion{0}
+    {
+      // figure out which type I am here .. 
+      if( DataType::kISRSize == 12 ) // only endcap disks for PS modules use 12 bits 
+      { 
+        kIsPS=1; 
+        kIsBarrel=0;
+      }
+      else if( DataType::kISRSize == 7 ) // all other modules use 7 bits for R 
+      {
+        kIsPS = ( DataType::kISZSize == 12 ) ; 
+        kIsBarrel = ( DataType::kISZSize >= 8 ); 
+      }
+    }
+    //default constructor 
+    InputRouterMemory(ap_uint<3> pLayerId, ap_uint<3> pCoarsePhi): 
+    InputRouterMemory()
+    {
+      kLayerId = pLayerId;
+      kPhiRegion = pCoarsePhi;
+    }
+
+    // getter 
+    ap_uint<1> isPS() const { return kIsPS;}
+    ap_uint<1> IsBarrel() const { return kIsBarrel;}
+    ap_uint<3> getLayerId() const { return kLayerId;}
+    ap_uint<3> getPhiRegion() const { return kPhiRegion;}
+    // setters
+    void setLayerId(const ap_uint<3> pLayerId)  { kLayerId=pLayerId;}
+    void setPhiRegion(const ap_uint<3> pCoarsePhi)  { kPhiRegion=pCoarsePhi;}
+  private : 
+    ap_uint<1> kIsPS;
+    ap_uint<1> kIsBarrel;
+    ap_uint<3> kLayerId;
+    ap_uint<3> kPhiRegion; 
+};
+
+// template<class ... Types> struct InputRouterMemories {};
 
 // Data object definition
 template<int ISType>
@@ -235,6 +280,9 @@ public:
   // Getter
   InputStubData raw() const {return data_; }
 
+  template<int NBitsRegion>
+  ap_uint<NBitsRegion> getCoarsePhiRegion() const { return data_.range(kISPhiMSB-1,kISPhiMSB-(NBitsRegion-1)); } 
+
   ISR getR() const {
     return data_.range(kISRMSB,kISRLSB);
   }
@@ -285,9 +333,8 @@ private:
   InputStubData data_;
 
 };
-
 // Memory definition
-template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 1, kNBits_MemAddr>;
+//template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
 
 // Data object definition
 class DTCMap 
