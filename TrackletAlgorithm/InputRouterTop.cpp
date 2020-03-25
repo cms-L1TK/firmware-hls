@@ -205,7 +205,7 @@ void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 				}
 				else 
 				{
-					(&hMemory_L[cPhiRegion])->write_mem(bx, hStub, nEntriesL3[cPhiRegion] );
+					(&hMemory_L3[cPhiRegion])->write_mem(bx, hStub, nEntriesL3[cPhiRegion] );
 					nEntriesL3[cPhiRegion]++;
 				}
 			}
