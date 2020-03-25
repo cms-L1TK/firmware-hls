@@ -42,7 +42,7 @@ void InputRouterPS(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> 
 			{
 				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 3 ); // only three layers in the barrel
 				#ifndef __SYNTHESIS__
-					std::cout << "\t.. Routing stub from PS barrel. Tracker layer " << +cLayerOrDiskId << "\n";
+					//std::cout << "\t.. Routing stub from PS barrel. Tracker layer " << +cLayerOrDiskId << "\n";
 				#endif
 				
 				if( cLayerOrDiskId == 1 ) 
@@ -56,7 +56,7 @@ void InputRouterPS(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> 
 			{
 				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 5 ); // only five disks in the endcap
 				#ifndef __SYNTHESIS__
-					std::cout << "\t.. Routing stub from PS endcap. Endcap disk " << +cLayerOrDiskId << "\n";
+					//std::cout << "\t.. Routing stub from PS endcap. Endcap disk " << +cLayerOrDiskId << "\n";
 				#endif
 
 				if( cLayerOrDiskId == 1 ) 
@@ -110,7 +110,7 @@ void InputRouter2S(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> 
 
 				assert( cLayerOrDiskId >=4 && cLayerOrDiskId <= 6 ); // only three layers in the barrel
 				#ifndef __SYNTHESIS__
-					std::cout << "\t.. Routing stub from 2S barrel. Tracker layer " << +cLayerOrDiskId << "\n";
+					//std::cout << "\t.. Routing stub from 2S barrel. Tracker layer " << +cLayerOrDiskId << "\n";
 				#endif
 
 				if( cLayerOrDiskId == 3 ) 
@@ -124,7 +124,7 @@ void InputRouter2S(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> 
 			{
 				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 5 ); // only five disks in the endcap
 				#ifndef __SYNTHESIS__
-					std::cout << "\t.. Routing stub from 2S endcap. Endcap disk " << +cLayerOrDiskId << "\n";
+					//std::cout << "\t.. Routing stub from 2S endcap. Endcap disk " << +cLayerOrDiskId << "\n";
 				#endif
 
 				if( cLayerOrDiskId == 1 ) 
