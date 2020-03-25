@@ -196,12 +196,12 @@ int main()
   for( int cBx = cBxSelected ; cBx < cBxSelected+1 ; cBx++)
   {
     // declare input stream to be used in hls simulation
-    hls::stream<ap_uint<kNBits_DTC>> hInputLink;
+    hls::stream<ap_uint<kNBits_DTC>> hLink;
 
     // push stubs into stub word vector for this bx 
     std::vector<ap_uint<kNBits_DTC>> cStubWords;
-    BXType hBxCounter = cBx&0x7;
-    std::cout << "Bx " << hBxCounter << "\n";
+    BXType hBx = cBx&0x7;
+    std::cout << "Bx " << hBx << "\n";
 
     auto& cStubs = cInputStubs[cBx];
     size_t cSize = kMaxStubsFromLink;
@@ -219,7 +219,7 @@ int main()
         //     << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) 
         //     << std::dec << "\n";
         cStubArray[cStubCounter] = ap_uint<kNBits_DTC>( cStub.c_str() ,2) ; 
-        hInputLink.write_nb(cStubArray[cStubCounter]);
+        hLink.write_nb(cStubArray[cStubCounter]);
       }
       else
       {
@@ -230,21 +230,18 @@ int main()
             << " not passing to input stream.\n";
       }
     }
-    // this figures out which memories to write to all by itself
-    // .. but its maybe not very elegant 
-    // InputRouterGeneric(hBxCounter, (int)cSize , cStubArray, 
-    // cLinkWord, hMemoriesPS , hMemories2S);
-
     // this writes to either the PS or the 2S memories 
+    //InputRouterTop(hBx, hLink, cLinkWord, hBarrelPS, hDiskPS, hBarrel2S, hDisk2S);
+    
     ap_uint<1> cIs2S;
     is2S(cLinkWord, cIs2S);
     if( !cIs2S)
     {
-      InputRouterPS(hBxCounter, hInputLink, cLinkWord, hBarrelPS, hDiskPS);
+      InputRouterPS(hBx, hLink, cLinkWord, hBarrelPS, hDiskPS);
     }
     else
     {
-      InputRouter2S(hBxCounter, hInputLink, cLinkWord, hBarrel2S, hDisk2S);
+      InputRouter2S(hBx, hLink, cLinkWord, hBarrel2S, hDisk2S);
     }
   }
   // to-do : comparison against emulation 

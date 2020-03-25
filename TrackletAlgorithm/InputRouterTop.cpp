@@ -242,10 +242,24 @@ void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 	
 }
 
-
 // route stubs to any memory 
+void InputRouterTop(const BXType bx, 
+	hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
+	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+	StubsBarrelPS hBrlPS, StubsDiskPS hDskPS, 
+	StubsBarrel2S hBrl2S, StubsDisk2S hDsk2S)
+{
+	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
+	if( cIs2S == 1 )
+		InputRouter2S(bx, hIputLink, hDTCMapEncoded, hBrl2S, hDsk2S);
+	else
+		InputRouterPS(bx, hIputLink, hDTCMapEncoded, hBrlPS, hDskPS);
+}
+
+
+// route stubs to any memory
 void InputRouterGeneric(const BXType bx, const int nStubs, 
-	const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], 
+	hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
 	IRMemory hM_PS[kTotalPSmemories], 
 	IRMemory hM_2S[kTotal2Smemories])
@@ -259,11 +273,12 @@ void InputRouterGeneric(const BXType bx, const int nStubs,
 			(&hM_2S[cMemoryIndex])->clear(bx);
 	}
 	
+	ap_uint<kNBits_DTC> hWord;
+	
 	for (int cStubCounter=0; cStubCounter<nStubs; cStubCounter++)
 	{
 		#pragma HLS pipeline II=1
-		RouteStub(bx, hIputLink[cStubCounter], hDTCMapEncoded, hM_PS, hM_2S);
-
+		if (hIputLink.read_nb(hWord))
+			RouteStub(bx, hWord, hDTCMapEncoded, hM_PS, hM_2S);
 	}
-
 }

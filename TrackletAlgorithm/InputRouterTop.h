@@ -102,9 +102,15 @@ void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 	StubsBarrel2S hBarrelMemories, StubsDisk2S hDiskMemories);
 
 void InputRouterGeneric(const BXType bx, const int nStubs, 
-	const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], 
+	hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
 	IRMemory hMemoriesPS[kTotalPSmemories], 
 	IRMemory hMemories2S[kTotal2Smemories]);	
+
+void InputRouterTop(const BXType bx, 
+	hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
+	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+	StubsBarrelPS hBrlPS, StubsDiskPS hDskPS, 
+	StubsBarrel2S hBrl2S, StubsDisk2S hDsk2S);
 
 #endif
