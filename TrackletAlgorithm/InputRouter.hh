@@ -40,18 +40,17 @@ void GetCoarsePhiRegion(const ap_uint<kNBits_DTC> hInputStub, ap_uint<NBits> &hP
 
 // write memory function
 template<class DataType, int NBits, int Nmemories>
-void WriteMemories(const BXType bx, const ap_uint<kNBits_DTC> hInputStub, InputRouterMemory<DataType,kNBits_BX,kNBits_MemAddr> hMemory[Nmemories])
+void WriteMemories(const BXType bx, const ap_uint<kNBits_DTC> hInputStub, ap_uint<8> nEntries[Nmemories], InputRouterMemory<DataType,kNBits_BX,kNBits_MemAddr> hMemory[Nmemories])
 {
 	ap_uint<NBits> cPhiRegion;
 	GetCoarsePhiRegion<DataType,NBits>(hInputStub, cPhiRegion );
 	assert(cPhiRegion >= 0 && cPhiRegion < Nmemories );
-	
+		
 	// #ifndef __SYNTHESIS__
 	// 	std::cout << "\t.. Writing to memory connected to phi region " << +cPhiRegion << "\n";
 	// #endif
-
 	DataType hStub(hInputStub.range(kBRAMwidth-1,0));
-	(&hMemory[cPhiRegion])->write_mem(bx, hStub, (&hMemory[cPhiRegion])->getEntries(bx) );
+	(&hMemory[cPhiRegion])->write_mem(bx, hStub, nEntries[cPhiRegion] );
 }
 
 // write memory function

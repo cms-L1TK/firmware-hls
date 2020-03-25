@@ -184,8 +184,11 @@ int main()
   // get stubs 
   InputStubs cInputStubs;
   getStubs(cLinkFile , cInputStubs);
-  for( int cBxSelected = 0 ; cBxSelected < cInputStubs.size() ; cBxSelected++)
+  for( int cBxSelected = 0 ; cBxSelected < 1 ; cBxSelected++)
   {
+    // declare input stream to be used in hls simulation
+    hls::stream<ap_uint<kNBits_DTC>> hInputLink;
+
     // push stubs into stub word vector for this bx 
     std::vector<ap_uint<kNBits_DTC>> cStubWords;
     BXType hBxCounter = cBxSelected&0x7;
@@ -194,16 +197,16 @@ int main()
     auto& cStubs = cInputStubs[cBxSelected];
     size_t cSize = std::min( static_cast<size_t>(kMaxStubsFromLink), cInputStubs[cBxSelected].size() );
     ap_uint<kNBits_DTC> *cStubArray = new ap_uint<kNBits_DTC>[cSize];
-    for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.end(); cStubIterator++)
+    for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.begin()+1; cStubIterator++)
     {
       auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
       auto& cStub = *cStubIterator;
       if( cStubCounter < kMaxStubsFromLink )
       {
-        if( cStubCounter%25 == 0 )
-          std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
-        //cStubWords.push_back( ap_uint<kNBits_DTC>( cStub.c_str() ,2) );
+        //if( cStubCounter%25 == 0 )
+        //  std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
         cStubArray[cStubCounter] = ap_uint<kNBits_DTC>( cStub.c_str() ,2) ; 
+        hInputLink.write_nb(cStubArray[cStubCounter]);
         //RouteStub(hBxCounter, ap_uint<kNBits_DTC>( cStub.c_str() ,2), cLinkWord, hMemoriesPS, hMemories2S);
       }
       else
@@ -220,32 +223,34 @@ int main()
     is2S(cLinkWord, cIs2S);
     if( !cIs2S)
     {
-      std::cout << "Before the input router there are : \n";
-      for( int cPhiRegion=0; cPhiRegion < 8; cPhiRegion++)
-        std::cout << "\t... entries in  " << +hMemory_L1[cPhiRegion].getEntries(hBxCounter) << " in L1 memory\n";
+      // std::cout << "Before the input router there are : \n";
+      // for( int cPhiRegion=0; cPhiRegion < 8; cPhiRegion++)
+      //   std::cout << "\t... entries in  " << +hMemory_L1[cPhiRegion].getEntries(hBxCounter) << " in L1 memory\n";
       
-      for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-        std::cout << "\t... entries in  " << +hMemory_D2[cPhiRegion].getEntries(hBxCounter) << " in D2 memory\n";
+      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
+      //   std::cout << "\t... entries in  " << +hMemory_D2[cPhiRegion].getEntries(hBxCounter) << " in D2 memory\n";
 
 
-      for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-        std::cout << "\t... entries in  " << +hMemory_D4[cPhiRegion].getEntries(hBxCounter) << " in D4 memory\n";
-
-      InputRouterPS(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
+      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
+      //   std::cout << "\t... entries in  " << +hMemory_D4[cPhiRegion].getEntries(hBxCounter) << " in D4 memory\n";
       
-      std::cout << "After the input router there are : \n";
-      for( int cPhiRegion=0; cPhiRegion < 8; cPhiRegion++)
-        std::cout << "\t... entries in  " << +hMemory_L1[cPhiRegion].getEntries(hBxCounter) << " in L1 memory\n";
+      InputRouterPS(hBxCounter, hInputLink, cLinkWord, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
+      //InputRouterPS(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
       
-      for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-        std::cout << "\t... entries in  " << +hMemory_D2[cPhiRegion].getEntries(hBxCounter) << " in D2 memory\n";
+      // std::cout << "After the input router there are : \n";
+      // for( int cPhiRegion=0; cPhiRegion < 8; cPhiRegion++)
+      //   std::cout << "\t... entries in  " << +hMemory_L1[cPhiRegion].getEntries(hBxCounter) << " in L1 memory\n";
+      
+      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
+      //   std::cout << "\t... entries in  " << +hMemory_D2[cPhiRegion].getEntries(hBxCounter) << " in D2 memory\n";
 
-      for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-        std::cout << "\t... entries in  " << +hMemory_D4[cPhiRegion].getEntries(hBxCounter) << " in D4 memory\n";
+      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
+      //   std::cout << "\t... entries in  " << +hMemory_D4[cPhiRegion].getEntries(hBxCounter) << " in D4 memory\n";
     }
     else
     {
-      InputRouter2S(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+      //InputRouter2S(hBxCounter, hInputLink, cLinkWord, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+      //InputRouter2S(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
     }
   }
   // to-do : comparison against emulation 
