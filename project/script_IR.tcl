@@ -24,12 +24,12 @@ source settings_hls.tcl
 # simulate 
 set nProc [exec nproc]
 #csim_design -compiler gcc -mflags "-j$nProc"
-# config_rtl -reset all -reset_async -reset_level low
+#config_rtl -reset all -reset_async -reset_level low
 # synthesize 
 csynth_design
 cosim_design
-export_design -format ip_catalog
+#export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-export_design -format ip_catalog -flow impl
+#export_design -format ip_catalog -flow impl
 
 exit
