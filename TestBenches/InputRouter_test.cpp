@@ -27,7 +27,7 @@ using LinkMap = std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>>
 // then 2 bits to assign whether link is PS/2S and if it is connected to the very first layer of the tracker or not 
 // 18 bits in total per link .. so can fit all links into a BRAM 12 deep ( 36 bits wide )
 // for the moment I store them one link per word (so a 36 bit wide bram , 24 deep can be used) 
-void getLinkInfo(LinkMap pInputMap, LINK pLinkId, ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
+void getLinkInfo(LinkMap pInputMap, int pLinkId, ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
 {
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
   // figure out DTC map encoding for this link 
@@ -131,9 +131,9 @@ int main()
         if( cToken.find("2S") != std::string::npos || cToken.find("PS") != std::string::npos ) 
         {
           if( cToken[0] == 'n')
-            cInputMap[cLinkCounter].first = "IL/Link_" + cToken.substr(4, cToken.length()-3) + "_B.dat"; //Link_PS10G_1_A.dat
+            cInputMap[cLinkCounter].first = cToken.substr(4, cToken.length()-3) + "_B"; //Link_PS10G_1_A.dat
           else
-            cInputMap[cLinkCounter].first = "IL/Link_" + cToken + "_A.dat" ; //Link_PS10G_1_A.dat
+            cInputMap[cLinkCounter].first = cToken + "_A" ; //Link_PS10G_1_A.dat
           std::cout << "Link name : " << cInputMap[cLinkCounter].first << "\n";
         }
       }
@@ -174,21 +174,23 @@ int main()
   MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemoriesPS[kTotalPSmemories]; // in total we have 32 input stub memories for 2S 'stubs'
 
   // figure out DTC map encoding for this link 
-  int cBxSelected = 0 ;
-  for( size_t cLink = 6 ; cLink < 7 ; cLink++) // this is the link connected to the first PS_10G DTC 
+  int cLinkId = 18 ; // PS_10G_1 (neg)
+  ap_uint<kLINKMAPwidth> cLinkWord = 0x0000;
+  std::string cDTCname = "";
+  getLinkInfo(cInputMap, cLinkId, cLinkWord, cDTCname);
+  std::string cLinkFile = "IL/IL_" + cDTCname + "/Link_" + cDTCname + ".dat" ;
+  std::cout << "DTC name from CMSSW " << cDTCname << " input file is " << cLinkFile << "\n";
+  
+  // get stubs 
+  InputStubs cInputStubs;
+  getStubs(cLinkFile , cInputStubs);
+  for( int cBxSelected = 0 ; cBxSelected < cInputStubs.size() ; cBxSelected++)
   {
-    LINK cLinkId = cLink;
-    ap_uint<kLINKMAPwidth> cLinkWord = 0x0000;
-    std::string cInputFile = "";
-    getLinkInfo(cInputMap, cLinkId, cLinkWord, cInputFile);
-
-    // get stubs 
-    InputStubs cInputStubs;
-    getStubs(cInputFile , cInputStubs);
     // push stubs into stub word vector for this bx 
-    
     std::vector<ap_uint<kNBits_DTC>> cStubWords;
     BXType hBxCounter = cBxSelected&0x7;
+    std::cout << "Bx " << hBxCounter << "\n";
+
     auto& cStubs = cInputStubs[cBxSelected];
     size_t cSize = std::min( static_cast<size_t>(kMaxStubsFromLink), cInputStubs[cBxSelected].size() );
     ap_uint<kNBits_DTC> *cStubArray = new ap_uint<kNBits_DTC>[cSize];
@@ -210,7 +212,7 @@ int main()
           std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
       }
     }
-    // this figures out which memories to write to all by itseld 
+    // this figures out which memories to write to all by itself.. but not very elegant 
     // InputRouterGeneric(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemoriesPS , hMemories2S);
 
     // this writes to either the PS or the 2S memories 
@@ -246,7 +248,6 @@ int main()
       InputRouter2S(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
     }
   }
-  
   // to-do : comparison against emulation 
 
   // Barrel : A, B, C, D 
