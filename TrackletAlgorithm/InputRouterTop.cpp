@@ -10,11 +10,14 @@ void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
 	StubsBarrelPS hBrl, StubsDiskPS hDsk)
 {
+	// local variables to keep track of how many entries 
+	// are in each memory 
 	EntriesBarrelPS cBrl;
 	EntriesDiskPS cDsk;
 	#pragma HLS interface ap_none port=hDTCMapEncoded
 	#pragma HLS interface ap_fifo port=hIputLink
 
+	// needed this to allow pipeline of 1 
 	#pragma HLS ARRAY_PARTITION variable=cBrl.n1 cyclic factor=4 dim=1
 	#pragma HLS ARRAY_PARTITION variable=cBrl.n2 cyclic factor=2 dim=1
 	#pragma HLS ARRAY_PARTITION variable=cBrl.n3 cyclic factor=2 dim=1
@@ -126,16 +129,19 @@ void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 
 
 
-// //route stubs for 2S memories only 
+//route stubs for 2S memories only 
 void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
 	StubsBarrel2S hBrl, StubsDisk2S hDsk)
 {
+	// local variables to keep track of how many entries 
+	// are in each memory 
 	EntriesBarrel2S cBrl;
 	EntriesDisk2S cDsk;
 	#pragma HLS interface ap_none port=hDTCMapEncoded
 	#pragma HLS interface ap_fifo port=hIputLink
 
+	// needed this to allow pipeline of 1 
 	#pragma HLS ARRAY_PARTITION variable=cBrl.n1 cyclic factor=2 dim=1
 	#pragma HLS ARRAY_PARTITION variable=cBrl.n2 cyclic factor=2 dim=1
 	#pragma HLS ARRAY_PARTITION variable=cBrl.n3 cyclic factor=2 dim=1

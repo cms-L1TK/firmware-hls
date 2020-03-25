@@ -20,7 +20,7 @@ constexpr int kNRegions = 4;
 // sizes to use in this top level function 
 typedef struct
 {
-    ap_uint<8> n1[kNRegionsLayer1]; 
+	ap_uint<8> n1[kNRegionsLayer1]; 
 	ap_uint<8> n2[kNRegions]; 
 	ap_uint<8> n3[kNRegions];
 } EntriesBarrelPS;
