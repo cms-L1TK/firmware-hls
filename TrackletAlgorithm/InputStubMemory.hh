@@ -335,6 +335,10 @@ private:
 };
 // Memory definition
 //template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
+using IRMemory = MemoryTemplate<ap_uint<kBRAMwidth>, kNBits_BX, kNBits_MemAddr>;
+template<int ISType> 
+using InputStubMemory = InputRouterMemory<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
+
 
 // Data object definition
 class DTCMap 

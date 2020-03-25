@@ -6,240 +6,229 @@
 				
 
 // route stubs for PS memories only 
-void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-				  InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L1[kNRegionsLayer1], InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L2[kNRegions], 
-				  InputRouterMemory<InputStub<BARRELPS>,kNBits_BX,kNBits_MemAddr> hMemory_L3[kNRegions],
-				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D1[kNRegions], InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D2[kNRegions], 
-				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D3[kNRegions], InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D4[kNRegions], 
-				  InputRouterMemory<InputStub<DISKPS>,kNBits_BX,kNBits_MemAddr> hMemory_D5[kNRegions])
+void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
+	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+	StubsBarrelPS hBrl, StubsDiskPS hDsk)
 {
+	EntriesBarrelPS cBrl;
+	EntriesDiskPS cDsk;
 	#pragma HLS interface ap_none port=hDTCMapEncoded
 	#pragma HLS interface ap_fifo port=hIputLink
 
+	#pragma HLS ARRAY_PARTITION variable=cBrl.n1 cyclic factor=4 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cBrl.n2 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cBrl.n3 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n1 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n2 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n3 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n4 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n5 cyclic factor=2 dim=1
+
 	// clear memories for this bunch crossing 
-	ap_uint<8> nEntriesL1[kNRegionsLayer1]; 
-	ap_uint<8> nEntriesL2[kNRegions]; 
-	ap_uint<8> nEntriesL3[kNRegions];
-	ap_uint<8> nEntriesD1[kNRegions]; 
-	ap_uint<8> nEntriesD2[kNRegions];
-	ap_uint<8> nEntriesD3[kNRegions]; 
-	ap_uint<8> nEntriesD4[kNRegions];
-	ap_uint<8> nEntriesD5[kNRegions];
-
-	#pragma HLS ARRAY_PARTITION variable=nEntriesL1 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesL2 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesL3 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD1 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD2 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD3 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD4 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD5 cyclic factor=4 dim=1
-
-	LOOP_ClearInputStubsPS : for( int cPhiRegion=0; cPhiRegion<kNRegionsLayer1; cPhiRegion++)
+	// one memory for each coarse phi bin 
+	LOOP_ClearInputStubsPS : 
+	for( int cPhiBn=0; cPhiBn<kNRegionsLayer1; cPhiBn++)
 	{
 		#pragma HLS pipeline II=1
 		#pragma HLS unroll factor=4 // clear four phi regions at a time ..
-			if( cPhiRegion < kNRegions )
-			{
-				(&hMemory_L2[cPhiRegion])->clear(bx);
-				(&hMemory_L3[cPhiRegion])->clear(bx);
-				(&hMemory_D1[cPhiRegion])->clear(bx);
-				(&hMemory_D2[cPhiRegion])->clear(bx);
-				(&hMemory_D3[cPhiRegion])->clear(bx);
-				(&hMemory_D4[cPhiRegion])->clear(bx);
-				(&hMemory_D5[cPhiRegion])->clear(bx);
-			}		
-			(&hMemory_L1[cPhiRegion])->clear(bx);
+		if( cPhiBn < kNRegions )
+		{
+			(&hBrl.m2[cPhiBn])->clear(bx);
+			(&hBrl.m3[cPhiBn])->clear(bx);
+			(&hDsk.m1[cPhiBn])->clear(bx);
+			(&hDsk.m2[cPhiBn])->clear(bx);
+			(&hDsk.m3[cPhiBn])->clear(bx);
+			(&hDsk.m4[cPhiBn])->clear(bx);
+			(&hDsk.m5[cPhiBn])->clear(bx);
+		}		
+		(&hBrl.m1[cPhiBn])->clear(bx);
 	}
 
 	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
-	ap_uint<3> cLayerOrDiskId;
-	ap_uint<1> cIsBarrel;
-	ap_uint<kNBits_DTC> hInputStub;
-	LOOP_InputStubsPS : for (int cStubCounter=0; cStubCounter<kMaxStubsFromLink; cStubCounter++)
+	ap_uint<3> cLyrOrDskId;
+	ap_uint<1> cIsBrl;
+	ap_uint<kNBits_DTC> hWord;
+	LOOP_InputStubsPS : 
+	for (int cStubCounter=0; cStubCounter<kMaxStubsFromLink; cStubCounter++)
 	{
 		#pragma HLS pipeline II=1
-			if (hIputLink.read_nb(hInputStub))
+		if (hIputLink.read_nb(hWord))
+		{
+			DecodeMap( hWord, hDTCMapEncoded , cLyrOrDskId, cIsBrl);
+			assert( cIs2S == 0 ); // this should only be for PS modules 
+		
+			if( cIsBrl == 1 ) // stub is from a barrel module 
 			{
-				DecodeMap( hInputStub, hDTCMapEncoded , cLayerOrDiskId, cIsBarrel);
-				assert( cIs2S == 0 ); // this should only be for PS modules 
-			
-				if( cIsBarrel == 1 ) // stub is from a barrel module 
+				// only three layers in the barrel
+				assert( cLyrOrDskId >=1 && cLyrOrDskId <= 3 ); 
+				InputStub<BARRELPS> hStub(hWord.range(kBRAMwidth-1,0));
+
+				if( cLyrOrDskId == 1 ) 
 				{
-					assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 3 ); // only three layers in the barrel
-					InputStub<BARRELPS> hStub(hInputStub.range(kBRAMwidth-1,0));
-	
-					if( cLayerOrDiskId == 1 ) 
-					{
-						ap_uint<3> cPhiRegion;
-						GetCoarsePhiRegion<InputStub<BARRELPS>,3>(hInputStub, cPhiRegion );
-						(&hMemory_L1[cPhiRegion])->write_mem(bx, hStub, nEntriesL1[cPhiRegion] );
-						nEntriesL1[cPhiRegion]++;
-					}
-					else
-					{
-						ap_uint<2> cPhiRegion;
-						GetCoarsePhiRegion<InputStub<BARRELPS>,2>(hInputStub, cPhiRegion );
-						if( cLayerOrDiskId == 2 ) 
-						{
-							(&hMemory_L2[cPhiRegion])->write_mem(bx, hStub, nEntriesL2[cPhiRegion] );
-							nEntriesL2[cPhiRegion]++;
-						}
-						else if( cLayerOrDiskId == 3 )
-						{
-							(&hMemory_L3[cPhiRegion])->write_mem(bx, hStub, nEntriesL2[cPhiRegion] );
-							nEntriesL3[cPhiRegion]++;
-						}
-					}
+					ap_uint<3> cPhiBn;
+					GetCoarsePhiRegion<InputStub<BARRELPS>,3>(hWord, cPhiBn);
+					(&hBrl.m1[cPhiBn])->write_mem(bx, hStub, cBrl.n1[cPhiBn]);
+					cBrl.n1[cPhiBn]++;
 				}
 				else
 				{
-					assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 5 ); // only three layers in the barrel
-					InputStub<DISKPS> hStub(hInputStub.range(kBRAMwidth-1,0));
-					ap_uint<2> cPhiRegion;
-					GetCoarsePhiRegion<InputStub<DISKPS>,2>(hInputStub, cPhiRegion );
-					
-					if( cLayerOrDiskId == 1 ) 
+					ap_uint<2> cPhiBn;
+					GetCoarsePhiRegion<InputStub<BARRELPS>,2>(hWord, cPhiBn);
+					if( cLyrOrDskId == 2 ) 
 					{
-						(&hMemory_D1[cPhiRegion])->write_mem(bx, hStub, nEntriesD1[cPhiRegion] );
-						nEntriesD1[cPhiRegion]++;
+						(&hBrl.m2[cPhiBn])->write_mem(bx,hStub,cBrl.n2[cPhiBn]);
+						cBrl.n2[cPhiBn]++;
 					}
-					else if( cLayerOrDiskId == 2 ) 
+					else if( cLyrOrDskId == 3 )
 					{
-						(&hMemory_D2[cPhiRegion])->write_mem(bx, hStub, nEntriesD2[cPhiRegion] );
-						nEntriesD2[cPhiRegion]++;
-					}
-					else if( cLayerOrDiskId == 3 ) 
-					{
-						(&hMemory_D3[cPhiRegion])->write_mem(bx, hStub, nEntriesD3[cPhiRegion] );
-						nEntriesD3[cPhiRegion]++;
-					}
-					else if( cLayerOrDiskId == 4 ) 
-					{
-						(&hMemory_D4[cPhiRegion])->write_mem(bx, hStub, nEntriesD4[cPhiRegion] );
-						nEntriesD4[cPhiRegion]++;
-					}
-					else 
-					{
-						(&hMemory_D5[cPhiRegion])->write_mem(bx, hStub, nEntriesD5[cPhiRegion] );
-						nEntriesD5[cPhiRegion]++;
+						(&hBrl.m3[cPhiBn])->write_mem(bx,hStub,cBrl.n3[cPhiBn]);
+						cBrl.n3[cPhiBn]++;
 					}
 				}
 			}
+			else
+			{
+				// only 5 disks in the endcap
+				assert( cLyrOrDskId >=1 && cLyrOrDskId <= 5 ); 
+				InputStub<DISKPS> hStub(hWord.range(kBRAMwidth-1,0));
+				ap_uint<2> cPhiBn;
+				GetCoarsePhiRegion<InputStub<DISKPS>,2>(hWord, cPhiBn);
+				
+				if( cLyrOrDskId == 1 ) 
+				{
+					(&hDsk.m1[cPhiBn])->write_mem(bx, hStub, cDsk.n1[cPhiBn]);
+					cDsk.n1[cPhiBn]++;
+				}
+				else if( cLyrOrDskId == 2 ) 
+				{
+					(&hDsk.m2[cPhiBn])->write_mem(bx, hStub, cDsk.n2[cPhiBn]);
+					cDsk.n2[cPhiBn]++;
+				}
+				else if( cLyrOrDskId == 3 ) 
+				{
+					(&hDsk.m3[cPhiBn])->write_mem(bx, hStub, cDsk.n3[cPhiBn]);
+					cDsk.n3[cPhiBn]++;
+				}
+				else if( cLyrOrDskId == 4 ) 
+				{
+					(&hDsk.m4[cPhiBn])->write_mem(bx, hStub, cDsk.n4[cPhiBn]);
+					cDsk.n4[cPhiBn]++;
+				}
+				else 
+				{
+					(&hDsk.m5[cPhiBn])->write_mem(bx, hStub, cDsk.n5[cPhiBn]);
+					cDsk.n5[cPhiBn]++;
+				}
+			}
+		}
 	}
 }
 
 
 
-// route stubs for 2S memories only 
-void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-				  InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L1[kNRegions], InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L2[kNRegions], 
-				  InputRouterMemory<InputStub<BARREL2S>,kNBits_BX,kNBits_MemAddr> hMemory_L3[kNRegions],
-				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D1[kNRegions], InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D2[kNRegions], 
-				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D3[kNRegions], InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D4[kNRegions], 
-				  InputRouterMemory<InputStub<DISK2S>,kNBits_BX,kNBits_MemAddr> hMemory_D5[kNRegions])
+// //route stubs for 2S memories only 
+void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
+	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+	StubsBarrel2S hBrl, StubsDisk2S hDsk)
 {
+	EntriesBarrel2S cBrl;
+	EntriesDisk2S cDsk;
 	#pragma HLS interface ap_none port=hDTCMapEncoded
 	#pragma HLS interface ap_fifo port=hIputLink
 
+	#pragma HLS ARRAY_PARTITION variable=cBrl.n1 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cBrl.n2 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cBrl.n3 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n1 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n2 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n3 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n4 cyclic factor=2 dim=1
+	#pragma HLS ARRAY_PARTITION variable=cDsk.n5 cyclic factor=2 dim=1
+
 	// clear memories for this bunch crossing 
-	ap_uint<8> nEntriesL1[kNRegions]; 
-	ap_uint<8> nEntriesL2[kNRegions]; 
-	ap_uint<8> nEntriesL3[kNRegions];
-	ap_uint<8> nEntriesD1[kNRegions]; 
-	ap_uint<8> nEntriesD2[kNRegions];
-	ap_uint<8> nEntriesD3[kNRegions]; 
-	ap_uint<8> nEntriesD4[kNRegions];
-	ap_uint<8> nEntriesD5[kNRegions];
-
-	#pragma HLS ARRAY_PARTITION variable=nEntriesL1 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesL2 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesL3 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD1 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD2 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD3 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD4 cyclic factor=4 dim=1
-	#pragma HLS ARRAY_PARTITION variable=nEntriesD5 cyclic factor=4 dim=1
-
-	LOOP_ClearInputStubs2S : for( int cPhiRegion=0; cPhiRegion<kNRegions; cPhiRegion++)
+	// one memory for each coarse phi bin 
+	LOOP_ClearInputStubsPS : 
+	for( int cPhiBn=0; cPhiBn<kNRegions; cPhiBn++)
 	{
 		#pragma HLS pipeline II=1
 		#pragma HLS unroll factor=4 // clear four phi regions at a time ..
-			(&hMemory_L1[cPhiRegion])->clear(bx);
-			(&hMemory_L2[cPhiRegion])->clear(bx);
-			(&hMemory_L3[cPhiRegion])->clear(bx);
-			(&hMemory_D1[cPhiRegion])->clear(bx);
-			(&hMemory_D2[cPhiRegion])->clear(bx);
-			(&hMemory_D3[cPhiRegion])->clear(bx);
-			(&hMemory_D4[cPhiRegion])->clear(bx);
-			(&hMemory_D5[cPhiRegion])->clear(bx);
+			(&hBrl.m1[cPhiBn])->clear(bx);
+			(&hBrl.m2[cPhiBn])->clear(bx);
+			(&hBrl.m3[cPhiBn])->clear(bx);
+			(&hDsk.m1[cPhiBn])->clear(bx);
+			(&hDsk.m2[cPhiBn])->clear(bx);
+			(&hDsk.m3[cPhiBn])->clear(bx);
+			(&hDsk.m4[cPhiBn])->clear(bx);
+			(&hDsk.m5[cPhiBn])->clear(bx);
 	}
+
 	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
-	ap_uint<3> cLayerOrDiskId;
-	ap_uint<1> cIsBarrel;
-	ap_uint<kNBits_DTC> hInputStub;
-	LOOP_InputStubs2S : for (int cStubCounter=0; cStubCounter<kMaxStubsFromLink; cStubCounter++)
+	ap_uint<3> cLyrOrDskId;
+	ap_uint<1> cIsBrl;
+	ap_uint<kNBits_DTC> hWord;
+	LOOP_InputStubs2S : 
+	for (int cStubCounter=0; cStubCounter<kMaxStubsFromLink; cStubCounter++)
 	{
 		#pragma HLS pipeline II=1
-		if (hIputLink.read_nb(hInputStub))
+		if (hIputLink.read_nb(hWord))
 		{
-			DecodeMap( hInputStub, hDTCMapEncoded , cLayerOrDiskId, cIsBarrel);
+			DecodeMap( hWord, hDTCMapEncoded , cLyrOrDskId, cIsBrl);
 			assert( cIs2S == 1 ); // this should only be for 2S modules 
-
-			if( cIsBarrel == 1 ) // stub is from a barrel module 
+			ap_uint<2> cPhiBn;
+			if( cIsBrl == 1 ) // stub is from a barrel module 
 			{
-				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 3 ); // only three layers in the barrel
-				InputStub<BARREL2S> hStub(hInputStub.range(kBRAMwidth-1,0));
-				ap_uint<2> cPhiRegion;
-				GetCoarsePhiRegion<InputStub<BARREL2S>,2>(hInputStub, cPhiRegion );
+				// three layers [4--6]
+				assert( cLyrOrDskId >=4 && cLyrOrDskId <= 6 ); 
+				InputStub<BARREL2S> hStub(hWord.range(kBRAMwidth-1,0));
+				GetCoarsePhiRegion<InputStub<BARRELPS>,2>(hWord, cPhiBn);
 					
-				if( cLayerOrDiskId == 1 ) 
+				if( cLyrOrDskId == 4 ) 
 				{
-					(&hMemory_L1[cPhiRegion])->write_mem(bx, hStub, nEntriesL1[cPhiRegion] );
-					nEntriesL1[cPhiRegion]++;
+					(&hBrl.m1[cPhiBn])->write_mem(bx, hStub, cBrl.n1[cPhiBn]);
+					cBrl.n1[cPhiBn]++;
 				}
-				else if( cLayerOrDiskId == 2 ) 
+				else if( cLyrOrDskId == 5 ) 
 				{
-					(&hMemory_L2[cPhiRegion])->write_mem(bx, hStub, nEntriesL2[cPhiRegion] );
-					nEntriesL2[cPhiRegion]++;
+					(&hBrl.m2[cPhiBn])->write_mem(bx, hStub, cBrl.n2[cPhiBn]);
+					cBrl.n2[cPhiBn]++;
 				}
 				else 
 				{
-					(&hMemory_L3[cPhiRegion])->write_mem(bx, hStub, nEntriesL3[cPhiRegion] );
-					nEntriesL3[cPhiRegion]++;
+					(&hBrl.m3[cPhiBn])->write_mem(bx, hStub, cBrl.n3[cPhiBn]);
+					cBrl.n3[cPhiBn]++;
 				}
 			}
 			else
 			{
-				assert( cLayerOrDiskId >=1 && cLayerOrDiskId <= 5 ); // only three layers in the barrel
-				InputStub<DISK2S> hStub(hInputStub.range(kBRAMwidth-1,0));
-				ap_uint<2> cPhiRegion;
-				GetCoarsePhiRegion<InputStub<DISK2S>,2>(hInputStub, cPhiRegion );
+				// five disks [1--5] in the endcap 
+				assert( cLyrOrDskId >=1 && cLyrOrDskId <= 5 ); 
+				InputStub<DISK2S> hStub(hWord.range(kBRAMwidth-1,0));
+				GetCoarsePhiRegion<InputStub<BARRELPS>,2>(hWord, cPhiBn);
 				
-				if( cLayerOrDiskId == 1 ) 
+				if( cLyrOrDskId == 1 ) 
 				{
-					(&hMemory_D1[cPhiRegion])->write_mem(bx, hStub, nEntriesD1[cPhiRegion] );
-					nEntriesD1[cPhiRegion]++;
+					(&hDsk.m1[cPhiBn])->write_mem(bx, hStub, cDsk.n1[cPhiBn]);
+					cDsk.n1[cPhiBn]++;
 				}
-				else if( cLayerOrDiskId == 2 ) 
+				else if( cLyrOrDskId == 2 ) 
 				{
-					(&hMemory_D2[cPhiRegion])->write_mem(bx, hStub, nEntriesD2[cPhiRegion] );
-					nEntriesD2[cPhiRegion]++;
+					(&hDsk.m2[cPhiBn])->write_mem(bx, hStub, cDsk.n2[cPhiBn]);
+					cDsk.n2[cPhiBn]++;
 				}
-				else if( cLayerOrDiskId == 3 ) 
+				else if( cLyrOrDskId == 3 ) 
 				{
-					(&hMemory_D3[cPhiRegion])->write_mem(bx, hStub, nEntriesD3[cPhiRegion] );
-					nEntriesD3[cPhiRegion]++;
+					(&hDsk.m3[cPhiBn])->write_mem(bx, hStub, cDsk.n3[cPhiBn]);
+					cDsk.n3[cPhiBn]++;
 				}
-				else if( cLayerOrDiskId == 4 ) 
+				else if( cLyrOrDskId == 4 ) 
 				{
-					(&hMemory_D4[cPhiRegion])->write_mem(bx, hStub, nEntriesD4[cPhiRegion] );
-					nEntriesD4[cPhiRegion]++;
+					(&hDsk.m4[cPhiBn])->write_mem(bx, hStub, cDsk.n4[cPhiBn]);
+					cDsk.n4[cPhiBn]++;
 				}
 				else 
 				{
-					(&hMemory_D5[cPhiRegion])->write_mem(bx, hStub, nEntriesD5[cPhiRegion] );
-					nEntriesD5[cPhiRegion]++;
+					(&hDsk.m5[cPhiBn])->write_mem(bx, hStub, cDsk.n5[cPhiBn]);
+					cDsk.n5[cPhiBn]++;
 				}
 			}
 		}
@@ -249,22 +238,25 @@ void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 
 
 // route stubs to any memory 
-void InputRouterGeneric(const BXType bx, const int nStubs, const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-				  MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemoriesPS[kTotalPSmemories], MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemories2S[kTotal2Smemories])
+void InputRouterGeneric(const BXType bx, const int nStubs, 
+	const ap_uint<kNBits_DTC> hIputLink[kMaxStubsFromLink], 
+	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
+	IRMemory hM_PS[kTotalPSmemories], 
+	IRMemory hM_2S[kTotal2Smemories])
 {
 	#pragma HLS interface ap_none port=hDTCMapEncoded
 	// clear memories for this bunch crossing 
 	for( int cMemoryIndex=0; cMemoryIndex<kTotalPSmemories; cMemoryIndex++)
 	{
-		(&hMemoriesPS[cMemoryIndex])->clear(bx);
+		(&hM_PS[cMemoryIndex])->clear(bx);
 		if( cMemoryIndex < kTotal2Smemories )
-			(&hMemories2S[cMemoryIndex])->clear(bx);
+			(&hM_2S[cMemoryIndex])->clear(bx);
 	}
 	
 	for (int cStubCounter=0; cStubCounter<nStubs; cStubCounter++)
 	{
 		#pragma HLS pipeline II=1
-			RouteStub(bx, hIputLink[cStubCounter], hDTCMapEncoded, hMemoriesPS, hMemories2S );
+		RouteStub(bx, hIputLink[cStubCounter], hDTCMapEncoded, hM_PS, hM_2S);
 
 	}
 

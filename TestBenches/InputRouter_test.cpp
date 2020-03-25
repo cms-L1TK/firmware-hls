@@ -16,7 +16,10 @@
 
 using namespace std;
 
-using LinkMap = std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>> ; // map of input links  [per DTC ]
+// map of input links  [per DTC ]
+using LinkMap = std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>> ; 
+//map of input stubs [ per Bx ]
+using InputStubs = std::map<int, std::vector<std::string>> ; 
 
 // get link information 
 // memory to store LUT for mapping of DTCs to layers/disks/etc. 
@@ -24,10 +27,15 @@ using LinkMap = std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>>
 // 1 bit for barrel/disk --> 4 bits  
 // up-to 4 layers/disks per DTC
 // 16 bits per link
-// then 2 bits to assign whether link is PS/2S and if it is connected to the very first layer of the tracker or not 
-// 18 bits in total per link .. so can fit all links into a BRAM 12 deep ( 36 bits wide )
-// for the moment I store them one link per word (so a 36 bit wide bram , 24 deep can be used) 
-void getLinkInfo(LinkMap pInputMap, int pLinkId, ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
+// then 2 bits 
+// 1 bit to assign whether link is PS/2S 
+// 1 bit if it is connected to the very first layer of the tracker or not 
+// 18 bits in total per link .. 
+// so can fit all links into a BRAM 12 deep ( 36 bits wide )
+// for the moment I store them one link per word 
+// (so a 36 bit wide bram , 24 deep can be used) 
+void getLinkInfo(LinkMap pInputMap, int pLinkId, 
+  ap_uint<kLINKMAPwidth>& pLinkWord, std::string& pLinkName )
 {
   // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
   // figure out DTC map encoding for this link 
@@ -54,8 +62,6 @@ void getLinkInfo(LinkMap pInputMap, int pLinkId, ap_uint<kLINKMAPwidth>& pLinkWo
   std::cout  << "DTC " << pInputMap[static_cast<int>(pLinkId)].first << " Link " << +pLinkId << " -- DTC map encoded word is " << std::bitset<kLINKMAPwidth>(pLinkWord) << "\n";
   pLinkName = pInputMap[static_cast<int>(pLinkId)].first;//"IL/Link_PS10G_1_A.dat";
 }
-
-using InputStubs = std::map<int, std::vector<std::string>> ; //map of input stubs [ per Bx ]
 // get stubs from file 
 bool getStubs(std::string pInputFile , InputStubs& pInputStubs)
 {
@@ -104,17 +110,22 @@ int main()
   #endif
 
  
-  // name is  : DTCtype[PS10G_PS5G_2S]_[DTC_number]_[which tracking nonant: each DTC reads out 2 tracking nonants]
+  // name is  : 
+  // DTCtype[PS10G_PS5G_2S]
+  // _[DTC_number]
+  // _[which tracking nonant: each DTC reads out 2 tracking nonants]
   std::string cInputFile_LinkMap = "IL/dtclinklayerdisk.dat";
-  std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>>   cInputMap;
-  std::cout << "Loading link map into memory .. will be used later" << std::endl;
+  std::map<int, std::pair<std::string ,std::vector<std::uint8_t>>> cInputMap;
+  std::cout << "Loading link map into memory .. will be used later" <<std::endl;
   std::ifstream fin_il_map;
   if (not openDataFile(fin_il_map,cInputFile_LinkMap)) 
   {
-    std::cout << "Could not find file " << cInputFile_LinkMap << std::endl;
+    std::cout << "Could not find file " 
+      << cInputFile_LinkMap << std::endl;
     return 0;
   }
-  std::cout << "Reading link map from file : " << cInputFile_LinkMap << std::endl;
+  std::cout << "Reading link map from file : " 
+    << cInputFile_LinkMap << std::endl;
   size_t cLinkCounter=0;
   // parse link map 
   for(std::string cInputLine; getline( fin_il_map, cInputLine ); )
@@ -128,10 +139,15 @@ int main()
         cIsAlNum = cIsAlNum && std::isalnum(cChar);
       if( !cIsAlNum ) // input link name 
       {
-        if( cToken.find("2S") != std::string::npos || cToken.find("PS") != std::string::npos ) 
+        if( cToken.find("2S") != std::string::npos 
+          || cToken.find("PS") != std::string::npos ) 
         {
           if( cToken[0] == 'n')
-            cInputMap[cLinkCounter].first = cToken.substr(4, cToken.length()-3) + "_B"; //Link_PS10G_1_A.dat
+          {
+            //Link_PS10G_1_A.dat
+            cInputMap[cLinkCounter].first = cToken.substr(4, cToken.length()-3); 
+            cInputMap[cLinkCounter].first += "_B";
+          }
           else
             cInputMap[cLinkCounter].first = cToken + "_A" ; //Link_PS10G_1_A.dat
           std::cout << "Link name : " << cInputMap[cLinkCounter].first << "\n";
@@ -151,27 +167,17 @@ int main()
 
   // memories for stubs 
   // PS memories 
-  InputRouterMemory<InputStub<BARRELPS>, kNBits_BX,kNBits_MemAddr> hMemory_L1[8];
-  InputRouterMemory<InputStub<BARRELPS>, kNBits_BX,kNBits_MemAddr> hMemory_L2[4];
-  InputRouterMemory<InputStub<BARRELPS>, kNBits_BX,kNBits_MemAddr> hMemory_L3[4];
-  InputRouterMemory<InputStub<DISKPS>, kNBits_BX,kNBits_MemAddr> hMemory_D1[4];
-  InputRouterMemory<InputStub<DISKPS>, kNBits_BX,kNBits_MemAddr> hMemory_D2[4];
-  InputRouterMemory<InputStub<DISKPS>, kNBits_BX,kNBits_MemAddr> hMemory_D3[4];
-  InputRouterMemory<InputStub<DISKPS>, kNBits_BX,kNBits_MemAddr> hMemory_D4[4];
-  InputRouterMemory<InputStub<DISKPS>, kNBits_BX,kNBits_MemAddr> hMemory_D5[4];
+  StubsBarrelPS hBarrelPS;
+  StubsDiskPS hDiskPS;
   // 2S memories 
-  InputRouterMemory<InputStub<BARREL2S>, kNBits_BX,kNBits_MemAddr> hMemory_L4[4];
-  InputRouterMemory<InputStub<BARREL2S>, kNBits_BX,kNBits_MemAddr> hMemory_L5[4];
-  InputRouterMemory<InputStub<BARREL2S>, kNBits_BX,kNBits_MemAddr> hMemory_L6[4];
-  InputRouterMemory<InputStub<DISK2S>, kNBits_BX,kNBits_MemAddr> hMemory2S_D1[4];
-  InputRouterMemory<InputStub<DISK2S>, kNBits_BX,kNBits_MemAddr> hMemory2S_D2[4];
-  InputRouterMemory<InputStub<DISK2S>, kNBits_BX,kNBits_MemAddr> hMemory2S_D3[4];
-  InputRouterMemory<InputStub<DISK2S>, kNBits_BX,kNBits_MemAddr> hMemory2S_D4[4];
-  InputRouterMemory<InputStub<DISK2S>, kNBits_BX,kNBits_MemAddr> hMemory2S_D5[4];
+  StubsBarrel2S hBarrel2S;
+  StubsDisk2S hDisk2S;
 
   // test memories .... 
-  MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemories2S[kTotal2Smemories]; // in total we have 32 input stub memories for 2S 'stubs'
-  MemoryTemplate<ap_uint<kBRAMwidth>,kNBits_BX,kNBits_MemAddr> hMemoriesPS[kTotalPSmemories]; // in total we have 32 input stub memories for 2S 'stubs'
+  // in total we have 32 input stub memories for 2S 'stubs'
+  IRMemory hMemories2S[kTotal2Smemories]; 
+  // in total we have 36 input stub memories for PS 'stubs'
+  IRMemory hMemoriesPS[kTotalPSmemories]; 
 
   // figure out DTC map encoding for this link 
   int cLinkId = 18 ; // PS_10G_1 (neg)
@@ -179,78 +185,66 @@ int main()
   std::string cDTCname = "";
   getLinkInfo(cInputMap, cLinkId, cLinkWord, cDTCname);
   std::string cLinkFile = "IL/IL_" + cDTCname + "/Link_" + cDTCname + ".dat" ;
-  std::cout << "DTC name from CMSSW " << cDTCname << " input file is " << cLinkFile << "\n";
+  std::cout << "DTC name from CMSSW " 
+    << cDTCname << " input file is " 
+    << cLinkFile << "\n";
   
   // get stubs 
   InputStubs cInputStubs;
   getStubs(cLinkFile , cInputStubs);
-  for( int cBxSelected = 0 ; cBxSelected < 1 ; cBxSelected++)
+  int cBxSelected = 0; 
+  for( int cBx = cBxSelected ; cBx < cBxSelected+1 ; cBx++)
   {
     // declare input stream to be used in hls simulation
     hls::stream<ap_uint<kNBits_DTC>> hInputLink;
 
     // push stubs into stub word vector for this bx 
     std::vector<ap_uint<kNBits_DTC>> cStubWords;
-    BXType hBxCounter = cBxSelected&0x7;
+    BXType hBxCounter = cBx&0x7;
     std::cout << "Bx " << hBxCounter << "\n";
 
-    auto& cStubs = cInputStubs[cBxSelected];
-    size_t cSize = std::min( static_cast<size_t>(kMaxStubsFromLink), cInputStubs[cBxSelected].size() );
+    auto& cStubs = cInputStubs[cBx];
+    size_t cSize = kMaxStubsFromLink;
+    if ( cInputStubs[cBx].size() < kMaxStubsFromLink )
+      cSize = cInputStubs[cBx].size();
     ap_uint<kNBits_DTC> *cStubArray = new ap_uint<kNBits_DTC>[cSize];
-    for( auto cStubIterator = cStubs.begin(); cStubIterator < cStubs.begin()+1; cStubIterator++)
+    for( auto cStubIter = cStubs.begin(); cStubIter < cStubs.end(); cStubIter++)
     {
-      auto cStubCounter = std::distance( cStubs.begin(), cStubIterator ); 
-      auto& cStub = *cStubIterator;
+      auto cStubCounter = std::distance( cStubs.begin(), cStubIter ); 
+      auto& cStub = *cStubIter;
       if( cStubCounter < kMaxStubsFromLink )
       {
-        //if( cStubCounter%25 == 0 )
-        //  std::cout << " \t\t... Stub #" << +cStubCounter << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) << std::dec << "\n";
+        // if( cStubCounter%25 == 0 )
+        //   std::cout << " \t\t... Stub #" << +cStubCounter 
+        //     << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) 
+        //     << std::dec << "\n";
         cStubArray[cStubCounter] = ap_uint<kNBits_DTC>( cStub.c_str() ,2) ; 
         hInputLink.write_nb(cStubArray[cStubCounter]);
-        //RouteStub(hBxCounter, ap_uint<kNBits_DTC>( cStub.c_str() ,2), cLinkWord, hMemoriesPS, hMemories2S);
       }
       else
       {
         if( cStubCounter == kMaxStubsFromLink) 
-          std::cout << "Warning - truncation expected. Stubs from simulation [currently @ stub #" << +cStubCounter << "] exceed maximum allowed on this link.. not passing to input stream.\n";
+          std::cout << "Warning - truncation expected!" 
+            << "Stubs from simulation [currently @ stub #" << +cStubCounter 
+            << "] exceed maximum allowed on this link.."
+            << " not passing to input stream.\n";
       }
     }
-    // this figures out which memories to write to all by itself.. but not very elegant 
-    // InputRouterGeneric(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemoriesPS , hMemories2S);
+    // this figures out which memories to write to all by itself
+    // .. but its maybe not very elegant 
+    // InputRouterGeneric(hBxCounter, (int)cSize , cStubArray, 
+    // cLinkWord, hMemoriesPS , hMemories2S);
 
     // this writes to either the PS or the 2S memories 
     ap_uint<1> cIs2S;
     is2S(cLinkWord, cIs2S);
     if( !cIs2S)
     {
-      // std::cout << "Before the input router there are : \n";
-      // for( int cPhiRegion=0; cPhiRegion < 8; cPhiRegion++)
-      //   std::cout << "\t... entries in  " << +hMemory_L1[cPhiRegion].getEntries(hBxCounter) << " in L1 memory\n";
-      
-      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-      //   std::cout << "\t... entries in  " << +hMemory_D2[cPhiRegion].getEntries(hBxCounter) << " in D2 memory\n";
-
-
-      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-      //   std::cout << "\t... entries in  " << +hMemory_D4[cPhiRegion].getEntries(hBxCounter) << " in D4 memory\n";
-      
-      InputRouterPS(hBxCounter, hInputLink, cLinkWord, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
-      //InputRouterPS(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L1, hMemory_L2, hMemory_L3, hMemory_D1, hMemory_D2, hMemory_D3, hMemory_D4, hMemory_D5);
-      
-      // std::cout << "After the input router there are : \n";
-      // for( int cPhiRegion=0; cPhiRegion < 8; cPhiRegion++)
-      //   std::cout << "\t... entries in  " << +hMemory_L1[cPhiRegion].getEntries(hBxCounter) << " in L1 memory\n";
-      
-      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-      //   std::cout << "\t... entries in  " << +hMemory_D2[cPhiRegion].getEntries(hBxCounter) << " in D2 memory\n";
-
-      // for( int cPhiRegion=0; cPhiRegion < 4; cPhiRegion++)
-      //   std::cout << "\t... entries in  " << +hMemory_D4[cPhiRegion].getEntries(hBxCounter) << " in D4 memory\n";
+      InputRouterPS(hBxCounter, hInputLink, cLinkWord, hBarrelPS, hDiskPS);
     }
     else
     {
-      //InputRouter2S(hBxCounter, hInputLink, cLinkWord, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
-      //InputRouter2S(hBxCounter, (int)cSize , cStubArray, cLinkWord, hMemory_L4, hMemory_L5, hMemory_L6, hMemory2S_D1, hMemory2S_D2, hMemory2S_D3, hMemory2S_D4, hMemory2S_D5);
+      InputRouter2S(hBxCounter, hInputLink, cLinkWord, hBarrel2S, hDisk2S);
     }
   }
   // to-do : comparison against emulation 
