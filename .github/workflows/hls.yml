@@ -13,12 +13,12 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Script1 # Script name
       run: |
-        cd project; pwd; ls-a; ls -a $GITHUB_WORKSPACE/_work; # cd and debug
+        cd project; pwd; ls -a; ls -a $GITHUB_WORKSPACE/_work; # cd and debug
         source /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
         vivado_hls -f "script_MC.tcl"
     - name: Script2 # Script name
       run: |
-        cd project; pwd; ls-a; ls -a $GITHUB_WORKSPACE/_work; # cd and debug
+        cd project; pwd; ls -a; ls -a $GITHUB_WORKSPACE/_work; # cd and debug
         source /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
         vivado_hls -f "script_ME.tcl"
         vivado_hls -f "script_PR.tcl"
