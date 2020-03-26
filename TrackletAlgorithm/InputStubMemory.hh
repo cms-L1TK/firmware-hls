@@ -233,43 +233,9 @@ private:
 
 };
 // Memory definition
-//template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
+template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
 using IRMemory = MemoryTemplate<ap_uint<kBRAMwidth>, kNBits_BX, kNBits_MemAddr>;
 template<int ISType> 
-using InputStubMemory = InputRouterMemory<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
+using ISMemory = InputRouterMemory<InputStub<ISType>, kNBits_BX, kNBits_MemAddr>;
 
-
-// Data object definition
-class DTCMap 
-{
-  public:
-    typedef ap_uint<kLINKMAPwidth> DTCInfo;
-
-    // Constructors
-    DTCMap(const DTCInfo& newdata):
-      data_(newdata)
-    {}
-
-    DTCMap():
-      data_(0)
-    {}
-
-    #ifndef __SYNTHESIS__
-    DTCMap(const char* datastr, int base=16)
-    {
-      DTCInfo newdata(datastr, base);
-      data_ = newdata;
-    }
-    #endif
-
-    // Getter
-    DTCInfo raw() const {return data_; }
-
-
-  private:
-    DTCInfo data_;
-
-};
-
-using DTCMapMemory = MemoryTemplate<DTCMap, 1, kNBits_MemAddr>;
 #endif
