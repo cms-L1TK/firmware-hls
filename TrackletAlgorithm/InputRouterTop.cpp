@@ -70,11 +70,6 @@ void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 				{
 					ap_uint<3> cPhiBn;
 					GetCoarsePhiRegion<InputStub<BARRELPS>,3>(hWord, cPhiBn);
-					#ifndef __SYNTHESIS__
-				  		std::cout << "Phi region is " << cPhiBn 
-				  			<< " writing " << std::hex << hStub.raw() << std::dec 
-				  			<< " to memory\n";
-				  	#endif
 					(&hBrl.m1[cPhiBn])->write_mem(bx, hStub, cBrl.n1[cPhiBn]);
 					cBrl.n1[cPhiBn]++;
 				}

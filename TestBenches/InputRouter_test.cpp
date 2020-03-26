@@ -284,10 +284,9 @@ int main()
         {
           std::cout << hBarrelPS.m1[cPhiRegion].getEntries(cBxSelected) 
             << " entries in L1 memory for Bx " << +cBxSelected << "\n";
-         int err_count = compareMemWithFile<InputStubMemory<BARRELPS> >(hBarrelPS.m1[cPhiRegion],cInputStream,cBxSelected,"InputStub");
+          int err_count = compareMemWithFile<InputStubMemory<BARRELPS> >(hBarrelPS.m1[cPhiRegion],cInputStream,cBxSelected,"InputStub");
         }
       }
-
     }
     cLayerIterator++;
   }

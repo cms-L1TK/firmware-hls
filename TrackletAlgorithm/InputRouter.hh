@@ -47,7 +47,7 @@ void GetCoarsePhiRegion(const ap_uint<kNBits_DTC> hInputStub,
 
 // templated write memories function
 template<int ISType, int NBits, int Nmemories>
-void WriteMemories(const BXType bx, const ap_uint<kNBits_DTC> hInputStub, 
+void WriteMemories(const BXType bx, const ap_uint<kBRAMwidth> hInputStub, 
 	ap_uint<8> nEntries[Nmemories], 
 	InputStubMemory<ISType> hMemory[Nmemories])
 {
