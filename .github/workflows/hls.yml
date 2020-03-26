@@ -35,7 +35,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: ME
-        path: project/matchengine/solution1/syn/report/MatchEngineTop_csynth.rpt
+        path: project/matchengine/solution1/syn/report/MatchEngineTopL3_csynth.rpt
     - name: PR # Script name
       run: |
         cd project
@@ -45,7 +45,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: PR
-        path: project/projrouter/solution1/syn/report/ProjectionRouterTop_csynth.rpt
+        path: project/projrouter/solution1/syn/report/*.rpt
     - name: TC # Script name
       run: |
         cd project
