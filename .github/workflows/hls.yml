@@ -24,6 +24,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Upload results
       uses: actions/upload-artifact@v1
       with:
+        name: MC
         path: project/match_calc/solution1/syn/report/MatchCalculatorTop_csynth.rpt
     - name: ME # Script name
       run: |
@@ -33,6 +34,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Upload results
       uses: actions/upload-artifact@v1
       with:
+        name: ME
         path: project/matchengine/solution1/syn/verilog/*
     - name: PR # Script name
       run: |
@@ -42,6 +44,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Upload results
       uses: actions/upload-artifact@v1
       with:
+        name: PR
         path: |
           project/projrouter/solution1/csim/report/ProjectionRouterTop_csim.log
           project/projrouter/solution1/impl/ip/hdl/verilog/*
