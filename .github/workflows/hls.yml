@@ -1,13 +1,12 @@
 name: HLS build on lnxfarm327
 env:
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh'
-  
-# Controls when the action will run. Triggers the workflow on push or pull request
-on:
-  push:
-  #    branches: [ master ]
-  #  pull_request:
-  #    branches: [ master ]
+
+on: # Controls when the action will run.
+  push: # Please add your branch down here if wanted. A build will be triggerd for each push.
+    branches: [master, feat_actions] 
+  #pull_request: # !!! SECURITY ISSUE: Only enable if repository is private. !!!
+  #  branches: [ master ] # !!! SECURITY ISSUE: Only enable if repository is private. !!!
 jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
   hls-build: # Job name
     runs-on: self-hosted # The type of runner that the job will run on
@@ -56,7 +55,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       with:
         name: TC
         path: project/trackletCalculator/solution1/syn/report/TrackletCalculator_L1L2G_csynth.rpt
-    # Does not work right now
+# Does not work right now
 #    - name: TE # Script name
 #      run: |
 #        cd project
