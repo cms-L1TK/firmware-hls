@@ -9,7 +9,7 @@ on:
   #  pull_request:
   #    branches: [ master ]
 jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-  build: # Job name
+  hls-build: # Job name
     runs-on: self-hosted # The type of runner that the job will run on
     steps: # Steps represent a sequence of tasks that will be executed as part of the job
     - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -25,9 +25,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: MC
-        path: |
-          project/match_calc/solution1/csim/report/MatchCalculatorTop_csim.log
-          project/match_calc/solution1/syn/report/MatchCalculatorTop_csynth.rpt
+        path: project/match_calc/solution1/syn/report/MatchCalculatorTop_csynth.rpt
     - name: ME # Script name
       run: |
         cd project
@@ -37,9 +35,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: ME
-        path: |
-          project/matchengine/solution1/csim/report/MatchEngineTop_sim.log
-          project/matchengine/solution1/syn/report/MatchEngineTop_csynth.rpt
+        path: project/matchengine/solution1/syn/report/MatchEngineTop_csynth.rpt
     - name: PR # Script name
       run: |
         cd project
@@ -49,9 +45,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: PR
-        path: |
-          project/projrouter/solution1/csim/report/ProjectionRouterTop_csim.log
-          project/projrouter/solution1/syn/report/ProjectionRouterTop_csynth.rpt
+        path: project/projrouter/solution1/syn/report/ProjectionRouterTop_csynth.rpt
     - name: TC # Script name
       run: |
         cd project
@@ -61,9 +55,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: TC
-        path: |
-          project/trackletCalculator/solution1/csim/report/TrackletCalculator_L1L2G_csim.log
-          project/trackletCalculator/solution1/syn/report/TrackletCalculator_L1L2G_csynth.rpt
+        path: project/trackletCalculator/solution1/syn/report/TrackletCalculator_L1L2G_csynth.rpt
     # Does not work right now
 #    - name: TE # Script name
 #      run: |
