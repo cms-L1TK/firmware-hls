@@ -1,5 +1,8 @@
 name: HLS build on lnxfarm327
-
+env:
+  VIVADO_VERSION: '2019.2'
+  VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
+  
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
   push:
@@ -11,50 +14,31 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     runs-on: self-hosted # The type of runner that the job will run on
     steps: # Steps represent a sequence of tasks that will be executed as part of the job
     - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Script1 # Script name
+    - name: Debug # Script name
       run: |
-        cd project; pwd; ls -a; ls -a $GITHUB_WORKSPACE; # cd and debug
-        source /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
+        pwd; ls -a; ls -a project; ls -a $GITHUB_WORKSPACE; # Debug
+    - name: MC # Script name
+      run: |
+        cd project
+        source $VIVADO_PATH_SH
         vivado_hls -f "script_MC.tcl"
-    - name: Script2 # Script name
+    - name: ME # Script name
       run: |
-        cd project; pwd; ls -a; ls -a $GITHUB_WORKSPACE; # cd and debug
-        source /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
+        cd project
+        source $VIVADO_PATH_SH
         vivado_hls -f "script_ME.tcl"
+    - name: PR # Script name
+      run: |
+        cd project
+        source $VIVADO_PATH_SH
         vivado_hls -f "script_PR.tcl"
+    - name: TC # Script name
+      run: |
+        cd project
+        source $VIVADO_PATH_SH
         vivado_hls -f "script_TC.tcl"
+    - name: TE # Script name
+      run: |
+        cd project
+        source $VIVADO_PATH_SH
         vivado_hls -f "script_TE.tcl"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
