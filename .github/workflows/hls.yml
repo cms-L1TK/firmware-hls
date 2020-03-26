@@ -1,0 +1,60 @@
+name: HLS build on lnxfarm327
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+on:
+  push:
+  #    branches: [ master ]
+  #  pull_request:
+  #    branches: [ master ]
+jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  build: # Job name
+    runs-on: self-hosted # The type of runner that the job will run on
+    steps: # Steps represent a sequence of tasks that will be executed as part of the job
+    - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - name: Script1 # Script name
+      run: |
+        cd project; pwd; ls-a; ls -a $GITHUB_WORKSPACE/_work; # cd and debug
+        source /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
+        vivado_hls -f "script_MC.tcl"
+    - name: Script2 # Script name
+      run: |
+        cd project; pwd; ls-a; ls -a $GITHUB_WORKSPACE/_work; # cd and debug
+        source /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
+        vivado_hls -f "script_ME.tcl"
+        vivado_hls -f "script_PR.tcl"
+        vivado_hls -f "script_TC.tcl"
+        vivado_hls -f "script_TE.tcl"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
