@@ -45,7 +45,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       uses: actions/upload-artifact@v1
       with:
         name: PR
-        path: project/projrouter/solution1/syn/report/*.rpt
+        path: project/projrouter/solution1/syn/report/ProjectionRouterTop_csynth.rpt
     - name: TC # Script name
       run: |
         cd project
