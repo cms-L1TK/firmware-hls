@@ -1,9 +1,9 @@
 #ifndef TRACKLETENGINE_H
 #define TRACKLETENGINE_H
 
-#include "VMStubTEInnerMemory.hh"
-#include "VMStubTEOuterMemory.hh"
-#include "StubPairMemory.hh"
+#include "VMStubTEInnerMemory.h"
+#include "VMStubTEOuterMemory.h"
+#include "StubPairMemory.h"
 
 #include "hls_math.h"
 #include <stdio.h>
@@ -36,32 +36,21 @@ enum phireg {
 
 }//namespace TE
 
-
-// functions to read in pt cut and stub bend cut tables
-#include "TrackletEngine_ptcut.h"
-#include "TrackletEngine_stubptinnercut.h"
-#include "TrackletEngine_stubptoutercut.h"
-
 //----------------------------
 // Tracklet Engine main code
 //============================
-template<int seed, int innerphi, int outerphi, int innertype, int outertype,
-         unsigned int ptdepth, unsigned int stubptinnerdepth, unsigned int stubptouterdepth>
+template<int innertype, int outertype, unsigned int ptdepth,
+  unsigned int stubptinnerdepth, unsigned int stubptouterdepth>
 void TrackletEngine(
 		    const ap_uint<3> bx,
 		    const VMStubTEInnerMemory<innertype>& instubinnerdata,
 		    const VMStubTEOuterMemory<outertype>& instubouterdata,
+                    const ap_uint<1> pttable[ptdepth],
+                    const ap_uint<1> bendinnertable[stubptinnerdepth],
+                    const ap_uint<1> bendoutertable[stubptouterdepth],
 		    StubPairMemory& outstubpair) {
 
-  ap_uint<1> pttable[ptdepth];
-  readPtTable<seed, innerphi, outerphi, ptdepth>(pttable);
-
-  ap_uint<1> bendinnertable[stubptinnerdepth];
-  readBendInnerTable<seed, innerphi, outerphi, stubptinnerdepth>(bendinnertable);
-
-  ap_uint<1> bendoutertable[stubptouterdepth];
-  readBendOuterTable<seed, innerphi, outerphi, stubptouterdepth>(bendoutertable);
-
+#pragma HLS inline
   int nstubpairs = 0;
 #pragma HLS dependence variable=nstubpairs intra WAR true
 

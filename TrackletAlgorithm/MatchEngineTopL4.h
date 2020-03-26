@@ -8,5 +8,4 @@ void MatchEngineTopL4(const ap_uint<3> bx,
 		      const VMProjectionMemory<BARREL>* const inprojdata,
 		      CandidateMatchMemory* const outcandmatch);
 
-
 #endif

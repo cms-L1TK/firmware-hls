@@ -1,7 +1,7 @@
 #ifndef PROJECTIONROUTERTOP_H
 #define PROJECTIONROUTERTOP_H
 
-#include "ProjectionRouter.hh"
+#include "ProjectionRouter.h"
 
 void ProjectionRouterTop(BXType bx,
                          const TrackletProjectionMemory<BARRELPS>*,
