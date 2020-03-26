@@ -1,7 +1,6 @@
 name: HLS build on lnxfarm327
 env:
-  VIVADO_VERSION: '2019.2'
-  VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
+  VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh'
   
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
