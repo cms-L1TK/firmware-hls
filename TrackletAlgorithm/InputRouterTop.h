@@ -94,12 +94,12 @@ void isFirst(ap_uint<kLINKMAPwidth> hDTCMapEncoded, ap_uint<1>& hIsFirst);
 
 void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-	StubsBarrelPS hBarrelMemories, StubsDiskPS hDiskMemories);
+	StubsBarrelPS& hBarrelMemories, StubsDiskPS& hDiskMemories);
 
 
 void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-	StubsBarrel2S hBarrelMemories, StubsDisk2S hDiskMemories);
+	StubsBarrel2S& hBarrelMemories, StubsDisk2S& hDiskMemories);
 
 void InputRouterGeneric(const BXType bx, const int nStubs, 
 	hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
@@ -110,8 +110,8 @@ void InputRouterGeneric(const BXType bx, const int nStubs,
 void InputRouterTop(const BXType bx, 
 	hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-	StubsBarrelPS hBrlPS, StubsDiskPS hDskPS, 
-	StubsBarrel2S hBrl2S, StubsDisk2S hDsk2S);
+	StubsBarrelPS& hBrlPS, StubsDiskPS& hDskPS, 
+	StubsBarrel2S& hBrl2S, StubsDisk2S& hDsk2S);
 
 #endif
 

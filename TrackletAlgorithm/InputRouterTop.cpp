@@ -8,7 +8,7 @@
 // route stubs for PS memories only 
 void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-	StubsBarrelPS hBrl, StubsDiskPS hDsk)
+	StubsBarrelPS& hBrl, StubsDiskPS& hDsk)
 {
 	// local variables to keep track of how many entries 
 	// are in each memory 
@@ -70,6 +70,11 @@ void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 				{
 					ap_uint<3> cPhiBn;
 					GetCoarsePhiRegion<InputStub<BARRELPS>,3>(hWord, cPhiBn);
+					#ifndef __SYNTHESIS__
+				  		std::cout << "Phi region is " << cPhiBn 
+				  			<< " writing " << std::hex << hStub.raw() << std::dec 
+				  			<< " to memory\n";
+				  	#endif
 					(&hBrl.m1[cPhiBn])->write_mem(bx, hStub, cBrl.n1[cPhiBn]);
 					cBrl.n1[cPhiBn]++;
 				}
@@ -132,7 +137,7 @@ void InputRouterPS(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 //route stubs for 2S memories only 
 void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-	StubsBarrel2S hBrl, StubsDisk2S hDsk)
+	StubsBarrel2S& hBrl, StubsDisk2S& hDsk)
 {
 	// local variables to keep track of how many entries 
 	// are in each memory 
@@ -246,8 +251,8 @@ void InputRouter2S(const BXType bx, hls::stream<ap_uint<kNBits_DTC>> &hIputLink,
 void InputRouterTop(const BXType bx, 
 	hls::stream<ap_uint<kNBits_DTC>> &hIputLink, 
 	const ap_uint<kLINKMAPwidth> hDTCMapEncoded, 
-	StubsBarrelPS hBrlPS, StubsDiskPS hDskPS, 
-	StubsBarrel2S hBrl2S, StubsDisk2S hDsk2S)
+	StubsBarrelPS& hBrlPS, StubsDiskPS& hDskPS, 
+	StubsBarrel2S& hBrl2S, StubsDisk2S& hDsk2S)
 {
 	ap_uint<1> cIs2S; is2S(hDTCMapEncoded, cIs2S);
 	if( cIs2S == 1 )

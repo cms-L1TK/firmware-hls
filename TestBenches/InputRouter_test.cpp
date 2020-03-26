@@ -195,12 +195,12 @@ int main()
   int cBxSelected = 0; 
   for( int cBx = cBxSelected ; cBx < cBxSelected+1 ; cBx++)
   {
+    BXType hBx = cBxSelected&0x7;
     // declare input stream to be used in hls simulation
     hls::stream<ap_uint<kNBits_DTC>> hLink;
 
     // push stubs into stub word vector for this bx 
     std::vector<ap_uint<kNBits_DTC>> cStubWords;
-    BXType hBx = cBx&0x7;
     std::cout << "Bx " << hBx << "\n";
 
     auto& cStubs = cInputStubs[cBx];
@@ -214,10 +214,9 @@ int main()
       auto& cStub = *cStubIter;
       if( cStubCounter < kMaxStubsFromLink )
       {
-        // if( cStubCounter%25 == 0 )
-        //   std::cout << " \t\t... Stub #" << +cStubCounter 
-        //     << " -- " << std::hex << ap_uint<kNBits_DTC>( cStub.c_str() ,2) 
-        //     << std::dec << "\n";
+        //if( cStubCounter%25 == 0 )
+        std::cout << " \t\t... Stub #" << +cStubCounter 
+          << " -- " << cStub.c_str() << "\n";
         cStubArray[cStubCounter] = ap_uint<kNBits_DTC>( cStub.c_str() ,2) ; 
         hLink.write_nb(cStubArray[cStubCounter]);
       }
@@ -244,7 +243,55 @@ int main()
       InputRouter2S(hBx, hLink, cLinkWord, hBarrel2S, hDisk2S);
     }
   }
+
   // to-do : comparison against emulation 
+  std::vector<std::string> cRegionLabelsAll{ "A", "B" , "C", "D"};
+  std::vector<std::string> cRegionLabelsL1{ "A", "B" , "C", "D", "E", "F","G", "H"};
+  bool cIs2S = ( cInputMap[static_cast<int>(cLinkId)].first.find("2S") != std::string::npos  ); 
+  auto cLayerIterator = cInputMap[static_cast<int>(cLinkId)].second.begin();
+  bool cFirstLayer=false;
+  // layer id is either layer number or disk number 
+  while( cLayerIterator <  cInputMap[static_cast<int>(cLinkId)].second.end() ) 
+  {
+    size_t cLayerId =  *cLayerIterator;
+    auto cIsBarrel = (cLayerId<10); 
+    cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
+    if( cLayerId == 1 && cIsBarrel == 1) // first barrel layer is special ...
+      cFirstLayer = true;
+    
+    std::string cEmFile = "IL/IL_" + cDTCname + "/InputStubs_IL_";
+    if( cIsBarrel )
+      cEmFile += "L" + std::to_string(cLayerId);
+    else
+      cEmFile += "D" + std::to_string(cLayerId);
+    
+    int cNRegions = (cLayerId==1) ? 8 : 4 ;
+    for( int cPhiRegion=0; cPhiRegion < cNRegions ; cPhiRegion++)
+    {
+      std::string cRegion;
+      if( cLayerId == 1 && cIsBarrel ) 
+        cRegion = cRegionLabelsL1[cPhiRegion];
+      else
+        cRegion = cRegionLabelsAll[cPhiRegion];
+        
+      std::string cFile = cEmFile + "PHI"+ cRegion + "_" + cDTCname + "_04.dat";
+      
+      ifstream cInputStream;
+      if( openDataFile(cInputStream,cFile) )
+      {
+        std::cout << cFile << "\n";
+        if( cLayerId == 1 && cIsBarrel ) 
+        {
+          std::cout << hBarrelPS.m1[cPhiRegion].getEntries(cBxSelected) 
+            << " entries in L1 memory for Bx " << +cBxSelected << "\n";
+         int err_count = compareMemWithFile<InputStubMemory<BARRELPS> >(hBarrelPS.m1[cPhiRegion],cInputStream,cBxSelected,"InputStub");
+        }
+      }
+
+    }
+    cLayerIterator++;
+  }
+
 
   // Barrel : A, B, C, D 
   // Regions : 0, 1 , 2 ,3 

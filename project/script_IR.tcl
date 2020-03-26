@@ -21,14 +21,16 @@ open_solution -reset "solution1"
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
 
+# create_clock -period 360MHz -name default
+
 # simulate 
 set nProc [exec nproc]
 csim_design -compiler gcc -mflags "-j$nProc"
-config_rtl -reset all -reset_async -reset_level low
+# config_rtl -reset all -reset_async -reset_level low
 # synthesize 
-csynth_design
-cosim_design
-# export_design -format ip_catalog
+# csynth_design
+# cosim_design
+# export_design -format ip_catalog -flow syn
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-export_design -format ip_catalog -flow impl
+# export_design -format ip_catalog -flow impl
 exit
