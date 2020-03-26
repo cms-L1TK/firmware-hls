@@ -11,8 +11,10 @@ const int nevents = 2;  //number of events to run
 
 using namespace std;
 
+// VMRouter Test for Layer 1, Allstub region E
+
 int main()
-{ 
+{
   // error counts
   int err = 0;
 
@@ -23,12 +25,13 @@ int main()
   static InputStubMemory<BARRELPS> ilink3;
   static InputStubMemory<BARRELPS> ilink4;
   static InputStubMemory<BARRELPS> ilink5;
-  // static InputStubMemory<BARRELPS> ilink6;
+  static InputStubMemory<BARRELPS> ilink6;
   // static InputStubMemory<BARRELPS> ilink7;
   // static InputStubMemory<BARRELPS> ilink8;
 
   // output memories
   static AllStubMemory<BARRELPS> allstub;
+  // ME memories
   static VMStubMEMemory<BARRELPS> vmstubme1;
   static VMStubMEMemory<BARRELPS> vmstubme2;
   static VMStubMEMemory<BARRELPS> vmstubme3;
@@ -112,7 +115,7 @@ int main()
 //  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n4_04.dat");
 //  if (not valid_vmstubme8) return -1;
 
-  ///////////////////////////  
+  ///////////////////////////
   // loop over events
   cout << "Start event loop ..." << endl;
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
@@ -127,21 +130,22 @@ int main()
     // writeMemFromFile<InputStubMemory>(ilink6, fin_ilink6, ievt);
     // writeMemFromFile<InputStubMemory>(ilink7, fin_ilink7, ievt);
     // writeMemFromFile<InputStubMemory>(ilink8, fin_ilink8, ievt);
-    
-    // bx
+
+    // bx - bunch crossing
     BXType bx = ievt;
     BXType bx_out;
 
     // Unit Under Test
     VMRouterTop(bx,
-    		&ilink1, &ilink2, &ilink3, 0,0,//&ilink4, &ilink5,
-		//&ilink6, &ilink7, &ilink8,
+    		&ilink1, &ilink2, &ilink3, 0, 0, 0, //&ilink4, &ilink5, &ilink6,
+		// &ilink7, &ilink8,
 			&allstub,
 		&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
 		&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8
 		);
 
     // compare the computed outputs with the expected ones
+    // add 1 per stub that is incorrect
     bool truncation = false;
     // AllStub
     err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub, fout_aproj, ievt,
@@ -180,5 +184,5 @@ int main()
   } // end of event loop
   std::cerr << "Exiting with return value " << err << std::endl;
   return err;
-  
+
 }
