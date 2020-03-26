@@ -21,16 +21,30 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         cd project
         source $VIVADO_PATH_SH
         vivado_hls -f "script_MC.tcl"
+    - name: Upload results
+      uses: actions/upload-artifact@v1
+      with:
+        path: project/match_calc/solution1/syn/report/MatchCalculatorTop_csynth.rpt
     - name: ME # Script name
       run: |
         cd project
         source $VIVADO_PATH_SH
         vivado_hls -f "script_ME.tcl"
+    - name: Upload results
+      uses: actions/upload-artifact@v1
+      with:
+        path: project/matchengine/solution1/syn/verilog/*
     - name: PR # Script name
       run: |
         cd project
         source $VIVADO_PATH_SH
         vivado_hls -f "script_PR.tcl"
+    - name: Upload results
+      uses: actions/upload-artifact@v1
+      with:
+        path: |
+          project/projrouter/solution1/csim/report/ProjectionRouterTop_csim.log
+          project/projrouter/solution1/impl/ip/hdl/verilog/*
     - name: TC # Script name
       run: |
         cd project
