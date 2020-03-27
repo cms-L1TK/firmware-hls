@@ -48,7 +48,9 @@ int main()
   static VMStubTEInnerMemory<BARRELPS> vmstubtei6;
   static VMStubTEInnerMemory<BARRELPS> vmstubtei7;
   static VMStubTEInnerMemory<BARRELPS> vmstubtei8;
-
+  // TE Inner Overlap
+  static VMStubTEInnerMemory<BARRELOL> vmstubteol1;
+  static VMStubTEInnerMemory<BARRELOL> vmstubteol2;
   ///////////////////////////
   // open input files
   cout << "Open files..." << endl;
@@ -87,10 +89,13 @@ int main()
 
   ///////////////////////////
   // open output files
+
+  // AllStub
   ifstream fout_aproj;
   bool valid_aproj = openDataFile(fout_aproj, "VMR/Stubs/AllStubs_AS_L1PHIEn1_04.dat");
   if (not valid_aproj) return -1;
 
+  // ME
   ifstream fout_vmstubme1;
   bool valid_vmstubme1 =  openDataFile(fout_vmstubme1, "VMR/VMStubsME/VMStubs_VMSME_L1PHIE17n1_04.dat");
   if (not valid_vmstubme1) return -1;
@@ -123,6 +128,7 @@ int main()
 //  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n4_04.dat");
 //  if (not valid_vmstubme8) return -1;
 
+  // TE Inner
 ifstream fout_vmstubtei1;
 bool valid_vmstubtei1 =  openDataFile(fout_vmstubtei1, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIE17n1_04.dat");
 if (not valid_vmstubtei1) return -1;
@@ -138,6 +144,15 @@ if (not valid_vmstubtei3) return -1;
 ifstream fout_vmstubtei4;
 bool valid_vmstubtei4 = openDataFile(fout_vmstubtei4, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIE20n1_04.dat");
 if (not valid_vmstubtei4) return -1;
+
+  // TE Inner Overlap
+ifstream fout_vmstubteol1;
+bool valid_vmstubteol1 =  openDataFile(fout_vmstubteol1, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIQ9n1_04.dat");
+if (not valid_vmstubteol1) return -1;
+
+ifstream fout_vmstubteol2;
+bool valid_vmstubteol2 = openDataFile(fout_vmstubteol2, "VMR/VMStubsTE/VMStubs_VMSTE_L1PHIQ10n1_04.dat");
+
   ///////////////////////////
   // loop over events
   cout << "Start event loop ..." << endl;
@@ -166,7 +181,8 @@ if (not valid_vmstubtei4) return -1;
 		&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
 		&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8,
     &vmstubtei1, &vmstubtei2, &vmstubtei3, &vmstubtei4,
-		&vmstubtei5, &vmstubtei6, &vmstubtei7, &vmstubtei8
+		&vmstubtei5, &vmstubtei6, &vmstubtei7, &vmstubtei8,
+    &vmstubteol1, &vmstubteol2
 		);
 
     // compare the computed outputs with the expected ones

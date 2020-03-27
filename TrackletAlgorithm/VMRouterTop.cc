@@ -27,21 +27,24 @@ void VMRouterTop(BXType bx,
 		VMStubTEInnerMemory<BARRELPS> *mtei4,
 		VMStubTEInnerMemory<BARRELPS> *mtei5,
 		VMStubTEInnerMemory<BARRELPS> *mtei6,
-		VMStubTEInnerMemory<BARRELPS> *mtei7
+		VMStubTEInnerMemory<BARRELPS> *mtei7,
+		VMStubTEInnerMemory<BARRELOL> *mteol1,
+		VMStubTEInnerMemory<BARRELOL> *mteol2
 		)
 {
 
 	// Variables for that are specified with regards to the test bench, should be set somewhere else
 	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	const int disk(0); // Which disk number the data is coming from, 0 if not disk
-	//const bool isPSmodule(true); // If the module is of the PS type, otherwise it's 2S
 	const int ninputs(3);  // The number of input memories
-	//ap_uint<6> imask(7); // Mask of which inputs are being used
+
 	const uint32_t MEMask(0x000F0000UL); // Mask of which memories that are being used.
 	const uint32_t TEIMask(0x000F0000UL); // Mask of which TE Inner memories that are used
+	const uint16_t OLMask(0x300); // Mask of which TE Outer memories that are used
+	const uint32_t TEOMask(0x0UL); // Mask of which TE Inner memories that are used
+	// Note that the masks are "reversed"
 
-
-	VMRouter<BARRELPS, BARRELPS, layer, disk, ninputs, MEMask, TEIMask>
+	VMRouter<BARRELPS, BARRELPS, layer, disk, ninputs, MEMask, TEIMask, OLMask, TEOMask>
 		 (bx,i0,i1,i2,nullptr,nullptr,nullptr,//i5,i6,i7,
 		 allStub,
 		 // ME memories
@@ -53,6 +56,14 @@ void VMRouterTop(BXType bx,
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
 		 mtei0,mtei1,mtei2,mtei3,nullptr,nullptr,nullptr,nullptr, // 16-23
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 24-31
+		 // TEInner Overlap memories
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
+		 mteol1,mteol2,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
+		 // TEOuter memories
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
+		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 16-23
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr // 24-31
 		 );
 
