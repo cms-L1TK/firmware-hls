@@ -55,9 +55,15 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       with:
         name: TC
         path: project/trackletCalculator/solution1/syn/report/TrackletCalculator_L1L2G_csynth.rpt
-# Does not work right now
-#    - name: TE # Script name
-#      run: |
-#        cd project
-#        source $VIVADO_PATH_SH
-#        vivado_hls -f "script_TE.tcl"
+    - name: TE # Script name
+      run: |
+        cd ../emData/TE
+        ./download.sh
+        cd ../project
+        source $VIVADO_PATH_SH
+        vivado_hls -f "script_TE.tcl"
+    - name: Upload results
+      uses: actions/upload-artifact@v1
+      with:
+        name: TE
+        path: project/trackletengine/solution1/syn/report/TrackletEngineTop_csynth.rpt
