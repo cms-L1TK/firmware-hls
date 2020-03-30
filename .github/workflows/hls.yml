@@ -59,7 +59,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
       run: |
         cd ../emData/TE
         ./download.sh
-        cd ../project
+        cd ../../project
         source $VIVADO_PATH_SH
         vivado_hls -f "script_TE.tcl"
     - name: Upload results
