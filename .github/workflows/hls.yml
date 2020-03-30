@@ -57,7 +57,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         path: project/trackletCalculator/solution1/syn/report/TrackletCalculator_L1L2G_csynth.rpt
     - name: TE # Script name
       run: |
-        cd ../emData/TE
+        cd emData/TE
         ./download.sh
         cd ../../project
         source $VIVADO_PATH_SH
