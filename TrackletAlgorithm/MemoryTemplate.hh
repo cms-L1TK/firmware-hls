@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+template<int> class AllStub;
+
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 // DataType: type of data object stored in the array
 // NBIT_BX: number of bits for BX;
@@ -61,6 +63,20 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	// TODO: check if valid
 	return dataarray_[ibx][index];
+  }
+
+  template<class SpecType>
+  bool write_mem(BunchXingT ibx, SpecType data, int addr_index)
+  {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS inline
+    static_assert(
+      std::is_same<DataType, SpecType>::value
+      || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
+      || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
+      , "Invalid conversion between data types");
+    DataType sameData(data.raw());
+    return write_mem(ibx,sameData,addr_index);
   }
 
   bool write_mem(BunchXingT ibx, DataType data, int addr_index)
