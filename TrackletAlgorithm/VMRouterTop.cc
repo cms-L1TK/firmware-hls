@@ -44,23 +44,33 @@ void VMRouterTop(BXType bx,
 	const uint32_t TEOMask(0x0UL); // Mask of which TE Inner memories that are used
 	// Note that the masks are "reversed"
 
-	VMRouter<BARRELPS, BARRELPS, layer, disk, ninputs, MEMask, TEIMask, OLMask, TEOMask>
-		 (bx,i0,i1,i2,nullptr,nullptr,nullptr,//i5,i6,i7,
+static const ap_uint<6> imask(0x3); // Mask of which inputs that are being used
+static const ap_uint<32> memask(0x000F0000UL); // Mask of which memories that are being used.
+static const ap_uint<32> teimask(0x000F0000UL); // Mask of which TE Inner memories that are used
+static const ap_uint<16> olmask(0x300); // Mask of which TE Outer memories that are used
+static const ap_uint<32> teomask(0x0); // Mask of which TE Inner memories that are used
+
+	VMRouter<BARRELPS, BARRELPS, layer, disk> //, ninputs, MEMask, TEIMask, OLMask, TEOMask>
+		 (bx, imask, i0,i1,i2,nullptr,nullptr,nullptr,//i5,i6,i7,
 		 allStub,
 		 // ME memories
+		 memask,
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
 		 m0,m1,m2,m3,nullptr,nullptr,nullptr,nullptr, // 16-23
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 24-31
 		 // TEInner memories
+		 teimask,
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
 		 mtei0,mtei1,mtei2,mtei3,nullptr,nullptr,nullptr,nullptr, // 16-23
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 24-31
 		 // TEInner Overlap memories
+		 olmask,
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
 		 mteol1,mteol2,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
 		 // TEOuter memories
+		 teomask,
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0-7
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 8-15
 		 nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 16-23

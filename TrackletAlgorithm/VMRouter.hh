@@ -199,18 +199,21 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 	// originally 64, but then it won't pass test bench as it contains more than 64 stubs
 	constexpr int MAXVMROUTER = kMaxProc; // TODO need right symbol here
 
-	//template <int layer, int disk, bool isPSmodule>
-	template <regionType INTYPE, regionType METYPE, int LAYER, int DISK, int NINPUTS, uint32_t MEMASK, uint32_t TEIMASK, uint16_t OLMASK, uint32_t TEOMASK>
+
+	template <regionType INTYPE, regionType METYPE, int LAYER, int DISK> //, int NINPUTS, uint32_t MEMASK, uint32_t TEIMASK, uint16_t OLMASK, uint32_t TEOMASK>
 	void VMRouter(const BXType bx,
 		// Input memories
+		const ap_uint<6>& imask,
 		const InputStubMemory<INTYPE>* const i0,
 		const InputStubMemory<INTYPE>* const i1,
 		const InputStubMemory<INTYPE>* const i2,
 		const InputStubMemory<INTYPE>* const i3,
 		const InputStubMemory<INTYPE>* const i4,
 		const InputStubMemory<INTYPE>* const i5,
+		// AllStub memory
 		AllStubMemory<INTYPE>* allstub,
 		// ME memories
+		const ap_uint<32>& memask,
 		VMStubMEMemory<METYPE> *m0,
 		VMStubMEMemory<METYPE> *m1,
 		VMStubMEMemory<METYPE> *m2,
@@ -244,6 +247,7 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 		VMStubMEMemory<METYPE> *m30,
 		VMStubMEMemory<METYPE> *m31,
 		// // Inner TE memories, non-overlap
+		const ap_uint<32>& teimask,
 		VMStubTEInnerMemory<METYPE> *mtei0,
 		VMStubTEInnerMemory<METYPE> *mtei1,
 		VMStubTEInnerMemory<METYPE> *mtei2,
@@ -277,6 +281,7 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 		VMStubTEInnerMemory<METYPE> *mtei30,
 		VMStubTEInnerMemory<METYPE> *mtei31,
 		// // TE Inner memories, overlap
+		const ap_uint<16>& olmask,
 		VMStubTEInnerMemory<BARRELOL> *mteol0,
 		VMStubTEInnerMemory<BARRELOL> *mteol1,
 		VMStubTEInnerMemory<BARRELOL> *mteol2,
@@ -294,6 +299,7 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 		VMStubTEInnerMemory<BARRELOL> *mteol14,
 		VMStubTEInnerMemory<BARRELOL> *mteol15,
 		// // TE Outer memories
+		const ap_uint<32>& teomask,
 		VMStubTEOuterMemory<METYPE> *mteo0,
 		VMStubTEOuterMemory<METYPE> *mteo1,
 		VMStubTEOuterMemory<METYPE> *mteo2,
@@ -365,140 +371,260 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 		// Reset address counters in output memories
 
 		allstub->clear(bx);
-		if ( MEMASK &  0x1        ) m0->clear(bx);
-		if ( MEMASK &  0x2        ) m1->clear(bx);
-		if ( MEMASK &  0x4        ) m2->clear(bx);
-		if ( MEMASK &  0x8        ) m3->clear(bx);
-		if ( MEMASK &  0x10       ) m4->clear(bx);
-		if ( MEMASK &  0x20       ) m5->clear(bx);
-		if ( MEMASK &  0x40       ) m6->clear(bx);
-		if ( MEMASK &  0x80       ) m7->clear(bx);
-		if ( MEMASK &  0x100      ) m8->clear(bx);
-		if ( MEMASK &  0x200      ) m9->clear(bx);
-		if ( MEMASK &  0x400      ) m10->clear(bx);
-		if ( MEMASK &  0x800      ) m11->clear(bx);
-		if ( MEMASK &  0x1000     ) m12->clear(bx);
-		if ( MEMASK &  0x2000     ) m13->clear(bx);
-		if ( MEMASK &  0x4000     ) m14->clear(bx);
-		if ( MEMASK &  0x8000     ) m15->clear(bx);
-		if ( MEMASK &  0x10000    ) m16->clear(bx);
-		if ( MEMASK &  0x20000    ) m17->clear(bx);
-		if ( MEMASK &  0x40000    ) m18->clear(bx);
-		if ( MEMASK &  0x80000    ) m19->clear(bx);
-		if ( MEMASK &  0x100000   ) m20->clear(bx);
-		if ( MEMASK &  0x200000   ) m21->clear(bx);
-		if ( MEMASK &  0x400000   ) m22->clear(bx);
-		if ( MEMASK &  0x800000   ) m23->clear(bx);
-		if ( MEMASK &  0x1000000  ) m24->clear(bx);
-		if ( MEMASK &  0x2000000  ) m25->clear(bx);
-		if ( MEMASK &  0x4000000  ) m26->clear(bx);
-		if ( MEMASK &  0x8000000  ) m27->clear(bx);
-		if ( MEMASK &  0x10000000 ) m28->clear(bx);
-		if ( MEMASK &  0x20000000 ) m29->clear(bx);
-		if ( MEMASK &  0x40000000 ) m30->clear(bx);
-		if ( MEMASK &  0x80000000 ) m31->clear(bx);
+		// if ( MEMASK &  0x1        ) m0->clear(bx);
+		// if ( MEMASK &  0x2        ) m1->clear(bx);
+		// if ( MEMASK &  0x4        ) m2->clear(bx);
+		// if ( MEMASK &  0x8        ) m3->clear(bx);
+		// if ( MEMASK &  0x10       ) m4->clear(bx);
+		// if ( MEMASK &  0x20       ) m5->clear(bx);
+		// if ( MEMASK &  0x40       ) m6->clear(bx);
+		// if ( MEMASK &  0x80       ) m7->clear(bx);
+		// if ( MEMASK &  0x100      ) m8->clear(bx);
+		// if ( MEMASK &  0x200      ) m9->clear(bx);
+		// if ( MEMASK &  0x400      ) m10->clear(bx);
+		// if ( MEMASK &  0x800      ) m11->clear(bx);
+		// if ( MEMASK &  0x1000     ) m12->clear(bx);
+		// if ( MEMASK &  0x2000     ) m13->clear(bx);
+		// if ( MEMASK &  0x4000     ) m14->clear(bx);
+		// if ( MEMASK &  0x8000     ) m15->clear(bx);
+		// if ( MEMASK &  0x10000    ) m16->clear(bx);
+		// if ( MEMASK &  0x20000    ) m17->clear(bx);
+		// if ( MEMASK &  0x40000    ) m18->clear(bx);
+		// if ( MEMASK &  0x80000    ) m19->clear(bx);
+		// if ( MEMASK &  0x100000   ) m20->clear(bx);
+		// if ( MEMASK &  0x200000   ) m21->clear(bx);
+		// if ( MEMASK &  0x400000   ) m22->clear(bx);
+		// if ( MEMASK &  0x800000   ) m23->clear(bx);
+		// if ( MEMASK &  0x1000000  ) m24->clear(bx);
+		// if ( MEMASK &  0x2000000  ) m25->clear(bx);
+		// if ( MEMASK &  0x4000000  ) m26->clear(bx);
+		// if ( MEMASK &  0x8000000  ) m27->clear(bx);
+		// if ( MEMASK &  0x10000000 ) m28->clear(bx);
+		// if ( MEMASK &  0x20000000 ) m29->clear(bx);
+		// if ( MEMASK &  0x40000000 ) m30->clear(bx);
+		// if ( MEMASK &  0x80000000 ) m31->clear(bx);
+		if ( memask[0] ) m0->clear(bx);
+	  if ( memask[1] ) m1->clear(bx);
+	  if ( memask[2] ) m2->clear(bx);
+	  if ( memask[3] ) m3->clear(bx);
+	  if ( memask[4] ) m4->clear(bx);
+	  if ( memask[5] ) m5->clear(bx);
+	  if ( memask[6] ) m6->clear(bx);
+	  if ( memask[7] ) m7->clear(bx);
+	  if ( memask[8] ) m8->clear(bx);
+	  if ( memask[9] ) m9->clear(bx);
+	  if ( memask[10] ) m10->clear(bx);
+	  if ( memask[11] ) m11->clear(bx);
+	  if ( memask[12] ) m12->clear(bx);
+	  if ( memask[13] ) m13->clear(bx);
+	  if ( memask[14] ) m14->clear(bx);
+	  if ( memask[15] ) m15->clear(bx);
+	  if ( memask[16] ) m16->clear(bx);
+	  if ( memask[17] ) m17->clear(bx);
+	  if ( memask[18] ) m18->clear(bx);
+	  if ( memask[19] ) m19->clear(bx);
+	  if ( memask[20] ) m20->clear(bx);
+	  if ( memask[21] ) m21->clear(bx);
+	  if ( memask[22] ) m22->clear(bx);
+	  if ( memask[23] ) m23->clear(bx);
+	  if ( memask[24] ) m24->clear(bx);
+	  if ( memask[25] ) m25->clear(bx);
+	  if ( memask[26] ) m26->clear(bx);
+	  if ( memask[27] ) m27->clear(bx);
+	  if ( memask[28] ) m28->clear(bx);
+	  if ( memask[29] ) m29->clear(bx);
+	  if ( memask[30] ) m30->clear(bx);
+	  if ( memask[31] ) m31->clear(bx);
 
-		if ( TEIMASK & 0x1        ) mtei0->clear(bx);
-		if ( TEIMASK & 0x2        ) mtei1->clear(bx);
-		if ( TEIMASK & 0x4        ) mtei2->clear(bx);
-		if ( TEIMASK & 0x8        ) mtei3->clear(bx);
-		if ( TEIMASK & 0x10       ) mtei4->clear(bx);
-		if ( TEIMASK & 0x20       ) mtei5->clear(bx);
-		if ( TEIMASK & 0x40       ) mtei6->clear(bx);
-		if ( TEIMASK & 0x80       ) mtei7->clear(bx);
-		if ( TEIMASK & 0x100      ) mtei8->clear(bx);
-		if ( TEIMASK & 0x200      ) mtei9->clear(bx);
-		if ( TEIMASK & 0x400      ) mtei10->clear(bx);
-		if ( TEIMASK & 0x800      ) mtei11->clear(bx);
-		if ( TEIMASK & 0x1000     ) mtei12->clear(bx);
-		if ( TEIMASK & 0x2000     ) mtei13->clear(bx);
-		if ( TEIMASK & 0x4000     ) mtei14->clear(bx);
-		if ( TEIMASK & 0x8000     ) mtei15->clear(bx);
-		if ( TEIMASK & 0x10000    ) mtei16->clear(bx);
-		if ( TEIMASK & 0x20000    ) mtei17->clear(bx);
-		if ( TEIMASK & 0x40000    ) mtei18->clear(bx);
-		if ( TEIMASK & 0x80000    ) mtei19->clear(bx);
-		if ( TEIMASK & 0x100000   ) mtei20->clear(bx);
-		if ( TEIMASK & 0x200000   ) mtei21->clear(bx);
-		if ( TEIMASK & 0x400000   ) mtei22->clear(bx);
-		if ( TEIMASK & 0x800000   ) mtei23->clear(bx);
-		if ( TEIMASK & 0x1000000  ) mtei24->clear(bx);
-		if ( TEIMASK & 0x2000000  ) mtei25->clear(bx);
-		if ( TEIMASK & 0x4000000  ) mtei26->clear(bx);
-		if ( TEIMASK & 0x8000000  ) mtei27->clear(bx);
-		if ( TEIMASK & 0x10000000 ) mtei28->clear(bx);
-		if ( TEIMASK & 0x20000000 ) mtei29->clear(bx);
-		if ( TEIMASK & 0x40000000 ) mtei30->clear(bx);
-		if ( TEIMASK & 0x80000000 ) mtei31->clear(bx);
+		// if ( TEIMASK & 0x1        ) mtei0->clear(bx);
+		// if ( TEIMASK & 0x2        ) mtei1->clear(bx);
+		// if ( TEIMASK & 0x4        ) mtei2->clear(bx);
+		// if ( TEIMASK & 0x8        ) mtei3->clear(bx);
+		// if ( TEIMASK & 0x10       ) mtei4->clear(bx);
+		// if ( TEIMASK & 0x20       ) mtei5->clear(bx);
+		// if ( TEIMASK & 0x40       ) mtei6->clear(bx);
+		// if ( TEIMASK & 0x80       ) mtei7->clear(bx);
+		// if ( TEIMASK & 0x100      ) mtei8->clear(bx);
+		// if ( TEIMASK & 0x200      ) mtei9->clear(bx);
+		// if ( TEIMASK & 0x400      ) mtei10->clear(bx);
+		// if ( TEIMASK & 0x800      ) mtei11->clear(bx);
+		// if ( TEIMASK & 0x1000     ) mtei12->clear(bx);
+		// if ( TEIMASK & 0x2000     ) mtei13->clear(bx);
+		// if ( TEIMASK & 0x4000     ) mtei14->clear(bx);
+		// if ( TEIMASK & 0x8000     ) mtei15->clear(bx);
+		// if ( TEIMASK & 0x10000    ) mtei16->clear(bx);
+		// if ( TEIMASK & 0x20000    ) mtei17->clear(bx);
+		// if ( TEIMASK & 0x40000    ) mtei18->clear(bx);
+		// if ( TEIMASK & 0x80000    ) mtei19->clear(bx);
+		// if ( TEIMASK & 0x100000   ) mtei20->clear(bx);
+		// if ( TEIMASK & 0x200000   ) mtei21->clear(bx);
+		// if ( TEIMASK & 0x400000   ) mtei22->clear(bx);
+		// if ( TEIMASK & 0x800000   ) mtei23->clear(bx);
+		// if ( TEIMASK & 0x1000000  ) mtei24->clear(bx);
+		// if ( TEIMASK & 0x2000000  ) mtei25->clear(bx);
+		// if ( TEIMASK & 0x4000000  ) mtei26->clear(bx);
+		// if ( TEIMASK & 0x8000000  ) mtei27->clear(bx);
+		// if ( TEIMASK & 0x10000000 ) mtei28->clear(bx);
+		// if ( TEIMASK & 0x20000000 ) mtei29->clear(bx);
+		// if ( TEIMASK & 0x40000000 ) mtei30->clear(bx);
+		// if ( TEIMASK & 0x80000000 ) mtei31->clear(bx);
 
-		if ( OLMASK & 0x1        ) mteol0->clear(bx);
-		if ( OLMASK & 0x2        ) mteol1->clear(bx);
-		if ( OLMASK & 0x4        ) mteol2->clear(bx);
-		if ( OLMASK & 0x8        ) mteol3->clear(bx);
-		if ( OLMASK & 0x10       ) mteol4->clear(bx);
-		if ( OLMASK & 0x20       ) mteol5->clear(bx);
-		if ( OLMASK & 0x40       ) mteol6->clear(bx);
-		if ( OLMASK & 0x80       ) mteol7->clear(bx);
-		if ( OLMASK & 0x100      ) mteol8->clear(bx);
-		if ( OLMASK & 0x200      ) mteol9->clear(bx);
-		if ( OLMASK & 0x400      ) mteol10->clear(bx);
-		if ( OLMASK & 0x800      ) mteol11->clear(bx);
-		if ( OLMASK & 0x1000     ) mteol12->clear(bx);
-		if ( OLMASK & 0x2000     ) mteol13->clear(bx);
-		if ( OLMASK & 0x4000     ) mteol14->clear(bx);
-		if ( OLMASK & 0x8000     ) mteol15->clear(bx);
+		if ( teimask[0] ) mtei0->clear(bx);
+		if ( teimask[1] ) mtei1->clear(bx);
+		if ( teimask[2] ) mtei2->clear(bx);
+		if ( teimask[3] ) mtei3->clear(bx);
+		if ( teimask[4] ) mtei4->clear(bx);
+		if ( teimask[5] ) mtei5->clear(bx);
+		if ( teimask[6] ) mtei6->clear(bx);
+		if ( teimask[7] ) mtei7->clear(bx);
+		if ( teimask[8] ) mtei8->clear(bx);
+		if ( teimask[9] ) mtei9->clear(bx);
+		if ( teimask[10] ) mtei10->clear(bx);
+		if ( teimask[11] ) mtei11->clear(bx);
+		if ( teimask[12] ) mtei12->clear(bx);
+		if ( teimask[13] ) mtei13->clear(bx);
+		if ( teimask[14] ) mtei14->clear(bx);
+		if ( teimask[15] ) mtei15->clear(bx);
+		if ( teimask[16] ) mtei16->clear(bx);
+		if ( teimask[17] ) mtei17->clear(bx);
+		if ( teimask[18] ) mtei18->clear(bx);
+		if ( teimask[19] ) mtei19->clear(bx);
+		if ( teimask[20] ) mtei20->clear(bx);
+		if ( teimask[21] ) mtei21->clear(bx);
+		if ( teimask[22] ) mtei22->clear(bx);
+		if ( teimask[23] ) mtei23->clear(bx);
+		if ( teimask[24] ) mtei24->clear(bx);
+		if ( teimask[25] ) mtei25->clear(bx);
+		if ( teimask[26] ) mtei26->clear(bx);
+		if ( teimask[27] ) mtei27->clear(bx);
+		if ( teimask[28] ) mtei28->clear(bx);
+		if ( teimask[29] ) mtei29->clear(bx);
+		if ( teimask[30] ) mtei30->clear(bx);
+		if ( teimask[31] ) mtei31->clear(bx);
 
-		if ( TEOMASK & 0x1        ) mteo0->clear(bx);
-		if ( TEOMASK & 0x2        ) mteo1->clear(bx);
-		if ( TEOMASK & 0x4        ) mteo2->clear(bx);
-		if ( TEOMASK & 0x8        ) mteo3->clear(bx);
-		if ( TEOMASK & 0x10       ) mteo4->clear(bx);
-		if ( TEOMASK & 0x20       ) mteo5->clear(bx);
-		if ( TEOMASK & 0x40       ) mteo6->clear(bx);
-		if ( TEOMASK & 0x80       ) mteo7->clear(bx);
-		if ( TEOMASK & 0x100      ) mteo8->clear(bx);
-		if ( TEOMASK & 0x200      ) mteo9->clear(bx);
-		if ( TEOMASK & 0x400      ) mteo10->clear(bx);
-		if ( TEOMASK & 0x800      ) mteo11->clear(bx);
-		if ( TEOMASK & 0x1000     ) mteo12->clear(bx);
-		if ( TEOMASK & 0x2000     ) mteo13->clear(bx);
-		if ( TEOMASK & 0x4000     ) mteo14->clear(bx);
-		if ( TEOMASK & 0x8000     ) mteo15->clear(bx);
-		if ( TEOMASK & 0x10000    ) mteo16->clear(bx);
-		if ( TEOMASK & 0x20000    ) mteo17->clear(bx);
-		if ( TEOMASK & 0x40000    ) mteo18->clear(bx);
-		if ( TEOMASK & 0x80000    ) mteo19->clear(bx);
-		if ( TEOMASK & 0x100000   ) mteo20->clear(bx);
-		if ( TEOMASK & 0x200000   ) mteo21->clear(bx);
-		if ( TEOMASK & 0x400000   ) mteo22->clear(bx);
-		if ( TEOMASK & 0x800000   ) mteo23->clear(bx);
-		if ( TEOMASK & 0x1000000  ) mteo24->clear(bx);
-		if ( TEOMASK & 0x2000000  ) mteo25->clear(bx);
-		if ( TEOMASK & 0x4000000  ) mteo26->clear(bx);
-		if ( TEOMASK & 0x8000000  ) mteo27->clear(bx);
-		if ( TEOMASK & 0x10000000 ) mteo28->clear(bx);
-		if ( TEOMASK & 0x20000000 ) mteo29->clear(bx);
-		if ( TEOMASK & 0x40000000 ) mteo30->clear(bx);
-		if ( TEOMASK & 0x80000000 ) mteo31->clear(bx);
+		// if ( OLMASK & 0x1        ) mteol0->clear(bx);
+		// if ( OLMASK & 0x2        ) mteol1->clear(bx);
+		// if ( OLMASK & 0x4        ) mteol2->clear(bx);
+		// if ( OLMASK & 0x8        ) mteol3->clear(bx);
+		// if ( OLMASK & 0x10       ) mteol4->clear(bx);
+		// if ( OLMASK & 0x20       ) mteol5->clear(bx);
+		// if ( OLMASK & 0x40       ) mteol6->clear(bx);
+		// if ( OLMASK & 0x80       ) mteol7->clear(bx);
+		// if ( OLMASK & 0x100      ) mteol8->clear(bx);
+		// if ( OLMASK & 0x200      ) mteol9->clear(bx);
+		// if ( OLMASK & 0x400      ) mteol10->clear(bx);
+		// if ( OLMASK & 0x800      ) mteol11->clear(bx);
+		// if ( OLMASK & 0x1000     ) mteol12->clear(bx);
+		// if ( OLMASK & 0x2000     ) mteol13->clear(bx);
+		// if ( OLMASK & 0x4000     ) mteol14->clear(bx);
+		// if ( OLMASK & 0x8000     ) mteol15->clear(bx);
+		if ( olmask[0] ) mteol0->clear(bx);
+		if ( olmask[1] ) mteol1->clear(bx);
+		if ( olmask[2] ) mteol2->clear(bx);
+		if ( olmask[3] ) mteol3->clear(bx);
+		if ( olmask[4] ) mteol4->clear(bx);
+		if ( olmask[5] ) mteol5->clear(bx);
+		if ( olmask[6] ) mteol6->clear(bx);
+		if ( olmask[7] ) mteol7->clear(bx);
+		if ( olmask[8] ) mteol8->clear(bx);
+		if ( olmask[9] ) mteol9->clear(bx);
+		if ( olmask[10] ) mteol10->clear(bx);
+		if ( olmask[11] ) mteol11->clear(bx);
+		if ( olmask[12] ) mteol12->clear(bx);
+		if ( olmask[13] ) mteol13->clear(bx);
+		if ( olmask[14] ) mteol14->clear(bx);
+		if ( olmask[15] ) mteol15->clear(bx);
 
+		// if ( TEOMASK & 0x1        ) mteo0->clear(bx);
+		// if ( TEOMASK & 0x2        ) mteo1->clear(bx);
+		// if ( TEOMASK & 0x4        ) mteo2->clear(bx);
+		// if ( TEOMASK & 0x8        ) mteo3->clear(bx);
+		// if ( TEOMASK & 0x10       ) mteo4->clear(bx);
+		// if ( TEOMASK & 0x20       ) mteo5->clear(bx);
+		// if ( TEOMASK & 0x40       ) mteo6->clear(bx);
+		// if ( TEOMASK & 0x80       ) mteo7->clear(bx);
+		// if ( TEOMASK & 0x100      ) mteo8->clear(bx);
+		// if ( TEOMASK & 0x200      ) mteo9->clear(bx);
+		// if ( TEOMASK & 0x400      ) mteo10->clear(bx);
+		// if ( TEOMASK & 0x800      ) mteo11->clear(bx);
+		// if ( TEOMASK & 0x1000     ) mteo12->clear(bx);
+		// if ( TEOMASK & 0x2000     ) mteo13->clear(bx);
+		// if ( TEOMASK & 0x4000     ) mteo14->clear(bx);
+		// if ( TEOMASK & 0x8000     ) mteo15->clear(bx);
+		// if ( TEOMASK & 0x10000    ) mteo16->clear(bx);
+		// if ( TEOMASK & 0x20000    ) mteo17->clear(bx);
+		// if ( TEOMASK & 0x40000    ) mteo18->clear(bx);
+		// if ( TEOMASK & 0x80000    ) mteo19->clear(bx);
+		// if ( TEOMASK & 0x100000   ) mteo20->clear(bx);
+		// if ( TEOMASK & 0x200000   ) mteo21->clear(bx);
+		// if ( TEOMASK & 0x400000   ) mteo22->clear(bx);
+		// if ( TEOMASK & 0x800000   ) mteo23->clear(bx);
+		// if ( TEOMASK & 0x1000000  ) mteo24->clear(bx);
+		// if ( TEOMASK & 0x2000000  ) mteo25->clear(bx);
+		// if ( TEOMASK & 0x4000000  ) mteo26->clear(bx);
+		// if ( TEOMASK & 0x8000000  ) mteo27->clear(bx);
+		// if ( TEOMASK & 0x10000000 ) mteo28->clear(bx);
+		// if ( TEOMASK & 0x20000000 ) mteo29->clear(bx);
+		// if ( TEOMASK & 0x40000000 ) mteo30->clear(bx);
+		// if ( TEOMASK & 0x80000000 ) mteo31->clear(bx);
+
+		if ( teomask[0] ) mteo0->clear(bx);
+		if ( teomask[1] ) mteo1->clear(bx);
+		if ( teomask[2] ) mteo2->clear(bx);
+		if ( teomask[3] ) mteo3->clear(bx);
+		if ( teomask[4] ) mteo4->clear(bx);
+		if ( teomask[5] ) mteo5->clear(bx);
+		if ( teomask[6] ) mteo6->clear(bx);
+		if ( teomask[7] ) mteo7->clear(bx);
+		if ( teomask[8] ) mteo8->clear(bx);
+		if ( teomask[9] ) mteo9->clear(bx);
+		if ( teomask[10] ) mteo10->clear(bx);
+		if ( teomask[11] ) mteo11->clear(bx);
+		if ( teomask[12] ) mteo12->clear(bx);
+		if ( teomask[13] ) mteo13->clear(bx);
+		if ( teomask[14] ) mteo14->clear(bx);
+		if ( teomask[15] ) mteo15->clear(bx);
+		if ( teomask[16] ) mteo16->clear(bx);
+		if ( teomask[17] ) mteo17->clear(bx);
+		if ( teomask[18] ) mteo18->clear(bx);
+		if ( teomask[19] ) mteo19->clear(bx);
+		if ( teomask[20] ) mteo20->clear(bx);
+		if ( teomask[21] ) mteo21->clear(bx);
+		if ( teomask[22] ) mteo22->clear(bx);
+		if ( teomask[23] ) mteo23->clear(bx);
+		if ( teomask[24] ) mteo24->clear(bx);
+		if ( teomask[25] ) mteo25->clear(bx);
+		if ( teomask[26] ) mteo26->clear(bx);
+		if ( teomask[27] ) mteo27->clear(bx);
+		if ( teomask[28] ) mteo28->clear(bx);
+		if ( teomask[29] ) mteo29->clear(bx);
+		if ( teomask[30] ) mteo30->clear(bx);
+		if ( teomask[31] ) mteo31->clear(bx);
 
 		// Number of data in each input memory
 		// Maybe find a better way to do this one day
 		typename InputStubMemory<INTYPE>::NEntryT zero(0);
 
-		auto n_i0 = zero;
-		auto n_i1 = zero;
-		auto n_i2 = zero;
-		auto n_i3 = zero;
-		auto n_i4 = zero;
-		auto n_i5 = zero;
+		// auto n_i0 = zero;
+		// auto n_i1 = zero;
+		// auto n_i2 = zero;
+		// auto n_i3 = zero;
+		// auto n_i4 = zero;
+		// auto n_i5 = zero;
+		//
+		// if ( 0 < NINPUTS ) n_i0 = i0->getEntries(bx);
+		// if ( 1 < NINPUTS ) n_i1 = i1->getEntries(bx);
+		// if ( 2 < NINPUTS ) n_i2 = i2->getEntries(bx);
+		// if ( 3 < NINPUTS ) n_i3 = i3->getEntries(bx);
+		// if ( 4 < NINPUTS ) n_i4 = i4->getEntries(bx);
+		// if ( 5 < NINPUTS ) n_i5 = i5->getEntries(bx);
 
-		if ( 0 < NINPUTS ) n_i0 = i0->getEntries(bx);
-		if ( 1 < NINPUTS ) n_i1 = i1->getEntries(bx);
-		if ( 2 < NINPUTS ) n_i2 = i2->getEntries(bx);
-		if ( 3 < NINPUTS ) n_i3 = i3->getEntries(bx);
-		if ( 4 < NINPUTS ) n_i4 = i4->getEntries(bx);
-		if ( 5 < NINPUTS ) n_i5 = i5->getEntries(bx);
+		auto n_i0 = imask[0] != 0 ? i0->getEntries(bx) : zero; // change to nullptr?
+		auto n_i1 = imask[1] != 0 ? i1->getEntries(bx) : zero;
+		auto n_i2 = imask[2] != 0 ? i2->getEntries(bx) : zero;
+		auto n_i3 = imask[3] != 0 ? i3->getEntries(bx) : zero;
+		auto n_i4 = imask[4] != 0 ? i4->getEntries(bx) : zero;
+		auto n_i5 = imask[5] != 0 ? i5->getEntries(bx) : zero;
 
 		// need to figure out how to get the accurate total count of loop
 		// iterations here for nested loops. Count in innermost loop?
@@ -671,136 +797,135 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 			//}
 			#endif // DEBUG
 
-			//Maybe faster to check memask first...? Nah, seems to be the same
 			//0-9
-			if ( MEMASK &  0x1 ) {
+			if ( memask[0] ) {
 				if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) )
 				m0->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x2 ) {
+			if ( memask[1] ) {
 				if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) )
 				m1->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x4 ) {
+			if ( memask[2] ) {
 				if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 )
 				m2->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x8 ) {
+			if ( memask[3] ) {
 				if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 )
 				m3->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x10 ) {
+			if ( memask[4] ) {
 				if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 )
 				m4->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x20 ) {
+			if ( memask[5] ) {
 				if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 )
 				m5->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x40 ) {
+			if ( memask[6] ) {
 				if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 )
 				m6->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x80 ) {
+			if ( memask[7] ) {
 				if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 )
 				m7->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x100 ) {
+			if ( memask[8] ) {
 				if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 )
 				m8->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x200 ) {
+			if ( memask[9] ) {
 				if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 )
 				m9->write_mem(bx, bin, stubme);
 			}
 			// 10-19
-			if ( MEMASK &  0x400 ) {
+			if ( memask[10] ) {
 				if ( (iphiRaw == 10) || (iphiRawMinus == 10) || (iphiRawPlus == 10) )
 				m10->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x800 ) {
+			if ( memask[11] ) {
 				if ( (iphiRaw == 11) || (iphiRawMinus == 11) || (iphiRawPlus == 11) )
 				m11->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x1000 ) {
+			if ( memask[12] ) {
 				if ( iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12 )
 				m12->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x2000 ) {
+			if ( memask[13] ) {
 				if ( iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13 )
 				m13->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x4000 ) {
+			if ( memask[14] ) {
 				if ( iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14 )
 				m14->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x8000 ) {
+			if ( memask[15] ) {
 				if ( iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15 )
 				m15->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x10000 ) {
+			if ( memask[16] ) {
 				if ( iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16 )
 				m16->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x20000 ) {
+			if ( memask[17] ) {
 				if ( iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17 )
 				m17->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x40000 ) {
+			if ( memask[18] ) {
 				if ( iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18 )
 				m18->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x80000 ) {
+			if ( memask[19] ) {
 				if ( iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19 )
 				m19->write_mem(bx, bin, stubme);
 			}
 			// 20-29
-			if ( MEMASK &  0x100000 ) {
+			if ( memask[20] ) {
 				if ( (iphiRaw == 20) || (iphiRawMinus == 20) || (iphiRawPlus == 20) )
 				m20->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x200000 ) {
+			if ( memask[21] ) {
 				if ( (iphiRaw == 21) || (iphiRawMinus == 21) || (iphiRawPlus == 21) )
 				m21->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x400000 ) {
+			if ( memask[22] ) {
 				if ( iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22 )
 				m22->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x800000 ) {
+			if ( memask[23] ) {
 				if ( iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23 )
 				m23->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x1000000 ) {
+			if ( memask[24] ) {
 				if ( iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24 )
 				m24->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x2000000 ) {
+			if ( memask[25] ) {
 				if ( iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25 )
 				m25->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x4000000 ) {
+			if ( memask[26] ) {
 				if ( iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26 )
 				m26->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x8000000 ) {
+			if ( memask[27] ) {
 				if ( iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27 )
 				m27->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x10000000 ) {
+			if ( memask[28] ) {
 				if ( iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28 )
 				m28->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x20000000 ) {
+			if ( memask[29] ) {
 				if ( iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29 )
 				m29->write_mem(bx, bin, stubme);
 			}
 			// 30-31
-			if ( MEMASK &  0x40000000 ) {
+			if ( memask[30] ) {
 				if ( (iphiRaw == 30) || (iphiRawMinus == 30) || (iphiRawPlus == 30) )
 				m30->write_mem(bx, bin, stubme);
 			}
-			if ( MEMASK &  0x80000000 ) {
+			if ( memask[31] ) {
 				if ( (iphiRaw == 31) || (iphiRawMinus == 31) || (iphiRawPlus == 31) )
 				m31->write_mem(bx, bin, stubme);
 			}
@@ -826,7 +951,7 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 
 
 			// TE Inner
-			if ( TEIMASK != 0) {
+			if ( teimask != 0) {
 				VMStubTEInner<INTYPE> stubTeInner;
 
 				stubTeInner.setBend(bend);
@@ -862,205 +987,336 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 
 				// Save stub to memories
 				// 0-9
-				if ( TEIMASK & 0x1 ) {
-					if ( iphiRaw == 0 ) {
-						mtei0->write_mem(bx, stubTeInner, addrCount[0]);
-						addrCount[0] += 1;
-					}
+				if ( teimask[0] ) {
+				  if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) )
+				  mtei0->write_mem(bx, stubTeInner, addrCount[0]);
+				  addrCount[0] += 1;
 				}
-				if ( TEIMASK & 0x2 ) {
-					if ( iphiRaw == 1 ) {
-						mtei1->write_mem(bx, stubTeInner, addrCount[1]);
-						addrCount[1] += 1;
-					}
+				if ( teimask[1] ) {
+				  if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) )
+				  mtei1->write_mem(bx, stubTeInner, addrCount[1]);
+				  addrCount[1] += 1;
 				}
-				if ( TEIMASK & 0x4 ) {
-					if ( iphiRaw == 2 ) {
-						mtei2->write_mem(bx, stubTeInner, addrCount[2]);
-						addrCount[2] += 1;
-					}
+				if ( teimask[2] ) {
+				  if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 )
+				  mtei2->write_mem(bx, stubTeInner, addrCount[2]);
+				  addrCount[2] += 1;
 				}
-				if ( TEIMASK & 0x8 ) {
-					if ( iphiRaw == 3 ) {
-						mtei3->write_mem(bx, stubTeInner, addrCount[3]);
-						addrCount[3] += 1;
-					}
+				if ( teimask[3] ) {
+				  if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 )
+				  mtei3->write_mem(bx, stubTeInner, addrCount[3]);
+				  addrCount[3] += 1;
 				}
-				if ( TEIMASK & 0x10 ) {
-					if ( iphiRaw == 4 ) {
-						mtei4->write_mem(bx, stubTeInner, addrCount[4]);
-						addrCount[4] += 1;
-					}
+				if ( teimask[4] ) {
+				  if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 )
+				  mtei4->write_mem(bx, stubTeInner, addrCount[4]);
+				  addrCount[4] += 1;
 				}
-				if ( TEIMASK & 0x20 ) {
-					if ( iphiRaw == 5 ) {
-						mtei5->write_mem(bx, stubTeInner, addrCount[5]);
-						addrCount[5] += 1;
-					}
+				if ( teimask[5] ) {
+				  if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 )
+				  mtei5->write_mem(bx, stubTeInner, addrCount[5]);
+				  addrCount[5] += 1;
 				}
-				if ( TEIMASK & 0x40 ) {
-					if ( iphiRaw == 6 ) {
-						mtei6->write_mem(bx, stubTeInner, addrCount[6]);
-						addrCount[6] += 1;
-					}
+				if ( teimask[6] ) {
+				  if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 )
+				  mtei6->write_mem(bx, stubTeInner, addrCount[6]);
+				  addrCount[6] += 1;
 				}
-				if ( TEIMASK & 0x80 ) {
-					if ( iphiRaw == 7 ) {
-						mtei7->write_mem(bx, stubTeInner, addrCount[7]);
-						addrCount[7] += 1;
-					}
+				if ( teimask[7] ) {
+				  if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 )
+				  mtei7->write_mem(bx, stubTeInner, addrCount[7]);
+				  addrCount[7] += 1;
 				}
-				if ( TEIMASK & 0x100 ) {
-					if ( iphiRaw == 8 ) {
-						mtei8->write_mem(bx, stubTeInner, addrCount[8]);
-						addrCount[8] += 1;
-					}
+				if ( teimask[8] ) {
+				  if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 )
+				  mtei8->write_mem(bx, stubTeInner, addrCount[8]);
+				  addrCount[8] += 1;
 				}
-				if ( TEIMASK & 0x200 ) {
-					if ( iphiRaw == 9 ) {
-						mtei9->write_mem(bx, stubTeInner, addrCount[9]);
-						addrCount[9] += 1;
-					}
+				if ( teimask[9] ) {
+				  if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 )
+				  mtei9->write_mem(bx, stubTeInner, addrCount[9]);
+				  addrCount[9] += 1;
 				}
 				// 10-19
-				if ( TEIMASK & 0x400 ) {
-					if ( iphiRaw == 10 ) {
-						mtei10->write_mem(bx, stubTeInner, addrCount[10]);
-						addrCount[10] += 1;
-					}
+				if ( teimask[10] ) {
+				  if ( (iphiRaw == 10) || (iphiRawMinus == 10) || (iphiRawPlus == 10) )
+				  mtei10->write_mem(bx, stubTeInner, addrCount[10]);
+				  addrCount[10] += 1;
 				}
-				if ( TEIMASK & 0x800 ) {
-					if ( iphiRaw == 11 ) {
-						mtei11->write_mem(bx, stubTeInner, addrCount[11]);
-						addrCount[11] += 1;
-					}
+				if ( teimask[11] ) {
+				  if ( (iphiRaw == 11) || (iphiRawMinus == 11) || (iphiRawPlus == 11) )
+				  mtei11->write_mem(bx, stubTeInner, addrCount[11]);
+				  addrCount[11] += 1;
 				}
-				if ( TEIMASK & 0x1000 ) {
-					if ( iphiRaw == 12 ) {
-						mtei12->write_mem(bx, stubTeInner, addrCount[12]);
-						addrCount[12] += 1;
-					}
+				if ( teimask[12] ) {
+				  if ( iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12 )
+				  mtei12->write_mem(bx, stubTeInner, addrCount[12]);
+				  addrCount[12] += 1;
 				}
-				if ( TEIMASK & 0x2000 ) {
-					if ( iphiRaw == 13 ) {
-						mtei13->write_mem(bx, stubTeInner, addrCount[13]);
-						addrCount[13] += 1;
-					}
+				if ( teimask[13] ) {
+				  if ( iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13 )
+				  mtei13->write_mem(bx, stubTeInner, addrCount[13]);
+				  addrCount[13] += 1;
 				}
-				if ( TEIMASK & 0x4000 ) {
-					if ( iphiRaw == 14 ) {
-						mtei14->write_mem(bx, stubTeInner, addrCount[14]);
-						addrCount[14] += 1;
-					}
+				if ( teimask[14] ) {
+				  if ( iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14 )
+				  mtei14->write_mem(bx, stubTeInner, addrCount[14]);
+				  addrCount[14] += 1;
 				}
-				if ( TEIMASK & 0x8000 ) {
-					if ( iphiRaw == 15 ) {
-						mtei15->write_mem(bx, stubTeInner, addrCount[15]);
-						addrCount[15] +=  1;
-					}
+				if ( teimask[15] ) {
+				  if ( iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15 )
+				  mtei15->write_mem(bx, stubTeInner, addrCount[15]);
+				  addrCount[15] += 1;
 				}
-				if ( TEIMASK & 0x10000 ) {
-					if ( iphiRaw == 16 ) {
-						mtei16->write_mem(bx, stubTeInner, addrCount[16]);
-						addrCount[16] += 1;
-					}
+				if ( teimask[16] ) {
+				  if ( iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16 )
+				  mtei16->write_mem(bx, stubTeInner, addrCount[16]);
+				  addrCount[16] += 1;
 				}
-				if ( TEIMASK & 0x20000 ) {
-					if ( iphiRaw == 17 ) {
-						mtei17->write_mem(bx, stubTeInner, addrCount[17]);
-						addrCount[17] += 1;
-					}
+				if ( teimask[17] ) {
+				  if ( iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17 )
+				  mtei17->write_mem(bx, stubTeInner, addrCount[17]);
+				  addrCount[17] += 1;
 				}
-				if ( TEIMASK & 0x40000 ) {
-					if ( iphiRaw == 18 ) {
-						mtei18->write_mem(bx, stubTeInner, addrCount[18]);
-						addrCount[18] += 1;
-					}
+				if ( teimask[18] ) {
+				  if ( iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18 )
+				  mtei18->write_mem(bx, stubTeInner, addrCount[18]);
+				  addrCount[18] += 1;
 				}
-				if ( TEIMASK & 0x80000 ) {
-					if ( iphiRaw == 19 ) {
-						mtei19->write_mem(bx, stubTeInner, addrCount[19]);
-						addrCount[19] += 1;
-					}
+				if ( teimask[19] ) {
+				  if ( iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19 )
+				  mtei19->write_mem(bx, stubTeInner, addrCount[19]);
+				  addrCount[19] += 1;
 				}
 				// 20-29
-				if ( TEIMASK & 0x100000 ) {
-					if ( iphiRaw == 20 ) {
-						mtei20->write_mem(bx, stubTeInner, addrCount[20]);
-						addrCount[20] += 1;
-					}
+				if ( teimask[20] ) {
+				  if ( (iphiRaw == 20) || (iphiRawMinus == 20) || (iphiRawPlus == 20) )
+				  mtei20->write_mem(bx, stubTeInner, addrCount[20]);
+				  addrCount[20] += 1;
 				}
-				if ( TEIMASK & 0x2000000 ) {
-					if ( iphiRaw == 21 ) {
-						mtei21->write_mem(bx, stubTeInner, addrCount[21]);
-						addrCount[21] += 1;
-					}
+				if ( teimask[21] ) {
+				  if ( (iphiRaw == 21) || (iphiRawMinus == 21) || (iphiRawPlus == 21) )
+				  mtei21->write_mem(bx, stubTeInner, addrCount[21]);
+				  addrCount[21] += 1;
 				}
-				if ( TEIMASK & 0x4000000 ) {
-					if ( iphiRaw == 22 ) {
-						mtei22->write_mem(bx, stubTeInner, addrCount[22]);
-						addrCount[22] += 1;
-					}
+				if ( teimask[22] ) {
+				  if ( iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22 )
+				  mtei22->write_mem(bx, stubTeInner, addrCount[22]);
+				  addrCount[22] += 1;
 				}
-				if ( TEIMASK & 0x8000000 ) {
-					if ( iphiRaw == 23 ) {
-						mtei23->write_mem(bx, stubTeInner, addrCount[23]);
-						addrCount[23] += 1;
-					}
+				if ( teimask[23] ) {
+				  if ( iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23 )
+				  mtei23->write_mem(bx, stubTeInner, addrCount[23]);
+				  addrCount[23] += 1;
 				}
-				if ( TEIMASK & 0x10000000 ) {
-					if ( iphiRaw == 24 ) {
-						mtei24->write_mem(bx, stubTeInner, addrCount[24]);
-						addrCount[24] += 1;
-					}
+				if ( teimask[24] ) {
+				  if ( iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24 )
+				  mtei24->write_mem(bx, stubTeInner, addrCount[24]);
+				  addrCount[24] += 1;
 				}
-				if ( TEIMASK & 0x20000000 ) {
-					if ( iphiRaw == 25 ) {
-						mtei25->write_mem(bx, stubTeInner, addrCount[25]);
-						addrCount[25] += 1;
-					}
+				if ( teimask[25] ) {
+				  if ( iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25 )
+				  mtei25->write_mem(bx, stubTeInner, addrCount[25]);
+				  addrCount[25] += 1;
 				}
-				if ( TEIMASK & 0x40000000 ) {
-					if ( iphiRaw == 26 ) {
-						mtei26->write_mem(bx, stubTeInner, addrCount[26]);
-						addrCount[26] += 1;
-					}
+				if ( teimask[26] ) {
+				  if ( iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26 )
+				  mtei26->write_mem(bx, stubTeInner, addrCount[26]);
+				  addrCount[26] += 1;
 				}
-				if ( TEIMASK & 0x80000000 ) {
-					if ( iphiRaw == 27 ) {
-						mtei27->write_mem(bx, stubTeInner, addrCount[27]);
-						addrCount[27] += 1;
-					}
+				if ( teimask[27] ) {
+				  if ( iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27 )
+				  mtei27->write_mem(bx, stubTeInner, addrCount[27]);
+				  addrCount[27] += 1;
 				}
-				if ( TEIMASK & 0x10000000 ) {
-					if ( iphiRaw == 28 ) {
-						mtei28->write_mem(bx, stubTeInner, addrCount[28]);
-						addrCount[28] += 1;
-					}
+				if ( teimask[28] ) {
+				  if ( iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28 )
+				  mtei28->write_mem(bx, stubTeInner, addrCount[28]);
+				  addrCount[28] += 1;
 				}
-				if ( TEIMASK & 0x20000000 ) {
-					if ( iphiRaw == 29 ) {
-						mtei29->write_mem(bx, stubTeInner, addrCount[29]);
-						addrCount[29] += 1;
-					}
+				if ( teimask[29] ) {
+				  if ( iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29 )
+				  mtei29->write_mem(bx, stubTeInner, addrCount[29]);
+				  addrCount[29] += 1;
 				}
 				// 30-31
-				if ( TEIMASK & 0x40000000 ) {
-					if ( iphiRaw == 30 ) {
-						mtei30->write_mem(bx, stubTeInner, addrCount[30]);
-						addrCount[30] += 1;
-					}
+				if ( teimask[30] ) {
+				  if ( (iphiRaw == 30) || (iphiRawMinus == 30) || (iphiRawPlus == 30) )
+				  mtei30->write_mem(bx, stubTeInner, addrCount[30]);
+				  addrCount[30] += 1;
 				}
-				if ( TEIMASK & 0x80000000 ) {
-					if ( iphiRaw == 31 ) {
-						mtei31->write_mem(bx, stubTeInner, addrCount[31]);
-						addrCount[31] += 1;
-					}
+				if ( teimask[31] ) {
+				  if ( (iphiRaw == 31) || (iphiRawMinus == 31) || (iphiRawPlus == 31) )
+				  mtei31->write_mem(bx, stubTeInner, addrCount[31]);
+				  addrCount[31] += 1;
+				}
+				if ( teimask[0] ) {
+				  if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) )
+				  mtei0->write_mem(bx, stubTeInner, addrCount[0]);
+				  addrCount[0] += 1;
+				}
+				if ( teimask[1] ) {
+				  if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) )
+				  mtei1->write_mem(bx, stubTeInner, addrCount[1]);
+				  addrCount[1] += 1;
+				}
+				if ( teimask[2] ) {
+				  if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 )
+				  mtei2->write_mem(bx, stubTeInner, addrCount[2]);
+				  addrCount[2] += 1;
+				}
+				if ( teimask[3] ) {
+				  if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 )
+				  mtei3->write_mem(bx, stubTeInner, addrCount[3]);
+				  addrCount[3] += 1;
+				}
+				if ( teimask[4] ) {
+				  if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 )
+				  mtei4->write_mem(bx, stubTeInner, addrCount[4]);
+				  addrCount[4] += 1;
+				}
+				if ( teimask[5] ) {
+				  if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 )
+				  mtei5->write_mem(bx, stubTeInner, addrCount[5]);
+				  addrCount[5] += 1;
+				}
+				if ( teimask[6] ) {
+				  if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 )
+				  mtei6->write_mem(bx, stubTeInner, addrCount[6]);
+				  addrCount[6] += 1;
+				}
+				if ( teimask[7] ) {
+				  if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 )
+				  mtei7->write_mem(bx, stubTeInner, addrCount[7]);
+				  addrCount[7] += 1;
+				}
+				if ( teimask[8] ) {
+				  if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 )
+				  mtei8->write_mem(bx, stubTeInner, addrCount[8]);
+				  addrCount[8] += 1;
+				}
+				if ( teimask[9] ) {
+				  if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 )
+				  mtei9->write_mem(bx, stubTeInner, addrCount[9]);
+				  addrCount[9] += 1;
+				}
+				// 10-19
+				if ( teimask[10] ) {
+				  if ( (iphiRaw == 10) || (iphiRawMinus == 10) || (iphiRawPlus == 10) )
+				  mtei10->write_mem(bx, stubTeInner, addrCount[10]);
+				  addrCount[10] += 1;
+				}
+				if ( teimask[11] ) {
+				  if ( (iphiRaw == 11) || (iphiRawMinus == 11) || (iphiRawPlus == 11) )
+				  mtei11->write_mem(bx, stubTeInner, addrCount[11]);
+				  addrCount[11] += 1;
+				}
+				if ( teimask[12] ) {
+				  if ( iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12 )
+				  mtei12->write_mem(bx, stubTeInner, addrCount[12]);
+				  addrCount[12] += 1;
+				}
+				if ( teimask[13] ) {
+				  if ( iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13 )
+				  mtei13->write_mem(bx, stubTeInner, addrCount[13]);
+				  addrCount[13] += 1;
+				}
+				if ( teimask[14] ) {
+				  if ( iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14 )
+				  mtei14->write_mem(bx, stubTeInner, addrCount[14]);
+				  addrCount[14] += 1;
+				}
+				if ( teimask[15] ) {
+				  if ( iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15 )
+				  mtei15->write_mem(bx, stubTeInner, addrCount[15]);
+				  addrCount[15] += 1;
+				}
+				if ( teimask[16] ) {
+				  if ( iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16 )
+				  mtei16->write_mem(bx, stubTeInner, addrCount[16]);
+				  addrCount[16] += 1;
+				}
+				if ( teimask[17] ) {
+				  if ( iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17 )
+				  mtei17->write_mem(bx, stubTeInner, addrCount[17]);
+				  addrCount[17] += 1;
+				}
+				if ( teimask[18] ) {
+				  if ( iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18 )
+				  mtei18->write_mem(bx, stubTeInner, addrCount[18]);
+				  addrCount[18] += 1;
+				}
+				if ( teimask[19] ) {
+				  if ( iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19 )
+				  mtei19->write_mem(bx, stubTeInner, addrCount[19]);
+				  addrCount[19] += 1;
+				}
+				// 20-29
+				if ( teimask[20] ) {
+				  if ( (iphiRaw == 20) || (iphiRawMinus == 20) || (iphiRawPlus == 20) )
+				  mtei20->write_mem(bx, stubTeInner, addrCount[20]);
+				  addrCount[20] += 1;
+				}
+				if ( teimask[21] ) {
+				  if ( (iphiRaw == 21) || (iphiRawMinus == 21) || (iphiRawPlus == 21) )
+				  mtei21->write_mem(bx, stubTeInner, addrCount[21]);
+				  addrCount[21] += 1;
+				}
+				if ( teimask[22] ) {
+				  if ( iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22 )
+				  mtei22->write_mem(bx, stubTeInner, addrCount[22]);
+				  addrCount[22] += 1;
+				}
+				if ( teimask[23] ) {
+				  if ( iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23 )
+				  mtei23->write_mem(bx, stubTeInner, addrCount[23]);
+				  addrCount[23] += 1;
+				}
+				if ( teimask[24] ) {
+				  if ( iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24 )
+				  mtei24->write_mem(bx, stubTeInner, addrCount[24]);
+				  addrCount[24] += 1;
+				}
+				if ( teimask[25] ) {
+				  if ( iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25 )
+				  mtei25->write_mem(bx, stubTeInner, addrCount[25]);
+				  addrCount[25] += 1;
+				}
+				if ( teimask[26] ) {
+				  if ( iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26 )
+				  mtei26->write_mem(bx, stubTeInner, addrCount[26]);
+				  addrCount[26] += 1;
+				}
+				if ( teimask[27] ) {
+				  if ( iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27 )
+				  mtei27->write_mem(bx, stubTeInner, addrCount[27]);
+				  addrCount[27] += 1;
+				}
+				if ( teimask[28] ) {
+				  if ( iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28 )
+				  mtei28->write_mem(bx, stubTeInner, addrCount[28]);
+				  addrCount[28] += 1;
+				}
+				if ( teimask[29] ) {
+				  if ( iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29 )
+				  mtei29->write_mem(bx, stubTeInner, addrCount[29]);
+				  addrCount[29] += 1;
+				}
+				// 30-31
+				if ( teimask[30] ) {
+				  if ( (iphiRaw == 30) || (iphiRawMinus == 30) || (iphiRawPlus == 30) )
+				  mtei30->write_mem(bx, stubTeInner, addrCount[30]);
+				  addrCount[30] += 1;
+				}
+				if ( teimask[31] ) {
+				  if ( (iphiRaw == 31) || (iphiRawMinus == 31) || (iphiRawPlus == 31) )
+				  mtei31->write_mem(bx, stubTeInner, addrCount[31]);
+				  addrCount[31] += 1;
 				}
 			}
 
 			//  OVERLAP
-			if ( OLMASK != 0 ) {//(LAYER == 1  || LAYER == 2) { // Make sure that only layer 1 and 2 are overlapped
+			if ( olmask != 0 ) {//(LAYER == 1  || LAYER == 2) { // Make sure that only layer 1 and 2 are overlapped
 				assert(LAYER == 1  || LAYER == 2);
 				auto z = stub.getZ();
 				auto r = stub.getR();
@@ -1092,102 +1348,86 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 
 					// Save stub to memories
 					// 0-9
-					if ( OLMASK & 0x1 ) {
-						if ( iphiRaw == 0 ) {
-							mteol0->write_mem(bx, stubOL, addrCountOL[0]);
-							addrCountOL[0] += 1;
-						}
+					if ( olmask[0] ) {
+					  if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) )
+					  mteol0->write_mem(bx, stubOL, addrCountOL[0]);
+					  addrCountOL[0] += 1;
 					}
-					if ( OLMASK & 0x2 ) {
-						if ( iphiRaw == 1 ) {
-							mteol1->write_mem(bx, stubOL, addrCountOL[1]);
-							addrCountOL[1] += 1;
-						}
+					if ( olmask[1] ) {
+					  if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) )
+					  mteol1->write_mem(bx, stubOL, addrCountOL[1]);
+					  addrCountOL[1] += 1;
 					}
-					if ( OLMASK & 0x4 ) {
-						if ( iphiRaw == 2 ) {
-							mteol2->write_mem(bx, stubOL, addrCountOL[2]);
-							addrCountOL[2] += 1;
-						}
+					if ( olmask[2] ) {
+					  if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 )
+					  mteol2->write_mem(bx, stubOL, addrCountOL[2]);
+					  addrCountOL[2] += 1;
 					}
-					if ( OLMASK & 0x8 ) {
-						if ( iphiRaw == 3 ) {
-							mteol3->write_mem(bx, stubOL, addrCountOL[3]);
-							addrCountOL[3] += 1;
-						}
+					if ( olmask[3] ) {
+					  if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 )
+					  mteol3->write_mem(bx, stubOL, addrCountOL[3]);
+					  addrCountOL[3] += 1;
 					}
-					if ( OLMASK & 0x10 ) {
-						if ( iphiRaw == 4 ) {
-							mteol4->write_mem(bx, stubOL, addrCountOL[4]);
-							addrCountOL[4] += 1;
-						}
+					if ( olmask[4] ) {
+					  if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 )
+					  mteol4->write_mem(bx, stubOL, addrCountOL[4]);
+					  addrCountOL[4] += 1;
 					}
-					if ( OLMASK & 0x20 ) {
-						if ( iphiRaw == 5 ) {
-							mteol5->write_mem(bx, stubOL, addrCountOL[5]);
-							addrCountOL[5] += 1;
-						}
+					if ( olmask[5] ) {
+					  if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 )
+					  mteol5->write_mem(bx, stubOL, addrCountOL[5]);
+					  addrCountOL[5] += 1;
 					}
-					if ( OLMASK & 0x40 ) {
-						if ( iphiRaw == 6 ) {
-							mteol6->write_mem(bx, stubOL, addrCountOL[6]);
-							addrCountOL[6] += 1;
-						}
+					if ( olmask[6] ) {
+					  if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 )
+					  mteol6->write_mem(bx, stubOL, addrCountOL[6]);
+					  addrCountOL[6] += 1;
 					}
-					if ( OLMASK & 0x80 ) {
-						if ( iphiRaw == 7 ) {
-							mteol7->write_mem(bx, stubOL, addrCountOL[7]);
-							addrCountOL[7] += 1;
-						}
+					if ( olmask[7] ) {
+					  if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 )
+					  mteol7->write_mem(bx, stubOL, addrCountOL[7]);
+					  addrCountOL[7] += 1;
 					}
-					if ( OLMASK & 0x100 ) {
-						if ( iphiRaw == 8 ) {
-							mteol8->write_mem(bx, stubOL, addrCountOL[8]);
-							addrCountOL[8] += 1;
-						}
+					if ( olmask[8] ) {
+					  if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 )
+					  mteol8->write_mem(bx, stubOL, addrCountOL[8]);
+					  addrCountOL[8] += 1;
 					}
-					if ( OLMASK & 0x200 ) {
-						if ( iphiRaw == 9 ) {
-							mteol9->write_mem(bx, stubOL, addrCountOL[9]);
-							addrCountOL[9] += 1;
-						}
+					if ( olmask[9] ) {
+					  if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 )
+					  mteol9->write_mem(bx, stubOL, addrCountOL[9]);
+					  addrCountOL[9] += 1;
 					}
 					// 10-19
-					if ( OLMASK & 0x400 ) {
-						if ( iphiRaw == 10 ) {
-							mteol10->write_mem(bx, stubOL, addrCountOL[10]);
-							addrCountOL[10] += 1;
-						}
+					if ( olmask[10] ) {
+					  if ( (iphiRaw == 10) || (iphiRawMinus == 10) || (iphiRawPlus == 10) )
+					  mteol10->write_mem(bx, stubOL, addrCountOL[10]);
+					  addrCountOL[10] += 1;
 					}
-					if ( OLMASK & 0x800 ) {
-						if ( iphiRaw == 11 ) {
-							mteol11->write_mem(bx, stubOL, addrCountOL[11]);
-							addrCountOL[11] += 1;
-						}
+					if ( olmask[11] ) {
+					  if ( (iphiRaw == 11) || (iphiRawMinus == 11) || (iphiRawPlus == 11) )
+					  mteol11->write_mem(bx, stubOL, addrCountOL[11]);
+					  addrCountOL[11] += 1;
 					}
-					if ( OLMASK & 0x1000 ) {
-						if ( iphiRaw == 12 ) {
-							mteol12->write_mem(bx, stubOL, addrCountOL[12]);
-							addrCountOL[12] += 1;
-						}
+					if ( olmask[12] ) {
+					  if ( iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12 )
+					  mteol12->write_mem(bx, stubOL, addrCountOL[12]);
+					  addrCountOL[12] += 1;
 					}
-					if ( OLMASK & 0x2000 ) {
-						if ( iphiRaw == 13 ) {
-							mteol13->write_mem(bx, stubOL, addrCountOL[13]);
-							addrCountOL[13] += 1;
-						}
+					if ( olmask[13] ) {
+					  if ( iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13 )
+					  mteol13->write_mem(bx, stubOL, addrCountOL[13]);
+					  addrCountOL[13] += 1;
 					}
-					if ( OLMASK & 0x4000 ) {
-						if ( iphiRaw == 14 ) {
-							mteol14->write_mem(bx, stubOL, addrCountOL[14]);
-							addrCountOL[14] += 1;
-						}
+					if ( olmask[14] ) {
+					  if ( iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14 )
+					  mteol14->write_mem(bx, stubOL, addrCountOL[14]);
+					  addrCountOL[14] += 1;
 					}
-					if ( OLMASK & 0x8000 ) {
-						if ( iphiRaw == 15 ) {
-							mteol15->write_mem(bx, stubOL, addrCountOL[15]);
-							addrCountOL[15] +=  1;
-						}
+					if ( olmask[15] ) {
+					  if ( iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15 )
+					  mteol15->write_mem(bx, stubOL, addrCountOL[15]);
+					  addrCountOL[15] += 1;
 					}
 				}
 				else {
@@ -1196,7 +1436,7 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 			}
 
 			// TE Outer
-			if ( TEOMASK != 0) {
+			if ( teomask != 0) {
 				VMStubTEOuter<INTYPE> stubTeOuter;
 
 				stubTeOuter.setBend(bend);
@@ -1206,8 +1446,8 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 
 				// LAYER
 				if ( LAYER != 0 ) {
-					auto nphireg = 5;
-					auto nfinephi = nfinephibarrelouter; // Number of bits for finephi?
+					auto nphireg = 4;
+					auto nfinephi = 3;//nfinephibarrelouter; // Number of bits for finephi?
 					auto z = stub.getZ();
 
 					// stubTeOuter.setFineR(); can I use finebintable?
@@ -1248,200 +1488,136 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi, const int V
 
 				// Save stub to memories
 				// 0-9
-				if ( TEOMASK & 0x1 ) {
-					if ( iphiRaw == 0 ) {
-						mteo0->write_mem(bx, bin, stubTeOuter);
-						addrCount[0] += 1;
-					}
+				if ( teomask[0] ) {
+				  if ( (iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0) )
+				  mteo0->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x2 ) {
-					if ( iphiRaw == 1 ) {
-						mteo1->write_mem(bx, bin, stubTeOuter);
-						addrCount[1] += 1;
-					}
+				if ( teomask[1] ) {
+				  if ( (iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1) )
+				  mteo1->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x4 ) {
-					if ( iphiRaw == 2 ) {
-						mteo2->write_mem(bx, bin, stubTeOuter);
-						addrCount[2] += 1;
-					}
+				if ( teomask[2] ) {
+				  if ( iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2 )
+				  mteo2->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x8 ) {
-					if ( iphiRaw == 3 ) {
-						mteo3->write_mem(bx, bin, stubTeOuter);
-						addrCount[3] += 1;
-					}
+				if ( teomask[3] ) {
+				  if ( iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3 )
+				  mteo3->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x10 ) {
-					if ( iphiRaw == 4 ) {
-						mteo4->write_mem(bx, bin, stubTeOuter);
-						addrCount[4] += 1;
-					}
+				if ( teomask[4] ) {
+				  if ( iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4 )
+				  mteo4->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x20 ) {
-					if ( iphiRaw == 5 ) {
-						mteo5->write_mem(bx, bin, stubTeOuter);
-						addrCount[5] += 1;
-					}
+				if ( teomask[5] ) {
+				  if ( iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5 )
+				  mteo5->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x40 ) {
-					if ( iphiRaw == 6 ) {
-						mteo6->write_mem(bx, bin, stubTeOuter);
-						addrCount[6] += 1;
-					}
+				if ( teomask[6] ) {
+				  if ( iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6 )
+				  mteo6->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x80 ) {
-					if ( iphiRaw == 7 ) {
-						mteo7->write_mem(bx, bin, stubTeOuter);
-						addrCount[7] += 1;
-					}
+				if ( teomask[7] ) {
+				  if ( iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7 )
+				  mteo7->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x100 ) {
-					if ( iphiRaw == 8 ) {
-						mteo8->write_mem(bx, bin, stubTeOuter);
-						addrCount[8] += 1;
-					}
+				if ( teomask[8] ) {
+				  if ( iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8 )
+				  mteo8->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x200 ) {
-					if ( iphiRaw == 9 ) {
-						mteo9->write_mem(bx, bin, stubTeOuter);
-						addrCount[9] += 1;
-					}
+				if ( teomask[9] ) {
+				  if ( iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9 )
+				  mteo9->write_mem(bx, bin, stubTeOuter);
 				}
 				// 10-19
-				if ( TEOMASK & 0x400 ) {
-					if ( iphiRaw == 10 ) {
-						mteo10->write_mem(bx, bin, stubTeOuter);
-						addrCount[10] += 1;
-					}
+				if ( teomask[10] ) {
+				  if ( (iphiRaw == 10) || (iphiRawMinus == 10) || (iphiRawPlus == 10) )
+				  mteo10->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x800 ) {
-					if ( iphiRaw == 11 ) {
-						mteo11->write_mem(bx, bin, stubTeOuter);
-						addrCount[11] += 1;
-					}
+				if ( teomask[11] ) {
+				  if ( (iphiRaw == 11) || (iphiRawMinus == 11) || (iphiRawPlus == 11) )
+				  mteo11->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x1000 ) {
-					if ( iphiRaw == 12 ) {
-						mteo12->write_mem(bx, bin, stubTeOuter);
-						addrCount[12] += 1;
-					}
+				if ( teomask[12] ) {
+				  if ( iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12 )
+				  mteo12->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x2000 ) {
-					if ( iphiRaw == 13 ) {
-						mteo13->write_mem(bx, bin, stubTeOuter);
-						addrCount[13] += 1;
-					}
+				if ( teomask[13] ) {
+				  if ( iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13 )
+				  mteo13->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x4000 ) {
-					if ( iphiRaw == 14 ) {
-						mteo14->write_mem(bx, bin, stubTeOuter);
-						addrCount[14] += 1;
-					}
+				if ( teomask[14] ) {
+				  if ( iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14 )
+				  mteo14->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x8000 ) {
-					if ( iphiRaw == 15 ) {
-						mteo15->write_mem(bx, bin, stubTeOuter);
-						addrCount[15] +=  1;
-					}
+				if ( teomask[15] ) {
+				  if ( iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15 )
+				  mteo15->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x10000 ) {
-					if ( iphiRaw == 16 ) {
-						mteo16->write_mem(bx, bin, stubTeOuter);
-						addrCount[16] += 1;
-					}
+				if ( teomask[16] ) {
+				  if ( iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16 )
+				  mteo16->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x20000 ) {
-					if ( iphiRaw == 17 ) {
-						mteo17->write_mem(bx, bin, stubTeOuter);
-						addrCount[17] += 1;
-					}
+				if ( teomask[17] ) {
+				  if ( iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17 )
+				  mteo17->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x40000 ) {
-					if ( iphiRaw == 18 ) {
-						mteo18->write_mem(bx, bin, stubTeOuter);
-						addrCount[18] += 1;
-					}
+				if ( teomask[18] ) {
+				  if ( iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18 )
+				  mteo18->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x80000 ) {
-					if ( iphiRaw == 19 ) {
-						mteo19->write_mem(bx, bin, stubTeOuter);
-						addrCount[19] += 1;
-					}
+				if ( teomask[19] ) {
+				  if ( iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19 )
+				  mteo19->write_mem(bx, bin, stubTeOuter);
 				}
 				// 20-29
-				if ( TEOMASK & 0x100000 ) {
-					if ( iphiRaw == 20 ) {
-						mteo20->write_mem(bx, bin, stubTeOuter);
-						addrCount[20] += 1;
-					}
+				if ( teomask[20] ) {
+				  if ( (iphiRaw == 20) || (iphiRawMinus == 20) || (iphiRawPlus == 20) )
+				  mteo20->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x2000000 ) {
-					if ( iphiRaw == 21 ) {
-						mteo21->write_mem(bx, bin, stubTeOuter);
-						addrCount[21] += 1;
-					}
+				if ( teomask[21] ) {
+				  if ( (iphiRaw == 21) || (iphiRawMinus == 21) || (iphiRawPlus == 21) )
+				  mteo21->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x4000000 ) {
-					if ( iphiRaw == 22 ) {
-						mteo22->write_mem(bx, bin, stubTeOuter);
-						addrCount[22] += 1;
-					}
+				if ( teomask[22] ) {
+				  if ( iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22 )
+				  mteo22->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x8000000 ) {
-					if ( iphiRaw == 23 ) {
-						mteo23->write_mem(bx, bin, stubTeOuter);
-						addrCount[23] += 1;
-					}
+				if ( teomask[23] ) {
+				  if ( iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23 )
+				  mteo23->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x10000000 ) {
-					if ( iphiRaw == 24 ) {
-						mteo24->write_mem(bx, bin, stubTeOuter);
-						addrCount[24] += 1;
-					}
+				if ( teomask[24] ) {
+				  if ( iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24 )
+				  mteo24->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x20000000 ) {
-					if ( iphiRaw == 25 ) {
-						mteo25->write_mem(bx, bin, stubTeOuter);
-						addrCount[25] += 1;
-					}
+				if ( teomask[25] ) {
+				  if ( iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25 )
+				  mteo25->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x40000000 ) {
-					if ( iphiRaw == 26 ) {
-						mteo26->write_mem(bx, bin, stubTeOuter);
-						addrCount[26] += 1;
-					}
+				if ( teomask[26] ) {
+				  if ( iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26 )
+				  mteo26->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x80000000 ) {
-					if ( iphiRaw == 27 ) {
-						mteo27->write_mem(bx, bin, stubTeOuter);
-						addrCount[27] += 1;
-					}
+				if ( teomask[27] ) {
+				  if ( iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27 )
+				  mteo27->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x10000000 ) {
-					if ( iphiRaw == 28 ) {
-						mteo28->write_mem(bx, bin, stubTeOuter);
-						addrCount[28] += 1;
-					}
+				if ( teomask[28] ) {
+				  if ( iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28 )
+				  mteo28->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x20000000 ) {
-					if ( iphiRaw == 29 ) {
-						mteo29->write_mem(bx, bin, stubTeOuter);
-						addrCount[29] += 1;
-					}
+				if ( teomask[29] ) {
+				  if ( iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29 )
+				  mteo29->write_mem(bx, bin, stubTeOuter);
 				}
 				// 30-31
-				if ( TEOMASK & 0x40000000 ) {
-					if ( iphiRaw == 30 ) {
-						mteo30->write_mem(bx, bin, stubTeOuter);
-						addrCount[30] += 1;
-					}
+				if ( teomask[30] ) {
+				  if ( (iphiRaw == 30) || (iphiRawMinus == 30) || (iphiRawPlus == 30) )
+				  mteo30->write_mem(bx, bin, stubTeOuter);
 				}
-				if ( TEOMASK & 0x80000000 ) {
-					if ( iphiRaw == 31 ) {
-						mteo31->write_mem(bx, bin, stubTeOuter);
-						addrCount[31] += 1;
-					}
+				if ( teomask[31] ) {
+				  if ( (iphiRaw == 31) || (iphiRawMinus == 31) || (iphiRawPlus == 31) )
+				  mteo31->write_mem(bx, bin, stubTeOuter);
 				}
 			}
 
