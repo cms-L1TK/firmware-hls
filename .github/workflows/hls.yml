@@ -1,7 +1,7 @@
 name: HLS build on lnxfarm327
 env:
   VIVADO_VERSION: '2019.2'
-  VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION }}/settings64.sh
+  VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
   GLOBAL_RUN_CMD: cd project && source ${{ VIVADO_PATH_SH }} && vivado_hls -f "script_CMD.tcl"
 
 on: # Controls when the action will run.
@@ -17,6 +17,9 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Debug # Script name
       run: |
         pwd; ls -a; ls -a project; ls -a $GITHUB_WORKSPACE; # Debug
+        $(echo ${{ env.VIVADO_VERSION }})
+        $(echo /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION}}/settings64.sh)
+        $(echo ${{ env.GLOBAL_RUN_CMD }})
     - name: MC # Script name
       id: ${{ MC }}
       env:
