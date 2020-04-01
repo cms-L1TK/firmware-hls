@@ -23,7 +23,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         $(echo ${{ env.GLOBAL_RUN_CMD }})
     - name: MC # Script name
       id: MC
-      env:
+#      env:
 #        RUN_CMD: $(echo ${{ env.GLOBAL_RUN_CMD }} | sed -E 's|CMD|echo(${{ jobs.<job_id>.steps.id }})|')
 #      run: ${{ RUN_CMD }}
       run: |
