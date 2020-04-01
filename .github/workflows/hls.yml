@@ -12,7 +12,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
   hls-build: # Job name
     runs-on: self-hosted # The type of runner that the job will run on
     env: 
-      VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION}}/settings64.sh
+      VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/${{ VIVADO_VERSION}}/settings64.sh
     steps: # Steps represent a sequence of tasks that will be executed as part of the job
     - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Debug # Script name
