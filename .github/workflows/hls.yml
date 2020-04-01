@@ -19,7 +19,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         pwd; ls -a; ls -a project; ls -a $GITHUB_WORKSPACE; # Debug
         echo ${{ env.VIVADO_VERSION }}
         echo $(echo ${{ env.VIVADO_VERSION }})
-        $(echo /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION}}/settings64.sh)
+        echo /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION}}/settings64.sh
 #        $(echo ${{ env.GLOBAL_RUN_CMD }})
     - name: MC # Script name
       id: MC
