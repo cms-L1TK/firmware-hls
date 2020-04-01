@@ -22,7 +22,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         $(echo /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION}}/settings64.sh)
         $(echo ${{ env.GLOBAL_RUN_CMD }})
     - name: MC # Script name
-      id: ${{ MC }}
+      id: MC
       env:
         RUN_CMD: $(echo ${{ env.GLOBAL_RUN_CMD }} | sed -E 's|CMD|${{ jobs.<job_id>.steps.id }}|')
       run: ${{ RUN_CMD }}
