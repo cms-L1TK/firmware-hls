@@ -1,7 +1,7 @@
 name: HLS build on lnxfarm327
 env:
   VIVADO_VERSION: '2019.2'
-  VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/${{ VIVADO_VERSION }}/settings64.sh
+  VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/${{ env.VIVADO_VERSION }}/settings64.sh
   GLOBAL_RUN_CMD: cd project && source ${{ VIVADO_PATH_SH }} && vivado_hls -f "script_CMD.tcl"
 
 on: # Controls when the action will run.
