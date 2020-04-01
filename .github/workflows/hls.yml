@@ -24,8 +24,8 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: MC # Script name
       id: MC
       env:
-        RUN_CMD: $(echo ${{ env.GLOBAL_RUN_CMD }} | sed -E 's|CMD|echo(${{ jobs.<job_id>.steps.id }})|')
-      run: ${{ RUN_CMD }}
+#        RUN_CMD: $(echo ${{ env.GLOBAL_RUN_CMD }} | sed -E 's|CMD|echo(${{ jobs.<job_id>.steps.id }})|')
+#      run: ${{ RUN_CMD }}
 #      run: |
 #        cd project
 #        source $VIVADO_PATH_SH
