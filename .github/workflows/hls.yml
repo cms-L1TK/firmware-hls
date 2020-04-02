@@ -1,8 +1,6 @@
 name: HLS build on lnxfarm327
 env:
-  VIVADO_VERSION: '2019.2'
-  VIVADO_PATH_SH: /nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh
-  GLOBAL_RUN_CMD: cd project && source echo(${{ VIVADO_PATH_SH }}) && vivado_hls -f "script_CMD.tcl"
+  VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/2019.2/settings64.sh'
 
 on: # Controls when the action will run.
   push: # Please add your branch down here if wanted. A build will be triggerd for each push.
@@ -17,16 +15,10 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Debug # Script name
       run: |
         pwd; ls -a; ls -a project; ls -a $GITHUB_WORKSPACE; # Debug
-#        $(echo ${{ env.GLOBAL_RUN_CMD }})
     - name: MC # Script name
-      id: MC
-#      env:
-#        RUN_CMD: $(echo ${{ env.GLOBAL_RUN_CMD }} | sed -E 's|CMD|echo(${{ jobs.<job_id>.steps.id }})|')
-#      run: ${{ RUN_CMD }}
       run: |
-        cd project
-#        source $VIVADO_PATH_SH
-#        vivado_hls -f "script_MC.tcl"
+        cd project; source $VIVADO_PATH_SH
+        vivado_hls -f "script_MC.tcl"
     - name: Upload results
       uses: actions/upload-artifact@v1
       with:
@@ -34,8 +26,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         path: project/match_calc/solution1/syn/report/MatchCalculatorTop_csynth.rpt
     - name: ME # Script name
       run: |
-        cd project
-        source $VIVADO_PATH_SH
+        cd project; source $VIVADO_PATH_SH
         vivado_hls -f "script_ME.tcl"
     - name: Upload results
       uses: actions/upload-artifact@v1
@@ -44,8 +35,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         path: project/matchengine/solution1/syn/report/MatchEngineTopL3_csynth.rpt
     - name: PR # Script name
       run: |
-        cd project
-        source $VIVADO_PATH_SH
+        cd project; source $VIVADO_PATH_SH
         vivado_hls -f "script_PR.tcl"
     - name: Upload results
       uses: actions/upload-artifact@v1
@@ -54,8 +44,7 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
         path: project/projrouter/solution1/syn/report/ProjectionRouterTop_csynth.rpt
     - name: TC # Script name
       run: |
-        cd project
-        source $VIVADO_PATH_SH
+        cd project; source $VIVADO_PATH_SH
         vivado_hls -f "script_TC.tcl"
     - name: Upload results
       uses: actions/upload-artifact@v1
