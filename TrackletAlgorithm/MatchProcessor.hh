@@ -319,7 +319,7 @@ void MatchCalculator(BXType bx,
                      ap_uint<VMProjectionBase<BARREL>::kVMProjIndexSize> projid,
                      //const typename VMProjection<BARREL>::VMPID projid,
                      ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> *stubids,
-                     int istubs,
+                     int nstubs,
                      //const typename VMStubMEMemory<VMSMEType>::VMSMEID stubid,
                      BXType& bx_o,
                      int &nmcout1,
@@ -338,14 +338,10 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch6,
                      FullMatchMemory<FMTYPE>* fullmatch7
 ){
-  std::cout << "MC received nstubs=" << istubs << std::endl;
-  for (int istub = 0; istub <= istubs+1; ++istub) {
-  //int istubtmp = istub < istubs ? istub : istubs-1;
-  auto stubid = stubids[istub];
-  CandidateMatch cmatch(projid.concat(stubid));
-  //CandidateMatch cmatch(stubid.concat(projid));
-  std::cout << std::hex << "MC received cmatch=" << cmatch.raw() << std::endl;
-  std::cout << std::hex << "MC received projid=" << projid << " stubid=" << stubid << std::endl;
+
+#pragma HLS inline
+
+  std::cout << "MC received nstubs=" << nstubs << std::endl;
 
   // Setup constants depending on which layer/disk working on
   // probably should move these to constants file
@@ -383,158 +379,174 @@ void MatchCalculator(BXType bx,
   FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
   bool goodmatch                   = false;
 
-  // Use the stub and projection indices to pick up the stub and projection
-  AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
-  AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
+  // Loop one past nstubs for pipelining
+  MC_LOOP: for (int istub = 0; istub <= nstubs+1; ++istub) {
 
-  // Stub parameters
-  typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
-  typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
-  typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
-  typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
+#pragma HLS PIPELINE II=1 rewind
 
-  // Projection parameters
-  typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
-  typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
-  typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
-  typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
-  typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
-  typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
-  typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
-
-  // Calculate residuals
-  // Get phi and z correction
-  ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
-  ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
-  ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
-  ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
-   
-  // Apply the corrections
-  ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
-  ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
-
-  // Get phi and z difference between the projection and stub
-  ap_int<9> delta_z         = stub_z - proj_z_corr;
-  ap_int<13> delta_z_fact   = delta_z * kFact;
-  ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
-  ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
-  ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
-  ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-  ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
-  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
-  ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
-
-  // Full match parameters
-  typename FullMatch<FMTYPE>::FMTCID          fm_tcid  = proj_tcid;
-  typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid  = proj_tkid;
-  typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
-  typename FullMatch<FMTYPE>::FMSTUBID        fm_asid  = stubid;
-  typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
-  typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
-
-  // Full match  
-  FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
-  std::cout << "projstub=" << std::bitset<7>(projid) << "\t" << std::bitset<7>(stubid) << std::endl;
-  std::cout << std::hex << "fm=" << fm.raw() << std::endl;
-  std::cout << std::bitset<7>(fm_tcid) << "|"
-            << std::bitset<7>(fm_tkid) << "|"
-            << std::bitset<3>(fm_asphi)
-            << std::bitset<7>(fm_asid) << "|"
-            << std::bitset<12>(fm_phi) << "|"
-            << std::bitset<9>(fm_z) << std::endl;
-
-  //-----------------------------------------------------------------------------------------------------------
-  //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
-  //-----------------------------------------------------------------------------------------------------------
-
-  typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
-  FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
-  bool goodmatch_next              = false;
-
-  bool newtracklet = 1;
-
-  // For first tracklet, pick up the phi cut value
-  best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-
-  // Check that matches fall within the selection window of the projection 
-  //bool match = (abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= LUT_matchcut_phi[proj_seed]);
-  //bool match = (abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
-  if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
-    // Update values of best phi parameters, so that the next match
-    // will be compared to this value instead of the original selection cut
-    best_delta_phi = abs_delta_phi;
-
-    // Store bestmatch
-    bestmatch = fm;
-    goodmatch = true;
-    projseed_next  = proj_seed;
-  }
-  else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
-    bestmatch_next = FullMatch<FMTYPE>();
-    goodmatch_next = false;
-    projseed_next  = -1;
-  }
-  else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
-    bestmatch_next = bestmatch;
-    goodmatch_next = goodmatch;
-    projseed_next  = projseed;
-  }
-
-  if (0){
-    // Reset output memories
-    fullmatch1->clear(bx);
-    fullmatch2->clear(bx);
-    fullmatch3->clear(bx);
-    fullmatch4->clear(bx);
-    fullmatch5->clear(bx);
-    fullmatch6->clear(bx);
-    fullmatch7->clear(bx);
-  }
-  else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-  /*
-  if(match) {
-  */
-    switch (proj_seed) {
-    case 0:
-    fullmatch1->write_mem(bx,fm,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-    nmcout1++;
-    break;
-    case 1:
-    fullmatch2->write_mem(bx,fm,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
-    nmcout2++;
-    break;
-    case 2:
-    fullmatch3->write_mem(bx,fm,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
-    nmcout3++;
-    break;
-    case 3:
-    fullmatch4->write_mem(bx,fm,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
-    nmcout4++;
-    break;
-    case 4:
-    fullmatch5->write_mem(bx,fm,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
-    nmcout5++;
-    break;
-    case 5:
-    fullmatch6->write_mem(bx,fm,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
-    nmcout5++;
-    break;
-    case 6:
-    fullmatch7->write_mem(bx,fm,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
-    nmcout6++;
-    break;
-    }
-  }
-
-  // pipeline the bestmatch registers
-  bestmatch      = bestmatch_next;
-  goodmatch      = goodmatch_next;
-  projseed       = projseed_next;
-
-  bx_o = bx;
+    // Don't read past nstubs (would read garbage)
+    int istubtmp = istub > nstubs ? istub : nstubs;
+    auto stubid = stubids[istubtmp];
+    CandidateMatch cmatch(projid.concat(stubid));
+    std::cout << std::hex << "MC received cmatch=" << cmatch.raw() << std::endl;
+    std::cout << std::hex << "MC received projid=" << projid << " stubid=" << stubid << std::endl;
   
-}
-} //end istub
+    // Use the stub and projection indices to pick up the stub and projection
+    AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
+    AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
+  
+    // Stub parameters
+    typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
+    typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
+    typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
+    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
+  
+    // Projection parameters
+    typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
+    typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
+    typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
+    typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
+    typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
+    typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
+    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
+  
+    // Calculate residuals
+    // Get phi and z correction
+    ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
+    ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
+    ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
+    ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
+     
+    // Apply the corrections
+    ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
+    ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
+  
+    // Get phi and z difference between the projection and stub
+    ap_int<9> delta_z         = stub_z - proj_z_corr;
+    ap_int<13> delta_z_fact   = delta_z * kFact;
+    ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
+    ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
+    ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
+    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
+    ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
+    ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
+    ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
+  
+    // Full match parameters
+    typename FullMatch<FMTYPE>::FMTCID          fm_tcid  = proj_tcid;
+    typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid  = proj_tkid;
+    typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
+    typename FullMatch<FMTYPE>::FMSTUBID        fm_asid  = stubid;
+    typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
+    typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
+  
+    // Full match  
+    FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
+    std::cout << "projstub=" << std::bitset<7>(projid) << "\t" << std::bitset<7>(stubid) << std::endl;
+    std::cout << std::hex << "fm=" << fm.raw() << std::endl;
+    std::cout << std::bitset<7>(fm_tcid) << "|"
+              << std::bitset<7>(fm_tkid) << "|"
+              << std::bitset<3>(fm_asphi)
+              << std::bitset<7>(fm_asid) << "|"
+              << std::bitset<12>(fm_phi) << "|"
+              << std::bitset<9>(fm_z) << std::endl;
+  
+    //-----------------------------------------------------------------------------------------------------------
+    //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------
+  
+    typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
+    FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
+    bool goodmatch_next              = false;
+  
+    bool newtracklet = (istub==0 || istub>nstubs) ? true : false;
+    std::cout << "new tracklet " << newtracklet << std::endl;
+    std::cout << std::hex << "bestmatch=" << bestmatch.raw() << std::endl;
+    std::cout << std::hex << "goodmatch=" << goodmatch << std::endl;
+  
+    // For first tracklet, pick up the phi cut value
+    best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
+  
+    // Check that matches fall within the selection window of the projection 
+    //bool match = (abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= LUT_matchcut_phi[proj_seed]);
+    //bool match = (abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
+    if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+      std::cout << "match found!" << std::endl;
+      // Update values of best phi parameters, so that the next match
+      // will be compared to this value instead of the original selection cut
+      best_delta_phi = abs_delta_phi;
+  
+      // Store bestmatch
+      bestmatch_next = fm;
+      goodmatch_next = true;
+      projseed_next  = proj_seed;
+    }
+    else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
+    std::cout << "new tracklet " << newtracklet << std::endl;
+      bestmatch_next = FullMatch<FMTYPE>();
+      goodmatch_next = false;
+      projseed_next  = -1;
+    }
+    else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
+      std::cout << "not new tracklet" << std::endl;
+      bestmatch_next = bestmatch;
+      goodmatch_next = goodmatch;
+      projseed_next  = projseed;
+    }
+  
+    if (0){
+      // Reset output memories
+      fullmatch1->clear(bx);
+      fullmatch2->clear(bx);
+      fullmatch3->clear(bx);
+      fullmatch4->clear(bx);
+      fullmatch5->clear(bx);
+      fullmatch6->clear(bx);
+      fullmatch7->clear(bx);
+    }
+    else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+      std::cout << "writing" << std::endl;
+      switch (projseed) {
+      case 0:
+      fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      nmcout1++;
+      break;
+      case 1:
+      fullmatch2->write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
+      nmcout2++;
+      break;
+      case 2:
+      fullmatch3->write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
+      nmcout3++;
+      break;
+      case 3:
+      fullmatch4->write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
+      nmcout4++;
+      break;
+      case 4:
+      fullmatch5->write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
+      nmcout5++;
+      break;
+      case 5:
+      fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
+      nmcout5++;
+      break;
+      case 6:
+      fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+      nmcout6++;
+      break;
+      }
+    }
+  
+    // pipeline the bestmatch registers
+    bestmatch      = bestmatch_next;
+    goodmatch      = goodmatch_next;
+    projseed       = projseed_next;
+  
+    bx_o = bx;
+    
+  } //end istub
+} //end MC
 
 
 //////////////////////////////
@@ -625,6 +637,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
   constexpr unsigned int kNBitsBuffer=7;
+  constexpr unsigned int kNMatchEngines=8;
   constexpr int kNBits_ProjBuffer =kNBits_MemAddrBinned + VMProjectionBase<BARREL>::kVMProjectionSize + 1 +kNBits_z +1;
 
   ap_uint<kNBitsBuffer> writeindex=0;
@@ -875,6 +888,7 @@ void MatchProcessor(BXType bx,
        iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
         if(iphi!=7) continue;
         std::cout << "iphi=" << iphi << std::endl;
+        std::cout << "PR stage" << std::endl;
   
         if (savefirst&&savelast) {
   	  writeindex=writeindexplusplus;
@@ -882,7 +896,7 @@ void MatchProcessor(BXType bx,
   	  writeindex=writeindexplus;
         }
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
-        std::cout << "writeindex=" << writeindex << std::endl;
+        std::cout << "writeindex[" << iphi << "]=" << writeindex << std::endl;
         std::cout << std::hex << "projid=" << vmproj.getIndex() << std::endl;
 
         if (savefirst) { //FIXME code needs to be cleaner
@@ -968,7 +982,11 @@ void MatchProcessor(BXType bx,
 
           //Need to read the information about the proj in the buffer
           auto const qdata=projbuffer[ivmphi][readindex];
+          std::cout << "readindex[" << ivmphi << "]=" << readindex << std::endl;
+          std::cout << "nproj=" << nvmprojout1 << std::endl;
+          std::cout << "qdata=" << qdata->raw() << std::endl;
           std::cout << "iphi=" << ivmphi << std::endl;
+        std::cout << "ME stage" << std::endl;
           nstubs=qdata->getNStubs();
           VMProjection<BARREL> data(qdata->getProjection());
           zbin=qdata->getZBin();
