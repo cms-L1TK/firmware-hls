@@ -71,6 +71,14 @@ public:
   };
 };
 
+template<>
+class AllStubBase<DISK> {
+public:
+   enum BitWidths {
+     kAllStubSize = AllStubBase<DISKPS>::kAllStubSize
+   };
+};
+
 
 // Data object definition
 template<int ASType>
@@ -175,6 +183,37 @@ public:
   void setBend(const ASBEND bend) {
     data_.range(kASBendMSB,kASBendLSB) = bend;
   }
+
+private:
+
+  AllStubData data_;
+
+};
+
+// Special data object definition
+template<>
+class AllStub<DISK> : public AllStubBase<DISK>
+{
+public:
+  typedef ap_uint<AllStubBase<DISK>::kAllStubSize> AllStubData;
+
+  AllStub(const AllStubData& newdata):
+    data_(newdata)
+  {}
+
+  AllStub():
+    data_(0)
+  {}
+
+  #ifndef __SYNTHESIS__
+  AllStub(const char* datastr, int base=16)
+  {
+    AllStubData newdata(datastr, base);
+    data_ = newdata;
+  }
+  #endif
+
+  AllStubData raw() const {return data_;}
 
 private:
 
