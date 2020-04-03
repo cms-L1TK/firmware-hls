@@ -9,9 +9,9 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Set remote
       run: |
         git remote -v set-url --push origin https://github.com/RobertGlein/firmware-hls-public
-        #git fetch -p origin
-        #git push --mirror
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        git fetch -v -p origin
+        git push -v --mirror
+#    - name: Push changes
+#      uses: ad-m/github-push-action@master
+#      with:
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
