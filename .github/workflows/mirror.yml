@@ -1,0 +1,17 @@
+name: Mirror to public repo
+
+on: push # Controls when the action will run.
+jobs: # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  mirror: # Job name
+    runs-on: self-hosted # The type of runner that the job will run on
+    steps: # Steps represent a sequence of tasks that will be executed as part of the job
+    - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - name: Push changes
+      run: |
+        git remote set-url --push origin https://hostname/exampleuser/mirrored
+        #git fetch -p origin
+        #git push --mirror
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        
