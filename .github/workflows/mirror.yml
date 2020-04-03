@@ -8,11 +8,10 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Set remote
       run: |
-        git remote set-url --push origin https://hostname/exampleuser/mirrored
+        git remote -v set-url --push origin https://github.com/RobertGlein/firmware-hls-public
         #git fetch -p origin
         #git push --mirror
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        
