@@ -1,5 +1,8 @@
 // TrackletEngine test bench
 #include "TrackletEngineTop.h"
+#include "TrackletEngine_ptcut.h"
+#include "TrackletEngine_stubptinnercut.h"
+#include "TrackletEngine_stubptoutercut.h"
 #include "StubPairMemory.hh"
 #include "VMStubTEInnerMemory.hh"
 #include "VMStubTEOuterMemory.hh"
@@ -39,6 +42,13 @@ int main(){
   assert(fin_vmstubsouter.good());
   assert(fin_stubpairs.good());
 
+  ap_uint<1> pttable[32];
+  ap_uint<1> bendinnertable[256];
+  ap_uint<1> bendoutertable[256];
+
+  readPtTable<TE::L1L2, TE::E18, TE::C17, 32>(pttable);
+  readBendInnerTable<TE::L1L2, TE::E18, TE::C17, 256>(bendinnertable);
+  readBendOuterTable<TE::L1L2, TE::E18, TE::C17, 256>(bendoutertable);
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
@@ -53,7 +63,7 @@ int main(){
 
 
     // Unit Under Test
-    TrackletEngineTop(bx, inputvmstubsinner, inputvmstubsouter, outputstubpairs);
+    TrackletEngineTop(bx, inputvmstubsinner, inputvmstubsouter, pttable, bendinnertable, bendoutertable, outputstubpairs);
     
     // compare calculated outputs with those read from emulation printout
     err_count += compareMemWithFile<StubPairMemory>(outputstubpairs,fin_stubpairs,ievt,"StubPair");
