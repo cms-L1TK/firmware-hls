@@ -60,3 +60,6 @@ set_property -name "top" -value "testfixture" -objects $obj
 set_property -name "xsim.simulate.runtime" -value "3000ns" -objects $obj
 
 puts "INFO: Project created:${_xil_proj_name_}"
+
+# Launch Simulation
+launch_simulation

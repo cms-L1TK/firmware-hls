@@ -11,6 +11,7 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 //		const InputStubMemory<BARRELPS> *i6,
 //		const InputStubMemory<BARRELPS> *i7,
 		AllStubMemory<BARRELPS> *allStub,
+		// ME memories
 		VMStubMEMemory<BARRELPS> *m0,
 		VMStubMEMemory<BARRELPS> *m1,
 		VMStubMEMemory<BARRELPS> *m2,
@@ -64,51 +65,27 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 
 					VMRouter<BARRELPS, BARRELPS, layer, disk>
 					//, ninputs, MEMask, TEIMask, OLMask, TEOMask>
-					(bx, finebintable, overlaptable, imask, i0, i1, i2,
-					nullptr, nullptr,
-					nullptr, //i5,i6,i7,
+					(bx, finebintable, overlaptable, imask,
+					i0, i1, i2, nullptr, nullptr, nullptr, //i5,i6,i7,
 					allStub,
 // ME memories
-					memask, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr, nullptr,
-					nullptr, // 0-7
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr,
-					nullptr, // 8-15
-					m0, m1, m2, m3, nullptr, nullptr, nullptr,
-					nullptr, // 16-23
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr,
-					nullptr, // 24-31
+					memask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
+					m0, m1, m2, m3, nullptr, nullptr, nullptr, nullptr, // 16-23
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 24-31
 // TEInner memories
-					teimask, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr, nullptr,
-					nullptr, // 0-7
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr,
-					nullptr, // 8-15
-					mtei0, mtei1, mtei2, mtei3, nullptr, nullptr, nullptr,
-					nullptr, // 16-23
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr,
-					nullptr, // 24-31
+					teimask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
+					mtei0, mtei1, mtei2, mtei3, nullptr, nullptr, nullptr, nullptr, // 16-23
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 24-31
 // TEInner Overlap memories
-					olmask, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr, nullptr,
-					nullptr, // 0-7
-					mteol1, mteol2, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr, // 8-15
+					olmask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
+					mteol1, mteol2, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
 // TEOuter memories
-					teomask, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr, nullptr,
-					nullptr, // 0-7
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr,
-					nullptr, // 8-15
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr,
-					nullptr, // 16-23
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-					nullptr, nullptr // 24-31
+					teomask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 16-23
+					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr // 24-31
 					);
-					return;}
+	return;
+}

@@ -1,4 +1,5 @@
 # firmware-hls : HLS implementation of the hybrid L1 track firmware
+![HLS build on lnxfarm327](https://github.com/cms-tracklet/firmware-hls/workflows/HLS%20build%20on%20lnxfarm327/badge.svg)
 
 ## Repo directory contents:
 

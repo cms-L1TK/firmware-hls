@@ -16,6 +16,7 @@ void VMRouterTop(BXType bx,
 //		const InputStubMemory<BARRELPS> *i6,
 //		const InputStubMemory<BARRELPS> *i7,
 		AllStubMemory<BARRELPS> *allStub,
+		// ME memories
 		VMStubMEMemory<BARRELPS> *m0,
 		VMStubMEMemory<BARRELPS> *m1,
 		VMStubMEMemory<BARRELPS> *m2,

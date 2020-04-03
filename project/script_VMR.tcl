@@ -1,22 +1,30 @@
-############################################################
-## This file is generated automatically by Vivado HLS.
-## Please DO NOT edit it.
-## Copyright (C) 1986-2017 Xilinx, Inc. All Rights Reserved.
-############################################################
-open_project -reset vmrouter
-set_top VMRouterTop
-#add_files ../TrackletAlgorithm/VMRouter.hh -cflags "-std=c++11"
-add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "-std=c++11"
-add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "-I../TrackletAlgorithm -std=c++11"
-add_files -tb ../emData/VMR
-open_solution -reset "solution3"
-source set_fpga.tcl
-create_clock -period 4 -name default
+# Script to generate project for VMR
+#   vivado_hls -f script_VMR.tcl
+#   vivado_hls -p vmrouter
+# WARNING: this will wipe out the original project by the same name
 
-# Compile & create IP Core
-csim_design -clean -compiler gcc -mflags "-j8"
+# create new project (deleting any existing one of same name)
+open_project -reset vmrouter
+
+# source files
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set_top VMRouterTop
+add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "$CFLAGS"
+add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "$CFLAGS"
+
+# data files
+add_files -tb ../emData/VMR/
+
+open_solution "solution1"
+
+# Define FPGA, clock frequency & common HLS settings.
+source settings_hls.tcl
+
+csim_design -compiler gcc -mflags "-j8"
 csynth_design
-cosim_design -trace_level all -rtl vhdl
-#export_design -rtl vhdl -format ip_catalog
-#export_design -flow impl -rtl vhdl -format ip_catalog
+cosim_design
+export_design -format ip_catalog
+# Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
+#export_design -format ip_catalog -flow impl
+
 exit

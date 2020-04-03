@@ -83,7 +83,7 @@ public:
   }
 
 
-  DataType* get_mem(BunchXingT ibx) {return dataarray_[ibx];}
+  const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {

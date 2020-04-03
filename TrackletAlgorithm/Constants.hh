@@ -19,6 +19,7 @@ constexpr int kNBits_BX = 3;
 constexpr int kNBits_MemAddrBinned = 4;
 constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
 
+constexpr int kNBits_z = 3;
 
 constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
