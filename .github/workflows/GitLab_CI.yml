@@ -1,0 +1,23 @@
+name: Mirror and run GitLab CI
+
+on: # Controls when the action will run.
+  push: # Please add your branch down here if wanted. A build will be triggerd for each push.
+    branches: [feat_actions] 
+  #pull_request:
+  #  branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Mirror + trigger CI
+      uses: SvanBoxel/gitlab-mirror-and-ci-action@master
+      with:
+        args: "https://gitlab.cern.ch/rglein/firmware-hls"
+      env:
+        GITLAB_HOSTNAME: "gitlab.cern.ch"
+        GITLAB_USERNAME: "rglein"
+        GITLAB_PASSWORD: ${{ secrets.GitHub }} // Generate here: https://gitlab.com/profile/personal_access_tokens
+        GITLAB_PROJECT_ID: "88426"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} // https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret
