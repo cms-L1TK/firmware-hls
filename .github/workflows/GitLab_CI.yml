@@ -7,8 +7,8 @@ on: # Controls when the action will run.
   #  branches: [ master ]
 
 jobs:
-  mirror&trig: # https://github.com/marketplace/actions/mirror-to-gitlab-and-run-gitlab-ci
-    name: mirror&trig
+  mirror_trig: # https://github.com/marketplace/actions/mirror-to-gitlab-and-run-gitlab-ci
+    name: mirror_trig
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -33,3 +33,4 @@ jobs:
         url: "https://gitlab.cern.ch/rglein/firmware-hls_actions"
         token: ${{ secrets.GITLAB_TRIGGER }}
         project_id: 88426
+        debug: true
