@@ -23,14 +23,14 @@ jobs:
         GITLAB_PROJECT_ID: "89897"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret and add to GitHub secrets
 
-  trig:
-    name: trig # https://github.com/marketplace/actions/trigger-gitlab-ci
-    runs-on: ubuntu-latest
-    steps:
-    - name: trigger Job
-      uses: appleboy/gitlab-ci-action@master
-      with:
-        url: "https://gitlab.cern.ch/rglein/firmware-hls_actions"
-        token: ${{ secrets.GITLAB_TRIGGER }}
-        project_id: 89897
-        debug: true
+#  trig:
+#    name: trig # https://github.com/marketplace/actions/trigger-gitlab-ci
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: trigger Job
+#      uses: appleboy/gitlab-ci-action@master
+#      with:
+#        url: "https://gitlab.cern.ch/rglein/firmware-hls_actions"
+#        token: ${{ secrets.GITLAB_TRIGGER }}
+#        project_id: 89897
+#        debug: true
