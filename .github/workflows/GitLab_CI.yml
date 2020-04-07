@@ -15,8 +15,7 @@ jobs:
     - name: run1
       run: echo 'I got here'
     - name: run2
-      if: "contains(secrets.CI_TEST, '345')"
-      run: echo 'secret exists'
+      run: echo "my secret is ${{ secrets.CI_TEST }}"
     - name: Mirror + trigger CI
       uses: SvanBoxel/gitlab-mirror-and-ci-action@master
       with:
