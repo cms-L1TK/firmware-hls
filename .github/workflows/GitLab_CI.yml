@@ -26,6 +26,8 @@ jobs:
       if: github.event_name == 'pull_request'
       run: |
         echo ::set-env name=current_branch::${{ github.head_ref }}
+    - name: Redefine GITHUB_REF
+      run: echo ::set-env name=GITHUB_REF::${{ env.current_branch }}
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
