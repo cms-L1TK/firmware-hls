@@ -16,6 +16,8 @@ jobs:
       run: echo 'I got here again'
     - name: run2
       run: echo "my secret is ${{ secrets.CI_TEST }}"
+    - name: run3
+      run: echo "github.ref = ${{ github.ref }}"
     - name: Mirror + trigger CI
       uses: SvanBoxel/gitlab-mirror-and-ci-action@master
       with:
