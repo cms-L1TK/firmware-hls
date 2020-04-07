@@ -8,7 +8,7 @@ on: # Controls when the action will run.
     branches: [feat_actions]
 
 env:
-  current_branch: $(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')
+  current_branch: 'master'
 
 jobs:
   mirror_trig: # https://github.com/marketplace/actions/mirror-to-gitlab-and-run-gitlab-ci
@@ -22,10 +22,14 @@ jobs:
       run: echo "my secret is ${{ secrets.CI_TEST }}"
     - name: run3
       run: echo "github.ref = ${{ github.ref }}"
-    - name: Redefine branch
+    - name: Redefine branch on pull_request
       if: github.event_name == 'pull_request'
       run: |
         echo ::set-env name=current_branch::${{ github.head_ref }}
+    - name: Redefine branch on push
+      if: github.event_name == 'push'
+      run: |
+        $(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')
     - name: Redefine GITHUB_REF
       run: echo ::set-env name=GITHUB_REF::${{ env.current_branch }}
     - name: Dump GitHub context
