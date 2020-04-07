@@ -63,7 +63,7 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 					;
 // SHOULD I USE SOMETHING ELSE THAN INT FOR MY TABLES???
 
-					VMRouter<BARRELPS, BARRELPS, layer, disk>
+					VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk>
 					//, ninputs, MEMask, TEIMask, OLMask, TEOMask>
 					(bx, finebintable, overlaptable, imask,
 					i0, i1, i2, nullptr, nullptr, nullptr, //i5,i6,i7,

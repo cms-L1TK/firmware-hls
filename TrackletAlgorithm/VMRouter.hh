@@ -33,7 +33,7 @@ constexpr unsigned int nallprojlayers[6] = { 8, 4, 4, 4, 4, 4 };
 constexpr unsigned int nvmmelayers[6] = { 4, 8, 8, 8, 8, 8 };
 
 constexpr unsigned int nallstubsdisks[5] = { 4, 4, 4, 4, 4 };
-constexpr unsigned int nvmmedisks[5] = { 4, 4, 4, 4, 4 };
+constexpr unsigned int nvmmedisks[5] = { 8, 4, 4, 4, 4 };
 
 constexpr unsigned int nvmtedisks[5] = { 4, 4, 4, 4, 4 };
 
@@ -196,18 +196,19 @@ inline ap_uint<5> iphivmRawMinus(const typename AllStub<INTYPE>::ASPHI phi) {
 // originally 64, but then it won't pass test bench as it contains more than 64 stubs
 constexpr int MAXVMROUTER = kMaxProc; // TODO need right symbol here
 
-template<regionType INTYPE, regionType METYPE, int LAYER, int DISK> //, int NINPUTS, uint32_t MEMASK, uint32_t TEIMASK, uint16_t OLMASK, uint32_t TEOMASK>
+template<regionType INTYPE, regionType INTYPE2, regionType METYPE, int LAYER, int DISK> //, int NINPUTS, uint32_t MEMASK, uint32_t TEIMASK, uint16_t OLMASK, uint32_t TEOMASK>
 void VMRouter(const BXType bx, const int finebintable[],
 		const int overlaptable[],
 		// Input memories
-		const ap_uint<6>& imask, const InputStubMemory<INTYPE>* const i0,
+		const ap_uint<6>& imask,
+		const InputStubMemory<INTYPE2>* const i0,
 		const InputStubMemory<INTYPE>* const i1,
 		const InputStubMemory<INTYPE>* const i2,
-		const InputStubMemory<INTYPE>* const i3,
+		const InputStubMemory<INTYPE2>* const i3,
 		const InputStubMemory<INTYPE>* const i4,
 		const InputStubMemory<INTYPE>* const i5,
 		// AllStub memory
-		AllStubMemory<INTYPE>* allstub,
+		AllStubMemory<METYPE>* allstub,
 		// ME memories
 		const ap_uint<32>& memask, VMStubMEMemory<METYPE> *m0,
 		VMStubMEMemory<METYPE> *m1, VMStubMEMemory<METYPE> *m2,
@@ -332,42 +333,11 @@ void VMRouter(const BXType bx, const int finebintable[],
 	// 		;
 	// }
 
-#pragma HLS array_partition variable=finebintable
+
 	// Reset address counters in output memories
 
 	allstub->clear(bx);
-	// if ( MEMASK &  0x1        ) m0->clear(bx);
-	// if ( MEMASK &  0x2        ) m1->clear(bx);
-	// if ( MEMASK &  0x4        ) m2->clear(bx);
-	// if ( MEMASK &  0x8        ) m3->clear(bx);
-	// if ( MEMASK &  0x10       ) m4->clear(bx);
-	// if ( MEMASK &  0x20       ) m5->clear(bx);
-	// if ( MEMASK &  0x40       ) m6->clear(bx);
-	// if ( MEMASK &  0x80       ) m7->clear(bx);
-	// if ( MEMASK &  0x100      ) m8->clear(bx);
-	// if ( MEMASK &  0x200      ) m9->clear(bx);
-	// if ( MEMASK &  0x400      ) m10->clear(bx);
-	// if ( MEMASK &  0x800      ) m11->clear(bx);
-	// if ( MEMASK &  0x1000     ) m12->clear(bx);
-	// if ( MEMASK &  0x2000     ) m13->clear(bx);
-	// if ( MEMASK &  0x4000     ) m14->clear(bx);
-	// if ( MEMASK &  0x8000     ) m15->clear(bx);
-	// if ( MEMASK &  0x10000    ) m16->clear(bx);
-	// if ( MEMASK &  0x20000    ) m17->clear(bx);
-	// if ( MEMASK &  0x40000    ) m18->clear(bx);
-	// if ( MEMASK &  0x80000    ) m19->clear(bx);
-	// if ( MEMASK &  0x100000   ) m20->clear(bx);
-	// if ( MEMASK &  0x200000   ) m21->clear(bx);
-	// if ( MEMASK &  0x400000   ) m22->clear(bx);
-	// if ( MEMASK &  0x800000   ) m23->clear(bx);
-	// if ( MEMASK &  0x1000000  ) m24->clear(bx);
-	// if ( MEMASK &  0x2000000  ) m25->clear(bx);
-	// if ( MEMASK &  0x4000000  ) m26->clear(bx);
-	// if ( MEMASK &  0x8000000  ) m27->clear(bx);
-	// if ( MEMASK &  0x10000000 ) m28->clear(bx);
-	// if ( MEMASK &  0x20000000 ) m29->clear(bx);
-	// if ( MEMASK &  0x40000000 ) m30->clear(bx);
-	// if ( MEMASK &  0x80000000 ) m31->clear(bx);
+
 	if (memask[0])
 		m0->clear(bx);
 	if (memask[1])
@@ -433,38 +403,6 @@ void VMRouter(const BXType bx, const int finebintable[],
 	if (memask[31])
 		m31->clear(bx);
 
-	// if ( TEIMASK & 0x1        ) mtei0->clear(bx);
-	// if ( TEIMASK & 0x2        ) mtei1->clear(bx);
-	// if ( TEIMASK & 0x4        ) mtei2->clear(bx);
-	// if ( TEIMASK & 0x8        ) mtei3->clear(bx);
-	// if ( TEIMASK & 0x10       ) mtei4->clear(bx);
-	// if ( TEIMASK & 0x20       ) mtei5->clear(bx);
-	// if ( TEIMASK & 0x40       ) mtei6->clear(bx);
-	// if ( TEIMASK & 0x80       ) mtei7->clear(bx);
-	// if ( TEIMASK & 0x100      ) mtei8->clear(bx);
-	// if ( TEIMASK & 0x200      ) mtei9->clear(bx);
-	// if ( TEIMASK & 0x400      ) mtei10->clear(bx);
-	// if ( TEIMASK & 0x800      ) mtei11->clear(bx);
-	// if ( TEIMASK & 0x1000     ) mtei12->clear(bx);
-	// if ( TEIMASK & 0x2000     ) mtei13->clear(bx);
-	// if ( TEIMASK & 0x4000     ) mtei14->clear(bx);
-	// if ( TEIMASK & 0x8000     ) mtei15->clear(bx);
-	// if ( TEIMASK & 0x10000    ) mtei16->clear(bx);
-	// if ( TEIMASK & 0x20000    ) mtei17->clear(bx);
-	// if ( TEIMASK & 0x40000    ) mtei18->clear(bx);
-	// if ( TEIMASK & 0x80000    ) mtei19->clear(bx);
-	// if ( TEIMASK & 0x100000   ) mtei20->clear(bx);
-	// if ( TEIMASK & 0x200000   ) mtei21->clear(bx);
-	// if ( TEIMASK & 0x400000   ) mtei22->clear(bx);
-	// if ( TEIMASK & 0x800000   ) mtei23->clear(bx);
-	// if ( TEIMASK & 0x1000000  ) mtei24->clear(bx);
-	// if ( TEIMASK & 0x2000000  ) mtei25->clear(bx);
-	// if ( TEIMASK & 0x4000000  ) mtei26->clear(bx);
-	// if ( TEIMASK & 0x8000000  ) mtei27->clear(bx);
-	// if ( TEIMASK & 0x10000000 ) mtei28->clear(bx);
-	// if ( TEIMASK & 0x20000000 ) mtei29->clear(bx);
-	// if ( TEIMASK & 0x40000000 ) mtei30->clear(bx);
-	// if ( TEIMASK & 0x80000000 ) mtei31->clear(bx);
 
 	if (teimask[0])
 		mtei0->clear(bx);
@@ -531,22 +469,6 @@ void VMRouter(const BXType bx, const int finebintable[],
 	if (teimask[31])
 		mtei31->clear(bx);
 
-	// if ( OLMASK & 0x1        ) mteol0->clear(bx);
-	// if ( OLMASK & 0x2        ) mteol1->clear(bx);
-	// if ( OLMASK & 0x4        ) mteol2->clear(bx);
-	// if ( OLMASK & 0x8        ) mteol3->clear(bx);
-	// if ( OLMASK & 0x10       ) mteol4->clear(bx);
-	// if ( OLMASK & 0x20       ) mteol5->clear(bx);
-	// if ( OLMASK & 0x40       ) mteol6->clear(bx);
-	// if ( OLMASK & 0x80       ) mteol7->clear(bx);
-	// if ( OLMASK & 0x100      ) mteol8->clear(bx);
-	// if ( OLMASK & 0x200      ) mteol9->clear(bx);
-	// if ( OLMASK & 0x400      ) mteol10->clear(bx);
-	// if ( OLMASK & 0x800      ) mteol11->clear(bx);
-	// if ( OLMASK & 0x1000     ) mteol12->clear(bx);
-	// if ( OLMASK & 0x2000     ) mteol13->clear(bx);
-	// if ( OLMASK & 0x4000     ) mteol14->clear(bx);
-	// if ( OLMASK & 0x8000     ) mteol15->clear(bx);
 	if (olmask[0])
 		mteol0->clear(bx);
 	if (olmask[1])
@@ -580,38 +502,6 @@ void VMRouter(const BXType bx, const int finebintable[],
 	if (olmask[15])
 		mteol15->clear(bx);
 
-	// if ( TEOMASK & 0x1        ) mteo0->clear(bx);
-	// if ( TEOMASK & 0x2        ) mteo1->clear(bx);
-	// if ( TEOMASK & 0x4        ) mteo2->clear(bx);
-	// if ( TEOMASK & 0x8        ) mteo3->clear(bx);
-	// if ( TEOMASK & 0x10       ) mteo4->clear(bx);
-	// if ( TEOMASK & 0x20       ) mteo5->clear(bx);
-	// if ( TEOMASK & 0x40       ) mteo6->clear(bx);
-	// if ( TEOMASK & 0x80       ) mteo7->clear(bx);
-	// if ( TEOMASK & 0x100      ) mteo8->clear(bx);
-	// if ( TEOMASK & 0x200      ) mteo9->clear(bx);
-	// if ( TEOMASK & 0x400      ) mteo10->clear(bx);
-	// if ( TEOMASK & 0x800      ) mteo11->clear(bx);
-	// if ( TEOMASK & 0x1000     ) mteo12->clear(bx);
-	// if ( TEOMASK & 0x2000     ) mteo13->clear(bx);
-	// if ( TEOMASK & 0x4000     ) mteo14->clear(bx);
-	// if ( TEOMASK & 0x8000     ) mteo15->clear(bx);
-	// if ( TEOMASK & 0x10000    ) mteo16->clear(bx);
-	// if ( TEOMASK & 0x20000    ) mteo17->clear(bx);
-	// if ( TEOMASK & 0x40000    ) mteo18->clear(bx);
-	// if ( TEOMASK & 0x80000    ) mteo19->clear(bx);
-	// if ( TEOMASK & 0x100000   ) mteo20->clear(bx);
-	// if ( TEOMASK & 0x200000   ) mteo21->clear(bx);
-	// if ( TEOMASK & 0x400000   ) mteo22->clear(bx);
-	// if ( TEOMASK & 0x800000   ) mteo23->clear(bx);
-	// if ( TEOMASK & 0x1000000  ) mteo24->clear(bx);
-	// if ( TEOMASK & 0x2000000  ) mteo25->clear(bx);
-	// if ( TEOMASK & 0x4000000  ) mteo26->clear(bx);
-	// if ( TEOMASK & 0x8000000  ) mteo27->clear(bx);
-	// if ( TEOMASK & 0x10000000 ) mteo28->clear(bx);
-	// if ( TEOMASK & 0x20000000 ) mteo29->clear(bx);
-	// if ( TEOMASK & 0x40000000 ) mteo30->clear(bx);
-	// if ( TEOMASK & 0x80000000 ) mteo31->clear(bx);
 
 	if (teomask[0])
 		mteo0->clear(bx);
@@ -682,20 +572,6 @@ void VMRouter(const BXType bx, const int finebintable[],
 	// Maybe find a better way to do this one day
 	typename InputStubMemory<INTYPE>::NEntryT zero(0);
 
-	// auto n_i0 = zero;
-	// auto n_i1 = zero;
-	// auto n_i2 = zero;
-	// auto n_i3 = zero;
-	// auto n_i4 = zero;
-	// auto n_i5 = zero;
-	//
-	// if ( 0 < NINPUTS ) n_i0 = i0->getEntries(bx);
-	// if ( 1 < NINPUTS ) n_i1 = i1->getEntries(bx);
-	// if ( 2 < NINPUTS ) n_i2 = i2->getEntries(bx);
-	// if ( 3 < NINPUTS ) n_i3 = i3->getEntries(bx);
-	// if ( 4 < NINPUTS ) n_i4 = i4->getEntries(bx);
-	// if ( 5 < NINPUTS ) n_i5 = i5->getEntries(bx);
-
 	auto n_i0 = imask[0] != 0 ? i0->getEntries(bx) : zero; // change to nullptr?
 	auto n_i1 = imask[1] != 0 ? i1->getEntries(bx) : zero;
 	auto n_i2 = imask[2] != 0 ? i2->getEntries(bx) : zero;
@@ -711,6 +587,10 @@ void VMRouter(const BXType bx, const int finebintable[],
 	int addrCountOL[16] = { 0 }; // Keeps track of write address for TE Inner Overlap
 	int addrCountO[32] = { 0 }; // Keeps track of write address for TE Outer
 
+// Partitioning finebintable uses more LUTs instead of a BRAM, but timing seems the same
+#pragma HLS array_partition variable=finebintable
+#pragma HLS array_partition variable=addrCount
+
 	TOPLEVEL: for (auto i = 0; i < kMaxProc; ++i) {
 #pragma HLS PIPELINE II=1
 		const bool haveData = (n_i0 > 0) || (n_i1 > 0) || (n_i2 > 0)
@@ -723,13 +603,24 @@ void VMRouter(const BXType bx, const int finebintable[],
 		//const InputStubMemory *next; // this method makes vivado crash
 
 		bool resetNext = false; // Used to reset read_addr
+		bool isDisk2S = false; // Used to determine if first or 4th input, which are different for disks
 		InputStub<INTYPE> stub;
+		InputStub<INTYPE2> stub2; // Only used for input 1 and 4 since they can be of different type in disks. find a better way to do this...
+
 		// auto stub =  ? // input type can changes in the disks
 
 		// Read stub from memory in turn
 		if (n_i0) {
 			//next = i0;
-			stub = i0->read_mem(bx, read_addr);
+			stub2 = i0->read_mem(bx, read_addr);
+			isDisk2S = true;
+			// Would like to do something like this: (with if constexpr or something)
+			// if (DISK) {
+			// 	isDisk2S = true;
+			// 	stub2 = i0->read_mem(bx, read_addr);
+			// } else {
+			// 	stub = i0->read_mem(bx, read_addr);
+			// }
 			--n_i0;
 			if (n_i0 == 0)
 				resetNext = true;
@@ -747,7 +638,8 @@ void VMRouter(const BXType bx, const int finebintable[],
 				resetNext = true;
 		} else if (n_i3) {
 			//next = i3;
-			stub = i3->read_mem(bx, read_addr);
+			stub2 = i3->read_mem(bx, read_addr);
+			isDisk2S = true;
 			--n_i3;
 			if (n_i3 == 0)
 				resetNext = true;
@@ -775,24 +667,36 @@ void VMRouter(const BXType bx, const int finebintable[],
 
 		// add stub to AllStub memory (memories?)
 		// HACK fix me
-		AllStub<INTYPE> allstubd(stub.raw());
-		std::cout << "Out put stub: " << std::hex << allstubd.raw() << std::dec
-				<< std::endl;
-		// END HACK
-		// What is the hack??
-		allstub->write_mem(bx, allstubd, i);
+		if (isDisk2S) { // is vivado smart enough to know this is always false for layer?
+			AllStub<INTYPE2> allstubd(stub2.raw());
+			std::cout << "Out put stub: " << std::hex << allstubd.raw() << std::dec
+					<< std::endl;
+			// END HACK
+			// What is the hack??
+			allstub->write_mem(bx, allstubd, i);
+		} else {
+			AllStub<INTYPE> allstubd(stub.raw());
+			std::cout << "Out put stub: " << std::hex << allstubd.raw() << std::dec
+					<< std::endl;
+			// END HACK
+			// What is the hack??
+			allstub->write_mem(bx, allstubd, i);
+		}
+
 
 		/////////////////////////////////////////////
 		// executeME() START ------------------------------
 		// hourglass only
 
+		//auto bend = (isDisk2S) ? stub2.getBend() : stub.getBend(); // Doesn't work because not same bit lengths
 		VMStubME<METYPE> stubme;
-		stubme.setBend(stub.getBend()); // how does it now if 3 or 4 bits? Same size as in InputStub thus no need to shift bits
-		stubme.setIndex(typename VMStubME<METYPE>::VMSMEID(i));
+		if (isDisk2S) {
+			stubme.setBend(stub2.getBend());
+		} else {
+			stubme.setBend(stub.getBend());
+		}
 
-		//WHY ARE THESE HACKS? THEY ARE NOT NEEDED
-		//auto layer_ = layer; // hack.
-		//auto disk_  = disk; // hack --these are mutually exclusive so ...
+		stubme.setIndex(typename VMStubME<METYPE>::VMSMEID(i));
 
 		// Total number of VMs for ME
 		auto nvm =
@@ -800,11 +704,14 @@ void VMRouter(const BXType bx, const int finebintable[],
 						nallstubslayers[LAYER - 1] * nvmmelayers[LAYER - 1] :
 						nallstubsdisks[DISK - 1] * nvmmedisks[DISK - 1];
 
-		auto stubPhi = stub.getPhi();
+
+		auto stubPhi = (isDisk2S) ? stub2.getPhi() : stub.getPhi();
 		auto iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
 		auto iphiRawPlus = iphivmRawPlus<INTYPE>(stubPhi); // Top 5 bits of phi after adding a small number
 		auto iphiRawMinus = iphivmRawMinus<INTYPE>(stubPhi); // Top 5 bits of phi after subtracting a small number
-		auto d = nvm / 32; // Some sort of normalisation thing
+		float d = nvm / 32.; // Some sort of normalisation thing, maybe not use float?
+		std::cout << "Stubphi " << stubPhi << std::endl;
+		std::cout << "iphiraw * d + " << iphiRaw;
 		// TODO: comment this
 		iphiRaw = iphiRaw * d; // The VM number
 		iphiRawPlus = iphiRawPlus * d;
@@ -813,10 +720,17 @@ void VMRouter(const BXType bx, const int finebintable[],
 			iphiRawPlus = nvm - 1;
 		if (iphiRawMinus >= nvm)
 			iphiRawMinus = nvm - 1;
+		// The following if the iphiplus/minus "went around the edges". Maybe put in the above if statements
+		if (iphiRawPlus < iphiRaw)
+			iphiRawPlus = nvm -1;
+		if (iphiRawMinus > iphiRaw) {
+			iphiRawMinus = 0;
+		}
+
 		// if (! (std::abs(iphiRaw-iphiRawPlus) <= 1 )) {
 		//   std::cout << "XXX+: " << iphiRaw << " " << iphiRawPlus << std::endl;
 		// }
-
+    std::cout << " * " << d << " = " << iphiRaw << std::endl;
 		// Stubs can only end up in the neighbouring VM after calculating iphivmrawplus/minus
 		assert(std::abs(iphiRaw - iphiRawPlus) <= 1);
 		assert(std::abs(iphiRaw-iphiRawMinus) <= 1 );
@@ -824,22 +738,27 @@ void VMRouter(const BXType bx, const int finebintable[],
 		ap_uint<MEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
 
 		if (DISK) { // Not implemented
-			assert(1 == 0);
 			auto r = stub.getR();
+			if (isDisk2S) r = stub2.getR(); // will the number of bits be correct?? probably not, but it is fine because it's only used for the index
 
-			// Get the 3 MSBs of r and add 4 as r is signed (takes values between -4 and 3)
-			bin = (r >> (r.length() - MEBinsBits)) + (1 << (MEBinsBits - 1)); // Coarse r value
+			// Get the 3 MSBs of r and add 4 as r is signed (takes values between -4 and 3). Is r really signed?
+			bin = (r >> (r.length() - MEBinsBits)) -1; // + (1 << (MEBinsBits - 1)); // Coarse r value
+			if (isDisk2S) bin = r + 1; // by looking at input files...
 
 			// Ignoring the sign (MSB): the top 7 MSBs of r. Note, not the index that is being saved to the stub
 			typename VMStubME<METYPE>::VMSMEID index = (r
 					>> (r.length() - nbitsfinebintable))
 					& ((1 << nbitsfinebintable) - 1);
+
+			if (isDisk2S) index = r;
+
+			//std::cout << "R " << r << "     INDEX " << index << "       Is 2S " << isDisk2S << std::endl << std::endl;
 			// set rfine: the r position within a bin
 			typename VMStubME<METYPE>::VMSMEFINEZ rfine = finebintable[index]; // is it the same table as for z?
 			assert(rfine >= 0);
 			stubme.setFineZ(rfine);
 		} else { // layer
-			auto z = stub.getZ();
+			auto z = (isDisk2S) ? stub2.getZ() : stub.getZ();
 
 			// Get the 3 MSBs of z and add 4 as z is signed (takes values between -4 and 3)
 			bin = (z >> (z.length() - MEBinsBits)) + (1 << (MEBinsBits - 1)); // Coarse z value
@@ -1016,16 +935,19 @@ void VMRouter(const BXType bx, const int finebintable[],
 						nallstubslayers[LAYER - 1] * nvmtelayers[LAYER - 1] : //Shouldn't it be LAYER!=0, and LAYER-1?
 						nallstubsdisks[DISK - 1] * nvmtedisks[DISK - 1];
 
-		stubPhi = stub.getPhi(); // Could take from ME
+		// stubPhi = stub.getPhi(); // Could take from ME
 		iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
 		iphiRaw = iphiRaw * nvmte / 32; // Which VM
-		auto bend = stub.getBend();
 
 		// TE Inner
 		if (teimask != 0) {
-			VMStubTEInner<INTYPE> stubTeInner;
+			VMStubTEInner<METYPE> stubTeInner;
 
-			stubTeInner.setBend(bend);
+			if (isDisk2S) {
+				stubTeInner.setBend(stub2.getBend());
+			} else {
+				stubTeInner.setBend(stub.getBend());
+			}
 			stubTeInner.setIndex(typename VMStubTEInner<METYPE>::VMSTEIID(i));
 
 			// LAYER
@@ -1035,22 +957,28 @@ void VMRouter(const BXType bx, const int finebintable[],
 					nphireg = 4;
 				if (LAYER == 5)
 					nphireg = 4;
-				auto nfinephi = nfinephibarrelinner; // Number of bits for finephi?
-				auto z = stub.getZ();
-				auto nzbits = stubTeInner.getZBits().length();
+				int nfinephi = nfinephibarrelinner; // Number of bits for finephi?
+				auto z = (isDisk2S) ? stub2.getZ() : stub.getZ();
+				int nzbits = stubTeInner.getZBits().length();
 
-				stubTeInner.setZBits(z >> (z.length() - nzbits)); // Maybe change so that we don't call getZ etc so many times? Remove hardcoded value
+				stubTeInner.setZBits(z >> (z.length() - nzbits));
 				stubTeInner.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
 			} else { // DISKS
 				assert(DISK != 0);
 
-				auto nphireg = 4; // Number of bits for VMs? Number of phi regions?
-				auto nfinephi = nfinephidiskinner; // Number of bits for finephi?
-				auto r = stub.getZ();
-				auto nrbits = stubTeInner.getZBits().length();
+				int nphireg = 4; // Number of bits for VMs? Number of phi regions?
+				int nfinephi = nfinephidiskinner; // Number of bits for finephi?
+				int nrbits = stubTeInner.getZBits().length(); // Number of bits we want for r
+				auto r = stub.getR(); // Fix so it works for disks
 
-				stubTeInner.setZBits(r >> (r.length() - nrbits)); // Maybe change so that we don't call getZ etc so many times? Remove hardcoded value
+				if (isDisk2S) {
+					r = stub2.getR(); // we don't want to shift the encoded 2S?
+				} else {
+					r = r >> (r.length() - nrbits);
+				}
+
+				stubTeInner.setZBits(r);
 				stubTeInner.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
 			}
@@ -1402,339 +1330,339 @@ void VMRouter(const BXType bx, const int finebintable[],
 				addrCount[31] += 1;
 			}
 		}
-
-		//  OVERLAP
-		if (olmask != 0) {//(LAYER == 1  || LAYER == 2) { // Make sure that only layer 1 and 2 are overlapped
-			assert(LAYER == 1 || LAYER == 2);
-			auto z = stub.getZ();
-			auto r = stub.getR();
-			int zbin = (z + (1 << (z.length() - 1))) >> (z.length() - 7); // Make z positive and take the 5 MSBs
-			int rbin = (r + (1 << (r.length() - 1))) >> (r.length() - 3); // What is this doing... r already positive?! 4 MSBs??
-			int index = zbin * rbin + rbin;
-			//ap_int<10> overlap = overlaptable[index];
-			int overlap = overlaptable[index];
-			if (overlap != 1023) { // which is like -1 if we had signed stuff?
-				VMStubTEInner<BARRELOL> stubOL;
-				auto nvmol = nallstubslayers[LAYER] * 2; // Always 2 overlap vms?
-				// 16 overlap vms per layer
-				stubPhi = stub.getPhi(); // Could take from ME
-				iphiRaw = iphivmRaw<INTYPE>(stubPhi) >> 1; // Top 4 bits of phi, NEED iphivmraw THAT RETURNS THE TOP 4?! CHECK THIS
-				iphiRaw = iphiRaw * nvmol / 16; // Which VM, BECAUSE WE HAVE 16 VMS?
-
-				auto nzbits = stubOL.getZBits().length();
-				auto nphireg = 4; // What is this still
-				auto nfinephi = 1; // or nfinephioverlapinner??? which is 2
-
-				stubOL.setBend(bend);  //move so we don't call it all the time
-				stubOL.setIndex(typename VMStubTEInner<BARRELOL>::VMSTEIID(i));
-				stubOL.setZBits(z >> (z.length() - nzbits)); // Maybe change so that we don't call getZ etc so many times? Manipulate bits?
-				stubOL.setFinePhi(
-						iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
-
-				std::cout << "Overlap stub " << overlap << " " << std::hex
-						<< stubOL.raw() << std::endl;
-				std::cout << "iphiRaw: " << std::dec << iphiRaw << std::endl
-						<< std::endl;
-				// No coarse phi bins? Aaaah probably yes, since they correspond to the different VMs?
-
-				// Save stub to memories
-				// 0-9
-				if (olmask[0]) {
-					if ((iphiRaw == 0) || (iphiRawMinus == 0)
-							|| (iphiRawPlus == 0))
-						mteol0->write_mem(bx, stubOL, addrCountOL[0]);
-					addrCountOL[0] += 1;
-				}
-				if (olmask[1]) {
-					if ((iphiRaw == 1) || (iphiRawMinus == 1)
-							|| (iphiRawPlus == 1))
-						mteol1->write_mem(bx, stubOL, addrCountOL[1]);
-					addrCountOL[1] += 1;
-				}
-				if (olmask[2]) {
-					if (iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2)
-						mteol2->write_mem(bx, stubOL, addrCountOL[2]);
-					addrCountOL[2] += 1;
-				}
-				if (olmask[3]) {
-					if (iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3)
-						mteol3->write_mem(bx, stubOL, addrCountOL[3]);
-					addrCountOL[3] += 1;
-				}
-				if (olmask[4]) {
-					if (iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4)
-						mteol4->write_mem(bx, stubOL, addrCountOL[4]);
-					addrCountOL[4] += 1;
-				}
-				if (olmask[5]) {
-					if (iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5)
-						mteol5->write_mem(bx, stubOL, addrCountOL[5]);
-					addrCountOL[5] += 1;
-				}
-				if (olmask[6]) {
-					if (iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6)
-						mteol6->write_mem(bx, stubOL, addrCountOL[6]);
-					addrCountOL[6] += 1;
-				}
-				if (olmask[7]) {
-					if (iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7)
-						mteol7->write_mem(bx, stubOL, addrCountOL[7]);
-					addrCountOL[7] += 1;
-				}
-				if (olmask[8]) {
-					if (iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8)
-						mteol8->write_mem(bx, stubOL, addrCountOL[8]);
-					addrCountOL[8] += 1;
-				}
-				if (olmask[9]) {
-					if (iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9)
-						mteol9->write_mem(bx, stubOL, addrCountOL[9]);
-					addrCountOL[9] += 1;
-				}
-				// 10-19
-				if (olmask[10]) {
-					if ((iphiRaw == 10) || (iphiRawMinus == 10)
-							|| (iphiRawPlus == 10))
-						mteol10->write_mem(bx, stubOL, addrCountOL[10]);
-					addrCountOL[10] += 1;
-				}
-				if (olmask[11]) {
-					if ((iphiRaw == 11) || (iphiRawMinus == 11)
-							|| (iphiRawPlus == 11))
-						mteol11->write_mem(bx, stubOL, addrCountOL[11]);
-					addrCountOL[11] += 1;
-				}
-				if (olmask[12]) {
-					if (iphiRaw == 12 || iphiRawMinus == 12
-							|| iphiRawPlus == 12)
-						mteol12->write_mem(bx, stubOL, addrCountOL[12]);
-					addrCountOL[12] += 1;
-				}
-				if (olmask[13]) {
-					if (iphiRaw == 13 || iphiRawMinus == 13
-							|| iphiRawPlus == 13)
-						mteol13->write_mem(bx, stubOL, addrCountOL[13]);
-					addrCountOL[13] += 1;
-				}
-				if (olmask[14]) {
-					if (iphiRaw == 14 || iphiRawMinus == 14
-							|| iphiRawPlus == 14)
-						mteol14->write_mem(bx, stubOL, addrCountOL[14]);
-					addrCountOL[14] += 1;
-				}
-				if (olmask[15]) {
-					if (iphiRaw == 15 || iphiRawMinus == 15
-							|| iphiRawPlus == 15)
-						mteol15->write_mem(bx, stubOL, addrCountOL[15]);
-					addrCountOL[15] += 1;
-				}
-			} else {
-				std::cout << "NO OVERLAP" << std::endl << std::endl;
-			}
-		}
-
-		// TE Outer
-		if (teomask != 0) {
-			VMStubTEOuter<INTYPE> stubTeOuter;
-
-			stubTeOuter.setBend(bend);
-			stubTeOuter.setIndex(typename VMStubTEOuter<METYPE>::VMSTEOID(i));
-
-			ap_uint<TEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
-
-			// LAYER
-			if (LAYER != 0) {
-				auto nphireg = 4;
-				auto nfinephi = 3; //nfinephibarrelouter; // Number of bits for finephi?
-				auto z = stub.getZ();
-
-				// stubTeOuter.setFineR(); can I use finebintable?
-				stubTeOuter.setFinePhi(
-						iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
-
-				// Get the 3 MSBs of z and add 4 as z is signed (takes values between -4 and 3)
-				bin = (z >> (z.length() - TEBinsBits))
-						+ (1 << (TEBinsBits - 1)); // Coarse z value
-
-				// Ignoring the sign (MSB): the top 7 MSBs of z. Note: not the index that is being saved to the stub
-				typename VMStubTEOuter<METYPE>::VMSTEOID index = (z
-						>> (z.length() - nbitsfinebintable))
-						& ((1 << nbitsfinebintable) - 1);
-				// Set zfine: the z position within a bin
-				typename VMStubTEOuter<METYPE>::VMSTEOFINEZ zfine =
-						finebintable[index]; // Using the bits 5 down to 2?
-				stubme.setFineZ(zfine);
-			} else { // DISKS
-				assert(DISK != 0);
-
-				auto nphireg = 4; // Number of bits for VMs? Number of phi regions?
-				auto nfinephi = nfinephidiskouter; // Number of bits for finephi?
-				auto r = stub.getZ();
-
-				stubTeOuter.setFinePhi(
-						iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
-
-				// Get the 3 MSBs of r and add 4 as r is signed (takes values between -4 and 3)
-				bin = (r >> (r.length() - TEBinsBits))
-						+ (1 << (TEBinsBits - 1)); // Coarse r value
-
-				// Ignoring the sign (MSB): the top 7 MSBs of r. Note, not the index that is being saved to the stub
-				typename VMStubTEOuter<METYPE>::VMSTEOID index = (r
-						>> (r.length() - nbitsfinebintable))
-						& ((1 << nbitsfinebintable) - 1);
-				// set rfine: the r position within a bin
-				typename VMStubTEOuter<METYPE>::VMSTEOFINEZ rfine =
-						finebintable[index]; // is it the same table as for z?
-				assert(rfine >= 0);
-				stubme.setFineZ(rfine);
-			}
-
-			std::cout << "TEOuter stub " << std::hex << stubTeOuter.raw()
-					<< std::endl;
-			std::cout << "iphiRaw: " << std::dec << iphiRaw << std::endl
-					<< std::endl;
-			// No coarse phi bins? Aaaah probably yes, since they correspond to the different VMs?
-
-			// Save stub to memories
-			// 0-9
-			if (teomask[0]) {
-				if ((iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0))
-					mteo0->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[1]) {
-				if ((iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1))
-					mteo1->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[2]) {
-				if (iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2)
-					mteo2->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[3]) {
-				if (iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3)
-					mteo3->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[4]) {
-				if (iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4)
-					mteo4->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[5]) {
-				if (iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5)
-					mteo5->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[6]) {
-				if (iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6)
-					mteo6->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[7]) {
-				if (iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7)
-					mteo7->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[8]) {
-				if (iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8)
-					mteo8->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[9]) {
-				if (iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9)
-					mteo9->write_mem(bx, bin, stubTeOuter);
-			}
-			// 10-19
-			if (teomask[10]) {
-				if ((iphiRaw == 10) || (iphiRawMinus == 10)
-						|| (iphiRawPlus == 10))
-					mteo10->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[11]) {
-				if ((iphiRaw == 11) || (iphiRawMinus == 11)
-						|| (iphiRawPlus == 11))
-					mteo11->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[12]) {
-				if (iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12)
-					mteo12->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[13]) {
-				if (iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13)
-					mteo13->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[14]) {
-				if (iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14)
-					mteo14->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[15]) {
-				if (iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15)
-					mteo15->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[16]) {
-				if (iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16)
-					mteo16->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[17]) {
-				if (iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17)
-					mteo17->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[18]) {
-				if (iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18)
-					mteo18->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[19]) {
-				if (iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19)
-					mteo19->write_mem(bx, bin, stubTeOuter);
-			}
-			// 20-29
-			if (teomask[20]) {
-				if ((iphiRaw == 20) || (iphiRawMinus == 20)
-						|| (iphiRawPlus == 20))
-					mteo20->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[21]) {
-				if ((iphiRaw == 21) || (iphiRawMinus == 21)
-						|| (iphiRawPlus == 21))
-					mteo21->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[22]) {
-				if (iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22)
-					mteo22->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[23]) {
-				if (iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23)
-					mteo23->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[24]) {
-				if (iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24)
-					mteo24->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[25]) {
-				if (iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25)
-					mteo25->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[26]) {
-				if (iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26)
-					mteo26->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[27]) {
-				if (iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27)
-					mteo27->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[28]) {
-				if (iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28)
-					mteo28->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[29]) {
-				if (iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29)
-					mteo29->write_mem(bx, bin, stubTeOuter);
-			}
-			// 30-31
-			if (teomask[30]) {
-				if ((iphiRaw == 30) || (iphiRawMinus == 30)
-						|| (iphiRawPlus == 30))
-					mteo30->write_mem(bx, bin, stubTeOuter);
-			}
-			if (teomask[31]) {
-				if ((iphiRaw == 31) || (iphiRawMinus == 31)
-						|| (iphiRawPlus == 31))
-					mteo31->write_mem(bx, bin, stubTeOuter);
-			}
-		}
+		//
+		// //  OVERLAP
+		// if (olmask != 0) {//(LAYER == 1  || LAYER == 2) { // Make sure that only layer 1 and 2 are overlapped
+		// 	assert(LAYER == 1 || LAYER == 2);
+		// 	auto z = stub.getZ();
+		// 	auto r = stub.getR();
+		// 	int zbin = (z + (1 << (z.length() - 1))) >> (z.length() - 7); // Make z positive and take the 5 MSBs
+		// 	int rbin = (r + (1 << (r.length() - 1))) >> (r.length() - 3); // What is this doing... r already positive?! 4 MSBs??
+		// 	int index = zbin * rbin + rbin;
+		// 	//ap_int<10> overlap = overlaptable[index];
+		// 	int overlap = overlaptable[index];
+		// 	if (overlap != 1023) { // which is like -1 if we had signed stuff?
+		// 		VMStubTEInner<BARRELOL> stubOL;
+		// 		auto nvmol = nallstubslayers[LAYER] * 2; // Always 2 overlap vms?
+		// 		// 16 overlap vms per layer
+		// 		stubPhi = stub.getPhi(); // Could take from ME
+		// 		iphiRaw = iphivmRaw<INTYPE>(stubPhi) >> 1; // Top 4 bits of phi, NEED iphivmraw THAT RETURNS THE TOP 4?! CHECK THIS
+		// 		iphiRaw = iphiRaw * nvmol / 16; // Which VM, BECAUSE WE HAVE 16 VMS?
+		//
+		// 		auto nzbits = stubOL.getZBits().length();
+		// 		auto nphireg = 4; // What is this still
+		// 		auto nfinephi = 1; // or nfinephioverlapinner??? which is 2
+		//
+		// 		stubOL.setBend(bend);  //move so we don't call it all the time
+		// 		stubOL.setIndex(typename VMStubTEInner<BARRELOL>::VMSTEIID(i));
+		// 		stubOL.setZBits(z >> (z.length() - nzbits)); // Maybe change so that we don't call getZ etc so many times? Manipulate bits?
+		// 		stubOL.setFinePhi(
+		// 				iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
+		//
+		// 		std::cout << "Overlap stub " << overlap << " " << std::hex
+		// 				<< stubOL.raw() << std::endl;
+		// 		std::cout << "iphiRaw: " << std::dec << iphiRaw << std::endl
+		// 				<< std::endl;
+		// 		// No coarse phi bins? Aaaah probably yes, since they correspond to the different VMs?
+		//
+		// 		// Save stub to memories
+		// 		// 0-9
+		// 		if (olmask[0]) {
+		// 			if ((iphiRaw == 0) || (iphiRawMinus == 0)
+		// 					|| (iphiRawPlus == 0))
+		// 				mteol0->write_mem(bx, stubOL, addrCountOL[0]);
+		// 			addrCountOL[0] += 1;
+		// 		}
+		// 		if (olmask[1]) {
+		// 			if ((iphiRaw == 1) || (iphiRawMinus == 1)
+		// 					|| (iphiRawPlus == 1))
+		// 				mteol1->write_mem(bx, stubOL, addrCountOL[1]);
+		// 			addrCountOL[1] += 1;
+		// 		}
+		// 		if (olmask[2]) {
+		// 			if (iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2)
+		// 				mteol2->write_mem(bx, stubOL, addrCountOL[2]);
+		// 			addrCountOL[2] += 1;
+		// 		}
+		// 		if (olmask[3]) {
+		// 			if (iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3)
+		// 				mteol3->write_mem(bx, stubOL, addrCountOL[3]);
+		// 			addrCountOL[3] += 1;
+		// 		}
+		// 		if (olmask[4]) {
+		// 			if (iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4)
+		// 				mteol4->write_mem(bx, stubOL, addrCountOL[4]);
+		// 			addrCountOL[4] += 1;
+		// 		}
+		// 		if (olmask[5]) {
+		// 			if (iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5)
+		// 				mteol5->write_mem(bx, stubOL, addrCountOL[5]);
+		// 			addrCountOL[5] += 1;
+		// 		}
+		// 		if (olmask[6]) {
+		// 			if (iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6)
+		// 				mteol6->write_mem(bx, stubOL, addrCountOL[6]);
+		// 			addrCountOL[6] += 1;
+		// 		}
+		// 		if (olmask[7]) {
+		// 			if (iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7)
+		// 				mteol7->write_mem(bx, stubOL, addrCountOL[7]);
+		// 			addrCountOL[7] += 1;
+		// 		}
+		// 		if (olmask[8]) {
+		// 			if (iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8)
+		// 				mteol8->write_mem(bx, stubOL, addrCountOL[8]);
+		// 			addrCountOL[8] += 1;
+		// 		}
+		// 		if (olmask[9]) {
+		// 			if (iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9)
+		// 				mteol9->write_mem(bx, stubOL, addrCountOL[9]);
+		// 			addrCountOL[9] += 1;
+		// 		}
+		// 		// 10-19
+		// 		if (olmask[10]) {
+		// 			if ((iphiRaw == 10) || (iphiRawMinus == 10)
+		// 					|| (iphiRawPlus == 10))
+		// 				mteol10->write_mem(bx, stubOL, addrCountOL[10]);
+		// 			addrCountOL[10] += 1;
+		// 		}
+		// 		if (olmask[11]) {
+		// 			if ((iphiRaw == 11) || (iphiRawMinus == 11)
+		// 					|| (iphiRawPlus == 11))
+		// 				mteol11->write_mem(bx, stubOL, addrCountOL[11]);
+		// 			addrCountOL[11] += 1;
+		// 		}
+		// 		if (olmask[12]) {
+		// 			if (iphiRaw == 12 || iphiRawMinus == 12
+		// 					|| iphiRawPlus == 12)
+		// 				mteol12->write_mem(bx, stubOL, addrCountOL[12]);
+		// 			addrCountOL[12] += 1;
+		// 		}
+		// 		if (olmask[13]) {
+		// 			if (iphiRaw == 13 || iphiRawMinus == 13
+		// 					|| iphiRawPlus == 13)
+		// 				mteol13->write_mem(bx, stubOL, addrCountOL[13]);
+		// 			addrCountOL[13] += 1;
+		// 		}
+		// 		if (olmask[14]) {
+		// 			if (iphiRaw == 14 || iphiRawMinus == 14
+		// 					|| iphiRawPlus == 14)
+		// 				mteol14->write_mem(bx, stubOL, addrCountOL[14]);
+		// 			addrCountOL[14] += 1;
+		// 		}
+		// 		if (olmask[15]) {
+		// 			if (iphiRaw == 15 || iphiRawMinus == 15
+		// 					|| iphiRawPlus == 15)
+		// 				mteol15->write_mem(bx, stubOL, addrCountOL[15]);
+		// 			addrCountOL[15] += 1;
+		// 		}
+		// 	} else {
+		// 		std::cout << "NO OVERLAP" << std::endl << std::endl;
+		// 	}
+		// }
+		//
+		// // TE Outer
+		// if (teomask != 0) {
+		// 	VMStubTEOuter<INTYPE> stubTeOuter;
+		//
+		// 	stubTeOuter.setBend(bend);
+		// 	stubTeOuter.setIndex(typename VMStubTEOuter<METYPE>::VMSTEOID(i));
+		//
+		// 	ap_uint<TEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
+		//
+		// 	// LAYER
+		// 	if (LAYER != 0) {
+		// 		auto nphireg = 4;
+		// 		auto nfinephi = 3; //nfinephibarrelouter; // Number of bits for finephi?
+		// 		auto z = stub.getZ();
+		//
+		// 		// stubTeOuter.setFineR(); can I use finebintable?
+		// 		stubTeOuter.setFinePhi(
+		// 				iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
+		//
+		// 		// Get the 3 MSBs of z and add 4 as z is signed (takes values between -4 and 3)
+		// 		bin = (z >> (z.length() - TEBinsBits))
+		// 				+ (1 << (TEBinsBits - 1)); // Coarse z value
+		//
+		// 		// Ignoring the sign (MSB): the top 7 MSBs of z. Note: not the index that is being saved to the stub
+		// 		typename VMStubTEOuter<METYPE>::VMSTEOID index = (z
+		// 				>> (z.length() - nbitsfinebintable))
+		// 				& ((1 << nbitsfinebintable) - 1);
+		// 		// Set zfine: the z position within a bin
+		// 		typename VMStubTEOuter<METYPE>::VMSTEOFINEZ zfine =
+		// 				finebintable[index]; // Using the bits 5 down to 2?
+		// 		stubme.setFineZ(zfine);
+		// 	} else { // DISKS
+		// 		assert(DISK != 0);
+		//
+		// 		auto nphireg = 4; // Number of bits for VMs? Number of phi regions?
+		// 		auto nfinephi = nfinephidiskouter; // Number of bits for finephi?
+		// 		auto r = stub.getZ();
+		//
+		// 		stubTeOuter.setFinePhi(
+		// 				iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
+		//
+		// 		// Get the 3 MSBs of r and add 4 as r is signed (takes values between -4 and 3)
+		// 		bin = (r >> (r.length() - TEBinsBits))
+		// 				+ (1 << (TEBinsBits - 1)); // Coarse r value
+		//
+		// 		// Ignoring the sign (MSB): the top 7 MSBs of r. Note, not the index that is being saved to the stub
+		// 		typename VMStubTEOuter<METYPE>::VMSTEOID index = (r
+		// 				>> (r.length() - nbitsfinebintable))
+		// 				& ((1 << nbitsfinebintable) - 1);
+		// 		// set rfine: the r position within a bin
+		// 		typename VMStubTEOuter<METYPE>::VMSTEOFINEZ rfine =
+		// 				finebintable[index]; // is it the same table as for z?
+		// 		assert(rfine >= 0);
+		// 		stubme.setFineZ(rfine);
+		// 	}
+		//
+		// 	std::cout << "TEOuter stub " << std::hex << stubTeOuter.raw()
+		// 			<< std::endl;
+		// 	std::cout << "iphiRaw: " << std::dec << iphiRaw << std::endl
+		// 			<< std::endl;
+		// 	// No coarse phi bins? Aaaah probably yes, since they correspond to the different VMs?
+		//
+		// 	// Save stub to memories
+		// 	// 0-9
+		// 	if (teomask[0]) {
+		// 		if ((iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0))
+		// 			mteo0->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[1]) {
+		// 		if ((iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1))
+		// 			mteo1->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[2]) {
+		// 		if (iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2)
+		// 			mteo2->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[3]) {
+		// 		if (iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3)
+		// 			mteo3->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[4]) {
+		// 		if (iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4)
+		// 			mteo4->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[5]) {
+		// 		if (iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5)
+		// 			mteo5->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[6]) {
+		// 		if (iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6)
+		// 			mteo6->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[7]) {
+		// 		if (iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7)
+		// 			mteo7->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[8]) {
+		// 		if (iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8)
+		// 			mteo8->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[9]) {
+		// 		if (iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9)
+		// 			mteo9->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	// 10-19
+		// 	if (teomask[10]) {
+		// 		if ((iphiRaw == 10) || (iphiRawMinus == 10)
+		// 				|| (iphiRawPlus == 10))
+		// 			mteo10->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[11]) {
+		// 		if ((iphiRaw == 11) || (iphiRawMinus == 11)
+		// 				|| (iphiRawPlus == 11))
+		// 			mteo11->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[12]) {
+		// 		if (iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12)
+		// 			mteo12->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[13]) {
+		// 		if (iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13)
+		// 			mteo13->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[14]) {
+		// 		if (iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14)
+		// 			mteo14->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[15]) {
+		// 		if (iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15)
+		// 			mteo15->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[16]) {
+		// 		if (iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16)
+		// 			mteo16->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[17]) {
+		// 		if (iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17)
+		// 			mteo17->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[18]) {
+		// 		if (iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18)
+		// 			mteo18->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[19]) {
+		// 		if (iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19)
+		// 			mteo19->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	// 20-29
+		// 	if (teomask[20]) {
+		// 		if ((iphiRaw == 20) || (iphiRawMinus == 20)
+		// 				|| (iphiRawPlus == 20))
+		// 			mteo20->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[21]) {
+		// 		if ((iphiRaw == 21) || (iphiRawMinus == 21)
+		// 				|| (iphiRawPlus == 21))
+		// 			mteo21->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[22]) {
+		// 		if (iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22)
+		// 			mteo22->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[23]) {
+		// 		if (iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23)
+		// 			mteo23->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[24]) {
+		// 		if (iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24)
+		// 			mteo24->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[25]) {
+		// 		if (iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25)
+		// 			mteo25->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[26]) {
+		// 		if (iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26)
+		// 			mteo26->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[27]) {
+		// 		if (iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27)
+		// 			mteo27->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[28]) {
+		// 		if (iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28)
+		// 			mteo28->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[29]) {
+		// 		if (iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29)
+		// 			mteo29->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	// 30-31
+		// 	if (teomask[30]) {
+		// 		if ((iphiRaw == 30) || (iphiRawMinus == 30)
+		// 				|| (iphiRawPlus == 30))
+		// 			mteo30->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// 	if (teomask[31]) {
+		// 		if ((iphiRaw == 31) || (iphiRawMinus == 31)
+		// 				|| (iphiRawPlus == 31))
+		// 			mteo31->write_mem(bx, bin, stubTeOuter);
+		// 	}
+		// }
 
 		// // executeTE() END   ------------------------------
 
