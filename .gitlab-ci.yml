@@ -5,15 +5,8 @@ variables:
 
 stages: # ---------------------------------------------------------------------
 #  - quality-check
-  - hls-csim
-#  - hls-csynth
-  - hls-csynth-cosim-export
-#  - hls-cosim
-#  - hls-export
-#  - top-make
-#  - top-sim
-#  - top-synth
-#  - top-impl 
+  - hls-build
+#  - topTF-build
 
 # Job templates ---------------------------------------------------------------
 .job_template: &template_base
@@ -22,27 +15,13 @@ stages: # ---------------------------------------------------------------------
   before_script:
     - source $VIVADO_PATH_SH
 
-.job_template: &template_hls-csim
+.job_template: &template_hls-build
   <<: *template_base
-  stage: hls-csim
+  stage: hls-build
   script:
     - cd project
     - pwd; ls -la; #debug
-    - vivado_hls -f "script_${PROJ_NAME}_csim.tcl"
-  artifacts:
-    when: always
-    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
-    paths:
-      - ./project/$PROJ_NAME/
-    expire_in: 1 day
-
-.job_template: &template_hls-csynth-cosim-export
-  <<: *template_base
-  stage: hls-csynth-cosim-export
-  script:
-    - cd project
-    - pwd; ls -la; #debug
-    - vivado_hls -f "script_${PROJ_NAME}_csynth_cosim_export.tcl"
+    - vivado_hls -f "script_${PROJ_NAME}.tcl"
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -52,35 +31,20 @@ stages: # ---------------------------------------------------------------------
 
 
 # Jobs ------------------------------------------------------------------------
-PR-hls-csim:
-  <<: *template_hls-csim
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "PR"
-PR-hls-csynth-cosim-export:
-  <<: *template_hls-csynth-cosim-export
+PR-hls-build:
+  <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PR"
 
-ME-hls-csim:
-  <<: *template_hls-csim
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ME"
-ME-hls-csynth-cosim-export:
-  <<: *template_hls-csynth-cosim-export
+ME-hls-build:
+  <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ME"
 
-MC-hls-csim:
-  <<: *template_hls-csim
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "MC"
-MC-hls-csynth-cosim-export:
-  <<: *template_hls-csynth-cosim-export
+MC-hls-build:
+  <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
