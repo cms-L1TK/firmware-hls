@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: run1
-      run: echo 'I got here'
+      run: echo 'I got here again'
     - name: run2
       run: echo "my secret is ${{ secrets.CI_TEST }}"
     - name: Mirror + trigger CI
