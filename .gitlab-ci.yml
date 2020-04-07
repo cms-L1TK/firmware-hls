@@ -31,20 +31,34 @@ stages: # ---------------------------------------------------------------------
 
 
 # Jobs ------------------------------------------------------------------------
-PR-hls-build:
-  <<: *template_hls-build
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "PR"
-
-ME-hls-build:
-  <<: *template_hls-build
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ME"
-
 MC-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
+ME-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ME"
+PR-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PR"
+TC-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TC"
+TE-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TE"
+  script:
+    - cd emData/TE
+    - ./download.sh
+    - cd ../../project
+    - pwd; ls -la; #debug
+    - vivado_hls -f "script_${PROJ_NAME}.tcl"
