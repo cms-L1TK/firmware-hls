@@ -29,7 +29,7 @@ jobs:
     - name: Redefine branch on push
       if: github.event_name == 'push'
       run: |
-        $(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')
+        echo ::set-env name=current_branch::$(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')
     - name: Redefine GITHUB_REF
       run: echo ::set-env name=GITHUB_REF::${{ env.current_branch }}
     - name: Dump GitHub context
