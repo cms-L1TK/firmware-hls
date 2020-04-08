@@ -7,7 +7,7 @@
 #include "FileReadUtility.hh"
 #include "Constants.hh"
 
-const int nevents = 1;  //number of events to run
+const int nevents = 50;  //number of events to run
 
 using namespace std;
 

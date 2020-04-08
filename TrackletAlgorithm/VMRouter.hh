@@ -20,7 +20,6 @@
 
 constexpr double rmaxdisk = 120.0;
 constexpr int nrbitsdisk = 12;
-constexpr double kr = rmaxdisk / (1 << nrbitsdisk);
 
 // from FPGAConstants.hh -- needs a final home
 constexpr unsigned int nallstubslayers[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, i.e. coarse phi regions, per sector
