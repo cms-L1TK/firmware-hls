@@ -1,7 +1,6 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
-  PROJ_NAME: $CI_COMMIT_REF_NAME
 
 stages: # ---------------------------------------------------------------------
 #  - quality-check
@@ -26,8 +25,8 @@ stages: # ---------------------------------------------------------------------
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
-      - ./project/$PROJ_NAME/
-    expire_in: 1 day
+      - ./project/
+    expire_in: 1 week
 # Jobs ------------------------------------------------------------------------
 VMR-hls-build:
   <<: *template_hls-build
