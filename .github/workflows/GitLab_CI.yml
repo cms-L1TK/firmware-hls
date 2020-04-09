@@ -17,7 +17,6 @@ jobs:
     - uses: actions/checkout@v1
     - name: Debug
       run: |
-        echo "Secret = ${{ secrets.CI_TEST }}"
         echo "github.ref = ${{ github.ref }}"
     - name: Redefine branch on pull_request
       if: github.event_name == 'pull_request'
