@@ -75,5 +75,5 @@ jobs: # A workflow run is made up of one or more jobs that can run sequentially 
     - name: Upload results
       uses: actions/upload-artifact@v1
       with:
-        name: PR
+        name: VMR
         path: project/vmrouter/solution1/syn/report/VMRouterTop_csynth.rpt
