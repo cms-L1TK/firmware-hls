@@ -7,7 +7,7 @@
 #include "FileReadUtility.hh"
 #include "Constants.hh"
 
-const int nevents = 2;  //number of events to run
+const int nevents = 50;  //number of events to run
 
 using namespace std;
 
@@ -50,16 +50,16 @@ int main()
   if (not validin1) return -1;
 
   ifstream fin_ilink2;
-  bool validin2 = openDataFile(fin_ilink2, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
+  bool validin2 = openDataFile(fin_ilink2, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_PS10G_2_B_04.dat");
   if (not validin2) return -1;
 
   ifstream fin_ilink3;
-  bool validin3 = openDataFile(fin_ilink3, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
+  bool validin3 = openDataFile(fin_ilink3, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
   if (not validin3) return -1;
 
-  // ifstream fin_ilink4;
-  // bool validin4 = openDataFile(fin_ilink4, "VMR/VMR_L1PHIE/Trackleilinkections_ILINK_L1L2I_L3PHIC_04.dat");
-  // if (not validin4) return -1;
+  ifstream fin_ilink4;
+  bool validin4 = openDataFile(fin_ilink4, "VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
+  if (not validin4) return -1;
 
   // ifstream fin_ilink5;
   // bool validin5 = openDataFile(fin_ilink5, "VMR/VMR_L1PHIE/Trackleilinkections_ILINK_L1L2J_L3PHIC_04.dat");
@@ -125,7 +125,7 @@ int main()
     writeMemFromFile<InputStubMemory<BARRELPS>>(ilink1, fin_ilink1, ievt);
     writeMemFromFile<InputStubMemory<BARRELPS>>(ilink2, fin_ilink2, ievt);
     writeMemFromFile<InputStubMemory<BARRELPS>>(ilink3, fin_ilink3, ievt);
-    // writeMemFromFile<InputStubMemory>(ilink4, fin_ilink4, ievt);
+    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink4, fin_ilink4, ievt);
     // writeMemFromFile<InputStubMemory>(ilink5, fin_ilink5, ievt);
     // writeMemFromFile<InputStubMemory>(ilink6, fin_ilink6, ievt);
     // writeMemFromFile<InputStubMemory>(ilink7, fin_ilink7, ievt);
@@ -137,7 +137,7 @@ int main()
 
     // Unit Under Test
     VMRouterTop(bx,
-    		&ilink1, &ilink2, &ilink3, 0, 0, 0, //&ilink4, &ilink5, &ilink6,
+    		&ilink1, &ilink2, &ilink3, &ilink4, 0, 0, //&ilink4, &ilink5, &ilink6,
 		// &ilink7, &ilink8,
 			&allstub,
 		&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,

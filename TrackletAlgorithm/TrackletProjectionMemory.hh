@@ -114,11 +114,33 @@ public:
   // Getter
   TrackletProjectionData raw() const {return data_;}
 
+  // TCID is a unique identifier assigned to each TC. It is a concatenation of
+  // the seed and iTC numbers:
+  // TCID = (seed<<4) + iTC
+  // The seed number is assigned as follows:
+  //   L1L2 -> 0
+  //   L3L4 -> 1
+  //   L5L6 -> 2
+  //   D1D2 -> 3
+  //   D3D4 -> 4
+  //   D1L1/L1D1 -> 5
+  //   D1L2/L2D1 -> 6
+  // The iTC number comes from the letter at the end of the TC name (i.e.,
+  // TC_L1L2A and TC_L5L6A have the same iTC number); generally indicates the
+  // region of the phi sector being processed:
+  //   A -> 0
+  //   B -> 1
+  //   C -> 2
+  //   ...
   TProjTCID getTCID() const {
     return data_.range(kTProjTCIDMSB,kTProjTCIDLSB);
   }
 
-  TProjTCID getTrackletIndex() const {
+  // The tracklets in an event are indexed starting from zero, and the indices
+  // are independent for each TC; i.e., the first tracklet written by any given
+  // TC has tracklet index zero, the second tracklet written by any given TC
+  // has tracklet index one, etc.
+  TProjTrackletIndex getTrackletIndex() const {
     return data_.range(kTProjTrackletIndexMSB,kTProjTrackletIndexLSB);
   }
 
@@ -130,10 +152,13 @@ public:
     return data_.range(kTProjRZMSB,kTProjRZLSB);
   }
 
+  // The phi derivative is d(phi)/d(r) at the given layer/disk
   TProjPHIDER getPhiDer() {
     return data_.range(kTProjPhiDMSB,kTProjPhiDLSB);
   }
 
+  // The r/z derivative is d(z)/d(r) at the given layer and d(r)/d(z) at the
+  // given disk
   TProjRZDER getRZDer() {
     return data_.range(kTProjRZDMSB,kTProjRZDLSB);
   }
@@ -143,7 +168,7 @@ public:
     data_.range(kTProjTCIDMSB,kTProjTCIDLSB) = id;
   }
 
-  void setTrackletIndex(const TProjTCID id) {
+  void setTrackletIndex(const TProjTrackletIndex id) {
     data_.range(kTProjTrackletIndexMSB,kTProjTrackletIndexLSB) = id;
   }
 

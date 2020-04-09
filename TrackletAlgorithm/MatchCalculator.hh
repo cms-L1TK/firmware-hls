@@ -245,7 +245,8 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch4,
                      FullMatchMemory<FMTYPE>* fullmatch5,
                      FullMatchMemory<FMTYPE>* fullmatch6,
-                     FullMatchMemory<FMTYPE>* fullmatch7
+                     FullMatchMemory<FMTYPE>* fullmatch7,
+                     FullMatchMemory<FMTYPE>* fullmatch8
 ){
 #pragma HLS inline
   // Initialization
@@ -273,10 +274,10 @@ void MatchCalculator(BXType bx,
   const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
   // Setup look up tables for match cuts
-  ap_uint<17> LUT_matchcut_phi[7];
-  readTable_Cuts<true,LAYER,17,7>(LUT_matchcut_phi);
-  ap_uint<13> LUT_matchcut_z[7];
-  readTable_Cuts<false,LAYER,13,7>(LUT_matchcut_z);
+  ap_uint<17> LUT_matchcut_phi[12];
+  readTable_Cuts<true,LAYER,17,12>(LUT_matchcut_phi);
+  ap_uint<13> LUT_matchcut_z[12];
+  readTable_Cuts<false,LAYER,13,12>(LUT_matchcut_z);
 
   // Initialize MC delta phi cut variables
   ap_uint<17> best_delta_phi;
@@ -406,11 +407,10 @@ void MatchCalculator(BXType bx,
   int nmcout6 = 0;
   int nmcout7 = 0;
   int nmcout8 = 0;  
-  int nallproj = 0;
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc; istep++)
   {
 
-#pragma HLS PIPELINE II=1 rewind
+#pragma HLS PIPELINE II=1 
 
     // Pick up number of candidate matches for each CM memory
     ncm1 = match1->getEntries(bx);
@@ -748,8 +748,8 @@ void MatchCalculator(BXType bx,
     ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
     // Get phi and z difference between the projection and stub
-    ap_int<9> delta_z         = stub_z - proj_z_corr;
-    ap_int<13> delta_z_fact   = delta_z * kFact;
+    ap_int<10> delta_z         = stub_z - proj_z_corr;
+    ap_int<14> delta_z_fact   = delta_z * kFact;
     ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
     ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
@@ -811,6 +811,7 @@ void MatchCalculator(BXType bx,
       fullmatch5->clear(bx);
       fullmatch6->clear(bx);
       fullmatch7->clear(bx);
+      fullmatch8->clear(bx);
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
@@ -819,28 +820,32 @@ void MatchCalculator(BXType bx,
       nmcout1++;
       break;
       case 1:
-      fullmatch2->write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
+      fullmatch2->write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L2L3 seed
       nmcout2++;
       break;
       case 2:
-      fullmatch3->write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
+      fullmatch3->write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L3L4 seed
       nmcout3++;
       break;
       case 3:
-      fullmatch4->write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
+      fullmatch4->write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // L5L6 seed
       nmcout4++;
       break;
       case 4:
-      fullmatch5->write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
+      fullmatch5->write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D1D2 seed
       nmcout5++;
       break;
       case 5:
-      fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
-      nmcout5++;
+      fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // D3D4 seed
+      nmcout6++;
       break;
       case 6:
-      fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
-      nmcout6++;
+      fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L1D1 seed
+      nmcout7++;
+      break;
+      case 7:
+      fullmatch8->write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
+      nmcout8++;
       break;
       }
     }

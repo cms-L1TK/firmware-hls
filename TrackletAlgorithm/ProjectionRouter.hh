@@ -314,7 +314,7 @@ void ProjectionRouter(BXType bx,
       // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
 
       // All seeding pairs are PS modules except L3L4 and L5L6
-      bool psseed = not(iseed==1 or iseed==2); 
+      bool psseed = not(iseed==2 or iseed==3); 
 
       // VM Projection
       VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);

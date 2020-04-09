@@ -21,6 +21,7 @@ void MatchCalculatorTop(BXType bx,
                         FullMatchMemory<BARREL>*,
                         FullMatchMemory<BARREL>*,
                         FullMatchMemory<BARREL>*,
+                        FullMatchMemory<BARREL>*,
                         FullMatchMemory<BARREL>*
                        );
 

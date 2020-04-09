@@ -20,7 +20,6 @@
 
 constexpr double rmaxdisk = 120.0;
 constexpr int nrbitsdisk = 12;
-constexpr double kr = rmaxdisk / (1 << nrbitsdisk);
 
 // from FPGAConstants.hh -- needs a final home
 constexpr unsigned int nallstubslayers[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, i.e. coarse phi regions, per sector
@@ -116,7 +115,7 @@ inline void init_finebintable(const int layer_, const int disk_,
 	}
 #else // __SYNTHESIS__
 	int tmp[256]=
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
+#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
 
 	for (int i=0;i<256;i++) {
 		finebintable_[i]=tmp[i];
@@ -221,7 +220,7 @@ void VMRouter(const BXType bx,
 // lookup table - 2^nbinsfinbinetable entries actually filled
 // Table is filled with numbers between 0 and 7 (and -1): the finer region each z/r bin is divided into.
 	static const int finebintable_[kMaxFineBinTable] =
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
+#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
 	;
 
 // reset address counters in output memories
