@@ -386,7 +386,7 @@ void MatchCalculator(BXType bx,
 
     // Don't read past nstubs (would read garbage)
     int istubtmp = istub > nstubs ? istub : nstubs;
-    auto stubid = stubids[istubtmp];
+    auto stubid = stubids[istub];
     CandidateMatch cmatch(projid.concat(stubid));
     std::cout << std::hex << "MC received cmatch=" << cmatch.raw() << std::endl;
     std::cout << std::hex << "MC received projid=" << projid << " stubid=" << stubid << std::endl;
@@ -394,6 +394,8 @@ void MatchCalculator(BXType bx,
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
+    std::cout << "proj=" << proj.raw() << std::endl;
+    std::cout << "stub=" << stub.raw() << std::endl;
   
     // Stub parameters
     typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
@@ -482,7 +484,7 @@ void MatchCalculator(BXType bx,
       projseed_next  = proj_seed;
     }
     else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
-    std::cout << "new tracklet " << newtracklet << std::endl;
+    std::cout << "else new tracklet " << newtracklet << std::endl;
       bestmatch_next = FullMatch<FMTYPE>();
       goodmatch_next = false;
       projseed_next  = -1;
@@ -505,7 +507,7 @@ void MatchCalculator(BXType bx,
       fullmatch7->clear(bx);
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-      std::cout << "writing" << std::endl;
+      std::cout << "writing " << bestmatch.raw() << std::endl;
       switch (projseed) {
       case 0:
       fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -581,6 +583,14 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj22in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj23in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
+                      const VMStubMEMemory<VMSMEType>* instubdata1,
+                      const VMStubMEMemory<VMSMEType>* instubdata2,
+                      const VMStubMEMemory<VMSMEType>* instubdata3,
+                      const VMStubMEMemory<VMSMEType>* instubdata4,
+                      const VMStubMEMemory<VMSMEType>* instubdata5,
+                      const VMStubMEMemory<VMSMEType>* instubdata6,
+                      const VMStubMEMemory<VMSMEType>* instubdata7,
+                      const VMStubMEMemory<VMSMEType>* instubdata8,
                       const VMStubMEMemory<VMSMEType>* instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       const AllProjectionMemory<APTYPE>* allproj,
@@ -640,7 +650,8 @@ void MatchProcessor(BXType bx,
   constexpr unsigned int kNMatchEngines=8;
   constexpr int kNBits_ProjBuffer =kNBits_MemAddrBinned + VMProjectionBase<BARREL>::kVMProjectionSize + 1 +kNBits_z +1;
 
-  ap_uint<kNBitsBuffer> writeindex=0;
+  ap_uint<kNBitsBuffer> *writeindex=new ap_uint<kNBitsBuffer>[kNBitsBuffer];
+  ap_uint<kNBitsBuffer> writeindex1=0;
   ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
@@ -686,10 +697,19 @@ void MatchProcessor(BXType bx,
   int kMatchEngines=8;
 
     //ap_uint<kNBits_ProjBuffer> projbuffer[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
-    ProjectionRouterBuffer<BARREL> *projbuffer[kMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> projbuffer[kMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer1[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer2[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer3[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer4[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer5[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer6[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer7[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> *projbuffer8[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBufferMemory<BARREL> projbuffermem;  //projbuffer = nstub+projdata+finez
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
 #pragma HLS dependence variable=istub intra WAR true
+        std::cout << "PR stage" << std::endl;
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 
@@ -762,6 +782,8 @@ void MatchProcessor(BXType bx,
       // rinv in VMProjection takes only the top 5 bits
       // and is shifted to be positive
       typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
+      /* FIXME
+      */
       {
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
         std::cout << std::hex << "projid=" << vmproj.getIndex() << std::endl;
@@ -774,9 +796,23 @@ void MatchProcessor(BXType bx,
       //next projection and put in buffer if there are stubs in the 
       //memory the projection points to
 
+      //auto iphiproj = allproj->read_mem(bx, istep).getPhi();
+      //auto iphi5 = iphiproj>>(iphiproj.length()-5);
+  constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
+  constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
+  constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
+      auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
+        nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
+      auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
+       iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
+        //if(iphi<6) continue;
       //prefetch and calculate write pointers for buffer
-      ap_uint<kNBitsBuffer> writeindexplus=writeindex+1;
-      ap_uint<kNBitsBuffer> writeindexplusplus=writeindex+2;
+      ap_uint<kNBitsBuffer> writeindexplus=writeindex[iphi]+1;
+      ap_uint<kNBitsBuffer> writeindexplusplus=writeindex[iphi]+2;
+      /*
+      ap_uint<kNBitsBuffer> writeindexplus=writeindex1+1;
+      ap_uint<kNBitsBuffer> writeindexplusplus=writeindex1+2;
+      */
   
       //Determine if buffere is full - or near full as a projection
       //can point to two z bins we might fill two slots in the buffer
@@ -811,12 +847,12 @@ void MatchProcessor(BXType bx,
     std::cout << std::hex << "getFineZ=" << vmproj.getFineZ() << std::endl;
     std::cout << std::hex << "getRInv=" << vmproj.getRInv() << std::endl;
     std::cout << std::hex << "getIsPSSeed=" << vmproj.getIsPSSeed() << std::endl << std::endl;
-    std::cout << std::dec <<  "index=" << istep << std::endl
+    std::cout << std::dec <<  "index[iphi]=" << istep << std::endl
               << std::hex << "projfinez=" << finez << std::endl
               << "rinv=" << rinv << std::endl
               << "isPSSeed=" << isPSseed << std::endl << std::endl;
         std::cout << "###" << std::endl;
-        std::cout << std::hex << "writeindex=" << writeindex << "\treadindex=" << readindex << std::endl;
+        std::cout << std::hex << "writeindex[iphi]=" << writeindex << "\treadindex[iphi]=" << readindex << std::endl;
         }
       }
       */
@@ -840,15 +876,43 @@ void MatchProcessor(BXType bx,
         static_assert(not DISK, "PR: Layer only for now.");
   
         //Check if there are stubs in the memory
-        auto const nstubfirst=instubdata->getEntries(bx,zfirst);
-        auto const  nstublast=instubdata->getEntries(bx,zlast);
+        ProjectionRouterBufferMemory<BARREL>::NEntryT nstubfirst;
+        ProjectionRouterBufferMemory<BARREL>::NEntryT  nstublast;
+        switch (iphi) {
+          case 0:  nstubfirst=instubdata1->getEntries(bx,zfirst);
+                    nstublast=instubdata1->getEntries(bx,zlast);
+          break;
+          case 1:  nstubfirst=instubdata2->getEntries(bx,zfirst);
+                    nstublast=instubdata2->getEntries(bx,zlast);
+          break;
+          case 2:  nstubfirst=instubdata3->getEntries(bx,zfirst);
+                    nstublast=instubdata3->getEntries(bx,zlast);
+          break;
+          case 3:  nstubfirst=instubdata4->getEntries(bx,zfirst);
+                    nstublast=instubdata4->getEntries(bx,zlast);
+          break;
+          case 4:  nstubfirst=instubdata5->getEntries(bx,zfirst);
+                    nstublast=instubdata5->getEntries(bx,zlast);
+          break;
+          case 5:  nstubfirst=instubdata6->getEntries(bx,zfirst);
+                    nstublast=instubdata6->getEntries(bx,zlast);
+          break;
+          case 6:  nstubfirst=instubdata7->getEntries(bx,zfirst);
+                    nstublast=instubdata7->getEntries(bx,zlast);
+          break;
+          case 7:  nstubfirst=instubdata8->getEntries(bx,zfirst);
+                    nstublast=instubdata8->getEntries(bx,zlast);
+          break;
+        }
       /* FIXME
       std::cout << "nstubfirst=" << nstubfirst << "\t"
                 << "nstublast=" << nstublast << std::endl;
       */
         bool savefirst=nstubfirst!=0;
         bool savelast=nstublast!=0&&projzbin.range(0,0);
-        auto const writeindextmp=writeindex;
+        auto const writeindextmp=writeindex[iphi];
+        //writeindex1=writeindex[iphi];
+        //auto const writeindextmp=writeindex1;
         //if(projdata.raw() == 0) {savefirst=0; savelast=0;} //FIXME cathing blank entries
       {
       /* FIXME
@@ -868,40 +932,56 @@ void MatchProcessor(BXType bx,
     std::cout << std::hex << "getFineZ=" << vmproj.getFineZ() << std::endl;
     std::cout << std::hex << "getRInv=" << vmproj.getRInv() << std::endl;
     std::cout << std::hex << "getIsPSSeed=" << vmproj.getIsPSSeed() << std::endl << std::endl;
-    std::cout << std::dec <<  "index=" << istep << std::endl
+    std::cout << std::dec <<  "index[iphi]=" << istep << std::endl
               << std::hex << "projfinez=" << finez << std::endl
               << "rinv=" << rinv << std::endl
               << "isPSSeed=" << isPSseed << std::endl << std::endl;
         std::cout << "###" << std::endl;
-        std::cout << std::hex << "\treadindex=" << readindex << std::endl;
+        std::cout << std::hex << "\treadindex[iphi]=" << readindex << std::endl;
         }
       */
       }
-      auto iphiproj = allproj->read_mem(bx, istep).getPhi();
-      auto iphi5 = iphiproj>>(iphiproj.length()-5);
-  constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
-  constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
-  constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
-      auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
-        nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
-      auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
-       iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
-        if(iphi!=7) continue;
-        std::cout << "iphi=" << iphi << std::endl;
-        std::cout << "PR stage" << std::endl;
   
         if (savefirst&&savelast) {
-  	  writeindex=writeindexplusplus;
+  	  writeindex[iphi]=writeindexplusplus;
+  	  writeindex1=writeindexplusplus;
         } else if (savefirst||savelast) {
-  	  writeindex=writeindexplus;
+  	  writeindex[iphi]=writeindexplus;
+  	  writeindex1=writeindexplus;
         }
+        //writeindex[iphi]=writeindex1;
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
-        std::cout << "writeindex[" << iphi << "]=" << writeindex << std::endl;
+        /* FIXME
+        std::cout << "writeindex1=" << writeindex1 << std::endl;
+        std::cout << "writeindextmp=" << writeindextmp << std::endl;
+        std::cout << "writeindex[" << iphi << "]=" << writeindex[iphi] << std::endl;
         std::cout << std::hex << "projid=" << vmproj.getIndex() << std::endl;
+        */
 
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
-          projbuffer[iphi][writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+          projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+        /*
+          switch (iphi) {
+            case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 1: projbuffer2[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 2: projbuffer3[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 3: projbuffer4[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 4: projbuffer5[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 5: projbuffer6[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 6: projbuffer7[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 7: projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+          }
+          projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+        */
           //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
         /* FIXME
         std::cout << std::hex << "proj=" << projbuffer[writeindextmp]->raw() << std::endl;
@@ -912,7 +992,28 @@ void MatchProcessor(BXType bx,
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             ap_uint<kNBitsBuffer> writeindextmpplus=writeindextmp+1;
-            projbuffer[iphi][writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffer[iphi][writeindextmpplus]=ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+        /*
+          switch (iphi) {
+            case 0: projbuffer1[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 1: projbuffer2[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 2: projbuffer3[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 3: projbuffer4[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 4: projbuffer5[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 5: projbuffer6[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 6: projbuffer7[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 7: projbuffer8[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+          }
+            projbuffer8[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+        */
         /* FIXME
         std::cout << std::hex << "proj=" << projbuffer[writeindextmpplus]->raw() << std::endl;
         std::cout << "who's proj=" << projbuffer[writeindextmpplus]->getProjection() << std::endl;
@@ -921,7 +1022,28 @@ void MatchProcessor(BXType bx,
           //projbuffermem.write_mem(bx, *projbuffer[writeindextmpplus], writeindextmpplus);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
-            projbuffer[iphi][writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+          /*
+          switch (iphi) {
+            case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 1: projbuffer2[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 2: projbuffer3[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 3: projbuffer4[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 4: projbuffer5[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 5: projbuffer6[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 6: projbuffer7[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 7: projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+          }
+            projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+          */
           //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
         /* FIXME
         std::cout << std::hex << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
@@ -941,7 +1063,8 @@ void MatchProcessor(BXType bx,
   std::cout << "Starting ME loop" << std::endl;
   for (int ivmphi = 0; ivmphi < kMatchEngines; ++ivmphi) {
 #pragma HLS PIPELINE II=1
-  if(ivmphi!=7) continue;
+  //if(ivmphi<6) continue;
+  readindex=0;
   ENG_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 
@@ -955,11 +1078,14 @@ void MatchProcessor(BXType bx,
       //Determin if buffere is empty
       //Buffer for projections
       //readindex = istep;
-      bool buffernotempty=(writeindex!=readindex);
+      //bool buffernotempty=(writeindex1!=readindex);
+      bool buffernotempty=(writeindex[ivmphi]!=readindex);
+      //bool buffernotlarger=(readindex<=writeindex1);
+      bool buffernotlarger=(readindex<=writeindex[ivmphi]);
         /* FIXME
       std::cout << "buffernotempty=" << buffernotempty << std::endl;
       std::cout << std::dec << "istep=" << istep << "\tistub=" << istub << std::endl;
-        std::cout << std::hex << "writeindex=" << writeindex << "\treadindex=" << readindex << std::endl;
+        std::cout << std::hex << "writeindex[iphi]=" << writeindex << "\treadindex[iphi]=" << readindex << std::endl;
       */
  
       // vmproj index
@@ -972,24 +1098,50 @@ void MatchProcessor(BXType bx,
     //If the buffer is not empty we have a projection that we need to 
     //process. 
     ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> *stubids;
-    if (buffernotempty) {
+        //std::cout << "writeindex[" << ivmphi << "]=" << writeindex[ivmphi] << "\treadindex[" << ivmphi << "]=" << readindex << std::endl;
+    if (buffernotempty && buffernotlarger) {
 
         ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
 
+        //std::cout << "readindex[" << ivmphi << "]=" << readindex << std::endl;
         //New projection
         if (istub==0) {
           stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
 
           //Need to read the information about the proj in the buffer
+          //std::cout << "nproj=" << writeindex1 << std::endl;
+          std::cout << "nproj=" << writeindex[ivmphi] << std::endl;
           auto const qdata=projbuffer[ivmphi][readindex];
-          std::cout << "readindex[" << ivmphi << "]=" << readindex << std::endl;
-          std::cout << "nproj=" << nvmprojout1 << std::endl;
-          std::cout << "qdata=" << qdata->raw() << std::endl;
+          /*
+          ProjectionRouterBuffer<BARREL> *qdata;
+          switch (ivmphi) {
+            case 0: qdata=projbuffer1[readindex];
+            break;
+            case 1: qdata=projbuffer2[readindex];
+            break;
+            case 2: qdata=projbuffer3[readindex];
+            break;
+            case 3: qdata=projbuffer4[readindex];
+            break;
+            case 4: qdata=projbuffer5[readindex];
+            break;
+            case 5: qdata=projbuffer6[readindex];
+            break;
+            case 6: qdata=projbuffer7[readindex];
+            break;
+            case 7: qdata=projbuffer8[readindex];
+            break;
+          }
+          */
+          std::cout << "qdata=" << qdata.raw() << std::endl;
+          auto nstub = qdata.getNStubs();
+          std::cout << "nstubs=" << nstubs << std::endl;
+          std::cout << "data=" << qdata.getProjection() << std::endl;
           std::cout << "iphi=" << ivmphi << std::endl;
         std::cout << "ME stage" << std::endl;
-          nstubs=qdata->getNStubs();
-          VMProjection<BARREL> data(qdata->getProjection());
-          zbin=qdata->getZBin();
+          nstubs=qdata.getNStubs();
+          VMProjection<BARREL> data(qdata.getProjection());
+          zbin=qdata.getZBin();
         /* FIXME
         std::cout << std::hex << "data=" << data.raw() << std::endl;
         std::cout << "who's proj=" << data.raw() << std::endl;
@@ -1018,7 +1170,7 @@ void MatchProcessor(BXType bx,
               << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(data.getIsPSSeed()) << std::endl << std::endl;
         std::cout << std::hex << "projid=" << data.getIndex() << std::endl;
         std::cout << "###" << std::endl;
-        std::cout << std::hex << "\treadindex=" << readindex << std::endl;
+        std::cout << std::hex << "\treadindex[iphi]=" << readindex << std::endl;
         std::cout << "buffernotempty=" << buffernotempty << std::endl;
         }
       }
@@ -1028,9 +1180,9 @@ void MatchProcessor(BXType bx,
           projfinez=data.getFineZ();
           projrinv=data.getRInv();
           isPSseed=data.getIsPSSeed();
-          projzbin=qdata->getZBin();
+          projzbin=qdata.getZBin();
 
-          second=qdata->hasSecond();
+          second=qdata.hasSecond();
           //second=qdata.range(0,0);	
 
           //Calculate fine z position
@@ -1058,12 +1210,32 @@ void MatchProcessor(BXType bx,
         
         //Read stub memory and extract data fields
         auto const  stubadd=zbin.concat(istubtmp);
+      std::cout << "stubadd=" << stubadd << std::endl;
         /* FIXME
         std::cout << "zbin=" << zbin << "\tistubtmp=" << istubtmp << std::endl;
         std::cout << "stubadd=" << stubadd << std::endl;
         std::cout << "concat=" << zbin.concat(istubtmp) << std::endl;
         */
-        auto stubdata=instubdata->read_mem(bx,stubadd);
+        //auto stubdata=instubdata->read_mem(bx,stubadd);
+        VMStubME<VMSMEType> stubdata;//=instubdata->read_mem(bx,stubadd);
+        switch (ivmphi) {
+          case 0: stubdata=instubdata1->read_mem(bx,stubadd);
+          break;
+          case 1: stubdata=instubdata2->read_mem(bx,stubadd);
+          break;
+          case 2: stubdata=instubdata3->read_mem(bx,stubadd);
+          break;
+          case 3: stubdata=instubdata4->read_mem(bx,stubadd);
+          break;
+          case 4: stubdata=instubdata5->read_mem(bx,stubadd);
+          break;
+          case 5: stubdata=instubdata6->read_mem(bx,stubadd);
+          break;
+          case 6: stubdata=instubdata7->read_mem(bx,stubadd);
+          break;
+          case 7: stubdata=instubdata8->read_mem(bx,stubadd);
+          break;
+        }
         auto stubindex=stubdata.getIndex();
         auto stubfinez=stubdata.getFineZ();
         auto stubbend=stubdata.getBend();
@@ -1085,7 +1257,7 @@ void MatchProcessor(BXType bx,
           //outcandmatch->write_mem(bx,cmatch,ncmatchout);
           ncmatchout ++;
         /* FIXME
-          std::cout << std::hex << "projindex=" << projindex << " stubindex=" << stubindex << std::endl;
+          std::cout << std::hex << "projindex[iphi]=" << projindex << " stubindex=" << stubindex << std::endl;
       std::cout << "stubadd=" << stubadd << std::endl;
           //istep is projid
         std::cout << "tproj" << std::endl;
@@ -1104,6 +1276,7 @@ void MatchProcessor(BXType bx,
         */
           CandidateMatch cmatch(projindex.concat(stubindex));
           stubids[istubtmp]=stubindex;
+          std::cout << "istubtmp=" << istubtmp << std::endl;
           std::cout << "stubids[" << istubtmp << "]=" << stubids[istubtmp] << std::endl;
           if(istub==0 && stubids!=0) {
           std::cout << std::hex << "Sending to MC cmatch=" << cmatch.raw() << std::endl;
@@ -1121,7 +1294,7 @@ void MatchProcessor(BXType bx,
     
         // Use the stub and projection indices to pick up the stub and projection
         /*
-        VMProjection<BARREL> data(qdata->getProjection());
+        VMProjection<BARREL> data(qdata.getProjection());
         //VMProjection<BARREL> data(qdata.range(25,4));
         auto projid = data.getIndex();
         auto stubid = stubdata.getIndex();
