@@ -1278,15 +1278,15 @@ void MatchProcessor(BXType bx,
           stubids[istubtmp]=stubindex;
           std::cout << "istubtmp=" << istubtmp << std::endl;
           std::cout << "stubids[" << istubtmp << "]=" << stubids[istubtmp] << std::endl;
-          if(istub==0 && stubids!=0) {
           std::cout << std::hex << "Sending to MC cmatch=" << cmatch.raw() << std::endl;
-          MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
-                    (bx, allstub, allproj, projindex, stubids, istubtmp, bx_o,
-                     nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
-                     fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7);
-          }
           //delete qdata; //Free up mem when finished with projbuffer entry
         } // if(pass&&table[index])
+        if(istub==0 && stubids!=0) {
+        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
+                  (bx, allstub, allproj, projindex, stubids, istubtmp, bx_o,
+                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7);
+        }
  
         //-----------------------------------------------------------------------------------------------------------
         //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
