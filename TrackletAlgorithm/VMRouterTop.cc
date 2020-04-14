@@ -57,15 +57,22 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 #include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
 	;
 
+	static const int binlookuptable[2048] = // 11 bits used for LUT
+#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1L2.tab" // Only for Layer 1
+					;
+
+static const int bendtable[8] = // bendtable
+				#include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.txt" // Only for Layer 1
+									;
 // Overlap LUT
 	static const int overlaptable[1024] = // 10 bits used for LUT
-#include "../emData/VMR/VMTableInnerL1D1.txt" // Only for Layer 1
+#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab" // Only for Layer 1
 					;
 // SHOULD I USE SOMETHING ELSE THAN INT FOR MY TABLES???
 
 					VMRouter<BARRELPS, BARRELPS, layer, disk>
 					//, ninputs, MEMask, TEIMask, OLMask, TEOMask>
-					(bx, finebintable, overlaptable, imask,
+					(bx, finebintable, binlookuptable, bendtable, overlaptable, imask,
 					i0, i1, i2, nullptr, nullptr, nullptr, //i5,i6,i7,
 					allStub,
 // ME memories

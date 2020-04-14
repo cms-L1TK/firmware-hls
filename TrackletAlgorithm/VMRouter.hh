@@ -197,7 +197,7 @@ inline ap_uint<5> iphivmRawMinus(const typename AllStub<INTYPE>::ASPHI phi) {
 constexpr int MAXVMROUTER = kMaxProc; // TODO need right symbol here
 
 template<regionType INTYPE, regionType METYPE, int LAYER, int DISK> //, int NINPUTS, uint32_t MEMASK, uint32_t TEIMASK, uint16_t OLMASK, uint32_t TEOMASK>
-void VMRouter(const BXType bx, const int finebintable[],
+void VMRouter(const BXType bx, const int finebintable[], const int binlookuptable[], const int bendtable[],
 		const int overlaptable[],
 		// Input memories
 		const ap_uint<6>& imask, const InputStubMemory<INTYPE>* const i0,
@@ -1027,7 +1027,7 @@ void VMRouter(const BXType bx, const int finebintable[],
 
 			stubTeInner.setBend(bend);
 			stubTeInner.setIndex(typename VMStubTEInner<METYPE>::VMSTEIID(i));
-
+			ap_uint<11> binlookup; // make it nicer
 			// LAYER
 			if (LAYER != 0) {
 				auto nphireg = 5; // Number of bits for VMs? Number of phi regions?
@@ -1037,9 +1037,18 @@ void VMRouter(const BXType bx, const int finebintable[],
 					nphireg = 4;
 				auto nfinephi = nfinephibarrelinner; // Number of bits for finephi?
 				auto z = stub.getZ();
-				auto nzbits = stubTeInner.getZBits().length();
+				auto r = stub.getR();
+				int zbins = (1 << 7); // 7 = zbits
+				int rbins = (1 << 4); // Number of bins in r
+				int zbin = (z + (1 << (z.length() - 1))) >> (z.length() - 7); // Make z positive and take the 5 MSBs TODO replace 7
+				int rbin = (r + (1 << (r.length() - 1))) >> (r.length() - 4); // What is this doing... r already positive?! 4 MSBs??
 
-				stubTeInner.setZBits(z >> (z.length() - nzbits)); // Maybe change so that we don't call getZ etc so many times? Remove hardcoded value
+				int index = zbin * rbins + rbin; // number of bins
+
+				binlookup = binlookuptable[index];
+				std::cout << "INDEX: " << index << "    binlookup: " << binlookup <<std::endl;
+
+				stubTeInner.setZBits(binlookup);
 				stubTeInner.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, nphireg, nfinephi)); // is this the right nphireg
 			} else { // DISKS
@@ -1057,350 +1066,209 @@ void VMRouter(const BXType bx, const int finebintable[],
 
 			std::cout << "TEInner stub " << std::hex << stubTeInner.raw()
 					<< std::endl;
-			std::cout << "iphiRaw: " << std::dec << iphiRaw << std::endl
+			std::cout << "iphiRaw: " << std::dec << iphiRaw <<std::endl
 					<< std::endl;
 			// No coarse phi bins? Aaaah probably yes, since they correspond to the different VMs?
-
+			bool passbend = bendtable[bend];
+			if (binlookup <= 1008 && passbend) {
 			// Save stub to memories
 			// 0-9
 			if (teimask[0]) {
-				if ((iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0))
+				if (iphiRaw == 0) {
 					mtei0->write_mem(bx, stubTeInner, addrCount[0]);
-				addrCount[0] += 1;
+					addrCount[0] += 1;
+				}
 			}
 			if (teimask[1]) {
-				if ((iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1))
+				if (iphiRaw == 1) {
 					mtei1->write_mem(bx, stubTeInner, addrCount[1]);
-				addrCount[1] += 1;
+					addrCount[1] += 1;
+				}
 			}
 			if (teimask[2]) {
-				if (iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2)
+				if (iphiRaw == 2) {
 					mtei2->write_mem(bx, stubTeInner, addrCount[2]);
-				addrCount[2] += 1;
+					addrCount[2] += 1;
+				}
 			}
 			if (teimask[3]) {
-				if (iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3)
+				if (iphiRaw == 3) {
 					mtei3->write_mem(bx, stubTeInner, addrCount[3]);
-				addrCount[3] += 1;
+					addrCount[3] += 1;
+				}
 			}
 			if (teimask[4]) {
-				if (iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4)
+				if (iphiRaw == 4) {
 					mtei4->write_mem(bx, stubTeInner, addrCount[4]);
-				addrCount[4] += 1;
+					addrCount[4] += 1;
+				}
 			}
 			if (teimask[5]) {
-				if (iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5)
+				if (iphiRaw == 5) {
 					mtei5->write_mem(bx, stubTeInner, addrCount[5]);
-				addrCount[5] += 1;
+					addrCount[5] += 1;
+				}
 			}
 			if (teimask[6]) {
-				if (iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6)
+				if (iphiRaw == 6) {
 					mtei6->write_mem(bx, stubTeInner, addrCount[6]);
-				addrCount[6] += 1;
+					addrCount[6] += 1;
+				}
 			}
 			if (teimask[7]) {
-				if (iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7)
+				if (iphiRaw == 7) {
 					mtei7->write_mem(bx, stubTeInner, addrCount[7]);
-				addrCount[7] += 1;
+					addrCount[7] += 1;
+				}
 			}
 			if (teimask[8]) {
-				if (iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8)
+				if (iphiRaw == 8) {
 					mtei8->write_mem(bx, stubTeInner, addrCount[8]);
-				addrCount[8] += 1;
+					addrCount[8] += 1;
+				}
 			}
 			if (teimask[9]) {
-				if (iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9)
+				if (iphiRaw == 9) {
 					mtei9->write_mem(bx, stubTeInner, addrCount[9]);
-				addrCount[9] += 1;
+					addrCount[9] += 1;
+				}
 			}
 			// 10-19
 			if (teimask[10]) {
-				if ((iphiRaw == 10) || (iphiRawMinus == 10)
-						|| (iphiRawPlus == 10))
+				if (iphiRaw == 10) {
 					mtei10->write_mem(bx, stubTeInner, addrCount[10]);
-				addrCount[10] += 1;
+					addrCount[10] += 1;
+				}
 			}
 			if (teimask[11]) {
-				if ((iphiRaw == 11) || (iphiRawMinus == 11)
-						|| (iphiRawPlus == 11))
+				if (iphiRaw == 11) {
 					mtei11->write_mem(bx, stubTeInner, addrCount[11]);
-				addrCount[11] += 1;
+					addrCount[11] += 1;
+				}
 			}
 			if (teimask[12]) {
-				if (iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12)
+				if (iphiRaw == 12) {
 					mtei12->write_mem(bx, stubTeInner, addrCount[12]);
-				addrCount[12] += 1;
+					addrCount[12] += 1;
+				}
 			}
 			if (teimask[13]) {
-				if (iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13)
+				if (iphiRaw == 13) {
 					mtei13->write_mem(bx, stubTeInner, addrCount[13]);
 				addrCount[13] += 1;
+				}
 			}
 			if (teimask[14]) {
-				if (iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14)
+				if (iphiRaw == 14) {
 					mtei14->write_mem(bx, stubTeInner, addrCount[14]);
-				addrCount[14] += 1;
+					addrCount[14] += 1;
+				}
 			}
 			if (teimask[15]) {
-				if (iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15)
+				if (iphiRaw == 15) {
 					mtei15->write_mem(bx, stubTeInner, addrCount[15]);
-				addrCount[15] += 1;
+					addrCount[15] += 1;
+				}
 			}
 			if (teimask[16]) {
-				if (iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16)
+				if (iphiRaw == 16) {
 					mtei16->write_mem(bx, stubTeInner, addrCount[16]);
-				addrCount[16] += 1;
-			}
+					addrCount[16] += 1;
+				}
+				}
 			if (teimask[17]) {
-				if (iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17)
+				if (iphiRaw == 17) {
 					mtei17->write_mem(bx, stubTeInner, addrCount[17]);
-				addrCount[17] += 1;
+					addrCount[17] += 1;
+				}
 			}
 			if (teimask[18]) {
-				if (iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18)
+				if (iphiRaw == 18) {
 					mtei18->write_mem(bx, stubTeInner, addrCount[18]);
-				addrCount[18] += 1;
+					addrCount[18] += 1;
+				}
 			}
 			if (teimask[19]) {
-				if (iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19)
+				if (iphiRaw == 19) {
 					mtei19->write_mem(bx, stubTeInner, addrCount[19]);
-				addrCount[19] += 1;
+					addrCount[19] += 1;
+				}
 			}
 			// 20-29
 			if (teimask[20]) {
-				if ((iphiRaw == 20) || (iphiRawMinus == 20)
-						|| (iphiRawPlus == 20))
+				if (iphiRaw == 20) {
 					mtei20->write_mem(bx, stubTeInner, addrCount[20]);
-				addrCount[20] += 1;
+					addrCount[20] += 1;
+				}
 			}
 			if (teimask[21]) {
-				if ((iphiRaw == 21) || (iphiRawMinus == 21)
-						|| (iphiRawPlus == 21))
+				if (iphiRaw == 21) {
 					mtei21->write_mem(bx, stubTeInner, addrCount[21]);
-				addrCount[21] += 1;
+					addrCount[21] += 1;
+				}
 			}
 			if (teimask[22]) {
-				if (iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22)
+				if (iphiRaw == 22) {
 					mtei22->write_mem(bx, stubTeInner, addrCount[22]);
-				addrCount[22] += 1;
+					addrCount[22] += 1;
+				}
 			}
 			if (teimask[23]) {
-				if (iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23)
+				if (iphiRaw == 23) {
 					mtei23->write_mem(bx, stubTeInner, addrCount[23]);
-				addrCount[23] += 1;
+					addrCount[23] += 1;
+				}
 			}
 			if (teimask[24]) {
-				if (iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24)
+				if (iphiRaw == 24) {
 					mtei24->write_mem(bx, stubTeInner, addrCount[24]);
-				addrCount[24] += 1;
+					addrCount[24] += 1;
+				}
 			}
 			if (teimask[25]) {
-				if (iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25)
+				if (iphiRaw == 25) {
 					mtei25->write_mem(bx, stubTeInner, addrCount[25]);
 				addrCount[25] += 1;
 			}
+			}
 			if (teimask[26]) {
-				if (iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26)
+				if (iphiRaw == 26) {
 					mtei26->write_mem(bx, stubTeInner, addrCount[26]);
-				addrCount[26] += 1;
+					addrCount[26] += 1;
+				}
 			}
 			if (teimask[27]) {
-				if (iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27)
+				if (iphiRaw == 27) {
 					mtei27->write_mem(bx, stubTeInner, addrCount[27]);
 				addrCount[27] += 1;
+				}
 			}
 			if (teimask[28]) {
-				if (iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28)
+				if (iphiRaw == 28) {
 					mtei28->write_mem(bx, stubTeInner, addrCount[28]);
 				addrCount[28] += 1;
+				}
 			}
 			if (teimask[29]) {
-				if (iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29)
+				if (iphiRaw == 29) {
 					mtei29->write_mem(bx, stubTeInner, addrCount[29]);
-				addrCount[29] += 1;
+					addrCount[29] += 1;
+				}
 			}
 			// 30-31
 			if (teimask[30]) {
-				if ((iphiRaw == 30) || (iphiRawMinus == 30)
-						|| (iphiRawPlus == 30))
+				if (iphiRaw == 30) {
 					mtei30->write_mem(bx, stubTeInner, addrCount[30]);
-				addrCount[30] += 1;
+					addrCount[30] += 1;
+				}
 			}
 			if (teimask[31]) {
-				if ((iphiRaw == 31) || (iphiRawMinus == 31)
-						|| (iphiRawPlus == 31))
+				if (iphiRaw == 31) {
 					mtei31->write_mem(bx, stubTeInner, addrCount[31]);
-				addrCount[31] += 1;
+					addrCount[31] += 1;
+				}
 			}
-			if (teimask[0]) {
-				if ((iphiRaw == 0) || (iphiRawMinus == 0) || (iphiRawPlus == 0))
-					mtei0->write_mem(bx, stubTeInner, addrCount[0]);
-				addrCount[0] += 1;
-			}
-			if (teimask[1]) {
-				if ((iphiRaw == 1) || (iphiRawMinus == 1) || (iphiRawPlus == 1))
-					mtei1->write_mem(bx, stubTeInner, addrCount[1]);
-				addrCount[1] += 1;
-			}
-			if (teimask[2]) {
-				if (iphiRaw == 2 || iphiRawMinus == 2 || iphiRawPlus == 2)
-					mtei2->write_mem(bx, stubTeInner, addrCount[2]);
-				addrCount[2] += 1;
-			}
-			if (teimask[3]) {
-				if (iphiRaw == 3 || iphiRawMinus == 3 || iphiRawPlus == 3)
-					mtei3->write_mem(bx, stubTeInner, addrCount[3]);
-				addrCount[3] += 1;
-			}
-			if (teimask[4]) {
-				if (iphiRaw == 4 || iphiRawMinus == 4 || iphiRawPlus == 4)
-					mtei4->write_mem(bx, stubTeInner, addrCount[4]);
-				addrCount[4] += 1;
-			}
-			if (teimask[5]) {
-				if (iphiRaw == 5 || iphiRawMinus == 5 || iphiRawPlus == 5)
-					mtei5->write_mem(bx, stubTeInner, addrCount[5]);
-				addrCount[5] += 1;
-			}
-			if (teimask[6]) {
-				if (iphiRaw == 6 || iphiRawMinus == 6 || iphiRawPlus == 6)
-					mtei6->write_mem(bx, stubTeInner, addrCount[6]);
-				addrCount[6] += 1;
-			}
-			if (teimask[7]) {
-				if (iphiRaw == 7 || iphiRawMinus == 7 || iphiRawPlus == 7)
-					mtei7->write_mem(bx, stubTeInner, addrCount[7]);
-				addrCount[7] += 1;
-			}
-			if (teimask[8]) {
-				if (iphiRaw == 8 || iphiRawMinus == 8 || iphiRawPlus == 8)
-					mtei8->write_mem(bx, stubTeInner, addrCount[8]);
-				addrCount[8] += 1;
-			}
-			if (teimask[9]) {
-				if (iphiRaw == 9 || iphiRawMinus == 9 || iphiRawPlus == 9)
-					mtei9->write_mem(bx, stubTeInner, addrCount[9]);
-				addrCount[9] += 1;
-			}
-			// 10-19
-			if (teimask[10]) {
-				if ((iphiRaw == 10) || (iphiRawMinus == 10)
-						|| (iphiRawPlus == 10))
-					mtei10->write_mem(bx, stubTeInner, addrCount[10]);
-				addrCount[10] += 1;
-			}
-			if (teimask[11]) {
-				if ((iphiRaw == 11) || (iphiRawMinus == 11)
-						|| (iphiRawPlus == 11))
-					mtei11->write_mem(bx, stubTeInner, addrCount[11]);
-				addrCount[11] += 1;
-			}
-			if (teimask[12]) {
-				if (iphiRaw == 12 || iphiRawMinus == 12 || iphiRawPlus == 12)
-					mtei12->write_mem(bx, stubTeInner, addrCount[12]);
-				addrCount[12] += 1;
-			}
-			if (teimask[13]) {
-				if (iphiRaw == 13 || iphiRawMinus == 13 || iphiRawPlus == 13)
-					mtei13->write_mem(bx, stubTeInner, addrCount[13]);
-				addrCount[13] += 1;
-			}
-			if (teimask[14]) {
-				if (iphiRaw == 14 || iphiRawMinus == 14 || iphiRawPlus == 14)
-					mtei14->write_mem(bx, stubTeInner, addrCount[14]);
-				addrCount[14] += 1;
-			}
-			if (teimask[15]) {
-				if (iphiRaw == 15 || iphiRawMinus == 15 || iphiRawPlus == 15)
-					mtei15->write_mem(bx, stubTeInner, addrCount[15]);
-				addrCount[15] += 1;
-			}
-			if (teimask[16]) {
-				if (iphiRaw == 16 || iphiRawMinus == 16 || iphiRawPlus == 16)
-					mtei16->write_mem(bx, stubTeInner, addrCount[16]);
-				addrCount[16] += 1;
-			}
-			if (teimask[17]) {
-				if (iphiRaw == 17 || iphiRawMinus == 17 || iphiRawPlus == 17)
-					mtei17->write_mem(bx, stubTeInner, addrCount[17]);
-				addrCount[17] += 1;
-			}
-			if (teimask[18]) {
-				if (iphiRaw == 18 || iphiRawMinus == 18 || iphiRawPlus == 18)
-					mtei18->write_mem(bx, stubTeInner, addrCount[18]);
-				addrCount[18] += 1;
-			}
-			if (teimask[19]) {
-				if (iphiRaw == 19 || iphiRawMinus == 19 || iphiRawPlus == 19)
-					mtei19->write_mem(bx, stubTeInner, addrCount[19]);
-				addrCount[19] += 1;
-			}
-			// 20-29
-			if (teimask[20]) {
-				if ((iphiRaw == 20) || (iphiRawMinus == 20)
-						|| (iphiRawPlus == 20))
-					mtei20->write_mem(bx, stubTeInner, addrCount[20]);
-				addrCount[20] += 1;
-			}
-			if (teimask[21]) {
-				if ((iphiRaw == 21) || (iphiRawMinus == 21)
-						|| (iphiRawPlus == 21))
-					mtei21->write_mem(bx, stubTeInner, addrCount[21]);
-				addrCount[21] += 1;
-			}
-			if (teimask[22]) {
-				if (iphiRaw == 22 || iphiRawMinus == 22 || iphiRawPlus == 22)
-					mtei22->write_mem(bx, stubTeInner, addrCount[22]);
-				addrCount[22] += 1;
-			}
-			if (teimask[23]) {
-				if (iphiRaw == 23 || iphiRawMinus == 23 || iphiRawPlus == 23)
-					mtei23->write_mem(bx, stubTeInner, addrCount[23]);
-				addrCount[23] += 1;
-			}
-			if (teimask[24]) {
-				if (iphiRaw == 24 || iphiRawMinus == 24 || iphiRawPlus == 24)
-					mtei24->write_mem(bx, stubTeInner, addrCount[24]);
-				addrCount[24] += 1;
-			}
-			if (teimask[25]) {
-				if (iphiRaw == 25 || iphiRawMinus == 25 || iphiRawPlus == 25)
-					mtei25->write_mem(bx, stubTeInner, addrCount[25]);
-				addrCount[25] += 1;
-			}
-			if (teimask[26]) {
-				if (iphiRaw == 26 || iphiRawMinus == 26 || iphiRawPlus == 26)
-					mtei26->write_mem(bx, stubTeInner, addrCount[26]);
-				addrCount[26] += 1;
-			}
-			if (teimask[27]) {
-				if (iphiRaw == 27 || iphiRawMinus == 27 || iphiRawPlus == 27)
-					mtei27->write_mem(bx, stubTeInner, addrCount[27]);
-				addrCount[27] += 1;
-			}
-			if (teimask[28]) {
-				if (iphiRaw == 28 || iphiRawMinus == 28 || iphiRawPlus == 28)
-					mtei28->write_mem(bx, stubTeInner, addrCount[28]);
-				addrCount[28] += 1;
-			}
-			if (teimask[29]) {
-				if (iphiRaw == 29 || iphiRawMinus == 29 || iphiRawPlus == 29)
-					mtei29->write_mem(bx, stubTeInner, addrCount[29]);
-				addrCount[29] += 1;
-			}
-			// 30-31
-			if (teimask[30]) {
-				if ((iphiRaw == 30) || (iphiRawMinus == 30)
-						|| (iphiRawPlus == 30))
-					mtei30->write_mem(bx, stubTeInner, addrCount[30]);
-				addrCount[30] += 1;
-			}
-			if (teimask[31]) {
-				if ((iphiRaw == 31) || (iphiRawMinus == 31)
-						|| (iphiRawPlus == 31))
-					mtei31->write_mem(bx, stubTeInner, addrCount[31]);
-				addrCount[31] += 1;
-			}
+		}
 		}
 
 		//  OVERLAP

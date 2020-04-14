@@ -245,21 +245,21 @@ int main() {
 //    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme8, fout_vmstubme8, ievt,
 //                                                  "VMStubME8", truncation);
 
-// VMStubTEInner1
-// err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei1, fout_vmstubtei1, ievt,
-//                                               "VMStubTEInner17", truncation);
-//
-// // VMStubTEInner2
-// err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei2, fout_vmstubtei2, ievt,
-//                                               "VMStubTEInner18", truncation);
-//
-// // VMStubTEInner3
-// err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei3, fout_vmstubtei3, ievt,
-//                                               "VMStubTEInner19", truncation);
-//
-// // VMStubTEInner4
-// err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei4, fout_vmstubtei4, ievt,
-//                                               "VMStubTEInner20", truncation);
+//VMStubTEInner1
+err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei1, fout_vmstubtei1, ievt,
+                                              "VMStubTEInner17", truncation);
+
+// VMStubTEInner2
+err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei2, fout_vmstubtei2, ievt,
+                                              "VMStubTEInner18", truncation);
+
+// VMStubTEInner3
+err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei3, fout_vmstubtei3, ievt,
+                                              "VMStubTEInner19", truncation);
+
+// VMStubTEInner4
+err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei4, fout_vmstubtei4, ievt,
+                                              "VMStubTEInner20", truncation);
 	} // end of event loop
 	std::cerr << "Exiting with return value " << err << std::endl;
 	return err;
