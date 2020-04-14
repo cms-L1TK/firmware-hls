@@ -1,9 +1,9 @@
 #ifndef TRACKLETENGINE_H
 #define TRACKLETENGINE_H
 
-#include "VMStubTEInnerMemory.hh"
-#include "VMStubTEOuterMemory.hh"
-#include "StubPairMemory.hh"
+#include "VMStubTEInnerMemory.h"
+#include "VMStubTEOuterMemory.h"
+#include "StubPairMemory.h"
 
 #include "hls_math.h"
 #include <stdio.h>
@@ -50,6 +50,7 @@ void TrackletEngine(
                     const ap_uint<1> bendoutertable[stubptouterdepth],
 		    StubPairMemory& outstubpair) {
 
+#pragma HLS inline
   int nstubpairs = 0;
 #pragma HLS dependence variable=nstubpairs intra WAR true
 

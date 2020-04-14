@@ -1,8 +1,8 @@
 // InputRouter Test
 #include "hls_stream.h"
-#include "InputStubMemory.hh"
-#include "InputRouter.hh"
-#include "FileReadUtility.hh"
+#include "InputStubMemory.h"
+#include "InputRouter.h"
+#include "FileReadUtility.h"
 
 #include <iostream>
 #include <fstream>

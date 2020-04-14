@@ -1,10 +1,10 @@
 #ifndef MATCHENGINE_H
 #define MATCHENGINE_H
 
-#include "Constants.hh"
-#include "VMProjectionMemory.hh"
-#include "CandidateMatchMemory.hh"
-#include "VMStubMEMemory.hh"
+#include "Constants.h"
+#include "VMProjectionMemory.h"
+#include "CandidateMatchMemory.h"
+#include "VMStubMEMemory.h"
 #include "hls_math.h"
 #include <iostream>
 #include <fstream>
@@ -15,7 +15,7 @@ void readTable(bool table[256]){
 
   if (L==1) {
     bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_L1.tab"
+#include "../emData/ME/ME_L3PHIC20/METable_L1.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
@@ -23,7 +23,7 @@ void readTable(bool table[256]){
 
   if (L==2) {
     bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_L2.tab"
+#include "../emData/ME/ME_L3PHIC20/METable_L2.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
@@ -31,7 +31,7 @@ void readTable(bool table[256]){
 
   if (L==3) {
     bool tmp[256]=
-#include "../emData/ME/ME_L1PHIE20/METable_L3.tab"
+#include "../emData/ME/ME_L3PHIC20/METable_L3.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
@@ -39,7 +39,7 @@ void readTable(bool table[256]){
 
   if (L==4) {
     bool tmp[512]=
-#include "../emData/ME/ME_L1PHIE20/METable_L4.tab"
+#include "../emData/ME/ME_L3PHIC20/METable_L4.tab"
     for (int i=0;i<512;i++){
       table[i]=tmp[i];
     }
@@ -47,7 +47,7 @@ void readTable(bool table[256]){
 
   if (L==5) {
     bool tmp[512]=
-#include "../emData/ME/ME_L1PHIE20/METable_L5.tab"
+#include "../emData/ME/ME_L3PHIC20/METable_L5.tab"
     for (int i=0;i<512;i++){
       table[i]=tmp[i];
     }
@@ -55,7 +55,7 @@ void readTable(bool table[256]){
 
   if (L==6) {
     bool tmp[512]=
-#include "../emData/ME/ME_L1PHIE20/METable_L6.tab"
+#include "../emData/ME/ME_L3PHIC20/METable_L6.tab"
     for (int i=0;i<512;i++){
       table[i]=tmp[i];
     }
@@ -85,7 +85,7 @@ void MatchEngine(BXType bx, BXType& bx_o,
 		 const VMProjectionMemory<BARREL>* inprojdata,
 		 CandidateMatchMemory* outcandmatch){
 
-
+#pragma HLS inline
 #ifndef __SYNTHESIS__
   //Prinout of number of projections and stubs
   std::cout << "In MatchEngine #proj ="<<std::hex<<inprojdata->getEntries(bx)<<" #stubs=";
