@@ -13,6 +13,7 @@
 // STL Headers
 #include <iostream>
 #include <fstream>
+#include <bitset>
 
 /////////////////////////////
 // -- PREPROCESSOR FUNCTIONS
