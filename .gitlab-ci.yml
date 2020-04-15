@@ -28,26 +28,11 @@ stages: # ---------------------------------------------------------------------
       - ./project/
     expire_in: 1 week
 # Jobs ------------------------------------------------------------------------
-MC-hls-build:
+VMR-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "MC"
-ME-hls-build:
-  <<: *template_hls-build
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ME"
-PR-hls-build:
-  <<: *template_hls-build
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "PR"
-TC-hls-build:
-  <<: *template_hls-build
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "TC"
+    PROJ_NAME: "VMR"
 TE-hls-build:
   <<: *template_hls-build
   variables:
@@ -59,3 +44,30 @@ TE-hls-build:
     - cd ../../project
     - pwd; ls -la; #debug
     - vivado_hls -f "script_${PROJ_NAME}.tcl"
+TC-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TC"
+  script:
+    - cd emData/TC
+    - ./download.sh
+    - cd ../../project
+    - pwd; ls -la; #debug
+    - vivado_hls -f "script_${PROJ_NAME}.tcl"
+PR-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PR"
+ME-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ME"
+MC-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "MC"
+
