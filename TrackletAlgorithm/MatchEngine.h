@@ -101,7 +101,6 @@ namespace ME {
 		kMax = 5
 	};
 }
-constexpr unsigned int kZAdjustment = 8;
 
 /////////////////////////////
 // -- MATCH ENGINE FUNCTIONS
