@@ -53,6 +53,7 @@ int main() {
   static FullMatchMemory<BARREL> fullmatch5;
   static FullMatchMemory<BARREL> fullmatch6;
   static FullMatchMemory<BARREL> fullmatch7;
+  static FullMatchMemory<BARREL> fullmatch8;
 
   ap_uint<8>* valid;
 
@@ -155,20 +156,29 @@ int main() {
                         &allstub, &allproj,
                         bx_out,
                         &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4,
-                        &fullmatch5, &fullmatch6, &fullmatch7);
+                        &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches
     bool truncation = true;
 
     std::cout << "mem content" << std::endl;
+    std::cout << "fullmatch1" << std::endl;
     fullmatch1.print_mem();
+    std::cout << "fullmatch2" << std::endl;
     fullmatch2.print_mem();
+    std::cout << "fullmatch3" << std::endl;
     fullmatch3.print_mem();
+    std::cout << "fullmatch4" << std::endl;
     fullmatch4.print_mem();
+    std::cout << "fullmatch5" << std::endl;
     fullmatch5.print_mem();
+    std::cout << "fullmatch6" << std::endl;
     fullmatch6.print_mem();
+    std::cout << "fullmatch7" << std::endl;
     fullmatch7.print_mem();
+    std::cout << "fullmatch8" << std::endl;
+    fullmatch8.print_mem();
     // compare the computed outputs with the expected ones 
     //std::cout << "FM: L1L2 seeding" << std::endl;
     err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch1, fout_fm1, ievt, "FullMatch", truncation);
