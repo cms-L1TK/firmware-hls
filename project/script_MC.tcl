@@ -9,7 +9,7 @@ open_project -reset match_calc
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top MatchCalculatorTop
-add_files ../TrackletAlgorithm/MatchCalculatorTop.cpp -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files

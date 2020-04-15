@@ -1,4 +1,4 @@
-#include "VMRouterTop.hh"
+#include "VMRouterTop.h"
 
 // VMRouter Top Function for layer 1, AllStub region E
 
@@ -20,6 +20,7 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 		VMStubMEMemory<BARRELPS> *m5,
 		VMStubMEMemory<BARRELPS> *m6,
 		VMStubMEMemory<BARRELPS> *m7,
+		// TE Inner memories
 		VMStubTEInnerMemory<BARRELPS> *mtei0,
 		VMStubTEInnerMemory<BARRELPS> *mtei1,
 		VMStubTEInnerMemory<BARRELPS> *mtei2,
@@ -32,17 +33,15 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 		VMStubTEInnerMemory<BARRELOL> *mteol2) {
 
 // Variables for that are specified with regards to the test bench, should be set somewhere else
-	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
-	const int disk(0); // Which disk number the data is coming from, 0 if not disk
-	const int ninputs(3);  // The number of input memories
 
 // const uint32_t MEMask(0x000F0000UL); // Mask of which memories that are being used.
 // const uint32_t TEIMask(0x000F0000UL); // Mask of which TE Inner memories that are used
 // const uint16_t OLMask(0x300); // Mask of which TE Outer memories that are used
 // const uint32_t TEOMask(0x0UL); // Mask of which TE Inner memories that are used
 // Note that the masks are "reversed"
-
-	static const ap_uint<6> imask(0x7); // Mask of which inputs that are being used
+	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
+	const int disk(0); // Which disk number the data is coming from, 0 if not disk
+	static const ap_uint<6> imask(0xF); // Mask of which inputs that are being used
 	static const ap_uint<32> memask(0x000F0000UL); // Mask of which memories that are being used.
 	static const ap_uint<32> teimask(0x000F0000UL); // Mask of which TE Inner memories that are used
 	static const ap_uint<16> olmask(0x300); // Mask of which TE Outer memories that are used
@@ -54,26 +53,36 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 // lookup table - 2^nbinsfinbinetable entries actually filled
 // Table is filled with numbers between 0 and 7 (and -1): the finer region each z/r bin is divided into.
 	static const int finebintable[kMaxFineBinTable] =
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.txt"
+#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
 	;
 
 	static const int binlookuptable[2048] = // 11 bits used for LUT
 #include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1L2.tab" // Only for Layer 1
 					;
 
-static const int bendtable[8] = // bendtable
-				#include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.txt" // Only for Layer 1
-									;
+
+// Bendcut tables
+static const int bendtablesize = 8;
+static const int bendtable[][bendtablesize] = {
+			#include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.txt" // Seems to be the same for all E regions
+			// ,
+			// #include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.txt"
+			// ,
+			// #include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.txt"
+			// ,
+			// #include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.txt"
+};
+
 // Overlap LUT
 	static const int overlaptable[1024] = // 10 bits used for LUT
 #include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab" // Only for Layer 1
 					;
 // SHOULD I USE SOMETHING ELSE THAN INT FOR MY TABLES???
 
-					VMRouter<BARRELPS, BARRELPS, layer, disk>
+					VMRouter<BARRELPS, BARRELPS, layer, disk, bendtablesize>
 					//, ninputs, MEMask, TEIMask, OLMask, TEOMask>
 					(bx, finebintable, binlookuptable, bendtable, overlaptable, imask,
-					i0, i1, i2, nullptr, nullptr, nullptr, //i5,i6,i7,
+					i0, i1, i2, i3, nullptr, nullptr, //i5,i6,i7,
 					allStub,
 // ME memories
 					memask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7

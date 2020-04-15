@@ -9,7 +9,7 @@ open_project -reset matchengine
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top MatchEngineTopL3
-add_files ../TrackletAlgorithm/MatchEngineTopL3.cpp -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchEngineTopL3.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchEngineL3_test.cpp -cflags "$CFLAGS"
 
 # data files
