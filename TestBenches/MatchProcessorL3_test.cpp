@@ -44,7 +44,6 @@ int main() {
   VMStubMEMemory<BARRELPS> inputvmstubs6;
   VMStubMEMemory<BARRELPS> inputvmstubs7;
   VMStubMEMemory<BARRELPS> inputvmstubs8;
-  VMStubMEMemory<BARRELPS> inputvmstubs;
 
   // declare output memory array to be filled by hls simulation
   static FullMatchMemory<BARREL> fullmatch1;
@@ -81,7 +80,6 @@ int main() {
   if (not openDataFile(fin_tproj8, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat")) return -1;
 
   ifstream fin_vmstub1, fin_vmstub2, fin_vmstub3, fin_vmstub4, fin_vmstub5, fin_vmstub6, fin_vmstub7, fin_vmstub8;
-  ifstream fin_vmstub;
   bool validvmstub1 = openDataFile(fin_vmstub1,"MP/MP_L3PHIC17/VMStubs_VMSMP_L3PHIC17n1_04.dat");
   bool validvmstub2 = openDataFile(fin_vmstub2,"MP/MP_L3PHIC18/VMStubs_VMSMP_L3PHIC18n1_04.dat");
   bool validvmstub3 = openDataFile(fin_vmstub3,"MP/MP_L3PHIC19/VMStubs_VMSMP_L3PHIC19n1_04.dat");
@@ -90,7 +88,6 @@ int main() {
   bool validvmstub6 = openDataFile(fin_vmstub6,"MP/MP_L3PHIC22/VMStubs_VMSMP_L3PHIC22n1_04.dat");
   bool validvmstub7 = openDataFile(fin_vmstub7,"MP/MP_L3PHIC23/VMStubs_VMSMP_L3PHIC23n1_04.dat");
   bool validvmstub8 = openDataFile(fin_vmstub8,"MP/MP_L3PHIC24/VMStubs_VMSMP_L3PHIC24n1_04.dat");
-  bool validvmstub = openDataFile(fin_vmstub,"MP/MP_L3PHIC24/VMStubs_VMSMP_L3PHIC24n1_04.dat");
   if (not validvmstub1) return -1;
   if (not validvmstub2) return -1;
   if (not validvmstub3) return -1;
@@ -99,7 +96,6 @@ int main() {
   if (not validvmstub6) return -1;
   if (not validvmstub7) return -1;
   if (not validvmstub8) return -1;
-  if (not validvmstub) return -1;
 
   if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn4_04.dat")) return -1;
   if (not openDataFile(fin_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat")) return -1;
@@ -145,7 +141,6 @@ int main() {
     writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs6, fin_vmstub6, ievt);
     writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs7, fin_vmstub7, ievt);
     writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs8, fin_vmstub8, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs, fin_vmstub, ievt);
 
     //set bunch crossing
     BXType bx=ievt;
@@ -157,7 +152,7 @@ int main() {
                         &tproj5, &tproj6, &tproj7, &tproj8,
                         &inputvmstubs1, &inputvmstubs2, &inputvmstubs3, &inputvmstubs4,
                         &inputvmstubs5, &inputvmstubs6, &inputvmstubs7, &inputvmstubs8,
-                        &inputvmstubs, &allstub, &allproj,
+                        &allstub, &allproj,
                         bx_out,
                         &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4,
                         &fullmatch5, &fullmatch6, &fullmatch7);
@@ -210,7 +205,6 @@ int main() {
   fin_vmstub6.close();
   fin_vmstub7.close();
   fin_vmstub8.close();
-  fin_vmstub.close();
   fout_fm1.close();
   fout_fm2.close();
   fout_fm3.close();
