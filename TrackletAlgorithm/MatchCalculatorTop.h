@@ -1,7 +1,7 @@
 #ifndef MATCHCALCULATORTOP_H
 #define MATCHCALCULATORTOP_H
 
-#include "MatchCalculator.hh"
+#include "MatchCalculator.h"
 
 void MatchCalculatorTop(BXType bx,
                         const CandidateMatchMemory*,

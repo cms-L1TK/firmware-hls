@@ -1,8 +1,8 @@
 // Test bench for the MatchCalculator 
 #include "MatchCalculatorTop.h"
 
-#include "FileReadUtility.hh"
-#include "Constants.hh"
+#include "FileReadUtility.h"
+#include "Constants.h"
 
 #include "hls_math.h"
 #include <iostream>

@@ -9,7 +9,7 @@ open_project -reset projrouter
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top ProjectionRouterTop
-add_files ../TrackletAlgorithm/ProjectionRouterTop.cpp -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/ProjectionRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "$CFLAGS"
 
 # data files
