@@ -10,6 +10,7 @@
 #include "AllStubMemory.hh"
 #include "AllProjectionMemory.hh"
 #include "FullMatchMemory.hh"
+#include "MatchEngineUnit.hh"
 #include "hls_math.h"
 #include <iostream>
 #include <fstream>
@@ -591,7 +592,6 @@ void MatchProcessor(BXType bx,
                       const VMStubMEMemory<VMSMEType>* instubdata6,
                       const VMStubMEMemory<VMSMEType>* instubdata7,
                       const VMStubMEMemory<VMSMEType>* instubdata8,
-                      const VMStubMEMemory<VMSMEType>* instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       const AllProjectionMemory<APTYPE>* allproj,
                       BXType& bx_o,
@@ -609,7 +609,7 @@ void MatchProcessor(BXType bx,
   //Prinout of number of projections and stubs
   std::cout << "In MatchrProcessor #stubs=";
   for (unsigned int zbin=0;zbin<8;zbin++){
-    std::cout <<" "<<instubdata->getEntries(bx,zbin);
+    std::cout <<" "<<instubdata1->getEntries(bx,zbin);
   }
   std::cout<<std::dec<<std::endl;
 #endif
@@ -1061,10 +1061,30 @@ void MatchProcessor(BXType bx,
   } //end loop
 
   std::cout << "Starting ME loop" << std::endl;
+  readindex=0;
+  MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kMatchEngines];
+  for(int iphi = 0; iphi < kMatchEngines; ++iphi)
+    matchengine[iphi].init(bx, table, projbuffer[iphi], writeindex[iphi], iphi);
+
+  int iMEbest=kMatchEngines;
+  int bestID=-1;
+  bool bestInPipeline=false;
+  ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+    for(int iphi = 0; iphi < kMatchEngines; ++iphi) {
+      matchengine[iphi].step(instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8);
+      if(matchengine[iphi].idle() && !matchengine[iphi].empty())
+        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
+                  (bx, allstub, allproj, matchengine[iphi].getProjindex(), matchengine[iphi].getStubIds(), matchengine[iphi].getNStubs(), bx_o,
+                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7);
+    }
+  
+  } //end loop
+
+return;
   for (int ivmphi = 0; ivmphi < kMatchEngines; ++ivmphi) {
 #pragma HLS PIPELINE II=1
   //if(ivmphi<6) continue;
-  readindex=0;
   ENG_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 
@@ -1217,7 +1237,7 @@ void MatchProcessor(BXType bx,
         std::cout << "concat=" << zbin.concat(istubtmp) << std::endl;
         */
         //auto stubdata=instubdata->read_mem(bx,stubadd);
-        VMStubME<VMSMEType> stubdata;//=instubdata->read_mem(bx,stubadd);
+        VMStubME<VMSMEType> stubdata;
         switch (ivmphi) {
           case 0: stubdata=instubdata1->read_mem(bx,stubadd);
           break;
