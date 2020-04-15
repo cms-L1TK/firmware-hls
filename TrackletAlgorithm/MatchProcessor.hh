@@ -337,7 +337,8 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch4,
                      FullMatchMemory<FMTYPE>* fullmatch5,
                      FullMatchMemory<FMTYPE>* fullmatch6,
-                     FullMatchMemory<FMTYPE>* fullmatch7
+                     FullMatchMemory<FMTYPE>* fullmatch7,
+                     FullMatchMemory<FMTYPE>* fullmatch8
 ){
 
 #pragma HLS inline
@@ -506,6 +507,7 @@ void MatchCalculator(BXType bx,
       fullmatch5->clear(bx);
       fullmatch6->clear(bx);
       fullmatch7->clear(bx);
+      fullmatch8->clear(bx);
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       std::cout << "writing " << bestmatch.raw() << std::endl;
@@ -532,11 +534,15 @@ void MatchCalculator(BXType bx,
       break;
       case 5:
       fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
-      nmcout5++;
+      nmcout6++;
       break;
       case 6:
       fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
-      nmcout6++;
+      nmcout7++;
+      break;
+      case 7:
+      fullmatch8->write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+      nmcout8++;
       break;
       }
     }
@@ -601,7 +607,8 @@ void MatchProcessor(BXType bx,
                       FullMatchMemory<FMTYPE>* fullmatch4,
                       FullMatchMemory<FMTYPE>* fullmatch5,
                       FullMatchMemory<FMTYPE>* fullmatch6,
-                      FullMatchMemory<FMTYPE>* fullmatch7
+                      FullMatchMemory<FMTYPE>* fullmatch7,
+                      FullMatchMemory<FMTYPE>* fullmatch8
 ){
 #pragma HLS inline
 
@@ -628,6 +635,7 @@ void MatchProcessor(BXType bx,
   fullmatch5->clear(bx);
   fullmatch6->clear(bx);
   fullmatch7->clear(bx);
+  fullmatch8->clear(bx);
 
   // initialization:
   // check the number of entries in the input memories
@@ -694,10 +702,9 @@ void MatchProcessor(BXType bx,
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
   auto nproj=0;
-  int kMatchEngines=8;
 
     //ap_uint<kNBits_ProjBuffer> projbuffer[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
-    ProjectionRouterBuffer<BARREL> projbuffer[kMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+    ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer1[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer2[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer3[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
@@ -960,6 +967,7 @@ void MatchProcessor(BXType bx,
 
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
+            std::cout << "PRiphi=" << iphi << std::endl;
           projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
         /*
           switch (iphi) {
@@ -983,15 +991,16 @@ void MatchProcessor(BXType bx,
           projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
         */
           //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
-        /* FIXME
         std::cout << std::hex << "proj=" << projbuffer[writeindextmp]->raw() << std::endl;
         std::cout << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
+        /* FIXME
         */
         }
         if (savelast) {
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             ap_uint<kNBitsBuffer> writeindextmpplus=writeindextmp+1;
+            std::cout << "PRiphi=" << iphi << std::endl;
             projbuffer[iphi][writeindextmpplus]=ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
         /*
           switch (iphi) {
@@ -1014,14 +1023,15 @@ void MatchProcessor(BXType bx,
           }
             projbuffer8[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
         */
-        /* FIXME
         std::cout << std::hex << "proj=" << projbuffer[writeindextmpplus]->raw() << std::endl;
         std::cout << "who's proj=" << projbuffer[writeindextmpplus]->getProjection() << std::endl;
+        /* FIXME
         std::cout << std::hex << "and vmproj=" << vmproj.raw() << std::endl;
         */
           //projbuffermem.write_mem(bx, *projbuffer[writeindextmpplus], writeindextmpplus);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
+            std::cout << "PRiphi=" << iphi << std::endl;
             projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
           /*
           switch (iphi) {
@@ -1045,9 +1055,9 @@ void MatchProcessor(BXType bx,
             projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
           */
           //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
-        /* FIXME
         std::cout << std::hex << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
         std::cout << std::hex << "writeing proj=" << projbuffer[writeindextmp]->raw() << std::endl;
+        /* FIXME
         */
           }
         }
@@ -1062,29 +1072,30 @@ void MatchProcessor(BXType bx,
 
   std::cout << "Starting ME loop" << std::endl;
   readindex=0;
-  MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kMatchEngines];
-  for(int iphi = 0; iphi < kMatchEngines; ++iphi)
+  MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
+  for(int iphi = 0; iphi < kNMatchEngines; ++iphi)
     matchengine[iphi].init(bx, table, projbuffer[iphi], writeindex[iphi], iphi);
 
-  int iMEbest=kMatchEngines;
+  int iMEbest=kNMatchEngines;
   int bestID=-1;
   bool bestInPipeline=false;
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
-    for(int iphi = 0; iphi < kMatchEngines; ++iphi) {
+    for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
       matchengine[iphi].step(instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8);
       if(matchengine[iphi].idle() && !matchengine[iphi].empty())
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                   (bx, allstub, allproj, matchengine[iphi].getProjindex(), matchengine[iphi].getStubIds(), matchengine[iphi].getNStubs(), bx_o,
                    nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
-                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7);
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
     }
-  
   } //end loop
+  
 
 return;
-  for (int ivmphi = 0; ivmphi < kMatchEngines; ++ivmphi) {
+  for (int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
 #pragma HLS PIPELINE II=1
   //if(ivmphi<6) continue;
+  readindex=0;
   ENG_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 
@@ -1305,7 +1316,7 @@ return;
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                   (bx, allstub, allproj, projindex, stubids, istubtmp, bx_o,
                    nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
-                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7);
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
         }
  
         //-----------------------------------------------------------------------------------------------------------
