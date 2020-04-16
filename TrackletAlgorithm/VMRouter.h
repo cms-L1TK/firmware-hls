@@ -192,6 +192,30 @@ inline ap_uint<5> iphivmRawMinus(const typename AllStub<INTYPE>::ASPHI phi) {
 
 }
 
+// Get the corrected phi using the bend at the nominal radius of the barrel which TE (and ME?) assumes it to be
+template<regionType INTYPE>
+inline typename AllStub<INTYPE>::ASPHI getPhiCorr(const typename AllStub<INTYPE>::ASPHI phi,
+	const typename AllStub<INTYPE>::ASR r, const typename AllStub<INTYPE>::ASBEND bend) {
+	if (INTYPE == DISKPS || INTYPE == DISK2S) return phi; // Do nothing if disks
+
+	// For layers
+	static const int corrtable[] = // LUT with correction for different r and bend
+#include "../emData/VMR/VMPhiCorrL1.txt"
+	;
+
+	int rbins = 1 << 3; // The number of bins for r. Found hardcoded in VMRouterPhiCorrTable.h
+	int rbin=(r+(1<<(r.length()-1)))>>(r.length()-3); // Which bin r belongs to
+	int index = bend * rbins + rbin; // index for where we find our correction value
+	int corrval = corrtable[index]; // the amount we need to correct our phi
+
+	int phicorr = phi - corrval; // the corrected phi
+
+	if (phicorr < 0) phicorr = 0; // can't be less than 0
+	if (phicorr >= 1 << phi.length()) phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
+
+	return phicorr;
+}
+
 // Maximum number of stubs that can be processed (memory depth)
 // originally 64, but then it won't pass test bench as it contains more than 64 stubs
 constexpr int MAXVMROUTER = kMaxProc; // TODO need right symbol here
@@ -776,7 +800,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int binlookuptabl
 						nallstubslayers[LAYER - 1] * nvmmelayers[LAYER - 1] :
 						nallstubsdisks[DISK - 1] * nvmmedisks[DISK - 1];
 
-		auto stubPhi = stub.getPhi();
+		auto stubPhi = stub.getPhi(); //getPhiCorr<INTYPE>(stub.getPhi(), stub.getR(), stub.getBend());
 		auto iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
 		auto iphiRawPlus = iphivmRawPlus<INTYPE>(stubPhi); // Top 5 bits of phi after adding a small number
 		auto iphiRawMinus = iphivmRawMinus<INTYPE>(stubPhi); // Top 5 bits of phi after subtracting a small number
@@ -992,7 +1016,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int binlookuptabl
 						nallstubslayers[LAYER - 1] * nvmtelayers[LAYER - 1] :
 						nallstubsdisks[DISK - 1] * nvmtedisks[DISK - 1];
 
-		stubPhi = stub.getPhi(); // Could take from ME
+		stubPhi = getPhiCorr<INTYPE>(stub.getPhi(), stub.getR(), stub.getBend()); // Could take from ME
 		iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
 		iphiRaw = iphiRaw * nvmte / 32.0; // Which VM
 		//iphiRaw = iphiRawPlus;
@@ -1267,7 +1291,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int binlookuptabl
 				VMStubTEInner<BARRELOL> stubOL;
 				auto nvmol = nallstubslayers[LAYER] * 2; // Always 2 overlap vms?
 				// 16 overlap vms per layer
-				stubPhi = stub.getPhi(); // Could take from ME
+				stubPhi = getPhiCorr<INTYPE>(stub.getPhi(), stub.getR(), stub.getBend()); // Could take from ME
 				iphiRaw = iphivmRaw<INTYPE>(stubPhi) >> 1; // Top 4 bits of phi, NEED iphivmraw THAT RETURNS THE TOP 4?! CHECK THIS
 				iphiRaw = iphiRaw * nvmol / 16; // Which VM, BECAUSE WE HAVE 16 VMS?
 
