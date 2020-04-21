@@ -1,9 +1,9 @@
 #ifndef PRBUFFERMEMORY_HH
 #define PRBUFFERMEMORY_HH
 
-#include "Constants.hh"
-#include "MemoryTemplate.hh"
-#include "VMProjectionMemory.hh"
+#include "Constants.h"
+#include "MemoryTemplate.h"
+#include "VMProjectionMemory.h"
 
 // ProjectionRouterBufferBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMProjType> class ProjectionRouterBufferBase {};
