@@ -20,8 +20,9 @@ public:
     kPRBufferNStubsSize = kNBits_MemAddrBinned,
     kPRBufferIndexSize = 7,
     kPRBufferHasSecondSize = 1,
+    kPRBufferTCIDSize = 7,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferIsPSSeedSize + kPRBufferIndexSize + kPRBufferNStubsSize + VMProjectionBase<BARREL>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferHasSecondSize
+    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + kPRBufferNStubsSize + VMProjectionBase<BARREL>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferHasSecondSize
   };
 };
 
@@ -37,8 +38,9 @@ public:
     kPRBufferNStubsSize = kNBits_MemAddrBinned,
     kPRBufferIndexSize = 7,
     kPRBufferHasSecondSize = 1,
+    kPRBufferTCIDSize = 7,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferIsPSSeedSize + kPRBufferIndexSize + VMProjectionBase<DISK>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferNStubsSize + kPRBufferHasSecondSize
+    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + VMProjectionBase<DISK>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferNStubsSize + kPRBufferHasSecondSize
   };
 };
 
@@ -61,7 +63,9 @@ public:
     kPRBufferIndexLSB = kPRProjNStubsMSB + 1,
     kPRBufferIndexMSB = kPRBufferIndexLSB + 1,
     kPRBufferHasSecondLSB = kPRBufferIndexMSB + 1,
-    kPRBufferHasSecondMSB = kPRBufferHasSecondLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferHasSecondSize - 1
+    kPRBufferHasSecondMSB = kPRBufferHasSecondLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferHasSecondSize - 1,
+    kPRBufferTCIDLSB = kPRBufferHasSecondLSB + 1,
+    kPRBufferTCIDMSB = kPRBufferTCIDLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferTCIDSize - 1
   };
   
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferIndexSize> VMPID;
@@ -70,6 +74,7 @@ public:
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferNStubsSize> PRNSTUB;
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferZBinSize> VMPZBIN;
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kProjectionRouterBufferSize> ProjBuffer;
+  typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferTCIDSize> TCID;
 
   // Constructors
   ProjectionRouterBuffer(const ProjBuffer& newdata):
@@ -77,13 +82,13 @@ public:
   {}
 
   // This constructor is only used for projections in BARREL
-  ProjectionRouterBuffer(const PRHASSEC hasSec, const VMPID index, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjData projdata, const bool ps):
-    data_( (((((hasSec,index),nstub),projdata),zbin),ps) )
+  ProjectionRouterBuffer(const TCID tcid, const PRHASSEC hasSec, const VMPID index, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjData projdata, const bool ps):
+    data_( ((((((tcid,hasSec),index),nstub),projdata),zbin),ps) )
   {
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
     setNStubs(nstub); //FIXME error with data_ constructor not setting nstubs correctly
     setHasSecond(hasSec); //FIXME error with data_ constructor not setting hasSec correctly
-    Print();
+    //Print();
   }
 
   // This constructor is only used for projections in DISK
@@ -124,12 +129,16 @@ public:
   void Print()
   {
     std::cout << "Contents in buffer:" << std::endl;
-    std::cout << std::hex << "sec=" << hasSecond() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
+    std::cout << std::hex << "tcid=" << getTCID() << " sec=" << hasSecond() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
   }
   #endif
   
   // Getter
   ProjBuffer raw() const {return data_;}
+
+  TCID getTCID() const {
+    return data_.range(kPRBufferTCIDMSB,kPRBufferTCIDLSB);
+  }
   
   PRHASSEC hasSecond() const {
     return data_.range(kPRBufferHasSecondMSB,kPRBufferHasSecondLSB);
@@ -158,6 +167,10 @@ public:
   }
   
   // Setter
+  void setTCID(const TCID tcid) {
+    data_.range(kPRBufferTCIDMSB,kPRBufferTCIDLSB) = tcid;
+  }
+
   void setHasSecond(const PRHASSEC hasSec) {
     data_.range(kPRBufferHasSecondMSB,kPRBufferHasSecondLSB) = hasSec;
   }
