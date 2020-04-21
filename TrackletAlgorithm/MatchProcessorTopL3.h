@@ -1,7 +1,7 @@
 #ifndef MATCHENGINETOPL3_H
 #define MATCHENGINETOPL3_H
 
-#include "MatchProcessor.hh"
+#include "MatchProcessor.h"
 
 void MatchProcessorTopL3(BXType bx,
                       const TrackletProjectionMemory<BARRELPS>* const proj1in,
