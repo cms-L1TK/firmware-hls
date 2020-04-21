@@ -368,10 +368,10 @@ void MatchCalculator(BXType bx,
   const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
   // Setup look up tables for match cuts
-  ap_uint<17> LUT_matchcut_phi[12];
-  readTable_Cuts<true,LAYER,17,12>(LUT_matchcut_phi);
-  ap_uint<13> LUT_matchcut_z[12];
-  readTable_Cuts<false,LAYER,13,12>(LUT_matchcut_z);
+  ap_uint<17> LUT_matchcut_phi[7];
+  readTable_Cuts<true,LAYER,17,7>(LUT_matchcut_phi);
+  ap_uint<13> LUT_matchcut_z[7];
+  readTable_Cuts<false,LAYER,13,7>(LUT_matchcut_z);
 
   // Initialize MC delta phi cut variables
   ap_uint<17> best_delta_phi;
