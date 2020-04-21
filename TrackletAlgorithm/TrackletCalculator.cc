@@ -28,7 +28,7 @@ void TrackletCalculator_L1L2E(
 #pragma HLS array_partition variable=projout_barrel_2s complete
 #pragma HLS array_partition variable=projout_disk complete
 
-  TC_L1L2E: TrackletCalculator<TC::L1L2, TC::E, BARRELPS, BARRELPS, 2, 1, 13, 0x1FE0, 0x0000, 0x7772000, 0x7777, kMaxProc>(
+  TC_L1L2E: TrackletCalculator<TC::L1L2, TC::E, BARRELPS, BARRELPS, 2, 1, 13, 0x1FE0, 0x0000, 0x7777000, 0x7777, kMaxProc>(
     bx,
     innerStubs,
     outerStubs,
@@ -58,7 +58,7 @@ void TrackletCalculator_L1L2G(
 #pragma HLS array_partition variable=projout_barrel_2s complete
 #pragma HLS array_partition variable=projout_disk complete
 
-  TC_L1L2G: TrackletCalculator<TC::L1L2, TC::G, BARRELPS, BARRELPS, 1, 2, 13, 0x0000, 0x1FEE, 0xEEE6000, 0xEEEE, kMaxProc>(
+  TC_L1L2G: TrackletCalculator<TC::L1L2, TC::G, BARRELPS, BARRELPS, 1, 2, 13, 0x0000, 0x1FEE, 0xF666000, 0xEEEE, kMaxProc>(
     bx,
     innerStubs,
     outerStubs,
@@ -88,7 +88,7 @@ void TrackletCalculator_L3L4E(
 #pragma HLS array_partition variable=projout_barrel_2s complete
 #pragma HLS array_partition variable=projout_disk complete
 
-  TC_L3L4E: TrackletCalculator<TC::L3L4, TC::E, BARRELPS, BARREL2S, 1, 2, 11, 0x0000, 0x7FE, 0xE600478, 0xEE, kMaxProc>(
+  TC_L3L4E: TrackletCalculator<TC::L3L4, TC::E, BARRELPS, BARREL2S, 1, 2, 11, 0x0000, 0x7FE, 0x6600638, 0x66, kMaxProc>(
     bx,
     innerStubs,
     outerStubs,

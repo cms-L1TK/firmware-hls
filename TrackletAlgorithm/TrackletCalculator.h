@@ -19,6 +19,7 @@ namespace TC {
     typedef ap_int<13> rmean;
     typedef ap_int<14> zmean;
     typedef ap_int<15> rinv;
+    typedef ap_int<11> z0;
     typedef ap_uint<20> phiL;
     typedef ap_int<15> zL;
     typedef ap_int<11> der_phiL;
@@ -30,7 +31,7 @@ namespace TC {
     typedef ap_uint<1> flag;
   }
 
-  enum seed {UNDEF_SEED, L1L2 = 0, L3L4 = 1, L5L6 = 2, D1D2 = 3, D3D4 = 4, L1D1 = 5, L2D1 = 6};
+  enum seed {UNDEF_SEED, L1L2 = 0, L2L3 = 1, L3L4 = 2, L5L6 = 3, D1D2 = 4, D3D4 = 5, L1D1 = 6, L2D1 = 7};
   enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
   enum layer {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5};
   enum disk {D1 = 0, D2 = 1, D3 = 2, D4 = 3, D5 = 4};
@@ -78,18 +79,18 @@ namespace TC {
   static const ap_uint<9> z0cut_L1L2 = 15.0 / kz0 + 1.0e-1;
   static const ap_uint<9> z0cut = 1.5 * 15.0 / kz0 + 1.0e-1;
   static const Types::rmean RMEAN[6] = {
-    25.137 / kr + 1.0e-1,
-    37.471 / kr + 1.0e-1,
-    52.588 / kr + 1.0e-1,
-    68.760 / kr + 1.0e-1,
-    86.045 / kr + 1.0e-1,
-    110.830 / kr + 1.0e-1
+    24.9316 / kr + 1.0e-1,
+    37.1777 / kr + 1.0e-1,
+    52.2656 / kr + 1.0e-1,
+    68.7598 / kr + 1.0e-1,
+    86.0156 / kr + 1.0e-1,
+    108.311 / kr + 1.0e-1
   };
   static const Types::zmean ZMEAN[5] = {
-    131.19 / kz + 1.0e-1,
+    131.191 / kz + 1.0e-1,
     154.98 / kz + 1.0e-1,
-    185.33 / kz + 1.0e-1,
-    221.60 / kz + 1.0e-1,
+    185.332 / kz + 1.0e-1,
+    221.602 / kz + 1.0e-1,
     265.02 / kz + 1.0e-1
   };
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +121,7 @@ namespace TC {
     Types::rinv * const rinv_output,
     TrackletParameters::PHI0PAR * const phi0_output,
     TrackletParameters::TPAR * const t_output,
-    TrackletParameters::Z0PAR * const z0_output,
+    Types::z0 * const z0_output,
     Types::phiL * const phiL_0_output,
     Types::phiL * const phiL_1_output,
     Types::phiL * const phiL_2_output,
@@ -143,7 +144,7 @@ namespace TC {
     Types::der_rD * const der_rD_output
   );
 
-  template<seed Seed, regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TrackletParameters::Z0PAR * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
+  template<seed Seed, regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
   template<seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
@@ -230,7 +231,7 @@ void TrackletCalculator_L3L4E(
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
 template<TC::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
-TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TrackletParameters::Z0PAR * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
+TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
 {
   TC::Types::rmean r1mean, r2mean, rproj[4];
   switch (Seed) {
@@ -311,10 +312,10 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
       valid_proj[i] = false;
     if (zL[i] >= (1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1)))
       valid_proj[i] = false;
-    if (phiL[i] >= ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 1)) {
-      phiL[i] = ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 2);
+    if (phiL[i] >= ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 1))
       valid_proj[i] = false;
-    }
+    if (phiL[i] <= 0)
+      valid_proj[i] = false;
     if (rproj[i] < 2048) {
       phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
       if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
@@ -322,10 +323,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
     }
     else
       zL[i] >>= (TrackletProjection<BARRELPS>::kTProjRZSize - TrackletProjection<BARREL2S>::kTProjRZSize);
-    if (phiL[i] <= 0) {
-      phiL[i] = 1;
-      valid_proj[i] = false;
-    }
   }
 
 // Determine which disk projections are valid.
@@ -333,27 +330,20 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
     valid_proj_disk[i] = true;
     if (abs(*t) < 512)
       valid_proj_disk[i] = false;
-    if (phiD[i] < 0) {
-      phiD[i] = 0;
+    if (phiD[i] <= 0)
       valid_proj_disk[i] = false;
-    }
-    if (phiD[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize)) {
-      phiD[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
+    if (phiD[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
       valid_proj_disk[i] = false;
-    }
-    if (rD[i] < 342 || rD[i] > 2048) {
+    if (rD[i] < 342 || rD[i] > 2048)
       valid_proj_disk[i] = false;
-      phiD[i] = 0;
-      rD[i] = 0;
-    }
   }
 
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
   bool success = true;
-  if (abs(*rinv) > rinvcut)
+  if (abs(*rinv) >= rinvcut)
     success = false;
-  if (abs(*z0) > ((Seed == TC::L1L2) ? z0cut_L1L2 : z0cut))
+  if (abs(*z0) >= ((Seed == TC::L1L2) ? z0cut_L1L2 : z0cut))
     success = false;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
@@ -465,7 +455,7 @@ TC::processStubPair(
 {
   TC::Types::rinv rinv;
   TrackletParameters::PHI0PAR phi0;
-  TrackletParameters::Z0PAR z0;
+  TC::Types::z0 z0;
   TrackletParameters::TPAR t;
   TC::Types::phiL phiL[4];
   TC::Types::zL zL[4];
