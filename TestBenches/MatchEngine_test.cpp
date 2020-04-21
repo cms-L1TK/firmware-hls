@@ -1,9 +1,9 @@
 // ProjectionRouter test bench
 #include "MatchEngineTopL1.h"
-#include "CandidateMatchMemory.hh"
-#include "VMProjectionMemory.hh"
-#include "VMStubMEMemory.hh"
-#include "FileReadUtility.hh"
+#include "CandidateMatchMemory.h"
+#include "VMProjectionMemory.h"
+#include "VMStubMEMemory.h"
+#include "FileReadUtility.h"
 #include "hls_math.h"
 
 #include <iostream>

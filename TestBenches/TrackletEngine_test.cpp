@@ -3,10 +3,10 @@
 #include "TrackletEngine_ptcut.h"
 #include "TrackletEngine_stubptinnercut.h"
 #include "TrackletEngine_stubptoutercut.h"
-#include "StubPairMemory.hh"
-#include "VMStubTEInnerMemory.hh"
-#include "VMStubTEOuterMemory.hh"
-#include "FileReadUtility.hh"
+#include "StubPairMemory.h"
+#include "VMStubTEInnerMemory.h"
+#include "VMStubTEOuterMemory.h"
+#include "FileReadUtility.h"
 #include "hls_math.h"
 
 
@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <iterator>
 
-const int nevents = 3;  // number of events to run
+const int nevents = 100;  // number of events to run
 
 using namespace std;
 
