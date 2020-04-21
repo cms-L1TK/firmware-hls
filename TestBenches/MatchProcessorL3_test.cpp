@@ -162,6 +162,7 @@ int main() {
     // matches
     bool truncation = true;
 
+    /*
     std::cout << "mem content" << std::endl;
     std::cout << "fullmatch1" << std::endl;
     fullmatch1.print_mem();
@@ -179,6 +180,7 @@ int main() {
     fullmatch7.print_mem();
     std::cout << "fullmatch8" << std::endl;
     fullmatch8.print_mem();
+    */
     // compare the computed outputs with the expected ones 
     //std::cout << "FM: L1L2 seeding" << std::endl;
     err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch1, fout_fm1, ievt, "FullMatch", truncation);
