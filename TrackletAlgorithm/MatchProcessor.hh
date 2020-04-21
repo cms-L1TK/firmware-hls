@@ -343,7 +343,7 @@ void MatchCalculator(BXType bx,
 
 #pragma HLS inline
 
-  std::cout << "MC received nstubs=" << nstubs << std::endl;
+  //std::cout << "MC received nstubs=" << nstubs << std::endl;
 
   // Setup constants depending on which layer/disk working on
   // probably should move these to constants file
@@ -390,14 +390,19 @@ void MatchCalculator(BXType bx,
     int istubtmp = istub > nstubs ? istub : nstubs;
     auto stubid = stubids[istub];
     CandidateMatch cmatch(projid.concat(stubid));
+    /* FIXME
     std::cout << std::hex << "MC received cmatch=" << cmatch.raw() << std::endl;
     std::cout << std::hex << "MC received projid=" << projid << " stubid=" << stubid << std::endl;
+    */
   
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
+    std::cout << "MC proj=" << proj.raw() << std::endl;
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
+    /* FIXME
     std::cout << "proj=" << proj.raw() << std::endl;
     std::cout << "stub=" << stub.raw() << std::endl;
+    */
   
     // Stub parameters
     typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
@@ -446,6 +451,7 @@ void MatchCalculator(BXType bx,
   
     // Full match  
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
+    /* FIXME
     std::cout << "projstub=" << std::bitset<7>(projid) << "\t" << std::bitset<7>(stubid) << std::endl;
     std::cout << std::hex << "fm=" << fm.raw() << std::endl;
     std::cout << std::bitset<7>(fm_tcid) << "|"
@@ -454,6 +460,7 @@ void MatchCalculator(BXType bx,
               << std::bitset<7>(fm_asid) << "|"
               << std::bitset<12>(fm_phi) << "|"
               << std::bitset<9>(fm_z) << std::endl;
+    */
   
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -464,9 +471,11 @@ void MatchCalculator(BXType bx,
     bool goodmatch_next              = false;
   
     bool newtracklet = (istub==0 || istub>nstubs) ? true : false;
+    /* FIXME
     std::cout << "new tracklet " << newtracklet << std::endl;
     std::cout << std::hex << "bestmatch=" << bestmatch.raw() << std::endl;
     std::cout << std::hex << "goodmatch=" << goodmatch << std::endl;
+    */
   
     // For first tracklet, pick up the phi cut value
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
@@ -475,7 +484,7 @@ void MatchCalculator(BXType bx,
     //bool match = (abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= LUT_matchcut_phi[proj_seed]);
     //bool match = (abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
     if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
-      std::cout << "match found!" << std::endl;
+      //std::cout << "match found!" << std::endl;
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
       best_delta_phi = abs_delta_phi;
@@ -486,13 +495,13 @@ void MatchCalculator(BXType bx,
       projseed_next  = proj_seed;
     }
     else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
-    std::cout << "else new tracklet " << newtracklet << std::endl;
+    //std::cout << "else new tracklet " << newtracklet << std::endl;
       bestmatch_next = FullMatch<FMTYPE>();
       goodmatch_next = false;
       projseed_next  = -1;
     }
     else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
-      std::cout << "not new tracklet" << std::endl;
+      //std::cout << "not new tracklet" << std::endl;
       bestmatch_next = bestmatch;
       goodmatch_next = goodmatch;
       projseed_next  = projseed;
@@ -510,7 +519,10 @@ void MatchCalculator(BXType bx,
       fullmatch8->clear(bx);
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-      std::cout << "writing " << bestmatch.raw() << std::endl;
+      //std::cout << "writing " << bestmatch.raw() << std::endl;
+    std::cout << std::hex << "MC received cmatch=" << cmatch.raw() << std::endl;
+    std::cout << std::hex << "MC received projid=" << projid << " stubid=" << stubid << std::endl;
+    std::cout << std::hex << "FM=" << bestmatch.raw() << std::endl;
       switch (projseed) {
       case 0:
       fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -541,7 +553,7 @@ void MatchCalculator(BXType bx,
       nmcout7++;
       break;
       case 7:
-      fullmatch8->write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+      fullmatch8->write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
       nmcout8++;
       break;
       }
@@ -614,11 +626,13 @@ void MatchProcessor(BXType bx,
 
 #ifndef __SYNTHESIS__
   //Prinout of number of projections and stubs
-  std::cout << "In MatchrProcessor #stubs=";
+  //std::cout << "In MatchrProcessor #stubs=";
+  /*
   for (unsigned int zbin=0;zbin<8;zbin++){
     std::cout <<" "<<instubdata1->getEntries(bx,zbin);
   }
   std::cout<<std::dec<<std::endl;
+  */
 #endif
 
   using namespace PR;
@@ -716,7 +730,7 @@ void MatchProcessor(BXType bx,
     ProjectionRouterBufferMemory<BARREL> projbuffermem;  //projbuffer = nstub+projdata+finez
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
 #pragma HLS dependence variable=istub intra WAR true
-        std::cout << "PR stage" << std::endl;
+        //std::cout << "PR stage" << std::endl;
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 
@@ -734,6 +748,39 @@ void MatchProcessor(BXType bx,
        projdata, nproj);
        //projdata, &tproj);
 
+    /*
+    nproj=0;
+    for(ap_uint<kNBits_MemAddr+1> inMEM=0; inMEM<nINMEM; ++inMEM)
+      nproj+=numbersin[inMEM];
+    std::cout << "iproj=" << iproj << "\tnproj=" << nproj << std::endl;
+
+    nproj=0;
+          if(proj1in!=nullptr) nproj += proj1in->getEntries(bx);
+          if(proj2in!=nullptr) nproj += proj2in->getEntries(bx);
+          if(proj3in!=nullptr) nproj += proj3in->getEntries(bx);
+          if(proj4in!=nullptr) nproj += proj4in->getEntries(bx);
+          if(proj5in!=nullptr) nproj += proj5in->getEntries(bx);
+          if(proj6in!=nullptr) nproj += proj6in->getEntries(bx);
+          if(proj7in!=nullptr) nproj += proj7in->getEntries(bx);
+          if(proj8in!=nullptr) nproj += proj8in->getEntries(bx);
+          if(proj9in!=nullptr) nproj += proj9in->getEntries(bx);
+          if(proj10in!=nullptr) nproj += proj10in->getEntries(bx);
+          if(proj11in!=nullptr) nproj += proj11in->getEntries(bx);
+          if(proj12in!=nullptr) nproj += proj12in->getEntries(bx);
+          if(proj13in!=nullptr) nproj += proj13in->getEntries(bx);
+          if(proj14in!=nullptr) nproj += proj14in->getEntries(bx);
+          if(proj15in!=nullptr) nproj += proj15in->getEntries(bx);
+          if(proj16in!=nullptr) nproj += proj16in->getEntries(bx);
+          if(proj17in!=nullptr) nproj += proj17in->getEntries(bx);
+          if(proj18in!=nullptr) nproj += proj18in->getEntries(bx);
+          if(proj19in!=nullptr) nproj += proj19in->getEntries(bx);
+          if(proj20in!=nullptr) nproj += proj20in->getEntries(bx);
+          if(proj21in!=nullptr) nproj += proj21in->getEntries(bx);
+          if(proj22in!=nullptr) nproj += proj22in->getEntries(bx);
+          if(proj23in!=nullptr) nproj += proj23in->getEntries(bx);
+          if(proj24in!=nullptr) nproj += proj24in->getEntries(bx);
+    */
+
     bool moreproj=iproj<nproj;
 
     if (validin) {
@@ -742,6 +789,7 @@ void MatchProcessor(BXType bx,
       auto izproj = projdata.getRZ();
       auto iphider = projdata.getPhiDer();
       auto trackletid = projdata.getTCID();
+      //std::cout << std::hex << "projdata=" << projdata.raw() << std::endl;
 
       // PS seed
       // top 3 bits of tracklet index indicate the seeding pair
@@ -790,11 +838,12 @@ void MatchProcessor(BXType bx,
       // and is shifted to be positive
       typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
       /* FIXME
-      */
       {
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
         std::cout << std::hex << "projid=" << vmproj.getIndex() << std::endl;
+        //std::cout << std::hex << "vmproj=" << vmproj.raw() << std::endl;
       }
+      */
 
       ///////////////////////////////////
       //This is where Anders calls the ME
@@ -864,7 +913,8 @@ void MatchProcessor(BXType bx,
       }
       */
 
-      if (moreproj&&buffernotfull){
+      if (buffernotfull){
+      //if (moreproj&&buffernotfull){
         auto const iprojtmp=iproj;
         iproj++;
         moreproj=iproj<nproj;
@@ -958,6 +1008,7 @@ void MatchProcessor(BXType bx,
         }
         //writeindex[iphi]=writeindex1;
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
+      //std::cout << std::hex << "vmproj=" << vmproj.raw() << std::endl;
         /* FIXME
         std::cout << "writeindex1=" << writeindex1 << std::endl;
         std::cout << "writeindextmp=" << writeindextmp << std::endl;
@@ -967,8 +1018,12 @@ void MatchProcessor(BXType bx,
 
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
+            /* FIXME
             std::cout << "PRiphi=" << iphi << std::endl;
-          projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            std::cout << "save first" << std::endl;
+            */
+          projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+          if(iphi==7) projbuffer[iphi][writeindextmp].Print();
         /*
           switch (iphi) {
             case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
@@ -991,8 +1046,8 @@ void MatchProcessor(BXType bx,
           projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
         */
           //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
-        std::cout << std::hex << "proj=" << projbuffer[writeindextmp]->raw() << std::endl;
-        std::cout << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
+        //std::cout << std::hex << "proj=" << projbuffer[writeindextmp]->raw() << std::endl;
+        //std::cout << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
         /* FIXME
         */
         }
@@ -1000,8 +1055,8 @@ void MatchProcessor(BXType bx,
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             ap_uint<kNBitsBuffer> writeindextmpplus=writeindextmp+1;
-            std::cout << "PRiphi=" << iphi << std::endl;
-            projbuffer[iphi][writeindextmpplus]=ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffer[iphi][writeindextmpplus]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+          if(iphi==7) projbuffer[iphi][writeindextmp].Print();
         /*
           switch (iphi) {
             case 0: projbuffer1[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
@@ -1023,16 +1078,16 @@ void MatchProcessor(BXType bx,
           }
             projbuffer8[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
         */
-        std::cout << std::hex << "proj=" << projbuffer[writeindextmpplus]->raw() << std::endl;
-        std::cout << "who's proj=" << projbuffer[writeindextmpplus]->getProjection() << std::endl;
+        //std::cout << std::hex << "proj=" << projbuffer[writeindextmpplus]->raw() << std::endl;
+        //std::cout << "who's proj=" << projbuffer[writeindextmpplus]->getProjection() << std::endl;
         /* FIXME
         std::cout << std::hex << "and vmproj=" << vmproj.raw() << std::endl;
         */
           //projbuffermem.write_mem(bx, *projbuffer[writeindextmpplus], writeindextmpplus);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
-            std::cout << "PRiphi=" << iphi << std::endl;
-            projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+          if(iphi==7) projbuffer[iphi][writeindextmp].Print();
           /*
           switch (iphi) {
             case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
@@ -1055,14 +1110,15 @@ void MatchProcessor(BXType bx,
             projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
           */
           //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
-        std::cout << std::hex << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
-        std::cout << std::hex << "writeing proj=" << projbuffer[writeindextmp]->raw() << std::endl;
+        //std::cout << std::hex << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
+        //std::cout << std::hex << "writeing proj=" << projbuffer[writeindextmp]->raw() << std::endl;
         /* FIXME
         */
           }
         }
 
       } // end if
+      //std::cout << std::hex << "moreproj/buffernotfull" << " " << moreproj << " " << buffernotfull << std::endl;
 
 /*
 */
@@ -1070,282 +1126,71 @@ void MatchProcessor(BXType bx,
 
   } //end loop
 
-  std::cout << "Starting ME loop" << std::endl;
+  //std::cout << "Starting ME loop" << std::endl;
   readindex=0;
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
-  for(int iphi = 0; iphi < kNMatchEngines; ++iphi)
-    matchengine[iphi].init(bx, table, projbuffer[iphi], writeindex[iphi], iphi);
+  for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
+#pragma HLS unroll
+    const VMStubMEMemory<VMSMEType>* instubdata;
+    switch (iphi) {
+      case 0: instubdata=instubdata1;
+      break;
+      case 1: instubdata=instubdata2;
+      break;
+      case 2: instubdata=instubdata3;
+      break;
+      case 3: instubdata=instubdata4;
+      break;
+      case 4: instubdata=instubdata5;
+      break;
+      case 5: instubdata=instubdata6;
+      break;
+      case 6: instubdata=instubdata7;
+      break;
+      case 7: instubdata=instubdata8;
+      break;
+    }
+    matchengine[iphi].init(bx, table, instubdata, projbuffer[iphi], writeindex[iphi], iphi);
+  }
 
   int iMEbest=kNMatchEngines;
-  int bestID=-1;
+  typename AllProjection<APTYPE>::AProjTCID bestTCID=-1;
   bool bestInPipeline=false;
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+#pragma HLS PIPELINE II=1
     for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
+#pragma HLS unroll
       matchengine[iphi].step(instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8);
-      if(matchengine[iphi].idle() && !matchengine[iphi].empty())
+      typename VMProjection<BARREL>::VMPID projindex;
+      typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
+      typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
+      if(matchengine[iphi].idle() && !matchengine[iphi].done() && !matchengine[iphi].empty()) {
+        typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
+        matchengine[iphi].read(currentTCID, projindex, stubid, nstub);
+        //currentTCID=allproj->read_mem(bx, projindex).getTCID();
+        //std::cout << "current=" << currentTCID << "\tbest=" << bestTCID << std::endl;
+        if ((iMEbest==kNMatchEngines)||(currentTCID<bestTCID)) {
+        //std::cout << iMEbest << "\t" << currentTCID << std::endl;
+	  iMEbest=iphi;
+	  bestTCID=currentTCID;
+	  bestInPipeline=matchengine[iphi].empty();
+	}
+        /*
+        */
+        if (iMEbest!=kNMatchEngines&&(!bestInPipeline)) {
+        std::cout << "Sending to MC projid=" << matchengine[iphi].getProjindex() << std::endl;
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
+                  //(bx, allstub, allproj, projindex, stubid, nstub, bx_o,
                   (bx, allstub, allproj, matchengine[iphi].getProjindex(), matchengine[iphi].getStubIds(), matchengine[iphi].getNStubs(), bx_o,
                    nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
                    fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
-    }
-  } //end loop
-  
-
-return;
-  for (int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
-#pragma HLS PIPELINE II=1
-  //if(ivmphi<6) continue;
-  readindex=0;
-  ENG_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
-#pragma HLS PIPELINE II=1
-
-      ////////////////////////////////////////////
-      //This seems like where the ME buffer starts
-      //Goes outside if(valid) ?
-      ////////////////////////////////////////////
-      //If the buffer is not empty we have a projection that we need to 
-      //process. 
-
-      //Determin if buffere is empty
-      //Buffer for projections
-      //readindex = istep;
-      //bool buffernotempty=(writeindex1!=readindex);
-      bool buffernotempty=(writeindex[ivmphi]!=readindex);
-      //bool buffernotlarger=(readindex<=writeindex1);
-      bool buffernotlarger=(readindex<=writeindex[ivmphi]);
-        /* FIXME
-      std::cout << "buffernotempty=" << buffernotempty << std::endl;
-      std::cout << std::dec << "istep=" << istep << "\tistub=" << istub << std::endl;
-        std::cout << std::hex << "writeindex[iphi]=" << writeindex << "\treadindex[iphi]=" << readindex << std::endl;
-      */
- 
-      // vmproj index
-      VMProjection<BARREL>::VMPID projindex;
-      typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
-    int ncmatchout = 0;
-
-    // Buffer still has projections to read out
-      //if (readindex < nproj) {
-    //If the buffer is not empty we have a projection that we need to 
-    //process. 
-    ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> *stubids;
-        //std::cout << "writeindex[" << ivmphi << "]=" << writeindex[ivmphi] << "\treadindex[" << ivmphi << "]=" << readindex << std::endl;
-    if (buffernotempty && buffernotlarger) {
-
-        ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
-
-        //std::cout << "readindex[" << ivmphi << "]=" << readindex << std::endl;
-        //New projection
-        if (istub==0) {
-          stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
-
-          //Need to read the information about the proj in the buffer
-          //std::cout << "nproj=" << writeindex1 << std::endl;
-          std::cout << "nproj=" << writeindex[ivmphi] << std::endl;
-          auto const qdata=projbuffer[ivmphi][readindex];
-          /*
-          ProjectionRouterBuffer<BARREL> *qdata;
-          switch (ivmphi) {
-            case 0: qdata=projbuffer1[readindex];
-            break;
-            case 1: qdata=projbuffer2[readindex];
-            break;
-            case 2: qdata=projbuffer3[readindex];
-            break;
-            case 3: qdata=projbuffer4[readindex];
-            break;
-            case 4: qdata=projbuffer5[readindex];
-            break;
-            case 5: qdata=projbuffer6[readindex];
-            break;
-            case 6: qdata=projbuffer7[readindex];
-            break;
-            case 7: qdata=projbuffer8[readindex];
-            break;
-          }
-          */
-          std::cout << "qdata=" << qdata.raw() << std::endl;
-          auto nstub = qdata.getNStubs();
-          std::cout << "nstubs=" << nstubs << std::endl;
-          std::cout << "data=" << qdata.getProjection() << std::endl;
-          std::cout << "iphi=" << ivmphi << std::endl;
-        std::cout << "ME stage" << std::endl;
-          nstubs=qdata.getNStubs();
-          VMProjection<BARREL> data(qdata.getProjection());
-          zbin=qdata.getZBin();
-        /* FIXME
-        std::cout << std::hex << "data=" << data.raw() << std::endl;
-        std::cout << "who's proj=" << data.raw() << std::endl;
-        std::cout << std::dec << "nstubs=" << nstubs << std::endl;
-        std::cout << std::hex << "zbin=" << zbin << "\tistubtmp=" << istubtmp << std::endl;
-        std::cout << "concat=" << zbin.concat(istubtmp) << std::endl;
-        */
-      /* FIXME
-      {
-      auto iphiproj = allproj->read_mem(bx, istep).getPhi();
-      auto iphi5 = iphiproj>>(iphiproj.length()-5);
-  constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
-  constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
-  constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
-      auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
-        nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
-      auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
-      ap_uint<3> iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
-        if(iphi==3 || 1) {
-        std::cout << "read from buffer address=" << readindex << std::endl;
-        std::cout << std::hex << "vmproj=" << std::bitset<VMProjectionBase<BARREL>::kVMProjectionSize>( data.raw() ) << std::endl;
-    std::cout << std::dec << std::bitset<VMProjectionBase<BARREL>::kVMProjIndexSize>(data.getIndex()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjZBinSize>(data.getZBin()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjFineZSize>(data.getFineZ()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjRinvSize>(data.getRInv()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(data.getIsPSSeed()) << std::endl << std::endl;
-        std::cout << std::hex << "projid=" << data.getIndex() << std::endl;
-        std::cout << "###" << std::endl;
-        std::cout << std::hex << "\treadindex[iphi]=" << readindex << std::endl;
-        std::cout << "buffernotempty=" << buffernotempty << std::endl;
         }
-      }
-      */
+      } //end MC if
 
-          projindex=data.getIndex();
-          projfinez=data.getFineZ();
-          projrinv=data.getRInv();
-          isPSseed=data.getIsPSSeed();
-          projzbin=qdata.getZBin();
-
-          second=qdata.hasSecond();
-          //second=qdata.range(0,0);	
-
-          //Calculate fine z position
-          if (second) {
-            projfinezadj=projfinez-8;
-          } else {
-            projfinezadj=projfinez;
-          }
-
-          if (nstubs==1) {
-            istub=0;
-            readindex++;
-          } else {
-            istub++;
-          }
-        } else {
-          //Check if last stub, if so, go to next buffer entry 
-          if (istub+1>=nstubs){
-            istub=0;
-            readindex++;
-          } else {
-            istub++;
-          }
-        }
-        
-        //Read stub memory and extract data fields
-        auto const  stubadd=zbin.concat(istubtmp);
-      std::cout << "stubadd=" << stubadd << std::endl;
-        /* FIXME
-        std::cout << "zbin=" << zbin << "\tistubtmp=" << istubtmp << std::endl;
-        std::cout << "stubadd=" << stubadd << std::endl;
-        std::cout << "concat=" << zbin.concat(istubtmp) << std::endl;
-        */
-        //auto stubdata=instubdata->read_mem(bx,stubadd);
-        VMStubME<VMSMEType> stubdata;
-        switch (ivmphi) {
-          case 0: stubdata=instubdata1->read_mem(bx,stubadd);
-          break;
-          case 1: stubdata=instubdata2->read_mem(bx,stubadd);
-          break;
-          case 2: stubdata=instubdata3->read_mem(bx,stubadd);
-          break;
-          case 3: stubdata=instubdata4->read_mem(bx,stubadd);
-          break;
-          case 4: stubdata=instubdata5->read_mem(bx,stubadd);
-          break;
-          case 5: stubdata=instubdata6->read_mem(bx,stubadd);
-          break;
-          case 6: stubdata=instubdata7->read_mem(bx,stubadd);
-          break;
-          case 7: stubdata=instubdata8->read_mem(bx,stubadd);
-          break;
-        }
-        auto stubindex=stubdata.getIndex();
-        auto stubfinez=stubdata.getFineZ();
-        auto stubbend=stubdata.getBend();
-        std::cout << std::hex << "zbin=" << zbin << "\tistubtmp=" << istubtmp << std::endl;
-        std::cout << std::hex << "projid=" << projindex << "\tstubid=" << stubindex << std::endl;
-  
-        //Check if stub z position consistent
-        ap_int<5> idz=stubfinez-projfinezadj;
-        bool pass;
-        if (isPSseed) {
-          pass=idz>=-2&&idz<=2;
-        } else {
-          pass=idz>=-5&&idz<=5;
-        }
-
-        //Check if stub bend and proj rinv consistent
-        auto const index=projrinv.concat(stubbend);
-        if (pass&&table[index]) {
-          //outcandmatch->write_mem(bx,cmatch,ncmatchout);
-          ncmatchout ++;
-        /* FIXME
-          std::cout << std::hex << "projindex[iphi]=" << projindex << " stubindex=" << stubindex << std::endl;
-      std::cout << "stubadd=" << stubadd << std::endl;
-          //istep is projid
-        std::cout << "tproj" << std::endl;
-    std::cout << std::dec <<  "index=" << projindex << std::endl
-              << std::hex << "projfinez=" << projfinez << std::endl
-              << "rinv=" << projrinv << std::endl
-              << "isPSSeed=" << isPSseed << std::endl << std::endl;
-        std::cout << "###" << std::endl;
-        VMProjection<VMPTYPE> vmproj(projindex, projzbin, projfinez, projrinv, isPSseed);
-        std::cout << std::hex << "vmproj=" << std::bitset<VMProjectionBase<BARREL>::kVMProjectionSize>( vmproj.raw() ) << std::endl;
-    std::cout << std::dec << std::bitset<VMProjectionBase<BARREL>::kVMProjIndexSize>(vmproj.getIndex()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjZBinSize>(vmproj.getZBin()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjFineZSize>(vmproj.getFineZ()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjRinvSize>(vmproj.getRInv()) << " "
-              << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(vmproj.getIsPSSeed()) << std::endl << std::endl;
-        */
-          CandidateMatch cmatch(projindex.concat(stubindex));
-          stubids[istubtmp]=stubindex;
-          std::cout << "istubtmp=" << istubtmp << std::endl;
-          std::cout << "stubids[" << istubtmp << "]=" << stubids[istubtmp] << std::endl;
-          std::cout << std::hex << "Sending to MC cmatch=" << cmatch.raw() << std::endl;
-          //delete qdata; //Free up mem when finished with projbuffer entry
-        } // if(pass&&table[index])
-        if(istub==0 && stubids!=0) {
-        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
-                  (bx, allstub, allproj, projindex, stubids, istubtmp, bx_o,
-                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
-                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
-        }
- 
-        //-----------------------------------------------------------------------------------------------------------
-        //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
-        //-----------------------------------------------------------------------------------------------------------
-    
-        // Use the stub and projection indices to pick up the stub and projection
-        /*
-        VMProjection<BARREL> data(qdata.getProjection());
-        //VMProjection<BARREL> data(qdata.range(25,4));
-        auto projid = data.getIndex();
-        auto stubid = stubdata.getIndex();
-	CandidateMatch cmatch(projindex.concat(stubindex));
-        if(projindex == 39) std::cout << std::bitset<7>(stubindex) << std::endl;
-        if(cmatch.raw() == 0x1135) std::cout << "found one!" << std::endl;
-        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
-                  (bx, allstub, allproj, istep, stubid, istep, bx_o,
-                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7);
-        delete qdata; //Free up mem when finished with projbuffer entry
-        */
-    
-      } // if(buffernotempty)
-
-    //} // end if(validin)
+    } //end 8ME loop
 
   } //end loop
-
-  } //end ivmphi
-  std::cout << "Ending ME" << std::endl;
+  //std::cout << "Ending ME" << std::endl;
 
 } // end MatchProcessor()
 
