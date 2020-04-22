@@ -7,7 +7,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 100;  //number of events to run
+const int nevents = 1;  //number of events to run
 
 using namespace std;
 
@@ -246,6 +246,14 @@ err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei3, fout_vmstub
 // VMStubTEInner4
 err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei4, fout_vmstubtei4, ievt,
                                               "VMStubTEInner20", truncation);
+
+// //VMStubTEInner1 Overlap
+// err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(vmstubteol1, fout_vmstubteol1, ievt,
+//                                               "VMStubTEOverlap1", truncation);
+//
+// // VMStubTEInner2 Overlap
+// err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(vmstubteol2, fout_vmstubteol2, ievt,
+//                                               "VMStubTEOverlap2", truncation);
 	} // end of event loop
 	std::cerr << "Exiting with return value " << err << std::endl;
 	return err;
