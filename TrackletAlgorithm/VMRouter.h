@@ -927,7 +927,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 						nallstubsdisks[DISK - 1] * nvmtedisks[DISK - 1];
 
 		auto iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi. TODO: we don't really need this...
-		constexpr auto d1 = nvmte / 32.;
+		static const ap_ufixed<5,4> d1 = nvmte / 32.; // Precision of 0.5, should be enough
 		int ivm = iphiRaw * d1; // Which VM
 
 		// TE Inner
@@ -1207,7 +1207,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 				// 16 overlap vms per layer
 				auto iphiRaw = iphivmRaw<INTYPE>(stubPhi) >> 1; // Top 4 bits of phi
-				constexpr auto d2 = nvmol / 16.; // Some normalisation thing
+				static const ap_ufixed<4,3> d2 = nvmol / 16.; // Some normalisation thing
 				int ivm = iphiRaw * d2; // Which VM, BECAUSE WE HAVE 16 VMS?
 
 				bool passbend = bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut TODO: we can skip the rest if false
