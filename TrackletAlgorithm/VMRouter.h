@@ -238,7 +238,7 @@ inline int memStartVal(const ap_uint<32> mask) {
 
 // Main function
 template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int bendtablesize>
-void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], const int binlookuptable[], const int bendtable[][bendtablesize],
+void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], const int binlookuptable[], const int bendtable[][bendtablesize], const int bendtable2[][bendtablesize],
 		const int overlaptable[],
 		// Input memories
 		const ap_uint<6>& imask,
@@ -989,10 +989,10 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			} else { // DISKS
 				assert(DISK != 0);
 
-				constexpr int zbins = (1 << 7); // 7 = zbits
-				constexpr int rbins = (1 << 4); // Number of bins in r
-				ap_uint<7> zbin = (z + (1 << (z.length() - 1))) >> (z.length() - 7); // Make z positive and take the 7 MSBs TODO replace 7
-				ap_uint<4> rbin = (r + (1 << (nrbits - 1))) >> (nrbits - 4);
+				constexpr int zbins = (1 << 3); // 7 = zbits
+				constexpr int rbins = (1 << 8); // Number of bins in r
+				ap_uint<3> zbin = (z + (1 << (z.length() - 1))) >> (z.length() - 3); // Make z positive and take the 7 MSBs TODO replace 7
+				ap_uint<8> rbin = r >> (nrbits-8);//(r + (1 << (nrbits - 1))) >> (nrbits - 8);
 
 				int index = zbin * rbins + rbin; // number of bins
 
@@ -1355,7 +1355,8 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			stubTeOuter.setIndex(typename VMStubTEOuter<OUTTYPE>::VMSTEOID(i));
 
 			ap_uint<TEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
-			ivm = iphivmRaw<INTYPE>(stubPhi);
+			iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi. TODO: we don't really need this...
+			ivm = iphiRaw * nvmte / 32.0; // Which VM
 
 			constexpr auto vmbits = (LAYER) ? vmbitsLayer[LAYER-1] : vmbitsDisk[DISK-1]; // Number of bits for VMs
 			constexpr auto finephibits = (LAYER) ? nfinephibarrelouter : nfinephidiskouter; // Number of bits for finephi
@@ -1413,7 +1414,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 					<< std::endl;
 #endif // DEBUG
 
-			bool passbend = bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut
+			bool passbend = (DISK == 1) ? bendtable2[ivm-firstmem][bend] : bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut
 
 			// Write the TE Outer stub to the correct memory
 			// Only if it has a valid bend
