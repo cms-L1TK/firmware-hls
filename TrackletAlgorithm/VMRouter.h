@@ -69,7 +69,7 @@ constexpr int MAXVMROUTER = kMaxProc;
 // TODO: maybe use something similar to updated C++ emulation
 constexpr int vmbitsLayer[6] = {5, 5, 4, 5, 4, 5}; // Could be computed using the number of VMs...
 constexpr int vmbitsDisk[5] = {4, 4, 4, 4, 4};
-constexpr int vmbitsOverlap = 4;
+constexpr int vmbitsOverlap[2] = {4, 3};
 
 // Currently not used, but should be kept for creating the finebin LUTs
 // TODO: either remove this or write out function for all tables that are used?!
@@ -709,9 +709,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		stubme.setBend(bend); // how does it now if 3 or 4 bits? Same size as in InputStub thus no need to shift bits
 		stubme.setIndex(typename VMStubME<OUTTYPE>::VMSMEID(i));
 
-		auto iphiRaw = iphivmRaw<INTYPE>(stubPhi_uncorr); // Top 5 bits of phi
-		auto iphiRawPlus = iphivmRawPlus<INTYPE>(stubPhi_uncorr); // Top 5 bits of phi after adding a small number
-		auto iphiRawMinus = iphivmRawMinus<INTYPE>(stubPhi_uncorr); // Top 5 bits of phi after subtracting a small number
+		auto iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
+		auto iphiRawPlus = iphivmRawPlus<INTYPE>(stubPhi); // Top 5 bits of phi after adding a small number
+		auto iphiRawMinus = iphivmRawMinus<INTYPE>(stubPhi); // Top 5 bits of phi after subtracting a small number
 
 		auto ivm = iphiRaw * d; // The VM number
 		auto ivmPlus = iphiRawPlus * d;
@@ -1212,7 +1212,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 				bool passbend = bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut TODO: we can skip the rest if false
 
-				constexpr auto vmbits = vmbitsOverlap;
+				constexpr auto vmbits = (LAYER == 1) ? 4 :3; //vmbitsOverlap[LAYER-1];
 				constexpr auto finephibits = 2; // or nfinephioverlapinner??? which is 2
 
 				stubOL.setBend(bend);
