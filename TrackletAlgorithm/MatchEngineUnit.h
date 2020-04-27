@@ -42,6 +42,10 @@ MatchEngineUnit() {
 
 }
 
+~MatchEngineUnit() {
+  delete[] stubids;
+}
+
 void init(BXType bxin, bool *tab, const VMStubMEMemory<VMSMEType>* instubdata, ProjectionRouterBuffer<BARREL> *proj, const INDEX iproj, int iphi) {
 #pragma HLS inline
   stubmem = instubdata;
@@ -98,20 +102,20 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 #pragma HLS inline  
   trackletid = tcid;
   id = projindex;
-  stubid = stubids;
   nstub = nstubs;
+  //stubid = stubids;
+  // Deep copy
+  /*
+  */
+  stubid = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
+  for(int i = 0; i < nstubs; ++i)
+    stubid[i] = stubids[i];
+  //idle_ = false;
+  idle_ = readindex>writeindex;
 
 }
 
-void step(const VMStubMEMemory<VMSMEType>* instubdata1,
-          const VMStubMEMemory<VMSMEType>* instubdata2,
-          const VMStubMEMemory<VMSMEType>* instubdata3,
-          const VMStubMEMemory<VMSMEType>* instubdata4,
-          const VMStubMEMemory<VMSMEType>* instubdata5,
-          const VMStubMEMemory<VMSMEType>* instubdata6,
-          const VMStubMEMemory<VMSMEType>* instubdata7,
-          const VMStubMEMemory<VMSMEType>* instubdata8
-){
+void step() {
 #pragma HLS inline
 #pragma HLS PIPELINE II=1
 
@@ -150,14 +154,16 @@ void step(const VMStubMEMemory<VMSMEType>* instubdata1,
       //std::cout << "readindex[" << ivmphi << "]=" << readindex << std::endl;
       //New projection
       if (istub==0) {
+        std::cout << "new projection" << std::endl;
+        //delete[] stubids;
         stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
 
         //Need to read the information about the proj in the buffer
         //std::cout << "nproj=" << writeindex1 << std::endl;
         auto const qdata=projbuffer[readindex];
-        if(ivmphi==7) { std::cout << "MEU "; projbuffer[readindex].Print(); }
+        std::cout << "MEU "; projbuffer[readindex].Print();
         tcid=qdata.getTCID();
-        projbuffer[readindex].Print();
+        //projbuffer[readindex].Print();
         /*
         ProjectionRouterBuffer<BARREL> *qdata;
         switch (ivmphi) {
@@ -233,20 +239,31 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
           projfinezadj=projfinez;
         }
 
+        std::cout << "nstubs=" << nstubs << std::endl;
+        std::cout << "istub before =" << istub << std::endl;
         if (nstubs==1) {
           istub=0;
           readindex++;
+          std::cout << "one" << std::endl;
         } else {
           istub++;
+          std::cout << "new and incrementing" << std::endl;
         }
+        std::cout << "istub after =" << istub << std::endl;
       } else {
         //Check if last stub, if so, go to next buffer entry 
+        std::cout << "NOT new projection" << std::endl;
+        std::cout << "nstubs=" << nstubs << std::endl;
+        std::cout << "istub before =" << istub << std::endl;
         if (istub+1>=nstubs){
           istub=0;
           readindex++;
+          std::cout << "larger" << std::endl;
         } else {
           istub++;
+          std::cout << "incrementing" << std::endl;
         }
+        std::cout << "istub after =" << istub << std::endl;
       }
       
       //Read stub memory and extract data fields
@@ -295,10 +312,19 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
             << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(vmproj.getIsPSSeed()) << std::endl << std::endl;
       */
       CandidateMatch cmatch(projindex.concat(stubindex));
+      if(ivmphi==6) std::cout << "Sending to MC projid=" << projindex << " stubid=" << stubindex << std::endl;
+      if(ivmphi==6) std::cout << "Sending to MC cmatch=" << cmatch.raw() << std::endl;
+      std::cout << "istub=" << istub << std::endl;
       stubids[istubtmp]=stubindex;
+      std::cout << "nstubs=" << nstubs << " istubtmp=" << istubtmp << " stubindex=" << stubindex << std::endl;
       //delete qdata; //Free up mem when finished with projbuffer entry
     } // if(pass&&table[index])
     if(istub==0 && stubids!=0) idle_ = true;
+    if(istub==0 && stubids!=0) {
+      for(int i = 0; i < getNStubs(); i++)
+        std::cout << "stubid(" << i << ")=" << stubids[i] << std::endl;
+    }
+    if(ivmphi==7) std::cout << "readindex=" << readindex << " writeindex=" << writeindex << std::endl;
     if(readindex>writeindex) done_ = true;
  
     //-----------------------------------------------------------------------------------------------------------
