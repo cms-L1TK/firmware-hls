@@ -73,26 +73,12 @@ namespace TC {
   static const uint32_t mask_D3 = 0xF << shift_D3;
   static const uint32_t mask_D4 = 0xF << shift_D4;
 
-  // the 1.0e-1 is needed to get the floating point truncation right
+// the 1.0e-1 is a fudge factor needed to get the floating point truncation
+// right
   static const float ptcut = 1.91;
   static const ap_uint<13> rinvcut = 0.01 * 0.3 * 3.8 / ptcut / krinv + 1.0e-1;
   static const ap_uint<9> z0cut_L1L2 = 15.0 / kz0 + 1.0e-1;
   static const ap_uint<9> z0cut = 1.5 * 15.0 / kz0 + 1.0e-1;
-  static const Types::rmean RMEAN[6] = {
-    24.9316 / kr + 1.0e-1,
-    37.1777 / kr + 1.0e-1,
-    52.2656 / kr + 1.0e-1,
-    68.7598 / kr + 1.0e-1,
-    86.0156 / kr + 1.0e-1,
-    108.311 / kr + 1.0e-1
-  };
-  static const Types::zmean ZMEAN[5] = {
-    131.191 / kz + 1.0e-1,
-    154.98 / kz + 1.0e-1,
-    185.332 / kz + 1.0e-1,
-    221.602 / kz + 1.0e-1,
-    265.02 / kz + 1.0e-1
-  };
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,31 +222,31 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   TC::Types::rmean r1mean, r2mean, rproj[4];
   switch (Seed) {
     case TC::L1L2:
-      r1mean   = RMEAN[L1];
-      r2mean   = RMEAN[L2];
-      rproj[0] = RMEAN[L3];
-      rproj[1] = RMEAN[L4];
-      rproj[2] = RMEAN[L5];
-      rproj[3] = RMEAN[L6];
+      r1mean   = rmean[L1];
+      r2mean   = rmean[L2];
+      rproj[0] = rmean[L3];
+      rproj[1] = rmean[L4];
+      rproj[2] = rmean[L5];
+      rproj[3] = rmean[L6];
       break;
     case TC::L3L4:
-      rproj[0] = RMEAN[L1];
-      rproj[1] = RMEAN[L2];
-      r1mean   = RMEAN[L3];
-      r2mean   = RMEAN[L4];
-      rproj[2] = RMEAN[L5];
-      rproj[3] = RMEAN[L6];
+      rproj[0] = rmean[L1];
+      rproj[1] = rmean[L2];
+      r1mean   = rmean[L3];
+      r2mean   = rmean[L4];
+      rproj[2] = rmean[L5];
+      rproj[3] = rmean[L6];
       break;
     case TC::L5L6:
-      rproj[0] = RMEAN[L1];
-      rproj[1] = RMEAN[L2];
-      rproj[2] = RMEAN[L3];
-      rproj[3] = RMEAN[L4];
-      r1mean   = RMEAN[L5];
-      r2mean   = RMEAN[L6];
+      rproj[0] = rmean[L1];
+      rproj[1] = rmean[L2];
+      rproj[2] = rmean[L3];
+      rproj[3] = rmean[L4];
+      r1mean   = rmean[L5];
+      r2mean   = rmean[L6];
       break;
   }
-  TC::Types::zmean zproj[4] = {ZMEAN[D1], ZMEAN[D2], ZMEAN[D3], ZMEAN[D4]};
+  TC::Types::zmean zproj[4] = {zmean[D1], zmean[D2], zmean[D3], zmean[D4]};
   calculate_LXLY<Seed, InnerRegion, OuterRegion>(
       innerStub.getR(),
       innerStub.getPhi(),
