@@ -203,20 +203,31 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
           projfinezadj=projfinez;
         }
 
+        std::cout << "nstubs=" << nstubs << std::endl;
+        std::cout << "istub before =" << istub << std::endl;
         if (nstubs==1) {
           istub=0;
           readindex++;
+          std::cout << "one" << std::endl;
         } else {
           istub++;
+          std::cout << "new and incrementing" << std::endl;
         }
+        std::cout << "istub after =" << istub << std::endl;
       } else {
         //Check if last stub, if so, go to next buffer entry 
+        std::cout << "NOT new projection" << std::endl;
+        std::cout << "nstubs=" << nstubs << std::endl;
+        std::cout << "istub before =" << istub << std::endl;
         if (istub+1>=nstubs){
           istub=0;
           readindex++;
+          std::cout << "larger" << std::endl;
         } else {
           istub++;
+          std::cout << "incrementing" << std::endl;
         }
+        std::cout << "istub after =" << istub << std::endl;
       }
       
       //Read stub memory and extract data fields
