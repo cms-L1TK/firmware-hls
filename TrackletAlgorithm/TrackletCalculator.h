@@ -165,7 +165,29 @@ namespace TC {
   );
 }
 
-template<TC::seed Seed, TC::itc iTC, regionType InnerRegion, regionType OuterRegion, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem, uint16_t ASInnerMask, uint16_t ASOuterMask, uint32_t TPROJMaskBarrel, uint32_t TPROJMaskDisk, uint16_t N> void
+template<TC::seed Seed> constexpr regionType InnerRegion() {
+  return (
+    (Seed == TC::L1L2 || Seed == TC::L2L3 || Seed == TC::L3L4 || Seed == TC::L1D1 || Seed == TC::L2D1) ? BARRELPS : (
+      (Seed == TC::L5L6) ? BARREL2S : DISK
+    )
+  );
+}
+template<TC::seed Seed> constexpr regionType OuterRegion() {
+  return (
+    (Seed == TC::L1L2 || Seed == TC::L2L3) ? BARRELPS : (
+      (Seed == TC::L3L4 || Seed == TC::L5L6) ? BARREL2S : DISK
+    )
+  );
+}
+template<TC::seed Seed, TC::itc iTC> constexpr uint8_t NASMemInner();
+template<TC::seed Seed, TC::itc iTC> constexpr uint8_t NASMemOuter();
+template<TC::seed Seed, TC::itc iTC> constexpr uint8_t NSPMem();
+template<TC::seed Seed, TC::itc iTC> constexpr uint16_t ASInnerMask();
+template<TC::seed Seed, TC::itc iTC> constexpr uint16_t ASOuterMask();
+template<TC::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
+template<TC::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
+
+template<TC::seed Seed, TC::itc iTC, regionType InnerRegion, regionType OuterRegion, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem, uint16_t N> void
 TrackletCalculator(
     const BXType bx,
     const AllStubMemory<InnerRegion> innerStubs[NASMemInner],
@@ -213,6 +235,7 @@ void TrackletCalculator_L3L4E(
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "TrackletCalculator_calculate_LXLY.h"
+#include "TrackletCalculator_parameters.h"
 
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
@@ -537,35 +560,14 @@ regionType OuterRegion, // region type of the outer stubs
 uint8_t NASMemInner, // number of inner all-stub memories
 uint8_t NASMemOuter, // number of outer all-stub memories
 uint8_t NSPMem, // number of stub-pair memories
-uint16_t ASInnerMask, // see below
-uint16_t ASOuterMask, // see below
-uint32_t TPROJMaskBarrel, // see below
-uint32_t TPROJMaskDisk, // see below
 uint16_t N // maximum number of stub pairs processed
 > void
 TrackletCalculator(
     const BXType bx,
-
-// The specific inner all-stub memory that the indices in a given stub-pair
-// memory correspond to is determined by ASInnerMask. The bits of this mask,
-// from least significant to most significant, represent the stub-pair memories
-// in the order they are passed to TrackletCalculator; e.g., the LSB
-// corresponds to stubPairs[0]. The bit for a given stub-pair memory is the
-// index (0 or 1) of the inner all-stub memory that should be used. Likewise,
-// the specific outer all-stub memories are determined by ASOuterMask.
     const AllStubMemory<InnerRegion> innerStubs[NASMemInner],
     const AllStubMemory<OuterRegion> outerStubs[NASMemOuter],
     const StubPairMemory stubPairs[NSPMem],
     TrackletParameterMemory * const trackletParameters,
-
-// The validity of each of the barrel TPROJ memories is determined by
-// TPROJMaskBarrel. The bits of this mask, from least significant to most
-// significant, represent the memories in the order they are passed to
-// TrackletCalculator; e.g., the LSB corresponds to
-// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is
-// valid, if it is not, the corresponding memory is not valid. Likewise, the
-// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk
-// in the same way.
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
     TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
@@ -585,15 +587,15 @@ TrackletCalculator(
   trackletParameters->clear(bx);
   clear_barrel_ps: for (unsigned i = 0; i < TC::N_PROJOUT_BARRELPS; i++)
 #pragma HLS unroll
-    if (TPROJMaskBarrel & (0x1 << i))
+    if (TPROJMaskBarrel<Seed, iTC>() & (0x1 << i))
       projout_barrel_ps[i].clear();
   clear_barrel_2s: for (unsigned i = 0; i < TC::N_PROJOUT_BARREL2S; i++)
 #pragma HLS unroll
-    if (TPROJMaskBarrel & (0x1 << (i + TC::N_PROJOUT_BARRELPS)))
+    if (TPROJMaskBarrel<Seed, iTC>() & (0x1 << (i + TC::N_PROJOUT_BARRELPS)))
       projout_barrel_2s[i].clear();
   clear_disk: for (unsigned i = 0; i < TC::N_PROJOUT_DISK; i++)
 #pragma HLS unroll
-    if (TPROJMaskDisk & (0x1 << i))
+    if (TPROJMaskDisk<Seed, iTC>() & (0x1 << i))
       projout_disk[i].clear();
 
   TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0;
@@ -618,10 +620,10 @@ TrackletCalculator(
 // all-stubs memory to use based on iSPMem:
       innerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getInnerIndex();
       outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
-      const AllStub<InnerRegion> &innerStub = innerStubs[(ASInnerMask & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
-      const AllStub<OuterRegion> &outerStub = outerStubs[(ASOuterMask & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
+      const AllStub<InnerRegion> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
+      const AllStub<OuterRegion> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
 
-      TC::processStubPair<Seed, InnerRegion, OuterRegion, TPROJMaskBarrel, TPROJMaskDisk>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
+      TC::processStubPair<Seed, InnerRegion, OuterRegion, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
   }
 }
