@@ -1,9 +1,12 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
+  CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7/root/bin/clang-tidy'
+  CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
+  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/2019.2/include'
 
 stages: # ---------------------------------------------------------------------
-#  - quality-check
+  - quality-check
   - hls-build
 #  - topTF-build
 
@@ -13,6 +16,16 @@ stages: # ---------------------------------------------------------------------
     - xilinx-tools
   before_script:
     - source $VIVADO_PATH_SH
+
+.job_template: &template_quality-check
+  tags:
+    - xilinx-tools
+  stage: quality-check
+  script:
+    - cd project
+    - pwd; ls -la; #debug
+    # Hard coded -config='' because the quotes do not work in the variable
+    - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
 
 .job_template: &template_hls-build
   <<: *template_base
@@ -28,6 +41,38 @@ stages: # ---------------------------------------------------------------------
       - ./project/
     expire_in: 1 week
 # Jobs ------------------------------------------------------------------------
+# Quality checks ------------
+VMR-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
+TE-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TrackletAlgorithm/TrackletEngineTop.cc'
+  script:
+    - cd emData/TE; ./download.sh; cd ../../project
+    - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
+TC-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_* ../TrackletAlgorithm/TrackletCalculator.cc'
+  script:
+    - cd emData/TC; ./download.sh; cd ../../project
+    - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
+PR-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/ProjectionRouter_test.cpp ../TrackletAlgorithm/ProjectionRouterTop.cc'
+ME-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cpp'
+MC-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+# HLS builds ---------------
 VMR-hls-build:
   <<: *template_hls-build
   variables:
@@ -39,10 +84,7 @@ TE-hls-build:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TE"
   script:
-    - cd emData/TE
-    - ./download.sh
-    - cd ../../project
-    - pwd; ls -la; #debug
+    - cd emData/TE; ./download.sh; cd ../../project
     - vivado_hls -f "script_${PROJ_NAME}.tcl"
 TC-hls-build:
   <<: *template_hls-build
@@ -50,10 +92,7 @@ TC-hls-build:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TC"
   script:
-    - cd emData/TC
-    - ./download.sh
-    - cd ../../project
-    - pwd; ls -la; #debug
+    - cd emData/TC; ./download.sh; cd ../../project
     - vivado_hls -f "script_${PROJ_NAME}.tcl"
 PR-hls-build:
   <<: *template_hls-build
@@ -70,4 +109,3 @@ MC-hls-build:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
-
