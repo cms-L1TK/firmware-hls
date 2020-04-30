@@ -129,7 +129,7 @@ public:
   void Print()
   {
     std::cout << "Contents in buffer:" << std::endl;
-    std::cout << std::hex << "tcid=" << getTCID() << " sec=" << hasSecond() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
+    std::cout << std::hex << "tcid=" << getTCID() << " sec=" << hasSecond() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
   }
   #endif
   
