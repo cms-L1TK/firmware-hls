@@ -38,87 +38,101 @@ MatchEngineUnit() {
   nstubs=0;
   idle_ = true;
   done_ = true;
-  stubids=nullptr;
+  //stubids=nullptr;
 
 }
 
 ~MatchEngineUnit() {
-  delete[] stubids;
+  //delete[] stubids;
 }
 
-void init(BXType bxin, bool *tab, const VMStubMEMemory<VMSMEType>* instubdata, ProjectionRouterBuffer<BARREL> *proj, const INDEX iproj, int iphi) {
+inline void init(BXType bxin, const INDEX iproj, int iphi) {
+//void init(BXType bxin, bool *tab, const VMStubMEMemory<VMSMEType>* instubdata, ProjectionRouterBuffer<BARREL> *proj, const INDEX iproj, int iphi) {
 #pragma HLS inline
-  stubmem = instubdata;
-  projbuffer = proj;
+  //stubmem = instubdata;
+  //projbuffer = proj;
   writeindex = iproj;
   readindex = 0;
   idle_ = false;
   done_ = false;
-  table = tab;
+  //table = tab;
   bx = bxin;
   ivmphi = iphi;
 
 }
 
-bool empty() {
+inline bool empty() {
 #pragma HLS inline  
   //buffernotempty=(writeindex!=readindex);
   return (writeindex==readindex);
 
 }
 
-bool idle() {
+inline bool idle() {
 #pragma HLS inline  
   return idle_;
 }
 
-bool done() {
+inline bool done() {
 #pragma HLS inline  
   return done_;
 }
 
-STUBID* getStubIds() {
+inline STUBID* getStubIds() {
 #pragma HLS inline  
   return stubids;
 
 }
 
-ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
+inline ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
 #pragma HLS inline  
   return tcid;
 }
 
-VMProjection<BARREL>::VMPID& getProjindex() {
+inline VMProjection<BARREL>::VMPID& getProjindex() {
 #pragma HLS inline  
   return projindex;
 }
 
-NSTUBS getNStubs() {
+inline NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs;
 }
 
-void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
+inline void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
   trackletid = tcid;
   id = projindex;
   nstub = nstubs;
-  //stubid = stubids;
+  stubid = stubids;
   // Deep copy
   /*
-  */
   stubid = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
   for(int i = 0; i < nstubs; ++i)
     stubid[i] = stubids[i];
+  */
   //idle_ = false;
   idle_ = readindex>writeindex;
 
 }
 
-void step() {
+inline void read() {
+#pragma HLS inline  
+  nstubs = 0;
+  idle_ = readindex>writeindex;
+
+}
+
+inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 #pragma HLS inline
 #pragma HLS PIPELINE II=1
+#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
+#pragma HLS ARRAY_PARTITION variable=stubids complete dim=0
+#pragma HLS ARRAY_PARTITION variable=table complete dim=0
 
+    #ifndef __SYNTHESIS__
+    std::cout << "stepping" << std::endl;
+    #endif
     ////////////////////////////////////////////
     //This seems like where the ME buffer starts
     //Goes outside if(valid) ?
@@ -154,14 +168,15 @@ void step() {
       //std::cout << "readindex[" << ivmphi << "]=" << readindex << std::endl;
       //New projection
       if (istub==0) {
-        std::cout << "new projection" << std::endl;
         //delete[] stubids;
-        stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
+        //stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
+        for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i)
+          stubids[i]=0;
 
         //Need to read the information about the proj in the buffer
         //std::cout << "nproj=" << writeindex1 << std::endl;
         auto const qdata=projbuffer[readindex];
-        std::cout << "MEU "; projbuffer[readindex].Print();
+        //std::cout << "MEU "; projbuffer[readindex].Print();
         tcid=qdata.getTCID();
         //projbuffer[readindex].Print();
         /*
@@ -239,31 +254,20 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
           projfinezadj=projfinez;
         }
 
-        std::cout << "nstubs=" << nstubs << std::endl;
-        std::cout << "istub before =" << istub << std::endl;
         if (nstubs==1) {
           istub=0;
           readindex++;
-          std::cout << "one" << std::endl;
         } else {
           istub++;
-          std::cout << "new and incrementing" << std::endl;
         }
-        std::cout << "istub after =" << istub << std::endl;
       } else {
         //Check if last stub, if so, go to next buffer entry 
-        std::cout << "NOT new projection" << std::endl;
-        std::cout << "nstubs=" << nstubs << std::endl;
-        std::cout << "istub before =" << istub << std::endl;
         if (istub+1>=nstubs){
           istub=0;
           readindex++;
-          std::cout << "larger" << std::endl;
         } else {
           istub++;
-          std::cout << "incrementing" << std::endl;
         }
-        std::cout << "istub after =" << istub << std::endl;
       }
       
       //Read stub memory and extract data fields
@@ -312,19 +316,11 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
             << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(vmproj.getIsPSSeed()) << std::endl << std::endl;
       */
       CandidateMatch cmatch(projindex.concat(stubindex));
-      if(ivmphi==6) std::cout << "Sending to MC projid=" << projindex << " stubid=" << stubindex << std::endl;
-      if(ivmphi==6) std::cout << "Sending to MC cmatch=" << cmatch.raw() << std::endl;
-      std::cout << "istub=" << istub << std::endl;
       stubids[istubtmp]=stubindex;
-      std::cout << "nstubs=" << nstubs << " istubtmp=" << istubtmp << " stubindex=" << stubindex << std::endl;
       //delete qdata; //Free up mem when finished with projbuffer entry
     } // if(pass&&table[index])
-    if(istub==0 && stubids!=0) idle_ = true;
-    if(istub==0 && stubids!=0) {
-      for(int i = 0; i < getNStubs(); i++)
-        std::cout << "stubid(" << i << ")=" << stubids[i] << std::endl;
-    }
-    if(ivmphi==7) std::cout << "readindex=" << readindex << " writeindex=" << writeindex << std::endl;
+    //if(istub==0 && stubids!=0) idle_ = true;
+    if(istub==0 && nstubs>0) idle_ = true;
     if(readindex>writeindex) done_ = true;
  
     //-----------------------------------------------------------------------------------------------------------
@@ -348,11 +344,12 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
 
   } // if(buffernotempty)
 
+  return idle_;
 } // end step
 
  private:
-  ProjectionRouterBuffer<BARREL> *projbuffer;//[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];  //projbuffer = nstub+projdata+finez
-  const VMStubMEMemory<VMSMEType>* stubmem;
+  //ProjectionRouterBuffer<BARREL> *projbuffer;//[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+  //const VMStubMEMemory<VMSMEType>* stubmem;
   INDEX writeindex;
   INDEX readindex;
   NSTUBS nstubs;
@@ -361,18 +358,15 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
   int istep_;
   int ivmphi;
   BXType bx;
-  bool *table;//[256];
+  //bool *table;//[256];
   NSTUBS istub=0;
-  STUBID *stubids;
+  STUBID stubids[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
   ap_int<5> projfinezadj; //FIXME Need replace 5 with const
   ProjectionRouterBuffer<BARREL>::TCID tcid;
   ProjectionRouterBuffer<BARREL>::PRHASSEC isPSseed;
   ProjectionRouterBuffer<BARREL>::VMPZBIN zbin;
   VMProjection<BARREL>::VMPRINV projrinv;
   VMProjection<BARREL>::VMPID projindex;
-#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
-#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=0
-#pragma HLS dependence variable=istub intra WAR true
 
 }; // end class
 
