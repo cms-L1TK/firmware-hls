@@ -17,6 +17,7 @@ void MatchProcessorTopL3(BXType bx,
                       FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]) {
 
  #pragma HLS interface register port=bx_o
+/*
  #pragma HLS resource variable=proj1in->get_mem() latency=2
  #pragma HLS resource variable=proj2in->get_mem() latency=2
  #pragma HLS resource variable=proj3in->get_mem() latency=2

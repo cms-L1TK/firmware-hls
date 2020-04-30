@@ -905,6 +905,38 @@ void MatchProcessor(BXType bx,
 
 } // end MatchProcessor()
 
+/*
+void runMatchCalculator(bool *table, 
+                        const VMStubMEMemory<VMSMEType>* instubdata,
+                        ProjectionRouterBuffer<BARREL> *projbuffer,
+                        MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> &matchengine) {
+      matchengine.step(table, instubdata1, projbuffer);
+      typename VMProjection<BARREL>::VMPID projindex;
+      typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
+      typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
+      if(matchengine.idle() && !matchengine.done() && !matchengine.empty()) {
+        typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
+        matchengine.read(currentTCID, projindex, stubid, nstub);
+        //currentTCID=matchengine.getTCID();
+        //std::cout << "current=" << currentTCID << "\tbest=" << bestTCID << std::endl;
+        if ((iMEbest==kNMatchEngines)||(currentTCID<bestTCID)) {
+        //std::cout << iMEbest << "\t" << currentTCID << std::endl;
+	  iMEbest=iphi;
+	  bestTCID=currentTCID;
+	  bestInPipeline=matchengine.empty();
+	}
+        if (iMEbest!=kNMatchEngines&&(!bestInPipeline)) {
+        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
+                  //(bx, allstub, allproj, projindex, stubid, nstub, bx_o,
+                  (bx, allstub, allproj, matchengine.getProjindex(), matchengine.getStubIds(), matchengine.getNStubs(), bx_o,
+                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
+        //matchengine.read();
+        }
+      } //end MC if
+
+} //end runMatchCalculator
+*/
 
 
 #endif
