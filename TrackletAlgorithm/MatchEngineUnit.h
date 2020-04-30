@@ -62,19 +62,19 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
 
 }
 
-bool empty() {
+inline bool empty() {
 #pragma HLS inline  
   return (readindex==0);
 
 }
 
-bool idle() {
+inline bool idle() {
 #pragma HLS inline  
   //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   return idle_;
 }
 
-bool done() {
+inline bool done() {
 #pragma HLS inline  
   //std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << (done_ ? "": " not") << " done!" << std::endl;
   return done_;
@@ -91,7 +91,7 @@ STUBID* getStubIds() {
 
 }
 
-ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
+inline ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
 #pragma HLS inline  
   return tcid;
 }
@@ -102,12 +102,12 @@ VMProjection<BARREL>::VMPID getProjindex() {
   return projbuffer.getIndex();
 }
 
-NSTUBS getNStubs() {
+inline NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs;
 }
 
-void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
+inline void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
   //std::cout << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
   trackletid = getTCID();
@@ -150,6 +150,9 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
     if(idle() || done()) return true;
 
+    #ifndef __SYNTHESIS__
+    std::cout << "stepping" << std::endl;
+    #endif
     ////////////////////////////////////////////
     //This seems like where the ME buffer starts
     //Goes outside if(valid) ?
@@ -203,31 +206,20 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
           projfinezadj=projfinez;
         }
 
-        std::cout << "nstubs=" << nstubs << std::endl;
-        std::cout << "istub before =" << istub << std::endl;
         if (nstubs==1) {
           istub=0;
           readindex++;
-          std::cout << "one" << std::endl;
         } else {
           istub++;
-          std::cout << "new and incrementing" << std::endl;
         }
-        std::cout << "istub after =" << istub << std::endl;
       } else {
         //Check if last stub, if so, go to next buffer entry 
-        std::cout << "NOT new projection" << std::endl;
-        std::cout << "nstubs=" << nstubs << std::endl;
-        std::cout << "istub before =" << istub << std::endl;
         if (istub+1>=nstubs){
           istub=0;
           readindex++;
-          std::cout << "larger" << std::endl;
         } else {
           istub++;
-          std::cout << "incrementing" << std::endl;
         }
-        std::cout << "istub after =" << istub << std::endl;
       }
       
       //Read stub memory and extract data fields
@@ -267,6 +259,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
   } // if(buffernotempty)
   return false;
 
+  return idle_;
 } // end step
 
  private:
