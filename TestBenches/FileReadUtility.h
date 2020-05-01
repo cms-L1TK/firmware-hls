@@ -24,7 +24,7 @@ bool openDataFile(std::ifstream& file_in, const std::string& file_name)
     std::cerr << "Open of file " << file_name << " failed with error: ";
     std::cerr << std::strerror(errno);
     std::cerr << std::endl;
-    std::cerr << "running from directory " << getcwd(NULL,0) << std::endl;
+    std::cerr << "running from directory " << getcwd(nullptr,0) << std::endl;
   }
 
   return success;
@@ -64,7 +64,7 @@ std::vector<std::string> split(const std::string& s, char delimiter)
   std::istringstream sstream(s);
   
   while (getline(sstream, token, delimiter)) {
-    if (token=="") continue;
+    if (token.empty()) continue;
     tokens.push_back(token);
   }
   
@@ -92,10 +92,10 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
       return;
     } else {
       if (split(line,' ').size()==4) {
-	memory.write_mem(ievt, line.c_str(), base);	
+       memory.write_mem(ievt, line, base);
       } else {
 	const std::string datastr = split(line, ' ').back();
-	memory.write_mem(ievt, datastr.c_str(), base);
+	memory.write_mem(ievt, datastr, base);
       }
     }	
   }

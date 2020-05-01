@@ -1,7 +1,7 @@
 #include "MatchEngine.h"
 
-void readTable(bool table[LSIZE]){
-	bool tmp[LSIZE]=
+void readTable(ap_uint<1> table[LSIZE]){
+	ap_uint<1> tmp[LSIZE]=
 	#if LAYER == 1
 #include "../emData/ME/ME_L3PHIC20/METable_L1.tab"
 	#elif LAYER == 2
@@ -33,7 +33,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	//Initialize table for bend-rinv consistency
 	//
 	//bool table[(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
-	bool table[LSIZE];
+	ap_uint<1> table[LSIZE];
 	readTable(table);
 
 	outputCandidateMatch.clear();

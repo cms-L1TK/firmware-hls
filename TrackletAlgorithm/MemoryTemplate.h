@@ -104,6 +104,13 @@ public:
 	// std::cout << "write_mem " << data << std::endl;
 	return write_mem(ibx, data, nent);
   }
+  bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
+  {
+    DataType data(datastr.c_str(), base);
+        int nent = nentries_[ibx];
+	// std::cout << "write_mem " << data << std::endl;
+	return write_mem(ibx, data, nent);
+  }
 
   // print memory contents
   void print_data(const DataType data) const
