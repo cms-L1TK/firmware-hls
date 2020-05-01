@@ -10,7 +10,7 @@ template<int VMSTEIType> class VMStubTEInnerBase {};
 template<>
 class VMStubTEInnerBase<BARRELPS>
 {
-public: 
+public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
     kVMSTEIZBitsSize = 10,
@@ -58,8 +58,8 @@ class VMStubTEInnerBase<DISK>
 public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
-    kVMSTEIZBitsSize = 9,
-    kVMSTEIFinePhiSize = 1,
+    kVMSTEIZBitsSize = 10,
+    kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 3,
     kVMSTEIIDSize = 7,
     // Bit size for full VMStubTEInnerMemory

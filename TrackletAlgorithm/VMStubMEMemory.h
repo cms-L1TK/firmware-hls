@@ -41,8 +41,8 @@ class VMStubMEBase<DISK>
 public:
   enum BitWidths {
     // Bit size for VMStubMEMemory fields
-    kVMSMEFineZSize = 4,
-    kVMSMEBendSize = 4,
+    kVMSMEFineZSize = 3,
+    kVMSMEBendSize = 3,
     kVMSMEIndexSize = 7,
     // Bit size for full VMStubMEMemory
     kVMStubMESize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIndexSize
@@ -79,7 +79,7 @@ public:
   VMStubME(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEZ finez):
     data_( ((id, bend), finez) )
   {}
-  
+
   VMStubME():
     data_(0)
   {}
