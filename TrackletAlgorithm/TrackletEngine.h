@@ -6,7 +6,6 @@
 #include "StubPairMemory.h"
 
 #include "hls_math.h"
-#include <stdio.h>
 #include <string>
 
 class CandMatch;
