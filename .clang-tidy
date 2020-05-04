@@ -14,7 +14,21 @@ Checks: -*,
   ,readability-redundant-string-cstr,
   ,readability-static-definition-in-anonymous-namespace,
   ,readability-uniqueptr-delete-release
-WarningsAsErrors: ''
+WarningsAsErrors: -*,
+  ,boost-use-to-string,
+  ,misc-string-compare,
+  ,misc-uniqueptr-reset-release,
+  ,modernize-deprecated-headers,
+  ,modernize-make-shared,
+  ,modernize-use-bool-literals,
+  ,modernize-use-equals-delete,
+  ,modernize-use-nullptr,
+  ,modernize-use-override,
+  ,performance-unnecessary-copy-initialization,
+  ,readability-container-size-empty,
+  ,readability-redundant-string-cstr,
+  ,readability-static-definition-in-anonymous-namespace,
+  ,readability-uniqueptr-delete-release
 HeaderFilterRegex: '../TrackletAlgorithm|../TestBenches'
 AnalyzeTemporaryDtors: false
 CheckOptions:    
