@@ -9,8 +9,8 @@
 void VMRouterTop(BXType bx,
 		const InputStubMemory<BARRELPS> inputMemories[6],
 		AllStubMemory<BARRELPS> allStub[6],
-		VMStubMEMemory<BARRELPS> meMemories[32],
-		VMStubTEInnerMemory<BARRELPS> teiMemories[32],
+		VMStubMEMemory<BARRELPS> meMemories[4],
+		VMStubTEInnerMemory<BARRELPS> teiMemories[5][4],
 		VMStubTEInnerMemory<BARRELOL> olMemories[3][16],
 		VMStubTEOuterMemory<BARRELPS> teoMemories[32]
 		);

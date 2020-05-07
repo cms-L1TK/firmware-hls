@@ -1,19 +1,18 @@
 #include "VMRouterTop.h"
 
 // VMRouter Top Function for layer 1, AllStub region E
-
 void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> inputMemories[6],
 		AllStubMemory<BARRELPS> allStub[6],
-		VMStubMEMemory<BARRELPS> meMemories[32],
-		VMStubTEInnerMemory<BARRELPS> teiMemories[32],
+		VMStubMEMemory<BARRELPS> meMemories[4],
+		VMStubTEInnerMemory<BARRELPS> teiMemories[5][4],
 		VMStubTEInnerMemory<BARRELOL> olMemories[3][16],
 		VMStubTEOuterMemory<BARRELPS> teoMemories[32]) {
 
 
 // Variables for that are specified with regards to the test bench, should be set somewhere else
-// Note that the first memory is represented by the LSB
-	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
-	const int disk(0); // Which disk number the data is coming from, 0 if not disk
+// The first memory is represented by the LSB
+	constexpr int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
+	constexpr int disk(0); // Which disk number the data is coming from, 0 if not disk
 	static const ap_uint<6> imask(0xF); // Mask of which inputs that are being used
 	static const ap_uint<32> memask(0x000F0000UL); // Mask of which memories that are being used.
 	static const ap_uint<32> teimask(0x000F0000UL); // Mask of which TE Inner memories that are used
@@ -40,6 +39,7 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> inputMemories[6],
 
 
 // Bendcut tables
+constexpr int ntecopies = 5;
 static const int bendtablesize = 8; // The size of each vmbendcut table. Either 8 or 16.
 static const int bendtable[][bendtablesize] = {
 			#include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.tab" // Seems to be the same for all E regions
@@ -50,6 +50,7 @@ static const int bendtable[][bendtablesize] = {
 			,
 			#include "../emData/VMR/VMSTE_L1PHIE20n1_vmbendcut.tab"
 };
+
 
 // Overlap LUT
 	static const int overlaptable[1024] = // 10 bits used for LUT
