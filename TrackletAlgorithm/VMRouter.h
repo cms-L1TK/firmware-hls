@@ -74,7 +74,7 @@ constexpr int vmbitsOverlap[2] = {4, 3};
 // Currently not used, but should be kept for creating the finebin LUTs
 // TODO: either remove this or write out function for all tables that are used?!
 inline void init_finebintable(const int LAYER, const int DISK,
-		int finebintable[kMaxFineBinTable], int & nbitsfinebintable) {
+		int finebintable[kMaxFineBinTable], int & nbitszfinebintable) {
 #ifndef __SYNTHESIS__
 // initialize
 	for (auto i = 0; i < kMaxFineBinTable; i++) {
@@ -82,19 +82,19 @@ inline void init_finebintable(const int LAYER, const int DISK,
 	}
 
 	if (LAYER != 0) {
-		nbitsfinebintable = 8;
-		unsigned int nbins = 1 << nbitsfinebintable;
+		nbitszfinebintable = 8;
+		unsigned int nbins = 1 << nbitszfinebintable;
 
 		for (unsigned int i = 0; i < nbins; i++) {
-			int ibin = (i >> (nbitsfinebintable - 3));
+			int ibin = (i >> (nbitszfinebintable - 3));
 
-			int zfine = (i >> (nbitsfinebintable - 6)) - (ibin << 3);
+			int zfine = (i >> (nbitszfinebintable - 6)) - (ibin << 3);
 
 			//awkward bit manipulations since the index is from a signed number...
-			int index = i + (1 << (nbitsfinebintable - 1));
+			int index = i + (1 << (nbitszfinebintable - 1));
 
-			if (index >= (1 << nbitsfinebintable)) {
-				index -= (1 << nbitsfinebintable);
+			if (index >= (1 << nbitszfinebintable)) {
+				index -= (1 << nbitszfinebintable);
 			}
 
 			finebintable[index] = zfine;
@@ -104,8 +104,8 @@ inline void init_finebintable(const int LAYER, const int DISK,
 
 	if (DISK != 0) {
 
-		nbitsfinebintable = 8;
-		unsigned int nbins = 1 << nbitsfinebintable;
+		nbitszfinebintable = 8;
+		unsigned int nbins = 1 << nbitszfinebintable;
 
 		for (unsigned int i = 0; i < nbins; i++) {
 
@@ -118,7 +118,7 @@ inline void init_finebintable(const int LAYER, const int DISK,
 					rstub = rDSSouter[i];
 				}
 			} else {
-				rstub = kr * (i << (nrbitsdisk - nbitsfinebintable));
+				rstub = kr * (i << (nrbitsdisk - nbitszfinebintable));
 			}
 
 			if (rstub < rmindiskvm) {
@@ -142,7 +142,7 @@ inline void init_finebintable(const int LAYER, const int DISK,
 	for (int i=0;i<256;i++) {
 		finebintable[i]=tmp[i];
 	}
-	nbitsfinebintable = 256;
+	nbitszfinebintable = 256;
 #endif // __SYNTHESIS__
 }
 
@@ -343,7 +343,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		VMStubTEOuterMemory<OUTTYPE> *mteo31) {
 
 	#pragma HLS inline
-		static int nbitsfinebintable = 8; // this appears to always be 8. Total number of bits the finebintable consists of
+
+		constexpr int nbitszfinebintable = 7; // Number of bits used for z in finebintable
+		constexpr int nbitsrfinebintable = (LAYER) ? 4 : 3; // Number of bits used for r in finebintable
 
 //#pragma HLS array_partition variable=finebintable
 //#pragma HLS array_partition variable=bendtable
@@ -727,41 +729,48 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		assert(std::abs(ivm - ivmPlus) <= 1);
 		assert(std::abs(ivm-ivmMinus) <= 1 );
 
-		ap_uint<MEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
+
+		// Indices used to find the rzfine value in finebintable
+		// finebintable returns the top 6 bits of a corrected z
+		// Note: not the index that is being saved to the stub
+
+		// Make z unsigned and take the top "nbitszfinebintable" bits
+		ap_uint<nbitszfinebintable + nbitsrfinebintable> indexz = ((z + (1<<(nzbits-1)))
+				>> (nzbits - nbitszfinebintable));
+		ap_uint<nbitsrfinebintable> indexr = 0;
 
 		if (DISK) { // Not implemented
-
-			// Get the 3 MSBs of r and add 4 as r is signed (takes values between -4 and 3)
-			bin = (r >> (nrbits - MEBinsBits)) + (1 << (MEBinsBits - 1)); // Coarse r value
 
 			// Index of where to find the rfine value in finebintable
 			// The top 7 MSBs of r, ignoring the sign.
 			// Note: not the index that is being saved to the stub
 			typename VMStubME<OUTTYPE>::VMSMEID index = (r
-					>> (r.length() - nbitsfinebintable))
-					& ((1 << nbitsfinebintable) - 1);
+					>> (r.length() - nbitszfinebintable))
+					& ((1 << nbitszfinebintable) - 1);
 
 			// Set rfine: the r position within a bin
 			typename VMStubME<OUTTYPE>::VMSMEFINEZ rfine = finebintable[index]; // is it the same table as for z?
 			assert(rfine >= 0);
 			stubme.setFineZ(rfine);
-		} else { // layer
-
-			// Get the 3 MSBs of z and add 4 as z is signed (z takes values between -4 and 3)
-			bin = (z >> (nzbits - MEBinsBits)) + (1 << (MEBinsBits - 1)); // Coarse z value
-
-			// Index of where to find the zfine value in finebintable
-			// The top 7 MSBs of z, ignoring the sign.
-			// Note: not the index that is being saved to the stub
-			// TODO: change the type?? it's confusing. Same for the other memories
-			typename VMStubME<OUTTYPE>::VMSMEID index = (z
-					>> (nzbits - nbitsfinebintable))
-					& ((1 << nbitsfinebintable) - 1);
-
-			// Set zfine: the z position within a bin
-			typename VMStubME<OUTTYPE>::VMSMEFINEZ zfine = finebintable[index]; // Using the bits 5 down to 2?
-			stubme.setFineZ(zfine);
+		} else { // LAYER
+			// Make r unsigned and take the top "nbitsrfinebintable" bits
+			indexr = ( ( r + (1 << (nrbits-1))) >> (nrbits -nbitsrfinebintable));
 		}
+
+		// The index for finebintable
+		ap_uint<nbitszfinebintable + nbitsrfinebintable> index = (indexz<<nbitsrfinebintable)+indexr;
+
+		// Get the corrected r/z position
+		int rzfine = finebintable[index];
+
+		// Coarse z. The bin the stub is going to be put it in the memory
+		ap_uint<MEBinsBits> bin = rzfine >> 3; // 3 bits, i.e. max 8 bins within each VM
+
+		// Set rzfine, i.e. the r/z bits within a coarse r/z region
+		rzfine = rzfine & 7; // the 3 LSB as rzfine
+		stubme.setFineZ(rzfine);
+
+		assert(rzfine>=0);
 
 // For debugging
 #ifndef __SYNTHESIS__
@@ -1349,6 +1358,16 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			constexpr auto vmbits = (LAYER) ? vmbitsLayer[LAYER-1] : vmbitsDisk[DISK-1]; // Number of bits for VMs
 			constexpr auto finephibits = (LAYER) ? nfinephibarrelouter : nfinephidiskouter; // Number of bits for finephi
 
+
+			// Indices used to find the rzfine value in finebintable
+			// finebintable returns the top 6 bits of a corrected z
+			// Note: not the index that is being saved to the stub
+
+			// Make z unsigned and take the top "nbitszfinebintable" bits
+			ap_uint<nbitszfinebintable + nbitsrfinebintable> indexz = ((z + (1<<(nzbits-1)))
+					>> (nzbits - nbitszfinebintable));
+			ap_uint<nbitsrfinebintable> indexr = 0;
+
 			// LAYER
 			if (LAYER != 0) {
 
@@ -1367,17 +1386,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 				bin = binlookuptable[indexo]/8; // is >> 3 faster?
 
-				// Index of where to find the zfine value in finebintable
-				// The top 7 MSBs of z, ignoring the sign.
-				// Note: not the index that is being saved to the stub
-				typename VMStubTEOuter<OUTTYPE>::VMSTEOID index = (z
-						>> (nzbits - nbitsfinebintable))
-						& ((1 << nbitsfinebintable) - 1);
+				// Make r unsigned and save the top "nbitsrfinebintable" bits
+				indexr = ( ( r + (1 << (nrbits-1))) >> (nrbits -nbitsrfinebintable));
 
-				// Set zfine: the z position within a bin
-				typename VMStubTEOuter<OUTTYPE>::VMSTEOFINEZ zfine =
-						finebintable[index];
-				stubTeOuter.setFineZ(zfine);
 			} else { // DISKS
 				assert(DISK != 0);
 
@@ -1392,8 +1403,8 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				// The top 7 MSBs of r, ignoring the sign.
 				// Note: not the index that is being saved to the stub
 				typename VMStubTEOuter<OUTTYPE>::VMSTEOID index = (r
-						>> (nrbits - nbitsfinebintable))
-						& ((1 << nbitsfinebintable) - 1);
+						>> (nrbits - nbitszfinebintable))
+						& ((1 << nbitszfinebintable) - 1);
 
 				// set rfine: the r position within a bin
 				typename VMStubTEOuter<OUTTYPE>::VMSTEOFINEZ rfine =
@@ -1401,6 +1412,16 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				assert(rfine >= 0);
 				stubTeOuter.setFineZ(rfine);
 			}
+
+			// The index for finebintable
+			ap_uint<nbitszfinebintable + nbitsrfinebintable> index = (indexz<<nbitsrfinebintable)+indexr;
+
+			// Get the corrected r/z position
+			int rzfine = finebintable[index];
+
+			// Set rzfine, i.e. the r/z bits within a coarse r/z region
+			rzfine = rzfine & 7; // the 3 LSB as rzfine
+			stubTeOuter.setFineZ(rzfine);
 
 // For debugging
 #ifndef __SYNTHESIS__
