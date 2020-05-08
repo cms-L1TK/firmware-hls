@@ -44,7 +44,7 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
     kVMSTEIZBitsSize = 10,
-    kVMSTEIFinePhiSize = 1,
+    kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 3,
     kVMSTEIIDSize = 7,
     // Bit size for full VMStubTEInnerMemory

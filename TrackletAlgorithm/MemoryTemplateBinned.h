@@ -103,7 +103,6 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS dependence variable=nentries_ intra WAR true
 #pragma HLS inline
-
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
 	if (nentry_ibx <= (kNMemDepth)) {
@@ -143,10 +142,11 @@ public:
 
     std::string datastr = split(line, ' ').back();
 
-    int slot=atoi(split(line, ' ').front().c_str());
+    int slot= (int)strtol(split(line, ' ').front().c_str(), NULL, 16); //atoi(split(line, ' ').front().c_str());
 
     DataType data(datastr.c_str(), base);
     //std::cout << "write_mem slot data : " << slot<<" "<<data << std::endl;
+
     return write_mem(bx, slot, data);
   }
 

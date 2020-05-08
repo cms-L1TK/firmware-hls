@@ -13,7 +13,7 @@ class VMStubMEBase<BARRELPS>
 public:
   enum BitWidths {
     // Bit size for VMStubMEMemory fields
-    kVMSMEFineZSize = 4,
+    kVMSMEFineZSize = 3,
     kVMSMEBendSize = 3,
     kVMSMEIndexSize = 7,
     // Bit size for full VMStubMEMemory
@@ -27,7 +27,7 @@ class VMStubMEBase<BARREL2S>
 public:
   enum BitWidths {
     // Bit size for VMStubMEMemory fields
-    kVMSMEFineZSize = 4,
+    kVMSMEFineZSize = 3,
     kVMSMEBendSize = 4,
     kVMSMEIndexSize = 7,
     // Bit size for full VMStubMEMemory
@@ -42,7 +42,7 @@ public:
   enum BitWidths {
     // Bit size for VMStubMEMemory fields
     kVMSMEFineZSize = 3,
-    kVMSMEBendSize = 3,
+    kVMSMEBendSize = 4,
     kVMSMEIndexSize = 7,
     // Bit size for full VMStubMEMemory
     kVMStubMESize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIndexSize
@@ -127,7 +127,7 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,3>;
+template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,4>;
 
 
 #endif
