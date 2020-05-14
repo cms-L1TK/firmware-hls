@@ -173,7 +173,7 @@ inline int iphivmFineBins(const typename AllStub<INTYPE>::ASPHI phi,
 // we add a small amount to the raw value; if it's not the same
 // as the central value we copy the data to the adjacent memory as well.
 template<regionType INTYPE>
-inline ap_uint<5> iphivmRawPlus(const typename AllStub<INTYPE>::ASPHI phi) {
+inline ap_uint<7> iphivmRawPlus(const typename AllStub<INTYPE>::ASPHI phi) {
 	// // TODO: get rid of hard-coded values
 	// ap_uint<7> tmp = phi.range(phi.length()-1,phi.length()-7);
 	// auto iphivmp = ++tmp;
@@ -687,12 +687,12 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 		// Variables that are going to be used by ME and TE memories
 		auto bend = stub.getBend();
-		auto stubPhi_uncorr = stub.getPhi(); // Original phi, uncorrected. Should probably not be used, waiting for update of C++ emulation?
-		auto stubPhi = getPhiCorr<INTYPE>(stub.getPhi(), stub.getR(), stub.getBend(), corrtable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
 		auto z = stub.getZ();
 		auto r = stub.getR();
 		auto nzbits = z.length();
 		auto nrbits = r.length();
+		auto stubPhi_uncorr = stub.getPhi(); // Original phi, uncorrected. Should probably not be used, waiting for update of C++ emulation?
+		auto stubPhi = getPhiCorr<INTYPE>(stubPhi_uncorr, r, bend, corrtable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
 
 
 		/////////////////////////////////////////////

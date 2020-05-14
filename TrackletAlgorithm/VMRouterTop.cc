@@ -32,13 +32,7 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 		VMStubTEInnerMemory<BARRELOL> *mteol1,
 		VMStubTEInnerMemory<BARRELOL> *mteol2) {
 
-// Variables for that are specified with regards to the test bench, should be set somewhere else
-
-// const uint32_t MEMask(0x000F0000UL); // Mask of which memories that are being used.
-// const uint32_t TEIMask(0x000F0000UL); // Mask of which TE Inner memories that are used
-// const uint16_t OLMask(0x300); // Mask of which TE Outer memories that are used
-// const uint32_t TEOMask(0x0UL); // Mask of which TE Inner memories that are used
-// Note that the masks are "reversed"
+// Variables for that are specified with regards to the test bench
 	const int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	const int disk(0); // Which disk number the data is coming from, 0 if not disk
 	static const ap_uint<6> imask(0xF); // Mask of which inputs that are being used
@@ -50,39 +44,41 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 ///////////////////////////
 // Open Lookup tables
 
-// lookup table - 2^nbinsfinbinetable entries actually filled
-// Table is filled with numbers between 0 and 7 (and -1): the finer region each z/r bin is divided into.
-	static const int finebintable[kMaxFineBinTable] =
+// LUT with the finer region each z/r bin is divided into.
+	static const int finebintable[] =
 #include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
 	;
 
-	// Only used by layers. LUT with phi corrections for different r and bend
+	// LUT with phi corrections to the nominal radius. Only used by layers.
+	// Values are determined by the radius and the bend of the stub.
 	static const int phicorrtable[] =
-#include "../emData/VMR/VMPhiCorrL1.txt"
+#include "../emData/VMR/VMR_L1PHIE/VMPhiCorrL1.txt"
 	;
 
-	static const int binlookuptable[2048] = // 11 bits used for LUT
+// LUT with the Z/R bits for TE memories
+// Todo: comment on what the bits represent
+	static const int binlookuptable[] =
 #include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1L2.tab" // Only for Layer 1
 					;
 
+					// LUT with the Z/R bits for TE Overlap memories
+						static const int overlaptable[1024] = // 10 bits used for LUT
+					#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab"
+										;
 
-// Bendcut tables
+// LUT with bend cuts for the TE memories
+// The n memory versions contain stubs sorted by the bend
+// Todo: add the other n TE copies
 static const int bendtablesize = 8; // The size of each vmbendcut table. Either 8 or 16.
 static const int bendtable[][bendtablesize] = {
-			#include "../emData/VMR/VMSTE_L1PHIE17n1_vmbendcut.tab" // Seems to be the same for all E regions
+			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE17n1_vmbendcut.tab"
 			,
-			#include "../emData/VMR/VMSTE_L1PHIE18n1_vmbendcut.tab"
+			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE18n1_vmbendcut.tab"
 			,
-			#include "../emData/VMR/VMSTE_L1PHIE19n1_vmbendcut.tab"
+			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE19n1_vmbendcut.tab"
 			,
-			#include "../emData/VMR/VMSTE_L1PHIE20n1_vmbendcut.tab"
+			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE20n1_vmbendcut.tab"
 };
-
-// Overlap LUT
-	static const int overlaptable[1024] = // 10 bits used for LUT
-#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab" // Only for Layer 1
-					;
-// SHOULD I USE SOMETHING ELSE THAN INT FOR MY TABLES???
 
 					VMRouter<BARRELPS, BARRELPS, layer, disk, bendtablesize>
 					(bx, finebintable, phicorrtable, binlookuptable, bendtable, overlaptable,
