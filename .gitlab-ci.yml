@@ -79,22 +79,17 @@ VMR-hls-build:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMR"
+  allow_failure: true
 TE-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TE"
-  script:
-    - cd emData/TE; ./download.sh; cd ../../project
-    - vivado_hls -f "script_${PROJ_NAME}.tcl"
 TC-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TC"
-  script:
-    - cd emData/TC; ./download.sh; cd ../../project
-    - vivado_hls -f "script_${PROJ_NAME}.tcl"
 PR-hls-build:
   <<: *template_hls-build
   variables:

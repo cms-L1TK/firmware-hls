@@ -44,7 +44,7 @@ constexpr double rDSSinner[10] = { 66.7728, 71.7967, 77.5409, 82.5584, 84.8736,
 constexpr double rDSSouter[10] = { 65.1694, 70.1936, 75.6641, 80.6908, 83.9581,
 		88.9827, 94.6539, 99.6772, 102.494, 107.519 }; // <=== these 10 are for outer 3 disks
 
-constexpr int kMaxFineBinTable = 256;
+constexpr int kMaxFineBinTable = 2048;
 
 // TODO: fix the hacky underscores; probably pass in a pointer
 // since we need to have different tables for different templated
@@ -114,10 +114,10 @@ inline void init_finebintable(const int layer_, const int disk_,
 		}
 	}
 #else // __SYNTHESIS__
-	int tmp[256]=
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
+	int tmp[2048]=
+#include "../emData/VMR/tables/VMR_L1PHIE_finebin.tab"
 
-	for (int i=0;i<256;i++) {
+	for (int i=0;i<2048;i++) {
 		finebintable_[i]=tmp[i];
 	}
 	nbitsfinebintable_ = 256;
@@ -221,7 +221,7 @@ void VMRouter(const BXType bx,
 // lookup table - 2^nbinsfinbinetable entries actually filled
 // Table is filled with numbers between 0 and 7 (and -1): the finer region each z/r bin is divided into.
 	static const int finebintable_[kMaxFineBinTable] =
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
+#include "../emData/VMR/tables/VMR_L1PHIE_finebin.tab"
 	;
 
 // reset address counters in output memories

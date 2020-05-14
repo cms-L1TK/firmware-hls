@@ -3,17 +3,17 @@
 void readTable(ap_uint<1> table[LSIZE]){
 	ap_uint<1> tmp[LSIZE]=
 	#if LAYER == 1
-#include "../emData/ME/ME_L3PHIC20/METable_L1.tab"
+#include "../emData/ME/tables/METable_L1.tab"
 	#elif LAYER == 2
-#include "../emData/ME/ME_L3PHIC20/METable_L2.tab"
+#include "../emData/ME/tables/METable_L2.tab"
 	#elif LAYER == 3
-#include "../emData/ME/ME_L3PHIC20/METable_L3.tab"
+#include "../emData/ME/tables/METable_L3.tab"
 	#elif LAYER == 4
-#include "../emData/ME/ME_L3PHIC20/METable_L4.tab"
+#include "../emData/ME/tables/METable_L4.tab"
 	#elif LAYER == 5
-#include "../emData/ME/ME_L3PHIC20/METable_L5.tab"
+#include "../emData/ME/tables/METable_L5.tab"
 	#elif LAYER == 6
-#include "../emData/ME/ME_L3PHIC20/METable_L6.tab"
+#include "../emData/ME/tables/METable_L6.tab"
 	#else
 {};
 	#endif
