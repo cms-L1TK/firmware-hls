@@ -7,20 +7,13 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 		const InputStubMemory<BARRELPS> *i2,
 		const InputStubMemory<BARRELPS> *i3,
 		const InputStubMemory<BARRELPS> *i4,
-		const InputStubMemory<BARRELPS> *i5,
-//		const InputStubMemory<BARRELPS> *i6,
-//		const InputStubMemory<BARRELPS> *i7,
-		AllStubMemory<BARRELPS> *allStub,
-		// ME memories
-		VMStubMEMemory<BARRELPS> *m0,
-		VMStubMEMemory<BARRELPS> *m1,
-		VMStubMEMemory<BARRELPS> *m2,
-		VMStubMEMemory<BARRELPS> *m3,
-		VMStubMEMemory<BARRELPS> *m4,
-		VMStubMEMemory<BARRELPS> *m5,
-		VMStubMEMemory<BARRELPS> *m6,
-		VMStubMEMemory<BARRELPS> *m7,
-		// TE Inner memories
+		const InputStubMemory<BARRELPS> *i5, AllStubMemory<BARRELPS> *allStub,
+// ME memories
+		VMStubMEMemory<BARRELPS> *m0, VMStubMEMemory<BARRELPS> *m1,
+		VMStubMEMemory<BARRELPS> *m2, VMStubMEMemory<BARRELPS> *m3,
+		VMStubMEMemory<BARRELPS> *m4, VMStubMEMemory<BARRELPS> *m5,
+		VMStubMEMemory<BARRELPS> *m6, VMStubMEMemory<BARRELPS> *m7,
+// TE Inner memories
 		VMStubTEInnerMemory<BARRELPS> *mtei0,
 		VMStubTEInnerMemory<BARRELPS> *mtei1,
 		VMStubTEInnerMemory<BARRELPS> *mtei2,
@@ -49,8 +42,8 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 #include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
 	;
 
-	// LUT with phi corrections to the nominal radius. Only used by layers.
-	// Values are determined by the radius and the bend of the stub.
+// LUT with phi corrections to the nominal radius. Only used by layers.
+// Values are determined by the radius and the bend of the stub.
 	static const int phicorrtable[] =
 #include "../emData/VMR/VMR_L1PHIE/VMPhiCorrL1.txt"
 	;
@@ -59,49 +52,50 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 // Todo: comment on what the bits represent
 	static const int binlookuptable[] =
 #include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1L2.tab" // Only for Layer 1
-					;
+	;
 
-					// LUT with the Z/R bits for TE Overlap memories
-						static const int overlaptable[1024] = // 10 bits used for LUT
-					#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab"
-										;
+// LUT with the Z/R bits for TE Overlap memories
+	static const int overlaptable[1024] =// 10 bits used for LUT
+#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab"
+	;
 
 // LUT with bend cuts for the TE memories
 // The n memory versions contain stubs sorted by the bend
 // Todo: add the other n TE copies
-static const int bendtablesize = 8; // The size of each vmbendcut table. Either 8 or 16.
+	static const int bendtablesize = 8; // The size of each vmbendcut table. Either 8 or 16.
 static const int bendtable[][bendtablesize] = {
-			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE17n1_vmbendcut.tab"
-			,
-			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE18n1_vmbendcut.tab"
-			,
-			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE19n1_vmbendcut.tab"
-			,
-			#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE20n1_vmbendcut.tab"
-};
+#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE17n1_vmbendcut.tab"
+	,
+#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE18n1_vmbendcut.tab"
+	,
+#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE19n1_vmbendcut.tab"
+	,
+#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE20n1_vmbendcut.tab"
+}
+;
 
-					VMRouter<BARRELPS, BARRELPS, layer, disk, bendtablesize>
-					(bx, finebintable, phicorrtable, binlookuptable, bendtable, overlaptable,
-					imask, i0, i1, i2, i3, nullptr, nullptr, //i5,i6,i7,
-					allStub,
+VMRouter<BARRELPS, BARRELPS, layer, disk, bendtablesize>
+(bx, finebintable, phicorrtable, binlookuptable, bendtable, overlaptable,
+		imask, i0, i1, i2, i3, nullptr, nullptr, //i5,i6,i7,
+		allStub,
 // ME memories
-					memask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
-					m0, m1, m2, m3, nullptr, nullptr, nullptr, nullptr, // 16-23
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 24-31
+		memask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 0-7
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 8-15
+		m0, m1, m2, m3, nullptr, nullptr, nullptr, nullptr,// 16-23
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 24-31
 // TEInner memories
-					teimask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
-					mtei0, mtei1, mtei2, mtei3, nullptr, nullptr, nullptr, nullptr, // 16-23
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 24-31
+		teimask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 0-7
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 8-15
+		mtei0, mtei1, mtei2, mtei3, nullptr, nullptr, nullptr, nullptr,// 16-23
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 24-31
 // TEInner Overlap memories
-					olmask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
-					mteol1, mteol2, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
+		olmask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 0-7
+		mteol1, mteol2, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 8-15
 // TEOuter memories
-					teomask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 16-23
-					nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr // 24-31
-					);
-	return;
+		teomask, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 0-7
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 8-15
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,// 16-23
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr// 24-31
+);
+return;
 }
