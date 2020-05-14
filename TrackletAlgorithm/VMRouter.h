@@ -791,8 +791,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		ap_uint<MEBinsBits> bin = rzfine >> 3; // 3 bits, i.e. max 8 bins within each VM
 		if (isNegDisk) bin += 8;
 
-		std::cout << "IS NEG DISK "<< isNegDisk << "    RZFINE: " << rzfine << "     INDEX: " << index << "    index R " << indexr <<  "    INDEX Z " << indexz << std::endl;
-
 		// Set rzfine, i.e. the r/z bits within a coarse r/z region
 		rzfine = rzfine & 7; // the 3 LSB as rzfine
 		stubme.setFineZ(rzfine);
@@ -1003,14 +1001,20 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			} else { // DISKS
 				assert(DISK != 0);
 
-				constexpr int zbins = (1 << 3); // 7 = zbits
-				constexpr int rbins = (1 << 8); // Number of bins in r
-				ap_uint<3> zbin = (z + (1 << (z.length() - 1))) >> (z.length() - 3); // Make z positive and take the 7 MSBs TODO replace 7
-				ap_uint<8> rbin = r >> (nrbits-8);//(r + (1 << (nrbits - 1))) >> (nrbits - 8);
+				constexpr int nz = 3;
+				constexpr int nr = 8;
+				constexpr int zbins = (1 << nz); // 7 = zbits
+				constexpr int rbins = (1 << nr); // Number of bins in r
+				ap_uint<nz> zbin = (z + (1 << (nzbits - 1))) >> (nzbits - nz); // Make z positive and take the 7 MSBs TODO replace 7
+				if (isNegDisk) zbin = 7 - zbin;
+				ap_uint<nr> rbin = r;
+				if (!isDisk2S) rbin = r >> (nrbits-nr);//(r + (1 << (nrbits - 1))) >> (nrbits - 8);
 
-				int index = zbin * rbins + rbin; // number of bins
+				int index = rbin * zbins + zbin; // number of bins
 
 				binlookup = binlookuptable[index];
+
+				std::cout << "IS NEG DISK "<< isNegDisk << "    rbin: " << rbin << "   z bin " << zbin << "     INDEX: " << index << "    BINLOOKUP " << binlookup << std::endl;
 
 				stubTeInner.setZBits(binlookup);
 				stubTeInner.setFinePhi(
@@ -1032,7 +1036,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			// and a valid bend
 			// TODO: implement VMR to write to the n memory copies, which are different depending on the bendcuts
 			// TODO: doesn't it make more sense if < 1024?
-			if (binlookup <= 1008 && passbend) {
+			if ((binlookup < 1024)  && (binlookup >= 0)  && passbend) {
 				// 0-9
 				if (teimask[0]) {
 					if (ivm == 0) {
@@ -1396,7 +1400,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			constexpr auto vmbits = (LAYER) ? vmbitsLayer[LAYER-1] : vmbitsDisk[DISK-1]; // Number of bits for VMs
 			constexpr auto finephibits = (LAYER) ? nfinephibarrelouter : nfinephidiskouter; // Number of bits for finephi
 
-
+			int binlookup = -1;
 			// Indices used to find the rzfine value in finebintable
 			// finebintable returns the top 6 bits of a corrected z
 			// Note: not the index that is being saved to the stub
@@ -1433,29 +1437,37 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				stubTeOuter.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits));
 
-				constexpr auto zbinbits = (DISK == 1) ? 3 : 7;
-				constexpr auto rbinbits = (DISK == 1) ? 7 : 4;
+				constexpr auto zbinbits = 3; //(DISK == 1) ? 3 : 7;
+				constexpr auto rbinbits = 7; //(DISK == 1) ? 7 : 4;
 				constexpr auto zbins = (1 << zbinbits); // 7 = zbits
 				constexpr auto rbins = (1 << rbinbits); // Number of bins in r
 				ap_uint<zbinbits> zbin = (z + (1 << (nzbits - 1))) >> (nzbits - zbinbits); // Make z positive and take the 7 MSBs TODO replace 7
-				ap_uint<rbinbits> rbin = (r + (1 << (nrbits - 1))) >> (nrbits - rbinbits);
+				ap_uint<rbinbits> rbin; // = (r + (1 << (nrbits - 1))) >> (nrbits - rbinbits);
 
-				int indexo = zbin * rbins + rbin; // number of bins
 
-				bin = (DISK == 1) ? overlaptable[indexo]/8 : binlookuptable[indexo]/8; // is >> 3 faster?
 
-				// Index of where to find the rfine value in finebintable
-				// The top 7 MSBs of r, ignoring the sign.
-				// Note: not the index that is being saved to the stub
-				typename VMStubTEOuter<OUTTYPE>::VMSTEOID index = (r
-						>> (nrbits - nbitszfinebintable))
-						& ((1 << nbitszfinebintable) - 1);
+				// Make r unsigned and save the top "nbitsrfinebintable" bits
+				if (isNegDisk) {
+					indexz = (1<<nbitszfinebintable)-indexz;
+					zbin = 7-zbin;
 
-				// set rfine: the r position within a bin
-				typename VMStubTEOuter<OUTTYPE>::VMSTEOFINEZ rfine =
-						finebintable[index]; // is it the same table as for z?
-				assert(rfine >= 0);
-				stubTeOuter.setFineZ(rfine);
+				}
+				if (isDisk2S) {
+					indexr = r;
+					rbin = r;
+				} else {
+					// Take the top "nbitsrfinebintable" bits
+					indexr = r >> (nrbits - nbitsrfinebintable);
+					rbin = r >> (nrbits - rbinbits);
+				}
+
+				int indexo = rbin * zbins + zbin; // number of bins
+				binlookup = overlaptable[indexo];//binlookuptable[indexo2]; // is >> 3 faster?
+				int bintemp = (DISK == 1) ? overlaptable[indexo] : binlookuptable[indexo]/8; // is >> 3 faster?
+				bin = bintemp&7;
+				std::cout <<" r " << r << "   rbin  " << rbin << "   rbins " << rbins << std::endl;
+				std::cout <<" Z " << z << "   zbin  " << zbin << "   zbins " << zbins << std::endl;
+				std::cout << "isnegdisk  " << isNegDisk << "  TABLE VAL " << overlaptable[indexo] << "     BIN " << bin << std::endl;
 			}
 
 			// The index for finebintable
@@ -1463,6 +1475,10 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 			// Get the corrected r/z position
 			int rzfine = finebintable[index];
+
+			// Coarse z. The bin the stub is going to be put it in the memory
+			//bin = rzfine >> 3; // 3 bits, i.e. max 8 bins within each VM
+			//if (isNegDisk) bin += 8;
 
 			// Set rzfine, i.e. the r/z bits within a coarse r/z region
 			rzfine = rzfine & 7; // the 3 LSB as rzfine
@@ -1482,7 +1498,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			// Only if it has a valid bend
 			// TODO: implement VMR to write to the n memory copies, which are different depending on the bendcuts
 			// TODO: can only use ivm if first memory is 0
-			if (passbend) {
+			if (passbend && ((binlookup >= 0) && (binlookup < 2048)) ) {
 			// 0-9
 			if (teomask[0]) {
 				if (ivm == 0)
