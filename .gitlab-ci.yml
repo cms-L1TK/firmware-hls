@@ -22,7 +22,9 @@ stages: # ---------------------------------------------------------------------
     - xilinx-tools
   stage: quality-check
   script:
-    - cd project
+    - cd emData
+    - ./download.sh
+    - cd ../project
     - pwd; ls -la; #debug
     # Hard coded -config='' because the quotes do not work in the variable
     - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
