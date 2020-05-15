@@ -759,10 +759,10 @@ void MatchCalculator(BXType bx,
     ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
     // Full match parameters
-    typename FullMatch<FMTYPE>::FMTCID          fm_tcid  = proj_tcid;
-    typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid  = proj_tkid;
+    typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
+    typename FullMatch<FMTYPE>::FMTrackletIndex &fm_tkid  = proj_tkid;
     typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
-    typename FullMatch<FMTYPE>::FMSTUBID        fm_asid  = stubid;
+    typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid  = stubid;
     typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
     typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
 
