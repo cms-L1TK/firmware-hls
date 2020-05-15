@@ -22,7 +22,9 @@ stages: # ---------------------------------------------------------------------
     - xilinx-tools
   stage: quality-check
   script:
-    - cd project
+    - cd emData
+    - ./download.sh
+    - cd ../project
     - pwd; ls -la; #debug
     # Hard coded -config='' because the quotes do not work in the variable
     - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
@@ -51,16 +53,10 @@ TE-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TrackletAlgorithm/TrackletEngineTop.cc'
-  script:
-    - cd emData/TE; ./download.sh; cd ../../project
-    - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
 TC-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_* ../TrackletAlgorithm/TrackletCalculator.cc'
-  script:
-    - cd emData/TC; ./download.sh; cd ../../project
-    - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
 PR-quality-check:
   <<: *template_quality-check
   variables:
@@ -79,22 +75,17 @@ VMR-hls-build:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMR"
+  allow_failure: true
 TE-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TE"
-  script:
-    - cd emData/TE; ./download.sh; cd ../../project
-    - vivado_hls -f "script_${PROJ_NAME}.tcl"
 TC-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TC"
-  script:
-    - cd emData/TC; ./download.sh; cd ../../project
-    - vivado_hls -f "script_${PROJ_NAME}.tcl"
 PR-hls-build:
   <<: *template_hls-build
   variables:

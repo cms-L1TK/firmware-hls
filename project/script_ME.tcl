@@ -10,7 +10,7 @@ open_project -reset matchengine
 # Optional Flags: -DDEBUG
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top MatchEngineTop
-add_files ../TrackletAlgorithm/MatchEngine.cpp -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchEngine.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "$CFLAGS"
 
 # data files

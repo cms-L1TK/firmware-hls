@@ -91,7 +91,7 @@ public:
     kISRMSB = kISRLSB + InputStubBase<ISType>::kISRSize - 1
   };
 
-  typedef ap_uint<InputStubBase<ISType>::kISRSize> ISR;
+  typedef ap_int<InputStubBase<ISType>::kISRSize> ISR;
   typedef ap_int<InputStubBase<ISType>::kISZSize> ISZ;
   typedef ap_uint<InputStubBase<ISType>::kISPhiSize> ISPHI;
   typedef ap_uint<InputStubBase<ISType>::kISAlphaSize> ISALPHA;

@@ -150,32 +150,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
     if (L==1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L1PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L2PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L4PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L5PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L6PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -185,32 +185,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else { // z cuts
     if (L==1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L1PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L2PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L4PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L5PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L6PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
