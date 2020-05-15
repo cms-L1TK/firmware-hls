@@ -15,6 +15,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 class MemoryTemplate
 {
 public:
+  typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR+1> NEntryT;
   
@@ -103,6 +104,13 @@ public:
 	// std::cout << "write_mem " << data << std::endl;
 	return write_mem(ibx, data, nent);
   }
+  bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
+  {
+    DataType data(datastr.c_str(), base);
+        int nent = nentries_[ibx];
+	// std::cout << "write_mem " << data << std::endl;
+	return write_mem(ibx, data, nent);
+  }
 
   // print memory contents
   void print_data(const DataType data) const
@@ -133,6 +141,8 @@ public:
 	  }
 	}
   }
+
+  static constexpr int getWidth() {return DataType::getWidth();}
   
 #endif
   
