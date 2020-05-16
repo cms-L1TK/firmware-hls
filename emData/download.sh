@@ -46,7 +46,7 @@ then
 fi
 
 # Download and unpack the tarball.
-wget -O MemPrints.tar.gz --verbose "https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+wget -O MemPrints.tar.gz --verbose ${tarball_url}
 tar -xzvf MemPrints.tar.gz
 rm -fv MemPrints.tar.gz
 
