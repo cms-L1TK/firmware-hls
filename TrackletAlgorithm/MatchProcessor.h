@@ -948,8 +948,8 @@ void MatchProcessor(BXType bx,
       validin = false;
     }// end if not near full
 
-    ivmphi++;
-    if(ivmphi>=8) ivmphi=0;
+    //ivmphi++;
+    //if(ivmphi>=8) ivmphi=0;
   } //end loop
 
 
