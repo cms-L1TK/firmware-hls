@@ -857,8 +857,8 @@ void MatchProcessor(BXType bx,
 
     } //end MEU loop
 
-    ivmphi++;
-    if(ivmphi>=8) ivmphi=0;
+    //ivmphi++;
+    //if(ivmphi>=8) ivmphi=0;
   } //end loop
 
 
