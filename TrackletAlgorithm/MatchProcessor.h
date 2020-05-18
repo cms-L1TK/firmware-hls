@@ -1213,12 +1213,9 @@ void MatchProcessor(BXType bx,
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 #pragma HLS loop_flatten
-    //for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
+    for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
 //#pragma HLS PIPELINE II=1 rewind
 //#pragma HLS unroll
-    #ifndef __SYNTHESIS__
-    std::cout << ivmphi;
-    #endif
       /*
       switch(ivmphi) {
         case 0: runMatchCalculator(table, instubdata1, projbuffer, matchengine[0]);
@@ -1238,6 +1235,7 @@ void MatchProcessor(BXType bx,
         case 7: runMatchCalculator(table, instubdata8, projbuffer, matchengine[7]);
         break;
       }
+      */
       switch(ivmphi) {
         case 0: matchengine[0].step(table, instubdata1, projbuffer[0]);
         break;
@@ -1256,7 +1254,7 @@ void MatchProcessor(BXType bx,
         case 7: matchengine[7].step(table, instubdata8, projbuffer[7]);
         break;
       }
-      */
+      /*
       bool skip = false;
       if(!matchengine[0].idle() && !skip) { skip = matchengine[0].step(table, instubdata1, projbuffer[0]); ivmphi++; }
       if(!matchengine[1].idle() && !skip) { skip = matchengine[1].step(table, instubdata2, projbuffer[1]); ivmphi++; }
@@ -1266,6 +1264,7 @@ void MatchProcessor(BXType bx,
       if(!matchengine[5].idle() && !skip) { skip = matchengine[5].step(table, instubdata6, projbuffer[5]); ivmphi++; }
       if(!matchengine[6].idle() && !skip) { skip = matchengine[6].step(table, instubdata7, projbuffer[6]); ivmphi++; }
       if(!matchengine[7].idle() && !skip) { skip = matchengine[7].step(table, instubdata8, projbuffer[7]); ivmphi++; }
+      */
       typename VMProjection<BARREL>::VMPID projindex;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
@@ -1290,10 +1289,10 @@ void MatchProcessor(BXType bx,
         }
       } //end MC if
 
-    //} //end 8ME loop
+    } //end 8ME loop
 
-    ivmphi++;
-    if(ivmphi>=8) ivmphi=0;
+    //ivmphi++;
+    //if(ivmphi>=8) ivmphi=0;
   } //end loop
   #ifndef __SYNTHESIS__
   std::cout << "Ending ME" << std::endl;
