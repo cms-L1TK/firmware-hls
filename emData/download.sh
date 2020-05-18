@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# fw_synch_200515
+tarball_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
 declare -a processing_modules=(
@@ -43,7 +46,7 @@ then
 fi
 
 # Download and unpack the tarball.
-wget -O MemPrints.tar.gz --verbose "https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+wget -O MemPrints.tar.gz --verbose ${tarball_url}
 tar -xzvf MemPrints.tar.gz
 rm -fv MemPrints.tar.gz
 
@@ -51,8 +54,8 @@ rm -fv MemPrints.tar.gz
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
-# For each of the desired modules, copy the associated test-bench files into a
-# dedicated directory.
+# For each of the desired modules, create a dedicated directory with symbolic
+# links to the associated test-bench files.
 for module in ${processing_modules[@]}
 do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
@@ -62,6 +65,6 @@ do
   mkdir -pv ${target_dir}
   for mem in `grep "${module}\." wires_hourglass.dat | awk '{print $1}' | sort -u`;
   do
-    find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec cp -fv {} ${target_dir}/ \;
+    find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -sv ../../{} ${target_dir}/ \;
   done
 done
