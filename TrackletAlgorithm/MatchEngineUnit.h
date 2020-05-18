@@ -150,9 +150,6 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
     if(idle() || done()) return true;
 
-    #ifndef __SYNTHESIS__
-    std::cout << "stepping" << std::endl;
-    #endif
     ////////////////////////////////////////////
     //This seems like where the ME buffer starts
     //Goes outside if(valid) ?
