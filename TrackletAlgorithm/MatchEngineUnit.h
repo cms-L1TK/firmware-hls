@@ -130,9 +130,6 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, Projecti
 #pragma HLS ARRAY_PARTITION variable=stubids complete dim=0
 #pragma HLS ARRAY_PARTITION variable=table complete dim=0
 
-    #ifndef __SYNTHESIS__
-    std::cout << "stepping" << std::endl;
-    #endif
     ////////////////////////////////////////////
     //This seems like where the ME buffer starts
     //Goes outside if(valid) ?
