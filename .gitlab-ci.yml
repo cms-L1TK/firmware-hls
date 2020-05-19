@@ -64,7 +64,7 @@ PR-quality-check:
 ME-quality-check:
   <<: *template_quality-check
   variables:
-    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cc'
 MC-quality-check:
   <<: *template_quality-check
   variables:
