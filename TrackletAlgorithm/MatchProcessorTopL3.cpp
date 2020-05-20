@@ -30,7 +30,6 @@ void MatchProcessorTopL3(BXType bx,
                       FullMatchMemory<BARREL>* fullmatch8) {
 
  #pragma HLS interface register port=bx_o
-/*
  #pragma HLS resource variable=proj1in->get_mem() latency=2
  #pragma HLS resource variable=proj2in->get_mem() latency=2
  #pragma HLS resource variable=proj3in->get_mem() latency=2
@@ -39,17 +38,8 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=proj6in->get_mem() latency=2
  #pragma HLS resource variable=proj7in->get_mem() latency=2
  #pragma HLS resource variable=proj8in->get_mem() latency=2
- #pragma HLS resource variable=instubdata1->get_mem() latency=2
- #pragma HLS resource variable=instubdata2->get_mem() latency=2
- #pragma HLS resource variable=instubdata3->get_mem() latency=2
- #pragma HLS resource variable=instubdata4->get_mem() latency=2
- #pragma HLS resource variable=instubdata5->get_mem() latency=2
- #pragma HLS resource variable=instubdata6->get_mem() latency=2
- #pragma HLS resource variable=instubdata7->get_mem() latency=2
- #pragma HLS resource variable=instubdata8->get_mem() latency=2
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
-*/
 
  MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, 8, 3, 0, 2>
                      (bx,
