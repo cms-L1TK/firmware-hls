@@ -17,7 +17,6 @@ void MatchProcessorTopL3(BXType bx,
                       FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]) {
 
  #pragma HLS interface register port=bx_o
-/*
  #pragma HLS resource variable=proj1in->get_mem() latency=2
  #pragma HLS resource variable=proj2in->get_mem() latency=2
  #pragma HLS resource variable=proj3in->get_mem() latency=2
@@ -36,7 +35,6 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=instubdata[7].get_mem() latency=2
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
-*/
 
  MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, 8, 3, 0, 2>
                      (bx,
