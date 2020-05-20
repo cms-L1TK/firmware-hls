@@ -1157,9 +1157,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS PIPELINE II=1
     //for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
 //#pragma HLS unroll
-    #ifndef __SYNTHESIS__
-    std::cout << ivmphi << std::endl;
-    #endif
     switch (ivmphi) {
       case 0: matchengine[ivmphi].step(table, instubdata1, projbuffer[ivmphi]);
       break;
