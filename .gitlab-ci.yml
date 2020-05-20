@@ -28,7 +28,6 @@ stages: # ---------------------------------------------------------------------
     - pwd; ls -la; #debug
     # Hard coded -config='' because the quotes do not work in the variable
     - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
-  allow_failure: true # to proceed with errors for now
 
 .job_template: &template_hls-build
   <<: *template_base
@@ -49,6 +48,7 @@ VMR-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
+  allow_failure: true
 TE-quality-check:
   <<: *template_quality-check
   variables:
@@ -64,7 +64,7 @@ PR-quality-check:
 ME-quality-check:
   <<: *template_quality-check
   variables:
-    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cc'
 MC-quality-check:
   <<: *template_quality-check
   variables:

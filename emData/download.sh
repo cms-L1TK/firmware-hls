@@ -46,9 +46,9 @@ then
 fi
 
 # Download and unpack the tarball.
-wget -O MemPrints.tar.gz --verbose ${tarball_url}
-tar -xzvf MemPrints.tar.gz
-rm -fv MemPrints.tar.gz
+wget -O MemPrints.tar.gz --quiet ${tarball_url}
+tar -xzf MemPrints.tar.gz
+rm -f MemPrints.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
@@ -61,10 +61,10 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   target_dir=${module_type}/${module}
 
-  rm -rfv ${target_dir}
-  mkdir -pv ${target_dir}
+  rm -rf ${target_dir}
+  mkdir -p ${target_dir}
   for mem in `grep "${module}\." wires_hourglass.dat | awk '{print $1}' | sort -u`;
   do
-    find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -sv ../../{} ${target_dir}/ \;
+    find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
   done
 done
