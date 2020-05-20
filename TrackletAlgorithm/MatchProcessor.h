@@ -724,7 +724,7 @@ void MatchProcessor(BXType bx,
     ProjectionRouterBuffer<BARREL> *projbuffer7[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer8[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBufferMemory<BARREL> projbuffermem;  //projbuffer = nstub+projdata+finez
-#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
+#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=istub intra WAR true
         //std::cout << "PR stage" << std::endl;
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
