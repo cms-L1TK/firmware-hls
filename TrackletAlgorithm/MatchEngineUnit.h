@@ -120,8 +120,6 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 #pragma HLS inline
 #pragma HLS PIPELINE II=1
-//#pragma HLS resource variable=projbuffer core=XPM_MEMORY uram
-#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
 #pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=istub intra WAR true
 
