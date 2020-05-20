@@ -724,7 +724,7 @@ void MatchProcessor(BXType bx,
     ProjectionRouterBuffer<BARREL> *projbuffer7[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer8[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBufferMemory<BARREL> projbuffermem;  //projbuffer = nstub+projdata+finez
-//#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
+#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
 #pragma HLS dependence variable=istub intra WAR true
         //std::cout << "PR stage" << std::endl;
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
@@ -1151,54 +1151,59 @@ void MatchProcessor(BXType bx,
   int iMEbest=kNMatchEngines;
   typename AllProjection<APTYPE>::AProjTCID bestTCID=-1;
   bool bestInPipeline=false;
-  ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+  ap_uint<3> ivmphi=0;
+  ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut+95; ++istep) {
 #pragma HLS PIPELINE II=1
-    for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
-#pragma HLS unroll
-    switch (iphi) {
-      case 0: matchengine[iphi].step(table, instubdata1, projbuffer[iphi]);
+    //for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
+//#pragma HLS unroll
+    #ifndef __SYNTHESIS__
+    std::cout << ivmphi << std::endl;
+    #endif
+    switch (ivmphi) {
+      case 0: matchengine[ivmphi].step(table, instubdata1, projbuffer[ivmphi]);
       break;
-      case 1: matchengine[iphi].step(table, instubdata2, projbuffer[iphi]);
+      case 1: matchengine[ivmphi].step(table, instubdata2, projbuffer[ivmphi]);
       break;
-      case 2: matchengine[iphi].step(table, instubdata3, projbuffer[iphi]);
+      case 2: matchengine[ivmphi].step(table, instubdata3, projbuffer[ivmphi]);
       break;
-      case 3: matchengine[iphi].step(table, instubdata4, projbuffer[iphi]);
+      case 3: matchengine[ivmphi].step(table, instubdata4, projbuffer[ivmphi]);
       break;
-      case 4: matchengine[iphi].step(table, instubdata5, projbuffer[iphi]);
+      case 4: matchengine[ivmphi].step(table, instubdata5, projbuffer[ivmphi]);
       break;
-      case 5: matchengine[iphi].step(table, instubdata6, projbuffer[iphi]);
+      case 5: matchengine[ivmphi].step(table, instubdata6, projbuffer[ivmphi]);
       break;
-      case 6: matchengine[iphi].step(table, instubdata7, projbuffer[iphi]);
+      case 6: matchengine[ivmphi].step(table, instubdata7, projbuffer[ivmphi]);
       break;
-      case 7: matchengine[iphi].step(table, instubdata8, projbuffer[iphi]);
+      case 7: matchengine[ivmphi].step(table, instubdata8, projbuffer[ivmphi]);
       break;
     }
       typename VMProjection<BARREL>::VMPID projindex;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
-      if(matchengine[iphi].idle() && !matchengine[iphi].done() && !matchengine[iphi].empty()) {
+      if(matchengine[ivmphi].idle() && !matchengine[ivmphi].done() && !matchengine[ivmphi].empty()) {
         typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-        matchengine[iphi].read(currentTCID, projindex, stubid, nstub);
+        matchengine[ivmphi].read(currentTCID, projindex, stubid, nstub);
         //currentTCID=allproj->read_mem(bx, projindex).getTCID();
         //std::cout << "current=" << currentTCID << "\tbest=" << bestTCID << std::endl;
         if ((iMEbest==kNMatchEngines)||(currentTCID<bestTCID)) {
         //std::cout << iMEbest << "\t" << currentTCID << std::endl;
-	  iMEbest=iphi;
+	  iMEbest=ivmphi;
 	  bestTCID=currentTCID;
-	  bestInPipeline=matchengine[iphi].empty();
+	  bestInPipeline=matchengine[ivmphi].empty();
 	}
         /*
         */
         if (iMEbest!=kNMatchEngines&&(!bestInPipeline)) {
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                   //(bx, allstub, allproj, projindex, stubid, nstub, bx_o,
-                  (bx, allstub, allproj, matchengine[iphi].getProjindex(), matchengine[iphi].getStubIds(), matchengine[iphi].getNStubs(), bx_o,
+                  (bx, allstub, allproj, matchengine[ivmphi].getProjindex(), matchengine[ivmphi].getStubIds(), matchengine[ivmphi].getNStubs(), bx_o,
                    nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
                    fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
         }
       } //end MC if
 
-    } //end 8ME loop
+    //} //end 8ME loop
+    ivmphi++;
 
   } //end loop
   //std::cout << "Ending ME" << std::endl;
