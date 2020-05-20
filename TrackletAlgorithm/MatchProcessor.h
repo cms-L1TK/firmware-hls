@@ -1122,6 +1122,7 @@ void MatchProcessor(BXType bx,
   //std::cout << "Starting ME loop" << std::endl;
   readindex=0;
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
+#pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
   for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
 #pragma HLS unroll
 /*
