@@ -62,19 +62,19 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
 
 }
 
-inline bool empty() {
+bool empty() {
 #pragma HLS inline  
   return (readindex==0);
 
 }
 
-inline bool idle() {
+bool idle() {
 #pragma HLS inline  
   //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   return idle_;
 }
 
-inline bool done() {
+bool done() {
 #pragma HLS inline  
   //std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << (done_ ? "": " not") << " done!" << std::endl;
   return done_;
@@ -91,7 +91,7 @@ STUBID* getStubIds() {
 
 }
 
-inline ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
+ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
 #pragma HLS inline  
   return tcid;
 }
@@ -102,12 +102,12 @@ VMProjection<BARREL>::VMPID getProjindex() {
   return projbuffer.getIndex();
 }
 
-inline NSTUBS getNStubs() {
+NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs;
 }
 
-inline void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
+void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
   //std::cout << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
   trackletid = getTCID();
@@ -256,7 +256,6 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
   } // if(buffernotempty)
   return false;
 
-  return idle_;
 } // end step
 
  private:
