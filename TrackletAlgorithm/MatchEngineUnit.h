@@ -99,7 +99,7 @@ inline MatchEngineUnit() {
    return nearFullLUT[(readindex_,writeindex_)];
  }
 
-inline bool idle() {
+bool idle() {
 #pragma HLS inline  
   return idle_;
 }
@@ -159,7 +159,7 @@ inline VMProjection<BARREL>::VMPID getProjindex() {
   return projbuffer_.getIndex();
 }
 
-inline NSTUBS getNStubs() {
+NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs_;
 }
