@@ -13,7 +13,7 @@ add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/VMR/
+add_files -tb ../emData/MemPrints/
 
 open_solution "solution1"
 
