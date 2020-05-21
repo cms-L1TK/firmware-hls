@@ -58,25 +58,25 @@ int main() {
 
 	ifstream fin_ilink1;
 	bool validin1 = openDataFile(fin_ilink1,
-			"VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
+			"MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
 	if (not validin1)
 		return -1;
 
 	ifstream fin_ilink2;
 	bool validin2 = openDataFile(fin_ilink2,
-			"VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_PS10G_2_B_04.dat");
+			"MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_2_B_04.dat");
 	if (not validin2)
 		return -1;
 
 	ifstream fin_ilink3;
 	bool validin3 = openDataFile(fin_ilink3,
-			"VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
+			"MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
 	if (not validin3)
 		return -1;
 
 	ifstream fin_ilink4;
 	bool validin4 = openDataFile(fin_ilink4,
-			"VMR/VMR_L1PHIE/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
+			"MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
 	if (not validin4)
 		return -1;
 
@@ -100,31 +100,31 @@ int main() {
 // open output files
 	ifstream fout_aproj;
 	bool valid_aproj = openDataFile(fout_aproj,
-			"VMR/VMR_L1PHIE/AllStubs_AS_L1PHIEn1_04.dat");
+			"MemPrints/Stubs/AllStubs_AS_L1PHIEn1_04.dat");
 	if (not valid_aproj)
 		return -1;
 
 	ifstream fout_vmstubme1;
 	bool valid_vmstubme1 = openDataFile(fout_vmstubme1,
-			"VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE17n1_04.dat");
+			"MemPrints/VMStubsME/VMStubs_VMSME_L1PHIE17n1_04.dat");
 	if (not valid_vmstubme1)
 		return -1;
 
 	ifstream fout_vmstubme2;
 	bool valid_vmstubme2 = openDataFile(fout_vmstubme2,
-			"VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE18n1_04.dat");
+			"MemPrints/VMStubsME/VMStubs_VMSME_L1PHIE18n1_04.dat");
 	if (not valid_vmstubme2)
 		return -1;
 
 	ifstream fout_vmstubme3;
 	bool valid_vmstubme3 = openDataFile(fout_vmstubme3,
-			"VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE19n1_04.dat");
+			"MemPrints/VMStubsME/VMStubs_VMSME_L1PHIE19n1_04.dat");
 	if (not valid_vmstubme3)
 		return -1;
 
 	ifstream fout_vmstubme4;
 	bool valid_vmstubme4 = openDataFile(fout_vmstubme4,
-			"VMR/VMR_L1PHIE/VMStubs_VMSME_L1PHIE20n1_04.dat");
+			"MemPrints/VMStubsME/VMStubs_VMSME_L1PHIE20n1_04.dat");
 	if (not valid_vmstubme4)
 		return -1;
 
@@ -147,38 +147,38 @@ int main() {
 // TE Inner
 	ifstream fout_vmstubtei1;
 	bool valid_vmstubtei1 = openDataFile(fout_vmstubtei1,
-			"VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE17n1_04.dat");
+			"MemPrints/VMStubsTE/VMStubs_VMSTE_L1PHIE17n1_04.dat");
 	if (not valid_vmstubtei1)
 		return -1;
 
 	ifstream fout_vmstubtei2;
 	bool valid_vmstubtei2 = openDataFile(fout_vmstubtei2,
-			"VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE18n1_04.dat");
+			"MemPrints/VMStubsTE/VMStubs_VMSTE_L1PHIE18n1_04.dat");
 	if (not valid_vmstubtei2)
 		return -1;
 
 	ifstream fout_vmstubtei3;
 	bool valid_vmstubtei3 = openDataFile(fout_vmstubtei3,
-			"VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE19n1_04.dat");
+			"MemPrints/VMStubsTE/VMStubs_VMSTE_L1PHIE19n1_04.dat");
 	if (not valid_vmstubtei3)
 		return -1;
 
 	ifstream fout_vmstubtei4;
 	bool valid_vmstubtei4 = openDataFile(fout_vmstubtei4,
-			"VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIE20n1_04.dat");
+			"MemPrints/VMStubsTE/VMStubs_VMSTE_L1PHIE20n1_04.dat");
 	if (not valid_vmstubtei4)
 		return -1;
 
 // TE Inner Overlap
 	ifstream fout_vmstubteol1;
 	bool valid_vmstubteol1 = openDataFile(fout_vmstubteol1,
-			"VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIQ9n1_04.dat");
+			"MemPrints/VMStubsTE/VMStubs_VMSTE_L1PHIQ9n1_04.dat");
 	if (not valid_vmstubteol1)
 		return -1;
 
 	ifstream fout_vmstubteol2;
 	bool valid_vmstubteol2 = openDataFile(fout_vmstubteol2,
-			"VMR/VMR_L1PHIE/VMStubs_VMSTE_L1PHIQ10n1_04.dat");
+			"MemPrints/VMStubsTE/VMStubs_VMSTE_L1PHIQ10n1_04.dat");
 
 ///////////////////////////
 // loop over events
@@ -263,13 +263,13 @@ int main() {
 		err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(vmstubtei4,
 				fout_vmstubtei4, ievt, "VMStubTEInner20", truncation);
 
-// //VMStubTEInner1 Overlap
-// err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(vmstubteol1, fout_vmstubteol1, ievt,
-//                                               "VMStubTEOverlap1", truncation);
-//
-// // VMStubTEInner2 Overlap
-// err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(vmstubteol2, fout_vmstubteol2, ievt,
-//                                               "VMStubTEOverlap2", truncation);
+//VMStubTEInner1 Overlap
+err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(vmstubteol1, fout_vmstubteol1, ievt,
+                                              "VMStubTEOverlap1", truncation);
+
+// VMStubTEInner2 Overlap
+err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(vmstubteol2, fout_vmstubteol2, ievt,
+                                              "VMStubTEOverlap2", truncation);
 	} // end of event loop
 	std::cerr << "Exiting with return value " << err << std::endl;
 	return err;

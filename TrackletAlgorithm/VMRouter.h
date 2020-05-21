@@ -137,9 +137,10 @@ inline void init_finebintable(const int LAYER, const int DISK,
 	}
 #else // __SYNTHESIS__
 	int tmp[2048]=
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
 
-	for (int i=0;i<256;i++) {
+#include "../emData/VMR/tables/VMR_L1PHIE_finebin.tab"
+
+	for (int i=0;i<2048;i++) {
 		finebintable[i]=tmp[i];
 	}
 	nbitszfinebintable = 256;
@@ -243,10 +244,9 @@ inline ap_uint<5> memStartVal(const ap_uint<32> mask) {
 }
 
 // Main function
-template<regionType INTYPE, regionType OUTTYPE, int LAYER, int DISK,
-		int bendtablesize>
+template<regionType INTYPE, regionType OUTTYPE, int LAYER, int DISK>
 void VMRouter(const BXType bx, const int finebintable[], const int corrtable[],
-		const int binlookuptable[], const int bendtable[][bendtablesize],
+		const int binlookuptable[], const ap_uint<1>* bendtable[],
 		const int overlaptable[],
 // Input memories
 		const ap_uint<6>& imask, const InputStubMemory<INTYPE>* const i0,
@@ -368,6 +368,8 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[],
 //#pragma HLS array_partition variable=bendtable
 //#pragma HLS array_partition variable=binlookuptable //max 1024 partitions
 //#pragma HLS array_partition variable=overlaptable
+
+#pragma HLS interface ap_bus port=bendtable depth=8
 
 // Reset address counters in output memories
 	allstub->clear(bx);
@@ -1230,8 +1232,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[],
 				static const ap_ufixed<4, 3> d2 = nvmol / 16.; // Some normalisation thing
 				int ivm = iphiRaw * d2; // Which VM, BECAUSE WE HAVE 16 VMS?
 
-				bool passbend = bendtable[ivm - firstmem][bend]; // Check if stub passes bend cut TODO: we can skip the rest if false
-
 				constexpr auto vmbits = (LAYER == 1) ? 4 : 3; //vmbitsOverlap[LAYER-1];
 				constexpr auto finephibits = 2; // or nfinephioverlapinner??? which is 2
 
@@ -1241,7 +1241,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[],
 				stubOL.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits)); // is this the right vmbits
 
-				if (passbend) {
 // For debugging
 #ifndef __SYNTHESIS__
 					std::cout << "Overlap stub " << overlap << " " << std::hex
@@ -1350,7 +1349,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[],
 							addrCountOL[15] += 1;
 						}
 					}
-				}
+
 			} else {
 				std::cout << "NO OVERLAP" << std::endl << std::endl;
 			}

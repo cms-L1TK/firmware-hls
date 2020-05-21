@@ -127,6 +127,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return AllProjectionBase<AProjType>::kAllProjectionSize;}
+  
   AllProjectionData raw() const {return data_;}
   
   AProjTCID getTCID() const {

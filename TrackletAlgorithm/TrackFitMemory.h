@@ -73,6 +73,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return kTrackFitSize;}
+
   TrackFitData raw() const {return data_;}
 
   TFPT getPt() const {

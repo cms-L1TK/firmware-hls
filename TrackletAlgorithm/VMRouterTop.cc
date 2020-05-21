@@ -1,13 +1,23 @@
 #include "VMRouterTop.h"
 
+//Fill bendcut tables
+void fillBendcutTable(ap_uint<1> table[][8]){
+
+}
+
+
 // VMRouter Top Function for layer 1, AllStub region E
 
-void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
+void VMRouterTop(BXType bx,
+// Input memories
+		const InputStubMemory<BARRELPS> *i0,
 		const InputStubMemory<BARRELPS> *i1,
 		const InputStubMemory<BARRELPS> *i2,
 		const InputStubMemory<BARRELPS> *i3,
 		const InputStubMemory<BARRELPS> *i4,
-		const InputStubMemory<BARRELPS> *i5, AllStubMemory<BARRELPS> *allStub,
+		const InputStubMemory<BARRELPS> *i5,
+// AllStub memories
+		AllStubMemory<BARRELPS> *allStub,
 // ME memories
 		VMStubMEMemory<BARRELPS> *m0, VMStubMEMemory<BARRELPS> *m1,
 		VMStubMEMemory<BARRELPS> *m2, VMStubMEMemory<BARRELPS> *m3,
@@ -39,42 +49,50 @@ void VMRouterTop(BXType bx, const InputStubMemory<BARRELPS> *i0,
 
 // LUT with the finer region each z/r bin is divided into.
 	static const int finebintable[] =
-#include "../emData/VMR/VMR_L1PHIE/VMR_L1PHIE_finebin.tab"
+#include "../emData/VMR/tables/VMR_L1PHIE_finebin.tab"
 	;
 
 // LUT with phi corrections to the nominal radius. Only used by layers.
 // Values are determined by the radius and the bend of the stub.
 	static const int phicorrtable[] =
-#include "../emData/VMR/VMR_L1PHIE/VMPhiCorrL1.txt"
+#include "../emData/VMR/tables/VMPhiCorrL1.txt"
 	;
 
 // LUT with the Z/R bits for TE memories
 // Todo: comment on what the bits represent
 	static const int binlookuptable[] =
-#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1L2.tab" // Only for Layer 1
+#include "../emData/VMR/tables/VMTableInnerL1L2.tab" // Only for Layer 1
 	;
 
 // LUT with the Z/R bits for TE Overlap memories
 	static const int overlaptable[1024] =// 10 bits used for LUT
-#include "../emData/VMR/VMR_L1PHIE/VMTableInnerL1D1.tab"
+#include "../emData/VMR/tables/VMTableInnerL1D1.tab"
 	;
 
 // LUT with bend cuts for the TE memories
 // The n memory versions contain stubs sorted by the bend
-// Todo: add the other n TE copies
-	static const int bendtablesize = 8; // The size of each vmbendcut table. Either 8 or 16.
-static const int bendtable[][bendtablesize] = {
-#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE17n1_vmbendcut.tab"
-	,
-#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE18n1_vmbendcut.tab"
-	,
-#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE19n1_vmbendcut.tab"
-	,
-#include "../emData/VMR/VMR_L1PHIE/VMSTE_L1PHIE20n1_vmbendcut.tab"
-}
+// TODO: add the other n TE copies and find a better way to do this...
+const ap_uint<1> tmptable1[] =
+#include "../emData/VMR/tables/VMSTE_L1PHIE17n1_vmbendcut.tab"
 ;
 
-VMRouter<BARRELPS, BARRELPS, layer, disk, bendtablesize>
+const ap_uint<1> tmptable2[] =
+#include "../emData/VMR/tables/VMSTE_L1PHIE18n1_vmbendcut.tab"
+;
+
+const ap_uint<1> tmptable3[] =
+#include "../emData/VMR/tables/VMSTE_L1PHIE19n1_vmbendcut.tab"
+;
+
+const ap_uint<1> tmptable4[] =
+#include "../emData/VMR/tables/VMSTE_L1PHIE20n1_vmbendcut.tab"
+;
+
+static const ap_uint<1>* bendtable[] = {tmptable1, tmptable2, tmptable3, tmptable4};
+
+
+// Main function
+VMRouter<BARRELPS, BARRELPS, layer, disk>
 (bx, finebintable, phicorrtable, binlookuptable, bendtable, overlaptable,
 		imask, i0, i1, i2, i3, nullptr, nullptr, //i5,i6,i7,
 		allStub,
