@@ -72,19 +72,19 @@ void VMRouterTop(BXType bx,
 // LUT with bend cuts for the TE memories
 // The n memory versions contain stubs sorted by the bend
 // TODO: add the other n TE copies and find a better way to do this...
-const ap_uint<1> tmptable1[] =
+ap_uint<1> tmptable1[] =
 #include "../emData/VMR/tables/VMSTE_L1PHIE17n1_vmbendcut.tab"
 ;
 
-const ap_uint<1> tmptable2[] =
+ap_uint<1> tmptable2[] =
 #include "../emData/VMR/tables/VMSTE_L1PHIE18n1_vmbendcut.tab"
 ;
 
-const ap_uint<1> tmptable3[] =
+ap_uint<1> tmptable3[] =
 #include "../emData/VMR/tables/VMSTE_L1PHIE19n1_vmbendcut.tab"
 ;
 
-const ap_uint<1> tmptable4[] =
+ap_uint<1> tmptable4[] =
 #include "../emData/VMR/tables/VMSTE_L1PHIE20n1_vmbendcut.tab"
 ;
 
