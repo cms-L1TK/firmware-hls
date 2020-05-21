@@ -35,7 +35,8 @@ void ProjectionRouterTop(BXType bx,
  PR_L3PHIC: ProjectionRouter<BARRELPS, BARREL, 8, 3, 0>
     (bx,
      proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
-     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+     nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
+     nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
      bx_o,
      allprojout,
      vmprojout1, vmprojout2, vmprojout3, vmprojout4, vmprojout5, vmprojout6, vmprojout7, vmprojout8
