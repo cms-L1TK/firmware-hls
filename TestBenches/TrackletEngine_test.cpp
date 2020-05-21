@@ -1,14 +1,10 @@
 // TrackletEngine test bench
 #include "TrackletEngineTop.h"
-#include "TrackletEngine_ptcut.h"
-#include "TrackletEngine_stubptinnercut.h"
-#include "TrackletEngine_stubptoutercut.h"
 #include "StubPairMemory.h"
 #include "VMStubTEInnerMemory.h"
 #include "VMStubTEOuterMemory.h"
 #include "FileReadUtility.h"
 #include "hls_math.h"
-
 
 #include <iostream>
 #include <fstream>
@@ -19,7 +15,6 @@
 const int nevents = 100;  // number of events to run
 
 using namespace std;
-
 
 int main(){
   // error counter
@@ -42,13 +37,12 @@ int main(){
   assert(fin_vmstubsouter.good());
   assert(fin_stubpairs.good());
 
-  ap_uint<1> pttable[32];
-  ap_uint<1> bendinnertable[256];
-  ap_uint<1> bendoutertable[256];
-
-  readPtTable<TE::L1L2, TE::E18, TE::C17, 32>(pttable);
-  readBendInnerTable<TE::L1L2, TE::E18, TE::C17, 256>(bendinnertable);
-  readBendOuterTable<TE::L1L2, TE::E18, TE::C17, 256>(bendoutertable);
+  ap_uint<1> pttable[32] =
+#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_ptcut.tab"
+  ap_uint<1> bendinnertable[256] =
+#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"
+  ap_uint<1> bendoutertable[256] =
+#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptoutercut.tab"
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {

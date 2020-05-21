@@ -93,6 +93,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return VMStubMEBase<VMSMEType>::kVMStubMESize;}
+
   VMStubMEData raw() const {return data_;}
 
   VMSMEID getIndex() const {

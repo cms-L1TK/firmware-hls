@@ -137,6 +137,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return AllStubBase<ASType>::kAllStubSize;}
+
   AllStubData raw() const {return data_; }
 
   ASR getR() const {

@@ -102,6 +102,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return FullMatchBase<FMType>::kFullMatchSize;}
+
   FullMatchData raw() const {return data_;}
 
   FMTCID getTCID() const {

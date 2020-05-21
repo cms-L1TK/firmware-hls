@@ -98,6 +98,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return VMStubTEOuterBase<VMSTEOType>::kVMStubTEOuterSize;}
+  
   VMStubTEOuterData raw() const {return data_;}
 
   VMSTEOID getIndex() const {
