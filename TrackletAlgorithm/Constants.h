@@ -21,7 +21,7 @@ constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
 
 constexpr int kNBits_z = 3;
 
-constexpr int MEBinsBits = 4;
+constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
 
 // stub digitization constants

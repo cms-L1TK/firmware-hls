@@ -238,8 +238,8 @@ inline ap_uint<5> memStartVal(const ap_uint<32> mask) {
 }
 
 // Main function
-template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int bendtablesize>
-void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], const int binlookuptable[], const int bendtable[][bendtablesize], const int bendtable2[][bendtablesize],
+template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK>
+void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], const int binlookuptable[], const ap_uint<1>* bendtable[], const ap_uint<1>* bendtable2[],
 		const int overlaptable[],
 		// Input memories
 		const ap_uint<6>& imask,
@@ -1260,8 +1260,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				static const ap_ufixed<4,3> d2 = nvmol / 16.; // Some normalisation thing
 				int ivm = iphiRaw * d2; // Which VM, BECAUSE WE HAVE 16 VMS?
 
-				bool passbend = bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut TODO: we can skip the rest if false
-
 				constexpr auto vmbits = (LAYER == 1) ? 4 :3; //vmbitsOverlap[LAYER-1];
 				constexpr auto finephibits = 2; // or nfinephioverlapinner??? which is 2
 
@@ -1271,7 +1269,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				stubOL.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits)); // is this the right vmbits
 
-				if (passbend) {
 // For debugging
 #ifndef __SYNTHESIS__
 				std::cout << "Overlap stub " << overlap << " " << std::hex
@@ -1380,7 +1377,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 						addrCountOL[15] += 1;
 					}
 				}
-			}
 			} else {
 				std::cout << "NO OVERLAP" << std::endl << std::endl;
 			}
@@ -1492,7 +1488,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 					<< std::endl;
 #endif // DEBUG
 
-			bool passbend = (DISK == 1) ? bendtable2[ivm-firstmem][bend] : bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut
+			bool passbend = (DISK == 1) ? bendtable2[ivm-firstmem][bend] : bendtable[ivm-firstmem][bend]; // Check if stub passes bend cut.
 
 			// Write the TE Outer stub to the correct memory
 			// Only if it has a valid bend
