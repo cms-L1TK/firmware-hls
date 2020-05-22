@@ -1058,7 +1058,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 				constexpr int nz = 3;
 				constexpr int nr = 8;
-				constexpr int zbins = (1 << nz); // 7 = zbits
+				constexpr int zbins = (1 << nz); // Number of bind in z
 				constexpr int rbins = (1 << nr); // Number of bins in r
 				ap_uint<nz> zbin = (z + (1 << (nzbits - 1))) >> (nzbits - nz); // Make z positive and take the 7 MSBs TODO replace 7
 				if (isNegDisk) zbin = 7 - zbin;
@@ -1068,8 +1068,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				int index = rbin * zbins + zbin; // number of bins
 
 				binlookup = binlookuptable[index];
-
-				std::cout << "IS NEG DISK "<< isNegDisk << "    rbin: " << rbin << "   z bin " << zbin << "     INDEX: " << index << "    BINLOOKUP " << binlookup << std::endl;
 
 				stubTeInner.setZBits(binlookup);
 				stubTeInner.setFinePhi(
@@ -1511,8 +1509,12 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				}
 
 				int indexo = rbin * zbins + zbin; // number of bins
-				int bin = (DISK == 1) ? overlaptable[indexo] : binlookuptable[indexo]/8; // is >> 3 faster?
-				bin = bin&7;
+				bin = (DISK == 1) ? overlaptable[indexo]/8 : binlookuptable[indexo]/8; // is >> 3 faster?
+
+				// Following found in VMStubTEMemory.h of emulation
+				assert(bin<4);
+				if (isNegDisk) bin+= 4;
+
 				std::cout <<" r " << r << "   rbin  " << rbin << "   rbins " << rbins << std::endl;
 				std::cout <<" Z " << z << "   zbin  " << zbin << "   zbins " << zbins << std::endl;
 				std::cout << "isnegdisk  " << isNegDisk << "  TABLE VAL " << overlaptable[indexo] << "     BIN " << bin << std::endl;
@@ -1536,13 +1538,14 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			std::cout << "ivm: " << std::dec << ivm << std::endl << std::endl;
 #endif // DEBUG
 
-			bool passbend = bendtable[ivm - firstmem][bend]; // Check if stub passes bend cut
+			bool passbend = (DISK==1) ? bendtable2[ivm - firstmem][bend] : bendtable[ivm - firstmem][bend]; // Check if stub passes bend cut
 
 // Write the TE Outer stub to the correct memory
 // Only if it has a valid bend
 // TODO: implement VMR to write to the n memory copies, which are different depending on the bendcuts
 // TODO: can only use ivm if first memory is 0
 			if (passbend) {
+				std::cout << "     BIN " << bin << std::endl;
 // 0-9
 				if (teomask[0]) {
 					if (ivm == 0)
@@ -1676,7 +1679,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 						mteo31->write_mem(bx, bin, stubTeOuter);
 				}
 			} else {
-				std::cout << "DIDN'T PASS BEND" << std::endl;
+				std::cout << "DIDN'T PASS BEND" << std::endl << std::endl;
 			}
 		}
 

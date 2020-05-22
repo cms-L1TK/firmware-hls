@@ -98,7 +98,7 @@ public:
     kASRLSB = kASZMSB + 1,
     kASRMSB = kASRLSB + AllStubBase<ASType>::kASRSize - 1
   };
-  
+
   typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
@@ -214,6 +214,9 @@ public:
     data_ = newdata;
   }
   #endif
+
+  // Getter
+  static constexpr int getWidth() {return AllStubBase<DISK>::kAllStubSize;}
 
   AllStubData raw() const {return data_;}
 
