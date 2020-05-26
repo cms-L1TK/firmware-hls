@@ -1,7 +1,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
-  CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7/root/bin/clang-tidy'
+  CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7.0/root/bin/clang-tidy'
   CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
   CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/2019.2/include'
 
@@ -21,21 +21,23 @@ stages: # ---------------------------------------------------------------------
   tags:
     - xilinx-tools
   stage: quality-check
+  before_script:
+    # Needed for new tool version
+    - source /opt/rh/llvm-toolset-7.0/enable
   script:
     - cd emData
     - ./download.sh
     - cd ../project
-    - pwd; ls -la; #debug
+    - pwd; ls -la; # Debug
     # Hard coded -config='' because the quotes do not work in the variable
     - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
-  allow_failure: true # to proceed with errors for now
 
 .job_template: &template_hls-build
   <<: *template_base
   stage: hls-build
   script:
     - cd project
-    - pwd; ls -la; #debug
+    - pwd; ls -la; # Debug
     - vivado_hls -f "script_${PROJ_NAME}.tcl"
   artifacts:
     when: on_success
@@ -49,6 +51,7 @@ VMR-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
+  allow_failure: true
 TE-quality-check:
   <<: *template_quality-check
   variables:
@@ -64,7 +67,7 @@ PR-quality-check:
 ME-quality-check:
   <<: *template_quality-check
   variables:
-    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngine.cc'
 MC-quality-check:
   <<: *template_quality-check
   variables:
