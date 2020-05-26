@@ -731,7 +731,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		auto stubPhi_uncorr = (isDisk2S) ? stub2.getPhi() : stub.getPhi(); // Original phi, uncorrected. Should probably not be used, waiting for update of C++ emulation?
 		auto stubPhi = getPhiCorr<INTYPE>(stubPhi_uncorr, r, bend, corrtable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
 
-		std::cout << "INDEX " << i << "     BEND "<< bend << "       NUMBER of bend bits: " << nbendbits << std::endl;
+		std::cout << "INDEX " << i << "     BEND "<< bend << "   stubPhi  " << stubPhi << std::endl;
 
 
 /////////////////////////////////////////////
@@ -751,6 +751,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		stubme.setIndex(typename VMStubME<OUTTYPE>::VMSMEID(i));
 
 		auto iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi
+		std::cout << " top 5 bits of phi corr " <<iphiRaw << "    d " << d << std::endl;
 		auto iphiRawPlus = iphivmRawPlus<INTYPE>(stubPhi); // Top 5 bits of phi after adding a small number
 		auto iphiRawMinus = iphivmRawMinus<INTYPE>(stubPhi); // Top 5 bits of phi after subtracting a small number
 
@@ -1019,7 +1020,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		int ivm = iphiRaw * d1; // Which VM
 
 // TE Inner
-		if (teimask != 0) {
+		if ((teimask != 0) && (!isDisk2S)) {
 
 			VMStubTEInner<OUTTYPE> stubTeInner;
 
@@ -1081,6 +1082,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			std::cout << "ivm: " << std::dec << ivm << std::endl << std::endl;
 #endif // DEBUG
 
+std::cout<< "binlookup  " << binlookup << std::endl;
 
 // Write the TE Inner stub to the correct memory
 // Only if it has a valid binlookup value, less than 1008 (table uses 1048575 as "-1"),
@@ -1435,7 +1437,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		}
 
 // TE Outer
-		if (teomask != 0) {
+		if ((teomask != 0) && (!isDisk2S)) {
 			VMStubTEOuter<OUTTYPE> stubTeOuter;
 
 			stubTeOuter.setBend(bend);
@@ -1539,7 +1541,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 #endif // DEBUG
 
 			bool passbend = (DISK==1) ? bendtable2[ivm - firstmem][bend] : bendtable[ivm - firstmem][bend]; // Check if stub passes bend cut
-
 // Write the TE Outer stub to the correct memory
 // Only if it has a valid bend
 // TODO: implement VMR to write to the n memory copies, which are different depending on the bendcuts
