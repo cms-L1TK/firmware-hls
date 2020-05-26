@@ -60,7 +60,7 @@ void VMRouterTop(BXType bx,
 
 // LUT with the Z/R bits for TE memories
 // Todo: comment on what the bits represent
-	static const int binlookuptable[] =
+	static const int rzbitstable[] =
 #include "../emData/VMR/tables/VMTableInnerL1L2.tab" // Only for Layer 1
 	;
 
@@ -90,10 +90,11 @@ ap_uint<1> tmptable4[] =
 
 static const ap_uint<1>* bendtable[] = {tmptable1, tmptable2, tmptable3, tmptable4};
 
+static const ap_uint<1>* bendtable2[] = {0};
 
 // Main function
-VMRouter<BARRELPS, BARRELPS, layer, disk>
-(bx, finebintable, phicorrtable, binlookuptable, bendtable, overlaptable,
+VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk>
+(bx, finebintable, phicorrtable, rzbitstable, bendtable, bendtable2, overlaptable,
 		imask, i0, i1, i2, i3, nullptr, nullptr, //i5,i6,i7,
 		allStub,
 // ME memories
