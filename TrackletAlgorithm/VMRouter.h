@@ -1483,55 +1483,51 @@ std::cout<< "binlookup  " << binlookup << std::endl;
 				indexr = ((r + (1 << (nrbits - 1)))
 						>> (nrbits - nbitsrfinebintable));
 
+	// The index for finebintable
+				ap_uint<nbitszfinebintable + nbitsrfinebintable> index = (indexz
+						<< nbitsrfinebintable) + indexr;
+
+	// Get the corrected r/z position
+				int rzfine = finebintable[index];
+
+	// Set rzfine, i.e. the r/z bits within a coarse r/z region
+				rzfine = rzfine & 7; // the 3 LSB as rzfine
+				stubTeOuter.setFineZ(rzfine);
+
 			} else { // DISKS
 				assert(DISK != 0);
 
 				stubTeOuter.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits));
 
-				constexpr auto zbinbits = 3; //(DISK == 1) ? 3 : 7;
-				constexpr auto rbinbits = 7; //(DISK == 1) ? 7 : 4;
-				constexpr auto zbins = (1 << zbinbits); // 7 = zbits
+				constexpr auto zbinbits = 3;
+				constexpr auto rbinbits = 7;
+				constexpr auto zbins = (1 << zbinbits); // Number of bins in z
 				constexpr auto rbins = (1 << rbinbits); // Number of bins in r
-				ap_uint<zbinbits> zbin = (z + (1 << (nzbits - 1))) >> (nzbits - zbinbits); // Make z positive and take the 7 MSBs TODO replace 7
-				ap_uint<rbinbits> rbin; // = (r + (1 << (nrbits - 1))) >> (nrbits - rbinbits);
+				ap_uint<zbinbits> zbin = (z + (1 << (nzbits - 1))) >> (nzbits - zbinbits); // Make z positive and take the 7 MSBs
+				ap_uint<rbinbits> rbin = r >> (nrbits - rbinbits);
 
-				// Make r unsigned and save the top "nbitsrfinebintable" bits
+				// Special case if negative disk
 				if (isNegDisk) {
-					indexz = (1<<nbitszfinebintable)-indexz;
 					zbin = 7-zbin;
 				}
-				if (isDisk2S) {
-					indexr = r;
-					rbin = r;
-				} else {
-					// Take the top "nbitsrfinebintable" bits
-					indexr = r >> (nrbits - nbitsrfinebintable);
-					rbin = r >> (nrbits - rbinbits);
-				}
 
-				int indexo = rbin * zbins + zbin; // number of bins
-				bin = (DISK == 1) ? overlaptable[indexo]/8 : binlookuptable[indexo]/8; // is >> 3 faster?
+				// Find the VM bit information in binlookup LUT
+				// First 2 MSB is the binning in r, and the 3 LSB is the fine r within a bin
+				auto index = rbin * zbins + zbin; // Index for LUT
+				ap_uint<5> binlookup = (DISK == 1) ? overlaptable[index] : binlookuptable[index];
 
-				// Following found in VMStubTEMemory.h of emulation
-				assert(bin<4);
+				bin = binlookup >> 3; // or /8
+
+				// Bin 4-7 is used for negative disks
 				if (isNegDisk) bin+= 4;
 
-				std::cout <<" r " << r << "   rbin  " << rbin << "   rbins " << rbins << std::endl;
-				std::cout <<" Z " << z << "   zbin  " << zbin << "   zbins " << zbins << std::endl;
-				std::cout << "isnegdisk  " << isNegDisk << "  TABLE VAL " << overlaptable[indexo] << "     BIN " << bin << std::endl;
+				// Set fine r
+				ap_uint<3> rzfine = binlookup & 7;
+				stubTeOuter.setFineZ(rzfine);
 			}
 
-// The index for finebintable
-			ap_uint<nbitszfinebintable + nbitsrfinebintable> index = (indexz
-					<< nbitsrfinebintable) + indexr;
-
-// Get the corrected r/z position
-			int rzfine = finebintable[index];
-
-// Set rzfine, i.e. the r/z bits within a coarse r/z region
-			rzfine = rzfine & 7; // the 3 LSB as rzfine
-			stubTeOuter.setFineZ(rzfine);
+			bool passbend = (DISK==1) ? bendtable2[ivm - firstmem][bend] : bendtable[ivm - firstmem][bend]; // Check if stub passes bend cut
 
 // For debugging
 #ifndef __SYNTHESIS__
@@ -1540,13 +1536,11 @@ std::cout<< "binlookup  " << binlookup << std::endl;
 			std::cout << "ivm: " << std::dec << ivm << std::endl << std::endl;
 #endif // DEBUG
 
-			bool passbend = (DISK==1) ? bendtable2[ivm - firstmem][bend] : bendtable[ivm - firstmem][bend]; // Check if stub passes bend cut
 // Write the TE Outer stub to the correct memory
 // Only if it has a valid bend
 // TODO: implement VMR to write to the n memory copies, which are different depending on the bendcuts
 // TODO: can only use ivm if first memory is 0
 			if (passbend) {
-				std::cout << "     BIN " << bin << std::endl;
 // 0-9
 				if (teomask[0]) {
 					if (ivm == 0)
@@ -1680,7 +1674,10 @@ std::cout<< "binlookup  " << binlookup << std::endl;
 						mteo31->write_mem(bx, bin, stubTeOuter);
 				}
 			} else {
+				// For debugging
+				#ifndef __SYNTHESIS__
 				std::cout << "DIDN'T PASS BEND" << std::endl << std::endl;
+				#endif // debug
 			}
 		}
 
