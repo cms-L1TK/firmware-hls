@@ -1,9 +1,6 @@
 #include "VMRouterTop.h"
 
-//Fill bendcut tables
-void fillBendcutTable(ap_uint<1> table[][8]){
-
-}
+// Determine the masks
 
 
 // VMRouter Top Function for layer 1, AllStub region E
@@ -69,9 +66,8 @@ void VMRouterTop(BXType bx,
 #include "../emData/VMR/tables/VMTableInnerL1D1.tab"
 	;
 
-// LUT with bend cuts for the TE memories
-// The n memory versions contain stubs sorted by the bend
-// TODO: add the other n TE copies and find a better way to do this...
+// LUT with bend-cuts for the TE memories
+// The cuts are different depending on the memory version (nX)
 ap_uint<1> tmptable1[] =
 #include "../emData/VMR/tables/VMSTE_L1PHIE17n1_vmbendcut.tab"
 ;
@@ -90,11 +86,11 @@ ap_uint<1> tmptable4[] =
 
 static const ap_uint<1>* bendtable[] = {tmptable1, tmptable2, tmptable3, tmptable4};
 
-static const ap_uint<1>* bendtable2[] = {0};
+static const ap_uint<1>* bendextratable[] = {0};
 
 // Main function
 VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk>
-(bx, finebintable, phicorrtable, rzbitstable, bendtable, bendtable2, overlaptable,
+(bx, finebintable, phicorrtable, rzbitstable, bendtable, bendextratable, overlaptable,
 		imask, i0, i1, i2, i3, nullptr, nullptr, //i5,i6,i7,
 		allStub,
 // ME memories

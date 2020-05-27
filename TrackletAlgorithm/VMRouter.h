@@ -540,10 +540,12 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 	auto n_i4 = imask[4] != 0 ? i4->getEntries(bx) : zero;
 	auto n_i5 = imask[5] != 0 ? i5->getEntries(bx) : zero;
 
+	//auto n_tot = n_i0 + n_i1 + n_i2 + n_i3 + n_i4 + n_i5;
+
 // Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
 
-	int addrCountTEI[32]; // Writing of TE Inner stubs
+	int addrCountTEI[32] = {0}; // Writing of TE Inner stubs
 #pragma HLS array_partition variable=addrCount
 	for (int i = 0; i < 32; i++) {
 #pragma HLS UNROLL
@@ -560,6 +562,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 	static const int firstmem =
 			(teimask) ? memStartVal(teimask) : memStartVal(teomask); // The number of the first TE memory
 
+
+
+
 	TOPLEVEL: for (auto i = 0; i < kMaxProc; ++i) {
 #pragma HLS PIPELINE II=1
 #pragma HLS latency max=4
@@ -568,7 +573,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 
 // Stop processing stubs if we have looped over the maximum number
 // that can be processed or if we have gone through all data
-		if ((i > MAXVMROUTER) || !haveData)
+		if ((i > MAXVMROUTER) || !haveData) //n_tot
 			continue;
 
 		bool resetNext = false; // Used to reset read_addr
@@ -576,12 +581,12 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 		bool disk2S = false; // Used to determine if DISK2S
 		bool negdisk = false; // Used to determine if it's negative disk, the last 3 inputs memories
 		InputStub<INTYPE> stub;
-		InputStub<INTYPE2> stub2; // Used for input 1 and 4 since they can be of different type in disks. find a better way to do this...
+		InputStub<INTYPE2> stubspec; // Used for input 1 and 4 since they can be of different type in disks. find a better way to do this...
 
 		// Read stub from memory in turn
 		if (n_i0) {
 			//next = i0;
-			stub2 = i0->read_mem(bx, read_addr);
+			stubspec = i0->read_mem(bx, read_addr);
 			isSpecialStub = true;
 			--n_i0;
 			if (n_i0 == 0)
@@ -597,7 +602,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 			if (n_i2 == 0)
 				resetNext = true;
 		} else if (n_i3) {
-			stub2 = i3->read_mem(bx, read_addr);
+			stubspec = i3->read_mem(bx, read_addr);
 			isSpecialStub  = true;
 			negdisk = (DISK) ? true : false;
 			--n_i3;
@@ -617,6 +622,8 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[], 
 				resetNext = true;
 		}
 
+		//--n_tot;
+
 // If the stub is from a DISK2S module
 if (isSpecialStub && DISK) {
 	disk2S = true;
@@ -629,7 +636,7 @@ if (isSpecialStub && DISK) {
 			++read_addr;
 
 		// Add stub to AllStub memory
-		AllStub<OUTTYPE> allstubd = (isSpecialStub) ? stub2.raw() : stub.raw();
+		AllStub<OUTTYPE> allstubd = (isSpecialStub) ? stubspec.raw() : stub.raw();
 		allstub->write_mem(bx, allstubd, i);
 
 // For debugging
@@ -639,15 +646,15 @@ if (isSpecialStub && DISK) {
 #endif // DEBUG
 
 		// Variables that are going to be used by ME and TE memories
-		auto z = (isSpecialStub) ? stub2.getZ() : stub.getZ();
-		int r = (isSpecialStub) ? stub2.getR().range() : stub.getR().range();
-		int bend = (isSpecialStub) ? stub2.getBend().range() : stub.getBend().range();
-		auto stubPhi_uncorr = (isSpecialStub) ? stub2.getPhi() : stub.getPhi(); // Original phi, uncorrected.
+		auto z = (isSpecialStub) ? stubspec.getZ() : stub.getZ();
+		int r = (isSpecialStub) ? stubspec.getR().range() : stub.getR().range();
+		int bend = (isSpecialStub) ? stubspec.getBend().range() : stub.getBend().range();
+		auto stubPhi_uncorr = (isSpecialStub) ? stubspec.getPhi() : stub.getPhi(); // Original phi, uncorrected.
 		auto stubPhi = getPhiCorr<INTYPE>(stubPhi_uncorr, r, bend, corrtable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
 
-		int nrbits = (isSpecialStub) ? stub2.getR().length() : stub.getR().length(); // Number of bits for r
-		int nzbits = (isSpecialStub) ? stub2.getZ().length() : stub.getZ().length(); // Number of bits for z
-		int nbendbits = (isSpecialStub) ? stub2.getBend().length() : stub.getBend().length();
+		int nrbits = (isSpecialStub) ? stubspec.getR().length() : stub.getR().length(); // Number of bits for r
+		int nzbits = (isSpecialStub) ? stubspec.getZ().length() : stub.getZ().length(); // Number of bits for z
+		int nbendbits = (isSpecialStub) ? stubspec.getBend().length() : stub.getBend().length();
 
 
 
@@ -1315,8 +1322,6 @@ bool passbend = bendtable[ivm - firstmem][bend]; // Check if stub passes bend cu
 			stubTeOuter.setIndex(typename VMStubTEOuter<OUTTYPE>::VMSTEOID(i));
 
 			ap_uint<TEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
-			iphiRaw = iphivmRaw<INTYPE>(stubPhi); // Top 5 bits of phi. TODO: we don't really need this...
-			ivm = iphiRaw * nvmte / 32.0; // Which VM
 
 			constexpr auto vmbits =
 					(LAYER) ? vmbitslayer[LAYER - 1] : vmbitsdisk[DISK - 1]; // Number of bits for VMs
