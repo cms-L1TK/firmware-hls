@@ -62,6 +62,7 @@ void VMRouterTop(BXType bx,
 	;
 
 // LUT with the Z/R bits for TE Overlap memories
+// Only used for Layer 1 and 1, and Disk 1
 	static const int overlaptable[1024] =// 10 bits used for LUT
 #include "../emData/VMR/tables/VMTableInnerL1D1.tab"
 	;
@@ -86,7 +87,7 @@ ap_uint<1> tmptable4[] =
 
 static const ap_uint<1>* bendtable[] = {tmptable1, tmptable2, tmptable3, tmptable4};
 
-static const ap_uint<1>* bendextratable[] = {0};
+static const ap_uint<1>* bendextratable[1]; // Only used for Disk 1
 
 // Main function
 VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk>
