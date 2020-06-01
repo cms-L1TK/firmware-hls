@@ -51,7 +51,6 @@ VMR-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
-  allow_failure: true
 TE-quality-check:
   <<: *template_quality-check
   variables:
