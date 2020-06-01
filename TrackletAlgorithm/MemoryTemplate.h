@@ -15,14 +15,15 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 class MemoryTemplate
 {
 public:
+  typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR+1> NEntryT;
-
+  
 protected:
 
   DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
   NEntryT nentries_[1<<NBIT_BX];                  // number of entries
-
+  
 public:
 
   MemoryTemplate()
@@ -45,9 +46,7 @@ public:
 
   void clear(BunchXingT bx) {
 #pragma HLS inline
-    //NEntryT zero = nentries_[bx];
-    //zero = 0;
-    nentries_[bx] = 0;//-= nentries_[bx];//zero;
+    nentries_[bx] = 0;
   }
 
   unsigned int getDepth() const {return (1<<NBIT_ADDR);}
@@ -96,11 +95,18 @@ public:
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
-
+  
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
   {
 	DataType data(datastr, base);
+        int nent = nentries_[ibx];
+	// std::cout << "write_mem " << data << std::endl;
+	return write_mem(ibx, data, nent);
+  }
+  bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
+  {
+    DataType data(datastr.c_str(), base);
         int nent = nentries_[ibx];
 	// std::cout << "write_mem " << data << std::endl;
 	return write_mem(ibx, data, nent);
@@ -136,8 +142,10 @@ public:
 	}
   }
 
+  static constexpr int getWidth() {return DataType::getWidth();}
+  
 #endif
-
+  
 };
 
 #endif

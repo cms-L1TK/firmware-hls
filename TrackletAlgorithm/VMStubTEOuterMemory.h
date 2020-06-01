@@ -44,7 +44,7 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubTEOuterMemory fields
     kVMSTEOFineZSize = 3,
-    kVMSTEOFinePhiSize = 2,
+    kVMSTEOFinePhiSize = 3,
     kVMSTEOBendSize = 3,
     kVMSTEOIDSize = 7,
     // Bit size for full VMStubTEOuterMemory
@@ -98,6 +98,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return VMStubTEOuterBase<VMSTEOType>::kVMStubTEOuterSize;}
+  
   VMStubTEOuterData raw() const {return data_;}
 
   VMSTEOID getIndex() const {

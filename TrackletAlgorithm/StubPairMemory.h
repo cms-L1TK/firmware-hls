@@ -48,6 +48,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return kStubPairSize;}
+
   StubPairData raw() const {return data_;}
   
   SPInnerIndex getInnerIndex() const {

@@ -27,7 +27,7 @@ e.g. AllStubs*.dat contains one row per stub: "stub_number stub_coords_(binary)[
 
 File naming convention: "L3" or "D5" indicate barrel or disk number; "PHIC" indicates 3rd course phi division given layer of nonant.
 
-Some of the files are large, so not stored directly in git. You should download them from CERNbox with emData/TC/download.sh etc.
+Some of the files are large, so not stored directly in git. These are automatically downloaded when any of the scripts in the project/ directory are executed within Vivado HLS.
 
 ### .tab files 
 

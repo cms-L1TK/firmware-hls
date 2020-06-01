@@ -20,7 +20,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 class MemoryTemplateBinned{
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR-NBIT_BIN+1> NEntryT;
-
+  
 protected:
   enum BitWidths {
     kNBxBins = 1<<NBIT_BX,
@@ -30,7 +30,7 @@ protected:
 
   DataType dataarray_[kNBxBins][kNMemDepth];  // data array
   NEntryT nentries_[kNBxBins][kNSlots];     // number of entries
-
+  
 public:
 
   MemoryTemplateBinned()
@@ -38,14 +38,14 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	clear();
   }
-
+  
   ~MemoryTemplateBinned(){}
-
+  
   void clear()
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-
+	
 	for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
 #pragma HLS UNROLL
 	  clear(ibx);
@@ -56,7 +56,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-
+	
 	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
 #pragma HLS UNROLL
 	  nentries_[bx][ibin] = 0;
@@ -89,7 +89,7 @@ public:
 	// TODO: check if valid
 	return dataarray_[ibx][index];
   }
-
+  
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot,
 		    ap_uint<NBIT_ADDR> index) const
   {
@@ -106,7 +106,7 @@ public:
 
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
-	if (nentry_ibx <= (kNMemDepth)) {
+	if (nentry_ibx <= (1<<(NBIT_ADDR-NBIT_BIN))) {
 	  // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+nentry_ibx] = data;
 	  nentries_[ibx][slot] = nentry_ibx + 1;
@@ -123,7 +123,7 @@ public:
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
-
+  
   ///////////////////////////////////
   std::vector<std::string> split(const std::string& s, char delimiter)
   {
@@ -143,7 +143,7 @@ public:
 
     std::string datastr = split(line, ' ').back();
 
-    int slot=atoi(split(line, ' ').front().c_str());
+    int slot=(int)strtol(split(line, ' ').front().c_str(), NULL, 16); // Convert string (in hexadecimal) to int. Originally: atoi(split(line, ' ').front().c_str());
 
     DataType data(datastr.c_str(), base);
     //std::cout << "write_mem slot data : " << slot<<" "<<data << std::endl;
@@ -185,8 +185,10 @@ public:
 	}
   }
 
+  static constexpr int getWidth() {return DataType::getWidth();}
+  
 #endif
-
+  
 };
 
 #endif

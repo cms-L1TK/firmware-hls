@@ -1,77 +1,105 @@
 // ProjectionRouter test bench
-#include "MatchEngineTopL1.h"
+
+// cms-tracklet/firmware-hls Headers
+#include "MatchEngine.h"
 #include "CandidateMatchMemory.h"
 #include "VMProjectionMemory.h"
 #include "VMStubMEMemory.h"
 #include "FileReadUtility.h"
+
+// HLS Headers
 #include "hls_math.h"
 
+// STL Headers
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
 #include <iterator>
 
+using namespace std;
 
 const int nevents = 100;  // number of events to run
 
-using namespace std;
-
-
-
 int main() {
-  // error counter
-  int err_count = 0;
+	// Error counter
+	int err_count = 0;
 
-  // declare input memory arrays to be read from the emulation files
-  VMProjectionMemory<BARREL> inputvmprojs;
-  VMStubMEMemory<BARRELPS> inputvmstubs;
-  //CandidateMatchMemory inputcandmatches;
+	// Declare input memory arrays to be read from the emulation files
+	VMProjectionMemory<PROJECTIONTYPE> inputvmprojs;
+	VMStubMEMemory<MODULETYPE> inputvmstubs;
+	//CandidateMatchMemory inputcandmatches;
 
-  // declare output memory array to be filled by hls simulation
-  CandidateMatchMemory outputcandmatches;
+	// Declare output memory array to be filled by hls simulation
+	CandidateMatchMemory outputcandmatches;
 
-  ifstream fin_vmproj;
-  bool validvmproj = openDataFile(fin_vmproj,"ME/ME_L1PHIE20/VMProjections_VMPROJ_L1PHIE20_04.dat");
-  if (not validvmproj) return -1;
+	// Open file(s) with the input projections, stubs, and reference results
+	ifstream fin_vmproj;
+	ifstream fin_vmstub;
+	ifstream fin_candmatch;
+	bool validvmproj    = false;
+	bool validvmstub    = false;
+	bool validcandmatch = false;
+#if LAYER == 1
+	validvmproj    = openDataFile(fin_vmproj,"ME/ME_L1PHIE20/VMProjections_VMPROJ_L1PHIE20_04.dat");
+	validvmstub    = openDataFile(fin_vmstub,"ME/ME_L1PHIE20/VMStubs_VMSME_L1PHIE20n1_04.dat");
+	validcandmatch = openDataFile(fin_candmatch,"ME/ME_L1PHIE20/CandidateMatches_CM_L1PHIE20_04.dat");
+#elif LAYER == 2
+	validvmproj    = false;
+	validvmstub    = false;
+	validcandmatch = false;
+#elif LAYER == 3
+	validvmproj    = openDataFile(fin_vmproj,"ME/ME_L3PHIC20/VMProjections_VMPROJ_L3PHIC20_04.dat");
+	validvmstub    = openDataFile(fin_vmstub,"ME/ME_L3PHIC20/VMStubs_VMSME_L3PHIC20n1_04.dat");
+	validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
+#elif LAYER == 4
+	validvmproj    = openDataFile(fin_vmproj,"ME/ME_L4PHIB12/VMProjections_VMPROJ_L4PHIB12_04.dat");
+	validvmstub    = openDataFile(fin_vmstub,"ME/ME_L4PHIB12/VMStubs_VMSME_L4PHIB12n1_04.dat");
+	validcandmatch = openDataFile(fin_candmatch,"ME/ME_L4PHIB12/CandidateMatches_CM_L4PHIB12_04.dat");
+#elif LAYER == 5
+	validvmproj    = false;
+	validvmstub    = false;
+	validcandmatch = false;
+#elif LAYER == 6
+	validvmproj    = false;
+	validvmstub    = false;
+	validcandmatch = false;
+#endif
+	if (not validvmproj) return -1;
+	if (not validvmstub) return -2;
+	if (not validcandmatch) return -3;
 
-  ifstream fin_vmstub;
-  bool validvmstub = openDataFile(fin_vmstub,"ME/ME_L1PHIE20/VMStubs_VMSME_L1PHIE20n1_04.dat");
-  if (not validvmstub) return -1;
+	// Loop over events
+	for (int ievt = 0; ievt < nevents; ++ievt) {
+		cout << "Event: " << dec << ievt << endl;
 
-  // open file(s) with reference results
+		writeMemFromFile<VMProjectionMemory<PROJECTIONTYPE> >(inputvmprojs, fin_vmproj, ievt);
+		writeMemFromFile<VMStubMEMemory<MODULETYPE> >(inputvmstubs, fin_vmstub, ievt);
 
-  ifstream fin_candmatch;
-  bool validcandmatch = openDataFile(fin_candmatch,"ME/ME_L1PHIE20/CandidateMatches_CM_L1PHIE20_04.dat");
-  if (not validcandmatch) return -1;
+		//Set bunch crossing
+		BXType bx=ievt&0x7;
+		BXType bx_out;
 
-  // loop over events
-  for (int ievt = 0; ievt < nevents; ++ievt) {
-    cout << "Event: " << dec << ievt << endl;
+		//Print the number of projections and stubs
+		std::cout << "In MatchEngine #proj ="<<std::hex<<inputvmprojs.getEntries(bx)<<" #stubs=";
+		for (unsigned int zbin=0;zbin<8;zbin++){
+			std::cout <<" "<<inputvmstubs.getEntries(bx,zbin);
+		}
+		std::cout<<std::dec<<std::endl;
 
-    writeMemFromFile<VMProjectionMemory<BARREL> >(inputvmprojs, fin_vmproj, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs, fin_vmstub, ievt);
+		// Unit Under Test
+		MatchEngineTop(bx,bx_out,inputvmstubs,inputvmprojs,outputcandmatches);
 
-    //set bunch crossing
-    BXType bx=ievt&0x7;
+		// Compare the computed outputs with the expected ones for the candidate matches
+		bool truncation = true;
+		err_count += compareMemWithFile<CandidateMatchMemory,16,2>(outputcandmatches, fin_candmatch, ievt, "CandidateMatch",truncation);
 
-    // Unit Under Test
-    MatchEngineTopL1(bx,&inputvmstubs,&inputvmprojs,&outputcandmatches);
-
-    // compare the computed outputs with the expected ones for the candidate 
-    // matches
-    err_count += compareMemWithFile<CandidateMatchMemory>(outputcandmatches, 
-							  fin_candmatch, 
-							  ievt,"CandidateMatch");
-    
-
-  }  // end of event loop
+	}  // End of event loop
   
-  // close files
-  fin_vmstub.close();
-  fin_vmproj.close();
-  fin_candmatch.close();
+	// Close files
+	fin_vmstub.close();
+	fin_vmproj.close();
+	fin_candmatch.close();
 
-  return err_count;
-
+	return err_count;
 }

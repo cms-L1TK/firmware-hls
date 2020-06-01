@@ -64,6 +64,8 @@ public:
   #endif
   
   // Getter
+  static constexpr int getWidth() {return kTrackletParameterSize;}
+
   TrackletParameterData raw() const {return data_;}
 
   STUBINDEX getStubIndexOuter() const {

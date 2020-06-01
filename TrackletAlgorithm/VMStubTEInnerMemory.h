@@ -58,8 +58,8 @@ class VMStubTEInnerBase<DISK>
 public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
-    kVMSTEIZBitsSize = 9,
-    kVMSTEIFinePhiSize = 1,
+    kVMSTEIZBitsSize = 10,
+    kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 3,
     kVMSTEIIDSize = 7,
     // Bit size for full VMStubTEInnerMemory
@@ -113,6 +113,8 @@ public:
   #endif
 
   // Getter
+  static constexpr int getWidth() {return VMStubTEInnerBase<VMSTEIType>::kVMStubTEInnerSize;}
+
   VMStubTEInnerData raw() const {return data_;}
 
   VMSTEIID getIndex() const {
