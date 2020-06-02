@@ -120,7 +120,7 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 #pragma HLS inline
 #pragma HLS PIPELINE II=1
-#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
+//#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=istub intra WAR true
 
     ////////////////////////////////////////////
@@ -151,6 +151,7 @@ void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRoute
   //If the buffer is not empty we have a projection that we need to 
   //process. 
       //std::cout << "writeindex[" << ivmphi << "]=" << writeindex[ivmphi] << "\treadindex[" << ivmphi << "]=" << readindex << std::endl;
+        projbuffer[readindex].Print();
   if (!empty() && buffernotlarger) {
 
       ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
@@ -167,7 +168,7 @@ void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRoute
         //std::cout << "nproj=" << writeindex1 << std::endl;
         auto const qdata=projbuffer[readindex];
         tcid=qdata.getTCID();
-        //projbuffer[readindex].Print();
+        projbuffer[readindex].Print();
         /*
         ProjectionRouterBuffer<BARREL> *qdata;
         switch (ivmphi) {
