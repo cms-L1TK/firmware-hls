@@ -155,7 +155,11 @@ namespace PR
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
   // functions to rewind correctly, this can be set to zero (or simply removed)
+<<<<<<< HEAD
   constexpr unsigned int LoopItersCut = 6;// - 95; 
+=======
+  constexpr unsigned int LoopItersCut = 6 - 95; 
+>>>>>>> Second BX has all matches when printing (probably a pointer issue)
 
 } // namesapce PR
 
@@ -618,10 +622,30 @@ void MatchProcessor(BXType bx,
   constexpr unsigned int kNBitsBuffer=7;
   constexpr unsigned int kNMatchEngines=8;
 
+<<<<<<< HEAD
   static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
 #pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=writeindex inter false
   static ap_uint<kNBitsBuffer> readindex=0;
+=======
+  ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer];
+  ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
+//#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
+//#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
+#pragma HLS dependence variable=writeindex inter RAW false 
+  ap_uint<kNBitsBuffer> readindex=0;
+
+  // declare counters for each of the 8 output VMProj // !!!
+  int nvmprojout1 = 0;
+  int nvmprojout2 = 0;
+  int nvmprojout3 = 0;
+  int nvmprojout4 = 0;
+  int nvmprojout5 = 0;
+  int nvmprojout6 = 0;
+  int nvmprojout7 = 0;
+  int nvmprojout8 = 0;  
+  int nallproj = 0;
+>>>>>>> Second BX has all matches when printing (probably a pointer issue)
 
   // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
@@ -654,6 +678,7 @@ void MatchProcessor(BXType bx,
   //more projections to read
   auto nproj=0;
 
+<<<<<<< HEAD
   //const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
   //ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
   ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNMatchEngines];
@@ -839,6 +864,40 @@ void MatchProcessor(BXType bx,
           projbuffertmp.setPhi(iphi);
           projbufferarray.add(projbuffertmp);
           //projbufferarray[iphi].add(projbuffertmp);
+=======
+            /* FIXME
+            std::cout << "PRiphi=" << iphi << std::endl;
+            std::cout << "save first" << std::endl;
+            */
+      std::cout << std::hex << "iphi=" << iphi+1 << " vmproj=" << vmproj.raw() << std::endl;
+          projbuffer[iphi][writeindextmp[iphi]]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+        /*
+          switch (iphi) {
+            case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 1: projbuffer2[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 2: projbuffer3[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 3: projbuffer4[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 4: projbuffer5[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 5: projbuffer6[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 6: projbuffer7[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+            case 7: projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+            break;
+          }
+          projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+        */
+          //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
+        //std::cout << std::hex << "proj=" << projbuffer[writeindextmp]->raw() << std::endl;
+        //std::cout << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
+        /* FIXME
+        */
+>>>>>>> Second BX has all matches when printing (probably a pointer issue)
         }
         if (savelast) {
           if (savefirst) {
@@ -855,6 +914,66 @@ void MatchProcessor(BXType bx,
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
+=======
+            projbuffer[iphi][writeindextmp[iphi]+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            //projbuffer[iphi][writeindextmpplus]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+        /*
+          switch (iphi) {
+            case 0: projbuffer1[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 1: projbuffer2[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 2: projbuffer3[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 3: projbuffer4[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 4: projbuffer5[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 5: projbuffer6[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 6: projbuffer7[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 7: projbuffer8[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+          }
+            projbuffer8[writeindextmpplus]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+        */
+        //std::cout << std::hex << "proj=" << projbuffer[writeindextmpplus]->raw() << std::endl;
+        //std::cout << "who's proj=" << projbuffer[writeindextmpplus]->getProjection() << std::endl;
+        /* FIXME
+        std::cout << std::hex << "and vmproj=" << vmproj.raw() << std::endl;
+        */
+          //projbuffermem.write_mem(bx, *projbuffer[writeindextmpplus], writeindextmpplus);
+          } else {
+            ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
+            projbuffer[iphi][writeindextmp[iphi]]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+          /*
+          switch (iphi) {
+            case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 1: projbuffer2[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 2: projbuffer3[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 3: projbuffer4[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 4: projbuffer5[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 5: projbuffer6[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 6: projbuffer7[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+            case 7: projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            break;
+          }
+            projbuffer8[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+          */
+          //projbuffermem.write_mem(bx, *projbuffer[0][writeindextmp], writeindextmp);
+        //std::cout << std::hex << "who's proj=" << projbuffer[writeindextmp]->getProjection() << std::endl;
+        //std::cout << std::hex << "writeing proj=" << projbuffer[writeindextmp]->raw() << std::endl;
+        /* FIXME
+        */
+>>>>>>> Second BX has all matches when printing (probably a pointer issue)
           }
         }
 
@@ -866,6 +985,7 @@ void MatchProcessor(BXType bx,
 
     } // end if(validin)
 
+<<<<<<< HEAD
     MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
       bool ready = false;
