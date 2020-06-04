@@ -13,13 +13,13 @@ set_top MatchEngineTop
 add_files ../TrackletAlgorithm/MatchEngine.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "$CFLAGS"
 
-# data files
-add_files -tb ../emData/ME/
-
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+
+# data files
+add_files -tb ../emData/ME/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

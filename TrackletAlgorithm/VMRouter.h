@@ -15,7 +15,7 @@
 #include "VMStubMEMemory.h"
 #include "VMStubTEInnerMemory.h"
 #include "VMStubTEOuterMemory.h"
-#include <assert.h>
+#include <cassert>
 
 // from Constants.hh -- needs a final home?
 constexpr unsigned int nallstubslayers[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, coarse phi regions, per sector
@@ -300,7 +300,8 @@ void VMRouter(const BXType bx, const int finebintable[], const int corrtable[],
 //#pragma HLS array_partition variable=overlaptable
 
 // Maximum depth of bendtable is 8
-#pragma HLS interface ap_bus port=bendtable depth=8
+//#pragma HLS interface ap_bus port=bendtable depth=8
+
 
 // Reset address counters in output memories
 	allstub->clear(bx);

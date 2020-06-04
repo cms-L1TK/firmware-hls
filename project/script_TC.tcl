@@ -12,14 +12,14 @@ set_top TrackletCalculator_L1L2G
 add_files ../TrackletAlgorithm/TrackletCalculator.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletCalculator_L1L2G_test.cpp -cflags "$CFLAGS"
 
-# data files
-add_files -tb ../emData/TC/tables/
-add_files -tb ../emData/TC/TC_L1L2G/
-
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+
+# data files
+add_files -tb ../emData/TC/tables/
+add_files -tb ../emData/TC/TC_L1L2G/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design
