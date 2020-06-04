@@ -202,7 +202,7 @@ int main() {
 
 		// Unit Under Test
 		// Unit Under Test
-		VMRouterTop(bx, &ilink1, &ilink2, &ilink3, &ilink4, 0, 0,
+		VMRouterTop(bx, &ilink1, &ilink2, &ilink3, &ilink4, nullptr, nullptr,
 				//&ilink7, &ilink8,
 				&allstub, &vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
 				&vmstubme5, &vmstubme6, &vmstubme7, &vmstubme8, &vmstubtei1,

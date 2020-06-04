@@ -143,7 +143,8 @@ public:
 
     std::string datastr = split(line, ' ').back();
 
-    int slot=(int)strtol(split(line, ' ').front().c_str(), NULL, 16); // Convert string (in hexadecimal) to int. Originally: atoi(split(line, ' ').front().c_str());
+    int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, 16); // Convert string (in hexadecimal) to int
+    // Originally: atoi(split(line, ' ').front().c_str()); but that didn't work for disks with 16 bins
 
     DataType data(datastr.c_str(), base);
     //std::cout << "write_mem slot data : " << slot<<" "<<data << std::endl;

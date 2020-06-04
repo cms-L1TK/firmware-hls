@@ -43,43 +43,43 @@ void VMRouterTop(BXType bx,
 
 // LUT with the finer region each z/r bin is divided into.
 	static const int finebintable[] =
-#include "../emData/VMR/tables/VMR_L1PHIE_finebin.tab"
+#include "../emData/MemPrints/Tables/VMR_L1PHIE_finebin.tab"
 	;
 
 // LUT with phi corrections to the nominal radius. Only used by layers.
 // Values are determined by the radius and the bend of the stub.
 	static const int phicorrtable[] =
-#include "../emData/VMR/tables/VMPhiCorrL1.txt"
+#include "../emData/MemPrints/Tables/VMPhiCorrL1.txt"
 	;
 
 // LUT with the Z/R bits for TE memories
 // Todo: comment on what the bits represent
 	static const int rzbitstable[] =
-#include "../emData/VMR/tables/VMTableInnerL1L2.tab" // Only for Layer 1
+#include "../emData/MemPrints/Tables/VMTableInnerL1L2.tab" // Only for Layer 1
 	
 
 // LUT with the Z/R bits for TE Overlap memories
 // Only used for Layer 1 and 2, and Disk 1
 	static const int overlaptable[1024] =// 10 bits used for LUT
-#include "../emData/VMR/tables/VMTableInnerL1D1.tab"
+#include "../emData/MemPrints/Tables/VMTableInnerL1D1.tab"
 	;
 
 // LUT with bend-cuts for the TE memories
 // The cuts are different depending on the memory version (nX)
 	ap_uint<1> tmptable1[] =
-#include "../emData/VMR/tables/VMSTE_L1PHIE17n1_vmbendcut.tab"
+#include "../emData/MemPrints/Tables/VMSTE_L1PHIE17n1_vmbendcut.tab"
 	;
 
 	ap_uint<1> tmptable2[] =
-#include "../emData/VMR/tables/VMSTE_L1PHIE18n1_vmbendcut.tab"
+#include "../emData/MemPrints/Tables/VMSTE_L1PHIE18n1_vmbendcut.tab"
 	;
 
 	ap_uint<1> tmptable3[] =
-#include "../emData/VMR/tables/VMSTE_L1PHIE19n1_vmbendcut.tab"
+#include "../emData/MemPrints/Tables/VMSTE_L1PHIE19n1_vmbendcut.tab"
 	;
 
 	ap_uint<1> tmptable4[] =
-#include "../emData/VMR/tables/VMSTE_L1PHIE20n1_vmbendcut.tab"
+#include "../emData/MemPrints/Tables/VMSTE_L1PHIE20n1_vmbendcut.tab"
 	;
 
 	static const ap_uint<1>* bendtable[] = {tmptable1, tmptable2, tmptable3, tmptable4};
@@ -96,7 +96,7 @@ void VMRouterTop(BXType bx,
 	#pragma HLS resource variable=finebintable latency=2
 	#pragma HLS resource variable=rzbitstable latency=2
 	#pragma HLS resource variable=overlaptable latency=2
-	//phicorrtable (and bendtable?) seems to be using LUTs as it's relatively small
+	//phicorrtable (and bendtable?) seems to be using LUTs as it's relatively small?
 	
 /////////////////////////
 // Main function
