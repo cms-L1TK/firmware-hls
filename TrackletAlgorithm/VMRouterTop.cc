@@ -32,12 +32,12 @@ void VMRouterTop(BXType bx,
 
 	// The main function
 	VMRouter<BARRELPS, BARRELPS, layer, disk, ninputs, meMask>(
-		 bx, i0, i1, i2, i3, 0, 0, //i6, i7,
+		 bx, i0, i1, i2, i3, nullptr, nullptr, //i6, i7,
 		 allStub,
-		 0, 0, 0, 0, 0, 0, 0, 0, // 0-7
-		 0, 0, 0, 0, 0, 0, 0, 0, // 8-15
-		 m0,m1,m2,m3,0, 0, 0, 0, // 16-23
-		 0, 0, 0, 0, 0, 0, 0, 0 // 24-31
+		 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 0-7
+		 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, // 8-15
+		 m0,m1,m2,m3,nullptr, nullptr, nullptr, nullptr, // 16-23
+		 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr // 24-31
 		 );
 
 	return;

@@ -13,7 +13,7 @@
 #include "VMStubMEMemory.h"
 #include "VMStubTEInnerMemory.h"
 #include "VMStubTEOuterMemory.h"
-#include <assert.h>
+#include <cassert>
 
 // I include this to get the constants. we should figure out if this is
 // the right way to go.

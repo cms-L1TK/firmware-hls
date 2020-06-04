@@ -137,7 +137,7 @@ int main()
 
     // Unit Under Test
     VMRouterTop(bx,
-    		&ilink1, &ilink2, &ilink3, &ilink4, 0, 0, //&ilink4, &ilink5, &ilink6,
+		&ilink1, &ilink2, &ilink3, &ilink4, nullptr, nullptr, //&ilink4, &ilink5, &ilink6,
 		// &ilink7, &ilink8,
 			&allstub,
 		&vmstubme1, &vmstubme2, &vmstubme3, &vmstubme4,
