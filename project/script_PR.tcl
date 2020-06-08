@@ -12,14 +12,14 @@ set_top ProjectionRouterTop
 add_files ../TrackletAlgorithm/ProjectionRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "$CFLAGS"
 
-# data files
-add_files -tb ../emData/PR/PR_L3PHIC/
-#add_files -tb ../emData/PR/PR_L3L4_L1PHI3/
-
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+
+# data files
+add_files -tb ../emData/PR/PR_L3PHIC/
+#add_files -tb ../emData/PR/PR_L3L4_L1PHI3/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

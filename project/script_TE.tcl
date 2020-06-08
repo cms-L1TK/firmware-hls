@@ -12,13 +12,13 @@ set_top TrackletEngineTop
 add_files ../TrackletAlgorithm/TrackletEngineTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "$CFLAGS"
 
-# data files
-add_files -tb ../emData/TE/
-
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+
+# data files
+add_files -tb ../emData/TE/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

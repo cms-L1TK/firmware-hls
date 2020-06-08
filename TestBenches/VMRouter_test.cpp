@@ -35,8 +35,6 @@ int main()
 	static VMStubTEInnerMemory<BARRELPS> teiMemories[4][5];
 	// TE Inner Overlap memories, including copies
 	static VMStubTEInnerMemory<BARRELOL> olMemories[2][3];
-  // TE Outer memories
-  static VMStubTEOuterMemory<BARRELPS> teoMemories[1][1];
 
 
 ///////////////////////////
@@ -263,7 +261,7 @@ int main()
     // Unit Under Test
 		// Unit Under Test
 				VMRouterTop(bx, &ilink1, &ilink2, &ilink3, &ilink4,
-						allstub, meMemories, teiMemories, olMemories, teoMemories);
+						allstub, meMemories, teiMemories, olMemories);
 
     // compare the computed outputs with the expected ones
     // add 1 per stub that is incorrect
@@ -296,7 +294,6 @@ int main()
     // VMStubME4
     err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[3], fout_vmstubme4, ievt,
                                                   "VMStubME20", truncation);
-
 //    // VMStubME5
 //    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme5, fout_vmstubme5, ievt,
 //                                                  "VMStubME5", truncation);

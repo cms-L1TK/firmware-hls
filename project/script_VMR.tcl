@@ -12,13 +12,13 @@ set_top VMRouterTop
 add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "$CFLAGS"
 
-# data files
-add_files -tb ../emData/MemPrints/
-
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+
+# data files
+add_files -tb ../emData/MemPrints/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

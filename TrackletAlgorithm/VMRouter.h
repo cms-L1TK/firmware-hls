@@ -15,7 +15,7 @@
 #include "VMStubMEMemory.h"
 #include "VMStubTEInnerMemory.h"
 #include "VMStubTEOuterMemory.h"
-#include <assert.h>
+#include <cassert>
 
 // from Constants.hh -- needs a final home?
 constexpr unsigned int nallstubslayers[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, coarse phi regions, per sector
@@ -176,7 +176,7 @@ inline ap_uint<5> memStartVal(const ap_uint<32> mask) {
 
 // Two input region types INTYPE and INTYPE2 due to the disks having both 2S and PS inputs.
 // According to wiring script for disks, the 0th and 2th input are always different
-template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int NTEI, int NTEOL, int NTEO>
+template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
 void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[], const int rzbitstable[], 
 		const ap_uint<1>* bendtable[], const ap_uint<1>* bendextratable[], const int overlaptable[],
 		// Input memories
@@ -188,19 +188,19 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		const InputStubMemory<INTYPE>* const i4,
 		const InputStubMemory<INTYPE>* const i5,
 		// AllStub memory
-		AllStubMemory<INTYPE> allstub[],
+		AllStubMemory<OUTTYPE> allstub[],
 		// ME memories
 		const ap_uint<32>& memask, VMStubMEMemory<OUTTYPE> meMemories[],
 		// // Inner TE memories, non-overlap
-		const ap_uint<32>& teimask, VMStubTEInnerMemory<OUTTYPE> teiMemories[][NTEI],
+		const ap_uint<32>& teimask, VMStubTEInnerMemory<OUTTYPE> teiMemories[][MAXNTEI],
 		// // TE Inner memories, overlap
-		const ap_uint<16>& olmask, VMStubTEInnerMemory<BARRELOL> olMemories[][NTEOL],
+		const ap_uint<16>& olmask, VMStubTEInnerMemory<BARRELOL> olMemories[][MAXNTEOL],
 		// // TE Outer memories
-		const ap_uint<32>& teomask, VMStubTEOuterMemory<OUTTYPE> teoMemories[][NTEO]) {
+		const ap_uint<32>& teomask, VMStubTEOuterMemory<OUTTYPE> teoMemories[][MAXNTEO]) {
 
 #pragma HLS inline
-#pragma HLS array_partition variable=bendtable complete dim=0
-#pragma HLS array_partition variable=bendextratable complete dim=0
+#pragma HLS array_partition variable=bendtable complete dim=1
+#pragma HLS array_partition variable=bendextratable complete dim=1
 #pragma HLS array_partition variable = allstub complete
 #pragma HLS array_partition variable = meMemories complete
 #pragma HLS array_partition variable = teiMemories complete dim=2
@@ -215,10 +215,10 @@ constexpr int nbitsrfinebintable =
 		
 static const int firstme = memStartVal(memask); // The number of the first ME memory
 static const int firstte = (teimask) ? memStartVal(teimask) : memStartVal(teomask); // The number of the first TE memory
-constexpr int firstol = 8; // The number pf the first OL memory. TODO: remove hardcoded value
+static const int firstol = (olmask) ? static_cast<int>(memStartVal(olmask)) : 0; // The number pf the first OL memory. TODO: remove hardcoded value
 
 constexpr int n_me = (LAYER) ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1]; // Number of ME memories/VM for this coarse phi region
-constexpr int n_tei = (LAYER) ? nvmtelayers[LAYER-1] : nvmtedisks[DISK-1]; // Number of TE memories for this coarse phi region
+constexpr int n_te = (LAYER) ? nvmtelayers[LAYER-1] : nvmtedisks[DISK-1]; // Number of TE memories for this coarse phi region
 constexpr int n_ol = ((LAYER == 1) || (LAYER == 2)) ? nvmteoverlaplayers[LAYER-1] : 0; // Number of TE Overlap memories for this coarse phi region
 
 // Total number of VMs for ME in a whole sector
@@ -233,17 +233,16 @@ constexpr auto ntotvmte =
 				nallstubslayers[LAYER - 1] * nvmtelayers[LAYER - 1] :
 				nallstubsdisks[DISK - 1] * nvmtedisks[DISK - 1];
 
-constexpr int nallcopies = 6; // Number of AllStub memory copies. TODO: Remove hardcoded value
-constexpr int ntecopies = 5; // Number of TE Inner memory copies. TODO: Remove hardcoded value
-constexpr int nolcopies = 3; // Number of copies for the extra overlap memories. TODO: Remove hardcoded value
+//constexpr int nallcopies = 6; // Number of AllStub memory copies. TODO: Remove hardcoded value
+//constexpr int ntecopies = 3; // Number of TE Inner memory copies. TODO: Remove hardcoded value
+//constexpr int nolcopies = 5; // Number of copies for the extra overlap memories. TODO: Remove hardcoded value
 
 const ap_ufixed<5, 4> d_me = ntotvmme / 32.0; // Some sort of normalisation thing
 const ap_ufixed<5, 4> d_te = ntotvmte / 32.0;
 
-
 	// Reset address counters in output memories
 	// Only clear if the masks says that memory is used
-ALLSTUB_CLEAR:	for (int i = 0; i < nallcopies; i++) {
+ALLSTUB_CLEAR:	for (int i = 0; i < MAXNALL; i++) {
 		#pragma HLS UNROLL
 		allstub[i].clear(bx);
 	}
@@ -256,10 +255,10 @@ ME_CLEAR:	for (int i = 0; i < n_me; i++) {
 }
 
 if (teimask) {
-TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
+TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 		#pragma HLS UNROLL
 		if (teimask[i + firstte]) {
-			for (int j = 0; j < ntecopies; j++) {
+			for (int j = 0; j < MAXNTEI; j++) {
 				#pragma HLS UNROLL
 				teiMemories[i][j].clear(bx);
 			}
@@ -268,10 +267,10 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 }
 
 	if (teomask) {
-	TEO_CLEAR:	for (int i; i < n_tei; i++) {
+	TEO_CLEAR:	for (int i = 0; i < n_te; i++) {
 		#pragma HLS UNROLL
-		if (teimask[i + firstte]) {
-			for (int j = 0; j < NTEO; j++) {
+		if (teomask[i + firstte]) {
+			for (int j = 0; j < MAXNTEO; j++) {
 				#pragma HLS UNROLL
 				teoMemories[i][j].clear(bx);
 			}
@@ -279,12 +278,11 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 	}
 }
 
-
 	if (olmask) {
 	OL_CLEAR:	for (int i = 0; i < n_ol; i++) {
 			#pragma HLS UNROLL
 			if (olmask[i + firstol]) {
-				for (int j = 0; j < nolcopies; j++) {
+				for (int j = 0; j < MAXNTEOL; j++) {
 					#pragma HLS UNROLL
 					olMemories[i][j].clear(bx);
 			}
@@ -312,29 +310,32 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 // Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
 	
-	static int addrCountTEI[n_tei][ntecopies]; // Writing of TE Inner stubs
+	static int addrCountTEI[n_te][MAXNTEI]; // Writing of TE Inner stubs
 		if (teimask) {
 	#pragma HLS array_partition variable = addrCountTEI complete dim=0
-	ADDR_TEI:	for (int i = 0; i < n_tei; i++) {
+	ADDR_TEI:	for (int i = 0; i < n_te; i++) {
 			#pragma HLS UNROLL
-			for (int j = 0; j < ntecopies; j++) {
+			for (int j = 0; j < MAXNTEI; j++) {
 				#pragma HLS UNROLL
 					addrCountTEI[i][j] = 0;
 			}
 		}
 }
 
-	static int addrCountOL[n_ol][nolcopies]; // Writing of TE Overlap stubs
+	static int addrCountOL[n_ol][MAXNTEOL]; // Writing of TE Overlap stubs
 		if (olmask) {
 	#pragma HLS array_partition variable=addrCountOL complete dim=0
 	ADDR_OL:	for (int i = 0; i < n_ol; i++) {
 			#pragma HLS UNROLL
-			for (int j = 0; j < nolcopies; j++) {
+			for (int j = 0; j < MAXNTEOL; j++) {
 				#pragma HLS UNROLL
 				addrCountOL[i][j] = 0;
 			}
 		}
 }
+ 
+//#pragma HLS resource variable=addrCountTEI latency=2
+//#pragma HLS resource variable=addrCountOL latency=2
 
 /////////////////////////////////////
 // Main Loop 
@@ -413,7 +414,7 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 		// Add stub to all AllStub memory copies
 		AllStub<OUTTYPE> allstubd =
 				(isSpecialStub) ? stubspec.raw() : stub.raw();
-		for (int n = 0; n < nallcopies; n++) {
+		for (int n = 0; n < MAXNALL; n++) {
 			#pragma HLS UNROLL
 			allstub[n].write_mem(bx, allstubd, i);
 		}
@@ -629,14 +630,16 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 						// TODO: remove hardcoded value
 						if (rzbits <= 1024 && teimask[ivm]) {
 							int memindex = ivm-firstte;
-							int bendindex = memindex*ntecopies;
-								for (int n = 0; n < ntecopies; n++) {
+							int bendindex = memindex*MAXNTEI;
+								for (int n = 0; n < MAXNTEI; n++) {
 									#pragma HLS UNROLL
-									bool passbend = bendtable[bendindex+n][bend];
+									//int tempindex = bendindex+n; 
+									bool passbend = bendtable[bendindex][bend];
 									if (passbend) {
 										teiMemories[memindex][n].write_mem(bx, stubTeInner, addrCountTEI[memindex][n]);
 										addrCountTEI[memindex][n] += 1;
 									}
+									bendindex++;
 								}
 							}
 					} // END TE INNER
@@ -693,8 +696,8 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 				// Note: the n copies seem to be the same
 				if (olmask[ivm]) {
 					int memindex = ivm - firstol; // The memory index in array and addrcount
-					int bendindex = memindex*nolcopies;
-					for (int n = 0; n < nolcopies; n++) {
+					int bendindex = memindex*MAXNTEOL;
+					for (int n = 0; n < MAXNTEOL; n++) {
 						#pragma HLS UNROLL
 						bool passbend = bendextratable[bendindex+n][bend];
 						if (passbend) {
@@ -789,7 +792,7 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 #ifndef __SYNTHESIS__
 			std::cout << "TEOuter stub " << std::hex << stubTeOuter.raw()
 					<< std::endl;
-			std::cout << "ivm: " << std::dec << ivm << std::endl
+			std::cout << "ivm: " << std::dec << ivm << "       to bin " << bin << std::endl
 					<< std::endl;
 #endif // DEBUG
 
@@ -798,8 +801,8 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 			// TODO: implement VMR to write to the n memory copies, which are different depending on the bendcuts
 			if (teomask[ivm]) {
 				int memindex = ivm-firstte;
-				int bendindex = memindex*ntecopies;
-					for (int n = 0; n < ntecopies; n++) {
+				int bendindex = memindex*MAXNTEO;
+					for (int n = 0; n < MAXNTEO; n++) {
 						#pragma HLS UNROLL
 						bool passbend =
 								(DISK == 1) ?
@@ -813,9 +816,9 @@ TEI_CLEAR:	for (int i = 0; i < n_tei; i++) {
 		}
 
 // executeTE() END   ------------------------------
-
+ 
 	} // outside loop
-
+	
 } // VMRouter
 
 #endif //VMROUTER_HH

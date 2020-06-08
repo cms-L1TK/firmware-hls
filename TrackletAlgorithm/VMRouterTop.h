@@ -17,8 +17,7 @@ void VMRouterTop(BXType bx,
 		AllStubMemory<BARRELPS> allStub[6],
 		VMStubMEMemory<BARRELPS> meMemories[4],
 		VMStubTEInnerMemory<BARRELPS> teiMemories[4][5],
-		VMStubTEInnerMemory<BARRELOL> olMemories[2][3],
-		VMStubTEOuterMemory<BARRELPS> teoMemories[1][1]
+		VMStubTEInnerMemory<BARRELOL> olMemories[2][3]
 		);
 
 #endif // VMROUTERTOP_HH
