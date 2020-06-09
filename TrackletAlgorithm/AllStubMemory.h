@@ -194,7 +194,7 @@ private:
 
 // Special data object definition
 template<>
-class AllStub<DISK> : public AllStubBase<DISK>
+class AllStub<6> : public AllStubBase<DISK> // Can't generate cosim files if AllStub<DISK> for some reason...
 {
 public:
   typedef ap_uint<AllStubBase<DISK>::kAllStubSize> AllStubData;
