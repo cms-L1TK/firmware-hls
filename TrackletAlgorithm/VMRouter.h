@@ -18,16 +18,16 @@
 #include <cassert>
 
 // from Constants.hh -- needs a final home?
-constexpr unsigned int nallstubslayers[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, coarse phi regions, per sector
+constexpr unsigned int nallstubsLAYERNs[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, coarse phi regions, per sector
 constexpr unsigned int nallstubsdisks[5] = { 4, 4, 4, 4, 4 };
 
-constexpr unsigned int nvmmelayers[6] = { 4, 8, 8, 8, 8, 8 }; // Number of ME VM modules per coarse phi region
+constexpr unsigned int nvmmeLAYERNs[6] = { 4, 8, 8, 8, 8, 8 }; // Number of ME VM modules per coarse phi region
 constexpr unsigned int nvmmedisks[5] = { 8, 4, 4, 4, 4 };
 
-constexpr unsigned int nvmtelayers[6] = { 4, 8, 4, 8, 4, 8 }; // Number of TE VM modules per coarse phi region
+constexpr unsigned int nvmteLAYERNs[6] = { 4, 8, 4, 8, 4, 8 }; // Number of TE VM modules per coarse phi region
 constexpr unsigned int nvmtedisks[5] = { 4, 4, 4, 4, 4 };
 
-constexpr unsigned int nvmteoverlaplayers[2] = {2, 2}; // Number of Overlap VM modules per coarse phi region
+constexpr unsigned int nvmteoverlapLAYERNs[2] = {2, 2}; // Number of Overlap VM modules per coarse phi region
 
 // Number of finephi bits used. Can't this be taken from the memories?
 static const int nfinephibarrelinner = 2;
@@ -42,34 +42,34 @@ static const int nfinephioverlapouter = 3;
 // Maximum number of stubs that can be processed (memory depth)
 constexpr int MAXVMROUTER = kMaxProc;
 
-// Number of bits used for the VMs for different layers and disks
+// Number of bits used for the VMs for different LAYERNs and disks
 // E.g. 32 VMs would use 5 vmbits
-constexpr int vmbitslayer[6] = { 5, 5, 4, 5, 4, 5 }; // Could be computed using the number of VMs...
+constexpr int vmbitsLAYERN[6] = { 5, 5, 4, 5, 4, 5 }; // Could be computed using the number of VMs...
 constexpr int vmbitsdisk[5] = { 4, 4, 4, 4, 4 };
 constexpr int vmbitsoverlap[2] = { 4, 3 };
 
 // Number of bits used for z and r in finebin LUTs
-constexpr int nbitszfinebintablelayer = 7;
-constexpr int nbitsrfinebintablelayer = 4;
+constexpr int nbitszfinebintableLAYERN = 7;
+constexpr int nbitsrfinebintableLAYERN = 4;
 
 constexpr int nbitszfinebintabledisk = 3;
 constexpr int nbitsrfinebintabledisk = 7;
 
 // Number of bits used for z and r in rzbits LUTs
-constexpr int nzbitsinnertablelayer = 7;
-constexpr int nrbitsinnertablelayer = 4;
+constexpr int nzbitsinnertableLAYERN = 7;
+constexpr int nrbitsinnertableLAYERN = 4;
 
 constexpr int nzbitsinnertabledisk = 3;
 constexpr int nrbitsinnertabledisk = 8;
 
-constexpr int nzbitsoutertablelayer = 7;
-constexpr int nrbitsoutertablelayer = 4;
+constexpr int nzbitsoutertableLAYERN = 7;
+constexpr int nrbitsoutertableLAYERN = 4;
 
 constexpr int nzbitsoutertabledisk = 3;
 constexpr int nrbitsoutertabledisk = 7;
 
-constexpr int nzbitsoverlaptable = 7;
-constexpr int nrbitsoverlaptable = 3;
+constexpr int nzbitsrzbitsoverlaptable = 7;
+constexpr int nrbitsrzbitsoverlaptable = 3;
 
 // Number of bits used for r in phicorr LUTs
 constexpr int nrbitsphiphicorrtable = 3;
@@ -175,10 +175,11 @@ inline ap_uint<5> memStartVal(const ap_uint<32> mask) {
 // Main function
 
 // Two input region types INTYPE and INTYPE2 due to the disks having both 2S and PS inputs.
-// According to wiring script for disks, the 0th and 2th input are always different
-template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
-void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[], const int rzbitstable[], 
-		const ap_uint<1>* bendtable[], const ap_uint<1>* bendextratable[], const int overlaptable[],
+// According to wiring script for disks, the 0th and 2th input are different for Disks
+// The last three inputs are also for the negative disks
+template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYERN, int DISKN, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
+void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[], const int rzbitstable[], const int rzbitsoverlaptable[],
+		const ap_uint<1>* bendtable[], const ap_uint<1>* bendoverlaptable[],
 		// Input memories
 		const ap_uint<6>& imask, 
 		const InputStubMemory<INTYPE2>* const i0,
@@ -200,38 +201,38 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 
 #pragma HLS inline
 #pragma HLS array_partition variable=bendtable complete dim=1
-#pragma HLS array_partition variable=bendextratable complete dim=1
+#pragma HLS array_partition variable=bendoverlaptable complete dim=1
 #pragma HLS array_partition variable = allstub complete
 #pragma HLS array_partition variable = meMemories complete
 #pragma HLS array_partition variable = teiMemories complete dim=2
 #pragma HLS array_partition variable = olMemories complete dim=2
-#pragma HLS array_partition variable = teoMemories complete 
+#pragma HLS array_partition variable = teoMemories complete dim=2
 
 // Some variables
 constexpr int nbitszfinebintable =
-		(LAYER) ? nbitszfinebintablelayer : nbitszfinebintabledisk; // Number of bits used for z in finebintable
+		(LAYERN) ? nbitszfinebintableLAYERN : nbitszfinebintabledisk; // Number of bits used for z in finebintable
 constexpr int nbitsrfinebintable =
-		(LAYER) ? nbitsrfinebintablelayer : nbitsrfinebintabledisk; // Number of bits used for r in finebintable
+		(LAYERN) ? nbitsrfinebintableLAYERN : nbitsrfinebintabledisk; // Number of bits used for r in finebintable
 		
 static const int firstme = memStartVal(memask); // The number of the first ME memory
 static const int firstte = (teimask) ? memStartVal(teimask) : memStartVal(teomask); // The number of the first TE memory
-static const int firstol = (olmask) ? static_cast<int>(memStartVal(olmask)) : 0; // The number pf the first OL memory. TODO: remove hardcoded value
+static const int firstol = (olmask) ? static_cast<int>(memStartVal(olmask)) : 0; // The number of the first OL memory
 
-constexpr int n_me = (LAYER) ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1]; // Number of ME memories/VM for this coarse phi region
-constexpr int n_te = (LAYER) ? nvmtelayers[LAYER-1] : nvmtedisks[DISK-1]; // Number of TE memories for this coarse phi region
-constexpr int n_ol = ((LAYER == 1) || (LAYER == 2)) ? nvmteoverlaplayers[LAYER-1] : 0; // Number of TE Overlap memories for this coarse phi region
+constexpr int n_me = (LAYERN) ? nvmmeLAYERNs[LAYERN-1] : nvmmedisks[DISKN-1]; // Number of ME memories/VM for this coarse phi region
+constexpr int n_te = (LAYERN) ? nvmteLAYERNs[LAYERN-1] : nvmtedisks[DISKN-1]; // Number of TE memories for this coarse phi region
+constexpr int n_ol = ((LAYERN == 1) || (LAYERN == 2)) ? nvmteoverlapLAYERNs[LAYERN-1] : 0; // Number of TE Overlap memories for this coarse phi region
 
 // Total number of VMs for ME in a whole sector
 constexpr auto ntotvmme =
-		LAYER != 0 ?
-				nallstubslayers[LAYER - 1]
-						* nvmmelayers[LAYER - 1] :
-				nallstubsdisks[DISK - 1] * nvmmedisks[DISK - 1];
+		LAYERN != 0 ?
+				nallstubsLAYERNs[LAYERN - 1]
+						* nvmmeLAYERNs[LAYERN - 1] :
+				nallstubsdisks[DISKN - 1] * nvmmedisks[DISKN - 1];
 // Total number of VMs for TE in a whole sector
 constexpr auto ntotvmte =
-		LAYER != 0 ?
-				nallstubslayers[LAYER - 1] * nvmtelayers[LAYER - 1] :
-				nallstubsdisks[DISK - 1] * nvmtedisks[DISK - 1];
+		LAYERN != 0 ?
+				nallstubsLAYERNs[LAYERN - 1] * nvmteLAYERNs[LAYERN - 1] :
+				nallstubsdisks[DISKN - 1] * nvmtedisks[DISKN - 1];
 
 //constexpr int nallcopies = 6; // Number of AllStub memory copies. TODO: Remove hardcoded value
 //constexpr int ntecopies = 3; // Number of TE Inner memory copies. TODO: Remove hardcoded value
@@ -291,8 +292,8 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 	}
 	
 	// Maximum depth of bendtable is 8?
-	#pragma HLS interface ap_bus port=bendtable depth=20
-	#pragma HLS interface ap_bus port=bendtable depth=6
+	// #pragma HLS interface ap_bus port=bendtable depth=20
+	// #pragma HLS interface ap_bus port=bendoverlaptable depth=6
 	
 	// Number of data in each input memory
 	const typename InputStubMemory<INTYPE>::NEntryT zero(0);
@@ -380,19 +381,19 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 		} else if (n_i3) {
 			stubspec = i3->read_mem(bx, read_addr);
 			isSpecialStub = true;
-			negdisk = (DISK) ? true : false;
+			negdisk = (DISKN) ? true : false;
 			--n_i3;
 			if (n_i3 == 0)
 				resetNext = true;
 		} else if (n_i4) {
 			stub = i4->read_mem(bx, read_addr);
-			negdisk = (DISK) ? true : false;
+			negdisk = (DISKN) ? true : false;
 			--n_i4;
 			if (n_i4 == 0)
 				resetNext = true;
 		} else {
 			stub = i5->read_mem(bx, read_addr);
-			negdisk = (DISK) ? true : false;
+			negdisk = (DISKN) ? true : false;
 			--n_i5;
 			if (n_i5 == 0)
 				resetNext = true;
@@ -400,7 +401,7 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 
 
 // If the stub is from a DISK2S module
-		if (isSpecialStub && DISK) {
+		if (isSpecialStub && DISKN) {
 			disk2S = true;
 		}
 
@@ -483,7 +484,7 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 					+ (1 << (nzbits - 1))) >> (nzbits - nbitszfinebintable)); // Make z unsigned and take the top "nbitszfinebintable" bits
 			ap_uint<nbitsrfinebintable> indexr = 0;
 
-			if (DISK) {
+			if (DISKN) {
 				if (negdisk) {
 					indexz = (1 << nbitszfinebintable) - indexz;
 				}
@@ -493,7 +494,7 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 // Take the top "nbitsrfinebintable" bits
 					indexr = r >> (nrbits - nbitsrfinebintable);
 				}
-			} else { // LAYER
+			} else { // LAYERN
 				indexr = ((r + (1 << (nrbits - 1)))
 						>> (nrbits - nbitsrfinebintable)); // Make r unsigned and take the top "nbitsrfinebintable" bits
 			}
@@ -564,25 +565,25 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 			stubTeInner.setIndex(typename VMStubTEInner<OUTTYPE>::VMSTEIID(i));
 
 			constexpr auto vmbits =
-					(LAYER) ? vmbitslayer[LAYER - 1] : vmbitsdisk[DISK - 1]; // Number of bits for VMs
+					(LAYERN) ? vmbitsLAYERN[LAYERN - 1] : vmbitsdisk[DISKN - 1]; // Number of bits for VMs
 			constexpr auto finephibits =
-					(LAYER) ? nfinephibarrelinner : nfinephidiskinner; // Number of bits for finephi
+					(LAYERN) ? nfinephibarrelinner : nfinephidiskinner; // Number of bits for finephi
 
 // The z/r information bits saved for TE Inner memories.
-// Which VMs to look at in the outer layer.
+// Which VMs to look at in the outer LAYERN.
 // Note: not the z/r coordinate for the inner stub
 // Called binlookup in emulation
 			int rzbits;
 
-// LAYER
-			if (LAYER != 0) {
+// LAYERN
+			if (LAYERN != 0) {
 
-				constexpr auto zbins = (1 << nzbitsinnertablelayer); // Number of bins in z
-				constexpr auto rbins = (1 << nrbitsinnertablelayer); // Number of bins in r
-				ap_uint<nzbitsinnertablelayer> zbin = (z + (1 << (nzbits - 1)))
-						>> (nzbits - nzbitsinnertablelayer); // Make z positive and take the 7 (nzbitsinnertablelayer) MSBs
-				ap_uint<nrbitsinnertablelayer> rbin = (r + (1 << (nrbits - 1)))
-						>> (nrbits - nrbitsinnertablelayer);
+				constexpr auto zbins = (1 << nzbitsinnertableLAYERN); // Number of bins in z
+				constexpr auto rbins = (1 << nrbitsinnertableLAYERN); // Number of bins in r
+				ap_uint<nzbitsinnertableLAYERN> zbin = (z + (1 << (nzbits - 1)))
+						>> (nzbits - nzbitsinnertableLAYERN); // Make z positive and take the 7 (nzbitsinnertableLAYERN) MSBs
+				ap_uint<nrbitsinnertableLAYERN> rbin = (r + (1 << (nrbits - 1)))
+						>> (nrbits - nrbitsinnertableLAYERN);
 
 				int index = zbin * rbins + rbin; // Index for LUT
 
@@ -592,13 +593,13 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 				stubTeInner.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits));
 
-			} else { // DISKS
-				assert(DISK != 0);
+			} else { // DISKNS
+				assert(DISKN != 0);
 
 				constexpr int zbins = (1 << nzbitsinnertabledisk); // Number of bins in z
 				constexpr int rbins = (1 << nrbitsinnertabledisk); // Number of bins in r
 				ap_uint<nzbitsinnertabledisk> zbin = (z + (1 << (nzbits - 1)))
-						>> (nzbits - nzbitsinnertabledisk); // Make z positive and take the 7 (nzbitsinnertablelayer) MSBs
+						>> (nzbits - nzbitsinnertabledisk); // Make z positive and take the 7 (nzbitsinnertableLAYERN) MSBs
 				ap_uint<nrbitsinnertabledisk> rbin = r
 						>> (nrbits - nrbitsinnertabledisk);
 
@@ -649,32 +650,32 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 // OVERLAP
 		if (olmask != 0) {
 
-			assert(LAYER == 1 || LAYER == 2); // Make sure that only layer 1 and 2 are overlapped
+			assert(LAYERN == 1 || LAYERN == 2); // Make sure that only LAYERN 1 and 2 are overlapped
 
-			constexpr auto zbins = (1 << nzbitsoverlaptable); // Number of bins in z
-			constexpr auto rbins = (1 << nrbitsoverlaptable); // Number of bins in r
-			ap_uint<nzbitsoverlaptable> zbin = (z + (1 << (nzbits - 1)))
-					>> (nzbits - nzbitsoverlaptable); // Make z positive and take the 7 MSBs
-			ap_uint<nrbitsoverlaptable> rbin = (r + (1 << (nrbits - 1)))
-					>> (nrbits - nrbitsoverlaptable);
+			constexpr auto zbins = (1 << nzbitsrzbitsoverlaptable); // Number of bins in z
+			constexpr auto rbins = (1 << nrbitsrzbitsoverlaptable); // Number of bins in r
+			ap_uint<nzbitsrzbitsoverlaptable> zbin = (z + (1 << (nzbits - 1)))
+					>> (nzbits - nzbitsrzbitsoverlaptable); // Make z positive and take the 7 MSBs
+			ap_uint<nrbitsrzbitsoverlaptable> rbin = (r + (1 << (nrbits - 1)))
+					>> (nrbits - nrbitsrzbitsoverlaptable);
 
-			int index = zbin * rbins + rbin; // Index for overlaptable
+			int index = zbin * rbins + rbin; // Index for rzbitsoverlaptable
 
-			int overlap = overlaptable[index];
+			int overlap = rzbitsoverlaptable[index];
 
 			if (overlap != 1023) { // which is like "-1" if we had signed stuff...
 
 				constexpr auto nvmol =
-						(LAYER) ? nallstubslayers[LAYER - 1] * 2 : 0; // Always 2 overlap vms?
+						(LAYERN) ? nallstubsLAYERNs[LAYERN - 1] * 2 : 0; // Always 2 overlap vms?
 
 				VMStubTEInner<BARRELOL> stubOL;
 
-// 16 overlap vms per layer
+// 16 overlap vms per LAYERN
 				auto iphiRaw = iphivmRaw<INTYPE>(stubPhi) >> 1; // Top 4 bits of phi
 				const ap_ufixed<4, 3> d2 = nvmol / 16.; // Some normalisation thing
 				int ivm = iphiRaw * d2; // Which VM it belongs to
 
-				constexpr auto vmbits = (LAYER) ? vmbitsoverlap[LAYER - 1] : 0;
+				constexpr auto vmbits = (LAYERN) ? vmbitsoverlap[LAYERN - 1] : 0;
 
 				stubOL.setBend(bend);
 				stubOL.setIndex(typename VMStubTEInner<BARRELOL>::VMSTEIID(i));
@@ -699,7 +700,7 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 					int bendindex = memindex*MAXNTEOL;
 					for (int n = 0; n < MAXNTEOL; n++) {
 						#pragma HLS UNROLL
-						bool passbend = bendextratable[bendindex+n][bend];
+						bool passbend = bendoverlaptable[bendindex+n][bend];
 						if (passbend) {
 							olMemories[memindex][n].write_mem(bx, stubOL, addrCountOL[memindex][n]);
 							addrCountOL[memindex][n] += 1;
@@ -725,22 +726,22 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 			ap_uint<TEBinsBits> bin; // 3 bits, i.e. max 8 bins within each VM
 
 			constexpr auto vmbits =
-					(LAYER) ? vmbitslayer[LAYER - 1] : vmbitsdisk[DISK - 1]; // Number of bits for VMs
+					(LAYERN) ? vmbitsLAYERN[LAYERN - 1] : vmbitsdisk[DISKN - 1]; // Number of bits for VMs
 			constexpr auto finephibits =
-					(LAYER) ? nfinephibarrelouter : nfinephidiskouter; // Number of bits for finephi
+					(LAYERN) ? nfinephibarrelouter : nfinephidiskouter; // Number of bits for finephi
 
-// LAYER
-			if (LAYER != 0) {
+// LAYERN
+			if (LAYERN != 0) {
 
 				stubTeOuter.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits)); // is this the right vmbits
 
-				constexpr auto zbins = (1 << nzbitsoutertablelayer); // Number of bins in z
-				constexpr auto rbins = (1 << nrbitsoutertablelayer); // Number of bins in r
-				ap_uint<nzbitsoutertablelayer> zbin = (z + (1 << (nzbits - 1)))
-						>> (nzbits - nzbitsoutertablelayer); // Make z positive and take the 7 MSBs
-				ap_uint<nrbitsoutertablelayer> rbin = (r + (1 << (nrbits - 1)))
-						>> (nrbits - nrbitsoutertablelayer);
+				constexpr auto zbins = (1 << nzbitsoutertableLAYERN); // Number of bins in z
+				constexpr auto rbins = (1 << nrbitsoutertableLAYERN); // Number of bins in r
+				ap_uint<nzbitsoutertableLAYERN> zbin = (z + (1 << (nzbits - 1)))
+						>> (nzbits - nzbitsoutertableLAYERN); // Make z positive and take the 7 MSBs
+				ap_uint<nrbitsoutertableLAYERN> rbin = (r + (1 << (nrbits - 1)))
+						>> (nrbits - nrbitsoutertableLAYERN);
 
 // Find the VM bit information in rzbits LUT
 // First 3 MSB is the binning in z, and the 3 LSB is the fine z within a bin
@@ -753,8 +754,8 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 				ap_uint<3> zfine = rzbits & 7;
 				stubTeOuter.setFineZ(zfine);
 
-			} else { // DISKS
-				assert(DISK != 0);
+			} else { // DISKNS
+				assert(DISKN != 0);
 
 				stubTeOuter.setFinePhi(
 						iphivmFineBins<INTYPE>(stubPhi, vmbits, finephibits));
@@ -775,7 +776,7 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 // First 2 MSB is the binning in r, and the 3 LSB is the fine r within a bin
 				auto index = rbin * zbins + zbin; // Index for LUT
 				ap_uint<5> rzbits =
-						(DISK == 1) ? overlaptable[index] : rzbitstable[index];
+						(DISKN == 1) ? rzbitsoverlaptable[index] : rzbitstable[index];
 
 				bin = rzbits >> 3; // Remove the 3 LSBs, i.e. the finebin bits
 
@@ -805,8 +806,8 @@ TEI_CLEAR:	for (int i = 0; i < n_te; i++) {
 					for (int n = 0; n < MAXNTEO; n++) {
 						#pragma HLS UNROLL
 						bool passbend =
-								(DISK == 1) ?
-										bendextratable[bendindex+n][bend] :
+								(DISKN == 1) ?
+										bendoverlaptable[bendindex+n][bend] :
 										bendtable[bendindex+n][bend]; // Check if stub passes bend cut
 						if (passbend) {
 							teoMemories[memindex][n].write_mem(bx, bin, stubTeOuter);

@@ -14,23 +14,26 @@ void VMRouterTop(BXType bx,
 		VMStubTEInnerMemory<BARRELPS> teiMemories[4][5],
 		VMStubTEInnerMemory<BARRELOL> olMemories[2][3]) {
 
+//////////////////////////////////
+// Variables for that are specified with regards to the test bench
 
-// Variables for that are specified with regards to the test bench, should be set somewhere else
-// The first memory is represented by the LSB
 	constexpr int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	constexpr int disk(0); // Which disk number the data is coming from, 0 if not disk
 	
-	constexpr int nall(6);
-	constexpr int ntei(5); // Number of TEInner memory copies 
-	constexpr int nteol(3);
-	constexpr int nteo(1);
+	// Maximum number of memory "copies"
+	constexpr int ncpall(6); // Allstub memory
+	constexpr int ncptei(5); // TE Inner memories
+	constexpr int ncpteol(3); // TE Inner Overlap memories
+	constexpr int ncpteo(1); // Can't use 0 evne if we don't have any TE Outer
 	
-	static const ap_uint<6> imask(0xF); // Mask of which inputs that are being used
-	static const ap_uint<32> memask(0x000F0000UL); // Mask of which memories that are being used.
-	static const ap_uint<32> teimask(0x000F0000UL); // Mask of which TE Inner memories that are used
-	static const ap_uint<16> olmask(0x300); // Mask of which TE Outer memories that are used
-	static const ap_uint<32> teomask(0x0); // Mask of which TE Inner memories that are used
-	
+	// Masks of which memories that are being used. The first memory is represented by the LSB
+	static const ap_uint<6> imask(0xF); // Input memories
+	static const ap_uint<32> memask(0x000F0000UL); // ME memories
+	static const ap_uint<32> teimask(0x000F0000UL); // TE Inner memories
+	static const ap_uint<16> olmask(0x300); // TE Inner Overlap memories
+	static const ap_uint<32> teomask(0x0); // TE Outer memories
+
+
 ///////////////////////////
 // Open Lookup tables
 
@@ -53,7 +56,7 @@ void VMRouterTop(BXType bx,
 
 // LUT with the Z/R bits for TE Overlap memories
 // Only used for Layer 1 and 2, and Disk 1
-	static const int overlaptable[1024] =// 10 bits used for LUT
+	static const int rzbitsoverlaptable[1024] =// 10 bits used for LUT
 #include "../emData/MemPrints/Tables/VMTableInnerL1D1.tab"
 	;
 
@@ -151,33 +154,33 @@ void VMRouterTop(BXType bx,
 						tmptable4_n1, tmptable4_n2, tmptable4_n3, tmptable4_n4, tmptable4_n5};
 
 	// TE Overlap Memory 1
-						ap_uint<1> tmpextratable1_n1[] =
+						ap_uint<1> tmpoverlaptable1_n1[] =
 	#include "../emData/MemPrints/Tables/VMSTE_L1PHIQ9n1_vmbendcut.tab"
 						;
 
-						ap_uint<1> tmpextratable1_n2[] =
+						ap_uint<1> tmpoverlaptable1_n2[] =
 	#include "../emData/MemPrints/Tables/VMSTE_L1PHIQ9n2_vmbendcut.tab"
 						;
 
-						ap_uint<1> tmpextratable1_n3[] =
+						ap_uint<1> tmpoverlaptable1_n3[] =
 	#include "../emData/MemPrints/Tables/VMSTE_L1PHIQ9n3_vmbendcut.tab"
 						;
 
 	// TE Overlap Memory 2
-						ap_uint<1> tmpextratable2_n1[] =
+						ap_uint<1> tmpoverlaptable2_n1[] =
 	#include "../emData/MemPrints/Tables/VMSTE_L1PHIQ10n1_vmbendcut.tab"
 						;
 
-						ap_uint<1> tmpextratable2_n2[] =
+						ap_uint<1> tmpoverlaptable2_n2[] =
 	#include "../emData/MemPrints/Tables/VMSTE_L1PHIQ10n2_vmbendcut.tab"
 						;
 
-						ap_uint<1> tmpextratable2_n3[] =
+						ap_uint<1> tmpoverlaptable2_n3[] =
 	#include "../emData/MemPrints/Tables/VMSTE_L1PHIQ10n3_vmbendcut.tab"
 						
-					static const ap_uint<1>* bendextratable[] = {
-						tmpextratable1_n1, tmpextratable1_n2, tmpextratable1_n3,
-						tmpextratable2_n1, tmpextratable2_n2, tmpextratable2_n3}; // Only used for overlap
+					static const ap_uint<1>* bendoverlaptable[] = {
+						tmpoverlaptable1_n1, tmpoverlaptable1_n2, tmpoverlaptable1_n3,
+						tmpoverlaptable2_n1, tmpoverlaptable2_n2, tmpoverlaptable2_n3}; // Only used for overlap
 
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
@@ -188,7 +191,7 @@ void VMRouterTop(BXType bx,
 	
 	#pragma HLS resource variable=finebintable latency=2
 	#pragma HLS resource variable=rzbitstable latency=2
-	#pragma HLS resource variable=overlaptable latency=2
+	#pragma HLS resource variable=rzbitsoverlaptable latency=2
 	#pragma HLS resource variable=bendtable latency=2
 	//phicorrtable and bendtable seems to be using LUTs as it's relatively small?
 	
@@ -196,10 +199,10 @@ void VMRouterTop(BXType bx,
 /////////////////////////
 // Main function
 
-// template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK>
+// template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
 // Disks have two types of input
-					VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk,  nall, ntei, nteol, nteo>
-					(bx, finebintable, phicorrtable, rzbitstable, bendtable, bendextratable, overlaptable,
+					VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk,  ncpall, ncptei, ncpteol, ncpteo>
+					(bx, finebintable, phicorrtable, rzbitstable, rzbitsoverlaptable, bendtable, bendoverlaptable,
 					imask, i0, i1, i2, i3, nullptr, nullptr,
 					allStub,
 // ME memories
