@@ -1,4 +1,4 @@
-#include "VMRouterTop_D1.hh"
+#include "VMRouterTop_D1.h"
 
 // VMRouter Top Function for Disk 1, AllStub region A
 
@@ -37,20 +37,31 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 	///////////////////////////
 	// Open Lookup tables
 
-	// lookup table - 2^nbinsfinbinetable entries actually filled
-	// Table is filled with numbers between 0 and 7 (and -1): the finer region each z/r bin is divided into.
+// LUT with the finer region each z/r bin is divided into.
 		static const int finebintable[] =
 	#include "../emData/MemPrints/Tables/VMR_D1PHIA_finebin.tab"
 		;
 
-		// Only used by layers. LUT with phi corrections for different r and bend
+// LUT with phi corrections to the nominal radius. Only used by layers.
+// Values are determined by the radius and the bend of the stub.
 		static const int phicorrtable[] =
 	#include "../emData/MemPrints/Tables/VMPhiCorrL1.txt"
 		;
-
+		
+// LUT with the Z/R bits for TE memories
+// Todo: comment on what the bits represent
 		static const int rzbitstable[2048] = // 11 bits used for LUT
 	#include "../emData/MemPrints/Tables/VMTableInnerD1D2.tab" // Only for Layer 1
+		;
+
+// LUT with the Z/R bits for TE Overlap memories
+// Only used for Layer 1 and 2, and Disk 1
+		static const int rzbitsextratable[] = // 10 bits used for LUT
+	#include "../emData/MemPrints/Tables/VMTableOuterD1.tab" // Only for Layer 1
 						;
+
+// LUT with bend-cuts for the TE memories
+// The cuts are different depending on the memory version (nX)
 
 	// Bendcut tables
 	ap_uint<1> tmptable1_n1[] =
@@ -99,94 +110,97 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 		tmptable4_n1, tmptable4_n2, tmptable4_n3};
 
 
-	ap_uint<1> tmpoverlaptable1_n1[] =
+	ap_uint<1> tmpextratable1_n1[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX1n1_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable1_n2[] =
+	ap_uint<1> tmpextratable1_n2[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX1n2_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable1_n3[] =
+	ap_uint<1> tmpextratable1_n3[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX1n3_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable1_n4[8] = {0};
-	ap_uint<1> tmpoverlaptable1_n5[8] = {0};
+	ap_uint<1> tmpextratable1_n4[8] = {0};
+	ap_uint<1> tmpextratable1_n5[8] = {0};
 
-	ap_uint<1> tmpoverlaptable2_n1[] =
+	ap_uint<1> tmpextratable2_n1[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n1_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable2_n2[] =
+	ap_uint<1> tmpextratable2_n2[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n2_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable2_n3[] =
+	ap_uint<1> tmpextratable2_n3[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n3_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable2_n4[] =
+	ap_uint<1> tmpextratable2_n4[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n4_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable2_n5[8] = {0};
+	ap_uint<1> tmpextratable2_n5[8] = {0};
 
 
-	ap_uint<1> tmpoverlaptable3_n1[] =
+	ap_uint<1> tmpextratable3_n1[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n1_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable3_n2[] =
+	ap_uint<1> tmpextratable3_n2[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n2_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable3_n3[] =
+	ap_uint<1> tmpextratable3_n3[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n3_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable3_n4[] =
+	ap_uint<1> tmpextratable3_n4[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n4_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable3_n5[] =
+	ap_uint<1> tmpextratable3_n5[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n5_vmbendcut.tab"
 	;
 
-	ap_uint<1> tmpoverlaptable4_n1[] =
+	ap_uint<1> tmpextratable4_n1[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n1_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable4_n2[] =
+	ap_uint<1> tmpextratable4_n2[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n2_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable4_n3[] =
+	ap_uint<1> tmpextratable4_n3[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n3_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable4_n4[] =
+	ap_uint<1> tmpextratable4_n4[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n4_vmbendcut.tab"
 	;
-	ap_uint<1> tmpoverlaptable4_n5[] =
+	ap_uint<1> tmpextratable4_n5[] =
 	#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n5_vmbendcut.tab"
 	;
 	
 
 	static const ap_uint<1>* bendextratable[] = {
-		tmpoverlaptable1_n1, tmpoverlaptable1_n2, tmpoverlaptable1_n3, tmpoverlaptable1_n4, tmpoverlaptable1_n5,
-		tmpoverlaptable2_n1, tmpoverlaptable2_n2, tmpoverlaptable2_n3, tmpoverlaptable2_n4, tmpoverlaptable2_n5,
-		tmpoverlaptable3_n1, tmpoverlaptable3_n2, tmpoverlaptable3_n3, tmpoverlaptable3_n4, tmpoverlaptable3_n5,
-		tmpoverlaptable4_n1, tmpoverlaptable4_n2, tmpoverlaptable4_n3, tmpoverlaptable4_n4, tmpoverlaptable4_n5};
+		tmpextratable1_n1, tmpextratable1_n2, tmpextratable1_n3, tmpextratable1_n4, tmpextratable1_n5,
+		tmpextratable2_n1, tmpextratable2_n2, tmpextratable2_n3, tmpextratable2_n4, tmpextratable2_n5,
+		tmpextratable3_n1, tmpextratable3_n2, tmpextratable3_n3, tmpextratable3_n4, tmpextratable3_n5,
+		tmpextratable4_n1, tmpextratable4_n2, tmpextratable4_n3, tmpextratable4_n4, tmpextratable4_n5};
 
 
-	// Overlap LUT
-		static const int rzbitsoverlaptable[] = // 10 bits used for LUT
-	#include "../emData/MemPrints/Tables/VMTableOuterD1.tab" // Only for Layer 1
-						;
 
 	// Takes 2 clock cycles before on gets data, used at high frequencies
 		#pragma HLS resource variable=i0->get_mem() latency=2
 		#pragma HLS resource variable=i1->get_mem() latency=2
 		#pragma HLS resource variable=i2->get_mem() latency=2
 		#pragma HLS resource variable=i3->get_mem() latency=2
+		#pragma HLS resource variable=i4->get_mem() latency=2
+		#pragma HLS resource variable=i5->get_mem() latency=2
 		
 		#pragma HLS resource variable=finebintable latency=2
 		#pragma HLS resource variable=rzbitstable latency=2
-		#pragma HLS resource variable=rzbitsoverlaptable latency=2
-		#pragma HLS resource variable=bendtable latency=2
+		#pragma HLS resource variable=rzbitsextratable latency=2
+		//#pragma HLS resource variable=bendtable latency=2
+		//#pragma HLS resource variable=bendextratable latency=2
 		//phicorrtable and bendtable seems to be using LUTs as it's relatively small?
 
 
 	VMRouter<DISKPS, DISK2S, DISK, layer, disk, nall, ntei, nteol, nteo>
-	(bx, finebintable, phicorrtable, rzbitstable, rzbitsoverlaptable, bendtable, bendextratable,
+	(bx, finebintable, phicorrtable, 
+		rzbitstable, nullptr, rzbitsextratable, 
+		bendtable, nullptr, bendextratable,
+// Input memories
 		imask, i0,i1,i2,i3,i4,i5,//,i6,i7,
+// AllStub memories
 		allStub,
 // ME memories
 		memask, meMemories,
