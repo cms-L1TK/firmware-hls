@@ -1,5 +1,5 @@
-#ifndef INPUTSTUBMEMORY_HH
-#define INPUTSTUBMEMORY_HH
+#ifndef TrackletAlgorithm_InputStubMemory_h
+#define TrackletAlgorithm_InputStubMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

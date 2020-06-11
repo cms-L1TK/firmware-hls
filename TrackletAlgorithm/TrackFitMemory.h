@@ -1,5 +1,5 @@
-#ifndef TRACKFITMEMORY_HH
-#define TRACKFITMEMORY_HH
+#ifndef TrackletAlgorithm_TrackFitMemory_h
+#define TrackletAlgorithm_TrackFitMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

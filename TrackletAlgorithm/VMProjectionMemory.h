@@ -1,5 +1,5 @@
-#ifndef VMPROJECTIONMEMORY_HH
-#define VMPROJECTIONMEMORY_HH
+#ifndef TrackletAlgorithm_VMProjectionMemory_h
+#define TrackletAlgorithm_VMProjectionMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

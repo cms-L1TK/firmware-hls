@@ -4,7 +4,9 @@
 
 // First tracklet 2.0 version -- December 2018 -- wittich
 
-#pragma once
+#ifndef TrackletAlgorithm_VMRouter_h
+#define TrackletAlgorithm_VMRouter_h
+
 #include "ap_int.h"
 
 #include "Constants.h"
@@ -616,3 +618,5 @@ void VMRouter(const BXType bx,
 	} // outside loop
 
 } // VMRouter
+
+#endif

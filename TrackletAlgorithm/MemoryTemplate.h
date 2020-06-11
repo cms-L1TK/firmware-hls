@@ -1,6 +1,6 @@
 // Class template for memory module
-#ifndef MEMORYTEMPLATE_HH
-#define MEMORYTEMPLATE_HH
+#ifndef TrackletAlgorithm_MemoryTemplate_h
+#define TrackletAlgorithm_MemoryTemplate_h
 
 #include <iostream>
 

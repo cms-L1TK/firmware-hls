@@ -1,5 +1,5 @@
-#ifndef PROJECTIONROUTER_HH
-#define PROJECTIONROUTER_HH
+#ifndef TrackletAlgorithm_ProjectionRouter_h
+#define TrackletAlgorithm_ProjectionRouter_h
 
 // Projection Router
 #include "Constants.h"
