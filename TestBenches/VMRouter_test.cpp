@@ -7,7 +7,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 100;  //number of events to run
+const int nevents = 1;  //number of events to run
 
 using namespace std;
 
@@ -20,15 +20,15 @@ int main()
 
   ///////////////////////////
   // input memories
-  	static InputStubMemory<BARRELPS> ilink1;
-  	static InputStubMemory<BARRELPS> ilink2;
-  	static InputStubMemory<BARRELPS> ilink3;
-  	static InputStubMemory<BARRELPS> ilink4;
-  	static InputStubMemory<BARRELPS> ilink5;
-  	static InputStubMemory<BARRELPS> ilink6;
+  	static InputStubMemory<BARRELPS> inputStub1;
+  	static InputStubMemory<BARRELPS> inputStub2;
+  	static InputStubMemory<BARRELPS> inputStub3;
+  	static InputStubMemory<BARRELPS> inputStub4;
+  	static InputStubMemory<BARRELPS> inputStub5;
+  	static InputStubMemory<BARRELPS> inputStub6;
 
   // output memories
-  static AllStubMemory<BARRELPS> allstub[6];
+  static AllStubMemory<BARRELPS> allStub[6];
   // ME memories
   static VMStubMEMemory<BARRELPS> meMemories[4];
 	// TE Inner memories
@@ -41,36 +41,36 @@ int main()
 // open input files
 	cout << "Open files..." << endl;
 
-  ifstream fin_ilink1;
-  bool validin1 = openDataFile(fin_ilink1, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
+  ifstream fin_inputstub1;
+  bool validin1 = openDataFile(fin_inputstub1, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
   if (not validin1) return -1;
 
-  ifstream fin_ilink2;
-  bool validin2 = openDataFile(fin_ilink2, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_2_B_04.dat");
+  ifstream fin_inputstub2;
+  bool validin2 = openDataFile(fin_inputstub2, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_2_B_04.dat");
   if (not validin2) return -1;
 
-  ifstream fin_ilink3;
-  bool validin3 = openDataFile(fin_ilink3, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
+  ifstream fin_inputstub3;
+  bool validin3 = openDataFile(fin_inputstub3, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_1_B_04.dat");
   if (not validin3) return -1;
 
-  ifstream fin_ilink4;
-  bool validin4 = openDataFile(fin_ilink4, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
+  ifstream fin_inputstub4;
+  bool validin4 = openDataFile(fin_inputstub4, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
   if (not validin4) return -1;
 
-  // ifstream fin_ilink5;
-  // bool validin5 = openDataFile(fin_ilink5, "MemPrints/Trackleilinkections_ILINK_L1L2J_L3PHIC_04.dat");
+  // ifstream fin_inputstub5;
+  // bool validin5 = openDataFile(fin_inputstub5, "MemPrints/TrackleinputStubections_ILINK_L1L2J_L3PHIC_04.dat");
   // if (not validin5) return -1;
 
-  // ifstream fin_ilink6;
-  // bool validin6 = openDataFile(fin_ilink6, "MemPrints/Trackleilinkections_ILINK_L5L6B_L3PHIC_04.dat");
+  // ifstream fin_inputstub6;
+  // bool validin6 = openDataFile(fin_inputstub6, "MemPrints/TrackleinputStubections_ILINK_L5L6B_L3PHIC_04.dat");
   // if (not validin6) return -1;
 
-  // ifstream fin_ilink7;
-  // bool validin7 = openDataFile(fin_ilink7, "MemPrints/Trackleilinkections_ILINK_L5L6C_L3PHIC_04.dat");
+  // ifstream fin_inputstub7;
+  // bool validin7 = openDataFile(fin_inputstub7, "MemPrints/TrackleinputStubections_ILINK_L5L6C_L3PHIC_04.dat");
   // if (not validin7) return -1;
 
-  // ifstream fin_ilink8;
-  // bool validin8 = openDataFile(fin_ilink8, "MemPrints/Trackleilinkections_ILINK_L5L6D_L3PHIC_04.dat");
+  // ifstream fin_inputstub8;
+  // bool validin8 = openDataFile(fin_inputstub8, "MemPrints/TrackleinputStubections_ILINK_L5L6D_L3PHIC_04.dat");
   // if (not validin8) return -1;
 
   ///////////////////////////
@@ -244,111 +244,83 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    // read event and write to memories
-    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink1, fin_ilink1, ievt);
-    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink2, fin_ilink2, ievt);
-    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink3, fin_ilink3, ievt);
-    writeMemFromFile<InputStubMemory<BARRELPS>>(ilink4, fin_ilink4, ievt);
-    // writeMemFromFile<InputStubMemory>(ilink5, fin_ilink5, ievt);
-    // writeMemFromFile<InputStubMemory>(ilink6, fin_ilink6, ievt);
-    // writeMemFromFile<InputStubMemory>(ilink7, fin_ilink7, ievt);
-    // writeMemFromFile<InputStubMemory>(ilink8, fin_ilink8, ievt);
+  // read event and write to memories
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub1, fin_inputstub1, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub2, fin_inputstub2, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub3, fin_inputstub3, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub4, fin_inputstub4, ievt);
+  // writeMemFromFile<InputStubMemory>(inputStub5, fin_inputstub5, ievt);
+  // writeMemFromFile<InputStubMemory>(inputStub6, fin_inputstub6, ievt);
+  // writeMemFromFile<InputStubMemory>(inputStub7, fin_inputstub7, ievt);
+  // writeMemFromFile<InputStubMemory>(inputStub8, fin_inputstub8, ievt);
 
-    // bx - bunch crossing
-    BXType bx = ievt;
-    BXType bx_out;
+  // bx - bunch crossing
+  BXType bx = ievt;
+  BXType bx_out;
 
-    // Unit Under Test
-		// Unit Under Test
-				VMRouterTop(bx, &ilink1, &ilink2, &ilink3, &ilink4,
-						allstub, meMemories, teiMemories, olMemories);
+  // Unit Under Test
+	VMRouterTop(bx, &inputStub1, &inputStub2, &inputStub3, &inputStub4,
+			allStub, meMemories, teiMemories, olMemories);
 
-    // compare the computed outputs with the expected ones
-    // add 1 per stub that is incorrect
-    bool truncation = false;
+  // compare the computed outputs with the expected ones
+  // add 1 per stub that is incorrect
+  bool truncation = false;
 
-    // AllStub
-    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub[0], fout_allstub_n1, ievt,
-                                                   "AllStub", truncation);
-    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub[1], fout_allstub_n2, ievt,
-                                                  "AllStub", truncation);
-    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub[2], fout_allstub_n3, ievt,
-                                                  "AllStub", truncation);
-    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub[3], fout_allstub_n4, ievt,
-                                                  "AllStub", truncation);
-    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub[4], fout_allstub_n5, ievt,
-                                                  "AllStub", truncation);
-    err += compareMemWithFile<AllStubMemory<BARRELPS>>(allstub[5], fout_allstub_n6, ievt,
-                                                  "AllStub", truncation);
+  // AllStub
+  err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[0], fout_allstub_n1, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[1], fout_allstub_n2, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[2], fout_allstub_n3, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[3], fout_allstub_n4, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[4], fout_allstub_n5, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[5], fout_allstub_n6, ievt, "AllStub", truncation);
 
-    // ME Memories
-    // VMStubME1
-    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[0], fout_vmstubme1, ievt,
-                                                  "VMStubME17", truncation);
-    // VMStubME2
-    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[1], fout_vmstubme2, ievt,
-                                                  "VMStubME18", truncation);
-    // VMStubME3
-    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[2], fout_vmstubme3, ievt,
-                                                  "VMStubME19", truncation);
-    // VMStubME4
-    err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[3], fout_vmstubme4, ievt,
-                                                  "VMStubME20", truncation);
-//    // VMStubME5
-//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme5, fout_vmstubme5, ievt,
-//                                                  "VMStubME5", truncation);
-//    // VMStubME6
-//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme6, fout_vmstubme6, ievt,
-//                                                  "VMStubME6", truncation);
-//    // VMStubME7
-//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme7, fout_vmstubme7, ievt,
-//                                                  "VMStubME7", truncation);
-//    // VMStubME8
-//    err += compareMemWithFile<VMStubMEMemory<BARRELPS>>(vmstubme8, fout_vmstubme8, ievt,
-//                                                  "VMStubME8", truncation);
+  // ME Memories
+  // VMStubME1
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[0], fout_vmstubme1, ievt, "VMStubME17", truncation);
+  // VMStubME2
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[1], fout_vmstubme2, ievt, "VMStubME18", truncation);
+  // VMStubME3
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[2], fout_vmstubme3, ievt, "VMStubME19", truncation);
+  // VMStubME4
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[3], fout_vmstubme4, ievt, "VMStubME20", truncation);
 
-// TE Memories
-//VMStubTEInner1
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][0], fout_vmstubtei1_n1, ievt,
-                                              "VMStubTEInner17", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][1], fout_vmstubtei1_n2, ievt,
-                                              "VMStubTEInner17", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][2], fout_vmstubtei1_n3, ievt,
-                                              "VMStubTEInner17", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][3], fout_vmstubtei1_n4, ievt,
-                                              "VMStubTEInner17", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][4], fout_vmstubtei1_n5, ievt,
-                                              "VMStubTEInner17", truncation);
-// VMStubTEInner2
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][0], fout_vmstubtei2_n1, ievt, "VMStubTEInner18", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][1], fout_vmstubtei2_n2, ievt, "VMStubTEInner18", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][2], fout_vmstubtei2_n3, ievt, "VMStubTEInner18", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][3], fout_vmstubtei2_n4, ievt, "VMStubTEInner18", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][4], fout_vmstubtei2_n5, ievt, "VMStubTEInner18", truncation);
+  // TE Memories
+  //VMStubTEInner1
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][0], fout_vmstubtei1_n1, ievt, "VMStubTEInner17", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][1], fout_vmstubtei1_n2, ievt, "VMStubTEInner17", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][2], fout_vmstubtei1_n3, ievt, "VMStubTEInner17", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][3], fout_vmstubtei1_n4, ievt, "VMStubTEInner17", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][4], fout_vmstubtei1_n5, ievt, "VMStubTEInner17", truncation);
+  // VMStubTEInner2
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][0], fout_vmstubtei2_n1, ievt, "VMStubTEInner18", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][1], fout_vmstubtei2_n2, ievt, "VMStubTEInner18", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][2], fout_vmstubtei2_n3, ievt, "VMStubTEInner18", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][3], fout_vmstubtei2_n4, ievt, "VMStubTEInner18", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[1][4], fout_vmstubtei2_n5, ievt, "VMStubTEInner18", truncation);
 
-// VMStubTEInner3
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][0], fout_vmstubtei3_n1, ievt, "VMStubTEInner19", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][1], fout_vmstubtei3_n2, ievt, "VMStubTEInner19", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][2], fout_vmstubtei3_n3, ievt, "VMStubTEInner19", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][3], fout_vmstubtei3_n4, ievt, "VMStubTEInner19", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][4], fout_vmstubtei3_n5, ievt, "VMStubTEInner19", truncation);
+  // VMStubTEInner3
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][0], fout_vmstubtei3_n1, ievt, "VMStubTEInner19", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][1], fout_vmstubtei3_n2, ievt, "VMStubTEInner19", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][2], fout_vmstubtei3_n3, ievt, "VMStubTEInner19", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][3], fout_vmstubtei3_n4, ievt, "VMStubTEInner19", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][4], fout_vmstubtei3_n5, ievt, "VMStubTEInner19", truncation);
 
-// VMStubTEInner4
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][0], fout_vmstubtei4_n1, ievt, "VMStubTEInner20", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][1], fout_vmstubtei4_n2, ievt, "VMStubTEInner20", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][2], fout_vmstubtei4_n3, ievt, "VMStubTEInner20", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][3], fout_vmstubtei4_n4, ievt, "VMStubTEInner20", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][4], fout_vmstubtei4_n5, ievt, "VMStubTEInner20", truncation);
+  // VMStubTEInner4
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][0], fout_vmstubtei4_n1, ievt, "VMStubTEInner20", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][1], fout_vmstubtei4_n2, ievt, "VMStubTEInner20", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][2], fout_vmstubtei4_n3, ievt, "VMStubTEInner20", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][3], fout_vmstubtei4_n4, ievt, "VMStubTEInner20", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][4], fout_vmstubtei4_n5, ievt, "VMStubTEInner20", truncation);
 
-// TE Inner Overlap memories
-// VMStubTEInner1 Overlap
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[0][0], fout_vmstubteol1_n1, ievt, "VMStubTEOverlap1", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[0][1], fout_vmstubteol1_n2, ievt, "VMStubTEOverlap1", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[0][2], fout_vmstubteol1_n3, ievt, "VMStubTEOverlap1", truncation);
-// VMStubTEInner2 Overlap
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[1][0], fout_vmstubteol2_n1, ievt, "VMStubTEOverlap2", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[1][1], fout_vmstubteol2_n2, ievt, "VMStubTEOverlap2", truncation);
-err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[1][2], fout_vmstubteol2_n3, ievt, "VMStubTEOverlap2", truncation);
+  // TE Inner Overlap memories
+  // VMStubTEInner1 Overlap
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[0][0], fout_vmstubteol1_n1, ievt, "VMStubTEOverlap1", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[0][1], fout_vmstubteol1_n2, ievt, "VMStubTEOverlap1", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[0][2], fout_vmstubteol1_n3, ievt, "VMStubTEOverlap1", truncation);
+  // VMStubTEInner2 Overlap
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[1][0], fout_vmstubteol2_n1, ievt, "VMStubTEOverlap2", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[1][1], fout_vmstubteol2_n2, ievt, "VMStubTEOverlap2", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<BARRELOL>>(olMemories[1][2], fout_vmstubteol2_n3, ievt, "VMStubTEOverlap2", truncation);
 
   } // end of event loop
 

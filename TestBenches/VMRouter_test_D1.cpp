@@ -20,15 +20,15 @@ int main()
 
   ///////////////////////////
   // input memories
-  static InputStubMemory<DISK2S> ilink1;
-  static InputStubMemory<DISKPS> ilink2;
-  static InputStubMemory<DISKPS> ilink3;
-  static InputStubMemory<DISK2S> ilink4;
-  static InputStubMemory<DISKPS> ilink5;
-  static InputStubMemory<DISKPS> ilink6;
+  static InputStubMemory<DISK2S> inputStub1;
+  static InputStubMemory<DISKPS> inputStub2;
+  static InputStubMemory<DISKPS> inputStub3;
+  static InputStubMemory<DISK2S> inputStub4;
+  static InputStubMemory<DISKPS> inputStub5;
+  static InputStubMemory<DISKPS> inputStub6;
 
   // output memories
-  static AllStubMemory<DISK> allstub[6];
+  static AllStubMemory<DISK> allStub[6];
   // ME memories
   static VMStubMEMemory<DISK> meMemories[8];
 	// TE Inner memories
@@ -43,28 +43,28 @@ int main()
   // open input files
   cout << "Open files..." << endl;
 
-  ifstream fin_ilink1;
-  bool validin1 = openDataFile(fin_ilink1, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_2S_5_A_04.dat");
+  ifstream fin_inputstub1;
+  bool validin1 = openDataFile(fin_inputstub1, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_2S_5_A_04.dat");
   if (not validin1) return -1;
 
-  ifstream fin_ilink2;
-  bool validin2 = openDataFile(fin_ilink2, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_PS10G_2_A_04.dat");
+  ifstream fin_inputstub2;
+  bool validin2 = openDataFile(fin_inputstub2, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_PS10G_2_A_04.dat");
   if (not validin2) return -1;
 
-  ifstream fin_ilink3;
-  bool validin3 = openDataFile(fin_ilink3, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_PS5G_4_A_04.dat");
+  ifstream fin_inputstub3;
+  bool validin3 = openDataFile(fin_inputstub3, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_PS5G_4_A_04.dat");
   if (not validin3) return -1;
 
-  ifstream fin_ilink4;
-  bool validin4 = openDataFile(fin_ilink4, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_2S_5_A_04.dat");
+  ifstream fin_inputstub4;
+  bool validin4 = openDataFile(fin_inputstub4, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_2S_5_A_04.dat");
   if (not validin4) return -1;
 
-  ifstream fin_ilink5;
-  bool validin5 = openDataFile(fin_ilink5, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_PS10G_2_A_04.dat");
+  ifstream fin_inputstub5;
+  bool validin5 = openDataFile(fin_inputstub5, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_PS10G_2_A_04.dat");
   if (not validin5) return -1;
 
-  ifstream fin_ilink6;
-  bool validin6 = openDataFile(fin_ilink6, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_PS5G_4_A_04.dat");
+  ifstream fin_inputstub6;
+  bool validin6 = openDataFile(fin_inputstub6, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_PS5G_4_A_04.dat");
   if (not validin6) return -1;
 
 
@@ -289,122 +289,106 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    // read event and write to memories
-    writeMemFromFile<InputStubMemory<DISK2S>>(ilink1, fin_ilink1, ievt);
-    writeMemFromFile<InputStubMemory<DISKPS>>(ilink2, fin_ilink2, ievt);
-    writeMemFromFile<InputStubMemory<DISKPS>>(ilink3, fin_ilink3, ievt);
-    writeMemFromFile<InputStubMemory<DISK2S>>(ilink4, fin_ilink4, ievt);
-    writeMemFromFile<InputStubMemory<DISKPS>>(ilink5, fin_ilink5, ievt);
-    writeMemFromFile<InputStubMemory<DISKPS>>(ilink6, fin_ilink6, ievt);
+  // read event and write to memories
+  writeMemFromFile<InputStubMemory<DISK2S>>(inputStub1, fin_inputstub1, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub2, fin_inputstub2, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub3, fin_inputstub3, ievt);
+  writeMemFromFile<InputStubMemory<DISK2S>>(inputStub4, fin_inputstub4, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub5, fin_inputstub5, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub6, fin_inputstub6, ievt);
 
-    // bx
-    BXType bx = ievt;
-    BXType bx_out;
+  // bx
+  BXType bx = ievt;
+  BXType bx_out;
 
-    // Unit Under Test
-    VMRouterTop(bx,
-    		&ilink1, &ilink2, &ilink3, &ilink4, &ilink5, &ilink6,
-        allstub, meMemories, teiMemories, teoMemories
-		);
+  // Unit Under Test
+  VMRouterTop(bx,
+  		&inputStub1, &inputStub2, &inputStub3, &inputStub4, &inputStub5, &inputStub6,
+      allStub, meMemories, teiMemories, teoMemories
+	);
 
-    // compare the computed outputs with the expected ones
-    bool truncation = false;
-    // AllStub
-    // err += compareMemWithFile<AllStubMemory<DISK>>(allstub[0], fout_allstub_n1, ievt,
-    //                                                "AllStub", truncation);
-    // err += compareMemWithFile<AllStubMemory<DISK>>(allstub[1], fout_allstub_n2, ievt,
-    //                                               "AllStub", truncation);
-    // err += compareMemWithFile<AllStubMemory<DISK>>(allstub[2], fout_allstub_n3, ievt,
-    //                                               "AllStub", truncation);
-    // err += compareMemWithFile<AllStubMemory<DISK>>(allstub[3], fout_allstub_n4, ievt,
-    //                                               "AllStub", truncation);
-    // err += compareMemWithFile<AllStubMemory<DISK>>(allstub[4], fout_allstub_n5, ievt,
-    //                                               "AllStub", truncation);
-    // err += compareMemWithFile<AllStubMemory<DISK>>(allstub[5], fout_allstub_n6, ievt,
-    //                                               "AllStub", truncation);
-    // 
-    // // VMStubME1
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[0], fout_vmstubme1, ievt,"VMStubME1", truncation);
-    // 
-    // // VMStubME2
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[1], fout_vmstubme2, ievt,"VMStubME2", truncation);
-    // 
-    // // VMStubME3
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[2], fout_vmstubme3, ievt,"VMStubME3", truncation);
-    // 
-    // // VMStubME4
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[3], fout_vmstubme4, ievt,"VMStubME4", truncation);
-    // 
-    // // VMStubME5
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[4], fout_vmstubme5, ievt,"VMStubME5", truncation);
-    // 
-    //  // VMStubME6
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[5], fout_vmstubme6, ievt,"VMStubME6", truncation);
-    // 
-    //  // VMStubME7
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[6], fout_vmstubme7, ievt,"VMStubME7", truncation);
-    // 
-    //  // VMStubME8
-    // err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[7], fout_vmstubme8, ievt,"VMStubME8", truncation);
+  // compare the computed outputs with the expected ones
+  bool truncation = false;
+  // AllStub
+  err += compareMemWithFile<AllStubMemory<DISK>>(allStub[0], fout_allstub_n1, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<DISK>>(allStub[1], fout_allstub_n2, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<DISK>>(allStub[2], fout_allstub_n3, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<DISK>>(allStub[3], fout_allstub_n4, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<DISK>>(allStub[4], fout_allstub_n5, ievt, "AllStub", truncation);
+  err += compareMemWithFile<AllStubMemory<DISK>>(allStub[5], fout_allstub_n6, ievt, "AllStub", truncation);
+  
+  // VMStubME1
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[0], fout_vmstubme1, ievt,"VMStubME1", truncation);
+  
+  // VMStubME2
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[1], fout_vmstubme2, ievt,"VMStubME2", truncation);
+  
+  // VMStubME3
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[2], fout_vmstubme3, ievt,"VMStubME3", truncation);
+  
+  // VMStubME4
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[3], fout_vmstubme4, ievt,"VMStubME4", truncation);
+  
+  // VMStubME5
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[4], fout_vmstubme5, ievt,"VMStubME5", truncation);
+  
+   // VMStubME6
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[5], fout_vmstubme6, ievt,"VMStubME6", truncation);
+  
+   // VMStubME7
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[6], fout_vmstubme7, ievt,"VMStubME7", truncation);
+  
+   // VMStubME8
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[7], fout_vmstubme8, ievt,"VMStubME8", truncation);
 
 
-    // TE Memories
-    //VMStubTEInner1
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[0][0], fout_vmstubtei1_n1, ievt,
-                                                  "VMStubTEInner1", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[0][1], fout_vmstubtei1_n2, ievt,
-                                                  "VMStubTEInner1", truncation);
-    // err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[0][2], fout_vmstubtei1_n3, ievt,
-    //                                               "VMStubTEInner1", truncation);
-    // VMStubTEInner2
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[1][0], fout_vmstubtei2_n1, ievt, "VMStubTEInner2", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[1][1], fout_vmstubtei2_n2, ievt, "VMStubTEInner2", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[1][2], fout_vmstubtei2_n3, ievt, "VMStubTEInner2", truncation);
-    
-    // VMStubTEInner3
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[2][0], fout_vmstubtei3_n1, ievt, "VMStubTEInner3", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[2][1], fout_vmstubtei3_n2, ievt, "VMStubTEInner3", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[2][2], fout_vmstubtei3_n3, ievt, "VMStubTEInner3", truncation);
+  // TE Memories
+  //VMStubTEInner1
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[0][0], fout_vmstubtei1_n1, ievt, "VMStubTEInner1", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[0][1], fout_vmstubtei1_n2, ievt, "VMStubTEInner1", truncation);
+  // VMStubTEInner2
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[1][0], fout_vmstubtei2_n1, ievt, "VMStubTEInner2", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[1][1], fout_vmstubtei2_n2, ievt, "VMStubTEInner2", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[1][2], fout_vmstubtei2_n3, ievt, "VMStubTEInner2", truncation);
+  
+  // VMStubTEInner3
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[2][0], fout_vmstubtei3_n1, ievt, "VMStubTEInner3", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[2][1], fout_vmstubtei3_n2, ievt, "VMStubTEInner3", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[2][2], fout_vmstubtei3_n3, ievt, "VMStubTEInner3", truncation);
 
-    // VMStubTEInner4
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[3][0], fout_vmstubtei4_n1, ievt, "VMStubTEInner4", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[3][1], fout_vmstubtei4_n2, ievt, "VMStubTEInner4", truncation);
-    err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[3][2], fout_vmstubtei4_n3, ievt, "VMStubTEInner4", truncation);
+  // VMStubTEInner4
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[3][0], fout_vmstubtei4_n1, ievt, "VMStubTEInner4", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[3][1], fout_vmstubtei4_n2, ievt, "VMStubTEInner4", truncation);
+  err += compareMemWithFile<VMStubTEInnerMemory<DISK>>(teiMemories[3][2], fout_vmstubtei4_n3, ievt, "VMStubTEInner4", truncation);
 
 
-    // TE Memories
-    // VMStubTEOuter1
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][0], fout_vmstubteo1_n1, ievt,
-                                                  "VMStubTEOuter1", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][1], fout_vmstubteo1_n2, ievt,
-                                                  "VMStubTEOuter1", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][2], fout_vmstubteo1_n3, ievt,
-                                                  "VMStubTEOuter1", truncation);
-    // err += compareMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][3], fout_vmstubteo1_n4, ievt,
-    //                                               "VMStubTEOuter1", truncation);
-    // err += compareMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][4], fout_vmstubteo1_n5, ievt,
-    //                                               "VMStubTEOuter1", truncation);
-    // VMStubTEOuter2
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][0], fout_vmstubteo2_n1, ievt, "VMStubTEOuter2", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][1], fout_vmstubteo2_n2, ievt, "VMStubTEOuter2", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][2], fout_vmstubteo2_n3, ievt, "VMStubTEOuter2", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][3], fout_vmstubteo2_n4, ievt, "VMStubTEOuter2", truncation);
-    // err += compareMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][4], fout_vmstubteo2_n5, ievt, "VMStubTEOuter2", truncation);
-    
-    // VMStubTEOuter3
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][0], fout_vmstubteo3_n1, ievt, "VMStubTEOuter3", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][1], fout_vmstubteo3_n2, ievt, "VMStubTEOuter3", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][2], fout_vmstubteo3_n3, ievt, "VMStubTEOuter3", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][3], fout_vmstubteo3_n4, ievt, "VMStubTEOuter3", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][4], fout_vmstubteo3_n5, ievt, "VMStubTEOuter3", truncation);
-    
-    // VMStubTEOuter4
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][0], fout_vmstubteo4_n1, ievt, "VMStubTEOuter4", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][1], fout_vmstubteo4_n2, ievt, "VMStubTEOuter4", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][2], fout_vmstubteo4_n3, ievt, "VMStubTEOuter4", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][3], fout_vmstubteo4_n4, ievt, "VMStubTEOuter4", truncation);
-    err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][4], fout_vmstubteo4_n5, ievt, "VMStubTEOuter4", truncation);
-    
+  // TE Memories
+  // VMStubTEOuter1
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][0], fout_vmstubteo1_n1, ievt, "VMStubTEOuter1", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][1], fout_vmstubteo1_n2, ievt, "VMStubTEOuter1", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[0][2], fout_vmstubteo1_n3, ievt, "VMStubTEOuter1", truncation);
+
+  // VMStubTEOuter2
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][0], fout_vmstubteo2_n1, ievt, "VMStubTEOuter2", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][1], fout_vmstubteo2_n2, ievt, "VMStubTEOuter2", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][2], fout_vmstubteo2_n3, ievt, "VMStubTEOuter2", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][3], fout_vmstubteo2_n4, ievt, "VMStubTEOuter2", truncation);
+  // err += compareMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[1][4], fout_vmstubteo2_n5, ievt, "VMStubTEOuter2", truncation);
+  
+  // VMStubTEOuter3
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][0], fout_vmstubteo3_n1, ievt, "VMStubTEOuter3", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][1], fout_vmstubteo3_n2, ievt, "VMStubTEOuter3", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][2], fout_vmstubteo3_n3, ievt, "VMStubTEOuter3", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][3], fout_vmstubteo3_n4, ievt, "VMStubTEOuter3", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[2][4], fout_vmstubteo3_n5, ievt, "VMStubTEOuter3", truncation);
+  
+  // VMStubTEOuter4
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][0], fout_vmstubteo4_n1, ievt, "VMStubTEOuter4", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][1], fout_vmstubteo4_n2, ievt, "VMStubTEOuter4", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][2], fout_vmstubteo4_n3, ievt, "VMStubTEOuter4", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][3], fout_vmstubteo4_n4, ievt, "VMStubTEOuter4", truncation);
+  err += compareBinnedMemWithFile<VMStubTEOuterMemory<DISK>>(teoMemories[3][4], fout_vmstubteo4_n5, ievt, "VMStubTEOuter4", truncation);
+  
   } // end of event loop
   std::cerr << "Exiting with return value " << err << std::endl;
   return err;
