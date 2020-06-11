@@ -1,5 +1,5 @@
-#ifndef MATCHCALCULATOR_HH
-#define MATCHCALCULATOR_HH
+#ifndef TrackletAlgorithm_MatchCalculator_h
+#define TrackletAlgorithm_MatchCalculator_h
 
 // MatchCalculator
 
@@ -873,4 +873,3 @@ void MatchCalculator(BXType bx,
 }// end MatchCalculator
 
 #endif
- 

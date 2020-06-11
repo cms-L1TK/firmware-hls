@@ -1,5 +1,5 @@
-#ifndef TRACKLETENGINETOP_H
-#define TRACKLETENGINETOP_H
+#ifndef TrackletAlgorithm_TrackletEngineTop_h
+#define TrackletAlgorithm_TrackletEngineTop_h
 
 #include "TrackletEngine.h"
 

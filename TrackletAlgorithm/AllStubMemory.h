@@ -1,5 +1,5 @@
-#ifndef ALLSTUBMEMORY_HH
-#define ALLSTUBMEMORY_HH
+#ifndef TrackletAlgorithm_AllStubMemory_h
+#define TrackletAlgorithm_AllStubMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

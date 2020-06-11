@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TrackletAlgorithm_VMRouterTop_h
+#define TrackletAlgorithm_VMRouterTop_h
+
 #include "VMRouter.h"
 
 
@@ -22,3 +24,5 @@ void VMRouterTop(BXType bx,
 		VMStubMEMemory<BARRELPS> *m6,
 		VMStubMEMemory<BARRELPS> *m7
 		);
+
+#endif

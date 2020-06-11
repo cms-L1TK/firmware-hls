@@ -1,5 +1,5 @@
-#ifndef TRACKLETPARAMETERMEMORY_HH
-#define TRACKLETPARAMETERMEMORY_HH
+#ifndef TrackletAlgorithm_TrackletParameterMemory_h
+#define TrackletAlgorithm_TrackletParameterMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
@@ -125,6 +125,5 @@ private:
 
 // Memory definition
 typedef MemoryTemplate<TrackletParameters, 2, kNBits_MemAddr> TrackletParameterMemory;
-
 
 #endif

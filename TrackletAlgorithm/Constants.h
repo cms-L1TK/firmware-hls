@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_HH
-#define CONSTANTS_HH
+#ifndef TrackletAlgorithm_Constants_h
+#define TrackletAlgorithm_Constants_h
 
 #include "ap_int.h"
 
@@ -58,6 +58,5 @@ enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK};
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
-
 
 #endif

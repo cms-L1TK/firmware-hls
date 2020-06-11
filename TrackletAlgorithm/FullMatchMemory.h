@@ -1,5 +1,5 @@
-#ifndef FULLMATCHMEMORY_HH
-#define FULLMATCHMEMORY_HH
+#ifndef TrackletAlgorithm_FullMatchMemory_h
+#define TrackletAlgorithm_FullMatchMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

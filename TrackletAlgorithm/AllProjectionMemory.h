@@ -1,5 +1,5 @@
-#ifndef ALLPROJECTIONMEMORY_HH
-#define ALLPROJECTIONMEMORY_HH
+#ifndef TrackletAlgorithm_AllProjectionMemory_h
+#define TrackletAlgorithm_AllProjectionMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
