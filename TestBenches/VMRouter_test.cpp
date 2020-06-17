@@ -7,7 +7,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 1;  //number of events to run
+const int nevents = 100;  //number of events to run
 
 using namespace std;
 
@@ -20,26 +20,20 @@ int main()
 
   ///////////////////////////
   // input memories
-  	static InputStubMemory<BARRELPS> inputStub1;
-  	static InputStubMemory<BARRELPS> inputStub2;
-  	static InputStubMemory<BARRELPS> inputStub3;
-  	static InputStubMemory<BARRELPS> inputStub4;
-  	static InputStubMemory<BARRELPS> inputStub5;
-  	static InputStubMemory<BARRELPS> inputStub6;
-
+  static InputStubMemory<BARRELPS> inputStub[4];
   // output memories
   static AllStubMemory<BARRELPS> allStub[6];
   // ME memories
   static VMStubMEMemory<BARRELPS> meMemories[4];
-	// TE Inner memories
-	static VMStubTEInnerMemory<BARRELPS> teiMemories[4][5];
-	// TE Inner Overlap memories, including copies
-	static VMStubTEInnerMemory<BARRELOL> olMemories[2][3];
+  // TE Inner memories
+  static VMStubTEInnerMemory<BARRELPS> teiMemories[4][5];
+  // TE Inner Overlap memories, including copies
+  static VMStubTEInnerMemory<BARRELOL> olMemories[2][3];
 
 
 ///////////////////////////
 // open input files
-	cout << "Open files..." << endl;
+  cout << "Open files..." << endl;
 
   ifstream fin_inputstub1;
   bool validin1 = openDataFile(fin_inputstub1, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_PS10G_1_B_04.dat");
@@ -57,21 +51,6 @@ int main()
   bool validin4 = openDataFile(fin_inputstub4, "MemPrints/InputStubs/InputStubs_IL_L1PHIE_neg_PS10G_2_B_04.dat");
   if (not validin4) return -1;
 
-  // ifstream fin_inputstub5;
-  // bool validin5 = openDataFile(fin_inputstub5, "MemPrints/TrackleinputStubections_ILINK_L1L2J_L3PHIC_04.dat");
-  // if (not validin5) return -1;
-
-  // ifstream fin_inputstub6;
-  // bool validin6 = openDataFile(fin_inputstub6, "MemPrints/TrackleinputStubections_ILINK_L5L6B_L3PHIC_04.dat");
-  // if (not validin6) return -1;
-
-  // ifstream fin_inputstub7;
-  // bool validin7 = openDataFile(fin_inputstub7, "MemPrints/TrackleinputStubections_ILINK_L5L6C_L3PHIC_04.dat");
-  // if (not validin7) return -1;
-
-  // ifstream fin_inputstub8;
-  // bool validin8 = openDataFile(fin_inputstub8, "MemPrints/TrackleinputStubections_ILINK_L5L6D_L3PHIC_04.dat");
-  // if (not validin8) return -1;
 
   ///////////////////////////
   // open output files
@@ -117,22 +96,7 @@ int main()
   ifstream fout_vmstubme4;
   bool valid_vmstubme4 = openDataFile(fout_vmstubme4, "MemPrints/VMStubsME/VMStubs_VMSME_L1PHIE20n1_04.dat");
   if (not valid_vmstubme4) return -1;
-  
-//  ifstream fout_vmstubme5;
-//  bool valid_vmstubme5 =  openDataFile(fout_vmstubme5, "MemPrints/VMStubs_VMSTE_L1PHIE17n1_04.dat");
-//  if (not valid_vmstubme5) return -1;
-//
-//  ifstream fout_vmstubme6;
-//  bool valid_vmstubme6 = openDataFile(fout_vmstubme6, "MemPrints/VMStubs_VMSTE_L1PHIE17n2_04.dat");
-//  if (not valid_vmstubme6) return -1;
-//
-//  ifstream fout_vmstubme7;
-//  bool valid_vmstubme7 = openDataFile(fout_vmstubme7, "MemPrints/VMStubs_VMSTE_L1PHIE17n3_04.dat");
-//  if (not valid_vmstubme7) return -1;
-//
-//  ifstream fout_vmstubme8;
-//  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "MemPrints/VMStubs_VMSTE_L1PHIE17n4_04.dat");
-//  if (not valid_vmstubme8) return -1;
+
 
 // TE Inner
 // 17
@@ -245,10 +209,10 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
   // read event and write to memories
-  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub1, fin_inputstub1, ievt);
-  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub2, fin_inputstub2, ievt);
-  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub3, fin_inputstub3, ievt);
-  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub4, fin_inputstub4, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub[0], fin_inputstub1, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub[1], fin_inputstub2, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub[2], fin_inputstub3, ievt);
+  writeMemFromFile<InputStubMemory<BARRELPS>>(inputStub[3], fin_inputstub4, ievt);
   // writeMemFromFile<InputStubMemory>(inputStub5, fin_inputstub5, ievt);
   // writeMemFromFile<InputStubMemory>(inputStub6, fin_inputstub6, ievt);
   // writeMemFromFile<InputStubMemory>(inputStub7, fin_inputstub7, ievt);
@@ -259,7 +223,7 @@ int main()
   BXType bx_out;
 
   // Unit Under Test
-	VMRouterTop(bx, &inputStub1, &inputStub2, &inputStub3, &inputStub4,
+	VMRouterTop(bx, inputStub,
 			allStub, meMemories, teiMemories, olMemories);
 
   // compare the computed outputs with the expected ones

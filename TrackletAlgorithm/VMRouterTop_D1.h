@@ -6,12 +6,8 @@
 // VMRouter Top Function for Disk 1, AllStub region A
 void VMRouterTop(BXType bx,
 	// Input memories
-	const InputStubMemory<DISK2S> *i0,
-	const InputStubMemory<DISKPS> *i1,
-	const InputStubMemory<DISKPS> *i2,
-	const InputStubMemory<DISK2S> *i3,
-	const InputStubMemory<DISKPS> *i4,
-	const InputStubMemory<DISKPS> *i5,
+	const InputStubMemory<DISKPS> inputStub[4],
+	const InputStubMemory<DISK2S> inputStubDisk2S[2],
 	// Output memories
 	AllStubMemory<DISK> allStub[6],
 	VMStubMEMemory<DISK> meMemories[4],

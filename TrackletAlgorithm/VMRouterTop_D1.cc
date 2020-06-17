@@ -2,18 +2,15 @@
 
 // VMRouter Top Function for Disk 1, AllStub region A
 void VMRouterTop(BXType bx,
-// Input memories
-		const InputStubMemory<DISK2S> *i0,
-		const InputStubMemory<DISKPS> *i1,
-		const InputStubMemory<DISKPS> *i2,
-		const InputStubMemory<DISK2S> *i3,
-		const InputStubMemory<DISKPS> *i4,
-		const InputStubMemory<DISKPS> *i5,
-// Output memories
-AllStubMemory<DISK> allStub[6],
-VMStubMEMemory<DISK> meMemories[8],
-VMStubTEInnerMemory<DISK> teiMemories[4][3],
-VMStubTEOuterMemory<DISK> teoMemories[4][5]
+	// Input memories
+	// Input memories
+	const InputStubMemory<DISKPS> inputStub[4],
+	const InputStubMemory<DISK2S> inputStubDisk2S[2],
+	// Output memories
+	AllStubMemory<DISK> allStub[6],
+	VMStubMEMemory<DISK> meMemories[8],
+	VMStubTEInnerMemory<DISK> teiMemories[4][3],
+	VMStubTEOuterMemory<DISK> teoMemories[4][5]
 		)
 {
 
@@ -193,12 +190,12 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
-#pragma HLS resource variable=i0->get_mem() latency=2
-#pragma HLS resource variable=i1->get_mem() latency=2
-#pragma HLS resource variable=i2->get_mem() latency=2
-#pragma HLS resource variable=i3->get_mem() latency=2
-#pragma HLS resource variable=i4->get_mem() latency=2
-#pragma HLS resource variable=i5->get_mem() latency=2
+#pragma HLS resource variable=inputStub[0].get_mem() latency=2
+#pragma HLS resource variable=inputStub[1].get_mem() latency=2
+#pragma HLS resource variable=inputStub[2].get_mem() latency=2
+#pragma HLS resource variable=inputStub[3].get_mem() latency=2
+#pragma HLS resource variable=inputStubDisk2S[0].get_mem() latency=2
+#pragma HLS resource variable=inputStubDisk2S[1].get_mem() latency=2
 
 #pragma HLS resource variable=finebintable latency=2
 #pragma HLS resource variable=rzbitstable latency=2
@@ -211,14 +208,14 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 /////////////////////////
 // Main function
 	
-	// template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
+	// template<regionType INTYPE, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
 	// Disks have two types of input
-	VMRouter<DISKPS, DISK2S, DISK, layer, disk, nall, ntei, nteol, nteo>
+	VMRouter<DISKPS, DISK, layer, disk, nall, ntei, nteol, nteo>
 	(bx, finebintable, nullptr, 
 		rzbitstable, nullptr, rzbitsextratable, 
 		bendtable, nullptr, bendextratable,
 // Input memories
-		imask, i0,i1,i2,i3,i4,i5,//,i6,i7,
+		imask, inputStub, inputStubDisk2S,
 // AllStub memories
 		allStub,
 // ME memories

@@ -29,14 +29,14 @@ constexpr unsigned int nvmtedisks[5] = { 4, 4, 4, 4, 4 };
 constexpr unsigned int nvmteoverlaplayers[2] = {2, 2}; // Number of Overlap VM modules per coarse phi region
 
 // Number of finephi bits used. Can't this be taken from the memories?
-static const int nfinephibarrelinner = 2;
-static const int nfinephibarrelouter = 3;
+constexpr int nfinephibarrelinner = 2;
+constexpr int nfinephibarrelouter = 3;
 
-static const int nfinephidiskinner = 2;
-static const int nfinephidiskouter = 3;
+constexpr int nfinephidiskinner = 2;
+constexpr int nfinephidiskouter = 3;
 
-static const int nfinephioverlapinner = 2;
-static const int nfinephioverlapouter = 3;
+constexpr int nfinephioverlapinner = 2;
+constexpr int nfinephioverlapouter = 3;
 
 // Maximum number of stubs that can be processed (memory depth)
 constexpr int MAXVMROUTER = kMaxProc;
@@ -178,7 +178,7 @@ inline ap_uint<maxvmbits> getFirstMemNumber(const ap_uint<32> mask) {
 
 // Returns a ME stub with all the values set
 template<regionType InType, regionType OutType, int Layer, int Disk>
-inline VMStubME<OutType> setStubME(const InputStub<InType> stub, 
+inline VMStubME<OutType> createStubME(const InputStub<InType> stub, 
 		const int index, const bool negdisk, const int finebintable[], 
 		const int phicorrtable[], int& ivmPlus, int& ivmMinus, int& bin) {
 	
@@ -273,7 +273,7 @@ inline VMStubME<OutType> setStubME(const InputStub<InType> stub,
 
 // Returns a TE Inner stub with all the values set
 template<regionType InType, regionType OutType, int Layer, int Disk>
-inline VMStubTEInner<OutType> setStubTEInner(const InputStub<InType> stub, 
+inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub, 
 		const int index, const bool negdisk, const int rzbitsinnertable[], 
 		const int phicorrtable[], int& ivm, int& rzbits) {
 	
@@ -361,7 +361,7 @@ inline VMStubTEInner<OutType> setStubTEInner(const InputStub<InType> stub,
 
 // Returns a TE Outer stub with all the values set
 template<regionType InType, regionType OutType, int Layer, int Disk>
-inline VMStubTEOuter<OutType> setStubTEOuter(const InputStub<InType> stub, 
+inline VMStubTEOuter<OutType> createStubTEOuter(const InputStub<InType> stub, 
 		const int index, const bool negdisk, const int rzbitsoutertable[], 
 		const int phicorrtable[], int& ivm, int& bin) {
 	
@@ -466,7 +466,7 @@ inline VMStubTEOuter<OutType> setStubTEOuter(const InputStub<InType> stub,
 
 // Returns a TE Overlap stub with all the values set
 template<regionType InType, int Layer>
-inline VMStubTEInner<BARRELOL> setStubTEOverlap(const InputStub<InType> stub, 
+inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub, 
 		const int index, const int rzbitsoverlaptable[], 
 		const int phicorrtable[], int& ivm, int& rzbits) {
 	
@@ -522,12 +522,11 @@ inline VMStubTEInner<BARRELOL> setStubTEOverlap(const InputStub<InType> stub,
 /////////////////////////////////
 // Main function
 
-// InType InType2 - Two input region types InType and InType2 due to the disks having both 2S and PS inputs.
-// 		According to wiring script for disks, the 0th and 2th input are different for Disks.
-// 		The last three inputs are also for the negative disks.
+// InType DISK2S - Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
+// 		According to wiring script, there's two DISK2S and half the inputs are for negative disks.
 // Layer Disk - Specifies the layer or disk number
 // MAXN - The maximum number of copies of a memory type
-template<regionType InType, regionType InType2, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
+template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
 void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[], 
 		// rzbitstables (binlookup in emulation)
 		const int rzbitsinnertable[], const int rzbitsoverlaptable[], const int rzbitsoutertable[],
@@ -535,12 +534,8 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		const ap_uint<1>* bendtable[], const ap_uint<1>* bendoverlaptable[], const ap_uint<1>* bendoutertable[],
 		// Input memories
 		const ap_uint<6>& imask, 
-		const InputStubMemory<InType2>* const i0,
-		const InputStubMemory<InType>* const i1,
-		const InputStubMemory<InType>* const i2,
-		const InputStubMemory<InType2>* const i3,
-		const InputStubMemory<InType>* const i4,
-		const InputStubMemory<InType>* const i5,
+		const InputStubMemory<InType> inputStub[],
+		const InputStubMemory<DISK2S> inputStubDisk2S[],
 		// AllStub memory
 		AllStubMemory<OutType> allStub[],
 		// ME memories
@@ -557,17 +552,19 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 #pragma HLS array_partition variable=bendoverlaptable complete dim=1
 #pragma HLS array_partition variable=bendoutertable complete dim=1
 //#pragma HLS interface ap_bus port=bendtable depth=8
-#pragma HLS array_partition variable=allstub complete
-#pragma HLS array_partition variable=meMemories complete
+#pragma HLS array_partition variable=inputStub complete dim=1
+#pragma HLS array_partition variable=inputStubDisk2S complete dim=1
+#pragma HLS array_partition variable=allstub complete dim=1
+#pragma HLS array_partition variable=meMemories complete dim=1
 #pragma HLS array_partition variable=teiMemories complete dim=2
 #pragma HLS array_partition variable=olMemories complete dim=2
 #pragma HLS array_partition variable=teoMemories complete dim=2
 
 
 	// The first memory numbers, the position of the first non-zero bit in the mask
-	static const ap_uint<maxvmbits> firstme = getFirstMemNumber(memask); // ME memory
-	static const ap_uint<maxvmbits> firstte = (teimask) ? getFirstMemNumber(teimask) : getFirstMemNumber(teomask); // TE memory
-	static const ap_uint<maxvmbits> firstol = (olmask) ? static_cast<int>(getFirstMemNumber(olmask)) : 0; // TE Overlap memory
+	static const int firstme = getFirstMemNumber(memask); // ME memory
+	static const int firstte = (teimask) ? getFirstMemNumber(teimask) : getFirstMemNumber(teomask); // TE memory
+	static const int firstol = (olmask) ? static_cast<int>(getFirstMemNumber(olmask)) : 0; // TE Overlap memory
 
 	// Number of memories/VMs for one coarse phi region
 	constexpr int nvmme = (Layer) ? nvmmelayers[Layer-1] : nvmmedisks[Disk-1]; // ME memories
@@ -628,26 +625,30 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 	
 	// Number of data in each input memory
 	
+	typename InputStubMemory<InType>::NEntryT ninputs[6]; // Array containing the number of inputs. Last two indices are for DISK2S
+	#pragma HLS array_partition variable=ninputs complete dim=0
+	
 	const typename InputStubMemory<InType>::NEntryT zero(0);
-
-	auto n_i0 = imask[0] != 0 ? i0->getEntries(bx) : zero;
-	auto n_i1 = imask[1] != 0 ? i1->getEntries(bx) : zero;
-	auto n_i2 = imask[2] != 0 ? i2->getEntries(bx) : zero;
-	auto n_i3 = imask[3] != 0 ? i3->getEntries(bx) : zero;
-	auto n_i4 = imask[4] != 0 ? i4->getEntries(bx) : zero;
-	auto n_i5 = imask[5] != 0 ? i5->getEntries(bx) : zero;
-
-	int n_tot = n_i0 + n_i1 + n_i2 + n_i3 + n_i4 + n_i5;
-	//const int maxLoop = (kMaxProc < n_tot) ? kMaxProc : n_tot;
-
-
+	
+	int ntotal = 0; // Total number of inputs
+	
+	for (int i = 0; i < 6; i++) {
+		#pragma HLS UNROLL
+		if (i < 4) { 
+			ninputs[i] = imask[i] != 0 ? inputStub[i].getEntries(bx) : zero;
+		} else { // For DISK2S
+			ninputs[i] = imask[i] != 0 ? inputStubDisk2S[i-4].getEntries(bx) : zero;
+		}
+		ntotal += ninputs[i];
+	}
+	
 	// Create variables that keep track of which memory address to read and write to
 
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
 	
 	int addrCountTEI[nvmte][MaxTEICopies]; // Writing of TE Inner stubs
 	if (teimask) {
-		#pragma HLS array_partition variable = addrCountTEI complete dim=0
+		#pragma HLS array_partition variable=addrCountTEI complete dim=0
 		ADDR_TEI:	for (int i = 0; i < nvmte; i++) {
 			#pragma HLS UNROLL
 			for (int j = 0; j < MaxTEICopies; j++) {
@@ -675,67 +676,61 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 
 	TOPLEVEL: for (auto i = 0; i < kMaxProc; ++i) {
 #pragma HLS PIPELINE II=1
-
-		// const bool haveData = (n_i0 > 0) || (n_i1 > 0) || (n_i2 > 0)
-		// 		|| (n_i3 > 0) || (n_i4 > 0) || (n_i5 > 0);
 		
 		// Stop processing stubs if we have looped over the maximum number
 		// that can be processed or if we have gone through all data
-		if ((i > MAXVMROUTER) || !n_tot) // use haveData or n_tot?
+		if ((i > MAXVMROUTER) || !ntotal)
 			continue;
 
 		bool resetNext = false; // Used to reset read_addr
-		bool isSpecialStub = false; // Used to determine if first or fourth input memory, which are different for disks
 		bool disk2S = false; // Used to determine if DISK2S
 		bool negdisk = false; // Used to determine if it's negative disk, the last 3 inputs memories
 		
 		InputStub<InType> stub;
-		InputStub<InType2> stubspec; // Used for input 1 and 4 since they can be of different type in disks. find a better way to do this...
+		InputStub<DISK2S> stubDisk2S; // Used for disks. find a better way to do this...
 		
-		// Read stub from memory in turn
-		if (n_i0) {
-			stubspec = i0->read_mem(bx, read_addr);
-			isSpecialStub = true;
-			--n_i0;
-			if (n_i0 == 0)
-				resetNext = true;
-		} else if (n_i1) {
-			stub = i1->read_mem(bx, read_addr);
-			--n_i1;
-			if (n_i1 == 0)
-				resetNext = true;
-		} else if (n_i2) {
-			stub = i2->read_mem(bx, read_addr);
-			--n_i2;
-			if (n_i2 == 0)
-				resetNext = true;
-		} else if (n_i3) {
-			stubspec = i3->read_mem(bx, read_addr);
-			isSpecialStub = true;
-			negdisk = (Disk) ? true : false;
-			--n_i3;
-			if (n_i3 == 0)
-				resetNext = true;
-		} else if (n_i4) {
-			stub = i4->read_mem(bx, read_addr);
-			negdisk = (Disk) ? true : false;
-			--n_i4;
-			if (n_i4 == 0)
-				resetNext = true;
-		} else {
-			stub = i5->read_mem(bx, read_addr);
-			negdisk = (Disk) ? true : false;
-			--n_i5;
-			if (n_i5 == 0)
-				resetNext = true;
-		}
-		
-		--n_tot;
-
-		// If the stub is from a DISK2S module
-		if (isSpecialStub && Disk) {
+		// Read stub from memory in turn. 
+		// Reading is ordered as in wiring script to pass testbench
+		if (ninputs[4]) { // For DISK2S
+			assert(Disk);
+			stubDisk2S = inputStubDisk2S[0].read_mem(bx, read_addr);
 			disk2S = true;
+			--ninputs[4];
+			if (ninputs[4] == 0)
+				resetNext = true;
+		} else if (ninputs[0]) {
+			stub = inputStub[0].read_mem(bx, read_addr);
+			--ninputs[0];
+			if (ninputs[0] == 0)
+				resetNext = true;
+		} else if (ninputs[1]) {
+			stub = inputStub[1].read_mem(bx, read_addr);
+			--ninputs[1];
+			if (ninputs[1] == 0)
+				resetNext = true;
+		} else if (ninputs[5]) { // For DISK2S
+			assert(Disk);
+			stubDisk2S = inputStubDisk2S[1].read_mem(bx, read_addr);
+			disk2S = true;
+			negdisk = (Disk) ? true : false;
+			--ninputs[5];
+			if (ninputs[5] == 0)
+				resetNext = true;
+		} else if (ninputs[2]) {
+			stub = inputStub[2].read_mem(bx, read_addr);
+			negdisk = (Disk) ? true : false;
+			--ninputs[2];
+			if (ninputs[2] == 0)
+				resetNext = true;
+		} else if (ninputs[3]) {
+			stub = inputStub[3].read_mem(bx, read_addr);
+			negdisk = (Disk) ? true : false;
+			--ninputs[3];
+			if (ninputs[3] == 0)
+				resetNext = true;
 		}
+		
+		--ntotal;
 
 		// Increment the read address, or reset it to zero when all stubs in a memory has been read
 		if (resetNext)
@@ -748,7 +743,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 // AllStub memories
 
 		AllStub<OutType> allstubd =
-				(isSpecialStub) ? stubspec.raw() : stub.raw();
+				(disk2S) ? stubDisk2S.raw() : stub.raw();
 		for (int n = 0; n < MaxAllCopies; n++) {
 			#pragma HLS UNROLL
 			allStub[n].write_mem(bx, allstubd, i);
@@ -772,10 +767,10 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			int bin; // Coarse z. The bin the stub is going to be put it in the memory
 			
 			// Create the ME stub to save
-			VMStubME<OutType> stubme = (isSpecialStub) ? 
-					setStubME<InType2, OutType, Layer, Disk>(stubspec, i, negdisk, finebintable, phicorrtable, ivmPlus, ivmMinus, bin) :
-					setStubME<InType, OutType, Layer, Disk>(stub, i, negdisk, finebintable, phicorrtable, ivmPlus, ivmMinus, bin);;
-			
+			VMStubME<OutType> stubme = (disk2S) ? 
+					createStubME<DISK2S, OutType, Layer, Disk>(stubDisk2S, i, negdisk, finebintable, phicorrtable, ivmPlus, ivmMinus, bin) :
+					createStubME<InType, OutType, Layer, Disk>(stub, i, negdisk, finebintable, phicorrtable, ivmPlus, ivmMinus, bin);;
+
 // For debugging
 #ifndef __SYNTHESIS__
 			std::cout << "ME stub " << std::hex << stubme.raw() << std::endl;
@@ -823,9 +818,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			int rzbits;
 
 			// Create the TE Inner stub to save
-			VMStubTEInner<OutType> stubte = (isSpecialStub) ? 
-					setStubTEInner<InType2, OutType, Layer, Disk>(stubspec, i, negdisk, rzbitsinnertable, phicorrtable, ivm, rzbits) :
-					setStubTEInner<InType, OutType, Layer, Disk>(stub, i, negdisk, rzbitsinnertable, phicorrtable, ivm, rzbits);
+			VMStubTEInner<OutType> stubte = (disk2S) ? 
+					createStubTEInner<DISK2S, OutType, Layer, Disk>(stubDisk2S, i, negdisk, rzbitsinnertable, phicorrtable, ivm, rzbits) :
+					createStubTEInner<InType, OutType, Layer, Disk>(stub, i, negdisk, rzbitsinnertable, phicorrtable, ivm, rzbits);
 
 			// For debugging
 			#ifndef __SYNTHESIS__
@@ -863,9 +858,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			int bin; // Coarse z. The bin the stub is going to be put it in the memory
 			
 			// Create the TE Inner stub to save
-			VMStubTEOuter<OutType> stubte = (isSpecialStub) ? 
-					setStubTEOuter<InType2, OutType, Layer, Disk>(stubspec, i, negdisk, rzbitsoutertable, phicorrtable, ivm, bin) :
-					setStubTEOuter<InType, OutType, Layer, Disk>(stub, i, negdisk, rzbitsoutertable, phicorrtable, ivm, bin);
+			VMStubTEOuter<OutType> stubte = (disk2S) ? 
+					createStubTEOuter<DISK2S, OutType, Layer, Disk>(stubDisk2S, i, negdisk, rzbitsoutertable, phicorrtable, ivm, bin) :
+					createStubTEOuter<InType, OutType, Layer, Disk>(stub, i, negdisk, rzbitsoutertable, phicorrtable, ivm, bin);
 
 // For debugging
 #ifndef __SYNTHESIS__
@@ -908,9 +903,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			int rzbits;
 			
 			// Create the TE Inner stub to save
-			VMStubTEInner<BARRELOL> stubol = (isSpecialStub) ? 
-					setStubTEOverlap<InType2, Layer>(stubspec, i, rzbitsoverlaptable, phicorrtable, ivm, rzbits) :
-					setStubTEOverlap<InType, Layer>(stub, i, rzbitsoverlaptable, phicorrtable, ivm, rzbits);
+			VMStubTEInner<BARRELOL> stubol = (disk2S) ? 
+					createStubTEOverlap<DISK2S, Layer>(stubDisk2S, i, rzbitsoverlaptable, phicorrtable, ivm, rzbits) :
+					createStubTEOverlap<InType, Layer>(stub, i, rzbitsoverlaptable, phicorrtable, ivm, rzbits);
 
 // For debugging
 #ifndef __SYNTHESIS__
