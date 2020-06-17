@@ -77,7 +77,6 @@ VMR-hls-build:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMR"
-  allow_failure: true
 TE-hls-build:
   <<: *template_hls-build
   variables:
