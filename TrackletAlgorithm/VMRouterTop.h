@@ -1,5 +1,5 @@
-#ifndef VMROUTERTOP_H
-#define VMROUTERTOP_H
+#ifndef TrackletAlgorithm_VMRouterTop_h
+#define TrackletAlgorithm_VMRouterTop_h
 
 #include "VMRouter.h"
 
@@ -27,4 +27,4 @@ void VMRouterTop(BXType bx,
 	VMStubTEInnerMemory<BARRELOL> olMemories[numOL][maxOLCopies]
 	);
 
-#endif // VMROUTERTOP_H
+#endif // TrackletAlgorithm_VMRouterTop_h

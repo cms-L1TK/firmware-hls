@@ -1,5 +1,5 @@
-#ifndef VMSTUBTEOUTERMEMORY_HH
-#define VMSTUBTEOUTERMEMORY_HH
+#ifndef TrackletAlgorithm_VMStubTEOuterMemory_h
+#define TrackletAlgorithm_VMStubTEOuterMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplateBinned.h"

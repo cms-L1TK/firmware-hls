@@ -1,3 +1,6 @@
+#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h
+#define TrackletAlgorithm_TrackletCalculator_parameters_h
+
 // This file contains numbers of memories and bit masks that are specific to
 // each TrackletCalculator and that come directly from the wiring.
 //
@@ -86,3 +89,5 @@ template<> constexpr uint32_t TPROJMaskBarrel<TC::L3L4, TC::E>() {
 template<> constexpr uint32_t TPROJMaskDisk<TC::L3L4, TC::E>() {
   return 0x66;
 }
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef VMSTUBMEMEMORY_HH
-#define VMSTUBMEMEMORY_HH
+#ifndef TrackletAlgorithm_VMStubMEMemory_h
+#define TrackletAlgorithm_VMStubMEMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplateBinned.h"
@@ -130,6 +130,5 @@ private:
 
 // Memory definition
 template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,3>;
-
 
 #endif

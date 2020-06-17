@@ -1,5 +1,5 @@
-#ifndef CANDIDATEMATCHMEMORY_HH
-#define CANDIDATEMATCHMEMORY_HH
+#ifndef TrackletAlgorithm_CandidateMatchMemory_h
+#define TrackletAlgorithm_CandidateMatchMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

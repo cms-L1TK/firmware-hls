@@ -1,6 +1,6 @@
 // Class template for binned memory module
-#ifndef MEMORYTEMPLATEBINNED_HH
-#define MEMORYTEMPLATEBINNED_HH
+#ifndef TrackletAlgorithm_MemoryTemplateBinned_h
+#define TrackletAlgorithm_MemoryTemplateBinned_h
 
 #ifndef __SYNTHESIS__
 #include <iostream>

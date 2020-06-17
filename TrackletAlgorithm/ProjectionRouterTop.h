@@ -1,5 +1,5 @@
-#ifndef PROJECTIONROUTERTOP_H
-#define PROJECTIONROUTERTOP_H
+#ifndef TrackletAlgorithm_ProjectionRouterTop_h
+#define TrackletAlgorithm_ProjectionRouterTop_h
 
 #include "ProjectionRouter.h"
 

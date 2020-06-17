@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TrackletAlgorithm_LayerRouter_h
+#define TrackletAlgorithm_LayerRouter_h
 
 #include "HLSConstants.h"
 #include "HLSFullStubLayerPS.h"
@@ -14,3 +15,5 @@ LayerRouter(
 	    //              HLSFullStubLayerPS *StubOut5,
 	    //              HLSFullStubLayerPS *StubOut6              
 	    );
+
+#endif

@@ -3,8 +3,8 @@
 // -------
 // First tracklet 2.0 version -- December 2018 -- wittich
 
-#ifndef VMROUTER_H
-#define VMROUTER_H
+#ifndef TrackletAlgorithm_VMRouter_h
+#define TrackletAlgorithm_VMRouter_h
 
 #include "ap_int.h"
 
@@ -938,4 +938,4 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 	} // Outside main loop
 } // End VMRouter
 
-#endif //VMROUTER_H
+#endif // TrackletAlgorithm_VMRouterTop_h

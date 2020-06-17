@@ -1,5 +1,5 @@
-#ifndef TRACKLETENGINE_H
-#define TRACKLETENGINE_H
+#ifndef TrackletAlgorithm_TrackletEngine_h
+#define TrackletAlgorithm_TrackletEngine_h
 
 #include "VMStubTEInnerMemory.h"
 #include "VMStubTEOuterMemory.h"
@@ -216,4 +216,5 @@ void TrackletEngine(
       	 }
   }
 }
+
 #endif

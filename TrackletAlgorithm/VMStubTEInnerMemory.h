@@ -1,5 +1,5 @@
-#ifndef VMSTUBTEINNERMEMORY_HH
-#define VMSTUBTEINNERMEMORY_HH
+#ifndef TrackletAlgorithm_VMStubTEInnerMemory_h
+#define TrackletAlgorithm_VMStubTEInnerMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

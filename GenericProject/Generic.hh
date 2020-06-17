@@ -1,6 +1,6 @@
 // header file for generic project
-
-#pragma once
+#ifndef GenericProject_Generic_hh
+#define GenericProject_Generic_hh
 
 #include "Constants.hh"
 
@@ -32,4 +32,4 @@ void OneToThree(
 	      int & n_out3  // number of third input
 		);
 
-
+#endif

@@ -1,5 +1,5 @@
-#ifndef STUBPAIRMEMORY_HH
-#define STUBPAIRMEMORY_HH
+#ifndef TrackletAlgorithm_StubPairMemory_h
+#define TrackletAlgorithm_StubPairMemory_h
 
 #include "Constants.h"
 #include "MemoryTemplate.h"

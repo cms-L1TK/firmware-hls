@@ -1,8 +1,8 @@
 // Utilities used only in test bench for C simulation
 #ifndef __SYNTHESIS__
 
-#ifndef FILEREADUTILITY
-#define FILEREADUTILITY
+#ifndef TestBenches_FileReadUtility_h
+#define TestBenches_FileReadUtility_h
 
 #include <iostream>
 #include <fstream>
@@ -264,7 +264,6 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   
 }
 
+#endif // TestBenches_FileReadUtility_h
 
-#endif  // FILEREADUTILITY
-
-#endif  // __SYNTHESIS__
+#endif // __SYNTHESIS__

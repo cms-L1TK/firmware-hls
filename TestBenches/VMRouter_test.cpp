@@ -222,15 +222,13 @@ int main()
   // bx - bunch crossing
   BXType bx = ievt;
   BXType bx_out;
-  
-  std::cout << "I EVT " << ievt << " BX " << bx << std::endl;
-  
+
+
   // Unit Under Test
 	VMRouterTop(bx, inputStub,
 			allStub, meMemories, teiMemories, olMemories);
-  
-  std::cout << " NUMBER OF TEI " <<  teiMemories[2][0].getEntries(bx) << " jirv "<< teiMemories[2][0].getEntries(ievt) << std::endl;
-  
+
+
   // compare the computed outputs with the expected ones
   // add 1 per stub that is incorrect
   bool truncation = false;

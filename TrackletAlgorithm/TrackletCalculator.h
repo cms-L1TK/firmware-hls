@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TrackletAlgorithm_TrackletCalculator_h
+#define TrackletAlgorithm_TrackletCalculator_h
 
 #include <cmath>
 
@@ -627,3 +628,5 @@ TrackletCalculator(
     }
   }
 }
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef MATCHENGINE_H
-#define MATCHENGINE_H
+#ifndef TrackletAlgorithm_MatchEngine_h
+#define TrackletAlgorithm_MatchEngine_h
 
 // cms-tracklet/firmware-hls Headers
 #include "Constants.h"

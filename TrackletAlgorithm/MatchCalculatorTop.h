@@ -1,5 +1,5 @@
-#ifndef MATCHCALCULATORTOP_H
-#define MATCHCALCULATORTOP_H
+#ifndef TrackletAlgorithm_MatchCalculatorTop_h
+#define TrackletAlgorithm_MatchCalculatorTop_h
 
 #include "MatchCalculator.h"
 
