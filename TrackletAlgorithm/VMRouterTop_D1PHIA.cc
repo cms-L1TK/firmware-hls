@@ -1,19 +1,16 @@
-#include "VMRouterTop_D1.h"
+#include "VMRouterTop_D1PHIA.h"
 
 // VMRouter Top Function for Disk 1, AllStub region A
 void VMRouterTop(BXType bx,
-// Input memories
-		const InputStubMemory<DISK2S> *i0,
-		const InputStubMemory<DISKPS> *i1,
-		const InputStubMemory<DISKPS> *i2,
-		const InputStubMemory<DISK2S> *i3,
-		const InputStubMemory<DISKPS> *i4,
-		const InputStubMemory<DISKPS> *i5,
-// Output memories
-AllStubMemory<DISK> allStub[6],
-VMStubMEMemory<DISK> meMemories[8],
-VMStubTEInnerMemory<DISK> teiMemories[4][3],
-VMStubTEOuterMemory<DISK> teoMemories[4][5]
+	// Input memories
+	// Input memories
+	const InputStubMemory<DISKPS> inputStub[numInputs],
+	const InputStubMemory<DISK2S> inputStubDisk2S[numInputsDisk2S],
+	// Output memories
+	AllStubMemory<DISK> allStub[maxAllCopies],
+	VMStubMEMemory<DISK> meMemories[numME],
+	VMStubTEInnerMemory<DISK> teiMemories[numTEI][maxTEICopies],
+	VMStubTEOuterMemory<DISK> teoMemories[numTEO][maxTEOCopies]
 		)
 {
 
@@ -22,12 +19,6 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 	
 	constexpr int layer(0); // Which barrel layer number the data is coming from, 0 if not barrel
 	constexpr int disk(1); // Which disk number the data is coming from, 0 if not disk
-	
-	// Maximum number of memory "copies"
-	constexpr int nall(6); // Allstub memory
-	constexpr int ntei(3); // TE Inner memories
-	constexpr int nteol(1); // Can't use 0 evne if we don't have any TE Inner Overlap memories
-	constexpr int nteo(5); // TE Outer memories
 	
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	static const ap_uint<6> imask(0x3F); // Input memories
@@ -193,12 +184,12 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
-#pragma HLS resource variable=i0->get_mem() latency=2
-#pragma HLS resource variable=i1->get_mem() latency=2
-#pragma HLS resource variable=i2->get_mem() latency=2
-#pragma HLS resource variable=i3->get_mem() latency=2
-#pragma HLS resource variable=i4->get_mem() latency=2
-#pragma HLS resource variable=i5->get_mem() latency=2
+#pragma HLS resource variable=inputStub[0].get_mem() latency=2
+#pragma HLS resource variable=inputStub[1].get_mem() latency=2
+#pragma HLS resource variable=inputStub[2].get_mem() latency=2
+#pragma HLS resource variable=inputStub[3].get_mem() latency=2
+#pragma HLS resource variable=inputStubDisk2S[0].get_mem() latency=2
+#pragma HLS resource variable=inputStubDisk2S[1].get_mem() latency=2
 
 #pragma HLS resource variable=finebintable latency=2
 #pragma HLS resource variable=rzbitstable latency=2
@@ -211,14 +202,13 @@ VMStubTEOuterMemory<DISK> teoMemories[4][5]
 /////////////////////////
 // Main function
 	
-	// template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
-	// Disks have two types of input
-	VMRouter<DISKPS, DISK2S, DISK, layer, disk, nall, ntei, nteol, nteo>
+	// template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
+	VMRouter<DISKPS, DISK, layer, disk,  maxAllCopies, maxTEICopies, maxOLCopies, maxTEOCopies>
 	(bx, finebintable, nullptr, 
 		rzbitstable, nullptr, rzbitsextratable, 
 		bendtable, nullptr, bendextratable,
 // Input memories
-		imask, i0,i1,i2,i3,i4,i5,//,i6,i7,
+		imask, inputStub, inputStubDisk2S,
 // AllStub memories
 		allStub,
 // ME memories

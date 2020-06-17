@@ -1,5 +1,5 @@
 // Test bench for VMRouter
-#include "VMRouterTop_D1.h"
+#include "VMRouterTop_D1PHIA.h"
 
 #include <algorithm>
 #include <iterator>
@@ -20,12 +20,8 @@ int main()
 
   ///////////////////////////
   // input memories
-  static InputStubMemory<DISK2S> inputStub1;
-  static InputStubMemory<DISKPS> inputStub2;
-  static InputStubMemory<DISKPS> inputStub3;
-  static InputStubMemory<DISK2S> inputStub4;
-  static InputStubMemory<DISKPS> inputStub5;
-  static InputStubMemory<DISKPS> inputStub6;
+  static InputStubMemory<DISKPS> inputStub[4];
+  static InputStubMemory<DISK2S> inputStubDisk2S[2];
 
   // output memories
   static AllStubMemory<DISK> allStub[6];
@@ -290,20 +286,19 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
   // read event and write to memories
-  writeMemFromFile<InputStubMemory<DISK2S>>(inputStub1, fin_inputstub1, ievt);
-  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub2, fin_inputstub2, ievt);
-  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub3, fin_inputstub3, ievt);
-  writeMemFromFile<InputStubMemory<DISK2S>>(inputStub4, fin_inputstub4, ievt);
-  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub5, fin_inputstub5, ievt);
-  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub6, fin_inputstub6, ievt);
+  writeMemFromFile<InputStubMemory<DISK2S>>(inputStubDisk2S[0], fin_inputstub1, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub[0], fin_inputstub2, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub[1], fin_inputstub3, ievt);
+  writeMemFromFile<InputStubMemory<DISK2S>>(inputStubDisk2S[1], fin_inputstub4, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub[2], fin_inputstub5, ievt);
+  writeMemFromFile<InputStubMemory<DISKPS>>(inputStub[3], fin_inputstub6, ievt);
 
   // bx
   BXType bx = ievt;
   BXType bx_out;
 
   // Unit Under Test
-  VMRouterTop(bx,
-  		&inputStub1, &inputStub2, &inputStub3, &inputStub4, &inputStub5, &inputStub6,
+  VMRouterTop(bx, inputStub, inputStubDisk2S,
       allStub, meMemories, teiMemories, teoMemories
 	);
 

@@ -3,15 +3,12 @@
 // VMRouter Top Function for layer 1, AllStub region E
 void VMRouterTop(BXType bx, 
 	// Input memories
-		const InputStubMemory<BARRELPS>* i0,
-		const InputStubMemory<BARRELPS>* i1,
-		const InputStubMemory<BARRELPS>* i2,
-		const InputStubMemory<BARRELPS>* i3,
+		const InputStubMemory<BARRELPS> inputStub[numInputs],
 		// Output memories
-		AllStubMemory<BARRELPS> allStub[6],
-		VMStubMEMemory<BARRELPS> meMemories[4],
-		VMStubTEInnerMemory<BARRELPS> teiMemories[4][5],
-		VMStubTEInnerMemory<BARRELOL> olMemories[2][3]) {
+		AllStubMemory<BARRELPS> allStub[maxAllCopies],
+		VMStubMEMemory<BARRELPS> meMemories[numME],
+		VMStubTEInnerMemory<BARRELPS> teiMemories[numTEI][maxTEICopies],
+		VMStubTEInnerMemory<BARRELOL> olMemories[numOL][maxOLCopies]) {
 
 //////////////////////////////////
 // Variables for that are specified with regards to the test bench
@@ -19,11 +16,7 @@ void VMRouterTop(BXType bx,
 	constexpr int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	constexpr int disk(0); // Which disk number the data is coming from, 0 if not disk
 	
-	// Maximum number of memory "copies"
-	constexpr int ncpall(6); // Allstub memory
-	constexpr int ncptei(5); // TE Inner memories
-	constexpr int ncpteol(3); // TE Inner Overlap memories
-	constexpr int ncpteo(1); // Can't use 0 evne if we don't have any TE Outer memories
+
 	
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	static const ap_uint<6> imask(0xF); // Input memories
@@ -190,10 +183,10 @@ void VMRouterTop(BXType bx,
 
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
-#pragma HLS resource variable=i0->get_mem() latency=2
-#pragma HLS resource variable=i1->get_mem() latency=2
-#pragma HLS resource variable=i2->get_mem() latency=2
-#pragma HLS resource variable=i3->get_mem() latency=2
+#pragma HLS resource variable=inputStub[0].get_mem() latency=2
+#pragma HLS resource variable=inputStub[1].get_mem() latency=2
+#pragma HLS resource variable=inputStub[2].get_mem() latency=2
+#pragma HLS resource variable=inputStub[3].get_mem() latency=2
 
 #pragma HLS resource variable=finebintable latency=2
 #pragma HLS resource variable=rzbitstable latency=2
@@ -206,14 +199,13 @@ void VMRouterTop(BXType bx,
 /////////////////////////
 // Main function
 
-	// template<regionType INTYPE, regionType INTYPE2, regionType OUTTYPE, int LAYER, int DISK, int MAXNALL, int MAXNTEI, int MAXNTEOL, int MAXNTEO>
-	// Disks have two types of input
-	VMRouter<BARRELPS, BARRELPS, BARRELPS, layer, disk,  ncpall, ncptei, ncpteol, ncpteo>
+	// template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
+	VMRouter<BARRELPS, BARRELPS, layer, disk,  maxAllCopies, maxTEICopies, maxOLCopies, maxTEOCopies>
 	(bx, finebintable, phicorrtable, 
 		rzbitstable, rzbitsextratable, nullptr,
 		bendtable, bendextratable, nullptr,
 // Input memories
-		imask, i0, i1, i2, i3, nullptr, nullptr,
+		imask, inputStub, nullptr,
 // AllStub memories
 		allStub,
 // ME memories
