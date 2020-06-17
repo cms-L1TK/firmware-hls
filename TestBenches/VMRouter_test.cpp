@@ -7,7 +7,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 1;  //number of events to run
+const int nevents = 10;  //number of events to run
 
 using namespace std;
 
@@ -20,21 +20,21 @@ int main()
 
   ///////////////////////////
   // input memories
-  	static InputStubMemory<BARRELPS> inputStub1;
-  	static InputStubMemory<BARRELPS> inputStub2;
-  	static InputStubMemory<BARRELPS> inputStub3;
-  	static InputStubMemory<BARRELPS> inputStub4;
-  	static InputStubMemory<BARRELPS> inputStub5;
-  	static InputStubMemory<BARRELPS> inputStub6;
+  static InputStubMemory<BARRELPS> inputStub1;
+  static InputStubMemory<BARRELPS> inputStub2;
+  static InputStubMemory<BARRELPS> inputStub3;
+  static InputStubMemory<BARRELPS> inputStub4;
+  static InputStubMemory<BARRELPS> inputStub5;
+  static InputStubMemory<BARRELPS> inputStub6;
 
   // output memories
   static AllStubMemory<BARRELPS> allStub[6];
   // ME memories
   static VMStubMEMemory<BARRELPS> meMemories[4];
-	// TE Inner memories
-	static VMStubTEInnerMemory<BARRELPS> teiMemories[4][5];
-	// TE Inner Overlap memories, including copies
-	static VMStubTEInnerMemory<BARRELOL> olMemories[2][3];
+  // TE Inner memories
+  static VMStubTEInnerMemory<BARRELPS> teiMemories[4][5];
+  // TE Inner Overlap memories, including copies
+  static VMStubTEInnerMemory<BARRELOL> olMemories[2][3];
 
 
 ///////////////////////////
@@ -257,11 +257,15 @@ int main()
   // bx - bunch crossing
   BXType bx = ievt;
   BXType bx_out;
-
+  
+  std::cout << "I EVT " << ievt << " BX " << bx << std::endl;
+  
   // Unit Under Test
 	VMRouterTop(bx, &inputStub1, &inputStub2, &inputStub3, &inputStub4,
 			allStub, meMemories, teiMemories, olMemories);
-
+  
+  std::cout << " NUMBER OF TEI " <<  teiMemories[2][0].getEntries(bx) << " jirv "<< teiMemories[2][0].getEntries(ievt) << std::endl;
+  
   // compare the computed outputs with the expected ones
   // add 1 per stub that is incorrect
   bool truncation = false;
@@ -273,7 +277,7 @@ int main()
   err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[3], fout_allstub_n4, ievt, "AllStub", truncation);
   err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[4], fout_allstub_n5, ievt, "AllStub", truncation);
   err += compareMemWithFile<AllStubMemory<BARRELPS>>(allStub[5], fout_allstub_n6, ievt, "AllStub", truncation);
-
+  
   // ME Memories
   // VMStubME1
   err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[0], fout_vmstubme1, ievt, "VMStubME17", truncation);
@@ -285,7 +289,7 @@ int main()
   err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[3], fout_vmstubme4, ievt, "VMStubME20", truncation);
 
   // TE Memories
-  //VMStubTEInner1
+  // VMStubTEInner1
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][0], fout_vmstubtei1_n1, ievt, "VMStubTEInner17", truncation);
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][1], fout_vmstubtei1_n2, ievt, "VMStubTEInner17", truncation);
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[0][2], fout_vmstubtei1_n3, ievt, "VMStubTEInner17", truncation);
@@ -304,7 +308,7 @@ int main()
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][2], fout_vmstubtei3_n3, ievt, "VMStubTEInner19", truncation);
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][3], fout_vmstubtei3_n4, ievt, "VMStubTEInner19", truncation);
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[2][4], fout_vmstubtei3_n5, ievt, "VMStubTEInner19", truncation);
-
+  
   // VMStubTEInner4
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][0], fout_vmstubtei4_n1, ievt, "VMStubTEInner20", truncation);
   err += compareMemWithFile<VMStubTEInnerMemory<BARRELPS>>(teiMemories[3][1], fout_vmstubtei4_n2, ievt, "VMStubTEInner20", truncation);

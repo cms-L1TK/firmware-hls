@@ -70,7 +70,7 @@ constexpr int nzbitsrzbitsoverlaptable = 7;
 constexpr int nrbitsrzbitsoverlaptable = 3;
 
 // Number of MSBs used for r index in phicorr LUTs
-constexpr int nrbitsphicorrtable = 3; // Found hardcoded in VMRouterPhiphicorrtable.h
+constexpr int nrbitsphicorrtable = 3; // Found hardcoded in VMRouterphicorrtable.h
 
 
 
@@ -174,6 +174,7 @@ inline ap_uint<5> getFirstMemNumber(const ap_uint<32> mask) {
 	return i;
 }
 
+
 /////////////////////////////////
 // Main function
 
@@ -187,7 +188,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		// rzbitstables (binlookup in emulation)
 		const int rzbitsinnertable[], const int rzbitsoverlaptable[], const int rzbitsoutertable[],
 		// bendcut tables
-		const ap_uint<1>* bendtable[], const ap_uint<1>* bendoverlaptable[], const ap_uint<1>* bendoutertable[],
+		const ap_uint<1>* bendinnertable[], const ap_uint<1>* bendoverlaptable[], const ap_uint<1>* bendoutertable[],
 		// Input memories
 		const ap_uint<6>& imask, 
 		const InputStubMemory<InType2>* const i0,
@@ -208,10 +209,10 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		const ap_uint<32>& teomask, VMStubTEOuterMemory<OutType> teoMemories[][MaxTEOCopies]) {
 
 #pragma HLS inline
-#pragma HLS array_partition variable=bendtable complete dim=1
+#pragma HLS array_partition variable=bendinnertable complete dim=1
 #pragma HLS array_partition variable=bendoverlaptable complete dim=1
 #pragma HLS array_partition variable=bendoutertable complete dim=1
-//#pragma HLS interface ap_bus port=bendtable depth=8
+//#pragma HLS interface ap_bus port=bendinnertable depth=8
 #pragma HLS array_partition variable=allstub complete
 #pragma HLS array_partition variable=meMemories complete
 #pragma HLS array_partition variable=teiMemories complete dim=2
@@ -226,9 +227,9 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			(Layer) ? nbitsrfinebintablelayer : nbitsrfinebintabledisk; // Number of MSBs of r used in finebintable
 	
 	// The first memory numbers, the position of the first non-zero bit in the mask
-	static const ap_uint<5> firstme = getFirstMemNumber(memask); // ME memory
-	static const ap_uint<5> firstte = (teimask) ? getFirstMemNumber(teimask) : getFirstMemNumber(teomask); // TE memory
-	static const ap_uint<5> firstol = (olmask) ? static_cast<int>(getFirstMemNumber(olmask)) : 0; // TE Overlap memory
+	static const int firstme = getFirstMemNumber(memask); // ME memory
+	static const int firstte = (teimask) ? getFirstMemNumber(teimask) : getFirstMemNumber(teomask); // TE memory
+	static const int firstol = (olmask) ? static_cast<int>(getFirstMemNumber(olmask)) : 0; // TE Overlap memory
 
 	// Number of memories/VMs for one coarse phi region
 	constexpr int nvmme = (Layer) ? nvmmelayers[Layer-1] : nvmmedisks[Disk-1]; // ME memories
@@ -638,7 +639,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 				ap_uint<6> bendindex = memindex*MaxTEICopies; // Index for bendcut LUTs
 				for (int n = 0; n < MaxTEICopies; n++) {
 					#pragma HLS UNROLL
-					bool passbend = bendtable[bendindex][bend];
+					bool passbend = bendinnertable[bendindex][bend];
 					if (passbend) {
 						teiMemories[memindex][n].write_mem(bx, stubTeInner, addrCountTEI[memindex][n]);
 						addrCountTEI[memindex][n] += 1; // Count the memory addresses we have written to
