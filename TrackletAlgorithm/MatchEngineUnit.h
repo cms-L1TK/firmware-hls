@@ -151,7 +151,7 @@ void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRoute
   //If the buffer is not empty we have a projection that we need to 
   //process. 
       //std::cout << "writeindex[" << ivmphi << "]=" << writeindex[ivmphi] << "\treadindex[" << ivmphi << "]=" << readindex << std::endl;
-        projbuffer[readindex].Print();
+        //projbuffer[readindex].Print();
   if (!empty() && buffernotlarger) {
 
       ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
@@ -168,7 +168,7 @@ void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRoute
         //std::cout << "nproj=" << writeindex1 << std::endl;
         auto const qdata=projbuffer[readindex];
         tcid=qdata.getTCID();
-        projbuffer[readindex].Print();
+        //projbuffer[readindex].Print();
         /*
         ProjectionRouterBuffer<BARREL> *qdata;
         switch (ivmphi) {
