@@ -869,7 +869,7 @@ void MatchProcessor(BXType bx,
             std::cout << "PRiphi=" << iphi << std::endl;
             std::cout << "save first" << std::endl;
             */
-      std::cout << std::hex << "iphi=" << iphi+1 << " vmproj=" << vmproj.raw() << std::endl;
+      //std::cout << std::hex << "iphi=" << iphi+1 << " vmproj=" << vmproj.raw() << std::endl;
           projbuffer[iphi][writeindextmp[iphi]]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
         /*
           switch (iphi) {
