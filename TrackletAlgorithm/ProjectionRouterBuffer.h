@@ -88,7 +88,7 @@ public:
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
     setNStubs(nstub); //FIXME error with data_ constructor not setting nstubs correctly
     setHasSecond(hasSec); //FIXME error with data_ constructor not setting hasSec correctly
-    Print();
+    //Print();
   }
 
   // This constructor is only used for projections in DISK
