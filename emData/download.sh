@@ -8,6 +8,7 @@ tarball_url="https://cernbox.cern.ch/index.php/s/tsxTkilHDVhnbYF/download"
 declare -a processing_modules=(
   # VMRouter
   "VMR_L1PHIE"
+  "VMR_D1PHIA"
 
   # TrackletEngine
   "TE_L1PHIE18_L2PHIC17"
