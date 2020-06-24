@@ -1,5 +1,5 @@
-#ifndef VMROUTERTOP_H
-#define VMROUTERTOP_H
+#ifndef TrackletAlgorithm_VMRouterTop_D1PHIA_h
+#define TrackletAlgorithm_VMRouterTop_D1PHIA_h
 
 #include "VMRouter.h"
 
@@ -31,4 +31,4 @@ void VMRouterTop(BXType bx,
 	VMStubTEOuterMemory<DISK> teoMemories[numTEO][maxTEOCopies]
 	);
 
-#endif // VMROUTERTOP_H
+#endif // TrackletAlgorithm_VMRouterTop_D1PHIA_h
