@@ -129,6 +129,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 2, kNBits_MemAddr,3>;
+template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr,3>;
 
 #endif

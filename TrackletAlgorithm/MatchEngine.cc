@@ -217,8 +217,8 @@ void MatchEngineTop(const BXType bx, BXType& bx_o,
 					CandidateMatchMemory& outputCandidateMatch) {
 
 #pragma HLS interface register port=bx_o
-//#pragma HLS resource variable=inputStubData->get_mem() latency=2
-//#pragma HLS resource variable=inputProjectionData->get_mem() latency=2
+#pragma HLS resource variable=inputStubData->get_mem() latency=2
+#pragma HLS resource variable=inputProjectionData->get_mem() latency=2
 
 	MatchEngine<LAYER,MODULETYPE,PROJECTIONTYPE>(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch); 
 }
