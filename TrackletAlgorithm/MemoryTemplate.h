@@ -84,7 +84,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-    if (addr_index <= (1<<NBIT_ADDR)) {
+    if (addr_index < (1<<NBIT_ADDR)) {
       dataarray_[ibx][addr_index] = data;
       nentries_[ibx] = addr_index + 1;
       return true;

@@ -106,7 +106,7 @@ public:
 
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
-	if (nentry_ibx <= (1<<(NBIT_ADDR-NBIT_BIN))) {
+	if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))) {
 	  // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+nentry_ibx] = data;
 	  nentries_[ibx][slot] = nentry_ibx + 1;
