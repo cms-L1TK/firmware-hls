@@ -35,28 +35,28 @@ void VMRouterTop(BXType bx,
 	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
 	// Indexed using r and z position bits
 	static const int finebintable[] =
-#include "../emData/MemPrints/Tables/VMR_D1PHIA_finebin.tab"
+#include "../emData/VMR/tables/VMR_D1PHIA_finebin.tab"
 	;
 
 	// LUT with phi corrections to project the stub to the nominal radius. 
 	// Only used by layers.
 	// Indexed using phi and bend bits
 	// 	static const int phicorrtable[] =
-	// #include "../emData/MemPrints/Tables/VMPhiCorrL1.txt"
+	// #include "../emData/VMR/tables/VMPhiCorrL1.txt"
 	// 	;
 		
 	// LUT with the Z/R bits for TE memories
 	// Contain information about where in z to look for valid stub pairs
 	// Indexed using z and r position bits
 	static const int rzbitstable[2048] = // 11 bits used for LUT
-#include "../emData/MemPrints/Tables/VMTableInnerD1D2.tab" // Only for Layer 1
+#include "../emData/VMR/tables/VMTableInnerD1D2.tab" // Only for Layer 1
 	;
 
 	// LUT with the Z/R bits for TE Overlap memories
 	// Only used for Layer 1 and 2, and Disk 1
 	// Indexed using z and r position bits
 	static const int rzbitsextratable[] = // 10 bits used for LUT
-#include "../emData/MemPrints/Tables/VMTableOuterD1.tab" // Only for Layer 1
+#include "../emData/VMR/tables/VMTableOuterD1.tab" // Only for Layer 1
 	;
 
 
@@ -65,44 +65,44 @@ void VMRouterTop(BXType bx,
 
 	// TE Memory 1
 	ap_uint<1> tmptable1_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA1n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA1n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable1_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA1n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA1n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable1_n3[8] = {0};
 	
 	// TE Memory 2
 	ap_uint<1> tmptable2_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA2n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA2n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable2_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA2n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA2n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable2_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA2n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA2n3_vmbendcut.tab"
 	;
 	
 	// TE Memory 3
 	ap_uint<1> tmptable3_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA3n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA3n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable3_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA3n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA3n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable3_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA3n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA3n3_vmbendcut.tab"
 	;
 
 	// TE Memory 4
 	ap_uint<1> tmptable4_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA4n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA4n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable4_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA4n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA4n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmptable4_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIA4n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIA4n3_vmbendcut.tab"
 	;
 	
 	static const ap_uint<1>* bendtable[] = {
@@ -114,13 +114,13 @@ void VMRouterTop(BXType bx,
 
 	// TE Overlap Memory 1
 	ap_uint<1> tmpextratable1_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX1n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX1n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable1_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX1n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX1n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable1_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX1n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX1n3_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable1_n4[8] = {0};
 	
@@ -128,51 +128,51 @@ void VMRouterTop(BXType bx,
 
 	// TE Overlap Memory 2
 	ap_uint<1> tmpextratable2_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX2n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable2_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX2n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable2_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX2n3_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable2_n4[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX2n4_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX2n4_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable2_n5[8] = {0};
 
 	// TE Overlap Memory 3
 	ap_uint<1> tmpextratable3_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX3n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable3_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX3n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable3_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX3n3_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable3_n4[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n4_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX3n4_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable3_n5[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX3n5_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX3n5_vmbendcut.tab"
 	;
 
 	// TE Overlap Memory 4
 	ap_uint<1> tmpextratable4_n1[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n1_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX4n1_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable4_n2[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n2_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX4n2_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable4_n3[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n3_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX4n3_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable4_n4[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n4_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX4n4_vmbendcut.tab"
 	;
 	ap_uint<1> tmpextratable4_n5[] =
-#include "../emData/MemPrints/Tables/VMSTE_D1PHIX4n5_vmbendcut.tab"
+#include "../emData/VMR/tables/VMSTE_D1PHIX4n5_vmbendcut.tab"
 	;
 
 	static const ap_uint<1>* bendextratable[] = {

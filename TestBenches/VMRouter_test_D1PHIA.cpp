@@ -40,27 +40,27 @@ int main()
   cout << "Open files..." << endl;
 
   ifstream fin_inputstub1;
-  bool validin1 = openDataFile(fin_inputstub1, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_2S_5_A_04.dat");
+  bool validin1 = openDataFile(fin_inputstub1, "VMR_D1PHIA/InputStubs_IL_D1PHIA_2S_5_A_04.dat");
   if (not validin1) return -1;
 
   ifstream fin_inputstub2;
-  bool validin2 = openDataFile(fin_inputstub2, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_PS10G_2_A_04.dat");
+  bool validin2 = openDataFile(fin_inputstub2, "VMR_D1PHIA/InputStubs_IL_D1PHIA_PS10G_2_A_04.dat");
   if (not validin2) return -1;
 
   ifstream fin_inputstub3;
-  bool validin3 = openDataFile(fin_inputstub3, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_PS5G_4_A_04.dat");
+  bool validin3 = openDataFile(fin_inputstub3, "VMR_D1PHIA/InputStubs_IL_D1PHIA_PS5G_4_A_04.dat");
   if (not validin3) return -1;
 
   ifstream fin_inputstub4;
-  bool validin4 = openDataFile(fin_inputstub4, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_2S_5_A_04.dat");
+  bool validin4 = openDataFile(fin_inputstub4, "VMR_D1PHIA/InputStubs_IL_D1PHIA_neg_2S_5_A_04.dat");
   if (not validin4) return -1;
 
   ifstream fin_inputstub5;
-  bool validin5 = openDataFile(fin_inputstub5, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_PS10G_2_A_04.dat");
+  bool validin5 = openDataFile(fin_inputstub5, "VMR_D1PHIA/InputStubs_IL_D1PHIA_neg_PS10G_2_A_04.dat");
   if (not validin5) return -1;
 
   ifstream fin_inputstub6;
-  bool validin6 = openDataFile(fin_inputstub6, "MemPrints/InputStubs/InputStubs_IL_D1PHIA_neg_PS5G_4_A_04.dat");
+  bool validin6 = openDataFile(fin_inputstub6, "VMR_D1PHIA/InputStubs_IL_D1PHIA_neg_PS5G_4_A_04.dat");
   if (not validin6) return -1;
 
 
@@ -69,214 +69,214 @@ int main()
   
   // AllStub
   ifstream fout_allstub_n1;
-  bool valid_allstub_n1 = openDataFile(fout_allstub_n1, "MemPrints/Stubs/AllStubs_AS_D1PHIAn1_04.dat");
+  bool valid_allstub_n1 = openDataFile(fout_allstub_n1, "VMR_D1PHIA/AllStubs_AS_D1PHIAn1_04.dat");
   if (not valid_allstub_n1) return -1;
   
   ifstream fout_allstub_n2;
-  bool valid_allstub_n2 = openDataFile(fout_allstub_n2, "MemPrints/Stubs/AllStubs_AS_D1PHIAn2_04.dat");
+  bool valid_allstub_n2 = openDataFile(fout_allstub_n2, "VMR_D1PHIA/AllStubs_AS_D1PHIAn2_04.dat");
   if (not valid_allstub_n2) return -1;
   
   ifstream fout_allstub_n3;
-  bool valid_allstub_n3 = openDataFile(fout_allstub_n3, "MemPrints/Stubs/AllStubs_AS_D1PHIAn3_04.dat");
+  bool valid_allstub_n3 = openDataFile(fout_allstub_n3, "VMR_D1PHIA/AllStubs_AS_D1PHIAn3_04.dat");
   if (not valid_allstub_n3) return -1;
   
   ifstream fout_allstub_n4;
-  bool valid_allstub_n4 = openDataFile(fout_allstub_n4, "MemPrints/Stubs/AllStubs_AS_D1PHIAn4_04.dat");
+  bool valid_allstub_n4 = openDataFile(fout_allstub_n4, "VMR_D1PHIA/AllStubs_AS_D1PHIAn4_04.dat");
   if (not valid_allstub_n4) return -1;
   
   ifstream fout_allstub_n5;
-  bool valid_allstub_n5 = openDataFile(fout_allstub_n5, "MemPrints/Stubs/AllStubs_AS_D1PHIAn5_04.dat");
+  bool valid_allstub_n5 = openDataFile(fout_allstub_n5, "VMR_D1PHIA/AllStubs_AS_D1PHIAn5_04.dat");
   if (not valid_allstub_n5) return -1;
   
   ifstream fout_allstub_n6;
-  bool valid_allstub_n6 = openDataFile(fout_allstub_n6, "MemPrints/Stubs/AllStubs_AS_D1PHIAn6_04.dat");
+  bool valid_allstub_n6 = openDataFile(fout_allstub_n6, "VMR_D1PHIA/AllStubs_AS_D1PHIAn6_04.dat");
   if (not valid_allstub_n6) return -1;
   
   // ME memories
   ifstream fout_vmstubme1;
-  bool valid_vmstubme1 =  openDataFile(fout_vmstubme1, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA1n1_04.dat");
+  bool valid_vmstubme1 =  openDataFile(fout_vmstubme1, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA1n1_04.dat");
   if (not valid_vmstubme1) return -1;
 
   ifstream fout_vmstubme2;
-  bool valid_vmstubme2 = openDataFile(fout_vmstubme2, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA2n1_04.dat");
+  bool valid_vmstubme2 = openDataFile(fout_vmstubme2, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA2n1_04.dat");
   if (not valid_vmstubme2) return -1;
 
   ifstream fout_vmstubme3;
-  bool valid_vmstubme3 = openDataFile(fout_vmstubme3, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA3n1_04.dat");
+  bool valid_vmstubme3 = openDataFile(fout_vmstubme3, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA3n1_04.dat");
   if (not valid_vmstubme3) return -1;
 
   ifstream fout_vmstubme4;
-  bool valid_vmstubme4 = openDataFile(fout_vmstubme4, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA4n1_04.dat");
+  bool valid_vmstubme4 = openDataFile(fout_vmstubme4, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA4n1_04.dat");
   if (not valid_vmstubme4) return -1;
 
   ifstream fout_vmstubme5;
-  bool valid_vmstubme5 =  openDataFile(fout_vmstubme5, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA5n1_04.dat");
+  bool valid_vmstubme5 =  openDataFile(fout_vmstubme5, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA5n1_04.dat");
   if (not valid_vmstubme5) return -1;
 
   ifstream fout_vmstubme6;
-  bool valid_vmstubme6 = openDataFile(fout_vmstubme6, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA6n1_04.dat");
+  bool valid_vmstubme6 = openDataFile(fout_vmstubme6, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA6n1_04.dat");
   if (not valid_vmstubme6) return -1;
 
   ifstream fout_vmstubme7;
-  bool valid_vmstubme7 = openDataFile(fout_vmstubme7, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA7n1_04.dat");
+  bool valid_vmstubme7 = openDataFile(fout_vmstubme7, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA7n1_04.dat");
   if (not valid_vmstubme7) return -1;
 
   ifstream fout_vmstubme8;
-  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "MemPrints/VMStubsME/VMStubs_VMSME_D1PHIA8n1_04.dat");
+  bool valid_vmstubme8 = openDataFile(fout_vmstubme8, "VMR_D1PHIA/VMStubs_VMSME_D1PHIA8n1_04.dat");
   if (not valid_vmstubme8) return -1;
 
   // TE inner
   // 1
   ifstream fout_vmstubtei1_n1;
-  bool valid_vmstubtei1_n1 =  openDataFile(fout_vmstubtei1_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA1n1_04.dat");
+  bool valid_vmstubtei1_n1 =  openDataFile(fout_vmstubtei1_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA1n1_04.dat");
   if (not valid_vmstubtei1_n1) return -1;
 
   ifstream fout_vmstubtei1_n2;
-  bool valid_vmstubtei1_n2 =  openDataFile(fout_vmstubtei1_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA1n2_04.dat");
+  bool valid_vmstubtei1_n2 =  openDataFile(fout_vmstubtei1_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA1n2_04.dat");
   if (not valid_vmstubtei1_n2) return -1;
   
   // ifstream fout_vmstubtei1_n3;
-  // bool valid_vmstubtei1_n3 =  openDataFile(fout_vmstubtei1_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA1n3_04.dat");
+  // bool valid_vmstubtei1_n3 =  openDataFile(fout_vmstubtei1_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA1n3_04.dat");
   // if (not valid_vmstubtei1_n3) return -1;
   
   // 2
   ifstream fout_vmstubtei2_n1;
-  bool valid_vmstubtei2_n1 = openDataFile(fout_vmstubtei2_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA2n1_04.dat");
+  bool valid_vmstubtei2_n1 = openDataFile(fout_vmstubtei2_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA2n1_04.dat");
   if (not valid_vmstubtei2_n1) return -1;
   
   ifstream fout_vmstubtei2_n2;
-  bool valid_vmstubtei2_n2 = openDataFile(fout_vmstubtei2_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA2n2_04.dat");
+  bool valid_vmstubtei2_n2 = openDataFile(fout_vmstubtei2_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA2n2_04.dat");
   if (not valid_vmstubtei2_n2) return -1;
   
   ifstream fout_vmstubtei2_n3;
-  bool valid_vmstubtei2_n3 = openDataFile(fout_vmstubtei2_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA2n3_04.dat");
+  bool valid_vmstubtei2_n3 = openDataFile(fout_vmstubtei2_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA2n3_04.dat");
   if (not valid_vmstubtei2_n3) return -1;
 
   // 3
   ifstream fout_vmstubtei3_n1;
-  bool valid_vmstubtei3_n1 = openDataFile(fout_vmstubtei3_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA3n1_04.dat");
+  bool valid_vmstubtei3_n1 = openDataFile(fout_vmstubtei3_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA3n1_04.dat");
   if (not valid_vmstubtei3_n1) return -1;
 
   ifstream fout_vmstubtei3_n2;
-  bool valid_vmstubtei3_n2 = openDataFile(fout_vmstubtei3_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA3n2_04.dat");
+  bool valid_vmstubtei3_n2 = openDataFile(fout_vmstubtei3_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA3n2_04.dat");
   if (not valid_vmstubtei3_n2) return -1;
   
   ifstream fout_vmstubtei3_n3;
-  bool valid_vmstubtei3_n3 = openDataFile(fout_vmstubtei3_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA3n3_04.dat");
+  bool valid_vmstubtei3_n3 = openDataFile(fout_vmstubtei3_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA3n3_04.dat");
   if (not valid_vmstubtei3_n3) return -1;
   
   // 4
   ifstream fout_vmstubtei4_n1;
-  bool valid_vmstubtei4_n1 = openDataFile(fout_vmstubtei4_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA4n1_04.dat");
+  bool valid_vmstubtei4_n1 = openDataFile(fout_vmstubtei4_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA4n1_04.dat");
   if (not valid_vmstubtei4_n1) return -1;
   
   ifstream fout_vmstubtei4_n2;
-  bool valid_vmstubtei4_n2 = openDataFile(fout_vmstubtei4_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA4n2_04.dat");
+  bool valid_vmstubtei4_n2 = openDataFile(fout_vmstubtei4_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA4n2_04.dat");
   if (not valid_vmstubtei4_n2) return -1;
   
   ifstream fout_vmstubtei4_n3;
-  bool valid_vmstubtei4_n3 = openDataFile(fout_vmstubtei4_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA4n3_04.dat");
+  bool valid_vmstubtei4_n3 = openDataFile(fout_vmstubtei4_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA4n3_04.dat");
   if (not valid_vmstubtei4_n3) return -1;
 
   // ifstream fout_vmstubtei5;
-  // bool valid_vmstubtei5 =  openDataFile(fout_vmstubtei5, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA5n1_04.dat");
+  // bool valid_vmstubtei5 =  openDataFile(fout_vmstubtei5, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA5n1_04.dat");
   // if (not valid_vmstubtei5) return -1;
   //
   // ifstream fout_vmstubtei6;
-  // bool valid_vmstubtei6 = openDataFile(fout_vmstubtei6, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA6n1_04.dat");
+  // bool valid_vmstubtei6 = openDataFile(fout_vmstubtei6, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA6n1_04.dat");
   // if (not valid_vmstubtei6) return -1;
   //
   // ifstream fout_vmstubtei7;
-  // bool valid_vmstubtei7 = openDataFile(fout_vmstubtei7, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA7n1_04.dat");
+  // bool valid_vmstubtei7 = openDataFile(fout_vmstubtei7, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA7n1_04.dat");
   // if (not valid_vmstubtei7) return -1;
   //
   // ifstream fout_vmstubtei8;
-  // bool valid_vmstubtei8 = openDataFile(fout_vmstubtei8, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIA8n1_04.dat");
+  // bool valid_vmstubtei8 = openDataFile(fout_vmstubtei8, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIA8n1_04.dat");
   // if (not valid_vmstubtei8) return -1;
 
   // TE Outer
   // 1
   ifstream fout_vmstubteo1_n1;
-  bool valid_vmstubteo1_n1 = openDataFile(fout_vmstubteo1_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX1n1_04.dat");
+  bool valid_vmstubteo1_n1 = openDataFile(fout_vmstubteo1_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX1n1_04.dat");
   if (not valid_vmstubteo1_n1) return -1;
 
   ifstream fout_vmstubteo1_n2;
-  bool valid_vmstubteo1_n2 = openDataFile(fout_vmstubteo1_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX1n2_04.dat");
+  bool valid_vmstubteo1_n2 = openDataFile(fout_vmstubteo1_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX1n2_04.dat");
   if (not valid_vmstubteo1_n2) return -1;
   
   ifstream fout_vmstubteo1_n3;
-  bool valid_vmstubteo1_n3 = openDataFile(fout_vmstubteo1_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX1n3_04.dat");
+  bool valid_vmstubteo1_n3 = openDataFile(fout_vmstubteo1_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX1n3_04.dat");
   if (not valid_vmstubteo1_n3) return -1;
   
   // ifstream fout_vmstubteo1_n4;
-  // bool valid_vmstubteo1_n4 = openDataFile(fout_vmstubteo1_n4, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX1n4_04.dat");
+  // bool valid_vmstubteo1_n4 = openDataFile(fout_vmstubteo1_n4, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX1n4_04.dat");
   // if (not valid_vmstubteo1_n4) return -1;
   
   // ifstream fout_vmstubteo1_n5;
-  // bool valid_vmstubteo1_n5 = openDataFile(fout_vmstubteo1_n5, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX1n5_04.dat");
+  // bool valid_vmstubteo1_n5 = openDataFile(fout_vmstubteo1_n5, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX1n5_04.dat");
   // if (not valid_vmstubteo1_n5) return -1;
   
   // 2
   ifstream fout_vmstubteo2_n1;
-  bool valid_vmstubteo2_n1 = openDataFile(fout_vmstubteo2_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX2n1_04.dat");
+  bool valid_vmstubteo2_n1 = openDataFile(fout_vmstubteo2_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX2n1_04.dat");
   if (not valid_vmstubteo2_n1) return -1;
   
   ifstream fout_vmstubteo2_n2;
-  bool valid_vmstubteo2_n2 = openDataFile(fout_vmstubteo2_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX2n2_04.dat");
+  bool valid_vmstubteo2_n2 = openDataFile(fout_vmstubteo2_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX2n2_04.dat");
   if (not valid_vmstubteo2_n2) return -1;
   
   ifstream fout_vmstubteo2_n3;
-  bool valid_vmstubteo2_n3 = openDataFile(fout_vmstubteo2_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX2n3_04.dat");
+  bool valid_vmstubteo2_n3 = openDataFile(fout_vmstubteo2_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX2n3_04.dat");
   if (not valid_vmstubteo2_n3) return -1;
   
   ifstream fout_vmstubteo2_n4;
-  bool valid_vmstubteo2_n4 = openDataFile(fout_vmstubteo2_n4, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX2n4_04.dat");
+  bool valid_vmstubteo2_n4 = openDataFile(fout_vmstubteo2_n4, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX2n4_04.dat");
   if (not valid_vmstubteo2_n4) return -1;
   
   // ifstream fout_vmstubteo2_n5;
-  // bool valid_vmstubteo2_n5 = openDataFile(fout_vmstubteo2_n5, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX2n5_04.dat");
+  // bool valid_vmstubteo2_n5 = openDataFile(fout_vmstubteo2_n5, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX2n5_04.dat");
   // if (not valid_vmstubteo2_n5) return -1;
   
   // 3
   ifstream fout_vmstubteo3_n1;
-  bool valid_vmstubteo3_n1 = openDataFile(fout_vmstubteo3_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX3n1_04.dat");
+  bool valid_vmstubteo3_n1 = openDataFile(fout_vmstubteo3_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX3n1_04.dat");
   if (not valid_vmstubteo3_n1) return -1;
   
   ifstream fout_vmstubteo3_n2;
-  bool valid_vmstubteo3_n2 = openDataFile(fout_vmstubteo3_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX3n2_04.dat");
+  bool valid_vmstubteo3_n2 = openDataFile(fout_vmstubteo3_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX3n2_04.dat");
   if (not valid_vmstubteo3_n2) return -1;
   
   ifstream fout_vmstubteo3_n3;
-  bool valid_vmstubteo3_n3 = openDataFile(fout_vmstubteo3_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX3n3_04.dat");
+  bool valid_vmstubteo3_n3 = openDataFile(fout_vmstubteo3_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX3n3_04.dat");
   if (not valid_vmstubteo3_n3) return -1;
   
   ifstream fout_vmstubteo3_n4;
-  bool valid_vmstubteo3_n4 = openDataFile(fout_vmstubteo3_n4, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX3n4_04.dat");
+  bool valid_vmstubteo3_n4 = openDataFile(fout_vmstubteo3_n4, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX3n4_04.dat");
   if (not valid_vmstubteo3_n4) return -1;
   
   ifstream fout_vmstubteo3_n5;
-  bool valid_vmstubteo3_n5 = openDataFile(fout_vmstubteo3_n5, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX3n5_04.dat");
+  bool valid_vmstubteo3_n5 = openDataFile(fout_vmstubteo3_n5, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX3n5_04.dat");
   if (not valid_vmstubteo3_n5) return -1;
 
   // 4
   ifstream fout_vmstubteo4_n1;
-  bool valid_vmstubteo4_n1 = openDataFile(fout_vmstubteo4_n1, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX4n1_04.dat");
+  bool valid_vmstubteo4_n1 = openDataFile(fout_vmstubteo4_n1, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX4n1_04.dat");
   if (not valid_vmstubteo4_n1) return -1;
 
   ifstream fout_vmstubteo4_n2;
-  bool valid_vmstubteo4_n2 = openDataFile(fout_vmstubteo4_n2, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX4n2_04.dat");
+  bool valid_vmstubteo4_n2 = openDataFile(fout_vmstubteo4_n2, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX4n2_04.dat");
   if (not valid_vmstubteo4_n2) return -1;
   
   ifstream fout_vmstubteo4_n3;
-  bool valid_vmstubteo4_n3 = openDataFile(fout_vmstubteo4_n3, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX4n3_04.dat");
+  bool valid_vmstubteo4_n3 = openDataFile(fout_vmstubteo4_n3, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX4n3_04.dat");
   if (not valid_vmstubteo4_n3) return -1;
   
   ifstream fout_vmstubteo4_n4;
-  bool valid_vmstubteo4_n4 = openDataFile(fout_vmstubteo4_n4, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX4n4_04.dat");
+  bool valid_vmstubteo4_n4 = openDataFile(fout_vmstubteo4_n4, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX4n4_04.dat");
   if (not valid_vmstubteo4_n4) return -1;
   
   ifstream fout_vmstubteo4_n5;
-  bool valid_vmstubteo4_n5 = openDataFile(fout_vmstubteo4_n5, "MemPrints/VMStubsTE/VMStubs_VMSTE_D1PHIX4n5_04.dat");
+  bool valid_vmstubteo4_n5 = openDataFile(fout_vmstubteo4_n5, "VMR_D1PHIA/VMStubs_VMSTE_D1PHIX4n5_04.dat");
   if (not valid_vmstubteo4_n5) return -1;
   
   ///////////////////////////
