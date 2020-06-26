@@ -6,7 +6,7 @@ void VMRouterTop(BXType bx,
 		const InputStubMemory<BARRELPS> inputStub[numInputs],
 		// Output memories
 		AllStubMemory<BARRELPS> allStub[maxAllCopies],
-		VMStubMEMemory<BARRELPS> meMemories[numME],
+		VMStubMEMemory<BARRELPS, nbitsbin> meMemories[numME],
 		VMStubTEInnerMemory<BARRELPS> teiMemories[numTEI][maxTEICopies],
 		VMStubTEInnerMemory<BARRELOL> olMemories[numOL][maxOLCopies]) {
 
@@ -16,16 +16,13 @@ void VMRouterTop(BXType bx,
 	constexpr int layer(1); // Which barrel layer number the data is coming from, 0 if not barrel
 	constexpr int disk(0); // Which disk number the data is coming from, 0 if not disk
 	
-
-	
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	static const ap_uint<6> imask(0xF); // Input memories
 	static const ap_uint<32> memask(0x000F0000UL); // ME memories
 	static const ap_uint<32> teimask(0x000F0000UL); // TE Inner memories
 	static const ap_uint<16> olmask(0x300); // TE Inner Overlap memories
 	static const ap_uint<32> teomask(0x0); // TE Outer memories
-
-
+	
 	///////////////////////////
 	// Open Lookup tables
 
@@ -200,7 +197,7 @@ void VMRouterTop(BXType bx,
 // Main function
 
 	// template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
-	VMRouter<BARRELPS, BARRELPS, layer, disk,  maxAllCopies, maxTEICopies, maxOLCopies, maxTEOCopies>
+	VMRouter<BARRELPS, BARRELPS, layer, disk,  maxAllCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin>
 	(bx, finebintable, phicorrtable, 
 		rzbitstable, rzbitsextratable, nullptr,
 		bendtable, bendextratable, nullptr,

@@ -256,7 +256,7 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 	// Get the corrected r/z position
 	ap_uint<6> rzcorr = finebintable[finebinindex];
 
-	// Coarse z. The bin the stub is going to be put it in the memory
+	// Coarse z. The bin the stub is going to be put in, in the memory
 	bin = rzcorr >> 3; // 3 bits, i.e. max 8 bins within each VM
 	if (negdisk)
 		bin += 8; // Only needed if 16 ME bins
@@ -526,7 +526,7 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 // 		According to wiring script, there's two DISK2S and half the inputs are for negative disks.
 // Layer Disk - Specifies the layer or disk number
 // MAXN - The maximum number of copies of a memory type
-template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
+template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin>
 void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[], 
 		// rzbitstables (binlookup in emulation)
 		const int rzbitsinnertable[], const int rzbitsoverlaptable[], const int rzbitsoutertable[],
@@ -539,7 +539,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		// AllStub memory
 		AllStubMemory<OutType> allStub[],
 		// ME memories
-		const ap_uint<32>& memask, VMStubMEMemory<OutType> meMemories[],
+		const ap_uint<32>& memask, VMStubMEMemory<OutType, NBitsBin> meMemories[],
 		// Inner TE memories, non-overlap
 		const ap_uint<32>& teimask, VMStubTEInnerMemory<OutType> teiMemories[][MaxTEICopies],
 		// TE Inner memories, overlap
@@ -764,7 +764,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			int ivmPlus;
 			int ivmMinus;
 			
-			int bin; // Coarse z. The bin the stub is going to be put it in the memory
+			int bin; // Coarse z. The bin the stub is going to be put in, in the memory
 			
 			// Create the ME stub to save
 			VMStubME<OutType> stubme = (disk2S) ? 
@@ -791,7 +791,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		// Write the ME stub to the correct memory.
 		// If stub is close to a border (ivmPlus != ivmMinus)
 		// write it to the adjacent memory as well
-		#pragma HLS dependence variable=meMemories intra false
+		// #pragma HLS dependence variable=meMemories intra false
 		for (int n = 0; n < 32; n++) {
 			#pragma HLS UNROLL
 			if (memask[n]) {
@@ -855,7 +855,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		if ((teomask != 0) && (!disk2S)) {
 			
 			int ivm; // The VM number
-			int bin; // Coarse z. The bin the stub is going to be put it in the memory
+			int bin; // Coarse z. The bin the stub is going to be put in, in the memory
 			
 			// Create the TE Inner stub to save
 			VMStubTEOuter<OutType> stubte = (disk2S) ? 

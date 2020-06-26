@@ -16,9 +16,11 @@ constexpr int numTEO(4); // TE Outer memories
 // Maximum number of memory "copies" for this Phi region
 constexpr int maxAllCopies(6); // Allstub memory
 constexpr int maxTEICopies(3); // TE Inner memories
-constexpr int maxOLCopies(1); // Can't use 0 evne if we don't have any TE Inner Overlap memories
+constexpr int maxOLCopies(1); // Can't use 0 even if we don't have any TE Inner Overlap memories
 constexpr int maxTEOCopies(5); // TE Outer memories
 
+// Number of bits used for the bins in VMStubeME memories
+constexpr int nbitsbin = 4; //3 for barrel, 4 for disks
 
 void VMRouterTop(BXType bx,
 	// Input memories
@@ -26,7 +28,7 @@ void VMRouterTop(BXType bx,
 	const InputStubMemory<DISK2S> inputStubDisk2S[numInputsDisk2S],
 	// Output memories
 	AllStubMemory<DISK> allStub[maxAllCopies],
-	VMStubMEMemory<DISK> meMemories[numME],
+	VMStubMEMemory<DISK, nbitsbin> meMemories[numME],
 	VMStubTEInnerMemory<DISK> teiMemories[numTEI][maxTEICopies],
 	VMStubTEOuterMemory<DISK> teoMemories[numTEO][maxTEOCopies]
 	);

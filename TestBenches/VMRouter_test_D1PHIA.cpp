@@ -26,7 +26,7 @@ int main()
   // output memories
   static AllStubMemory<DISK> allStub[6];
   // ME memories
-  static VMStubMEMemory<DISK> meMemories[8];
+  static VMStubMEMemory<DISK, 4> meMemories[8];
 	// TE Inner memories
 	static VMStubTEInnerMemory<DISK> teiMemories[4][3];
   // TE Inner Overlap memories, including copies
@@ -313,28 +313,28 @@ int main()
   err += compareMemWithFile<AllStubMemory<DISK>>(allStub[5], fout_allstub_n6, ievt, "AllStub", truncation);
   
   // VMStubME1
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[0], fout_vmstubme1, ievt,"VMStubME1", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[0], fout_vmstubme1, ievt,"VMStubME1", truncation);
   
   // VMStubME2
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[1], fout_vmstubme2, ievt,"VMStubME2", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[1], fout_vmstubme2, ievt,"VMStubME2", truncation);
   
   // VMStubME3
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[2], fout_vmstubme3, ievt,"VMStubME3", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[2], fout_vmstubme3, ievt,"VMStubME3", truncation);
   
   // VMStubME4
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[3], fout_vmstubme4, ievt,"VMStubME4", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[3], fout_vmstubme4, ievt,"VMStubME4", truncation);
   
   // VMStubME5
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[4], fout_vmstubme5, ievt,"VMStubME5", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[4], fout_vmstubme5, ievt,"VMStubME5", truncation);
   
    // VMStubME6
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[5], fout_vmstubme6, ievt,"VMStubME6", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[5], fout_vmstubme6, ievt,"VMStubME6", truncation);
   
    // VMStubME7
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[6], fout_vmstubme7, ievt,"VMStubME7", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[6], fout_vmstubme7, ievt,"VMStubME7", truncation);
   
    // VMStubME8
-  err += compareBinnedMemWithFile<VMStubMEMemory<DISK>>(meMemories[7], fout_vmstubme8, ievt,"VMStubME8", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<DISK, 4>>(meMemories[7], fout_vmstubme8, ievt,"VMStubME8", truncation);
 
 
   // TE Memories

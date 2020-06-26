@@ -25,7 +25,7 @@ int main()
   // output memories
   static AllStubMemory<BARRELPS> allStub[6];
   // ME memories
-  static VMStubMEMemory<BARRELPS> meMemories[4];
+  static VMStubMEMemory<BARRELPS, 3> meMemories[4];
   // TE Inner memories, including copies
   static VMStubTEInnerMemory<BARRELPS> teiMemories[4][5];
   // TE Inner Overlap memories, including copies
@@ -243,13 +243,13 @@ int main()
   
   // ME Memories
   // VMStubME1
-  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[0], fout_vmstubme1, ievt, "VMStubME17", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS, 3>>(meMemories[0], fout_vmstubme1, ievt, "VMStubME17", truncation);
   // VMStubME2
-  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[1], fout_vmstubme2, ievt, "VMStubME18", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS, 3>>(meMemories[1], fout_vmstubme2, ievt, "VMStubME18", truncation);
   // VMStubME3
-  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[2], fout_vmstubme3, ievt, "VMStubME19", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS, 3>>(meMemories[2], fout_vmstubme3, ievt, "VMStubME19", truncation);
   // VMStubME4
-  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS>>(meMemories[3], fout_vmstubme4, ievt, "VMStubME20", truncation);
+  err += compareBinnedMemWithFile<VMStubMEMemory<BARRELPS, 3>>(meMemories[3], fout_vmstubme4, ievt, "VMStubME20", truncation);
 
   // TE Memories
   // VMStubTEInner1

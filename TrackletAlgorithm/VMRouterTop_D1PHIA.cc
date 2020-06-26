@@ -8,7 +8,7 @@ void VMRouterTop(BXType bx,
 	const InputStubMemory<DISK2S> inputStubDisk2S[numInputsDisk2S],
 	// Output memories
 	AllStubMemory<DISK> allStub[maxAllCopies],
-	VMStubMEMemory<DISK> meMemories[numME],
+	VMStubMEMemory<DISK, nbitsbin> meMemories[numME],
 	VMStubTEInnerMemory<DISK> teiMemories[numTEI][maxTEICopies],
 	VMStubTEOuterMemory<DISK> teoMemories[numTEO][maxTEOCopies]
 		)
@@ -203,7 +203,7 @@ void VMRouterTop(BXType bx,
 // Main function
 	
 	// template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies>
-	VMRouter<DISKPS, DISK, layer, disk,  maxAllCopies, maxTEICopies, maxOLCopies, maxTEOCopies>
+	VMRouter<DISKPS, DISK, layer, disk,  maxAllCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin>
 	(bx, finebintable, nullptr, 
 		rzbitstable, nullptr, rzbitsextratable, 
 		bendtable, nullptr, bendextratable,
