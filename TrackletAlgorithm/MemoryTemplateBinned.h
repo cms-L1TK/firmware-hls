@@ -106,7 +106,7 @@ public:
 
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
-	if (nentry_ibx <= (kNMemDepth)) {
+	if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))) {
 	  // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+nentry_ibx] = data;
 	  nentries_[ibx][slot] = nentry_ibx + 1;
@@ -143,7 +143,8 @@ public:
 
     std::string datastr = split(line, ' ').back();
 
-    int slot=atoi(split(line, ' ').front().c_str());
+    int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
+    // Originally: atoi(split(line, ' ').front().c_str()); but that didn't work for disks with 16 bins
 
     DataType data(datastr.c_str(), base);
     //std::cout << "write_mem slot data : " << slot<<" "<<data << std::endl;

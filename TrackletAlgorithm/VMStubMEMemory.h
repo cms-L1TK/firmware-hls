@@ -79,7 +79,7 @@ public:
   VMStubME(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEZ finez):
     data_( ((id, bend), finez) )
   {}
-  
+
   VMStubME():
     data_(0)
   {}
@@ -129,6 +129,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr,3>;
+template<int VMSMEType, int NBIT_BIN> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr, NBIT_BIN>;
 
 #endif

@@ -8,6 +8,7 @@ tarball_url="https://cernbox.cern.ch/index.php/s/tsxTkilHDVhnbYF/download"
 declare -a processing_modules=(
   # VMRouter
   "VMR_L1PHIE"
+  "VMR_D1PHIA"
 
   # TrackletEngine
   "TE_L1PHIE18_L2PHIC17"
@@ -89,8 +90,17 @@ do
   then
           layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-  elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
+  elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+  elif [[ ${module_type} == "VMR" ]]
+  then
+          layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          for mem in `grep "${module}\." wires_hourglass.dat | awk '{print $1}' | sort -u`;
+          do
+            find ${table_location} -type f -name "${mem}*.tab" -exec ln -s ../../{} ${table_target_dir}/ \;
+          done
   fi
 done

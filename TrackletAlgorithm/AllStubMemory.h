@@ -194,8 +194,9 @@ private:
 
 // Special data object definition
 template<>
-class AllStub<DISK> : public AllStubBase<DISK>
+class AllStub<6> : public AllStubBase<DISK> // Can't generate cosim files if AllStub<DISK> for some reason...
 {
+  static_assert(DISK == 6, "DISK is assumed to be 6 in this class specialization.");
 public:
   typedef ap_uint<AllStubBase<DISK>::kAllStubSize> AllStubData;
 
@@ -214,6 +215,9 @@ public:
     data_ = newdata;
   }
   #endif
+
+  // Getter
+  static constexpr int getWidth() {return AllStubBase<DISK>::kAllStubSize;}
 
   AllStubData raw() const {return data_;}
 

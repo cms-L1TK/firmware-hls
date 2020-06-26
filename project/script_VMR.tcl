@@ -18,7 +18,8 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/VMR/
+add_files -tb ../emData/VMR/tables/
+add_files -tb ../emData/VMR/VMR_L1PHIE/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

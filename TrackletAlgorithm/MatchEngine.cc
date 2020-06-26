@@ -26,7 +26,7 @@ void readTable(ap_uint<1> table[LSIZE]){
 //template<int L, regionType VMSMEType>
 template<int L, int VMSMEType, int VMPMEType>
 void MatchEngine(const BXType bx, BXType& bx_o,
-				 const VMStubMEMemory<VMSMEType>& inputStubData,
+				 const VMStubMEMemory<VMSMEType, NBITBIN>& inputStubData,
 				 const VMProjectionMemory<VMPMEType>& inputProjectionData,
 				 CandidateMatchMemory& outputCandidateMatch) {
 	//
@@ -212,7 +212,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 }
 
 void MatchEngineTop(const BXType bx, BXType& bx_o,
-					const VMStubMEMemory<MODULETYPE>& inputStubData,
+					const VMStubMEMemory<MODULETYPE, NBITBIN>& inputStubData,
 					const VMProjectionMemory<PROJECTIONTYPE>& inputProjectionData,
 					CandidateMatchMemory& outputCandidateMatch) {
 
