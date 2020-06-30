@@ -616,7 +616,15 @@ void MatchProcessor(BXType bx,
                       FullMatchMemory<FMTYPE>* fullmatch5,
                       FullMatchMemory<FMTYPE>* fullmatch6,
                       FullMatchMemory<FMTYPE>* fullmatch7,
-                      FullMatchMemory<FMTYPE>* fullmatch8
+                      FullMatchMemory<FMTYPE>* fullmatch8,
+                         VMProjectionMemory<BARREL>* vmprojout1,
+                         VMProjectionMemory<BARREL>* vmprojout2,
+                         VMProjectionMemory<BARREL>* vmprojout3,
+                         VMProjectionMemory<BARREL>* vmprojout4,
+                         VMProjectionMemory<BARREL>* vmprojout5,
+                         VMProjectionMemory<BARREL>* vmprojout6,
+                         VMProjectionMemory<BARREL>* vmprojout7,
+                         VMProjectionMemory<BARREL>* vmprojout8
 ){
 #pragma HLS inline
 
@@ -646,6 +654,15 @@ void MatchProcessor(BXType bx,
   fullmatch6->clear(bx);
   fullmatch7->clear(bx);
   fullmatch8->clear(bx);
+
+  vmprojout1->clear(bx);
+  vmprojout2->clear(bx);
+  vmprojout3->clear(bx);
+  vmprojout4->clear(bx);
+  vmprojout5->clear(bx);
+  vmprojout6->clear(bx);
+  vmprojout7->clear(bx);
+  vmprojout8->clear(bx);
 
   // initialization:
   // check the number of entries in the input memories
@@ -1010,7 +1027,7 @@ void MatchProcessor(BXType bx,
   	  //writeindex[iphi]=writeindexplus;
         }
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
-      //std::cout << std::hex << "vmproj=" << vmproj.raw() << std::endl;
+      if(iphi==0) std::cout << std::hex << "vmproj=" << vmproj.raw() << std::endl;
       //std::cout << savefirst << savelast << std::endl;
         /* FIXME
         std::cout << "writeindextmp=" << writeindextmp << std::endl;
@@ -1026,6 +1043,32 @@ void MatchProcessor(BXType bx,
             */
       //std::cout << std::hex << "iphi=" << iphi+1 << " vmproj=" << vmproj.raw() << std::endl;
           projbuffer[iphi][writeindextmp[iphi]]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+          switch(iphi) {
+            case 0: vmprojout1->write_mem(bx, vmproj, nvmprojout1);
+            nvmprojout1++;
+            break;
+            case 1: vmprojout2->write_mem(bx, vmproj, nvmprojout2);
+            nvmprojout2++;
+            break;
+            case 2: vmprojout3->write_mem(bx, vmproj, nvmprojout3);
+            nvmprojout3++;
+            break;
+            case 3: vmprojout4->write_mem(bx, vmproj, nvmprojout4);
+            nvmprojout4++;
+            break;
+            case 4: vmprojout5->write_mem(bx, vmproj, nvmprojout5);
+            nvmprojout5++;
+            break;
+            case 5: vmprojout6->write_mem(bx, vmproj, nvmprojout6);
+            nvmprojout6++;
+            break;
+            case 6: vmprojout7->write_mem(bx, vmproj, nvmprojout7);
+            nvmprojout7++;
+            break;
+            case 7: vmprojout8->write_mem(bx, vmproj, nvmprojout8);
+            nvmprojout8++;
+            break;
+          }
         /*
           switch (iphi) {
             case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
@@ -1130,7 +1173,7 @@ void MatchProcessor(BXType bx,
   readindex=0;
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
-  for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
+  MEINIT_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
 #pragma HLS unroll
 /*
     const VMStubMEMemory<VMSMEType>* instubdata;
