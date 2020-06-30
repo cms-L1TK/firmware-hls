@@ -112,16 +112,17 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
   for(int i = 0; i < nstubs; ++i)
     stubid[i] = stubids[i];
   */
-  //idle_ = false;
-  idle_ = readindex>writeindex;
+  idle_ = false;
+  //idle_ = readindex>writeindex;
 
 }
 
-void step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
+inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 #pragma HLS inline
 #pragma HLS PIPELINE II=1
 //#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=istub intra WAR true
+    if(idle() || done()) return true;
 
     ////////////////////////////////////////////
     //This seems like where the ME buffer starts
@@ -312,6 +313,7 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
     //if(istub==0 && stubids!=0) idle_ = true;
     if(istub==0 && nstubs>0) idle_ = true;
     if(readindex>writeindex) done_ = true;
+    if(istub==0 && nstubs>0) return true;
  
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
@@ -333,6 +335,7 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
     */
 
   } // if(buffernotempty)
+  return false;
 
 } // end step
 
