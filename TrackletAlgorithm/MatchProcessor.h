@@ -673,7 +673,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
 //#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 //#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
-#pragma HLS dependence variable=writeindex inter RAW false 
+#pragma HLS dependence variable=writeindex inter RAW true 
   ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
@@ -1129,7 +1129,7 @@ void MatchProcessor(BXType bx,
   //std::cout << "Starting ME loop" << std::endl;
   readindex=0;
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
-//#pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
+#pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
   for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
 #pragma HLS unroll
 /*
@@ -1160,10 +1160,12 @@ void MatchProcessor(BXType bx,
   typename AllProjection<APTYPE>::AProjTCID bestTCID=-1;
   bool bestInPipeline=false;
   ap_uint<3> ivmphi=0;
+  bool ready=false;
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
     //for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
 //#pragma HLS unroll
+    /*
     switch (ivmphi) {
       case 0: matchengine[ivmphi].step(table, instubdata1, projbuffer[ivmphi]);
       break;
@@ -1182,10 +1184,20 @@ void MatchProcessor(BXType bx,
       case 7: matchengine[ivmphi].step(table, instubdata8, projbuffer[ivmphi]);
       break;
     }
+    */
+      if(!matchengine[0].done()) if(matchengine[0].step(table, instubdata1, projbuffer[0])) { ivmphi=0; ready=true; }
+      if(!matchengine[1].done()) if(matchengine[1].step(table, instubdata2, projbuffer[1])) { ivmphi=1; ready=true; }
+      if(!matchengine[2].done()) if(matchengine[2].step(table, instubdata3, projbuffer[2])) { ivmphi=2; ready=true; }
+      if(!matchengine[3].done()) if(matchengine[3].step(table, instubdata4, projbuffer[3])) { ivmphi=3; ready=true; }
+      if(!matchengine[4].done()) if(matchengine[4].step(table, instubdata5, projbuffer[4])) { ivmphi=4; ready=true; }
+      if(!matchengine[5].done()) if(matchengine[5].step(table, instubdata6, projbuffer[5])) { ivmphi=5; ready=true; }
+      if(!matchengine[6].done()) if(matchengine[6].step(table, instubdata7, projbuffer[6])) { ivmphi=6; ready=true; }
+      if(!matchengine[7].done()) if(matchengine[7].step(table, instubdata8, projbuffer[7])) { ivmphi=7; ready=true; }
       typename VMProjection<BARREL>::VMPID projindex;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
-      if(matchengine[ivmphi].idle() && !matchengine[ivmphi].done() && !matchengine[ivmphi].empty()) {
+      //if(matchengine[ivmphi].idle() && !matchengine[ivmphi].done() && !matchengine[ivmphi].empty()) {
+      if(ready) {
         typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
         matchengine[ivmphi].read(currentTCID, projindex, stubid, nstub);
         //currentTCID=allproj->read_mem(bx, projindex).getTCID();
@@ -1208,7 +1220,7 @@ void MatchProcessor(BXType bx,
       } //end MC if
 
     //} //end 8ME loop
-    ivmphi++;
+    //ivmphi++;
 
   } //end loop
   //std::cout << "Ending ME" << std::endl;
