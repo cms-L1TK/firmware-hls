@@ -577,6 +577,15 @@ void MatchProcessor(BXType bx,
   fullmatch[7].clear(bx);
   */
 
+  vmprojout1->clear(bx);
+  vmprojout2->clear(bx);
+  vmprojout3->clear(bx);
+  vmprojout4->clear(bx);
+  vmprojout5->clear(bx);
+  vmprojout6->clear(bx);
+  vmprojout7->clear(bx);
+  vmprojout8->clear(bx);
+
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
