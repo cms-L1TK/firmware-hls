@@ -226,29 +226,18 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 
 // MatchCalculator
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int LAYER=0, int DISK=0, int PHISEC=0>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, int LAYER=0, int DISK=0, int PHISEC=0>
 void MatchCalculator(BXType bx,
-                     const CandidateMatchMemory* match1,
-                     const CandidateMatchMemory* match2,
-                     const CandidateMatchMemory* match3,
-                     const CandidateMatchMemory* match4,
-                     const CandidateMatchMemory* match5,
-                     const CandidateMatchMemory* match6,
-                     const CandidateMatchMemory* match7,
-                     const CandidateMatchMemory* match8,
+                     const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjectionMemory<APTYPE>* allproj,
                      BXType& bx_o,
-                     FullMatchMemory<FMTYPE>* fullmatch1,
-                     FullMatchMemory<FMTYPE>* fullmatch2,
-                     FullMatchMemory<FMTYPE>* fullmatch3,
-                     FullMatchMemory<FMTYPE>* fullmatch4,
-                     FullMatchMemory<FMTYPE>* fullmatch5,
-                     FullMatchMemory<FMTYPE>* fullmatch6,
-                     FullMatchMemory<FMTYPE>* fullmatch7,
-                     FullMatchMemory<FMTYPE>* fullmatch8
+                     FullMatchMemory<FMTYPE> fullmatch[MaxFullMatchCopies]
 ){
 #pragma HLS inline
+#pragma HLS array_partition variable=match complete dim=1
+#pragma HLS array_partition variable=fullmatch complete dim=1
+
   // Initialization
  
   // Setup constants depending on which layer/disk working on
@@ -413,14 +402,14 @@ void MatchCalculator(BXType bx,
 #pragma HLS PIPELINE II=1 
 
     // Pick up number of candidate matches for each CM memory
-    ncm1 = match1->getEntries(bx);
-    ncm2 = match2->getEntries(bx);
-    ncm3 = match3->getEntries(bx);
-    ncm4 = match4->getEntries(bx);
-    ncm5 = match5->getEntries(bx);
-    ncm6 = match6->getEntries(bx);
-    ncm7 = match7->getEntries(bx);
-    ncm8 = match8->getEntries(bx);
+    ncm1 = match[0].getEntries(bx);
+    ncm2 = match[1].getEntries(bx);
+    ncm3 = match[2].getEntries(bx);
+    ncm4 = match[3].getEntries(bx);
+    ncm5 = match[4].getEntries(bx);
+    ncm6 = match[5].getEntries(bx);
+    ncm7 = match[6].getEntries(bx);
+    ncm8 = match[7].getEntries(bx);
 
     // Count up total number of CMs *and protect incase of overflow)
     total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
@@ -517,14 +506,14 @@ void MatchCalculator(BXType bx,
     if (read8) addr8++;
 
     // Read in each candidate match
-    const CandidateMatch &cm1 = match1->read_mem(bx,addr1);
-    const CandidateMatch &cm2 = match2->read_mem(bx,addr2);
-    const CandidateMatch &cm3 = match3->read_mem(bx,addr3); 
-    const CandidateMatch &cm4 = match4->read_mem(bx,addr4); 
-    const CandidateMatch &cm5 = match5->read_mem(bx,addr5); 
-    const CandidateMatch &cm6 = match6->read_mem(bx,addr6); 
-    const CandidateMatch &cm7 = match7->read_mem(bx,addr7); 
-    const CandidateMatch &cm8 = match8->read_mem(bx,addr8); 
+    const CandidateMatch &cm1 = match[0].read_mem(bx,addr1);
+    const CandidateMatch &cm2 = match[1].read_mem(bx,addr2);
+    const CandidateMatch &cm3 = match[2].read_mem(bx,addr3); 
+    const CandidateMatch &cm4 = match[3].read_mem(bx,addr4); 
+    const CandidateMatch &cm5 = match[4].read_mem(bx,addr5); 
+    const CandidateMatch &cm6 = match[5].read_mem(bx,addr6); 
+    const CandidateMatch &cm7 = match[6].read_mem(bx,addr7); 
+    const CandidateMatch &cm8 = match[7].read_mem(bx,addr8); 
 
     // Valid signal for the candidate match
     bool valid1 = (addr1 < ncm1) && (ncm1 > 0);
@@ -804,47 +793,47 @@ void MatchCalculator(BXType bx,
 
     if (istep==0){
       // Reset output memories
-      fullmatch1->clear(bx);
-      fullmatch2->clear(bx);
-      fullmatch3->clear(bx);
-      fullmatch4->clear(bx);
-      fullmatch5->clear(bx);
-      fullmatch6->clear(bx);
-      fullmatch7->clear(bx);
-      fullmatch8->clear(bx);
+      fullmatch[0].clear(bx);
+      fullmatch[1].clear(bx);
+      fullmatch[2].clear(bx);
+      fullmatch[3].clear(bx);
+      fullmatch[4].clear(bx);
+      fullmatch[5].clear(bx);
+      fullmatch[6].clear(bx);
+      fullmatch[7].clear(bx);
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
       case 0:
-      fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
       nmcout1++;
       break;
       case 1:
-      fullmatch2->write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L2L3 seed
+      fullmatch[1].write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L2L3 seed
       nmcout2++;
       break;
       case 2:
-      fullmatch3->write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L3L4 seed
+      fullmatch[2].write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L3L4 seed
       nmcout3++;
       break;
       case 3:
-      fullmatch4->write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // L5L6 seed
+      fullmatch[3].write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // L5L6 seed
       nmcout4++;
       break;
       case 4:
-      fullmatch5->write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D1D2 seed
+      fullmatch[4].write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D1D2 seed
       nmcout5++;
       break;
       case 5:
-      fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // D3D4 seed
+      fullmatch[5].write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // D3D4 seed
       nmcout6++;
       break;
       case 6:
-      fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L1D1 seed
+      fullmatch[6].write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L1D1 seed
       nmcout7++;
       break;
       case 7:
-      fullmatch8->write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
+      fullmatch[7].write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
       nmcout8++;
       break;
       }
@@ -861,13 +850,13 @@ void MatchCalculator(BXType bx,
 
   /*
   // finish by writing out the last match made (to minimize truncation) -- can't do this because not in the loop 
-  fullmatch1->write_mem(bx,bestmatch,(goodmatch=true && projseed==0)); // L1L2 seed
-  fullmatch2->write_mem(bx,bestmatch,(goodmatch=true && projseed==1)); // L3L4 seed
-  fullmatch3->write_mem(bx,bestmatch,(goodmatch=true && projseed==2)); // L5L6 seed
-  fullmatch4->write_mem(bx,bestmatch,(goodmatch=true && projseed==3)); // D1D2 seed
-  fullmatch5->write_mem(bx,bestmatch,(goodmatch=true && projseed==4)); // D3D4 seed
-  fullmatch6->write_mem(bx,bestmatch,(goodmatch=true && projseed==5)); // L1D1 seed
-  fullmatch7->write_mem(bx,bestmatch,(goodmatch=true && projseed==6)); // L2D1 seed
+  fullmatch[0].write_mem(bx,bestmatch,(goodmatch=true && projseed==0)); // L1L2 seed
+  fullmatch[1].write_mem(bx,bestmatch,(goodmatch=true && projseed==1)); // L3L4 seed
+  fullmatch[2].write_mem(bx,bestmatch,(goodmatch=true && projseed==2)); // L5L6 seed
+  fullmatch[3].write_mem(bx,bestmatch,(goodmatch=true && projseed==3)); // D1D2 seed
+  fullmatch[4].write_mem(bx,bestmatch,(goodmatch=true && projseed==4)); // D3D4 seed
+  fullmatch[5].write_mem(bx,bestmatch,(goodmatch=true && projseed==5)); // L1D1 seed
+  fullmatch[6].write_mem(bx,bestmatch,(goodmatch=true && projseed==6)); // L2D1 seed
   */
 
 }// end MatchCalculator
