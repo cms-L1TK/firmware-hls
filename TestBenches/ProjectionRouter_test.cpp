@@ -127,6 +127,8 @@ int main()
     writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj6, fin_tproj6, ievt);
     writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj7, fin_tproj7, ievt);
     writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj8, fin_tproj8, ievt);
+
+    TrackletProjectionMemory<BARRELPS> tprojarray[8] = {tproj1,tproj2,tproj3,tproj4,tproj5,tproj6,tproj7,tproj8};
     
     // bx
     BXType bx = ievt;
@@ -134,8 +136,7 @@ int main()
 
     // Unit Under Test
     ProjectionRouterTop(bx,
-                        &tproj1, &tproj2, &tproj3, &tproj4,
-                        &tproj5, &tproj6, &tproj7, &tproj8,
+                        tprojarray,
                         bx_out,
                         &allproj,
                         &vmproj1, &vmproj2, &vmproj3, &vmproj4,
