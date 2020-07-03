@@ -12,7 +12,7 @@
 namespace PR
 {
   template<regionType PROJTYPE, unsigned int nINMEM>
-  bool new_read_input_mems(BXType bx,
+  bool read_input_mems(BXType bx,
                        ap_uint<nINMEM>& mem_hasdata,
                        ap_uint<kNBits_MemAddr> nentries[nINMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
@@ -22,8 +22,8 @@ namespace PR
 #pragma HLS inline
 
     if (mem_hasdata == 0) return false;
-    // 3 bits memory index for up to 8 input memory priority encoder
-    ap_uint<3> read_imem = __builtin_ctz(mem_hasdata);
+    // 5 bits memory index for up to 32 input memory priority encoder
+    ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
     data = projin[read_imem].read_mem(bx, read_addr);
     ++read_addr;
     if (read_addr >= nentries[read_imem]) {
@@ -34,7 +34,7 @@ namespace PR
 
     return true;
 
-  } // new_read_input_mems
+  } // read_input_mems
 
   /////////////////////////////////////////////////////
   // FIXME
@@ -57,40 +57,34 @@ namespace PR
   // functions to rewind correctly, this can be set to zero (or simply removed)
   constexpr unsigned int LoopItersCut = 6; 
   
-} // namesapce PR
+} // namespace PR
 
 //////////////////////////////
 // ProjectionRouter
 template<regionType PROJTYPE, regionType VMPTYPE, unsigned int nINMEM,
-         int LAYER=0, int DISK=0>
+         unsigned int nOUTMEM, int LAYER=0, int DISK=0>
 void ProjectionRouter(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE> projin[],
                       BXType& bx_o,
-                      AllProjectionMemory<PROJTYPE>* const allprojout,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout1,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout2,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout3,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout4,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout5,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout6,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout7,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout8
-){
+                      AllProjectionMemory<PROJTYPE>& allprojout,
+                      VMProjectionMemory<VMPTYPE> vmprojout[])
+{
 #pragma HLS inline
 #pragma HLS array_partition variable=projin complete dim=1
+#pragma HLS array_partition variable=vmprojout complete dim=1
 
   using namespace PR;
-  
-  // reset output memories
-  allprojout->clear(bx);
-  vmprojout1->clear(bx);
-  vmprojout2->clear(bx);
-  vmprojout3->clear(bx);
-  vmprojout4->clear(bx);
-  vmprojout5->clear(bx);
-  vmprojout6->clear(bx);
-  vmprojout7->clear(bx);
-  vmprojout8->clear(bx);
+
+  // reset output memories & counters
+  ap_uint<kNBits_MemAddr> nallproj = 0;
+  ap_uint<kNBits_MemAddr> nvmprojout[nOUTMEM];
+#pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
+  allprojout.clear(bx);
+  for (int i=0; i<nOUTMEM; i++) {
+#pragma HLS unroll
+    vmprojout[i].clear(bx);
+    nvmprojout[i] = 0;
+  }
 
   // initialization:
   // check the number of entries in the input memories
@@ -107,23 +101,12 @@ void ProjectionRouter(BXType bx,
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
-  // declare counters for each of the 8 output VMProj // !!!
-  int nvmprojout1 = 0;
-  int nvmprojout2 = 0;
-  int nvmprojout3 = 0;
-  int nvmprojout4 = 0;
-  int nvmprojout5 = 0;
-  int nvmprojout6 = 0;
-  int nvmprojout7 = 0;
-  int nvmprojout8 = 0;  
-  int nallproj = 0;
-
   PROC_LOOP: for (int i = 0; i < kMaxProc-LoopItersCut; ++i) {
 #pragma HLS PIPELINE II=1
 
     // read inputs
     TrackletProjection<PROJTYPE> tproj;
-    bool validin = new_read_input_mems<PROJTYPE,nINMEM>(bx, mem_hasdata, numbersin, mem_read_addr, projin, tproj);
+    bool validin = read_input_mems<PROJTYPE,nINMEM>(bx, mem_hasdata, numbersin, mem_read_addr, projin, tproj);
 
     if (validin) {
     
@@ -208,46 +191,14 @@ void ProjectionRouter(BXType bx,
 
       // write outputs
       //assert(iphi>=0 and iphi<4);
-      switch(iphi) {
-      case 0:
-        vmprojout1->write_mem(bx, vmproj, nvmprojout1);
-        nvmprojout1 ++;
-        break;
-      case 1:
-        vmprojout2->write_mem(bx, vmproj, nvmprojout2);
-        nvmprojout2 ++;
-        break;
-      case 2:
-        vmprojout3->write_mem(bx, vmproj, nvmprojout3);
-        nvmprojout3 ++;
-        break;
-      case 3:
-        vmprojout4->write_mem(bx, vmproj, nvmprojout4);
-        nvmprojout4 ++;
-        break;
-      case 4:
-        vmprojout5->write_mem(bx, vmproj, nvmprojout5);
-        nvmprojout5 ++;
-        break;
-      case 5:
-        vmprojout6->write_mem(bx, vmproj, nvmprojout6);
-        nvmprojout6 ++;
-        break;
-      case 6:
-        vmprojout7->write_mem(bx, vmproj, nvmprojout7);
-        nvmprojout7 ++;
-        break;
-      case 7:
-        vmprojout8->write_mem(bx, vmproj, nvmprojout8);
-        nvmprojout8 ++;
-        break;
-      }
+      vmprojout[iphi].write_mem(bx, vmproj, nvmprojout[iphi]);
+      nvmprojout[iphi] ++;
 
       /////////////////
       // AllProjection
       AllProjection<PROJTYPE> aproj(tproj.raw());
       // write output
-      allprojout->write_mem(bx, aproj, nallproj);
+      allprojout.write_mem(bx, aproj, nallproj);
       nallproj ++;
     }
 

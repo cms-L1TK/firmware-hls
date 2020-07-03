@@ -129,18 +129,14 @@ int main()
     writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj8, fin_tproj8, ievt);
 
     TrackletProjectionMemory<BARRELPS> tprojarray[8] = {tproj1,tproj2,tproj3,tproj4,tproj5,tproj6,tproj7,tproj8};
+    VMProjectionMemory<BARREL> vmprojarray[8] = {vmproj1,vmproj2,vmproj3,vmproj4,vmproj5,vmproj6,vmproj7,vmproj8};
     
     // bx
     BXType bx = ievt;
     BXType bx_out;
 
     // Unit Under Test
-    ProjectionRouterTop(bx,
-                        tprojarray,
-                        bx_out,
-                        &allproj,
-                        &vmproj1, &vmproj2, &vmproj3, &vmproj4,
-                        &vmproj5, &vmproj6, &vmproj7, &vmproj8);
+    ProjectionRouterTop(bx, tprojarray, bx_out, allproj, vmprojarray);
 
     // compare the computed outputs with the expected ones
     bool truncation = false;
@@ -149,35 +145,35 @@ int main()
       (allproj,fout_aproj, ievt, "AllProjection", truncation, kMaxProc-10);
     // VMProjection1
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj1, fout_vmproj1, ievt, "VMProjection1", truncation, kMaxProc-10);
+      (vmprojarray[0], fout_vmproj1, ievt, "VMProjection1", truncation, kMaxProc-10);
 
     // VMProjection2
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj2, fout_vmproj2, ievt, "VMProjection2", truncation, kMaxProc-10);
+      (vmprojarray[1], fout_vmproj2, ievt, "VMProjection2", truncation, kMaxProc-10);
 
     // VMProjection3
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj3, fout_vmproj3, ievt, "VMProjection3", truncation, kMaxProc-10);
+      (vmprojarray[2], fout_vmproj3, ievt, "VMProjection3", truncation, kMaxProc-10);
 
     // VMProjection4
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj4, fout_vmproj4, ievt, "VMProjection4", truncation, kMaxProc-10);
+      (vmprojarray[3], fout_vmproj4, ievt, "VMProjection4", truncation, kMaxProc-10);
 
     // VMProjection5
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj5, fout_vmproj5, ievt, "VMProjection5", truncation, kMaxProc-10);
+      (vmprojarray[4], fout_vmproj5, ievt, "VMProjection5", truncation, kMaxProc-10);
 
     // VMProjection6
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj6, fout_vmproj6, ievt, "VMProjection6", truncation, kMaxProc-10);
+      (vmprojarray[5], fout_vmproj6, ievt, "VMProjection6", truncation, kMaxProc-10);
 
     // VMProjection7
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj7, fout_vmproj7, ievt, "VMProjection7", truncation, kMaxProc-10);
+      (vmprojarray[6], fout_vmproj7, ievt, "VMProjection7", truncation, kMaxProc-10);
 
     // VMProjection8
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
+      (vmprojarray[7], fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
     
   } // end of event loop
   
