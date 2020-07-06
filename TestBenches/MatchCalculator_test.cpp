@@ -24,26 +24,12 @@ int main() {
   int err_count = 0;
 
   // declare input memory arrays to be read from the emulation files
-  static CandidateMatchMemory           match1;
-  static CandidateMatchMemory           match2;
-  static CandidateMatchMemory           match3;
-  static CandidateMatchMemory           match4;
-  static CandidateMatchMemory           match5;
-  static CandidateMatchMemory           match6;
-  static CandidateMatchMemory           match7;
-  static CandidateMatchMemory           match8;
+  static CandidateMatchMemory           match[maxMatchCopies];
   static AllStubMemory<BARRELPS>        allstub;
   static AllProjectionMemory<BARRELPS>  allproj;
 
   // declare output memory array to be filled by hls simulation
-  static FullMatchMemory<BARREL> fullmatch1;
-  static FullMatchMemory<BARREL> fullmatch2;
-  static FullMatchMemory<BARREL> fullmatch3;
-  static FullMatchMemory<BARREL> fullmatch4;
-  static FullMatchMemory<BARREL> fullmatch5;
-  static FullMatchMemory<BARREL> fullmatch6;
-  static FullMatchMemory<BARREL> fullmatch7;
-  static FullMatchMemory<BARREL> fullmatch8;
+  static FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies];
 
   // read in input files
   ifstream fin_as;
@@ -94,14 +80,14 @@ int main() {
     // make memories from the input text files
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
     writeMemFromFile<AllProjectionMemory<BARRELPS> >(allproj, fin_ap, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match1, fin_cm1, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match2, fin_cm2, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match3, fin_cm3, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match4, fin_cm4, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match5, fin_cm5, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match6, fin_cm6, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match7, fin_cm7, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match8, fin_cm8, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[0], fin_cm1, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[1], fin_cm2, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[2], fin_cm3, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[3], fin_cm4, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[4], fin_cm5, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[5], fin_cm6, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[6], fin_cm7, ievt);
+    writeMemFromFile<CandidateMatchMemory>(match[7], fin_cm8, ievt);
 
     //set bunch crossing
     BXType bx = ievt;
@@ -109,27 +95,26 @@ int main() {
 
     // Unit Under Test
     MatchCalculatorTop(
-      bx, &match1, &match2, &match3, &match4, &match5, &match6, &match7, &match8, &allstub, &allproj, bx_out,
-      &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4, &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8
+      bx, match, &allstub, &allproj, bx_out, fullmatch
     );
 
     // compare the computed outputs with the expected ones 
     //std::cout << "FM: L1L2 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch1, fout_fm1, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[0], fout_fm1, ievt, "FullMatch", truncation);
     //std::cout << "FM: L2L3 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch2, fout_fm2, ievt, "FullMatch", truncation);
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[1], fout_fm2, ievt, "FullMatch", truncation);
     //std::cout << "FM: L3L4 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch3, fout_fm3, ievt, "FullMatch", truncation);
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[2], fout_fm3, ievt, "FullMatch", truncation);
     //std::cout << "FM: L5L6 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch4, fout_fm4, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[3], fout_fm4, ievt, "FullMatch", truncation);
     //std::cout << "FM: D1D2 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch5, fout_fm5, ievt, "FullMatch", truncation);
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[4], fout_fm5, ievt, "FullMatch", truncation);
     //std::cout << "FM: D3D4 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch6, fout_fm6, ievt, "FullMatch", truncation);
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[5], fout_fm6, ievt, "FullMatch", truncation);
     //std::cout << "FM: L1D1 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch7, fout_fm7, ievt, "FullMatch", truncation);
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[6], fout_fm7, ievt, "FullMatch", truncation);
     //std::cout << "FM: L2D1 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch8, fout_fm8, ievt, "FullMatch", truncation);
+    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[7], fout_fm8, ievt, "FullMatch", truncation);
 
   }  // end of event loop
   
