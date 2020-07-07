@@ -11,108 +11,29 @@
 
 namespace PR
 {
-
-  //////////////////////////////
-  // Initialization
-  // check the number of entries in the input memories
-  // fill the bit mask indicating if memories are empty or not
-  template<int nMEM, int NBits_Entries, class MemType>
-  inline void init(BXType bx,
-                   // bitmasks to indicate if memories are empty
-                   ap_uint<nMEM>& mem_hasdata,
-                   // number of entries for each memory
-                   ap_uint<NBits_Entries> nentries[nMEM],
-                   const int i,
-                   const MemType* const mem)
-  {    
-#pragma HLS inline  
-    ap_uint<kNBits_MemAddr+1> num = mem->getEntries(bx);
-    nentries[i] = num;
-    if (num > 0) mem_hasdata.set(i);
-  }
-  
-  // recursive case
-  template<int nMEM, int NBits_Entries, class MemType, class... Args>
-  inline void init(BXType bx, ap_uint<nMEM>& mem_hasdata,
-                   ap_uint<NBits_Entries> nentries[nMEM],
-                   const int i,
-                   const MemType* const mem, Args... args)
-  {
-#pragma HLS inline 
-    ap_uint<kNBits_MemAddr+1> num = mem->getEntries(bx);
-    nentries[i] = num;
-    if (num > 0) mem_hasdata.set(i);
-
-    if (i+1 < nMEM) init(bx, mem_hasdata, nentries, i+1, args...);
-  }
-
-  //////////////////////////////
-  // Priority encoder based input memory reading logic
-  template<class DataType, class MemType>
-  void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
-                  ap_uint<kNBits_MemAddr>& read_addr,
-                  const int i, const MemType* const inmem)
-  {
-#pragma HLS inline
-    if (read_imem == i) data = inmem->read_mem(bx, read_addr);
-  }
-
-  template<class DataType, class MemType, class... Args>
-  void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
-                  ap_uint<kNBits_MemAddr>& read_addr,
-                  const int i,
-                  const MemType* const inmem, Args... args)
-  {
-    if (read_imem == i) data = inmem->read_mem(bx, read_addr);
-    read_inmem(data, bx, read_imem, read_addr, i+1, args...);
-  }
-
-  
-  template<class DataType, class MemType, int nMEM, int NBits_Entries>
+  template<regionType PROJTYPE, unsigned int nINMEM>
   bool read_input_mems(BXType bx,
-                       ap_uint<nMEM>& mem_hasdata,
-                       ap_uint<NBits_Entries> nentries[nMEM],
+                       ap_uint<nINMEM>& mem_hasdata,
+                       ap_uint<kNBits_MemAddr> nentries[nINMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
-                       // memory pointers
-                       const MemType* const mem0, const MemType* const mem1,
-                       const MemType* const mem2, const MemType* const mem3,
-                       const MemType* const mem4, const MemType* const mem5,
-                       const MemType* const mem6, const MemType* const mem7,
-                       const MemType* const mem8, const MemType* const mem9,
-                       const MemType* const mem10, const MemType* const mem11,
-                       const MemType* const mem12, const MemType* const mem13,
-                       const MemType* const mem14, const MemType* const mem15,
-                       const MemType* const mem16, const MemType* const mem17,
-                       const MemType* const mem18, const MemType* const mem19,
-                       const MemType* const mem20, const MemType* const mem21,
-                       const MemType* const mem22, const MemType* const mem23,
-                       DataType& data)
+                       const TrackletProjectionMemory<PROJTYPE> projin[],
+                       TrackletProjection<PROJTYPE>& data) 
   {
 #pragma HLS inline
+
     if (mem_hasdata == 0) return false;
-
-    // 5 bits memory index for up to 32 input memories
-    // priority encoder
+    // 5 bits memory index for up to 32 input memory priority encoder
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
-
-    // read the memory "read_imem" with the address "read_addr"
-    read_inmem(data, bx, read_imem, read_addr, 0,
-               mem0,mem1,mem2,mem3,mem4,mem5,mem6,mem7,
-               mem8,mem9,mem10,mem11,mem12,mem13,mem14,mem15,
-               mem16,mem17,mem18,mem19,mem20,mem21,mem22,mem23);
-
-    // Increase the read address
+    data = projin[read_imem].read_mem(bx, read_addr);
     ++read_addr;
-
     if (read_addr >= nentries[read_imem]) {
-      // All entries in the memory[read_imem] have been read out
-      // Prepare to move to the next non-empty memory
+      // All entries in the memory[read_imem] have been read out - Prepare to move to the next non-empty memory
       read_addr = 0;
       mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
     }
 
     return true;
-    
+
   } // read_input_mems
 
   /////////////////////////////////////////////////////
@@ -136,107 +57,56 @@ namespace PR
   // functions to rewind correctly, this can be set to zero (or simply removed)
   constexpr unsigned int LoopItersCut = 6; 
   
-} // namesapce PR
+} // namespace PR
 
 //////////////////////////////
 // ProjectionRouter
 template<regionType PROJTYPE, regionType VMPTYPE, unsigned int nINMEM,
-         int LAYER=0, int DISK=0>
+         unsigned int nOUTMEM, int LAYER=0, int DISK=0>
 void ProjectionRouter(BXType bx,
-                      // because Vivado HLS cannot synthesize an array of
-                      // pointers that point to stuff other than scalar or
-                      // array of scalar ...
-                      const TrackletProjectionMemory<PROJTYPE>* const proj1in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj2in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj3in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj4in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj5in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj6in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj7in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj8in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj9in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj10in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj11in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj12in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj13in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj14in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj15in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj16in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj17in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj18in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj19in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj20in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj21in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj22in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj23in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj24in,
+                      const TrackletProjectionMemory<PROJTYPE> projin[],
                       BXType& bx_o,
-                      AllProjectionMemory<PROJTYPE>* const allprojout,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout1,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout2,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout3,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout4,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout5,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout6,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout7,
-                      VMProjectionMemory<VMPTYPE>* const vmprojout8
-){
+                      AllProjectionMemory<PROJTYPE>& allprojout,
+                      VMProjectionMemory<VMPTYPE> vmprojout[])
+{
 #pragma HLS inline
+#pragma HLS array_partition variable=projin complete dim=1
+#pragma HLS array_partition variable=vmprojout complete dim=1
 
   using namespace PR;
-  
-  // reset output memories
-  allprojout->clear(bx);
-  vmprojout1->clear(bx);
-  vmprojout2->clear(bx);
-  vmprojout3->clear(bx);
-  vmprojout4->clear(bx);
-  vmprojout5->clear(bx);
-  vmprojout6->clear(bx);
-  vmprojout7->clear(bx);
-  vmprojout8->clear(bx);
+
+  // reset output memories & counters
+  ap_uint<kNBits_MemAddr> nallproj = 0;
+  ap_uint<kNBits_MemAddr> nvmprojout[nOUTMEM];
+#pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
+  allprojout.clear(bx);
+  for (int i=0; i<nOUTMEM; i++) {
+#pragma HLS unroll
+    vmprojout[i].clear(bx);
+    nvmprojout[i] = 0;
+  }
 
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
   ap_uint<nINMEM> mem_hasdata = 0;
-  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
+  ap_uint<kNBits_MemAddr> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+  for (int i=0; i<nINMEM; i++) {
+#pragma HLS unroll
+    numbersin[i] = projin[i].getEntries(bx);
+    if (numbersin[i] > 0) mem_hasdata.set(i);
+  }
 
-  //init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
-  init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
-    (bx, mem_hasdata, numbersin,0,
-     proj1in,proj2in,proj3in,proj4in,proj5in,proj6in,proj7in,proj8in,
-     proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
-     proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
-  
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
-
-  // declare counters for each of the 8 output VMProj // !!!
-  int nvmprojout1 = 0;
-  int nvmprojout2 = 0;
-  int nvmprojout3 = 0;
-  int nvmprojout4 = 0;
-  int nvmprojout5 = 0;
-  int nvmprojout6 = 0;
-  int nvmprojout7 = 0;
-  int nvmprojout8 = 0;  
-  int nallproj = 0;
 
   PROC_LOOP: for (int i = 0; i < kMaxProc-LoopItersCut; ++i) {
 #pragma HLS PIPELINE II=1
 
     // read inputs
     TrackletProjection<PROJTYPE> tproj;
-    bool validin = read_input_mems<TrackletProjection<PROJTYPE>,
-                                   TrackletProjectionMemory<PROJTYPE>,
-                                   nINMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr,
-       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
-       proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
-       proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in,
-       tproj);
+    bool validin = read_input_mems<PROJTYPE,nINMEM>(bx, mem_hasdata, numbersin, mem_read_addr, projin, tproj);
 
     if (validin) {
     
@@ -321,46 +191,14 @@ void ProjectionRouter(BXType bx,
 
       // write outputs
       //assert(iphi>=0 and iphi<4);
-      switch(iphi) {
-      case 0:
-        vmprojout1->write_mem(bx, vmproj, nvmprojout1);
-        nvmprojout1 ++;
-        break;
-      case 1:
-        vmprojout2->write_mem(bx, vmproj, nvmprojout2);
-        nvmprojout2 ++;
-        break;
-      case 2:
-        vmprojout3->write_mem(bx, vmproj, nvmprojout3);
-        nvmprojout3 ++;
-        break;
-      case 3:
-        vmprojout4->write_mem(bx, vmproj, nvmprojout4);
-        nvmprojout4 ++;
-        break;
-      case 4:
-        vmprojout5->write_mem(bx, vmproj, nvmprojout5);
-        nvmprojout5 ++;
-        break;
-      case 5:
-        vmprojout6->write_mem(bx, vmproj, nvmprojout6);
-        nvmprojout6 ++;
-        break;
-      case 6:
-        vmprojout7->write_mem(bx, vmproj, nvmprojout7);
-        nvmprojout7 ++;
-        break;
-      case 7:
-        vmprojout8->write_mem(bx, vmproj, nvmprojout8);
-        nvmprojout8 ++;
-        break;
-      }
+      vmprojout[iphi].write_mem(bx, vmproj, nvmprojout[iphi]);
+      nvmprojout[iphi] ++;
 
       /////////////////
       // AllProjection
       AllProjection<PROJTYPE> aproj(tproj.raw());
       // write output
-      allprojout->write_mem(bx, aproj, nallproj);
+      allprojout.write_mem(bx, aproj, nallproj);
       nallproj ++;
     }
 

@@ -5,23 +5,8 @@
 
 void ProjectionRouterTop(BXType bx,
                          const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
-                         const TrackletProjectionMemory<BARRELPS>*,
                          BXType&,
-                         AllProjectionMemory<BARRELPS>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*,
-                         VMProjectionMemory<BARREL>*
-                         );
+                         AllProjectionMemory<BARRELPS>&,
+                         VMProjectionMemory<BARREL>*);
 
 #endif
