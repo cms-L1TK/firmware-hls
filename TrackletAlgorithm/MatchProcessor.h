@@ -690,7 +690,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
 //#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 //#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
-#pragma HLS dependence variable=writeindex inter RAW true 
+#pragma HLS dependence variable=writeindex inter RAW false 
   ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
@@ -1027,22 +1027,37 @@ void MatchProcessor(BXType bx,
   	  //writeindex[iphi]=writeindexplus;
         }
         VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
-      if(iphi==0) std::cout << std::hex << "vmproj=" << vmproj.raw() << std::endl;
-      //std::cout << savefirst << savelast << std::endl;
         /* FIXME
+      if(!savefirst && !savelast) std::cout << std::hex << "vmproj=" << vmproj.raw() << " nstubfirst=" << nstubfirst << " nstublast=" << nstublast << " projzbin[0]=" << projzbin.range(0,0) << " zfirst=" << zfirst << " zlast=" << zlast << std::endl;
+        if(!savefirst && !savelast) {
+        std::cout << "Printing mem" << std::endl;
+        switch (iphi) {
+          case 0:  instubdata1->print_mem(bx);
+          break;
+          case 1:  instubdata2->print_mem(bx);
+          break;
+          case 2:  instubdata3->print_mem(bx);
+          break;
+          case 3:  instubdata4->print_mem(bx);
+          break;
+          case 4:  instubdata5->print_mem(bx);
+          break;
+          case 5:  instubdata6->print_mem(bx);
+          break;
+          case 6:  instubdata7->print_mem(bx);
+          break;
+          case 7:  instubdata8->print_mem(bx);
+          break;
+        }
+        std::cout << "Done!" << std::endl;
+        }
+      //std::cout << savefirst << savelast << std::endl;
         std::cout << "writeindextmp=" << writeindextmp << std::endl;
         std::cout << "writeindex[" << iphi << "]=" << writeindex[iphi] << std::endl;
         std::cout << std::hex << "projid=" << vmproj.getIndex() << std::endl;
         */
 
-        if (savefirst) { //FIXME code needs to be cleaner
-          ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
-            /* FIXME
-            std::cout << "PRiphi=" << iphi << std::endl;
-            std::cout << "save first" << std::endl;
-            */
-      //std::cout << std::hex << "iphi=" << iphi+1 << " vmproj=" << vmproj.raw() << std::endl;
-          projbuffer[iphi][writeindextmp[iphi]]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+        if(savefirst || savelast) {
           switch(iphi) {
             case 0: vmprojout1->write_mem(bx, vmproj, nvmprojout1);
             nvmprojout1++;
@@ -1069,6 +1084,15 @@ void MatchProcessor(BXType bx,
             nvmprojout8++;
             break;
           }
+        }
+        if (savefirst) { //FIXME code needs to be cleaner
+          ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
+            /* FIXME
+            std::cout << "PRiphi=" << iphi << std::endl;
+            std::cout << "save first" << std::endl;
+            */
+      //std::cout << std::hex << "iphi=" << iphi+1 << " vmproj=" << vmproj.raw() << std::endl;
+          projbuffer[iphi][writeindextmp[iphi]]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
         /*
           switch (iphi) {
             case 0: projbuffer1[writeindextmp]=new ProjectionRouterBuffer<BARREL>(sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
