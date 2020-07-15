@@ -331,6 +331,7 @@ void MatchCalculator(BXType bx,
                      int &nmcout6,
                      int &nmcout7,
                      int &nmcout8,
+                     int &noutcandmatch,
                      FullMatchMemory<FMTYPE>* fullmatch1,
                      FullMatchMemory<FMTYPE>* fullmatch2,
                      FullMatchMemory<FMTYPE>* fullmatch3,
@@ -338,7 +339,8 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch5,
                      FullMatchMemory<FMTYPE>* fullmatch6,
                      FullMatchMemory<FMTYPE>* fullmatch7,
-                     FullMatchMemory<FMTYPE>* fullmatch8
+                     FullMatchMemory<FMTYPE>* fullmatch8,
+		     CandidateMatchMemory* outcandmatch
 ){
 
 #pragma HLS inline
@@ -519,6 +521,8 @@ void MatchCalculator(BXType bx,
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       //std::cout << "writing " << bestmatch.raw() << std::endl;
+      outcandmatch->write_mem(bx,cmatch,noutcandmatch);
+      noutcandmatch++;
       switch (projseed) {
       case 0:
       fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -624,7 +628,8 @@ void MatchProcessor(BXType bx,
                          VMProjectionMemory<BARREL>* vmprojout5,
                          VMProjectionMemory<BARREL>* vmprojout6,
                          VMProjectionMemory<BARREL>* vmprojout7,
-                         VMProjectionMemory<BARREL>* vmprojout8
+                         VMProjectionMemory<BARREL>* vmprojout8,
+		         CandidateMatchMemory* outcandmatch
 ){
 #pragma HLS inline
 
@@ -663,6 +668,7 @@ void MatchProcessor(BXType bx,
   vmprojout6->clear(bx);
   vmprojout7->clear(bx);
   vmprojout8->clear(bx);
+  outcandmatch->clear(bx);
 
   // initialization:
   // check the number of entries in the input memories
@@ -703,6 +709,7 @@ void MatchProcessor(BXType bx,
   int nvmprojout7 = 0;
   int nvmprojout8 = 0;  
   int nallproj = 0;
+  int noutcandmatch = 0;
 
   // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
@@ -1281,8 +1288,8 @@ void MatchProcessor(BXType bx,
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                   //(bx, allstub, allproj, projindex, stubid, nstub, bx_o,
                   (bx, allstub, allproj, matchengine[ivmphi].getProjindex(), matchengine[ivmphi].getStubIds(), matchengine[ivmphi].getNStubs(), bx_o,
-                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, 
-                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
+                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, noutcandmatch,
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8,outcandmatch);
         //}
       } //end MC if
 

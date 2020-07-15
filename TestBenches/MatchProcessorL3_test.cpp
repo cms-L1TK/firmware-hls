@@ -64,6 +64,9 @@ int main() {
   static VMProjectionMemory<BARREL> vmproj7;
   static VMProjectionMemory<BARREL> vmproj8;
 
+  // declare output memory array to be filled by hls simulation
+  CandidateMatchMemory outputcandmatches;
+
   ap_uint<8>* valid;
 
   // open input files
@@ -159,6 +162,10 @@ int main() {
   bool valid_vmproj8 = openDataFile(fout_vmproj8, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC24_04.dat");
   if (not valid_vmproj8) return -1;
 
+  ifstream fin_candmatch;
+  bool validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
+  if (not validcandmatch) return -1;
+
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
@@ -199,7 +206,8 @@ int main() {
                         &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4,
                         &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8,
                         &vmproj1, &vmproj2, &vmproj3, &vmproj4,
-                        &vmproj5, &vmproj6, &vmproj7, &vmproj8);
+                        &vmproj5, &vmproj6, &vmproj7, &vmproj8,
+                        &outputcandmatches);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches
@@ -281,6 +289,12 @@ compareMemWithFile<VMProjectionMemory<BARREL> >
     //err_count += 
 compareMemWithFile<VMProjectionMemory<BARREL> >
       (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
+
+    // compare the computed outputs with the expected ones for the candidate 
+    // matches
+    err_count += compareMemWithFile<CandidateMatchMemory>(outputcandmatches, 
+							  fin_candmatch, 
+							  ievt,"CandidateMatch",truncation);
     
 
   }  // end of event loop
@@ -302,6 +316,8 @@ compareMemWithFile<VMProjectionMemory<BARREL> >
   fin_vmstub6.close();
   fin_vmstub7.close();
   fin_vmstub8.close();
+  fin_candmatch.close();
+
   fout_fm1.close();
   fout_fm2.close();
   fout_fm3.close();
