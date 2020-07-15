@@ -58,6 +58,9 @@ int main() {
   static VMProjectionMemory<BARREL> vmproj7;
   static VMProjectionMemory<BARREL> vmproj8;
 
+  // declare output memory array to be filled by hls simulation
+  CandidateMatchMemory outputcandmatches;
+
   ap_uint<8>* valid;
 
   // open input files
@@ -152,6 +155,10 @@ int main() {
   ifstream fout_vmproj8;
   bool valid_vmproj8 = openDataFile(fout_vmproj8, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC24_04.dat");
   if (not valid_vmproj8) return -1;
+
+  ifstream fin_candmatch;
+  bool validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
+  if (not validcandmatch) return -1;
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
@@ -287,6 +294,12 @@ compareMemWithFile<VMProjectionMemory<BARREL> >
     //err_count += 
 compareMemWithFile<VMProjectionMemory<BARREL> >
       (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
+
+    // compare the computed outputs with the expected ones for the candidate 
+    // matches
+    err_count += compareMemWithFile<CandidateMatchMemory>(outputcandmatches, 
+							  fin_candmatch, 
+							  ievt,"CandidateMatch",truncation);
     
 
   }  // end of event loop
