@@ -602,6 +602,7 @@ void MatchProcessor(BXType bx,
   vmprojout6->clear(bx);
   vmprojout7->clear(bx);
   vmprojout8->clear(bx);
+  outcandmatch->clear(bx);
 
   // initialization:
   // check the number of entries in the input memories
