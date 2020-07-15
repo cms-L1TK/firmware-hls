@@ -38,6 +38,7 @@ void MatchProcessorTopL3(BXType bx,
                          VMProjectionMemory<BARREL>* vmprojout5,
                          VMProjectionMemory<BARREL>* vmprojout6,
                          VMProjectionMemory<BARREL>* vmprojout7,
-                         VMProjectionMemory<BARREL>* vmprojout8);
+                         VMProjectionMemory<BARREL>* vmprojout8,
+		         CandidateMatchMemory* outcandmatch);
 
 #endif

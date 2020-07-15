@@ -35,7 +35,8 @@ void MatchProcessorTopL3(BXType bx,
                          VMProjectionMemory<BARREL>* vmprojout5,
                          VMProjectionMemory<BARREL>* vmprojout6,
                          VMProjectionMemory<BARREL>* vmprojout7,
-                         VMProjectionMemory<BARREL>* vmprojout8) {
+                         VMProjectionMemory<BARREL>* vmprojout8,
+		         CandidateMatchMemory* outcandmatch) {
 
  #pragma HLS interface register port=bx_o
  #pragma HLS resource variable=proj1in->get_mem() latency=2
@@ -73,6 +74,7 @@ void MatchProcessorTopL3(BXType bx,
                          vmprojout5,
                          vmprojout6,
                          vmprojout7,
-                         vmprojout8);
+                         vmprojout8,
+			 outcandmatch);
 }
 
