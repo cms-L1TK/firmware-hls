@@ -195,6 +195,8 @@ int main() {
     BXType bx=ievt;
     BXType bx_out;
 
+    int noutcandmatch = 0;
+
     // Unit Under Test
     MatchProcessorTopL3(bx,
                         &tproj1, &tproj2, &tproj3, &tproj4,
@@ -207,6 +209,7 @@ int main() {
                         &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8,
                         &vmproj1, &vmproj2, &vmproj3, &vmproj4,
                         &vmproj5, &vmproj6, &vmproj7, &vmproj8,
+                        noutcandmatch,
                         &outputcandmatches);
 
     // compare the computed outputs with the expected ones for the candidate 
@@ -296,6 +299,7 @@ compareMemWithFile<VMProjectionMemory<BARREL> >
 							  fin_candmatch, 
 							  ievt,"CandidateMatch",truncation);
     
+    std::cout << noutcandmatch << " cmatches" << std::endl;
 
   }  // end of event loop
   
