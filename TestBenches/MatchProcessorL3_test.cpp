@@ -297,6 +297,7 @@ compareMemWithFile<VMProjectionMemory<BARREL> >
 							  fin_candmatch, 
 							  ievt,"CandidateMatch",truncation);
     
+    std::cout << noutcandmatch << " cmatches" << std::endl;
 
   }  // end of event loop
   
