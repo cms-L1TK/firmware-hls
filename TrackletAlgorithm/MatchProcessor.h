@@ -629,6 +629,7 @@ void MatchProcessor(BXType bx,
                          VMProjectionMemory<BARREL>* vmprojout6,
                          VMProjectionMemory<BARREL>* vmprojout7,
                          VMProjectionMemory<BARREL>* vmprojout8,
+                         int &noutcandmatch,
 		         CandidateMatchMemory* outcandmatch
 ){
 #pragma HLS inline
@@ -709,7 +710,6 @@ void MatchProcessor(BXType bx,
   int nvmprojout7 = 0;
   int nvmprojout8 = 0;  
   int nallproj = 0;
-  int noutcandmatch = 0;
 
   // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
