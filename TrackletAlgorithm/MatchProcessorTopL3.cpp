@@ -36,6 +36,7 @@ void MatchProcessorTopL3(BXType bx,
                          VMProjectionMemory<BARREL>* vmprojout6,
                          VMProjectionMemory<BARREL>* vmprojout7,
                          VMProjectionMemory<BARREL>* vmprojout8,
+                         int &noutcandmatch,
 		         CandidateMatchMemory* outcandmatch) {
 
  #pragma HLS interface register port=bx_o
@@ -75,6 +76,7 @@ void MatchProcessorTopL3(BXType bx,
                          vmprojout6,
                          vmprojout7,
                          vmprojout8,
+                         noutcandmatch,
 			 outcandmatch);
 }
 
