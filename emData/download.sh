@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+# https://github.com/aehart/cmssw/tree/hex_format
+memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+
 # fw_synch_200515
-memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
-luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
+#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
