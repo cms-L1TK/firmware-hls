@@ -1,5 +1,4 @@
 # firmware-hls : HLS implementation of the hybrid L1 track firmware
-![HLS build on lnxfarm327](https://github.com/cms-tracklet/firmware-hls/workflows/HLS%20build%20on%20lnxfarm327/badge.svg)
 
 ## Repo directory contents:
 
@@ -55,3 +54,24 @@ The correct versions of imath and fpga_emulation_longVM can be checked out and b
         cd ../fpga_emulation_longVM/
         git checkout AH_190930
         make fpga
+
+## Continuous Integration (CI) 
+
+Purpose: Automatically run SW quality checks and build the HLS projects (csim, csynth, cosim, and export) for a PR to the master.
+
+In order to keep the GitHub repository public we use GitHub Actions and GitLab CI/CD:
+
+* GitHub Actions uses a public runner, the workflow is defined in .github/workflows/GitLab_CI.yml
+* GitHub Actions mirrors the repository to GitLab and runs GitLab CI/CD
+* GitLab CI/CD uses a private runner (lnxfarm327.colorado.edu) and performs the SW quality checks and the HLS builds as defined in .gitlab-ci.yml
+    - SW quality checks are based on clang-tidy (llvm-toolset-7.0) and are defined in .clang-tidy and .clang-format very similar to CMSSW
+    - HLS builds are using Vivado HLS (or Vitis HLS) and are defined in the script files of the project folder
+    - Results (logs and artifacts) of the SW quality checks and HLS builds can be found here https://gitlab.cern.ch/rglein/firmware-hls_actions/pipelines 
+    - The default behavior blocks a stage (e.g. Hls-build) when a previous stage (e.g. Quality-check) failed 
+* GitHub Actions pulls the GitLab CI/CD status and the pass/fail outcome
+
+### Use CI for Personal Branch
+
+* Add your branch name to the "on:" section of .github/workflows/GitLab_CI.yml 
+    - In the "push:" subsection to trigger CI on each push, e.g. "branches: [feat_CI,<your_branch_name>]" and/or
+    - in the "pull_request:" subsection to trigger CI on each PR, e.g. "branches: [master,<your_branch_name>]"
