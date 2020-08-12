@@ -43,7 +43,6 @@ constexpr int kNBits_BX = 3;
 constexpr int kNBits_MemAddrBinned = 4;
 constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
 
-constexpr int kNBits_pttableTE = 5;
 constexpr int kNBits_bendinnertableTE = 8;
 constexpr int kNBits_bendoutertableTE = 8;
 

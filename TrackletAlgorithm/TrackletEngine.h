@@ -38,13 +38,12 @@ enum phireg {
 //----------------------------
 // Tracklet Engine main code
 //============================
-template<int innertype, int outertype, unsigned int ptdepth,
+template<int innertype, int outertype,
   unsigned int stubptinnerdepth, unsigned int stubptouterdepth>
 void TrackletEngine(
 		    const ap_uint<3> bx,
 		    const VMStubTEInnerMemory<innertype>& instubinnerdata,
 		    const VMStubTEOuterMemory<outertype>& instubouterdata,
-                    const ap_uint<1> pttable[ptdepth],
                     const ap_uint<1> bendinnertable[stubptinnerdepth],
                     const ap_uint<1> bendoutertable[stubptouterdepth],
 		    StubPairMemory& outstubpair) {
@@ -207,7 +206,6 @@ void TrackletEngine(
           	  // pT cut
           	  ap_uint<5> ptindex1=innerstubfinephi.concat(outerstubfinephi);
           	  ap_uint<5> ptindex2=ptindex1;
-          	  ap_uint<1> pt_tmp = pttable[ptindex1];
 
           	  // inner stub bend consistency
           	  ap_uint<8> bendinnerindex=ptindex1.concat(innerstubbend);
@@ -216,7 +214,7 @@ void TrackletEngine(
           	  ap_uint<8> bendouterindex=ptindex2.concat(outerstubbend);
           	  ap_uint<1> bo_tmp = bendoutertable[bendouterindex];
 
-          	  ap_uint<1> ifskip = (!z_tmp) || (!pt_tmp) || (!bi_tmp) || (!bo_tmp);
+          	  ap_uint<1> ifskip = (!z_tmp) || (!bi_tmp) || (!bo_tmp);
 
           	  if(!ifskip) {
                  	// good stub pair, so write it!
