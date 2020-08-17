@@ -50,16 +50,16 @@ constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
 
 // physical constants
-constexpr double c = 0.3; // m/ns
+constexpr double c = 0.299792458; // m/ns
 
 // stub digitization constants
 constexpr double kr = 0.0292969;
-constexpr double kphi = 7.71297e-06;
+constexpr double kphi = 7.71867e-06;
 constexpr double kz = 0.0585938;
 
 // tracklet digitization constants
-constexpr double krinv = 1.0284e-06;
-constexpr double kphi0 = 1.54259e-05;
+constexpr double krinv = 1.02916e-06;
+constexpr double kphi0 = 1.54373e-05;
 constexpr double kt = 0.00195312;
 constexpr double kz0 = 0.0585938;
 
@@ -78,7 +78,7 @@ constexpr double krprojderdisk = 0.0078125;
 // detector constants
 constexpr int N_LAYER = 6; // # of barrel layers assumed
 constexpr int N_DISK = 5; // # of endcap disks assumed
-constexpr double bfield = 3.8; // T
+constexpr double bfield = 3.8112; // T
 constexpr int rmean[N_LAYER] = { 851, 1269, 1784, 2347, 2936, 3697 };
 constexpr int zmean[N_DISK] = { 2239, 2645, 3163, 3782, 4523 };
 constexpr double zlength = 120.0; // cm
