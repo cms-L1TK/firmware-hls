@@ -85,8 +85,6 @@ constexpr double zlength = 120.0; // cm
 constexpr double rmindiskvm = 22.5; // cm
 constexpr double rmindisk = 20.0; // cm
 constexpr double rmaxdisk = 120.0; // cm
-constexpr double rmindisktc = 12.0; // cm
-constexpr double rmaxdisktc = 112.0; // cm
 
 // cut constants
 constexpr double ptcut = 1.91; // GeV

@@ -376,7 +376,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
       proj_success = false;
   }
   else {
-    if (proj.getRZ() < floatToInt(rmindisktc, krprojdisk) || proj.getRZ() > floatToInt(rmaxdisktc, krprojdisk))
+    if (proj.getRZ() < floatToInt(rmindiskvm, krprojdisk) || proj.getRZ() > floatToInt(rmaxdisk, krprojdisk))
       proj_success = false;
   }
 
