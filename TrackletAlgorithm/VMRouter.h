@@ -826,7 +826,7 @@ TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LA
 			#endif // DEBUG
 
 			// Write the TE Inner stub to the correct memory
-			// Only if it has a valid rzbits/binlookup value, less than 1024 (table uses 1048575 as "-1"),
+			// Only if it has a valid rzbits/binlookup value,
 			// and a valid bend
 			if (rzbits >= 0 && teimask[ivm]) {
 				int memindex = ivm-firstte; // Index for the correct memory in memory array
@@ -911,7 +911,6 @@ TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LA
 #endif // DEBUG
 
 				// Save stub to Overlap memories
-				// 1023 is like "-1" if we had signed stuff...
 				if (olmask[ivm] && (rzbits != -1)) {
 					int memindex = ivm - firstol; // The memory index in array and addrcount
 					int bendindex = memindex*MaxOLCopies; // Index for bendcut LUTs
