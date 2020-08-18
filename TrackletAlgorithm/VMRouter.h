@@ -66,7 +66,7 @@ constexpr int nzbitsoutertabledisk = 3;
 constexpr int nrbitsoutertabledisk = 7;
 
 constexpr int nzbitsrzbitsoverlaptable = 7;
-constexpr int nrbitsrzbitsoverlaptable = 3;
+constexpr int nrbitsrzbitsoverlaptable = 4;
 
 // Number of MSBs used for r index in phicorr LUTs
 constexpr int nrbitsphicorrtable = 3; // Found hardcoded in VMRouterphicorrtable.h
@@ -828,7 +828,7 @@ TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LA
 			// Write the TE Inner stub to the correct memory
 			// Only if it has a valid rzbits/binlookup value, less than 1024 (table uses 1048575 as "-1"),
 			// and a valid bend
-			if (rzbits <= 1024 && teimask[ivm]) {
+			if (rzbits >= 0 && teimask[ivm]) {
 				int memindex = ivm-firstte; // Index for the correct memory in memory array
 				int bendindex = memindex*MaxTEICopies; // Index for bendcut LUTs
 				for (int n = 0; n < MaxTEICopies; n++) {
@@ -912,7 +912,7 @@ TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LA
 
 				// Save stub to Overlap memories
 				// 1023 is like "-1" if we had signed stuff...
-				if (olmask[ivm] && (rzbits != 1023)) {
+				if (olmask[ivm] && (rzbits != -1)) {
 					int memindex = ivm - firstol; // The memory index in array and addrcount
 					int bendindex = memindex*MaxOLCopies; // Index for bendcut LUTs
 					for (int n = 0; n < MaxOLCopies; n++) {
