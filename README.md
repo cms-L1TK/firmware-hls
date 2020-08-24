@@ -69,6 +69,8 @@ A few changes need to be made in order to enable truncation, to output test vect
     bool writeMem_{true};    //If true will print out content of memories to files
     bool writeTable_{true};  //If true will print out content of LUTs to files
 …
+    bool writeHLSInvTable_{true};  //Write out tables of drinv and invt in tracklet calculator for HLS module
+…
     // When false, match calculator does not save multiple matches, even when doKF=true.
     // This is a temporary fix for compatibilty with HLS. We will need to implement multiple match
     // printing in emulator eventually, possibly after CMSSW-integration inspired rewrites
