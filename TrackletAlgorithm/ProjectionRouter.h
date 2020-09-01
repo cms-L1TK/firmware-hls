@@ -93,12 +93,11 @@ void ProjectionRouter(BXType bx,
       // reset output memories & counters
       nallproj = 0;
 #pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
-      allprojout.clear(bx);
       for (int i=0; i<nOUTMEM; i++) {
 #pragma HLS unroll
-        vmprojout[i].clear(bx);
         nvmprojout[i] = 0;
       }
+
       // check the number of entries in the input memories
       // fill the bit mask indicating if memories are empty or not
       mem_hasdata = 0;

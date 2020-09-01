@@ -52,8 +52,6 @@ void TrackletEngine(
   int nstubpairs = 0;
 #pragma HLS dependence variable=nstubpairs intra WAR true
 
-  outstubpair.clear(bx);
-
   //
   // Set up a FIFO based on a circular buffer structure
   // Each element consists of

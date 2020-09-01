@@ -127,6 +127,15 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+    // Clear all output memories before starting.
+    tpar.clear();
+    for (unsigned i = 0; i < TC::N_PROJOUT_BARRELPS; i++)
+      tproj_barrel_ps[i].clear();
+    for (unsigned i = 0; i < TC::N_PROJOUT_BARREL2S; i++)
+      tproj_barrel_2s[i].clear();
+    for (unsigned i = 0; i < TC::N_PROJOUT_DISK; i++)
+      tproj_disk[i].clear();
+
     // read event and write to memories
     writeMemFromFile<AllStubMemory<BARRELPS> >(innerStubs[0], fin_innerStubs, ievt);
     writeMemFromFile<AllStubMemory<BARREL2S> >(outerStubs[0], fin_outerStubs0, ievt);
@@ -189,6 +198,8 @@ int main()
 
   } // end of event loop
 
+  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  if (err > 255) err = 255;
   return err;
 
 }

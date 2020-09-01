@@ -36,8 +36,6 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	ap_uint<1> table[LSIZE];
 	readTable(table);
 
-	outputCandidateMatch.clear(bx);
-
 	//
 	// Set up a FIFO based on a circular buffer structure.
 	// Projection memory is read and if projections points to nonempty zbin for the stubs it is stored on this buffer.

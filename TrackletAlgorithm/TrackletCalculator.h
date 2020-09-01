@@ -591,18 +591,6 @@ TrackletCalculator(
       memset(nproj_barrel_ps, 0, sizeof(int) * TC::N_PROJOUT_BARRELPS);
       memset(nproj_barrel_2s, 0, sizeof(int) * TC::N_PROJOUT_BARREL2S);
       memset(nproj_disk, 0, sizeof(int) * TC::N_PROJOUT_DISK);
-
-      trackletParameters->clear(bx);
-      clear_barrel_ps: for (unsigned j = 0; j < TC::N_PROJOUT_BARRELPS; j++)
-        if (TPROJMaskBarrel<Seed, iTC>() & (0x1 << j))
-          projout_barrel_ps[j].clear(bx);
-      clear_barrel_2s: for (unsigned j = 0; j < TC::N_PROJOUT_BARREL2S; j++)
-        if (TPROJMaskBarrel<Seed, iTC>() & (0x1 << (j + TC::N_PROJOUT_BARRELPS)))
-          projout_barrel_2s[j].clear(bx);
-      clear_disk: for (unsigned j = 0; j < TC::N_PROJOUT_DISK; j++)
-        if (TPROJMaskDisk<Seed, iTC>() & (0x1 << j))
-          projout_disk[j].clear(bx);
-
       trackletIndex = 0;
     }
     else {

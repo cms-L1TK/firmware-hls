@@ -77,6 +77,15 @@ int main() {
   for (int ievt = 0; ievt < nevents; ++ievt) {
     //cout << "Event: " << dec << ievt << endl;
 
+    fullmatch[0].clear();
+//    fullmatch[1].clear();
+//    fullmatch[2].clear();
+    fullmatch[3].clear();
+//    fullmatch[4].clear();
+//    fullmatch[5].clear();
+//    fullmatch[6].clear();
+//    fullmatch[7].clear();
+
     // make memories from the input text files
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
     writeMemFromFile<AllProjectionMemory<BARRELPS> >(allproj, fin_ap, ievt);
@@ -138,5 +147,7 @@ int main() {
   fout_fm7.close();
   fout_fm7.close();
 
+  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  if (err_count > 255) err_count = 255;
   return err_count;
 }

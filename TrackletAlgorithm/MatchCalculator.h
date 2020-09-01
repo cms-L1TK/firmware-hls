@@ -795,18 +795,7 @@ void MatchCalculator(BXType bx,
       projseed_next  = projseed;
     }
 
-    if (istep==0){
-      // Reset output memories
-      fullmatch[0].clear(bx);
-      fullmatch[1].clear(bx);
-      fullmatch[2].clear(bx);
-      fullmatch[3].clear(bx);
-      fullmatch[4].clear(bx);
-      fullmatch[5].clear(bx);
-      fullmatch[6].clear(bx);
-      fullmatch[7].clear(bx);
-    }
-    else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+    if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
       case 0:
       fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed

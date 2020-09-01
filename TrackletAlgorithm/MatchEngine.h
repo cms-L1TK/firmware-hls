@@ -73,7 +73,7 @@
 #define LSIZE RINVSTEPS*(1<<VMStubME<MODULETYPE>::kVMSMEBendSize)
 #define BUFFERSIZE 8
 constexpr unsigned int kNBits_BufferAddr=BITS_TO_REPRESENT(BUFFERSIZE-1);
-constexpr int kBufferDataSize = VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitData   // number of bits for stubs array size
+constexpr int kBufferDataSize = VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitDataAddr   // number of bits for stubs array size
 							  + VMProjection<PROJECTIONTYPE>::kVMProjectionSize	// projection data size
 							  + MEBinsBits										// number of bits for index of z-bin
 							  + 1;												// z-bin flag (0 => first bin, 1 => second bin)
@@ -87,7 +87,7 @@ namespace ME {
 		kVMMEProjectionLSB = kVMMEZBinMSB + 1,
 		kVMMEProjectionMSB = kVMMEProjectionLSB + VMProjection<PROJECTIONTYPE>::kVMProjectionSize - 1,
 		kVMMENStubsLSB = kVMMEProjectionMSB + 1,
-		kVMMENStubsMSB = kVMMENStubsLSB + VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitData - 1
+		kVMMENStubsMSB = kVMMENStubsLSB + VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitDataAddr - 1
 	};
 	enum StubZPositionBarrelConsistency {
 		kPSMin = -2,

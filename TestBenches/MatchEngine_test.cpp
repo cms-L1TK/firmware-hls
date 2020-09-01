@@ -73,6 +73,8 @@ int main() {
 	for (int ievt = 0; ievt < nevents; ++ievt) {
 		cout << "Event: " << dec << ievt << endl;
 
+                outputcandmatches.clear();
+
 		writeMemFromFile<VMProjectionMemory<PROJECTIONTYPE> >(inputvmprojs, fin_vmproj, ievt);
 		writeMemFromFile<VMStubMEMemory<MODULETYPE, NBITBIN> >(inputvmstubs, fin_vmstub, ievt);
 
@@ -100,6 +102,7 @@ int main() {
 	fin_vmstub.close();
 	fin_vmproj.close();
 	fin_candmatch.close();
-
+        // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+        if (err_count > 255) err_count = 255;
 	return err_count;
 }
