@@ -52,11 +52,6 @@ namespace PR
   // number of VMs in one allstub block for each disk
   constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
 
-  // Number of loop iterations subtracted from the full 108 so that the function
-  // stays synchronized with other functions in the chain. Once we get these
-  // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 6; 
-  
 } // namespace PR
 
 //////////////////////////////
@@ -75,134 +70,138 @@ void ProjectionRouter(BXType bx,
 
   using namespace PR;
 
-  // reset output memories & counters
-  ap_uint<kNBits_MemAddr> nallproj = 0;
+  // Initialization
+  ap_uint<kNBits_MemAddr> nallproj;
   ap_uint<kNBits_MemAddr> nvmprojout[nOUTMEM];
-#pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
-  allprojout.clear(bx);
-  for (int i=0; i<nOUTMEM; i++) {
-#pragma HLS unroll
-    vmprojout[i].clear(bx);
-    nvmprojout[i] = 0;
-  }
-
-  // initialization:
-  // check the number of entries in the input memories
-  // fill the bit mask indicating if memories are empty or not
-  ap_uint<nINMEM> mem_hasdata = 0;
+  ap_uint<nINMEM> mem_hasdata;
   ap_uint<kNBits_MemAddr> numbersin[nINMEM];
-#pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-  for (int i=0; i<nINMEM; i++) {
+  ap_uint<kNBits_MemAddr> mem_read_addr;
+
+  PROC_LOOP: for (int istep = 0; istep < kMaxProc; ++istep) {
+#pragma HLS PIPELINE II=1 rewind
+    if (istep == 0) {
+
+      // reset output memories & counters
+      nallproj = 0;
+#pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
+      allprojout.clear(bx);
+      for (int i=0; i<nOUTMEM; i++) {
 #pragma HLS unroll
-    numbersin[i] = projin[i].getEntries(bx);
-    if (numbersin[i] > 0) mem_hasdata.set(i);
-  }
+        vmprojout[i].clear(bx);
+        nvmprojout[i] = 0;
+      }
+      // check the number of entries in the input memories
+      // fill the bit mask indicating if memories are empty or not
+      mem_hasdata = 0;
+#pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+      for (int i=0; i<nINMEM; i++) {
+#pragma HLS unroll
+        numbersin[i] = projin[i].getEntries(bx);
+        if (numbersin[i] > 0) mem_hasdata.set(i);
+      }
+      mem_read_addr = 0;
 
-  // declare index of input memory to be read
-  ap_uint<kNBits_MemAddr> mem_read_addr = 0;
+    } else {
 
-  PROC_LOOP: for (int i = 0; i < kMaxProc-LoopItersCut; ++i) {
-#pragma HLS PIPELINE II=1
+      // read inputs
+      TrackletProjection<PROJTYPE> tproj;
+      bool validin = read_input_mems<PROJTYPE,nINMEM>(bx, mem_hasdata, numbersin, mem_read_addr, projin, tproj);
 
-    // read inputs
-    TrackletProjection<PROJTYPE> tproj;
-    bool validin = read_input_mems<PROJTYPE,nINMEM>(bx, mem_hasdata, numbersin, mem_read_addr, projin, tproj);
+      if (validin) {
 
-    if (validin) {
-    
-      auto iphiproj = tproj.getPhi();
-      auto izproj = tproj.getRZ();
-      auto iphider = tproj.getPhiDer();
-      auto trackletid = tproj.getTCID();
+        auto iphiproj = tproj.getPhi();
+        auto izproj = tproj.getRZ();
+        auto iphider = tproj.getPhiDer();
+        auto trackletid = tproj.getTCID();
 
-      //////////////////////////
-      // hourglass configuration
+        //////////////////////////
+        // hourglass configuration
    
-      // top 5 bits of phi
-      auto iphi5 = iphiproj>>(iphiproj.length()-5);
+        // top 5 bits of phi
+        auto iphi5 = iphiproj>>(iphiproj.length()-5);
     
-      // total number of VMs
-      auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
-        nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
-      //assert(nvm>0);
+        // total number of VMs
+        auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
+          nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
+        //assert(nvm>0);
     
-      // number of VMs per module
-      auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
+        // number of VMs per module
+        auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
 
-      // routing
-      ap_uint<3> iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
+        // routing
+        ap_uint<3> iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
     
-      ///////////////
-      // VMProjection
-      static_assert(not DISK, "PR: Layer only for now.");
+        ///////////////
+        // VMProjection
+        static_assert(not DISK, "PR: Layer only for now.");
     
-      // vmproj index
-      typename VMProjection<VMPTYPE>::VMPID index = i;
-      //assert(i < (1<<index.length()));
+        // vmproj index
+        typename VMProjection<VMPTYPE>::VMPID index = nallproj;
+        //assert(i < (1<<index.length()));
 
-      // vmproj z
-      // Separate the vm projections into zbins
-      // The central bin e.g. zbin=4+(zproj.value()>>(zproj.nbits()-3));
-      // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
-      // But we need some range (particularly for L5L6 seed projecting to L1-L3):
-      // Lower bound
-      ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
-      // Upper bound
-      ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
-      if (zbin1tmp >= (1<<MEBinsBits)) zbin1tmp = 0; //note that zbin1 is unsigned
-      if (zbin2tmp >= (1<<MEBinsBits)) zbin2tmp = (1<<MEBinsBits)-1;
+        // vmproj z
+        // Separate the vm projections into zbins
+        // The central bin e.g. zbin=4+(zproj.value()>>(zproj.nbits()-3));
+        // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
+        // But we need some range (particularly for L5L6 seed projecting to L1-L3):
+        // Lower bound
+        ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
+        // Upper bound
+        ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
+        if (zbin1tmp >= (1<<MEBinsBits)) zbin1tmp = 0; //note that zbin1 is unsigned
+        if (zbin2tmp >= (1<<MEBinsBits)) zbin2tmp = (1<<MEBinsBits)-1;
 
-      // One extra bit was used in the above calculation. Now take it away.
-      ap_uint<MEBinsBits> zbin1 = zbin1tmp;
-      ap_uint<MEBinsBits> zbin2 = zbin2tmp;
-      //assert(zbin1<=zbin2);
-      //assert(zbin2-zbin1<=1);
+        // One extra bit was used in the above calculation. Now take it away.
+        ap_uint<MEBinsBits> zbin1 = zbin1tmp;
+        ap_uint<MEBinsBits> zbin2 = zbin2tmp;
+        //assert(zbin1<=zbin2);
+        //assert(zbin2-zbin1<=1);
     
-      typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
+        typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
-      //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
-      // need to be careful about left shift of ap_(u)int
-      typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
+        //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
+        // need to be careful about left shift of ap_(u)int
+        typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
 
-      // vmproj irinv
-      // phider = -irinv/2
-      // Note: auto does not work well here
-      // auto infers 42 bits because -2 is treated as a 32-bit int
-      ap_uint<TrackletProjection<PROJTYPE>::BitWidths::kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
+        // vmproj irinv
+        // phider = -irinv/2
+        // Note: auto does not work well here
+        // auto infers 42 bits because -2 is treated as a 32-bit int
+        ap_uint<TrackletProjection<PROJTYPE>::BitWidths::kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
 
-      // rinv in VMProjection takes only the top 5 bits
-      // and is shifted to be positive
-      typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
-      //assert(rinv >=0 and rinv < 32);
+        // rinv in VMProjection takes only the top 5 bits
+        // and is shifted to be positive
+        typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
+        //assert(rinv >=0 and rinv < 32);
     
-      // PS seed
-      // top 3 bits of tracklet index indicate the seeding pair
-      ap_uint<3> iseed = trackletid >> (trackletid.length()-3);
-      // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
-      // and here?
-      // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
-      // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
+        // PS seed
+        // top 3 bits of tracklet index indicate the seeding pair
+        ap_uint<3> iseed = trackletid >> (trackletid.length()-3);
+        // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
+        // and here?
+        // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
 
-      // All seeding pairs are PS modules except L3L4 and L5L6
-      bool psseed = not(iseed==2 or iseed==3); 
+        // All seeding pairs are PS modules except L3L4 and L5L6
+        bool psseed = not(iseed==2 or iseed==3); 
 
-      // VM Projection
-      VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);
+        // VM Projection
+        VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);
 
-      // write outputs
-      //assert(iphi>=0 and iphi<4);
-      vmprojout[iphi].write_mem(bx, vmproj, nvmprojout[iphi]);
-      nvmprojout[iphi] ++;
+        // write outputs
+        //assert(iphi>=0 and iphi<4);
+        vmprojout[iphi].write_mem(bx, vmproj, nvmprojout[iphi]);
+        nvmprojout[iphi] ++;
 
-      /////////////////
-      // AllProjection
-      AllProjection<PROJTYPE> aproj(tproj.raw());
-      // write output
-      allprojout.write_mem(bx, aproj, nallproj);
-      nallproj ++;
+        /////////////////
+        // AllProjection
+        AllProjection<PROJTYPE> aproj(tproj.raw());
+        // write output
+        allprojout.write_mem(bx, aproj, nallproj);
+        nallproj ++;
+      }
     }
 
-    if (i==kMaxProc-LoopItersCut-1) bx_o = bx;
+    if (istep==kMaxProc-1) bx_o = bx;
  
   } // end of PROC_LOOP
   
