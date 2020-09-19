@@ -96,7 +96,9 @@ void TrackletEngine(
   //
   // main loop
   //
-  for (unsigned int istep=1; istep<kMaxProc; istep++) {
+  // Seven iterations are subtracted so that the total latency is 108 clock
+  // cycles. Pipeline rewinding does not currently work.
+  for (unsigned int istep=0; istep<kMaxProc-7; istep++) {
 #pragma HLS pipeline II=1
 
 	  // pre-fetch element from buffer
