@@ -11,6 +11,26 @@ constexpr int kMaxStubsFromLink = 256;
 constexpr int kTMUX = 18;   //For hourglass project
 constexpr int kMaxProc = kTMUX * 6;
 
+// List of module types
+namespace module {
+  enum type {UNKNOWN, IR, VMR, VMR_LAYER, VMR_DISK, TE, TC, PR, ME, MC, NMODULES};
+};
+
+// Map from a module type to an offset used to reduce the number of iterations
+// in the processing loop of that module type.
+// N.B.: actual STL maps are not allowed in HLS, so this is an emulation of
+// that container as a constexpr function.
+constexpr unsigned kMaxProcOffset(const module::type m) {
+  return (m == module::VMR_LAYER ? 7 :
+         (m == module::VMR_DISK ? 8 :
+         (m == module::TE ? 7 :
+         (m == module::TC ? 0 :
+         (m == module::PR ? 0 :
+         (m == module::ME ? 7 :
+         (m == module::MC ? 0 :
+         (0))))))));
+}
+
 // Memory
 constexpr int kNBits_MemAddr = 7;
 constexpr int kMemDepth = (1<<kNBits_MemAddr);

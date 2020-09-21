@@ -589,7 +589,7 @@ TrackletCalculator(
   const TrackletProjection<BARRELPS>::TProjTCID TCID = TC::ID<Seed, iTC>();
 
 // Loop over all stub pairs.
-  stub_pairs: for (TC::Types::nSP i = 0; i < kMaxProc; i++) {
+  stub_pairs: for (TC::Types::nSP i = 0; i < kMaxProc - kMaxProcOffset(module::TC); i++) {
 #pragma HLS pipeline II=1 rewind
 
 // The first iteration is sacrificed to clearing the output memories and

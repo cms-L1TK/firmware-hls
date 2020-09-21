@@ -77,7 +77,7 @@ void ProjectionRouter(BXType bx,
   ap_uint<kNBits_MemAddr> numbersin[nINMEM];
   ap_uint<kNBits_MemAddr> mem_read_addr;
 
-  PROC_LOOP: for (int istep = 0; istep < kMaxProc; ++istep) {
+  PROC_LOOP: for (int istep = 0; istep < kMaxProc - kMaxProcOffset(module::PR); ++istep) {
 #pragma HLS PIPELINE II=1 rewind
     if (istep == 0) {
 
@@ -201,7 +201,7 @@ void ProjectionRouter(BXType bx,
       }
     }
 
-    if (istep==kMaxProc-1) bx_o = bx;
+    if (istep==kMaxProc-kMaxProcOffset(module::PR)-1) bx_o = bx;
  
   } // end of PROC_LOOP
   
