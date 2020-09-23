@@ -33,7 +33,6 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	//
 	//Initialize table for bend-rinv consistency
 	//
-	//bool table[(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 	ap_uint<1> table[LSIZE];
 	readTable(table);
 
