@@ -12,4 +12,6 @@ fi
 find -mindepth 1 -maxdepth 1 \
   ! -regex "^\.\/download\.sh$" \
   ! -regex "^\.\/clean\.sh$" \
+# temporarily adding this untill this is added to the tarball 
+  ! -regex "^\.\/dtclinklayerdisk.\.dat$" \
   -exec rm -rfv {} \;

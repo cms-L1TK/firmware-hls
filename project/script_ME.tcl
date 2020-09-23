@@ -22,9 +22,9 @@ source settings_hls.tcl
 add_files -tb ../emData/ME/
 
 csim_design -compiler gcc -mflags "-j8"
-csynth_design
-cosim_design -trace_level all -rtl verilog -verbose
-export_design -format ip_catalog
+#csynth_design
+#cosim_design -trace_level all -rtl verilog -verbose
+#export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -rtl verilog -format ip_catalog -flow impl
 
