@@ -137,7 +137,6 @@ void ProjectionRouter(BXType bx,
     
         // vmproj index
         typename VMProjection<VMPTYPE>::VMPID index = nallproj;
-        //assert(i < (1<<index.length()));
 
         // vmproj z
         // Separate the vm projections into zbins
