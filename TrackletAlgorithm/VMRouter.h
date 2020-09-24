@@ -38,10 +38,6 @@ constexpr int nfinephidiskouter = 3;
 constexpr int nfinephioverlapinner = 2;
 constexpr int nfinephioverlapouter = 3;
 
-// Loop reduction factors to make overall II = 108
-constexpr int loopReductionLayer = 7;
-constexpr int loopReductionDisk = 8;
-
 // Number of bits used for the VMs for different layers and disks
 // E.g. 32 VMs would use 5 vmbits
 constexpr int vmbitslayer[6] = { 5, 5, 4, 5, 4, 5 }; // Could be computed using the number of VMs...
