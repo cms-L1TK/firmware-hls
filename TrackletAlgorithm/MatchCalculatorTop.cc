@@ -14,7 +14,10 @@ void MatchCalculatorTop(BXType bx,
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
 
-  MC_L3PHIC: MatchCalculator<BARRELPS, BARRELPS, BARREL, maxMatchCopies, maxFullMatchCopies, 3, 0, 2>
+  const auto LAYER  = 3;
+  const auto DISK   = 0;
+  const auto PHISEC = 2;
+  MC_L3PHIC: MatchCalculator<BARRELPS, BARRELPS, BARREL, maxMatchCopies, maxFullMatchCopies, LAYER, DISK, PHISEC>
     (
       bx,
       match,
