@@ -41,16 +41,16 @@ namespace PR
   // Move the following to Constants.h?
   // How to deal with these using enum?
 
-  // number of allstub memories for each layer
-  constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
-  // number of VMs in one allstub block for each layer
-  constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
+  // number of bits used to distinguish allstub memories for each layer
+  constexpr unsigned int nbits_allstubslayers[6]={3,2,2,2,2,2};
+  // number of bits used to distinguish VMs in one allstub block for each layer
+  constexpr unsigned int nbits_vmmelayers[6]={2,3,3,3,3,3};
 
-  // number of allstub memories for each disk
-  constexpr unsigned int nallstubsdisks[5]={4,4,4,4,4};
+  // number of bits used to distinguish allstub memories for each disk
+  constexpr unsigned int nbits_allstubsdisks[5]={2,2,2,2,2};
   
-  // number of VMs in one allstub block for each disk
-  constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
+  // number of bits used to distinguish VMs in one allstub block for each disk
+  constexpr unsigned int nbits_vmmedisks[5]={3,2,2,2,2};
 
   // number of bits needed for max number of VMs per layer/disk (max number is 32)
   constexpr unsigned int nbits_maxvm = 5;
@@ -125,21 +125,16 @@ void ProjectionRouter(BXType bx,
 
         //////////////////////////
         // hourglass configuration
-   
-        // top 5 bits of phi
-        auto iphi5 = iphiproj>>(iphiproj.length()-nbits_maxvm);
-    
-        // total number of VMs
-        auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
-          nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
-        //assert(nvm>0);
-    
-        // number of VMs per module
-        auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
 
-        // routing
-        ap_uint<3> iphi = (iphi5/((1<<nbits_maxvm)/nvm))&(nbins-1);  // OPTIMIZE ME
-    
+        // number of bits used to distinguish the different modules in each layer/disk
+        auto nbits_all = LAYER!=0 ? nbits_allstubslayers[LAYER-1] : nbits_allstubsdisks[DISK-1];
+
+        // number of bits used to distinguish between VMs within a module
+        auto nbits_vmme = LAYER!=0 ? nbits_vmmelayers[LAYER-1] : nbits_vmmedisks[DISK-1];
+
+        // bits used for routing
+        auto iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
+
         ///////////////
         // VMProjection
         static_assert(not DISK, "PR: Layer only for now.");
