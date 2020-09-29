@@ -288,8 +288,8 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> ncm6 = 0;
   ap_uint<kNBits_MemAddr> ncm7 = 0;
   ap_uint<kNBits_MemAddr> ncm8 = 0;
-  ap_uint<14> total  = 0;
-  ap_uint<7> ncm = 0;
+  ap_uint<kNBits_MemAddr+1> total  = 0;
+  ap_uint<kNBits_MemAddr> ncm = 0;
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
