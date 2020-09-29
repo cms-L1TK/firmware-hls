@@ -37,6 +37,31 @@ declare -a processing_modules=(
   "MC_L6PHIC"
 )
 
+# Function that prints information regarding the usage of this command
+function usage() {
+  echo "$(basename $0) [-h|--help] [-t|--tables]"
+  echo ""
+  echo "Options:"
+  echo "  -h, --help    show this help message and exit"
+  echo "  -t, --tables  download and unpack only LUTs.tar.gz"
+}
+
+# Parse the command line options.
+tables_only=0
+while [[ $1 != "" ]]
+do
+  case $1 in
+    -t | --tables )  tables_only=1
+                     ;;
+    -h | --help )    usage
+                     exit
+                     ;;
+    * )              usage
+                     exit 1
+  esac
+  shift
+done
+
 # If either the MemPrints or the LUTs directory exists, assume the script has
 # already been run, and simply exit.
 if [ -d "MemPrints" ] || [ -d "LUTs" ]
@@ -56,6 +81,12 @@ fi
 wget -O LUTs.tar.gz --quiet ${luts_url}
 tar -xzf LUTs.tar.gz
 rm -f LUTs.tar.gz
+
+# Exit now if we are only downloading and unpacking LUTs.tar.gz.
+if [[ $tables_only != 0 ]]
+then
+  exit 0
+fi
 
 # Download and unpack MemPrints.tar.gz.
 wget -O MemPrints.tar.gz --quiet ${memprints_url}
