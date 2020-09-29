@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # fw_synch_200515
-tarball_url="https://cernbox.cern.ch/index.php/s/tsxTkilHDVhnbYF/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
+luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
@@ -36,9 +37,9 @@ declare -a processing_modules=(
   "MC_L6PHIC"
 )
 
-# If the MemPrints directory exists, assume the script has already been run,
-# and simply exit.
-if [ -d "MemPrints" ]
+# If either the MemPrints or the LUTs directory exists, assume the script has
+# already been run, and simply exit.
+if [ -d "MemPrints" ] || [ -d "LUTs" ]
 then
   exit 0
 fi
@@ -51,8 +52,13 @@ then
   exit 1
 fi
 
-# Download and unpack the tarball.
-wget -O MemPrints.tar.gz --quiet ${tarball_url}
+# Download and unpack LUTs.tar.gz.
+wget -O LUTs.tar.gz --quiet ${luts_url}
+tar -xzf LUTs.tar.gz
+rm -f LUTs.tar.gz
+
+# Download and unpack MemPrints.tar.gz.
+wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
 
@@ -75,7 +81,7 @@ do
   done
 
   # Table linking logic specific to each module type
-  table_location="MemPrints/Tables/"
+  table_location="LUTs/"
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
