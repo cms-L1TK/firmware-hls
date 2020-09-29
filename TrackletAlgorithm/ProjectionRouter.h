@@ -52,6 +52,15 @@ namespace PR
   // number of VMs in one allstub block for each disk
   constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
 
+  // number of bits needed for max number of VMs per layer/disk (max number is 32)
+  constexpr unsigned int nbits_maxvm = 5;
+
+  // number of extra bits to keep when calculating which zbin(s) a projection should go to
+  constexpr unsigned int zbins_nbitsextra = 2;
+
+  // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
+  constexpr unsigned int zbins_adjust = 2;
+
 } // namespace PR
 
 //////////////////////////////
@@ -118,7 +127,7 @@ void ProjectionRouter(BXType bx,
         // hourglass configuration
    
         // top 5 bits of phi
-        auto iphi5 = iphiproj>>(iphiproj.length()-5);
+        auto iphi5 = iphiproj>>(iphiproj.length()-nbits_maxvm);
     
         // total number of VMs
         auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
@@ -129,7 +138,7 @@ void ProjectionRouter(BXType bx,
         auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
 
         // routing
-        ap_uint<3> iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
+        ap_uint<3> iphi = (iphi5/((1<<nbits_maxvm)/nvm))&(nbins-1);  // OPTIMIZE ME
     
         ///////////////
         // VMProjection
@@ -140,13 +149,19 @@ void ProjectionRouter(BXType bx,
 
         // vmproj z
         // Separate the vm projections into zbins
-        // The central bin e.g. zbin=4+(zproj.value()>>(zproj.nbits()-3));
-        // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
-        // But we need some range (particularly for L5L6 seed projecting to L1-L3):
+        // To determine which zbin in VMStubsME the ME should look in to match this VMProjection,
+        // the purpose of these lines is to take the top MEBinsBits (3) bits of zproj and shift it
+        // to make it positive, which gives the bin index. But there is a range of possible z values
+        // over which we want to look for matched stubs, and there is therefore possibly 2 bins that
+        // we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+2=5)
+        // bits of zproj, adjust the value up and down by zbins_adjust (2), then truncate the
+        // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
+        // Then the two if statements afterwards adjust the bin indices in case the adjustments
+        // overflowed the number of bins
         // Lower bound
-        ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
+        ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-zbins_nbitsextra))-zbins_adjust)>>zbins_nbitsextra);
         // Upper bound
-        ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
+        ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-zbins_nbitsextra))+zbins_adjust)>>zbins_nbitsextra);
         if (zbin1tmp >= (1<<MEBinsBits)) zbin1tmp = 0; //note that zbin1 is unsigned
         if (zbin2tmp >= (1<<MEBinsBits)) zbin2tmp = (1<<MEBinsBits)-1;
 
@@ -160,7 +175,8 @@ void ProjectionRouter(BXType bx,
     
         //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
         // need to be careful about left shift of ap_(u)int
-        typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
+        auto nfinebits = VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize;
+        typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(nfinebits+zbins_nbitsextra-1))+(izproj>>(izproj.length()-nfinebits-zbins_nbitsextra)))-(zbin1,ap_uint<3>(0));
 
         // vmproj irinv
         // phider = -irinv/2
@@ -170,7 +186,7 @@ void ProjectionRouter(BXType bx,
 
         // rinv in VMProjection takes only the top 5 bits
         // and is shifted to be positive
-        typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
+        typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+(irinv_tmp>>(irinv_tmp.length()-nbits_maxvm));
         //assert(rinv >=0 and rinv < 32);
     
         // PS seed
