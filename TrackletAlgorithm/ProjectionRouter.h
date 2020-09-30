@@ -166,15 +166,16 @@ void ProjectionRouter(BXType bx,
                          ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
                          ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5+zbins_adjust);
 
-        auto zbin1 = zbinlower >> zbins_nbitsextra;
-        auto zbin2 = zbinupper >> zbins_nbitsextra;
+        ap_uint<MEBinsBits> zbin1 = zbinlower >> zbins_nbitsextra;
+        ap_uint<MEBinsBits> zbin2 = zbinupper >> zbins_nbitsextra;
         
         typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
         //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
         // need to be careful about left shift of ap_(u)int
         auto nfinebits = VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize;
-        typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(nfinebits+zbins_nbitsextra-1))+(izproj>>(izproj.length()-nfinebits-zbins_nbitsextra)))-(zbin1,ap_uint<3>(0));
+        ap_uint<VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize+zbins_nbitsextra-MEBinsBits> zeropad(0);
+        typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(nfinebits+zbins_nbitsextra-1))+(izproj.range(izproj.length()-1,izproj.length()-nfinebits-zbins_nbitsextra))-(zbin1,zeropad);
 
         // vmproj irinv
         // phider = -irinv/2
