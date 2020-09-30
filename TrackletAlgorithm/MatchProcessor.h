@@ -166,7 +166,9 @@ void readTable(bool table[256]){
   if (L==1) {
     bool tmp[256]=
 #include "../emData/ME/ME_L3PHIC20/METable_L1.tab"
-    for (int i=0;i<256;i++){
+    ME1tab_loop: for (int i=0;i<256;i++){
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -174,7 +176,9 @@ void readTable(bool table[256]){
   if (L==2) {
     bool tmp[256]=
 #include "../emData/ME/ME_L3PHIC20/METable_L2.tab"
-    for (int i=0;i<256;i++){
+    ME2tab_loop: for (int i=0;i<256;i++){
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -182,7 +186,9 @@ void readTable(bool table[256]){
   if (L==3) {
     bool tmp[256]=
 #include "../emData/ME/ME_L3PHIC20/METable_L3.tab"
-    for (int i=0;i<256;i++){
+    ME3tab_loop: for (int i=0;i<256;i++){
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -190,7 +196,9 @@ void readTable(bool table[256]){
   if (L==4) {
     bool tmp[512]=
 #include "../emData/ME/ME_L3PHIC20/METable_L4.tab"
-    for (int i=0;i<512;i++){
+    ME4tab_loop: for (int i=0;i<512;i++){
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -198,7 +206,9 @@ void readTable(bool table[256]){
   if (L==5) {
     bool tmp[512]=
 #include "../emData/ME/ME_L3PHIC20/METable_L5.tab"
-    for (int i=0;i<512;i++){
+    ME5tab_loop: for (int i=0;i<512;i++){
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -206,7 +216,9 @@ void readTable(bool table[256]){
   if (L==6) {
     bool tmp[512]=
 #include "../emData/ME/ME_L3PHIC20/METable_L6.tab"
-    for (int i=0;i<512;i++){
+    ME6tab_loop: for (int i=0;i<512;i++){
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -239,32 +251,56 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     if (L==1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L1PHIC_phicut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC1phi_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L2PHIC_phicut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC2phi_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC3phi_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L4PHIC_phicut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+      MC4phi_loop: for (int i = 0; i < depth; i++) {
+        table[i] = tmp[i];
+      }
     }
     else if (L==5){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L5PHIC_phicut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC5phi_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L6PHIC_phicut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC6phi_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else {
       static_assert(true, "Only LAYERS 1 to 6 are valid");
@@ -274,32 +310,56 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     if (L==1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L1PHIC_zcut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC1z_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L2PHIC_zcut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC2z_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L3PHIC_zcut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC3z_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L4PHIC_zcut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC4z_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==5){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L5PHIC_zcut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC5z_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else if (L==6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/MC_L3PHIC/MC_L6PHIC_zcut.tab"
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+      MC6z_loop: for (int i = 0; i < depth; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS unroll
+        table[i] = tmp[i];
+      }
     }
     else {
       static_assert(true, "Only LAYERS 1 to 6 are valid");
@@ -369,11 +429,16 @@ void MatchCalculator(BXType bx,
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
+  const auto LUT_matchcut_phi_width = 17;
+  const auto LUT_matchcut_phi_depth = 12;
+  const auto LUT_matchcut_z_width = 13;
+  const auto LUT_matchcut_z_depth = 12;
+
   // Setup look up tables for match cuts
-  ap_uint<17> LUT_matchcut_phi[7];
-  readTable_Cuts<true,LAYER,17,7>(LUT_matchcut_phi);
-  ap_uint<13> LUT_matchcut_z[7];
-  readTable_Cuts<false,LAYER,13,7>(LUT_matchcut_z);
+  ap_uint<LUT_matchcut_phi_width> LUT_matchcut_phi[LUT_matchcut_phi_depth];
+  readTable_Cuts<true,LAYER,LUT_matchcut_phi_width,LUT_matchcut_phi_depth>(LUT_matchcut_phi);
+  ap_uint<LUT_matchcut_z_width> LUT_matchcut_z[LUT_matchcut_z_depth];
+  readTable_Cuts<false,LAYER,LUT_matchcut_z_width,LUT_matchcut_z_depth>(LUT_matchcut_z);
 
   // Initialize MC delta phi cut variables
   ap_uint<17> best_delta_phi;
@@ -384,9 +449,8 @@ void MatchCalculator(BXType bx,
   bool goodmatch                   = false;
 
   // Loop one past nstubs for pipelining
-  MC_LOOP: for (int istub = 0; istub <= nstubs+1; ++istub) {
-
-#pragma HLS PIPELINE II=1 rewind
+  MC_LOOP: for (int istub = 0; istub < kMaxProc; ++istub) {
+  //MC_LOOP: for (int istub = 0; istub <= nstubs+1; ++istub) {
 
     // Don't read past nstubs (would read garbage)
     int istubtmp = istub > nstubs ? istub : nstubs;
@@ -521,8 +585,8 @@ void MatchCalculator(BXType bx,
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       //std::cout << "writing " << bestmatch.raw() << std::endl;
-      outcandmatch->write_mem(bx,cmatch,noutcandmatch);
-      noutcandmatch++;
+      //outcandmatch->write_mem(bx,cmatch,noutcandmatch);
+      //noutcandmatch++;
       switch (projseed) {
       case 0:
       fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -697,7 +761,9 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
 //#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 //#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
-#pragma HLS dependence variable=writeindex inter RAW false 
+#pragma HLS RESOURCE variable=writeindex core=XPM_MEMORY uram
+#pragma HLS RESOURCE variable=writeindextmp core=XPM_MEMORY uram
+#pragma HLS dependence variable=writeindex inter false 
   ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
@@ -743,6 +809,10 @@ void MatchProcessor(BXType bx,
 
     //ap_uint<kNBits_ProjBuffer> projbuffer[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=2
+    /*
+PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i) 
+#pragma HLS resource variable=projbuffer[i] core=RAM_2P_LUTRAM
     ProjectionRouterBuffer<BARREL> *projbuffer1[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer2[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer3[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
@@ -752,11 +822,12 @@ void MatchProcessor(BXType bx,
     ProjectionRouterBuffer<BARREL> *projbuffer7[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> *projbuffer8[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBufferMemory<BARREL> projbuffermem;  //projbuffer = nstub+projdata+finez
+    */
 //#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
 //#pragma HLS dependence variable=istub intra WAR true
         //std::cout << "PR stage" << std::endl;
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
-#pragma HLS PIPELINE II=1
+#pragma HLS PIPELINE II=1 rewind
 #pragma HLS loop_flatten
 //#pragma HLS unroll
 
@@ -764,6 +835,7 @@ void MatchProcessor(BXType bx,
     TrackletProjection<PROJTYPE> projdata;
     TrackletProjectionMemory<PROJTYPE> tproj;
     //bool validin = read_input_mems<VMProjectionMemory<BARREL>,
+//#pragma HLS dependence variable=mem_read_addr intra WAR true
     bool validin = read_input_mems<TrackletProjection<PROJTYPE>,
                                    TrackletProjectionMemory<PROJTYPE>,
                                    nINMEM, kNBits_MemAddr+1>
@@ -995,7 +1067,7 @@ void MatchProcessor(BXType bx,
         bool savefirst=nstubfirst!=0;
         bool savelast=nstublast!=0&&projzbin.range(0,0);
         writeindextmp[iphi]=writeindex[iphi];
-#pragma HLS dependence variable=writeindextmp inter RAW false 
+//#pragma HLS dependence variable=writeindextmp inter false 
         //auto const writeindextmp=writeindex[iphi];
         //if(projdata.raw() == 0) {savefirst=0; savelast=0;} //FIXME cathing blank entries
       {
@@ -1092,6 +1164,8 @@ void MatchProcessor(BXType bx,
             break;
           }
         }
+        /*
+        */
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
             /* FIXME
@@ -1203,7 +1277,9 @@ void MatchProcessor(BXType bx,
   //std::cout << "Starting ME loop" << std::endl;
   readindex=0;
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
+#pragma HLS dependence variable=istub inter false 
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
+//#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
   MEINIT_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
 #pragma HLS unroll
 /*
@@ -1236,9 +1312,29 @@ void MatchProcessor(BXType bx,
   ap_uint<3> ivmphi=0;
   bool ready=false;
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+//#pragma HLS PIPELINE II=1
+#pragma HLS loop_flatten
+    MEPHI_LOOP: for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
 #pragma HLS PIPELINE II=1
-    //for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
-//#pragma HLS unroll
+#pragma HLS unroll
+    switch (ivmphi) {
+      case 0: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata1, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 1: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata2, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 2: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata3, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 3: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata4, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 4: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata5, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 5: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata6, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 6: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata7, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+      case 7: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata8, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
+      break;
+    }
     /*
     switch (ivmphi) {
       case 0: matchengine[ivmphi].step(table, instubdata1, projbuffer[ivmphi]);
@@ -1258,20 +1354,21 @@ void MatchProcessor(BXType bx,
       case 7: matchengine[ivmphi].step(table, instubdata8, projbuffer[ivmphi]);
       break;
     }
+      if(!matchengine[0].done()) if(matchengine[0].step(table, instubdata1, projbuffer[0], outcandmatch, noutcandmatch)) { ivmphi=0; ready=true; }
+      if(!matchengine[1].done()) if(matchengine[1].step(table, instubdata2, projbuffer[1], outcandmatch, noutcandmatch)) { ivmphi=1; ready=true; }
+      if(!matchengine[2].done()) if(matchengine[2].step(table, instubdata3, projbuffer[2], outcandmatch, noutcandmatch)) { ivmphi=2; ready=true; }
+      if(!matchengine[3].done()) if(matchengine[3].step(table, instubdata4, projbuffer[3], outcandmatch, noutcandmatch)) { ivmphi=3; ready=true; }
+      if(!matchengine[4].done()) if(matchengine[4].step(table, instubdata5, projbuffer[4], outcandmatch, noutcandmatch)) { ivmphi=4; ready=true; }
+      if(!matchengine[5].done()) if(matchengine[5].step(table, instubdata6, projbuffer[5], outcandmatch, noutcandmatch)) { ivmphi=5; ready=true; }
+      if(!matchengine[6].done()) if(matchengine[6].step(table, instubdata7, projbuffer[6], outcandmatch, noutcandmatch)) { ivmphi=6; ready=true; }
+      if(!matchengine[7].done()) if(matchengine[7].step(table, instubdata8, projbuffer[7], outcandmatch, noutcandmatch)) { ivmphi=7; ready=true; }
     */
-      if(!matchengine[0].done()) if(matchengine[0].step(table, instubdata1, projbuffer[0])) { ivmphi=0; ready=true; }
-      if(!matchengine[1].done()) if(matchengine[1].step(table, instubdata2, projbuffer[1])) { ivmphi=1; ready=true; }
-      if(!matchengine[2].done()) if(matchengine[2].step(table, instubdata3, projbuffer[2])) { ivmphi=2; ready=true; }
-      if(!matchengine[3].done()) if(matchengine[3].step(table, instubdata4, projbuffer[3])) { ivmphi=3; ready=true; }
-      if(!matchengine[4].done()) if(matchengine[4].step(table, instubdata5, projbuffer[4])) { ivmphi=4; ready=true; }
-      if(!matchengine[5].done()) if(matchengine[5].step(table, instubdata6, projbuffer[5])) { ivmphi=5; ready=true; }
-      if(!matchengine[6].done()) if(matchengine[6].step(table, instubdata7, projbuffer[6])) { ivmphi=6; ready=true; }
-      if(!matchengine[7].done()) if(matchengine[7].step(table, instubdata8, projbuffer[7])) { ivmphi=7; ready=true; }
       typename VMProjection<BARREL>::VMPID projindex;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
       //if(matchengine[ivmphi].idle() && !matchengine[ivmphi].done() && !matchengine[ivmphi].empty()) {
       if(ready) {
+        if(!matchengine[ivmphi].idle()) continue;
         typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
         matchengine[ivmphi].read(currentTCID, projindex, stubid, nstub);
         //currentTCID=allproj->read_mem(bx, projindex).getTCID();
@@ -1293,7 +1390,7 @@ void MatchProcessor(BXType bx,
         //}
       } //end MC if
 
-    //} //end 8ME loop
+    } //end 8ME loop
     //ivmphi++;
 
   } //end loop
