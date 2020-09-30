@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # fw_synch_200515
-tarball_url="https://cernbox.cern.ch/index.php/s/tsxTkilHDVhnbYF/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
+luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
@@ -36,11 +37,48 @@ declare -a processing_modules=(
   "MC_L6PHIC"
 )
 
+# Function that prints information regarding the usage of this command
+function usage() {
+  echo "$(basename $0) [-h|--help] [-t|--tables]"
+  echo ""
+  echo "Without any options, downloads and unpacks MemPrints.tar.gz and LUTs.tar.gz."
+  echo "MemPrints.tar.gz contains test vectors produced by the emulation, and"
+  echo "LUTs.tar.gz contains lookup tables and other small miscellaneous files."
+  echo ""
+  echo "Options:"
+  echo "  -h, --help    show this help message and exit"
+  echo "  -t, --tables  download and unpack only LUTs.tar.gz"
+}
+
+# Parse the command line options.
+tables_only=0
+while [[ $1 != "" ]]
+do
+  case $1 in
+    -t | --tables )  tables_only=1
+                     ;;
+    -h | --help )    usage
+                     exit
+                     ;;
+    * )              usage
+                     exit 1
+  esac
+  shift
+done
+
 # If the MemPrints directory exists, assume the script has already been run,
 # and simply exit.
 if [ -d "MemPrints" ]
 then
   exit 0
+fi
+
+# If the LUTs directory exists, assume LUTs.tar.gz has already been downloaded
+# and unpacked, and only download and unpack MemPrints.tar.gz.
+memprints_only=0
+if [ -d "LUTs" ]
+then
+  memprints_only=1
 fi
 
 # Exit with an error message if run from a directory other than emData/.
@@ -51,8 +89,22 @@ then
   exit 1
 fi
 
-# Download and unpack the tarball.
-wget -O MemPrints.tar.gz --quiet ${tarball_url}
+# Download and unpack LUTs.tar.gz.
+if [[ $memprints_only == 0 ]]
+then
+  wget -O LUTs.tar.gz --quiet ${luts_url}
+  tar -xzf LUTs.tar.gz
+  rm -f LUTs.tar.gz
+fi
+
+# Exit now if we are only downloading and unpacking LUTs.tar.gz.
+if [[ $tables_only != 0 ]]
+then
+  exit 0
+fi
+
+# Download and unpack MemPrints.tar.gz.
+wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
 
@@ -75,7 +127,7 @@ do
   done
 
   # Table linking logic specific to each module type
-  table_location="MemPrints/Tables/"
+  table_location="LUTs/"
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
