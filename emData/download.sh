@@ -41,6 +41,10 @@ declare -a processing_modules=(
 function usage() {
   echo "$(basename $0) [-h|--help] [-t|--tables]"
   echo ""
+  echo "Without any options, downloads and unpacks MemPrints.tar.gz and LUTs.tar.gz."
+  echo "MemPrints.tar.gz contains test vectors produced by the emulation, and"
+  echo "LUTs.tar.gz contains lookup tables and other small miscellaneous files."
+  echo ""
   echo "Options:"
   echo "  -h, --help    show this help message and exit"
   echo "  -t, --tables  download and unpack only LUTs.tar.gz"
