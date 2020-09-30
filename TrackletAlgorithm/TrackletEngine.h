@@ -63,11 +63,22 @@ void TrackletEngine(
   //       [# of outer stubs in z-bin][inner stub data][index of z-bin][z-bin flag]
   //
   constexpr unsigned int kNBits_BufferAddr = 3;
+  constexpr unsigned int kNOuterStubsSize = 5;
+  constexpr unsigned int kZBinFlagSize = 1;
   constexpr int kBufferDataSize =
-		    5                                             // number of bits for outer stubs array size (size of NEntryT in MemoryTemplateBinned.h)
-		  + VMStubTEInner<innertype>::kVMStubTEInnerSize  // inner stub data size
-		  + TEBinsBits                                    // number of bits for index of z-bin
-		  + 1;                                            // z-bin flag (0 => first bin, 1 => second bin)
+                  kNOuterStubsSize                              // number of bits for outer stubs array size (size of NEntryT in MemoryTemplateBinned.h)
+                + VMStubTEInner<innertype>::kVMStubTEInnerSize  // inner stub data size
+                + TEBinsBits                                    // number of bits for index of z-bin
+                + kZBinFlagSize;                                // z-bin flag (0 => first bin, 1 => second bin)
+
+  constexpr unsigned int kZBinFlagLSB = 0;
+  constexpr unsigned int kZBinFlagMSB = kZBinFlagLSB + kZBinFlagSize - 1;
+  constexpr unsigned int kZBinIndexLSB = kZBinFlagMSB + 1;
+  constexpr unsigned int kZBinIndexMSB = kZBinIndexLSB + TEBinsBits - 1;
+  constexpr unsigned int kInnerStubDataLSB = kZBinIndexMSB + 1;
+  constexpr unsigned int kInnerStubDataMSB = kInnerStubDataLSB + VMStubTEInner<innertype>::kVMStubTEInnerSize - 1;
+  constexpr unsigned int kNOuterStubsLSB = kInnerStubDataMSB + 1;
+  constexpr unsigned int kNOuterStubsMSB = kNOuterStubsLSB + kNOuterStubsSize - 1;
 
   ap_uint<kBufferDataSize> teBuffer[1<<kNBits_BufferAddr];
 #pragma HLS ARRAY_PARTITION variable teBuffer complete dim=0
@@ -83,7 +94,6 @@ void TrackletEngine(
   typename VMStubTEInner<innertype>::VMSTEIID      innerstubindex;
   typename VMStubTEInner<innertype>::VMSTEIBEND    innerstubbend;
   typename VMStubTEInner<innertype>::VMSTEIFINEPHI innerstubfinephi;
-  typename VMStubTEInner<innertype>::VMSTEIZBITS   innerstubzbits;
   ap_uint<TEBinsBits> zdiffmax;
   ap_uint<TEBinsBits> zbinfirst;
   ap_uint<1> second;
@@ -118,14 +128,13 @@ void TrackletEngine(
 		  istubinner++;
 		  morestubinner = istubinner<nstubinner;
 
-		  auto const innerstubzbitstmp = innerstubdatatmp.getZBits();
-		  ap_uint<TEBinsBits> zbinstart = innerstubzbitstmp.range(6,4);
-		  ap_uint<TEBinsBits> zbinlast  = zbinstart + innerstubzbitstmp.range(3,3);
+		  ap_uint<TEBinsBits> zbinstart = innerstubdatatmp.getZBinStart();
+		  ap_uint<TEBinsBits> zbinlast  = zbinstart + innerstubdatatmp.getZBinDiff();
 
 		  auto const nstubsstart = instubouterdata.getEntries(bx,zbinstart);
 		  auto const nstubslast  = instubouterdata.getEntries(bx,zbinlast);
 		  ap_uint<1> savestart = (nstubsstart != 0);
-		  ap_uint<1> savelast  = (nstubslast  != 0) && innerstubzbitstmp.range(3,3);
+		  ap_uint<1> savelast  = (nstubslast  != 0) && innerstubdatatmp.getZBinDiff();
 		  auto const writeindextmp = writeindex;
 
 		  if(savestart && savelast) {
@@ -159,19 +168,18 @@ void TrackletEngine(
 		  ap_uint<TEBinsBits> ibin;
 
 		  if(istubouter==0) {
-			  nstubs = bufdata.range(30,26);
+			  nstubs = bufdata.range(kNOuterStubsMSB, kNOuterStubsLSB);
 
-			  ibin = bufdata.range(3,1);
-			  VMStubTEInner<innertype> data(bufdata.range(25,4));
+			  ibin = bufdata.range(kZBinIndexMSB, kZBinIndexLSB);
+			  VMStubTEInner<innertype> data(bufdata.range(kInnerStubDataMSB, kInnerStubDataLSB));
 
 			  innerstubindex   = data.getIndex();
 			  innerstubbend    = data.getBend();
 			  innerstubfinephi = data.getFinePhi();
-			  innerstubzbits   = data.getZBits();
-			  zdiffmax  = innerstubzbits.range(9,7);
-			  zbinfirst = innerstubzbits.range(2,0);
+			  zdiffmax  = data.getZDiffMax();
+			  zbinfirst = data.getZBinFirst();
 
-			  second = bufdata.range(0,0);
+			  second = bufdata.range(kZBinFlagMSB, kZBinFlagLSB);
 		  }
 
 		  // if there are no more outer stubs to process, advance the read index pointer to the next buffer element,

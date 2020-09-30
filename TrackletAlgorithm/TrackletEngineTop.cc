@@ -3,9 +3,9 @@
 void TrackletEngineTop(const BXType bx,
                        const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
                        const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
-                       const ap_uint<1> pttable[32],
-                       const ap_uint<1> bendinnertable[256],
-                       const ap_uint<1> bendoutertable[256],
+                       const ap_uint<1> pttable[1<<kNBits_pttableTE],
+                       const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE],
+                       const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE],
                        StubPairMemory& outstubpair)
 {
 #pragma HLS resource variable=instubinnerdata.get_mem() latency=2
@@ -13,6 +13,6 @@ void TrackletEngineTop(const BXType bx,
 #pragma HLS resource variable=pttable latency=2
 #pragma HLS resource variable=bendinnertable latency=2
 #pragma HLS resource variable=bendoutertable latency=2
-  TrackletEngine<BARRELPS, BARRELPS, 32, 256, 256>
+  TrackletEngine<BARRELPS, BARRELPS, 1<<kNBits_pttableTE, 1<<kNBits_bendinnertableTE, 1<<kNBits_bendoutertableTE>
   (bx, instubinnerdata, instubouterdata, pttable, bendinnertable, bendoutertable, outstubpair);
 }
