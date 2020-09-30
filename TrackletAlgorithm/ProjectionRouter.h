@@ -154,21 +154,21 @@ void ProjectionRouter(BXType bx,
         // we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+2=5)
         // bits of zproj, adjust the value up and down by zbins_adjust (2), then truncate the
         // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
-        // Then the two if statements afterwards adjust the bin indices in case the adjustments
-        // overflowed the number of bins
-        // Lower bound
-        ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-zbins_nbitsextra))-zbins_adjust)>>zbins_nbitsextra);
-        // Upper bound
-        ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-zbins_nbitsextra))+zbins_adjust)>>zbins_nbitsextra);
-        if (zbin1tmp >= (1<<MEBinsBits)) zbin1tmp = 0; //note that zbin1 is unsigned
-        if (zbin2tmp >= (1<<MEBinsBits)) zbin2tmp = (1<<MEBinsBits)-1;
+        auto zbinposfull = (1<<(izproj.length()-1))+izproj;
+        auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
 
-        // One extra bit was used in the above calculation. Now take it away.
-        ap_uint<MEBinsBits> zbin1 = zbin1tmp;
-        ap_uint<MEBinsBits> zbin2 = zbin2tmp;
-        //assert(zbin1<=zbin2);
-        //assert(zbin2-zbin1<=1);
-    
+        // Lower Bound
+        auto zbinlower = zbinpos5<zbins_adjust ?
+                         ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
+                         ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5-zbins_adjust);
+        // Upper Bound
+        auto zbinupper = zbinpos5>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
+                         ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
+                         ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5+zbins_adjust);
+
+        auto zbin1 = zbinlower >> zbins_nbitsextra;
+        auto zbin2 = zbinupper >> zbins_nbitsextra;
+        
         typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
         //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
