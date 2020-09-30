@@ -29,14 +29,14 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 				 const VMStubMEMemory<VMSMEType, NBITBIN>& inputStubData,
 				 const VMProjectionMemory<VMPMEType>& inputProjectionData,
 				 CandidateMatchMemory& outputCandidateMatch) {
+#pragma HLS inline
 	//
 	//Initialize table for bend-rinv consistency
 	//
-	//bool table[(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 	ap_uint<1> table[LSIZE];
 	readTable(table);
 
-	outputCandidateMatch.clear();
+	outputCandidateMatch.clear(bx);
 
 	//
 	// Set up a FIFO based on a circular buffer structure.
@@ -75,8 +75,10 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	std::cout << "ProjectionIndex\tStubIndex\t<=== (PASS/FAIL)" << std::endl;
 #endif
 
-	// Main processing loops starts here
-	STEP_LOOP: for (ap_uint<kNBits_MemAddr> istep=0; istep<kMaxProc; istep++) {
+	// Main processing loops starts here.
+        // Seven iterations are subtracted so that the total latency is 108 clock
+        // cycles. Pipeline rewinding does not currently work.
+	STEP_LOOP: for (ap_uint<kNBits_MemAddr> istep=0; istep<kMaxProc - kMaxProcOffset(module::ME); istep++) {
 		#pragma HLS PIPELINE II=1
 		#pragma HLS DEPENDENCE variable=tail_readindex inter false
 

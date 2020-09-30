@@ -38,9 +38,6 @@ constexpr int nfinephidiskouter = 3;
 constexpr int nfinephioverlapinner = 2;
 constexpr int nfinephioverlapouter = 3;
 
-// Maximum number of stubs that can be processed (memory depth)
-constexpr int MAXVMROUTER = kMaxProc;
-
 // Number of bits used for the VMs for different layers and disks
 // E.g. 32 VMs would use 5 vmbits
 constexpr int vmbitslayer[6] = { 5, 5, 4, 5, 4, 5 }; // Could be computed using the number of VMs...
@@ -674,13 +671,11 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 /////////////////////////////////////
 // Main Loop
 
-	TOPLEVEL: for (auto i = 0; i < kMaxProc; ++i) {
+TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LAYER) : kMaxProcOffset(module::VMR_DISK)); ++i) {
 #pragma HLS PIPELINE II=1
-		
-		// Stop processing stubs if we have looped over the maximum number
-		// that can be processed or if we have gone through all data
-		if ((i > MAXVMROUTER) || !ntotal)
-			continue;
+
+		// Stop processing stubs if we have gone through all data
+		if (!ntotal) continue;
 
 		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S

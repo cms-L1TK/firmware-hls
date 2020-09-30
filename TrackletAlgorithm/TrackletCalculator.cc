@@ -35,8 +35,7 @@ TC_L1L2E: TrackletCalculator<
   OuterRegion<TC::L1L2>(),
   NASMemInner<TC::L1L2, TC::E>(),
   NASMemOuter<TC::L1L2, TC::E>(),
-  NSPMem<TC::L1L2, TC::E>(),
-  kMaxProc
+  NSPMem<TC::L1L2, TC::E>()
  >(
     bx,
     innerStubs,
@@ -74,8 +73,7 @@ TC_L1L2G: TrackletCalculator<
   OuterRegion<TC::L1L2>(),
   NASMemInner<TC::L1L2, TC::G>(),
   NASMemOuter<TC::L1L2, TC::G>(),
-  NSPMem<TC::L1L2, TC::G>(),
-  kMaxProc
+  NSPMem<TC::L1L2, TC::G>()
  >(
     bx,
     innerStubs,
@@ -113,8 +111,7 @@ TC_L3L4E: TrackletCalculator<
   OuterRegion<TC::L3L4>(),
   NASMemInner<TC::L3L4, TC::E>(),
   NASMemOuter<TC::L3L4, TC::E>(),
-  NSPMem<TC::L3L4, TC::E>(),
-  kMaxProc
+  NSPMem<TC::L3L4, TC::E>()
  >(
     bx,
     innerStubs,
