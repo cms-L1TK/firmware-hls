@@ -55,9 +55,6 @@ namespace PR
   // number of bits for seed in tracklet index
   constexpr unsigned int nbits_seed = 3;
 
-  // number of bits needed for max number of VMs per layer/disk (max number is 32)
-  constexpr unsigned int nbits_maxvm = 5;
-
   // number of extra bits to keep when calculating which zbin(s) a projection should go to
   constexpr unsigned int zbins_nbitsextra = 2;
 

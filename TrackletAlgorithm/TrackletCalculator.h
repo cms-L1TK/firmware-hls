@@ -75,12 +75,6 @@ namespace TC {
   static const uint32_t mask_D3 = 0xF << shift_D3;
   static const uint32_t mask_D4 = 0xF << shift_D4;
 
-// the 1.0e-1 is a fudge factor needed to get the floating point truncation
-// right
-  static const float ptcut = 1.91;
-  static const ap_uint<13> rinvcut = 0.01 * 0.3 * 3.8 / ptcut / krinv + 1.0e-1;
-  static const ap_uint<9> z0cut_L1L2 = 15.0 / kz0 + 1.0e-1;
-  static const ap_uint<9> z0cut = 1.5 * 15.0 / kz0 + 1.0e-1;
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +128,7 @@ namespace TC {
 
   template<seed Seed, regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
-  template<seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
+  template<TC::seed Seed, TC::itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
   template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], const bool success);
 
@@ -317,7 +311,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   );
 
 // Determine which layer projections are valid.
-  valid_proj: for (ap_uint<3> i = 0; i < 4; i++) {
+  valid_proj: for (ap_uint<3> i = 0; i < N_LAYER - 2; i++) {
     valid_proj[i] = true;
     if (zL[i] < -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1)))
       valid_proj[i] = false;
@@ -327,7 +321,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
       valid_proj[i] = false;
     if (phiL[i] <= 0)
       valid_proj[i] = false;
-    if (rproj[i] < 2048) {
+    if (rproj[i] < rmean[3]) {
       phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
       if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
         phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
@@ -337,24 +331,24 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   }
 
 // Determine which disk projections are valid.
-  valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
+  valid_proj_disk: for (ap_uint<3> i = 0; i < N_DISK - 1; i++) {
     valid_proj_disk[i] = true;
-    if (abs(*t) < 512)
+    if (abs(*t) < INT(1.0,kt)) // disk projections are invalid if |t| < 1
       valid_proj_disk[i] = false;
     if (phiD[i] <= 0)
       valid_proj_disk[i] = false;
     if (phiD[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
       valid_proj_disk[i] = false;
-    if (rD[i] < 342 || rD[i] > 2048)
+    if (rD[i] <= INT(rmindisk,krprojdisk) || rD[i] > INT(rmaxdisk,krprojdisk))
       valid_proj_disk[i] = false;
   }
 
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
   bool success = true;
-  if (abs(*rinv) >= rinvcut)
+  if (abs(*rinv) >= INT(rinvcut,krinv))
     success = false;
-  if (abs(*z0) >= ((Seed == TC::L1L2) ? z0cut_L1L2 : z0cut))
+  if (abs(*z0) >= ((Seed == TC::L1L2) ? INT(z0cut,kz0) : INT(1.5 * z0cut,kz0)))
     success = false;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
@@ -368,7 +362,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 template<TC::seed Seed, TC::itc iTC> const TrackletProjection<BARRELPS>::TProjTCID
 TC::ID()
 {
-  return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC);
+  return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC);
 }
 
 // Writes a tracklet projection to the appropriate tracklet projection memory.
@@ -381,20 +375,20 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
   if (TProjType != DISK) {
     if ((proj.getRZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getRZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
       proj_success = false;
-    if (abs(proj.getRZ()) > 2048)
+    if (abs(proj.getRZ()) > INT(zlength,kz))
       proj_success = false;
   }
   else {
-    if (proj.getRZ() < 205 || proj.getRZ() > 1911)
+    if (proj.getRZ() < INT(rmindisktc,krprojdisk) || proj.getRZ() > INT(rmaxdisktc,krprojdisk))
       proj_success = false;
   }
 
 // Fill correct TrackletProjectionMemory according to phi bin of projection.
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
-  if (TProjType == BARRELPS && NProjOut == nproj_L1)
-    phi >>= 2;
-  else
-    phi >>= 3;
+  if (TProjType == BARRELPS && NProjOut == nproj_L1) // layer 1
+    phi >>= (nbits_maxvm - nbitsallstubs[0]);
+  else // all other layers and disks
+    phi >>= (nbits_maxvm - nbitsallstubs[1]);
 
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
     projout[0].write_mem(bx, proj, nproj[0]++);
@@ -468,16 +462,16 @@ TC::processStubPair(
   TrackletParameters::PHI0PAR phi0;
   TC::Types::z0 z0;
   TrackletParameters::TPAR t;
-  TC::Types::phiL phiL[4];
-  TC::Types::zL zL[4];
+  TC::Types::phiL phiL[N_LAYER - 2];
+  TC::Types::zL zL[N_LAYER - 2];
   TC::Types::der_phiL der_phiL;
   TC::Types::der_zL der_zL;
-  TC::Types::flag valid_proj[4];
-  TC::Types::phiD phiD[4];
-  TC::Types::rD rD[4];
+  TC::Types::flag valid_proj[N_LAYER - 2];
+  TC::Types::phiD phiD[N_DISK - 1];
+  TC::Types::rD rD[N_DISK - 1];
   TC::Types::der_phiD der_phiD;
   TC::Types::der_rD der_rD;
-  TC::Types::flag valid_proj_disk[4];
+  TC::Types::flag valid_proj_disk[N_DISK - 1];
   bool success;
 
 // Calculate the tracklet parameters and projections.
