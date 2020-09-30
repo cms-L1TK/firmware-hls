@@ -117,11 +117,11 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 }
 
-inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
+inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer, CandidateMatchMemory* outcandmatch, int &ncmatchout) {
 #pragma HLS inline
-#pragma HLS PIPELINE II=1
+//#pragma HLS PIPELINE II=1
 //#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
-#pragma HLS dependence variable=istub intra WAR true
+#pragma HLS dependence variable=istub inter WAR true
     if(idle() || done()) return true;
 
     ////////////////////////////////////////////
@@ -146,7 +146,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, Projecti
  
     // vmproj index
     typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
-  int ncmatchout = 0;
+  //int ncmatchout = 0;
 
   // Buffer still has projections to read out
   //If the buffer is not empty we have a projection that we need to 
@@ -162,8 +162,11 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, Projecti
       if (istub==0) {
         //delete[] stubids;
         //stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
-        for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i)
+        SID_LOOP: for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i) {
+#pragma HLS PIPELINE II=1
+#pragma HLS loop_flatten
           stubids[i]=0;
+        }
 
         //Need to read the information about the proj in the buffer
         //std::cout << "nproj=" << writeindex1 << std::endl;
@@ -286,8 +289,6 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
       //Check if stub bend and proj rinv consistent
       auto const index=projrinv.concat(stubbend);
       if (pass&&table[index]) {
-        //outcandmatch->write_mem(bx,cmatch,ncmatchout);
-        ncmatchout ++;
       /* FIXME
         std::cout << std::hex << "projindex[iphi]=" << projindex << " stubindex=" << stubindex << std::endl;
     std::cout << "stubadd=" << stubadd << std::endl;
@@ -307,6 +308,8 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
             << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(vmproj.getIsPSSeed()) << std::endl << std::endl;
       */
       CandidateMatch cmatch(projindex.concat(stubindex));
+        outcandmatch->write_mem(bx,cmatch,ncmatchout);
+        ncmatchout ++;
       stubids[istubtmp]=stubindex;
       //delete qdata; //Free up mem when finished with projbuffer entry
     } // if(pass&&table[index])
