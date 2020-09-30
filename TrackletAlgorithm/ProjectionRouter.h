@@ -52,6 +52,9 @@ namespace PR
   // number of bits used to distinguish VMs in one allstub block for each disk
   constexpr unsigned int nbits_vmmedisks[5]={3,2,2,2,2};
 
+  // number of bits for seed in tracklet index
+  constexpr unsigned int nbits_seed = 3;
+
   // number of bits needed for max number of VMs per layer/disk (max number is 32)
   constexpr unsigned int nbits_maxvm = 5;
 
@@ -181,12 +184,12 @@ void ProjectionRouter(BXType bx,
 
         // rinv in VMProjection takes only the top 5 bits
         // and is shifted to be positive
-        typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+(irinv_tmp>>(irinv_tmp.length()-nbits_maxvm));
+        typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
         //assert(rinv >=0 and rinv < 32);
     
         // PS seed
         // top 3 bits of tracklet index indicate the seeding pair
-        ap_uint<3> iseed = trackletid >> (trackletid.length()-3);
+        ap_uint<nbits_seed> iseed = trackletid.range(trackletid.length()-1,trackletid.length()-nbits_seed);
         // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
         // and here?
         // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
