@@ -76,7 +76,7 @@ MC-quality-check:
   variables:
     CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
 # HLS builds ---------------
-VMR-hls-build:
+IR-hls-build:
   <<: *template_hls-build
   variables:
     VIVADO_VERSION: "2019.2"
