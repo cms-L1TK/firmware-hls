@@ -66,11 +66,19 @@ do
   shift
 done
 
-# If either the MemPrints or the LUTs directory exists, assume the script has
-# already been run, and simply exit.
-if [ -d "MemPrints" ] || [ -d "LUTs" ]
+# If the MemPrints directory exists, assume the script has already been run,
+# and simply exit.
+if [ -d "MemPrints" ]
 then
   exit 0
+fi
+
+# If the LUTs directory exists, assume LUTs.tar.gz has already been downloaded
+# and unpacked, and only download and unpack MemPrints.tar.gz.
+memprints_only=0
+if [ -d "LUTs" ]
+then
+  memprints_only=1
 fi
 
 # Exit with an error message if run from a directory other than emData/.
@@ -82,9 +90,12 @@ then
 fi
 
 # Download and unpack LUTs.tar.gz.
-wget -O LUTs.tar.gz --quiet ${luts_url}
-tar -xzf LUTs.tar.gz
-rm -f LUTs.tar.gz
+if [[ $memprints_only == 0 ]]
+then
+  wget -O LUTs.tar.gz --quiet ${luts_url}
+  tar -xzf LUTs.tar.gz
+  rm -f LUTs.tar.gz
+fi
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
