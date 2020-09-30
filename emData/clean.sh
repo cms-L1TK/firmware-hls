@@ -12,4 +12,5 @@ fi
 find -mindepth 1 -maxdepth 1 \
   ! -regex "^\.\/download\.sh$" \
   ! -regex "^\.\/clean\.sh$" \
+  ! -regex "^\.\/dtclinklayerdisk\.dat$" \
   -exec rm -rfv {} \;

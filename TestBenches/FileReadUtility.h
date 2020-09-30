@@ -57,6 +57,51 @@ void readEventFromFile(DataType& memarray, std::ifstream& fin, int ievt){
   }
 }
 
+// S.S. Storey 
+// read from file directly 
+template<class MemType, int Base=2>
+void getFromFile(MemType& hMemory, std::ifstream& pInputStream, int pEvent
+, char pDelimeter = '|' , char pSplitToken = ' '){
+  
+
+  // clear memory for this bx/event 
+  hMemory.clear(pEvent);
+  // check file is still good 
+  assert(pInputStream.good());
+  
+  int cEventCounter=-1;
+  do
+  {
+    std::string cInputLine="";
+    getline( pInputStream, cInputLine );
+    if( cInputLine.find("Event") != std::string::npos ) 
+    {
+      //std::cout << cInputLine << "\n";
+      cEventCounter++;
+    }
+    else
+    {
+      if(cEventCounter != pEvent)
+        continue;
+      
+      // split line 
+      //std::cout << cInputLine << "\n";
+      std::stringstream cLineContent(cInputLine);
+      for(std::string cToken; getline( cLineContent, cToken , pSplitToken ); )
+      {
+        // look for binary representation of word  
+        if( cToken.find('|') != std::string::npos )  
+        {
+          //remove delimeter
+          cToken.erase( std::remove(cToken.begin(), cToken.end(), pDelimeter), cToken.end() );
+          hMemory.write_mem(pEvent, cToken, Base);
+        }
+      }
+    }
+  }while( pInputStream.good() && cEventCounter <= pEvent);
+}
+
+
 std::vector<std::string> split(const std::string& s, char delimiter)
 {
   std::vector<std::string> tokens;
@@ -70,6 +115,7 @@ std::vector<std::string> split(const std::string& s, char delimiter)
   
   return tokens;
 }
+
 
 template<class MemType>
 void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16)
@@ -102,6 +148,72 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   
 }
 
+// add a function that returns the mismatched stubs 
+template<class MemType, int InputBase=16, int OutputBase=16>
+int compareMems(const MemType hRefMemory, const MemType hMemory
+  , int ievt
+  , const std::string& label
+  , bool& truncated, int maxProc = kMaxProc)
+{
+  unsigned int err_count = 0;
+  int iBx = ievt&0x7;
+
+  ////////////////////////////////////////
+  // compare expected data with those computed and stored in the output memory
+  if (hRefMemory.getEntries(iBx)!=0 or hMemory.getEntries(ievt)!=0)
+    std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+  
+  std::vector<std::bitset<OutputBase>> cMismatches(0);
+  for (int i = 0; i < hRefMemory.getEntries(ievt); ++i) {
+
+    // Maximum processing steps per event is kMaxProc
+    if (i >= maxProc) {
+      std::cout << "WARNING: Extra data in the reference memory!" << std::endl;
+      std::cout << "Truncation due to maximum number of processing steps per event maxProc = " << std::dec << maxProc << std::endl;
+      truncated = true;
+      break;
+    }
+    
+    std::cout << i << "\t";
+
+    auto data_ref = hRefMemory.read_mem(ievt,i).raw();
+    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_ref) << "\t";
+    else                 std::cout << std::hex << data_ref << "\t";
+    
+    if (i >= hMemory.getEntries(iBx) ) {
+      // missing entries in the computed memory
+      if (not truncated) err_count++;
+      std::cout << "missing" << std::endl;
+      continue;
+    }
+
+    auto data_com = hMemory.read_mem(iBx,i).raw();
+    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_com);
+    else                 std::cout << std::hex << data_com; // << std::endl;
+
+    if (data_com != data_ref) {
+      std::cout << "\t" << "<=== INCONSISTENT";
+      err_count++;
+    }
+
+    std::cout << std::endl;
+  }
+  
+  // in case computed memory has extra contents...
+  if (hMemory.getEntries(iBx) >  hRefMemory.getEntries(ievt)) {
+    
+    for (int i = hRefMemory.getEntries(ievt); i < hMemory.getEntries(iBx); ++i) {
+      auto data_extra = hMemory.read_mem(iBx, i).raw();   
+      std::cout << "missing" << "\t" << std::hex << data_extra << std::endl;
+      err_count++;
+    }
+  }
+
+  return err_count;
+  
+}
+
+
 // TODO: FIXME or write a new one for binned memories
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
@@ -112,6 +224,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   err_count = compareMemWithFile<MemType,InputBase,OutputBase>(memory,fout,ievt,label,truncated);
   return err_count;
 }
+
 
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
@@ -125,64 +238,10 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
-  // Check if at least one of the memories in comparison is non empty
-  // before spamming the screen
-  if (memory_ref.getEntries(ievt) or memory.getEntries(ievt)) {
-    std::cout << label << ":" << std::endl;
-  }
-
-  ////////////////////////////////////////
-  // compare expected data with those computed and stored in the output memory
-  if (memory.getEntries(ievt)!=0 or memory_ref.getEntries(ievt)!=0)
-    std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
-  
-  for (int i = 0; i < memory_ref.getEntries(ievt); ++i) {
-
-    // Maximum processing steps per event is kMaxProc
-    if (i >= maxProc) {
-      std::cout << "WARNING: Extra data in the reference memory!" << std::endl;
-      std::cout << "Truncation due to maximum number of processing steps per event maxProc = " << std::dec << maxProc << std::endl;
-      truncated = true;
-      break;
-    }
-    
-    std::cout << i << "\t";
-
-    auto data_ref = memory_ref.read_mem(ievt,i).raw();
-    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_ref) << "\t";
-    else                 std::cout << std::hex << data_ref << "\t";
-    
-    if (i >= memory.getEntries(ievt) ) {
-      // missing entries in the computed memory
-      if (not truncated) err_count++;
-      std::cout << "missing" << std::endl;
-      continue;
-    }
-
-    auto data_com = memory.read_mem(ievt,i).raw();
-    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_com);
-    else                 std::cout << std::hex << data_com; // << std::endl;
-
-    if (data_com != data_ref) {
-      std::cout << "\t" << "<=== INCONSISTENT";
-      err_count++;
-    }
-
-    std::cout << std::endl;
-  }
-  
-  // in case computed memory has extra contents...
-  if (memory.getEntries(ievt) >  memory_ref.getEntries(ievt)) {
-    
-    for (int i = memory_ref.getEntries(ievt); i < memory.getEntries(ievt); ++i) {
-      auto data_extra = memory.read_mem(ievt, i).raw();   
-      std::cout << "missing" << "\t" << std::hex << data_extra << std::endl;
-      err_count++;
-    }
-  }
-
-  return err_count;
-  
+  return compareMems<MemType,InputBase,OutputBase>( memory_ref, memory
+  , ievt
+  , label
+  , truncated, maxProc);
 }
 
 template<class MemType, int InputBase=16, int OutputBase=16>

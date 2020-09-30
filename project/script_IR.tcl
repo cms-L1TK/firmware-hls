@@ -8,9 +8,9 @@ open_project -reset inputrouter
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top InputRouter
-add_files ../TrackletAlgorithm/InputRouter.cpp -cflags "$CFLAGS"
-add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "CFLAGS"
+set_top InputRouterTop
+add_files ../TrackletAlgorithm/InputRouterTop.cc -cflags "$CFLAGS"
+add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
 
@@ -18,13 +18,17 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/IL/
+add_files -tb ../emData/
 
-csim_design -compiler gcc -mflags "-j8"
+create_clock -period 240MHz -name slow_clock 
+create_clock -period 360MHz -name fast_clock
+
+set nProc [exec nproc]
+csim_design -compiler gcc -mflags "-j$nProc"
 csynth_design
-cosim_design 
-export_design -format ip_catalog
+#cosim_design 
+#cosim_design -trace_level all -rtl verilog -verbose
+#export_design -format ip_catalog 
+#export_design -format ip_catalog -flow syn
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-#export_design -format ip_catalog -flow impl
-
 exit
