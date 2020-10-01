@@ -163,8 +163,8 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, Projecti
         //delete[] stubids;
         //stubids = new ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize>[nstubs];
         SID_LOOP: for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i) {
-#pragma HLS PIPELINE II=1
-#pragma HLS loop_flatten
+//#pragma HLS PIPELINE II=1
+#pragma HLS unroll
           stubids[i]=0;
         }
 
