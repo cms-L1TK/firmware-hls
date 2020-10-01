@@ -193,7 +193,7 @@ void ProjectionRouter(BXType bx,
         // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
 
         // All seeding pairs are PS modules except L3L4 and L5L6
-        bool psseed = not(iseed==2 or iseed==3); 
+        bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
 
         // VM Projection
         VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);

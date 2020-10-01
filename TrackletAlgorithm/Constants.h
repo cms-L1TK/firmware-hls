@@ -101,6 +101,17 @@ constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number 
 // List of regions for memory template parameters
 enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK};
 
+namespace TF {
+  // List of seeds
+  enum seed {UNDEF_SEED, L1L2 = 0, L2L3 = 1, L3L4 = 2, L5L6 = 3, D1D2 = 4, D3D4 = 5, L1D1 = 6, L2D1 = 7};
+
+  // List of layers
+  enum layer {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5};
+
+  // List of disks
+  enum disk {D1 = 0, D2 = 1, D3 = 2, D4 = 3, D5 = 4};
+}
+
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
 

@@ -29,13 +29,13 @@ void TrackletCalculator_L1L2E(
 #pragma HLS array_partition variable=projout_disk complete
 
 TC_L1L2E: TrackletCalculator<
-  TC::L1L2,
+  TF::L1L2,
   TC::E,
-  InnerRegion<TC::L1L2>(),
-  OuterRegion<TC::L1L2>(),
-  NASMemInner<TC::L1L2, TC::E>(),
-  NASMemOuter<TC::L1L2, TC::E>(),
-  NSPMem<TC::L1L2, TC::E>()
+  InnerRegion<TF::L1L2>(),
+  OuterRegion<TF::L1L2>(),
+  NASMemInner<TF::L1L2, TC::E>(),
+  NASMemOuter<TF::L1L2, TC::E>(),
+  NSPMem<TF::L1L2, TC::E>()
  >(
     bx,
     innerStubs,
@@ -67,13 +67,13 @@ void TrackletCalculator_L1L2G(
 #pragma HLS array_partition variable=projout_disk complete
 
 TC_L1L2G: TrackletCalculator<
-  TC::L1L2,
+  TF::L1L2,
   TC::G,
-  InnerRegion<TC::L1L2>(),
-  OuterRegion<TC::L1L2>(),
-  NASMemInner<TC::L1L2, TC::G>(),
-  NASMemOuter<TC::L1L2, TC::G>(),
-  NSPMem<TC::L1L2, TC::G>()
+  InnerRegion<TF::L1L2>(),
+  OuterRegion<TF::L1L2>(),
+  NASMemInner<TF::L1L2, TC::G>(),
+  NASMemOuter<TF::L1L2, TC::G>(),
+  NSPMem<TF::L1L2, TC::G>()
  >(
     bx,
     innerStubs,
@@ -105,13 +105,13 @@ void TrackletCalculator_L3L4E(
 #pragma HLS array_partition variable=projout_disk complete
 
 TC_L3L4E: TrackletCalculator<
-  TC::L3L4,
+  TF::L3L4,
   TC::E,
-  InnerRegion<TC::L3L4>(),
-  OuterRegion<TC::L3L4>(),
-  NASMemInner<TC::L3L4, TC::E>(),
-  NASMemOuter<TC::L3L4, TC::E>(),
-  NSPMem<TC::L3L4, TC::E>()
+  InnerRegion<TF::L3L4>(),
+  OuterRegion<TF::L3L4>(),
+  NASMemInner<TF::L3L4, TC::E>(),
+  NASMemOuter<TF::L3L4, TC::E>(),
+  NSPMem<TF::L3L4, TC::E>()
  >(
     bx,
     innerStubs,
