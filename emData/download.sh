@@ -9,6 +9,7 @@ luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 declare -a processing_modules=(
   # VMRouter
   "VMR_L1PHIE"
+  "VMR_L2PHIB"
   "VMR_D1PHIA"
 
   # TrackletEngine
