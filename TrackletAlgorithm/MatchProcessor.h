@@ -809,7 +809,7 @@ void MatchProcessor(BXType bx,
 
     //ap_uint<kNBits_ProjBuffer> projbuffer[1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
     ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
-#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=2
+#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
     /*
 PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i) 
 #pragma HLS resource variable=projbuffer[i] core=RAM_2P_LUTRAM
