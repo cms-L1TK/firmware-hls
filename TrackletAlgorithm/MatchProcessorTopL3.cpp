@@ -48,6 +48,14 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=proj6in->get_mem() latency=2
  #pragma HLS resource variable=proj7in->get_mem() latency=2
  #pragma HLS resource variable=proj8in->get_mem() latency=2
+ #pragma HLS resource variable=instubdata1->get_mem() latency=2
+ #pragma HLS resource variable=instubdata2->get_mem() latency=2
+ #pragma HLS resource variable=instubdata3->get_mem() latency=2
+ #pragma HLS resource variable=instubdata4->get_mem() latency=2
+ #pragma HLS resource variable=instubdata5->get_mem() latency=2
+ #pragma HLS resource variable=instubdata6->get_mem() latency=2
+ #pragma HLS resource variable=instubdata7->get_mem() latency=2
+ #pragma HLS resource variable=instubdata8->get_mem() latency=2
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
  #pragma HLS resource variable=fullmatch1->get_mem() latency=2
