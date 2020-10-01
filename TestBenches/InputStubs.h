@@ -11,9 +11,17 @@
 
 //
 static const int kMaxLyrsPerDTC = 4; 
-// link assignment table 
 
+// link assignment table 
 // TO-BE fixed :  need this added to emData 
+// 3 bits for layer/disk id  --> 3 bits 
+// 1 bit for barrel/disk --> 4 bits  
+// up-to 4 layers/disks per DTC
+// 16 bits per link
+// then 3 bits 
+// 1 bit to assign whether link is PS/2S 
+// 3 bits to encode the number of layers readout by this DTC 
+// 20 bits in total 
 static const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
 {
   0x500b9, 0x3000b, 0x3000d, 0x5006d, 
@@ -58,18 +66,16 @@ typedef std::map<int, std::vector<int>> TkMap;
 // link id [key]
 // DTC name [from dtclinklayer]
 // then a list of encoded layers 
-void createLinkMap(std::string pInputFile_LinkMap, int pDTCsplit, LinkMap& pLinkMap ) 
+void createLinkMap(std::string pInputCablingMap, int pDTCsplit, LinkMap& pLinkMap ) 
 {
   std::string cBaseName  = "Link_";
   //std::cout << "Loading link map into memory .. will be used later" <<std::endl;
   std::ifstream fin_il_map;
-  if (not openDataFile(fin_il_map,pInputFile_LinkMap)) 
+  if (not openDataFile(fin_il_map,pInputCablingMap)) 
   {
     std::cout << "Could not find file " 
-      << pInputFile_LinkMap << std::endl;
+      << pInputCablingMap << std::endl;
   }
-  // std::cout << "Reading link map from file : " 
-  //   << pInputFile_LinkMap << std::endl;
   size_t cLinkCounter=0;
   // parse link map 
   for(std::string cInputLine; getline( fin_il_map, cInputLine ); )
@@ -88,14 +94,6 @@ void createLinkMap(std::string pInputFile_LinkMap, int pDTCsplit, LinkMap& pLink
         {
           pLinkMap[cLinkCounter].first += cBaseName + cToken;
           pLinkMap[cLinkCounter].first += (pDTCsplit==0)?"_A":"_B";
-          //if( cToken[0] == 'n')
-          //{
-            //Link_PS10G_1_A.dat
-            //pLinkMap[cLinkCounter].first = cBaseName + cToken.substr(4, cToken.length()-3); 
-            //pLinkMap[cLinkCounter].first += "_B";
-          //}
-          //else
-            //pLinkMap[cLinkCounter].first = cBaseName + cToken + "_A" ; //Link_PS10G_1_A.dat
           if( IR_DEBUG)
             std::cout << "Link name : " << pLinkMap[cLinkCounter].first << "\n";
         }
@@ -109,12 +107,12 @@ void createLinkMap(std::string pInputFile_LinkMap, int pDTCsplit, LinkMap& pLink
     }
     cLinkCounter++;
   }
-  //std::cout << "Mapped out " << +pLinkMap.size() << " links." << std::endl;
-  
 }
 
-
 // get DTC layer map 
+// map is 
+// layer id [key]
+// then a list of links ids that read out these layers 
 TkMap getLyrLinkMap( std::string pInputCablingMap )
 {
 	TkMap cMap; 
@@ -192,79 +190,7 @@ TkMap getLyrLinkMap( std::string pInputCablingMap )
 	return cLyrMap;
 }
 
-
-// get link id from map .. 
-void getLinkId(LinkMap pInputMap, std::string pDTC, int &pLinkId)
-{
-  bool cFound=false;
-  auto cMapIterator = pInputMap.begin();
-  do
-  {
-    auto cDTCname = (*cMapIterator).second.first;
-    auto cLayers = (*cMapIterator).second.second;
-    if( cDTCname.find(pDTC) != std::string::npos  ) 
-      cFound=true;
-    else
-      cMapIterator++;
-  }while(!cFound && cMapIterator != pInputMap.end());
-  assert( cFound ); 
-  pLinkId = (cFound)? (*cMapIterator).first : -1;  
-}
-
-// get link information 
-// memory to store LUT for mapping of DTCs to layers/disks/etc. 
-// 3 bits for layer/disk id  --> 3 bits 
-// 1 bit for barrel/disk --> 4 bits  
-// up-to 4 layers/disks per DTC
-// 16 bits per link
-// then 3 bits 
-// 1 bit to assign whether link is PS/2S 
-// 3 bits to encode the number of layers readout by this DTC 
-// 20 bits in total 
-void getLinkInfo(LinkMap pInputMap, int pLinkId, 
-  ap_uint<kLINKMAPwidth>& pLinkWord)
-{
-  // read files with stubs .. this is in the 'input' comparison [all c++ ... nothing to do with HLS for the moment]
-  // figure out DTC map encoding for this link 
-  pLinkWord = 0x0000;
-  uint32_t cWord = 0x00000000; 
-  int cIs2S = ( pInputMap[static_cast<int>(pLinkId)].first.find("2S") != std::string::npos  ) ? 1 : 0 ; 
-  auto cLayerIterator = pInputMap[static_cast<int>(pLinkId)].second.begin();
-  int cNLyrs=0;
-  bool cFirstLayer=false;
-  while( cLayerIterator <  pInputMap[static_cast<int>(pLinkId)].second.end() ) // layer id is either layer number or disk number 
-  {
-    auto cLayerCounter = std::distance( pInputMap[static_cast<int>(pLinkId)].second.begin(), cLayerIterator ); 
-    size_t cLayerId =  *cLayerIterator;
-
-    auto cIsBarrel = (cLayerId<10); 
-    cLayerId = (cLayerId < 10 ) ? cLayerId : (cLayerId-10);
-    cWord  = cWord | ( ( (cLayerId << 1) | cIsBarrel ) << 4*cLayerCounter );  
-    if( cLayerId == 1 && cIsBarrel == 1) // first barrel layer is special ...
-      cFirstLayer = true;
-    cNLyrs++;
-    cLayerIterator++;
-  }
-  cWord = (cNLyrs << 17) | ( cIs2S << 16) | cWord ;
-  pLinkWord = ap_uint<kLINKMAPwidth>( cWord);
-  if( IR_DEBUG )
-  {
-    std::cout  << "DTC " << pInputMap[static_cast<int>(pLinkId)].first 
-      << " Link " << +pLinkId
-      << " -- DTC map encoded word is " 
-      << std::bitset<kLINKMAPwidth>(pLinkWord) 
-      << " -- "
-      << std::hex 
-      << +pLinkWord 
-      << std::dec 
-      << " Is2S bit is set to " << +cIs2S
-      << " which is " << +(pLinkWord.range(kLINKMAPwidth-1,kLINKMAPwidth-3))
-      << " layers"
-      << "\n";
-  }
-}
-
-
+// try and replace wth something from FileReadUtlity 
 // get stubs from emulation file 
 // get stubs from file 
 bool getStubs(std::string pDTC , InputStubs& pInputStubs)
@@ -273,6 +199,7 @@ bool getStubs(std::string pDTC , InputStubs& pInputStubs)
   //std::string cBaseName  = "emData/MemPrints/InputStubs/Link_";
   std::string cInputFile = cBaseName + pDTC + ".dat";
   pInputStubs.clear();
+  
   std::ifstream fin_il;
   bool validil = openDataFile(fin_il,cInputFile); // what does this do? 
   if (not validil) 
@@ -314,7 +241,7 @@ bool getStubs(std::string pDTC , InputStubs& pInputStubs)
 // get stubs for bx 
 void readStubs(std::string pLinkFile, int pBxSelected, ap_uint<kNBits_DTC> *pStubs) 
 {
-  // get stubs + fill memories with IR process 
+  
   InputStubs cInputStubs;
   getStubs(pLinkFile , cInputStubs);
   for( int cBx = pBxSelected ; cBx < pBxSelected+1 ; cBx++)
@@ -329,7 +256,7 @@ void readStubs(std::string pLinkFile, int pBxSelected, ap_uint<kNBits_DTC> *pStu
   }
 }
 
-// compare memory with emulation 
+// get name of mem print 
 std::string getMemPrint(std::string pDTC
   , int pLyrIndx , int pPhiBin , int pNonant
   , ap_uint<kLINKMAPwidth> hLinkWord )
@@ -373,6 +300,7 @@ std::string getMemPrint(std::string pDTC
   } 		
 }	
 
+// return name of link file based on link id 
 std::string getLinkName( int pLinkId
 	, int pDTCsplit = 0 
 	, std::string pInputFile_LinkMap = "emData/dtclinklayerdisk.dat")
@@ -386,6 +314,7 @@ std::string getLinkName( int pLinkId
 	return cLinkName;	
 }
 
+// return name of dtc based on link id 
 std::string getDTCName( int pLinkId
 	, int pDTCsplit = 0 
 	, std::string pInputFile_LinkMap = "emData/dtclinklayerdisk.dat")
@@ -397,7 +326,7 @@ std::string getDTCName( int pLinkId
 	return cDTCName;
 }
 
-// fill from input files 
+// fill array of stubs input files 
 void fillInputStubs(ap_uint<kNBits_DTC> *pStubs 
 , int pLinkId
 , int pBxSelected 
@@ -644,19 +573,16 @@ int simInputRouter(DTCStubMemory *hMemories
   }
 
   // report missing stubs [ref vs. input ]  
-  if(IR_DEBUG)
+  int cIndx=0;
+  for(auto cMissing : cPhiMissing )
   {
-    int cIndx=0;
-    for(auto cMissing : cPhiMissing )
-    {
-      std::cout <<  std::dec 
-        << " Missing Barrel PS stub, layer 1 with phi value "
-        << cMissing << " from emulated memory#" 
-        << +cMemIndxMissing[cIndx] 
-        << " which is phi bin " 
-        << cMissing/(16383./8.) << "\n";
-      cIndx++;  
-    }
+    std::cout <<  std::dec 
+      << " Missing Barrel PS stub, layer 1 with phi value "
+      << cMissing << " from emulated memory#" 
+      << +cMemIndxMissing[cIndx] 
+      << " which is phi bin " 
+      << cMissing/(16383./8.) << "\n";
+    cIndx++;  
   }
   // return error count 
   return std::accumulate(cErrorCount.begin(), cErrorCount.end(), 0);  

@@ -15,7 +15,7 @@ int main()
  
   //
   int cFirstBx = 0 ;
-  int cLastBx = 1;
+  int cLastBx = 10;
   // 
   int pLinkId = 6; 
   int cTotalErrorCount = simInputRouter( hMemories

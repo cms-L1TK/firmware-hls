@@ -22,9 +22,22 @@ constexpr unsigned int kNLayers = 4;
 
 // Number of MSBs used for r index in phicorr LUTs
 constexpr int kNBitsPhiCorrTableR = 3; // Found hardcoded in VMRouterphicorrtable.h
+// size of link LUT 
 constexpr int kSizeLinkTable = 12;
+// size of phi correction table 
+// for barrel PS
 constexpr int kSizePhiCorrTablePS = 64;
+// size of phi correction table 
+// for barrel 2S
 constexpr int kSizePhiCorrTable2S = 128;
+// number of phi bins IR sorts 
+// stubs into for first PS barrel 
+constexpr int kNbitsPhiBinsPSL1 = 3; 
+// number of phi bins IR sorts 
+// stubs into for all regions of 
+// the tracker 
+// except for PS L1
+constexpr int kNbitsPhiBinsTkr = 2; 
 
 //
 #define IR_DEBUG false
@@ -74,9 +87,9 @@ void GetPhiBinBrl(const ap_uint<kNBits_DTC> inStub
 	ap_uint<8> hPhiMSB = AllStub<ASType>::kASPhiMSB;
 	ap_uint<8> hPhiLSB;
 	if( pLyrId == 1 && ASType == BARRELPS ) 
-		hPhiLSB = AllStub<ASType>::kASPhiMSB-(3-1);
+		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsPSL1-1);
 	else
-		hPhiLSB = AllStub<ASType>::kASPhiMSB-(2-1);
+		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
 
 	AllStub<ASType> hStub(inStub.range(kBRAMwidth-1,0));
 	ap_uint<3> phiBnRaw = hStub.raw().range(hPhiMSB,hPhiLSB) & 0x7;
@@ -128,9 +141,9 @@ void GetPhiBinDsk(const ap_uint<kNBits_DTC> inStub
 	ap_uint<5> hPhiMSB = AllStub<ASType>::kASPhiMSB;
 	ap_uint<5> hPhiLSB;
 	if( pLyrId == 1 && ASType == BARRELPS ) 
-		hPhiLSB = AllStub<ASType>::kASPhiMSB-(3-1);
+		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsPSL1-1);
 	else
-		hPhiLSB = AllStub<ASType>::kASPhiMSB-(2-1);
+		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
 
 	phiBn = inStub.range(hPhiMSB,hPhiLSB) & 0x7;
 }

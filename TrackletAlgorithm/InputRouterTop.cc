@@ -1,28 +1,28 @@
 #include "InputRouterTop.h"
 
 void InputRouterTop( const BXType hBx
-  , const ap_uint<6> hLinkId 
-  , const ap_uint<kLINKMAPwidth> hLinkTable[kSizeLinkTable]
+  , const ap_uint<6> hInputLinkId 
+  , const ap_uint<kLINKMAPwidth> kInputLinkLUT[kSizeLinkTable]
   , const int kPhiCorrtable_L1[kSizePhiCorrTablePS]
   , const int kPhiCorrtable_L2[kSizePhiCorrTablePS]
   , const int kPhiCorrtable_L3[kSizePhiCorrTablePS]
   , const int kPhiCorrtable_L4[kSizePhiCorrTable2S]
   , const int kPhiCorrtable_L5[kSizePhiCorrTable2S]
   , const int kPhiCorrtable_L6[kSizePhiCorrTable2S]
-  , ap_uint<kNBits_DTC> hStubs[kMaxStubsFromLink]
-  , DTCStubMemory hMemories[kNIRMemories]) {
+  , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]
+  , DTCStubMemory hOutputStubs[kNIRMemories]) {
 
 #pragma HLS clock domain = slow_clock
-#pragma HLS interface ap_none port = hLinkId
-#pragma HLS interface ap_memory port = hLinkTable
-#pragma HLS stream variable = hStubs depth = 1
+#pragma HLS interface ap_none port = hInputLinkId
+#pragma HLS interface ap_memory port = kInputLinkLUT
+#pragma HLS stream variable = hInputStubs depth = 1
 
-  ap_uint<kLINKMAPwidth> hLinkWord = hLinkTable[hLinkId % 12];
+  ap_uint<kLINKMAPwidth> hLinkWord = kInputLinkLUT[hInputLinkId % 12];
   ap_uint<3> hNLayers = hLinkWord.range(kLINKMAPwidth - 1, kLINKMAPwidth - 3);
   ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth - 4, kLINKMAPwidth - 4);
 #ifndef __SYNTHESIS__
   if (IR_DEBUG) {
-    std::cout << "Link# " << +hLinkId 
+    std::cout << "Link# " << +hInputLinkId 
               << " Link Word is " << std::bitset<kLINKMAPwidth>(hLinkWord)
               << " - Is2S bit is set to " << hIs2S << "\n";
   }
@@ -63,12 +63,11 @@ LOOP_ClearOutputMemories:
   for (unsigned int cMemIndx = 0; cMemIndx < kNIRMemories; cMemIndx++) {
 #pragma HLS unroll
     hNStubs[cMemIndx] = 0;
-    (&hMemories[cMemIndx])->clear(hBx);
-    //hNStubs[cMemIndx] = (&hMemories[cMemIndx])->getEntries(hBx);
+    (&hOutputStubs[cMemIndx])->clear(hBx);
 #ifndef __SYNTHESIS__
     if (IR_DEBUG) {
     std::cout << ".........."
-      << +(&hMemories[cMemIndx])->getEntries(hBx) 
+      << +(&hOutputStubs[cMemIndx])->getEntries(hBx) 
       << " entries... "
       << "\n";
     }
@@ -81,7 +80,7 @@ LOOP_ProcessIR:
 #pragma HLS PIPELINE rewind
     // decode stub
     // check which memory
-    ap_uint<kNBits_DTC> hStub = hStubs[cStubCounter];
+    ap_uint<kNBits_DTC> hStub = hInputStubs[cStubCounter];
     if (hStub == 0)
       continue;
 
@@ -98,10 +97,10 @@ LOOP_ProcessIR:
     ap_uint<3> hPhiBn;
     if (hIsBrl == 1) {
       if (hIs2S == 0)
-        GetPhiBinBrl<BARRELPS, 64>(hStub, kPhiCorrtable_L1, kPhiCorrtable_L2,
+        GetPhiBinBrl<BARRELPS, kSizePhiCorrTablePS>(hStub, kPhiCorrtable_L1, kPhiCorrtable_L2,
                                    kPhiCorrtable_L3, hLyrId, hPhiBn);
       else
-        GetPhiBinBrl<BARREL2S, 128>(hStub, kPhiCorrtable_L4, kPhiCorrtable_L5,
+        GetPhiBinBrl<BARREL2S, kSizePhiCorrTable2S>(hStub, kPhiCorrtable_L4, kPhiCorrtable_L5,
                                     kPhiCorrtable_L6, hLyrId, hPhiBn);
     } else {
       if (hIs2S == 0)
@@ -122,8 +121,6 @@ LOOP_ProcessIR:
     // write to memory
     unsigned int cMemIndx = cIndx + hPhiBn;
     assert(cMemIndx < cNMemories);
-    // get entries
-    //ap_uint<8> hEntries = +(&hMemories[cMemIndx])->getEntries(hBx); 
     ap_uint<8> hEntries = hNStubs[cMemIndx];
 #ifndef __SYNTHESIS__
     if (IR_DEBUG) {
@@ -134,7 +131,7 @@ LOOP_ProcessIR:
                 << " Current number of entries " << +hEntries << "\n";
     }
 #endif
-    (&hMemories[cMemIndx])->write_mem(hBx, hMemWord, hEntries);
+    (&hOutputStubs[cMemIndx])->write_mem(hBx, hMemWord, hEntries);
     hNStubs[cMemIndx] = hEntries + 1;
   }
 
@@ -143,7 +140,7 @@ LOOP_ProcessIR:
     std::cout << "After processing...\n";
     for (unsigned int cMemIndx = 0; cMemIndx < kNIRMemories; cMemIndx++) {
       std::cout << ".........."
-        << +(&hMemories[cMemIndx])->getEntries(hBx) 
+        << +(&hOutputStubs[cMemIndx])->getEntries(hBx) 
         << " entries... "
         << "\n";
     }
