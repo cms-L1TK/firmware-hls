@@ -1314,6 +1314,7 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 //#pragma HLS PIPELINE II=1
 #pragma HLS loop_flatten
+    /*
     MEPHI_LOOP: for(int ivmphi = 0; ivmphi < kNMatchEngines; ++ivmphi) {
 #pragma HLS PIPELINE II=1
 #pragma HLS unroll
@@ -1335,7 +1336,6 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
       case 7: if(!matchengine[ivmphi].done() && !matchengine[ivmphi].idle()) if(matchengine[ivmphi].step(table, instubdata8, projbuffer[ivmphi], outcandmatch, noutcandmatch)) { ready=true; }
       break;
     }
-    /*
     switch (ivmphi) {
       case 0: matchengine[ivmphi].step(table, instubdata1, projbuffer[ivmphi]);
       break;
@@ -1354,6 +1354,7 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
       case 7: matchengine[ivmphi].step(table, instubdata8, projbuffer[ivmphi]);
       break;
     }
+    */
       if(!matchengine[0].done()) if(matchengine[0].step(table, instubdata1, projbuffer[0], outcandmatch, noutcandmatch)) { ivmphi=0; ready=true; }
       if(!matchengine[1].done()) if(matchengine[1].step(table, instubdata2, projbuffer[1], outcandmatch, noutcandmatch)) { ivmphi=1; ready=true; }
       if(!matchengine[2].done()) if(matchengine[2].step(table, instubdata3, projbuffer[2], outcandmatch, noutcandmatch)) { ivmphi=2; ready=true; }
@@ -1362,7 +1363,6 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
       if(!matchengine[5].done()) if(matchengine[5].step(table, instubdata6, projbuffer[5], outcandmatch, noutcandmatch)) { ivmphi=5; ready=true; }
       if(!matchengine[6].done()) if(matchengine[6].step(table, instubdata7, projbuffer[6], outcandmatch, noutcandmatch)) { ivmphi=6; ready=true; }
       if(!matchengine[7].done()) if(matchengine[7].step(table, instubdata8, projbuffer[7], outcandmatch, noutcandmatch)) { ivmphi=7; ready=true; }
-    */
       typename VMProjection<BARREL>::VMPID projindex;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
@@ -1390,7 +1390,7 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
         //}
       } //end MC if
 
-    } //end 8ME loop
+    //} //end 8ME loop
     //ivmphi++;
 
   } //end loop
