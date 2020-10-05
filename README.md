@@ -34,13 +34,13 @@ These correspond to LUT used internally by the algo steps.
 
 ## Corresponding C++ emulation
 
-The C++ emulation was used to create the files that are downloaded by emData/download.sh. The version used to create these files can be obtained with the following recipe:
+The C++ emulation was used to create the files that are downloaded by emData/download.sh. The version used to create these files can be obtained with the following recipe (adapted from the [L1TrackSoftware TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/L1TrackSoftware)):
 
 ```bash
-cmsrel CMSSW_11_1_0_pre8
-cd CMSSW_11_1_0_pre8/src/
+cmsrel CMSSW_11_2_0_pre6
+cd CMSSW_11_2_0_pre6/src/
 cmsenv 
-git cms-checkout-topic -u cms-L1TK:L1TK-dev-11_1_0_pre8
+git cms-checkout-topic -u cms-L1TK:L1TK-dev-11_2_0_pre6
 git clone https://github.com/cms-data/L1Trigger-TrackFindingTracklet.git L1Trigger/TrackFindingTracklet/data
 cd L1Trigger/TrackFindingTracklet/data/
 mkdir -p LUTs \
