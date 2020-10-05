@@ -117,7 +117,7 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 }
 
-inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer, CandidateMatchMemory* outcandmatch, int &ncmatchout) {
+inline bool step(bool *table, const VMStubMEMemory<VMSMEType>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 #pragma HLS inline
 //#pragma HLS PIPELINE II=1
 //#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
@@ -306,10 +306,10 @@ constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
             << std::bitset<VMProjectionBase<BARREL>::kVMProjFineZSize>(vmproj.getFineZ()) << " "
             << std::bitset<VMProjectionBase<BARREL>::kVMProjRinvSize>(vmproj.getRInv()) << " "
             << std::bitset<VMProjectionBase<BARREL>::kVMProjIsPSSeedSize>(vmproj.getIsPSSeed()) << std::endl << std::endl;
-      */
       CandidateMatch cmatch(projindex.concat(stubindex));
         outcandmatch->write_mem(bx,cmatch,ncmatchout);
         ncmatchout ++;
+      */
       stubids[istubtmp]=stubindex;
       //delete qdata; //Free up mem when finished with projbuffer entry
     } // if(pass&&table[index])
