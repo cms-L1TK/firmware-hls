@@ -331,7 +331,6 @@ void MatchCalculator(BXType bx,
                      int &nmcout6,
                      int &nmcout7,
                      int &nmcout8,
-                     int &noutcandmatch,
                      FullMatchMemory<FMTYPE>* fullmatch1,
                      FullMatchMemory<FMTYPE>* fullmatch2,
                      FullMatchMemory<FMTYPE>* fullmatch3,
@@ -339,8 +338,7 @@ void MatchCalculator(BXType bx,
                      FullMatchMemory<FMTYPE>* fullmatch5,
                      FullMatchMemory<FMTYPE>* fullmatch6,
                      FullMatchMemory<FMTYPE>* fullmatch7,
-                     FullMatchMemory<FMTYPE>* fullmatch8,
-		     CandidateMatchMemory* outcandmatch
+                     FullMatchMemory<FMTYPE>* fullmatch8
 ){
 
 #pragma HLS inline
@@ -528,8 +526,6 @@ void MatchCalculator(BXType bx,
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       //std::cout << "writing " << bestmatch.raw() << std::endl;
-      //outcandmatch->write_mem(bx,cmatch,noutcandmatch);
-      //noutcandmatch++;
       switch (projseed) {
       case 0:
       fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -627,17 +623,7 @@ void MatchProcessor(BXType bx,
                       FullMatchMemory<FMTYPE>* fullmatch5,
                       FullMatchMemory<FMTYPE>* fullmatch6,
                       FullMatchMemory<FMTYPE>* fullmatch7,
-                      FullMatchMemory<FMTYPE>* fullmatch8,
-                         VMProjectionMemory<BARREL>* vmprojout1,
-                         VMProjectionMemory<BARREL>* vmprojout2,
-                         VMProjectionMemory<BARREL>* vmprojout3,
-                         VMProjectionMemory<BARREL>* vmprojout4,
-                         VMProjectionMemory<BARREL>* vmprojout5,
-                         VMProjectionMemory<BARREL>* vmprojout6,
-                         VMProjectionMemory<BARREL>* vmprojout7,
-                         VMProjectionMemory<BARREL>* vmprojout8,
-                         int &noutcandmatch,
-		         CandidateMatchMemory* outcandmatch
+                      FullMatchMemory<FMTYPE>* fullmatch8
 ){
 #pragma HLS inline
 
@@ -686,16 +672,6 @@ void MatchProcessor(BXType bx,
   fullmatch7->clear(bx);
   fullmatch8->clear(bx);
 
-  vmprojout1->clear(bx);
-  vmprojout2->clear(bx);
-  vmprojout3->clear(bx);
-  vmprojout4->clear(bx);
-  vmprojout5->clear(bx);
-  vmprojout6->clear(bx);
-  vmprojout7->clear(bx);
-  vmprojout8->clear(bx);
-  outcandmatch->clear(bx);
-
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
@@ -728,17 +704,6 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
-  int nvmprojout1 = 0;
-  int nvmprojout2 = 0;
-  int nvmprojout3 = 0;
-  int nvmprojout4 = 0;
-  int nvmprojout5 = 0;
-  int nvmprojout6 = 0;
-  int nvmprojout7 = 0;
-  int nvmprojout8 = 0;  
-  int nallproj = 0;
-
-  // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
   int nmcout2 = 0;
   int nmcout3 = 0;
@@ -746,8 +711,7 @@ void MatchProcessor(BXType bx,
   int nmcout5 = 0;
   int nmcout6 = 0;
   int nmcout7 = 0;
-  int nmcout8 = 0;  
-
+  int nmcout8 = 0;
 
   ////////////////////////////////////////////
   //Some ME stuff
@@ -1101,34 +1065,6 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
         std::cout << std::hex << "projid=" << vmproj.getIndex() << std::endl;
         */
 
-        if(savefirst || savelast) {
-          switch(iphi) {
-            case 0: vmprojout1->write_mem(bx, vmproj, nvmprojout1);
-            nvmprojout1++;
-            break;
-            case 1: vmprojout2->write_mem(bx, vmproj, nvmprojout2);
-            nvmprojout2++;
-            break;
-            case 2: vmprojout3->write_mem(bx, vmproj, nvmprojout3);
-            nvmprojout3++;
-            break;
-            case 3: vmprojout4->write_mem(bx, vmproj, nvmprojout4);
-            nvmprojout4++;
-            break;
-            case 4: vmprojout5->write_mem(bx, vmproj, nvmprojout5);
-            nvmprojout5++;
-            break;
-            case 5: vmprojout6->write_mem(bx, vmproj, nvmprojout6);
-            nvmprojout6++;
-            break;
-            case 6: vmprojout7->write_mem(bx, vmproj, nvmprojout7);
-            nvmprojout7++;
-            break;
-            case 7: vmprojout8->write_mem(bx, vmproj, nvmprojout8);
-            nvmprojout8++;
-            break;
-          }
-        }
         /*
         */
         if (savefirst) { //FIXME code needs to be cleaner
@@ -1320,14 +1256,14 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
       break;
     }
     */
-      if(!matchengine[0].done() && !ready) if(matchengine[0].step(table, instubdata1, projbuffer[0], outcandmatch, noutcandmatch)) { ivmphi=0; ready=true; }
-      if(!matchengine[1].done() && !ready) if(matchengine[1].step(table, instubdata2, projbuffer[1], outcandmatch, noutcandmatch)) { ivmphi=1; ready=true; }
-      if(!matchengine[2].done() && !ready) if(matchengine[2].step(table, instubdata3, projbuffer[2], outcandmatch, noutcandmatch)) { ivmphi=2; ready=true; }
-      if(!matchengine[3].done() && !ready) if(matchengine[3].step(table, instubdata4, projbuffer[3], outcandmatch, noutcandmatch)) { ivmphi=3; ready=true; }
-      if(!matchengine[4].done() && !ready) if(matchengine[4].step(table, instubdata5, projbuffer[4], outcandmatch, noutcandmatch)) { ivmphi=4; ready=true; }
-      if(!matchengine[5].done() && !ready) if(matchengine[5].step(table, instubdata6, projbuffer[5], outcandmatch, noutcandmatch)) { ivmphi=5; ready=true; }
-      if(!matchengine[6].done() && !ready) if(matchengine[6].step(table, instubdata7, projbuffer[6], outcandmatch, noutcandmatch)) { ivmphi=6; ready=true; }
-      if(!matchengine[7].done() && !ready) if(matchengine[7].step(table, instubdata8, projbuffer[7], outcandmatch, noutcandmatch)) { ivmphi=7; ready=true; }
+      if(!matchengine[0].done() && !ready) if(matchengine[0].step(table, instubdata1, projbuffer[0])) { ivmphi=0; ready=true; }
+      if(!matchengine[1].done() && !ready) if(matchengine[1].step(table, instubdata2, projbuffer[1])) { ivmphi=1; ready=true; }
+      if(!matchengine[2].done() && !ready) if(matchengine[2].step(table, instubdata3, projbuffer[2])) { ivmphi=2; ready=true; }
+      if(!matchengine[3].done() && !ready) if(matchengine[3].step(table, instubdata4, projbuffer[3])) { ivmphi=3; ready=true; }
+      if(!matchengine[4].done() && !ready) if(matchengine[4].step(table, instubdata5, projbuffer[4])) { ivmphi=4; ready=true; }
+      if(!matchengine[5].done() && !ready) if(matchengine[5].step(table, instubdata6, projbuffer[5])) { ivmphi=5; ready=true; }
+      if(!matchengine[6].done() && !ready) if(matchengine[6].step(table, instubdata7, projbuffer[6])) { ivmphi=6; ready=true; }
+      if(!matchengine[7].done() && !ready) if(matchengine[7].step(table, instubdata8, projbuffer[7])) { ivmphi=7; ready=true; }
       typename VMProjection<BARREL>::VMPID projindex;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
@@ -1350,8 +1286,8 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                   //(bx, allstub, allproj, projindex, stubid, nstub, bx_o,
                   (bx, allstub, allproj, matchengine[ivmphi].getProjindex(), matchengine[ivmphi].getStubIds(), matchengine[ivmphi].getNStubs(), bx_o,
-                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8, noutcandmatch,
-                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8,outcandmatch);
+                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
+                   fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
         //}
       } //end MC if
 
