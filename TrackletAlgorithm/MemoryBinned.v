@@ -13,7 +13,7 @@
 
 
 module MemoryBinned #(
-  parameter RAM_WIDTH = 14,                       // Specify RAM data width, VM Stub: 14 for Barral LPS, 15 for Barral L2S/DISK
+  parameter RAM_WIDTH = 14,                       // Specify RAM data width, VM Stub: 14 for Barrel LPS, 15 for Barrel L2S/DISK
   parameter RAM_DEPTH = 512,                     // Specify RAM depth (number of entries) 512 is for 4 pages
   parameter INIT_FILE = "",                       // Specify name/location of RAM initialization file if using one (leave blank if not)
   parameter RAM_PERFORMANCE = "HIGH_PERFORMANCE",  // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
