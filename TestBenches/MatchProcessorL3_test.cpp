@@ -55,18 +55,6 @@ int main() {
   static FullMatchMemory<BARREL> fullmatch7;
   static FullMatchMemory<BARREL> fullmatch8;
 
-  static VMProjectionMemory<BARREL> vmproj1;
-  static VMProjectionMemory<BARREL> vmproj2;
-  static VMProjectionMemory<BARREL> vmproj3;
-  static VMProjectionMemory<BARREL> vmproj4;
-  static VMProjectionMemory<BARREL> vmproj5;
-  static VMProjectionMemory<BARREL> vmproj6;
-  static VMProjectionMemory<BARREL> vmproj7;
-  static VMProjectionMemory<BARREL> vmproj8;
-
-  // declare output memory array to be filled by hls simulation
-  CandidateMatchMemory outputcandmatches;
-
   ap_uint<8>* valid;
 
   // open input files
@@ -130,42 +118,6 @@ int main() {
   //if (not openDataFile(fout_fm6,"")) return -1;
   //if (not openDataFile(fout_fm7,"MC/MC_L1PHIC/FullMatches_FM_L2D1_L1PHIC_04.dat")) return -1;
 
-  ifstream fout_vmproj1;
-  bool valid_vmproj1 =  openDataFile(fout_vmproj1, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC17_04.dat");
-  if (not valid_vmproj1) return -1;
-
-  ifstream fout_vmproj2;
-  bool valid_vmproj2 = openDataFile(fout_vmproj2, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC18_04.dat");
-  if (not valid_vmproj2) return -1;
-
-  ifstream fout_vmproj3;
-  bool valid_vmproj3 = openDataFile(fout_vmproj3, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC19_04.dat");
-  if (not valid_vmproj3) return -1;
-
-  ifstream fout_vmproj4;
-  bool valid_vmproj4 = openDataFile(fout_vmproj4, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC20_04.dat");
-  if (not valid_vmproj4) return -1;
-
-  ifstream fout_vmproj5;
-  bool valid_vmproj5 =  openDataFile(fout_vmproj5, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC21_04.dat");
-  if (not valid_vmproj5) return -1;
-
-  ifstream fout_vmproj6;
-  bool valid_vmproj6 = openDataFile(fout_vmproj6, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC22_04.dat");
-  if (not valid_vmproj6) return -1;
-
-  ifstream fout_vmproj7;
-  bool valid_vmproj7 = openDataFile(fout_vmproj7, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC23_04.dat");
-  if (not valid_vmproj7) return -1;
-
-  ifstream fout_vmproj8;
-  bool valid_vmproj8 = openDataFile(fout_vmproj8, "PR/PR_L3PHIC/VMProjections_VMPROJ_L3PHIC24_04.dat");
-  if (not valid_vmproj8) return -1;
-
-  ifstream fin_candmatch;
-  bool validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
-  if (not validcandmatch) return -1;
-
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
@@ -206,11 +158,7 @@ int main() {
                         &allstub, &allproj,
                         bx_out,
                         &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4,
-                        &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8,
-                        &vmproj1, &vmproj2, &vmproj3, &vmproj4,
-                        &vmproj5, &vmproj6, &vmproj7, &vmproj8,
-                        noutcandmatch,
-                        &outputcandmatches);
+                        &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches
@@ -251,55 +199,6 @@ int main() {
     //std::cout << "FM: L2D1 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch7, fout_fm7, ievt, "FullMatch", truncation);
     
-    /*
-    */
-    // VMProjection1
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj1, fout_vmproj1, ievt, "VMProjection1", truncation, kMaxProc-10);
-
-    // VMProjection2
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj2, fout_vmproj2, ievt, "VMProjection2", truncation, kMaxProc-10);
-
-    // VMProjection3
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj3, fout_vmproj3, ievt, "VMProjection3", truncation, kMaxProc-10);
-
-    // VMProjection4
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj4, fout_vmproj4, ievt, "VMProjection4", truncation, kMaxProc-10);
-
-    // VMProjection5
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj5, fout_vmproj5, ievt, "VMProjection5", truncation, kMaxProc-10);
-
-    // VMProjection6
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj6, fout_vmproj6, ievt, "VMProjection6", truncation, kMaxProc-10);
-
-    // VMProjection7
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj7, fout_vmproj7, ievt, "VMProjection7", truncation, kMaxProc-10);
-
-    // VMProjection8
-    //err_count += 
-compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmproj8, fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
-
-    // compare the computed outputs with the expected ones for the candidate 
-    // matches
-    err_count += compareMemWithFile<CandidateMatchMemory>(outputcandmatches, 
-							  fin_candmatch, 
-							  ievt,"CandidateMatch",truncation);
-    
-    std::cout << noutcandmatch << " cmatches" << std::endl;
 
   }  // end of event loop
   
@@ -320,7 +219,6 @@ compareMemWithFile<VMProjectionMemory<BARREL> >
   fin_vmstub6.close();
   fin_vmstub7.close();
   fin_vmstub8.close();
-  fin_candmatch.close();
 
   fout_fm1.close();
   fout_fm2.close();

@@ -27,17 +27,7 @@ void MatchProcessorTopL3(BXType bx,
                       FullMatchMemory<BARREL>* fullmatch5,
                       FullMatchMemory<BARREL>* fullmatch6,
                       FullMatchMemory<BARREL>* fullmatch7,
-                      FullMatchMemory<BARREL>* fullmatch8,
-                         VMProjectionMemory<BARREL>* vmprojout1,
-                         VMProjectionMemory<BARREL>* vmprojout2,
-                         VMProjectionMemory<BARREL>* vmprojout3,
-                         VMProjectionMemory<BARREL>* vmprojout4,
-                         VMProjectionMemory<BARREL>* vmprojout5,
-                         VMProjectionMemory<BARREL>* vmprojout6,
-                         VMProjectionMemory<BARREL>* vmprojout7,
-                         VMProjectionMemory<BARREL>* vmprojout8,
-                         int &noutcandmatch,
-		         CandidateMatchMemory* outcandmatch) {
+                      FullMatchMemory<BARREL>* fullmatch8) {
 
  #pragma HLS interface register port=bx_o
  #pragma HLS resource variable=proj1in->get_mem() latency=2
@@ -75,16 +65,6 @@ void MatchProcessorTopL3(BXType bx,
                       allstub,
                       allproj,
                       bx_o,
-                      fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8,
-                         vmprojout1,
-                         vmprojout2,
-                         vmprojout3,
-                         vmprojout4,
-                         vmprojout5,
-                         vmprojout6,
-                         vmprojout7,
-                         vmprojout8,
-                         noutcandmatch,
-			 outcandmatch);
+                      fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
 }
 
