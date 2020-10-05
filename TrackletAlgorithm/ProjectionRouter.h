@@ -56,10 +56,10 @@ namespace PR
   constexpr unsigned int nbits_seed = 3;
 
   // number of extra bits to keep when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_nbitsextra = 2;
+  constexpr unsigned int zbins_nbitsextra = 3;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_adjust = 2;
+  constexpr unsigned int zbins_adjust = 1;
 
 } // namespace PR
 
@@ -169,10 +169,11 @@ void ProjectionRouter(BXType bx,
         typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
         //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
-        // need to be careful about left shift of ap_(u)int
+        // we shift right by (nfinebits-1) instead of nfinebits because we need to keep 1 extra MSB in case zbin1 is different from the 3 MSBs of zproj,
+        // which can happen because zbin1 is adjusted by zbins_adjust
         auto nfinebits = VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize;
-        ap_uint<VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize+zbins_nbitsextra-MEBinsBits> zeropad(0);
-        typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(nfinebits+zbins_nbitsextra-1))+(izproj.range(izproj.length()-1,izproj.length()-nfinebits-zbins_nbitsextra))-(zbin1,zeropad);
+        ap_uint<VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize-1> zeropad(0);
+        typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(MEBinsBits+(nfinebits-1)-1))+(izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-(nfinebits-1)))-(zbin1,zeropad);
 
         // vmproj irinv
         // phider = -irinv/2
