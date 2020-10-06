@@ -389,9 +389,9 @@ void MatchCalculator(BXType bx,
   bool goodmatch                   = false;
 
   // Loop one past nstubs for pipelining
-  MC_LOOP: for (int istub = 0; istub < kMaxProc-PR::LoopItersCut; ++istub) {
+  //MC_LOOP: for (int istub = 0; istub < kMaxProc-PR::LoopItersCut; ++istub) {
+  MC_LOOP: for (int istub = 0; istub <= nstubs+1; ++istub) {
 #pragma HLS PIPELINE II=1
-  //MC_LOOP: for (int istub = 0; istub <= nstubs+1; ++istub) {
 
     // Don't read past nstubs (would read garbage)
     int istubtmp = istub > nstubs ? istub : nstubs;
