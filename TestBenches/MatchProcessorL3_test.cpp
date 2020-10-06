@@ -36,14 +36,14 @@ int main() {
   static AllStubMemory<BARRELPS>        allstub;
   static AllProjectionMemory<BARRELPS>  allproj;
 
-  VMStubMEMemory<BARRELPS> inputvmstubs1;
-  VMStubMEMemory<BARRELPS> inputvmstubs2;
-  VMStubMEMemory<BARRELPS> inputvmstubs3;
-  VMStubMEMemory<BARRELPS> inputvmstubs4;
-  VMStubMEMemory<BARRELPS> inputvmstubs5;
-  VMStubMEMemory<BARRELPS> inputvmstubs6;
-  VMStubMEMemory<BARRELPS> inputvmstubs7;
-  VMStubMEMemory<BARRELPS> inputvmstubs8;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs1;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs2;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs3;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs4;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs5;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs6;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs7;
+  VMStubMEMemory<BARRELPS,3> inputvmstubs8;
 
   // declare output memory array to be filled by hls simulation
   static FullMatchMemory<BARREL> fullmatch1;
@@ -134,14 +134,14 @@ int main() {
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
     writeMemFromFile<AllProjectionMemory<BARRELPS> >(allproj, fin_ap, ievt);
 
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs1, fin_vmstub1, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs2, fin_vmstub2, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs3, fin_vmstub3, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs4, fin_vmstub4, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs5, fin_vmstub5, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs6, fin_vmstub6, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs7, fin_vmstub7, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS> >(inputvmstubs8, fin_vmstub8, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs1, fin_vmstub1, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs2, fin_vmstub2, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs3, fin_vmstub3, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs4, fin_vmstub4, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs5, fin_vmstub5, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs6, fin_vmstub6, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs7, fin_vmstub7, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs8, fin_vmstub8, ievt);
 
     //set bunch crossing
     BXType bx=ievt;
