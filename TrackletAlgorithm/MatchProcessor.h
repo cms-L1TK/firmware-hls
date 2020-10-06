@@ -694,7 +694,7 @@ void MatchProcessor(BXType bx,
   constexpr unsigned int kNMatchEngines=8;
   constexpr int kNBits_ProjBuffer =kNBits_MemAddrBinned + VMProjectionBase<BARREL>::kVMProjectionSize + 1 +kNBits_z +1;
 
-  static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer];
+  static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
   //ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
 #pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 //#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
