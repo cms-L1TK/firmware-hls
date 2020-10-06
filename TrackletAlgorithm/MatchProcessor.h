@@ -694,11 +694,12 @@ void MatchProcessor(BXType bx,
   constexpr unsigned int kNMatchEngines=8;
   constexpr int kNBits_ProjBuffer =kNBits_MemAddrBinned + VMProjectionBase<BARREL>::kVMProjectionSize + 1 +kNBits_z +1;
 
-  ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer];
+  static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer];
   //ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
-//#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
+#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 //#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
-#pragma HLS RESOURCE variable=writeindex core=XPM_MEMORY uram
+//#pragma HLS RESOURCE variable=writeindex core=XPM_MEMORY uram
+//#pragma HLS ARRAY_PARTITION variable=writeindex complete dim=0
 //#pragma HLS RESOURCE variable=writeindextmp core=XPM_MEMORY uram
 #pragma HLS dependence variable=writeindex inter false
   ap_uint<kNBitsBuffer> readindex=0;
@@ -753,7 +754,7 @@ PRAG_LOOP: for(int i = 0; i < kNMatchEngines; ++i)
         //std::cout << "PR stage" << std::endl;
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
-#pragma HLS loop_flatten
+//#pragma HLS loop_flatten
 //#pragma HLS unroll
 
     // read inputs
