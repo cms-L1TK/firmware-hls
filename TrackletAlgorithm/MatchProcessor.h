@@ -238,32 +238,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
     if (L==1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L1PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L2PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L4PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L5PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L6PHIC_phicut.tab"
+#include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -273,32 +273,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else { // z cuts
     if (L==1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L1PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L2PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L3PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L4PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L5PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/MC_L3PHIC/MC_L6PHIC_zcut.tab"
+#include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -605,14 +605,14 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj22in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj23in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
-                      const VMStubMEMemory<VMSMEType>* instubdata1,
-                      const VMStubMEMemory<VMSMEType>* instubdata2,
-                      const VMStubMEMemory<VMSMEType>* instubdata3,
-                      const VMStubMEMemory<VMSMEType>* instubdata4,
-                      const VMStubMEMemory<VMSMEType>* instubdata5,
-                      const VMStubMEMemory<VMSMEType>* instubdata6,
-                      const VMStubMEMemory<VMSMEType>* instubdata7,
-                      const VMStubMEMemory<VMSMEType>* instubdata8,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata1,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata2,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata3,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata4,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata5,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata6,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata7,
+                      const VMStubMEMemory<VMSMEType,3>* instubdata8,
                       const AllStubMemory<ASTYPE>* allstub,
                       const AllProjectionMemory<APTYPE>* allproj,
                       BXType& bx_o,
