@@ -219,5 +219,9 @@ do
           do
             find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           done
+  elif [[ ${module_type} == "MP" ]]
+  then
+          layer=`echo ${module} | sed "s/MP_\(.*\).*/\1/g"`
+          ln -s ../../MemPrints/VMStubsME/VMStubs_VMSME_${layer}n1_04.dat MP/MP_${layer}/ 
   fi
 done
