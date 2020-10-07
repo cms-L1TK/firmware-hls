@@ -81,14 +81,14 @@ int main() {
   if (not openDataFile(fin_tproj8, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat")) return -1;
 
   ifstream fin_vmstub1, fin_vmstub2, fin_vmstub3, fin_vmstub4, fin_vmstub5, fin_vmstub6, fin_vmstub7, fin_vmstub8;
-  bool validvmstub1 = openDataFile(fin_vmstub1,"MP/MP_L3PHIC17/VMStubs_VMSMP_L3PHIC17n1_04.dat");
-  bool validvmstub2 = openDataFile(fin_vmstub2,"MP/MP_L3PHIC18/VMStubs_VMSMP_L3PHIC18n1_04.dat");
-  bool validvmstub3 = openDataFile(fin_vmstub3,"MP/MP_L3PHIC19/VMStubs_VMSMP_L3PHIC19n1_04.dat");
-  bool validvmstub4 = openDataFile(fin_vmstub4,"MP/MP_L3PHIC20/VMStubs_VMSMP_L3PHIC20n1_04.dat");
-  bool validvmstub5 = openDataFile(fin_vmstub5,"MP/MP_L3PHIC21/VMStubs_VMSMP_L3PHIC21n1_04.dat");
-  bool validvmstub6 = openDataFile(fin_vmstub6,"MP/MP_L3PHIC22/VMStubs_VMSMP_L3PHIC22n1_04.dat");
-  bool validvmstub7 = openDataFile(fin_vmstub7,"MP/MP_L3PHIC23/VMStubs_VMSMP_L3PHIC23n1_04.dat");
-  bool validvmstub8 = openDataFile(fin_vmstub8,"MP/MP_L3PHIC24/VMStubs_VMSMP_L3PHIC24n1_04.dat");
+  bool validvmstub1 = openDataFile(fin_vmstub1,"MP/MP_L3PHIC17/VMStubs_VMSME_L3PHIC17n1_04.dat");
+  bool validvmstub2 = openDataFile(fin_vmstub2,"MP/MP_L3PHIC18/VMStubs_VMSME_L3PHIC18n1_04.dat");
+  bool validvmstub3 = openDataFile(fin_vmstub3,"MP/MP_L3PHIC19/VMStubs_VMSME_L3PHIC19n1_04.dat");
+  bool validvmstub4 = openDataFile(fin_vmstub4,"MP/MP_L3PHIC20/VMStubs_VMSME_L3PHIC20n1_04.dat");
+  bool validvmstub5 = openDataFile(fin_vmstub5,"MP/MP_L3PHIC21/VMStubs_VMSME_L3PHIC21n1_04.dat");
+  bool validvmstub6 = openDataFile(fin_vmstub6,"MP/MP_L3PHIC22/VMStubs_VMSME_L3PHIC22n1_04.dat");
+  bool validvmstub7 = openDataFile(fin_vmstub7,"MP/MP_L3PHIC23/VMStubs_VMSME_L3PHIC23n1_04.dat");
+  bool validvmstub8 = openDataFile(fin_vmstub8,"MP/MP_L3PHIC24/VMStubs_VMSME_L3PHIC24n1_04.dat");
   if (not validvmstub1) return -1;
   if (not validvmstub2) return -1;
   if (not validvmstub3) return -1;
@@ -98,7 +98,7 @@ int main() {
   if (not validvmstub7) return -1;
   if (not validvmstub8) return -1;
 
-  if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn4_04.dat")) return -1;
+  if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn6_04.dat")) return -1;
   if (not openDataFile(fin_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat")) return -1;
 
   // open file(s) with reference results
