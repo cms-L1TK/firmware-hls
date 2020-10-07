@@ -39,6 +39,16 @@ declare -a processing_modules=(
   "MC_L4PHIC"
   "MC_L5PHIC"
   "MC_L6PHIC"
+
+  # MatchProcessor
+  "MP_L3PHIC17"
+  "MP_L3PHIC18"
+  "MP_L3PHIC19"
+  "MP_L3PHIC20"
+  "MP_L3PHIC21"
+  "MP_L3PHIC22"
+  "MP_L3PHIC23"
+  "MP_L3PHIC24"
 )
 
 # Function that prints information regarding the usage of this command
@@ -158,5 +168,9 @@ do
           do
             find ${table_location} -type f -name "${mem}*.tab" -exec ln -s ../../{} ${table_target_dir}/ \;
           done
+  elif [[ ${module_type} == "MP" ]]
+  then
+          layer=`echo ${module} | sed "s/MP_\(.*\).*/\1/g"`
+          ln -s ../../MemPrints/VMStubsME/VMStubs_VMSME_${layer}n1_04.dat MP/MP_${layer}/ 
   fi
 done
