@@ -40,7 +40,7 @@ The C++ emulation was used to create the files that are downloaded by emData/dow
 cmsrel CMSSW_11_2_0_pre6
 cd CMSSW_11_2_0_pre6/src/
 cmsenv 
-git cms-checkout-topic -u cms-L1TK:L1TK-dev-11_2_0_pre6
+git cms-checkout-topic -u cms-L1TK:fw_synch_201005
 git clone https://github.com/cms-data/L1Trigger-TrackFindingTracklet.git L1Trigger/TrackFindingTracklet/data
 cd L1Trigger/TrackFindingTracklet/data/
 mkdir -p LUTs \
