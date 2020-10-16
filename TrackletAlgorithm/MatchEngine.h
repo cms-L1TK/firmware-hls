@@ -87,7 +87,7 @@ namespace ME {
 		kVMMEProjectionLSB = kVMMEZBinMSB + 1,
 		kVMMEProjectionMSB = kVMMEProjectionLSB + VMProjection<PROJECTIONTYPE>::kVMProjectionSize - 1,
 		kVMMENStubsLSB = kVMMEProjectionMSB + 1,
-		kVMMENStubsMSB = kVMMENStubsLSB + 5 - 1
+		kVMMENStubsMSB = kVMMENStubsLSB + VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitData - 1
 	};
 	enum StubZPositionBarrelConsistency {
 		kPSMin = -2,
