@@ -18,8 +18,11 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
 class MemoryTemplateBinned{
+public:
+  static constexpr unsigned int kNBitDataAddr = NBIT_ADDR-NBIT_BIN;
+  static constexpr unsigned int kNBitData = kNBitDataAddr+1;
   typedef ap_uint<NBIT_BX> BunchXingT;
-  typedef ap_uint<NBIT_ADDR-NBIT_BIN+1> NEntryT;
+  typedef ap_uint<kNBitData> NEntryT;
   
 protected:
   enum BitWidths {
@@ -95,7 +98,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
     // TODO: check if valid
-    return dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+index];
+    return dataarray_[ibx][(1<<(kNBitDataAddr))*slot+index];
   }
 
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data)
@@ -106,9 +109,9 @@ public:
 
 	NEntryT nentry_ibx = nentries_[ibx][slot];
 
-	if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))) {
-	  // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
-	  dataarray_[ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+nentry_ibx] = data;
+	if (nentry_ibx < (1<<(kNBitDataAddr))) {
+	  // write address for slot: 1<<(kNBitDataAddr) * slot + nentry_ibx
+	  dataarray_[ibx][(1<<(kNBitDataAddr))*slot+nentry_ibx] = data;
 	  nentries_[ibx][slot] = nentry_ibx + 1;
 	  return true;
 	}
@@ -171,7 +174,7 @@ public:
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
       for (int i = 0; i < nentries_[bx][slot]; ++i) {
 		std::cout << bx << " " << i << " ";
-		print_entry(bx, i + slot*(1<<(NBIT_ADDR-NBIT_BIN)) );
+		print_entry(bx, i + slot*(1<<(kNBitDataAddr)) );
       }
     }
   }
