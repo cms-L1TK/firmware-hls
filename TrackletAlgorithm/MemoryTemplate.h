@@ -15,13 +15,15 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 class MemoryTemplate
 {
 public:
+  static constexpr unsigned int kNBitAddr = NBIT_ADDR;
+  static constexpr unsigned int kNBitData = kNBitAddr+1;
   typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
-  typedef ap_uint<NBIT_ADDR+1> NEntryT;
+  typedef ap_uint<kNBitData> NEntryT;
   
 protected:
 
-  DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
+  DataType dataarray_[1<<NBIT_BX][1<<kNBitAddr];  // data array
   NEntryT nentries_[1<<NBIT_BX];                  // number of entries
   
 public:
@@ -49,7 +51,7 @@ public:
     nentries_[bx] = 0;
   }
 
-  unsigned int getDepth() const {return (1<<NBIT_ADDR);}
+  unsigned int getDepth() const {return (1<<kNBitAddr);}
   unsigned int getNBX() const {return (1<<NBIT_BX);}
 
   NEntryT getEntries(BunchXingT bx) const {
@@ -57,7 +59,7 @@ public:
 	return nentries_[bx];
   }
 
-  const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
+  const DataType (&get_mem() const)[1<<NBIT_BX][1<<kNBitAddr] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
@@ -84,7 +86,7 @@ public:
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-    if (addr_index < (1<<NBIT_ADDR)) {
+    if (addr_index < (1<<kNBitAddr)) {
       dataarray_[ibx][addr_index] = data;
       nentries_[ibx] = addr_index + 1;
       return true;
