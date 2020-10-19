@@ -262,11 +262,16 @@ void MatchCalculator(BXType bx,
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
+  const auto LUT_matchcut_phi_width = 17;
+  const auto LUT_matchcut_phi_depth = 12;
+  const auto LUT_matchcut_z_width = 13;
+  const auto LUT_matchcut_z_depth = 12;
+
   // Setup look up tables for match cuts
-  ap_uint<17> LUT_matchcut_phi[12];
-  readTable_Cuts<true,LAYER,17,12>(LUT_matchcut_phi);
-  ap_uint<13> LUT_matchcut_z[12];
-  readTable_Cuts<false,LAYER,13,12>(LUT_matchcut_z);
+  ap_uint<LUT_matchcut_phi_width> LUT_matchcut_phi[LUT_matchcut_phi_depth];
+  readTable_Cuts<true,LAYER,LUT_matchcut_phi_width,LUT_matchcut_phi_depth>(LUT_matchcut_phi);
+  ap_uint<LUT_matchcut_z_width> LUT_matchcut_z[LUT_matchcut_z_depth];
+  readTable_Cuts<false,LAYER,LUT_matchcut_z_width,LUT_matchcut_z_depth>(LUT_matchcut_z);
 
   // Initialize MC delta phi cut variables
   ap_uint<17> best_delta_phi;
@@ -283,9 +288,8 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> ncm6 = 0;
   ap_uint<kNBits_MemAddr> ncm7 = 0;
   ap_uint<kNBits_MemAddr> ncm8 = 0;
-  ap_uint<7> maximum = kMaxProc;
-  ap_uint<14> total  = 0;
-  ap_uint<7> ncm = 0;
+  ap_uint<kNBits_MemAddr+1> total  = 0;
+  ap_uint<kNBits_MemAddr> ncm = 0;
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
@@ -413,7 +417,7 @@ void MatchCalculator(BXType bx,
 
     // Count up total number of CMs *and protect incase of overflow)
     total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
-    ncm    = (total > maximum)? maximum : total.range(7,0);
+    ncm    = (total > kMaxProc)? kMaxProc : total.range(7,0);
 
     // pipeline variables
     bool read_L1_1_next = false;

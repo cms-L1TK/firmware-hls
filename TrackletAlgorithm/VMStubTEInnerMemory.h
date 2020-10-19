@@ -14,6 +14,10 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
     kVMSTEIZBitsSize = 10,
+    kVMSTEIZDiffMaxSize = 3, // [9:7] of ZBits
+    kVMSTEIZBinStartSize = 3, // [6:4] of ZBits
+    kVMSTEIZBinDiffSize = 1, // [3:3] of ZBits
+    kVMSTEIZBinFirstSize = 3, // [2:0] of ZBits
     kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 3,
     kVMSTEIIDSize = 7,
@@ -29,6 +33,10 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
     kVMSTEIZBitsSize = 10,
+    kVMSTEIZDiffMaxSize = 3, // [9:7] of ZBits
+    kVMSTEIZBinStartSize = 3, // [6:4] of ZBits
+    kVMSTEIZBinDiffSize = 1, // [3:3] of ZBits
+    kVMSTEIZBinFirstSize = 3, // [2:0] of ZBits
     kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 4,
     kVMSTEIIDSize = 7,
@@ -44,6 +52,10 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
     kVMSTEIZBitsSize = 10,
+    kVMSTEIZDiffMaxSize = 3, // [9:7] of ZBits
+    kVMSTEIZBinStartSize = 3, // [6:4] of ZBits
+    kVMSTEIZBinDiffSize = 1, // [3:3] of ZBits
+    kVMSTEIZBinFirstSize = 3, // [2:0] of ZBits
     kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 3,
     kVMSTEIIDSize = 7,
@@ -59,6 +71,10 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubTEInnerMemory fields
     kVMSTEIZBitsSize = 10,
+    kVMSTEIZDiffMaxSize = 3, // [9:7] of ZBits
+    kVMSTEIZBinStartSize = 3, // [6:4] of ZBits
+    kVMSTEIZBinDiffSize = 1, // [3:3] of ZBits
+    kVMSTEIZBinFirstSize = 3, // [2:0] of ZBits
     kVMSTEIFinePhiSize = 2,
     kVMSTEIBendSize = 3,
     kVMSTEIIDSize = 7,
@@ -81,13 +97,26 @@ public:
     kVMSTEIBendLSB = kVMSTEIFinePhiMSB + 1,
     kVMSTEIBendMSB = kVMSTEIBendLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIBendSize - 1,
     kVMSTEIIDLSB = kVMSTEIBendMSB + 1,
-    kVMSTEIIDMSB = kVMSTEIIDLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIIDSize - 1
-  };
+    kVMSTEIIDMSB = kVMSTEIIDLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIIDSize - 1,
 
+    // LSB and MSB for subfields of ZBits
+    kVMSTEIZBinFirstLSB = kVMSTEIZBitsLSB,
+    kVMSTEIZBinFirstMSB = kVMSTEIZBinFirstLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBinFirstSize - 1,
+    kVMSTEIZBinDiffLSB = kVMSTEIZBinFirstMSB + 1,
+    kVMSTEIZBinDiffMSB = kVMSTEIZBinDiffLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBinDiffSize - 1,
+    kVMSTEIZBinStartLSB = kVMSTEIZBinDiffMSB + 1,
+    kVMSTEIZBinStartMSB = kVMSTEIZBinStartLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBinStartSize - 1,
+    kVMSTEIZDiffMaxLSB = kVMSTEIZBinStartMSB + 1,
+    kVMSTEIZDiffMaxMSB = kVMSTEIZDiffMaxLSB + VMStubTEInnerBase<VMSTEIType>::kVMSTEIZDiffMaxSize - 1
+  };
   typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIIDSize> VMSTEIID;
   typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIBendSize> VMSTEIBEND;
   typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIFinePhiSize> VMSTEIFINEPHI;
   typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBitsSize> VMSTEIZBITS;
+  typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIZDiffMaxSize> VMSTEIZDIFFMAX;
+  typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBinStartSize> VMSTEIZBINSTART;
+  typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBinDiffSize> VMSTEIZBINDIFF;
+  typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMSTEIZBinFirstSize> VMSTEIZBINFIRST;
 
   typedef ap_uint<VMStubTEInnerBase<VMSTEIType>::kVMStubTEInnerSize> VMStubTEInnerData;
 
@@ -131,6 +160,22 @@ public:
 
   VMSTEIZBITS getZBits() const {
     return data_.range(kVMSTEIZBitsMSB,kVMSTEIZBitsLSB);
+  }
+
+  VMSTEIZDIFFMAX getZDiffMax() const {
+    return data_.range(kVMSTEIZDiffMaxMSB,kVMSTEIZDiffMaxLSB);
+  }
+
+  VMSTEIZBINSTART getZBinStart() const {
+    return data_.range(kVMSTEIZBinStartMSB,kVMSTEIZBinStartLSB);
+  }
+
+  VMSTEIZBINDIFF getZBinDiff() const {
+    return data_.range(kVMSTEIZBinDiffMSB,kVMSTEIZBinDiffLSB);
+  }
+
+  VMSTEIZBINFIRST getZBinFirst() const {
+    return data_.range(kVMSTEIZBinFirstMSB,kVMSTEIZBinFirstLSB);
   }
 
   // Setter

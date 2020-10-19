@@ -76,8 +76,8 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 #endif
 
 	// Main processing loops starts here.
-        // Seven iterations are subtracted so that the total latency is 108 clock
-        // cycles. Pipeline rewinding does not currently work.
+	// Seven iterations are subtracted so that the total latency is 108 clock
+	// cycles. Pipeline rewinding does not currently work.
 	STEP_LOOP: for (ap_uint<kNBits_MemAddr> istep=0; istep<kMaxProc - kMaxProcOffset(module::ME); istep++) {
 		#pragma HLS PIPELINE II=1
 		#pragma HLS DEPENDENCE variable=tail_readindex inter false
@@ -170,11 +170,12 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 
 			// Calculate fine z position
 			ap_int<VMProjectionBase<PROJECTIONTYPE>::kVMProjFineZSize+1> projfinezadj = projfinez;
-			if (second) projfinezadj = projfinezadj - 8;
+			if (second) projfinezadj = projfinezadj - kZAdjustment;
 			ap_int<VMProjectionBase<PROJECTIONTYPE>::kVMProjFineZSize+1> idz          = stubfinez - projfinezadj;
 
 			// Check if stub z position consistent
-			bool pass = (isPSseed) ? (idz >= -2 && idz <= 2) : (idz >= -5 && idz <= 5);
+			bool pass = (isPSseed) ? (idz >= ME::StubZPositionBarrelConsistency::kPSMin && idz <= ME::StubZPositionBarrelConsistency::kPSMax)
+								   : (idz >= ME::StubZPositionBarrelConsistency::k2SMin && idz <= ME::StubZPositionBarrelConsistency::k2SMax);
 
 			// Check if stub bend and proj rinv consistent
 #ifdef DEBUG

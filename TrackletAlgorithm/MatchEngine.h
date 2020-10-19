@@ -73,23 +73,30 @@
 #define LSIZE RINVSTEPS*(1<<VMStubME<MODULETYPE>::kVMSMEBendSize)
 #define BUFFERSIZE 8
 constexpr unsigned int kNBits_BufferAddr=BITS_TO_REPRESENT(BUFFERSIZE-1);
-constexpr int kBufferDataSize = 5												// number of bits for stubs array size (size of NEntryT in MemoryTemplateBinned.h)
+constexpr int kBufferDataSize = VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitData   // number of bits for stubs array size
 							  + VMProjection<PROJECTIONTYPE>::kVMProjectionSize	// projection data size
 							  + MEBinsBits										// number of bits for index of z-bin
 							  + 1;												// z-bin flag (0 => first bin, 1 => second bin)
 namespace ME {
 	enum BitLocations {
-	    // The location of the least significant bit (LSB) and most significant bit (MSB) in the ME buffer word for different fields
-	    kVMMESecondLSB = 0,
-	    kVMMESecondMSB = 0,
-	    kVMMEZBinLSB = kVMMESecondMSB + 1,
-	    kVMMEZBinMSB = kVMMEZBinLSB + MEBinsBits - 1,
-	    kVMMEProjectionLSB = kVMMEZBinMSB + 1,
-	    kVMMEProjectionMSB = kVMMEProjectionLSB + VMProjection<PROJECTIONTYPE>::kVMProjectionSize - 1,
-   	    kVMMENStubsLSB = kVMMEProjectionMSB + 1,
-	    kVMMENStubsMSB = kVMMENStubsLSB + 5 - 1
+		// The location of the least significant bit (LSB) and most significant bit (MSB) in the ME buffer word for different fields
+		kVMMESecondLSB = 0,
+		kVMMESecondMSB = 0,
+		kVMMEZBinLSB = kVMMESecondMSB + 1,
+		kVMMEZBinMSB = kVMMEZBinLSB + MEBinsBits - 1,
+		kVMMEProjectionLSB = kVMMEZBinMSB + 1,
+		kVMMEProjectionMSB = kVMMEProjectionLSB + VMProjection<PROJECTIONTYPE>::kVMProjectionSize - 1,
+		kVMMENStubsLSB = kVMMEProjectionMSB + 1,
+		kVMMENStubsMSB = kVMMENStubsLSB + VMStubMEMemory<MODULETYPE,NBITBIN>::kNBitData - 1
+	};
+	enum StubZPositionBarrelConsistency {
+		kPSMin = -2,
+		kPSMax = 2,
+		k2SMin = -5,
+		k2SMax = 5
 	};
 }
+constexpr unsigned int kZAdjustment = 8;
 
 /////////////////////////////
 // -- MATCH ENGINE FUNCTIONS
