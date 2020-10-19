@@ -16,7 +16,11 @@ void ProjectionRouterTop(BXType bx,
  #pragma HLS resource variable=projin[5]->get_mem() latency=2
  #pragma HLS resource variable=projin[6]->get_mem() latency=2
  #pragma HLS resource variable=projin[7]->get_mem() latency=2
-  // PR_L3PHIC
- PR_L3PHIC: ProjectionRouter<BARRELPS, BARREL, 8, 8, 3, 0>
+ // Constants specific to PR_L3PHIC
+ constexpr unsigned int nInMem = 8;
+ constexpr unsigned int nOutMem = 8;
+ constexpr int layer = 3;
+ constexpr int disk = 0;
+ PR_L3PHIC: ProjectionRouter<BARRELPS, BARREL, nInMem, nOutMem, layer, disk>
     (bx, projin, bx_o, allprojout, vmprojout);
 }
