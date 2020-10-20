@@ -241,7 +241,7 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 	ap_uint<nbitszfinebintable + nbitsrfinebintable> finebinindex = (indexz * rbins) + indexr;
 
 	// Get the corrected r/z position
-	ap_uint<6> rzcorr = finebintable[finebinindex];
+	const auto rzcorr = finebintable[finebinindex];
 
 	// Coarse z. The bin the stub is going to be put in, in the memory
 	bin = rzcorr >> 3; // 3 bits, i.e. max 8 bins within each VM
