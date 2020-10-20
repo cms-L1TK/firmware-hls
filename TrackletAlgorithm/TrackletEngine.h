@@ -204,14 +204,14 @@ void TrackletEngine(
 		  const ap_uint<1> z_tmp = (zbin>=zbinfirst) && (zbin-zbinfirst<=zdiffmax);
 
           	  // pT cut
-          	  auto const ptindex1=innerstubfinephi.concat(outerstubfinephi);
+          	  auto const ptindex1=innerstubfinephi.concat(outerstubfinephi).get();
           	  auto const ptindex2=ptindex1;
 
           	  // inner stub bend consistency
-          	  auto const bendinnerindex=ptindex1.concat(innerstubbend);
+          	  auto const bendinnerindex=ptindex1.concat(innerstubbend).get();
           	  auto const bi_tmp = bendinnertable[bendinnerindex];
 
-          	  auto const bendouterindex=ptindex2.concat(outerstubbend);
+          	  auto const bendouterindex=ptindex2.concat(outerstubbend).get();
           	  auto const bo_tmp = bendoutertable[bendouterindex];
 
           	  const ap_uint<1> ifskip = (!z_tmp) || (!bi_tmp) || (!bo_tmp);
