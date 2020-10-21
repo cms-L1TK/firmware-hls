@@ -169,10 +169,14 @@ void ProjectionRouter(BXType bx,
         typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
         //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
-        // we shift right by (nfinebits-1) instead of nfinebits because we need to keep 1 extra MSB in case zbin1 is different from the 3 MSBs of zproj,
-        // which can happen because zbin1 is adjusted by zbins_adjust
         auto nfinebits = VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize;
         ap_uint<VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize-1> zeropad(0);
+        // The finez calculation has three parts
+        // 1: +(1<<(MEBinsBits+(nfinebits-1)-1)) - converts the top MEBinsBits+(nfinebits-1) of the word to positive
+        // 2: +(izproj.range(...,...)            - gets the top MEBinsBits+(nfinebits-1) of izproj
+        // 3: -(zbin1,zeropad)                   - subtracts zbin1, left-shifted by kVMProjFineZSize-1, off of finez, so that the finez is relative to zbin1
+        // N.B. We use (nfinebits-1) instead of nfinebits throughout the calculation because we need to keep 1 extra MSB in case zbin1 is different
+        // from the 3 MSBs of zproj, which can happen because zbin1 is adjusted by zbins_adjust
         typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(MEBinsBits+(nfinebits-1)-1))+(izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-(nfinebits-1)))-(zbin1,zeropad);
 
         // vmproj irinv
