@@ -35,6 +35,7 @@ stages: # ---------------------------------------------------------------------
 .job_template: &template_hls-build
   <<: *template_base
   stage: hls-build
+  when: always
   script:
     - cd project
     - pwd; ls -la; # Debug
