@@ -68,7 +68,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
        memory.write_mem(ievt, line, base);
       } else {
 	const std::string datastr = split(line, ' ').back();
-        memory.write_mem(ievt, datastr, base);
+	memory.write_mem(ievt, datastr, base);
       }
     }	
   }
@@ -78,7 +78,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
-                                bool truncated = false, int maxProc = kMaxProc)
+                                bool& truncated = false, int maxProc = kMaxProc)
 {
   unsigned int err_count = 0;
 
@@ -119,6 +119,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
       std::cout << "\t" << "<=== INCONSISTENT";
       err_count++;
     }
+
     std::cout << std::endl;
   }
   
@@ -173,6 +174,7 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
         std::cout << "\t" << "<=== INCONSISTENT";
         err_count++;
       }
+
       std::cout << std::endl;
     } // loop over entries in bin
   } // loop over bins

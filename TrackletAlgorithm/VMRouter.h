@@ -561,7 +561,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 	// Create variables that keep track of which memory address to read and write to
 
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	
+
 	int addrCountME[nvmme][nmaxbinsperpage]; // Writing of ME stubs
 	if (memask) {
 		#pragma HLS array_partition variable=addrCountME complete dim=0
@@ -608,7 +608,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 			#pragma HLS UNROLL
 			for (int j = 0; j < MaxOLCopies; j++) {
 				#pragma HLS UNROLL
-					addrCountOL[i][j] = 0;
+				addrCountOL[i][j] = 0;
 			}
 		}
 }

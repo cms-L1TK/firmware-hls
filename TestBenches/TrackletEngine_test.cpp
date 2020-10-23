@@ -68,8 +68,8 @@ int main(){
   fin_vmstubsinner.close();
   fin_vmstubsouter.close();
   fin_stubpairs.close();
-
+  
   // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
-  if (err_count > 255) err_count = 255;  
+  if (err_count > 255) err_count = 255;
   return err_count;
 }

@@ -165,6 +165,7 @@ int main()
       (vmprojarray[7], fout_vmproj8, ievt, "VMProjection8", truncation);
     
   } // end of event loop
+  
   // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
   if (err > 255) err = 255;
   return err;

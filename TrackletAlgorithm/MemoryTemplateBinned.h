@@ -79,7 +79,7 @@ public:
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
-
+  
   MemoryTemplateBinned()
   {
         clear();
