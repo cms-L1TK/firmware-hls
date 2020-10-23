@@ -31,15 +31,15 @@ public:
 
   NEntryT getEntries(BunchXingT bx) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-       return nentries_[bx];
+	return nentries_[bx];
   }
 
   const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
-       // TODO: check if valid
-       return dataarray_[ibx][index];
+	// TODO: check if valid
+	return dataarray_[ibx][index];
   }
 
   template<class SpecType>
@@ -89,18 +89,18 @@ public:
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
   {
-     DataType data(datastr, base);
-     int nent = nentries_[ibx]; 
-     bool success = write_mem(ibx, data, nent);
-     if (success) nentries_[ibx] ++;
+	DataType data(datastr, base);
+	int nent = nentries_[ibx]; 
+	bool success = write_mem(ibx, data, nent);
+	if (success) nentries_[ibx] ++;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
   {
-    DataType data(datastr.c_str(), base);
-    int nent = nentries_[ibx];
-    bool success = write_mem(ibx, data, nent);
-    if (success) nentries_[ibx] ++;
+	DataType data(datastr.c_str(), base);
+	int nent = nentries_[ibx];
+	bool success = write_mem(ibx, data, nent);
+	if (success) nentries_[ibx] ++;
   }
 
   // print memory contents
@@ -117,25 +117,26 @@ public:
 
   void print_mem(BunchXingT bx) const
   {
-       for (int i = 0; i <  nentries_[bx]; ++i) {
-         std::cout << bx << " " << i << " ";
-         print_entry(bx,i);
-       }
+	for (int i = 0; i <  nentries_[bx]; ++i) {
+	  std::cout << bx << " " << i << " ";
+	  print_entry(bx,i);
+	}
   }
 
   void print_mem() const
   {
-       for (int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
-         for (int i = 0; i < nentries_[ibx]; ++i) {
-               std::cout << ibx << " " << i << " ";
-               print_entry(ibx,i);
-         }
-       }
+	for (int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
+	  for (int i = 0; i < nentries_[ibx]; ++i) {
+		std::cout << ibx << " " << i << " ";
+		print_entry(ibx,i);
+	  }
+	}
   }
 
   static constexpr int getWidth() {return DataType::getWidth();}
   
 #endif
+  
 };
 
 #endif
