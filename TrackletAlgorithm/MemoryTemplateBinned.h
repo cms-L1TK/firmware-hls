@@ -126,6 +126,7 @@ public:
     int nent = nentries_[bx][slot];
     bool success = write_mem(bx, slot, data, nent);
     if (success) nentries_[bx][slot] ++;
+    return success;
   }
 
 

@@ -93,6 +93,7 @@ public:
 	int nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
 	if (success) nentries_[ibx] ++;
+        return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
@@ -101,6 +102,7 @@ public:
 	int nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);
 	if (success) nentries_[ibx] ++;
+        return success;
   }
 
   // print memory contents
