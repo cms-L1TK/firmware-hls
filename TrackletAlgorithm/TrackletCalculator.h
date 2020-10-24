@@ -567,15 +567,27 @@ TrackletCalculator(
 {
   static_assert(Seed == TF::L1L2 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L3L4, and L5L6 seeds have been implemented so far.");
 
-  int npar;
+  int npar = 0;
   int nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
   int nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
   int nproj_disk[TC::N_PROJOUT_DISK];
 #pragma HLS array_partition variable=nproj_barrel_ps complete
 #pragma HLS array_partition variable=nproj_barrel_2s complete
 #pragma HLS array_partition variable=nproj_disk complete
+  for (unsigned i = 0; i < TC::N_PROJOUT_BARRELPS; i++) {
+#pragma HLS unroll
+    nproj_barrel_ps[i] = 0;
+  }
+  for (unsigned i = 0; i < TC::N_PROJOUT_BARREL2S; i++) {
+#pragma HLS unroll
+    nproj_barrel_2s[i] = 0;
+  }
+  for (unsigned i = 0; i < TC::N_PROJOUT_DISK; i++) {
+#pragma HLS unroll
+    nproj_disk[i] = 0;
+  }
 
-  TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex;
+  TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0;
 
   const TrackletProjection<BARRELPS>::TProjTCID TCID = TC::ID<Seed, iTC>();
 
@@ -586,29 +598,20 @@ TrackletCalculator(
 // The first iteration is sacrificed to clearing the output memories and
 // zeroing the number of tracklets and projections. Therefore, only
 // kMaxProc - 1 iterations are actually used for processing stub pairs.
-    if (i == 0) {
-      npar = 0;
-      memset(nproj_barrel_ps, 0, sizeof(int) * TC::N_PROJOUT_BARRELPS);
-      memset(nproj_barrel_2s, 0, sizeof(int) * TC::N_PROJOUT_BARREL2S);
-      memset(nproj_disk, 0, sizeof(int) * TC::N_PROJOUT_DISK);
-      trackletIndex = 0;
-    }
-    else {
-      TC::Types::nSPMem iSPMem;
-      TC::Types::nSP iSP = i - 1;
-      bool done;
-      TC::getIndices<NSPMem>(bx, stubPairs, iSPMem, iSP, done);
+    TC::Types::nSPMem iSPMem;
+    TC::Types::nSP iSP = i - 1;
+    bool done;
+    TC::getIndices<NSPMem>(bx, stubPairs, iSPMem, iSP, done);
 
-      if (!done) {
+    if (!done) {
 // Retrieve the inner and outer stubs for this stub pair, determining which
 // all-stubs memory to use based on iSPMem:
-        const StubPair::SPInnerIndex innerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getInnerIndex();
-        const StubPair::SPOuterIndex outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
-        const AllStub<InnerRegion> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
-        const AllStub<OuterRegion> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
+      const StubPair::SPInnerIndex innerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getInnerIndex();
+      const StubPair::SPOuterIndex outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
+      const AllStub<InnerRegion> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
+      const AllStub<OuterRegion> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
 
-        TC::processStubPair<Seed, InnerRegion, OuterRegion, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
-      }
+      TC::processStubPair<Seed, InnerRegion, OuterRegion, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
   }
 }
