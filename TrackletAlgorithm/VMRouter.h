@@ -562,7 +562,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
 
-	int addrCountME[nvmme][nmaxbinsperpage]; // Writing of ME stubs
+	ap_uint<kNBits_MemAddr> addrCountME[nvmme][nmaxbinsperpage]; // Writing of ME stubs
 	if (memask) {
 		#pragma HLS array_partition variable=addrCountME complete dim=0
 		ADDR_ME:	for (int i = 0; i < nvmme; i++) {
@@ -574,7 +574,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		}
 	}
 
-	int addrCountTEI[nvmte][MaxTEICopies]; // Writing of TE Inner stubs
+	ap_uint<kNBits_MemAddr> addrCountTEI[nvmte][MaxTEICopies]; // Writing of TE Inner stubs
 	if (teimask) {
 		#pragma HLS array_partition variable=addrCountTEI complete dim=0
 		ADDR_TEI:	for (int i = 0; i < nvmte; i++) {
@@ -586,7 +586,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		}
 	}
 
-	int addrCountTEO[nvmte][MaxTEOCopies][nmaxbinsperpage]; // Writing of TE Outer stubs
+	ap_uint<kNBits_MemAddr> addrCountTEO[nvmte][MaxTEOCopies][nmaxbinsperpage]; // Writing of TE Outer stubs
 	if (teomask) {
 		#pragma HLS array_partition variable=addrCountTEO complete dim=0
 		ADDR_TEO:	for (int i = 0; i < nvmte; i++) {
@@ -601,7 +601,7 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		}
 	}
 
-	int addrCountOL[nvmol][MaxOLCopies]; // Writing of TE Overlap stubs
+	ap_uint<kNBits_MemAddr> addrCountOL[nvmol][MaxOLCopies]; // Writing of TE Overlap stubs
 	if (olmask) {
 	#pragma HLS array_partition variable=addrCountOL complete dim=0
 	ADDR_OL:	for (int i = 0; i < nvmol; i++) {
