@@ -77,7 +77,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	// Seven iterations are subtracted so that the total latency is 108 clock
 	// cycles. Pipeline rewinding does not currently work.
 	STEP_LOOP: for (ap_uint<kNBits_MemAddr> istep=0; istep<kMaxProc - kMaxProcOffset(module::ME); istep++) {
-		#pragma HLS PIPELINE II=1
+		#pragma HLS PIPELINE II=1 rewind
 		#pragma HLS DEPENDENCE variable=tail_readindex inter false
 
 		// Pre-fetch an element from the buffer
