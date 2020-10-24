@@ -78,7 +78,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
-                                const bool& truncated = false, int maxProc = kMaxProc)
+                                const bool truncated = false, int maxProc = kMaxProc)
 {
   unsigned int err_count = 0;
 
@@ -131,7 +131,7 @@ template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemWithFile(const MemType& memory, 
                                       std::ifstream& fout,
                                       int ievt, const std::string& label,
-                                      const bool& truncated = false, int maxProc = kMaxProc)
+                                      const bool truncated = false, int maxProc = kMaxProc)
 {
   unsigned int err_count = 0;
 
