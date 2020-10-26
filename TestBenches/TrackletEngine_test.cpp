@@ -46,6 +46,8 @@ int main(){
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+    outputstubpairs.clear();
+
     //read next event from the input files
     writeMemFromFile<VMStubTEInnerMemory<BARRELPS> >(inputvmstubsinner, fin_vmstubsinner,ievt);
     writeMemFromFile<VMStubTEOuterMemory<BARRELPS> >(inputvmstubsouter, fin_vmstubsouter,ievt);
@@ -67,5 +69,7 @@ int main(){
   fin_vmstubsouter.close();
   fin_stubpairs.close();
   
+  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  if (err_count > 255) err_count = 255;
   return err_count;
 }

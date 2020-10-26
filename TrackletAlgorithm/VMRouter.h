@@ -56,6 +56,8 @@ constexpr int nbitsrtabledisk = 8;
 // Number of MSBs used for r index in phicorr LUTs
 constexpr int nrbitsphicorrtable = 3; // Found hardcoded in VMRouterphicorrtable.h
 
+constexpr int nmaxbinsperpage = 16; // 8 bins/page in barrel, 16 in disks (may change in future)
+
 
 
 // Some functions
@@ -537,58 +539,6 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 	constexpr int nvmte = (Layer) ? nvmtelayers[Layer-1] : nvmtedisks[Disk-1]; // TE memories
 	constexpr int nvmol = ((Layer == 1) || (Layer == 2)) ? nvmteoverlaplayers[Layer-1] : 0; // TE Overlap memories
 
-
-	// Reset address counters in output memories
-	// Only clear if the masks says that memory is used
-	ALLSTUB_CLEAR:	for (int i = 0; i < MaxAllCopies; i++) {
-		#pragma HLS UNROLL
-		allStub[i].clear(bx);
-	}
-
-	if (memask) {
-		ME_CLEAR:	for (int i = 0; i < nvmme; i++) {
-			#pragma HLS UNROLL
-			if (memask[i + firstme]) meMemories[i].clear(bx);
-		}
-	}
-
-	if (teimask) {
-		TEI_CLEAR:	for (int i = 0; i < nvmte; i++) {
-			#pragma HLS UNROLL
-			if (teimask[i + firstte]) {
-				for (int j = 0; j < MaxTEICopies; j++) {
-					#pragma HLS UNROLL
-					teiMemories[i][j].clear(bx);
-				}
-			}
-		}
-	}
-
-	if (teomask) {
-		TEO_CLEAR:	for (int i = 0; i < nvmte; i++) {
-			#pragma HLS UNROLL
-			if (teomask[i + firstte]) {
-				for (int j = 0; j < MaxTEOCopies; j++) {
-					#pragma HLS UNROLL
-					teoMemories[i][j].clear(bx);
-				}
-			}
-		}
-	}
-
-	if (olmask) {
-	OL_CLEAR:	for (int i = 0; i < nvmol; i++) {
-			#pragma HLS UNROLL
-			if (olmask[i + firstol]) {
-				for (int j = 0; j < MaxOLCopies; j++) {
-					#pragma HLS UNROLL
-					olMemories[i][j].clear(bx);
-			}
-			}
-		}
-	}
-
-
 	// Number of data in each input memory
 
 	typename InputStubMemory<InType>::NEntryT ninputs[6]; // Array containing the number of inputs. Last two indices are for DISK2S
@@ -612,7 +562,19 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
 
-	int addrCountTEI[nvmte][MaxTEICopies]; // Writing of TE Inner stubs
+	ap_uint<kNBits_MemAddr> addrCountME[nvmme][nmaxbinsperpage]; // Writing of ME stubs
+	if (memask) {
+		#pragma HLS array_partition variable=addrCountME complete dim=0
+		ADDR_ME:	for (int i = 0; i < nvmme; i++) {
+			#pragma HLS UNROLL
+			for (int j = 0; j < nmaxbinsperpage; j++) {
+				#pragma HLS UNROLL
+					addrCountME[i][j]= 0;
+			}
+		}
+	}
+
+	ap_uint<kNBits_MemAddr> addrCountTEI[nvmte][MaxTEICopies]; // Writing of TE Inner stubs
 	if (teimask) {
 		#pragma HLS array_partition variable=addrCountTEI complete dim=0
 		ADDR_TEI:	for (int i = 0; i < nvmte; i++) {
@@ -624,7 +586,22 @@ void VMRouter(const BXType bx, const int finebintable[], const int phicorrtable[
 		}
 	}
 
-	int addrCountOL[nvmol][MaxOLCopies]; // Writing of TE Overlap stubs
+	ap_uint<kNBits_MemAddr> addrCountTEO[nvmte][MaxTEOCopies][nmaxbinsperpage]; // Writing of TE Outer stubs
+	if (teomask) {
+		#pragma HLS array_partition variable=addrCountTEO complete dim=0
+		ADDR_TEO:	for (int i = 0; i < nvmte; i++) {
+			#pragma HLS UNROLL
+			for (int j = 0; j < MaxTEOCopies; j++) {
+				#pragma HLS UNROLL
+				for (int k = 0; k < nmaxbinsperpage; k++) {
+					#pragma HLS UNROLL
+						addrCountTEO[i][j][k] = 0;
+				}
+			}
+		}
+	}
+
+	ap_uint<kNBits_MemAddr> addrCountOL[nvmol][MaxOLCopies]; // Writing of TE Overlap stubs
 	if (olmask) {
 	#pragma HLS array_partition variable=addrCountOL complete dim=0
 	ADDR_OL:	for (int i = 0; i < nvmol; i++) {
@@ -759,8 +736,10 @@ TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LA
 		for (int n = 0; n < 32; n++) {
 			#pragma HLS UNROLL
 			if (memask[n]) {
-					if ((ivmMinus == n) || (ivmPlus == n))
-						meMemories[n-firstme].write_mem(bx, bin, stubme);
+					if ((ivmMinus == n) || (ivmPlus == n)) {
+						meMemories[n-firstme].write_mem(bx, bin, stubme, addrCountME[n-firstme][bin]);
+						addrCountME[n-firstme][bin] += 1; // Count the memory addresses we have written to
+					}
 				}
 			}
 		} // End ME memories
@@ -841,7 +820,8 @@ TOPLEVEL: for (auto i = 0; i < kMaxProc - (Layer ? kMaxProcOffset(module::VMR_LA
 					#pragma HLS UNROLL
 					bool passbend = bendoutertable[bendindex][stubte.getBend()]; // Check if stub passes bend cut
 					if (passbend) {
-						teoMemories[memindex][n].write_mem(bx, bin, stubte);
+						teoMemories[memindex][n].write_mem(bx, bin, stubte, addrCountTEO[memindex][n][bin]);
+						addrCountTEO[memindex][n][bin] += 1; // Count the memory addresses we have written to
 					}
 					bendindex++; // Use next bendcut table for the next memory "copy"
 				}

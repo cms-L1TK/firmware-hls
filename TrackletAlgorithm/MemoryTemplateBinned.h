@@ -13,16 +13,15 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 		 unsigned int NBIT_BIN>
 // DataType: type of data object stored in the array
 // NBIT_BX: number of bits for BX;
-// (1<<NBIT_BIN): number of BXs the memory is keeping track of
+// (1<<NBIT_BX): number of BXs the memory is keeping track of
 // NBIT_ADDR: number of bits for memory address space per BX
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
 class MemoryTemplateBinned{
 public:
   static constexpr unsigned int kNBitDataAddr = NBIT_ADDR-NBIT_BIN;
-  static constexpr unsigned int kNBitData = kNBitDataAddr+1;
   typedef ap_uint<NBIT_BX> BunchXingT;
-  typedef ap_uint<kNBitData> NEntryT;
+  typedef ap_uint<kNBitDataAddr> NEntryT;
   
 protected:
   enum BitWidths {
@@ -36,83 +35,37 @@ protected:
   
 public:
 
-  MemoryTemplateBinned()
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	clear();
-  }
-  
-  ~MemoryTemplateBinned(){}
-  
-  void clear()
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS inline
-	
-	for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
-#pragma HLS UNROLL
-	  clear(ibx);
-	}
-  }
-
-  void clear(BunchXingT bx)
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS inline
-	
-	for (unsigned int ibin = 0; ibin < (kNSlots); ++ibin) {
-#pragma HLS UNROLL
-	  nentries_[bx][ibin] = 0;
-	}
-  }
-
   unsigned int getDepth() const {return kNMemDepth;}
   unsigned int getNBX() const {return kNBxBins;}
   unsigned int getNBins() const {return kNSlots;}
+  unsigned int getNEntryPerBin() const {return (1<<(kNBitDataAddr));}
 
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> ibin) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	return nentries_[bx][ibin];
   }
 
-  NEntryT getEntries(BunchXingT bx) const {
-    NEntryT val = 0;
-    for ( auto i = 0; i < getDepth(); ++i ) {
-      val += getEntries(bx, i);
-    }
-    return val;
-  }
-
-
   const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	// TODO: check if valid
-	return dataarray_[ibx][index];
+    // TODO: check if valid
+    return dataarray_[ibx][index];
   }
   
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot,
 		    ap_uint<NBIT_ADDR> index) const
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
     // TODO: check if valid
     return dataarray_[ibx][(1<<(kNBitDataAddr))*slot+index];
   }
 
-  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data)
+  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, int nentry_ibx)
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS dependence variable=nentries_ intra WAR true
 #pragma HLS inline
-
-	NEntryT nentry_ibx = nentries_[ibx][slot];
-
 	if (nentry_ibx < (1<<(kNBitDataAddr))) {
 	  // write address for slot: 1<<(kNBitDataAddr) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(kNBitDataAddr))*slot+nentry_ibx] = data;
-	  nentries_[ibx][slot] = nentry_ibx + 1;
 	  return true;
 	}
 	else {
@@ -127,6 +80,26 @@ public:
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
   
+  MemoryTemplateBinned()
+  {
+        clear();
+  }
+
+  ~MemoryTemplateBinned(){}
+
+  void clear()
+  {
+    DataType data("0",16);
+    for (size_t ibx=0; ibx<kNBxBins; ++ibx) {
+      for (size_t ibin=0; ibin<kNSlots; ++ibin) {
+        nentries_[ibx][ibin] = 0;
+        for (size_t addr=0; addr<(1<<(kNBitDataAddr)); ++addr) {
+          write_mem(ibx,ibin,data,addr);
+        }
+      }
+    }
+  }
+
   ///////////////////////////////////
   std::vector<std::string> split(const std::string& s, char delimiter)
   {
@@ -150,8 +123,10 @@ public:
     // Originally: atoi(split(line, ' ').front().c_str()); but that didn't work for disks with 16 bins
 
     DataType data(datastr.c_str(), base);
-    //std::cout << "write_mem slot data : " << slot<<" "<<data << std::endl;
-    return write_mem(bx, slot, data);
+    int nent = nentries_[bx][slot];
+    bool success = write_mem(bx, slot, data, nent);
+    if (success) nentries_[bx][slot] ++;
+    return success;
   }
 
 
@@ -170,13 +145,11 @@ public:
   void print_mem(BunchXingT bx) const
   {
 	for(int slot=0;slot<(kNSlots);slot++) {
-      //std::cout << "slot "<<slot<<" entries "
-      //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
-      for (int i = 0; i < nentries_[bx][slot]; ++i) {
+	  for (int i = 0; i < nentries_[bx][slot]; ++i) {
 		std::cout << bx << " " << i << " ";
 		print_entry(bx, i + slot*(1<<(kNBitDataAddr)) );
-      }
-    }
+ 	  }
+	}
   }
 
   void print_mem() const
