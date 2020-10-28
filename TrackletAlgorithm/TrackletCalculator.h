@@ -127,7 +127,7 @@ namespace TC {
 
   template<TF::seed Seed, TC::itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
-  template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], const bool success);
+  template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], ap_uint<kNBits_MemAddr> nproj[NProjOut], const bool success);
 
   template<uint8_t NSPMem> void
   getIndices(
@@ -151,10 +151,10 @@ namespace TC {
       TrackletProjectionMemory<BARRELPS> projout_barrel_ps[N_PROJOUT_BARRELPS],
       TrackletProjectionMemory<BARREL2S> projout_barrel_2s[N_PROJOUT_BARREL2S],
       TrackletProjectionMemory<DISK> projout_barrel_disk[N_PROJOUT_DISK],
-      int &npar,
-      int nproj_barrel_ps[N_PROJOUT_BARRELPS],
-      int nproj_barrel_2s[N_PROJOUT_BARREL2S],
-      int nproj_disk[N_PROJOUT_DISK]
+      ap_uint<kNBits_MemAddr> &npar,
+      ap_uint<kNBits_MemAddr> nproj_barrel_ps[N_PROJOUT_BARRELPS],
+      ap_uint<kNBits_MemAddr> nproj_barrel_2s[N_PROJOUT_BARREL2S],
+      ap_uint<kNBits_MemAddr> nproj_disk[N_PROJOUT_DISK]
   );
 }
 
@@ -364,7 +364,7 @@ TC::ID()
 
 // Writes a tracklet projection to the appropriate tracklet projection memory.
 template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
-TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], const bool success)
+TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], ap_uint<kNBits_MemAddr> nproj[NProjOut], const bool success)
 {
   bool proj_success = true;
 
@@ -449,10 +449,10 @@ TC::processStubPair(
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[N_PROJOUT_BARREL2S],
     TrackletProjectionMemory<DISK> projout_disk[N_PROJOUT_DISK],
-    int &npar,
-    int nproj_barrel_ps[N_PROJOUT_BARRELPS],
-    int nproj_barrel_2s[N_PROJOUT_BARREL2S],
-    int nproj_disk[N_PROJOUT_DISK]
+    ap_uint<kNBits_MemAddr> &npar,
+    ap_uint<kNBits_MemAddr> nproj_barrel_ps[N_PROJOUT_BARRELPS],
+    ap_uint<kNBits_MemAddr> nproj_barrel_2s[N_PROJOUT_BARREL2S],
+    ap_uint<kNBits_MemAddr> nproj_disk[N_PROJOUT_DISK]
 )
 {
   TC::Types::rinv rinv;
@@ -567,10 +567,10 @@ TrackletCalculator(
 {
   static_assert(Seed == TF::L1L2 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L3L4, and L5L6 seeds have been implemented so far.");
 
-  int npar = 0;
-  int nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
-  int nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
-  int nproj_disk[TC::N_PROJOUT_DISK];
+  ap_uint<kNBits_MemAddr> npar = 0;
+  ap_uint<kNBits_MemAddr> nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
+  ap_uint<kNBits_MemAddr> nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
+  ap_uint<kNBits_MemAddr> nproj_disk[TC::N_PROJOUT_DISK];
 #pragma HLS array_partition variable=nproj_barrel_ps complete
 #pragma HLS array_partition variable=nproj_barrel_2s complete
 #pragma HLS array_partition variable=nproj_disk complete

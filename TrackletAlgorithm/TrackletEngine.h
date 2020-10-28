@@ -49,7 +49,7 @@ void TrackletEngine(
 		    StubPairMemory& outstubpair) {
 
 #pragma HLS inline
-  int nstubpairs = 0;
+  ap_uint<kNBits_MemAddr> nstubpairs = 0;
 #pragma HLS dependence variable=nstubpairs intra WAR true
 
   //

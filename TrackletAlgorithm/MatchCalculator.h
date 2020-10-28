@@ -392,14 +392,14 @@ void MatchCalculator(BXType bx,
   //-------------------------------- DATA PROCESSING STARTS ---------------------------------------------------
   //-----------------------------------------------------------------------------------------------------------
   // declare counters for each of the 8 output VMProj // !!!
-  int nmcout1 = 0;
-  int nmcout2 = 0;
-  int nmcout3 = 0;
-  int nmcout4 = 0;
-  int nmcout5 = 0;
-  int nmcout6 = 0;
-  int nmcout7 = 0;
-  int nmcout8 = 0;  
+  ap_uint<kNBits_MemAddr> nmcout1 = 0;
+  ap_uint<kNBits_MemAddr> nmcout2 = 0;
+  ap_uint<kNBits_MemAddr> nmcout3 = 0;
+  ap_uint<kNBits_MemAddr> nmcout4 = 0;
+  ap_uint<kNBits_MemAddr> nmcout5 = 0;
+  ap_uint<kNBits_MemAddr> nmcout6 = 0;
+  ap_uint<kNBits_MemAddr> nmcout7 = 0;
+  ap_uint<kNBits_MemAddr> nmcout8 = 0;  
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
 
