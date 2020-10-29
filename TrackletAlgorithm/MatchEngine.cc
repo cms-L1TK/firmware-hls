@@ -60,7 +60,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	typename VMProjection<VMPMEType>::VMPFINEZ projfinez;
 	typename VMProjection<VMPMEType>::VMPRINV projrinv;
 	ap_uint<MEBinsBits> zbin = 0;
-	int ncmatch = 0;
+	ap_uint<kNBits_MemAddr> ncmatch = 0;
 	bool isPSseed;
 	bool second;
 
