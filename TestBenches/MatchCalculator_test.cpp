@@ -75,7 +75,7 @@ int main() {
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
-    cout << "Event: " << dec << ievt << endl;
+    //cout << "Event: " << dec << ievt << endl;
 
     fullmatch[0].clear();
 //    fullmatch[1].clear();
