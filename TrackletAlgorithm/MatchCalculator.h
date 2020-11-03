@@ -229,6 +229,7 @@ namespace MC {
   enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
 template<TF::layer Layer, MC::itc PHI> constexpr uint16_t FMMask();
+template<TF::layer, MC::itc, TF::seed> constexpr bool FMMask();
 #include "MatchCalculator_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1, MC::itc PHISEC=MC::A>
@@ -316,24 +317,6 @@ void MatchCalculator(BXType bx,
   bool read7 = false;
   bool read8 = false;
 
-  static const uint8_t shift_L1L2 = 0;
-  static const uint8_t shift_L2L3 = shift_L1L2 + 1;
-  static const uint8_t shift_L3L4 = shift_L2L3 + 1;
-  static const uint8_t shift_L5L6 = shift_L3L4 + 1;
-  static const uint8_t shift_D1D2 = shift_L5L6 + 1;
-  static const uint8_t shift_D3D4 = shift_D1D2 + 1;
-  static const uint8_t shift_L1D1 = shift_D3D4 + 1;
-  static const uint8_t shift_L2D1 = shift_L1D1 + 1;
-
-  static const uint16_t mask_L1L2 = 1 << shift_L1L2;
-  static const uint16_t mask_L2L3 = 1 << shift_L2L3;
-  static const uint16_t mask_L3L4 = 1 << shift_L3L4;
-  static const uint16_t mask_L5L6 = 1 << shift_L5L6;
-  static const uint16_t mask_D1D2 = 1 << shift_D1D2;
-  static const uint16_t mask_D3D4 = 1 << shift_D3D4;
-  static const uint16_t mask_L1D1 = 1 << shift_L1D1;
-  static const uint16_t mask_L2D1 = 1 << shift_L2D1;
- 
   // MC_L3PHIC mask {1: on, 0: off}
   //static const uint16_t FML1L2 = 1 << shift_L1L2;
   //static const uint16_t FML2L3 = 0 << shift_L2L3;
@@ -830,54 +813,54 @@ void MatchCalculator(BXType bx,
 
     if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
-      case 0:
-      if(FMMask<LAYER, PHISEC>() & mask_L1L2) { //projseed 0-7 equivalent to shift
-      fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-      nmcout1++;
-      }
-      break;
-      case 1:
-      if(FMMask<LAYER, PHISEC>() & mask_L2L3) {
-      fullmatch[1].write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L2L3 seed
-      nmcout2++;
-      }
-      break;
-      case 2:
-      if(FMMask<LAYER, PHISEC>() & mask_L3L4) {
-      fullmatch[2].write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L3L4 seed
-      nmcout3++;
-      }
-      break;
-      case 3:
-      if(FMMask<LAYER, PHISEC>() & mask_L5L6) {
-      fullmatch[3].write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // L5L6 seed
-      nmcout4++;
-      }
-      break;
-      case 4:
-      if(FMMask<LAYER, PHISEC>() & mask_D1D2) {
-      fullmatch[4].write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D1D2 seed
-      nmcout5++;
-      }
-      break;
-      case 5:
-      if(FMMask<LAYER, PHISEC>() & mask_D3D4) {
-      fullmatch[5].write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // D3D4 seed
-      nmcout6++;
-      }
-      break;
-      case 6:
-      if(FMMask<LAYER, PHISEC>() & mask_L1D1) {
-      fullmatch[6].write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L1D1 seed
-      nmcout7++;
-      }
-      break;
-      case 7:
-      if(FMMask<LAYER, PHISEC>() & mask_L2D1) {
-      fullmatch[7].write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
-      nmcout8++;
-      }
-      break;
+        case 0:
+        if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
+          fullmatch[0].write_mem(bx,bestmatch,nmcout1); // L1L2 seed
+          nmcout1++;
+        }
+        break;
+        case 1:
+        if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
+          fullmatch[1].write_mem(bx,bestmatch,nmcout2); // L2L3 seed
+          nmcout2++;
+        }
+        break;
+        case 2:
+        if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
+          fullmatch[2].write_mem(bx,bestmatch,nmcout3); // L3L4 seed
+          nmcout3++;
+        }
+        break;
+        case 3:
+        if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
+          fullmatch[3].write_mem(bx,bestmatch,nmcout4); // L5L6 seed
+          nmcout4++;
+        }
+        break;
+        case 4:
+        if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
+          fullmatch[4].write_mem(bx,bestmatch,nmcout5); // D1D2 seed
+          nmcout5++;
+        }
+        break;
+        case 5:
+        if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
+          fullmatch[5].write_mem(bx,bestmatch,nmcout6); // D3D4 seed
+          nmcout6++;
+        }
+        break;
+        case 6:
+        if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
+          fullmatch[6].write_mem(bx,bestmatch,nmcout7); // L1D1 seed
+          nmcout7++;
+        }
+        break;
+        case 7:
+        if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
+          fullmatch[7].write_mem(bx,bestmatch,nmcout8); // L2D1 seed
+          nmcout8++;
+        }
+        break;
       }
     }
 
