@@ -4,28 +4,18 @@
 // magic numbers for MC L3PHIC
 // shift and mask values shouldn't depend on layer/disk and phi sector
 
-// define shifts
-static const uint8_t shift_L1L2 = 0;
-static const uint8_t shift_L2L3 = shift_L1L2 + 1;
-static const uint8_t shift_L3L4 = shift_L2L3 + 1;
-static const uint8_t shift_L5L6 = shift_L3L4 + 1;
-static const uint8_t shift_D1D2 = shift_L5L6 + 1;
-static const uint8_t shift_D3D4 = shift_D1D2 + 1;
-static const uint8_t shift_L1D1 = shift_D3D4 + 1;
-static const uint8_t shift_L2D1 = shift_L1D1 + 1;
-
 // define masks
-static const uint16_t mask_L1L2 = 1 << shift_L1L2;
-static const uint16_t mask_L2L3 = 1 << shift_L2L3;
-static const uint16_t mask_L3L4 = 1 << shift_L3L4;
-static const uint16_t mask_L5L6 = 1 << shift_L5L6;
-static const uint16_t mask_D1D2 = 1 << shift_D1D2;
-static const uint16_t mask_D3D4 = 1 << shift_D3D4;
-static const uint16_t mask_L1D1 = 1 << shift_L1D1;
-static const uint16_t mask_L2D1 = 1 << shift_L2D1;
+static const auto mask_L1L2 = 1 << TF::L1L2;
+static const auto mask_L2L3 = 1 << TF::L2L3;
+static const auto mask_L3L4 = 1 << TF::L3L4;
+static const auto mask_L5L6 = 1 << TF::L5L6;
+static const auto mask_D1D2 = 1 << TF::D1D2;
+static const auto mask_D3D4 = 1 << TF::D3D4;
+static const auto mask_L1D1 = 1 << TF::L1D1;
+static const auto mask_L2D1 = 1 << TF::L2D1;
  
 // masking out all but L1L2 and L5L6 seeding
-template<> constexpr uint16_t FMMask<TF::L3, MC::C>() {
+template<TF::layer Layer, MC::imc PHI> constexpr uint16_t FMMask() {
   return 0b00001001;
 }
 

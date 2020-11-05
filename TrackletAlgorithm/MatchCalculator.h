@@ -148,32 +148,32 @@ ap_uint<width> iabs( ap_int<width> value )
 template<bool phi, TF::layer L, int width, int depth>
 void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
-    if (L==0){
+    if (L==TF::L1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==1){
+    else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==2){
+    else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==3){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==4){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==5){
+    else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
@@ -183,32 +183,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
   } // end phi cuts
   else { // z cuts
-    if (L==0){
+    if (L==TF::L1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==1){
+    else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==2){
+    else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==3){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==4){
+    else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==5){
+    else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
@@ -226,13 +226,12 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 
 // MatchCalculator
 namespace MC {
-  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
+  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
-template<TF::layer Layer, MC::itc PHI> constexpr uint16_t FMMask();
-template<TF::layer, MC::itc, TF::seed> constexpr bool FMMask();
+template<TF::layer, MC::imc, TF::seed> constexpr bool FMMask();
 #include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1, MC::itc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
