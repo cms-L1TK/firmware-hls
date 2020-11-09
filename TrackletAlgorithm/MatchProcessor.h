@@ -835,7 +835,6 @@ void MatchProcessor(BXType bx,
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
 #pragma HLS dependence variable=istub inter false 
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
-//#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
   MEINIT_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
 #pragma HLS unroll
     matchengine[iphi].init(bx, writeindex[iphi], iphi);
@@ -848,6 +847,12 @@ void MatchProcessor(BXType bx,
   ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS loop_flatten
    bool ready=false;
+   const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
+   MEU_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
+#pragma HLS unroll
+     if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi], projbuffer[iphi])) { ivmphi=iphi; ready=true; }
+   }
+   /*
    if(!matchengine[0].done() && !ready) if(matchengine[0].step(table, instubdata1, projbuffer[0])) { ivmphi=0; ready=true; }
    if(!matchengine[1].done() && !ready) if(matchengine[1].step(table, instubdata2, projbuffer[1])) { ivmphi=1; ready=true; }
    if(!matchengine[2].done() && !ready) if(matchengine[2].step(table, instubdata3, projbuffer[2])) { ivmphi=2; ready=true; }
@@ -856,6 +861,7 @@ void MatchProcessor(BXType bx,
    if(!matchengine[5].done() && !ready) if(matchengine[5].step(table, instubdata6, projbuffer[5])) { ivmphi=5; ready=true; }
    if(!matchengine[6].done() && !ready) if(matchengine[6].step(table, instubdata7, projbuffer[6])) { ivmphi=6; ready=true; }
    if(!matchengine[7].done() && !ready) if(matchengine[7].step(table, instubdata8, projbuffer[7])) { ivmphi=7; ready=true; }
+   */
    typename VMProjection<BARREL>::VMPID projindex;
    typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
    typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
@@ -868,7 +874,6 @@ void MatchProcessor(BXType bx,
        bestInPipeline=matchengine[ivmphi].empty();
      }
      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
-               //(bx, allstub, allproj, projindex, stubid, nstub, bx_o,
                (bx, allstub, allproj, matchengine[ivmphi].getProjindex(), matchengine[ivmphi].getStubIds(), matchengine[ivmphi].getNStubs(), bx_o,
                 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
                 fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
