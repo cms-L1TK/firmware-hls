@@ -578,24 +578,6 @@ void MatchProcessor(BXType bx,
   bool table[(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
   readTable<L>(table);
   
-/*
-#pragma HLS resource variable=instubdata1 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata2 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata3 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata4 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata5 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata6 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata7 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=instubdata8 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch1 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch2 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch3 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch4 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch5 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch6 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch7 core=RAM_2P_LUTRAM
-#pragma HLS resource variable=fullmatch8 core=RAM_2P_LUTRAM
-*/
   // reset output memories
   /*
   fullmatch[0].clear(bx);
@@ -791,7 +773,6 @@ void MatchProcessor(BXType bx,
       bool buffernotfull=(writeindextmp+1!=readindextmp)&&(writeindextmp+2!=readindextmp);
 
       if (buffernotfull){
-      //if (moreproj&&buffernotfull){
         auto const iprojtmp=iproj;
         iproj++;
         moreproj=iproj<nproj;
