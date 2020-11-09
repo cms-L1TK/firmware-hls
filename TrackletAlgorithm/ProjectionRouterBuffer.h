@@ -15,7 +15,6 @@ public:
   enum BitWidths {
     // Bit sizes for ProjectionRouterBufferMemory fields
     kPRBufferIsPSSeedSize = 1,
-    //kPRProjSize = VMProjection<VMPTYPE>::kVMProjectionSize,
     kPRBufferZBinSize = MEBinsBits+1,
     kPRBufferNStubsSize = kNBits_MemAddrBinned,
     kPRBufferIndexSize = 7,
@@ -88,7 +87,6 @@ public:
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
     setNStubs(nstub); //FIXME error with data_ constructor not setting nstubs correctly
     setHasSecond(hasSec); //FIXME error with data_ constructor not setting hasSec correctly
-    //Print();
   }
 
   // This constructor is only used for projections in DISK
@@ -102,20 +100,7 @@ public:
     data_(0)
   {}
   
-  /*
-  //Copy constructor
-  // This constructor is only used for projections in BARREL
-  ProjectionRouterBuffer<VMProjType> (const ProjectionRouterBuffer<VMProjType>& copy):
-    data_( ((copy.hasSecond(),copy.getProjection()),copy.getZBin()) )
-  {
-    static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
-    setIsPSSeed(copy.getIsPSSeed());
-  }
-
-  ProjectionRouterBuffer():
-    data_(0)
-  {}
-  */
+  
 
   #ifndef __SYNTHESIS__
   ProjectionRouterBuffer(const char* datastr, int base=16)
