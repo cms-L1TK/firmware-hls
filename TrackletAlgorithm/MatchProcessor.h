@@ -650,6 +650,10 @@ void MatchProcessor(BXType bx,
 #pragma HLS PIPELINE II=1 rewind
     std::cout << "istep=" << istep << std::endl;
 
+    bool ready=false;
+    ap_uint<3> ivmphi=0;
+
+
     // read inputs
     TrackletProjection<PROJTYPE> projdata;
     TrackletProjectionMemory<PROJTYPE> tproj;
@@ -857,6 +861,7 @@ void MatchProcessor(BXType bx,
 
     } //end MEU loop
 
+  //} //end loop
   } //end loop
 
 
