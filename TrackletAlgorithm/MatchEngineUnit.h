@@ -41,14 +41,16 @@ MatchEngineUnit() {
 
 }
 
-inline void init(BXType bxin, const INDEX iproj, int iphi) {
+inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, int iphi, const INDEX iproj) {
 #pragma HLS inline
   writeindex = iproj;
   readindex = 0;
   idle_ = false;
-  done_ = false;
+  done_ = true;
   bx = bxin;
   ivmphi = iphi;
+  projbuffer = projbuffer_;
+  projbuffer.Print();
 
 }
 
@@ -98,9 +100,11 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 }
 
-inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
+//inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
+inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
+    done_ = readindex>writeindex ? true : false;
     if(idle() || done()) return true;
 
     ////////////////////////////////////////////
@@ -133,12 +137,13 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, Projec
         }
 
         //Need to read the information about the proj in the buffer
-        auto const qdata=projbuffer[readindex];
+        auto const qdata=projbuffer;
         tcid=qdata.getTCID();
         auto nstub = qdata.getNStubs();
         nstubs=qdata.getNStubs();
         VMProjection<BARREL> data(qdata.getProjection());
-         zbin=qdata.getZBin();
+        std::cout << std::hex << data.raw() << std::endl;
+        zbin=qdata.getZBin();
 
         projindex=data.getIndex();
         auto projfinez=data.getFineZ();
@@ -224,6 +229,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, Projec
   ProjectionRouterBuffer<BARREL>::VMPZBIN zbin;
   VMProjection<BARREL>::VMPRINV projrinv;
   VMProjection<BARREL>::VMPID projindex;
+  ProjectionRouterBuffer<BARREL> projbuffer;
 
 }; // end class
 
