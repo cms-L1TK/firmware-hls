@@ -948,6 +948,7 @@ void MatchProcessor(BXType bx,
       validin = false;
     }// end if not near full
 
+  //} //end loop
   } //end loop
 
 
