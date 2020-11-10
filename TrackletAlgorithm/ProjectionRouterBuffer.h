@@ -20,8 +20,9 @@ public:
     kPRBufferIndexSize = 7,
     kPRBufferHasSecondSize = 1,
     kPRBufferTCIDSize = 7,
+    kPRBufferPhiSize = 3,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + kPRBufferNStubsSize + VMProjectionBase<BARREL>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferHasSecondSize
+    kProjectionRouterBufferSize = kPRBufferPhiSize + kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + kPRBufferNStubsSize + VMProjectionBase<BARREL>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferHasSecondSize
   };
 };
 
@@ -64,7 +65,9 @@ public:
     kPRBufferHasSecondLSB = kPRBufferIndexMSB + 1,
     kPRBufferHasSecondMSB = kPRBufferHasSecondLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferHasSecondSize - 1,
     kPRBufferTCIDLSB = kPRBufferHasSecondLSB + 1,
-    kPRBufferTCIDMSB = kPRBufferTCIDLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferTCIDSize - 1
+    kPRBufferTCIDMSB = kPRBufferTCIDLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferTCIDSize - 1,
+    kPRBufferPhiLSB = kPRBufferTCIDMSB + 1,
+    kPRBufferPhiMSB = kPRBufferPhiLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferPhiSize - 1
   };
   
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferIndexSize> VMPID;
@@ -74,6 +77,7 @@ public:
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferZBinSize> VMPZBIN;
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kProjectionRouterBufferSize> ProjBuffer;
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferTCIDSize> TCID;
+  typedef ap_uint<ProjectionRouterBufferBase<VMProjType>::kPRBufferPhiSize> PRPHI;
 
   // Constructors
   ProjectionRouterBuffer(const ProjBuffer& newdata):
@@ -150,6 +154,11 @@ public:
     static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
     return data_.range(kPRBufferIsPSSeedLSB,kPRBufferIsPSSeedMSB);
   }
+
+  PRPHI getPhi() {
+    static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
+    return data_.range(kPRBufferPhiLSB,kPRBufferPhiMSB);
+  }
   
   // Setter
   void setTCID(const TCID tcid) {
@@ -181,6 +190,12 @@ public:
   void setIsPSSeed(const bool psseed) {
     static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
     data_.range(kPRBufferIsPSSeedLSB,kPRBufferIsPSSeedMSB) = psseed;
+  }
+
+  // This setter is only used for projections in BARREL
+  void setPhi(const PRPHI phi) {
+    static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
+    data_.range(kPRBufferPhiLSB,kPRBufferPhiMSB) = phi;
   }
   
 private:
