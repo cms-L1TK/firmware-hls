@@ -544,7 +544,7 @@ void MatchCalculator(BXType bx,
 
 //////////////////////////////
 // MatchProcessor
-template<int L, regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, unsigned int nINMEM,
+template<int L, regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int maxInCopies, int maxFullMatchCopies, unsigned int nINMEM,
          int LAYER=0, int DISK=0, int PHISEC=0>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
@@ -574,6 +574,7 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj22in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj23in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
+                      const VMStubMEMemory<VMSMEType,3> instubdata[maxInCopies],
                       const VMStubMEMemory<VMSMEType,3>* instubdata1,
                       const VMStubMEMemory<VMSMEType,3>* instubdata2,
                       const VMStubMEMemory<VMSMEType,3>* instubdata3,
@@ -585,6 +586,7 @@ void MatchProcessor(BXType bx,
                       const AllStubMemory<ASTYPE>* allstub,
                       const AllProjectionMemory<APTYPE>* allproj,
                       BXType& bx_o,
+                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies],
                       FullMatchMemory<FMTYPE>* fullmatch1,
                       FullMatchMemory<FMTYPE>* fullmatch2,
                       FullMatchMemory<FMTYPE>* fullmatch3,
@@ -668,7 +670,7 @@ void MatchProcessor(BXType bx,
   //more projections to read
   auto nproj=0;
 
-  const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
+  //const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
   ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
   ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNMatchEngines];
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
@@ -860,7 +862,8 @@ void MatchProcessor(BXType bx,
       //if(matchengine[iphi].idle() && !projbufferarray[iphi].empty()) {
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
-        matchengine[iMEU].init(bx, tmpprojbuff, instubdata[iphi], writeindex[iphi]);
+        const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
+        matchengine[iMEU].init(bx, tmpprojbuff, instub, writeindex[iphi]);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
       if(!matchengine[iMEU].done() && !ready) if(matchengine[iMEU].step(table)) { ivmphi=iMEU; ready=true; }

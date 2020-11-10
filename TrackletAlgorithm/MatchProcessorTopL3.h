@@ -3,6 +3,9 @@
 
 #include "MatchProcessor.h"
 
+constexpr int maxInCopies(8);
+constexpr int maxFullMatchCopies(8);
+
 void MatchProcessorTopL3(BXType bx,
                       const TrackletProjectionMemory<BARRELPS>* const proj1in,
                       const TrackletProjectionMemory<BARRELPS>* const proj2in,
@@ -12,6 +15,7 @@ void MatchProcessorTopL3(BXType bx,
                       const TrackletProjectionMemory<BARRELPS>* const proj6in,
                       const TrackletProjectionMemory<BARRELPS>* const proj7in,
                       const TrackletProjectionMemory<BARRELPS>* const proj8in,
+                      const VMStubMEMemory<BARRELPS,3> instubdata[maxInCopies],
                       const VMStubMEMemory<BARRELPS,3>* instubdata1,
                       const VMStubMEMemory<BARRELPS,3>* instubdata2,
                       const VMStubMEMemory<BARRELPS,3>* instubdata3,
@@ -23,6 +27,7 @@ void MatchProcessorTopL3(BXType bx,
                       const AllStubMemory<BARRELPS>* allstub,
                       const AllProjectionMemory<BARRELPS>* allproj,
                       BXType& bx_o,
+                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies],
                       FullMatchMemory<BARREL>* fullmatch1,
                       FullMatchMemory<BARREL>* fullmatch2,
                       FullMatchMemory<BARREL>* fullmatch3,
