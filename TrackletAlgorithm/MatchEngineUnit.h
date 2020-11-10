@@ -41,34 +41,36 @@ MatchEngineUnit() {
 
 }
 
-inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, int iphi, const INDEX iproj) {
+inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const VMStubMEMemory<VMSMEType,3>* stubmem_, const INDEX iproj) {
 #pragma HLS inline
   writeindex = iproj;
   readindex = 0;
   idle_ = false;
   done_ = false;
   bx = bxin;
-  ivmphi = iphi;
   projbuffer = projbuffer_;
-  std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.raw() << " Received writeindex=" << writeindex << std::endl;
+  ivmphi = projbuffer_.getPhi();
+  stubmem = stubmem_;
+  //std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.raw() << " Received writeindex=" << writeindex << std::endl;
   //projbuffer.Print();
 
 }
 
 bool empty() {
 #pragma HLS inline  
-  return (writeindex==readindex);
+  return (writeindex==0);
 
 }
 
 bool idle() {
 #pragma HLS inline  
+  //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   return idle_;
 }
 
 bool done() {
 #pragma HLS inline  
-  std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << " done!" << std::endl;
+  //std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << (done_ ? "": " not") << " done!" << std::endl;
   return done_;
 }
 
@@ -95,18 +97,19 @@ NSTUBS getNStubs() {
 
 void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
+  //std::cout << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
   trackletid = tcid;
   id = projindex;
   nstub = nstubs;
-  idle_ = false;
+  idle_ = true;
 
 }
 
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
-inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
+inline bool step(bool *table) {//, const VMStubMEMemory<VMSMEType,3>* stubmem) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
-    std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\t" << readindex << "\t" << writeindex << std::endl;
+    //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
     if(idle() || done()) return true;
 
     ////////////////////////////////////////////
@@ -127,7 +130,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
   // Buffer still has projections to read out
   //If the buffer is not empty we have a projection that we need to 
   //process. 
-  if (!empty() && buffernotlarger) {
+  if (!empty() && !done()) {// && buffernotlarger) {
 
       ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
 
@@ -144,7 +147,6 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
         auto nstub = qdata.getNStubs();
         nstubs=qdata.getNStubs();
         VMProjection<BARREL> data(qdata.getProjection());
-        std::cout << std::hex << data.raw() << std::endl;
         zbin=qdata.getZBin();
 
         projindex=data.getIndex();
@@ -198,10 +200,12 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
       auto const index=projrinv.concat(stubbend);
       if (pass&&table[index]) {
       stubids[istubtmp]=stubindex;
+      //std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
-    if(istub==0 && nstubs>0) idle_ = true;
+    //if(istub==0 && nstubs>0) idle_ = true;
     if(readindex>writeindex) done_ = true;
-    if(istub==0 && nstubs>0) return true;
+    //if(istub==0 && nstubs>0) return true;
+    if(done_) return true;
  
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
@@ -231,6 +235,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
   ProjectionRouterBuffer<BARREL>::VMPZBIN zbin;
   VMProjection<BARREL>::VMPRINV projrinv;
   VMProjection<BARREL>::VMPID projindex;
+  const VMStubMEMemory<VMSMEType,3>* stubmem;
   ProjectionRouterBuffer<BARREL> projbuffer;
 
 }; // end class
