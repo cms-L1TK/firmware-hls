@@ -14,7 +14,7 @@
 #include <iterator>
 
 
-const int nevents = 2;  // number of events to run
+const int nevents = 1;  // number of events to run
 
 using namespace std;
 
