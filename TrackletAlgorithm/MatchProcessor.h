@@ -7,6 +7,7 @@
 #include "VMStubMEMemory.h"
 #include "VMProjectionMemory.h"
 #include "ProjectionRouterBuffer.h"
+#include "ProjectionRouterBufferArray.h"
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
@@ -388,6 +389,7 @@ void MatchCalculator(BXType bx,
     int istubtmp = istub > nstubs ? istub : nstubs;
     auto stubid = stubids[istub];
     CandidateMatch cmatch(projid.concat(stubid));
+    //std::cout << "projid=" << projid << "\tstubid=" << stubid << std::endl;
   
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
@@ -635,8 +637,7 @@ void MatchProcessor(BXType bx,
   static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
 #pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=writeindex inter false
-  static ap_uint<kNBitsBuffer> readindex[kNBitsBuffer];
-#pragma HLS resource variable=readindex core=RAM_2P_LUTRAM
+  static ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
@@ -669,6 +670,7 @@ void MatchProcessor(BXType bx,
 
   const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
   ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+  ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNMatchEngines];
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
 #pragma HLS dependence variable=istub inter false 
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
@@ -764,7 +766,7 @@ void MatchProcessor(BXType bx,
       auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
       iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
       ap_uint<kNBitsBuffer> writeindextmp=writeindex[iphi];
-      ap_uint<kNBitsBuffer> readindextmp=readindex[iphi];
+      ap_uint<kNBitsBuffer> readindextmp=readindex;
 
       bool buffernotfull=(writeindextmp+1!=readindextmp)&&(writeindextmp+2!=readindextmp);
 
@@ -826,32 +828,43 @@ void MatchProcessor(BXType bx,
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
           projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
           projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+          projbuffertmp.setPhi(iphi);
+          projbufferarray.add(projbuffertmp);
+          //projbufferarray[iphi].add(projbuffertmp);
         }
         if (savelast) {
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffertmp.setPhi(iphi);
+            projbufferarray.add(projbuffertmp);
+            //projbufferarray[iphi].add(projbuffertmp);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffertmp.setPhi(iphi);
+            projbufferarray.add(projbuffertmp);
+            //projbufferarray[iphi].add(projbuffertmp);
           }
-        }
-        if (savefirst||savelast) {
         }
 
       } // end if
 
     } // end if(validin)
 
-    MEU_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
+    MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
-      if(matchengine[iphi].done() && readindex[iphi] < writeindex[iphi]) {
-        matchengine[iphi].init(bx, projbuffer[iphi][readindex[iphi]], iphi, writeindex[iphi]);
-        readindex[iphi]++;
+      if(matchengine[iMEU].idle() && !projbufferarray.empty()) {
+      //if(matchengine[iphi].idle() && !projbufferarray[iphi].empty()) {
+        auto tmpprojbuff = projbufferarray.read();
+        auto iphi = tmpprojbuff.getPhi();
+        matchengine[iMEU].init(bx, tmpprojbuff, instubdata[iphi], writeindex[iphi]);
+        //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
-      if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi])) { ivmphi=iphi; ready=true; }
+      if(!matchengine[iMEU].done() && !ready) if(matchengine[iMEU].step(table)) { ivmphi=iMEU; ready=true; }
+      //if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[0])) { ivmphi=iphi; ready=true; }
       //if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi], projbuffer[iphi])) { ivmphi=iphi; ready=true; }
     }
 
