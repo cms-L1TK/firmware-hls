@@ -324,14 +324,7 @@ void MatchCalculator(BXType bx,
                      int &nmcout6,
                      int &nmcout7,
                      int &nmcout8,
-                     FullMatchMemory<FMTYPE>* fullmatch1,
-                     FullMatchMemory<FMTYPE>* fullmatch2,
-                     FullMatchMemory<FMTYPE>* fullmatch3,
-                     FullMatchMemory<FMTYPE>* fullmatch4,
-                     FullMatchMemory<FMTYPE>* fullmatch5,
-                     FullMatchMemory<FMTYPE>* fullmatch6,
-                     FullMatchMemory<FMTYPE>* fullmatch7,
-                     FullMatchMemory<FMTYPE>* fullmatch8
+                     FullMatchMemory<BARREL> fullmatch[]
 ){
 
 #pragma HLS inline
@@ -485,47 +478,47 @@ void MatchCalculator(BXType bx,
   
     if (0){
       // Reset output memories
-      fullmatch1->clear(bx);
-      fullmatch2->clear(bx);
-      fullmatch3->clear(bx);
-      fullmatch4->clear(bx);
-      fullmatch5->clear(bx);
-      fullmatch6->clear(bx);
-      fullmatch7->clear(bx);
-      fullmatch8->clear(bx);
+      fullmatch[0].clear(bx);
+      fullmatch[1].clear(bx);
+      fullmatch[2].clear(bx);
+      fullmatch[3].clear(bx);
+      fullmatch[4].clear(bx);
+      fullmatch[5].clear(bx);
+      fullmatch[6].clear(bx);
+      fullmatch[7].clear(bx);
     }
     else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
       case 0:
-      fullmatch1->write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
       nmcout1++;
       break;
       case 1:
-      fullmatch2->write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
+      fullmatch[1].write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
       nmcout2++;
       break;
       case 2:
-      fullmatch3->write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
+      fullmatch[2].write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
       nmcout3++;
       break;
       case 3:
-      fullmatch4->write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
+      fullmatch[3].write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
       nmcout4++;
       break;
       case 4:
-      fullmatch5->write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
+      fullmatch[4].write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
       nmcout5++;
       break;
       case 5:
-      fullmatch6->write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
+      fullmatch[5].write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
       nmcout6++;
       break;
       case 6:
-      fullmatch7->write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
+      fullmatch[6].write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
       nmcout7++;
       break;
       case 7:
-      fullmatch8->write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
+      fullmatch[7].write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
       nmcout8++;
       break;
       }
@@ -575,26 +568,10 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj23in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
                       const VMStubMEMemory<VMSMEType,3> instubdata[maxInCopies],
-                      const VMStubMEMemory<VMSMEType,3>* instubdata1,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata2,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata3,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata4,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata5,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata6,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata7,
-                      const VMStubMEMemory<VMSMEType,3>* instubdata8,
                       const AllStubMemory<ASTYPE>* allstub,
                       const AllProjectionMemory<APTYPE>* allproj,
                       BXType& bx_o,
-                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies],
-                      FullMatchMemory<FMTYPE>* fullmatch1,
-                      FullMatchMemory<FMTYPE>* fullmatch2,
-                      FullMatchMemory<FMTYPE>* fullmatch3,
-                      FullMatchMemory<FMTYPE>* fullmatch4,
-                      FullMatchMemory<FMTYPE>* fullmatch5,
-                      FullMatchMemory<FMTYPE>* fullmatch6,
-                      FullMatchMemory<FMTYPE>* fullmatch7,
-                      FullMatchMemory<FMTYPE>* fullmatch8
+                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
 ){
 #pragma HLS inline
 
@@ -606,14 +583,14 @@ void MatchProcessor(BXType bx,
   readTable<L>(table);
   
   // reset output memories
-  fullmatch1->clear(bx);
-  fullmatch2->clear(bx);
-  fullmatch3->clear(bx);
-  fullmatch4->clear(bx);
-  fullmatch5->clear(bx);
-  fullmatch6->clear(bx);
-  fullmatch7->clear(bx);
-  fullmatch8->clear(bx);
+  fullmatch[0].clear(bx);
+  fullmatch[1].clear(bx);
+  fullmatch[2].clear(bx);
+  fullmatch[3].clear(bx);
+  fullmatch[4].clear(bx);
+  fullmatch[5].clear(bx);
+  fullmatch[6].clear(bx);
+  fullmatch[7].clear(bx);
 
   // initialization:
   // check the number of entries in the input memories
@@ -789,7 +766,11 @@ void MatchProcessor(BXType bx,
         //Check if there are stubs in the memory
         ProjectionRouterBufferMemory<BARREL>::NEntryT nstubfirst;
         ProjectionRouterBufferMemory<BARREL>::NEntryT  nstublast;
+        nstubfirst=instubdata[iphi].getEntries(bx,zfirst);
+        nstublast= instubdata[iphi].getEntries(bx,zlast);
+        /*
         switch (iphi) {
+          break;
           case 0:  nstubfirst=instubdata1->getEntries(bx,zfirst);
                     nstublast=instubdata1->getEntries(bx,zlast);
           break;
@@ -815,6 +796,7 @@ void MatchProcessor(BXType bx,
                     nstublast=instubdata8->getEntries(bx,zlast);
           break;
         }
+        */
         bool savefirst=nstubfirst!=0;
         bool savelast=nstublast!=0&&projzbin.range(0,0);
   
@@ -912,7 +894,7 @@ void MatchProcessor(BXType bx,
      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                (bx, allstub, allproj, matchengine[ivmphi].getProjindex(), matchengine[ivmphi].getStubIds(), matchengine[ivmphi].getNStubs(), bx_o,
                 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
-                fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
+                fullmatch);
    } //end MC if
 
   //} //end loop
