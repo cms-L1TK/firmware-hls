@@ -47,7 +47,7 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
   writeindex = iproj;
   readindex = 0;
   idle_ = false;
-  done_ = true;
+  done_ = false;
   bx = bxin;
   projbuffer = projbuffer_;
   projindex = projbuffer_.getIndex();
