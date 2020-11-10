@@ -41,7 +41,7 @@ MatchEngineUnit() {
 
 }
 
-inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const VMStubMEMemory<VMSMEType,3>* stubmem_, const INDEX iproj) {
+inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const VMStubMEMemory<VMSMEType,3> *stubmem_, const INDEX iproj) {
 #pragma HLS inline
   writeindex = iproj;
   readindex = 0;
@@ -106,7 +106,7 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 }
 
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
-inline bool step(bool *table) {//, const VMStubMEMemory<VMSMEType,3>* stubmem) {
+inline bool step(bool *table) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
@@ -235,7 +235,7 @@ inline bool step(bool *table) {//, const VMStubMEMemory<VMSMEType,3>* stubmem) {
   ProjectionRouterBuffer<BARREL>::VMPZBIN zbin;
   VMProjection<BARREL>::VMPRINV projrinv;
   VMProjection<BARREL>::VMPID projindex;
-  const VMStubMEMemory<VMSMEType,3>* stubmem;
+  const VMStubMEMemory<VMSMEType,3> *stubmem;
   ProjectionRouterBuffer<BARREL> projbuffer;
 
 }; // end class

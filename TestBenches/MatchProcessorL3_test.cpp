@@ -46,6 +46,7 @@ int main() {
   VMStubMEMemory<BARRELPS,3> inputvmstubs8;
 
   // declare output memory array to be filled by hls simulation
+  static FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies];
   static FullMatchMemory<BARREL> fullmatch1;
   static FullMatchMemory<BARREL> fullmatch2;
   static FullMatchMemory<BARREL> fullmatch3;
@@ -142,6 +143,17 @@ int main() {
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs6, fin_vmstub6, ievt);
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs7, fin_vmstub7, ievt);
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs8, fin_vmstub8, ievt);
+    /* FIXME
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[0], fin_vmstub1, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[1], fin_vmstub2, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[2], fin_vmstub3, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[3], fin_vmstub4, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[4], fin_vmstub5, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[5], fin_vmstub6, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[6], fin_vmstub7, ievt);
+    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[7], fin_vmstub8, ievt);
+    */
+    VMStubMEMemory<BARRELPS,3> inputvmstubs[maxInCopies] = {inputvmstubs1, inputvmstubs2, inputvmstubs3, inputvmstubs4, inputvmstubs5, inputvmstubs6, inputvmstubs7, inputvmstubs8};
 
     //set bunch crossing
     BXType bx=ievt;
@@ -153,10 +165,12 @@ int main() {
     MatchProcessorTopL3(bx,
                         &tproj1, &tproj2, &tproj3, &tproj4,
                         &tproj5, &tproj6, &tproj7, &tproj8,
+                        inputvmstubs,
                         &inputvmstubs1, &inputvmstubs2, &inputvmstubs3, &inputvmstubs4,
                         &inputvmstubs5, &inputvmstubs6, &inputvmstubs7, &inputvmstubs8,
                         &allstub, &allproj,
                         bx_out,
+                        fullmatch,
                         &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4,
                         &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8);
 

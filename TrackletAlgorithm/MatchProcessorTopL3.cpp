@@ -9,6 +9,7 @@ void MatchProcessorTopL3(BXType bx,
                       const TrackletProjectionMemory<BARRELPS>* const proj6in,
                       const TrackletProjectionMemory<BARRELPS>* const proj7in,
                       const TrackletProjectionMemory<BARRELPS>* const proj8in,
+                      const VMStubMEMemory<BARRELPS,3> instubdata[maxInCopies],
                       const VMStubMEMemory<BARRELPS,3>* instubdata1,
                       const VMStubMEMemory<BARRELPS,3>* instubdata2,
                       const VMStubMEMemory<BARRELPS,3>* instubdata3,
@@ -20,6 +21,7 @@ void MatchProcessorTopL3(BXType bx,
                       const AllStubMemory<BARRELPS>* allstub,
                       const AllProjectionMemory<BARRELPS>* allproj,
                       BXType& bx_o,
+                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies],
                       FullMatchMemory<BARREL>* fullmatch1,
                       FullMatchMemory<BARREL>* fullmatch2,
                       FullMatchMemory<BARREL>* fullmatch3,
@@ -57,14 +59,16 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=fullmatch7->get_mem() latency=2
  #pragma HLS resource variable=fullmatch8->get_mem() latency=2
 
- MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, 8, 3, 0, 2>
+ MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, 8, 3, 0, 2>
                      (bx,
                       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                      instubdata,
                       instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8,
                       allstub,
                       allproj,
                       bx_o,
+                      fullmatch,
                       fullmatch1, fullmatch2, fullmatch3, fullmatch4, fullmatch5, fullmatch6, fullmatch7, fullmatch8);
 }
 
