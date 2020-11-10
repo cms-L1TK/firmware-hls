@@ -101,6 +101,7 @@ inline MatchEngineUnit() {
 
 bool idle() {
 #pragma HLS inline  
+  //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   return idle_;
 }
 
