@@ -46,11 +46,12 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, int ip
   writeindex = iproj;
   readindex = 0;
   idle_ = false;
-  done_ = true;
+  done_ = false;
   bx = bxin;
   ivmphi = iphi;
   projbuffer = projbuffer_;
-  projbuffer.Print();
+  std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.raw() << " Received writeindex=" << writeindex << std::endl;
+  //projbuffer.Print();
 
 }
 
@@ -67,6 +68,7 @@ bool idle() {
 
 bool done() {
 #pragma HLS inline  
+  std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << " done!" << std::endl;
   return done_;
 }
 
@@ -104,7 +106,7 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
-    done_ = readindex>writeindex ? true : false;
+    std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\t" << readindex << "\t" << writeindex << std::endl;
     if(idle() || done()) return true;
 
     ////////////////////////////////////////////
