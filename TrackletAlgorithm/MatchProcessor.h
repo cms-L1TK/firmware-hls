@@ -635,7 +635,8 @@ void MatchProcessor(BXType bx,
   static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
 #pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=writeindex inter false
-  ap_uint<kNBitsBuffer> readindex=0;
+  static ap_uint<kNBitsBuffer> readindex[kNBitsBuffer];
+#pragma HLS resource variable=readindex core=RAM_2P_LUTRAM
 
   // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
@@ -763,8 +764,9 @@ void MatchProcessor(BXType bx,
       auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
       iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
       ap_uint<kNBitsBuffer> writeindextmp=writeindex[iphi];
+      ap_uint<kNBitsBuffer> readindextmp=readindex[iphi];
 
-      bool buffernotfull=(writeindextmp+1!=readindex)&&(writeindextmp+2!=readindex);
+      bool buffernotfull=(writeindextmp+1!=readindextmp)&&(writeindextmp+2!=readindextmp);
 
       if (buffernotfull){
         auto const iprojtmp=iproj;
@@ -837,22 +839,24 @@ void MatchProcessor(BXType bx,
           }
         }
         if (savefirst||savelast) {
-          MEU_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
-            #pragma HLS unroll
-            if(matchengine[iphi].done()) {
-              matchengine[iphi].init(bx, projbuffertmp, iphi, writeindex[iphi]);
-            }
-            if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi])) { ivmphi=iphi; ready=true; }
-            //if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi], projbuffer[iphi])) { ivmphi=iphi; ready=true; }
-          }
         }
 
       } // end if
 
     } // end if(validin)
 
-  readindex=0;
+    MEU_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
+      #pragma HLS unroll
+      if(matchengine[iphi].done() && readindex[iphi] < writeindex[iphi]) {
+        matchengine[iphi].init(bx, projbuffer[iphi][readindex[iphi]], iphi, writeindex[iphi]);
+        readindex[iphi]++;
+      }
+      if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi])) { ivmphi=iphi; ready=true; }
+      //if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi], projbuffer[iphi])) { ivmphi=iphi; ready=true; }
+    }
+
   /*
+  readindex=0;
   MEINIT_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
 #pragma HLS unroll
     matchengine[iphi].init(bx, writeindex[iphi], iphi);
