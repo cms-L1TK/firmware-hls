@@ -47,14 +47,6 @@ int main() {
 
   // declare output memory array to be filled by hls simulation
   static FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies];
-  static FullMatchMemory<BARREL> fullmatch1;
-  static FullMatchMemory<BARREL> fullmatch2;
-  static FullMatchMemory<BARREL> fullmatch3;
-  static FullMatchMemory<BARREL> fullmatch4;
-  static FullMatchMemory<BARREL> fullmatch5;
-  static FullMatchMemory<BARREL> fullmatch6;
-  static FullMatchMemory<BARREL> fullmatch7;
-  static FullMatchMemory<BARREL> fullmatch8;
 
   ap_uint<8>* valid;
 
@@ -166,44 +158,21 @@ int main() {
                         &tproj1, &tproj2, &tproj3, &tproj4,
                         &tproj5, &tproj6, &tproj7, &tproj8,
                         inputvmstubs,
-                        &inputvmstubs1, &inputvmstubs2, &inputvmstubs3, &inputvmstubs4,
-                        &inputvmstubs5, &inputvmstubs6, &inputvmstubs7, &inputvmstubs8,
                         &allstub, &allproj,
                         bx_out,
-                        fullmatch,
-                        &fullmatch1, &fullmatch2, &fullmatch3, &fullmatch4,
-                        &fullmatch5, &fullmatch6, &fullmatch7, &fullmatch8);
+                        fullmatch);
 
     // compare the computed outputs with the expected ones for the candidate 
     // matches
     bool truncation = true;
 
-    /*
-    std::cout << "mem content" << std::endl;
-    std::cout << "fullmatch1" << std::endl;
-    fullmatch1.print_mem();
-    std::cout << "fullmatch2" << std::endl;
-    fullmatch2.print_mem();
-    std::cout << "fullmatch3" << std::endl;
-    fullmatch3.print_mem();
-    std::cout << "fullmatch4" << std::endl;
-    fullmatch4.print_mem();
-    std::cout << "fullmatch5" << std::endl;
-    fullmatch5.print_mem();
-    std::cout << "fullmatch6" << std::endl;
-    fullmatch6.print_mem();
-    std::cout << "fullmatch7" << std::endl;
-    fullmatch7.print_mem();
-    std::cout << "fullmatch8" << std::endl;
-    fullmatch8.print_mem();
-    */
     // compare the computed outputs with the expected ones 
     //std::cout << "FM: L1L2 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch1, fout_fm1, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[0], fout_fm1, ievt, "FullMatch", truncation);
     //std::cout << "FM: L3L4 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch2, fout_fm2, ievt, "FullMatch", truncation);
     //std::cout << "FM: L5L6 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch3, fout_fm3, ievt, "FullMatch", truncation);
+    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[2], fout_fm3, ievt, "FullMatch", truncation);
     //std::cout << "FM: D1D2 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch4, fout_fm4, ievt, "FullMatch", truncation);
     //std::cout << "FM: D3D4 seeding" << std::endl;
