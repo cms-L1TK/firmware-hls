@@ -17,7 +17,7 @@ constexpr int kMaxProc = kTMUX * 6;
 
 // List of module types
 namespace module {
-  enum type {UNKNOWN, IR, VMR, VMR_LAYER, VMR_DISK, TE, TC, PR, ME, MC, NMODULES};
+  enum type {UNKNOWN, IR, VMR, TE, TC, PR, ME, MC, NMODULES};
 };
 
 // Map from a module type to an offset used to reduce the number of iterations
@@ -25,14 +25,13 @@ namespace module {
 // N.B.: actual STL maps are not allowed in HLS, so this is an emulation of
 // that container as a constexpr function.
 constexpr unsigned kMaxProcOffset(const module::type m) {
-  return (m == module::VMR_LAYER ? 7 :
-         (m == module::VMR_DISK ? 8 :
+  return (m == module::VMR ? 0 :
          (m == module::TE ? 7 :
          (m == module::TC ? 0 :
          (m == module::PR ? 0 :
          (m == module::ME ? 7 :
          (m == module::MC ? 0 :
-         (0))))))));
+         (0)))))));
 }
 
 // Memory
