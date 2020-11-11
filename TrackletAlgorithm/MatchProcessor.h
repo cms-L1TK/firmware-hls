@@ -673,10 +673,6 @@ void MatchProcessor(BXType bx,
     }
     //std::cout << "istep=" << istep << std::endl;
 
-    bool ready=false;
-    ap_uint<3> ivmphi=0;
-
-
     // read inputs
     TrackletProjection<PROJTYPE> projdata;
     TrackletProjectionMemory<PROJTYPE> tproj;
