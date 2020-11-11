@@ -657,10 +657,6 @@ void MatchProcessor(BXType bx,
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1
 
-    bool ready=false;
-    ap_uint<3> ivmphi=0;
-
-
     // read inputs
     TrackletProjection<PROJTYPE> projdata;
     TrackletProjectionMemory<PROJTYPE> tproj;
@@ -840,64 +836,31 @@ void MatchProcessor(BXType bx,
 
     MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
+      bool ready=false;
       if(matchengine[iMEU].idle() && !projbufferarray.empty()) {
-      //if(matchengine[iphi].idle() && !projbufferarray[iphi].empty()) {
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
         matchengine[iMEU].init(bx, tmpprojbuff, instub, writeindex[iphi]);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
-      if(!matchengine[iMEU].done() && !ready) if(matchengine[iMEU].step(table)) { ivmphi=iMEU; ready=true; }
-      //if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[0])) { ivmphi=iphi; ready=true; }
-      //if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi], projbuffer[iphi])) { ivmphi=iphi; ready=true; }
-    }
+      if(!matchengine[iMEU].done()) ready = matchengine[iMEU].step(table);
 
-  /*
-  readindex=0;
-  MEINIT_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
-#pragma HLS unroll
-    matchengine[iphi].init(bx, writeindex[iphi], iphi);
-  }
-  */
-
-  int iMEbest=kNMatchEngines;
-  typename AllProjection<APTYPE>::AProjTCID bestTCID=-1;
-  bool bestInPipeline=false;
-  //ME_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS loop_flatten
-   /*
-   MEU_LOOP: for(int iphi = 0; iphi < kNMatchEngines; ++iphi) {
-#pragma HLS unroll
-     if(!matchengine[iphi].done() && !ready) if(matchengine[iphi].step(table, instubdata[iphi], projbuffer[iphi])) { ivmphi=iphi; ready=true; }
-   }
-   if(!matchengine[0].done() && !ready) if(matchengine[0].step(table, instubdata1, projbuffer[0])) { ivmphi=0; ready=true; }
-   if(!matchengine[1].done() && !ready) if(matchengine[1].step(table, instubdata2, projbuffer[1])) { ivmphi=1; ready=true; }
-   if(!matchengine[2].done() && !ready) if(matchengine[2].step(table, instubdata3, projbuffer[2])) { ivmphi=2; ready=true; }
-   if(!matchengine[3].done() && !ready) if(matchengine[3].step(table, instubdata4, projbuffer[3])) { ivmphi=3; ready=true; }
-   if(!matchengine[4].done() && !ready) if(matchengine[4].step(table, instubdata5, projbuffer[4])) { ivmphi=4; ready=true; }
-   if(!matchengine[5].done() && !ready) if(matchengine[5].step(table, instubdata6, projbuffer[5])) { ivmphi=5; ready=true; }
-   if(!matchengine[6].done() && !ready) if(matchengine[6].step(table, instubdata7, projbuffer[6])) { ivmphi=6; ready=true; }
-   if(!matchengine[7].done() && !ready) if(matchengine[7].step(table, instubdata8, projbuffer[7])) { ivmphi=7; ready=true; }
-   */
-   typename VMProjection<BARREL>::VMPID projindex;
-   typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
-   typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
-   if(ready) {
-     typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-     matchengine[ivmphi].read(currentTCID, projindex, stubid, nstub);
-     if ((iMEbest==kNMatchEngines)||(currentTCID<bestTCID)) {
-       iMEbest=ivmphi;
-       bestTCID=currentTCID;
-       bestInPipeline=matchengine[ivmphi].empty();
-     }
-     MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
-               (bx, allstub, allproj, matchengine[ivmphi].getProjindex(), matchengine[ivmphi].getStubIds(), matchengine[ivmphi].getNStubs(), bx_o,
-                nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
-                fullmatch);
-   } //end MC if
+     if(ready) {
+       typename VMProjection<BARREL>::VMPID projindex;
+       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
+       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
+       typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
+       matchengine[iMEU].read(currentTCID, projindex, stubid, nstub);
+       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
+                 (bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
+                  nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
+                  fullmatch);
+      } //end MC if
 
-  //} //end loop
+    } //end MEU loop
+
   } //end loop
 
 
