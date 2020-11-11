@@ -1,6 +1,7 @@
 #include "MatchProcessorTopL3.h"
 
 void MatchProcessorTopL3(BXType bx,
+                      const TrackletProjectionMemory<BARRELPS> tprojarray[maxTrackletProjections],
                       const TrackletProjectionMemory<BARRELPS>* const proj1in,
                       const TrackletProjectionMemory<BARRELPS>* const proj2in,
                       const TrackletProjectionMemory<BARRELPS>* const proj3in,
@@ -35,8 +36,9 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
 
- MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, 8, 3, 0, 2>
+ MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, 8, 3, 0, 2>
                      (bx,
+                      tprojarray,
                       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                       instubdata,
