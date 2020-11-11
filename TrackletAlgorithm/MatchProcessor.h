@@ -476,18 +476,7 @@ void MatchCalculator(BXType bx,
       projseed_next  = projseed;
     }
   
-    if (0){
-      // Reset output memories
-      fullmatch[0].clear(bx);
-      fullmatch[1].clear(bx);
-      fullmatch[2].clear(bx);
-      fullmatch[3].clear(bx);
-      fullmatch[4].clear(bx);
-      fullmatch[5].clear(bx);
-      fullmatch[6].clear(bx);
-      fullmatch[7].clear(bx);
-    }
-    else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+    if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
       case 0:
       fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -849,12 +838,13 @@ void MatchProcessor(BXType bx,
 #pragma HLS loop_flatten
      if(ready) {
        typename VMProjection<BARREL>::VMPID projindex;
-       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubid;
-       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstub;
+       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubids;
+       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
        typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-       matchengine[iMEU].read(currentTCID, projindex, stubid, nstub);
+       matchengine[iMEU].read(currentTCID, projindex, stubids, nstubs);
        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
-                 (bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
+                 //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
+                 (bx, allstub, allproj, projindex, matchengine[iMEU].getStubIds(), nstubs, bx_o,
                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
                   fullmatch);
       } //end MC if

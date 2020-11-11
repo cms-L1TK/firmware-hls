@@ -98,9 +98,10 @@ NSTUBS getNStubs() {
 void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
   //std::cout << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
-  trackletid = tcid;
-  id = projindex;
-  nstub = nstubs;
+  trackletid = getTCID();
+  id = getProjindex();
+  stubid = getStubIds();
+  nstub = getNStubs();
   idle_ = true;
 
 }
