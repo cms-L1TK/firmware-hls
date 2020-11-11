@@ -24,6 +24,7 @@ int main() {
   int err_count = 0;
 
   // input memories
+  static TrackletProjectionMemory<BARRELPS> tprojarray[maxTrackletProjections];
   static TrackletProjectionMemory<BARRELPS> tproj1;
   static TrackletProjectionMemory<BARRELPS> tproj2;
   static TrackletProjectionMemory<BARRELPS> tproj3;
@@ -125,6 +126,7 @@ int main() {
 
     // Unit Under Test
     MatchProcessorTopL3(bx,
+                        tprojarray,
                         &tproj1, &tproj2, &tproj3, &tproj4,
                         &tproj5, &tproj6, &tproj7, &tproj8,
 			&tproj9, &tproj10,

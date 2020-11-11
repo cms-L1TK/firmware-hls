@@ -40,6 +40,7 @@ void MatchProcessorTopL3(BXType bx,
 
  MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, maxTrackletProjections, 3, 0, 2>
                      (bx,
+                      tprojarray,
                       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
                       proj9in, proj10in, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                       instubdata,
