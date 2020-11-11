@@ -3,10 +3,12 @@
 
 #include "MatchProcessor.h"
 
+constexpr int maxTrackletProjections(8);
 constexpr int maxInCopies(8);
 constexpr int maxFullMatchCopies(8);
 
 void MatchProcessorTopL3(BXType bx,
+                      const TrackletProjectionMemory<BARRELPS> tprojarray[maxTrackletProjections],
                       const TrackletProjectionMemory<BARRELPS>* const proj1in,
                       const TrackletProjectionMemory<BARRELPS>* const proj2in,
                       const TrackletProjectionMemory<BARRELPS>* const proj3in,
