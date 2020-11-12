@@ -376,7 +376,6 @@ void MatchCalculator(BXType bx,
 
     // Don't read past nstubs (would read garbage)
     CandidateMatch cmatch(projid.concat(stubid));
-    std::cout << "MC received projid=" << projid << "\tstubid=" << stubid << std::endl;
   
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
@@ -429,6 +428,7 @@ void MatchCalculator(BXType bx,
   
     // Full match  
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
+    std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "fm=" << fm.raw() << std::endl;
   
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -455,9 +455,9 @@ void MatchCalculator(BXType bx,
       best_delta_phi = abs_delta_phi;
   
       // Store bestmatch
-      bestmatch_next = fm;
-      goodmatch_next = true;
-      projseed_next  = proj_seed;
+      bestmatch = fm;
+      goodmatch = true;
+      projseed  = proj_seed;
     }
     else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
       bestmatch_next = FullMatch<FMTYPE>();

@@ -21,7 +21,7 @@ public:
   }
 
   inline bool empty() { 
-    std::cout << "Empty? " << (ptr_ == width_) << std::endl;
+    std::cout << "Empty projbuffer? " << (ptr_ == width_) << std::endl;
     return ptr_ == width_;
   }
 
