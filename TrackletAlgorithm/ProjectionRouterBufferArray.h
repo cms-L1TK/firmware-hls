@@ -52,6 +52,20 @@ public:
     reset();
   }
 
+  #ifndef __SYNTHESIS__
+  void print() {
+    if(empty()) {
+      std::cout << "unread contents in projbuffer empty!" << std::endl;
+    }
+    else {
+      std::cout << "Unread contents in projbuffer" << std::endl;
+      for(int i = ptr_; i < width_; ++i){
+        std::cout << std::hex << i << ": " << projbuffer[i].raw() << std::endl;
+      }
+    }
+  }
+  #endif
+
 private:
   ap_uint<kNBitsBuffer> readptr_ = 0;
   ap_uint<kNBitsBuffer> writeptr_ = 0;
