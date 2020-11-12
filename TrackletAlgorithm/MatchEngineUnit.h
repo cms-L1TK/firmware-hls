@@ -120,7 +120,7 @@ void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BAR
   projid = getProjindex();
   stubid = stubids[ptr];
   ptr++;
-  idle_ = ptr > readindex ? true : idle_;
+  idle_ = ptr >= readindex ? true : idle_;
 
 }
 
