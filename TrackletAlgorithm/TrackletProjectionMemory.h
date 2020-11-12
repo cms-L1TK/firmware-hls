@@ -19,6 +19,8 @@ public:
     kTProjRZSize = 12,
     kTProjPhiSize = 14,
     kTProjTCIDSize = 7,
+    kTProjSeedSize = 3, // upper three bits of TCID
+    kTProjITCSize = 4, // lower four bits of TCID
     kTProjTrackletIndexSize = 7,
     // Bit size for full TrackletProjectionMemory
     kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
@@ -36,6 +38,8 @@ public:
     kTProjRZSize = 8,
     kTProjPhiSize = 17,
     kTProjTCIDSize = 7,
+    kTProjSeedSize = 3, // upper three bits of TCID
+    kTProjITCSize = 4, // lower four bits of TCID
     kTProjTrackletIndexSize = 7,
     // Bit size for full TrackletProjectionMemory
     kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize
@@ -53,6 +57,8 @@ public:
     kTProjRZSize = 12,
     kTProjPhiSize = 14,
     kTProjTCIDSize = 7,
+    kTProjSeedSize = 3, // upper three bits of TCID
+    kTProjITCSize = 4, // lower four bits of TCID
     kTProjTrackletIndexSize = 7,
     // Bit size for full TrackletProjectionMemory
     kTrackletProjectionSize = kTProjTCIDSize + kTProjTrackletIndexSize + kTProjPhiSize + kTProjRZSize + kTProjPhiDSize + kTProjRZDSize

@@ -38,22 +38,19 @@ enum phireg {
 //----------------------------
 // Tracklet Engine main code
 //============================
-template<int innertype, int outertype, unsigned int ptdepth,
+template<int innertype, int outertype,
   unsigned int stubptinnerdepth, unsigned int stubptouterdepth>
 void TrackletEngine(
-		    const ap_uint<3> bx,
+		    const BXType bx,
 		    const VMStubTEInnerMemory<innertype>& instubinnerdata,
 		    const VMStubTEOuterMemory<outertype>& instubouterdata,
-                    const ap_uint<1> pttable[ptdepth],
                     const ap_uint<1> bendinnertable[stubptinnerdepth],
                     const ap_uint<1> bendoutertable[stubptouterdepth],
 		    StubPairMemory& outstubpair) {
 
 #pragma HLS inline
-  int nstubpairs = 0;
+  ap_uint<kNBits_MemAddr> nstubpairs = 0;
 #pragma HLS dependence variable=nstubpairs intra WAR true
-
-  outstubpair.clear(bx);
 
   //
   // Set up a FIFO based on a circular buffer structure
@@ -63,11 +60,22 @@ void TrackletEngine(
   //       [# of outer stubs in z-bin][inner stub data][index of z-bin][z-bin flag]
   //
   constexpr unsigned int kNBits_BufferAddr = 3;
+  constexpr unsigned int kNOuterStubsSize = 5;
+  constexpr unsigned int kZBinFlagSize = 1;
   constexpr int kBufferDataSize =
-		    5                                             // number of bits for outer stubs array size (size of NEntryT in MemoryTemplateBinned.h)
-		  + VMStubTEInner<innertype>::kVMStubTEInnerSize  // inner stub data size
-		  + TEBinsBits                                    // number of bits for index of z-bin
-		  + 1;                                            // z-bin flag (0 => first bin, 1 => second bin)
+                  kNOuterStubsSize                              // number of bits for outer stubs array size (size of NEntryT in MemoryTemplateBinned.h)
+                + VMStubTEInner<innertype>::kVMStubTEInnerSize  // inner stub data size
+                + TEBinsBits                                    // number of bits for index of z-bin
+                + kZBinFlagSize;                                // z-bin flag (0 => first bin, 1 => second bin)
+
+  constexpr unsigned int kZBinFlagLSB = 0;
+  constexpr unsigned int kZBinFlagMSB = kZBinFlagLSB + kZBinFlagSize - 1;
+  constexpr unsigned int kZBinIndexLSB = kZBinFlagMSB + 1;
+  constexpr unsigned int kZBinIndexMSB = kZBinIndexLSB + TEBinsBits - 1;
+  constexpr unsigned int kInnerStubDataLSB = kZBinIndexMSB + 1;
+  constexpr unsigned int kInnerStubDataMSB = kInnerStubDataLSB + VMStubTEInner<innertype>::kVMStubTEInnerSize - 1;
+  constexpr unsigned int kNOuterStubsLSB = kInnerStubDataMSB + 1;
+  constexpr unsigned int kNOuterStubsMSB = kNOuterStubsLSB + kNOuterStubsSize - 1;
 
   ap_uint<kBufferDataSize> teBuffer[1<<kNBits_BufferAddr];
 #pragma HLS ARRAY_PARTITION variable teBuffer complete dim=0
@@ -83,7 +91,6 @@ void TrackletEngine(
   typename VMStubTEInner<innertype>::VMSTEIID      innerstubindex;
   typename VMStubTEInner<innertype>::VMSTEIBEND    innerstubbend;
   typename VMStubTEInner<innertype>::VMSTEIFINEPHI innerstubfinephi;
-  typename VMStubTEInner<innertype>::VMSTEIZBITS   innerstubzbits;
   ap_uint<TEBinsBits> zdiffmax;
   ap_uint<TEBinsBits> zbinfirst;
   ap_uint<1> second;
@@ -99,18 +106,18 @@ void TrackletEngine(
   // Seven iterations are subtracted so that the total latency is 108 clock
   // cycles. Pipeline rewinding does not currently work.
   for (unsigned int istep=0; istep<kMaxProc - kMaxProcOffset(module::TE); istep++) {
-#pragma HLS pipeline II=1
+#pragma HLS pipeline II=1 rewind
 
 	  // pre-fetch element from buffer
 	  auto const bufdata = teBuffer[readindex];
 
 	  // buffer is not full if 2 slots are available, as we may write stubs for up to 2 z-bins
-	  ap_uint<kNBits_BufferAddr> writeindexplus     = writeindex+1;
-	  ap_uint<kNBits_BufferAddr> writeindexplusplus = writeindex+2;
-	  ap_uint<1> buffernotfull = (writeindexplus!=readindex) && (writeindexplusplus!=readindex);
+	  const ap_uint<kNBits_BufferAddr> writeindexplus     = writeindex+1;
+	  const ap_uint<kNBits_BufferAddr> writeindexplusplus = writeindex+2;
+	  const ap_uint<1> buffernotfull = (writeindexplus!=readindex) && (writeindexplusplus!=readindex);
 
 	  // buffer is not empty when current write index and read index are different
-	  ap_uint<1> buffernotempty = (writeindex!=readindex);
+	  const ap_uint<1> buffernotempty = (writeindex!=readindex);
 
 	  // buffer is not full and there are more inner stubs to read in...
 	  if(morestubinner && buffernotfull) {
@@ -118,14 +125,13 @@ void TrackletEngine(
 		  istubinner++;
 		  morestubinner = istubinner<nstubinner;
 
-		  auto const innerstubzbitstmp = innerstubdatatmp.getZBits();
-		  ap_uint<TEBinsBits> zbinstart = innerstubzbitstmp.range(6,4);
-		  ap_uint<TEBinsBits> zbinlast  = zbinstart + innerstubzbitstmp.range(3,3);
+		  const ap_uint<TEBinsBits> zbinstart = innerstubdatatmp.getZBinStart();
+		  const ap_uint<TEBinsBits> zbinlast  = zbinstart + innerstubdatatmp.getZBinDiff();
 
 		  auto const nstubsstart = instubouterdata.getEntries(bx,zbinstart);
 		  auto const nstubslast  = instubouterdata.getEntries(bx,zbinlast);
-		  ap_uint<1> savestart = (nstubsstart != 0);
-		  ap_uint<1> savelast  = (nstubslast  != 0) && innerstubzbitstmp.range(3,3);
+		  const ap_uint<1> savestart = (nstubsstart != 0);
+		  const ap_uint<1> savelast  = (nstubslast  != 0) && innerstubdatatmp.getZBinDiff();
 		  auto const writeindextmp = writeindex;
 
 		  if(savestart && savelast) {
@@ -135,17 +141,17 @@ void TrackletEngine(
 		  }
 
 		  if(savestart) {
-			  ap_uint<1> zero = 0;
-			  ap_uint<TEBinsBits+1> tmp1 = zbinstart.concat(zero);
-			  ap_uint<VMStubTEInner<innertype>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
+			  const ap_uint<1> zero = 0;
+			  const ap_uint<TEBinsBits+1> tmp1 = zbinstart.concat(zero);
+			  const ap_uint<VMStubTEInner<innertype>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
 			  teBuffer[writeindextmp] = nstubsstart.concat(tmp2);
 		  }
 		  if(savelast) {
-			  ap_uint<1> one = 1;
-			  ap_uint<TEBinsBits+1> tmp1 = zbinlast.concat(one);
-			  ap_uint<VMStubTEInner<innertype>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
+			  const ap_uint<1> one = 1;
+			  const ap_uint<TEBinsBits+1> tmp1 = zbinlast.concat(one);
+			  const ap_uint<VMStubTEInner<innertype>::kVMStubTEInnerSize+TEBinsBits+1> tmp2 = innerstubdatatmp.raw().concat(tmp1);
 			  if(savestart) {
-				  ap_uint<kNBits_BufferAddr> writeindextmpplus = writeindextmp+1;
+				  const ap_uint<kNBits_BufferAddr> writeindextmpplus = writeindextmp+1;
 				  teBuffer[writeindextmpplus] = nstubslast.concat(tmp2);
 			  } else {
 				  teBuffer[writeindextmp] = nstubslast.concat(tmp2);
@@ -155,23 +161,22 @@ void TrackletEngine(
 
 	  // buffer has elements to process...
 	  if(buffernotempty) {
-		  ap_uint<kNBits_MemAddrBinned> istuboutertmp = istubouter;
+		  const ap_uint<kNBits_MemAddrBinned> istuboutertmp = istubouter;
 		  ap_uint<TEBinsBits> ibin;
 
 		  if(istubouter==0) {
-			  nstubs = bufdata.range(30,26);
+			  nstubs = bufdata.range(kNOuterStubsMSB, kNOuterStubsLSB);
 
-			  ibin = bufdata.range(3,1);
-			  VMStubTEInner<innertype> data(bufdata.range(25,4));
+			  ibin = bufdata.range(kZBinIndexMSB, kZBinIndexLSB);
+			  VMStubTEInner<innertype> data(bufdata.range(kInnerStubDataMSB, kInnerStubDataLSB));
 
 			  innerstubindex   = data.getIndex();
 			  innerstubbend    = data.getBend();
 			  innerstubfinephi = data.getFinePhi();
-			  innerstubzbits   = data.getZBits();
-			  zdiffmax  = innerstubzbits.range(9,7);
-			  zbinfirst = innerstubzbits.range(2,0);
+			  zdiffmax  = data.getZDiffMax();
+			  zbinfirst = data.getZBinFirst();
 
-			  second = bufdata.range(0,0);
+			  second = bufdata.range(kZBinFlagMSB, kZBinFlagLSB);
 		  }
 
 		  // if there are no more outer stubs to process, advance the read index pointer to the next buffer element,
@@ -194,21 +199,19 @@ void TrackletEngine(
 		  // z-coordinate consistency
 		  int tmpz = outerstubfinez;
 		  int zbin = (second) ? (tmpz+8) : tmpz;
-		  ap_uint<1> z_tmp = (zbin>=zbinfirst) && (zbin-zbinfirst<=zdiffmax);
+		  const ap_uint<1> z_tmp = (zbin>=zbinfirst) && (zbin-zbinfirst<=zdiffmax);
 
           	  // pT cut
-          	  ap_uint<5> ptindex1=innerstubfinephi.concat(outerstubfinephi);
-          	  ap_uint<5> ptindex2=ptindex1;
-          	  ap_uint<1> pt_tmp = pttable[ptindex1];
+          	  auto const ptindex=innerstubfinephi.concat(outerstubfinephi).get();
 
           	  // inner stub bend consistency
-          	  ap_uint<8> bendinnerindex=ptindex1.concat(innerstubbend);
-          	  ap_uint<1> bi_tmp = bendinnertable[bendinnerindex];
+          	  auto const bendinnerindex=ptindex.concat(innerstubbend).get();
+          	  auto const bi_tmp = bendinnertable[bendinnerindex];
 
-          	  ap_uint<8> bendouterindex=ptindex2.concat(outerstubbend);
-          	  ap_uint<1> bo_tmp = bendoutertable[bendouterindex];
+          	  auto const bendouterindex=ptindex.concat(outerstubbend).get();
+          	  auto const bo_tmp = bendoutertable[bendouterindex];
 
-          	  ap_uint<1> ifskip = (!z_tmp) || (!pt_tmp) || (!bi_tmp) || (!bo_tmp);
+          	  const ap_uint<1> ifskip = (!z_tmp) || (!bi_tmp) || (!bo_tmp);
 
           	  if(!ifskip) {
                  	// good stub pair, so write it!

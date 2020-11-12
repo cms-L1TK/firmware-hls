@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+# fw_synch_201005
+memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
+
 # fw_synch_200515
-memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
-luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
+#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.

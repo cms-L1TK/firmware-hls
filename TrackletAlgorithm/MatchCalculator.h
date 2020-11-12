@@ -145,35 +145,35 @@ ap_uint<width> iabs( ap_int<width> value )
 // Template to get look up tables
 
 // Table for phi or z cuts
-template<bool phi, int L, int width, int depth>
+template<bool phi, TF::layer L, int width, int depth>
 void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
-    if (L==1){
+    if (L==TF::L1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==2){
+    else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==3){
+    else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==4){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==5){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==6){
+    else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
@@ -183,32 +183,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
   } // end phi cuts
   else { // z cuts
-    if (L==1){
+    if (L==TF::L1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==2){
+    else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==3){
+    else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==4){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==5){
+    else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==6){
+    else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
@@ -225,8 +225,13 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //////////////////////////////////////////////////////////////
 
 // MatchCalculator
+namespace MC {
+  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
+}
+template<TF::layer, MC::imc, TF::seed> constexpr bool FMMask();
+#include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, int LAYER=0, int DISK=0, int PHISEC=0>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
@@ -262,11 +267,16 @@ void MatchCalculator(BXType bx,
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
+  const auto LUT_matchcut_phi_width = 17;
+  const auto LUT_matchcut_phi_depth = 12;
+  const auto LUT_matchcut_z_width = 13;
+  const auto LUT_matchcut_z_depth = 12;
+
   // Setup look up tables for match cuts
-  ap_uint<17> LUT_matchcut_phi[12];
-  readTable_Cuts<true,LAYER,17,12>(LUT_matchcut_phi);
-  ap_uint<13> LUT_matchcut_z[12];
-  readTable_Cuts<false,LAYER,13,12>(LUT_matchcut_z);
+  ap_uint<LUT_matchcut_phi_width> LUT_matchcut_phi[LUT_matchcut_phi_depth];
+  readTable_Cuts<true,LAYER,LUT_matchcut_phi_width,LUT_matchcut_phi_depth>(LUT_matchcut_phi);
+  ap_uint<LUT_matchcut_z_width> LUT_matchcut_z[LUT_matchcut_z_depth];
+  readTable_Cuts<false,LAYER,LUT_matchcut_z_width,LUT_matchcut_z_depth>(LUT_matchcut_z);
 
   // Initialize MC delta phi cut variables
   ap_uint<17> best_delta_phi;
@@ -283,9 +293,8 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> ncm6 = 0;
   ap_uint<kNBits_MemAddr> ncm7 = 0;
   ap_uint<kNBits_MemAddr> ncm8 = 0;
-  ap_uint<7> maximum = kMaxProc;
-  ap_uint<14> total  = 0;
-  ap_uint<7> ncm = 0;
+  ap_uint<kNBits_MemAddr+1> total  = 0;
+  ap_uint<kNBits_MemAddr> ncm = 0;
 
   // Initialize read addresses for candidate matches
   ap_uint<kNBits_MemAddr> addr1 = 0;  
@@ -306,6 +315,16 @@ void MatchCalculator(BXType bx,
   bool read6 = false;
   bool read7 = false;
   bool read8 = false;
+
+  // MC_L3PHIC mask {1: on, 0: off}
+  //static const uint16_t FML1L2 = 1 << shift_L1L2;
+  //static const uint16_t FML2L3 = 0 << shift_L2L3;
+  //static const uint16_t FML3L4 = 0 << shift_L3L4;
+  //static const uint16_t FML5L6 = 1 << shift_L5L6;
+  //static const uint16_t FMD1D2 = 0 << shift_D1D2;
+  //static const uint16_t FMD3D4 = 0 << shift_D3D4;
+  //static const uint16_t FML1D1 = 0 << shift_L1D1;
+  //static const uint16_t FML2D1 = 0 << shift_L2D1;
 
   // Variables for the merger
   // layer 1 variables
@@ -388,14 +407,14 @@ void MatchCalculator(BXType bx,
   //-------------------------------- DATA PROCESSING STARTS ---------------------------------------------------
   //-----------------------------------------------------------------------------------------------------------
   // declare counters for each of the 8 output VMProj // !!!
-  int nmcout1 = 0;
-  int nmcout2 = 0;
-  int nmcout3 = 0;
-  int nmcout4 = 0;
-  int nmcout5 = 0;
-  int nmcout6 = 0;
-  int nmcout7 = 0;
-  int nmcout8 = 0;  
+  ap_uint<kNBits_MemAddr> nmcout1 = 0;
+  ap_uint<kNBits_MemAddr> nmcout2 = 0;
+  ap_uint<kNBits_MemAddr> nmcout3 = 0;
+  ap_uint<kNBits_MemAddr> nmcout4 = 0;
+  ap_uint<kNBits_MemAddr> nmcout5 = 0;
+  ap_uint<kNBits_MemAddr> nmcout6 = 0;
+  ap_uint<kNBits_MemAddr> nmcout7 = 0;
+  ap_uint<kNBits_MemAddr> nmcout8 = 0;  
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
 
@@ -413,7 +432,7 @@ void MatchCalculator(BXType bx,
 
     // Count up total number of CMs *and protect incase of overflow)
     total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
-    ncm    = (total > maximum)? maximum : total.range(7,0);
+    ncm    = (total > kMaxProc)? kMaxProc : total.range(7,0);
 
     // pipeline variables
     bool read_L1_1_next = false;
@@ -791,51 +810,56 @@ void MatchCalculator(BXType bx,
       projseed_next  = projseed;
     }
 
-    if (istep==0){
-      // Reset output memories
-      fullmatch[0].clear(bx);
-      fullmatch[1].clear(bx);
-      fullmatch[2].clear(bx);
-      fullmatch[3].clear(bx);
-      fullmatch[4].clear(bx);
-      fullmatch[5].clear(bx);
-      fullmatch[6].clear(bx);
-      fullmatch[7].clear(bx);
-    }
-    else if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+    if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
       switch (projseed) {
-      case 0:
-      fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-      nmcout1++;
-      break;
-      case 1:
-      fullmatch[1].write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L2L3 seed
-      nmcout2++;
-      break;
-      case 2:
-      fullmatch[2].write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L3L4 seed
-      nmcout3++;
-      break;
-      case 3:
-      fullmatch[3].write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // L5L6 seed
-      nmcout4++;
-      break;
-      case 4:
-      fullmatch[4].write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D1D2 seed
-      nmcout5++;
-      break;
-      case 5:
-      fullmatch[5].write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // D3D4 seed
-      nmcout6++;
-      break;
-      case 6:
-      fullmatch[6].write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L1D1 seed
-      nmcout7++;
-      break;
-      case 7:
-      fullmatch[7].write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
-      nmcout8++;
-      break;
+        case 0:
+        if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
+          fullmatch[0].write_mem(bx,bestmatch,nmcout1); // L1L2 seed
+          nmcout1++;
+        }
+        break;
+        case 1:
+        if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
+          fullmatch[1].write_mem(bx,bestmatch,nmcout2); // L2L3 seed
+          nmcout2++;
+        }
+        break;
+        case 2:
+        if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
+          fullmatch[2].write_mem(bx,bestmatch,nmcout3); // L3L4 seed
+          nmcout3++;
+        }
+        break;
+        case 3:
+        if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
+          fullmatch[3].write_mem(bx,bestmatch,nmcout4); // L5L6 seed
+          nmcout4++;
+        }
+        break;
+        case 4:
+        if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
+          fullmatch[4].write_mem(bx,bestmatch,nmcout5); // D1D2 seed
+          nmcout5++;
+        }
+        break;
+        case 5:
+        if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
+          fullmatch[5].write_mem(bx,bestmatch,nmcout6); // D3D4 seed
+          nmcout6++;
+        }
+        break;
+        case 6:
+        if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
+          fullmatch[6].write_mem(bx,bestmatch,nmcout7); // L1D1 seed
+          nmcout7++;
+        }
+        break;
+        case 7:
+        if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
+          fullmatch[7].write_mem(bx,bestmatch,nmcout8); // L2D1 seed
+          nmcout8++;
+        }
+        break;
       }
     }
 

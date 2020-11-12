@@ -118,48 +118,56 @@ int main()
     BXType bx = ievt;
     BXType bx_out;
 
+    // Clear output memories
+    allproj.clear();
+    for (unsigned int imem = 0; imem<8; imem++) {
+      vmprojarray[imem].clear();
+    }
+
     // Unit Under Test
     ProjectionRouterTop(bx, tprojarray, bx_out, allproj, vmprojarray);
 
     // compare the computed outputs with the expected ones
-    bool truncation = false;
+    bool truncation = true;
     // AllProjection
     err += compareMemWithFile<AllProjectionMemory<BARRELPS> >
-      (allproj,fout_aproj, ievt, "AllProjection", truncation, kMaxProc-10);
+      (allproj,fout_aproj, ievt, "AllProjection", truncation);
     // VMProjection1
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[0], fout_vmproj1, ievt, "VMProjection1", truncation, kMaxProc-10);
+      (vmprojarray[0], fout_vmproj1, ievt, "VMProjection1", truncation);
 
     // VMProjection2
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[1], fout_vmproj2, ievt, "VMProjection2", truncation, kMaxProc-10);
+      (vmprojarray[1], fout_vmproj2, ievt, "VMProjection2", truncation);
 
     // VMProjection3
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[2], fout_vmproj3, ievt, "VMProjection3", truncation, kMaxProc-10);
+      (vmprojarray[2], fout_vmproj3, ievt, "VMProjection3", truncation);
 
     // VMProjection4
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[3], fout_vmproj4, ievt, "VMProjection4", truncation, kMaxProc-10);
+      (vmprojarray[3], fout_vmproj4, ievt, "VMProjection4", truncation);
 
     // VMProjection5
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[4], fout_vmproj5, ievt, "VMProjection5", truncation, kMaxProc-10);
+      (vmprojarray[4], fout_vmproj5, ievt, "VMProjection5", truncation);
 
     // VMProjection6
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[5], fout_vmproj6, ievt, "VMProjection6", truncation, kMaxProc-10);
+      (vmprojarray[5], fout_vmproj6, ievt, "VMProjection6", truncation);
 
     // VMProjection7
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[6], fout_vmproj7, ievt, "VMProjection7", truncation, kMaxProc-10);
+      (vmprojarray[6], fout_vmproj7, ievt, "VMProjection7", truncation);
 
     // VMProjection8
     err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[7], fout_vmproj8, ievt, "VMProjection8", truncation, kMaxProc-10);
+      (vmprojarray[7], fout_vmproj8, ievt, "VMProjection8", truncation);
     
   } // end of event loop
   
+  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  if (err > 255) err = 255;
   return err;
   
 }

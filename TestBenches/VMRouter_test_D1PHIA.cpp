@@ -285,6 +285,24 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+  // clear output memories
+  for (int i=0; i<6; ++i) {
+    allStub[i].clear();
+  }
+  for (int i=0; i<8; ++i) {
+    meMemories[i].clear();
+  }
+  for (int i=0; i<4; ++i) {
+    for (int j=0; j<3; j++) {
+      teiMemories[i][j].clear();
+    }
+  }
+  for (int i=0; i<4; ++i) {
+    for (int j=0; j<5; j++) {
+      teoMemories[i][j].clear();
+    }
+  }
+
   // read event and write to memories
   writeMemFromFile<InputStubMemory<DISK2S>>(inputStubDisk2S[0], fin_inputstub1, ievt);
   writeMemFromFile<InputStubMemory<DISKPS>>(inputStub[0], fin_inputstub2, ievt);

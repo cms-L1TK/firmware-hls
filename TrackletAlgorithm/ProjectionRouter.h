@@ -55,14 +55,11 @@ namespace PR
   // number of bits for seed in tracklet index
   constexpr unsigned int nbits_seed = 3;
 
-  // number of bits needed for max number of VMs per layer/disk (max number is 32)
-  constexpr unsigned int nbits_maxvm = 5;
-
   // number of extra bits to keep when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_nbitsextra = 2;
+  constexpr unsigned int zbins_nbitsextra = 3;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_adjust = 2;
+  constexpr unsigned int zbins_adjust = 1;
 
 } // namespace PR
 
@@ -96,12 +93,11 @@ void ProjectionRouter(BXType bx,
       // reset output memories & counters
       nallproj = 0;
 #pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
-      allprojout.clear(bx);
       for (int i=0; i<nOUTMEM; i++) {
 #pragma HLS unroll
-        vmprojout[i].clear(bx);
         nvmprojout[i] = 0;
       }
+
       // check the number of entries in the input memories
       // fill the bit mask indicating if memories are empty or not
       mem_hasdata = 0;
@@ -172,10 +168,15 @@ void ProjectionRouter(BXType bx,
         typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
         //fine vm z bits. Use 4 bits for fine position. starting at zbin 1
-        // need to be careful about left shift of ap_(u)int
         auto nfinebits = VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize;
-        ap_uint<VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize+zbins_nbitsextra-MEBinsBits> zeropad(0);
-        typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(nfinebits+zbins_nbitsextra-1))+(izproj.range(izproj.length()-1,izproj.length()-nfinebits-zbins_nbitsextra))-(zbin1,zeropad);
+        ap_uint<VMProjection<VMPTYPE>::BitWidths::kVMProjFineZSize-1> zeropad(0);
+        // The finez calculation has three parts
+        // 1: +(1<<(MEBinsBits+(nfinebits-1)-1)) - converts the top MEBinsBits+(nfinebits-1) of the word to positive
+        // 2: +(izproj.range(...,...)            - gets the top MEBinsBits+(nfinebits-1) of izproj
+        // 3: -(zbin1,zeropad)                   - subtracts zbin1, left-shifted by kVMProjFineZSize-1, off of finez, so that the finez is relative to zbin1
+        // N.B. We use (nfinebits-1) instead of nfinebits throughout the calculation because we need to keep 1 extra MSB in case zbin1 is different
+        // from the 3 MSBs of zproj, which can happen because zbin1 is adjusted by zbins_adjust
+        typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(MEBinsBits+(nfinebits-1)-1))+(izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-(nfinebits-1)))-(zbin1,zeropad);
 
         // vmproj irinv
         // phider = -irinv/2
@@ -196,7 +197,7 @@ void ProjectionRouter(BXType bx,
         // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
 
         // All seeding pairs are PS modules except L3L4 and L5L6
-        bool psseed = not(iseed==2 or iseed==3); 
+        bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
 
         // VM Projection
         VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);

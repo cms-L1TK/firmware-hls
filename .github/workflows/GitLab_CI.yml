@@ -21,11 +21,11 @@ jobs:
     - name: Redefine branch on pull_request
       if: github.event_name == 'pull_request'
       run: |
-        echo ::set-env name=current_branch::${{ github.head_ref }}
+        echo "current_branch=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
     - name: Redefine branch on push
       if: github.event_name == 'push'
       run: |
-        echo ::set-env name=current_branch::$(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')
+        echo "current_branch=$(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')" >> $GITHUB_ENV
     - name: Mirror + trigger CI
       uses: RobertGlein/gitlab-mirror-and-ci-action@master
       with:

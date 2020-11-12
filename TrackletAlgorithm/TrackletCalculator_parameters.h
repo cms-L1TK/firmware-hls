@@ -22,71 +22,71 @@
 // in the same way.
 
 // magic numbers for TC_L1L2E
-template<> constexpr uint8_t NASMemInner<TC::L1L2, TC::E>() {
+template<> constexpr uint8_t NASMemInner<TF::L1L2, TC::E>() {
   return 2;
 }
-template<> constexpr uint8_t NASMemOuter<TC::L1L2, TC::E>() {
+template<> constexpr uint8_t NASMemOuter<TF::L1L2, TC::E>() {
   return 1;
 }
-template<> constexpr uint8_t NSPMem<TC::L1L2, TC::E>() {
+template<> constexpr uint8_t NSPMem<TF::L1L2, TC::E>() {
   return 13;
 }
-template<> constexpr uint16_t ASInnerMask<TC::L1L2, TC::E>() {
+template<> constexpr uint16_t ASInnerMask<TF::L1L2, TC::E>() {
   return 0x1FE0;
 }
-template<> constexpr uint16_t ASOuterMask<TC::L1L2, TC::E>() {
+template<> constexpr uint16_t ASOuterMask<TF::L1L2, TC::E>() {
   return 0x0000;
 }
-template<> constexpr uint32_t TPROJMaskBarrel<TC::L1L2, TC::E>() {
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::E>() {
   return 0x7777000;
 }
-template<> constexpr uint32_t TPROJMaskDisk<TC::L1L2, TC::E>() {
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::E>() {
   return 0x7777;
 }
 
 // magic numbers for TC_L1L2G
-template<> constexpr uint8_t NASMemInner<TC::L1L2, TC::G>() {
+template<> constexpr uint8_t NASMemInner<TF::L1L2, TC::G>() {
   return 1;
 }
-template<> constexpr uint8_t NASMemOuter<TC::L1L2, TC::G>() {
+template<> constexpr uint8_t NASMemOuter<TF::L1L2, TC::G>() {
   return 2;
 }
-template<> constexpr uint8_t NSPMem<TC::L1L2, TC::G>() {
+template<> constexpr uint8_t NSPMem<TF::L1L2, TC::G>() {
   return 13;
 }
-template<> constexpr uint16_t ASInnerMask<TC::L1L2, TC::G>() {
+template<> constexpr uint16_t ASInnerMask<TF::L1L2, TC::G>() {
   return 0x0000;
 }
-template<> constexpr uint16_t ASOuterMask<TC::L1L2, TC::G>() {
+template<> constexpr uint16_t ASOuterMask<TF::L1L2, TC::G>() {
   return 0x1FEE;
 }
-template<> constexpr uint32_t TPROJMaskBarrel<TC::L1L2, TC::G>() {
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::G>() {
   return 0xF666000;
 }
-template<> constexpr uint32_t TPROJMaskDisk<TC::L1L2, TC::G>() {
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::G>() {
   return 0xEEEE;
 }
 
 // magic numbers for TC_L3L4E
-template<> constexpr uint8_t NASMemInner<TC::L3L4, TC::E>() {
+template<> constexpr uint8_t NASMemInner<TF::L3L4, TC::E>() {
   return 1;
 }
-template<> constexpr uint8_t NASMemOuter<TC::L3L4, TC::E>() {
+template<> constexpr uint8_t NASMemOuter<TF::L3L4, TC::E>() {
   return 2;
 }
-template<> constexpr uint8_t NSPMem<TC::L3L4, TC::E>() {
+template<> constexpr uint8_t NSPMem<TF::L3L4, TC::E>() {
   return 11;
 }
-template<> constexpr uint16_t ASInnerMask<TC::L3L4, TC::E>() {
+template<> constexpr uint16_t ASInnerMask<TF::L3L4, TC::E>() {
   return 0x0000;
 }
-template<> constexpr uint16_t ASOuterMask<TC::L3L4, TC::E>() {
+template<> constexpr uint16_t ASOuterMask<TF::L3L4, TC::E>() {
   return 0x7FE;
 }
-template<> constexpr uint32_t TPROJMaskBarrel<TC::L3L4, TC::E>() {
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TC::E>() {
   return 0x6600638;
 }
-template<> constexpr uint32_t TPROJMaskDisk<TC::L3L4, TC::E>() {
+template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TC::E>() {
   return 0x66;
 }
 

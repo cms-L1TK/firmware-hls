@@ -37,8 +37,6 @@ int main(){
   assert(fin_vmstubsouter.good());
   assert(fin_stubpairs.good());
 
-  ap_uint<1> pttable[32] =
-#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_ptcut.tab"
   ap_uint<1> bendinnertable[256] =
 #include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"
   ap_uint<1> bendoutertable[256] =
@@ -47,6 +45,8 @@ int main(){
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
+
+    outputstubpairs.clear();
 
     //read next event from the input files
     writeMemFromFile<VMStubTEInnerMemory<BARRELPS> >(inputvmstubsinner, fin_vmstubsinner,ievt);
@@ -57,7 +57,7 @@ int main(){
 
 
     // Unit Under Test
-    TrackletEngineTop(bx, inputvmstubsinner, inputvmstubsouter, pttable, bendinnertable, bendoutertable, outputstubpairs);
+    TrackletEngineTop(bx, inputvmstubsinner, inputvmstubsouter, bendinnertable, bendoutertable, outputstubpairs);
     
     // compare calculated outputs with those read from emulation printout
     err_count += compareMemWithFile<StubPairMemory>(outputstubpairs,fin_stubpairs,ievt,"StubPair");
@@ -69,5 +69,7 @@ int main(){
   fin_vmstubsouter.close();
   fin_stubpairs.close();
   
+  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  if (err_count > 255) err_count = 255;
   return err_count;
 }

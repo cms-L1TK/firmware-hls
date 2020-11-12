@@ -29,6 +29,22 @@ static const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
   0x20005, 0x60a62, 0x40047, 0x40087
 };
 
+static const ap_uint<kBINMAPwidth> kLinkNPhiBns[] = 
+{
+  0x01B , 0x003 , 0x003 , 0x01B , 
+  0x01B , 0x01B , 0x0DF , 0x6DF , 
+  0x003 , 0x0DB , 0x01B , 0x01B 
+};
+
+static const ap_uint<kNMEMwidth> kLinkNMemories[] = 
+{
+   8 ,  4 ,  4 ,  8 , 
+   8 ,  8 , 16 , 20 , 
+   4 , 12 ,  8 ,  8 
+};
+
+
+
 // LUT with phi corrections to the nominal radius. Only used by layers.
 // Values are determined by the radius and the bend of the stub.
 static const int kPhiCorrtable_L1[] =
@@ -356,32 +372,58 @@ void procInputRouter(DTCStubMemory *hMemories
   , ap_uint<kNBits_DTC> *pStubs )
 {
 
+
 	ap_uint<6> hLinkId(pLinkId);
-	ap_uint<kLINKMAPwidth> hLinkWord = 0x00;
-	hLinkWord = kLinkAssignmentTable[hLinkId%12];
-	ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
-	std::cout << "Link Word is " 
-	<< std::bitset<kLINKMAPwidth>(hLinkWord)
-	<< "\t"
-	<< std::hex
-	<< hLinkWord 
-	<< std::dec
-	<< "\n";
+	ap_uint<kLINKMAPwidth> hLinkWord = kLinkAssignmentTable[hLinkId%12];
+  ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[hLinkId%12];
+  ap_uint<kNMEMwidth> hNmemories = kLinkNMemories[hLinkId%12];
+  ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
+  // clear memories 
+  for( unsigned int cIndx=0; cIndx < (unsigned int)hNmemories ; cIndx++)
+  { 
+     hMemories[cIndx].clear();
+  }
 
-	// BxId  
-	BXType hBx = pBxSelected&0x7;
+  std::cout << "Link Word is " 
+  << std::bitset<kLINKMAPwidth>(hLinkWord)
+  << "\t"
+  << std::hex
+  << hLinkWord 
+  << std::dec
+  << "\t connected to "
+  << hNmemories 
+  << " memories."
+  << "\n";
 
-	InputRouterTop( hBx
-		, hLinkId 
-		, kLinkAssignmentTable
-		, kPhiCorrtable_L1 
-		, kPhiCorrtable_L2
-		, kPhiCorrtable_L3
-		, kPhiCorrtable_L4
-		, kPhiCorrtable_L5
-		, kPhiCorrtable_L6
-		, pStubs 
-		, hMemories);
+  // decode link wrd for this layer
+  // figure out which of the LUTs I need 
+  const int* cLUT_L1 = (  hIs2S == 1 )  ? kPhiCorrtable_L4 : kPhiCorrtable_L1; 
+  const int* cLUT_L2 = (  hIs2S == 1 )  ? kPhiCorrtable_L5 : kPhiCorrtable_L2; 
+  const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
+
+  BXType hBx = pBxSelected&0x7;
+  InputRouterTop( hBx
+  , hLinkId // link id 
+  , hLinkWord // input link LUT 
+  , hPhBnWord  // n phi bins LUT 
+  , hNmemories // number of mems LUT
+  , cLUT_L1// corrections frst brl lyr  
+  , cLUT_L2 // corrections scnd brl lyr  
+  , cLUT_L3 // corrections thrd brl lyr  
+  , pStubs
+  , hMemories);
+
+	// InputRouterTop( hBx
+	// 	, hLinkId 
+	// 	, kLinkAssignmentTable
+	// 	, kPhiCorrtable_L1 
+	// 	, kPhiCorrtable_L2
+	// 	, kPhiCorrtable_L3
+	// 	, kPhiCorrtable_L4
+	// 	, kPhiCorrtable_L5
+	// 	, kPhiCorrtable_L6
+	// 	, pStubs 
+	// 	, hMemories);
 }
 
 // prepare file streams 
@@ -422,35 +464,38 @@ void prepareInputStreams( ifstream * pInputStreams
 }
 
 // check HLS against emulation 
-template< class DataType, int nMemories>
-int verifyHLS( int pBxId 
-  , DataType* hMemories
-  , DataType* hRefMemories
-  , bool pTruncated=false )
-{
+// template< class DataType, int nMemories>
+// int verifyHLS( int pBxId 
+//   , DataType* hMemories
+//   , DataType* hRefMemories
+//   , bool pTruncated=false )
+// {
 
-  BXType hBx = pBxId&0x7;
-  int cTotalErrorCount=0;
-  std::vector<int> cErrorCount(0);
-  for(int cMemIndx=0; cMemIndx< nMemories; cMemIndx++)
-  {
-    if( hRefMemories[cMemIndx].getEntries(hBx) == 0  ) continue;
+//   BXType hBx = pBxId&0x7;
+//   int cTotalErrorCount=0;
+//   std::vector<int> cErrorCount(0);
+//   for(int cMemIndx=0; cMemIndx< nMemories; cMemIndx++)
+//   {
+//     if( hRefMemories[cMemIndx].getEntries(hBx) == 0 ) continue;
 
-    std::cout << dec 
-      << "Comparing stubs from memory#" 
-      << +cMemIndx 
-      << " found "
-      << +hMemories[cMemIndx].getEntries(hBx) 
-      << " entries in memory produced by the HLS...and "
-      << +hRefMemories[cMemIndx].getEntries(hBx) 
-      << " entries in memory produced by emulation.\n";
+//     //if( cMemIndx >= 4 && cMemIndx < 8) 
+//     //{
+//       std::cout << dec 
+//         << "Comparing stubs from memory#" 
+//         << +cMemIndx 
+//         << " found "
+//         << +hMemories[cMemIndx].getEntries(hBx) 
+//         << " entries in memory produced by the HLS...and "
+//         << +hRefMemories[cMemIndx].getEntries(hBx) 
+//         << " entries in memory produced by emulation.\n";
 
-    int cNerrors = compareMems<DTCStubMemory,16>(hRefMemories[cMemIndx], hMemories[cMemIndx] , pBxId  , "DTCStubMemory" , pTruncated );
-    cErrorCount.push_back( cNerrors );
-  }//lyrs
-  cTotalErrorCount += std::accumulate(cErrorCount.begin(), cErrorCount.end(), 0);
-  return cTotalErrorCount;
-}
+//       int cNerrors = compareMems<DTCStubMemory,16>(hRefMemories[cMemIndx], hMemories[cMemIndx] , pBxId  , "DTCStubMemory" , pTruncated );
+//       cErrorCount.push_back( cNerrors );
+//     //}
+//   }//lyrs
+//   cTotalErrorCount += std::accumulate(cErrorCount.begin(), cErrorCount.end(), 0);
+//   return cTotalErrorCount;
+// }
 
 
 // pInputFile_LinkMap dtc link layer map 
@@ -467,7 +512,7 @@ int simInputRouter(DTCStubMemory *hMemories
 {
 
   // prepare input streams 
-  ifstream cInputStreams[kNIRMemories];
+  ifstream cInputStreams[cNMemories];
   prepareInputStreams( cInputStreams
 	  , pLinkId
 	  , pDTCsplit
@@ -476,11 +521,11 @@ int simInputRouter(DTCStubMemory *hMemories
 
   
   // declare reference memories 
-  DTCStubMemory hRefMems[kNIRMemories]; 
+  DTCStubMemory hRefMems[cNMemories]; 
   // declare reference memories that are 
   // checked against inputs 
   // these will be used to verify the HLS 
-  DTCStubMemory hVrfRefMems[kNIRMemories]; 
+  DTCStubMemory hVrfRefMems[cNMemories]; 
   // book keeping 
   std::vector<int> cErrorCount(0);
   std::vector<int> cPhiMissing(0);
@@ -499,7 +544,7 @@ int simInputRouter(DTCStubMemory *hMemories
     	, pInputFile_LinkMap );
 
     // fill reference memories
-    for( int cMemIndx=0; cMemIndx < kNIRMemories; cMemIndx++ )
+    for( int cMemIndx=0; cMemIndx < cNMemories; cMemIndx++ )
     {
       if( !cInputStreams[cMemIndx].is_open() ) continue; 
       
@@ -512,78 +557,78 @@ int simInputRouter(DTCStubMemory *hMemories
     // process 
     procInputRouter(hMemories , pLinkId  , cBxId , cStubs ); 
 
-    // check if all these entries are in the emulated memory  
-    // also appear in the file with the input stubs 
-    for( int cMemIndx=0; cMemIndx < kNIRMemories; cMemIndx++ )
-    {
-      if( hRefMems[cMemIndx].getEntries(hBx) == 0 ) continue; 
+    // // check if all these entries are in the emulated memory  
+    // // also appear in the file with the input stubs 
+    // for( int cMemIndx=0; cMemIndx < kNIRMemories; cMemIndx++ )
+    // {
+    //   if( hRefMems[cMemIndx].getEntries(hBx) == 0 ) continue; 
       
-      // clear memory 
-      hVrfRefMems[cMemIndx].clear(hBx);
-      for( int cIndx=0; cIndx <  hRefMems[cMemIndx].getEntries(hBx); cIndx++ ) 
-      {
-        auto cRaw = hRefMems[cMemIndx].read_mem(hBx, cIndx).raw();
-        ap_uint<1> cFound=0;
-        for( auto cStub : cStubs ) 
-        {
-          if( cStub == 0x00 ) continue;
-          if( cStub.range(kBRAMwidth-1,0) == cRaw ){
-            cFound=1;
-            std::stringstream ss;
-            ss << hex << (long long)(cStub.range(kBRAMwidth-1,0)) << dec ;
-            if( IR_DEBUG )
-            {
-              std::cout << hex << cStub.range(kBRAMwidth-1,0)
-                << " "
-                << ss.str() 
-                << std::dec << "\n";
-            }
-            hVrfRefMems[cMemIndx].write_mem(hBx, ss.str());
-          } 
-        } 
-        if( cFound == 0  && cMemIndx < 8  )
-        {
-          AllStub<BARRELPS> hStub( cRaw );
-          cPhiMissing.push_back( hStub.getPhi() );
-          cMemIndxMissing.push_back( cMemIndx );
-        }
-      }// loop over memory entries  from emulation reference 
-      if( IR_DEBUG )
-      {
-        std::cout << "Mem#" << +cMemIndx 
-         << " has been filled with " << +hRefMems[cMemIndx].getEntries(hBx)
-         << " in emulator...."
-         << " reference used for comparison has " 
-         << +hVrfRefMems[cMemIndx].getEntries(hBx)
-         << " entries. This has been checked against input!!! \n";
-      }
-    }
+    //   // clear memory 
+    //   hVrfRefMems[cMemIndx].clear(hBx);
+    //   for( int cIndx=0; cIndx <  hRefMems[cMemIndx].getEntries(hBx); cIndx++ ) 
+    //   {
+    //     auto cRaw = hRefMems[cMemIndx].read_mem(hBx, cIndx).raw();
+    //     ap_uint<1> cFound=0;
+    //     for( auto cStub : cStubs ) 
+    //     {
+    //       if( cStub == 0x00 ) continue;
+    //       if( cStub.range(kBRAMwidth-1,0) == cRaw ){
+    //         cFound=1;
+    //         std::stringstream ss;
+    //         ss << hex << (long long)(cStub.range(kBRAMwidth-1,0)) << dec ;
+    //         if( IR_DEBUG )
+    //         {
+    //           std::cout << hex << cStub.range(kBRAMwidth-1,0)
+    //             << " "
+    //             << ss.str() 
+    //             << std::dec << "\n";
+    //         }
+    //         hVrfRefMems[cMemIndx].write_mem(hBx, ss.str());
+    //       } 
+    //     } 
+    //     if( cFound == 0  && cMemIndx < 8  )
+    //     {
+    //       AllStub<BARRELPS> hStub( cRaw );
+    //       cPhiMissing.push_back( hStub.getPhi() );
+    //       cMemIndxMissing.push_back( cMemIndx );
+    //     }
+    //   }// loop over memory entries  from emulation reference 
+    //   if( IR_DEBUG )
+    //   {
+    //     std::cout << "Mem#" << +cMemIndx 
+    //      << " has been filled with " << +hRefMems[cMemIndx].getEntries(hBx)
+    //      << " in emulator...."
+    //      << " reference used for comparison has " 
+    //      << +hVrfRefMems[cMemIndx].getEntries(hBx)
+    //      << " entries. This has been checked against input!!! \n";
+    //   }
+    // }
     
-    // verify HLS  
-    int cNerrors = verifyHLS<DTCStubMemory, kNIRMemories>( cBxId ,hMemories
-      , hVrfRefMems, pTruncated ); 
-    cErrorCount.push_back( cNerrors );
+    // // verify HLS  
+    // int cNerrors = verifyHLS<DTCStubMemory, kNIRMemories>( cBxId ,hMemories
+    //   , hVrfRefMems, pTruncated ); 
+    // cErrorCount.push_back( cNerrors );
   }// loop over Bx Ids 
     
   // close streams
-  for( int cMemIndx = 0 ; cMemIndx < kNIRMemories ; cMemIndx ++ )
+  for( int cMemIndx = 0 ; cMemIndx < cNMemories ; cMemIndx ++ )
   {
   	if( !cInputStreams[cMemIndx].is_open() ) continue;
   	cInputStreams[cMemIndx].close();
   }
 
-  // report missing stubs [ref vs. input ]  
-  int cIndx=0;
-  for(auto cMissing : cPhiMissing )
-  {
-    std::cout <<  std::dec 
-      << " Missing Barrel PS stub, layer 1 with phi value "
-      << cMissing << " from emulated memory#" 
-      << +cMemIndxMissing[cIndx] 
-      << " which is phi bin " 
-      << cMissing/(16383./8.) << "\n";
-    cIndx++;  
-  }
+  // // report missing stubs [ref vs. input ]  
+  // int cIndx=0;
+  // for(auto cMissing : cPhiMissing )
+  // {
+  //   std::cout <<  std::dec 
+  //     << " Missing Barrel PS stub, layer 1 with phi value "
+  //     << cMissing << " from emulated memory#" 
+  //     << +cMemIndxMissing[cIndx] 
+  //     << " which is phi bin " 
+  //     << cMissing/(16383./8.) << "\n";
+  //   cIndx++;  
+  // }
   // return error count 
   return std::accumulate(cErrorCount.begin(), cErrorCount.end(), 0);  
 }
