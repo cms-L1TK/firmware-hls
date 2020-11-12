@@ -42,24 +42,20 @@ constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. C
 
 
 ///////////////////////////////////////////////
-// Variables that don't need manual changing
+// Variables that don't need manual changing for barrel layers
 
 // Number of VMs
-constexpr int nvmStandardTE = (kLAYER) ? nvmtelayers[kLAYER-1] : nvmtedisks[kDISK-1];
-
-constexpr int nvmME = (kLAYER) ? nvmmelayers[kLAYER-1] : nvmmedisks[kDISK-1]; // ME memories
-constexpr int nvmTEI = (kLAYER != 2) ? nvmStandardTE : nvmteextralayers[kLAYER-1]; // TE Inner memories
+constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
+constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Inner memories
 constexpr int nvmOL = (kLAYER == 1 || kLAYER == 2) ? nvmollayers[kLAYER-1] : 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
-constexpr int nvmTEO = (kLAYER != 3) ? nvmStandardTE : nvmteextralayers[kLAYER-1]; // TE Outer memories
+constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Outer memories
 
 // Number of bits used for the bins in VMStubeME memories
-constexpr int nbitsbin = (kLAYER) ? 3 : 4;
+constexpr int nbitsbin = 3;
 
 // What regionType the input/output is
-constexpr regionType tmpLayerType = (kLAYER > 3) ? BARREL2S : BARRELPS;
-
-constexpr regionType inputType = (kLAYER) ? tmpLayerType : DISKPS;
-constexpr regionType outputType = (kLAYER) ? tmpLayerType : DISK;
+constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
 
 
 /////////////////////////////////////////////////////
