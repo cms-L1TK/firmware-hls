@@ -428,7 +428,7 @@ void MatchCalculator(BXType bx,
   
     // Full match  
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
-    std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "fm=" << fm.raw() << std::endl;
+    std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "\tfm=" << fm.raw() << std::endl;
   
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -834,7 +834,7 @@ void MatchProcessor(BXType bx,
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
-        matchengine[iMEU].init(bx, tmpprojbuff, writeindex[iphi]);
+        matchengine[iMEU].init(bx, tmpprojbuff, writeindex[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
       if(!matchengine[iMEU].done()) { 
@@ -847,6 +847,7 @@ void MatchProcessor(BXType bx,
        typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
        typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
        matchengine[iMEU].readNext(currentTCID, projindex, stubid);
+       std::cout << "Sending to MC projid=" << projindex << "\tstubid=" << stubid << std::endl;
        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                  //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
                  (bx, allstub, allproj, projindex, stubid, nstubs, bx_o,

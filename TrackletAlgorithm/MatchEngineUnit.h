@@ -42,7 +42,7 @@ MatchEngineUnit() {
 
 }
 
-inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const INDEX iproj) {
+inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const INDEX iproj, int unit) {
 #pragma HLS inline
   writeindex = iproj;
   readindex = 0;
@@ -50,8 +50,12 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
   done_ = false;
   bx = bxin;
   projbuffer = projbuffer_;
+  projindex = projbuffer_.getIndex();
   ivmphi = projbuffer_.getPhi();
   ptr = 0;
+  unit_ = unit;
+  std::cout << "Initializing MEU " << unit_ << std::endl;
+  print();
   //stubmem = stubmem_;
   //std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.raw() << " Received writeindex=" << writeindex << std::endl;
   //projbuffer.Print();
@@ -60,7 +64,7 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
 
 bool empty() {
 #pragma HLS inline  
-  return (writeindex==0);
+  return (readindex==0);
 
 }
 
@@ -92,9 +96,10 @@ ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
   return tcid;
 }
 
-VMProjection<BARREL>::VMPID& getProjindex() {
+VMProjection<BARREL>::VMPID getProjindex() {
 #pragma HLS inline  
-  return projindex;
+  std::cout << "projindex=" << projindex << "\tprojid=" << projbuffer.getIndex() << std::endl;
+  return projbuffer.getIndex();
 }
 
 NSTUBS getNStubs() {
@@ -115,14 +120,28 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& projid, STUBID& stubid) {
 #pragma HLS inline  
-  std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
+  print();
   trackletid = getTCID();
   projid = getProjindex();
   stubid = stubids[ptr];
+  std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
   ptr++;
   idle_ = ptr >= readindex ? true : idle_;
 
 }
+
+#ifndef __SYNTHESIS__
+void print() {
+  if(empty()) 
+    std::cout << "Empty MEU projid=" << projbuffer.getIndex() << unit_ << std::endl;
+  else {
+    std::cout << "Unread contents in MEU projid=" << projbuffer.getIndex() << unit_ << std::endl;
+    for(int i = ptr; i < readindex; ++i){
+      std::cout << std::hex << i << ": " << stubids[i] << std::endl;
+    }
+  }
+}
+#endif
 
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
@@ -149,7 +168,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
   // Buffer still has projections to read out
   //If the buffer is not empty we have a projection that we need to 
   //process. 
-  if (!empty() && !done()) {// && buffernotlarger) {
+  if (!done()) {// && buffernotlarger) {
       auto readindextmp = readindex;
 
       ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
@@ -223,7 +242,8 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
       std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
     //if(istub==0 && nstubs>0) idle_ = true;
-    if(readindex>writeindex) done_ = true;
+    if(readindex>nstubs) done_ = true;
+    //if(readindex>writeindex) done_ = true;
     //if(istub==0 && nstubs>0) return true;
     if(done_) return true;
  
@@ -247,6 +267,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
   bool done_;
   int istep_;
   int ivmphi;
+  int unit_;
   BXType bx;
   NSTUBS istub=0;
   STUBID stubids[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
