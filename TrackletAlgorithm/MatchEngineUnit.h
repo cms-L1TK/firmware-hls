@@ -150,6 +150,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
   //If the buffer is not empty we have a projection that we need to 
   //process. 
   if (!empty() && !done()) {// && buffernotlarger) {
+      auto readindextmp = readindex;
 
       ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
 
@@ -218,8 +219,8 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
       //Check if stub bend and proj rinv consistent
       auto const index=projrinv.concat(stubbend);
       if (pass&&table[index]) {
-      stubids[readindex]=stubindex;
-      //std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
+      stubids[readindextmp]=stubindex;
+      std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
     //if(istub==0 && nstubs>0) idle_ = true;
     if(readindex>writeindex) done_ = true;
