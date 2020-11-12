@@ -61,7 +61,7 @@ public:
     kPRProjNStubsLSB = kPRProjMSB + 1,
     kPRProjNStubsMSB = kPRProjNStubsLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferNStubsSize - 1,
     kPRBufferIndexLSB = kPRProjNStubsMSB + 1,
-    kPRBufferIndexMSB = kPRBufferIndexLSB + 1,
+    kPRBufferIndexMSB = kPRBufferIndexLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferIndexSize - 1,
     kPRBufferHasSecondLSB = kPRBufferIndexMSB + 1,
     kPRBufferHasSecondMSB = kPRBufferHasSecondLSB + ProjectionRouterBufferBase<VMProjType>::kPRBufferHasSecondSize - 1,
     kPRBufferTCIDLSB = kPRBufferHasSecondLSB + 1,
@@ -89,6 +89,9 @@ public:
     data_( ((((((tcid,hasSec),index),nstub),projdata),zbin),ps) )
   {
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
+    VMProjection<BARREL> vmproj(projdata);
+    setIndex(vmproj.getIndex()); //FIXME error with data_ constructor not setting projindex correctly
+    std::cout << "Creating new projrouterbuffer with projid=" << getIndex() << "\twith internal projid=" << vmproj.getIndex() << std::endl;
     setNStubs(nstub); //FIXME error with data_ constructor not setting nstubs correctly
     setHasSecond(hasSec); //FIXME error with data_ constructor not setting hasSec correctly
   }
