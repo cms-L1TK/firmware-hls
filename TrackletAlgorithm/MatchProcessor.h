@@ -376,7 +376,6 @@ void MatchCalculator(BXType bx,
 
     // Don't read past nstubs (would read garbage)
     CandidateMatch cmatch(projid.concat(stubid));
-    std::cout << "MC received projid=" << projid << "\tstubid=" << stubid << std::endl;
   
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
