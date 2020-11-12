@@ -9,19 +9,19 @@ public:
     ap_uint<kNBitsBuffer> tmpptr = ptr_;
     ptr_++;
     //if(empty()) reset(); //read all projections, reset array to 0
-    //std::cout << std::hex << "reading proj=" << projbuffer[tmpptr].raw() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
+    std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].raw() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
     return projbuffer[tmpptr];
 
   }
 
   inline void add(ProjectionRouterBuffer<BARREL> proj) {
     projbuffer[width_] = proj;
-    //std::cout << std::hex << "adding proj=" << projbuffer[width_].raw() << "\twidth= " << width_ << std::endl;
+    std::cout << std::hex << "adding proj=" << projbuffer[width_].raw() << "\twidth= " << width_ << std::endl;
     width_++;
   }
 
   inline bool empty() { 
-    //std::cout << "Empty? " << (ptr_ == width_) << std::endl;
+    std::cout << "Empty? " << (ptr_ == width_) << std::endl;
     return ptr_ == width_;
   }
 
@@ -32,7 +32,10 @@ public:
     empty();
   }
 
-  ProjectionRouterBufferArray() { reset(); }
+  ProjectionRouterBufferArray() {
+#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
+    reset();
+  }
 
 private:
   ap_uint<kNBitsBuffer> ptr_ = 0;
