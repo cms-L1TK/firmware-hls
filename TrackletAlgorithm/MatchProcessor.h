@@ -313,7 +313,7 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjectionMemory<APTYPE>* allproj,
                      ap_uint<VMProjectionBase<BARREL>::kVMProjIndexSize> projid,
-                     ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> *stubids,
+                     ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> stubid,
                      int nstubs,
                      BXType& bx_o,
                      int &nmcout1,
@@ -374,15 +374,9 @@ void MatchCalculator(BXType bx,
   FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
   bool goodmatch                   = false;
 
-  // Loop one past nstubs for pipelining
-  MC_LOOP: for (int istub = 0; istub <= nstubs+1; ++istub) {
-#pragma HLS PIPELINE II=1
-
     // Don't read past nstubs (would read garbage)
-    int istubtmp = istub > nstubs ? istub : nstubs;
-    auto stubid = stubids[istub];
     CandidateMatch cmatch(projid.concat(stubid));
-    //std::cout << "projid=" << projid << "\tstubid=" << stubid << std::endl;
+    std::cout << "MC received projid=" << projid << "\tstubid=" << stubid << std::endl;
   
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
@@ -444,7 +438,7 @@ void MatchCalculator(BXType bx,
     FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
     bool goodmatch_next              = false;
   
-    bool newtracklet = (istub==0 || istub>nstubs) ? true : false;
+    bool newtracklet = true;
     /* FIXME
     std::cout << "new tracklet " << newtracklet << std::endl;
     std::cout << std::hex << "bestmatch=" << bestmatch.raw() << std::endl;
@@ -520,7 +514,6 @@ void MatchCalculator(BXType bx,
   
     bx_o = bx;
     
-  } //end istub
 } //end MC
 
 
@@ -573,6 +566,7 @@ void MatchProcessor(BXType bx,
   readTable<L>(table);
   
   // reset output memories
+  /*
   fullmatch[0].clear(bx);
   fullmatch[1].clear(bx);
   fullmatch[2].clear(bx);
@@ -581,6 +575,7 @@ void MatchProcessor(BXType bx,
   fullmatch[5].clear(bx);
   fullmatch[6].clear(bx);
   fullmatch[7].clear(bx);
+  */
 
   // initialization:
   // check the number of entries in the input memories
@@ -589,6 +584,8 @@ void MatchProcessor(BXType bx,
 #pragma HLS dependence variable=mem_hasdata inter RAW true
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
+#pragma HLS resource variable=instubdata core=RAM_2P_LUTRAM
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin,0,
@@ -650,7 +647,8 @@ void MatchProcessor(BXType bx,
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
-#pragma HLS PIPELINE II=1
+#pragma HLS PIPELINE II=1 rewind
+    std::cout << "istep=" << istep << std::endl;
 
     // read inputs
     TrackletProjection<PROJTYPE> projdata;
@@ -836,21 +834,22 @@ void MatchProcessor(BXType bx,
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
-        matchengine[iMEU].init(bx, tmpprojbuff, instub, writeindex[iphi]);
+        matchengine[iMEU].init(bx, tmpprojbuff, writeindex[iphi]);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
-      if(!matchengine[iMEU].done()) ready = matchengine[iMEU].step(table);
+      if(!matchengine[iMEU].done()) { 
+        ready = matchengine[iMEU].step(table, instubdata);
+      }
 
-#pragma HLS loop_flatten
-     if(ready) {
+     if(matchengine[iMEU].ready()) {
        typename VMProjection<BARREL>::VMPID projindex;
-       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID* stubids;
+       typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID stubid;
        typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
        typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-       matchengine[iMEU].read(currentTCID, projindex, stubids, nstubs);
+       matchengine[iMEU].readNext(currentTCID, projindex, stubid);
        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                  //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
-                 (bx, allstub, allproj, projindex, matchengine[iMEU].getStubIds(), nstubs, bx_o,
+                 (bx, allstub, allproj, projindex, stubid, nstubs, bx_o,
                   nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
                   fullmatch);
       } //end MC if

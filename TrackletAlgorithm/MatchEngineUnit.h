@@ -36,12 +36,13 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
 MatchEngineUnit() {
   nstubs=0;
+  ptr = 0;
   idle_ = true;
   done_ = true;
 
 }
 
-inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const VMStubMEMemory<VMSMEType,3> *stubmem_, const INDEX iproj) {
+inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const INDEX iproj) {
 #pragma HLS inline
   writeindex = iproj;
   readindex = 0;
@@ -50,7 +51,8 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
   bx = bxin;
   projbuffer = projbuffer_;
   ivmphi = projbuffer_.getPhi();
-  stubmem = stubmem_;
+  ptr = 0;
+  //stubmem = stubmem_;
   //std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.raw() << " Received writeindex=" << writeindex << std::endl;
   //projbuffer.Print();
 
@@ -72,6 +74,11 @@ bool done() {
 #pragma HLS inline  
   //std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << (done_ ? "": " not") << " done!" << std::endl;
   return done_;
+}
+
+bool ready() {
+#pragma HLS inline  
+  return ptr < readindex;
 }
 
 STUBID* getStubIds() {
@@ -106,8 +113,19 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 }
 
+void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& projid, STUBID& stubid) {
+#pragma HLS inline  
+  std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
+  trackletid = getTCID();
+  projid = getProjindex();
+  stubid = stubids[ptr];
+  ptr++;
+  idle_ = ptr > readindex ? true : idle_;
+
+}
+
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
-inline bool step(bool *table) {
+inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
@@ -183,7 +201,7 @@ inline bool step(bool *table) {
       
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
-      const VMStubME<VMSMEType> stubdata=stubmem->read_mem(bx,stubadd);
+      const VMStubME<VMSMEType> stubdata=stubmem[ivmphi].read_mem(bx,stubadd);
       auto stubindex=stubdata.getIndex();
       auto stubfinez=stubdata.getFineZ();
       auto stubbend=stubdata.getBend();
@@ -200,7 +218,7 @@ inline bool step(bool *table) {
       //Check if stub bend and proj rinv consistent
       auto const index=projrinv.concat(stubbend);
       if (pass&&table[index]) {
-      stubids[istubtmp]=stubindex;
+      stubids[readindex]=stubindex;
       //std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
     //if(istub==0 && nstubs>0) idle_ = true;
@@ -222,6 +240,7 @@ inline bool step(bool *table) {
  private:
   INDEX writeindex;
   INDEX readindex;
+  INDEX ptr;
   NSTUBS nstubs;
   bool idle_;
   bool done_;
@@ -236,7 +255,7 @@ inline bool step(bool *table) {
   ProjectionRouterBuffer<BARREL>::VMPZBIN zbin;
   VMProjection<BARREL>::VMPRINV projrinv;
   VMProjection<BARREL>::VMPID projindex;
-  const VMStubMEMemory<VMSMEType,3> *stubmem;
+  //const VMStubMEMemory<VMSMEType,3> *stubmem;
   ProjectionRouterBuffer<BARREL> projbuffer;
 
 }; // end class
