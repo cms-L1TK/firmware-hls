@@ -187,10 +187,6 @@ void VMRouterTop(BXType bx,
 //#pragma HLS resource variable=rzBitsOverlapTable latency=2
 #pragma HLS resource variable=rzBitsOuterTable latency=2
 
-//phiCorrtTable and bendCutTable seems to be using LUTs as they relatively small?
-//#pragma HLS resource variable=bendCutInnerTable latency=2
-//#pragma HLS resource variable=bendCutOuterTable latency=2
-
 
 	//////////////////////////////////
 	// Create memory masks

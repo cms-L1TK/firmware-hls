@@ -20,7 +20,7 @@
 // Variables for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 1 // Which barrel layer number the data is coming from, 0 if not barrel
+#define kLAYER 1 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
 
 constexpr char phiRegion = 'E'; // Which AllStub/PhiRegion
@@ -42,20 +42,41 @@ constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. C
 
 
 ///////////////////////////////////////////////
-// Variables that don't need manual changing for barrel layers
+// Variables that don't need manual changing
 
-// Number of VMs
-constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
-constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Inner memories
-constexpr int nvmOL = (kLAYER == 1 || kLAYER == 2) ? nvmollayers[kLAYER-1] : 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
-constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Outer memories
+#if kLAYER == kDISK
+#error kLAYER and kDISK can't be the sam
+#elif kLAYER > 0
+	// Number of VMs
+	constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
+	constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Inner memories
+	constexpr int nvmOL = (kLAYER == 1 || kLAYER == 2) ? nvmollayers[kLAYER-1] : 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
+	constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Outer memories
 
-// Number of bits used for the bins in VMStubeME memories
-constexpr int nbitsbin = 3;
+	// Number of bits used for the bins in VMStubeME memories
+	constexpr int nbitsbin = 3;
 
-// What regionType the input/output is
-constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
-constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+	// What regionType the input/output is
+	constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+	constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+
+#elif kDISK > 0
+	// Number of VMs
+	constexpr int nvmME = nvmmedisks[kDISK-1]; // ME memories
+	constexpr int nvmTEI = nvmtedisks[kDISK-1]; // TE Inner memories
+	constexpr int nvmOL = 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
+	constexpr int nvmTEO = nvmtedisks[kDISK-1]; // TE Outer memories
+
+	// Number of bits used for the bins in VMStubeME memories
+	constexpr int nbitsbin = 4;
+
+	// What regionType the input/output is
+	constexpr regionType inputType = DISKPS;
+	constexpr regionType outputType = DISK;
+
+#else
+#error Need to have either kLAYER or kDISK larger than 0.
+#endif
 
 
 /////////////////////////////////////////////////////
