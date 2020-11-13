@@ -182,11 +182,6 @@ void VMRouterTop(BXType bx,
 #pragma HLS resource variable=inputStubDisk2S[0].get_mem() latency=2
 #pragma HLS resource variable=inputStubDisk2S[1].get_mem() latency=2
 
-#pragma HLS resource variable=fineBinTable latency=2
-#pragma HLS resource variable=rzBitsInnerTable latency=2
-//#pragma HLS resource variable=rzBitsOverlapTable latency=2
-#pragma HLS resource variable=rzBitsOuterTable latency=2
-
 
 	//////////////////////////////////
 	// Create memory masks
