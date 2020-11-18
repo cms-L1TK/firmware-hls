@@ -9,21 +9,21 @@ public:
     ap_uint<kNBitsBuffer> tmpptr = ptr_;
     ptr_++;
     if(empty()) reset(); //read all projections, reset array to 0
-    std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].raw() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
-    print();
+    //std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].raw() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
+    //print();
     return projbuffer[tmpptr];
 
   }
 
   inline void add(ProjectionRouterBuffer<BARREL> &proj) {
     projbuffer[width_] = proj;
-    std::cout << std::hex << "adding proj=" << proj.raw() << "\tprojid=" << proj.getIndex() << "\twidth= " << width_ << std::endl;
+    //std::cout << std::hex << "adding proj=" << proj.raw() << "\tprojid=" << proj.getIndex() << "\twidth= " << width_ << std::endl;
     width_++;
-    print();
+    //print();
   }
 
   inline bool empty() { 
-    std::cout << "Empty projbuffer? " << (ptr_ == width_) << std::endl;
+    //std::cout << "Empty projbuffer? " << (ptr_ == width_) << std::endl;
     return ptr_ == width_;
   }
 

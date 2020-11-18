@@ -54,8 +54,8 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
   ivmphi = projbuffer_.getPhi();
   ptr = 0;
   unit_ = unit;
-  std::cout << "Initializing MEU " << unit_ << std::endl;
-  print();
+  //std::cout << "Initializing MEU " << unit_ << std::endl;
+  //print();
   //stubmem = stubmem_;
   //std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.raw() << " Received writeindex=" << writeindex << std::endl;
   //projbuffer.Print();
@@ -98,7 +98,7 @@ ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
 
 VMProjection<BARREL>::VMPID getProjindex() {
 #pragma HLS inline  
-  std::cout << "projindex=" << projindex << "\tprojid=" << projbuffer.getIndex() << std::endl;
+  //std::cout << "projindex=" << projindex << "\tprojid=" << projbuffer.getIndex() << std::endl;
   return projbuffer.getIndex();
 }
 
@@ -120,11 +120,11 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& projid, STUBID& stubid) {
 #pragma HLS inline  
-  print();
+  //print();
   trackletid = getTCID();
   projid = getProjindex();
   stubid = stubids[ptr];
-  std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
+  //std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
   ptr++;
   idle_ = ptr >= readindex ? true : idle_;
 
@@ -239,7 +239,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
       auto const index=projrinv.concat(stubbend);
       if (pass&&table[index]) {
       stubids[readindextmp]=stubindex;
-      std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
+      //std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
     //if(istub==0 && nstubs>0) idle_ = true;
     if(readindex>nstubs) done_ = true;

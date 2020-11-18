@@ -428,7 +428,7 @@ void MatchCalculator(BXType bx,
   
     // Full match  
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
-    std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "\tfm=" << fm.raw() << std::endl;
+    //std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "\tfm=" << fm.raw() << std::endl;
   
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -647,7 +647,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1 rewind
-    std::cout << "istep=" << istep << std::endl;
+    //std::cout << "istep=" << istep << std::endl;
 
     // read inputs
     TrackletProjection<PROJTYPE> projdata;
@@ -846,7 +846,7 @@ void MatchProcessor(BXType bx,
        typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
        typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
        matchengine[iMEU].readNext(currentTCID, projindex, stubid);
-       std::cout << "Sending to MC projid=" << projindex << "\tstubid=" << stubid << std::endl;
+       //std::cout << "Sending to MC projid=" << projindex << "\tstubid=" << stubid << std::endl;
        MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
                  //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
                  (bx, allstub, allproj, projindex, stubid, nstubs, bx_o,
