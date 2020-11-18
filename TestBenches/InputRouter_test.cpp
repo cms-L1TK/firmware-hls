@@ -237,11 +237,10 @@ void prepareInputStreams( ifstream * pInputStreams
   }
 }
 
-
+// test bench starts here 
 int main()
 {
  
-  bool cTruncated = false;
   int cDTCsplit=0;
   int cNonant=4;
   std::string cInputFile_LinkMap = "emData/dtclinklayerdisk.dat";
@@ -249,7 +248,7 @@ int main()
   
   //
   int cFirstBx = 0 ;
-  int cLastBx = 0;
+  int cLastBx = 4;
   // 
   int cLinkId = 6; 
   std::string cLinkName = getLinkName( cLinkId, cDTCsplit , cInputFile_LinkMap); 
@@ -307,6 +306,7 @@ int main()
     // {
     //   writeMemFromFile<DTCStubMemory>(hRefMems[cMemIndx], cInputStreams[cMemIndx], cEvId);
     // }
+    
     
     // only compare the ones I want 
     if( cEvId < cFirstBx || cEvId > cLastBx ) continue;
@@ -374,51 +374,18 @@ int main()
       int cErCnt = compareMemWithFile<DTCStubMemory>(hMemories[cMemIndx], cInputStreams[cMemIndx], cEvId, "DTCStubMemory", cTruncated);
       cTotalErrCnt += cErCnt;
     }
-    
-    // check stubs in the stream 
-    // for( size_t cStubIndx = 0; cStubIndx < kMaxStubsFromLink; cStubIndx++)
-    // {
-    //   if( hInputStubs[cStubIndx] == 0 ) continue;
-
-    //   std::cout << "\t..Stub#" << +cStubIndx 
-    //     << " is "
-    //     << std::hex
-    //     << (hInputStubs[cStubIndx])
-    //     << std::dec 
-    //     << "\n";
-    // }
-
-    // check how many stubs are in each memory 
-    // for( size_t cMemIndx = 0; cMemIndx < cNMemories; cMemIndx++)
-    // {
-    //   std::cout << "\t...Found " 
-    //     << +hRefMems[cMemIndx].getEntries(cEvId) 
-    //     << " in memory#"
-    //     << +cMemIndx 
-    //     << " from emulation and "
-    //     << +hMemories[cMemIndx].getEntries(cEvId) 
-    //     << " from HLS top level"
-    //     << "\n";
-    //   for( int cEntry=0; cEntry < hRefMems[cMemIndx].getEntries(cEvId) ; cEntry++)
-    //   {
-    //     auto cStub = hMemories[cMemIndx].read_mem(cEvId, cEntry); 
-    //     std::cout << "\t\t...entry#"
-    //       << +cEntry
-    //       << " stub is "
-    //       << std::hex
-    //       << cStub.raw()
-    //       << std::dec
-    //       << " from reference memory is "
-    //       << std::hex
-    //       << hRefMems[cMemIndx].read_mem(cEvId, cEntry).raw()
-    //       << std::dec
-    //       << "\n";
-    //   }
-    // }
 
     // reset input file stream back to the start 
     cLinkDataStream.clear();
     cLinkDataStream.seekg (0, ios::beg);
   }
+
+  // place point back to start 
+  for( size_t cMemIndx = 0; cMemIndx < cTotalNMems; cMemIndx++)
+  {
+    cInputStreams[cMemIndx].close();
+  }
+  cLinkDataStream.close();
+
   return cTotalErrCnt;
 }

@@ -205,23 +205,6 @@ void InputRouter( const BXType hBx
 	  assert(cMemIndx < nOMems);
 	  ap_uint<8> hEntries = hNStubs[cMemIndx];
 	  #ifndef __SYNTHESIS__
-	    std::cout << "Stub # " << cStubCounter 
-	      << " in Bx "
-	      << hBx 
-	      << " from layer #" << hEncLyr 
-	      << " (enc.) which is connected to "
-	      << cNBns 
-	      << " IR memories...\t filling memory index "
-	      << cMemIndx 
-	      << " since its phi bin "
-	      << hPhiBn
-	      << " which has "
-	      << hEntries 
-	      << " entries."
-	      << "\n";
-	  #endif
-
-	  #ifndef __SYNTHESIS__
 	  if (IR_DEBUG) {
 	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
 	            << " [ EncLyrId " << hEncLyr << " ] "
@@ -233,18 +216,6 @@ void InputRouter( const BXType hBx
 	  hOutputStubs[cMemIndx].write_mem(hBx, hMemWord, hEntries);
 	  hNStubs[cMemIndx] = hEntries + 1;
 	}
-
-	#ifndef __SYNTHESIS__
-	  for( size_t cIndx=0; cIndx < nOMems; cIndx++)
-	  {
-		std::cout << "\t...Found " 
-	        << hOutputStubs[cIndx].getEntries(hBx) 
-	        << " in memory#"
-	        << +cIndx 
-	        << " from HLS top level"
-	        << "\n";
-	  }
-	#endif
 }
 
 
