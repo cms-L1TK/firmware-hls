@@ -145,7 +145,7 @@ void InputRouter( const BXType hBx
 	  if (hStub == 0)   continue;
 
 	  // named constants in InputRouter.h 
-	  ap_uint<3> hEncLyr = ap_uint<3>(hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x3);
+	  ap_uint<3> hEncLyr = ap_uint<3>(hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x7);
 	  ap_uint<kBRAMwidth> hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
 	  // get memory word
 	  DTCStub hMemWord(hStbWrd);
@@ -186,7 +186,7 @@ void InputRouter( const BXType hBx
 	  {
 	  	AllStub<BARRELPS> hAStub(hStub.range(kBRAMwidth-1,0));
 	  	auto hPhiCorrected = getPhiCorr<BARRELPS>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
-	  	auto hPhiBn = hPhiCorrected.range(hPhiCorrected.width-1,hPhiCorrected.width-kNbitsPhiBinsPSL1);
+	  	auto hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsPSL1);
 		cMemIndx = cIndx + (int)hPhiBn;
 	  }
 	  else if( cRegion == DISKPS )
@@ -200,7 +200,7 @@ void InputRouter( const BXType hBx
 	  {
 	  	AllStub<BARREL2S> hAStub(hStub.range(kBRAMwidth-1,0));
 	  	auto hPhiCorrected = getPhiCorr<BARREL2S>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
-	  	auto hPhiBn = hPhiCorrected.range(hPhiCorrected.width-1,hPhiCorrected.width-kNbitsPhiBinsTkr);
+	  	auto hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsTkr);
 	    cMemIndx = cIndx + (int)hPhiBn;
 	  }
 	  else if( cRegion == DISK2S )
