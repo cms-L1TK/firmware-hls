@@ -144,16 +144,14 @@ void InputRouter( const BXType hBx
 	  // add check of valid bit here 
 	  if (hStub == 0)   continue;
 
-	  // named constants in InputRouter.h 
-	  ap_uint<3> hEncLyr = ap_uint<3>(hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x7);
 	  ap_uint<kBRAMwidth> hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
+	  int hEncLyr = (hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x7);
 	  // get memory word
 	  DTCStub hMemWord(hStbWrd);
 	    
 	  // decode link wrd for this layer
-	  ap_uint<kSizeLinkWord> hWrd = hLinkWord.range(kSizeLinkWord * hEncLyr + (kSizeLinkWord-1), kSizeLinkWord * hEncLyr);
-	  ap_uint<1> hIsBrl= hWrd.range(0, 0);
-	  ap_uint<3> hLyrId= hWrd.range(3, 1);
+	  int hIsBrl= hLinkWord.range(kSizeLinkWord * hEncLyr, kSizeLinkWord * hEncLyr);
+	  int hLyrId= hLinkWord.range(3 + kSizeLinkWord * hEncLyr, 1 + kSizeLinkWord * hEncLyr);
 
 	  // point to the correct 
 	  // LUT with the phi 
@@ -180,48 +178,51 @@ void InputRouter( const BXType hBx
 	  }
 	  
 	  // get phi bin
-	  regionType cRegion = ( hIsBrl == 1 ) ? BARRELPS : DISKPS;
-	  cRegion = ( hIs2S == 1 ) ? static_cast<regionType>(cRegion+1) : cRegion ;
-	  if( cRegion == BARRELPS )  
+	  // regionType cRegion = ( hIsBrl == 1 ) ? BARRELPS : DISKPS;
+	  // cRegion = ( hIs2S == 1 ) ? static_cast<regionType>(cRegion+1) : cRegion ;
+	  // barrel PS 
+	  //if( cRegion == BARRELPS )  
+	  if( hIsBrl == 1 && hIs2S == 0 )
 	  {
 	  	AllStub<BARRELPS> hAStub(hStub.range(kBRAMwidth-1,0));
 	  	auto hPhiCorrected = getPhiCorr<BARRELPS>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
-	  	auto hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsPSL1);
-		cMemIndx = cIndx + (int)hPhiBn;
+	  	const int hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsPSL1);
+	  	cMemIndx = cIndx + hPhiBn;
 	  }
-	  else if( cRegion == DISKPS )
+	  else if( hIsBrl == 0 && hIs2S == 0 )
+	  //else if( cRegion == DISKPS )
 	  {
 	  	auto hPhiMSB = AllStub<DISKPS>::kASPhiMSB;
 		auto hPhiLSB = AllStub<DISKPS>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-	    auto hPhiBn = hStub.range(hPhiMSB,hPhiLSB) ;
-	    cMemIndx = cIndx + (int)hPhiBn;
+	    const int  hPhiBn = hStub.range(hPhiMSB,hPhiLSB) ;
+		cMemIndx = cIndx + hPhiBn;
 	  }
-	  else if( cRegion == BARREL2S )
+	  else if(  hIs2S == 0 )
+	  //else if( cRegion == BARREL2S )
 	  {
 	  	AllStub<BARREL2S> hAStub(hStub.range(kBRAMwidth-1,0));
 	  	auto hPhiCorrected = getPhiCorr<BARREL2S>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
-	  	auto hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsTkr);
-	    cMemIndx = cIndx + (int)hPhiBn;
+	  	const int hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsTkr);
+	    cMemIndx = cIndx + hPhiBn;
 	  }
-	  else if( cRegion == DISK2S )
+	  else if(  hIs2S == 1 )
+	  //else if( cRegion == DISK2S )
 	  {
 	  	auto hPhiMSB = AllStub<DISK2S>::kASPhiMSB;
 		auto hPhiLSB = AllStub<DISK2S>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-	    auto hPhiBn = hStub.range(hPhiMSB,hPhiLSB);
-	    cMemIndx = cIndx + (int)hPhiBn;
+	    const int hPhiBn = hStub.range(hPhiMSB,hPhiLSB);
+	    cMemIndx = cIndx + hPhiBn;
 	  }
-	  assert(cMemIndx < nOMems);
+	  assert(cMemIndx < (int)(nOMems));
 	  
-	  //ap_uint<kNMEMwidth> cMemIndx(cIndx);
 	  // write to memory
-	  //static const int cMemIndx = cIndx;
 	  #ifndef __SYNTHESIS__
 	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
 	            << " Mem#" << cIndx
 	            << " MemIndx#" << cMemIndx
 	            << "\n";
 	  #endif
-	  ap_uint<kNBits_MemAddr> hEntries = hNStubs[cMemIndx];
+	  int hEntries = int(hNStubs[cMemIndx]);
 	  
 	  #ifndef __SYNTHESIS__
 	  if (IR_DEBUG) {
