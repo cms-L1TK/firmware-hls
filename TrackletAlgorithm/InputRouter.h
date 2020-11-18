@@ -13,7 +13,7 @@ constexpr int kLINKMAPwidth = 20;
 constexpr int kSizeLinkWord = 4; 
 constexpr int kBINMAPwidth = 12; 
 constexpr int kSizeBinWord =  3; 
-constexpr int kNMEMwidth = 5;
+constexpr int kNMEMwidth = 8;
 #ifndef __SYNTHESIS__
 	#include <bitset> 
 #endif
@@ -45,6 +45,27 @@ constexpr int kNbitsPhiBinsPSL1 = 3;
 // except for PS L1
 constexpr int kNbitsPhiBinsTkr = 2; 
 
+// typedefs
+// encoded DTC layer id 
+constexpr unsigned int kNBitsDTCLyrEnc=3;
+typedef ap_uint<kNBitsDTCLyrEnc> EncodedDTCLyrId ;
+// raw trakcker layer id 
+constexpr unsigned int kNBitsLyrTk=3; 
+typedef ap_uint<kNBitsLyrTk> TkLyrId ;
+// barrel bit 
+constexpr unsigned int kNBitsBrlBit=1;
+typedef ap_uint<kNBitsBrlBit> BrlBit; 
+//
+constexpr unsigned int kNBitsPhi=3; 
+typedef ap_uint<kNBitsPhi> LyrPhiBn; 
+
+// 
+constexpr int kFrstPSBrlLyr = 1; 
+constexpr int kScndPSBrlLyr = 2;; 
+constexpr int kThrdPSBrlLyr = 3; 
+constexpr int kFrst2SBrlLyr = 4; 
+constexpr int kScnd2SBrlLyr = 5;; 
+constexpr int kThrd2SBrlLyr = 6; 
 //
 #define IR_DEBUG false
 
@@ -127,28 +148,28 @@ void InputRouter( const BXType hBx
 	  if (hStub == 0)   continue;
 
 	  // named constants in InputRouter.h 
-	  ap_uint<3> hEncLyr = ap_uint<3>(hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x3);
+	  EncodedDTCLyrId hEncLyr = EncodedDTCLyrId(hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x3);
 	  ap_uint<kBRAMwidth> hStbWrd = hStub.range(kBRAMwidth - 1, 0);
 	  // get memory word
 	  DTCStub hMemWord(hStbWrd);
 	    
 	  // decode link wrd for this layer
 	  ap_uint<kSizeLinkWord> hWrd = hLinkWord.range(kSizeLinkWord * hEncLyr + (kSizeLinkWord-1), kSizeLinkWord * hEncLyr);
-	  ap_uint<1> hIsBrl = hWrd.range(1, 0);
-	  ap_uint<3> hLyrId = hWrd.range(3, 1);
+	  BrlBit hIsBrl = hWrd.range(hIsBrl.width, 0);
+	  TkLyrId hLyrId = hWrd.range(hLyrId.width, hIsBrl.width);
 	  // point to the correct 
 	  // LUT with the phi 
 	  // corrections 
 	  const int* cLUT; 
-	  if( hLyrId == 1 || hLyrId == 4 ) 
+	  if( hLyrId == kFrstPSBrlLyr || hLyrId == kFrst2SBrlLyr ) 
 	  	cLUT = hPhiCorrtable_L1;
-	  else if( hLyrId == 2 || hLyrId == 5 ) 
+	  else if( hLyrId == kScndPSBrlLyr || hLyrId == kScnd2SBrlLyr ) 
 	  	cLUT = hPhiCorrtable_L2;
 	  else 
 	  	cLUT = hPhiCorrtable_L3;
 	  	
 	  // get phi bin
-	  ap_uint<3> hPhiBn = 0 ;
+	  LyrPhiBn hPhiBn = 0 ;
 	  regionType cRegion = ( hIsBrl == 1 ) ? BARRELPS : DISKPS;
 	  auto cIncrmntRegion = ( hIs2S == 1 ) ? 1 : 0;
 	  cRegion = static_cast<regionType>(cIncrmntRegion+cRegion);
@@ -162,6 +183,32 @@ void InputRouter( const BXType hBx
 	  	auto hPhiMSB = AllStub<BARRELPS>::kASPhiMSB;
 		auto hPhiLSB = AllStub<BARRELPS>::kASPhiMSB-(cPhiBitsOffset-1);
 	    hPhiBn = hAStub.raw().range(hPhiMSB,hPhiLSB) & 0x7;
+
+	    #ifndef __SYNTHESIS__
+	    {
+	      if (IR_DEBUG) {
+			  AllStub<BARRELPS> hRawStub(hStub.range(kBRAMwidth-1,0));
+		      auto hPhiRaw = hRawStub.getPhi();
+		      int cMemIndx=0;
+		      for (int cLyr = 0; cLyr < kNLayers; cLyr++) 
+			  {
+			    #pragma HLS unroll
+			    // update index
+			    ap_uint<kSizeBinWord> hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);
+			    cMemIndx += (cLyr < hEncLyr) ? (1+(unsigned int)(hBnWrd)) : 0; 
+			  }
+		  	  std::cout << "\t.. Stub : " << std::hex << hRawStub.raw() << std::dec
+		  			<< " Raw phi is " << hPhiRaw
+		  			<< " Corrected phi is " <<  hPhiCorrected 
+		            << " [ EncLyrId " << hEncLyr << " ] "
+		            << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
+		            << " PhiBn#" << +hPhiBn   
+		            << " there are already " << hNStubs[cMemIndx+hPhiBn] 
+		            << " entries in this memory\n";
+		 	}
+		}
+		#endif
+
 	  }
 	  else if( cRegion == DISKPS )
 	  {
@@ -188,7 +235,6 @@ void InputRouter( const BXType hBx
 	  
 	  // update index
 	  unsigned int cIndx = 0;
-	  unsigned int cNBns = 0;
 	  LOOP_UpdateMemIndx:
 	  for (int cLyr = 0; cLyr < kNLayers; cLyr++) 
 	  {
@@ -196,14 +242,13 @@ void InputRouter( const BXType hBx
 	    // update index
 	    ap_uint<kSizeBinWord> hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);
 	    cIndx += (cLyr < hEncLyr) ? (1+(unsigned int)(hBnWrd)) : 0; 
-	    cNBns += (hBnWrd == 0) ? 0 : (1 + (unsigned int)(hBnWrd)) ;
 	  }
 	  // and add phi bin 
 	  unsigned int cMemIndx = cIndx + hPhiBn;
-	  
 	  // write to memory
 	  assert(cMemIndx < nOMems);
-	  ap_uint<8> hEntries = hNStubs[cMemIndx];
+	  ap_uint<kNMEMwidth> hEntries = hNStubs[cMemIndx];
+	  
 	  #ifndef __SYNTHESIS__
 	  if (IR_DEBUG) {
 	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec

@@ -31,6 +31,9 @@ static const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
   0x20005, 0x60a62, 0x40047, 0x40087
 };
 
+// number of phi bins read out 
+// by each link (kSizeBinWord per layer )
+// upto 4 layers per link  
 static const ap_uint<kBINMAPwidth> kLinkNPhiBns[] = 
 {
   0x01B , 0x003 , 0x003 , 0x01B , 
@@ -38,6 +41,8 @@ static const ap_uint<kBINMAPwidth> kLinkNPhiBns[] =
   0x003 , 0x0DB , 0x01B , 0x01B 
 };
 
+// total number of memoreis 
+// readout b each link 
 static const ap_uint<kNMEMwidth> kLinkNMemories[] = 
 {
    8 ,  4 ,  4 ,  8 , 
@@ -248,7 +253,7 @@ int main()
   
   //
   int cFirstBx = 0 ;
-  int cLastBx = 4;
+  int cLastBx = 5;
   // 
   int cLinkId = 6; 
   std::string cLinkName = getLinkName( cLinkId, cDTCsplit , cInputFile_LinkMap); 
@@ -266,11 +271,21 @@ int main()
   {
     ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[cLinkId%12];
     ap_uint<kSizeBinWord> hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);
-    cNLyrs += ( hBnWrd != 0 );
-    cNPhiBnsPerLyr[cLyr] = hBnWrd;
-    cTotalNMems += hBnWrd;
+    cNLyrs += ( hBnWrd != 0 ) ? 1 : 0 ;
+    cNPhiBnsPerLyr[cLyr] =  ( hBnWrd != 0 ) ? int(1 + hBnWrd) : 0 ;
+    cTotalNMems +=  ( hBnWrd != 0 ) ? int(1+hBnWrd) : 0;
+    std::cout << "Link#"
+      << cLinkId
+      << " - number of phi bins readout by layer "
+      << +cLyr 
+      << " is "
+      << cNPhiBnsPerLyr[cLyr]
+      << " total number of memories will be "
+      << cTotalNMems
+      << " total number of layers read out is "
+      << cNLyrs
+      << "\n";
   }
-
   DTCStubMemory hMemories[cNMemories];
   
   // prepare input streams 
@@ -367,9 +382,12 @@ int main()
       // remove this when modified 
       // emulation data is available 
       if( cLinkId%12 == 6 || cLinkId%12 ==7 ) 
-        if( cMemIndx == 3 ) // D L1 
+        if( cMemIndx >= 3 ) // for now do not compare edges of L1 
           continue;
 
+      std::cout << "Memory#" 
+        << cMemIndx 
+        << "\n";
       bool cTruncated=false;
       int cErCnt = compareMemWithFile<DTCStubMemory>(hMemories[cMemIndx], cInputStreams[cMemIndx], cEvId, "DTCStubMemory", cTruncated);
       cTotalErrCnt += cErCnt;
