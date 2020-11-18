@@ -219,16 +219,23 @@ void prepareInputStreams( ifstream * pInputStreams
   std::cout << "DTC " << cDTCName << " is link#" <<  pLinkId << std::endl;
   
   ap_uint<kLINKMAPwidth> hLinkWord = kLinkAssignmentTable[pLinkId%12];
-  ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
+  ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[pLinkId%12];
   int cMemIndx=0;
   for(int cLyrIndx=0; cLyrIndx< kMaxLyrsPerDTC; cLyrIndx++)
   {
-    LnkWrd hWrd = hLinkWord.range(LnkWrd.width*cLyrIndx+LnkWrd.width-1,LnkWrd.width*cLyrIndx);
+    LnkWrd hWrd;
+    hWrd = hLinkWord.range(hWrd.width*cLyrIndx+hWrd.width-1,hWrd.width*cLyrIndx);
     if( hWrd == 0) continue;
     BrlBit hIsBrl = hWrd.range(hIsBrl.width, 0);
     TkLyrId hLyrId = hWrd.range(hLyrId.width, hIsBrl.width);
-    // then over phi bins
-    int cNPhiBns = ( (hIs2S==0) && hLyrId==1 && hIsBrl) ? 8 : 4; 
+    // get phi bin 
+    ap_uint<kSizeBinWord> hBnWrd = hPhBnWord.range(kSizeBinWord * cLyrIndx + (kSizeBinWord-1), kSizeBinWord * cLyrIndx);
+    auto cNPhiBns =  (1+(unsigned int)(hBnWrd));
+    std::cout << "Layer# " << cLyrIndx 
+      << " " << cNPhiBns 
+      << " phi bins"
+      << "\n";
+    
     for( int cPhiBn=0; cPhiBn<cNPhiBns; cPhiBn++)
     {
       std::string cMemPrint = getMemPrintName(cDTCName ,cLyrIndx, cPhiBn, pNonant, hLinkWord);
@@ -253,7 +260,7 @@ int main()
   
   //
   int cFirstBx = 0 ;
-  int cLastBx = 5;
+  int cLastBx = 100;
   // 
   int cLinkId = 6; 
   std::string cLinkName = getLinkName( cLinkId, cDTCsplit , cInputFile_LinkMap); 
@@ -404,6 +411,6 @@ int main()
     cInputStreams[cMemIndx].close();
   }
   cLinkDataStream.close();
-
   return cTotalErrCnt;
+  //return 0;
 }
