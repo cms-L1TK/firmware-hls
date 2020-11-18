@@ -354,17 +354,29 @@ void InputRouter( const BXType hBx
 	  assert(cMemIndx < nOMems);
 	  ap_uint<8> hEntries = hNStubs[cMemIndx];
 	  #ifndef __SYNTHESIS__
-	  if (IR_DEBUG) {
-	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
-	            << " [ EncLyrId " << hEncLyr << " ] "
-	            << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
-	            << " PhiBn#" << +hPhiBn << " Mem#" << cMemIndx
-	            << " Current number of entries " << +hEntries << "\n";
-	  }
+	  //if (IR_DEBUG) {
+	  // std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
+	  //           << " [ EncLyrId " << hEncLyr << " ] "
+	  //           << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
+	  //           << " PhiBn#" << +hPhiBn << " Mem#" << cMemIndx
+	  //           << " Current number of entries " << +hEntries << "\n";
+	  //}
 	  #endif
 	  (&hOutputStubs[cMemIndx])->write_mem(hBx, hMemWord, hEntries);
 	  hNStubs[cMemIndx] = hEntries + 1;
 	}
+
+	#ifndef __SYNTHESIS__
+	  for( size_t cIndx=0; cIndx < nOMems; cIndx++)
+	  {
+	    std::cout << "\t...Found " 
+	        << (&hOutputStubs[cIndx])->getEntries(hBx) 
+	        << " in memory#"
+	        << +cIndx 
+	        << " from HLS top level"
+	        << "\n";
+	  }
+	#endif
 }
 
 

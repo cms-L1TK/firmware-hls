@@ -25,9 +25,9 @@ create_clock -period 360MHz -name fast_clock
 
 set nProc [exec nproc]
 csim_design -compiler gcc -mflags "-j$nProc"
-csynth_design
-cosim_design 
-export_design -format ip_catalog -flow syn
+#csynth_design
+#cosim_design 
+#export_design -format ip_catalog -flow syn
 #cosim_design -trace_level all -rtl verilog -verbose
 #export_design -format ip_catalog -flow syn
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).

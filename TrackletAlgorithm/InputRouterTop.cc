@@ -40,6 +40,18 @@ if( hInputLinkId%12 == 6 )
       , hInputStubs
       , hOutputStubs);
 
+// check 
+#ifndef __SYNTHESIS__
+  for( size_t cIndx=0; cIndx < cNMemories; cIndx++)
+  {
+    std::cout << "\t...Found " 
+        << +hOutputStubs[cIndx].getEntries(hBx) 
+        << " in memory#"
+        << +cIndx 
+        << " from HLS top level"
+        << "\n";
+  }
+#endif
 // if( (hInputLinkId%12) < 6 ) 
 // {
 //   switch(hInputLinkId%12) 

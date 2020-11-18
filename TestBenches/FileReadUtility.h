@@ -45,18 +45,62 @@ std::vector<std::string> split(const std::string& s, char delimiter)
 }
 
 // S.S. Storey 
-// read from file directly 
-template<class MemType, int Base=2>
-void getFromFile(MemType& hMemory, std::ifstream& pInputStream, int pEvent
-, char pDelimeter = '|' , char pSplitToken = ' '){
+// read f
+// template<class MemType, int Base=2>
+// void getFromFile(MemType& hMemory, std::ifstream& pInputStream, int pEvent
+// , char pDelimeter = '|' , char pSplitToken = ' '){
   
 
-  // clear memory for this bx/event 
-  hMemory.clear();
+//   // clear memory for this bx/event 
+//   hMemory.clear();
+//   // check file is still good 
+//   assert(pInputStream.good());
+  
+//   int cEventCounter=-1;
+//   do
+//   {
+//     std::string cInputLine="";
+//     getline( pInputStream, cInputLine );
+//     if( cInputLine.find("Event") != std::string::npos ) 
+//     {
+//       //std::cout << cInputLine << "\n";
+//       cEventCounter++;
+//     }
+//     else
+//     {
+//       if(cEventCounter != pEvent)
+//         continue;
+      
+//       // split line 
+//       //std::cout << cInputLine << "\n";
+//       std::stringstream cLineContent(cInputLine);
+//       for(std::string cToken; getline( cLineContent, cToken , pSplitToken ); )
+//       {
+//         // look for binary representation of word  
+//         if( cToken.find('|') != std::string::npos )  
+//         {
+//           //remove delimeter
+//           cToken.erase( std::remove(cToken.begin(), cToken.end(), pDelimeter), cToken.end() );
+//           hMemory.write_mem(pEvent, cToken, Base);
+//         }
+//       }
+//     }
+//   }while( pInputStream.good() && cEventCounter <= pEvent);
+// }
+
+// S.S. Storey 
+// added because the IR 
+// needs to fill a stream and not a memory 
+// so writeMemFromFile does not work 
+template<class DataType, int Base=2>
+void readDataFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
+, char pDelimeter = '|' , char pSplitToken = ' '){
+  
   // check file is still good 
   assert(pInputStream.good());
   
   int cEventCounter=-1;
+  int cCounter=0;
   do
   {
     std::string cInputLine="";
@@ -81,7 +125,14 @@ void getFromFile(MemType& hMemory, std::ifstream& pInputStream, int pEvent
         {
           //remove delimeter
           cToken.erase( std::remove(cToken.begin(), cToken.end(), pDelimeter), cToken.end() );
-          hMemory.write_mem(pEvent, cToken, Base);
+          // #ifndef __SYNTHESIS__
+          //   std::cout << cToken
+          //     << " " 
+          //     << std::stol( cToken , nullptr, 2 ) 
+          //     << "\n";
+          // #endif 
+          hData[cCounter] = std::stol( cToken , nullptr,Base )  ;
+          cCounter++; 
         }
       }
     }
