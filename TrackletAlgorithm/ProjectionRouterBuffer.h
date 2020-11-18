@@ -91,7 +91,7 @@ public:
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
     VMProjection<BARREL> vmproj(projdata);
     setIndex(vmproj.getIndex()); //FIXME error with data_ constructor not setting projindex correctly
-    std::cout << "Creating new projrouterbuffer with projid=" << getIndex() << "\twith internal projid=" << vmproj.getIndex() << std::endl;
+    //std::cout << "Creating new projrouterbuffer with projid=" << getIndex() << "\twith internal projid=" << vmproj.getIndex() << std::endl;
     setNStubs(nstub); //FIXME error with data_ constructor not setting nstubs correctly
     setHasSecond(hasSec); //FIXME error with data_ constructor not setting hasSec correctly
   }
