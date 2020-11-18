@@ -223,10 +223,10 @@ void prepareInputStreams( ifstream * pInputStreams
   int cMemIndx=0;
   for(int cLyrIndx=0; cLyrIndx< kMaxLyrsPerDTC; cLyrIndx++)
   {
-    ap_uint<4> hWrd = hLinkWord.range(4*cLyrIndx+3,4*cLyrIndx);
+    LnkWrd hWrd = hLinkWord.range(LnkWrd.width*cLyrIndx+LnkWrd.width-1,LnkWrd.width*cLyrIndx);
     if( hWrd == 0) continue;
-    ap_uint<1> hIsBrl = hWrd.range(1,0);
-    ap_uint<3> hLyrId = hWrd.range(3,1);
+    BrlBit hIsBrl = hWrd.range(hIsBrl.width, 0);
+    TkLyrId hLyrId = hWrd.range(hLyrId.width, hIsBrl.width);
     // then over phi bins
     int cNPhiBns = ( (hIs2S==0) && hLyrId==1 && hIsBrl) ? 8 : 4; 
     for( int cPhiBn=0; cPhiBn<cNPhiBns; cPhiBn++)

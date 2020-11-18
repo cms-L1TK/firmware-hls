@@ -58,6 +58,9 @@ typedef ap_uint<kNBitsBrlBit> BrlBit;
 //
 constexpr unsigned int kNBitsPhi=3; 
 typedef ap_uint<kNBitsPhi> LyrPhiBn; 
+// link word 
+constexpr unsigned int kNBitsLnkWrd=4;
+typedef ap_uint<kNBitsLnkWrd> LnkWrd;
 
 // 
 constexpr int kFrstPSBrlLyr = 1; 
