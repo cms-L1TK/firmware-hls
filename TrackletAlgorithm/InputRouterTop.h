@@ -8,20 +8,6 @@
 // is that really the only way to do this? 
 constexpr unsigned int cNMemories = 16; 
 
-// void InputRouterTop( const BXType hBx
-// 	, const ap_uint<6> hInputLinkId // link id 
-// 	, const ap_uint<kLINKMAPwidth> kInputLink // input link LUT 
-//   	, const ap_uint<kBINMAPwidth> kNPhiBns  // n phi bins LUT 
-//   	, const ap_uint<kNMEMwidth> kLinkNMemories // number of memories filled by each IR module
-//   	, const int* kPhiCorrtable_L1 // corrections L1 PS 
-// 	, const int* kPhiCorrtable_L2 // corrections L2 PS 
-// 	, const int* kPhiCorrtable_L3 // corrections L3 PS 
-// 	, const int* kPhiCorrtable_L4 // corrections L1 2S 
-// 	, const int* kPhiCorrtable_L5 // corrections L2 2S 
-// 	, const int* kPhiCorrtable_L6 // corrections L3 2S 
-// 	, ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]
-// 	, DTCStubMemory* hOutputStubs);
-
 void InputRouterTop( const BXType hBx
 	, const ap_uint<6> hInputLinkId // link id 
 	, const ap_uint<kLINKMAPwidth> kInputLink // input link LUT 
@@ -31,7 +17,7 @@ void InputRouterTop( const BXType hBx
 	, const int* kPhiCorrtable_L2 // corrections scnd brl lyr  
 	, const int* kPhiCorrtable_L3 // corrections thrd brl lyr   
 	, ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs 
-	, DTCStubMemory* hOutputStubs);//output memories 
+	, DTCStubMemory hOutputStubs[cNMemories]);//output memories 
 
 
 #endif

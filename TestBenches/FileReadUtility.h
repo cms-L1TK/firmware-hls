@@ -44,49 +44,6 @@ std::vector<std::string> split(const std::string& s, char delimiter)
   return tokens;
 }
 
-// S.S. Storey 
-// read f
-// template<class MemType, int Base=2>
-// void getFromFile(MemType& hMemory, std::ifstream& pInputStream, int pEvent
-// , char pDelimeter = '|' , char pSplitToken = ' '){
-  
-
-//   // clear memory for this bx/event 
-//   hMemory.clear();
-//   // check file is still good 
-//   assert(pInputStream.good());
-  
-//   int cEventCounter=-1;
-//   do
-//   {
-//     std::string cInputLine="";
-//     getline( pInputStream, cInputLine );
-//     if( cInputLine.find("Event") != std::string::npos ) 
-//     {
-//       //std::cout << cInputLine << "\n";
-//       cEventCounter++;
-//     }
-//     else
-//     {
-//       if(cEventCounter != pEvent)
-//         continue;
-      
-//       // split line 
-//       //std::cout << cInputLine << "\n";
-//       std::stringstream cLineContent(cInputLine);
-//       for(std::string cToken; getline( cLineContent, cToken , pSplitToken ); )
-//       {
-//         // look for binary representation of word  
-//         if( cToken.find('|') != std::string::npos )  
-//         {
-//           //remove delimeter
-//           cToken.erase( std::remove(cToken.begin(), cToken.end(), pDelimeter), cToken.end() );
-//           hMemory.write_mem(pEvent, cToken, Base);
-//         }
-//       }
-//     }
-//   }while( pInputStream.good() && cEventCounter <= pEvent);
-// }
 
 // S.S. Storey 
 // added because the IR 

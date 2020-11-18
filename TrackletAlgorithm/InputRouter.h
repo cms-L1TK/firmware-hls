@@ -79,138 +79,6 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 }
 
 
-// // template<regionType ASType, unsigned int nCorrBns> 
-// // inline void GetPhiBinBrl(const ap_uint<kNBits_DTC> inStub
-// // 	, const int hPhiCorrtable_L1[nCorrBns]
-// // 	, const int hPhiCorrtable_L2[nCorrBns]
-// // 	, const int hPhiCorrtable_L3[nCorrBns]
-// // 	, ap_uint<3> pLyrId 
-// // 	, ap_uint<3> &phiBn )
-// // {
-// // 	#pragma HLS pipeline II=1 
-// // 	#pragma HLS inline 
-
-// // 	ap_uint<8> hPhiMSB = AllStub<ASType>::kASPhiMSB;
-// // 	ap_uint<8> hPhiLSB;
-// // 	if( pLyrId == 1 && ASType == BARRELPS ) 
-// // 		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsPSL1-1);
-// // 	else
-// // 		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-
-// // 	AllStub<ASType> hStub(inStub.range(kBRAMwidth-1,0));
-// // 	ap_uint<3> phiBnRaw = hStub.raw().range(hPhiMSB,hPhiLSB) & 0x7;
-
-// // 	#ifndef __SYNTHESIS__
-// // 			if( IR_DEBUG )
-// // 			{
-// // 				std::cout << "\t\t.. original phi bin is "
-// // 					<< phiBnRaw
-// // 					<< "\n";
-// // 			}
-// // 	#endif
-// // 	typename AllStub<ASType>::ASPHI hPhiCorrected; 
-// // 	if( pLyrId == 1 || pLyrId == 4 )
-// // 	{  
-// // 		//GetPhiCorrection<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), kPhiCorrtable_L1,hPhiCorrected); 
-// // 		hPhiCorrected = getPhiCorr<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), hPhiCorrtable_L1); 
-// // 	}
-// // 	else if( pLyrId == 2 || pLyrId == 5 )
-// // 	{  
-// // 		//GetPhiCorrection<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), kPhiCorrtable_L2,hPhiCorrected); 
-// // 		hPhiCorrected = getPhiCorr<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), hPhiCorrtable_L2); 
-// // 	}
-// // 	else if( pLyrId == 3 || pLyrId == 6 )
-// // 	{  
-// // 		//GetPhiCorrection<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), kPhiCorrtable_L3,hPhiCorrected); 
-// // 		hPhiCorrected = getPhiCorr<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), hPhiCorrtable_L3); 
-// // 	}
-// // 	hStub.setPhi(hPhiCorrected);
-// // 	phiBn = hStub.raw().range(hPhiMSB,hPhiLSB) & 0x7;
-// // 	#ifndef __SYNTHESIS__
-// // 			if( IR_DEBUG )
-// // 			{
-// // 				std::cout << "\t\t.. after correction phi bin is "
-// // 					<< phiBn
-// // 					<< "\n";
-// // 			}
-// // 	#endif
-	
-// // }
-// template<regionType ASType> 
-// inline void GetPhiBinBrl(const ap_uint<kNBits_DTC> inStub
-// 	, const int hPhiCorrtable_L1[]
-// 	, const int hPhiCorrtable_L2[]
-// 	, const int hPhiCorrtable_L3[]
-// 	, ap_uint<3> pLyrId 
-// 	, ap_uint<3> &phiBn )
-// {
-// 	#pragma HLS pipeline II=1 
-// 	#pragma HLS inline 
-
-// 	ap_uint<8> hPhiMSB = AllStub<ASType>::kASPhiMSB;
-// 	ap_uint<8> hPhiLSB;
-// 	if( pLyrId == 1 && ASType == BARRELPS ) 
-// 		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsPSL1-1);
-// 	else
-// 		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-
-// 	AllStub<ASType> hStub(inStub.range(kBRAMwidth-1,0));
-// 	ap_uint<3> phiBnRaw = hStub.raw().range(hPhiMSB,hPhiLSB) & 0x7;
-
-// 	#ifndef __SYNTHESIS__
-// 			if( IR_DEBUG )
-// 			{
-// 				std::cout << "\t\t.. original phi bin is "
-// 					<< phiBnRaw
-// 					<< "\n";
-// 			}
-// 	#endif
-// 	typename AllStub<ASType>::ASPHI hPhiCorrected; 
-// 	if( pLyrId == 1 || pLyrId == 4 )
-// 	{  
-// 		//GetPhiCorrection<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), kPhiCorrtable_L1,hPhiCorrected); 
-// 		hPhiCorrected = getPhiCorr<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), hPhiCorrtable_L1); 
-// 	}
-// 	else if( pLyrId == 2 || pLyrId == 5 )
-// 	{  
-// 		//GetPhiCorrection<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), kPhiCorrtable_L2,hPhiCorrected); 
-// 		hPhiCorrected = getPhiCorr<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), hPhiCorrtable_L2); 
-// 	}
-// 	else if( pLyrId == 3 || pLyrId == 6 )
-// 	{  
-// 		//GetPhiCorrection<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), kPhiCorrtable_L3,hPhiCorrected); 
-// 		hPhiCorrected = getPhiCorr<ASType>(hStub.getPhi(), hStub.getR(), hStub.getBend(), hPhiCorrtable_L3); 
-// 	}
-// 	hStub.setPhi(hPhiCorrected);
-// 	phiBn = hStub.raw().range(hPhiMSB,hPhiLSB) & 0x7;
-// 	#ifndef __SYNTHESIS__
-// 			if( IR_DEBUG )
-// 			{
-// 				std::cout << "\t\t.. after correction phi bin is "
-// 					<< phiBn
-// 					<< "\n";
-// 			}
-// 	#endif
-	
-// }
-
-// template<regionType ASType> 
-// inline void GetPhiBinDsk(const ap_uint<kNBits_DTC> inStub
-// 	, ap_uint<3> pLyrId 
-// 	, ap_uint<3> &phiBn )
-// {
-// 	#pragma HLS pipeline II=1 
-// 	#pragma HLS inline 
-// 	ap_uint<5> hPhiMSB = AllStub<ASType>::kASPhiMSB;
-// 	ap_uint<5> hPhiLSB;
-// 	if( pLyrId == 1 && ASType == BARRELPS ) 
-// 		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsPSL1-1);
-// 	else
-// 		hPhiLSB = AllStub<ASType>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-
-// 	phiBn = inStub.range(hPhiMSB,hPhiLSB) & 0x7;
-// }
-
 template<unsigned int nOMems>
 void InputRouter( const BXType hBx
 	, const ap_uint<kLINKMAPwidth> hLinkWord
@@ -236,7 +104,6 @@ void InputRouter( const BXType hBx
 	for (unsigned int cMemIndx = 0; cMemIndx < nOMems ; cMemIndx++) 
 	{
 	#pragma HLS unroll
-	 //if( cMemIndx >= nOMems )  continue;
 	hNStubs[cMemIndx] = 0;
 	 #ifndef __SYNTHESIS__
 	  if (IR_DEBUG) {
@@ -252,7 +119,7 @@ void InputRouter( const BXType hBx
 	for (int cStubCounter = 0; cStubCounter < kMaxStubsFromLink; cStubCounter++) 
 	{
 	#pragma HLS pipeline II = 1
-	#pragma HLS PIPELINE rewind
+	//#pragma HLS PIPELINE rewind
 	  // decode stub
 	  // check which memory
 	  ap_uint<kNBits_DTC> hStub = hInputStubs[cStubCounter];
@@ -285,13 +152,8 @@ void InputRouter( const BXType hBx
 	  regionType cRegion = ( hIsBrl == 1 ) ? BARRELPS : DISKPS;
 	  auto cIncrmntRegion = ( hIs2S == 1 ) ? 1 : 0;
 	  cRegion = static_cast<regionType>(cIncrmntRegion+cRegion);
-	  #ifndef __SYNTHESIS__
-	  	std::cout << "Region is "
-	  		<< +cRegion 
-	  		<< "\n";
-	  #endif
 	  auto cPhiBitsOffset = ( hLyrId == 1  )  ?  kNbitsPhiBinsPSL1 : kNbitsPhiBinsTkr; 
-	  if( cRegion == BARRELPS ) 
+	  if( cRegion == BARRELPS )  
 	  {
 	  	AllStub<BARRELPS> hAStub(hStub.range(kBRAMwidth-1,0));
 	  	auto hPhiCorrected = getPhiCorr<BARRELPS>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
@@ -338,8 +200,14 @@ void InputRouter( const BXType hBx
 	  }
 	  // and add phi bin 
 	  unsigned int cMemIndx = cIndx + hPhiBn;
+	  
+	  // write to memory
+	  assert(cMemIndx < nOMems);
+	  ap_uint<8> hEntries = hNStubs[cMemIndx];
 	  #ifndef __SYNTHESIS__
 	    std::cout << "Stub # " << cStubCounter 
+	      << " in Bx "
+	      << hBx 
 	      << " from layer #" << hEncLyr 
 	      << " (enc.) which is connected to "
 	      << cNBns 
@@ -347,30 +215,30 @@ void InputRouter( const BXType hBx
 	      << cMemIndx 
 	      << " since its phi bin "
 	      << hPhiBn
+	      << " which has "
+	      << hEntries 
+	      << " entries."
 	      << "\n";
 	  #endif
 
-	  // write to memory
-	  assert(cMemIndx < nOMems);
-	  ap_uint<8> hEntries = hNStubs[cMemIndx];
 	  #ifndef __SYNTHESIS__
-	  //if (IR_DEBUG) {
-	  // std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
-	  //           << " [ EncLyrId " << hEncLyr << " ] "
-	  //           << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
-	  //           << " PhiBn#" << +hPhiBn << " Mem#" << cMemIndx
-	  //           << " Current number of entries " << +hEntries << "\n";
-	  //}
+	  if (IR_DEBUG) {
+	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
+	            << " [ EncLyrId " << hEncLyr << " ] "
+	            << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
+	            << " PhiBn#" << +hPhiBn << " Mem#" << cMemIndx
+	            << " Current number of entries " << +hEntries << "\n";
+	  }
 	  #endif
-	  (&hOutputStubs[cMemIndx])->write_mem(hBx, hMemWord, hEntries);
+	  hOutputStubs[cMemIndx].write_mem(hBx, hMemWord, hEntries);
 	  hNStubs[cMemIndx] = hEntries + 1;
 	}
 
 	#ifndef __SYNTHESIS__
 	  for( size_t cIndx=0; cIndx < nOMems; cIndx++)
 	  {
-	    std::cout << "\t...Found " 
-	        << (&hOutputStubs[cIndx])->getEntries(hBx) 
+		std::cout << "\t...Found " 
+	        << hOutputStubs[cIndx].getEntries(hBx) 
 	        << " in memory#"
 	        << +cIndx 
 	        << " from HLS top level"

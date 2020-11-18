@@ -157,7 +157,7 @@ std::string getDTCName( int pLinkId
 
 // get name of mem print 
 // from emulation 
-std::string getMemPrint(std::string pDTC
+std::string getMemPrintName(std::string pDTC
   , int pLyrIndx , int pPhiBin , int pNonant
   , ap_uint<kLINKMAPwidth> hLinkWord )
 {
@@ -226,7 +226,7 @@ void prepareInputStreams( ifstream * pInputStreams
     int cNPhiBns = ( (hIs2S==0) && hLyrId==1 && hIsBrl) ? 8 : 4; 
     for( int cPhiBn=0; cPhiBn<cNPhiBns; cPhiBn++)
     {
-      std::string cMemPrint = getMemPrint(cDTCName ,cLyrIndx, cPhiBn, pNonant, hLinkWord);
+      std::string cMemPrint = getMemPrintName(cDTCName ,cLyrIndx, cPhiBn, pNonant, hLinkWord);
       if( !cMemPrint.empty() )
       {
         std::cout << "Loading stubs from .. " << cMemPrint << "\n";
@@ -255,6 +255,22 @@ int main()
   std::string cLinkName = getLinkName( cLinkId, cDTCsplit , cInputFile_LinkMap); 
   std::string cInputFile_Link = cBaseName + cLinkName + ".dat";
  
+  // figure out 
+  // how many phi bins 
+  // per layer 
+  // and how many memories
+  // there are in total 
+  int cNLyrs=0;
+  int cNPhiBnsPerLyr[kMaxLyrsPerDTC];
+  int cTotalNMems=0;
+  for(int cLyr=0; cLyr < kMaxLyrsPerDTC; cLyr++)
+  {
+    ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[cLinkId%12];
+    ap_uint<kSizeBinWord> hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);
+    cNLyrs += ( hBnWrd != 0 );
+    cNPhiBnsPerLyr[cLyr] = hBnWrd;
+    cTotalNMems += hBnWrd;
+  }
 
   DTCStubMemory hMemories[cNMemories];
   
@@ -279,18 +295,18 @@ int main()
   if( !openDataFile(cLinkDataStream,cInputFile_Link ) ) 
     return 1; 
 
-
+  int cTotalErrCnt=0;
   for( int cEvId=0; cEvId < kMaxNEvents; cEvId++)
   {
     // fill reference output memories 
     // these will be used to compare the 
     // output of the emulation to 
     // the output of the HLS top level 
-    DTCStubMemory hRefMems[cNMemories]; 
-    for( size_t cMemIndx = 0; cMemIndx < cNMemories; cMemIndx++)
-    {
-      writeMemFromFile<DTCStubMemory>(hRefMems[cMemIndx], cInputStreams[cMemIndx], cEvId);
-    }
+    // DTCStubMemory hRefMems[cNMemories]; 
+    // for( size_t cMemIndx = 0; cMemIndx < cNMemories; cMemIndx++)
+    // {
+    //   writeMemFromFile<DTCStubMemory>(hRefMems[cMemIndx], cInputStreams[cMemIndx], cEvId);
+    // }
     
     // only compare the ones I want 
     if( cEvId < cFirstBx || cEvId > cLastBx ) continue;
@@ -310,7 +326,7 @@ int main()
     ap_uint<kNMEMwidth> hNmemories = kLinkNMemories[hLinkId%12];
     ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
     // clear memories 
-    for( unsigned int cIndx=0; cIndx < (unsigned int)hNmemories ; cIndx++)
+    for( unsigned int cIndx=0; cIndx < (unsigned int)cTotalNMems ; cIndx++)
     { 
        hMemories[cIndx].clear();
     }
@@ -343,6 +359,22 @@ int main()
       , hInputStubs // input stub stream 
       , hMemories); 
 
+    // compare memories 
+    for( size_t cMemIndx = 0; cMemIndx < cTotalNMems; cMemIndx++)
+    {
+      // for now I exclude the last phi bin 
+      // of L1 
+      // remove this when modified 
+      // emulation data is available 
+      if( cLinkId%12 == 6 || cLinkId%12 ==7 ) 
+        if( cMemIndx == 3 ) // D L1 
+          continue;
+
+      bool cTruncated=false;
+      int cErCnt = compareMemWithFile<DTCStubMemory>(hMemories[cMemIndx], cInputStreams[cMemIndx], cEvId, "DTCStubMemory", cTruncated);
+      cTotalErrCnt += cErCnt;
+    }
+    
     // check stubs in the stream 
     // for( size_t cStubIndx = 0; cStubIndx < kMaxStubsFromLink; cStubIndx++)
     // {
@@ -357,31 +389,36 @@ int main()
     // }
 
     // check how many stubs are in each memory 
-    for( size_t cMemIndx = 0; cMemIndx < cNMemories; cMemIndx++)
-    {
-      std::cout << "\t...Found " 
-        << +hRefMems[cMemIndx].getEntries(cEvId) 
-        << " in memory#"
-        << +cMemIndx 
-        << " from emulation and "
-        << +hMemories[cMemIndx].getEntries(cEvId) 
-        << " from HLS top level"
-        << "\n";
-    }
+    // for( size_t cMemIndx = 0; cMemIndx < cNMemories; cMemIndx++)
+    // {
+    //   std::cout << "\t...Found " 
+    //     << +hRefMems[cMemIndx].getEntries(cEvId) 
+    //     << " in memory#"
+    //     << +cMemIndx 
+    //     << " from emulation and "
+    //     << +hMemories[cMemIndx].getEntries(cEvId) 
+    //     << " from HLS top level"
+    //     << "\n";
+    //   for( int cEntry=0; cEntry < hRefMems[cMemIndx].getEntries(cEvId) ; cEntry++)
+    //   {
+    //     auto cStub = hMemories[cMemIndx].read_mem(cEvId, cEntry); 
+    //     std::cout << "\t\t...entry#"
+    //       << +cEntry
+    //       << " stub is "
+    //       << std::hex
+    //       << cStub.raw()
+    //       << std::dec
+    //       << " from reference memory is "
+    //       << std::hex
+    //       << hRefMems[cMemIndx].read_mem(cEvId, cEntry).raw()
+    //       << std::dec
+    //       << "\n";
+    //   }
+    // }
 
     // reset input file stream back to the start 
     cLinkDataStream.clear();
     cLinkDataStream.seekg (0, ios::beg);
   }
-
-  // int cTotalErrorCount = simInputRouter( hMemories
-  //   , cTruncated 
-  //   , pLinkId 
-  //   , cInputFile_LinkMap
-  //   , cFirstBx
-  //   , cLastBx
-  //   , cDTCsplit
-  //   , cNonant); 
-  // return cTotalErrorCount;
-  return 0;
+  return cTotalErrCnt;
 }
