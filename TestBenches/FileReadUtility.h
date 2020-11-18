@@ -82,13 +82,7 @@ void readDataFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
         {
           //remove delimeter
           cToken.erase( std::remove(cToken.begin(), cToken.end(), pDelimeter), cToken.end() );
-          // #ifndef __SYNTHESIS__
-          //   std::cout << cToken
-          //     << " " 
-          //     << std::stol( cToken , nullptr, 2 ) 
-          //     << "\n";
-          // #endif 
-          hData[cCounter] = std::stol( cToken , nullptr,Base )  ;
+          hData[cCounter] = DataType(std::stol( cToken , nullptr,Base ) );
           cCounter++; 
         }
       }

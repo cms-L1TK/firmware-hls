@@ -5,14 +5,14 @@ void InputRouterTop( const BXType hBx
   , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT 
   , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT 
   , const ap_uint<kNMEMwidth> hNmemories // number of memories filled by each IR module
-  , const int kPhiCorrtable_L1[] // corrections frst brl lyr  
-  , const int kPhiCorrtable_L2[] // corrections scnd brl lyr   
-  , const int kPhiCorrtable_L3[] // corrections thrd brl lyr  
+  , const int* kPhiCorrtable_L1 // corrections frst brl lyr  
+  , const int* kPhiCorrtable_L2 // corrections scnd brl lyr   
+  , const int* kPhiCorrtable_L3 // corrections thrd brl lyr  
   , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]
   , DTCStubMemory hOutputStubs[cNMemories]) {
 
   #pragma HLS stream variable = hInputStubs depth = 1
-  
+ 
   #ifndef __SYNTHESIS__
     std::cout << "IR module reading out link " << +hInputLinkId
       << " is going to fill "

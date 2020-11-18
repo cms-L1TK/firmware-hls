@@ -11,8 +11,8 @@
 #include <iterator>
 #include <map>
 
-static const int kMaxLyrsPerDTC = 4; 
-static const int kMaxNEvents = 100;  // max number of events to run
+
+static const int kMaxNEvents = 10;  // max number of events to run
 
 // link assignment table 
 // TO-BE fixed :  need this added to emData 
@@ -218,16 +218,15 @@ void prepareInputStreams( ifstream * pInputStreams
   std::string cDTCName = getDTCName( pLinkId, pDTCsplit , pInputFile_LinkMap); 
   std::cout << "DTC " << cDTCName << " is link#" <<  pLinkId << std::endl;
   
-  ap_uint<kLINKMAPwidth> hLinkWord = kLinkAssignmentTable[pLinkId%12];
-  ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[pLinkId%12];
+  auto hLinkWord = kLinkAssignmentTable[pLinkId%12];
+  auto hPhBnWord = kLinkNPhiBns[pLinkId%12];
   int cMemIndx=0;
   for(int cLyrIndx=0; cLyrIndx< kMaxLyrsPerDTC; cLyrIndx++)
   {
-    LnkWrd hWrd;
-    hWrd = hLinkWord.range(hWrd.width*cLyrIndx+hWrd.width-1,hWrd.width*cLyrIndx);
+    ap_uint<kSizeLinkWord> hWrd = hLinkWord.range(kSizeLinkWord*cLyrIndx+kSizeLinkWord-1,kSizeLinkWord*cLyrIndx);
     if( hWrd == 0) continue;
-    BrlBit hIsBrl = hWrd.range(hIsBrl.width, 0);
-    TkLyrId hLyrId = hWrd.range(hLyrId.width, hIsBrl.width);
+    ap_uint<1> hIsBrl = hWrd.range(0, 0);
+    ap_uint<3> hLyrId = hWrd.range(3, 1);
     // get phi bin 
     ap_uint<kSizeBinWord> hBnWrd = hPhBnWord.range(kSizeBinWord * cLyrIndx + (kSizeBinWord-1), kSizeBinWord * cLyrIndx);
     auto cNPhiBns =  (1+(unsigned int)(hBnWrd));
@@ -260,7 +259,7 @@ int main()
   
   //
   int cFirstBx = 0 ;
-  int cLastBx = 100;
+  int cLastBx = 1;
   // 
   int cLinkId = 6; 
   std::string cLinkName = getLinkName( cLinkId, cDTCsplit , cInputFile_LinkMap); 
@@ -316,6 +315,13 @@ int main()
   if( !openDataFile(cLinkDataStream,cInputFile_Link ) ) 
     return 1; 
 
+  // now prepare inputs for IR 
+  const ap_uint<6> hLinkId = cLinkId;
+  const ap_uint<kLINKMAPwidth> hLinkWord = kLinkAssignmentTable[cLinkId%12];
+  const ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[cLinkId%12];
+  const ap_uint<kNMEMwidth> hNmemories = kLinkNMemories[cLinkId%12];
+  ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
+  
   int cTotalErrCnt=0;
   for( int cEvId=0; cEvId < kMaxNEvents; cEvId++)
   {
@@ -340,15 +346,8 @@ int main()
       hInputStubs[cStubIndx]=ap_uint<kNBits_DTC>(0);
     readDataFromFile<ap_uint<kNBits_DTC>>(hInputStubs , cLinkDataStream, cEvId);
     
-    // now prepare inputs for IR 
-    // top 
-    ap_uint<6> hLinkId(cLinkId);
-    ap_uint<kLINKMAPwidth> hLinkWord = kLinkAssignmentTable[hLinkId%12];
-    ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[hLinkId%12];
-    ap_uint<kNMEMwidth> hNmemories = kLinkNMemories[hLinkId%12];
-    ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
     // clear memories 
-    for( unsigned int cIndx=0; cIndx < (unsigned int)cTotalNMems ; cIndx++)
+    for( unsigned int cIndx=0; cIndx < (unsigned int)hNmemories ; cIndx++)
     { 
        hMemories[cIndx].clear();
     }
@@ -365,9 +364,9 @@ int main()
 
     // decode link wrd for this layer
     // figure out which of the LUTs I need 
-    const int* cLUT_L1 = (  hIs2S == 1 )  ? kPhiCorrtable_L4 : kPhiCorrtable_L1; 
-    const int* cLUT_L2 = (  hIs2S == 1 )  ? kPhiCorrtable_L5 : kPhiCorrtable_L2; 
-    const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
+    static const int* cLUT_L1 = (  hIs2S == 1 )  ? kPhiCorrtable_L4 : kPhiCorrtable_L1; 
+    static const int* cLUT_L2 = (  hIs2S == 1 )  ? kPhiCorrtable_L5 : kPhiCorrtable_L2; 
+    static const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
 
     BXType hBx = cEvId&0x7;
     InputRouterTop( hBx
@@ -382,14 +381,14 @@ int main()
       , hMemories); 
 
     // compare memories 
-    for( size_t cMemIndx = 0; cMemIndx < cTotalNMems; cMemIndx++)
+    for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)
     {
       // for now I exclude the last phi bin 
       // of L1 
       // remove this when modified 
       // emulation data is available 
       if( cLinkId%12 == 6 || cLinkId%12 ==7 ) 
-        if( cMemIndx >= 3 ) // for now do not compare edges of L1 
+        if( cMemIndx >= 3 && cMemIndx < 8 ) // for now do not compare edges of L1 
           continue;
 
       std::cout << "Memory#" 
@@ -406,11 +405,10 @@ int main()
   }
 
   // place point back to start 
-  for( size_t cMemIndx = 0; cMemIndx < cTotalNMems; cMemIndx++)
+  for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)
   {
     cInputStreams[cMemIndx].close();
   }
   cLinkDataStream.close();
   return cTotalErrCnt;
-  //return 0;
 }

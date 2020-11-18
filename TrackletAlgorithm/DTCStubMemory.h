@@ -21,7 +21,7 @@ public:
 enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
     kDSStubLSB = 0 ,
-	kDSStubMSB = kDSStubLSB + DTCStubBase::kDSStubSize - 1  
+	  kDSStubMSB = kDSStubLSB + DTCStubBase::kDSStubSize - 1  
     };
 
   typedef ap_uint<kBRAMwidth> DTCStubWord;
@@ -55,6 +55,6 @@ private:
 };
 
 // Memory definition
-using DTCStubMemory = MemoryTemplate<DTCStub, 1, kNBits_MemAddr>;
+using DTCStubMemory = MemoryTemplate<DTCStub, 3, kNBits_MemAddr>;
 
 #endif

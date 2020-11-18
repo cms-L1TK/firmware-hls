@@ -17,7 +17,7 @@ void InputRouterTop( const BXType hBx
 	, const int* kPhiCorrtable_L2 // corrections scnd brl lyr  
 	, const int* kPhiCorrtable_L3 // corrections thrd brl lyr   
 	, ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs 
-	, DTCStubMemory hOutputStubs[cNMemories]);//output memories 
+	, DTCStubMemory hOutputStubs[]);//output memories 
 
 
 #endif
