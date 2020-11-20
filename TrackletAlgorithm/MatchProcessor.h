@@ -132,16 +132,25 @@ namespace PR
   // Move the following to Constants.hh?
   // How to deal with these using enum?
 
-  // number of allstub memories for each layer
-  constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
-  // number of VMs in one allstub block for each layer
-  constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
+  // number of bits used to distinguish allstub memories for each layer
+  constexpr unsigned int nbits_allstubslayers[6]={3,2,2,2,2,2};
+  // number of bits used to distinguish VMs in one allstub block for each layer
+  constexpr unsigned int nbits_vmmelayers[6]={2,3,3,3,3,3};
 
-  // number of allstub memories for each disk
-  constexpr unsigned int nallstubsdisks[5]={4,4,4,4,4};
+  // number of bits used to distinguish allstub memories for each disk
+  constexpr unsigned int nbits_allstubsdisks[5]={2,2,2,2,2};
   
-  // number of VMs in one allstub block for each disk
-  constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
+  // number of bits used to distinguish VMs in one allstub block for each disk
+  constexpr unsigned int nbits_vmmedisks[5]={3,2,2,2,2};
+
+  // number of bits for seed in tracklet index
+  constexpr unsigned int nbits_seed = 3;
+
+  // number of extra bits to keep when calculating which zbin(s) a projection should go to
+  constexpr unsigned int zbins_nbitsextra = 3;
+
+  // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
+  constexpr unsigned int zbins_adjust = 1;
 
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
@@ -620,7 +629,7 @@ void MatchProcessor(BXType bx,
   int nmcout7 = 0;
   int nmcout8 = 0;
 
-  int nallproj = 0;
+  ap_uint<kNBits_MemAddr> nallproj;
 
   ////////////////////////////////////////////
   //Some ME stuff
@@ -650,6 +659,11 @@ void MatchProcessor(BXType bx,
 //#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1 //rewind
+    if (istep == 0) {
+
+      // reset output memories & counters
+      nallproj = 0;
+    }
     //std::cout << "istep=" << istep << std::endl;
 
     // read inputs
@@ -668,10 +682,6 @@ void MatchProcessor(BXType bx,
     bool moreproj=iproj<nproj;
 
     if (validin) {
-      AllProjection<APTYPE> aproj(projdata.raw());
-      allproj->write_mem(bx,aproj,nallproj);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-      nallproj++;
-
       auto iphiproj = projdata.getPhi();
       auto izproj = projdata.getRZ();
       auto iphider = projdata.getPhiDer();
@@ -679,38 +689,47 @@ void MatchProcessor(BXType bx,
 
       // PS seed
       // top 3 bits of tracklet index indicate the seeding pair
-      ap_uint<3> iseed = trackletid >> (trackletid.length()-3);
+      ap_uint<nbits_seed> iseed = trackletid.range(trackletid.length()-1,trackletid.length()-nbits_seed);
       // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
       // and here?
       // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
       // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
 
       // All seeding pairs are PS modules except L3L4 and L5L6
-      bool psseed = not(iseed==1 or iseed==2); 
+      bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
   
       //////////////////////////
       // hourglass configuration
      
-      // top 5 bits of phi
-      auto iphi5 = iphiproj>>(iphiproj.length()-5);
+      // vmproj index
+      typename VMProjection<VMPTYPE>::VMPID index = nallproj;
 
       // vmproj z
       // Separate the vm projections into zbins
-      // The central bin e.g. zbin=4+(zproj.value()>>(zproj.nbits()-3));
-      // (assume 8 bins; take top 3 bits of zproj and shift it to make it positive)
-      // But we need some range (particularly for L5L6 seed projecting to L1-L3):
-      // Lower bound
-      ap_uint<MEBinsBits+1> zbin1tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))-2)>>2);
-      // Upper bound
-      ap_uint<MEBinsBits+1> zbin2tmp = (1<<(MEBinsBits-1))+(((izproj>>(izproj.length()-MEBinsBits-2))+2)>>2);
-      if (zbin1tmp >= (1<<MEBinsBits)) zbin1tmp = 0; //note that zbin1 is unsigned
-      if (zbin2tmp >= (1<<MEBinsBits)) zbin2tmp = (1<<MEBinsBits)-1;
+      // To determine which zbin in VMStubsME the ME should look in to match this VMProjection,
+      // the purpose of these lines is to take the top MEBinsBits (3) bits of zproj and shift it
+      // to make it positive, which gives the bin index. But there is a range of possible z values
+      // over which we want to look for matched stubs, and there is therefore possibly 2 bins that
+      // we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+2=5)
+      // bits of zproj, adjust the value up and down by zbins_adjust (2), then truncate the
+      // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
+      auto zbinposfull = (1<<(izproj.length()-1))+izproj;
+      auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
 
-      // One extra bit was used in the above calculation. Now take it away.
-      ap_uint<MEBinsBits> zbin1 = zbin1tmp;
-      ap_uint<MEBinsBits> zbin2 = zbin2tmp;
+      // Lower Bound
+      auto zbinlower = zbinpos5<zbins_adjust ?
+                       ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
+                       ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5-zbins_adjust);
+      // Upper Bound
+      auto zbinupper = zbinpos5>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
+                       ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
+                       ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5+zbins_adjust);
+
+      ap_uint<MEBinsBits> zbin1 = zbinlower >> zbins_nbitsextra;
+      ap_uint<MEBinsBits> zbin2 = zbinupper >> zbins_nbitsextra;
+      
+      typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
     
-      typename VMProjection<VMPTYPE>::VMPZBIN projzbin = (zbin1, zbin2!=zbin1);
       // VM Projection
       typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
  
@@ -722,7 +741,7 @@ void MatchProcessor(BXType bx,
 
       // rinv in VMProjection takes only the top 5 bits
       // and is shifted to be positive
-      typename VMProjection<VMPTYPE>::VMPRINV rinv = 16+(irinv_tmp>>(irinv_tmp.length()-5));
+      typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
 
       ///////////////////////////////////
       //This is where Anders calls the ME
@@ -731,13 +750,17 @@ void MatchProcessor(BXType bx,
       //next projection and put in buffer if there are stubs in the 
       //memory the projection points to
 
-      constexpr unsigned int nvmmelayers[6]={4,8,8,8,8,8};
-      constexpr unsigned int nallstubslayers[6]={8,4,4,4,4,4};
-      constexpr unsigned int nvmmedisks[5]={8,4,4,4,4};
-      auto nvm = LAYER!=0 ? nvmmelayers[LAYER-1]*nallstubslayers[LAYER-1] :
-      nvmmedisks[DISK-1]*nallstubsdisks[DISK-1];
-      auto nbins = LAYER!=0 ? nvmmelayers[LAYER-1] : nvmmedisks[DISK-1];
-      iphi = (iphi5/(32/nvm))&(nbins-1);  // OPTIMIZE ME
+      //////////////////////////
+      // hourglass configuration
+
+      // number of bits used to distinguish the different modules in each layer/disk
+      auto nbits_all = LAYER!=0 ? nbits_allstubslayers[LAYER-1] : nbits_allstubsdisks[DISK-1];
+
+      // number of bits used to distinguish between VMs within a module
+      auto nbits_vmme = LAYER!=0 ? nbits_vmmelayers[LAYER-1] : nbits_vmmedisks[DISK-1];
+
+      // bits used for routing
+      iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
       ap_uint<kNBitsBuffer> writeindextmp=writeindex[iphi];
       ap_uint<kNBitsBuffer> readindextmp=readindex;
 
@@ -750,8 +773,8 @@ void MatchProcessor(BXType bx,
         if(iproj>=nproj) iproj=0;
 
         //The first and last zbin the projection points to
-        ap_uint<TEBinsBits> zfirst=projzbin.range(3,1);
-        ap_uint<TEBinsBits> zlast=zfirst+projzbin.range(0,0);
+        ap_uint<TEBinsBits> zfirst=zbin.range(3,1);
+        ap_uint<TEBinsBits> zlast=zfirst+zbin.range(0,0);
   
         ///////////////
         // VMProjection
@@ -792,20 +815,21 @@ void MatchProcessor(BXType bx,
         }
         */
         bool savefirst=nstubfirst!=0;
-        bool savelast=nstublast!=0&&projzbin.range(0,0);
+        bool savelast=nstublast!=0&&zbin.range(0,0);
   
         if (savefirst&&savelast) {
   	  writeindex[iphi]=writeindextmp+2;
         } else if (savefirst||savelast) {
   	  writeindex[iphi]=writeindextmp+1;
         }
-        VMProjection<BARREL> vmproj(istep, projzbin, finez, rinv, psseed);
+        VMProjection<BARREL> vmproj(index, zbin, finez, rinv, psseed);
+        std::cout << "istep=" << istep << "\tnallproj=" << nallproj << "\tindex=" << index << std::endl;
 
         ProjectionRouterBuffer<BARREL> projbuffertmp;
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
           //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
-          projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+          projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, index, nstubfirst, zfirst, vmproj.raw(), 0);
           projbuffertmp.setPhi(iphi);
           projbufferarray.add(projbuffertmp);
           //projbufferarray[iphi].add(projbuffertmp);
@@ -814,14 +838,14 @@ void MatchProcessor(BXType bx,
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             //projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
-            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, index, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
-            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, index, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
@@ -829,6 +853,10 @@ void MatchProcessor(BXType bx,
         }
 
       } // end if
+
+      AllProjection<APTYPE> aproj(projdata.raw());
+      allproj->write_mem(bx,aproj,nallproj);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      nallproj++;
 
     } // end if(validin)
 
