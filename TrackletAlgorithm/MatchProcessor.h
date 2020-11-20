@@ -823,7 +823,6 @@ void MatchProcessor(BXType bx,
   	  writeindex[iphi]=writeindextmp+1;
         }
         VMProjection<BARREL> vmproj(index, zbin, finez, rinv, psseed);
-        std::cout << "istep=" << istep << "\tnallproj=" << nallproj << "\tindex=" << index << std::endl;
 
         ProjectionRouterBuffer<BARREL> projbuffertmp;
         if (savefirst) { //FIXME code needs to be cleaner
