@@ -829,7 +829,7 @@ void MatchProcessor(BXType bx,
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
           //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
-          projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, index, nstubfirst, zfirst, vmproj.raw(), 0);
+          projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstubfirst, zfirst, vmproj, 0);
           projbuffertmp.setPhi(iphi);
           projbufferarray.add(projbuffertmp);
           //projbufferarray[iphi].add(projbuffertmp);
@@ -838,14 +838,14 @@ void MatchProcessor(BXType bx,
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             //projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
-            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, index, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstublast, zlast, vmproj, psseed);
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
-            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, index, nstublast, zlast, vmproj.raw(), psseed);
+            projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstublast, zlast, vmproj, psseed);
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
