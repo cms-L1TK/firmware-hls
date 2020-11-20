@@ -12,7 +12,7 @@ void MatchProcessorTopL3(BXType bx,
                       const TrackletProjectionMemory<BARRELPS>* const proj8in,
                       const VMStubMEMemory<BARRELPS,3> instubdata[maxInCopies],
                       const AllStubMemory<BARRELPS>* allstub,
-                      const AllProjectionMemory<BARRELPS>* allproj,
+                      AllProjectionMemory<BARRELPS>* allproj,
                       BXType& bx_o,
                       FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]) {
 
