@@ -36,6 +36,7 @@ public:
 
   ProjectionRouterBufferArray() {
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
+//#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
     reset();
   }
 

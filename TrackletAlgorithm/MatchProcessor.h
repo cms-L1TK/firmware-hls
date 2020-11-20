@@ -428,6 +428,7 @@ void MatchCalculator(BXType bx,
   
     // Full match  
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
+#pragma HLS dependence variable=fm intra RAW false
     //std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "\tfm=" << fm.raw() << std::endl;
   
     //-----------------------------------------------------------------------------------------------------------
@@ -552,7 +553,7 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
                       const VMStubMEMemory<VMSMEType,3> instubdata[maxInCopies],
                       const AllStubMemory<ASTYPE>* allstub,
-                      const AllProjectionMemory<APTYPE>* allproj,
+                      AllProjectionMemory<APTYPE>* allproj,
                       BXType& bx_o,
                       FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
 ){
@@ -585,7 +586,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 #pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
-#pragma HLS resource variable=instubdata core=RAM_2P_LUTRAM
+//#pragma HLS resource variable=fullmatch core=RAM_2P_LUTRAM
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin,0,
@@ -619,6 +620,8 @@ void MatchProcessor(BXType bx,
   int nmcout7 = 0;
   int nmcout8 = 0;
 
+  int nallproj = 0;
+
   ////////////////////////////////////////////
   //Some ME stuff
   ////////////////////////////////////////////
@@ -639,14 +642,14 @@ void MatchProcessor(BXType bx,
   auto nproj=0;
 
   //const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
-  ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
+  //ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
   ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNMatchEngines];
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
 #pragma HLS dependence variable=istub inter false 
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
-#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
+//#pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=1
   PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
-#pragma HLS PIPELINE II=1 rewind
+#pragma HLS PIPELINE II=1 //rewind
     //std::cout << "istep=" << istep << std::endl;
 
     // read inputs
@@ -665,6 +668,9 @@ void MatchProcessor(BXType bx,
     bool moreproj=iproj<nproj;
 
     if (validin) {
+      AllProjection<APTYPE> aproj(projdata.raw());
+      allproj->write_mem(bx,aproj,nallproj);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
+      nallproj++;
 
       auto iphiproj = projdata.getPhi();
       auto izproj = projdata.getRZ();
@@ -798,7 +804,7 @@ void MatchProcessor(BXType bx,
         ProjectionRouterBuffer<BARREL> projbuffertmp;
         if (savefirst) { //FIXME code needs to be cleaner
           ProjectionRouterBuffer<BARREL>::PRHASSEC sec=0;
-          projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
+          //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
           projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
           projbuffertmp.setPhi(iphi);
           projbufferarray.add(projbuffertmp);
@@ -807,14 +813,14 @@ void MatchProcessor(BXType bx,
         if (savelast) {
           if (savefirst) {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
-            projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            //projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
-            projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
+            //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp.setPhi(iphi);
             projbufferarray.add(projbuffertmp);
