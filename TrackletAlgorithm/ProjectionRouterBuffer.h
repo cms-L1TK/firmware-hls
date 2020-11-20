@@ -85,12 +85,12 @@ public:
   {}
 
   // This constructor is only used for projections in BARREL
-  ProjectionRouterBuffer(const TCID tcid, const PRHASSEC hasSec, const VMPID index, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjData projdata, const bool ps):
-    data_( ((((((tcid,hasSec),index),nstub),projdata),zbin),ps) )
+  ProjectionRouterBuffer(const TCID tcid, const PRHASSEC hasSec, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
+    data_( ((((((tcid,hasSec),projdata.getIndex()),nstub),projdata.raw()),zbin),ps) )
   {
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
-    VMProjection<BARREL> vmproj(projdata);
-    setIndex(vmproj.getIndex()); //FIXME error with data_ constructor not setting projindex correctly
+    //VMProjection<BARREL> vmproj(projdata);
+    setIndex(projdata.getIndex()); //FIXME error with data_ constructor not setting projindex correctly
     //std::cout << "Creating new projrouterbuffer with projid=" << getIndex() << "\twith internal projid=" << vmproj.getIndex() << std::endl;
     setNStubs(nstub); //FIXME error with data_ constructor not setting nstubs correctly
     setHasSecond(hasSec); //FIXME error with data_ constructor not setting hasSec correctly
