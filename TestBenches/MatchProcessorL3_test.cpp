@@ -94,6 +94,7 @@ int main() {
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+    allproj.clear();
     fullmatch[0].clear();
 //    fullmatch[1].clear();
 //    fullmatch[2].clear();
