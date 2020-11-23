@@ -35,14 +35,14 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=instubdata[7].get_mem() latency=2
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
- #pragma HLS resource variable=fullmatch1->get_mem() latency=2
- #pragma HLS resource variable=fullmatch2->get_mem() latency=2
- #pragma HLS resource variable=fullmatch3->get_mem() latency=2
- #pragma HLS resource variable=fullmatch4->get_mem() latency=2
- #pragma HLS resource variable=fullmatch5->get_mem() latency=2
- #pragma HLS resource variable=fullmatch6->get_mem() latency=2
- #pragma HLS resource variable=fullmatch7->get_mem() latency=2
- #pragma HLS resource variable=fullmatch8->get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[0].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[1].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[2].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[3].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[4].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[5].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[6].get_mem() latency=2
+ #pragma HLS resource variable=fullmatch[7].get_mem() latency=2
 
  MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, 8, 3, 0, 2>
                      (bx,
