@@ -55,22 +55,22 @@ const ap_uint<kNMEMwidth> kLinkNMemories[] =
 // LUT with phi corrections to the nominal radius. Only used by layers.
 // Values are determined by the radius and the bend of the stub.
 const int kPhiCorrtable_L1[] =
-#include "../emData/LUTs/VMPhiCorrL1.txt"
+#include "../emData/LUTs/VMPhiCorrL1.tab"
 ;
 const int kPhiCorrtable_L2[] =
-#include "../emData/LUTs/VMPhiCorrL2.txt"
+#include "../emData/LUTs/VMPhiCorrL2.tab"
 ;
 const int kPhiCorrtable_L3[] =
-#include "../emData/LUTs/VMPhiCorrL3.txt"
+#include "../emData/LUTs/VMPhiCorrL3.tab"
 ;
 const int kPhiCorrtable_L4[] =
-#include "../emData/LUTs/VMPhiCorrL4.txt"
+#include "../emData/LUTs/VMPhiCorrL4.tab"
 ;
 const int kPhiCorrtable_L5[] =
-#include "../emData/LUTs/VMPhiCorrL5.txt"
+#include "../emData/LUTs/VMPhiCorrL5.tab"
 ;
 const int kPhiCorrtable_L6[] =
-#include "../emData/LUTs/VMPhiCorrL6.txt"
+#include "../emData/LUTs/VMPhiCorrL6.tab"
 ;
 
 // map of input links  [per DTC ]
@@ -316,7 +316,7 @@ int main()
     return 1; 
 
   // now prepare inputs for IR 
-  const ap_uint<6> hLinkId = cLinkId;
+  ap_uint<kNBitsNLnks> hLinkId = cLinkId;
   const ap_uint<kLINKMAPwidth> hLinkWord = kLinkAssignmentTable[cLinkId%12];
   const ap_uint<kBINMAPwidth> hPhBnWord = kLinkNPhiBns[cLinkId%12];
   const ap_uint<kNMEMwidth> hNmemories = kLinkNMemories[cLinkId%12];

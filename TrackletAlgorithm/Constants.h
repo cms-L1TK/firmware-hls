@@ -115,6 +115,6 @@ typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisite
 
 // FPGA constants 
 constexpr unsigned kBRAMwidth = 36; 
-constexpr int kNBits_DTC = 38; 
+constexpr int kNBits_DTC = 39; 
 
 #endif

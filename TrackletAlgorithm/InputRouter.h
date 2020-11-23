@@ -9,6 +9,7 @@
 
 
 // link map
+static const int kNBitsNLnks = 6; 
 static const int kLINKMAPwidth = 20;
 static const int kSizeLinkWord = 4; 
 static const int kBINMAPwidth = 12; 
@@ -69,7 +70,16 @@ static const int kThrdPSBrlLyr = 3;
 static const int kFrst2SBrlLyr = 4; 
 static const int kScnd2SBrlLyr = 5; 
 static const int kThrd2SBrlLyr = 6; 
-//
+// valid bit in DTC stub 
+// these can change when tarball is modified 
+static const int kLSBVldBt = kNBits_DTC-1;//0;
+static const int kMSBVldBt = kNBits_DTC-1;//0; 
+// lyr bit in DTC stub 
+// these can change when tarball is modified 
+static const int kLSBLyrBts = kNBits_DTC - 3;//1; 
+static const int kMSBLyrBts = kNBits_DTC - 2;//2; 
+
+
 #define IR_DEBUG false
 
 // Get the corrected phi, i.e. phi at the average radius of the barrel
@@ -142,10 +152,22 @@ void InputRouter( const BXType hBx
 	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 
 	  if (hStub == 0)   continue;
-
-	  auto hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
-	  auto hEncLyr = (hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x7);
+	  // check valid bit
+	  auto hVldBt = hStub.range( kMSBVldBt ,  kLSBVldBt);
+	  if( hVldBt == 0 ) continue;
+	  // encoded layer 
+	  auto hEncLyr = hStub.range(kMSBLyrBts, kLSBLyrBts);
+	  #ifndef __SYNTHESIS__
+	  if( IR_DEBUG)
+	  {
+	  	  std::cout << "\t.. Stub : " << std::bitset<kNBits_DTC>(hStub) 
+		            << " [ ValidBit " << std::bitset<1>(hVldBt) << " ] "
+					<< " [ EncLyrId " << std::bitset<2>(hEncLyr) << " ] "
+					<< "\n";
+	  }
+	  #endif
 	  // get memory word
+	  auto hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
 	  DTCStub hMemWord(hStbWrd);
 	    
 	  // decode link wrd for this layer
@@ -221,6 +243,7 @@ void InputRouter( const BXType hBx
 	  }
 	  #endif
 	  (&hOutputStubs[cMemIndx])->write_mem(hBx, hMemWord, hEntries);
+	  // update counter 
 	  hNStubs[cMemIndx] = hEntries + 1;
 	}
 }
