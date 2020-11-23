@@ -81,9 +81,8 @@ typename AllStub<InType>::ASPHI getPhiCorr(
 		const typename AllStub<InType>::ASBEND bend, const int phicorrtable[]) 
 {
 	
-	constexpr auto rbins = 1 << kNBitsPhiCorrTableR; // The number of bins for r
-	ap_uint<kNBitsPhiCorrTableR> rbin = (r + (1 << (r.length() - 1)))
-			>> (r.length() - kNBitsPhiCorrTableR); // Which bin r belongs to. Note r = 0 is mid radius
+	auto rbins = 1 << kNBitsPhiCorrTableR; // The number of bins for r
+	auto rbin = (r + (1 << (r.length() - 1))) >> (r.length() - kNBitsPhiCorrTableR); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * rbins + rbin; // Index for where we find our correction value
 	auto corrval = phicorrtable[index]; // The amount we need to correct our phi
 	auto phicorr = ((phi) - corrval); // the corrected phi
@@ -98,15 +97,15 @@ typename AllStub<InType>::ASPHI getPhiCorr(
 }
 
 
-template<unsigned int nOMems>
+template<unsigned int nOMems, unsigned int nLUTEntries>
 void InputRouter( const BXType hBx
 	, const ap_uint<kLINKMAPwidth> hLinkWord
 	, const ap_uint<kBINMAPwidth> hPhBnWord 
-	, const int hPhiCorrtable_L1[]
-	, const int hPhiCorrtable_L2[]
-	, const int hPhiCorrtable_L3[]
-	, ap_uint<kNBits_DTC> hInputStubs[]
-	, DTCStubMemory hOutputStubs[])
+	, const int hPhiCorrtable_L1[nLUTEntries]
+	, const int hPhiCorrtable_L2[nLUTEntries]
+	, const int hPhiCorrtable_L3[nLUTEntries]
+	, ap_uint<kNBits_DTC>* hInputStubs
+	, DTCStubMemory* hOutputStubs)
 {
 
 	#pragma HLS clock domain = slow_clock
@@ -140,33 +139,32 @@ void InputRouter( const BXType hBx
 	#pragma HLS PIPELINE rewind
 	  // decode stub
 	  // check which memory
-	  ap_uint<kNBits_DTC> hStub = hInputStubs[cStubCounter];
+	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 
 	  if (hStub == 0)   continue;
 
-	  ap_uint<kBRAMwidth> hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
-	  int hEncLyr = (hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x7);
+	  auto hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
+	  auto hEncLyr = (hStub.range(kNBits_DTC - 1, kNBits_DTC - 2) & 0x7);
 	  // get memory word
 	  DTCStub hMemWord(hStbWrd);
 	    
 	  // decode link wrd for this layer
-	  int hIsBrl= hLinkWord.range(kSizeLinkWord * hEncLyr, kSizeLinkWord * hEncLyr);
-	  int hLyrId= hLinkWord.range(3 + kSizeLinkWord * hEncLyr, 1 + kSizeLinkWord * hEncLyr);
-
+	  auto hIsBrl= hLinkWord.range((kNBitsBrlBit-1) + kSizeLinkWord * hEncLyr, kSizeLinkWord * hEncLyr);
+	  auto hLyrId= hLinkWord.range((kNBitsLyrTk-1) + kSizeLinkWord * hEncLyr + kNBitsBrlBit, kNBitsBrlBit + kSizeLinkWord * hEncLyr);
+	  
 	  // point to the correct 
 	  // LUT with the phi 
 	  // corrections 
-	  static const int* cLUT; 
+	  const int* cLUT; 
 	  if( hLyrId == kFrstPSBrlLyr || hLyrId == kFrst2SBrlLyr ) 
 	  	cLUT = hPhiCorrtable_L1;
 	  else if( hLyrId == kScndPSBrlLyr || hLyrId == kScnd2SBrlLyr ) 
 	  	cLUT = hPhiCorrtable_L2;
-	  else 
+	  else if( hLyrId == kThrdPSBrlLyr || hLyrId == kThrd2SBrlLyr )
 	  	cLUT = hPhiCorrtable_L3;
 	  
 	  // update index
 	  // and add phi bin 
-	  int cMemIndx = 0;
 	  int cIndx = 0;
 	  LOOP_UpdateMemIndx:
 	  for (int cLyr = 0; cLyr < kMaxLyrsPerDTC; cLyr++) 
@@ -178,59 +176,48 @@ void InputRouter( const BXType hBx
 	  }
 	  
 	  // get phi bin
-	  // regionType cRegion = ( hIsBrl == 1 ) ? BARRELPS : DISKPS;
-	  // cRegion = ( hIs2S == 1 ) ? static_cast<regionType>(cRegion+1) : cRegion ;
-	  // barrel PS 
-	  //if( cRegion == BARRELPS )  
+	  int cIndxThisBn = 0;
 	  if( hIsBrl == 1 && hIs2S == 0 )
 	  {
-	  	AllStub<BARRELPS> hAStub(hStub.range(kBRAMwidth-1,0));
-	  	auto hPhiCorrected = getPhiCorr<BARRELPS>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
-	  	const int hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsPSL1);
-	  	cMemIndx = cIndx + hPhiBn;
+	  	auto cOffset = (hLyrId == kFrstPSBrlLyr) ? kNbitsPhiBinsPSL1 : kNbitsPhiBinsTkr; 
+	  	AllStub<BARRELPS> hAStub(hStub.range(kNBits_DTC-1,0));
+		auto hPhiCorrected = getPhiCorr<BARRELPS>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
+		auto hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1, hPhiCorrected.length()-cOffset);
+	  	cIndxThisBn =  hPhiBn;
 	  }
 	  else if( hIsBrl == 0 && hIs2S == 0 )
-	  //else if( cRegion == DISKPS )
 	  {
 	  	auto hPhiMSB = AllStub<DISKPS>::kASPhiMSB;
 		auto hPhiLSB = AllStub<DISKPS>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-	    const int  hPhiBn = hStub.range(hPhiMSB,hPhiLSB) ;
-		cMemIndx = cIndx + hPhiBn;
+	    auto  hPhiBn = hStub.range(hPhiMSB,hPhiLSB) ;
+		cIndxThisBn = hPhiBn;
 	  }
-	  else if(  hIs2S == 0 )
-	  //else if( cRegion == BARREL2S )
+	  else if(  hIsBrl == 1)
 	  {
-	  	AllStub<BARREL2S> hAStub(hStub.range(kBRAMwidth-1,0));
+	  	AllStub<BARREL2S> hAStub(hStub.range(kNBits_DTC-1,0));
 	  	auto hPhiCorrected = getPhiCorr<BARREL2S>(hAStub.getPhi(), hAStub.getR(), hAStub.getBend(), cLUT); 
-	  	const int hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1,hPhiCorrected.length()-kNbitsPhiBinsTkr);
-	    cMemIndx = cIndx + hPhiBn;
+		auto hPhiBn = hPhiCorrected.range(hPhiCorrected.length()-1, hPhiCorrected.length()-kNbitsPhiBinsTkr);
+	  	cIndxThisBn = hPhiBn;
 	  }
-	  else if(  hIs2S == 1 )
-	  //else if( cRegion == DISK2S )
+	  else if(  hIsBrl == 0)
 	  {
 	  	auto hPhiMSB = AllStub<DISK2S>::kASPhiMSB;
 		auto hPhiLSB = AllStub<DISK2S>::kASPhiMSB-(kNbitsPhiBinsTkr-1);
-	    const int hPhiBn = hStub.range(hPhiMSB,hPhiLSB);
-	    cMemIndx = cIndx + hPhiBn;
+	    auto hPhiBn = hStub.range(hPhiMSB,hPhiLSB);
+	    cIndxThisBn =  hPhiBn;
 	  }
-	  assert(cMemIndx < (int)(nOMems));
-	  
-	  // write to memory
+	  // assign memory index
+	  auto cMemIndx = cIndx+cIndxThisBn;
+	  assert(cMemIndx < nOMems);
+	  auto hEntries = hNStubs[cMemIndx];
 	  #ifndef __SYNTHESIS__
-	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
-	            << " Mem#" << cIndx
-	            << " MemIndx#" << cMemIndx
-	            << "\n";
-	  #endif
-	  int hEntries = int(hNStubs[cMemIndx]);
-	  
-	  #ifndef __SYNTHESIS__
-	  if (IR_DEBUG) {
-	  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
-	            << " [ EncLyrId " << hEncLyr << " ] "
-	            << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
-	            << " Mem#" << cMemIndx
-	            << " Current number of entries " << +hEntries << "\n";
+	  if( IR_DEBUG )
+	  {
+		  std::cout << "\t.. Stub : " << std::hex << hStbWrd << std::dec
+		            << " [ EncLyrId " << hEncLyr << " ] "
+		            << "[ LyrId " << hLyrId << " ] IsBrl bit " << +hIsBrl
+		            << " Mem#" << cMemIndx
+		            << " Current number of entries " << +hEntries << "\n";
 	  }
 	  #endif
 	  (&hOutputStubs[cMemIndx])->write_mem(hBx, hMemWord, hEntries);

@@ -24,7 +24,7 @@ static const int kMaxNEvents = 10;  // max number of events to run
 // 1 bit to assign whether link is PS/2S 
 // 3 bits to encode the number of layers readout by this DTC 
 // 20 bits in total 
-static const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
+const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
 {
   0x500b9, 0x3000b, 0x3000d, 0x5006d, 
   0x50082, 0x500a4, 0x60843, 0x8a623, 
@@ -34,7 +34,7 @@ static const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
 // number of phi bins read out 
 // by each link (kSizeBinWord per layer )
 // upto 4 layers per link  
-static const ap_uint<kBINMAPwidth> kLinkNPhiBns[] = 
+const ap_uint<kBINMAPwidth> kLinkNPhiBns[] = 
 {
   0x01B , 0x003 , 0x003 , 0x01B , 
   0x01B , 0x01B , 0x0DF , 0x6DF , 
@@ -43,7 +43,7 @@ static const ap_uint<kBINMAPwidth> kLinkNPhiBns[] =
 
 // total number of memoreis 
 // readout b each link 
-static const ap_uint<kNMEMwidth> kLinkNMemories[] = 
+const ap_uint<kNMEMwidth> kLinkNMemories[] = 
 {
    8 ,  4 ,  4 ,  8 , 
    8 ,  8 , 16 , 20 , 
@@ -54,22 +54,22 @@ static const ap_uint<kNMEMwidth> kLinkNMemories[] =
 
 // LUT with phi corrections to the nominal radius. Only used by layers.
 // Values are determined by the radius and the bend of the stub.
-static const int kPhiCorrtable_L1[] =
+const int kPhiCorrtable_L1[] =
 #include "../emData/LUTs/VMPhiCorrL1.txt"
 ;
-static const int kPhiCorrtable_L2[] =
+const int kPhiCorrtable_L2[] =
 #include "../emData/LUTs/VMPhiCorrL2.txt"
 ;
-static const int kPhiCorrtable_L3[] =
+const int kPhiCorrtable_L3[] =
 #include "../emData/LUTs/VMPhiCorrL3.txt"
 ;
-static const int kPhiCorrtable_L4[] =
+const int kPhiCorrtable_L4[] =
 #include "../emData/LUTs/VMPhiCorrL4.txt"
 ;
-static const int kPhiCorrtable_L5[] =
+const int kPhiCorrtable_L5[] =
 #include "../emData/LUTs/VMPhiCorrL5.txt"
 ;
-static const int kPhiCorrtable_L6[] =
+const int kPhiCorrtable_L6[] =
 #include "../emData/LUTs/VMPhiCorrL6.txt"
 ;
 

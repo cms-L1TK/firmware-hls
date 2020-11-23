@@ -13,9 +13,9 @@ void InputRouterTop( const BXType hBx
 	, const ap_uint<kLINKMAPwidth> kInputLink // input link LUT 
   	, const ap_uint<kBINMAPwidth> kNPhiBns  // n phi bins LUT 
   	, const ap_uint<kNMEMwidth> kLinkNMemories // number of memories filled by each IR module
-  	, const int* kPhiCorrtable_L1 // corrections frst brl lyr  
-	, const int* kPhiCorrtable_L2 // corrections scnd brl lyr  
-	, const int* kPhiCorrtable_L3 // corrections thrd brl lyr   
+  	, const int kPhiCorrtable_L1[] // corrections frst brl lyr  
+	, const int kPhiCorrtable_L2[] // corrections scnd brl lyr  
+	, const int kPhiCorrtable_L3[] // corrections thrd brl lyr   
 	, ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs 
 	, DTCStubMemory hOutputStubs[]);//output memories 
 
