@@ -174,11 +174,6 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
       ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
 
       if (istub==0) {
-        SID_LOOP: for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i) {
-//#pragma HLS PIPELINE II=1
-#pragma HLS unroll
-          stubids[i]=0;
-        }
 
         //Need to read the information about the proj in the buffer
         auto const qdata=projbuffer;
