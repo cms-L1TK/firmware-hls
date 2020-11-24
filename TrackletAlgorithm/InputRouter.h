@@ -85,18 +85,22 @@ static const int kMSBLyrBts = kNBits_DTC - 2;//2;
 // Get the corrected phi, i.e. phi at the average radius of the barrel
 // Corrected phi is used by ME and TE memories in the barrel
 template<regionType InType>
-typename AllStub<InType>::ASPHI getPhiCorr(
+inline typename AllStub<InType>::ASPHI getPhiCorr(
 		const typename AllStub<InType>::ASPHI phi,
 		const typename AllStub<InType>::ASR r,
 		const typename AllStub<InType>::ASBEND bend, const int phicorrtable[]) 
 {
 	
-	auto rbins = 1 << kNBitsPhiCorrTableR; // The number of bins for r
-	auto rbin = (r + (1 << (r.length() - 1))) >> (r.length() - kNBitsPhiCorrTableR); // Which bin r belongs to. Note r = 0 is mid radius
+	#pragma HLS array_partition variable = phicorrtable complete
+	constexpr auto rbins = 1 << kNBitsPhiCorrTableR; // The number of bins for r
+
+	ap_uint<kNBitsPhiCorrTableR> rbin = (r + (1 << (r.length() - 1)))
+			>> (r.length() - kNBitsPhiCorrTableR); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * rbins + rbin; // Index for where we find our correction value
 	auto corrval = phicorrtable[index]; // The amount we need to correct our phi
-	auto phicorr = ((phi) - corrval); // the corrected phi
-	
+
+	auto phicorr = phi - corrval; // the corrected phi
+
 	// Check for overflow
 	if (phicorr < 0)
 		phicorr = 0; // can't be less than 0
@@ -104,6 +108,20 @@ typename AllStub<InType>::ASPHI getPhiCorr(
 		phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
 
 	return phicorr;
+
+	// auto rbins = 1 << kNBitsPhiCorrTableR; // The number of bins for r
+	// auto rbin = (r + (1 << (r.length() - 1))) >> (r.length() - kNBitsPhiCorrTableR); // Which bin r belongs to. Note r = 0 is mid radius
+	// auto index = bend * rbins + rbin; // Index for where we find our correction value
+	// auto corrval = phicorrtable[index]; // The amount we need to correct our phi
+	// auto phicorr = ((phi) - corrval); // the corrected phi
+	
+	// // Check for overflow
+	// if (phicorr < 0)
+	// 	phicorr = 0; // can't be less than 0
+	// if (phicorr >= 1 << phi.length())
+	// 	phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
+
+	// return phicorr;
 }
 
 
@@ -117,9 +135,9 @@ void InputRouter( const BXType hBx
 	, ap_uint<kNBits_DTC>* hInputStubs
 	, DTCStubMemory* hOutputStubs)
 {
-
-	#pragma HLS clock domain = slow_clock
-  	#pragma HLS interface ap_memory port = hPhiCorrtable_L1
+	
+	#pragma HLS inline
+	#pragma HLS interface ap_memory port = hPhiCorrtable_L1
   	#pragma HLS interface ap_memory port = hPhiCorrtable_L2
   	#pragma HLS interface ap_memory port = hPhiCorrtable_L3
   
@@ -146,7 +164,7 @@ void InputRouter( const BXType hBx
 	for (int cStubCounter = 0; cStubCounter < kMaxStubsFromLink; cStubCounter++) 
 	{
 	#pragma HLS pipeline II = 1
-	#pragma HLS PIPELINE rewind
+	//#pragma HLS PIPELINE rewind
 	  // decode stub
 	  // check which memory
 	  auto hStub = hInputStubs[cStubCounter];
@@ -177,7 +195,7 @@ void InputRouter( const BXType hBx
 	  // point to the correct 
 	  // LUT with the phi 
 	  // corrections 
-	  const int* cLUT; 
+	  static const int* cLUT; 
 	  if( hLyrId == kFrstPSBrlLyr || hLyrId == kFrst2SBrlLyr ) 
 	  	cLUT = hPhiCorrtable_L1;
 	  else if( hLyrId == kScndPSBrlLyr || hLyrId == kScnd2SBrlLyr ) 
