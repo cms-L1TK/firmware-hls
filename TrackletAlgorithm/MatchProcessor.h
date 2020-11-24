@@ -437,10 +437,7 @@ void MatchCalculator(BXType bx,
   
     // Full match  
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_phi,fm_z);
-for(int i = 0; i < maxFullMatchCopies; ++i) {
-#pragma HLS unroll
-#pragma HLS dependence variable=fullmatch[i] intra RAW true
-}
+#pragma HLS dependence variable=fullmatch intra false
     //std::cout << std::hex << "MC received projid=" << projid << "\tstubid=" << stubid << "\tfm=" << fm.raw() << std::endl;
   
     //-----------------------------------------------------------------------------------------------------------
@@ -865,22 +862,24 @@ void MatchProcessor(BXType bx,
 
     } // end if(validin)
 
+    #pragma HLS dependence variable=matchengine inter false
     MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
+      auto &meu = matchengine[iMEU];
       bool ready = false;
-      bool idle = matchengine[iMEU].idle();
-      bool done = matchengine[iMEU].done();
+      bool idle = meu.idle();
+      bool done = meu.done();
       bool empty = projbufferarray.empty();
       if(idle && !empty) {
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
-        matchengine[iMEU].init(bx, tmpprojbuff, writeindex[iphi], iMEU);
+        meu.init(bx, tmpprojbuff, writeindex[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
       if(!done) { 
-        ready = matchengine[iMEU].step(table, instubdata);
-        ready = matchengine[iMEU].ready();
+        ready = meu.step(table, instubdata);
+        ready = meu.ready();
       }
 
       if(ready) {
@@ -888,7 +887,7 @@ void MatchProcessor(BXType bx,
         typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID stubid;
         typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
         typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-        matchengine[iMEU].readNext(currentTCID, projindex, stubid);
+        meu.readNext(currentTCID, projindex, stubid);
         //std::cout << "Sending to MC projid=" << projindex << "\tstubid=" << stubid << std::endl;
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
                   //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
