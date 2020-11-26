@@ -616,8 +616,11 @@ void MatchProcessor(BXType bx,
   constexpr unsigned int kNMatchEngines=8;
 
   static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
+  ap_uint<kNBitsBuffer> writeindextmp[kNBitsBuffer];
 #pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
+#pragma HLS resource variable=writeindextmp core=RAM_2P_LUTRAM
 #pragma HLS dependence variable=writeindex inter false
+#pragma HLS dependence variable=writeindextmp inter false
   static ap_uint<kNBitsBuffer> readindex=0;
 
   // declare counters for each of the 8 output VMProj // !!!
@@ -655,6 +658,9 @@ void MatchProcessor(BXType bx,
   //ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
   ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNMatchEngines];
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
+//#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
+//#pragma HLS ARRAY_PARTITION variable=allproj complete dim=0
+//#pragma HLS dependence variable=allproj intra RAW true
 #pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
 //#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=1
 //#pragma HLS dependence variable=matchengine intra RAW true
@@ -764,10 +770,11 @@ void MatchProcessor(BXType bx,
 
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
-      ap_uint<kNBitsBuffer> writeindextmp=writeindex[iphi];
+      writeindextmp[iphi]=writeindex[iphi];
+      //ap_uint<kNBitsBuffer> writeindextmp=writeindex[iphi];
       ap_uint<kNBitsBuffer> readindextmp=readindex;
 
-      bool buffernotfull=(writeindextmp+1!=readindextmp)&&(writeindextmp+2!=readindextmp);
+      bool buffernotfull=(writeindextmp[iphi]+1!=readindextmp)&&(writeindextmp[iphi]+2!=readindextmp);
 
       if (buffernotfull){
         auto const iprojtmp=iproj;
@@ -821,9 +828,9 @@ void MatchProcessor(BXType bx,
         bool savelast=nstublast!=0&&zbin.range(0,0);
   
         if (savefirst&&savelast) {
-  	  writeindex[iphi]=writeindextmp+2;
+  	  writeindex[iphi]=writeindextmp[iphi]+2;
         } else if (savefirst||savelast) {
-  	  writeindex[iphi]=writeindextmp+1;
+  	  writeindex[iphi]=writeindextmp[iphi]+1;
         }
         VMProjection<BARREL> vmproj(index, zbin, finez, rinv, psseed);
 
@@ -874,7 +881,7 @@ void MatchProcessor(BXType bx,
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
-        meu.init(bx, tmpprojbuff, writeindex[iphi], iMEU);
+        meu.init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
       if(!done) { 
@@ -898,7 +905,6 @@ void MatchProcessor(BXType bx,
 
     } //end MEU loop
 
-  //} //end loop
   } //end loop
 
 
