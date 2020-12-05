@@ -99,7 +99,7 @@ inline MatchEngineUnit() {
    return nearFullLUT[(readindex_,writeindex_)];
  }
 
-bool idle() {
+inline bool idle() {
 #pragma HLS inline  
   //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   return idle_;
@@ -160,7 +160,7 @@ inline VMProjection<BARREL>::VMPID getProjindex() {
   return projbuffer_.getIndex();
 }
 
-NSTUBS getNStubs() {
+inline NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs_;
 }
