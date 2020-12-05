@@ -34,7 +34,8 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
-MatchEngineUnit() {
+inline MatchEngineUnit() {
+#pragma HLS inline
   nstubs=0;
   ptr = 0;
   idle_ = true;
@@ -42,8 +43,40 @@ MatchEngineUnit() {
 
 }
 
+inline MatchEngineUnit(const MatchEngineUnit& meu) {
+#pragma HLS inline
+  writeindex = meu.writeindex;
+  readindex = meu.readindex;
+  ptr = meu.ptr;
+  nstubs = meu.nstubs;
+  idle_ = meu.idle_;
+  done_ = meu.done_;
+  istep_ = meu.istep_;
+  ivmphi = meu.ivmphi;
+  unit_ = meu.unit_;
+  bx = meu.bx;
+  istub = meu.istub;
+  for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i) {
+    #pragma HLS unroll
+    stubids[i] = meu.stubids[i];
+  }
+  /*
+  */
+  stubids = meu.stubids;
+  projfinezadj = meu.projfinezadj;
+  tcid = meu.tcid;
+  isPSseed = meu.isPSseed;
+  zbin = meu.zbin;
+  projrinv = meu.projrinv;
+  projindex = meu.projindex;
+  projbuffer = meu.projbuffer;
+}
+
 inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const INDEX iproj, int unit) {
 #pragma HLS inline
+#pragma HLS ARRAY_PARTITION variable=stubids complete dim=1
+//#pragma HLS dependence variable=stubids inter false
+//#pragma HLS resource variable=stubids core=RAM_2P_LUTRAM
   writeindex = iproj;
   readindex = 0;
   idle_ = false;
@@ -62,52 +95,52 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
 
 }
 
-bool empty() {
+inline bool empty() {
 #pragma HLS inline  
   return (readindex==0);
 
 }
 
-bool idle() {
+inline bool idle() {
 #pragma HLS inline  
   //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   return idle_;
 }
 
-bool done() {
+inline bool done() {
 #pragma HLS inline  
   //std::cout << projbuffer.raw() << " " << " iphi=" << ivmphi << (done_ ? "": " not") << " done!" << std::endl;
   return done_;
 }
 
-bool ready() {
+inline bool ready() {
 #pragma HLS inline  
   return ptr < readindex;
 }
 
-STUBID* getStubIds() {
+inline STUBID* getStubIds() {
 #pragma HLS inline  
   return stubids;
 
 }
 
-ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
+inline ProjectionRouterBuffer<BARREL>::TCID& getTCID() {
 #pragma HLS inline  
   return tcid;
 }
 
-VMProjection<BARREL>::VMPID getProjindex() {
+inline VMProjection<BARREL>::VMPID getProjindex() {
 #pragma HLS inline  
   //std::cout << "projindex=" << projindex << "\tprojid=" << projbuffer.getIndex() << std::endl;
   return projbuffer.getIndex();
 }
 
-NSTUBS getNStubs() {
+inline NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs;
 }
 
-void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
+inline void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
   //std::cout << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
   trackletid = getTCID();
@@ -118,7 +151,7 @@ void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>
 
 }
 
-void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& projid, STUBID& stubid) {
+inline void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& projid, STUBID& stubid) {
 #pragma HLS inline  
   //print();
   trackletid = getTCID();
@@ -253,7 +286,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
 
 } // end step
 
- private:
+ //protected:
   INDEX writeindex;
   INDEX readindex;
   INDEX ptr;
