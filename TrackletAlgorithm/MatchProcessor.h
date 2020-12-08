@@ -659,8 +659,8 @@ void MatchProcessor(BXType bx,
   //ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
   ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNMatchEngines];
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
-#pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
-//#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
+//#pragma HLS resource variable=matchengine core=RAM_2P_LUTRAM
+#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 //#pragma HLS dependence variable=matchengine intra false 
 //#pragma HLS dependence variable=matchengine inter RAW true
 //#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
@@ -880,8 +880,8 @@ void MatchProcessor(BXType bx,
     } // end if(validin)
 
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchenginetmp[kNMatchEngines];
-#pragma HLS resource variable=matchenginetmp core=RAM_2P_LUTRAM
-//#pragma HLS ARRAY_PARTITION variable=matchenginetmp complete dim=0
+//#pragma HLS resource variable=matchenginetmp core=RAM_2P_LUTRAM
+#pragma HLS ARRAY_PARTITION variable=matchenginetmp complete dim=0
 //#pragma HLS dependence variable=matchenginetmp intra false
 #pragma HLS dependence variable=matchenginetmp inter RAW true
 //#pragma HLS dependence variable=matchengine inter RAW true
