@@ -65,6 +65,15 @@ int main() {
   ifstream fin_as;
   ifstream fout_ap;
 
+  if (not openDataFile(fin_tproj1, "MP/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj2, "MP/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj3, "MP/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj4, "MP/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj5, "MP/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj6, "MP/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj7, "MP/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj8, "MP/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat")) return -1;
+  /*
   if (not openDataFile(fin_tproj1, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat")) return -1;
   if (not openDataFile(fin_tproj2, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat")) return -1;
   if (not openDataFile(fin_tproj3, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat")) return -1;
@@ -73,8 +82,10 @@ int main() {
   if (not openDataFile(fin_tproj6, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat")) return -1;
   if (not openDataFile(fin_tproj7, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat")) return -1;
   if (not openDataFile(fin_tproj8, "PR/PR_L3PHIC/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat")) return -1;
+  */
 
   ifstream fin_vmstub1, fin_vmstub2, fin_vmstub3, fin_vmstub4, fin_vmstub5, fin_vmstub6, fin_vmstub7, fin_vmstub8;
+  /*
   bool validvmstub1 = openDataFile(fin_vmstub1,"MP/MP_L3PHIC17/VMStubs_VMSME_L3PHIC17n1_04.dat");
   bool validvmstub2 = openDataFile(fin_vmstub2,"MP/MP_L3PHIC18/VMStubs_VMSME_L3PHIC18n1_04.dat");
   bool validvmstub3 = openDataFile(fin_vmstub3,"MP/MP_L3PHIC19/VMStubs_VMSME_L3PHIC19n1_04.dat");
@@ -83,6 +94,15 @@ int main() {
   bool validvmstub6 = openDataFile(fin_vmstub6,"MP/MP_L3PHIC22/VMStubs_VMSME_L3PHIC22n1_04.dat");
   bool validvmstub7 = openDataFile(fin_vmstub7,"MP/MP_L3PHIC23/VMStubs_VMSME_L3PHIC23n1_04.dat");
   bool validvmstub8 = openDataFile(fin_vmstub8,"MP/MP_L3PHIC24/VMStubs_VMSME_L3PHIC24n1_04.dat");
+  */
+  bool validvmstub1 = openDataFile(fin_vmstub1,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub2 = openDataFile(fin_vmstub2,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub3 = openDataFile(fin_vmstub3,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub4 = openDataFile(fin_vmstub4,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub5 = openDataFile(fin_vmstub5,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub6 = openDataFile(fin_vmstub6,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub7 = openDataFile(fin_vmstub7,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
+  bool validvmstub8 = openDataFile(fin_vmstub8,"MP/VMStubs_VMSME_L3PHICn1_04.dat");
   if (not validvmstub1) return -1;
   if (not validvmstub2) return -1;
   if (not validvmstub3) return -1;
@@ -92,7 +112,11 @@ int main() {
   if (not validvmstub7) return -1;
   if (not validvmstub8) return -1;
 
+  /*
   if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn6_04.dat")) return -1;
+  if (not openDataFile(fout_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat")) return -1;
+  */
+  if (not openDataFile(fin_as,"MP/AllStubs_AS_L3PHICn1_04.dat")) return -1;
   if (not openDataFile(fout_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat")) return -1;
 
   // open file(s) with reference results
@@ -104,9 +128,11 @@ int main() {
   ifstream fout_fm6;
   ifstream fout_fm7;
 
-  if (not openDataFile(fout_fm1,"MC/MC_L3PHIC/FullMatches_FM_L1L2_L3PHIC_04.dat")) return -1;
+  //if (not openDataFile(fout_fm1,"MC/MC_L3PHIC/FullMatches_FM_L1L2_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fout_fm1,"MP/FullMatches_FM_L1L2_L3PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm2,"MC/MC_L1PHIC/FullMatches_FM_L3L4_L1PHIC_04.dat")) return -1;
-  if (not openDataFile(fout_fm3,"MC/MC_L3PHIC/FullMatches_FM_L5L6_L3PHIC_04.dat")) return -1;
+  //if (not openDataFile(fout_fm3,"MC/MC_L3PHIC/FullMatches_FM_L5L6_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fout_fm3,"MP/FullMatches_FM_L5L6_L3PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm4,"MC/MC_L1PHIC/FullMatches_FM_D1D2_L1PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm5,"MC/MC_L1PHIC/FullMatches_FM_D3D4_L1PHIC_04.dat")) return -1;
   //if (not openDataFile(fout_fm6,"")) return -1;

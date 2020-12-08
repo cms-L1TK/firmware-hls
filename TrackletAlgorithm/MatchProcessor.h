@@ -183,7 +183,7 @@ void readTable(bool table[256]){
 
   if (L==3) {
     bool tmp[256]=
-#include "../emData/ME/tables/METable_L3.tab"
+#include "../emData/MP/tables/METable_L3.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
@@ -252,7 +252,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L3PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==4){
@@ -287,7 +287,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==3){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L3PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==4){
