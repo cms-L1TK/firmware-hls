@@ -20,6 +20,7 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/VMR/tables/
 add_files -tb ../emData/VMR/VMR_L1PHIE/
+add_files -tb ../emData/wires_hourglass.dat
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design
