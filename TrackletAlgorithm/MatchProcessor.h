@@ -612,14 +612,14 @@ void MatchProcessor(BXType bx,
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
-  constexpr unsigned int kNBitsBuffer=7;
+  constexpr unsigned int kNBitsBuffer=3;
   constexpr unsigned int kNMatchEngines=8;
 
-  static ap_uint<kNBitsBuffer> writeindex[kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
+  static ap_uint<kNBitsBuffer> writeindex[1<<kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
 //#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
 #pragma HLS ARRAY_PARTITION variable=writeindex complete dim=0
 //#pragma HLS dependence variable=writeindex inter false
-  for(int i = 0; i < kNBitsBuffer; ++i) {
+  for(int i = 0; i < 1<<kNBitsBuffer; ++i) {
     #pragma HLS unroll
     writeindex[i] = 0;
   }
