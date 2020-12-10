@@ -4,7 +4,7 @@
 #include "Constants.h"
 #include "CandidateMatchMemory.h"
 #include "TrackletProjectionMemory.h"
-#include "VMStubMEMemory.h"
+#include "VMStubMEMemoryCM.h"
 #include "VMProjectionMemory.h"
 #include "ProjectionRouterBuffer.h"
 #include "AllStubMemory.h"
@@ -30,7 +30,7 @@ template<int VMSMEType, int VMProjType, int VMPTYPE>
 class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
-  typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> STUBID;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> STUBID;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
@@ -177,7 +177,7 @@ void print() {
 #endif
 
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
-inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
+inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
@@ -249,7 +249,7 @@ inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3> *stubmem) {
       
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
-      const VMStubME<VMSMEType> stubdata=stubmem[ivmphi].read_mem(bx,stubadd);
+      const VMStubMECM<VMSMEType> stubdata=stubmem[ivmphi].read_mem(bx,stubadd);
       auto stubindex=stubdata.getIndex();
       auto stubfinez=stubdata.getFineZ();
       auto stubbend=stubdata.getBend();
