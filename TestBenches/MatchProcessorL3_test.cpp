@@ -3,7 +3,7 @@
 #include "CandidateMatchMemory.h"
 #include "VMProjectionMemory.h"
 #include "ProjectionRouterBuffer.h"
-#include "VMStubMEMemory.h"
+#include "VMStubMEMemoryCM.h"
 #include "FileReadUtility.h"
 #include "hls_math.h"
 
@@ -37,14 +37,14 @@ int main() {
   static AllStubMemory<BARRELPS>        allstub;
   static AllProjectionMemory<BARRELPS>  allproj;
 
-  VMStubMEMemory<BARRELPS,3> inputvmstubs1;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs2;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs3;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs4;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs5;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs6;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs7;
-  VMStubMEMemory<BARRELPS,3> inputvmstubs8;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs1;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs2;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs3;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs4;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs5;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs6;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs7;
+  VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs8;
 
   // declare output memory array to be filled by hls simulation
   static FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies];
@@ -172,14 +172,14 @@ int main() {
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
     //writeMemFromFile<AllProjectionMemory<BARRELPS> >(allproj, fin_ap, ievt);
 
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs1, fin_vmstub1, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs2, fin_vmstub2, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs3, fin_vmstub3, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs4, fin_vmstub4, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs5, fin_vmstub5, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs6, fin_vmstub6, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs7, fin_vmstub7, ievt);
-    writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs8, fin_vmstub8, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs1, fin_vmstub1, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs2, fin_vmstub2, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs3, fin_vmstub3, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs4, fin_vmstub4, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs5, fin_vmstub5, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs6, fin_vmstub6, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs7, fin_vmstub7, ievt);
+    writeMemFromFile<VMStubMEMemoryCM<BARRELPS,3,3> >(inputvmstubs8, fin_vmstub8, ievt);
     /* FIXME
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[0], fin_vmstub1, ievt);
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[1], fin_vmstub2, ievt);
@@ -190,7 +190,7 @@ int main() {
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[6], fin_vmstub7, ievt);
     writeMemFromFile<VMStubMEMemory<BARRELPS,3> >(inputvmstubs[7], fin_vmstub8, ievt);
     */
-    VMStubMEMemory<BARRELPS,3> inputvmstubs[maxInCopies] = {inputvmstubs1, inputvmstubs2, inputvmstubs3, inputvmstubs4, inputvmstubs5, inputvmstubs6, inputvmstubs7, inputvmstubs8};
+    VMStubMEMemoryCM<BARRELPS,3,3> inputvmstubs[maxInCopies] = {inputvmstubs1, inputvmstubs2, inputvmstubs3, inputvmstubs4, inputvmstubs5, inputvmstubs6, inputvmstubs7, inputvmstubs8};
 
     //set bunch crossing
     BXType bx=ievt;
