@@ -4,7 +4,7 @@
 #include "Constants.h"
 #include "CandidateMatchMemory.h"
 #include "TrackletProjectionMemory.h"
-#include "VMStubMEMemory.h"
+#include "VMStubMEMemoryCM.h"
 #include "VMProjectionMemory.h"
 #include "ProjectionRouterBuffer.h"
 #include "ProjectionRouterBufferArray.h"
@@ -322,7 +322,7 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjectionMemory<APTYPE>* allproj,
                      ap_uint<VMProjectionBase<BARREL>::kVMProjIndexSize> projid,
-                     ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> stubid,
+                     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubid,
                      int nstubs,
                      BXType& bx_o,
                      int &nmcout1,
@@ -560,7 +560,7 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj22in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj23in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
-                      const VMStubMEMemory<VMSMEType,3> instubdata[maxInCopies],
+                      const VMStubMEMemoryCM<VMSMEType,3,3> instubdata[maxInCopies],
                       const AllStubMemory<ASTYPE>* allstub,
                       AllProjectionMemory<APTYPE>* allproj,
                       BXType& bx_o,
@@ -902,7 +902,7 @@ void MatchProcessor(BXType bx,
       if(idle && !empty) {
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
-        const VMStubMEMemory<VMSMEType,3> *instub = &(instubdata[iphi]);
+        const VMStubMEMemoryCM<VMSMEType,3,3> *instub = &(instubdata[iphi]);
         meu.init(bx, tmpprojbuff, writeindextmp, iMEU);
         //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
