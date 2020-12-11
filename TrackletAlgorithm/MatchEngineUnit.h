@@ -31,7 +31,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> STUBID;
-  typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
+  typedef ap_uint<kNBits_MemAddrBinned+2> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
 inline MatchEngineUnit() {
@@ -204,7 +204,7 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
   if (!done()) {// && buffernotlarger) {
       auto readindextmp = readindex;
 
-      ap_uint<kNBits_MemAddrBinned> istubtmp=istub;
+      ap_uint<kNBits_MemAddrBinned+2> istubtmp=istub;
 
       if (istub==0) {
 
@@ -250,6 +250,7 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
       //Read stub memory and extract data fields
       auto const  stubadd=zbin.concat(istubtmp);
       const VMStubMECM<VMSMEType> stubdata=stubmem[ivmphi].read_mem(bx,stubadd);
+      std::cout << std::hex << stubdata.raw() << std::endl;
       auto stubindex=stubdata.getIndex();
       auto stubfinez=stubdata.getFineZ();
       auto stubbend=stubdata.getBend();
