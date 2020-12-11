@@ -14,7 +14,7 @@
 #include <iterator>
 
 
-const int nevents = 2;  // number of events to run
+const int nevents = 1;  // number of events to run
 
 using namespace std;
 
@@ -220,7 +220,7 @@ int main() {
     //std::cout << "FM: L3L4 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch2, fout_fm2, ievt, "FullMatch", truncation);
     //std::cout << "FM: L5L6 seeding" << std::endl;
-    compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[2], fout_fm3, ievt, "FullMatch", truncation);
+    compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[3], fout_fm3, ievt, "FullMatch", truncation);
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[2], fout_fm3, ievt, "FullMatch", truncation);
     //std::cout << "FM: D1D2 seeding" << std::endl;
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch4, fout_fm4, ievt, "FullMatch", truncation);
