@@ -147,7 +147,7 @@ namespace PR
   constexpr unsigned int nbits_seed = 3;
 
   // number of extra bits to keep when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_nbitsextra = 3;
+  constexpr unsigned int zbins_nbitsextra = 4;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
   constexpr unsigned int zbins_adjust = 1;
@@ -734,6 +734,8 @@ void MatchProcessor(BXType bx,
       // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
       auto zbinposfull = (1<<(izproj.length()-1))+izproj;
       auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
+      std::cout << "zbinposfull=" << std::bitset<zbinposfull.width>(zbinposfull) << std::endl;
+      std::cout << "zbinpos5=" << std::bitset<6>(zbinpos5) << std::endl;
 
       // Lower Bound
       auto zbinlower = zbinpos5<zbins_adjust ?
