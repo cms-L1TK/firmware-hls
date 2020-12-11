@@ -21,7 +21,7 @@ class MemoryTemplateBinned{
 public:
   static constexpr unsigned int kNBitDataAddr = NBIT_ADDR-NBIT_BIN;
   typedef ap_uint<NBIT_BX> BunchXingT;
-  typedef ap_uint<kNBitDataAddr+1> NEntryT;
+  typedef ap_uint<kNBitDataAddr> NEntryT;
   
 protected:
   enum BitWidths {

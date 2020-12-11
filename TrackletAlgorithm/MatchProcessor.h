@@ -147,7 +147,7 @@ namespace PR
   constexpr unsigned int nbits_seed = 3;
 
   // number of extra bits to keep when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_nbitsextra = 4;
+  constexpr unsigned int zbins_nbitsextra = 3;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
   constexpr unsigned int zbins_adjust = 1;
@@ -734,8 +734,6 @@ void MatchProcessor(BXType bx,
       // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
       auto zbinposfull = (1<<(izproj.length()-1))+izproj;
       auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
-      std::cout << "zbinposfull=" << std::bitset<zbinposfull.width>(zbinposfull) << std::endl;
-      std::cout << "zbinpos5=" << std::bitset<6>(zbinpos5) << std::endl;
 
       // Lower Bound
       auto zbinlower = zbinpos5<zbins_adjust ?
@@ -805,8 +803,10 @@ void MatchProcessor(BXType bx,
         //Check if there are stubs in the memory
         ProjectionRouterBufferMemory<BARREL>::NEntryT nstubfirst;
         ProjectionRouterBufferMemory<BARREL>::NEntryT  nstublast;
-        nstubfirst=instubdata[iphi].getEntries(bx,zfirst);
-        nstublast= instubdata[iphi].getEntries(bx,zlast);
+        nstubfirst=instubdata[iphi].getEntries(bx,iphi*8+zfirst);
+        nstublast= instubdata[iphi].getEntries(bx,iphi*8+zlast);
+        std::cout << "iphi zfirst zlast nstubfirst nstublast : "
+                  <<iphi<<" "<<zfirst<<" "<<zlast<<" "<<nstubfirst<<" "<<nstublast<<std::endl;
         /*
         switch (iphi) {
           break;
@@ -904,8 +904,8 @@ void MatchProcessor(BXType bx,
       if(idle && !empty) {
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
-        const VMStubMEMemoryCM<VMSMEType,3,3> *instub = &(instubdata[iphi]);
-        meu.init(bx, tmpprojbuff, writeindextmp, iMEU);
+        const VMStubMEMemoryCM<VMSMEType,3,3> *instub = &(instubdata[iMEU]);
+        meu.init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
         //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
