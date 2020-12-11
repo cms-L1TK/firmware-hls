@@ -72,7 +72,7 @@ inline MatchEngineUnit(const MatchEngineUnit& meu) {
   projbuffer = meu.projbuffer;
 }
 
-inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const INDEX iproj, int unit) {
+inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const INDEX iproj, int iphi, int unit) {
 #pragma HLS inline
 #pragma HLS ARRAY_PARTITION variable=stubids complete dim=1
 //#pragma HLS dependence variable=stubids inter false
@@ -85,6 +85,7 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
   projbuffer = projbuffer_;
   projindex = projbuffer_.getIndex();
   ivmphi = projbuffer_.getPhi();
+  iphi_ = iphi;
   ptr = 0;
   unit_ = unit;
   //std::cout << "Initializing MEU " << unit_ << std::endl;
@@ -248,9 +249,9 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
       }
       
       //Read stub memory and extract data fields
-      auto const  stubadd=zbin.concat(istubtmp);
-      const VMStubMECM<VMSMEType> stubdata=stubmem[ivmphi].read_mem(bx,stubadd);
-      std::cout << std::hex << stubdata.raw() << std::endl;
+      //auto const  stubadd=zbin.concat(istubtmp);
+      int stubadd=16*(iphi_*8+zbin)+istubtmp;
+      const VMStubMECM<VMSMEType> stubdata=stubmem[unit_].read_mem(bx,stubadd);
       auto stubindex=stubdata.getIndex();
       auto stubfinez=stubdata.getFineZ();
       auto stubbend=stubdata.getBend();
@@ -296,6 +297,7 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
   bool done_;
   int istep_;
   int ivmphi;
+  int iphi_;
   int unit_;
   BXType bx;
   NSTUBS istub=0;
