@@ -147,7 +147,7 @@ namespace PR
   constexpr unsigned int nbits_seed = 3;
 
   // number of extra bits to keep when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_nbitsextra = 3;
+  constexpr unsigned int zbins_nbitsextra = 4;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
   constexpr unsigned int zbins_adjust_PSseed = 1;
