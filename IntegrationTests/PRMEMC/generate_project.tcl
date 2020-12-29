@@ -91,7 +91,7 @@ open_wave_config {./top_tf.wcfg}
 restart
 run 50 us
 
-exit
+#exit
 
 #set_property SOURCE_SET sources_1 [get_filesets sim_1]
 #add_files -fileset sim_1 -norecurse {/home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/endian_h.vhd /home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/regexp_h.vhd /home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/stdio_h_2args.vhd /home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/strings_h.vhd /home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/ctype_h.vhd /home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/debugio_h.vhd /home/vivado/local_mount/firmware-hls/IntegrationTests/ExpTopPRMEMC_Test/sourceFiles/stdio/stdlib_h.vhd}

@@ -158,14 +158,14 @@ architecture behavior of tb_top_tf is
   signal AP_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal AP_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0);
   signal AP_L3PHIC_dataarray_data_V_din       : std_logic_vector(59 downto 0);
-  signal AP_L3PHIC_nentries_V_we  : t_myarray8_1b;
-  signal AP_L3PHIC_nentries_V_din : t_myarray8_8b;
+  --signal AP_L3PHIC_nentries_V_we  : t_myarray8_1b;
+  --signal AP_L3PHIC_nentries_V_din : t_myarray8_8b;
   -- VMProjection output
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : t_myarray8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : t_myarray8_8b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_din       : t_myarray8_21b;
-  signal VMPROJ_L3PHIC17to24_nentries_V_we  : t_myarray2_8_1b;
-  signal VMPROJ_L3PHIC17to24_nentries_V_din : t_myarray2_8_8b;
+  --signal VMPROJ_L3PHIC17to24_nentries_V_we  : t_myarray2_8_1b;
+  --signal VMPROJ_L3PHIC17to24_nentries_V_din : t_myarray2_8_8b;
   -- MatchEngine output
   signal ME_bx_out     : t_myarray8_3b;
   signal ME_bx_out_vld : t_myarray8_1b;
@@ -174,8 +174,8 @@ architecture behavior of tb_top_tf is
   signal CM_L3PHIC17to24_dataarray_data_V_wea       : t_myarray8_1b;
   signal CM_L3PHIC17to24_dataarray_data_V_writeaddr : t_myarray8_8b;
   signal CM_L3PHIC17to24_dataarray_data_V_din       : t_myarray8_14b;
-  signal CM_L3PHIC17to24_nentries_V_we  : t_myarray2_8_1b;
-  signal CM_L3PHIC17to24_nentries_V_din : t_myarray2_8_8b;
+  --signal CM_L3PHIC17to24_nentries_V_we  : t_myarray2_8_1b;
+  --signal CM_L3PHIC17to24_nentries_V_din : t_myarray2_8_8b;
 
 
 begin
@@ -534,14 +534,14 @@ begin
         VMPROJ_L3PHIC17to24_dataarray_data_V_wea       => VMPROJ_L3PHIC17to24_dataarray_data_V_wea,
         VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr,
         VMPROJ_L3PHIC17to24_dataarray_data_V_din       => VMPROJ_L3PHIC17to24_dataarray_data_V_din,
-        VMPROJ_L3PHIC17to24_nentries_V_we              => VMPROJ_L3PHIC17to24_nentries_V_we,
-        VMPROJ_L3PHIC17to24_nentries_V_din             => VMPROJ_L3PHIC17to24_nentries_V_din,
+        --VMPROJ_L3PHIC17to24_nentries_V_we              => VMPROJ_L3PHIC17to24_nentries_V_we,
+        --VMPROJ_L3PHIC17to24_nentries_V_din             => VMPROJ_L3PHIC17to24_nentries_V_din,
         -- AllProjection output
         AP_L3PHIC_dataarray_data_V_wea       => AP_L3PHIC_dataarray_data_V_wea,
         AP_L3PHIC_dataarray_data_V_writeaddr => AP_L3PHIC_dataarray_data_V_writeaddr,
         AP_L3PHIC_dataarray_data_V_din       => AP_L3PHIC_dataarray_data_V_din,
-        AP_L3PHIC_nentries_V_we              => AP_L3PHIC_nentries_V_we,
-        AP_L3PHIC_nentries_V_din             => AP_L3PHIC_nentries_V_din,
+        --AP_L3PHIC_nentries_V_we              => AP_L3PHIC_nentries_V_we,
+        --AP_L3PHIC_nentries_V_din             => AP_L3PHIC_nentries_V_din,
         -- ProjectionRouter output
         PR_bx_out     => PR_bx_out,
         PR_bx_out_vld => PR_bx_out_vld,
@@ -550,8 +550,8 @@ begin
         CM_L3PHIC17to24_dataarray_data_V_wea       => CM_L3PHIC17to24_dataarray_data_V_wea,
         CM_L3PHIC17to24_dataarray_data_V_writeaddr => CM_L3PHIC17to24_dataarray_data_V_writeaddr,
         CM_L3PHIC17to24_dataarray_data_V_din       => CM_L3PHIC17to24_dataarray_data_V_din,
-        CM_L3PHIC17to24_nentries_V_we              => CM_L3PHIC17to24_nentries_V_we,
-        CM_L3PHIC17to24_nentries_V_din             => CM_L3PHIC17to24_nentries_V_din,
+        --CM_L3PHIC17to24_nentries_V_we              => CM_L3PHIC17to24_nentries_V_we,
+        --CM_L3PHIC17to24_nentries_V_din             => CM_L3PHIC17to24_nentries_V_din,
         -- MatchEngine output
         ME_bx_out     => ME_bx_out,
         ME_bx_out_vld => ME_bx_out_vld,
@@ -586,7 +586,7 @@ begin
                 --AP_L3PHIC_nentries_V_we(5)='1' or AP_L3PHIC_nentries_V_we(6)='1' or AP_L3PHIC_nentries_V_we(7)='1') then -- Only write valid data
           write_emData_line_8p(reset, v_bx_cnt, PR_done, PR_bx_out, PR_bx_out_vld, FILE_OUT_AP, "AP_L3PHIC_dataarray_data_V_din",
                                AP_L3PHIC_dataarray_data_V_din, AP_L3PHIC_dataarray_data_V_wea, AP_L3PHIC_dataarray_data_V_writeaddr,
-                               AP_L3PHIC_nentries_V_din, AP_L3PHIC_nentries_V_we );
+                               (others => (others => '0')), (others => '0') );--AP_L3PHIC_nentries_V_din, AP_L3PHIC_nentries_V_we );
         end if;
         wait for CLK_PERIOD; -- Main time control
       end loop l_BX;
@@ -609,9 +609,10 @@ begin
           v_bx_cnt := v_bx_cnt + 1;
         end if;
         l_copies : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7
-          if (VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp)='1' or VMPROJ_L3PHIC17to24_nentries_V_we(0)(cp)='1' or VMPROJ_L3PHIC17to24_nentries_V_we(1)(cp)='1') then -- Only write valid data
-            myarray2_8b := (VMPROJ_L3PHIC17to24_nentries_V_din(0)(cp)) & (VMPROJ_L3PHIC17to24_nentries_V_din(1)(cp)); -- Needed to avoid sim error (casting does not work)
-            myarray2_1b := (VMPROJ_L3PHIC17to24_nentries_V_we(0)(cp))  & (VMPROJ_L3PHIC17to24_nentries_V_we(1)(cp));  -- Needed to avoid sim error (casting does not work)
+          if (VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp)='1') then -- Only write valid data
+          --if (VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp)='1' or VMPROJ_L3PHIC17to24_nentries_V_we(0)(cp)='1' or VMPROJ_L3PHIC17to24_nentries_V_we(1)(cp)='1') then -- Only write valid data
+            --myarray2_8b := (VMPROJ_L3PHIC17to24_nentries_V_din(0)(cp)) & (VMPROJ_L3PHIC17to24_nentries_V_din(1)(cp)); -- Needed to avoid sim error (casting does not work)
+            --myarray2_1b := (VMPROJ_L3PHIC17to24_nentries_V_we(0)(cp))  & (VMPROJ_L3PHIC17to24_nentries_V_we(1)(cp));  -- Needed to avoid sim error (casting does not work)
             write_emData_line_2p(reset, v_bx_cnt, PR_done, PR_bx_out, PR_bx_out_vld, FILE_OUT_VMP(cp), "VMPROJ_L3PHIC17to24_dataarray_data_V_din",
                                  VMPROJ_L3PHIC17to24_dataarray_data_V_din(cp), VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp), VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(cp),
                                  myarray2_8b, myarray2_1b );
@@ -639,9 +640,10 @@ begin
           v_bx_cnt := v_bx_cnt + 1;
         end if;
         l_copies : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7
-          if (CM_L3PHIC17to24_dataarray_data_V_wea(cp)='1' or CM_L3PHIC17to24_nentries_V_we(0)(cp)='1' or CM_L3PHIC17to24_nentries_V_we(1)(cp)='1') then -- Only write valid data
-            myarray2_8b := (CM_L3PHIC17to24_nentries_V_din(0)(cp)) & (CM_L3PHIC17to24_nentries_V_din(1)(cp)); -- Needed to avoid sim error (casting does not work)
-            myarray2_1b := (CM_L3PHIC17to24_nentries_V_we(0)(cp))  & (CM_L3PHIC17to24_nentries_V_we(1)(cp));  -- Needed to avoid sim error (casting does not work)
+          if (CM_L3PHIC17to24_dataarray_data_V_wea(cp)='1') then
+          --if (CM_L3PHIC17to24_dataarray_data_V_wea(cp)='1' or CM_L3PHIC17to24_nentries_V_we(0)(cp)='1' or CM_L3PHIC17to24_nentries_V_we(1)(cp)='1') then -- Only write valid data
+            --myarray2_8b := (CM_L3PHIC17to24_nentries_V_din(0)(cp)) & (CM_L3PHIC17to24_nentries_V_din(1)(cp)); -- Needed to avoid sim error (casting does not work)
+            --myarray2_1b := (CM_L3PHIC17to24_nentries_V_we(0)(cp))  & (CM_L3PHIC17to24_nentries_V_we(1)(cp));  -- Needed to avoid sim error (casting does not work)
             write_emData_line_2p(reset, v_bx_cnt, ME_all_done, ME_bx_out(cp), ME_bx_out_vld(cp), FILE_OUT_CM(cp), "CM_L3PHIC17to24_dataarray_data_V_din",
                                  CM_L3PHIC17to24_dataarray_data_V_din(cp), CM_L3PHIC17to24_dataarray_data_V_wea(cp), CM_L3PHIC17to24_dataarray_data_V_writeaddr(cp),
                                  myarray2_8b, myarray2_1b );
