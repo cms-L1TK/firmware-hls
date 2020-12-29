@@ -30,8 +30,8 @@
 # Directories in project
 vmrouter_1
 vmrouter_2
-emData/TE
-IntegrationTests/PRMEMC_Test
+emData
+IntegrationTests/PRMEMC/*.txt
 
 # Precompiled Headers
 *.gch
@@ -56,3 +56,4 @@ IntegrationTests/PRMEMC_Test
 *.exe
 *.out
 *.app
+

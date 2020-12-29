@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_tf_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_tf_top" />
+            <top_module name="tf_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="40524833fs"></ZoomStartTime>
+      <ZoomEndTime time="46859834fs"></ZoomEndTime>
+      <Cursor1Time time="45804000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="155"></NameColumnWidth>
+      <ValueColumnWidth column_width="99"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="25" />
+   <wvobject type="logic" fp_name="/tb_tf_top/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/tb_tf_top/bx_cnt">
+      <obj_property name="ElementShortName">bx_cnt</obj_property>
+      <obj_property name="ObjectShortName">bx_cnt</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider293" type="divider">
+      <obj_property name="label">PR</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_start">
+      <obj_property name="ElementShortName">PR_start</obj_property>
+      <obj_property name="ObjectShortName">PR_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_idle">
+      <obj_property name="ElementShortName">PR_idle</obj_property>
+      <obj_property name="ObjectShortName">PR_idle</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_ready">
+      <obj_property name="ElementShortName">PR_ready</obj_property>
+      <obj_property name="ObjectShortName">PR_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_done">
+      <obj_property name="ElementShortName">PR_done</obj_property>
+      <obj_property name="ObjectShortName">PR_done</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_bx_in">
+      <obj_property name="ElementShortName">PR_bx_in[2:0]</obj_property>
+      <obj_property name="ObjectShortName">PR_bx_in[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_bx_out">
+      <obj_property name="ElementShortName">PR_bx_out[2:0]</obj_property>
+      <obj_property name="ObjectShortName">PR_bx_out[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/PR_bx_out_vld">
+      <obj_property name="ElementShortName">PR_bx_out_vld</obj_property>
+      <obj_property name="ObjectShortName">PR_bx_out_vld</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider294" type="divider">
+      <obj_property name="label">ME/ME3</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_start">
+      <obj_property name="ElementShortName">ME_start</obj_property>
+      <obj_property name="ObjectShortName">ME_start</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_idle">
+      <obj_property name="ElementShortName">ME_idle[0:7]</obj_property>
+      <obj_property name="ObjectShortName">ME_idle[0:7]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_ready">
+      <obj_property name="ElementShortName">ME_ready[0:7]</obj_property>
+      <obj_property name="ObjectShortName">ME_ready[0:7]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_done">
+      <obj_property name="ElementShortName">ME_done[0:7]</obj_property>
+      <obj_property name="ObjectShortName">ME_done[0:7]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_all_done">
+      <obj_property name="ElementShortName">ME_all_done</obj_property>
+      <obj_property name="ObjectShortName">ME_all_done</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_bx_out">
+      <obj_property name="ElementShortName">ME_bx_out[0:7][2:0]</obj_property>
+      <obj_property name="ObjectShortName">ME_bx_out[0:7][2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_bx_out_vld">
+      <obj_property name="ElementShortName">ME_bx_out_vld[0:7]</obj_property>
+      <obj_property name="ObjectShortName">ME_bx_out_vld[0:7]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider295" type="divider">
+      <obj_property name="label">MC</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/MC_start">
+      <obj_property name="ElementShortName">MC_start</obj_property>
+      <obj_property name="ObjectShortName">MC_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/MC_idle">
+      <obj_property name="ElementShortName">MC_idle</obj_property>
+      <obj_property name="ObjectShortName">MC_idle</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/MC_ready">
+      <obj_property name="ElementShortName">MC_ready</obj_property>
+      <obj_property name="ObjectShortName">MC_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/MC_done">
+      <obj_property name="ElementShortName">MC_done</obj_property>
+      <obj_property name="ObjectShortName">MC_done</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/MC_bx_out">
+      <obj_property name="ElementShortName">MC_bx_out[2:0]</obj_property>
+      <obj_property name="ObjectShortName">MC_bx_out[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/MC_bx_out_vld">
+      <obj_property name="ElementShortName">MC_bx_out_vld</obj_property>
+      <obj_property name="ObjectShortName">MC_bx_out_vld</obj_property>
+   </wvobject>
+</wave_config>
