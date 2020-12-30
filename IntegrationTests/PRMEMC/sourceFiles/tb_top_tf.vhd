@@ -56,7 +56,7 @@ architecture behavior of tb_top_tf is
   constant INST_TOP_TF       : integer := 2;          --! Instantiate top_tf or others
                                                       --! 0: Generated prmemc chain
                                                       --! 1: top_tf
-                                                      --! 2: top_tf_full
+                                                      --! 2: top_tf_full (intermediate MemPrints)
   constant CLK_PERIOD        : time    := 4.16667 ns; --! 240 MHz
   constant DEBUG             : boolean := true;       --! Debug off/on
   constant VMSME_DELAY       : integer := 1-1;        --! Number of BX delays (can be written early 8 pages)
