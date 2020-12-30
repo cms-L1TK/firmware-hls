@@ -67,11 +67,15 @@ package mytypes_pkg is
   type t_myarray8_8_8_4b is array(0 to 7) of t_myarray8_8_4b;
   type t_myarray8_8_8_5b is array(0 to 7) of t_myarray8_8_5b;
   -- Others
-   type t_myarray_1d_int is array(natural range <>) of integer;                  --! 1D array of int
-   type t_myarray_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
+  type t_myarray_1d_int is array(natural range <>) of integer;                  --! 1D array of int
+  type t_myarray_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
   type t_myarray_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
-  -- ########################### Procedures #######################
+    -- ########################### Functions ################################################################
+  --! @brief Binary logarithm to determine bit width for addressing
+  function clogb2 (bit_depth : integer) return integer;
+
+  -- -- ########################### Procedures #######################
   procedure char2int (
     char : in  character;            --! Input charater 0...9, a...f, and A...F
     int  : out natural range 0 to 15 --! Output interger 0...15
@@ -135,8 +139,28 @@ end package mytypes_pkg;
 
 package body mytypes_pkg is
 
-  -- ########################### Procedures ################################################################
+  -- ########################### Functions ################################################################
+  --! @brief Binary logarithm to determine bit width for addressing
+  function clogb2 (bit_depth : integer) return integer is
+    variable depth : integer := bit_depth;
+    variable count : integer := 1;
+  begin
+    for clogb2 in 1 to bit_depth loop     -- Works for up to 32 bit integers
+      if (bit_depth <= 2) then
+        count := 1;
+      else
+        if(depth <= 1) then
+          count := count;
+        else
+          depth := depth / 2;
+          count := count + 1;
+        end if;
+      end if;
+    end loop;
+    return(count-1);
+  end;
 
+  -- ########################### Procedures ################################################################
   --! @brief Convert character to integer
   procedure char2int (
     char : in  character;            --! Input charater 0...9, a...f, and A...F
