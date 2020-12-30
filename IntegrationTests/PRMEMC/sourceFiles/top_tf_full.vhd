@@ -60,7 +60,7 @@ entity top_tf_full is
     ME_bx_out_vld : inout t_myarray8_1b;
     ME_all_done   : inout std_logic;
     -- FullMatches output
-    FM_L1L2XX_L3PHIC_dataarray_data_V_enb      : in std_logic; 
+    FM_L1L2XX_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L1L2XX_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
     FM_L1L2XX_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
     FM_L1L2XX_L3PHIC_nentries_V_dout : out t_myarray2_8b;
@@ -104,7 +104,7 @@ GENERIC (
   RAM_DEPTH       : integer := 1024;                -- Specify RAM depth (number of entries)
   INIT_FILE       : string  := "";                  -- Specify name/location of RAM initialization file if using one (leave blank if not)
   RAM_PERFORMANCE : string  := "HIGH_PERFORMANCE";  -- Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  HEX             : integer := 1 
+  HEX             : integer := 1
   );
 PORT (
   addra    : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Write address bus, width determined from RAM_DEPTH
@@ -150,7 +150,7 @@ GENERIC (
   RAM_DEPTH       : integer := 512;                 -- Specify RAM depth (number of entries) 512 is for 4 pages
   INIT_FILE       : string  := "";                  -- Specify name/location of RAM initialization file if using one (leave blank if not)
   RAM_PERFORMANCE : string  := "HIGH_PERFORMANCE";  -- Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  HEX             : integer := 1 
+  HEX             : integer := 1
   );
 PORT (
   addra      : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Write address bus, width determined from RAM_DEPTH
@@ -364,44 +364,44 @@ END COMPONENT;
   signal TPROJ_L3PHIC_dataarray_data_V_readaddr : t_myarray8_8b;
   signal TPROJ_L3PHIC_dataarray_data_V_dout     : t_myarray8_60b;
   signal TPROJ_L3PHIC_nentries_V_dout : t_myarray2_8_8b;
-    
+
   -- connecting VMProjections memories to MatchEngine input
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_enb      : t_myarray8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr : t_myarray8_8b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_myarray8_21b;
   signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_myarray2_8_8b;
-  
+
   -- connecting VMStubME memories to MatchEngine input
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_myarray8_1b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_myarray8_10b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_myarray8_14b;
   signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_myarray8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem); set MSbit to zero
-  
+
   -- Note: myMemoryBinned class allocates 4-bits for nentries in each bin, while
   -- MatchEngine ports are expecting 5-bits. Leaving the 5th bit unconnected seems
   -- to cause Vivado to trim away logic and messes up some LUT logic in the ME
   -- module. Assign 'dont_touch' attribute to the nentries signal to prevent this.
   attribute dont_touch : string;
   attribute dont_touch of VMSME_L3PHIC17to24n1_nentries_V_dout : signal is "true";
-  
+
   -- MatchEngine signals
   signal ME_start : std_logic := '0';
   signal ME_done  : t_myarray8_1b := (others => '0');
   signal ME_idle  : std_logic := '0';
   signal ME_ready : std_logic := '0';
-  
+
   -- connecting AllStubs memory to MatchCalculator input
   signal AS_L3PHICn4_dataarray_data_V_enb      : std_logic;
   signal AS_L3PHICn4_dataarray_data_V_readaddr : std_logic_vector(9 downto 0);
   signal AS_L3PHICn4_dataarray_data_V_dout     : std_logic_vector(35 downto 0);
   signal AS_L3PHICn4_nentries_V_dout : t_myarray8_8b;
-  
+
   -- connecting AllProjections memory to MatchCalculator input
   signal AP_L3PHIC_dataarray_data_V_enb      : std_logic;
   signal AP_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(9 downto 0);
   signal AP_L3PHIC_dataarray_data_V_dout     : std_logic_vector(59 downto 0);
   signal AP_L3PHIC_nentries_V_dout : t_myarray8_8b;
-  
+
   -- connecting CandidateMatches memories to MatchCalculator input
   signal CM_L3PHIC17to24_dataarray_data_V_enb      : t_myarray8_1b;
   signal CM_L3PHIC17to24_dataarray_data_V_readaddr : t_myarray8_8b;
@@ -414,13 +414,13 @@ END COMPONENT;
   signal MC_ready : std_logic := '0';
 
   -- connecting MatchCalculator output to FullMatches memories
-  signal FM_L1L2XX_L3PHIC_dataarray_data_V_wea       : std_logic; 
+  signal FM_L1L2XX_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal FM_L1L2XX_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
   signal FM_L1L2XX_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
   signal FM_L5L6XX_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal FM_L5L6XX_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
   signal FM_L5L6XX_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
-    
+
 begin
 
   --------------------------------------------------------------
@@ -429,9 +429,9 @@ begin
   p_ME_start : process(clk)
   begin
     if rising_edge(clk) then
-      if PR_done = '1' then 
+      if PR_done = '1' then
         if (ME_ready='1' or ME_idle='1') then
-          ME_start <= '1'; 
+          ME_start <= '1';
         else
           ME_start <= '0';
         end if;
@@ -440,15 +440,15 @@ begin
       end if;
     end if;
   end process;
-  
+
   ME_all_done <= ME_done(0) and ME_done(1) and ME_done(2) and ME_done(3) and ME_done(4) and ME_done(5) and ME_done(6) and ME_done(7);
-  
+
   p_MC_start : process(clk)
   begin
     if rising_edge(clk) then
-      if ME_all_done = '1' then 
+      if ME_all_done = '1' then
         if (MC_ready='1' or MC_idle='1') then
-          MC_start <= '1'; 
+          MC_start <= '1';
         else
           MC_start <= '0';
         end if;
@@ -471,7 +471,7 @@ begin
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
         HEX             => 1
         )
-      port map (        
+      port map (
         clka     => clk,
         wea      => TPROJ_L3PHIC_dataarray_data_V_wea(tpidx),
         addra    => TPROJ_L3PHIC_dataarray_data_V_writeaddr(tpidx),
@@ -507,15 +507,15 @@ begin
         nent_o6  => open,
         nent_o7  => open
         );
-        
+
   end generate gen_TPROJ_L3PHIC;
 
-  
+
   --------------------------------------------------------------
   -- ProjectionRouter
   --------------------------------------------------------------
   PR_L3PHIC : entity work.PR_L3PHIC
-    port map (  
+    port map (
       ap_clk   => clk,
       ap_rst   => reset,
       ap_start => PR_start,
@@ -613,9 +613,9 @@ begin
       RAM_DEPTH       => 1024,
       INIT_FILE       => "",
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      HEX             => 1       
+      HEX             => 1
       )
-    port map (        
+    port map (
       clka     => clk,
       wea      => AP_L3PHIC_dataarray_data_V_wea,
       addra    => AP_L3PHIC_dataarray_data_V_writeaddr,
@@ -652,7 +652,7 @@ begin
       nent_o7  => AP_L3PHIC_nentries_V_dout(7)
       );
 
-  
+
   --------------------------------------------------------------
   -- VMProjection memories
   --------------------------------------------------------------
@@ -664,9 +664,9 @@ begin
         RAM_DEPTH       => 256,
         INIT_FILE       => "",
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 0       
+        HEX             => 0
         )
-      port map (        
+      port map (
         clka     => clk,
         wea      => VMPROJ_L3PHIC17to24_dataarray_data_V_wea(vmpidx),
         addra    => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(vmpidx),
@@ -691,7 +691,7 @@ begin
         rstb     => '0',
         regceb   => '1',
         enb      => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(vmpidx),
-        addrb    => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),  
+        addrb    => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),
         doutb    => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(vmpidx),
         nent_o0  => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(vmpidx),
         nent_o1  => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(vmpidx),
@@ -702,7 +702,7 @@ begin
         nent_o6  => open,
         nent_o7  => open
         );
-        
+
   end generate gen_VMPROJ_L3PHIC17to24;
 
 
@@ -717,9 +717,9 @@ begin
         RAM_DEPTH       => 1024,
         INIT_FILE       => "",
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 0       
+        HEX             => 0
         )
-      port map (        
+      port map (
         clka       => clk,
         wea        => VMSME_L3PHIC17to24n1_dataarray_data_V_wea(vmsidx),
         addra      => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(vmsidx),
@@ -925,7 +925,7 @@ begin
         );
 
   end generate gen_VMSME_L3PHIC17to24n1;
- 
+
 
   --------------------------------------------------------------
   -- MatchEngine
@@ -1020,7 +1020,7 @@ begin
         outputCandidateMatch_dataarray_data_V_we0      => CM_L3PHIC17to24_dataarray_data_V_wea(meidx),
         outputCandidateMatch_dataarray_data_V_d0       => CM_L3PHIC17to24_dataarray_data_V_din(meidx)
         );
-        
+
   end generate gen_ME;
 
   --------------------------------------------------------------
@@ -1034,7 +1034,7 @@ begin
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
       HEX             => 0
       )
-    port map (        
+    port map (
       clka     => clk,
       wea      => AS_L3PHICn4_dataarray_data_V_wea,
       addra    => AS_L3PHICn4_dataarray_data_V_writeaddr,
@@ -1069,7 +1069,7 @@ begin
       nent_o5  => AS_L3PHICn4_nentries_V_dout(5),
       nent_o6  => AS_L3PHICn4_nentries_V_dout(6),
       nent_o7  => AS_L3PHICn4_nentries_V_dout(7)
-      );  
+      );
 
 
   --------------------------------------------------------------
@@ -1083,9 +1083,9 @@ begin
         RAM_DEPTH       => 256,
         INIT_FILE       => "",
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 1       
+        HEX             => 1
         )
-      port map (        
+      port map (
         clka     => clk,
         wea      => CM_L3PHIC17to24_dataarray_data_V_wea(cmidx),
         addra    => CM_L3PHIC17to24_dataarray_data_V_writeaddr(cmidx),
@@ -1110,7 +1110,7 @@ begin
         rstb     => '0',
         regceb   => '1',
         enb      => CM_L3PHIC17to24_dataarray_data_V_enb(cmidx),
-        addrb    => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),  
+        addrb    => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),
         doutb    => CM_L3PHIC17to24_dataarray_data_V_dout(cmidx),
         nent_o0  => CM_L3PHIC17to24_nentries_V_dout(0)(cmidx),
         nent_o1  => CM_L3PHIC17to24_nentries_V_dout(1)(cmidx),
@@ -1121,10 +1121,10 @@ begin
         nent_o6  => open,
         nent_o7  => open
         );
-        
-  end generate gen_CM_L3PHIC17to24;  
-  
-  
+
+  end generate gen_CM_L3PHIC17to24;
+
+
   --------------------------------------------------------------
   -- MatchCalculator
   --------------------------------------------------------------
@@ -1207,7 +1207,7 @@ begin
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
       HEX             => 0
       )
-    port map (        
+    port map (
       clka     => clk,
       wea      => FM_L1L2XX_L3PHIC_dataarray_data_V_wea,
       addra    => FM_L1L2XX_L3PHIC_dataarray_data_V_writeaddr,
@@ -1243,7 +1243,7 @@ begin
       nent_o6  => open,
       nent_o7  => open
       );
-  
+
   FM_L5L6XX_L3PHIC : myMemory
     generic map (
       RAM_WIDTH       => 45,
@@ -1252,7 +1252,7 @@ begin
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
       HEX             => 0
       )
-    port map (        
+    port map (
       clka     => clk,
       wea      => FM_L5L6XX_L3PHIC_dataarray_data_V_wea,
       addra    => FM_L5L6XX_L3PHIC_dataarray_data_V_writeaddr,
