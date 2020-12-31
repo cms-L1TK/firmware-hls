@@ -222,9 +222,9 @@ def comparePredefined(args):
             ret_sum += compare(comparison_filename=("TextIO/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                                reference_filenames=[("../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
 
-    ret_sum += compare(comparison_filename="TextIO/FM_L1L2XX_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+    ret_sum += compare(comparison_filename="TextIO/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                        reference_filenames=["../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
-    ret_sum += compare(comparison_filename="TextIO/FM_L5L6XX_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+    ret_sum += compare(comparison_filename="TextIO/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                        reference_filenames=["../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
     print("Accumulated number of errors =",ret_sum)
@@ -243,8 +243,8 @@ Examples:
 =========
 python3 CompareMemPrintsFW.py --help
 python3 CompareMemPrintsFW.py -l testData/ -r CandidateMatches_CM_L3PHIC17_04.dat -c CM_L3PHIC17.txt
-python3 CompareMemPrintsFW.py -l testData/ -r FullMatches_FM_L1L2_L3PHIC_04.dat -c FM_L1L2XX_L3PHIC.txt
-python3 CompareMemPrintsFW.py -l testData/ -r FullMatches_FM_L5L6_L3PHIC_04.dat -c FM_L5L6XX_L3PHIC.txt
+python3 CompareMemPrintsFW.py -l testData/ -r FullMatches_FM_L1L2_L3PHIC_04.dat -c FM_L1L2_L3PHIC.txt
+python3 CompareMemPrintsFW.py -l testData/ -r FullMatches_FM_L5L6_L3PHIC_04.dat -c FM_L5L6_L3PHIC.txt
 python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.dat -c VMPROJ_L3PHIC17.txt
 """,
                                     epilog="",

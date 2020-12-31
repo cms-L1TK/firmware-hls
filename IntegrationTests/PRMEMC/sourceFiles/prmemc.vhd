@@ -1139,16 +1139,16 @@ entity SectorProcessor is
     TPROJ_L1L2XXF_L3PHIC_nentries_0_V_din : in std_logic_vector(7 downto 0);
     TPROJ_L1L2XXF_L3PHIC_nentries_1_V_we  : in std_logic;
     TPROJ_L1L2XXF_L3PHIC_nentries_1_V_din : in std_logic_vector(7 downto 0);
-    FM_L5L6XX_L3PHIC_dataarray_data_V_enb      : in std_logic;
-    FM_L5L6XX_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
-    FM_L5L6XX_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
-    FM_L5L6XX_L3PHIC_nentries_0_V_dout : out std_logic_vector(7 downto 0);
-    FM_L5L6XX_L3PHIC_nentries_1_V_dout : out std_logic_vector(7 downto 0);
-    FM_L1L2XX_L3PHIC_dataarray_data_V_enb      : in std_logic;
-    FM_L1L2XX_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
-    FM_L1L2XX_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
-    FM_L1L2XX_L3PHIC_nentries_0_V_dout : out std_logic_vector(7 downto 0);
-    FM_L1L2XX_L3PHIC_nentries_1_V_dout : out std_logic_vector(7 downto 0)
+    FM_L5L6_L3PHIC_dataarray_data_V_enb      : in std_logic;
+    FM_L5L6_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
+    FM_L5L6_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
+    FM_L5L6_L3PHIC_nentries_0_V_dout : out std_logic_vector(7 downto 0);
+    FM_L5L6_L3PHIC_nentries_1_V_dout : out std_logic_vector(7 downto 0);
+    FM_L1L2_L3PHIC_dataarray_data_V_enb      : in std_logic;
+    FM_L1L2_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
+    FM_L1L2_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
+    FM_L1L2_L3PHIC_nentries_0_V_dout : out std_logic_vector(7 downto 0);
+    FM_L1L2_L3PHIC_nentries_1_V_dout : out std_logic_vector(7 downto 0)
 );
 end SectorProcessor;
 
@@ -2257,21 +2257,21 @@ END COMPONENT;
   signal AP_L3PHIC_nentries_6_V_dout : std_logic_vector(7 downto 0);
   signal AP_L3PHIC_nentries_7_V_dout : std_logic_vector(7 downto 0);
 
-  signal FM_L1L2XX_L3PHIC_dataarray_data_V_wea       : std_logic;
-  signal FM_L1L2XX_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
-  signal FM_L1L2XX_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
-  signal FM_L1L2XX_L3PHIC_nentries_0_V_we  : std_logic;
-  signal FM_L1L2XX_L3PHIC_nentries_0_V_din : std_logic_vector(7 downto 0);
-  signal FM_L1L2XX_L3PHIC_nentries_1_V_we  : std_logic;
-  signal FM_L1L2XX_L3PHIC_nentries_1_V_din : std_logic_vector(7 downto 0);
+  signal FM_L1L2_L3PHIC_dataarray_data_V_wea       : std_logic;
+  signal FM_L1L2_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
+  signal FM_L1L2_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
+  signal FM_L1L2_L3PHIC_nentries_0_V_we  : std_logic;
+  signal FM_L1L2_L3PHIC_nentries_0_V_din : std_logic_vector(7 downto 0);
+  signal FM_L1L2_L3PHIC_nentries_1_V_we  : std_logic;
+  signal FM_L1L2_L3PHIC_nentries_1_V_din : std_logic_vector(7 downto 0);
 
-  signal FM_L5L6XX_L3PHIC_dataarray_data_V_wea       : std_logic;
-  signal FM_L5L6XX_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
-  signal FM_L5L6XX_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
-  signal FM_L5L6XX_L3PHIC_nentries_0_V_we  : std_logic;
-  signal FM_L5L6XX_L3PHIC_nentries_0_V_din : std_logic_vector(7 downto 0);
-  signal FM_L5L6XX_L3PHIC_nentries_1_V_we  : std_logic;
-  signal FM_L5L6XX_L3PHIC_nentries_1_V_din : std_logic_vector(7 downto 0);
+  signal FM_L5L6_L3PHIC_dataarray_data_V_wea       : std_logic;
+  signal FM_L5L6_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
+  signal FM_L5L6_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
+  signal FM_L5L6_L3PHIC_nentries_0_V_we  : std_logic;
+  signal FM_L5L6_L3PHIC_nentries_0_V_din : std_logic_vector(7 downto 0);
+  signal FM_L5L6_L3PHIC_nentries_1_V_we  : std_logic;
+  signal FM_L5L6_L3PHIC_nentries_1_V_din : std_logic_vector(7 downto 0);
 
   signal ProjectionRouter_done : std_logic := '0';
   signal MatchEngine_start : std_logic := '0';
@@ -5186,7 +5186,7 @@ VMSME_L3PHIC24n1 : myMemoryBinned
   );
 
 
-  FM_L1L2XX_L3PHIC : myMemory
+  FM_L1L2_L3PHIC : myMemory
     generic map (
       RAM_WIDTH       => 45,
       RAM_DEPTH       => 256,
@@ -5196,19 +5196,19 @@ VMSME_L3PHIC24n1 : myMemoryBinned
     )
     port map (
       clka      => clk,
-      wea       => FM_L1L2XX_L3PHIC_dataarray_data_V_wea,
-      addra     => FM_L1L2XX_L3PHIC_dataarray_data_V_writeaddr,
-      dina      => FM_L1L2XX_L3PHIC_dataarray_data_V_din,
+      wea       => FM_L1L2_L3PHIC_dataarray_data_V_wea,
+      addra     => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
+      dina      => FM_L1L2_L3PHIC_dataarray_data_V_din,
       clkb      => clk,
       rstb      => '0',
       regceb    => '1',
-      enb       => FM_L1L2XX_L3PHIC_dataarray_data_V_enb,
-      addrb     => FM_L1L2XX_L3PHIC_dataarray_data_V_readaddr,
-      doutb     => FM_L1L2XX_L3PHIC_dataarray_data_V_dout,
-      nent_we0 => FM_L1L2XX_L3PHIC_nentries_0_V_we,
-      nent_i0  => FM_L1L2XX_L3PHIC_nentries_0_V_din,
-      nent_we1 => FM_L1L2XX_L3PHIC_nentries_1_V_we,
-      nent_i1  => FM_L1L2XX_L3PHIC_nentries_1_V_din,
+      enb       => FM_L1L2_L3PHIC_dataarray_data_V_enb,
+      addrb     => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
+      doutb     => FM_L1L2_L3PHIC_dataarray_data_V_dout,
+      nent_we0 => FM_L1L2_L3PHIC_nentries_0_V_we,
+      nent_i0  => FM_L1L2_L3PHIC_nentries_0_V_din,
+      nent_we1 => FM_L1L2_L3PHIC_nentries_1_V_we,
+      nent_i1  => FM_L1L2_L3PHIC_nentries_1_V_din,
       nent_we2 => '0',
       nent_i2  => (others=>'0'),
       nent_we3 => '0',
@@ -5221,8 +5221,8 @@ VMSME_L3PHIC24n1 : myMemoryBinned
       nent_i6  => (others=>'0'),
       nent_we7 => '0',
       nent_i7  => (others=>'0'),
-      nent_o0  => FM_L1L2XX_L3PHIC_nentries_0_V_dout,
-      nent_o1  => FM_L1L2XX_L3PHIC_nentries_1_V_dout,
+      nent_o0  => FM_L1L2_L3PHIC_nentries_0_V_dout,
+      nent_o1  => FM_L1L2_L3PHIC_nentries_1_V_dout,
       nent_o2  => open,
       nent_o3  => open,
       nent_o4  => open,
@@ -5232,7 +5232,7 @@ VMSME_L3PHIC24n1 : myMemoryBinned
   );
 
 
-  FM_L5L6XX_L3PHIC : myMemory
+  FM_L5L6_L3PHIC : myMemory
     generic map (
       RAM_WIDTH       => 45,
       RAM_DEPTH       => 256,
@@ -5242,19 +5242,19 @@ VMSME_L3PHIC24n1 : myMemoryBinned
     )
     port map (
       clka      => clk,
-      wea       => FM_L5L6XX_L3PHIC_dataarray_data_V_wea,
-      addra     => FM_L5L6XX_L3PHIC_dataarray_data_V_writeaddr,
-      dina      => FM_L5L6XX_L3PHIC_dataarray_data_V_din,
+      wea       => FM_L5L6_L3PHIC_dataarray_data_V_wea,
+      addra     => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
+      dina      => FM_L5L6_L3PHIC_dataarray_data_V_din,
       clkb      => clk,
       rstb      => '0',
       regceb    => '1',
-      enb       => FM_L5L6XX_L3PHIC_dataarray_data_V_enb,
-      addrb     => FM_L5L6XX_L3PHIC_dataarray_data_V_readaddr,
-      doutb     => FM_L5L6XX_L3PHIC_dataarray_data_V_dout,
-      nent_we0 => FM_L5L6XX_L3PHIC_nentries_0_V_we,
-      nent_i0  => FM_L5L6XX_L3PHIC_nentries_0_V_din,
-      nent_we1 => FM_L5L6XX_L3PHIC_nentries_1_V_we,
-      nent_i1  => FM_L5L6XX_L3PHIC_nentries_1_V_din,
+      enb       => FM_L5L6_L3PHIC_dataarray_data_V_enb,
+      addrb     => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
+      doutb     => FM_L5L6_L3PHIC_dataarray_data_V_dout,
+      nent_we0 => FM_L5L6_L3PHIC_nentries_0_V_we,
+      nent_i0  => FM_L5L6_L3PHIC_nentries_0_V_din,
+      nent_we1 => FM_L5L6_L3PHIC_nentries_1_V_we,
+      nent_i1  => FM_L5L6_L3PHIC_nentries_1_V_din,
       nent_we2 => '0',
       nent_i2  => (others=>'0'),
       nent_we3 => '0',
@@ -5267,8 +5267,8 @@ VMSME_L3PHIC24n1 : myMemoryBinned
       nent_i6  => (others=>'0'),
       nent_we7 => '0',
       nent_i7  => (others=>'0'),
-      nent_o0  => FM_L5L6XX_L3PHIC_nentries_0_V_dout,
-      nent_o1  => FM_L5L6XX_L3PHIC_nentries_1_V_dout,
+      nent_o0  => FM_L5L6_L3PHIC_nentries_0_V_dout,
+      nent_o1  => FM_L5L6_L3PHIC_nentries_1_V_dout,
       nent_o2  => open,
       nent_o3  => open,
       nent_o4  => open,
@@ -6136,14 +6136,14 @@ VMSME_L3PHIC24n1 : myMemoryBinned
       allproj_dataarray_data_V_ce0         => AP_L3PHIC_dataarray_data_V_enb,
       allproj_dataarray_data_V_address0     => AP_L3PHIC_dataarray_data_V_readaddr,
       allproj_dataarray_data_V_q0            => AP_L3PHIC_dataarray_data_V_dout,
-      fullmatch_0_dataarray_data_V_address0 => FM_L1L2XX_L3PHIC_dataarray_data_V_writeaddr,
+      fullmatch_0_dataarray_data_V_address0 => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
       fullmatch_0_dataarray_data_V_ce0      => open,
-      fullmatch_0_dataarray_data_V_we0      => FM_L1L2XX_L3PHIC_dataarray_data_V_wea,
-      fullmatch_0_dataarray_data_V_d0       => FM_L1L2XX_L3PHIC_dataarray_data_V_din,
-      fullmatch_3_dataarray_data_V_address0 => FM_L5L6XX_L3PHIC_dataarray_data_V_writeaddr,
+      fullmatch_0_dataarray_data_V_we0      => FM_L1L2_L3PHIC_dataarray_data_V_wea,
+      fullmatch_0_dataarray_data_V_d0       => FM_L1L2_L3PHIC_dataarray_data_V_din,
+      fullmatch_3_dataarray_data_V_address0 => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
       fullmatch_3_dataarray_data_V_ce0      => open,
-      fullmatch_3_dataarray_data_V_we0      => FM_L5L6XX_L3PHIC_dataarray_data_V_wea,
-      fullmatch_3_dataarray_data_V_d0       => FM_L5L6XX_L3PHIC_dataarray_data_V_din  );
+      fullmatch_3_dataarray_data_V_we0      => FM_L5L6_L3PHIC_dataarray_data_V_wea,
+      fullmatch_3_dataarray_data_V_d0       => FM_L5L6_L3PHIC_dataarray_data_V_din  );
 
 
 end rtl;
