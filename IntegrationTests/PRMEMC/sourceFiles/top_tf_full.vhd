@@ -83,8 +83,9 @@ GENERIC (
   RAM_WIDTH       : integer := 18;                  -- Specify RAM data width
   RAM_DEPTH       : integer := 1024;                -- Specify RAM depth (number of entries)
   INIT_FILE       : string  := "";                  -- Specify name/location of RAM initialization file if using one (leave blank if not)
+  INIT_HEX        : integer := 1;                   -- Read init file in hex (default) or bin
   RAM_PERFORMANCE : string  := "HIGH_PERFORMANCE";  -- Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  HEX             : integer := 1
+  COUNT_NENT      : integer := 1                    -- Count number of entries internally. Ignores input ports nent_ix and nent_wex.
   );
 PORT (
   addra    : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Write address bus, width determined from RAM_DEPTH
@@ -129,8 +130,9 @@ GENERIC (
   RAM_WIDTH       : integer := 14;                  -- Specify RAM data width, VM Stub: 14 for Barral LPS, 15 for Barral L2S/DISK
   RAM_DEPTH       : integer := 512;                 -- Specify RAM depth (number of entries) 512 is for 4 pages
   INIT_FILE       : string  := "";                  -- Specify name/location of RAM initialization file if using one (leave blank if not)
+  INIT_HEX        : integer := 1;                   -- Read init file in hex (default) or bin
   RAM_PERFORMANCE : string  := "HIGH_PERFORMANCE";  -- Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  HEX             : integer := 1
+  COUNT_NENT      : integer := 1                    -- Count number of entries internally. Ignores input ports nent_ix and nent_wex.
   );
 PORT (
   addra      : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Write address bus, width determined from RAM_DEPTH
@@ -438,8 +440,9 @@ begin
         RAM_WIDTH       => 60,
         RAM_DEPTH       => 256,
         INIT_FILE       => "",
+        INIT_HEX        =>  1,
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 1
+        COUNT_NENT      => 1
         )
       port map (
         clka     => clk,
@@ -582,8 +585,9 @@ begin
       RAM_WIDTH       => 60,
       RAM_DEPTH       => 1024,
       INIT_FILE       => "",
+      INIT_HEX        =>  1,
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      HEX             => 1
+      COUNT_NENT      => 1
       )
     port map (
       clka     => clk,
@@ -633,8 +637,9 @@ begin
         RAM_WIDTH       => 21,
         RAM_DEPTH       => 256,
         INIT_FILE       => "",
+        INIT_HEX        =>  1,
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 0
+        COUNT_NENT      => 1
         )
       port map (
         clka     => clk,
@@ -686,8 +691,9 @@ begin
         RAM_WIDTH       => 14,
         RAM_DEPTH       => 1024,
         INIT_FILE       => "",
+        INIT_HEX        =>  1,
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 0
+        COUNT_NENT      => 1
         )
       port map (
         clka       => clk,
@@ -1001,8 +1007,9 @@ begin
       RAM_WIDTH       => 36,
       RAM_DEPTH       => 1024,
       INIT_FILE       => "",
+      INIT_HEX        =>  1,
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      HEX             => 0
+      COUNT_NENT      => 1
       )
     port map (
       clka     => clk,
@@ -1052,8 +1059,9 @@ begin
         RAM_WIDTH       => 14,
         RAM_DEPTH       => 256,
         INIT_FILE       => "",
+        INIT_HEX        =>  1,
         RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        HEX             => 1
+        COUNT_NENT      => 1
         )
       port map (
         clka     => clk,
@@ -1174,8 +1182,9 @@ begin
       RAM_WIDTH       => 45,
       RAM_DEPTH       => 256,
       INIT_FILE       => "",
+      INIT_HEX        =>  1,
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      HEX             => 0
+      COUNT_NENT      => 1
       )
     port map (
       clka     => clk,
@@ -1219,8 +1228,9 @@ begin
       RAM_WIDTH       => 45,
       RAM_DEPTH       => 256,
       INIT_FILE       => "",
+      INIT_HEX        =>  1,
       RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      HEX             => 0
+      COUNT_NENT      => 1
       )
     port map (
       clka     => clk,

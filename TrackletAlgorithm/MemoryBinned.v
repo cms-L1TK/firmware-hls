@@ -6,7 +6,9 @@
 // Target Devices: xcvu7p-flvb2104-1-e 
 // Description: Binned Memory modules which store data between the algorithm steps in the Hybrid L1 Tracking algorithm
 // Revision:
-// Revision 0.01 - File modified from Memory.v, n_ent ports added.
+// 0.01 - File imported from Tracklet 1.0, n_ent ports added.
+// 0.02 - Add 8 page support.
+// 0.03 - Add parameter for counting n_ent (n_ent input ports not needed if true).
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
@@ -16,9 +18,9 @@ module myMemoryBinned #(
   parameter RAM_WIDTH = 14,                       // Specify RAM data width, VM Stub: 14 for Barral LPS, 15 for Barral L2S/DISK
   parameter RAM_DEPTH = 1024,                     // Specify RAM depth (number of entries) 1024 is for 8 pages
   parameter INIT_FILE = "",                       // Specify name/location of RAM initialization file if using one (leave blank if not)
-  parameter RAM_PERFORMANCE = "HIGH_PERFORMANCE",  // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  parameter HEX = 1
-
+  parameter INIT_HEX = 1,                         // Read init file in hex (default) or bin
+  parameter RAM_PERFORMANCE = "HIGH_PERFORMANCE", // Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+  parameter COUNT_NENT = 0                        // Count number of entries internally. Ignores input ports nent_ix and nent_wex.
 ) (
   input [clogb2(RAM_DEPTH)-1:0] addra, // Write address bus, width determined from RAM_DEPTH
   input [clogb2(RAM_DEPTH)-1:0] addrb, // Read address bus, width determined from RAM_DEPTH
@@ -240,7 +242,7 @@ module myMemoryBinned #(
   generate
     if (INIT_FILE != "") begin: use_init_file
       initial
-        if (HEX)
+        if (INIT_HEX)
             $readmemh(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
         else
             $readmemb(INIT_FILE, BRAM, 0, RAM_DEPTH-1);

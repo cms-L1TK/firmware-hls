@@ -6,7 +6,8 @@
 // Target Devices: xcvu7p-flvb2104-1-e 
 // Description: Memory modules which store data between the algorithm steps in the Hybrid L1 Tracking algorithm
 // Revision:
-// Revision 0.01 - File imported from Tracklet 1.0, n_ent ports added.
+// 0.01 - File imported from Tracklet 1.0, n_ent ports added.
+// 0.02 - Add parameter for counting n_ent (n_ent input ports not needed if true).
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
@@ -16,9 +17,9 @@ module myMemory #(
   parameter RAM_WIDTH = 18,                       // Specify RAM data width
   parameter RAM_DEPTH = 1024,                     // Specify RAM depth (number of entries)
   parameter INIT_FILE = "",                       // Specify name/location of RAM initialization file if using one (leave blank if not)
-  parameter RAM_PERFORMANCE = "HIGH_PERFORMANCE",  // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  parameter HEX = 1
-
+  parameter INIT_HEX = 1,                         // Read init file in hex (default) or bin
+  parameter RAM_PERFORMANCE = "HIGH_PERFORMANCE", // Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+  parameter COUNT_NENT = 0                        // Count number of entries internally. Ignores input ports nent_ix and nent_wex.
 ) (
   input [clogb2(RAM_DEPTH)-1:0] addra, // Write address bus, width determined from RAM_DEPTH
   input [clogb2(RAM_DEPTH)-1:0] addrb, // Read address bus, width determined from RAM_DEPTH
@@ -29,30 +30,30 @@ module myMemory #(
   input enb,                           // Read Enable, for additional power savings, disable when not in use
   input rstb,                          // Output reset (does not affect memory contents)
   input regceb,                        // Output register enable
-  input [7:0]nent_i0,                   // Num entries received
-  input nent_we0,                       // Write enable
-  output [7:0]nent_o0,                  // Num entries per page [4 bits each]
-  input [7:0]nent_i1,                   // Num entries received
-  input nent_we1,                       // Write enable
-  output [7:0]nent_o1,                  // Num entries per page [4 bits each]
-  input [7:0]nent_i2,                   // Num entries received
-  input nent_we2,                       // Write enable
-  output [7:0]nent_o2,                  // Num entries per page [4 bits each]
-  input [7:0]nent_i3,                   // Num entries received
-  input nent_we3,                       // Write enable
-  output [7:0]nent_o3,                  // Num entries per page [4 bits each]      
-  input [7:0]nent_i4,                   // Num entries received
-  input nent_we4,                       // Write enable
-  output [7:0]nent_o4,                  // Num entries per page [4 bits each]      
-  input [7:0]nent_i5,                   // Num entries received
-  input nent_we5,                       // Write enable
-  output [7:0]nent_o5,                  // Num entries per page [4 bits each]      
-  input [7:0]nent_i6,                   // Num entries received
-  input nent_we6,                       // Write enable
-  output [7:0]nent_o6,                  // Num entries per page [4 bits each]      
-  input [7:0]nent_i7,                   // Num entries received
-  input nent_we7,                       // Write enable
-  output [7:0]nent_o7,                  // Num entries per page [4 bits each]      
+  input [7:0]nent_i0,                  // Num entries received
+  input nent_we0,                      // Write enable
+  output [7:0]nent_o0,                 // Num entries per page [4 bits each]
+  input [7:0]nent_i1,                  // Num entries received
+  input nent_we1,                      // Write enable
+  output [7:0]nent_o1,                 // Num entries per page [4 bits each]
+  input [7:0]nent_i2,                  // Num entries received
+  input nent_we2,                      // Write enable
+  output [7:0]nent_o2,                 // Num entries per page [4 bits each]
+  input [7:0]nent_i3,                  // Num entries received
+  input nent_we3,                      // Write enable
+  output [7:0]nent_o3,                 // Num entries per page [4 bits each]      
+  input [7:0]nent_i4,                  // Num entries received
+  input nent_we4,                      // Write enable
+  output [7:0]nent_o4,                 // Num entries per page [4 bits each]      
+  input [7:0]nent_i5,                  // Num entries received
+  input nent_we5,                      // Write enable
+  output [7:0]nent_o5,                 // Num entries per page [4 bits each]      
+  input [7:0]nent_i6,                  // Num entries received
+  input nent_we6,                      // Write enable
+  output [7:0]nent_o6,                 // Num entries per page [4 bits each]      
+  input [7:0]nent_i7,                  // Num entries received
+  input nent_we7,                      // Write enable
+  output [7:0]nent_o7,                 // Num entries per page [4 bits each]      
   output [RAM_WIDTH-1:0] doutb         // RAM output data
 );
 
@@ -64,7 +65,7 @@ module myMemory #(
   generate
     if (INIT_FILE != "") begin: use_init_file
       initial
-        if (HEX)
+        if (INIT_HEX)
             $readmemh(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
         else
             $readmemb(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
@@ -76,28 +77,58 @@ module myMemory #(
     end
   endgenerate
 
-  always @(posedge clka) begin
-    if (wea)
-    begin
-      BRAM[addra] <= dina;
+  // always @(posedge clka) begin
+  //   if (wea)
+  //   begin
+  //     BRAM[addra] <= dina;
+  //   end
+
+
+
+  generate 
+    if (COUNT_NENT == 0) begin
+      always @(posedge clka) begin
+        if (wea)
+        begin
+          BRAM[addra] <= dina;
+        end
+        if (nent_we0)
+          nent[0] <= nent_i0;
+      end
+    end else begin
+      always @(posedge clka) begin
+        if (wea)
+        begin
+          BRAM[addra] <= dina;
+        end
+        if (nent_we1)
+          nent[1] <= nent_i1;
+      end
     end
-    if (nent_we0)
-      nent[0] <= nent_i0;
-    if (nent_we1)
-      nent[1] <= nent_i1;
-    if (nent_we2)
-      nent[2] <= nent_i2;
-    if (nent_we3)
-      nent[3] <= nent_i3;
-    if (nent_we4)
-      nent[4] <= nent_i4;
-    if (nent_we5)
-      nent[5] <= nent_i5;
-    if (nent_we6)
-      nent[6] <= nent_i6;
-    if (nent_we7)
-      nent[7] <= nent_i7;
-  end
+  endgenerate
+
+    // if (COUNT_NENT = 0) begin // Get number of entries from ports
+    //   if (nent_we0)
+    //     nent[0] <= nent_i0;
+    //   if (nent_we1)
+    //     nent[1] <= nent_i1;
+    //   if (nent_we2)
+    //     nent[2] <= nent_i2;
+    //   if (nent_we3)
+    //     nent[3] <= nent_i3;
+    //   if (nent_we4)
+    //     nent[4] <= nent_i4;
+    //   if (nent_we5)
+    //     nent[5] <= nent_i5;
+    //   if (nent_we6)
+    //     nent[6] <= nent_i6;
+    //   if (nent_we7)
+    //     nent[7] <= nent_i7;
+    // end else begin // Calculate number of entries internally
+    //   nent[0] <= nent_i0;
+    // end
+
+  //end
 
   always @(posedge clkb)
     if (enb)
