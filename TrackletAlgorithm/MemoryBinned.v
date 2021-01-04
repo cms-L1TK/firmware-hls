@@ -8,7 +8,7 @@
 // Revision:
 // 0.01 - File imported from Tracklet 1.0, n_ent ports added.
 // 0.02 - Add 8 page support.
-// 0.03 - Add parameter for counting n_ent (n_ent input ports not needed if true).
+// 0.03 - Add parameter for counting n_ent (n_ent input ports are ignored if true).
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////

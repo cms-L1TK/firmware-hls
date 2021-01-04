@@ -7,7 +7,7 @@
 // Description: Memory modules which store data between the algorithm steps in the Hybrid L1 Tracking algorithm
 // Revision:
 // 0.01 - File imported from Tracklet 1.0, n_ent ports added.
-// 0.02 - Add parameter for counting n_ent (n_ent input ports not needed if true).
+// 0.02 - Add parameter for counting n_ent (n_ent input ports are ignored if true).
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
@@ -77,58 +77,47 @@ module myMemory #(
     end
   endgenerate
 
-  // always @(posedge clka) begin
-  //   if (wea)
-  //   begin
-  //     BRAM[addra] <= dina;
-  //   end
 
+  always @(posedge clka) begin
+    if (wea) begin
+      BRAM[addra] <= dina;
+    end
+  end
 
 
   generate 
-    if (COUNT_NENT == 0) begin
+    if (COUNT_NENT == 0) begin // Use nent input ports
       always @(posedge clka) begin
-        if (wea)
-        begin
-          BRAM[addra] <= dina;
-        end
         if (nent_we0)
           nent[0] <= nent_i0;
-      end
-    end else begin
-      always @(posedge clka) begin
-        if (wea)
-        begin
-          BRAM[addra] <= dina;
-        end
         if (nent_we1)
           nent[1] <= nent_i1;
+        if (nent_we2)
+          nent[2] <= nent_i2;
+        if (nent_we3)
+          nent[3] <= nent_i3;
+        if (nent_we4)
+          nent[4] <= nent_i4;
+        if (nent_we5)
+          nent[5] <= nent_i5;
+        if (nent_we6)
+          nent[6] <= nent_i6;
+        if (nent_we7)
+          nent[7] <= nent_i7;
+      end
+    end else begin // Count number of entries internally 
+      always @(posedge clka) begin
+        if (wea) begin
+          case (addra) inside
+           [1:0]: reg_out <= data_a;
+           [3:2]: reg_out <= data_b;
+          endcase
+          nent <= nent+1;
+        end
       end
     end
   endgenerate
 
-    // if (COUNT_NENT = 0) begin // Get number of entries from ports
-    //   if (nent_we0)
-    //     nent[0] <= nent_i0;
-    //   if (nent_we1)
-    //     nent[1] <= nent_i1;
-    //   if (nent_we2)
-    //     nent[2] <= nent_i2;
-    //   if (nent_we3)
-    //     nent[3] <= nent_i3;
-    //   if (nent_we4)
-    //     nent[4] <= nent_i4;
-    //   if (nent_we5)
-    //     nent[5] <= nent_i5;
-    //   if (nent_we6)
-    //     nent[6] <= nent_i6;
-    //   if (nent_we7)
-    //     nent[7] <= nent_i7;
-    // end else begin // Calculate number of entries internally
-    //   nent[0] <= nent_i0;
-    // end
-
-  //end
 
   always @(posedge clkb)
     if (enb)
