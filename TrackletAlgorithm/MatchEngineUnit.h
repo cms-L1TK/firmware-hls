@@ -56,11 +56,11 @@ inline MatchEngineUnit(const MatchEngineUnit& meu) {
   unit_ = meu.unit_;
   bx = meu.bx;
   istub = meu.istub;
+  /*
   for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; ++i) {
     #pragma HLS unroll
     stubids[i] = meu.stubids[i];
   }
-  /*
   */
   stubids = meu.stubids;
   projfinezadj = meu.projfinezadj;
