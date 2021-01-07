@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module myMemoryBinned #(
+module memory_binned #(
   parameter RAM_WIDTH = 14,                       // Specify RAM data width, VM Stub: 14 for Barral LPS, 15 for Barral L2S/DISK
   parameter RAM_DEPTH = 1024,                     // Specify RAM depth (number of entries) 1024 is for 8 pages
   parameter INIT_FILE = "",                       // Specify name/location of RAM initialization file if using one (leave blank if not)
@@ -500,11 +500,5 @@ module myMemoryBinned #(
     end
   endgenerate
 
-  //  The following function calculates the address width based on specified RAM depth
-  function integer clogb2;
-    input integer depth;
-      for (clogb2=0; depth>1; clogb2=clogb2+1)
-        depth = depth >> 1;
-  endfunction
 
 endmodule

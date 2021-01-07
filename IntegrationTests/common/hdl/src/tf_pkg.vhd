@@ -1,9 +1,7 @@
 --==========================================================================
--- CU Boulder
--------------------------------------------------------------------------------
 --! @file
 --! @brief Package for the track finding top and test bench using TextIO.
---! @author Glein
+--! @author rglein@CUBoulder
 --! @date 2020-05-28
 --! @version v.1.0
 --=============================================================================
@@ -30,46 +28,46 @@ use unisim.vcomponents.all;
 
 
 --! @brief Package.
-package mytypes_pkg is
+package tf_pkg is
 
   -- ########################### Constants #######################
   constant DEBUG                  : boolean := true; --! Debug off/on
-  constant MAX_EVENTS             : integer := 100;   -- Max. number of BX events
-  constant MAX_ENTRIES            : integer := 108;   -- Max. number of entries: 108 = BX period with 240 MHz
-  constant EMDATA_WIDTH           : integer := 68;    -- Max. bit width of emData
-  constant N_MEM_BINS             : integer := 8;     -- Number of memory bins
-  constant N_ENTRIES_PER_MEM_BINS : integer := 16;    -- Number of entries per memory bin
-  constant PAGE_OFFSET            : integer := 128;   -- Page offset for all memories
+  constant MAX_EVENTS             : integer := 100;  --! Max. number of BX events
+  constant MAX_ENTRIES            : integer := 108;  --! Max. number of entries: 108 = BX period with 240 MHz
+  constant EMDATA_WIDTH           : integer := 68;   --! Max. bit width of emData
+  constant N_MEM_BINS             : integer := 8;    --! Number of memory bins
+  constant N_ENTRIES_PER_MEM_BINS : integer := 16;   --! Number of entries per memory bin
+  constant PAGE_OFFSET            : integer := 128;  --! Page offset for all memories
 
   -- ########################### Types ###########################
   -- 2D
-  type t_myarray2_1b  is array(1 downto 0) of std_logic;
-  type t_myarray2_8b  is array(1 downto 0) of std_logic_vector(7 downto 0);
-  type t_myarray8_1b  is array(7 downto 0) of std_logic;
-  type t_myarray8_2b  is array(7 downto 0) of std_logic_vector(1 downto 0);
-  type t_myarray8_3b  is array(7 downto 0) of std_logic_vector(2 downto 0);
-  type t_myarray8_4b  is array(7 downto 0) of std_logic_vector(3 downto 0);
-  type t_myarray8_5b  is array(7 downto 0) of std_logic_vector(4 downto 0);
-  type t_myarray8_8b  is array(7 downto 0) of std_logic_vector(7 downto 0);
-  type t_myarray8_9b  is array(7 downto 0) of std_logic_vector(8 downto 0);
-  type t_myarray8_10b is array(7 downto 0) of std_logic_vector(9 downto 0);
-  type t_myarray8_14b is array(7 downto 0) of std_logic_vector(13 downto 0);
-  type t_myarray8_21b is array(7 downto 0) of std_logic_vector(20 downto 0);
-  type t_myarray8_60b is array(7 downto 0) of std_logic_vector(59 downto 0);
+  type t_arr2_1b  is array(1 downto 0) of std_logic;
+  type t_arr2_8b  is array(1 downto 0) of std_logic_vector(7 downto 0);
+  type t_arr8_1b  is array(7 downto 0) of std_logic;
+  type t_arr8_2b  is array(7 downto 0) of std_logic_vector(1 downto 0);
+  type t_arr8_3b  is array(7 downto 0) of std_logic_vector(2 downto 0);
+  type t_arr8_4b  is array(7 downto 0) of std_logic_vector(3 downto 0);
+  type t_arr8_5b  is array(7 downto 0) of std_logic_vector(4 downto 0);
+  type t_arr8_8b  is array(7 downto 0) of std_logic_vector(7 downto 0);
+  type t_arr8_9b  is array(7 downto 0) of std_logic_vector(8 downto 0);
+  type t_arr8_10b is array(7 downto 0) of std_logic_vector(9 downto 0);
+  type t_arr8_14b is array(7 downto 0) of std_logic_vector(13 downto 0);
+  type t_arr8_21b is array(7 downto 0) of std_logic_vector(20 downto 0);
+  type t_arr8_60b is array(7 downto 0) of std_logic_vector(59 downto 0);
   -- 3D
-  type t_myarray2_8_1b is array(0 to 1) of t_myarray8_1b;
-  type t_myarray2_8_8b is array(0 to 1) of t_myarray8_8b;
-  type t_myarray8_8_1b is array(0 to 7) of t_myarray8_1b;
-  type t_myarray8_8_4b is array(0 to 7) of t_myarray8_4b;
-  type t_myarray8_8_5b is array(0 to 7) of t_myarray8_5b;
+  type t_arr2_8_1b is array(0 to 1) of t_arr8_1b;
+  type t_arr2_8_8b is array(0 to 1) of t_arr8_8b;
+  type t_arr8_8_1b is array(0 to 7) of t_arr8_1b;
+  type t_arr8_8_4b is array(0 to 7) of t_arr8_4b;
+  type t_arr8_8_5b is array(0 to 7) of t_arr8_5b;
   -- 4D
-  type t_myarray8_8_8_1b is array(0 to 7) of t_myarray8_8_1b;
-  type t_myarray8_8_8_4b is array(0 to 7) of t_myarray8_8_4b;
-  type t_myarray8_8_8_5b is array(0 to 7) of t_myarray8_8_5b;
+  type t_arr8_8_8_1b is array(0 to 7) of t_arr8_8_1b;
+  type t_arr8_8_8_4b is array(0 to 7) of t_arr8_8_4b;
+  type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
   -- Others
-  type t_myarray_1d_int is array(natural range <>) of integer;                  --! 1D array of int
-  type t_myarray_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
-  type t_myarray_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
+  type t_arr_1d_int is array(natural range <>) of integer;                  --! 1D array of int
+  type t_arr_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
+  type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
     -- ########################### Functions ################################################################
   --! @brief Binary logarithm to determine bit width for addressing
@@ -82,23 +80,23 @@ package mytypes_pkg is
   );
   procedure read_emData_2p (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   );
   procedure read_emData_8p (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   );
   procedure read_emData_2p_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
   );
   procedure read_emData_8p_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
   );
   procedure write_header_line (
     file_path       : in string;  --! File path as string
@@ -116,8 +114,8 @@ package mytypes_pkg is
     mem_data        : in std_logic_vector; --! Data write values
     mem_wea         : in std_logic;        --! Write enable of data
     mem_addr        : in std_logic_vector; --! Memory address
-    n_entries_p2    : in t_myarray2_8b;    --! Number of entries per page
-    n_entries_p2_we : in t_myarray2_1b     --! Number of entries per page write enable
+    n_entries_p2    : in t_arr2_8b;    --! Number of entries per page
+    n_entries_p2_we : in t_arr2_1b     --! Number of entries per page write enable
   );
   procedure write_emData_line_8p (
     reset           : in std_logic;        --! HDL (global) reset
@@ -130,14 +128,14 @@ package mytypes_pkg is
     mem_data        : in std_logic_vector; --! Data write values
     mem_wea         : in std_logic;        --! Write enable of data
     mem_addr        : in std_logic_vector; --! Memory address
-    n_entries_p2    : in t_myarray8_8b;    --! Number of entries per page
-    n_entries_p2_we : in t_myarray8_1b     --! Number of entries per page write enable
+    n_entries_p2    : in t_arr8_8b;    --! Number of entries per page
+    n_entries_p2_we : in t_arr8_1b     --! Number of entries per page write enable
   );
 
-end package mytypes_pkg;
+end package tf_pkg;
 
 
-package body mytypes_pkg is
+package body tf_pkg is
 
   -- ########################### Functions ################################################################
   --! @brief Binary logarithm to determine bit width for addressing
@@ -190,8 +188,8 @@ package body mytypes_pkg is
   --!          ... BX = 010 (even) Event : 3 is page 0/2 ... BX = 111 (odd) Event : 8 is page 1/7
   procedure read_emData_2p (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   ) is
   constant N_PAGES         : integer :=2;                        --! Number of pages
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
@@ -242,8 +240,8 @@ package body mytypes_pkg is
   --!          ... BX = 010 (even) Event : 3 is page 0/2 ... BX = 111 (odd) Event : 8 is page 1/7
   procedure read_emData_8p (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   ) is
   constant N_PAGES         : integer :=8;                        --! Number of pages
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
@@ -315,8 +313,8 @@ package body mytypes_pkg is
   --...
   procedure read_emData_2p_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
   ) is
   constant N_PAGES         : integer :=2;                        --! Number of pages
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
@@ -397,8 +395,8 @@ package body mytypes_pkg is
   --...
   procedure read_emData_8p_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_myarray_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
   ) is
   constant N_PAGES         : integer :=8;                        --! Number of pages
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
@@ -486,8 +484,8 @@ package body mytypes_pkg is
     mem_data        : in std_logic_vector; --! Data write values
     mem_wea         : in std_logic;        --! Write enable of data
     mem_addr        : in std_logic_vector; --! Memory address
-    n_entries_p2    : in t_myarray2_8b;    --! Number of entries per page
-    n_entries_p2_we : in t_myarray2_1b     --! Number of entries per page write enable
+    n_entries_p2    : in t_arr2_8b;    --! Number of entries per page
+    n_entries_p2_we : in t_arr2_1b     --! Number of entries per page write enable
   ) is
   constant N_PAGES  : integer := 2;      --! Number of pages
   file     file_out : text is file_path; -- Text - a file of character strings
@@ -526,8 +524,8 @@ package body mytypes_pkg is
     mem_data        : in std_logic_vector; --! Data write values
     mem_wea         : in std_logic;        --! Write enable of data
     mem_addr        : in std_logic_vector; --! Memory address
-    n_entries_p2    : in t_myarray8_8b;    --! Number of entries per page
-    n_entries_p2_we : in t_myarray8_1b     --! Number of entries per page write enable
+    n_entries_p2    : in t_arr8_8b;    --! Number of entries per page
+    n_entries_p2_we : in t_arr8_1b     --! Number of entries per page write enable
   ) is
   constant N_PAGES  : integer := 8;      --! Number of pages
   file     file_out : text is file_path; -- Text - a file of character strings
@@ -555,4 +553,4 @@ package body mytypes_pkg is
     file_close(file_out);
   end write_emData_line_8p;
 
-end package body mytypes_pkg;
+end package body tf_pkg;

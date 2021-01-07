@@ -2,7 +2,7 @@
 set origin_dir "."
 
 # Set the project name
-set _xil_proj_name_ "PRMEMC"
+set _xil_proj_name_ [lindex $argv 0]
 
 # Create project
 create_project -force ${_xil_proj_name_} ./${_xil_proj_name_} -part xcvu7p-flvb2104-1-e
@@ -27,12 +27,12 @@ update_ip_catalog -rebuild
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
 set files [list \
- [file normalize "${origin_dir}/../../TrackletAlgorithm/Memory.v"] \
- [file normalize "${origin_dir}/../../TrackletAlgorithm/MemoryBinned.v"] \
- [file normalize "${origin_dir}/sourceFiles/mytypes_pkg.vhd"] \
- [file normalize "${origin_dir}/sourceFiles/top_tf.vhd"] \
- [file normalize "${origin_dir}/sourceFiles/top_tf_full.vhd"] \
- [file normalize "${origin_dir}/sourceFiles/prmemc.vhd"] \
+ [file normalize "${origin_dir}/../src/tf_pkg.vhd"] \
+ [file normalize "${origin_dir}/../src/tf_mem.vhd"] \
+ [file normalize "${origin_dir}/../src/tf_mem_bin.vhd"] \
+ [file normalize "${origin_dir}/src/top_tf.vhd"] \
+ [file normalize "${origin_dir}/src/top_tf_full.vhd"] \
+ [file normalize "${origin_dir}/src/prmemc.vhd"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -44,7 +44,7 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 # Set 'sim_1' fileset object
 set obj [get_filesets sim_1]
 set files [list \
- [file normalize "${origin_dir}/sourceFiles/tb_top_tf.vhd"] \
+ [file normalize "${origin_dir}/tb/tb_top_tf.vhd"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -54,22 +54,22 @@ create_ip -name MatchEngineTop -vendor xilinx.com -library hls -version 1.0 -mod
 create_ip -name ProjectionRouterTop -vendor xilinx.com -library hls -version 1.0 -module_name PR_L3PHIC
 
 # Make sourcefiles
-set file "${origin_dir}/sourceFiles/top_tf.vhd"
+set file "${origin_dir}/src/top_tf.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value {VHDL 2008} -objects $file_obj
 
-set file "${origin_dir}/sourceFiles/top_tf_full.vhd"
+set file "${origin_dir}/src/top_tf_full.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value {VHDL 2008} -objects $file_obj
 
-set file "${origin_dir}/sourceFiles/prmemc.vhd"
+set file "${origin_dir}/src/prmemc.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value {VHDL 2008} -objects $file_obj
 
-set file "${origin_dir}/sourceFiles/tb_top_tf.vhd"
+set file "${origin_dir}/tb/tb_top_tf.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value {VHDL 2008} -objects $file_obj
@@ -85,9 +85,9 @@ puts "INFO: Project created:${_xil_proj_name_}"
 launch_simulation
 
 
-open_wave_config {./prmemc.wcfg}
-open_wave_config {./start_bx.wcfg}
-open_wave_config {./top_tf.wcfg}
+open_wave_config {./tb/prmemc.wcfg}
+open_wave_config {./tb/start_bx.wcfg}
+open_wave_config {./tb/top_tf.wcfg}
 restart
 run 50 us
 

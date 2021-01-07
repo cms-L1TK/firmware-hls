@@ -1,3 +1,12 @@
+--===========================================================================
+--! @file
+--! @brief Top file for track finding configuration with additional ports for 
+--!        intermediate results.
+--! @author robert.glein@colorado.edu
+--! @date 2020-06-01
+--! @version v.1.0
+--===========================================================================
+
 --! Standard library
 library ieee;
 --! Standard package
@@ -10,7 +19,7 @@ library unisim;
 use unisim.vcomponents.all;
 
 --! User packages
-use work.mytypes_pkg.all;
+use work.tf_pkg.all;
 
 
 entity top_tf_full is
@@ -22,27 +31,27 @@ entity top_tf_full is
     PR_ready  : out std_logic;
     PR_bx_in  : in std_logic_vector(2 downto 0);
     -- TrackletProjections input
-    TPROJ_L3PHIC_dataarray_data_V_wea       : in t_myarray8_1b;
-    TPROJ_L3PHIC_dataarray_data_V_writeaddr : in t_myarray8_8b;
-    TPROJ_L3PHIC_dataarray_data_V_din       : in t_myarray8_60b;
-    TPROJ_L3PHIC_nentries_V_we  : in t_myarray2_8_1b;
-    TPROJ_L3PHIC_nentries_V_din : in t_myarray2_8_8b;
+    TPROJ_L3PHIC_dataarray_data_V_wea       : in t_arr8_1b;
+    TPROJ_L3PHIC_dataarray_data_V_writeaddr : in t_arr8_8b;
+    TPROJ_L3PHIC_dataarray_data_V_din       : in t_arr8_60b;
+    TPROJ_L3PHIC_nentries_V_we  : in t_arr2_8_1b;
+    TPROJ_L3PHIC_nentries_V_din : in t_arr2_8_8b;
     -- VMStubsME input
-    VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : in t_myarray8_1b;
-    VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : in t_myarray8_10b;
-    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_myarray8_14b;
-    VMSME_L3PHIC17to24n1_nentries_V_we  : in t_myarray8_8_8_1b;
-    VMSME_L3PHIC17to24n1_nentries_V_din : in t_myarray8_8_8_4b;
+    VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : in t_arr8_1b;
+    VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : in t_arr8_10b;
+    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_14b;
+    VMSME_L3PHIC17to24n1_nentries_V_we  : in t_arr8_8_8_1b;
+    VMSME_L3PHIC17to24n1_nentries_V_din : in t_arr8_8_8_4b;
     -- AllStubs input
     AS_L3PHICn4_dataarray_data_V_wea       : in std_logic;
     AS_L3PHICn4_dataarray_data_V_writeaddr : in std_logic_vector(9 downto 0);
     AS_L3PHICn4_dataarray_data_V_din       : in std_logic_vector(35 downto 0);
-    AS_L3PHICn4_nentries_V_we  : in t_myarray8_1b;
-    AS_L3PHICn4_nentries_V_din : in t_myarray8_8b;
+    AS_L3PHICn4_nentries_V_we  : in t_arr8_1b;
+    AS_L3PHICn4_nentries_V_din : in t_arr8_8b;
     -- VMProjection output
-    VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : inout t_myarray8_1b;
-    VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : inout t_myarray8_8b;
-    VMPROJ_L3PHIC17to24_dataarray_data_V_din       : inout t_myarray8_21b;
+    VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : inout t_arr8_1b;
+    VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : inout t_arr8_8b;
+    VMPROJ_L3PHIC17to24_dataarray_data_V_din       : inout t_arr8_21b;
     -- AllProjection output
     AP_L3PHIC_dataarray_data_V_wea       : inout std_logic;
     AP_L3PHIC_dataarray_data_V_writeaddr : inout std_logic_vector(9 downto 0);
@@ -52,22 +61,22 @@ entity top_tf_full is
     PR_bx_out_vld : inout std_logic;
     PR_done       : inout std_logic;
     -- CandidateMatch output
-    CM_L3PHIC17to24_dataarray_data_V_wea       : inout t_myarray8_1b;
-    CM_L3PHIC17to24_dataarray_data_V_writeaddr : inout t_myarray8_8b;
-    CM_L3PHIC17to24_dataarray_data_V_din       : inout t_myarray8_14b;
+    CM_L3PHIC17to24_dataarray_data_V_wea       : inout t_arr8_1b;
+    CM_L3PHIC17to24_dataarray_data_V_writeaddr : inout t_arr8_8b;
+    CM_L3PHIC17to24_dataarray_data_V_din       : inout t_arr8_14b;
     -- MatchEngine output
-    ME_bx_out     : inout t_myarray8_3b;
-    ME_bx_out_vld : inout t_myarray8_1b;
+    ME_bx_out     : inout t_arr8_3b;
+    ME_bx_out_vld : inout t_arr8_1b;
     ME_all_done   : inout std_logic;
     -- FullMatches output
     FM_L1L2_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L1L2_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
     FM_L1L2_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
-    FM_L1L2_L3PHIC_nentries_V_dout : out t_myarray2_8b;
+    FM_L1L2_L3PHIC_nentries_V_dout : out t_arr2_8b;
     FM_L5L6_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L5L6_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
     FM_L5L6_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
-    FM_L5L6_L3PHIC_nentries_V_dout : out t_myarray2_8b;
+    FM_L5L6_L3PHIC_nentries_V_dout : out t_arr2_8b;
     -- MatchCalculator output
     MC_bx_out     : out std_logic_vector(2 downto 0);
     MC_bx_out_vld : out std_logic;
@@ -78,288 +87,26 @@ end top_tf_full;
 
 architecture rtl of top_tf_full is
 
-COMPONENT myMemory
-GENERIC (
-  RAM_WIDTH       : integer := 18;                  -- Specify RAM data width
-  RAM_DEPTH       : integer := 1024;                -- Specify RAM depth (number of entries)
-  INIT_FILE       : string  := "";                  -- Specify name/location of RAM initialization file if using one (leave blank if not)
-  INIT_HEX        : integer := 1;                   -- Read init file in hex (default) or bin
-  RAM_PERFORMANCE : string  := "HIGH_PERFORMANCE";  -- Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  COUNT_NENT      : integer := 1                    -- Count number of entries internally. Ignores input ports nent_ix and nent_wex.
-  );
-PORT (
-  addra    : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Write address bus, width determined from RAM_DEPTH
-  addrb    : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Read address bus, width determined from RAM_DEPTH
-  dina     : in std_logic_vector(RAM_WIDTH - 1 downto 0);          -- RAM input data
-  clka     : in std_logic;                                         -- Write clock
-  clkb     : in std_logic;                                         -- Read clock
-  wea      : in std_logic;                                         -- Write enable
-  enb      : in std_logic;                                         -- Read Enable, for additional power savings, disable when not in use
-  rstb     : in std_logic;                                         -- Output reset (does not affect memory contents)
-  regceb   : in std_logic;                                         -- Output register enable
-  nent_i0  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we0 : in std_logic;                                         -- Write enable
-  nent_o0  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i1  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we1 : in std_logic;                                         -- Write enable
-  nent_o1  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i2  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we2 : in std_logic;                                         -- Write enable
-  nent_o2  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i3  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we3 : in std_logic;                                         -- Write enable
-  nent_o3  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i4  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we4 : in std_logic;                                         -- Write enable
-  nent_o4  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i5  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we5 : in std_logic;                                         -- Write enable
-  nent_o5  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i6  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we6 : in std_logic;                                         -- Write enable
-  nent_o6  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  nent_i7  : in std_logic_vector(7 downto 0);                      -- Num entries received
-  nent_we7 : in std_logic;                                         -- Write enable
-  nent_o7  : out std_logic_vector(7 downto 0);                     -- Num entries per page [4 bits each]
-  doutb    : out std_logic_vector(RAM_WIDTH-1 downto 0)            -- RAM output data
-  );
-END COMPONENT;
-
-COMPONENT myMemoryBinned
-GENERIC (
-  RAM_WIDTH       : integer := 14;                  -- Specify RAM data width, VM Stub: 14 for Barral LPS, 15 for Barral L2S/DISK
-  RAM_DEPTH       : integer := 512;                 -- Specify RAM depth (number of entries) 512 is for 4 pages
-  INIT_FILE       : string  := "";                  -- Specify name/location of RAM initialization file if using one (leave blank if not)
-  INIT_HEX        : integer := 1;                   -- Read init file in hex (default) or bin
-  RAM_PERFORMANCE : string  := "HIGH_PERFORMANCE";  -- Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
-  COUNT_NENT      : integer := 1                    -- Count number of entries internally. Ignores input ports nent_ix and nent_wex.
-  );
-PORT (
-  addra      : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Write address bus, width determined from RAM_DEPTH
-  addrb      : in std_logic_vector(clogb2(RAM_DEPTH) - 1 downto 0);  -- Read address bus, width determined from RAM_DEPTH
-  dina       : in std_logic_vector(RAM_WIDTH - 1 downto 0);          -- RAM input data
-  clka       : in std_logic;                                         -- Write clock
-  clkb       : in std_logic;                                         -- Read clock
-  wea        : in std_logic;                                         -- Write enable
-  enb        : in std_logic;                                         -- Read Enable, for additional power savings, disable when not in use
-  rstb       : in std_logic;                                         -- Output reset (does not affect memory contents)
-  regceb     : in std_logic;                                         -- Output register enable
-  nent_0_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we0 : in std_logic;                                         -- Write enable
-  nent_0_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we1 : in std_logic;                                         -- Write enable
-  nent_0_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we2 : in std_logic;                                         -- Write enable
-  nent_0_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we3 : in std_logic;                                         -- Write enable
-  nent_0_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we4 : in std_logic;                                         -- Write enable
-  nent_0_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we5 : in std_logic;                                         -- Write enable
-  nent_0_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we6 : in std_logic;                                         -- Write enable
-  nent_0_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_0_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_0_we7 : in std_logic;                                         -- Write enable
-  nent_0_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 0 [4 bits each]
-  nent_1_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we0 : in std_logic;                                         -- Write enable
-  nent_1_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we1 : in std_logic;                                         -- Write enable
-  nent_1_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we2 : in std_logic;                                         -- Write enable
-  nent_1_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we3 : in std_logic;                                         -- Write enable
-  nent_1_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we4 : in std_logic;                                         -- Write enable
-  nent_1_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we5 : in std_logic;                                         -- Write enable
-  nent_1_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we6 : in std_logic;                                         -- Write enable
-  nent_1_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_1_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_1_we7 : in std_logic;                                         -- Write enable
-  nent_1_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 1 [4 bits each]
-  nent_2_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we0 : in std_logic;                                         -- Write enable
-  nent_2_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we1 : in std_logic;                                         -- Write enable
-  nent_2_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we2 : in std_logic;                                         -- Write enable
-  nent_2_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we3 : in std_logic;                                         -- Write enable
-  nent_2_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we4 : in std_logic;                                         -- Write enable
-  nent_2_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we5 : in std_logic;                                         -- Write enable
-  nent_2_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we6 : in std_logic;                                         -- Write enable
-  nent_2_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_2_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_2_we7 : in std_logic;                                         -- Write enable
-  nent_2_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 2 [4 bits each]
-  nent_3_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we0 : in std_logic;                                         -- Write enable
-  nent_3_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we1 : in std_logic;                                         -- Write enable
-  nent_3_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we2 : in std_logic;                                         -- Write enable
-  nent_3_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we3 : in std_logic;                                         -- Write enable
-  nent_3_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we4 : in std_logic;                                         -- Write enable
-  nent_3_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we5 : in std_logic;                                         -- Write enable
-  nent_3_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we6 : in std_logic;                                         -- Write enable
-  nent_3_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_3_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_3_we7 : in std_logic;                                         -- Write enable
-  nent_3_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 3 [4 bits each]
-  nent_4_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we0 : in std_logic;                                         -- Write enable
-  nent_4_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we1 : in std_logic;                                         -- Write enable
-  nent_4_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we2 : in std_logic;                                         -- Write enable
-  nent_4_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we3 : in std_logic;                                         -- Write enable
-  nent_4_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we4 : in std_logic;                                         -- Write enable
-  nent_4_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we5 : in std_logic;                                         -- Write enable
-  nent_4_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we6 : in std_logic;                                         -- Write enable
-  nent_4_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_4_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_4_we7 : in std_logic;                                         -- Write enable
-  nent_4_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 4 [4 bits each]
-  nent_5_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we0 : in std_logic;                                         -- Write enable
-  nent_5_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we1 : in std_logic;                                         -- Write enable
-  nent_5_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we2 : in std_logic;                                         -- Write enable
-  nent_5_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we3 : in std_logic;                                         -- Write enable
-  nent_5_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we4 : in std_logic;                                         -- Write enable
-  nent_5_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we5 : in std_logic;                                         -- Write enable
-  nent_5_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we6 : in std_logic;                                         -- Write enable
-  nent_5_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_5_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_5_we7 : in std_logic;                                         -- Write enable
-  nent_5_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 5 [4 bits each]
-  nent_6_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we0 : in std_logic;                                         -- Write enable
-  nent_6_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we1 : in std_logic;                                         -- Write enable
-  nent_6_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we2 : in std_logic;                                         -- Write enable
-  nent_6_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we3 : in std_logic;                                         -- Write enable
-  nent_6_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we4 : in std_logic;                                         -- Write enable
-  nent_6_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we5 : in std_logic;                                         -- Write enable
-  nent_6_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we6 : in std_logic;                                         -- Write enable
-  nent_6_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_6_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_6_we7 : in std_logic;                                         -- Write enable
-  nent_6_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 6 [4 bits each]
-  nent_7_i0  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we0 : in std_logic;                                         -- Write enable
-  nent_7_o0  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i1  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we1 : in std_logic;                                         -- Write enable
-  nent_7_o1  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i2  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we2 : in std_logic;                                         -- Write enable
-  nent_7_o2  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i3  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we3 : in std_logic;                                         -- Write enable
-  nent_7_o3  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i4  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we4 : in std_logic;                                         -- Write enable
-  nent_7_o4  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i5  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we5 : in std_logic;                                         -- Write enable
-  nent_7_o5  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i6  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we6 : in std_logic;                                         -- Write enable
-  nent_7_o6  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  nent_7_i7  : in std_logic_vector(3 downto 0);                      -- Num entries received
-  nent_7_we7 : in std_logic;                                         -- Write enable
-  nent_7_o7  : out std_logic_vector(3 downto 0);                     -- Num entries for page 7 [4 bits each]
-  doutb      : out std_logic_vector(RAM_WIDTH-1 downto 0)            -- RAM output data
-  );
-END COMPONENT;
-
   -- connecting TrackletProjections memories to ProjectionRouter input
   -- (0-7) -> (L1L2F-L1L2J, L5L6B-L5L6D)
-  signal TPROJ_L3PHIC_dataarray_data_V_enb      : t_myarray8_1b;
-  signal TPROJ_L3PHIC_dataarray_data_V_readaddr : t_myarray8_8b;
-  signal TPROJ_L3PHIC_dataarray_data_V_dout     : t_myarray8_60b;
-  signal TPROJ_L3PHIC_nentries_V_dout : t_myarray2_8_8b;
+  signal TPROJ_L3PHIC_dataarray_data_V_enb      : t_arr8_1b;
+  signal TPROJ_L3PHIC_dataarray_data_V_readaddr : t_arr8_8b;
+  signal TPROJ_L3PHIC_dataarray_data_V_dout     : t_arr8_60b;
+  signal TPROJ_L3PHIC_nentries_V_dout : t_arr2_8_8b;
 
   -- connecting VMProjections memories to MatchEngine input
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_enb      : t_myarray8_1b;
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr : t_myarray8_8b;
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_myarray8_21b;
-  signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_myarray2_8_8b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_21b;
+  signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_arr2_8_8b;
 
   -- connecting VMStubME memories to MatchEngine input
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_myarray8_1b;
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_myarray8_10b;
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_myarray8_14b;
-  signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_myarray8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem); set MSbit to zero
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_arr8_1b;
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_arr8_10b;
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_14b;
+  signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_arr8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem); set MSbit to zero
 
-  -- Note: myMemoryBinned class allocates 4-bits for nentries in each bin, while
+  -- Note: entity work.tf_mem_bin class allocates 4-bits for nentries in each bin, while
   -- MatchEngine ports are expecting 5-bits. Leaving the 5th bit unconnected seems
   -- to cause Vivado to trim away logic and messes up some LUT logic in the ME
   -- module. Assign 'dont_touch' attribute to the nentries signal to prevent this.
@@ -368,7 +115,7 @@ END COMPONENT;
 
   -- MatchEngine signals
   signal ME_start : std_logic := '0';
-  signal ME_done  : t_myarray8_1b := (others => '0');
+  signal ME_done  : t_arr8_1b := (others => '0');
   signal ME_idle  : std_logic := '0';
   signal ME_ready : std_logic := '0';
 
@@ -376,19 +123,19 @@ END COMPONENT;
   signal AS_L3PHICn4_dataarray_data_V_enb      : std_logic;
   signal AS_L3PHICn4_dataarray_data_V_readaddr : std_logic_vector(9 downto 0);
   signal AS_L3PHICn4_dataarray_data_V_dout     : std_logic_vector(35 downto 0);
-  signal AS_L3PHICn4_nentries_V_dout : t_myarray8_8b;
+  signal AS_L3PHICn4_nentries_V_dout : t_arr8_8b;
 
   -- connecting AllProjections memory to MatchCalculator input
   signal AP_L3PHIC_dataarray_data_V_enb      : std_logic;
   signal AP_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(9 downto 0);
   signal AP_L3PHIC_dataarray_data_V_dout     : std_logic_vector(59 downto 0);
-  signal AP_L3PHIC_nentries_V_dout : t_myarray8_8b;
+  signal AP_L3PHIC_nentries_V_dout : t_arr8_8b;
 
   -- connecting CandidateMatches memories to MatchCalculator input
-  signal CM_L3PHIC17to24_dataarray_data_V_enb      : t_myarray8_1b;
-  signal CM_L3PHIC17to24_dataarray_data_V_readaddr : t_myarray8_8b;
-  signal CM_L3PHIC17to24_dataarray_data_V_dout     : t_myarray8_14b;
-  signal CM_L3PHIC17to24_nentries_V_dout : t_myarray2_8_8b;
+  signal CM_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
+  signal CM_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
+  signal CM_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_14b;
+  signal CM_L3PHIC17to24_nentries_V_dout : t_arr2_8_8b;
 
   -- MatchCalculator signals
   signal MC_start : std_logic := '0';
@@ -435,7 +182,7 @@ begin
   --------------------------------------------------------------
   gen_TPROJ_L3PHIC : for tpidx in 7 downto 0 generate
   begin
-    TPROJ_L3PHIC : myMemory
+    TPROJ_L3PHIC : entity work.tf_mem
       generic map (
         RAM_WIDTH       => 60,
         RAM_DEPTH       => 256,
@@ -445,40 +192,35 @@ begin
         COUNT_NENT      => 1
         )
       port map (
-        clka     => clk,
-        wea      => TPROJ_L3PHIC_dataarray_data_V_wea(tpidx),
-        addra    => TPROJ_L3PHIC_dataarray_data_V_writeaddr(tpidx),
-        dina     => TPROJ_L3PHIC_dataarray_data_V_din(tpidx),
-        nent_we0 => TPROJ_L3PHIC_nentries_V_we(0)(tpidx),
-        nent_i0  => TPROJ_L3PHIC_nentries_V_din(0)(tpidx),
-        nent_we1 => TPROJ_L3PHIC_nentries_V_we(1)(tpidx),
-        nent_i1  => TPROJ_L3PHIC_nentries_V_din(1)(tpidx),
-        nent_we2 => '0',
-        nent_i2  => (others=>'0'),
-        nent_we3 => '0',
-        nent_i3  => (others=>'0'),
-        nent_we4 => '0',
-        nent_i4  => (others=>'0'),
-        nent_we5 => '0',
-        nent_i5  => (others=>'0'),
-        nent_we6 => '0',
-        nent_i6  => (others=>'0'),
-        nent_we7 => '0',
-        nent_i7  => (others=>'0'),
-        clkb     => clk,
-        rstb     => '0',
-        regceb   => '1',
-        enb      => TPROJ_L3PHIC_dataarray_data_V_enb(tpidx),
-        addrb    => TPROJ_L3PHIC_dataarray_data_V_readaddr(tpidx),
-        doutb    => TPROJ_L3PHIC_dataarray_data_V_dout(tpidx),
-        nent_o0  => TPROJ_L3PHIC_nentries_V_dout(0)(tpidx),
-        nent_o1  => TPROJ_L3PHIC_nentries_V_dout(1)(tpidx),
-        nent_o2  => open,
-        nent_o3  => open,
-        nent_o4  => open,
-        nent_o5  => open,
-        nent_o6  => open,
-        nent_o7  => open
+        clka       => clk,
+        wea        => TPROJ_L3PHIC_dataarray_data_V_wea(tpidx),
+        addra      => TPROJ_L3PHIC_dataarray_data_V_writeaddr(tpidx),
+        dina       => TPROJ_L3PHIC_dataarray_data_V_din(tpidx),
+        nent_we(0) => TPROJ_L3PHIC_nentries_V_we(0)(tpidx),
+        nent_i(0)  => TPROJ_L3PHIC_nentries_V_din(0)(tpidx),
+        nent_we(1) => TPROJ_L3PHIC_nentries_V_we(1)(tpidx),
+        nent_i(1)  => TPROJ_L3PHIC_nentries_V_din(1)(tpidx),
+        nent_we(2) => '0',
+        nent_i(2)  => (others=>'0'),
+        nent_we(3) => '0',
+        nent_i(3)  => (others=>'0'),
+        nent_we(4) => '0',
+        nent_i(4)  => (others=>'0'),
+        nent_we(5) => '0',
+        nent_i(5)  => (others=>'0'),
+        nent_we(6) => '0',
+        nent_i(6)  => (others=>'0'),
+        nent_we(7) => '0',
+        nent_i(7)  => (others=>'0'),
+        clkb       => clk,
+        rstb       => '0',
+        regceb     => '1',
+        enb        => TPROJ_L3PHIC_dataarray_data_V_enb(tpidx),
+        addrb      => TPROJ_L3PHIC_dataarray_data_V_readaddr(tpidx),
+        doutb      => TPROJ_L3PHIC_dataarray_data_V_dout(tpidx),
+        nent_o(0)  => TPROJ_L3PHIC_nentries_V_dout(0)(tpidx),
+        nent_o(1)  => TPROJ_L3PHIC_nentries_V_dout(1)(tpidx)
+        -- partially associated formal 'nent_o(others)' cannot have actual OPEN
         );
 
   end generate gen_TPROJ_L3PHIC;
@@ -580,7 +322,7 @@ begin
   --------------------------------------------------------------
   -- AllProjection memory
   --------------------------------------------------------------
-  AP_L3PHIC : myMemory
+  AP_L3PHIC : entity work.tf_mem
     generic map (
       RAM_WIDTH       => 60,
       RAM_DEPTH       => 1024,
@@ -590,40 +332,40 @@ begin
       COUNT_NENT      => 1
       )
     port map (
-      clka     => clk,
-      wea      => AP_L3PHIC_dataarray_data_V_wea,
-      addra    => AP_L3PHIC_dataarray_data_V_writeaddr,
-      dina     => AP_L3PHIC_dataarray_data_V_din,
-      nent_we0 => '0',
-      nent_i0  => (others => '0'),
-      nent_we1 => '0',
-      nent_i1  => (others => '0'),
-      nent_we2 => '0',
-      nent_i2  => (others => '0'),
-      nent_we3 => '0',
-      nent_i3  => (others => '0'),
-      nent_we4 => '0',
-      nent_i4  => (others => '0'),
-      nent_we5 => '0',
-      nent_i5  => (others => '0'),
-      nent_we6 => '0',
-      nent_i6  => (others => '0'),
-      nent_we7 => '0',
-      nent_i7  => (others => '0'),
-      clkb     => clk,
-      rstb     => '0',
-      regceb   => '1',
-      enb      => AP_L3PHIC_dataarray_data_V_enb,
-      addrb    => AP_L3PHIC_dataarray_data_V_readaddr,
-      doutb    => AP_L3PHIC_dataarray_data_V_dout,
-      nent_o0  => AP_L3PHIC_nentries_V_dout(0),
-      nent_o1  => AP_L3PHIC_nentries_V_dout(1),
-      nent_o2  => AP_L3PHIC_nentries_V_dout(2),
-      nent_o3  => AP_L3PHIC_nentries_V_dout(3),
-      nent_o4  => AP_L3PHIC_nentries_V_dout(4),
-      nent_o5  => AP_L3PHIC_nentries_V_dout(5),
-      nent_o6  => AP_L3PHIC_nentries_V_dout(6),
-      nent_o7  => AP_L3PHIC_nentries_V_dout(7)
+      clka       => clk,
+      wea        => AP_L3PHIC_dataarray_data_V_wea,
+      addra      => AP_L3PHIC_dataarray_data_V_writeaddr,
+      dina       => AP_L3PHIC_dataarray_data_V_din,
+      nent_we(0) => '0',
+      nent_i(0)  => (others => '0'),
+      nent_we(1) => '0',
+      nent_i(1)  => (others => '0'),
+      nent_we(2) => '0',
+      nent_i(2)  => (others => '0'),
+      nent_we(3) => '0',
+      nent_i(3)  => (others => '0'),
+      nent_we(4) => '0',
+      nent_i(4)  => (others => '0'),
+      nent_we(5) => '0',
+      nent_i(5)  => (others => '0'),
+      nent_we(6) => '0',
+      nent_i(6)  => (others => '0'),
+      nent_we(7) => '0',
+      nent_i(7)  => (others => '0'),
+      clkb       => clk,
+      rstb       => '0',
+      regceb     => '1',
+      enb        => AP_L3PHIC_dataarray_data_V_enb,
+      addrb      => AP_L3PHIC_dataarray_data_V_readaddr,
+      doutb      => AP_L3PHIC_dataarray_data_V_dout,
+      nent_o(0)  => AP_L3PHIC_nentries_V_dout(0),
+      nent_o(1)  => AP_L3PHIC_nentries_V_dout(1),
+      nent_o(2)  => AP_L3PHIC_nentries_V_dout(2),
+      nent_o(3)  => AP_L3PHIC_nentries_V_dout(3),
+      nent_o(4)  => AP_L3PHIC_nentries_V_dout(4),
+      nent_o(5)  => AP_L3PHIC_nentries_V_dout(5),
+      nent_o(6)  => AP_L3PHIC_nentries_V_dout(6),
+      nent_o(7)  => AP_L3PHIC_nentries_V_dout(7)
       );
 
 
@@ -632,7 +374,7 @@ begin
   --------------------------------------------------------------
   gen_VMPROJ_L3PHIC17to24 : for vmpidx in 7 downto 0 generate
   begin
-    VMPROJ_L3PHIC17to24 : myMemory
+    VMPROJ_L3PHIC17to24 : entity work.tf_mem
       generic map (
         RAM_WIDTH       => 21,
         RAM_DEPTH       => 256,
@@ -642,40 +384,35 @@ begin
         COUNT_NENT      => 1
         )
       port map (
-        clka     => clk,
-        wea      => VMPROJ_L3PHIC17to24_dataarray_data_V_wea(vmpidx),
-        addra    => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(vmpidx),
-        dina     => VMPROJ_L3PHIC17to24_dataarray_data_V_din(vmpidx),
-        nent_we0 => '0',
-        nent_i0  => (others=>'0'),
-        nent_we1 => '0',
-        nent_i1  => (others=>'0'),
-        nent_we2 => '0',
-        nent_i2  => (others=>'0'),
-        nent_we3 => '0',
-        nent_i3  => (others=>'0'),
-        nent_we4 => '0',
-        nent_i4  => (others=>'0'),
-        nent_we5 => '0',
-        nent_i5  => (others=>'0'),
-        nent_we6 => '0',
-        nent_i6  => (others=>'0'),
-        nent_we7 => '0',
-        nent_i7  => (others=>'0'),
-        clkb     => clk,
-        rstb     => '0',
-        regceb   => '1',
-        enb      => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(vmpidx),
-        addrb    => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),
-        doutb    => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(vmpidx),
-        nent_o0  => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(vmpidx),
-        nent_o1  => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(vmpidx),
-        nent_o2  => open,
-        nent_o3  => open,
-        nent_o4  => open,
-        nent_o5  => open,
-        nent_o6  => open,
-        nent_o7  => open
+        clka       => clk,
+        wea        => VMPROJ_L3PHIC17to24_dataarray_data_V_wea(vmpidx),
+        addra      => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(vmpidx),
+        dina       => VMPROJ_L3PHIC17to24_dataarray_data_V_din(vmpidx),
+        nent_we(0) => '0',
+        nent_i(0)  => (others=>'0'),
+        nent_we(1) => '0',
+        nent_i(1)  => (others=>'0'),
+        nent_we(2) => '0',
+        nent_i(2)  => (others=>'0'),
+        nent_we(3) => '0',
+        nent_i(3)  => (others=>'0'),
+        nent_we(4) => '0',
+        nent_i(4)  => (others=>'0'),
+        nent_we(5) => '0',
+        nent_i(5)  => (others=>'0'),
+        nent_we(6) => '0',
+        nent_i(6)  => (others=>'0'),
+        nent_we(7) => '0',
+        nent_i(7)  => (others=>'0'),
+        clkb       => clk,
+        rstb       => '0',
+        regceb     => '1',
+        enb        => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(vmpidx),
+        addrb      => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),
+        doutb      => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(vmpidx),
+        nent_o(0)  => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(vmpidx),
+        nent_o(1)  => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(vmpidx)
+        -- partially associated formal 'nent_o(others)' cannot have actual OPEN
         );
 
   end generate gen_VMPROJ_L3PHIC17to24;
@@ -686,7 +423,7 @@ begin
   --------------------------------------------------------------
   gen_VMSME_L3PHIC17to24n1 : for vmsidx in 7 downto 0 generate
   begin
-    VMSME_L3PHIC17to24n1 : myMemoryBinned
+    VMSME_L3PHIC17to24n1 : entity work.tf_mem_bin
       generic map (
         RAM_WIDTH       => 14,
         RAM_DEPTH       => 1024,
@@ -1002,7 +739,7 @@ begin
   --------------------------------------------------------------
   -- AllStubs memory
   --------------------------------------------------------------
-  AS_L3PHICn4 : myMemory
+  AS_L3PHICn4 : entity work.tf_mem
     generic map (
       RAM_WIDTH       => 36,
       RAM_DEPTH       => 1024,
@@ -1012,40 +749,40 @@ begin
       COUNT_NENT      => 1
       )
     port map (
-      clka     => clk,
-      wea      => AS_L3PHICn4_dataarray_data_V_wea,
-      addra    => AS_L3PHICn4_dataarray_data_V_writeaddr,
-      dina     => AS_L3PHICn4_dataarray_data_V_din,
-      nent_we0 =>  AS_L3PHICn4_nentries_V_we(0),
-      nent_i0  => AS_L3PHICn4_nentries_V_din(0),
-      nent_we1 =>  AS_L3PHICn4_nentries_V_we(1),
-      nent_i1  => AS_L3PHICn4_nentries_V_din(1),
-      nent_we2 =>  AS_L3PHICn4_nentries_V_we(2),
-      nent_i2  => AS_L3PHICn4_nentries_V_din(2),
-      nent_we3 =>  AS_L3PHICn4_nentries_V_we(3),
-      nent_i3  => AS_L3PHICn4_nentries_V_din(3),
-      nent_we4 =>  AS_L3PHICn4_nentries_V_we(4),
-      nent_i4  => AS_L3PHICn4_nentries_V_din(4),
-      nent_we5 =>  AS_L3PHICn4_nentries_V_we(5),
-      nent_i5  => AS_L3PHICn4_nentries_V_din(5),
-      nent_we6 =>  AS_L3PHICn4_nentries_V_we(6),
-      nent_i6  => AS_L3PHICn4_nentries_V_din(6),
-      nent_we7 =>  AS_L3PHICn4_nentries_V_we(7),
-      nent_i7  => AS_L3PHICn4_nentries_V_din(7),
-      clkb     => clk,
-      rstb     => '0',
-      regceb   => '1',
-      enb      => AS_L3PHICn4_dataarray_data_V_enb,
-      addrb    => AS_L3PHICn4_dataarray_data_V_readaddr,
-      doutb    => AS_L3PHICn4_dataarray_data_V_dout,
-      nent_o0  => AS_L3PHICn4_nentries_V_dout(0),
-      nent_o1  => AS_L3PHICn4_nentries_V_dout(1),
-      nent_o2  => AS_L3PHICn4_nentries_V_dout(2),
-      nent_o3  => AS_L3PHICn4_nentries_V_dout(3),
-      nent_o4  => AS_L3PHICn4_nentries_V_dout(4),
-      nent_o5  => AS_L3PHICn4_nentries_V_dout(5),
-      nent_o6  => AS_L3PHICn4_nentries_V_dout(6),
-      nent_o7  => AS_L3PHICn4_nentries_V_dout(7)
+      clka       => clk,
+      wea        => AS_L3PHICn4_dataarray_data_V_wea,
+      addra      => AS_L3PHICn4_dataarray_data_V_writeaddr,
+      dina       => AS_L3PHICn4_dataarray_data_V_din,
+      nent_we(0) =>  AS_L3PHICn4_nentries_V_we(0),
+      nent_i(0)  => AS_L3PHICn4_nentries_V_din(0),
+      nent_we(1) =>  AS_L3PHICn4_nentries_V_we(1),
+      nent_i(1)  => AS_L3PHICn4_nentries_V_din(1),
+      nent_we(2) =>  AS_L3PHICn4_nentries_V_we(2),
+      nent_i(2)  => AS_L3PHICn4_nentries_V_din(2),
+      nent_we(3) =>  AS_L3PHICn4_nentries_V_we(3),
+      nent_i(3)  => AS_L3PHICn4_nentries_V_din(3),
+      nent_we(4) =>  AS_L3PHICn4_nentries_V_we(4),
+      nent_i(4)  => AS_L3PHICn4_nentries_V_din(4),
+      nent_we(5) =>  AS_L3PHICn4_nentries_V_we(5),
+      nent_i(5)  => AS_L3PHICn4_nentries_V_din(5),
+      nent_we(6) =>  AS_L3PHICn4_nentries_V_we(6),
+      nent_i(6)  => AS_L3PHICn4_nentries_V_din(6),
+      nent_we(7) =>  AS_L3PHICn4_nentries_V_we(7),
+      nent_i(7)  => AS_L3PHICn4_nentries_V_din(7),
+      clkb       => clk,
+      rstb       => '0',
+      regceb     => '1',
+      enb        => AS_L3PHICn4_dataarray_data_V_enb,
+      addrb      => AS_L3PHICn4_dataarray_data_V_readaddr,
+      doutb      => AS_L3PHICn4_dataarray_data_V_dout,
+      nent_o(0)  => AS_L3PHICn4_nentries_V_dout(0),
+      nent_o(1)  => AS_L3PHICn4_nentries_V_dout(1),
+      nent_o(2)  => AS_L3PHICn4_nentries_V_dout(2),
+      nent_o(3)  => AS_L3PHICn4_nentries_V_dout(3),
+      nent_o(4)  => AS_L3PHICn4_nentries_V_dout(4),
+      nent_o(5)  => AS_L3PHICn4_nentries_V_dout(5),
+      nent_o(6)  => AS_L3PHICn4_nentries_V_dout(6),
+      nent_o(7)  => AS_L3PHICn4_nentries_V_dout(7)
       );
 
 
@@ -1054,7 +791,7 @@ begin
   --------------------------------------------------------------
   gen_CM_L3PHIC17to24 : for cmidx in 7 downto 0 generate
   begin
-    CM_L3PHIC17to24 : myMemory
+    CM_L3PHIC17to24 : entity work.tf_mem
       generic map (
         RAM_WIDTH       => 14,
         RAM_DEPTH       => 256,
@@ -1064,40 +801,35 @@ begin
         COUNT_NENT      => 1
         )
       port map (
-        clka     => clk,
-        wea      => CM_L3PHIC17to24_dataarray_data_V_wea(cmidx),
-        addra    => CM_L3PHIC17to24_dataarray_data_V_writeaddr(cmidx),
-        dina     => CM_L3PHIC17to24_dataarray_data_V_din(cmidx),
-        nent_we0 => '0',
-        nent_i0  => (others=>'0'),
-        nent_we1 => '0',
-        nent_i1  => (others=>'0'),
-        nent_we2 => '0',
-        nent_i2  => (others=>'0'),
-        nent_we3 => '0',
-        nent_i3  => (others=>'0'),
-        nent_we4 => '0',
-        nent_i4  => (others=>'0'),
-        nent_we5 => '0',
-        nent_i5  => (others=>'0'),
-        nent_we6 => '0',
-        nent_i6  => (others=>'0'),
-        nent_we7 => '0',
-        nent_i7  => (others=>'0'),
-        clkb     => clk,
-        rstb     => '0',
-        regceb   => '1',
-        enb      => CM_L3PHIC17to24_dataarray_data_V_enb(cmidx),
-        addrb    => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),
-        doutb    => CM_L3PHIC17to24_dataarray_data_V_dout(cmidx),
-        nent_o0  => CM_L3PHIC17to24_nentries_V_dout(0)(cmidx),
-        nent_o1  => CM_L3PHIC17to24_nentries_V_dout(1)(cmidx),
-        nent_o2  => open,
-        nent_o3  => open,
-        nent_o4  => open,
-        nent_o5  => open,
-        nent_o6  => open,
-        nent_o7  => open
+        clka       => clk,
+        wea        => CM_L3PHIC17to24_dataarray_data_V_wea(cmidx),
+        addra      => CM_L3PHIC17to24_dataarray_data_V_writeaddr(cmidx),
+        dina       => CM_L3PHIC17to24_dataarray_data_V_din(cmidx),
+        nent_we(0) => '0',
+        nent_i(0)  => (others=>'0'),
+        nent_we(1) => '0',
+        nent_i(1)  => (others=>'0'),
+        nent_we(2) => '0',
+        nent_i(2)  => (others=>'0'),
+        nent_we(3) => '0',
+        nent_i(3)  => (others=>'0'),
+        nent_we(4) => '0',
+        nent_i(4)  => (others=>'0'),
+        nent_we(5) => '0',
+        nent_i(5)  => (others=>'0'),
+        nent_we(6) => '0',
+        nent_i(6)  => (others=>'0'),
+        nent_we(7) => '0',
+        nent_i(7)  => (others=>'0'),
+        clkb       => clk,
+        rstb       => '0',
+        regceb     => '1',
+        enb        => CM_L3PHIC17to24_dataarray_data_V_enb(cmidx),
+        addrb      => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),
+        doutb      => CM_L3PHIC17to24_dataarray_data_V_dout(cmidx),
+        nent_o(0)  => CM_L3PHIC17to24_nentries_V_dout(0)(cmidx),
+        nent_o(1)  => CM_L3PHIC17to24_nentries_V_dout(1)(cmidx)
+        -- partially associated formal 'nent_o(others)' cannot have actual OPEN
         );
 
   end generate gen_CM_L3PHIC17to24;
@@ -1177,7 +909,7 @@ begin
   --------------------------------------------------------------
   -- FullMatches memories
   --------------------------------------------------------------
-  FM_L1L2_L3PHIC : myMemory
+  FM_L1L2_L3PHIC : entity work.tf_mem
     generic map (
       RAM_WIDTH       => 45,
       RAM_DEPTH       => 256,
@@ -1187,43 +919,38 @@ begin
       COUNT_NENT      => 1
       )
     port map (
-      clka     => clk,
-      wea      => FM_L1L2_L3PHIC_dataarray_data_V_wea,
-      addra    => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
-      dina     => FM_L1L2_L3PHIC_dataarray_data_V_din,
-      nent_we0 => '0',
-      nent_i0  => (others=>'0'),
-      nent_we1 => '0',
-      nent_i1  => (others=>'0'),
-      nent_we2 => '0',
-      nent_i2  => (others=>'0'),
-      nent_we3 => '0',
-      nent_i3  => (others=>'0'),
-      nent_we4 => '0',
-      nent_i4  => (others=>'0'),
-      nent_we5 => '0',
-      nent_i5  => (others=>'0'),
-      nent_we6 => '0',
-      nent_i6  => (others=>'0'),
-      nent_we7 => '0',
-      nent_i7  => (others=>'0'),
-      clkb     => clk,
-      rstb     => '0',
-      regceb   => '1',
-      enb      => FM_L1L2_L3PHIC_dataarray_data_V_enb,
-      addrb    => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
-      doutb    => FM_L1L2_L3PHIC_dataarray_data_V_dout,
-      nent_o0  => FM_L1L2_L3PHIC_nentries_V_dout(0),
-      nent_o1  => FM_L1L2_L3PHIC_nentries_V_dout(1),
-      nent_o2  => open,
-      nent_o3  => open,
-      nent_o4  => open,
-      nent_o5  => open,
-      nent_o6  => open,
-      nent_o7  => open
+      clka       => clk,
+      wea        => FM_L1L2_L3PHIC_dataarray_data_V_wea,
+      addra      => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
+      dina       => FM_L1L2_L3PHIC_dataarray_data_V_din,
+      nent_we(0) => '0',
+      nent_i(0)  => (others=>'0'),
+      nent_we(1) => '0',
+      nent_i(1)  => (others=>'0'),
+      nent_we(2) => '0',
+      nent_i(2)  => (others=>'0'),
+      nent_we(3) => '0',
+      nent_i(3)  => (others=>'0'),
+      nent_we(4) => '0',
+      nent_i(4)  => (others=>'0'),
+      nent_we(5) => '0',
+      nent_i(5)  => (others=>'0'),
+      nent_we(6) => '0',
+      nent_i(6)  => (others=>'0'),
+      nent_we(7) => '0',
+      nent_i(7)  => (others=>'0'),
+      clkb       => clk,
+      rstb       => '0',
+      regceb     => '1',
+      enb        => FM_L1L2_L3PHIC_dataarray_data_V_enb,
+      addrb      => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
+      doutb      => FM_L1L2_L3PHIC_dataarray_data_V_dout,
+      nent_o(0)  => FM_L1L2_L3PHIC_nentries_V_dout(0),
+      nent_o(1)  => FM_L1L2_L3PHIC_nentries_V_dout(1)
+      -- partially associated formal 'nent_o(others)' cannot have actual OPEN
       );
 
-  FM_L5L6_L3PHIC : myMemory
+  FM_L5L6_L3PHIC : entity work.tf_mem
     generic map (
       RAM_WIDTH       => 45,
       RAM_DEPTH       => 256,
@@ -1233,40 +960,35 @@ begin
       COUNT_NENT      => 1
       )
     port map (
-      clka     => clk,
-      wea      => FM_L5L6_L3PHIC_dataarray_data_V_wea,
-      addra    => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
-      dina     => FM_L5L6_L3PHIC_dataarray_data_V_din,
-      nent_we0 => '0',
-      nent_i0  => (others=>'0'),
-      nent_we1 => '0',
-      nent_i1  => (others=>'0'),
-      nent_we2 => '0',
-      nent_i2  => (others=>'0'),
-      nent_we3 => '0',
-      nent_i3  => (others=>'0'),
-      nent_we4 => '0',
-      nent_i4  => (others=>'0'),
-      nent_we5 => '0',
-      nent_i5  => (others=>'0'),
-      nent_we6 => '0',
-      nent_i6  => (others=>'0'),
-      nent_we7 => '0',
-      nent_i7  => (others=>'0'),
-      clkb     => clk,
-      rstb     => '0',
-      regceb   => '1',
-      enb      => FM_L5L6_L3PHIC_dataarray_data_V_enb,
-      addrb    => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
-      doutb    => FM_L5L6_L3PHIC_dataarray_data_V_dout,
-      nent_o0  => FM_L5L6_L3PHIC_nentries_V_dout(0),
-      nent_o1  => FM_L5L6_L3PHIC_nentries_V_dout(1),
-      nent_o2  => open,
-      nent_o3  => open,
-      nent_o4  => open,
-      nent_o5  => open,
-      nent_o6  => open,
-      nent_o7  => open
+      clka       => clk,
+      wea        => FM_L5L6_L3PHIC_dataarray_data_V_wea,
+      addra      => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
+      dina       => FM_L5L6_L3PHIC_dataarray_data_V_din,
+      nent_we(0) => '0',
+      nent_i(0)  => (others=>'0'),
+      nent_we(1) => '0',
+      nent_i(1)  => (others=>'0'),
+      nent_we(2) => '0',
+      nent_i(2)  => (others=>'0'),
+      nent_we(3) => '0',
+      nent_i(3)  => (others=>'0'),
+      nent_we(4) => '0',
+      nent_i(4)  => (others=>'0'),
+      nent_we(5) => '0',
+      nent_i(5)  => (others=>'0'),
+      nent_we(6) => '0',
+      nent_i(6)  => (others=>'0'),
+      nent_we(7) => '0',
+      nent_i(7)  => (others=>'0'),
+      clkb       => clk,
+      rstb       => '0',
+      regceb     => '1',
+      enb        => FM_L5L6_L3PHIC_dataarray_data_V_enb,
+      addrb      => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
+      doutb      => FM_L5L6_L3PHIC_dataarray_data_V_dout,
+      nent_o(0)  => FM_L5L6_L3PHIC_nentries_V_dout(0),
+      nent_o(1)  => FM_L5L6_L3PHIC_nentries_V_dout(1)
+      -- partially associated formal 'nent_o(others)' cannot have actual OPEN
       );
 
 end rtl;

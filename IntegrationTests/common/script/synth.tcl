@@ -2,7 +2,7 @@
 set origin_dir "."
 
 # Set the project name
-set _xil_proj_name_ "PRMEMC"
+set _xil_proj_name_ [lindex $argv 0]
 
 # Open project
 open_project ./${_xil_proj_name_}/${_xil_proj_name_}.xpr
