@@ -29,26 +29,26 @@ library unisim;
 use unisim.vcomponents.all;
 
 --! User packages
-use work.mytypes_pkg.all;
+use work.tf_pkg.all;
 
 
 
 --! @brief TB
-entity tb_top_tf is
-end tb_top_tf;
+entity tb_tf_top is
+end tb_tf_top;
 
 --! @brief TB
-architecture behavior of tb_top_tf is
+architecture behavior of tb_tf_top is
   -- ########################### Types ###########################
   type t_str_array_TPROJ is array(natural range <>) of string(1 to 103); --! String array
   type t_str_array_VMSME is array(natural range <>) of string(1 to 79);  --! String array
   type t_str_array_VMP   is array(natural range <>) of string(1 to 41);  --! String array
   type t_str_array_CM    is array(natural range <>) of string(1 to 37);  --! String array
   type t_str_array_FM    is array(natural range <>) of string(1 to 40);  --! String array
-  type t_myarray_1d_1d_int    is array(natural range <>) of t_myarray_1d_int(0 to MAX_EVENTS-1);                      --! 1x1D array of int
-  type t_myarray_1d_2d_int    is array(natural range <>) of t_myarray_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1);    --! 1x2D array of int
-  type t_myarray_1d_2d_slv_2p is array(natural range <>) of t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! 1x2D array of slv
-  type t_myarray_1d_2d_slv_8p is array(natural range <>) of t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! 1x2D array of slv
+  type t_arr_1d_1d_int    is array(natural range <>) of t_arr_1d_int(0 to MAX_EVENTS-1);                      --! 1x1D array of int
+  type t_arr_1d_2d_int    is array(natural range <>) of t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1);    --! 1x2D array of int
+  type t_arr_1d_2d_slv_2p is array(natural range <>) of t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! 1x2D array of slv
+  type t_arr_1d_2d_slv_8p is array(natural range <>) of t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! 1x2D array of slv
 
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
@@ -108,44 +108,44 @@ architecture behavior of tb_top_tf is
   signal PR_ready  : std_logic;
   signal PR_bx_in  : std_logic_vector(2 downto 0) := (others => '0');
   -- For TrackletProjections memories
-  signal TPROJ_L3PHIC_dataarray_data_V_wea       : t_myarray8_1b   := (others => '0');
-  signal TPROJ_L3PHIC_dataarray_data_V_writeaddr : t_myarray8_8b   := (others => (others => '0'));
-  signal TPROJ_L3PHIC_dataarray_data_V_din       : t_myarray8_60b  := (others => (others => '0'));
-  signal TPROJ_L3PHIC_nentries_V_we  : t_myarray2_8_1b := (others => (others => '0'));
-  signal TPROJ_L3PHIC_nentries_V_din : t_myarray2_8_8b := (others => (others => (others => '0')));
+  signal TPROJ_L3PHIC_dataarray_data_V_wea       : t_arr8_1b   := (others => '0');
+  signal TPROJ_L3PHIC_dataarray_data_V_writeaddr : t_arr8_8b   := (others => (others => '0'));
+  signal TPROJ_L3PHIC_dataarray_data_V_din       : t_arr8_60b  := (others => (others => '0'));
+  signal TPROJ_L3PHIC_nentries_V_we  : t_arr2_8_1b := (others => (others => '0'));
+  signal TPROJ_L3PHIC_nentries_V_din : t_arr2_8_8b := (others => (others => (others => '0')));
   -- For VMStubME memories
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : t_myarray8_1b  := (others => '0');
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : t_myarray8_10b  := (others => (others => '0'));
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_myarray8_14b := (others => (others => '0'));
-  signal VMSME_L3PHIC17to24n1_nentries_V_we  : t_myarray8_8_8_1b := (others => (others => (others => '0')));             -- (#page, #bin, #mem)
-  signal VMSME_L3PHIC17to24n1_nentries_V_din : t_myarray8_8_8_4b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem)
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : t_arr8_1b  := (others => '0');
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : t_arr8_10b  := (others => (others => '0'));
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_arr8_14b := (others => (others => '0'));
+  signal VMSME_L3PHIC17to24n1_nentries_V_we  : t_arr8_8_8_1b := (others => (others => (others => '0')));             -- (#page, #bin, #mem)
+  signal VMSME_L3PHIC17to24n1_nentries_V_din : t_arr8_8_8_4b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem)
   -- For AllStubs memories
   signal AS_L3PHICn4_dataarray_data_V_wea       : std_logic                     := '0';
   signal AS_L3PHICn4_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0)  := (others => '0');
   signal AS_L3PHICn4_dataarray_data_V_din       : std_logic_vector(35 downto 0) := (others => '0');
-  signal AS_L3PHICn4_nentries_V_we  : t_myarray8_1b := (others => '0');
-  signal AS_L3PHICn4_nentries_V_din : t_myarray8_8b := (others => (others => '0'));
+  signal AS_L3PHICn4_nentries_V_we  : t_arr8_1b := (others => '0');
+  signal AS_L3PHICn4_nentries_V_din : t_arr8_8b := (others => (others => '0'));
   -- FullMatches output
   signal FM_L1L2_L3PHIC_dataarray_data_V_enb      : std_logic                     := '0';
   signal FM_L1L2_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(7 downto 0)  := (others => '0');
   signal FM_L1L2_L3PHIC_dataarray_data_V_dout     : std_logic_vector(44 downto 0);
-  signal FM_L1L2_L3PHIC_nentries_V_dout : t_myarray2_8b;
+  signal FM_L1L2_L3PHIC_nentries_V_dout : t_arr2_8b;
   signal FM_L5L6_L3PHIC_dataarray_data_V_enb      : std_logic                     := '0';
   signal FM_L5L6_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(7 downto 0)  := (others => '0');
   signal FM_L5L6_L3PHIC_dataarray_data_V_dout     : std_logic_vector(44 downto 0);
-  signal FM_L5L6_L3PHIC_nentries_V_dout : t_myarray2_8b;
+  signal FM_L5L6_L3PHIC_nentries_V_dout : t_arr2_8b;
   -- MatchCalculator outputs
   signal MC_bx_out     : std_logic_vector(2 downto 0);
   signal MC_bx_out_vld : std_logic;
   signal MC_done       : std_logic;
   -- ### Other signals ###
   signal PR_start_tmp                       : std_logic := '0';
-  signal TPROJ_L3PHICn4_data_arr            : t_myarray_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
-  signal TPROJ_L3PHICn4_n_entries_arr       : t_myarray_1d_1d_int(0 to N_ME_IN_CHAIN-1);
-  signal VMSME_L3PHIC17to24n1_data_arr      : t_myarray_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
-  signal VMSME_L3PHIC17to24n1_n_entries_arr : t_myarray_1d_2d_int(0 to N_ME_IN_CHAIN-1);
-  signal AS_L3PHICn4_data_arr               : t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1);
-  signal AS_L3PHICn4_n_entries_arr          : t_myarray_1d_int(0 to MAX_EVENTS-1);
+  signal TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
+  signal TPROJ_L3PHICn4_n_entries_arr       : t_arr_1d_1d_int(0 to N_ME_IN_CHAIN-1);
+  signal VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
+  signal VMSME_L3PHIC17to24n1_n_entries_arr : t_arr_1d_2d_int(0 to N_ME_IN_CHAIN-1);
+  signal AS_L3PHICn4_data_arr               : t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1);
+  signal AS_L3PHICn4_n_entries_arr          : t_arr_1d_int(0 to MAX_EVENTS-1);
   signal bx_cnt                             : integer := 0; -- BX counter
   signal page_cnt2                          : integer := 0; -- Page counter
   signal page_cnt8                          : integer := 0; -- Page counter
@@ -158,24 +158,24 @@ architecture behavior of tb_top_tf is
   signal AP_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal AP_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0);
   signal AP_L3PHIC_dataarray_data_V_din       : std_logic_vector(59 downto 0);
-  --signal AP_L3PHIC_nentries_V_we  : t_myarray8_1b;
-  --signal AP_L3PHIC_nentries_V_din : t_myarray8_8b;
+  --signal AP_L3PHIC_nentries_V_we  : t_arr8_1b;
+  --signal AP_L3PHIC_nentries_V_din : t_arr8_8b;
   -- VMProjection output
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : t_myarray8_1b;
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : t_myarray8_8b;
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_din       : t_myarray8_21b;
-  --signal VMPROJ_L3PHIC17to24_nentries_V_we  : t_myarray2_8_1b;
-  --signal VMPROJ_L3PHIC17to24_nentries_V_din : t_myarray2_8_8b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : t_arr8_1b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : t_arr8_8b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_din       : t_arr8_21b;
+  --signal VMPROJ_L3PHIC17to24_nentries_V_we  : t_arr2_8_1b;
+  --signal VMPROJ_L3PHIC17to24_nentries_V_din : t_arr2_8_8b;
   -- MatchEngine output
-  signal ME_bx_out     : t_myarray8_3b;
-  signal ME_bx_out_vld : t_myarray8_1b;
+  signal ME_bx_out     : t_arr8_3b;
+  signal ME_bx_out_vld : t_arr8_1b;
   signal ME_all_done   : std_logic := '0';
   -- CandidateMatch output
-  signal CM_L3PHIC17to24_dataarray_data_V_wea       : t_myarray8_1b;
-  signal CM_L3PHIC17to24_dataarray_data_V_writeaddr : t_myarray8_8b;
-  signal CM_L3PHIC17to24_dataarray_data_V_din       : t_myarray8_14b;
-  --signal CM_L3PHIC17to24_nentries_V_we  : t_myarray2_8_1b;
-  --signal CM_L3PHIC17to24_nentries_V_din : t_myarray2_8_8b;
+  signal CM_L3PHIC17to24_dataarray_data_V_wea       : t_arr8_1b;
+  signal CM_L3PHIC17to24_dataarray_data_V_writeaddr : t_arr8_8b;
+  signal CM_L3PHIC17to24_dataarray_data_V_din       : t_arr8_14b;
+  --signal CM_L3PHIC17to24_nentries_V_we  : t_arr2_8_1b;
+  --signal CM_L3PHIC17to24_nentries_V_din : t_arr2_8_8b;
 
 
 begin
@@ -193,12 +193,12 @@ begin
 
   --! @brief Read emData process ---------------------------------------
   read_data : process
-    variable v_TPROJ_L3PHICn4_data_arr            : t_myarray_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
-    variable v_TPROJ_L3PHICn4_n_entries_arr       : t_myarray_1d_1d_int(0 to N_ME_IN_CHAIN-1);
-    variable v_VMSME_L3PHIC17to24n1_data_arr      : t_myarray_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
-    variable v_VMSME_L3PHIC17to24n1_n_entries_arr : t_myarray_1d_2d_int(0 to N_ME_IN_CHAIN-1);
-    variable v_AS_L3PHICn4_data_arr               : t_myarray_2d_slv(0 to MAX_EVENTS-1,0 to N_ME_IN_CHAIN*PAGE_OFFSET-1);
-    variable v_AS_L3PHICn4_n_entries_arr          : t_myarray_1d_int(0 to MAX_EVENTS-1);
+    variable v_TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
+    variable v_TPROJ_L3PHICn4_n_entries_arr       : t_arr_1d_1d_int(0 to N_ME_IN_CHAIN-1);
+    variable v_VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
+    variable v_VMSME_L3PHIC17to24n1_n_entries_arr : t_arr_1d_2d_int(0 to N_ME_IN_CHAIN-1);
+    variable v_AS_L3PHICn4_data_arr               : t_arr_2d_slv(0 to MAX_EVENTS-1,0 to N_ME_IN_CHAIN*PAGE_OFFSET-1);
+    variable v_AS_L3PHICn4_n_entries_arr          : t_arr_1d_int(0 to MAX_EVENTS-1);
     variable v_line_in : line; -- Line for debug
   begin
     -- TPROJ
@@ -259,9 +259,9 @@ begin
     variable v_page_cnt2_d0            : integer := 0; -- Page counter 
     variable v_page_cnt2_d1            : integer := 0; -- Page counter delayed by one
     variable v_page_cnt8               : integer := 0; -- Page counter
-    variable v_VMSME_n_entries_bin     : t_myarray_1d_int(0 to N_ME_IN_CHAIN-1) := (others => 0); -- Number of VMSME entries per bin
-    variable v_VMSME_n_entries_bin_cnt : t_myarray_1d_int(0 to N_ME_IN_CHAIN-1) := (others => 0); -- Counter of VMSME entries per bin
-    variable v_bin_cnt                 : t_myarray_1d_int(0 to N_ME_IN_CHAIN-1) := (others => 0); -- Bin counter
+    variable v_VMSME_n_entries_bin     : t_arr_1d_int(0 to N_ME_IN_CHAIN-1) := (others => 0); -- Number of VMSME entries per bin
+    variable v_VMSME_n_entries_bin_cnt : t_arr_1d_int(0 to N_ME_IN_CHAIN-1) := (others => 0); -- Counter of VMSME entries per bin
+    variable v_bin_cnt                 : t_arr_1d_int(0 to N_ME_IN_CHAIN-1) := (others => 0); -- Bin counter
     variable v_last_bin                : boolean := false; -- Last bin tag
     variable v_line_in : line; -- Line for debug
   begin
@@ -456,8 +456,8 @@ begin
 
   -- ########################### Instantiation ###########################
   -- Instantiate the Unit Under Test (UUT)
-  i_top_tf : if INST_TOP_TF = 1 generate
-    uut : entity work.top_tf
+  i_tf_top : if INST_TOP_TF = 1 generate
+    uut : entity work.tf_top
       port map(
         clk       => clk,
         reset     => reset,
@@ -498,8 +498,8 @@ begin
         MC_done       => MC_done );
   end generate;
 
-  i_top_tf_full : if INST_TOP_TF = 2 generate
-    uut : entity work.top_tf_full
+  i_tf_top_full : if INST_TOP_TF = 2 generate
+    uut : entity work.tf_top_full
       port map(
         clk       => clk,
         reset     => reset,
@@ -590,9 +590,9 @@ begin
     --! @brief TextIO process for writting the output ---------------------------------------
     write_result_VMP : process
       variable v_bx_cnt      : integer       := -1; --! BX counter
-      variable myarray2_8b   : t_myarray2_8b := (others => (others => '0')); -- Temporary array to avoid sim error
-      variable myarray2_1b   : t_myarray2_1b := (others => '0'); -- Temporary array to avoid sim error
-      variable v_addr_d1     : t_myarray8_8b := (others => (others => '0')); -- Delayed address
+      variable myarray2_8b   : t_arr2_8b := (others => (others => '0')); -- Temporary array to avoid sim error
+      variable myarray2_1b   : t_arr2_1b := (others => '0'); -- Temporary array to avoid sim error
+      variable v_addr_d1     : t_arr8_8b := (others => (others => '0')); -- Delayed address
     begin
       wait until PR_start = '1'; -- Wait to start
       l_copies_header : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7
@@ -621,9 +621,9 @@ begin
     --! @brief TextIO process for writting the output ---------------------------------------
     write_result_CM : process
       variable v_bx_cnt    : integer       := -1; --! BX counter
-      variable myarray2_8b : t_myarray2_8b := (others => (others => '0')); -- Temporary array to avoid sim error
-      variable myarray2_1b : t_myarray2_1b := (others => '0'); -- Temporary array to avoid sim error
-      variable v_addr_d1   : t_myarray8_8b := (others => (others => '0')); -- Delayed address
+      variable myarray2_8b : t_arr2_8b := (others => (others => '0')); -- Temporary array to avoid sim error
+      variable myarray2_1b : t_arr2_1b := (others => '0'); -- Temporary array to avoid sim error
+      variable v_addr_d1   : t_arr8_8b := (others => (others => '0')); -- Delayed address
     begin
       wait until PR_done = '1'; -- Wait to start = ME_start
       l_copies_header : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7

@@ -22,7 +22,7 @@ use unisim.vcomponents.all;
 use work.tf_pkg.all;
 
 
-entity top_tf_full is
+entity tf_top_full is
   port(
     clk       : in std_logic;
     reset     : in std_logic;
@@ -83,9 +83,9 @@ entity top_tf_full is
     MC_done       : out std_logic
     );
 
-end top_tf_full;
+end tf_top_full;
 
-architecture rtl of top_tf_full is
+architecture rtl of tf_top_full is
 
   -- connecting TrackletProjections memories to ProjectionRouter input
   -- (0-7) -> (L1L2F-L1L2J, L5L6B-L5L6D)
