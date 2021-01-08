@@ -66,6 +66,7 @@ package tf_pkg is
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
   -- Others
   type t_arr_1d_int is array(natural range <>) of integer;                  --! 1D array of int
+  type t_arr_1d_slv is array(natural range <>) of std_logic_vector;         --! 1D array of slv
   type t_arr_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
@@ -182,6 +183,30 @@ package body tf_pkg is
     end if;
   end char2int;
 
+  --! @brief TextIO procedure to read memory data to initialize tf_mem
+  procedure read_tf_mem_data (
+    file_path : in  string;       --! File path as string
+    data_arr  : out t_arr_1d_slv; --! Dataarray with read values
+    hex_val   : in  boolean       --! Read file vales as hex or bin
+  ) is
+  file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
+  variable line_in         : line;                               -- Line - one string from a text file
+  variable i_bx_row        : integer;                            -- Read row index
+  begin
+    data_arr      := (others => (others => '0')); -- Init
+    l_rd_row : while not endfile(file_in) loop -- Read until EoF
+    --l_rd_row : for i in 0 to 5 loop -- Debug
+      readline (file_in, line_in);
+      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
+        --if DEBUG=true then writeline(output, line_in); end if;
+      else
+        hread(line_in, data_arr(i_bx_row)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
+        i_bx_row := i_bx_row +1;
+      end if;
+    end loop l_rd_row;
+    file_close(file_in);
+  end read_tf_mem_data;
+
   --! @brief TextIO procedure to read emData for non-binned memories all at once
   --! Assuming normal memory format with the first column as entries counter per BX
   --! N_PAGES=2/8: BX = 000 (even) Event : 1 is page 0/0 and BX = 001 (odd) Event : 2 is page 1/1 ...
@@ -195,7 +220,6 @@ package body tf_pkg is
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
-  variable line_tmp        : line;                               -- Line - one string from a text file
   variable bx_cnt          : integer;                            -- BX counter
   variable i_bx_row        : integer;                            -- Read row index
   variable i_rd_col        : integer;                            -- Read column index
@@ -247,7 +271,6 @@ package body tf_pkg is
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
-  variable line_tmp        : line;                               -- Line - one string from a text file
   variable bx_cnt          : integer;                            -- BX counter
   variable i_bx_row        : integer;                            -- Read row index
   variable i_rd_col        : integer;                            -- Read column index
@@ -320,7 +343,6 @@ package body tf_pkg is
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
-  variable line_tmp        : line;                               -- Line - one string from a text file
   variable bx_cnt          : integer;                            -- BX counter
   variable i_bx_row        : integer;                            -- Read row index
   variable i_rd_col        : integer;                            -- Read column index
@@ -350,7 +372,6 @@ package body tf_pkg is
             end if;
             if (i_rd_col=2) then
               char2int(char, n_entry_mem_bin);
-              --if DEBUG=true then write(line_tmp, string'("mem_bin: ")); write(line_tmp, mem_bin); write(line_tmp, string'(";   n_entry_mem_bin: ")); write(line_tmp, n_entry_mem_bin); writeline(output, line_tmp); end if;
             end if;
             if (char='x') then                   -- ... until the next x
               cnt_x_char := cnt_x_char +1;
@@ -402,7 +423,6 @@ package body tf_pkg is
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
-  variable line_tmp        : line;                               -- Line - one string from a text file
   variable bx_cnt          : integer;                            -- BX counter
   variable i_bx_row        : integer;                            -- Read row index
   variable i_rd_col        : integer;                            -- Read column index
@@ -432,7 +452,6 @@ package body tf_pkg is
             end if;
             if (i_rd_col=2) then
               char2int(char, n_entry_mem_bin);
-              --if DEBUG=true then write(line_tmp, string'("mem_bin: ")); write(line_tmp, mem_bin); write(line_tmp, string'(";   n_entry_mem_bin: ")); write(line_tmp, n_entry_mem_bin); writeline(output, line_tmp); end if; 
             end if;
             if (char='x') then                   -- ... until the next x
               cnt_x_char := cnt_x_char +1;

@@ -13,6 +13,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 --! Signed/unsigned calculations
 use ieee.numeric_std.all;
+--! Standard functions
+library std;
+--! Standard TextIO functions
+use std.textio.all;
 
 --! Xilinx library
 library unisim;
@@ -24,12 +28,11 @@ use work.tf_pkg.all;
 
 entity tf_mem is
   generic (
-    RAM_WIDTH       : integer := 18;                --! Specify RAM data width
-    RAM_DEPTH       : integer := 1024;              --! Specify RAM depth (number of entries)
-    INIT_FILE       : string := "";                 --! Specify name/location of RAM initialization file if using one (leave blank if not)
-    INIT_HEX        : integer := 1;                 --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
-    COUNT_NENT      : integer := 0                  --! Count number of entries internally. Ignores input ports nent_ix and nent_wex.
+    RAM_WIDTH       : natural := 18;               --! Specify RAM data width
+    RAM_DEPTH       : natural := 1024;             --! Specify RAM depth (number of entries)
+    INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
+    INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     );
   port (
     clka    : in  std_logic;                                      --! Write clock
@@ -42,8 +45,6 @@ entity tf_mem is
     dina    : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     addrb   : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb   : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    nent_i  : in  t_arr8_8b;                                      --! Num entries received
-    nent_we : in  std_logic_vector(7 downto 0);                   --! Write enable
     nent_o  : out t_arr8_8b                                       --! Num entries per page
     );
 end tf_mem;
@@ -51,38 +52,45 @@ end tf_mem;
 architecture rtl of tf_mem is
 
 -- ########################### Types ###########################
-type t_arr_2D  is array(RAM_DEPTH-1 downto 0) of std_logic_vector(RAM_WIDTH-1 downto 0);
+--type t_arr_2D is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0);
 
 -- ########################### Signals ###########################
-signal sa_BRAM     : t_arr_2D;                               --! BRAM content
-signal sv_RAM_data : std_logic_vector(RAM_WIDTH-1 downto 0); --! RAM data
-signal nent        : t_arr8_8b;                              --! Number of entries
+--signal sa_BRAM    : t_arr_2D;                               --! BRAM content
+signal sa_RAM_data : t_arr_1d_slv(0 to RAM_DEPTH-1); --! RAM data content
+signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0); --! RAM data row
+signal sa_nent     : t_arr8_8b;                              --! Number of entries
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
-attribute ram_style of sa_BRAM : signal is "block";
+attribute ram_style of sa_RAM_data : signal is "block";
 
 
 begin
 
-doutb <= (others => '0');
+sa_RAM_data(0) <= sv_RAM_row;
 
+  -- The following code either initializes the memory values to a specified file or to all zeros to match hardware
+  INIT_MEM : if (INIT_FILE/="") generate
 
---  // The following code either initializes the memory values to a specified file or to all zeros to match hardware
---  generate
---    if (INIT_FILE != "") begin: use_init_file
---      initial
---        if (INIT_HEX)
---            $readmemh(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
---        else
---            $readmemb(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
---    end else begin: init_bram_to_zero
---      integer ram_index;
---      initial
---        for (ram_index = 0; ram_index < RAM_DEPTH; ram_index = ram_index + 1)
---          BRAM[ram_index] = {RAM_WIDTH{1'b0}};
---    end
---  endgenerate
+  else generate
+
+  end generate INIT_MEM;
+
+  
+  --generate
+  --  if (INIT_FILE != "") begin: use_init_file
+  --    initial
+  --      if (INIT_HEX)
+  --          $readmemh(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
+  --      else
+  --          $readmemb(INIT_FILE, BRAM, 0, RAM_DEPTH-1);
+  --  end else begin: init_bram_to_zero
+  --    integer ram_index;
+  --    initial
+  --      for (ram_index = 0; ram_index < RAM_DEPTH; ram_index = ram_index + 1)
+  --        BRAM[ram_index] = {RAM_WIDTH{1'b0}};
+  --  end
+  --endgenerate
 
 
 --  always @(posedge clka) begin
