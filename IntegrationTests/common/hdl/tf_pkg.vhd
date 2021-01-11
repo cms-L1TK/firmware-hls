@@ -32,12 +32,16 @@ package tf_pkg is
 
   -- ########################### Constants #######################
   constant DEBUG                  : boolean := true; --! Debug off/on
-  constant MAX_EVENTS             : integer := 100;  --! Max. number of BX events
-  constant MAX_ENTRIES            : integer := 108;  --! Max. number of entries: 108 = BX period with 240 MHz
-  constant EMDATA_WIDTH           : integer := 68;   --! Max. bit width of emData
-  constant N_MEM_BINS             : integer := 8;    --! Number of memory bins
-  constant N_ENTRIES_PER_MEM_BINS : integer := 16;   --! Number of entries per memory bin
-  constant PAGE_OFFSET            : integer := 128;  --! Page offset for all memories
+  constant MAX_EVENTS             : natural := 100;  --! Max. number of BX events
+  constant MAX_ENTRIES            : natural := 108;  --! Max. number of entries: 108 = BX period with 240 MHz
+  constant EMDATA_WIDTH           : natural := 68;   --! Max. bit width of emData
+  constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
+  constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
+  constant PAGE_OFFSET            : natural := 128;  --! Page offset for all memories
+  -- Memory width constants
+  constant RAM_WIDTH_AS    : natural := 36; --! Width for memories
+  constant RAM_WIDTH_TPROJ : natural := 60; --! Width for memories
+  constant RAM_WIDTH_AP    : natural := 60; --! Width for memories
 
   -- ########################### Types ###########################
   -- 2D
@@ -66,7 +70,6 @@ package tf_pkg is
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
   -- Others
   type t_arr_1d_int is array(natural range <>) of integer;                  --! 1D array of int
-  type t_arr_1d_slv is array(natural range <>) of std_logic_vector;         --! 1D array of slv
   type t_arr_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
@@ -159,6 +162,7 @@ package body tf_pkg is
     return(count-1);
   end;
 
+
   -- ########################### Procedures ################################################################
   --! @brief Convert character to integer
   procedure char2int (
@@ -182,30 +186,6 @@ package body tf_pkg is
       int := character'pos(char)-48;
     end if;
   end char2int;
-
-  --! @brief TextIO procedure to read memory data to initialize tf_mem
-  procedure read_tf_mem_data (
-    file_path : in  string;       --! File path as string
-    data_arr  : out t_arr_1d_slv; --! Dataarray with read values
-    hex_val   : in  boolean       --! Read file vales as hex or bin
-  ) is
-  file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
-  variable line_in         : line;                               -- Line - one string from a text file
-  variable i_bx_row        : integer;                            -- Read row index
-  begin
-    data_arr      := (others => (others => '0')); -- Init
-    l_rd_row : while not endfile(file_in) loop -- Read until EoF
-    --l_rd_row : for i in 0 to 5 loop -- Debug
-      readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
-        --if DEBUG=true then writeline(output, line_in); end if;
-      else
-        hread(line_in, data_arr(i_bx_row)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
-        i_bx_row := i_bx_row +1;
-      end if;
-    end loop l_rd_row;
-    file_close(file_in);
-  end read_tf_mem_data;
 
   --! @brief TextIO procedure to read emData for non-binned memories all at once
   --! Assuming normal memory format with the first column as entries counter per BX

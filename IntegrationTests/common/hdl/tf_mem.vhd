@@ -1,7 +1,7 @@
 --===========================================================================
 --! @file
---! @brief Memory module which stores data between the algorithm steps in the 
---!        Hybrid L1 Tracking algorithm. Based on the Memory.v module.
+--! @brief 2-page memory module which stores data between the algorithm steps 
+--         in the Hybrid L1 Tracking algorithm. Based on the Memory.v module. 
 --! @author robert.glein@colorado.edu
 --! @date 2021-01-05
 --! @version v.1.0
@@ -52,29 +52,60 @@ end tf_mem;
 architecture rtl of tf_mem is
 
 -- ########################### Types ###########################
---type t_arr_2D is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0);
+type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
+
+-- ########################### Function ##########################
+--! @brief TextIO function to read memory data to initialize tf_mem. Needed here because of variable slv width!
+impure function read_tf_mem_data (
+file_path : string;      --! File path as string
+hex_val   : boolean)     --! Read file vales as hex or bin
+return t_arr_1d_slv_mem is --! Dataarray with read values
+  file     file_in  : text open READ_MODE is file_path;                -- Text - a file of character strings
+  variable line_in  : line;                                            -- Line - one string from a text file
+  variable char     : character;                                       -- Character
+  variable i_bx_row : integer;                                         -- Read row index
+  variable data_arr : t_arr_1d_slv_mem := (others => (others => '0')); -- Output RAM array
+begin
+ i_bx_row := 0; -- Init
+ l_rd_row : while not endfile(file_in) loop -- Read until EoF
+   readline (file_in, line_in);
+   if (hex_val=true) then
+     if (line_in'length > 1) then
+       read(line_in, char); read(line_in, char); -- Read '0' and 'x' chars
+       hread(line_in, data_arr(i_bx_row)(RAM_WIDTH-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
+     else
+       data_arr(i_bx_row) := (others => '0');
+     end if;
+   else
+     read(line_in, data_arr(i_bx_row)(RAM_WIDTH-1 downto 0)); -- Read value as bin slv
+   end if;
+   i_bx_row := i_bx_row +1;
+ end loop l_rd_row;
+ file_close(file_in);
+ return data_arr;
+end read_tf_mem_data;
 
 -- ########################### Signals ###########################
---signal sa_BRAM    : t_arr_2D;                               --! BRAM content
-signal sa_RAM_data : t_arr_1d_slv(0 to RAM_DEPTH-1); --! RAM data content
-signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0); --! RAM data row
-signal sa_nent     : t_arr8_8b;                              --! Number of entries
+signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX); --! RAM data content
+signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');  --! RAM data row
+signal sa_nent     : t_arr8_8b;                                                 --! Number of entries
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 attribute ram_style of sa_RAM_data : signal is "block";
 
-
 begin
 
-sa_RAM_data(0) <= sv_RAM_row;
-
-  -- The following code either initializes the memory values to a specified file or to all zeros to match hardware
-  INIT_MEM : if (INIT_FILE/="") generate
-
-  else generate
-
-  end generate INIT_MEM;
+-- The following code either initializes the memory values to a specified file or to all zeros to match hardware
+process(clka)
+begin
+  if rising_edge(clka) then
+    if (wea='1') then
+      sa_RAM_data(to_integer(unsigned(addra))) <= dina;
+    end if;
+    --MAX_ENTRIES
+  end if;
+end process init_mem;
 
   
   --generate

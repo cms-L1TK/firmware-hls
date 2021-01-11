@@ -34,20 +34,14 @@ entity tf_top_full is
     TPROJ_L3PHIC_dataarray_data_V_wea       : in t_arr8_1b;
     TPROJ_L3PHIC_dataarray_data_V_writeaddr : in t_arr8_8b;
     TPROJ_L3PHIC_dataarray_data_V_din       : in t_arr8_60b;
-    TPROJ_L3PHIC_nentries_V_we  : in t_arr2_8_1b;
-    TPROJ_L3PHIC_nentries_V_din : in t_arr2_8_8b;
     -- VMStubsME input
     VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : in t_arr8_1b;
     VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : in t_arr8_10b;
     VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_14b;
-    VMSME_L3PHIC17to24n1_nentries_V_we  : in t_arr8_8_8_1b;
-    VMSME_L3PHIC17to24n1_nentries_V_din : in t_arr8_8_8_4b;
     -- AllStubs input
     AS_L3PHICn4_dataarray_data_V_wea       : in std_logic;
     AS_L3PHICn4_dataarray_data_V_writeaddr : in std_logic_vector(9 downto 0);
     AS_L3PHICn4_dataarray_data_V_din       : in std_logic_vector(35 downto 0);
-    AS_L3PHICn4_nentries_V_we  : in t_arr8_1b;
-    AS_L3PHICn4_nentries_V_din : in t_arr8_8b;
     -- VMProjection output
     VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : inout t_arr8_1b;
     VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : inout t_arr8_8b;
@@ -184,45 +178,27 @@ begin
   begin
     TPROJ_L3PHIC : entity work.tf_mem
       generic map (
-        RAM_WIDTH       => 60,
+        RAM_WIDTH       => RAM_WIDTH_TPROJ,
         RAM_DEPTH       => 256,
-        INIT_FILE       => "",
-        INIT_HEX        =>  1,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        COUNT_NENT      => 1
+        INIT_FILE       => "../../../../../emDataMemInitObsolete/TrackletProjections_TPROJ_L1L2G_L3PHIC_04MOD.dat",
+        INIT_HEX        => true,
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
         )
       port map (
         clka       => clk,
         wea        => TPROJ_L3PHIC_dataarray_data_V_wea(tpidx),
         addra      => TPROJ_L3PHIC_dataarray_data_V_writeaddr(tpidx),
         dina       => TPROJ_L3PHIC_dataarray_data_V_din(tpidx),
-        nent_we(0) => TPROJ_L3PHIC_nentries_V_we(0)(tpidx),
-        nent_i(0)  => TPROJ_L3PHIC_nentries_V_din(0)(tpidx),
-        nent_we(1) => TPROJ_L3PHIC_nentries_V_we(1)(tpidx),
-        nent_i(1)  => TPROJ_L3PHIC_nentries_V_din(1)(tpidx),
-        nent_we(2) => '0',
-        nent_i(2)  => (others=>'0'),
-        nent_we(3) => '0',
-        nent_i(3)  => (others=>'0'),
-        nent_we(4) => '0',
-        nent_i(4)  => (others=>'0'),
-        nent_we(5) => '0',
-        nent_i(5)  => (others=>'0'),
-        nent_we(6) => '0',
-        nent_i(6)  => (others=>'0'),
-        nent_we(7) => '0',
-        nent_i(7)  => (others=>'0'),
         clkb       => clk,
-        rstb       => '0',
         regceb     => '1',
         enb        => TPROJ_L3PHIC_dataarray_data_V_enb(tpidx),
+        rstb       => '0',
         addrb      => TPROJ_L3PHIC_dataarray_data_V_readaddr(tpidx),
         doutb      => TPROJ_L3PHIC_dataarray_data_V_dout(tpidx),
         nent_o(0)  => TPROJ_L3PHIC_nentries_V_dout(0)(tpidx),
         nent_o(1)  => TPROJ_L3PHIC_nentries_V_dout(1)(tpidx)
         -- partially associated formal 'nent_o(others)' cannot have actual OPEN
         );
-
   end generate gen_TPROJ_L3PHIC;
 
 
@@ -324,40 +300,23 @@ begin
   --------------------------------------------------------------
   AP_L3PHIC : entity work.tf_mem
     generic map (
-      RAM_WIDTH       => 60,
+      RAM_WIDTH       => RAM_WIDTH_AS,--RAM_WIDTH_AP,
       RAM_DEPTH       => 1024,
-      INIT_FILE       => "",
-      INIT_HEX        =>  1,
-      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      COUNT_NENT      => 1
+      INIT_FILE       => "../../../../../emDataMemInitObsolete/AS_L3PHICn4.dat",
+      INIT_HEX        => false,
+      RAM_PERFORMANCE => "HIGH_PERFORMANCE"
       )
     port map (
       clka       => clk,
       wea        => AP_L3PHIC_dataarray_data_V_wea,
       addra      => AP_L3PHIC_dataarray_data_V_writeaddr,
-      dina       => AP_L3PHIC_dataarray_data_V_din,
-      nent_we(0) => '0',
-      nent_i(0)  => (others => '0'),
-      nent_we(1) => '0',
-      nent_i(1)  => (others => '0'),
-      nent_we(2) => '0',
-      nent_i(2)  => (others => '0'),
-      nent_we(3) => '0',
-      nent_i(3)  => (others => '0'),
-      nent_we(4) => '0',
-      nent_i(4)  => (others => '0'),
-      nent_we(5) => '0',
-      nent_i(5)  => (others => '0'),
-      nent_we(6) => '0',
-      nent_i(6)  => (others => '0'),
-      nent_we(7) => '0',
-      nent_i(7)  => (others => '0'),
+      dina       => (others => '0'),--AP_L3PHIC_dataarray_data_V_din,
       clkb       => clk,
-      rstb       => '0',
       regceb     => '1',
       enb        => AP_L3PHIC_dataarray_data_V_enb,
+      rstb       => '0',
       addrb      => AP_L3PHIC_dataarray_data_V_readaddr,
-      doutb      => AP_L3PHIC_dataarray_data_V_dout,
+      doutb      => open,--AP_L3PHIC_dataarray_data_V_dout,
       nent_o(0)  => AP_L3PHIC_nentries_V_dout(0),
       nent_o(1)  => AP_L3PHIC_nentries_V_dout(1),
       nent_o(2)  => AP_L3PHIC_nentries_V_dout(2),
@@ -369,626 +328,482 @@ begin
       );
 
 
-  --------------------------------------------------------------
-  -- VMProjection memories
-  --------------------------------------------------------------
-  gen_VMPROJ_L3PHIC17to24 : for vmpidx in 7 downto 0 generate
-  begin
-    VMPROJ_L3PHIC17to24 : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 21,
-        RAM_DEPTH       => 256,
-        INIT_FILE       => "",
-        INIT_HEX        =>  1,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        COUNT_NENT      => 1
-        )
-      port map (
-        clka       => clk,
-        wea        => VMPROJ_L3PHIC17to24_dataarray_data_V_wea(vmpidx),
-        addra      => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(vmpidx),
-        dina       => VMPROJ_L3PHIC17to24_dataarray_data_V_din(vmpidx),
-        nent_we(0) => '0',
-        nent_i(0)  => (others=>'0'),
-        nent_we(1) => '0',
-        nent_i(1)  => (others=>'0'),
-        nent_we(2) => '0',
-        nent_i(2)  => (others=>'0'),
-        nent_we(3) => '0',
-        nent_i(3)  => (others=>'0'),
-        nent_we(4) => '0',
-        nent_i(4)  => (others=>'0'),
-        nent_we(5) => '0',
-        nent_i(5)  => (others=>'0'),
-        nent_we(6) => '0',
-        nent_i(6)  => (others=>'0'),
-        nent_we(7) => '0',
-        nent_i(7)  => (others=>'0'),
-        clkb       => clk,
-        rstb       => '0',
-        regceb     => '1',
-        enb        => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(vmpidx),
-        addrb      => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),
-        doutb      => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(vmpidx),
-        nent_o(0)  => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(vmpidx),
-        nent_o(1)  => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(vmpidx)
-        -- partially associated formal 'nent_o(others)' cannot have actual OPEN
-        );
+  ----------------------------------------------------------------
+  ---- VMProjection memories
+  ----------------------------------------------------------------
+  --gen_VMPROJ_L3PHIC17to24 : for vmpidx in 7 downto 0 generate
+  --begin
+  --  VMPROJ_L3PHIC17to24 : entity work.tf_mem
+  --    generic map (
+  --      RAM_WIDTH       => 21,
+  --      RAM_DEPTH       => 256,
+  --      INIT_FILE       => "",
+  --      INIT_HEX        =>  1,
+  --      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+  --      COUNT_NENT      => 1
+  --      )
+  --    port map (
+  --      clka       => clk,
+  --      wea        => VMPROJ_L3PHIC17to24_dataarray_data_V_wea(vmpidx),
+  --      addra      => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(vmpidx),
+  --      dina       => VMPROJ_L3PHIC17to24_dataarray_data_V_din(vmpidx),
+  --      nent_we(0) => '0',
+  --      nent_i(0)  => (others=>'0'),
+  --      nent_we(1) => '0',
+  --      nent_i(1)  => (others=>'0'),
+  --      nent_we(2) => '0',
+  --      nent_i(2)  => (others=>'0'),
+  --      nent_we(3) => '0',
+  --      nent_i(3)  => (others=>'0'),
+  --      nent_we(4) => '0',
+  --      nent_i(4)  => (others=>'0'),
+  --      nent_we(5) => '0',
+  --      nent_i(5)  => (others=>'0'),
+  --      nent_we(6) => '0',
+  --      nent_i(6)  => (others=>'0'),
+  --      nent_we(7) => '0',
+  --      nent_i(7)  => (others=>'0'),
+  --      clkb       => clk,
+  --      rstb       => '0',
+  --      regceb     => '1',
+  --      enb        => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(vmpidx),
+  --      addrb      => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),
+  --      doutb      => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(vmpidx),
+  --      nent_o(0)  => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(vmpidx),
+  --      nent_o(1)  => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(vmpidx)
+  --      -- partially associated formal 'nent_o(others)' cannot have actual OPEN
+  --      );
 
-  end generate gen_VMPROJ_L3PHIC17to24;
-
-
-  --------------------------------------------------------------
-  -- VMStubME memories
-  --------------------------------------------------------------
-  gen_VMSME_L3PHIC17to24n1 : for vmsidx in 7 downto 0 generate
-  begin
-    VMSME_L3PHIC17to24n1 : entity work.tf_mem_bin
-      generic map (
-        RAM_WIDTH       => 14,
-        RAM_DEPTH       => 1024,
-        INIT_FILE       => "",
-        INIT_HEX        =>  1,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        COUNT_NENT      => 1
-        )
-      port map (
-        clka       => clk,
-        wea        => VMSME_L3PHIC17to24n1_dataarray_data_V_wea(vmsidx),
-        addra      => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(vmsidx),
-        dina       => VMSME_L3PHIC17to24n1_dataarray_data_V_din(vmsidx),
-        nent_0_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(0)(vmsidx),
-        nent_0_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(0)(vmsidx),
-        nent_0_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(1)(vmsidx),
-        nent_0_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(1)(vmsidx),
-        nent_0_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(2)(vmsidx),
-        nent_0_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(2)(vmsidx),
-        nent_0_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(3)(vmsidx),
-        nent_0_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(3)(vmsidx),
-        nent_0_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(4)(vmsidx),
-        nent_0_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(4)(vmsidx),
-        nent_0_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(5)(vmsidx),
-        nent_0_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(5)(vmsidx),
-        nent_0_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(6)(vmsidx),
-        nent_0_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(6)(vmsidx),
-        nent_0_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(0)(7)(vmsidx),
-        nent_0_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(0)(7)(vmsidx),
-        nent_1_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(0)(vmsidx),
-        nent_1_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(0)(vmsidx),
-        nent_1_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(1)(vmsidx),
-        nent_1_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(1)(vmsidx),
-        nent_1_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(2)(vmsidx),
-        nent_1_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(2)(vmsidx),
-        nent_1_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(3)(vmsidx),
-        nent_1_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(3)(vmsidx),
-        nent_1_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(4)(vmsidx),
-        nent_1_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(4)(vmsidx),
-        nent_1_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(5)(vmsidx),
-        nent_1_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(5)(vmsidx),
-        nent_1_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(6)(vmsidx),
-        nent_1_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(6)(vmsidx),
-        nent_1_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(1)(7)(vmsidx),
-        nent_1_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(1)(7)(vmsidx),
-        nent_2_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(0)(vmsidx),
-        nent_2_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(0)(vmsidx),
-        nent_2_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(1)(vmsidx),
-        nent_2_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(1)(vmsidx),
-        nent_2_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(2)(vmsidx),
-        nent_2_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(2)(vmsidx),
-        nent_2_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(3)(vmsidx),
-        nent_2_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(3)(vmsidx),
-        nent_2_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(4)(vmsidx),
-        nent_2_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(4)(vmsidx),
-        nent_2_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(5)(vmsidx),
-        nent_2_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(5)(vmsidx),
-        nent_2_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(6)(vmsidx),
-        nent_2_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(6)(vmsidx),
-        nent_2_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(2)(7)(vmsidx),
-        nent_2_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(2)(7)(vmsidx),
-        nent_3_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(0)(vmsidx),
-        nent_3_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(0)(vmsidx),
-        nent_3_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(1)(vmsidx),
-        nent_3_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(1)(vmsidx),
-        nent_3_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(2)(vmsidx),
-        nent_3_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(2)(vmsidx),
-        nent_3_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(3)(vmsidx),
-        nent_3_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(3)(vmsidx),
-        nent_3_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(4)(vmsidx),
-        nent_3_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(4)(vmsidx),
-        nent_3_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(5)(vmsidx),
-        nent_3_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(5)(vmsidx),
-        nent_3_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(6)(vmsidx),
-        nent_3_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(6)(vmsidx),
-        nent_3_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(3)(7)(vmsidx),
-        nent_3_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(3)(7)(vmsidx),
-        nent_4_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(0)(vmsidx),
-        nent_4_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(0)(vmsidx),
-        nent_4_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(1)(vmsidx),
-        nent_4_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(1)(vmsidx),
-        nent_4_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(2)(vmsidx),
-        nent_4_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(2)(vmsidx),
-        nent_4_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(3)(vmsidx),
-        nent_4_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(3)(vmsidx),
-        nent_4_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(4)(vmsidx),
-        nent_4_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(4)(vmsidx),
-        nent_4_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(5)(vmsidx),
-        nent_4_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(5)(vmsidx),
-        nent_4_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(6)(vmsidx),
-        nent_4_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(6)(vmsidx),
-        nent_4_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(4)(7)(vmsidx),
-        nent_4_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(4)(7)(vmsidx),
-        nent_5_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(0)(vmsidx),
-        nent_5_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(0)(vmsidx),
-        nent_5_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(1)(vmsidx),
-        nent_5_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(1)(vmsidx),
-        nent_5_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(2)(vmsidx),
-        nent_5_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(2)(vmsidx),
-        nent_5_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(3)(vmsidx),
-        nent_5_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(3)(vmsidx),
-        nent_5_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(4)(vmsidx),
-        nent_5_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(4)(vmsidx),
-        nent_5_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(5)(vmsidx),
-        nent_5_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(5)(vmsidx),
-        nent_5_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(6)(vmsidx),
-        nent_5_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(6)(vmsidx),
-        nent_5_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(5)(7)(vmsidx),
-        nent_5_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(5)(7)(vmsidx),
-        nent_6_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(0)(vmsidx),
-        nent_6_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(0)(vmsidx),
-        nent_6_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(1)(vmsidx),
-        nent_6_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(1)(vmsidx),
-        nent_6_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(2)(vmsidx),
-        nent_6_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(2)(vmsidx),
-        nent_6_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(3)(vmsidx),
-        nent_6_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(3)(vmsidx),
-        nent_6_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(4)(vmsidx),
-        nent_6_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(4)(vmsidx),
-        nent_6_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(5)(vmsidx),
-        nent_6_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(5)(vmsidx),
-        nent_6_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(6)(vmsidx),
-        nent_6_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(6)(vmsidx),
-        nent_6_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(6)(7)(vmsidx),
-        nent_6_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(6)(7)(vmsidx),
-        nent_7_we0 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(0)(vmsidx),
-        nent_7_i0  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(0)(vmsidx),
-        nent_7_we1 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(1)(vmsidx),
-        nent_7_i1  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(1)(vmsidx),
-        nent_7_we2 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(2)(vmsidx),
-        nent_7_i2  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(2)(vmsidx),
-        nent_7_we3 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(3)(vmsidx),
-        nent_7_i3  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(3)(vmsidx),
-        nent_7_we4 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(4)(vmsidx),
-        nent_7_i4  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(4)(vmsidx),
-        nent_7_we5 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(5)(vmsidx),
-        nent_7_i5  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(5)(vmsidx),
-        nent_7_we6 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(6)(vmsidx),
-        nent_7_i6  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(6)(vmsidx),
-        nent_7_we7 =>  VMSME_L3PHIC17to24n1_nentries_V_we(7)(7)(vmsidx),
-        nent_7_i7  => VMSME_L3PHIC17to24n1_nentries_V_din(7)(7)(vmsidx),
-        clkb       => clk,
-        rstb       => '0',
-        regceb     => '1',
-        enb        => VMSME_L3PHIC17to24n1_dataarray_data_V_enb(vmsidx),
-        addrb      => VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr(vmsidx),
-        doutb      => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(vmsidx),
-        nent_0_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(0)(vmsidx)(3 downto 0),
-        nent_0_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(1)(vmsidx)(3 downto 0),
-        nent_0_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(2)(vmsidx)(3 downto 0),
-        nent_0_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(3)(vmsidx)(3 downto 0),
-        nent_0_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(4)(vmsidx)(3 downto 0),
-        nent_0_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(5)(vmsidx)(3 downto 0),
-        nent_0_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(6)(vmsidx)(3 downto 0),
-        nent_0_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(7)(vmsidx)(3 downto 0),
-        nent_1_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(0)(vmsidx)(3 downto 0),
-        nent_1_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(1)(vmsidx)(3 downto 0),
-        nent_1_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(2)(vmsidx)(3 downto 0),
-        nent_1_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(3)(vmsidx)(3 downto 0),
-        nent_1_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(4)(vmsidx)(3 downto 0),
-        nent_1_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(5)(vmsidx)(3 downto 0),
-        nent_1_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(6)(vmsidx)(3 downto 0),
-        nent_1_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(7)(vmsidx)(3 downto 0),
-        nent_2_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(0)(vmsidx)(3 downto 0),
-        nent_2_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(1)(vmsidx)(3 downto 0),
-        nent_2_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(2)(vmsidx)(3 downto 0),
-        nent_2_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(3)(vmsidx)(3 downto 0),
-        nent_2_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(4)(vmsidx)(3 downto 0),
-        nent_2_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(5)(vmsidx)(3 downto 0),
-        nent_2_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(6)(vmsidx)(3 downto 0),
-        nent_2_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(7)(vmsidx)(3 downto 0),
-        nent_3_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(0)(vmsidx)(3 downto 0),
-        nent_3_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(1)(vmsidx)(3 downto 0),
-        nent_3_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(2)(vmsidx)(3 downto 0),
-        nent_3_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(3)(vmsidx)(3 downto 0),
-        nent_3_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(4)(vmsidx)(3 downto 0),
-        nent_3_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(5)(vmsidx)(3 downto 0),
-        nent_3_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(6)(vmsidx)(3 downto 0),
-        nent_3_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(7)(vmsidx)(3 downto 0),
-        nent_4_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(0)(vmsidx)(3 downto 0),
-        nent_4_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(1)(vmsidx)(3 downto 0),
-        nent_4_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(2)(vmsidx)(3 downto 0),
-        nent_4_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(3)(vmsidx)(3 downto 0),
-        nent_4_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(4)(vmsidx)(3 downto 0),
-        nent_4_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(5)(vmsidx)(3 downto 0),
-        nent_4_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(6)(vmsidx)(3 downto 0),
-        nent_4_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(7)(vmsidx)(3 downto 0),
-        nent_5_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(0)(vmsidx)(3 downto 0),
-        nent_5_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(1)(vmsidx)(3 downto 0),
-        nent_5_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(2)(vmsidx)(3 downto 0),
-        nent_5_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(3)(vmsidx)(3 downto 0),
-        nent_5_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(4)(vmsidx)(3 downto 0),
-        nent_5_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(5)(vmsidx)(3 downto 0),
-        nent_5_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(6)(vmsidx)(3 downto 0),
-        nent_5_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(7)(vmsidx)(3 downto 0),
-        nent_6_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(0)(vmsidx)(3 downto 0),
-        nent_6_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(1)(vmsidx)(3 downto 0),
-        nent_6_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(2)(vmsidx)(3 downto 0),
-        nent_6_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(3)(vmsidx)(3 downto 0),
-        nent_6_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(4)(vmsidx)(3 downto 0),
-        nent_6_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(5)(vmsidx)(3 downto 0),
-        nent_6_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(6)(vmsidx)(3 downto 0),
-        nent_6_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(7)(vmsidx)(3 downto 0),
-        nent_7_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(0)(vmsidx)(3 downto 0),
-        nent_7_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(1)(vmsidx)(3 downto 0),
-        nent_7_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(2)(vmsidx)(3 downto 0),
-        nent_7_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(3)(vmsidx)(3 downto 0),
-        nent_7_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(4)(vmsidx)(3 downto 0),
-        nent_7_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(5)(vmsidx)(3 downto 0),
-        nent_7_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(6)(vmsidx)(3 downto 0),
-        nent_7_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(7)(vmsidx)(3 downto 0)
-        );
-
-  end generate gen_VMSME_L3PHIC17to24n1;
+  --end generate gen_VMPROJ_L3PHIC17to24;
 
 
-  --------------------------------------------------------------
-  -- MatchEngine
-  --------------------------------------------------------------
-  gen_ME : for meidx in 7 downto 0 generate
-  begin
-    i_ME : entity work.MatchEngineTopL3_0
-      port map (
-        ap_clk   => clk,
-        ap_rst   => reset,
-        ap_start => ME_start,
-        ap_done  => ME_done(meidx),
-        ap_idle  => ME_idle,
-        ap_ready => ME_ready,
-        bx_V          => PR_bx_out,
-        bx_o_V        => ME_bx_out(meidx),
-        bx_o_V_ap_vld => ME_bx_out_vld(meidx),
-        inputStubData_dataarray_data_V_address0 => VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr(meidx),
-        inputStubData_dataarray_data_V_ce0      => VMSME_L3PHIC17to24n1_dataarray_data_V_enb(meidx),
-        inputStubData_dataarray_data_V_q0       => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(meidx)(12 downto 0),
-        inputStubData_nentries_0_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(0)(meidx),
-        inputStubData_nentries_0_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(1)(meidx),
-        inputStubData_nentries_0_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(2)(meidx),
-        inputStubData_nentries_0_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(3)(meidx),
-        inputStubData_nentries_0_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(4)(meidx),
-        inputStubData_nentries_0_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(5)(meidx),
-        inputStubData_nentries_0_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(6)(meidx),
-        inputStubData_nentries_0_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(7)(meidx),
-        inputStubData_nentries_1_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(0)(meidx),
-        inputStubData_nentries_1_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(1)(meidx),
-        inputStubData_nentries_1_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(2)(meidx),
-        inputStubData_nentries_1_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(3)(meidx),
-        inputStubData_nentries_1_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(4)(meidx),
-        inputStubData_nentries_1_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(5)(meidx),
-        inputStubData_nentries_1_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(6)(meidx),
-        inputStubData_nentries_1_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(7)(meidx),
-        inputStubData_nentries_2_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(0)(meidx),
-        inputStubData_nentries_2_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(1)(meidx),
-        inputStubData_nentries_2_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(2)(meidx),
-        inputStubData_nentries_2_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(3)(meidx),
-        inputStubData_nentries_2_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(4)(meidx),
-        inputStubData_nentries_2_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(5)(meidx),
-        inputStubData_nentries_2_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(6)(meidx),
-        inputStubData_nentries_2_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(7)(meidx),
-        inputStubData_nentries_3_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(0)(meidx),
-        inputStubData_nentries_3_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(1)(meidx),
-        inputStubData_nentries_3_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(2)(meidx),
-        inputStubData_nentries_3_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(3)(meidx),
-        inputStubData_nentries_3_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(4)(meidx),
-        inputStubData_nentries_3_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(5)(meidx),
-        inputStubData_nentries_3_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(6)(meidx),
-        inputStubData_nentries_3_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(7)(meidx),
-        inputStubData_nentries_4_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(0)(meidx),
-        inputStubData_nentries_4_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(1)(meidx),
-        inputStubData_nentries_4_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(2)(meidx),
-        inputStubData_nentries_4_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(3)(meidx),
-        inputStubData_nentries_4_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(4)(meidx),
-        inputStubData_nentries_4_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(5)(meidx),
-        inputStubData_nentries_4_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(6)(meidx),
-        inputStubData_nentries_4_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(7)(meidx),
-        inputStubData_nentries_5_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(0)(meidx),
-        inputStubData_nentries_5_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(1)(meidx),
-        inputStubData_nentries_5_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(2)(meidx),
-        inputStubData_nentries_5_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(3)(meidx),
-        inputStubData_nentries_5_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(4)(meidx),
-        inputStubData_nentries_5_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(5)(meidx),
-        inputStubData_nentries_5_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(6)(meidx),
-        inputStubData_nentries_5_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(7)(meidx),
-        inputStubData_nentries_6_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(0)(meidx),
-        inputStubData_nentries_6_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(1)(meidx),
-        inputStubData_nentries_6_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(2)(meidx),
-        inputStubData_nentries_6_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(3)(meidx),
-        inputStubData_nentries_6_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(4)(meidx),
-        inputStubData_nentries_6_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(5)(meidx),
-        inputStubData_nentries_6_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(6)(meidx),
-        inputStubData_nentries_6_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(7)(meidx),
-        inputStubData_nentries_7_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(0)(meidx),
-        inputStubData_nentries_7_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(1)(meidx),
-        inputStubData_nentries_7_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(2)(meidx),
-        inputStubData_nentries_7_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(3)(meidx),
-        inputStubData_nentries_7_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(4)(meidx),
-        inputStubData_nentries_7_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(5)(meidx),
-        inputStubData_nentries_7_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(6)(meidx),
-        inputStubData_nentries_7_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(7)(meidx),
-        inputProjectionData_dataarray_data_V_address0 => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(meidx),
-        inputProjectionData_dataarray_data_V_ce0      => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(meidx),
-        inputProjectionData_dataarray_data_V_q0       => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(meidx),
-        inputProjectionData_nentries_0_V => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(meidx)(6 downto 0),
-        inputProjectionData_nentries_1_V => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(meidx)(6 downto 0),
-        outputCandidateMatch_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_writeaddr(meidx),
-        outputCandidateMatch_dataarray_data_V_ce0      => open,
-        outputCandidateMatch_dataarray_data_V_we0      => CM_L3PHIC17to24_dataarray_data_V_wea(meidx),
-        outputCandidateMatch_dataarray_data_V_d0       => CM_L3PHIC17to24_dataarray_data_V_din(meidx)
-        );
+  ----------------------------------------------------------------
+  ---- VMStubME memories
+  ----------------------------------------------------------------
+  --gen_VMSME_L3PHIC17to24n1 : for vmsidx in 7 downto 0 generate
+  --begin
+  --  VMSME_L3PHIC17to24n1 : entity work.tf_mem_bin
+  --    generic map (
+  --      RAM_WIDTH       => 14,
+  --      RAM_DEPTH       => 1024,
+  --      INIT_FILE       => "",
+  --      INIT_HEX        =>  1,
+  --      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+  --      COUNT_NENT      => 1
+  --      )
+  --    port map (
+  --      clka       => clk,
+  --      wea        => VMSME_L3PHIC17to24n1_dataarray_data_V_wea(vmsidx),
+  --      addra      => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(vmsidx),
+  --      dina       => VMSME_L3PHIC17to24n1_dataarray_data_V_din(vmsidx),
+  --      clkb       => clk,
+  --      rstb       => '0',
+  --      regceb     => '1',
+  --      enb        => VMSME_L3PHIC17to24n1_dataarray_data_V_enb(vmsidx),
+  --      addrb      => VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr(vmsidx),
+  --      doutb      => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(vmsidx),
+  --      nent_0_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(0)(vmsidx)(3 downto 0),
+  --      nent_0_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(1)(vmsidx)(3 downto 0),
+  --      nent_0_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(2)(vmsidx)(3 downto 0),
+  --      nent_0_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(3)(vmsidx)(3 downto 0),
+  --      nent_0_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(4)(vmsidx)(3 downto 0),
+  --      nent_0_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(5)(vmsidx)(3 downto 0),
+  --      nent_0_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(6)(vmsidx)(3 downto 0),
+  --      nent_0_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(7)(vmsidx)(3 downto 0),
+  --      nent_1_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(0)(vmsidx)(3 downto 0),
+  --      nent_1_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(1)(vmsidx)(3 downto 0),
+  --      nent_1_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(2)(vmsidx)(3 downto 0),
+  --      nent_1_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(3)(vmsidx)(3 downto 0),
+  --      nent_1_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(4)(vmsidx)(3 downto 0),
+  --      nent_1_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(5)(vmsidx)(3 downto 0),
+  --      nent_1_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(6)(vmsidx)(3 downto 0),
+  --      nent_1_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(7)(vmsidx)(3 downto 0),
+  --      nent_2_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(0)(vmsidx)(3 downto 0),
+  --      nent_2_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(1)(vmsidx)(3 downto 0),
+  --      nent_2_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(2)(vmsidx)(3 downto 0),
+  --      nent_2_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(3)(vmsidx)(3 downto 0),
+  --      nent_2_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(4)(vmsidx)(3 downto 0),
+  --      nent_2_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(5)(vmsidx)(3 downto 0),
+  --      nent_2_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(6)(vmsidx)(3 downto 0),
+  --      nent_2_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(7)(vmsidx)(3 downto 0),
+  --      nent_3_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(0)(vmsidx)(3 downto 0),
+  --      nent_3_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(1)(vmsidx)(3 downto 0),
+  --      nent_3_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(2)(vmsidx)(3 downto 0),
+  --      nent_3_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(3)(vmsidx)(3 downto 0),
+  --      nent_3_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(4)(vmsidx)(3 downto 0),
+  --      nent_3_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(5)(vmsidx)(3 downto 0),
+  --      nent_3_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(6)(vmsidx)(3 downto 0),
+  --      nent_3_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(7)(vmsidx)(3 downto 0),
+  --      nent_4_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(0)(vmsidx)(3 downto 0),
+  --      nent_4_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(1)(vmsidx)(3 downto 0),
+  --      nent_4_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(2)(vmsidx)(3 downto 0),
+  --      nent_4_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(3)(vmsidx)(3 downto 0),
+  --      nent_4_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(4)(vmsidx)(3 downto 0),
+  --      nent_4_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(5)(vmsidx)(3 downto 0),
+  --      nent_4_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(6)(vmsidx)(3 downto 0),
+  --      nent_4_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(7)(vmsidx)(3 downto 0),
+  --      nent_5_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(0)(vmsidx)(3 downto 0),
+  --      nent_5_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(1)(vmsidx)(3 downto 0),
+  --      nent_5_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(2)(vmsidx)(3 downto 0),
+  --      nent_5_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(3)(vmsidx)(3 downto 0),
+  --      nent_5_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(4)(vmsidx)(3 downto 0),
+  --      nent_5_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(5)(vmsidx)(3 downto 0),
+  --      nent_5_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(6)(vmsidx)(3 downto 0),
+  --      nent_5_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(7)(vmsidx)(3 downto 0),
+  --      nent_6_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(0)(vmsidx)(3 downto 0),
+  --      nent_6_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(1)(vmsidx)(3 downto 0),
+  --      nent_6_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(2)(vmsidx)(3 downto 0),
+  --      nent_6_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(3)(vmsidx)(3 downto 0),
+  --      nent_6_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(4)(vmsidx)(3 downto 0),
+  --      nent_6_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(5)(vmsidx)(3 downto 0),
+  --      nent_6_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(6)(vmsidx)(3 downto 0),
+  --      nent_6_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(7)(vmsidx)(3 downto 0),
+  --      nent_7_o0  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(0)(vmsidx)(3 downto 0),
+  --      nent_7_o1  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(1)(vmsidx)(3 downto 0),
+  --      nent_7_o2  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(2)(vmsidx)(3 downto 0),
+  --      nent_7_o3  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(3)(vmsidx)(3 downto 0),
+  --      nent_7_o4  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(4)(vmsidx)(3 downto 0),
+  --      nent_7_o5  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(5)(vmsidx)(3 downto 0),
+  --      nent_7_o6  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(6)(vmsidx)(3 downto 0),
+  --      nent_7_o7  => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(7)(vmsidx)(3 downto 0)
+  --      );
 
-  end generate gen_ME;
-
-  --------------------------------------------------------------
-  -- AllStubs memory
-  --------------------------------------------------------------
-  AS_L3PHICn4 : entity work.tf_mem
-    generic map (
-      RAM_WIDTH       => 36,
-      RAM_DEPTH       => 1024,
-      INIT_FILE       => "",
-      INIT_HEX        =>  1,
-      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      COUNT_NENT      => 1
-      )
-    port map (
-      clka       => clk,
-      wea        => AS_L3PHICn4_dataarray_data_V_wea,
-      addra      => AS_L3PHICn4_dataarray_data_V_writeaddr,
-      dina       => AS_L3PHICn4_dataarray_data_V_din,
-      nent_we(0) =>  AS_L3PHICn4_nentries_V_we(0),
-      nent_i(0)  => AS_L3PHICn4_nentries_V_din(0),
-      nent_we(1) =>  AS_L3PHICn4_nentries_V_we(1),
-      nent_i(1)  => AS_L3PHICn4_nentries_V_din(1),
-      nent_we(2) =>  AS_L3PHICn4_nentries_V_we(2),
-      nent_i(2)  => AS_L3PHICn4_nentries_V_din(2),
-      nent_we(3) =>  AS_L3PHICn4_nentries_V_we(3),
-      nent_i(3)  => AS_L3PHICn4_nentries_V_din(3),
-      nent_we(4) =>  AS_L3PHICn4_nentries_V_we(4),
-      nent_i(4)  => AS_L3PHICn4_nentries_V_din(4),
-      nent_we(5) =>  AS_L3PHICn4_nentries_V_we(5),
-      nent_i(5)  => AS_L3PHICn4_nentries_V_din(5),
-      nent_we(6) =>  AS_L3PHICn4_nentries_V_we(6),
-      nent_i(6)  => AS_L3PHICn4_nentries_V_din(6),
-      nent_we(7) =>  AS_L3PHICn4_nentries_V_we(7),
-      nent_i(7)  => AS_L3PHICn4_nentries_V_din(7),
-      clkb       => clk,
-      rstb       => '0',
-      regceb     => '1',
-      enb        => AS_L3PHICn4_dataarray_data_V_enb,
-      addrb      => AS_L3PHICn4_dataarray_data_V_readaddr,
-      doutb      => AS_L3PHICn4_dataarray_data_V_dout,
-      nent_o(0)  => AS_L3PHICn4_nentries_V_dout(0),
-      nent_o(1)  => AS_L3PHICn4_nentries_V_dout(1),
-      nent_o(2)  => AS_L3PHICn4_nentries_V_dout(2),
-      nent_o(3)  => AS_L3PHICn4_nentries_V_dout(3),
-      nent_o(4)  => AS_L3PHICn4_nentries_V_dout(4),
-      nent_o(5)  => AS_L3PHICn4_nentries_V_dout(5),
-      nent_o(6)  => AS_L3PHICn4_nentries_V_dout(6),
-      nent_o(7)  => AS_L3PHICn4_nentries_V_dout(7)
-      );
+  --end generate gen_VMSME_L3PHIC17to24n1;
 
 
-  --------------------------------------------------------------
-  -- CandidateMatches memories
-  --------------------------------------------------------------
-  gen_CM_L3PHIC17to24 : for cmidx in 7 downto 0 generate
-  begin
-    CM_L3PHIC17to24 : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 14,
-        RAM_DEPTH       => 256,
-        INIT_FILE       => "",
-        INIT_HEX        =>  1,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        COUNT_NENT      => 1
-        )
-      port map (
-        clka       => clk,
-        wea        => CM_L3PHIC17to24_dataarray_data_V_wea(cmidx),
-        addra      => CM_L3PHIC17to24_dataarray_data_V_writeaddr(cmidx),
-        dina       => CM_L3PHIC17to24_dataarray_data_V_din(cmidx),
-        nent_we(0) => '0',
-        nent_i(0)  => (others=>'0'),
-        nent_we(1) => '0',
-        nent_i(1)  => (others=>'0'),
-        nent_we(2) => '0',
-        nent_i(2)  => (others=>'0'),
-        nent_we(3) => '0',
-        nent_i(3)  => (others=>'0'),
-        nent_we(4) => '0',
-        nent_i(4)  => (others=>'0'),
-        nent_we(5) => '0',
-        nent_i(5)  => (others=>'0'),
-        nent_we(6) => '0',
-        nent_i(6)  => (others=>'0'),
-        nent_we(7) => '0',
-        nent_i(7)  => (others=>'0'),
-        clkb       => clk,
-        rstb       => '0',
-        regceb     => '1',
-        enb        => CM_L3PHIC17to24_dataarray_data_V_enb(cmidx),
-        addrb      => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),
-        doutb      => CM_L3PHIC17to24_dataarray_data_V_dout(cmidx),
-        nent_o(0)  => CM_L3PHIC17to24_nentries_V_dout(0)(cmidx),
-        nent_o(1)  => CM_L3PHIC17to24_nentries_V_dout(1)(cmidx)
-        -- partially associated formal 'nent_o(others)' cannot have actual OPEN
-        );
+  ----------------------------------------------------------------
+  ---- MatchEngine
+  ----------------------------------------------------------------
+  --gen_ME : for meidx in 7 downto 0 generate
+  --begin
+  --  i_ME : entity work.MatchEngineTopL3_0
+  --    port map (
+  --      ap_clk   => clk,
+  --      ap_rst   => reset,
+  --      ap_start => ME_start,
+  --      ap_done  => ME_done(meidx),
+  --      ap_idle  => ME_idle,
+  --      ap_ready => ME_ready,
+  --      bx_V          => PR_bx_out,
+  --      bx_o_V        => ME_bx_out(meidx),
+  --      bx_o_V_ap_vld => ME_bx_out_vld(meidx),
+  --      inputStubData_dataarray_data_V_address0 => VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr(meidx),
+  --      inputStubData_dataarray_data_V_ce0      => VMSME_L3PHIC17to24n1_dataarray_data_V_enb(meidx),
+  --      inputStubData_dataarray_data_V_q0       => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(meidx)(12 downto 0),
+  --      inputStubData_nentries_0_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(0)(meidx),
+  --      inputStubData_nentries_0_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(1)(meidx),
+  --      inputStubData_nentries_0_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(2)(meidx),
+  --      inputStubData_nentries_0_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(3)(meidx),
+  --      inputStubData_nentries_0_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(4)(meidx),
+  --      inputStubData_nentries_0_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(5)(meidx),
+  --      inputStubData_nentries_0_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(6)(meidx),
+  --      inputStubData_nentries_0_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(7)(meidx),
+  --      inputStubData_nentries_1_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(0)(meidx),
+  --      inputStubData_nentries_1_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(1)(meidx),
+  --      inputStubData_nentries_1_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(2)(meidx),
+  --      inputStubData_nentries_1_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(3)(meidx),
+  --      inputStubData_nentries_1_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(4)(meidx),
+  --      inputStubData_nentries_1_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(5)(meidx),
+  --      inputStubData_nentries_1_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(6)(meidx),
+  --      inputStubData_nentries_1_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(1)(7)(meidx),
+  --      inputStubData_nentries_2_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(0)(meidx),
+  --      inputStubData_nentries_2_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(1)(meidx),
+  --      inputStubData_nentries_2_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(2)(meidx),
+  --      inputStubData_nentries_2_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(3)(meidx),
+  --      inputStubData_nentries_2_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(4)(meidx),
+  --      inputStubData_nentries_2_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(5)(meidx),
+  --      inputStubData_nentries_2_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(6)(meidx),
+  --      inputStubData_nentries_2_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(2)(7)(meidx),
+  --      inputStubData_nentries_3_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(0)(meidx),
+  --      inputStubData_nentries_3_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(1)(meidx),
+  --      inputStubData_nentries_3_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(2)(meidx),
+  --      inputStubData_nentries_3_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(3)(meidx),
+  --      inputStubData_nentries_3_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(4)(meidx),
+  --      inputStubData_nentries_3_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(5)(meidx),
+  --      inputStubData_nentries_3_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(6)(meidx),
+  --      inputStubData_nentries_3_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(3)(7)(meidx),
+  --      inputStubData_nentries_4_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(0)(meidx),
+  --      inputStubData_nentries_4_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(1)(meidx),
+  --      inputStubData_nentries_4_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(2)(meidx),
+  --      inputStubData_nentries_4_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(3)(meidx),
+  --      inputStubData_nentries_4_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(4)(meidx),
+  --      inputStubData_nentries_4_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(5)(meidx),
+  --      inputStubData_nentries_4_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(6)(meidx),
+  --      inputStubData_nentries_4_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(4)(7)(meidx),
+  --      inputStubData_nentries_5_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(0)(meidx),
+  --      inputStubData_nentries_5_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(1)(meidx),
+  --      inputStubData_nentries_5_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(2)(meidx),
+  --      inputStubData_nentries_5_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(3)(meidx),
+  --      inputStubData_nentries_5_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(4)(meidx),
+  --      inputStubData_nentries_5_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(5)(meidx),
+  --      inputStubData_nentries_5_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(6)(meidx),
+  --      inputStubData_nentries_5_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(5)(7)(meidx),
+  --      inputStubData_nentries_6_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(0)(meidx),
+  --      inputStubData_nentries_6_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(1)(meidx),
+  --      inputStubData_nentries_6_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(2)(meidx),
+  --      inputStubData_nentries_6_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(3)(meidx),
+  --      inputStubData_nentries_6_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(4)(meidx),
+  --      inputStubData_nentries_6_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(5)(meidx),
+  --      inputStubData_nentries_6_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(6)(meidx),
+  --      inputStubData_nentries_6_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(6)(7)(meidx),
+  --      inputStubData_nentries_7_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(0)(meidx),
+  --      inputStubData_nentries_7_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(1)(meidx),
+  --      inputStubData_nentries_7_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(2)(meidx),
+  --      inputStubData_nentries_7_V_3 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(3)(meidx),
+  --      inputStubData_nentries_7_V_4 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(4)(meidx),
+  --      inputStubData_nentries_7_V_5 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(5)(meidx),
+  --      inputStubData_nentries_7_V_6 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(6)(meidx),
+  --      inputStubData_nentries_7_V_7 => VMSME_L3PHIC17to24n1_nentries_V_dout(7)(7)(meidx),
+  --      inputProjectionData_dataarray_data_V_address0 => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(meidx),
+  --      inputProjectionData_dataarray_data_V_ce0      => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(meidx),
+  --      inputProjectionData_dataarray_data_V_q0       => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(meidx),
+  --      inputProjectionData_nentries_0_V => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(meidx)(6 downto 0),
+  --      inputProjectionData_nentries_1_V => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(meidx)(6 downto 0),
+  --      outputCandidateMatch_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_writeaddr(meidx),
+  --      outputCandidateMatch_dataarray_data_V_ce0      => open,
+  --      outputCandidateMatch_dataarray_data_V_we0      => CM_L3PHIC17to24_dataarray_data_V_wea(meidx),
+  --      outputCandidateMatch_dataarray_data_V_d0       => CM_L3PHIC17to24_dataarray_data_V_din(meidx)
+  --      );
 
-  end generate gen_CM_L3PHIC17to24;
+  --end generate gen_ME;
+
+  ----------------------------------------------------------------
+  ---- AllStubs memory
+  ----------------------------------------------------------------
+  --AS_L3PHICn4 : entity work.tf_mem
+  --  generic map (
+  --    RAM_WIDTH       => 36,
+  --    RAM_DEPTH       => 1024,
+  --    INIT_FILE       => "",
+  --    INIT_HEX        =>  1,
+  --    RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+  --    COUNT_NENT      => 1
+  --    )
+  --  port map (
+  --    clka       => clk,
+  --    wea        => AS_L3PHICn4_dataarray_data_V_wea,
+  --    addra      => AS_L3PHICn4_dataarray_data_V_writeaddr,
+  --    dina       => AS_L3PHICn4_dataarray_data_V_din,
+  --    clkb       => clk,
+  --    rstb       => '0',
+  --    regceb     => '1',
+  --    enb        => AS_L3PHICn4_dataarray_data_V_enb,
+  --    addrb      => AS_L3PHICn4_dataarray_data_V_readaddr,
+  --    doutb      => AS_L3PHICn4_dataarray_data_V_dout,
+  --    nent_o(0)  => AS_L3PHICn4_nentries_V_dout(0),
+  --    nent_o(1)  => AS_L3PHICn4_nentries_V_dout(1),
+  --    nent_o(2)  => AS_L3PHICn4_nentries_V_dout(2),
+  --    nent_o(3)  => AS_L3PHICn4_nentries_V_dout(3),
+  --    nent_o(4)  => AS_L3PHICn4_nentries_V_dout(4),
+  --    nent_o(5)  => AS_L3PHICn4_nentries_V_dout(5),
+  --    nent_o(6)  => AS_L3PHICn4_nentries_V_dout(6),
+  --    nent_o(7)  => AS_L3PHICn4_nentries_V_dout(7)
+  --    );
 
 
-  --------------------------------------------------------------
-  -- MatchCalculator
-  --------------------------------------------------------------
-  MC_L3PHIC : entity work.MC_L3PHIC
-    port map (
-      ap_clk   => clk,
-      ap_rst   => reset,
-      ap_start => MC_start,
-      ap_done  => MC_done,
-      ap_idle  => MC_idle,
-      ap_ready => MC_ready,
-      bx_V     => ME_bx_out(0), -- All MEs should have the same counter value
-      match_0_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(0),
-      match_0_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(0),
-      match_0_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(0),
-      match_0_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(0)(6 downto 0),
-      match_0_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(0)(6 downto 0),
-      match_1_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(1),
-      match_1_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(1),
-      match_1_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(1),
-      match_1_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(1)(6 downto 0),
-      match_1_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(1)(6 downto 0),
-      match_2_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(2),
-      match_2_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(2),
-      match_2_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(2),
-      match_2_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(2)(6 downto 0),
-      match_2_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(2)(6 downto 0),
-      match_3_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(3),
-      match_3_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(3),
-      match_3_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(3),
-      match_3_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(3)(6 downto 0),
-      match_3_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(3)(6 downto 0),
-      match_4_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(4),
-      match_4_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(4),
-      match_4_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(4),
-      match_4_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(4)(6 downto 0),
-      match_4_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(4)(6 downto 0),
-      match_5_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(5),
-      match_5_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(5),
-      match_5_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(5),
-      match_5_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(5)(6 downto 0),
-      match_5_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(5)(6 downto 0),
-      match_6_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(6),
-      match_6_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(6),
-      match_6_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(6),
-      match_6_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(6)(6 downto 0),
-      match_6_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(6)(6 downto 0),
-      match_7_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(7),
-      match_7_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(7),
-      match_7_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(7),
-      match_7_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(7)(6 downto 0),
-      match_7_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(7)(6 downto 0),
-      allstub_dataarray_data_V_address0 => AS_L3PHICn4_dataarray_data_V_readaddr,
-      allstub_dataarray_data_V_ce0      => AS_L3PHICn4_dataarray_data_V_enb,
-      allstub_dataarray_data_V_q0       => AS_L3PHICn4_dataarray_data_V_dout,
-      allproj_dataarray_data_V_address0 => AP_L3PHIC_dataarray_data_V_readaddr,
-      allproj_dataarray_data_V_ce0      => AP_L3PHIC_dataarray_data_V_enb,
-      allproj_dataarray_data_V_q0       => AP_L3PHIC_dataarray_data_V_dout,
-      bx_o_V        => MC_bx_out,
-      bx_o_V_ap_vld => MC_bx_out_vld,
-      fullmatch_0_dataarray_data_V_address0 => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
-      fullmatch_0_dataarray_data_V_ce0      => open,
-      fullmatch_0_dataarray_data_V_we0      => FM_L1L2_L3PHIC_dataarray_data_V_wea,
-      fullmatch_0_dataarray_data_V_d0       => FM_L1L2_L3PHIC_dataarray_data_V_din,
-      fullmatch_3_dataarray_data_V_address0 => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
-      fullmatch_3_dataarray_data_V_ce0      => open,
-      fullmatch_3_dataarray_data_V_we0      => FM_L5L6_L3PHIC_dataarray_data_V_wea,
-      fullmatch_3_dataarray_data_V_d0       => FM_L5L6_L3PHIC_dataarray_data_V_din
-      );
+  ----------------------------------------------------------------
+  ---- CandidateMatches memories
+  ----------------------------------------------------------------
+  --gen_CM_L3PHIC17to24 : for cmidx in 7 downto 0 generate
+  --begin
+  --  CM_L3PHIC17to24 : entity work.tf_mem
+  --    generic map (
+  --      RAM_WIDTH       => 14,
+  --      RAM_DEPTH       => 256,
+  --      INIT_FILE       => "",
+  --      INIT_HEX        =>  1,
+  --      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+  --      COUNT_NENT      => 1
+  --      )
+  --    port map (
+  --      clka       => clk,
+  --      wea        => CM_L3PHIC17to24_dataarray_data_V_wea(cmidx),
+  --      addra      => CM_L3PHIC17to24_dataarray_data_V_writeaddr(cmidx),
+  --      dina       => CM_L3PHIC17to24_dataarray_data_V_din(cmidx),
+  --      nent_we(0) => '0',
+  --      nent_i(0)  => (others=>'0'),
+  --      nent_we(1) => '0',
+  --      nent_i(1)  => (others=>'0'),
+  --      nent_we(2) => '0',
+  --      nent_i(2)  => (others=>'0'),
+  --      nent_we(3) => '0',
+  --      nent_i(3)  => (others=>'0'),
+  --      nent_we(4) => '0',
+  --      nent_i(4)  => (others=>'0'),
+  --      nent_we(5) => '0',
+  --      nent_i(5)  => (others=>'0'),
+  --      nent_we(6) => '0',
+  --      nent_i(6)  => (others=>'0'),
+  --      nent_we(7) => '0',
+  --      nent_i(7)  => (others=>'0'),
+  --      clkb       => clk,
+  --      rstb       => '0',
+  --      regceb     => '1',
+  --      enb        => CM_L3PHIC17to24_dataarray_data_V_enb(cmidx),
+  --      addrb      => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),
+  --      doutb      => CM_L3PHIC17to24_dataarray_data_V_dout(cmidx),
+  --      nent_o(0)  => CM_L3PHIC17to24_nentries_V_dout(0)(cmidx),
+  --      nent_o(1)  => CM_L3PHIC17to24_nentries_V_dout(1)(cmidx)
+  --      -- partially associated formal 'nent_o(others)' cannot have actual OPEN
+  --      );
+
+  --end generate gen_CM_L3PHIC17to24;
 
 
-  --------------------------------------------------------------
-  -- FullMatches memories
-  --------------------------------------------------------------
-  FM_L1L2_L3PHIC : entity work.tf_mem
-    generic map (
-      RAM_WIDTH       => 45,
-      RAM_DEPTH       => 256,
-      INIT_FILE       => "",
-      INIT_HEX        =>  1,
-      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      COUNT_NENT      => 1
-      )
-    port map (
-      clka       => clk,
-      wea        => FM_L1L2_L3PHIC_dataarray_data_V_wea,
-      addra      => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
-      dina       => FM_L1L2_L3PHIC_dataarray_data_V_din,
-      nent_we(0) => '0',
-      nent_i(0)  => (others=>'0'),
-      nent_we(1) => '0',
-      nent_i(1)  => (others=>'0'),
-      nent_we(2) => '0',
-      nent_i(2)  => (others=>'0'),
-      nent_we(3) => '0',
-      nent_i(3)  => (others=>'0'),
-      nent_we(4) => '0',
-      nent_i(4)  => (others=>'0'),
-      nent_we(5) => '0',
-      nent_i(5)  => (others=>'0'),
-      nent_we(6) => '0',
-      nent_i(6)  => (others=>'0'),
-      nent_we(7) => '0',
-      nent_i(7)  => (others=>'0'),
-      clkb       => clk,
-      rstb       => '0',
-      regceb     => '1',
-      enb        => FM_L1L2_L3PHIC_dataarray_data_V_enb,
-      addrb      => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
-      doutb      => FM_L1L2_L3PHIC_dataarray_data_V_dout,
-      nent_o(0)  => FM_L1L2_L3PHIC_nentries_V_dout(0),
-      nent_o(1)  => FM_L1L2_L3PHIC_nentries_V_dout(1)
-      -- partially associated formal 'nent_o(others)' cannot have actual OPEN
-      );
+  ----------------------------------------------------------------
+  ---- MatchCalculator
+  ----------------------------------------------------------------
+  --MC_L3PHIC : entity work.MC_L3PHIC
+  --  port map (
+  --    ap_clk   => clk,
+  --    ap_rst   => reset,
+  --    ap_start => MC_start,
+  --    ap_done  => MC_done,
+  --    ap_idle  => MC_idle,
+  --    ap_ready => MC_ready,
+  --    bx_V     => ME_bx_out(0), -- All MEs should have the same counter value
+  --    match_0_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(0),
+  --    match_0_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(0),
+  --    match_0_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(0),
+  --    match_0_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(0)(6 downto 0),
+  --    match_0_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(0)(6 downto 0),
+  --    match_1_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(1),
+  --    match_1_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(1),
+  --    match_1_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(1),
+  --    match_1_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(1)(6 downto 0),
+  --    match_1_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(1)(6 downto 0),
+  --    match_2_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(2),
+  --    match_2_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(2),
+  --    match_2_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(2),
+  --    match_2_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(2)(6 downto 0),
+  --    match_2_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(2)(6 downto 0),
+  --    match_3_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(3),
+  --    match_3_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(3),
+  --    match_3_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(3),
+  --    match_3_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(3)(6 downto 0),
+  --    match_3_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(3)(6 downto 0),
+  --    match_4_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(4),
+  --    match_4_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(4),
+  --    match_4_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(4),
+  --    match_4_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(4)(6 downto 0),
+  --    match_4_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(4)(6 downto 0),
+  --    match_5_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(5),
+  --    match_5_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(5),
+  --    match_5_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(5),
+  --    match_5_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(5)(6 downto 0),
+  --    match_5_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(5)(6 downto 0),
+  --    match_6_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(6),
+  --    match_6_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(6),
+  --    match_6_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(6),
+  --    match_6_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(6)(6 downto 0),
+  --    match_6_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(6)(6 downto 0),
+  --    match_7_dataarray_data_V_address0 => CM_L3PHIC17to24_dataarray_data_V_readaddr(7),
+  --    match_7_dataarray_data_V_ce0      => CM_L3PHIC17to24_dataarray_data_V_enb(7),
+  --    match_7_dataarray_data_V_q0       => CM_L3PHIC17to24_dataarray_data_V_dout(7),
+  --    match_7_nentries_0_V              => CM_L3PHIC17to24_nentries_V_dout(0)(7)(6 downto 0),
+  --    match_7_nentries_1_V              => CM_L3PHIC17to24_nentries_V_dout(1)(7)(6 downto 0),
+  --    allstub_dataarray_data_V_address0 => AS_L3PHICn4_dataarray_data_V_readaddr,
+  --    allstub_dataarray_data_V_ce0      => AS_L3PHICn4_dataarray_data_V_enb,
+  --    allstub_dataarray_data_V_q0       => AS_L3PHICn4_dataarray_data_V_dout,
+  --    allproj_dataarray_data_V_address0 => AP_L3PHIC_dataarray_data_V_readaddr,
+  --    allproj_dataarray_data_V_ce0      => AP_L3PHIC_dataarray_data_V_enb,
+  --    allproj_dataarray_data_V_q0       => AP_L3PHIC_dataarray_data_V_dout,
+  --    bx_o_V        => MC_bx_out,
+  --    bx_o_V_ap_vld => MC_bx_out_vld,
+  --    fullmatch_0_dataarray_data_V_address0 => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
+  --    fullmatch_0_dataarray_data_V_ce0      => open,
+  --    fullmatch_0_dataarray_data_V_we0      => FM_L1L2_L3PHIC_dataarray_data_V_wea,
+  --    fullmatch_0_dataarray_data_V_d0       => FM_L1L2_L3PHIC_dataarray_data_V_din,
+  --    fullmatch_3_dataarray_data_V_address0 => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
+  --    fullmatch_3_dataarray_data_V_ce0      => open,
+  --    fullmatch_3_dataarray_data_V_we0      => FM_L5L6_L3PHIC_dataarray_data_V_wea,
+  --    fullmatch_3_dataarray_data_V_d0       => FM_L5L6_L3PHIC_dataarray_data_V_din
+  --    );
 
-  FM_L5L6_L3PHIC : entity work.tf_mem
-    generic map (
-      RAM_WIDTH       => 45,
-      RAM_DEPTH       => 256,
-      INIT_FILE       => "",
-      INIT_HEX        =>  1,
-      RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-      COUNT_NENT      => 1
-      )
-    port map (
-      clka       => clk,
-      wea        => FM_L5L6_L3PHIC_dataarray_data_V_wea,
-      addra      => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
-      dina       => FM_L5L6_L3PHIC_dataarray_data_V_din,
-      nent_we(0) => '0',
-      nent_i(0)  => (others=>'0'),
-      nent_we(1) => '0',
-      nent_i(1)  => (others=>'0'),
-      nent_we(2) => '0',
-      nent_i(2)  => (others=>'0'),
-      nent_we(3) => '0',
-      nent_i(3)  => (others=>'0'),
-      nent_we(4) => '0',
-      nent_i(4)  => (others=>'0'),
-      nent_we(5) => '0',
-      nent_i(5)  => (others=>'0'),
-      nent_we(6) => '0',
-      nent_i(6)  => (others=>'0'),
-      nent_we(7) => '0',
-      nent_i(7)  => (others=>'0'),
-      clkb       => clk,
-      rstb       => '0',
-      regceb     => '1',
-      enb        => FM_L5L6_L3PHIC_dataarray_data_V_enb,
-      addrb      => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
-      doutb      => FM_L5L6_L3PHIC_dataarray_data_V_dout,
-      nent_o(0)  => FM_L5L6_L3PHIC_nentries_V_dout(0),
-      nent_o(1)  => FM_L5L6_L3PHIC_nentries_V_dout(1)
-      -- partially associated formal 'nent_o(others)' cannot have actual OPEN
-      );
+
+  ----------------------------------------------------------------
+  ---- FullMatches memories
+  ----------------------------------------------------------------
+  --FM_L1L2_L3PHIC : entity work.tf_mem
+  --  generic map (
+  --    RAM_WIDTH       => 45,
+  --    RAM_DEPTH       => 256,
+  --    INIT_FILE       => "",
+  --    INIT_HEX        =>  1,
+  --    RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+  --    COUNT_NENT      => 1
+  --    )
+  --  port map (
+  --    clka       => clk,
+  --    wea        => FM_L1L2_L3PHIC_dataarray_data_V_wea,
+  --    addra      => FM_L1L2_L3PHIC_dataarray_data_V_writeaddr,
+  --    dina       => FM_L1L2_L3PHIC_dataarray_data_V_din,
+  --    nent_we(0) => '0',
+  --    nent_i(0)  => (others=>'0'),
+  --    nent_we(1) => '0',
+  --    nent_i(1)  => (others=>'0'),
+  --    nent_we(2) => '0',
+  --    nent_i(2)  => (others=>'0'),
+  --    nent_we(3) => '0',
+  --    nent_i(3)  => (others=>'0'),
+  --    nent_we(4) => '0',
+  --    nent_i(4)  => (others=>'0'),
+  --    nent_we(5) => '0',
+  --    nent_i(5)  => (others=>'0'),
+  --    nent_we(6) => '0',
+  --    nent_i(6)  => (others=>'0'),
+  --    nent_we(7) => '0',
+  --    nent_i(7)  => (others=>'0'),
+  --    clkb       => clk,
+  --    rstb       => '0',
+  --    regceb     => '1',
+  --    enb        => FM_L1L2_L3PHIC_dataarray_data_V_enb,
+  --    addrb      => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
+  --    doutb      => FM_L1L2_L3PHIC_dataarray_data_V_dout,
+  --    nent_o(0)  => FM_L1L2_L3PHIC_nentries_V_dout(0),
+  --    nent_o(1)  => FM_L1L2_L3PHIC_nentries_V_dout(1)
+  --    -- partially associated formal 'nent_o(others)' cannot have actual OPEN
+  --    );
+
+  --FM_L5L6_L3PHIC : entity work.tf_mem
+  --  generic map (
+  --    RAM_WIDTH       => 45,
+  --    RAM_DEPTH       => 256,
+  --    INIT_FILE       => "",
+  --    INIT_HEX        =>  1,
+  --    RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+  --    COUNT_NENT      => 1
+  --    )
+  --  port map (
+  --    clka       => clk,
+  --    wea        => FM_L5L6_L3PHIC_dataarray_data_V_wea,
+  --    addra      => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
+  --    dina       => FM_L5L6_L3PHIC_dataarray_data_V_din,
+  --    nent_we(0) => '0',
+  --    nent_i(0)  => (others=>'0'),
+  --    nent_we(1) => '0',
+  --    nent_i(1)  => (others=>'0'),
+  --    nent_we(2) => '0',
+  --    nent_i(2)  => (others=>'0'),
+  --    nent_we(3) => '0',
+  --    nent_i(3)  => (others=>'0'),
+  --    nent_we(4) => '0',
+  --    nent_i(4)  => (others=>'0'),
+  --    nent_we(5) => '0',
+  --    nent_i(5)  => (others=>'0'),
+  --    nent_we(6) => '0',
+  --    nent_i(6)  => (others=>'0'),
+  --    nent_we(7) => '0',
+  --    nent_i(7)  => (others=>'0'),
+  --    clkb       => clk,
+  --    rstb       => '0',
+  --    regceb     => '1',
+  --    enb        => FM_L5L6_L3PHIC_dataarray_data_V_enb,
+  --    addrb      => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
+  --    doutb      => FM_L5L6_L3PHIC_dataarray_data_V_dout,
+  --    nent_o(0)  => FM_L5L6_L3PHIC_nentries_V_dout(0),
+  --    nent_o(1)  => FM_L5L6_L3PHIC_nentries_V_dout(1)
+  --    -- partially associated formal 'nent_o(others)' cannot have actual OPEN
+  --    );
 
 end rtl;
