@@ -98,6 +98,7 @@ launch_simulation
 open_wave_config {./tb/prmemc.wcfg}
 open_wave_config {./tb/start_bx.wcfg}
 open_wave_config {./tb/tf_top.wcfg}
+open_wave_config {./tb/mem_tf.wcfg}
 restart
 run 50 us
 

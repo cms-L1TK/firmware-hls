@@ -111,29 +111,23 @@ architecture behavior of tb_tf_top is
   signal TPROJ_L3PHIC_dataarray_data_V_wea       : t_arr8_1b   := (others => '0');
   signal TPROJ_L3PHIC_dataarray_data_V_writeaddr : t_arr8_8b   := (others => (others => '0'));
   signal TPROJ_L3PHIC_dataarray_data_V_din       : t_arr8_60b  := (others => (others => '0'));
-  signal TPROJ_L3PHIC_nentries_V_we  : t_arr2_8_1b := (others => (others => '0'));
-  signal TPROJ_L3PHIC_nentries_V_din : t_arr2_8_8b := (others => (others => (others => '0')));
   -- For VMStubME memories
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : t_arr8_1b  := (others => '0');
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : t_arr8_10b  := (others => (others => '0'));
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_arr8_14b := (others => (others => '0'));
-  signal VMSME_L3PHIC17to24n1_nentries_V_we  : t_arr8_8_8_1b := (others => (others => (others => '0')));             -- (#page, #bin, #mem)
-  signal VMSME_L3PHIC17to24n1_nentries_V_din : t_arr8_8_8_4b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem)
   -- For AllStubs memories
   signal AS_L3PHICn4_dataarray_data_V_wea       : std_logic                     := '0';
   signal AS_L3PHICn4_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0)  := (others => '0');
   signal AS_L3PHICn4_dataarray_data_V_din       : std_logic_vector(35 downto 0) := (others => '0');
-  signal AS_L3PHICn4_nentries_V_we  : t_arr8_1b := (others => '0');
-  signal AS_L3PHICn4_nentries_V_din : t_arr8_8b := (others => (others => '0'));
   -- FullMatches output
   signal FM_L1L2_L3PHIC_dataarray_data_V_enb      : std_logic                     := '0';
   signal FM_L1L2_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(7 downto 0)  := (others => '0');
   signal FM_L1L2_L3PHIC_dataarray_data_V_dout     : std_logic_vector(44 downto 0);
-  signal FM_L1L2_L3PHIC_nentries_V_dout : t_arr2_8b;
+  signal FM_L1L2_L3PHIC_nentries_V_dout : t_arr2_7b;
   signal FM_L5L6_L3PHIC_dataarray_data_V_enb      : std_logic                     := '0';
   signal FM_L5L6_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(7 downto 0)  := (others => '0');
   signal FM_L5L6_L3PHIC_dataarray_data_V_dout     : std_logic_vector(44 downto 0);
-  signal FM_L5L6_L3PHIC_nentries_V_dout : t_arr2_8b;
+  signal FM_L5L6_L3PHIC_nentries_V_dout : t_arr2_7b;
   -- MatchCalculator outputs
   signal MC_bx_out     : std_logic_vector(2 downto 0);
   signal MC_bx_out_vld : std_logic;
@@ -158,14 +152,10 @@ architecture behavior of tb_tf_top is
   signal AP_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal AP_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0);
   signal AP_L3PHIC_dataarray_data_V_din       : std_logic_vector(59 downto 0);
-  --signal AP_L3PHIC_nentries_V_we  : t_arr8_1b;
-  --signal AP_L3PHIC_nentries_V_din : t_arr8_8b;
   -- VMProjection output
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : t_arr8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : t_arr8_8b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_din       : t_arr8_21b;
-  --signal VMPROJ_L3PHIC17to24_nentries_V_we  : t_arr2_8_1b;
-  --signal VMPROJ_L3PHIC17to24_nentries_V_din : t_arr2_8_8b;
   -- MatchEngine output
   signal ME_bx_out     : t_arr8_3b;
   signal ME_bx_out_vld : t_arr8_1b;
@@ -174,8 +164,6 @@ architecture behavior of tb_tf_top is
   signal CM_L3PHIC17to24_dataarray_data_V_wea       : t_arr8_1b;
   signal CM_L3PHIC17to24_dataarray_data_V_writeaddr : t_arr8_8b;
   signal CM_L3PHIC17to24_dataarray_data_V_din       : t_arr8_14b;
-  --signal CM_L3PHIC17to24_nentries_V_we  : t_arr2_8_1b;
-  --signal CM_L3PHIC17to24_nentries_V_din : t_arr2_8_8b;
 
 
 begin
@@ -283,26 +271,21 @@ begin
           -- TPROJ
           if (v_bx_cnt<MAX_EVENTS-1) then -- Start early
             TPROJ_L3PHIC_dataarray_data_V_wea <= (others => '1');
-            TPROJ_L3PHIC_nentries_V_we        <= (others => (others => '1'));
             TPROJ_L3PHIC_dataarray_data_V_writeaddr(cp) <= std_logic_vector(to_unsigned(addr+PAGE_OFFSET*v_page_cnt2_d1, TPROJ_L3PHIC_dataarray_data_V_writeaddr(0)'length));
             TPROJ_L3PHIC_dataarray_data_V_din(cp)       <= TPROJ_L3PHICn4_data_arr(cp)(v_bx_cnt+1,addr+PAGE_OFFSET*v_page_cnt2_d1) (TPROJ_L3PHIC_dataarray_data_V_din(0)'length-1 downto 0);
-            TPROJ_L3PHIC_nentries_V_din(v_page_cnt2_d1)(cp) <= std_logic_vector(to_unsigned(TPROJ_L3PHICn4_n_entries_arr(cp)(v_bx_cnt+1), TPROJ_L3PHIC_nentries_V_din(0)(0)'length));
           end if;
           -- VMSME & PR_start
           PR_start <= '0'; -- Default assigment
           if (v_bx_cnt>=VMSME_DELAY and v_bx_cnt<MAX_EVENTS) then -- Start after delay of BXs
             PR_start <= '1';
             VMSME_L3PHIC17to24n1_dataarray_data_V_wea(cp) <= '1';                                     -- Default assigment
-            VMSME_L3PHIC17to24n1_nentries_V_we            <= (others => (others => (others => '1'))); -- Default assigment
             if v_bin_cnt(cp)<=N_MEM_BINS-1 then -- Valid bin
               v_VMSME_n_entries_bin(cp) := VMSME_L3PHIC17to24n1_n_entries_arr(cp)(v_bx_cnt-VMSME_DELAY,v_bin_cnt(cp));
-              VMSME_L3PHIC17to24n1_nentries_V_din(((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS))(v_bin_cnt(cp))(cp) <= std_logic_vector(to_unsigned(v_VMSME_n_entries_bin(cp), VMSME_L3PHIC17to24n1_nentries_V_din(0)(0)(0)'length));
             end if;
             l_bin_empty : while (v_VMSME_n_entries_bin(cp)<=0) loop -- Bin empty
               v_bin_cnt(cp)             := v_bin_cnt(cp) +1; -- Skip empty bin
               if v_bin_cnt(cp)<=N_MEM_BINS-1 then -- Valid bin
                 v_VMSME_n_entries_bin(cp) := VMSME_L3PHIC17to24n1_n_entries_arr(cp)(v_bx_cnt-VMSME_DELAY,v_bin_cnt(cp));
-                VMSME_L3PHIC17to24n1_nentries_V_din(((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS))(v_bin_cnt(cp))(cp) <= std_logic_vector(to_unsigned(v_VMSME_n_entries_bin(cp), VMSME_L3PHIC17to24n1_nentries_V_din(0)(0)(0)'length));
               else
                 v_bin_cnt(cp) := N_MEM_BINS;
                 exit;
@@ -333,17 +316,14 @@ begin
               v_bin_cnt(cp) := N_MEM_BINS; 
               if v_last_bin=false then
                 VMSME_L3PHIC17to24n1_dataarray_data_V_wea(cp) <= '0';
-                VMSME_L3PHIC17to24n1_nentries_V_we            <= (others => (others => (others => '0')));
               end if;
             end if;
           end if;
           -- AS
           if (v_bx_cnt>=AS_DELAY and v_bx_cnt<MAX_EVENTS-1) then -- Start after delay of BXs
             AS_L3PHICn4_dataarray_data_V_wea <= '1';
-            AS_L3PHICn4_nentries_V_we        <= (others => '1');
             AS_L3PHICn4_dataarray_data_V_writeaddr  <= std_logic_vector(to_unsigned(addr+(PAGE_OFFSET*((v_page_cnt8-AS_DELAY) mod N_MEM_BINS)),AS_L3PHICn4_dataarray_data_V_writeaddr'length));
             AS_L3PHICn4_dataarray_data_V_din        <= AS_L3PHICn4_data_arr(v_bx_cnt-AS_DELAY,addr+(PAGE_OFFSET*((v_page_cnt8-AS_DELAY) mod N_MEM_BINS))) (AS_L3PHICn4_dataarray_data_V_din'length-1 downto 0); 
-            AS_L3PHICn4_nentries_V_din((v_page_cnt8-AS_DELAY) mod N_MEM_BINS) <= std_logic_vector(to_unsigned(AS_L3PHICn4_n_entries_arr(v_bx_cnt-AS_DELAY), AS_L3PHICn4_nentries_V_din(0)'length));
           end if;
         end loop l_copies;
         wait for CLK_PERIOD; -- Main time control
@@ -558,12 +538,9 @@ begin
           v_bx_cnt := v_bx_cnt + 1;
         end if;
         if (AP_L3PHIC_dataarray_data_V_wea='1') then -- Only write valid data
-                --or AP_L3PHIC_nentries_V_we(0)='1' or AP_L3PHIC_nentries_V_we(1)='1' or
-                --AP_L3PHIC_nentries_V_we(2)='1' or AP_L3PHIC_nentries_V_we(3)='1' or AP_L3PHIC_nentries_V_we(4)='1' or
-                --AP_L3PHIC_nentries_V_we(5)='1' or AP_L3PHIC_nentries_V_we(6)='1' or AP_L3PHIC_nentries_V_we(7)='1') then -- Only write valid data
           write_emData_line_8p(reset, v_bx_cnt, PR_done, PR_bx_out, PR_bx_out_vld, FILE_OUT_AP, "AP_L3PHIC_dataarray_data_V_din",
                                AP_L3PHIC_dataarray_data_V_din, AP_L3PHIC_dataarray_data_V_wea, AP_L3PHIC_dataarray_data_V_writeaddr,
-                               (others => (others => '0')), (others => '0') );--AP_L3PHIC_nentries_V_din, AP_L3PHIC_nentries_V_we );
+                               (others => (others => '0')), (others => '0') );
         end if;
         wait for CLK_PERIOD; -- Main time control
       end loop l_BX;
@@ -587,9 +564,6 @@ begin
         end if;
         l_copies : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7
           if (VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp)='1') then -- Only write valid data
-          --if (VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp)='1' or VMPROJ_L3PHIC17to24_nentries_V_we(0)(cp)='1' or VMPROJ_L3PHIC17to24_nentries_V_we(1)(cp)='1') then -- Only write valid data
-            --myarray2_8b := (VMPROJ_L3PHIC17to24_nentries_V_din(0)(cp)) & (VMPROJ_L3PHIC17to24_nentries_V_din(1)(cp)); -- Needed to avoid sim error (casting does not work)
-            --myarray2_1b := (VMPROJ_L3PHIC17to24_nentries_V_we(0)(cp))  & (VMPROJ_L3PHIC17to24_nentries_V_we(1)(cp));  -- Needed to avoid sim error (casting does not work)
             write_emData_line_2p(reset, v_bx_cnt, PR_done, PR_bx_out, PR_bx_out_vld, FILE_OUT_VMP(cp), "VMPROJ_L3PHIC17to24_dataarray_data_V_din",
                                  VMPROJ_L3PHIC17to24_dataarray_data_V_din(cp), VMPROJ_L3PHIC17to24_dataarray_data_V_wea(cp), VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(cp),
                                  myarray2_8b, myarray2_1b );
@@ -618,10 +592,7 @@ begin
         end if;
         l_copies : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7
           if (CM_L3PHIC17to24_dataarray_data_V_wea(cp)='1') then
-          --if (CM_L3PHIC17to24_dataarray_data_V_wea(cp)='1' or CM_L3PHIC17to24_nentries_V_we(0)(cp)='1' or CM_L3PHIC17to24_nentries_V_we(1)(cp)='1') then -- Only write valid data
-            --myarray2_8b := (CM_L3PHIC17to24_nentries_V_din(0)(cp)) & (CM_L3PHIC17to24_nentries_V_din(1)(cp)); -- Needed to avoid sim error (casting does not work)
-            --myarray2_1b := (CM_L3PHIC17to24_nentries_V_we(0)(cp))  & (CM_L3PHIC17to24_nentries_V_we(1)(cp));  -- Needed to avoid sim error (casting does not work)
-            write_emData_line_2p(reset, v_bx_cnt, ME_all_done, ME_bx_out(cp), ME_bx_out_vld(cp), FILE_OUT_CM(cp), "CM_L3PHIC17to24_dataarray_data_V_din",
+           write_emData_line_2p(reset, v_bx_cnt, ME_all_done, ME_bx_out(cp), ME_bx_out_vld(cp), FILE_OUT_CM(cp), "CM_L3PHIC17to24_dataarray_data_V_din",
                                  CM_L3PHIC17to24_dataarray_data_V_din(cp), CM_L3PHIC17to24_dataarray_data_V_wea(cp), CM_L3PHIC17to24_dataarray_data_V_writeaddr(cp),
                                  myarray2_8b, myarray2_1b );
           end if;

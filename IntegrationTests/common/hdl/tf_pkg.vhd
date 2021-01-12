@@ -45,21 +45,24 @@ package tf_pkg is
 
   -- ########################### Types ###########################
   -- 2D
-  type t_arr2_1b  is array(1 downto 0) of std_logic;
-  type t_arr2_8b  is array(1 downto 0) of std_logic_vector(7 downto 0);
-  type t_arr8_1b  is array(7 downto 0) of std_logic;
-  type t_arr8_2b  is array(7 downto 0) of std_logic_vector(1 downto 0);
-  type t_arr8_3b  is array(7 downto 0) of std_logic_vector(2 downto 0);
-  type t_arr8_4b  is array(7 downto 0) of std_logic_vector(3 downto 0);
-  type t_arr8_5b  is array(7 downto 0) of std_logic_vector(4 downto 0);
-  type t_arr8_8b  is array(7 downto 0) of std_logic_vector(7 downto 0);
-  type t_arr8_9b  is array(7 downto 0) of std_logic_vector(8 downto 0);
-  type t_arr8_10b is array(7 downto 0) of std_logic_vector(9 downto 0);
-  type t_arr8_14b is array(7 downto 0) of std_logic_vector(13 downto 0);
-  type t_arr8_21b is array(7 downto 0) of std_logic_vector(20 downto 0);
-  type t_arr8_60b is array(7 downto 0) of std_logic_vector(59 downto 0);
+  type t_arr2_1b  is array(0 to 1) of std_logic;
+  type t_arr2_7b  is array(0 to 1) of std_logic_vector(6 downto 0);
+  type t_arr2_8b  is array(0 to 1) of std_logic_vector(7 downto 0);
+  type t_arr8_1b  is array(0 to 7) of std_logic;
+  type t_arr8_2b  is array(0 to 7) of std_logic_vector(1 downto 0);
+  type t_arr8_3b  is array(0 to 7) of std_logic_vector(2 downto 0);
+  type t_arr8_4b  is array(0 to 7) of std_logic_vector(3 downto 0);
+  type t_arr8_5b  is array(0 to 7) of std_logic_vector(4 downto 0);
+  type t_arr8_7b  is array(0 to 7) of std_logic_vector(6 downto 0);
+  type t_arr8_8b  is array(0 to 7) of std_logic_vector(7 downto 0);
+  type t_arr8_9b  is array(0 to 7) of std_logic_vector(8 downto 0);
+  type t_arr8_10b is array(0 to 7) of std_logic_vector(9 downto 0);
+  type t_arr8_14b is array(0 to 7) of std_logic_vector(13 downto 0);
+  type t_arr8_21b is array(0 to 7) of std_logic_vector(20 downto 0);
+  type t_arr8_60b is array(0 to 7) of std_logic_vector(59 downto 0);
   -- 3D
   type t_arr2_8_1b is array(0 to 1) of t_arr8_1b;
+  type t_arr2_8_7b is array(0 to 1) of t_arr8_7b;
   type t_arr2_8_8b is array(0 to 1) of t_arr8_8b;
   type t_arr8_8_1b is array(0 to 7) of t_arr8_1b;
   type t_arr8_8_4b is array(0 to 7) of t_arr8_4b;

@@ -45,11 +45,11 @@ entity tf_top is
     FM_L1L2_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L1L2_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
     FM_L1L2_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
-    FM_L1L2_L3PHIC_nentries_V_dout : out t_arr2_8b;
+    FM_L1L2_L3PHIC_nentries_V_dout : out t_arr2_7b;
     FM_L5L6_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L5L6_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
     FM_L5L6_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
-    FM_L5L6_L3PHIC_nentries_V_dout : out t_arr2_8b;
+    FM_L5L6_L3PHIC_nentries_V_dout : out t_arr2_7b;
     -- MatchCalculator output
     MC_bx_out     : out std_logic_vector(2 downto 0);
     MC_bx_out_vld : out std_logic;
@@ -66,7 +66,7 @@ architecture rtl of tf_top is
   signal TPROJ_L3PHIC_dataarray_data_V_enb      : t_arr8_1b;
   signal TPROJ_L3PHIC_dataarray_data_V_readaddr : t_arr8_8b;
   signal TPROJ_L3PHIC_dataarray_data_V_dout     : t_arr8_60b;
-  signal TPROJ_L3PHIC_nentries_V_dout : t_arr2_8_8b;
+  signal TPROJ_L3PHIC_nentries_V_dout : t_arr2_8_7b;
 
   -- ProjectionRouter signals
   signal PR_done       : std_logic := '0';
@@ -87,7 +87,7 @@ architecture rtl of tf_top is
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_21b;
-  signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_arr2_8_8b;
+  signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_arr2_8_7b;
 
   -- connecting VMStubME memories to MatchEngine input
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_arr8_1b;
@@ -120,19 +120,19 @@ architecture rtl of tf_top is
   signal AS_L3PHICn4_dataarray_data_V_enb      : std_logic;
   signal AS_L3PHICn4_dataarray_data_V_readaddr : std_logic_vector(9 downto 0);
   signal AS_L3PHICn4_dataarray_data_V_dout     : std_logic_vector(35 downto 0);
-  signal AS_L3PHICn4_nentries_V_dout : t_arr8_8b;
+  signal AS_L3PHICn4_nentries_V_dout : t_arr8_7b;
 
   -- connecting AllProjections memory to MatchCalculator input
   signal AP_L3PHIC_dataarray_data_V_enb      : std_logic;
   signal AP_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(9 downto 0);
   signal AP_L3PHIC_dataarray_data_V_dout     : std_logic_vector(59 downto 0);
-  signal AP_L3PHIC_nentries_V_dout : t_arr8_8b;
+  signal AP_L3PHIC_nentries_V_dout : t_arr8_7b;
 
   -- connecting CandidateMatches memories to MatchCalculator input
   signal CM_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
   signal CM_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
   signal CM_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_14b;
-  signal CM_L3PHIC17to24_nentries_V_dout : t_arr2_8_8b;
+  signal CM_L3PHIC17to24_nentries_V_dout : t_arr2_8_7b;
 
   -- MatchCalculator signals
   signal MC_start : std_logic := '0';
