@@ -52,34 +52,34 @@ stages: # ---------------------------------------------------------------------
   <<: *template_base
   stage: topTF-sim_synth
   script:
-    - cd IntegrationTests/PRMEMC
+    - cd IntegrationTests/${PROJ_NAME}
     - pwd; ls -la; #debug
-    - mkdir TextIO # Output folder for VHDL TextIO
-    - vivado -mode tcl -source generate_project.tcl
-    - md5sum ./TextIO/FM_L1L2XX_L3PHIC.txt; md5sum ./TextIO/FM_L5L6XX_L3PHIC.txt # Output check right after sim
-    - vivado -mode tcl -source synth.tcl
-    - md5sum ./TextIO/FM_L1L2XX_L3PHIC.txt; md5sum ./TextIO/FM_L5L6XX_L3PHIC.txt # Output check repeat at the end for convenience 
+    - mkdir tb/data # Output folder for VHDL TextIO
+    - vivado -mode tcl -source script/generate_project.tcl -tclargs ${PROJ_NAME}
+    - md5sum ./tb/data/FM_L1L2XX_L3PHIC.txt; md5sum ./tb/data/FM_L5L6XX_L3PHIC.txt # Output check right after sim
+    - vivado -mode tcl -source script/synth.tcl -tclargs ${PROJ_NAME}
+    - md5sum ./tb/data/FM_L1L2XX_L3PHIC.txt; md5sum ./tb/data/FM_L5L6XX_L3PHIC.txt # Output check repeat at the end for convenience 
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
-      - ./IntegrationTests/PRMEMC/TextIO/
-      - ./IntegrationTests/PRMEMC/*.txt
-      - ./IntegrationTests/PRMEMC/ExpTopPRMEMC_Test/ExpTopPRMEMC_Test.runs/synth_1/*.rpt
+      - ./IntegrationTests/${PROJ_NAME}/tb/data/
+      - ./IntegrationTests/${PROJ_NAME}/*.txt
+      - ./IntegrationTests/${PROJ_NAME}/${PROJ_NAME}/${PROJ_NAME}.runs/synth_1/*.rpt
     expire_in: 1 week
 
 .job_template: &template_check-results
   <<: *template_base # to get on the correct runner
   stage: check-results
   script:
-    - cd IntegrationTests/PRMEMC
+    - cd IntegrationTests/${PROJ_NAME}/common/script
     # Compare HDL sim output with full machtes Mem/Prints
     - python3 CompareMemPrintsFW.py -p -s
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
-      - ./IntegrationTests/PRMEMC/TextIO/*.txt
+      - ./IntegrationTests/${PROJ_NAME}/tb/data/*.txt
     expire_in: 10 week
     
 # Jobs ------------------------------------------------------------------------
@@ -117,8 +117,10 @@ topPRMEMC-sim_synth:
   <<: *template_topTF-sim_synth
   variables:
     VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PRMEMC"
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
+    PROJ_NAME: "PRMEMC"
