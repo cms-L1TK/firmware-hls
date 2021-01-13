@@ -56,9 +56,9 @@ stages: # ---------------------------------------------------------------------
     - pwd; ls -la; #debug
     - mkdir tb/data # Output folder for VHDL TextIO
     - vivado -mode tcl -source script/generate_project.tcl -tclargs ${PROJ_NAME}
-    - md5sum ./tb/data/FM_L1L2XX_L3PHIC.txt; md5sum ./tb/data/FM_L5L6XX_L3PHIC.txt # Output check right after sim
+    - md5sum ./tb/data/FM_L1L2_L3PHIC.txt; md5sum ./tb/data/FM_L5L6_L3PHIC.txt # Output check right after sim
     - vivado -mode tcl -source script/synth.tcl -tclargs ${PROJ_NAME}
-    - md5sum ./tb/data/FM_L1L2XX_L3PHIC.txt; md5sum ./tb/data/FM_L5L6XX_L3PHIC.txt # Output check repeat at the end for convenience 
+    - md5sum ./tb/data/FM_L1L2_L3PHIC.txt; md5sum ./tb/data/FM_L5L6_L3PHIC.txt # Output check repeat at the end for convenience 
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
