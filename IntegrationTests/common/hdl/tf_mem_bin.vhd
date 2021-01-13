@@ -102,13 +102,7 @@ attribute ram_style of sa_RAM_data : signal is "block";
 
 begin
 
-process(clka)
-  variable clk_cnt : natural := 0; -- Clock counter
-begin
 
-sv_RAM_row <= sa_RAM_data(to_integer(unsigned(addrb)));
-
-end process;
 
 process(clkb)
 begin

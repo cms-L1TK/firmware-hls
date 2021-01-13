@@ -103,7 +103,8 @@ attribute ram_style of sa_RAM_data : signal is "block";
 begin
 
 process(clka)
-  variable clk_cnt : natural := 0; -- Clock counter
+  variable clk_cnt  : natural := 0; -- Clock counter
+  variable page_cnt : natural := 0; -- Page counter
 begin
   if rising_edge(clka) then
     if (wea='1') then -- Write data
@@ -135,7 +136,12 @@ begin
         clk_cnt := clk_cnt+1;
       else
         clk_cnt := 0;
-        nent_o <= (others => (others => '0'));
+        if (page_cnt <= RAM_DEPTH/PAGE_OFFSET) then -- Assuming linear page access
+          nent_o((page_cnt+1) mod RAM_DEPTH/PAGE_OFFSET) <= (others => '0'); -- Reset oldest nent counter value
+          page_cnt := page_cnt +1;
+        else
+          page_cnt := 0;
+        end if;
       end if;
     end if;
   end if;
