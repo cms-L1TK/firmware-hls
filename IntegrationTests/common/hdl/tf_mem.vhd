@@ -137,11 +137,11 @@ begin
       else
         clk_cnt := 0;
         if (page_cnt <= RAM_DEPTH/PAGE_OFFSET) then -- Assuming linear page access
-          nent_o((page_cnt+1) mod RAM_DEPTH/PAGE_OFFSET) <= (others => '0'); -- Reset oldest nent counter value
           page_cnt := page_cnt +1;
         else
           page_cnt := 0;
         end if;
+        nent_o((page_cnt+1) mod RAM_DEPTH/PAGE_OFFSET) <= (others => '0'); -- Reset oldest nent counter value
       end if;
     end if;
   end if;
