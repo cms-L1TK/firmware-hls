@@ -165,37 +165,37 @@ int main()
        tproj_disk
     );
 
-    bool truncate;
+    bool truncation = false;
 
     // compare the computed outputs with the expected ones
     err += compareMemWithFile<TrackletParameterMemory>(tpar, fout_tpar, ievt,
-                                                   "\nTrackletParameter", truncate);
+                                                   "\nTrackletParameter", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHID], fout_tproj0, ievt,
-                                                   "\nTrackletProjection (L1PHID)", truncate);
+                                                   "\nTrackletProjection (L1PHID)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIE], fout_tproj1, ievt,
-                                                   "\nTrackletProjection (L1PHIE)", truncate);
+                                                   "\nTrackletProjection (L1PHIE)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIF], fout_tproj2, ievt,
-                                                   "\nTrackletProjection (L1PHIF)", truncate);
+                                                   "\nTrackletProjection (L1PHIF)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L2PHIB], fout_tproj3, ievt,
-                                                   "\nTrackletProjection (L2PHIB)", truncate);
+                                                   "\nTrackletProjection (L2PHIB)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L2PHIC], fout_tproj4, ievt,
-                                                   "\nTrackletProjection (L2PHIC)", truncate);
+                                                   "\nTrackletProjection (L2PHIC)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHIB], fout_tproj5, ievt,
-                                                   "\nTrackletProjection (L5PHIB)", truncate);
+                                                   "\nTrackletProjection (L5PHIB)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHIC], fout_tproj6, ievt,
-                                                   "\nTrackletProjection (L5PHIC)", truncate);
+                                                   "\nTrackletProjection (L5PHIC)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHIB], fout_tproj7, ievt,
-                                                   "\nTrackletProjection (L6PHIB)", truncate);
+                                                   "\nTrackletProjection (L6PHIB)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHIC], fout_tproj8, ievt,
-                                                   "\nTrackletProjection (L6PHIC)", truncate);
+                                                   "\nTrackletProjection (L6PHIC)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D1PHIB], fout_tproj9, ievt,
-                                                   "\nTrackletProjection (D1PHIB)", truncate);
+                                                   "\nTrackletProjection (D1PHIB)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D1PHIC], fout_tproj10, ievt,
-                                                   "\nTrackletProjection (D1PHIC)", truncate);
+                                                   "\nTrackletProjection (D1PHIC)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D2PHIB], fout_tproj11, ievt,
-                                                   "\nTrackletProjection (D2PHIB)", truncate);
+                                                   "\nTrackletProjection (D2PHIB)", truncation);
     err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D2PHIC], fout_tproj12, ievt,
-                                                   "\nTrackletProjection (D2PHIC)", truncate);
+                                                   "\nTrackletProjection (D2PHIC)", truncation);
     cout << endl;
 
   } // end of event loop
