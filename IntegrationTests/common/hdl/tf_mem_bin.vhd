@@ -46,7 +46,14 @@ entity tf_mem_bin is
     dina    : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     addrb   : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb   : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    nent_o  : out t_arr8_8_5b                                     --! Num entries (page)(bin)
+    nent_o0 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o1 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o2 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o3 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o4 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o5 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o6 : out t_arr8_5b;                                      --! Num entries (bin); No 2D array to avoid partially associated port
+    nent_o7 : out t_arr8_5b                                       --! Num entries (bin); No 2D array to avoid partially associated port
     );
 end tf_mem_bin;
 
