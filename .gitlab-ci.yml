@@ -72,7 +72,7 @@ stages: # ---------------------------------------------------------------------
   <<: *template_base # to get on the correct runner
   stage: check-results
   script:
-    - cd IntegrationTests/${PROJ_NAME}/common/script
+    - cd IntegrationTests/common/script
     # Compare HDL sim output with full machtes Mem/Prints
     - python3 CompareMemPrintsFW.py -p -s
   artifacts:

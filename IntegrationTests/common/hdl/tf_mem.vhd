@@ -46,14 +46,14 @@ entity tf_mem is
     dina    : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     addrb   : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb   : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    nent_o0 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o1 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o2 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o3 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o4 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o5 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o6 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0); --! Num entries per page; No array to avoid partially associated port
-    nent_o7 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0)  --! Num entries per page; No array to avoid partially associated port
+    nent_o0 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o1 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o2 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o3 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o4 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o5 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o6 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o7 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0')  --! Num entries per page; No array to avoid partially associated port
     );
 end tf_mem;
 
@@ -110,14 +110,18 @@ attribute ram_style of sa_RAM_data : signal is "block";
 begin
 
 process(clka)
-  variable vn_clk_cnt  : natural := 0; -- Clock counter
-  variable vn_page_cnt : natural := 0; -- Page counter
+  variable vi_clk_cnt  : integer := -1; -- Clock counter
+  variable vi_page_cnt : integer := 0;  -- Page counter
   --variable v_line_dbg  : line; -- Line for debug
 begin
   if rising_edge(clka) then
-    if (wea='1') then -- Write data
-      sa_RAM_data(to_integer(unsigned(addra))) <= dina;
-      if (addra = (addra'range => '0')) or (addra /= sv_addra_d1) then -- Count n_entries; 
+    if (wea='1') then
+      sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
+      -- From here on (in this process) nent counter realted code
+      if (vi_clk_cnt=-1) then
+        vi_clk_cnt := 0; -- Start counter
+      end if;
+      if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- Count n_entries; 
         case (to_integer(unsigned(addra))) is
           when 0*PAGE_OFFSET to 1*PAGE_OFFSET-1 =>
             nent_o0 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o0)) + 1, nent_o0'length)); -- + 1 (slv)
@@ -140,43 +144,41 @@ begin
         end case;
       end if;
       sv_addra_d1 <= addra;
-      if (vn_clk_cnt < MAX_ENTRIES-2) then -- Assuming that wea is always '1' during counting
-        vn_clk_cnt := vn_clk_cnt+1;
-      elsif (vn_clk_cnt = MAX_ENTRIES-2) then
-        vn_clk_cnt := vn_clk_cnt+1;
-        case (vn_page_cnt) is -- Reset nent counter value
-          when 0 =>
-            nent_o1 <= (others => '0');
-          when 1 =>
-            if (RAM_DEPTH/PAGE_OFFSET <= 2) then
-              nent_o0 <= (others => '0');
-            else
-              nent_o2 <= (others => '0');
-            end if;
-          when 2 =>
-            nent_o3 <= (others => '0');
-          when 3 =>
-            nent_o4 <= (others => '0');
-          when 4 =>
-            nent_o5 <= (others => '0');
-          when 5 =>
-            nent_o6 <= (others => '0');
-          when 6 =>
-            nent_o7 <= (others => '0');
-          when 7 =>
+    end if; -- (wea='1')
+    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then
+      vi_clk_cnt := vi_clk_cnt+1;
+--    elsif (vi_clk_cnt = MAX_ENTRIES-2) then
+--      vi_clk_cnt := vi_clk_cnt+1;
+    elsif (vi_clk_cnt >= MAX_ENTRIES-1) then
+      vi_clk_cnt := 0;
+      case (vi_page_cnt) is -- Reset nent counter value
+        when 0 =>
+          nent_o1 <= (others => '0');
+        when 1 =>
+          if (RAM_DEPTH/PAGE_OFFSET <= 2) then
             nent_o0 <= (others => '0');
-          when others =>
-            assert (false) report "vn_page_cnt out of range" severity error;
-        end case;
-        if (vn_page_cnt < RAM_DEPTH/PAGE_OFFSET-1) then -- Assuming linear continuous page access
-          vn_page_cnt := vn_page_cnt +1;
-        elsif (vn_clk_cnt = MAX_ENTRIES-1) then
-          vn_clk_cnt := vn_clk_cnt+1;
-        else
-          vn_page_cnt := 0;
-        end if;
+          else
+            nent_o2 <= (others => '0');
+          end if;
+        when 2 =>
+          nent_o3 <= (others => '0');
+        when 3 =>
+          nent_o4 <= (others => '0');
+        when 4 =>
+          nent_o5 <= (others => '0');
+        when 5 =>
+          nent_o6 <= (others => '0');
+        when 6 =>
+          nent_o7 <= (others => '0');
+        when 7 =>
+          nent_o0 <= (others => '0');
+        when others =>
+          assert (false) report "vi_page_cnt out of range" severity error;
+      end case;
+      if (vi_page_cnt < RAM_DEPTH/PAGE_OFFSET-1) then -- Assuming linear continuous page access
+        vi_page_cnt := vi_page_cnt +1;
       else
-        vn_clk_cnt := 0;
+        vi_page_cnt := 0;
       end if;
     end if;
   end if;

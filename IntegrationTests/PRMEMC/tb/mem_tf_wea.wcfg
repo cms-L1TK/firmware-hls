@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_tf_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_tf_top" />
+            <top_module name="tf_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="2000000fs"></ZoomStartTime>
+      <ZoomEndTime time="13027905fs"></ZoomEndTime>
+      <Cursor1Time time="3446960fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="174"></NameColumnWidth>
+      <ValueColumnWidth column_width="143"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="21" />
+   <wave_markers>
+      <marker label="" time="4167" />
+   </wave_markers>
+   <wvobject type="other" fp_name="/tb_tf_top/bx_cnt">
+      <obj_property name="ElementShortName">bx_cnt</obj_property>
+      <obj_property name="ObjectShortName">bx_cnt</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider285" type="divider">
+      <obj_property name="label">VMSME</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/clka">
+      <obj_property name="ElementShortName">clka</obj_property>
+      <obj_property name="ObjectShortName">clka</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/clkb">
+      <obj_property name="ElementShortName">clkb</obj_property>
+      <obj_property name="ObjectShortName">clkb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider142" type="divider">
+      <obj_property name="label">AS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/AS_L3PHICn4/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/AS_L3PHICn4/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider254" type="divider">
+      <obj_property name="label">TPROJ</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_TPROJ_L3PHIC(7)\/TPROJ_L3PHIC/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_TPROJ_L3PHIC(7)\/TPROJ_L3PHIC/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider253" type="divider">
+      <obj_property name="label">AP</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/AP_L3PHIC/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/AP_L3PHIC/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider169" type="divider">
+      <obj_property name="label">CM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider170" type="divider">
+      <obj_property name="label">FM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/FM_L1L2_L3PHIC/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/FM_L1L2_L3PHIC/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
+   </wvobject>
+</wave_config>
