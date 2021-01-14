@@ -58,9 +58,11 @@ int main(){
 
     // Unit Under Test
     TrackletEngineTop(bx, inputvmstubsinner, inputvmstubsouter, bendinnertable, bendoutertable, outputstubpairs);
-    
+
+    bool truncation = false;
+
     // compare calculated outputs with those read from emulation printout
-    err_count += compareMemWithFile<StubPairMemory>(outputstubpairs,fin_stubpairs,ievt,"StubPair");
+    err_count += compareMemWithFile<StubPairMemory>(outputstubpairs,fin_stubpairs,ievt,"StubPair",truncation);
 
   }  // end of event loop
 
