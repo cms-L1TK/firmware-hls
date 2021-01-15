@@ -112,14 +112,13 @@ begin
 process(clka)
   variable vi_clk_cnt  : integer := -1; -- Clock counter
   variable vi_page_cnt : integer := 0;  -- Page counter
-  --variable v_line_dbg  : line; -- Line for debug
 begin
   if rising_edge(clka) then
     if (wea='1') then
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- From here on (in this process) nent counter realted code
       if (vi_clk_cnt=-1) then
-        vi_clk_cnt := 0; -- Start counter
+        vi_clk_cnt := 0; -- Start counter initially
       end if;
       if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- Count n_entries; 
         case (to_integer(unsigned(addra))) is
@@ -147,18 +146,16 @@ begin
     end if; -- (wea='1')
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then
       vi_clk_cnt := vi_clk_cnt+1;
---    elsif (vi_clk_cnt = MAX_ENTRIES-2) then
---      vi_clk_cnt := vi_clk_cnt+1;
-    elsif (vi_clk_cnt >= MAX_ENTRIES-1) then
+    elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      case (vi_page_cnt) is -- Reset nent counter value
+      case (vi_page_cnt) is -- Reset nent counter values
         when 0 =>
           nent_o1 <= (others => '0');
         when 1 =>
           if (RAM_DEPTH/PAGE_OFFSET <= 2) then
-            nent_o0 <= (others => '0');
+            nent_o0 <= (others => '0'); -- 2 page version
           else
-            nent_o2 <= (others => '0');
+            nent_o2 <= (others => '0'); -- 8 page version
           end if;
         when 2 =>
           nent_o3 <= (others => '0');

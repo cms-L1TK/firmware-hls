@@ -77,13 +77,12 @@ package tf_pkg is
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
     -- ########################### Functions ################################################################
-  --! @brief Binary logarithm to determine bit width for addressing
   function clogb2 (bit_depth : integer) return integer;
 
   -- -- ########################### Procedures #######################
   procedure char2int (
     char : in  character;            --! Input charater 0...9, a...f, and A...F
-    int  : out natural range 0 to 15 --! Output interger 0...15
+    int  : out integer range 0 to 15 --! Output integer 0...15
   );
   procedure read_emData_2p (
     file_path     : in    string;  --! File path as string
@@ -168,9 +167,10 @@ package body tf_pkg is
 
   -- ########################### Procedures ################################################################
   --! @brief Convert character to integer
+  --! Procedure to limit the output by using range
   procedure char2int (
     char : in  character;            --! Input charater 0...9, a...f, and A...F
-    int  : out natural range 0 to 15 --! Output interger 0...15
+    int  : out integer range 0 to 15 --! Output integer 0...15
   ) is
   begin
     if    (char = 'a') or (char = 'A') then
