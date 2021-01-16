@@ -29,7 +29,7 @@ constexpr unsigned kMaxProcOffset(const module::type m) {
          (m == module::TE ? 7 :
          (m == module::TC ? 0 :
          (m == module::PR ? 0 :
-         (m == module::ME ? 7 :
+         (m == module::ME ? 0 :
          (m == module::MC ? 0 :
          (0)))))));
 }

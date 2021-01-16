@@ -36,24 +36,25 @@ entity tf_mem is
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     );
   port (
-    clka    : in  std_logic;                                      --! Write clock
-    clkb    : in  std_logic;                                      --! Read clock
-    wea     : in  std_logic;                                      --! Write enable
-    enb     : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
-    rstb    : in  std_logic;                                      --! Output reset (does not affect memory contents)
-    regceb  : in  std_logic;                                      --! Output register enable
-    addra   : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
-    dina    : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
-    addrb   : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
-    doutb   : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    nent_o0 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o1 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o2 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o3 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o4 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o5 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o6 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
-    nent_o7 : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0')  --! Num entries per page; No array to avoid partially associated port
+    clka      : in  std_logic;                                      --! Write clock
+    clkb      : in  std_logic;                                      --! Read clock
+    wea       : in  std_logic;                                      --! Write enable
+    enb       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
+    regceb    : in  std_logic;                                      --! Output register enable
+    addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
+    dina      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
+    addrb     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
+    doutb     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
+    sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
+    nent_o0   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o1   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o2   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o3   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o4   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o5   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o6   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0'); --! Num entries per page; No array to avoid partially associated port
+    nent_o7   : out std_logic_vector(clogb2(MAX_ENTRIES) downto 0) := (others => '0')  --! Num entries per page; No array to avoid partially associated port
     );
 end tf_mem;
 
@@ -114,12 +115,12 @@ process(clka)
   variable vi_page_cnt : integer := 0;  -- Page counter
 begin
   if rising_edge(clka) then
+    if (sync_nent='1' and vi_clk_cnt=-1) then
+      vi_clk_cnt := 0; -- Start counter initially
+    end if;
     if (wea='1') then
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- From here on (in this process) nent counter realted code
-      if (vi_clk_cnt=-1) then
-        vi_clk_cnt := 0; -- Start counter initially
-      end if;
       if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- Count n_entries; 
         case (to_integer(unsigned(addra))) is
           when 0*PAGE_OFFSET to 1*PAGE_OFFSET-1 =>

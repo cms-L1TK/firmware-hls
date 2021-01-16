@@ -154,8 +154,8 @@ begin
     if rising_edge(clk) then
       if PR_done='1' then
         ME_start <= '1';
-      elsif ME_ready='1' or ME_idle='1' then
-        ME_start <= '0';
+--      elsif ME_ready='1' or ME_idle='1' then
+--        ME_start <= '0';
       end if;
     end if;
   end process;
@@ -195,6 +195,7 @@ begin
         rstb       => '0',
         addrb      => TPROJ_L3PHIC_dataarray_data_V_readaddr(tpidx),
         doutb      => TPROJ_L3PHIC_dataarray_data_V_dout(tpidx),
+        sync_nent  => PR_start,
         nent_o0    => TPROJ_L3PHIC_nentries_V_dout(0)(tpidx),
         nent_o1    => TPROJ_L3PHIC_nentries_V_dout(1)(tpidx),
         nent_o2    => open,
@@ -322,6 +323,7 @@ begin
       rstb       => '0',
       addrb      => AP_L3PHIC_dataarray_data_V_readaddr,
       doutb      => AP_L3PHIC_dataarray_data_V_dout,
+      sync_nent  => MC_start,
       nent_o0    => AP_L3PHIC_nentries_V_dout(0),
       nent_o1    => AP_L3PHIC_nentries_V_dout(1),
       nent_o2    => AP_L3PHIC_nentries_V_dout(2),
@@ -357,6 +359,7 @@ begin
         enb        => VMPROJ_L3PHIC17to24_dataarray_data_V_enb(vmpidx),
         addrb      => VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr(vmpidx),
         doutb      => VMPROJ_L3PHIC17to24_dataarray_data_V_dout(vmpidx),
+        sync_nent  => ME_start,
         nent_o0    => VMPROJ_L3PHIC17to24_nentries_V_dout(0)(vmpidx),
         nent_o1    => VMPROJ_L3PHIC17to24_nentries_V_dout(1)(vmpidx),
         nent_o2    => open,
@@ -581,6 +584,7 @@ begin
       enb        => AS_L3PHICn4_dataarray_data_V_enb,
       addrb      => AS_L3PHICn4_dataarray_data_V_readaddr,
       doutb      => AS_L3PHICn4_dataarray_data_V_dout,
+      sync_nent  => PR_done,
       nent_o0    => AS_L3PHICn4_nentries_V_dout(0),
       nent_o1    => AS_L3PHICn4_nentries_V_dout(1),
       nent_o2    => AS_L3PHICn4_nentries_V_dout(2),
@@ -616,6 +620,7 @@ begin
         enb        => CM_L3PHIC17to24_dataarray_data_V_enb(cmidx),
         addrb      => CM_L3PHIC17to24_dataarray_data_V_readaddr(cmidx),
         doutb      => CM_L3PHIC17to24_dataarray_data_V_dout(cmidx),
+        sync_nent  => MC_start,
         nent_o0    => CM_L3PHIC17to24_nentries_V_dout(0)(cmidx),
         nent_o1    => CM_L3PHIC17to24_nentries_V_dout(1)(cmidx),
         nent_o2    => open,
@@ -722,6 +727,7 @@ begin
       enb        => FM_L1L2_L3PHIC_dataarray_data_V_enb,
       addrb      => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
       doutb      => FM_L1L2_L3PHIC_dataarray_data_V_dout,
+      sync_nent  => MC_done,
       nent_o0    => FM_L1L2_L3PHIC_nentries_V_dout(0),
       nent_o1    => FM_L1L2_L3PHIC_nentries_V_dout(1),
       nent_o2    => open,
@@ -751,6 +757,7 @@ begin
       enb        => FM_L5L6_L3PHIC_dataarray_data_V_enb,
       addrb      => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
       doutb      => FM_L5L6_L3PHIC_dataarray_data_V_dout,
+      sync_nent  => MC_done,
       nent_o0    => FM_L5L6_L3PHIC_nentries_V_dout(0),
       nent_o1    => FM_L5L6_L3PHIC_nentries_V_dout(1),
       nent_o2    => open,
