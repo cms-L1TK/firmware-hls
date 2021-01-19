@@ -114,62 +114,31 @@ process(clka)
   variable vi_clk_cnt  : integer := -1; -- Clock counter
   variable vi_page_cnt : integer := 0;  -- Page counter
 begin
-  if rising_edge(clka) then
-    if (sync_nent='1' and vi_clk_cnt=-1) then
-      vi_clk_cnt := 0; -- Start counter initially
+  if rising_edge(clka) then -- ######################################### Start counter initially
+    if (sync_nent='1') and vi_clk_cnt=-1 then
+      vi_clk_cnt := 0;
     end if;
-    if (wea='1') then
-      sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
-      -- From here on (in this process) nent counter realted code
-      if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- Count n_entries; 
-        case (to_integer(unsigned(addra))) is
-          when 0*PAGE_OFFSET to 1*PAGE_OFFSET-1 =>
-            nent_o0 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o0)) + 1, nent_o0'length)); -- + 1 (slv)
-          when 1*PAGE_OFFSET to 2*PAGE_OFFSET-1 =>
-            nent_o1 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o1)) + 1, nent_o1'length)); -- + 1 (slv)
-          when 2*PAGE_OFFSET to 3*PAGE_OFFSET-1 =>
-            nent_o2 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o2)) + 1, nent_o2'length)); -- + 1 (slv)
-          when 3*PAGE_OFFSET to 4*PAGE_OFFSET-1 =>
-            nent_o3 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o3)) + 1, nent_o3'length)); -- + 1 (slv)
-          when 4*PAGE_OFFSET to 5*PAGE_OFFSET-1 =>
-            nent_o4 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o4)) + 1, nent_o4'length)); -- + 1 (slv)
-          when 5*PAGE_OFFSET to 6*PAGE_OFFSET-1 =>
-            nent_o5 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o5)) + 1, nent_o5'length)); -- + 1 (slv)
-          when 6*PAGE_OFFSET to 7*PAGE_OFFSET-1 =>
-            nent_o6 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o6)) + 1, nent_o6'length)); -- + 1 (slv)
-          when 7*PAGE_OFFSET to 8*PAGE_OFFSET-1 =>
-            nent_o7 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o7)) + 1, nent_o7'length)); -- + 1 (slv)
-          when others =>
-            assert (false) report "addra out of range" severity error;
-        end case;
-      end if;
-      sv_addra_d1 <= addra;
-    end if; -- (wea='1')
-    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then
+    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
       case (vi_page_cnt) is -- Reset nent counter values
         when 0 =>
-          nent_o1 <= (others => '0');
-        when 1 =>
-          if (RAM_DEPTH/PAGE_OFFSET <= 2) then
-            nent_o0 <= (others => '0'); -- 2 page version
-          else
-            nent_o2 <= (others => '0'); -- 8 page version
-          end if;
-        when 2 =>
-          nent_o3 <= (others => '0');
-        when 3 =>
-          nent_o4 <= (others => '0');
-        when 4 =>
-          nent_o5 <= (others => '0');
-        when 5 =>
-          nent_o6 <= (others => '0');
-        when 6 =>
-          nent_o7 <= (others => '0');
-        when 7 =>
           nent_o0 <= (others => '0');
+        when 1 =>
+          nent_o1 <= (others => '0');
+        when 2 =>
+          nent_o2 <= (others => '0');
+        when 3 =>
+          nent_o3 <= (others => '0');
+        when 4 =>
+          nent_o4 <= (others => '0');
+        when 5 =>
+          nent_o5 <= (others => '0');
+        when 6 =>
+          nent_o6 <= (others => '0');
+        when 7 =>
+          nent_o7 <= (others => '0');
         when others =>
           assert (false) report "vi_page_cnt out of range" severity error;
       end case;
@@ -179,6 +148,64 @@ begin
         vi_page_cnt := 0;
       end if;
     end if;
+    if (wea='1') then
+      sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
+      if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- ##### Count n_entries;
+        case (to_integer(unsigned(addra))) is
+          when 0*PAGE_OFFSET to 1*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(0*PAGE_OFFSET, addra'length))) then
+              nent_o0 <= std_logic_vector(to_unsigned(1, nent_o0'length)); -- <= 1 (slv)
+            else
+              nent_o0 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o0)) + 1, nent_o0'length)); -- + 1 (slv)
+            end if;
+          when 1*PAGE_OFFSET to 2*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(1*PAGE_OFFSET, addra'length))) then
+              nent_o1 <= std_logic_vector(to_unsigned(1, nent_o1'length)); -- <= 1 (slv)
+            else
+              nent_o1 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o1)) + 1, nent_o1'length)); -- + 1 (slv)
+            end if;
+          when 2*PAGE_OFFSET to 3*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(2*PAGE_OFFSET, addra'length))) then
+              nent_o2 <= std_logic_vector(to_unsigned(1, nent_o2'length)); -- <= 1 (slv)
+            else
+              nent_o2 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o2)) + 1, nent_o2'length)); -- + 1 (slv)
+            end if;
+          when 3*PAGE_OFFSET to 4*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(3*PAGE_OFFSET, addra'length))) then
+              nent_o3 <= std_logic_vector(to_unsigned(1, nent_o3'length)); -- <= 1 (slv)
+            else
+              nent_o3 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o3)) + 1, nent_o3'length)); -- + 1 (slv)
+            end if;
+          when 4*PAGE_OFFSET to 5*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(4*PAGE_OFFSET, addra'length))) then
+              nent_o4 <= std_logic_vector(to_unsigned(1, nent_o4'length)); -- <= 1 (slv)
+            else
+              nent_o4 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o4)) + 1, nent_o5'length)); -- + 1 (slv)
+            end if;
+          when 5*PAGE_OFFSET to 6*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(5*PAGE_OFFSET, addra'length))) then
+              nent_o5 <= std_logic_vector(to_unsigned(1, nent_o5'length)); -- <= 1 (slv)
+            else
+              nent_o5 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o5)) + 1, nent_o5'length)); -- + 1 (slv)
+            end if;
+          when 6*PAGE_OFFSET to 7*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(6*PAGE_OFFSET, addra'length))) then
+              nent_o6 <= std_logic_vector(to_unsigned(1, nent_o6'length)); -- <= 1 (slv)
+            else
+              nent_o6 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o6)) + 1, nent_o6'length)); -- + 1 (slv)
+            end if;
+          when 7*PAGE_OFFSET to 8*PAGE_OFFSET-1 =>
+            if (addra = std_logic_vector(to_unsigned(7*PAGE_OFFSET, addra'length))) then
+              nent_o7 <= std_logic_vector(to_unsigned(1, nent_o7'length)); -- <= 1 (slv)
+            else
+              nent_o7 <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o7)) + 1, nent_o7'length)); -- + 1 (slv)
+            end if;
+          when others =>
+            assert (false) report "addra out of range" severity error;
+        end case;
+      end if;
+      sv_addra_d1 <= addra;
+    end if; -- (wea='1')
   end if;
 end process;
 
