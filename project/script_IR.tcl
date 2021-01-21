@@ -29,5 +29,5 @@ csynth_design
 # possible options -trace_level all -rtl verilog -verbose 
 cosim_design 
 # possible options  -flow syn, -flow impl
-export_design -format ip_catalog 
+#export_design -format ip_catalog 
 exit
