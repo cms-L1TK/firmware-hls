@@ -44,6 +44,52 @@ std::vector<std::string> split(const std::string& s, char delimiter)
   return tokens;
 }
 
+
+// S.S. Storey 
+// added because the IR 
+// needs to fill a stream and not a memory 
+// so writeMemFromFile does not work 
+template<class DataType, int Base=2>
+void writeArrayFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
+, char pDelimeter = '|' , char pSplitToken = ' '){
+  
+  // check file is still good 
+  assert(pInputStream.good());
+  
+  int cEventCounter=-1;
+  int cCounter=0;
+  do
+  {
+    std::string cInputLine="";
+    getline( pInputStream, cInputLine );
+    if( cInputLine.find("Event") != std::string::npos ) 
+    {
+      //std::cout << cInputLine << "\n";
+      cEventCounter++;
+    }
+    else
+    {
+      if(cEventCounter != pEvent)
+        continue;
+      
+      // split line 
+      //std::cout << cInputLine << "\n";
+      std::stringstream cLineContent(cInputLine);
+      for(std::string cToken; getline( cLineContent, cToken , pSplitToken ); )
+      {
+        // look for binary representation of word  
+        if( cToken.find('|') != std::string::npos )  
+        {
+          //remove delimeter
+          cToken.erase( std::remove(cToken.begin(), cToken.end(), pDelimeter), cToken.end() );
+          hData[cCounter] = DataType(std::stol( cToken , nullptr,Base ) );
+          cCounter++; 
+        }
+      }
+    }
+  }while( pInputStream.good() && cEventCounter <= pEvent);
+}
+
 template<class MemType>
 void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16)
 {
