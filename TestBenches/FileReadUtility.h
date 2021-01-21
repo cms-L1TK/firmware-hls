@@ -50,7 +50,7 @@ std::vector<std::string> split(const std::string& s, char delimiter)
 // needs to fill a stream and not a memory 
 // so writeMemFromFile does not work 
 template<class DataType, int Base=2>
-void readDataFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
+void writeArrayFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
 , char pDelimeter = '|' , char pSplitToken = ' '){
   
   // check file is still good 

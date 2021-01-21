@@ -346,7 +346,7 @@ int main()
     ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink];
     for( size_t cStubIndx=0; cStubIndx < kMaxStubsFromLink; cStubIndx++)
       hInputStubs[cStubIndx]=ap_uint<kNBits_DTC>(0);
-    readDataFromFile<ap_uint<kNBits_DTC>>(hInputStubs , cLinkDataStream, cEvId);
+    writeArrayFromFile<ap_uint<kNBits_DTC>>(hInputStubs , cLinkDataStream, cEvId);
     
     // clear memories 
     for( unsigned int cIndx=0; cIndx < (unsigned int)hNmemories ; cIndx++)
