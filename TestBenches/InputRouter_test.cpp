@@ -251,7 +251,9 @@ void prepareInputStreams( ifstream * pInputStreams
 // test bench starts here 
 int main()
 {
- 
+  
+  // allow for truncation memory check [i.e. missing entries can pass check]
+  bool cTruncation=false;
   int cDTCsplit=0;
   int cNonant=4;
   std::string cInputFile_LinkMap = "emData/dtclinklayerdisk.dat";
@@ -351,7 +353,9 @@ int main()
     { 
        hMemories[cIndx].clear();
     }
-    std::cout << "Link Word is " 
+    std::cout << "IR Module for link#" 
+      << +hLinkId
+      << " Link Word is " 
       << std::bitset<kLINKMAPwidth>(hLinkWord)
       << "\t"
       << std::hex
@@ -369,11 +373,15 @@ int main()
     static const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
 
     BXType hBx = cEvId&0x7;
+    // #ifndef __SYNTHESIS__
+    // std::cout << "IR module reading out link " << +hLinkId
+    //   << " is going to fill "
+    //   <<  hNmemories
+    //   << " memories\n";
+    // #endif
     InputRouterTop( hBx
-      , hLinkId // link id 
       , hLinkWord // input link LUT 
       , hPhBnWord  // n phi bins LUT 
-      , hNmemories // number of mems LUT
       , cLUT_L1// corrections frst brl lyr  
       , cLUT_L2 // corrections scnd brl lyr  
       , cLUT_L3 // corrections thrd brl lyr  
@@ -394,8 +402,7 @@ int main()
       std::cout << "Memory#" 
         << cMemIndx 
         << "\n";
-      bool cTruncated=false;
-      int cErCnt = compareMemWithFile<DTCStubMemory>(hMemories[cMemIndx], cInputStreams[cMemIndx], cEvId, "DTCStubMemory", cTruncated);
+      int cErCnt = compareMemWithFile<DTCStubMemory>(hMemories[cMemIndx], cInputStreams[cMemIndx], cEvId, "DTCStubMemory", cTruncation);
       cTotalErrCnt += cErCnt;
     }
 
