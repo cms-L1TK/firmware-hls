@@ -8,6 +8,7 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
+#include "bitset"
 
 //////////////////////////////////////////////////////////////
 
@@ -126,6 +127,34 @@ void merger(
     }
 
 }
+
+template<int MaxMatchCopies>
+bool read_input_mems(BXType bx,
+                     ap_uint<MaxMatchCopies>& mem_hasdata,
+                     ap_uint<MaxMatchCopies>& tmp_mem_hasdata,
+                     ap_uint<kNBits_MemAddr> nentries[MaxMatchCopies],
+                     ap_uint<kNBits_MemAddr> read_addr[],
+                     const CandidateMatchMemory match[],
+                     CandidateMatch &cm) {
+#pragma HLS inline
+
+    if (mem_hasdata == 0) return false;
+    // 5 bits memory index for up to 32 input memory priority encoder
+    ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
+    std::cout << "read_imem=" << read_imem << std::endl;
+    cm = match[read_imem].read_mem(bx, read_addr[read_imem]);
+    ++read_addr[read_imem];
+    if (read_addr[read_imem] >= nentries[read_imem]) {
+      // All entries in the memory[read_imem] have been read out - Prepare to move to the next non-empty memory
+      read_addr[read_imem] = 0;
+      mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
+    }
+    tmp_mem_hasdata.clear(read_imem);
+    tmp_mem_hasdata = tmp_mem_hasdata == 0 ? mem_hasdata : tmp_mem_hasdata;
+
+    return true;
+
+} // read_input_mems
 
 //////////////////////////////////////////////////////////////
 
@@ -415,10 +444,16 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> nmcout6 = 0;
   ap_uint<kNBits_MemAddr> nmcout7 = 0;
   ap_uint<kNBits_MemAddr> nmcout8 = 0;  
+
+  ap_uint<MaxMatchCopies> mem_hasdata;
+  ap_uint<MaxMatchCopies> tmp_mem_hasdata;
+  ap_uint<kNBits_MemAddr> numbersin[MaxMatchCopies];
+  ap_uint<kNBits_MemAddr> mem_read_addr[MaxMatchCopies];
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
 
 #pragma HLS PIPELINE II=1 
+    if (istep == 0) {
 
     // Pick up number of candidate matches for each CM memory
     ncm1 = match[0].getEntries(bx);
@@ -429,6 +464,32 @@ void MatchCalculator(BXType bx,
     ncm6 = match[5].getEntries(bx);
     ncm7 = match[6].getEntries(bx);
     ncm8 = match[7].getEntries(bx);
+    std::cout << "ncm1=" << ncm1 << std::endl;
+    std::cout << "ncm2=" << ncm2 << std::endl;
+    std::cout << "ncm3=" << ncm3 << std::endl;
+    std::cout << "ncm4=" << ncm4 << std::endl;
+    std::cout << "ncm5=" << ncm5 << std::endl;
+    std::cout << "ncm6=" << ncm6 << std::endl;
+    std::cout << "ncm7=" << ncm7 << std::endl;
+    std::cout << "ncm8=" << ncm8 << std::endl;
+    if (ncm1 > 0) mem_hasdata.set(0);
+    if (ncm2 > 0) mem_hasdata.set(1);
+    if (ncm3 > 0) mem_hasdata.set(2);
+    if (ncm4 > 0) mem_hasdata.set(3);
+    if (ncm5 > 0) mem_hasdata.set(4);
+    if (ncm6 > 0) mem_hasdata.set(5);
+    if (ncm7 > 0) mem_hasdata.set(6);
+    if (ncm8 > 0) mem_hasdata.set(7);
+      for(int i = 0; i < MaxMatchCopies; ++i) {
+#pragma HLS unroll
+      mem_read_addr[i] = 0;
+      }
+      tmp_mem_hasdata = mem_hasdata;
+    }
+    std::cout << "mem_hasdata=" << std::bitset<MaxMatchCopies>( mem_hasdata) << std::endl;
+    std::cout << "ctz=" << __builtin_ctz(mem_hasdata) << std::endl;
+    std::cout << "tmp_mem_hasdata=" << std::bitset<MaxMatchCopies>( tmp_mem_hasdata) << std::endl;
+    std::cout << "ctz=" << __builtin_ctz(tmp_mem_hasdata) << std::endl;
 
     // Count up total number of CMs *and protect incase of overflow)
     total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
@@ -657,6 +718,25 @@ void MatchCalculator(BXType bx,
     cm_L2_1    = cm_L2_1_next;
     cm_L2_2    = cm_L2_2_next;
     datastream = cm_L3_next;
+    bool validin = read_input_mems<MaxMatchCopies>(bx, mem_hasdata, tmp_mem_hasdata, numbersin, mem_read_addr, match, datastream);
+    //if(validin) std::cout << "istep=" << istep << "\tvalid match" << std::endl;
+    //datastream = validin ? datastream : CandidateMatch();
+    std::cout << "istep=" << istep << "\tcm1=" << cm1.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm2=" << cm2.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm3=" << cm3.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm4=" << cm4.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm5=" << cm5.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm6=" << cm6.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm7=" << cm7.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm8=" << cm8.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L1_1_next=" << cm_L1_1_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L1_2_next=" << cm_L1_2_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L1_3_next=" << cm_L1_3_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L1_4_next=" << cm_L1_4_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L2_1_next=" << cm_L2_1_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L2_2_next=" << cm_L2_2_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tcm_L3_next=" << cm_L3_next.raw() << std::endl;
+    std::cout << "istep=" << istep << "\tdatastream=" << datastream.raw() << std::endl;
 
     valid_L1_1 = valid_L1_1_next;
     valid_L1_2 = valid_L1_2_next;
