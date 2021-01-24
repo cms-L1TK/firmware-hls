@@ -40,8 +40,8 @@ end tb_tf_top;
 --! @brief TB
 architecture behavior of tb_tf_top is
   -- ########################### Types ###########################
-  type t_str_array_TPROJ is array(natural range <>) of string(1 to 103); --! String array
-  type t_str_array_VMSME is array(natural range <>) of string(1 to 79);  --! String array
+  type t_str_array_TPROJ is array(natural range <>) of string(1 to 106); --! String array
+  type t_str_array_VMSME is array(natural range <>) of string(1 to 82);  --! String array
   type t_str_array_VMP   is array(natural range <>) of string(1 to 42);  --! String array
   type t_str_array_CM    is array(natural range <>) of string(1 to 38);  --! String array
   type t_str_array_FM    is array(natural range <>) of string(1 to 41);  --! String array
@@ -62,42 +62,42 @@ architecture behavior of tb_tf_top is
   constant VMSME_DELAY       : integer := 1-1;        --! Number of BX delays (can be written early 8 pages)
   constant AS_DELAY          : integer := 2-1;        --! Number of BX delays (can be written early 8 pages)
   constant MEM_READ_DELAY    : integer := 2;          --! Number of memory read delay
-  constant FILE_IN_TPROJ : t_str_array_TPROJ(0 to N_ME_IN_CHAIN-1) := ("../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat", --! Input files
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat" );
-  constant FILE_IN_VMSME : t_str_array_VMSME(0 to N_ME_IN_CHAIN-1) := ("../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC17n1_04.dat", --! Input files
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC18n1_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC19n1_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC20n1_04.dat", -- Used by lastest ME HLS c(o)sim
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC21n1_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC22n1_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC23n1_04.dat",
-                                                                       "../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC24n1_04.dat" );
-  constant FILE_IN_AS        : string := "../../../../../../../emData/MemPrints/Stubs/AllStubs_AS_L3PHICn6_04.dat"; --! Input file
-  constant FILE_OUT_VMP      : t_str_array_VMP(0 to N_ME_IN_CHAIN-1) := ("../../../../../tb/data/VMPROJ_L3PHIC17.txt", --! Output file for VMP
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC18.txt",
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC19.txt",
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC20.txt",
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC21.txt",
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC22.txt",
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC23.txt",
-                                                                         "../../../../../tb/data/VMPROJ_L3PHIC24.txt" );
-  constant FILE_OUT_AP       : string := "../../../../../tb/data/AP_L3PHIC.txt";  --! Output file for AP
-  constant FILE_OUT_CM       : t_str_array_CM(0 to N_ME_IN_CHAIN-1) :=  ("../../../../../tb/data/CM_L3PHIC17.txt", --! Output file for CM
-                                                                         "../../../../../tb/data/CM_L3PHIC18.txt",
-                                                                         "../../../../../tb/data/CM_L3PHIC19.txt",
-                                                                         "../../../../../tb/data/CM_L3PHIC20.txt",
-                                                                         "../../../../../tb/data/CM_L3PHIC21.txt",
-                                                                         "../../../../../tb/data/CM_L3PHIC22.txt",
-                                                                         "../../../../../tb/data/CM_L3PHIC23.txt",
-                                                                         "../../../../../tb/data/CM_L3PHIC24.txt" );
-  constant FILE_OUT_FM       : t_str_array_FM(0 to 1) :=  ("../../../../../tb/data/FM_L1L2_L3PHIC.txt", --! Output file for FM
-                                                           "../../../../../tb/data/FM_L5L6_L3PHIC.txt" );
+  constant FILE_IN_TPROJ : t_str_array_TPROJ(0 to N_ME_IN_CHAIN-1) := ("../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat", --! Input files
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/TrackletProjections/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat" );
+  constant FILE_IN_VMSME : t_str_array_VMSME(0 to N_ME_IN_CHAIN-1) := ("../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC17n1_04.dat", --! Input files
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC18n1_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC19n1_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC20n1_04.dat", -- Used by lastest ME HLS c(o)sim
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC21n1_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC22n1_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC23n1_04.dat",
+                                                                       "../../../../../../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC24n1_04.dat" );
+  constant FILE_IN_AS        : string := "../../../../../../../../emData/MemPrints/Stubs/AllStubs_AS_L3PHICn6_04.dat"; --! Input file
+  constant FILE_OUT_VMP      : t_str_array_VMP(0 to N_ME_IN_CHAIN-1) := ("../../../../../dataOut/VMPROJ_L3PHIC17.txt", --! Output file for VMP
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC18.txt",
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC19.txt",
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC20.txt",
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC21.txt",
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC22.txt",
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC23.txt",
+                                                                         "../../../../../dataOut/VMPROJ_L3PHIC24.txt" );
+  constant FILE_OUT_AP       : string := "../../../../../dataOut/AP_L3PHIC.txt";  --! Output file for AP
+  constant FILE_OUT_CM       : t_str_array_CM(0 to N_ME_IN_CHAIN-1) :=  ("../../../../../dataOut/CM_L3PHIC17.txt", --! Output file for CM
+                                                                         "../../../../../dataOut/CM_L3PHIC18.txt",
+                                                                         "../../../../../dataOut/CM_L3PHIC19.txt",
+                                                                         "../../../../../dataOut/CM_L3PHIC20.txt",
+                                                                         "../../../../../dataOut/CM_L3PHIC21.txt",
+                                                                         "../../../../../dataOut/CM_L3PHIC22.txt",
+                                                                         "../../../../../dataOut/CM_L3PHIC23.txt",
+                                                                         "../../../../../dataOut/CM_L3PHIC24.txt" );
+  constant FILE_OUT_FM       : t_str_array_FM(0 to 1) :=  ("../../../../../dataOut/FM_L1L2_L3PHIC.txt", --! Output file for FM
+                                                           "../../../../../dataOut/FM_L5L6_L3PHIC.txt" );
 
   -- ########################### Signals ###########################
   -- ### UUT signals ###

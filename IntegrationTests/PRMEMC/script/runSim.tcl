@@ -1,0 +1,21 @@
+# Open project
+set projName "Work"
+open_project $projName/Work.xpr
+
+# Create directory for output .txt file
+file delete -force dataOut/
+file mkdir dataOut/
+
+# Launch Simulation
+launch_simulation
+
+# Set default wave viewer cfg
+open_wave_config {../tb/prmemc.wcfg}
+open_wave_config {../tb/start_bx.wcfg}
+open_wave_config {../tb/tf_top.wcfg}
+open_wave_config {../tb/mem_tf.wcfg}
+open_wave_config {../tb/mem_tf_wea.wcfg}
+
+restart
+# Need 4us + 450ns per event
+run 50 us
