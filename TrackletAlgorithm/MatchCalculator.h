@@ -129,32 +129,130 @@ void merger(
 }
 
 template<int MaxMatchCopies>
+inline bool read_input_mems(BXType bx,
+                     const CandidateMatch match[],
+                     const CandidateMatchMemory matches[],
+                     //bool read_addr[MaxMatchCopies],
+                     ap_uint<kNBits_MemAddr> read_addr[MaxMatchCopies],
+                     bool read[MaxMatchCopies],
+                     CandidateMatch &cm) {
+#pragma HLS inline
+    ap_uint<8> best_imem = 0;
+    CandidateMatch tmpcm;
+    cm = CandidateMatch();
+    // search the buffer for the smallest projid
+    MBEST: for(int i = 0; i < MaxMatchCopies; ++i) {
+#pragma HLS unroll
+      //tmpcm = match[i];
+      tmpcm = matches[i].read_mem(bx, read_addr[i]);
+      if(tmpcm.raw() != 0) {
+        if(cm.raw() == 0) {
+          cm = tmpcm;
+          best_imem = i;
+        }
+        else if(tmpcm.getProjIndex() < cm.getProjIndex()) {
+          cm = tmpcm;
+          best_imem = i;
+        }
+      }
+    }
+    read_addr[best_imem] = read_addr[best_imem] + 1;
+    MADDR: for(int i = 0; i < MaxMatchCopies; ++i) {
+#pragma HLS unroll
+      read[i] = (i == best_imem);
+    }
+
+    return true;
+}
+
+/*
+template<int MaxMatchCopies>
+inline bool read_input_mems(BXType bx,
+                     const CandidateMatch match[],
+                     CandidateMatch matchbuffer[],
+                     int &buffsize,
+                     CandidateMatch &cm) {
+#pragma HLS inline
+    //const CandidateMatch match[MaxMatchCopies] = { cm1, cm2, cm3, cm4, cm5, cm6, cm7, cm8};
+    // Add new CMs to the buffer
+    MBUFFER: for(int i = 0; i < MaxMatchCopies; ++i) {
+#pragma HLS unroll
+      if(match[i].raw() != 0) {
+        matchbuffer[buffsize] = match[i];
+        buffsize++;
+      }
+    }
+
+    //if (mem_hasdata == 0) return false;
+    ap_uint<8> best_imem = 0;
+    CandidateMatch tmpcm;
+    cm = CandidateMatch();
+    // search the buffer for the smallest projid
+    MBEST: for(int i = 0; i < 255; ++i) {
+#pragma HLS unroll
+      tmpcm = matchbuffer[i];
+      if(tmpcm.raw() != 0) {
+        if(cm.raw() == 0) {
+          cm = tmpcm;
+          best_imem = i;
+        }
+        else if(tmpcm.getProjIndex() < cm.getProjIndex()) {
+          cm = tmpcm;
+          best_imem = i;
+        }
+      }
+    }
+    matchbuffer[best_imem] = CandidateMatch();
+
+    return true;
+}
+
+template<int MaxMatchCopies>
 bool read_input_mems(BXType bx,
                      ap_uint<MaxMatchCopies>& mem_hasdata,
                      ap_uint<MaxMatchCopies>& tmp_mem_hasdata,
                      ap_uint<kNBits_MemAddr> nentries[MaxMatchCopies],
                      ap_uint<kNBits_MemAddr> read_addr[],
-                     const CandidateMatchMemory match[],
+                     const CandidateMatch match[],
                      CandidateMatch &cm) {
 #pragma HLS inline
 
     if (mem_hasdata == 0) return false;
     // 5 bits memory index for up to 32 input memory priority encoder
+    ap_uint<MaxMatchCopies>& tmptmp_mem_hasdata = mem_hasdata;
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
-    std::cout << "read_imem=" << read_imem << std::endl;
-    cm = match[read_imem].read_mem(bx, read_addr[read_imem]);
-    ++read_addr[read_imem];
-    if (read_addr[read_imem] >= nentries[read_imem]) {
-      // All entries in the memory[read_imem] have been read out - Prepare to move to the next non-empty memory
-      read_addr[read_imem] = 0;
-      mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
+    ap_uint<5> best_imem = 0;
+    CandidateMatch tmpcm;
+    for(ap_uint<5> i = 0; i < MaxMatchCopies; ++i) {
+#pragma HLS unroll
+      tmpcm = match[i];
+      //std::cout << "tmpcm=" << tmpcm.raw() << std::endl;
+      //cm = (cm.raw() == 0 || tmpcm.getProjIndex() < cm.getProjIndex()) && tmpcm.raw() != 0 && tmp_mem_hasdata.range(i,i) > 0 ? tmpcm : cm;
+      //best_imem = (cm.raw() == 0 || tmpcm.getProjIndex() < cm.getProjIndex()) && tmpcm.raw() != 0 && tmp_mem_hasdata.range(i,i) > 0 ? i : best_imem;
+      if(tmp_mem_hasdata.range(i,i) > 0) {
+        if(cm.raw() == 0) {
+          cm = tmpcm;
+          best_imem = i;
+        }
+        else if(tmpcm.getProjIndex() < cm.getProjIndex()) {
+          cm = tmpcm;
+          best_imem = i;
+        }
+      }
     }
-    tmp_mem_hasdata.clear(read_imem);
-    tmp_mem_hasdata = tmp_mem_hasdata == 0 ? mem_hasdata : tmp_mem_hasdata;
+    tmp_mem_hasdata.clear(best_imem);
+    ++read_addr[read_imem];
+    if (read_addr[best_imem] >= nentries[best_imem]) {
+      // All entries in the memory[best_imem] have been read out - Prepare to move to the next non-empty memory
+      read_addr[best_imem] = 0;
+      mem_hasdata.clear(best_imem);  // set the current lowest 1 bit to 0
+    }
+    if(tmp_mem_hasdata == 0) tmp_mem_hasdata = mem_hasdata;
 
     return true;
 
 } // read_input_mems
+*/
 
 //////////////////////////////////////////////////////////////
 
@@ -446,14 +544,27 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> nmcout8 = 0;  
 
   ap_uint<MaxMatchCopies> mem_hasdata;
-  ap_uint<MaxMatchCopies> tmp_mem_hasdata;
-  ap_uint<kNBits_MemAddr> numbersin[MaxMatchCopies];
-  ap_uint<kNBits_MemAddr> mem_read_addr[MaxMatchCopies];
+  //ap_uint<MaxMatchCopies> tmp_mem_hasdata;
+  //ap_uint<kNBits_MemAddr> numbersin[MaxMatchCopies];
+  //ap_uint<kNBits_MemAddr> mem_read_addr[MaxMatchCopies];
+//#pragma HLS array_partition variable=numbersin complete dim=1
+//#pragma HLS array_partition variable=mem_read_addr complete dim=1
+
+  static CandidateMatch matchbuffer[255];
+//#pragma HLS array_partition variable=matchbuffer complete dim=1
+#pragma HLS resource variable=matchbuffer core=RAM_2P_LUTRAM
+#pragma HLS dependence variable=matchbuffer inter false
+    MINIT: for(int i = 0; i < 255; ++i) {
+#pragma HLS unroll
+      matchbuffer[i] = CandidateMatch();
+    }
+  static int buffsize = 0;
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
 
 #pragma HLS PIPELINE II=1 
     if (istep == 0) {
+    buffsize = 0;
 
     // Pick up number of candidate matches for each CM memory
     ncm1 = match[0].getEntries(bx);
@@ -464,14 +575,6 @@ void MatchCalculator(BXType bx,
     ncm6 = match[5].getEntries(bx);
     ncm7 = match[6].getEntries(bx);
     ncm8 = match[7].getEntries(bx);
-    std::cout << "ncm1=" << ncm1 << std::endl;
-    std::cout << "ncm2=" << ncm2 << std::endl;
-    std::cout << "ncm3=" << ncm3 << std::endl;
-    std::cout << "ncm4=" << ncm4 << std::endl;
-    std::cout << "ncm5=" << ncm5 << std::endl;
-    std::cout << "ncm6=" << ncm6 << std::endl;
-    std::cout << "ncm7=" << ncm7 << std::endl;
-    std::cout << "ncm8=" << ncm8 << std::endl;
     if (ncm1 > 0) mem_hasdata.set(0);
     if (ncm2 > 0) mem_hasdata.set(1);
     if (ncm3 > 0) mem_hasdata.set(2);
@@ -480,16 +583,14 @@ void MatchCalculator(BXType bx,
     if (ncm6 > 0) mem_hasdata.set(5);
     if (ncm7 > 0) mem_hasdata.set(6);
     if (ncm8 > 0) mem_hasdata.set(7);
+/*
       for(int i = 0; i < MaxMatchCopies; ++i) {
 #pragma HLS unroll
-      mem_read_addr[i] = 0;
+      //mem_read_addr[i] = 0;
       }
-      tmp_mem_hasdata = mem_hasdata;
+*/
+    //tmp_mem_hasdata = mem_hasdata;
     }
-    std::cout << "mem_hasdata=" << std::bitset<MaxMatchCopies>( mem_hasdata) << std::endl;
-    std::cout << "ctz=" << __builtin_ctz(mem_hasdata) << std::endl;
-    std::cout << "tmp_mem_hasdata=" << std::bitset<MaxMatchCopies>( tmp_mem_hasdata) << std::endl;
-    std::cout << "ctz=" << __builtin_ctz(tmp_mem_hasdata) << std::endl;
 
     // Count up total number of CMs *and protect incase of overflow)
     total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
@@ -576,6 +677,7 @@ void MatchCalculator(BXType bx,
 
     // Increment the read addresses for the candidate matches
 
+    /*
     if (read1) addr1++;
     if (read2) addr2++;
     if (read3) addr3++;
@@ -584,6 +686,7 @@ void MatchCalculator(BXType bx,
     if (read6) addr6++;
     if (read7) addr7++;
     if (read8) addr8++;
+    */
 
     // Read in each candidate match
     const CandidateMatch &cm1 = match[0].read_mem(bx,addr1);
@@ -606,6 +709,7 @@ void MatchCalculator(BXType bx,
     bool valid8 = (addr8 < ncm8) && (ncm8 > 0);
 
     // merger Layer 1 Part 1
+    /*
     merger<1,1>(
       cm1, valid1, cm2, valid2,                      // inputs: inA, validA, inB, validB
       cm_L1_1, valid_L1_1, read_L1_1,                // inputs: out, vout, inread from L2_1
@@ -718,25 +822,43 @@ void MatchCalculator(BXType bx,
     cm_L2_1    = cm_L2_1_next;
     cm_L2_2    = cm_L2_2_next;
     datastream = cm_L3_next;
-    bool validin = read_input_mems<MaxMatchCopies>(bx, mem_hasdata, tmp_mem_hasdata, numbersin, mem_read_addr, match, datastream);
+    */
+    const CandidateMatch matches[MaxMatchCopies] = { cm1, cm2, cm3, cm4, cm5, cm6, cm7, cm8};
+#pragma HLS array_partition variable=matches complete dim=1
+    /*
+    read1 = true;
+    read2 = true;
+    read3 = true;
+    read4 = true;
+    read5 = true;
+    read6 = true;
+    read7 = true;
+    read8 = true;
+    */
+    //bool validin = read_input_mems<MaxMatchCopies>(bx, mem_hasdata, tmp_mem_hasdata, numbersin, mem_read_addr, matches, datastream);
+    ap_uint<kNBits_MemAddr> read_addr[MaxMatchCopies] = {addr1, addr2, addr3, addr4, addr5, addr6, addr7, addr8};
+    bool read[MaxMatchCopies];
+    bool validin = read_input_mems<MaxMatchCopies>(bx, matches, match, read_addr, read, datastream);
+    addr1 = read_addr[0];
+    addr2 = read_addr[1];
+    addr3 = read_addr[2];
+    addr4 = read_addr[3];
+    addr5 = read_addr[4];
+    addr6 = read_addr[5];
+    addr7 = read_addr[6];
+    addr8 = read_addr[7];
+    read1 = read[0];
+    read2 = read[1];
+    read3 = read[2];
+    read4 = read[3];
+    read5 = read[4];
+    read6 = read[5];
+    read7 = read[6];
+    read8 = read[7];
+    //bool validin = read_input_mems<MaxMatchCopies>(bx, matches, matchbuffer, buffsize, datastream);
+    //bool validin = read_input_mems<MaxMatchCopies>(bx, matches, matchbuffer, buffsize, datastream);
     //if(validin) std::cout << "istep=" << istep << "\tvalid match" << std::endl;
-    //datastream = validin ? datastream : CandidateMatch();
-    std::cout << "istep=" << istep << "\tcm1=" << cm1.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm2=" << cm2.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm3=" << cm3.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm4=" << cm4.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm5=" << cm5.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm6=" << cm6.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm7=" << cm7.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm8=" << cm8.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L1_1_next=" << cm_L1_1_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L1_2_next=" << cm_L1_2_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L1_3_next=" << cm_L1_3_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L1_4_next=" << cm_L1_4_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L2_1_next=" << cm_L2_1_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L2_2_next=" << cm_L2_2_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tcm_L3_next=" << cm_L3_next.raw() << std::endl;
-    std::cout << "istep=" << istep << "\tdatastream=" << datastream.raw() << std::endl;
+    datastream = validin ? datastream : CandidateMatch();
 
     valid_L1_1 = valid_L1_1_next;
     valid_L1_2 = valid_L1_2_next;
