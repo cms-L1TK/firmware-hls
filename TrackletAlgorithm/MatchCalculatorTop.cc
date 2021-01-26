@@ -10,7 +10,14 @@ void MatchCalculatorTop(BXType bx,
 {
  #pragma HLS inline off
  #pragma HLS interface register port=bx_o
- #pragma HLS resource variable=match.get_mem() latency=2
+ #pragma HLS resource variable=match[0].get_mem() latency=2
+ #pragma HLS resource variable=match[1].get_mem() latency=2
+ #pragma HLS resource variable=match[2].get_mem() latency=2
+ #pragma HLS resource variable=match[3].get_mem() latency=2
+ #pragma HLS resource variable=match[4].get_mem() latency=2
+ #pragma HLS resource variable=match[5].get_mem() latency=2
+ #pragma HLS resource variable=match[6].get_mem() latency=2
+ #pragma HLS resource variable=match[7].get_mem() latency=2
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=allproj->get_mem() latency=2
 

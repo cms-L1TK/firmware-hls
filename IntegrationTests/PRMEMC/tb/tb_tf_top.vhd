@@ -334,6 +334,7 @@ begin
   end process playback;
 
   --! @brief TextIO process for writting the output ---------------------------------------
+  -- TODO: Replace wite with write ry procedures (e.g. like CM)
   write_result : process
     file     file_out_L1L2 : text open WRITE_MODE is FILE_OUT_FM(0); -- Text - a file of character strings
     file     file_out_L5L6 : text open WRITE_MODE is FILE_OUT_FM(1); -- Text - a file of character strings
