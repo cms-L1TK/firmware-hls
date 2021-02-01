@@ -46,6 +46,7 @@ void TrackletEngine(
 		    const VMStubTEOuterMemory<outertype>& instubouterdata,
                     const ap_uint<1> bendinnertable[stubptinnerdepth],
                     const ap_uint<1> bendoutertable[stubptouterdepth],
+                    BXType& bx_o,
 		    StubPairMemory& outstubpair) {
 
 #pragma HLS inline
@@ -220,6 +221,8 @@ void TrackletEngine(
           	  }
       	 }
   }
+
+  bx_o = bx;
 }
 
 #endif
