@@ -373,6 +373,7 @@ int main()
     static const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
 
     BXType hBx = cEvId&0x7;
+    BXType hBxOut; 
     // #ifndef __SYNTHESIS__
     // std::cout << "IR module reading out link " << +hLinkId
     //   << " is going to fill "
@@ -386,7 +387,8 @@ int main()
       , cLUT_L2 // corrections scnd brl lyr  
       , cLUT_L3 // corrections thrd brl lyr  
       , hInputStubs // input stub stream 
-      , hMemories); 
+      , hBxOut // output bx 
+      , hMemories);  // output memories 
 
     // compare memories 
     for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)

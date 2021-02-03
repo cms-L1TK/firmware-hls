@@ -133,6 +133,7 @@ void InputRouter( const BXType hBx
 	, const int hPhiCorrtable_L2[nLUTEntries]
 	, const int hPhiCorrtable_L3[nLUTEntries]
 	, ap_uint<kNBits_DTC>* hInputStubs
+	, BXType& hOutputBx 
 	, DTCStubMemory* hOutputStubs)
 {
 	
@@ -140,6 +141,7 @@ void InputRouter( const BXType hBx
 	#pragma HLS interface ap_memory port = hPhiCorrtable_L1
   	#pragma HLS interface ap_memory port = hPhiCorrtable_L2
   	#pragma HLS interface ap_memory port = hPhiCorrtable_L3
+  	#pragma HLS interface register 	port = hOutputBx 
   
   	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	// clear stub counter
@@ -264,6 +266,8 @@ void InputRouter( const BXType hBx
 	  // update counter 
 	  hNStubs[cMemIndx] = hEntries + 1;
 	}
+	// update output bx port 
+	hOutputBx = hBx;
 }
 
 

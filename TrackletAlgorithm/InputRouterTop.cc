@@ -7,6 +7,7 @@ void InputRouterTop( const BXType hBx
   , const int kPhiCorrtable_L2[cNEntriesLUT] // corrections scnd brl lyr   
   , const int kPhiCorrtable_L3[cNEntriesLUT] // corrections thrd brl lyr  
   , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]
+  , BXType & hOutputBx // output bx 
   , DTCStubMemory hOutputStubs[cNMemories]) {
 
   #pragma HLS clock domain = slow_clock
@@ -20,5 +21,6 @@ void InputRouterTop( const BXType hBx
       , kPhiCorrtable_L2
       , kPhiCorrtable_L3
       , hInputStubs
+      , hOutputBx
       , hOutputStubs);
 }
