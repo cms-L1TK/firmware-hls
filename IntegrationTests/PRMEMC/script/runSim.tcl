@@ -2,6 +2,8 @@
 set projName "Work"
 open_project $projName/Work.xpr
 
+reset_simulation sim_1
+
 # Create directory for output .txt file
 file delete -force dataOut/
 file mkdir dataOut/
