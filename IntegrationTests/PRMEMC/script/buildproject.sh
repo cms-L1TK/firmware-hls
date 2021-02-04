@@ -13,5 +13,6 @@ cd ../emData
 
 # Open the Vivado GUI and initialize the project
 cd ../IntegrationTests/$PROJECT
+mkdir tb/data
 vivado -mode tcl -source script/generate_project.tcl -tclargs $PROJECT
 vivado -mode tcl -source ../common/script/synth.tcl -tclargs $PROJECT
