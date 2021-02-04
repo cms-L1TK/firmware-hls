@@ -868,9 +868,9 @@ void MatchCalculator(BXType bx,
     goodmatch      = goodmatch_next;
     projseed       = projseed_next;
 
-    if (istep==kMaxProc-kMaxProcOffset(module::MC)-1) bx_o = bx;
-
   }// end MC_LOOP 
+
+  bx_o = bx;
 
   /*
   // finish by writing out the last match made (to minimize truncation) -- can't do this because not in the loop 
