@@ -126,14 +126,14 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 
 
 template<unsigned int nOMems, unsigned int nLUTEntries>
-void InputRouter( const BXType hBx
+void InputRouter( const BXType bx
 	, const ap_uint<kLINKMAPwidth> hLinkWord
 	, const ap_uint<kBINMAPwidth> hPhBnWord 
 	, const int hPhiCorrtable_L1[nLUTEntries]
 	, const int hPhiCorrtable_L2[nLUTEntries]
 	, const int hPhiCorrtable_L3[nLUTEntries]
 	, ap_uint<kNBits_DTC>* hInputStubs
-	, BXType& hOutputBx 
+	, BXType& bx_o 
 	, DTCStubMemory* hOutputStubs)
 {
 	
@@ -155,7 +155,7 @@ void InputRouter( const BXType hBx
 	 #ifndef __SYNTHESIS__
 	  if (IR_DEBUG) {
 	  std::cout << ".........."
-	    << +(&hOutputStubs[cMemIndx])->getEntries(hBx) 
+	    << +(&hOutputStubs[cMemIndx])->getEntries(bx) 
 	    << " entries... "
 	    << "\n";
 	  }
@@ -262,12 +262,12 @@ void InputRouter( const BXType hBx
 		            << " Current number of entries " << +hEntries << "\n";
 	  }
 	  #endif
-	  (&hOutputStubs[cMemIndx])->write_mem(hBx, hMemWord, hEntries);
+	  (&hOutputStubs[cMemIndx])->write_mem(bx, hMemWord, hEntries);
 	  // update counter 
 	  hNStubs[cMemIndx] = hEntries + 1;
 	}
 	// update output bx port 
-	hOutputBx = hBx;
+	bx_o = bx;
 }
 
 
