@@ -141,7 +141,7 @@ void InputRouter( const BXType bx
 	#pragma HLS interface ap_memory port = hPhiCorrtable_L1
   	#pragma HLS interface ap_memory port = hPhiCorrtable_L2
   	#pragma HLS interface ap_memory port = hPhiCorrtable_L3
-  	#pragma HLS interface register 	port = hOutputBx 
+  	#pragma HLS interface register 	port = bx 
   
   	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	// clear stub counter
