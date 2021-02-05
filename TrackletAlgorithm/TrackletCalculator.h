@@ -186,6 +186,7 @@ TrackletCalculator(
     const AllStubMemory<InnerRegion> innerStubs[NASMemInner],
     const AllStubMemory<OuterRegion> outerStubs[NASMemOuter],
     const StubPairMemory stubPairs[NSPMem],
+    BXType& bx_o,
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -197,6 +198,7 @@ void TrackletCalculator_L1L2E(
     const AllStubMemory<BARRELPS> innerStubs[2],
     const AllStubMemory<BARRELPS> outerStubs[1],
     const StubPairMemory stubPairs[13],
+    BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -208,6 +210,7 @@ void TrackletCalculator_L1L2G(
     const AllStubMemory<BARRELPS> innerStubs[1],
     const AllStubMemory<BARRELPS> outerStubs[2],
     const StubPairMemory stubPairs[13],
+    BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -219,6 +222,7 @@ void TrackletCalculator_L3L4E(
     const AllStubMemory<BARRELPS> innerStubs[1],
     const AllStubMemory<BARREL2S> outerStubs[2],
     const StubPairMemory stubPairs[11],
+    BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -559,6 +563,7 @@ TrackletCalculator(
     const AllStubMemory<InnerRegion> innerStubs[NASMemInner],
     const AllStubMemory<OuterRegion> outerStubs[NASMemOuter],
     const StubPairMemory stubPairs[NSPMem],
+    BXType& bx_o,
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -614,6 +619,8 @@ TrackletCalculator(
       TC::processStubPair<Seed, InnerRegion, OuterRegion, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
   }
+
+  bx_o = bx;
 }
 
 #endif

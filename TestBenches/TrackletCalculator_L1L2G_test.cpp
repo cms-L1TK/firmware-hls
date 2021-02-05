@@ -189,9 +189,11 @@ int main()
 
     // bx
     BXType bx = ievt;
+    BXType bx_o;
 
     // Unit Under Test
     TrackletCalculator_L1L2G(bx, innerStubs, outerStubs, stubPairs,
+       bx_o,
        &tpar,
        tproj_barrel_ps,
        tproj_barrel_2s,
