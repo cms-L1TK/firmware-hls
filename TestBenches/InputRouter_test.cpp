@@ -372,21 +372,23 @@ int main()
     static const int* cLUT_L2 = (  hIs2S == 1 )  ? kPhiCorrtable_L5 : kPhiCorrtable_L2; 
     static const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
 
-    BXType hBx = cEvId&0x7;
+    BXType bx = cEvId&0x7;
+    BXType bx_o; 
     // #ifndef __SYNTHESIS__
     // std::cout << "IR module reading out link " << +hLinkId
     //   << " is going to fill "
     //   <<  hNmemories
     //   << " memories\n";
     // #endif
-    InputRouterTop( hBx
+    InputRouterTop( bx
       , hLinkWord // input link LUT 
       , hPhBnWord  // n phi bins LUT 
       , cLUT_L1// corrections frst brl lyr  
       , cLUT_L2 // corrections scnd brl lyr  
       , cLUT_L3 // corrections thrd brl lyr  
       , hInputStubs // input stub stream 
-      , hMemories); 
+      , bx_o // output bx 
+      , hMemories);  // output memories 
 
     // compare memories 
     for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)

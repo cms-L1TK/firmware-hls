@@ -213,9 +213,9 @@ void ProjectionRouter(BXType bx,
       nallproj ++;
       }
 
-    if (istep==kMaxProc-kMaxProcOffset(module::PR)-1) bx_o = bx;
- 
   } // end of PROC_LOOP
+
+  bx_o = bx;
   
 } // ProjectionRouter
 

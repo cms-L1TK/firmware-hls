@@ -61,7 +61,7 @@ constexpr int nbitsztabledisk = 3;
 constexpr int nbitsrtabledisk = 8;
 
 // Number of MSBs used for r index in phiCorr LUTs
-constexpr int nbitsrphitorrtable = 3; // Found hardcoded in VMRouterphiCorrTable.h
+constexpr int nbitsrphicorrtable = 3; // Found hardcoded in VMRouterphiCorrTable.h
 
 // Constants used for calculating which VM a stub belongs to
 constexpr int nbits_maxvmol = 4; // Overlap
@@ -160,10 +160,10 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 	if (InType == DISKPS || InType == DISK2S)
 		return phi; // Do nothing if disks
 
-	constexpr auto rBins = 1 << nbitsrphitorrtable; // The number of bins for r
+	constexpr auto rBins = 1 << nbitsrphicorrtable; // The number of bins for r
 
-	ap_uint<nbitsrphitorrtable> rBin = (r + (1 << (r.length() - 1)))
-			>> (r.length() - nbitsrphitorrtable); // Which bin r belongs to. Note r = 0 is mid radius
+	ap_uint<nbitsrphicorrtable> rBin = (r + (1 << (r.length() - 1)))
+			>> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * rBins + rBin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
@@ -581,7 +581,7 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 // MAXCopies - The maximum number of copies of a memory type
 // NBitsBin number of bits used for the bins in MEMemories
 template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin, int BendCutTableSize>
-void VMRouter(const BXType bx, const int fineBinTable[], const int phiCorrTable[],
+void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int phiCorrTable[],
 		// rzbitstables, aka binlookup in emulation
 		const int rzbitsInnerTable[], const int rzbitsOverlapTable[], const int rzbitsOuterTable[],
 		// bendcut tables
@@ -933,6 +933,8 @@ void VMRouter(const BXType bx, const int fineBinTable[], const int phiCorrTable[
 
 		} // End TE Overlap memories
 	} // Outside main loop
+
+	bx_o = bx;
 } // End VMRouter
 
 #endif // TrackletAlgorithm_VMRouterTop_h

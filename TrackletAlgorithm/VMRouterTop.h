@@ -83,7 +83,7 @@ constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. C
 // VMRouter Top Function
 // Changed manually
 
-void VMRouterTop(BXType bx,
+void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStub[numInputs],
 
