@@ -53,7 +53,7 @@ architecture behavior of tb_tf_top is
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
   constant N_ME_IN_CHAIN     : integer := 8; --! Number of match engines in chain
-  constant INST_TOP_TF       : integer := 2;          --! Instantiate top_tf or others
+  constant INST_TOP_TF       : integer := 0;          --! Instantiate top_tf or others
                                                       --! 0: Generated prmemc chain
                                                       --! 1: top_tf
                                                       --! 2: top_tf_full (intermediate MemPrints)
@@ -114,7 +114,7 @@ architecture behavior of tb_tf_top is
   -- For VMStubME memories
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : t_arr8_1b  := (others => '0');
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : t_arr8_10b  := (others => (others => '0'));
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_arr8_14b := (others => (others => '0'));
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_arr8_13b := (others => (others => '0'));
   -- For AllStubs memories
   signal AS_L3PHICn4_dataarray_data_V_wea       : std_logic                     := '0';
   signal AS_L3PHICn4_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0)  := (others => '0');

@@ -57,6 +57,7 @@ package tf_pkg is
   type t_arr8_8b  is array(0 to 7) of std_logic_vector(7 downto 0);
   type t_arr8_9b  is array(0 to 7) of std_logic_vector(8 downto 0);
   type t_arr8_10b is array(0 to 7) of std_logic_vector(9 downto 0);
+  type t_arr8_13b is array(0 to 7) of std_logic_vector(12 downto 0);
   type t_arr8_14b is array(0 to 7) of std_logic_vector(13 downto 0);
   type t_arr8_21b is array(0 to 7) of std_logic_vector(20 downto 0);
   type t_arr8_60b is array(0 to 7) of std_logic_vector(59 downto 0);
