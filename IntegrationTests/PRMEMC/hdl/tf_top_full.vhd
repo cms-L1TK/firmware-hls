@@ -380,7 +380,7 @@ begin
   begin
     VMSME_L3PHIC17to24n1 : entity work.tf_mem_bin
       generic map (
-        RAM_WIDTH       => 14,
+        RAM_WIDTH       => 13,
         RAM_DEPTH       => 1024,
         INIT_FILE       => "",
         INIT_HEX        => true,
