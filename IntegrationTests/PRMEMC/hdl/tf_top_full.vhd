@@ -485,7 +485,7 @@ begin
         bx_o_V_ap_vld => ME_bx_out_vld(meidx),
         inputStubData_dataarray_data_V_address0 => VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr(meidx),
         inputStubData_dataarray_data_V_ce0      => VMSME_L3PHIC17to24n1_dataarray_data_V_enb(meidx),
-        inputStubData_dataarray_data_V_q0       => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(meidx)(12 downto 0),
+        inputStubData_dataarray_data_V_q0       => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(meidx),
         inputStubData_nentries_0_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(0)(meidx),
         inputStubData_nentries_0_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(1)(meidx),
         inputStubData_nentries_0_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(2)(meidx),
