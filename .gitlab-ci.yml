@@ -109,6 +109,7 @@ ME-hls-build:
     PROJ_NAME: "ME"
 MC-hls-build:
   <<: *template_hls-build
+  allow_failure: true # FIXME: remove on next synchronization with emulation
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"

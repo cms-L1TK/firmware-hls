@@ -93,7 +93,7 @@ int main() {
 		MatchEngineTop(bx,bx_out,inputvmstubs,inputvmprojs,outputcandmatches);
 
 		// Compare the computed outputs with the expected ones for the candidate matches
-		bool truncation = true;
+		bool truncation = false;
 		err_count += compareMemWithFile<CandidateMatchMemory,16,2>(outputcandmatches, fin_candmatch, ievt, "CandidateMatch",truncation);
 
 	}  // End of event loop
