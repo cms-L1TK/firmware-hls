@@ -14,7 +14,7 @@ update_ip_catalog -rebuild
 # Create .xci files for user HLS IP
 # FIX: HLS project scripts should produce IP with name like MC_L3PHIC
 create_ip -name MatchCalculatorTop -module_name MC_L3PHIC -vendor xilinx.com -library hls -version 1.0
-create_ip -name MatchEngineTop -module_name MatchEngineTopL3_0 -vendor xilinx.com -library hls -version 1.0
+create_ip -name MatchEngineTop -module_name ME_L3PHIC -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop -module_name PR_L3PHIC -vendor xilinx.com -library hls -version 1.0
 
 # Add HDL for algo
