@@ -19,5 +19,5 @@ open_wave_config {../tb/mem_tf.wcfg}
 open_wave_config {../tb/mem_tf_wea.wcfg}
 
 restart
-# Need 4us + 450ns per event
+# Need 4us + 0.45us per event (50us for 100 events, but 10us for quick test).
 run 50 us
