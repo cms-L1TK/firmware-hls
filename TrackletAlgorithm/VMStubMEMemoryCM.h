@@ -14,11 +14,10 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
-    kVMSMEFinePhiSize = 3,
     kVMSMEBendSize = 3,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
-    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
+    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIDSize
   };
 };
 
@@ -29,11 +28,10 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
-    kVMSMEFinePhiSize = 3,
     kVMSMEBendSize = 4,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
-    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
+    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIDSize
   };
 };
 
@@ -48,7 +46,7 @@ public:
     kVMSMEBendSize = 4,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
-    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
+    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIDSize
   };
 };
 
@@ -61,9 +59,7 @@ public:
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubMEMemoryCM word for different fields
     kVMSMEFineZLSB = 0,
     kVMSMEFineZMSB = kVMSMEFineZLSB + VMStubMECMBase<VMSMEType>::kVMSMEFineZSize - 1,
-    kVMSMEFinePhiLSB = kVMSMEFineZMSB + 1,
-    kVMSMEFinePhiMSB = kVMSMEFinePhiLSB + VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize - 1,
-    kVMSMEBendLSB = kVMSMEFinePhiMSB + 1,
+    kVMSMEBendLSB = kVMSMEFineZMSB + 1,
     kVMSMEBendMSB = kVMSMEBendLSB + VMStubMECMBase<VMSMEType>::kVMSMEBendSize - 1,
     kVMSMEIDLSB = kVMSMEBendMSB + 1,
     kVMSMEIDMSB = kVMSMEIDLSB + VMStubMECMBase<VMSMEType>::kVMSMEIDSize - 1
