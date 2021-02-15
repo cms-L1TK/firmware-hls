@@ -15,6 +15,22 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 
         vivado_hls -p <project>
 
+### Track Quality Specific Instructions
+To generate the track quality HLS from a python saved model format run:
+
+        run_TQ_coniferconversion.sh
+
+In the track quality folder. This requires three python packages to be installed in whatever python environment you will be using: 
+- joblib
+- Numpy
+- xgboost (contains scikit-learn)
+
+Once run this will generate the 2 HLS files for the track quality firmware and a reference datafile that will be compared with the csim output. To run the track quality csim, synth etc.. :
+
+        vivado_hls -f script_TQ.tcl
+
+Which generates the project folder trackquality
+
 ## Format of emData/ files.
 
 ### .dat files (test bench input/output data)
