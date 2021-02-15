@@ -54,10 +54,10 @@ architecture behavior of tb_tf_top is
   -- ############ Please change the constants in this section ###################
   constant N_ME_IN_CHAIN     : integer := 8; --! Number of match engines in chain
   constant INST_TOP_TF       : integer := 0;          --! Instantiate top_tf or others
-                                                      --! 0: Generated prmemc chain
+                                                      --! 0: Generated SectorProcessor chain
                                                       --! 1: top_tf
                                                       --! 2: top_tf_full (intermediate MemPrints)
-  constant CLK_PERIOD        : time    := 4.16667 ns; --! 240 MHz
+  constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
   constant DEBUG             : boolean := true;       --! Debug off/on
   constant VMSME_DELAY       : integer := 1-1;        --! Number of BX delays (can be written early 8 pages)
   constant AS_DELAY          : integer := 2-1;        --! Number of BX delays (can be written early 8 pages)
@@ -333,7 +333,9 @@ begin
     wait for CLK_PERIOD;
   end process playback;
 
+
   --! @brief TextIO process for writting the output ---------------------------------------
+  -- TODO: Replace with write procedures (e.g. like CM) but take MEM_READ_DELAY into accout because it is the read port
   write_result : process
     file     file_out_L1L2 : text open WRITE_MODE is FILE_OUT_FM(0); -- Text - a file of character strings
     file     file_out_L5L6 : text open WRITE_MODE is FILE_OUT_FM(1); -- Text - a file of character strings

@@ -24,9 +24,13 @@ add_files -fileset sources_1 [glob ../hdl/*.vhd]
 # Add HDL for TB
 add_files -fileset sim_1 [glob ../tb/*.vhd]
 
+# Provide name of top-level HDL (without .vhd extension).
+set topLevelHDL "SectorProcessor"
+#set topLevelHDL "tf_top_full"
+
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
-set_property top -value "SectorProcessor" -objects [get_filesets sources_1]
+set_property top -value ${topLevelHDL} -objects [get_filesets sources_1]
 set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
 set_property xsim.simulate.runtime -value "50us" -objects  [get_filesets sim_1]
 
