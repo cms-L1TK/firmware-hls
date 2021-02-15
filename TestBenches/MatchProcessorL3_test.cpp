@@ -213,7 +213,7 @@ int main() {
     bool truncation = true;
 
     // compare the computed outputs with the expected ones 
-    compareMemWithFile<AllProjectionMemory<BARRELPS> >(allproj, fout_ap, ievt, "AllProjections", truncation);
+    //compareMemWithFile<AllProjectionMemory<BARRELPS> >(allproj, fout_ap, ievt, "AllProjections", truncation);
     //std::cout << "FM: L1L2 seeding" << std::endl;
     compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[0], fout_fm1, ievt, "FullMatch", truncation);
     //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[0], fout_fm1, ievt, "FullMatch", truncation);
