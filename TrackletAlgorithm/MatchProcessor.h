@@ -895,6 +895,7 @@ void MatchProcessor(BXType bx,
 */
     int currentMEU = -1;
     bool ready = false;
+    ProjectionRouterBuffer<BARREL>::TCID bestTCID = -1;
     MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
       auto &meu = matchenginetmp[iMEU];
@@ -912,7 +913,9 @@ void MatchProcessor(BXType bx,
       if(!done && !ready) { 
         ready = meu.step(table, instubdata);
         ready = meu.ready();
+        ready &= meu.getTCID() < bestTCID;
         currentMEU = ready ? iMEU : currentMEU;
+        bestTCID = ready ? meu.getTCID() : bestTCID;
       }
 
 
