@@ -25,7 +25,7 @@ In the track quality folder. This requires three python packages to be installed
 - Numpy
 - xgboost (contains scikit-learn)
 
-Once run this will generate the 2 HLS files for the track quality firmware and a reference datafile that will be compared with the csim output. To run the track quality csim, synth etc.. :
+Once run this will generate the 2 HLS files for the track quality firmware (BDT.h and parameters.h) and a reference datafile that will be compared with the csim output. To run the track quality csim, synth etc.. :
 
         vivado_hls -f script_TQ.tcl
 

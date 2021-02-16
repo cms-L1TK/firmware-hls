@@ -3,6 +3,28 @@
 #   vivado_hls -p trackquality
 # WARNING: this will wipe out the original project by the same name
 
+# Check parameters exists, cannot run without it
+if { [file exists ../TrackletAlgorithm/parameters.h ] == 1} {     
+        set parameters_age [file mtime ../TrackletAlgorithm/parameters.h]
+        puts "parameters.h created at [clock format [file mtime ../TrackletAlgorithm/parameters.h]] \n"
+        set model_age  [file mtime ../TrackQuality/xgboost_model.pkl] 
+        puts "xgboost_model.pkl created at [clock format [file mtime ../TrackQuality/xgboost_model.pkl]] \n"
+        set diff [expr $parameters_age - $model_age]   
+
+        # If parameters was created after the model file exit as this parameters.h is outdated
+        if { $diff < 0 } {
+           puts "parameters.h is outdated rerun conversion" 
+           exit
+        } 
+        
+        
+    } else {
+
+    puts "parameters.h not present, follow track quality instructions in README"
+    exit
+
+    }
+
 # create new project (deleting any existing one of same name)
 open_project -reset trackquality
 
