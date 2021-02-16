@@ -55,8 +55,8 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode tcl -source script/makeProject.tcl
-    - vivado -mode tcl -source script/runSim.tcl
+    - vivado -mode tcl -source ./makeProject.tcl
+    - vivado -mode tcl -source ./runSim.tcl
     - md5sum ./dataOut/FM_L1L2_L3PHIC.txt; md5sum ./dataOut/FM_L5L6_L3PHIC.txt # Output check right after sim
     - md5sum ./dataOut/FM_L1L2_L3PHIC.txt; md5sum ./dataOut/FM_L5L6_L3PHIC.txt # Output check repeat at the end for convenience
   artifacts:
