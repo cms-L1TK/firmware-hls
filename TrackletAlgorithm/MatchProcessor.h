@@ -664,7 +664,10 @@ void MatchProcessor(BXType bx,
 //#pragma HLS dependence variable=matchengine intra false 
 //#pragma HLS dependence variable=matchengine inter RAW true
 //#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
-#pragma HLS ARRAY_PARTITION variable=allproj complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=allproj complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=0
+#pragma HLS resource variable=instubdata core=RAM_2P_LUTRAM
+#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
 //#pragma HLS dependence variable=allproj intra RAW true
 //#pragma HLS dependence variable=allproj intra RAW true
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
@@ -884,8 +887,7 @@ void MatchProcessor(BXType bx,
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchenginetmp[kNMatchEngines];
 //#pragma HLS resource variable=matchenginetmp core=RAM_2P_LUTRAM
 #pragma HLS ARRAY_PARTITION variable=matchenginetmp complete dim=0
-//#pragma HLS dependence variable=matchenginetmp intra false
-#pragma HLS dependence variable=matchenginetmp inter RAW true
+//#pragma HLS dependence variable=matchenginetmp inter RAW true
 //#pragma HLS dependence variable=matchengine inter RAW true
     MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
@@ -898,7 +900,7 @@ void MatchProcessor(BXType bx,
     ProjectionRouterBuffer<BARREL>::TCID bestTCID = -1;
     MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
-      auto &meu = matchenginetmp[iMEU];
+      auto &meu = matchengine[iMEU];
       bool idle = meu.idle();
       bool done = meu.done();
       bool empty = projbufferarray.empty();
@@ -906,13 +908,25 @@ void MatchProcessor(BXType bx,
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemoryCM<VMSMEType,3,3> *instub = &(instubdata[iMEU]);
-        meu.init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
+        //meu.init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
+        matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
         //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
       if(!done && !ready) { 
-        ready = meu.step(table, instubdata);
-        ready = meu.ready();
+        ready = matchenginetmp[iMEU].step(table, instubdata[iMEU]);
+        //ready = meu.step(table, instubdata);
+        //ready = meu.ready();
+        /*
+        std::cout << "ready=" << ready << std::endl;
+        ready &= meu.getTCID() < bestTCID;
+        currentMEU = ready ? iMEU : currentMEU;
+        bestTCID = ready ? meu.getTCID() : bestTCID;
+        std::cout << "bestTCID=" << bestTCID << std::endl;
+        */
+      }
+      if(!done && ready) {
+        //std::cout << "is ready=" << ready << std::endl;
         ready &= meu.getTCID() < bestTCID;
         currentMEU = ready ? iMEU : currentMEU;
         bestTCID = ready ? meu.getTCID() : bestTCID;
@@ -926,7 +940,7 @@ void MatchProcessor(BXType bx,
         typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID stubid;
         typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
         typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-        matchenginetmp[currentMEU].readNext(currentTCID, projindex, stubid);
+        matchengine[currentMEU].readNext(currentTCID, projindex, stubid);
         //std::cout << "Sending to MC projid=" << projindex << "\tstubid=" << stubid << std::endl;
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
                   //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
