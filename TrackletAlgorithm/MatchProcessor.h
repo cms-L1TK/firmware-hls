@@ -664,10 +664,10 @@ void MatchProcessor(BXType bx,
 //#pragma HLS dependence variable=matchengine intra false 
 //#pragma HLS dependence variable=matchengine inter RAW true
 //#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
-//#pragma HLS ARRAY_PARTITION variable=allproj complete dim=0
-//#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=0
-#pragma HLS resource variable=instubdata core=RAM_2P_LUTRAM
-#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
+#pragma HLS ARRAY_PARTITION variable=allproj complete dim=1
+#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
+//#pragma HLS resource variable=instubdata core=RAM_2P_LUTRAM
+//#pragma HLS resource variable=allproj core=RAM_2P_LUTRAM
 //#pragma HLS dependence variable=allproj intra RAW true
 //#pragma HLS dependence variable=allproj intra RAW true
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
