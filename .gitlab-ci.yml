@@ -8,7 +8,8 @@ variables:
 stages: # ---------------------------------------------------------------------
   - quality-check
   - hls-build
-  - topTF-sim_synth
+  - topTF-sim
+  - topTF-synth
   - check-results
 
 # Job templates ---------------------------------------------------------------
@@ -48,27 +49,39 @@ stages: # ---------------------------------------------------------------------
       - ./emData/
     expire_in: 1 week
 
-.job_template: &template_topTF-sim_synth
+.job_template: &template_topTF-sim
   <<: *template_base
-  stage: topTF-sim_synth
+  stage: topTF-sim
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode tcl -source script/makeProject.tcl
-    - vivado -mode tcl -source script/runSim.tcl
+    - vivado -mode tcl -source ./makeProject.tcl
+    - vivado -mode tcl -source ./runSim.tcl
     - md5sum ./dataOut/FM_L1L2_L3PHIC.txt; md5sum ./dataOut/FM_L5L6_L3PHIC.txt # Output check right after sim
-    - vivado -mode tcl -source ../common/script/synth.tcl -tclargs ${PROJ_NAME}
     - md5sum ./dataOut/FM_L1L2_L3PHIC.txt; md5sum ./dataOut/FM_L5L6_L3PHIC.txt # Output check repeat at the end for convenience
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
       - ./IntegrationTests/${PROJ_NAME}/script/dataOut/
-      - ./IntegrationTests/${PROJ_NAME}/${PROJ_NAME}/${PROJ_NAME}.runs/synth_1/*.rpt
+    expire_in: 1 week
+
+.job_template: &template_topTF-synth
+  <<: *template_base
+  stage: topTF-synth
+  script:
+    - cd IntegrationTests/${PROJ_NAME}/script
+    - pwd; ls -la; #debug
+    - vivado -mode tcl -source ../../common/script/synth.tcl 
+  artifacts:
+    when: on_success
+    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+    paths:
+      - ./IntegrationTests/${PROJ_NAME}/script/Work/Work.runs/synth_1/*.rpt
     expire_in: 1 week
 
 .job_template: &template_check-results
-  <<: *template_base # to get on the correct runner
+  <<: *template_base
   stage: check-results
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
@@ -112,8 +125,14 @@ MC-hls-build:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
 # FW sim_synth ---------------
-topPRMEMC-sim_synth:
-  <<: *template_topTF-sim_synth
+topPRMEMC-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PRMEMC"
+# FW sim_synth ---------------
+topPRMEMC-synth:
+  <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
