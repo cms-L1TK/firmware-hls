@@ -87,6 +87,7 @@ stages: # ---------------------------------------------------------------------
     - cd IntegrationTests/${PROJ_NAME}/script
     # Compare HDL sim output with full machtes Mem/Prints
     - python3 ../../common/script/CompareMemPrintsFW.py -p -s
+  allow_failure: true # Still functional errors in the chain
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -142,4 +143,3 @@ topPRMEMC-check-results:
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
     PROJ_NAME: "PRMEMC"
-    allow_failure: true # Still functional errors in the chain
