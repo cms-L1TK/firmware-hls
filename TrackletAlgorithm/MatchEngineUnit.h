@@ -39,6 +39,7 @@ inline MatchEngineUnit() {
   nstubs=0;
   ptr = 0;
   idle_ = true;
+  ready_ = false;
   done_ = true;
 
 }
@@ -117,6 +118,7 @@ inline bool done() {
 inline bool ready() {
 #pragma HLS inline  
   return ptr < readindex;
+  return ready_;
 }
 
 inline STUBID* getStubIds() {
@@ -161,6 +163,7 @@ inline void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProject
   //std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
   ptr++;
   idle_ = ptr >= readindex ? true : idle_;
+  //idle_ = ready() ? idle_ : true;
 
 }
 
@@ -178,7 +181,7 @@ void print() {
 #endif
 
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
-inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
+inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
 #pragma HLS inline
 #pragma HLS dependence variable=istub inter WAR true
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
@@ -251,7 +254,8 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
       //Read stub memory and extract data fields
       //auto const  stubadd=zbin.concat(istubtmp);
       int stubadd=16*(iphi_*8+zbin)+istubtmp;
-      const VMStubMECM<VMSMEType> stubdata=stubmem[unit_].read_mem(bx,stubadd);
+      const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(bx,stubadd);
+      //const VMStubMECM<VMSMEType> stubdata=stubmem[unit_].read_mem(bx,stubadd);
       auto stubindex=stubdata.getIndex();
       auto stubfinez=stubdata.getFineZ();
       auto stubbend=stubdata.getBend();
@@ -272,6 +276,7 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
       //std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
     //if(istub==0 && nstubs>0) idle_ = true;
+    ready_ = ptr < readindex;
     if(readindex>nstubs) done_ = true;
     //if(readindex>writeindex) done_ = true;
     //if(istub==0 && nstubs>0) return true;
@@ -294,6 +299,7 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> *stubmem) {
   INDEX ptr;
   NSTUBS nstubs;
   bool idle_;
+  bool ready_;
   bool done_;
   int istep_;
   int ivmphi;
