@@ -183,7 +183,7 @@ void print() {
 //inline bool step(bool *table, const VMStubMEMemory<VMSMEType,3>* stubmem, ProjectionRouterBuffer<BARREL> *projbuffer) {
 inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
 #pragma HLS inline
-#pragma HLS dependence variable=istub inter WAR true
+//#pragma HLS dependence variable=istub inter WAR true
     //std::cout << "step " << projbuffer.raw() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << writeindex << std::endl;
     if(idle() || done()) return true;
 
