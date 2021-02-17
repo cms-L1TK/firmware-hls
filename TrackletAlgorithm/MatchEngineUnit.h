@@ -142,6 +142,10 @@ inline NSTUBS getNStubs() {
 #pragma HLS inline  
   return nstubs;
 }
+inline int getIPhi() {
+#pragma HLS inline  
+  return iphi_;
+}
 
 inline void read(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProjection<BARREL>::VMPID& id, STUBID* stubid, NSTUBS& nstub) {
 #pragma HLS inline  
