@@ -124,13 +124,13 @@ MC-hls-build:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
-# FW sim_synth ---------------
+# FW simulation ---------------
 topPRMEMC-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
-# FW sim_synth ---------------
+# FW synthesis ---------------
 topPRMEMC-synth:
   <<: *template_topTF-synth
   variables:

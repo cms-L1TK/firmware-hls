@@ -611,10 +611,10 @@ begin
   i_others : if INST_TOP_TF = 0 generate
     uut : entity work.SectorProcessor
       port map(
-        clk        => clk,
-        reset      => reset,
-        ProjectionRouter_start                => PR_start,
-        bx_in_ProjectionRouter => PR_bx_in,
+        clk                        => clk,
+        reset                      => reset,
+        ProjectionRouter_start     => PR_start,
+        bx_in_ProjectionRouter     => PR_bx_in,
         bx_out_MatchCalculator     => MC_bx_out,
         bx_out_MatchCalculator_vld => MC_bx_out_vld,
         MatchCalculator_done       => MC_done,
