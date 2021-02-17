@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+#================================================================
+# Compare .txt files (corresponding to memory content) written
+# by FW with those expected from C++ emulation.
+# 
+# Run from IntegrationTests/someChain/script/ with:
+#  ../../common/script/CompareMemPrintsFW.py -p -s
+#
+# Assumes txt files written by FW are in dataOut/
+# & C++ emulation expectations in ../../../emData/
+#================================================================
+
 import argparse
 import os
 import pandas as pd
@@ -208,24 +219,24 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
 def comparePredefined(args):
     ret_sum = 0
-    if os.path.exists('./tb/data/AP_L3PHIC.txt'):
-        ret_sum += compare(comparison_filename="tb/data/AP_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                           reference_filenames=["../../emData/MemPrints/TrackletProjections/AllProj_AP_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+    if os.path.exists('./dataOut/AP_L3PHIC.txt'):
+        ret_sum += compare(comparison_filename="./dataOut/AP_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                           reference_filenames=["../../../emData/MemPrints/TrackletProjections/AllProj_AP_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
     for i in range(17,25):
-        if os.path.exists(('./tb/data/VMPROJ_L3PHIC%i.txt' % (i))):
-            ret_sum += compare(comparison_filename=("tb/data/VMPROJ_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=[("../../emData/MemPrints/VMProjections/VMProjections_VMPROJ_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+        if os.path.exists(('./dataOut/VMPROJ_L3PHIC%i.txt' % (i))):
+            ret_sum += compare(comparison_filename=("./dataOut/VMPROJ_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                               reference_filenames=[("../../../emData/MemPrints/VMProjections/VMProjections_VMPROJ_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
 
     for i in range(17,25):
-        if os.path.exists(('./tb/data/CM_L3PHIC%i.txt' % (i))):
-            ret_sum += compare(comparison_filename=("tb/data/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=[("../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+        if os.path.exists(('./dataOut/CM_L3PHIC%i.txt' % (i))):
+            ret_sum += compare(comparison_filename=("./dataOut/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                               reference_filenames=[("../../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
 
-    ret_sum += compare(comparison_filename="tb/data/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                       reference_filenames=["../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
-    ret_sum += compare(comparison_filename="tb/data/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                       reference_filenames=["../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+    ret_sum += compare(comparison_filename="./dataOut/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                       reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+    ret_sum += compare(comparison_filename="./dataOut/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                       reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
     print("Accumulated number of errors =",ret_sum)
 

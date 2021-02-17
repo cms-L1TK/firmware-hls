@@ -37,7 +37,7 @@ entity tf_top_full is
     -- VMStubsME input
     VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : in t_arr8_1b;
     VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : in t_arr8_10b;
-    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_14b;
+    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_13b;
     -- AllStubs input
     AS_L3PHICn4_dataarray_data_V_wea       : in std_logic;
     AS_L3PHICn4_dataarray_data_V_writeaddr : in std_logic_vector(9 downto 0);
@@ -97,7 +97,7 @@ architecture rtl of tf_top_full is
   -- connecting VMStubME memories to MatchEngine input
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_arr8_1b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_arr8_10b;
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_14b;
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_13b;
   signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_arr8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem); set MSbit to zero
 
   -- MatchEngine signals
@@ -373,7 +373,7 @@ begin
   begin
     VMSME_L3PHIC17to24n1 : entity work.tf_mem_bin
       generic map (
-        RAM_WIDTH       => 14,
+        RAM_WIDTH       => 13,
         RAM_DEPTH       => 1024,
         INIT_FILE       => "",
         INIT_HEX        => true,
@@ -473,7 +473,7 @@ begin
   --------------------------------------------------------------
   gen_ME : for meidx in 7 downto 0 generate
   begin
-    i_ME : entity work.MatchEngineTopL3_0
+    i_ME : entity work.ME_L3PHIC
       port map (
         ap_clk   => clk,
         ap_rst   => reset,
@@ -486,7 +486,7 @@ begin
         bx_o_V_ap_vld => ME_bx_out_vld(meidx),
         inputStubData_dataarray_data_V_address0 => VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr(meidx),
         inputStubData_dataarray_data_V_ce0      => VMSME_L3PHIC17to24n1_dataarray_data_V_enb(meidx),
-        inputStubData_dataarray_data_V_q0       => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(meidx)(12 downto 0),
+        inputStubData_dataarray_data_V_q0       => VMSME_L3PHIC17to24n1_dataarray_data_V_dout(meidx),
         inputStubData_nentries_0_V_0 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(0)(meidx),
         inputStubData_nentries_0_V_1 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(1)(meidx),
         inputStubData_nentries_0_V_2 => VMSME_L3PHIC17to24n1_nentries_V_dout(0)(2)(meidx),

@@ -36,7 +36,7 @@ entity tf_top is
     -- VMStubsME input
     VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : in t_arr8_1b;
     VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : in t_arr8_10b;
-    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_14b;
+    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_13b;
     -- AllStubs input
     AS_L3PHICn4_dataarray_data_V_wea       : in std_logic;
     AS_L3PHICn4_dataarray_data_V_writeaddr : in std_logic_vector(9 downto 0);
@@ -92,7 +92,7 @@ architecture rtl of tf_top is
   -- connecting VMStubME memories to MatchEngine input
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_arr8_1b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_arr8_10b;
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_14b;
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_13b;
   signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_arr8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem); set MSbit to zero
 
   -- Note: entity work.tf_mem_bin class allocates 4-bits for nentries in each bin, while
