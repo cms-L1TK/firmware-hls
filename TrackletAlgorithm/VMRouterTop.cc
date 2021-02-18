@@ -14,7 +14,7 @@
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
-void VMRouterTop(BXType bx,
+void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStub[numInputs],
 
@@ -166,6 +166,7 @@ void VMRouterTop(BXType bx,
 #pragma HLS resource variable=inputStub[2].get_mem() latency=2
 #pragma HLS resource variable=inputStub[3].get_mem() latency=2
 
+#pragma HLS interface register port=bx_o
 
 	//////////////////////////////////
 	// Create memory masks
@@ -190,7 +191,7 @@ void VMRouterTop(BXType bx,
 	// Main function
 
 	VMRouter<inputType, outputType, kLAYER, kDISK,  maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
-	(bx, fineBinTable, phiCorrTable,
+	(bx, bx_o, fineBinTable, phiCorrTable,
 		rzBitsInnerTable, rzBitsOverlapTable, nullptr,
 		bendCutInnerTable, bendCutOverlapTable, nullptr,
 		// Input memories

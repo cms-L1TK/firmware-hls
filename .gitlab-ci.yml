@@ -96,6 +96,22 @@ stages: # ---------------------------------------------------------------------
     
 # Jobs ------------------------------------------------------------------------
 # Quality checks ------------
+IR-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TrackletAlgorithm/InputRouterTop.cc'
+VMR-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
+TE-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TrackletAlgorithm/TrackletEngineTop.cc'
+TC-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_* ../TrackletAlgorithm/TrackletCalculator.cc'
 PR-quality-check:
   <<: *template_quality-check
   variables:
@@ -109,6 +125,26 @@ MC-quality-check:
   variables:
     CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
 # HLS builds ---------------
+IR-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "IR"
+VMR-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "VMR"
+TE-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TE"
+TC-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TC"
 PR-hls-build:
   <<: *template_hls-build
   variables:
@@ -121,6 +157,7 @@ ME-hls-build:
     PROJ_NAME: "ME"
 MC-hls-build:
   <<: *template_hls-build
+  allow_failure: true # FIXME: remove on next synchronization with emulation
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
