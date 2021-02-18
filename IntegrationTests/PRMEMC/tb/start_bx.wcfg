@@ -11,18 +11,19 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="8916667fs"></ZoomEndTime>
-      <Cursor1Time time="1399776fs"></Cursor1Time>
+      <ZoomStartTime time="40524833fs"></ZoomStartTime>
+      <ZoomEndTime time="46859834fs"></ZoomEndTime>
+      <Cursor1Time time="45804000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="155"></NameColumnWidth>
-      <ValueColumnWidth column_width="107"></ValueColumnWidth>
+      <ValueColumnWidth column_width="99"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="24" />
-   <wave_markers>
-      <marker label="" time="2299632" />
-   </wave_markers>
+   <WVObjectSize size="25" />
+   <wvobject type="logic" fp_name="/tb_tf_top/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
    <wvobject type="other" fp_name="/tb_tf_top/bx_cnt">
       <obj_property name="ElementShortName">bx_cnt</obj_property>
       <obj_property name="ObjectShortName">bx_cnt</obj_property>
@@ -67,13 +68,13 @@
       <obj_property name="ElementShortName">ME_start</obj_property>
       <obj_property name="ObjectShortName">ME_start</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_idle">
-      <obj_property name="ElementShortName">ME_idle</obj_property>
-      <obj_property name="ObjectShortName">ME_idle</obj_property>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_idle">
+      <obj_property name="ElementShortName">ME_idle[0:7]</obj_property>
+      <obj_property name="ObjectShortName">ME_idle[0:7]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_ready">
-      <obj_property name="ElementShortName">ME_ready</obj_property>
-      <obj_property name="ObjectShortName">ME_ready</obj_property>
+   <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_ready">
+      <obj_property name="ElementShortName">ME_ready[0:7]</obj_property>
+      <obj_property name="ObjectShortName">ME_ready[0:7]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/ME_done">
       <obj_property name="ElementShortName">ME_done[0:7]</obj_property>

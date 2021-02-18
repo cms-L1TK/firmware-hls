@@ -53,7 +53,7 @@ architecture behavior of tb_tf_top is
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
   constant N_ME_IN_CHAIN     : integer := 8; --! Number of match engines in chain
-  constant INST_TOP_TF       : integer := 0;          --! Instantiate top_tf or others
+  constant INST_TOP_TF       : integer := 2;          --! Instantiate top_tf or others
                                                       --! 0: Generated SectorProcessor chain
                                                       --! 1: top_tf
                                                       --! 2: top_tf_full (intermediate MemPrints)
@@ -135,7 +135,6 @@ architecture behavior of tb_tf_top is
   signal MC_bx_out_vld : std_logic;
   signal MC_done       : std_logic;
   -- ### Other signals ###
-  signal PR_start_tmp                       : std_logic := '0';
   signal TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
   signal TPROJ_L3PHICn4_n_entries_arr       : t_arr_1d_1d_int(0 to N_ME_IN_CHAIN-1);
   signal VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
@@ -277,7 +276,7 @@ begin
             TPROJ_L3PHIC_dataarray_data_V_din(cp)       <= TPROJ_L3PHICn4_data_arr(cp)(v_bx_cnt+1,addr+PAGE_OFFSET*v_page_cnt2_d1) (TPROJ_L3PHIC_dataarray_data_V_din(0)'length-1 downto 0);
           end if;
           -- VMSME & PR_start
-          PR_start <= '0'; -- Default assigment
+          --PR_start <= '0'; -- Default assigment
           if (v_bx_cnt>=VMSME_DELAY and v_bx_cnt<MAX_EVENTS) then -- Start after delay of BXs
             PR_start <= '1';
             VMSME_L3PHIC17to24n1_dataarray_data_V_wea(cp) <= '1';                                     -- Default assigment

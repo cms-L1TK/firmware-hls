@@ -103,8 +103,8 @@ architecture rtl of tf_top_full is
   -- MatchEngine signals
   signal ME_start : std_logic := '0';
   signal ME_done  : t_arr8_1b := (others => '0');
-  signal ME_idle  : std_logic := '0';
-  signal ME_ready : std_logic := '0';
+  signal ME_idle  : t_arr8_1b := (others => '0');
+  signal ME_ready : t_arr8_1b := (others => '0');
 
   -- connecting AllStubs memory to MatchCalculator input
   signal AS_L3PHICn4_dataarray_data_V_enb      : std_logic;
@@ -142,20 +142,18 @@ begin
   --------------------------------------------------------------
   -- Signaling section
   --------------------------------------------------------------
-  p_ME_start : process(clk) -- II_PR=108, II_ME=101, II_MC=108
+  p_ME_start : process(clk)
   begin
     if rising_edge(clk) then
       if PR_done='1' then
         ME_start <= '1';
---      elsif ME_ready='1' or ME_idle='1' then
---        ME_start <= '0';
       end if;
     end if;
   end process;
 
   ME_all_done <= ME_done(0) and ME_done(1) and ME_done(2) and ME_done(3) and ME_done(4) and ME_done(5) and ME_done(6) and ME_done(7);
 
-  p_MC_start : process(clk) -- II_PR=108, II_ME=101, II_MC=108
+  p_MC_start : process(clk)
   begin
     if rising_edge(clk) then
       if ME_all_done = '1' then
@@ -479,8 +477,8 @@ begin
         ap_rst   => reset,
         ap_start => ME_start,
         ap_done  => ME_done(meidx),
-        ap_idle  => ME_idle,
-        ap_ready => ME_ready,
+        ap_idle  => ME_idle(meidx),
+        ap_ready => ME_ready(meidx),
         bx_V          => PR_bx_out,
         bx_o_V        => ME_bx_out(meidx),
         bx_o_V_ap_vld => ME_bx_out_vld(meidx),

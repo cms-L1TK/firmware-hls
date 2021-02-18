@@ -11,20 +11,24 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="10230001fs"></ZoomEndTime>
-      <Cursor1Time time="0fs"></Cursor1Time>
+      <ZoomStartTime time="2234666fs"></ZoomStartTime>
+      <ZoomEndTime time="4602667fs"></ZoomEndTime>
+      <Cursor1Time time="3112000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="164"></NameColumnWidth>
-      <ValueColumnWidth column_width="177"></ValueColumnWidth>
+      <ValueColumnWidth column_width="173"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="183" />
+   <WVObjectSize size="184" />
    <wave_markers>
       <marker label="" time="2749560" />
    </wave_markers>
+   <wvobject type="other" fp_name="/tb_tf_top/bx_cnt">
+      <obj_property name="ElementShortName">bx_cnt</obj_property>
+      <obj_property name="ObjectShortName">bx_cnt</obj_property>
+   </wvobject>
    <wvobject fp_name="divider285" type="divider">
-      <obj_property name="label">VMSME</obj_property>
+      <obj_property name="label">VMSME24</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/clka">
@@ -35,14 +39,6 @@
       <obj_property name="ElementShortName">clkb</obj_property>
       <obj_property name="ObjectShortName">clkb</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/wea">
-      <obj_property name="ElementShortName">wea</obj_property>
-      <obj_property name="ObjectShortName">wea</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/enb">
-      <obj_property name="ElementShortName">enb</obj_property>
-      <obj_property name="ObjectShortName">enb</obj_property>
-   </wvobject>
    <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/rstb">
       <obj_property name="ElementShortName">rstb</obj_property>
       <obj_property name="ObjectShortName">rstb</obj_property>
@@ -51,6 +47,10 @@
       <obj_property name="ElementShortName">regceb</obj_property>
       <obj_property name="ObjectShortName">regceb</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/addra">
       <obj_property name="ElementShortName">addra[9:0]</obj_property>
       <obj_property name="ObjectShortName">addra[9:0]</obj_property>
@@ -58,6 +58,10 @@
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/dina">
       <obj_property name="ElementShortName">dina[13:0]</obj_property>
       <obj_property name="ObjectShortName">dina[13:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMSME_L3PHIC17to24n1(7)\/VMSME_L3PHIC17to24n1/addrb">
       <obj_property name="ElementShortName">addrb[9:0]</obj_property>
@@ -455,14 +459,6 @@
       <obj_property name="ElementShortName">clkb</obj_property>
       <obj_property name="ObjectShortName">clkb</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/wea">
-      <obj_property name="ElementShortName">wea</obj_property>
-      <obj_property name="ObjectShortName">wea</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/enb">
-      <obj_property name="ElementShortName">enb</obj_property>
-      <obj_property name="ObjectShortName">enb</obj_property>
-   </wvobject>
    <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/rstb">
       <obj_property name="ElementShortName">rstb</obj_property>
       <obj_property name="ObjectShortName">rstb</obj_property>
@@ -471,6 +467,10 @@
       <obj_property name="ElementShortName">regceb</obj_property>
       <obj_property name="ObjectShortName">regceb</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/addra">
       <obj_property name="ElementShortName">addra[7:0]</obj_property>
       <obj_property name="ObjectShortName">addra[7:0]</obj_property>
@@ -478,6 +478,10 @@
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/dina">
       <obj_property name="ElementShortName">dina[20:0]</obj_property>
       <obj_property name="ObjectShortName">dina[20:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_VMPROJ_L3PHIC17to24(7)\/VMPROJ_L3PHIC17to24/addrb">
       <obj_property name="ElementShortName">addrb[7:0]</obj_property>
@@ -559,14 +563,6 @@
       <obj_property name="ElementShortName">clkb</obj_property>
       <obj_property name="ObjectShortName">clkb</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/wea">
-      <obj_property name="ElementShortName">wea</obj_property>
-      <obj_property name="ObjectShortName">wea</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/enb">
-      <obj_property name="ElementShortName">enb</obj_property>
-      <obj_property name="ObjectShortName">enb</obj_property>
-   </wvobject>
    <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/rstb">
       <obj_property name="ElementShortName">rstb</obj_property>
       <obj_property name="ObjectShortName">rstb</obj_property>
@@ -575,6 +571,10 @@
       <obj_property name="ElementShortName">regceb</obj_property>
       <obj_property name="ObjectShortName">regceb</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/wea">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/addra">
       <obj_property name="ElementShortName">addra[7:0]</obj_property>
       <obj_property name="ObjectShortName">addra[7:0]</obj_property>
@@ -582,6 +582,10 @@
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/dina">
       <obj_property name="ElementShortName">dina[13:0]</obj_property>
       <obj_property name="ObjectShortName">dina[13:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/enb">
+      <obj_property name="ElementShortName">enb</obj_property>
+      <obj_property name="ObjectShortName">enb</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb_tf_top/i_tf_top_full/uut/\gen_CM_L3PHIC17to24(7)\/CM_L3PHIC17to24/addrb">
       <obj_property name="ElementShortName">addrb[7:0]</obj_property>
