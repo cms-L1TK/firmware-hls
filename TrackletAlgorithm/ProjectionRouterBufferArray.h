@@ -60,7 +60,7 @@ public:
     else {
       std::cout << "Unread contents in projbuffer" << std::endl;
       for(int i = ptr_; i < width_; ++i){
-        std::cout << std::hex << i << ": " << projbuffer[i].raw() << std::endl;
+        std::cout << std::hex << i << ": " << projbuffer[i].raw() << (i==ptr_ ? " <=== ptr" : "") << std::endl;
       }
     }
   }
