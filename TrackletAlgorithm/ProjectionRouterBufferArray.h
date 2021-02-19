@@ -9,9 +9,9 @@ public:
 #pragma HLS inline
     ap_uint<kNBitsBuffer> tmpptr = ptr_;
     ptr_++;
-    empty_ = ptr_ == width_ ? true : false;
+    empty_ = ptr_ >= width_ ? true : false;
     if(empty()) reset(); //read all projections, reset array to 0
-    //std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].raw() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
+    //std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].getProjection() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
     //print();
     return projbuffer[tmpptr];
 
@@ -20,7 +20,7 @@ public:
   inline void addProjection(ProjectionRouterBuffer<BARREL> &proj) {
 #pragma HLS inline
     projbuffer[width_] = proj;
-    //std::cout << std::hex << "adding proj=" << proj.raw() << "\tprojid=" << proj.getIndex() << "\twidth= " << width_ << std::endl;
+    //std::cout << std::hex << "adding proj=" << proj.getProjection() << "\tprojid=" << proj.getIndex() << "\twidth= " << width_ << std::endl;
     width_++;
     empty_ = false;
     //print();
@@ -56,7 +56,7 @@ public:
     else {
       std::cout << "Unread contents in projbuffer" << std::endl;
       for(int i = ptr_; i < width_; ++i){
-        std::cout << std::hex << i << ": " << projbuffer[i].raw() << std::endl;
+        std::cout << std::hex << i << ": " << projbuffer[i].raw() << (i==ptr_ ? " <=== ptr" : "") << std::endl;
       }
     }
   }
