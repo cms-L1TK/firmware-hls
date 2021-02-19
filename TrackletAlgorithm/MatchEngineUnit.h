@@ -164,7 +164,7 @@ inline void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProject
   trackletid = getTCID();
   projid = getProjindex();
   stubid = stubids[ptr];
-  //std::cout << std::hex << "reading MEU " << projbuffer.raw() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
+  //std::cout << std::hex << "reading MEU " << unit_ << " " << projbuffer.getProjection() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
   ptr++;
   idle_ = ptr >= readindex ? true : idle_;
   //idle_ = ready() ? idle_ : true;
@@ -174,9 +174,9 @@ inline void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProject
 #ifndef __SYNTHESIS__
 void print() {
   if(empty()) 
-    std::cout << "Empty MEU projid=" << projbuffer.getIndex() << unit_ << std::endl;
+    std::cout << "Empty MEU " << unit_ << " projid=" << projbuffer.getIndex() << std::endl;
   else {
-    std::cout << "Unread contents in MEU projid=" << projbuffer.getIndex() << unit_ << std::endl;
+    std::cout << "Unread contents in MEU "  << unit_ << " projid=" << projbuffer.getIndex() << std::endl;
     for(int i = ptr; i < readindex; ++i){
       std::cout << std::hex << i << ": " << stubids[i] << std::endl;
     }

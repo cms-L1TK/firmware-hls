@@ -481,6 +481,7 @@ void MatchCalculator(BXType bx,
     }
   
     if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+      //std::cout << "Match! projid=" << projid << "\tfullmatch=" << bestmatch.raw() << std::endl;
       switch (projseed) {
       case 0:
       fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -523,6 +524,7 @@ void MatchCalculator(BXType bx,
     projseed       = projseed_next;
   
     bx_o = bx;
+    //std::cout << "MC done" << std::endl;
     
 } //end MC
 
@@ -650,6 +652,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddrBinned> istub=0;
 
   ap_uint<kNBits_MemAddr> iproj=0; //counter
+  ap_uint<kNMatchEngines/2> iProj=0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -857,6 +860,7 @@ void MatchProcessor(BXType bx,
           //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
           projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstubfirst, zfirst, vmproj, 0);
           projbuffertmp.setPhi(iphi);
+          //std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
           projbufferarray[iprojbuff].addProjection(projbuffertmp);
           //projbufferarray[iphi].add(projbuffertmp);
           iprojbuff = (iprojbuff+1)%kNMatchEngines;
@@ -867,6 +871,7 @@ void MatchProcessor(BXType bx,
             //projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstublast, zlast, vmproj, psseed);
             projbuffertmp.setPhi(iphi);
+            //std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
             projbufferarray[iprojbuff].addProjection(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
             iprojbuff = (iprojbuff+1)%kNMatchEngines;
@@ -875,6 +880,7 @@ void MatchProcessor(BXType bx,
             //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstublast, zlast, vmproj, psseed);
             projbuffertmp.setPhi(iphi);
+            //std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
             projbufferarray[iprojbuff].addProjection(projbuffertmp);
             //projbufferarray[iphi].add(projbuffertmp);
             iprojbuff = (iprojbuff+1)%kNMatchEngines;
@@ -908,9 +914,10 @@ void MatchProcessor(BXType bx,
       auto &meu = matchengine[iMEU];
       bool idle = meu.idle();
       bool done = meu.done();
-      bool empty = projbufferarray[iMEU].empty();
+      bool empty = projbufferarray[iProj].empty();
       if(idle && !empty) {
-        auto tmpprojbuff = projbufferarray[iMEU].read();
+        //std::cout << "reading projbufferarray " << iProj << std::endl;
+        auto tmpprojbuff = projbufferarray[iProj].read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemoryCM<VMSMEType,3,3> *instub = &(instubdata[iMEU]);
         //meu.init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
@@ -918,6 +925,7 @@ void MatchProcessor(BXType bx,
         //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
+      //ready = meu.ready();
       if(!done && !ready) { 
         ready = matchenginetmp[iMEU].step(table, instubdata[iMEU]);
         //ready = meu.step(table, instubdata);
@@ -936,6 +944,7 @@ void MatchProcessor(BXType bx,
         currentMEU = ready ? iMEU : currentMEU;
         bestTCID = ready ? meu.getTCID() : bestTCID;
       }
+      iProj = iProj + 1;
 
 
     } //end MEU loop
