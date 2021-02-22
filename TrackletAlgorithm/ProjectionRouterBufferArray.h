@@ -11,8 +11,8 @@ public:
     ptr_++;
     empty_ = ptr_ >= width_ ? true : false;
     if(empty()) reset(); //read all projections, reset array to 0
-    //std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].getProjection() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
-    //print();
+    std::cout << std::hex << "reading projbuffer proj=" << projbuffer[tmpptr].getProjection() << "\ttmpptr=" << tmpptr << "\tmoving ptr_=" << ptr_ << "\twidth_=" << width_ << std::endl;
+    print();
     return projbuffer[tmpptr];
 
   }
@@ -20,15 +20,15 @@ public:
   inline void addProjection(ProjectionRouterBuffer<BARREL> &proj) {
 #pragma HLS inline
     projbuffer[width_] = proj;
-    //std::cout << std::hex << "adding proj=" << proj.getProjection() << "\tprojid=" << proj.getIndex() << "\twidth= " << width_ << std::endl;
     width_++;
     empty_ = false;
+    std::cout << std::hex << "adding proj=" << proj.getProjection() << "\tprojid=" << proj.getIndex() << "\twidth= " << width_ << std::endl;
     //print();
   }
 
   inline bool empty() { 
 #pragma HLS inline
-    //std::cout << "Empty projbuffer? " << (ptr_ == width_) << std::endl;
+    std::cout << "Empty projbuffer? " << (ptr_ == width_) << std::endl;
     //return ptr_ == width_;
     return empty_;
   }
@@ -46,6 +46,10 @@ public:
 #pragma HLS ARRAY_PARTITION variable=projbuffer complete dim=0
 //#pragma HLS resource variable=projbuffer core=RAM_2P_LUTRAM
     reset();
+    PRBUFF_INIT: for(int i = 0; i < 1<<kNBitsBuffer; ++i) {
+    #pragma HLS unroll
+      projbuffer[i] = ProjectionRouterBuffer<BARREL>();
+    }
   }
 
   #ifndef __SYNTHESIS__
