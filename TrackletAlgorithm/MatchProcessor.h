@@ -645,7 +645,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddrBinned> istub=0;
 
   ap_uint<kNBits_MemAddr> iproj=0; //counter
-  ap_uint<kNMatchEngines/2> iProj=0;
+  ap_uint<kNProj> iProj=0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read

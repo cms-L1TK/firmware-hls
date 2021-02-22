@@ -50,6 +50,10 @@ public:
 
   ProjectionRouterBufferArray() {
     reset();
+    PRBUFF_INIT: for(int i = 0; i < 1<<kNBitsBuffer; ++i) {
+    #pragma HLS unroll
+      projbuffer[i] = ProjectionRouterBuffer<BARREL>();
+    }
   }
 
   #ifndef __SYNTHESIS__
