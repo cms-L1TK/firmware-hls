@@ -43,17 +43,20 @@ package tf_pkg is
   constant RAM_WIDTH_TPROJ : natural := 60; --! Width for memories
   constant RAM_WIDTH_AP    : natural := 60; --! Width for memories
 
+  -- ########################### Functions ################################################################
+  function clogb2_old (bit_depth : integer) return integer;
+  function clogb2     (bit_depth : integer) return integer;
+
   -- ########################### Types ###########################
+
   -- 2D
   type t_arr2_1b  is array(0 to 1) of std_logic;
-  type t_arr2_7b  is array(0 to 1) of std_logic_vector(6 downto 0);
   type t_arr2_8b  is array(0 to 1) of std_logic_vector(7 downto 0);
   type t_arr8_1b  is array(0 to 7) of std_logic;
   type t_arr8_2b  is array(0 to 7) of std_logic_vector(1 downto 0);
   type t_arr8_3b  is array(0 to 7) of std_logic_vector(2 downto 0);
   type t_arr8_4b  is array(0 to 7) of std_logic_vector(3 downto 0);
   type t_arr8_5b  is array(0 to 7) of std_logic_vector(4 downto 0);
-  type t_arr8_7b  is array(0 to 7) of std_logic_vector(6 downto 0);
   type t_arr8_8b  is array(0 to 7) of std_logic_vector(7 downto 0);
   type t_arr8_9b  is array(0 to 7) of std_logic_vector(8 downto 0);
   type t_arr8_10b is array(0 to 7) of std_logic_vector(9 downto 0);
@@ -63,22 +66,29 @@ package tf_pkg is
   type t_arr8_60b is array(0 to 7) of std_logic_vector(59 downto 0);
   -- 3D
   type t_arr2_8_1b is array(0 to 1) of t_arr8_1b;
-  type t_arr2_8_7b is array(0 to 1) of t_arr8_7b;
+  --type t_arr2_8_7b is array(0 to 1) of t_arr8_7b;
   type t_arr2_8_8b is array(0 to 1) of t_arr8_8b;
   type t_arr8_8_1b is array(0 to 7) of t_arr8_1b;
   type t_arr8_8_4b is array(0 to 7) of t_arr8_4b;
-  type t_arr8_8_5b is array(0 to 7) of t_arr8_5b;
   -- 4D
   type t_arr8_8_8_1b is array(0 to 7) of t_arr8_8_1b;
   type t_arr8_8_8_4b is array(0 to 7) of t_arr8_8_4b;
-  type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
   -- Others
   type t_arr_1d_int is array(natural range <>) of integer;                  --! 1D array of int
   type t_arr_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
-    -- ########################### Functions ################################################################
-  function clogb2 (bit_depth : integer) return integer;
+  -- clogb2(MAX_ENTRIES) = 6.
+  type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;
+  type t_arr_7b  is array(integer range<>) of std_logic_vector(6 downto 0);
+  type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
+  type t_arr8_2_meb is array(0 to 7) of t_arr_meb(0 to 1);
+
+  subtype t_arr2_7b is t_arr_7b(0 to 1);
+  subtype t_arr8_7b is t_arr_7b(0 to 7);
+  type t_arr8_2_7b is array(0 to 7) of t_arr2_7b;
+  subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
+  type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
 
   -- -- ########################### Procedures #######################
   procedure char2int (
@@ -146,7 +156,10 @@ package body tf_pkg is
 
   -- ########################### Functions ################################################################
   --! @brief Binary logarithm to determine bit width for addressing
-  function clogb2 (bit_depth : integer) return integer is
+  --! Returns (-1 + no. of bits needed to represent number bit_depth) 
+  --! except if argument is 2, when it returns 0.
+
+  function clogb2_old (bit_depth : integer) return integer is
     variable depth : integer := bit_depth;
     variable count : integer := 1;
   begin
@@ -165,6 +178,14 @@ package body tf_pkg is
     return(count-1);
   end;
 
+  --! @brief Gets #bits needed to form any value from 0 to bit_depth-1.
+  --! Identical result to clogb2_old() if arg. is exact power of 2.
+  --! Result 1 larger than clogb2_old() otherwise.
+  --! Exception if arg. = 2, when it is 1 larger than clogb2_old().
+  function clogb2 (bit_depth : integer) return integer is
+  begin
+    return integer( ceil( log2( real( bit_depth ) ) ) );
+  end;
 
   -- ########################### Procedures ################################################################
   --! @brief Convert character to integer

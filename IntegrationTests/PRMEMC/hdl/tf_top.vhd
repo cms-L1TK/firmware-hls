@@ -66,7 +66,7 @@ architecture rtl of tf_top is
   signal TPROJ_L3PHIC_dataarray_data_V_enb      : t_arr8_1b;
   signal TPROJ_L3PHIC_dataarray_data_V_readaddr : t_arr8_8b;
   signal TPROJ_L3PHIC_dataarray_data_V_dout     : t_arr8_60b;
-  signal TPROJ_L3PHIC_nentries_V_dout : t_arr2_8_7b;
+  signal TPROJ_L3PHIC_nentries_V_dout : t_arr8_2_7b;
 
   -- ProjectionRouter signals
   signal PR_done       : std_logic := '0';
@@ -87,13 +87,13 @@ architecture rtl of tf_top is
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_21b;
-  signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_arr2_8_7b;
+  signal VMPROJ_L3PHIC17to24_nentries_V_dout : t_arr8_2_7b;
 
   -- connecting VMStubME memories to MatchEngine input
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_arr8_1b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_arr8_10b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_13b;
-  signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_arr8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#page, #bin, #mem); set MSbit to zero
+  signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_arr8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#mem, #page, #bin); set MSbit to zero
 
   -- Note: entity work.tf_mem_bin class allocates 4-bits for nentries in each bin, while
   -- MatchEngine ports are expecting 5-bits. Leaving the 5th bit unconnected seems
@@ -132,7 +132,7 @@ architecture rtl of tf_top is
   signal CM_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
   signal CM_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
   signal CM_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_14b;
-  signal CM_L3PHIC17to24_nentries_V_dout : t_arr2_8_7b;
+  signal CM_L3PHIC17to24_nentries_V_dout : t_arr8_2_7b;
 
   -- MatchCalculator signals
   signal MC_start : std_logic := '0';

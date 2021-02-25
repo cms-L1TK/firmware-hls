@@ -30,7 +30,8 @@ use work.tf_pkg.all;
 entity tf_mem_bin is
   generic (
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
-    RAM_DEPTH       : natural := 1024;             --! Specify RAM depth (number of entries)
+    NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
+    RAM_DEPTH       : natural := NUM_PAGES*PAGE_OFFSET; --! Leave at default. RAM depth (no. of entries)
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
@@ -47,14 +48,7 @@ entity tf_mem_bin is
     addrb     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
-    nent_o0   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 0; No 2D array to avoid partially associated port
-    nent_o1   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 1; No 2D array to avoid partially associated port
-    nent_o2   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 2; No 2D array to avoid partially associated port
-    nent_o3   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 3; No 2D array to avoid partially associated port
-    nent_o4   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 4; No 2D array to avoid partially associated port
-    nent_o5   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 5; No 2D array to avoid partially associated port
-    nent_o6   : out t_arr8_5b := (others => (others => '0'));       --! Num entries (bin) for page 6; No 2D array to avoid partially associated port
-    nent_o7   : out t_arr8_5b := (others => (others => '0'))        --! Num entries (bin) for page 7; No 2D array to avoid partially associated port
+    nent_o    : out t_arr_8_5b(0 to NUM_PAGES-1) := (others => (others => (others => '0'))) --! entries(page)(bin)
     );
 end tf_mem_bin;
 
@@ -111,10 +105,12 @@ attribute ram_style of sa_RAM_data : signal is "block";
 begin
 
 process(clka)
-  variable vi_clk_cnt  : integer := -1; -- Clock counter
-  variable vi_page_cnt : integer := 0;  -- Page counter
-  variable vi_nent_idx : integer := 0;  -- Bin index of nent
-  --variable v_line_out  : line;          -- Line for debug
+  variable vi_clk_cnt   : integer := -1; -- Clock counter
+  variable vi_page_cnt  : integer := 0;  -- Page counter
+  variable vi_nent_idx  : integer := 0;  -- Bin index of nent
+  variable page         : integer := 0;
+  variable addr_in_page : integer := 0;
+  --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
     if (sync_nent='1') and vi_clk_cnt=-1 then
@@ -124,27 +120,9 @@ begin
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      case (vi_page_cnt) is -- Reset nent counter values
-        when 0 =>
-          nent_o0 <= (others => (others => '0'));
-        when 1 =>
-          nent_o1 <= (others => (others => '0'));
-        when 2 =>
-          nent_o2 <= (others => (others => '0'));
-        when 3 =>
-          nent_o3 <= (others => (others => '0'));
-        when 4 =>
-          nent_o4 <= (others => (others => '0'));
-        when 5 =>
-          nent_o5 <= (others => (others => '0'));
-        when 6 =>
-          nent_o6 <= (others => (others => '0'));
-        when 7 =>
-          nent_o7 <= (others => (others => '0'));
-        when others =>
-          assert (false) report "vi_page_cnt out of range" severity error;
-      end case;
-      if (vi_page_cnt < RAM_DEPTH/PAGE_OFFSET-1) then -- Assuming linear continuous page access
+      nent_o(vi_page_cnt) <= (others => (others => '0'));    
+      assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
+      if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
         vi_page_cnt := vi_page_cnt +1;
       else
         vi_page_cnt := 0;
@@ -155,58 +133,15 @@ begin
       if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- ##### Count n_entries;
         vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(N_ENTRIES_PER_MEM_BINS))) mod N_MEM_BINS; -- Calculate bin index
         --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
-        case (to_integer(unsigned(addra))) is
-          when 0*PAGE_OFFSET to 1*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(0*PAGE_OFFSET, addra'length))) then
-              nent_o0(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o0(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o0(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o0(vi_nent_idx))) + 1, nent_o0(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 1*PAGE_OFFSET to 2*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(1*PAGE_OFFSET, addra'length))) then
-              nent_o1(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o1(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o1(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o1(vi_nent_idx))) + 1, nent_o1(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 2*PAGE_OFFSET to 3*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(2*PAGE_OFFSET, addra'length))) then
-              nent_o2(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o2(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o2(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o2(vi_nent_idx))) + 1, nent_o2(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 3*PAGE_OFFSET to 4*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(3*PAGE_OFFSET, addra'length))) then
-              nent_o3(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o3(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o3(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o3(vi_nent_idx))) + 1, nent_o3(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 4*PAGE_OFFSET to 5*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(4*PAGE_OFFSET, addra'length))) then
-              nent_o4(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o4(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o4(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o4(vi_nent_idx))) + 1, nent_o4(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 5*PAGE_OFFSET to 6*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(5*PAGE_OFFSET, addra'length))) then
-              nent_o5(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o5(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o5(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o5(vi_nent_idx))) + 1, nent_o5(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 6*PAGE_OFFSET to 7*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(6*PAGE_OFFSET, addra'length))) then
-              nent_o6(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o6(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o6(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o6(vi_nent_idx))) + 1, nent_o6(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when 7*PAGE_OFFSET to 8*PAGE_OFFSET-1 =>
-            if (addra = std_logic_vector(to_unsigned(7*PAGE_OFFSET, addra'length))) then
-              nent_o7(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o7(vi_nent_idx)'length)); -- <= 1 (slv)
-            else
-              nent_o7(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o7(vi_nent_idx))) + 1, nent_o7(vi_nent_idx)'length)); -- + 1 (slv)
-            end if;
-          when others =>
-            assert (false) report "addra out of range" severity error;
-        end case;
+
+        page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_OFFSET))));
+        addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_OFFSET)-1 downto 0)));
+        assert (page < NUM_PAGES) report "page out of range" severity error;
+        if (addr_in_page = 0) then
+          nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
+        else
+          nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
+        end if; 
       end if;
       sv_addra_d1 <= addra;
     end if; -- (wea='1')

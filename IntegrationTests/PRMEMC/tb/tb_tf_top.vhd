@@ -671,13 +671,11 @@ begin
         FM_L1L2_L3PHIC_dataarray_data_V_enb      => FM_L1L2_L3PHIC_dataarray_data_V_enb,
         FM_L1L2_L3PHIC_dataarray_data_V_readaddr => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
         FM_L1L2_L3PHIC_dataarray_data_V_dout     => FM_L1L2_L3PHIC_dataarray_data_V_dout,
-        FM_L1L2_L3PHIC_nentries_0_V_dout         => FM_L1L2_L3PHIC_nentries_V_dout(0),
-        FM_L1L2_L3PHIC_nentries_1_V_dout         => FM_L1L2_L3PHIC_nentries_V_dout(1),
+        FM_L1L2_L3PHIC_nentries_VV_dout          => FM_L1L2_L3PHIC_nentries_V_dout,
         FM_L5L6_L3PHIC_dataarray_data_V_enb      => FM_L5L6_L3PHIC_dataarray_data_V_enb,
         FM_L5L6_L3PHIC_dataarray_data_V_readaddr => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
         FM_L5L6_L3PHIC_dataarray_data_V_dout     => FM_L5L6_L3PHIC_dataarray_data_V_dout,
-        FM_L5L6_L3PHIC_nentries_0_V_dout         => FM_L5L6_L3PHIC_nentries_V_dout(0),
-        FM_L5L6_L3PHIC_nentries_1_V_dout         => FM_L5L6_L3PHIC_nentries_V_dout(1)  );
+        FM_L5L6_L3PHIC_nentries_VV_dout          => FM_L5L6_L3PHIC_nentries_V_dout   );
   end generate;
 
 
