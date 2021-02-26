@@ -78,17 +78,19 @@ package tf_pkg is
   type t_arr_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
-  -- clogb2(MAX_ENTRIES) = 6.
-  type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;
+  -- Used for memories
   type t_arr_7b  is array(integer range<>) of std_logic_vector(6 downto 0);
-  type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
-  type t_arr8_2_meb is array(0 to 7) of t_arr_meb(0 to 1);
-
   subtype t_arr2_7b is t_arr_7b(0 to 1);
   subtype t_arr8_7b is t_arr_7b(0 to 7);
   type t_arr8_2_7b is array(0 to 7) of t_arr2_7b;
+
+  type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;
   subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
+
+  -- Could be used in place of t_arr_7b. 
+  -- type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
+
 
   -- -- ########################### Procedures #######################
   procedure char2int (

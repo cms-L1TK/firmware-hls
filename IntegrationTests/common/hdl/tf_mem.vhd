@@ -35,7 +35,7 @@ entity tf_mem is
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
-    ); 
+    );
   port (
     clka      : in  std_logic;                                      --! Write clock
     clkb      : in  std_logic;                                      --! Read clock
