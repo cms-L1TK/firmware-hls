@@ -16,14 +16,23 @@ This would create a project directory \<project> ("projrouter" in case of the ab
         vivado_hls -p <project>
 
 ### Track Quality Specific Instructions
+In the TrackQuality directory first run: 
+
+        setupEnv.sh environment.yml Install
+
+
+This will install a miniconda python environment under the Install dir within the TrackQuality dir (or manually install the packages listed in environment.yml if you have an existing conda install)
+
+Then run:
+
+        source env.sh
+
+to setup the python environment
+
 To generate the track quality HLS from a python saved model format run:
 
         run_TQ_coniferconversion.sh
 
-In the track quality folder. This requires three python packages to be installed in whatever python environment you will be using: 
-- joblib
-- Numpy
-- xgboost (contains scikit-learn)
 
 Once run this will generate the 2 HLS files for the track quality firmware (BDT.h and parameters.h) and a reference datafile that will be compared with the csim output. To run the track quality csim, synth etc.. :
 

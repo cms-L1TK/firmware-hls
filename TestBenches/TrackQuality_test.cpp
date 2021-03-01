@@ -20,9 +20,13 @@ using namespace std;
 int main()
 {
   //load input data from text file
-  ifstream fin_tracks("../../../../../TrackQuality/hls_hex.dat");
+  ifstream fin_tracks;
+  bool valid_intrack = openDataFile(fin_tracks,"TQ/hls_hex.dat");
+  if (not valid_intrack) return -1;
   //load predictions from text file
-  ifstream fin_predictions("../../../../../TrackQuality/conifer_predictions.dat");
+  ifstream fin_predictions;
+  bool valid_inpred = openDataFile(fin_predictions,"TQ/conifer_predictions.dat");
+  if (not valid_inpred) return -1;
 
   std::string trk_line;
   std::string pred_line;

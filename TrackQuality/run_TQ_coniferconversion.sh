@@ -48,4 +48,8 @@ mv simdir/firmware/BDT.h ../TrackletAlgorithm
 
 rm -r simdir
 
+mkdir ../emData/TQ
+cp hls_hex.dat ../emData/TQ
+cp conifer_predictions.dat ../emData/TQ
+
 
