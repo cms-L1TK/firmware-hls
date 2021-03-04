@@ -103,6 +103,7 @@ inline bool idle() {
 #pragma HLS inline  
   //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   //if(idle_) std::cout << "MEU " << unit_ << " idle" << std::endl;
+  return ptr > readindex ? true : idle_;
   return idle_;
 }
 

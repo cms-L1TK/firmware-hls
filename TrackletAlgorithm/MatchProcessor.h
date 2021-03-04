@@ -645,7 +645,6 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddrBinned> istub=0;
 
   ap_uint<kNBits_MemAddr> iproj=0; //counter
-  ap_uint<kNProj> iProj=0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -696,6 +695,7 @@ void MatchProcessor(BXType bx,
     ap_uint<3> iphi = 0;
     if (istep == 0) {
       nallproj = 0;
+      //projbufferarray.reset();
     }
 
     //bool projBuffNearFull = projbufferarray.nearFull();
