@@ -54,6 +54,19 @@ public:
     #pragma HLS unroll
       projbuffer[i] = ProjectionRouterBuffer<BARREL>();
     }
+    //reset();
+  }
+
+  inline void operator=(const ProjectionRouterBufferArray &rhs) {
+#pragma HLS inline
+    ptr_ = rhs.ptr_;
+    width_ = rhs.width_;
+    empty_ = rhs.empty_;
+    PRBUFF_INIT: for(int i = 0; i < 1<<kNBitsBuffer; ++i) {
+    #pragma HLS unroll
+      projbuffer[i] = rhs.projbuffer[i];
+    }
+    //reset();
   }
 
   #ifndef __SYNTHESIS__
