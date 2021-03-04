@@ -129,10 +129,10 @@ inline void init(BXType bxin, ProjectionRouterBuffer<BARREL> projbuffer_, const 
   iphi_ = iphi;
   ptr = 0;
   unit_ = unit;
-  std::cout << "Initializing MEU " << unit_ << std::endl;
+  //std::cout << "Initializing MEU " << unit_ << std::endl;
   //print();
   //stubmem = stubmem_;
-  std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.getProjection() << " Received writeindex=" << writeindex << std::endl;
+  //std::cout << std::hex << "Initializing iphi=" << ivmphi << "\t" << projbuffer.getProjection() << " Received writeindex=" << writeindex << std::endl;
   //projbuffer.Print();
 
 }
@@ -147,6 +147,7 @@ inline bool idle() {
 #pragma HLS inline  
   //std::cout << std::hex << "iphi=" << ivmphi << (idle_ ? "": " not") << " idle!" << std::endl;
   //if(idle_) std::cout << "MEU " << unit_ << " idle" << std::endl;
+  return ptr > readindex ? true : idle_;
   return idle_;
 }
 
@@ -207,8 +208,9 @@ inline void readNext(ProjectionRouterBuffer<BARREL>::TCID& trackletid, VMProject
   projid = getProjindex();
   stubid = stubids[ptr];
   ptr++;
-  std::cout << std::hex << "reading MEU " << unit_ << " " << projbuffer.getProjection() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
-  idle_ = ptr >= readindex ? true : idle_;
+  //idle_ = ptr > readindex ? true : idle_;
+  //std::cout << std::hex << "reading MEU " << unit_ << " " << projbuffer.getProjection() << "\tprojid=" << projbuffer.getIndex() << "\tstubid=" << stubid << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tptr=" << ptr << "\tmax=" << writeindex << std::endl;
+  //idle_ = ptr >= readindex ? true : idle_;
   //idle_ = ready() ? idle_ : true;
 
 }
@@ -230,10 +232,10 @@ void print() {
 inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
 #pragma HLS inline
 //#pragma HLS dependence variable=istub inter WAR true
-#pragma HLS dependence variable=idle_ intra RAW true
+//#pragma HLS dependence variable=idle_ intra RAW true
     if(idle() || done()) return true;
     copy_ = true;
-    std::cout << "step " << projbuffer.getProjection() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << nstubs << std::endl;
+    //std::cout << "step " << projbuffer.getProjection() << "\t" << "iphi=" << ivmphi << "\treading=" << readindex << "\tmax=" << nstubs << std::endl;
 
     ////////////////////////////////////////////
     //This seems like where the ME buffer starts
@@ -304,11 +306,11 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
       //Read stub memory and extract data fields
       //auto const  stubadd=zbin.concat(istubtmp);
       int stubadd=16*(iphi_*8+zbin)+istubtmp;
-      std::cout << "reading istubtmp=" << istubtmp << " stubadd=" << stubadd << std::endl;
+      //std::cout << "reading istubtmp=" << istubtmp << " stubadd=" << stubadd << std::endl;
       const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(bx,stubadd);
       //const VMStubMECM<VMSMEType> stubdata=stubmem[unit_].read_mem(bx,stubadd);
       auto stubindex=stubdata.getIndex();
-      std::cout << "stubid=" << stubindex << std::endl;
+      //std::cout << "stubid=" << stubindex << std::endl;
       auto stubfinez=stubdata.getFineZ();
       auto stubbend=stubdata.getBend();
 
@@ -325,13 +327,13 @@ inline bool step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
       auto const index=projrinv.concat(stubbend);
       if (pass&&table[index]) {
       stubids[readindextmp]=stubindex;
-      std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
+      //std::cout << std::hex << "MEU found stubid=" << stubindex << std::endl;
     } // if(pass&&table[index])
-    print();
+    //print();
     //if(istub==0 && nstubs>0) idle_ = true;
     ready_ = ptr < readindex;
     if(readindex>=nstubs) done_ = true;
-    std::cout << "readindex=" << readindex << "\tnstubs=" << nstubs << "\tdone=" << done() << std::endl;
+    //std::cout << "readindex=" << readindex << "\tnstubs=" << nstubs << "\tdone=" << done() << std::endl;
     //if(readindex>writeindex) done_ = true;
     //if(istub==0 && nstubs>0) return true;
     //if(done_) std::cout << "MEU " << unit_ << "done stepping" << std::endl;
