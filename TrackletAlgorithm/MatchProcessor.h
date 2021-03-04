@@ -481,7 +481,7 @@ void MatchCalculator(BXType bx,
     }
   
     if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-      std::cout << "Match! projid=" << projid << "\tfullmatch=" << bestmatch.raw() << std::endl;
+      //std::cout << "Match! projid=" << projid << "\tfullmatch=" << bestmatch.raw() << std::endl;
       switch (projseed) {
       case 0:
       fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -616,7 +616,6 @@ void MatchProcessor(BXType bx,
 
   constexpr unsigned int kNBitsBuffer=3;
   constexpr unsigned int kNMatchEngines=4;
-  constexpr unsigned int kNProj=4;
 
   static ap_uint<kNBitsBuffer> writeindex[1<<kNBitsBuffer]; //no fullmatch if not static, not passing to MEU?
 //#pragma HLS resource variable=writeindex core=RAM_2P_LUTRAM
@@ -653,7 +652,6 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddrBinned> istub=0;
 
   ap_uint<kNBits_MemAddr> iproj=0; //counter
-  ap_uint<kNProj> iProj=0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -661,9 +659,10 @@ void MatchProcessor(BXType bx,
 
   //const VMStubMEMemory<VMSMEType,3>* instubdata[kNMatchEngines] = {instubdata1, instubdata2, instubdata3, instubdata4, instubdata5, instubdata6, instubdata7, instubdata8};
   //ProjectionRouterBuffer<BARREL> projbuffer[kNMatchEngines][1<<kNBitsBuffer];  //projbuffer = nstub+projdata+finez
-  ProjectionRouterBufferArray<kNBitsBuffer> projbufferarray;//[kNProj];// = {ProjectionRouterBufferArray<kNBitsBuffer>()};
-//#pragma HLS ARRAY_PARTITION variable=projbufferarray complete dim=0
-  int iprojbuff = 0;
+  ProjectionRouterBufferArray<3> projbufferarray;//[kNMatchEngines];// = {ProjectionRouterBufferArray<kNBitsBuffer>()};
+//#pragma HLS ARRAY_PARTITION variable=projbufferarray complete dim=1
+  ap_uint<2> iprojbuff = 0;
+  ap_uint<2> iProj = 0;
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE> matchengine[kNMatchEngines];
     MEU_start: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
@@ -696,6 +695,7 @@ void MatchProcessor(BXType bx,
 
       // reset output memories & counters
       nallproj = 0;
+      //projbufferarray.reset();
     }
     //std::cout << "istep=" << istep << std::endl;
 
@@ -819,9 +819,9 @@ void MatchProcessor(BXType bx,
         ProjectionRouterBufferMemory<BARREL>::NEntryT  nstublast;
         nstubfirst=instubdata[iphi].getEntries(bx,iphi*8+zfirst);
         nstublast= instubdata[iphi].getEntries(bx,iphi*8+zlast);
+        /*
         std::cout << "iphi zfirst zlast nstubfirst nstublast : "
                   <<iphi<<" "<<zfirst<<" "<<zlast<<" "<<nstubfirst<<" "<<nstublast<<std::endl;
-        /*
         switch (iphi) {
           break;
           case 0:  nstubfirst=instubdata1->getEntries(bx,zfirst);
@@ -866,11 +866,10 @@ void MatchProcessor(BXType bx,
           //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstubfirst, zfirst, vmproj.raw(), 0);
           projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstubfirst, zfirst, vmproj, 0);
           projbuffertmp.setPhi(iphi);
-          std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
+          //std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
           projbufferarray.addProjection(projbuffertmp);
-          //projbufferarray[iprojbuff].addProjection(projbuffertmp);
+          iprojbuff++;
           //projbufferarray[iphi].add(projbuffertmp);
-          iprojbuff = (iprojbuff+1)%kNProj;
         }
         if (savelast) {
           if (savefirst) {
@@ -878,21 +877,19 @@ void MatchProcessor(BXType bx,
             //projbuffer[iphi][writeindextmp+1]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstublast, zlast, vmproj, psseed);
             projbuffertmp.setPhi(iphi);
-            std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
+            //std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
             projbufferarray.addProjection(projbuffertmp);
-            //projbufferarray[iprojbuff].addProjection(projbuffertmp);
+            iprojbuff++;
             //projbufferarray[iphi].add(projbuffertmp);
-            iprojbuff = (iprojbuff+1)%kNProj;
           } else {
             ProjectionRouterBuffer<BARREL>::PRHASSEC sec=1;
             //projbuffer[iphi][writeindextmp]=ProjectionRouterBuffer<BARREL>(trackletid, sec, istep, nstublast, zlast, vmproj.raw(), psseed);
             projbuffertmp=ProjectionRouterBuffer<BARREL>(trackletid, sec, nstublast, zlast, vmproj, psseed);
             projbuffertmp.setPhi(iphi);
-            std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
+            //std::cout << std::hex << "adding projdata=" << projdata.raw() << std::endl;
             projbufferarray.addProjection(projbuffertmp);
-            //projbufferarray[iprojbuff].addProjection(projbuffertmp);
+            iprojbuff++;
             //projbufferarray[iphi].add(projbuffertmp);
-            iprojbuff = (iprojbuff+1)%kNProj;
           }
         }
 
@@ -909,47 +906,69 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=matchenginetmp complete dim=0
 //#pragma HLS dependence variable=matchenginetmp inter RAW true
 //#pragma HLS dependence variable=matchengine inter RAW true
+  bool idles[kNMatchEngines];
+  bool dones[kNMatchEngines];
+  bool emptys[kNMatchEngines];
+#pragma HLS ARRAY_PARTITION variable=idles complete dim=0
+#pragma HLS ARRAY_PARTITION variable=dones complete dim=0
+#pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
+    bool ready = false;
+    int currentMEU = -1;
+    ProjectionRouterBuffer<BARREL>::TCID bestTCID = -1;
     MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
       matchenginetmp[iMEU] = matchengine[iMEU];
+      emptys[iMEU] = projbufferarray.empty();
+      idles[iMEU] = matchenginetmp[iMEU].idle();
+      dones[iMEU] = matchenginetmp[iMEU].done();
+      bestTCID = (matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? matchenginetmp[iMEU].getTCID() : bestTCID;
+      currentMEU = (matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? iMEU : currentMEU;
+      ready = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? true : ready;
     }
 /*
 */
-    int currentMEU = -1;
-    bool ready = false;
-    ProjectionRouterBuffer<BARREL>::TCID bestTCID = -1;
     MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
-      auto &meu = matchenginetmp[iMEU];
+      auto &meu = matchengine[iMEU];
+      /*
       bool idle = meu.idle();
       bool done = meu.done();
+      */
       bool empty = projbufferarray.empty();
-      //bool empty = projbufferarray[iProj].empty();
-      std::cout << "is MEU " << iMEU << " idle? " << meu.idle() << std::endl;
+      bool idle = idles[iMEU];//meu.idle();
+      bool done = dones[iMEU];//meu.done();
+      /*
+      bool empty = emptys[iMEU];//projbufferarray[iMEU].empty();
+      */
+      //bool empty = projbufferarray.empty();
+      //std::cout << "is MEU " << iMEU << " idle? " << meu.idle() << std::endl;
       if(idle && !empty) {
-        std::cout << "reading projbufferarray " << iProj << std::endl;
+        //std::cout << "reading projbufferarray " << iProj << std::endl;
         auto tmpprojbuff = projbufferarray.read();
+        iProj++;
         //auto tmpprojbuff = projbufferarray[iProj].read();
         auto iphi = tmpprojbuff.getPhi();
         const VMStubMEMemoryCM<VMSMEType,3,3> *instub = &(instubdata[iMEU]);
-        //meu.init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
-        matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
+        meu.init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
+        //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp, iphi, iMEU);
         //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
       if(!ready) {
-        ready = meu.done();
-        ready = meu.done() && !meu.idle();
+        /*
+        ready = dones[iMEU];//meu.done();
+        ready = dones[iMEU] && !idles[iMEU];//meu.done() && !meu.idle();
         if(ready) {
           //std::cout << "is MEU done?" << std::endl;
           ready &= meu.getTCID() <= bestTCID;
           //std::cout << "still ready=" << ready << std::endl;
           currentMEU = ready ? iMEU : currentMEU;
           bestTCID = ready ? meu.getTCID() : bestTCID;
-          meu.print();
+          //meu.print();
           //std::cout << "MEU to read: " << currentMEU << "\tbestTCID=" << bestTCID << "\tready=" << ready << std::endl;
         }
-        if(!ready) matchenginetmp[iMEU].step(table, instubdata[iMEU]);
+        */
+        if(!ready) meu.step(table, instubdata[iMEU]);
         //ready = meu.step(table, instubdata);
         //ready = meu.ready();
         /*
@@ -960,10 +979,10 @@ void MatchProcessor(BXType bx,
         std::cout << "bestTCID=" << bestTCID << std::endl;
         */
       }
-      iProj = (iProj+1)%kNProj;
 
 
     } //end MEU loop
+        iProj++;
         //std::cout << "will read MEU: " << currentMEU << "\tbestTCID=" << bestTCID << "\tready=" << ready << std::endl;
 
       if(ready && currentMEU >= 0) {
@@ -971,11 +990,11 @@ void MatchProcessor(BXType bx,
         typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::STUBID stubid;
         typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE>::NSTUBS nstubs;
         typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
-        std::cout << "reading MEU for MC" << std::endl;
-        matchenginetmp[currentMEU].print();
+        //std::cout << "reading MEU for MC" << std::endl;
+        //matchenginetmp[currentMEU].print();
         /*
         */
-        matchenginetmp[currentMEU].readNext(currentTCID, projindex, stubid);
+        matchengine[currentMEU].readNext(currentTCID, projindex, stubid);
         //std::cout << "Sending to MC projid=" << projindex << "\tstubid=" << stubid << std::endl;
         MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
                   //(bx, allstub, allproj, matchengine[iMEU].getProjindex(), matchengine[iMEU].getStubIds(), matchengine[iMEU].getNStubs(), bx_o,
@@ -984,11 +1003,11 @@ void MatchProcessor(BXType bx,
                    fullmatch);
       } //end MC if
 
+    /*
     MEU_update: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
       matchengine[iMEU] = matchenginetmp[iMEU];
     }
-    /*
     */
   } //end loop
 
