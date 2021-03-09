@@ -183,7 +183,7 @@ void readTable(bool table[256]){
 
   if (L==3) {
     bool tmp[256]=
-#include "../emData/ME/tables/METable_L3.tab"
+#include "../emData/MP/tables/METable_L3.tab"
     for (int i=0;i<256;i++){
       table[i]=tmp[i];
     }
@@ -921,8 +921,8 @@ void MatchProcessor(BXType bx,
       emptys[iMEU] = projbufferarray.empty();
       idles[iMEU] = matchenginetmp[iMEU].idle();
       dones[iMEU] = matchenginetmp[iMEU].done();
-      bestTCID = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? matchenginetmp[iMEU].getTCID() : bestTCID;
-      currentMEU = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? iMEU : currentMEU;
+      bestTCID = (matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? matchenginetmp[iMEU].getTCID() : bestTCID;
+      currentMEU = (matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? iMEU : currentMEU;
       ready = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? true : ready;
     }
 /*
