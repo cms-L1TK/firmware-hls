@@ -915,15 +915,19 @@ void MatchProcessor(BXType bx,
     bool ready = false;
     int currentMEU = -1;
     ProjectionRouterBuffer<BARREL>::TCID bestTCID = -1;
+    ProjectionRouterBuffer<BARREL>::TCID TCID[kNMatchEngines] = {-1};
     MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
       matchenginetmp[iMEU] = matchengine[iMEU];
       emptys[iMEU] = projbufferarray.empty();
       idles[iMEU] = matchenginetmp[iMEU].idle();
       dones[iMEU] = matchenginetmp[iMEU].done();
-      bestTCID = (matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? matchenginetmp[iMEU].getTCID() : bestTCID;
-      currentMEU = (matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? iMEU : currentMEU;
+      /*
+      bestTCID = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? matchenginetmp[iMEU].getTCID() : bestTCID;
+      currentMEU = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? iMEU : currentMEU;
       ready = (!ready && matchenginetmp[iMEU].getTCID() <= bestTCID && dones[iMEU] && !idles[iMEU]) ? true : ready;
+      */
+      TCID[iMEU] = (dones[iMEU] && !idles[iMEU]) ? matchenginetmp[iMEU].getTCID() : ProjectionRouterBuffer<BARREL>::TCID(-1);
     }
 /*
 */
@@ -954,7 +958,7 @@ void MatchProcessor(BXType bx,
         //matchenginetmp[iMEU].init(bx, tmpprojbuff, writeindextmp[iphi], iMEU);
         //matchengine[iphi].init(bx, projbufferarray[iphi].read(), instubdata[iphi], iphi, writeindex[iphi]);
       }
-      if(!ready) {
+      if(!ready || 1) {
         /*
         ready = dones[iMEU];//meu.done();
         ready = dones[iMEU] && !idles[iMEU];//meu.done() && !meu.idle();
@@ -968,7 +972,7 @@ void MatchProcessor(BXType bx,
           //std::cout << "MEU to read: " << currentMEU << "\tbestTCID=" << bestTCID << "\tready=" << ready << std::endl;
         }
         */
-        if(!ready) meu.step(table, instubdata[iMEU]);
+        if(!ready || 1) meu.step(table, instubdata[iMEU]);
         //ready = meu.step(table, instubdata);
         //ready = meu.ready();
         /*
@@ -984,6 +988,11 @@ void MatchProcessor(BXType bx,
     } //end MEU loop
         iProj++;
         //std::cout << "will read MEU: " << currentMEU << "\tbestTCID=" << bestTCID << "\tready=" << ready << std::endl;
+      for(int i = 0; i < kNMatchEngines; ++i) {
+        currentMEU = TCID[i] <= bestTCID ? i : currentMEU;
+        bestTCID = TCID[i] <= bestTCID ? TCID[i] : bestTCID;
+      }
+      ready = true;
 
       if(ready && currentMEU >= 0) {
         typename VMProjection<BARREL>::VMPID projindex;
