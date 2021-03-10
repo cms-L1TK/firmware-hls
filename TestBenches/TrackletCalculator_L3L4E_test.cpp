@@ -1,5 +1,5 @@
 // Test bench for TrackletCalculator
-#include "TrackletCalculator.h"
+#include "TrackletCalculatorTop.h"
 
 #include <algorithm>
 #include <iterator>
