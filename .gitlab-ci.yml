@@ -123,6 +123,10 @@ MC-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+TB-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TrackletAlgorithm/TrackBuilderTop.cc'
 # HLS builds ---------------
 IR-hls-build:
   <<: *template_hls-build
@@ -159,6 +163,11 @@ MC-hls-build:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
+TB-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TB"
 # FW simulation ---------------
 topPRMEMC-sim:
   <<: *template_topTF-sim

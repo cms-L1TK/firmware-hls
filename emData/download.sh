@@ -4,6 +4,11 @@
 memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
 luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
 
+# Supplemental test-vectors for development of the PurgeDuplicates module.
+# Generated after PR #70 was merged:
+# https://github.com/cms-L1TK/cmssw/tree/1606921d6c26b13292808ec8198db8c6a400dad0
+pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
+
 # fw_synch_200515
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
@@ -111,6 +116,11 @@ fi
 wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
+
+# Download and unpack PD.tar.gz
+wget -O PD.tar.gz --quiet ${pd_url}
+tar -xzf PD.tar.gz
+rm -f PD.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
