@@ -1,16 +1,16 @@
-# Script to generate project for TC
-#   vivado_hls -f script_TC.tcl
-#   vivado_hls -p trackletCalculator
+# Script to generate project for TB
+#   vivado_hls -f script_TB.tcl
+#   vivado_hls -p trackBuilder
 # WARNING: this will wipe out the original project by the same name
 
 # create new project (deleting any existing one of same name)
-open_project -reset trackletCalculator
+open_project -reset trackBuilder
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top TrackletCalculator_L1L2G
-add_files ../TrackletAlgorithm/TrackletCalculatorTop.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/TrackletCalculator_L1L2G_test.cpp -cflags "$CFLAGS"
+set_top TrackBuilder_L1L2
+add_files ../TrackletAlgorithm/TrackBuilderTop.cc -cflags "$CFLAGS"
+add_files -tb ../TestBenches/TrackBuilder_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
 
@@ -18,12 +18,11 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/TC/tables/
-add_files -tb ../emData/TC/TC_L1L2G/
+add_files -tb ../emData/TB/TB_L1L2/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design
-cosim_design 
+cosim_design
 export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -format ip_catalog -flow impl

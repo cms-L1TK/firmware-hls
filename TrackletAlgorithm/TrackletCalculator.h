@@ -180,53 +180,17 @@ template<TF::seed Seed, TC::itc iTC> constexpr uint16_t ASOuterMask();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
 
-template<TF::seed Seed, TC::itc iTC, regionType InnerRegion, regionType OuterRegion, uint8_t NASMemInner, uint8_t NASMemOuter, uint8_t NSPMem> void
+template<TF::seed Seed, TC::itc iTC, regionType InnerRegion, regionType OuterRegion, uint8_t NSPMem> void
 TrackletCalculator(
     const BXType bx,
-    const AllStubMemory<InnerRegion> innerStubs[NASMemInner],
-    const AllStubMemory<OuterRegion> outerStubs[NASMemOuter],
-    const StubPairMemory stubPairs[NSPMem],
+    const AllStubMemory<InnerRegion> innerStubs[],
+    const AllStubMemory<OuterRegion> outerStubs[],
+    const StubPairMemory stubPairs[],
     BXType& bx_o,
     TrackletParameterMemory * const trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-);
-
-void TrackletCalculator_L1L2E(
-    const BXType bx,
-    const AllStubMemory<BARRELPS> innerStubs[2],
-    const AllStubMemory<BARRELPS> outerStubs[1],
-    const StubPairMemory stubPairs[13],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-);
-
-void TrackletCalculator_L1L2G(
-    const BXType bx,
-    const AllStubMemory<BARRELPS> innerStubs[1],
-    const AllStubMemory<BARRELPS> outerStubs[2],
-    const StubPairMemory stubPairs[13],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-);
-
-void TrackletCalculator_L3L4E(
-    const BXType bx,
-    const AllStubMemory<BARRELPS> innerStubs[1],
-    const AllStubMemory<BARREL2S> outerStubs[2],
-    const StubPairMemory stubPairs[11],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
+    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
+    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
+    TrackletProjectionMemory<DISK> projout_disk[]
 );
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -554,20 +518,18 @@ TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
              // being processed
 regionType InnerRegion, // region type of the inner stubs
 regionType OuterRegion, // region type of the outer stubs
-uint8_t NASMemInner, // number of inner all-stub memories
-uint8_t NASMemOuter, // number of outer all-stub memories
 uint8_t NSPMem // number of stub-pair memories
 > void
 TrackletCalculator(
     const BXType bx,
-    const AllStubMemory<InnerRegion> innerStubs[NASMemInner],
-    const AllStubMemory<OuterRegion> outerStubs[NASMemOuter],
-    const StubPairMemory stubPairs[NSPMem],
+    const AllStubMemory<InnerRegion> innerStubs[],
+    const AllStubMemory<OuterRegion> outerStubs[],
+    const StubPairMemory stubPairs[],
     BXType& bx_o,
     TrackletParameterMemory * const trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
+    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
+    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
+    TrackletProjectionMemory<DISK> projout_disk[]
 )
 {
   static_assert(Seed == TF::L1L2 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L3L4, and L5L6 seeds have been implemented so far.");
