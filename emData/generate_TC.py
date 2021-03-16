@@ -2,8 +2,8 @@
 
 # This script generates TrackletCalculator_parameters.h,
 # TrackletCalculatorTop.h, and TrackletCalculatorTop.cc in the
-# TrackletAlgorithm/ directory. Currently supports all TCs for L1L2 and L3L4,
-# as well as TC_L5L6A and TC_L5L6D.
+# TrackletAlgorithm/ directory. Currently supports all TCs for L1L2, as well as
+# TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
 import sys, re
 from enum import Enum
@@ -73,11 +73,14 @@ asOuterMems = {}
 spMems = {}
 tprojMems = {}
 for line in wiresFile:
-    # Only barrel-only seeds are supported right now. And for L5L6, only
-    # TC_L5L6A and TC_L5L6D are supported because we currently assume the inner
-    # stubs and outer stubs each have up to two all-stubs memories associated
-    # with them. However, TC_L5L6B and TC_L5L6C have up to three.
-    if "TC_L1L2" not in line and "TC_L3L4" not in line and "TC_L5L6A" not in line and "TC_L5L6D" not in line:
+    # Only barrel-only seeds are supported right now. And for L3L4 and L5L6,
+    # only TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D are supported because we
+    # currently assume the inner stubs and outer stubs each have up to two
+    # all-stubs memories associated with them. However, the other L3L4 and L5L6
+    # TCs have up to three.
+    if "TC_L1L2" not in line \
+      and "TC_L3L4A" not in line and "TC_L3L4D" not in line \
+      and "TC_L5L6A" not in line and "TC_L5L6D" not in line:
         continue
     line = line.rstrip()
     tcName = re.sub(r".*TC_(.....).*", r"TC_\1", line)
