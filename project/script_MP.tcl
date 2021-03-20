@@ -12,16 +12,14 @@ set_top MatchProcessorTopL3
 add_files ../TrackletAlgorithm/MatchProcessorTopL3.cpp -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchProcessorL3_test.cpp -cflags "$CFLAGS"
 
-# data files
-add_files -tb ../emData/PR/
-add_files -tb ../emData/ME/
-add_files -tb ../emData/MC/
-add_files -tb ../emData/MP/
-
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+
+# data files
+add_files -tb ../emData/MP/Tables/
+add_files -tb ../emData/MP/MP_L3PHIC/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design
