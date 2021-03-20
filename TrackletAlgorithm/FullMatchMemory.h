@@ -15,13 +15,16 @@ public:
     // Bit size for FullMatchMemory fields
     kFMZResSize = 9,
     kFMPhiResSize = 12,
+    kFMStubRSize = 7,
     kFMStubIndexSize = 10,
     kFMStubPhiIDSize = 3,   // subdivision of StubIndex
     kFMStubIDSize = 7,      // subdivision of StubIndex
     kFMTrackletIndexSize = 7,
     kFMTCIDSize = 7,
+    kFMSeedSize = 3, // upper three bits of TCID
+    kFMITCSize = 4, // lower four bits of TCID
     // Bit size for full FullMatchMemory
-    kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMPhiResSize + kFMZResSize
+    kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
   };
 };
 
@@ -33,13 +36,16 @@ public:
     // Bit size for FullMatchMemory fields
     kFMZResSize = 7,
     kFMPhiResSize = 12,
+    kFMStubRSize = 12,
     kFMStubIndexSize = 10,
     kFMStubPhiIDSize = 3,   // subdivision of StubIndex
     kFMStubIDSize = 7,      // subdivision of StubIndex
     kFMTrackletIndexSize = 7,
     kFMTCIDSize = 7,
+    kFMSeedSize = 3, // upper three bits of TCID
+    kFMITCSize = 4, // lower four bits of TCID
     // Bit size for full FullMatchMemory
-    kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMPhiResSize + kFMZResSize
+    kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
   };
 };
 
@@ -54,9 +60,11 @@ public:
     kFMZResMSB = kFMZResLSB + FullMatchBase<FMType>::kFMZResSize - 1,
     kFMPhiResLSB = kFMZResMSB + 1,
     kFMPhiResMSB = kFMPhiResLSB + FullMatchBase<FMType>::kFMPhiResSize - 1,
-    kFMStubIndexLSB = kFMPhiResMSB + 1,
+    kFMStubRLSB = kFMPhiResMSB + 1,
+    kFMStubRMSB = kFMStubRLSB + FullMatchBase<FMType>::kFMStubRSize - 1,
+    kFMStubIndexLSB = kFMStubRMSB + 1,
     kFMStubIndexMSB = kFMStubIndexLSB + FullMatchBase<FMType>::kFMStubIndexSize - 1,
-    kFMStubIDLSB = kFMPhiResMSB + 1,
+    kFMStubIDLSB = kFMStubRMSB + 1,
     kFMStubIDMSB = kFMStubIDLSB + FullMatchBase<FMType>::kFMStubIDSize - 1,
     kFMStubPhiIDLSB = kFMStubIDMSB + 1,
     kFMStubPhiIDMSB = kFMStubPhiIDLSB + FullMatchBase<FMType>::kFMStubPhiIDSize - 1,
@@ -68,11 +76,13 @@ public:
 
   typedef ap_int<FullMatchBase<FMType>::kFMZResSize> FMZRES;
   typedef ap_int<FullMatchBase<FMType>::kFMPhiResSize> FMPHIRES;
+  typedef ap_uint<FullMatchBase<FMType>::kFMStubRSize> FMSTUBR;
   typedef ap_uint<FullMatchBase<FMType>::kFMStubIndexSize> FMSTUBINDEX;
   typedef ap_uint<FullMatchBase<FMType>::kFMStubIDSize> FMSTUBID;        // subdivision of StubIndex 
   typedef ap_uint<FullMatchBase<FMType>::kFMStubPhiIDSize> FMSTUBPHIID;  // subdivision of StubIndex
   typedef ap_uint<FullMatchBase<FMType>::kFMTrackletIndexSize> FMTrackletIndex;
   typedef ap_uint<FullMatchBase<FMType>::kFMTCIDSize> FMTCID;
+  typedef ap_uint<FullMatchBase<FMType>::kFMTCIDSize + FullMatchBase<FMType>::kFMTrackletIndexSize> FMTrackletID;
 
   typedef ap_uint<FullMatchBase<FMType>::kFullMatchSize> FullMatchData;
 
@@ -81,12 +91,12 @@ public:
     data_(newdata)
   {}
 
-  FullMatch(const FMTCID tcid, const FMTrackletIndex trackletindex, const FMSTUBINDEX stub, const FMPHIRES phires, const FMZRES zres):
-    data_( ((((tcid,trackletindex),stub),phires),zres) )
+  FullMatch(const FMTCID tcid, const FMTrackletIndex trackletindex, const FMSTUBINDEX stub, const FMSTUBR stubr, const FMPHIRES phires, const FMZRES zres):
+    data_( (((((tcid,trackletindex),stub),stubr),phires),zres) )
   {}
 
-  FullMatch(const FMTCID tcid, const FMTrackletIndex trackletindex, const FMSTUBPHIID stubphiid, const FMSTUBID stubid, const FMPHIRES phires, const FMZRES zres):
-	data_( (((((tcid,trackletindex),stubphiid),stubid),phires),zres) )
+  FullMatch(const FMTCID tcid, const FMTrackletIndex trackletindex, const FMSTUBPHIID stubphiid, const FMSTUBID stubid, const FMSTUBR stubr, const FMPHIRES phires, const FMZRES zres):
+	data_( ((((((tcid,trackletindex),stubphiid),stubid),stubr),phires),zres) )
   {}
 
   FullMatch():
@@ -106,12 +116,35 @@ public:
 
   FullMatchData raw() const {return data_;}
 
+  // TCID is a unique identifier assigned to each TC. It is a concatenation of
+  // the seed and iTC numbers:
+  // TCID = (seed<<4) + iTC
+  // The seed number is assigned as follows:
+  //   L1L2 -> 0
+  //   L2L3 -> 1
+  //   L3L4 -> 2
+  //   L5L6 -> 3
+  //   D1D2 -> 4
+  //   D3D4 -> 5
+  //   D1L1/L1D1 -> 6
+  //   D1L2/L2D1 -> 7
+  // The iTC number comes from the letter at the end of the TC name (i.e.,
+  // TC_L1L2A and TC_L5L6A have the same iTC number); generally indicates the
+  // region of the phi sector being processed:
+  //   A -> 0
+  //   B -> 1
+  //   C -> 2
+  //   ...
   FMTCID getTCID() const {
     return data_.range(kFMTCIDMSB,kFMTCIDLSB);
   }
 
   FMTrackletIndex getTrackletIndex() const {
     return data_.range(kFMTrackletIndexMSB,kFMTrackletIndexLSB);
+  }
+
+  FMTrackletID getTrackletID() const {
+    return data_.range(kFMTCIDMSB,kFMTrackletIndexLSB);
   }
 
   FMSTUBINDEX getStubIndex() const {
@@ -124,6 +157,10 @@ public:
 
   FMSTUBPHIID getStubPhiID() const {
     return data_.range(kFMStubPhiIDMSB,kFMStubPhiIDLSB);
+  }
+
+  FMSTUBR getStubR() const {
+    return data_.range(kFMStubRMSB,kFMStubRLSB);
   }
 
   FMPHIRES getPhiRes() const {
@@ -153,6 +190,10 @@ public:
 
   void setStubID(const FMSTUBID stid) {
     data_.range(kFMStubIDMSB,kFMStubIDLSB) = stid;
+  }
+
+  void setStubR(const FMSTUBR stubr) {
+    data_.range(kFMStubRMSB,kFMStubRLSB) = stubr;
   }
 
   void setPhiRes(const FMPHIRES phires) {
