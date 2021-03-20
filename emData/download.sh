@@ -13,8 +13,8 @@ luts_url="https://www.dropbox.com/s/6ebazqxtb1e0caw/LUTsStandard_210315.tgz?dl=0
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # Combined modules - temporary
-tarball_url_cm="https://www.dropbox.com/s/ahmcn0o1aepvjpx/MemPrintsCombined_210314.tgz?dl=0"
-luts_url_cm="https://www.dropbox.com/s/znk3ueolj3j58ep/LUTsCombined_210314.tgz?dl=0"
+tarball_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
