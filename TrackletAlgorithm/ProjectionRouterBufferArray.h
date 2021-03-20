@@ -57,31 +57,15 @@ public:
     //reset();
   }
 
-  inline void operator=(const ProjectionRouterBufferArray &rhs) {
+  inline void reset() {
 #pragma HLS inline
-    ptr_ = rhs.ptr_;
-    width_ = rhs.width_;
-    empty_ = rhs.empty_;
-    PRBUFF_INIT: for(int i = 0; i < 1<<kNBitsBuffer; ++i) {
-    #pragma HLS unroll
-      projbuffer[i] = rhs.projbuffer[i];
-    }
-    //reset();
+    readptr_ = 0;
+    writeptr_ = 0;
   }
 
-  #ifndef __SYNTHESIS__
-  void print() {
-    if(empty()) {
-      std::cout << "unread contents in projbuffer empty!" << std::endl;
-    }
-    else {
-      std::cout << "Unread contents in projbuffer" << std::endl;
-      for(int i = ptr_; i < width_; ++i){
-        std::cout << std::hex << i << ": " << projbuffer[i].raw() << (i==ptr_ ? " <=== ptr" : "") << std::endl;
-      }
-    }
+  ProjectionRouterBufferArray() {
+    reset();
   }
-  #endif
 
 private:
   ap_uint<kNBitsBuffer> readptr_ = 0;

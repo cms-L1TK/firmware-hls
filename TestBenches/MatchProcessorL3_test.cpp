@@ -24,7 +24,6 @@ int main() {
   int err_count = 0;
 
   // input memories
-  static TrackletProjectionMemory<BARRELPS> tprojarray[maxTrackletProjections];
   static TrackletProjectionMemory<BARRELPS> tproj1;
   static TrackletProjectionMemory<BARRELPS> tproj2;
   static TrackletProjectionMemory<BARRELPS> tproj3;
@@ -94,7 +93,6 @@ int main() {
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    allproj.clear();
     fullmatch[0].clear();
 //    fullmatch[1].clear();
 //    fullmatch[2].clear();
@@ -127,7 +125,6 @@ int main() {
 
     // Unit Under Test
     MatchProcessorTopL3(bx,
-                        tprojarray,
                         &tproj1, &tproj2, &tproj3, &tproj4,
                         &tproj5, &tproj6, &tproj7, &tproj8,
 			&tproj9, &tproj10,

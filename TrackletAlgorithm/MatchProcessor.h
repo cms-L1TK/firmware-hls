@@ -551,7 +551,6 @@ void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
                       // array of scalar ...
-                      const TrackletProjectionMemory<PROJTYPE> tprojarray[maxTrackletProjections], 
                       const TrackletProjectionMemory<PROJTYPE>* const proj1in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj2in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj3in,
@@ -607,15 +606,14 @@ void MatchProcessor(BXType bx,
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin,0,
-     /*
-     &tprojarray[1],&tprojarray[2],&tprojarray[3],&tprojarray[4],&tprojarray[5],&tprojarray[6],&tprojarray[7],&tprojarray[8],
-     &tprojarray[9],&tprojarray[10],&tprojarray[11],&tprojarray[12],&tprojarray[13],&tprojarray[14],&tprojarray[15],&tprojarray[16],
-     &tprojarray[17],&tprojarray[18],&tprojarray[19],&tprojarray[20],&tprojarray[21],&tprojarray[22],&tprojarray[23],&tprojarray[24]);
-     */
      proj1in,proj2in,proj3in,proj4in,proj5in,proj6in,proj7in,proj8in,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
+  for (unsigned int ii=0;ii<nINMEM;ii++) {
+    std::cout << "ii mem_hasdata numbersin : "<<ii<<" "<<mem_hasdata[ii]<<" "<<numbersin[ii]<<std::endl;
+  }
+
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
