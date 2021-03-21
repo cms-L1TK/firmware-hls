@@ -610,10 +610,6 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
-  for (unsigned int ii=0;ii<nINMEM;ii++) {
-    std::cout << "ii mem_hasdata numbersin : "<<ii<<" "<<mem_hasdata[ii]<<" "<<numbersin[ii]<<std::endl;
-  }
-
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
