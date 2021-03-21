@@ -68,8 +68,16 @@ inline bool idle() {
   return idle_;
 }
 
-inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID& getTCID() {
-#pragma HLS inline  
+inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID() {
+#pragma HLS inline
+  if (!empty()) {
+    ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
+    ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
+    (vmstub,allprojdata) = matches_[readindex_];
+    AllProjection<AllProjectionType> allproj(allprojdata);
+    return allproj.getTCID();
+  }
+  assert(!idle_);
   return tcid;
 }
 
