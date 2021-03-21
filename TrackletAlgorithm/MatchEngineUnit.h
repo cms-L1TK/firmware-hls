@@ -49,7 +49,6 @@ inline MatchEngineUnit() {
   idle_ = false;
   bx = bxin;
   istub_ = 0;
-  //std::cout << "MEU::init allproj : "<<projbuffer.getAllProj()<<std::endl;
   projbuffer_ = projbuffer;
   projindex = projbuffer.getIndex();
   nstubs=projbuffer.getNStubs();
@@ -97,8 +96,6 @@ inline MATCH read() {
  inline void step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
 #pragma HLS inline
 
-
-   //std::cout << "MEU "<<unit_<<" step "<<idle_<<std::endl;
 
    if(idle_) return;
    
@@ -156,7 +153,6 @@ inline MATCH read() {
    int stubadd=16*(iphi_*8+zbin)+istubtmp;
    const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(bx,stubadd);
    auto stubindex=stubdata.getIndex();
-   std::cout << "stubadd iphi zbin istubtmp stubindex : "<<stubadd<<" "<<iphi_<<" "<<zbin<<" "<<istubtmp<<" "<<stubindex<<std::endl; 
    auto stubfinez=stubdata.getFineZ();
    auto stubbend=stubdata.getBend();
    
@@ -172,7 +168,6 @@ inline MATCH read() {
    //Check if stub bend and proj rinv consistent
    auto const index=projrinv.concat(stubbend);
    if (pass&&table[index]) {
-     std::cout << "Saving match in MEU = "<<unit_<<" with stubindex : "<<stubindex<<" "<<projbuffer_.getAllProj()<<std::endl;
      matches_[writeindex_++]=(stubindex,projbuffer_.getAllProj());
    } // if(pass&&table[index])
    
