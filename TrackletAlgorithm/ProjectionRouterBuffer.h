@@ -93,19 +93,6 @@ public:
   data_( (allproj, phi, tcid, hasSec, projdata.getIndex(), nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
   {
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
-
-    std::cout << "zbin projdata.raw() : "<<zbin<<" "<<projdata.raw()<<std::endl;
-    assert(zbin==getZBin());
-    assert(projdata.raw()==getProjection());
-    std::cout << "widths : "<<projdata.raw().width<<" "<<getProjection().width<<" "<<VMProjection<VMProjType>::kVMProjectionSize<<std::endl;
-    std::cout <<"nstubs: "<<nstub<<" "<<getNStubs()<<std::endl;
-    std::cout <<"widths nstubs: "<<nstub.width<<" "<<getNStubs().width<<std::endl;
-    assert(nstub==getNStubs());
-    assert(phi==getPhi());
-
-    std::cout << "widths allproj : " << allproj.width << " " << getAllProj().width << "  " << AllProjection<AllProjectionType>::kAllProjectionSize <<std::endl;
-    assert(allproj==getAllProj());
-
   }
 
   // This constructor is only used for projections in DISK

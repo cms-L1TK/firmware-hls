@@ -401,8 +401,6 @@ void MatchCalculator(BXType bx,
   typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
   typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
 
-  std::cout << "***MatchCalculator: phi tcid trackletindex stubid = "<<proj_phi<<" "<<proj_tcid<<" "<<proj_tkid<<" "<<stubid<<std::endl;
-  
   // Calculate residuals
   // Get phi and z correction
   ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
@@ -426,8 +424,6 @@ void MatchCalculator(BXType bx,
   ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
   
 
-  std::cout << "delta_phi : "<<stub_phi<<" "<<proj_phi_corr<<" "<<phi_corr<<std::endl;
-
   // Full match parameters
   typename FullMatch<FMTYPE>::FMTCID          fm_tcid  = proj_tcid;
   typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid  = proj_tkid;
@@ -439,9 +435,6 @@ void MatchCalculator(BXType bx,
   // Full match  
   typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
   FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,(ap_uint<3>(2),fm_asid),fm_stubr,fm_phi,fm_z);
-
-  std::cout << "fm : " << fm_tcid.to_string(2) << " " << fm_tkid.to_string(2)<< " " << fm_asid.to_string(2)<< " " << fm_stubr.to_string(2)<< " " << fm_phi.to_string(2)<< " " << fm_z.to_string(2) << std::endl;
-  std::cout << "fm : " << fm.raw().to_string(2) << " " << fm.raw().to_string(16) << std::endl;
 
   //-----------------------------------------------------------------------------------------------------------
   //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -455,9 +448,6 @@ void MatchCalculator(BXType bx,
   
   // For first tracklet, pick up the phi cut value
   best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-  
-  std::cout << "delta phi : "<<abs_delta_phi << " " << best_delta_phi << std::endl;
-  std::cout << "delta z i : "<<abs_delta_z << " " << LUT_matchcut_z[proj_seed] << std::endl;
   
   // Check that matches fall within the selection window of the projection 
   if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
@@ -482,7 +472,6 @@ void MatchCalculator(BXType bx,
   }
   
   if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-    std::cout << "Match! projid=" << projid << "\tfullmatch=" << bestmatch.raw() << std::endl;
     switch (projseed) {
     case 0:
       fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
@@ -592,10 +581,6 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
-  for (unsigned int ii=0;ii<nINMEM;ii++) {
-    std::cout << "ii mem_hasdata numbersin : "<<ii<<" "<<mem_hasdata[ii]<<" "<<numbersin[ii]<<std::endl;
-  }
-
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -657,7 +642,6 @@ void MatchProcessor(BXType bx,
       nallproj = 0;
       //projbufferarray.reset();
     }
-    //std::cout << "istep=" << istep << std::endl;
 
     if (!projbufferarray.nearFull()){
 
@@ -778,9 +762,6 @@ void MatchProcessor(BXType bx,
   
         VMProjection<BARREL> vmproj(index, zbin, finez, rinv, psseed);
 
-	std::cout << "PROJECTION:"<<projdata.getPhi()<<" "<<projdata.getRZ()<<" "<<projdata.getPhiDer()
-		  <<" "<<projdata.getRZDer()<<" TCID index : "<<projdata.getTCID()<<" "<<projdata.getTrackletIndex()<<std::endl;
-
 	AllProjection<APTYPE> allproj(projdata.getTCID(), projdata.getTrackletIndex(), projdata.getPhi(),
 				      projdata.getRZ(), projdata.getPhiDer(), projdata.getRZDer());
 
@@ -793,16 +774,10 @@ void MatchProcessor(BXType bx,
 	typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = allproj.getRZDer();
 
 
-	std::cout << "projection:"<<proj_phi<<" "<<proj_z<<" "<<proj_phid
-		  <<" "<<proj_zd<<" TCID index : "<<proj_tcid<<" "<<proj_tkid<<std::endl;
-
-
         if (savefirst) { //FIXME code needs to be cleaner
           typename ProjectionRouterBuffer<BARREL, APTYPE>::PRHASSEC sec=0;
           ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), iphi,trackletid, sec, nstubfirst, zfirst, vmproj, 0);
-          //projbuffertmp.setPhi(iphi);
 	  AllProjection<APTYPE> proj(projbuffertmp.getAllProj());
-	  std::cout << "PrOjEcTiOn:"<<proj.getPhi()<<std::endl;
           projbufferarray.addProjection(projbuffertmp);
         }
         if (savelast) {
@@ -810,15 +785,11 @@ void MatchProcessor(BXType bx,
             typename ProjectionRouterBuffer<BARREL, APTYPE>::PRHASSEC sec=1;
             ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), iphi,trackletid, sec, nstublast, zlast, vmproj, psseed);
 	    AllProjection<APTYPE> proj(projbuffertmp.getAllProj());
-	    std::cout << "PrOjEcTiOn:"<<proj.getPhi()<<std::endl;
-            //projbuffertmp.setPhi(iphi);
             projbufferarray.addProjection(projbuffertmp);
           } else {
             typename ProjectionRouterBuffer<BARREL, APTYPE>::PRHASSEC sec=1;
             ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), iphi,trackletid, sec, nstublast, zlast, vmproj, psseed);
 	    AllProjection<APTYPE> proj(projbuffertmp.getAllProj());
-	    std::cout << "PrOjEcTiOn:"<<proj.getPhi()<<std::endl;
-            //projbuffertmp.setPhi(iphi);
             projbufferarray.addProjection(projbuffertmp);
           }
         }
@@ -837,15 +808,20 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=dones complete dim=0
 #pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
     int currentMEU = -1;
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID bestTCID = -1;
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID TCID[kNMatchEngines] = {-1};
 
   MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
       emptys[iMEU] = matchengine[iMEU].empty();
       idles[iMEU] = matchengine[iMEU].idle();
-      TCID[iMEU] = (!emptys[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
-      if (!emptys[iMEU]) currentMEU=iMEU;
+      if (!emptys[iMEU]) {
+	if (currentMEU==-1) {
+	  currentMEU=iMEU;
+	} else {
+	  if (matchengine[iMEU].getTCID()<matchengine[currentMEU].getTCID()){
+	    currentMEU=iMEU;
+	  } 
+	}
+      }
     }
     
     
@@ -859,7 +835,6 @@ void MatchProcessor(BXType bx,
       if(idle && !empty) {
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
-	std::cout << "istep = "<<istep<<" Initialize matchengine : "<<iMEU<<std::endl;
         meu.init(bx, tmpprojbuff, iphi, iMEU);
       }
 
@@ -876,9 +851,6 @@ void MatchProcessor(BXType bx,
 
       (stubindex,allproj) = matchengine[currentMEU].read();
       
-
-
-      std::cout << "istep = "<<istep<<" Call matchCalculator : "<<currentMEU<<std::endl;
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
 	(bx, allstub, allproj, projindex, stubindex, bx_o,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
