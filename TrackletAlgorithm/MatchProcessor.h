@@ -807,23 +807,39 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=idles complete dim=0
 #pragma HLS ARRAY_PARTITION variable=dones complete dim=0
 #pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
-    int currentMEU = -1;
+    int bestMEU = -1;
+    int bestnoidleMEU = -1;
 
   MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
       emptys[iMEU] = matchengine[iMEU].empty();
       idles[iMEU] = matchengine[iMEU].idle();
       if (!emptys[iMEU]) {
-	if (currentMEU==-1) {
-	  currentMEU=iMEU;
+	if (bestMEU==-1) {
+	  bestMEU=iMEU;
 	} else {
-	  if (matchengine[iMEU].getTCID()<matchengine[currentMEU].getTCID()){
-	    currentMEU=iMEU;
+	  if (matchengine[iMEU].getTCID()<matchengine[bestMEU].getTCID()){
+	    bestMEU=iMEU;
 	  } 
+	}
+      } else {
+	if (!idles[iMEU]) {
+	  if (bestnoidleMEU==-1) {
+	    bestnoidleMEU = iMEU;
+	  } else {
+	    if (matchengine[iMEU].getTCID()<matchengine[bestnoidleMEU].getTCID()){
+	      bestnoidleMEU=iMEU;
+	    } 
+	  }
 	}
       }
     }
-    
+    if (bestMEU!=-1 && bestnoidleMEU!=-1) {
+      if (matchengine[bestnoidleMEU].getTCID()<matchengine[bestMEU].getTCID()){
+	bestMEU=-1;
+      }
+    }
+
     
   MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
@@ -842,14 +858,14 @@ void MatchProcessor(BXType bx,
       
     } //end MEU loop
       
-    if(currentMEU >= 0) {
+    if(bestMEU >= 0) {
       typename VMProjection<BARREL>::VMPID projindex;
       //typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE>::MATCH match;
       typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allproj;
 
-      (stubindex,allproj) = matchengine[currentMEU].read();
+      (stubindex,allproj) = matchengine[bestMEU].read();
       
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
 	(bx, allstub, allproj, projindex, stubindex, bx_o,
