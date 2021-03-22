@@ -79,10 +79,11 @@ These correspond to LUT used internally by the algo steps.
 The C++ emulation was used to create the files that are downloaded by emData/download.sh. The version used to create these files can be obtained with the following recipe (adapted from the [L1TrackSoftware TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/L1TrackSoftware)):
 
 ```bash
-cmsrel CMSSW_11_2_0_pre6
-cd CMSSW_11_2_0_pre6/src/
+cmsrel CMSSW_11_3_0_pre3
+cd CMSSW_11_3_0_pre3/src/
 cmsenv 
-git cms-checkout-topic -u cms-L1TK:fw_synch_201005
+git cms-checkout-topic -u cms-L1TK:DTC_merge_1130
+git checkout 3124072134721da67d39fc305aafdda3c824be5d
 git clone https://github.com/cms-data/L1Trigger-TrackFindingTracklet.git L1Trigger/TrackFindingTracklet/data
 cd L1Trigger/TrackFindingTracklet/data/
 mkdir -p LUTs \
@@ -104,8 +105,9 @@ A few changes need to be made in order to enable truncation, to output test vect
 
 ```c++
 …
-    //Offset to the maximum number of steps in each processing step. Set to 0 for standard
-    //trunction. Set to large value, e.g. 10000 to remove truncation
+    // Offset to the maximum number of steps in each processing step:
+    // Set to 0 (default) means standard truncation
+    // Set to large value, e.g. 10000, to disable truncation
     unsigned int maxstepoffset_{0};
 …
     bool writeMem_{true};    //If true will print out content of memories to files
