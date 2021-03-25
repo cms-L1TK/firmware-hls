@@ -708,16 +708,9 @@ void MatchProcessor(BXType bx,
 	// VM Projection
 	typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
 	
-	// vmproj irinv
-	// phider = -irinv/2
-	// Note: auto does not work well here
-	// auto infers 42 bits because -2 is treated as a 32-bit int
-	ap_uint<TrackletProjection<PROJTYPE>::BitWidths::kTProjPhiDSize+1> irinv_tmp = iphider * (-2);
-	
-	// rinv in VMProjection takes only the top 5 bits
-	// and is shifted to be positive
-	typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
-	
+	//Extracts the rinv of the projection from the phider; recall phider = - rinv/2
+	typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1)) - 1 - iphider.range(iphider.length()-1,iphider.length()-nbits_maxvm);
+
 	///////////////////////////////////
 	//This is where Anders calls the ME
 	///////////////////////////////////
