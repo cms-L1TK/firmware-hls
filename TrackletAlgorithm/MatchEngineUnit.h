@@ -38,7 +38,9 @@ inline MatchEngineUnit() {
 #pragma HLS inline
   writeindex_ = 0;
   readindex_ = 0;
-  nstubs=0;
+  stubmask_ = 0;
+  nstubs_ = 0;
+  nstubsall_ = 0;
   unit_ = -1;
   idle_ = true;
 }
@@ -49,19 +51,40 @@ inline MatchEngineUnit() {
   idle_ = false;
   bx = bxin;
   istub_ = 0;
+  AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
   projbuffer_ = projbuffer;
   projindex = projbuffer.getIndex();
-  nstubs=projbuffer.getNStubs();
+  nstubsall_ = projbuffer.getNStubs();
+  shift_ = projbuffer.shift();
+  stubmask_[0] = nstubsall_.range(3,0)!=0;
+  stubmask_[1] = nstubsall_.range(7,4)!=0;
+  stubmask_[2] = nstubsall_.range(11,8)!=0;
+  stubmask_[3] = nstubsall_.range(15,12)!=0;
+  //std::cout << "init "<<unit<<" stubmask : "<<stubmask_[3]<<" "<<stubmask_[2]<<" "<<stubmask_[1]<<" "<<stubmask_[0]
+  //	    <<"    "<<nstubsall_.range(15,12)<<" "<<nstubsall_.range(11,8)
+  //	    <<" "<<nstubsall_.range(7,4)<<" "<<nstubsall_.range(3,0)<<std::endl;
+  ap_uint<2> index = __builtin_ctz(stubmask_);
+  stubmask_[index]=0;
+  second_ = index==1 || index==3; // can be simplified
+  phiPlus_ = index==2 || index==3; // can be simplified
+  nstubs_ = nstubsall_.range(4*index+3,4*index);
+  assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
   unit_ = unit;
 }
 
-inline bool empty() {
+ inline bool empty() {
 #pragma HLS inline  
-  return (readindex_==writeindex_);
-
-}
+   return (readindex_==writeindex_);
+   
+ }
+ 
+ inline bool nearFull() {
+   INDEX writeindexnext = writeindex_+1;
+   INDEX writeindexnext2 = writeindex_+1;
+   return readindex_==writeindexnext || readindex_==writeindexnext2;
+ }
 
 inline bool idle() {
 #pragma HLS inline  
@@ -81,6 +104,20 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   return tcid;
 }
 
+inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkID() {
+#pragma HLS inline
+  if (!empty()) {
+    ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
+    ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
+    (vmstub,allprojdata) = matches_[readindex_];
+    AllProjection<AllProjectionType> allproj(allprojdata);
+    return (allproj.getTCID(), allproj.getTrackletIndex());
+  }
+  assert(!idle_);
+  AllProjection<AllProjectionType> allproj(projbuffer_.getAllProj());
+  return (tcid, allproj.getTrackletIndex());
+}
+
 inline VMProjection<BARREL>::VMPID getProjindex() {
 #pragma HLS inline  
   return projbuffer_.getIndex();
@@ -88,7 +125,7 @@ inline VMProjection<BARREL>::VMPID getProjindex() {
 
 inline NSTUBS getNStubs() {
 #pragma HLS inline  
-  return nstubs;
+  return nstubs_;
 }
 inline int getIPhi() {
 #pragma HLS inline  
@@ -105,7 +142,7 @@ inline MATCH read() {
 #pragma HLS inline
 
 
-   if(idle_) return;
+   if(idle_||nearFull()) return;
    
    // vmproj index
    typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
@@ -115,67 +152,123 @@ inline MATCH read() {
    //process. 
 
    ap_uint<kNBits_MemAddrBinned+2> istubtmp=istub_;
-     
+
+   ap_uint<1> phiPlusSave = phiPlus_;
+   auto nstubssave = nstubs_;
+   auto secondSave = second_;
+
    if (istub_==0) {
        
      //Need to read the information about the proj in the buffer
+     //FIXME - should this not be in init method
      auto const qdata=projbuffer_;
      tcid=qdata.getTCID();
-     auto nstub = qdata.getNStubs();
-     nstubs=qdata.getNStubs();
+     //auto nstub = qdata.getNStubs();
+     //nstubs=qdata.getNStubs();
      VMProjection<BARREL> data(qdata.getProjection());
      zbin=qdata.getZBin();
      
      projindex=data.getIndex();
      auto projfinez=data.getFineZ();
+     projfinephi_=data.getFinePhi();
      projrinv=data.getRInv();
      isPSseed=data.getIsPSSeed();
      auto projzbin=qdata.getZBin();
      
-     auto second=qdata.hasSecond();
+     //auto second=qdata.hasSecond();
      
      //Calculate fine z position
-     if (second) {
-	 projfinezadj=projfinez-8;
+     if (second_) {
+       projfinezadj=projfinez-8;
+       zbin=zbin+1;
      } else {
        projfinezadj=projfinez;
      }
+
+     //std::cout << "projfinephi_ : "<<projfinephi_<<std::endl;
+
+     if (!phiPlus_) {
+       if (shift_==-1) {
+	 projfinephi_ -= 8;
+       }
+     } else {
+       //When we get here shift_ is either 1 or -1
+       if (shift_==1) {
+	 projfinephi_ += 8;
+       }
+     }
+
      
-     if (nstubs==1) {
+     if (nstubs_==1) {
        istub_=0;
-       idle_ = true;
+       if (stubmask_==0) {
+	 idle_ = true;
+       } else {
+	 ap_uint<2> index = __builtin_ctz(stubmask_);
+	 stubmask_[index]=0;
+	 second_ =  index==1 || index==3; // can be simplified
+	 phiPlus_ =  index==2 || index==3; // can be simplified
+	 nstubs_ = nstubsall_.range(4*index+3,4*index);
+	 assert(nstubs_!=0);
+       }
      } else {
        istub_++;
      }
    } else {
      //Check if last stub, if so, go to next buffer entry 
-     if (istub_+1>=nstubs){
+     if (istub_+1>=nstubs_){
        istub_=0;
-       idle_ = true;
+       if (stubmask_==0) {
+	 idle_ = true;
+       } else {
+	 ap_uint<2> index = __builtin_ctz(stubmask_);
+	 stubmask_[index]=0;
+	 second_ =  index==1 || index==3; // can be simplified
+	 phiPlus_ =  index==2 || index==3; // can be simplified
+	 nstubs_ = nstubsall_.range(4*index+3,4*index);
+	 assert(nstubs_!=0);
+       }
      } else {
        istub_++;
      }
    }
-   
+
    //Read stub memory and extract data fields
-   int stubadd=16*(iphi_*8+zbin)+istubtmp;
+   int stubadd=16*((iphi_+phiPlusSave)*8+(zbin))+istubtmp;
+   //int izbin=zbin;
+   //izbin+=secondSave;
+   //std::cout << "unit="<<unit_<<" nstubs : "<<nstubssave<<" "<<stubmem.getEntries(bx,(iphi_+phiPlusSave)*8+(zbin))
+   //	     <<"   "<<phiPlusSave<<" "<<secondSave<<"   iphi_+phiPlusSave izbin : "<<iphi_+phiPlusSave<<" "<<zbin<<std::endl;
+   assert(nstubssave==stubmem.getEntries(bx,(iphi_+phiPlusSave)*8+(zbin)));
    const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(bx,stubadd);
    auto stubindex=stubdata.getIndex();
    auto stubfinez=stubdata.getFineZ();
+   auto stubfinephi=stubdata.getFinePhi();
    auto stubbend=stubdata.getBend();
-   
+
+   int phidiff = projfinephi_ - stubfinephi;
+
+   //std::cout << "phidiff : "<<phidiff<<"    "<<projfinephi_<<" "<<stubfinephi<<std::endl;
+   bool passphi =  phidiff < 3 && phidiff > -3;
+
    //Check if stub z position consistent
    ap_int<5> idz=stubfinez-projfinezadj;
    bool pass;
    if (isPSseed) {
-     pass=idz>=-2&&idz<=2;
+     pass=idz>=-1&&idz<=1;
    } else {
      pass=idz>=-5&&idz<=5;
    }
-     
-   //Check if stub bend and proj rinv consistent
+
    auto const index=projrinv.concat(stubbend);
-   if (pass&&table[index]) {
+     
+   //AllProjection<AllProjectionType> allproj(projbuffer_.getAllProj());
+   //std::cout << "Trying projection and stub : "<<(tcid, allproj.getTrackletIndex())<<" "<<stubindex
+   //	     <<"   pass="<<passphi<<" "<<pass<<" "<<table[index]<<" index:"<<index<<" projrinv bend: "<<projrinv<<" "<<stubbend<<"  shift_ isPSseed : "<<shift_<<" "<<isPSseed
+   // 	     <<" slot="<<((iphi_+phiPlusSave)*8+zbin)<<std::endl;
+
+   //Check if stub bend and proj rinv consistent
+   if (passphi&&pass&&table[index]) {
      matches_[writeindex_++]=(stubindex,projbuffer_.getAllProj());
    } // if(pass&&table[index])
    
@@ -184,7 +277,12 @@ inline MATCH read() {
  //protected:
  INDEX writeindex_;
  INDEX readindex_;
- NSTUBS nstubs;
+ ap_uint<16> nstubsall_;
+ NSTUBS nstubs_;
+ ap_uint<4> stubmask_;
+ ap_uint<1> second_;
+ ap_uint<1> phiPlus_;
+ ap_int<2> shift_;
  bool idle_;
  int ivmphi;
  int iphi_;
@@ -193,8 +291,9 @@ inline MATCH read() {
  NSTUBS istub_=0;
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_int<5> projfinezadj; //FIXME Need replace 5 with const
+ ap_int<5> projfinephi_; //FIXME Need replace 5 with const
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid;
- typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PRHASSEC isPSseed;
+ bool isPSseed;
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::VMPZBIN zbin;
  VMProjection<BARREL>::VMPRINV projrinv;
  VMProjection<BARREL>::VMPID projindex;

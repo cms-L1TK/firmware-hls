@@ -17,7 +17,7 @@ public:
     kVMProjRinvSize = 5,
     kVMProjFinePhiSize = 3,
     kVMProjFineZSize = 4,
-    kVMProjZBinSize = MEBinsBits+1+2,
+    kVMProjZBinSize = MEBinsBits+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
     kVMProjectionSize = kVMProjIsPSSeedSize + kVMProjRinvSize + kVMProjFineZSize + kVMProjFinePhiSize + kVMProjZBinSize + kVMProjIndexSize
@@ -131,7 +131,7 @@ public:
   // This getter is only used for projections in BARREL
   bool getIsPSSeed() const {
     static_assert("VMProjType == BARREL", "Getter should only be used for BARREL projections");
-    return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
+    return data_.range(kVMProjIsPSSeedMSB,kVMProjIsPSSeedLSB);
   }
   
   // Setter
@@ -158,7 +158,7 @@ public:
   // This setter is only used for projections in BARREL
   void setIsPSSeed(const bool psseed) {
     static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
-    data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB) = psseed;
+    data_.range(kVMProjIsPSSeedMSB,kVMProjIsPSSeedLSB) = psseed;
   }
   
 private:

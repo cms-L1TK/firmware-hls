@@ -45,7 +45,7 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=fullmatch[6].get_mem() latency=2
  #pragma HLS resource variable=fullmatch[7].get_mem() latency=2
 
- MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, 8, 3, 0, 2>
+ MatchProcessor<3, BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, maxTrackletProjections, 3, 0, 2>
                      (bx,
                       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
                       proj9in, proj10in, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,

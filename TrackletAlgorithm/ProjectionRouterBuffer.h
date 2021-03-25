@@ -17,13 +17,13 @@ public:
     // Bit sizes for ProjectionRouterBufferMemory fields
     kPRBufferIsPSSeedSize = 1,
     kPRBufferZBinSize = MEBinsBits+1,
-    kPRBufferNStubsSize = kNBits_MemAddrBinned,
+    kPRBufferNStubsSize = 4*kNBits_MemAddrBinned,
     kPRBufferIndexSize = 7,
-    kPRBufferHasSecondSize = 1,
+    kPRBufferShiftSize = 2,
     kPRBufferTCIDSize = 7,
     kPRBufferPhiSize = 3,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferPhiSize + kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + kPRBufferNStubsSize + VMProjectionBase<BARREL>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferHasSecondSize + AllProjection<AllProjectionType>::kAllProjectionSize
+    kProjectionRouterBufferSize = kPRBufferPhiSize + kPRBufferTCIDSize + kPRBufferShiftSize + kPRBufferIndexSize + kPRBufferNStubsSize + kPRBufferZBinSize + kPRBufferIsPSSeedSize + VMProjectionBase<BARREL>::kVMProjectionSize + AllProjection<AllProjectionType>::kAllProjectionSize
   };
 };
 
@@ -36,12 +36,12 @@ public:
     kPRBufferIsPSSeedSize = 0,
     //kPRProjSize = VMProjection<VMPTYPE>::kVMProjectionSize,
     kPRBufferZBinSize = MEBinsBits+1+1,
-    kPRBufferNStubsSize = kNBits_MemAddrBinned,
+    kPRBufferNStubsSize = 4*kNBits_MemAddrBinned,
     kPRBufferIndexSize = 7,
-    kPRBufferHasSecondSize = 1,
+    kPRBufferShiftSize = 2,
     kPRBufferTCIDSize = 7,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + VMProjectionBase<DISK>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferNStubsSize + kPRBufferHasSecondSize + AllProjection<AllProjectionType>::kAllProjectionSize
+    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + VMProjectionBase<DISK>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferNStubsSize + kPRBufferShiftSize + AllProjection<AllProjectionType>::kAllProjectionSize
   };
 };
 
@@ -58,14 +58,14 @@ public:
     kPRBufferZBinLSB = kPRBufferIsPSSeedMSB + 1,
     kPRBufferZBinMSB = kPRBufferZBinLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize - 1,
     kPRProjLSB = kPRBufferZBinMSB + 1,
-    kPRProjMSB = kPRProjLSB + VMProjection<VMProjType>::kVMProjectionSize - 1,
+    kPRProjMSB = kPRProjLSB + VMProjectionBase<VMProjType>::kVMProjectionSize - 1,
     kPRProjNStubsLSB = kPRProjMSB + 1,
     kPRProjNStubsMSB = kPRProjNStubsLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferNStubsSize - 1,
     kPRBufferIndexLSB = kPRProjNStubsMSB + 1,
     kPRBufferIndexMSB = kPRBufferIndexLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferIndexSize - 1,
-    kPRBufferHasSecondLSB = kPRBufferIndexMSB + 1,
-    kPRBufferHasSecondMSB = kPRBufferHasSecondLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferHasSecondSize - 1,
-    kPRBufferTCIDLSB = kPRBufferHasSecondLSB + 1,
+    kPRBufferShiftLSB = kPRBufferIndexMSB + 1,
+    kPRBufferShiftMSB = kPRBufferShiftLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferShiftSize - 1,
+    kPRBufferTCIDLSB = kPRBufferShiftMSB + 1,
     kPRBufferTCIDMSB = kPRBufferTCIDLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferTCIDSize - 1,
     kPRBufferPhiLSB = kPRBufferTCIDMSB + 1,
     kPRBufferPhiMSB = kPRBufferPhiLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferPhiSize - 1,
@@ -74,7 +74,7 @@ public:
   };
   
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferIndexSize> VMPID;
-  typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferHasSecondSize> PRHASSEC;
+  typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferShiftSize> SHIFT;
   typedef ap_uint<VMProjectionBase<VMProjType>::kVMProjectionSize> VMProjData;
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferNStubsSize> PRNSTUB;
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize> VMPZBIN;
@@ -83,21 +83,24 @@ public:
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferPhiSize> PRPHI;
   typedef typename AllProjection<AllProjectionType>::AllProjectionData ALLPROJ;
 
+  typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferTCIDSize+
+    ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferIndexSize> TRKID;
+
   // Constructors
  ProjectionRouterBuffer(const ProjBuffer& newdata):
   data_(newdata)
   {}
   
   // This constructor is only used for projections in BARREL
- ProjectionRouterBuffer(const ALLPROJ allproj, const PRPHI phi, const TCID tcid, const PRHASSEC hasSec, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
-  data_( (allproj, phi, tcid, hasSec, projdata.getIndex(), nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
+ ProjectionRouterBuffer(const ALLPROJ allproj, const PRPHI phi, const SHIFT shift, const TCID tcid, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
+  data_( (allproj, phi, tcid, shift, projdata.getIndex(), nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
   {
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
   // This constructor is only used for projections in DISK
-  ProjectionRouterBuffer(const PRHASSEC hasSec, const VMPID index, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjData projdata):
-    data_( ((((hasSec,index),nstub),projdata),zbin) )
+  ProjectionRouterBuffer(const SHIFT shift, const VMPID index, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjData projdata):
+    data_( ((((shift,index),nstub),projdata),zbin) )
   {
     static_assert(VMProjType == DISK, "Constructor should only be used for DISK projections");
   }
@@ -120,7 +123,7 @@ public:
   void Print()
   {
     std::cout << "Contents in buffer:" << std::endl;
-    std::cout << std::hex << "tcid=" << getTCID() << " sec=" << hasSecond() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
+    std::cout << std::hex << "tcid=" << getTCID() << " shift=" << shift() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
   }
   #endif
   
@@ -131,8 +134,8 @@ public:
     return data_.range(kPRBufferTCIDMSB,kPRBufferTCIDLSB);
   }
   
-  PRHASSEC hasSecond() const {
-    return data_.range(kPRBufferHasSecondMSB,kPRBufferHasSecondLSB);
+  SHIFT shift() const {
+    return data_.range(kPRBufferShiftMSB,kPRBufferShiftLSB);
   }
 
   VMPZBIN getZBin() const {
@@ -152,7 +155,7 @@ public:
   }
 
   // This getter is only used for projections in BARREL
-  PRHASSEC getIsPSSeed() {
+  bool getIsPSSeed() {
     static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
     return data_.range(kPRBufferIsPSSeedMSB,kPRBufferIsPSSeedLSB);
   }
@@ -172,8 +175,8 @@ public:
     data_.range(kPRBufferTCIDMSB,kPRBufferTCIDLSB) = tcid;
   }
 
-  void setHasSecond(const PRHASSEC hasSec) {
-    data_.range(kPRBufferHasSecondMSB,kPRBufferHasSecondLSB) = hasSec;
+  void setShift(const SHIFT shift) {
+    data_.range(kPRBufferShiftMSB,kPRBufferShiftLSB) = shift;
   }
   
   void setZBin(const VMPZBIN zbin) {
