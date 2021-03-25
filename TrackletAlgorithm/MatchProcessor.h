@@ -104,6 +104,8 @@ namespace PR
     // priority encoder
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
+    //std::cout << "Reading inmem : "<< read_imem << std::endl;
+
     // read the memory "read_imem" with the address "read_addr"
     read_inmem(data, bx, read_imem, read_addr, 0,
     //read_inmem(data, datamem, bx, read_imem, read_addr, 0,
@@ -154,7 +156,7 @@ namespace PR
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
   // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 6;// - 95; 
+  constexpr unsigned int LoopItersCut = 1;
 
 } // namesapce PR
 
@@ -318,6 +320,9 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies,int LAYER=0, int PHISEC=0>
 void MatchCalculator(BXType bx,
+		     ap_uint<1> newtracklet,
+		     ap_uint<1>& savedMatch,
+		     ap_uint<17>& best_delta_phi,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMProjectionBase<BARREL>::kVMProjIndexSize> projid,
@@ -372,12 +377,6 @@ void MatchCalculator(BXType bx,
   ap_uint<LUT_matchcut_z_width> LUT_matchcut_z[LUT_matchcut_z_depth];
   readTable_Cuts<false,LAYER,LUT_matchcut_z_width,LUT_matchcut_z_depth>(LUT_matchcut_z);
 
-  // Initialize MC delta phi cut variables
-  ap_uint<17> best_delta_phi;
-
-  // Full match shift register to store best match
-  typename AllProjection<APTYPE>::AProjTCSEED projseed;
-  FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
   bool goodmatch                   = false;
 
   CandidateMatch cmatch(projid.concat(stubid));
@@ -440,78 +439,62 @@ void MatchCalculator(BXType bx,
   //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
   //-----------------------------------------------------------------------------------------------------------
   
-  //typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
-  FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
-  bool goodmatch_next              = false;
-  
-  bool newtracklet = true;
+  if (newtracklet) {
+    savedMatch = 0;
+  }
   
   // For first tracklet, pick up the phi cut value
   best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-  
+
   // Check that matches fall within the selection window of the projection 
   if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     best_delta_phi = abs_delta_phi;
-    
+
+    //std::cout << "Found match!" <<std::endl;
+
     // Store bestmatch
-    bestmatch = fm;
     goodmatch = true;
-    projseed  = proj_seed;
-  }
-  else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
-    bestmatch_next = FullMatch<FMTYPE>();
-    goodmatch_next = false;
-    projseed_next  = -1;
-  }
-  else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
-    bestmatch_next = bestmatch;
-    goodmatch_next = goodmatch;
-    projseed_next  = projseed;
   }
   
-  if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-    switch (projseed) {
+  if(goodmatch) { // Write out only the best match, based on the seeding 
+    switch (proj_seed) {
     case 0:
-      fullmatch[0].write_mem(bx,bestmatch,nmcout1);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-      nmcout1++;
+      fullmatch[0].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
+      nmcout1+=1-savedMatch;
       break;
     case 1:
-      fullmatch[1].write_mem(bx,bestmatch,nmcout2);//(newtracklet && goodmatch==true && projseed==1)); // L3L4 seed
-      nmcout2++;
+      fullmatch[1].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
+      nmcout2+=1-savedMatch;
       break;
     case 2:
-      fullmatch[2].write_mem(bx,bestmatch,nmcout3);//(newtracklet && goodmatch==true && projseed==2)); // L5L6 seed
-      nmcout3++;
+      fullmatch[2].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
+      nmcout3+=1-savedMatch;
       break;
     case 3:
-      fullmatch[3].write_mem(bx,bestmatch,nmcout4);//(newtracklet && goodmatch==true && projseed==3)); // D1D2 seed
-      nmcout4++;
+      fullmatch[3].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
+      nmcout4+=1-savedMatch;
       break;
     case 4:
-      fullmatch[4].write_mem(bx,bestmatch,nmcout5);//(newtracklet && goodmatch==true && projseed==4)); // D3D4 seed
-      nmcout5++;
+      fullmatch[4].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
+      nmcout5+=1-savedMatch;
       break;
     case 5:
-      fullmatch[5].write_mem(bx,bestmatch,nmcout6);//(newtracklet && goodmatch==true && projseed==5)); // L1D1 seed
-      nmcout6++;
+      fullmatch[5].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
+      nmcout6+=1-savedMatch;
       break;
     case 6:
-      fullmatch[6].write_mem(bx,bestmatch,nmcout7);//(newtracklet && goodmatch==true && projseed==6)); // L2D1 seed
-      nmcout7++;
+      fullmatch[6].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
+      nmcout7+=1-savedMatch;
       break;
     case 7:
-      fullmatch[7].write_mem(bx,bestmatch,nmcout8);//(newtracklet && goodmatch==true && projseed==7)); // L2D1 seed
-      nmcout8++;
+      fullmatch[7].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
+      nmcout8+=1-savedMatch;
       break;
     }
+    savedMatch = 1;
   }
-  
-  // pipeline the bestmatch registers
-  bestmatch      = bestmatch_next;
-  goodmatch      = goodmatch_next;
-  projseed       = projseed_next;
   
   bx_o = bx;
   
@@ -581,6 +564,13 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
+  //std::cout << "mem_hasdata : "<<mem_hasdata<<std::endl;
+
+  //for(unsigned int i=0;i<nINMEM;i++) {
+  //  std::cout << "mem_hasdata i numbersin : "<<i<<" "<<numbersin[i]<<std::endl;
+  //}
+
+
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -628,6 +618,12 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 #pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
 #pragma HLS dependence variable=istub inter false
+
+
+  //These are used inside the MatchCalculator method and needs to be retained between iterations
+  ap_uint<1> savedMatch;
+  ap_uint<17> best_delta_phi;
+  typename ProjectionRouterBuffer<BARREL, APTYPE>::TRKID lastTrkID(-1);
 
 
  PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
@@ -737,7 +733,31 @@ void MatchProcessor(BXType bx,
 	
 	// bits used for routing
 	iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
-	
+
+	typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,
+									iphiproj.length()-nbits_all-nbits_vmme-3); 
+
+	int nextrabits = 2;
+	int overlapbits = nbits_vmme + nextrabits;
+
+	unsigned int extrabits = iphiproj.range(iphiproj.length() - overlapbits-1, iphiproj.length() - overlapbits - nextrabits);
+
+	//std::cout << "iphi extrabits : "<<iphi<<" "<<extrabits << std::endl;
+
+	unsigned int ivmPlus = iphi;
+
+	ap_int<2> shift = 0;
+	    
+	if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
+	  shift = 1;
+	  ivmPlus++;
+	}
+	unsigned int ivmMinus = iphi;
+	if (extrabits == 0 && iphi != 0) {
+	  shift = -1;
+	  ivmMinus--;
+	}
+
         auto const iprojtmp=iproj;
         iproj++;
         moreproj=iproj<nproj;
@@ -751,16 +771,29 @@ void MatchProcessor(BXType bx,
         // VMProjection
         static_assert(not DISK, "PR: Layer only for now.");
   
-        //Check if there are stubs in the memory
-        typename ProjectionRouterBufferMemory<BARREL, APTYPE>::NEntryT nstubfirst;
-        typename ProjectionRouterBufferMemory<BARREL, APTYPE>::NEntryT  nstublast;
-        nstubfirst=instubdata[iphi].getEntries(bx,iphi*8+zfirst);
-        nstublast= instubdata[iphi].getEntries(bx,iphi*8+zlast);
+        //Check if there are stubs in the memory --- FIXME use proper type
+        ap_uint<4> nstubfirstMinus=instubdata[0].getEntries(bx,ivmMinus*8+zfirst);
+        ap_uint<4> nstublastMinus=instubdata[0].getEntries(bx,ivmMinus*8+zlast);
+        ap_uint<4> nstubfirstPlus=instubdata[0].getEntries(bx,ivmPlus*8+zfirst);
+        ap_uint<4> nstublastPlus=instubdata[0].getEntries(bx,ivmPlus*8+zlast);
 
-        bool savefirst=nstubfirst!=0;
-        bool savelast=nstublast!=0&&zbin.range(0,0);
+	if (ivmMinus==ivmPlus) {
+	  nstubfirstPlus = 0;
+	  nstublastPlus = 0;
+	}
+	if (zfirst==zlast) {
+	  nstublastMinus = 0;
+	  nstublastPlus = 0;
+	}
+
+	//std::cout << "istep="<<istep<<" MP nstubs : "<<nstublastPlus<<" "<<nstubfirstPlus<<" "<<nstublastMinus<<" "<<nstubfirstMinus<<
+	//  "     ivmMinus  zlast : "<<ivmMinus<<" "<<zlast<<"   zfirst : "<<zfirst<<"  iphiproj:"<<iphiproj<<std::endl;
+
+	ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
+
   
-        VMProjection<BARREL> vmproj(index, zbin, finez, rinv, psseed);
+	//std::cout << "finephi : " << finephi << std::endl;
+        VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
 
 	AllProjection<APTYPE> allproj(projdata.getTCID(), projdata.getTrackletIndex(), projdata.getPhi(),
 				      projdata.getRZ(), projdata.getPhiDer(), projdata.getRZDer());
@@ -773,32 +806,16 @@ void MatchProcessor(BXType bx,
 	typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = allproj.getPhiDer();
 	typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = allproj.getRZDer();
 
+	//std::cout << "InputBuffer trkID :"<<128*proj_tcid+proj_tkid<<" ivmMinus ivmPlus shift : "<<ivmMinus<<" "<<ivmPlus<<" "<<shift<<std::endl;
 
-        if (savefirst) { //FIXME code needs to be cleaner
-          typename ProjectionRouterBuffer<BARREL, APTYPE>::PRHASSEC sec=0;
-          ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), iphi,trackletid, sec, nstubfirst, zfirst, vmproj, 0);
-	  AllProjection<APTYPE> proj(projbuffertmp.getAllProj());
+        if (nstubs!=0) { 
+          ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
           projbufferarray.addProjection(projbuffertmp);
         }
-        if (savelast) {
-          if (savefirst) {
-            typename ProjectionRouterBuffer<BARREL, APTYPE>::PRHASSEC sec=1;
-            ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), iphi,trackletid, sec, nstublast, zlast, vmproj, psseed);
-	    AllProjection<APTYPE> proj(projbuffertmp.getAllProj());
-            projbufferarray.addProjection(projbuffertmp);
-          } else {
-            typename ProjectionRouterBuffer<BARREL, APTYPE>::PRHASSEC sec=1;
-            ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), iphi,trackletid, sec, nstublast, zlast, vmproj, psseed);
-	    AllProjection<APTYPE> proj(projbuffertmp.getAllProj());
-            projbufferarray.addProjection(projbuffertmp);
-          }
-        }
+
 
       } // end if
 
-      //AllProjection<APTYPE> aproj(projdata.raw());
-      //allproj->write_mem(bx,aproj,nallproj);//(newtracklet && goodmatch==true && projseed==0)); // L1L2 seed
-      //nallproj++;
 
     } // end if(validin)
 
@@ -818,7 +835,7 @@ void MatchProcessor(BXType bx,
 	if (bestMEU==-1) {
 	  bestMEU=iMEU;
 	} else {
-	  if (matchengine[iMEU].getTCID()<matchengine[bestMEU].getTCID()){
+	  if (matchengine[iMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
 	    bestMEU=iMEU;
 	  } 
 	}
@@ -827,7 +844,7 @@ void MatchProcessor(BXType bx,
 	  if (bestnoidleMEU==-1) {
 	    bestnoidleMEU = iMEU;
 	  } else {
-	    if (matchengine[iMEU].getTCID()<matchengine[bestnoidleMEU].getTCID()){
+	    if (matchengine[iMEU].getTrkID()<matchengine[bestnoidleMEU].getTrkID()){
 	      bestnoidleMEU=iMEU;
 	    } 
 	  }
@@ -835,12 +852,13 @@ void MatchProcessor(BXType bx,
       }
     }
     if (bestMEU!=-1 && bestnoidleMEU!=-1) {
-      if (matchengine[bestnoidleMEU].getTCID()<matchengine[bestMEU].getTCID()){
+      if (matchengine[bestnoidleMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
 	bestMEU=-1;
       }
     }
 
     
+    bool init = false;
   MEU_LOOP: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
       auto &meu = matchengine[iMEU];
@@ -848,7 +866,8 @@ void MatchProcessor(BXType bx,
       bool empty = projbufferarray.empty();
       bool idle = idles[iMEU];//meu.idle();
       
-      if(idle && !empty) {
+      if(idle && !empty && !init) {
+	init =  true;
         auto tmpprojbuff = projbufferarray.read();
         auto iphi = tmpprojbuff.getPhi();
         meu.init(bx, tmpprojbuff, iphi, iMEU);
@@ -859,16 +878,25 @@ void MatchProcessor(BXType bx,
     } //end MEU loop
       
     if(bestMEU >= 0) {
+
+      auto trkindex=matchengine[bestMEU].getTrkID();
+
+      //std::cout << "bestMEU TrkID : "<<bestMEU<<" "<<matchengine[bestMEU].getTrkID()<<std::endl;
       typename VMProjection<BARREL>::VMPID projindex;
-      //typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE>::MATCH match;
-      typename AllProjection<APTYPE>::AProjTCID currentTCID=-1;
+
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allproj;
 
       (stubindex,allproj) = matchengine[bestMEU].read();
-      
+
+      ap_uint<1> newtracklet = lastTrkID != trkindex;
+
+      lastTrkID = trkindex;
+
+      //std::cout << "istep="<<istep<<" MatchCalculator : "<<trkindex<<" "<<stubindex<<" newTracklet:"<<newtracklet<<std::endl;
+
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-	(bx, allstub, allproj, projindex, stubindex, bx_o,
+      (bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, projindex, stubindex, bx_o,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
 	 fullmatch);
       } //end MC if
