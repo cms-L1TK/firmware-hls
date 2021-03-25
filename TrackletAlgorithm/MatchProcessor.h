@@ -151,7 +151,8 @@ namespace PR
   constexpr unsigned int zbins_nbitsextra = 3;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_adjust = 1;
+  constexpr unsigned int zbins_adjust_PSseed = 1;
+  constexpr unsigned int zbins_adjust_2Sseed = 4;
 
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
@@ -688,6 +689,8 @@ void MatchProcessor(BXType bx,
 	// we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+2=5)
 	// bits of zproj, adjust the value up and down by zbins_adjust (2), then truncate the
 	// zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
+
+	int zbins_adjust = psseed ? zbins_adjust_PSseed : zbins_adjust_2Sseed;
 	auto zbinposfull = (1<<(izproj.length()-1))+izproj;
 	auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
 	
@@ -799,7 +802,7 @@ void MatchProcessor(BXType bx,
 	typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = allproj.getPhiDer();
 	typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = allproj.getRZDer();
 
-	//std::cout << "InputBuffer trkID :"<<128*proj_tcid+proj_tkid<<" ivmMinus ivmPlus shift : "<<ivmMinus<<" "<<ivmPlus<<" "<<shift<<std::endl;
+	//std::cout << "InputBuffer trkID :"<<128*proj_tcid+proj_tkid<<" ivmMinus ivmPlus shift second: "<<ivmMinus<<" "<<ivmPlus<<" "<<shift<<" "<<zbin.range(0,0)<<std::endl;
 
         if (nstubs!=0) { 
           ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
