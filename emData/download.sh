@@ -5,8 +5,8 @@
 #luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
 
 # standard configurations - temporary
-tarball_url="https://www.dropbox.com/s/8942mkttj198y90/MemPrintsStandard_210315.tgz?dl=0"
-luts_url="https://www.dropbox.com/s/6ebazqxtb1e0caw/LUTsStandard_210315.tgz?dl=0"
+tarball_url="https://www.dropbox.com/s/ytw36m9cbh3ojja/MemPrintsStandard_210325.tgz?dl=0"
+luts_url="https://www.dropbox.com/s/a86wul6kd0ta3k0/LUTsStandard_210325.tgz?dl=0"
 
 # fw_synch_200515
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
