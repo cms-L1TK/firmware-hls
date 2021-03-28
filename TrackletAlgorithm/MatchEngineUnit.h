@@ -60,9 +60,6 @@ inline MatchEngineUnit() {
   stubmask_[1] = nstubsall_.range(7,4)!=0;
   stubmask_[2] = nstubsall_.range(11,8)!=0;
   stubmask_[3] = nstubsall_.range(15,12)!=0;
-  //std::cout << "init "<<unit<<" stubmask : "<<stubmask_[3]<<" "<<stubmask_[2]<<" "<<stubmask_[1]<<" "<<stubmask_[0]
-  //	    <<"    "<<nstubsall_.range(15,12)<<" "<<nstubsall_.range(11,8)
-  //	    <<" "<<nstubsall_.range(7,4)<<" "<<nstubsall_.range(3,0)<<std::endl;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index==1 || index==3; // can be simplified
@@ -138,7 +135,7 @@ inline MATCH read() {
 
 }
 
- inline void step(bool *table, const VMStubMEMemoryCM<VMSMEType,3,3> &stubmem) {
+ inline void step(bool *table, const VMStubMEMemoryCM<VMSMEType, 3, 3, kNMatchEngines> &stubmem) {
 #pragma HLS inline
 
 
@@ -160,7 +157,7 @@ inline MATCH read() {
    if (istub_==0) {
        
      //Need to read the information about the proj in the buffer
-     //FIXME - should this not be in init method
+     //FIXME - should this not be in init method?
      auto const qdata=projbuffer_;
      tcid=qdata.getTCID();
      //auto nstub = qdata.getNStubs();
@@ -175,8 +172,6 @@ inline MATCH read() {
      isPSseed=data.getIsPSSeed();
      auto projzbin=qdata.getZBin();
      
-     //auto second=qdata.hasSecond();
-     
      //Calculate fine z position
      if (second_) {
        projfinezadj=projfinez-8;
@@ -184,8 +179,6 @@ inline MATCH read() {
      } else {
        projfinezadj=projfinez;
      }
-
-     //std::cout << "projfinephi_ : "<<projfinephi_<<std::endl;
 
      if (!phiPlus_) {
        if (shift_==-1) {
@@ -234,13 +227,9 @@ inline MATCH read() {
    }
 
    //Read stub memory and extract data fields
-   int stubadd=16*((iphi_+phiPlusSave)*8+(zbin))+istubtmp;
-   //int izbin=zbin;
-   //izbin+=secondSave;
-   //std::cout << "unit="<<unit_<<" nstubs : "<<nstubssave<<" "<<stubmem.getEntries(bx,(iphi_+phiPlusSave)*8+(zbin))
-   //	     <<"   "<<phiPlusSave<<" "<<secondSave<<"   iphi_+phiPlusSave izbin : "<<iphi_+phiPlusSave<<" "<<zbin<<std::endl;
-   assert(nstubssave==stubmem.getEntries(bx,(iphi_+phiPlusSave)*8+(zbin)));
-   const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(bx,stubadd);
+   int stubadd=16*(iphi_+phiPlusSave+8*zbin)+istubtmp;
+   assert(nstubssave==stubmem.getEntries(bx, zbin, iphi_+phiPlusSave));
+   const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(unit_, bx, stubadd);
    auto stubindex=stubdata.getIndex();
    auto stubfinez=stubdata.getFineZ();
    auto stubfinephi=stubdata.getFinePhi();
@@ -248,7 +237,6 @@ inline MATCH read() {
 
    int phidiff = projfinephi_ - stubfinephi;
 
-   //std::cout << "phidiff : "<<phidiff<<"    "<<projfinephi_<<" "<<stubfinephi<<std::endl;
    bool passphi =  phidiff < 3 && phidiff > -3;
 
    //Check if stub z position consistent
@@ -262,11 +250,6 @@ inline MATCH read() {
 
    auto const index=projrinv.concat(stubbend);
      
-   //AllProjection<AllProjectionType> allproj(projbuffer_.getAllProj());
-   //std::cout << "Trying projection and stub : "<<(tcid, allproj.getTrackletIndex())<<" "<<stubindex
-   //	     <<"   pass="<<passphi<<" "<<pass<<" "<<table[index]<<" index:"<<index<<" projrinv bend: "<<projrinv<<" "<<stubbend<<"  shift_ isPSseed : "<<shift_<<" "<<isPSseed
-   // 	     <<" slot="<<((iphi_+phiPlusSave)*8+zbin)<<std::endl;
-
    //Check if stub bend and proj rinv consistent
    if (passphi&&pass&&table[index]) {
      matches_[writeindex_++]=(stubindex,projbuffer_.getAllProj());
