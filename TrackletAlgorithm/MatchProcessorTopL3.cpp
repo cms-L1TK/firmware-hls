@@ -1,20 +1,20 @@
 #include "MatchProcessorTopL3.h"
 
 void MatchProcessorTopL3(BXType bx,
-                      const TrackletProjectionMemory<BARRELPS>* const proj1in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj2in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj3in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj4in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj5in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj6in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj7in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj8in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj9in,
-                      const TrackletProjectionMemory<BARRELPS>* const proj10in,
-                      const VMStubMEMemoryCM<BARRELPS,3,3> instubdata[maxInCopies],
-                      const AllStubMemory<BARRELPS>* allstub,
-                      BXType& bx_o,
-                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]) {
+			 const TrackletProjectionMemory<BARRELPS>* const proj1in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj2in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj3in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj4in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj5in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj6in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj7in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj8in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj9in,
+			 const TrackletProjectionMemory<BARRELPS>* const proj10in,
+			 const VMStubMEMemoryCM<BARRELPS, 3, 3, kNMatchEngines>& instubdata,
+			 const AllStubMemory<BARRELPS>* allstub,
+			 BXType& bx_o,
+			 FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]) {
 
  #pragma HLS interface register port=bx_o
  #pragma HLS resource variable=proj1in->get_mem() latency=2
@@ -27,14 +27,7 @@ void MatchProcessorTopL3(BXType bx,
  #pragma HLS resource variable=proj8in->get_mem() latency=2
  #pragma HLS resource variable=proj9in->get_mem() latency=2
  #pragma HLS resource variable=proj10in->get_mem() latency=2
- #pragma HLS resource variable=instubdata[0].get_mem() latency=2
- #pragma HLS resource variable=instubdata[1].get_mem() latency=2
- #pragma HLS resource variable=instubdata[2].get_mem() latency=2
- #pragma HLS resource variable=instubdata[3].get_mem() latency=2
- #pragma HLS resource variable=instubdata[4].get_mem() latency=2
- #pragma HLS resource variable=instubdata[5].get_mem() latency=2
- #pragma HLS resource variable=instubdata[6].get_mem() latency=2
- #pragma HLS resource variable=instubdata[7].get_mem() latency=2
+ #pragma HLS resource variable=instubdata.get_mem() latency=2
  #pragma HLS resource variable=allstub->get_mem() latency=2
  #pragma HLS resource variable=fullmatch[0].get_mem() latency=2
  #pragma HLS resource variable=fullmatch[1].get_mem() latency=2
