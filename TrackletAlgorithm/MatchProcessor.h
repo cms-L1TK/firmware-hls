@@ -104,8 +104,6 @@ namespace PR
     // priority encoder
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
-    //std::cout << "Reading inmem : "<< read_imem << std::endl;
-
     // read the memory "read_imem" with the address "read_addr"
     read_inmem(data, bx, read_imem, read_addr, 0,
     //read_inmem(data, datamem, bx, read_imem, read_addr, 0,
@@ -612,13 +610,6 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
-  //std::cout << "mem_hasdata : "<<mem_hasdata<<std::endl;
-
-  //for(unsigned int i=0;i<nINMEM;i++) {
-  //  std::cout << "mem_hasdata i numbersin : "<<i<<" "<<numbersin[i]<<std::endl;
-  //}
-
-
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
