@@ -104,8 +104,6 @@ namespace PR
     // priority encoder
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
-    //std::cout << "Reading inmem : "<< read_imem << std::endl;
-
     // read the memory "read_imem" with the address "read_addr"
     read_inmem(data, bx, read_imem, read_addr, 0,
     //read_inmem(data, datamem, bx, read_imem, read_addr, 0,
@@ -534,7 +532,7 @@ void MatchProcessor(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE>* const proj22in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj23in,
                       const TrackletProjectionMemory<PROJTYPE>* const proj24in,
-                      const VMStubMEMemoryCM<VMSMEType,3,3> instubdata[maxInCopies],
+		      const VMStubMEMemoryCM<VMSMEType, 3, 3, kNMatchEngines>& instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       BXType& bx_o,
                       FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
@@ -565,18 +563,10 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
-  //std::cout << "mem_hasdata : "<<mem_hasdata<<std::endl;
-
-  //for(unsigned int i=0;i<nINMEM;i++) {
-  //  std::cout << "mem_hasdata i numbersin : "<<i<<" "<<numbersin[i]<<std::endl;
-  //}
-
-
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
   constexpr unsigned int kNBitsBuffer=3;
-  constexpr unsigned int kNMatchEngines=4;
 
   // declare counters for each of the 8 output VMProj // !!!
   int nmcout1 = 0;
@@ -738,8 +728,6 @@ void MatchProcessor(BXType bx,
 
 	unsigned int extrabits = iphiproj.range(iphiproj.length() - overlapbits-1, iphiproj.length() - overlapbits - nextrabits);
 
-	//std::cout << "iphi extrabits : "<<iphi<<" "<<extrabits << std::endl;
-
 	unsigned int ivmPlus = iphi;
 
 	ap_int<2> shift = 0;
@@ -768,10 +756,10 @@ void MatchProcessor(BXType bx,
         static_assert(not DISK, "PR: Layer only for now.");
   
         //Check if there are stubs in the memory --- FIXME use proper type
-        ap_uint<4> nstubfirstMinus=instubdata[0].getEntries(bx,ivmMinus*8+zfirst);
-        ap_uint<4> nstublastMinus=instubdata[0].getEntries(bx,ivmMinus*8+zlast);
-        ap_uint<4> nstubfirstPlus=instubdata[0].getEntries(bx,ivmPlus*8+zfirst);
-        ap_uint<4> nstublastPlus=instubdata[0].getEntries(bx,ivmPlus*8+zlast);
+        ap_uint<4> nstubfirstMinus=instubdata.getEntries(bx, zfirst, ivmMinus);
+        ap_uint<4> nstublastMinus=instubdata.getEntries(bx, zlast, ivmMinus);
+        ap_uint<4> nstubfirstPlus=instubdata.getEntries(bx, zfirst, ivmPlus);
+        ap_uint<4> nstublastPlus=instubdata.getEntries(bx, zlast, ivmPlus);
 
 	if (ivmMinus==ivmPlus) {
 	  nstubfirstPlus = 0;
@@ -782,13 +770,8 @@ void MatchProcessor(BXType bx,
 	  nstublastPlus = 0;
 	}
 
-	//std::cout << "istep="<<istep<<" MP nstubs : "<<nstublastPlus<<" "<<nstubfirstPlus<<" "<<nstublastMinus<<" "<<nstubfirstMinus<<
-	//  "     ivmMinus  zlast : "<<ivmMinus<<" "<<zlast<<"   zfirst : "<<zfirst<<"  iphiproj:"<<iphiproj<<std::endl;
-
 	ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
-
   
-	//std::cout << "finephi : " << finephi << std::endl;
         VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
 
 	AllProjection<APTYPE> allproj(projdata.getTCID(), projdata.getTrackletIndex(), projdata.getPhi(),
@@ -801,8 +784,6 @@ void MatchProcessor(BXType bx,
 	typename AllProjection<APTYPE>::AProjRZ            proj_z    = allproj.getRZ();
 	typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = allproj.getPhiDer();
 	typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = allproj.getRZDer();
-
-	//std::cout << "InputBuffer trkID :"<<128*proj_tcid+proj_tkid<<" ivmMinus ivmPlus shift second: "<<ivmMinus<<" "<<ivmPlus<<" "<<shift<<" "<<zbin.range(0,0)<<std::endl;
 
         if (nstubs!=0) { 
           ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
@@ -869,7 +850,7 @@ void MatchProcessor(BXType bx,
         meu.init(bx, tmpprojbuff, iphi, iMEU);
       }
 
-      meu.step(table, instubdata[iMEU]);
+      meu.step(table, instubdata);
       
     } //end MEU loop
       
@@ -877,7 +858,6 @@ void MatchProcessor(BXType bx,
 
       auto trkindex=matchengine[bestMEU].getTrkID();
 
-      //std::cout << "bestMEU TrkID : "<<bestMEU<<" "<<matchengine[bestMEU].getTrkID()<<std::endl;
       typename VMProjection<BARREL>::VMPID projindex;
 
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
@@ -888,8 +868,6 @@ void MatchProcessor(BXType bx,
       ap_uint<1> newtracklet = lastTrkID != trkindex;
 
       lastTrkID = trkindex;
-
-      //std::cout << "istep="<<istep<<" MatchCalculator : "<<trkindex<<" "<<stubindex<<" newTracklet:"<<newtracklet<<std::endl;
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
       (bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, projindex, stubindex, bx_o,

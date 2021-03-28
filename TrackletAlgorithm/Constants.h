@@ -38,6 +38,7 @@ constexpr unsigned kMaxProcOffset(const module::type m) {
 constexpr int kNBits_MemAddr = 7;
 constexpr int kMemDepth = (1<<kNBits_MemAddr);
 constexpr int kNBits_BX = 3;
+constexpr unsigned int kNMatchEngines=4;
 
 constexpr int kNBits_MemAddrBinned = 4;
 constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
