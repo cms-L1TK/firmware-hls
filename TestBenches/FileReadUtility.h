@@ -12,6 +12,9 @@
 #include <unistd.h>
 #include <vector>
 #include <bitset>
+#include <map>
+#include <regex>
+#include <glob.h>
 
 #include "../TrackletAlgorithm/Constants.h"
 
@@ -232,6 +235,100 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   return err_count;
   
 }
+
+// Class designed to help organize test-bench input and output files. The
+// member methods each take in a string that can contain glob-style wildcards,
+// e.g.:
+// "AllStubs*_L1*"
+// See the glob(7) man page for full details of the supported syntax.
+class TBHelper {
+  public:
+    // constructor takes in the base directory of the input and output files
+    TBHelper(const std::string &baseDir) : baseDir_(baseDir) {}
+
+    // destructor closes all open files and clears member maps
+    ~TBHelper() {
+      for (auto &query : files_) {
+        for (auto &file : query.second)
+          file.close();
+      }
+      files_.clear();
+      fileNames_.clear();
+    }
+
+    // returns number of files matching given string
+    unsigned nFiles(const std::string &query) {
+      processQuery(query);
+      return fileNames_.at(query).size();
+    }
+
+    // returns vector of input streams, one for each file matching given string
+    std::vector<std::ifstream> &files(const std::string &query) {
+      processQuery(query);
+      return files_.at(query);
+    }
+
+    // returns vector of file names, one for each file matching given string
+    std::vector<std::string> &fileNames(const std::string &query) {
+      processQuery(query);
+      return fileNames_.at(query);
+    }
+
+  private:
+    std::string baseDir_;
+    std::map<std::string, std::vector<std::ifstream> > files_;
+    std::map<std::string, std::vector<std::string> > fileNames_;
+
+    // private method for processing the given string using glob
+    void processQuery(const std::string &query) {
+      if (!files_.count(query)) {
+        auto &files = files_[query];
+        auto &fileNames = fileNames_[query];
+        glob_t globbuf;
+        globbuf.gl_offs = 0;
+        glob((baseDir_ + "/" + query).c_str(), 0, nullptr, &globbuf);
+        for (unsigned i = 0; i < globbuf.gl_pathc; i++)
+          fileNames.emplace_back(globbuf.gl_pathv[i]);
+
+        // function for padding single-digit numbers in the file name with a
+        // leading zero
+        const auto padNumbers = [](const std::string &fileName) {
+          const std::regex singleDigit("([^0-9])([0-9])([^0-9.])");
+          return std::regex_replace(fileName, singleDigit, "$010$02$03");
+        };
+
+        // function for removing padding added by padNumbers
+        const auto removePadding = [](const std::string &fileName) {
+          const std::regex paddedNumber("([^0-9])0([0-9])([^0-9.])");
+          return std::regex_replace(fileName, paddedNumber, "$01$02$03");
+        };
+
+        // The next three steps are needed to get the file name ordering right.
+        // For example, the following file names will be returned in this order
+        // by glob:
+        //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
+        //   "StubPairs_SP_L3PHIC9_L4PHIC20_04.dat"
+        // However, they should be in the opposite order according to the
+        // wiring. So we first pad any single-digit numbers with a leading
+        // zero:
+        //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
+        //   "StubPairs_SP_L3PHIC09_L4PHIC20_04.dat"
+        // Then we re-sort them:
+        //   "StubPairs_SP_L3PHIC09_L4PHIC20_04.dat"
+        //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
+        // And finally, we remove the padding added in the first step:
+        //   "StubPairs_SP_L3PHIC9_L4PHIC20_04.dat"
+        //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
+        std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padNumbers);
+        std::sort(fileNames.begin(), fileNames.end());
+        std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removePadding);
+
+        for (const auto &fileName : fileNames)
+          files.emplace_back(fileName);
+        globfree(&globbuf);
+      }
+    }
+};
 
 #endif // TestBenches_FileReadUtility_h
 
