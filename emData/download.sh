@@ -6,7 +6,7 @@
 
 # standard configurations - temporary
 tarball_url="https://www.dropbox.com/s/ytw36m9cbh3ojja/MemPrintsStandard_210325.tgz?dl=0"
-luts_url="https://www.dropbox.com/s/a86wul6kd0ta3k0/LUTsStandard_210325.tgz?dl=0"
+luts_url="https://www.dropbox.com/s/y52qrbf2gcbxjj1/LUTsStandard_210329.tgz?dl=0"
 
 # fw_synch_200515
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
