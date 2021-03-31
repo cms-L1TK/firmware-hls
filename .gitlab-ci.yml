@@ -8,7 +8,9 @@ variables:
 stages: # ---------------------------------------------------------------------
   - quality-check
   - hls-build
-#  - topTF-build
+  - topTF-sim
+  - check-results
+  - topTF-synth
 
 # Job templates ---------------------------------------------------------------
 .job_template: &template_base
@@ -35,7 +37,6 @@ stages: # ---------------------------------------------------------------------
 .job_template: &template_hls-build
   <<: *template_base
   stage: hls-build
-  when: always
   script:
     - cd project
     - pwd; ls -la; # Debug
@@ -45,7 +46,53 @@ stages: # ---------------------------------------------------------------------
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
       - ./project/
+      - ./emData/
     expire_in: 1 week
+
+.job_template: &template_topTF-sim
+  <<: *template_base
+  stage: topTF-sim
+  script:
+    - cd IntegrationTests/${PROJ_NAME}/script
+    - pwd; ls -la; #debug
+    - vivado -mode tcl -source ./makeProject.tcl
+    - vivado -mode tcl -source ./runSim.tcl
+  artifacts:
+    when: on_success
+    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+    paths:
+      - ./IntegrationTests/${PROJ_NAME}/script/dataOut/
+      - ./IntegrationTests/${PROJ_NAME}/script/Work/
+    expire_in: 1 week
+
+.job_template: &template_check-results
+  <<: *template_base
+  stage: check-results
+  script:
+    - cd IntegrationTests/${PROJ_NAME}/script
+    # Compare HDL sim output with full machtes Mem/Prints
+    - python3 ../../common/script/CompareMemPrintsFW.py -p -s
+  artifacts:
+    when: on_success
+    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+    paths:
+      - ./IntegrationTests/${PROJ_NAME}/script/dataOut/*.txt
+    expire_in: 10 week
+
+.job_template: &template_topTF-synth
+  <<: *template_base
+  stage: topTF-synth
+  script:
+    - cd IntegrationTests/${PROJ_NAME}/script
+    - pwd; ls -la; #debug
+    - vivado -mode tcl -source ../../common/script/synth.tcl 
+  artifacts:
+    when: on_success
+    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+    paths:
+      - ./IntegrationTests/${PROJ_NAME}/script/Work/Work.runs/synth_1/*.rpt
+    expire_in: 1 week
+    
 # Jobs ------------------------------------------------------------------------
 # Quality checks ------------
 IR-quality-check:
@@ -63,7 +110,7 @@ TE-quality-check:
 TC-quality-check:
   <<: *template_quality-check
   variables:
-    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_* ../TrackletAlgorithm/TrackletCalculator.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_* ../TrackletAlgorithm/TrackletCalculatorTop.cc'
 PR-quality-check:
   <<: *template_quality-check
   variables:
@@ -76,6 +123,10 @@ MC-quality-check:
   <<: *template_quality-check
   variables:
     CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+TB-quality-check:
+  <<: *template_quality-check
+  variables:
+    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TrackletAlgorithm/TrackBuilderTop.cc'
 # HLS builds ---------------
 IR-hls-build:
   <<: *template_hls-build
@@ -109,7 +160,30 @@ ME-hls-build:
     PROJ_NAME: "ME"
 MC-hls-build:
   <<: *template_hls-build
-  allow_failure: true # FIXME: remove on next synchronization with emulation
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
+TB-hls-build:
+  <<: *template_hls-build
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TB"
+# FW simulation ---------------
+topPRMEMC-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PRMEMC"
+# Check FW results ---------------
+topPRMEMC-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
+    PROJ_NAME: "PRMEMC"
+# FW synthesis ---------------
+topPRMEMC-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PRMEMC"

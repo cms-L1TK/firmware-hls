@@ -9,7 +9,7 @@ open_project -reset trackletCalculator
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top TrackletCalculator_L1L2G
-add_files ../TrackletAlgorithm/TrackletCalculator.cc -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/TrackletCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletCalculator_L1L2G_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"

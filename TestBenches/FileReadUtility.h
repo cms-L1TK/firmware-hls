@@ -121,7 +121,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   
 }
 
-template<class MemType, int InputBase=16, int OutputBase=16>
+template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
                                 const bool truncated = false, int maxProc = kMaxProc)
@@ -133,9 +133,13 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
+  constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
+  constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
+
   for (int i = 0; i < memory_ref.getDepth(); ++i) {
-    auto data_ref = memory_ref.read_mem(ievt,i).raw();
-    auto data_com = memory.read_mem(ievt,i).raw();
+    auto data_ref = memory_ref.read_mem(ievt,i).raw().range(msb,lsb);
+    auto data_com = memory.read_mem(ievt,i).raw().range(msb,lsb);
     if (i==0) {
       // If both reference and computed memories are completely empty, skip it
       if (data_com == 0 && data_ref == 0) break;
@@ -146,10 +150,10 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
     if (data_com == 0 && data_ref == 0) continue;
 
     std::cout << i << "\t";
-    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_ref) << "\t";
+    if (OutputBase == 2) std::cout << std::bitset<width>(data_ref) << "\t";
     else                 std::cout << std::hex << data_ref << "\t";
     
-    if (OutputBase == 2) std::cout << std::bitset<MemType::getWidth()>(data_com);
+    if (OutputBase == 2) std::cout << std::bitset<width>(data_com);
     else                 std::cout << std::hex << data_com; // << std::endl;
 
     // If there is extra entries in reference
