@@ -1,7 +1,6 @@
 #!/bin/bash
 
 SCRIPT_DIR=`dirname ${BASH_SOURCE[0]}`
-STOP=""
 echo "Script directory "$SCRIPT_DIR
 
 function run_setup()

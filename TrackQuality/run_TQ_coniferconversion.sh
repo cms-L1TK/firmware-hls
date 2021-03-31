@@ -43,8 +43,8 @@ fi
 
 python conifer_converter.py xgboost_model.pkl
 
-mv simdir/firmware/parameters.h ../TrackletAlgorithm
-mv simdir/firmware/BDT.h ../TrackletAlgorithm
+mv simdir/firmware/parameters.h .
+mv simdir/firmware/BDT.h .
 
 rm -r simdir
 

@@ -4,9 +4,9 @@
 # WARNING: this will wipe out the original project by the same name
 
 # Check parameters exists, cannot run without it
-if { [file exists ../TrackletAlgorithm/parameters.h ] == 1} {     
-        set parameters_age [file mtime ../TrackletAlgorithm/parameters.h]
-        puts "parameters.h created at [clock format [file mtime ../TrackletAlgorithm/parameters.h]] \n"
+if { [file exists ../TrackQuality/parameters.h ] == 1} {     
+        set parameters_age [file mtime ../TrackQuality/parameters.h]
+        puts "parameters.h created at [clock format [file mtime ../TrackQuality/parameters.h]] \n"
         set model_age  [file mtime ../TrackQuality/xgboost_model.pkl] 
         puts "xgboost_model.pkl created at [clock format [file mtime ../TrackQuality/xgboost_model.pkl]] \n"
         set diff [expr $parameters_age - $model_age]   
@@ -29,10 +29,9 @@ if { [file exists ../TrackletAlgorithm/parameters.h ] == 1} {
 open_project -reset trackquality
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set CFLAGS {-std=c++11 -I../TrackQuality}
 set_top TrackQualityTop
-add_files ../TrackletAlgorithm/BDT.h -cflags "$CFLAGS"
-add_files ../TrackletAlgorithm/TrackQualityTop.cc -cflags "$CFLAGS"
+add_files ../TrackQuality/TrackQualityTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackQuality_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"

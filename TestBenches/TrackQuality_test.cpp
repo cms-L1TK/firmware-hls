@@ -32,6 +32,7 @@ int main()
   std::string pred_line;
   int err_count = 0;
   int event_count = 0;
+  int track_count = 0;
 
   while (event_count < nevents) {
     
@@ -39,20 +40,17 @@ int main()
     
     if (trk_line.find("Event") != std::string::npos){
       event_count ++;
+      track_count = 0;
       continue;
     }
     else{
+      track_count ++;
       std::getline(fin_predictions,pred_line); //predicitions don't have event headers so only iterate when input data is tracks
 
       char pDelimeter = '|';
       std::vector<std::string> splitline = split(trk_line, pDelimeter);
-      
-      ap_uint<96> x = 0;
-      std::stringstream ss;
-      ss << std::hex << splitline[0];  //convert 96-bit hex track word to 96-bit uint
-      ss >> x;
 
-      TTTrack inputTrack(x); //Convert to TTTrack representation
+      TTTrack inputTrack(splitline[0]); //Construct TTTrack representation
 
       score_arr_t score{};
       score_t tree_scores[BDT::fn_classes(n_classes) * n_trees]{};  //Setup score arrays
@@ -62,8 +60,9 @@ int main()
       TrackQualityTop(inputTrack,score,tree_scores);
 
       if (abs((float)score[0] - std::stof(pred_line)) > 0.0001 ) {
-        std::cout << "\t" << "<=== INCONSISTENT";
-        std::cout << (float)score[0] << "|" << std::stof(pred_line) << std::endl;
+        std::cout << "\t" << "<=== INCONSISTENT\n";
+        std::cout << "Event: " << event_count << " Track: " << track_count << std::endl;
+        std::cout << "HLS Prediction: " << (float)score[0] << " Python Prediction: " << std::stof(pred_line) << std::endl;
         err_count++;
       }
    
