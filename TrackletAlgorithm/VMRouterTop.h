@@ -34,9 +34,8 @@ constexpr int maxOLCopies(3); // TE Inner Overlap memories
 constexpr int maxTEOCopies(1); // TE Outer memories
 
 // Number of inputs
-constexpr int numInputs(7); // Total number of input memories
-constexpr int numInputsDiskPS(0); // Only used for disks
-constexpr int numInputsDisk2S(numInputs-numInputsDiskPS); // Only used for disks
+constexpr int numInputs(7); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
 
 constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. Can't use 0.
 

@@ -65,7 +65,10 @@ bool findFileNames(string fileDirStart, string wireFileName, string memID, strin
   return true;
 }
 
-
+// Decides sorting order of modules: PS first, 2S last
+bool sortByModule(string lhs, string rhs) {
+  if((lhs.find("PS") != string::npos) && (rhs.find("2S") != string::npos)) return true;
+}
 
 int main() {
 
@@ -84,14 +87,17 @@ int main() {
   char extraPhiRegion[] = {'I', 'J', 'K', 'L'}; // Special naming for the extra memories TEInner L2 and TEOuter L3.
 
   // Input file names
-  string inputNameList[numInputs];
-  int inputNumCopies[numInputs] = {0}; // Array containing the number of copies of each memory
+  string inputNameList[numInputs + numInputsDisk2S];
+  int inputNumCopies[numInputs + numInputsDisk2S] = {0}; // Array containing the number of copies of each memory
 
   string inputDir = testDataDirectory + "/InputStubs"; // Directory of InputStubs, including the first part of the file name
   string inMemID = "IL_" + layerID; // Input memory ID for the specified phi region
 
   // Get the input file names and check that the wiring file can be opened properly
-  if (not findFileNames<numInputs>(inputDir, wireFileName, inMemID, inputNameList, inputNumCopies)) return -1;
+  if (not findFileNames<numInputs + numInputsDisk2S>(inputDir, wireFileName, inMemID, inputNameList, inputNumCopies)) return -1;
+
+  // Sort the inputNameList such that the 2S modules come last
+  sort(inputNameList, inputNameList + (numInputs + numInputsDisk2S), sortByModule);
 
 
   // Start of AllStub file names, excluding the copy number
@@ -175,9 +181,9 @@ int main() {
   // open input files
   cout << "Open files..." << endl;
 
-  ifstream fin_inputstub[numInputs];
+  ifstream fin_inputstub[numInputs + numInputsDisk2S];
 
-  for (unsigned int i = 0; i < numInputs; i++) {
+  for (unsigned int i = 0; i < numInputs + numInputsDisk2S; i++) {
     bool valid = openDataFile(fin_inputstub[i], inputNameList[i] + fileEnding);
     if (not valid) return -1;
   }
@@ -270,18 +276,15 @@ int main() {
       }
     }
 
-    int num2S = 0; // Keeps track of how many DISK 2S modules we have written to
-
     // read event and write to memories
-    for (unsigned int i = 0; i < numInputs; i++) {
+    for (unsigned int i = 0; i < numInputs + numInputsDisk2S; i++) {
       if (kLAYER) {
         writeMemFromFile<InputStubMemory<inputType>>(inputStub[i], fin_inputstub[i], ievt);
       } else {
-        if (i == 0 || i == 3) {
-          writeMemFromFile<InputStubMemory<DISK2S>>(inputStubDisk2S[num2S], fin_inputstub[i], ievt);
-          num2S++;
+        if (i < numInputs) {
+          writeMemFromFile<InputStubMemory<inputType>>(inputStub[i], fin_inputstub[i], ievt);
         } else {
-          writeMemFromFile<InputStubMemory<inputType>>(inputStub[i - num2S], fin_inputstub[i], ievt);
+          writeMemFromFile<InputStubMemory<DISK2S>>(inputStubDisk2S[i - numInputs], fin_inputstub[i], ievt);
         }
       }
     }
