@@ -12,11 +12,11 @@
 
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
-#if !defined __SEED__
-  #define __SEED__ __L1L2__
+#if !defined SEED_
+  #define SEED_ L1L2_
 #endif
-#if !defined __MODULE__
-  #define __MODULE__ __TC_L1L2E__
+#if !defined MODULE_
+  #define MODULE_ TC_L1L2E_
 #endif
 
 const int nevents = 100;  //number of events to run
@@ -26,17 +26,17 @@ using namespace std;
 int main()
 {
   // these need to be customized according to the specific TC being tested
-#if __SEED__ == __L1L2__
+#if SEED_ == L1L2_
   const auto InnerStubType = BARRELPS;
   const auto OuterStubType = BARRELPS;
   const string innerStubPattern = "AllStubs*_L1*";
   const string outerStubPattern = "AllStubs*_L2*";
-#elif __SEED__ == __L3L4__
+#elif SEED_ == L3L4_
   const auto InnerStubType = BARRELPS;
   const auto OuterStubType = BARREL2S;
   const string innerStubPattern = "AllStubs*_L3*";
   const string outerStubPattern = "AllStubs*_L4*";
-#elif __SEED__ == __L5L6__
+#elif SEED_ == L5L6_
   const auto InnerStubType = BARREL2S;
   const auto OuterStubType = BARREL2S;
   const string innerStubPattern = "AllStubs*_L5*";
@@ -44,49 +44,49 @@ int main()
 #else
   #error "Undefined seed"
 #endif
-#if __MODULE__ == __TC_L1L2A__
+#if MODULE_ == TC_L1L2A_
   TBHelper tb("TC/TC_L1L2A");
-#elif __MODULE__ == __TC_L1L2B__
+#elif MODULE_ == TC_L1L2B_
   TBHelper tb("TC/TC_L1L2B");
-#elif __MODULE__ == __TC_L1L2C__
+#elif MODULE_ == TC_L1L2C_
   TBHelper tb("TC/TC_L1L2C");
-#elif __MODULE__ == __TC_L1L2D__
+#elif MODULE_ == TC_L1L2D_
   TBHelper tb("TC/TC_L1L2D");
-#elif __MODULE__ == __TC_L1L2E__
+#elif MODULE_ == TC_L1L2E_
   TBHelper tb("TC/TC_L1L2E");
-#elif __MODULE__ == __TC_L1L2F__
+#elif MODULE_ == TC_L1L2F_
   TBHelper tb("TC/TC_L1L2F");
-#elif __MODULE__ == __TC_L1L2G__
+#elif MODULE_ == TC_L1L2G_
   TBHelper tb("TC/TC_L1L2G");
-#elif __MODULE__ == __TC_L1L2H__
+#elif MODULE_ == TC_L1L2H_
   TBHelper tb("TC/TC_L1L2H");
-#elif __MODULE__ == __TC_L1L2I__
+#elif MODULE_ == TC_L1L2I_
   TBHelper tb("TC/TC_L1L2I");
-#elif __MODULE__ == __TC_L1L2J__
+#elif MODULE_ == TC_L1L2J_
   TBHelper tb("TC/TC_L1L2J");
-#elif __MODULE__ == __TC_L1L2K__
+#elif MODULE_ == TC_L1L2K_
   TBHelper tb("TC/TC_L1L2K");
-#elif __MODULE__ == __TC_L1L2L__
+#elif MODULE_ == TC_L1L2L_
   TBHelper tb("TC/TC_L1L2L");
-#elif __MODULE__ == __TC_L3L4A__
+#elif MODULE_ == TC_L3L4A_
   TBHelper tb("TC/TC_L3L4A");
-#elif __MODULE__ == __TC_L3L4B__
+#elif MODULE_ == TC_L3L4B_
   TBHelper tb("TC/TC_L3L4B");
-#elif __MODULE__ == __TC_L3L4C__
+#elif MODULE_ == TC_L3L4C_
   TBHelper tb("TC/TC_L3L4C");
-#elif __MODULE__ == __TC_L3L4D__
+#elif MODULE_ == TC_L3L4D_
   TBHelper tb("TC/TC_L3L4D");
-#elif __MODULE__ == __TC_L3L4E__
+#elif MODULE_ == TC_L3L4E_
   TBHelper tb("TC/TC_L3L4E");
-#elif __MODULE__ == __TC_L3L4F__
+#elif MODULE_ == TC_L3L4F_
   TBHelper tb("TC/TC_L3L4F");
-#elif __MODULE__ == __TC_L3L4G__
+#elif MODULE_ == TC_L3L4G_
   TBHelper tb("TC/TC_L3L4G");
-#elif __MODULE__ == __TC_L3L4H__
+#elif MODULE_ == TC_L3L4H_
   TBHelper tb("TC/TC_L3L4H");
-#elif __MODULE__ == __TC_L5L6A__
+#elif MODULE_ == TC_L5L6A_
   TBHelper tb("TC/TC_L5L6A");
-#elif __MODULE__ == __TC_L5L6D__
+#elif MODULE_ == TC_L5L6D_
   TBHelper tb("TC/TC_L5L6D");
 #else
   #error "Undefined TC"
@@ -139,49 +139,49 @@ int main()
     BXType bx_o;
 
     // Unit Under Test
-#if __MODULE__ == __TC_L1L2A__
+#if MODULE_ == TC_L1L2A_
     TrackletCalculator_L1L2A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2B__
+#elif MODULE_ == TC_L1L2B_
     TrackletCalculator_L1L2B(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2C__
+#elif MODULE_ == TC_L1L2C_
     TrackletCalculator_L1L2C(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2D__
+#elif MODULE_ == TC_L1L2D_
     TrackletCalculator_L1L2D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2E__
+#elif MODULE_ == TC_L1L2E_
     TrackletCalculator_L1L2E(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2F__
+#elif MODULE_ == TC_L1L2F_
     TrackletCalculator_L1L2F(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2G__
+#elif MODULE_ == TC_L1L2G_
     TrackletCalculator_L1L2G(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2H__
+#elif MODULE_ == TC_L1L2H_
     TrackletCalculator_L1L2H(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2I__
+#elif MODULE_ == TC_L1L2I_
     TrackletCalculator_L1L2I(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2J__
+#elif MODULE_ == TC_L1L2J_
     TrackletCalculator_L1L2J(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2K__
+#elif MODULE_ == TC_L1L2K_
     TrackletCalculator_L1L2K(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L1L2L__
+#elif MODULE_ == TC_L1L2L_
     TrackletCalculator_L1L2L(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4A__
+#elif MODULE_ == TC_L3L4A_
     TrackletCalculator_L3L4A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4B__
+#elif MODULE_ == TC_L3L4B_
     TrackletCalculator_L3L4B(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4C__
+#elif MODULE_ == TC_L3L4C_
     TrackletCalculator_L3L4C(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4D__
+#elif MODULE_ == TC_L3L4D_
     TrackletCalculator_L3L4D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4E__
+#elif MODULE_ == TC_L3L4E_
     TrackletCalculator_L3L4E(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4F__
+#elif MODULE_ == TC_L3L4F_
     TrackletCalculator_L3L4F(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4G__
+#elif MODULE_ == TC_L3L4G_
     TrackletCalculator_L3L4G(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L3L4H__
+#elif MODULE_ == TC_L3L4H_
     TrackletCalculator_L3L4H(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L5L6A__
+#elif MODULE_ == TC_L5L6A_
     TrackletCalculator_L5L6A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif __MODULE__ == __TC_L5L6D__
+#elif MODULE_ == TC_L5L6D_
     TrackletCalculator_L5L6D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 #else
   #error "Undefined TC"

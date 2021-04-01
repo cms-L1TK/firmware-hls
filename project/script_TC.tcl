@@ -36,7 +36,7 @@ foreach i $modules_to_test {
   set iTC [string range $i 7 7]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"__SEED__=__" $seed "__\" -D \"__MODULE__=__" $i "__\""] ""]
+  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top [join [list "TrackletCalculator_" $seed $iTC] ""]
