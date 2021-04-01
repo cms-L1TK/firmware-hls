@@ -102,46 +102,52 @@ wiresFile.close()
 
 # Open and print out preambles for the parameters and top files.
 parametersFile = open("TrackletCalculator_parameters.h", "w")
-parametersFile.write("#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h\n")
-parametersFile.write("#define TrackletAlgorithm_TrackletCalculator_parameters_h\n")
-parametersFile.write("\n")
-parametersFile.write("// This file contains numbers of memories and bit masks that are specific to\n")
-parametersFile.write("// each TrackletCalculator and that come directly from the wiring.\n")
-parametersFile.write("//\n")
-parametersFile.write("// The specific inner all-stub memory that the indices in a given stub-pair\n")
-parametersFile.write("// memory correspond to is determined by ASInnerMask. The bits of this mask,\n")
-parametersFile.write("// from least significant to most significant, represent the stub-pair memories\n")
-parametersFile.write("// in the order they are passed to TrackletCalculator; e.g., the LSB\n")
-parametersFile.write("// corresponds to stubPairs[0]. The bit for a given stub-pair memory is the\n")
-parametersFile.write("// index (0 or 1) of the inner all-stub memory that should be used. Likewise,\n")
-parametersFile.write("// the specific outer all-stub memories are determined by ASOuterMask.\n")
-parametersFile.write("//\n")
-parametersFile.write("// The validity of each of the barrel TPROJ memories is determined by\n")
-parametersFile.write("// TPROJMaskBarrel. The bits of this mask, from least significant to most\n")
-parametersFile.write("// significant, represent the memories in the order they are passed to\n")
-parametersFile.write("// TrackletCalculator; e.g., the LSB corresponds to\n")
-parametersFile.write("// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n")
-parametersFile.write("// valid, if it is not, the corresponding memory is not valid. Likewise, the\n")
-parametersFile.write("// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n")
-parametersFile.write("// in the same way.\n")
+parametersFile.write(
+    "#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h\n"
+    "#define TrackletAlgorithm_TrackletCalculator_parameters_h\n"
+    "\n"
+    "// This file contains numbers of memories and bit masks that are specific to\n"
+    "// each TrackletCalculator and that come directly from the wiring.\n"
+    "//\n"
+    "// The specific inner all-stub memory that the indices in a given stub-pair\n"
+    "// memory correspond to is determined by ASInnerMask. The bits of this mask,\n"
+    "// from least significant to most significant, represent the stub-pair memories\n"
+    "// in the order they are passed to TrackletCalculator; e.g., the LSB\n"
+    "// corresponds to stubPairs[0]. The bit for a given stub-pair memory is the\n"
+    "// index (0 or 1) of the inner all-stub memory that should be used. Likewise,\n"
+    "// the specific outer all-stub memories are determined by ASOuterMask.\n"
+    "//\n"
+    "// The validity of each of the barrel TPROJ memories is determined by\n"
+    "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
+    "// significant, represent the memories in the order they are passed to\n"
+    "// TrackletCalculator; e.g., the LSB corresponds to\n"
+    "// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n"
+    "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
+    "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
+    "// in the same way.\n"
+)
 topHeaderFile = open("TrackletCalculatorTop.h", "w")
-topHeaderFile.write("#ifndef TrackletAlgorithm_TrackletCalculatorTop_h\n")
-topHeaderFile.write("#define TrackletAlgorithm_TrackletCalculatorTop_h\n")
-topHeaderFile.write("\n")
-topHeaderFile.write("#include \"TrackletCalculator.h\"\n")
+topHeaderFile.write(
+    "#ifndef TrackletAlgorithm_TrackletCalculatorTop_h\n"
+    "#define TrackletAlgorithm_TrackletCalculatorTop_h\n"
+    "\n"
+    "#include \"TrackletCalculator.h\"\n"
+)
 topFile = open("TrackletCalculatorTop.cc", "w")
-topFile.write("#include \"TrackletCalculatorTop.h\"\n")
-topFile.write("\n")
-topFile.write("////////////////////////////////////////////////////////////////////////////////\n")
-topFile.write("// Top functions for various TrackletCalculators (TC). For each iteration of\n")
-topFile.write("// the main processing loop, a TC retrieves a pair of stub indices from one of\n")
-topFile.write("// the stub-pair memories, and in turn, these indices are used to retrieve one\n")
-topFile.write("// stub each from an inner and an outer all-stub memory. This pair of stubs is\n")
-topFile.write("// used to calculate a rough set of helix parameters, which are written to the\n")
-topFile.write("// tracklet-parameter memory if the tracklet passes cuts on rinv and z0. Rough\n")
-topFile.write("// projections to additional layers and disks are also calculated and are\n")
-topFile.write("// written to the appropriate tracklet-projection memories.\n")
-topFile.write("////////////////////////////////////////////////////////////////////////////////\n")
+topFile.write(
+    "#include \"TrackletCalculatorTop.h\"\n"
+    "\n"
+    "////////////////////////////////////////////////////////////////////////////////\n"
+    "// Top functions for various TrackletCalculators (TC). For each iteration of\n"
+    "// the main processing loop, a TC retrieves a pair of stub indices from one of\n"
+    "// the stub-pair memories, and in turn, these indices are used to retrieve one\n"
+    "// stub each from an inner and an outer all-stub memory. This pair of stubs is\n"
+    "// used to calculate a rough set of helix parameters, which are written to the\n"
+    "// tracklet-parameter memory if the tracklet passes cuts on rinv and z0. Rough\n"
+    "// projections to additional layers and disks are also calculated and are\n"
+    "// written to the appropriate tracklet-projection memories.\n"
+    "////////////////////////////////////////////////////////////////////////////////\n"
+)
 
 # Calculate parameters and print out parameters and top function for each TC.
 for tcName in sorted(asInnerMems.keys()):
@@ -189,61 +195,68 @@ for tcName in sorted(asInnerMems.keys()):
             tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
 
     # Print out parameters for this TC.
-    parametersFile.write("\n")
-    parametersFile.write("// magic numbers for " + tcName + "\n")
-    parametersFile.write("template<> constexpr uint8_t NASMemInner<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return " + str(nASMemInner) + ";\n")
-    parametersFile.write("}\n")
-    parametersFile.write("template<> constexpr uint8_t NASMemOuter<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return " + str(nASMemOuter) + ";\n")
-    parametersFile.write("}\n")
-    parametersFile.write("template<> constexpr uint8_t NSPMem<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return " + str(nSPMem) + ";\n")
-    parametersFile.write("}\n")
-    parametersFile.write("template<> constexpr uint32_t ASInnerMask<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return 0x%X;\n" % asInnerMask)
-    parametersFile.write("}\n")
-    parametersFile.write("template<> constexpr uint32_t ASOuterMask<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return 0x%X;\n" % asOuterMask)
-    parametersFile.write("}\n")
-    parametersFile.write("template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return 0x%X;\n" % tprojMaskBarrel)
-    parametersFile.write("}\n")
-    parametersFile.write("template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n")
-    parametersFile.write("  return 0x%X;\n" % tprojMaskDisk)
-    parametersFile.write("}\n")
+    parametersFile.write(
+        ("\n"
+        "// magic numbers for " + tcName + "\n"
+        "template<> constexpr uint8_t NASMemInner<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return " + str(nASMemInner) + ";\n"
+        "}\n"
+        "template<> constexpr uint8_t NASMemOuter<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return " + str(nASMemOuter) + ";\n"
+        "}\n"
+        "template<> constexpr uint8_t NSPMem<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return " + str(nSPMem) + ";\n"
+        "}\n"
+        "template<> constexpr uint32_t ASInnerMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return 0x%X;\n"
+        "}\n"
+        "template<> constexpr uint32_t ASOuterMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return 0x%X;\n"
+        "}\n"
+        "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return 0x%X;\n"
+        "}\n"
+        "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n"
+        "  return 0x%X;\n"
+        "}\n")
+        % (asInnerMask, asOuterMask, tprojMaskBarrel, tprojMaskDisk)
+    )
 
     # Print out prototype for top function for this TC.
-    topHeaderFile.write("\n")
-    topHeaderFile.write("void TrackletCalculator_" + seed + iTC + "(\n")
-    topHeaderFile.write("    const BXType bx,\n")
-    topHeaderFile.write("    const AllStubMemory<InnerRegion<TF::" + seed + ">()> innerStubs[],\n")
-    topHeaderFile.write("    const AllStubMemory<OuterRegion<TF::" + seed + ">()> outerStubs[],\n")
-    topHeaderFile.write("    const StubPairMemory stubPairs[],\n")
-    topHeaderFile.write("    BXType& bx_o,\n")
-    topHeaderFile.write("    TrackletParameterMemory * trackletParameters,\n")
-    topHeaderFile.write("    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n")
-    topHeaderFile.write("    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n")
-    topHeaderFile.write("    TrackletProjectionMemory<DISK> projout_disk[]\n")
-    topHeaderFile.write(");\n")
+    topHeaderFile.write(
+        "\n"
+        "void TrackletCalculator_" + seed + iTC + "(\n"
+        "    const BXType bx,\n"
+        "    const AllStubMemory<InnerRegion<TF::" + seed + ">()> innerStubs[],\n"
+        "    const AllStubMemory<OuterRegion<TF::" + seed + ">()> outerStubs[],\n"
+        "    const StubPairMemory stubPairs[],\n"
+        "    BXType& bx_o,\n"
+        "    TrackletParameterMemory * trackletParameters,\n"
+        "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
+        "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
+        "    TrackletProjectionMemory<DISK> projout_disk[]\n"
+        ");\n"
+    )
 
     # Print out definition of top function for this TC.
-    topFile.write("\n")
-    topFile.write("void TrackletCalculator_" + seed + iTC + "(\n")
-    topFile.write("    const BXType bx,\n")
-    topFile.write("    const AllStubMemory<InnerRegion<TF::" + seed + ">()> innerStubs[NASMemInner<TF::" + seed + ", TC::" + iTC + ">()],\n")
-    topFile.write("    const AllStubMemory<OuterRegion<TF::" + seed + ">()> outerStubs[NASMemOuter<TF::" + seed + ", TC::" + iTC + ">()],\n")
-    topFile.write("    const StubPairMemory stubPairs[NSPMem<TF::" + seed + ", TC::" + iTC + ">()],\n")
-    topFile.write("    BXType& bx_o,\n")
-    topFile.write("    TrackletParameterMemory * trackletParameters,\n")
-    topFile.write("    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n")
-    topFile.write("    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n")
-    topFile.write("    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n")
-    topFile.write(") {\n")
-    topFile.write("#pragma HLS inline recursive\n")
-    topFile.write("#pragma HLS array_partition variable=innerStubs complete dim=1\n")
-    topFile.write("#pragma HLS array_partition variable=outerStubs complete dim=1\n")
-    topFile.write("#pragma HLS array_partition variable=stubPairs complete dim=1\n")
+    topFile.write(
+        "\n"
+        "void TrackletCalculator_" + seed + iTC + "(\n"
+        "    const BXType bx,\n"
+        "    const AllStubMemory<InnerRegion<TF::" + seed + ">()> innerStubs[NASMemInner<TF::" + seed + ", TC::" + iTC + ">()],\n"
+        "    const AllStubMemory<OuterRegion<TF::" + seed + ">()> outerStubs[NASMemOuter<TF::" + seed + ", TC::" + iTC + ">()],\n"
+        "    const StubPairMemory stubPairs[NSPMem<TF::" + seed + ", TC::" + iTC + ">()],\n"
+        "    BXType& bx_o,\n"
+        "    TrackletParameterMemory * trackletParameters,\n"
+        "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
+        "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
+        "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
+        ") {\n"
+        "#pragma HLS inline recursive\n"
+        "#pragma HLS array_partition variable=innerStubs complete dim=1\n"
+        "#pragma HLS array_partition variable=outerStubs complete dim=1\n"
+        "#pragma HLS array_partition variable=stubPairs complete dim=1\n"
+    )
     if nASMemInner == 1:
         topFile.write("#pragma HLS resource variable=innerStubs.get_mem() latency=2\n")
     else:
@@ -259,35 +272,43 @@ for tcName in sorted(asInnerMems.keys()):
     else:
         for i in range(0, nSPMem):
             topFile.write("#pragma HLS resource variable=stubPairs[" + str(i) + "].get_mem() latency=2\n")
-    topFile.write("#pragma HLS interface register port=bx_o\n")
-    topFile.write("#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n")
-    topFile.write("#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n")
-    topFile.write("#pragma HLS array_partition variable=projout_disk complete dim=1\n")
-    topFile.write("\n")
-    topFile.write("TC_" + seed + iTC + ": TrackletCalculator<\n")
-    topFile.write("  TF::" + seed + ",\n")
-    topFile.write("  TC::" + iTC + ",\n")
-    topFile.write("  NSPMem<TF::" + seed + ", TC::" + iTC + ">()\n")
-    topFile.write(" >(\n")
-    topFile.write("    bx,\n")
-    topFile.write("    innerStubs,\n")
-    topFile.write("    outerStubs,\n")
-    topFile.write("    stubPairs,\n")
-    topFile.write("    bx_o,\n")
-    topFile.write("    trackletParameters,\n")
-    topFile.write("    projout_barrel_ps,\n")
-    topFile.write("    projout_barrel_2s,\n")
-    topFile.write("    projout_disk\n")
-    topFile.write("  );\n")
-    topFile.write("}\n")
+    topFile.write(
+        "#pragma HLS interface register port=bx_o\n"
+        "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
+        "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
+        "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+        "\n"
+        "TC_" + seed + iTC + ": TrackletCalculator<\n"
+        "  TF::" + seed + ",\n"
+        "  TC::" + iTC + ",\n"
+        "  NSPMem<TF::" + seed + ", TC::" + iTC + ">()\n"
+        " >(\n"
+        "    bx,\n"
+        "    innerStubs,\n"
+        "    outerStubs,\n"
+        "    stubPairs,\n"
+        "    bx_o,\n"
+        "    trackletParameters,\n"
+        "    projout_barrel_ps,\n"
+        "    projout_barrel_2s,\n"
+        "    projout_disk\n"
+        "  );\n"
+        "}\n"
+    )
 
 # Print out endifs and close files.
-parametersFile.write("\n")
-parametersFile.write("#endif\n")
+parametersFile.write(
+    "\n"
+    "#endif\n"
+)
 parametersFile.close()
-topHeaderFile.write("\n")
-topHeaderFile.write("#endif\n")
+topHeaderFile.write(
+    "\n"
+    "#endif\n"
+)
 topHeaderFile.close()
-topFile.write("\n")
-topFile.write("////////////////////////////////////////////////////////////////////////////////\n")
+topFile.write(
+    "\n"
+    "////////////////////////////////////////////////////////////////////////////////\n"
+)
 topFile.close()
