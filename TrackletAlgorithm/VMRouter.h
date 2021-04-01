@@ -71,7 +71,6 @@ constexpr float maxvmolbins = 1 << nbits_maxvmol; // Overlap
 constexpr int nbitsphiraw = 7; // Number of bits used for calculating iPhiRawPlus/Minus
 
 // The length of the masks used for the memories
-//constexpr int maskISsize = 16; // Input memories
 constexpr int maskMEsize = 1 << nbits_maxvm; // ME memories
 constexpr int maskTEIsize = 1 << nbits_maxvm; // TEInner memories
 constexpr int maskOLsize = 1 << nbits_maxvmol; // TEInner Overlap memories

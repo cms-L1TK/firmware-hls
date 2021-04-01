@@ -67,7 +67,7 @@ bool findFileNames(string fileDirStart, string wireFileName, string memID, strin
 
 // Decides sorting order of modules: PS first, 2S last
 bool sortByModule(string lhs, string rhs) {
-  if((lhs.find("PS") != string::npos) && (rhs.find("2S") != string::npos)) return true;
+  return (lhs.find("PS") != string::npos) && (rhs.find("2S") != string::npos);
 }
 
 int main() {
