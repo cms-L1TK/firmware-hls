@@ -7,6 +7,7 @@
 source env_hls.tcl
 
 set modules_to_test {
+  {TC_L1L2D}
   {TC_L1L2E}
   {TC_L1L2F}
   {TC_L1L2G}
