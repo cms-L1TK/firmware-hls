@@ -162,7 +162,7 @@ int main()
 			    tproj_disk
 			    );
 
-    bool truncate;
+    bool truncate = false;
 
     cout << "Start compare" << endl;
 
