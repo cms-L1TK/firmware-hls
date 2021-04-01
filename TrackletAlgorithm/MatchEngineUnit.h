@@ -14,6 +14,14 @@
 #include <iostream>
 #include <fstream>
 #include <bitset>
+#include "MatchProcessor_parameters.h"
+
+template<int nbits>
+static const ap_uint<1 << nbits> hasOneStub() {
+  ap_uint<1 << nbits> onlyOneStub(0);
+  onlyOneStub[1] = 1;
+  return onlyOneStub;
+}
 
 template<int VMProjType> class MatchEngineUnitBase {};
 
@@ -62,8 +70,12 @@ inline MatchEngineUnit() {
   stubmask_[3] = nstubsall_.range(15,12)!=0;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
+  /*
   second_ = index==1 || index==3; // can be simplified
   phiPlus_ = index==2 || index==3; // can be simplified
+  */
+  second_ = isSecond[index];
+  phiPlus_ = isPhiPlus[index];
   nstubs_ = nstubsall_.range(4*index+3,4*index);
   assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
@@ -78,9 +90,12 @@ inline MatchEngineUnit() {
  }
  
  inline bool nearFull() {
+   /*
    INDEX writeindexnext = writeindex_+1;
    INDEX writeindexnext2 = writeindex_+1;
    return readindex_==writeindexnext || readindex_==writeindexnext2;
+   */
+   return nearFullLUT[(readindex_,writeindex_)];
  }
 
 inline bool idle() {
@@ -192,9 +207,11 @@ inline MATCH read() {
      }
 
      
-     if (nstubs_==1) {
+     //if (nstubs_==1) {
+     if (onlyOneStub[nstubs_]) {
        istub_=0;
-       if (stubmask_==0) {
+       if (!stubmask_) {
+       //if (stubmask_==0) {
 	 idle_ = true;
        } else {
 	 ap_uint<2> index = __builtin_ctz(stubmask_);
@@ -211,7 +228,8 @@ inline MATCH read() {
      //Check if last stub, if so, go to next buffer entry 
      if (istub_+1>=nstubs_){
        istub_=0;
-       if (stubmask_==0) {
+       if (!stubmask_) {
+       //if (stubmask_==0) {
 	 idle_ = true;
        } else {
 	 ap_uint<2> index = __builtin_ctz(stubmask_);
@@ -281,8 +299,11 @@ inline MATCH read() {
  VMProjection<BARREL>::VMPRINV projrinv;
  VMProjection<BARREL>::VMPID projindex;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
+ ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFullUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
+ bool isSecond[4] = {0, 1, 0, 1};
+ bool isPhiPlus[4] = {0, 0, 1, 1};
+ ap_uint<1<<(kNBits_MemAddrBinned+2)> onlyOneStub = hasOneStub<kNBits_MemAddrBinned+2>();
  
 }; // end class
-
 
 #endif

@@ -2,6 +2,7 @@
 #define PRBUFFERARRAY_HH
 
 #include "ProjectionRouterBuffer.h"
+#include "MatchProcessor_parameters.h"
 
 template<int kNBitsBuffer,int AllProjectionType> class ProjectionRouterBufferArray {
 public:
@@ -20,9 +21,13 @@ public:
   }
 
   bool nearFull() {
+    /*
     ap_uint<kNBitsBuffer> writeptrnext(writeptr_+1);
     ap_uint<kNBitsBuffer> writeptrnextnext(writeptr_+2);
     return writeptrnext==readptr_ || writeptrnextnext==readptr_;
+    */
+    //nearFullPRBuffUnit<kNBitsBuffer>()[readptr_, writeptr_];
+    return nearFullLUT[(readptr_, writeptr_)];
   }
 
 
@@ -40,6 +45,7 @@ private:
   ap_uint<kNBitsBuffer> readptr_ = 0;
   ap_uint<kNBitsBuffer> writeptr_ = 0;
   ProjectionRouterBuffer<BARREL,AllProjectionType> projbuffer_[1<<kNBitsBuffer];
+  ap_uint<(1 << (2 * kNBitsBuffer))> nearFullLUT = nearFullUnit<kNBitsBuffer>();
 
 };
 
