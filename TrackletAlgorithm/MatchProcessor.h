@@ -553,7 +553,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS dependence variable=mem_hasdata inter RAW true
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
 //#pragma HLS resource variable=fullmatch core=RAM_2P_LUTRAM
 //#pragma HLS ARRAY_PARTITION variable=fullmatch complete dim=0
 
@@ -607,7 +607,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
 #pragma HLS dependence variable=istub inter false
 
 
@@ -799,7 +799,7 @@ void MatchProcessor(BXType bx,
     bool idles[kNMatchEngines];
     bool emptys[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=idles complete dim=0
-#pragma HLS ARRAY_PARTITION variable=dones complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=dones complete dim=0
 #pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
     int bestMEU = -1;
     int bestnoidleMEU = -1;
