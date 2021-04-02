@@ -567,7 +567,7 @@ TrackletCalculator(
 // zeroing the number of tracklets and projections. Therefore, only
 // kMaxProc - 1 iterations are actually used for processing stub pairs.
     TC::Types::nSPMem iSPMem;
-    TC::Types::nSP iSP = i - 1;
+    TC::Types::nSP iSP = i;
     bool done;
     TC::getIndices<NSPMem>(bx, stubPairs, iSPMem, iSP, done);
 
