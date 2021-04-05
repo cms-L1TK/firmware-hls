@@ -600,10 +600,12 @@ void MatchProcessor(BXType bx,
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
+  /*
     MEU_start: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       #pragma HLS unroll
     matchengine[iMEU] = MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE>();
     }
+  */
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
