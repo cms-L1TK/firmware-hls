@@ -197,12 +197,12 @@ inline MATCH read() {
 
      if (!phiPlus_) {
        if (shift_==-1) {
-	 projfinephi_ -= 8;
+         projfinephi_ -= 8;
        }
      } else {
        //When we get here shift_ is either 1 or -1
        if (shift_==1) {
-	 projfinephi_ += 8;
+         projfinephi_ += 8;
        }
      }
 
@@ -212,14 +212,14 @@ inline MATCH read() {
        istub_=0;
        if (!stubmask_) {
        //if (stubmask_==0) {
-	 idle_ = true;
+         idle_ = true;
        } else {
-	 ap_uint<2> index = __builtin_ctz(stubmask_);
-	 stubmask_[index]=0;
-	 second_ =  index==1 || index==3; // can be simplified
-	 phiPlus_ =  index==2 || index==3; // can be simplified
-	 nstubs_ = nstubsall_.range(4*index+3,4*index);
-	 assert(nstubs_!=0);
+         ap_uint<2> index = __builtin_ctz(stubmask_);
+         stubmask_[index]=0;
+         second_ =  index==1 || index==3; // can be simplified
+         phiPlus_ =  index==2 || index==3; // can be simplified
+         nstubs_ = nstubsall_.range(4*index+3,4*index);
+         assert(nstubs_!=0);
        }
      } else {
        istub_++;
@@ -230,14 +230,14 @@ inline MATCH read() {
        istub_=0;
        if (!stubmask_) {
        //if (stubmask_==0) {
-	 idle_ = true;
+         idle_ = true;
        } else {
-	 ap_uint<2> index = __builtin_ctz(stubmask_);
-	 stubmask_[index]=0;
-	 second_ =  index==1 || index==3; // can be simplified
-	 phiPlus_ =  index==2 || index==3; // can be simplified
-	 nstubs_ = nstubsall_.range(4*index+3,4*index);
-	 assert(nstubs_!=0);
+         ap_uint<2> index = __builtin_ctz(stubmask_);
+         stubmask_[index]=0;
+         second_ =  index==1 || index==3; // can be simplified
+         phiPlus_ =  index==2 || index==3; // can be simplified
+         nstubs_ = nstubsall_.range(4*index+3,4*index);
+         assert(nstubs_!=0);
        }
      } else {
        istub_++;
