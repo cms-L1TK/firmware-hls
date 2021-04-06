@@ -166,7 +166,8 @@ void readTable(bool table[256]){
   if (L==1) {
     bool tmp[256]=
 #include "../emData/ME/tables/METable_L1.tab"
-    for (int i=0;i<256;i++){
+    for (int i=0;i<256;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -175,7 +176,8 @@ void readTable(bool table[256]){
   if (L==2) {
     bool tmp[256]=
 #include "../emData/ME/tables/METable_L2.tab"
-    for (int i=0;i<256;i++){
+    for (int i=0;i<256;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -184,7 +186,8 @@ void readTable(bool table[256]){
   if (L==3) {
     bool tmp[256]=
 #include "../emData/MP/tables/METable_L3.tab"
-    for (int i=0;i<256;i++){
+    for (int i=0;i<256;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -192,7 +195,8 @@ void readTable(bool table[256]){
   if (L==4) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L4.tab"
-    for (int i=0;i<512;i++){
+    for (int i=0;i<512;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -201,7 +205,8 @@ void readTable(bool table[256]){
   if (L==5) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L5.tab"
-    for (int i=0;i<512;i++){
+#pragma HLS unroll
+    for (int i=0;i<512;++i){
       table[i]=tmp[i];
     }
   }
@@ -209,7 +214,8 @@ void readTable(bool table[256]){
   if (L==6) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L6.tab"
-    for (int i=0;i<512;i++){
+#pragma HLS unroll
+    for (int i=0;i<512;++i){
       table[i]=tmp[i];
     }
   }
@@ -546,6 +552,7 @@ void MatchProcessor(BXType bx,
   bool table[kNMatchEngines][(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 #pragma HLS ARRAY_PARTITION variable=table dim=1
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll
     readTable<L>(table[iMEU]); 
   } 
 
