@@ -550,7 +550,7 @@ void MatchProcessor(BXType bx,
   
   //Initialize table for bend-rinv consistency
   bool table[kNMatchEngines][(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
-#pragma HLS ARRAY_PARTITION variable=table dim=1
+#pragma HLS ARRAY_PARTITION variable=table dim=0
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<L>(table[iMEU]); 
