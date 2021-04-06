@@ -49,7 +49,6 @@ inline MatchEngineUnit() {
   stubmask_ = 0;
   nstubs_ = 0;
   nstubsall_ = 0;
-  unit_ = -1;
   idle_ = true;
 }
 
@@ -80,7 +79,6 @@ inline MatchEngineUnit() {
   assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
-  unit_ = unit;
 }
 
  inline bool empty() {
@@ -150,7 +148,7 @@ inline MATCH read() {
 
 }
 
- inline void step(bool *table, const VMStubMEMemoryCM<VMSMEType, 3, 3, kNMatchEngines> &stubmem) {
+ inline void step(bool *table, const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 #pragma HLS inline
 
 
@@ -246,8 +244,8 @@ inline MATCH read() {
 
    //Read stub memory and extract data fields
    int stubadd=16*(iphi_+phiPlusSave+8*zbin)+istubtmp;
-   assert(nstubssave==stubmem.getEntries(bx, zbin, iphi_+phiPlusSave));
-   const VMStubMECM<VMSMEType> stubdata=stubmem.read_mem(unit_, bx, stubadd);
+   //assert(nstubssave==stubmem.getEntries(bx, zbin, iphi_+phiPlusSave));
+   const VMStubMECM<VMSMEType> stubdata=stubmem[bx][stubadd];
    auto stubindex=stubdata.getIndex();
    auto stubfinez=stubdata.getFineZ();
    auto stubfinephi=stubdata.getFinePhi();
@@ -287,7 +285,6 @@ inline MATCH read() {
  bool idle_;
  int ivmphi;
  int iphi_;
- int unit_;
  BXType bx;
  NSTUBS istub_=0;
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];

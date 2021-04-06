@@ -88,6 +88,11 @@ class MemoryTemplateBinnedCM{
     }
     return val;
   }
+  
+  const DataType (&getMem(unsigned int icopy) const)[1<<NBIT_BX][1<<NBIT_ADDR] {
+#pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
+    return dataarray_[icopy];
+  }
 
 
   const DataType (&get_mem() const)[NCOPY][1<<NBIT_BX][1<<NBIT_ADDR] {
