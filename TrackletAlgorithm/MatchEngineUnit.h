@@ -245,7 +245,7 @@ inline MATCH read() {
    //Read stub memory and extract data fields
    int stubadd=16*(iphi_+phiPlusSave+8*zbin)+istubtmp;
    //assert(nstubssave==stubmem.getEntries(bx, zbin, iphi_+phiPlusSave));
-   const VMStubMECM<VMSMEType> stubdata=stubmem[bx][stubadd];
+   const VMStubMECM<VMSMEType> stubdata=stubmem[bx&1][stubadd];
    auto stubindex=stubdata.getIndex();
    auto stubfinez=stubdata.getFineZ();
    auto stubfinephi=stubdata.getFinePhi();
