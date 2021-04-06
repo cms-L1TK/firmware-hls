@@ -95,14 +95,14 @@ namespace TC {
 // Functions that are defined in TrackletCalculator_calculate_LXLY.h,
 // TrackletCalculator.cc, and the bottom of this file.
 ////////////////////////////////////////////////////////////////////////////////
-  template<TF::seed Seed>
+  template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion>
   void calculate_LXLY (
-    const typename AllStub<InnerRegion<Seed>()>::ASR r1_input,
-    const typename AllStub<InnerRegion<Seed>()>::ASPHI phi1_input,
-    const typename AllStub<InnerRegion<Seed>()>::ASZ z1_input,
-    const typename AllStub<OuterRegion<Seed>()>::ASR r2_input,
-    const typename AllStub<OuterRegion<Seed>()>::ASPHI phi2_input,
-    const typename AllStub<OuterRegion<Seed>()>::ASZ z2_input,
+    const typename AllStub<InnerRegion>::ASR r1_input,
+    const typename AllStub<InnerRegion>::ASPHI phi1_input,
+    const typename AllStub<InnerRegion>::ASZ z1_input,
+    const typename AllStub<OuterRegion>::ASR r2_input,
+    const typename AllStub<OuterRegion>::ASPHI phi2_input,
+    const typename AllStub<OuterRegion>::ASZ z2_input,
     const Types::rmean r1mean_input,
     const Types::rmean r2mean_input,
     const Types::rmean rproj0_input,
@@ -234,7 +234,7 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
       break;
   }
   TC::Types::zmean zproj[4] = {zmean[TF::D1], zmean[TF::D2], zmean[TF::D3], zmean[TF::D4]};
-  calculate_LXLY<Seed>(
+  calculate_LXLY<Seed, InnerRegion<Seed>(), OuterRegion<Seed>()>(
       innerStub.getR(),
       innerStub.getPhi(),
       innerStub.getZ(),
