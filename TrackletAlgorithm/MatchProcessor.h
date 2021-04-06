@@ -689,7 +689,6 @@ void MatchProcessor(BXType bx,
     ap_uint<3> iphi = 0;
     if (istep == 0) {
       nallproj = 0;
-      //projbufferarray.reset();
     }
 
     //bool projBuffNearFull = projbufferarray.nearFull();
@@ -772,7 +771,7 @@ void MatchProcessor(BXType bx,
       ap_uint<1> newtracklet = lastTrkID != trkindex;
       
       lastTrkID = trkindex;
-
+      
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
 	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, projindex, stubindex, bx_o,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
