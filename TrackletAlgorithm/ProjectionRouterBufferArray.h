@@ -8,6 +8,7 @@ template<int kNBitsBuffer,int AllProjectionType> class ProjectionRouterBufferArr
 public:
   inline ProjectionRouterBuffer<BARREL,AllProjectionType> read() {
 #pragma HLS inline
+#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete dim=0
     return projbuffer_[readptr_++];
   }
 
@@ -17,7 +18,8 @@ public:
   }
 
   inline bool empty() { 
-    return readptr_ == writeptr_;
+    //return readptr_ == writeptr_;
+    return emptyLUT[(readptr_, writeptr_)];
   }
 
   bool nearFull() {
@@ -46,6 +48,7 @@ private:
   ap_uint<kNBitsBuffer> writeptr_ = 0;
   ProjectionRouterBuffer<BARREL,AllProjectionType> projbuffer_[1<<kNBitsBuffer];
   ap_uint<(1 << (2 * kNBitsBuffer))> nearFullLUT = nearFullUnit<kNBitsBuffer>();
+  ap_uint<(1 << (2 * kNBitsBuffer))> emptyLUT = emptyUnit<kNBitsBuffer>();
 
 };
 
