@@ -617,7 +617,8 @@ void MatchProcessor(BXType bx,
     }
   */
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
-#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
+//#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
+#pragma HLS RESOURCE variable=instubdata core=RAM_2P_LUTRAM 
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 //#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
 #pragma HLS dependence variable=istub inter false
@@ -637,7 +638,10 @@ void MatchProcessor(BXType bx,
       nallproj = 0;
     }
 
-    bool projBuffNearFull = projbufferarray.nearFull();
+    //bool projBuffNearFull = projbufferarray.nearFull();
+    bool readptr = projbufferarray.getReadPtr();
+    bool writeptr = projbufferarray.getWritePtr();
+    bool projBuffNearFull = nearFullUnit<kNBitsBuffer>()[(readptr,writeptr)];
     
     
     ap_uint<kNMatchEngines> idles;
