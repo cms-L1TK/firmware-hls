@@ -14,6 +14,7 @@ public:
 
   inline void addProjection(ProjectionRouterBuffer<BARREL,AllProjectionType> &proj) {
 #pragma HLS inline
+#pragma HLS array_partition variable=projbuffer_ complete
     projbuffer_[writeptr_++] = proj;
   }
 

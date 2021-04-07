@@ -550,7 +550,7 @@ void MatchProcessor(BXType bx,
   
   //Initialize table for bend-rinv consistency
   bool table[kNMatchEngines][(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
-#pragma HLS ARRAY_PARTITION variable=table dim=0
+#pragma HLS ARRAY_PARTITION variable=table complete
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<L>(table[iMEU]); 
@@ -617,8 +617,8 @@ void MatchProcessor(BXType bx,
     }
   */
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
-//#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
-#pragma HLS RESOURCE variable=instubdata core=RAM_2P_LUTRAM 
+#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
+//#pragma HLS RESOURCE variable=instubdata core=RAM_2P_LUTRAM 
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 //#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
 #pragma HLS dependence variable=istub inter false
@@ -641,8 +641,8 @@ void MatchProcessor(BXType bx,
     //bool projBuffNearFull = projbufferarray.nearFull();
     bool readptr = projbufferarray.getReadPtr();
     bool writeptr = projbufferarray.getWritePtr();
+    bool empty = readptr == writeptr;
     bool projBuffNearFull = nearFullUnit<kNBitsBuffer>()[(readptr,writeptr)];
-    
     
     ap_uint<kNMatchEngines> idles;
     bool emptys[kNMatchEngines];
@@ -680,7 +680,6 @@ void MatchProcessor(BXType bx,
       }
     }
     
-    bool empty = projbufferarray.empty();
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff;
     if (idles.or_reduce() && !empty) {
       tmpprojbuff = projbufferarray.read();
@@ -729,7 +728,7 @@ void MatchProcessor(BXType bx,
 
       // read inputs
       TrackletProjection<PROJTYPE> projdata;
-      TrackletProjectionMemory<PROJTYPE> tproj;
+      //TrackletProjectionMemory<PROJTYPE> tproj;
       bool validin = read_input_mems<TrackletProjection<PROJTYPE>,
 	TrackletProjectionMemory<PROJTYPE>,
 	nINMEM, kNBits_MemAddr+1>
