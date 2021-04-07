@@ -155,7 +155,7 @@ inline MATCH read() {
    if(idle_||nearFull()) return;
    
    // vmproj index
-   typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
+   //typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
    
    // Buffer still has projections to read out
    //If the buffer is not empty we have a projection that we need to 
@@ -176,14 +176,14 @@ inline MATCH read() {
      //auto nstub = qdata.getNStubs();
      //nstubs=qdata.getNStubs();
      VMProjection<BARREL> data(qdata.getProjection());
-     zbin=qdata.getZBin();
+     zbin=data.getZBin().range(3,1); //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
      
      projindex=data.getIndex();
      auto projfinez=data.getFineZ();
      projfinephi_=data.getFinePhi();
      projrinv=data.getRInv();
      isPSseed=data.getIsPSSeed();
-     auto projzbin=qdata.getZBin();
+     //auto projzbin=qdata.getZBin();
      
      //Calculate fine z position
      if (second_) {
