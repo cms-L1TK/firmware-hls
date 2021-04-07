@@ -639,8 +639,8 @@ void MatchProcessor(BXType bx,
     }
 
     //bool projBuffNearFull = projbufferarray.nearFull();
-    bool readptr = projbufferarray.getReadPtr();
-    bool writeptr = projbufferarray.getWritePtr();
+    auto readptr = projbufferarray.getReadPtr();
+    auto writeptr = projbufferarray.getWritePtr();
     bool empty = readptr == writeptr;
     bool projBuffNearFull = nearFullUnit<kNBitsBuffer>()[(readptr,writeptr)];
     
