@@ -629,8 +629,10 @@ void MatchProcessor(BXType bx,
   ap_uint<17> best_delta_phi;
   typename ProjectionRouterBuffer<BARREL, APTYPE>::TRKID lastTrkID(-1);
 
-  TrackletProjection<PROJTYPE> projdata;
-  bool validin = false;
+  TrackletProjection<PROJTYPE> projdata, projdata_;
+  bool validin = false; 
+  bool validin_ = false; 
+
 
 
 
@@ -729,11 +731,11 @@ void MatchProcessor(BXType bx,
     
 
       
-    if (validin) {
-      auto iphiproj = projdata.getPhi();
-      auto izproj = projdata.getRZ();
-      auto iphider = projdata.getPhiDer();
-      auto trackletid = projdata.getTCID();
+    if (validin_) {
+      auto iphiproj = projdata_.getPhi();
+      auto izproj = projdata_.getRZ();
+      auto iphider = projdata_.getPhiDer();
+      auto trackletid = projdata_.getTCID();
       
       // PS seed
       // top 3 bits of tracklet index indicate the seeding pair
@@ -851,8 +853,8 @@ void MatchProcessor(BXType bx,
       
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
-      AllProjection<APTYPE> allproj(projdata.getTCID(), projdata.getTrackletIndex(), projdata.getPhi(),
-				    projdata.getRZ(), projdata.getPhiDer(), projdata.getRZDer());
+      AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
+				    projdata_.getRZ(), projdata_.getPhiDer(), projdata_.getRZDer());
       
       typename AllProjection<APTYPE>::AProjTCID          proj_tcid = allproj.getTCID();
       typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = allproj.getTrackletIndex();
@@ -868,7 +870,10 @@ void MatchProcessor(BXType bx,
       }
       
     } // end if(validin)
-    
+
+    projdata_ = projdata;
+    validin_ = validin;
+
     if (!projBuffNearFull){
       
       // read inputs
