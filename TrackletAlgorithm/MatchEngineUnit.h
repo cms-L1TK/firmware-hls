@@ -50,6 +50,7 @@ inline MatchEngineUnit() {
   nstubs_ = 0;
   nstubsall_ = 0;
   idle_ = true;
+  good_ = false;
 }
 
 
@@ -151,8 +152,48 @@ inline MATCH read() {
  inline void step(bool *table, const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 #pragma HLS inline
 
+   bool nearfull = nearFull();
 
-   if(idle_||nearFull()) return;
+   if (good__) {
+     auto stubindex=stubdata__.getIndex();
+     auto stubfinez=stubdata__.getFineZ();
+     auto stubfinephi=stubdata__.getFinePhi();
+     auto stubbend=stubdata__.getBend();
+     
+     int phidiff = projfinephi___ - stubfinephi;
+
+     bool passphi =  phidiff < 3 && phidiff > -3;
+
+     //Check if stub z position consistent
+     ap_int<5> idz=stubfinez-projfinezadj__;
+     bool pass;
+     if (isPSseed__) {
+       pass=idz>=-1&&idz<=1;
+     } else {
+       pass=idz>=-5&&idz<=5;
+     }
+
+     auto const index=projrinv__.concat(stubbend);
+     
+     //Check if stub bend and proj rinv consistent
+     if (passphi&&pass&&table[index]) {
+       matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
+     } // if(pass&&table[index])
+   }
+
+   good__ = good_;
+   stubdata__ = stubdata_;
+   projfinephi___ = projfinephi__;
+   projfinezadj__ = projfinezadj_;
+   isPSseed__ = isPSseed_;
+   projrinv__ = projrinv_;
+   projbuffer___ = projbuffer__;
+
+   if(idle_||nearfull) {
+     good_ = false;
+     return;
+   }
+
    
    // vmproj index
    //typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
@@ -245,31 +286,14 @@ inline MATCH read() {
    //Read stub memory and extract data fields
    int stubadd=16*(iphi_+phiPlusSave+8*zbin)+istubtmp;
    //assert(nstubssave==stubmem.getEntries(bx, zbin, iphi_+phiPlusSave));
-   const VMStubMECM<VMSMEType> stubdata=stubmem[bx&1][stubadd];
-   auto stubindex=stubdata.getIndex();
-   auto stubfinez=stubdata.getFineZ();
-   auto stubfinephi=stubdata.getFinePhi();
-   auto stubbend=stubdata.getBend();
+   stubdata_ = stubmem[bx&1][stubadd];
+   projfinephi__ = projfinephi_;
+   projfinezadj_ = projfinezadj;
+   isPSseed_ = isPSseed;
+   projrinv_ = projrinv;
+   projbuffer__ = projbuffer_;
+   good_ =  true;
 
-   int phidiff = projfinephi_ - stubfinephi;
-
-   bool passphi =  phidiff < 3 && phidiff > -3;
-
-   //Check if stub z position consistent
-   ap_int<5> idz=stubfinez-projfinezadj;
-   bool pass;
-   if (isPSseed) {
-     pass=idz>=-1&&idz<=1;
-   } else {
-     pass=idz>=-5&&idz<=5;
-   }
-
-   auto const index=projrinv.concat(stubbend);
-     
-   //Check if stub bend and proj rinv consistent
-   if (passphi&&pass&&table[index]) {
-     matches_[writeindex_++]=(stubindex,projbuffer_.getAllProj());
-   } // if(pass&&table[index])
    
  } // end step
 
@@ -287,6 +311,14 @@ inline MATCH read() {
  int iphi_;
  BXType bx;
  NSTUBS istub_=0;
+ VMStubMECM<VMSMEType> stubdata_, stubdata__; 
+ bool good_, good__;
+ ap_int<5> projfinephi__, projfinephi___;
+ ap_int<5> projfinezadj_, projfinezadj__;
+ bool isPSseed_, isPSseed__;
+ VMProjection<BARREL>::VMPRINV projrinv_, projrinv__;
+ ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___;
+
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_int<5> projfinezadj; //FIXME Need replace 5 with const
  ap_int<5> projfinephi_; //FIXME Need replace 5 with const
