@@ -32,6 +32,14 @@ public:
     return nearFullLUT[(readptr_, writeptr_)];
   }
 
+  ap_uint<kNBitsBuffer> getReadPtr() {
+    return readptr_;
+  }
+
+  ap_uint<kNBitsBuffer> getWritePtr() {
+    return writeptr_;
+  }
+
 
   inline void reset() {
 #pragma HLS inline
