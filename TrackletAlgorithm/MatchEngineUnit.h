@@ -39,7 +39,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize> MATCH;
-  typedef ap_uint<kNBits_MemAddrBinned+2> NSTUBS;
+  typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
 inline MatchEngineUnit() {
@@ -202,10 +202,10 @@ inline MATCH read() {
    //If the buffer is not empty we have a projection that we need to 
    //process. 
 
-   ap_uint<kNBits_MemAddrBinned+2> istubtmp=istub_;
+   NSTUBS istubtmp=istub_;
 
-   ap_uint<1> phiPlusSave = phiPlus_;
-   auto nstubssave = nstubs_;
+   //ap_uint<1> phiPlusSave = phiPlus_;
+   ap_uint<3> iphiSave = iphi_ + phiPlus_;
    auto secondSave = second_;
 
    if (istub_==0) {
@@ -284,8 +284,7 @@ inline MATCH read() {
    }
 
    //Read stub memory and extract data fields
-   int stubadd=16*(iphi_+phiPlusSave+8*zbin)+istubtmp;
-   //assert(nstubssave==stubmem.getEntries(bx, zbin, iphi_+phiPlusSave));
+   ap_uint<10> stubadd=(zbin,iphiSave,istubtmp);
    stubdata_ = stubmem[bx&1][stubadd];
    projfinephi__ = projfinephi_;
    projfinezadj_ = projfinezadj;
@@ -308,7 +307,7 @@ inline MATCH read() {
  ap_int<2> shift_;
  bool idle_;
  int ivmphi;
- int iphi_;
+ ap_uint<3> iphi_;
  BXType bx;
  NSTUBS istub_=0;
  VMStubMECM<VMSMEType> stubdata_, stubdata__; 
