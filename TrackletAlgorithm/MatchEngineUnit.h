@@ -245,42 +245,24 @@ inline MATCH read() {
        }
      }
 
-     
-     //if (nstubs_==1) {
-     if (onlyOneStub[nstubs_]) {
-       istub_=0;
-       if (!stubmask_) {
+   }
+   
+   //Check if last stub, if so, go to next buffer entry 
+   if (istub_+1>=nstubs_){
+     istub_=0;
+     if (!stubmask_) {
        //if (stubmask_==0) {
-         idle_ = true;
-       } else {
-         ap_uint<2> index = __builtin_ctz(stubmask_);
-         stubmask_[index]=0;
-         second_ =  index==1 || index==3; // can be simplified
-         phiPlus_ =  index==2 || index==3; // can be simplified
-         nstubs_ = nstubsall_.range(4*index+3,4*index);
-         assert(nstubs_!=0);
-       }
+       idle_ = true;
      } else {
-       istub_++;
+       ap_uint<2> index = __builtin_ctz(stubmask_);
+       stubmask_[index]=0;
+       second_ =  index[0];
+       phiPlus_ =  index[1];
+       nstubs_ = nstubsall_.range(4*index+3,4*index);
+       assert(nstubs_!=0);
      }
    } else {
-     //Check if last stub, if so, go to next buffer entry 
-     if (istub_+1>=nstubs_){
-       istub_=0;
-       if (!stubmask_) {
-       //if (stubmask_==0) {
-         idle_ = true;
-       } else {
-         ap_uint<2> index = __builtin_ctz(stubmask_);
-         stubmask_[index]=0;
-         second_ =  index==1 || index==3; // can be simplified
-         phiPlus_ =  index==2 || index==3; // can be simplified
-         nstubs_ = nstubsall_.range(4*index+3,4*index);
-         assert(nstubs_!=0);
-       }
-     } else {
-       istub_++;
-     }
+     istub_++;
    }
 
    //Read stub memory and extract data fields
