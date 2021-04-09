@@ -154,6 +154,14 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
         "////////////////////////////////////////////////////////////////////////////////\n"
     )
 
+    nASMemInnerStr = "\nuint8_t NASMemInner(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    nASMemOuterStr = "\nuint8_t NASMemOuter(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    nSPMemStr = "\nuint8_t NSPMem(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    asInnerMaskStr = "\nuint64_t ASInnerMask(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    asOuterMaskStr = "\nuint64_t ASOuterMask(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    tprojMaskBarrelStr = "\nuint32_t TPROJMaskBarrel(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    tprojMaskDiskStr = "\nuint32_t TPROJMaskDisk(const TF::seed Seed, const TF::phiRegion iTC) {\n"
+    elseStr = ""
     # Calculate parameters and print out parameters and top function for each TC.
     for tcName in sorted(asInnerMems.keys()):
         seed = re.sub(r"TC_(....).", r"\1", tcName)
@@ -215,23 +223,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
                 tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
 
         # Print out parameters for this TC.
-        parametersFile.write(
-            ("\n"
-            "// magic numbers for " + tcName + "\n"
-            "template<> constexpr uint64_t ASInnerMask<TF::" + seed + ", TF::" + iTC + ">() {\n"
-            "  return 0x%X;\n"
-            "}\n"
-            "template<> constexpr uint64_t ASOuterMask<TF::" + seed + ", TF::" + iTC + ">() {\n"
-            "  return 0x%X;\n"
-            "}\n"
-            "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TF::" + iTC + ">() {\n"
-            "  return 0x%X;\n"
-            "}\n"
-            "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TF::" + iTC + ">() {\n"
-            "  return 0x%X;\n"
-            "}\n")
-            % (asInnerMask, asOuterMask, tprojMaskBarrel, tprojMaskDisk)
-        )
+        asInnerMaskStr += (
+           "  %sif (Seed == TF::" + seed + " && iTC == TF::" + iTC + ")\n"
+           "    return 0x%X;\n"
+        ) % (elseStr, asInnerMask)
+        asOuterMaskStr += (
+           "  %sif (Seed == TF::" + seed + " && iTC == TF::" + iTC + ")\n"
+           "    return 0x%X;\n"
+        ) % (elseStr, asOuterMask)
+        tprojMaskBarrelStr += (
+           "  %sif (Seed == TF::" + seed + " && iTC == TF::" + iTC + ")\n"
+           "    return 0x%X;\n"
+        ) % (elseStr, tprojMaskBarrel)
+        tprojMaskDiskStr += (
+           "  %sif (Seed == TF::" + seed + " && iTC == TF::" + iTC + ")\n"
+           "    return 0x%X;\n"
+        ) % (elseStr, tprojMaskDisk)
 
         # Print out prototype for top function for this TC.
         topHeaderFile.write(
@@ -280,11 +287,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
             "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
             "\n"
-            "TC_" + seed + iTC + ": TrackletCalculator<\n"
-            "  TF::" + seed + ",\n"
-            "  TF::" + iTC + ",\n"
-            "  " + str(nSPMem) + "\n"
-            " >(\n"
+            "TC_" + seed + iTC + ": TrackletCalculator<InnerRegion<TF::" + seed + ">(), OuterRegion<TF::" + seed + ">()>(\n"
+            "    TF::" + seed + ",\n"
+            "    TF::" + iTC + ", \n"
+            "    " + str(nSPMem) + ",\n"
             "    bx,\n"
             "    innerStubs,\n"
             "    outerStubs,\n"
@@ -298,16 +304,36 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "}\n"
         )
 
+        elseStr = "else "
+
+    nASMemInnerStr += "  return 0;\n}\n"
+    nASMemOuterStr += "  return 0;\n}\n"
+    nSPMemStr += "  return 0;\n}\n"
+    asInnerMaskStr += "  return 0;\n}\n"
+    asOuterMaskStr += "  return 0;\n}\n"
+    tprojMaskBarrelStr += "  return 0;\n}\n"
+    tprojMaskDiskStr += "  return 0;\n}\n"
+
     # Print out endifs and close files.
     parametersFile.write(
+        nASMemInnerStr +
+        nASMemOuterStr +
+        nSPMemStr +
+        asInnerMaskStr +
+        asOuterMaskStr +
+        tprojMaskBarrelStr +
+        tprojMaskDiskStr +
         "\n"
         "#endif\n"
     )
+    parametersFile.close()
     topHeaderFile.write(
         "\n"
         "#endif\n"
     )
+    topHeaderFile.close()
     topFile.write(
         "\n"
         "////////////////////////////////////////////////////////////////////////////////\n"
     )
+    topFile.close()
