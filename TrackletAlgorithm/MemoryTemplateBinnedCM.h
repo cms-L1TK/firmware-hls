@@ -114,7 +114,7 @@ class MemoryTemplateBinnedCM{
 #pragma HLS inline
 
     ap_uint<3> ibin,ireg;    
-    (ibin,ireg)=slot;
+    (ireg,ibin)=slot;
 
     NEntryT nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
 
@@ -166,13 +166,8 @@ class MemoryTemplateBinnedCM{
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
     // Originally: atoi(split(line, ' ').front().c_str()); but that didn't work for disks with 16 bins
 
-    //change order HACK...
-    ap_uint<3> ireg,bin;
-    (ireg,bin)=ap_uint<6>(slot);
-    int newslot=(bin,ireg);
-
     DataType data(datastr.c_str(), base);
-    return write_mem(bx, newslot, data);
+    return write_mem(bx, slot, data);
   }
 
 
