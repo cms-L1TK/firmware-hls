@@ -94,12 +94,18 @@ inline MatchEngineUnit() {
    INDEX writeindexnext2 = writeindex_+1;
    return readindex_==writeindexnext || readindex_==writeindexnext2;
    */
+
    return nearFullLUT[(readindex_,writeindex_)];
  }
 
 inline bool idle() {
 #pragma HLS inline  
   return idle_;
+}
+
+inline bool processing() {
+#pragma HLS inline  
+  return !idle_||good_||good__;
 }
 
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID() {
@@ -111,7 +117,14 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
-  assert(!idle_);
+  assert(!idle_||good_||good__);
+  if (good__) {
+    return projbuffer___.getTCID();
+  }
+  if (good_) {
+    return projbuffer__.getTCID();
+  } 
+  assert(tcid==projbuffer_.getTCID());
   return tcid;
 }
 
@@ -124,7 +137,15 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
-  assert(!idle_);
+  assert(!idle_||good_||good__);
+  if (good__) {
+    AllProjection<AllProjectionType> allproj(projbuffer___.getAllProj());
+    return (projbuffer___.getTCID(), allproj.getTrackletIndex());
+  }
+  if (good_) {
+    AllProjection<AllProjectionType> allproj(projbuffer__.getAllProj());
+    return (projbuffer__.getTCID(), allproj.getTrackletIndex());
+  } 
   AllProjection<AllProjectionType> allproj(projbuffer_.getAllProj());
   return (tcid, allproj.getTrackletIndex());
 }
@@ -309,7 +330,7 @@ inline MATCH read() {
  VMProjection<BARREL>::VMPRINV projrinv;
  VMProjection<BARREL>::VMPID projindex;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
- ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFullUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
+ ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
  bool isSecond[4] = {0, 1, 0, 1};
  bool isPhiPlus[4] = {0, 0, 1, 1};
  ap_uint<1<<(kNBits_MemAddrBinned+2)> onlyOneStub = hasOneStub<kNBits_MemAddrBinned+2>();
