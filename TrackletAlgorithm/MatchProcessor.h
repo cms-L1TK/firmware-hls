@@ -464,6 +464,7 @@ void MatchCalculator(BXType bx,
   }
   
   if(goodmatch) { // Write out only the best match, based on the seeding 
+    //std::cout << "Found match "<<fm_tcid<<" "<<fm_tkid<<std::endl;
     switch (proj_seed) {
     case 0:
       fullmatch[0].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
@@ -651,15 +652,25 @@ void MatchProcessor(BXType bx,
     bool projBuffNearFull = nearFullUnit<kNBitsBuffer>()[(readptr,writeptr)];
     
     ap_uint<kNMatchEngines> idles;
+    ap_uint<kNMatchEngines> processing;
     bool emptys[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
     int bestMEU = -1;
-    int bestnoidleMEU = -1;
+    int bestprocessingMEU = -1;
     
+    //std::cout << "istep="<<istep;
+
   MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
       emptys[iMEU] = matchengine[iMEU].empty();
       idles[iMEU] = matchengine[iMEU].idle();
+      processing[iMEU] = matchengine[iMEU].processing();
+      //std::cout<<"  MEU["<<iMEU<<"] e="<<emptys[iMEU]<<" p="<<processing[iMEU];
+      //if (emptys[iMEU]&&!processing[iMEU]) {
+      //	std::cout << " ----";
+      //} else {
+      //std::cout << " "<<matchengine[iMEU].getTrkID();
+      //}
       if (!emptys[iMEU]) {
         if (bestMEU==-1) {
           bestMEU=iMEU;
@@ -669,23 +680,30 @@ void MatchProcessor(BXType bx,
           } 
         }
       } else {
-        if (!idles[iMEU]) {
-          if (bestnoidleMEU==-1) {
-            bestnoidleMEU = iMEU;
+        if (processing[iMEU]) {
+          if (bestprocessingMEU==-1) {
+            bestprocessingMEU = iMEU;
           } else {
-            if (matchengine[iMEU].getTrkID()<matchengine[bestnoidleMEU].getTrkID()){
-              bestnoidleMEU=iMEU;
+            if (matchengine[iMEU].getTrkID()<matchengine[bestprocessingMEU].getTrkID()){
+              bestprocessingMEU=iMEU;
             } 
           }
         }
       }
     }
-    if (bestMEU!=-1 && bestnoidleMEU!=-1) {
-      if (matchengine[bestnoidleMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
+    if (bestMEU!=-1 && bestprocessingMEU!=-1) {
+      if (matchengine[bestprocessingMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
         bestMEU=-1;
       }
     }
-    
+
+    //std::cout << " bestMEU="<<bestMEU;
+    //if (bestMEU>=0) {
+    //std::cout<<" "<<matchengine[bestMEU].getTrkID()<<std::endl;
+    //} else {
+    //std::cout << std::endl;
+    //}
+
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff;
     if (idles.or_reduce() && !empty) {
       tmpprojbuff = projbufferarray.read();
@@ -703,13 +721,13 @@ void MatchProcessor(BXType bx,
         auto iphi = tmpprojbuff.getPhi();
         meu.init(bx, tmpprojbuff, iphi, iMEU);
       }
-      
+
       meu.step(table[iMEU], instubdata.getMem(iMEU));
-      
+
     } //end MEU loop
     
     if(bestMEU >= 0) {
-      
+
       auto trkindex=matchengine[bestMEU].getTrkID();
       
       typename VMProjection<BARREL>::VMPID projindex;
@@ -722,7 +740,7 @@ void MatchProcessor(BXType bx,
       ap_uint<1> newtracklet = lastTrkID != trkindex;
       
       lastTrkID = trkindex;
-      
+
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
 	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, projindex, stubindex, bx_o,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
