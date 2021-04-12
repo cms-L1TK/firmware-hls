@@ -84,7 +84,8 @@ inline MatchEngineUnit() {
 
  inline bool empty() {
 #pragma HLS inline  
-   return (readindex_==writeindex_);
+   //return (readindex_==writeindex_);
+   return emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
    
  }
  
@@ -181,18 +182,21 @@ inline MATCH read() {
      auto stubfinephi=stubdata__.getFinePhi();
      auto stubbend=stubdata__.getBend();
      
-     int phidiff = projfinephi___ - stubfinephi;
+     //int phidiff = projfinephi___ - stubfinephi;
 
-     bool passphi =  phidiff < 3 && phidiff > -3;
+     //bool passphi =  phidiff < 3 && phidiff > -3;
+     bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
 
      //Check if stub z position consistent
-     ap_int<5> idz=stubfinez-projfinezadj__;
-     bool pass;
+     //ap_int<5> idz=stubfinez-projfinezadj__;
+     bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
+     /*
      if (isPSseed__) {
        pass=idz>=-1&&idz<=1;
      } else {
        pass=idz>=-5&&idz<=5;
      }
+     */
 
      auto const index=projrinv__.concat(stubbend);
      
@@ -210,8 +214,10 @@ inline MATCH read() {
    projrinv__ = projrinv_;
    projbuffer___ = projbuffer__;
 
+   good_ = idle_ ? false : good_;
+   good_ = nearfull ? false : good_;
    if(idle_||nearfull) {
-     good_ = false;
+     //good_ = false;
      return;
    }
 
