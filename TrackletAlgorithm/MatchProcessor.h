@@ -155,7 +155,7 @@ namespace PR
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
   // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 1;
+  constexpr unsigned int LoopItersCut = 7;
 
 } // namesapce PR
 
@@ -652,75 +652,42 @@ void MatchProcessor(BXType bx,
     bool projBuffNearFull = nearFullUnit<kNBitsBuffer>()[(readptr,writeptr)];
     
     ap_uint<kNMatchEngines> idles;
-    ap_uint<kNMatchEngines> processing;
-    bool emptys[kNMatchEngines];
-#pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
-    int bestMEU = -1;
-    int bestprocessingMEU = -1;
-    int bestnoidleMEU = -1;
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID TCID[kNMatchEngines] = {-1};
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noidleTCID[kNMatchEngines] = {-1};
-    
+    ap_uint<kNMatchEngines> emptys;
+    typename ProjectionRouterBuffer<BARREL, ASTYPE>::TRKID trkids[kNMatchEngines];
+#pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
+
+
     //std::cout << "istep="<<istep;
 
     bool anyidle = false;
-  MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-#pragma HLS unroll
-      emptys[iMEU] = matchengine[iMEU].empty();
+
+  MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll      
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
-      processing[iMEU] = matchengine[iMEU].processing();
-      //std::cout<<"  MEU["<<iMEU<<"] e="<<emptys[iMEU]<<" p="<<processing[iMEU];
-      //if (emptys[iMEU]&&!processing[iMEU]) {
-      //	std::cout << " ----";
-      //} else {
-      //std::cout << " "<<matchengine[iMEU].getTrkID();
-      //}
-      TCID[iMEU] = (!emptys[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
-      noidleTCID[iMEU] = (!emptys[iMEU] && !processing[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
-      if (!emptys[iMEU]) {
-        if (bestMEU==-1) {
-          bestMEU=iMEU;
-        } else {
-          if (matchengine[iMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
-            bestMEU=iMEU;
-          } 
-        }
-      } else {
-        if (processing[iMEU]) {
-          if (bestprocessingMEU==-1) {
-            bestprocessingMEU = iMEU;
-          } else {
-            if (matchengine[iMEU].getTrkID()<matchengine[bestprocessingMEU].getTrkID()){
-              bestprocessingMEU=iMEU;
-            } 
-          }
-        }
+      emptys[iMEU] = matchengine[iMEU].empty();
+      trkids[iMEU] = matchengine[iMEU].getTrkID();
+      //std::cout << "iMEU : "<<trkids[iMEU] << " " << emptys[iMEU] << std::endl;
+    }
+   
+    
+    ap_uint<kNMatchEngines> smallest = ~emptys;
+    //std::cout << "init smallest : "<<smallest[0]<<" "<<smallest[1]<<" "<<smallest[2]<<" "<<smallest[3]<<std::endl;
+#pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
+  MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
+#pragma HLS unroll
+  MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
+#pragma HLS unroll
+	smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
+        smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
       }
     }
-    /*
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noidlebestTCID = -1;
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noprocessingbestTCID = -1;
-    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID bestTCID = -1;
-    for(int i = 0; i < kNMatchEngines; ++i) {
-      bestMEU = !emptys[i] && TCID[i] < bestTCID ? i : bestMEU;
-      bestprocessingMEU = emptys[i] && TCID[i] < noprocessingbestTCID ? i : bestprocessingMEU;
-      bestTCID = TCID[i] < bestTCID ? TCID[i] : bestTCID;
-      noidlebestTCID = TCID[i] <= noidlebestTCID ? TCID[i] : noidlebestTCID;
-    }
-    */
-    if (bestMEU!=-1 && bestprocessingMEU!=-1) {
-      if (matchengine[bestprocessingMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
-        bestMEU=-1;
-      }
-    }
+      
+    //std::cout << "smallest : "<<smallest[0]<<" "<<smallest[1]<<" "<<smallest[2]<<" "<<smallest[3]<<std::endl;
+    
+    ap_uint<1> hasMatch = smallest.or_reduce();
+    ap_uint<3> bestiMEU = __builtin_ctz(smallest);
 
-    //std::cout << " bestMEU="<<bestMEU;
-    //if (bestMEU>=0) {
-    //std::cout<<" "<<matchengine[bestMEU].getTrkID()<<std::endl;
-    //} else {
-    //std::cout << std::endl;
-    //}
 
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff;
     if (anyidle && !empty) {
@@ -744,16 +711,16 @@ void MatchProcessor(BXType bx,
 
     } //end MEU loop
     
-    if(bestMEU >= 0) {
+    if(hasMatch) {
 
-      auto trkindex=matchengine[bestMEU].getTrkID();
+      auto trkindex=matchengine[bestiMEU].getTrkID();
       
       typename VMProjection<BARREL>::VMPID projindex;
       
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allproj;
       
-      (stubindex,allproj) = matchengine[bestMEU].read();
+      (stubindex,allproj) = matchengine[bestiMEU].read();
       
       ap_uint<1> newtracklet = lastTrkID != trkindex;
       
