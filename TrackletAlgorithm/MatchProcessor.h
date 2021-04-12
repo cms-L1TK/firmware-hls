@@ -736,7 +736,7 @@ void MatchProcessor(BXType bx,
         meu.init(bx, tmpprojbuff, iphi, iMEU);
       }
 
-      meu.step(table[iMEU], instubdata.getMem(iMEU));
+      else meu.step(table[iMEU], instubdata.getMem(iMEU));
 
     } //end MEU loop
     
