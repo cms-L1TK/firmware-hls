@@ -678,7 +678,6 @@ void MatchProcessor(BXType bx,
       //}
       TCID[iMEU] = (!emptys[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
       noidleTCID[iMEU] = (!emptys[iMEU] && !processing[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
-      /*
       if (!emptys[iMEU]) {
         if (bestMEU==-1) {
           bestMEU=iMEU;
@@ -698,15 +697,18 @@ void MatchProcessor(BXType bx,
           }
         }
       }
-      */
     }
+    /*
     typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noidlebestTCID = -1;
+    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noprocessingbestTCID = -1;
     typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID bestTCID = -1;
     for(int i = 0; i < kNMatchEngines; ++i) {
-      bestMEU = TCID[i] < bestTCID ? i : bestMEU;
+      bestMEU = !emptys[i] && TCID[i] < bestTCID ? i : bestMEU;
+      bestprocessingMEU = emptys[i] && TCID[i] < noprocessingbestTCID ? i : bestprocessingMEU;
       bestTCID = TCID[i] < bestTCID ? TCID[i] : bestTCID;
       noidlebestTCID = TCID[i] <= noidlebestTCID ? TCID[i] : noidlebestTCID;
     }
+    */
     if (bestMEU!=-1 && bestprocessingMEU!=-1) {
       if (matchengine[bestprocessingMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
         bestMEU=-1;
