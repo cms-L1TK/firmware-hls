@@ -663,10 +663,12 @@ void MatchProcessor(BXType bx,
     
     //std::cout << "istep="<<istep;
 
+    bool anyidle = false;
   MEU_prefetch: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
       emptys[iMEU] = matchengine[iMEU].empty();
       idles[iMEU] = matchengine[iMEU].idle();
+      anyidle = idles[iMEU] ? true : anyidle;
       processing[iMEU] = matchengine[iMEU].processing();
       //std::cout<<"  MEU["<<iMEU<<"] e="<<emptys[iMEU]<<" p="<<processing[iMEU];
       //if (emptys[iMEU]&&!processing[iMEU]) {
@@ -719,7 +721,7 @@ void MatchProcessor(BXType bx,
     //}
 
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff;
-    if (idles.or_reduce() && !empty) {
+    if (anyidle && !empty) {
       tmpprojbuff = projbufferarray.read();
     }
     
