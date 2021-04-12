@@ -675,7 +675,7 @@ void MatchProcessor(BXType bx,
       //std::cout << " "<<matchengine[iMEU].getTrkID();
       //}
       TCID[iMEU] = (!emptys[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
-      noidleTCID[iMEU] = (!emptys[iMEU] && !idles[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
+      noidleTCID[iMEU] = (!emptys[iMEU] && !processing[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
       /*
       if (!emptys[iMEU]) {
         if (bestMEU==-1) {
