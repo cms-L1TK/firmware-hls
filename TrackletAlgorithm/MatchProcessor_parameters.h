@@ -95,14 +95,13 @@ static const ap_uint<1 << 2*nbits> isLessThanSize() {
   ap_uint<1 << 2*nbits> tab(0);
   ap_uint<nbits> Max(max);
   ap_uint<nbits> Min(-max);
-  const int length(proj+stub);
   for(int i = 0; i < 1<<2*nbits; ++i) {
 #pragma HLS unroll
     ap_uint<proj> projphi;
     ap_uint<stub> stubphi;
     ap_uint<proj+stub> address(i);
     (projphi,stubphi) = address;
-    ap_uint<length> result = projphi - stubphi;
+    ap_uint<nbits> result = projphi - stubphi;
     if(lessThan) {
       if(result <= Max || result >= Min) tab[i] = 1;
     }
