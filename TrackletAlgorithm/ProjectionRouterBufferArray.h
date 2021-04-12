@@ -8,7 +8,7 @@ template<int kNBitsBuffer,int AllProjectionType> class ProjectionRouterBufferArr
 public:
   inline ProjectionRouterBuffer<BARREL,AllProjectionType> read() {
 #pragma HLS inline
-#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
     return projbuffer_[readptr_++];
   }
 
