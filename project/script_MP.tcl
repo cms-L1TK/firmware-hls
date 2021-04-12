@@ -18,7 +18,7 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/MP/Tables/
+add_files -tb ../emData/MP/tables/
 add_files -tb ../emData/MP/MP_L3PHIC/
 
 csim_design -compiler gcc -mflags "-j8"
