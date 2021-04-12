@@ -657,6 +657,9 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=emptys complete dim=0
     int bestMEU = -1;
     int bestprocessingMEU = -1;
+    int bestnoidleMEU = -1;
+    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID TCID[kNMatchEngines] = {-1};
+    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noidleTCID[kNMatchEngines] = {-1};
     
     //std::cout << "istep="<<istep;
 
@@ -671,6 +674,9 @@ void MatchProcessor(BXType bx,
       //} else {
       //std::cout << " "<<matchengine[iMEU].getTrkID();
       //}
+      TCID[iMEU] = (!emptys[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
+      noidleTCID[iMEU] = (!emptys[iMEU] && !idles[iMEU]) ? matchengine[iMEU].getTCID() : typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID(-1);
+      /*
       if (!emptys[iMEU]) {
         if (bestMEU==-1) {
           bestMEU=iMEU;
@@ -690,6 +696,14 @@ void MatchProcessor(BXType bx,
           }
         }
       }
+      */
+    }
+    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID noidlebestTCID = -1;
+    typename ProjectionRouterBuffer<BARREL, APTYPE>::TCID bestTCID = -1;
+    for(int i = 0; i < kNMatchEngines; ++i) {
+      bestMEU = TCID[i] < bestTCID ? i : bestMEU;
+      bestTCID = TCID[i] < bestTCID ? TCID[i] : bestTCID;
+      noidlebestTCID = TCID[i] <= noidlebestTCID ? TCID[i] : noidlebestTCID;
     }
     if (bestMEU!=-1 && bestprocessingMEU!=-1) {
       if (matchengine[bestprocessingMEU].getTrkID()<matchengine[bestMEU].getTrkID()){
