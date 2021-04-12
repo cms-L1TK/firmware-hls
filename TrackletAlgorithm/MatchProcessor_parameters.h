@@ -79,6 +79,7 @@ static const ap_uint<1 << nbits> isLessThanSize() {
   ap_uint<nbits> Max(max);
   ap_uint<nbits> Min(-max);
   for(int i = 0; i < 1<<nbits; ++i) {
+#pragma HLS unroll
     if(lessThan) {
       if(i <= Max || i >= Min) tab[i] = 1;
     }
@@ -96,6 +97,7 @@ static const ap_uint<1 << 2*nbits> isLessThanSize() {
   ap_uint<nbits> Min(-max);
   const int length(proj+stub);
   for(int i = 0; i < 1<<2*nbits; ++i) {
+#pragma HLS unroll
     ap_uint<proj> projphi;
     ap_uint<stub> stubphi;
     ap_uint<proj+stub> address(i);
