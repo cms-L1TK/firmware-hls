@@ -138,7 +138,10 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
-  assert(!idle_||good_||good__);
+  if (idle_&&!good_&&!good__) {
+    typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID tmp(0);
+    return ~tmp;
+  }
   if (good__) {
     AllProjection<AllProjectionType> allproj(projbuffer___.getAllProj());
     return (projbuffer___.getTCID(), allproj.getTrackletIndex());
