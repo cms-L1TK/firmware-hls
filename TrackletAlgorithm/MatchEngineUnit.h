@@ -48,7 +48,6 @@ inline MatchEngineUnit() {
   readindex_ = 0;
   stubmask_ = 0;
   nstubs_ = 0;
-  nstubsall_ = 0;
   idle_ = true;
   good_ = false;
 }
@@ -56,18 +55,19 @@ inline MatchEngineUnit() {
 
  inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, int iphi, int unit) {
 #pragma HLS inline
+#pragma HLS array_partition variable=nstubsall_ complete dim=1
   idle_ = false;
   bx = bxin;
   istub_ = 0;
   AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
   projbuffer_ = projbuffer;
   projindex = projbuffer.getIndex();
-  nstubsall_ = projbuffer.getNStubs();
+  (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   shift_ = projbuffer.shift();
-  stubmask_[0] = nstubsall_.range(3,0)!=0;
-  stubmask_[1] = nstubsall_.range(7,4)!=0;
-  stubmask_[2] = nstubsall_.range(11,8)!=0;
-  stubmask_[3] = nstubsall_.range(15,12)!=0;
+  stubmask_[0] = nstubsall_[0]!=0;
+  stubmask_[1] = nstubsall_[1]!=0;
+  stubmask_[2] = nstubsall_[2]!=0;
+  stubmask_[3] = nstubsall_[3]!=0;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   /*
@@ -76,7 +76,7 @@ inline MatchEngineUnit() {
   */
   second_ = isSecond[index];
   phiPlus_ = isPhiPlus[index];
-  nstubs_ = nstubsall_.range(4*index+3,4*index);
+  nstubs_ = nstubsall_[index];
   assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
@@ -176,6 +176,7 @@ inline MATCH read() {
 
  inline void step(bool *table, const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 #pragma HLS inline
+#pragma HLS array_partition variable=nstubsall_ complete dim=1
 
    bool nearfull = nearFull();
 
@@ -288,7 +289,7 @@ inline MATCH read() {
        stubmask_[index]=0;
        second_ =  index[0];
        phiPlus_ =  index[1];
-       nstubs_ = nstubsall_.range(4*index+3,4*index);
+       nstubs_ = nstubsall_[index];
        assert(nstubs_!=0);
      }
    } else {
@@ -311,7 +312,7 @@ inline MATCH read() {
  //protected:
  INDEX writeindex_;
  INDEX readindex_;
- ap_uint<16> nstubsall_;
+ ap_uint<4> nstubsall_[4];
  NSTUBS nstubs_;
  ap_uint<4> stubmask_;
  ap_uint<1> second_;
