@@ -418,15 +418,18 @@ void MatchCalculator(BXType bx,
   
   // Get phi and z difference between the projection and stub
   ap_int<9> delta_z         = stub_z - proj_z_corr;
+  ap_int<9> delta_z_m       = proj_z_corr - stub_z;
   ap_int<13> delta_z_fact   = delta_z * kFact;
+  ap_int<13> delta_z_m_fact = delta_z_m * kFact;
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
   ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   constexpr int shifttmp = kShift_phi0bit - 1 + kPhi0_shift;
   ap_int<18> shiftprojphi   = proj_phi_long << shifttmp; // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
-  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
-  ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
+  ap_int<17> delta_phi_m    = shiftprojphi - shiftstubphi;
+  ap_uint<13> abs_delta_z   = (delta_z_fact>=0)?delta_z_fact:delta_z_m_fact ; // absolute value of delta z
+  ap_uint<17> abs_delta_phi = (delta_phi>=0)?delta_phi:delta_phi_m;    // absolute value of delta phi
   
 
   // Full match parameters
