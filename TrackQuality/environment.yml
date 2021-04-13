@@ -1,0 +1,8 @@
+name: TQ
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - xgboost
+  - joblib

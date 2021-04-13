@@ -110,7 +110,7 @@ TE-quality-check:
 TC-quality-check:
   <<: *template_quality-check
   variables:
-    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_* ../TrackletAlgorithm/TrackletCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TrackletAlgorithm/TrackletCalculatorTop.cc'
 PR-quality-check:
   <<: *template_quality-check
   variables:
