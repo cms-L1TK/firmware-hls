@@ -362,8 +362,8 @@ void MatchCalculator(BXType bx,
   const ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation (defined in constants)
 
   const auto kFact               = (1 <= LAYER <= 3)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456)); // fact_ in emulation defined in MC
-  const auto kPhi0_shift         = (1 <= LAYER <= 3)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
-  const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
+  constexpr int kPhi0_shift         = (1 <= LAYER <= 3)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
+  constexpr int  kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
   const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456;                                           // icorrshift for L456
   const auto kPhi_corr_shift     = (1 <= LAYER <= 3)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
@@ -422,7 +422,8 @@ void MatchCalculator(BXType bx,
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
   ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
-  ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
+  constexpr int shifttmp = kShift_phi0bit - 1 + kPhi0_shift;
+  ap_int<18> shiftprojphi   = proj_phi_long << shifttmp; // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
   ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
   ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
