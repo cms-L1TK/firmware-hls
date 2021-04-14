@@ -165,6 +165,8 @@ for tcName in sorted(asInnerMems.keys()):
     # AS inner and outer masks
     asInnerMask = 0
     asOuterMask = 0
+    asInnerMems[tcName].sort()
+    asOuterMems[tcName].sort()
     for i in range(0, len(spMems[tcName])):
         innerPart = re.sub(r".*_(..PHI.).*_(..PHI.).*", r"\1", spMems[tcName][i])
         outerPart = re.sub(r".*_(..PHI.).*_(..PHI.).*", r"\2", spMems[tcName][i])

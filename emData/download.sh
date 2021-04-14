@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 
-# fw_synch_201005
-#tarball_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
-
 # standard configurations - temporary
-tarball_url="https://www.dropbox.com/s/x6sac8yege91zhq/MemPrintsStandard_200403.tgz?dl=0"
-luts_url="https://www.dropbox.com/s/ihiehx0xpybcrhb/LUTsStandard_200403.tgz?dl=0"
+memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+# Combined modules - temporary
+memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
+
+# fw_synch_201005
+#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
 
 # fw_synch_200515
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
-
-# Combined modules - temporary
-tarball_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
-luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
@@ -142,12 +141,12 @@ then
 fi
 
 # Download and unpack the tarball.
-wget -O MemPrints.tgz --quiet ${tarball_url_cm}
+wget -O MemPrints.tgz --quiet ${memprints_url_cm}
 tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsCM
 rm -f MemPrints.tgz
 
-wget -O MemPrints.tar.gz --quiet ${tarball_url}
+wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
 
@@ -160,70 +159,57 @@ unset LD_LIBRARY_PATH
 for module in ${processing_modules[@]}
 do
   echo ${module}
-  cm="false"
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
+  memprint_location="MemPrints"
+  table_location="LUTs"
   if [[ ${module_type} == "TP" ]]
   then
-      cm="true"
+    memprint_location="MemPrintsCM"
+    table_location="LUTsCM"
   fi
+  wires="${table_location}/wires.dat"
 
   target_dir=${module_type}/${module}
 
   rm -rf ${target_dir}
   mkdir -p ${target_dir}
 
-  if [[ ${cm} == "true" ]]
-  then
-      for mem in `grep "${module}\." LUTsCM/wires.dat | awk '{print $1}' | sort -u`;
-      do
-	  find MemPrintsCM/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-      done
-  else 
-      for mem in `grep "${module}\." LUTs/wires.dat | awk '{print $1}' | sort -u`;
-      do
-	  find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-      done
-  fi
+  for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+  do
+    find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+  done
 
   # Table linking logic specific to each module type
-  table_location="LUTs/"
-  ln -sf ${table_location}wires.dat wires_hourglass.dat
-  if [[ ${cm} == "true" ]]
-  then
-      table_location="LUTsCM/"
-      ln -sf ${table_location}wires.dat wires_hourglassCombinedModules.dat
-  fi
-
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
-      mkdir -p ${table_target_dir}
+          mkdir -p ${table_target_dir}
   fi
 
   if [[ ${module_type} == "TC" ]]
   then
-      layer_pair=`echo ${module} | sed "s/\(.*\)./\1/g"`
-      find ${table_location} -type f -name "${layer_pair}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer_pair=`echo ${module} | sed "s/\(.*\)./\1/g"`
+          find ${table_location} -type f -name "${layer_pair}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "ME" ]]
   then
-      layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
-      find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then
-      layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
-      find ${table_location} -type f -name "TP_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "TP_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
-      find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "VMR" ]]
   then
-      layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
-      find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      for mem in `grep "${module}\." LUTs/wires.dat | awk '{print $1}' | sort -u`;
-      do
-          find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      done
+          layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+          do
+            find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          done
   fi
 done
