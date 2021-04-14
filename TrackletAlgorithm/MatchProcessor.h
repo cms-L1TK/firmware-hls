@@ -126,6 +126,7 @@ namespace PR
     
   } // read_input_mems
 
+
   /////////////////////////////////////////////////////
   // FIXME
   // Move the following to Constants.hh?
@@ -156,6 +157,37 @@ namespace PR
   // stays synchronized with other functions in the chain. Once we get these
   // functions to rewind correctly, this can be set to zero (or simply removed)
   constexpr unsigned int LoopItersCut = 7;
+
+  inline void zbinLUTinit(ap_uint<2*MEBinsBits> zbinLUT[128], int zbins_adjust_PSseed, int zbins_adjust_2Sseed){
+
+    for(unsigned int ibin=0; ibin<128; ibin++) {
+
+      ap_uint<7> bin(ibin);
+
+      ap_uint<1> psseed;
+      ap_int<6> zbin6;
+
+      (psseed,zbin6) =  bin;
+
+      int zbins_adjust = psseed ? zbins_adjust_PSseed : zbins_adjust_2Sseed;
+      ap_uint<6> zbinpos6 = (1<<(zbin6.length()-1))+zbin6;
+
+      // Lower Bound
+      auto zbinlower = zbinpos6<zbins_adjust ?
+	ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
+	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6-zbins_adjust);
+      // Upper Bound
+      auto zbinupper = zbinpos6>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
+	ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
+	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6+zbins_adjust);
+      
+      ap_uint<MEBinsBits> zbin1 = zbinlower >> zbins_nbitsextra;
+      ap_uint<MEBinsBits> zbin2 = zbinupper >> zbins_nbitsextra;
+      
+      zbinLUT[ibin] = (zbin1, zbin2);
+    }
+  }
+
 
 } // namesapce PR
 
@@ -638,8 +670,18 @@ void MatchProcessor(BXType bx,
   bool validin = false; 
   bool validin_ = false; 
 
+  static ap_uint<2*MEBinsBits> zbinLUT[128];
+#pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
+  zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
 
-
+  ap_uint<4> nvmstubs[8][8]; 
+#pragma HLS ARRAY_PARTITION variable=nvmstubs complete dim=0
+  
+ nstubsloop: for (unsigned int izbin=0;izbin<8;izbin++) {
+#pragma HLS unroll      
+    (nvmstubs[izbin][7],nvmstubs[izbin][6],nvmstubs[izbin][5],nvmstubs[izbin][4],
+     nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
+  }
 
  PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1 //rewind
@@ -767,30 +809,43 @@ void MatchProcessor(BXType bx,
       // the purpose of these lines is to take the top MEBinsBits (3) bits of zproj and shift it
       // to make it positive, which gives the bin index. But there is a range of possible z values
       // over which we want to look for matched stubs, and there is therefore possibly 2 bins that
-      // we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+2=5)
+      // we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+3=6)
       // bits of zproj, adjust the value up and down by zbins_adjust (2), then truncate the
       // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
       
+      ap_int<6> zbin6 = izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
+
+      //The first and last zbin the projection points to
+      ap_uint<MEBinsBits> zfirst, zlast;
+
+      (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
+
+      typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zfirst, zfirst!=zlast);      
+
+      /*      
       int zbins_adjust = psseed ? zbins_adjust_PSseed : zbins_adjust_2Sseed;
-      auto zbinposfull = (1<<(izproj.length()-1))+izproj;
-      auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
-      
+      ap_uint<6> zbinpos6 = (1<<(zbin6.length()-1))+zbin6;
+
       // Lower Bound
-      auto zbinlower = zbinpos5<zbins_adjust ?
+      auto zbinlower = zbinpos6<zbins_adjust ?
 	ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
-	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5-zbins_adjust);
+	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6-zbins_adjust);
       // Upper Bound
-      auto zbinupper = zbinpos5>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
+      auto zbinupper = zbinpos6>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
 	ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
-	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos5+zbins_adjust);
+	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6+zbins_adjust);
       
       ap_uint<MEBinsBits> zbin1 = zbinlower >> zbins_nbitsextra;
       ap_uint<MEBinsBits> zbin2 = zbinupper >> zbins_nbitsextra;
-      
-      typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zbin1, zbin2!=zbin1);
-      
+
+      std::cout << "zbin1 : "<<zbin1<<" "<<zfirst<<std::endl;
+      std::cout << "zbin2 : "<<zbin2<<" "<<zlast<<std::endl;
+      assert(zbin1==zfirst);
+      assert(zbin2==zlast);
+      */
+
       // VM Projection
-      typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zbin1,ap_uint<3>(0));
+      typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zfirst,ap_uint<3>(0));
       
       //Extracts the rinv of the projection from the phider; recall phider = - rinv/2
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1)) - 1 - iphider.range(iphider.length()-1,iphider.length()-nbits_maxvm);
@@ -833,19 +888,14 @@ void MatchProcessor(BXType bx,
 	ivmMinus--;
       }
       
-      //The first and last zbin the projection points to
-      ap_uint<TEBinsBits> zfirst=zbin.range(3,1);
-      ap_uint<TEBinsBits> zlast=zfirst+zbin.range(0,0);
-      
       ///////////////
       // VMProjection
       static_assert(not DISK, "PR: Layer only for now.");
       
-      //Check if there are stubs in the memory --- FIXME use proper type
-      ap_uint<4> nstubfirstMinus=instubdata.getEntries(bx, zfirst, ivmMinus);
-      ap_uint<4> nstublastMinus=instubdata.getEntries(bx, zlast, ivmMinus);
-      ap_uint<4> nstubfirstPlus=instubdata.getEntries(bx, zfirst, ivmPlus);
-      ap_uint<4> nstublastPlus=instubdata.getEntries(bx, zlast, ivmPlus);
+      ap_uint<4> nstubfirstMinus=nvmstubs[zfirst][ivmMinus];
+      ap_uint<4> nstublastMinus=nvmstubs[zlast][ivmMinus];
+      ap_uint<4> nstubfirstPlus=nvmstubs[zfirst][ivmPlus];
+      ap_uint<4> nstublastPlus=nvmstubs[zlast][ivmPlus];
       
       if (ivmMinus==ivmPlus) {
 	nstubfirstPlus = 0;
@@ -862,7 +912,8 @@ void MatchProcessor(BXType bx,
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getRZ(), projdata_.getPhiDer(), projdata_.getRZDer());
-      
+
+      /*      
       typename AllProjection<APTYPE>::AProjTCID          proj_tcid = allproj.getTCID();
       typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = allproj.getTrackletIndex();
       typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = allproj.getSeed();
@@ -870,7 +921,8 @@ void MatchProcessor(BXType bx,
       typename AllProjection<APTYPE>::AProjRZ            proj_z    = allproj.getRZ();
       typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = allproj.getPhiDer();
       typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = allproj.getRZDer();
-      
+      */
+
       if (nstubs!=0) { 
 	ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
 	projbufferarray.addProjection(projbuffertmp);
