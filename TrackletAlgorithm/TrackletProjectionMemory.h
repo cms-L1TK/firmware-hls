@@ -127,12 +127,13 @@ public:
   // TCID = (seed<<4) + iTC
   // The seed number is assigned as follows:
   //   L1L2 -> 0
-  //   L3L4 -> 1
-  //   L5L6 -> 2
-  //   D1D2 -> 3
-  //   D3D4 -> 4
-  //   D1L1/L1D1 -> 5
-  //   D1L2/L2D1 -> 6
+  //   L2L3 -> 1
+  //   L3L4 -> 2
+  //   L5L6 -> 3
+  //   D1D2 -> 4
+  //   D3D4 -> 5
+  //   D1L1/L1D1 -> 6
+  //   D1L2/L2D1 -> 7
   // The iTC number comes from the letter at the end of the TC name (i.e.,
   // TC_L1L2A and TC_L5L6A have the same iTC number); generally indicates the
   // region of the phi sector being processed:
