@@ -2,7 +2,7 @@
 set cwd [pwd]
 cd ../emData/
 if { [catch { exec ./download.sh } msg] } {
-    puts $msg
+  puts $msg
 }
 cd $cwd
 
