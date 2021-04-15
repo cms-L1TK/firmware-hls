@@ -16,11 +16,7 @@ set_top MatchEngineTop
 add_files ../TrackletAlgorithm/MatchEngine.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "$CFLAGS"
 
-if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
-    open_solution "solution1" -flow_target vivado
-} else {
-    open_solution "solution1"
-}
+open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
@@ -28,18 +24,9 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/ME/
 
-switch -glob -- $exe {
-    *vitis* {
-        #csim_design -mflags "-j8" # FIXME: activate on next synchronization with emulation
-        csynth_design
-        #cosim_design -trace_level all -rtl verilog # FIXME: activate on next synchronization with emulation
-    }
-    default {
-		#csim_design -compiler gcc -mflags "-j8" # FIXME: activate on next synchronization with emulation
-        csynth_design
-		#cosim_design -trace_level all -rtl verilog -verbose # FIXME: activate on next synchronization with emulation
-    }
-}
+#csim_design -mflags "-j8" # FIXME: activate on next synchronization with emulation
+csynth_design
+#cosim_design -trace_level all -rtl verilog # FIXME: activate on next synchronization with emulation
 export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -rtl verilog -format ip_catalog -flow impl

@@ -15,11 +15,7 @@ set_top InputRouterTop
 add_files ../TrackletAlgorithm/InputRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 
-if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
-    open_solution "solution1" -flow_target vivado
-} else {
-    open_solution "solution1"
-}
+open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
@@ -31,14 +27,7 @@ create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
 
 set nProc [exec nproc]
-switch -glob -- $exe {
-    *vitis* {
-        csim_design -mflags "-j$nProc"
-    }
-    default {
-        csim_design -compiler gcc -mflags "-j$nProc"
-    }
-}
+csim_design -mflags "-j$nProc"
 csynth_design 
 # possible options -trace_level all -rtl verilog -verbose 
 cosim_design 

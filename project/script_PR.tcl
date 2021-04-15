@@ -15,11 +15,7 @@ set_top ProjectionRouterTop
 add_files ../TrackletAlgorithm/ProjectionRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "$CFLAGS"
 
-if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
-    open_solution "solution1" -flow_target vivado
-} else {
-    open_solution "solution1"
-}
+open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
@@ -28,14 +24,7 @@ source settings_hls.tcl
 add_files -tb ../emData/PR/PR_L3PHIC/
 #add_files -tb ../emData/PR/PR_L3L4_L1PHI3/
 
-switch -glob -- $exe {
-    *vitis* {
-        csim_design -mflags "-j8"
-    }
-    default {
-        csim_design -compiler gcc -mflags "-j8"
-    }
-}
+csim_design -mflags "-j8"
 csynth_design
 cosim_design 
 export_design -format ip_catalog

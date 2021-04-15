@@ -15,11 +15,7 @@ set_top MatchCalculatorTop
 add_files ../TrackletAlgorithm/MatchCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchCalculator_test.cpp -cflags "$CFLAGS"
 
-if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
-    open_solution "solution1" -flow_target vivado
-} else {
-    open_solution "solution1"
-}
+open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
@@ -27,14 +23,7 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/MC/
 
-switch -glob -- $exe {
-    *vitis* {
-        #csim_design -mflags "-j8" # FIXME: activate when missing values are fixed
-    }
-    default {
-        #csim_design -compiler gcc -mflags "-j8" # FIXME: activate when missing values are fixed
-    }
-}
+#csim_design -mflags "-j8" # FIXME: activate when missing values are fixed
 csynth_design
 #cosim_design # FIXME: activate when missing values are fixed
 export_design -format ip_catalog

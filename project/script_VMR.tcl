@@ -15,11 +15,7 @@ set_top VMRouterTop
 add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "$CFLAGS"
 
-if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
-    open_solution "solution1" -flow_target vivado
-} else {
-    open_solution "solution1"
-}
+open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
@@ -29,14 +25,7 @@ add_files -tb ../emData/VMR/tables/
 add_files -tb ../emData/VMR/VMR_L1PHIE/
 add_files -tb ../emData/wires_hourglass.dat
 
-switch -glob -- $exe {
-    *vitis* {
-        csim_design -mflags "-j8"
-    }
-    default {
-        csim_design -compiler gcc -mflags "-j8"
-    }
-}
+csim_design -mflags "-j8"
 csynth_design
 cosim_design
 export_design -format ip_catalog

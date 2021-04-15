@@ -43,22 +43,11 @@ foreach i $modules_to_test {
 
   # run C-simulation for each module in modules_to_test
   set_top [join [list "TrackletCalculator_" $seed $iTC] ""]
-  if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
-    open_solution [join [list "solution_" $seed $iTC] ""] -flow_target vivado
-  } else {
-    open_solution [join [list "solution_" $seed $iTC] ""]
-  }
+  open_solution [join [list "solution_" $seed $iTC] ""]
+
   # Define FPGA, clock frequency & common HLS settings.
   source settings_hls.tcl
-  switch -glob -- $exe {
-    *vitis* {
-      csim_design -mflags "-j8"
-    }
-    default {
-      csim_design -compiler gcc -mflags "-j8"
-    }
-  }
-  csim_design -compiler gcc -mflags "-j8"
+  csim_design -mflags "-j8"
 
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {

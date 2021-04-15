@@ -114,7 +114,7 @@ TC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-	CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TrackletAlgorithm/TrackletCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TrackletAlgorithm/TrackletCalculatorTop.cc'
 PR-quality-check:
   <<: *template_quality-check
   variables:
@@ -133,6 +133,7 @@ MC-quality-check:
 TB-quality-check:
   <<: *template_quality-check
   variables:
+    VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TrackletAlgorithm/TrackBuilderTop.cc'
 # HLS builds ---------------
 IR-vivado-hls-build:
@@ -187,6 +188,7 @@ MC-vivado-hls-build:
 TB-hls-build:
   <<: *template_hls-build
   variables:
+    EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TB"
 # FW simulation ---------------
