@@ -46,6 +46,51 @@ public:
     kFMITCSize = 4, // lower four bits of TCID
     // Bit size for full FullMatchMemory
     kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
+<<<<<<< HEAD
+=======
+  };
+};
+
+template<>
+class FullMatchBase<BARREL_FOR_MC>
+{
+public:
+  enum BitWidths {
+    // Bit size for FullMatchMemory fields
+    kFMZResSize = 9,
+    kFMPhiResSize = 12,
+    kFMStubRSize = 0, // this field is currently missing in the test-vectors for the MC
+    kFMStubIndexSize = 10,
+    kFMStubPhiIDSize = 3,   // subdivision of StubIndex
+    kFMStubIDSize = 7,      // subdivision of StubIndex
+    kFMTrackletIndexSize = 7,
+    kFMTCIDSize = 7,
+    kFMSeedSize = 3, // upper three bits of TCID
+    kFMITCSize = 4, // lower four bits of TCID
+    // Bit size for full FullMatchMemory
+    kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
+  };
+};
+
+template<>
+class FullMatchBase<DISK_FOR_MC>
+{
+public:
+  enum BitWidths {
+    // Bit size for FullMatchMemory fields
+    kFMZResSize = 7,
+    kFMPhiResSize = 12,
+    kFMStubRSize = 0, // this field is currently missing in the test-vectors for the MC
+    kFMStubIndexSize = 10,
+    kFMStubPhiIDSize = 3,   // subdivision of StubIndex
+    kFMStubIDSize = 7,      // subdivision of StubIndex
+    kFMTrackletIndexSize = 7,
+    kFMTCIDSize = 7,
+    kFMSeedSize = 3, // upper three bits of TCID
+    kFMITCSize = 4, // lower four bits of TCID
+    // Bit size for full FullMatchMemory
+    kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
+>>>>>>> MPrebase
   };
 };
 

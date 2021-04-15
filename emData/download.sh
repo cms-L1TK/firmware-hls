@@ -7,6 +7,14 @@
 # standard configurations - temporary
 tarball_url="https://www.dropbox.com/s/8942mkttj198y90/MemPrintsStandard_210315.tgz?dl=0"
 luts_url="https://www.dropbox.com/s/6ebazqxtb1e0caw/LUTsStandard_210315.tgz?dl=0"
+<<<<<<< HEAD
+=======
+
+# Supplemental test-vectors for development of the PurgeDuplicates module.
+# Generated after PR #70 was merged:
+# https://github.com/cms-L1TK/cmssw/tree/1606921d6c26b13292808ec8198db8c6a400dad0
+pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
+>>>>>>> MPrebase
 
 # fw_synch_200515
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
@@ -27,9 +35,29 @@ declare -a processing_modules=(
   "TE_L1PHIE18_L2PHIC17"
 
   # TrackletCalculator
+  "TC_L1L2A"
+  "TC_L1L2B"
+  "TC_L1L2C"
+  "TC_L1L2D"
   "TC_L1L2E"
+  "TC_L1L2F"
   "TC_L1L2G"
+  "TC_L1L2H"
+  "TC_L1L2I"
+  "TC_L1L2J"
+  "TC_L1L2K"
+  "TC_L1L2L"
+  "TC_L3L4A"
+  "TC_L3L4B"
+  "TC_L3L4C"
+  "TC_L3L4D"
   "TC_L3L4E"
+  "TC_L3L4F"
+  "TC_L3L4G"
+  "TC_L3L4H"
+  "TC_L5L6A"
+  "TC_L5L6B"
+  "TC_L5L6C"
   "TC_L5L6D"
 
   # ProjectionRouter
@@ -137,6 +165,11 @@ rm -f MemPrints.tgz
 wget -O MemPrints.tar.gz --quiet ${tarball_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
+
+# Download and unpack PD.tar.gz
+wget -O PD.tar.gz --quiet ${pd_url}
+tar -xzf PD.tar.gz
+rm -f PD.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165

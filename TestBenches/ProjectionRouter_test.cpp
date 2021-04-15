@@ -128,7 +128,7 @@ int main()
     ProjectionRouterTop(bx, tprojarray, bx_out, allproj, vmprojarray);
 
     // compare the computed outputs with the expected ones
-    bool truncation = true;
+    bool truncation = false;
     // AllProjection
     err += compareMemWithFile<AllProjectionMemory<BARRELPS> >
       (allproj,fout_aproj, ievt, "AllProjection", truncation);

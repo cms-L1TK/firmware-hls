@@ -288,9 +288,10 @@ int main() {
 
     // bx - bunch crossing
     BXType bx = ievt;
+    BXType bx_out;
 
     // Unit Under Test
-    VMRouterTop(bx, inputStub
+    VMRouterTop(bx, bx_out, inputStub
 #if kDISK > 0
         , inputStubDisk2S
 #endif

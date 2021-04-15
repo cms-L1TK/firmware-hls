@@ -8,6 +8,7 @@ void TrackletEngineTop(const BXType bx,
                        const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
                        const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE],
                        const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE],
+                       BXType& bx_o,
                        StubPairMemory& outstubpair);
 
 #endif

@@ -29,7 +29,7 @@ constexpr unsigned kMaxProcOffset(const module::type m) {
          (m == module::TE ? 7 :
          (m == module::TC ? 0 :
          (m == module::PR ? 0 :
-         (m == module::ME ? 7 :
+         (m == module::ME ? 0 :
          (m == module::MC ? 0 :
          (0)))))));
 }
@@ -96,7 +96,7 @@ constexpr unsigned nbitsallstubs[N_LAYER + N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2,
 constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)
 
 // List of regions for memory template parameters
-enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK};
+enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK, BARREL_FOR_MC, DISK_FOR_MC};
 
 namespace TF {
   // List of seeds
@@ -111,5 +111,10 @@ namespace TF {
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
+
+
+// FPGA constants 
+constexpr unsigned kBRAMwidth = 36; 
+constexpr int kNBits_DTC = 39; 
 
 #endif

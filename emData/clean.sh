@@ -12,4 +12,6 @@ fi
 find -mindepth 1 -maxdepth 1 \
   ! -regex "^\.\/download\.sh$" \
   ! -regex "^\.\/clean\.sh$" \
-  -exec rm -rfv {} \;
+  ! -regex "^\.\/generate_[A-Z]*\.py$" \
+    -exec rm -rfv {} \;
+  #! -regex "^\.\/dtclinklayerdisk\.dat$" \
