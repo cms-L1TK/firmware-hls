@@ -46,8 +46,6 @@ public:
     kFMITCSize = 4, // lower four bits of TCID
     // Bit size for full FullMatchMemory
     kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
-<<<<<<< HEAD
-=======
   };
 };
 
@@ -90,7 +88,6 @@ public:
     kFMITCSize = 4, // lower four bits of TCID
     // Bit size for full FullMatchMemory
     kFullMatchSize = kFMTCIDSize + kFMTrackletIndexSize + kFMStubIndexSize + kFMStubRSize + kFMPhiResSize + kFMZResSize
->>>>>>> MPrebase
   };
 };
 

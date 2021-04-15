@@ -7,14 +7,11 @@
 # standard configurations - temporary
 tarball_url="https://www.dropbox.com/s/8942mkttj198y90/MemPrintsStandard_210315.tgz?dl=0"
 luts_url="https://www.dropbox.com/s/6ebazqxtb1e0caw/LUTsStandard_210315.tgz?dl=0"
-<<<<<<< HEAD
-=======
 
 # Supplemental test-vectors for development of the PurgeDuplicates module.
 # Generated after PR #70 was merged:
 # https://github.com/cms-L1TK/cmssw/tree/1606921d6c26b13292808ec8198db8c6a400dad0
 pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
->>>>>>> MPrebase
 
 # fw_synch_200515
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
