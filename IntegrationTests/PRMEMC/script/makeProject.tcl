@@ -26,7 +26,8 @@ add_files -fileset sim_1 [glob ../tb/*.vhd]
 
 # Provide name of top-level HDL (without .vhd extension).
 #set topLevelHDL "SectorProcessor"
-set topLevelHDL "tf_top_full"
+set topLevelHDL "SectorProcessorFull"
+#set topLevelHDL "tf_top_full"
 
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
