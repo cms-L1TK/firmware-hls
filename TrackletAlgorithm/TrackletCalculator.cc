@@ -33,6 +33,105 @@ TC::getIndices(
   done = !set || iSPMem >= NSPMem;
 }
 
+void
+TrackletCalculator(
+    const TF::seed Seed,
+    const TC::itc iTC,
+    const uint8_t NSPMem,
+
+    const BXType bx,
+    const AllStubMemory<BARRELPS> innerStubs[],
+    const AllStubMemory<BARRELPS> outerStubs[],
+    const StubPairMemory stubPairs[],
+    BXType& bx_o,
+    TrackletParameterMemory * const trackletParameters,
+    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
+    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
+    TrackletProjectionMemory<DISK> projout_disk[]
+) {
+  TrackletCalculator_<BARRELPS, BARRELPS>(
+    Seed,
+    iTC,
+    NSPMem,
+
+    bx,
+    innerStubs,
+    outerStubs,
+    stubPairs,
+    bx_o,
+    trackletParameters,
+    projout_barrel_ps,
+    projout_barrel_2s,
+    projout_disk
+  );
+}
+
+void
+TrackletCalculator(
+    const TF::seed Seed,
+    const TC::itc iTC,
+    const uint8_t NSPMem,
+
+    const BXType bx,
+    const AllStubMemory<BARRELPS> innerStubs[],
+    const AllStubMemory<BARREL2S> outerStubs[],
+    const StubPairMemory stubPairs[],
+    BXType& bx_o,
+    TrackletParameterMemory * const trackletParameters,
+    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
+    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
+    TrackletProjectionMemory<DISK> projout_disk[]
+) {
+  TrackletCalculator_<BARRELPS, BARREL2S>(
+    Seed,
+    iTC,
+    NSPMem,
+
+    bx,
+    innerStubs,
+    outerStubs,
+    stubPairs,
+    bx_o,
+    trackletParameters,
+    projout_barrel_ps,
+    projout_barrel_2s,
+    projout_disk
+  );
+}
+
+void
+TrackletCalculator(
+    const TF::seed Seed,
+    const TC::itc iTC,
+    const uint8_t NSPMem,
+
+    const BXType bx,
+    const AllStubMemory<BARREL2S> innerStubs[],
+    const AllStubMemory<BARREL2S> outerStubs[],
+    const StubPairMemory stubPairs[],
+    BXType& bx_o,
+    TrackletParameterMemory * const trackletParameters,
+    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
+    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
+    TrackletProjectionMemory<DISK> projout_disk[]
+) {
+  TrackletCalculator_<BARREL2S, BARREL2S>(
+    Seed,
+    iTC,
+    NSPMem,
+
+    bx,
+    innerStubs,
+    outerStubs,
+    stubPairs,
+    bx_o,
+    trackletParameters,
+    projout_barrel_ps,
+    projout_barrel_2s,
+    projout_disk
+  );
+}
+
 // This file contains numbers of memories and bit masks that are specific to
 // each TrackletCalculator and that come directly from the wiring.
 //
