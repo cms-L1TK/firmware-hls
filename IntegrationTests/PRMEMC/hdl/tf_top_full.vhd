@@ -37,7 +37,7 @@ entity tf_top_full is
     -- VMStubsME input
     VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : in t_arr8_1b;
     VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : in t_arr8_10b;
-    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_13b;
+    VMSME_L3PHIC17to24n1_dataarray_data_V_din       : in t_arr8_16b;
     -- AllStubs input
     AS_L3PHICn4_dataarray_data_V_wea       : in std_logic;
     AS_L3PHICn4_dataarray_data_V_writeaddr : in std_logic_vector(9 downto 0);
@@ -45,7 +45,7 @@ entity tf_top_full is
     -- VMProjection output
     VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : inout t_arr8_1b;           --! Intermediate memory port for debug; DO NOT CONNECT IN FINAL DESIGN
     VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : inout t_arr8_8b;           --! Intermediate memory port for debug; DO NOT CONNECT IN FINAL DESIGN
-    VMPROJ_L3PHIC17to24_dataarray_data_V_din       : inout t_arr8_21b;          --! Intermediate memory port for debug; DO NOT CONNECT IN FINAL DESIGN
+    VMPROJ_L3PHIC17to24_dataarray_data_V_din       : inout t_arr8_24b;          --! Intermediate memory port for debug; DO NOT CONNECT IN FINAL DESIGN
     -- AllProjection output
     AP_L3PHIC_dataarray_data_V_wea       : inout std_logic;                     --! Intermediate memory port for debug; DO NOT CONNECT IN FINAL DESIGN
     AP_L3PHIC_dataarray_data_V_writeaddr : inout std_logic_vector(9 downto 0);  --! Intermediate memory port for debug; DO NOT CONNECT IN FINAL DESIGN
@@ -65,11 +65,11 @@ entity tf_top_full is
     -- FullMatches output
     FM_L1L2_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L1L2_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
-    FM_L1L2_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
+    FM_L1L2_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(51 downto 0);
     FM_L1L2_L3PHIC_nentries_V_dout : out t_arr2_7b;
     FM_L5L6_L3PHIC_dataarray_data_V_enb      : in std_logic;
     FM_L5L6_L3PHIC_dataarray_data_V_readaddr : in std_logic_vector(7 downto 0);
-    FM_L5L6_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(44 downto 0);
+    FM_L5L6_L3PHIC_dataarray_data_V_dout     : out std_logic_vector(51 downto 0);
     FM_L5L6_L3PHIC_nentries_V_dout : out t_arr2_7b;
     -- MatchCalculator output
     MC_bx_out     : out std_logic_vector(2 downto 0);
@@ -91,13 +91,13 @@ architecture rtl of tf_top_full is
   -- connecting VMProjections memories to MatchEngine input
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_enb      : t_arr8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_readaddr : t_arr8_8b;
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_21b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_dout     : t_arr8_24b;
   signal VMPROJ_L3PHIC17to24_nentries_V_dout           : t_arr8_2_7b;
 
   -- connecting VMStubME memories to MatchEngine input
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_enb      : t_arr8_1b;
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_readaddr : t_arr8_10b;
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_13b;
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_dout     : t_arr8_16b;
   signal VMSME_L3PHIC17to24n1_nentries_V_dout           : t_arr8_8_8_5b := (others => (others => (others => (others => '0')))); -- (#mem, #page, #bin); set MSbit to zero
 
   -- MatchEngine signals
@@ -132,10 +132,10 @@ architecture rtl of tf_top_full is
   -- connecting MatchCalculator output to FullMatches memories
   signal FM_L1L2_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal FM_L1L2_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
-  signal FM_L1L2_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
+  signal FM_L1L2_L3PHIC_dataarray_data_V_din       : std_logic_vector(51 downto 0);
   signal FM_L5L6_L3PHIC_dataarray_data_V_wea       : std_logic;
   signal FM_L5L6_L3PHIC_dataarray_data_V_writeaddr : std_logic_vector(7 downto 0);
-  signal FM_L5L6_L3PHIC_dataarray_data_V_din       : std_logic_vector(44 downto 0);
+  signal FM_L5L6_L3PHIC_dataarray_data_V_din       : std_logic_vector(51 downto 0);
 
 begin
 
