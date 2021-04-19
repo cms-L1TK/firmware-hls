@@ -208,6 +208,10 @@ topPRMEMC-sim:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
+  dependencies:
+    - PR-vivado-hls-build
+    - ME-vivado-hls-build
+    - MC-vivado-hls-build
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
@@ -215,9 +219,20 @@ topPRMEMC-check-results:
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
     PROJ_NAME: "PRMEMC"
+  dependencies:
+    - PR-vivado-hls-build
+    - ME-vivado-hls-build
+    - MC-vivado-hls-build
+    - topPRMEMC-sim
 # FW synthesis ---------------
 topPRMEMC-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
+  dependencies:
+    - PR-vivado-hls-build
+    - ME-vivado-hls-build
+    - MC-vivado-hls-build
+    - topPRMEMC-sim
+    - topPRMEMC-check-results
