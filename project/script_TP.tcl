@@ -3,6 +3,9 @@
 #   vivado_hls -p trackletProcessor
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset trackletProcessor
 
