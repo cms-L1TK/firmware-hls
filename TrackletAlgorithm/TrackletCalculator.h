@@ -103,6 +103,9 @@ namespace TC {
   template<regionType InnerRegion, regionType OuterRegion>
   void calculate_LXLY (
     const TF::seed Seed, 
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
+
     const typename AllStub<InnerRegion>::ASR r1_input,
     const typename AllStub<InnerRegion>::ASPHI phi1_input,
     const typename AllStub<InnerRegion>::ASZ z1_input,
@@ -146,7 +149,7 @@ namespace TC {
     Types::der_rD * const der_rD_output
   );
 
-  template<regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const TF::seed Seed, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
+  template<regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const TF::seed Seed, const ap_int<18> LUT_drinv[], const ap_int<18> LUT_invt[], const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
   const TrackletProjection<BARRELPS>::TProjTCID ID(const TF::seed Seed, const TF::phiRegion iTC);
 
@@ -167,6 +170,8 @@ namespace TC {
       const TF::seed Seed,
       const uint32_t TPROJMaskBarrel,
       const uint32_t TPROJMaskDisk,
+      const ap_int<18> LUT_drinv[],
+      const ap_int<18> LUT_invt[],
 
       const BXType bx,
       const StubPair::SPInnerIndex innerIndex,
@@ -196,6 +201,8 @@ TrackletCalculator_(
     const TF::seed Seed,
     const TF::phiRegion iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<InnerRegion> innerStubs[],
@@ -213,6 +220,8 @@ TrackletCalculator(
     const TF::seed Seed,
     const TC::itc iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[],
@@ -230,6 +239,8 @@ TrackletCalculator(
     const TF::seed Seed,
     const TC::itc iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[],
@@ -247,6 +258,8 @@ TrackletCalculator(
     const TF::seed Seed,
     const TC::itc iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<BARREL2S> innerStubs[],
@@ -266,7 +279,7 @@ TrackletCalculator(
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
 template<regionType InnerRegion, regionType OuterRegion> bool
-TC::barrelSeeding(const TF::seed Seed, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
+TC::barrelSeeding(const TF::seed Seed, const ap_int<18> LUT_drinv[], const ap_int<18> LUT_invt[], const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
 {
   TC::Types::rmean r1mean, r2mean, rproj[4];
   switch (Seed) {
@@ -308,6 +321,9 @@ TC::barrelSeeding(const TF::seed Seed, const AllStub<InnerRegion> &innerStub, co
   TC::Types::zmean zproj[4] = {zmean[TF::D1], zmean[TF::D2], zmean[TF::D3], zmean[TF::D4]};
   calculate_LXLY<InnerRegion, OuterRegion>(
       Seed,
+      LUT_drinv,
+      LUT_invt,
+
       innerStub.getR(),
       innerStub.getPhi(),
       innerStub.getZ(),
@@ -451,6 +467,8 @@ TC::processStubPair(
     const TF::seed Seed,
     const uint32_t TPROJMaskBarrel,
     const uint32_t TPROJMaskDisk,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const StubPair::SPInnerIndex innerIndex,
@@ -486,7 +504,7 @@ TC::processStubPair(
   bool success;
 
 // Calculate the tracklet parameters and projections.
-  success = TC::barrelSeeding<InnerRegion, OuterRegion>(Seed, innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
+  success = TC::barrelSeeding<InnerRegion, OuterRegion>(Seed, LUT_drinv, LUT_invt, innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
 
 // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(innerIndex, outerIndex, rinv, phi0, z0, t);
@@ -580,6 +598,8 @@ TrackletCalculator_(
     const TF::seed Seed,
     const TF::phiRegion iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<InnerRegion> innerStubs[],
@@ -641,7 +661,7 @@ TrackletCalculator_(
       const AllStub<InnerRegion> &innerStub = innerStubs[(ASInnerMask(Seed, iTC) & iSPMemMask) >> maskShift].read_mem(bx, innerIndex);
       const AllStub<OuterRegion> &outerStub = outerStubs[(ASOuterMask(Seed, iTC) & iSPMemMask) >> maskShift].read_mem(bx, outerIndex);
 
-      TC::processStubPair<InnerRegion, OuterRegion>(Seed, TPROJMaskBarrel(Seed, iTC), TPROJMaskDisk(Seed, iTC), bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
+      TC::processStubPair<InnerRegion, OuterRegion>(Seed, TPROJMaskBarrel(Seed, iTC), TPROJMaskDisk(Seed, iTC), LUT_drinv, LUT_invt, bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
   }
 

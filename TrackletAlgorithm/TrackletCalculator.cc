@@ -6,6 +6,7 @@ TC::ID(const TF::seed Seed, const TC::itc iTC)
 {
   return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC);
 }
+
 // Determine the correct stub-pair memory and stub-pair index given the global
 // index initially stored in iSP.
 void
@@ -38,6 +39,8 @@ TrackletCalculator(
     const TF::seed Seed,
     const TC::itc iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[],
@@ -53,6 +56,8 @@ TrackletCalculator(
     Seed,
     iTC,
     NSPMem,
+    LUT_drinv,
+    LUT_invt,
 
     bx,
     innerStubs,
@@ -71,6 +76,8 @@ TrackletCalculator(
     const TF::seed Seed,
     const TC::itc iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<BARRELPS> innerStubs[],
@@ -86,6 +93,8 @@ TrackletCalculator(
     Seed,
     iTC,
     NSPMem,
+    LUT_drinv,
+    LUT_invt,
 
     bx,
     innerStubs,
@@ -104,6 +113,8 @@ TrackletCalculator(
     const TF::seed Seed,
     const TC::itc iTC,
     const uint8_t NSPMem,
+    const ap_int<18> LUT_drinv[],
+    const ap_int<18> LUT_invt[],
 
     const BXType bx,
     const AllStubMemory<BARREL2S> innerStubs[],
@@ -119,6 +130,8 @@ TrackletCalculator(
     Seed,
     iTC,
     NSPMem,
+    LUT_drinv,
+    LUT_invt,
 
     bx,
     innerStubs,
