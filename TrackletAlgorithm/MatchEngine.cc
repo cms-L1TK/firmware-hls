@@ -92,7 +92,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 		// The buffer is not empty when current write index and read index are different
 		// With this you have to assume the buffer will never be absolutely full
 		bool bufferNotEmpty = head_writeindex != tail_readindex;
-		
+
 		// If we have more projections and the buffer is not full we read
 		// next projection and put in buffer if there are stubs in the 
 		// memory the to which the projection points
