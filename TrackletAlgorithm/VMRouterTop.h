@@ -44,7 +44,7 @@ constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. C
 // Variables that don't need manual changing
 
 #if kLAYER == kDISK
-#error kLAYER and kDISK can not be the sam
+#error kLAYER and kDISK cannot be the same
 #elif kLAYER > 0
 	// Number of VMs
 	constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
