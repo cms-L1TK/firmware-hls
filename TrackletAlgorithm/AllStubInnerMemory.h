@@ -4,7 +4,7 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 
-// AllStubBase is where we define the bit widths, which depend on the class template parameter
+// AllStubInnerBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubInnerBase {};
 
 template<>
@@ -94,7 +94,7 @@ class AllStubInner : public AllStubInnerBase<ASType>
 {
 public:
   enum BitLocations {
-    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubMemory word for different fields
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubInnerMemory word for different fields
     kASFinePhiLSB = 0,
     kASFinePhiMSB = kASFinePhiLSB + AllStubInnerBase<ASType>::kASFinePhiSize - 1,
     kASIndexLSB = kASFinePhiMSB +1,
@@ -229,7 +229,7 @@ private:
 
 // Special data object definition
 template<>
-class AllStubInner<6> : public AllStubInnerBase<DISK> // Can't generate cosim files if AllStub<DISK> for some reason...
+class AllStubInner<6> : public AllStubInnerBase<DISK> // Can't generate cosim files if AllStubInner<DISK> for some reason...
 {
   static_assert(DISK == 6, "DISK is assumed to be 6 in this class specialization.");
 public:

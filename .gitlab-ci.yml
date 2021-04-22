@@ -208,7 +208,7 @@ topPRMEMC-sim:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
-  dependencies:
+  dependencies: # needed to avoid interference from ME-vitis-hls-build
     - PR-vivado-hls-build
     - ME-vivado-hls-build
     - MC-vivado-hls-build
