@@ -34,7 +34,7 @@ architecture behavioral of tf_lut is
       hread(data_fileLine, ROM(I));
     end loop;
     return ROM;
-  end initRomFromFile;
+  end function;
   signal rom : romType := initRomFromFile;
 
   attribute syn_rom_style : string;
