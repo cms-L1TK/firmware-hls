@@ -1,3 +1,4 @@
+
 --==========================================================================
 -- CU Boulder
 -------------------------------------------------------------------------------
@@ -30,8 +31,7 @@ use unisim.vcomponents.all;
 
 --! User packages
 use work.tf_pkg.all;
-
-
+use work.memUtil_pkg.all;
 
 --! @brief TB
 entity tb_tf_top is
@@ -52,12 +52,19 @@ architecture behavior of tb_tf_top is
 
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
-  constant N_ME_IN_CHAIN     : integer := 8; --! Number of match engines in chain
-  constant INST_TOP_TF       : integer := 1;          --! Instantiate top_tf or others
-                                                      --! 0: Generated SectorProcessor chain
-                                                      --! 1: top_tf_full (intermediate MemPrints)
+  constant N_ME_IN_CHAIN : integer := 8; --! Number of match engines in chain
+
+  --=========================================================================
+  -- Specify version of chain to run from TB:
+  --    0 = SectorProcessor.vhd from python script.
+  --    1 = SectorProcessorFull.vhd from python script (gives intermediate MemPrints).
+  --    2 = top_tf_full.vhd hand-written code (gives intermediate MemPrints)
+  --    N.B. Change this also in makeProject.tcl !
+  constant INST_TOP_TF   : integer := 1; 
+  --=========================================================================
+
   constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
-  constant DEBUG             : boolean := true;       --! Debug off/on
+  constant DEBUG             : boolean := false;      --! Debug off/on
   constant VMSME_DELAY       : integer := 1-1;        --! Number of BX delays (can be written early 8 pages)
   constant AS_DELAY          : integer := 2-1;        --! Number of BX delays (can be written early 8 pages)
   constant MEM_READ_DELAY    : integer := 2;          --! Number of memory read delay
@@ -108,6 +115,7 @@ architecture behavior of tb_tf_top is
   signal PR_idle   : std_logic;
   signal PR_ready  : std_logic;
   signal PR_bx_in  : std_logic_vector(2 downto 0) := (others => '0');
+
   -- For TrackletProjections memories
   signal TPROJ_L3PHIC_dataarray_data_V_wea       : t_arr8_1b   := (others => '0');
   signal TPROJ_L3PHIC_dataarray_data_V_writeaddr : t_arr8_8b   := (others => (others => '0'));
@@ -165,19 +173,12 @@ architecture behavior of tb_tf_top is
   signal CM_L3PHIC17to24_dataarray_data_V_writeaddr : t_arr8_8b;
   signal CM_L3PHIC17to24_dataarray_data_V_din       : t_arr8_14b;
 
-
 begin
 
-  -- ########################### Processes ###########################
+  --! @brief Make clock ---------------------------------------
+  clk <= not clk after CLK_PERIOD/2;
 
-  --! @brief Clock process ---------------------------------------
-  CLK_process : process
-  begin
-    clk <= '1';
-    wait for CLK_PERIOD/2;
-    clk <= '0';
-    wait for CLK_PERIOD/2;
-  end process CLK_process;
+  -- ########################### Processes ###########################
 
   --! @brief Read emData process ---------------------------------------
   --! @details Read all emData from files and store it in big memory arrays as
@@ -258,8 +259,11 @@ begin
     variable v_line_in : line; -- Line for debug
   begin
     wait for CLK_PERIOD; -- Let the read process finish
+    wait until rising_edge(clk);
+
     reset <= '0';           -- Reset cycle
     l_BX : for v_bx_cnt in -1 to MAX_EVENTS+10 loop -- -1 (to write the first memories before starting) to 110 (+10 to let later modules and write finish)
+      write(v_line_in, string'("=== Processing event ")); write(v_line_in, integer'(v_bx_cnt)); write(v_line_in, string'(" at SIM time ")); write(v_line_in, NOW); writeline(output, v_line_in);
       bx_cnt         <= v_bx_cnt;       -- Update the signal
       v_page_cnt2_d0 := v_bx_cnt mod 2;          -- mod 2
       v_page_cnt2_d1 := (v_bx_cnt+1) mod 2;      -- mod 2
@@ -269,6 +273,7 @@ begin
       v_bin_cnt      := (others => 0);
       v_VMSME_n_entries_bin_cnt := (others => 0);
       PR_bx_in <= std_logic_vector(to_unsigned(v_bx_cnt, PR_bx_in'length));
+
       l_addr : for addr in 0 to MAX_ENTRIES-1 loop -- 0 to 107
         l_copies : for cp in 0 to N_ME_IN_CHAIN-1 loop -- 0 to 7 -- Unable to assign arrays directly
           v_last_bin := false; -- Default assigment
@@ -295,6 +300,7 @@ begin
                 exit;
               end if;
             end loop l_bin_empty;
+
             if v_bin_cnt(cp)<=N_MEM_BINS-1 then -- Valid bin
               VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(cp) <=                            std_logic_vector(to_unsigned((v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS)), VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(0)'length));
               VMSME_L3PHIC17to24n1_dataarray_data_V_din(cp)       <= VMSME_L3PHIC17to24n1_data_arr(cp)(v_bx_cnt-VMSME_DELAY, (v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS))) (VMSME_L3PHIC17to24n1_dataarray_data_V_din(0)'length-1 downto 0);
@@ -330,11 +336,11 @@ begin
             AS_L3PHICn4_dataarray_data_V_din        <= AS_L3PHICn4_data_arr(v_bx_cnt-AS_DELAY,addr+(PAGE_OFFSET*((v_page_cnt8-AS_DELAY) mod N_MEM_BINS))) (AS_L3PHICn4_dataarray_data_V_din'length-1 downto 0); 
           end if;
         end loop l_copies;
-        wait for CLK_PERIOD; -- Main time control
+	wait until rising_edge(clk); -- Main time control
         --if DEBUG=true then assert (v_bx_cnt>0) report "addr = " & integer'image(addr) & ";   VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(0) = " & integer'image(to_integer(unsigned(VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(0)))) severity note; end if;
       end loop l_addr;
     end loop l_BX;
-    wait for CLK_PERIOD;
+    wait until rising_edge(clk);
   end process playback;
 
 
@@ -361,9 +367,12 @@ begin
     write(v_line, string'("readaddr"), right, 9);  write(v_line, string'("FM_L5L6_L3PHIC_dataarray_data_V_dout"), right, 37);
     write(v_line, string'("MC_done"), right, 9);  write(v_line, string'("MC_bx_out_vld"), right, 14); write(v_line, string'("MC_bx_out"), right, 10);
     writeline (file_out_L5L6, v_line); -- Write line
-    wait until rising_edge(MC_done); -- Wait for first result
+
+    wait until rising_edge(clk) and MC_done = '1'; -- Wait for first result
     l_BX : for v_bx_cnt in 0 to MAX_EVENTS-1 loop -- 0 to 99
-      l_addr : for addr in 0 to MAX_ENTRIES-1+MEM_READ_DELAY loop -- 0 to 109
+      -- FIX: This is buggy. As mem read takes 2 clks, it will lose last 2 samples
+      --      per event.
+      l_addr : for addr in 0 to MAX_ENTRIES-1 loop 
         if (addr <= MAX_ENTRIES-1) then -- w/o MEM_READ_DELAY
           if (v_bx_cnt mod 2)=0 then -- 1. page
             if (addr < (to_integer(unsigned(FM_L1L2_L3PHIC_nentries_V_dout(0))))) then -- Only read number of entries: Switch off in complete read out mode
@@ -391,6 +400,15 @@ begin
         end if;
         FM_L1L2_L3PHIC_dataarray_data_V_readaddr <= std_logic_vector(to_unsigned(addr+(PAGE_OFFSET*(v_bx_cnt mod 2)),FM_L1L2_L3PHIC_dataarray_data_V_readaddr'length));
         FM_L5L6_L3PHIC_dataarray_data_V_readaddr <= std_logic_vector(to_unsigned(addr+(PAGE_OFFSET*(v_bx_cnt mod 2)),FM_L5L6_L3PHIC_dataarray_data_V_readaddr'length));
+
+        v_FM_L1L2_L3PHIC_dataarray_data_V_enb_d :=  v_FM_L1L2_L3PHIC_dataarray_data_V_enb_d(MEM_READ_DELAY-2 downto 0) & FM_L1L2_L3PHIC_dataarray_data_V_enb; -- Required delay
+        v_FM_L5L6_L3PHIC_dataarray_data_V_enb_d :=  v_FM_L5L6_L3PHIC_dataarray_data_V_enb_d(MEM_READ_DELAY-2 downto 0) & FM_L5L6_L3PHIC_dataarray_data_V_enb; -- Required delay
+
+	-- Repeat this multiple times to go through all simulation delta-times.
+        wait for 0 ns; -- Update signals
+        wait for 0 ns; -- Update signals
+        wait for 0 ns; -- Update signals
+        wait for 0 ns; -- Update signals
         wait for 0 ns; -- Update signals
         -- Other writes ---------------------------------------
         if (addr >= MEM_READ_DELAY) then -- Take read dealy into account
@@ -429,10 +447,8 @@ begin
           write(v_line, string'("0x"), right, 9);  hwrite(v_line, MC_bx_out, right, 1);
           writeline (file_out_L5L6, v_line); -- Write line
         end if;
-        v_FM_L1L2_L3PHIC_dataarray_data_V_enb_d :=  v_FM_L1L2_L3PHIC_dataarray_data_V_enb_d(MEM_READ_DELAY-2 downto 0) & FM_L1L2_L3PHIC_dataarray_data_V_enb; -- Required delay
-        v_FM_L5L6_L3PHIC_dataarray_data_V_enb_d :=  v_FM_L5L6_L3PHIC_dataarray_data_V_enb_d(MEM_READ_DELAY-2 downto 0) & FM_L5L6_L3PHIC_dataarray_data_V_enb; -- Required delay
         if (DEBUG=true and v_bx_cnt<=5 and addr<=10) then write(v_line, string'("v_bx_cnt: ")); write(v_line, v_bx_cnt); write(v_line, string'("   FM_L1L2_L3PHIC readaddr: ")); hwrite(v_line, FM_L1L2_L3PHIC_dataarray_data_V_readaddr); write(v_line, string'(", dout: ")); hwrite(v_line, FM_L1L2_L3PHIC_dataarray_data_V_dout); writeline(output, v_line); end if;
-        wait for CLK_PERIOD; -- Main time control
+	wait until rising_edge(clk); -- Main time control
       end loop l_addr;
     end loop l_BX;
     file_close(file_out_L1L2);
@@ -442,7 +458,7 @@ begin
 
   -- ########################### Instantiation ###########################
   -- Instantiate the Unit Under Test (UUT)
-  i_tf_top_full : if INST_TOP_TF = 1 generate
+  i_tf_top_full : if INST_TOP_TF = 2 generate
     uut : entity work.tf_top_full
       port map(
         clk       => clk,
@@ -496,6 +512,127 @@ begin
         MC_bx_out     => MC_bx_out,
         MC_bx_out_vld => MC_bx_out_vld,
         MC_done       => MC_done );
+   end generate i_tf_top_full;
+
+
+  sectorProcFull : if INST_TOP_TF = 1 generate
+
+    -- Signals to interface to new SectorProcessorFull
+    signal ME_bx_out_tmp     : std_logic_vector(2 downto 0);
+    signal ME_bx_out_vld_tmp : std_logic;
+    -- For TrackletProjections memories
+    signal TPROJ_60_mem_A_wea        : t_arr_TPROJ_60_1b   := (others => '0');
+    signal TPROJ_60_mem_AV_writeaddr : t_arr_TPROJ_60_ADDR := (others => (others => '0'));
+    signal TPROJ_60_mem_AV_din       : t_arr_TPROJ_60_DATA := (others => (others => '0'));
+    signal VMSME_13_mem_A_wea        : t_arr_VMSME_13_1b   := (others => '0');
+    signal VMSME_13_mem_AV_writeaddr : t_arr_VMSME_13_ADDR := (others => (others => '0'));
+    signal VMSME_13_mem_AV_din       : t_arr_VMSME_13_DATA := (others => (others => '0'));
+    signal AS_36_mem_A_wea           : t_arr_AS_36_1b      := (others => '0');
+    signal AS_36_mem_AV_writeaddr    : t_arr_AS_36_ADDR    := (others => (others => '0'));
+    signal AS_36_mem_AV_din          : t_arr_AS_36_DATA    := (others => (others => '0'));
+    signal VMPROJ_21_mem_A_wea       : t_arr_VMPROJ_21_1b      := (others => '0');
+    signal VMPROJ_21_mem_AV_writeaddr: t_arr_VMPROJ_21_ADDR    := (others => (others => '0'));
+    signal VMPROJ_21_mem_AV_din      : t_arr_VMPROJ_21_DATA    := (others => (others => '0'));
+    signal CM_14_mem_A_wea           : t_arr_CM_14_1b      := (others => '0');
+    signal CM_14_mem_AV_writeaddr    : t_arr_CM_14_ADDR    := (others => (others => '0'));
+    signal CM_14_mem_AV_din          : t_arr_CM_14_DATA    := (others => (others => '0'));
+    signal AP_60_mem_A_wea           : t_arr_AP_60_1b      := (others => '0');
+    signal AP_60_mem_AV_writeaddr    : t_arr_AP_60_ADDR    := (others => (others => '0'));
+    signal AP_60_mem_AV_din          : t_arr_AP_60_DATA    := (others => (others => '0'));
+    signal FM_45_mem_A_enb           : t_arr_FM_45_1b      := (others => '0');
+    signal FM_45_mem_AV_readaddr     : t_arr_FM_45_ADDR    := (others => (others => '0'));
+    signal FM_45_mem_AV_dout         : t_arr_FM_45_DATA    := (others => (others => '0'));
+    signal FM_45_mem_AAV_dout_nent   : t_arr_FM_45_NENT    := (others => (others => (others => '0')));
+  -- ----------------------------------------------------
+  begin
+
+    -- Copy input/output signals for old SectorProcessor to/from ones for new one.
+
+    CopyArrayFull : for mm in 0 to N_ME_IN_CHAIN-1 generate
+      ME_bx_out(mm)     <= ME_bx_out_tmp;
+      ME_bx_out_vld(mm) <= ME_bx_out_vld_tmp;
+      -- TrackletProjections input
+      TPROJ_60_mem_A_wea(enum_TPROJ_60'val(mm))        <= TPROJ_L3PHIC_dataarray_data_V_wea(mm);
+      TPROJ_60_mem_AV_writeaddr(enum_TPROJ_60'val(mm)) <= TPROJ_L3PHIC_dataarray_data_V_writeaddr(mm);
+      TPROJ_60_mem_AV_din(enum_TPROJ_60'val(mm))       <= TPROJ_L3PHIC_dataarray_data_V_din(mm);
+      -- VMStubME input
+      VMSME_13_mem_A_wea(enum_VMSME_13'val(mm))        <= VMSME_L3PHIC17to24n1_dataarray_data_V_wea(mm);
+      VMSME_13_mem_AV_writeaddr(enum_VMSME_13'val(mm)) <= VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(mm);
+      VMSME_13_mem_AV_din(enum_VMSME_13'val(mm))       <= VMSME_L3PHIC17to24n1_dataarray_data_V_din(mm);
+      -- Debug output
+      VMPROJ_L3PHIC17to24_dataarray_data_V_wea(mm)       <= VMPROJ_21_mem_A_wea(enum_VMPROJ_21'val(mm));
+      VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(mm) <= VMPROJ_21_mem_AV_writeaddr(enum_VMPROJ_21'val(mm));
+      VMPROJ_L3PHIC17to24_dataarray_data_V_din(mm)       <= VMPROJ_21_mem_AV_din(enum_VMPROJ_21'val(mm));
+      CM_L3PHIC17to24_dataarray_data_V_wea(mm)       <= CM_14_mem_A_wea(enum_CM_14'val(mm));
+      CM_L3PHIC17to24_dataarray_data_V_writeaddr(mm) <= CM_14_mem_AV_writeaddr(enum_CM_14'val(mm));
+      CM_L3PHIC17to24_dataarray_data_V_din(mm)       <= CM_14_mem_AV_din(enum_CM_14'val(mm));
+    end generate CopyArrayFull;
+
+    -- AllStubs input
+    AS_36_mem_A_wea(L3PHICn6)        <= AS_L3PHICn4_dataarray_data_V_wea;
+    AS_36_mem_AV_writeaddr(L3PHICn6) <= AS_L3PHICn4_dataarray_data_V_writeaddr;
+    AS_36_mem_AV_din(L3PHICn6)       <= AS_L3PHICn4_dataarray_data_V_din;
+    -- Debug output
+    AP_L3PHIC_dataarray_data_V_wea       <= AP_60_mem_A_wea(L3PHIC);
+    AP_L3PHIC_dataarray_data_V_writeaddr <= AP_60_mem_AV_writeaddr(L3PHIC);
+    AP_L3PHIC_dataarray_data_V_din       <= AP_60_mem_AV_din(L3PHIC);
+    -- FullMatches data output (others input)
+    FM_45_mem_A_enb(L1L2_L3PHIC)         <= FM_L1L2_L3PHIC_dataarray_data_V_enb;
+    FM_45_mem_AV_readaddr(L1L2_L3PHIC)   <= FM_L1L2_L3PHIC_dataarray_data_V_readaddr;
+    FM_L1L2_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L1L2_L3PHIC);
+    FM_L1L2_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L1L2_L3PHIC);
+    FM_45_mem_A_enb(L5L6_L3PHIC)         <= FM_L5L6_L3PHIC_dataarray_data_V_enb;
+    FM_45_mem_AV_readaddr(L5L6_L3PHIC)   <= FM_L5L6_L3PHIC_dataarray_data_V_readaddr;
+    FM_L5L6_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L5L6_L3PHIC);
+    FM_L5L6_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L5L6_L3PHIC);
+
+    uut : entity work.SectorProcessorFull
+      port map(
+        clk                        => clk,
+        reset                      => reset,
+        PR_start                   => PR_start,
+        PR_bx_in                   => PR_bx_in,
+        MC_bx_out                  => MC_bx_out,
+        MC_bx_out_vld              => MC_bx_out_vld,
+        MC_done                    => MC_done,
+	-- Debug control signals
+        PR_bx_out                  => PR_bx_out,
+        PR_bx_out_vld              => PR_bx_out_vld,
+        PR_done                    => PR_done,
+        ME_bx_out                  => ME_bx_out_tmp,
+        ME_bx_out_vld              => ME_bx_out_vld_tmp,
+        ME_done                    => ME_all_done,
+	-- Input data
+	TPROJ_60_mem_A_wea 	   => TPROJ_60_mem_A_wea,
+	TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+	TPROJ_60_mem_AV_din 	   => TPROJ_60_mem_AV_din,
+	VMSME_13_mem_A_wea 	   => VMSME_13_mem_A_wea,
+	VMSME_13_mem_AV_writeaddr  => VMSME_13_mem_AV_writeaddr,
+	VMSME_13_mem_AV_din 	   => VMSME_13_mem_AV_din,
+	AS_36_mem_A_wea 	   => AS_36_mem_A_wea,
+	AS_36_mem_AV_writeaddr 	   => AS_36_mem_AV_writeaddr,
+	AS_36_mem_AV_din 	   => AS_36_mem_AV_din,
+	-- Debug output data
+	VMPROJ_21_mem_A_wea 	   => VMPROJ_21_mem_A_wea,
+	VMPROJ_21_mem_AV_writeaddr => VMPROJ_21_mem_AV_writeaddr,
+	VMPROJ_21_mem_AV_din 	   => VMPROJ_21_mem_AV_din,
+	CM_14_mem_A_wea 	   => CM_14_mem_A_wea,
+	CM_14_mem_AV_writeaddr 	   => CM_14_mem_AV_writeaddr,
+	CM_14_mem_AV_din 	   => CM_14_mem_AV_din,
+	AP_60_mem_A_wea 	   => AP_60_mem_A_wea,
+	AP_60_mem_AV_writeaddr 	   => AP_60_mem_AV_writeaddr,
+	AP_60_mem_AV_din 	   => AP_60_mem_AV_din,
+	-- Output data
+	FM_45_mem_A_enb 	   => FM_45_mem_A_enb,
+	FM_45_mem_AV_readaddr 	   => FM_45_mem_AV_readaddr,
+	FM_45_mem_AV_dout 	   => FM_45_mem_AV_dout,
+	FM_45_mem_AAV_dout_nent    => FM_45_mem_AAV_dout_nent
+      );
+  end generate sectorProcFull;
+
+
+
+  fileOutput : if INST_TOP_TF >= 1 generate
     --! @brief TextIO process for writting the output ---------------------------------------
     --! @details Read additional memory outputs (from intermediate HLS modules in the chain) and
     --!         write it to files using procedures.
@@ -576,78 +713,79 @@ begin
       end loop l_BX;
       wait;
     end process write_result_CM;
-  end generate;
+  end generate fileOutput;
 
-  i_others : if INST_TOP_TF = 0 generate
+  sectorProc : if INST_TOP_TF = 0 generate
+
+    -- Arrays to interface to new SectorProcessor
+    -- For TrackletProjections memories
+    signal TPROJ_60_mem_A_wea        : t_arr_TPROJ_60_1b   := (others => '0');
+    signal TPROJ_60_mem_AV_writeaddr : t_arr_TPROJ_60_ADDR := (others => (others => '0'));
+    signal TPROJ_60_mem_AV_din       : t_arr_TPROJ_60_DATA := (others => (others => '0'));
+    signal VMSME_13_mem_A_wea        : t_arr_VMSME_13_1b   := (others => '0');
+    signal VMSME_13_mem_AV_writeaddr : t_arr_VMSME_13_ADDR := (others => (others => '0'));
+    signal VMSME_13_mem_AV_din       : t_arr_VMSME_13_DATA := (others => (others => '0'));
+    signal AS_36_mem_A_wea           : t_arr_AS_36_1b      := (others => '0');
+    signal AS_36_mem_AV_writeaddr    : t_arr_AS_36_ADDR    := (others => (others => '0'));
+    signal AS_36_mem_AV_din          : t_arr_AS_36_DATA    := (others => (others => '0'));
+    signal FM_45_mem_A_enb           : t_arr_FM_45_1b      := (others => '0');
+    signal FM_45_mem_AV_readaddr     : t_arr_FM_45_ADDR    := (others => (others => '0'));
+    signal FM_45_mem_AV_dout         : t_arr_FM_45_DATA    := (others => (others => '0'));
+    signal FM_45_mem_AAV_dout_nent   : t_arr_FM_45_NENT    := (others => (others => (others => '0')));
+  -- ----------------------------------------------------
+  begin
+
+    -- Copy input/output arrays for old SectorProcessor to/from arrays for new one.
+
+    CopyArray : for mm in 0 to N_ME_IN_CHAIN-1 generate
+      -- TrackletProjections input
+      TPROJ_60_mem_A_wea(enum_TPROJ_60'val(mm))        <= TPROJ_L3PHIC_dataarray_data_V_wea(mm);
+      TPROJ_60_mem_AV_writeaddr(enum_TPROJ_60'val(mm)) <= TPROJ_L3PHIC_dataarray_data_V_writeaddr(mm);
+      TPROJ_60_mem_AV_din(enum_TPROJ_60'val(mm))       <= TPROJ_L3PHIC_dataarray_data_V_din(mm);
+      -- VMStubME input
+      VMSME_13_mem_A_wea(enum_VMSME_13'val(mm))        <= VMSME_L3PHIC17to24n1_dataarray_data_V_wea(mm);
+      VMSME_13_mem_AV_writeaddr(enum_VMSME_13'val(mm)) <= VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(mm);
+      VMSME_13_mem_AV_din(enum_VMSME_13'val(mm))       <= VMSME_L3PHIC17to24n1_dataarray_data_V_din(mm);
+    end generate CopyArray;
+
+    -- AllStubs input
+    AS_36_mem_A_wea(L3PHICn6)        <= AS_L3PHICn4_dataarray_data_V_wea;
+    AS_36_mem_AV_writeaddr(L3PHICn6) <= AS_L3PHICn4_dataarray_data_V_writeaddr;
+    AS_36_mem_AV_din(L3PHICn6)       <= AS_L3PHICn4_dataarray_data_V_din;
+    -- FullMatches data output (others input)
+    FM_45_mem_A_enb(L1L2_L3PHIC)         <= FM_L1L2_L3PHIC_dataarray_data_V_enb;
+    FM_45_mem_AV_readaddr(L1L2_L3PHIC)   <= FM_L1L2_L3PHIC_dataarray_data_V_readaddr;
+    FM_L1L2_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L1L2_L3PHIC);
+    FM_L1L2_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L1L2_L3PHIC);
+    FM_45_mem_A_enb(L5L6_L3PHIC)         <= FM_L5L6_L3PHIC_dataarray_data_V_enb;
+    FM_45_mem_AV_readaddr(L5L6_L3PHIC)   <= FM_L5L6_L3PHIC_dataarray_data_V_readaddr;
+    FM_L5L6_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L5L6_L3PHIC);
+    FM_L5L6_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L5L6_L3PHIC);
+
     uut : entity work.SectorProcessor
       port map(
         clk                        => clk,
         reset                      => reset,
-        ProjectionRouter_start     => PR_start,
-        bx_in_ProjectionRouter     => PR_bx_in,
-        bx_out_MatchCalculator     => MC_bx_out,
-        bx_out_MatchCalculator_vld => MC_bx_out_vld,
-        MatchCalculator_done       => MC_done,
-        TPROJ_L1L2F_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(0),
-        TPROJ_L1L2F_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(0),
-        TPROJ_L1L2F_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(0),
-        TPROJ_L1L2G_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(1),
-        TPROJ_L1L2G_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(1),
-        TPROJ_L1L2G_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(1),
-        TPROJ_L1L2H_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(2),
-        TPROJ_L1L2H_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(2),
-        TPROJ_L1L2H_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(2),
-        TPROJ_L1L2I_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(3),
-        TPROJ_L1L2I_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(3),
-        TPROJ_L1L2I_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(3),
-        TPROJ_L1L2J_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(4),
-        TPROJ_L1L2J_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(4),
-        TPROJ_L1L2J_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(4),
-        TPROJ_L5L6B_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(5),
-        TPROJ_L5L6B_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(5),
-        TPROJ_L5L6B_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(5),
-        TPROJ_L5L6C_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(6),
-        TPROJ_L5L6C_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(6),
-        TPROJ_L5L6C_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(6),
-        TPROJ_L5L6D_L3PHIC_dataarray_data_V_wea       =>           TPROJ_L3PHIC_dataarray_data_V_wea(7),
-        TPROJ_L5L6D_L3PHIC_dataarray_data_V_writeaddr =>     TPROJ_L3PHIC_dataarray_data_V_writeaddr(7),
-        TPROJ_L5L6D_L3PHIC_dataarray_data_V_din       =>           TPROJ_L3PHIC_dataarray_data_V_din(7),
-        VMSME_L3PHIC17n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(0),
-        VMSME_L3PHIC17n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(0),
-        VMSME_L3PHIC17n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(0),
-        VMSME_L3PHIC18n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(1),
-        VMSME_L3PHIC18n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(1),
-        VMSME_L3PHIC18n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(1),
-        VMSME_L3PHIC19n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(2),
-        VMSME_L3PHIC19n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(2),
-        VMSME_L3PHIC19n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(2),
-        VMSME_L3PHIC20n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(3),
-        VMSME_L3PHIC20n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(3),
-        VMSME_L3PHIC20n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(3),
-        VMSME_L3PHIC21n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(4),
-        VMSME_L3PHIC21n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(4),
-        VMSME_L3PHIC21n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(4),
-        VMSME_L3PHIC22n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(5),
-        VMSME_L3PHIC22n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(5),
-        VMSME_L3PHIC22n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(5),
-        VMSME_L3PHIC23n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(6),
-        VMSME_L3PHIC23n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(6),
-        VMSME_L3PHIC23n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(6),
-        VMSME_L3PHIC24n1_dataarray_data_V_wea       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_wea(7),
-        VMSME_L3PHIC24n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(7),
-        VMSME_L3PHIC24n1_dataarray_data_V_din       =>       VMSME_L3PHIC17to24n1_dataarray_data_V_din(7),
-        AS_L3PHICn6_dataarray_data_V_wea       => AS_L3PHICn4_dataarray_data_V_wea,
-        AS_L3PHICn6_dataarray_data_V_writeaddr => AS_L3PHICn4_dataarray_data_V_writeaddr,
-        AS_L3PHICn6_dataarray_data_V_din       => AS_L3PHICn4_dataarray_data_V_din,
-        FM_L1L2_L3PHIC_dataarray_data_V_enb      => FM_L1L2_L3PHIC_dataarray_data_V_enb,
-        FM_L1L2_L3PHIC_dataarray_data_V_readaddr => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
-        FM_L1L2_L3PHIC_dataarray_data_V_dout     => FM_L1L2_L3PHIC_dataarray_data_V_dout,
-        FM_L1L2_L3PHIC_nentries_VV_dout          => FM_L1L2_L3PHIC_nentries_V_dout,
-        FM_L5L6_L3PHIC_dataarray_data_V_enb      => FM_L5L6_L3PHIC_dataarray_data_V_enb,
-        FM_L5L6_L3PHIC_dataarray_data_V_readaddr => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
-        FM_L5L6_L3PHIC_dataarray_data_V_dout     => FM_L5L6_L3PHIC_dataarray_data_V_dout,
-        FM_L5L6_L3PHIC_nentries_VV_dout          => FM_L5L6_L3PHIC_nentries_V_dout   );
-  end generate;
+        PR_start                   => PR_start,
+        PR_bx_in                   => PR_bx_in,
+        MC_bx_out                  => MC_bx_out,
+        MC_bx_out_vld              => MC_bx_out_vld,
+        MC_done                    => MC_done,
+	TPROJ_60_mem_A_wea 	   => TPROJ_60_mem_A_wea,
+	TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+	TPROJ_60_mem_AV_din 	   => TPROJ_60_mem_AV_din,
+	VMSME_13_mem_A_wea 	   => VMSME_13_mem_A_wea,
+	VMSME_13_mem_AV_writeaddr  => VMSME_13_mem_AV_writeaddr,
+	VMSME_13_mem_AV_din 	   => VMSME_13_mem_AV_din,
+	AS_36_mem_A_wea 	   => AS_36_mem_A_wea,
+	AS_36_mem_AV_writeaddr 	   => AS_36_mem_AV_writeaddr,
+	AS_36_mem_AV_din 	   => AS_36_mem_AV_din,
+	FM_45_mem_A_enb 	   => FM_45_mem_A_enb,
+	FM_45_mem_AV_readaddr 	   => FM_45_mem_AV_readaddr,
+	FM_45_mem_AV_dout 	   => FM_45_mem_AV_dout,
+	FM_45_mem_AAV_dout_nent    => FM_45_mem_AAV_dout_nent
+      );
+  end generate sectorProc;
 
 
 end behavior;

@@ -3,6 +3,9 @@
 #   vivado_hls -p matchengine
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset matchengine
 
@@ -21,9 +24,9 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/ME/
 
-#csim_design -compiler gcc -mflags "-j8" # FIXME: activate on next synchronization with emulation
+#csim_design -mflags "-j8" # FIXME: activate on next synchronization with emulation
 csynth_design
-#cosim_design -trace_level all -rtl verilog -verbose # FIXME: activate on next synchronization with emulation
+#cosim_design -trace_level all -rtl verilog # FIXME: activate on next synchronization with emulation
 export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -rtl verilog -format ip_catalog -flow impl

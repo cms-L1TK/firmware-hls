@@ -5,7 +5,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
 
-entity SectorProcessor is
+entity SectorProcessorFull is
   port(
     clk        : in std_logic;
     reset      : in std_logic;
@@ -14,12 +14,27 @@ entity SectorProcessor is
     MC_bx_out : out std_logic_vector(2 downto 0);
     MC_bx_out_vld : out std_logic;
     MC_done   : out std_logic;
+    PR_bx_out : out std_logic_vector(2 downto 0);
+    PR_bx_out_vld : out std_logic;
+    PR_done   : out std_logic;
+    ME_bx_out : out std_logic_vector(2 downto 0);
+    ME_bx_out_vld : out std_logic;
+    ME_done   : out std_logic;
     TPROJ_60_mem_A_wea        : in t_arr_TPROJ_60_1b;
     TPROJ_60_mem_AV_writeaddr : in t_arr_TPROJ_60_ADDR;
     TPROJ_60_mem_AV_din       : in t_arr_TPROJ_60_DATA;
     VMSME_13_mem_A_wea        : in t_arr_VMSME_13_1b;
     VMSME_13_mem_AV_writeaddr : in t_arr_VMSME_13_ADDR;
     VMSME_13_mem_AV_din       : in t_arr_VMSME_13_DATA;
+    VMPROJ_21_mem_A_wea        : out t_arr_VMPROJ_21_1b;
+    VMPROJ_21_mem_AV_writeaddr : out t_arr_VMPROJ_21_ADDR;
+    VMPROJ_21_mem_AV_din       : out t_arr_VMPROJ_21_DATA;
+    CM_14_mem_A_wea        : out t_arr_CM_14_1b;
+    CM_14_mem_AV_writeaddr : out t_arr_CM_14_ADDR;
+    CM_14_mem_AV_din       : out t_arr_CM_14_DATA;
+    AP_60_mem_A_wea        : out t_arr_AP_60_1b;
+    AP_60_mem_AV_writeaddr : out t_arr_AP_60_ADDR;
+    AP_60_mem_AV_din       : out t_arr_AP_60_DATA;
     AS_36_mem_A_wea        : in t_arr_AS_36_1b;
     AS_36_mem_AV_writeaddr : in t_arr_AS_36_ADDR;
     AS_36_mem_AV_din       : in t_arr_AS_36_DATA;
@@ -28,9 +43,9 @@ entity SectorProcessor is
     FM_45_mem_AV_dout        : out t_arr_FM_45_DATA;
     FM_45_mem_AAV_dout_nent  : out t_arr_FM_45_NENT
   );
-end SectorProcessor;
+end SectorProcessorFull;
 
-architecture rtl of SectorProcessor is
+architecture rtl of SectorProcessorFull is
 
   signal TPROJ_60_mem_A_enb          : t_arr_TPROJ_60_1b;
   signal TPROJ_60_mem_AV_readaddr    : t_arr_TPROJ_60_ADDR;
@@ -40,23 +55,14 @@ architecture rtl of SectorProcessor is
   signal VMSME_13_mem_AV_readaddr    : t_arr_VMSME_13_ADDR;
   signal VMSME_13_mem_AV_dout        : t_arr_VMSME_13_DATA;
   signal VMSME_13_mem_AAAV_dout_nent : t_arr_VMSME_13_NENT; -- (#page)(#bin)
-  signal VMPROJ_21_mem_A_wea          : t_arr_VMPROJ_21_1b;
-  signal VMPROJ_21_mem_AV_writeaddr   : t_arr_VMPROJ_21_ADDR;
-  signal VMPROJ_21_mem_AV_din         : t_arr_VMPROJ_21_DATA;
   signal VMPROJ_21_mem_A_enb          : t_arr_VMPROJ_21_1b;
   signal VMPROJ_21_mem_AV_readaddr    : t_arr_VMPROJ_21_ADDR;
   signal VMPROJ_21_mem_AV_dout        : t_arr_VMPROJ_21_DATA;
   signal VMPROJ_21_mem_AAV_dout_nent  : t_arr_VMPROJ_21_NENT; -- (#page)
-  signal CM_14_mem_A_wea          : t_arr_CM_14_1b;
-  signal CM_14_mem_AV_writeaddr   : t_arr_CM_14_ADDR;
-  signal CM_14_mem_AV_din         : t_arr_CM_14_DATA;
   signal CM_14_mem_A_enb          : t_arr_CM_14_1b;
   signal CM_14_mem_AV_readaddr    : t_arr_CM_14_ADDR;
   signal CM_14_mem_AV_dout        : t_arr_CM_14_DATA;
   signal CM_14_mem_AAV_dout_nent  : t_arr_CM_14_NENT; -- (#page)
-  signal AP_60_mem_A_wea          : t_arr_AP_60_1b;
-  signal AP_60_mem_AV_writeaddr   : t_arr_AP_60_ADDR;
-  signal AP_60_mem_AV_din         : t_arr_AP_60_DATA;
   signal AP_60_mem_A_enb          : t_arr_AP_60_1b;
   signal AP_60_mem_AV_readaddr    : t_arr_AP_60_ADDR;
   signal AP_60_mem_AV_dout        : t_arr_AP_60_DATA;
@@ -66,13 +72,7 @@ architecture rtl of SectorProcessor is
   signal FM_45_mem_A_wea          : t_arr_FM_45_1b;
   signal FM_45_mem_AV_writeaddr   : t_arr_FM_45_ADDR;
   signal FM_45_mem_AV_din         : t_arr_FM_45_DATA;
-  signal PR_done : std_logic := '0';
-  signal PR_bx_out : std_logic_vector(2 downto 0);
-  signal PR_bx_out_vld : std_logic;
   signal ME_start : std_logic := '0';
-  signal ME_done : std_logic := '0';
-  signal ME_bx_out : std_logic_vector(2 downto 0);
-  signal ME_bx_out_vld : std_logic;
   signal MC_start : std_logic := '0';
 begin
 
