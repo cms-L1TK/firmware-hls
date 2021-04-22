@@ -3,6 +3,9 @@
 #   vivado_hls -p vmrouter
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset vmrouter
 
@@ -22,7 +25,7 @@ add_files -tb ../emData/VMR/tables/
 add_files -tb ../emData/VMR/VMR_L1PHIE/
 add_files -tb ../emData/wires_hourglass.dat
 
-csim_design -compiler gcc -mflags "-j8"
+csim_design -mflags "-j8"
 csynth_design
 cosim_design
 export_design -format ip_catalog
