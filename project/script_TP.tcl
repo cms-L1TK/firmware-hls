@@ -24,7 +24,7 @@ source settings_hls.tcl
 add_files -tb ../emData/TP/tables/
 add_files -tb ../emData/TP/TP_L1L2D/
 
-csim_design -compiler gcc -mflags "-j8"
+csim_design -mflags "-j8"
 csynth_design
 cosim_design 
 export_design -format ip_catalog
