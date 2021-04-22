@@ -119,7 +119,7 @@ void ProjectionRouter(BXType bx,
       auto iphiproj = tproj.getPhi();
       auto izproj = tproj.getRZ();
       auto iphider = tproj.getPhiDer();
-      auto trackletid = tproj.getTCID();
+      auto iseed = tproj.getSeed();
 
       //////////////////////////
       // hourglass configuration
@@ -139,13 +139,6 @@ void ProjectionRouter(BXType bx,
     
       // vmproj index
       typename VMProjection<VMPTYPE>::VMPID index = nallproj;
-
-      // PS seed
-      // top 3 bits of tracklet index indicate the seeding pair
-      ap_uint<nbits_seed> iseed = trackletid.range(trackletid.length()-1,trackletid.length()-nbits_seed);
-      // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
-      // and here?
-      // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
 
       // All seeding pairs are PS modules except L3L4 and L5L6
       bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6);

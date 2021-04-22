@@ -84,10 +84,18 @@ public:
     kTProjTrackletIndexLSB = kTProjPhiMSB + 1,
     kTProjTrackletIndexMSB = kTProjTrackletIndexLSB + TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize - 1,
     kTProjTCIDLSB = kTProjTrackletIndexMSB + 1,
-    kTProjTCIDMSB = kTProjTCIDLSB + TrackletProjectionBase<TProjType>::kTProjTCIDSize - 1
+    kTProjTCIDMSB = kTProjTCIDLSB + TrackletProjectionBase<TProjType>::kTProjTCIDSize - 1,
+
+    // subdivisions of the TCID
+    kTProjITCLSB = kTProjTrackletIndexMSB + 1,
+    kTProjITCMSB = kTProjITCLSB + TrackletProjectionBase<TProjType>::kTProjITCSize - 1,
+    kTProjSeedLSB = kTProjITCMSB + 1,
+    kTProjSeedMSB = kTProjSeedLSB + TrackletProjectionBase<TProjType>::kTProjSeedSize - 1,
   };
 
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTCIDSize> TProjTCID;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjSeedSize> TProjSeed;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjITCSize> TProjITC;
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize> TProjTrackletIndex;
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjPhiSize> TProjPHI;
   typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZSize> TProjRZ;
@@ -143,6 +151,14 @@ public:
   //   ...
   TProjTCID getTCID() const {
     return data_.range(kTProjTCIDMSB,kTProjTCIDLSB);
+  }
+
+  TProjSeed getSeed() const {
+    return data_.range(kTProjSeedMSB,kTProjSeedLSB);
+  }
+
+  TProjITC getITC() const {
+    return data_.range(kTProjITCMSB,kTProjITCLSB);
   }
 
   // The tracklets in an event are indexed starting from zero, and the indices
