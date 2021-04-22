@@ -16,6 +16,7 @@ entity tf_lut is
            lut_depth    : integer := 256);
   port (
     clk : in std_logic;
+    ce : in std_logic;
     addr : in std_logic_vector(clogb2(lut_depth)-1 downto 0);
     dout : out std_logic_vector(lut_width-1 downto 0)
     );
@@ -46,7 +47,9 @@ begin
   process (clk)
   begin
     if (rising_edge(clk)) then
-      dout <= rom(to_integer(unsigned(addr)));
+      if (ce = '1') then 
+        dout <= rom(to_integer(unsigned(addr)));
+      end if;
     end if;
   end process;
 end architecture behavioral;      
