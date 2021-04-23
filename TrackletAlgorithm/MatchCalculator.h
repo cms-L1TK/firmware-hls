@@ -752,7 +752,8 @@ void MatchCalculator(BXType bx,
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
     // Apply the corrections
-    const int kProj_phi_len = (APTYPE == BARRELPS) ? 15 : 18;
+    //const int kProj_phi_len = (APTYPE == BARRELPS) ? 15 : 18;
+    const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
     ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
     ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
