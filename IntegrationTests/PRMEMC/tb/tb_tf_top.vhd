@@ -47,8 +47,7 @@ architecture behavior of tb_tf_top is
   type t_str_array_FM    is array(natural range <>) of string(1 to 41);  --! String array
   type t_arr_1d_1d_int    is array(natural range <>) of t_arr_1d_int(0 to MAX_EVENTS-1);                      --! 1x1D array of int
   type t_arr_1d_2d_int    is array(natural range <>) of t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1);    --! 1x2D array of int
-  type t_arr_1d_2d_slv_2p is array(natural range <>) of t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! 1x2D array of slv
-  type t_arr_1d_2d_slv_8p is array(natural range <>) of t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! 1x2D array of slv
+  type t_arr_1d_2d_slv is array(natural range <>) of t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! 1x2D array of slv
 
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
@@ -141,11 +140,11 @@ architecture behavior of tb_tf_top is
   signal MC_bx_out_vld : std_logic;
   signal MC_done       : std_logic;
   -- ### Other signals ###
-  signal TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
+  signal TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv(0 to N_ME_IN_CHAIN-1);
   signal TPROJ_L3PHICn4_n_entries_arr       : t_arr_1d_1d_int(0 to N_ME_IN_CHAIN-1);
-  signal VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
+  signal VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv(0 to N_ME_IN_CHAIN-1);
   signal VMSME_L3PHIC17to24n1_n_entries_arr : t_arr_1d_2d_int(0 to N_ME_IN_CHAIN-1);
-  signal AS_L3PHICn4_data_arr               : t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1);
+  signal AS_L3PHICn4_data_arr               : t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1);
   signal AS_L3PHICn4_n_entries_arr          : t_arr_1d_int(0 to MAX_EVENTS-1);
   signal bx_cnt                             : integer := 0; -- BX counter
   signal page_cnt2                          : integer := 0; -- Page counter
@@ -183,50 +182,50 @@ begin
   --! @details Read all emData from files and store it in big memory arrays as
   --!         input for the UUT. Memory intensive but fast.
   read_data : process
-    variable v_TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv_2p(0 to N_ME_IN_CHAIN-1);
+    variable v_TPROJ_L3PHICn4_data_arr            : t_arr_1d_2d_slv(0 to N_ME_IN_CHAIN-1);
     variable v_TPROJ_L3PHICn4_n_entries_arr       : t_arr_1d_1d_int(0 to N_ME_IN_CHAIN-1);
-    variable v_VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv_8p(0 to N_ME_IN_CHAIN-1);
+    variable v_VMSME_L3PHIC17to24n1_data_arr      : t_arr_1d_2d_slv(0 to N_ME_IN_CHAIN-1);
     variable v_VMSME_L3PHIC17to24n1_n_entries_arr : t_arr_1d_2d_int(0 to N_ME_IN_CHAIN-1);
-    variable v_AS_L3PHICn4_data_arr               : t_arr_2d_slv(0 to MAX_EVENTS-1,0 to N_ME_IN_CHAIN*PAGE_OFFSET-1);
+    variable v_AS_L3PHICn4_data_arr               : t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1);
     variable v_AS_L3PHICn4_n_entries_arr          : t_arr_1d_int(0 to MAX_EVENTS-1);
     variable v_line_in : line; -- Line for debug
   begin
     -- TPROJ
     l_TPROJ_read : for i in 0 to N_ME_IN_CHAIN-1 loop
-      read_emData_2p (FILE_IN_TPROJ(i), v_TPROJ_L3PHICn4_data_arr(i), v_TPROJ_L3PHICn4_n_entries_arr(i));
+      read_emData (FILE_IN_TPROJ(i), v_TPROJ_L3PHICn4_data_arr(i), v_TPROJ_L3PHICn4_n_entries_arr(i));
       if DEBUG=true then write(v_line_in, string'("TPROJ_i: ")); write(v_line_in, i); write(v_line_in, string'(";   v_TPROJ_L3PHICn4_data_arr(i)(0,0): ")); hwrite(v_line_in, v_TPROJ_L3PHICn4_data_arr(i)(0,0)); writeline(output, v_line_in); end if;
       if DEBUG=true then write(v_line_in, string'("TPROJ_i: ")); write(v_line_in, i); write(v_line_in, string'(";   v_TPROJ_L3PHICn4_n_entries_arr(i)(0): ")); write(v_line_in, v_TPROJ_L3PHICn4_n_entries_arr(i)(0)); writeline(output, v_line_in); end if;
     end loop l_TPROJ_read;
-    if DEBUG=true then write(v_line_in, string'("v_TPROJ_L3PHICn4_data_arr(0)(99,0+128): ")); hwrite(v_line_in, v_TPROJ_L3PHICn4_data_arr(0)(99,0+128)); writeline(output, v_line_in); end if;
-    if DEBUG=true then write(v_line_in, string'("v_TPROJ_L3PHICn4_data_arr(0)(99,3+128): ")); hwrite(v_line_in, v_TPROJ_L3PHICn4_data_arr(0)(99,3+128)); writeline(output, v_line_in); end if;
+    if DEBUG=true then write(v_line_in, string'("v_TPROJ_L3PHICn4_data_arr(0)(99,0): ")); hwrite(v_line_in, v_TPROJ_L3PHICn4_data_arr(0)(99,0)); writeline(output, v_line_in); end if;
+    if DEBUG=true then write(v_line_in, string'("v_TPROJ_L3PHICn4_data_arr(0)(99,3): ")); hwrite(v_line_in, v_TPROJ_L3PHICn4_data_arr(0)(99,3)); writeline(output, v_line_in); end if;
     if DEBUG=true then write(v_line_in, string'("v_TPROJ_L3PHICn4_n_entries_arr(0)(99): "));   write(v_line_in, v_TPROJ_L3PHICn4_n_entries_arr(0)(99)); writeline(output, v_line_in); end if;
     -- VMSME
     l_VMSME_read : for i in 0 to N_ME_IN_CHAIN-1 loop
-      read_emData_8p_bin (FILE_IN_VMSME(i), v_VMSME_L3PHIC17to24n1_data_arr(i), v_VMSME_L3PHIC17to24n1_n_entries_arr(i));
+      read_emData_bin (FILE_IN_VMSME(i), v_VMSME_L3PHIC17to24n1_data_arr(i), v_VMSME_L3PHIC17to24n1_n_entries_arr(i));
       if DEBUG=true then write(v_line_in, string'("VMSME_i: ")); write(v_line_in, i); write(v_line_in, string'(";   v_VMSME_L3PHIC17to24n1_data_arr(i)(0,0): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(i)(0,0)); writeline(output, v_line_in); end if;
       if DEBUG=true then write(v_line_in, string'("VMSME_i: ")); write(v_line_in, i); write(v_line_in, string'(";   v_VMSME_L3PHIC17to24n1_n_entries_arr(i)(0,0): ")); write(v_line_in, v_VMSME_L3PHIC17to24n1_n_entries_arr(i)(0,0)); writeline(output, v_line_in); end if;
     end loop l_VMSME_read;
-    if DEBUG=true then write(v_line_in, string'("v_VMSME_L3PHIC17to24n1_data_arr(0)(99,3*PAGE_OFFSET+7*N_ENTRIES_PER_MEM_BINS): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(0)(99,3*PAGE_OFFSET+7*N_ENTRIES_PER_MEM_BINS)); writeline(output, v_line_in); end if;
+    if DEBUG=true then write(v_line_in, string'("v_VMSME_L3PHIC17to24n1_data_arr(0)(99,7*N_ENTRIES_PER_MEM_BINS): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(0)(99,7*N_ENTRIES_PER_MEM_BINS)); writeline(output, v_line_in); end if;
       if DEBUG=true then write(v_line_in, string'("v_VMSME_L3PHIC17to24n1_n_entries_arr(0)(99,7): ")); write(v_line_in, v_VMSME_L3PHIC17to24n1_n_entries_arr(0)(99,7)); writeline(output, v_line_in); end if;
     l_VMSME_debug0 : for i in 0 to 64 loop -- until last utilized addr
       if DEBUG=true then write(v_line_in, string'("addr: ")); write(v_line_in, i); write(v_line_in, string'(";   v_VMSME_L3PHIC17to24n1_data_arr(0)(0,addr): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(0)(0,i)); writeline(output, v_line_in); end if;
     end loop l_VMSME_debug0;
-    l_VMSME_debug9 : for i in 1*PAGE_OFFSET to 1*PAGE_OFFSET+(5*16+1) loop -- until last utilized addr
+    l_VMSME_debug9 : for i in 0 to (5*16+1) loop -- until last utilized addr
       if DEBUG=true then write(v_line_in, string'("addr: ")); write(v_line_in, i); write(v_line_in, string'(";   v_VMSME_L3PHIC17to24n1_data_arr(6)(9,addr): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(6)(9,i)); writeline(output, v_line_in); end if;
     end loop l_VMSME_debug9;
-    l_VMSME_debug23 : for i in 7*PAGE_OFFSET to 7*PAGE_OFFSET+(6*16+4) loop -- until last utilized addr
+    l_VMSME_debug23 : for i in 0 to (6*16+4) loop -- until last utilized addr
       if DEBUG=true then write(v_line_in, string'("addr: ")); write(v_line_in, i); write(v_line_in, string'(";   v_VMSME_L3PHIC17to24n1_data_arr(4)(23,addr): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(4)(23,i)); writeline(output, v_line_in); end if;
     end loop l_VMSME_debug23;
-    l_VMSME_debug99 : for i in 3*PAGE_OFFSET to 3*PAGE_OFFSET+(7*16) loop -- until last utilized addr
+    l_VMSME_debug99 : for i in 0 to (7*16) loop -- until last utilized addr
       if DEBUG=true then write(v_line_in, string'("addr: ")); write(v_line_in, i); write(v_line_in, string'(";   v_VMSME_L3PHIC17to24n1_data_arr(0)(99,addr): ")); hwrite(v_line_in, v_VMSME_L3PHIC17to24n1_data_arr(0)(99,i)); writeline(output, v_line_in); end if;
     end loop l_VMSME_debug99;
     -- AS
-    read_emData_8p (FILE_IN_AS, v_AS_L3PHICn4_data_arr, v_AS_L3PHICn4_n_entries_arr);
+    read_emData (FILE_IN_AS, v_AS_L3PHICn4_data_arr, v_AS_L3PHICn4_n_entries_arr);
     if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_data_arr(0,0): "));         hwrite(v_line_in, v_AS_L3PHICn4_data_arr(0,0)); writeline(output, v_line_in); end if;
     if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_data_arr(0,71): "));        hwrite(v_line_in, v_AS_L3PHICn4_data_arr(0,71)); writeline(output, v_line_in); end if;
     if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_n_entries_arr(0): "));       write(v_line_in, v_AS_L3PHICn4_n_entries_arr(0)); writeline(output, v_line_in); end if;
-    if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_data_arr(99,0+128*3): "));  hwrite(v_line_in, v_AS_L3PHICn4_data_arr(99,0+128*3)); writeline(output, v_line_in); end if;
-    if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_data_arr(99,35+128*3): ")); hwrite(v_line_in, v_AS_L3PHICn4_data_arr(99,35+128*3)); writeline(output, v_line_in); end if;
+    if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_data_arr(99,0): "));  hwrite(v_line_in, v_AS_L3PHICn4_data_arr(99,0)); writeline(output, v_line_in); end if;
+    if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_data_arr(99,35: ")); hwrite(v_line_in, v_AS_L3PHICn4_data_arr(99,35)); writeline(output, v_line_in); end if;
     if DEBUG=true then write(v_line_in, string'("v_AS_L3PHICn4_n_entries_arr(99): "));      write(v_line_in, v_AS_L3PHICn4_n_entries_arr(99)); writeline(output, v_line_in); end if;
     -- Map variables to signals
     TPROJ_L3PHICn4_data_arr            <= v_TPROJ_L3PHICn4_data_arr;
@@ -280,7 +279,7 @@ begin
           if (v_bx_cnt<MAX_EVENTS-1) then -- Start early
             TPROJ_L3PHIC_dataarray_data_V_wea <= (others => '1');
             TPROJ_L3PHIC_dataarray_data_V_writeaddr(cp) <= std_logic_vector(to_unsigned(addr+PAGE_OFFSET*v_page_cnt2_d1, TPROJ_L3PHIC_dataarray_data_V_writeaddr(0)'length));
-            TPROJ_L3PHIC_dataarray_data_V_din(cp)       <= TPROJ_L3PHICn4_data_arr(cp)(v_bx_cnt+1,addr+PAGE_OFFSET*v_page_cnt2_d1) (TPROJ_L3PHIC_dataarray_data_V_din(0)'length-1 downto 0);
+            TPROJ_L3PHIC_dataarray_data_V_din(cp)       <= TPROJ_L3PHICn4_data_arr(cp)(v_bx_cnt+1,addr) (TPROJ_L3PHIC_dataarray_data_V_din(0)'length-1 downto 0);
           end if;
           -- VMSME & PR_start
           --PR_start <= '0'; -- Default assigment
@@ -302,13 +301,12 @@ begin
 
             if v_bin_cnt(cp)<=N_MEM_BINS-1 then -- Valid bin
               VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(cp) <=                            std_logic_vector(to_unsigned((v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS)), VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(0)'length));
-              VMSME_L3PHIC17to24n1_dataarray_data_V_din(cp)       <= VMSME_L3PHIC17to24n1_data_arr(cp)(v_bx_cnt-VMSME_DELAY, (v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS))) (VMSME_L3PHIC17to24n1_dataarray_data_V_din(0)'length-1 downto 0);
+              VMSME_L3PHIC17to24n1_dataarray_data_V_din(cp)       <= VMSME_L3PHIC17to24n1_data_arr(cp)(v_bx_cnt-VMSME_DELAY, v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) (VMSME_L3PHIC17to24n1_dataarray_data_V_din(0)'length-1 downto 0);
               if (DEBUG=true and ((v_bx_cnt=9 and cp=6) or (v_bx_cnt=23 and cp=4))) then write(v_line_in, string'("v_bx_cnt: ")); write(v_line_in, v_bx_cnt); write(v_line_in, string'(";   cp: ")); write(v_line_in, cp); writeline(output, v_line_in); end if;
               if (DEBUG=true and ((v_bx_cnt=9 and cp=6) or (v_bx_cnt=23 and cp=4))) then write(v_line_in, string'("VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(cp): ")); write(v_line_in, ((v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS)))); writeline(output, v_line_in); end if;
-              if (DEBUG=true and ((v_bx_cnt=9 and cp=6) or (v_bx_cnt=23 and cp=4))) then write(v_line_in, string'("VMSME_L3PHIC17to24n1_dataarray_data_V_din(cp): ")); hwrite(v_line_in, VMSME_L3PHIC17to24n1_data_arr(cp)(v_bx_cnt-VMSME_DELAY, (v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS))) (VMSME_L3PHIC17to24n1_dataarray_data_V_din(0)'length-1 downto 0)); writeline(output, v_line_in); end if;
+              if (DEBUG=true and ((v_bx_cnt=9 and cp=6) or (v_bx_cnt=23 and cp=4))) then write(v_line_in, string'("VMSME_L3PHIC17to24n1_dataarray_data_V_din(cp): ")); hwrite(v_line_in, VMSME_L3PHIC17to24n1_data_arr(cp)(v_bx_cnt-VMSME_DELAY, v_bin_cnt(cp)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) (VMSME_L3PHIC17to24n1_dataarray_data_V_din(0)'length-1 downto 0)); writeline(output, v_line_in); end if;
               if (DEBUG=true and ((v_bx_cnt=9 and cp=6) or (v_bx_cnt=23 and cp=4))) then write(v_line_in, string'("v_VMSME_n_entries_bin_cnt(cp): ")); write(v_line_in, v_VMSME_n_entries_bin_cnt(cp)); write(v_line_in, string'(";   v_VMSME_n_entries_bin(cp): ")); write(v_line_in, v_VMSME_n_entries_bin(cp)); write(v_line_in, string'(";   v_bin_cnt(cp): ")); write(v_line_in, v_bin_cnt(cp)); writeline(output, v_line_in); end if;
             end if;
-            --if DEBUG=true then assert (addr>1 or v_bx_cnt>0) report "addr = " & integer'image(addr) & ";   cp = " & integer'image(addr) & ";   v_bin_cnt(0) = " & integer'image(v_bin_cnt(0)) & ";   v_VMSME_n_entries_bin_cnt(cp) = " & integer'image(v_VMSME_n_entries_bin_cnt(cp)) & ";   waddr = " & integer'image((v_bin_cnt(0)*N_ENTRIES_PER_MEM_BINS+v_VMSME_n_entries_bin_cnt(cp)) + (PAGE_OFFSET*((v_page_cnt8-VMSME_DELAY) mod N_MEM_BINS))) severity note; end if;
             if v_VMSME_n_entries_bin_cnt(cp)>=v_VMSME_n_entries_bin(cp)-1 then -- End of bin entries
               if (v_bin_cnt(cp)=N_MEM_BINS-1) then -- Last bin
                 v_last_bin := true;
@@ -332,7 +330,7 @@ begin
           if (v_bx_cnt>=AS_DELAY and v_bx_cnt<MAX_EVENTS-1) then -- Start after delay of BXs
             AS_L3PHICn4_dataarray_data_V_wea <= '1';
             AS_L3PHICn4_dataarray_data_V_writeaddr  <= std_logic_vector(to_unsigned(addr+(PAGE_OFFSET*((v_page_cnt8-AS_DELAY) mod N_MEM_BINS)),AS_L3PHICn4_dataarray_data_V_writeaddr'length));
-            AS_L3PHICn4_dataarray_data_V_din        <= AS_L3PHICn4_data_arr(v_bx_cnt-AS_DELAY,addr+(PAGE_OFFSET*((v_page_cnt8-AS_DELAY) mod N_MEM_BINS))) (AS_L3PHICn4_dataarray_data_V_din'length-1 downto 0); 
+            AS_L3PHICn4_dataarray_data_V_din        <= AS_L3PHICn4_data_arr(v_bx_cnt-AS_DELAY,addr) (AS_L3PHICn4_dataarray_data_V_din'length-1 downto 0); 
           end if;
         end loop l_copies;
 	wait until rising_edge(clk); -- Main time control
