@@ -58,13 +58,12 @@ architecture behavior of tb_tf_top is
   -- Specify version of chain to run from TB:
   --    0 = SectorProcessor.vhd from python script.
   --    1 = SectorProcessorFull.vhd from python script (gives intermediate MemPrints).
-  --    2 = top_tf_full.vhd hand-written code (gives intermediate MemPrints)
   --    N.B. Change this also in makeProject.tcl !
   constant INST_TOP_TF   : integer := 1; 
   --=========================================================================
 
   constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
-  constant DEBUG             : boolean := false;      --! Debug off/on
+  constant DEBUG             : boolean := true;      --! Debug off/on
   constant VMSME_DELAY       : integer := 1-1;        --! Number of BX delays (can be written early 8 pages)
   constant AS_DELAY          : integer := 2-1;        --! Number of BX delays (can be written early 8 pages)
   constant MEM_READ_DELAY    : integer := 2;          --! Number of memory read delay
@@ -458,62 +457,6 @@ begin
 
   -- ########################### Instantiation ###########################
   -- Instantiate the Unit Under Test (UUT)
-  i_tf_top_full : if INST_TOP_TF = 2 generate
-    uut : entity work.tf_top_full
-      port map(
-        clk       => clk,
-        reset     => reset,
-        PR_start  => PR_start,
-        PR_idle   => PR_idle,
-        PR_ready  => PR_ready,
-        PR_bx_in  => PR_bx_in,
-        -- TrackletProjections input
-        TPROJ_L3PHIC_dataarray_data_V_wea       => TPROJ_L3PHIC_dataarray_data_V_wea,
-        TPROJ_L3PHIC_dataarray_data_V_writeaddr => TPROJ_L3PHIC_dataarray_data_V_writeaddr,
-        TPROJ_L3PHIC_dataarray_data_V_din       => TPROJ_L3PHIC_dataarray_data_V_din,
-        -- VMStubsME input
-        VMSME_L3PHIC17to24n1_dataarray_data_V_wea       => VMSME_L3PHIC17to24n1_dataarray_data_V_wea,
-        VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr => VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr,
-        VMSME_L3PHIC17to24n1_dataarray_data_V_din       => VMSME_L3PHIC17to24n1_dataarray_data_V_din,
-        -- AllStubs input
-        AS_L3PHICn4_dataarray_data_V_wea       => AS_L3PHICn4_dataarray_data_V_wea,
-        AS_L3PHICn4_dataarray_data_V_writeaddr => AS_L3PHICn4_dataarray_data_V_writeaddr,
-        AS_L3PHICn4_dataarray_data_V_din       => AS_L3PHICn4_dataarray_data_V_din,
-        -- VMProjection output
-        VMPROJ_L3PHIC17to24_dataarray_data_V_wea       => VMPROJ_L3PHIC17to24_dataarray_data_V_wea,
-        VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr => VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr,
-        VMPROJ_L3PHIC17to24_dataarray_data_V_din       => VMPROJ_L3PHIC17to24_dataarray_data_V_din,
-        -- AllProjection output
-        AP_L3PHIC_dataarray_data_V_wea       => AP_L3PHIC_dataarray_data_V_wea,
-        AP_L3PHIC_dataarray_data_V_writeaddr => AP_L3PHIC_dataarray_data_V_writeaddr,
-        AP_L3PHIC_dataarray_data_V_din       => AP_L3PHIC_dataarray_data_V_din,
-        -- ProjectionRouter output
-        PR_bx_out     => PR_bx_out,
-        PR_bx_out_vld => PR_bx_out_vld,
-        PR_done       => PR_done,
-        -- CandidateMatch output
-        CM_L3PHIC17to24_dataarray_data_V_wea       => CM_L3PHIC17to24_dataarray_data_V_wea,
-        CM_L3PHIC17to24_dataarray_data_V_writeaddr => CM_L3PHIC17to24_dataarray_data_V_writeaddr,
-        CM_L3PHIC17to24_dataarray_data_V_din       => CM_L3PHIC17to24_dataarray_data_V_din,
-        -- MatchEngine output
-        ME_bx_out     => ME_bx_out,
-        ME_bx_out_vld => ME_bx_out_vld,
-        ME_all_done   => ME_all_done,
-        -- FullMatches output
-        FM_L1L2_L3PHIC_dataarray_data_V_enb      => FM_L1L2_L3PHIC_dataarray_data_V_enb,
-        FM_L1L2_L3PHIC_dataarray_data_V_readaddr => FM_L1L2_L3PHIC_dataarray_data_V_readaddr,
-        FM_L1L2_L3PHIC_dataarray_data_V_dout     => FM_L1L2_L3PHIC_dataarray_data_V_dout,
-        FM_L1L2_L3PHIC_nentries_V_dout           => FM_L1L2_L3PHIC_nentries_V_dout,
-        FM_L5L6_L3PHIC_dataarray_data_V_enb      => FM_L5L6_L3PHIC_dataarray_data_V_enb,
-        FM_L5L6_L3PHIC_dataarray_data_V_readaddr => FM_L5L6_L3PHIC_dataarray_data_V_readaddr,
-        FM_L5L6_L3PHIC_dataarray_data_V_dout     => FM_L5L6_L3PHIC_dataarray_data_V_dout,
-        FM_L5L6_L3PHIC_nentries_V_dout           => FM_L5L6_L3PHIC_nentries_V_dout,
-        -- MatchCalculator output
-        MC_bx_out     => MC_bx_out,
-        MC_bx_out_vld => MC_bx_out_vld,
-        MC_done       => MC_done );
-   end generate i_tf_top_full;
-
 
   sectorProcFull : if INST_TOP_TF = 1 generate
 
@@ -632,7 +575,7 @@ begin
 
 
 
-  fileOutput : if INST_TOP_TF >= 1 generate
+  fileOutput : if INST_TOP_TF = 1 generate
     --! @brief TextIO process for writting the output ---------------------------------------
     --! @details Read additional memory outputs (from intermediate HLS modules in the chain) and
     --!         write it to files using procedures.
