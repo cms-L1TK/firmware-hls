@@ -44,7 +44,6 @@ package tf_pkg is
   constant RAM_WIDTH_AP    : natural := 60; --! Width for memories
 
   -- ########################### Functions ################################################################
-  function clogb2_old (bit_depth : integer) return integer;
   function clogb2     (bit_depth : integer) return integer;
 
   -- ########################### Types ###########################
@@ -157,28 +156,6 @@ end package tf_pkg;
 package body tf_pkg is
 
   -- ########################### Functions ################################################################
-  --! @brief Binary logarithm to determine bit width for addressing
-  --! Returns (-1 + no. of bits needed to represent number bit_depth) 
-  --! except if argument is 2, when it returns 0.
-
-  function clogb2_old (bit_depth : integer) return integer is
-    variable depth : integer := bit_depth;
-    variable count : integer := 1;
-  begin
-    for clogb2 in 1 to bit_depth loop     -- Works for up to 32 bit integers
-      if (bit_depth <= 2) then
-        count := 1;
-      else
-        if(depth <= 1) then
-          count := count;
-        else
-          depth := depth / 2;
-          count := count + 1;
-        end if;
-      end if;
-    end loop;
-    return(count-1);
-  end;
 
   --! @brief Gets #bits needed to form any value from 0 to bit_depth-1.
   --! Identical result to clogb2_old() if arg. is exact power of 2.
