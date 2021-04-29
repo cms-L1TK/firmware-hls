@@ -459,8 +459,8 @@ int main(int argc, char * argv[])
   // allow for truncation memory check [i.e. missing entries can pass check]
   bool cTruncation=false;
   std::string cInputFile_Wires = "emData/LUTs/wires.dat";
-  // to be moved to emulation/wiring script 
-  prepareLUTs(cDTCsplit,  cNonant, cInputFile_Wires ); 
+  // // to be moved to emulation/wiring script 
+  // prepareLUTs(cDTCsplit,  cNonant, cInputFile_Wires ); 
 
   //
   int cFirstBx = 0 ;
