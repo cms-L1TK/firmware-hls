@@ -190,7 +190,6 @@ package body tf_pkg is
     data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   ) is
-  constant N_PAGES         : integer :=2;                        --! Number of pages
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
@@ -206,7 +205,7 @@ package body tf_pkg is
     l_rd_row : while not endfile(file_in) loop -- Read until EoF
     --l_rd_row : for i in 0 to 5 loop -- Debug
       readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
+      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify event header line or empty line
         i_bx_row := 0;       -- Init
         bx_cnt   := bx_cnt +1;
         --if DEBUG=true then writeline(output, line_in); end if;
@@ -260,7 +259,6 @@ package body tf_pkg is
     data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
   ) is
-  constant N_PAGES         : integer :=2;                        --! Number of pages
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
@@ -278,7 +276,7 @@ package body tf_pkg is
     l_rd_row : while not endfile(file_in) loop -- Read until EoF
     --l_rd_row : for i in 0 to 5 loop -- Debug
       readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
+      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify event header line or empty line
         i_bx_row := 0;       -- Init
         bx_cnt   := bx_cnt +1;
         --if DEBUG=true then writeline(output, line_in); end if;

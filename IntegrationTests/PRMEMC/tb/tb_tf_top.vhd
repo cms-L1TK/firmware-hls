@@ -62,7 +62,7 @@ architecture behavior of tb_tf_top is
   --=========================================================================
 
   constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
-  constant DEBUG             : boolean := true;      --! Debug off/on
+  constant DEBUG             : boolean := false;      --! Debug off/on
   constant VMSME_DELAY       : integer := 1-1;        --! Number of BX delays (can be written early 8 pages)
   constant AS_DELAY          : integer := 2-1;        --! Number of BX delays (can be written early 8 pages)
   constant MEM_READ_DELAY    : integer := 2;          --! Number of memory read delay
