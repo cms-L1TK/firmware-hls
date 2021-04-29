@@ -32,7 +32,7 @@ set topLevelHDL "SectorProcessorFull"
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
 set_property top -value ${topLevelHDL} -objects [get_filesets sources_1]
 set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
-set_property xsim.simulate.runtime -value "50us" -objects  [get_filesets sim_1]
+set_property xsim.simulate.runtime -value "0us" -objects  [get_filesets sim_1]
 
 update_compile_order -fileset sources_1 
 
