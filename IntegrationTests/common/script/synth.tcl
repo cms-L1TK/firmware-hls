@@ -27,7 +27,7 @@ wait_on_run synth_1
 
 # Make reports
 open_run synth_1
-report_timing_summary -file timing_synth_1.rpt
+report_timing_summary -file timing_synth.rpt
 report_utilization -hierarchical -file utilization_synth.rpt
 
 exit
