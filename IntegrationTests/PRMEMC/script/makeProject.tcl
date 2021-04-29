@@ -24,6 +24,9 @@ add_files -fileset sources_1 [glob ../hdl/*.vhd]
 # Add HDL for TB
 add_files -fileset sim_1 [glob ../tb/*.vhd]
 
+# Add constraints (clock etc.)
+add_files -fileset constrs_1 -norecurse [glob ../../common/hdl/constraints.xdc]
+
 # Provide name of top-level HDL (without .vhd extension).
 #set topLevelHDL "SectorProcessor"
 set topLevelHDL "SectorProcessorFull"
