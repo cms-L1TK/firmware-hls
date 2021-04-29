@@ -2,7 +2,6 @@
 
 
 void InputRouterTop( const BXType bx
-  , const unsigned int hNmemories // number of memories 
   , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT 
   , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT 
   , const int kPhiCorrtable_L1[cNEntriesLUT] // corrections frst brl lyr  

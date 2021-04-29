@@ -16,7 +16,6 @@ constexpr unsigned int cNEntriesLUT = kSizePhiCorrTablePS;
 
 
 void InputRouterTop( const BXType bx
-	, const unsigned int hNmemories // number of memories 
 	, const ap_uint<kLINKMAPwidth> kInputLink // input link LUT 
   	, const ap_uint<kBINMAPwidth> kNPhiBns  // n phi bins LUT 
   	, const int kPhiCorrtable_L1[] // corrections frst brl lyr  

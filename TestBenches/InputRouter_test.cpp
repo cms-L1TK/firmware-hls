@@ -76,9 +76,6 @@ const int kPhiCorrtable_L6[] =
 #include "../emData/LUTs/VMPhiCorrL6.tab"
 ;
 
-// const int kIRNmemsLUT[] =
-// #include "../emData/LUTs/IR_Nmems.tab"
-// ;
 
 
 // map of detector regions read out [ per DTC ]
@@ -424,38 +421,6 @@ void prepareInputStreams( ifstream * pInputStreams
   }
 }
 
-// for now .. create LUT for IR 
-// this can eventually be produced 
-// by either the wiring script 
-// or the emulation 
-void prepareLUTs( int pDTCsplit = 0
-  , int pNonant = 4 
-  , std::string pInputFile_Wires = "emData/LUTs/wires.dat" )
-{
-  auto cDtcMap = getCablingMap( pInputFile_Wires );
-  auto cMapIter = cDtcMap.begin(); 
-  uint8_t cLinkId=0;
-  ofstream cOstream_LUT;
-  cOstream_LUT.open ("emData/LUTs/IR_Nmems.tab");
-  cOstream_LUT << "{\n";
-  do
-  {
-    auto cDtcName = cMapIter->first;
-    auto cLyrs = cMapIter->second; 
-    auto cNmems = getNMemories( cLinkId, pDTCsplit, pNonant, pInputFile_Wires);
-    std::cout << "For link# " << +cLinkId
-      << " found  " << +cNmems.first 
-      << " memories connected to this link\t"
-      << "Word encoding number of bins readout per link is 0x"
-      <<  std::hex << int(cNmems.second)  << std::dec
-    <<  "\n";
-    cOstream_LUT << std::to_string(+cNmems.first) << ",\n";
-    cLinkId++;  
-    cMapIter++;
-  }while( cMapIter != cDtcMap.end() );
-  cOstream_LUT << "};";
-  cOstream_LUT.close();
-}
 
 // test bench starts here 
 int main(int argc, char * argv[])
@@ -627,7 +592,6 @@ int main(int argc, char * argv[])
     BXType hBx = cEvId&0x7;
     BXType hBx_o; 
     InputRouterTop( hBx
-      , cNmemories // number of memories 
       , hLinkWord // input link LUT 
       , hPhBnWord  // n phi bins LUT 
       , cLUT_L1// corrections frst brl lyr  
@@ -678,12 +642,6 @@ int main(int argc, char * argv[])
     cInputStreams[cMemIndx].close();
   }
   cLinkDataStream.close();
-
-  // // remove temp LUT 
-  // if( remove( "emData/LUTs/IR_Nmems.tab" ) == 0 )
-  // {
-  //   std::cout << "Temperorary LUT created by IR test bench deleted.\n";
-  // }
 
   return cTotalErrCnt;
 }
