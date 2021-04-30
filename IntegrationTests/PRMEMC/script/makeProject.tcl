@@ -25,7 +25,9 @@ add_files -fileset sources_1 [glob ../hdl/*.vhd]
 add_files -fileset sim_1 [glob ../tb/*.vhd]
 
 # Add constraints (clock etc.)
-add_files -fileset constrs_1 -norecurse [glob ../../common/hdl/constraints.xdc]
+# FIX THIS: commented out, as introduces wierd 100ns delay to some signals
+# like PR_DONE in Vivado wave display, messing up .txt file output from TB.
+#add_files -fileset constrs_1 [glob ../../common/hdl/constraints.xdc]
 
 # Provide name of top-level HDL (without .vhd extension).
 #set topLevelHDL "SectorProcessor"
