@@ -28,6 +28,7 @@ This would create a project directory \<project> ("projrouter" in case of the ab
    which writes data output from chain to dataOut/*.txt).
 5) python ../../common/script/CompareMemPrintsFW.py -p -s (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt).
 6) vivado -mode batch -source ../../common/script/synth.tcl (runs synthesis, writes utilization & timing reports to current directory).
+7) vivado -mode batch -source ../../common/script/impl.tcl (runs implementation, writes utilization & timing reports to current directory).
 
 ## Track Quality Specific Instructions
 In the TrackQuality directory first run: 
