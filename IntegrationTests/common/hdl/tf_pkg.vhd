@@ -209,7 +209,7 @@ package body tf_pkg is
         i_bx_row := 0;       -- Init
         bx_cnt   := bx_cnt +1;
         --if DEBUG=true then writeline(output, line_in); end if;
-      else
+      elsif (bx_cnt >= 0) then
         i_rd_col := 0;   -- Init
         cnt_x_char := 0; -- Init
         l_rd_col : while line_in'length>0 loop -- Loop over the columns
@@ -224,6 +224,8 @@ package body tf_pkg is
         end loop l_rd_col;
         n_entries_arr(bx_cnt) := n_entries_arr(bx_cnt) +1;
         i_bx_row := i_bx_row +1;
+      else
+        assert false report "No BX header before data in txt file" severity FAILURE;
       end if;
     end loop l_rd_row;
     file_close(file_in);
@@ -280,7 +282,7 @@ package body tf_pkg is
         i_bx_row := 0;       -- Init
         bx_cnt   := bx_cnt +1;
         --if DEBUG=true then writeline(output, line_in); end if;
-      else
+      elsif (bx_cnt >= 0) then
         i_rd_col := 0;   -- Init
         cnt_x_char := 0; -- Init
         l_rd_col : while line_in'length>0 loop  -- Loop over the columns
@@ -301,6 +303,8 @@ package body tf_pkg is
         i_rd_col := i_rd_col +1;
         end loop l_rd_col;
         i_bx_row := i_bx_row +1;
+      else
+        assert false report "No BX header before data in txt file" severity FAILURE;
       end if;
     end loop l_rd_row;
     file_close(file_in);
