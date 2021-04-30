@@ -354,7 +354,7 @@ begin
   end process playback;
 
 
-  --! @brief TextIO process for writting the output ---------------------------------------
+  --! @brief TextIO process for writing the output ---------------------------------------
   --! @details Read memory outputs (from last HLS module in the chain) and write it to files including headers.
   -- TODO: Replace with write procedures (e.g. like CM) but take MEM_READ_DELAY into account because it is the read port
   write_result : process
@@ -421,7 +421,7 @@ begin
         wait for 0 ns; -- Update signals
         wait for 0 ns; -- Update signals
         -- Other writes ---------------------------------------
-        if (addr >= MEM_READ_DELAY) then -- Take read dealy into account
+        if (addr >= MEM_READ_DELAY) then -- Take read delay into account
           write(v_line, NOW, right, 20); -- NOW = current simulation time
           write(v_line, v_bx_cnt, right, 4);
           --write(v_line, string'("0x"), right, 4); hwrite(v_line, std_logic_vector(to_unsigned(addr,10)), right, 3);
@@ -463,6 +463,7 @@ begin
     end loop l_BX;
     file_close(file_out_L1L2);
     file_close(file_out_L5L6);
+    -- Normal termination of simulation. All done.
     assert false report "Simulation finished!" severity FAILURE;
   end process write_result;
 
