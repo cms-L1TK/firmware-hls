@@ -15,7 +15,7 @@ class TEData {
   };
 
   enum BitLocations {
-    // The location of the least significant bit (LSB) and most significant bit (MSB) in the ProjectionRouterBufferMemory word for different fields
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the TEData word for different fields
     kTEDataStubMaskLSB = 0,
     kTEDataStubMaskMSB = kTEDataStubMaskLSB + 2*(1<<TrackletEngineUnit<BARRELPS>::kNBitsPhiBins) - 1,
     kTEDatarzbinfirstLSB = kTEDataStubMaskMSB+1,

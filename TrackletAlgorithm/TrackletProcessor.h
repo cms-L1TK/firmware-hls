@@ -34,10 +34,7 @@ namespace TC {
     typedef ap_uint<1> flag;
   }
 
-  enum seed {UNDEF_SEED, L1L2 = 0, L2L3 = 1, L3L4 = 2, L5L6 = 3, D1D2 = 4, D3D4 = 5, L1D1 = 6, L2D1 = 7};
   enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
-  enum layer {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5};
-  enum disk {D1 = 0, D2 = 1, D3 = 2, D4 = 3, D5 = 4};
   enum projout_index_barrel_ps {L1PHIA = 0, L1PHIB = 1, L1PHIC = 2, L1PHID = 3, L1PHIE = 4, L1PHIF = 5, L1PHIG = 6, L1PHIH = 7, L2PHIA = 8, L2PHIB = 9, L2PHIC = 10, L2PHID = 11, L3PHIA = 12, L3PHIB = 13, L3PHIC = 14, L3PHID = 15, N_PROJOUT_BARRELPS = 16};
   enum projout_index_barrel_2s {L4PHIA = 0, L4PHIB = 1, L4PHIC = 2, L4PHID = 3, L5PHIA = 4, L5PHIB = 5, L5PHIC = 6, L5PHID = 7, L6PHIA = 8, L6PHIB = 9, L6PHIC = 10, L6PHID = 11, N_PROJOUT_BARREL2S = 12};
   enum projout_index_disk      {D1PHIA = 0, D1PHIB = 1, D1PHIC = 2, D1PHID = 3, D2PHIA = 4, D2PHIB = 5, D2PHIC = 6, D2PHID = 7, D3PHIA = 8, D3PHIB = 9, D3PHIC = 10, D3PHID = 11, D4PHIA = 12, D4PHIB = 13, D4PHIC = 14, D4PHID = 15, N_PROJOUT_DISK = 16};
@@ -76,12 +73,6 @@ namespace TC {
   static const uint32_t mask_D3 = 0xF << shift_D3;
   static const uint32_t mask_D4 = 0xF << shift_D4;
 
-// the 1.0e-1 is a fudge factor needed to get the floating point truncation
-// right
-  static const float ptcut = 1.91;
-  static const ap_uint<13> rinvcut = 0.01 * 0.299792458 * 3.8112 / ptcut / krinv;
-  static const ap_uint<9> z0cut_L1L2 = 15.0 / kz0 + 1.0e-1;
-  static const ap_uint<9> z0cut = 1.5 * 15.0 / kz0 + 1.0e-1;
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +126,7 @@ namespace TC {
 
   template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
-  template<seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
+  template<TF::seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
   template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], const bool success);
 
@@ -175,11 +166,6 @@ template<TF::seed Seed> constexpr regionType OuterRegion() {
     )
   );
 }
-template<TF::seed Seed, TC::itc iTC> constexpr uint8_t NASMemInner();
-template<TF::seed Seed, TC::itc iTC> constexpr uint8_t NASMemOuter();
-template<TF::seed Seed, TC::itc iTC> constexpr uint8_t NSPMem();
-template<TF::seed Seed, TC::itc iTC> constexpr uint16_t ASInnerMask();
-template<TF::seed Seed, TC::itc iTC> constexpr uint16_t ASOuterMask();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
 
@@ -211,31 +197,31 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   TC::Types::rmean r1mean, r2mean, rproj[4];
   switch (Seed) {
     case TF::L1L2:
-      r1mean   = rmean[L1];
-      r2mean   = rmean[L2];
-      rproj[0] = rmean[L3];
-      rproj[1] = rmean[L4];
-      rproj[2] = rmean[L5];
-      rproj[3] = rmean[L6];
+      r1mean   = rmean[TF::L1];
+      r2mean   = rmean[TF::L2];
+      rproj[0] = rmean[TF::L3];
+      rproj[1] = rmean[TF::L4];
+      rproj[2] = rmean[TF::L5];
+      rproj[3] = rmean[TF::L6];
       break;
     case TF::L3L4:
-      rproj[0] = rmean[L1];
-      rproj[1] = rmean[L2];
-      r1mean   = rmean[L3];
-      r2mean   = rmean[L4];
-      rproj[2] = rmean[L5];
-      rproj[3] = rmean[L6];
+      rproj[0] = rmean[TF::L1];
+      rproj[1] = rmean[TF::L2];
+      r1mean   = rmean[TF::L3];
+      r2mean   = rmean[TF::L4];
+      rproj[2] = rmean[TF::L5];
+      rproj[3] = rmean[TF::L6];
       break;
     case TF::L5L6:
-      rproj[0] = rmean[L1];
-      rproj[1] = rmean[L2];
-      rproj[2] = rmean[L3];
-      rproj[3] = rmean[L4];
-      r1mean   = rmean[L5];
-      r2mean   = rmean[L6];
+      rproj[0] = rmean[TF::L1];
+      rproj[1] = rmean[TF::L2];
+      rproj[2] = rmean[TF::L3];
+      rproj[3] = rmean[TF::L4];
+      r1mean   = rmean[TF::L5];
+      r2mean   = rmean[TF::L6];
       break;
   }
-  TC::Types::zmean zproj[4] = {zmean[D1], zmean[D2], zmean[D3], zmean[D4]};
+  TC::Types::zmean zproj[4] = {zmean[TF::D1], zmean[TF::D2], zmean[TF::D3], zmean[TF::D4]};
   calculate_LXLY<Seed, InnerRegion, OuterRegion>(
       innerStub.getR(),
       innerStub.getPhi(),
@@ -317,7 +303,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // Determine which disk projections are valid.
   valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>=512;
+    bool valid_t=abs(*t)>=floatToInt(1.0, kt);
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= 342 && rD[i] <= 2048;
@@ -329,8 +315,8 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
 
-  bool valid_rinv=abs(*rinv) < rinvcut;
-  bool valid_z0=abs(*z0) < ((Seed == TF::L1L2) ? z0cut_L1L2 : z0cut);
+  bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
+  bool valid_z0=abs(*z0) < ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5 * z0cut, kz0));
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
   const bool keep = (phicrit > 9253) && (phicrit < 56269);
