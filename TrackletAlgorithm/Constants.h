@@ -33,7 +33,7 @@ namespace module {
 // that container as a constexpr function.
 constexpr unsigned kMaxProcOffset(const module::type m) {
   return (m == module::VMR ? 0 :
-         (m == module::TE ? 7 :
+         (m == module::TE ? 0 :
          (m == module::TC ? 0 :
          (m == module::PR ? 0 :
          (m == module::ME ? 0 :
