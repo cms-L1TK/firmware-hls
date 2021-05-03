@@ -23,9 +23,9 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/MC/
 
-#csim_design -mflags "-j8" # FIXME: activate when missing values are fixed
+csim_design -mflags "-j8"
 csynth_design
-#cosim_design # FIXME: activate when missing values are fixed
+cosim_design 
 export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -format ip_catalog -flow impl

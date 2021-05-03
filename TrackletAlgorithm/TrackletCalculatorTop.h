@@ -159,79 +159,7 @@ void TrackletCalculator_L3L4A(
     TrackletProjectionMemory<DISK> projout_disk[]
 );
 
-void TrackletCalculator_L3L4B(
-    const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],
-    const StubPairMemory stubPairs[],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[]
-);
-
-void TrackletCalculator_L3L4C(
-    const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],
-    const StubPairMemory stubPairs[],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[]
-);
-
 void TrackletCalculator_L3L4D(
-    const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],
-    const StubPairMemory stubPairs[],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[]
-);
-
-void TrackletCalculator_L3L4E(
-    const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],
-    const StubPairMemory stubPairs[],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[]
-);
-
-void TrackletCalculator_L3L4F(
-    const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],
-    const StubPairMemory stubPairs[],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[]
-);
-
-void TrackletCalculator_L3L4G(
-    const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],
-    const StubPairMemory stubPairs[],
-    BXType& bx_o,
-    TrackletParameterMemory * trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[]
-);
-
-void TrackletCalculator_L3L4H(
     const BXType bx,
     const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[],
     const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[],

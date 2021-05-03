@@ -7,15 +7,12 @@
 source env_hls.tcl
 
 set modules_to_test {
+  {TC_L1L2D}
   {TC_L1L2E}
   {TC_L1L2F}
   {TC_L1L2G}
   {TC_L1L2H}
   {TC_L1L2I}
-  {TC_L3L4C}
-  {TC_L3L4D}
-  {TC_L3L4E}
-  {TC_L3L4F}
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail

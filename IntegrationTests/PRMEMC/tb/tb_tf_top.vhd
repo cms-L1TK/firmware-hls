@@ -123,7 +123,7 @@ architecture behavior of tb_tf_top is
   -- For VMStubME memories
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_wea       : t_arr8_1b  := (others => '0');
   signal VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr : t_arr8_10b  := (others => (others => '0'));
-  signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_arr8_13b := (others => (others => '0'));
+  signal VMSME_L3PHIC17to24n1_dataarray_data_V_din       : t_arr8_16b := (others => (others => '0'));
   -- For AllStubs memories
   signal AS_L3PHICn4_dataarray_data_V_wea       : std_logic                     := '0';
   signal AS_L3PHICn4_dataarray_data_V_writeaddr : std_logic_vector(9 downto 0)  := (others => '0');
@@ -131,11 +131,11 @@ architecture behavior of tb_tf_top is
   -- FullMatches output
   signal FM_L1L2_L3PHIC_dataarray_data_V_enb      : std_logic                     := '0';
   signal FM_L1L2_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(7 downto 0)  := (others => '0');
-  signal FM_L1L2_L3PHIC_dataarray_data_V_dout     : std_logic_vector(44 downto 0);
+  signal FM_L1L2_L3PHIC_dataarray_data_V_dout     : std_logic_vector(51 downto 0);
   signal FM_L1L2_L3PHIC_nentries_V_dout : t_arr2_7b;
   signal FM_L5L6_L3PHIC_dataarray_data_V_enb      : std_logic                     := '0';
   signal FM_L5L6_L3PHIC_dataarray_data_V_readaddr : std_logic_vector(7 downto 0)  := (others => '0');
-  signal FM_L5L6_L3PHIC_dataarray_data_V_dout     : std_logic_vector(44 downto 0);
+  signal FM_L5L6_L3PHIC_dataarray_data_V_dout     : std_logic_vector(51 downto 0);
   signal FM_L5L6_L3PHIC_nentries_V_dout : t_arr2_7b;
   -- MatchCalculator outputs
   signal MC_bx_out     : std_logic_vector(2 downto 0);
@@ -163,7 +163,7 @@ architecture behavior of tb_tf_top is
   -- VMProjection output
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_wea       : t_arr8_1b;
   signal VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr : t_arr8_8b;
-  signal VMPROJ_L3PHIC17to24_dataarray_data_V_din       : t_arr8_21b;
+  signal VMPROJ_L3PHIC17to24_dataarray_data_V_din       : t_arr8_24b;
   -- MatchEngine output
   signal ME_bx_out     : t_arr8_3b;
   signal ME_bx_out_vld : t_arr8_1b;
@@ -524,25 +524,25 @@ begin
     signal TPROJ_60_mem_A_wea        : t_arr_TPROJ_60_1b   := (others => '0');
     signal TPROJ_60_mem_AV_writeaddr : t_arr_TPROJ_60_ADDR := (others => (others => '0'));
     signal TPROJ_60_mem_AV_din       : t_arr_TPROJ_60_DATA := (others => (others => '0'));
-    signal VMSME_13_mem_A_wea        : t_arr_VMSME_13_1b   := (others => '0');
-    signal VMSME_13_mem_AV_writeaddr : t_arr_VMSME_13_ADDR := (others => (others => '0'));
-    signal VMSME_13_mem_AV_din       : t_arr_VMSME_13_DATA := (others => (others => '0'));
+    signal VMSME_16_mem_A_wea        : t_arr_VMSME_16_1b   := (others => '0');
+    signal VMSME_16_mem_AV_writeaddr : t_arr_VMSME_16_ADDR := (others => (others => '0'));
+    signal VMSME_16_mem_AV_din       : t_arr_VMSME_16_DATA := (others => (others => '0'));
     signal AS_36_mem_A_wea           : t_arr_AS_36_1b      := (others => '0');
     signal AS_36_mem_AV_writeaddr    : t_arr_AS_36_ADDR    := (others => (others => '0'));
     signal AS_36_mem_AV_din          : t_arr_AS_36_DATA    := (others => (others => '0'));
-    signal VMPROJ_21_mem_A_wea       : t_arr_VMPROJ_21_1b      := (others => '0');
-    signal VMPROJ_21_mem_AV_writeaddr: t_arr_VMPROJ_21_ADDR    := (others => (others => '0'));
-    signal VMPROJ_21_mem_AV_din      : t_arr_VMPROJ_21_DATA    := (others => (others => '0'));
+    signal VMPROJ_24_mem_A_wea       : t_arr_VMPROJ_24_1b      := (others => '0');
+    signal VMPROJ_24_mem_AV_writeaddr: t_arr_VMPROJ_24_ADDR    := (others => (others => '0'));
+    signal VMPROJ_24_mem_AV_din      : t_arr_VMPROJ_24_DATA    := (others => (others => '0'));
     signal CM_14_mem_A_wea           : t_arr_CM_14_1b      := (others => '0');
     signal CM_14_mem_AV_writeaddr    : t_arr_CM_14_ADDR    := (others => (others => '0'));
     signal CM_14_mem_AV_din          : t_arr_CM_14_DATA    := (others => (others => '0'));
     signal AP_60_mem_A_wea           : t_arr_AP_60_1b      := (others => '0');
     signal AP_60_mem_AV_writeaddr    : t_arr_AP_60_ADDR    := (others => (others => '0'));
     signal AP_60_mem_AV_din          : t_arr_AP_60_DATA    := (others => (others => '0'));
-    signal FM_45_mem_A_enb           : t_arr_FM_45_1b      := (others => '0');
-    signal FM_45_mem_AV_readaddr     : t_arr_FM_45_ADDR    := (others => (others => '0'));
-    signal FM_45_mem_AV_dout         : t_arr_FM_45_DATA    := (others => (others => '0'));
-    signal FM_45_mem_AAV_dout_nent   : t_arr_FM_45_NENT    := (others => (others => (others => '0')));
+    signal FM_52_mem_A_enb           : t_arr_FM_52_1b      := (others => '0');
+    signal FM_52_mem_AV_readaddr     : t_arr_FM_52_ADDR    := (others => (others => '0'));
+    signal FM_52_mem_AV_dout         : t_arr_FM_52_DATA    := (others => (others => '0'));
+    signal FM_52_mem_AAV_dout_nent   : t_arr_FM_52_NENT    := (others => (others => (others => '0')));
   -- ----------------------------------------------------
   begin
 
@@ -556,13 +556,13 @@ begin
       TPROJ_60_mem_AV_writeaddr(enum_TPROJ_60'val(mm)) <= TPROJ_L3PHIC_dataarray_data_V_writeaddr(mm);
       TPROJ_60_mem_AV_din(enum_TPROJ_60'val(mm))       <= TPROJ_L3PHIC_dataarray_data_V_din(mm);
       -- VMStubME input
-      VMSME_13_mem_A_wea(enum_VMSME_13'val(mm))        <= VMSME_L3PHIC17to24n1_dataarray_data_V_wea(mm);
-      VMSME_13_mem_AV_writeaddr(enum_VMSME_13'val(mm)) <= VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(mm);
-      VMSME_13_mem_AV_din(enum_VMSME_13'val(mm))       <= VMSME_L3PHIC17to24n1_dataarray_data_V_din(mm);
+      VMSME_16_mem_A_wea(enum_VMSME_16'val(mm))        <= VMSME_L3PHIC17to24n1_dataarray_data_V_wea(mm);
+      VMSME_16_mem_AV_writeaddr(enum_VMSME_16'val(mm)) <= VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(mm);
+      VMSME_16_mem_AV_din(enum_VMSME_16'val(mm))       <= VMSME_L3PHIC17to24n1_dataarray_data_V_din(mm);
       -- Debug output
-      VMPROJ_L3PHIC17to24_dataarray_data_V_wea(mm)       <= VMPROJ_21_mem_A_wea(enum_VMPROJ_21'val(mm));
-      VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(mm) <= VMPROJ_21_mem_AV_writeaddr(enum_VMPROJ_21'val(mm));
-      VMPROJ_L3PHIC17to24_dataarray_data_V_din(mm)       <= VMPROJ_21_mem_AV_din(enum_VMPROJ_21'val(mm));
+      VMPROJ_L3PHIC17to24_dataarray_data_V_wea(mm)       <= VMPROJ_24_mem_A_wea(enum_VMPROJ_24'val(mm));
+      VMPROJ_L3PHIC17to24_dataarray_data_V_writeaddr(mm) <= VMPROJ_24_mem_AV_writeaddr(enum_VMPROJ_24'val(mm));
+      VMPROJ_L3PHIC17to24_dataarray_data_V_din(mm)       <= VMPROJ_24_mem_AV_din(enum_VMPROJ_24'val(mm));
       CM_L3PHIC17to24_dataarray_data_V_wea(mm)       <= CM_14_mem_A_wea(enum_CM_14'val(mm));
       CM_L3PHIC17to24_dataarray_data_V_writeaddr(mm) <= CM_14_mem_AV_writeaddr(enum_CM_14'val(mm));
       CM_L3PHIC17to24_dataarray_data_V_din(mm)       <= CM_14_mem_AV_din(enum_CM_14'val(mm));
@@ -577,14 +577,14 @@ begin
     AP_L3PHIC_dataarray_data_V_writeaddr <= AP_60_mem_AV_writeaddr(L3PHIC);
     AP_L3PHIC_dataarray_data_V_din       <= AP_60_mem_AV_din(L3PHIC);
     -- FullMatches data output (others input)
-    FM_45_mem_A_enb(L1L2_L3PHIC)         <= FM_L1L2_L3PHIC_dataarray_data_V_enb;
-    FM_45_mem_AV_readaddr(L1L2_L3PHIC)   <= FM_L1L2_L3PHIC_dataarray_data_V_readaddr;
-    FM_L1L2_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L1L2_L3PHIC);
-    FM_L1L2_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L1L2_L3PHIC);
-    FM_45_mem_A_enb(L5L6_L3PHIC)         <= FM_L5L6_L3PHIC_dataarray_data_V_enb;
-    FM_45_mem_AV_readaddr(L5L6_L3PHIC)   <= FM_L5L6_L3PHIC_dataarray_data_V_readaddr;
-    FM_L5L6_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L5L6_L3PHIC);
-    FM_L5L6_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L5L6_L3PHIC);
+    FM_52_mem_A_enb(L1L2_L3PHIC)         <= FM_L1L2_L3PHIC_dataarray_data_V_enb;
+    FM_52_mem_AV_readaddr(L1L2_L3PHIC)   <= FM_L1L2_L3PHIC_dataarray_data_V_readaddr;
+    FM_L1L2_L3PHIC_dataarray_data_V_dout <= FM_52_mem_AV_dout(L1L2_L3PHIC);
+    FM_L1L2_L3PHIC_nentries_V_dout       <= FM_52_mem_AAV_dout_nent(L1L2_L3PHIC);
+    FM_52_mem_A_enb(L5L6_L3PHIC)         <= FM_L5L6_L3PHIC_dataarray_data_V_enb;
+    FM_52_mem_AV_readaddr(L5L6_L3PHIC)   <= FM_L5L6_L3PHIC_dataarray_data_V_readaddr;
+    FM_L5L6_L3PHIC_dataarray_data_V_dout <= FM_52_mem_AV_dout(L5L6_L3PHIC);
+    FM_L5L6_L3PHIC_nentries_V_dout       <= FM_52_mem_AAV_dout_nent(L5L6_L3PHIC);
 
     uut : entity work.SectorProcessorFull
       port map(
@@ -606,16 +606,16 @@ begin
 	TPROJ_60_mem_A_wea 	   => TPROJ_60_mem_A_wea,
 	TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
 	TPROJ_60_mem_AV_din 	   => TPROJ_60_mem_AV_din,
-	VMSME_13_mem_A_wea 	   => VMSME_13_mem_A_wea,
-	VMSME_13_mem_AV_writeaddr  => VMSME_13_mem_AV_writeaddr,
-	VMSME_13_mem_AV_din 	   => VMSME_13_mem_AV_din,
+	VMSME_16_mem_A_wea 	   => VMSME_16_mem_A_wea,
+	VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
+	VMSME_16_mem_AV_din 	   => VMSME_16_mem_AV_din,
 	AS_36_mem_A_wea 	   => AS_36_mem_A_wea,
 	AS_36_mem_AV_writeaddr 	   => AS_36_mem_AV_writeaddr,
 	AS_36_mem_AV_din 	   => AS_36_mem_AV_din,
 	-- Debug output data
-	VMPROJ_21_mem_A_wea 	   => VMPROJ_21_mem_A_wea,
-	VMPROJ_21_mem_AV_writeaddr => VMPROJ_21_mem_AV_writeaddr,
-	VMPROJ_21_mem_AV_din 	   => VMPROJ_21_mem_AV_din,
+	VMPROJ_24_mem_A_wea 	   => VMPROJ_24_mem_A_wea,
+	VMPROJ_24_mem_AV_writeaddr => VMPROJ_24_mem_AV_writeaddr,
+	VMPROJ_24_mem_AV_din 	   => VMPROJ_24_mem_AV_din,
 	CM_14_mem_A_wea 	   => CM_14_mem_A_wea,
 	CM_14_mem_AV_writeaddr 	   => CM_14_mem_AV_writeaddr,
 	CM_14_mem_AV_din 	   => CM_14_mem_AV_din,
@@ -623,10 +623,10 @@ begin
 	AP_60_mem_AV_writeaddr 	   => AP_60_mem_AV_writeaddr,
 	AP_60_mem_AV_din 	   => AP_60_mem_AV_din,
 	-- Output data
-	FM_45_mem_A_enb 	   => FM_45_mem_A_enb,
-	FM_45_mem_AV_readaddr 	   => FM_45_mem_AV_readaddr,
-	FM_45_mem_AV_dout 	   => FM_45_mem_AV_dout,
-	FM_45_mem_AAV_dout_nent    => FM_45_mem_AAV_dout_nent
+	FM_52_mem_A_enb 	   => FM_52_mem_A_enb,
+	FM_52_mem_AV_readaddr 	   => FM_52_mem_AV_readaddr,
+	FM_52_mem_AV_dout 	   => FM_52_mem_AV_dout,
+	FM_52_mem_AAV_dout_nent    => FM_52_mem_AAV_dout_nent
       );
   end generate sectorProcFull;
 
@@ -722,16 +722,16 @@ begin
     signal TPROJ_60_mem_A_wea        : t_arr_TPROJ_60_1b   := (others => '0');
     signal TPROJ_60_mem_AV_writeaddr : t_arr_TPROJ_60_ADDR := (others => (others => '0'));
     signal TPROJ_60_mem_AV_din       : t_arr_TPROJ_60_DATA := (others => (others => '0'));
-    signal VMSME_13_mem_A_wea        : t_arr_VMSME_13_1b   := (others => '0');
-    signal VMSME_13_mem_AV_writeaddr : t_arr_VMSME_13_ADDR := (others => (others => '0'));
-    signal VMSME_13_mem_AV_din       : t_arr_VMSME_13_DATA := (others => (others => '0'));
+    signal VMSME_16_mem_A_wea        : t_arr_VMSME_16_1b   := (others => '0');
+    signal VMSME_16_mem_AV_writeaddr : t_arr_VMSME_16_ADDR := (others => (others => '0'));
+    signal VMSME_16_mem_AV_din       : t_arr_VMSME_16_DATA := (others => (others => '0'));
     signal AS_36_mem_A_wea           : t_arr_AS_36_1b      := (others => '0');
     signal AS_36_mem_AV_writeaddr    : t_arr_AS_36_ADDR    := (others => (others => '0'));
     signal AS_36_mem_AV_din          : t_arr_AS_36_DATA    := (others => (others => '0'));
-    signal FM_45_mem_A_enb           : t_arr_FM_45_1b      := (others => '0');
-    signal FM_45_mem_AV_readaddr     : t_arr_FM_45_ADDR    := (others => (others => '0'));
-    signal FM_45_mem_AV_dout         : t_arr_FM_45_DATA    := (others => (others => '0'));
-    signal FM_45_mem_AAV_dout_nent   : t_arr_FM_45_NENT    := (others => (others => (others => '0')));
+    signal FM_52_mem_A_enb           : t_arr_FM_52_1b      := (others => '0');
+    signal FM_52_mem_AV_readaddr     : t_arr_FM_52_ADDR    := (others => (others => '0'));
+    signal FM_52_mem_AV_dout         : t_arr_FM_52_DATA    := (others => (others => '0'));
+    signal FM_52_mem_AAV_dout_nent   : t_arr_FM_52_NENT    := (others => (others => (others => '0')));
   -- ----------------------------------------------------
   begin
 
@@ -743,9 +743,9 @@ begin
       TPROJ_60_mem_AV_writeaddr(enum_TPROJ_60'val(mm)) <= TPROJ_L3PHIC_dataarray_data_V_writeaddr(mm);
       TPROJ_60_mem_AV_din(enum_TPROJ_60'val(mm))       <= TPROJ_L3PHIC_dataarray_data_V_din(mm);
       -- VMStubME input
-      VMSME_13_mem_A_wea(enum_VMSME_13'val(mm))        <= VMSME_L3PHIC17to24n1_dataarray_data_V_wea(mm);
-      VMSME_13_mem_AV_writeaddr(enum_VMSME_13'val(mm)) <= VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(mm);
-      VMSME_13_mem_AV_din(enum_VMSME_13'val(mm))       <= VMSME_L3PHIC17to24n1_dataarray_data_V_din(mm);
+      VMSME_16_mem_A_wea(enum_VMSME_16'val(mm))        <= VMSME_L3PHIC17to24n1_dataarray_data_V_wea(mm);
+      VMSME_16_mem_AV_writeaddr(enum_VMSME_16'val(mm)) <= VMSME_L3PHIC17to24n1_dataarray_data_V_writeaddr(mm);
+      VMSME_16_mem_AV_din(enum_VMSME_16'val(mm))       <= VMSME_L3PHIC17to24n1_dataarray_data_V_din(mm);
     end generate CopyArray;
 
     -- AllStubs input
@@ -753,14 +753,14 @@ begin
     AS_36_mem_AV_writeaddr(L3PHICn6) <= AS_L3PHICn4_dataarray_data_V_writeaddr;
     AS_36_mem_AV_din(L3PHICn6)       <= AS_L3PHICn4_dataarray_data_V_din;
     -- FullMatches data output (others input)
-    FM_45_mem_A_enb(L1L2_L3PHIC)         <= FM_L1L2_L3PHIC_dataarray_data_V_enb;
-    FM_45_mem_AV_readaddr(L1L2_L3PHIC)   <= FM_L1L2_L3PHIC_dataarray_data_V_readaddr;
-    FM_L1L2_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L1L2_L3PHIC);
-    FM_L1L2_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L1L2_L3PHIC);
-    FM_45_mem_A_enb(L5L6_L3PHIC)         <= FM_L5L6_L3PHIC_dataarray_data_V_enb;
-    FM_45_mem_AV_readaddr(L5L6_L3PHIC)   <= FM_L5L6_L3PHIC_dataarray_data_V_readaddr;
-    FM_L5L6_L3PHIC_dataarray_data_V_dout <= FM_45_mem_AV_dout(L5L6_L3PHIC);
-    FM_L5L6_L3PHIC_nentries_V_dout       <= FM_45_mem_AAV_dout_nent(L5L6_L3PHIC);
+    FM_52_mem_A_enb(L1L2_L3PHIC)         <= FM_L1L2_L3PHIC_dataarray_data_V_enb;
+    FM_52_mem_AV_readaddr(L1L2_L3PHIC)   <= FM_L1L2_L3PHIC_dataarray_data_V_readaddr;
+    FM_L1L2_L3PHIC_dataarray_data_V_dout <= FM_52_mem_AV_dout(L1L2_L3PHIC);
+    FM_L1L2_L3PHIC_nentries_V_dout       <= FM_52_mem_AAV_dout_nent(L1L2_L3PHIC);
+    FM_52_mem_A_enb(L5L6_L3PHIC)         <= FM_L5L6_L3PHIC_dataarray_data_V_enb;
+    FM_52_mem_AV_readaddr(L5L6_L3PHIC)   <= FM_L5L6_L3PHIC_dataarray_data_V_readaddr;
+    FM_L5L6_L3PHIC_dataarray_data_V_dout <= FM_52_mem_AV_dout(L5L6_L3PHIC);
+    FM_L5L6_L3PHIC_nentries_V_dout       <= FM_52_mem_AAV_dout_nent(L5L6_L3PHIC);
 
     uut : entity work.SectorProcessor
       port map(
@@ -774,16 +774,16 @@ begin
 	TPROJ_60_mem_A_wea 	   => TPROJ_60_mem_A_wea,
 	TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
 	TPROJ_60_mem_AV_din 	   => TPROJ_60_mem_AV_din,
-	VMSME_13_mem_A_wea 	   => VMSME_13_mem_A_wea,
-	VMSME_13_mem_AV_writeaddr  => VMSME_13_mem_AV_writeaddr,
-	VMSME_13_mem_AV_din 	   => VMSME_13_mem_AV_din,
+	VMSME_16_mem_A_wea 	   => VMSME_16_mem_A_wea,
+	VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
+	VMSME_16_mem_AV_din 	   => VMSME_16_mem_AV_din,
 	AS_36_mem_A_wea 	   => AS_36_mem_A_wea,
 	AS_36_mem_AV_writeaddr 	   => AS_36_mem_AV_writeaddr,
 	AS_36_mem_AV_din 	   => AS_36_mem_AV_din,
-	FM_45_mem_A_enb 	   => FM_45_mem_A_enb,
-	FM_45_mem_AV_readaddr 	   => FM_45_mem_AV_readaddr,
-	FM_45_mem_AV_dout 	   => FM_45_mem_AV_dout,
-	FM_45_mem_AAV_dout_nent    => FM_45_mem_AAV_dout_nent
+	FM_52_mem_A_enb 	   => FM_52_mem_A_enb,
+	FM_52_mem_AV_readaddr 	   => FM_52_mem_AV_readaddr,
+	FM_52_mem_AV_dout 	   => FM_52_mem_AV_dout,
+	FM_52_mem_AAV_dout_nent    => FM_52_mem_AAV_dout_nent
       );
   end generate sectorProc;
 

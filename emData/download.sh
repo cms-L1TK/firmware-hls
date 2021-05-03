@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
-# fw_synch_201005
-memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
-luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
+#### fw_synch_210503 ####
+# Standard configuration
+memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+# Combined modules
+memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
 
-# Supplemental test-vectors for development of the PurgeDuplicates module.
-# Generated after PR #70 was merged:
-# https://github.com/cms-L1TK/cmssw/tree/1606921d6c26b13292808ec8198db8c6a400dad0
-pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
+#### fw_synch_201005 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
 
-# fw_synch_200515
+#### fw_synch_200515 ####
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
@@ -40,10 +43,6 @@ declare -a processing_modules=(
   "TC_L3L4B"
   "TC_L3L4C"
   "TC_L3L4D"
-  "TC_L3L4E"
-  "TC_L3L4F"
-  "TC_L3L4G"
-  "TC_L3L4H"
   "TC_L5L6A"
   "TC_L5L6B"
   "TC_L5L6C"
@@ -64,6 +63,12 @@ declare -a processing_modules=(
   "MC_L4PHIC"
   "MC_L5PHIC"
   "MC_L6PHIC"
+
+  # TrackBuilder (aka FitTrack)
+  "FT_L1L2"
+
+  # Tracklet Processor
+  "TP_L1L2D" 
 )
 
 # Function that prints information regarding the usage of this command
@@ -121,6 +126,10 @@ fi
 # Download and unpack LUTs.tar.gz.
 if [[ $memprints_only == 0 ]]
 then
+  wget -O LUTs.tgz --quiet ${luts_url_cm}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsCM
+  rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzf LUTs.tar.gz
   rm -f LUTs.tar.gz
@@ -132,15 +141,15 @@ then
   exit 0
 fi
 
-# Download and unpack MemPrints.tar.gz.
+# Download and unpack the tarball.
+wget -O MemPrints.tgz --quiet ${memprints_url_cm}
+tar -xzf MemPrints.tgz
+mv MemPrints MemPrintsCM
+rm -f MemPrints.tgz
+
 wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
-
-# Download and unpack PD.tar.gz
-wget -O PD.tar.gz --quiet ${pd_url}
-tar -xzf PD.tar.gz
-rm -f PD.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
@@ -150,18 +159,28 @@ unset LD_LIBRARY_PATH
 # links to the associated test-bench files.
 for module in ${processing_modules[@]}
 do
+  echo ${module}
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
+  memprint_location="MemPrints"
+  table_location="LUTs"
+  if [[ ${module_type} == "TP" ]]
+  then
+    memprint_location="MemPrintsCM"
+    table_location="LUTsCM"
+  fi
+  wires="${table_location}/wires.dat"
+
   target_dir=${module_type}/${module}
 
   rm -rf ${target_dir}
   mkdir -p ${target_dir}
-  for mem in `grep "${module}\." wires_hourglass.dat | awk '{print $1}' | sort -u`;
+
+  for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
   do
-    find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+    find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
   done
 
   # Table linking logic specific to each module type
-  table_location="LUTs/"
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
@@ -176,6 +195,11 @@ do
   then
           layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+  elif [[ ${module_type} == "TP" ]]
+  then
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "TP_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
@@ -184,9 +208,9 @@ do
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          for mem in `grep "${module}\." wires_hourglass.dat | awk '{print $1}' | sort -u`;
+          for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
           do
-            find ${table_location} -type f -name "${mem}*.tab" -exec ln -s ../../{} ${table_target_dir}/ \;
+            find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           done
   fi
 done
