@@ -23,8 +23,6 @@ class ComparisonModule{
 
     unsigned int getNProcessed(){return tracksProcessed;}
 
-    // void processTrack();
-
     unsigned int myIndex;
 
     unsigned int getEndOfStream(){return endOfStream;}
