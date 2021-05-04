@@ -3,8 +3,7 @@
 
 #include "TrackFitMemory.h"
 
-void TrackMerger(const BXType bx,
-                    TrackFitMemory inputTracks,
-                    TrackFitMemory &outputTracks);
+void TrackMerger(const BXType bx, TrackFit::Trackword trackWord [kMaxProc], TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc], 
+TrackFit::DiskStubWord diskStubWords[4][kMaxProc]));
 
 #endif
