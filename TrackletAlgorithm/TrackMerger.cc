@@ -16,7 +16,6 @@ TrackFit::DiskStubWord diskStubWords[4][kMaxProc]){
         trkFit.setTrackWord(trackWord[i]);
         auto trackStubMap = trkFit.getHitMap();
         std::cout << "Track Stub Map: " << trackStubMap << std::endl;
-        unsigned int stubCounter = 0;
         //every 3 bits is a new layer/disk - getting number of stubs in each layer
         for (int layer = 0; layer < trackStubMap.length()/kTFHitCountSize; layer++){
             int stubNumber = trackStubMap.range(trackStubMap.length() - kTFHitCountSize*layer, trackStubMap.length() - kTFHitCountSize*(layer + 1))
@@ -36,16 +35,14 @@ TrackFit::DiskStubWord diskStubWords[4][kMaxProc]){
                 //getStubPhiResid() for phi res of stub
                 //set phi res to smallest value using setStubPhiResid()
             }
-            //stubCounter++;
         }
             
       
     // if there are > 3 stubs in common, merge tracks into single track
-    //if (stubCounter > 3){
+    //if (stubNumber > 3){
         // assign track helix params according to best seed type between the two tracks
         // use trkFit.getTrackWord() then trkFit.getSeedType() 
         // merge using trkFit.setTrackWord()
-        // create the TrackStub
         //}
 
     }
