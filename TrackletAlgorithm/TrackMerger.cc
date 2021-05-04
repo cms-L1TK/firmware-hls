@@ -1,15 +1,7 @@
 #include "TrackMerger.h"
 
-void TrackMerger(const BXType bx, TrackFit::Trackword trackWord [kMaxProc], TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc], 
-TrackFit::DiskStubWord diskStubWords[4][kMaxProc]), TrackFit::TrackWord newTrackWord){
-    //ap_uint<kNBits_MemAddr> addr;
-    //TrackFitMemory inputTracks;
-    //TrackFitMemory outputTracks;
-    //for(ap_uint<kNBits_MemAddr> addr = 0; addr < inputTracks.getEntries(bx); addr++){
-        //auto track = inputTracks.read_mem(bx, addr);
-        //outputTracks.write_mem(bx, track, addr);
-         
-    //}
+void TrackMerger(const BXType bx, TrackFit::TrackWord trackWord [kMaxProc], TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc], 
+TrackFit::DiskStubWord diskStubWords[4][kMaxProc]){
 
     #pragma HLS array_partition variable=barrelStubWords complete dim=1
     #pragma HLS array_partition variable=diskStubWords complete dim=1
@@ -20,32 +12,39 @@ TrackFit::DiskStubWord diskStubWords[4][kMaxProc]), TrackFit::TrackWord newTrack
     // Comparison module
     // count stubs in common, looking at stubs with smallest phi residual in each layer
     for (unsigned int i = 0; i < kMaxProc; i++){
-        auto trackStubMap = trackWord.getHitMap();
+        TrackFit trkFit;
+        trkFit.setTrackWord(trackWord[i]);
+        auto trackStubMap = trkFit.getHitMap();
         std::cout << "Track Stub Map: " << trackStubMap << std::endl;
-        //for(each layer){
-            //unsigned int stubCounter = 0;
-            //for(each hit in layer){
-                //if(in barrel){
-                    //getBarrelStubWord()
-                    //getStubIndex() for hit and getStubPhiResid() for phi res of stub
-                    //compare stub index if they are the same
-                    //set phi res to smallest value using setStubPhiResid()
-                //}
-                //if(in disk){
-                    //getDiskStubWord()
-                    //getStubIndex() for hit and getStubPhiResid() for phi res of stub
-                    //compare stub index if they are the same
-                    //set phi res to smallest value using setStubPhiResid()
-                //}
-                
-                //stubCounter++;
-           //}       
-        //}
+        unsigned int stubCounter = 0;
+        //every 3 bits is a new layer/disk - getting number of stubs in each layer
+        for (int layer = 0; layer < trackStubMap.length()/kTFHitCountSize; layer++){
+            int stubNumber = trackStubMap.range(trackStubMap.length() - kTFHitCountSize*layer, trackStubMap.length() - kTFHitCountSize*(layer + 1))
+             
+             for (unsigned int j = 0; j < kNBarrelStubs - 1; j++;){
+                trkFit.setBarrelStubWord<j>(barrelStubWords[j][i]);
+                //barrelStubWord = trkFit.getBarrelStubWord<2>();
+                //trkFit.getStubIndex()
+                //getStubPhiResid() for phi res of stub
+                //set phi res to smallest value using setStubPhiResid()
+             }
+            
+            for (unsigned int k = kNBarrelStubs; k < kNStubs - 1; k++;){
+                trkFit.setDiskStubWord<k>(DiskStubWords[k][i]);
+                //use trkFit.getDiskStubWord()
+                //trkFit.getStubIndex()
+                //getStubPhiResid() for phi res of stub
+                //set phi res to smallest value using setStubPhiResid()
+            }
+            //stubCounter++;
+        }
+            
+      
     // if there are > 3 stubs in common, merge tracks into single track
     //if (stubCounter > 3){
         // assign track helix params according to best seed type between the two tracks
-        // use track.getTrackWord() then track.getSeedType() 
-        // merge using track.setTrackWord()
+        // use trkFit.getTrackWord() then trkFit.getSeedType() 
+        // merge using trkFit.setTrackWord()
         // create the TrackStub
         //}
 
