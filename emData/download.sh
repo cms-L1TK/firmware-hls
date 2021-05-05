@@ -18,8 +18,12 @@ pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # Combined modules - temporary
-tarball_url_cm="https://www.dropbox.com/s/d91rt7jxdci5cxg/MemPrintsCombined_210325.tgz?dl=0"
-luts_url_cm="https://www.dropbox.com/s/ha9to96ims49iwg/LUTsCombined_210325.tgz?dl=0"
+#tarball_url_cm="https://www.dropbox.com/s/d91rt7jxdci5cxg/MemPrintsCombined_210325.tgz?dl=0"
+#luts_url_cm="https://www.dropbox.com/s/ha9to96ims49iwg/LUTsCombined_210325.tgz?dl=0"
+#tarball_url_cm="https://www.dropbox.com/s/eaosn2famgwh6p3/MemPrints_Combined_210503.tgx?dl=0"
+#luts_url_cm="https://www.dropbox.com/s/pgcnbtvbzzajcls/LUTs_Combined_210503.tgx?dl=0"
+tarball_url_cm="https://www.dropbox.com/s/zrhs3e6j2em6lbd/MemPrints_Combined_210504.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/kdj2bey9nb9ds4c/LUTs_Combined_210504.tgz?dl=0"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.

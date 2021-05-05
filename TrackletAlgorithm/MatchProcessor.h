@@ -156,7 +156,7 @@ namespace PR
   // Number of loop iterations subtracted from the full 108 so that the function
   // stays synchronized with other functions in the chain. Once we get these
   // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 7;
+  constexpr unsigned int LoopItersCut = 0;
 
   inline void zbinLUTinit(ap_uint<2*MEBinsBits> zbinLUT[128], int zbins_adjust_PSseed, int zbins_adjust_2Sseed){
 
@@ -256,6 +256,8 @@ void readTable(bool table[256]){
 
 
 }
+
+
 
 //////////////////////////////////////////////////////////////
 
@@ -584,7 +586,7 @@ void MatchProcessor(BXType bx,
 
   
   using namespace PR;
-  
+
   //Initialize table for bend-rinv consistency
   bool table[kNMatchEngines][(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 #pragma HLS ARRAY_PARTITION variable=table complete
@@ -610,6 +612,11 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
+
+  for (unsigned int ii=0;ii<nINMEM;ii++) {
+    std::cout << "ii nmem : "<<ii<<" "<<numbersin[ii]<<std::endl;
+  }
+
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -686,17 +693,27 @@ void MatchProcessor(BXType bx,
  PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1 //rewind
 
+    //bool projBuffNearFull = projbufferarray.nearFull();
+    auto readptr = projbufferarray.getReadPtr();
+    auto writeptr = projbufferarray.getWritePtr();
+    bool empty = readptr == writeptr;
+    bool projBuffNearFull = nearFull3Unit<kNBitsBuffer>()[(readptr,writeptr)];
+    
+    std::cout << "istep = "<<istep<<" projBuff: "<<projbufferarray.getReadPtr()<<" "<<projbufferarray.getWritePtr()
+              <<" "<<projBuffNearFull;
+    for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+      std::cout <<" MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()
+		<<" "<<matchengine[iMEU].idle()<<" "<<matchengine[iMEU].empty()
+		<<" "<<matchengine[iMEU].Good_()<<matchengine[iMEU].Good__()
+		<<" "<<matchengine[iMEU].getTrkID();
+    }
+    std::cout << std::endl;
+
     ap_uint<3> iphi = 0;
     if (istep == 0) {
       nallproj = 0;
     }
 
-    //bool projBuffNearFull = projbufferarray.nearFull();
-    auto readptr = projbufferarray.getReadPtr();
-    auto writeptr = projbufferarray.getWritePtr();
-    bool empty = readptr == writeptr;
-    bool projBuffNearFull = nearFullUnit<kNBitsBuffer>()[(readptr,writeptr)];
-    
     ap_uint<kNMatchEngines> idles;
     ap_uint<kNMatchEngines> emptys;
     typename ProjectionRouterBuffer<BARREL, ASTYPE>::TRKID trkids[kNMatchEngines];
@@ -709,6 +726,7 @@ void MatchProcessor(BXType bx,
 
   MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
+      matchengine[iMEU].set_empty();
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
@@ -719,6 +737,7 @@ void MatchProcessor(BXType bx,
     
     ap_uint<kNMatchEngines> smallest = ~emptys;
     //std::cout << "init smallest : "<<smallest[0]<<" "<<smallest[1]<<" "<<smallest[2]<<" "<<smallest[3]<<std::endl;
+    //std::cout << "trkids : "<<trkids[0]<<" "<<trkids[1]<<" "<<trkids[2]<<" "<<trkids[3]<<std::endl;
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
   MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
@@ -746,14 +765,16 @@ void MatchProcessor(BXType bx,
       auto &meu = matchengine[iMEU];
       
       bool idle = idles[iMEU];//meu.idle();
-      
+
+      meu.processPipeLine(table[iMEU]);      
+
       if(idle && !empty && !init) {
         init =  true;
         auto iphi = tmpprojbuff.getPhi();
         meu.init(bx, tmpprojbuff, iphi, iMEU);
       }
 
-      else meu.step(table[iMEU], instubdata.getMem(iMEU));
+      else meu.step(instubdata.getMem(iMEU), iMEU==0);
 
     } //end MEU loop
     
@@ -925,6 +946,7 @@ void MatchProcessor(BXType bx,
 
       if (nstubs!=0) { 
 	ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
+	//std::cout << "istep: "<<istep<<" adding to projbuffer"<<std::endl;
 	projbufferarray.addProjection(projbuffertmp);
       }
       
@@ -943,7 +965,10 @@ void MatchProcessor(BXType bx,
 	 proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
 	 proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
 	 proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in,
-	 projdata, nproj); 
+	 projdata, nproj);
+
+      //std::cout << "istep validin : "<<istep<<" "<<validin<<std::endl;
+ 
     } else {
       validin = false;
     }// end if not near full

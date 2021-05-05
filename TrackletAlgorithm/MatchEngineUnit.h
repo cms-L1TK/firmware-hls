@@ -42,15 +42,49 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
-inline MatchEngineUnit() {
+  inline MatchEngineUnit() {
 #pragma HLS inline
-  writeindex_ = 0;
-  readindex_ = 0;
-  stubmask_ = 0;
-  nstubs_ = 0;
-  idle_ = true;
-  good_ = false;
-}
+    writeindex_ = 0;
+    readindex_ = 0;
+    stubmask_ = 0;
+    nstubs_ = 0;
+    idle_ = true;
+    good_ = false;
+    good__ = false;
+  }
+  
+  inline void processPipeLine(bool *table) {
+    if (good__) {
+      auto stubindex=stubdata__.getIndex();
+      auto stubfinez=stubdata__.getFineZ();
+      auto stubfinephi=stubdata__.getFinePhi();
+      auto stubbend=stubdata__.getBend();
+    
+      //int phidiff = projfinephi___ - stubfinephi;
+
+      //bool passphi =  phidiff < 3 && phidiff > -3;
+      bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
+    
+      //Check if stub z position consistent
+      //ap_int<5> idz=stubfinez-projfinezadj__;
+      bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
+
+      auto const index=projrinv__.concat(stubbend);
+
+      //Check if stub bend and proj rinv consistent
+      if (passphi&&pass&&table[index]) {
+	matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
+      } // if(pass&&table[index])
+    }
+
+    good__ = good_;
+    stubdata__ = stubdata_;
+    projfinephi___ = projfinephi__;
+    projfinezadj__ = projfinezadj_;
+    isPSseed__ = isPSseed_;
+    projrinv__ = projrinv_;
+    projbuffer___ = projbuffer__;
+  }
 
 
  inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, int iphi, int unit) {
@@ -80,13 +114,55 @@ inline MatchEngineUnit() {
   assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
+  auto const qdata=projbuffer_;
+  tcid=qdata.getTCID();
+
+  /*
+  if (good__) {
+    auto stubindex=stubdata__.getIndex();
+    auto stubfinez=stubdata__.getFineZ();
+    auto stubfinephi=stubdata__.getFinePhi();
+    auto stubbend=stubdata__.getBend();
+    
+    //int phidiff = projfinephi___ - stubfinephi;
+
+    //bool passphi =  phidiff < 3 && phidiff > -3;
+    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
+    
+    //Check if stub z position consistent
+    //ap_int<5> idz=stubfinez-projfinezadj__;
+    bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
+
+    auto const index=projrinv__.concat(stubbend);
+
+    //Check if stub bend and proj rinv consistent
+    if (passphi&&pass&&table[index]) {
+      matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
+    } // if(pass&&table[index])
+  }
+
+  good__ = good_;
+  stubdata__ = stubdata_;
+  projfinephi___ = projfinephi__;
+  projfinezadj__ = projfinezadj_;
+  isPSseed__ = isPSseed_;
+  projrinv__ = projrinv_;
+  projbuffer___ = projbuffer__;
+  */  
+
+  good_ = false;
+
 }
 
- inline bool empty() {
+ inline void set_empty() {
+   empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+ }
+
+ inline bool empty() const {
 #pragma HLS inline  
    //return (readindex_==writeindex_);
-   return emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
-   
+   //return emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+   return empty_;
  }
  
  inline bool nearFull() {
@@ -99,10 +175,19 @@ inline MatchEngineUnit() {
    return nearFullLUT[(readindex_,writeindex_)];
  }
 
-inline bool idle() {
+ inline bool idle() {
 #pragma HLS inline  
-  return idle_;
-}
+   return idle_;
+ }
+
+ inline INDEX readIndex() const {
+   return readindex_;
+ }
+
+ inline INDEX writeIndex() const {
+   return writeindex_;
+ }
+   
 
 inline bool processing() {
 #pragma HLS inline  
@@ -174,12 +259,13 @@ inline MATCH read() {
 
 }
 
- inline void step(bool *table, const VMStubMECM<VMSMEType> stubmem[2][1024]) {
+ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024], bool print) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
    bool nearfull = nearFull();
 
+   /*
    if (good__) {
      auto stubindex=stubdata__.getIndex();
      auto stubfinez=stubdata__.getFineZ();
@@ -194,16 +280,14 @@ inline MATCH read() {
      //Check if stub z position consistent
      //ap_int<5> idz=stubfinez-projfinezadj__;
      bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
-     /*
-     if (isPSseed__) {
-       pass=idz>=-1&&idz<=1;
-     } else {
-       pass=idz>=-5&&idz<=5;
-     }
-     */
 
      auto const index=projrinv__.concat(stubbend);
-     
+
+     if (print) {
+       //std::cout << "passphi pass table index : "<<passphi<<" "<<pass<<" "<<table[index]<<" "<<index
+       //		 <<"  z : "<<stubfinez<<" "<<projfinezadj__<<std::endl;
+     }
+
      //Check if stub bend and proj rinv consistent
      if (passphi&&pass&&table[index]) {
        matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
@@ -218,12 +302,17 @@ inline MATCH read() {
    projrinv__ = projrinv_;
    projbuffer___ = projbuffer__;
 
+   */
+
    good_ = idle_ ? false : good_;
    good_ = nearfull ? false : good_;
-   if(idle_||nearfull) {
-     //good_ = false;
-     return;
-   }
+
+   bool process = (!idle_) && (!nearfull);
+
+   //if(idle_||nearfull) {
+   //  //good_ = false;
+   //  return;
+   // }
 
    
    // vmproj index
@@ -279,35 +368,43 @@ inline MATCH read() {
    }
    
    //Check if last stub, if so, go to next buffer entry 
-   if (istub_+1>=nstubs_){
-     istub_=0;
-     if (!stubmask_) {
-       //if (stubmask_==0) {
-       idle_ = true;
+   if (process) {
+     if (istub_+1>=nstubs_){
+       istub_=0;
+       if (!stubmask_) {
+	 //if (stubmask_==0) {
+	 idle_ = true;
+       } else {
+	 ap_uint<2> index = __builtin_ctz(stubmask_);
+	 stubmask_[index]=0;
+	 second_ =  index[0];
+	 phiPlus_ =  index[1];
+	 nstubs_ = nstubsall_[index];
+	 assert(nstubs_!=0);
+       }
      } else {
-       ap_uint<2> index = __builtin_ctz(stubmask_);
-       stubmask_[index]=0;
-       second_ =  index[0];
-       phiPlus_ =  index[1];
-       nstubs_ = nstubsall_[index];
-       assert(nstubs_!=0);
+       istub_++;
      }
-   } else {
-     istub_++;
    }
 
    //Read stub memory and extract data fields
    ap_uint<10> stubadd=(zbin,iphiSave,istubtmp);
+   if (print) {
+     //std::cout << "Read vmstub zbin iphi : "<<zbin<<" "<<iphiSave<<std::endl;
+   }
    stubdata_ = stubmem[bx&1][stubadd];
    projfinephi__ = projfinephi_;
    projfinezadj_ = projfinezadj;
    isPSseed_ = isPSseed;
    projrinv_ = projrinv;
    projbuffer__ = projbuffer_;
-   good_ =  true;
+   good_ =  process;
 
    
  } // end step
+
+ bool Good_() const { return good_;}
+ bool Good__() const { return good__;}
 
  //protected:
  INDEX writeindex_;
@@ -322,6 +419,7 @@ inline MATCH read() {
  int ivmphi;
  ap_uint<3> iphi_;
  BXType bx;
+ bool empty_;
  NSTUBS istub_=0;
  VMStubMECM<VMSMEType> stubdata_, stubdata__; 
  bool good_, good__;
