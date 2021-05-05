@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <iterator>
 
-const int nevents = 5;  // number of events to run
+const int nevents = 10;  // number of events to run
 
 using namespace std;
 
