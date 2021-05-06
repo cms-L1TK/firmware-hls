@@ -1,7 +1,13 @@
 #include "TrackMerger.h"
 
-void TrackMerger(const BXType bx, TrackFit::TrackWord trackWord [kMaxProc], TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc], 
-TrackFit::DiskStubWord diskStubWords[4][kMaxProc]){
+void TrackMerger(const BXType bx,
+  const TrackFit::TrackWord trackWord [kMaxProc],
+  const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
+  const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
+  BXType &bx_o,
+  TrackFit::TrackWord trackWord_o [kMaxProc],
+  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]){
 
     #pragma HLS array_partition variable=barrelStubWords complete dim=1
     #pragma HLS array_partition variable=diskStubWords complete dim=1
@@ -17,19 +23,47 @@ TrackFit::DiskStubWord diskStubWords[4][kMaxProc]){
         auto trackStubMap = trkFit.getHitMap();
         std::cout << "Track Stub Map: " << trackStubMap << std::endl;
         //every 3 bits is a new layer/disk - getting number of stubs in each layer
-        for (int layer = 0; layer < trackStubMap.length()/kTFHitCountSize; layer++){
-            int stubNumber = trackStubMap.range(trackStubMap.length() - kTFHitCountSize*layer, trackStubMap.length() - kTFHitCountSize*(layer + 1))
+        for (int layer = 0; layer < trackStubMap.length()/TrackFit::kTFHitCountSize; layer++){
+            int stubNumber = trackStubMap.range(trackStubMap.length() - TrackFit::kTFHitCountSize*layer, trackStubMap.length() - TrackFit::kTFHitCountSize*(layer + 1));
              
-             for (unsigned int j = 0; j < kNBarrelStubs - 1; j++;){
-                trkFit.setBarrelStubWord<j>(barrelStubWords[j][i]);
+             for (unsigned int j = 0; j < TrackFit::kNBarrelStubs - 1; j++){
+                 switch (j){
+                   case 0:
+                      trkFit.setBarrelStubWord<0>(barrelStubWords[0][i]);
+                      break;
+                   case 1:
+                      trkFit.setBarrelStubWord<1>(barrelStubWords[1][i]);
+                      break;
+                   case 2:
+                      trkFit.setBarrelStubWord<2>(barrelStubWords[2][i]);
+                      break;
+                    case 3:
+                      trkFit.setBarrelStubWord<3>(barrelStubWords[3][i]);
+                      break;
+
+                 }
                 //barrelStubWord = trkFit.getBarrelStubWord<2>();
                 //trkFit.getStubIndex()
                 //getStubPhiResid() for phi res of stub
                 //set phi res to smallest value using setStubPhiResid()
              }
             
-            for (unsigned int k = kNBarrelStubs; k < kNStubs - 1; k++;){
-                trkFit.setDiskStubWord<k>(DiskStubWords[k][i]);
+            for (unsigned int k = TrackFit::kNBarrelStubs; k < TrackFit::kNStubs - 1; k++){
+                 switch (k){
+                   case 0:
+                      trkFit.setDiskStubWord<0>(diskStubWords[0][i]);
+                      break;
+                   case 1:
+                      trkFit.setDiskStubWord<1>(diskStubWords[1][i]);
+                      break;
+                   case 2:
+                      trkFit.setDiskStubWord<2>(diskStubWords[2][i]);
+                      break;
+                    case 3:
+                      trkFit.setDiskStubWord<3>(diskStubWords[3][i]);
+                      break;
+
+                 }
                 //use trkFit.getDiskStubWord()
                 //trkFit.getStubIndex()
                 //getStubPhiResid() for phi res of stub
@@ -46,4 +80,5 @@ TrackFit::DiskStubWord diskStubWords[4][kMaxProc]){
         //}
 
     }
+     bx_o = bx;
 }

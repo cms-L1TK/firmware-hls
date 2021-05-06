@@ -14,36 +14,79 @@ const int nevents = 100;
 using namespace std;
 
 int main(){
-    //Error counter
-    int err_count = 0;
+  //Error counter
+  int err_count = 0;
     
   // Input memories
-  TrackFitMemory inputTracks;
+  static TrackFit::TrackWord trackWord[kMaxProc];
+  static TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc];
+  static TrackFit::DiskStubWord diskStubWords[4][kMaxProc];
+  static TrackFitMemory inputTracks;
 
   // Output memories
-  TrackFitMemory outputTracks;
+  static TrackFit::TrackWord trackWord_o [kMaxProc];
+  static TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc];
+  static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
+  static TrackFitMemory outputTracks;
 
   // Open input files
-  ifstream fin_inputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_BT_L1L2_04.dat");
+  //ifstream fin_inputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_BT_L1L2_04.dat");
+  ifstream fin_inputTracks("../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
   assert(fin_inputTracks.good());
-  //ifstream fout_outputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_BT_L1L2_04.dat");
-  ifstream fout_outputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_PT_L1L2_04.dat");
+  ifstream fout_outputTracks("../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
+  //ifstream fout_outputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_PT_L1L2_04.dat");
   assert(fout_outputTracks.good());
 
   // Loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+    for (unsigned short i = 0; i < kMaxProc; ++ievt){
+      trackWord[i] = TrackFit::TrackWord(0);
+      for (unsigned short j = 0; j < 4; j++){
+        barrelStubWords[j][i] = TrackFit::BarrelStubWord(0);
+        diskStubWords[j][i] = TrackFit::DiskStubWord(0);
+      }
+    }
     outputTracks.clear();
 
     // Read in next event from input
-    writeArrayFromFile<TrackFiMemory> (inputTracks, fin_inputTracks, ievt);
+    writeArrayFromFile<TrackFitMemory> (inputTracks, fin_inputTracks, ievt);
+
+    // Set input memories into arrays of input track/stub words
+   
 
     // Set bunch crossing
     BXType bx = ievt;
+    BXType bx_o;
 
     // Unit under test
-    TrackMergerTop(bx, inputTracks, outputTracks);
+    TrackMergerTop(const BXType bx,
+    const TrackFit::TrackWord trackWord [kMaxProc],
+    const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
+    const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
+    BXType bx_o,
+    TrackFit::TrackWord trackWord_o [kMaxProc],
+    TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
+    TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]);
+
+    // Filling outputs
+    unsigned nTracks = 0;
+    for (unsigned short i = 0; i < kMaxProc; i++){
+      TrackFit track;
+      track.setTrackWord(trackWord[i]);
+      track.setBarrelStubWord<0>(barrelStubWords[0][i]);
+      track.setBarrelStubWord<1>(barrelStubWords[1][i]);
+      track.setBarrelStubWord<2>(barrelStubWords[2][i]);
+      track.setBarrelStubWord<3>(barrelStubWords[3][i]);
+      track.setDiskStubWord<4>(diskStubWords[0][i]);
+      track.setDiskStubWord<5>(diskStubWords[1][i]);
+      track.setDiskStubWord<6>(diskStubWords[2][i]);
+      track.setDiskStubWord<7>(diskStubWords[3][i]);
+      if (track.getTrackValid()){
+        outputTracks.write_mem(bx, track, nTracks++);
+      }
+    }
 
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks, ievt, "Tracks");
