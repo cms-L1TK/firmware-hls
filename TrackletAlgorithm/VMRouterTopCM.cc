@@ -13,16 +13,23 @@
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
-void VMRouterTopCM(const BXType bx, BXType& bx_o,
+void VMRouterTopCM(const BXType bx, BXType& bx_o
 	// Input memories
-	const InputStubMemory<inputType> inputStubs[numInputs],
+	, const InputStubMemory<inputType> inputStubs[numInputs]
+#if kDISK > 0
+  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+#endif
 
 	// Output memories
-	AllStubMemory<outputType> memoriesAS[numASCopies],
-	AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],
-	VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME,
-	VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies> *memoryTEO)
- {
+	, AllStubMemory<outputType> memoriesAS[numASCopies]
+#if kLAYER == 1 || kLAYER == 2 // Add layers/disks
+	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
+#endif
+	, VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+	, VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies> *memoryTEO
+#endif
+ ) {
 
 
 	///////////////////////////
@@ -103,14 +110,28 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSize, phiRegSize, numTEOCopies>
 	(bx, bx_o, METable, phiCorrTable,
 		// Input memories
-		inputStubs, nullptr,
+		inputStubs, 
+#if kDISK > 0
+		inputStubsDisk2S,
+#else
+		nullptr,
+#endif
 		// AllStub memories
 		memoriesAS, 
-		maskASI, memoriesASInner,
+		maskASI, 
+#if kLAYER == 1 || kLAYER == 2 // Add layers/disks
+		memoriesASInner,
+#else
+		nullptr,
+#endif
 		// ME memories
 		memoryME,
 		// TEOuter memories
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 		memoryTEO
+#else
+		nullptr,
+#endif
 		);
 
 	return;
