@@ -16,7 +16,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 // NBIT_ADDR: number of bits for memory address space per BX
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
-// NCOPY: is the number of memory copies - same as numbr of TE used
+// NCOPY: is the number of memory copies - same as number of TE used
 class MemoryTemplateBinnedCM{
 
  public: 
@@ -55,7 +55,15 @@ class MemoryTemplateBinnedCM{
 
   void clear(BunchXingT bx) {
 #pragma HLS inline
-	
+
+  DataType data("0",16);
+  cleardataloop: for ( int j = 0; j < getNBins(); ++j ) {
+			for (int i = 0; i < getNEntryPerBin() ; ++i) {
+        int slot = j*getNEntryPerBin()+i;
+				write_mem(bx, slot, data);
+			}
+		}
+
   clearloop2:for (unsigned int ibin = 0; ibin < 8; ++ibin) {
 #pragma HLS UNROLL
       nentries8_[bx][ibin] = 0;
@@ -66,6 +74,8 @@ class MemoryTemplateBinnedCM{
   unsigned int getDepth() const {return kNMemDepth;}
   unsigned int getNBX() const {return kNBxBins;}
   unsigned int getNBins() const {return kNSlots;}
+  unsigned int getNEntryPerBin() const {return (1<<(NBIT_ADDR-NBIT_BIN));}
+  unsigned int getNCopy() const {return NCOPY;}
 
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<3> ibin,ireg;
@@ -111,12 +121,17 @@ class MemoryTemplateBinnedCM{
   
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
+#pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
+
 #pragma HLS inline
 
-    ap_uint<3> ibin,ireg;    
+    ap_uint<3> ibin,ireg;
+
     (ireg,ibin)=slot;
 
-    NEntryT nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
+    auto nentry_ibx_tmp = nentries8_[ibx][ibin];
+    ap_uint<4> nentry_ibx = nentry_ibx_tmp.range(ireg*4+3,ireg*4); // Reduces timing a little bit
 
     if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))) {
       // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
@@ -127,7 +142,7 @@ class MemoryTemplateBinnedCM{
       }
 
       binmask8_[ibx][ibin].set_bit(ireg,true);
-      
+
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       
       return true;
