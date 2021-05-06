@@ -195,9 +195,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		AllStubMemory<OutType> memoriesAS[nAllCopies],
 		const ap_uint<maskASIsize>& maskASI, AllStubInnerMemory<OutType> memoriesASInner[],
 		// ME memories
-		VMStubMEMemoryCM<OutType, rzSize, phiRegSize>& memoryME,
+		VMStubMEMemoryCM<OutType, rzSize, phiRegSize> *memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType,rzSize,phiRegSize,nTEOCopies>& memoryTEO) {
+		VMStubTEOuterMemoryCM<OutType,rzSize,phiRegSize,nTEOCopies> *memoryTEO) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
@@ -400,7 +400,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				createVMStub<VMStubMECM<OutType>, InType, OutType, Layer, Disk>(true, stub, i, negDisk, METable, phiCorrTable, slot);
 
 		// Write the ME stub
-		memoryME.write_mem(bx, slot, stubME, addrCountME[slot]);
+		memoryME->write_mem(bx, slot, stubME, addrCountME[slot]);
 		addrCountME[slot] += 1;
 
 		// For debugging
@@ -422,7 +422,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			VMStubTEOuter<OutType> stubTEO = createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk>(false, stub, i, negDisk, METable, phiCorrTable, slot);
 
 			// Write the TE Outer stub if bin isn't negative
-			memoryTEO.write_mem(bx, slot, stubTEO);
+			memoryTEO->write_mem(bx, slot, stubTEO);
 
 			// For debugging
 			#ifndef __SYNTHESIS__

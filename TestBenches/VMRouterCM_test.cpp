@@ -113,10 +113,13 @@ int main() {
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
-        , memoriesAS, memoriesASInner
-        , memoryME
+        , memoriesAS
+#if kLAYER == 1 || kLAYER == 2 // Add layers/disks
+        , memoriesASInner
+#endif
+        , &memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-        , memoryTEO
+        , &memoryTEO
 #endif
       );
 

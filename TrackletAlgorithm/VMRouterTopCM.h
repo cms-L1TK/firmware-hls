@@ -70,8 +70,8 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	// Output memories
 	AllStubMemory<outputType> memoriesAS[numASCopies],
 	AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],
-	VMStubMEMemoryCM<outputType, rzSize, phiRegSize>& memoryME,
-	VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies>& memoryTEO
+	VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME,
+	VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies> *memoryTEO
 	);
 
 #endif // TrackletAlgorithm_VMRouterTopCM_h
