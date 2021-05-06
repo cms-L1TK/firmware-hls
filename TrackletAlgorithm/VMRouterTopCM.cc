@@ -9,8 +9,8 @@
 //          - the the number and directories to the LUTs
 //          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
 //          - the call to VMRouter() in VMRouterTopCM.cc
-//          - the included top function in VMRouter_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR.tcl (if file name is changed)
+//          - the included top function in VMRouterCM_test.cpp (if file name is changed)
+//          - the top function and memory directory in script_VMR_CM.tcl (if file name is changed)
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
@@ -19,8 +19,8 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	const InputStubMemory<inputType> inputStubs[numInputs],
 
 	// Output memories
-	AllStubMemory<outputType> memoriesAS[maxASCopies],
-	AllStubInnerMemory<outputType> memoriesASInner[maxASInnerCopies], //const ap_uint<maskASIsize>& maskASI,
+	AllStubMemory<outputType> memoriesAS[numASCopies],
+	AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],
 	VMStubMEMemoryCM<outputType, rzSize, phiRegSize>& memoryME,
 	VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies>& memoryTEO)
  {
@@ -62,7 +62,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	/////////////////////////
 	// Main function
 
-	VMRouterCM<numInputs, numInputsDisk2S, maxASCopies, maxASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSize, phiRegSize, numTEOCopies>
+	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSize, phiRegSize, numTEOCopies>
 	(bx, bx_o, METable, phiCorrTable,
 		// Input memories
 		inputStubs, nullptr,

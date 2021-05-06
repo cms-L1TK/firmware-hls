@@ -10,7 +10,7 @@ using namespace std;
 
 const int nEvents = 100;  //number of events to run
 
-// VMRouter Test that works for all regions
+// VMRouterCM Test that works for all regions
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
@@ -22,8 +22,7 @@ const int nEvents = 100;  //number of events to run
 int main() {
 
   ////////////////////////////////////////////////////////////////
-  // Get lists of the input/output memory directory and file names
-  // I.e. the names of the test vector files
+  // Get the test vectors
 
   TBHelper tb("VMRCM/VMR_L2PHIA");
 
@@ -46,7 +45,7 @@ int main() {
   const auto nVMSTE = tb.nFiles(tePattern);
   
   // Make sure that the number of input and output memories are correct
-  assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == maxASCopies));
+  assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies));
   
   // Open the files
   cout << "Open files..." << endl;
@@ -59,6 +58,7 @@ int main() {
   auto &fout_vmstubme = tb.files(mePattern);
   auto &fout_vmstubte = tb.files(tePattern);
 
+
   ///////////////////////////
   // Declare memories
 
@@ -66,26 +66,25 @@ int main() {
   static InputStubMemory<inputType> inputStubs[numInputs];
   static InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]; //Only used for Disks
 
-  // output memories
-  static AllStubMemory<outputType> memoriesAS[maxASCopies];
-  static AllStubInnerMemory<outputType> memoriesASInner[maxASInnerCopies];
-  // ME memories
+  // Output memories
+  static AllStubMemory<outputType> memoriesAS[numASCopies];
+  static AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies];
   static VMStubMEMemoryCM<outputType, rzSize, phiRegSize> memoryME;
-  // TE Outer memories
   static VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies> memoryTEO;
 
+
   ///////////////////////////
-  // loop over events
-  
-  // error count
+  // Loop over events
+
+  cout << "Start event loop ..." << endl;  
+
+  // Error count
   int err = 0;
-  
-  cout << "Start event loop ..." << endl;
 
   for (unsigned int ievt = 0; ievt < nEvents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    // clear output memories
+    // Clear output memories
     for (int i=0; i<nASCopies; ++i) {
       memoriesAS[i].clear();
     }
@@ -97,7 +96,7 @@ int main() {
       memoryTEO.clear();
     }
 
-    // read event and write to memories
+    // Read event and write to memories
     for (unsigned int i = 0; i < numInputs; i++) {
       writeMemFromFile<InputStubMemory<inputType>>(inputStubs[i], fin_inputstubs[i], ievt);
     }
@@ -114,36 +113,32 @@ int main() {
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
-        , memoriesAS, memoriesASInner//, maskASI
+        , memoriesAS, memoriesASInner
         , memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
         , memoryTEO
 #endif
       );
 
-    // compare the computed outputs with the expected ones
-    // add 1 to the error count per stub that is incorrect
-
+    // Compare the computed outputs with the expected ones
+    // Add 1 to the error count per stub that is incorrect
     bool truncation = false;
 
     // AllStub memories
-    for (unsigned int i = 0; i < maxASCopies; i++) {
+    for (unsigned int i = 0; i < numASCopies; i++) {
       err += compareMemWithFile<AllStubMemory<outputType>>(memoriesAS[i], fout_allstubs[i], ievt, "AllStub", truncation);
     }
-
     // Allstub Inner memories
-    for (unsigned int i = 0; i < maxASInnerCopies; i++) {
+    for (unsigned int i = 0; i < numASInnerCopies; i++) {
       err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
     }
-
     // ME memories
-    err += compareBinnedMemWithFile<VMStubMEMemoryCM<outputType, rzSize, phiRegSize>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
-    
+    err += compareBinnedMemWithFile<VMStubMEMemoryCM<outputType, rzSize, phiRegSize>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
     //TE Outer memories
     if (numTEOCopies) {
       err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies>>(memoryTEO, fout_vmstubte[0], ievt, "VMStubTEOuter", truncation);
     }
-  } // end of event loop
+  } // End of event loop
 
 	cerr << "Exiting with return value " << err << endl;
 	// This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass

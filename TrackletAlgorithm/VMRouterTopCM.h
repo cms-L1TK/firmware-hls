@@ -12,8 +12,8 @@
 //          - the the number and directories to the LUTs
 //          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
 //          - the call to VMRouter() in VMRouterTopCM.cc
-//          - the included top function in VMRouter_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR.tcl (if file name is changed)
+//          - the included top function in VMRouterCM_test.cpp (if file name is changed)
+//          - the top function and memory directory in script_VMR_CM.tcl (if file name is changed)
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 ////////////////////////////////////////////
@@ -28,15 +28,15 @@ constexpr int sector = 4; //  Specifies the sector
 
 // Maximum number of memory "copies" for this Phi region
 // Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int maxASCopies(3); // Allstub memory
-constexpr int maxASInnerCopies(4); // Allstub memory
+constexpr int numASCopies(3); // Allstub memory
+constexpr int numASInnerCopies(4); // Allstub memory
 constexpr int numTEOCopies(3); // TE Outer memories
 
 // Number of inputs
 constexpr int numInputs(2); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
 
-//Size of phi regions and rz?!?!
+//Bit size of phi and rz bins?!?!
 constexpr int phiRegSize(3);
 constexpr int rzSize(3);
 
@@ -61,7 +61,7 @@ constexpr int rzSize(3);
 
 
 /////////////////////////////////////////////////////
-// VMRouter Top Function
+// VMRouterCM Top Function
 // Changed manually
 
 void VMRouterTopCM(const BXType bx, BXType& bx_o,
@@ -69,8 +69,8 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	const InputStubMemory<inputType> inputStubs[numInputs],
 
 	// Output memories
-	AllStubMemory<outputType> memoriesAS[maxASCopies],
-	AllStubInnerMemory<outputType> memoriesASInner[maxASInnerCopies], //const ap_uint<maskASIsize>& maskASI,
+	AllStubMemory<outputType> memoriesAS[numASCopies],
+	AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],
 	VMStubMEMemoryCM<outputType, rzSize, phiRegSize>& memoryME,
 	VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies>& memoryTEO
 	);

@@ -1,16 +1,9 @@
 // VMRouterCM
-// Log
-// -------
-// First tracklet 2.0 version -- December 2018 -- wittich
 
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 // Several types of memories depending on which module that is going to read it.
 // Each VMRouterCM correspond to one phi/AllStub region.
-// Each VM correspond to one ME/TE memory.
 // Each memory type contain different bits of the same stub.
-// AllStub and TE memories has several versions/copies of the VM.
-
-// Assumes at most 7 inputs in the layers, and 7 (PS) + 2 (2S) inputs in the disks
 
 // NOTE: Nothing in VMRouterCM.h needs to be changed to run a different phi region
 
@@ -56,7 +49,6 @@ constexpr int maskASIsize = 12; // Allstub Inner memories
 
 //////////////////////////////////////
 // Functions used by the VMR CM
-
 
 // Returns the bits of phi corresponding to finephi, i.e. phi regions within a VM
 // vmbits is the number of bits for the VMs, i.e. coarse phi region. E.g. 32 VMs would use vmbits=5
@@ -192,24 +184,20 @@ inline T createVMStub(bool isMEStub, const InputStub<InType> inputStub,
 /////////////////////////////////
 // Main function
 
-// InType DISK2S - Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
-// 		According to wiring script, there's two DISK2S and half the inputs are for negative disks.
-// Layer Disk - Specifies the layer or disk number
-// MAXCopies - The maximum number of copies of a memory type
-// NBitsBin number of bits used for the bins in MEMemories
-template<int nInputMems, int nInputDisk2SMems, int MaxAllCopies, int MaxAllInnerCopies, int Layer, int Disk, regionType InType, regionType OutType, int rzSize, int phiRegSize, int numTEOCopies>
+// Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
+template<int nInputMems, int nInputDisk2SMems, int nAllCopies, int nAllInnerCopies, int Layer, int Disk, regionType InType, regionType OutType, int rzSize, int phiRegSize, int nTEOCopies>
 void VMRouterCM(const BXType bx, BXType& bx_o, 
 		const int METable[], const int phiCorrTable[],
 		// Input memories
 		const InputStubMemory<InType> inputStubs[],
 		const InputStubMemory<DISK2S> inputStubsDisk2S[],
 		// AllStub memory
-		AllStubMemory<OutType> memoriesAS[MaxAllCopies],
+		AllStubMemory<OutType> memoriesAS[nAllCopies],
 		const ap_uint<maskASIsize>& maskASI, AllStubInnerMemory<OutType> memoriesASInner[],
 		// ME memories
 		VMStubMEMemoryCM<OutType, rzSize, phiRegSize>& memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType,rzSize,phiRegSize,numTEOCopies>& memoryTEO) {
+		VMStubTEOuterMemoryCM<OutType,rzSize,phiRegSize,nTEOCopies>& memoryTEO) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
@@ -218,7 +206,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 #pragma HLS array_partition variable=memoriesASInner complete dim=1
 
 	// Number of data in each input memory
-	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems + nInputDisk2SMems]; // Array containing the number of inputs. Last two indices are for DISK2S
+	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems + nInputDisk2SMems]; // Array containing the number of inputs
 	#pragma HLS array_partition variable=nInputs complete dim=0
 
 	//Keeps track of input memories that still have stubs to process, one bit per memory
@@ -238,8 +226,8 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	ap_uint<(4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1> addrCountME[1 << (rzSize + phiRegSize)]; // Writing of ME stubs, nr bits taken from whatever is in the memories
-	ap_uint<kNBits_MemAddr> addrCountASI[MaxAllInnerCopies]; // Writing of Inner Allstubs
+	ap_uint<5> addrCountME[1 << (rzSize + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
+	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerCopies]; // Writing of Inner Allstubs
 	
 	#pragma HLS array_partition variable=addrCountME complete dim=0
 	#pragma HLS array_partition variable=addrCountASI complete dim=0
@@ -248,14 +236,14 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		#pragma HLS unroll
 		addrCountME[i] = 0;
 	}
-
-	for (int i = 0; i < MaxAllInnerCopies; i++) {
+	for (int i = 0; i < nAllInnerCopies; i++) {
 		#pragma HLS unroll
 		addrCountASI[i] = 0;
 	}
 
 	/////////////////////////////////////
 	// Main Loop
+
 	constexpr int maxLoop = kMaxProc;
 
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
@@ -305,7 +293,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					(disk2S) ? stubDisk2S.raw() : stub.raw();
 
 			// Write stub to all memory copies
-			for (int n = 0; n < MaxAllCopies; n++) {
+			for (int n = 0; n < nAllCopies; n++) {
 #pragma HLS UNROLL
 				memoriesAS[n].write_mem(bx, allstub, i);
 			}
@@ -322,7 +310,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 			if (maskASI) {
 
-				int comparison_rz = (Layer) ? static_cast<int>(abs(stub.getZ())) : static_cast<int>(stub.getR());				
+				int comparison_rz = (Layer) ? static_cast<int>(abs(stub.getZ())) : static_cast<int>(stub.getR());
 				bool passRZCut = false;
 				bool passRZSpecialCut = false;
 
@@ -365,7 +353,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 
 					for (int n = 0; n < maskASIsize; n++) {
-		#pragma HLS UNROLL
+#pragma HLS UNROLL
 
 						if (maskASI[n]) {
 							bool passPhiCut = false;
@@ -418,9 +406,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		// For debugging
 		#ifndef __SYNTHESIS__
 					std::cout << "ME stub " << std::hex << stubME.raw()
-							<< std::endl;
-					std::cout << "       to slot " << slot << std::endl;
-					std::cout << "       addrcount " << std::dec << addrCountME[slot] << std::endl;
+							<< std::dec << "       to slot " << slot << std::endl;
 		#endif // DEBUG
 		// End ME memories
 
@@ -428,7 +414,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		////////////////////////////////////
 		// TE Outer memories
 
-		if (numTEOCopies && (!disk2S)) {
+		if (nTEOCopies && (!disk2S)) {
 
 			int slot; // Coarse z. The bin the stub is going to be put in, in the memory
 
@@ -441,8 +427,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			// For debugging
 			#ifndef __SYNTHESIS__
 						std::cout << "TEOuter stub " << std::hex << stubTEO.raw()
-								<< std::endl;
-						std::cout << "       to slot " << slot << std::endl;
+								<< std::dec << "       to slot " << slot << std::endl;
 			#endif // DEBUG
 			
 		} // End TE Outer memories
