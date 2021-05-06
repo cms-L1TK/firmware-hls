@@ -27,7 +27,7 @@ constexpr int sector = 4; //  Specifies the sector
 
 // Maximum number of memory "copies" for this Phi region
 // Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int numASCopies(3); // Allstub memory
+constexpr int numASCopies(4); // Allstub memory
 constexpr int numASInnerCopies(4); // Allstub memory
 constexpr int numTEOCopies(3); // TE Outer memories
 

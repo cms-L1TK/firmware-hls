@@ -30,7 +30,7 @@ int main() {
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
   const string inputDisk2SPattern = "InputStubs*_D*2S*";
   
-  const string allStubPattern = "AllStubs*PHI?_*";  // need "PHI?_*" because of bug in the MemPrintsCM?
+  const string allStubPattern = "AllStubs*";
   const string allStubInnerPattern = "AllInnerStubs*";
   const string mePattern = "VMStubs_VMSME*";
   const string tePattern = "VMStubs_VMSTE*";
