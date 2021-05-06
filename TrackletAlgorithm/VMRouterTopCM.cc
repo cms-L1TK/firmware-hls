@@ -6,9 +6,8 @@
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterTopCM.h
 //          - the input parameters to VMRouterTopCM in VMRouterTopCM.h/.cc
-//          - the the number and directories to the LUTs
 //          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
-//          - the call to VMRouter() in VMRouterTopCM.cc
+//          - the call to VMRouterCM() in VMRouterTopCM.cc
 //          - the included top function in VMRouterCM_test.cpp (if file name is changed)
 //          - the top function and memory directory in script_VMR_CM.tcl (if file name is changed)
 //          - add the phi region in emData/download.sh, make sure to also run clean
@@ -33,15 +32,54 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	// LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
 	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
 	// Indexed using r and z position bits
-	static const int METable[] =
-#include "../emData/LUTsCM/VMRME_L2.tab"
-
+#if kLAYER == 1
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_L1.tab"
+#elif kLAYER == 2
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_L2.tab"
+#elif kLAYER == 3
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_L3.tab"
+#elif kLAYER == 4
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_L4.tab"
+#elif kLAYER == 5
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_L5.tab"
+#elif kLAYER == 6
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_L6.tab"
+#elif kDISK == 1
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_D1.tab"
+#elif kLAYER == 2
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_D2.tab"
+#endif
 
 	// LUT with phi corrections to project the stub to the average radius in a layer.
 	// Only used by layers.
 	// Indexed using phi and bend bits
-	static const int phiCorrTable[] =
-#include "../emData/LUTsCM/VMPhiCorrL2.tab"
+#if kLAYER == 1
+		static const int phiCorrTable[] =
+	#include "../emData/VMRCM/tables/VMPhiCorrL1.tab"
+#elif kLAYER == 2
+		static const int phiCorrTable[] =
+	#include "../emData/VMRCM/tables/VMPhiCorrL2.tab"
+#elif kLAYER == 3
+		static const int phiCorrTable[] =
+	#include "../emData/VMRCM/tables/VMPhiCorrL3.tab"
+#elif kLAYER == 4
+		static const int phiCorrTable[] =
+	#include "../emData/VMRCM/tables/VMPhiCorrL4.tab"
+#elif kLAYER == 5
+		static const int phiCorrTable[] =
+	#include "../emData/VMRCM/tables/VMPhiCorrL5.tab"
+#elif kLAYER == 6
+		static const int phiCorrTable[] =
+	#include "../emData/VMRCM/tables/VMPhiCorrL6.tab"
+#endif
 
 // // Takes 2 clock cycles before on gets data, used at high frequencies
 #pragma HLS resource variable=inputStubs[0].get_mem() latency=2
@@ -56,7 +94,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o,
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
 	// First three bits are L,M,R for Barrel and disk, the six after that are A-F for Barrel, last three are L,M,R for Overlap
-	static const ap_uint<maskASIsize> maskASI = 0xC06;
+	static const ap_uint<maskASIsize> maskASI = 0b110000000110;
 
 
 	/////////////////////////

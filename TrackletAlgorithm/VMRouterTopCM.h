@@ -9,9 +9,8 @@
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterTopCM.h
 //          - the input parameters to VMRouterTopCM in VMRouterTopCM.h/.cc
-//          - the the number and directories to the LUTs
 //          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
-//          - the call to VMRouter() in VMRouterTopCM.cc
+//          - the call to VMRouterCM() in VMRouterTopCM.cc
 //          - the included top function in VMRouterCM_test.cpp (if file name is changed)
 //          - the top function and memory directory in script_VMR_CM.tcl (if file name is changed)
 //          - add the phi region in emData/download.sh, make sure to also run clean
