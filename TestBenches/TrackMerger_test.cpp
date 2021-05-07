@@ -52,7 +52,7 @@ int main(){
     outputTracks.clear();
 
     // Read in next event from input
-    writeArrayFromFile<TrackFitMemory> (inputTracks, fin_inputTracks, ievt);
+    writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks, ievt);
 
     // Set input memories into arrays of input track/stub words
     for(unsigned short i = 0; i < inputTracks.getEntries(); i++){
@@ -70,14 +70,14 @@ int main(){
     BXType bx_o;
 
     // Unit under test
-    TrackMergerTop(const BXType bx,
-    const TrackFit::TrackWord trackWord [kMaxProc],
-    const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
-    const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
-    BXType bx_o,
-    TrackFit::TrackWord trackWord_o [kMaxProc],
-    TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-    TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]);
+    TrackMergerTop(bx,
+    trackWord,
+    barrelStubWords,
+    diskStubWords,
+    bx_o,
+    trackWord_o,
+    barrelStubWords_o,
+    diskStubWords_o);
 
     // Filling outputs
     unsigned nTracks = 0;
