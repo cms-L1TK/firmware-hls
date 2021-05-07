@@ -35,7 +35,7 @@ constexpr int numTEOCopies(3); // TE Outer memories
 constexpr int numInputs(2); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
 
-//Bit size of phi and rz bins?!?!
+//Bit size of phi and rz bins?!?! These don't change I think
 constexpr int phiRegSize(3);
 constexpr int rzSize(3);
 

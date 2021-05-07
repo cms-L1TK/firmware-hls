@@ -29,8 +29,8 @@
 // E.g. 32 VMs would use 5 vmbits
 constexpr int nbitsallstubslayer[6] = { 3, 2, 2, 2, 2, 2}; // Number of bits for the Allstub memories in each layer
 constexpr int nbitsallstubsdisk[5] = {2};
-constexpr int nbitsvmlayer[6] = { 5, 5, 5, 5, 5, 5 }; // Could be computed using the number of VMs...
-constexpr int nbitsvmdisk[5] = { 4, 4, 4, 4, 4 };
+constexpr int nbitsvmlayer[6] = { 2, 3, 3, 3, 3, 3 }; // for me??
+constexpr int nbitsvmdisk[5] = { 3, 2, 2, 2, 2 };
 constexpr int nbitsvmextra[3] = { 0, 4, 4 };
 
 // Number of most significant bits (MSBs) of z and r used for index in the LUTs
@@ -57,7 +57,7 @@ template<regionType InType>
 inline int iphivmFineBins(const typename AllStub<InType>::ASPHI phi,
 		const int vmbits, const int finebits) {
 
-	auto finebin = (phi.range(phi.length() - 1 - vmbits, phi.length() - vmbits - finebits));
+	auto finebin = (phi.range(phi.length() - vmbits - 1, phi.length() - vmbits - finebits));
 
 	return finebin;
 }
@@ -124,13 +124,13 @@ inline T createVMStub(bool isMEStub, const InputStub<InType> inputStub,
 	constexpr auto vmbits =
 			((Layer == 3) && !isMEStub) ? nbitsvmextra[Layer - 1] : vmbitsTmp; // Number of bits for VMs
 	constexpr unsigned int nbitsallstubs = 
-			(Layer) ? nbitsallstubslayer[Layer] : nbitsallstubsdisk[Disk]; // Number of bits for the number of Alltub memories in a layer/disk
+			(Layer) ? nbitsallstubslayer[Layer-1] : nbitsallstubsdisk[Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Set values to VMStub
 	stub.setBend(bend);
 	stub.setIndex(index);
 	stub.setFinePhi(
-				iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits));
+				iphivmFineBins<InType>(phiCorr, nbitsallstubs + vmbits, nFinePhiBits));
 
 	// Indices used to find the rzfine value in finebintable
 	// finebintable returns the top 6 bits of a corrected z
@@ -168,7 +168,7 @@ inline T createVMStub(bool isMEStub, const InputStub<InType> inputStub,
 		else bin += (1 << TEBinsBits)/2; // += 4
 	}
 	
-	auto ivm = phiCorr.range(phiCorr.length() - nbitsallstubs - 1, phiCorr.length() - vmbits); //get the phi bits that corresponds to the old TE vms. what is 2? because we have 2 bits all stubs?? and 3 buts for te?
+	auto ivm = phiCorr.range(phiCorr.length() - nbitsallstubs - 1, phiCorr.length() - (nbitsallstubs + vmbits)); //get the phi bits that corresponds to the old TE vms. what is 2? because we have 2 bits all stubs?? and 3 buts for te?
 	slot = ivm * 8 + bin; //1 << 3 is the number of bins NBINS?
 
 	// Set rzfine, i.e. the r/z bits within a coarse r/z region
@@ -317,9 +317,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				// Use comparison_rz to check if they pass the RZ cuts
 				if (Layer == 1) { // TODO: use comparison value 2 for LMR memories
 					constexpr float comparison_value = 95.0 / kz;
-					constexpr float comparison_value2 = 70 / kz;
+					constexpr float comparison_valueLMR = 70 / kz;
 					passRZCut = !(comparison_rz > comparison_value);
-					passRZSpecialCut = !(comparison_rz < comparison_value2);
+					passRZSpecialCut = !(comparison_rz < comparison_valueLMR);
 				} else if (Layer == 2) {
 					constexpr float comparison_value = 50.0 / kz;
 					passRZCut = !(comparison_rz < comparison_value);
@@ -343,12 +343,12 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					auto phiCorr = getPhiCorr<InType>(stub.getPhi(), stub.getR(), stub.getBend(), phiCorrTable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
 					allstubinner.setFinePhi(phiCorr.range(phiCorr.length() - 1, phiCorr.length() - allstubinner.getFinePhi().length())); // top 8 bits of phicorr
 
-					constexpr unsigned int phicutmax = (Layer == 1) ? 4 : 6; // I have no idea where these numbers come from, see emulation
+					constexpr unsigned int phicutmax = (Layer == 1) ? 4 : 6; // I have no idea what these numbers are, see emulation
 					constexpr unsigned int phicutmin = (Layer == 1) ? 4 : 2;
 
-					constexpr unsigned int nbitsallstubs = (Layer) ? nbitsallstubslayer[Layer] : nbitsallstubsdisk[Disk]; // Number of bits for the number of Alltub memories in a layer/disk
+					constexpr unsigned int nbitsallstubs = (Layer) ? nbitsallstubslayer[Layer-1] : nbitsallstubsdisk[Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
-					auto iphipos = phiCorr.range(phiCorr.length() - nbitsallstubs -1, phiCorr.length() - (nbitsallstubs + 3)); // Top three bits after the allstub bits 
+					auto iphipos = phiCorr.range(phiCorr.length() - nbitsallstubs -1, phiCorr.length() - (nbitsallstubs + phiRegSize)); // Top three bits after the allstub bits 
 					unsigned int inner_mem_index = 0; // Keeps track of which allstub inner memory to write to
 
 
@@ -357,17 +357,17 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 						if (maskASI[n]) {
 							bool passPhiCut = false;
-							bool passSpecialCut = (Layer != 1) ? true : ((n < 3 || n > 8) && passRZSpecialCut) || (!(n < 3 || n > 8) && passRZCut); // For layer 1 the LMR memories have different cuts
+							bool passSpecialCut = (Layer != 1) ? true : ((n > 5) && passRZSpecialCut) || (!(n > 5) && passRZCut); // For layer 1 the LMR memories have different cuts
 
-							if (n==0 || n==9) {
+							if (n==6 || n==9) { // L
 								passPhiCut = !(iphipos>=phicutmin);
-							} else if (n == 2 || n==11) {
+							} else if (n == 8 || n==11) { // R
 								passPhiCut = !(iphipos<phicutmax);
-							} else if (n == 3 || n==6 || n==8) {
+							} else if (n == 0 || n==3 || n==5) { // A, D, F
 								passPhiCut = !(iphipos<4);
-							} else if (n == 4 || n==5 || n==7) {
+							} else if (n == 1 || n==2 || n==4) { // B, C, E
 								passPhiCut = !(iphipos>=4);
-							} else { // 1 and 10
+							} else { // M
 								passPhiCut = true;
 							}
 
@@ -392,7 +392,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		/////////////////////////////////////////////
 		// ME memories
 
-		int slot; // Coarse z. The bin the stub is going to be put in, in the memory
+		int slot; // The bin the stub is going to be put in, in the memory
 
 		// Create the ME stub to save
 		VMStubMECM<OutType> stubME = (disk2S) ?
@@ -414,9 +414,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		////////////////////////////////////
 		// TE Outer memories
 
-		if (nTEOCopies && (!disk2S)) {
+		if ((nTEOCopies > 1) && (!disk2S)) {
 
-			int slot; // Coarse z. The bin the stub is going to be put in, in the memory
+			int slot; // The bin the stub is going to be put in, in the memory
 
 			// Create the TE Outer stub to save
 			VMStubTEOuter<OutType> stubTEO = createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk>(false, stub, i, negDisk, METable, phiCorrTable, slot);

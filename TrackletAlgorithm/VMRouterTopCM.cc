@@ -100,8 +100,9 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
-	// First three bits are L,M,R for Barrel and disk, the six after that are A-F for Barrel, last three are L,M,R for Overlap
-	static const ap_uint<maskASIsize> maskASI = 0b110000000110;
+	// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
+	// NOTE: read from right to left
+	static const ap_uint<maskASIsize> maskASI = 0b110110000000;
 
 
 	/////////////////////////
@@ -130,7 +131,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 		memoryTEO
 #else
-		nullptr,
+		nullptr
 #endif
 		);
 

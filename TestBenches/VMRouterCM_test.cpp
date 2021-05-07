@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int nEvents = 100;  //number of events to run
+const int nEvents = 1;  //number of events to run
 
 // VMRouterCM Test that works for all regions
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
@@ -138,7 +138,7 @@ int main() {
     // ME memories
     err += compareBinnedMemWithFile<VMStubMEMemoryCM<outputType, rzSize, phiRegSize>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
     //TE Outer memories
-    if (numTEOCopies) {
+    if (nVMSTE) {
       err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies>>(memoryTEO, fout_vmstubte[0], ievt, "VMStubTEOuter", truncation);
     }
   } // End of event loop
