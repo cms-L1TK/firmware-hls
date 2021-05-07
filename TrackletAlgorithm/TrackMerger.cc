@@ -51,16 +51,16 @@ void TrackMerger(const BXType bx,
             for (unsigned int k = TrackFit::kNBarrelStubs; k < TrackFit::kNStubs - 1; k++){
                  switch (k){
                    case 0:
-                      trkFit.setDiskStubWord<0>(diskStubWords[0][i]);
+                      trkFit.setDiskStubWord<4>(diskStubWords[0][i]);
                       break;
                    case 1:
-                      trkFit.setDiskStubWord<1>(diskStubWords[1][i]);
+                      trkFit.setDiskStubWord<5>(diskStubWords[1][i]);
                       break;
                    case 2:
-                      trkFit.setDiskStubWord<2>(diskStubWords[2][i]);
+                      trkFit.setDiskStubWord<6>(diskStubWords[2][i]);
                       break;
                     case 3:
-                      trkFit.setDiskStubWord<3>(diskStubWords[3][i]);
+                      trkFit.setDiskStubWord<7>(diskStubWords[3][i]);
                       break;
 
                  }
