@@ -69,6 +69,9 @@ declare -a processing_modules=(
 
   # Tracklet Processor
   "TP_L1L2D" 
+
+  # Purge Duplicates (TrackMerger)
+  "TM"
 )
 
 # Function that prints information regarding the usage of this command
