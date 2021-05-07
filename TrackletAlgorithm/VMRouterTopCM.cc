@@ -22,7 +22,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[numASCopies]
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 // Add layers/disks
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
 	, VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME
@@ -102,7 +102,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 	// and a "1" implies that the specified memory is used for this phi region
 	// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
 	// NOTE: read from right to left
-	static const ap_uint<maskASIsize> maskASI = 0b0;//0b000111000000;//0b110110000000;
+	static const ap_uint<maskASIsize> maskASI = 0b000111000000;//0b110110000000;
 
 
 	/////////////////////////
@@ -120,7 +120,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 		// AllStub memories
 		memoriesAS, 
 		maskASI, 
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 // Add layers/disks
 		memoriesASInner,
 #else
 		nullptr,

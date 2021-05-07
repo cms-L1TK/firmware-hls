@@ -24,7 +24,7 @@ int main() {
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  TBHelper tb("VMRCM/VMR_L4PHIC");
+  TBHelper tb("VMRCM/VMR_L5PHIC");
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
@@ -114,7 +114,7 @@ int main() {
         , inputStubsDisk2S
 #endif
         , memoriesAS
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 // Add layers/disks
         , memoriesASInner
 #endif
         , &memoryME
