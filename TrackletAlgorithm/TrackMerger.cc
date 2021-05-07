@@ -64,7 +64,7 @@ void TrackMerger(const BXType bx,
                       break;
 
                  }
-                //use trkFit.getDiskStubWord()
+                //use trkFit.getDiskStubWord<>()
                 //trkFit.getStubIndex()
                 //getStubPhiResid() for phi res of stub
                 //set phi res to smallest value using setStubPhiResid()
