@@ -31,7 +31,7 @@ constexpr int nbitsallstubslayer[6] = { 3, 2, 2, 2, 2, 2}; // Number of bits for
 constexpr int nbitsallstubsdisk[5] = {2};
 constexpr int nbitsvmlayer[6] = { 2, 3, 3, 3, 3, 3 }; // for me??
 constexpr int nbitsvmdisk[5] = { 3, 2, 2, 2, 2 };
-constexpr int nbitsvmextra[3] = { 0, 4, 4 };
+constexpr int nbitsvmextra[3] = { 0, 0, 3 }; // don't need this if they are the same as the normal??
 
 // Number of most significant bits (MSBs) of z and r used for index in the LUTs
 constexpr int nbitsztablelayer = 7;
@@ -93,8 +93,8 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 
 
 // Returns a ME/TE stub with all the values set
-template<class T, regionType InType, regionType OutType, int Layer, int Disk>
-inline T createVMStub(bool isMEStub, const InputStub<InType> inputStub,
+template<class T, regionType InType, regionType OutType, int Layer, int Disk, bool isMEStub>
+inline T createVMStub(const InputStub<InType> inputStub,
 		const int index, const bool negDisk, const int fineBinTable[],
 		const int phiCorrTable[], int& slot) {
 
@@ -396,8 +396,8 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 		// Create the ME stub to save
 		VMStubMECM<OutType> stubME = (disk2S) ?
-				createVMStub<VMStubMECM<OutType>, DISK2S, OutType, Layer, Disk>(true, stubDisk2S, i, negDisk, METable, phiCorrTable, slot) :
-				createVMStub<VMStubMECM<OutType>, InType, OutType, Layer, Disk>(true, stub, i, negDisk, METable, phiCorrTable, slot);
+				createVMStub<VMStubMECM<OutType>, DISK2S, OutType, Layer, Disk, true>(stubDisk2S, i, negDisk, METable, phiCorrTable, slot) :
+				createVMStub<VMStubMECM<OutType>, InType, OutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slot);
 
 		// Write the ME stub
 		memoryME->write_mem(bx, slot, stubME, addrCountME[slot]);
@@ -414,12 +414,12 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		////////////////////////////////////
 		// TE Outer memories
 
-		if ((nTEOCopies > 1) && (!disk2S)) {
+		if (nTEOCopies && !disk2S) {
 
 			int slot; // The bin the stub is going to be put in, in the memory
 
 			// Create the TE Outer stub to save
-			VMStubTEOuter<OutType> stubTEO = createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk>(false, stub, i, negDisk, METable, phiCorrTable, slot);
+			VMStubTEOuter<OutType> stubTEO = createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slot);
 
 			// Write the TE Outer stub if bin isn't negative
 			memoryTEO->write_mem(bx, slot, stubTEO);

@@ -24,7 +24,7 @@ int main() {
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  TBHelper tb("VMRCM/VMR_L2PHIA");
+  TBHelper tb("VMRCM/VMR_L3PHIC");
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
@@ -46,7 +46,7 @@ int main() {
   
   // Make sure that the number of input and output memories are correct
   assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies));
-  
+
   // Open the files
   cout << "Open files..." << endl;
 
@@ -114,7 +114,7 @@ int main() {
         , inputStubsDisk2S
 #endif
         , memoriesAS
-#if kLAYER == 1 || kLAYER == 2 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 // Add layers/disks
         , memoriesASInner
 #endif
         , &memoryME

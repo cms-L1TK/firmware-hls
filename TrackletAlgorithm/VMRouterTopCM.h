@@ -19,20 +19,20 @@
 // Variables for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 2 // Which barrel layer number the data is coming from
+#define kLAYER 3 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
 
-constexpr char phiRegion = 'A'; // Which AllStub/PhiRegion
+constexpr char phiRegion = 'C'; // Which AllStub/PhiRegion
 constexpr int sector = 4; //  Specifies the sector
 
 // Maximum number of memory "copies" for this Phi region
 // Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int numASCopies(4); // Allstub memory
-constexpr int numASInnerCopies(4); // Allstub memory
-constexpr int numTEOCopies(3); // TE Outer memories
+constexpr int numASCopies(2); // Allstub memory
+constexpr int numASInnerCopies(3); // Allstub memory
+constexpr int numTEOCopies(1); // TE Outer memories, can be 0??
 
 // Number of inputs
-constexpr int numInputs(2); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputs(7); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
 
 //Bit size of phi and rz bins?!?! These don't change I think
@@ -72,7 +72,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[numASCopies]
-#if kLAYER == 1 || kLAYER == 2 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 // Add layers/disks
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
 	, VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME
