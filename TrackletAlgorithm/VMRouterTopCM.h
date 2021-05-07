@@ -19,7 +19,7 @@
 // Variables for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 3 // Which barrel layer number the data is coming from
+#define kLAYER 4 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
 
 constexpr char phiRegion = 'C'; // Which AllStub/PhiRegion
@@ -28,11 +28,11 @@ constexpr int sector = 4; //  Specifies the sector
 // Maximum number of memory "copies" for this Phi region
 // Note: can't use 0 if we don't have any memories of a certain type. Use 1.
 constexpr int numASCopies(2); // Allstub memory
-constexpr int numASInnerCopies(3); // Allstub memory
+constexpr int numASInnerCopies(1); // Allstub memory
 constexpr int numTEOCopies(1); // TE Outer memories, can be 0??
 
 // Number of inputs
-constexpr int numInputs(7); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputs(4); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
 
 //Bit size of phi and rz bins?!?! These don't change I think

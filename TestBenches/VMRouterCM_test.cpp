@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int nEvents = 1;  //number of events to run
+const int nEvents = 100;  //number of events to run
 
 // VMRouterCM Test that works for all regions
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
@@ -24,7 +24,7 @@ int main() {
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  TBHelper tb("VMRCM/VMR_L3PHIC");
+  TBHelper tb("VMRCM/VMR_L4PHIC");
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
@@ -132,8 +132,10 @@ int main() {
       err += compareMemWithFile<AllStubMemory<outputType>>(memoriesAS[i], fout_allstubs[i], ievt, "AllStub", truncation);
     }
     // Allstub Inner memories
-    for (unsigned int i = 0; i < numASInnerCopies; i++) {
-      err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
+    if (nASInnerCopies) {
+      for (unsigned int i = 0; i < numASInnerCopies; i++) {
+        err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
+      }
     }
     // ME memories
     err += compareBinnedMemWithFile<VMStubMEMemoryCM<outputType, rzSize, phiRegSize>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
