@@ -60,8 +60,8 @@ int main(){
       track = inputTrack.read_mem(i);
       TrackFit::trackWord[i] = track.getTrackWord();
       for (unsigned short j = 0; j < 4; j++){
-        barrelStubWords[j][i] = TrackFit::BarrelStubWord barrelStubWords;
-        diskStubWords[j][i] = TrackFit::DiskStubWord diskStubWords;
+        barrelStubWords[j][i] = track.getBarrelStubWord;
+        diskStubWords[j][i] = track.getDiskStubWord;
       }
     }
 
