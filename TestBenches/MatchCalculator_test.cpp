@@ -43,7 +43,7 @@ int main() {
   ifstream fin_cm7;
   ifstream fin_cm8;
 
-  if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn6_04.dat")) return -1;
+  if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn1_04.dat")) return -1;
   if (not openDataFile(fin_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat")) return -1;
   if (not openDataFile(fin_cm1,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC17_04.dat")) return -1;
   if (not openDataFile(fin_cm2,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC18_04.dat")) return -1;

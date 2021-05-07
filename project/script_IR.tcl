@@ -3,6 +3,9 @@
 #   vivado_hls -p inputrouter
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset inputrouter
 
@@ -24,10 +27,10 @@ create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
 
 set nProc [exec nproc]
-csim_design -compiler gcc -mflags "-j$nProc"
+csim_design -mflags "-j$nProc" -argv "--link,6 --dtcSplit,0 --tkNonant,4"
 csynth_design 
 # possible options -trace_level all -rtl verilog -verbose 
-cosim_design 
+cosim_design  -argv "--link,6 --dtcSplit,0 --tkNonant,4"
 # possible options  -flow syn, -flow impl
-#export_design -format ip_catalog 
+export_design -format ip_catalog 
 exit

@@ -3,6 +3,9 @@
 #   vivado_hls -p match_calc
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset match_calc
 
@@ -20,7 +23,7 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/MC/
 
-csim_design -compiler gcc -mflags "-j8"
+csim_design -mflags "-j8"
 csynth_design
 cosim_design 
 export_design -format ip_catalog

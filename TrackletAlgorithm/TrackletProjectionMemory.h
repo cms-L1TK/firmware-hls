@@ -84,10 +84,18 @@ public:
     kTProjTrackletIndexLSB = kTProjPhiMSB + 1,
     kTProjTrackletIndexMSB = kTProjTrackletIndexLSB + TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize - 1,
     kTProjTCIDLSB = kTProjTrackletIndexMSB + 1,
-    kTProjTCIDMSB = kTProjTCIDLSB + TrackletProjectionBase<TProjType>::kTProjTCIDSize - 1
+    kTProjTCIDMSB = kTProjTCIDLSB + TrackletProjectionBase<TProjType>::kTProjTCIDSize - 1,
+
+    // subdivisions of the TCID
+    kTProjITCLSB = kTProjTrackletIndexMSB + 1,
+    kTProjITCMSB = kTProjITCLSB + TrackletProjectionBase<TProjType>::kTProjITCSize - 1,
+    kTProjSeedLSB = kTProjITCMSB + 1,
+    kTProjSeedMSB = kTProjSeedLSB + TrackletProjectionBase<TProjType>::kTProjSeedSize - 1,
   };
 
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTCIDSize> TProjTCID;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjSeedSize> TProjSeed;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjITCSize> TProjITC;
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize> TProjTrackletIndex;
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjPhiSize> TProjPHI;
   typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZSize> TProjRZ;
@@ -127,12 +135,13 @@ public:
   // TCID = (seed<<4) + iTC
   // The seed number is assigned as follows:
   //   L1L2 -> 0
-  //   L3L4 -> 1
-  //   L5L6 -> 2
-  //   D1D2 -> 3
-  //   D3D4 -> 4
-  //   D1L1/L1D1 -> 5
-  //   D1L2/L2D1 -> 6
+  //   L2L3 -> 1
+  //   L3L4 -> 2
+  //   L5L6 -> 3
+  //   D1D2 -> 4
+  //   D3D4 -> 5
+  //   D1L1/L1D1 -> 6
+  //   D1L2/L2D1 -> 7
   // The iTC number comes from the letter at the end of the TC name (i.e.,
   // TC_L1L2A and TC_L5L6A have the same iTC number); generally indicates the
   // region of the phi sector being processed:
@@ -142,6 +151,14 @@ public:
   //   ...
   TProjTCID getTCID() const {
     return data_.range(kTProjTCIDMSB,kTProjTCIDLSB);
+  }
+
+  TProjSeed getSeed() const {
+    return data_.range(kTProjSeedMSB,kTProjSeedLSB);
+  }
+
+  TProjITC getITC() const {
+    return data_.range(kTProjITCMSB,kTProjITCLSB);
   }
 
   // The tracklets in an event are indexed starting from zero, and the indices

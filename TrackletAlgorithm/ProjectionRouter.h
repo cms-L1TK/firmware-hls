@@ -59,7 +59,8 @@ namespace PR
   constexpr unsigned int zbins_nbitsextra = 3;
 
   // value by which a z-projection is adjusted up & down when calculating which zbin(s) a projection should go to
-  constexpr unsigned int zbins_adjust = 1;
+  constexpr unsigned int zbins_adjust_PS_seed = 1;
+  constexpr unsigned int zbins_adjust_2S_seed = 4;
 
 } // namespace PR
 
@@ -118,7 +119,7 @@ void ProjectionRouter(BXType bx,
       auto iphiproj = tproj.getPhi();
       auto izproj = tproj.getRZ();
       auto iphider = tproj.getPhiDer();
-      auto trackletid = tproj.getTCID();
+      auto iseed = tproj.getSeed();
 
       //////////////////////////
       // hourglass configuration
@@ -139,6 +140,9 @@ void ProjectionRouter(BXType bx,
       // vmproj index
       typename VMProjection<VMPTYPE>::VMPID index = nallproj;
 
+      // All seeding pairs are PS modules except L3L4 and L5L6
+      bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6);
+
       // vmproj z
       // Separate the vm projections into zbins
       // To determine which zbin in VMStubsME the ME should look in to match this VMProjection,
@@ -146,10 +150,12 @@ void ProjectionRouter(BXType bx,
       // to make it positive, which gives the bin index. But there is a range of possible z values
       // over which we want to look for matched stubs, and there is therefore possibly 2 bins that
       // we will have to look in. So we first take the first MEBinsBits+zbins_nbitsextra (3+2=5)
-      // bits of zproj, adjust the value up and down by zbins_adjust (2), then truncate the
+      // bits of zproj, adjust the value up and down by zbins_adjust (1 or 4), then truncate the
       // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
       auto zbinposfull = (1<<(izproj.length()-1))+izproj;
       auto zbinpos5 = zbinposfull.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
+
+      unsigned int zbins_adjust = psseed ? zbins_adjust_PS_seed : zbins_adjust_2S_seed;
 
       // Lower Bound
       auto zbinlower = zbinpos5<zbins_adjust ?
@@ -176,6 +182,11 @@ void ProjectionRouter(BXType bx,
       // from the 3 MSBs of zproj, which can happen because zbin1 is adjusted by zbins_adjust
       typename VMProjection<VMPTYPE>::VMPFINEZ finez = (1<<(MEBinsBits+(nfinebits-1)-1))+(izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-(nfinebits-1)))-(zbin1,zeropad);
 
+      // vmproj fine phi
+      // these are the bits following (less significant than) the bit that defines iphi
+      auto nfinephibits = VMProjection<VMPTYPE>::BitWidths::kVMProjFinePhiSize;
+      auto finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,iphiproj.length()-nbits_all-nbits_vmme-nfinephibits);
+
       // vmproj irinv
       // phider = -irinv/2
       // Note: auto does not work well here
@@ -186,19 +197,11 @@ void ProjectionRouter(BXType bx,
       // and is shifted to be positive
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
       //assert(rinv >=0 and rinv < 32);
-    
-      // PS seed
-      // top 3 bits of tracklet index indicate the seeding pair
-      ap_uint<nbits_seed> iseed = trackletid.range(trackletid.length()-1,trackletid.length()-nbits_seed);
-      // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
-      // and here?
-      // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
 
-      // All seeding pairs are PS modules except L3L4 and L5L6
-      bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
+      std::cout << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
 
       // VM Projection
-      VMProjection<VMPTYPE> vmproj(index, zbin, finez, rinv, psseed);
+      VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
 
       // write outputs
       //assert(iphi>=0 and iphi<4);
@@ -211,7 +214,7 @@ void ProjectionRouter(BXType bx,
       // write output
       allprojout.write_mem(bx, aproj, nallproj);
       nallproj ++;
-      }
+    }
 
   } // end of PROC_LOOP
 
