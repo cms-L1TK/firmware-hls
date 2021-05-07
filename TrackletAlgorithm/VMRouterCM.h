@@ -316,15 +316,15 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 				// Use comparison_rz to check if they pass the RZ cuts
 				if (Layer == 1) { // TODO: use comparison value 2 for LMR memories
-					constexpr float comparison_value = 95.0 / kz_cm[Layer];
-					constexpr float comparison_valueLMR = 70 / kz_cm[Layer];
+					constexpr float comparison_value = 95.0 / kz_cm[Layer-1];
+					constexpr float comparison_valueLMR = 70 / kz_cm[Layer-1];
 					passRZCut = !(comparison_rz > comparison_value);
 					passRZSpecialCut = !(comparison_rz < comparison_valueLMR);
 				} else if (Layer == 2) {
-					constexpr float comparison_value = 50.0 / kz_cm[Layer];
+					constexpr float comparison_value = 50.0 / kz_cm[Layer-1];
 					passRZCut = !(comparison_rz < comparison_value);
 				} else if (Layer == 3 || Layer == 5) {
-					constexpr float comparison_value = 95.0 / kz_cm[Layer];
+					constexpr float comparison_value = 95.0 / kz_cm[Layer-1];
 					passRZCut = !(comparison_rz > comparison_value);
 					std::cout<< comparison_rz << " > " << comparison_value << std::endl;
 				} else if (Disk == 1 || Disk == 3) {

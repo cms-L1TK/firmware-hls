@@ -24,7 +24,7 @@ int main() {
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  TBHelper tb("VMRCM/VMR_L5PHIC");
+  TBHelper tb("VMRCM/VMR_L6PHIC");
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
