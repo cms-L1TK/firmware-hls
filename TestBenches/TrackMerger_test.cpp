@@ -30,11 +30,12 @@ int main(){
   static TrackFitMemory outputTracks;
 
   // Open input files
-  //ifstream fin_inputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_BT_L1L2_04.dat");
-  ifstream fin_inputTracks("../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
+  ifstream fin_inputTracks;
+  openDataFile(fin_inputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
   assert(fin_inputTracks.good());
-  ifstream fout_outputTracks("../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
-  //ifstream fout_outputTracks("../../../../../emData/TM/TM_L1L2/TrackFit_PT_L1L2_04.dat");
+
+  ifstream fout_outputTracks;
+  openDataFile(fout_outputTracks, "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
   assert(fout_outputTracks.good());
 
   // Loop over events
@@ -54,7 +55,15 @@ int main(){
     writeArrayFromFile<TrackFitMemory> (inputTracks, fin_inputTracks, ievt);
 
     // Set input memories into arrays of input track/stub words
-   
+    for(unsigned short i = 0; i < inputTracks.getEntries(); i++){
+      TrackFit track;
+      track = inputTrack.read_mem(i);
+      TrackFit::trackWord[i] = track.getTrackWord();
+      for (unsigned short j = 0; j < 4; j++){
+        barrelStubWords[j][i] = TrackFit::BarrelStubWord barrelStubWords;
+        diskStubWords[j][i] = TrackFit::DiskStubWord diskStubWords;
+      }
+    }
 
     // Set bunch crossing
     BXType bx = ievt;
