@@ -19,27 +19,28 @@
 // Variables for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 6 // Which barrel layer number the data is coming from
-#define kDISK 0 // Which disk number the data is coming from, 0 if not disk
+#define kLAYER 0 // Which barrel layer number the data is coming from
+#define kDISK 1 // Which disk number the data is coming from, 0 if not disk
 
 constexpr char phiRegion = 'C'; // Which AllStub/PhiRegion
 constexpr int sector = 4; //  Specifies the sector
 
 // Maximum number of memory "copies" for this Phi region
-constexpr int numASCopies(2); // Allstub memory
-constexpr int numASInnerCopies(1); // Allstub memory Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int numTEOCopies(1); // TE Outer memories, can be 0 when no TEOuter memories
+constexpr int numASCopies(4); // Allstub memory
+constexpr int numASInnerCopies(3); // Allstub memory Note: can't use 0 if we don't have any memories of a certain type. Use 1.
+constexpr int numTEOCopies(3); // TE Outer memories, can be 0 when no TEOuter memories
 
 // Number of inputs
 constexpr int numInputs(8); // Number of input memories, EXCLUDING DISK2S
-constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
-
-//Bit size of phi and rz bins?!?! These don't change I think
-constexpr int phiRegSize(3);
-constexpr int rzSize(3);
+constexpr int numInputsDisk2S(4); // Number of DISK2S input memories
 
 ///////////////////////////////////////////////
 // Variables that don't need manual changing
+
+//Bit size of phi and rz bins?!?! These don't change I think
+constexpr int phiRegSize(3);
+constexpr int rzSizeTE(3);
+constexpr int rzSizeME = (kLAYER) ? 3 : 4;
 
 #if kLAYER == kDISK
 #error kLAYER and kDISK can not be the same
@@ -71,12 +72,12 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[numASCopies]
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 // Add layers/disks
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME
+	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies> *memoryTEO
+	, VMStubTEOuterMemoryCM<outputType,rzSizeTE,phiRegSize,numTEOCopies> *memoryTEO
 #endif
 	);
 

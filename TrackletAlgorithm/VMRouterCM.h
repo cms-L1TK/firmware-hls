@@ -168,8 +168,8 @@ inline T createVMStub(const InputStub<InType> inputStub,
 		else bin += (1 << TEBinsBits)/2; // += 4
 	}
 	
-	auto ivm = phiCorr.range(phiCorr.length() - nbitsallstubs - 1, phiCorr.length() - (nbitsallstubs + vmbits)); //get the phi bits that corresponds to the old TE vms. what is 2? because we have 2 bits all stubs?? and 3 buts for te?
-	slot = ivm * 8 + bin; //1 << 3 is the number of bins NBINS?
+	auto ivm = phiCorr.range(phiCorr.length() - nbitsallstubs - 1, phiCorr.length() - (nbitsallstubs + vmbits)); //get the phi bits that corresponds to the old vms
+	slot = (Disk && isMEStub) ? ivm * 16 + bin : ivm * 8 + bin; //1 << 3 is the number of bins NBINS?
 
 	// Set rzfine, i.e. the r/z bits within a coarse r/z region
 	auto rzfine = rzCorr & ((1 << nfinerzbits) - 1); // the 3 LSB as rzfine
@@ -185,9 +185,9 @@ inline T createVMStub(const InputStub<InType> inputStub,
 // Main function
 
 // Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
-template<int nInputMems, int nInputDisk2SMems, int nAllCopies, int nAllInnerCopies, int Layer, int Disk, regionType InType, regionType OutType, int rzSize, int phiRegSize, int nTEOCopies>
+template<int nInputMems, int nInputDisk2SMems, int nAllCopies, int nAllInnerCopies, int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int rzSizeTE, int phiRegSize, int nTEOCopies>
 void VMRouterCM(const BXType bx, BXType& bx_o, 
-		const int METable[], const int phiCorrTable[],
+		const int METable[], const int TEDiskTable[], const int phiCorrTable[],
 		// Input memories
 		const InputStubMemory<InType> inputStubs[],
 		const InputStubMemory<DISK2S> inputStubsDisk2S[],
@@ -195,9 +195,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		AllStubMemory<OutType> memoriesAS[nAllCopies],
 		const ap_uint<maskASIsize>& maskASI, AllStubInnerMemory<OutType> memoriesASInner[],
 		// ME memories
-		VMStubMEMemoryCM<OutType, rzSize, phiRegSize> *memoryME,
+		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize> *memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType,rzSize,phiRegSize,nTEOCopies> *memoryTEO) {
+		VMStubTEOuterMemoryCM<OutType,rzSizeTE,phiRegSize,nTEOCopies> *memoryTEO) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
@@ -226,13 +226,13 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	ap_uint<5> addrCountME[1 << (rzSize + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
+	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
 	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerCopies]; // Writing of Inner Allstubs
 	
 	#pragma HLS array_partition variable=addrCountME complete dim=0
 	#pragma HLS array_partition variable=addrCountASI complete dim=0
 	
-	for (int i = 0; i < 1 << (rzSize + phiRegSize); i++) {
+	for (int i = 0; i < 1 << (rzSizeME + phiRegSize); i++) {
 		#pragma HLS unroll
 		addrCountME[i] = 0;
 	}
@@ -316,21 +316,21 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 				// Use comparison_rz to check if they pass the RZ cuts
 				if (Layer == 1) { // TODO: use comparison value 2 for LMR memories
-					constexpr float comparison_value = 95.0 / kz_cm[Layer-1];
-					constexpr float comparison_valueLMR = 70 / kz_cm[Layer-1];
+					constexpr float comparison_value = (Layer) ? 95.0 / kz_cm[Layer-1] : 0;
+					constexpr float comparison_valueLMR = (Layer) ? 70 / kz_cm[Layer-1] : 0;
 					passRZCut = !(comparison_rz > comparison_value);
 					passRZSpecialCut = !(comparison_rz < comparison_valueLMR);
 				} else if (Layer == 2) {
-					constexpr float comparison_value = 50.0 / kz_cm[Layer-1];
+					constexpr float comparison_value = (Layer) ? 50.0 / kz_cm[Layer-1] : 0;
 					passRZCut = !(comparison_rz < comparison_value);
 				} else if (Layer == 3 || Layer == 5) {
-					constexpr float comparison_value = 95.0 / kz_cm[Layer-1];
+					constexpr float comparison_value = (Layer) ? 95.0 / kz_cm[Layer-1] : 0;
 					passRZCut = !(comparison_rz > comparison_value);
 					std::cout<< comparison_rz << " > " << comparison_value << std::endl;
 				} else if (Disk == 1 || Disk == 3) {
 					constexpr float comparison_value = 55.0 / kr;
 					constexpr float comparison_value2 = 2*N_DISK; // 2*int(N_DSS_MOD) in emulation
-					passRZCut = !((comparison_rz > comparison_value) && (comparison_rz < comparison_value2));
+					passRZCut = !(comparison_rz > comparison_value) && !(comparison_rz < comparison_value2);
 				}
 
 				// Write the stubs that pass the RZ cuts
@@ -420,7 +420,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			int slot; // The bin the stub is going to be put in, in the memory
 
 			// Create the TE Outer stub to save
-			VMStubTEOuter<OutType> stubTEO = createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slot);
+			VMStubTEOuter<OutType> stubTEO = (Layer) ? createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slot) : createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slot);
 
 			// Write the TE Outer stub if bin isn't negative
 			memoryTEO->write_mem(bx, slot, stubTEO);

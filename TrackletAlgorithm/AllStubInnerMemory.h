@@ -83,6 +83,10 @@ template<>
 class AllStubInnerBase<DISK> {
 public:
    enum BitWidths {
+     // Bit size for AllStubInnerMemory fields
+     kASIndexSize = AllStubInnerBase<DISKPS>::kASIndexSize,
+     kASFinePhiSize = AllStubInnerBase<DISKPS>::kASFinePhiSize,
+     // Bit size for full AllStubInnerMemory
      kAllStubInnerSize = AllStubInnerBase<DISKPS>::kAllStubInnerSize
    };
 };
@@ -233,7 +237,17 @@ class AllStubInner<6> : public AllStubInnerBase<DISK> // Can't generate cosim fi
 {
   static_assert(DISK == 6, "DISK is assumed to be 6 in this class specialization.");
 public:
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubInnerMemory word for different fields
+    kASFinePhiLSB = 0,
+    kASFinePhiMSB = kASFinePhiLSB + AllStubInnerBase<DISK>::kASFinePhiSize - 1,
+    kASIndexLSB = kASFinePhiMSB +1,
+    kASIndexMSB = kASIndexLSB + AllStubInnerBase<DISK>::kASIndexSize - 1
+  };
+
   typedef ap_uint<AllStubInnerBase<DISK>::kAllStubInnerSize> AllStubInnerData;
+  typedef ap_uint<AllStubInnerBase<DISK>::kASFinePhiSize> ASFINEPHI;
+  typedef ap_uint<AllStubInnerBase<DISK>::kASIndexSize> ASINDEX;
 
   AllStubInner(const AllStubInnerData& newdata):
     data_(newdata)
@@ -254,7 +268,20 @@ public:
   // Getter
   static constexpr int getWidth() {return AllStubInnerBase<DISK>::kAllStubInnerSize;}
 
+  ASFINEPHI getFinePhi() const {
+    return data_.range(kASFinePhiMSB,kASFinePhiLSB);
+  }
+
   AllStubInnerData raw() const {return data_;}
+  
+  // Setter
+  void setIndex(const ASINDEX index) {
+    data_.range(kASIndexMSB,kASIndexLSB) = index;
+  }
+  
+  void setFinePhi(const ASFINEPHI finephi) {
+    data_.range(kASFinePhiMSB,kASFinePhiLSB) = finephi;
+  }
 
 private:
 

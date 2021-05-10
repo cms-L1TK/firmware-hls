@@ -22,12 +22,12 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[numASCopies]
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 // Add layers/disks
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSize, phiRegSize> *memoryME
+	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType,rzSize,phiRegSize,numTEOCopies> *memoryTEO
+	, VMStubTEOuterMemoryCM<outputType,rzSizeTE,phiRegSize,numTEOCopies> *memoryTEO
 #endif
  ) {
 
@@ -60,9 +60,29 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 #elif kDISK == 1
 		static const int METable[] =
 	#include "../emData/VMRCM/tables/VMRME_D1.tab"
-#elif kLAYER == 2
+#elif kDISK == 2
 		static const int METable[] =
 	#include "../emData/VMRCM/tables/VMRME_D2.tab"
+#elif kDISK == 3
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_D3.tab"
+#elif kDISK == 4
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_D4.tab"
+#elif kDISK == 5
+		static const int METable[] =
+	#include "../emData/VMRCM/tables/VMRME_D5.tab"
+#endif
+
+#if kDISK == 1
+		static const int TEDiskTable[] =
+	#include "../emData/VMRCM/tables/VMRTE_D1.tab"
+#elif kDISK == 2
+		static const int TEDiskTable[] =
+	#include "../emData/VMRCM/tables/VMRTE_D2.tab"
+#elif kDISK == 4
+		static const int TEDiskTable[] =
+	#include "../emData/VMRCM/tables/VMRTE_D4.tab"
 #endif
 
 	// LUT with phi corrections to project the stub to the average radius in a layer.
@@ -102,14 +122,24 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 	// and a "1" implies that the specified memory is used for this phi region
 	// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
 	// NOTE: read from right to left
-	static const ap_uint<maskASIsize> maskASI = 0b0;//0b110110000000;
+	static const ap_uint<maskASIsize> maskASI = 0b000111000000;//0b110110000000;
 
 
 	/////////////////////////
 	// Main function
 
-	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSize, phiRegSize, numTEOCopies>
-	(bx, bx_o, METable, phiCorrTable,
+	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSizeME, rzSizeTE, phiRegSize, numTEOCopies>
+	(bx, bx_o, METable,
+#if kDISK == 1 || kDISK == 2 || kDISK == 4
+		TEDiskTable,
+#else
+		nullptr,
+#endif
+#if kDISK > 0
+		nullptr,
+#else
+		phiCorrTable,
+#endif
 		// Input memories
 		inputStubs, 
 #if kDISK > 0
@@ -120,7 +150,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 		// AllStub memories
 		memoriesAS, 
 		maskASI, 
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 // Add layers/disks
 		memoriesASInner,
 #else
 		nullptr,
