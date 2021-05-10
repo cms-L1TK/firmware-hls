@@ -1,5 +1,5 @@
-#ifndef TrackletAlgorithm_VMRouterTopCM_h
-#define TrackletAlgorithm_VMRouterTopCM_h
+#ifndef TrackletAlgorithm_VMRouterCMTop_h
+#define TrackletAlgorithm_VMRouterCMTop_h
 
 #include "VMRouterCM.h"
 
@@ -7,9 +7,9 @@
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterTopCM.h
-//          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
-//          - maskASI in VMRouterTopCM.cc
+//          - constants specified in VMRouterCMTop.h
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
+//          - maskASI in VMRouterCMTop.cc
 //          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
@@ -61,7 +61,7 @@ constexpr int rzSizeME = (kLAYER) ? 3 : 4;
 // VMRouterCM Top Function
 // Changed manually
 
-void VMRouterTopCM(const BXType bx, BXType& bx_o
+void VMRouterCMTop(const BXType bx, BXType& bx_o
 	// Input memories
 	, const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
@@ -79,4 +79,4 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 #endif
 	);
 
-#endif // TrackletAlgorithm_VMRouterTopCM_h
+#endif // TrackletAlgorithm_VMRouterCMTop_h

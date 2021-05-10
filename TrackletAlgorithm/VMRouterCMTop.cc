@@ -1,17 +1,17 @@
-#include "VMRouterTopCM.h"
+#include "VMRouterCMTop.h"
 
 // VMRouter Top Function for layer 2, AllStub region A
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterTopCM.h
-//          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
-//          - maskASI in VMRouterTopCM.cc
+//          - constants specified in VMRouterCMTop.h
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
+//          - maskASI in VMRouterCMTop.cc
 //          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
-void VMRouterTopCM(const BXType bx, BXType& bx_o
+void VMRouterCMTop(const BXType bx, BXType& bx_o
 	// Input memories
 	, const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0

@@ -1,5 +1,5 @@
 // Test bench for VMRouter Combined Modules
-#include "VMRouterTopCM.h"
+#include "VMRouterCMTop.h"
 
 #include <algorithm>
 #include <iterator>
@@ -14,9 +14,9 @@ const int nEvents = 100;  //number of events to run
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterTopCM.h
-//          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
-//          - maskASI in VMRouterTopCM.cc
+//          - constants specified in VMRouterCMTop.h
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
+//          - maskASI in VMRouterCMTop.cc
 //          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
@@ -113,7 +113,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterTopCM(bx, bx_out, inputStubs
+    VMRouterCMTop(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
