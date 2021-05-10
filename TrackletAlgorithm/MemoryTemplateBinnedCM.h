@@ -127,13 +127,12 @@ class MemoryTemplateBinnedCM{
 #pragma HLS inline
 
     ap_uint<3> ibin,ireg;
-
     (ireg,ibin)=slot;
 
     auto nentry_ibx_tmp = nentries8_[ibx][ibin];
     ap_uint<4> nentry_ibx = nentry_ibx_tmp.range(ireg*4+3,ireg*4); // Reduces timing a little bit
 
-    if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))-1) {
+    if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
   
     writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {

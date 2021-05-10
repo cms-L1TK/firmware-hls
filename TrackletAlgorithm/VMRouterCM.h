@@ -112,9 +112,9 @@ inline T createVMStub(const InputStub<InType> inputStub,
 
 	// Number of bits for table indices
 	constexpr int nbitsztable =
-			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in finebintable
+			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
 	constexpr int nbitsrtable =
-			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in finebintable
+			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
 	constexpr auto vmbits =
 			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
@@ -125,15 +125,13 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	stub.setFinePhi(
 				iphivmFineBins<InType>(phicorr, nbitsall + vmbits, nbitsfinephi));
 
-	// Indices used to find the rzfine value in finebintable
-	// finebintable returns the top 6 bits of a corrected z
+	// Indices used to find the rzfine value in LUT table
+	// LUT table returns the top 6 bits of a corrected z
 	// Note: not the index that is being saved to the stub
-	ap_uint<nbitsztable + nbitsrtable> indexz =
-			//((z + (1 << (nbitsz - 1))) >> (nbitsz - nbitsztable)); // Make z unsigned and take the top "nbitsztable" bits
-			(z >> (nbitsz - nbitsztable));
+	ap_uint<nbitsztable + nbitsrtable> indexz = (z >> (nbitsz - nbitsztable)); // Make z unsigned and take the top "nbitsztable" bits
 	ap_uint<nbitsrtable> indexr = -1;
 
-	constexpr int rbins = (1 << nbitsrtable); // Number of bins in r in finebintable
+	constexpr int rbins = (1 << nbitsrtable); // Number of bins in r in LUT table
 
 	if (Disk) {
 		if (negDisk) {
