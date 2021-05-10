@@ -33,7 +33,7 @@ class MemoryTemplateBinnedCM{
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
   ap_uint<8> binmask8_[kNBxBins][8];
-  ap_uint<40> nentries8_[kNBxBins][8];
+  ap_uint<32> nentries8_[kNBxBins][8];
 
   
  public:
@@ -80,10 +80,10 @@ class MemoryTemplateBinnedCM{
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<3> ibin,ireg;
     (ibin,ireg)=slot;
-    return nentries8_[bx][ibin].range(ireg*5+4,ireg*5);
+    return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<40> getEntries8(BunchXingT bx, ap_uint<3> ibin) const {
+  ap_uint<32> getEntries8(BunchXingT bx, ap_uint<3> ibin) const {
     #pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
     return nentries8_[bx][ibin];
   }
@@ -131,9 +131,9 @@ class MemoryTemplateBinnedCM{
     (ireg,ibin)=slot;
 
     auto nentry_ibx_tmp = nentries8_[ibx][ibin];
-    ap_uint<5> nentry_ibx = nentry_ibx_tmp.range(ireg*5+4,ireg*5); // Reduces timing a little bit
+    ap_uint<4> nentry_ibx = nentry_ibx_tmp.range(ireg*4+3,ireg*4); // Reduces timing a little bit
 
-    if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))) {
+    if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))-1) {
       // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
   
     writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {
@@ -143,7 +143,7 @@ class MemoryTemplateBinnedCM{
 
       binmask8_[ibx][ibin].set_bit(ireg,true);
 
-      nentries8_[ibx][ibin].range(ireg*5+4,ireg*5)=nentry_ibx+1;
+      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       
       return true;
     }
