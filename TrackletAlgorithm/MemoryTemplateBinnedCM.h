@@ -57,9 +57,9 @@ class MemoryTemplateBinnedCM{
 #pragma HLS inline
 
   DataType data("0",16);
-  cleardataloop: for ( int j = 0; j < getNBins(); ++j ) {
-			for (int i = 0; i < getNEntryPerBin() ; ++i) {
-        int slot = j*getNEntryPerBin()+i;
+  cleardataloop: for (int i = 0; i < getNBins(); ++i ) {
+			for (int j = 0; j < getNEntryPerBin(); ++j) {
+        int slot = i*getNEntryPerBin()+j;
 				write_mem(bx, slot, data);
 			}
 		}
