@@ -8,23 +8,24 @@
 
 using namespace std;
 
-const int nEvents = 1;  //number of events to run
+const int nEvents = 100;  //number of events to run
 
 // VMRouterCM Test that works for all regions
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
+//          - constants specified in VMRouterTopCM.h
+//          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
+//          - maskASI in VMRouterTopCM.cc
 //          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
-//          - the included top function in VMRouterCM_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR_CM.tcl (if file name is changed)
-//          - and the changes listed in VMRouterTopCM.cc/h
+//          - add the phi region in emData/download.sh, make sure to also run clean
 
 int main() {
 
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  TBHelper tb("VMRCM/VMR_D1PHIC");
+  TBHelper tb("VMRCM/VMR_L2PHIA");
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
@@ -117,7 +118,7 @@ int main() {
         , inputStubsDisk2S
 #endif
         , memoriesAS
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
         , memoriesASInner
 #endif
         , &memoryME
@@ -131,15 +132,15 @@ int main() {
     bool truncation = false;
 
     // AllStub memories
-    // for (unsigned int i = 0; i < numASCopies; i++) {
-    //   err += compareMemWithFile<AllStubMemory<outputType>>(memoriesAS[i], fout_allstubs[i], ievt, "AllStub", truncation);
-    // }
+    for (unsigned int i = 0; i < numASCopies; i++) {
+      err += compareMemWithFile<AllStubMemory<outputType>>(memoriesAS[i], fout_allstubs[i], ievt, "AllStub", truncation);
+    }
     // Allstub Inner memories
-    // if (nASInnerCopies) {
-    //   for (unsigned int i = 0; i < numASInnerCopies; i++) {
-    //     err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
-    //   }
-    // }
+    if (nASInnerCopies) {
+      for (unsigned int i = 0; i < numASInnerCopies; i++) {
+        err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
+      }
+    }
     // ME memories
     err += compareBinnedMemWithFile<VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
     //TE Outer memories

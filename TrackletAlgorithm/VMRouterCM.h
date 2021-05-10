@@ -27,11 +27,8 @@
 
 // Number of bits used for the VMs for different layers and disks
 // E.g. 32 VMs would use 5 vmbits
-constexpr int nbitsallstubslayer[6] = { 3, 2, 2, 2, 2, 2}; // Number of bits for the Allstub memories in each layer
-constexpr int nbitsallstubsdisk[5] = {2};
-constexpr int nbitsvmlayer[6] = { 2, 3, 3, 3, 3, 3 }; // for me??
+constexpr int nbitsvmlayer[6] = { 2, 3, 3, 3, 3, 3 };
 constexpr int nbitsvmdisk[5] = { 3, 2, 2, 2, 2 };
-constexpr int nbitsvmextra[3] = { 0, 0, 3 }; // don't need this if they are the same as the normal??
 
 // Number of most significant bits (MSBs) of z and r used for index in the LUTs
 constexpr int nbitsztablelayer = 7;
@@ -40,8 +37,8 @@ constexpr int nbitsrtablelayer = 4;
 constexpr int nbitsztabledisk = 3;
 constexpr int nbitsrtabledisk = 8;
 
-// Number of MSBs used for r index in phiCorr LUTs
-constexpr int nbitsrphicorrtable = 3; // Found hardcoded in VMRouterphiCorrTable.h
+// Number of MSBs used for r index in phicorr LUTs
+constexpr int nbitsrphicorrtable = 3;
 
 // The length of the masks used for the memories
 constexpr int maskASIsize = 12; // Allstub Inner memories
@@ -73,29 +70,29 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 	if (InType == DISKPS || InType == DISK2S)
 		return phi; // Do nothing if disks
 
-	constexpr auto rBins = 1 << nbitsrphicorrtable; // The number of bins for r
+	constexpr auto nrbins = 1 << nbitsrphicorrtable; // The number of bins for r
 
-	ap_uint<nbitsrphicorrtable> rBin = (r + (1 << (r.length() - 1)))
+	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1)))
 			>> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
-	auto index = bend * rBins + rBin; // Index for where we find our correction value
+	auto index = bend * nrbins + rbin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
-	auto phiCorr = phi - corrValue; // the corrected phi
+	auto phicorr = phi - corrValue; // the corrected phi
 
 	// Check for overflow
-	if (phiCorr < 0)
-		phiCorr = 0; // can't be less than 0
-	if (phiCorr >= 1 << phi.length())
-		phiCorr = (1 << phi.length()) - 1;  // can't be more than the max value
+	if (phicorr < 0)
+		phicorr = 0; // can't be less than 0
+	if (phicorr >= 1 << phi.length())
+		phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
 
-	return phiCorr;
+	return phicorr;
 }
 
 
 // Returns a ME/TE stub with all the values set
 template<class T, regionType InType, regionType OutType, int Layer, int Disk, bool isMEStub>
 inline T createVMStub(const InputStub<InType> inputStub,
-		const int index, const bool negDisk, const int fineBinTable[],
+		const int index, const bool negDisk, const int lutTable[],
 		const int phiCorrTable[], int& slot) {
 
 	// The stub that is going to be returned
@@ -106,73 +103,69 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	auto r = inputStub.getR();
 	auto bend = inputStub.getBend();
 	auto phi = inputStub.getPhi();
-	auto phiCorr = getPhiCorr<InType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
+	auto phicorr = getPhiCorr<InType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
 
-	int nrBits = r.length(); // Number of bits for r
-	int nzBits = z.length(); // Number of bits for z
-	int nbendBits = bend.length(); // Number of bits for bend
-	int nfinerzbits = stub.getFineZ().length(); // Number of bits for finer/z
-	int nFinePhiBits = stub.getFinePhi().length();  // Number of bits for finephi
+	int nbitsr = r.length(); // Number of bits for r
+	int nbitsz = z.length(); // Number of bits for z
+	int nbitsfinerz = stub.getFineZ().length(); // Number of bits for finer/z
+	int nbitsfinephi = stub.getFinePhi().length();  // Number of bits for finephi
 
 	// Number of bits for table indices
 	constexpr int nbitsztable =
 			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in finebintable
 	constexpr int nbitsrtable =
 			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in finebintable
-	constexpr auto vmbitsTmp =
-			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
 	constexpr auto vmbits =
-			((Layer == 3) && !isMEStub) ? nbitsvmextra[Layer - 1] : vmbitsTmp; // Number of bits for VMs
-	constexpr unsigned int nbitsallstubs = 
-			(Layer) ? nbitsallstubslayer[Layer-1] : nbitsallstubsdisk[Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
+			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
+	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Set values to VMStub
 	stub.setBend(bend);
 	stub.setIndex(index);
 	stub.setFinePhi(
-				iphivmFineBins<InType>(phiCorr, nbitsallstubs + vmbits, nFinePhiBits));
+				iphivmFineBins<InType>(phicorr, nbitsall + vmbits, nbitsfinephi));
 
 	// Indices used to find the rzfine value in finebintable
 	// finebintable returns the top 6 bits of a corrected z
 	// Note: not the index that is being saved to the stub
 	ap_uint<nbitsztable + nbitsrtable> indexz =
-			//((z + (1 << (nzBits - 1))) >> (nzBits - nbitsztable)); // Make z unsigned and take the top "nbitsztable" bits
-			(z >> (nzBits - nbitsztable));
+			//((z + (1 << (nbitsz - 1))) >> (nbitsz - nbitsztable)); // Make z unsigned and take the top "nbitsztable" bits
+			(z >> (nbitsz - nbitsztable));
 	ap_uint<nbitsrtable> indexr = -1;
 
 	constexpr int rbins = (1 << nbitsrtable); // Number of bins in r in finebintable
 
 	if (Disk) {
 		if (negDisk) {
-			indexz = (1 << nbitsztable) - indexz;
+			indexz = (1 << nbitsztable) -1 - indexz;
 		}
 		indexr = r;
 		if (InType == DISKPS) {
-			indexr = r >> (nrBits - nbitsrtable); // Take the top "nbitsrtable" bits
+			indexr = r >> (nbitsr - nbitsrtable); // Take the top "nbitsrtable" bits
 		}
 	} else { // Layer
-		indexr = (r >> (nrBits- nbitsrtable));// Make r unsigned and take the top "nbitsrtable" bits
+		indexr = (r >> (nbitsr- nbitsrtable));// Make r unsigned and take the top "nbitsrtable" bits
 	}
 
-	// The index for finebintable
-	ap_uint<nbitsztable + nbitsrtable> finebinindex = (indexz * rbins) + indexr;
+	// The index for LUT table
+	ap_uint<nbitsztable + nbitsrtable> lutIndex = (indexz * rbins) + indexr;
 
-	// Get the corrected r/z position
-	auto rzCorr = fineBinTable[finebinindex];
+	// Get the LUT value
+	auto lutValue = lutTable[lutIndex];
 
 	// Coarse z. The bin the stub is going to be put in, in the memory
-	int bin = rzCorr >> nfinerzbits; // 3 bits, i.e. max 8 bins within each VM
+	int bin = lutValue >> nbitsfinerz; // 3 bits, i.e. max 8 bins within each VM
 
 	if (negDisk) {
 		if (isMEStub) bin += 1 << MEBinsBits; // bin 8-16 are for negative disk
 		else bin += (1 << TEBinsBits)/2; // += 4
 	}
 	
-	auto ivm = phiCorr.range(phiCorr.length() - nbitsallstubs - 1, phiCorr.length() - (nbitsallstubs + vmbits)); //get the phi bits that corresponds to the old vms
+	auto ivm = phicorr.range(phicorr.length() - nbitsall - 1, phicorr.length() - (nbitsall + vmbits)); //get the phi bits that corresponds to the old vms
 	slot = (Disk && isMEStub) ? ivm * 16 + bin : ivm * 8 + bin; //1 << 3 is the number of bins NBINS?
 
 	// Set rzfine, i.e. the r/z bits within a coarse r/z region
-	auto rzfine = rzCorr & ((1 << nfinerzbits) - 1); // the 3 LSB as rzfine
+	auto rzfine = lutValue & ((1 << nbitsfinerz) - 1); // the 3 LSB as rzfine
 	stub.setFineZ(rzfine);
 
 	assert(rzfine >= 0);
@@ -316,19 +309,19 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 				// Use comparison_rz to check if they pass the RZ cuts
 				if (Layer == 1) { // TODO: use comparison value 2 for LMR memories
-					constexpr float comparison_value = (Layer) ? 95.0 / kz_cm[Layer-1] : 0;
-					constexpr float comparison_valueLMR = (Layer) ? 70 / kz_cm[Layer-1] : 0;
+					constexpr float comparison_value = (Layer) ? VMROUTERCUTZL1L3L5 / kz_cm[Layer-1] : 0;
+					constexpr float comparison_valueLMR = (Layer) ? VMROUTERCUTZL1 / kz_cm[Layer-1] : 0; // For LMR memories
 					passRZCut = !(comparison_rz > comparison_value);
 					passRZSpecialCut = !(comparison_rz < comparison_valueLMR);
 				} else if (Layer == 2) {
-					constexpr float comparison_value = (Layer) ? 50.0 / kz_cm[Layer-1] : 0;
+					constexpr float comparison_value = (Layer) ? VMROUTERCUTZL2 / kz_cm[Layer-1] : 0;
 					passRZCut = !(comparison_rz < comparison_value);
 				} else if (Layer == 3 || Layer == 5) {
-					constexpr float comparison_value = (Layer) ? 95.0 / kz_cm[Layer-1] : 0;
+					constexpr float comparison_value = (Layer) ? VMROUTERCUTZL1L3L5 / kz_cm[Layer-1] : 0;
 					passRZCut = !(comparison_rz > comparison_value);
 					std::cout<< comparison_rz << " > " << comparison_value << std::endl;
 				} else if (Disk == 1 || Disk == 3) {
-					constexpr float comparison_value = 55.0 / kr;
+					constexpr float comparison_value = VMROUTERCUTRD1D3 / kr;
 					constexpr float comparison_value2 = 2*N_DISK; // 2*int(N_DSS_MOD) in emulation
 					passRZCut = !(comparison_rz > comparison_value) && !(comparison_rz < comparison_value2);
 				}
@@ -341,15 +334,15 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 								: static_cast<ap_uint<allstubinner.getWidth()>>(stub.raw()) << (allstubinner.getWidth() - stub.getWidth()); // shift by finephi and index
 
 					allstubinner.setIndex(i);
-					auto phiCorr = getPhiCorr<InType>(stub.getPhi(), stub.getR(), stub.getBend(), phiCorrTable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
-					allstubinner.setFinePhi(phiCorr.range(phiCorr.length() - 1, phiCorr.length() - allstubinner.getFinePhi().length())); // top 8 bits of phicorr
+					auto phicorr = getPhiCorr<InType>(stub.getPhi(), stub.getR(), stub.getBend(), phiCorrTable); // Corrected phi, i.e. phi at nominal radius (what about disks?)
+					allstubinner.setFinePhi(phicorr.range(phicorr.length() - 1, phicorr.length() - allstubinner.getFinePhi().length())); // top 8 bits of phicorr
 
 					constexpr unsigned int phicutmax = (Layer == 1) ? 4 : 6; // I have no idea what these numbers are, see emulation
 					constexpr unsigned int phicutmin = (Layer == 1) ? 4 : 2;
 
-					constexpr unsigned int nbitsallstubs = (Layer) ? nbitsallstubslayer[Layer-1] : nbitsallstubsdisk[Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
+					constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
-					auto iphipos = phiCorr.range(phiCorr.length() - nbitsallstubs -1, phiCorr.length() - (nbitsallstubs + phiRegSize)); // Top three bits after the allstub bits 
+					auto iphipos = phicorr.range(phicorr.length() - nbitsall -1, phicorr.length() - (nbitsall + phiRegSize)); // Top three bits after the allstub bits 
 					unsigned int inner_mem_index = 0; // Keeps track of which allstub inner memory to write to
 
 
@@ -393,21 +386,21 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		/////////////////////////////////////////////
 		// ME memories
 
-		int slot; // The bin the stub is going to be put in, in the memory
+		int slotME; // The bin the stub is going to be put in, in the memory
 
 		// Create the ME stub to save
 		VMStubMECM<OutType> stubME = (disk2S) ?
-				createVMStub<VMStubMECM<OutType>, DISK2S, OutType, Layer, Disk, true>(stubDisk2S, i, negDisk, METable, phiCorrTable, slot) :
-				createVMStub<VMStubMECM<OutType>, InType, OutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slot);
+				createVMStub<VMStubMECM<OutType>, DISK2S, OutType, Layer, Disk, true>(stubDisk2S, i, negDisk, METable, phiCorrTable, slotME) :
+				createVMStub<VMStubMECM<OutType>, InType, OutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
-		memoryME->write_mem(bx, slot, stubME, addrCountME[slot]);
-		addrCountME[slot] += 1;
+		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
+		addrCountME[slotME] += 1;
 
 		// For debugging
 		#ifndef __SYNTHESIS__
 					std::cout << "ME stub " << std::hex << stubME.raw()
-							<< std::dec << "       to slot " << slot << std::endl;
+							<< std::dec << "       to slot " << slotME << std::endl;
 		#endif // DEBUG
 		// End ME memories
 
@@ -417,18 +410,20 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 		if (nTEOCopies && !disk2S) {
 
-			int slot; // The bin the stub is going to be put in, in the memory
+			int slotTE; // The bin the stub is going to be put in, in the memory
 
 			// Create the TE Outer stub to save
-			VMStubTEOuter<OutType> stubTEO = (Layer) ? createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slot) : createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slot);
+			VMStubTEOuter<OutType> stubTEO = (Layer) ? 
+					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slotTE) : 
+					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
 
 			// Write the TE Outer stub if bin isn't negative
-			memoryTEO->write_mem(bx, slot, stubTEO);
+			memoryTEO->write_mem(bx, slotTE, stubTEO);
 
 			// For debugging
 			#ifndef __SYNTHESIS__
 						std::cout << "TEOuter stub " << std::hex << stubTEO.raw()
-								<< std::dec << "       to slot " << slot << std::endl;
+								<< std::dec << "       to slot " << slotTE << std::endl;
 			#endif // DEBUG
 			
 		} // End TE Outer memories

@@ -5,11 +5,9 @@
 
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterTopCM.h
-//          - the input parameters to VMRouterTopCM in VMRouterTopCM.h/.cc
 //          - add/remove pragmas depending on inputStubs in VMRouterTopCM.cc
-//          - the call to VMRouterCM() in VMRouterTopCM.cc
-//          - the included top function in VMRouterCM_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR_CM.tcl (if file name is changed)
+//          - maskASI in VMRouterTopCM.cc
+//          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
@@ -22,7 +20,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[numASCopies]
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
 	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize> *memoryME
@@ -121,15 +119,18 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
 	// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
-	// NOTE: read from right to left
-	static const ap_uint<maskASIsize> maskASI = 0b000111000000;//0b110110000000;
+	// NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
+	static const ap_uint<maskASIsize> maskASI = 0b110110000000; // Change me when switching phi region
 
 
 	/////////////////////////
 	// Main function
 
 	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSizeME, rzSizeTE, phiRegSize, numTEOCopies>
-	(bx, bx_o, METable,
+	(bx, bx_o, 
+
+		// LUTs
+		METable,
 #if kDISK == 1 || kDISK == 2 || kDISK == 4
 		TEDiskTable,
 #else
@@ -140,6 +141,7 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 #else
 		phiCorrTable,
 #endif
+
 		// Input memories
 		inputStubs, 
 #if kDISK > 0
@@ -147,16 +149,19 @@ void VMRouterTopCM(const BXType bx, BXType& bx_o
 #else
 		nullptr,
 #endif
+
 		// AllStub memories
 		memoriesAS, 
 		maskASI, 
-#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 // Add layers/disks
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 || kDISK == 3
 		memoriesASInner,
 #else
 		nullptr,
 #endif
+
 		// ME memories
 		memoryME,
+
 		// TEOuter memories
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 		memoryTEO
