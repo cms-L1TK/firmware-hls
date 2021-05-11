@@ -8,8 +8,7 @@
 
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterCMTop.h
-//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
-//          - maskASI in VMRouterCMTop.cc
+//          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
@@ -31,6 +30,11 @@ constexpr int numTEOCopies(3); // TE Outer memories, can be 0 when no TEOuter me
 // Number of inputs
 constexpr int numInputs(2); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
+
+// Masks of which AllStubInner memories that are being used in this phi region; represente by a "1"
+// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
+// NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
+static const ap_uint<maskASIsize> maskASI = 0b110110000000;
 
 
 ///////////////////////////////////////////////

@@ -15,8 +15,7 @@ const int nEvents = 100;  //number of events to run
 
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterCMTop.h
-//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
-//          - maskASI in VMRouterCMTop.cc
+//          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
