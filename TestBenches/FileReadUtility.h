@@ -237,7 +237,7 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   
 }
 
-// For TE Outer CM. Could modify the normal one since the copies are identical?
+// For TE Outer CM.
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemCMWithFile(const MemType& memory,
                                       std::ifstream& fout,

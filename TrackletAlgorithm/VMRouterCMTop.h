@@ -10,8 +10,8 @@
 //          - constants specified in VMRouterCMTop.h
 //          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
 //          - maskASI in VMRouterCMTop.cc
-//          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
+
 
 ////////////////////////////////////////////
 // Variables for that are specified with regards to the VMR region
@@ -32,10 +32,11 @@ constexpr int numTEOCopies(3); // TE Outer memories, can be 0 when no TEOuter me
 constexpr int numInputs(2); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
 
+
 ///////////////////////////////////////////////
 // Variables that don't need manual changing
 
-//Bit size of phi and rz bins?!?! These don't change I think
+//Bit size of phi and rz bins
 constexpr int phiRegSize(3);
 constexpr int rzSizeTE(3);
 constexpr int rzSizeME = (kLAYER) ? 3 : 4;

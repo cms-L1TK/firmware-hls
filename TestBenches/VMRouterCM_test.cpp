@@ -17,15 +17,16 @@ const int nEvents = 100;  //number of events to run
 //          - constants specified in VMRouterCMTop.h
 //          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
 //          - maskASI in VMRouterCMTop.cc
-//          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
+
 
 int main() {
 
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  TBHelper tb("VMRCM/VMR_L2PHIA");
+  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phiRegion;
+  TBHelper tb("VMRCM/VMR_" + vmrID);
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
@@ -46,7 +47,7 @@ int main() {
   const auto nVMSTE = tb.nFiles(tePattern);
   
   // Make sure that the number of input and output memories are correct
-  assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies));
+  assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies) && (nVMSTE == numTEOCopies));
 
   // Open the files
   cout << "Open files..." << endl;

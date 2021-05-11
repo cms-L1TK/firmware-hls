@@ -7,7 +7,6 @@
 //          - constants specified in VMRouterCMTop.h
 //          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc
 //          - maskASI in VMRouterCMTop.cc
-//          - the base directory when instantiating TBHelper in VMRouterCM_test.cpp
 //          - add the phi region in emData/download.sh, make sure to also run clean
 
 
@@ -27,7 +26,19 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 	, VMStubTEOuterMemoryCM<outputType,rzSizeTE,phiRegSize,numTEOCopies> *memoryTEO
 #endif
- ) {
+	) {
+
+	// // Takes 2 clock cycles before on gets data, used at high frequencies
+	#pragma HLS resource variable=inputStubs[0].get_mem() latency=2
+	#pragma HLS resource variable=inputStubs[1].get_mem() latency=2
+	// #pragma HLS resource variable=inputStubs[2].get_mem() latency=2
+	// #pragma HLS resource variable=inputStubs[3].get_mem() latency=2
+
+	// Masks of which memories that are being used. The first memory is represented by the LSB
+	// and a "1" implies that the specified memory is used for this phi region
+	// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
+	// NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
+	static const ap_uint<maskASIsize> maskASI = 0b110110000000; // Change me when switching phi region
 
 
 	///////////////////////////
@@ -105,22 +116,6 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 		static const int phiCorrTable[] =
 	#include "../emData/VMRCM/tables/VMPhiCorrL6.tab"
 #endif
-
-// // Takes 2 clock cycles before on gets data, used at high frequencies
-#pragma HLS resource variable=inputStubs[0].get_mem() latency=2
-#pragma HLS resource variable=inputStubs[1].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[2].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[3].get_mem() latency=2
-
-
-	//////////////////////////////////
-	// Create memory masks
-
-	// Masks of which memories that are being used. The first memory is represented by the LSB
-	// and a "1" implies that the specified memory is used for this phi region
-	// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
-	// NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
-	static const ap_uint<maskASIsize> maskASI = 0b110110000000; // Change me when switching phi region
 
 
 	/////////////////////////
