@@ -22,8 +22,7 @@ source settings_hls.tcl
 
 # data files
 add_files -tb ../emData/VMR/tables/
-add_files -tb ../emData/VMR/VMR_L1PHIE/
-add_files -tb ../emData/LUTs/wires.dat
+add_files -tb ../emData/VMR/
 
 csim_design -mflags "-j8"
 csynth_design
