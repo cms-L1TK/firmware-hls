@@ -29,8 +29,8 @@ create_clock -period 360MHz -name fast_clock
 set nProc [exec nproc]
 csim_design -mflags "-j$nProc" -argv "--link,6 --dtcSplit,0 --tkNonant,4"
 csynth_design 
-# possible options -trace_level all -rtl verilog -verbose 
-cosim_design  -argv "--link,6 --dtcSplit,0 --tkNonant,4"
-# possible options  -flow syn, -flow impl
-export_design -format ip_catalog 
+# # possible options -trace_level all -rtl verilog -verbose 
+# cosim_design  -argv "--link,6 --dtcSplit,0 --tkNonant,4"
+# # possible options  -flow syn, -flow impl
+# export_design -format ip_catalog 
 exit

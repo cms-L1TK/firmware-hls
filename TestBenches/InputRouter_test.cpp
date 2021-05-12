@@ -55,29 +55,6 @@ static const int kMaxNEvents = 100;  // max number of events to run
 
 
 
-// LUT with phi corrections to the nominal radius. Only used by layers.
-// Values are determined by the radius and the bend of the stub.
-const int kPhiCorrtable_L1[] =
-#include "../emData/LUTs/VMPhiCorrL1.tab"
-;
-const int kPhiCorrtable_L2[] =
-#include "../emData/LUTs/VMPhiCorrL2.tab"
-;
-const int kPhiCorrtable_L3[] =
-#include "../emData/LUTs/VMPhiCorrL3.tab"
-;
-const int kPhiCorrtable_L4[] =
-#include "../emData/LUTs/VMPhiCorrL4.tab"
-;
-const int kPhiCorrtable_L5[] =
-#include "../emData/LUTs/VMPhiCorrL5.tab"
-;
-const int kPhiCorrtable_L6[] =
-#include "../emData/LUTs/VMPhiCorrL6.tab"
-;
-
-
-
 // map of detector regions read out [ per DTC ]
 using CablingMap = std::map<int, std::vector<uint8_t>> ;
 // map of dtc names and link ids 
@@ -583,20 +560,12 @@ int main(int argc, char * argv[])
       << " memories."
       << "\n";
 
-    // decode link wrd for this layer
-    // figure out which of the LUTs I need 
-    static const int* cLUT_L1 = (  hIs2S == 1 )  ? kPhiCorrtable_L4 : kPhiCorrtable_L1; 
-    static const int* cLUT_L2 = (  hIs2S == 1 )  ? kPhiCorrtable_L5 : kPhiCorrtable_L2; 
-    static const int* cLUT_L3 = (  hIs2S == 1 )  ? kPhiCorrtable_L6 : kPhiCorrtable_L3; 
-
     BXType hBx = cEvId&0x7;
     BXType hBx_o; 
+    
     InputRouterTop( hBx
       , hLinkWord // input link LUT 
       , hPhBnWord  // n phi bins LUT 
-      , cLUT_L1// corrections frst brl lyr  
-      , cLUT_L2 // corrections scnd brl lyr  
-      , cLUT_L3 // corrections thrd brl lyr  
       , hInputStubs // input stub stream 
       , hBx_o // output bx 
       , hMemories); 
