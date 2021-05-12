@@ -24,8 +24,9 @@ const int nEvents = 100;  //number of events to run
 // Count the number of copies of each memory in a file name vector
 vector<int> countCopies(vector<string> fileNames) {
   vector<int> numCopies; // Each element in vector corresponds to one memory, i.e. L1PHIE17
+  string firstCopyIndex = fileNames.begin()->substr(fileNames.begin()->find("n")+1, 1); // The number after n
   for (auto f = fileNames.begin(); f != fileNames.end(); ++f) {
-    if (f->find("n1")) numCopies.push_back(0); 
+    if (f->find("n"+firstCopyIndex) != string::npos) numCopies.push_back(1);
     else numCopies.back() += 1;
   }
   return numCopies;
@@ -54,9 +55,9 @@ int main() {
   
   const string allStubPattern = "AllStubs*";
   const string mePattern = "VMStubs_VMSME*";
-  const string teiPattern = (nvmTEI) ? "VMStubs_VMSTE*PHI" + string(1,teiPhiRegion) + "*" : "No TEInner.";
-  const string teolPattern = (nvmOL) ? "VMStubs_VMSTE*PHI" + string(1,teolPhiRegion) + "*" : "No TEInner Overlap.";
-  const string teoPattern = (nvmTEO) ? "VMStubs_VMSTE*PHI" + string(1,teoPhiRegion) + "*" : "No TEOuter.";
+  const string teiPattern = (nvmTEI && maxTEICopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teiPhiRegion) + "*" : "No TEInner.";
+  const string teolPattern = (nvmOL && maxOLCopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teolPhiRegion) + "*" : "No TEInner Overlap.";
+  const string teoPattern = (nvmTEO && maxTEOCopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teoPhiRegion) + "*" : "No TEOuter.";
   
   // Number of files
   const auto nInputStubs = tb.nFiles(inputPattern);
@@ -76,7 +77,7 @@ int main() {
 
   auto &fin_inputstubs = tb.files(inputPattern);
   auto &fin_inputstubs_disk2s = tb.files(inputDisk2SPattern);
-
+  
   auto &fout_allstubs = tb.files(allStubPattern);
   auto &fout_vmstubme = tb.files(mePattern);
   auto &fout_vmstubtei = tb.files(teiPattern);
@@ -84,9 +85,10 @@ int main() {
   auto &fout_vmstubteo = tb.files(teoPattern);
 
   // Get the number of copies for each TE memory
-  auto numCopiesTEI = countCopies(tb.fileNames(teiPattern));
-  auto numCopiesOL = countCopies(tb.fileNames(teolPattern));
-  auto numCopiesTEO = countCopies(tb.fileNames(teoPattern));
+  vector<int> zero = {0};
+  auto numCopiesTEI = (nVMSTEI) ? countCopies(tb.fileNames(teiPattern)) : zero;
+  auto numCopiesOL = (nVMSTEOL) ? countCopies(tb.fileNames(teolPattern)) : zero;
+  auto numCopiesTEO = (nVMSTEO) ? countCopies(tb.fileNames(teoPattern)) : zero;
 
 
   ///////////////////////////
@@ -176,7 +178,7 @@ int main() {
     for (unsigned int i = 0; i < maxASCopies; i++) {
       err += compareMemWithFile<AllStubMemory<outputType>>(memoriesAS[i], fout_allstubs[i], ievt, "AllStub", truncation);
     }
-
+    
     // ME Memories
     for (unsigned int i = 0; i < nvmME; i++) {
       err += compareBinnedMemWithFile<VMStubMEMemory<outputType, nbitsbin>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
@@ -188,10 +190,11 @@ int main() {
       for (unsigned int i = 0; i < nvmTEI; i++) {
         for (unsigned int j = 0; j < numCopiesTEI[i]; j++) {
           err += compareMemWithFile<VMStubTEInnerMemory<outputType>>(memoriesTEI[i][j], fout_vmstubtei[k], ievt, "VMStubTEInner" + to_string(i) + "n" + to_string(j+1), truncation);
+          k++;
         }
       }
     }
-
+    
     // TE Inner Overlap memories
     if (nVMSTEOL) {
       int k = 0;
@@ -202,7 +205,7 @@ int main() {
         }
       }
     }
-
+    
     // TE Outer memories
     if (nVMSTEO) {
       int k = 0;
