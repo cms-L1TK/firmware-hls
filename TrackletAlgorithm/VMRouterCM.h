@@ -43,6 +43,8 @@ constexpr int nbitsrphicorrtable = 3;
 // The length of the masks used for the memories
 constexpr int maskASIsize = 12; // Allstub Inner memories
 
+// Enum for the different versions of Allstub Inner memories. L,M,R can be used for both barrel and disks
+enum allStubInnerVersions {A, B, C, D, E, F, L, M, R, OL, OM, OR};
 
 //////////////////////////////////////
 // Functions used by the VMR CM
@@ -343,23 +345,23 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					auto iphipos = phicorr.range(phicorr.length() - nbitsall -1, phicorr.length() - (nbitsall + phiRegSize)); // Top three bits after the allstub bits 
 					unsigned int inner_mem_index = 0; // Keeps track of which allstub inner memory to write to
 
-
+					// Loop over all possible memory versions
 					for (int n = 0; n < maskASIsize; n++) {
 #pragma HLS UNROLL
 
 						if (maskASI[n]) {
 							bool passPhiCut = false;
-							bool passSpecialCut = (Layer != 1) ? true : ((n > 5) && passRZSpecialCut) || (!(n > 5) && passRZCut); // For layer 1 the LMR memories have different cuts
+							bool passSpecialCut = (Layer != 1) ? true : ((n > F) && passRZSpecialCut) || (!(n > F) && passRZCut); // For layer 1 the LMR memories have different cuts
 
-							if (n==6 || n==9) { // L
+							if (n==L || n==OL) {
 								passPhiCut = !(iphipos>=phicutmin);
-							} else if (n == 8 || n==11) { // R
+							} else if (n == R || n==OR) {
 								passPhiCut = !(iphipos<phicutmax);
-							} else if (n == 0 || n==3 || n==5) { // A, D, F
+							} else if (n == A || n==D || n==F) {
 								passPhiCut = !(iphipos<4);
-							} else if (n == 1 || n==2 || n==4) { // B, C, E
+							} else if (n == B || n==C || n==E) {
 								passPhiCut = !(iphipos>=4);
-							} else { // M
+							} else if (n == M || n == OM) {
 								passPhiCut = true;
 							}
 
