@@ -121,11 +121,13 @@ inline T createVMStub(const InputStub<InType> inputStub,
 			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
+	// Number of bits for the memory bins
+	constexpr int nbitsbin = (isMEStub) ? ((Layer) ? MEBinsBits : MEBinsBits + 1) : TEBinsBits; // ME in disks has double the amount of bins
+
 	// Set values to VMStub
 	stub.setBend(bend);
 	stub.setIndex(index);
-	stub.setFinePhi(
-				iphivmFineBins<InType>(phicorr, nbitsall + vmbits, nbitsfinephi));
+	stub.setFinePhi(iphivmFineBins<InType>(phicorr, nbitsall + vmbits, nbitsfinephi));
 
 	// Indices used to find the rzfine value in LUT table
 	// LUT table returns the top 6 bits of a corrected z
@@ -156,13 +158,10 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	// Coarse z. The bin the stub is going to be put in, in the memory
 	int bin = lutValue >> nbitsfinerz; // 3 bits, i.e. max 8 bins within each VM
 
-	if (negDisk) {
-		if (isMEStub) bin += 1 << MEBinsBits; // bin 8-16 are for negative disk
-		else bin += (1 << TEBinsBits)/2; // += 4
-	}
+	if (negDisk) bin += 1 << (nbitsbin-1); // The upper half of the bins are for negative disks
 	
 	auto ivm = phicorr.range(phicorr.length() - nbitsall - 1, phicorr.length() - (nbitsall + vmbits)); //get the phi bits that corresponds to the old vms
-	slot = (Disk && isMEStub) ? ivm * 16 + bin : ivm * 8 + bin; //1 << 3 is the number of bins NBINS?
+	slot = ivm * (1 << nbitsbin) + bin;
 
 	// Set rzfine, i.e. the r/z bits within a coarse r/z region
 	auto rzfine = lutValue & ((1 << nbitsfinerz) - 1); // the 3 LSB as rzfine
