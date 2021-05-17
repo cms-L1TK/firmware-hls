@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
+# Standard configuration
+memprints_url="https://www.dropbox.com/s/nvuthntfb68lgxz/MemPrints_Standard_210514.tgz?dl=0"
+luts_url="https://www.dropbox.com/s/54jbuihchjagzkh/LUTs_Standard_210514.tgz?dl=0"
+# Combined modules
+memprints_url_cm="https://www.dropbox.com/s/92uwmigihji4b5e/MemPrints_Combined_210514.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/8ff6dfysgnrxycx/LUTs_Combined_210514.tgz?dl=0"
+
+
 #### fw_synch_210503 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
-luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
 # Combined modules
-memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
-luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
+#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
 
 #### fw_synch_201005 ####
 #memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
@@ -219,8 +227,8 @@ do
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then
-          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
-          find ${table_location} -type f -name "TP_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
+          find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
