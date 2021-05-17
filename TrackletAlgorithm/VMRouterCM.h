@@ -66,23 +66,19 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 		const typename AllStub<InType>::ASR r,
 		const typename AllStub<InType>::ASBEND bend, const int phiCorrTable[]) {
 
-	if (InType == DISKPS || InType == DISK2S)
-		return phi; // Do nothing if disks
+	if (InType == DISKPS || InType == DISK2S) return phi; // Do nothing if disks
 
 	constexpr auto nrbins = 1 << nbitsrphicorrtable; // The number of bins for r
 
-	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1)))
-			>> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
+	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * nrbins + rbin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
 	auto phicorr = phi - corrValue; // the corrected phi
 
-// Check for overflow
-	if (phicorr < 0)
-		phicorr = 0; // can't be less than 0
-	if (phicorr >= 1 << phi.length())
-		phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
+	// Check for overflow
+	if (phicorr < 0) phicorr = 0; // can't be less than 0
+	if (phicorr >= 1 << phi.length()) phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
 
 	return phicorr;
 }
