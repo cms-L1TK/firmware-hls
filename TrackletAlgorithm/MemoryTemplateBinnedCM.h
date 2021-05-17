@@ -162,8 +162,7 @@ class MemoryTemplateBinnedCM{
 
     ap_uint<3> ibin,ireg;
     (ireg,ibin)=slot;
-    auto nentry_ibx_tmp = nentries8_[ibx][ibin];
-    ap_uint<4> nentry_ibx = nentry_ibx_tmp.range(ireg*4+3,ireg*4); // Reduces timing a little bit
+    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
     
     DataType data(datastr.c_str(), base);
 
