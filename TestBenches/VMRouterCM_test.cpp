@@ -96,9 +96,6 @@ int main() {
     if (nVMSTE) {
       memoryTEO.clear();
     }
-    auto path = tb.fileNames(inputPattern);
-    for (auto i = path.begin(); i != path.end(); ++i)
-    std::cout << *i << ' ';
     
     // Read event and write to memories
     for (unsigned int i = 0; i < numInputs; i++) {

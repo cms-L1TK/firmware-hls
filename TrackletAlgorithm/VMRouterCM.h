@@ -74,8 +74,7 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 
 	constexpr auto nrbins = 1 << nbitsrphicorrtable; // The number of bins for r
 
-	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1)))
-			>> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
+	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * nrbins + rbin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
@@ -218,19 +217,24 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
 	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerCopies]; // Writing of Inner Allstubs
-	
-	#pragma HLS array_partition variable=addrCountME complete dim=0
+	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
+	ap_uint<5> addrCountTE[1 << (rzSizeTE + phiRegSize)]; // Writing of TE stubs
 	#pragma HLS array_partition variable=addrCountASI complete dim=0
-	
+	#pragma HLS array_partition variable=addrCountME complete dim=0
+	#pragma HLS array_partition variable=addrCountTE complete dim=0
+
+	for (int i = 0; i < nAllInnerCopies; i++) {
+		#pragma HLS unroll
+		addrCountASI[i] = 0;
+	}
 	for (int i = 0; i < 1 << (rzSizeME + phiRegSize); i++) {
 		#pragma HLS unroll
 		addrCountME[i] = 0;
 	}
-	for (int i = 0; i < nAllInnerCopies; i++) {
+	for (int i = 0; i < 1 << (rzSizeTE + phiRegSize); i++) {
 		#pragma HLS unroll
-		addrCountASI[i] = 0;
+		addrCountTE[i] = 0;
 	}
 
 	/////////////////////////////////////
@@ -417,7 +421,8 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
 
 			// Write the TE Outer stub if bin isn't negative
-			memoryTEO->write_mem(bx, slotTE, stubTEO);
+			memoryTEO->write_mem(bx, slotTE, stubTEO, addrCountTE[slotTE]);
+			addrCountTE[slotTE] += 1;
 
 			// For debugging
 			#ifndef __SYNTHESIS__
