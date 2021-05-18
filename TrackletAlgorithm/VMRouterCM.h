@@ -107,7 +107,7 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	// Number of bits for table indices
 	constexpr int nbitsztable = (Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
 	constexpr int nbitsrtable = (Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
-	constexpr auto vmbits = (Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
+	constexpr auto vmbits = (Layer) ? nbitsvmlayer[Layer-1] : nbitsvmdisk[Disk-1]; // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Number of bits for the memory bins
@@ -160,6 +160,7 @@ inline T createVMStub(const InputStub<InType> inputStub,
 
 	return stub;
 };
+
 
 /////////////////////////////////
 // Main function

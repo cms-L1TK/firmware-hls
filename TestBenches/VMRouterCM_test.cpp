@@ -17,14 +17,17 @@ const int nEvents = 100;  //number of events to run
 //          - constants specified in VMRouterCMTop.h
 //          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//          - add region specific constants defined in VMRouterCM_parameters.h if missing
 
 
 int main() {
 
+  constexpr int sector = 4; //  Specifies the sector/nonant
+
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phiRegion;
+  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + static_cast<char>(phiRegion);
   TBHelper tb("VMRCM/VMR_" + vmrID);
 
   // String patterns of the memory file names

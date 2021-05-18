@@ -2,6 +2,7 @@
 #define TrackletAlgorithm_VMRouterCMTop_h
 
 #include "VMRouterCM.h"
+#include "VMRouterCM_parameters.h"
 
 // VMRouter Top Function for layer 2, AllStub region A
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
@@ -10,49 +11,54 @@
 //          - constants specified in VMRouterCMTop.h
 //          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//          - add region specific constants defined in VMRouterCM_parameters.h if missing
+
 
 
 ////////////////////////////////////////////
-// Variables for that are specified with regards to the VMR region
+// Values for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 2 // Which barrel layer number the data is coming from
-#define kDISK 0 // Which disk number the data is coming from, 0 if not disk
+#define kLAYER 0 // Which barrel layer number the data is coming from
+#define kDISK 1 // Which disk number the data is coming from, 0 if not disk
 
-constexpr char phiRegion = 'A'; // Which AllStub/PhiRegion
-constexpr int sector = 4; //  Specifies the sector
+constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 
-// Maximum number of memory "copies" for this Phi region
-constexpr int numASCopies(4); // Allstub memory
-constexpr int numASInnerCopies(4); // Allstub memory Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int numTEOCopies(3); // TE Outer memories, can be 0 when no TEOuter memories
+
+///////////////////////////////////////////////
+// Values that don't need manual changing
+
+constexpr bool isLayer = (kLAYER) ? true : false;
+constexpr int layerDisk = (kLAYER) ? kLAYER-1 : kDISK-1;
 
 // Number of inputs
-constexpr int numInputs(2); // Number of input memories, EXCLUDING DISK2S
-constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
+constexpr int numInputs = getNumInputs<isLayer, layerDisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S = getNumInputsDisk2S<isLayer, layerDisk, phiRegion>(); // Number of DISK2S input memories
+
+// Maximum number of memory "copies" for this Phi region
+constexpr int numASCopies = getNumASCopies<isLayer, layerDisk, phiRegion>(); // Allstub memory
+constexpr int numASInnerCopies = getNumASInnerCopies<isLayer, layerDisk, phiRegion>(); // Allstub Inner memory
+constexpr int numTEOCopies = getNumTEOCopies<isLayer, layerDisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories
 
 // Masks of which AllStubInner memories that are being used in this phi region; represente by a "1"
 // First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
 // NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
-static const ap_uint<maskASIsize> maskASI = 0b110110000000;
-
-
-///////////////////////////////////////////////
-// Variables that don't need manual changing
+static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<isLayer, layerDisk, phiRegion>();
 
 //Bit size of phi and rz bins
 constexpr int phiRegSize(3);
 constexpr int rzSizeTE(3);
-constexpr int rzSizeME = (kLAYER) ? 3 : 4;
 
 #if kLAYER == kDISK
 #error kLAYER and kDISK can not be the same
 #elif kLAYER > 0
+	constexpr int rzSizeME = 3;
 	// What regionType the input/output is
 	constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
 	constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
 
 #elif kDISK > 0
+	constexpr int rzSizeME = 4;
 	// What regionType the input/output is
 	constexpr regionType inputType = DISKPS;
 	constexpr regionType outputType = DISK;
@@ -64,7 +70,6 @@ constexpr int rzSizeME = (kLAYER) ? 3 : 4;
 
 /////////////////////////////////////////////////////
 // VMRouterCM Top Function
-// Changed manually
 
 void VMRouterCMTop(const BXType bx, BXType& bx_o
 	// Input memories

@@ -7,6 +7,7 @@
 //          - constants specified in VMRouterCMTop.h
 //          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//          - add region specific constants defined in VMRouterCM_parameters.h if missing
 
 
 void VMRouterCMTop(const BXType bx, BXType& bx_o
@@ -36,7 +37,6 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 
 	///////////////////////////
 	// Open Lookup tables
-	// NOTE: needs to be changed manually if run for a different phi region
 
 	// LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
 	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
