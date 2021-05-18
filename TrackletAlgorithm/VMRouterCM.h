@@ -85,9 +85,9 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 
 // Returns a ME/TE stub with all the values set
 template<class T, regionType InType, regionType OutType, int Layer, int Disk, bool isMEStub>
-inline T createVMStub(const InputStub<InType> inputStub, const int index,
-		const bool negDisk, const int lutTable[], const int phiCorrTable[],
-		int& slot) {
+inline T createVMStub(const InputStub<InType> inputStub,
+		const int index, const bool negDisk, const int lutTable[],
+		const int phiCorrTable[], int& slot) {
 
 	// The stub that is going to be returned
 	T stub;
@@ -102,13 +102,13 @@ inline T createVMStub(const InputStub<InType> inputStub, const int index,
 	int nbitsr = r.length(); // Number of bits for r
 	int nbitsz = z.length(); // Number of bits for z
 	int nbitsfinerz = stub.getFineZ().length(); // Number of bits for finer/z
-	int nbitsfinephi = stub.getFinePhi().length(); // Number of bits for finephi
+	int nbitsfinephi = stub.getFinePhi().length();  // Number of bits for finephi
 
 	// Number of bits for table indices
 	constexpr int nbitsztable = (Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
 	constexpr int nbitsrtable = (Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
 	constexpr auto vmbits = (Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
-	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer - 1] : nbitsallstubs[N_LAYER + Disk - 1]; // Number of bits for the number of Alltub memories in a layer/disk
+	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Number of bits for the memory bins
 	constexpr int nbitsbin = (isMEStub) ? ((Layer) ? MEBinsBits : MEBinsBits + 1) : TEBinsBits; // ME in disks has double the amount of bins
@@ -127,11 +127,15 @@ inline T createVMStub(const InputStub<InType> inputStub, const int index,
 	constexpr int rbins = (1 << nbitsrtable); // Number of bins in r in LUT table
 
 	if (Disk) {
-		if (negDisk) indexz = (1 << nbitsztable) - 1 - indexz;
-
+		if (negDisk) {
+			indexz = (1 << nbitsztable) -1 - indexz;
+		}
 		indexr = r;
-		if (InType == DISKPS) indexr = r >> (nbitsr - nbitsrtable); // Take the top "nbitsrtable" bits
-		else indexr = (r >> (nbitsr - nbitsrtable)); // Make r unsigned and take the top "nbitsrtable" bits
+		if (InType == DISKPS) {
+			indexr = r >> (nbitsr - nbitsrtable); // Take the top "nbitsrtable" bits
+		}
+	} else { // Layer
+		indexr = (r >> (nbitsr- nbitsrtable));// Make r unsigned and take the top "nbitsrtable" bits
 	}
 
 	// The index for LUT table
@@ -143,8 +147,8 @@ inline T createVMStub(const InputStub<InType> inputStub, const int index,
 	// Coarse z. The bin the stub is going to be put in, in the memory
 	int bin = lutValue >> nbitsfinerz; // 3 bits, i.e. max 8 bins within each VM
 
-	if (negDisk) bin += 1 << (nbitsbin - 1); // The upper half of the bins are for negative disks
-
+	if (negDisk) bin += 1 << (nbitsbin-1); // The upper half of the bins are for negative disks
+	
 	auto ivm = phicorr.range(phicorr.length() - nbitsall - 1, phicorr.length() - (nbitsall + vmbits)); //get the phi bits that corresponds to the old vms
 	slot = ivm * (1 << nbitsbin) + bin;
 
