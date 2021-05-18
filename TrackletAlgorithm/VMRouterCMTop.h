@@ -19,8 +19,8 @@
 // Values for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 0 // Which barrel layer number the data is coming from
-#define kDISK 1 // Which disk number the data is coming from, 0 if not disk
+#define kLAYER 2 // Which barrel layer number the data is coming from
+#define kDISK 0 // Which disk number the data is coming from, 0 if not disk
 
 constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 
