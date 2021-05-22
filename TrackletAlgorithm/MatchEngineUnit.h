@@ -54,6 +54,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   }
   
   inline void processPipeLine(bool *table) {
+#pragma HLS inline
     if (good__) {
       auto stubindex=stubdata__.getIndex();
       auto stubfinez=stubdata__.getFineZ();
@@ -161,7 +162,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
  inline bool empty() const {
 #pragma HLS inline  
    //return (readindex_==writeindex_);
-   //return emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
    return empty_;
  }
  
@@ -328,7 +328,7 @@ inline MATCH read() {
    ap_uint<3> iphiSave = iphi_ + phiPlus_;
    auto secondSave = second_;
 
-   if (istub_==0) {
+   if(emptyUnit<kNBits_MemAddrBinned>()[istub_]) {
        
      //Need to read the information about the proj in the buffer
      //FIXME - should this not be in init method?

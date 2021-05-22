@@ -589,7 +589,7 @@ void MatchProcessor(BXType bx,
 
   //Initialize table for bend-rinv consistency
   bool table[kNMatchEngines][(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
-#pragma HLS ARRAY_PARTITION variable=table complete
+#pragma HLS ARRAY_PARTITION variable=table dim=0 complete
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<L>(table[iMEU]); 
@@ -613,9 +613,11 @@ void MatchProcessor(BXType bx,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
 
+  /*
   for (unsigned int ii=0;ii<nINMEM;ii++) {
     std::cout << "ii nmem : "<<ii<<" "<<numbersin[ii]<<std::endl;
   }
+  */
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
@@ -696,9 +698,10 @@ void MatchProcessor(BXType bx,
     //bool projBuffNearFull = projbufferarray.nearFull();
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
-    bool empty = readptr == writeptr;
+    bool empty = emptyUnit<kNBitsBuffer>()[(readptr,writeptr)];
     bool projBuffNearFull = nearFull3Unit<kNBitsBuffer>()[(readptr,writeptr)];
     
+    /*
     std::cout << "istep = "<<istep<<" projBuff: "<<projbufferarray.getReadPtr()<<" "<<projbufferarray.getWritePtr()
               <<" "<<projBuffNearFull;
     for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
@@ -708,6 +711,7 @@ void MatchProcessor(BXType bx,
 		<<" "<<matchengine[iMEU].getTrkID();
     }
     std::cout << std::endl;
+    */
 
     ap_uint<3> iphi = 0;
     if (istep == 0) {
@@ -766,8 +770,6 @@ void MatchProcessor(BXType bx,
       
       bool idle = idles[iMEU];//meu.idle();
 
-      meu.processPipeLine(table[iMEU]);      
-
       if(idle && !empty && !init) {
         init =  true;
         auto iphi = tmpprojbuff.getPhi();
@@ -775,6 +777,8 @@ void MatchProcessor(BXType bx,
       }
 
       else meu.step(instubdata.getMem(iMEU), iMEU==0);
+
+      meu.processPipeLine(table[iMEU]);      
 
     } //end MEU loop
     
