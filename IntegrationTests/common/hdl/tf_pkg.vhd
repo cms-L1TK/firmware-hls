@@ -37,7 +37,7 @@ package tf_pkg is
   constant EMDATA_WIDTH           : natural := 68;   --! Max. bit width of emData
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
-  constant PAGE_OFFSET            : natural := 128;  --! Page offset for all memories
+  constant PAGE_LENGTH            : natural := 128;  --! Page length of all memories
   -- Memory width constants
   constant RAM_WIDTH_AS    : natural := 36; --! Width for memories
   constant RAM_WIDTH_TPROJ : natural := 60; --! Width for memories
@@ -98,12 +98,12 @@ package tf_pkg is
   );
   procedure read_emData (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   );
   procedure read_emData_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
   );
   procedure write_header_line (
@@ -187,7 +187,7 @@ package body tf_pkg is
   --!          ... BX = 010 (even) Event : 3 is page 0/2 ... BX = 111 (odd) Event : 8 is page 1/7
   procedure read_emData (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   ) is
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
@@ -258,7 +258,7 @@ package body tf_pkg is
   --...
   procedure read_emData_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
   ) is
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read

@@ -31,7 +31,7 @@ entity tf_mem is
   generic (
     RAM_WIDTH       : natural := 18;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
-    RAM_DEPTH       : natural := NUM_PAGES*PAGE_OFFSET; --! Leave at default. RAM depth (no. of entries)
+    RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
@@ -97,7 +97,6 @@ end read_tf_mem_data;
 -- ########################### Signals ###########################
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
-signal sv_addra_d1 : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0) := (others => '1'); --! Write address bus delayed
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
@@ -129,19 +128,16 @@ begin
     end if;
     if (wea='1') then
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
-      if ((addra = (addra'range => '0')) or (addra /= sv_addra_d1)) and (dina /= (dina'range => '0')) then -- ##### Count n_entries;
-      
-        page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_OFFSET))));
-	addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_OFFSET)-1 downto 0)));
-        assert (page < NUM_PAGES) report "page out of range" severity error;
-        if (addr_in_page = 0) then
-          nent_o(page) <= std_logic_vector(to_unsigned(1, nent_o(page)'length)); -- <= 1 (slv)
-        else
-          nent_o(page) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page))) + 1, nent_o(page)'length)); -- + 1 (slv)
-        end if;	
-      end if;
-      sv_addra_d1 <= addra;
-    end if; -- (wea='1')
+      -- Count entries
+      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
+      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
+      assert (page < NUM_PAGES) report "page out of range" severity error;
+      if (addr_in_page = 0) then
+        nent_o(page) <= std_logic_vector(to_unsigned(1, nent_o(page)'length)); -- <= 1 (slv)
+      else
+        nent_o(page) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page))) + 1, nent_o(page)'length)); -- + 1 (slv)
+      end if;	
+    end if;
   end if;
 end process;
 

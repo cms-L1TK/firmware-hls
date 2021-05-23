@@ -17,19 +17,20 @@ create_ip -name MatchCalculatorTop -module_name MC_L3PHIC -vendor xilinx.com -li
 create_ip -name MatchEngineTop -module_name ME_L3PHIC -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop -module_name PR_L3PHIC -vendor xilinx.com -library hls -version 1.0
 
-# Add HDL for algo
-add_files -fileset sources_1 [glob ../../common/hdl/*.vhd]
-add_files -fileset sources_1 [glob ../hdl/*.vhd]
-
-# Add HDL for TB
-add_files -fileset sim_1 [glob ../tb/*.vhd]
-
-# Add constraints (clock etc.)
-add_files -fileset constrs_1 [glob ../../common/hdl/constraints.xdc]
-
 # Provide name of top-level HDL (without .vhd extension).
 #set topLevelHDL "SectorProcessor"
 set topLevelHDL "SectorProcessorFull"
+
+# Add HDL for algo
+add_files -fileset sources_1 [glob ../hdl/SectorProcessor*.vhd]
+add_files -fileset sources_1 [glob ../hdl/memUtil_pkg.vhd]
+add_files -fileset sources_1 [glob ../../common/hdl/*.vhd]
+
+# Add HDL for TB
+add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
+
+# Add constraints (clock etc.)
+add_files -fileset constrs_1 [glob ../../common/hdl/constraints.xdc]
 
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]

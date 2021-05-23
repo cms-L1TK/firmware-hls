@@ -279,14 +279,7 @@ begin
   end generate FM_52_loop;
 
 
-  p_ME_start : process(clk)
-  begin
-    if rising_edge(clk) then
-      if PR_done = '1' then
-        ME_start <= '1';
-      end if;
-    end if;
-  end process;
+  ME_start <= '1' when PR_done = '1';
 
   PR_L3PHIC : entity work.PR_L3PHIC
     port map (
@@ -377,14 +370,7 @@ begin
       vmprojout_7_dataarray_data_V_d0        => VMPROJ_24_mem_AV_din(L3PHIC24)
   );
 
-  p_MC_start : process(clk)
-  begin
-    if rising_edge(clk) then
-      if ME_done = '1' then
-        MC_start <= '1';
-      end if;
-    end if;
-  end process;
+  MC_start <= '1' when ME_done = '1';
 
   ME_L3PHIC17 : entity work.ME_L3PHIC
     port map (
