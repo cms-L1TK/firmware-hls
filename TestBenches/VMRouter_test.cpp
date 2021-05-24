@@ -169,7 +169,7 @@ int main() {
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
         , memoriesTEO
 #endif
-      );
+    );
 
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect
