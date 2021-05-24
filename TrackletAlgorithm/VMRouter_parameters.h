@@ -327,6 +327,7 @@ template<> inline const ap_uint<getBendCutTableSize<true, TF::L1, phiRegions::D>
   return nullptr;
 }
 
+
 ////////////////
 // VMR_L1PHIE //
 ////////////////
@@ -448,6 +449,7 @@ template<> inline const ap_uint<getBendCutTableSize<true, TF::L1, phiRegions::E>
 template<> inline const ap_uint<getBendCutTableSize<true, TF::L1, phiRegions::E>()>* getBendCutOuterTable<true, TF::L1, phiRegions::E>(){
   return nullptr;
 }
+
 
 ////////////////
 // VMR_L2PHIA //
@@ -857,6 +859,7 @@ ap_uint<1> tmpBendOuterTable6_n3[bendCutTableSize] =
   return bendCutOuterTable;
 }
 
+
 ////////////////
 // VMR_L3PHIA //
 ////////////////
@@ -996,6 +999,7 @@ template<> inline const ap_uint<getBendCutTableSize<true, TF::L3, phiRegions::A>
   return bendCutOuterTable;
 }
 
+
 ////////////////
 // VMR_L4PHIA //
 ////////////////
@@ -1105,6 +1109,7 @@ template<> inline const ap_uint<getBendCutTableSize<true, TF::L4, phiRegions::A>
 
   return bendCutOuterTable;
 }
+
 
 ////////////////
 // VMR_L5PHIA //
@@ -1221,6 +1226,7 @@ template<> inline const ap_uint<getBendCutTableSize<true, TF::L5, phiRegions::A>
 template<> inline const ap_uint<getBendCutTableSize<true, TF::L5, phiRegions::A>()>* getBendCutOuterTable<true, TF::L5, phiRegions::A>(){
   return nullptr;
 }
+
 
 ////////////////
 // VMR_L6PHIA //
@@ -1345,6 +1351,7 @@ template<> inline const ap_uint<getBendCutTableSize<true, TF::L6, phiRegions::A>
 
   return bendCutOuterTable;
 }
+
 
 ////////////////
 // VMR_D1PHIA //
