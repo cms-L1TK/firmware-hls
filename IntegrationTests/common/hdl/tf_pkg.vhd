@@ -44,7 +44,6 @@ package tf_pkg is
   constant RAM_WIDTH_AP    : natural := 60; --! Width for memories
 
   -- ########################### Functions ################################################################
-  function clogb2_old (bit_depth : integer) return integer;
   function clogb2     (bit_depth : integer) return integer;
 
   -- ########################### Types ###########################
@@ -97,30 +96,20 @@ package tf_pkg is
     char : in  character;            --! Input charater 0...9, a...f, and A...F
     int  : out integer range 0 to 15 --! Output integer 0...15
   );
-  procedure read_emData_2p (
+  procedure read_emData (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   );
-  procedure read_emData_8p (
+  procedure read_emData_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
-  );
-  procedure read_emData_2p_bin (
-    file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
-  );
-  procedure read_emData_8p_bin (
-    file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
   );
   procedure write_header_line (
     file_path       : in string;  --! File path as string
     signal_name     : in string;  --! Signal name that will be printed in output file
-    N_PAGES         : in integer  --! Number of pages
+    N_PAGES         : in natural  --! Number of pages
   );
   procedure write_emData_line_2p (
     reset           : in std_logic;        --! HDL (global) reset
@@ -157,28 +146,6 @@ end package tf_pkg;
 package body tf_pkg is
 
   -- ########################### Functions ################################################################
-  --! @brief Binary logarithm to determine bit width for addressing
-  --! Returns (-1 + no. of bits needed to represent number bit_depth) 
-  --! except if argument is 2, when it returns 0.
-
-  function clogb2_old (bit_depth : integer) return integer is
-    variable depth : integer := bit_depth;
-    variable count : integer := 1;
-  begin
-    for clogb2 in 1 to bit_depth loop     -- Works for up to 32 bit integers
-      if (bit_depth <= 2) then
-        count := 1;
-      else
-        if(depth <= 1) then
-          count := count;
-        else
-          depth := depth / 2;
-          count := count + 1;
-        end if;
-      end if;
-    end loop;
-    return(count-1);
-  end;
 
   --! @brief Gets #bits needed to form any value from 0 to bit_depth-1.
   --! Identical result to clogb2_old() if arg. is exact power of 2.
@@ -218,12 +185,11 @@ package body tf_pkg is
   --! Assuming normal memory format with the first column as entries counter per BX
   --! N_PAGES=2/8: BX = 000 (even) Event : 1 is page 0/0 and BX = 001 (odd) Event : 2 is page 1/1 ...
   --!          ... BX = 010 (even) Event : 3 is page 0/2 ... BX = 111 (odd) Event : 8 is page 1/7
-  procedure read_emData_2p (
+  procedure read_emData (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
   ) is
-  constant N_PAGES         : integer :=2;                        --! Number of pages
   constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
@@ -232,7 +198,6 @@ package body tf_pkg is
   variable i_rd_col        : integer;                            -- Read column index
   variable cnt_x_char      : integer;                            -- Count of 'x' characters
   variable char            : character;                          -- Character
-  variable addr_mult       : integer;                            -- Address multiplier
   begin
     data_arr      := (others => (others => (others => '0'))); -- Init
     n_entries_arr := (others => 0);                           -- Init
@@ -240,19 +205,18 @@ package body tf_pkg is
     l_rd_row : while not endfile(file_in) loop -- Read until EoF
     --l_rd_row : for i in 0 to 5 loop -- Debug
       readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
+      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify event header line or empty line
         i_bx_row := 0;       -- Init
         bx_cnt   := bx_cnt +1;
         --if DEBUG=true then writeline(output, line_in); end if;
-      else
+      elsif (bx_cnt >= 0) then
         i_rd_col := 0;   -- Init
         cnt_x_char := 0; -- Init
         l_rd_col : while line_in'length>0 loop -- Loop over the columns
           read(line_in, char);                 -- Read chars ...
           if (char='x') then                   -- ... until the next x
             if (cnt_x_char >= N_X_CHAR-1) then -- Number of 'x' chars reached
-              addr_mult := bx_cnt mod N_PAGES;
-              hread(line_in, data_arr(bx_cnt,i_bx_row+addr_mult*PAGE_OFFSET)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
+              hread(line_in, data_arr(bx_cnt,i_bx_row)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
             end if;
             cnt_x_char := cnt_x_char +1;
           end if;
@@ -260,61 +224,12 @@ package body tf_pkg is
         end loop l_rd_col;
         n_entries_arr(bx_cnt) := n_entries_arr(bx_cnt) +1;
         i_bx_row := i_bx_row +1;
-      end if;
-    end loop l_rd_row;
-    file_close(file_in);
-  end read_emData_2p;
-
-  --! @brief TextIO procedure to read emData for non-binned memories all at once
-  --! Assuming normal memory format with the first column as entries counter per BX
-  --! N_PAGES=2/8: BX = 000 (even) Event : 1 is page 0/0 and BX = 001 (odd) Event : 2 is page 1/1 ...
-  --!          ... BX = 010 (even) Event : 3 is page 0/2 ... BX = 111 (odd) Event : 8 is page 1/7
-  procedure read_emData_8p (
-    file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_arr_1d_int(0 to MAX_EVENTS-1)                       --! Number of entries per event
-  ) is
-  constant N_PAGES         : integer :=8;                        --! Number of pages
-  constant N_X_CHAR        : integer :=2;                        --! Count of 'x' characters before actual value to read
-  file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
-  variable line_in         : line;                               -- Line - one string from a text file
-  variable bx_cnt          : integer;                            -- BX counter
-  variable i_bx_row        : integer;                            -- Read row index
-  variable i_rd_col        : integer;                            -- Read column index
-  variable cnt_x_char      : integer;                            -- Count of 'x' characters
-  variable char            : character;                          -- Character
-  variable addr_mult       : integer;                            -- Address multiplier
-  begin
-    data_arr      := (others => (others => (others => '0'))); -- Init
-    n_entries_arr := (others => 0);                           -- Init
-    bx_cnt        := -1;                                      -- Init
-    l_rd_row : while not endfile(file_in) loop -- Read until EoF
-    --l_rd_row : for i in 0 to 5 loop -- Debug
-      readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
-        i_bx_row := 0;       -- Init
-        bx_cnt   := bx_cnt +1;
-        --if DEBUG=true then writeline(output, line_in); end if;
       else
-        i_rd_col := 0;   -- Init
-        cnt_x_char := 0; -- Init
-        l_rd_col : while line_in'length>0 loop -- Loop over the columns
-          read(line_in, char);                 -- Read chars ...
-          if (char='x') then                   -- ... until the next x
-            if (cnt_x_char >= N_X_CHAR-1) then -- Number of 'x' chars reached
-              addr_mult := bx_cnt mod N_PAGES;
-              hread(line_in, data_arr(bx_cnt,i_bx_row+addr_mult*PAGE_OFFSET)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
-            end if;
-            cnt_x_char := cnt_x_char +1;
-          end if;
-        i_rd_col := i_rd_col +1;
-        end loop l_rd_col;
-        n_entries_arr(bx_cnt) := n_entries_arr(bx_cnt) +1;
-        i_bx_row := i_bx_row +1;
+        assert false report "No BX header before data in txt file" severity FAILURE;
       end if;
     end loop l_rd_row;
     file_close(file_in);
-  end read_emData_8p;
+  end read_emData;
 
   --! @brief TextIO procedure to read emData for binned memories all at once
   --! Assuming binned memory format with the first column as bin address (0...7, address_offset=16) ...
@@ -341,12 +256,11 @@ package body tf_pkg is
   --1 0 0101101|001|001 0x0B49 // addr 16
   --1 1 0101110|101|001 0x0BA9 // addr 17
   --...
-  procedure read_emData_2p_bin (
+  procedure read_emData_bin (
     file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 2*PAGE_OFFSET-1); --! Dataarray with read values
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_OFFSET-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
   ) is
-  constant N_PAGES         : integer :=2;                        --! Number of pages
   constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
   file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
   variable line_in         : line;                               -- Line - one string from a text file
@@ -357,7 +271,6 @@ package body tf_pkg is
   variable char            : character;                          -- Character
   variable mem_bin         : integer;                            -- Bin number of memory
   variable n_entry_mem_bin : integer;                            -- Entry number of memory bin
-  variable addr_mult       : integer;                            -- Address multiplier
   begin
     data_arr      := (others => (others => (others => '0'))); -- Init
     n_entries_arr := (others => (others => 0));               -- Init
@@ -365,11 +278,11 @@ package body tf_pkg is
     l_rd_row : while not endfile(file_in) loop -- Read until EoF
     --l_rd_row : for i in 0 to 5 loop -- Debug
       readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
+      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify event header line or empty line
         i_bx_row := 0;       -- Init
         bx_cnt   := bx_cnt +1;
         --if DEBUG=true then writeline(output, line_in); end if;
-      else
+      elsif (bx_cnt >= 0) then
         i_rd_col := 0;   -- Init
         cnt_x_char := 0; -- Init
         l_rd_col : while line_in'length>0 loop  -- Loop over the columns
@@ -383,98 +296,19 @@ package body tf_pkg is
             if (char='x') then                   -- ... until the next x
               cnt_x_char := cnt_x_char +1;
               if (cnt_x_char >= N_X_CHAR) then -- Number of 'x' chars reached
-                addr_mult := bx_cnt mod N_PAGES;
-                hread(line_in, data_arr(bx_cnt,mem_bin*N_ENTRIES_PER_MEM_BINS+n_entry_mem_bin+addr_mult*PAGE_OFFSET)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
+                hread(line_in, data_arr(bx_cnt,mem_bin*N_ENTRIES_PER_MEM_BINS+n_entry_mem_bin)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
               end if;
               n_entries_arr(bx_cnt,mem_bin) := n_entries_arr(bx_cnt,mem_bin) +1;
             end if;
         i_rd_col := i_rd_col +1;
         end loop l_rd_col;
         i_bx_row := i_bx_row +1;
-      end if;
-    end loop l_rd_row;
-    file_close(file_in);
-  end read_emData_2p_bin;
-
-  --! @brief TextIO procedure to read emData for binned memories all at once
-  --! Assuming binned memory format with the first column as bin address (0...7, address_offset=16) ...
-  --! ...and the second column as bin entry address (0...F)
-  --! N_PAGES=2/8: BX = 000 (even) Event : 1 is page 0/0 and BX = 001 (odd) Event : 2 is page 1/1 ...
-  --!          ... BX = 010 (even) Event : 3 is page 0/2 ... BX = 111 (odd) Event : 8 is page 1/7
-  --BX = 000 Event : 1      // page 0/0   (emData/MemPrints/VMStubsME/VMStubs_VMSME_L3PHIC17n1_04.dat)
-  --1 0 0111111|011|101 0x0FDD // addr 16
-  --2 0 1000001|011|001 0x1059 // addr 32
-  --3 0 0101101|100|010 0x0B62 // addr 48
-  --3 1 0101110|110|010 0x0BB2 // addr 49
-  --...
-  --BX = 001 Event : 2      // page 1/1
-  --0 0 1001011|000|011 0x12C3 // addr 128
-  --...
-  --BX = 010 Event : 3      // page 0/2
-  --1 0 0110000|010|001 0x0C11 // addr 128*2+16
-  --...
-  --BX = 111 Event : 8      // page 1/7
-  --3 0 0101000|011|000 0x0A18 // addr 128*7+48
-  --3 1 0101001|110|100 0x0A74 // addr 128*7+49
-  --...
-  --BX = 000 Event : 9      // page 0/0
-  --1 0 0101101|001|001 0x0B49 // addr 16
-  --1 1 0101110|101|001 0x0BA9 // addr 17
-  --...
-  procedure read_emData_8p_bin (
-    file_path     : in    string;  --! File path as string
-    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to 8*PAGE_OFFSET-1); --! Dataarray with read values
-    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event per bin
-  ) is
-  constant N_PAGES         : integer :=8;                        --! Number of pages
-  constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
-  file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
-  variable line_in         : line;                               -- Line - one string from a text file
-  variable bx_cnt          : integer;                            -- BX counter
-  variable i_bx_row        : integer;                            -- Read row index
-  variable i_rd_col        : integer;                            -- Read column index
-  variable cnt_x_char      : integer;                            -- Count of 'x' characters
-  variable char            : character;                          -- Character
-  variable mem_bin         : integer;                            -- Bin number of memory
-  variable n_entry_mem_bin : integer;                            -- Entry number of memory bin
-  variable addr_mult       : integer;                            -- Address multiplier
-  begin
-    data_arr      := (others => (others => (others => '0'))); -- Init
-    n_entries_arr := (others => (others => 0));               -- Init
-    bx_cnt        := -1;                                      -- Init
-    l_rd_row : while not endfile(file_in) loop -- Read until EoF
-    --l_rd_row : for i in 0 to 5 loop -- Debug
-      readline (file_in, line_in);
-      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify a header line or empty line
-        i_bx_row := 0;       -- Init
-        bx_cnt   := bx_cnt +1;
-        --if DEBUG=true then writeline(output, line_in); end if;
       else
-        i_rd_col := 0;   -- Init
-        cnt_x_char := 0; -- Init
-        l_rd_col : while line_in'length>0 loop  -- Loop over the columns
-          read(line_in, char);                  -- Read chars ...
-            if (i_rd_col=0) then
-              char2int(char, mem_bin);
-            end if;
-            if (i_rd_col=2) then
-              char2int(char, n_entry_mem_bin);
-            end if;
-            if (char='x') then                   -- ... until the next x
-              cnt_x_char := cnt_x_char +1;
-              if (cnt_x_char >= N_X_CHAR) then -- Number of 'x' chars reached
-                addr_mult := bx_cnt mod N_PAGES;
-                hread(line_in, data_arr(bx_cnt,mem_bin*N_ENTRIES_PER_MEM_BINS+n_entry_mem_bin+addr_mult*PAGE_OFFSET)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
-              end if;
-              n_entries_arr(bx_cnt,mem_bin) := n_entries_arr(bx_cnt,mem_bin) +1;
-            end if;
-        i_rd_col := i_rd_col +1;
-        end loop l_rd_col;
-        i_bx_row := i_bx_row +1;
+        assert false report "No BX header before data in txt file" severity FAILURE;
       end if;
     end loop l_rd_row;
     file_close(file_in);
-  end read_emData_8p_bin;
+  end read_emData_bin;
 
   --! @brief TextIO procedure to write emData for non-binned memories one line per clock cycle
   procedure write_header_line (

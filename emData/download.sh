@@ -23,6 +23,9 @@ declare -a processing_modules=(
   "VMR_L1PHIE"
   "VMR_D1PHIA"
 
+  # VMRouter CM
+  "VMRCM_L2PHIA"
+
   # TrackletEngine
   "TE_L1PHIE18_L2PHIC17"
 
@@ -163,10 +166,14 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   table_location="LUTs"
-  if [[ ${module_type} == "TP" ]]
+  if [[ ${module_type} == "TP" ]] || [[ ${module_type} == "VMRCM" ]]
   then
     memprint_location="MemPrintsCM"
     table_location="LUTsCM"
+    if [[ ${module_type} == "VMRCM" ]]
+    then
+      module=`echo ${module} | sed "s/CM//"`
+    fi
   fi
   wires="${table_location}/wires.dat"
 
@@ -203,7 +210,7 @@ do
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-  elif [[ ${module_type} == "VMR" ]]
+  elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;

@@ -58,10 +58,24 @@ constexpr int TEBinsBits = 3;
 // physical constants
 constexpr double c = 0.299792458; // m/ns
 
+// detector constants
+constexpr int N_LAYER = 6; // # of barrel layers assumed
+constexpr int N_DISK = 5; // # of endcap disks assumed
+constexpr double bfield = 3.8112; // T
+constexpr int rmean[N_LAYER] = { 851, 1269, 1784, 2347, 2936, 3697 };
+constexpr int zmean[N_DISK] = { 2239, 2645, 3163, 3782, 4523 };
+constexpr double zlength = 120.0; // cm
+constexpr double rmindiskvm = 22.5; // cm
+constexpr double rmindisk = 20.0; // cm
+constexpr double rmaxdisk = 120.0; // cm
+
 // stub digitization constants
 constexpr double kr = 0.0292969;
 constexpr double kphi = 7.71867e-06;
 constexpr double kz = 0.0585938;
+
+// stub digitization constants for combined modules
+constexpr double kz_cm[N_LAYER] = {2*zlength/(1<<12), 2*zlength/(1<<12), 2*zlength/(1<<12), 2*zlength/(1<<8), 2*zlength/(1<<8), 2*zlength/(1<<8)};
 
 // tracklet digitization constants
 constexpr double krinv = 1.04549e-06;
@@ -81,21 +95,16 @@ constexpr double kphiprojderdisk = 1.64665e-05;
 constexpr double krprojdisk = 0.0585938;
 constexpr double krprojderdisk = 0.0078125;
 
-// detector constants
-constexpr int N_LAYER = 6; // # of barrel layers assumed
-constexpr int N_DISK = 5; // # of endcap disks assumed
-constexpr double bfield = 3.8112; // T
-constexpr int rmean[N_LAYER] = { 851, 1269, 1784, 2347, 2936, 3697 };
-constexpr int zmean[N_DISK] = { 2239, 2645, 3163, 3782, 4523 };
-constexpr double zlength = 120.0; // cm
-constexpr double rmindiskvm = 22.5; // cm
-constexpr double rmindisk = 20.0; // cm
-constexpr double rmaxdisk = 120.0; // cm
-
 // cut constants
 constexpr double ptcut = 1.91; // GeV
 constexpr double rinvcut = 0.01 * c * bfield / ptcut; // 0.01 to convert to 1/cm
 constexpr double z0cut = 15.0; // cm
+
+// cut constants for combined modules
+constexpr double VMROUTERCUTZL2 = 50.0;      //Min L2 z for inner allstub in cm
+constexpr double VMROUTERCUTZL1L3L5 = 95.0;  //Max z for inner barrel layers in cm
+constexpr double VMROUTERCUTZL1 = 70.0;      //Max z for L1 barrel seeding in cm
+constexpr double VMROUTERCUTRD1D3 = 55.0;    //Max r for disk seeds in cm
 
 // various bit widths
 constexpr unsigned nbitsallstubs[N_LAYER + N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
