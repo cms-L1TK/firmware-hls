@@ -11,7 +11,7 @@
 //          - constants specified in VMRouterTop.h
 //          - the input parameters to VMRouterTop in VMRouterTop.h/.cc
 //          - the the number and directories to the LUTs
-//          - add/remove pragmas depending on inputStub in VMRouterTop.cc
+//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc
 //          - the call to VMRouter() in VMRouterTop.cc
 //          - the included top function in VMRouter_test.cpp (if file name is changed)
 //          - the top function and memory directory in script_VMR.tcl (if file name is changed)
@@ -86,13 +86,23 @@ constexpr int bendCutTableSize = getBendCutTableSize<isLayer, layerDisk, phiRegi
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
-	const InputStubMemory<inputType> inputStub[numInputs],
+	const InputStubMemory<inputType> inputStubs[numInputs]
+#if kDISK > 0
+  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+#endif
 
 	// Output memories
-	AllStubMemory<outputType> allStub[maxASCopies],
-	VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME],
-	VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies],
-	VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+	, AllStubMemory<outputType> memoriesAS[maxASCopies]
+	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
+#endif
+#if kLAYER == 1 || kLAYER == 2
+	, VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+#endif
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+	, VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
+#endif
 	);
 
 #endif // TrackletAlgorithm_VMRouterTop_h

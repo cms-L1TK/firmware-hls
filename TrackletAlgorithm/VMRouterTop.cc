@@ -7,7 +7,7 @@
 //          - constants specified in VMRouterTop.h
 //          - the input parameters to VMRouterTop in VMRouterTop.h/.cc
 //          - the the number and directories to the LUTs
-//          - add/remove pragmas depending on inputStub in VMRouterTop.cc
+//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc
 //          - the call to VMRouter() in VMRouterTop.cc
 //          - the included top function in VMRouter_test.cpp (if file name is changed)
 //          - the top function and memory directory in script_VMR.tcl (if file name is changed)
@@ -17,23 +17,33 @@
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
-	const InputStubMemory<inputType> inputStub[numInputs],
+	const InputStubMemory<inputType> inputStubs[numInputs]
+#if kDISK > 0
+  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+#endif
 
 	// Output memories
-	AllStubMemory<outputType> memoriesAS[maxASCopies],
-	VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME],
-	VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies],
-	VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies])
- {
+	, AllStubMemory<outputType> memoriesAS[maxASCopies]
+	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
+#endif
+#if kLAYER == 1 || kLAYER == 2
+	, VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+#endif
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+	, VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
+#endif
+) {
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
-#pragma HLS resource variable=inputStub[0].get_mem() latency=2
-#pragma HLS resource variable=inputStub[1].get_mem() latency=2
-#pragma HLS resource variable=inputStub[2].get_mem() latency=2
-#pragma HLS resource variable=inputStub[3].get_mem() latency=2
-#pragma HLS resource variable=inputStub[4].get_mem() latency=2
-#pragma HLS resource variable=inputStub[5].get_mem() latency=2
-#pragma HLS resource variable=inputStub[6].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[0].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[1].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[2].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[3].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[4].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[5].get_mem() latency=2
+#pragma HLS resource variable=inputStubs[6].get_mem() latency=2
 
 #pragma HLS interface register port=bx_o
 
@@ -91,17 +101,37 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 		rzBitsInnerTable, rzBitsOverlapTable, rzBitsOuterTable,
 		bendCutInnerTable, bendCutOverlapTable, bendCutOuterTable,
 		// Input memories
-		inputStub, nullptr,
+		inputStubs,
+#if kDISK > 0
+		inputStubsDisk2S,
+#else
+		nullptr,
+#endif
 		// AllStub memories
 		memoriesAS,
 		// ME memories
 		maskME, memoriesME,
 		// TEInner memories
-		maskTEI, memoriesTEI,
+		maskTEI,
+#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+		memoriesTEI,
+#else
+		nullptr
+#endif
 		// TEInner Overlap memories
-		maskOL, memoriesOL,
+		maskOL, 
+#if kLAYER == 1 || kLAYER == 2
+		memoriesOL,
+#else
+		nullptr
+#endif
 		// TEOuter memories
-		maskTEO, nullptr
+		maskTEO, 
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+		memoriesTEO
+#else
+		nullptr
+#endif
 		);
 
 	return;
