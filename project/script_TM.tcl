@@ -1,3 +1,5 @@
+source env_hls.tcl
+
 open_project -reset trackMerger
 
 # source files
@@ -14,7 +16,7 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/TM/
+add_files -tb ../emData/PD/
 
 csim_design -compiler gcc -mflags "-j8"
 #csynth_design

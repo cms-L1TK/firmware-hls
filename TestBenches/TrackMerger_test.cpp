@@ -31,15 +31,15 @@ int main(){
 
   // Open input files
   ifstream fin_inputTracks;
-  openDataFile(fin_inputTracks,"../../../../../emData/TM/TrackFit_TF_L1L2_04.dat");
+  openDataFile(fin_inputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
   assert(fin_inputTracks.good());
 
   ifstream fout_outputTracks;
-  openDataFile(fout_outputTracks, "../../../../../emData/TM/CleanTrack_CT_L1L2_04.dat");
+  openDataFile(fout_outputTracks, "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
   assert(fout_outputTracks.good());
 
   // Loop over events
-  for (int ievt = 0; ievt < nevents; ++ievt) {
+  for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     for (unsigned short i = 0; i < kMaxProc; ++ievt){
@@ -57,11 +57,27 @@ int main(){
     // Set input memories into arrays of input track/stub words
     for(unsigned short i = 0; i < inputTracks.getEntries(); i++){
       TrackFit track;
-      track = inputTrack.read_mem(i);
-      TrackFit::trackWord[i] = track.getTrackWord();
-      for (unsigned short j = 0; j < 4; j++){
-        barrelStubWords[j][i] = track.getBarrelStubWord<j>();
-        diskStubWords[j][i] = track.getDiskStubWord<j>();
+      track = inputTracks.read_mem(i);
+      trackWord[i] = track.getTrackWord();
+       for (unsigned short j = 0; j < 4; j++){
+        switch (j) {
+          case 0:
+            barrelStubWords[0][i] = track.getBarrelStubWord<0>();
+            diskStubWords[0][i] = track.getDiskStubWord<0>();
+            break;
+          case 1:
+            barrelStubWords[1][i] = track.getBarrelStubWord<1>();
+            diskStubWords[1][i] = track.getDiskStubWord<1>();
+            break;
+          case 2:
+            barrelStubWords[2][i] = track.getBarrelStubWord<2>();
+            diskStubWords[2][i] = track.getDiskStubWord<2>();
+            break;
+          case 3:
+            barrelStubWords[3][i] = track.getBarrelStubWord<3>();
+            diskStubWords[3][i] = track.getDiskStubWord<3>();
+            break;
+        }
       }
     }
 
