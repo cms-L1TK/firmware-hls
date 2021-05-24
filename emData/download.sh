@@ -71,7 +71,7 @@ declare -a processing_modules=(
   "TP_L1L2D" 
 
   # Purge Duplicates (TrackMerger)
-  "TM"
+  "PD"
 )
 
 # Function that prints information regarding the usage of this command
