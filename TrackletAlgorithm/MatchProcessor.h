@@ -195,7 +195,7 @@ namespace PR
 template<int L>
 void readTable(bool table[256]){
 
-  if (L==1) {
+  if (L==TF::L1) {
     bool tmp[256]=
 #include "../emData/ME/tables/METable_L1.tab"
     for (int i=0;i<256;++i){
@@ -204,8 +204,8 @@ void readTable(bool table[256]){
     }
   }
 
-/*
-  if (L==2) {
+/* FIXME uncomment these out when testing L2,L5, and L6. Need to be added to download.sh to work.
+  if (L==TF::L2) {
     bool tmp[256]=
 #include "../emData/ME/tables/METable_L2.tab"
     for (int i=0;i<256;++i){
@@ -215,7 +215,7 @@ void readTable(bool table[256]){
   }
 */
 
-  if (L==3) {
+  if (L==TF::L3) {
     bool tmp[256]=
 #include "../emData/MP/tables/METable_L3.tab"
     for (int i=0;i<256;++i){
@@ -224,7 +224,7 @@ void readTable(bool table[256]){
     }
   }
 
-  if (L==4) {
+  if (L==TF::L4) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L4.tab"
     for (int i=0;i<512;++i){
@@ -234,7 +234,7 @@ void readTable(bool table[256]){
   }
 
 /*
-  if (L==5) {
+  if (L==TF::L5) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L5.tab"
 #pragma HLS unroll
@@ -243,7 +243,7 @@ void readTable(bool table[256]){
     }
   }
 
-  if (L==6) {
+  if (L==TF::L6) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L6.tab"
 #pragma HLS unroll
@@ -280,32 +280,32 @@ ap_uint<width> iabs( ap_int<width> value )
 template<bool phi, int L, int width, int depth>
 void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
-    if (L==1){
+    if (L==TF::L1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==2){
+    else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==3){
+    else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MP/tables/MP_L3PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==4){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==5){
+    else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==6){
+    else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
@@ -315,32 +315,32 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
   } // end phi cuts
   else { // z cuts
-    if (L==1){
+    if (L==TF::L1){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==2){
+    else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==3){
+    else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
 #include "../emData/MP/tables/MP_L3PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==4){
+    else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==5){
+    else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
-    else if (L==6){
+    else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
 #include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
@@ -357,7 +357,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies,int LAYER=0, int PHISEC=0>
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, int LAYER=TF::L1>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& savedMatch,
@@ -395,15 +395,15 @@ void MatchCalculator(BXType bx,
   const ap_int<4>  kShift_PS_zderL = -7; // PS_zderL_shift in emulation (defined in constants)
   const ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation (defined in constants)
 
-  const auto kFact               = (1 <= LAYER <= 3)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456)); // fact_ in emulation defined in MC
-  constexpr int kPhi0_shift         = (1 <= LAYER <= 3)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
+  const auto kFact               = (LAYER < TF::L4)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456)); // fact_ in emulation defined in MC
+  const auto kPhi0_shift         = (LAYER < TF::L4)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
   constexpr int  kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
   const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456;                                           // icorrshift for L456
-  const auto kPhi_corr_shift     = (1 <= LAYER <= 3)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
+  const auto kPhi_corr_shift     = (LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
-  const auto kZ_corr_shift       = (1 <= LAYER <= 3)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
+  const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
 
   const auto LUT_matchcut_phi_width = 17;
   const auto LUT_matchcut_phi_depth = 12;
@@ -547,8 +547,8 @@ void MatchCalculator(BXType bx,
 
 //////////////////////////////
 // MatchProcessor
-template<int L, regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int maxInCopies, int maxFullMatchCopies, int maxTrackletProjections, unsigned int nINMEM,
-         int LAYER=0, int DISK=0, int PHISEC=0>
+template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int maxInCopies, int maxFullMatchCopies, int maxTrackletProjections, unsigned int nINMEM,
+         TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
@@ -588,11 +588,11 @@ void MatchProcessor(BXType bx,
   using namespace PR;
 
   //Initialize table for bend-rinv consistency
-  bool table[kNMatchEngines][(L<4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
+  bool table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
-    readTable<L>(table[iMEU]); 
+    readTable<LAYER>(table[iMEU]); 
   } 
 
   // initialization:
@@ -602,9 +602,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS dependence variable=mem_hasdata inter RAW true
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-//#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
-//#pragma HLS resource variable=fullmatch core=RAM_2P_LUTRAM
-//#pragma HLS ARRAY_PARTITION variable=fullmatch complete dim=0
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin,0,
@@ -612,13 +609,6 @@ void MatchProcessor(BXType bx,
      proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
      proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
   
-
-  /*
-  for (unsigned int ii=0;ii<nINMEM;ii++) {
-    std::cout << "ii nmem : "<<ii<<" "<<numbersin[ii]<<std::endl;
-  }
-  */
-
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -656,17 +646,9 @@ void MatchProcessor(BXType bx,
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
-  /*
-    MEU_start: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-      #pragma HLS unroll
-    matchengine[iMEU] = MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE>();
-    }
-  */
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
-//#pragma HLS RESOURCE variable=instubdata core=RAM_2P_LUTRAM 
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-//#pragma HLS ARRAY_PARTITION variable=tprojarray complete dim=0
 #pragma HLS dependence variable=istub inter false
 
 
@@ -695,24 +677,11 @@ void MatchProcessor(BXType bx,
  PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1 //rewind
 
-    //bool projBuffNearFull = projbufferarray.nearFull();
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<kNBitsBuffer>()[(readptr,writeptr)];
     bool projBuffNearFull = nearFull3Unit<kNBitsBuffer>()[(readptr,writeptr)];
     
-    /*
-    std::cout << "istep = "<<istep<<" projBuff: "<<projbufferarray.getReadPtr()<<" "<<projbufferarray.getWritePtr()
-              <<" "<<projBuffNearFull;
-    for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-      std::cout <<" MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()
-		<<" "<<matchengine[iMEU].idle()<<" "<<matchengine[iMEU].empty()
-		<<" "<<matchengine[iMEU].Good_()<<matchengine[iMEU].Good__()
-		<<" "<<matchengine[iMEU].getTrkID();
-    }
-    std::cout << std::endl;
-    */
-
     ap_uint<3> iphi = 0;
     if (istep == 0) {
       nallproj = 0;
@@ -724,8 +693,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
 
 
-    //std::cout << "istep="<<istep;
-
     bool anyidle = false;
 
   MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
@@ -735,13 +702,10 @@ void MatchProcessor(BXType bx,
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
       trkids[iMEU] = matchengine[iMEU].getTrkID();
-      //std::cout << "iMEU : "<<trkids[iMEU] << " " << emptys[iMEU] << std::endl;
     }
    
     
     ap_uint<kNMatchEngines> smallest = ~emptys;
-    //std::cout << "init smallest : "<<smallest[0]<<" "<<smallest[1]<<" "<<smallest[2]<<" "<<smallest[3]<<std::endl;
-    //std::cout << "trkids : "<<trkids[0]<<" "<<trkids[1]<<" "<<trkids[2]<<" "<<trkids[3]<<std::endl;
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
   MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
@@ -752,8 +716,6 @@ void MatchProcessor(BXType bx,
       }
     }
       
-    //std::cout << "smallest : "<<smallest[0]<<" "<<smallest[1]<<" "<<smallest[2]<<" "<<smallest[3]<<std::endl;
-    
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
 
@@ -768,7 +730,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll
       auto &meu = matchengine[iMEU];
       
-      bool idle = idles[iMEU];//meu.idle();
+      bool idle = idles[iMEU];
 
       if(idle && !empty && !init) {
         init =  true;
@@ -797,7 +759,7 @@ void MatchProcessor(BXType bx,
       
       lastTrkID = trkindex;
 
-      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
+      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER>
 	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, projindex, stubindex, bx_o,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
 	 fullmatch);
@@ -846,28 +808,6 @@ void MatchProcessor(BXType bx,
       (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (zfirst, zfirst!=zlast);      
-
-      /*      
-      int zbins_adjust = psseed ? zbins_adjust_PSseed : zbins_adjust_2Sseed;
-      ap_uint<6> zbinpos6 = (1<<(zbin6.length()-1))+zbin6;
-
-      // Lower Bound
-      auto zbinlower = zbinpos6<zbins_adjust ?
-	ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
-	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6-zbins_adjust);
-      // Upper Bound
-      auto zbinupper = zbinpos6>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
-	ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
-	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6+zbins_adjust);
-      
-      ap_uint<MEBinsBits> zbin1 = zbinlower >> zbins_nbitsextra;
-      ap_uint<MEBinsBits> zbin2 = zbinupper >> zbins_nbitsextra;
-
-      std::cout << "zbin1 : "<<zbin1<<" "<<zfirst<<std::endl;
-      std::cout << "zbin2 : "<<zbin2<<" "<<zlast<<std::endl;
-      assert(zbin1==zfirst);
-      assert(zbin2==zlast);
-      */
 
       // VM Projection
       typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zfirst,ap_uint<3>(0));
@@ -937,20 +877,8 @@ void MatchProcessor(BXType bx,
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getRZ(), projdata_.getPhiDer(), projdata_.getRZDer());
-
-      /*      
-      typename AllProjection<APTYPE>::AProjTCID          proj_tcid = allproj.getTCID();
-      typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = allproj.getTrackletIndex();
-      typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = allproj.getSeed();
-      typename AllProjection<APTYPE>::AProjPHI           proj_phi  = allproj.getPhi();
-      typename AllProjection<APTYPE>::AProjRZ            proj_z    = allproj.getRZ();
-      typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = allproj.getPhiDer();
-      typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = allproj.getRZDer();
-      */
-
       if (nstubs!=0) { 
 	ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
-	//std::cout << "istep: "<<istep<<" adding to projbuffer"<<std::endl;
 	projbufferarray.addProjection(projbuffertmp);
       }
       
@@ -971,7 +899,6 @@ void MatchProcessor(BXType bx,
 	 proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in,
 	 projdata, nproj);
 
-      //std::cout << "istep validin : "<<istep<<" "<<validin<<std::endl;
  
     } else {
       validin = false;

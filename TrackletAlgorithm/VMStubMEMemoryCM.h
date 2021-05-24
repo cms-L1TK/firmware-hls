@@ -99,7 +99,7 @@ public:
 
   // Getter
   static constexpr int getWidth() {return VMStubMECMBase<VMSMEType>::kVMStubMECMSize;}
-  
+
   VMStubMECMData raw() const {return data_;}
 
   VMSMEID getIndex() const {

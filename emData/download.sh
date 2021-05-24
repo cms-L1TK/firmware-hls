@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 
-# fw_synch_201005
-#tarball_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+#### fw_synch_210503 ####
+# Standard configuration
+memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+# Combined modules
+tarball_url_cm="https://www.dropbox.com/s/zrhs3e6j2em6lbd/MemPrints_Combined_210504.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/kdj2bey9nb9ds4c/LUTs_Combined_210504.tgz?dl=0"
+
+#### fw_synch_201005 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
 
-# standard configurations - temporary
-tarball_url="https://www.dropbox.com/s/8942mkttj198y90/MemPrintsStandard_210315.tgz?dl=0"
-luts_url="https://www.dropbox.com/s/6ebazqxtb1e0caw/LUTsStandard_210315.tgz?dl=0"
-
-# Supplemental test-vectors for development of the PurgeDuplicates module.
-# Generated after PR #70 was merged:
-# https://github.com/cms-L1TK/cmssw/tree/1606921d6c26b13292808ec8198db8c6a400dad0
-pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
-
-# fw_synch_200515
+#### fw_synch_200515 ####
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
@@ -31,6 +30,9 @@ declare -a processing_modules=(
   # VMRouter
   "VMR_L1PHIE"
   "VMR_D1PHIA"
+
+  # VMRouter CM
+  "VMRCM_L2PHIA"
 
   # TrackletEngine
   "TE_L1PHIE18_L2PHIC17"
@@ -52,10 +54,6 @@ declare -a processing_modules=(
   "TC_L3L4B"
   "TC_L3L4C"
   "TC_L3L4D"
-  "TC_L3L4E"
-  "TC_L3L4F"
-  "TC_L3L4G"
-  "TC_L3L4H"
   "TC_L5L6A"
   "TC_L5L6B"
   "TC_L5L6C"
@@ -163,14 +161,9 @@ tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsCM
 rm -f MemPrints.tgz
 
-wget -O MemPrints.tar.gz --quiet ${tarball_url}
+wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
-
-# Download and unpack PD.tar.gz
-wget -O PD.tar.gz --quiet ${pd_url}
-tar -xzf PD.tar.gz
-rm -f PD.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
@@ -187,6 +180,7 @@ do
   then
       cm="true"
   fi
+  wires="${table_location}/wires.dat"
 
   target_dir=${module_type}/${module}
 
@@ -237,6 +231,15 @@ do
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
       find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+  elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
+  then
+          layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+          do
+            find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          done
   elif [[ ${module_type} == "MP" ]]
   then
       layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`

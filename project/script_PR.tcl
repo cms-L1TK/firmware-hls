@@ -3,6 +3,9 @@
 #   vivado_hls -p projrouter
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset projrouter
 
@@ -21,7 +24,7 @@ source settings_hls.tcl
 add_files -tb ../emData/PR/PR_L3PHIC/
 #add_files -tb ../emData/PR/PR_L3L4_L1PHI3/
 
-csim_design -compiler gcc -mflags "-j8"
+csim_design -mflags "-j8"
 csynth_design
 cosim_design 
 export_design -format ip_catalog

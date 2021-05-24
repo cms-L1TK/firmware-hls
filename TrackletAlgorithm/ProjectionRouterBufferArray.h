@@ -41,7 +41,6 @@ public:
     return writeptr_;
   }
 
-
   inline void reset() {
 #pragma HLS inline
     readptr_ = 0;

@@ -3,6 +3,9 @@
 #   vivado_hls -p trackBuilder
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 # create new project (deleting any existing one of same name)
 open_project -reset trackBuilder
 
@@ -18,7 +21,7 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/TB/TB_L1L2/
+add_files -tb ../emData/FT/FT_L1L2/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design

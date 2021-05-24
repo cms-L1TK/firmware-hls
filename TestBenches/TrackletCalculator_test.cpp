@@ -70,20 +70,8 @@ int main()
   TBHelper tb("TC/TC_L1L2L");
 #elif MODULE_ == TC_L3L4A_
   TBHelper tb("TC/TC_L3L4A");
-#elif MODULE_ == TC_L3L4B_
-  TBHelper tb("TC/TC_L3L4B");
-#elif MODULE_ == TC_L3L4C_
-  TBHelper tb("TC/TC_L3L4C");
 #elif MODULE_ == TC_L3L4D_
   TBHelper tb("TC/TC_L3L4D");
-#elif MODULE_ == TC_L3L4E_
-  TBHelper tb("TC/TC_L3L4E");
-#elif MODULE_ == TC_L3L4F_
-  TBHelper tb("TC/TC_L3L4F");
-#elif MODULE_ == TC_L3L4G_
-  TBHelper tb("TC/TC_L3L4G");
-#elif MODULE_ == TC_L3L4H_
-  TBHelper tb("TC/TC_L3L4H");
 #elif MODULE_ == TC_L5L6A_
   TBHelper tb("TC/TC_L5L6A");
 #elif MODULE_ == TC_L5L6D_
@@ -165,20 +153,8 @@ int main()
     TrackletCalculator_L1L2L(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 #elif MODULE_ == TC_L3L4A_
     TrackletCalculator_L3L4A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4B_
-    TrackletCalculator_L3L4B(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4C_
-    TrackletCalculator_L3L4C(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 #elif MODULE_ == TC_L3L4D_
     TrackletCalculator_L3L4D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4E_
-    TrackletCalculator_L3L4E(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4F_
-    TrackletCalculator_L3L4F(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4G_
-    TrackletCalculator_L3L4G(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4H_
-    TrackletCalculator_L3L4H(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 #elif MODULE_ == TC_L5L6A_
     TrackletCalculator_L5L6A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 #elif MODULE_ == TC_L5L6D_

@@ -10,8 +10,6 @@
 // Each memory type contain different bits of the same stub.
 // AllStub and TE memories has several versions/copies of the VM.
 
-// Assumes at most 4 inputs in the layers, and 4 (PS) + 2 (2S) inputs in the disks
-
 // NOTE: Nothing in VMRouter.h needs to be changed to run a different phi region
 
 
@@ -48,7 +46,8 @@ constexpr unsigned int nvmteextralayers[3] = { 0, 4, 4 }; // Number of extra TEI
 
 // Number of bits used for the VMs for different layers and disks
 // E.g. 32 VMs would use 5 vmbits
-constexpr int nbitsvmlayer[6] = { 5, 5, 4, 5, 4, 5 }; // Could be computed using the number of VMs...
+constexpr int nbitsvmlayer[6] = { 5, 5, 5, 5, 5, 5 }; // Could be computed using the number of VMs...
+constexpr int nbitsvmtelayer[6] = { 5, 5, 4, 5, 4, 5 }; // For TE (inner) memories
 constexpr int nbitsvmdisk[5] = { 4, 4, 4, 4, 4 };
 constexpr int nbitsvmoverlap[2] = { 4, 3 };
 constexpr int nbitsvmextra[3] = { 0, 4, 4 };
@@ -72,14 +71,10 @@ constexpr float maxvmolbins = 1 << nbits_maxvmol; // Overlap
 constexpr int nbitsphiraw = 7; // Number of bits used for calculating iPhiRawPlus/Minus
 
 // The length of the masks used for the memories
-constexpr int maskISsize = 6; // Input memories
 constexpr int maskMEsize = 1 << nbits_maxvm; // ME memories
 constexpr int maskTEIsize = 1 << nbits_maxvm; // TEInner memories
 constexpr int maskOLsize = 1 << nbits_maxvmol; // TEInner Overlap memories
 constexpr int maskTEOsize = 1 << nbits_maxvm; // TEOuter memories
-
-// Maximum number of memories, exclusive DISK2S
-constexpr int maxinput = 4;
 
 // Number of bins per page in memories (may change in future)
 constexpr int nmaxbinsperpagelayer = 8;
@@ -247,12 +242,16 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 	int nzBits = z.length(); // Number of bits for z
 	int nbendBits = bend.length(); // Number of bits for bend
 	int nfinerzbits = stubME.getFineZ().length(); // Number of bits for finer/z
+	int nFinePhiBits = stubME.getFinePhi().length(); // Number of bits used for fine phi
 
 	// Number of bits for table indices
 	constexpr int nbitszfinebintable =
 			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in finebintable
 	constexpr int nbitsrfinebintable =
 			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in finebintable
+
+	constexpr auto vmbits =
+			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
 
 	// Total number of VMs for ME for a layer/disk in a whole sector
 	constexpr int nvmTotME =
@@ -266,6 +265,8 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 	// Set values to VMStubME
 	stubME.setBend(bend);
 	stubME.setIndex(typename VMStubME<OutType>::VMSMEID(index));
+	stubME.setFinePhi(
+			iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits)); // Set finephi, i.e. the phi bits within a vme region region
 
 	auto iphiRaw = iphivmRaw<InType>(phiCorr); // Top 5 bits of phi
 	auto iphiRawPlus = iphivmRawPlus<InType>(phiCorr); // Top 5 bits of phi after adding a small number
@@ -356,7 +357,7 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 	constexpr auto nrbitsinnertable =
 			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of bits for rbins in Inner Table
 	constexpr auto vmbitsTmp =
-			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
+			(Layer) ? nbitsvmtelayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
 	constexpr auto vmbits =
 			(Layer != 2) ? vmbitsTmp : nbitsvmextra[Layer - 1]; // Number of bits for VMs
 
@@ -376,6 +377,8 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 	// Set values to VMStubeTEInner
 	stubTEI.setBend(bend);
 	stubTEI.setIndex(typename VMStubTEInner<OutType>::VMSTEIID(index));
+	stubTEI.setFinePhi(
+			iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits));
 
 	auto iphiRaw = iphivmRaw<InType>(phiCorr); // Top 5 bits of phi
 
@@ -409,8 +412,6 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 	rzbits = rzbitsInnerTable[rzbitsIndex]; // The z/r information bits saved for TE Inner memories.
 
 	stubTEI.setZBits(rzbits);
-	stubTEI.setFinePhi(
-			iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits));
 
 	return stubTEI;
 }
@@ -465,7 +466,6 @@ inline VMStubTEOuter<OutType> createStubTEOuter(const InputStub<InType> stub,
 	// Set values to VMSTubTE Outer
 	stubTEO.setBend(bend);
 	stubTEO.setIndex(typename VMStubTEOuter<OutType>::VMSTEOID(index));
-
 	stubTEO.setFinePhi(
 				iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits));
 
@@ -580,14 +580,13 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 // Layer Disk - Specifies the layer or disk number
 // MAXCopies - The maximum number of copies of a memory type
 // NBitsBin number of bits used for the bins in MEMemories
-template<regionType InType, regionType OutType, int Layer, int Disk, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin, int BendCutTableSize>
+template<regionType InType, regionType OutType, int Layer, int Disk, int nInputMems, int nInputDisk2SMems, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin, int BendCutTableSize>
 void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int phiCorrTable[],
 		// rzbitstables, aka binlookup in emulation
 		const int rzbitsInnerTable[], const int rzbitsOverlapTable[], const int rzbitsOuterTable[],
 		// bendcut tables
 		const ap_uint<BendCutTableSize> bendCutInnerTable[], const ap_uint<BendCutTableSize> bendCutOverlapTable[], const ap_uint<BendCutTableSize> bendCutOuterTable[],
 		// Input memories
-		const ap_uint<maskISsize>& maskIS,
 		const InputStubMemory<InType> inputStubs[],
 		const InputStubMemory<DISK2S> inputStubsDisk2S[],
 		// AllStub memory
@@ -629,18 +628,22 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 	constexpr int nmaxbinsperpage = (Layer) ? nmaxbinsperpagelayer : nmaxbinsperpagedisk; // Number of bins per page in memories
 
 	// Number of data in each input memory
-	typename InputStubMemory<InType>::NEntryT nInputs[maskISsize]; // Array containing the number of inputs. Last two indices are for DISK2S
+	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems + nInputDisk2SMems]; // Array containing the number of inputs. Last two indices are for DISK2S
 	#pragma HLS array_partition variable=nInputs complete dim=0
 
-	const typename InputStubMemory<InType>::NEntryT zero(0);
+	//Keeps track of input memories that still have stubs to process, one bit per memory
+	ap_uint<nInputMems + nInputDisk2SMems> hasStubs;
 
-	for (int i = 0; i < maskISsize; i++) {
+	for (int i = 0; i < nInputMems; i++) {
 #pragma HLS UNROLL
-		if (i < maxinput) {
-			nInputs[i] = maskIS[i] != 0 ? inputStubs[i].getEntries(bx) : zero;
-		} else { // For DISK2S
-			nInputs[i] = maskIS[i] != 0 ? inputStubsDisk2S[i-maxinput].getEntries(bx) : zero;
-		}
+		nInputs[i] = inputStubs[i].getEntries(bx);
+		hasStubs[i] = nInputs[i];
+	}
+	// For DISK2S
+	for (int i = nInputMems; i < nInputMems + nInputDisk2SMems; i++) {
+#pragma HLS UNROLL
+		nInputs[i] = inputStubsDisk2S[i - nInputMems].getEntries(bx);
+		hasStubs[i] = nInputs[i];
 	}
 
 	//Create variables that keep track of which memory address to read and write to
@@ -671,57 +674,32 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
 
+		bool noStubsLeft = !hasStubs.or_reduce(); // Determines if we have processed all stubs. Is true if hasStubs is all 0s
 		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S
-		bool negDisk = false; // Used to determine if it's negative disk, the last 3 inputs memories
-		bool noStubsLeft = false; // Used to determine if we have processed all stubs
+		bool negDisk = false; // Used to determine if it's negative disk
 
 		InputStub<InType> stub;
 		InputStub<DISK2S> stubDisk2S; // Used for disks. TODO: Find a better way to do this...?
 
-		// Read stub from memory in turn.
-		// Reading is ordered as in wiring script to pass testbench
-		if (maskIS[4] && nInputs[4]) { // For DISK2S
-			assert(Disk);
-			stubDisk2S = inputStubsDisk2S[0].read_mem(bx, read_addr);
-			disk2S = true;
-			--nInputs[4];
-			if (nInputs[4] == 0)
-				resetNext = true;
-		} else if (maskIS[0] && nInputs[0]) {
-			stub = inputStubs[0].read_mem(bx, read_addr);
-			--nInputs[0];
-			if (nInputs[0] == 0)
-				resetNext = true;
-		} else if (maskIS[1] && nInputs[1]) {
-			stub = inputStubs[1].read_mem(bx, read_addr);
-			--nInputs[1];
-			if (nInputs[1] == 0)
-				resetNext = true;
-		} else if (maskIS[5] && nInputs[5]) { // For DISK2S
-			assert(Disk);
-			stubDisk2S = inputStubsDisk2S[1].read_mem(bx, read_addr);
-			disk2S = true;
-			negDisk = (Disk) ? true : false;
-			--nInputs[5];
-			if (nInputs[5] == 0)
-				resetNext = true;
-		} else if (maskIS[2] && nInputs[2]) {
-			stub = inputStubs[2].read_mem(bx, read_addr);
-			negDisk = (Disk) ? true : false;
-			--nInputs[2];
-			if (nInputs[2] == 0)
-				resetNext = true;
-		} else if (maskIS[3] && nInputs[3]) {
-			stub = inputStubs[3].read_mem(bx, read_addr);
-			negDisk = (Disk) ? true : false;
-			--nInputs[3];
-			if (nInputs[3] == 0)
-				resetNext = true;
-		} else {
-			noStubsLeft = true;
-		}
+		// Read a stub. The input memories are in the order PS, negPS, 2S, neg2S
+		int mem_index = __builtin_ctz(hasStubs); // The first non-zero index
 
+		if(!noStubsLeft) {
+		  if (mem_index < nInputMems) {
+		    stub = inputStubs[mem_index].read_mem(bx, read_addr);
+		    if (InType == DISKPS) {
+		      negDisk = mem_index >= (nInputMems>>1);
+		    }
+		  } else { // For DISK2S
+		    stubDisk2S = inputStubsDisk2S[mem_index - nInputMems].read_mem(bx, read_addr);
+		    disk2S = true;
+		    negDisk = mem_index >= nInputMems + (nInputDisk2SMems >> 1);
+		  }
+		  resetNext = nInputs[mem_index] == 1;
+		  hasStubs[mem_index] = !resetNext;
+		  --nInputs[mem_index];
+		}
 
 		// Increment the read address, or reset it to zero when all stubs in a memory has been read
 		if (resetNext)
@@ -730,6 +708,7 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 			++read_addr;
 
 		if (noStubsLeft) continue; // End here if we already have processed all stubs
+		// Note: putting the continue here rather than at the start of the loop seems to yield better timing.
 
 
 		////////////////////////////////////////

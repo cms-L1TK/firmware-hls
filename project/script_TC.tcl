@@ -3,16 +3,16 @@
 #   vivado_hls -p trackletCalculator
 # WARNING: this will wipe out the original project by the same name
 
+# get some information about the executable and environment
+source env_hls.tcl
+
 set modules_to_test {
+  {TC_L1L2D}
   {TC_L1L2E}
   {TC_L1L2F}
   {TC_L1L2G}
   {TC_L1L2H}
   {TC_L1L2I}
-  {TC_L3L4C}
-  {TC_L3L4D}
-  {TC_L3L4E}
-  {TC_L3L4F}
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
@@ -41,8 +41,10 @@ foreach i $modules_to_test {
   # run C-simulation for each module in modules_to_test
   set_top [join [list "TrackletCalculator_" $seed $iTC] ""]
   open_solution [join [list "solution_" $seed $iTC] ""]
+
+  # Define FPGA, clock frequency & common HLS settings.
   source settings_hls.tcl
-  csim_design -compiler gcc -mflags "-j8"
+  csim_design -mflags "-j8"
 
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {

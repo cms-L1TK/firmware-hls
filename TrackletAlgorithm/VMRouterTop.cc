@@ -165,6 +165,9 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 #pragma HLS resource variable=inputStub[1].get_mem() latency=2
 #pragma HLS resource variable=inputStub[2].get_mem() latency=2
 #pragma HLS resource variable=inputStub[3].get_mem() latency=2
+#pragma HLS resource variable=inputStub[4].get_mem() latency=2
+#pragma HLS resource variable=inputStub[5].get_mem() latency=2
+#pragma HLS resource variable=inputStub[6].get_mem() latency=2
 
 #pragma HLS interface register port=bx_o
 
@@ -174,7 +177,6 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
 	// Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
-	static const ap_uint<maskISsize> maskIS = ((1 << numInputs) - 1); // Input memories
 	static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (phiRegion - 'A')); // ME memories
 	static const ap_uint<maskTEIsize> maskTEI =
 		(kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
@@ -190,12 +192,12 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	/////////////////////////
 	// Main function
 
-	VMRouter<inputType, outputType, kLAYER, kDISK,  maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
+	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
 	(bx, bx_o, fineBinTable, phiCorrTable,
 		rzBitsInnerTable, rzBitsOverlapTable, nullptr,
 		bendCutInnerTable, bendCutOverlapTable, nullptr,
 		// Input memories
-		maskIS, inputStub, nullptr,
+		inputStub, nullptr,
 		// AllStub memories
 		memoriesAS,
 		// ME memories

@@ -61,13 +61,9 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
       auto stubfinephi=stubdata__.getFinePhi();
       auto stubbend=stubdata__.getBend();
     
-      //int phidiff = projfinephi___ - stubfinephi;
-
-      //bool passphi =  phidiff < 3 && phidiff > -3;
       bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
     
       //Check if stub z position consistent
-      //ap_int<5> idz=stubfinez-projfinezadj__;
       bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
 
       auto const index=projrinv__.concat(stubbend);
@@ -75,7 +71,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
       //Check if stub bend and proj rinv consistent
       if (passphi&&pass&&table[index]) {
 	matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
-      } // if(pass&&table[index])
+      }
     }
 
     good__ = good_;
@@ -105,10 +101,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   stubmask_[3] = nstubsall_[3]!=0;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
-  /*
-  second_ = index==1 || index==3; // can be simplified
-  phiPlus_ = index==2 || index==3; // can be simplified
-  */
   second_ = isSecond[index];
   phiPlus_ = isPhiPlus[index];
   nstubs_ = nstubsall_[index];
@@ -117,39 +109,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   iphi_ = iphi;
   auto const qdata=projbuffer_;
   tcid=qdata.getTCID();
-
-  /*
-  if (good__) {
-    auto stubindex=stubdata__.getIndex();
-    auto stubfinez=stubdata__.getFineZ();
-    auto stubfinephi=stubdata__.getFinePhi();
-    auto stubbend=stubdata__.getBend();
-    
-    //int phidiff = projfinephi___ - stubfinephi;
-
-    //bool passphi =  phidiff < 3 && phidiff > -3;
-    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
-    
-    //Check if stub z position consistent
-    //ap_int<5> idz=stubfinez-projfinezadj__;
-    bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
-
-    auto const index=projrinv__.concat(stubbend);
-
-    //Check if stub bend and proj rinv consistent
-    if (passphi&&pass&&table[index]) {
-      matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
-    } // if(pass&&table[index])
-  }
-
-  good__ = good_;
-  stubdata__ = stubdata_;
-  projfinephi___ = projfinephi__;
-  projfinezadj__ = projfinezadj_;
-  isPSseed__ = isPSseed_;
-  projrinv__ = projrinv_;
-  projbuffer___ = projbuffer__;
-  */  
 
   good_ = false;
 
@@ -161,17 +120,10 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  inline bool empty() const {
 #pragma HLS inline  
-   //return (readindex_==writeindex_);
    return empty_;
  }
  
  inline bool nearFull() {
-   /*
-   INDEX writeindexnext = writeindex_+1;
-   INDEX writeindexnext2 = writeindex_+1;
-   return readindex_==writeindexnext || readindex_==writeindexnext2;
-   */
-
    return nearFullLUT[(readindex_,writeindex_)];
  }
 
@@ -265,56 +217,11 @@ inline MATCH read() {
 
    bool nearfull = nearFull();
 
-   /*
-   if (good__) {
-     auto stubindex=stubdata__.getIndex();
-     auto stubfinez=stubdata__.getFineZ();
-     auto stubfinephi=stubdata__.getFinePhi();
-     auto stubbend=stubdata__.getBend();
-     
-     //int phidiff = projfinephi___ - stubfinephi;
-
-     //bool passphi =  phidiff < 3 && phidiff > -3;
-     bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
-
-     //Check if stub z position consistent
-     //ap_int<5> idz=stubfinez-projfinezadj__;
-     bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
-
-     auto const index=projrinv__.concat(stubbend);
-
-     if (print) {
-       //std::cout << "passphi pass table index : "<<passphi<<" "<<pass<<" "<<table[index]<<" "<<index
-       //		 <<"  z : "<<stubfinez<<" "<<projfinezadj__<<std::endl;
-     }
-
-     //Check if stub bend and proj rinv consistent
-     if (passphi&&pass&&table[index]) {
-       matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
-     } // if(pass&&table[index])
-   }
-
-   good__ = good_;
-   stubdata__ = stubdata_;
-   projfinephi___ = projfinephi__;
-   projfinezadj__ = projfinezadj_;
-   isPSseed__ = isPSseed_;
-   projrinv__ = projrinv_;
-   projbuffer___ = projbuffer__;
-
-   */
-
    good_ = idle_ ? false : good_;
    good_ = nearfull ? false : good_;
 
    bool process = (!idle_) && (!nearfull);
 
-   //if(idle_||nearfull) {
-   //  //good_ = false;
-   //  return;
-   // }
-
-   
    // vmproj index
    //typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
    
@@ -324,7 +231,6 @@ inline MATCH read() {
 
    NSTUBS istubtmp=istub_;
 
-   //ap_uint<1> phiPlusSave = phiPlus_;
    ap_uint<3> iphiSave = iphi_ + phiPlus_;
    auto secondSave = second_;
 
@@ -334,8 +240,6 @@ inline MATCH read() {
      //FIXME - should this not be in init method?
      auto const qdata=projbuffer_;
      tcid=qdata.getTCID();
-     //auto nstub = qdata.getNStubs();
-     //nstubs=qdata.getNStubs();
      VMProjection<BARREL> data(qdata.getProjection());
      zbin=data.getZBin().range(3,1); //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
      
@@ -344,7 +248,6 @@ inline MATCH read() {
      projfinephi_=data.getFinePhi();
      projrinv=data.getRInv();
      isPSseed=data.getIsPSSeed();
-     //auto projzbin=qdata.getZBin();
      
      //Calculate fine z position
      if (second_) {
@@ -372,7 +275,6 @@ inline MATCH read() {
      if (istub_+1>=nstubs_){
        istub_=0;
        if (!stubmask_) {
-	 //if (stubmask_==0) {
 	 idle_ = true;
        } else {
 	 ap_uint<2> index = __builtin_ctz(stubmask_);
@@ -390,7 +292,6 @@ inline MATCH read() {
    //Read stub memory and extract data fields
    ap_uint<10> stubadd=(zbin,iphiSave,istubtmp);
    if (print) {
-     //std::cout << "Read vmstub zbin iphi : "<<zbin<<" "<<iphiSave<<std::endl;
    }
    stubdata_ = stubmem[bx&1][stubadd];
    projfinephi__ = projfinephi_;
@@ -406,7 +307,7 @@ inline MATCH read() {
  bool Good_() const { return good_;}
  bool Good__() const { return good__;}
 
- //protected:
+ private:
  INDEX writeindex_;
  INDEX readindex_;
  ap_uint<4> nstubsall_[4];
