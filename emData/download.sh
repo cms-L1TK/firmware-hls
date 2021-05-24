@@ -30,9 +30,6 @@ declare -a processing_modules=(
   "VMR_L6PHIA"
   "VMR_D1PHIA"
   "VMR_D2PHIA"
-  "VMR_D3PHIA"
-  "VMR_D4PHIA"
-  "VMR_D5PHIA"
 
   # VMRouter CM
   "VMRCM_L2PHIA"

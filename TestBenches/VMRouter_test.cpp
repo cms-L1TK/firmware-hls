@@ -160,7 +160,7 @@ int main() {
         , inputStubsDisk2S
 #endif
         , memoriesAS, memoriesME
-#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
         , memoriesTEI
 #endif
 #if kLAYER == 1 || kLAYER == 2
@@ -220,9 +220,9 @@ int main() {
     }
   } // End of event loop
 
-	cerr << "Exiting with return value " << err << endl;
-	// This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
-	if (err > 255) err = 255;
-	return err;
+  cerr << "Exiting with return value " << err << endl;
+  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  if (err > 255) err = 255;
+  return err;
 
 }

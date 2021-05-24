@@ -15,13 +15,13 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
-  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+	, const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
 #endif
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[maxASCopies]
 	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
-#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
 #endif
 #if kLAYER == 1 || kLAYER == 2
@@ -79,7 +79,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
 	static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (static_cast<char>(phiRegion) - 'A')); // ME memories
 	static const ap_uint<maskTEIsize> maskTEI =
-		(kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
+		(kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
 				((1 << nvmTEI) - 1) << (nvmTEI * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner memories, only used for odd layers/disk and layer 2
 	static const ap_uint<maskOLsize> maskOL =
 		((kLAYER == 1) || (kLAYER == 2)) ?
@@ -109,7 +109,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 		maskME, memoriesME,
 		// TEInner memories
 		maskTEI,
-#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 		memoriesTEI,
 #else
 		nullptr,

@@ -84,13 +84,13 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
-  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+	, const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
 #endif
 
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[maxASCopies]
 	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
-#if kLAYER == 1 || kLAYER  == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
 #endif
 #if kLAYER == 1 || kLAYER == 2
