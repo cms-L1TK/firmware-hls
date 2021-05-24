@@ -21,7 +21,18 @@ luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?d
 declare -a processing_modules=(
   # VMRouter
   "VMR_L1PHIE"
+  "VMR_L1PHID"
+  "VMR_L2PHIA"
+  "VMR_L2PHIB"
+  "VMR_L3PHIA"
+  "VMR_L4PHIA"
+  "VMR_L5PHIA"
+  "VMR_L6PHIA"
   "VMR_D1PHIA"
+  "VMR_D2PHIA"
+  "VMR_D3PHIA"
+  "VMR_D4PHIA"
+  "VMR_D5PHIA"
 
   # VMRouter CM
   "VMRCM_L2PHIA"

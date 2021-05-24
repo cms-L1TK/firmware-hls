@@ -4,18 +4,14 @@
 #include "VMRouter.h"
 #include "VMRouter_parameters.h"
 
-// VMRouter Top Function for layer 1, AllStub region E
+// VMRouter Top Function for layer 2, AllStub region A
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterTop.h
-//          - the input parameters to VMRouterTop in VMRouterTop.h/.cc
-//          - the the number and directories to the LUTs
-//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc
-//          - the call to VMRouter() in VMRouterTop.cc
-//          - the included top function in VMRouter_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR.tcl (if file name is changed)
+//          - add number to VMRouter_parameters.h if not already defined
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
 
 ////////////////////////////////////////////
 // Variables for that are specified with regards to the VMR region

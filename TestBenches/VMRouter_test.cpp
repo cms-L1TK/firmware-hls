@@ -1,6 +1,5 @@
 // Test bench for VMRouter
 #include "VMRouterTop.h"
-//#include "VMRouterTop_D1PHIA.h"
 
 #include <algorithm>
 #include <iterator>
@@ -15,10 +14,10 @@ const int nEvents = 100;  //number of events to run
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
-//          - the included top function in VMRouter_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR.tcl (if file name is changed)
+//          - constants specified in VMRouterTop.h
+//          - add number to VMRouter_parameters.h if not already defined
 //          - add the phi region in emData/download.sh, make sure to also run clean
-//          - and the changes listed in VMRouterTop.cc/h
+//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
 
 
 // Count the number of copies of each memory in a file name vector
