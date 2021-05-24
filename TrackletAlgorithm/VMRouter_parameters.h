@@ -547,110 +547,208 @@ ap_uint<1> tmpBendOuterTable6_n3[bendCutTableSize] =
 ////////////////
 // VMR_L2PHIB //
 ////////////////
-// template<> inline const ap_uint<getBendCutTableSize<true, TF::L2, phiRegions::B>()>* getBendCutOuterTable<true, TF::L2, phiRegions::B>(){
-//   const int bendCutTableSize = getBendCutTableSize<true, TF::L2, phiRegions::B>();
-//   // TE Memory 1
-//   ap_uint<1> tmpBendOuterTable1_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB9n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable1_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB9n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable1_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB9n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable1_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB9n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable1_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB9n5_vmbendcut.tab"
-//   // TE Memory 2
-//   ap_uint<1> tmpBendOuterTable2_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB10n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable2_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB10n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable2_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB10n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable2_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB10n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable2_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB10n5_vmbendcut.tab"
-//   // TE Memory 3
-//   ap_uint<1> tmpBendOuterTable3_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB11n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable3_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB11n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable3_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB11n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable3_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB11n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable3_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB11n5_vmbendcut.tab"
-//   // TE Memory 4
-//   ap_uint<1> tmpBendOuterTable4_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB12n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable4_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB12n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable4_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB12n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable4_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB12n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable4_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB12n5_vmbendcut.tab"
-//   // TE Memory 5
-//   ap_uint<1> tmpBendOuterTable5_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB13n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable5_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB13n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable5_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB13n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable5_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB13n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable5_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB13n5_vmbendcut.tab"
-//   // TE Memory 6
-//   ap_uint<1> tmpBendOuterTable6_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB14n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable6_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB14n2_vmbendcut.tab"
-// ap_uint<1> tmpBendOuterTable6_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB14n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable6_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB14n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable6_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB14n5_vmbendcut.tab"
-//   // TE Memory 7
-//   ap_uint<1> tmpBendOuterTable7_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB15n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable7_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB15n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable7_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB15n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable7_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB15n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable7_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB15n5_vmbendcut.tab"
-//   // TE Memory 8
-//   ap_uint<1> tmpBendOuterTable8_n1[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB16n1_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable8_n2[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB16n2_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable8_n3[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB16n3_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable8_n4[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB16n4_vmbendcut.tab"
-//   ap_uint<1> tmpBendOuterTable8_n5[bendCutTableSize] =
-// #include "../emData/VMR/tables/VMSTE_L2PHIB16n5_vmbendcut.tab"
-// 
-//   // Combine all the temporary tables into one big table
-//   static const ap_uint<bendCutTableSize> bendCutOuterTable[] = {
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n5),
-//     arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n5)};
-// 
-//   return bendCutOuterTable
-// }
+template<> constexpr int getNumInputs<true, TF::L2, phiRegions::B>(){ // Number of input memories, EXCLUDING DISK2S
+  return 4;
+}
+template<> constexpr int getNumInputsDisk2S<true, TF::L2, phiRegions::B>(){ // Number of DISK2S input memories
+  return 0;
+}
+template<> constexpr int getNumASCopies<true, TF::L2, phiRegions::B>(){ // Allstub memory
+  return 10;
+}
+template<> constexpr int getNumTEICopies<true, TF::L2, phiRegions::B>(){ // TE Inner memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.
+  return 3;
+}
+template<> constexpr int getNumOLCopies<true, TF::L2, phiRegions::B>(){ // TE Inner Overlap memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.
+  return 4;
+}
+template<> constexpr int getNumTEOCopies<true, TF::L2, phiRegions::B>(){ // TE Outer memories, NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.
+  return 5;
+}
+template<> constexpr int getBendCutTableSize<true, TF::L2, phiRegions::B>(){
+  return 8;
+}
+
+template<> inline const int* getFineBinTable<true, TF::L2, phiRegions::B>(){
+  static int lut[] =
+#include "../emData/VMR/tables/VMR_L2PHIB_finebin.tab"
+  return lut;
+}
+
+template<> inline const ap_uint<getBendCutTableSize<true, TF::L2, phiRegions::B>()>* getBendCutInnerTable<true, TF::L2, phiRegions::B>(){
+  const int bendCutTableSize = getBendCutTableSize<true, TF::L2, phiRegions::B>();
+  // TE Memory 1
+	ap_uint<1> tmpBendInnerTable1_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ5n1_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable1_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ5n2_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable1_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ5n3_vmbendcut.tab"
+	// TE Memory 2
+	ap_uint<1> tmpBendInnerTable2_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ6n1_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable2_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ6n2_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable2_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ6n3_vmbendcut.tab"
+	// TE Memory 3
+	ap_uint<1> tmpBendInnerTable3_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ7n1_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable3_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ7n2_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable3_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ7n3_vmbendcut.tab"
+// TE Memory 4
+	ap_uint<1> tmpBendInnerTable4_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ8n1_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable4_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ8n2_vmbendcut.tab"
+	ap_uint<1> tmpBendInnerTable4_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIJ8n3_vmbendcut.tab"
+
+	// Combine all the temporary tables into one big table
+	static ap_uint<bendCutTableSize> bendCutInnerTable[] = {
+		arrayToInt<bendCutTableSize>(tmpBendInnerTable1_n1), arrayToInt<bendCutTableSize>(tmpBendInnerTable1_n2), arrayToInt<bendCutTableSize>(tmpBendInnerTable1_n3),
+		arrayToInt<bendCutTableSize>(tmpBendInnerTable2_n1), arrayToInt<bendCutTableSize>(tmpBendInnerTable2_n2), arrayToInt<bendCutTableSize>(tmpBendInnerTable2_n3),
+		arrayToInt<bendCutTableSize>(tmpBendInnerTable3_n1), arrayToInt<bendCutTableSize>(tmpBendInnerTable3_n2), arrayToInt<bendCutTableSize>(tmpBendInnerTable3_n3),
+		arrayToInt<bendCutTableSize>(tmpBendInnerTable4_n1), arrayToInt<bendCutTableSize>(tmpBendInnerTable4_n2), arrayToInt<bendCutTableSize>(tmpBendInnerTable4_n3)};
+
+  return bendCutInnerTable;
+}
+
+template<> inline const ap_uint<getBendCutTableSize<true, TF::L2, phiRegions::B>()>* getBendCutOverlapTable<true, TF::L2, phiRegions::B>(){
+  const int bendCutTableSize = getBendCutTableSize<true, TF::L2, phiRegions::B>();
+  // TE Overlap Memory 1
+	ap_uint<1> tmpBendOverlapTable1_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY3n5_vmbendcut.tab"
+	ap_uint<1> tmpBendOverlapTable1_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY3n6_vmbendcut.tab"
+	ap_uint<1> tmpBendOverlapTable1_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY3n7_vmbendcut.tab"
+	ap_uint<1> tmpBendOverlapTable1_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY3n8_vmbendcut.tab"
+	// TE Overlap Memory 2
+	ap_uint<1> tmpBendOverlapTable2_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY4n5_vmbendcut.tab"
+	ap_uint<1> tmpBendOverlapTable2_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY4n6_vmbendcut.tab"
+	ap_uint<1> tmpBendOverlapTable2_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY4n7_vmbendcut.tab"
+	ap_uint<1> tmpBendOverlapTable2_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIY4n8_vmbendcut.tab"
+
+	// Combine all the temporary Overlap tables into one big table
+	static ap_uint<bendCutTableSize> bendCutOverlapTable[] = {
+		arrayToInt<bendCutTableSize>(tmpBendOverlapTable1_n1), arrayToInt<bendCutTableSize>(tmpBendOverlapTable1_n2), arrayToInt<bendCutTableSize>(tmpBendOverlapTable1_n3), arrayToInt<bendCutTableSize>(tmpBendOverlapTable1_n4),
+		arrayToInt<bendCutTableSize>(tmpBendOverlapTable2_n1), arrayToInt<bendCutTableSize>(tmpBendOverlapTable2_n2), arrayToInt<bendCutTableSize>(tmpBendOverlapTable2_n3), arrayToInt<bendCutTableSize>(tmpBendOverlapTable2_n4)};
+
+  return bendCutOverlapTable;
+}
+
+template<> inline const ap_uint<getBendCutTableSize<true, TF::L2, phiRegions::B>()>* getBendCutOuterTable<true, TF::L2, phiRegions::B>(){
+  const int bendCutTableSize = getBendCutTableSize<true, TF::L2, phiRegions::B>();
+  // TE Memory 1
+  ap_uint<1> tmpBendOuterTable1_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB9n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable1_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB9n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable1_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB9n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable1_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB9n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable1_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB9n5_vmbendcut.tab"
+  // TE Memory 2
+  ap_uint<1> tmpBendOuterTable2_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB10n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable2_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB10n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable2_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB10n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable2_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB10n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable2_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB10n5_vmbendcut.tab"
+  // TE Memory 3
+  ap_uint<1> tmpBendOuterTable3_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB11n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable3_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB11n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable3_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB11n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable3_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB11n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable3_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB11n5_vmbendcut.tab"
+  // TE Memory 4
+  ap_uint<1> tmpBendOuterTable4_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB12n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable4_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB12n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable4_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB12n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable4_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB12n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable4_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB12n5_vmbendcut.tab"
+  // TE Memory 5
+  ap_uint<1> tmpBendOuterTable5_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB13n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable5_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB13n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable5_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB13n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable5_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB13n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable5_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB13n5_vmbendcut.tab"
+  // TE Memory 6
+  ap_uint<1> tmpBendOuterTable6_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB14n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable6_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB14n2_vmbendcut.tab"
+ap_uint<1> tmpBendOuterTable6_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB14n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable6_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB14n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable6_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB14n5_vmbendcut.tab"
+  // TE Memory 7
+  ap_uint<1> tmpBendOuterTable7_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB15n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable7_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB15n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable7_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB15n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable7_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB15n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable7_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB15n5_vmbendcut.tab"
+  // TE Memory 8
+  ap_uint<1> tmpBendOuterTable8_n1[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB16n1_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable8_n2[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB16n2_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable8_n3[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB16n3_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable8_n4[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB16n4_vmbendcut.tab"
+  ap_uint<1> tmpBendOuterTable8_n5[bendCutTableSize] =
+#include "../emData/VMR/tables/VMSTE_L2PHIB16n5_vmbendcut.tab"
+
+  // Combine all the temporary tables into one big table
+  static ap_uint<bendCutTableSize> bendCutOuterTable[] = {
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable1_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable2_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable3_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable4_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable5_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable6_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable7_n5),
+    arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n1), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n2), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n3), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n4), arrayToInt<bendCutTableSize>(tmpBendOuterTable8_n5)};
+
+  return bendCutOuterTable;
+}
 
 // Add more layers and phi regions
 
