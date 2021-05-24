@@ -2,7 +2,7 @@
 #define TrackletAlgorithm_VMStubMEMemoryCM_h
 
 #include "Constants.h"
-#include "MemoryTemplateBinned.h"
+#include "MemoryTemplateBinnedCM.h"
 
 // VMStubMECMBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSMEType> class VMStubMECMBase {};
@@ -45,7 +45,7 @@ public:
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
     kVMSMEFinePhiSize = 3,
-    kVMSMEBendSize = 4,
+    kVMSMEBendSize = 3,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
     kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
@@ -71,8 +71,8 @@ public:
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> VMSMEID;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
-  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMStubMECMSize> VMStubMECMData;
 
@@ -81,8 +81,8 @@ public:
     data_(newdata)
   {}
 
-  VMStubMECM(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEPHI finephi, const VMSMEFINEZ finez):
-    data_( (((id,bend),finephi),finez) )
+ VMStubMECM(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEPHI finephi, const VMSMEFINEZ finez):
+    data_( (id, bend,finephi, finez) )
   {}
 
   VMStubMECM():
@@ -110,12 +110,12 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
-  VMSMEFINEPHI getFinePhi() const {
-    return data_.range(kVMSMEFinePhiMSB, kVMSMEFinePhiLSB);
-  }
-
   VMSMEFINEZ getFineZ() const {
     return data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB);
+  }
+
+  VMSMEFINEPHI getFinePhi() const {
+    return data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB);
   }
 
   // Setter
@@ -127,12 +127,12 @@ public:
     data_.range(kVMSMEBendMSB,kVMSMEBendLSB) = bend;
   }
 
-  void setFinePhi(const VMSMEFINEPHI finephi) {
-    data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB) = finephi;
-  }
-
   void setFineZ(const VMSMEFINEZ finez) {
     data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
+  }
+
+  void setFinePhi(const VMSMEFINEPHI finephi) {
+    data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB) = finephi;
   }
 
 private:
@@ -142,6 +142,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType, int RZSize, int PhiRegSize > using VMStubMEMemoryCM = MemoryTemplateBinned<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize>;
+template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>;
 
 #endif
