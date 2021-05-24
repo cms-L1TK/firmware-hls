@@ -287,20 +287,20 @@ begin
         if (CLK_COUNT < MAX_ENTRIES) then
           CLK_COUNT := CLK_COUNT + 1;
         else
-	  CLK_COUNT := 1;
-	  EVENT_COUNT := EVENT_COUNT + 1;
+          CLK_COUNT := 1;
+          EVENT_COUNT := EVENT_COUNT + 1;
 
-	  -- PR should start one TM period after time when first event starting being 
-	  -- written to first memory in chain, as it takes this long to write full event.
+          -- PR should start one TM period after time when first event starting being 
+          -- written to first memory in chain, as it takes this long to write full event.
           PR_START <= '1';
-	  PR_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, PR_BX_IN'length));
+          PR_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, PR_BX_IN'length));
 
-	  write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
+          write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
         end if;
-	-- Releae
-	if (CLK_COUNT = CLK_RESET) then 
-	  RESET <= '0';
-	end if;
+        -- Releae
+        if (CLK_COUNT = CLK_RESET) then 
+          RESET <= '0';
+        end if;
       end if;
     end if;
   end process procStart;
@@ -320,19 +320,19 @@ begin
         MC_bx_out                  => MC_bx_out,
         MC_bx_out_vld              => MC_bx_out_vld,
         MC_done                    => MC_done,
-	TPROJ_60_mem_A_wea 	   => TPROJ_60_mem_A_wea,
-	TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
-	TPROJ_60_mem_AV_din 	   => TPROJ_60_mem_AV_din,
-	VMSME_16_mem_A_wea 	   => VMSME_16_mem_A_wea,
-	VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
-	VMSME_16_mem_AV_din 	   => VMSME_16_mem_AV_din,
-	AS_36_mem_A_wea 	   => AS_36_mem_A_wea,
-	AS_36_mem_AV_writeaddr 	   => AS_36_mem_AV_writeaddr,
-	AS_36_mem_AV_din 	   => AS_36_mem_AV_din,
-	FM_52_mem_A_enb 	   => FM_52_mem_A_enb,
-	FM_52_mem_AV_readaddr 	   => FM_52_mem_AV_readaddr,
-	FM_52_mem_AV_dout 	   => FM_52_mem_AV_dout,
-	FM_52_mem_AAV_dout_nent    => FM_52_mem_AAV_dout_nent
+        TPROJ_60_mem_A_wea         => TPROJ_60_mem_A_wea,
+        TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+        TPROJ_60_mem_AV_din        => TPROJ_60_mem_AV_din,
+        VMSME_16_mem_A_wea         => VMSME_16_mem_A_wea,
+        VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
+        VMSME_16_mem_AV_din        => VMSME_16_mem_AV_din,
+        AS_36_mem_A_wea            => AS_36_mem_A_wea,
+        AS_36_mem_AV_writeaddr     => AS_36_mem_AV_writeaddr,
+        AS_36_mem_AV_din           => AS_36_mem_AV_din,
+        FM_52_mem_A_enb            => FM_52_mem_A_enb,
+        FM_52_mem_AV_readaddr      => FM_52_mem_AV_readaddr,
+        FM_52_mem_AV_dout          => FM_52_mem_AV_dout,
+        FM_52_mem_AAV_dout_nent    => FM_52_mem_AAV_dout_nent
       );
   end generate sectorProc;
 
@@ -348,38 +348,38 @@ begin
         MC_bx_out                  => MC_bx_out,
         MC_bx_out_vld              => MC_bx_out_vld,
         MC_done                    => MC_done,
-	-- Debug control signals
+        -- Debug control signals
         PR_bx_out                  => PR_bx_out,
         PR_bx_out_vld              => PR_bx_out_vld,
         PR_done                    => PR_done,
         ME_bx_out                  => ME_bx_out,
         ME_bx_out_vld              => ME_bx_out_vld,
         ME_done                    => ME_done,
-	-- Input data
-	TPROJ_60_mem_A_wea 	   => TPROJ_60_mem_A_wea,
-	TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
-	TPROJ_60_mem_AV_din 	   => TPROJ_60_mem_AV_din,
-	VMSME_16_mem_A_wea 	   => VMSME_16_mem_A_wea,
-	VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
-	VMSME_16_mem_AV_din 	   => VMSME_16_mem_AV_din,
-	AS_36_mem_A_wea 	   => AS_36_mem_A_wea,
-	AS_36_mem_AV_writeaddr 	   => AS_36_mem_AV_writeaddr,
-	AS_36_mem_AV_din 	   => AS_36_mem_AV_din,
-	-- Debug output data
-	VMPROJ_24_mem_A_wea 	   => VMPROJ_24_mem_A_wea,
-	VMPROJ_24_mem_AV_writeaddr => VMPROJ_24_mem_AV_writeaddr,
-	VMPROJ_24_mem_AV_din 	   => VMPROJ_24_mem_AV_din,
-	CM_14_mem_A_wea 	   => CM_14_mem_A_wea,
-	CM_14_mem_AV_writeaddr 	   => CM_14_mem_AV_writeaddr,
-	CM_14_mem_AV_din 	   => CM_14_mem_AV_din,
-	AP_60_mem_A_wea 	   => AP_60_mem_A_wea,
-	AP_60_mem_AV_writeaddr 	   => AP_60_mem_AV_writeaddr,
-	AP_60_mem_AV_din 	   => AP_60_mem_AV_din,
-	-- Output data
-	FM_52_mem_A_enb 	   => FM_52_mem_A_enb,
-	FM_52_mem_AV_readaddr 	   => FM_52_mem_AV_readaddr,
-	FM_52_mem_AV_dout 	   => FM_52_mem_AV_dout,
-	FM_52_mem_AAV_dout_nent    => FM_52_mem_AAV_dout_nent
+        -- Input data
+        TPROJ_60_mem_A_wea         => TPROJ_60_mem_A_wea,
+        TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+        TPROJ_60_mem_AV_din        => TPROJ_60_mem_AV_din,
+        VMSME_16_mem_A_wea         => VMSME_16_mem_A_wea,
+        VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
+        VMSME_16_mem_AV_din        => VMSME_16_mem_AV_din,
+        AS_36_mem_A_wea            => AS_36_mem_A_wea,
+        AS_36_mem_AV_writeaddr     => AS_36_mem_AV_writeaddr,
+        AS_36_mem_AV_din           => AS_36_mem_AV_din,
+        -- Debug output data
+        VMPROJ_24_mem_A_wea        => VMPROJ_24_mem_A_wea,
+        VMPROJ_24_mem_AV_writeaddr => VMPROJ_24_mem_AV_writeaddr,
+        VMPROJ_24_mem_AV_din       => VMPROJ_24_mem_AV_din,
+        CM_14_mem_A_wea            => CM_14_mem_A_wea,
+        CM_14_mem_AV_writeaddr     => CM_14_mem_AV_writeaddr,
+        CM_14_mem_AV_din           => CM_14_mem_AV_din,
+        AP_60_mem_A_wea            => AP_60_mem_A_wea,
+        AP_60_mem_AV_writeaddr     => AP_60_mem_AV_writeaddr,
+        AP_60_mem_AV_din           => AP_60_mem_AV_din,
+        -- Output data
+        FM_52_mem_A_enb            => FM_52_mem_A_enb,
+        FM_52_mem_AV_readaddr      => FM_52_mem_AV_readaddr,
+        FM_52_mem_AV_dout          => FM_52_mem_AV_dout,
+        FM_52_mem_AAV_dout_nent    => FM_52_mem_AAV_dout_nent
       );
   end generate sectorProcFull;
 
@@ -444,7 +444,7 @@ begin
         v_FM_L1L2_L3PHIC_dataarray_data_V_enb_d :=  v_FM_L1L2_L3PHIC_dataarray_data_V_enb_d(MEM_READ_DELAY-2 downto 0) & FM_52_mem_A_enb(L1L2_L3PHIC); -- Required delay
         v_FM_L5L6_L3PHIC_dataarray_data_V_enb_d :=  v_FM_L5L6_L3PHIC_dataarray_data_V_enb_d(MEM_READ_DELAY-2 downto 0) & FM_52_mem_A_enb(L5L6_L3PHIC); -- Required delay
 
-	-- Repeat this multiple times to go through all simulation delta-times.
+        -- Repeat this multiple times to go through all simulation delta-times.
         wait for 0 ns; -- Update signals
         wait for 0 ns; -- Update signals
         wait for 0 ns; -- Update signals
@@ -488,7 +488,7 @@ begin
           writeline (file_out_L5L6, v_line); -- Write line
         end if;
         if (DEBUG=true and v_bx_cnt<=5 and addr<=10) then write(v_line, string'("v_bx_cnt: ")); write(v_line, v_bx_cnt); write(v_line, string'("   FM_L1L2_L3PHIC readaddr: ")); hwrite(v_line, FM_52_mem_AV_readaddr(L1L2_L3PHIC)); write(v_line, string'(", dout: ")); hwrite(v_line, FM_52_mem_AV_dout(L1L2_L3PHIC)); writeline(output, v_line); end if;
-	wait until rising_edge(clk); -- Main time control
+        wait until rising_edge(clk); -- Main time control
       end loop l_addr;
     end loop l_BX;
     file_close(file_out_L1L2);
