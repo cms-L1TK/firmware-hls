@@ -180,7 +180,7 @@ int main() {
     for (unsigned int i = 0; i < maxASCopies; i++) {
       err += compareMemWithFile<AllStubMemory<outputType>>(memoriesAS[i], fout_allstubs[i], ievt, "AllStub", truncation);
     }
-    
+
     // ME Memories
     for (unsigned int i = 0; i < nvmME; i++) {
       err += compareBinnedMemWithFile<VMStubMEMemory<outputType, nbitsbin>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
@@ -196,7 +196,7 @@ int main() {
         }
       }
     }
-    
+
     // TE Inner Overlap memories
     if (nVMSTEOL) {
       int k = 0;
@@ -207,7 +207,7 @@ int main() {
         }
       }
     }
-    
+
     // TE Outer memories
     if (nVMSTEO) {
       int k = 0;

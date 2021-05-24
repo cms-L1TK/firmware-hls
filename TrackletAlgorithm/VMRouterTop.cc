@@ -92,7 +92,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	/////////////////////////
 	// Main function
 
-	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, ap_uint<bendCutTableSize>>
+	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
 	(bx, bx_o, fineBinTable, phiCorrTable,
 		rzBitsInnerTable, rzBitsOverlapTable, rzBitsOuterTable,
 		bendCutInnerTable, bendCutOverlapTable, bendCutOuterTable,
