@@ -16,7 +16,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
 // NBIT_ADDR: number of bits for memory address space per BX
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
-// NCOPY: is the number of memory copies - same as number of TE used
+// NCOPY: is the number of memory copies - same as number of TEUs or MEUs used
 class MemoryTemplateBinnedCM{
 
  public: 
@@ -38,16 +38,37 @@ class MemoryTemplateBinnedCM{
   
  public:
 
+  MemoryTemplateBinnedCM() {
+    clear();
+  }
+  
+  ~MemoryTemplateBinnedCM() {}
+  
+  void clear() {
+#pragma HLS inline
+	
+  clearloop1:for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
+#pragma HLS UNROLL
+      clear(ibx);
+    }
+  }
+
+  void clear(BunchXingT bx) {
+#pragma HLS inline
+	
+  clearloop2:for (unsigned int ibin = 0; ibin < 8; ++ibin) {
+#pragma HLS UNROLL
+      nentries8_[bx][ibin] = 0;
+      binmask8_[bx][ibin] = 0;
+    }
+  }
+
   unsigned int getDepth() const {return kNMemDepth;}
   unsigned int getNBX() const {return kNBxBins;}
   unsigned int getNBins() const {return kNSlots;}
-  unsigned int getNEntryPerBin() const {return (1<<(NBIT_ADDR-NBIT_BIN));}
-  unsigned int getNCopy() const {return NCOPY;}
 
-  NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
-    ap_uint<3> ibin,ireg;
-    (ibin,ireg)=slot;
-    return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
+  NEntryT getEntries(BunchXingT bx, ap_uint<3> rzbin, ap_uint<3> phibin) const {
+    return nentries8_[bx][rzbin].range(phibin*4+3,phibin*4);
   }
 
   ap_uint<32> getEntries8(BunchXingT bx, ap_uint<3> ibin) const {
@@ -73,6 +94,7 @@ class MemoryTemplateBinnedCM{
     return dataarray_[icopy];
   }
 
+
   const DataType (&get_mem() const)[NCOPY][1<<NBIT_BX][1<<NBIT_ADDR] {
     return dataarray_;
   }
@@ -87,29 +109,35 @@ class MemoryTemplateBinnedCM{
 		    ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
-    return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
+    return dataarray_[icopy][ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+index];
   }
   
-  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, int nentry_ibx) {
+  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
-
 #pragma HLS inline
 
-    if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
-      // write address for slot: getNEntryPerBin() * slot + nentry_ibx
+    ap_uint<3> ibin,ireg;    
+    (ibin,ireg)=slot;
+
+    NEntryT nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
+
+    if (nentry_ibx < (1<<(NBIT_ADDR-NBIT_BIN))) {
+      // write address for slot: 1<<(NBIT_ADDR-NBIT_BIN) * slot + nentry_ibx
   
     writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {
 #pragma HLS unroll
-	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
+	dataarray_[icopy][ibx][(1<<(NBIT_ADDR-NBIT_BIN))*slot+nentry_ibx] = data;
       }
 
+      binmask8_[ibx][ibin].set_bit(ireg,true);
+      
+      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      
       return true;
     }
     else {
 #ifndef __SYNTHESIS__
-      if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-        std::cout << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
-      }
+      std::cout << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
 #endif
       return false;
     }
@@ -118,32 +146,7 @@ class MemoryTemplateBinnedCM{
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
-
-  MemoryTemplateBinnedCM() {
-    clear();
-  }
   
-  ~MemoryTemplateBinnedCM() {}
-  
-  void clear() {
-    
-    DataType data("0",16);
-    for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
-      // Clear data
-      for (int i = 0; i < getNBins(); ++i ) {
-        for (int j = 0; j < getNEntryPerBin(); ++j) {
-          write_mem(ibx, i, data, j);
-        }
-      }
-      // Clear nentries8 and binmask8
-      for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
-        nentries8_[ibx][ibin] = 0;
-        binmask8_[ibx][ibin] = 0;
-      }
-    }
-  }
-
-
   ///////////////////////////////////
   std::vector<std::string> split(const std::string& s, char delimiter)
   {
@@ -158,26 +161,21 @@ class MemoryTemplateBinnedCM{
   }
 
   // write memory from text file
-  bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
+  bool write_mem(BunchXingT bx, const std::string& line, int base=16)
   {
 
     std::string datastr = split(line, ' ').back();
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
+    // Originally: atoi(split(line, ' ').front().c_str()); but that didn't work for disks with 16 bins
 
-    ap_uint<3> ibin,ireg;
-    (ireg,ibin)=slot;
-    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
-    
+    //change order HACK...
+    ap_uint<3> ireg,bin;
+    (ireg,bin)=ap_uint<6>(slot);
+    int newslot=(bin,ireg);
+
     DataType data(datastr.c_str(), base);
-
-    bool success = write_mem(ibx, slot, data, nentry_ibx);
-    if (success) {
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      binmask8_[ibx][ibin].set_bit(ireg,true);
-    }
-
-    return success;
+    return write_mem(bx, newslot, data);
   }
 
 
@@ -200,7 +198,7 @@ class MemoryTemplateBinnedCM{
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
       for (int i = 0; i < nentries8_[bx][slot]; ++i) {
 		std::cout << bx << " " << i << " ";
-		print_entry(bx, i + slot*getNEntryPerBin() );
+		print_entry(bx, i + slot*(1<<(NBIT_ADDR-NBIT_BIN)) );
       }
     }
   }

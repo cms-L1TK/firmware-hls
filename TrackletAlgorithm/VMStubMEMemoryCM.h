@@ -118,10 +118,6 @@ public:
     return data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB);
   }
 
-  VMSMEFINEPHI getFinePhi() const {
-    return data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB);
-  }
-
   // Setter
   void setIndex(const VMSMEID id) {
     data_.range(kVMSMEIDMSB,kVMSMEIDLSB) = id;

@@ -41,22 +41,6 @@ public:
     return writeptr_;
   }
 
-
-  inline void reset() {
-#pragma HLS inline
-    readptr_ = 0;
-    writeptr_ = 0;
-  }
-
-  ProjectionRouterBufferArray() {
-    reset();
-    PRBUFF_INIT: for(int i = 0; i < 1<<kNBitsBuffer; ++i) {
-    #pragma HLS unroll
-      projbuffer[i] = ProjectionRouterBuffer<BARREL>();
-    }
-    //reset();
-  }
-
   inline void reset() {
 #pragma HLS inline
     readptr_ = 0;
