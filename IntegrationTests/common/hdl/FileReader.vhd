@@ -106,87 +106,87 @@ begin
         if (not CREATE_DUMMY_DATA) then
           -- Read next line in file.
           readline (FILE_IN, LINE_IN);
-	end if;
+        end if;
 
         if (LINE_IN.all(1 to 2) = "BX") then 
 
-  	  -- New event header
+          -- New event header
 
-	  if (DATA_CNT < MAX_ENTRIES) then
+          if (DATA_CNT < MAX_ENTRIES) then
 
-	    -- Last event didn't have full number of entries in file,
-	    -- so invent dummy data to represent the remainder.
+            -- Last event didn't have full number of entries in file,
+            -- so invent dummy data to represent the remainder.
             WRITE_EN <= '0';
             ADDR     <= (others => '0');
             DATA     <= (others => '0');
-	    DATA_CNT := DATA_CNT + 1;
-  	    -- We sent output signals, so stop looping
-	    LOOPING := false;
-	    -- Note that we're creating dummy data.
-	    CREATE_DUMMY_DATA := true;
+            DATA_CNT := DATA_CNT + 1;
+            -- We sent output signals, so stop looping
+            LOOPING := false;
+            -- Note that we're creating dummy data.
+            CREATE_DUMMY_DATA := true;
 
-	  else
+          else
 
-	    -- We've finished processing last event, so get on with new one.
+            -- We've finished processing last event, so get on with new one.
             BX_CNT := BX_CNT + 1;
-  	    PAGE := BX_CNT mod NUM_PAGES;
-	    DATA_CNT := 0;
-	    -- Note that we are now reading data from file again.
-	    CREATE_DUMMY_DATA := false;
+            PAGE := BX_CNT mod NUM_PAGES;
+            DATA_CNT := 0;
+            -- Note that we are now reading data from file again.
+            CREATE_DUMMY_DATA := false;
 
-	  end if;
+          end if;
 
         elsif (LINE_IN.all = "") then
 
-	  -- Skip blank lines
+          -- Skip blank lines
 
-	elsif (BX_CNT >= 0) then
+        elsif (BX_CNT >= 0) then
 
-  	  CNT_X_CHAR := 0;
-	  FOUND_WORD := false;
+          CNT_X_CHAR := 0;
+          FOUND_WORD := false;
 
-  	  -- Line containing data. Extract data word.
+          -- Line containing data. Extract data word.
 
-	  if (NUM_BINS > 1) then
-	    -- Get memory bin 
+          if (NUM_BINS > 1) then
+            -- Get memory bin 
             read(LINE_IN, CHAR);        
             char2int(CHAR, MEM_BIN);
             read(LINE_IN, CHAR);        
             read(LINE_IN, CHAR);        
             char2int(CHAR, POS_IN_MEM_BIN);
-	  end if;
+          end if;
 
           rd_col : while (LINE_IN'length > 0) loop -- Loop over the columns
             read(LINE_IN, CHAR);                 -- Read chars ...
             if (CHAR = 'x') then                   -- ... until the next x
-	      CNT_X_CHAR := CNT_X_CHAR + 1;
+              CNT_X_CHAR := CNT_X_CHAR + 1;
               if ((NUM_BINS > 1 and CNT_X_CHAR = NUM_X_CHAR_BINNED) or
-	          (NUM_BINS = 1 and CNT_X_CHAR = NUM_X_CHAR_UNBINNED)) then -- No. of 'x' chars reached
-	        -- Found data word.
-	        FOUND_WORD := true;
-	        hread(line_in, emDATA(LINE_IN'length*4-1 downto 0)); -- Read remainer of line as hex. 
-	      end if;
-	    end if;
+                  (NUM_BINS = 1 and CNT_X_CHAR = NUM_X_CHAR_UNBINNED)) then -- No. of 'x' chars reached
+                -- Found data word.
+                FOUND_WORD := true;
+                hread(line_in, emDATA(LINE_IN'length*4-1 downto 0)); -- Read remainer of line as hex. 
+              end if;
+            end if;
           end loop rd_col;
 
-	  assert FOUND_WORD report "Unexpected data line format in "&FILE_NAME&" "&integer'image(CNT_X_CHAR) severity FAILURE;	 
+          assert FOUND_WORD report "Unexpected data line format in "&FILE_NAME&" "&integer'image(CNT_X_CHAR) severity FAILURE;   
 
           -- Truncate data word to desired width.
           DATA <= emDATA(RAM_WIDTH-1 downto 0);
-	  if (NUM_BINS > 1) then
-	    -- Binned memory
-  	    ADDR <= std_logic_vector(to_unsigned(POS_IN_MEM_BIN + BIN_SIZE*MEM_BIN + PAGE_LENGTH*PAGE, ADDR_WIDTH));
-	  else
-	    -- Unbinned memory
-  	    ADDR <= std_logic_vector(to_unsigned(DATA_CNT + PAGE_LENGTH*PAGE, ADDR_WIDTH));
+          if (NUM_BINS > 1) then
+            -- Binned memory
+            ADDR <= std_logic_vector(to_unsigned(POS_IN_MEM_BIN + BIN_SIZE*MEM_BIN + PAGE_LENGTH*PAGE, ADDR_WIDTH));
+          else
+            -- Unbinned memory
+            ADDR <= std_logic_vector(to_unsigned(DATA_CNT + PAGE_LENGTH*PAGE, ADDR_WIDTH));
           end if;
-	  WRITE_EN <= '1';
-	  DATA_CNT := DATA_CNT + 1;
-	  -- We sent output signals, so stop looping
-	  LOOPING := false;
+          WRITE_EN <= '1';
+          DATA_CNT := DATA_CNT + 1;
+          -- We sent output signals, so stop looping
+          LOOPING := false;
 
         else
-  	  assert false report "No BX header before data in "&FILE_NAME severity FAILURE;
+          assert false report "No BX header before data in "&FILE_NAME severity FAILURE;
         end if;
       end loop findNextDataLine;
     end if;
