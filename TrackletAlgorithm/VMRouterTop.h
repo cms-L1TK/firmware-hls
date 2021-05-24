@@ -2,6 +2,7 @@
 #define TrackletAlgorithm_VMRouterTop_h
 
 #include "VMRouter.h"
+#include "VMRouter_parameters.h"
 
 // VMRouter Top Function for layer 1, AllStub region E
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
@@ -23,25 +24,26 @@
 #define kLAYER 1 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
 
-constexpr char phiRegion = 'E'; // Which AllStub/PhiRegion
-constexpr int sector = 4; //  Specifies the sector
-
-// Maximum number of memory "copies" for this Phi region
-// Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int maxASCopies(4); // Allstub memory
-constexpr int maxTEICopies(5); // TE Inner memories
-constexpr int maxOLCopies(3); // TE Inner Overlap memories
-constexpr int maxTEOCopies(1); // TE Outer memories
-
-// Number of inputs
-constexpr int numInputs(7); // Number of input memories, EXCLUDING DISK2S
-constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
-
-constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. Can't use 0.
+constexpr phiRegions phiRegion = phiRegions::E; // Which AllStub/PhiRegion
 
 
 ///////////////////////////////////////////////
 // Variables that don't need manual changing
+
+constexpr bool isLayer = (kLAYER) ? true : false;
+constexpr int layerDisk = (kLAYER) ? kLAYER-1 : kDISK-1;
+
+// Number of inputs
+constexpr int numInputs = getNumInputs<isLayer, layerDisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S = getNumInputsDisk2S<isLayer, layerDisk, phiRegion>(); // Number of DISK2S input memories
+
+// Maximum number of memory "copies" for this Phi region
+constexpr int maxASCopies = getNumASCopies<isLayer, layerDisk, phiRegion>(); // Allstub memory
+constexpr int maxTEICopies = getNumTEICopies<isLayer, layerDisk, phiRegion>(); // TE Inner memories
+constexpr int maxOLCopies = getNumOLCopies<isLayer, layerDisk, phiRegion>(); // TE Inner memories
+constexpr int maxTEOCopies = getNumTEOCopies<isLayer, layerDisk, phiRegion>(); // TE Outer memories
+
+constexpr int bendCutTableSize = getBendCutTableSize<isLayer, layerDisk, phiRegion>(); // Number of entries in each bendcut table
 
 #if kLAYER == kDISK
 #error kLAYER and kDISK cannot be the same

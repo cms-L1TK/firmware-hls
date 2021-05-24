@@ -86,19 +86,6 @@ constexpr int NBitsBinTEO = 3;
 //////////////////////////////////////
 // Functions used by the VMR
 
-// Converts an array of 0s and 1s to an ap_uint
-template<int arraySize>
-inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
-	ap_uint<arraySize> number;
-
-	for(int i = 0; i < arraySize; i++) {
-		#pragma HLS unroll
-		number[i] = array[i];
-	}
-
-	return number;
-}
-
 // Returns top 5 (nbits_maxvm) bits of phi, i.e. max 31 in decimal
 template<regionType InType>
 inline ap_uint<nbits_maxvm> iphivmRaw(const typename AllStub<InType>::ASPHI phi) {
@@ -580,12 +567,12 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 // Layer Disk - Specifies the layer or disk number
 // MAXCopies - The maximum number of copies of a memory type
 // NBitsBin number of bits used for the bins in MEMemories
-template<regionType InType, regionType OutType, int Layer, int Disk, int nInputMems, int nInputDisk2SMems, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin, int BendCutTableSize>
+template<regionType InType, regionType OutType, int Layer, int Disk, int nInputMems, int nInputDisk2SMems, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin, class T>
 void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int phiCorrTable[],
 		// rzbitstables, aka binlookup in emulation
 		const int rzbitsInnerTable[], const int rzbitsOverlapTable[], const int rzbitsOuterTable[],
 		// bendcut tables
-		const ap_uint<BendCutTableSize> bendCutInnerTable[], const ap_uint<BendCutTableSize> bendCutOverlapTable[], const ap_uint<BendCutTableSize> bendCutOuterTable[],
+		const T bendCutInnerTable[], const T bendCutOverlapTable[], const T bendCutOuterTable[],
 		// Input memories
 		const InputStubMemory<InType> inputStubs[],
 		const InputStubMemory<DISK2S> inputStubsDisk2S[],

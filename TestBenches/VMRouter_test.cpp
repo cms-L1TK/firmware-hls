@@ -35,18 +35,21 @@ vector<int> countCopies(vector<string> fileNames) {
 
 int main() {
 
+  constexpr int sector = 4; //  Specifies the sector
+  constexpr char phi = static_cast<char>(phiRegion);
+
   char overlapPhiRegion[] = {'X', 'Y', 'Z', 'W', 'Q', 'R', 'S', 'T'}; // Special naming for the TE overlap memories, and outer memories in Disk 1
   char extraPhiRegion[] = {'I', 'J', 'K', 'L'}; // Special naming for the extra memories TEInner L2 and TEOuter L3.
 
-  char teiPhiRegion = (kLAYER != 2) ? phiRegion : extraPhiRegion[phiRegion - 'A'];
-  char teolPhiRegion = (kLAYER == 1 || kLAYER == 2) ? overlapPhiRegion[phiRegion - 'A'] : ' ';
-  char teoPhiRegion = (kDISK == 1) ? overlapPhiRegion[phiRegion - 'A'] : ((kLAYER == 3) ? extraPhiRegion[phiRegion - 'A'] : phiRegion);
+  char teiPhiRegion = (kLAYER != 2) ? phi : extraPhiRegion[phi - 'A'];
+  char teolPhiRegion = (kLAYER == 1 || kLAYER == 2) ? overlapPhiRegion[phi - 'A'] : ' ';
+  char teoPhiRegion = (kDISK == 1) ? overlapPhiRegion[phi - 'A'] : ((kLAYER == 3) ? extraPhiRegion[phi - 'A'] : phi);
 
 
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phiRegion;
+  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phi;
   TBHelper tb("VMR/VMR_" + vmrID);
 
   // String patterns of the memory file names
