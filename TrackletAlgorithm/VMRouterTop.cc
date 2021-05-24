@@ -39,11 +39,11 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 // Takes 2 clock cycles before on gets data, used at high frequencies
 #pragma HLS resource variable=inputStubs[0].get_mem() latency=2
 #pragma HLS resource variable=inputStubs[1].get_mem() latency=2
-#pragma HLS resource variable=inputStubs[2].get_mem() latency=2
-#pragma HLS resource variable=inputStubs[3].get_mem() latency=2
-#pragma HLS resource variable=inputStubs[4].get_mem() latency=2
-#pragma HLS resource variable=inputStubs[5].get_mem() latency=2
-#pragma HLS resource variable=inputStubs[6].get_mem() latency=2
+// #pragma HLS resource variable=inputStubs[2].get_mem() latency=2
+// #pragma HLS resource variable=inputStubs[3].get_mem() latency=2
+// #pragma HLS resource variable=inputStubs[4].get_mem() latency=2
+// #pragma HLS resource variable=inputStubs[5].get_mem() latency=2
+// #pragma HLS resource variable=inputStubs[6].get_mem() latency=2
 
 #pragma HLS interface register port=bx_o
 
