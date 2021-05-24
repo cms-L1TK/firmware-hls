@@ -114,8 +114,8 @@ void TrackMerger(const BXType bx,
                   }
                 }
               }
-              minPhiRes = phiRes[0];
-              trkFit.setStubPhiResid(minPhiRes);
+              //minPhiRes = phiRes[0];
+              //trkFit.setStubPhiResid(minPhiRes);
             }
 
          // if there are > 3 stubs in common, merge tracks into single track
