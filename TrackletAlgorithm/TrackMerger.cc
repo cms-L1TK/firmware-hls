@@ -103,19 +103,12 @@ void TrackMerger(const BXType bx,
             }
             
             // set phi res to smallest value for each index
-            int minPhiRes[TrackFit::kNStubs];
             for (int m = stubIndex[0]; m < stubIndex[TrackFit::kNStubs]; m++){
-              for(int i = 0; i < phiRes[TrackFit::kNStubs]; i++){
-                for (int x; x < phiRes[TrackFit::kNStubs] - 1; x++){
-                  if (phiRes[x] > phiRes[x+1]){
-                    double temp_value = phiRes[x];
-                    phiRes[x] =  phiRes[x+1];
-                    phiRes[x+1] = temp_value;
-                  }
-                }
+              int min_value = 999;
+              for(int i = 0; i < TrackFit::kNStubs; i++){
+                 if (phiRes[i] < min_value) min_value = phiRes[i];
               }
-              //minPhiRes = phiRes[0];
-              //trkFit.setStubPhiResid(minPhiRes);
+              //trkFit.setStubPhiResid(min_value);
             }
 
          // if there are > 3 stubs in common, merge tracks into single track
