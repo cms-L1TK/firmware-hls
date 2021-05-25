@@ -21,10 +21,10 @@ void TrackMerger(const BXType bx,
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
         auto trackStubMap = trkFit.getHitMap();
-        std::cout << "Track Stub Map: " << trackStubMap << std::endl;
+        //std::cout << "Track Stub Map: " << trackStubMap << std::endl;
         // every 3 bits is a new layer/disk - getting number of stubs in each layer
         for (int layer = 0; layer < trackStubMap.length()/TrackFit::kTFHitCountSize; layer++){
-            int stubNumber = trackStubMap.range(trackStubMap.length() - TrackFit::kTFHitCountSize*layer, trackStubMap.length() - TrackFit::kTFHitCountSize*(layer + 1));
+            int stubNumber = trackStubMap.range(trackStubMap.length() - TrackFit::kTFHitCountSize*layer - 1 , trackStubMap.length() - TrackFit::kTFHitCountSize*(layer + 1));
              
              for (unsigned int j = 0; j < TrackFit::kNBarrelStubs - 1; j++){
                  switch (j){
