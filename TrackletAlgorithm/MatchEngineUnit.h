@@ -30,7 +30,6 @@ class MatchEngineUnitBase<BARREL> {
  public:
   enum BitWidths{
     kNBitsBuffer=3,
-    kNMatchEngines=4
   };
 };
 
