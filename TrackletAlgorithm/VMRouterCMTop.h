@@ -82,7 +82,7 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 || kDISK == 3
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize> *memoryME
+	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 	, VMStubTEOuterMemoryCM<outputType,rzSizeTE,phiRegSize,numTEOCopies> *memoryTEO
 #endif
