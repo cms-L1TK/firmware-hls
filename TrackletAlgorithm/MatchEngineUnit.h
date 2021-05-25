@@ -210,7 +210,7 @@ inline MATCH read() {
 
 }
 
- inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024], bool print) {
+ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
@@ -289,9 +289,7 @@ inline MATCH read() {
    }
 
    //Read stub memory and extract data fields
-   ap_uint<10> stubadd=(zbin,iphiSave,istubtmp);
-   if (print) {
-   }
+   ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
    stubdata_ = stubmem[bx&1][stubadd];
    projfinephi__ = projfinephi_;
    projfinezadj_ = projfinezadj;
@@ -334,7 +332,7 @@ inline MATCH read() {
  ap_int<5> projfinephi_; //FIXME Need replace 5 with const
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid;
  bool isPSseed;
- typename ProjectionRouterBuffer<BARREL, AllProjectionType>::VMPZBIN zbin;
+ typename ProjectionRouterBuffer<BARREL, AllProjectionType>::VMPZBINNOFLAG zbin;
  VMProjection<BARREL>::VMPRINV projrinv;
  VMProjection<BARREL>::VMPID projindex;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
