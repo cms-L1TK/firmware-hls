@@ -6,6 +6,7 @@ variables:
   CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
 
 stages: # ---------------------------------------------------------------------
+  - download
   - quality-check
   - hls-build
   - topTF-sim
@@ -27,9 +28,7 @@ stages: # ---------------------------------------------------------------------
     # Needed for new tool version
     - source /opt/rh/llvm-toolset-7.0/enable
   script:
-    - cd emData
-    - ./download.sh
-    - cd ../project
+    - cd project
     - pwd; ls -la; # Debug
     # Hard coded -config='' because the quotes do not work in the variable
     - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
@@ -46,7 +45,6 @@ stages: # ---------------------------------------------------------------------
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
       - ./project/
-      - ./emData/
     expire_in: 1 week
 
 .job_template: &template_topTF-sim
@@ -94,6 +92,20 @@ stages: # ---------------------------------------------------------------------
     expire_in: 1 week
     
 # Jobs ------------------------------------------------------------------------
+# Download ------------
+download:
+  tags:
+    - xilinx-tools
+  stage: download
+  script:
+    - cd emData
+    - ./download.sh
+  artifacts:
+    when: on_success
+    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+    paths:
+      - ./emData/
+    expire_in: 1 week
 # Quality checks ------------
 IR-quality-check:
   <<: *template_quality-check
@@ -232,6 +244,7 @@ topPRMEMC-sim:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   dependencies: # needed to avoid interference from ME-vitis-hls-build
+    - download
     - PR-vivado-hls-build
     - ME-vivado-hls-build
     - MC-vivado-hls-build
@@ -243,6 +256,7 @@ topPRMEMC-check-results:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
     PROJ_NAME: "PRMEMC"
   dependencies:
+    - download
     - PR-vivado-hls-build
     - ME-vivado-hls-build
     - MC-vivado-hls-build
