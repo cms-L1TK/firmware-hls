@@ -177,7 +177,7 @@ uint8_t NASMemInner(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::E)
     return 2;
   else if (Seed == TF::L1L2 && iTC == TC::F)
-    return 2;
+    return 1;
   else if (Seed == TF::L1L2 && iTC == TC::G)
     return 1;
   else if (Seed == TF::L1L2 && iTC == TC::H)
@@ -185,27 +185,15 @@ uint8_t NASMemInner(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::I)
     return 1;
   else if (Seed == TF::L1L2 && iTC == TC::J)
-    return 1;
+    return 2;
   else if (Seed == TF::L1L2 && iTC == TC::K)
     return 2;
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 1;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 1;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
     return 2;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
-    return 1;
   else if (Seed == TF::L3L4 && iTC == TC::D)
     return 2;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
-    return 1;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 1;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 1;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 1;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 2;
   else if (Seed == TF::L5L6 && iTC == TC::D)
@@ -239,21 +227,9 @@ uint8_t NASMemOuter(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 1;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 1;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
     return 2;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
-    return 1;
   else if (Seed == TF::L3L4 && iTC == TC::D)
     return 2;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
-    return 1;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 2;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 2;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 1;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 2;
   else if (Seed == TF::L5L6 && iTC == TC::D)
@@ -273,7 +249,7 @@ uint8_t NSPMem(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::E)
     return 13;
   else if (Seed == TF::L1L2 && iTC == TC::F)
-    return 13;
+    return 12;
   else if (Seed == TF::L1L2 && iTC == TC::G)
     return 13;
   else if (Seed == TF::L1L2 && iTC == TC::H)
@@ -283,25 +259,13 @@ uint8_t NSPMem(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::J)
     return 13;
   else if (Seed == TF::L1L2 && iTC == TC::K)
-    return 12;
+    return 13;
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 12;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 12;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
-    return 12;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
-    return 12;
+    return 23;
   else if (Seed == TF::L3L4 && iTC == TC::D)
-    return 12;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
-    return 11;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 11;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 11;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 11;
+    return 23;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 30;
   else if (Seed == TF::L5L6 && iTC == TC::D)
@@ -321,35 +285,23 @@ uint32_t ASInnerMask(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::E)
     return 0x1FE0;
   else if (Seed == TF::L1L2 && iTC == TC::F)
-    return 0x1000;
+    return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::G)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::H)
-    return 0x1FC0;
+    return 0x1F80;
   else if (Seed == TF::L1L2 && iTC == TC::I)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::J)
-    return 0x0;
+    return 0x1FFE;
   else if (Seed == TF::L1L2 && iTC == TC::K)
-    return 0xF80;
+    return 0x1F00;
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 0x0;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 0x0;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
-    return 0xC00;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
-    return 0x0;
+    return 0x400000;
   else if (Seed == TF::L3L4 && iTC == TC::D)
-    return 0xC00;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
-    return 0x0;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 0x0;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 0x0;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 0x0;
+    return 0x7FFFFE;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 0x30000000;
   else if (Seed == TF::L5L6 && iTC == TC::D)
@@ -365,61 +317,49 @@ uint32_t ASOuterMask(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::C)
     return 0x620;
   else if (Seed == TF::L1L2 && iTC == TC::D)
-    return 0x8;
+    return 0x1FF7;
   else if (Seed == TF::L1L2 && iTC == TC::E)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::F)
     return 0xC40;
   else if (Seed == TF::L1L2 && iTC == TC::G)
-    return 0x1FEE;
+    return 0x1FDC;
   else if (Seed == TF::L1L2 && iTC == TC::H)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::I)
-    return 0x1880;
+    return 0x1100;
   else if (Seed == TF::L1L2 && iTC == TC::J)
-    return 0x1FDC;
+    return 0x1FB9;
   else if (Seed == TF::L1L2 && iTC == TC::K)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 0x0;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 0x0;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
-    return 0x300;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
-    return 0x0;
+    return 0x300000;
   else if (Seed == TF::L3L4 && iTC == TC::D)
-    return 0x300;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
-    return 0x0;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 0x600;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 0x7FC;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 0x0;
+    return 0x7FFFF9;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 0xE080000;
   else if (Seed == TF::L5L6 && iTC == TC::D)
-    return 0x41C;
+    return 0x3FFFFBE3;
   return 0;
 }
 
 uint32_t TPROJMaskBarrel(const TF::seed Seed, const TC::itc iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
-    return 0x3333000;
+    return 0x3311000;
   else if (Seed == TF::L1L2 && iTC == TC::B)
-    return 0x7333000;
+    return 0x3333000;
   else if (Seed == TF::L1L2 && iTC == TC::C)
-    return 0x7733000;
+    return 0x7333000;
   else if (Seed == TF::L1L2 && iTC == TC::D)
-    return 0x7777000;
+    return 0x7733000;
   else if (Seed == TF::L1L2 && iTC == TC::E)
-    return 0xF777000;
+    return 0x7776000;
   else if (Seed == TF::L1L2 && iTC == TC::F)
-    return 0xFF66000;
+    return 0x7766000;
   else if (Seed == TF::L1L2 && iTC == TC::G)
-    return 0xFEE6000;
+    return 0xEE66000;
   else if (Seed == TF::L1L2 && iTC == TC::H)
     return 0xEEEE000;
   else if (Seed == TF::L1L2 && iTC == TC::I)
@@ -429,27 +369,15 @@ uint32_t TPROJMaskBarrel(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::K)
     return 0xCCCC000;
   else if (Seed == TF::L1L2 && iTC == TC::L)
-    return 0xCCC8000;
+    return 0xCC88000;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 0x330030E;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
-    return 0x730031E;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
-    return 0x770063C;
+    return 0x3300306;
   else if (Seed == TF::L3L4 && iTC == TC::D)
-    return 0xF600678;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
-    return 0xEE00CF0;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 0xEC00CE0;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 0xCC008C0;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 0xC8008C0;
+    return 0xCC00CE0;
   else if (Seed == TF::L5L6 && iTC == TC::A)
-    return 0x3771E;
+    return 0x3330E;
   else if (Seed == TF::L5L6 && iTC == TC::D)
-    return 0xCCCE0;
+    return 0xCCCF0;
   return 0;
 }
 
@@ -457,13 +385,13 @@ uint32_t TPROJMaskDisk(const TF::seed Seed, const TC::itc iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x3333;
   else if (Seed == TF::L1L2 && iTC == TC::B)
-    return 0x7777;
+    return 0x3333;
   else if (Seed == TF::L1L2 && iTC == TC::C)
     return 0x7777;
   else if (Seed == TF::L1L2 && iTC == TC::D)
     return 0x7777;
   else if (Seed == TF::L1L2 && iTC == TC::E)
-    return 0xFFFF;
+    return 0x7777;
   else if (Seed == TF::L1L2 && iTC == TC::F)
     return 0xFFFF;
   else if (Seed == TF::L1L2 && iTC == TC::G)
@@ -479,21 +407,9 @@ uint32_t TPROJMaskDisk(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 0xCCCC;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 0x33;
-  else if (Seed == TF::L3L4 && iTC == TC::B)
-    return 0x77;
-  else if (Seed == TF::L3L4 && iTC == TC::C)
     return 0x77;
   else if (Seed == TF::L3L4 && iTC == TC::D)
-    return 0xFF;
-  else if (Seed == TF::L3L4 && iTC == TC::E)
     return 0xEE;
-  else if (Seed == TF::L3L4 && iTC == TC::F)
-    return 0xEE;
-  else if (Seed == TF::L3L4 && iTC == TC::G)
-    return 0xCC;
-  else if (Seed == TF::L3L4 && iTC == TC::H)
-    return 0xCC;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 0x0;
   else if (Seed == TF::L5L6 && iTC == TC::D)
