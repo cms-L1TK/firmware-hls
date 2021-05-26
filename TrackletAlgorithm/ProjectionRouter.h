@@ -43,8 +43,6 @@ namespace PR
 
   // number of bits used to distinguish allstub memories for each layer
   constexpr unsigned int nbits_allstubslayers[6]={3,2,2,2,2,2};
-  // number of bits used to distinguish VMs in one allstub block for each layer
-  constexpr unsigned int nbits_vmmelayers[6]={2,3,3,3,3,3};
 
   // number of bits used to distinguish allstub memories for each disk
   constexpr unsigned int nbits_allstubsdisks[5]={2,2,2,2,2};
