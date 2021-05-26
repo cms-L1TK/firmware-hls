@@ -45,7 +45,7 @@ public:
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
     kVMSMEFinePhiSize = 3,
-    kVMSMEBendSize = 3,
+    kVMSMEBendSize = 4,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
     kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
