@@ -8,23 +8,23 @@
 enum class phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};
 
 // The functions that returns the LUTs and parameters
-template<TF::layerDisk> const int* getPhiCorrTable();
-template<TF::layerDisk> const int* getRzBitsInnerTable();
-template<TF::layerDisk> const int* getRzBitsOverlapTable();
-template<TF::layerDisk> const int* getRzBitsOuterTable();
-template<TF::layerDisk, phiRegions phi> const int* getFineBinTable();
-template<TF::layerDisk, phiRegions phi, int size> const ap_uint<size>* getBendCutInnerTable();
-template<TF::layerDisk, phiRegions phi, int size> const ap_uint<size>* getBendCutOverlapTable();
-template<TF::layerDisk, phiRegions phi, int size> const ap_uint<size>* getBendCutOuterTable();
+template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();
+template<TF::layerDisk LayerDisk> const int* getRzBitsInnerTable();
+template<TF::layerDisk LayerDisk> const int* getRzBitsOverlapTable();
+template<TF::layerDisk LayerDisk> const int* getRzBitsOuterTable();
+template<TF::layerDisk LayerDisk, phiRegions Phi> const int* getFineBinTable();
+template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutInnerTable();
+template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutOverlapTable();
+template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutOuterTable();
 
-template<TF::layerDisk, phiRegions phi> constexpr int getNumInputs();
-template<TF::layerDisk, phiRegions phi> constexpr int getNumInputsDisk2S();
-template<TF::layerDisk, phiRegions phi> constexpr int getNumASCopies();
-template<TF::layerDisk, phiRegions phi> constexpr int getNumTEICopies();
-template<TF::layerDisk, phiRegions phi> constexpr int getNumOLCopies();
-template<TF::layerDisk, phiRegions phi> constexpr int getNumTEOCopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputsDisk2S();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASCopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumTEICopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumOLCopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumTEOCopies();
 
-template<TF::layerDisk, phiRegions phi> constexpr int getBendCutTableSize();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getBendCutTableSize();
 
 // Help function that converts an array of 0s and 1s to an ap_uint
 template<int arraySize>

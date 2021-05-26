@@ -28,22 +28,21 @@ constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 ///////////////////////////////////////////////
 // Values that don't need manual changing
 
-constexpr bool isLayer = (kLAYER) ? true : false;
-constexpr int layerDisk = (kLAYER) ? kLAYER-1 : kDISK-1;
+constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
 
 // Number of inputs
-constexpr int numInputs = getNumInputs<isLayer, layerDisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
-constexpr int numInputsDisk2S = getNumInputsDisk2S<isLayer, layerDisk, phiRegion>(); // Number of DISK2S input memories
+constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S = getNumInputsDisk2S<layerdisk, phiRegion>(); // Number of DISK2S input memories
 
 // Maximum number of memory "copies" for this Phi region
-constexpr int numASCopies = getNumASCopies<isLayer, layerDisk, phiRegion>(); // Allstub memory
-constexpr int numASInnerCopies = getNumASInnerCopies<isLayer, layerDisk, phiRegion>(); // Allstub Inner memory
-constexpr int numTEOCopies = getNumTEOCopies<isLayer, layerDisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories
+constexpr int numASCopies = getNumASCopies<layerdisk, phiRegion>(); // Allstub memory
+constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory
+constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories
 
 // Masks of which AllStubInner memories that are being used in this phi region; represente by a "1"
 // First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
 // NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
-static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<isLayer, layerDisk, phiRegion>();
+static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<layerdisk, phiRegion>();
 
 //Bit size of phi and rz bins
 constexpr int phiRegSize(3);
