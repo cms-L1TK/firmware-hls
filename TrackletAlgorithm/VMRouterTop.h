@@ -26,20 +26,19 @@ constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 ///////////////////////////////////////////////
 // Variables that don't need manual changing
 
-constexpr bool isLayer = (kLAYER) ? true : false;
-constexpr int layerDisk = (kLAYER) ? kLAYER-1 : kDISK-1;
+constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
 
 // Number of inputs
-constexpr int numInputs = getNumInputs<isLayer, layerDisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
-constexpr int numInputsDisk2S = getNumInputsDisk2S<isLayer, layerDisk, phiRegion>(); // Number of DISK2S input memories
+constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S = getNumInputsDisk2S<layerdisk, phiRegion>(); // Number of DISK2S input memories
 
 // Maximum number of memory "copies" for this Phi region
-constexpr int maxASCopies = getNumASCopies<isLayer, layerDisk, phiRegion>(); // Allstub memory
-constexpr int maxTEICopies = getNumTEICopies<isLayer, layerDisk, phiRegion>(); // TE Inner memories
-constexpr int maxOLCopies = getNumOLCopies<isLayer, layerDisk, phiRegion>(); // TE Inner memories
-constexpr int maxTEOCopies = getNumTEOCopies<isLayer, layerDisk, phiRegion>(); // TE Outer memories
+constexpr int maxASCopies = getNumASCopies<layerdisk, phiRegion>(); // Allstub memory
+constexpr int maxTEICopies = getNumTEICopies<layerdisk, phiRegion>(); // TE Inner memories
+constexpr int maxOLCopies = getNumOLCopies<layerdisk, phiRegion>(); // TE Inner memories
+constexpr int maxTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories
 
-constexpr int bendCutTableSize = getBendCutTableSize<isLayer, layerDisk, phiRegion>(); // Number of entries in each bendcut table
+constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); // Number of entries in each bendcut table
 
 #if kLAYER == kDISK
 #error kLAYER and kDISK cannot be the same

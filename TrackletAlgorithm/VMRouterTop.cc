@@ -49,27 +49,27 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	// LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
 	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
 	// Indexed using r and z position bits
-	static const int* fineBinTable = getFineBinTable<isLayer, layerDisk, phiRegion>();
+	static const int* fineBinTable = getFineBinTable<layerdisk, phiRegion>();
 
 	// LUT with phi corrections to project the stub to the average radius in a layer.
 	// Only used by layers.
 	// Indexed using phi and bend bits
-	static const int* phiCorrTable = getPhiCorrTable<isLayer, layerDisk>();
+	static const int* phiCorrTable = getPhiCorrTable<layerdisk>();
 
 	// LUT with the Z/R bits for TE memories
 	// Contain information about where in z to look for valid stub pairs
 	// Indexed using z and r position bits
-	static const int* rzBitsInnerTable = getRzBitsInnerTable<isLayer, layerDisk>();
-	static const int* rzBitsOverlapTable = getRzBitsOverlapTable<isLayer, layerDisk>();
-	static const int* rzBitsOuterTable = getRzBitsOuterTable<isLayer, layerDisk>();
+	static const int* rzBitsInnerTable = getRzBitsInnerTable<layerdisk>();
+	static const int* rzBitsOverlapTable = getRzBitsOverlapTable<layerdisk>();
+	static const int* rzBitsOuterTable = getRzBitsOuterTable<layerdisk>();
 
 	// LUT with bend-cuts for the TE memories
 	// The cuts are different depending on the memory version (nX)
 	// Indexed using bend bits
 	// Note: use an array of zeros for "missing" memories in the first and last Phi Region
-	static const ap_uint<bendCutTableSize>* bendCutInnerTable = getBendCutInnerTable<isLayer, layerDisk, phiRegion, bendCutTableSize>();
-	static const ap_uint<bendCutTableSize>* bendCutOverlapTable = getBendCutOverlapTable<isLayer, layerDisk, phiRegion, bendCutTableSize>();
-	static const ap_uint<bendCutTableSize>* bendCutOuterTable = getBendCutOuterTable<isLayer, layerDisk, phiRegion, bendCutTableSize>();
+	static const ap_uint<bendCutTableSize>* bendCutInnerTable = getBendCutInnerTable<layerdisk, phiRegion, bendCutTableSize>();
+	static const ap_uint<bendCutTableSize>* bendCutOverlapTable = getBendCutOverlapTable<layerdisk, phiRegion, bendCutTableSize>();
+	static const ap_uint<bendCutTableSize>* bendCutOuterTable = getBendCutOuterTable<layerdisk, phiRegion, bendCutTableSize>();
 
 	//////////////////////////////////
 	// Create memory masks
