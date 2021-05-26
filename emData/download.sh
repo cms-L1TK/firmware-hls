@@ -1,29 +1,20 @@
 #!/usr/bin/env bash
 
-# fw_synch_201005
-#tarball_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+#### fw_synch_210503 ####
+# Standard configuration
+memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+# Combined modules
+memprints_url_cm="https://www.dropbox.com/s/zrhs3e6j2em6lbd/MemPrints_Combined_210504.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/kdj2bey9nb9ds4c/LUTs_Combined_210504.tgz?dl=0"
+
+#### fw_synch_201005 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
 
-# standard configurations - temporary
-tarball_url="https://www.dropbox.com/s/8942mkttj198y90/MemPrintsStandard_210315.tgz?dl=0"
-luts_url="https://www.dropbox.com/s/6ebazqxtb1e0caw/LUTsStandard_210315.tgz?dl=0"
-
-# Supplemental test-vectors for development of the PurgeDuplicates module.
-# Generated after PR #70 was merged:
-# https://github.com/cms-L1TK/cmssw/tree/1606921d6c26b13292808ec8198db8c6a400dad0
-pd_url="https://cernbox.cern.ch/index.php/s/tk6d4GPnMlMKZNf/download"
-
-# fw_synch_200515
+#### fw_synch_200515 ####
 #memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
 #luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
-
-# Combined modules - temporary
-#tarball_url_cm="https://www.dropbox.com/s/d91rt7jxdci5cxg/MemPrintsCombined_210325.tgz?dl=0"
-#luts_url_cm="https://www.dropbox.com/s/ha9to96ims49iwg/LUTsCombined_210325.tgz?dl=0"
-#tarball_url_cm="https://www.dropbox.com/s/eaosn2famgwh6p3/MemPrints_Combined_210503.tgx?dl=0"
-#luts_url_cm="https://www.dropbox.com/s/pgcnbtvbzzajcls/LUTs_Combined_210503.tgx?dl=0"
-tarball_url_cm="https://www.dropbox.com/s/zrhs3e6j2em6lbd/MemPrints_Combined_210504.tgz?dl=0"
-luts_url_cm="https://www.dropbox.com/s/kdj2bey9nb9ds4c/LUTs_Combined_210504.tgz?dl=0"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
@@ -169,19 +160,14 @@ then
 fi
 
 # Download and unpack the tarball.
-wget -O MemPrints.tgz --quiet ${tarball_url_cm}
+wget -O MemPrints.tgz --quiet ${memprints_url_cm}
 tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsCM
 rm -f MemPrints.tgz
 
-wget -O MemPrints.tar.gz --quiet ${tarball_url}
+wget -O MemPrints.tar.gz --quiet ${memprints_url}
 tar -xzf MemPrints.tar.gz
 rm -f MemPrints.tar.gz
-
-# Download and unpack PD.tar.gz
-wget -O PD.tar.gz --quiet ${pd_url}
-tar -xzf PD.tar.gz
-rm -f PD.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
@@ -192,82 +178,67 @@ unset LD_LIBRARY_PATH
 for module in ${processing_modules[@]}
 do
   echo ${module}
-  cm="false"
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
+  memprint_location="MemPrints"
+  table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
-    cm="true"
+    memprint_location="MemPrintsCM"
+    table_location="LUTsCM"
     if [[ ${module_type} == "VMRCM" ]]
     then
-    #  memprint_location="MemPrintsCM"
-    #  table_location="LUTsCM"
       module=`echo ${module} | sed "s/CM//"`
     fi
   fi
+  wires="${table_location}/wires.dat"
 
   target_dir=${module_type}/${module}
 
   rm -rf ${target_dir}
   mkdir -p ${target_dir}
 
-  if [[ ${cm} == "true" ]]
-  then
-      for mem in `grep "${module}\." LUTsCM/wires.dat | awk '{print $1}' | sort -u`;
-      do
-	  find MemPrintsCM/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-      done
-  else 
-      for mem in `grep "${module}\." LUTs/wires.dat | awk '{print $1}' | sort -u`;
-      do
-	  find MemPrints/ -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-      done
-  fi
+  for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+  do
+    find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+  done
 
   # Table linking logic specific to each module type
-  table_location="LUTs/"
-  ln -sf ${table_location}wires.dat wires_hourglass.dat
-  if [[ ${cm} == "true" ]]
-  then
-      table_location="LUTsCM/"
-      ln -sf ${table_location}wires.dat wires_hourglassCombinedModules.dat
-  fi
-
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
-      mkdir -p ${table_target_dir}
+          mkdir -p ${table_target_dir}
   fi
 
   if [[ ${module_type} == "TC" ]]
   then
-      layer_pair=`echo ${module} | sed "s/\(.*\)./\1/g"`
-      find ${table_location} -type f -name "${layer_pair}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer_pair=`echo ${module} | sed "s/\(.*\)./\1/g"`
+          find ${table_location} -type f -name "${layer_pair}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "ME" ]]
   then
-      layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
-      find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then
-      seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
-      find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
+          find ${table_location} -type f -name "TP_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
-      find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MP" ]]
   then
-      layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
-      find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
-      layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
-      find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      for mem in `grep "${module}\." LUTs/wires.dat | awk '{print $1}' | sort -u`;
-      do
-          find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-      done
+          layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+          do
+            find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          done
   fi
 done
