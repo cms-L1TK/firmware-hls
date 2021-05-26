@@ -110,6 +110,8 @@ constexpr double VMROUTERCUTRD1D3 = 55.0;    //Max r for disk seeds in cm
 // various bit widths
 constexpr unsigned nbitsallstubs[N_LAYER + N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)
+// number of bits used to distinguish VMs in one allstub block for each layer
+constexpr unsigned int nbits_vmmelayers[6]={2,3,3,3,3,3};
 
 // List of regions for memory template parameters
 enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK, BARREL_FOR_MC, DISK_FOR_MC};

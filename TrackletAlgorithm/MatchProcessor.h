@@ -132,14 +132,6 @@ namespace PR
   // Move the following to Constants.hh?
   // How to deal with these using enum?
 
-  // number of bits used to distinguish allstub memories for each layer
-  constexpr unsigned int nbits_allstubslayers[6]={3,2,2,2,2,2};
-  // number of bits used to distinguish VMs in one allstub block for each layer
-  constexpr unsigned int nbits_vmmelayers[6]={2,3,3,3,3,3};
-
-  // number of bits used to distinguish allstub memories for each disk
-  constexpr unsigned int nbits_allstubsdisks[5]={2,2,2,2,2};
-  
   // number of bits used to distinguish VMs in one allstub block for each disk
   constexpr unsigned int nbits_vmmedisks[5]={3,2,2,2,2};
 
@@ -823,7 +815,7 @@ void MatchProcessor(BXType bx,
       //memory the projection points to
       
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER!=0 ? nbits_allstubslayers[LAYER-1] : nbits_allstubsdisks[DISK-1];
+      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[N_LAYER + DISK-1];
       
       // number of bits used to distinguish between VMs within a module
       auto nbits_vmme = LAYER!=0 ? nbits_vmmelayers[LAYER-1] : nbits_vmmedisks[DISK-1];
