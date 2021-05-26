@@ -24,7 +24,7 @@ source settings_hls.tcl
 add_files -tb ../emData/MP/tables/
 add_files -tb ../emData/MP/MP_L3PHIC/
 
-csim_design -compiler gcc -mflags "-j8"
+csim_design -mflags "-j8"
 csynth_design
 cosim_design 
 export_design -format ip_catalog
