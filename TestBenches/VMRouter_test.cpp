@@ -21,7 +21,7 @@ const int nEvents = 100;  //number of events to run
 
 
 // Count the number of copies of each memory in a file name vector
-vector<int> countCopies(vector<string> fileNames) {
+vector<int> countCopies(const vector<string> &fileNames) {
   vector<int> numCopies; // Each element in vector corresponds to one memory, i.e. L1PHIE17
   string firstCopyIndex = fileNames.begin()->substr(fileNames.begin()->find("n")+1, 1); // The number after n
   for (auto f = fileNames.begin(); f != fileNames.end(); ++f) {
