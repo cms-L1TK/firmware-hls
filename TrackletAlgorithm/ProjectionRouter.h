@@ -41,15 +41,6 @@ namespace PR
   // Move the following to Constants.h?
   // How to deal with these using enum?
 
-  // number of bits used to distinguish allstub memories for each layer
-  constexpr unsigned int nbits_allstubslayers[6]={3,2,2,2,2,2};
-
-  // number of bits used to distinguish allstub memories for each disk
-  constexpr unsigned int nbits_allstubsdisks[5]={2,2,2,2,2};
-  
-  // number of bits used to distinguish VMs in one allstub block for each disk
-  constexpr unsigned int nbits_vmmedisks[5]={3,2,2,2,2};
-
   // number of bits for seed in tracklet index
   constexpr unsigned int nbits_seed = 3;
 
@@ -123,10 +114,10 @@ void ProjectionRouter(BXType bx,
       // hourglass configuration
 
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER!=0 ? nbits_allstubslayers[LAYER-1] : nbits_allstubsdisks[DISK-1];
+      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[N_LAYER + DISK-1];
 
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER!=0 ? nbits_vmmelayers[LAYER-1] : nbits_vmmedisks[DISK-1];
+      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[N_LAYER + DISK-1];
 
       // bits used for routing
       auto iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);

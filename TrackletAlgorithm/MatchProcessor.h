@@ -818,7 +818,7 @@ void MatchProcessor(BXType bx,
       auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[N_LAYER + DISK-1];
       
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER!=0 ? nbits_vmmelayers[LAYER-1] : nbits_vmmedisks[DISK-1];
+      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[N_LAYER + DISK-1];
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
