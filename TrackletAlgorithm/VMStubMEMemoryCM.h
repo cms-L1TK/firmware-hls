@@ -71,8 +71,8 @@ public:
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> VMSMEID;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
-  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMStubMECMSize> VMStubMECMData;
 
@@ -110,12 +110,12 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
-  VMSMEFINEZ getFineZ() const {
-    return data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB);
+  VMSMEFINEPHI getFinePhi() const {
+    return data_.range(kVMSMEFinePhiMSB, kVMSMEFinePhiLSB);
   }
 
-  VMSMEFINEPHI getFinePhi() const {
-    return data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB);
+  VMSMEFINEZ getFineZ() const {
+    return data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB);
   }
 
   // Setter
@@ -127,12 +127,12 @@ public:
     data_.range(kVMSMEBendMSB,kVMSMEBendLSB) = bend;
   }
 
-  void setFineZ(const VMSMEFINEZ finez) {
-    data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
-  }
-
   void setFinePhi(const VMSMEFINEPHI finephi) {
     data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB) = finephi;
+  }
+
+  void setFineZ(const VMSMEFINEZ finez) {
+    data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
   }
 
 private:
