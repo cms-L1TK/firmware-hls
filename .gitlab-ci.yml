@@ -212,6 +212,12 @@ MC-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
+MP-vivado-hls-build:
+  <<: *template_hls-build
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "MP"
 TB-hls-build:
   <<: *template_hls-build
   variables:
