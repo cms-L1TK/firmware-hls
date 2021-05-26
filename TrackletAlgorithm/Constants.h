@@ -62,8 +62,8 @@ constexpr double c = 0.299792458; // m/ns
 constexpr int N_LAYER = 6; // # of barrel layers assumed
 constexpr int N_DISK = 5; // # of endcap disks assumed
 constexpr double bfield = 3.8112; // T
-constexpr int rmean[N_LAYER] = { 851, 1269, 1784, 2347, 2936, 3697 };
-constexpr int zmean[N_DISK] = { 2239, 2645, 3163, 3782, 4523 };
+constexpr int rmean[N_LAYER + N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
+constexpr int zmean[N_LAYER + N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
 constexpr double zlength = 120.0; // cm
 constexpr double rmindiskvm = 22.5; // cm
 constexpr double rmindisk = 20.0; // cm
@@ -117,11 +117,8 @@ namespace TF {
   // List of seeds
   enum seed {UNDEF_SEED, L1L2 = 0, L2L3 = 1, L3L4 = 2, L5L6 = 3, D1D2 = 4, D3D4 = 5, L1D1 = 6, L2D1 = 7};
 
-  // List of layers
-  enum layer {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5};
-
-  // List of disks
-  enum disk {D1 = 0, D2 = 1, D3 = 2, D4 = 3, D5 = 4};
+  // List of layers and disks
+  enum layerDisk {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5, D1 = 6, D2 = 7, D3 = 8, D4 = 9, D5 = 10};
 }
 
 // Global BX type

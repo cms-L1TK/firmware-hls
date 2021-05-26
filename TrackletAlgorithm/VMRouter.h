@@ -86,19 +86,6 @@ constexpr int NBitsBinTEO = 3;
 //////////////////////////////////////
 // Functions used by the VMR
 
-// Converts an array of 0s and 1s to an ap_uint
-template<int arraySize>
-inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
-	ap_uint<arraySize> number;
-
-	for(int i = 0; i < arraySize; i++) {
-		#pragma HLS unroll
-		number[i] = array[i];
-	}
-
-	return number;
-}
-
 // Returns top 5 (nbits_maxvm) bits of phi, i.e. max 31 in decimal
 template<regionType InType>
 inline ap_uint<nbits_maxvm> iphivmRaw(const typename AllStub<InType>::ASPHI phi) {
@@ -264,7 +251,7 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 
 	// Set values to VMStubME
 	stubME.setBend(bend);
-	stubME.setIndex(typename VMStubME<OutType>::VMSMEID(index));
+	stubME.setIndex(index);
 	stubME.setFinePhi(
 			iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits)); // Set finephi, i.e. the phi bits within a vme region region
 
@@ -376,7 +363,7 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 
 	// Set values to VMStubeTEInner
 	stubTEI.setBend(bend);
-	stubTEI.setIndex(typename VMStubTEInner<OutType>::VMSTEIID(index));
+	stubTEI.setIndex(index);
 	stubTEI.setFinePhi(
 			iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits));
 
@@ -465,7 +452,7 @@ inline VMStubTEOuter<OutType> createStubTEOuter(const InputStub<InType> stub,
 
 	// Set values to VMSTubTE Outer
 	stubTEO.setBend(bend);
-	stubTEO.setIndex(typename VMStubTEOuter<OutType>::VMSTEOID(index));
+	stubTEO.setIndex(index);
 	stubTEO.setFinePhi(
 				iphivmFineBins<InType>(phiCorr, vmbits, nFinePhiBits));
 
@@ -562,7 +549,7 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 	rzbits = rzbitsOverlapTable[rzbitsIndex];
 
 	stubOL.setBend(bend);
-	stubOL.setIndex(typename VMStubTEInner<BARRELOL>::VMSTEIID(index));
+	stubOL.setIndex(index);
 	stubOL.setZBits(rzbits);
 	stubOL.setFinePhi(
 	iphivmFineBins<InType>(phiCorr, vmbits,
@@ -608,8 +595,11 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 #pragma HLS array_partition variable=inputStubsDisk2S complete dim=1
 #pragma HLS array_partition variable=memoriesAS complete dim=1
 #pragma HLS array_partition variable=memoriesME complete dim=1
+#pragma HLS array_partition variable=memoriesTEI complete dim=1
 #pragma HLS array_partition variable=memoriesTEI complete dim=2
+#pragma HLS array_partition variable=memoriesOL complete dim=1
 #pragma HLS array_partition variable=memoriesOL complete dim=2
+#pragma HLS array_partition variable=memoriesTEO complete dim=1
 #pragma HLS array_partition variable=memoriesTEO complete dim=2
 
 
@@ -916,4 +906,4 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 	bx_o = bx;
 } // End VMRouter
 
-#endif // TrackletAlgorithm_VMRouterTop_h
+#endif // TrackletAlgorithm_VMRouter_h

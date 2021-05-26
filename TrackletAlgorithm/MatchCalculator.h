@@ -145,7 +145,7 @@ ap_uint<width> iabs( ap_int<width> value )
 // Template to get look up tables
 
 // Table for phi or z cuts
-template<bool phi, TF::layer L, int width, int depth>
+template<bool phi, TF::layerDisk L, int width, int depth>
 void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
     if (L==TF::L1){
@@ -228,10 +228,10 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 namespace MC {
   enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
-template<TF::layer, MC::imc, TF::seed> constexpr bool FMMask();
+template<TF::layerDisk, MC::imc, TF::seed> constexpr bool FMMask();
 #include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1, MC::imc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
