@@ -132,9 +132,6 @@ namespace PR
   // Move the following to Constants.hh?
   // How to deal with these using enum?
 
-  // number of bits used to distinguish VMs in one allstub block for each disk
-  constexpr unsigned int nbits_vmmedisks[5]={3,2,2,2,2};
-
   // number of bits for seed in tracklet index
   constexpr unsigned int nbits_seed = 3;
 
