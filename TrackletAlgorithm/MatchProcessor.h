@@ -182,7 +182,7 @@ namespace PR
 
 
 template<int L>
-void readTable(bool table[256]){
+void readTable(ap_uint<1> table[256]){
 
   if (L==TF::L1) {
     bool tmp[256]=

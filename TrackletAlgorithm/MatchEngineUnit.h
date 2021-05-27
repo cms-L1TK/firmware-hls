@@ -52,7 +52,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     good__ = false;
   }
   
-  inline void processPipeLine(bool *table) {
+  inline void processPipeLine(ap_uint<1> *table) {
 #pragma HLS inline
     if (good__) {
       auto stubindex=stubdata__.getIndex();
