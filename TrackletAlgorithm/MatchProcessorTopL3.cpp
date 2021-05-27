@@ -43,7 +43,7 @@ void MatchProcessorTopL3(BXType bx,
  MatchProcessor<BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, maxTrackletProjections, LAYER, DISK>
                      (bx,
                       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
-                      proj9in, proj1nullptrin, nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
+                      proj9in, proj10in, nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
                       instubdata,
                       allstub,
                       bx_o,
