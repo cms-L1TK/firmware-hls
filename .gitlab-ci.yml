@@ -144,7 +144,7 @@ MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TrackletAlgorithm/MatchProcessorTopL3.cc'
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TrackletAlgorithm/MatchProcessorTopL3.cpp'
 TB-quality-check:
   <<: *template_quality-check
   variables:
