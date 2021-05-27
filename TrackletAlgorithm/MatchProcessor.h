@@ -537,7 +537,7 @@ void MatchCalculator(BXType bx,
 //////////////////////////////
 // MatchProcessor
 template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int maxInCopies, int maxFullMatchCopies, int maxTrackletProjections, unsigned int nINMEM,
-         TF::layer LAYER=TF::L1, TF::disk DISK=TF::D1>
+         TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
@@ -844,7 +844,6 @@ void MatchProcessor(BXType bx,
       
       ///////////////
       // VMProjection
-      static_assert(not DISK, "PR: Layer only for now.");
       
       ap_uint<4> nstubfirstMinus=nvmstubs[zfirst][ivmMinus];
       ap_uint<4> nstublastMinus=nvmstubs[zlast][ivmMinus];
