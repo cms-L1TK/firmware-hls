@@ -337,8 +337,8 @@ inline MATCH read() {
  VMProjection<BARREL>::VMPID projindex;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
  ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
- bool isSecond[4] = {0, 1, 0, 1};
- bool isPhiPlus[4] = {0, 0, 1, 1};
+ bool isSecond[4] = {false, true, false, true};
+ bool isPhiPlus[4] = {false, false, true, true};
  ap_uint<1<<(kNBits_MemAddrBinned+2)> onlyOneStub = hasOneStub<kNBits_MemAddrBinned+2>();
  
 }; // end class
