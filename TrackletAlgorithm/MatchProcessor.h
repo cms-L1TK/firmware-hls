@@ -182,7 +182,7 @@ namespace PR
 
 
 template<int L>
-void readTable(ap_uint<1> table[256]){
+void readTable(ap_uint<1> table[]){
 
   if (L==TF::L1) {
     bool tmp[256]=
@@ -778,7 +778,7 @@ void MatchProcessor(BXType bx,
       // hourglass configuration
       
       // vmproj index
-      typename VMProjection<VMPTYPE>::VMPID index = nallproj;
+      const typename VMProjection<VMPTYPE>::VMPID &index = nallproj;
       
       // vmproj z
       // Separate the vm projections into zbins
