@@ -40,7 +40,8 @@ void MatchProcessorTopL3(BXType bx,
 
  const auto LAYER  = TF::L3;
  const auto DISK   = TF::D1;
- MatchProcessor<BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, maxTrackletProjections, LAYER, DISK>
+  const auto PHISEC = MC::C;
+ MatchProcessor<BARRELPS, BARRELPS, BARREL, BARRELPS, BARRELPS, BARREL, maxInCopies, maxFullMatchCopies, maxTrackletProjections, maxTrackletProjections, LAYER, DISK, PHISEC>
                      (bx,
                       proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
                       proj9in, proj10in, nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,

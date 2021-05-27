@@ -346,7 +346,12 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, int LAYER=TF::L1>
+// MatchCalculator
+namespace MC {
+  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
+}
+
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, int LAYER=TF::L1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& savedMatch,
@@ -418,7 +423,7 @@ void MatchCalculator(BXType bx,
   typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
   typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
   typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
-  
+
   // Projection parameters
   typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
   typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
@@ -434,34 +439,31 @@ void MatchCalculator(BXType bx,
   ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
   ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
-  
+   
   // Apply the corrections
-  ap_int<15> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
+  const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
+  ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
   ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
-  
+
   // Get phi and z difference between the projection and stub
-  ap_int<9> delta_z         = stub_z - proj_z_corr;
-  ap_int<9> delta_z_m       = proj_z_corr - stub_z;
-  ap_int<13> delta_z_fact   = delta_z * kFact;
-  ap_int<13> delta_z_m_fact = delta_z_m * kFact;
+  ap_int<10> delta_z         = stub_z - proj_z_corr;
+  ap_int<14> delta_z_fact   = delta_z * kFact;
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
   ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
-  constexpr int shifttmp = kShift_phi0bit - 1 + kPhi0_shift;
-  ap_int<18> shiftprojphi   = proj_phi_long << shifttmp; // shift
+  ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
-  ap_int<17> delta_phi_m    = shiftprojphi - shiftstubphi;
-  ap_uint<13> abs_delta_z   = (delta_z_fact>=0)?delta_z_fact:delta_z_m_fact ; // absolute value of delta z
-  ap_uint<17> abs_delta_phi = (delta_phi>=0)?delta_phi:delta_phi_m;    // absolute value of delta phi
-  
+  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
+  ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
   // Full match parameters
-  typename FullMatch<FMTYPE>::FMTCID          fm_tcid  = proj_tcid;
-  typename FullMatch<FMTYPE>::FMTrackletIndex fm_tkid  = proj_tkid;
-  typename FullMatch<FMTYPE>::FMSTUBID        fm_asid  = stubid;
-  typename FullMatch<FMTYPE>::FMSTUBR         fm_stubr = stub_r;
-  typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
-  typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
+  const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
+  const typename FullMatch<FMTYPE>::FMTrackletIndex &fm_tkid  = proj_tkid;
+  const typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
+  const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid  = stubid;
+  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = stub_r;
+  const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
+  const typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
   
   // Full match  
   typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
@@ -533,11 +535,10 @@ void MatchCalculator(BXType bx,
   
 } //end MC
 
-
 //////////////////////////////
 // MatchProcessor
 template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int maxInCopies, int maxFullMatchCopies, int maxTrackletProjections, unsigned int nINMEM,
-         TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1>
+         TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, MC::imc PHISEC=MC::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
@@ -748,7 +749,7 @@ void MatchProcessor(BXType bx,
       
       lastTrkID = trkindex;
 
-      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER>
+      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
 	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, projindex, stubindex, bx_o,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
 	 fullmatch);
