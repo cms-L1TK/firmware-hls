@@ -10,6 +10,8 @@ use ieee.numeric_Std.all;
 library std ;
 use std.textio.all;
 
+use work.tf_pkg.all;
+
 entity tf_lut is
   generic (lut_file : string := "lut.dat";
            lut_width   : integer := 1;
@@ -27,20 +29,20 @@ architecture behavioral of tf_lut is
   impure function initRomFromFile return romType is
     file data_file : text open read_mode is lut_file;
     variable data_fileLine : line;
-    variable ROM : romType;
+    variable rom_data : romType;
   begin
     for I in romType'range loop
       readline(data_file, data_fileLine);
-      hread(data_fileLine, ROM(I));
+      hread(data_fileLine, rom_data(I));
     end loop;
-    return ROM;
+    return rom_data;
   end function;
-  signal rom : romType := initRomFromFile;
 
+  signal rom : romType := initRomFromFile;
   attribute syn_rom_style : string;
-  attribute syn_rom_style of mem : signal is "select_rom";
+  attribute syn_rom_style of rom : signal is "select_rom";
   attribute ROM_STYLE : string;
-  attribute ROM_STYLE of mem : signal is "distributed";
+  attribute ROM_STYLE of rom : signal is "distributed";
   
 begin
                                                   
