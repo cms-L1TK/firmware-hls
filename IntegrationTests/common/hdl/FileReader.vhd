@@ -73,6 +73,11 @@ procFile : process(CLK)
 
 begin
 
+  -- Check user didn't change values of derived generics.
+  assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
+  assert (ADDR_WIDTH = clogb2(RAM_DEPTH)) report "User changed ADDR_WIDTH" severity FAILURE;
+  assert (BIN_SIZE = PAGE_LENGTH/NUM_BINS) report "User changed BIN_SIZE" severity FAILURE;
+
   if rising_edge(CLK) then
   
     -- Open file
