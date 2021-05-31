@@ -59,6 +59,7 @@ class ReferenceType(Enum):
         return '{0}'.format(self.value)
 
 def parse_reference_file(filename):
+    # Parse .txt file from C++ emulation in emData/
     events = []
     with open(filename,'r') as f:
         values = []
@@ -135,18 +136,12 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         # Parse the reference data
         reference_data = parse_reference_file(file_location+"/"+reference_filename)
 
-        # Read column names from file and add a column because the time and units are separated by a space (first two columns)
+        # Read column names from file
         column_names = list(pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,nrows=1))
-        column_names.insert(1,"unit")
         if verbose: print(column_names)
 
-        # Open the comparison data
-        if reference_type == ReferenceType.FM:
-            column_selections = ['BX#','enb','readaddr',reference_type.name+"_"]
-        elif reference_type in [ReferenceType.AP,ReferenceType.CM,ReferenceType.VMPROJ]:
-            column_selections = ['BX#','wea','mem_addr',reference_type.name+"_"]
-        else:
-            raise TypeError("Unknown type of the reference file (implemented options: FullMatches, CandidateMatches)")
+        # Open the comparison (= VHDL test-bench output) data
+        column_selections = ['BX','ADDR','DATA']
         data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
@@ -154,7 +149,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         value_index = get_column_index(layers,data)
         address_index = value_index-1
         valid_index = value_index-2
-        selected_columns = data[['BX#',data.columns[valid_index],data.columns[address_index],data.columns[value_index]]]
+        selected_columns = data[['BX','ADDR','DATA']]
 
         group_index = 0
         group_sub_index = -1
@@ -164,7 +159,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             good = True
 
             # Select the correct event from the comparison data
-            selected_rows = selected_columns.loc[selected_columns['BX#'] == ievent]
+            selected_rows = selected_columns.loc[selected_columns['BX'] == ievent]
             if len(selected_rows) == 0 and len(event) != 0:
                 good = False
                 number_of_missing_events += 1
@@ -173,7 +168,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 else:             print("\t"+message)
 
             # Select only the comparison data where the valid bit is set
-            selected_rows = selected_rows.loc[selected_rows[selected_rows.columns[1]] == '0b1']
+            #selected_rows = selected_rows.loc[selected_rows[selected_rows.columns[1]] == '0b1']
 
             # Check the legnth of the two sets
             # Raise an exception if the are fewer entries for a given event in the comparison data than in the reference data
@@ -190,17 +185,17 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 number_of_good_events += good
                 continue
 
-            offset = selected_rows[selected_rows.columns[3]].index[0]
+            offset = selected_rows[selected_rows.columns[2]].index[0]
             for ival,val in enumerate(event):
                 # In case there are fewer entries in the comparison data than in the reference data
-                if offset+ival not in selected_rows[selected_rows.columns[3]]: continue
+                if offset+ival not in selected_rows[selected_rows.columns[2]]: continue
 
                 # Raise exception if the values for a given entry don't match
-                if selected_rows[selected_rows.columns[3]][offset+ival] != val:
+                if selected_rows[selected_rows.columns[2]][offset+ival] != val:
                     good = False
                     number_of_value_mismatches += 1
-                    message = "The values for event "+str(ievent)+" address "+str(selected_rows[selected_rows.columns[2]][offset+ival])+" do not match!"\
-                              "\n\treference="+str(val)+" comparison="+str(selected_rows[selected_rows.columns[3]][offset+ival])
+                    message = "The values for event "+str(ievent)+" address "+str(selected_rows[selected_rows.columns[1]][offset+ival])+" do not match!"\
+                              "\n\treference="+str(val)+" comparison="+str(selected_rows[selected_rows.columns[2]][offset+ival])
                     if fail_on_error: raise Exception(message)
                     else:             print("\t\t"+message.replace("\n","\n\t\t"))
 
