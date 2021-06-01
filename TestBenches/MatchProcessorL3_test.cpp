@@ -24,16 +24,7 @@ int main() {
   int err_count = 0;
 
   // input memories
-  static TrackletProjectionMemory<BARRELPS> tproj1;
-  static TrackletProjectionMemory<BARRELPS> tproj2;
-  static TrackletProjectionMemory<BARRELPS> tproj3;
-  static TrackletProjectionMemory<BARRELPS> tproj4;
-  static TrackletProjectionMemory<BARRELPS> tproj5;
-  static TrackletProjectionMemory<BARRELPS> tproj6;
-  static TrackletProjectionMemory<BARRELPS> tproj7;
-  static TrackletProjectionMemory<BARRELPS> tproj8;
-  static TrackletProjectionMemory<BARRELPS> tproj9;
-  static TrackletProjectionMemory<BARRELPS> tproj10;
+  static TrackletProjectionMemory<BARRELPS> tproj[maxTrackletProjections];
   static AllStubMemory<BARRELPS>        allstub;
 
   VMStubMEMemoryCM<BARRELPS, 3, 3, kNMatchEngines> inputvmstubs;
@@ -46,29 +37,20 @@ int main() {
   // open input files
   cout << "Open files..." << endl;
 
-  ifstream fin_tproj1;
-  ifstream fin_tproj2;
-  ifstream fin_tproj3;
-  ifstream fin_tproj4;
-  ifstream fin_tproj5;
-  ifstream fin_tproj6;
-  ifstream fin_tproj7;
-  ifstream fin_tproj8;
-  ifstream fin_tproj9;
-  ifstream fin_tproj10;
+  ifstream fin_tproj[maxTrackletProjections];
   ifstream fin_as;
   //ifstream fout_ap;
 
-  if (not openDataFile(fin_tproj1, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2E_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj2, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj3, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj4, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj5, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj6, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj7, "MP_L3PHIC/TrackletProjections_TPROJ_L1L2K_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj8, "MP_L3PHIC/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj9, "MP_L3PHIC/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_tproj10, "MP_L3PHIC/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[0], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2E_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[1], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[2], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[3], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[4], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[5], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[6], "MP_L3PHIC/TrackletProjections_TPROJ_L1L2K_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[7], "MP_L3PHIC/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[8], "MP_L3PHIC/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat")) return -1;
+  if (not openDataFile(fin_tproj[9], "MP_L3PHIC/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat")) return -1;
 
   ifstream fin_vmstub;
 
@@ -103,16 +85,16 @@ int main() {
 //    fullmatch[7].clear();
 
     // read event and write to memories
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj1, fin_tproj1, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj2, fin_tproj2, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj3, fin_tproj3, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj4, fin_tproj4, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj5, fin_tproj5, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj6, fin_tproj6, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj7, fin_tproj7, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj8, fin_tproj8, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj9, fin_tproj9, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj10, fin_tproj10, ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[0], fin_tproj[0], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[1], fin_tproj[1], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[2], fin_tproj[2], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[3], fin_tproj[3], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[4], fin_tproj[4], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[5], fin_tproj[5], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[6], fin_tproj[6], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[7], fin_tproj[7], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[8], fin_tproj[8], ievt);
+    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[9], fin_tproj[9], ievt);
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
 
     writeMemFromFile<VMStubMEMemoryCM<BARRELPS, 3, 3, kNMatchEngines> >(inputvmstubs, fin_vmstub, ievt);
@@ -125,9 +107,7 @@ int main() {
 
     // Unit Under Test
     MatchProcessorTopL3(bx,
-                        &tproj1, &tproj2, &tproj3, &tproj4,
-                        &tproj5, &tproj6, &tproj7, &tproj8,
-			&tproj9, &tproj10,
+                        tproj,
                         inputvmstubs,
                         &allstub,
                         bx_out,
@@ -159,14 +139,8 @@ int main() {
   }  // end of event loop
   
   // close files
-  fin_tproj1.close();
-  fin_tproj2.close();
-  fin_tproj3.close();
-  fin_tproj4.close();
-  fin_tproj5.close();
-  fin_tproj6.close();
-  fin_tproj7.close();
-  fin_tproj8.close();
+  for(int i = 0; i < maxTrackletProjections; i++)
+    fin_tproj[i].close();
   fin_vmstub.close();
 
   fout_fm1.close();

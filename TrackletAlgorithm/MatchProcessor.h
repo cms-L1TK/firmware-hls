@@ -27,54 +27,32 @@ namespace PR
   inline void init(BXType bx,
                    ap_uint<nMEM>& mem_hasdata,
                    ap_uint<NBits_Entries> nentries[nMEM],
-                   const int i,
-                   const MemType* const mem)
+                   const MemType mem[nMEM])
   {    
 #pragma HLS inline  
-    ap_uint<kNBits_MemAddr+1> num = mem->getEntries(bx);
-    nentries[i] = num;
-    if (num > 0) mem_hasdata.set(i);
-  }
-  
-  // recursive case
-  template<int nMEM, int NBits_Entries, class MemType, class... Args>
-  inline void init(BXType bx, ap_uint<nMEM>& mem_hasdata,
-                   ap_uint<NBits_Entries> nentries[nMEM],
-                   const int i,
-                   const MemType* const mem, Args... args)
-  {
-#pragma HLS inline 
-    ap_uint<kNBits_MemAddr+1> num = mem->getEntries(bx);
-    nentries[i] = num;
-    if (num > 0) mem_hasdata.set(i);
-
-    if (i+1 < nMEM) init(bx, mem_hasdata, nentries, i+1, args...);
+    for(int i = 0; i < nMEM; ++i) {
+#pragma HLS unroll
+      ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
+      nentries[i] = num;
+      if (num > 0) mem_hasdata.set(i);
+    }
   }
   
   //////////////////////////////
   // Priority encoder based input memory reading logic
-  template<class DataType, class MemType>
+  template<class DataType, class MemType, int nMEM>
   void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
                   ap_uint<kNBits_MemAddr>& read_addr,
-                  const int i, const MemType* const inmem)
+                  const MemType inmem[nMEM])
   {
 #pragma HLS inline
+    for(int i = 0; i < nMEM; ++i) {
+#pragma HLS unroll
     
-    if (read_imem == i) {
-      data = inmem->read_mem(bx, read_addr);
+      if (read_imem == i) {
+        data = inmem[i].read_mem(bx, read_addr);
+      }
     }
-  }
-
-  template<class DataType, class MemType, class... Args>
-  void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
-                  ap_uint<kNBits_MemAddr>& read_addr,
-                  const int i,
-                  const MemType* const inmem, Args... args)
-  {
-    if (read_imem == i) {
-      data = inmem->read_mem(bx, read_addr);
-    }
-    read_inmem(data, bx, read_imem, read_addr, i+1, args...);
   }
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
@@ -83,18 +61,7 @@ namespace PR
                        ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // memory pointers
-                       const MemType* const mem0, const MemType* const mem1,
-                       const MemType* const mem2, const MemType* const mem3,
-                       const MemType* const mem4, const MemType* const mem5,
-                       const MemType* const mem6, const MemType* const mem7,
-                       const MemType* const mem8, const MemType* const mem9,
-                       const MemType* const mem10, const MemType* const mem11,
-                       const MemType* const mem12, const MemType* const mem13,
-                       const MemType* const mem14, const MemType* const mem15,
-                       const MemType* const mem16, const MemType* const mem17,
-                       const MemType* const mem18, const MemType* const mem19,
-                       const MemType* const mem20, const MemType* const mem21,
-                       const MemType* const mem22, const MemType* const mem23,
+                       const MemType mem[nMEM],
                        DataType& data, int& nproj)
   {
 #pragma HLS inline
@@ -105,11 +72,7 @@ namespace PR
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
     // read the memory "read_imem" with the address "read_addr"
-    read_inmem(data, bx, read_imem, read_addr, 0,
-    //read_inmem(data, datamem, bx, read_imem, read_addr, 0,
-               mem0,mem1,mem2,mem3,mem4,mem5,mem6,mem7,
-               mem8,mem9,mem10,mem11,mem12,mem13,mem14,mem15,
-               mem16,mem17,mem18,mem19,mem20,mem21,mem22,mem23);
+    read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, mem);
 
     // Increase the read address
     ++read_addr;
@@ -486,14 +449,11 @@ void MatchCalculator(BXType bx,
     // will be compared to this value instead of the original selection cut
     best_delta_phi = abs_delta_phi;
 
-    //std::cout << "Found match!" <<std::endl;
-
     // Store bestmatch
     goodmatch = true;
   }
   
   if(goodmatch) { // Write out only the best match, based on the seeding 
-    //std::cout << "Found match "<<fm_tcid<<" "<<fm_tkid<<std::endl;
     switch (proj_seed) {
     case 0:
       fullmatch[0].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
@@ -537,36 +497,13 @@ void MatchCalculator(BXType bx,
 
 //////////////////////////////
 // MatchProcessor
-template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int maxInCopies, int maxFullMatchCopies, int maxTrackletProjections, unsigned int nINMEM,
+template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
          TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, MC::imc PHISEC=MC::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
                       // array of scalar ...
-                      const TrackletProjectionMemory<PROJTYPE>* const proj1in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj2in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj3in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj4in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj5in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj6in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj7in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj8in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj9in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj10in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj11in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj12in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj13in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj14in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj15in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj16in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj17in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj18in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj19in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj20in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj21in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj22in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj23in,
-                      const TrackletProjectionMemory<PROJTYPE>* const proj24in,
+                      const TrackletProjectionMemory<PROJTYPE> projin[nINMEM],
                       const VMStubMEMemoryCM<VMSMEType, 3, 3, kNMatchEngines>& instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       BXType& bx_o,
@@ -594,10 +531,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
-    (bx, mem_hasdata, numbersin,0,
-     proj1in,proj2in,proj3in,proj4in,proj5in,proj6in,proj7in,proj8in,
-     proj9in,proj10in,proj11in,proj12in,proj13in,proj14in,proj15in,proj16in,
-     proj17in,proj18in,proj19in,proj20in,proj21in,proj22in,proj23in,proj24in);
+    (bx, mem_hasdata, numbersin, projin);
   
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
@@ -883,10 +817,8 @@ void MatchProcessor(BXType bx,
 	TrackletProjectionMemory<PROJTYPE>,
 	nINMEM, kNBits_MemAddr+1>
 	(bx, mem_hasdata, numbersin, mem_read_addr,
-	 proj1in, proj2in, proj3in, proj4in, proj5in, proj6in, proj7in, proj8in,
-	 proj9in, proj10in, proj11in, proj12in, proj13in, proj14in, proj15in, proj16in,
-	 proj17in, proj18in, proj19in, proj20in, proj21in, proj22in, proj23in, proj24in,
-	 projdata, nproj);
+         projin, projdata, nproj);
+
 
  
     } else {
