@@ -74,16 +74,6 @@ def parse_reference_file(filename):
         events.append(values)
     return events
 
-def get_column_index(layers, df):
-    match = False
-    column_index = -1
-    for icol, column_header in enumerate(df.columns):
-        match = len(re.findall(layers,column_header))>0
-        if match:
-            column_index = icol
-            break
-    return icol
-
 def print_results(total_number_of_events, number_of_good_events, number_of_missing_events, number_of_event_length_mismatches, number_of_value_mismatches):
     print("\nResults\n"+(7*'='))
     print("Good events: "+str(number_of_good_events))
@@ -124,15 +114,6 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             reference_type = ReferenceType[reference_type_string]
         print("Comparing " + reference_type.FullName() + " values ... ")
 
-        # Find the layer names for the reference file
-        if reference_type == ReferenceType.FM:
-            layers = re.search("(L[0-9]L[0-9])",reference_filename).group(0)
-            print("Comparing the values for layers "+str(layers)+" to the reference file "+str(reference_filename)+" ... ")
-        elif reference_type in [ReferenceType.AP,ReferenceType.CM,ReferenceType.VMPROJ] :
-            layers = re.search("(L[0-9])",reference_filename).group(0)
-        else:
-            raise TypeError("Unknown type of the reference file (implemented options: FullMatches, CandidateMatches)")
-
         # Parse the reference data
         reference_data = parse_reference_file(file_location+"/"+reference_filename)
 
@@ -145,14 +126,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
-        # Get the column index for the correct columns of data
-        value_index = get_column_index(layers,data)
-        address_index = value_index-1
-        valid_index = value_index-2
-        selected_columns = data[['BX','ADDR','DATA']]
-
-        group_index = 0
-        group_sub_index = -1
+        selected_columns = data[column_selections]
 
         for ievent,event in enumerate(reference_data):
             print("Doing event "+str(ievent+1)+"/"+str(len(reference_data))+" ... ")
