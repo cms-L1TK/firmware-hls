@@ -85,16 +85,8 @@ int main() {
 //    fullmatch[7].clear();
 
     // read event and write to memories
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[0], fin_tproj[0], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[1], fin_tproj[1], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[2], fin_tproj[2], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[3], fin_tproj[3], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[4], fin_tproj[4], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[5], fin_tproj[5], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[6], fin_tproj[6], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[7], fin_tproj[7], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[8], fin_tproj[8], ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[9], fin_tproj[9], ievt);
+    for(int i = 0; i < maxTrackletProjections; i++)
+      writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[i], fin_tproj[i], ievt);
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
 
     writeMemFromFile<VMStubMEMemoryCM<BARRELPS, 3, 3, kNMatchEngines> >(inputvmstubs, fin_vmstub, ievt);
