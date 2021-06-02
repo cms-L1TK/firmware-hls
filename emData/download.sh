@@ -5,8 +5,8 @@
 memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
 luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
 # Combined modules
-memprints_url_cm="https://www.dropbox.com/s/zrhs3e6j2em6lbd/MemPrints_Combined_210504.tgz?dl=0"
-luts_url_cm="https://www.dropbox.com/s/kdj2bey9nb9ds4c/LUTs_Combined_210504.tgz?dl=0"
+memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
 
 #### fw_synch_201005 ####
 #memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
