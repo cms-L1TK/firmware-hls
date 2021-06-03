@@ -2,7 +2,7 @@
 #define TrackletAlgorithm_VMStubMEMemoryCM_h
 
 #include "Constants.h"
-#include "MemoryTemplateBinned.h"
+#include "MemoryTemplateBinnedCM.h"
 
 // VMStubMECMBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSMEType> class VMStubMECMBase {};
@@ -81,8 +81,8 @@ public:
     data_(newdata)
   {}
 
-  VMStubMECM(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEPHI finephi, const VMSMEFINEZ finez):
-    data_( (((id,bend),finephi),finez) )
+ VMStubMECM(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEPHI finephi, const VMSMEFINEZ finez):
+    data_( (id, bend,finephi, finez) )
   {}
 
   VMStubMECM():
@@ -142,6 +142,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType, int RZSize, int PhiRegSize > using VMStubMEMemoryCM = MemoryTemplateBinned<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize>;
+template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>;
 
 #endif

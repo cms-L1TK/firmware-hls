@@ -140,6 +140,11 @@ MC-quality-check:
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+MP-quality-check:
+  <<: *template_quality-check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TrackletAlgorithm/MatchProcessorTopL3.cpp'
 TB-quality-check:
   <<: *template_quality-check
   variables:
@@ -207,6 +212,13 @@ MC-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
+MP-vivado-hls-build:
+  <<: *template_hls-build
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "MP"
 TB-hls-build:
   <<: *template_hls-build
   variables:

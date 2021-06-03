@@ -180,7 +180,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		const ap_uint<maskASIsize>& maskASI,
 		AllStubInnerMemory<OutType> memoriesASInner[],
 		// ME memories
-		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize> *memoryME,
+		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
 		// TE Outer memories
 		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, nTEOCopies> *memoryTEO) {
 

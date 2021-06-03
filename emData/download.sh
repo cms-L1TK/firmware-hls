@@ -54,6 +54,10 @@ declare -a processing_modules=(
   "TC_L3L4B"
   "TC_L3L4C"
   "TC_L3L4D"
+  "TC_L3L4E"
+  "TC_L3L4F"
+  "TC_L3L4G"
+  "TC_L3L4H"
   "TC_L5L6A"
   "TC_L5L6B"
   "TC_L5L6C"
@@ -74,6 +78,9 @@ declare -a processing_modules=(
   "MC_L4PHIC"
   "MC_L5PHIC"
   "MC_L6PHIC"
+
+  # MatchProcessor
+  "MP_L3PHIC"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
@@ -174,7 +181,7 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   table_location="LUTs"
-  if [[ ${module_type} == "TP" ]] || [[ ${module_type} == "VMRCM" ]]
+  if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
     memprint_location="MemPrintsCM"
     table_location="LUTsCM"
@@ -218,6 +225,12 @@ do
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+  elif [[ ${module_type} == "MP" ]]
+  then
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
