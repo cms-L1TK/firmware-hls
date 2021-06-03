@@ -18,7 +18,7 @@ int main()
   int err = 0;
 
   ap_uint<10> innervmtable[2048] =
-#include "../emData/TP/tables/TP_L1L2.tab"
+#include "../emData/TP/tables/TP_L1.tab"
 
   ap_uint<8> useregion[2048] =
 #include "../emData/TP/tables/TP_L1L2D_usereg.tab"
@@ -49,7 +49,7 @@ int main()
   if (not openDataFile(fin_innerStubs1, dir + "/AllInnerStubs_AS_L1PHIC_BF_04.dat")) return -1;
 
   ifstream fin_outerStubs;
-  if (not openDataFile(fin_outerStubs, dir + "/AllStubs_AS_L2PHIB_B_L1D_04.dat")) return -1;
+  if (not openDataFile(fin_outerStubs, dir + "/AllStubs_AS_L2PHIB_B_D_04.dat")) return -1;
 
   ifstream fin_outervmstubs;
   if (not openDataFile(fin_outervmstubs, dir + "/VMStubs_VMSTE_L2PHIBn1_04.dat")) return -1;

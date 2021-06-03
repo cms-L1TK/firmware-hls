@@ -219,7 +219,7 @@ do
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then
-          layer=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
