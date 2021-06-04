@@ -66,6 +66,9 @@ public:
 	if (nentry_ibx < (1<<(kNBitDataAddr))) {
 	  // write address for slot: 1<<(kNBitDataAddr) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(kNBitDataAddr))*slot+nentry_ibx] = data;
+    #ifdef CMSSW_GIT_HASH
+    nentries_[ibx][slot]++;
+    #endif
 	  return true;
 	}
 	else {
@@ -125,7 +128,9 @@ public:
     DataType data(datastr.c_str(), base);
     int nent = nentries_[bx][slot];
     bool success = write_mem(bx, slot, data, nent);
+    #ifndef CMSSW_GIT_HASH
     if (success) nentries_[bx][slot] ++;
+    #endif
     return success;
   }
 
