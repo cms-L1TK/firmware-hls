@@ -150,14 +150,6 @@ public:
   
 #endif
 
-// #ifdef CMSSW_GIT_HASH
-//   bool write_mem_CMSSW(BunchXingT ibx, DataType data, int addr_index)
-//   {
-//     bool success = write_mem(ibx, data, addr_index);
-//     if (success) nentries_[ibx] ++;
-//           return success;
-//   }
-// #endif
 };
 
 #endif
