@@ -99,7 +99,7 @@ public:
 	bool success = write_mem(ibx, data, nent);
 
   #ifndef CMSSW_GIT_HASH
-	if (success) nentries_[ibx] ++;
+  if (success) nentries_[ibx] ++;
   #endif
   return success;
   }
@@ -111,7 +111,7 @@ public:
 	bool success = write_mem(ibx, data, nent);
 
   #ifndef CMSSW_GIT_HASH
-	if (success) nentries_[ibx] ++;
+  if (success) nentries_[ibx] ++;
   #endif
   return success;
   }
