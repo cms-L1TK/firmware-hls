@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-#### fw_synch_210528 ####
+#### fw_synch_210607 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/KOOAIS0llZfM3rI/download"
-luts_url="https://cernbox.cern.ch/index.php/s/tZzWwTtA5i24yep/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/I8y7j2zcSsHxIuc/download"
+luts_url="https://cernbox.cern.ch/index.php/s/vbPlDAWrmjVP1lK/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/yvDLGUXnmQN4NAp/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/oAhoD4wVfEpk0Zw/download"
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/w8iw9dnZ0yXJnI8/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/mHpT5TUQ6IZFQqx/download"
 
 #### fw_synch_210503 ####
 # Standard configuration
