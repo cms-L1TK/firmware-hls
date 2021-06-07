@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- Counter to count clock cycles in between ap_done
+-- Counter to count clock cycles between two successive ap_done pulses
 -- And compare the number of counts with latency_expected.
 -- If not equal, error signal is raised for one clock cycle, error is asserted if in
--- simulation and not muted, error_sticky flag will stay raised until reset
+-- simulation and not muted, error_sticky flag will stay raised until reset.
 -- Serves as a sanity check to check latency of one or more HLS modules in
 -- simulation or on chip.
 -- Rui Zou
