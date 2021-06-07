@@ -21,7 +21,18 @@ luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?d
 declare -a processing_modules=(
   # VMRouter
   "VMR_L1PHIE"
+  "VMR_L1PHID"
+  "VMR_L2PHIA"
+  "VMR_L2PHIB"
+  "VMR_L3PHIA"
+  "VMR_L4PHIA"
+  "VMR_L5PHIA"
+  "VMR_L6PHIA"
   "VMR_D1PHIA"
+  "VMR_D2PHIA"
+
+  # VMRouter CM
+  "VMRCM_L2PHIA"
 
   # TrackletEngine
   "TE_L1PHIE18_L2PHIC17"
@@ -43,6 +54,10 @@ declare -a processing_modules=(
   "TC_L3L4B"
   "TC_L3L4C"
   "TC_L3L4D"
+  "TC_L3L4E"
+  "TC_L3L4F"
+  "TC_L3L4G"
+  "TC_L3L4H"
   "TC_L5L6A"
   "TC_L5L6B"
   "TC_L5L6C"
@@ -63,6 +78,9 @@ declare -a processing_modules=(
   "MC_L4PHIC"
   "MC_L5PHIC"
   "MC_L6PHIC"
+
+  # MatchProcessor
+  "MP_L3PHIC"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
@@ -163,10 +181,14 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   table_location="LUTs"
-  if [[ ${module_type} == "TP" ]]
+  if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
     memprint_location="MemPrintsCM"
     table_location="LUTsCM"
+    if [[ ${module_type} == "VMRCM" ]]
+    then
+      module=`echo ${module} | sed "s/CM//"`
+    fi
   fi
   wires="${table_location}/wires.dat"
 
@@ -203,7 +225,13 @@ do
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-  elif [[ ${module_type} == "VMR" ]]
+  elif [[ ${module_type} == "MP" ]]
+  then
+          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+  elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;

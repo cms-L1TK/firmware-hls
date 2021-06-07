@@ -124,6 +124,6 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplate<TrackletParameters, 2, kNBits_MemAddr> TrackletParameterMemory;
+typedef MemoryTemplate<TrackletParameters, 3, kNBits_MemAddr> TrackletParameterMemory;
 
 #endif

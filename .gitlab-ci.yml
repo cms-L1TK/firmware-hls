@@ -105,6 +105,11 @@ VMR-quality-check:
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
+VMRCM-quality-check:
+  <<: *template_quality-check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TrackletAlgorithm/VMRouterCMTop.cc'
 TE-quality-check:
   <<: *template_quality-check
   variables:
@@ -135,6 +140,11 @@ MC-quality-check:
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+MP-quality-check:
+  <<: *template_quality-check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TrackletAlgorithm/MatchProcessorTopL3.cpp'
 TB-quality-check:
   <<: *template_quality-check
   variables:
@@ -153,6 +163,12 @@ VMR-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMR"
+VMRCM-vivado-hls-build:
+  <<: *template_hls-build
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "VMRCM"
 TE-vivado-hls-build:
   <<: *template_hls-build
   variables:
@@ -196,6 +212,13 @@ MC-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
+MP-vivado-hls-build:
+  <<: *template_hls-build
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "MP"
 TB-hls-build:
   <<: *template_hls-build
   variables:

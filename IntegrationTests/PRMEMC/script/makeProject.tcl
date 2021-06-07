@@ -17,23 +17,26 @@ create_ip -name MatchCalculatorTop -module_name MC_L3PHIC -vendor xilinx.com -li
 create_ip -name MatchEngineTop -module_name ME_L3PHIC -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop -module_name PR_L3PHIC -vendor xilinx.com -library hls -version 1.0
 
-# Add HDL for algo
-add_files -fileset sources_1 [glob ../../common/hdl/*.vhd]
-add_files -fileset sources_1 [glob ../hdl/*.vhd]
-
-# Add HDL for TB
-add_files -fileset sim_1 [glob ../tb/*.vhd]
-
 # Provide name of top-level HDL (without .vhd extension).
 #set topLevelHDL "SectorProcessor"
 set topLevelHDL "SectorProcessorFull"
-#set topLevelHDL "tf_top_full"
+
+# Add HDL for algo
+add_files -fileset sources_1 [glob ../hdl/SectorProcessor*.vhd]
+add_files -fileset sources_1 [glob ../hdl/memUtil_pkg.vhd]
+add_files -fileset sources_1 [glob ../../common/hdl/*.vhd]
+
+# Add HDL for TB
+add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
+
+# Add constraints (clock etc.)
+add_files -fileset constrs_1 [glob ../../common/hdl/constraints.xdc]
 
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
 set_property top -value ${topLevelHDL} -objects [get_filesets sources_1]
 set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
-set_property xsim.simulate.runtime -value "50us" -objects  [get_filesets sim_1]
+set_property xsim.simulate.runtime -value "0us" -objects  [get_filesets sim_1]
 
 update_compile_order -fileset sources_1 
 

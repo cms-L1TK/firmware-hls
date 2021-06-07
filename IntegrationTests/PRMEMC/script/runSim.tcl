@@ -1,6 +1,6 @@
 # Open project
 set projName "Work"
-open_project $projName/Work.xpr
+open_project $projName/$projName.xpr
 
 reset_simulation sim_1
 

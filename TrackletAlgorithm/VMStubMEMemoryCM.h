@@ -2,7 +2,7 @@
 #define TrackletAlgorithm_VMStubMEMemoryCM_h
 
 #include "Constants.h"
-#include "MemoryTemplateBinned.h"
+#include "MemoryTemplateBinnedCM.h"
 
 // VMStubMECMBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSMEType> class VMStubMECMBase {};
@@ -14,10 +14,11 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
+    kVMSMEFinePhiSize = 3,
     kVMSMEBendSize = 3,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
-    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIDSize
+    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
   };
 };
 
@@ -28,10 +29,11 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
+    kVMSMEFinePhiSize = 3,
     kVMSMEBendSize = 4,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
-    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIDSize
+    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
   };
 };
 
@@ -42,10 +44,11 @@ public:
   enum BitWidths {
     // Bit sizes for VMStubMEMemoryCM fields
     kVMSMEFineZSize = 3,
-    kVMSMEBendSize = 3,
+    kVMSMEFinePhiSize = 3,
+    kVMSMEBendSize = 4,
     kVMSMEIDSize = 7,
     // Bit size for full VMStubMEMemoryCM
-    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEBendSize + kVMSMEIDSize
+    kVMStubMECMSize = kVMSMEFineZSize + kVMSMEFinePhiSize + kVMSMEBendSize + kVMSMEIDSize
   };
 };
 
@@ -58,7 +61,9 @@ public:
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubMEMemoryCM word for different fields
     kVMSMEFineZLSB = 0,
     kVMSMEFineZMSB = kVMSMEFineZLSB + VMStubMECMBase<VMSMEType>::kVMSMEFineZSize - 1,
-    kVMSMEBendLSB = kVMSMEFineZMSB + 1,
+    kVMSMEFinePhiLSB = kVMSMEFineZMSB + 1,
+    kVMSMEFinePhiMSB = kVMSMEFinePhiLSB + VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize - 1,
+    kVMSMEBendLSB = kVMSMEFinePhiMSB + 1,
     kVMSMEBendMSB = kVMSMEBendLSB + VMStubMECMBase<VMSMEType>::kVMSMEBendSize - 1,
     kVMSMEIDLSB = kVMSMEBendMSB + 1,
     kVMSMEIDMSB = kVMSMEIDLSB + VMStubMECMBase<VMSMEType>::kVMSMEIDSize - 1
@@ -66,6 +71,7 @@ public:
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> VMSMEID;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMStubMECMSize> VMStubMECMData;
@@ -75,8 +81,8 @@ public:
     data_(newdata)
   {}
 
-  VMStubMECM(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEZ finez):
-    data_( ((id,bend),finez) )
+ VMStubMECM(const VMSMEID id, const VMSMEBEND bend, const VMSMEFINEPHI finephi, const VMSMEFINEZ finez):
+    data_( (id, bend,finephi, finez) )
   {}
 
   VMStubMECM():
@@ -93,7 +99,7 @@ public:
 
   // Getter
   static constexpr int getWidth() {return VMStubMECMBase<VMSMEType>::kVMStubMECMSize;}
-  
+
   VMStubMECMData raw() const {return data_;}
 
   VMSMEID getIndex() const {
@@ -102,6 +108,10 @@ public:
 
   VMSMEBEND getBend() const {
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
+  }
+
+  VMSMEFINEPHI getFinePhi() const {
+    return data_.range(kVMSMEFinePhiMSB, kVMSMEFinePhiLSB);
   }
 
   VMSMEFINEZ getFineZ() const {
@@ -117,6 +127,10 @@ public:
     data_.range(kVMSMEBendMSB,kVMSMEBendLSB) = bend;
   }
 
+  void setFinePhi(const VMSMEFINEPHI finephi) {
+    data_.range(kVMSMEFinePhiMSB,kVMSMEFinePhiLSB) = finephi;
+  }
+
   void setFineZ(const VMSMEFINEZ finez) {
     data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
   }
@@ -128,6 +142,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType, int RZSize, int PhiRegSize > using VMStubMEMemoryCM = MemoryTemplateBinned<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize>;
+template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>;
 
 #endif

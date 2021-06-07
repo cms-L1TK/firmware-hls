@@ -24,10 +24,11 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 1) cd IntegrationTests/PRMEMC/script/
 2) ./compileHLS.sh (makes HLS IP cores).
 3) vivado -mode batch -source makeProject.tcl (creates Vivado project).
-4) vivado -mode batch -source runProject.tcl (runs Vivado simulation,
+4) vivado -mode batch -source runSim.tcl (runs Vivado simulation,
    which writes data output from chain to dataOut/*.txt).
 5) python ../../common/script/CompareMemPrintsFW.py -p -s (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt).
-6) vivado -mode batch -source ../../common/script/synth.tcl (runs synthesis).
+6) vivado -mode batch -source ../../common/script/synth.tcl (runs synthesis, writes utilization & timing reports to current directory).
+7) vivado -mode batch -source ../../common/script/impl.tcl (runs implementation, writes utilization & timing reports to current directory). N.B. This step is optional, and not required for code validation.
 
 ## Track Quality Specific Instructions
 In the TrackQuality directory first run: 

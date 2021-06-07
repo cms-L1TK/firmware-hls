@@ -2,46 +2,43 @@
 #define TrackletAlgorithm_VMRouterTop_h
 
 #include "VMRouter.h"
+#include "VMRouter_parameters.h"
 
-// VMRouter Top Function for layer 1, AllStub region E
+// VMRouter Top Function for layer 2, AllStub region A
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // NOTE: to run a different phi region, change the following
 //          - constants specified in VMRouterTop.h
-//          - the input parameters to VMRouterTop in VMRouterTop.h/.cc
-//          - the the number and directories to the LUTs
-//          - add/remove pragmas depending on inputStub in VMRouterTop.cc
-//          - the call to VMRouter() in VMRouterTop.cc
-//          - the included top function in VMRouter_test.cpp (if file name is changed)
-//          - the top function and memory directory in script_VMR.tcl (if file name is changed)
+//          - add number to VMRouter_parameters.h if not already defined
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
 
 ////////////////////////////////////////////
 // Variables for that are specified with regards to the VMR region
 // Changed manually
 
-#define kLAYER 1 // Which barrel layer number the data is coming from
+#define kLAYER 2 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
 
-constexpr char phiRegion = 'E'; // Which AllStub/PhiRegion
-constexpr int sector = 4; //  Specifies the sector
-
-// Maximum number of memory "copies" for this Phi region
-// Note: can't use 0 if we don't have any memories of a certain type. Use 1.
-constexpr int maxASCopies(4); // Allstub memory
-constexpr int maxTEICopies(5); // TE Inner memories
-constexpr int maxOLCopies(3); // TE Inner Overlap memories
-constexpr int maxTEOCopies(1); // TE Outer memories
-
-// Number of inputs
-constexpr int numInputs(7); // Number of input memories, EXCLUDING DISK2S
-constexpr int numInputsDisk2S(0); // Number of DISK2S input memories
-
-constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. Can't use 0.
+constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 
 
 ///////////////////////////////////////////////
 // Variables that don't need manual changing
+
+constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
+
+// Number of inputs
+constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S = getNumInputsDisk2S<layerdisk, phiRegion>(); // Number of DISK2S input memories
+
+// Maximum number of memory "copies" for this Phi region
+constexpr int maxASCopies = getNumASCopies<layerdisk, phiRegion>(); // Allstub memory
+constexpr int maxTEICopies = getNumTEICopies<layerdisk, phiRegion>(); // TE Inner memories
+constexpr int maxOLCopies = getNumOLCopies<layerdisk, phiRegion>(); // TE Inner memories
+constexpr int maxTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories
+
+constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); // Number of entries in each bendcut table
 
 #if kLAYER == kDISK
 #error kLAYER and kDISK cannot be the same
@@ -84,13 +81,23 @@ constexpr int bendCutTableSize(8); // Number of entries in each bendcut table. C
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
-	const InputStubMemory<inputType> inputStub[numInputs],
+	const InputStubMemory<inputType> inputStubs[numInputs]
+#if kDISK > 0
+	, const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+#endif
 
 	// Output memories
-	AllStubMemory<outputType> allStub[maxASCopies],
-	VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME],
-	VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies],
-	VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+	, AllStubMemory<outputType> memoriesAS[maxASCopies]
+	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
+#endif
+#if kLAYER == 1 || kLAYER == 2
+	, VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+#endif
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+	, VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
+#endif
 	);
 
 #endif // TrackletAlgorithm_VMRouterTop_h
