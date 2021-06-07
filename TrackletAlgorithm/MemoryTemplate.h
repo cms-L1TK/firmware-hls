@@ -62,7 +62,7 @@ public:
       dataarray_[ibx][addr_index] = data;
       
       #ifdef CMSSW_GIT_HASH
-        nentries_[ibx] = addr_index + 1;
+      nentries_[ibx] = addr_index + 1;
       #endif
       
       return true;
@@ -101,7 +101,7 @@ public:
   #ifndef CMSSW_GIT_HASH
 	if (success) nentries_[ibx] ++;
   #endif
-        return success;
+  return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
@@ -113,7 +113,7 @@ public:
   #ifndef CMSSW_GIT_HASH
 	if (success) nentries_[ibx] ++;
   #endif
-        return success;
+  return success;
   }
 
   // print memory contents
