@@ -1,5 +1,10 @@
 -------------------------------------------------------------------------------
 -- Counter to count clock cycles in between ap_done
+-- And compare the number of counts with latency_expected.
+-- If not equal, error signal is raised for one clock cycle, error is asserted if in
+-- simulation and not muted, error_sticky flag will stay raised until reset
+-- Serves as a sanity check to check latency of one or more HLS modules in
+-- simulation or on chip.
 -- Rui Zou
 -------------------------------------------------------------------------------
 
@@ -13,7 +18,8 @@ entity latency_monitor is
 
   generic (
     latency_expected    :integer := 108;
-    max_value  : integer          := 255);
+    max_value  : integer          := 255;
+    mute       : boolean := false);
   port (
     reset      : in std_logic;
     clk        : in  std_logic;
@@ -50,6 +56,7 @@ begin  -- architecture behavioral
             latency <= latency_count;
             if not (latency = latency_expected) then
                 error <= '1';
+                assert mute report "Latency is not the expected value!" severity error;
             end if;
           end if;
         else
