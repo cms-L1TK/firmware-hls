@@ -98,10 +98,10 @@ public:
 	int nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
 
-  #ifndef CMSSW_GIT_HASH
-  if (success) nentries_[ibx] ++;
-  #endif
-  return success;
+	#ifndef CMSSW_GIT_HASH
+	if (success) nentries_[ibx] ++;
+	#endif
+	return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
@@ -110,10 +110,10 @@ public:
 	int nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);
 
-  #ifndef CMSSW_GIT_HASH
-  if (success) nentries_[ibx] ++;
-  #endif
-  return success;
+	#ifndef CMSSW_GIT_HASH
+	if (success) nentries_[ibx] ++;
+	#endif
+	return success;
   }
 
   // print memory contents
