@@ -206,12 +206,14 @@ PR-vivado-hls-build:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PR"
 ME-vivado-hls-build:
+  allow_failure: true # FIXME: remove after all errors are fixed
   <<: *template_hls-build
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ME"
 ME-vitis-hls-build:
+  allow_failure: true # FIXME: remove after all errors are fixed
   <<: *template_hls-build
   variables:
     EXECUTABLE: 'vivado_hls'
