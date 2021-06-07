@@ -212,6 +212,13 @@ ME-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ME"
+  artifacts: # FIXME: remove after all errors are fixed
+    when: always
+    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+    paths:
+      - ./project/
+      - ./emData/
+    expire_in: 1 week
 ME-vitis-hls-build:
   allow_failure: true # FIXME: remove after all errors are fixed
   <<: *template_hls-build
