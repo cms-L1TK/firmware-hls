@@ -105,6 +105,13 @@ class MemoryTemplateBinnedCM{
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
 
+      #ifdef CMSSW_GIT_HASH
+      ap_uint<3> ibin,ireg;
+      (ireg,ibin)=slot;
+      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      binmask8_[ibx][ibin].set_bit(ireg,true);
+      #endif
+
       return true;
     }
     else {
