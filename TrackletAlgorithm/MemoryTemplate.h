@@ -60,6 +60,11 @@ public:
 #pragma HLS inline
     if (addr_index < (1<<NBIT_ADDR)) {
       dataarray_[ibx][addr_index] = data;
+      
+      #ifdef CMSSW_GIT_HASH
+      nentries_[ibx] = addr_index + 1;
+      #endif
+      
       return true;
     } else {
       return false;
@@ -92,8 +97,11 @@ public:
 	DataType data(datastr, base);
 	int nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
+
+	#ifndef CMSSW_GIT_HASH
 	if (success) nentries_[ibx] ++;
-        return success;
+	#endif
+	return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
@@ -101,8 +109,11 @@ public:
 	DataType data(datastr.c_str(), base);
 	int nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);
+
+	#ifndef CMSSW_GIT_HASH
 	if (success) nentries_[ibx] ++;
-        return success;
+	#endif
+	return success;
   }
 
   // print memory contents
@@ -138,7 +149,7 @@ public:
   static constexpr int getWidth() {return DataType::getWidth();}
   
 #endif
-  
+
 };
 
 #endif

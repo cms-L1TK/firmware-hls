@@ -286,7 +286,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		}
 
 // For debugging
-#ifndef __SYNTHESIS__
+#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
 		std::cout << std::endl << "Stub index no. " << i << std::endl
 				<< "Out put stub: " << std::hex << allstub.raw() << std::dec
 				<< std::endl;
@@ -369,7 +369,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				}
 
 // For debugging
-#ifndef __SYNTHESIS__
+#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
 				std::cout << std::endl << "Allstub Inner: " << std::hex
 						<< allstubinner.raw() << std::dec << std::endl;
 #endif // DEBUG
@@ -392,7 +392,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		addrCountME[slotME] += 1;
 
 // For debugging
-#ifndef __SYNTHESIS__
+#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
 		std::cout << "ME stub " << std::hex << stubME.raw() << std::dec
 				<< "       to slot " << slotME << std::endl;
 #endif // DEBUG
@@ -415,7 +415,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			addrCountTE[slotTE] += 1;
 
 // For debugging
-#ifndef __SYNTHESIS__
+#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
 			std::cout << "TEOuter stub " << std::hex << stubTEO.raw()
 					<< std::dec << "       to slot " << slotTE << std::endl;
 #endif // DEBUG
