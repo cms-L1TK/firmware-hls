@@ -21,6 +21,7 @@ void TrackMerger(const BXType bx,
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
         auto trackStubMap = trkFit.getHitMap();
+        auto trackHitCount = trkFit.getHitCount();
         //std::cout << "Track Stub Map: " << trackStubMap << std::endl;
         // every 3 bits is a new layer/disk - getting number of stubs in each layer
         for (int layer = 0; layer < trackStubMap.length()/TrackFit::kTFHitCountSize; layer++){
@@ -102,23 +103,23 @@ void TrackMerger(const BXType bx,
               }
             }
             
-            // set phi res to smallest value for each index
+            // considering smallest phi residual in each layer
             for (int m = stubIndex[0]; m < stubIndex[TrackFit::kNStubs]; m++){
               int min_value = 999;
               for(int i = 0; i < TrackFit::kNStubs; i++){
                  if (phiRes[i] < min_value) min_value = phiRes[i];
               }
-              //trkFit.setStubPhiResid(min_value);
+              trkFit.setStubPhiResid(min_value);
             }
+        }
 
-         // if there are > 3 stubs in common, merge tracks into single track
-         //if (stubNumber > 3){
-            // merging tracks
-            // assign track helix params according to best seed type between the two tracks - trkFit.getSeedType() 
-            // merge using trkFit.setTrackWord()
-         //}
+        // if there are > 3 stubs in common, merge tracks into single track
+        //if (stubs in common > 3 ){
+          // merging tracks
+          // assign track helix params according to best seed type between the two tracks - trkFit.getSeedType() 
+          // merge using trkFit.setTrackWord() - using parameters of track with best seed type
+        //}
 
-    }
     bx_o = bx;
   }
 }
