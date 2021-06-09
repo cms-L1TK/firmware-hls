@@ -36,10 +36,12 @@ class TrackletEngineUnit {
     idle_ = true;
 
     ap_uint<1> stubptinnertmp[kNBitsPTLut] =
-#include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
+//#include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
+#include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
     
     ap_uint<1> stubptoutertmp[kNBitsPTLut] =
-#include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
+//#include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
+#include "../emData/TP/tables/TP_L2L3C_stubptoutercut.tab"
 
  for(unsigned int i=0;i<kNBitsPTLut;i++) {
    stubptinnerlutnew_[i] = stubptinnertmp[i];

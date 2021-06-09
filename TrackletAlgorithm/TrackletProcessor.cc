@@ -86,4 +86,53 @@ void TrackletProcessor_L1L2D(
 
 }
 
+
+void TrackletProcessor_L2L3C(
+    const BXType bx,
+    const ap_uint<10> lut[2048],
+    const ap_uint<8> regionlut[2048],
+    const AllStubInnerMemory<BARRELPS> innerStubs[3],
+    const AllStubMemory<BARRELPS>* outerStubs,
+    const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+    TrackletParameterMemory * trackletParameters,
+    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
+    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
+    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
+) {
+#pragma HLS inline recursive
+#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2
+#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
+#pragma HLS resource variable=innerStubs[1].get_mem() latency=2
+#pragma HLS resource variable=innerStubs[2].get_mem() latency=2
+#pragma HLS resource variable=outerStubs->get_mem() latency=2
+#pragma HLS resource variable=outerVMStubs.get_mem() latency=2
+#pragma HLS array_partition variable=projout_barrel_ps complete
+#pragma HLS array_partition variable=projout_barrel_2s complete
+#pragma HLS array_partition variable=projout_disk complete
+
+ TP_L2L3C: TrackletProcessor<TF::L2L3,
+                             TC::C,
+                             kNTEUnits,
+                             BARRELPS,
+                             BARRELPS,
+                             2, //Outer phi region
+                             kNbitsrzbin,
+                             kNbitsphibin,
+                             3, //Number of inner AS memories
+                             108>(bx,
+                                  lut,
+                                  regionlut,
+                                  innerStubs,
+                                  outerStubs,
+                                  outerVMStubs,
+                                  trackletParameters,
+                                  projout_barrel_ps,
+                                  projout_barrel_2s,
+                                  projout_disk
+                                  );
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////

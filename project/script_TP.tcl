@@ -11,9 +11,9 @@ open_project -reset trackletProcessor
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top TrackletProcessor_L1L2D
+set_top TrackletProcessor_L2L3C
 add_files ../TrackletAlgorithm/TrackletProcessor.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/TrackletProcessor_L1L2D_test.cpp -cflags "$CFLAGS"
+add_files -tb ../TestBenches/TrackletProcessor_L2L3C_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
 
@@ -22,12 +22,12 @@ source settings_hls.tcl
 
 # data files
 add_files -tb ../emData/TP/tables/
-add_files -tb ../emData/TP/TP_L1L2D/
+add_files -tb ../emData/TP/TP_L2L3C/
 
 csim_design -mflags "-j8"
-csynth_design
-cosim_design 
-export_design -format ip_catalog
+#csynth_design
+#cosim_design 
+#export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -format ip_catalog -flow impl
 
