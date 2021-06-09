@@ -71,6 +71,7 @@ declare -a processing_modules=(
   "TC_L1L2J"
   "TC_L1L2K"
   "TC_L1L2L"
+  "TC_L2L3C"
   "TC_L3L4A"
   "TC_L3L4B"
   "TC_L3L4C"
@@ -133,6 +134,7 @@ declare -a processing_modules=(
 
   # Tracklet Processor
   "TP_L1L2D" 
+  "TP_L2L3C" 
 )
 
 # Function that prints information regarding the usage of this command
