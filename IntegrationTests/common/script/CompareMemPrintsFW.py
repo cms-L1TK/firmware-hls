@@ -112,7 +112,8 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             raise IndexError("Unable to determine the reference file type from the file name")
         finally:
             reference_type = ReferenceType[reference_type_string]
-        print("Comparing " + reference_type.FullName() + " values ... ")
+
+        print("Comparing TB results to ref. file "+str(reference_filename)+" ... ")
 
         # Parse the reference data
         reference_data = parse_reference_file(file_location+"/"+reference_filename)
