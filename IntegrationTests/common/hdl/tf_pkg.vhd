@@ -38,6 +38,7 @@ package tf_pkg is
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
   constant PAGE_LENGTH            : natural := 128;  --! Page length of all memories
+  constant MEM_READ_LATENCY       : natural := 2;    --! Memory read latency.
   -- Memory width constants
   constant RAM_WIDTH_AS    : natural := 36; --! Width for memories
   constant RAM_WIDTH_TPROJ : natural := 60; --! Width for memories
