@@ -32,6 +32,8 @@ entity tf_mem_bin is
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
     RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
+    NUM_MEM_BINS    : natural := 8;                --! Specify number of memory bins
+    NUM_ENTRIES_PER_MEM_BINS : natural := 16;      --! Specify number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
@@ -130,7 +132,7 @@ begin
     if (wea='1') then
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
-      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(N_ENTRIES_PER_MEM_BINS))) mod N_MEM_BINS; -- Calculate bin index
+      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));

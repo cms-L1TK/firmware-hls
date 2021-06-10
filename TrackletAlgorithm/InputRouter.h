@@ -226,8 +226,9 @@ void InputRouter( const BXType bx
 	
 	#pragma HLS inline
 	#pragma HLS interface register port = bx_o
-  
-  	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
+	#pragma HLS array_partition variable = hOutputStubs complete
+
+		ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 
 	// count memories 
 	unsigned int nMems=0;

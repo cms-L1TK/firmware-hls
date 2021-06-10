@@ -7,11 +7,11 @@
 // at the moment I'm changing this for each link 
 // is that really the only way to do this? 
 
-// only for PS10G_1_A for now 
+// only for PS10G_3_A for now 
 // other cases to be added 
 // when I have final link map
 //constexpr unsigned int cTest = (const)(std::atoi(getenv ("TEST")));
-constexpr unsigned int cNMemories = 17; 
+constexpr unsigned int cNMemories = 7;
 
 void InputRouterTop( const BXType bx
 	, const ap_uint<kLINKMAPwidth> kInputLink // input link LUT 

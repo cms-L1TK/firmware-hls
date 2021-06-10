@@ -37,6 +37,8 @@ package tf_pkg is
   constant EMDATA_WIDTH           : natural := 68;   --! Max. bit width of emData
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
+  constant N_MEM_BINS_ME_DISK     : natural := 16;   --! Number of memory bins for ME disk
+  constant N_ENTRIES_PER_MEM_BINS_ME_DISK : natural := 8;   --! Number of entries per memory bin for ME disk
   constant PAGE_LENGTH            : natural := 128;  --! Page length of all memories
   constant MEM_READ_LATENCY       : natural := 2;    --! Memory read latency.
   -- Memory width constants
@@ -85,6 +87,7 @@ package tf_pkg is
   type t_arr8_2_7b is array(0 to 7) of t_arr2_7b;
 
   type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;
+  subtype t_arr2_8_5b is t_arr_8_5b(0 to 1);
   subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
 
@@ -106,6 +109,11 @@ package tf_pkg is
     file_path     : in    string;  --! File path as string
     data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
     n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS-1)     --! Number of entries per event
+  );
+  procedure read_emData_bin_me_disk (
+    file_path     : in    string;  --! File path as string
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS_ME_DISK-1)     --! Number of entries per event
   );
   procedure write_header_line (
     file_path       : in string;  --! File path as string
@@ -310,6 +318,61 @@ package body tf_pkg is
     end loop l_rd_row;
     file_close(file_in);
   end read_emData_bin;
+
+  -- read_emData_bin function for ME disks
+  procedure read_emData_bin_me_disk (
+    file_path     : in    string;  --! File path as string
+    data_arr      : out   t_arr_2d_slv(0 to MAX_EVENTS-1,0 to PAGE_LENGTH-1); --! Dataarray with read values
+    n_entries_arr : inout t_arr_2d_int(0 to MAX_EVENTS-1,0 to N_MEM_BINS_ME_DISK-1)     --! Number of entries per event per bin
+  ) is
+  constant N_X_CHAR        : integer :=1;                        --! Count of 'x' characters before actual value to read
+  file     file_in         : text open READ_MODE is file_path;   -- Text - a file of character strings
+  variable line_in         : line;                               -- Line - one string from a text file
+  variable bx_cnt          : integer;                            -- BX counter
+  variable i_bx_row        : integer;                            -- Read row index
+  variable i_rd_col        : integer;                            -- Read column index
+  variable cnt_x_char      : integer;                            -- Count of 'x' characters
+  variable char            : character;                          -- Character
+  variable mem_bin         : integer;                            -- Bin number of memory
+  variable n_entry_mem_bin : integer;                            -- Entry number of memory bin
+  begin
+    data_arr      := (others => (others => (others => '0'))); -- Init
+    n_entries_arr := (others => (others => 0));               -- Init
+    bx_cnt        := -1;                                      -- Init
+    l_rd_row : while not endfile(file_in) loop -- Read until EoF
+    --l_rd_row : for i in 0 to 5 loop -- Debug
+      readline (file_in, line_in);
+      if (line_in.all(1 to 2) = "BX" or line_in.all = "") then -- Identify event header line or empty line
+        i_bx_row := 0;       -- Init
+        bx_cnt   := bx_cnt +1;
+        --if DEBUG=true then writeline(output, line_in); end if;
+      elsif (bx_cnt >= 0) then
+        i_rd_col := 0;   -- Init
+        cnt_x_char := 0; -- Init
+        l_rd_col : while line_in'length>0 loop  -- Loop over the columns
+          read(line_in, char);                  -- Read chars ...
+            if (i_rd_col=0) then
+              char2int(char, mem_bin);
+            end if;
+            if (i_rd_col=2) then
+              char2int(char, n_entry_mem_bin);
+            end if;
+            if (char='x') then                   -- ... until the next x
+              cnt_x_char := cnt_x_char +1;
+              if (cnt_x_char >= N_X_CHAR) then -- Number of 'x' chars reached
+                hread(line_in, data_arr(bx_cnt,mem_bin*N_ENTRIES_PER_MEM_BINS_ME_DISK+n_entry_mem_bin)(line_in'length*4-1 downto 0)); -- Read value as hex slv (line_in'length in hex)
+              end if;
+              n_entries_arr(bx_cnt,mem_bin) := n_entries_arr(bx_cnt,mem_bin) +1;
+            end if;
+        i_rd_col := i_rd_col +1;
+        end loop l_rd_col;
+        i_bx_row := i_bx_row +1;
+      else
+        assert false report "No BX header before data in txt file" severity FAILURE;
+      end if;
+    end loop l_rd_row;
+    file_close(file_in);
+  end read_emData_bin_me_disk;
 
   --! @brief TextIO procedure to write emData for non-binned memories one line per clock cycle
   procedure write_header_line (

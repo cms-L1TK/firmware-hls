@@ -55,6 +55,6 @@ private:
 };
 
 // Memory definition
-using DTCStubMemory = MemoryTemplate<DTCStub, 3, kNBits_MemAddr>;
+using DTCStubMemory = MemoryTemplate<DTCStub, 1, kNBits_MemAddr>;
 
 #endif

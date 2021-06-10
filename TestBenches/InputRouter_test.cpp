@@ -189,6 +189,13 @@ std::string getDTCName( int pLinkId
 {
   auto cDtcMap = getCablingMap( pInputFile_Wires );
   auto cMapIter = *std::next(cDtcMap.begin(), pLinkId);
+
+  for(auto cMapItem : cDtcMap)
+  {
+    //auto cLyrs = cMapItem.second;
+    std::cout << "DTC " << cMapItem.first << endl;
+  }
+
   return cMapIter.first;
 }
 
@@ -403,7 +410,7 @@ void prepareInputStreams( ifstream * pInputStreams
 int main(int argc, char * argv[])
 {
   // default values for test bench 
-  int cLinkId = 6; 
+  int cLinkId = 8; 
   int cDTCsplit=0;
   int cNonant=4;
   // if cmd line args are passed 

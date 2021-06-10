@@ -24,7 +24,7 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 #endif
 	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType,rzSizeTE,phiRegSize,numTEOCopies> *memoryTEO
+	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits> memoriesTEO[numTEOCopies]
 #endif
 	) {
 
@@ -152,7 +152,7 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 
 		// TEOuter memories
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-		memoryTEO
+		memoriesTEO
 #else
 		nullptr
 #endif
