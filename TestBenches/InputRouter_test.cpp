@@ -189,13 +189,6 @@ std::string getDTCName( int pLinkId
 {
   auto cDtcMap = getCablingMap( pInputFile_Wires );
   auto cMapIter = *std::next(cDtcMap.begin(), pLinkId);
-
-  for(auto cMapItem : cDtcMap)
-  {
-    //auto cLyrs = cMapItem.second;
-    std::cout << "DTC " << cMapItem.first << endl;
-  }
-
   return cMapIter.first;
 }
 
