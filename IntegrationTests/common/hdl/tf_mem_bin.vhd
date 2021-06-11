@@ -33,7 +33,7 @@ entity tf_mem_bin is
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
     RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
     NUM_MEM_BINS    : natural := 8;                --! Specify number of memory bins
-    NUM_ENTRIES_PER_MEM_BINS : natural := 16;      --! Specify number of entries per memory bin
+    NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
