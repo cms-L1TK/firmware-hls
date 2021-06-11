@@ -37,6 +37,8 @@ package tf_pkg is
   constant EMDATA_WIDTH           : natural := 68;   --! Max. bit width of emData
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
+  constant N_MEM_BINS_ME_DISK     : natural := 16;   --! Number of memory bins for ME disk
+  constant N_ENTRIES_PER_MEM_BINS_ME_DISK : natural := 8;   --! Number of entries per memory bin for ME disk
   constant PAGE_LENGTH            : natural := 128;  --! Page length of all memories
   constant MEM_READ_LATENCY       : natural := 2;    --! Memory read latency.
   -- Memory width constants
@@ -85,6 +87,7 @@ package tf_pkg is
   type t_arr8_2_7b is array(0 to 7) of t_arr2_7b;
 
   type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;
+  subtype t_arr2_8_5b is t_arr_8_5b(0 to 1);
   subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
 

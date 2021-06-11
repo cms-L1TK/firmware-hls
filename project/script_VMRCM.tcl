@@ -21,7 +21,6 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/VMRCM/tables/
 add_files -tb ../emData/VMRCM/
 
 csim_design -mflags "-j8"

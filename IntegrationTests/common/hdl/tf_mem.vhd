@@ -104,6 +104,9 @@ attribute ram_style of sa_RAM_data : signal is "block";
 
 begin
 
+-- Check user didn't change values of derived generics.
+assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
+
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter

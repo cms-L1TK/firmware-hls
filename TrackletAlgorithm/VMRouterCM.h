@@ -182,13 +182,14 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		// ME memories
 		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, nTEOCopies> *memoryTEO) {
+		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnits> memoriesTEO[nTEOCopies]) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
 #pragma HLS array_partition variable=inputStubsDisk2S complete dim=1
 #pragma HLS array_partition variable=memoriesAS complete dim=1
 #pragma HLS array_partition variable=memoriesASInner complete dim=1
+#pragma HLS array_partition variable=memoriesTEO complete dim=1
 
 	// Number of data in each input memory
 	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems
@@ -410,8 +411,11 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slotTE) :
 					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
 
-			// Write the TE Outer stub if bin isn't negative
-			memoryTEO->write_mem(bx, slotTE, stubTEO, addrCountTE[slotTE]);
+			// Write stub to all TE memory copies
+			for (int n = 0; n < nTEOCopies; n++) {
+#pragma HLS UNROLL
+				memoriesTEO[n].write_mem(bx, slotTE, stubTEO, addrCountTE[slotTE]);
+			}
 			addrCountTE[slotTE] += 1;
 
 // For debugging
