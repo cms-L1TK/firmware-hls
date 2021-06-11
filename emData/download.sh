@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
+#### fw_synch_210611 ####
+# Standard configuration
+memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
+luts_url="https://cernbox.cern.ch/index.php/s/H2Q8XXjFmyXhYXp/download"
+# Combined modules
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
+
 #### fw_synch_210607 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/I8y7j2zcSsHxIuc/download"
-luts_url="https://cernbox.cern.ch/index.php/s/vbPlDAWrmjVP1lK/download"
+#memprints_url="https://cernbox.cern.ch/index.php/s/I8y7j2zcSsHxIuc/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/vbPlDAWrmjVP1lK/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/w8iw9dnZ0yXJnI8/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/mHpT5TUQ6IZFQqx/download"
+#memprints_url_cm="https://cernbox.cern.ch/index.php/s/w8iw9dnZ0yXJnI8/download"
+#luts_url_cm="https://cernbox.cern.ch/index.php/s/mHpT5TUQ6IZFQqx/download"
 
 #### fw_synch_210503 ####
 # Standard configuration
