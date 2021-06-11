@@ -38,9 +38,6 @@ set_property xsim.simulate.runtime -value "50us" -objects  [get_filesets sim_1]
 
 update_compile_order -fileset sources_1 
 
-# set mode to out_of_context as the VMR has too many input/output ports
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
-
 puts "INFO: Project created: ${projName}"
 
 exit
