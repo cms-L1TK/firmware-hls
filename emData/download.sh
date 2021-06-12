@@ -3,7 +3,7 @@
 #### fw_synch_210611 ####
 # Standard configuration
 memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/H2Q8XXjFmyXhYXp/download"
+luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
