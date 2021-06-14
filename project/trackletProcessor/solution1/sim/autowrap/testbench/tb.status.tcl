@@ -1,1 +1,0 @@
-set ::AESL_AUTOSIM::gTopFileName /mnt/data1/jf847/firmware-hls/project/trackletProcessor/solution1/./sim/autowrap/testbench/TrackletProcessor.cc_pre.cc.tb.cc
