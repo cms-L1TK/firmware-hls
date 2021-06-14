@@ -8,7 +8,9 @@
 #include "CandidateMatchMemory.h"
 
 // HLS Headers
-#include "hls_math.h"
+#ifndef CMSSW_GIT_HASH
+  #include "hls_math.h"
+#endif
 
 // STL Headers
 #include <iostream>

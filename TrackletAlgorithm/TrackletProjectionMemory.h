@@ -212,6 +212,30 @@ public:
   void setRZDer(const TProjRZDER zder) {
     data_.range(kTProjRZDMSB,kTProjRZDLSB) = zder;
   }
+
+  std::string getBitStr() {
+
+     std::string str = decodeToBits(getTCID(),TrackletProjectionBase<TProjType>::kTProjTCIDSize);
+     str += "|"+decodeToBits(getTrackletIndex(),TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize);
+     str += "|"+decodeToBits(getPhi(),TrackletProjectionBase<TProjType>::kTProjPhiSize);
+     str += "|"+decodeToBits(getRZ(),TrackletProjectionBase<TProjType>::kTProjRZSize);
+     str += "|"+decodeToBits(getPhiDer(),TrackletProjectionBase<TProjType>::kTProjPhiDSize);
+     str += "|"+decodeToBits(getRZDer(),TrackletProjectionBase<TProjType>::kTProjRZDSize);
+     return str;
+  }
+
+  // TO DO: This belongs in some sort of helper class.
+  std::string decodeToBits(unsigned int field, unsigned int size) const
+  {
+
+    unsigned int valtmp = field;
+    std::string str = "";
+    for(unsigned int i=0; i< size; i++) {
+      str = ((valtmp & 1) ? "1" : "0") + str;
+      valtmp >>= 1;
+    }
+    return str;
+  }
   
 private:
   

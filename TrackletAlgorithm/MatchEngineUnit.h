@@ -10,7 +10,11 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
-#include "hls_math.h"
+
+#ifndef CMSSW_GIT_HASH
+  #include "hls_math.h"
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <bitset>

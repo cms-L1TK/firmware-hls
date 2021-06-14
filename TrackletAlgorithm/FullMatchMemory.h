@@ -246,6 +246,29 @@ public:
     data_.range(kFMZResMSB,kFMZResLSB) = zres;
   }
 
+  std::string getBitStr() {
+
+     std::string str = decodeToBits(getTCID(),FullMatchBase<FMType>::kFMTCIDSize);
+     str += "|"+decodeToBits(getTrackletIndex(),FullMatchBase<FMType>::kFMTrackletIndexSize);
+     str += "|"+decodeToBits(getStubIndex(),FullMatchBase<FMType>::kFMStubIndexSize);
+     str += "|"+decodeToBits(getPhiRes(),FullMatchBase<FMType>::kFMPhiResSize);
+     str += "|"+decodeToBits(getZRes(),FullMatchBase<FMType>::kFMZResSize);
+     return str;
+  }
+
+  // TO DO: This belongs in some sort of helper class.
+  std::string decodeToBits(unsigned int field, unsigned int size) const
+  {
+
+    unsigned int valtmp = field;
+    std::string str = "";
+    for(unsigned int i=0; i< size; i++) {
+      str = ((valtmp & 1) ? "1" : "0") + str;
+      valtmp >>= 1;
+    }
+    return str;
+  }
+
 private:
 
   FullMatchData data_;

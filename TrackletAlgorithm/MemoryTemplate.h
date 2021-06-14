@@ -130,7 +130,7 @@ public:
 
   void print_mem(BunchXingT bx) const
   {
-	for (int i = 0; i <  nentries_[bx]; ++i) {
+	for (unsigned int i = 0; i <  nentries_[bx]; ++i) {
 	  std::cout << bx << " " << i << " ";
 	  print_entry(bx,i);
 	}
@@ -138,8 +138,8 @@ public:
 
   void print_mem() const
   {
-	for (int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
-	  for (int i = 0; i < nentries_[ibx]; ++i) {
+	for (unsigned int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
+	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
 		std::cout << ibx << " " << i << " ";
 		print_entry(ibx,i);
 	  }
@@ -147,7 +147,15 @@ public:
   }
 
   static constexpr int getWidth() {return DataType::getWidth();}
-  
+ 
+  std::string name_;
+  void setName(std::string name) { name_ = name;}
+  std::string const& getName() const { return name_;}
+
+  unsigned int iSector_;
+  void setSector(unsigned int iS) { iSector_ = iS;}
+  unsigned int getSector() const { return iSector_;}
+ 
 #endif
 
 };

@@ -139,8 +139,8 @@ class MemoryTemplateBinnedCM{
     DataType data("0",16);
     for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
       // Clear data
-      for (int i = 0; i < getNBins(); ++i ) {
-        for (int j = 0; j < getNEntryPerBin(); ++j) {
+      for (unsigned int i = 0; i < getNBins(); ++i ) {
+        for (unsigned int j = 0; j < getNEntryPerBin(); ++j) {
           write_mem(ibx, i, data, j);
         }
       }
@@ -206,10 +206,10 @@ class MemoryTemplateBinnedCM{
 
   void print_mem(BunchXingT bx) const
   {
-	for(int slot=0;slot<8;slot++) {
+	for(unsigned int slot=0;slot<8;slot++) {
       //std::cout << "slot "<<slot<<" entries "
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
-      for (int i = 0; i < nentries8_[bx][slot]; ++i) {
+      for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
 		std::cout << bx << " " << i << " ";
 		print_entry(bx, i + slot*getNEntryPerBin() );
       }
@@ -218,8 +218,8 @@ class MemoryTemplateBinnedCM{
 
   void print_mem() const
   {
-	for (int ibx = 0; ibx < kNBxBins; ++ibx) {
-	  for (int i = 0; i < 8; ++i) {
+	for (unsigned int ibx = 0; ibx < kNBxBins; ++ibx) {
+	  for (unsigned int i = 0; i < 8; ++i) {
 		std::cout << ibx << " " << i << " ";
 		print_entry(ibx,i);
 	  }
@@ -227,6 +227,14 @@ class MemoryTemplateBinnedCM{
   }
 
   static constexpr int getWidth() {return DataType::getWidth();}
+
+  std::string name_;
+  void setName(std::string name) { name_ = name;}
+  std::string const& getName() const { return name_;}
+
+  unsigned int iSector_;
+  void setSector(unsigned int iS) { iSector_ = iS;}
+  unsigned int getSector() const { return iSector_;}
   
 #endif
   

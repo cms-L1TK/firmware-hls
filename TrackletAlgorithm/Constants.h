@@ -3,6 +3,11 @@
 
 #include "ap_int.h"
 
+#ifdef CMSSW_GIT_HAS
+  #include "Settings.h"
+  using namespace trklet;
+#endif
+
 // Inline function to convert floating point values to integers, given a
 // digitization constant. The 1.0e-1 is a fudge factor needed to get the
 // floating point truncation to agree exactly with the emulation.
@@ -60,8 +65,10 @@ constexpr int TEBinsBits = 3;
 constexpr double c = 0.299792458; // m/ns
 
 // detector constants
-constexpr int N_LAYER = 6; // # of barrel layers assumed
-constexpr int N_DISK = 5; // # of endcap disks assumed
+#ifndef CMSSW_GIT_HASH
+  constexpr int N_LAYER = 6; // # of barrel layers assumed
+  constexpr int N_DISK = 5; // # of endcap disks assumed
+#endif
 constexpr double bfield = 3.8112; // T
 constexpr int rmean[N_LAYER + N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
 constexpr int zmean[N_LAYER + N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
