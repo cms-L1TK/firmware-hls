@@ -336,7 +336,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // impact parameter.
 
   bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
-  bool valid_z0=abs(*z0) < ((Seed == TF::L1L2 || Seed == TF::L2L3) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
+  bool valid_z0=abs(*z0) < ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
   const bool keep = (phicrit > 9253) && (phicrit < 56269);
   std::cout<<"phi0: "<<*phi0<<" rinv: "<<*rinv<<" z0: "<<*z0<<" phicrit: "<<phicrit<<" valid_rinv: "<<valid_rinv<<" valid_z0: "<<valid_z0<<" keep: "<<keep<<std::endl;
@@ -620,14 +620,14 @@ TrackletProcessor(
 #pragma HLS pipeline II=1
 
     
-    /*    
+        
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
               << tebuffer.readptr()<<" "<<tebuffer.writeptr();
     for (unsigned k = 0; k < NTEUnits; k++){
       std::cout<<" ["<<k<<" "<<teunits[k].readindex_<<" "<<teunits[k].writeindex_<<" "<<teunits[k].idle_<<"]";
     }
     std::cout << std::endl;
-    */
+    
    
 
     //

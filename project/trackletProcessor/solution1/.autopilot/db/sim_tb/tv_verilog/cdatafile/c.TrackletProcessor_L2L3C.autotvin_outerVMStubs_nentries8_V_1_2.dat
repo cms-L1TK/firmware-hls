@@ -1,0 +1,302 @@
+[[[runtime]]]
+[[transaction]] 0
+0x000000000
+[[/transaction]] 
+[[transaction]] 1
+0x000020101
+[[/transaction]] 
+[[transaction]] 2
+0x000000000
+[[/transaction]] 
+[[transaction]] 3
+0x003201000
+[[/transaction]] 
+[[transaction]] 4
+0x000000000
+[[/transaction]] 
+[[transaction]] 5
+0x022000021
+[[/transaction]] 
+[[transaction]] 6
+0x000000000
+[[/transaction]] 
+[[transaction]] 7
+0x020101032
+[[/transaction]] 
+[[transaction]] 8
+0x000000000
+[[/transaction]] 
+[[transaction]] 9
+0x000300102
+[[/transaction]] 
+[[transaction]] 10
+0x000000000
+[[/transaction]] 
+[[transaction]] 11
+0x003201100
+[[/transaction]] 
+[[transaction]] 12
+0x000000000
+[[/transaction]] 
+[[transaction]] 13
+0x020101010
+[[/transaction]] 
+[[transaction]] 14
+0x000000000
+[[/transaction]] 
+[[transaction]] 15
+0x010201011
+[[/transaction]] 
+[[transaction]] 16
+0x000000000
+[[/transaction]] 
+[[transaction]] 17
+0x001000031
+[[/transaction]] 
+[[transaction]] 18
+0x000000000
+[[/transaction]] 
+[[transaction]] 19
+0x000021110
+[[/transaction]] 
+[[transaction]] 20
+0x000000000
+[[/transaction]] 
+[[transaction]] 21
+0x010111001
+[[/transaction]] 
+[[transaction]] 22
+0x000000000
+[[/transaction]] 
+[[transaction]] 23
+0x003000300
+[[/transaction]] 
+[[transaction]] 24
+0x000000000
+[[/transaction]] 
+[[transaction]] 25
+0x031003141
+[[/transaction]] 
+[[transaction]] 26
+0x000000000
+[[/transaction]] 
+[[transaction]] 27
+0x000000012
+[[/transaction]] 
+[[transaction]] 28
+0x000000000
+[[/transaction]] 
+[[transaction]] 29
+0x022212102
+[[/transaction]] 
+[[transaction]] 30
+0x000000000
+[[/transaction]] 
+[[transaction]] 31
+0x003000012
+[[/transaction]] 
+[[transaction]] 32
+0x000000000
+[[/transaction]] 
+[[transaction]] 33
+0x031002121
+[[/transaction]] 
+[[transaction]] 34
+0x000000000
+[[/transaction]] 
+[[transaction]] 35
+0x013000021
+[[/transaction]] 
+[[transaction]] 36
+0x000000000
+[[/transaction]] 
+[[transaction]] 37
+0x020104030
+[[/transaction]] 
+[[transaction]] 38
+0x000000000
+[[/transaction]] 
+[[transaction]] 39
+0x001000100
+[[/transaction]] 
+[[transaction]] 40
+0x000000000
+[[/transaction]] 
+[[transaction]] 41
+0x020102302
+[[/transaction]] 
+[[transaction]] 42
+0x000000000
+[[/transaction]] 
+[[transaction]] 43
+0x000001220
+[[/transaction]] 
+[[transaction]] 44
+0x000000000
+[[/transaction]] 
+[[transaction]] 45
+0x000011011
+[[/transaction]] 
+[[transaction]] 46
+0x000000000
+[[/transaction]] 
+[[transaction]] 47
+0x001100001
+[[/transaction]] 
+[[transaction]] 48
+0x000000000
+[[/transaction]] 
+[[transaction]] 49
+0x020110100
+[[/transaction]] 
+[[transaction]] 50
+0x000000000
+[[/transaction]] 
+[[transaction]] 51
+0x000320011
+[[/transaction]] 
+[[transaction]] 52
+0x000000000
+[[/transaction]] 
+[[transaction]] 53
+0x010001101
+[[/transaction]] 
+[[transaction]] 54
+0x000000000
+[[/transaction]] 
+[[transaction]] 55
+0x010001400
+[[/transaction]] 
+[[transaction]] 56
+0x000000000
+[[/transaction]] 
+[[transaction]] 57
+0x000020101
+[[/transaction]] 
+[[transaction]] 58
+0x000000000
+[[/transaction]] 
+[[transaction]] 59
+0x000100101
+[[/transaction]] 
+[[transaction]] 60
+0x000000000
+[[/transaction]] 
+[[transaction]] 61
+0x001340102
+[[/transaction]] 
+[[transaction]] 62
+0x000000000
+[[/transaction]] 
+[[transaction]] 63
+0x010140000
+[[/transaction]] 
+[[transaction]] 64
+0x000000000
+[[/transaction]] 
+[[transaction]] 65
+0x002110021
+[[/transaction]] 
+[[transaction]] 66
+0x000000000
+[[/transaction]] 
+[[transaction]] 67
+0x000120021
+[[/transaction]] 
+[[transaction]] 68
+0x000000000
+[[/transaction]] 
+[[transaction]] 69
+0x000021201
+[[/transaction]] 
+[[transaction]] 70
+0x000000000
+[[/transaction]] 
+[[transaction]] 71
+0x012110100
+[[/transaction]] 
+[[transaction]] 72
+0x000000000
+[[/transaction]] 
+[[transaction]] 73
+0x030102012
+[[/transaction]] 
+[[transaction]] 74
+0x000000000
+[[/transaction]] 
+[[transaction]] 75
+0x014110113
+[[/transaction]] 
+[[transaction]] 76
+0x000000000
+[[/transaction]] 
+[[transaction]] 77
+0x000000010
+[[/transaction]] 
+[[transaction]] 78
+0x000000000
+[[/transaction]] 
+[[transaction]] 79
+0x011032110
+[[/transaction]] 
+[[transaction]] 80
+0x000000000
+[[/transaction]] 
+[[transaction]] 81
+0x014121421
+[[/transaction]] 
+[[transaction]] 82
+0x000000000
+[[/transaction]] 
+[[transaction]] 83
+0x012100021
+[[/transaction]] 
+[[transaction]] 84
+0x000000000
+[[/transaction]] 
+[[transaction]] 85
+0x010100310
+[[/transaction]] 
+[[transaction]] 86
+0x000000000
+[[/transaction]] 
+[[transaction]] 87
+0x020202411
+[[/transaction]] 
+[[transaction]] 88
+0x000000000
+[[/transaction]] 
+[[transaction]] 89
+0x010100100
+[[/transaction]] 
+[[transaction]] 90
+0x000000000
+[[/transaction]] 
+[[transaction]] 91
+0x001121100
+[[/transaction]] 
+[[transaction]] 92
+0x000000000
+[[/transaction]] 
+[[transaction]] 93
+0x001012010
+[[/transaction]] 
+[[transaction]] 94
+0x000000000
+[[/transaction]] 
+[[transaction]] 95
+0x001000201
+[[/transaction]] 
+[[transaction]] 96
+0x000000000
+[[/transaction]] 
+[[transaction]] 97
+0x000031111
+[[/transaction]] 
+[[transaction]] 98
+0x000000000
+[[/transaction]] 
+[[transaction]] 99
+0x011100120
+[[/transaction]] 
+[[[/runtime]]]

@@ -135,6 +135,8 @@ declare -a processing_modules=(
   # Tracklet Processor
   "TP_L1L2D" 
   "TP_L2L3C" 
+  "TP_L3L4C"
+
 )
 
 # Function that prints information regarding the usage of this command

@@ -1,0 +1,863 @@
+<InterfaceSummary>
+<RtlPorts>
+<name>bx_V</name>
+<CType>
+<TypeName>ap_uint 3</TypeName>
+<TypeWidth>3</TypeWidth>
+<PhysicalWidth>3</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>lut_V</name>
+<CType>
+<TypeName>ap_uint 10</TypeName>
+<TypeWidth>10</TypeWidth>
+<PhysicalWidth>10</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>regionlut_V</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 51</TypeName>
+<TypeWidth>51</TypeWidth>
+<PhysicalWidth>51</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_0_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_1_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_2_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_3_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_4_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_5_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_6_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_0_nentries_7_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_0_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_1_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_2_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_3_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_4_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_5_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_6_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_1_nentries_7_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_0_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_1_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_2_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_3_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_4_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_5_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_6_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>innerStubs_2_nentries_7_V</name>
+<CType>
+<TypeName>ap_uint 7</TypeName>
+<TypeWidth>7</TypeWidth>
+<PhysicalWidth>7</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerStubs_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 36</TypeName>
+<TypeWidth>36</TypeWidth>
+<PhysicalWidth>36</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_dataarray_data_V_0</name>
+<CType>
+<TypeName>ap_uint 16</TypeName>
+<TypeWidth>16</TypeWidth>
+<PhysicalWidth>16</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_dataarray_data_V_1</name>
+<CType>
+<TypeName>ap_uint 16</TypeName>
+<TypeWidth>16</TypeWidth>
+<PhysicalWidth>16</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_0</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_1</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_2</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_3</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_4</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_5</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_6</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_0_7</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_0</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_1</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_2</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_3</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_4</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_5</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_6</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_binmask8_V_1_7</name>
+<CType>
+<TypeName>ap_uint 8</TypeName>
+<TypeWidth>8</TypeWidth>
+<PhysicalWidth>8</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_0</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_1</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_2</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_3</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_4</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_5</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_6</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_0_7</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_0</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_1</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_2</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_3</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_4</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_5</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_6</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>outerVMStubs_nentries8_V_1_7</name>
+<CType>
+<TypeName>ap_uint 32</TypeName>
+<TypeWidth>32</TypeWidth>
+<PhysicalWidth>32</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>trackletParameters_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 70</TypeName>
+<TypeWidth>70</TypeWidth>
+<PhysicalWidth>70</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_ps_3_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 60</TypeName>
+<TypeWidth>60</TypeWidth>
+<PhysicalWidth>60</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_ps_4_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 60</TypeName>
+<TypeWidth>60</TypeWidth>
+<PhysicalWidth>60</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_ps_5_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 60</TypeName>
+<TypeWidth>60</TypeWidth>
+<PhysicalWidth>60</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_ps_6_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 60</TypeName>
+<TypeWidth>60</TypeWidth>
+<PhysicalWidth>60</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_2s_1_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 58</TypeName>
+<TypeWidth>58</TypeWidth>
+<PhysicalWidth>58</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_2s_2_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 58</TypeName>
+<TypeWidth>58</TypeWidth>
+<PhysicalWidth>58</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_2s_3_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 58</TypeName>
+<TypeWidth>58</TypeWidth>
+<PhysicalWidth>58</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_2s_5_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 58</TypeName>
+<TypeWidth>58</TypeWidth>
+<PhysicalWidth>58</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_2s_6_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 58</TypeName>
+<TypeWidth>58</TypeWidth>
+<PhysicalWidth>58</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_barrel_2s_7_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 58</TypeName>
+<TypeWidth>58</TypeWidth>
+<PhysicalWidth>58</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_1_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_2_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_3_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_5_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_6_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_7_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_9_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_10_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_11_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_13_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_14_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+<RtlPorts>
+<name>projout_disk_15_dataarray_data_V</name>
+<CType>
+<TypeName>ap_uint 59</TypeName>
+<TypeWidth>59</TypeWidth>
+<PhysicalWidth>59</PhysicalWidth>
+</CType>
+<CFractionWidth>0</CFractionWidth>
+<InvalidType>0</InvalidType>
+</RtlPorts>
+</InterfaceSummary>
+

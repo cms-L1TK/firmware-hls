@@ -25,8 +25,8 @@ add_files -tb ../emData/TP/tables/
 add_files -tb ../emData/TP/TP_L2L3C/
 
 csim_design -mflags "-j8"
-#csynth_design
-#cosim_design 
+csynth_design
+cosim_design 
 #export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -format ip_catalog -flow impl
