@@ -208,6 +208,7 @@ architecture behavior of tb_tf_top is
   signal AS_36_mem_A_enb             : t_arr_AS_36_1b       := (others => '0');
   signal AS_36_mem_AV_readaddr       : t_arr_AS_36_ADDR     := (others => (others => '0'));
   signal AS_36_mem_AV_dout           : t_arr_AS_36_DATA     := (others => (others => '0'));
+  signal AS_36_mem_AAV_dout_nent     : t_arr_AS_36_NENT     := (others => (others => (others => '0')));
   signal VMSME_16_mem_A_enb          : t_arr_VMSME_16_1b    := (others => '0');
   signal VMSME_16_mem_AV_readaddr    : t_arr_VMSME_16_ADDR  := (others => (others => '0'));
   signal VMSME_16_mem_AV_dout        : t_arr_VMSME_16_DATA  := (others => (others => '0'));
@@ -411,7 +412,7 @@ begin
     port map (
       CLK => CLK,
       DONE => VMR_DONE,
-      NENT_ARR => open,
+      NENT_ARR => AS_36_mem_AAV_dout_nent(var), -- always 0, will that cause issues in FileWriterFromRAM?
       ADDR => AS_36_mem_AV_readaddr(var),
       DATA => AS_36_mem_AV_dout(var),
       READ_EN => AS_36_mem_A_enb(var)
