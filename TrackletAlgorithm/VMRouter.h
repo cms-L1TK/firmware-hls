@@ -47,8 +47,9 @@ constexpr unsigned int nvmteextralayers[3] = { 0, 4, 4 }; // Number of extra TEI
 // Number of bits used for the VMs for different layers and disks
 // E.g. 32 VMs would use 5 vmbits
 constexpr int nbitsvmlayer[6] = { 5, 5, 5, 5, 5, 5 }; // Could be computed using the number of VMs...
+constexpr int nbitsvmdisk[5] = { 5, 4, 4, 4, 4 };
 constexpr int nbitsvmtelayer[6] = { 5, 5, 4, 5, 4, 5 }; // For TE (inner) memories
-constexpr int nbitsvmdisk[5] = { 4, 4, 4, 4, 4 };
+constexpr int nbitsvmtedisk[5] = { 4, 4, 4, 4, 4 };
 constexpr int nbitsvmoverlap[2] = { 4, 3 };
 constexpr int nbitsvmextra[3] = { 0, 4, 4 };
 
@@ -344,7 +345,7 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 	constexpr auto nrbitsinnertable =
 			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of bits for rbins in Inner Table
 	constexpr auto vmbitsTmp =
-			(Layer) ? nbitsvmtelayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
+			(Layer) ? nbitsvmtelayer[Layer - 1] : nbitsvmtedisk[Disk - 1]; // Number of bits for standard VMs
 	constexpr auto vmbits =
 			(Layer != 2) ? vmbitsTmp : nbitsvmextra[Layer - 1]; // Number of bits for VMs
 
@@ -432,7 +433,7 @@ inline VMStubTEOuter<OutType> createStubTEOuter(const InputStub<InType> stub,
 	constexpr auto nrbitsoutertable =
 			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of bits for rbins in Outer Table
 	constexpr auto vmbitsTmp =
-			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
+			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmtedisk[Disk - 1]; // Number of bits for standard VMs
 	constexpr auto vmbits =
 			(Layer != 3) ? vmbitsTmp : nbitsvmextra[Layer - 1]; // Number of bits for VMs
 
