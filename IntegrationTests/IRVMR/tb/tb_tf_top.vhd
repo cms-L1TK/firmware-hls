@@ -76,22 +76,22 @@ architecture behavior of tb_tf_top is
 
   -- Input files
   constant FILE_IN_DL_39 : t_str_arr_DL_39 := (
-  emDataDir&"InputStubs/Link_DL_PS10G_3_A_04.dat", -- 35 long
+  emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat", -- 35 long, REMOVE NEG WHEN YOU FIGURE OUT A WAY FOR IT TO NOT CRASH DUE TO SPACES
   emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat"); -- 38 long
 
   -- Output files IR
   constant FILE_OUT_IL_36 : t_str_arr_IL_36 := (
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIA_PS10G_3_A_04.dat", -- 48 long
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIB_PS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIC_PS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIA_PS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIB_PS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIC_PS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHID_PS10G_3_A_04.dat",
+  emDataDir&"InputStubs/InputStubs_IL_L2PHIA_PS10G_3_A_04.dat   ", -- 48 long
+  emDataDir&"InputStubs/InputStubs_IL_L2PHIB_PS10G_3_A_04.dat   ",
+  emDataDir&"InputStubs/InputStubs_IL_L2PHIC_PS10G_3_A_04.dat   ",
+  emDataDir&"InputStubs/InputStubs_IL_D2PHIA_PS10G_3_A_04.dat   ",
+  emDataDir&"InputStubs/InputStubs_IL_D2PHIB_PS10G_3_A_04.dat   ",
+  emDataDir&"InputStubs/InputStubs_IL_D2PHIC_PS10G_3_A_04.dat   ",
+  emDataDir&"InputStubs/InputStubs_IL_D2PHID_PS10G_3_A_04.dat   ",
   emDataDir&"InputStubs/InputStubs_IL_L2PHIA_negPS10G_3_A_04.dat", -- 51 long
   emDataDir&"InputStubs/InputStubs_IL_L2PHIB_negPS10G_3_A_04.dat",
   emDataDir&"InputStubs/InputStubs_IL_L2PHIC_negPS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIA_negPS10G_3_A _04.dat",
+  emDataDir&"InputStubs/InputStubs_IL_D2PHIA_negPS10G_3_A_04.dat",
   emDataDir&"InputStubs/InputStubs_IL_D2PHIB_negPS10G_3_A_04.dat",
   emDataDir&"InputStubs/InputStubs_IL_D2PHIC_negPS10G_3_A_04.dat",
   emDataDir&"InputStubs/InputStubs_IL_D2PHID_negPS10G_3_A_04.dat");
@@ -141,7 +141,6 @@ architecture behavior of tb_tf_top is
   emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA1n2_04.dat",
   emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA1n3_04.dat",
   emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n1_04.dat",
   emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n2_04.dat",
   emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n3_04.dat",
   emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n4_04.dat",
@@ -178,7 +177,7 @@ architecture behavior of tb_tf_top is
 
   -- Debug output files to check input was correctly read.
   constant FILE_OUT_DL_debug : t_str_arr_DL_39_debug := (
-  dataOutDir&"Link_DL_PS10G_3_A.debug.txt",  
+  dataOutDir&"Link_DL_PS10G_3_A.debug.txt   ",  
   dataOutDir&"Link_DL_negPS10G_3_A.debug.txt"); -- 30 long
 
   -- ########################### Signals ###########################
@@ -235,21 +234,20 @@ begin
 
   DL_39_loop : for var in enum_DL_39 generate
   begin
-    readDL_39 : entity work.FileReader 
+    readDL_39 : entity work.FileReaderToFIFO 
     generic map (
       FILE_NAME  => FILE_IN_DL_39(var),
       DELAY      => DL_DELAY*MAX_ENTRIES,
-      RAM_WIDTH  => 39,
-      NUM_PAGES  => 2,
+      FIFO_WIDTH  => 39,
       DEBUG      => true,
       FILE_NAME_DEBUG => FILE_OUT_DL_debug(var)
     )
     port map (
       CLK => CLK,
-      ADDR => DL_39_link_read(var), -- needs to change
+      READ_SHIT => DL_39_link_read(var), -- needs to change??
+      EMPTY_NEG => DL_39_link_empty_neg(var), -- needs to change??
       DATA => DL_39_link_AV_dout(var),
-      START => START_DL(var),
-      WRITE_EN => DL_39_link_AV_dout(var) -- needs to change
+      START => START_DL(var)
     );
   end generate DL_39_loop;
 
@@ -421,7 +419,7 @@ begin
 
   VMSME_16_loop : for var in enum_VMSME_16 generate
   begin
-    writeME_16 : entity work.FileWriterFromRAM 
+    writeME_16 : entity work.FileWriterFromRAMBinned 
     generic map (
       FILE_NAME  => FILE_OUT_VMSME_16(var),
       RAM_WIDTH  => 16,
@@ -442,7 +440,7 @@ begin
     writeTE_22 : entity work.FileWriterFromRAM 
     generic map (
       FILE_NAME  => FILE_OUT_VMSTE_22(var),
-      RAM_WIDTH  => 16,
+      RAM_WIDTH  => 22,
       NUM_PAGES  => 2
     )
     port map (
@@ -457,7 +455,7 @@ begin
 
   VMSTE_16_loop : for var in enum_VMSTE_16 generate
   begin
-    writeTE_16 : entity work.FileWriterFromRAM 
+    writeTE_16 : entity work.FileWriterFromRAMBinned 
     generic map (
       FILE_NAME  => FILE_OUT_VMSTE_16(var),
       RAM_WIDTH  => 16,
