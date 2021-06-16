@@ -38,7 +38,7 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::A>() {
   return 0x0;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::A>() {
-  return 0x3311000;
+  return 0x2311000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::A>() {
   return 0x3333;
@@ -84,10 +84,10 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::C>() {
   return 0x620;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::C>() {
-  return 0x7333000;
+  return 0x3333000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::C>() {
-  return 0x7777;
+  return 0x3337;
 }
 
 // magic numbers for TC_L1L2D
@@ -130,7 +130,7 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::E>() {
   return 0x0;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::E>() {
-  return 0x7776000;
+  return 0x7772000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::E>() {
   return 0x7777;
@@ -153,10 +153,10 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::F>() {
   return 0xC40;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::F>() {
-  return 0x7766000;
+  return 0x7666000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::F>() {
-  return 0xFFFF;
+  return 0x777F;
 }
 
 // magic numbers for TC_L1L2G
@@ -176,10 +176,10 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::G>() {
   return 0x1FDC;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::G>() {
-  return 0xEE66000;
+  return 0xE666000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::G>() {
-  return 0xFFFF;
+  return 0xEEEF;
 }
 
 // magic numbers for TC_L1L2H
@@ -199,7 +199,7 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::H>() {
   return 0x0;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::H>() {
-  return 0xEEEE000;
+  return 0xEEE4000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::H>() {
   return 0xEEEE;
@@ -245,10 +245,10 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::J>() {
   return 0x1FB9;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::J>() {
-  return 0xECCC000;
+  return 0xCCCC000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::J>() {
-  return 0xEEEE;
+  return 0xCCCE;
 }
 
 // magic numbers for TC_L1L2K
@@ -268,7 +268,7 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::K>() {
   return 0x0;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::K>() {
-  return 0xCCCC000;
+  return 0xCCC8000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::K>() {
   return 0xCCCC;
@@ -291,7 +291,7 @@ template<> constexpr uint32_t ASOuterMask<TF::L1L2, TC::L>() {
   return 0x0;
 }
 template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TC::L>() {
-  return 0xCC88000;
+  return 0x4C88000;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TC::L>() {
   return 0xCCCC;
@@ -317,7 +317,7 @@ template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TC::A>() {
   return 0x3300306;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TC::A>() {
-  return 0x77;
+  return 0x33;
 }
 
 // magic numbers for TC_L3L4D
@@ -340,7 +340,7 @@ template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TC::D>() {
   return 0xCC00CE0;
 }
 template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TC::D>() {
-  return 0xEE;
+  return 0xCC;
 }
 
 // magic numbers for TC_L5L6A
