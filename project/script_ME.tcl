@@ -24,18 +24,11 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/ME/
 
-set csim_return [catch {csim_design -mflags "-j8"}]
+csim_design -mflags "-j8"
 csynth_design
-set cosim_return [catch {cosim_design -trace_level all -rtl verilog}]
+cosim_design -trace_level all -rtl verilog
 export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
 #export_design -rtl verilog -format ip_catalog -flow impl
-
-# If the C-simulation or C/RTL cosimulation fail, we catch the errors above and
-# only exit with an error code here, so that the design is still C-synthesized
-# and exported for the PR-ME-MC chain. REMOVE AFTER DEBUGGING.
-if {$csim_return != 0 || $cosim_return != 0} {
-  exit 1
-}
 
 exit
