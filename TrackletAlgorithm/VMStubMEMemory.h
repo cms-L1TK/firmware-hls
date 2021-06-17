@@ -136,18 +136,15 @@ public:
     data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
   }
 
-  std::string getBitStr()
-  {
-     std::string str = decodeToBits(getIndex(),VMStubMEBase<VMSMEType>::kVMSMEIndexSize);
-     str += "|"+decodeToBits(getBend(),VMStubMEBase<VMSMEType>::kVMSMEBendSize);
-     str += "|"+decodeToBits(getFineZ(),VMStubMEBase<VMSMEType>::kVMSMEFineZSize);
-     return str;
+  std::string getBitStr() {
+    std::string str = decodeToBits(getIndex(),VMStubMEBase<VMSMEType>::kVMSMEIndexSize);
+    str += "|"+decodeToBits(getBend(),VMStubMEBase<VMSMEType>::kVMSMEBendSize);
+    str += "|"+decodeToBits(getFineZ(),VMStubMEBase<VMSMEType>::kVMSMEFineZSize);
+    return str;
   }
 
   // TO DO: This belongs in some sort of helper class.
-  std::string decodeToBits(unsigned int field, unsigned int size) const
-  {
-
+  std::string decodeToBits(unsigned int field, unsigned int size) const {
     unsigned int valtmp = field;
     std::string str = "";
     for(unsigned int i=0; i< size; i++) {

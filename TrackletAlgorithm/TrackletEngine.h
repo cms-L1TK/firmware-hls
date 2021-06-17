@@ -5,7 +5,10 @@
 #include "VMStubTEOuterMemory.h"
 #include "StubPairMemory.h"
 
-#include "hls_math.h"
+#if __has_include
+  #include "hls_math.h"
+#endif
+
 #include <string>
 
 class CandMatch;

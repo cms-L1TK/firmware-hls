@@ -8,7 +8,7 @@
 #include "CandidateMatchMemory.h"
 
 // HLS Headers
-#ifndef CMSSW_GIT_HASH
+#if __has_include
   #include "hls_math.h"
 #endif
 

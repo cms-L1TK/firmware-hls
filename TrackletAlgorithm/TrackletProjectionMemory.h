@@ -214,20 +214,17 @@ public:
   }
 
   std::string getBitStr() {
-
-     std::string str = decodeToBits(getTCID(),TrackletProjectionBase<TProjType>::kTProjTCIDSize);
-     str += "|"+decodeToBits(getTrackletIndex(),TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize);
-     str += "|"+decodeToBits(getPhi(),TrackletProjectionBase<TProjType>::kTProjPhiSize);
-     str += "|"+decodeToBits(getRZ(),TrackletProjectionBase<TProjType>::kTProjRZSize);
-     str += "|"+decodeToBits(getPhiDer(),TrackletProjectionBase<TProjType>::kTProjPhiDSize);
-     str += "|"+decodeToBits(getRZDer(),TrackletProjectionBase<TProjType>::kTProjRZDSize);
-     return str;
+    std::string str = decodeToBits(getTCID(),TrackletProjectionBase<TProjType>::kTProjTCIDSize);
+    str += "|"+decodeToBits(getTrackletIndex(),TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize);
+    str += "|"+decodeToBits(getPhi(),TrackletProjectionBase<TProjType>::kTProjPhiSize);
+    str += "|"+decodeToBits(getRZ(),TrackletProjectionBase<TProjType>::kTProjRZSize);
+    str += "|"+decodeToBits(getPhiDer(),TrackletProjectionBase<TProjType>::kTProjPhiDSize);
+    str += "|"+decodeToBits(getRZDer(),TrackletProjectionBase<TProjType>::kTProjRZDSize);
+    return str;
   }
 
   // TO DO: This belongs in some sort of helper class.
-  std::string decodeToBits(unsigned int field, unsigned int size) const
-  {
-
+  std::string decodeToBits(unsigned int field, unsigned int size) const {
     unsigned int valtmp = field;
     std::string str = "";
     for(unsigned int i=0; i< size; i++) {
