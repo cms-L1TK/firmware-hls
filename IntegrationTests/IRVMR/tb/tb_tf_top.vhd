@@ -74,10 +74,13 @@ architecture behavior of tb_tf_top is
   constant emDataDir  : string := "../../../../../../../../emData/MemPrints/"; -- 41 long
   constant dataOutDir : string := "../../../../../dataOut/"; -- 23 long
 
+  constant fileEnding : string := "_04.dat"; -- what all data files end with
+ 
   -- Input files
-  constant FILE_IN_DL_39 : t_str_arr_DL_39 := (
-  emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat", -- 35 long, REMOVE NEG WHEN YOU FIGURE OUT A WAY FOR IT TO NOT CRASH DUE TO SPACES
-  emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat"); -- 38 long
+  -- constant FILE_IN_DL_39 : t_str_arr_DL_39 := (
+  -- emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat", -- 35 long, REMOVE NEG WHEN YOU FIGURE OUT A WAY FOR IT TO NOT CRASH DUE TO SPACES
+  -- emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat"); -- 38 long
+  constant FILE_IN_DL_39_DIR : string := emDataDir&"InputStubs/";
 
   -- Output files IR
   constant FILE_OUT_IL_36 : t_str_arr_IL_36 := (
@@ -97,14 +100,16 @@ architecture behavior of tb_tf_top is
   emDataDir&"InputStubs/InputStubs_IL_D2PHID_negPS10G_3_A_04.dat");
 
   -- Output files VMR
-  constant FILE_OUT_AS_36 : t_str_arr_AS_36 := (
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn1_04.dat",
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn2_04.dat",
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn3_04.dat",
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn4_04.dat",
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn5_04.dat",
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn6_04.dat",
-  emDataDir&"Stubs/AllStubs_AS_L2PHIAn7_04.dat"); -- 33 long
+  -- constant FILE_OUT_AS_36 : t_str_arr_AS_36 := (
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn1_04.dat",
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn2_04.dat",
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn3_04.dat",
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn4_04.dat",
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn5_04.dat",
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn6_04.dat",
+  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn7_04.dat"); -- 33 long
+
+  constant FILE_OUT_AS_36_DIR : string := emDataDir&"Stubs/";
 
   constant FILE_OUT_VMSME_16 : t_str_arr_VMSME_16 := ( -- 40 long
   emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA1n1_04.dat",
@@ -236,7 +241,7 @@ begin
   begin
     readDL_39 : entity work.FileReaderToFIFO 
     generic map (
-      FILE_NAME  => FILE_IN_DL_39(var),
+      FILE_NAME  => FILE_IN_DL_39_DIR&get_filename(var),
       DELAY      => DL_DELAY*MAX_ENTRIES,
       FIFO_WIDTH  => 39,
       DEBUG      => true,
@@ -403,7 +408,7 @@ begin
   begin
     writeAS_36 : entity work.FileWriterFromRAM 
     generic map (
-      FILE_NAME  => FILE_OUT_AS_36(var),
+      FILE_NAME  => FILE_OUT_AS_36_DIR&get_filename(var),
       RAM_WIDTH  => 36,
       NUM_PAGES  => 8
     )

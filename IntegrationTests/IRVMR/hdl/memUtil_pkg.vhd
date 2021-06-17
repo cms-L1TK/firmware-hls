@@ -6,6 +6,8 @@ use work.tf_pkg.all;
 
 package memUtil_pkg is
 
+  -- ########################### Types ###########################
+
   type enum_DL_39 is (PS10G_3_A,negPS10G_3_A);
 
   type enum_IL_36 is (L2PHIB_PS10G_3_A,L2PHIC_PS10G_3_A,D2PHIA_PS10G_3_A,D2PHIB_PS10G_3_A,D2PHIC_PS10G_3_A,D2PHID_PS10G_3_A,L2PHIB_negPS10G_3_A,L2PHIC_negPS10G_3_A,D2PHIA_negPS10G_3_A,D2PHIB_negPS10G_3_A,D2PHIC_negPS10G_3_A,D2PHID_negPS10G_3_A,L2PHIA_PS10G_3_A,L2PHIA_negPS10G_3_A);
@@ -40,4 +42,41 @@ package memUtil_pkg is
   type t_arr_VMSTE_22_ADDR is array(enum_VMSTE_22) of std_logic_vector(7 downto 0);
   type t_arr_VMSTE_22_DATA is array(enum_VMSTE_22) of std_logic_vector(21 downto 0);
   type t_arr_VMSTE_22_NENT is array(enum_VMSTE_22) of t_arr2_7b;
+  
+  -- ########################### Functions ########################
+  
+  function get_filename(val: enum_DL_39) return string;
+  function get_filename(val: enum_AS_36) return string;
+
 end package memUtil_pkg;
+
+
+package body memUtil_pkg is
+  
+  -- ########################### Functions ########################
+
+  function get_filename(val: enum_DL_39) return string is
+  begin
+    case val is
+      when PS10G_3_A => return "Link_DL_PS10G_3_A_04.dat";
+      when negPS10G_3_A => return "Link_DL_negPS10G_3_A_04.dat";
+    end case;
+    return "No filename found.";
+  end get_filename;
+
+  function get_filename(val: enum_AS_36) return string is
+  begin
+    case val is
+      when L2PHIAn1 => return "AllStubs_AS_L2PHIAn1_04.dat";
+      when L2PHIAn2 => return "AllStubs_AS_L2PHIAn2_04.dat";
+      when L2PHIAn3 => return "AllStubs_AS_L2PHIAn3_04.dat";
+      when L2PHIAn4 => return "AllStubs_AS_L2PHIAn4_04.dat";
+      when L2PHIAn5 => return "AllStubs_AS_L2PHIAn5_04.dat";
+      when L2PHIAn6 => return "AllStubs_AS_L2PHIAn6_04.dat"; 
+      when L2PHIAn7 => return "AllStubs_AS_L2PHIAn7_04.dat";
+    end case;
+    return "No filename found.";
+  end get_filename;
+
+end package body memUtil_pkg;
+      
