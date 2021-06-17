@@ -8,7 +8,7 @@
 #include "CandidateMatchMemory.h"
 
 // HLS Headers
-#if __has_include
+#ifdef __SYNTHESIS__
   #include "hls_math.h"
 #endif
 

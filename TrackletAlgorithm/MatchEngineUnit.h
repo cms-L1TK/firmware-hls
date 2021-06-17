@@ -11,7 +11,7 @@
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
 
-#if __has_include
+#ifdef __SYNTHESIS__
   #include "hls_math.h"
 #endif
 

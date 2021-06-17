@@ -5,7 +5,7 @@
 #include "VMStubTEOuterMemory.h"
 #include "StubPairMemory.h"
 
-#if __has_include
+#ifdef __SYNTHESIS__
   #include "hls_math.h"
 #endif
 

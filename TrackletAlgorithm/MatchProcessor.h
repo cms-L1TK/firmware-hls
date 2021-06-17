@@ -12,7 +12,7 @@
 #include "FullMatchMemory.h"
 #include "MatchEngineUnit.h"
 
-#if __has_include
+#ifdef __SYNTHESIS__
   #include "hls_math.h"
 #endif
 
