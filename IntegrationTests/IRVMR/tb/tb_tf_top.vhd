@@ -41,18 +41,6 @@ end tb_tf_top;
 
 --! @brief TB
 architecture behavior of tb_tf_top is
-  -- ########################### Types ###########################
-  -- Define type of array of strings for input/output file names.
-  type t_str_arr_DL_39    is array(enum_DL_39)     of string(1 to 79);   -- WHAT HAPPENS IF THE STRINGS ARE NOT THE SAME LENGTH
-  type t_str_arr_IL_36    is array(enum_IL_36)     of string(1 to 92);   -- WHAT ARE THESE NUMBERS??? Seems to be number of characters for emdata+directory
-  type t_str_arr_AS_36    is array(enum_AS_36)     of string(1 to 74);
-  type t_str_arr_VMSME_16 is array(enum_VMSME_16)  of string(1 to 81);
-  type t_str_arr_VMSTE_22 is array(enum_VMSTE_22)  of string(1 to 81);
-  type t_str_arr_VMSTE_16 is array(enum_VMSTE_16)  of string(1 to 81);
-
-
-  -- Define type of array of strings for debug output file names. 
-  type t_str_arr_DL_39_debug    is array(enum_DL_39)     of string(1 to 53); -- WTF WHY IS THE NUMBER DIFFERENT
 
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
@@ -74,116 +62,22 @@ architecture behavior of tb_tf_top is
   constant emDataDir  : string := "../../../../../../../../emData/MemPrints/"; -- 41 long
   constant dataOutDir : string := "../../../../../dataOut/"; -- 23 long
 
-  constant fileEnding : string := "_04.dat"; -- what all data files end with
- 
+  -- File directories and the start of the file names that they have in common
   -- Input files
-  -- constant FILE_IN_DL_39 : t_str_arr_DL_39 := (
-  -- emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat", -- 35 long, REMOVE NEG WHEN YOU FIGURE OUT A WAY FOR IT TO NOT CRASH DUE TO SPACES
-  -- emDataDir&"InputStubs/Link_DL_negPS10G_3_A_04.dat"); -- 38 long
-  constant FILE_IN_DL_39_DIR : string := emDataDir&"InputStubs/";
-
-  -- Output files IR
-  constant FILE_OUT_IL_36 : t_str_arr_IL_36 := (
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIA_PS10G_3_A_04.dat   ", -- 48 long
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIB_PS10G_3_A_04.dat   ",
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIC_PS10G_3_A_04.dat   ",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIA_PS10G_3_A_04.dat   ",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIB_PS10G_3_A_04.dat   ",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIC_PS10G_3_A_04.dat   ",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHID_PS10G_3_A_04.dat   ",
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIA_negPS10G_3_A_04.dat", -- 51 long
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIB_negPS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_L2PHIC_negPS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIA_negPS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIB_negPS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHIC_negPS10G_3_A_04.dat",
-  emDataDir&"InputStubs/InputStubs_IL_D2PHID_negPS10G_3_A_04.dat");
-
-  -- Output files VMR
-  -- constant FILE_OUT_AS_36 : t_str_arr_AS_36 := (
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn1_04.dat",
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn2_04.dat",
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn3_04.dat",
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn4_04.dat",
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn5_04.dat",
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn6_04.dat",
-  -- emDataDir&"Stubs/AllStubs_AS_L2PHIAn7_04.dat"); -- 33 long
-
-  constant FILE_OUT_AS_36_DIR : string := emDataDir&"Stubs/";
-
-  constant FILE_OUT_VMSME_16 : t_str_arr_VMSME_16 := ( -- 40 long
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA1n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA2n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA3n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA4n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA5n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA6n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA7n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L2PHIA8n1_04.dat");
-
-  constant FILE_OUT_VMSTE_22 : t_str_arr_VMSTE_22 := ( -- 40 long
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII1n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII1n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII2n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII2n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII2n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII3n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII3n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII3n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII4n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII4n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHII4n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX1n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX1n6_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX1n7_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX2n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX2n6_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX2n7_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIX2n8_04.dat");
-
-  constant FILE_OUT_VMSTE_16 : t_str_arr_VMSTE_16 := ( -- 40 long
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA1n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA1n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA1n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA2n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA3n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA3n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA3n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA3n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA3n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA4n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA4n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA4n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA4n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA4n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA5n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA5n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA5n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA5n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA5n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA6n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA6n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA6n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA6n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA6n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA7n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA7n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA7n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA7n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA7n5_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA8n1_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA8n2_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA8n3_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA8n4_04.dat",
-  emDataDir&"VMStubsTE/VMStubs_VMSTE_L2PHIA8n5_04.dat");
-
+  constant FILE_IN_DL_39 : string := emDataDir&"InputStubs/Link_DL_";
+  -- Output files
+  constant FILE_OUT_IL_36 : string := dataOutDir&"IL_";
+  constant FILE_OUT_AS_36 : string := dataOutDir&"AS_";
+  constant FILE_OUT_VMSME_16 : string := dataOutDir&"VMSME_";
+  constant FILE_OUT_VMSTE_22 : string := dataOutDir&"VMSTEI_";
+  constant FILE_OUT_VMSTE_16 : string := dataOutDir&"VMSTEO_";
   -- Debug output files to check input was correctly read.
-  constant FILE_OUT_DL_debug : t_str_arr_DL_39_debug := (
-  dataOutDir&"Link_DL_PS10G_3_A.debug.txt   ",  
-  dataOutDir&"Link_DL_negPS10G_3_A.debug.txt"); -- 30 long
+  constant FILE_OUT_DL_debug : string := dataOutDir&"DL_";
+
+  -- File name endings
+  constant inputFileNameEnding : string := "_04.dat";
+  constant outputFileNameEnding : string := ".txt";
+  constant debugFileNameEnding : string := ".debug.txt";
 
   -- ########################### Signals ###########################
   -- ### UUT signals ###
@@ -226,8 +120,8 @@ architecture behavior of tb_tf_top is
   signal VMSTE_22_mem_AV_dout        : t_arr_VMSTE_22_DATA  := (others => (others => '0'));
   signal VMSTE_22_mem_AAV_dout_nent  : t_arr_VMSTE_22_NENT  := (others => (others => (others => '0')));
 
-  -- Indicates that writing of DL memories of first event has started.
-  signal START_FIRST_WRITE : std_logic := '0';
+  -- Indicates that reading of DL of first event has started.
+  signal START_FIRST_DL : std_logic := '1';
   signal START_DL : t_arr_DL_39_1b := (others => '0');
 
 begin
@@ -241,11 +135,11 @@ begin
   begin
     readDL_39 : entity work.FileReaderToFIFO 
     generic map (
-      FILE_NAME  => FILE_IN_DL_39_DIR&get_filename(var),
+      FILE_NAME  => FILE_IN_DL_39&memory_enum_to_string(var)&inputFileNameEnding,
       DELAY      => DL_DELAY*MAX_ENTRIES,
       FIFO_WIDTH  => 39,
       DEBUG      => true,
-      FILE_NAME_DEBUG => FILE_OUT_DL_debug(var)
+      FILE_NAME_DEBUG => FILE_OUT_DL_debug&memory_enum_to_string(var)&debugFileNameEnding
     )
     port map (
       CLK => CLK,
@@ -258,29 +152,28 @@ begin
 
   -- As all DL39 signals start together, take first one, to determine when 
   -- first event starts being written to first memory in chain.
-  START_FIRST_WRITE <= START_DL(enum_DL_39'val(0));
+  -- START_FIRST_DL <= START_DL(enum_DL_39'val(0));
 
   procStart : process(CLK)
     -- Process to start first module in chain & generate its BX counter input.
     -- Also releases reset flag.
     constant CLK_RESET : natural := 5; -- Any low number OK.
     variable CLK_COUNT : natural := 1;
-    variable EVENT_COUNT : integer := -1;
+    variable EVENT_COUNT : integer := 0;
     variable v_line : line; -- Line for debug
   begin
 
-    if START_FIRST_WRITE = '1' then
+    if START_FIRST_DL = '1' then
       if rising_edge(CLK) then
+
+        IR_START <= '1';
+        IR_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, IR_BX_IN'length));
+
         if (CLK_COUNT < MAX_ENTRIES) then
           CLK_COUNT := CLK_COUNT + 1;
         else
           CLK_COUNT := 1;
           EVENT_COUNT := EVENT_COUNT + 1;
-
-          -- IR should start one TM period after time when first event starting being 
-          -- written to first memory in chain, as it takes this long to write full event.
-          IR_START <= '1';
-          IR_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, IR_BX_IN'length));
 
           write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
         end if;
@@ -385,7 +278,7 @@ begin
     begin
       writeIL_36 : entity work.FileWriter 
       generic map (
-        FILE_NAME  => FILE_OUT_IL_36(var),
+        FILE_NAME  => FILE_OUT_IL_36&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH  => 36,
         NUM_PAGES  => 2
       )
@@ -408,7 +301,7 @@ begin
   begin
     writeAS_36 : entity work.FileWriterFromRAM 
     generic map (
-      FILE_NAME  => FILE_OUT_AS_36_DIR&get_filename(var),
+      FILE_NAME  => FILE_OUT_AS_36&memory_enum_to_string(var)&outputFileNameEnding,
       RAM_WIDTH  => 36,
       NUM_PAGES  => 8
     )
@@ -426,7 +319,7 @@ begin
   begin
     writeME_16 : entity work.FileWriterFromRAMBinned 
     generic map (
-      FILE_NAME  => FILE_OUT_VMSME_16(var),
+      FILE_NAME  => FILE_OUT_VMSME_16&memory_enum_to_string(var)&outputFileNameEnding,
       RAM_WIDTH  => 16,
       NUM_PAGES  => 8
     )
@@ -444,7 +337,7 @@ begin
   begin
     writeTE_22 : entity work.FileWriterFromRAM 
     generic map (
-      FILE_NAME  => FILE_OUT_VMSTE_22(var),
+      FILE_NAME  => FILE_OUT_VMSTE_22&memory_enum_to_string(var)&outputFileNameEnding,
       RAM_WIDTH  => 22,
       NUM_PAGES  => 2
     )
@@ -462,7 +355,7 @@ begin
   begin
     writeTE_16 : entity work.FileWriterFromRAMBinned 
     generic map (
-      FILE_NAME  => FILE_OUT_VMSTE_16(var),
+      FILE_NAME  => FILE_OUT_VMSTE_16&memory_enum_to_string(var)&outputFileNameEnding,
       RAM_WIDTH  => 16,
       NUM_PAGES  => 2
     )

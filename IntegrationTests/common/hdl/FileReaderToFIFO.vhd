@@ -26,7 +26,7 @@ entity FileReaderToFIFO is
   generic (
     FILE_NAME  : string;   --! Name of .txt file corresponding to memory content
     DELAY      : natural := 0;     --! Delay output signals by this many clocks.
-    FIFO_WIDTH  : natural := 18;    --! RAM data width
+    FIFO_WIDTH  : natural := 39;    --! RAM data width
     DEBUG      : boolean := false; --! Debug printout
     FILE_NAME_DEBUG : string  := ""  --! Name of .txt file for debug printout.
   );
@@ -76,11 +76,9 @@ begin
     end if;
 
     if (WAITING or DONE or READ_SHIT='0') then
-
       -- No data, either because we're waiting to start reading it
       -- or because we already finished reading it.
-      EMPTY_NEG <= '1'; --??????
-      DATA      <= (others => '0');
+      DATA <= (others => '0');
  
     else 
 
@@ -95,15 +93,16 @@ begin
           readline (FILE_IN, LINE_IN);
         end if;
 
-        if (LINE_IN.all(1 to 2) = "BX") then 
+        if (LINE_IN.all(1 to 2) = "BX") then
 
           -- New event header
+
+          EMPTY_NEG <= '0'; -- no reads
 
           if (DATA_CNT < MAX_ENTRIES) then
 
             -- Last event didn't have full number of entries in file,
             -- so invent dummy data to represent the remainder.
-            EMPTY_NEG     <= '1'; -- 1 if empty?
             DATA     <= (others => '0');
             DATA_CNT := DATA_CNT + 1;
             -- We sent output signals, so stop looping
@@ -124,12 +123,14 @@ begin
         elsif (LINE_IN.all = "") then
 
           -- Skip blank lines
+          EMPTY_NEG <= '0'; -- no reads
 
         elsif (BX_CNT >= 0) then
 
-          FOUND_WORD := false;
-
           -- Line containing data. Extract data word.
+
+          FOUND_WORD := false;
+          EMPTY_NEG <= '1';  -- There is stub to be read
 
           rd_col : while (LINE_IN'length > 0) loop -- Loop over the columns
             read(LINE_IN, CHAR);                 -- Read chars ...
@@ -145,7 +146,6 @@ begin
           -- Truncate data word to desired width.
           DATA <= emDATA(FIFO_WIDTH-1 downto 0);
 
-          EMPTY_NEG <= '0'; -- 0??
           DATA_CNT := DATA_CNT + 1;
           -- We sent output signals, so stop looping
           LOOPING := false;
@@ -205,7 +205,7 @@ begin
         assert (FILE_STATUS = open_ok) report "Failed to open file "&FILE_NAME_DEBUG severity FAILURE;
       end if;
 
-      if (DEBUG and READ_SHIT = '1') then 
+      if (DEBUG and EMPTY_NEG = '1') then 
         write(LINE_OUT, string'("BX=")); write(LINE_OUT, EVENT_CNT);
         write(LINE_OUT, string'(" DATA=")); hwrite(LINE_OUT, DATA);
         write(LINE_OUT, string'(" at SIM time ")); write(LINE_OUT, NOW); 
