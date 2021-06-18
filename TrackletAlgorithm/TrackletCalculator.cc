@@ -347,29 +347,29 @@ uint32_t ASOuterMask(const TF::seed Seed, const TC::itc iTC) {
 
 uint32_t TPROJMaskBarrel(const TF::seed Seed, const TC::itc iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
-    return 0x3311000;
+    return 0x2311000;
   else if (Seed == TF::L1L2 && iTC == TC::B)
     return 0x3333000;
   else if (Seed == TF::L1L2 && iTC == TC::C)
-    return 0x7333000;
+    return 0x3333000;
   else if (Seed == TF::L1L2 && iTC == TC::D)
     return 0x7733000;
   else if (Seed == TF::L1L2 && iTC == TC::E)
-    return 0x7776000;
+    return 0x7772000;
   else if (Seed == TF::L1L2 && iTC == TC::F)
-    return 0x7766000;
+    return 0x7666000;
   else if (Seed == TF::L1L2 && iTC == TC::G)
-    return 0xEE66000;
+    return 0xE666000;
   else if (Seed == TF::L1L2 && iTC == TC::H)
-    return 0xEEEE000;
+    return 0xEEE4000;
   else if (Seed == TF::L1L2 && iTC == TC::I)
     return 0xEECC000;
   else if (Seed == TF::L1L2 && iTC == TC::J)
-    return 0xECCC000;
-  else if (Seed == TF::L1L2 && iTC == TC::K)
     return 0xCCCC000;
+  else if (Seed == TF::L1L2 && iTC == TC::K)
+    return 0xCCC8000;
   else if (Seed == TF::L1L2 && iTC == TC::L)
-    return 0xCC88000;
+    return 0x4C88000;
   else if (Seed == TF::L3L4 && iTC == TC::A)
     return 0x3300306;
   else if (Seed == TF::L3L4 && iTC == TC::D)
@@ -387,29 +387,29 @@ uint32_t TPROJMaskDisk(const TF::seed Seed, const TC::itc iTC) {
   else if (Seed == TF::L1L2 && iTC == TC::B)
     return 0x3333;
   else if (Seed == TF::L1L2 && iTC == TC::C)
-    return 0x7777;
+    return 0x3337;
   else if (Seed == TF::L1L2 && iTC == TC::D)
     return 0x7777;
   else if (Seed == TF::L1L2 && iTC == TC::E)
     return 0x7777;
   else if (Seed == TF::L1L2 && iTC == TC::F)
-    return 0xFFFF;
+    return 0x777F;
   else if (Seed == TF::L1L2 && iTC == TC::G)
-    return 0xFFFF;
+    return 0xEEEF;
   else if (Seed == TF::L1L2 && iTC == TC::H)
     return 0xEEEE;
   else if (Seed == TF::L1L2 && iTC == TC::I)
     return 0xEEEE;
   else if (Seed == TF::L1L2 && iTC == TC::J)
-    return 0xEEEE;
+    return 0xCCCE;
   else if (Seed == TF::L1L2 && iTC == TC::K)
     return 0xCCCC;
   else if (Seed == TF::L1L2 && iTC == TC::L)
     return 0xCCCC;
   else if (Seed == TF::L3L4 && iTC == TC::A)
-    return 0x77;
+    return 0x33;
   else if (Seed == TF::L3L4 && iTC == TC::D)
-    return 0xEE;
+    return 0xCC;
   else if (Seed == TF::L5L6 && iTC == TC::A)
     return 0x0;
   else if (Seed == TF::L5L6 && iTC == TC::D)
