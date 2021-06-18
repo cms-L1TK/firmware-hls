@@ -6,6 +6,8 @@ use work.tf_pkg.all;
 
 package memUtil_pkg is
 
+  -- ########################### Types ###########################
+
   type enum_TPROJ_60 is (L1L2F_L3PHIC,L1L2G_L3PHIC,L1L2H_L3PHIC,L1L2I_L3PHIC,L1L2J_L3PHIC,L5L6B_L3PHIC,L5L6C_L3PHIC,L5L6D_L3PHIC);
 
   type enum_VMSME_16 is (L3PHIC17n1,L3PHIC18n1,L3PHIC19n1,L3PHIC20n1,L3PHIC21n1,L3PHIC22n1,L3PHIC23n1,L3PHIC24n1);
@@ -48,4 +50,107 @@ package memUtil_pkg is
   type t_arr_FM_52_ADDR is array(enum_FM_52) of std_logic_vector(7 downto 0);
   type t_arr_FM_52_DATA is array(enum_FM_52) of std_logic_vector(51 downto 0);
   type t_arr_FM_52_NENT is array(enum_FM_52) of t_arr2_7b;
+
+  -- ########################### Functions ###########################
+
+  -- Following functions are needed because VHDL is not case sensitive when converting an enum to a string
+  function memory_enum_to_string(val: enum_TPROJ_60) return string;
+  function memory_enum_to_string(val: enum_VMSME_16) return string;
+  function memory_enum_to_string(val: enum_VMPROJ_24) return string;
+  function memory_enum_to_string(val: enum_CM_14) return string;
+  function memory_enum_to_string(val: enum_AP_60) return string;
+  function memory_enum_to_string(val: enum_AS_36) return string;
+  function memory_enum_to_string(val: enum_FM_52) return string;
+
 end package memUtil_pkg;
+
+package body memUtil_pkg is
+
+  -- ########################### Functions ###########################
+
+  function memory_enum_to_string(val: enum_TPROJ_60) return string is
+  begin
+    case val is
+       when L1L2F_L3PHIC => return "L1L2F_L3PHIC";
+       when L1L2G_L3PHIC => return "L1L2G_L3PHIC";
+       when L1L2H_L3PHIC => return "L1L2H_L3PHIC";
+       when L1L2I_L3PHIC => return "L1L2I_L3PHIC";
+       when L1L2J_L3PHIC => return "L1L2J_L3PHIC";
+       when L5L6B_L3PHIC => return "L5L6B_L3PHIC";
+       when L5L6C_L3PHIC => return "L5L6C_L3PHIC";
+       when L5L6D_L3PHIC => return "L5L6D_L3PHIC";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+  function memory_enum_to_string(val: enum_VMSME_16) return string is
+  begin
+    case val is
+       when L3PHIC17n1 => return "L3PHIC17n1";
+       when L3PHIC18n1 => return "L3PHIC18n1";
+       when L3PHIC19n1 => return "L3PHIC19n1";
+       when L3PHIC20n1 => return "L3PHIC20n1";
+       when L3PHIC21n1 => return "L3PHIC21n1";
+       when L3PHIC22n1 => return "L3PHIC22n1";
+       when L3PHIC23n1 => return "L3PHIC23n1";
+       when L3PHIC24n1 => return "L3PHIC24n1";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+  function memory_enum_to_string(val: enum_VMPROJ_24) return string is
+  begin
+    case val is
+       when L3PHIC17 => return "L3PHIC17";
+       when L3PHIC18 => return "L3PHIC18";
+       when L3PHIC19 => return "L3PHIC19";
+       when L3PHIC20 => return "L3PHIC20";
+       when L3PHIC21 => return "L3PHIC21";
+       when L3PHIC22 => return "L3PHIC22";
+       when L3PHIC23 => return "L3PHIC23";
+       when L3PHIC24 => return "L3PHIC24";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+  function memory_enum_to_string(val: enum_CM_14) return string is
+  begin
+    case val is
+       when L3PHIC17 => return "L3PHIC17";
+       when L3PHIC18 => return "L3PHIC18";
+       when L3PHIC19 => return "L3PHIC19";
+       when L3PHIC20 => return "L3PHIC20";
+       when L3PHIC21 => return "L3PHIC21";
+       when L3PHIC22 => return "L3PHIC22";
+       when L3PHIC23 => return "L3PHIC23";
+       when L3PHIC24 => return "L3PHIC24";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+  function memory_enum_to_string(val: enum_AP_60) return string is
+  begin
+    case val is
+       when L3PHIC => return "L3PHIC";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+  function memory_enum_to_string(val: enum_AS_36) return string is
+  begin
+    case val is
+       when L3PHICn6 => return "L3PHICn6";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+  function memory_enum_to_string(val: enum_FM_52) return string is
+  begin
+    case val is
+       when L1L2_L3PHIC => return "L1L2_L3PHIC";
+       when L5L6_L3PHIC => return "L5L6_L3PHIC";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
+end package body memUtil_pkg;
