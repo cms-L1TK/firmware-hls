@@ -12,10 +12,6 @@
 #include "FullMatchMemory.h"
 #include "MatchEngineUnit.h"
 
-#ifdef __SYNTHESIS__
-  #include "hls_math.h"
-#endif
-
 #include <iostream>
 #include <fstream>
 #include <bitset>

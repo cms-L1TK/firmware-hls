@@ -186,24 +186,13 @@ public:
     data_.range(kASBendMSB,kASBendLSB) = bend;
   }
 
-  std::string getBitStr() {
+  std::string getBitStr() const {
     std::string str = decodeToBits(getR(),AllStubBase<ASType>::kASRSize);
     str += "|"+decodeToBits(getZ(),AllStubBase<ASType>::kASZSize);
     str += "|"+decodeToBits(getPhi(),AllStubBase<ASType>::kASPhiSize);
     // Different get method for DISKPS?  Where is it?     
     //     str += "|"+decodeToBits(getAlpha(),AllStubBase<ASType>::kASAlphaSize);
     str += "|"+decodeToBits(getBend(),AllStubBase<ASType>::kASBendSize);
-    return str;
-  }
-
-  // TO DO: This belongs in some sort of helper class.
-  std::string decodeToBits(unsigned int field, unsigned int size) const {
-    unsigned int valtmp = field;
-    std::string str = "";
-    for(unsigned int i=0; i< size; i++) {
-      str = ((valtmp & 1) ? "1" : "0") + str;
-      valtmp >>= 1;
-    }
     return str;
   }
 

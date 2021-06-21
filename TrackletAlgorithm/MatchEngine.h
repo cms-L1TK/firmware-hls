@@ -7,11 +7,6 @@
 #include "VMStubMEMemory.h"
 #include "CandidateMatchMemory.h"
 
-// HLS Headers
-#ifdef __SYNTHESIS__
-  #include "hls_math.h"
-#endif
-
 // STL Headers
 #include <iostream>
 #include <fstream>

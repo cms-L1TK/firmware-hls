@@ -3,7 +3,7 @@
 
 #include "ap_int.h"
 
-#ifdef CMSSW_GIT_HAS
+#ifdef CMSSW_GIT_HASH
   #include "Settings.h"
   using namespace trklet;
 #endif
