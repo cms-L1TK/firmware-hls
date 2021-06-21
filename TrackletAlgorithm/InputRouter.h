@@ -107,7 +107,6 @@ static const int kLSBLyrBts = 1;
 static const int kMSBLyrBts = 2;
 
 constexpr unsigned int kMaxNmemories = 20;  
-#define IR_DEBUG false
 
 // Get the corrected phi, bin
 // i.e. phi at the average radius of the barrel
