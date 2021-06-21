@@ -278,18 +278,27 @@ void InputRouter( const BXType bx
 	  // corrections 
 	  static const int* cLUT; 
 	  if( hLyrId == kFrstPSBrlLyr )
+	  {
 	  	cLUT = kPhiCorrtable_L1;
-	  else if( hLyrId == kFrstPSBrlLyr )
+	  }
+	  else if( hLyrId == kScndPSBrlLyr )
+	  {
 	  	cLUT = kPhiCorrtable_L2;
-	  else if( hLyrId == kScndPSBrlLyr ) 
+	  }
+	  else if( hLyrId == kThrdPSBrlLyr ) 
+	  {
 	  	cLUT = kPhiCorrtable_L3;
-	  else if( hLyrId == kScnd2SBrlLyr ) 
+	  }
+	  else if( hLyrId == kFrst2SBrlLyr ) 
+	  {
 	  	cLUT = kPhiCorrtable_L4;
-	  else if( hLyrId == kThrdPSBrlLyr )
+	  }else if( hLyrId == kScnd2SBrlLyr )
+	  {
 	  	cLUT = kPhiCorrtable_L5;
-	  else if( hLyrId == kThrd2SBrlLyr )
+	  }else if( hLyrId == kThrd2SBrlLyr )
+	  {
 	  	cLUT = kPhiCorrtable_L6;
-
+	  }
 	  // update index
 	  unsigned int cIndx = 0;
 	  GetMemoryIndex<kMaxLyrsPerDTC>( nMemsPerLyr, hEncLyr, cIndx);
