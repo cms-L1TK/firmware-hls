@@ -59,7 +59,7 @@ procFile : process(CLK)
   variable LOOPING     : boolean := true; --! Need another loop to make output.
   variable CREATE_DUMMY_DATA  : boolean := false; --! Inventing null data. 
   variable v_line : line; -- Line for debug
-  variable line_is_read : boolean := true;
+  variable line_is_read : boolean := true; -- LINE_IN has been read by module
 begin
 
   if rising_edge(CLK) then
@@ -76,7 +76,7 @@ begin
       DONE := true;
     end if;
 
-    if (WAITING or DONE) then -- or READ_SHIT='0'
+    if (WAITING or DONE) then
       -- No data, either because we're waiting to start reading it
       -- or because we already finished reading it.
       DATA <= (others => '0');
@@ -90,26 +90,28 @@ begin
       else 
         LOOPING := false;
       end if;
+      --LOOPING := true;
 
       -- Read next data word from file.
 
       findNextDataLine : while LOOPING loop
         
-        if (not CREATE_DUMMY_DATA) then --  and READ_SHIT='1'
+        if (not CREATE_DUMMY_DATA) then -- and (line_is_read or READ_SHIT='1')) then
 
           -- Read next line in file.
           readline (FILE_IN, LINE_IN);
 
         end if;
-
+        -- write(v_line, string'("LINE ")); write(v_line,LINE_IN.all); write(v_line, string'(" BX_CNT ")); write(v_line, BX_CNT); write(v_line, string'(" DATA_CNT ")); write(v_line, DATA_CNT); writeline(output, v_line);
         if (LINE_IN.all(1 to 2) = "BX") then
 
           -- New event header
 
           EMPTY_NEG <= '0'; -- no reads
+          line_is_read := true; -- don't have to wait for this line to be read as it doesn't contain data
 
           if (DATA_CNT < MAX_ENTRIES) then
-            -- EMPTY_NEG <= '0'; -- no reads
+
             -- Last event didn't have full number of entries in file,
             -- so invent dummy data to represent the remainder.
             DATA     <= (others => '0');
@@ -120,16 +122,23 @@ begin
             CREATE_DUMMY_DATA := true;
 
           else
-            -- EMPTY_NEG <= '1'; -- maybe reads?!
+
             -- We've finished processing last event, so get on with new one.
             BX_CNT := BX_CNT + 1;
             DATA_CNT := 0;
             -- Note that we are now reading data from file again.
             CREATE_DUMMY_DATA := false;
-            line_is_read := true;
-
+            
           end if;
 
+        elsif (LINE_IN.all(1 to 2) /= "BX" and DATA_CNT >= MAX_ENTRIES) then
+          
+          -- skip data until next bx 
+          
+          if (BX_CNT = 99)  then -- or stop if end of file. FIX ME
+            LOOPING := false;
+          end if;
+          
         elsif (LINE_IN.all = "") then
 
           -- Skip blank lines

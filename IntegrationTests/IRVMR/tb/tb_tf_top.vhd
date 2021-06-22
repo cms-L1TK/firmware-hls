@@ -159,16 +159,13 @@ begin
     -- Process to start first module in chain & generate its BX counter input.
     -- Also releases reset flag.
     constant CLK_RESET : natural := 5; -- Any low number OK.
-    variable CLK_COUNT : natural := 1;
-    variable EVENT_COUNT : integer := 0;
+    variable CLK_COUNT : natural := MAX_ENTRIES;
+    variable EVENT_COUNT : integer := -1;
     variable v_line : line; -- Line for debug
   begin
 
     if START_FIRST_LINK = '1' then
       if rising_edge(CLK) then
-
-        IR_START <= '1';
-        IR_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, IR_BX_IN'length));
 
         if (CLK_COUNT < MAX_ENTRIES) then
           CLK_COUNT := CLK_COUNT + 1;
@@ -176,6 +173,9 @@ begin
           CLK_COUNT := 1;
           EVENT_COUNT := EVENT_COUNT + 1;
 
+          IR_START <= '1';
+          IR_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, IR_BX_IN'length));
+          
           write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
         end if;
         -- Releae
