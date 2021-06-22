@@ -58,7 +58,8 @@ procFile : process(CLK)
   variable emDATA      : std_logic_vector(EMDATA_WIDTH-1 downto 0) := (others => '0');
   variable LOOPING     : boolean := true; --! Need another loop to make output.
   variable CREATE_DUMMY_DATA  : boolean := false; --! Inventing null data. 
-
+  variable v_line : line; -- Line for debug
+  variable line_is_read : boolean := true;
 begin
 
   if rising_edge(CLK) then
@@ -75,22 +76,30 @@ begin
       DONE := true;
     end if;
 
-    if (WAITING or DONE or READ_SHIT='0') then
+    if (WAITING or DONE) then -- or READ_SHIT='0'
       -- No data, either because we're waiting to start reading it
       -- or because we already finished reading it.
       DATA <= (others => '0');
+      -- EMPTY_NEG <= '0';
  
     else 
 
-      LOOPING := true;
+      -- don't read next stub until we have an read signal
+      if (line_is_read or READ_SHIT='1') then
+        LOOPING := true;
+      else 
+        LOOPING := false;
+      end if;
 
       -- Read next data word from file.
 
       findNextDataLine : while LOOPING loop
+        
+        if (not CREATE_DUMMY_DATA) then --  and READ_SHIT='1'
 
-        if (not CREATE_DUMMY_DATA) then
           -- Read next line in file.
           readline (FILE_IN, LINE_IN);
+
         end if;
 
         if (LINE_IN.all(1 to 2) = "BX") then
@@ -100,7 +109,7 @@ begin
           EMPTY_NEG <= '0'; -- no reads
 
           if (DATA_CNT < MAX_ENTRIES) then
-
+            -- EMPTY_NEG <= '0'; -- no reads
             -- Last event didn't have full number of entries in file,
             -- so invent dummy data to represent the remainder.
             DATA     <= (others => '0');
@@ -111,12 +120,13 @@ begin
             CREATE_DUMMY_DATA := true;
 
           else
-
+            -- EMPTY_NEG <= '1'; -- maybe reads?!
             -- We've finished processing last event, so get on with new one.
             BX_CNT := BX_CNT + 1;
             DATA_CNT := 0;
             -- Note that we are now reading data from file again.
             CREATE_DUMMY_DATA := false;
+            line_is_read := true;
 
           end if;
 
@@ -149,6 +159,13 @@ begin
           DATA_CNT := DATA_CNT + 1;
           -- We sent output signals, so stop looping
           LOOPING := false;
+
+          -- Don't read the next line until it has been read
+          if (READ_SHIT='1') then
+            line_is_read := true;
+          else
+            line_is_read := false;
+          end if;
 
         else
           assert false report "No BX header before data in "&FILE_NAME severity FAILURE;
@@ -205,7 +222,7 @@ begin
         assert (FILE_STATUS = open_ok) report "Failed to open file "&FILE_NAME_DEBUG severity FAILURE;
       end if;
 
-      if (DEBUG and EMPTY_NEG = '1') then 
+      if (DEBUG and READ_SHIT = '1') then 
         write(LINE_OUT, string'("BX=")); write(LINE_OUT, EVENT_CNT);
         write(LINE_OUT, string'(" DATA=")); hwrite(LINE_OUT, DATA);
         write(LINE_OUT, string'(" at SIM time ")); write(LINE_OUT, NOW); 
