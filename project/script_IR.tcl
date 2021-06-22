@@ -27,7 +27,7 @@ create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
 
 set nProc [exec nproc]
-csim_design -compiler gcc -mflags "-j$nProc" -argv "--link,8 --dtcSplit,0 --tkNonant,4 --lastBx,100"
+csim_design -mflags "-j$nProc" -argv "--link,8 --dtcSplit,0 --tkNonant,4 --lastBx,100"
 csynth_design 
 #possible options -trace_level all -rtl verilog -verbose 
 cosim_design  -argv "--link,8 --dtcSplit,0 --tkNonant,4 --lastBx,100"

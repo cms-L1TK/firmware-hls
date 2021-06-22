@@ -109,7 +109,7 @@ DtcMap getCablingMap( std::string pInputWiresMap )
       uint8_t cLayerId = (cLyrName.substr(0,1).find("D") != std::string::npos)  ? (10 + cLyr): cLyr; 
       auto cDtcIter = std::find(cDtcNames.begin(), cDtcNames.end(), cDtcName ) ;
       // detector region printout   
-      if( cDtcIter == cDtcNames.end() || cDtcNames.size() == 0)
+      if( cDtcIter == cDtcNames.end() || cDtcNames.empty() )
       {
         // push back dtc name
         cDtcNames.push_back( cDtcName );
