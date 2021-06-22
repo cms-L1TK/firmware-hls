@@ -57,12 +57,12 @@ architecture behavior of tb_tf_top is
   constant DEBUG             : boolean := false;      --! Debug off/on
   constant DL_DELAY       : integer := 0;          --! Number of BX delays (can be written early 8 pages) DO WE NEED A DELAY SINCE ONLY MEMORIES READ FROM FILE USES THEM?
 
-  -- Paths of data files specified relative to Vivado project's xsim directory. 
+  -- Paths of data files specified relative to Vivado project's xsim directory.
   -- e.g. IntegrationTests/IRVMR/script/Work/Work.sim/sim_1/behav/xsim/
-  constant emDataDir  : string := "../../../../../../../../emData/MemPrints/"; -- 41 long
-  constant dataOutDir : string := "../../../../../dataOut/"; -- 23 long
+  constant emDataDir  : string := "../../../../../../../../emData/MemPrints/";
+  constant dataOutDir : string := "../../../../../dataOut/";
 
-  -- File directories and the start of the file names that they have in common
+  -- File directories and the start of the file names that the memories have in common
   -- Input files
   constant FILE_IN_DL_39 : string := emDataDir&"InputStubs/Link_DL_";
   -- Output files
@@ -75,7 +75,7 @@ architecture behavior of tb_tf_top is
   constant FILE_OUT_DL_debug : string := dataOutDir&"DL_";
 
   -- File name endings
-  constant inputFileNameEnding : string := "_04.dat";
+  constant inputFileNameEnding : string := "_04.dat"; -- 04 specifies the nonant the testvectors represent
   constant outputFileNameEnding : string := ".txt";
   constant debugFileNameEnding : string := ".debug.txt";
 
@@ -121,7 +121,7 @@ architecture behavior of tb_tf_top is
   signal VMSTE_22_mem_AAV_dout_nent  : t_arr_VMSTE_22_NENT  := (others => (others => (others => '0')));
 
   -- Indicates that reading of DL of first event has started.
-  signal START_FIRST_DL : std_logic := '1';
+  signal START_FIRST_LINK : std_logic := '0';
   signal START_DL : t_arr_DL_39_1b := (others => '0');
 
 begin
@@ -151,8 +151,9 @@ begin
   end generate DL_39_loop;
 
   -- As all DL39 signals start together, take first one, to determine when 
-  -- first event starts being written to first memory in chain.
-  -- START_FIRST_DL <= START_DL(enum_DL_39'val(0));
+  -- first event starts being read from the first link in the chain.
+  START_FIRST_LINK <= START_DL(enum_DL_39'val(0));
+
 
   procStart : process(CLK)
     -- Process to start first module in chain & generate its BX counter input.
@@ -163,7 +164,7 @@ begin
     variable v_line : line; -- Line for debug
   begin
 
-    if START_FIRST_DL = '1' then
+    if START_FIRST_LINK = '1' then
       if rising_edge(CLK) then
 
         IR_START <= '1';
