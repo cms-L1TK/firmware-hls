@@ -544,22 +544,22 @@ int main(int argc, char * argv[])
     return 1; 
 
   // now prepare inputs for IR 
-  ap_uint<kNBitsNLnks> hLinkId = cLinkId;
-  const ap_uint<kLINKMAPwidth> hLinkWord = cLnkWrd;
-  const ap_uint<kBINMAPwidth> hPhBnWord = cPhBnWord;
-  const ap_uint<kNMEMwidth> hNmemories = cNmemories;
+  // ap_uint<kNBitsNLnks> hLinkId = cLinkId;
+  // const ap_uint<kLINKMAPwidth> hLinkWord = cLnkWrd;
+  // const ap_uint<kBINMAPwidth> hPhBnWord = cPhBnWord;
   //ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
+  const ap_uint<kNMEMwidth> hNmemories = cNmemories;
   
   std::cout << "IR Module for link#" 
-      << +hLinkId
+      << +cLinkId
       << " Link Word is " 
-      << std::bitset<kLINKMAPwidth>(hLinkWord)
+      << std::bitset<kLINKMAPwidth>(cLnkWrd)
       << "\t"
       << std::hex
-      << hLinkWord 
+      << cLnkWrd 
       << std::dec
       << "\t connected to "
-      << hNmemories 
+      << cNmemories 
       << " memories."
       << "\n";
   // bns 
@@ -597,8 +597,8 @@ int main(int argc, char * argv[])
     BXType hBx_o; 
 
     InputRouterTop( hBx
-      , hLinkWord // input link LUT 
-      , hPhBnWord  // n phi bins LUT 
+      , cLnkWrd // input link LUT 
+      , cPhBnWord  // n phi bins LUT 
       , hInputStubs // input stub stream 
       , hBx_o // output bx 
       , hMemories); 
