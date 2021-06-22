@@ -269,7 +269,7 @@ using BnDscs = std::pair< std::vector<uint8_t>, std::vector<uint8_t>>;
 BnDscs getBns( int pLinkId
   , int pDTCsplit = 0
   , int pNonant = 4 
-  , std::string pInputFile_Wires = "emData/wires_hourglass.dat")
+  , std::string pInputFile_Wires = "emData/LUTs/wires.dat")
 {
 
   BnDscs cWrd;
@@ -310,7 +310,7 @@ BnDscs getBns( int pLinkId
 // 3 bits to encode the number of layers readout by this DTC 
 // 20 bits in total 
 ap_uint<kLINKMAPwidth> getLnkWrd(int pLinkId
-  , std::string pInputFile_Wires = "emData/wires_hourglass.dat")
+  , std::string pInputFile_Wires = "emData/LUTs/wires.dat")
 {
   std::string cDtcName = getDTCName( pLinkId, pInputFile_Wires ); 
   std::vector<uint8_t> cLyrs = getLyrs( pLinkId , pInputFile_Wires );
@@ -369,7 +369,7 @@ void prepareInputStreams( ifstream * pInputStreams
   , int pLinkId
   , int pDTCsplit = 0 
   , int pNonant = 4 
-  , std::string pInputFile_Wires = "emData/wires_hourglass.dat" )
+  , std::string pInputFile_Wires = "emData/LUTs/wires.dat" )
 {
   // dtc name
   std::string cDtcName = getDTCName( pLinkId, pInputFile_Wires );
@@ -423,7 +423,7 @@ void prepareInputStreams( ifstream * pInputStreams
 // or the emulation 
 void prepareLUTs( int pDTCsplit = 0
   , int pNonant = 4 
-  , std::string pInputFile_Wires = "emData/wires_hourglass.dat" )
+  , std::string pInputFile_Wires = "emData/LUTs/wires.dat" )
 {
   auto cDtcMap = getCablingMap( pInputFile_Wires );
   auto cMapIter = cDtcMap.begin(); 
