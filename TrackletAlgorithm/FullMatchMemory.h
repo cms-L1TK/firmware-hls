@@ -246,14 +246,16 @@ public:
     data_.range(kFMZResMSB,kFMZResLSB) = zres;
   }
 
+#ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getTCID(),FullMatchBase<FMType>::kFMTCIDSize);
-    str += "|"+decodeToBits(getTrackletIndex(),FullMatchBase<FMType>::kFMTrackletIndexSize);
-    str += "|"+decodeToBits(getStubIndex(),FullMatchBase<FMType>::kFMStubIndexSize);
-    str += "|"+decodeToBits(getPhiRes(),FullMatchBase<FMType>::kFMPhiResSize);
-    str += "|"+decodeToBits(getZRes(),FullMatchBase<FMType>::kFMZResSize);
+    std::string str = MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>::decodeToBits(getTCID(),FullMatchBase<FMType>::kFMTCIDSize);
+    str += "|"+MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>::decodeToBits(getTrackletIndex(),FullMatchBase<FMType>::kFMTrackletIndexSize);
+    str += "|"+MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>::decodeToBits(getStubIndex(),FullMatchBase<FMType>::kFMStubIndexSize);
+    str += "|"+MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>::decodeToBits(getPhiRes(),FullMatchBase<FMType>::kFMPhiResSize);
+    str += "|"+MemoryTemplate<FullMatch<FMType>, 1, kNBits_MemAddr>::decodeToBits(getZRes(),FullMatchBase<FMType>::kFMZResSize);
     return str;
   }
+#endif
 
 private:
 

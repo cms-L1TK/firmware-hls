@@ -186,15 +186,17 @@ public:
     data_.range(kASBendMSB,kASBendLSB) = bend;
   }
 
+#ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getR(),AllStubBase<ASType>::kASRSize);
-    str += "|"+decodeToBits(getZ(),AllStubBase<ASType>::kASZSize);
-    str += "|"+decodeToBits(getPhi(),AllStubBase<ASType>::kASPhiSize);
+    std::string str = MemoryTemplate<AllStub<ASType>, 3, kNBits_MemAddr>::decodeToBits(getR(),AllStubBase<ASType>::kASRSize);
+    str += "|"+MemoryTemplate<AllStub<ASType>, 3, kNBits_MemAddr>::decodeToBits(getZ(),AllStubBase<ASType>::kASZSize);
+    str += "|"+MemoryTemplate<AllStub<ASType>, 3, kNBits_MemAddr>::decodeToBits(getPhi(),AllStubBase<ASType>::kASPhiSize);
     // Different get method for DISKPS?  Where is it?     
     //     str += "|"+decodeToBits(getAlpha(),AllStubBase<ASType>::kASAlphaSize);
-    str += "|"+decodeToBits(getBend(),AllStubBase<ASType>::kASBendSize);
+    str += "|"+MemoryTemplate<AllStub<ASType>, 3, kNBits_MemAddr>::decodeToBits(getBend(),AllStubBase<ASType>::kASBendSize);
     return str;
   }
+#endif
 
 private:
 

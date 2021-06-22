@@ -136,12 +136,14 @@ public:
     data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
   }
 
+#ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getIndex(),VMStubMEBase<VMSMEType>::kVMSMEIndexSize);
-    str += "|"+decodeToBits(getBend(),VMStubMEBase<VMSMEType>::kVMSMEBendSize);
-    str += "|"+decodeToBits(getFineZ(),VMStubMEBase<VMSMEType>::kVMSMEFineZSize);
+    std::string str = MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr, NBIT_BIN>::decodeToBits(getIndex(),VMStubMEBase<VMSMEType>::kVMSMEIndexSize);
+    str += "|"+MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr, NBIT_BIN>::decodeToBits(getBend(),VMStubMEBase<VMSMEType>::kVMSMEBendSize);
+    str += "|"+MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr, NBIT_BIN>::decodeToBits(getFineZ(),VMStubMEBase<VMSMEType>::kVMSMEFineZSize);
     return str;
   }
+#endif
 
 private:
 
