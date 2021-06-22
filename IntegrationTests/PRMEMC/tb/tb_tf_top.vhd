@@ -64,7 +64,7 @@ architecture behavior of tb_tf_top is
   constant emDataDir  : string := "../../../../../../../../emData/MemPrints/";
   constant dataOutDir : string := "../../../../../dataOut/";
 
-  -- File directories and the start of the file names that they have in common
+  -- File directories and the start of the file names that memories have in common
   -- Input files
   constant FILE_IN_TPROJ_60 : string := emDataDir&"TrackletProjections/TrackletProjections_TPROJ_";    
   constant FILE_IN_VMSME_16 : string := emDataDir&"VMStubsME/VMStubs_VMSME_";
@@ -80,7 +80,7 @@ architecture behavior of tb_tf_top is
   constant FILE_OUT_AS_debug : string := dataOutDir&"AS_";
   
   -- File name endings
-  constant inputFileNameEnding : string := "_04.dat";
+  constant inputFileNameEnding : string := "_04.dat"; -- 04 specifies the nonant the testvectors represent
   constant outputFileNameEnding : string := ".txt";
   constant debugFileNameEnding : string := ".debug.txt";
 
