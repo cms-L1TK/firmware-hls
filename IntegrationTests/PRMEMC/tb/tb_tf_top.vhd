@@ -41,19 +41,6 @@ end tb_tf_top;
 
 --! @brief TB
 architecture behavior of tb_tf_top is
-  -- ########################### Types ###########################
-  -- Define type of array of strings for input/output file names.
-  type t_str_arr_TPROJ_60 is array(enum_TPROJ_60)  of string(1 to 106); 
-  type t_str_arr_VMSME_16 is array(enum_VMSME_16)  of string(1 to 82);  
-  type t_str_arr_AS_36    is array(enum_AS_36)     of string(1 to 74); 
-  type t_str_arr_VMP_24   is array(enum_VMPROJ_24) of string(1 to 42);  
-  type t_str_arr_AP_60    is array(enum_AP_60)     of string(1 to 36); 
-  type t_str_arr_CM_14    is array(enum_CM_14)     of string(1 to 38); 
-  type t_str_arr_FM_52    is array(enum_FM_52)     of string(1 to 41); 
-  -- Define type of array of strings for debug output file names.
-  type t_str_arr_TPROJ_60_debug is array(enum_TPROJ_60)  of string(1 to 51); 
-  type t_str_arr_VMSME_16_debug is array(enum_VMSME_16)  of string(1 to 47);  
-  type t_str_arr_AS_36_debug    is array(enum_AS_36)     of string(1 to 42); 
 
   -- ########################### Constant Definitions ###########################
   -- ############ Please change the constants in this section ###################
@@ -77,83 +64,25 @@ architecture behavior of tb_tf_top is
   constant emDataDir  : string := "../../../../../../../../emData/MemPrints/";
   constant dataOutDir : string := "../../../../../dataOut/";
 
+  -- File directories and the start of the file names that memories have in common
   -- Input files
-  constant FILE_IN_TPROJ_60 : t_str_arr_TPROJ_60 := (
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat",
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat",
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat",
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat",  
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat",
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat",
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat",  
-  emDataDir&"TrackletProjections/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat");    
-  -- Input files
-  constant FILE_IN_VMSME_16 : t_str_arr_VMSME_16 := (
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC17n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC18n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC19n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC20n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC21n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC22n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC23n1_04.dat",
-  emDataDir&"VMStubsME/VMStubs_VMSME_L3PHIC24n1_04.dat");
-
-  -- Input files (N.B. bizarre initialization method, due to VHDL issue with arrays of dim=1)
-  constant FILE_IN_AS_36 : t_str_arr_AS_36 := (L3PHICn6 =>
-  emDataDir&"Stubs/AllStubs_AS_L3PHICn6_04.dat");
-
+  constant FILE_IN_TPROJ_60 : string := emDataDir&"TrackletProjections/TrackletProjections_TPROJ_";    
+  constant FILE_IN_VMSME_16 : string := emDataDir&"VMStubsME/VMStubs_VMSME_";
+  constant FILE_IN_AS_36 : string := emDataDir&"Stubs/AllStubs_AS_";
   -- Output files
-  constant FILE_OUT_VMP_24 : t_str_arr_VMP_24 := ( 
-  dataOutDir&"VMPROJ_L3PHIC17.txt",
-  dataOutDir&"VMPROJ_L3PHIC18.txt",
-  dataOutDir&"VMPROJ_L3PHIC19.txt",
-  dataOutDir&"VMPROJ_L3PHIC20.txt",
-  dataOutDir&"VMPROJ_L3PHIC21.txt",
-  dataOutDir&"VMPROJ_L3PHIC22.txt",
-  dataOutDir&"VMPROJ_L3PHIC23.txt",
-  dataOutDir&"VMPROJ_L3PHIC24.txt");
-  -- Output files (N.B. bizarre initialization method, due to VHDL issue with arrays of dim=1)
-  constant FILE_OUT_AP_60 : t_str_arr_AP_60 := (L3PHIC =>
-  dataOutDir&"AP_L3PHIC.txt");
-  -- Output files
-  constant FILE_OUT_CM_14  : t_str_arr_CM_14 :=  (
-  dataOutDir&"CM_L3PHIC17.txt",
-  dataOutDir&"CM_L3PHIC18.txt",
-  dataOutDir&"CM_L3PHIC19.txt",
-  dataOutDir&"CM_L3PHIC20.txt",
-  dataOutDir&"CM_L3PHIC21.txt",
-  dataOutDir&"CM_L3PHIC22.txt",
-  dataOutDir&"CM_L3PHIC23.txt",
-  dataOutDir&"CM_L3PHIC24.txt");
-  -- Output files
-  constant FILE_OUT_FM_52 : t_str_arr_FM_52 :=  (
-  dataOutDir&"FM_L1L2_L3PHIC.txt", 
-  dataOutDir&"FM_L5L6_L3PHIC.txt");
-
+  constant FILE_OUT_VMP_24 : string := dataOutDir&"VMPROJ_";
+  constant FILE_OUT_AP_60 : string := dataOutDir&"AP_";
+  constant FILE_OUT_CM_14  : string := dataOutDir&"CM_";
+  constant FILE_OUT_FM_52 : string := dataOutDir&"FM_";
   -- Debug output files to check input was correctly read.
-  constant FILE_OUT_TPROJ_debug : t_str_arr_TPROJ_60_debug := (
-  dataOutDir&"TPROJ_L1L2F_L3PHIC.debug.txt",  
-  dataOutDir&"TPROJ_L1L2G_L3PHIC.debug.txt",
-  dataOutDir&"TPROJ_L1L2H_L3PHIC.debug.txt",
-  dataOutDir&"TPROJ_L1L2I_L3PHIC.debug.txt",
-  dataOutDir&"TPROJ_L1L2J_L3PHIC.debug.txt",
-  dataOutDir&"TPROJ_L5L6B_L3PHIC.debug.txt",
-  dataOutDir&"TPROJ_L5L6C_L3PHIC.debug.txt",
-  dataOutDir&"TPROJ_L5L6D_L3PHIC.debug.txt");
-  -- Debug output files to check input was correctly read.
-  constant FILE_OUT_VMSME_debug : t_str_arr_VMSME_16_debug := (
-  dataOutDir&"VMSME_L3PHIC17.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC18.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC19.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC20.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC21.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC22.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC23.debug.txt",  
-  dataOutDir&"VMSME_L3PHIC24.debug.txt");
-  -- Debug output files to check input was correctly read.
-  -- (N.B. bizarre initialization method, due to VHDL issue with arrays of dim=1)
-  constant FILE_OUT_AS_debug : t_str_arr_AS_36_debug := (L3PHICn6 =>
-  dataOutDir&"AS_L3PHIC.debug.txt");
+  constant FILE_OUT_TPROJ_debug : string := dataOutDir&"TPROJ_";
+  constant FILE_OUT_VMSME_debug : string := dataOutDir&"VMSME_";
+  constant FILE_OUT_AS_debug : string := dataOutDir&"AS_";
+  
+  -- File name endings
+  constant inputFileNameEnding : string := "_04.dat"; -- 04 specifies the nonant the testvectors represent
+  constant outputFileNameEnding : string := ".txt";
+  constant debugFileNameEnding : string := ".debug.txt";
 
   -- ########################### Signals ###########################
   -- ### UUT signals ###
@@ -212,12 +141,12 @@ begin
   begin
     readTPROJ_60 : entity work.FileReader 
     generic map (
-      FILE_NAME  => FILE_IN_TPROJ_60(var),
+      FILE_NAME  => FILE_IN_TPROJ_60&memory_enum_to_string(var)&inputFileNameEnding,
       DELAY      => TPROJ_DELAY*MAX_ENTRIES,
       RAM_WIDTH  => 60,
       NUM_PAGES  => 2,
       DEBUG      => true,
-      FILE_NAME_DEBUG => FILE_OUT_TPROJ_debug(var)
+      FILE_NAME_DEBUG => FILE_OUT_TPROJ_debug&memory_enum_to_string(var)&debugFileNameEnding
     )
     port map (
       CLK => CLK,
@@ -237,13 +166,13 @@ begin
   begin
     readVMSME_16 : entity work.FileReader 
     generic map (
-      FILE_NAME  => FILE_IN_VMSME_16(var),
+      FILE_NAME  => FILE_IN_VMSME_16&memory_enum_to_string(var)&inputFileNameEnding,
       DELAY      => VMSME_DELAY*MAX_ENTRIES,
       RAM_WIDTH  => 16,
       NUM_PAGES  => 8,
       NUM_BINS   => 8,
       DEBUG      => true,
-      FILE_NAME_DEBUG => FILE_OUT_VMSME_debug(var)
+      FILE_NAME_DEBUG => FILE_OUT_VMSME_debug&memory_enum_to_string(var)&debugFileNameEnding
     )
     port map (
       CLK => CLK,
@@ -258,12 +187,12 @@ begin
   begin
     readAS_36 : entity work.FileReader 
     generic map (
-      FILE_NAME  => FILE_IN_AS_36(var),
+      FILE_NAME  => FILE_IN_AS_36&memory_enum_to_string(var)&inputFileNameEnding,
       DELAY      => AS_DELAY*MAX_ENTRIES,
       RAM_WIDTH  => 36,
       NUM_PAGES  => 8,
       DEBUG      => true,
-      FILE_NAME_DEBUG => FILE_OUT_AS_debug(var)
+      FILE_NAME_DEBUG => FILE_OUT_AS_debug&memory_enum_to_string(var)&debugFileNameEnding
     )
     port map (
       CLK => CLK,
@@ -397,7 +326,7 @@ begin
     begin
       writeVMPROJ_24 : entity work.FileWriter 
       generic map (
-        FILE_NAME  => FILE_OUT_VMP_24(var),
+        FILE_NAME  => FILE_OUT_VMP_24&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH  => 24,
         NUM_PAGES  => 2
       )
@@ -415,7 +344,7 @@ begin
     begin
       writeAP_60 : entity work.FileWriter 
       generic map (
-        FILE_NAME  => FILE_OUT_AP_60(var),
+        FILE_NAME  => FILE_OUT_AP_60&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH  => 60,
         NUM_PAGES  => 8
       )
@@ -433,7 +362,7 @@ begin
     begin
       writeCM_14 : entity work.FileWriter 
       generic map (
-        FILE_NAME  => FILE_OUT_CM_14(var),
+        FILE_NAME  => FILE_OUT_CM_14&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH  => 14,
         NUM_PAGES  => 2
       )
@@ -456,7 +385,7 @@ begin
   begin
     writeFM_52 : entity work.FileWriterFromRAM 
     generic map (
-      FILE_NAME  => FILE_OUT_FM_52(var),
+      FILE_NAME  => FILE_OUT_FM_52&memory_enum_to_string(var)&outputFileNameEnding,
       RAM_WIDTH  => 52,
       NUM_PAGES  => 2
     )
