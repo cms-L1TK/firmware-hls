@@ -15,46 +15,6 @@
 
 static const int kMaxNEvents = 100;  // max number of events to run
 
-// tables now deduces from wire map
-// will remove when I've got some link data to test with
-// link assignment table 
-// TO-BE fixed :  need this added to emData 
-// 3 bits for layer/disk id  --> 3 bits 
-// 1 bit for barrel/disk --> 4 bits  
-// up-to 4 layers/disks per DTC
-// 16 bits per link
-// then 3 bits 
-// 1 bit to assign whether link is PS/2S 
-// 3 bits to encode the number of layers readout by this DTC 
-// 20 bits in total 
-// const ap_uint<kLINKMAPwidth> kLinkAssignmentTable[] =
-// {
-//   0x500b9, 0x3000b, 0x3000d, 0x5006d, 
-//   0x50082, 0x500a4, 0x60843, 0x8a623, 
-//   0x20005, 0x60a62, 0x40047, 0x40087
-// };
-
-// number of phi bins read out 
-// by each link (kSizeBinWord per layer )
-// upto 4 layers per link  
-// const ap_uint<kBINMAPwidth> kLinkNPhiBns[] = 
-// {
-//   0x01B , 0x003 , 0x003 , 0x01B , 
-//   0x01B , 0x01B , 0x0DF , 0x6DF , 
-//   0x003 , 0x0DB , 0x01B , 0x01B 
-// };
-
-// total number of memoreis 
-// readout b each link 
-// const ap_uint<kNMEMwidth> kLinkNMemories[] = 
-// {
-//    8 ,  4 ,  4 ,  8 , 
-//    8 ,  8 , 16 , 20 , 
-//    4 , 12 ,  8 ,  8 
-// };
-
-
-
 // map of detector regions read out [ per DTC ]
 using CablingMap = std::map<int, std::vector<uint8_t>> ;
 // map of dtc names and link ids 
@@ -68,6 +28,8 @@ using Stubs = std::vector<std::bitset<kNBits_DTC>>;
 // DTC layer map 
 typedef std::map<int, std::vector<int>> TkMap;
 
+const std::vector<uint8_t> kBnLbls = { 'A' , 'B' , 'C' , 'D' , 'E' , 'F' , 'G' , 'H'};
+#define IR_DEBUG false
 
 using namespace std;
 
@@ -147,7 +109,7 @@ DtcMap getCablingMap( std::string pInputWiresMap )
       uint8_t cLayerId = (cLyrName.substr(0,1).find("D") != std::string::npos)  ? (10 + cLyr): cLyr; 
       auto cDtcIter = std::find(cDtcNames.begin(), cDtcNames.end(), cDtcName ) ;
       // detector region printout   
-      if( cDtcIter == cDtcNames.end() || cDtcNames.empty())
+      if( cDtcIter == cDtcNames.end() || cDtcNames.empty() )
       {
         // push back dtc name
         cDtcNames.push_back( cDtcName );
@@ -250,14 +212,13 @@ DtcMemWrd getNMemories( int pLinkId
   DtcMemWrd cDtcMemWrd;
   std::string cDtcName = getDTCName( pLinkId, pInputFile_Wires ); 
   std::vector<uint8_t> cLyrs = getLyrs( pLinkId , pInputFile_Wires );
-  //std::cout << "Found " << +cLyrs.size() << " layer(s) readout out by [DTC]" << cDtcName << "\n";
+  std::cout << "Found " << +cLyrs.size() << " layer(s) readout out by [DTC]" << cDtcName << "\n";
   std::vector<int> cNmems(cLyrs.size(),0);
   ap_uint<kBINMAPwidth> cLinkNPhiBns=0;
   int cOffst=0; 
   for( auto cLyr : cLyrs )
   {
-    //std::cout << "Lyr:" << +cLyr << "\n";
-    int cNmemories=0;
+    std::vector<int> cPhiBns(0);
     for( size_t cPhiBn=0; cPhiBn<kMaxPhiBnsPrLyr; cPhiBn++)
     {
       // re-construct file name 
@@ -269,9 +230,10 @@ DtcMemWrd getNMemories( int pLinkId
       if( cFileFnd ){ 
         //std::cout << "\t\t.. " << cFileName << "\n";
         fin_mem_prints.close();
-        cNmemories++;
+        cPhiBns.push_back(cPhiBn);
       }//if file exists 
     }//all possible phi bins 
+    int cNmemories=cPhiBns.size();
     cLinkNPhiBns.range(cOffst+kSizeBinWord-1,cOffst) = cNmemories-1;
     cOffst += kSizeBinWord;
     auto cIndx= std::distance(cLyrs.begin(), std::find(cLyrs.begin(),cLyrs.end(),cLyr));
@@ -280,6 +242,42 @@ DtcMemWrd getNMemories( int pLinkId
   cDtcMemWrd.first = std::accumulate(cNmems.begin(), cNmems.end(), 0);
   cDtcMemWrd.second = cLinkNPhiBns;
   return cDtcMemWrd;
+}
+
+using BnDscs = std::pair< std::vector<uint8_t>, std::vector<uint8_t>>;
+BnDscs getBns( int pLinkId
+  , int pDTCsplit = 0
+  , int pNonant = 4 
+  , std::string pInputFile_Wires = "emData/LUTs/wires.dat")
+{
+
+  BnDscs cWrd;
+  std::string cDtcName = getDTCName( pLinkId, pInputFile_Wires ); 
+  std::vector<uint8_t> cLyrs = getLyrs( pLinkId , pInputFile_Wires );
+  std::vector<int> cNmems(cLyrs.size(),0);
+  std::vector<uint8_t> cBns(0);
+  std::vector<uint8_t> cIds(0);
+  for( auto cLyr : cLyrs )
+  {
+    //std::cout << "Lyr:" << +cLyr << "\n";
+    for( size_t cPhiBn=0; cPhiBn<kMaxPhiBnsPrLyr; cPhiBn++)
+    {
+      // re-construct file name 
+      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      cFileName += getMemPrintName( cDtcName,  pDTCsplit, pNonant, cLyr,  (int)cPhiBn);
+      std::ifstream fin_mem_prints;
+      bool cPrintError=false;
+      bool cFileFnd = openDataFile(fin_mem_prints,cFileName,cPrintError);
+      if( cFileFnd ){ 
+        fin_mem_prints.close();
+        cBns.push_back(cPhiBn);
+        cIds.push_back(cLyr);
+      }//if file exists 
+    }//all possible phi bins 
+  }//lyrs
+  cWrd.first = cIds;
+  cWrd.second = cBns;
+  return cWrd;
 }
 
 // 3 bits for layer/disk id  --> 3 bits 
@@ -306,7 +304,7 @@ ap_uint<kLINKMAPwidth> getLnkWrd(int pLinkId
     cWrd.range(3,1) = cLyr-cLyrCorr;
     cLnkWrd.range(cOffst+kSizeLinkWord-1, cOffst) = (int)cWrd;
     cOffst+= kSizeLinkWord;
-    //std::cout << "Lyr" << +cLyr << " isBrl " << (int)cIsBrl << " layer corr" << cLyrCorr << "\n";
+    std::cout << "Working - Lyr" << +cLyr << " isBrl " << (int)cIsBrl << " layer corr" << cLyrCorr << "\n";
   }
   bool cIs2S = ( cDtcName.find("2S") != std::string::npos  );
   cLnkWrd.range( kLINKMAPwidth-4,kLINKMAPwidth-4 ) = cIs2S ? 1 : 0 ;
@@ -402,10 +400,13 @@ void prepareInputStreams( ifstream * pInputStreams
 // test bench starts here 
 int main(int argc, char * argv[])
 {
+  //
+  int cFirstBx = 0 ;
   // default values for test bench 
   int cLinkId = 8; 
   int cDTCsplit=0;
   int cNonant=4;
+  int cLastBx = 100;
   // if cmd line args are passed 
   // parse them and change defaults 
   if( argc > 1 )
@@ -436,12 +437,7 @@ int main(int argc, char * argv[])
   // allow for truncation memory check [i.e. missing entries can pass check]
   bool cTruncation=false;
   std::string cInputFile_Wires = "emData/LUTs/wires.dat";
-  // // to be moved to emulation/wiring script 
-  // prepareLUTs(cDTCsplit,  cNonant, cInputFile_Wires ); 
-
-  //
-  int cFirstBx = 0 ;
-  int cLastBx = 0;
+  
   
   // dtc name
   std::string cDtcName = getDTCName( cLinkId, cInputFile_Wires );
@@ -499,104 +495,102 @@ int main(int argc, char * argv[])
     return 1; 
 
   // now prepare inputs for IR 
-  ap_uint<kNBitsNLnks> hLinkId = cLinkId;
-  const ap_uint<kLINKMAPwidth> &hLinkWord = cLnkWrd;
-  const ap_uint<kBINMAPwidth> &hPhBnWord = cPhBnWord;
+  // ap_uint<kNBitsNLnks> hLinkId = cLinkId;
+  // const ap_uint<kLINKMAPwidth> hLinkWord = cLnkWrd;
+  // const ap_uint<kBINMAPwidth> hPhBnWord = cPhBnWord;
+  //ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
   const ap_uint<kNMEMwidth> hNmemories = cNmemories;
-  ap_uint<1> hIs2S = hLinkWord.range(kLINKMAPwidth-3,kLINKMAPwidth-4);
   
-  
+  std::cout << "IR Module for link#" 
+      << +cLinkId
+      << " Link Word is " 
+      << std::bitset<kLINKMAPwidth>(cLnkWrd)
+      << "\t"
+      << std::hex
+      << cLnkWrd 
+      << std::dec
+      << "\t connected to "
+      << cNmemories 
+      << " memories."
+      << "\n";
+  // bns 
+  std::vector<int> nStubs(cNmemories,0);
+  auto cBns= getBns( cLinkId
+    , cDTCsplit  
+    , cNonant
+    , cInputFile_Wires);
+
+  #if IR_DEBUG
+    ofstream cOstream_Debug;
+    cOstream_Debug.open ("emData/IR_Mem_out.tab",ios::out);
+  #endif
   for( int cEvId=0; cEvId < kMaxNEvents; cEvId++)
   {
-    // fill reference output memories 
-    // these will be used to compare the 
-    // output of the emulation to 
-    // the output of the HLS top level 
-    // DTCStubMemory hRefMems[cNMemories]; 
-    // for( size_t cMemIndx = 0; cMemIndx < cNMemories; cMemIndx++)
-    // {
-    //   writeMemFromFile<DTCStubMemory>(hRefMems[cMemIndx], cInputStreams[cMemIndx], cEvId);
-    // }
-    
-    
     // only compare the ones I want 
     if( cEvId < cFirstBx || cEvId > cLastBx ) continue;
     
-    std::cout << "Event#" << +cEvId << "\n";
+    #if IR_DEBUG
+      std::cout << "Event#" << +cEvId << "\n";
+    #endif
+
     // prepare input stub stream 
     ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink];
     for( size_t cStubIndx=0; cStubIndx < kMaxStubsFromLink; cStubIndx++)
       hInputStubs[cStubIndx]=ap_uint<kNBits_DTC>(0);
     writeArrayFromFile<ap_uint<kNBits_DTC>>(hInputStubs , cLinkDataStream, cEvId);
-    // // look at stubs 
-    // for( unsigned int cIndx=0; cIndx < (unsigned int)kMaxStubsFromLink ; cIndx++)
-    // { 
-    //    if( hInputStubs[cIndx] == 0 ) continue;
-
-    //    auto hVldBt = hInputStubs[cIndx].range( kMSBVldBt ,  kLSBVldBt);
-    //    auto hEncLyr = hInputStubs[cIndx].range(kMSBLyrBts, kLSBLyrBts);
-    //    std::cout << "Stub " << std::bitset<kNBits_DTC>(hInputStubs[cIndx])
-    //     << " -- " << std::hex << hInputStubs[cIndx] << std::dec 
-    //     << " valid bit " << (int)hVldBt 
-    //     << " encoded layer " << (int)hEncLyr
-    //     << "\n";
-    // }
-
+    
     // clear memories 
     for( unsigned int cIndx=0; cIndx < (unsigned int)hNmemories ; cIndx++)
     { 
        hMemories[cIndx].clear();
     }
-    std::cout << "IR Module for link#" 
-      << +hLinkId
-      << " Link Word is " 
-      << std::bitset<kLINKMAPwidth>(hLinkWord)
-      << "\t"
-      << std::hex
-      << hLinkWord 
-      << std::dec
-      << "\t connected to "
-      << hNmemories 
-      << " memories."
-      << "\n";
-
     BXType hBx = cEvId&0x7;
     BXType hBx_o; 
-    
+
     InputRouterTop( hBx
-      , hLinkWord // input link LUT 
-      , hPhBnWord  // n phi bins LUT 
+      , cLnkWrd // input link LUT 
+      , cPhBnWord  // n phi bins LUT 
       , hInputStubs // input stub stream 
       , hBx_o // output bx 
       , hMemories); 
 
-    // // compare memories 
+    // compare memories 
+    #if IR_DEBUG
+      std::cout << "Comparing memories for Link#"  << +cLinkId 
+          << "\t event#" << +cEvId 
+          << "\n";
+    #endif
+    
     for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)
     {
-      // // for now I exclude the last phi bin 
-      // // of L1 
-      // // remove this when modified 
-      // // emulation data is available 
-      // if( cLinkId%12 == 6 || cLinkId%12 ==7 ) 
-      //   if( cMemIndx >= 3 && cMemIndx < 8 ) // for now do not compare edges of L1 
-      //     continue;
-
-      // std::cout << "Memory#" 
-      //   << cMemIndx 
-      //   << " depth is "
-      //   << hMemories[cMemIndx].getDepth()
-      //   << "\n";
-      // for( size_t cIndx=0; cIndx < hMemories[cMemIndx].getDepth(); cIndx++)
-      // {
-      //   auto cEntry = hMemories[cMemIndx].read_mem(hBx,cIndx).raw();
-      //   if( cEntry== 0 ) continue;
-      //   std::cout << "\t..#" << +cIndx 
-      //     << " entry " << std::bitset<kBRAMwidth>(cEntry)
-      //     << " --- " << std::hex << cEntry << std::dec 
-      //     << " --- "
-      //     << "\n";
-      // }
+      int cNstubsFound=0;
+      #if IR_DEBUG
+        cOstream_Debug << +cLinkId << "\t" << +cEvId << "\t";
+        cOstream_Debug << +cMemIndx << "\t";
+        cOstream_Debug << +cBns.first[cMemIndx] << "\t";
+        cOstream_Debug << +cBns.second[cMemIndx] << "\t";
+        std::cout << "Memory#" << +cMemIndx 
+          << "\t reads out modules from layer " << +cBns.first[cMemIndx]  
+          << "\t reads stubs from phi bin " << +cBns.second[cMemIndx] 
+          << "\t [" << kBnLbls[cBns.second[cMemIndx]] << "]\n" ;
+        for( size_t cIndx=0; cIndx < hMemories[cMemIndx].getDepth(); cIndx++)
+        {
+          auto cEntry = hMemories[cMemIndx].read_mem(hBx,cIndx).raw();
+          if( cEntry== 0 ) continue;
+          std::cout << "\t..Mem#" << +cIndx 
+            << " entry " << std::bitset<kBRAMwidth>(cEntry)
+            << " --- 0x" << std::hex << cEntry << std::dec 
+            << " --- "
+            << "\n" << std::dec ;
+          cNstubsFound++;
+        }
+        nStubs.at(cMemIndx) +=cNstubsFound;
+        cOstream_Debug << +cNstubsFound << "\n";
+      #endif
       int cErCnt = compareMemWithFile<DTCStubMemory>(hMemories[cMemIndx], cInputStreams[cMemIndx], cEvId, "DTCStubMemory", cTruncation);
+      #if IR_DEBUG
+        std::cout << "#### this memory has " << cErCnt << " mismatches.\n";
+      #endif
       cTotalErrCnt += cErCnt;
     }
 
@@ -604,6 +598,22 @@ int main(int argc, char * argv[])
     cLinkDataStream.clear();
     cLinkDataStream.seekg (0, ios::beg);
   }
+  #if IR_DEBUG
+    cOstream_Debug.close();
+    ofstream cOstream_Debug2;
+    std::string cSummaryFile = "emData/IR_Mem_out_summary_Link" + std::to_string(cLinkId);
+    cSummaryFile += ".tab";
+    cOstream_Debug2.open (cSummaryFile,ios::out);
+    for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)
+    {
+      cOstream_Debug2 << +cLinkId << "\t"; 
+      cOstream_Debug2 << +cMemIndx << "\t";
+      cOstream_Debug2 << +cBns.first[cMemIndx] << "\t";
+      cOstream_Debug2 << +cBns.second[cMemIndx] << "\t";
+      cOstream_Debug2 << nStubs.at(cMemIndx)<< "\n";
+    }
+    cOstream_Debug2.close();
+  #endif
 
   // place point back to start 
   for( size_t cMemIndx = 0; cMemIndx < (unsigned int)hNmemories; cMemIndx++)
@@ -611,6 +621,7 @@ int main(int argc, char * argv[])
     cInputStreams[cMemIndx].close();
   }
   cLinkDataStream.close();
+
 
   return cTotalErrCnt;
 }
