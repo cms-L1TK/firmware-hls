@@ -14,7 +14,7 @@ inline const int floatToInt(const double x, const double k) {
   return static_cast<int>(x / k + 1.0e-1);
 }
 
-constexpr int kNTEUnits = 2;
+constexpr int kNTEUnits = 5;
 constexpr int kNbitsrzbin = 3;
 constexpr int kNbitsphibin = 3;
 

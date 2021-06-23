@@ -8,7 +8,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 3;  //number of events to run
+const int nevents = 100;  //number of events to run
 
 using namespace std;
 
@@ -26,8 +26,7 @@ int main()
   ///////////////////////////
   // input memories
   static AllStubInnerMemory<BARRELPS> innerStubs[3];
-  static AllStubMemory<BARRELPS> outerStubs;
-  static VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outervmStubs;
+  static AllStubMemory<BARREL2S> outerStubs;
   static VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> outervmStubs;
 
 
@@ -44,19 +43,19 @@ int main()
   const string dir = "TP_L3L4C";
 
   ifstream fin_innerStubs0;
-  if (not openDataFile(fin_innerStubs0, dir + "/AllInnerStubs_AS_L2PHID_BL_04.dat")) return -1;
+  if (not openDataFile(fin_innerStubs0, dir + "/AllInnerStubs_AS_L3PHID_BL_04.dat")) return -1;
 
   ifstream fin_innerStubs1;
-  if (not openDataFile(fin_innerStubs1, dir + "/AllInnerStubs_AS_L2PHIB_BR_04.dat")) return -1;
+  if (not openDataFile(fin_innerStubs1, dir + "/AllInnerStubs_AS_L3PHIB_BR_04.dat")) return -1;
 
   ifstream fin_innerStubs2;
-  if (not openDataFile(fin_innerStubs2, dir + "/AllInnerStubs_AS_L2PHIC_BM_04.dat")) return -1;
+  if (not openDataFile(fin_innerStubs2, dir + "/AllInnerStubs_AS_L3PHIC_BM_04.dat")) return -1;
 
   ifstream fin_outerStubs;
-  if (not openDataFile(fin_outerStubs, dir + "/AllStubs_AS_L3PHIC_B_L2C_04.dat")) return -1;
+  if (not openDataFile(fin_outerStubs, dir + "/AllStubs_AS_L4PHIC_B_L3C_04.dat")) return -1;
 
   ifstream fin_outervmstubs;
-  if (not openDataFile(fin_outervmstubs, dir + "/VMStubs_VMSTE_L3PHIKn1_04.dat")) return -1;
+  if (not openDataFile(fin_outervmstubs, dir + "/VMStubs_VMSTE_L4PHICn1_04.dat")) return -1;
 
   ///////////////////////////
   // open output files
@@ -81,53 +80,45 @@ int main()
   ifstream fout_tproj5;
   if (not openDataFile(fout_tproj5, dir + "/TrackletProjections_TPROJ_L3L4C_D2PHID_04.dat")) return -1;
 
+
   ifstream fout_tproj6;
-  if (not openDataFile(fout_tproj6, dir + "/TrackletProjections_TPROJ_L3L4C_D3PHIB_04.dat")) return -1;
+  if (not openDataFile(fout_tproj6, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHID_04.dat")) return -1;
 
   ifstream fout_tproj7;
-  if (not openDataFile(fout_tproj7, dir + "/TrackletProjections_TPROJ_L3L4C_D3PHIC_04.dat")) return -1;
+  if (not openDataFile(fout_tproj7, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHIE_04.dat")) return -1;
 
   ifstream fout_tproj8;
-  if (not openDataFile(fout_tproj8, dir + "/TrackletProjections_TPROJ_L3L4C_D3PHID_04.dat")) return -1;
+  if (not openDataFile(fout_tproj8, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHIF_04.dat")) return -1;
 
   ifstream fout_tproj9;
-  if (not openDataFile(fout_tproj9, dir + "/TrackletProjections_TPROJ_L3L4C_D4PHIB_04.dat")) return -1;
+  if (not openDataFile(fout_tproj9, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHIG_04.dat")) return -1;
 
   ifstream fout_tproj10;
-  if (not openDataFile(fout_tproj10, dir + "/TrackletProjections_TPROJ_L3L4C_D4PHIC_04.dat")) return -1;
+  if (not openDataFile(fout_tproj10, dir + "/TrackletProjections_TPROJ_L3L4C_L2PHIB_04.dat")) return -1;
 
   ifstream fout_tproj11;
-  if (not openDataFile(fout_tproj11, dir + "/TrackletProjections_TPROJ_L3L4C_D4PHID_04.dat")) return -1;
+  if (not openDataFile(fout_tproj11, dir + "/TrackletProjections_TPROJ_L3L4C_L2PHIC_04.dat")) return -1;
 
   ifstream fout_tproj12;
-  if (not openDataFile(fout_tproj12, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHID_04.dat")) return -1;
+  if (not openDataFile(fout_tproj12, dir + "/TrackletProjections_TPROJ_L3L4C_L2PHID_04.dat")) return -1;
 
   ifstream fout_tproj13;
-  if (not openDataFile(fout_tproj13, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHIE_04.dat")) return -1;
+  if (not openDataFile(fout_tproj13, dir + "/TrackletProjections_TPROJ_L3L4C_L5PHIB_04.dat")) return -1;
 
   ifstream fout_tproj14;
-  if (not openDataFile(fout_tproj14, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHIF_04.dat")) return -1;
+  if (not openDataFile(fout_tproj14, dir + "/TrackletProjections_TPROJ_L3L4C_L5PHIC_04.dat")) return -1;
 
   ifstream fout_tproj15;
-  if (not openDataFile(fout_tproj15, dir + "/TrackletProjections_TPROJ_L3L4C_L1PHIG_04.dat")) return -1;
+  if (not openDataFile(fout_tproj15, dir + "/TrackletProjections_TPROJ_L3L4C_L5PHID_04.dat")) return -1;
 
   ifstream fout_tproj16;
-  if (not openDataFile(fout_tproj16, dir + "/TrackletProjections_TPROJ_L3L4C_L4PHIB_04.dat")) return -1;
+  if (not openDataFile(fout_tproj16, dir + "/TrackletProjections_TPROJ_L3L4C_L6PHIB_04.dat")) return -1;
 
   ifstream fout_tproj17;
-  if (not openDataFile(fout_tproj17, dir + "/TrackletProjections_TPROJ_L3L4C_L4PHIC_04.dat")) return -1;
+  if (not openDataFile(fout_tproj17, dir + "/TrackletProjections_TPROJ_L3L4C_L6PHIC_04.dat")) return -1;
 
   ifstream fout_tproj18;
-  if (not openDataFile(fout_tproj18, dir + "/TrackletProjections_TPROJ_L3L4C_L4PHID_04.dat")) return -1;
-
-  ifstream fout_tproj19;
-  if (not openDataFile(fout_tproj19, dir + "/TrackletProjections_TPROJ_L3L4C_L5PHIB_04.dat")) return -1;
-
-  ifstream fout_tproj20;
-  if (not openDataFile(fout_tproj20, dir + "/TrackletProjections_TPROJ_L3L4C_L5PHIC_04.dat")) return -1;
-
-  ifstream fout_tproj21;
-  if (not openDataFile(fout_tproj21, dir + "/TrackletProjections_TPROJ_L3L4C_L5PHID_04.dat")) return -1;
+  if (not openDataFile(fout_tproj18, dir + "/TrackletProjections_TPROJ_L3L4C_L6PHID_04.dat")) return -1;
 
   ///////////////////////////
   // loop over events
@@ -148,9 +139,9 @@ int main()
     writeMemFromFile<AllStubInnerMemory<BARRELPS> >(innerStubs[1], fin_innerStubs1, ievt);
     writeMemFromFile<AllStubInnerMemory<BARRELPS> >(innerStubs[2], fin_innerStubs2, ievt);
 
-    writeMemFromFile<AllStubMemory<BARRELPS> >(outerStubs, fin_outerStubs, ievt);
+    writeMemFromFile<AllStubMemory<BARREL2S> >(outerStubs, fin_outerStubs, ievt);
     cout << "Will read vmstubs"<<endl;
-    writeMemFromFile<VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> >(outervmStubs, fin_outervmstubs, ievt);
+    writeMemFromFile<VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> >(outervmStubs, fin_outervmstubs, ievt);
 
     // bx
     BXType bx = ievt;
@@ -187,38 +178,32 @@ int main()
                                                    "\nTrackletProjection (D2PHIC)", truncate);
     err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D2PHID], fout_tproj5, ievt,
                                                    "\nTrackletProjection (D2PHID)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D3PHIB], fout_tproj6, ievt,
-                                                   "\nTrackletProjection (D3PHIB)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D3PHIC], fout_tproj7, ievt,
-                                                   "\nTrackletProjection (D3PHIC)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D3PHID], fout_tproj8, ievt,
-                                                   "\nTrackletProjection (D3PHID)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D4PHIB], fout_tproj9, ievt,
-                                                   "\nTrackletProjection (D4PHIB)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D4PHIC], fout_tproj10, ievt,
-                                                   "\nTrackletProjection (D4PHIC)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TC::D4PHID], fout_tproj11, ievt,
-                                                   "\nTrackletProjection (D4PHID)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHID], fout_tproj12, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHID], fout_tproj6, ievt,
                                                    "\nTrackletProjection (L1PHID)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIE], fout_tproj13, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIE], fout_tproj7, ievt,
                                                    "\nTrackletProjection (L1PHIE)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIF], fout_tproj14, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIF], fout_tproj8, ievt,
                                                    "\nTrackletProjection (L1PHIF)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIG], fout_tproj15, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L1PHIG], fout_tproj9, ievt,
                                                    "\nTrackletProjection (L1PHIG)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L4PHIB], fout_tproj16, ievt,
-                                                   "\nTrackletProjection (L4PHIB)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L4PHIC], fout_tproj17, ievt,
-                                                   "\nTrackletProjection (L4PHIC)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L4PHID], fout_tproj18, ievt,
-                                                   "\nTrackletProjection (L4PHID)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHIB], fout_tproj19, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L2PHIB], fout_tproj10, ievt,
+                                                   "\nTrackletProjection (L2PHIB)", truncate);
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L2PHIC], fout_tproj11, ievt,
+                                                   "\nTrackletProjection (L2PHIC)", truncate);
+    err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L2PHID], fout_tproj12, ievt,
+                                                   "\nTrackletProjection (L2PHID)", truncate);
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHIB], fout_tproj13, ievt,
                                                    "\nTrackletProjection (L5PHIB)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHIC], fout_tproj20, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHIC], fout_tproj14, ievt,
                                                    "\nTrackletProjection (L5PHIC)", truncate);
-    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHID], fout_tproj21, ievt,
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L5PHID], fout_tproj15, ievt,
                                                    "\nTrackletProjection (L5PHID)", truncate);
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHIB], fout_tproj16, ievt,
+                                                   "\nTrackletProjection (L6PHIB)", truncate);
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHIC], fout_tproj17, ievt,
+                                                   "\nTrackletProjection (L6PHIC)", truncate);
+    err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHID], fout_tproj18, ievt,
+                                                   "\nTrackletProjection (L6PHID)", truncate);
     cout << endl;
 
   } // end of event loop
