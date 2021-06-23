@@ -216,17 +216,8 @@ DtcMemWrd getNMemories( int pLinkId
   std::vector<int> cNmems(cLyrs.size(),0);
   ap_uint<kBINMAPwidth> cLinkNPhiBns=0;
   int cOffst=0; 
-
-  ofstream cOstream_LUT;
-  if( pLinkId == 0 )
-    cOstream_LUT.open ("emData/IR_Nmems.tab",ios::out);
-  else
-    cOstream_LUT.open ("emData/IR_Nmems.tab",ios::app);
-  
   for( auto cLyr : cLyrs )
   {
-    //std::cout << "Lyr:" << +cLyr << "\n";
-    cOstream_LUT << +pLinkId << "\t" << +cLyr << "\t"; 
     std::vector<int> cPhiBns(0);
     for( size_t cPhiBn=0; cPhiBn<kMaxPhiBnsPrLyr; cPhiBn++)
     {
@@ -243,17 +234,6 @@ DtcMemWrd getNMemories( int pLinkId
       }//if file exists 
     }//all possible phi bins 
     int cNmemories=cPhiBns.size();
-    cOstream_LUT << +cNmemories << "\t";
-    int cBnNum=0; 
-    for( auto cPhiBn : cPhiBns )
-    {  
-      if( cBnNum != cPhiBns.size()-1)
-        cOstream_LUT << +cPhiBn << ","; 
-      else
-        cOstream_LUT << +cPhiBn ; 
-      cBnNum++;
-    }
-    cOstream_LUT << "\n";
     cLinkNPhiBns.range(cOffst+kSizeBinWord-1,cOffst) = cNmemories-1;
     cOffst += kSizeBinWord;
     auto cIndx= std::distance(cLyrs.begin(), std::find(cLyrs.begin(),cLyrs.end(),cLyr));
@@ -261,7 +241,6 @@ DtcMemWrd getNMemories( int pLinkId
   }
   cDtcMemWrd.first = std::accumulate(cNmems.begin(), cNmems.end(), 0);
   cDtcMemWrd.second = cLinkNPhiBns;
-  cOstream_LUT.close();
   return cDtcMemWrd;
 }
 
@@ -417,27 +396,6 @@ void prepareInputStreams( ifstream * pInputStreams
   }
 }
 
-// for now .. create LUT for IR 
-// this can eventually be produced 
-// by either the wiring script 
-// or the emulation 
-void prepareLUTs( int pDTCsplit = 0
-  , int pNonant = 4 
-  , std::string pInputFile_Wires = "emData/LUTs/wires.dat" )
-{
-  auto cDtcMap = getCablingMap( pInputFile_Wires );
-  auto cMapIter = cDtcMap.begin(); 
-  uint8_t cLinkId=0;
-  do
-  {
-    auto cDtcName = cMapIter->first;
-    auto cLyrs = cMapIter->second; 
-    auto cNmems = getNMemories( cLinkId, pDTCsplit, pNonant, pInputFile_Wires);
-    auto cBnWrd = cNmems.second; 
-    cLinkId++;  
-    cMapIter++;
-  }while( cMapIter != cDtcMap.end() );
-}
 
 // test bench starts here 
 int main(int argc, char * argv[])
@@ -445,10 +403,10 @@ int main(int argc, char * argv[])
   //
   int cFirstBx = 0 ;
   // default values for test bench 
-  int cLinkId = 6; 
+  int cLinkId = 8; 
   int cDTCsplit=0;
   int cNonant=4;
-  int cLastBx = 0;
+  int cLastBx = 100;
   // if cmd line args are passed 
   // parse them and change defaults 
   if( argc > 1 )
@@ -472,11 +430,6 @@ int main(int argc, char * argv[])
         cNonant  = std::stol( cArg.substr( cArg.find(",")+1 , cArg.length()-1) , nullptr, 10 );
         std::cout << "Tk nonant passed from cmd line is " << cDTCsplit << "\n";
       }
-        if( cArg.find("lastBx") != std::string::npos ) 
-      {
-        cLastBx  = std::stol( cArg.substr( cArg.find(",")+1 , cArg.length()-1) , nullptr, 10 );
-        std::cout << "Last Bx to process assed from cmd line is " << cLastBx << "\n";
-      }
     }
   }
   int cTotalErrCnt=0;
@@ -484,9 +437,7 @@ int main(int argc, char * argv[])
   // allow for truncation memory check [i.e. missing entries can pass check]
   bool cTruncation=false;
   std::string cInputFile_Wires = "emData/LUTs/wires.dat";
-  // to be moved to emulation/wiring script 
-  prepareLUTs(cDTCsplit,  cNonant, cInputFile_Wires ); 
-
+  
   
   // dtc name
   std::string cDtcName = getDTCName( cLinkId, cInputFile_Wires );
@@ -671,11 +622,6 @@ int main(int argc, char * argv[])
   }
   cLinkDataStream.close();
 
-  // remove temp LUT 
-  if( remove( "emData/LUTs/IR_Nmems.tab" ) == 0 )
-  {
-    std::cout << "Temperorary LUT created by IR test bench deleted.\n";
-  }
 
   return cTotalErrCnt;
 }
