@@ -50,6 +50,8 @@ class ReferenceType(Enum):
     CM     = 'CandidateMatches'
     FM     = 'FullMatches'
     VMPROJ = 'VMProjections'
+    VMSTE  = 'VMStubs'
+    AS     = 'AllStubs'
 
 
     def __str__(self):
@@ -82,7 +84,7 @@ def print_results(total_number_of_events, number_of_good_events, number_of_missi
     print("\tLength mismatches: "+str(number_of_event_length_mismatches))
     print("\tValue mismatches: "+str(number_of_value_mismatches)+"\n\n")
 
-def compare(comparison_filename="", fail_on_error=False, file_location='./', predefined=False, reference_filenames=[], save=False, verbose=False):
+def compare(comparison_filename="", fail_on_error=False, file_location='./', predefined="", reference_filenames=[], save=False, verbose=False):
     # Sanity checks
     if len(reference_filenames) == 0:
         raise Exception("No reference files were specified (-r). At least one reference file is needed to run the comparison.")
@@ -182,31 +184,58 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
     if save:
         sys.stdout = original_stdout
 
-    if predefined:
+    if predefined != "":
         return failed
     else:
         sys.exit(failed)
 
 def comparePredefined(args):
     ret_sum = 0
-    if os.path.exists('./dataOut/AP_L3PHIC.txt'):
-        ret_sum += compare(comparison_filename="./dataOut/AP_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                           reference_filenames=["../../../emData/MemPrints/TrackletProjections/AllProj_AP_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
-    for i in range(17,25):
-        if os.path.exists(('./dataOut/VMPROJ_L3PHIC%i.txt' % (i))):
-            ret_sum += compare(comparison_filename=("./dataOut/VMPROJ_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=[("../../../emData/MemPrints/VMProjections/VMProjections_VMPROJ_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+    if (args.predefined == "PRMEMC"):
+        if os.path.exists('./dataOut/AP_L3PHIC.txt'):
+            ret_sum += compare(comparison_filename="./dataOut/AP_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                               reference_filenames=["../../../emData/MemPrints/TrackletProjections/AllProj_AP_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+        
+        for i in range(17,25):
+            if os.path.exists(('./dataOut/VMPROJ_L3PHIC%i.txt' % (i))):
+                ret_sum += compare(comparison_filename=("./dataOut/VMPROJ_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                   reference_filenames=[("../../../emData/MemPrints/VMProjections/VMProjections_VMPROJ_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+        
+        for i in range(17,25):
+            if os.path.exists(('./dataOut/CM_L3PHIC%i.txt' % (i))):
+                ret_sum += compare(comparison_filename=("./dataOut/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                   reference_filenames=[("../../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+        
+        ret_sum += compare(comparison_filename="./dataOut/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                           reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+        ret_sum += compare(comparison_filename="./dataOut/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                           reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
-    for i in range(17,25):
-        if os.path.exists(('./dataOut/CM_L3PHIC%i.txt' % (i))):
-            ret_sum += compare(comparison_filename=("./dataOut/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=[("../../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+    if (args.predefined == "VMR"):
+        # AllStubs
+        for i in range(1,8):
+            if os.path.exists(('./dataOut/AS_L2PHIAn%i.txt' % (i))):
+                ret_sum += compare(comparison_filename=("./dataOut/AS_L2PHIAn%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                   reference_filenames=[("../../../emData/MemPrints/Stubs/AllStubs_AS_L2PHIAn%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+        
+        # ME
+        
+        # TE Inner 
+        for i in range(1,5):
+            for j in range(1,4):
+                if os.path.exists(('./dataOut/VMSTEI_L2PHII%in%i.txt' % (i,j))):
+                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHII%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHII%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
 
-    ret_sum += compare(comparison_filename="./dataOut/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                       reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
-    ret_sum += compare(comparison_filename="./dataOut/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                       reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+        # TE Inner Overlap
+        for i in range(1,3):
+            for j in range(5,9):
+                if os.path.exists(('./dataOut/VMSTEI_L2PHIX%in%i.txt' % (i,j))):
+                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHIX%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIX%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+
+        # TE Outer
 
     print("Accumulated number of errors =",ret_sum)
 
@@ -233,7 +262,7 @@ python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.d
     parser.add_argument("-c","--comparison_filename",default="output.txt",help="The filename of the testbench output file (default = %(default)s)")
     parser.add_argument("-f","--fail_on_error",default=False,action="store_true",help="Raise an exception on the first error as opposed to simply printing a message (default = %(default)s)")
     parser.add_argument("-l","--file_location",default="./",help="Location of the input files (default = %(default)s)")
-    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons (default = %(default)s)")
+    parser.add_argument("-p","--predefined",default="",help="Run predefined comparisons (default = %(default)s)")
     parser.add_argument("-r","--reference_filenames",default=[],nargs="+",help="A list of filenames for the reference files (default = %(default)s)")
     parser.add_argument("-s","--save",default=False,action="store_true",help="Save the output to a file (default = %(default)s)")
     parser.add_argument("-v","--verbose",default=False,action="store_true",help="Print extra information to the console (default = %(default)s)")
