@@ -53,6 +53,7 @@ class ReferenceType(Enum):
     VMSME  = 'VMStubs'
     VMSTE  = 'VMStubs'
     AS     = 'AllStubs'
+    IL     = 'InputStubs'
 
 
     def __str__(self):
@@ -213,7 +214,43 @@ def comparePredefined(args):
         ret_sum += compare(comparison_filename="./dataOut/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                            reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
-    if (args.predefined == "VMR"):
+    elif (args.predefined == "IRVMR"):
+        # IL
+        for i in ['L', 'D']:
+            for j in ['A', 'B', 'C', 'D']:
+                if os.path.exists(('./dataOut/IL_%c2PHI%c_PS10G_3_A.txt' % (i,j))):
+                    ret_sum += compare(comparison_filename=("./dataOut/IL_%c2PHI%c_PS10G_3_A.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                       reference_filenames=[("../../../emData/MemPrints/InputStubs/InputStubs_IL_%c2PHI%c_PS10G_3_A_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+        # AllStubs - temporarily removed due to issues with not having nentries port
+        # for i in range(1,8):
+        #     if os.path.exists(('./dataOut/AS_L2PHIAn%i.txt' % (i))):
+        #         ret_sum += compare(comparison_filename=("./dataOut/AS_L2PHIAn%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+        #                            reference_filenames=[("../../../emData/MemPrints/Stubs/AllStubs_AS_L2PHIAn%i_04.dat" % (i))], save=args.save, verbose=args.verbose)    
+        # ME
+        for i in range(1,9):
+            if os.path.exists(('./dataOut/VMSME_L2PHIA%in1.txt' % (i))):
+                ret_sum += compare(comparison_filename=("./dataOut/VMSME_L2PHIA%in1.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                   reference_filenames=[("../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L2PHIA%in1_04.dat" % (i))], save=args.save, verbose=args.verbose)
+        # TE Inner 
+        for i in range(1,5):
+            for j in range(1,4):
+                if os.path.exists(('./dataOut/VMSTEI_L2PHII%in%i.txt' % (i,j))):
+                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHII%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHII%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+        # TE Inner Overlap
+        for i in range(1,3):
+            for j in range(5,9):
+                if os.path.exists(('./dataOut/VMSTEI_L2PHIX%in%i.txt' % (i,j))):
+                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHIX%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIX%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+        # TE Outer
+        for i in range(1,9):
+            for j in range(1,6):
+                if os.path.exists(('./dataOut/VMSTEO_L2PHIA%in%i.txt' % (i,j))):
+                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEO_L2PHIA%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIA%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+
+    elif (args.predefined == "VMR"):
         # AllStubs - temporarily removed due to issues with not having nentries port
         # for i in range(1,8):
         #     if os.path.exists(('./dataOut/AS_L2PHIAn%i.txt' % (i))):
