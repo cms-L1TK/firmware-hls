@@ -16,7 +16,7 @@ use work.tf_pkg.all;
 --  Writes a .txt file with the ADDR & DATA of all valid entries in
 --  the final memories in the chain.
 --
---  N.B. This version assumes the memories are unbinned.
+--  N.B. This version assumes the memories are binned.
 -- ==================================================================
 
 entity FileWriterFromRAMBinned is
@@ -24,11 +24,11 @@ entity FileWriterFromRAMBinned is
     FILE_NAME  : string;   --! Name of .txt file to be written
     RAM_WIDTH  : natural := 18;    --! RAM data width
     NUM_PAGES  : natural := 2;     --! Number of pages in RAM memory
-    NUM_MEM_BINS    : natural := 8;                --! Specify number of memory bins
+    NUM_BINS    : natural := 8;                --! Specify number of memory bins
     -- Leave following parameters at their default values.
     RAM_DEPTH  : natural := NUM_PAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
     ADDR_WIDTH : natural := clogb2(RAM_DEPTH);      --! RAM address
-    NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH/NUM_MEM_BINS --! Number of entries per memory bin
+    NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH/NUM_BINS --! Number of entries per memory bin
   );
   port (
     CLK      : in  std_logic;
@@ -46,11 +46,10 @@ architecture behavior of FileWriterFromRAMBinned is
   type t_arr_en_lat is array(0 to MEM_READ_LATENCY) of std_logic;
   type t_arr_rd_lat is array(0 to MEM_READ_LATENCY) of std_logic_vector(ADDR_WIDTH-1 downto 0);
   type t_arr_bx_lat is array(0 to MEM_READ_LATENCY) of integer;
+  type t_arr_nent is array(0 to NUM_BINS) of natural;
   signal READ_EN_LATCH : t_arr_en_lat := (others => '0');
   signal ADDR_LATCH    : t_arr_rd_lat := (others => (others => '0'));
   signal BX_CNT_LATCH  : t_arr_bx_lat := (others => 0);
-  -- nentries arrays and shit
-  type t_arr_nent is array(0 to NUM_MEM_BINS) of natural; -- use natural or logic vector of size NUM_ENTRIES_PER_MEM_BINS?
 begin
 
 procFile : process(CLK)
@@ -60,13 +59,13 @@ procFile : process(CLK)
   variable LINE_OUT    : line;                              
   variable BX_CNT      : integer := -1;  --! Event counter
   variable PAGE        : natural := 0;
-  variable NENT        : t_arr_nent := (others => 0); -- nentries within bins or something
+  variable NENT        : t_arr_nent := (others => 0); --! number of entries within each bin
   variable DATA_CNT    : t_arr_nent := (others => 0);   --! Counter of data within page and bin
   variable v_REN       : std_logic := '0';
   variable v_ADDR      : std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
   constant zeroADDR    : std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
   constant TXT_WIDTH   : natural := 11;  --! Column width in output .txt file
-  --variable BIN         : std_logic_vector
+
   function to_hexstring ( VAR : std_logic_vector) return string is
   -- Convert to string, with "0x" prefix.
   begin    
@@ -78,7 +77,7 @@ begin
   -- Check user didn't change values of derived generics.
   assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
   assert (ADDR_WIDTH = clogb2(RAM_DEPTH)) report "User changed ADDR_WIDTH" severity FAILURE;
-  assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH/NUM_MEM_BINS) report "User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
+  assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH/NUM_BINS) report "User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
 
   if rising_edge(CLK) then
 
@@ -102,7 +101,7 @@ begin
     if (DONE = '1') then   --! Signal present in single clk cycle when event first ready.
       BX_CNT := BX_CNT + 1;
       PAGE := BX_CNT mod NUM_PAGES;
-      bin_nent_loop : for i in 0 to NUM_MEM_BINS-1 loop -- if this works, then we don't need a separate file for the binned?
+      bin_nent_loop : for i in 0 to NUM_BINS-1 loop
         NENT(i) := to_integer(unsigned(NENT_ARR(PAGE)(i)));
         DATA_CNT(i) := 0;
       end loop bin_nent_loop;
@@ -115,7 +114,7 @@ begin
     -- Launch memory read, if data remains to be read from current event.
 
     -- Loop over the bins and find the first unread data
-    bin_read_loop : for i in 0 to NUM_MEM_BINS-1 loop
+    bin_read_loop : for i in 0 to NUM_BINS-1 loop
       if (BX_CNT >= 0 and BX_CNT < MAX_EVENTS and DATA_CNT(i) < NENT(i)) then
         -- Data to read
         v_REN  := '1';
@@ -143,7 +142,7 @@ begin
       write(LINE_OUT, NOW   , right, TXT_WIDTH); 
       write(LINE_OUT, BX_CNT_LATCH(0), right, TXT_WIDTH);
       write(LINE_OUT, to_hexstring(ADDR_LATCH(0)), right, TXT_WIDTH);
-      write(LINE_OUT, to_integer(unsigned(ADDR_LATCH(0)(clogb2(NUM_MEM_BINS)+clogb2(NUM_ENTRIES_PER_MEM_BINS)-1 downto clogb2(NUM_ENTRIES_PER_MEM_BINS)))), right, TXT_WIDTH);
+      write(LINE_OUT, to_integer(unsigned(ADDR_LATCH(0)(clogb2(NUM_BINS)+clogb2(NUM_ENTRIES_PER_MEM_BINS)-1 downto clogb2(NUM_ENTRIES_PER_MEM_BINS)))), right, TXT_WIDTH);
       write(LINE_OUT, to_hexstring(DATA), right, 2*TXT_WIDTH);
       writeline(FILE_OUT, LINE_OUT);
     end if;
