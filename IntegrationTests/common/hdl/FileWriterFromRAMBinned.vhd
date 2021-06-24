@@ -66,7 +66,7 @@ procFile : process(CLK)
   variable v_ADDR      : std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
   constant zeroADDR    : std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
   constant TXT_WIDTH   : natural := 11;  --! Column width in output .txt file
-
+  --variable BIN         : std_logic_vector
   function to_hexstring ( VAR : std_logic_vector) return string is
   -- Convert to string, with "0x" prefix.
   begin    
@@ -113,41 +113,41 @@ begin
     end if;
 
     -- Launch memory read, if data remains to be read from current event.
+
+    -- Loop over the bins and find the first unread data
     bin_read_loop : for i in 0 to NUM_MEM_BINS-1 loop
       if (BX_CNT >= 0 and BX_CNT < MAX_EVENTS and DATA_CNT(i) < NENT(i)) then
         -- Data to read
         v_REN  := '1';
         v_ADDR := std_logic_vector(to_unsigned(DATA_CNT(i) + i*NUM_ENTRIES_PER_MEM_BINS + PAGE_LENGTH*PAGE, ADDR_WIDTH));
         DATA_CNT(i) := DATA_CNT(i) + 1;
+        exit;
       else
         -- No data to read.
         v_REN  := '0';
         v_ADDR := (others => '0');
       end if;
-      
-      -- DO I WANT THE FOLLOWING INSIDE THE LOOP???! BUT I THINK WE ONLY HAVE ONE STUB PER CLK??
-      READ_EN <= v_REN;
-      ADDR    <= v_ADDR;
-      -- As memory read takes 1-2 clks, store address and read-enable flags.
-      READ_EN_LATCH <= READ_EN_LATCH(1 to MEM_READ_LATENCY) & v_REN;
-      ADDR_LATCH    <= ADDR_LATCH   (1 to MEM_READ_LATENCY) & v_ADDR;
-      BX_CNT_LATCH  <= BX_CNT_LATCH (1 to MEM_READ_LATENCY) & BX_CNT;
-
-      -- Write to .txt file results of read from memory (if read took place).
-      -- (Delayed due to read latency of memory).
-      if (READ_EN_LATCH(0) = '1') then
-        -- Valid data, so write it to file.
-        write(LINE_OUT, NOW   , right, TXT_WIDTH); 
-        write(LINE_OUT, BX_CNT_LATCH(0), right, TXT_WIDTH);
-        write(LINE_OUT, to_hexstring(ADDR_LATCH(0)), right, TXT_WIDTH);
-        write(LINE_OUT, to_hexstring(ADDR_LATCH(0)), right, TXT_WIDTH); -- change this to bin
-        write(LINE_OUT, to_hexstring(DATA), right, 2*TXT_WIDTH);
-        writeline(FILE_OUT, LINE_OUT);
-        exit; -- exit loop when we have found a stub to write    
-      end if;
-
     end loop bin_read_loop;
-    
+
+    READ_EN <= v_REN;
+    ADDR    <= v_ADDR;
+    -- As memory read takes 1-2 clks, store address and read-enable flags.
+    READ_EN_LATCH <= READ_EN_LATCH(1 to MEM_READ_LATENCY) & v_REN;
+    ADDR_LATCH    <= ADDR_LATCH   (1 to MEM_READ_LATENCY) & v_ADDR;
+    BX_CNT_LATCH  <= BX_CNT_LATCH (1 to MEM_READ_LATENCY) & BX_CNT;
+
+    -- Write to .txt file results of read from memory (if read took place).
+    -- (Delayed due to read latency of memory).
+    if (READ_EN_LATCH(0) = '1') then
+      -- Valid data, so write it to file.
+      write(LINE_OUT, NOW   , right, TXT_WIDTH); 
+      write(LINE_OUT, BX_CNT_LATCH(0), right, TXT_WIDTH);
+      write(LINE_OUT, to_hexstring(ADDR_LATCH(0)), right, TXT_WIDTH);
+      write(LINE_OUT, to_integer(unsigned(ADDR_LATCH(0)(clogb2(NUM_MEM_BINS)+clogb2(NUM_ENTRIES_PER_MEM_BINS)-1 downto clogb2(NUM_ENTRIES_PER_MEM_BINS)))), right, TXT_WIDTH);
+      write(LINE_OUT, to_hexstring(DATA), right, 2*TXT_WIDTH);
+      writeline(FILE_OUT, LINE_OUT);
+    end if;
+
   end if;
 
 end process procFile;
