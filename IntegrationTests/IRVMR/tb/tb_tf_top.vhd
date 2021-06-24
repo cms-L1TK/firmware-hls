@@ -133,7 +133,7 @@ begin
 
   DL_39_loop : for var in enum_DL_39 generate
   begin
-    readDL_39 : entity work.FileReaderToFIFO 
+    readDL_39 : entity work.FileReaderFIFO 
     generic map (
       FILE_NAME  => FILE_IN_DL_39&memory_enum_to_string(var)&inputFileNameEnding,
       DELAY      => DL_DELAY*MAX_ENTRIES,

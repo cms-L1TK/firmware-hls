@@ -22,7 +22,7 @@ use work.tf_pkg.all;
 --  The start of the first event can be delayed by specified amount.
 -- ==================================================================
 
-entity FileReaderToFIFO is
+entity FileReaderFIFO is
   generic (
     FILE_NAME  : string;   --! Name of .txt file corresponding to memory content
     DELAY      : natural := 0;     --! Delay output signals by this many clocks.
@@ -37,10 +37,10 @@ entity FileReaderToFIFO is
     DATA      : out std_logic_vector(FIFO_WIDTH-1 downto 0);
     START     : out std_logic
   );
-end FileReaderToFIFO;
+end FileReaderFIFO;
 
 
-architecture behavior of FileReaderToFIFO is
+architecture behavior of FileReaderFIFO is
   signal EVENT_CNT : integer := -1;   --! Used for debug printout
   signal WAITING   : boolean := true; --! Used to delay start of first event.
 begin
