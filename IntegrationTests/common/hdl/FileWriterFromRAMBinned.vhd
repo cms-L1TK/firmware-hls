@@ -119,7 +119,6 @@ begin
         v_REN  := '1';
         v_ADDR := std_logic_vector(to_unsigned(DATA_CNT(i) + i*NUM_ENTRIES_PER_MEM_BINS + PAGE_LENGTH*PAGE, ADDR_WIDTH));
         DATA_CNT(i) := DATA_CNT(i) + 1;
-        -- exit; can move the reading outside loop if using exit?
       else
         -- No data to read.
         v_REN  := '0';
@@ -143,7 +142,8 @@ begin
         write(LINE_OUT, to_hexstring(ADDR_LATCH(0)), right, TXT_WIDTH);
         write(LINE_OUT, to_hexstring(ADDR_LATCH(0)), right, TXT_WIDTH); -- change this to bin
         write(LINE_OUT, to_hexstring(DATA), right, 2*TXT_WIDTH);
-        writeline(FILE_OUT, LINE_OUT);      
+        writeline(FILE_OUT, LINE_OUT);
+        exit; -- exit loop when we have found a stub to write    
       end if;
 
     end loop bin_read_loop;
