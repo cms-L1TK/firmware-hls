@@ -143,8 +143,8 @@ begin
     )
     port map (
       CLK => CLK,
-      READ_SHIT => DL_39_link_read(var), -- needs to change??
-      EMPTY_NEG => DL_39_link_empty_neg(var), -- needs to change??
+      READ_SHIT => DL_39_link_read(var),
+      EMPTY_NEG => DL_39_link_empty_neg(var),
       DATA => DL_39_link_AV_dout(var),
       START => START_DL(var)
     );
@@ -159,7 +159,7 @@ begin
     -- Process to start first module in chain & generate its BX counter input.
     -- Also releases reset flag.
     constant CLK_RESET : natural := 5; -- Any low number OK.
-    variable CLK_COUNT : natural := MAX_ENTRIES;
+    variable CLK_COUNT : natural := MAX_ENTRIES - CLK_RESET;
     variable EVENT_COUNT : integer := -1;
     variable v_line : line; -- Line for debug
   begin
@@ -179,7 +179,7 @@ begin
           write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
         end if;
         -- Releae
-        if (CLK_COUNT = CLK_RESET) then 
+        if (CLK_COUNT = MAX_ENTRIES) then 
           RESET <= '0';
         end if;
       end if;

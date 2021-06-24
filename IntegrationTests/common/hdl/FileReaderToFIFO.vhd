@@ -64,6 +64,7 @@ begin
 
   if rising_edge(CLK) then
   
+  -- write(v_line, string'(" BX_CNT ")); write(v_line, BX_CNT); write(v_line, string'(" DATA_CNT ")); write(v_line, DATA_CNT); writeline(output, v_line);
     -- Open file
     if (not INIT) then
       INIT := true;
@@ -80,11 +81,11 @@ begin
       -- No data, either because we're waiting to start reading it
       -- or because we already finished reading it.
       DATA <= (others => '0');
-      -- EMPTY_NEG <= '0';
+      EMPTY_NEG <= '0';
  
     else 
 
-      -- don't read next stub until we have an read signal
+      -- don't read next stub until we have a read signal
       if (line_is_read or READ_SHIT='1') then
         LOOPING := true;
       else 
@@ -108,7 +109,7 @@ begin
           -- New event header
 
           EMPTY_NEG <= '0'; -- no reads
-          line_is_read := true; -- don't have to wait for this line to be read as it doesn't contain data
+          line_is_read := true; -- don't wait for the event header line to be read as it doesn't contain data
 
           if (DATA_CNT < MAX_ENTRIES) then
 
@@ -133,16 +134,15 @@ begin
 
         elsif (LINE_IN.all(1 to 2) /= "BX" and DATA_CNT >= MAX_ENTRIES) then
           
-          -- skip data until next bx 
+          -- skip data until next bx if more than MAX_ENTRIES stubs in the event
           
-          if (BX_CNT = 99)  then -- or stop if end of file. FIX ME
+          if (endFile(FILE_IN)) then -- or stop if end of file.
             LOOPING := false;
           end if;
           
         elsif (LINE_IN.all = "") then
 
           -- Skip blank lines
-          EMPTY_NEG <= '0'; -- no reads
 
         elsif (BX_CNT >= 0) then
 
@@ -169,7 +169,7 @@ begin
           -- We sent output signals, so stop looping
           LOOPING := false;
 
-          -- Don't read the next line until it has been read
+          -- Don't read the next line until it has been read by the module
           if (READ_SHIT='1') then
             line_is_read := true;
           else
