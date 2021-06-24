@@ -143,7 +143,7 @@ begin
     )
     port map (
       CLK => CLK,
-      READ_SHIT => DL_39_link_read(var),
+      READ_EN => DL_39_link_read(var),
       EMPTY_NEG => DL_39_link_empty_neg(var),
       DATA => DL_39_link_AV_dout(var),
       START => START_DL(var)

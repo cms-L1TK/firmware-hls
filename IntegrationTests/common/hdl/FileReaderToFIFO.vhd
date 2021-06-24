@@ -32,7 +32,7 @@ entity FileReaderToFIFO is
   );
   port (
     CLK       : in  std_logic;
-    READ_SHIT : in std_logic;
+    READ_EN : in std_logic;
     EMPTY_NEG : out std_logic;
     DATA      : out std_logic_vector(FIFO_WIDTH-1 downto 0);
     START     : out std_logic
@@ -63,8 +63,7 @@ procFile : process(CLK)
 begin
 
   if rising_edge(CLK) then
-  
-  -- write(v_line, string'(" BX_CNT ")); write(v_line, BX_CNT); write(v_line, string'(" DATA_CNT ")); write(v_line, DATA_CNT); writeline(output, v_line);
+
     -- Open file
     if (not INIT) then
       INIT := true;
@@ -82,28 +81,27 @@ begin
       -- or because we already finished reading it.
       DATA <= (others => '0');
       EMPTY_NEG <= '0';
- 
+
     else 
 
       -- don't read next stub until we have a read signal
-      if (line_is_read or READ_SHIT='1') then
+      if (line_is_read or READ_EN='1') then
         LOOPING := true;
       else 
         LOOPING := false;
       end if;
-      --LOOPING := true;
 
       -- Read next data word from file.
 
       findNextDataLine : while LOOPING loop
         
-        if (not CREATE_DUMMY_DATA) then -- and (line_is_read or READ_SHIT='1')) then
+        if (not CREATE_DUMMY_DATA) then -- and (line_is_read or READ_EN='1')) then
 
           -- Read next line in file.
           readline (FILE_IN, LINE_IN);
 
         end if;
-        -- write(v_line, string'("LINE ")); write(v_line,LINE_IN.all); write(v_line, string'(" BX_CNT ")); write(v_line, BX_CNT); write(v_line, string'(" DATA_CNT ")); write(v_line, DATA_CNT); writeline(output, v_line);
+
         if (LINE_IN.all(1 to 2) = "BX") then
 
           -- New event header
@@ -129,17 +127,17 @@ begin
             DATA_CNT := 0;
             -- Note that we are now reading data from file again.
             CREATE_DUMMY_DATA := false;
-            
+
           end if;
 
         elsif (LINE_IN.all(1 to 2) /= "BX" and DATA_CNT >= MAX_ENTRIES) then
-          
+
           -- skip data until next bx if more than MAX_ENTRIES stubs in the event
-          
+
           if (endFile(FILE_IN)) then -- or stop if end of file.
             LOOPING := false;
           end if;
-          
+
         elsif (LINE_IN.all = "") then
 
           -- Skip blank lines
@@ -170,7 +168,7 @@ begin
           LOOPING := false;
 
           -- Don't read the next line until it has been read by the module
-          if (READ_SHIT='1') then
+          if (READ_EN='1') then
             line_is_read := true;
           else
             line_is_read := false;
@@ -231,7 +229,7 @@ begin
         assert (FILE_STATUS = open_ok) report "Failed to open file "&FILE_NAME_DEBUG severity FAILURE;
       end if;
 
-      if (DEBUG and READ_SHIT = '1') then 
+      if (DEBUG and READ_EN = '1') then 
         write(LINE_OUT, string'("BX=")); write(LINE_OUT, EVENT_CNT);
         write(LINE_OUT, string'(" DATA=")); hwrite(LINE_OUT, DATA);
         write(LINE_OUT, string'(" at SIM time ")); write(LINE_OUT, NOW); 
