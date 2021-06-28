@@ -98,7 +98,7 @@ begin
       PAGE := BX_CNT mod NUM_PAGES;
       DATA_CNT :=0;
 
-      if (RAM_WIDTH = 36 and NUM_PAGES = 8) then -- bodge since AS doesn't have an nentries port. FIX ME. Also some other memory doesn't have it as well
+      if (RAM_WIDTH = 36 and NUM_PAGES = 8) then -- FIX ME: bodge since AS doesn't have an nentries port. Also some other memory doesn't have it as well
         NENT := MAX_ENTRIES;
       else
         NENT := to_integer(unsigned(NENT_ARR(PAGE)));

@@ -98,6 +98,7 @@ begin
       if (DONE = '1') then
         -- Module has finished event, so increment event counter.
         BX_CNT := BX_CNT + 1;
+
         if (BX_CNT = MAX_EVENTS) then
           -- All events processed, so close file.
           file_close(FILE_OUT);
