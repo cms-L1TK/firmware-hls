@@ -10,7 +10,8 @@ void InputRouterTop( const BXType bx
 
   #pragma HLS clock domain = slow_clock
   #pragma HLS stream variable = hInputStubs depth = 1
-  
+	#pragma HLS interface register port = bx_o
+
   InputRouter<cNMemories>( bx
       , hLinkWord
       , hPhBnWord

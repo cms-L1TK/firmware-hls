@@ -224,7 +224,6 @@ void InputRouter( const BXType bx
 {
 	
 	#pragma HLS inline
-	#pragma HLS interface register port = bx_o
 	#pragma HLS array_partition variable = hOutputStubs complete
 
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
@@ -238,7 +237,7 @@ void InputRouter( const BXType bx
 	ClearCounters<nOMems>(nMems,  hNStubs);
 
 	LOOP_ProcessIR:
-	for (int cStubCounter = 0; cStubCounter < kMaxStubsFromLink; cStubCounter++) 
+	for (int cStubCounter = 0; cStubCounter < kMaxProc; cStubCounter++) 
 	{
 	#pragma HLS pipeline II = 1
 	#pragma HLS PIPELINE rewind
