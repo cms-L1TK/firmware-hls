@@ -62,8 +62,10 @@ class ReferenceType(Enum):
     def FullName(self):
         return '{0}'.format(self.value)
 
-def parse_reference_file(filename):
+def parse_reference_file(filename, is_binned):
     # Parse .txt file from C++ emulation in emData/
+    # Returns only data if unbinned.
+    # Returns bin & data if binned.
     events = []
     with open(filename,'r') as f:
         values = []
@@ -74,7 +76,12 @@ def parse_reference_file(filename):
                 events.append(values)
                 values = []
             else:
-                values.append(line.split()[-1].upper().replace('X','x'))
+                data = line.split()[-1].upper().replace('X','x')
+                if is_binned:
+                    bin = line.split()[0]
+                    values.append([bin, data])
+                else:
+                    values.append(data)
         events.append(values)
     return events
 
@@ -119,19 +126,26 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
         print("Comparing TB results to ref. file "+str(reference_filename)+" ... ")
 
-        # Parse the reference data
-        reference_data = parse_reference_file(file_location+"/"+reference_filename)
-
         # Read column names from file
         column_names = list(pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,nrows=1))
         if verbose: print(column_names)
 
+        # Check if binned memory
+        if ('BIN' in column_names):
+            is_binned = True
+            column_selections = ['BX','ADDR','BIN','DATA']
+        else:
+            is_binned = False
+            column_selections = ['BX','ADDR','DATA']
+
         # Open the comparison (= VHDL test-bench output) data
-        column_selections = ['BX','ADDR','DATA']
         data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
         selected_columns = data[column_selections]
+
+        # Parse the reference data
+        reference_data = parse_reference_file(file_location+"/"+reference_filename, is_binned)
 
         for ievent,event in enumerate(reference_data):
             print("Doing event "+str(ievent+1)+"/"+str(len(reference_data))+" ... ")
@@ -164,19 +178,35 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 number_of_good_events += good
                 continue
 
-            offset = selected_rows[selected_rows.columns[2]].index[0]
+            offset = selected_rows['DATA'].index[0]
+
             for ival,val in enumerate(event):
                 # In case there are fewer entries in the comparison data than in the reference data
-                if offset+ival not in selected_rows[selected_rows.columns[2]]: continue
+                if offset+ival not in selected_rows['DATA']: continue
+
+                if is_binned:
+                    bin, data = val
+                else:
+                    data = val
 
                 # Raise exception if the values for a given entry don't match
-                if selected_rows[selected_rows.columns[2]][offset+ival] != val:
+                if selected_rows['DATA'][offset+ival] != data:
                     good = False
                     number_of_value_mismatches += 1
-                    message = "The values for event "+str(ievent)+" address "+str(selected_rows[selected_rows.columns[1]][offset+ival])+" do not match!"\
-                              "\n\treference="+str(val)+" comparison="+str(selected_rows[selected_rows.columns[2]][offset+ival])
+                    message = "The values for event "+str(ievent)+" address "+str(selected_rows['ADDR'][offset+ival])+" do not match!"\
+                              "\n\treference="+str(data)+" comparison="+str(selected_rows['DATA'][offset+ival])
                     if fail_on_error: raise Exception(message)
                     else:             print("\t\t"+message.replace("\n","\n\t\t"))
+
+                # Raise exception if the bin number of a given entry don't match
+                elif is_binned:
+                    if selected_rows['BIN'][offset+ival] != int(bin):
+                        good = False
+                        number_of_value_mismatches += 1
+                        message = "The bin for event "+str(ievent)+" stub "+str(selected_rows['DATA'][offset+ival])+" do not match!"\
+                                  "\n\treference="+bin+" comparison="+str(selected_rows['BIN'][offset+ival])
+                        if fail_on_error: raise Exception(message)
+                        else:             print("\t\t"+message.replace("\n","\n\t\t"))
 
             number_of_good_events += good
 
