@@ -13,11 +13,11 @@ use STD.TEXTIO.all;
 use work.tf_pkg.all;
 
 -- ==================================================================
---  Outputs on each clk cycle one RAM data word & address,
---  with write-enable flag indicating if valid word.
+--  Outputs one data word each clock cycle if read is enabled. 
 --  The data are read from a .txt file, but if this has less than
---  108 entries per event, it outputs invalid signals for the
---  remaining clks in that event.
+--  108 entries per event, the data output is zeros for the
+--  remaining clks in that event. The empty_neg signal is always on
+--  due to unknown issues with the IR IP core.
 --
 --  The start of the first event can be delayed by specified amount.
 -- ==================================================================
@@ -26,7 +26,7 @@ entity FileReaderFIFO is
   generic (
     FILE_NAME  : string;   --! Name of .txt file corresponding to memory content
     DELAY      : natural := 0;     --! Delay output signals by this many clocks.
-    FIFO_WIDTH  : natural := 39;    --! RAM data width
+    FIFO_WIDTH  : natural := 39;    --! Data width
     DEBUG      : boolean := false; --! Debug printout
     FILE_NAME_DEBUG : string  := ""  --! Name of .txt file for debug printout.
   );
@@ -59,7 +59,7 @@ procFile : process(CLK)
   variable LOOPING     : boolean := true; --! Need another loop to make output.
   variable CREATE_DUMMY_DATA  : boolean := false; --! Inventing null data. 
   variable v_line : line; -- Line for debug
-  variable line_is_read : boolean := true; -- LINE_IN has been read by module
+  variable line_is_read : boolean := true; -- LINE_IN has been read by external module
 begin
 
   if rising_edge(CLK) then
@@ -80,11 +80,11 @@ begin
       -- No data, either because we're waiting to start reading it
       -- or because we already finished reading it.
       DATA <= (others => '0');
-      EMPTY_NEG <= '0';
+      -- EMPTY_NEG <= '0'; -- HACK: send out zero-data instead of an empty signal as the IR stops processing stubs if EMPTY_NEG is 0
 
     else 
 
-      -- don't read next stub until we have a read signal
+      -- don't read next data until we have a read signal
       if (line_is_read or READ_EN='1') then
         LOOPING := true;
       else 
@@ -95,7 +95,7 @@ begin
 
       findNextDataLine : while LOOPING loop
         
-        if (not CREATE_DUMMY_DATA) then -- and (line_is_read or READ_EN='1')) then
+        if (not CREATE_DUMMY_DATA) then
 
           -- Read next line in file.
           readline (FILE_IN, LINE_IN);
@@ -106,7 +106,7 @@ begin
 
           -- New event header
 
-          EMPTY_NEG <= '0'; -- no reads
+          -- EMPTY_NEG <= '0'; -- HACK: send out zero-data instead of an empty signal as the IR stops processing stubs if EMPTY_NEG is 0
           line_is_read := true; -- don't wait for the event header line to be read as it doesn't contain data
 
           if (DATA_CNT < MAX_ENTRIES) then
@@ -167,7 +167,7 @@ begin
           -- We sent output signals, so stop looping
           LOOPING := false;
 
-          -- Don't read the next line until it has been read by the module
+          -- Don't read the next line until it has been read by the external module
           if (READ_EN='1') then
             line_is_read := true;
           else
