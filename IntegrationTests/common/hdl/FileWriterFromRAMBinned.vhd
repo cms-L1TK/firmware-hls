@@ -13,7 +13,7 @@ use STD.TEXTIO.all;
 use work.tf_pkg.all;
 
 -- ==================================================================
---  Writes a .txt file with the ADDR & DATA of all valid entries in
+--  Writes a .txt file with the ADDR, BIN & DATA of all valid entries in
 --  the final memories in the chain.
 --
 --  N.B. This version assumes the memories are binned.

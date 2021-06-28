@@ -55,7 +55,7 @@ architecture behavior of tb_tf_top is
 
   constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
   constant DEBUG             : boolean := false;      --! Debug off/on
-  constant DL_DELAY       : integer := 0;          --! Number of BX delays (can be written early 8 pages) DO WE NEED A DELAY SINCE ONLY MEMORIES READ FROM FILE USES THEM?
+  constant DL_DELAY       : integer := 0;          --! Number of BX delays (can be written early 8 pages)
 
   -- Paths of data files specified relative to Vivado project's xsim directory.
   -- e.g. IntegrationTests/IRVMR/script/Work/Work.sim/sim_1/behav/xsim/
@@ -86,11 +86,11 @@ architecture behavior of tb_tf_top is
   signal IR_start  : std_logic := '0';
   signal IR_idle   : std_logic := '0';
   signal IR_ready  : std_logic := '0';
-  signal IR_bx_in  : std_logic_vector(2 downto 0) := (others => '1'); -- how many bx?
+  signal IR_bx_in  : std_logic_vector(2 downto 0) := (others => '1');
   signal IR_bx_out : std_logic_vector(2 downto 0) := (others => '1');
   signal IR_bx_out_vld : std_logic := '0';
   signal IR_done   : std_logic := '0';
-  signal VMR_bx_out : std_logic_vector(2 downto 0) := (others => '1'); -- how many bx?
+  signal VMR_bx_out : std_logic_vector(2 downto 0) := (others => '1');
   signal VMR_bx_out_vld : std_logic := '0';
   signal VMR_done   : std_logic := '0';
 
