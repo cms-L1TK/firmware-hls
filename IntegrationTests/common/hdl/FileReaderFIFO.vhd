@@ -58,7 +58,6 @@ procFile : process(CLK)
   variable emDATA      : std_logic_vector(EMDATA_WIDTH-1 downto 0) := (others => '0');
   variable LOOPING     : boolean := true; --! Need another loop to make output.
   variable CREATE_DUMMY_DATA  : boolean := false; --! Inventing null data. 
-  variable v_line : line; -- Line for debug
   variable line_is_read : boolean := true; -- LINE_IN has been read by external module
 begin
 
