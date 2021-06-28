@@ -280,6 +280,12 @@ def comparePredefined(args):
                     ret_sum += compare(comparison_filename=("./dataOut/VMSTEO_L2PHIA%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                                        reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIA%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
 
+    elif (args.predefined == ""):
+        raise IndexError("No predefined comparison specified.")
+    
+    else:
+        raise IndexError("Unknown predefined comparison specified.")
+
     print("Accumulated number of errors =",ret_sum)
 
     sys.exit(ret_sum)
