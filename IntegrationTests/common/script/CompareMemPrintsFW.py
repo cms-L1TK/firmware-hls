@@ -282,7 +282,7 @@ def comparePredefined(args):
 
     elif (args.predefined == ""):
         raise IndexError("No predefined comparison specified.")
-    
+
     else:
         raise IndexError("Unknown predefined comparison specified.")
 
@@ -311,7 +311,7 @@ python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.d
     parser.add_argument("-c","--comparison_filename",default="output.txt",help="The filename of the testbench output file (default = %(default)s)")
     parser.add_argument("-f","--fail_on_error",default=False,action="store_true",help="Raise an exception on the first error as opposed to simply printing a message (default = %(default)s)")
     parser.add_argument("-l","--file_location",default="./",help="Location of the input files (default = %(default)s)")
-    parser.add_argument("-p","--predefined",default="",help="Run predefined comparisons (default = %(default)s)")
+    parser.add_argument("-p","--predefined",default="",help="Run predefined comparisons. Options: PRMEMC, IRVMR, VMR (default = %(default)s)")
     parser.add_argument("-r","--reference_filenames",default=[],nargs="+",help="A list of filenames for the reference files (default = %(default)s)")
     parser.add_argument("-s","--save",default=False,action="store_true",help="Save the output to a file (default = %(default)s)")
     parser.add_argument("-v","--verbose",default=False,action="store_true",help="Print extra information to the console (default = %(default)s)")
