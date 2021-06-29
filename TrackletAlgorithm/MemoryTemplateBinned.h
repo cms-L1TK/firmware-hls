@@ -63,7 +63,7 @@ public:
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, int nentry_ibx)
   {
 #pragma HLS inline
-	if (nentry_ibx < (1<<(kNBitDataAddr))) {
+	if (nentry_ibx < ((1<<kNBitDataAddr)-1)) { // Temporary "-1" to only allow 15 (7 for VMSME DISK) stubs per bin instead of 16 (8) to match emulation
 	  // write address for slot: 1<<(kNBitDataAddr) * slot + nentry_ibx
 	  dataarray_[ibx][(1<<(kNBitDataAddr))*slot+nentry_ibx] = data;
 	  #ifdef CMSSW_GIT_HASH
@@ -73,7 +73,7 @@ public:
 	}
 	else {
 #ifndef __SYNTHESIS__
-	  std::cout << "Warning out of range" << std::endl;
+	  std::cout << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << std::endl;
 #endif
 	  return false;
 	}
@@ -96,7 +96,7 @@ public:
     for (size_t ibx=0; ibx<kNBxBins; ++ibx) {
       for (size_t ibin=0; ibin<kNSlots; ++ibin) {
         nentries_[ibx][ibin] = 0;
-        for (size_t addr=0; addr<(1<<(kNBitDataAddr)); ++addr) {
+        for (size_t addr=0; addr<((1<<kNBitDataAddr)-1); ++addr) { // Temporary "-1" to only allow 15 (7 for VMSME DISK) stubs per bin instead of 16 (8) to match emulation
           write_mem(ibx,ibin,data,addr);
         }
       }
