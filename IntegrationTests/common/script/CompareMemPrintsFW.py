@@ -46,14 +46,19 @@ class Logger(object):
         pass
 
 class ReferenceType(Enum):
+    IL     = 'InputStubs'
+    VMSTE  = 'VMStubs'
+    VMSME  = 'VMStubs'
+    AS     = 'AllStubs'
+    SP     = 'StubPairs'
+    TPAR   = 'TrackletParameters'
+    TPROJ  = 'TrackletProjections'
+    VMPROJ = 'VMProjections'
     AP     = 'AllProjections'
     CM     = 'CandidateMatches'
     FM     = 'FullMatches'
-    VMPROJ = 'VMProjections'
-    VMSME  = 'VMStubs'
-    VMSTE  = 'VMStubs'
-    AS     = 'AllStubs'
-    IL     = 'InputStubs'
+    TF     = 'TrackFit'
+    CT     = 'CleanTrack'
 
 
     def __str__(self):
