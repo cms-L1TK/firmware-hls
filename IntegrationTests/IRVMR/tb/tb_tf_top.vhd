@@ -55,7 +55,7 @@ architecture behavior of tb_tf_top is
 
   constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
   constant DEBUG             : boolean := false;      --! Debug off/on
-  constant DL_DELAY       : integer := 0;          --! Number of BX delays (can be written early 8 pages)
+  constant DL_DELAY          : integer := 0;          --! Number of BX delays
 
   -- Paths of data files specified relative to Vivado project's xsim directory.
   -- e.g. IntegrationTests/IRVMR/script/Work/Work.sim/sim_1/behav/xsim/
@@ -309,7 +309,7 @@ begin
     port map (
       CLK => CLK,
       DONE => VMR_DONE,
-      NENT_ARR => AS_36_mem_AAV_dout_nent(var), -- always 0, will that cause issues in FileWriterFromRAM?
+      NENT_ARR => AS_36_mem_AAV_dout_nent(var),
       ADDR => AS_36_mem_AV_readaddr(var),
       DATA => AS_36_mem_AV_dout(var),
       READ_EN => AS_36_mem_A_enb(var)

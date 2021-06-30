@@ -55,7 +55,7 @@ architecture behavior of tb_tf_top is
 
   constant CLK_PERIOD        : time    := 4 ns;       --! 250 MHz
   constant DEBUG             : boolean := false;      --! Debug off/on
-  constant TPROJ_DELAY       : integer := 0;          --! Number of BX delays (can be written early 8 pages)
+  constant TPROJ_DELAY       : integer := 0;          --! Number of BX delays
   constant VMSME_DELAY       : integer := 1;          --! Number of BX delays (can be written early 8 pages)
   constant AS_DELAY          : integer := 2;          --! Number of BX delays (can be written early 8 pages)
 
