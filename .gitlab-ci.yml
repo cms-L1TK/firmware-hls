@@ -68,8 +68,8 @@ stages: # ---------------------------------------------------------------------
   stage: check-results
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
-    # Compare HDL sim output with full machtes Mem/Prints
-    - python3 ../../common/script/CompareMemPrintsFW.py -p ${PROJ_NAME} -s
+    # Compare HDL sim output with Mem/Prints
+    - python3 ../../common/script/CompareMemPrintsFW.py -p -s
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"

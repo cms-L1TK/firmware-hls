@@ -16,6 +16,7 @@ import os
 import pandas as pd
 import re
 import sys
+import glob
 from enum import Enum
 
 # Python 2-3 compatibility
@@ -221,7 +222,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
     if save:
         sys.stdout = original_stdout
 
-    if predefined != "":
+    if predefined:
         return failed
     else:
         sys.exit(failed)
@@ -229,97 +230,26 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 def comparePredefined(args):
     ret_sum = 0
 
-    if (args.predefined == "PRMEMC"):
-        if os.path.exists('./dataOut/AP_L3PHIC.txt'):
-            ret_sum += compare(comparison_filename="./dataOut/AP_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=["../../../emData/MemPrints/TrackletProjections/AllProj_AP_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
-        
-        for i in range(17,25):
-            if os.path.exists(('./dataOut/VMPROJ_L3PHIC%i.txt' % (i))):
-                ret_sum += compare(comparison_filename=("./dataOut/VMPROJ_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                   reference_filenames=[("../../../emData/MemPrints/VMProjections/VMProjections_VMPROJ_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
-        
-        for i in range(17,25):
-            if os.path.exists(('./dataOut/CM_L3PHIC%i.txt' % (i))):
-                ret_sum += compare(comparison_filename=("./dataOut/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                   reference_filenames=[("../../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
-        
-        ret_sum += compare(comparison_filename="./dataOut/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                           reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
-        ret_sum += compare(comparison_filename="./dataOut/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                           reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+    comparison_dir = "./dataOut/"
+    reference_dir = "../../../emData/MemPrints/"
 
-    elif (args.predefined == "IRVMR"):
-        # IL
-        for i in ['L', 'D']:
-            for j in ['A', 'B', 'C', 'D']:
-                if os.path.exists(('./dataOut/IL_%c2PHI%c_PS10G_3_A.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/IL_%c2PHI%c_PS10G_3_A.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/InputStubs/InputStubs_IL_%c2PHI%c_PS10G_3_A_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
-        # AllStubs - temporarily removed due to issues with not having nentries port
-        # for i in range(1,8):
-        #     if os.path.exists(('./dataOut/AS_L2PHIAn%i.txt' % (i))):
-        #         ret_sum += compare(comparison_filename=("./dataOut/AS_L2PHIAn%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-        #                            reference_filenames=[("../../../emData/MemPrints/Stubs/AllStubs_AS_L2PHIAn%i_04.dat" % (i))], save=args.save, verbose=args.verbose)    
-        # ME
-        for i in range(1,9):
-            if os.path.exists(('./dataOut/VMSME_L2PHIA%in1.txt' % (i))):
-                ret_sum += compare(comparison_filename=("./dataOut/VMSME_L2PHIA%in1.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                   reference_filenames=[("../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L2PHIA%in1_04.dat" % (i))], save=args.save, verbose=args.verbose)
-        # TE Inner 
-        for i in range(1,5):
-            for j in range(1,4):
-                if os.path.exists(('./dataOut/VMSTEI_L2PHII%in%i.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHII%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHII%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
-        # TE Inner Overlap
-        for i in range(1,3):
-            for j in range(5,9):
-                if os.path.exists(('./dataOut/VMSTEI_L2PHIX%in%i.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHIX%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIX%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
-        # TE Outer
-        for i in range(1,9):
-            for j in range(1,6):
-                if os.path.exists(('./dataOut/VMSTEO_L2PHIA%in%i.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEO_L2PHIA%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIA%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+    # Make sure the default directories exists
+    if (not os.path.isdir(comparison_dir) or not os.path.isdir(reference_dir)):
+        raise FileNotFoundError("Please make sure that the directories " + comparison_dir + " and " + reference_dir + " exist from where this script is run with the predefined (-p) flag")
 
-    elif (args.predefined == "VMR"):
-        # AllStubs - temporarily removed due to issues with not having nentries port
-        # for i in range(1,8):
-        #     if os.path.exists(('./dataOut/AS_L2PHIAn%i.txt' % (i))):
-        #         ret_sum += compare(comparison_filename=("./dataOut/AS_L2PHIAn%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-        #                            reference_filenames=[("../../../emData/MemPrints/Stubs/AllStubs_AS_L2PHIAn%i_04.dat" % (i))], save=args.save, verbose=args.verbose)    
-        # ME
-        for i in range(1,9):
-            if os.path.exists(('./dataOut/VMSME_L2PHIA%in1.txt' % (i))):
-                ret_sum += compare(comparison_filename=("./dataOut/VMSME_L2PHIA%in1.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                   reference_filenames=[("../../../emData/MemPrints/VMStubsME/VMStubs_VMSME_L2PHIA%in1_04.dat" % (i))], save=args.save, verbose=args.verbose)
-        # TE Inner 
-        for i in range(1,5):
-            for j in range(1,4):
-                if os.path.exists(('./dataOut/VMSTEI_L2PHII%in%i.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHII%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHII%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
-        # TE Inner Overlap
-        for i in range(1,3):
-            for j in range(5,9):
-                if os.path.exists(('./dataOut/VMSTEI_L2PHIX%in%i.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEI_L2PHIX%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIX%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
-        # TE Outer
-        for i in range(1,9):
-            for j in range(1,6):
-                if os.path.exists(('./dataOut/VMSTEO_L2PHIA%in%i.txt' % (i,j))):
-                    ret_sum += compare(comparison_filename=("./dataOut/VMSTEO_L2PHIA%in%i.txt" % (i,j)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                                       reference_filenames=[("../../../emData/MemPrints/VMStubsTE/VMStubs_VMSTE_L2PHIA%in%i_04.dat" % (i,j))], save=args.save, verbose=args.verbose)
+    # Find the lists of filenames
+    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f] # Remove debug and comparison files from file list
+    comparison_filename_list.sort()
+    reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
+    try:
+        reference_filename_list = [glob.glob(reference_dir+"*/*"+f+"*.dat")[0] for f in reference_filename_list] # Find the corresponding reference filenames
+    except IndexError :
+        raise IndexError("Could not find matching reference file for comparison file.")
 
-    elif (args.predefined == ""):
-        raise IndexError("No predefined comparison specified.")
-
-    else:
-        raise IndexError("Unknown predefined comparison specified.")
+    # Loop over all the filenames and compare the data
+    for comp, ref in zip(comparison_filename_list, reference_filename_list):
+        ret_sum += compare(comparison_filename=comp, fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                           reference_filenames=[ref], save=args.save, verbose=args.verbose)
 
     print("Accumulated number of errors =",ret_sum)
 
@@ -346,7 +276,7 @@ python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.d
     parser.add_argument("-c","--comparison_filename",default="output.txt",help="The filename of the testbench output file (default = %(default)s)")
     parser.add_argument("-f","--fail_on_error",default=False,action="store_true",help="Raise an exception on the first error as opposed to simply printing a message (default = %(default)s)")
     parser.add_argument("-l","--file_location",default="./",help="Location of the input files (default = %(default)s)")
-    parser.add_argument("-p","--predefined",default="",help="Run predefined comparisons. Options: PRMEMC, IRVMR, VMR (default = %(default)s)")
+    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons using the output files in ./dataOut. Make sure that the reference files are located in ../../../emData/MemPrints/ (default = %(default)s)")
     parser.add_argument("-r","--reference_filenames",default=[],nargs="+",help="A list of filenames for the reference files (default = %(default)s)")
     parser.add_argument("-s","--save",default=False,action="store_true",help="Save the output to a file (default = %(default)s)")
     parser.add_argument("-v","--verbose",default=False,action="store_true",help="Print extra information to the console (default = %(default)s)")
