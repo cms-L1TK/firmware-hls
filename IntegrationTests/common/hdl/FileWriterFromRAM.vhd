@@ -98,11 +98,7 @@ begin
       PAGE := BX_CNT mod NUM_PAGES;
       DATA_CNT :=0;
 
-      if (RAM_WIDTH = 36 and NUM_PAGES = 8) then -- FIX ME: bodge since AS doesn't have an nentries port. Also some other memory doesn't have it as well
-        NENT := MAX_ENTRIES;
-      else
-        NENT := to_integer(unsigned(NENT_ARR(PAGE)));
-      end if;
+      NENT := to_integer(unsigned(NENT_ARR(PAGE)));
 
       if (BX_CNT = MAX_EVENTS) then
         -- All events processed, so close file.
@@ -132,7 +128,7 @@ begin
 
     -- Write to .txt file results of read from memory (if read took place).
     -- (Delayed due to read latency of memory).
-    if (READ_EN_LATCH(0) = '1' and DATA /= (DATA'range => '0')) then -- don't add if DATA are only zeros; due to AS bodge
+    if (READ_EN_LATCH(0) = '1') then
       -- Valid data, so write it to file.
       write(LINE_OUT, NOW   , right, TXT_WIDTH); 
       write(LINE_OUT, BX_CNT_LATCH(0), right, TXT_WIDTH);
