@@ -26,6 +26,7 @@ entity SectorProcessorFull is
     AS_36_mem_A_enb          : in t_arr_AS_36_1b;
     AS_36_mem_AV_readaddr    : in t_arr_AS_36_ADDR;
     AS_36_mem_AV_dout        : out t_arr_AS_36_DATA;
+    AS_36_mem_AAV_dout_nent  : out t_arr_AS_36_NENT;
     VMSME_16_mem_A_enb          : in t_arr_VMSME_16_1b;
     VMSME_16_mem_AV_readaddr    : in t_arr_VMSME_16_ADDR;
     VMSME_16_mem_AV_dout        : out t_arr_VMSME_16_DATA;
@@ -115,7 +116,7 @@ begin
         addrb     => AS_36_mem_AV_readaddr(var),
         doutb     => AS_36_mem_AV_dout(var),
         sync_nent => VMR_done,
-        nent_o    => open
+        nent_o    => AS_36_mem_AAV_dout_nent(var)
       );
 
   end generate AS_36_loop;

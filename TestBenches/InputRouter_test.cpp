@@ -406,7 +406,7 @@ int main(int argc, char * argv[])
   int cLinkId = 8; 
   int cDTCsplit=0;
   int cNonant=4;
-  int cLastBx = 100;
+  int cLastBx = 2;
   // if cmd line args are passed 
   // parse them and change defaults 
   if( argc > 1 )

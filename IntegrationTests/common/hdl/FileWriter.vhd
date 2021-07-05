@@ -86,7 +86,7 @@ begin
 
     if (START_LATCH = '1') then
 
-      if (WRITE_EN = '1') then 
+      if (WRITE_EN = '1' and BX_CNT < MAX_EVENTS) then 
         -- Valid data, so write it to file.
         write(LINE_OUT, NOW   , right, TXT_WIDTH); 
         write(LINE_OUT, BX_CNT, right, TXT_WIDTH);

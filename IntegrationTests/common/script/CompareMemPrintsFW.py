@@ -16,6 +16,7 @@ import os
 import pandas as pd
 import re
 import sys
+import glob
 from enum import Enum
 
 # Python 2-3 compatibility
@@ -46,10 +47,19 @@ class Logger(object):
         pass
 
 class ReferenceType(Enum):
+    IL     = 'InputStubs'
+    VMSTE  = 'VMStubs'
+    VMSME  = 'VMStubs'
+    AS     = 'AllStubs'
+    SP     = 'StubPairs'
+    TPAR   = 'TrackletParameters'
+    TPROJ  = 'TrackletProjections'
+    VMPROJ = 'VMProjections'
     AP     = 'AllProjections'
     CM     = 'CandidateMatches'
     FM     = 'FullMatches'
-    VMPROJ = 'VMProjections'
+    TF     = 'TrackFit'
+    CT     = 'CleanTrack'
 
 
     def __str__(self):
@@ -58,8 +68,10 @@ class ReferenceType(Enum):
     def FullName(self):
         return '{0}'.format(self.value)
 
-def parse_reference_file(filename):
+def parse_reference_file(filename, is_binned):
     # Parse .txt file from C++ emulation in emData/
+    # Returns only data if unbinned.
+    # Returns bin & data if binned.
     events = []
     with open(filename,'r') as f:
         values = []
@@ -70,7 +82,12 @@ def parse_reference_file(filename):
                 events.append(values)
                 values = []
             else:
-                values.append(line.split()[2].upper().replace('X','x'))
+                data = line.split()[-1].upper().replace('X','x')
+                if is_binned:
+                    bin = line.split()[0]
+                    values.append([bin, data])
+                else:
+                    values.append(data)
         events.append(values)
     return events
 
@@ -82,7 +99,7 @@ def print_results(total_number_of_events, number_of_good_events, number_of_missi
     print("\tLength mismatches: "+str(number_of_event_length_mismatches))
     print("\tValue mismatches: "+str(number_of_value_mismatches)+"\n\n")
 
-def compare(comparison_filename="", fail_on_error=False, file_location='./', predefined=False, reference_filenames=[], save=False, verbose=False):
+def compare(comparison_filename="", fail_on_error=False, file_location='./', predefined="", reference_filenames=[], save=False, verbose=False):
     # Sanity checks
     if len(reference_filenames) == 0:
         raise Exception("No reference files were specified (-r). At least one reference file is needed to run the comparison.")
@@ -115,19 +132,26 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
         print("Comparing TB results to ref. file "+str(reference_filename)+" ... ")
 
-        # Parse the reference data
-        reference_data = parse_reference_file(file_location+"/"+reference_filename)
-
         # Read column names from file
         column_names = list(pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,nrows=1))
         if verbose: print(column_names)
 
+        # Check if binned memory
+        if ('BIN' in column_names):
+            is_binned = True
+            column_selections = ['BX','ADDR','BIN','DATA']
+        else:
+            is_binned = False
+            column_selections = ['BX','ADDR','DATA']
+
         # Open the comparison (= VHDL test-bench output) data
-        column_selections = ['BX','ADDR','DATA']
         data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
         selected_columns = data[column_selections]
+
+        # Parse the reference data
+        reference_data = parse_reference_file(file_location+"/"+reference_filename, is_binned)
 
         for ievent,event in enumerate(reference_data):
             print("Doing event "+str(ievent+1)+"/"+str(len(reference_data))+" ... ")
@@ -160,19 +184,35 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 number_of_good_events += good
                 continue
 
-            offset = selected_rows[selected_rows.columns[2]].index[0]
+            offset = selected_rows['DATA'].index[0]
+
             for ival,val in enumerate(event):
                 # In case there are fewer entries in the comparison data than in the reference data
-                if offset+ival not in selected_rows[selected_rows.columns[2]]: continue
+                if offset+ival not in selected_rows['DATA']: continue
+
+                if is_binned:
+                    bin, data = val
+                else:
+                    data = val
 
                 # Raise exception if the values for a given entry don't match
-                if selected_rows[selected_rows.columns[2]][offset+ival] != val:
+                if selected_rows['DATA'][offset+ival] != data:
                     good = False
                     number_of_value_mismatches += 1
-                    message = "The values for event "+str(ievent)+" address "+str(selected_rows[selected_rows.columns[1]][offset+ival])+" do not match!"\
-                              "\n\treference="+str(val)+" comparison="+str(selected_rows[selected_rows.columns[2]][offset+ival])
+                    message = "The values for event "+str(ievent)+" address "+str(selected_rows['ADDR'][offset+ival])+" do not match!"\
+                              "\n\treference="+str(data)+" comparison="+str(selected_rows['DATA'][offset+ival])
                     if fail_on_error: raise Exception(message)
                     else:             print("\t\t"+message.replace("\n","\n\t\t"))
+
+                # Raise exception if the bin number of a given entry don't match
+                elif is_binned:
+                    if selected_rows['BIN'][offset+ival] != int(bin):
+                        good = False
+                        number_of_value_mismatches += 1
+                        message = "The bin for event "+str(ievent)+" stub "+str(selected_rows['DATA'][offset+ival])+" do not match!"\
+                                  "\n\treference="+bin+" comparison="+str(selected_rows['BIN'][offset+ival])
+                        if fail_on_error: raise Exception(message)
+                        else:             print("\t\t"+message.replace("\n","\n\t\t"))
 
             number_of_good_events += good
 
@@ -189,24 +229,27 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
 def comparePredefined(args):
     ret_sum = 0
-    if os.path.exists('./dataOut/AP_L3PHIC.txt'):
-        ret_sum += compare(comparison_filename="./dataOut/AP_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                           reference_filenames=["../../../emData/MemPrints/TrackletProjections/AllProj_AP_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
 
-    for i in range(17,25):
-        if os.path.exists(('./dataOut/VMPROJ_L3PHIC%i.txt' % (i))):
-            ret_sum += compare(comparison_filename=("./dataOut/VMPROJ_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=[("../../../emData/MemPrints/VMProjections/VMProjections_VMPROJ_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+    comparison_dir = "./dataOut/"
+    reference_dir = "../../../emData/MemPrints/"
 
-    for i in range(17,25):
-        if os.path.exists(('./dataOut/CM_L3PHIC%i.txt' % (i))):
-            ret_sum += compare(comparison_filename=("./dataOut/CM_L3PHIC%i.txt" % (i)), fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                               reference_filenames=[("../../../emData/MemPrints/Matches/CandidateMatches_CM_L3PHIC%i_04.dat" % (i))], save=args.save, verbose=args.verbose)
+    # Make sure the default directories exists
+    if (not os.path.isdir(comparison_dir) or not os.path.isdir(reference_dir)):
+        raise FileNotFoundError("Please make sure that the directories " + comparison_dir + " and " + reference_dir + " exist from where this script is run with the predefined (-p) flag")
 
-    ret_sum += compare(comparison_filename="./dataOut/FM_L1L2_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                       reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L1L2_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
-    ret_sum += compare(comparison_filename="./dataOut/FM_L5L6_L3PHIC.txt", fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
-                       reference_filenames=["../../../emData/MemPrints/Matches/FullMatches_FM_L5L6_L3PHIC_04.dat"], save=args.save, verbose=args.verbose)
+    # Find the lists of filenames
+    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f] # Remove debug and comparison files from file list
+    comparison_filename_list.sort()
+    reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
+    try:
+        reference_filename_list = [glob.glob(reference_dir+"*/*"+f+"*.dat")[0] for f in reference_filename_list] # Find the corresponding reference filenames
+    except IndexError :
+        raise IndexError("Could not find matching reference file for comparison file.")
+
+    # Loop over all the filenames and compare the data
+    for comp, ref in zip(comparison_filename_list, reference_filename_list):
+        ret_sum += compare(comparison_filename=comp, fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
+                           reference_filenames=[ref], save=args.save, verbose=args.verbose)
 
     print("Accumulated number of errors =",ret_sum)
 
@@ -233,7 +276,7 @@ python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.d
     parser.add_argument("-c","--comparison_filename",default="output.txt",help="The filename of the testbench output file (default = %(default)s)")
     parser.add_argument("-f","--fail_on_error",default=False,action="store_true",help="Raise an exception on the first error as opposed to simply printing a message (default = %(default)s)")
     parser.add_argument("-l","--file_location",default="./",help="Location of the input files (default = %(default)s)")
-    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons (default = %(default)s)")
+    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons using the output files in ./dataOut. Make sure that the reference files are located in ../../../emData/MemPrints/ (default = %(default)s)")
     parser.add_argument("-r","--reference_filenames",default=[],nargs="+",help="A list of filenames for the reference files (default = %(default)s)")
     parser.add_argument("-s","--save",default=False,action="store_true",help="Save the output to a file (default = %(default)s)")
     parser.add_argument("-v","--verbose",default=False,action="store_true",help="Print extra information to the console (default = %(default)s)")
