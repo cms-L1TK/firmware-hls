@@ -161,7 +161,7 @@ begin
       DELAY      => VMSTE_DELAY*MAX_ENTRIES,
       RAM_WIDTH  => 16,
       NUM_PAGES  => 2,
-      NUM_BINS   => 2,
+      NUM_BINS   => 8,
       DEBUG      => true,
       FILE_NAME_DEBUG => FILE_OUT_VMSTE_debug&memory_enum_to_string(var)&debugFileNameEnding
     )
