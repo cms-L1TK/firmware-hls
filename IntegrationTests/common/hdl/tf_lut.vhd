@@ -35,7 +35,7 @@ architecture behavioral of tf_lut is
     variable line_in : line;
     -- Determines number of 4*chars needed to be read from lut_file
     -- to correspond to specified LUT width.
-    constant lut_width_4 : integer := 4*integer(ceil(real(lut_width)/4));
+    constant lut_width_4 : integer := 4*integer(ceil(real(lut_width)/4.0));
     variable line_data : std_logic_vector(lut_width_4-1 downto 0) := (others => '0'); 
     variable rom_data : romType;
   begin
