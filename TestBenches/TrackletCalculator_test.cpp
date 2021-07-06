@@ -97,15 +97,20 @@ int main()
   TrackletProjectionMemory<BARREL2S> tproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
   TrackletProjectionMemory<DISK> tproj_disk[TC::N_PROJOUT_DISK];
 
+  // open input files from emulation
+  auto &fin_innerStubs = tb.files(innerStubPattern);
+  auto &fin_outerStubs = tb.files(outerStubPattern);
+  auto &fin_stubPairs = tb.files("StubPairs*");
+  auto &fout_tpar = tb.files("TrackletParameters*");
+  auto &fout_tproj = tb.files("TrackletProjections*");
+  const auto &tproj_names = tb.fileNames("TrackletProjections*");
+
   // loop over events
   cout << "Start event loop ..." << endl;
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    auto &fin_innerStubs = tb.files(innerStubPattern);
-    auto &fin_outerStubs = tb.files(outerStubPattern);
-    auto &fin_stubPairs = tb.files("StubPairs*");
     for (unsigned i = 0; i < nInnerStubMems; i++)
       writeMemFromFile<AllStubMemory<InnerStubType> >(innerStubs[i], fin_innerStubs.at(i), ievt);
     for (unsigned i = 0; i < nOuterStubMems; i++)
@@ -164,9 +169,6 @@ int main()
 #endif
 
     bool truncation = false;
-    auto &fout_tpar = tb.files("TrackletParameters*");
-    auto &fout_tproj = tb.files("TrackletProjections*");
-    const auto &tproj_names = tb.fileNames("TrackletProjections*");
 
     // compare the computed outputs with the expected ones
     err += compareMemWithFile<TrackletParameterMemory>(tpar, fout_tpar.at(0), ievt,
