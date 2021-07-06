@@ -46,8 +46,18 @@ package tf_pkg is
   constant RAM_WIDTH_TPROJ : natural := 60; --! Width for memories
   constant RAM_WIDTH_AP    : natural := 60; --! Width for memories
 
+  -- Boolean indicating if this is Vivado simulation.
+  constant IS_SIMULATION : boolean := FALSE
+-- pragma synthesis_off
+    or TRUE    -- this line is only executed if Vivado simulation.
+-- pragma synthesis_on
+  ;
+  
   -- ########################### Functions ################################################################
   function clogb2     (bit_depth : integer) return integer;
+
+  function getDirEMDATA return string;
+
 
   -- ########################### Types ###########################
 
@@ -159,6 +169,22 @@ package body tf_pkg is
   begin
     return integer( ceil( log2( real( bit_depth ) ) ) );
   end;
+
+
+  --! @brief Returns directory path to emData/
+  function getDirEMDATA return string is
+  begin
+    if IS_SIMULATION then
+      -- Sim path specified relative to Vivado project's xsim directory. 
+      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
+      return "../../../../../../../../emData/";
+    else
+      -- Synth path specified relative to dir where you run Vivado.
+      -- e.g. IntegrationTests/PRMEMC/script/
+      return "../../../emData/";
+    end if;
+  end;
+
 
   -- ########################### Procedures ################################################################
   --! @brief Convert character to integer
