@@ -19,7 +19,7 @@
 
 #include "../TrackletAlgorithm/Constants.h"
 
-bool openDataFile(std::ifstream& file_in, const std::string& file_name, bool print_error = true)
+inline bool openDataFile(std::ifstream& file_in, const std::string& file_name, bool print_error = true)
 {
   file_in.open(file_name);
 
@@ -34,7 +34,7 @@ bool openDataFile(std::ifstream& file_in, const std::string& file_name, bool pri
   return success;
 }
 
-std::vector<std::string> split(const std::string& s, char delimiter)
+inline std::vector<std::string> split(const std::string& s, char delimiter)
 {
   std::vector<std::string> tokens;
   std::string token;
@@ -141,7 +141,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
-  for (int i = 0; i < memory_ref.getDepth(); ++i) {
+  for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
     auto data_ref = memory_ref.read_mem(ievt,i).raw().range(msb,lsb);
     auto data_com = memory.read_mem(ievt,i).raw().range(msb,lsb);
     if (i==0) {
@@ -198,9 +198,9 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   // compare expected data with those computed and stored in the output memory
   std::cout << label << ":" << std::endl;
   std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
-  for ( int j = 0; j < memory_ref.getNBins(); ++j ) {
+  for (unsigned int j = 0; j < memory_ref.getNBins(); ++j ) {
     std::cout << "Bin " << std::dec << j << std::endl;
-    for (int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
+    for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
       auto data_ref = memory_ref.read_mem(ievt,j,i).raw();
       auto data_com = memory.read_mem(ievt,j,i).raw();
 
@@ -253,12 +253,12 @@ unsigned int compareBinnedMemCMWithFile(const MemType& memory,
 
   ////////////////////////////////////////
   // compare expected data with those computed and stored in the output memory
-  for ( int k = 0; k < memory_ref.getNCopy(); k++ ) {
+  for (unsigned int k = 0; k < memory_ref.getNCopy(); k++ ) {
     std::cout << label << "n" << std::to_string(k+1) << ":" << std::endl;
     std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
-    for ( int j = 0; j < memory_ref.getNBins(); ++j ) {
+    for (unsigned int j = 0; j < memory_ref.getNBins(); ++j ) {
       std::cout << "Bin " << std::dec << j << std::endl;
-      for (int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
+      for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
         auto data_ref = memory_ref.read_mem(k,ievt,j,i).raw();
         auto data_com = memory.read_mem(k,ievt,j,i).raw();
 

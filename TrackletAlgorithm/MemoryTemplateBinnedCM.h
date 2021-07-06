@@ -92,7 +92,7 @@ class MemoryTemplateBinnedCM{
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
   
-  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, int nentry_ibx) {
+  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 
 #pragma HLS inline
@@ -239,17 +239,6 @@ class MemoryTemplateBinnedCM{
   }
 
 #endif
-
-#ifdef CMSSW_GIT_HASH
-  std::string name_;
-  void setName(std::string name) { name_ = name;}
-  std::string const& getName() const { return name_;}
-
-  unsigned int iSector_;
-  void setSector(unsigned int iS) { iSector_ = iS;}
-  unsigned int getSector() const { return iSector_;}
-#endif 
-
   
 };
 

@@ -137,10 +137,9 @@ public:
 
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = 
-      MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>::decodeToBits(getIndex(),VMStubMECMBase<VMSMEType>::kVMSMEIDSize);
-    str += "|"+MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>decodeToBits(getBend(),VMStubMECMBase<VMSMEType>::kVMSMEBendSize);
-    str += "|"+MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>decodeToBits(getFineZ(),VMStubMECMBase<VMSMEType>::kVMSMEFineZSize);
+    std::string str = decodeToBits(getIndex(),VMStubMECMBase<VMSMEType>::kVMSMEIDSize);
+    str += "|"+decodeToBits(getBend(),VMStubMECMBase<VMSMEType>::kVMSMEBendSize);
+    str += "|"+decodeToBits(getFineZ(),VMStubMECMBase<VMSMEType>::kVMSMEFineZSize);
     return str;
   }
 #endif

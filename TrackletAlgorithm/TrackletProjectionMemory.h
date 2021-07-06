@@ -178,13 +178,13 @@ public:
   }
 
   // The phi derivative is d(phi)/d(r) at the given layer/disk
-  TProjPHIDER getPhiDer() {
+  TProjPHIDER getPhiDer() const {
     return data_.range(kTProjPhiDMSB,kTProjPhiDLSB);
   }
 
   // The r/z derivative is d(z)/d(r) at the given layer and d(r)/d(z) at the
   // given disk
-  TProjRZDER getRZDer() {
+  TProjRZDER getRZDer() const {
     return data_.range(kTProjRZDMSB,kTProjRZDLSB);
   }
 
@@ -215,12 +215,12 @@ public:
 
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>::decodeToBits(getTCID(),TrackletProjectionBase<TProjType>::kTProjTCIDSize);
-    str += "|"+MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>::decodeToBits(getTrackletIndex(),TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize);
-    str += "|"+MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>::decodeToBits(getPhi(),TrackletProjectionBase<TProjType>::kTProjPhiSize);
-    str += "|"+MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>::decodeToBits(getRZ(),TrackletProjectionBase<TProjType>::kTProjRZSize);
-    str += "|"+MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>::decodeToBits(getPhiDer(),TrackletProjectionBase<TProjType>::kTProjPhiDSize);
-    str += "|"+MemoryTemplate<TrackletProjection<TProjType>, 1, kNBits_MemAddr>::decodeToBits(getRZDer(),TrackletProjectionBase<TProjType>::kTProjRZDSize);
+    std::string str = decodeToBits(getTCID(),TrackletProjectionBase<TProjType>::kTProjTCIDSize);
+    str += "|"+decodeToBits(getTrackletIndex(),TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize);
+    str += "|"+decodeToBits(getPhi(),TrackletProjectionBase<TProjType>::kTProjPhiSize);
+    str += "|"+decodeToBits(getRZ(),TrackletProjectionBase<TProjType>::kTProjRZSize);
+    str += "|"+decodeToBits(getPhiDer(),TrackletProjectionBase<TProjType>::kTProjPhiDSize);
+    str += "|"+decodeToBits(getRZDer(),TrackletProjectionBase<TProjType>::kTProjRZDSize);
     return str;
   }
 #endif
