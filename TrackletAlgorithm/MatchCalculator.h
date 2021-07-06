@@ -227,6 +227,22 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 // MatchCalculator
 namespace MC {
   enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
+
+  template<TF::layerDisk layer> constexpr regionType ASRegion();
+  template<TF::layerDisk layer> constexpr regionType APRegion();
+  template<TF::layerDisk layer> constexpr regionType FMRegion();
+
+  template<> constexpr regionType ASRegion<TF::L3>() {
+    return BARRELPS;
+  }
+
+  template<> constexpr regionType APRegion<TF::L3>() {
+    return BARRELPS;
+  }
+
+  template<> constexpr regionType FMRegion<TF::L3>() {
+    return BARREL;
+  }
 }
 template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, MC::imc PHI> constexpr uint16_t FMMask();
