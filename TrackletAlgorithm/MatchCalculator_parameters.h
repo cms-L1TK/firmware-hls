@@ -36,6 +36,7 @@ template<> constexpr uint32_t FMMask<TF::L6, MC::B>() {
   return 0x5;
 }
 
+// return mask bit AND mask
 template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {
   return FMMask<Layer, PHI>() & (1<<Seed);
 }

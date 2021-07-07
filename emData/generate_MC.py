@@ -165,6 +165,7 @@ for tcName in sorted(CMMems.keys()):
 # Print out endifs and close files.
 parametersFile.write(
     "\n"
+    "// return mask bit AND mask\n"
     "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {\n"
     "  return FMMask<Layer, PHI>() & (1<<Seed);\n"
     "}\n"
