@@ -9,6 +9,20 @@ import os,sys, re
 TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
 TF_index = {k:v for v,k in enumerate(TF_index)}
 
+def ASRegion(region):
+  if region in ['L1', 'L2', 'L3']: return 'BARRELPS'
+  elif region in ['L4', 'L5', 'L6']: return 'BARREL2S'
+  else: return 'DISK'
+
+def APRegion(region):
+  if region in ['L1', 'L2', 'L3']: return 'BARRELPS'
+  elif region in ['L4', 'L5', 'L6']: return 'BARREL2S'
+  else: return 'DISK'
+
+def FMRegion(region):
+  if region in ['L1', 'L2', 'L3', 'L4', 'L5', 'L6']: return 'BARREL'
+  else: return 'DISK'
+
 if len(sys.argv) < 2:
     print("Usage: " + sys.argv[0] + " WIRES_FILE")
     sys.exit(1)
@@ -103,10 +117,10 @@ for tcName in sorted(CMMems.keys()):
         "void MatchCalculator_" + seed + "PHI" + iMC + "(\n"
         "    const BXType bx,\n"
         "    const CandidateMatchMemory match[maxMatchCopies],\n"
-        "    const AllStubMemory<BARRELPS>* allstub,\n"
-        "    const AllProjectionMemory<BARRELPS>* allproj,\n"
+        "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
+        "    const AllProjectionMemory<" + APRegion(seed) + ">* allproj,\n"
         "    BXType& bx_o,\n"
-        "    FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]\n"
+        "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[maxFullMatchCopies]\n"
         ");\n"
     )
 
@@ -116,10 +130,10 @@ for tcName in sorted(CMMems.keys()):
         "void MatchCalculator_" + seed + "PHI" + iMC + "(\n"
         "    const BXType bx,\n"
         "    const CandidateMatchMemory match[maxMatchCopies],\n"
-        "    const AllStubMemory<BARRELPS>* allstub,\n"
-        "    const AllProjectionMemory<BARRELPS>* allproj,\n"
+        "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
+        "    const AllProjectionMemory<" + APRegion(seed) + ">* allproj,\n"
         "    BXType& bx_o,\n"
-        "    FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]\n"
+        "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[maxFullMatchCopies]\n"
         ") {\n"
         "#pragma HLS inline off\n"
         "#pragma HLS interface register port=bx_o\n"
@@ -134,8 +148,7 @@ for tcName in sorted(CMMems.keys()):
         "#pragma HLS resource variable=allproj->get_mem() latency=2\n"
         "\n"
         "MC_" + seed + "PHI" + iMC + ": MatchCalculator<"
-	#ASTYPE, APTYPE, FMTYPE, MaxMatchCopies, MaxFullMatchCopies
-        "MC::ASRegion<TF::" + seed + ">(), MC::APRegion<TF::" + seed +">(), MC::FMRegion<TF::" + seed + ">(), " + str(len(TF_index)) + ", " + str(len(TF_index)) + ",\n"
+        "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(len(TF_index)) + ", " + str(len(TF_index)) + ",\n"
         " TF::" + seed + ", "
         "TF::" + "D1" + ", "
         "MC::" + iMC + "> (\n"

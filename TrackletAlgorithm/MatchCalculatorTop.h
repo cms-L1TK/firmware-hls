@@ -27,8 +27,8 @@ void MatchCalculator_L3PHIC(
 void MatchCalculator_L4PHIB(
     const BXType bx,
     const CandidateMatchMemory match[maxMatchCopies],
-    const AllStubMemory<BARRELPS>* allstub,
-    const AllProjectionMemory<BARRELPS>* allproj,
+    const AllStubMemory<BARREL2S>* allstub,
+    const AllProjectionMemory<BARREL2S>* allproj,
     BXType& bx_o,
     FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
 );
@@ -36,8 +36,8 @@ void MatchCalculator_L4PHIB(
 void MatchCalculator_L5PHIB(
     const BXType bx,
     const CandidateMatchMemory match[maxMatchCopies],
-    const AllStubMemory<BARRELPS>* allstub,
-    const AllProjectionMemory<BARRELPS>* allproj,
+    const AllStubMemory<BARREL2S>* allstub,
+    const AllProjectionMemory<BARREL2S>* allproj,
     BXType& bx_o,
     FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
 );
@@ -45,8 +45,8 @@ void MatchCalculator_L5PHIB(
 void MatchCalculator_L6PHIB(
     const BXType bx,
     const CandidateMatchMemory match[maxMatchCopies],
-    const AllStubMemory<BARRELPS>* allstub,
-    const AllProjectionMemory<BARRELPS>* allproj,
+    const AllStubMemory<BARREL2S>* allstub,
+    const AllProjectionMemory<BARREL2S>* allproj,
     BXType& bx_o,
     FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
 );
