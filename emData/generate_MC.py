@@ -4,7 +4,7 @@
 # MatchCalculatorTop.h, and MatchCalculatorTop.cc in the
 # TrackAlgorithm/ directory. Currently supports all MCs for L3_PHIC.
 
-import sys, re
+import os,sys, re
 
 TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
 TF_index = {k:v for v,k in enumerate(TF_index)}
@@ -40,7 +40,8 @@ for line in wiresFile:
 wiresFile.close()
 
 # Open and print out preambles for the parameters and top files.
-parametersFile = open("MatchCalculator_parameters.h", "w")
+dirname = os.path.dirname(os.path.realpath('__file__'))
+parametersFile = open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters.h"), "w")
 parametersFile.write(
     "#ifndef TrackAlgorithm_MatchCalculator_parameters_h\n"
     "#define TrackAlgorithm_MatchCalculator_parameters_h\n"
@@ -55,7 +56,7 @@ parametersFile.write(
     "// TF::L1L2. If a bit is set, the corresponding memory is\n"
     "// valid, if it is not, the corresponding memory is not valid.\n"
 )
-topHeaderFile = open("MatchCalculatorTop.h", "w")
+topHeaderFile = open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.h"), "w")
 topHeaderFile.write(
     "#ifndef TrackAlgorithm_MatchCalculatorTop_h\n"
     "#define TrackAlgorithm_MatchCalculatorTop_h\n"
@@ -65,7 +66,7 @@ topHeaderFile.write(
     "constexpr int maxMatchCopies(" + str(len(TF_index)) + ");\n"
     "constexpr int maxFullMatchCopies(" + str(len(TF_index)) + ");\n"
 )
-topFile = open("MatchCalculatorTop.cc", "w")
+topFile = open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.cc"), "w")
 topFile.write(
     "#include \"MatchCalculatorTop.h\"\n"
     "\n"
