@@ -22,7 +22,8 @@ FMMems = {}
 for line in wiresFile:
     # Only barrel-only seeds are supported right now.
     # Works for MC L3 phi sector C
-    if "MC_L3PHIC" not in line:
+    if not any(["MC_" + l + "PHIB" in line for l in ["L3", "L4", "L5", "L6"]]) and \
+       not any(["MC_" + l + "PHIC" in line for l in ["L3"]]): #MC_L3PHIC was used for testing
         continue
     line = line.rstrip()
     tcName = re.sub(r".*MC_(......).*", r"MC_\1", line)
@@ -60,6 +61,9 @@ topHeaderFile.write(
     "#define TrackAlgorithm_MatchCalculatorTop_h\n"
     "\n"
     "#include \"MatchCalculator.h\"\n"
+    "\n"
+    "constexpr int maxMatchCopies(" + str(len(TF_index)) + ");\n"
+    "constexpr int maxFullMatchCopies(" + str(len(TF_index)) + ");\n"
 )
 topFile = open("MatchCalculatorTop.cc", "w")
 topFile.write(
@@ -91,17 +95,9 @@ for tcName in sorted(CMMems.keys()):
         "  return 0x%X;\n"
         "}\n" % FMMask
     )
-    parametersFile.write(
-        "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {\n"
-        "  return FMMask<Layer, PHI>() & (1<<Seed);\n"
-        "}\n"
-    )
 
     # Print out prototype for top function for this MC.
     topHeaderFile.write(
-        "\n"
-        "constexpr int maxMatchCopies(" + str(len(TF_index)) + ");\n"
-        "constexpr int maxFullMatchCopies(" + str(len(TF_index)) + ");\n"
         "\n"
         "void MatchCalculator_" + seed + "PHI" + iMC + "(\n"
         "    const BXType bx,\n"
@@ -155,6 +151,9 @@ for tcName in sorted(CMMems.keys()):
 # Print out endifs and close files.
 parametersFile.write(
     "\n"
+    "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {\n"
+    "  return FMMask<Layer, PHI>() & (1<<Seed);\n"
+    "}\n"
     "#endif\n"
 )
 parametersFile.close()

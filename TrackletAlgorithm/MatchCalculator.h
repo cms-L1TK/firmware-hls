@@ -235,17 +235,44 @@ namespace MC {
   template<> constexpr regionType ASRegion<TF::L3>() {
     return BARRELPS;
   }
+  template<> constexpr regionType ASRegion<TF::L4>() {
+    return BARRELPS;
+  }
+  template<> constexpr regionType ASRegion<TF::L5>() {
+    return BARRELPS;
+  }
+  template<> constexpr regionType ASRegion<TF::L6>() {
+    return BARRELPS;
+  }
 
   template<> constexpr regionType APRegion<TF::L3>() {
+    return BARRELPS;
+  }
+  template<> constexpr regionType APRegion<TF::L4>() {
+    return BARRELPS;
+  }
+  template<> constexpr regionType APRegion<TF::L5>() {
+    return BARRELPS;
+  }
+  template<> constexpr regionType APRegion<TF::L6>() {
     return BARRELPS;
   }
 
   template<> constexpr regionType FMRegion<TF::L3>() {
     return BARREL;
   }
+  template<> constexpr regionType FMRegion<TF::L4>() {
+    return BARREL;
+  }
+  template<> constexpr regionType FMRegion<TF::L5>() {
+    return BARREL;
+  }
+  template<> constexpr regionType FMRegion<TF::L6>() {
+    return BARREL;
+  }
 }
 template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
-template<TF::layerDisk Layer, MC::imc PHI> constexpr uint16_t FMMask();
+template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
 #include "MatchCalculator_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, MC::imc PHISEC=MC::A>
