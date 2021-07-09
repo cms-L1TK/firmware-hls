@@ -89,7 +89,6 @@ def getDictOfMemories(wireconfig):
 
 def getDictOfCopies(mem_list):
 
-    max_copy_count = 0 # Maximum number of copies for a memory
     mem_copy_dict = collections.OrderedDict() # Dictionary that counts the number of copies
 
     for mem in mem_list:
@@ -100,10 +99,6 @@ def getDictOfCopies(mem_list):
             mem_copy_dict[mem_name] = 1
         else:
             mem_copy_dict[mem_name] += 1
-
-        # Keep track of the maximum number of copeis
-        if mem_copy_dict[mem_name] > max_copy_count:
-            max_copy_count = mem_copy_dict[mem_name]
 
     return mem_copy_dict
 

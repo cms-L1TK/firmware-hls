@@ -10,6 +10,8 @@ using namespace std;
 
 const int nEvents = 100;  //number of events to run
 
+// VMRouter Test that works for all regions
+// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
 // To run a different phi region, change the following:
 //          - add the phi region in emData/download.sh, make sure to also run clean
