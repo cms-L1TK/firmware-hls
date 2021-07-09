@@ -21,7 +21,7 @@
 // Changed manually
 
 #define kLAYER 0 // Which barrel layer number the data is coming from
-#define kDISK 1 // Which disk number the data is coming from, 0 if not disk
+#define kDISK 5 // Which disk number the data is coming from, 0 if not disk
 
 constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 

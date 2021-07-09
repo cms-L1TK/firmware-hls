@@ -6,7 +6,7 @@
 # VMR at a time. VMRouter_parameters.h contains magic numbers 
 # for all "default" VMRs plus one additonal VMR if specified.
 
-import argparse, sys, re
+import argparse
 import collections
 
 # Constants
@@ -24,6 +24,7 @@ has_vmste_outer = [False, True, True, True, False, True, True, True, False, True
 # Number of entries in bendcut table
 bendcuttable_size = [8, 8, 8, 16, 16, 16, 8, 8, 8, 8, 8]
 
+
 #############################################
 # Returns a dictionary of memories
 
@@ -34,10 +35,10 @@ def getDictOfMemories(wireconfig):
 
     # Dictionary of all the input and output memories
     mem_dict = {}
-    
+
     # Open wiring file
     wires_file = open(wireconfig)
-    
+
     # Loop over each line in the wiring
     for line in wires_file:
         # Check if any of the VMRs exist in the line
@@ -77,8 +78,9 @@ def getDictOfMemories(wireconfig):
             mem_dict["VMSTEO_" + vmr] = []
 
     wires_file.close()
-    
+
     return mem_dict
+
 
 ###################################
 # Returns a dictionary of memory copies
@@ -86,19 +88,19 @@ def getDictOfMemories(wireconfig):
 # Count the number of memories and copies, as the number of copies can differ
 
 def getDictOfCopies(mem_list):
-    
+
     max_copy_count = 0 # Maximum number of copies for a memory
     mem_copy_dict = collections.OrderedDict() # Dictionary that counts the number of copies
-    
+
     for mem in mem_list:
         mem_name = mem.split("n")[0] # Memory name without the copy number
-        
+
         # Count the number of copies
         if mem_name not in mem_copy_dict:
             mem_copy_dict[mem_name] = 1
         else:
             mem_copy_dict[mem_name] += 1
-        
+
         # Keep track of the maximum number of copeis
         if mem_copy_dict[mem_name] > max_copy_count:
             max_copy_count = mem_copy_dict[mem_name]
@@ -116,7 +118,11 @@ def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max
 
     table_string = "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">()>* getBendCut" + mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n" +\
                    "  const int bendCutTableSize = getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">();\n"
- 
+
+    # Sort memory list
+    mem_list.sort(key=lambda mem: int("".join([i for i in mem[:-2] if i.isdigit()]))) # Sort by number (excluding the "copy" number nX)
+    mem_list.sort(key=lambda mem: mem[:mem.index('PHI')]) # Sort alphabetically
+
     # Create temporary bendcut tables
     mem_index, mem_list_index = 0, 0
 
@@ -133,13 +139,13 @@ def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max
                 table_string += " {0};\n"
 
     # Combine temporary bendcut tables and return it
-    table_string += "  // Combine all the temporary tables into one big table\n" +\
+    table_string += "\n  // Combine all the temporary tables into one big table\n" +\
                     "  static ap_uint<bendCutTableSize> bendCutTable[] = {"
     for i in range(len(mem_copy_dict)):
         table_string += "\n    "
         for j in range(max_copy_count):
             table_string += "arrayToInt<bendCutTableSize>(tmpBendTable" + str(i+1) + "n" + str(j+1) + "), "
-    
+
     table_string = table_string[:-2] # Remove the last comma and space
     table_string += "\n  };\n\n" +\
                     "  return bendCutTable;\n" +\
@@ -223,7 +229,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
             "  return nullptr;\n"
             "}\n"
         )
-    
+
     # Write VMTableInner
     parameter_file.write("\n// VMTableInner\n")
     for i in range(num_layers):
@@ -238,7 +244,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
             +("  static int lut[] =\n#include \"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\"\n  return lut;\n" if has_vmste_inner[i+num_layers] else "  return nullptr;\n")+
             "}\n"
         )
-    
+
     # Write VMRTableInner - Overlap
     parameter_file.write("\n// VMTableInner - Overlap\n")
     for i in range(num_layers):
@@ -310,7 +316,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
                 "  return " + str(max_copy_count) + ";\n"
                 "}\n"
             )
-            
+
             # Bendcut tables
             if mem_dict[te_mem_type + "_" + vmr]: 
                 parameter_file.write(getBendCutTable(te_mem_region, layer_disk_char, layer_disk_num, phi_region, max_copy_count, mem_copy_dict, mem_dict[te_mem_type + "_" + vmr]))
@@ -320,7 +326,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
                 "  return nullptr;\n"
                 "}\n"
                 )
-        
+
         parameter_file.write(
             "template<> inline const int* getFineBinTable<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
             "  static int lut[] =\n"
@@ -340,7 +346,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
 def writeTopHeader(layer, disk, phi_region):
 
     header_file = open("VMRouterTop.h", "w")
-    
+
     # Write preamble
     header_file.write(
 """#ifndef TrackletAlgorithm_VMRouterTop_h
@@ -399,32 +405,32 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 #if kLAYER == kDISK
 #error kLAYER and kDISK cannot be the same
 #elif kLAYER > 0
-	// Number of VMs
-	constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
-	constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Inner memories
-	constexpr int nvmOL = (kLAYER == 1 || kLAYER == 2) ? nvmollayers[kLAYER-1] : 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
-	constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Outer memories
+    // Number of VMs
+    constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
+    constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Inner memories
+    constexpr int nvmOL = (kLAYER == 1 || kLAYER == 2) ? nvmollayers[kLAYER-1] : 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
+    constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Outer memories
 
-	// Number of bits used for the bins in VMStubeME memories
-	constexpr int nbitsbin = 3;
+    // Number of bits used for the bins in VMStubeME memories
+    constexpr int nbitsbin = 3;
 
-	// What regionType the input/output is
-	constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
-	constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+    // What regionType the input/output is
+    constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+    constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
 
 #elif kDISK > 0
-	// Number of VMs
-	constexpr int nvmME = nvmmedisks[kDISK-1]; // ME memories
-	constexpr int nvmTEI = nvmtedisks[kDISK-1]; // TE Inner memories
-	constexpr int nvmOL = 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
-	constexpr int nvmTEO = nvmtedisks[kDISK-1]; // TE Outer memories
+    // Number of VMs
+    constexpr int nvmME = nvmmedisks[kDISK-1]; // ME memories
+    constexpr int nvmTEI = nvmtedisks[kDISK-1]; // TE Inner memories
+    constexpr int nvmOL = 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
+    constexpr int nvmTEO = nvmtedisks[kDISK-1]; // TE Outer memories
 
-	// Number of bits used for the bins in VMStubeME memories
-	constexpr int nbitsbin = 4;
+    // Number of bits used for the bins in VMStubeME memories
+    constexpr int nbitsbin = 4;
 
-	// What regionType the input/output is
-	constexpr regionType inputType = DISKPS;
-	constexpr regionType outputType = DISK;
+    // What regionType the input/output is
+    constexpr regionType inputType = DISKPS;
+    constexpr regionType outputType = DISK;
 
 #else
 #error Need to have either kLAYER or kDISK larger than 0.
@@ -436,25 +442,25 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 // Changed manually
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
-	// Input memories
-	const InputStubMemory<inputType> inputStubs[numInputs]
+    // Input memories
+    const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
-	, const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+    , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
 #endif
 
-	// Output memories
-	, AllStubMemory<outputType> memoriesAS[maxASCopies]
-	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+    // Output memories
+    , AllStubMemory<outputType> memoriesAS[maxASCopies]
+    , VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
-	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
+    , VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
 #endif
 #if kLAYER == 1 || kLAYER == 2
-	, VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+    , VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
 #endif
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
+    , VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
 #endif
-	);
+    );
 
 #endif // TrackletAlgorithm_VMRouterTop_h
 """
@@ -485,23 +491,23 @@ def writeTopFile(num_inputs, num_inputs_disk2s):
 //          - run emData/generate_VMR.py to generate new top and parameters files
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
-	// Input memories
-	const InputStubMemory<inputType> inputStubs[numInputs]
+    // Input memories
+    const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
-	, const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+    , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
 #endif
 
-	// Output memories
-	, AllStubMemory<outputType> memoriesAS[maxASCopies]
-	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+    // Output memories
+    , AllStubMemory<outputType> memoriesAS[maxASCopies]
+    , VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
-	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
+    , VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
 #endif
 #if kLAYER == 1 || kLAYER == 2
-	, VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
+    , VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]
 #endif
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
+    , VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
 #endif
 ) {
 
@@ -517,106 +523,118 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
     top_file.write("""
 #pragma HLS interface register port=bx_o
 
-	///////////////////////////
-	// Open Lookup tables
+    ///////////////////////////
+    // Open Lookup tables
 
-	// LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
-	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
-	// Indexed using r and z position bits
-	static const int* fineBinTable = getFineBinTable<layerdisk, phiRegion>();
+    // LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
+    // Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
+    // Indexed using r and z position bits
+    static const int* fineBinTable = getFineBinTable<layerdisk, phiRegion>();
 
-	// LUT with phi corrections to project the stub to the average radius in a layer.
-	// Only used by layers.
-	// Indexed using phi and bend bits
-	static const int* phiCorrTable = getPhiCorrTable<layerdisk>();
+    // LUT with phi corrections to project the stub to the average radius in a layer.
+    // Only used by layers.
+    // Indexed using phi and bend bits
+    static const int* phiCorrTable = getPhiCorrTable<layerdisk>();
 
-	// LUT with the Z/R bits for TE memories
-	// Contain information about where in z to look for valid stub pairs
-	// Indexed using z and r position bits
-	static const int* rzBitsInnerTable = getRzBitsInnerTable<layerdisk>();
-	static const int* rzBitsOverlapTable = getRzBitsOverlapTable<layerdisk>();
-	static const int* rzBitsOuterTable = getRzBitsOuterTable<layerdisk>();
+    // LUT with the Z/R bits for TE memories
+    // Contain information about where in z to look for valid stub pairs
+    // Indexed using z and r position bits
+    static const int* rzBitsInnerTable = getRzBitsInnerTable<layerdisk>();
+    static const int* rzBitsOverlapTable = getRzBitsOverlapTable<layerdisk>();
+    static const int* rzBitsOuterTable = getRzBitsOuterTable<layerdisk>();
 
-	// LUT with bend-cuts for the TE memories
-	// The cuts are different depending on the memory version (nX)
-	// Indexed using bend bits
-	// Note: use an array of zeros for "missing" memories in the first and last Phi Region
-	static const ap_uint<bendCutTableSize>* bendCutInnerTable = getBendCutInnerTable<layerdisk, phiRegion, bendCutTableSize>();
-	static const ap_uint<bendCutTableSize>* bendCutOverlapTable = getBendCutOverlapTable<layerdisk, phiRegion, bendCutTableSize>();
-	static const ap_uint<bendCutTableSize>* bendCutOuterTable = getBendCutOuterTable<layerdisk, phiRegion, bendCutTableSize>();
+    // LUT with bend-cuts for the TE memories
+    // The cuts are different depending on the memory version (nX)
+    // Indexed using bend bits
+    // Note: use an array of zeros for "missing" memories in the first and last Phi Region
+    static const ap_uint<bendCutTableSize>* bendCutInnerTable = getBendCutInnerTable<layerdisk, phiRegion, bendCutTableSize>();
+    static const ap_uint<bendCutTableSize>* bendCutOverlapTable = getBendCutOverlapTable<layerdisk, phiRegion, bendCutTableSize>();
+    static const ap_uint<bendCutTableSize>* bendCutOuterTable = getBendCutOuterTable<layerdisk, phiRegion, bendCutTableSize>();
 
-	//////////////////////////////////
-	// Create memory masks
+    //////////////////////////////////
+    // Create memory masks
 
-	// Masks of which memories that are being used. The first memory is represented by the LSB
-	// and a "1" implies that the specified memory is used for this phi region
-	// Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
-	static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (static_cast<char>(phiRegion) - 'A')); // ME memories
-	static const ap_uint<maskTEIsize> maskTEI =
-		(kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
-				((1 << nvmTEI) - 1) << (nvmTEI * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner memories, only used for odd layers/disk and layer 2
-	static const ap_uint<maskOLsize> maskOL =
-		((kLAYER == 1) || (kLAYER == 2)) ?
-				((1 << nvmOL) - 1) << (nvmOL * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner Overlap memories, only used for layer 1 and 2
-	static const ap_uint<maskTEOsize> maskTEO =
-		(kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4) ?
-				((1 << nvmTEO) - 1) << (nvmTEO * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Outer memories, only for even layers/disks, and layer and disk 1
+    // Masks of which memories that are being used. The first memory is represented by the LSB
+    // and a "1" implies that the specified memory is used for this phi region
+    // Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
+    static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (static_cast<char>(phiRegion) - 'A')); // ME memories
+    static const ap_uint<maskTEIsize> maskTEI =
+        (kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
+                ((1 << nvmTEI) - 1) << (nvmTEI * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner memories, only used for odd layers/disk and layer 2
+    static const ap_uint<maskOLsize> maskOL =
+        ((kLAYER == 1) || (kLAYER == 2)) ?
+                ((1 << nvmOL) - 1) << (nvmOL * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner Overlap memories, only used for layer 1 and 2
+    static const ap_uint<maskTEOsize> maskTEO =
+        (kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4) ?
+                ((1 << nvmTEO) - 1) << (nvmTEO * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Outer memories, only for even layers/disks, and layer and disk 1
 
 
-	/////////////////////////
-	// Main function
+    /////////////////////////
+    // Main function
 
-	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
-	(bx, bx_o, fineBinTable, phiCorrTable,
-		rzBitsInnerTable, rzBitsOverlapTable, rzBitsOuterTable,
-		bendCutInnerTable, bendCutOverlapTable, bendCutOuterTable,
-		// Input memories
-		inputStubs,
+    VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
+    (bx, bx_o, fineBinTable, phiCorrTable,
+        rzBitsInnerTable, rzBitsOverlapTable, rzBitsOuterTable,
+        bendCutInnerTable, bendCutOverlapTable, bendCutOuterTable,
+        // Input memories
+        inputStubs,
 #if kDISK > 0
-		inputStubsDisk2S,
+        inputStubsDisk2S,
 #else
-		nullptr,
+        nullptr,
 #endif
-		// AllStub memories
-		memoriesAS,
-		// ME memories
-		maskME, memoriesME,
-		// TEInner memories
-		maskTEI,
+        // AllStub memories
+        memoriesAS,
+        // ME memories
+        maskME, memoriesME,
+        // TEInner memories
+        maskTEI,
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
-		memoriesTEI,
+        memoriesTEI,
 #else
-		nullptr,
+        nullptr,
 #endif
-		// TEInner Overlap memories
-		maskOL, 
+        // TEInner Overlap memories
+        maskOL, 
 #if kLAYER == 1 || kLAYER == 2
-		memoriesOL,
+        memoriesOL,
 #else
-		nullptr,
+        nullptr,
 #endif
-		// TEOuter memories
-		maskTEO, 
+        // TEOuter memories
+        maskTEO, 
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-		memoriesTEO
+        memoriesTEO
 #else
-		nullptr
+        nullptr
 #endif
-		);
+        );
 
-	return;
+    return;
 }
 """
     )
 
     top_file.close()
 
+
 ###############################
 # Main execution
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description = "")
+    parser = argparse.ArgumentParser(
+        description = """
+Generates top function and parameter files for the VMRouter.
+VMRouterTop.h and VMRouterTop.cc contain the top function for the single unit under test specified (default VMR_L2PHIA).
+VMRouter_parameters.h contains the magic numbers for the specified unit under test in addition to: """ + " ".join(vmr for vmr in default_vmr_list) + """.
+
+Examples:
+python generate_VMR.py
+python generate_VMR.py --uut VMR_L1PHIE
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
     parser.add_argument("-w", "--wireconfig", type=str, default="LUTs/wires.dat",
                         help="Name and directory of the configuration file for wiring (default = %(default)s)")
@@ -645,4 +663,3 @@ if __name__ == "__main__":
     writeTopHeader(layer, disk, phi_region)
     writeTopFile(len(mem_dict["IL_"+args.uut]), len(mem_dict["IL_DISK2S_"+args.uut]))
     writeParameterFile(mem_dict)
-    
