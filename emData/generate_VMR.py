@@ -484,6 +484,7 @@ def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
 //          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
 //          OR
 //          - run emData/generate_VMR.py to generate new top and parameters files
+
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]
@@ -503,6 +504,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	, VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]
 #endif
 ) {
+
 // Takes 2 clock cycles before on gets data, used at high frequencies
 """
     )
@@ -514,22 +516,27 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 
     top_file.write("""
 #pragma HLS interface register port=bx_o
+
 	///////////////////////////
 	// Open Lookup tables
+
 	// LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
 	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
 	// Indexed using r and z position bits
 	static const int* fineBinTable = getFineBinTable<layerdisk, phiRegion>();
+
 	// LUT with phi corrections to project the stub to the average radius in a layer.
 	// Only used by layers.
 	// Indexed using phi and bend bits
 	static const int* phiCorrTable = getPhiCorrTable<layerdisk>();
+
 	// LUT with the Z/R bits for TE memories
 	// Contain information about where in z to look for valid stub pairs
 	// Indexed using z and r position bits
 	static const int* rzBitsInnerTable = getRzBitsInnerTable<layerdisk>();
 	static const int* rzBitsOverlapTable = getRzBitsOverlapTable<layerdisk>();
 	static const int* rzBitsOuterTable = getRzBitsOuterTable<layerdisk>();
+
 	// LUT with bend-cuts for the TE memories
 	// The cuts are different depending on the memory version (nX)
 	// Indexed using bend bits
@@ -537,11 +544,13 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	static const ap_uint<bendCutTableSize>* bendCutInnerTable = getBendCutInnerTable<layerdisk, phiRegion, bendCutTableSize>();
 	static const ap_uint<bendCutTableSize>* bendCutOverlapTable = getBendCutOverlapTable<layerdisk, phiRegion, bendCutTableSize>();
 	static const ap_uint<bendCutTableSize>* bendCutOuterTable = getBendCutOuterTable<layerdisk, phiRegion, bendCutTableSize>();
+
 	//////////////////////////////////
 	// Create memory masks
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
 	// Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
+
 	static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (static_cast<char>(phiRegion) - 'A')); // ME memories
 	static const ap_uint<maskTEIsize> maskTEI =
 		(kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
@@ -552,8 +561,10 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	static const ap_uint<maskTEOsize> maskTEO =
 		(kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4) ?
 				((1 << nvmTEO) - 1) << (nvmTEO * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Outer memories, only for even layers/disks, and layer and disk 1
+
 	/////////////////////////
 	// Main function
+
 	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
 	(bx, bx_o, fineBinTable, phiCorrTable,
 		rzBitsInnerTable, rzBitsOverlapTable, rzBitsOuterTable,
@@ -591,6 +602,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 		nullptr
 #endif
 		);
+
 	return;
 }
 """
