@@ -1,4 +1,5 @@
 #include "VMRouterTop.h"
+
 // VMRouter Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 // To run a different phi region, change the following:

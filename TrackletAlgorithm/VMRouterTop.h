@@ -18,7 +18,6 @@
 
 ////////////////////////////////////////////
 // Variables for that are specified with regards to the VMR region
-// Changed manually
 
 #define kLAYER 2 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
@@ -27,7 +26,7 @@ constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 
 
 ///////////////////////////////////////////////
-// Variables that don't need manual changing
+// Variables that don't need changing
 
 constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
 
@@ -70,9 +69,11 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 #else
 #error Need to have either kLAYER or kDISK larger than 0.
 #endif
+
+
 /////////////////////////////////////////////////////
 // VMRouter Top Function
-// Changed manually
+
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]

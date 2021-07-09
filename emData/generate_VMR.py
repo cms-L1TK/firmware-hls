@@ -2,9 +2,9 @@
 
 # This script generates VMRouter_parameters.h, VMRouterTop.h, 
 # and VMRouterTop.cc in the TrackletAlgorithm/ directory. 
-# Supports all VMRs, but creates top function files for only one
-# VMR at a time. VMRouter_parameters.h contains magic numbers 
-# for all "default" VMRs plus one additonal VMR if specified.
+# Supports all VMRs, but creates separate top function files each
+# VMR specified. VMRouter_parameters.h contains magic numbers 
+# for all "default" VMRs plus additonals VMR if specified.
 
 import argparse
 import collections
@@ -31,7 +31,7 @@ bendcuttable_size = [8, 8, 8, 16, 16, 16, 8, 8, 8, 8, 8]
 # One key for every memory type in each layer/disk
 # Value is a list of all memory names for that key
 
-def getDictOfMemories(wireconfig):
+def getDictOfMemories(wireconfig, vmr_list):
 
     # Dictionary of all the input and output memories
     mem_dict = {}
@@ -42,7 +42,7 @@ def getDictOfMemories(wireconfig):
     # Loop over each line in the wiring
     for line in wires_file:
         # Check if any of the VMRs exist in the line
-        for vmr in default_vmr_list:
+        for vmr in vmr_list:
             if vmr in line:
                 mem_name = line.split()[0]
                 mem_type = mem_name.split("_")[0]
@@ -67,7 +67,7 @@ def getDictOfMemories(wireconfig):
                 break
 
     # Loop over all memories and add an empty IL DISK2S and VMSTE memory lists if missing in dictionary
-    for vmr in default_vmr_list:
+    for vmr in vmr_list:
         if "IL_DISK2S_" + vmr not in mem_dict:
             mem_dict["IL_DISK2S_" + vmr] = []
         if "VMSTEI_" + vmr not in mem_dict:
@@ -152,12 +152,12 @@ def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max
 # Writes the VMRouter_parameters.h file
 
 # Contains magic numbers for all default VMRs specified in download.sh
-# and the specified unit under test if non-default. Make sure to add
+# and the specified units under test if non-default. Make sure to add
 # non-default VMRs to download.sh and run it before running Vivado HLS
 
 def writeParameterFile(mem_dict):
 
-    parameter_file = open("VMRouter_parameters.h", "w")
+    parameter_file = open("../TrackletAlgorithm/VMRouter_parameters.h", "w")
 
     # Write preamble
     parameter_file.write(
@@ -338,15 +338,23 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
 #################################
 # Writes the VMRouterTop.h file
 
-def writeTopHeader(layer, disk, phi_region):
+def writeTopHeader(vmr_specific_name, vmr):
 
-    header_file = open("VMRouterTop.h", "w")
+    # Get layer/disk number and phi region
+    layer = vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0
+    disk = 0 if layer else vmr.split("_")[1][1]
+    phi_region= vmr.split("PHI")[1]
+
+    # Top file name
+    file_name = "VMRouterTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
+
+    header_file = open("../TrackletAlgorithm/" + file_name  + ".h", "w")
 
     # Write preamble
     header_file.write(
-"""#ifndef TrackletAlgorithm_VMRouterTop_h
-#define TrackletAlgorithm_VMRouterTop_h
-
+"#ifndef TrackletAlgorithm_" + file_name + "_h\n" +\
+"#define TrackletAlgorithm_" + file_name + "_h\n" +\
+"""
 #include "VMRouter.h"
 #include "VMRouter_parameters.h"
 
@@ -364,7 +372,6 @@ def writeTopHeader(layer, disk, phi_region):
 
 ////////////////////////////////////////////
 // Variables for that are specified with regards to the VMR region
-// Changed manually
 
 """
     )
@@ -381,7 +388,7 @@ def writeTopHeader(layer, disk, phi_region):
     header_file.write("""
 
 ///////////////////////////////////////////////
-// Variables that don't need manual changing
+// Variables that don't need changing
 
 constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
 
@@ -424,9 +431,11 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 #else
 #error Need to have either kLAYER or kDISK larger than 0.
 #endif
+
+
 /////////////////////////////////////////////////////
 // VMRouter Top Function
-// Changed manually
+
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]
@@ -454,13 +463,17 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 
 
 # Writes the VMRouterTop.cc file
-def writeTopFile(num_inputs, num_inputs_disk2s):
+def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
 
-    top_file = open("VMRouterTop.cc", "w")
+    # Top file name
+    file_name = "VMRouterTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
+
+    top_file = open("../TrackletAlgorithm/" + file_name  + ".cc", "w")
 
     # Write preamble
-    top_file.write(
-"""#include "VMRouterTop.h"
+    top_file.write("#include \"" + file_name + ".h\"" +\
+"""
+
 // VMRouter Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 // To run a different phi region, change the following:
@@ -594,40 +607,50 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description = """
 Generates top function and parameter files for the VMRouter.
-VMRouterTop.h and VMRouterTop.cc contain the top function for the single unit under test specified (default VMR_L2PHIA).
+VMRouterTop*.h and VMRouterTop*.cc contain the top function for the units under test specified (default VMR_L2PHIA).
 VMRouter_parameters.h contains the magic numbers for the specified unit under test in addition to: """ + " ".join(vmr for vmr in default_vmr_list) + """.
 
 Examples:
 python3 generate_VMR.py
-python3 generate_VMR.py --uut VMR_L1PHIE
+python3 generate_VMR.py --uut VMR_L1PHIE -o
+python3 generate_VMR.py --uut VMR_L1PHIE VMR_L1PHID
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
+    parser.add_argument("-o", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterTop.h/cc files (instead of creating files e.g. VMRouterTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
+    parser.add_argument("--uut", default=["VMR_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
     parser.add_argument("-w", "--wireconfig", type=str, default="LUTs/wires.dat",
                         help="Name and directory of the configuration file for wiring (default = %(default)s)")
-    parser.add_argument("--uut", type=str, default="VMR_L2PHIA", help="Unit Under Test (default = %(default)s)")
 
     args = parser.parse_args()
 
-    # Check that the Unit Under Test is a VMR
-    if "VMR" not in args.uut:
-        raise IndexError("Unit under test has to be a VMR.")
+    # Dictionary of all memories sorted by type and Unit Under Test
+    mem_dict = getDictOfMemories(args.wireconfig, default_vmr_list)
 
-    # Check if one of the default VMRs
-    if args.uut not in default_vmr_list:
-        default_vmr_list.append(uut)
-        default_vmr_list.sort()
-        print("Make sure to add " + uut + "to download.sh and run it before running Vivado HLS.")
+    # Include the VMR name in the names of VMRouterTop files
+    if len(args.uut) > 1 or not args.overwrite:
+        vmr_specific_name = True
+    else:
+        vmr_specific_name = False
 
-    # Get layer/disk number and phi region
-    layer = args.uut.split("_")[1][1] if args.uut.split("_")[1][0] == "L" else 0
-    disk = 0 if layer else args.uut.split("_")[1][1]
-    phi_region= args.uut.split("PHI")[1]
+    # Loop over all Units Under Test
+    for vmr in args.uut:
+        # Check that the Unit Under Test is a VMR
+        if "VMR" not in vmr:
+            raise IndexError("Unit under test has to be a VMR.")
 
-    mem_dict = getDictOfMemories(args.wireconfig)
+        # Check if one of the default VMRs
+        if vmr not in default_vmr_list:
+            default_vmr_list.append(vmr)
+            default_vmr_list.sort()
+            mem_dict.update(getDictOfMemories(args.wireconfig, [vmr]))
 
-    # Create and write the files
-    writeTopHeader(layer, disk, phi_region)
-    writeTopFile(len(mem_dict["IL_"+args.uut]), len(mem_dict["IL_DISK2S_"+args.uut]))
+            print("\nMake sure to add " + vmr + "to download.sh and run it before running Vivado HLS.\n")
+
+        # Create and write the files
+        writeTopHeader(vmr_specific_name, vmr)
+        writeTopFile(vmr_specific_name, vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]))
+
+    # Write parameters file
     writeParameterFile(mem_dict)
