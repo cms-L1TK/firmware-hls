@@ -28,7 +28,6 @@ luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
 # prepared for them.
 declare -a processing_modules=(
   # VMRouter
-  "VMR_L1PHIE"
   "VMR_L1PHID"
   "VMR_L2PHIA"
   "VMR_L2PHIB"
@@ -38,6 +37,9 @@ declare -a processing_modules=(
   "VMR_L6PHIA"
   "VMR_D1PHIA"
   "VMR_D2PHIA"
+  "VMR_D3PHIA"
+  "VMR_D4PHIA"
+  "VMR_D5PHIA"
 
   # VMRouter CM
   "VMRCM_L2PHIA"

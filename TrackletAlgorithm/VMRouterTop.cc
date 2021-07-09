@@ -1,15 +1,16 @@
 #include "VMRouterTop.h"
 
-// VMRouter Top Function for layer 2, AllStub region A
+// VMRouter Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
-// NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterTop.h
-//          - add number to VMRouter_parameters.h if not already defined
+// To run a different phi region, change the following:
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterTop.h
+//          - add corresponding magic numbers to VMRouter_parameters.h if not already defined
 //          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
-
-
+//          OR
+//          - run emData/generate_VMR.py to generate new top and parameters files
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
@@ -35,11 +36,6 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 // Takes 2 clock cycles before on gets data, used at high frequencies
 #pragma HLS resource variable=inputStubs[0].get_mem() latency=2
 #pragma HLS resource variable=inputStubs[1].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[2].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[3].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[4].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[5].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[6].get_mem() latency=2
 
 #pragma HLS interface register port=bx_o
 
