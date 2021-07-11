@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+## python 2/3 inter-compatibility
+from __future__ import absolute_import
+
 # This script generates VMRouter_parameters.h, VMRouterTop.h, 
 # and VMRouterTop.cc in the TrackletAlgorithm/ directory. 
 # Supports all VMRs, but creates separate top function files each
