@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.

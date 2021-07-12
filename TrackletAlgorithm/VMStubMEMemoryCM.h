@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplateBinnedCM.h"
+#include "globalFunctions.h"
 
 // VMStubMECMBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSMEType> class VMStubMECMBase {};
