@@ -4,6 +4,8 @@
 # MatchCalculatorTop.h, and MatchCalculatorTop.cc in the
 # TrackAlgorithm/ directory. Currently supports all MCs for L3_PHIC.
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os,sys, re
 
 TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
