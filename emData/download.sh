@@ -71,7 +71,10 @@ declare -a processing_modules=(
   "TC_L1L2J"
   "TC_L1L2K"
   "TC_L1L2L"
+  "TC_L2L3A"
+  "TC_L2L3B"
   "TC_L2L3C"
+  "TC_L2L3D"
   "TC_L3L4A"
   "TC_L3L4B"
   "TC_L3L4C"
@@ -136,6 +139,7 @@ declare -a processing_modules=(
   "TP_L1L2D" 
   "TP_L2L3C" 
   "TP_L3L4C"
+  "TP_L5L6C"
 
 )
 

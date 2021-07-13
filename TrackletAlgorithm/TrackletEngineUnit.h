@@ -12,8 +12,8 @@ class TrackletEngineUnit {
     kNBitsRZBin=3,
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
-    kNBitsPTLutInner=(Seed==(TF::L1L2||TF::L2L3))?256:512,
-    kNBitsPTLutOuter=(Seed==(TF::L1L2||TF::L2L3||TF::L3L4))?256:512
+    kNBitsPTLutInner=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
+    kNBitsPTLutOuter=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
   };
 
   typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
@@ -33,7 +33,7 @@ class TrackletEngineUnit {
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 /////  Grabs the appropriate lut based on seed and itc (need to be included in download.sh)
 
-    if (Seed==TF::L1L2){
+    if (Seed==TF::L1L2&&itc==3){
       ap_uint<1> stubptinnertmp[256]=
 #include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[256]=
@@ -46,7 +46,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L2L3){
+    else if (Seed==TF::L2L3&&itc==2){
       ap_uint<1> stubptinnertmp[256]=
 #include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[256]=
@@ -59,7 +59,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }  
     }
-   else if (Seed==TF::L3L4){
+   else if (Seed==TF::L3L4&&itc==2){
       ap_uint<1> stubptinnertmp[256]=
 #include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[512]=
@@ -72,6 +72,20 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
+    else if (Seed==TF::L5L6&&itc==2){
+      ap_uint<1> stubptinnertmp[1024]=
+#include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
+      ap_uint<1> stubptoutertmp[1024]=
+#include "../emData/TP/tables/TP_L5L6C_stubptoutercut.tab"
+
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+
     idle_ = true;
     }
  MEMSTUBS nstub16() const {

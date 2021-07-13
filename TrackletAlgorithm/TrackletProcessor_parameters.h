@@ -37,6 +37,12 @@ template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TC::C>() {
 template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TC::C>() {
   return 0xEE;
 }
-
+// magic numbers for TP_L5L6C //fix
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L5L6, TC::C>() {
+  return 0xFFFFF;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L5L6, TC::C>() {
+  return 0x0;
+}
 
 #endif
