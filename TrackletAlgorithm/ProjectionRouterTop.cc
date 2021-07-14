@@ -1,6 +1,6 @@
 #include "ProjectionRouterTop.h"
 
-void ProjectionRouterTop(BXType bx,
+void ProjectionRouterTop_L3PHIC(BXType bx,
                          const TrackletProjectionMemory<BARRELPS> projin[8],
                          BXType& bx_o,
                          AllProjectionMemory<BARRELPS>& allprojout,

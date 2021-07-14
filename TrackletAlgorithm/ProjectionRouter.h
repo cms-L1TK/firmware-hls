@@ -187,8 +187,6 @@ void ProjectionRouter(BXType bx,
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
       //assert(rinv >=0 and rinv < 32);
 
-      std::cout << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
-
       // VM Projection
       VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
 

@@ -350,6 +350,8 @@ class TBHelper {
         for (unsigned i = 0; i < globbuf.gl_pathc; i++)
           fileNames.emplace_back(globbuf.gl_pathv[i]);
 
+        // define functions needed to get file order to match the wiring
+
         // function for padding single-digit numbers in the file name with a
         // leading zero
         const auto padNumbers = [](const std::string &fileName) {
@@ -361,6 +363,23 @@ class TBHelper {
         const auto removePadding = [](const std::string &fileName) {
           const std::regex paddedNumber("([^0-9])0([0-9])([^0-9.])");
           return std::regex_replace(fileName, paddedNumber, "$01$02$03");
+        };
+
+        // function to put files in ascending seed order (L1L2 L2L3 L3L4 L5L6 D1D2 D3D4 L1D1 L2D1)
+        const auto padBySeed = [](const std::string &fileName) {
+          const std::regex seedType1("L[0-9]L[0-9]");
+          const std::regex seedType2("D[0-9]D[0-9]");
+          const std::regex seedType3("L[0-9]D[0-9]");
+          auto newFileName = std::regex_replace(fileName,seedType1,"PREFIXA_$&");
+          newFileName = std::regex_replace(newFileName,seedType2,"PREFIXB_$&");
+          newFileName = std::regex_replace(newFileName,seedType3,"PREFIXC_$&");
+          return newFileName;
+        };
+
+        // function for removing padding added by padBySeed
+        const auto removeSeedPad = [](const std::string &fileName) {
+          const std::regex prefix("PREFIX[ABC]_");
+          return std::regex_replace(fileName,prefix,"");
         };
 
         // The next three steps are needed to get the file name ordering right.
@@ -379,9 +398,11 @@ class TBHelper {
         // And finally, we remove the padding added in the first step:
         //   "StubPairs_SP_L3PHIC9_L4PHIC20_04.dat"
         //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
+        std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padBySeed);
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padNumbers);
         std::sort(fileNames.begin(), fileNames.end());
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removePadding);
+        std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removeSeedPad);
 
         for (const auto &fileName : fileNames)
           files.emplace_back(fileName);
