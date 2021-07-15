@@ -761,7 +761,7 @@ void MatchCalculator(BXType bx,
     ap_int<10> delta_z         = stub_z - proj_z_corr;
     ap_int<14> delta_z_fact   = delta_z * kFact;
     ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
-    ap_int<18> &proj_phi_long = proj_phi_corr;    // make longer to allow for shifting
+    const ap_int<18> &proj_phi_long = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
     ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
