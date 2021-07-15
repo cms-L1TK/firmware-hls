@@ -816,49 +816,49 @@ void MatchCalculator(BXType bx,
       switch (projseed) {
         case 0:
         if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-          fullmatch[0].write_mem(bx,bestmatch,nmcout1); // L1L2 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch,nmcout1); // L1L2 seed
           nmcout1++;
         }
         break;
         case 1:
         if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-          fullmatch[1].write_mem(bx,bestmatch,nmcout2); // L2L3 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch,nmcout2); // L2L3 seed
           nmcout2++;
         }
         break;
         case 2:
         if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-          fullmatch[2].write_mem(bx,bestmatch,nmcout3); // L3L4 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch,nmcout3); // L3L4 seed
           nmcout3++;
         }
         break;
         case 3:
         if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
-          fullmatch[3].write_mem(bx,bestmatch,nmcout4); // L5L6 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch,nmcout4); // L5L6 seed
           nmcout4++;
         }
         break;
         case 4:
         if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
-          fullmatch[4].write_mem(bx,bestmatch,nmcout5); // D1D2 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch,nmcout5); // D1D2 seed
           nmcout5++;
         }
         break;
         case 5:
         if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
-          fullmatch[5].write_mem(bx,bestmatch,nmcout6); // D3D4 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch,nmcout6); // D3D4 seed
           nmcout6++;
         }
         break;
         case 6:
         if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
-          fullmatch[6].write_mem(bx,bestmatch,nmcout7); // L1D1 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch,nmcout7); // L1D1 seed
           nmcout7++;
         }
         break;
         case 7:
         if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
-          fullmatch[7].write_mem(bx,bestmatch,nmcout8); // L2D1 seed
+          fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch,nmcout8); // L2D1 seed
           nmcout8++;
         }
         break;

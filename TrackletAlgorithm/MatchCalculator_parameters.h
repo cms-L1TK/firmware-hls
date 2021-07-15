@@ -13,4 +13,18 @@ template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask(
   return FMMask<Layer, PHI>() & (1<<Seed);
 }
 
+/*
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr  FMCount() {
+  return ~Seed & FMMask<Layer, PHI>() >> Seed;
+}
+*/
+// calculates the fullmatch array slot
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr ap_uint<1<<Seed> FMCount() {
+  ap_uint<1<<Seed> bits;
+  for(size_t i = 0; i <= Seed; ++i) {
+    bits.set(i);
+  }
+  return __builtin_popcount(bits & FMMask<Layer, PHI>())-1;
+}
+
 #endif
