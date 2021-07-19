@@ -26,8 +26,8 @@ void TrackletCalculator_L1L2A(
 #pragma HLS array_partition variable=innerStubs complete dim=1
 #pragma HLS array_partition variable=outerStubs complete dim=1
 #pragma HLS array_partition variable=stubPairs complete dim=1
-#pragma HLS resource variable=innerStubs.get_mem() latency=2
-#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
+#pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[2].get_mem() latency=2
@@ -80,7 +80,7 @@ void TrackletCalculator_L1L2B(
 #pragma HLS array_partition variable=stubPairs complete dim=1
 #pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=innerStubs[1].get_mem() latency=2
-#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[2].get_mem() latency=2
@@ -185,7 +185,7 @@ void TrackletCalculator_L1L2D(
 #pragma HLS array_partition variable=innerStubs complete dim=1
 #pragma HLS array_partition variable=outerStubs complete dim=1
 #pragma HLS array_partition variable=stubPairs complete dim=1
-#pragma HLS resource variable=innerStubs.get_mem() latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
@@ -240,7 +240,7 @@ void TrackletCalculator_L1L2E(
 #pragma HLS array_partition variable=stubPairs complete dim=1
 #pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=innerStubs[1].get_mem() latency=2
-#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[2].get_mem() latency=2
@@ -291,7 +291,7 @@ void TrackletCalculator_L1L2F(
 #pragma HLS array_partition variable=innerStubs complete dim=1
 #pragma HLS array_partition variable=outerStubs complete dim=1
 #pragma HLS array_partition variable=stubPairs complete dim=1
-#pragma HLS resource variable=innerStubs.get_mem() latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
@@ -343,7 +343,7 @@ void TrackletCalculator_L1L2G(
 #pragma HLS array_partition variable=innerStubs complete dim=1
 #pragma HLS array_partition variable=outerStubs complete dim=1
 #pragma HLS array_partition variable=stubPairs complete dim=1
-#pragma HLS resource variable=innerStubs.get_mem() latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
@@ -398,7 +398,7 @@ void TrackletCalculator_L1L2H(
 #pragma HLS array_partition variable=stubPairs complete dim=1
 #pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=innerStubs[1].get_mem() latency=2
-#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[2].get_mem() latency=2
@@ -449,7 +449,7 @@ void TrackletCalculator_L1L2I(
 #pragma HLS array_partition variable=innerStubs complete dim=1
 #pragma HLS array_partition variable=outerStubs complete dim=1
 #pragma HLS array_partition variable=stubPairs complete dim=1
-#pragma HLS resource variable=innerStubs.get_mem() latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=outerStubs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
@@ -558,7 +558,7 @@ void TrackletCalculator_L1L2K(
 #pragma HLS array_partition variable=stubPairs complete dim=1
 #pragma HLS resource variable=innerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=innerStubs[1].get_mem() latency=2
-#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[2].get_mem() latency=2
@@ -609,8 +609,8 @@ void TrackletCalculator_L1L2L(
 #pragma HLS array_partition variable=innerStubs complete dim=1
 #pragma HLS array_partition variable=outerStubs complete dim=1
 #pragma HLS array_partition variable=stubPairs complete dim=1
-#pragma HLS resource variable=innerStubs.get_mem() latency=2
-#pragma HLS resource variable=outerStubs.get_mem() latency=2
+#pragma HLS resource variable=innerStubs[0].get_mem() latency=2
+#pragma HLS resource variable=outerStubs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[0].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[1].get_mem() latency=2
 #pragma HLS resource variable=stubPairs[2].get_mem() latency=2
