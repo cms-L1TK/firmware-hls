@@ -13,9 +13,9 @@
 
 void TrackletCalculator_L1L2A(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::A>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::A>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::A>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[1],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[1],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -49,7 +49,7 @@ void TrackletCalculator_L1L2A(
 TC_L1L2A: TrackletCalculator<
   TF::L1L2,
   TC::A,
-  NSPMem<TF::L1L2, TC::A>()
+  13
  >(
     bx,
     innerStubs,
@@ -65,9 +65,9 @@ TC_L1L2A: TrackletCalculator<
 
 void TrackletCalculator_L1L2B(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::B>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::B>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::B>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[1],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -102,7 +102,7 @@ void TrackletCalculator_L1L2B(
 TC_L1L2B: TrackletCalculator<
   TF::L1L2,
   TC::B,
-  NSPMem<TF::L1L2, TC::B>()
+  13
  >(
     bx,
     innerStubs,
@@ -118,9 +118,9 @@ TC_L1L2B: TrackletCalculator<
 
 void TrackletCalculator_L1L2C(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::C>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::C>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::C>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[2],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -156,7 +156,7 @@ void TrackletCalculator_L1L2C(
 TC_L1L2C: TrackletCalculator<
   TF::L1L2,
   TC::C,
-  NSPMem<TF::L1L2, TC::C>()
+  13
  >(
     bx,
     innerStubs,
@@ -172,9 +172,9 @@ TC_L1L2C: TrackletCalculator<
 
 void TrackletCalculator_L1L2D(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::D>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::D>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::D>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[1],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[2],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -209,7 +209,7 @@ void TrackletCalculator_L1L2D(
 TC_L1L2D: TrackletCalculator<
   TF::L1L2,
   TC::D,
-  NSPMem<TF::L1L2, TC::D>()
+  13
  >(
     bx,
     innerStubs,
@@ -225,9 +225,9 @@ TC_L1L2D: TrackletCalculator<
 
 void TrackletCalculator_L1L2E(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::E>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::E>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::E>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[1],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -262,7 +262,7 @@ void TrackletCalculator_L1L2E(
 TC_L1L2E: TrackletCalculator<
   TF::L1L2,
   TC::E,
-  NSPMem<TF::L1L2, TC::E>()
+  13
  >(
     bx,
     innerStubs,
@@ -278,9 +278,9 @@ TC_L1L2E: TrackletCalculator<
 
 void TrackletCalculator_L1L2F(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::F>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::F>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::F>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[1],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[2],
+    const StubPairMemory stubPairs[12],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -314,7 +314,7 @@ void TrackletCalculator_L1L2F(
 TC_L1L2F: TrackletCalculator<
   TF::L1L2,
   TC::F,
-  NSPMem<TF::L1L2, TC::F>()
+  12
  >(
     bx,
     innerStubs,
@@ -330,9 +330,9 @@ TC_L1L2F: TrackletCalculator<
 
 void TrackletCalculator_L1L2G(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::G>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::G>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::G>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[1],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[2],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -367,7 +367,7 @@ void TrackletCalculator_L1L2G(
 TC_L1L2G: TrackletCalculator<
   TF::L1L2,
   TC::G,
-  NSPMem<TF::L1L2, TC::G>()
+  13
  >(
     bx,
     innerStubs,
@@ -383,9 +383,9 @@ TC_L1L2G: TrackletCalculator<
 
 void TrackletCalculator_L1L2H(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::H>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::H>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::H>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[1],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -420,7 +420,7 @@ void TrackletCalculator_L1L2H(
 TC_L1L2H: TrackletCalculator<
   TF::L1L2,
   TC::H,
-  NSPMem<TF::L1L2, TC::H>()
+  13
  >(
     bx,
     innerStubs,
@@ -436,9 +436,9 @@ TC_L1L2H: TrackletCalculator<
 
 void TrackletCalculator_L1L2I(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::I>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::I>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::I>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[1],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[2],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -473,7 +473,7 @@ void TrackletCalculator_L1L2I(
 TC_L1L2I: TrackletCalculator<
   TF::L1L2,
   TC::I,
-  NSPMem<TF::L1L2, TC::I>()
+  13
  >(
     bx,
     innerStubs,
@@ -489,9 +489,9 @@ TC_L1L2I: TrackletCalculator<
 
 void TrackletCalculator_L1L2J(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::J>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::J>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::J>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[2],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -527,7 +527,7 @@ void TrackletCalculator_L1L2J(
 TC_L1L2J: TrackletCalculator<
   TF::L1L2,
   TC::J,
-  NSPMem<TF::L1L2, TC::J>()
+  13
  >(
     bx,
     innerStubs,
@@ -543,9 +543,9 @@ TC_L1L2J: TrackletCalculator<
 
 void TrackletCalculator_L1L2K(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::K>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::K>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::K>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[1],
+    const StubPairMemory stubPairs[13],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -580,7 +580,7 @@ void TrackletCalculator_L1L2K(
 TC_L1L2K: TrackletCalculator<
   TF::L1L2,
   TC::K,
-  NSPMem<TF::L1L2, TC::K>()
+  13
  >(
     bx,
     innerStubs,
@@ -596,9 +596,9 @@ TC_L1L2K: TrackletCalculator<
 
 void TrackletCalculator_L1L2L(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[NASMemInner<TF::L1L2, TC::L>()],
-    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[NASMemOuter<TF::L1L2, TC::L>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L1L2, TC::L>()],
+    const AllStubMemory<InnerRegion<TF::L1L2>()> innerStubs[1],
+    const AllStubMemory<OuterRegion<TF::L1L2>()> outerStubs[1],
+    const StubPairMemory stubPairs[12],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -631,7 +631,7 @@ void TrackletCalculator_L1L2L(
 TC_L1L2L: TrackletCalculator<
   TF::L1L2,
   TC::L,
-  NSPMem<TF::L1L2, TC::L>()
+  12
  >(
     bx,
     innerStubs,
@@ -647,9 +647,9 @@ TC_L1L2L: TrackletCalculator<
 
 void TrackletCalculator_L3L4A(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[NASMemInner<TF::L3L4, TC::A>()],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[NASMemOuter<TF::L3L4, TC::A>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L3L4, TC::A>()],
+    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[2],
+    const StubPairMemory stubPairs[23],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -695,7 +695,7 @@ void TrackletCalculator_L3L4A(
 TC_L3L4A: TrackletCalculator<
   TF::L3L4,
   TC::A,
-  NSPMem<TF::L3L4, TC::A>()
+  23
  >(
     bx,
     innerStubs,
@@ -711,9 +711,9 @@ TC_L3L4A: TrackletCalculator<
 
 void TrackletCalculator_L3L4D(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[NASMemInner<TF::L3L4, TC::D>()],
-    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[NASMemOuter<TF::L3L4, TC::D>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L3L4, TC::D>()],
+    const AllStubMemory<InnerRegion<TF::L3L4>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L3L4>()> outerStubs[2],
+    const StubPairMemory stubPairs[23],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -759,7 +759,7 @@ void TrackletCalculator_L3L4D(
 TC_L3L4D: TrackletCalculator<
   TF::L3L4,
   TC::D,
-  NSPMem<TF::L3L4, TC::D>()
+  23
  >(
     bx,
     innerStubs,
@@ -775,9 +775,9 @@ TC_L3L4D: TrackletCalculator<
 
 void TrackletCalculator_L5L6A(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L5L6>()> innerStubs[NASMemInner<TF::L5L6, TC::A>()],
-    const AllStubMemory<OuterRegion<TF::L5L6>()> outerStubs[NASMemOuter<TF::L5L6, TC::A>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L5L6, TC::A>()],
+    const AllStubMemory<InnerRegion<TF::L5L6>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L5L6>()> outerStubs[2],
+    const StubPairMemory stubPairs[30],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -830,7 +830,7 @@ void TrackletCalculator_L5L6A(
 TC_L5L6A: TrackletCalculator<
   TF::L5L6,
   TC::A,
-  NSPMem<TF::L5L6, TC::A>()
+  30
  >(
     bx,
     innerStubs,
@@ -846,9 +846,9 @@ TC_L5L6A: TrackletCalculator<
 
 void TrackletCalculator_L5L6D(
     const BXType bx,
-    const AllStubMemory<InnerRegion<TF::L5L6>()> innerStubs[NASMemInner<TF::L5L6, TC::D>()],
-    const AllStubMemory<OuterRegion<TF::L5L6>()> outerStubs[NASMemOuter<TF::L5L6, TC::D>()],
-    const StubPairMemory stubPairs[NSPMem<TF::L5L6, TC::D>()],
+    const AllStubMemory<InnerRegion<TF::L5L6>()> innerStubs[2],
+    const AllStubMemory<OuterRegion<TF::L5L6>()> outerStubs[2],
+    const StubPairMemory stubPairs[30],
     BXType& bx_o,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
@@ -901,7 +901,7 @@ void TrackletCalculator_L5L6D(
 TC_L5L6D: TrackletCalculator<
   TF::L5L6,
   TC::D,
-  NSPMem<TF::L5L6, TC::D>()
+  30
  >(
     bx,
     innerStubs,
