@@ -1,9 +1,5 @@
 // ProjectionRouter test bench
-#include "MatchProcessorTopL3.h"
-#include "CandidateMatchMemory.h"
-#include "VMProjectionMemory.h"
-#include "ProjectionRouterBuffer.h"
-#include "VMStubMEMemoryCM.h"
+#include "MatchProcessorTop.h"
 #include "FileReadUtility.h"
 #include "hls_math.h"
 
@@ -24,20 +20,20 @@ int main() {
   int err_count = 0;
 
   // input memories
-  static TrackletProjectionMemory<BARRELPS> tproj[maxTrackletProjections];
+  static TrackletProjectionMemory<BARRELPS> tproj[L3PHICmaxTrackletProjections];
   static AllStubMemory<BARRELPS>        allstub;
 
   VMStubMEMemoryCM<BARRELPS, 3, 3, kNMatchEngines> inputvmstubs;
 
   // declare output memory array to be filled by hls simulation
-  static FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies];
+  static FullMatchMemory<BARREL> fullmatch[L3PHICmaxFullMatchCopies];
 
   ap_uint<8>* valid;
 
   // open input files
   cout << "Open files..." << endl;
 
-  ifstream fin_tproj[maxTrackletProjections];
+  ifstream fin_tproj[L3PHICmaxTrackletProjections];
   ifstream fin_as;
   //ifstream fout_ap;
 
@@ -85,7 +81,7 @@ int main() {
 //    fullmatch[7].clear();
 
     // read event and write to memories
-    for(int i = 0; i < maxTrackletProjections; i++)
+    for(int i = 0; i < L3PHICmaxTrackletProjections; i++)
       writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tproj[i], fin_tproj[i], ievt);
     writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
 
@@ -98,7 +94,7 @@ int main() {
     int noutcandmatch = 0;
 
     // Unit Under Test
-    MatchProcessorTopL3(bx,
+    MatchProcessor_L3PHIC(bx,
                         tproj,
                         inputvmstubs,
                         &allstub,
@@ -131,7 +127,7 @@ int main() {
   }  // end of event loop
   
   // close files
-  for(int i = 0; i < maxTrackletProjections; i++)
+  for(int i = 0; i < L3PHICmaxTrackletProjections; i++)
     fin_tproj[i].close();
   fin_vmstub.close();
 
