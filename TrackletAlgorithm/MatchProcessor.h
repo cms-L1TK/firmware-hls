@@ -313,8 +313,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 namespace MC {
   enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
-template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
-template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> static constexpr bool FMMask();
+template<TF::layerDisk Layer, MC::imc PHI> static constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, int LAYER=TF::L1, MC::imc PHISEC=MC::A>
@@ -415,7 +415,7 @@ void MatchCalculator(BXType bx,
   ap_int<10> delta_z         = stub_z - proj_z_corr;
   ap_int<14> delta_z_fact   = delta_z * kFact;
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
-  ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
+  const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
