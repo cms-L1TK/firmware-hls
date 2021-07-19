@@ -254,21 +254,12 @@ for tcName in sorted(asInnerMems.keys()):
         "#pragma HLS array_partition variable=outerStubs complete dim=1\n"
         "#pragma HLS array_partition variable=stubPairs complete dim=1\n"
     )
-    if nASMemInner == 1:
-        topFile.write("#pragma HLS resource variable=innerStubs.get_mem() latency=2\n")
-    else:
-        for i in range(0, nASMemInner):
-            topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
-    if nASMemOuter == 1:
-        topFile.write("#pragma HLS resource variable=outerStubs.get_mem() latency=2\n")
-    else:
-        for i in range(0, nASMemOuter):
-            topFile.write("#pragma HLS resource variable=outerStubs[" + str(i) + "].get_mem() latency=2\n")
-    if nSPMem == 1:
-        topFile.write("#pragma HLS resource variable=stubPairs.get_mem() latency=2\n")
-    else:
-        for i in range(0, nSPMem):
-            topFile.write("#pragma HLS resource variable=stubPairs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(0, nASMemInner):
+        topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(0, nASMemOuter):
+        topFile.write("#pragma HLS resource variable=outerStubs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(0, nSPMem):
+        topFile.write("#pragma HLS resource variable=stubPairs[" + str(i) + "].get_mem() latency=2\n")
     topFile.write(
         "#pragma HLS interface register port=bx_o\n"
         "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
