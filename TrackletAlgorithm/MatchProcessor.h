@@ -234,12 +234,12 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L3){
@@ -249,17 +249,17 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -269,12 +269,12 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else { // z cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L3){
@@ -284,17 +284,17 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -313,8 +313,11 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 namespace MC {
   enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> static constexpr bool FMMask();
+template<TF::layerDisk Layer, MC::imc PHI> static constexpr uint16_t FMMask();
+#include "MatchProcessor_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, int LAYER=TF::L1, MC::imc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& savedMatch,
@@ -412,7 +415,7 @@ void MatchCalculator(BXType bx,
   ap_int<10> delta_z         = stub_z - proj_z_corr;
   ap_int<14> delta_z_fact   = delta_z * kFact;
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
-  ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
+  const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
@@ -456,37 +459,53 @@ void MatchCalculator(BXType bx,
   if(goodmatch) { // Write out only the best match, based on the seeding 
     switch (proj_seed) {
     case 0:
-      fullmatch[0].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
+    if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
       nmcout1+=1-savedMatch;
-      break;
+    }
+    break;
     case 1:
-      fullmatch[1].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
+    if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
       nmcout2+=1-savedMatch;
-      break;
+    }
+    break;
     case 2:
-      fullmatch[2].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
+    if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
       nmcout3+=1-savedMatch;
-      break;
+    }
+    break;
     case 3:
-      fullmatch[3].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
+    if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
       nmcout4+=1-savedMatch;
-      break;
+    }
+    break;
     case 4:
-      fullmatch[4].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
+    if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
       nmcout5+=1-savedMatch;
-      break;
+    }
+    break;
     case 5:
-      fullmatch[5].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
+    if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
       nmcout6+=1-savedMatch;
-      break;
+    }
+    break;
     case 6:
-      fullmatch[6].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
+    if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
       nmcout7+=1-savedMatch;
-      break;
+    }
+    break;
     case 7:
-      fullmatch[7].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
+    if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
       nmcout8+=1-savedMatch;
-      break;
+    }
+    break;
     }
     savedMatch = 1;
   }

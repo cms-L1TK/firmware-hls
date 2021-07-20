@@ -11,9 +11,9 @@ open_project -reset match_processor
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top MatchProcessorTopL3
-add_files ../TrackletAlgorithm/MatchProcessorTopL3.cpp -cflags "$CFLAGS"
-add_files -tb ../TestBenches/MatchProcessorL3_test.cpp -cflags "$CFLAGS"
+set_top MatchProcessor_L3PHIC
+add_files ../TrackletAlgorithm/MatchProcessorTop.cc -cflags "$CFLAGS"
+add_files -tb ../TestBenches/MatchProcessor_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
 
@@ -21,8 +21,7 @@ open_solution "solution1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/MP/tables/
-add_files -tb ../emData/MP/MP_L3PHIC/
+add_files -tb ../emData/MP/
 
 csim_design -mflags "-j8"
 csynth_design

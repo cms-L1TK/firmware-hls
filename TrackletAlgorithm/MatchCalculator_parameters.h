@@ -13,4 +13,10 @@ template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask(
   return FMMask<Layer, PHI>() & (1<<Seed);
 }
 
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed>
+static const ap_uint<1 << Seed> FMCount() {
+  ap_uint<1<<Seed> bits(-1);
+  return __builtin_popcount(bits & FMMask<Layer, PHI>())-1;
+}
+
 #endif
