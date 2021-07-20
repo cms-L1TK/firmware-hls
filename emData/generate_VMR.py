@@ -658,12 +658,12 @@ Examples:
 python3 generate_VMR.py
 python3 generate_VMR.py --uut VMR_L1PHIE -o
 python3 generate_VMR.py --uut VMR_L1PHIE VMR_L1PHID
-python3 generate_VMRCM.py -a
+python3 generate_VMR.py -a
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMRouterCMs in a nonant.")
+    parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMRouters in a nonant.")
     parser.add_argument("-o", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterTop.h/cc files (instead of creating files e.g. VMRouterTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
     parser.add_argument("--uut", default=["VMR_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
     parser.add_argument("-w", "--wireconfig", type=str, default="LUTs/wires.dat",
