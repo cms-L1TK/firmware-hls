@@ -30,17 +30,28 @@ int main(){
 
 
   // open input files from emulation
-  ifstream fin_vmstubsinner("../../../../../emData/TE/TE_L1PHIE18_L2PHIC17/VMStubs_VMSTE_L1PHIE18n2_04.dat");
-  ifstream fin_vmstubsouter("../../../../../emData/TE/TE_L1PHIE18_L2PHIC17/VMStubs_VMSTE_L2PHIC17n4_04.dat");
-  ifstream fin_stubpairs("../../../../../emData/TE/TE_L1PHIE18_L2PHIC17/StubPairs_SP_L1PHIE18_L2PHIC17_04.dat");  
+  // TE_L1PHIE18_L2PHIC17
+  //ifstream fin_vmstubsinner("../../../../../emData/TE/TE_L1PHIE18_L2PHIC17/VMStubs_VMSTE_L1PHIE18n2_04.dat");
+  //ifstream fin_vmstubsouter("../../../../../emData/TE/TE_L1PHIE18_L2PHIC17/VMStubs_VMSTE_L2PHIC17n4_04.dat");
+  //ifstream fin_stubpairs("../../../../../emData/TE/TE_L1PHIE18_L2PHIC17/StubPairs_SP_L1PHIE18_L2PHIC17_04.dat");  
+  // TE_L1PHIC12_L2PHIB12/
+  ifstream fin_vmstubsinner("../../../../../emData/TE/TE_L1PHIC12_L2PHIB12/VMStubs_VMSTE_L1PHIC12n3_04.dat");
+  ifstream fin_vmstubsouter("../../../../../emData/TE/TE_L1PHIC12_L2PHIB12/VMStubs_VMSTE_L2PHIB12n3_04.dat");
+  ifstream fin_stubpairs("../../../../../emData/TE/TE_L1PHIC12_L2PHIB12/StubPairs_SP_L1PHIC12_L2PHIB12_04.dat");  
   assert(fin_vmstubsinner.good());
   assert(fin_vmstubsouter.good());
   assert(fin_stubpairs.good());
 
+  // TE_L1PHIE18_L2PHIC17
+  //ap_uint<1> bendinnertable[256] =
+  //#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"
+  //ap_uint<1> bendoutertable[256] =
+  //#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptoutercut.tab"
+  // TE_L1PHIC12_L2PHIB12/
   ap_uint<1> bendinnertable[256] =
-#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptinnercut.tab"
+#include "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptinnercut.tab"
   ap_uint<1> bendoutertable[256] =
-#include "../emData/TE/tables/TE_L1PHIE18_L2PHIC17_stubptoutercut.tab"
+#include "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptoutercut.tab"
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {

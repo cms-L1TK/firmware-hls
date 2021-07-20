@@ -43,6 +43,7 @@ declare -a processing_modules=(
   "VMRCM_L2PHIA"
 
   # TrackletEngine
+  "TE_L1PHIC12_L2PHIB12"
   "TE_L1PHIE18_L2PHIC17"
 
   # TrackletCalculator
