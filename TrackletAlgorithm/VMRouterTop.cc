@@ -1,15 +1,15 @@
 #include "VMRouterTop.h"
 
-// VMRouter Top Function for layer 2, AllStub region A
+// VMRouter Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-
-// NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterTop.h
-//          - add number to VMRouter_parameters.h if not already defined
+// To run a different phi region, change the following:
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterTop.h
+//          - add corresponding magic numbers to VMRouter_parameters.h if not already defined
 //          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
-
-
+//          OR
+//          - run emData/generate_VMR.py to generate new top and parameters files
 
 void VMRouterTop(const BXType bx, BXType& bx_o,
 	// Input memories
@@ -17,7 +17,6 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 #if kDISK > 0
 	, const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
 #endif
-
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[maxASCopies]
 	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
@@ -35,11 +34,6 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 // Takes 2 clock cycles before on gets data, used at high frequencies
 #pragma HLS resource variable=inputStubs[0].get_mem() latency=2
 #pragma HLS resource variable=inputStubs[1].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[2].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[3].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[4].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[5].get_mem() latency=2
-// #pragma HLS resource variable=inputStubs[6].get_mem() latency=2
 
 #pragma HLS interface register port=bx_o
 
@@ -73,10 +67,10 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 
 	//////////////////////////////////
 	// Create memory masks
-
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
 	// Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
+
 	static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (static_cast<char>(phiRegion) - 'A')); // ME memories
 	static const ap_uint<maskTEIsize> maskTEI =
 		(kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
@@ -87,7 +81,6 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 	static const ap_uint<maskTEOsize> maskTEO =
 		(kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4) ?
 				((1 << nvmTEO) - 1) << (nvmTEO * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Outer memories, only for even layers/disks, and layer and disk 1
-
 
 	/////////////////////////
 	// Main function
