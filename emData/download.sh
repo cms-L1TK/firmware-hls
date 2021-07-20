@@ -112,6 +112,12 @@ declare -a processing_modules=(
   "ME_D5PHIC12"
 
   # MatchCalculator
+  "MC_L1PHIB"
+  "MC_L2PHIB"
+  "MC_L3PHIB"
+  "MC_L4PHIB"
+  "MC_L5PHIB"
+  "MC_L6PHIB"
   "MC_L1PHIC"
   "MC_L2PHIC"
   "MC_L3PHIC"

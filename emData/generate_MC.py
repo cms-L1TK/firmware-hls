@@ -2,7 +2,7 @@
 
 # This script generates MatchCalculator_parameters.h,
 # MatchCalculatorTop.h, and MatchCalculatorTop.cc in the
-# TrackAlgorithm/ directory. Currently supports all MCs for L3_PHIC.
+# TrackletAlgorithm/ directory. Currently supports all MCs for L3_PHIC.
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -38,29 +38,32 @@ FMMems = {}
 for line in wiresFile:
     # Only barrel-only seeds are supported right now.
     # Works for MC L3 phi sector C
+    '''
     if not any(["MC_" + l + "PHIB" in line for l in ["L3", "L4", "L5", "L6"]]) and \
        not any(["MC_" + l + "PHIC" in line for l in ["L3"]]): #MC_L3PHIC was used for testing
         continue
+    '''
+    if "MC_D" in line: continue # No disks for now
     line = line.rstrip()
-    tcName = re.sub(r".*MC_(......).*", r"MC_\1", line)
+    mcName = re.sub(r".*MC_(......).*", r"MC_\1", line)
     memName = line.split()[0]
     if memName.startswith("CM_"):
-        if tcName not in CMMems:
-            CMMems[tcName] = []
-        CMMems[tcName].append(memName)
+        if mcName not in CMMems:
+            CMMems[mcName] = []
+        CMMems[mcName].append(memName)
     if memName.startswith("FM_"):
         FM = re.sub(r"FM_(....)_......", r"\1", memName)
-        if tcName not in FMMems:
-            FMMems[tcName] = []
-        FMMems[tcName].append(FM)
+        if mcName not in FMMems:
+            FMMems[mcName] = []
+        FMMems[mcName].append(FM)
 wiresFile.close()
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
 parametersFile = open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters.h"), "w")
 parametersFile.write(
-    "#ifndef TrackAlgorithm_MatchCalculator_parameters_h\n"
-    "#define TrackAlgorithm_MatchCalculator_parameters_h\n"
+    "#ifndef TrackletAlgorithm_MatchCalculator_parameters_h\n"
+    "#define TrackletAlgorithm_MatchCalculator_parameters_h\n"
     "\n"
     "// This file contains numbers of memories and bit masks that are specific to\n"
     "// each MatchCalculator and that come directly from the wiring.\n"
@@ -74,13 +77,11 @@ parametersFile.write(
 )
 topHeaderFile = open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.h"), "w")
 topHeaderFile.write(
-    "#ifndef TrackAlgorithm_MatchCalculatorTop_h\n"
-    "#define TrackAlgorithm_MatchCalculatorTop_h\n"
+    "#ifndef TrackletAlgorithm_MatchCalculatorTop_h\n"
+    "#define TrackletAlgorithm_MatchCalculatorTop_h\n"
     "\n"
     "#include \"MatchCalculator.h\"\n"
     "\n"
-    "constexpr int maxMatchCopies(" + str(len(TF_index)) + ");\n"
-    "constexpr int maxFullMatchCopies(" + str(len(TF_index)) + ");\n"
 )
 topFile = open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.cc"), "w")
 topFile.write(
@@ -94,20 +95,21 @@ topFile.write(
 )
 
 # Calculate parameters and print out parameters and top function for each MC.
-for tcName in sorted(CMMems.keys()):
-    seed = re.sub(r"MC_(..)....", r"\1", tcName)
-    iMC = re.sub(r"MC_.....(.)", r"\1", tcName)
+for mcName in sorted(CMMems.keys()):
+    seed = re.sub(r"MC_(..)....", r"\1", mcName)
+    iMC = re.sub(r"MC_.....(.)", r"\1", mcName)
 
     # numbers of memories
-    nCMMem = len(CMMems[tcName])
+    nCMMem = len(CMMems[mcName])
+    nFMMem = 8#FIXME after TBHelper is added to the test bench len(FMMems[tpName])
     FMMask = 0
-    for FM in FMMems[tcName]:
+    for FM in FMMems[mcName]:
         FMMask = FMMask | (1 << TF_index[FM])
 
     # Print out parameters for this MC.
     parametersFile.write(
         "\n"
-        "// magic numbers for " + tcName + "\n"
+        "// magic numbers for " + mcName + "\n"
         "template<> constexpr uint32_t FMMask<TF::" + seed + ", MC::" + iMC + ">() {\n"
         "  return 0x%X;\n"
         "}\n" % FMMask
@@ -116,13 +118,16 @@ for tcName in sorted(CMMems.keys()):
     # Print out prototype for top function for this MC.
     topHeaderFile.write(
         "\n"
+        "constexpr int " + seed + "PHI" + iMC + "maxMatchCopies(" + str(nCMMem) + ");\n"
+        "constexpr int " + seed + "PHI" + iMC + "maxFullMatchCopies(" + str(nFMMem) + ");\n"
+        "\n"
         "void MatchCalculator_" + seed + "PHI" + iMC + "(\n"
         "    const BXType bx,\n"
-        "    const CandidateMatchMemory match[maxMatchCopies],\n"
+        "    const CandidateMatchMemory match[" + seed + "PHI" + iMC + "maxMatchCopies],\n"
         "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
         "    const AllProjectionMemory<" + APRegion(seed) + ">* allproj,\n"
         "    BXType& bx_o,\n"
-        "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[maxFullMatchCopies]\n"
+        "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies]\n"
         ");\n"
     )
 
@@ -131,11 +136,11 @@ for tcName in sorted(CMMems.keys()):
         "\n"
         "void MatchCalculator_" + seed + "PHI" + iMC + "(\n"
         "    const BXType bx,\n"
-        "    const CandidateMatchMemory match[maxMatchCopies],\n"
+        "    const CandidateMatchMemory match[" + seed + "PHI" + iMC + "maxMatchCopies],\n"
         "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
         "    const AllProjectionMemory<" + APRegion(seed) + ">* allproj,\n"
         "    BXType& bx_o,\n"
-        "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[maxFullMatchCopies]\n"
+        "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies]\n"
         ") {\n"
         "#pragma HLS inline off\n"
         "#pragma HLS interface register port=bx_o\n"
