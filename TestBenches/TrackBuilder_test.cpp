@@ -24,10 +24,10 @@ int main()
   static FullMatchMemory<DISK> diskFullMatches[16];
 
   // output memories
-  static TrackFit::TrackWord trackWord[kMaxProc];
-  static TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc];
-  static TrackFit::DiskStubWord diskStubWords[4][kMaxProc];
-  static TrackFitMemory tracksMem;
+  static TrackFit<4, 4>::TrackWord trackWord[kMaxProc];
+  static TrackFit<4, 4>::BarrelStubWord barrelStubWords[4][kMaxProc];
+  static TrackFit<4, 4>::DiskStubWord diskStubWords[4][kMaxProc];
+  static TrackFitMemory<4, 4> tracksMem;
 
   ///////////////////////////
   // open input files
@@ -180,10 +180,10 @@ int main()
 
     // Clear all output memories before starting.
     for (unsigned short i = 0; i < kMaxProc; i++) {
-      trackWord[i] = TrackFit::TrackWord(0);
+      trackWord[i] = TrackFit<4, 4>::TrackWord(0);
       for (unsigned short j = 0; j < 4; j++) {
-        barrelStubWords[j][i] = TrackFit::BarrelStubWord(0);
-        diskStubWords[j][i] = TrackFit::DiskStubWord(0);
+        barrelStubWords[j][i] = TrackFit<4, 4>::BarrelStubWord(0);
+        diskStubWords[j][i] = TrackFit<4, 4>::DiskStubWord(0);
       }
     }
     tracksMem.clear();
@@ -251,7 +251,7 @@ int main()
 
     unsigned nTracks = 0;
     for (unsigned short i = 0; i < kMaxProc; i++) {
-      TrackFit track;
+      TrackFit<4, 4> track;
       track.setTrackWord(trackWord[i]);
       track.setBarrelStubWord<0>(barrelStubWords[0][i]);
       track.setBarrelStubWord<1>(barrelStubWords[1][i]);
@@ -269,23 +269,23 @@ int main()
     const auto &pos = fout_tracks.tellg();
 
     // compare the computed outputs with the expected ones
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFHitMapLSB,TrackFit::kTFTrackValidMSB>(tracksMem, fout_tracks, ievt, "\nTrack word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFHitMapLSB,TrackFit<4, 4>::kTFTrackValidMSB>(tracksMem, fout_tracks, ievt, "\nTrack word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(0),TrackFit::kTFStubValidMSB(0)>(tracksMem, fout_tracks, ievt, "\nStub 0 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(0),TrackFit<4, 4>::kTFStubValidMSB(0)>(tracksMem, fout_tracks, ievt, "\nStub 0 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(1),TrackFit::kTFStubValidMSB(1)>(tracksMem, fout_tracks, ievt, "\nStub 1 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(1),TrackFit<4, 4>::kTFStubValidMSB(1)>(tracksMem, fout_tracks, ievt, "\nStub 1 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(2),TrackFit::kTFStubValidMSB(2)>(tracksMem, fout_tracks, ievt, "\nStub 2 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(2),TrackFit<4, 4>::kTFStubValidMSB(2)>(tracksMem, fout_tracks, ievt, "\nStub 2 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(3),TrackFit::kTFStubValidMSB(3)>(tracksMem, fout_tracks, ievt, "\nStub 3 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(3),TrackFit<4, 4>::kTFStubValidMSB(3)>(tracksMem, fout_tracks, ievt, "\nStub 3 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(4),TrackFit::kTFStubValidMSB(4)>(tracksMem, fout_tracks, ievt, "\nStub 4 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(4),TrackFit<4, 4>::kTFStubValidMSB(4)>(tracksMem, fout_tracks, ievt, "\nStub 4 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(5),TrackFit::kTFStubValidMSB(5)>(tracksMem, fout_tracks, ievt, "\nStub 5 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(5),TrackFit<4, 4>::kTFStubValidMSB(5)>(tracksMem, fout_tracks, ievt, "\nStub 5 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(6),TrackFit::kTFStubValidMSB(6)>(tracksMem, fout_tracks, ievt, "\nStub 6 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(6),TrackFit<4, 4>::kTFStubValidMSB(6)>(tracksMem, fout_tracks, ievt, "\nStub 6 word", truncate);
     fout_tracks.clear(), fout_tracks.seekg(pos);
-    err += compareMemWithFile<TrackFitMemory,16,16,TrackFit::kTFStubRZResidLSB(7),TrackFit::kTFStubValidMSB(7)>(tracksMem, fout_tracks, ievt, "\nStub 7 word", truncate);
+    err += compareMemWithFile<TrackFitMemory<4, 4>,16,16,TrackFit<4, 4>::kTFStubRZResidLSB(7),TrackFit<4, 4>::kTFStubValidMSB(7)>(tracksMem, fout_tracks, ievt, "\nStub 7 word", truncate);
     cout << endl;
 
   } // end of event loop

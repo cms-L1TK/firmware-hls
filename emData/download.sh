@@ -81,6 +81,12 @@ declare -a processing_modules=(
   "ME_L4PHIB12"
 
   # MatchCalculator
+  "MC_L1PHIB"
+  "MC_L2PHIB"
+  "MC_L3PHIB"
+  "MC_L4PHIB"
+  "MC_L5PHIB"
+  "MC_L6PHIB"
   "MC_L1PHIC"
   "MC_L2PHIC"
   "MC_L3PHIC"
@@ -89,7 +95,12 @@ declare -a processing_modules=(
   "MC_L6PHIC"
 
   # MatchProcessor
+  "MP_L1PHIC"
+  "MP_L2PHIC"
   "MP_L3PHIC"
+  "MP_L4PHIC"
+  "MP_L5PHIC"
+  "MP_L6PHIC"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"

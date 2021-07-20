@@ -175,9 +175,6 @@ namespace TC {
   );
 }
 
-template<TF::seed Seed, TC::itc iTC> constexpr uint8_t NASMemInner();
-template<TF::seed Seed, TC::itc iTC> constexpr uint8_t NASMemOuter();
-template<TF::seed Seed, TC::itc iTC> constexpr uint8_t NSPMem();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t ASInnerMask();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t ASOuterMask();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
