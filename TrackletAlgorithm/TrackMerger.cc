@@ -21,13 +21,13 @@ void TrackMerger(const BXType bx,
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
         ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();
-        std::cout << "trackWord: " << trackWord << " " << "Track Stub Map: " << trackStubMap<< std::endl;
+        std::cout << "trackWord: " << trackWord[i] << " " << "Track Stub Map: " << trackStubMap<< std::endl;
         //auto trackHitCount = trkFit.getHitCount();
         //std::cout << "Track Stub Map: " << trackStubMap << std::endl;
         // every 3 bits is a new layer/disk - getting number of stubs in each layer
         //for (int layer = 0; layer < trackStubMap.length()/TrackFit::kTFHitCountSize; layer++){
              
-        for (unsigned int j = 0; j < TrackFit::kNBarrelStubs - 1; j++){ 
+        for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
             switch (j){
               case 0:
                 trkFit.setBarrelStubWord<0>(barrelStubWords[0][i]);
@@ -49,21 +49,21 @@ void TrackMerger(const BXType bx,
             }
         }  
             
-        for (unsigned int k = TrackFit::kNBarrelStubs; k < TrackFit::kNStubs - 1 ; k++){
+        for (unsigned int k = TrackFit::kNDiskStubs; k < TrackFit::kNStubs; k++){
             switch (k){
-              case 0:
+              case 4:
                 trkFit.setDiskStubWord<4>(diskStubWords[0][i]);
                 std::cout << "Disk: " << trkFit.getDiskStubWord<4>() << std::endl;
                 break;
-              case 1:
+              case 5:
                 trkFit.setDiskStubWord<5>(diskStubWords[1][i]);
                 std::cout << "Disk: " << trkFit.getDiskStubWord<5>() << std::endl;
                 break;
-              case 2:
+              case 6:
                 trkFit.setDiskStubWord<6>(diskStubWords[2][i]);
                 std::cout << "Disk: " << trkFit.getDiskStubWord<6>() << std::endl;
                 break;
-              case 3:
+              case 7:
                 trkFit.setDiskStubWord<7>(diskStubWords[3][i]);
                 std::cout << "Disk: " << trkFit.getDiskStubWord<7>() << std::endl;
                 break;
