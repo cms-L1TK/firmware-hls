@@ -42,7 +42,17 @@ declare -a processing_modules=(
   "VMR_D5PHIA"
 
   # VMRouter CM
+  "VMRCM_L1PHIA"
   "VMRCM_L2PHIA"
+  "VMRCM_L3PHIA"
+  "VMRCM_L4PHIA"
+  "VMRCM_L5PHIA"
+  "VMRCM_L6PHIA"
+  "VMRCM_D1PHIA"
+  "VMRCM_D2PHIA"
+  "VMRCM_D3PHIA"
+  "VMRCM_D4PHIA"
+  "VMRCM_D5PHIA"
 
   # TrackletEngine
   "TE_L1PHIC12_L2PHIB12"

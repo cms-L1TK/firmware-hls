@@ -1,0 +1,542 @@
+#!/usr/bin/env python
+
+## python 2/3 inter-compatibility
+from __future__ import absolute_import, print_function
+
+# This script generates VMRouterCM_parameters.h, VMRouterCMTop.h, 
+# and VMRouterCMTop.cc for the Combined Module VMR in the TrackletAlgorithm/ directory. 
+# Supports all VMRs, but creates separate top function files each
+# VMR specified. VMRouterCM_parameters.h contains magic numbers 
+# for all "default" VMRs plus additonals VMR if specified.
+
+import argparse
+import collections
+
+# Constants
+num_layers = 6
+num_disks = 5
+
+# The VMRs specified in download.sh
+default_vmr_list = ["VMR_L1PHIA", "VMR_L2PHIA", "VMR_L3PHIA" ,"VMR_L4PHIA", "VMR_L5PHIA", "VMR_L6PHIA", "VMR_D1PHIA", "VMR_D2PHIA", "VMR_D3PHIA", "VMR_D4PHIA", "VMR_D5PHIA"]
+
+# Lists of which layer/disk has VMSTE memories
+has_vmste_outer = [False, True, True, True, False, True, True, True, False, True, False]
+
+
+#############################################
+# Returns a dictionary of memories
+
+# One key for every memory type in each layer/disk
+# Value is a list of all memory names for that key
+
+def getDictOfMemories(wireconfig, vmr_list):
+
+    # Dictionary of all the input and output memories
+    mem_dict = {}
+
+    # Open wiring file
+    wires_file = open(wireconfig)
+
+    # Loop over each line in the wiring
+    for line in wires_file:
+        # Check if any of the VMRs exist in the line
+        for vmr in vmr_list:
+            if vmr in line:
+                mem_name = line.split()[0]
+                mem_type = mem_name.split("_")[0]
+                # Check if memory type is Inner AllStub or IL DISK2S
+                if "IL_D" in mem_name and "2S" in mem_name:
+                    mem_type = mem_type + "_DISK2S_" + vmr
+                elif "innerallstubin" in line:
+                    mem_type = mem_type + "I_" + vmr
+                else: 
+                    mem_type = mem_type + "_" + vmr
+                # Add memory and memory type to dictionary
+                if mem_type not in mem_dict:
+                    mem_dict[mem_type] = [mem_name]
+                else:
+                    mem_dict[mem_type].append(mem_name)
+                break
+
+    # Loop over all memories and add an empty IL DISK2S, AllStub Inner, and VMSTE memory lists if missing in dictionary
+    for vmr in vmr_list:
+        if "IL_DISK2S_" + vmr not in mem_dict:
+            mem_dict["IL_DISK2S_" + vmr] = []
+        if "VMSTE_" + vmr not in mem_dict:
+            mem_dict["VMSTE_" + vmr] = []
+        if "ASI_" + vmr not in mem_dict:
+            mem_dict["ASI_" + vmr] = []
+
+    wires_file.close()
+
+    return mem_dict
+
+
+###################################
+# Returns a dictionary of memory copies
+
+# Count the number of memories and copies, as the number of copies can differ
+
+def getDictOfCopies(mem_list):
+
+    mem_copy_dict = collections.OrderedDict() # Dictionary that counts the number of copies
+
+    for mem in mem_list:
+        mem_name = mem.split("n")[0] # Memory name without the copy number
+
+        # Count the number of copies
+        if mem_name not in mem_copy_dict:
+            mem_copy_dict[mem_name] = 1
+        else:
+            mem_copy_dict[mem_name] += 1
+
+    return mem_copy_dict
+
+
+###################################
+# Returns a string of the AllStub Inner memory mask
+
+# Masks of which AllStubInner memories that are being used in this phi region; represente by a "1"
+# First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
+# NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
+
+def getAllStubInnerMaskString(mem_list):
+
+    as_inner_list = ["OR", "OM", "OL", "BR/DR", "BM/DM", "BL/DL", "BF", "BE", "BD", "BC", "BB", "BA"]
+    mask = "0b";
+
+    # Loop over all the different AllStub Inner type
+    for mem_type in as_inner_list:
+        if any(mem_type in mem for mem in mem_list):
+            mask += "1"
+        elif "/" in mem_type:
+            if any(mem_type.split("/")[0] in mem for mem in mem_list) or any(mem_type.split("/")[1] in mem for mem in mem_list):
+                mask += "1"
+            else:
+                mask += "0"
+        else:
+            mask += "0"
+
+    return mask
+
+
+##########################################
+# Writes the VMRouterCM_parameters.h file
+
+# Contains magic numbers for all default VMRs specified in download.sh
+# and the specified units under test if non-default. Make sure to add
+# non-default VMRs to download.sh and run it before running Vivado HLS
+
+def writeParameterFile(mem_dict):
+
+    parameter_file = open("../TrackletAlgorithm/VMRouterCM_parameters.h", "w")
+
+    # Write preamble
+    parameter_file.write(
+"""#ifndef TrackletAlgorithm_VMRouterCM_parameters_h
+#define TrackletAlgorithm_VMRouterCM_parameters_h
+
+// Hardcoded number of memories and masks from the wiring.
+// Generated by generate_VMRCM.py
+""")
+
+    parameter_file.write("// Contains number for the following VMRs: " + " ".join(vmr for vmr in default_vmr_list) + "\n")
+
+    # Declare functions
+    parameter_file.write("""
+// Enums used to get the correct parameters
+enum class phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};
+
+// The functions that returns parameters and LUTs
+template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();
+template<TF::layerDisk LayerDisk> const int* getMETable();
+template<TF::layerDisk LayerDisk> const int* getTETable();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputsDisk2S();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASCopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASInnerCopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumTEOCopies();
+template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerMask();
+
+// VMPhiCorr LUTs
+"""
+    )
+
+    # Write phi correction LUTs functions
+    for i in range(num_layers):
+        parameter_file.write(
+            "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
+            "  static int lut[] = \n"
+            "#include \"../emData/VMRCM/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n"
+            "  return lut;\n"
+            "}\n"
+        )
+    for i in range(num_disks):
+        parameter_file.write(
+            "template<> inline const int* getPhiCorrTable<TF::D" + str(i+1) + ">(){\n"
+            "  return nullptr;\n"
+            "}\n"
+        )
+
+    # Write ME Tables
+    parameter_file.write("\n// ME Tables\n")
+    for i in range(num_layers):
+        parameter_file.write(
+            "template<> inline const int* getMETable<TF::L" + str(i+1) + ">(){\n"
+            "  static int lut[] =\n#include \"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\"\n  return lut;\n"
+            "}\n"
+        )
+    for i in range(num_disks):
+        parameter_file.write(
+            "template<> inline const int* getMETable<TF::D" + str(i+1) + ">(){\n"
+            "  static int lut[] =\n#include \"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\"\n  return lut;\n"
+            "}\n"
+        )
+
+    # Write TE Tables
+    parameter_file.write("\n// TE Tables\n")
+    for i in range(num_layers):
+        parameter_file.write(
+            "template<> inline const int* getTETable<TF::L" + str(i+1) + ">(){\n"
+            "  return nullptr;\n"
+            "}\n"
+        )
+    for i in range(num_disks):
+        parameter_file.write(
+            "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
+            +("  static int lut[] =\n#include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
+            "}\n"
+        )
+
+    # Write VMR specific functions
+    for vmr in default_vmr_list:
+
+        layer_disk_char = vmr.split("_")[1][0] # 'L' or 'D'
+        layer_disk_num = int(vmr.split("_")[1][1])
+        phi_region= vmr.split("PHI")[1]
+
+        # Get the number of copies for the specified TE memory type
+        mem_copy_dict = getDictOfCopies(mem_dict["VMSTE_" + vmr])
+        max_copy_count = max(mem_copy_dict.values()) if mem_copy_dict else 0
+
+        parameter_file.write(
+            "\n////////////////\n// " + vmr + " //\n////////////////\n"
+            "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
+            "  return " + str(len(mem_dict["IL_"+vmr])) + ";\n"
+            "}\n"
+            "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of DISK2S input memories\n"
+            "  return " + str(len(mem_dict["IL_DISK2S_"+vmr])) + ";\n"
+            "}\n"
+            "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub memory\n"
+            "  return " + str(len(mem_dict["AS_"+vmr])) + ";\n"
+            "}\n"
+            "template<> constexpr int getNumASInnerCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub Inner memory\n"
+            "  return " + str(len(mem_dict["ASI_"+vmr]) if mem_dict["ASI_"+vmr] else 1) + ";\n"
+            "}\n"
+            "template<> constexpr int getNumTEOCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE Outer memories\n"
+            "  return " + str(max_copy_count) + ";\n"
+            "}\n"
+            "template<> constexpr int getAllStubInnerMask<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+            "  return " + getAllStubInnerMaskString(mem_dict["ASI_"+vmr]) + ";\n"
+            "}\n"
+        )
+
+    # End parameter file
+    parameter_file.write("\n#endif // TrackletAlgorithm_VMRouterCM_parameters_h\n")
+    parameter_file.close()
+
+
+#################################
+# Writes the VMRouterCMTop.h file
+
+def writeTopHeader(vmr_specific_name, vmr):
+
+    # Get layer/disk number and phi region
+    layer = vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0
+    disk = 0 if layer else vmr.split("_")[1][1]
+    phi_region= vmr.split("PHI")[1]
+
+    # Top file name
+    file_name = "VMRouterCMTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
+
+    header_file = open("../TrackletAlgorithm/" + file_name  + ".h", "w")
+
+    # Write preamble
+    header_file.write(
+"#ifndef TrackletAlgorithm_" + file_name + "_h\n" +\
+"#define TrackletAlgorithm_" + file_name + "_h\n" +\
+"""
+#include "VMRouterCM.h"
+#include "VMRouterCM_parameters.h"
+
+// VMRouterCM Top Function
+// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
+
+// To run a different phi region, change the following:
+//          - add the phi region in emData/download.sh, make sure to also run clean
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
+//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
+//          OR
+//          - run emData/generate_VMRCM.py to generate new top and parameters files
+
+////////////////////////////////////////////
+// Variables for that are specified with regards to the VMR region
+
+"""
+    )
+
+    # Write the configuration
+    header_file.write(
+"#define kLAYER " + str(layer) + " // Which barrel layer number the data is coming from\n"
+"#define kDISK " + str(disk) + " // Which disk number the data is coming from, 0 if not disk\n\n"
+
+"constexpr phiRegions phiRegion = phiRegions::" + phi_region+ "; // Which AllStub/PhiRegion\n"
+    )
+
+    # Write the rest...
+    header_file.write("""
+
+///////////////////////////////////////////////
+// Values that don't need manual changing
+
+constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
+
+// Number of inputs
+constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
+constexpr int numInputsDisk2S = getNumInputsDisk2S<layerdisk, phiRegion>(); // Number of DISK2S input memories
+
+// Maximum number of memory "copies" for this Phi region
+constexpr int numASCopies = getNumASCopies<layerdisk, phiRegion>(); // Allstub memory
+constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory
+constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories
+
+// Masks of which AllStubInner memories that are being used in this phi region; represented by a "1"
+// First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
+// NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
+static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<layerdisk, phiRegion>();
+
+//Bit size of phi and rz bins
+constexpr int phiRegSize(3);
+constexpr int rzSizeTE(3);
+
+#if kLAYER == kDISK
+#error kLAYER and kDISK can not be the same
+#elif kLAYER > 0
+	constexpr int rzSizeME = 3;
+	// What regionType the input/output is
+	constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+	constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
+
+#elif kDISK > 0
+	constexpr int rzSizeME = 4;
+	// What regionType the input/output is
+	constexpr regionType inputType = DISKPS;
+	constexpr regionType outputType = DISK;
+
+#else
+#error Need to have either kLAYER or kDISK larger than 0.
+#endif
+
+
+/////////////////////////////////////////////////////
+// VMRouterCM Top Function
+
+void VMRouterCMTop(const BXType bx, BXType& bx_o
+	// Input memories
+	, const InputStubMemory<inputType> inputStubs[numInputs]
+#if kDISK > 0
+  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+#endif
+
+	// Output memories
+	, AllStubMemory<outputType> memoriesAS[numASCopies]
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 || kDISK == 3
+	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
+#endif
+	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits> memoriesTEO[numTEOCopies]
+#endif
+	);
+
+#endif // TrackletAlgorithm_VMRouterCMTop_h
+"""
+    )
+
+    header_file.close()
+
+
+# Writes the VMRouterCMTop.cc file
+def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
+
+    # Top file name
+    file_name = "VMRouterCMTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
+
+    top_file = open("../TrackletAlgorithm/" + file_name  + ".cc", "w")
+
+    # Write preamble
+    top_file.write("#include \"" + file_name + ".h\"" +\
+"""
+
+// VMRouterCM Top Function
+// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
+// To run a different phi region, change the following:
+//          - add the phi region in emData/download.sh, make sure to also run clean
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
+//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
+//          OR
+//          - run emData/generateCM_VMR.py to generate new top and parameters files
+
+void VMRouterCMTop(const BXType bx, BXType& bx_o
+	// Input memories
+	, const InputStubMemory<inputType> inputStubs[numInputs]
+#if kDISK > 0
+  , const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S]
+#endif
+
+	// Output memories
+	, AllStubMemory<outputType> memoriesAS[numASCopies]
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
+	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
+#endif
+	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits> memoriesTEO[numTEOCopies]
+#endif
+	) {
+
+// Takes 2 clock cycles before on gets data, used at high frequencies
+"""
+    )
+
+    for i in range(num_inputs):
+        top_file.write("#pragma HLS resource variable=inputStubs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(num_inputs_disk2s):
+        top_file.write("#pragma HLS resource variable=inputStubsDisk2S[" + str(i) + "].get_mem() latency=2\n")
+
+    top_file.write("""
+#pragma HLS interface register port=bx_o
+
+	///////////////////////////
+	// Open Lookup tables
+
+	// LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
+	// Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
+	// Indexed using r and z position bits
+	static const int* METable = getMETable<layerdisk>();
+	static const int* TETable = getTETable<layerdisk>();
+
+	// LUT with phi corrections to project the stub to the average radius in a layer.
+	// Only used by layers.
+	// Indexed using phi and bend bits
+	static const int* phiCorrTable = getPhiCorrTable<layerdisk>();
+
+
+	/////////////////////////
+	// Main function
+
+	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSizeME, rzSizeTE, phiRegSize, numTEOCopies>
+	(bx, bx_o, 
+
+		// LUTs
+		METable,
+		TETable,
+		phiCorrTable,
+
+		// Input memories
+		inputStubs, 
+#if kDISK > 0
+		inputStubsDisk2S,
+#else
+		nullptr,
+#endif
+
+		// AllStub memories
+		memoriesAS, 
+		maskASI, 
+#if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 || kDISK == 3
+		memoriesASInner,
+#else
+		nullptr,
+#endif
+
+		// ME memories
+		memoryME,
+
+		// TEOuter memories
+#if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
+		memoriesTEO
+#else
+		nullptr
+#endif
+		);
+
+	return;
+}
+"""
+    )
+
+    top_file.close()
+
+
+###############################
+# Main execution
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description = """
+Generates top function and parameter files for the VMRouterCM.
+VMRouterCMTop*.h and VMRouterCMTop*.cc contain the top function for the units under test specified (default VMR_L2PHIA).
+VMRouterCM_parameters.h contains the magic numbers for the specified unit under test in addition to: """ + " ".join(vmr for vmr in default_vmr_list) + """.
+
+Examples:
+python3 generate_VMRCM.py
+python3 generate_VMRCM.py --uut VMR_L1PHIE -o
+python3 generate_VMRCM.py --uut VMR_L1PHIE VMR_L1PHID
+python3 generate_VMRCM.py -a
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMRouterCMs in a nonant.")
+    parser.add_argument("-o", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterCMTop.h/cc files (instead of creating files e.g. VMRouterCMTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
+    parser.add_argument("--uut", default=["VMR_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
+    parser.add_argument("-w", "--wireconfig", type=str, default="LUTsCM/wires.dat",
+                        help="Name and directory of the configuration file for wiring (default = %(default)s)")
+
+    args = parser.parse_args()
+
+    # Dictionary of all memories sorted by type and Unit Under Test
+    mem_dict = getDictOfMemories(args.wireconfig, default_vmr_list)
+
+    # Include the VMR name in the names of VMRouterCMTop files
+    if len(args.uut) > 1 or not args.overwrite:
+        vmr_specific_name = True
+    else:
+        vmr_specific_name = False
+
+    # Loop over all Units Under Test
+    for vmr in args.uut:
+        # Check that the Unit Under Test is a VMR
+        if "VMR" not in vmr:
+            raise IndexError("Unit under test has to be a VMR.")
+
+        # Check if one of the default VMRs
+        if vmr not in default_vmr_list:
+            default_vmr_list.append(vmr)
+            default_vmr_list.sort()
+            mem_dict.update(getDictOfMemories(args.wireconfig, [vmr]))
+
+            print("\nMake sure to add " + vmr + "to download.sh and run it before running Vivado HLS.\n")
+
+        # Create and write the files
+        writeTopHeader(vmr_specific_name, vmr)
+        writeTopFile(vmr_specific_name, vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]))
+
+    # Write parameters file
+    writeParameterFile(mem_dict)
