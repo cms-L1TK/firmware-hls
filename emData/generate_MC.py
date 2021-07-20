@@ -37,12 +37,6 @@ CMMems = {}
 FMMems = {}
 for line in wiresFile:
     # Only barrel-only seeds are supported right now.
-    # Works for MC L3 phi sector C
-    '''
-    if not any(["MC_" + l + "PHIB" in line for l in ["L3", "L4", "L5", "L6"]]) and \
-       not any(["MC_" + l + "PHIC" in line for l in ["L3"]]): #MC_L3PHIC was used for testing
-        continue
-    '''
     if "MC_D" in line: continue # No disks for now
     line = line.rstrip()
     mcName = re.sub(r".*MC_(......).*", r"MC_\1", line)
