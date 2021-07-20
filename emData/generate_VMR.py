@@ -106,6 +106,28 @@ def getDictOfCopies(mem_list):
     return mem_copy_dict
 
 
+###################################
+# Returns a list of all VMRs
+
+def getAllVMRs(wireconfig):
+
+    vmr_list = []
+
+    # Open wiring file
+    wires_file = open(wireconfig)
+
+    # Loop over each line in the wiring
+    for line in wires_file:
+        module_name = line.split(" ")[-1].split(".")[0]
+        # Add module name if not already in vmr_list
+        if "VMR" in module_name and module_name not in vmr_list:
+            vmr_list.append(module_name)
+
+    wires_file.close()
+
+    return vmr_list
+
+
 #########################################
 # Bendcut Table Helper Function
 
@@ -636,10 +658,12 @@ Examples:
 python3 generate_VMR.py
 python3 generate_VMR.py --uut VMR_L1PHIE -o
 python3 generate_VMR.py --uut VMR_L1PHIE VMR_L1PHID
+python3 generate_VMRCM.py -a
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
+    parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMRouterCMs in a nonant.")
     parser.add_argument("-o", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterTop.h/cc files (instead of creating files e.g. VMRouterTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
     parser.add_argument("--uut", default=["VMR_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
     parser.add_argument("-w", "--wireconfig", type=str, default="LUTs/wires.dat",
@@ -650,14 +674,19 @@ python3 generate_VMR.py --uut VMR_L1PHIE VMR_L1PHID
     # Dictionary of all memories sorted by type and Unit Under Test
     mem_dict = getDictOfMemories(args.wireconfig, default_vmr_list)
 
-    # Include the VMR name in the names of VMRouterTop files
-    if len(args.uut) > 1 or not args.overwrite:
+    # Include the VMR name in the names of VMRouterCMTop files
+    if len(args.uut) > 1 or not args.overwrite or args.all:
         vmr_specific_name = True
     else:
         vmr_specific_name = False
 
     # Loop over all Units Under Test
-    for vmr in args.uut:
+    if args.all:
+        vmr_list = getAllVMRs(args.wireconfig)
+    else:
+        vmr_list = args.uut
+
+    for vmr in vmr_list:
         # Check that the Unit Under Test is a VMR
         if "VMR" not in vmr:
             raise IndexError("Unit under test has to be a VMR.")
@@ -668,7 +697,7 @@ python3 generate_VMR.py --uut VMR_L1PHIE VMR_L1PHID
             default_vmr_list.sort()
             mem_dict.update(getDictOfMemories(args.wireconfig, [vmr]))
 
-            print("\nMake sure to add " + vmr + "to download.sh and run it before running Vivado HLS.\n")
+            print("Make sure to add " + vmr + " to download.sh and run it before running Vivado HLS.")
 
         # Create and write the files
         writeTopHeader(vmr_specific_name, vmr)

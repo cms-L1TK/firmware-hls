@@ -94,6 +94,27 @@ def getDictOfCopies(mem_list):
 
 
 ###################################
+# Returns a list of all VMRs
+
+def getAllVMRs(wireconfig):
+
+    vmr_list = []
+
+    # Open wiring file
+    wires_file = open(wireconfig)
+
+    # Loop over each line in the wiring
+    for line in wires_file:
+        module_name = line.split(" ")[-1].split(".")[0]
+        # Add module name if not already in vmr_list
+        if "VMR" in module_name and module_name not in vmr_list:
+            vmr_list.append(module_name)
+
+    wires_file.close()
+
+    return vmr_list
+
+###################################
 # Returns a string of the AllStub Inner memory mask
 
 # Masks of which AllStubInner memories that are being used in this phi region; represente by a "1"
@@ -515,16 +536,21 @@ python3 generate_VMRCM.py -a
     mem_dict = getDictOfMemories(args.wireconfig, default_vmr_list)
 
     # Include the VMR name in the names of VMRouterCMTop files
-    if len(args.uut) > 1 or not args.overwrite:
+    if len(args.uut) > 1 or not args.overwrite or args.all:
         vmr_specific_name = True
     else:
         vmr_specific_name = False
 
     # Loop over all Units Under Test
-    for vmr in args.uut:
+    if args.all:
+        vmr_list = getAllVMRs(args.wireconfig)
+    else:
+        vmr_list = args.uut
+
+    for vmr in vmr_list:
         # Check that the Unit Under Test is a VMR
         if "VMR" not in vmr:
-            raise IndexError("Unit under test has to be a VMR.")
+            raise IndexError("Unit under test has to be an existing VMR. Example: VMR_L1PHIA.")
 
         # Check if one of the default VMRs
         if vmr not in default_vmr_list:
@@ -532,7 +558,7 @@ python3 generate_VMRCM.py -a
             default_vmr_list.sort()
             mem_dict.update(getDictOfMemories(args.wireconfig, [vmr]))
 
-            print("\nMake sure to add " + vmr + "to download.sh and run it before running Vivado HLS.\n")
+            print("Make sure to add " + vmr + " to download.sh and run it before running Vivado HLS.")
 
         # Create and write the files
         writeTopHeader(vmr_specific_name, vmr)
