@@ -3,7 +3,9 @@
 
 #ifdef CMSSW_GIT_HASH
 
- static std::string decodeToBits(unsigned int field, unsigned int size) {
+ template<class T>
+ std::string decodeToBits(const T field) {
+   constexpr unsigned int size = T::width;
    unsigned int valtmp = field;
    std::string str = "";
    for(unsigned int i=0; i< size; i++) {

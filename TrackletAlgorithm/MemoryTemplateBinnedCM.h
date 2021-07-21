@@ -228,16 +228,16 @@ class MemoryTemplateBinnedCM{
 
   static constexpr int getWidth() {return DataType::getWidth();}
   
-  static std::string decodeToBits(unsigned int field, unsigned int size) {
-    unsigned int valtmp = field;
-    std::string str = "";
-    for(unsigned int i=0; i< size; i++) {
-      str = ((valtmp & 1) ? "1" : "0") + str;
-      valtmp >>= 1;
-    }
-    return str;
-  }
+#endif
 
+#ifdef CMSSW_GIT_HASH
+  std::string name_;
+  void setName(std::string name) { name_ = name;}
+  std::string const& getName() const { return name_;}
+
+  unsigned int iSector_;
+  void setSector(unsigned int iS) { iSector_ = iS;}
+  unsigned int getSector() const { return iSector_;}
 #endif
   
 };

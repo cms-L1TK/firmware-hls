@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // AllStubBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubBase {};
@@ -188,12 +189,10 @@ public:
 
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getR(),AllStubBase<ASType>::kASRSize);
-    str += "|"+decodeToBits(getZ(),AllStubBase<ASType>::kASZSize);
-    str += "|"+decodeToBits(getPhi(),AllStubBase<ASType>::kASPhiSize);
-    // Different get method for DISKPS?  Where is it?     
-    //     str += "|"+decodeToBits(getAlpha(),AllStubBase<ASType>::kASAlphaSize);
-    str += "|"+decodeToBits(getBend(),AllStubBase<ASType>::kASBendSize);
+    std::string str = decodeToBits(getR());
+    str += "|"+decodeToBits(getZ());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getBend());
     return str;
   }
 #endif

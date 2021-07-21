@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplateBinnedCM.h"
+#include "globalFunctions.h"
 
 // VMStubMECMBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSMEType> class VMStubMECMBase {};
@@ -137,9 +138,9 @@ public:
 
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getIndex(),VMStubMECMBase<VMSMEType>::kVMSMEIDSize);
-    str += "|"+decodeToBits(getBend(),VMStubMECMBase<VMSMEType>::kVMSMEBendSize);
-    str += "|"+decodeToBits(getFineZ(),VMStubMECMBase<VMSMEType>::kVMSMEFineZSize);
+    std::string str = decodeToBits(getIndex());
+    str += "|"+decodeToBits(getBend());
+    str += "|"+decodeToBits(getFineZ());
     return str;
   }
 #endif

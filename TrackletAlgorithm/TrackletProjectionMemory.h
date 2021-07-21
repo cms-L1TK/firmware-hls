@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
@@ -215,12 +216,12 @@ public:
 
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getTCID(),TrackletProjectionBase<TProjType>::kTProjTCIDSize);
-    str += "|"+decodeToBits(getTrackletIndex(),TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize);
-    str += "|"+decodeToBits(getPhi(),TrackletProjectionBase<TProjType>::kTProjPhiSize);
-    str += "|"+decodeToBits(getRZ(),TrackletProjectionBase<TProjType>::kTProjRZSize);
-    str += "|"+decodeToBits(getPhiDer(),TrackletProjectionBase<TProjType>::kTProjPhiDSize);
-    str += "|"+decodeToBits(getRZDer(),TrackletProjectionBase<TProjType>::kTProjRZDSize);
+    std::string str = decodeToBits(getTCID());
+    str += "|"+decodeToBits(getTrackletIndex());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getRZ());
+    str += "|"+decodeToBits(getPhiDer());
+    str += "|"+decodeToBits(getRZDer());
     return str;
   }
 #endif
