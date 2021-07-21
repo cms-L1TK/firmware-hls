@@ -34,12 +34,13 @@ foreach i $modules_to_test {
   puts [join [list "======== TESTING " $i " ========"] ""]
   set seed [string range $i 3 6]
   set iTC [string range $i 7 7]
+  set top_func [join [list "TrackletCalculator_" $seed $iTC] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\""] ""]
+  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
 
   # run C-simulation for each module in modules_to_test
-  set_top [join [list "TrackletCalculator_" $seed $iTC] ""]
+  set_top $top_func
   open_solution [join [list "solution_" $seed $iTC] ""]
 
   # Define FPGA, clock frequency & common HLS settings.
