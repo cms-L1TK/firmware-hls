@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // FullMatchBase is where we define the bit widths, which depend on the class template parameter.
 template<int FMType> class FullMatchBase {};
@@ -245,6 +246,17 @@ public:
   void setZRes(const FMZRES zres) {
     data_.range(kFMZResMSB,kFMZResLSB) = zres;
   }
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getTCID());
+    str += "|"+decodeToBits(getTrackletIndex());
+    str += "|"+decodeToBits(getStubIndex());
+    str += "|"+decodeToBits(getPhiRes());
+    str += "|"+decodeToBits(getZRes());
+    return str;
+  }
+#endif
 
 private:
 

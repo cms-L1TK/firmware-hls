@@ -11,7 +11,7 @@
 #include "AllStubMemory.h"
 #include "FullMatchMemory.h"
 #include "MatchEngineUnit.h"
-#include "hls_math.h"
+
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -517,7 +517,7 @@ void MatchProcessor(BXType bx,
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
-  readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+  readtable: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
@@ -598,7 +598,7 @@ void MatchProcessor(BXType bx,
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
 
- PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+ PROC_LOOP: for (unsigned int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
 #pragma HLS PIPELINE II=1 //rewind
 
     auto readptr = projbufferarray.getReadPtr();
@@ -619,7 +619,7 @@ void MatchProcessor(BXType bx,
 
     bool anyidle = false;
 
-  MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+  MEU_get_trkids: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
       matchengine[iMEU].set_empty();
       idles[iMEU] = matchengine[iMEU].idle();
@@ -631,9 +631,9 @@ void MatchProcessor(BXType bx,
     
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
-  MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
+  MEU_smallest1: for(unsigned int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
-  MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
+  MEU_smallest2: for(unsigned int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
 #pragma HLS unroll
 	smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
         smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);

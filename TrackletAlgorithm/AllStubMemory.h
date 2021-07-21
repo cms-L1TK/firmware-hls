@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // AllStubBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubBase {};
@@ -185,6 +186,16 @@ public:
   void setBend(const ASBEND bend) {
     data_.range(kASBendMSB,kASBendLSB) = bend;
   }
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getR());
+    str += "|"+decodeToBits(getZ());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getBend());
+    return str;
+  }
+#endif
 
 private:
 
