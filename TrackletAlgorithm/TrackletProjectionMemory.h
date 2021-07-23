@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
@@ -178,13 +179,13 @@ public:
   }
 
   // The phi derivative is d(phi)/d(r) at the given layer/disk
-  TProjPHIDER getPhiDer() {
+  TProjPHIDER getPhiDer() const {
     return data_.range(kTProjPhiDMSB,kTProjPhiDLSB);
   }
 
   // The r/z derivative is d(z)/d(r) at the given layer and d(r)/d(z) at the
   // given disk
-  TProjRZDER getRZDer() {
+  TProjRZDER getRZDer() const {
     return data_.range(kTProjRZDMSB,kTProjRZDLSB);
   }
 
@@ -212,7 +213,19 @@ public:
   void setRZDer(const TProjRZDER zder) {
     data_.range(kTProjRZDMSB,kTProjRZDLSB) = zder;
   }
-  
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getTCID());
+    str += "|"+decodeToBits(getTrackletIndex());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getRZ());
+    str += "|"+decodeToBits(getPhiDer());
+    str += "|"+decodeToBits(getRZDer());
+    return str;
+  }
+#endif
+
 private:
   
   TrackletProjectionData data_;
