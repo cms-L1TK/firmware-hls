@@ -3,7 +3,7 @@
 # This script generates TrackBuilderTop.h and TrackBuilderTop.cc in the
 # TrackletAlgorithm/ directory.
 
-import sys, re
+import sys, re, os
 from enum import Enum
 
 if len(sys.argv) < 2:
@@ -40,14 +40,15 @@ for line in wiresFile:
 wiresFile.close()
 
 # Open and print out preambles for the top files.
-topHeaderFile = open("TrackBuilderTop.h", "w")
+dirname = os.path.dirname(os.path.realpath('__file__'))
+topHeaderFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackBuilderTop.h"), "w")
 topHeaderFile.write(
     "#ifndef TrackletAlgorithm_TrackBuilderTop_h\n"
     "#define TrackletAlgorithm_TrackBuilderTop_h\n"
     "\n"
     "#include \"TrackBuilder.h\"\n"
 )
-topFile = open("TrackBuilderTop.cc", "w")
+topFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackBuilderTop.cc"), "w")
 topFile.write(
     "#include \"TrackBuilderTop.h\"\n"
 )

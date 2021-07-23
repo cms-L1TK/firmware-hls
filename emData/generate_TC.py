@@ -6,7 +6,7 @@
 # TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
 from __future__ import absolute_import, print_function
-import sys, re
+import sys, re, os
 from enum import Enum
 
 # These enums must match those defined in
@@ -105,7 +105,8 @@ for line in wiresFile:
 wiresFile.close()
 
 # Open and print out preambles for the parameters and top files.
-parametersFile = open("TrackletCalculator_parameters.h", "w")
+dirname = os.path.dirname(os.path.realpath('__file__'))
+parametersFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculator_parameters.h"), "w")
 parametersFile.write(
     "#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h\n"
     "#define TrackletAlgorithm_TrackletCalculator_parameters_h\n"
@@ -130,14 +131,14 @@ parametersFile.write(
     "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
     "// in the same way.\n"
 )
-topHeaderFile = open("TrackletCalculatorTop.h", "w")
+topHeaderFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.h"), "w")
 topHeaderFile.write(
     "#ifndef TrackletAlgorithm_TrackletCalculatorTop_h\n"
     "#define TrackletAlgorithm_TrackletCalculatorTop_h\n"
     "\n"
     "#include \"TrackletCalculator.h\"\n"
 )
-topFile = open("TrackletCalculatorTop.cc", "w")
+topFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.cc"), "w")
 topFile.write(
     "#include \"TrackletCalculatorTop.h\"\n"
     "\n"
