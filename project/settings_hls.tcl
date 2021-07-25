@@ -1,23 +1,8 @@
-# List of generate scripts in the emData/ directory that need to executed
-set generate_scripts {
-  {generate_TC.py}
-  {generate_PR.py}
-  {generate_MC.py}
-  {generate_TB.py}
-}
-
 # Execute download.sh in the emData/ directory.
 set cwd [pwd]
 cd ../emData/
 if { [catch { exec ./download.sh } msg] } {
   puts $msg
-}
-
-# Execute each of the generate scripts.
-foreach i $generate_scripts {
-  if { [catch { exec [join [list "./" $i] ""] LUTs/wires.dat } msg] } {
-    puts $msg
-  }
 }
 cd $cwd
 
