@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script generates TrackletCalculator_parameters.h,
 # TrackletCalculatorTop.h, and TrackletCalculatorTop.cc in the
