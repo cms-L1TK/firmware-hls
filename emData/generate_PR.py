@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Automatically generates ProjectionRouterTop.h, and ProjectionRouterTop.cc
 import sys, os
 
