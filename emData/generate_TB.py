@@ -4,7 +4,6 @@
 # TrackletAlgorithm/ directory.
 
 import sys, re, os
-from enum import Enum
 
 if len(sys.argv) < 2:
     print("Usage: " + sys.argv[0] + " WIRES_FILE")
