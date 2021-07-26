@@ -8,7 +8,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 1;  //number of events to run
+const int nevents = 100;  //number of events to run
 
 using namespace std;
 
@@ -27,7 +27,7 @@ int main()
   // input memories
   static AllStubInnerMemory<BARRELPS> innerStubs[3];
   static AllStubMemory<BARREL2S> outerStubs;
-  static VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> outervmStubs;
+  static VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, 5> outervmStubs;
 
 
   // output memories
@@ -141,7 +141,7 @@ int main()
 
     writeMemFromFile<AllStubMemory<BARREL2S> >(outerStubs, fin_outerStubs, ievt);
     cout << "Will read vmstubs"<<endl;
-    writeMemFromFile<VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> >(outervmStubs, fin_outervmstubs, ievt);
+    writeMemFromFile<VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, 5> >(outervmStubs, fin_outervmstubs, ievt);
 
     // bx
     BXType bx = ievt;

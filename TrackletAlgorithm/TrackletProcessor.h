@@ -177,7 +177,7 @@ void TrackletProcessor_L1L2D(const BXType bx,
 			     const ap_uint<(1<<TrackletEngineUnit<TF::L1L2, TC::D,BARRELPS,BARRELPS>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARRELPS>::kASBendSize+AllStubInner<BARRELPS>::kASFinePhiSize)],
 			     const AllStubInnerMemory<BARRELPS> innerStubs[2],
 			     const AllStubMemory<BARRELPS>* outerStubs,
-			     const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+			     const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, 5> outerVMStubs,
 			     TrackletParameterMemory * trackletParameters,
 			     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
 			     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -189,7 +189,7 @@ void TrackletProcessor_L2L3C(const BXType bx,
                              const ap_uint<(1<<TrackletEngineUnit<TF::L2L3, TC::C,BARRELPS,BARRELPS>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARRELPS>::kASBendSize+AllStubInner<BARRELPS>::kASFinePhiSize)],
                              const AllStubInnerMemory<BARRELPS> innerStubs[3],
                              const AllStubMemory<BARRELPS>* outerStubs,
-                             const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+                             const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, 2> outerVMStubs,
                              TrackletParameterMemory * trackletParameters,
                              TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
                              TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -201,7 +201,7 @@ void TrackletProcessor_L3L4C(const BXType bx,
                              const ap_uint<(1<<TrackletEngineUnit<TF::L3L4, TC::C,BARRELPS,BARREL2S>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARRELPS>::kASBendSize+AllStubInner<BARRELPS>::kASFinePhiSize)],
                              const AllStubInnerMemory<BARRELPS> innerStubs[3],
                              const AllStubMemory<BARREL2S>* outerStubs,
-                             const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+                             const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, 5> outerVMStubs,
                              TrackletParameterMemory * trackletParameters,
                              TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
                              TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -213,7 +213,7 @@ void TrackletProcessor_L5L6C(const BXType bx,
                              const ap_uint<(1<<TrackletEngineUnit<TF::L5L6, TC::C,BARREL2S,BARREL2S>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARREL2S>::kASBendSize+AllStubInner<BARREL2S>::kASFinePhiSize)],
                              const AllStubInnerMemory<BARREL2S> innerStubs[3],
                              const AllStubMemory<BARREL2S>* outerStubs,
-                             const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+                             const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, 3> outerVMStubs,
                              TrackletParameterMemory * trackletParameters,
                              TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
                              TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -241,7 +241,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
       rproj[2] = rmean[TF::L5];
       rproj[3] = rmean[TF::L6];
       break;
-    case TF::L2L3://?
+    case TF::L2L3:
       rproj[0] = rmean[TF::L1];
       r1mean   = rmean[TF::L2];
       r2mean   = rmean[TF::L3];
@@ -348,11 +348,10 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // Determine which disk projections are valid.
   valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>floatToInt(1.0, kt);//?
+    bool valid_t=abs(*t)>floatToInt(1.0, kt);
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= 342 && rD[i] <= 2048;
-    //if(i==0){std::cout<<"t"<<abs(*t)<<"-"<<floatToInt(1.0, kt)<<" phid"<<phiD[i]<<"-"<<0<<"-"<<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1<<" rD:"<<rD[i]<<std::endl;}
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
 
   }
@@ -362,9 +361,9 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
   bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
   bool valid_z0=abs(*z0) < ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
-  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
-  const bool keep = (phicrit > 9253) && (phicrit < 56269);
-  std::cout<<"phi0: "<<*phi0<<" rinv: "<<*rinv<<" z0: "<<*z0<<" phicrit: "<<phicrit<<" valid_rinv: "<<valid_rinv<<" valid_z0: "<<valid_z0<<" keep: "<<keep<<std::endl;
+
+  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*469;//fixme, calculation adjusted to match emulation
+  const bool keep = (phicrit > 10190) && (phicrit < 55345);
 
   return valid_rinv && valid_z0 && keep;
 }
@@ -465,7 +464,6 @@ TC::processStubPair(
 
 // Calculate the tracklet parameters and projections.
   success = TC::barrelSeeding<Seed, InnerRegion, OuterRegion>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
-  std::cout<<"success: "<<success<<std::endl;
 // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(innerIndex, outerIndex, rinv, phi0, z0, t);
   if (success) trackletParameters->write_mem(bx, tpar, npar++);
@@ -490,7 +488,7 @@ TC::processStubPair(
 
       break;
 
-    case TF::L2L3://?
+    case TF::L2L3:
       {
         const TrackletProjection<BARRELPS> tproj_L1(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
         const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL[1], zL[1], der_phiL, der_zL);
@@ -571,7 +569,7 @@ TrackletProcessor(
     const ap_uint<(1<<TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<InnerRegion>::kASBendSize+AllStubInner<InnerRegion>::kASFinePhiSize)],
     const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner],
     const AllStubMemory<OuterRegion>* outerStubs,
-    const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,kNTEUnits>& outerVMStubs,
+    const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>& outerVMStubs,
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -580,7 +578,6 @@ TrackletProcessor(
 
 )
 {
-
   static_assert(Seed == TF::L1L2||Seed==TF::L2L3||Seed==TF::L3L4||Seed==TF::L5L6, "Only L1L2 and L2L3  seeds have been implemented so far.");
 
   int npar = 0;
@@ -646,7 +643,7 @@ TrackletProcessor(
 #pragma HLS pipeline II=1
 
     
-    
+    /*
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
               << tebuffer.readptr()<<" "<<tebuffer.writeptr()<<std::endl;
     
@@ -654,7 +651,7 @@ TrackletProcessor(
       std::cout<<" ["<<k<<" "<<teunits[k].readindex_<<" "<<teunits[k].writeindex_<<" "<<teunits[k].idle_<<"]";
     }
     std::cout << std::endl;
-    
+    */
    
 
     //
@@ -728,7 +725,6 @@ TrackletProcessor(
   step_teunits: for (unsigned int k = 0 ; k < NTEUnits; k++){
 #pragma HLS unroll
       ap_uint<1> init=teuidle[k]&&TEBufferData&&(k==iTEfirstidle);
-      //std::cout<<" "<<k<<" "<<init<<std::endl;
       //second step
 
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::INDEX writeindexnext=teuwriteindex[k]+1;
@@ -739,9 +735,11 @@ TrackletProcessor(
       ap_uint<NBitsPhiRegion> iAllstub=OuterPhiRegion;
       ap_uint<NfinephiBits> outerfinephi = (iAllstub, teunits[k].ireg___, finephi);
       
-//      constexpr unsigned int NdphiBits = (Seed==TF::L5L6) ? 6 : 5;
-      constexpr unsigned int NdphiBits = 5;
-      ap_uint<NdphiBits> idphi;
+      constexpr unsigned int NdphiBits = (Seed==TF::L5L6) ? 6 : 5;
+      ap_uint<NdphiBits> idphi,idphitmp;
+      ap_uint<NdphiBits+1> outerfinephitmp = outerfinephi&((1<<(NdphiBits+1))-1);
+      ap_uint<NdphiBits+1> innerfinephitmp = AllStubInner<InnerRegion>(teunits[k].innerstub___).getFinePhi()&((1<<(NdphiBits+1))-1);
+      idphitmp = outerfinephitmp-innerfinephitmp; 
       ap_uint<NfinephiBits-NdphiBits> overflow;
       (overflow,idphi) =  outerfinephi - AllStubInner<InnerRegion>(teunits[k].innerstub___).getFinePhi();
       
@@ -756,13 +754,13 @@ TrackletProcessor(
       const auto& outerbend = teunits[k].outervmstub___.getBend();
       const auto& innerbend = teunits[k].innerstub___.getBend();
       
-      auto ptinnerindex = (idphi, innerbend);
-      auto ptouterindex = (idphi, outerbend);
+      auto ptinnerindex = (idphitmp, innerbend);
+      auto ptouterindex = (idphitmp, outerbend);
       ap_uint<1> lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
       ap_uint<1> lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
       
       ap_uint<1> savestub = teunits[k].good___ && inrange && lutinner && lutouter && rzcut;
-      std::cout<<" teunits[k].good: "<<teunits[k].good___<<" savestub: "<<savestub<<" inrange: "<<inrange<<" lutinner:  "<<lutinner<<" lutouter: "<<lutouter<<" rzcut: "<<rzcut<<std::endl;
+      //std::cout<<" teunits[k].good: "<<teunits[k].good___<<" savestub: "<<savestub<<" inrange: "<<inrange<<" lutinner:  "<<lutinner<<" lutouter: "<<lutouter<<" rzcut: "<<rzcut<<std::endl;
       teunits[k].stubids_[teuwriteindex[k]] = (teunits[k].outervmstub___.getIndex(), 
 					       teunits[k].innerstub___.getAllStub(),
 					       teunits[k].innerstub___.getIndex());
@@ -790,11 +788,9 @@ TrackletProcessor(
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK memmask_init = tedatatmp.getStubMask();
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMINDEX memindex_init = __builtin_ctz(tedatatmp.getStubMask());
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMINDEX memindexlast_init = __builtin_clz(tedatatmp.getStubMask());
-      //std::cout<<"memmask_init: "<<memmask_init<<std::endl;
       memindexlast_init = ~memindexlast_init;
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMSTUBS memstubs_init = vmstubsentries[tedatatmp.getStart()];
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS nstubs_init(teunits[k].calcNStubs(memstubs_init,memmask_init));
-      //std::cout<<"nstubs_init:"<<nstubs_init<<std::endl;
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::PHIBIN rzbin_init=tedatatmp.getStart();
       ap_uint<1> next_init;
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::PHIBIN ireg_init;
@@ -805,7 +801,6 @@ TrackletProcessor(
       memmask_init[memindex_init] = good_init ? notallstubs_init : ap_uint<1>(1);
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS istub_init(good_init&&notallstubs_init); 
       ap_uint<1> idle_init = good_init && (!notallstubs_init) && (memindex_init==memindexlast_init);
-      //std::cout<<"idle_init: "<<idle_init<<" good_init: "<<good_init<<" notallstubs_init: "<<notallstubs_init<<" memindex_init: "<<memindex_init<<" memindexlast_init: "<<memindexlast_init<<std::endl;
       //Do 'regular' processing here
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK memmask_reg = teunits[k].memmask_;
       typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMINDEX memindex_reg = __builtin_ctz(teunits[k].memmask_);
@@ -843,7 +838,6 @@ TrackletProcessor(
       teunits[k].istub_ = init?istub_init:istub_reg;
       teunits[k].rzbin_ = init?rzbin_init:rzbin_reg;
       teunits[k].idle_ = init?idle_init:idle_reg;
-      //std::cout<<"teunits[k].idle_ : "<<teunits[k].idle_<<std::endl;
 
     }
 
@@ -932,6 +926,7 @@ TrackletProcessor(
     //Extract the current stub - check if valid. Calculate next stub. Check if valid
     istub__ = tebuffer.getIStub();
     bool validstub = istub__ < innerStubs[imem].getEntries(bx);
+    
     ap_uint<kNBits_MemAddr> istubnext = istub__+1;
     bool validstubnext=istubnext<innerStubs[imem].getEntries(bx);
     
@@ -944,11 +939,10 @@ TrackletProcessor(
     //Update istub if goodstub
     tebuffer.getIStub()=goodstub__?(validstubnext?istubnext:ap_uint<kNBits_MemAddr>(0)):istub__; 
     //Update imem if the next stub is not valid
-    tebuffer.getMem()=(goodstub__&&(!validstubnext))?imemnext:imem;
+    tebuffer.getMem()=((goodstub__&&(!validstubnext))||(innerStubs[imem].getEntries(bx) == 0&&validmem))?imemnext:imem;
     
     //Read stub from memory - BRAM with latency of one or two clks
     stub__ = innerStubs[imem].read_mem(bx,istub__);
-    
   } //end of istep
   
 }

@@ -46,7 +46,7 @@ void TrackletProcessor_L1L2D(
     const ap_uint<8> regionlut[2048],
     const AllStubInnerMemory<BARRELPS> innerStubs[2],
     const AllStubMemory<BARRELPS>* outerStubs,
-    const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+    const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::L1L2]> outerVMStubs,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -65,7 +65,7 @@ void TrackletProcessor_L1L2D(
 
  TP_L1L2D: TrackletProcessor<TF::L1L2, 
 			     TC::D, 
-			     kNTEUnits,
+			     kNTEUnits[TF::L1L2],//Number of TE Units
 			     BARRELPS, 
 			     BARRELPS,
 			     1, //Outer phi region
@@ -93,7 +93,7 @@ void TrackletProcessor_L2L3C(
     const ap_uint<8> regionlut[2048],
     const AllStubInnerMemory<BARRELPS> innerStubs[3],
     const AllStubMemory<BARRELPS>* outerStubs,
-    const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+    const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::L2L3]> outerVMStubs,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -113,7 +113,7 @@ void TrackletProcessor_L2L3C(
 
  TP_L2L3C: TrackletProcessor<TF::L2L3,
                              TC::C,
-                             kNTEUnits,
+                             kNTEUnits[TF::L2L3],//number of TE Units
                              BARRELPS,
                              BARRELPS,
                              2, //Outer phi region
@@ -142,7 +142,7 @@ void TrackletProcessor_L3L4C(
     const ap_uint<8> regionlut[2048],
     const AllStubInnerMemory<BARRELPS> innerStubs[3],
     const AllStubMemory<BARREL2S>* outerStubs,
-    const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+    const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::L3L4]> outerVMStubs,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -162,7 +162,7 @@ void TrackletProcessor_L3L4C(
 
  TP_L3L4C: TrackletProcessor<TF::L3L4,
                              TC::C,
-                             kNTEUnits,
+                             kNTEUnits[TF::L3L4],//Number of TE Units
                              BARRELPS,
                              BARREL2S,
                              2, //Outer phi region
@@ -189,7 +189,7 @@ void TrackletProcessor_L5L6C(
     const ap_uint<8> regionlut[4096],
     const AllStubInnerMemory<BARREL2S> innerStubs[3],
     const AllStubMemory<BARREL2S>* outerStubs,
-    const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits> outerVMStubs,
+    const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::L5L6]> outerVMStubs,
     TrackletParameterMemory * trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
@@ -209,7 +209,7 @@ void TrackletProcessor_L5L6C(
 
  TP_L5L6C: TrackletProcessor<TF::L5L6,
                              TC::C,
-                             kNTEUnits,
+                             kNTEUnits[TF::L5L6],//Number of TEUnits
                              BARREL2S,
                              BARREL2S,
                              2, //Outer phi region

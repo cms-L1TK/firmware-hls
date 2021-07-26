@@ -19,16 +19,17 @@ open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+set_clock_uncertainty .05
 
 # data files
 add_files -tb ../emData/TP/tables/
 add_files -tb ../emData/TP/TP_L5L6C/
 
 csim_design -mflags "-j8"
-#csynth_design
-#cosim_design 
+csynth_design
+cosim_design 
 #export_design -format ip_catalog
 # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-#export_design -format ip_catalog -flow impl
+export_design -format ip_catalog -flow impl
 
 exit

@@ -38,11 +38,8 @@ class TrackletEngineUnit {
 #include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[256]=
 #include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
-
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
-      }
-      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -51,11 +48,8 @@ class TrackletEngineUnit {
 #include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[256]=
 #include "../emData/TP/tables/TP_L2L3C_stubptoutercut.tab"
-
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
-      }
-      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }  
     }
@@ -64,7 +58,6 @@ class TrackletEngineUnit {
 #include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[512]=
 #include "../emData/TP/tables/TP_L3L4C_stubptoutercut.tab"
-
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
@@ -77,17 +70,15 @@ class TrackletEngineUnit {
 #include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[1024]=
 #include "../emData/TP/tables/TP_L5L6C_stubptoutercut.tab"
-
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
-      }
-      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-
     idle_ = true;
     }
+
+
  MEMSTUBS nstub16() const {
 #pragma HLS array_partition variable=ns complete dim=1
    return (ns[15],ns[14],ns[13],ns[12],ns[11],ns[10],ns[9],ns[8],ns[7],ns[6],ns[5],ns[4],ns[3],ns[2],ns[1],ns[0]);
