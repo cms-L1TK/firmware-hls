@@ -96,7 +96,7 @@ switch (Seed) {
   case TF::L3L4:
     {
       static const ap_int<18> LUT_drinv[512] = {
-#if __has_include("../emData/TC/tables/TC_L3L4_drinv.tab"
+#if __has_include("../emData/TC/tables/TC_L3L4_drinv.tab")
 #  include "../emData/TC/tables/TC_L3L4_drinv.tab"
 #endif
       };
@@ -106,7 +106,7 @@ switch (Seed) {
   case TF::L5L6:
     {
       static const ap_int<18> LUT_drinv[512] = {
-#if __has_include("../emData/TC/tables/TC_L5L6_drinv.tab"
+#if __has_include("../emData/TC/tables/TC_L5L6_drinv.tab")
 #  include "../emData/TC/tables/TC_L5L6_drinv.tab"
 #endif
       };
@@ -1110,7 +1110,7 @@ switch (Seed) {
   case TF::L1L2:
     {
       static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/TC/tables/TC_L1L2_invt.tab"
+#if __has_include("../emData/TC/tables/TC_L1L2_invt.tab")
 #  include "../emData/TC/tables/TC_L1L2_invt.tab"
 #endif
       };
@@ -1120,7 +1120,7 @@ switch (Seed) {
   case TF::L3L4:
     {
       static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/TC/tables/TC_L3L4_invt.tab"
+#if __has_include("../emData/TC/tables/TC_L3L4_invt.tab")
 #  include "../emData/TC/tables/TC_L3L4_invt.tab"
 #endif
       };
@@ -1130,7 +1130,7 @@ switch (Seed) {
   case TF::L5L6:
     {
       static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/TC/tables/TC_L5L6_invt.tab"
+#if __has_include("../emData/TC/tables/TC_L5L6_invt.tab")
 #  include "../emData/TC/tables/TC_L5L6_invt.tab"
 #endif
       };
