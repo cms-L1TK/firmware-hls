@@ -175,6 +175,7 @@ then
 fi
 
 ./generate_IR.py
+./generate_VMR.py -a -w LUTs/wires.dat
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]

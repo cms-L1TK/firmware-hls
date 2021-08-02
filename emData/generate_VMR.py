@@ -435,9 +435,9 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 #elif kLAYER > 0
 	// Number of VMs
 	constexpr int nvmME = nvmmelayers[kLAYER-1]; // ME memories
-	constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Inner memories
-	constexpr int nvmOL = (kLAYER == 1 || kLAYER == 2) ? nvmollayers[kLAYER-1] : 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
-	constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[kLAYER-1]; // TE Outer memories
+	constexpr int nvmTEI = (kLAYER != 2) ? nvmtelayers[kLAYER-1] : nvmteextralayers[1]; // TE Inner memories
+	constexpr int nvmOL = kLAYER == 1 ? nvmollayers[0] : (kLAYER == 2 ? nvmollayers[1] : 1); // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
+	constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[2]; // TE Outer memories
 
 	// Number of bits used for the bins in VMStubeME memories
 	constexpr int nbitsbin = 3;
@@ -468,7 +468,7 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 /////////////////////////////////////////////////////
 // VMRouter Top Function
 
-void VMRouterTop(const BXType bx, BXType& bx_o,
+void %s(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
@@ -488,7 +488,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 #endif
 	);
 #endif // TrackletAlgorithm_VMRouterTop_h
-"""
+""" % file_name
     )
 
     header_file.close()
@@ -517,7 +517,7 @@ def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
 //          OR
 //          - run emData/generate_VMR.py to generate new top and parameters files
 
-void VMRouterTop(const BXType bx, BXType& bx_o,
+void %s(const BXType bx, BXType& bx_o,
 	// Input memories
 	const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
@@ -538,7 +538,7 @@ void VMRouterTop(const BXType bx, BXType& bx_o,
 ) {
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
-"""
+""" % file_name
     )
 
     for i in range(num_inputs):

@@ -11,7 +11,7 @@ open_project -reset vmrouter
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top VMRouterTop
+set_top VMRouterTop_L2PHIA
 add_files ../TrackletAlgorithm/VMRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "$CFLAGS"
 

@@ -1,5 +1,5 @@
 // Test bench for VMRouter
-#include "VMRouterTop.h"
+#include "VMRouterTop_L2PHIA.h"
 
 #include <algorithm>
 #include <iterator>
@@ -158,7 +158,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterTop(bx, bx_out, inputStubs
+    VMRouterTop_L2PHIA(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
