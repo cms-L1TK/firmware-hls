@@ -169,7 +169,12 @@ parametersFile.write(
     "// return mask bit AND mask\n"
     "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {\n"
     "  return FMMask<Layer, PHI>() & (1<<Seed);\n"
-    "}\n"
+    "}\n\n"
+    "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed>\n"
+    "static const ap_uint<1 << Seed> FMCount() {\n"
+    "  ap_uint<1<<Seed> bits(-1);\n"
+    "  return __builtin_popcount(bits & FMMask<Layer, PHI>())-1;\n"
+    "}\n\n"
     "#endif\n"
 )
 parametersFile.close()
