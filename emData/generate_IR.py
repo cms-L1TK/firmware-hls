@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import, print_function
 import re
 import os
 
@@ -30,8 +33,8 @@ def createDefinitionsTemplate() :
   f.write("\n"
         "void InputRouterTop_IR_{LinkName}(\n"
         "    const BXType bx\n"
-        "    , const ap_uint<kLINKMAPwidth> kInputLink // input link LUT \n"
-        "    , const ap_uint<kBINMAPwidth> kNPhiBns  // n phi bins LUT \n"
+        "    , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT \n"
+        "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
         "    , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs \n"
         "    , BXType & bx_o // output bx  \n"
         "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}])"
@@ -47,6 +50,7 @@ def createDefinitionsTemplate() :
         "       , hOutputStubs);\n"
         "}}\n"
         )
+  f.close()
   return fileName
 
 # generate TopLevel declaration template 
@@ -56,12 +60,13 @@ def createDeclarationTemplate() :
   f.write("\n"
         "void InputRouterTop_IR_{LinkName}(\n"
         "    const BXType bx\n"
-        "    , const ap_uint<kLINKMAPwidth> kInputLink // input link LUT \n"
-        "    , const ap_uint<kBINMAPwidth> kNPhiBns  // n phi bins LUT \n"
+        "    , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT \n"
+        "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
         "    , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs \n"
         "    , BXType & bx_o // output bx  \n"
         "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}]"
         ");\n")
+  f.close()
   return fileName
 
 # generate TopLevel parameters template 
@@ -70,6 +75,7 @@ def createParametersTemplate() :
   f = open(fileName,'w')
   f.write("\n"
         "constexpr unsigned int cNMemories_IR_{LinkName} = {Noutputs};\n")
+  f.close()
   return fileName
 
 # generate all TopLevel parameters InputRouter_parameters.h
@@ -87,6 +93,7 @@ def createParameters(wiresFiles='./LUTs/wires.dat') :
       templateString = ftemp.read()
     file.write(templateString.format(**d))
   file.write('#endif\n')
+  file.close()
   os.remove(templateName)
 
 
@@ -106,6 +113,7 @@ def createDeclarations(wiresFiles='./LUTs/wires.dat') :
       templateString = ftemp.read()
     file.write(templateString.format(**d))
   file.write('#endif\n')
+  file.close()
   os.remove(templateName)
 
 # generate all TopLevel definitions InputRouterTop.h 
@@ -120,7 +128,7 @@ def createDefinitions(wiresFiles='./LUTs/wires.dat') :
     with open(templateName, 'r') as ftemp:
       templateString = ftemp.read()
     file.write(templateString.format(**d))
-  file.write('#endif\n')
+  file.close()
   os.remove(templateName)
 
 wiresFile = './LUTs/wires.dat'
