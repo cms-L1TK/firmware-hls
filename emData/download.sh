@@ -162,6 +162,8 @@ then
   rm -f LUTs.tar.gz
 fi
 
+./generate_IR.py
+
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
 then

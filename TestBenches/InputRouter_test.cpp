@@ -547,7 +547,7 @@ int main(int argc, char * argv[])
     BXType hBx = cEvId&0x7;
     BXType hBx_o; 
 
-    InputRouterTop( hBx
+    InputRouterTop_IR_DTC_PS10G_3_A( hBx
       , cLnkWrd // input link LUT 
       , cPhBnWord  // n phi bins LUT 
       , hInputStubs // input stub stream 
