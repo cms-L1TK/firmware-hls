@@ -153,7 +153,7 @@ def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max
         for i in range(max_copy_count):
             table_string += "  ap_uint<1> tmpBendTable" + str(mem_index) + "n" + str(i+1) + "[bendCutTableSize] ="
             if i < mem_copy_dict[key]:
-                table_string += "\n#include \"../emData/VMR/tables/" + mem_list[mem_list_index] + "_vmbendcut.tab\"\n"
+                table_string += "\n#if __has_include(\"../emData/VMR/tables/" + mem_list[mem_list_index] + "_vmbendcut.tab\")\n#  include \"../emData/VMR/tables/" + mem_list[mem_list_index] + "_vmbendcut.tab\"\n#else\n  {};\n#endif\n"
                 mem_list_index += 1
             else:
                 table_string += " {0};\n"
@@ -239,7 +239,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
         parameter_file.write(
             "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
             "  static int lut[] = \n"
-            "#include \"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n"
+            "#if __has_include(\"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n"
             "  return lut;\n"
             "}\n"
         )
@@ -255,13 +255,13 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
     for i in range(num_layers):
         parameter_file.write(
             "template<> inline const int* getRzBitsInnerTable<TF::L" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\"\n  return lut;\n" if has_vmste_inner[i] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_inner[i] else "  return nullptr;\n")+
             "}\n"
         )
     for i in range(num_disks):
         parameter_file.write(
             "template<> inline const int* getRzBitsInnerTable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#include \"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\"\n  return lut;\n" if has_vmste_inner[i+num_layers] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_inner[i+num_layers] else "  return nullptr;\n")+
             "}\n"
         )
 
@@ -270,7 +270,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
     for i in range(num_layers):
         parameter_file.write(
             "template<> inline const int* getRzBitsOverlapTable<TF::L" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\"\n  return lut;\n" if has_vmste_overlap[i] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\")\n#  include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_overlap[i] else "  return nullptr;\n")+
             "}\n"
         )
     for i in range(num_disks):
@@ -285,13 +285,13 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
     for i in range(num_layers):
         parameter_file.write(
             "template<> inline const int* getRzBitsOuterTable<TF::L" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#include \"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\"\n  return lut;\n" if has_vmste_outer[i] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i] else "  return nullptr;\n")+
             "}\n"
         )
     for i in range(num_disks):
         parameter_file.write(
             "template<> inline const int* getRzBitsOuterTable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#include \"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\"\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
             "}\n"
         )
 
@@ -350,7 +350,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
         parameter_file.write(
             "template<> inline const int* getFineBinTable<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
             "  static int lut[] =\n"
-            "#include \"../emData/VMR/tables/" + vmr + "_finebin.tab\"\n"
+            "#if __has_include(\"../emData/VMR/tables/" + vmr + "_finebin.tab\")\n#  include \"../emData/VMR/tables/" + vmr + "_finebin.tab\"\n#else\n  {};\n#endif\n"
             "  return lut;\n"
             "}\n"
         )
