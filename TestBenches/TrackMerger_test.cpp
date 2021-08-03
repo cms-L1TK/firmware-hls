@@ -35,7 +35,7 @@ int main(){
   assert(fin_inputTracks.good());
 
   ifstream fout_outputTracks;
-  openDataFile(fout_outputTracks, "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
+  openDataFile(fout_outputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");// "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
   assert(fout_outputTracks.good());
 
   // Loop over events
