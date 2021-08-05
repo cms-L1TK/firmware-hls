@@ -105,10 +105,9 @@ A few changes need to be made in order to enable truncation, to output test vect
 
 ```c++
 …
-    // Offset to the maximum number of steps in each processing step:
-    // Set to 0 (default) means standard truncation
-    // Set to large value, e.g. 10000, to disable truncation
-    unsigned int maxstepoffset_{0};
+    //Number of processing steps for one event (108=18TM*240MHz/40MHz)
+    // Change IR & TE from default values -- leave others unchanged.
+    std::unordered_map<std::string, unsigned int> maxstep_{{"IR", 108}, ... , {"TE", 107}}, ...}'
 …
     //--- These used to create files needed by HLS code.
     bool writeMem_{true};     //If true will print out content of memories (between algo steps) to files
