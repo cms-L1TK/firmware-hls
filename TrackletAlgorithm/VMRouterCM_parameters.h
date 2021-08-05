@@ -22,32 +22,56 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
 // VMPhiCorr LUTs
 template<> inline const int* getPhiCorrTable<TF::L1>(){
   static int lut[] = 
-#include "../emData/VMRCM/tables/VMPhiCorrL1.tab"
+#if __has_include("../emData/VMRCM/tables/VMPhiCorrL1.tab")
+#  include "../emData/VMRCM/tables/VMPhiCorrL1.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getPhiCorrTable<TF::L2>(){
   static int lut[] = 
-#include "../emData/VMRCM/tables/VMPhiCorrL2.tab"
+#if __has_include("../emData/VMRCM/tables/VMPhiCorrL2.tab")
+#  include "../emData/VMRCM/tables/VMPhiCorrL2.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getPhiCorrTable<TF::L3>(){
   static int lut[] = 
-#include "../emData/VMRCM/tables/VMPhiCorrL3.tab"
+#if __has_include("../emData/VMRCM/tables/VMPhiCorrL3.tab")
+#  include "../emData/VMRCM/tables/VMPhiCorrL3.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getPhiCorrTable<TF::L4>(){
   static int lut[] = 
-#include "../emData/VMRCM/tables/VMPhiCorrL4.tab"
+#if __has_include("../emData/VMRCM/tables/VMPhiCorrL4.tab")
+#  include "../emData/VMRCM/tables/VMPhiCorrL4.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getPhiCorrTable<TF::L5>(){
   static int lut[] = 
-#include "../emData/VMRCM/tables/VMPhiCorrL5.tab"
+#if __has_include("../emData/VMRCM/tables/VMPhiCorrL5.tab")
+#  include "../emData/VMRCM/tables/VMPhiCorrL5.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getPhiCorrTable<TF::L6>(){
   static int lut[] = 
-#include "../emData/VMRCM/tables/VMPhiCorrL6.tab"
+#if __has_include("../emData/VMRCM/tables/VMPhiCorrL6.tab")
+#  include "../emData/VMRCM/tables/VMPhiCorrL6.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getPhiCorrTable<TF::D1>(){
@@ -69,57 +93,101 @@ template<> inline const int* getPhiCorrTable<TF::D5>(){
 // ME Tables
 template<> inline const int* getMETable<TF::L1>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_L1.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_L1.tab")
+#  include "../emData/VMRCM/tables/VMRME_L1.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::L2>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_L2.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_L2.tab")
+#  include "../emData/VMRCM/tables/VMRME_L2.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::L3>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_L3.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_L3.tab")
+#  include "../emData/VMRCM/tables/VMRME_L3.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::L4>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_L4.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_L4.tab")
+#  include "../emData/VMRCM/tables/VMRME_L4.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::L5>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_L5.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_L5.tab")
+#  include "../emData/VMRCM/tables/VMRME_L5.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::L6>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_L6.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_L6.tab")
+#  include "../emData/VMRCM/tables/VMRME_L6.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::D1>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_D1.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_D1.tab")
+#  include "../emData/VMRCM/tables/VMRME_D1.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::D2>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_D2.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_D2.tab")
+#  include "../emData/VMRCM/tables/VMRME_D2.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::D3>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_D3.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_D3.tab")
+#  include "../emData/VMRCM/tables/VMRME_D3.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::D4>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_D4.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_D4.tab")
+#  include "../emData/VMRCM/tables/VMRME_D4.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getMETable<TF::D5>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRME_D5.tab"
+#if __has_include("../emData/VMRCM/tables/VMRME_D5.tab")
+#  include "../emData/VMRCM/tables/VMRME_D5.tab"
+#else
+  {};
+#endif
   return lut;
 }
 
@@ -144,12 +212,20 @@ template<> inline const int* getTETable<TF::L6>(){
 }
 template<> inline const int* getTETable<TF::D1>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRTE_D1.tab"
+#if __has_include("../emData/VMRCM/tables/VMRTE_D1.tab")
+#  include "../emData/VMRCM/tables/VMRTE_D1.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getTETable<TF::D2>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRTE_D2.tab"
+#if __has_include("../emData/VMRCM/tables/VMRTE_D2.tab")
+#  include "../emData/VMRCM/tables/VMRTE_D2.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getTETable<TF::D3>(){
@@ -157,7 +233,11 @@ template<> inline const int* getTETable<TF::D3>(){
 }
 template<> inline const int* getTETable<TF::D4>(){
   static int lut[] =
-#include "../emData/VMRCM/tables/VMRTE_D4.tab"
+#if __has_include("../emData/VMRCM/tables/VMRTE_D4.tab")
+#  include "../emData/VMRCM/tables/VMRTE_D4.tab"
+#else
+  {};
+#endif
   return lut;
 }
 template<> inline const int* getTETable<TF::D5>(){

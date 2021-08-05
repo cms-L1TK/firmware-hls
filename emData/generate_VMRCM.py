@@ -94,7 +94,7 @@ def getDictOfCopies(mem_list):
 
 
 ###################################
-# Returns a list of all VMRs
+# Returns a list of all VMRs in the given wiring
 
 def getAllVMRs(wireconfig):
 
@@ -188,7 +188,7 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
         parameter_file.write(
             "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
             "  static int lut[] = \n"
-            "#include \"../emData/VMRCM/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n"
+            "#if __has_include(\"../emData/VMRCM/tables/VMPhiCorrL" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n"
             "  return lut;\n"
             "}\n"
         )
@@ -204,13 +204,15 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
     for i in range(num_layers):
         parameter_file.write(
             "template<> inline const int* getMETable<TF::L" + str(i+1) + ">(){\n"
-            "  static int lut[] =\n#include \"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\"\n  return lut;\n"
+            "  static int lut[] =\n"
+            "#if __has_include(\"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
             "}\n"
         )
     for i in range(num_disks):
         parameter_file.write(
             "template<> inline const int* getMETable<TF::D" + str(i+1) + ">(){\n"
-            "  static int lut[] =\n#include \"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\"\n  return lut;\n"
+            "  static int lut[] =\n"
+            "#if __has_include(\"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
             "}\n"
         )
 
@@ -225,7 +227,7 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
     for i in range(num_disks):
         parameter_file.write(
             "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
             "}\n"
         )
 

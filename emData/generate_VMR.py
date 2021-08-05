@@ -107,7 +107,7 @@ def getDictOfCopies(mem_list):
 
 
 ###################################
-# Returns a list of all VMRs
+# Returns a list of all VMRs in the given wiring
 
 def getAllVMRs(wireconfig):
 
