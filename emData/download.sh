@@ -28,7 +28,6 @@ luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
 # prepared for them.
 declare -a processing_modules=(
   # VMRouter
-  "VMR_L1PHIE"
   "VMR_L1PHID"
   "VMR_L2PHIA"
   "VMR_L2PHIB"
@@ -38,9 +37,22 @@ declare -a processing_modules=(
   "VMR_L6PHIA"
   "VMR_D1PHIA"
   "VMR_D2PHIA"
+  "VMR_D3PHIA"
+  "VMR_D4PHIA"
+  "VMR_D5PHIA"
 
   # VMRouter CM
+  "VMRCM_L1PHIA"
   "VMRCM_L2PHIA"
+  "VMRCM_L3PHIA"
+  "VMRCM_L4PHIA"
+  "VMRCM_L5PHIA"
+  "VMRCM_L6PHIA"
+  "VMRCM_D1PHIA"
+  "VMRCM_D2PHIA"
+  "VMRCM_D3PHIA"
+  "VMRCM_D4PHIA"
+  "VMRCM_D5PHIA"
 
   # TrackletEngine
   "TE_L1PHIC12_L2PHIB12"
@@ -163,6 +175,7 @@ then
 fi
 
 ./generate_IR.py
+./generate_VMR.py -a -w LUTs/wires.dat
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]

@@ -1,5 +1,5 @@
 // Test bench for VMRouter
-#include "VMRouterTop.h"
+#include "VMRouterTop_L2PHIA.h"
 
 #include <algorithm>
 #include <iterator>
@@ -13,11 +13,14 @@ const int nEvents = 100;  //number of events to run
 // VMRouter Test that works for all regions
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
-// NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterTop.h
-//          - add number to VMRouter_parameters.h if not already defined
+// To run a different phi region, change the following:
 //          - add the phi region in emData/download.sh, make sure to also run clean
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterTop.h
+//          - add corresponding magic numbers to VMRouter_parameters.h if not already defined
 //          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
+//          OR
+//          - run emData/generate_VMR.py to generate new top and parameters files
 
 
 // Count the number of copies of each memory in a file name vector
@@ -155,7 +158,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterTop(bx, bx_out, inputStubs
+    VMRouterTop_L2PHIA(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif

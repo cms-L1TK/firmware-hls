@@ -176,13 +176,13 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		const InputStubMemory<InType> inputStubs[],
 		const InputStubMemory<DISK2S> inputStubsDisk2S[],
 		// AllStub memory
-		AllStubMemory<OutType> memoriesAS[nAllCopies],
+		AllStubMemory<OutType> memoriesAS[],
 		const ap_uint<maskASIsize>& maskASI,
 		AllStubInnerMemory<OutType> memoriesASInner[],
 		// ME memories
 		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnits> memoriesTEO[nTEOCopies]) {
+		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnits> memoriesTEO[]) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1

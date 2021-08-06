@@ -117,7 +117,7 @@ VMR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop_L2PHIA.cc'
 VMRCM-quality-check:
   <<: *template_quality-check
   variables:
