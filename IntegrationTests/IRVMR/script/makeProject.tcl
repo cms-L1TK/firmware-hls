@@ -14,8 +14,8 @@ update_ip_catalog -rebuild
 # Create .xci files for user HLS IP
 # Chain contains two IRs and one VMR
 # Note: currently uses the same IP core for the two IRs. OK for this minimal example but probably not in general.
-create_ip -name InputRouterTop -module_name IR_PS10G_3_A -vendor xilinx.com -library hls -version 1.0
-create_ip -name InputRouterTop -module_name IR_negPS10G_3_A -vendor xilinx.com -library hls -version 1.0
+create_ip -name InputRouterTop_IR_DTC_PS10G_3_A -module_name IR_PS10G_3_A -vendor xilinx.com -library hls -version 1.0
+create_ip -name InputRouterTop_IR_DTC_PS10G_3_A -module_name IR_negPS10G_3_A -vendor xilinx.com -library hls -version 1.0
 create_ip -name VMRouterTop_L2PHIA -module_name VMR_L2PHIA -vendor xilinx.com -library hls -version 1.0
 
 # Provide name of top-level HDL (without .vhd extension).
