@@ -110,7 +110,7 @@ A few cfg changes were made in order to output test vectors & lookup tables, adj
 …
 ```
 
-N.B. In future, better agreement with FW is achieved by also setting the following parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h . This was *not done* for the existing emData/ files, but is recommended if generating new ones:
+N.B. In future, better agreement with FW can be achieved by also setting the following parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h . This was *not done* for the existing emData/ files, but is recommended if generating new ones:
 
 ```c++
 …
