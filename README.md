@@ -87,7 +87,7 @@ git cms-checkout-topic -u cms-L1TK:fw_synch_210611
 git clone https://github.com/cms-data/L1Trigger-TrackFindingTracklet.git L1Trigger/TrackFindingTracklet/data
 ```
 
-A few cfg changes were made in order to adjust truncation, output test vectors and lookup tables, and to disable multiple matches in the MatchCalculator. This required editing parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h to match the following excerpts:
+A few cfg changes were made in order to output test vectors & lookup tables, adjust truncation, and to disable multiple matches in the MatchCalculator. This required editing parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h to match the following excerpts:
 
 ```c++
 …
@@ -110,7 +110,7 @@ A few cfg changes were made in order to adjust truncation, output test vectors a
 …
 ```
 
-N.B. In future, better agreement with FW is achieved by also setting the following parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h . This was not done for the existing emData/ files, but is recommended if generating new ones:
+N.B. In future, better agreement with FW is achieved by also setting the following parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h . This was *not done* for the existing emData/ files, but is recommended if generating new ones:
 
 ```c++
 …
