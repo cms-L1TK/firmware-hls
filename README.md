@@ -91,10 +91,6 @@ A few cfg changes were made in order to output test vectors & lookup tables, adj
 
 ```c++
 …
-    //Number of processing steps for one event (108=18TM*240MHz/40MHz)
-    // Change IR & TE from default values -- leave others unchanged.
-    std::unordered_map<std::string, unsigned int> maxstep_{{"IR", 108}, ... , {"TE", 107}}, ...}'
-…
     //--- These used to create files needed by HLS code.
     bool writeMem_{true};     //If true will print out content of memories (between algo steps) to files
     bool writeTable_{true};   //If true will print out content of LUTs to files
