@@ -128,8 +128,8 @@ public:
   #ifndef __SYNTHESIS__
   void Print()
   {
-    edm::LogVerbatim("HLS") << "Contents in buffer:" << std::endl;
-    edm::LogVerbatim("HLS") << std::hex << "tcid=" << getTCID() << " shift=" << shift() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
+    edm::LogVerbatim("FWHLS") << "Contents in buffer:" << std::endl;
+    edm::LogVerbatim("FWHLS") << std::hex << "tcid=" << getTCID() << " shift=" << shift() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
   }
   #endif
   

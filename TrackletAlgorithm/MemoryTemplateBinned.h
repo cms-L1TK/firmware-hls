@@ -79,7 +79,7 @@ public:
 	}
 	else {
 #ifndef __SYNTHESIS__
-edm::LogWarning("HLS") << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << std::endl;
+edm::LogWarning("FWHLS") << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << std::endl;
 #endif
 	  return false;
 	}
@@ -144,7 +144,7 @@ edm::LogWarning("HLS") << "Warning out of range: adress within bin " << nentry_i
   // print memory contents
   void print_data(const DataType data) const
   {
-    edm::LogVerbatim("HLS") << std::hex << data.raw() << std::endl;
+    edm::LogVerbatim("FWHLS") << std::hex << data.raw() << std::endl;
 	// TODO: overload '<<' in data class
   }
 
@@ -157,7 +157,7 @@ edm::LogWarning("HLS") << "Warning out of range: adress within bin " << nentry_i
   {
 	for(unsigned int slot=0;slot<(kNSlots);slot++) {
 	  for (unsigned int i = 0; i < nentries_[bx][slot]; ++i) {
-	    edm::LogVerbatim("HLS") << bx << " " << i << " ";
+	    edm::LogVerbatim("FWHLS") << bx << " " << i << " ";
 	    print_entry(bx, i + slot*(1<<(kNBitDataAddr)) );
  	  }
 	}
@@ -167,7 +167,7 @@ edm::LogWarning("HLS") << "Warning out of range: adress within bin " << nentry_i
   {
 	for (unsigned int ibx = 0; ibx < (kNBxBins); ++ibx) {
 	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
-	    edm::LogVerbatim("HLS") << ibx << " " << i << " ";
+	    edm::LogVerbatim("FWHLS") << ibx << " " << i << " ";
 	    print_entry(ibx,i);
 	  }
 	}

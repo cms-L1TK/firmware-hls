@@ -124,7 +124,7 @@ class MemoryTemplateBinnedCM{
     else {
 #ifndef __SYNTHESIS__
       if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-	edm::LogWarning("HLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
+	edm::LogWarning("FWHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
       }
 #endif
       return false;
@@ -202,7 +202,7 @@ class MemoryTemplateBinnedCM{
   // print memory contents
   void print_data(const DataType data) const
   {
-    edm::LogVerbatim("HLS") << std::hex << data.raw() << std::endl;
+    edm::LogVerbatim("FWHLS") << std::hex << data.raw() << std::endl;
 	// TODO: overload '<<' in data class
   }
 
@@ -217,7 +217,7 @@ class MemoryTemplateBinnedCM{
       //std::cout << "slot "<<slot<<" entries "
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
       for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
-	edm::LogVerbatim("HLS") << bx << " " << i << " ";
+	edm::LogVerbatim("FWHLS") << bx << " " << i << " ";
 	print_entry(bx, i + slot*getNEntryPerBin() );
       }
     }
@@ -227,7 +227,7 @@ class MemoryTemplateBinnedCM{
   {
 	for (unsigned int ibx = 0; ibx < kNBxBins; ++ibx) {
 	  for (unsigned int i = 0; i < 8; ++i) {
-	    edm::LogVerbatim("HLS") << ibx << " " << i << " ";
+	    edm::LogVerbatim("FWHLS") << ibx << " " << i << " ";
 	    print_entry(ibx,i);
 	  }
 	}

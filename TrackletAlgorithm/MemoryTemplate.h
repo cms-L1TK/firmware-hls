@@ -127,7 +127,7 @@ public:
   // print memory contents
   void print_data(const DataType data) const
   {
-    edm::LogVerbatim("HLS") << std::hex << data.raw() << std::endl;
+    edm::LogVerbatim("FWHLS") << std::hex << data.raw() << std::endl;
         // TODO: overload '<<' in data class
   }
 
@@ -139,7 +139,7 @@ public:
   void print_mem(BunchXingT bx) const
   {
 	for (unsigned int i = 0; i <  nentries_[bx]; ++i) {
-	  edm::LogVerbatim("HLS") << bx << " " << i << " ";
+	  edm::LogVerbatim("FWHLS") << bx << " " << i << " ";
 	  print_entry(bx,i);
 	}
   }
@@ -148,7 +148,7 @@ public:
   {
 	for (unsigned int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
 	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
-	    edm::LogVerbatim("HLS") << ibx << " " << i << " ";
+	    edm::LogVerbatim("FWHLS") << ibx << " " << i << " ";
 	    print_entry(ibx,i);
 	  }
 	}

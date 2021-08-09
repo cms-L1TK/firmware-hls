@@ -293,7 +293,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		edm::LogVerbatim("HLS") << std::endl << "Stub index no. " << i << std::endl
+		edm::LogVerbatim("FWHLS") << std::endl << "Stub index no. " << i << std::endl
 				<< "Out put stub: " << std::hex << allstub.raw() << std::dec
 				<< std::endl;
 #endif // DEBUG
@@ -376,7 +376,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-				edm::LogVerbatim("HLS") << std::endl << "Allstub Inner: " << std::hex
+				edm::LogVerbatim("FWHLS") << std::endl << "Allstub Inner: " << std::hex
 						<< allstubinner.raw() << std::dec << std::endl;
 #endif // DEBUG
 
@@ -399,7 +399,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		edm::LogVerbatim("HLS") << "ME stub " << std::hex << stubME.raw() << std::dec
+		edm::LogVerbatim("FWHLS") << "ME stub " << std::hex << stubME.raw() << std::dec
 				<< "       to slot " << slotME << std::endl;
 #endif // DEBUG
 		// End ME memories
@@ -425,7 +425,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-			edm::LogVerbatim("HLS") << "TEOuter stub " << std::hex << stubTEO.raw()
+			edm::LogVerbatim("FWHLS") << "TEOuter stub " << std::hex << stubTEO.raw()
 					<< std::dec << "       to slot " << slotTE << std::endl;
 #endif // DEBUG
 
