@@ -6,7 +6,11 @@
 #include "Constants.h"
 #include "AllStubMemory.h"
 #include "DTCStubMemory.h"
-
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
 
 // link map
 static const int kNBitsLnkDsc = 4; 
@@ -250,7 +254,7 @@ void InputRouter( const BXType bx
 	  if( hVldBt == 0 ){ 
 	  	#ifndef __SYNTHESIS__
 	  		#if IR_DEBUG
-	  			std::cout << "\t.. Invalid Stub : " << std::hex << hStub << std::dec << "\n";
+	                edm::LogWarning("HLS") << "\t.. Invalid Stub : " << std::hex << hStub << std::dec << "\n";
 	  		#endif
 	  	#endif
 	  	continue;
@@ -321,7 +325,7 @@ void InputRouter( const BXType bx
 	  assert(cMemIndx < nMems);
 	  #ifndef __SYNTHESIS__
 	  	#if IR_DEBUG
-		   std::cout << "\t.. Stub : " << std::hex << hStub << std::dec 
+	  edm::LogVerbatim("HLS") << "\t.. Stub : " << std::hex << hStub << std::dec 
 		   				<< " rel. parts : " << std::hex << hStbWrd << std::dec
 			            << " [ EncLyrId " << hEncLyr << " ] "
 						<< "[ LyrId " << hLyrId << " ] "

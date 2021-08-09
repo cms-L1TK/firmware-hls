@@ -5,6 +5,11 @@
 #include "MemoryTemplate.h"
 #include "VMProjectionMemory.h"
 #include "AllProjectionMemory.h"
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
 
 // ProjectionRouterBufferBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMProjType, int AllProjetionType> class ProjectionRouterBufferBase {};
@@ -123,8 +128,8 @@ public:
   #ifndef __SYNTHESIS__
   void Print()
   {
-    std::cout << "Contents in buffer:" << std::endl;
-    std::cout << std::hex << "tcid=" << getTCID() << " shift=" << shift() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
+    edm::LogVerbatim("HLS") << "Contents in buffer:" << std::endl;
+    edm::LogVerbatim("HLS") << std::hex << "tcid=" << getTCID() << " shift=" << shift() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
   }
   #endif
   

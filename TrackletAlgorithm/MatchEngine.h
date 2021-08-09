@@ -11,6 +11,12 @@
 #include <iostream>
 #include <fstream>
 
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
+
 /////////////////////////////
 // -- PREPROCESSOR FUNCTIONS
 #define IS_REPRESENTIBLE_IN_D_BITS(D, N)                \

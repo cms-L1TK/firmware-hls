@@ -4,8 +4,8 @@
 #include "ap_int.h"
 
 #ifdef CMSSW_GIT_HASH
-  #include "Settings.h"
-  using namespace trklet;
+#include "L1Trigger/TrackFindingTracklet/interface/Settings.h"
+using namespace trklet;
 #endif
 
 // Inline function to convert floating point values to integers, given a
@@ -109,10 +109,12 @@ constexpr double rinvcut = 0.01 * c * bfield / ptcut; // 0.01 to convert to 1/cm
 constexpr double z0cut = 15.0; // cm
 
 // cut constants for combined modules
+#ifndef CMSSW_GIT_HASH
 constexpr double VMROUTERCUTZL2 = 50.0;      //Min L2 z for inner allstub in cm
 constexpr double VMROUTERCUTZL1L3L5 = 95.0;  //Max z for inner barrel layers in cm
 constexpr double VMROUTERCUTZL1 = 70.0;      //Max z for L1 barrel seeding in cm
 constexpr double VMROUTERCUTRD1D3 = 55.0;    //Max r for disk seeds in cm
+#endif
 
 // various bit widths
 constexpr unsigned nbitsallstubs[N_LAYER + N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};

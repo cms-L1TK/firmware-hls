@@ -19,6 +19,11 @@
 #include "AllStubInnerMemory.h"
 #include "VMStubMEMemoryCM.h"
 #include "VMStubTEOuterMemoryCM.h"
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
 
 /////////////////////////////////////////
 // Constants
@@ -288,7 +293,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		std::cout << std::endl << "Stub index no. " << i << std::endl
+		edm::LogVerbatim("HLS") << std::endl << "Stub index no. " << i << std::endl
 				<< "Out put stub: " << std::hex << allstub.raw() << std::dec
 				<< std::endl;
 #endif // DEBUG
@@ -371,7 +376,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-				std::cout << std::endl << "Allstub Inner: " << std::hex
+				edm::LogVerbatim("HLS") << std::endl << "Allstub Inner: " << std::hex
 						<< allstubinner.raw() << std::dec << std::endl;
 #endif // DEBUG
 
@@ -394,7 +399,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		std::cout << "ME stub " << std::hex << stubME.raw() << std::dec
+		edm::LogVerbatim("HLS") << "ME stub " << std::hex << stubME.raw() << std::dec
 				<< "       to slot " << slotME << std::endl;
 #endif // DEBUG
 		// End ME memories
@@ -420,7 +425,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-			std::cout << "TEOuter stub " << std::hex << stubTEO.raw()
+			edm::LogVerbatim("HLS") << "TEOuter stub " << std::hex << stubTEO.raw()
 					<< std::dec << "       to slot " << slotTE << std::endl;
 #endif // DEBUG
 

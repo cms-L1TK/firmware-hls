@@ -6,7 +6,15 @@
 
 template<int> class AllStub;
 
+#ifdef CMSSW_GIT_HASH
+#define NBIT_BX 0
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR>
+#else
+#include "DummyMessageLogger.h"
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
+#endif
+
 // DataType: type of data object stored in the array
 // NBIT_BX: number of bits for BX;
 // (1<<NBIT_BIN): number of BXs the memory is keeping track of
@@ -119,8 +127,8 @@ public:
   // print memory contents
   void print_data(const DataType data) const
   {
-	std::cout << std::hex << data.raw() << std::endl;
-	// TODO: overload '<<' in data class
+    edm::LogVerbatim("HLS") << std::hex << data.raw() << std::endl;
+        // TODO: overload '<<' in data class
   }
 
   void print_entry(BunchXingT bx, ap_uint<NBIT_ADDR> index) const
@@ -131,7 +139,7 @@ public:
   void print_mem(BunchXingT bx) const
   {
 	for (unsigned int i = 0; i <  nentries_[bx]; ++i) {
-	  std::cout << bx << " " << i << " ";
+	  edm::LogVerbatim("HLS") << bx << " " << i << " ";
 	  print_entry(bx,i);
 	}
   }
@@ -140,8 +148,8 @@ public:
   {
 	for (unsigned int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
 	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
-		std::cout << ibx << " " << i << " ";
-		print_entry(ibx,i);
+	    edm::LogVerbatim("HLS") << ibx << " " << i << " ";
+	    print_entry(ibx,i);
 	  }
 	}
   }

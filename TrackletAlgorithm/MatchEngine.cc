@@ -71,7 +71,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	#pragma HLS dependence variable=istub intra WAR true
 
 #ifdef DEBUG
-	std::cout << "ProjectionIndex\tStubIndex\t<=== (PASS/FAIL)" << std::endl;
+	edm::LogVerbatim("HLS") << "ProjectionIndex\tStubIndex\t<=== (PASS/FAIL)" << std::endl;
 #endif
 
 	// Main processing loops starts here.
@@ -128,11 +128,11 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 				projectionBuffer[head_writeindex_tmp_last] = nstublast.concat(tmp2);
 			}
 #ifdef DEBUG
-			std::cout << "Writing " << savefirst+savelast << " z-bins ==> head_writeindex " << head_writeindex << "-->";
+			edm::LogVerbatim("HLS") << "Writing " << savefirst+savelast << " z-bins ==> head_writeindex " << head_writeindex << "-->";
 #endif
 			head_writeindex = head_writeindex + savefirst + savelast;
 #ifdef DEBUG
-			std::cout << head_writeindex << std::endl;
+			edm::LogVerbatim("HLS") << head_writeindex << std::endl;
 #endif
 		}
 
@@ -186,7 +186,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 
 			// Check if stub bend and proj rinv consistent
 #ifdef DEBUG
-			std::cout << projindex.to_string() << "\t" << stubindex.to_string() << "\t<=== ";
+			edm::LogVerbatim("HLS") << projindex.to_string() << "\t" << stubindex.to_string() << "\t<=== ";
 #endif
 			auto const index=projrinv.concat(stubbend);
 			if ( passphi && pass && table[index]) {
@@ -194,14 +194,14 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 				outputCandidateMatch.write_mem(bx,cmatch,ncmatch);
 				ncmatch++;
 #ifdef DEBUG
-				std::cout << "PASS -- " << ncmatch-1 << "\n";
+				edm::LogVerbatim("HLS") << "PASS -- " << ncmatch-1 << "\n";
 #endif
 			}
 #ifdef DEBUG
 			else {
-				std::cout << "FAIL" << "\n";
+			  edm::LogVerbatim("HLS") << "FAIL" << "\n";
 			}
-			std::cout << "\ttail_readindex: " << tail_readindex << "\n"
+			edm::LogVerbatim("HLS") << "\ttail_readindex: " << tail_readindex << "\n"
 					  << "\thead_writeindex: " << head_writeindex << "\n"
 					  << "\tsecond: " << second << "\n"
 					  << "\tprojfinez: " << projfinez << "\n"
