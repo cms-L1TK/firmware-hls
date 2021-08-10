@@ -85,7 +85,18 @@ declare -a processing_modules=(
   "TC_L5L6D"
 
   # ProjectionRouter
+  "PR_L1PHIB"
+  "PR_L2PHIB"
+  "PR_L3PHIB"
+  "PR_L4PHIB"
+  "PR_L5PHIB"
+  "PR_L6PHIB"
+  "PR_L1PHIC"
+  "PR_L2PHIC"
   "PR_L3PHIC"
+  "PR_L4PHIC"
+  "PR_L5PHIC"
+  "PR_L6PHIC"
 
   # MatchEngine
   "ME_L1PHIE20"

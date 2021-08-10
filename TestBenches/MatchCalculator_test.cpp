@@ -1,153 +1,166 @@
-// Test bench for the MatchCalculator 
+// Test bench for MatchCalculator
 #include "MatchCalculatorTop.h"
 
-#include "FileReadUtility.h"
-#include "Constants.h"
-
-#include "hls_math.h"
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <iterator>
 
+#include "Macros.h"
+#include "FileReadUtility.h"
+#include "Constants.h"
 
-const int nevents = 100; // number of events to run
-bool truncation = false; // compare results to truncated emulation
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined MODULE_
+  #define MODULE_ MC_L3PHIC_
+#endif
+
+const int nevents = 100;  //number of events to run
 
 using namespace std;
 
+int main()
+{
+  // Define memory patterns
+  const string candidateMatchPattern = "CandidateMatches*";
+  const string allProjectionPatternarray = "AllProj*";
+  const string allStubPatternarray = "AllStub*";
+  const string fullMatchPattern = "FullMatches*";
 
+  // Define region according to which layer is being tested
+#if MODULE_ == MC_L1PHIB_ || MODULE_ == MC_L2PHIB_ || MODULE_ == MC_L3PHIB_ || MODULE_ == MC_L1PHIC_ || MODULE_ == MC_L2PHIC_ || MODULE_ == MC_L3PHIC_
+  const auto projMemType = BARRELPS;
+  const auto stubMemType = BARRELPS;
+#elif MODULE_ == MC_L4PHIB_ || MODULE_ == MC_L5PHIB_ || MODULE_ == MC_L6PHIB_ || MODULE_ == MC_L4PHIC_ || MODULE_ == MC_L5PHIC_ || MODULE_ == MC_L6PHIC_
+  const auto projMemType = BARREL2S;
+  const auto stubMemType = BARREL2S;
+#else
+  #error "Undefined Module"
+#endif
 
-int main() {
-  // error counter
-  int err_count = 0;
+#if MODULE_ == MC_L1PHIB_ || MODULE_ == MC_L2PHIB_ || MODULE_ == MC_L3PHIB_ || MODULE_ == MC_L4PHIB_ || MODULE_ == MC_L5PHIB_ || MODULE_ == MC_L6PHIB_ || MODULE_ == MC_L1PHIC_ || MODULE_ == MC_L2PHIC_ || MODULE_ == MC_L3PHIC_ || MODULE_ == MC_L4PHIC_ || MODULE_ == MC_L5PHIC_ || MODULE_ == MC_L6PHIC_
+  const auto vmProjMemType = BARREL;
+#else
+  #error "Undefined Module"
+#endif
 
-  // declare input memory arrays to be read from the emulation files
-  static CandidateMatchMemory           match[L3PHICmaxMatchCopies];
-  static AllStubMemory<BARRELPS>        allstub;
-  static AllProjectionMemory<BARRELPS>  allproj;
+#if MODULE_ == MC_L1PHIB_
+  TBHelper tb("MC/MC_L1PHIB");
+#elif MODULE_ == MC_L2PHIB_
+  TBHelper tb("MC/MC_L2PHIB");
+#elif MODULE_ == MC_L3PHIB_
+  TBHelper tb("MC/MC_L3PHIB");
+#elif MODULE_ == MC_L4PHIB_
+  TBHelper tb("MC/MC_L4PHIB");
+#elif MODULE_ == MC_L5PHIB_
+  TBHelper tb("MC/MC_L5PHIB");
+#elif MODULE_ == MC_L6PHIB_
+  TBHelper tb("MC/MC_L6PHIB");
+#elif MODULE_ == MC_L1PHIC_
+  TBHelper tb("MC/MC_L1PHIC");
+#elif MODULE_ == MC_L2PHIC_
+  TBHelper tb("MC/MC_L2PHIC");
+#elif MODULE_ == MC_L3PHIC_
+  TBHelper tb("MC/MC_L3PHIC");
+#elif MODULE_ == MC_L4PHIC_
+  TBHelper tb("MC/MC_L4PHIC");
+#elif MODULE_ == MC_L5PHIC_
+  TBHelper tb("MC/MC_L5PHIC");
+#elif MODULE_ == MC_L6PHIC_
+  TBHelper tb("MC/MC_L6PHIC");
+#else
+  #error "Undefined Module"
+#endif
 
-  // declare output memory array to be filled by hls simulation
-  static FullMatchMemory<BARREL> fullmatch[L3PHICmaxFullMatchCopies];
+  // error counts
+  int err = 0;
 
-  // read in input files
-  ifstream fin_as;
-  ifstream fin_ap;
-  ifstream fin_cm1;
-  ifstream fin_cm2;
-  ifstream fin_cm3;
-  ifstream fin_cm4;
-  ifstream fin_cm5;
-  ifstream fin_cm6;
-  ifstream fin_cm7;
-  ifstream fin_cm8;
+  ///////////////////////////
+  // input memories
+  const auto nCandidateMatches = tb.nFiles(candidateMatchPattern);
+  vector<CandidateMatchMemory> cmatcharray(nCandidateMatches);
+  const auto nAllProjections = tb.nFiles(allProjectionPatternarray);
+  vector<AllProjectionMemory<projMemType>> allproj(nAllProjections);
+  const auto nAllStubs = tb.nFiles(allStubPatternarray);
+  vector<AllStubMemory<stubMemType>> allstub(nAllStubs);
 
-  if (not openDataFile(fin_as,"MC/MC_L3PHIC/AllStubs_AS_L3PHICn1_04.dat")) return -1;
-  if (not openDataFile(fin_ap,"MC/MC_L3PHIC/AllProj_AP_L3PHIC_04.dat")) return -1;
-  if (not openDataFile(fin_cm1,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC17_04.dat")) return -1;
-  if (not openDataFile(fin_cm2,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC18_04.dat")) return -1;
-  if (not openDataFile(fin_cm3,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC19_04.dat")) return -1;
-  if (not openDataFile(fin_cm4,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC20_04.dat")) return -1;
-  if (not openDataFile(fin_cm5,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC21_04.dat")) return -1;
-  if (not openDataFile(fin_cm6,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC22_04.dat")) return -1;
-  if (not openDataFile(fin_cm7,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC23_04.dat")) return -1;
-  if (not openDataFile(fin_cm8,"MC/MC_L3PHIC/CandidateMatches_CM_L3PHIC24_04.dat")) return -1;
-
-  // open file(s) with reference results
-  ifstream fout_fm1;
-  ifstream fout_fm2;
-  ifstream fout_fm3;
-  ifstream fout_fm4;
-  ifstream fout_fm5;
-  ifstream fout_fm6;
-  ifstream fout_fm7;
-  ifstream fout_fm8;
-
-  if (not openDataFile(fout_fm1,"MC/MC_L3PHIC/FullMatches_FM_L1L2_L3PHIC_04.dat")) return -1;
-  //if (not openDataFile(fout_fm2,"MC/MC_L1PHIC/FullMatches_FM_L2L3_L1PHIC_04.dat")) return -1;
-  //if (not openDataFile(fout_fm3,"MC/MC_L1PHIC/FullMatches_FM_L3L4_L1PHIC_04.dat")) return -1;
-  if (not openDataFile(fout_fm4,"MC/MC_L3PHIC/FullMatches_FM_L5L6_L3PHIC_04.dat")) return -1;
-  //if (not openDataFile(fout_fm4,"MC/MC_L1PHIC/FullMatches_FM_D1D2_L1PHIC_04.dat")) return -1;
-  //if (not openDataFile(fout_fm5,"MC/MC_L1PHIC/FullMatches_FM_D3D4_L1PHIC_04.dat")) return -1;
-  //if (not openDataFile(fout_fm6,"")) return -1;
-  //if (not openDataFile(fout_fm7,"MC/MC_L1PHIC/FullMatches_FM_L2D1_L1PHIC_04.dat")) return -1;
+  // output memories
+  const auto nFullMatches = tb.nFiles(fullMatchPattern);
+  vector<FullMatchMemory<vmProjMemType> > fullmatcharray(nFullMatches);
 
   // loop over events
-  for (int ievt = 0; ievt < nevents; ++ievt) {
-    //cout << "Event: " << dec << ievt << endl;
+  cout << "Start event loop ..." << endl;
+  for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
+    cout << "Event: " << dec << ievt << endl;
 
-    fullmatch[0].clear();
-//    fullmatch[1].clear();
-//    fullmatch[2].clear();
-    fullmatch[3].clear();
-//    fullmatch[4].clear();
-//    fullmatch[5].clear();
-//    fullmatch[6].clear();
-//    fullmatch[7].clear();
+    // read event and write to memories
+    auto &fin_CandidateMatches = tb.files(candidateMatchPattern);
+    for (unsigned int i = 0; i < nCandidateMatches; i++)
+      writeMemFromFile<CandidateMatchMemory>(cmatcharray[i], fin_CandidateMatches.at(i), ievt);
+    auto &fin_AllProjections = tb.files(allProjectionPatternarray);
+    for (unsigned int i = 0; i < nAllProjections; i++)
+      writeMemFromFile<AllProjectionMemory<projMemType>>(allproj[i], fin_AllProjections.at(i), ievt);
+    auto &fin_AllStubs = tb.files(allStubPatternarray);
+    for (unsigned int i = 0; i < nAllStubs; i++)
+      writeMemFromFile<AllStubMemory<stubMemType>>(allstub[i], fin_AllStubs.at(i), ievt);
 
-    // make memories from the input text files
-    writeMemFromFile<AllStubMemory<BARRELPS> >(allstub, fin_as, ievt);
-    writeMemFromFile<AllProjectionMemory<BARRELPS> >(allproj, fin_ap, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[0], fin_cm1, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[1], fin_cm2, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[2], fin_cm3, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[3], fin_cm4, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[4], fin_cm5, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[5], fin_cm6, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[6], fin_cm7, ievt);
-    writeMemFromFile<CandidateMatchMemory>(match[7], fin_cm8, ievt);
+    // clear allarray, output memories before starting
+    for (unsigned int i = 0; i < nFullMatches; i++)
+      fullmatcharray[i].clear();
 
-    //set bunch crossing
+    // bx
     BXType bx = ievt;
     BXType bx_out;
 
     // Unit Under Test
-    MatchCalculator_L3PHIC(
-      bx, match, &allstub, &allproj, bx_out, fullmatch
-    );
+#if MODULE_ == MC_L1PHIB_
+    MatchCalculator_L1PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L2PHIB_
+    MatchCalculator_L2PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L3PHIB_
+    MatchCalculator_L3PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L4PHIB_
+    MatchCalculator_L4PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L5PHIB_
+    MatchCalculator_L5PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L6PHIB_
+    MatchCalculator_L6PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L1PHIC_
+    MatchCalculator_L1PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L2PHIC_
+    MatchCalculator_L2PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L3PHIC_
+    MatchCalculator_L3PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L4PHIC_
+    MatchCalculator_L4PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L5PHIC_
+    MatchCalculator_L5PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#elif MODULE_ == MC_L6PHIC_
+    MatchCalculator_L6PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+#else
+  #error "Undefined MC"
+#endif
 
-    // compare the computed outputs with the expected ones 
-    //std::cout << "FM: L1L2 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[0], fout_fm1, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L2L3 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[1], fout_fm2, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L3L4 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[2], fout_fm3, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L5L6 seeding" << std::endl;
-    err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[3], fout_fm4, ievt, "FullMatch", truncation);
-    //std::cout << "FM: D1D2 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[4], fout_fm5, ievt, "FullMatch", truncation);
-    //std::cout << "FM: D3D4 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[5], fout_fm6, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L1D1 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[6], fout_fm7, ievt, "FullMatch", truncation);
-    //std::cout << "FM: L2D1 seeding" << std::endl;
-    //err_count += compareMemWithFile<FullMatchMemory<BARREL> >(fullmatch[7], fout_fm8, ievt, "FullMatch", truncation);
-
-  }  // end of event loop
+    bool truncation = false;
+    auto &fout_fullmatch = tb.files(fullMatchPattern);
+    const auto &fullmatch_names = tb.fileNames(fullMatchPattern);
+    
+    // compare the computed outputs with the expected ones
+    for (unsigned int i = 0; i < fullmatch_names.size(); i++) {
+      const auto &fullmatch_name = fullmatch_names.at(i);
+      auto &fout = fout_fullmatch.at(i);
+      string label = "FullMatch " + to_string(i);
+      err += compareMemWithFile<FullMatchMemory<vmProjMemType> >
+        (fullmatcharray[i], fout, ievt, label, truncation);
+    }
+    
+  } // end of event loop
   
-  // close files
-  fin_as.close();
-  fin_ap.close();
-  fin_cm1.close();
-  fin_cm2.close();
-  fin_cm3.close();
-  fin_cm4.close();
-  fin_cm5.close();
-  fin_cm6.close();
-  fin_cm7.close();
-  fin_cm8.close();
-  fout_fm1.close();
-  fout_fm2.close();
-  fout_fm3.close();
-  fout_fm4.close();
-  fout_fm5.close();
-  fout_fm6.close();
-  fout_fm7.close();
-  fout_fm7.close();
-
   // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
-  if (err_count > 255) err_count = 255;
-  return err_count;
+  if (err > 255) err = 255;
+//  cout << "Module actually has " << err << " errors." << endl;
+//  return 0;
+  return err;
+  
 }

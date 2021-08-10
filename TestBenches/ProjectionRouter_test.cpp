@@ -1,173 +1,159 @@
 // Test bench for ProjectionRouter
 #include "ProjectionRouterTop.h"
 
+#include <vector>
 #include <algorithm>
 #include <iterator>
+#include <iterator>
 
+#include "Macros.h"
 #include "FileReadUtility.h"
 #include "Constants.h"
+
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined MODULE_
+  #define MODULE_ PR_L3PHIC_
+#endif
 
 const int nevents = 100;  //number of events to run
 
 using namespace std;
 
 int main()
-{ 
+{
+  // Define memory patterns
+  const string trackletProjectionPattern = "TrackletProjections*";
+  const string allProjectionPattern = "AllProj*";
+  const string vmProjectionPattern = "VMProjections*";
+
+  // Define region according to which layer is being tested
+#if MODULE_ == PR_L1PHIB_ || MODULE_ == PR_L2PHIB_ || MODULE_ == PR_L3PHIB_ || MODULE_ == PR_L1PHIC_ || MODULE_ == PR_L2PHIC_ || MODULE_ == PR_L3PHIC_
+  const auto projMemType = BARRELPS;
+#elif MODULE_ == PR_L4PHIB_ || MODULE_ == PR_L5PHIB_ || MODULE_ == PR_L6PHIB_ || MODULE_ == PR_L4PHIC_ || MODULE_ == PR_L5PHIC_ || MODULE_ == PR_L6PHIC_
+  const auto projMemType = BARREL2S;
+#else
+  #error "Undefined Module"
+#endif
+
+#if MODULE_ == PR_L1PHIB_ || MODULE_ == PR_L2PHIB_ || MODULE_ == PR_L3PHIB_ || MODULE_ == PR_L4PHIB_ || MODULE_ == PR_L5PHIB_ || MODULE_ == PR_L6PHIB_ || MODULE_ == PR_L1PHIC_ || MODULE_ == PR_L2PHIC_ || MODULE_ == PR_L3PHIC_ || MODULE_ == PR_L4PHIC_ || MODULE_ == PR_L5PHIC_ || MODULE_ == PR_L6PHIC_
+  const auto vmProjMemType = BARREL;
+#else
+  #error "Undefined Module"
+#endif
+
+#if MODULE_ == PR_L1PHIB_
+  TBHelper tb("PR/PR_L1PHIB");
+#elif MODULE_ == PR_L2PHIB_
+  TBHelper tb("PR/PR_L2PHIB");
+#elif MODULE_ == PR_L3PHIB_
+  TBHelper tb("PR/PR_L3PHIB");
+#elif MODULE_ == PR_L4PHIB_
+  TBHelper tb("PR/PR_L4PHIB");
+#elif MODULE_ == PR_L5PHIB_
+  TBHelper tb("PR/PR_L5PHIB");
+#elif MODULE_ == PR_L6PHIB_
+  TBHelper tb("PR/PR_L6PHIB");
+#elif MODULE_ == PR_L1PHIC_
+  TBHelper tb("PR/PR_L1PHIC");
+#elif MODULE_ == PR_L2PHIC_
+  TBHelper tb("PR/PR_L2PHIC");
+#elif MODULE_ == PR_L3PHIC_
+  TBHelper tb("PR/PR_L3PHIC");
+#elif MODULE_ == PR_L4PHIC_
+  TBHelper tb("PR/PR_L4PHIC");
+#elif MODULE_ == PR_L5PHIC_
+  TBHelper tb("PR/PR_L5PHIC");
+#elif MODULE_ == PR_L6PHIC_
+  TBHelper tb("PR/PR_L6PHIC");
+#else
+  #error "Undefined Module"
+#endif
+
   // error counts
   int err = 0;
 
   ///////////////////////////
   // input memories
-  static TrackletProjectionMemory<BARRELPS> tprojarray[8];
+  const auto nTrackletProjections = tb.nFiles(trackletProjectionPattern);
+  vector<TrackletProjectionMemory<projMemType> > tprojarray(nTrackletProjections);
 
   // output memories
-  static AllProjectionMemory<BARRELPS> allproj;
-  static VMProjectionMemory<BARREL> vmprojarray[8];
+  AllProjectionMemory<projMemType> allproj;
+  const auto nVMProjections = tb.nFiles(vmProjectionPattern);
+  vector<VMProjectionMemory<vmProjMemType> > vmprojarray(nVMProjections);
 
-  ///////////////////////////
-  // open input files
-  cout << "Open files..." << endl;
-
-  ifstream fin_tproj1;
-  bool validin1 = openDataFile(fin_tproj1, "PR_L3PHIC/TrackletProjections_TPROJ_L1L2F_L3PHIC_04.dat");
-  if (not validin1) return -1;
-
-  ifstream fin_tproj2;
-  bool validin2 = openDataFile(fin_tproj2, "PR_L3PHIC/TrackletProjections_TPROJ_L1L2G_L3PHIC_04.dat");
-  if (not validin2) return -1;
-
-  ifstream fin_tproj3;
-  bool validin3 = openDataFile(fin_tproj3, "PR_L3PHIC/TrackletProjections_TPROJ_L1L2H_L3PHIC_04.dat");
-  if (not validin3) return -1;
-
-  ifstream fin_tproj4;
-  bool validin4 = openDataFile(fin_tproj4, "PR_L3PHIC/TrackletProjections_TPROJ_L1L2I_L3PHIC_04.dat");
-  if (not validin4) return -1;
-
-  ifstream fin_tproj5;
-  bool validin5 = openDataFile(fin_tproj5, "PR_L3PHIC/TrackletProjections_TPROJ_L1L2J_L3PHIC_04.dat");
-  if (not validin5) return -1;
-
-  ifstream fin_tproj6;
-  bool validin6 = openDataFile(fin_tproj6, "PR_L3PHIC/TrackletProjections_TPROJ_L5L6B_L3PHIC_04.dat");
-  if (not validin6) return -1;
-
-  ifstream fin_tproj7;
-  bool validin7 = openDataFile(fin_tproj7, "PR_L3PHIC/TrackletProjections_TPROJ_L5L6C_L3PHIC_04.dat");
-  if (not validin7) return -1;
-
-  ifstream fin_tproj8;
-  bool validin8 = openDataFile(fin_tproj8, "PR_L3PHIC/TrackletProjections_TPROJ_L5L6D_L3PHIC_04.dat");
-  if (not validin8) return -1;
-
-  ///////////////////////////
-  // open output files
-  ifstream fout_aproj;
-  bool valid_aproj = openDataFile(fout_aproj, "PR_L3PHIC/AllProj_AP_L3PHIC_04.dat");
-  if (not valid_aproj) return -1;
-
-  ifstream fout_vmproj1;
-  bool valid_vmproj1 =  openDataFile(fout_vmproj1, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC17_04.dat");
-  if (not valid_vmproj1) return -1;
-
-  ifstream fout_vmproj2;
-  bool valid_vmproj2 = openDataFile(fout_vmproj2, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC18_04.dat");
-  if (not valid_vmproj2) return -1;
-
-  ifstream fout_vmproj3;
-  bool valid_vmproj3 = openDataFile(fout_vmproj3, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC19_04.dat");
-  if (not valid_vmproj3) return -1;
-
-  ifstream fout_vmproj4;
-  bool valid_vmproj4 = openDataFile(fout_vmproj4, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC20_04.dat");
-  if (not valid_vmproj4) return -1;
-
-  ifstream fout_vmproj5;
-  bool valid_vmproj5 =  openDataFile(fout_vmproj5, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC21_04.dat");
-  if (not valid_vmproj5) return -1;
-
-  ifstream fout_vmproj6;
-  bool valid_vmproj6 = openDataFile(fout_vmproj6, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC22_04.dat");
-  if (not valid_vmproj6) return -1;
-
-  ifstream fout_vmproj7;
-  bool valid_vmproj7 = openDataFile(fout_vmproj7, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC23_04.dat");
-  if (not valid_vmproj7) return -1;
-
-  ifstream fout_vmproj8;
-  bool valid_vmproj8 = openDataFile(fout_vmproj8, "PR_L3PHIC/VMProjections_VMPROJ_L3PHIC24_04.dat");
-  if (not valid_vmproj8) return -1;
-
-  ///////////////////////////  
   // loop over events
   cout << "Start event loop ..." << endl;
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[0], fin_tproj1, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[1], fin_tproj2, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[2], fin_tproj3, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[3], fin_tproj4, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[4], fin_tproj5, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[5], fin_tproj6, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[6], fin_tproj7, ievt);
-    writeMemFromFile<TrackletProjectionMemory<BARRELPS> >(tprojarray[7], fin_tproj8, ievt);
+    auto &fin_TrackletProjections = tb.files(trackletProjectionPattern);
+    for (unsigned int i = 0; i < nTrackletProjections; i++)
+      writeMemFromFile<TrackletProjectionMemory<projMemType> >(tprojarray[i], fin_TrackletProjections.at(i), ievt);
+
+    // clear all output memories before starting
+    allproj.clear();
+    for (unsigned int i = 0; i < nVMProjections; i++)
+      vmprojarray[i].clear();
 
     // bx
     BXType bx = ievt;
     BXType bx_out;
 
-    // Clear output memories
-    allproj.clear();
-    for (unsigned int imem = 0; imem<8; imem++) {
-      vmprojarray[imem].clear();
-    }
-
     // Unit Under Test
-    ProjectionRouterTop_L3PHIC(bx, tprojarray, bx_out, allproj, vmprojarray);
+#if MODULE_ == PR_L1PHIB_
+    ProjectionRouterTop_L1PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L2PHIB_
+    ProjectionRouterTop_L2PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L3PHIB_
+    ProjectionRouterTop_L3PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L4PHIB_
+    ProjectionRouterTop_L4PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L5PHIB_
+    ProjectionRouterTop_L5PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L6PHIB_
+    ProjectionRouterTop_L6PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L1PHIC_
+    ProjectionRouterTop_L1PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L2PHIC_
+    ProjectionRouterTop_L2PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L3PHIC_
+    ProjectionRouterTop_L3PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L4PHIC_
+    ProjectionRouterTop_L4PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L5PHIC_
+    ProjectionRouterTop_L5PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#elif MODULE_ == PR_L6PHIC_
+    ProjectionRouterTop_L6PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
+#else
+  #error "Undefined PR"
+#endif
 
-    // compare the computed outputs with the expected ones
     bool truncation = false;
+    auto &fout_aproj = tb.files(allProjectionPattern);
+    auto &fout_vmproj = tb.files(vmProjectionPattern);
+    const auto &vmproj_names = tb.fileNames(vmProjectionPattern);
+    
+    // compare the computed outputs with the expected ones
     // AllProjection
-    err += compareMemWithFile<AllProjectionMemory<BARRELPS> >
-      (allproj,fout_aproj, ievt, "AllProjection", truncation);
-    // VMProjection1
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[0], fout_vmproj1, ievt, "VMProjection1", truncation);
+    err += compareMemWithFile<AllProjectionMemory<projMemType> >(allproj, fout_aproj.at(0), ievt, "AllProjection", truncation);
 
-    // VMProjection2
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[1], fout_vmproj2, ievt, "VMProjection2", truncation);
-
-    // VMProjection3
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[2], fout_vmproj3, ievt, "VMProjection3", truncation);
-
-    // VMProjection4
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[3], fout_vmproj4, ievt, "VMProjection4", truncation);
-
-    // VMProjection5
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[4], fout_vmproj5, ievt, "VMProjection5", truncation);
-
-    // VMProjection6
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[5], fout_vmproj6, ievt, "VMProjection6", truncation);
-
-    // VMProjection7
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[6], fout_vmproj7, ievt, "VMProjection7", truncation);
-
-    // VMProjection8
-    err += compareMemWithFile<VMProjectionMemory<BARREL> >
-      (vmprojarray[7], fout_vmproj8, ievt, "VMProjection8", truncation);
+    for (unsigned int i = 0; i < vmproj_names.size(); i++) {
+      const auto &vmproj_name = vmproj_names.at(i);
+      auto &fout = fout_vmproj.at(i);
+      string label = "VMProjection " + to_string(i);
+      err += compareMemWithFile<VMProjectionMemory<vmProjMemType> >
+        (vmprojarray[i], fout, ievt, label, truncation);
+    }
     
   } // end of event loop
   
   // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
   if (err > 255) err = 255;
+//  cout << "Module actually has " << err << " errors." << endl;
+//  return 0;
   return err;
   
 }
