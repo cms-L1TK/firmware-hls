@@ -9,30 +9,6 @@ memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/downl
 #memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
-#### fw_synch_210611 ####
-# Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
-# Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
-
-#### fw_synch_210503 ####
-# Standard configuration
-#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
-# Combined modules
-#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
-#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
-
-#### fw_synch_201005 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
-
-#### fw_synch_200515 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
-
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
 declare -a processing_modules=(
