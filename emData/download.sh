@@ -12,43 +12,45 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
 declare -a processing_modules=(
+  # InputRouter
+  "IR_PS10G_1_A"
+  "IR_PS10G_2_A"
+  "IR_PS10G_2_B"
+  "IR_PS10G_3_A"
+  "IR_PS10G_3_B"
+  "IR_PS_1_A"
+  "IR_PS_1_B"
+  "IR_PS_2_A"
+  "IR_PS_2_B"
+  "IR_2S_1_A"
+  "IR_2S_1_B"
+  "IR_2S_2_A"
+  "IR_2S_2_B"
+  "IR_2S_3_A"
+  "IR_2S_3_B"
+  "IR_2S_4_A"
+  "IR_2S_4_B"
+
   # VMRouter
   "VMR_L1PHID"
-  "VMR_L2PHIA"
   "VMR_L2PHIB"
-  "VMR_L3PHIA"
-  "VMR_L4PHIA"
-  "VMR_L5PHIA"
-  "VMR_L6PHIA"
-  "VMR_D1PHIA"
-  "VMR_D2PHIA"
-  "VMR_D3PHIA"
-  "VMR_D4PHIA"
-  "VMR_D5PHIA"
-
-  # VMRouter CM
-  "VMRCM_L1PHIA"
-  "VMRCM_L2PHIA"
-  "VMRCM_L3PHIA"
-  "VMRCM_L4PHIA"
-  "VMRCM_L5PHIA"
-  "VMRCM_L6PHIA"
-  "VMRCM_D1PHIA"
-  "VMRCM_D2PHIA"
-  "VMRCM_D3PHIA"
-  "VMRCM_D4PHIA"
-  "VMRCM_D5PHIA"
+  "VMR_L3PHIB"
+  "VMR_L4PHIB"
+  "VMR_L5PHIB"
+  "VMR_L6PHIB"
 
   # TrackletEngine
-  "TE_L1PHIC12_L2PHIB12"
-  "TE_L1PHIE18_L2PHIC17"
+  "TE_L1PHID14_L2PHIB15"
+  "TE_L1PHID14_L2PHIB16"
+  "TE_L1PHID15_L2PHIB13"
+  "TE_L1PHID15_L2PHIB14"
+  "TE_L1PHID15_L2PHIB15"
+  "TE_L1PHID15_L2PHIB16"
+  "TE_L1PHID16_L2PHIB14"
+  "TE_L1PHID16_L2PHIB15"
+  "TE_L1PHID16_L2PHIB16"
 
   # TrackletCalculator
-  "TC_L1L2A"
-  "TC_L1L2B"
-  "TC_L1L2C"
-  "TC_L1L2D"
-  "TC_L1L2E"
   "TC_L1L2F"
   "TC_L1L2G"
   "TC_L1L2H"
@@ -70,18 +72,10 @@ declare -a processing_modules=(
   "TC_L5L6D"
 
   # ProjectionRouter
-  "PR_L1PHIB"
-  "PR_L2PHIB"
   "PR_L3PHIB"
   "PR_L4PHIB"
   "PR_L5PHIB"
   "PR_L6PHIB"
-  "PR_L1PHIC"
-  "PR_L2PHIC"
-  "PR_L3PHIC"
-  "PR_L4PHIC"
-  "PR_L5PHIC"
-  "PR_L6PHIC"
 
   # MatchEngine
   "ME_L1PHIC12"
@@ -97,21 +91,10 @@ declare -a processing_modules=(
   "ME_D5PHIC12"
 
   # MatchCalculator
-  "MC_L1PHIB"
-  "MC_L2PHIB"
   "MC_L3PHIB"
   "MC_L4PHIB"
   "MC_L5PHIB"
   "MC_L6PHIB"
-  "MC_L1PHIC"
-  "MC_L2PHIC"
-  "MC_L3PHIC"
-  "MC_L4PHIC"
-  "MC_L5PHIC"
-  "MC_L6PHIC"
-
-  # MatchProcessor
-  "MP_L3PHIC"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
