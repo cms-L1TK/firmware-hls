@@ -6,13 +6,6 @@
 # get some information about the executable and environment
 source env_hls.tcl
 
-set modules_to_test {
-  {PR_L3PHIC}
-}
-# module_to_export must correspond to the default macros set at the top of the
-# test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export PR_L3PHIC
-
 # create new project (deleting any existing one of same name)
 open_project -reset projrouter
 
@@ -24,30 +17,28 @@ add_files -tb ../TestBenches/ProjectionRouter_test.cpp -cflags "$CFLAGS"
 # data files
 add_files -tb ../emData/PR/
 
+open_solution "solution_L3PHIB"
+source settings_hls.tcl
+set_top "ProjectionRouterTop_L3PHIB"
+csynth_design
+export_design -format ip_catalog
 
-foreach i $modules_to_test {
-  puts [join [list "======== TESTING " $i " ========"] ""]
-  set module $i
+open_solution "solution_L4PHIB"
+source settings_hls.tcl
+set_top "ProjectionRouterTop_L4PHIB"
+csynth_design
+export_design -format ip_catalog
 
-  # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"MODULE_=" $module "_\""] ""]
+open_solution "solution_L5PHIB"
+source settings_hls.tcl
+set_top "ProjectionRouterTop_L5PHIB"
+csynth_design
+export_design -format ip_catalog
 
-  # run C-simulation for each module in modules_to_test
-  set_top [join [list "ProjectionRouterTop_" [string range $i 3 8]] ""]
-  open_solution [join [list "solution_" $module] ""]
-
-  # Define FPGA, clock frequency & common HLS settings.
-  source settings_hls.tcl
-  csim_design -mflags "-j8"
-  csynth_design
-  export_design -format ip_catalog
-
-  # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
-  if { $i == $module_to_export } {
-    cosim_design
-    # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-    #export_design -format ip_catalog -flow impl
-  }
-}
+open_solution "solution_L6PHIB"
+source settings_hls.tcl
+set_top "ProjectionRouterTop_L6PHIB"
+csynth_design
+export_design -format ip_catalog
 
 exit

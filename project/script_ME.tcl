@@ -12,23 +12,37 @@ open_project -reset matchengine
 # source files
 # Optional Flags: -DDEBUG
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top MatchEngineTop
-add_files ../TrackletAlgorithm/MatchEngineTop.cc -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchEngineTop_L3.cc -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchEngineTop_L4.cc -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchEngineTop_L5.cc -cflags "$CFLAGS"
+add_files ../TrackletAlgorithm/MatchEngineTop_L6.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "$CFLAGS"
-
-open_solution "solution1"
-
-# Define FPGA, clock frequency & common HLS settings.
-source settings_hls.tcl
 
 # data files
 add_files -tb ../emData/ME/
 
-csim_design -mflags "-j8"
+open_solution "solution_L3"
+source settings_hls.tcl
+set_top MatchEngineTop_L3
 csynth_design
-cosim_design -trace_level all -rtl verilog
 export_design -format ip_catalog
-# Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-#export_design -rtl verilog -format ip_catalog -flow impl
+
+open_solution "solution_L4"
+source settings_hls.tcl
+set_top MatchEngineTop_L4
+csynth_design
+export_design -format ip_catalog
+
+open_solution "solution_L5"
+source settings_hls.tcl
+set_top MatchEngineTop_L5
+csynth_design
+export_design -format ip_catalog
+
+open_solution "solution_L6"
+source settings_hls.tcl
+set_top MatchEngineTop_L6
+csynth_design
+export_design -format ip_catalog
 
 exit

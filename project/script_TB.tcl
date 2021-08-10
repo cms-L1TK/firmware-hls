@@ -15,7 +15,7 @@ set_top TrackBuilder_L1L2
 add_files ../TrackletAlgorithm/TrackBuilderTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackBuilder_test.cpp -cflags "$CFLAGS"
 
-open_solution "solution1"
+open_solution "solution_L1L2"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
