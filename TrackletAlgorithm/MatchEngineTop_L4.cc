@@ -1,6 +1,6 @@
-#include "MatchEngineTop.h"
+#include "MatchEngineTop_L4.h"
 
-void MatchEngineTop(const BXType bx, BXType& bx_o,
+void MatchEngineTop_L4(const BXType bx, BXType& bx_o,
 					const VMStubMEMemory<MODULETYPE, NBITBIN>& inputStubData,
 					const VMProjectionMemory<PROJECTIONTYPE>& inputProjectionData,
 					CandidateMatchMemory& outputCandidateMatch) {

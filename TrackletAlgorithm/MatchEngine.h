@@ -14,7 +14,6 @@
 
 ///////////////
 // -- CONSTANTS
-#define LAYER 3
 //Options: BARREL and DISK
 #define PROJECTIONTYPE BARREL
 #if (LAYER >= 1) && (LAYER <= 3)
