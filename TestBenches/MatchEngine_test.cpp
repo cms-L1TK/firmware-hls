@@ -1,7 +1,7 @@
 // ProjectionRouter test bench
 
 // cms-tracklet/firmware-hls Headers
-#include "MatchEngine.h"
+#include "MatchEngineTop.h"
 #include "CandidateMatchMemory.h"
 #include "VMProjectionMemory.h"
 #include "VMStubMEMemory.h"
