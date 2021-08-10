@@ -15,19 +15,43 @@ set_top VMRouterTop_L2PHIA
 add_files ../TopFunctions/VMRouterTop_L2PHIA.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/VMRouter_test.cpp -cflags "$CFLAGS"
 
-open_solution "solution1"
-
-# Define FPGA, clock frequency & common HLS settings.
-source settings_hls.tcl
-
 # data files
 add_files -tb ../emData/VMR/
 
-csim_design -mflags "-j8"
+open_solution "solution_L1PHID"
+source settings_hls.tcl
+set_top VMRouterTop_L1PHID
 csynth_design
-cosim_design
 export_design -format ip_catalog
-# Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-#export_design -format ip_catalog -flow impl
+
+open_solution "solution_L2PHIB"
+source settings_hls.tcl
+set_top VMRouterTop_L2PHIB
+csynth_design
+export_design -format ip_catalog
+
+open_solution "solution_L3PHIB"
+source settings_hls.tcl
+set_top VMRouterTop_L3PHIB
+csynth_design
+export_design -format ip_catalog
+
+open_solution "solution_L4PHIB"
+source settings_hls.tcl
+set_top VMRouterTop_L4PHIB
+csynth_design
+export_design -format ip_catalog
+
+open_solution "solution_L5PHIB"
+source settings_hls.tcl
+set_top VMRouterTop_L5PHIB
+csynth_design
+export_design -format ip_catalog
+
+open_solution "solution_L6PHIB"
+source settings_hls.tcl
+set_top VMRouterTop_L6PHIB
+csynth_design
+export_design -format ip_catalog
 
 exit
