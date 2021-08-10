@@ -24,12 +24,12 @@ int main() {
   int err_count = 0;
 
   // declare input memory arrays to be read from the emulation files
-  static CandidateMatchMemory           match[maxMatchCopies];
+  static CandidateMatchMemory           match[L3PHICmaxMatchCopies];
   static AllStubMemory<BARRELPS>        allstub;
   static AllProjectionMemory<BARRELPS>  allproj;
 
   // declare output memory array to be filled by hls simulation
-  static FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies];
+  static FullMatchMemory<BARREL> fullmatch[L3PHICmaxFullMatchCopies];
 
   // read in input files
   ifstream fin_as;
@@ -103,7 +103,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    MatchCalculatorTop(
+    MatchCalculator_L3PHIC(
       bx, match, &allstub, &allproj, bx_out, fullmatch
     );
 

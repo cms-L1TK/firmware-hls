@@ -125,7 +125,7 @@ int main()
     }
 
     // Unit Under Test
-    ProjectionRouterTop(bx, tprojarray, bx_out, allproj, vmprojarray);
+    ProjectionRouterTop_L3PHIC(bx, tprojarray, bx_out, allproj, vmprojarray);
 
     // compare the computed outputs with the expected ones
     bool truncation = false;
