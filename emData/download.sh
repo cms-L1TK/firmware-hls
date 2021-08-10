@@ -1,29 +1,5 @@
 #!/usr/bin/env bash
 
-#### fw_synch_210611 ####
-# Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
-# Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
-
-#### fw_synch_210503 ####
-# Standard configuration
-#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
-# Combined modules
-#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
-#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
-
-#### fw_synch_201005 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
-
-#### fw_synch_200515 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
-
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
 declare -a processing_modules=(
@@ -122,9 +98,6 @@ declare -a processing_modules=(
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
-
-  # Tracklet Processor
-  "TP_L1L2D" 
 )
 
 # Function that prints information regarding the usage of this command
@@ -155,21 +128,6 @@ do
   esac
   shift
 done
-
-# If the MemPrints directory exists, assume the script has already been run,
-# and simply exit.
-if [ -d "MemPrints" ]
-then
-  exit 0
-fi
-
-# If the LUTs directory exists, assume LUTs.tar.gz has already been downloaded
-# and unpacked, and only download and unpack MemPrints.tar.gz.
-memprints_only=0
-if [ -d "LUTs" ]
-then
-  memprints_only=1
-fi
 
 # Exit with an error message if run from a directory other than emData/.
 cwd=`pwd | xargs basename`
@@ -204,16 +162,6 @@ if [[ $tables_only != 0 ]]
 then
   exit 0
 fi
-
-# Download and unpack the tarball.
-wget -O MemPrints.tgz --quiet ${memprints_url_cm}
-tar -xzf MemPrints.tgz
-mv MemPrints MemPrintsCM
-rm -f MemPrints.tgz
-
-wget -O MemPrints.tar.gz --quiet ${memprints_url}
-tar -xzf MemPrints.tar.gz
-rm -f MemPrints.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
