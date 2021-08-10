@@ -42,7 +42,7 @@ package memUtil_pkg is
 
   type enum_BW_46 is (L1L2_L3,L1L2_L4,L1L2_L5,L1L2_L6);
 
-  type enum_TW_72 is (L1L2);
+  type enum_TW_84 is (L1L2);
 
   type t_arr_DL_39_1b is array(enum_DL_39) of std_logic;
   type t_arr_DL_39_DATA is array(enum_DL_39) of std_logic_vector(38 downto 0);
@@ -108,8 +108,8 @@ package memUtil_pkg is
   type t_arr_FM_52_NENT is array(enum_FM_52) of t_arr2_7b;
   type t_arr_BW_46_1b is array(enum_BW_46) of std_logic;
   type t_arr_BW_46_DATA is array(enum_BW_46) of std_logic_vector(45 downto 0);
-  type t_arr_TW_72_1b is array(enum_TW_72) of std_logic;
-  type t_arr_TW_72_DATA is array(enum_TW_72) of std_logic_vector(71 downto 0);
+  type t_arr_TW_84_1b is array(enum_TW_84) of std_logic;
+  type t_arr_TW_84_DATA is array(enum_TW_84) of std_logic_vector(83 downto 0);
 
   -- ########################### Functions ###########################
 
@@ -131,7 +131,7 @@ package memUtil_pkg is
   function memory_enum_to_string(val: enum_CM_14) return string;
   function memory_enum_to_string(val: enum_FM_52) return string;
   function memory_enum_to_string(val: enum_BW_46) return string;
-  function memory_enum_to_string(val: enum_TW_72) return string;
+  function memory_enum_to_string(val: enum_TW_84) return string;
 
 end package memUtil_pkg;
 
@@ -439,7 +439,7 @@ package body memUtil_pkg is
     return "No conversion found.";
   end memory_enum_to_string;
 
-  function memory_enum_to_string(val: enum_TW_72) return string is
+  function memory_enum_to_string(val: enum_TW_84) return string is
   begin
     case val is
        when L1L2 => return "L1L2";

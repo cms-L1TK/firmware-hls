@@ -20,9 +20,9 @@ entity SectorProcessor is
     BW_46_stream_AV_din       : out t_arr_BW_46_DATA;
     BW_46_stream_A_full_neg   : in t_arr_BW_46_1b;
     BW_46_stream_A_write      : out t_arr_BW_46_1b;
-    TW_72_stream_AV_din       : out t_arr_TW_72_DATA;
-    TW_72_stream_A_full_neg   : in t_arr_TW_72_1b;
-    TW_72_stream_A_write      : out t_arr_TW_72_1b
+    TW_84_stream_AV_din       : out t_arr_TW_84_DATA;
+    TW_84_stream_A_full_neg   : in t_arr_TW_84_1b;
+    TW_84_stream_A_write      : out t_arr_TW_84_1b
   );
 end SectorProcessor;
 
@@ -5378,9 +5378,9 @@ begin
       barrelFullMatches_3_dataarray_data_V_q0        => FM_52_mem_AV_dout(L1L2_L6PHIB),
       barrelFullMatches_3_nentries_0_V               => FM_52_mem_AAV_dout_nent(L1L2_L6PHIB)(0),
       barrelFullMatches_3_nentries_1_V               => FM_52_mem_AAV_dout_nent(L1L2_L6PHIB)(1),
-      trackWord_V_din       => TW_72_stream_AV_din(L1L2),
-      trackWord_V_full_n    => TW_72_stream_A_full_neg(L1L2),
-      trackWord_V_write     => TW_72_stream_A_write(L1L2),
+      trackWord_V_din       => TW_84_stream_AV_din(L1L2),
+      trackWord_V_full_n    => TW_84_stream_A_full_neg(L1L2),
+      trackWord_V_write     => TW_84_stream_A_write(L1L2),
       barrelStubWords_0_V_din       => BW_46_stream_AV_din(L1L2_L3),
       barrelStubWords_0_V_full_n    => BW_46_stream_A_full_neg(L1L2_L3),
       barrelStubWords_0_V_write     => BW_46_stream_A_write(L1L2_L3),
