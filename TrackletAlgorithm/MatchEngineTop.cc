@@ -16,5 +16,5 @@ void MatchEngineTop(const BXType bx, BXType& bx_o,
     #pragma HLS resource variable=inputProjectionData->get_mem() latency=2
 #endif
 
-	MatchEngine<LayerDisk,kModuleType,kProjectionType>(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch);
+	MatchEngine<kLayerDisk,kModuleType,kProjectionType>(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch);
 }

@@ -40,57 +40,57 @@ int main() {
 	bool validvmproj    = false;
 	bool validvmstub    = false;
 	bool validcandmatch = false;
-	if (LayerDisk == TF::L1) {
+	if (kLayerDisk == TF::L1) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L1PHIC12/VMProjections_VMPROJ_L1PHIC12_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L1PHIC12/VMStubs_VMSME_L1PHIC12n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L1PHIC12/CandidateMatches_CM_L1PHIC12_04.dat");
 	}
-	else if (LayerDisk == TF::L2) {
+	else if (kLayerDisk == TF::L2) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L2PHIC20/VMProjections_VMPROJ_L2PHIC20_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L2PHIC20/VMStubs_VMSME_L2PHIC20n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L2PHIC20/CandidateMatches_CM_L2PHIC20_04.dat");
 	}
-	else if (LayerDisk == TF::L3) {
+	else if (kLayerDisk == TF::L3) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L3PHIC20/VMProjections_VMPROJ_L3PHIC20_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L3PHIC20/VMStubs_VMSME_L3PHIC20n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
 	}
-	else if (LayerDisk == TF::L4) {
+	else if (kLayerDisk == TF::L4) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L4PHIC20/VMProjections_VMPROJ_L4PHIC20_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L4PHIC20/VMStubs_VMSME_L4PHIC20n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L4PHIC20/CandidateMatches_CM_L4PHIC20_04.dat");
 	}
-	else if (LayerDisk == TF::L5) {
+	else if (kLayerDisk == TF::L5) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L5PHIC20/VMProjections_VMPROJ_L5PHIC20_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L5PHIC20/VMStubs_VMSME_L5PHIC20n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L5PHIC20/CandidateMatches_CM_L5PHIC20_04.dat");
 	}
-	else if (LayerDisk == TF::L6) {
+	else if (kLayerDisk == TF::L6) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L6PHIC20/VMProjections_VMPROJ_L6PHIC20_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L6PHIC20/VMStubs_VMSME_L6PHIC20n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L6PHIC20/CandidateMatches_CM_L6PHIC20_04.dat");
 	}
-	else if (LayerDisk == TF::D1) {
+	else if (kLayerDisk == TF::D1) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D1PHIC20/VMProjections_VMPROJ_D1PHIC20_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D1PHIC20/VMStubs_VMSME_D1PHIC20n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D1PHIC20/CandidateMatches_CM_D1PHIC20_04.dat");
 	}
-	else if (LayerDisk == TF::D2) {
+	else if (kLayerDisk == TF::D2) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D2PHIC12/VMProjections_VMPROJ_D2PHIC12_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D2PHIC12/VMStubs_VMSME_D2PHIC12n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D2PHIC12/CandidateMatches_CM_D2PHIC12_04.dat");
 	}
-	else if (LayerDisk == TF::D3) {
+	else if (kLayerDisk == TF::D3) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D3PHIC12/VMProjections_VMPROJ_D3PHIC12_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D3PHIC12/VMStubs_VMSME_D3PHIC12n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D3PHIC12/CandidateMatches_CM_D3PHIC12_04.dat");
 	}
-	else if (LayerDisk == TF::D4) {
+	else if (kLayerDisk == TF::D4) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D4PHIC12/VMProjections_VMPROJ_D4PHIC12_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D4PHIC12/VMStubs_VMSME_D4PHIC12n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D4PHIC12/CandidateMatches_CM_D4PHIC12_04.dat");
 	}
-	else if (LayerDisk == TF::D5) {
+	else if (kLayerDisk == TF::D5) {
 		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D5PHIC12/VMProjections_VMPROJ_D5PHIC12_04.dat");
 		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D5PHIC12/VMStubs_VMSME_D5PHIC12n1_04.dat");
 		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D5PHIC12/CandidateMatches_CM_D5PHIC12_04.dat");

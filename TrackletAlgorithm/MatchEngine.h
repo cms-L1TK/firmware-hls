@@ -25,11 +25,11 @@
 
 ///////////////
 // -- CONSTANTS
-constexpr TF::layerDisk LayerDisk = TF::L3;
+constexpr TF::layerDisk kLayerDisk = TF::L3;
 
-constexpr regionType kProjectionType = TF::layerDiskRegion[LayerDisk];
-constexpr regionType kModuleType = TF::layerDiskType[LayerDisk];
-constexpr unsigned int kNBitBin = (LayerDisk <= TF::L6) ? 3 : 4;
+constexpr regionType kProjectionType = TF::layerDiskRegion[kLayerDisk];
+constexpr regionType kModuleType = TF::layerDiskType[kLayerDisk];
+constexpr unsigned int kNBitBin = (kLayerDisk <= TF::L6) ? 3 : 4;
 constexpr unsigned int kRInvSteps = 32;
 constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
 constexpr unsigned int kBufferSize = 8;
