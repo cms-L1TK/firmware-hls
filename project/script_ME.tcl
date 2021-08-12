@@ -6,39 +6,35 @@
 # get some information about the executable and environment
 source env_hls.tcl
 
-# create new project (deleting any existing one of same name)
-open_project -reset matchengine
-
-# source files
 # Optional Flags: -DDEBUG
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+
+open_project -reset matchengine_L3
 add_files ../TrackletAlgorithm/MatchEngineTop_L3.cc -cflags "$CFLAGS"
-add_files ../TrackletAlgorithm/MatchEngineTop_L4.cc -cflags "$CFLAGS"
-add_files ../TrackletAlgorithm/MatchEngineTop_L5.cc -cflags "$CFLAGS"
-add_files ../TrackletAlgorithm/MatchEngineTop_L6.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "$CFLAGS"
-
-# data files
-add_files -tb ../emData/ME/
-
 open_solution "solution_L3"
 source settings_hls.tcl
 set_top MatchEngineTop_L3
 csynth_design
 export_design -format ip_catalog
 
+open_project -reset matchengine_L4
+add_files ../TrackletAlgorithm/MatchEngineTop_L4.cc -cflags "$CFLAGS"
 open_solution "solution_L4"
 source settings_hls.tcl
 set_top MatchEngineTop_L4
 csynth_design
 export_design -format ip_catalog
 
+open_project -reset matchengine_L5
+add_files ../TrackletAlgorithm/MatchEngineTop_L5.cc -cflags "$CFLAGS"
 open_solution "solution_L5"
 source settings_hls.tcl
 set_top MatchEngineTop_L5
 csynth_design
 export_design -format ip_catalog
 
+open_project -reset matchengine_L6
+add_files ../TrackletAlgorithm/MatchEngineTop_L6.cc -cflags "$CFLAGS"
 open_solution "solution_L6"
 source settings_hls.tcl
 set_top MatchEngineTop_L6
