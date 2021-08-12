@@ -5,7 +5,7 @@
 namespace edm {
   class LogVerbatim{
   public:
-    LogVerbatim(std::string type) { if(0) {std::cout<<type<<std::endl;} }
+    LogVerbatim(std::string type) { std::cout<<type<<std::endl; }
     ~LogVerbatim() { std::cout << std::endl;}
     template <class T> LogVerbatim& operator<<(T const& t) {std::cout << t;return *this;}
     LogVerbatim& operator<<(std::ostream& (*f)(std::ostream&)) {std::cout << f;return *this;}
@@ -13,7 +13,7 @@ namespace edm {
   };
   class LogPrint{
   public:
-    LogPrint(std::string type) { if(0) {std::cout<<type<<std::endl;} }
+    LogPrint(std::string type) { std::cout<<type<<std::endl; }
     ~LogPrint() { std::cout << std::endl;}
     template <class T> LogPrint& operator<<(T const& t) {std::cout << t;return *this;}
     LogPrint& operator<<(std::ostream& (*f)(std::ostream&)) {std::cout << f;return *this;}
@@ -21,7 +21,7 @@ namespace edm {
   };
   class LogWarning{
   public:
-    LogWarning(std::string type) { if(0) {std::cout<<type<<std::endl;} }
+    LogWarning(std::string type) { std::cout<<type<<std::endl; }
     ~LogWarning() { std::cout << std::endl;}
     template <class T> LogWarning& operator<<(T const& t) {std::cout << t;return *this;}
     LogWarning& operator<<(std::ostream& (*f)(std::ostream&)) {std::cout << f;return *this;}
@@ -29,7 +29,7 @@ namespace edm {
   };
   class LogProblem{
   public:
-    LogProblem(std::string type) { if(0) {std::cout<<type<<std::endl;} }
+    LogProblem(std::string type) { std::cout<<type<<std::endl; }
     ~LogProblem() { std::cout << std::endl;}
     template <class T> LogProblem& operator<<(T const& t) {std::cout << t;return *this;}
     LogProblem& operator<<(std::ostream& (*f)(std::ostream&)) {std::cout << f;return *this;}
