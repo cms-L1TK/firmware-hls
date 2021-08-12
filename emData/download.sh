@@ -88,9 +88,17 @@ declare -a processing_modules=(
   "PR_L3PHIC"
 
   # MatchEngine
-  "ME_L1PHIE20"
+  "ME_L1PHIC12"
+  "ME_L2PHIC20"
   "ME_L3PHIC20"
-  "ME_L4PHIB12"
+  "ME_L4PHIC20"
+  "ME_L5PHIC20"
+  "ME_L6PHIC20"
+  "ME_D1PHIC20"
+  "ME_D2PHIC12"
+  "ME_D3PHIC12"
+  "ME_D4PHIC12"
+  "ME_D5PHIC12"
 
   # MatchCalculator
   "MC_L1PHIC"
@@ -143,6 +151,7 @@ done
 # and simply exit.
 if [ -d "MemPrints" ]
 then
+  echo "The emData directory must be cleaned for this script to work."
   exit 0
 fi
 
@@ -239,7 +248,7 @@ do
           find ${table_location} -type f -name "${layer_pair}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "ME" ]]
   then
-          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then

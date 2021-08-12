@@ -1,8 +1,8 @@
 #include "MatchEngineTop.h"
 
 void MatchEngineTop(const BXType bx, BXType& bx_o,
-					const VMStubMEMemory<MODULETYPE, NBITBIN>& inputStubData,
-					const VMProjectionMemory<PROJECTIONTYPE>& inputProjectionData,
+					const VMStubMEMemory<kModuleType, kNBitBin>& inputStubData,
+					const VMProjectionMemory<kProjectionType>& inputProjectionData,
 					CandidateMatchMemory& outputCandidateMatch) {
 
 #pragma HLS interface register port=bx_o
@@ -15,5 +15,5 @@ void MatchEngineTop(const BXType bx, BXType& bx_o,
     #pragma HLS resource variable=inputProjectionData->get_mem() latency=2
 #endif
 
-	MatchEngine<LAYER,MODULETYPE,PROJECTIONTYPE>(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch); 
+	MatchEngine<LayerDisk,kModuleType,kProjectionType>(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch);
 }

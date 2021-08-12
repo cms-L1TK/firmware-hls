@@ -26,8 +26,8 @@ int main() {
 	int err_count = 0;
 
 	// Declare input memory arrays to be read from the emulation files
-	VMProjectionMemory<PROJECTIONTYPE> inputvmprojs;
-	VMStubMEMemory<MODULETYPE, NBITBIN> inputvmstubs;
+	VMProjectionMemory<kProjectionType> inputvmprojs;
+	VMStubMEMemory<kModuleType, kNBitBin> inputvmstubs;
 	//CandidateMatchMemory inputcandmatches;
 
 	// Declare output memory array to be filled by hls simulation
@@ -40,31 +40,61 @@ int main() {
 	bool validvmproj    = false;
 	bool validvmstub    = false;
 	bool validcandmatch = false;
-#if LAYER == 1
-	validvmproj    = openDataFile(fin_vmproj,"ME/ME_L1PHIE20/VMProjections_VMPROJ_L1PHIE20_04.dat");
-	validvmstub    = openDataFile(fin_vmstub,"ME/ME_L1PHIE20/VMStubs_VMSME_L1PHIE20n1_04.dat");
-	validcandmatch = openDataFile(fin_candmatch,"ME/ME_L1PHIE20/CandidateMatches_CM_L1PHIE20_04.dat");
-#elif LAYER == 2
-	validvmproj    = false;
-	validvmstub    = false;
-	validcandmatch = false;
-#elif LAYER == 3
-	validvmproj    = openDataFile(fin_vmproj,"ME/ME_L3PHIC20/VMProjections_VMPROJ_L3PHIC20_04.dat");
-	validvmstub    = openDataFile(fin_vmstub,"ME/ME_L3PHIC20/VMStubs_VMSME_L3PHIC20n1_04.dat");
-	validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
-#elif LAYER == 4
-	validvmproj    = openDataFile(fin_vmproj,"ME/ME_L4PHIB12/VMProjections_VMPROJ_L4PHIB12_04.dat");
-	validvmstub    = openDataFile(fin_vmstub,"ME/ME_L4PHIB12/VMStubs_VMSME_L4PHIB12n1_04.dat");
-	validcandmatch = openDataFile(fin_candmatch,"ME/ME_L4PHIB12/CandidateMatches_CM_L4PHIB12_04.dat");
-#elif LAYER == 5
-	validvmproj    = false;
-	validvmstub    = false;
-	validcandmatch = false;
-#elif LAYER == 6
-	validvmproj    = false;
-	validvmstub    = false;
-	validcandmatch = false;
-#endif
+	if (LayerDisk == TF::L1) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L1PHIC12/VMProjections_VMPROJ_L1PHIC12_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L1PHIC12/VMStubs_VMSME_L1PHIC12n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L1PHIC12/CandidateMatches_CM_L1PHIC12_04.dat");
+	}
+	else if (LayerDisk == TF::L2) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L2PHIC20/VMProjections_VMPROJ_L2PHIC20_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L2PHIC20/VMStubs_VMSME_L2PHIC20n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L2PHIC20/CandidateMatches_CM_L2PHIC20_04.dat");
+	}
+	else if (LayerDisk == TF::L3) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L3PHIC20/VMProjections_VMPROJ_L3PHIC20_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L3PHIC20/VMStubs_VMSME_L3PHIC20n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L3PHIC20/CandidateMatches_CM_L3PHIC20_04.dat");
+	}
+	else if (LayerDisk == TF::L4) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L4PHIC20/VMProjections_VMPROJ_L4PHIC20_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L4PHIC20/VMStubs_VMSME_L4PHIC20n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L4PHIC20/CandidateMatches_CM_L4PHIC20_04.dat");
+	}
+	else if (LayerDisk == TF::L5) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L5PHIC20/VMProjections_VMPROJ_L5PHIC20_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L5PHIC20/VMStubs_VMSME_L5PHIC20n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L5PHIC20/CandidateMatches_CM_L5PHIC20_04.dat");
+	}
+	else if (LayerDisk == TF::L6) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_L6PHIC20/VMProjections_VMPROJ_L6PHIC20_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_L6PHIC20/VMStubs_VMSME_L6PHIC20n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_L6PHIC20/CandidateMatches_CM_L6PHIC20_04.dat");
+	}
+	else if (LayerDisk == TF::D1) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D1PHIC20/VMProjections_VMPROJ_D1PHIC20_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D1PHIC20/VMStubs_VMSME_D1PHIC20n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D1PHIC20/CandidateMatches_CM_D1PHIC20_04.dat");
+	}
+	else if (LayerDisk == TF::D2) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D2PHIC12/VMProjections_VMPROJ_D2PHIC12_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D2PHIC12/VMStubs_VMSME_D2PHIC12n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D2PHIC12/CandidateMatches_CM_D2PHIC12_04.dat");
+	}
+	else if (LayerDisk == TF::D3) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D3PHIC12/VMProjections_VMPROJ_D3PHIC12_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D3PHIC12/VMStubs_VMSME_D3PHIC12n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D3PHIC12/CandidateMatches_CM_D3PHIC12_04.dat");
+	}
+	else if (LayerDisk == TF::D4) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D4PHIC12/VMProjections_VMPROJ_D4PHIC12_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D4PHIC12/VMStubs_VMSME_D4PHIC12n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D4PHIC12/CandidateMatches_CM_D4PHIC12_04.dat");
+	}
+	else if (LayerDisk == TF::D5) {
+		validvmproj    = openDataFile(fin_vmproj,"ME/ME_D5PHIC12/VMProjections_VMPROJ_D5PHIC12_04.dat");
+		validvmstub    = openDataFile(fin_vmstub,"ME/ME_D5PHIC12/VMStubs_VMSME_D5PHIC12n1_04.dat");
+		validcandmatch = openDataFile(fin_candmatch,"ME/ME_D5PHIC12/CandidateMatches_CM_D5PHIC12_04.dat");
+	}
 	if (not validvmproj) return -1;
 	if (not validvmstub) return -2;
 	if (not validcandmatch) return -3;
@@ -75,8 +105,8 @@ int main() {
 
                 outputcandmatches.clear();
 
-		writeMemFromFile<VMProjectionMemory<PROJECTIONTYPE> >(inputvmprojs, fin_vmproj, ievt);
-		writeMemFromFile<VMStubMEMemory<MODULETYPE, NBITBIN> >(inputvmstubs, fin_vmstub, ievt);
+		writeMemFromFile<VMProjectionMemory<kProjectionType> >(inputvmprojs, fin_vmproj, ievt);
+		writeMemFromFile<VMStubMEMemory<kModuleType, kNBitBin> >(inputvmstubs, fin_vmstub, ievt);
 
 		//Set bunch crossing
 		BXType bx=ievt&0x7;
