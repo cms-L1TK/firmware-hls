@@ -214,6 +214,7 @@ ME-vivado-hls-build:
     PROJ_NAME: "ME"
 ME-vitis-hls-build:
   <<: *template_hls-build
+  allow_failure: true # FIXME: remove after avitis updated to 2021.1 and confirmed that pre-synthesis failure is gone.
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2020.2"
