@@ -5,7 +5,7 @@
 #include "MemoryTemplate.h"
 #include "AllStubInnerMemory.h"
 #include "TrackletEngineUnit.h"
-template <TF::seed Seed,int itc, regionType innerRegion,regionType VMSTEType>
+template <TF::seed Seed,int iTC	, regionType innerRegion,regionType VMSTEType>
 class TEData{
 
  public:
@@ -17,13 +17,13 @@ class TEData{
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the TEData word for different fields
     kTEDataStubMaskLSB = 0,
-    kTEDataStubMaskMSB = kTEDataStubMaskLSB + 2*(1<<TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::kNBitsPhiBins) - 1,
+    kTEDataStubMaskMSB = kTEDataStubMaskLSB + 2*(1<<TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::kNBitsPhiBins) - 1,
     kTEDatarzbinfirstLSB = kTEDataStubMaskMSB+1,
-    kTEDatarzbinfirstMSB = kTEDatarzbinfirstLSB + TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::kNBitsRZFine - 1,
+    kTEDatarzbinfirstMSB = kTEDatarzbinfirstLSB + TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::kNBitsRZFine - 1,
     kTEDatastartLSB = kTEDatarzbinfirstMSB + 1,
-    kTEDatastartMSB = kTEDatastartLSB + TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::kNBitsRZBin - 1,
+    kTEDatastartMSB = kTEDatastartLSB + TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::kNBitsRZBin - 1,
     kTEDatarzdiffmaxLSB = kTEDatastartMSB + 1,
-    kTEDatarzdiffmaxMSB = kTEDatarzdiffmaxLSB + TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::kNBitsRZFine - 1,
+    kTEDatarzdiffmaxMSB = kTEDatarzdiffmaxLSB + TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::kNBitsRZFine - 1,
     kTEDataAllStubLSB = kTEDatarzdiffmaxMSB + 1,
     kTEDataAllStubMSB = kTEDataAllStubLSB + AllStubInner<innerRegion>::kAllStubInnerSize - 1
   };
@@ -39,19 +39,19 @@ class TEData{
     return data_.range(kTEDataAllStubMSB,kTEDataAllStubLSB);
   }
 
-  typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::RZBIN getStart() const {
+  typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::RZBIN getStart() const {
     return data_.range(kTEDatastartMSB,kTEDatastartLSB);
   }
 
-  typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::RZFINE getrzbinfirst() const {
+  typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::RZFINE getrzbinfirst() const {
     return data_.range(kTEDatarzbinfirstMSB,kTEDatarzbinfirstLSB);
   }
 
-  typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::RZFINE getrzdiffmax() const {
+  typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::RZFINE getrzdiffmax() const {
     return data_.range(kTEDatarzdiffmaxMSB,kTEDatarzdiffmaxLSB);
   }
 
-  const typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::MEMMASK getStubMask() const {
+  const typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::MEMMASK getStubMask() const {
     return data_.range(kTEDataStubMaskMSB,kTEDataStubMaskLSB);
   }
 
@@ -63,10 +63,10 @@ class TEData{
   data_(tedata)
   {}
   
- TEData( const typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::MEMMASK stubmask,
-	 const typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::RZFINE rzbinfirst, 
-	 const typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::RZBIN start, 
-	 const typename TrackletEngineUnit<Seed,itc,innerRegion,VMSTEType>::RZFINE rzdiffmax, 
+ TEData( const typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::MEMMASK stubmask,
+	 const typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::RZFINE rzbinfirst, 
+	 const typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::RZBIN start, 
+	 const typename TrackletEngineUnit<Seed,iTC,innerRegion,VMSTEType>::RZFINE rzdiffmax, 
 	 const typename AllStubInner<innerRegion>::AllStubInnerData stub
 	 ):
   data_( (stub, rzdiffmax, start, rzbinfirst, stubmask) )
@@ -82,7 +82,7 @@ class TEData{
   
 
 // Data object definition
-template <TF::seed Seed, int itc,regionType innerRegion,regionType VMSTEType>
+template <TF::seed Seed, int iTC,regionType innerRegion,regionType VMSTEType>
 class TEBuffer {
 
  public:
@@ -101,11 +101,11 @@ class TEBuffer {
 #pragma HLS array_partition variable=buffer_ complete dim=0
 }
 	
-  void setMemBegin(const typename TEData<Seed,itc,innerRegion,VMSTEType>::IMEM& begin) {
+  void setMemBegin(const typename TEData<Seed,iTC,innerRegion,VMSTEType>::IMEM& begin) {
     imembegin_=begin;
   }
   
-  void setMemEnd(const typename TEData<Seed,itc,innerRegion,VMSTEType>::IMEM& end) {
+  void setMemEnd(const typename TEData<Seed,iTC,innerRegion,VMSTEType>::IMEM& end) {
     imemend_=end;
   }
 
@@ -115,11 +115,11 @@ class TEBuffer {
     readptr_=0;
   }
 
-  typename TEData<Seed,itc,innerRegion,VMSTEType>::IMEM& getMem() {
+  typename TEData<Seed,iTC,innerRegion,VMSTEType>::IMEM& getMem() {
     return imem_;
   }
 
-  const typename TEData<Seed,itc,innerRegion,VMSTEType>::IMEM& getMemEnd() {
+  const typename TEData<Seed,iTC,innerRegion,VMSTEType>::IMEM& getMemEnd() {
     return imemend_;
   }
 
@@ -131,13 +131,13 @@ class TEBuffer {
     istub_=istub;
   }
 
-  void store(const typename TEData<Seed,itc,innerRegion,VMSTEType>::TEDATA& tedata) {
+  void store(const typename TEData<Seed,iTC,innerRegion,VMSTEType>::TEDATA& tedata) {
     auto writeptrtmp=writeptr_;
     buffer_[writeptrtmp]=tedata;
     writeptr_++;
   }
 
-  typename TEData<Seed,itc,innerRegion,VMSTEType>::TEDATA peek() const {
+  typename TEData<Seed,iTC,innerRegion,VMSTEType>::TEDATA peek() const {
     return buffer_[readptr_];
   }
 
@@ -165,9 +165,9 @@ class TEBuffer {
   TEBUFFERINDEX writeptr_, readptr_;
 
   NSTUBS istub_;
-  typename TEData<Seed,itc,innerRegion,VMSTEType>::IMEM imem_, imembegin_, imemend_;
+  typename TEData<Seed,iTC,innerRegion,VMSTEType>::IMEM imem_, imembegin_, imemend_;
   
-  typename TEData<Seed,itc,innerRegion,VMSTEType>::TEDATA buffer_[1<<kNBufferDepthBits];
+  typename TEData<Seed,iTC,innerRegion,VMSTEType>::TEDATA buffer_[1<<kNBufferDepthBits];
   
 private:
 

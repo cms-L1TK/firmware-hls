@@ -11,9 +11,9 @@ open_project -reset trackletProcessor
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top TrackletProcessor_L5L6C
+set_top TrackletProcessor_L3L4C
 add_files ../TrackletAlgorithm/TrackletProcessor.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/TrackletProcessor_L5L6C_test.cpp -cflags "$CFLAGS"
+add_files -tb ../TestBenches/TrackletProcessor_L3L4C_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
 
@@ -23,7 +23,7 @@ set_clock_uncertainty .05
 
 # data files
 add_files -tb ../emData/TP/tables/
-add_files -tb ../emData/TP/TP_L5L6C/
+add_files -tb ../emData/TP/TP_L3L4C/
 
 csim_design -mflags "-j8"
 csynth_design

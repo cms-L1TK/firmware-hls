@@ -3,7 +3,7 @@
 
 #include "Constants.h"
 #include "VMStubTEOuterMemoryCM.h"
-template<TF::seed Seed, int itc, regionType innerRegion,regionType VMSTEType>
+template<TF::seed Seed, int iTC, regionType innerRegion,regionType VMSTEType>
 class TrackletEngineUnit {
 
  public:
@@ -31,9 +31,9 @@ class TrackletEngineUnit {
 
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
-/////  Grabs the appropriate lut based on seed and itc (need to be included in download.sh)
+/////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
 
-    if (Seed==TF::L1L2&&itc==3){
+    if (Seed==TF::L1L2&&iTC==3){
       ap_uint<1> stubptinnertmp[256]=
 #include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[256]=
@@ -43,7 +43,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L2L3&&itc==2){
+    else if (Seed==TF::L2L3&&iTC==2){
       ap_uint<1> stubptinnertmp[256]=
 #include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[256]=
@@ -53,7 +53,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }  
     }
-   else if (Seed==TF::L3L4&&itc==2){
+   else if (Seed==TF::L3L4&&iTC==2){
       ap_uint<1> stubptinnertmp[256]=
 #include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[512]=
@@ -65,7 +65,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L5L6&&itc==2){
+    else if (Seed==TF::L5L6&&iTC==2){
       ap_uint<1> stubptinnertmp[1024]=
 #include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
       ap_uint<1> stubptoutertmp[1024]=
