@@ -120,10 +120,10 @@ void ProjectionRouter(BXType bx,
       // hourglass configuration
 
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[N_LAYER + DISK-1];
+      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[trklet::N_LAYER + DISK-1];
 
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[N_LAYER + DISK-1];
+      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[trklet::N_LAYER + DISK-1];
 
       // bits used for routing
       auto iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
