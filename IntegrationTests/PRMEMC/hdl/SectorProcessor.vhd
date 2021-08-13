@@ -14,15 +14,15 @@ entity SectorProcessor is
     MC_bx_out : out std_logic_vector(2 downto 0);
     MC_bx_out_vld : out std_logic;
     MC_done   : out std_logic;
-    TPROJ_60_mem_A_wea        : in t_arr_TPROJ_60_1b;
-    TPROJ_60_mem_AV_writeaddr : in t_arr_TPROJ_60_ADDR;
-    TPROJ_60_mem_AV_din       : in t_arr_TPROJ_60_DATA;
-    VMSME_16_mem_A_wea        : in t_arr_VMSME_16_1b;
-    VMSME_16_mem_AV_writeaddr : in t_arr_VMSME_16_ADDR;
-    VMSME_16_mem_AV_din       : in t_arr_VMSME_16_DATA;
     AS_36_mem_A_wea        : in t_arr_AS_36_1b;
     AS_36_mem_AV_writeaddr : in t_arr_AS_36_ADDR;
     AS_36_mem_AV_din       : in t_arr_AS_36_DATA;
+    VMSME_16_mem_A_wea        : in t_arr_VMSME_16_1b;
+    VMSME_16_mem_AV_writeaddr : in t_arr_VMSME_16_ADDR;
+    VMSME_16_mem_AV_din       : in t_arr_VMSME_16_DATA;
+    TPROJ_60_mem_A_wea        : in t_arr_TPROJ_60_1b;
+    TPROJ_60_mem_AV_writeaddr : in t_arr_TPROJ_60_ADDR;
+    TPROJ_60_mem_AV_din       : in t_arr_TPROJ_60_DATA;
     FM_52_mem_A_enb          : in t_arr_FM_52_1b;
     FM_52_mem_AV_readaddr    : in t_arr_FM_52_ADDR;
     FM_52_mem_AV_dout        : out t_arr_FM_52_DATA;
@@ -32,14 +32,17 @@ end SectorProcessor;
 
 architecture rtl of SectorProcessor is
 
-  signal TPROJ_60_mem_A_enb          : t_arr_TPROJ_60_1b;
-  signal TPROJ_60_mem_AV_readaddr    : t_arr_TPROJ_60_ADDR;
-  signal TPROJ_60_mem_AV_dout        : t_arr_TPROJ_60_DATA;
-  signal TPROJ_60_mem_AAV_dout_nent  : t_arr_TPROJ_60_NENT; -- (#page)
+  signal AS_36_mem_A_enb          : t_arr_AS_36_1b;
+  signal AS_36_mem_AV_readaddr    : t_arr_AS_36_ADDR;
+  signal AS_36_mem_AV_dout        : t_arr_AS_36_DATA;
   signal VMSME_16_mem_A_enb          : t_arr_VMSME_16_1b;
   signal VMSME_16_mem_AV_readaddr    : t_arr_VMSME_16_ADDR;
   signal VMSME_16_mem_AV_dout        : t_arr_VMSME_16_DATA;
   signal VMSME_16_mem_AAAV_dout_nent : t_arr_VMSME_16_NENT; -- (#page)(#bin)
+  signal TPROJ_60_mem_A_enb          : t_arr_TPROJ_60_1b;
+  signal TPROJ_60_mem_AV_readaddr    : t_arr_TPROJ_60_ADDR;
+  signal TPROJ_60_mem_AV_dout        : t_arr_TPROJ_60_DATA;
+  signal TPROJ_60_mem_AAV_dout_nent  : t_arr_TPROJ_60_NENT; -- (#page)
   signal VMPROJ_24_mem_A_wea          : t_arr_VMPROJ_24_1b;
   signal VMPROJ_24_mem_AV_writeaddr   : t_arr_VMPROJ_24_ADDR;
   signal VMPROJ_24_mem_AV_din         : t_arr_VMPROJ_24_DATA;
@@ -47,6 +50,12 @@ architecture rtl of SectorProcessor is
   signal VMPROJ_24_mem_AV_readaddr    : t_arr_VMPROJ_24_ADDR;
   signal VMPROJ_24_mem_AV_dout        : t_arr_VMPROJ_24_DATA;
   signal VMPROJ_24_mem_AAV_dout_nent  : t_arr_VMPROJ_24_NENT; -- (#page)
+  signal AP_60_mem_A_wea          : t_arr_AP_60_1b;
+  signal AP_60_mem_AV_writeaddr   : t_arr_AP_60_ADDR;
+  signal AP_60_mem_AV_din         : t_arr_AP_60_DATA;
+  signal AP_60_mem_A_enb          : t_arr_AP_60_1b;
+  signal AP_60_mem_AV_readaddr    : t_arr_AP_60_ADDR;
+  signal AP_60_mem_AV_dout        : t_arr_AP_60_DATA;
   signal CM_14_mem_A_wea          : t_arr_CM_14_1b;
   signal CM_14_mem_AV_writeaddr   : t_arr_CM_14_ADDR;
   signal CM_14_mem_AV_din         : t_arr_CM_14_DATA;
@@ -54,15 +63,6 @@ architecture rtl of SectorProcessor is
   signal CM_14_mem_AV_readaddr    : t_arr_CM_14_ADDR;
   signal CM_14_mem_AV_dout        : t_arr_CM_14_DATA;
   signal CM_14_mem_AAV_dout_nent  : t_arr_CM_14_NENT; -- (#page)
-  signal AP_60_mem_A_wea          : t_arr_AP_60_1b;
-  signal AP_60_mem_AV_writeaddr   : t_arr_AP_60_ADDR;
-  signal AP_60_mem_AV_din         : t_arr_AP_60_DATA;
-  signal AP_60_mem_A_enb          : t_arr_AP_60_1b;
-  signal AP_60_mem_AV_readaddr    : t_arr_AP_60_ADDR;
-  signal AP_60_mem_AV_dout        : t_arr_AP_60_DATA;
-  signal AS_36_mem_A_enb          : t_arr_AS_36_1b;
-  signal AS_36_mem_AV_readaddr    : t_arr_AS_36_ADDR;
-  signal AS_36_mem_AV_dout        : t_arr_AS_36_DATA;
   signal FM_52_mem_A_wea          : t_arr_FM_52_1b;
   signal FM_52_mem_AV_writeaddr   : t_arr_FM_52_ADDR;
   signal FM_52_mem_AV_din         : t_arr_FM_52_DATA;
@@ -74,35 +74,36 @@ architecture rtl of SectorProcessor is
   signal ME_bx_out : std_logic_vector(2 downto 0);
   signal ME_bx_out_vld : std_logic;
   signal MC_start : std_logic := '0';
+
 begin
 
-  TPROJ_60_loop : for var in enum_TPROJ_60 generate
+  AS_36_loop : for var in enum_AS_36 generate
   begin
 
-    TPROJ_60 : entity work.tf_mem
+    AS_36 : entity work.tf_mem
       generic map (
-        RAM_WIDTH       => 60,
-        NUM_PAGES       => 2,
+        RAM_WIDTH       => 36,
+        NUM_PAGES       => 8,
         INIT_FILE       => "",
         INIT_HEX        => true,
         RAM_PERFORMANCE => "HIGH_PERFORMANCE"
       )
       port map (
         clka      => clk,
-        wea       => TPROJ_60_mem_A_wea(var),
-        addra     => TPROJ_60_mem_AV_writeaddr(var),
-        dina      => TPROJ_60_mem_AV_din(var),
+        wea       => AS_36_mem_A_wea(var),
+        addra     => AS_36_mem_AV_writeaddr(var),
+        dina      => AS_36_mem_AV_din(var),
         clkb      => clk,
-        enb       => TPROJ_60_mem_A_enb(var),
+        enb       => AS_36_mem_A_enb(var),
         rstb      => '0',
         regceb    => '1',
-        addrb     => TPROJ_60_mem_AV_readaddr(var),
-        doutb     => TPROJ_60_mem_AV_dout(var),
-        sync_nent => PR_start,
-        nent_o    => TPROJ_60_mem_AAV_dout_nent(var)
+        addrb     => AS_36_mem_AV_readaddr(var),
+        doutb     => AS_36_mem_AV_dout(var),
+        sync_nent => MC_start,
+        nent_o    => open
       );
 
-  end generate TPROJ_60_loop;
+  end generate AS_36_loop;
 
 
   VMSME_16_loop : for var in enum_VMSME_16 generate
@@ -134,6 +135,35 @@ begin
   end generate VMSME_16_loop;
 
 
+  TPROJ_60_loop : for var in enum_TPROJ_60 generate
+  begin
+
+    TPROJ_60 : entity work.tf_mem
+      generic map (
+        RAM_WIDTH       => 60,
+        NUM_PAGES       => 2,
+        INIT_FILE       => "",
+        INIT_HEX        => true,
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
+      )
+      port map (
+        clka      => clk,
+        wea       => TPROJ_60_mem_A_wea(var),
+        addra     => TPROJ_60_mem_AV_writeaddr(var),
+        dina      => TPROJ_60_mem_AV_din(var),
+        clkb      => clk,
+        enb       => TPROJ_60_mem_A_enb(var),
+        rstb      => '0',
+        regceb    => '1',
+        addrb     => TPROJ_60_mem_AV_readaddr(var),
+        doutb     => TPROJ_60_mem_AV_dout(var),
+        sync_nent => PR_start,
+        nent_o    => TPROJ_60_mem_AAV_dout_nent(var)
+      );
+
+  end generate TPROJ_60_loop;
+
+
   VMPROJ_24_loop : for var in enum_VMPROJ_24 generate
   begin
 
@@ -161,35 +191,6 @@ begin
       );
 
   end generate VMPROJ_24_loop;
-
-
-  CM_14_loop : for var in enum_CM_14 generate
-  begin
-
-    CM_14 : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 14,
-        NUM_PAGES       => 2,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
-      )
-      port map (
-        clka      => clk,
-        wea       => CM_14_mem_A_wea(var),
-        addra     => CM_14_mem_AV_writeaddr(var),
-        dina      => CM_14_mem_AV_din(var),
-        clkb      => clk,
-        enb       => CM_14_mem_A_enb(var),
-        rstb      => '0',
-        regceb    => '1',
-        addrb     => CM_14_mem_AV_readaddr(var),
-        doutb     => CM_14_mem_AV_dout(var),
-        sync_nent => MC_start,
-        nent_o    => CM_14_mem_AAV_dout_nent(var)
-      );
-
-  end generate CM_14_loop;
 
 
   AP_60_loop : for var in enum_AP_60 generate
@@ -221,33 +222,33 @@ begin
   end generate AP_60_loop;
 
 
-  AS_36_loop : for var in enum_AS_36 generate
+  CM_14_loop : for var in enum_CM_14 generate
   begin
 
-    AS_36 : entity work.tf_mem
+    CM_14 : entity work.tf_mem
       generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
+        RAM_WIDTH       => 14,
+        NUM_PAGES       => 2,
         INIT_FILE       => "",
         INIT_HEX        => true,
         RAM_PERFORMANCE => "HIGH_PERFORMANCE"
       )
       port map (
         clka      => clk,
-        wea       => AS_36_mem_A_wea(var),
-        addra     => AS_36_mem_AV_writeaddr(var),
-        dina      => AS_36_mem_AV_din(var),
+        wea       => CM_14_mem_A_wea(var),
+        addra     => CM_14_mem_AV_writeaddr(var),
+        dina      => CM_14_mem_AV_din(var),
         clkb      => clk,
-        enb       => AS_36_mem_A_enb(var),
+        enb       => CM_14_mem_A_enb(var),
         rstb      => '0',
         regceb    => '1',
-        addrb     => AS_36_mem_AV_readaddr(var),
-        doutb     => AS_36_mem_AV_dout(var),
+        addrb     => CM_14_mem_AV_readaddr(var),
+        doutb     => CM_14_mem_AV_dout(var),
         sync_nent => MC_start,
-        nent_o    => open
+        nent_o    => CM_14_mem_AAV_dout_nent(var)
       );
 
-  end generate AS_36_loop;
+  end generate CM_14_loop;
 
 
   FM_52_loop : for var in enum_FM_52 generate
@@ -1121,9 +1122,9 @@ begin
       match_7_dataarray_data_V_q0        => CM_14_mem_AV_dout(L3PHIC24),
       match_7_nentries_0_V               => CM_14_mem_AAV_dout_nent(L3PHIC24)(0),
       match_7_nentries_1_V               => CM_14_mem_AAV_dout_nent(L3PHIC24)(1),
-      allstub_dataarray_data_V_ce0       => AS_36_mem_A_enb(L3PHICn6),
-      allstub_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L3PHICn6),
-      allstub_dataarray_data_V_q0        => AS_36_mem_AV_dout(L3PHICn6),
+      allstub_dataarray_data_V_ce0       => AS_36_mem_A_enb(L3PHICn1),
+      allstub_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L3PHICn1),
+      allstub_dataarray_data_V_q0        => AS_36_mem_AV_dout(L3PHICn1),
       allproj_dataarray_data_V_ce0       => AP_60_mem_A_enb(L3PHIC),
       allproj_dataarray_data_V_address0  => AP_60_mem_AV_readaddr(L3PHIC),
       allproj_dataarray_data_V_q0        => AP_60_mem_AV_dout(L3PHIC),
