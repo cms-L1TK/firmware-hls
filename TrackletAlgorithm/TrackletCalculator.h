@@ -279,7 +279,7 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
   );
 
 // Determine which layer projections are valid.
- valid_proj: for (ap_uint<3> i = 0; i < trklet::N_LAYER - 2; i++) {
+  valid_proj: for (ap_uint<3> i = 0; i < trklet::N_LAYER - 2; i++) {
     valid_proj[i] = true;
     if (zL[i] < -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1)))
       valid_proj[i] = false;

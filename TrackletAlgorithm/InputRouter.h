@@ -22,7 +22,7 @@ static const int kBINMAPwidth = 12;
 static const int kSizeBinWord =  3; 
 static const int kNMEMwidth = 5;
 #ifndef __SYNTHESIS__
-	#include <bitset> 
+#include <bitset> 
 #endif
 
 
@@ -121,8 +121,8 @@ void getPhiBinWithCorrection(ap_uint<kBRAMwidth> hStbWrd
 		, const int cNbits 
 		, int &phiBn ) 
 {
-	#pragma HLS inline
-  	#pragma HLS array_partition variable = phicorrtable complete
+#pragma HLS inline
+#pragma HLS array_partition variable = phicorrtable complete
 
   	AllStub<InType> hAStub(hStbWrd);
   	auto hPhi = hAStub.getPhi();
@@ -154,7 +154,7 @@ void getPhiBin( ap_uint<kBRAMwidth> hStbWrd
 		, const int cNbits 
 		, int &phiBn ) 
 {
-	#pragma HLS inline
+#pragma HLS inline
   	
 	AllStub<InType> hAStub(hStbWrd);
 	//typename AllStub<InType>::ASPHI
@@ -168,12 +168,12 @@ template<unsigned int nEntriesSize>
 void ClearCounters(unsigned int nMemories
 	, ap_uint<kNBits_MemAddr> nEntries[nEntriesSize]) 
 {
-  #pragma HLS inline
-  #pragma HLS array_partition variable = nEntries complete
+#pragma HLS inline
+#pragma HLS array_partition variable = nEntries complete
   LOOP_ClearCounters:
 	for (int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
   {
-    #pragma HLS unroll
+#pragma HLS unroll
     nEntries[cIndx]=0; 
   }
 }
@@ -184,13 +184,13 @@ void CountMemories(const ap_uint<kBINMAPwidth> hPhBnWord
 	, unsigned int &nMems
 	, unsigned int nMemsPerLyr[nLyrs]) 
 {
-  #pragma HLS inline
-  #pragma HLS array_partition variable = nMemsPerLyr complete
+#pragma HLS inline
+#pragma HLS array_partition variable = nMemsPerLyr complete
   int cPrevSize=0; 
   LOOP_CountOutputMemories:
   for (int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
   {
-     #pragma HLS unroll
+#pragma HLS unroll
   	 auto hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);
      nMemsPerLyr[cLyr] = (cLyr < nLyrs) ?  (1+(int)(hBnWrd)) : 0 ; 
      nMems = (cLyr < nLyrs) ? (cPrevSize +  (1+(int)(hBnWrd))) : cPrevSize; 
@@ -205,14 +205,14 @@ void GetMemoryIndex(unsigned int nMemsPerLyr[nLyrs]
 	, ap_uint<kLyBitsSize> hEncLyr 
 	, unsigned int &hIndx ) 
 {
-  #pragma HLS inline
-  #pragma HLS array_partition variable = nMemsPerLyr complete
+#pragma HLS inline
+#pragma HLS array_partition variable = nMemsPerLyr complete
 	// update index
 	int cPrevIndx=0; 
 	LOOP_UpdateMemIndx:
 	for (int cLyr = 0; cLyr < nLyrs; cLyr++) 
 	{
-		#pragma HLS unroll
+#pragma HLS unroll
 		int cUpdate = (cLyr < hEncLyr) ? nMemsPerLyr[cLyr] : 0; 
 		hIndx = cPrevIndx + cUpdate; 
 		cPrevIndx = hIndx;
@@ -228,8 +228,8 @@ void InputRouter( const BXType bx
 	, DTCStubMemory hOutputStubs[nOMems])
 {
 	
-	#pragma HLS inline
-	#pragma HLS array_partition variable = hOutputStubs complete
+#pragma HLS inline
+#pragma HLS array_partition variable = hOutputStubs complete
 
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 
@@ -244,8 +244,8 @@ void InputRouter( const BXType bx
 	LOOP_ProcessIR:
 	for (int cStubCounter = 0; cStubCounter < kMaxProc; cStubCounter++) 
 	{
-	#pragma HLS pipeline II = 1
-	#pragma HLS PIPELINE rewind
+#pragma HLS pipeline II = 1
+#pragma HLS PIPELINE rewind
 	  // decode stub
 	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 
@@ -253,12 +253,12 @@ void InputRouter( const BXType bx
 	  // check valid bit
 	  auto hVldBt = hStub.range( kMSBVldBt ,  kLSBVldBt);
 	  if( hVldBt == 0 ){ 
-	  	#ifndef __SYNTHESIS__
-	  		#if IR_DEBUG
-	                edm::LogWarning("L1trackHLS") << "\t.. Invalid Stub : " << std::hex << hStub << std::dec << "\n";
-	  		#endif
-	  	#endif
-	  	continue;
+#ifndef __SYNTHESIS__
+#if IR_DEBUG
+	    edm::LogWarning("L1trackHLS") << "\t.. Invalid Stub : " << std::hex << hStub << std::dec << "\n";
+#endif
+#endif
+	    continue;
 	  }
 	  // check which memory
 	  // needs to be filled 
@@ -324,8 +324,8 @@ void InputRouter( const BXType bx
 	  // assign memory index
 	  auto cMemIndx = cIndx+cIndxThisBn;
 	  assert(cMemIndx < nMems);
-	  #ifndef __SYNTHESIS__
-	  	#if IR_DEBUG
+#ifndef __SYNTHESIS__
+#if IR_DEBUG
 	  edm::LogVerbatim("L1trackHLS") << "\t.. Stub : " << std::hex << hStub << std::dec 
 		   				<< " rel. parts : " << std::hex << hStbWrd << std::dec
 			            << " [ EncLyrId " << hEncLyr << " ] "
@@ -336,8 +336,8 @@ void InputRouter( const BXType bx
 			            << " [ Indx " << cIndx << " ] "
 			            << " [ memIndx " << cMemIndx << " ] "
 			            << "\n";
-		#endif
-	#endif
+#endif
+#endif
 	  
 	  // update  counters 
 	  auto hEntries = hNStubs[cMemIndx];
