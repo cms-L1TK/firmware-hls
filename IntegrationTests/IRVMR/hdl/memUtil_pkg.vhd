@@ -45,7 +45,7 @@ package memUtil_pkg is
 
   -- ########################### Functions ###########################
 
-  -- Following functions are needed because VHDL is not case sensitive when converting an enum to a string
+  -- Following functions are needed because VHDL doesn't preserve case when converting an enum to a string using image
   function memory_enum_to_string(val: enum_DL_39) return string;
   function memory_enum_to_string(val: enum_IL_36) return string;
   function memory_enum_to_string(val: enum_AS_36) return string;
