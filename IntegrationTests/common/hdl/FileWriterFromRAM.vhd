@@ -99,21 +99,19 @@ begin
       PAGE := BX_CNT mod NUM_PAGES;
       DATA_CNT := 0;
 
-      NENT := to_integer(unsigned(NENT_ARR(PAGE)));
-
       if (BX_CNT = MAX_EVENTS) then
-        -- All events processed, so close file once all stubs has been written to file.
+        -- All events processed, so close file once all stubs have been written to file.
         CLOSE_FILE := true;
       end if;
-    else 
-      -- update NENT as NENT_ARR might not have finished counting when DONE signal goes high (NENT would never be 108 otherwise)
-      NENT := to_integer(unsigned(NENT_ARR(PAGE)));
     end if;
 
     -- All events processed, so close file.
     if (CLOSE_FILE and READ_EN_LATCH(0) = '0') then
       file_close(FILE_OUT);
     end if;
+
+    -- update NENT every clock cycle as NENT_ARR might not have finished counting when DONE signal goes high (NENT would never be 108 otherwise)
+    NENT := to_integer(unsigned(NENT_ARR(PAGE)));
 
     -- Launch memory read, if data remains to be read from current event.
 
