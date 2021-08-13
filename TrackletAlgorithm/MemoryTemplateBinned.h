@@ -6,14 +6,17 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
 #endif
 
 #ifdef CMSSW_GIT_HASH
 #define NBIT_BX 0
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
 template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN>
 #else
-#include "DummyMessageLogger.h"
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN>
 #endif
 
@@ -79,7 +82,7 @@ public:
 	}
 	else {
 #ifndef __SYNTHESIS__
-edm::LogWarning("FWHLS") << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << std::endl;
+edm::LogWarning("L1trackHLS") << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << std::endl;
 #endif
 	  return false;
 	}
@@ -144,7 +147,7 @@ edm::LogWarning("FWHLS") << "Warning out of range: adress within bin " << nentry
   // print memory contents
   void print_data(const DataType data) const
   {
-    edm::LogVerbatim("FWHLS") << std::hex << data.raw() << std::endl;
+    edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
 	// TODO: overload '<<' in data class
   }
 
@@ -157,7 +160,7 @@ edm::LogWarning("FWHLS") << "Warning out of range: adress within bin " << nentry
   {
 	for(unsigned int slot=0;slot<(kNSlots);slot++) {
 	  for (unsigned int i = 0; i < nentries_[bx][slot]; ++i) {
-	    edm::LogVerbatim("FWHLS") << bx << " " << i << " ";
+	    edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
 	    print_entry(bx, i + slot*(1<<(kNBitDataAddr)) );
  	  }
 	}
@@ -167,7 +170,7 @@ edm::LogWarning("FWHLS") << "Warning out of range: adress within bin " << nentry
   {
 	for (unsigned int ibx = 0; ibx < (kNBxBins); ++ibx) {
 	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
-	    edm::LogVerbatim("FWHLS") << ibx << " " << i << " ";
+	    edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
 	    print_entry(ibx,i);
 	  }
 	}

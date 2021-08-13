@@ -6,12 +6,13 @@
 #include "TrackletProjectionMemory.h"
 #include "AllProjectionMemory.h"
 #include "VMProjectionMemory.h"
+#ifndef __SYNTHESIS__
 #ifdef CMSSW_GIT_HASH
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #else
 #include "DummyMessageLogger.h"
 #endif
-
+#endif
 //#include <assert.h>
 
 namespace PR
@@ -192,7 +193,7 @@ void ProjectionRouter(BXType bx,
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
       //assert(rinv >=0 and rinv < 32);
 #ifndef __SYNTHESIS__
-      edm::LogVerbatim("FWHLS") << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
+      edm::LogVerbatim("L1trackHLS") << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
 #endif
       // VM Projection
       VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);

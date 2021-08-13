@@ -1,6 +1,7 @@
-#ifndef MessageLogger_MessageLogger_h
-#ifndef L1Trigger_TrackFindingTracklet_interface_Logger_h
-#define L1Trigger_TrackFindingTracklet_interface_Logger_h
+// Class definitions for dummy message logger which uses the same syntax as MessageLogger.h to cout messages. This allows users to use the message logger while running in CMSSW and to cout otherwise with a single line..
+#ifndef __SYNTHESIS__
+#ifndef TrackletAlgorithm_DummyMessageLogger_h
+#define TrackletAlgorithm_DummyMessageLogger_h
 #include<iostream>
 namespace edm {
   class LogVerbatim{

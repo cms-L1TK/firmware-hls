@@ -71,7 +71,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	#pragma HLS dependence variable=istub intra WAR true
 
 #ifdef DEBUG
-	edm::LogVerbatim("FWHLS") << "ProjectionIndex\tStubIndex\t<=== (PASS/FAIL)" << std::endl;
+	edm::LogVerbatim("L1trackHLS") << "ProjectionIndex\tStubIndex\t<=== (PASS/FAIL)" << std::endl;
 #endif
 
 	// Main processing loops starts here.
@@ -128,11 +128,11 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 				projectionBuffer[head_writeindex_tmp_last] = nstublast.concat(tmp2);
 			}
 #ifdef DEBUG
-			edm::LogVerbatim("FWHLS") << "Writing " << savefirst+savelast << " z-bins ==> head_writeindex " << head_writeindex << "-->";
+			edm::LogVerbatim("L1trackHLS") << "Writing " << savefirst+savelast << " z-bins ==> head_writeindex " << head_writeindex << "-->";
 #endif
 			head_writeindex = head_writeindex + savefirst + savelast;
 #ifdef DEBUG
-			edm::LogVerbatim("FWHLS") << head_writeindex << std::endl;
+			edm::LogVerbatim("L1trackHLS") << head_writeindex << std::endl;
 #endif
 		}
 
@@ -186,7 +186,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 
 			// Check if stub bend and proj rinv consistent
 #ifdef DEBUG
-			edm::LogVerbatim("FWHLS") << projindex.to_string() << "\t" << stubindex.to_string() << "\t<=== ";
+			edm::LogVerbatim("L1trackHLS") << projindex.to_string() << "\t" << stubindex.to_string() << "\t<=== ";
 #endif
 			auto const index=projrinv.concat(stubbend);
 			if ( passphi && pass && table[index]) {
@@ -194,14 +194,14 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 				outputCandidateMatch.write_mem(bx,cmatch,ncmatch);
 				ncmatch++;
 #ifdef DEBUG
-				edm::LogVerbatim("FWHLS") << "PASS -- " << ncmatch-1 << "\n";
+				edm::LogVerbatim("L1trackHLS") << "PASS -- " << ncmatch-1 << "\n";
 #endif
 			}
 #ifdef DEBUG
 			else {
-			  edm::LogVerbatim("FWHLS") << "FAIL" << "\n";
+			  edm::LogVerbatim("L1trackHLS") << "FAIL" << "\n";
 			}
-			edm::LogVerbatim("FWHLS") << "\ttail_readindex: " << tail_readindex << "\n"
+			edm::LogVerbatim("L1trackHLS") << "\ttail_readindex: " << tail_readindex << "\n"
 					  << "\thead_writeindex: " << head_writeindex << "\n"
 					  << "\tsecond: " << second << "\n"
 					  << "\tprojfinez: " << projfinez << "\n"

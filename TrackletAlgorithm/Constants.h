@@ -5,7 +5,6 @@
 
 #ifdef CMSSW_GIT_HASH
 #include "L1Trigger/TrackFindingTracklet/interface/Settings.h"
-using namespace trklet;
 #endif
 
 // Inline function to convert floating point values to integers, given a
@@ -66,12 +65,14 @@ constexpr double c = 0.299792458; // m/ns
 
 // detector constants
 #ifndef CMSSW_GIT_HASH
+namespace trklet{
   constexpr int N_LAYER = 6; // # of barrel layers assumed
   constexpr int N_DISK = 5; // # of endcap disks assumed
+}
 #endif
 constexpr double bfield = 3.8112; // T
-constexpr int rmean[N_LAYER + N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
-constexpr int zmean[N_LAYER + N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
+constexpr int rmean[trklet::N_LAYER + trklet::N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
+constexpr int zmean[trklet::N_LAYER + trklet::N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
 constexpr double zlength = 120.0; // cm
 constexpr double rmindiskvm = 22.5; // cm
 constexpr double rmindisk = 20.0; // cm
@@ -83,7 +84,7 @@ constexpr double kphi = 7.71867e-06;
 constexpr double kz = 0.0585938;
 
 // stub digitization constants for combined modules
-constexpr double kz_cm[N_LAYER] = {2*zlength/(1<<12), 2*zlength/(1<<12), 2*zlength/(1<<12), 2*zlength/(1<<8), 2*zlength/(1<<8), 2*zlength/(1<<8)};
+constexpr double kz_cm[trklet::N_LAYER] = {2*zlength/(1<<12), 2*zlength/(1<<12), 2*zlength/(1<<12), 2*zlength/(1<<8), 2*zlength/(1<<8), 2*zlength/(1<<8)};
 
 // tracklet digitization constants
 constexpr double krinv = 1.04549e-06;
@@ -110,17 +111,19 @@ constexpr double z0cut = 15.0; // cm
 
 // cut constants for combined modules
 #ifndef CMSSW_GIT_HASH
+namespace trklet{
 constexpr double VMROUTERCUTZL2 = 50.0;      //Min L2 z for inner allstub in cm
 constexpr double VMROUTERCUTZL1L3L5 = 95.0;  //Max z for inner barrel layers in cm
 constexpr double VMROUTERCUTZL1 = 70.0;      //Max z for L1 barrel seeding in cm
 constexpr double VMROUTERCUTRD1D3 = 55.0;    //Max r for disk seeds in cm
+}
 #endif
 
 // various bit widths
-constexpr unsigned nbitsallstubs[N_LAYER + N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+constexpr unsigned nbitsallstubs[trklet::N_LAYER + trklet::N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)
 // number of bits used to distinguish VMs in one allstub block for each layer
-constexpr unsigned int nbits_vmmeall[N_LAYER + N_DISK]={2,3,3,3,3,3,3,2,2,2,2};
+constexpr unsigned int nbits_vmmeall[trklet::N_LAYER + trklet::N_DISK]={2,3,3,3,3,3,3,2,2,2,2};
 
 // List of regions for memory template parameters
 enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK, BARREL_FOR_MC, DISK_FOR_MC};
