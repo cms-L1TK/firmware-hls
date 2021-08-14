@@ -279,7 +279,7 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
   );
 
 // Determine which layer projections are valid.
-  valid_proj: for (ap_uint<3> i = 0; i < N_LAYER - 2; i++) {
+  valid_proj: for (ap_uint<3> i = 0; i < trklet::N_LAYER - 2; i++) {
     valid_proj[i] = true;
     if (zL[i] < -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1)))
       valid_proj[i] = false;
@@ -299,7 +299,7 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
   }
 
 // Determine which disk projections are valid.
-  valid_proj_disk: for (ap_uint<3> i = 0; i < N_DISK - 1; i++) {
+ valid_proj_disk: for (ap_uint<3> i = 0; i < trklet::N_DISK - 1; i++) {
     valid_proj_disk[i] = true;
     if (abs(*t) < floatToInt(1.0, kt)) // disk projections are invalid if |t| < 1
       valid_proj_disk[i] = false;
@@ -430,16 +430,16 @@ TC::processStubPair(
   TrackletParameters::PHI0PAR phi0;
   TC::Types::z0 z0;
   TrackletParameters::TPAR t;
-  TC::Types::phiL phiL[N_LAYER - 2];
-  TC::Types::zL zL[N_LAYER - 2];
+  TC::Types::phiL phiL[trklet::N_LAYER - 2];
+  TC::Types::zL zL[trklet::N_LAYER - 2];
   TC::Types::der_phiL der_phiL;
   TC::Types::der_zL der_zL;
-  TC::Types::flag valid_proj[N_LAYER - 2];
-  TC::Types::phiD phiD[N_DISK - 1];
-  TC::Types::rD rD[N_DISK - 1];
+  TC::Types::flag valid_proj[trklet::N_LAYER - 2];
+  TC::Types::phiD phiD[trklet::N_DISK - 1];
+  TC::Types::rD rD[trklet::N_DISK - 1];
   TC::Types::der_phiD der_phiD;
   TC::Types::der_rD der_rD;
-  TC::Types::flag valid_proj_disk[N_DISK - 1];
+  TC::Types::flag valid_proj_disk[trklet::N_DISK - 1];
   bool success;
 
 // Calculate the tracklet parameters and projections.

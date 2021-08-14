@@ -28,7 +28,7 @@ constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 ///////////////////////////////////////////////
 // Values that don't need manual changing
 
-constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
+constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);
 
 // Number of inputs
 constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S

@@ -19,7 +19,13 @@
 #include "AllStubInnerMemory.h"
 #include "VMStubMEMemoryCM.h"
 #include "VMStubTEOuterMemoryCM.h"
-
+#ifndef __SYNTHESIS__
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
+#endif
 /////////////////////////////////////////
 // Constants
 
@@ -108,7 +114,7 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	constexpr int nbitsztable = (Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
 	constexpr int nbitsrtable = (Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
 	constexpr auto vmbits = (Layer) ? nbitsvmlayer[Layer-1] : nbitsvmdisk[Disk-1]; // Number of bits for standard VMs
-	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
+	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[trklet::N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Number of bits for the memory bins
 	constexpr int nbitsbin = (isMEStub) ? ((Layer) ? MEBinsBits : MEBinsBits + 1) : TEBinsBits; // ME in disks has double the amount of bins
@@ -288,7 +294,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		std::cout << std::endl << "Stub index no. " << i << std::endl
+		edm::LogVerbatim("L1trackHLS") << std::endl << "Stub index no. " << i << std::endl
 				<< "Out put stub: " << std::hex << allstub.raw() << std::dec
 				<< std::endl;
 #endif // DEBUG
@@ -304,19 +310,19 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 			// Use comparison_rz to check if they pass the RZ cuts
 			if (Layer == 1) { // TODO: use comparison value 2 for LMR memories
-				constexpr float comparison_value = (Layer) ? VMROUTERCUTZL1L3L5 / kz_cm[Layer - 1] : 0;
-				constexpr float comparison_valueLMR = (Layer) ? VMROUTERCUTZL1 / kz_cm[Layer - 1] : 0; // For LMR memories
+			  constexpr float comparison_value = (Layer) ? trklet::VMROUTERCUTZL1L3L5 / kz_cm[Layer - 1] : 0;
+			  constexpr float comparison_valueLMR = (Layer) ? trklet::VMROUTERCUTZL1 / kz_cm[Layer - 1] : 0; // For LMR memories
 				passRZCut = !(comparison_rz > comparison_value);
 				passRZSpecialCut = !(comparison_rz < comparison_valueLMR);
 			} else if (Layer == 2) {
-				constexpr float comparison_value = (Layer) ? VMROUTERCUTZL2 / kz_cm[Layer - 1] : 0;
+			  constexpr float comparison_value = (Layer) ? trklet::VMROUTERCUTZL2 / kz_cm[Layer - 1] : 0;
 				passRZCut = !(comparison_rz < comparison_value);
 			} else if (Layer == 3 || Layer == 5) {
-				constexpr float comparison_value = (Layer) ? VMROUTERCUTZL1L3L5 / kz_cm[Layer - 1] : 0;
+			  constexpr float comparison_value = (Layer) ? trklet::VMROUTERCUTZL1L3L5 / kz_cm[Layer - 1] : 0;
 				passRZCut = !(comparison_rz > comparison_value);
 			} else if (Disk == 1 || Disk == 3) {
-				constexpr float comparison_value = VMROUTERCUTRD1D3 / kr;
-				constexpr float comparison_value2 = 2 * N_DISK; // 2*int(N_DSS_MOD) in emulation
+			  constexpr float comparison_value = trklet::VMROUTERCUTRD1D3 / kr;
+			  constexpr float comparison_value2 = 2 * trklet::N_DISK; // 2*int(N_DSS_MOD) in emulation
 				passRZCut = !(comparison_rz > comparison_value) && !(comparison_rz < comparison_value2);
 			}
 
@@ -335,7 +341,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				constexpr unsigned int phicutmax = (Layer == 1) ? 4 : 6; // I have no idea what these numbers are, see emulation
 				constexpr unsigned int phicutmin = (Layer == 1) ? 4 : 2;
 
-				constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer - 1] : nbitsallstubs[N_LAYER + Disk - 1]; // Number of bits for the number of Alltub memories in a layer/disk
+				constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer - 1] : nbitsallstubs[trklet::N_LAYER + Disk - 1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 				auto iphipos = phicorr.range(phicorr.length() - nbitsall - 1, phicorr.length() - (nbitsall + phiRegSize)); // Top three bits after the allstub bits
 				unsigned int inner_mem_index = 0; // Keeps track of which allstub inner memory to write to
@@ -371,7 +377,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-				std::cout << std::endl << "Allstub Inner: " << std::hex
+				edm::LogVerbatim("L1trackHLS") << std::endl << "Allstub Inner: " << std::hex
 						<< allstubinner.raw() << std::dec << std::endl;
 #endif // DEBUG
 
@@ -394,7 +400,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		std::cout << "ME stub " << std::hex << stubME.raw() << std::dec
+		edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::dec
 				<< "       to slot " << slotME << std::endl;
 #endif // DEBUG
 		// End ME memories
@@ -420,7 +426,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 // For debugging
 #if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-			std::cout << "TEOuter stub " << std::hex << stubTEO.raw()
+			edm::LogVerbatim("L1trackHLS") << "TEOuter stub " << std::hex << stubTEO.raw()
 					<< std::dec << "       to slot " << slotTE << std::endl;
 #endif // DEBUG
 
