@@ -136,10 +136,10 @@ namespace TF {
   enum layerDisk {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5, D1 = 6, D2 = 7, D3 = 8, D4 = 9, D5 = 10};
 
   // List of layer and disk types
-  constexpr regionType layerDiskType[N_LAYER + N_DISK] = {BARRELPS, BARRELPS, BARRELPS, BARREL2S, BARREL2S, BARREL2S, DISK, DISK, DISK, DISK, DISK};
+  constexpr regionType layerDiskType[trklet::N_LAYER + trklet::N_DISK] = {BARRELPS, BARRELPS, BARRELPS, BARREL2S, BARREL2S, BARREL2S, DISK, DISK, DISK, DISK, DISK};
 
   // List of layer and disk regions
-  constexpr regionType layerDiskRegion[N_LAYER + N_DISK] = {BARREL, BARREL, BARREL, BARREL, BARREL, BARREL, DISK, DISK, DISK, DISK, DISK};
+  constexpr regionType layerDiskRegion[trklet::N_LAYER + trklet::N_DISK] = {BARREL, BARREL, BARREL, BARREL, BARREL, BARREL, DISK, DISK, DISK, DISK, DISK};
 }
 
 // Global BX type
