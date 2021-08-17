@@ -188,7 +188,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		// ME memories
 		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnits[(Layer) ? Layer-2 : N_LAYER+Disk-2]> memoriesTEO[]) {
+		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnits[(Layer) ? Layer-2 : Disk+4]> memoriesTEO[]) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
