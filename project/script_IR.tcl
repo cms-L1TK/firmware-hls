@@ -28,9 +28,8 @@ create_clock -period 360MHz -name fast_clock
 set nProc [exec nproc]
 set_top InputRouterTop_IR_DTC_PS10G_3_A
 csim_design -mflags "-j$nProc" -argv "--link,4 --tkNonant,4"
-csynth_design 
 #possible options -trace_level all -rtl verilog -verbose 
-cosim_design  -argv "--link,8 --dtcSplit,0 --tkNonant,4"
-#possible options  -flow syn, -flow impl
+csynth_design 
+# #possible options  -flow syn, -flow impl
 export_design -format ip_catalog 
 exit
