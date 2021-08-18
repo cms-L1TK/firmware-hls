@@ -11,7 +11,6 @@ open_project -reset inputrouter
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top InputRouterTop_IR_DTC_PS10G_3_A
 add_files ../TrackletAlgorithm/InputRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 
@@ -27,7 +26,8 @@ create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
 
 set nProc [exec nproc]
-csim_design -mflags "-j$nProc" -argv "--link,8 --dtcSplit,0 --tkNonant,4"
+set_top InputRouterTop_IR_DTC_PS10G_3_A
+csim_design -mflags "-j$nProc" -argv "--link,4 --tkNonant,4"
 csynth_design 
 #possible options -trace_level all -rtl verilog -verbose 
 cosim_design  -argv "--link,8 --dtcSplit,0 --tkNonant,4"
