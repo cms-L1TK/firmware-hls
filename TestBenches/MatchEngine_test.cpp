@@ -21,13 +21,23 @@ const int nevents = 100;  // number of events to run
 
 using namespace std;
 
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined KLAYERDISK
+  #define KLAYERDISK 2 // Corresponds to TF::L3
+#endif
+constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
+#if !defined TOPFUNCTION
+  #define TOPFUNCTION MatchEngineTop_L3
+#endif
+
 int main() {
 	// Error counter
 	int err_count = 0;
 
 	// Declare input memory arrays to be read from the emulation files
-	VMProjectionMemory<kProjectionType> inputvmprojs;
-	VMStubMEMemory<kModuleType, kNBitBin> inputvmstubs;
+	VMProjectionMemory<ProjectionType<kLayerDisk>()> inputvmprojs;
+	VMStubMEMemory<ModuleType<kLayerDisk>(), NBitBin<kLayerDisk>()> inputvmstubs;
 	//CandidateMatchMemory inputcandmatches;
 
 	// Declare output memory array to be filled by hls simulation
@@ -73,8 +83,8 @@ int main() {
 
 		outputcandmatches.clear();
 
-		writeMemFromFile<VMProjectionMemory<kProjectionType> >(inputvmprojs, fin_vmproj, ievt);
-		writeMemFromFile<VMStubMEMemory<kModuleType, kNBitBin> >(inputvmstubs, fin_vmstub, ievt);
+		writeMemFromFile<VMProjectionMemory<ProjectionType<kLayerDisk>()> >(inputvmprojs, fin_vmproj, ievt);
+		writeMemFromFile<VMStubMEMemory<ModuleType<kLayerDisk>(), NBitBin<kLayerDisk>()> >(inputvmstubs, fin_vmstub, ievt);
 
 		//Set bunch crossing
 		BXType bx=ievt&0x7;
@@ -88,7 +98,7 @@ int main() {
 		std::cout<<std::dec<<std::endl;
 
 		// Unit Under Test
-		MatchEngineTop(bx,bx_out,inputvmstubs,inputvmprojs,outputcandmatches);
+		TOPFUNCTION(bx,bx_out,inputvmstubs,inputvmprojs,outputcandmatches);
 
 		// Compare the computed outputs with the expected ones for the candidate matches
 		bool truncation = false;

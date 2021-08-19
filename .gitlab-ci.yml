@@ -28,6 +28,7 @@ stages: # ---------------------------------------------------------------------
     # Needed for new tool version
     - source /opt/rh/llvm-toolset-7.0/enable
   script:
+    - pwd; ls -la; ls -la TrackletAlgorithm/;
     - cd project
     - pwd; ls -la; # Debug
     # Hard coded -config='' because the quotes do not work in the variable

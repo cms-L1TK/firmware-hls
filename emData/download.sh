@@ -207,6 +207,7 @@ fi
 ./generate_PR.py LUTs/wires.dat
 ./generate_MC.py LUTs/wires.dat
 ./generate_TB.py LUTs/wires.dat
+./generate_ME.py -s
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
