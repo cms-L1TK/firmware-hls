@@ -321,7 +321,6 @@ std::string getMemPrintName( std::string pDtcName
   , int pLyr 
   , int pPhiBn  ) 
 {
-  std::string cDtcName = pDtcName; 
   int cLyrCorr = (pLyr<11)? 0 : 10; 
   std::string cLyrId = (pLyr<11) ? "L" : "D";
   cLyrId += std::to_string(pLyr-cLyrCorr); 
@@ -329,7 +328,7 @@ std::string getMemPrintName( std::string pDtcName
   std::stringstream ss;
   ss << "PHI" ; 
   ss << static_cast<char>(int('A') + pPhiBn);
-  ss << "_" << cDtcName << "_";
+  ss << "_" << pDtcName << "_";
   ss << std::setw(2) << std::setfill('0') << pNonant;
   std::string cMemPrint = "InputStubs_IL_";
   cMemPrint += cLyrId + ss.str() + ".dat"; 

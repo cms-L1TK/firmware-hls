@@ -27,7 +27,6 @@ create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
 
 set nProc [exec nproc]
-set_top InputRouterTop_IR_DTC_PS10G_3_A
 csim_design -mflags "-j$nProc" -argv "--link,4 --tkNonant,4"
 #possible options -trace_level all -rtl verilog -verbose 
 csynth_design 
