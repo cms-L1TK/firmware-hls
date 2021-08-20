@@ -133,7 +133,7 @@ def createDefinitions(wiresFiles='./LUTs/wires.dat') :
 
 wiresFile = './LUTs/wires.dat'
 # create InputRouter_parameters.h :
-# contains constants that define number of output memories per link 
+# contains constants that defines the number of output memories per link 
 createParameters(wiresFile)
 # create InputRouterTop.h 
 # declaration of top level function for each instance of the IR 
