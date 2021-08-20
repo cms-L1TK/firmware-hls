@@ -55,6 +55,7 @@ begin
 procFile : process(CLK)
   variable INIT        : boolean := false; --! File not yet open
   variable FILE_STATUS : file_open_status;
+  variable CLOSE_FILE  : boolean := false; --! File is ready to be closed
   file     FILE_OUT    : text;   
   variable LINE_OUT    : line;                              
   variable BX_CNT      : integer := -1;  --! Event counter
@@ -101,15 +102,26 @@ begin
     if (DONE = '1') then   --! Signal present in single clk cycle when event first ready.
       BX_CNT := BX_CNT + 1;
       PAGE := BX_CNT mod NUM_PAGES;
-      bin_nent_loop : for i in 0 to NUM_BINS-1 loop
-        NENT(i) := to_integer(unsigned(NENT_ARR(PAGE)(i)));
+
+      data_cnt_loop : for i in 0 to NUM_BINS-1 loop
         DATA_CNT(i) := 0;
-      end loop bin_nent_loop;
+      end loop data_cnt_loop;
+
       if (BX_CNT = MAX_EVENTS) then
-        -- All events processed, so close file.
-        file_close(FILE_OUT);
+        -- All events processed, so close file once all stubs have been written to file.
+        CLOSE_FILE := true;
       end if;
     end if;
+
+    -- All events processed, so close file.
+    if (CLOSE_FILE and READ_EN_LATCH(0) = '0') then
+      file_close(FILE_OUT);
+    end if;
+
+    -- update NENT every clock cycle as NENT_ARR might not have finished counting when DONE signal goes high
+    bin_nent_loop : for i in 0 to NUM_BINS-1 loop
+      NENT(i) := to_integer(unsigned(NENT_ARR(PAGE)(i)));
+    end loop bin_nent_loop;
 
     -- Launch memory read, if data remains to be read from current event.
 

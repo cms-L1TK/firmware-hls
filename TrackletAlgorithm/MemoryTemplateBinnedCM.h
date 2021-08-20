@@ -7,10 +7,20 @@
 #include <sstream>
 #include <vector>
 #include <bitset>
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
 #endif
 
-template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR,
-  unsigned int NBIT_BIN, unsigned int NCOPY>
+#ifdef CMSSW_GIT_HASH
+#define NBIT_BX 0
+template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int NCOPY>
+#else
+template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int NCOPY>
+#endif
+
 // DataType: type of data object stored in the array
 // NBIT_BX: number of bits for BX;
 // (1<<NBIT_BIN): number of BXs the memory is keeping track of
@@ -117,7 +127,7 @@ class MemoryTemplateBinnedCM{
     else {
 #ifndef __SYNTHESIS__
       if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-        std::cout << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
+	edm::LogWarning("L1trackHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
       }
 #endif
       return false;
@@ -195,7 +205,7 @@ class MemoryTemplateBinnedCM{
   // print memory contents
   void print_data(const DataType data) const
   {
-	std::cout << std::hex << data.raw() << std::endl;
+    edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
 	// TODO: overload '<<' in data class
   }
 
@@ -210,8 +220,8 @@ class MemoryTemplateBinnedCM{
       //std::cout << "slot "<<slot<<" entries "
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
       for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
-		std::cout << bx << " " << i << " ";
-		print_entry(bx, i + slot*getNEntryPerBin() );
+	edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
+	print_entry(bx, i + slot*getNEntryPerBin() );
       }
     }
   }
@@ -220,8 +230,8 @@ class MemoryTemplateBinnedCM{
   {
 	for (unsigned int ibx = 0; ibx < kNBxBins; ++ibx) {
 	  for (unsigned int i = 0; i < 8; ++i) {
-		std::cout << ibx << " " << i << " ";
-		print_entry(ibx,i);
+	    edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
+	    print_entry(ibx,i);
 	  }
 	}
   }

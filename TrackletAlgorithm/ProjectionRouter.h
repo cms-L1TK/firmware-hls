@@ -6,7 +6,13 @@
 #include "TrackletProjectionMemory.h"
 #include "AllProjectionMemory.h"
 #include "VMProjectionMemory.h"
-
+#ifndef __SYNTHESIS__
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
+#endif
 //#include <assert.h>
 
 namespace PR
@@ -114,10 +120,10 @@ void ProjectionRouter(BXType bx,
       // hourglass configuration
 
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[N_LAYER + DISK-1];
+      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[trklet::N_LAYER + DISK-1];
 
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[N_LAYER + DISK-1];
+      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[trklet::N_LAYER + DISK-1];
 
       // bits used for routing
       auto iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
@@ -186,9 +192,9 @@ void ProjectionRouter(BXType bx,
       // and is shifted to be positive
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
       //assert(rinv >=0 and rinv < 32);
-
-      std::cout << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
-
+#ifndef __SYNTHESIS__
+      edm::LogVerbatim("L1trackHLS") << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
+#endif
       // VM Projection
       VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
 

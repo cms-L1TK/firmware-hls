@@ -13,11 +13,14 @@ const int nEvents = 100;  //number of events to run
 // VMRouterCM Test that works for all regions
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
-// NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterCMTop.h
-//          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
+// To run a different phi region, change the following:
 //          - add the phi region in emData/download.sh, make sure to also run clean
-//          - add region specific constants defined in VMRouterCM_parameters.h if missing
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
+//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
+//          OR
+//          - run emData/generateCM_VMR.py to generate new top and parameters files
 
 
 int main() {
@@ -148,7 +151,7 @@ int main() {
     err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
     //TE Outer memories
     if (nVMSTE) {
-      for (unsigned int i = 0; i < numTEOCopies; i++) {
+      for (unsigned int i = 0; i < nVMSTE; i++) {
         err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
       }
     }

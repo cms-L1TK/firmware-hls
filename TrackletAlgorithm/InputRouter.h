@@ -8,6 +8,13 @@
 #include "DTCStubMemory.h"
 
 #define IR_DEBUG false
+#ifndef __SYNTHESIS__
+#ifdef CMSSW_GIT_HASH
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#else
+#include "DummyMessageLogger.h"
+#endif
+#endif
 // link map
 static const int kNBitsLnkDsc = 4; 
 static const int kNBitsNLnks = 6; 
@@ -172,7 +179,7 @@ void getCorrectedPhiBin(ap_uint<kBRAMwidth> hStbWrd
 	phiBn = cBn;
 	#ifndef __SYNTHESIS__
 		#if IR_DEBUG
-	  	 	std::cout << "Un-corrected phi bin is " << hPhi.range(AllStubBase<InType>::kASPhiSize-1, AllStubBase<InType>::kASPhiSize-cNbits) 
+	  	 	edm::LogVerbatim << "Un-corrected phi bin is " << hPhi.range(AllStubBase<InType>::kASPhiSize-1, AllStubBase<InType>::kASPhiSize-cNbits) 
 	  	 		<< " Corrected phi bin is " << cBn << "\n";
 	  	#endif
   	#endif
@@ -276,7 +283,7 @@ void GetMemoryIndex(const ap_uint<kBINMAPwidth> hPhBnWord
 	
 	#ifndef __SYNTHESIS__
 		#if IR_DEBUG
-	  	 	std::cout << "EncLyr#" << hEncLyr 
+	  	 	edm::LogVerbatim << "EncLyr#" << hEncLyr 
 	  	 		<< " Complete bn word is " << std::bitset<kBINMAPwidth>(hPhBnWord)
 	  	 		<< " BnWrd is " << std::bitset<kSizeBinWord>(hPhBnWord.range(kSizeBinWord*hEncLyr+kMaxPhiBnsPrLyr-1,kSizeBinWord*hEncLyr)) 
 	  	 		<< " Offset is " << cOffst
@@ -299,7 +306,9 @@ void InputRouter( const BXType bx
 	#pragma HLS array_partition variable = hOutputStubs complete
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	#ifndef __SYNTHESIS__
-      std::cout << "Nmemories is " << nOMems << "\n";
+	  #if IR_DEBUG
+		  edm::LogVerbatim("L1trackHLS") << "Nmemories is " << nOMems << "\n";
+      #endif
     #endif
      
 	// count memories 
@@ -324,7 +333,7 @@ void InputRouter( const BXType bx
 	  if( hVldBt == 0 ){ 
 	  	#ifndef __SYNTHESIS__
 	  		#if IR_DEBUG
-	  			std::cout << "\t.. Invalid Stub : " << std::hex << hStub << std::dec << "\n";
+	  			edm::LogVerbatim("L1trackHLS") << "\t.. Invalid Stub : " << std::hex << hStub << std::dec << "\n";
 	  		#endif
 	  	#endif
 	  	continue;
@@ -364,7 +373,7 @@ void InputRouter( const BXType bx
 	  if( hIsActive == 0 ){ 
 	  	#ifndef __SYNTHESIS__
 	  		#if IR_DEBUG
-	  			std::cout << "Bn#" << +cIndxThisBn << " connected to Lyr#" << hLyrId << " is not connected to this IR module\n" ; 
+	  			edm::LogVerbatim("L1trackHLS") << "Bn#" << +cIndxThisBn << " connected to Lyr#" << hLyrId << " is not connected to this IR module\n" ; 
 	 		#endif
 	  	#endif
 	  	continue; 
@@ -378,7 +387,7 @@ void InputRouter( const BXType bx
 	  assert(cMemIndx < nMems);
 	  #ifndef __SYNTHESIS__
 	  	#if IR_DEBUG
-	  	   std::cout << "\t.. Stub : " << std::hex << hStub << std::dec 
+	  	   edm::LogVerbatim("L1trackHLS") << "\t.. Stub : " << std::hex << hStub << std::dec 
 		   				<< " rel. parts : " << std::hex << hStbWrd << std::dec
 			            << " [ EncLyrId " << hEncLyr << " ] "
 						<< "[ LyrId " << hLyrId << " ] "

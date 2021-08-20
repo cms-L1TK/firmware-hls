@@ -4,20 +4,20 @@
 #include "VMRouterCM.h"
 #include "VMRouterCM_parameters.h"
 
-// VMRouter Top Function for layer 2, AllStub region A
+// VMRouterCM Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
-// NOTE: to run a different phi region, change the following
-//          - constants specified in VMRouterCMTop.h
-//          - add/remove pragmas depending on number of inputStubs in VMRouterCMTop.cc (not necessary for simulation)
+// To run a different phi region, change the following:
 //          - add the phi region in emData/download.sh, make sure to also run clean
-//          - add region specific constants defined in VMRouterCM_parameters.h if missing
-
-
+//
+//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
+//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
+//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
+//          OR
+//          - run emData/generate_VMRCM.py to generate new top and parameters files
 
 ////////////////////////////////////////////
-// Values for that are specified with regards to the VMR region
-// Changed manually
+// Variables for that are specified with regards to the VMR region
 
 #define kLAYER 2 // Which barrel layer number the data is coming from
 #define kDISK 0 // Which disk number the data is coming from, 0 if not disk
@@ -28,7 +28,7 @@ constexpr phiRegions phiRegion = phiRegions::A; // Which AllStub/PhiRegion
 ///////////////////////////////////////////////
 // Values that don't need manual changing
 
-constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : N_LAYER+kDISK-1);
+constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);
 
 // Number of inputs
 constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
@@ -39,7 +39,7 @@ constexpr int numASCopies = getNumASCopies<layerdisk, phiRegion>(); // Allstub m
 constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory
 constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories
 
-// Masks of which AllStubInner memories that are being used in this phi region; represente by a "1"
+// Masks of which AllStubInner memories that are being used in this phi region; represented by a "1"
 // First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
 // NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
 static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<layerdisk, phiRegion>();

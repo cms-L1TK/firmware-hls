@@ -75,9 +75,9 @@ Some of the files are large, so not stored directly in git. These are automatica
 
 These correspond to LUT used internally by the algo steps.
 
-## Corresponding C++ emulation
+## Corresponding CMSSW L1 track emulation
 
-The C++ emulation was used to create the files that are downloaded by emData/download.sh. The version used to create these files can be obtained with the following recipe (adapted from the [L1TrackSoftware TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/L1TrackSoftware)):
+The files that are downloaded by emData/download.sh were created by the CMSSSW L1 track emulation, with the the following recipe (adapted from the [L1TrackSoftware TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/L1TrackSoftware)).
 
 ```bash
 cmsrel CMSSW_11_3_0_pre3
@@ -85,30 +85,11 @@ cd CMSSW_11_3_0_pre3/src/
 cmsenv 
 git cms-checkout-topic -u cms-L1TK:fw_synch_210611
 git clone https://github.com/cms-data/L1Trigger-TrackFindingTracklet.git L1Trigger/TrackFindingTracklet/data
-cd L1Trigger/TrackFindingTracklet/data/
-mkdir -p LUTs \
-  MemPrints/CleanTrack \
-  MemPrints/FitTrack \
-  MemPrints/InputStubs \
-  MemPrints/Matches \
-  MemPrints/StubPairs \
-  MemPrints/Stubs \
-  MemPrints/TrackletParameters \
-  MemPrints/TrackletProjections \
-  MemPrints/VMProjections \
-  MemPrints/VMStubsME \
-  MemPrints/VMStubsTE
-cd -
 ```
 
-A few changes need to be made in order to enable truncation, to output test vectors and lookup tables, and to disable multiple matches in the MatchCalculator. So open L1Trigger/TrackFindingTracklet/interface/Settings.h and change the parameters to match the following:
+A few cfg changes were made in order to output test vectors & lookup tables, adjust truncation, and to disable multiple matches in the MatchCalculator. This required editing parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h to match the following excerpts:
 
 ```c++
-…
-    // Offset to the maximum number of steps in each processing step:
-    // Set to 0 (default) means standard truncation
-    // Set to large value, e.g. 10000, to disable truncation
-    unsigned int maxstepoffset_{0};
 …
     //--- These used to create files needed by HLS code.
     bool writeMem_{true};     //If true will print out content of memories (between algo steps) to files
@@ -125,13 +106,23 @@ A few changes need to be made in order to enable truncation, to output test vect
 …
 ```
 
-Then build the release with the usual command:
+N.B. In future, better agreement with FW can be achieved by also setting the following parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h . This was *not done* for the existing emData/ files, but is recommended if generating new ones:
+
+```c++
+…
+    //Number of processing steps for one event (108=18TM*240MHz/40MHz)
+    // Change IR & TE from default values -- leave others unchanged.
+    std::unordered_map<std::string, unsigned int> maxstep_{{"IR", 108}, ... , {"TE", 107}}, ...}'
+…
+```
+
+Then compilation was done with the usual command:
 
 ```bash
 scram b -j8
 ```
 
-Finally, increase the maximum number of events in L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py to 100:
+Finally, the maximum number of events in L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py was set to 100:
 
 ```python
 …
@@ -139,7 +130,7 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 …
 ```
 
-and run the emulation:
+and the emulation run:
 
 ```bash
 cd L1Trigger/TrackFindingTracklet/test/
