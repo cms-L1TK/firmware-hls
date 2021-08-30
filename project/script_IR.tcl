@@ -59,7 +59,7 @@ open_solution "solution_PS10G_3_A"
 source settings_hls.tcl
 create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
-set_top InputRouterTop_IR_DTC_PS10G_2_B
+set_top solution_PS10G_3_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
 export_design -format ip_catalog
@@ -120,7 +120,7 @@ set_top InputRouterTop_IR_DTC_PS_2_B
 csynth_design
 export_design -format ip_catalog
 
-Link 9
+# Link 9
 set LinkId 9 
 open_solution "solution_2S_1_A"
 source settings_hls.tcl
@@ -142,7 +142,7 @@ set_top InputRouterTop_IR_DTC_2S_1_B
 csynth_design
 export_design -format ip_catalog
 
-Link 11 
+# Link 11 
 set LinkId 11
 open_solution "solution_2S_2_A"
 source settings_hls.tcl
