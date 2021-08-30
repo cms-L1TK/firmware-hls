@@ -592,10 +592,10 @@ begin
       fullmatch_0_dataarray_data_V_ce0      => open,
       fullmatch_0_dataarray_data_V_we0      => FM_L1L2_L3PHIC_dataarray_data_V_wea,
       fullmatch_0_dataarray_data_V_d0       => FM_L1L2_L3PHIC_dataarray_data_V_din,
-      fullmatch_3_dataarray_data_V_address0 => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
-      fullmatch_3_dataarray_data_V_ce0      => open,
-      fullmatch_3_dataarray_data_V_we0      => FM_L5L6_L3PHIC_dataarray_data_V_wea,
-      fullmatch_3_dataarray_data_V_d0       => FM_L5L6_L3PHIC_dataarray_data_V_din
+      fullmatch_1_dataarray_data_V_address0 => FM_L5L6_L3PHIC_dataarray_data_V_writeaddr,
+      fullmatch_1_dataarray_data_V_ce0      => open,
+      fullmatch_1_dataarray_data_V_we0      => FM_L5L6_L3PHIC_dataarray_data_V_wea,
+      fullmatch_1_dataarray_data_V_d0       => FM_L5L6_L3PHIC_dataarray_data_V_din
       );
 
 
