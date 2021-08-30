@@ -192,10 +192,8 @@ void ProjectionRouter(BXType bx,
       // and is shifted to be positive
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1))+irinv_tmp.range(irinv_tmp.length()-1,irinv_tmp.length()-nbits_maxvm);
       //assert(rinv >=0 and rinv < 32);
-#ifndef __SYNTHESIS__
-      edm::LogVerbatim("L1trackHLS") << "finez zbin1 psseed: "<<finez<<" "<<zbin1<<" "<<psseed<<std::endl;
-#endif
       // VM Projection
+
       VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
 
       // write outputs

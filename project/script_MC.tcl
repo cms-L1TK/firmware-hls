@@ -11,7 +11,7 @@ open_project -reset match_calc
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top MatchCalculatorTop
+set_top MatchCalculator_L3PHIC
 add_files ../TrackletAlgorithm/MatchCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchCalculator_test.cpp -cflags "$CFLAGS"
 

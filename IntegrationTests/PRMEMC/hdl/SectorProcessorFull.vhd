@@ -1132,10 +1132,10 @@ begin
       fullmatch_0_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L3PHIC),
       fullmatch_0_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L3PHIC),
       fullmatch_0_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L3PHIC),
-      fullmatch_3_dataarray_data_V_ce0       => open,
-      fullmatch_3_dataarray_data_V_we0       => FM_52_mem_A_wea(L5L6_L3PHIC),
-      fullmatch_3_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L5L6_L3PHIC),
-      fullmatch_3_dataarray_data_V_d0        => FM_52_mem_AV_din(L5L6_L3PHIC)
+      fullmatch_1_dataarray_data_V_ce0       => open,
+      fullmatch_1_dataarray_data_V_we0       => FM_52_mem_A_wea(L5L6_L3PHIC),
+      fullmatch_1_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L5L6_L3PHIC),
+      fullmatch_1_dataarray_data_V_d0        => FM_52_mem_AV_din(L5L6_L3PHIC)
   );
 
 
