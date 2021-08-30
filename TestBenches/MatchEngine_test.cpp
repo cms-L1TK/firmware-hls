@@ -50,7 +50,7 @@ int main() {
 	else if (kLayerDisk == TF::D3) meName = "ME_D3PHIC12";
 	else if (kLayerDisk == TF::D4) meName = "ME_D4PHIC12";
 	else if (kLayerDisk == TF::D5) meName = "ME_D5PHIC12";
-        assert(meName != "");
+        assert(!meName.empty());
 
 	// Open the file(s) with the input projections, the stubs, and the reference results
 	TBHelper tbh("ME/" + meName);
