@@ -41,7 +41,7 @@ def createDefinitionsTemplate() :
         "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}])"
         "\n{{\n"
         "     #pragma HLS clock domain = slow_clock\n"
-        "     #pragma HLS stream variable = hInputStubs depth = 1\n"
+        "     #pragma HLS stream variable = hInputStubs depth = 108\n"
         "     #pragma HLS interface register port = bx_o\n"
         "     InputRouter<cNMemories_IR_{LinkName}>( bx\n"
         "       , hLinkWord\n"
