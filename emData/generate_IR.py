@@ -22,6 +22,7 @@ def getNmemsPerIR(wiresFiles='./LUTs/wires.dat') :
     irLines=[]
     for line in lines : 
       if re.search(dtcName, line, re.IGNORECASE) and ("neg" in dtcName) == ("neg" in line) : 
+          print(idx, ' - ' , line, ' - ' , dtcName)
           irLines.append(line)
     nMemories.append(len(irLines))
   return zip(dtcNames, nMemories)
@@ -35,12 +36,12 @@ def createDefinitionsTemplate() :
         "    const BXType bx\n"
         "    , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT \n"
         "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
-        "    , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs \n"
+        "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc]//input stubs \n"
         "    , BXType & bx_o // output bx  \n"
         "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}])"
         "\n{{\n"
         "     #pragma HLS clock domain = slow_clock\n"
-        "     #pragma HLS stream variable = hInputStubs depth = 1\n"
+        "     #pragma HLS stream variable = hInputStubs depth = 108\n"
         "     #pragma HLS interface register port = bx_o\n"
         "     InputRouter<cNMemories_IR_{LinkName}>( bx\n"
         "       , hLinkWord\n"
@@ -62,7 +63,7 @@ def createDeclarationTemplate() :
         "    const BXType bx\n"
         "    , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT \n"
         "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
-        "    , ap_uint<kNBits_DTC> hInputStubs[kMaxStubsFromLink]//input stubs \n"
+        "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc]//input stubs \n"
         "    , BXType & bx_o // output bx  \n"
         "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}]"
         ");\n")
