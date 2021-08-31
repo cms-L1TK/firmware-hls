@@ -15,6 +15,9 @@
 #if !defined MODULE_
   #define MODULE_ PR_L3PHIC_
 #endif
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ ProjectionRouterTop_L3PHIC
+#endif
 
 const int nevents = 100;  //number of events to run
 
@@ -28,47 +31,12 @@ int main()
   const string vmProjectionPattern = "VMProjections*";
 
   // Define region according to which layer is being tested
-#if MODULE_ == PR_L1PHIB_ || MODULE_ == PR_L2PHIB_ || MODULE_ == PR_L3PHIB_ || MODULE_ == PR_L1PHIC_ || MODULE_ == PR_L2PHIC_ || MODULE_ == PR_L3PHIC_
-  const auto projMemType = BARRELPS;
-#elif MODULE_ == PR_L4PHIB_ || MODULE_ == PR_L5PHIB_ || MODULE_ == PR_L6PHIB_ || MODULE_ == PR_L4PHIC_ || MODULE_ == PR_L5PHIC_ || MODULE_ == PR_L6PHIC_
-  const auto projMemType = BARREL2S;
-#else
-  #error "Undefined Module"
-#endif
-
-#if MODULE_ == PR_L1PHIB_ || MODULE_ == PR_L2PHIB_ || MODULE_ == PR_L3PHIB_ || MODULE_ == PR_L4PHIB_ || MODULE_ == PR_L5PHIB_ || MODULE_ == PR_L6PHIB_ || MODULE_ == PR_L1PHIC_ || MODULE_ == PR_L2PHIC_ || MODULE_ == PR_L3PHIC_ || MODULE_ == PR_L4PHIC_ || MODULE_ == PR_L5PHIC_ || MODULE_ == PR_L6PHIC_
+  assert(MODULE_ >= 413 && MODULE_ <= 440); // Select for PR modules
+  assert(std::string(module_name[MODULE_]).find("PHIB") != string::npos ||
+         std::string(module_name[MODULE_]).find("PHIC") != string::npos); // Select for PHIB and PHIC modules
+  const auto projMemType = (MODULE_ >= 413 && MODULE_ <= 428) ? BARRELPS : BARREL2S;
   const auto vmProjMemType = BARREL;
-#else
-  #error "Undefined Module"
-#endif
-
-#if MODULE_ == PR_L1PHIB_
-  TBHelper tb("PR/PR_L1PHIB");
-#elif MODULE_ == PR_L2PHIB_
-  TBHelper tb("PR/PR_L2PHIB");
-#elif MODULE_ == PR_L3PHIB_
-  TBHelper tb("PR/PR_L3PHIB");
-#elif MODULE_ == PR_L4PHIB_
-  TBHelper tb("PR/PR_L4PHIB");
-#elif MODULE_ == PR_L5PHIB_
-  TBHelper tb("PR/PR_L5PHIB");
-#elif MODULE_ == PR_L6PHIB_
-  TBHelper tb("PR/PR_L6PHIB");
-#elif MODULE_ == PR_L1PHIC_
-  TBHelper tb("PR/PR_L1PHIC");
-#elif MODULE_ == PR_L2PHIC_
-  TBHelper tb("PR/PR_L2PHIC");
-#elif MODULE_ == PR_L3PHIC_
-  TBHelper tb("PR/PR_L3PHIC");
-#elif MODULE_ == PR_L4PHIC_
-  TBHelper tb("PR/PR_L4PHIC");
-#elif MODULE_ == PR_L5PHIC_
-  TBHelper tb("PR/PR_L5PHIC");
-#elif MODULE_ == PR_L6PHIC_
-  TBHelper tb("PR/PR_L6PHIC");
-#else
-  #error "Undefined Module"
-#endif
+  TBHelper tb(std::string("PR/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
@@ -80,8 +48,19 @@ int main()
 
   // output memories
   AllProjectionMemory<projMemType> allproj;
+  const auto nAllProjections = tb.nFiles(allProjectionPattern);
   const auto nVMProjections = tb.nFiles(vmProjectionPattern);
   vector<VMProjectionMemory<vmProjMemType> > vmprojarray(nVMProjections);
+
+  // print the input files loaded
+  std::cout << "Loaded the input files:\n";
+  for (unsigned i = 0; i < nTrackletProjections; i++)
+    std::cout << "\t" << tb.fileNames(trackletProjectionPattern).at(i) << "\n";
+  for (unsigned i = 0; i < nVMProjections; i++)
+    std::cout << "\t" << tb.fileNames(vmProjectionPattern).at(i) << "\n";
+  for (unsigned i = 0; i < nAllProjections; i++)
+    std::cout << "\t" << tb.fileNames(allProjectionPattern).at(i) << "\n";
+  std::cout << std::endl;
 
   // loop over events
   cout << "Start event loop ..." << endl;
@@ -103,33 +82,7 @@ int main()
     BXType bx_out;
 
     // Unit Under Test
-#if MODULE_ == PR_L1PHIB_
-    ProjectionRouterTop_L1PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L2PHIB_
-    ProjectionRouterTop_L2PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L3PHIB_
-    ProjectionRouterTop_L3PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L4PHIB_
-    ProjectionRouterTop_L4PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L5PHIB_
-    ProjectionRouterTop_L5PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L6PHIB_
-    ProjectionRouterTop_L6PHIB(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L1PHIC_
-    ProjectionRouterTop_L1PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L2PHIC_
-    ProjectionRouterTop_L2PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L3PHIC_
-    ProjectionRouterTop_L3PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L4PHIC_
-    ProjectionRouterTop_L4PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L5PHIC_
-    ProjectionRouterTop_L5PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#elif MODULE_ == PR_L6PHIC_
-    ProjectionRouterTop_L6PHIC(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
-#else
-  #error "Undefined PR"
-#endif
+    TOP_FUNC_(bx, tprojarray.data(), bx_out, allproj, vmprojarray.data());
 
     bool truncation = false;
     auto &fout_aproj = tb.files(allProjectionPattern);
