@@ -1,6 +1,7 @@
 #include "TrackMerger.h"
+#include <bitset>
 
-void TrackMerger(const BXType bx,
+void TrackMergerHelper(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
@@ -21,44 +22,52 @@ void TrackMerger(const BXType bx,
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
         ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();
+        std::cout << "Track Stub Map: " << std::bitset<TrackFitBase::kTFHitMapSize>(trackStubMap) << std::endl;
         
-        //auto trackHitCount = trkFit.getHitCount();
-        // every 3 bits is a new layer/disk - getting number of stubs in each layer
-        //for (int layer = 0; layer < trackStubMap.length()/TrackFit::kTFHitCountSize; layer++){
-             
+        TrackFit::BarrelStubWord barrelStubWord;   
         for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
             switch (j){
               case 0:
                 trkFit.setBarrelStubWord<0>(barrelStubWords[0][i]);
+                barrelStubWord = trkFit.getBarrelStubWord<0>();
                 break;
               case 1:
                 trkFit.setBarrelStubWord<1>(barrelStubWords[1][i]);
+                barrelStubWord = trkFit.getBarrelStubWord<1>();
                 break;
               case 2:
                 trkFit.setBarrelStubWord<2>(barrelStubWords[2][i]);
+                barrelStubWord = trkFit.getBarrelStubWord<2>();
                 break;
               case 3:
                 trkFit.setBarrelStubWord<3>(barrelStubWords[3][i]);
+                barrelStubWord = trkFit.getBarrelStubWord<3>();
                 break;
 
             }
+            std::cout << "barrelStub: " << std::bitset <TrackFitBase::kBarrelStubSize> (barrelStubWord) << std::endl;
         }  
-            
+        TrackFit::DiskStubWord diskStubWord;    
         for (unsigned int k = TrackFit::kNDiskStubs; k < TrackFit::kNStubs; k++){
             switch (k){
               case 4:
                 trkFit.setDiskStubWord<4>(diskStubWords[0][i]);
+                diskStubWord = trkFit.getDiskStubWord<4>();
                 break;
               case 5:
                 trkFit.setDiskStubWord<5>(diskStubWords[1][i]);
+                diskStubWord = trkFit.getDiskStubWord<5>();
                 break;
               case 6:
                 trkFit.setDiskStubWord<6>(diskStubWords[2][i]);
+                diskStubWord = trkFit.getDiskStubWord<6>();
                 break;
               case 7:
                 trkFit.setDiskStubWord<7>(diskStubWords[3][i]);
+                diskStubWord = trkFit.getDiskStubWord<7>();
                 break;
             }
+            std::cout << "diskStubWord: " << std::bitset<TrackFitBase::kDiskStubSize> (diskStubWord) << std::endl;
         }
 
         // getting stub index
@@ -90,10 +99,12 @@ void TrackMerger(const BXType bx,
               stubIndex = trkFit.getStubIndex<7>();
               break;
           }
+          std::cout << "StubIndex: " << stubIndex << std::endl;
         }
+
     }
-
-
+  
+  
     bx_o = bx;
   
   }
