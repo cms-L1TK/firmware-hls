@@ -8,7 +8,17 @@ source env_hls.tcl
 
 # the set of modules to test
 set modules_to_test {
+  {ME_L1PHIC12}
+  {ME_L2PHIC20}
   {ME_L3PHIC20}
+  {ME_L4PHIC20}
+  {ME_L5PHIC20}
+  {ME_L6PHIC20}
+  {ME_D1PHIC20}
+  {ME_D2PHIC12}
+  {ME_D3PHIC12}
+  {ME_D4PHIC12}
+  {ME_D5PHIC12}
 }
 
 # module_to_export must correspond to the default macros set at the top of the

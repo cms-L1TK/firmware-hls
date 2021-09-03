@@ -105,7 +105,7 @@ int main() {
 
   // Output memories
   static AllStubMemory<outputType> memoriesAS[maxASCopies];
-  static VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME];
+  static VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin> memoriesME[nvmME];
   static VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies];
   static VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies];
   static VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies];
@@ -186,7 +186,7 @@ int main() {
 
     // ME Memories
     for (unsigned int i = 0; i < nvmME; i++) {
-      err += compareBinnedMemWithFile<VMStubMEMemory<outputType, nbitsbin>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
+      err += compareBinnedMemWithFile<VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
     }
 
     // TE Inner Memories

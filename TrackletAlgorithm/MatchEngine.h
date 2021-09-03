@@ -39,6 +39,21 @@ template<TF::layerDisk LayerDisk> constexpr unsigned int NBitBin() {
 	);
 }
 
+template<TF::layerDisk LayerDisk> constexpr unsigned int NBitMemAddr() {
+	return kNBits_MemAddr + (
+		(LayerDisk <= TF::L6) ? 0 : 1
+	);
+}
+
+template<TF::layerDisk LayerDisk, regionType ProjectionType, regionType ModuleType>
+bool getIsPSModule(const typename VMProjection<ProjectionType>::VMPZBIN & rzbin,
+								   const typename VMStubME<ModuleType>::VMSMEFINEZ & stubfinez) {
+	auto absRZBin = rzbin & 7;
+	return (ModuleType == BARRELPS) || 
+			( (ModuleType == DISK) && (LayerDisk >= TF::D1) && (LayerDisk <= TF::D2) && ( (absRZBin < 3) || (absRZBin == 3 && stubfinez <= 3) ) ) ||
+			( (ModuleType == DISK) && (LayerDisk >= TF::D3) && (LayerDisk <= TF::D5) && ( (absRZBin < 3) || (absRZBin == 3 && stubfinez <= 2) ) );
+}
+
 template<TF::layerDisk LayerDisk> inline const ap_uint<1>* readTable() {
 	printf("The LayerDisk value must be between TF::L1 (0) and TF::D5 (10)");
 	static ap_uint<1> lut[] = {};
@@ -102,9 +117,9 @@ template<> inline const ap_uint<1>* readTable<TF::D5>() {
 
 template<TF::layerDisk LayerDisk>
 void MatchEngine(const BXType bx, BXType& bx_o,
-								 const VMStubMEMemory<ModuleType<LayerDisk>(), NBitBin<LayerDisk>()>& inputStubData,
-								 const VMProjectionMemory<ProjectionType<LayerDisk>()>& inputProjectionData,
-								 CandidateMatchMemory& outputCandidateMatch) {
+				 const VMStubMEMemory<ModuleType<LayerDisk>(), NBitMemAddr<LayerDisk>(), NBitBin<LayerDisk>()>& inputStubData,
+				 const VMProjectionMemory<ProjectionType<LayerDisk>()>& inputProjectionData,
+				 CandidateMatchMemory& outputCandidateMatch) {
 #pragma HLS inline
 
 	//
@@ -113,25 +128,29 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	constexpr regionType kProjectionType = ProjectionType<LayerDisk>();
 	constexpr regionType kModuleType = ModuleType<LayerDisk>();
 	constexpr unsigned int kNBitBin = NBitBin<LayerDisk>();
+	constexpr unsigned int kNBitMemAddr = NBitMemAddr<LayerDisk>();
 	constexpr unsigned int kRInvSteps = 32;
 	constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
 	constexpr unsigned int kBufferSize = 8;
 	constexpr unsigned int kNBits_BufferAddr=BITS_TO_REPRESENT(kBufferSize - 1);
-	constexpr int kBufferDataSize = VMStubMEMemory<kModuleType,kNBitBin>::kNBitDataAddr   // number of bits for stubs array size
-								  + VMProjection<kProjectionType>::kVMProjectionSize	// projection data size
-								  + VMProjection<kProjectionType>::kVMProjZBinSize;	// number of bits for index of z-bin + z-bin flag (0 => first bin, 1 => second bin)
+	typedef VMProjection<kProjectionType> VMProjectionType;
+	typedef VMStubME<kModuleType> VMStubMEMemoryType;
+	typedef VMStubMEMemory<kModuleType,kNBitMemAddr,kNBitBin> VMStubMEMemoryBinnedType;
+	constexpr int kBufferDataSize = VMStubMEMemoryBinnedType::kNBitDataAddr   // number of bits for stubs array size
+								  + VMProjectionType::kVMProjectionSize	// projection data size
+								  + VMProjectionType::kVMProjZBinSize;	// number of bits for index of z-bin + z-bin flag (0 => first bin, 1 => second bin)
 	constexpr unsigned int kZAdjustment = 8;
 
 	enum BitLocations {
 		// The location of the least significant bit (LSB) and most significant bit (MSB) in the ME buffer word for different fields
 		kVMMESecondLSB = 0,
 		kVMMESecondMSB = 0,
-		kVMMEZBinLSB = kVMMESecondMSB + 1,
-		kVMMEZBinMSB = kVMMEZBinLSB + (VMProjection<kProjectionType>::kVMProjZBinSize - 1) - 1,
-		kVMMEProjectionLSB = kVMMEZBinMSB + 1,
-		kVMMEProjectionMSB = kVMMEProjectionLSB + VMProjection<kProjectionType>::kVMProjectionSize - 1,
+		kVMMERZBinLSB = kVMMESecondMSB + 1,
+		kVMMERZBinMSB = kVMMERZBinLSB + (VMProjectionType::kVMProjZBinSize - 1) - 1,
+		kVMMEProjectionLSB = kVMMERZBinMSB + 1,
+		kVMMEProjectionMSB = kVMMEProjectionLSB + VMProjectionType::kVMProjectionSize - 1,
 		kVMMENStubsLSB = kVMMEProjectionMSB + 1,
-		kVMMENStubsMSB = kVMMENStubsLSB + VMStubMEMemory<kModuleType,kNBitBin>::kNBitDataAddr - 1
+		kVMMENStubsMSB = kVMMENStubsLSB + VMStubMEMemoryBinnedType::kNBitDataAddr - 1
 	};
 	enum StubZPositionBarrelConsistency {
 		kBarrelPSMin = -1,
@@ -157,7 +176,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 
 	//
 	// Set up a FIFO based on a circular buffer structure.
-	// Projection memory is read and if projections points to nonempty zbin for the stubs it is stored on this buffer.
+	// Projection memory is read and if projections points to nonempty rzbin for the stubs it is stored on this buffer.
 	// The projection reading will stop if buffer is full and continue after the buffer is drained.
 	// Each element consists of
 	//   * kNBits_BufferAddr is the number of bits to handle buffer index (i.e. buffer size will be 1<<kNBits_BufferAddr).
@@ -175,16 +194,16 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	bool moreProjectionsAvailable = iprojection < nproj;
 
 	// Variables for the projection
-	typename VMProjection<kProjectionType>::VMPID projindex;
-	typename VMProjection<kProjectionType>::VMPFINEZ projfinez;
-	typename VMProjection<kProjectionType>::VMPFINEPHI projfinephi;
-	typename VMProjection<kProjectionType>::VMPRINV projrinv;
-	ap_uint<VMProjection<kProjectionType>::kVMProjZBinSize> zbin = 0;
+	typename VMProjectionType::VMPID projindex;
+	typename VMProjectionType::VMPFINEZ projfinez;
+	typename VMProjectionType::VMPFINEPHI projfinephi;
+	typename VMProjectionType::VMPRINV projrinv;
+	typename VMProjectionType::VMPZBIN rzbin = 0;
 	ap_uint<kNBits_MemAddr> ncmatch = 0;
 	bool isPSseed;
 	bool second;
 
-	// Number of stubs for current zbin and the stub being processed on this clock
+	// Number of stubs for current rzbin and the stub being processed on this clock
 	ap_uint<kNBits_MemAddrBinned> nstubs=0;
 	ap_uint<kNBits_MemAddrBinned> istub=0;
 	#pragma HLS dependence variable=istub intra WAR true
@@ -225,28 +244,28 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 			iprojection++;
 			moreProjectionsAvailable=iprojection<nproj;
 
-			// The first and last zbin the projection points to
+			// The first and last rzbin the projection points to
 			auto const projectionzbitstmp=projectiondatatmp.getZBin();
-			ap_uint<VMProjection<kProjectionType>::kVMProjZBinSize - 1> zbinfirst=projectionzbitstmp.range(VMProjection<kProjectionType>::kVMProjZBinSize-1,1);
-			ap_uint<VMProjection<kProjectionType>::kVMProjZBinSize - 1> zbinlast=zbinfirst + projectionzbitstmp.range(0,0);
+			ap_uint<VMProjectionType::kVMProjZBinSize - 1> rzbinfirst=projectionzbitstmp.range(VMProjectionType::kVMProjZBinSize-1,1);
+			ap_uint<VMProjectionType::kVMProjZBinSize - 1> rzbinlast=rzbinfirst + projectionzbitstmp.range(0,0);
 
 			// Check if there are stubs in the memory
-			auto const nstubfirst = inputStubData.getEntries(bx,zbinfirst);
-			auto const nstublast  = inputStubData.getEntries(bx,zbinlast);
+			auto const nstubfirst = inputStubData.getEntries(bx,rzbinfirst);
+			auto const nstublast  = inputStubData.getEntries(bx,rzbinlast);
 			bool savefirst = (nstubfirst != 0);
 			bool savelast  = (nstublast != 0) && projectionzbitstmp.range(0,0);
 			auto const head_writeindex_tmp=head_writeindex;
 
 			if (savefirst) {
 				ap_uint<1> zero=0;
-				ap_uint<VMProjection<kProjectionType>::kVMProjZBinSize> tmp=zbinfirst.concat(zero);
-				ap_uint<VMProjection<kProjectionType>::kVMProjectionSize + VMProjection<kProjectionType>::kVMProjZBinSize> tmp2=projectiondatatmp.raw().concat(tmp);
+				ap_uint<VMProjectionType::kVMProjZBinSize> tmp=rzbinfirst.concat(zero);
+				ap_uint<VMProjectionType::kVMProjectionSize + VMProjectionType::kVMProjZBinSize> tmp2=projectiondatatmp.raw().concat(tmp);
 				projectionBuffer[head_writeindex_tmp] = nstubfirst.concat(tmp2);
 			}
 			if (savelast) {
 				ap_uint<1> one=1;
-				ap_uint<VMProjection<kProjectionType>::kVMProjZBinSize> tmp=zbinlast.concat(one);
-				ap_uint<VMProjection<kProjectionType>::kVMProjectionSize + VMProjection<kProjectionType>::kVMProjZBinSize> tmp2=projectiondatatmp.raw().concat(tmp);
+				ap_uint<VMProjectionType::kVMProjZBinSize> tmp=rzbinlast.concat(one);
+				ap_uint<VMProjectionType::kVMProjectionSize + VMProjectionType::kVMProjZBinSize> tmp2=projectiondatatmp.raw().concat(tmp);
 				ap_uint<kNBits_BufferAddr> head_writeindex_tmp_last = head_writeindex_tmp+savefirst;
 				projectionBuffer[head_writeindex_tmp_last] = nstublast.concat(tmp2);
 			}
@@ -267,9 +286,9 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 
 			//Need to read the information about the proj in the buffer
 			second = qdata.range(BitLocations::kVMMESecondMSB, BitLocations::kVMMESecondLSB);
+			rzbin = qdata.range(BitLocations::kVMMERZBinMSB, BitLocations::kVMMERZBinLSB);
+			VMProjectionType data(qdata.range(BitLocations::kVMMEProjectionMSB, BitLocations::kVMMEProjectionLSB));
 			nstubs = qdata.range(BitLocations::kVMMENStubsMSB, BitLocations::kVMMENStubsLSB);
-			VMProjection<kProjectionType> data(qdata.range(BitLocations::kVMMEProjectionMSB, BitLocations::kVMMEProjectionLSB));
-			zbin = qdata.range(BitLocations::kVMMEZBinMSB, BitLocations::kVMMEZBinLSB);
 
 			projindex = data.getIndex();
 			projfinez = data.getFineZ();
@@ -287,12 +306,13 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 			}
 
 			// Read stub memory and extract data fields
-			auto const stubdata    = inputStubData.read_mem(bx, zbin, istubtmp);
-			auto const stubindex   = stubdata.getIndex();
-			auto const stubfinez   = stubdata.getFineZ();
-			auto const stubfinephi = stubdata.getFinePhi();
-			auto const stubbend    = stubdata.getBend();
-			//auto const isPSmodule  = ;
+			auto const stubdata        = inputStubData.read_mem(bx, rzbin, istubtmp);
+			auto const stubindex       = stubdata.getIndex();
+			auto const stubfinez       = stubdata.getFineZ();
+			auto const stubfinephi     = stubdata.getFinePhi();
+			auto const stubbend        = stubdata.getBend();
+			auto const stubbendReduced = stubdata.getBendPSDisk();
+			auto const isPSmodule      = getIsPSModule<LayerDisk, kProjectionType, kModuleType>(rzbin, stubfinez);
 
 			// Calculate fine z position
 			ap_int<VMProjectionBase<kProjectionType>::kVMProjFineZSize+1> projfinezadj = projfinez;
@@ -304,49 +324,64 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 			bool pass = false;
 			if (kProjectionType == BARREL) {
 				pass = (isPSseed) ? (idz >= StubZPositionBarrelConsistency::kBarrelPSMin && idz <= StubZPositionBarrelConsistency::kBarrelPSMax)
-													: (idz >= StubZPositionBarrelConsistency::kBarrel2SMin && idz <= StubZPositionBarrelConsistency::kBarrel2SMax);
+								  : (idz >= StubZPositionBarrelConsistency::kBarrel2SMin && idz <= StubZPositionBarrelConsistency::kBarrel2SMax);
 			}
-//			else {
-//				pass = (isPSmodule) ? (idz >= StubZPositionDiskConsistency::kDiskPSMin && idz <= StubZPositionDiskConsistency::kDiskPSMax)
-//														: (idz >= StubZPositionDiskConsistency::kDisk2SMin && idz <= StubZPositionDiskConsistency::kDisk2SMax);	
-//			}
+			else {
+				pass = (isPSmodule) ? (idz >= StubZPositionDiskConsistency::kDiskPSMin && idz <= StubZPositionDiskConsistency::kDiskPSMax)
+									: (idz >= StubZPositionDiskConsistency::kDisk2SMin && idz <= StubZPositionDiskConsistency::kDisk2SMax);
+			}
 
 			// Check is stub phi positions are consistent
 			bool passphi = ((idphi<StubPhiPositionConsistency::kMin) && (idphi>-StubPhiPositionConsistency::kMin)) ||
 										 ((idphi>StubPhiPositionConsistency::kMax) || (idphi<-StubPhiPositionConsistency::kMax));
 
 			// Check if stub bend and proj rinv consistent
-			auto const index = projrinv.concat(stubbend) ;//+ ((kProjectionType == DISK && isPSmodule) ? (1 << (kRInvBits + kNBitBin)) : 0);
+			auto const index_part1 = (kProjectionType == DISK && isPSmodule) ? projrinv.concat(stubbendReduced) : projrinv.concat(stubbend);
+			auto const index_part2 = ((kProjectionType == DISK && isPSmodule) ? (1 << (kRInvBits + kNBitBin)) : 0);
+			auto const index = index_part1 + index_part2;
 
 #ifdef DEBUG
-			std::cout << projindex.to_string(2) << "\t" << stubindex.to_string(2) << "\t<=== ";
+			std::cout << "Reading " << qdata.to_string(2) << " from buffer:\n"
+					  << "\tprojindex: " << projindex.to_string(2)
+					  << "\tstubindex: " << stubindex.to_string(2)
+					  << "\t<=== ";
 #endif
 			if ( passphi && pass && table[index]) {
 				CandidateMatch cmatch(projindex.concat(stubindex));
 				outputCandidateMatch.write_mem(bx,cmatch,ncmatch);
 				ncmatch++;
 #ifdef DEBUG
-				std::cout << "PASS -- " << ncmatch-1 << "\n";
+				std::cout << "PASS -- " << ncmatch - 1 << "\n"
+						  << "\t\tbx: " << bx << "\n"
+						  << "\t\tcmatch: " << cmatch.raw().to_string(2) << "\n"
+						  << "\t\tncmatch: " << ncmatch - 1 << "\n";
 #endif
 			}
 #ifdef DEBUG
 			else {
 				std::cout << "FAIL" << "\n";
 			}
-			std::cout << "\ttail_readindex: " << tail_readindex - ((istub +1 >= nstubs) ? 1 : 0) << "\n"
-					  << "\thead_writeindex: " << head_writeindex << "\n"
-					  << "\tsecond: " << second << "\n"
-					  << "\tprojfinez: " << projfinez << "\n"
-					  << "\tprojfinezadj: " << projfinezadj << "\n"
-					  << "\tstubfinez: " << stubfinez << "\n"
-					  << "\tidz: " << idz.to_string() << "\n"
-					  << "\tisPSseed: " << isPSseed << "\n"
-					  << "\tpass: " << pass << "\n"
-					  << "\tpassphi: " << passphi << "\n"
-					  << "\tindex: " << index.get().to_string() << "\n"
-					  << "\ttable[index]: " << table[index] << "\n"
-					  << "\tnstubs:" << nstubs << "\n"
-					  << "\tistub:" << istubtmp << std::endl;
+			std::cout << "\t\ttail_readindex: " << tail_readindex - ((istub +1 >= nstubs) ? 1 : 0) << "\n"
+					  << "\t\thead_writeindex: " << head_writeindex << "\n"
+					  << "\t\tkProjectionType: " << kProjectionType << "\n"
+					  << "\t\tkModuleType: " << kModuleType << "\n"
+					  << "\t\tsecond: " << second << "\n"
+					  << "\t\trzbin: " << rzbin << "\n"
+					  << "\t\tprojfinez: " << projfinez << "\n"
+					  << "\t\tprojfinezadj: " << projfinezadj << "\n"
+					  << "\t\tstubfinez: " << stubfinez << "\n"
+					  << "\t\tidz: " << idz.to_string() << "\n"
+					  << "\t\tisPSseed: " << isPSseed << "\n"
+					  << "\t\tisPSmodule: " << isPSmodule << "\n"
+					  << "\t\tpass: " << pass << "\n"
+					  << "\t\tpassphi: " << passphi << "\n"
+					  << "\t\tprojrinv: " << projrinv << " (" << projrinv.to_string(2) << " " << projrinv.length() << ")" << "\n"
+					  << "\t\tsubbend: " << stubbend << " (" << stubbend.to_string(2) << " " << stubbend.length() << ")" << "\n"
+					  << "\t\tsubbendReduced: " << stubbendReduced << " (" << stubbendReduced.to_string(2) << " " << stubbendReduced.length() << ")" << "\n"
+					  << "\t\tindex: " << index << " = " << index_part1 << " + " << index_part2 << "\n" //index.get().to_string() << "\n"
+					  << "\t\ttable[index]: " << table[index] << "\n"
+					  << "\t\tnstubs:" << nstubs << "\n"
+					  << "\t\tistub:" << istubtmp << std::endl;
 #endif
 		}
 	}

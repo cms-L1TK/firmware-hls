@@ -73,6 +73,7 @@ public:
 
   typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEIndexSize> VMSMEID;
   typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
+  typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEBendSize - 1> VMSMEBENDPSDISK;
   typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
   typedef ap_uint<VMStubMEBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
 
@@ -110,6 +111,10 @@ public:
 
   VMSMEBEND getBend() const {
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
+  }
+
+  VMSMEBENDPSDISK getBendPSDisk() const {
+    return data_.range(kVMSMEBendMSB - 1,kVMSMEBendLSB);
   }
 
   VMSMEFINEPHI getFinePhi() const {
@@ -153,6 +158,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType, int NBIT_BIN> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 3, kNBits_MemAddr, NBIT_BIN>;
+template<int VMSMEType, int NBIT_MEMADDR, int NBIT_BIN> using VMStubMEMemory = MemoryTemplateBinned<VMStubME<VMSMEType>, 3, NBIT_MEMADDR, NBIT_BIN>;
 
 #endif
