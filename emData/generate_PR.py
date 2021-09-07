@@ -1,14 +1,21 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, print_function
 
 # Automatically generates ProjectionRouterTop.h, and ProjectionRouterTop.cc
-import sys, os
+import sys, re, os
 
-modules_to_build = ["PR_L1PHIB","PR_L2PHIB","PR_L3PHIB","PR_L4PHIB","PR_L5PHIB","PR_L6PHIB",
-                    "PR_L1PHIC","PR_L2PHIC","PR_L3PHIC","PR_L4PHIC","PR_L5PHIC","PR_L6PHIC"]
+def getListOfModules(wiresFileName):
+    wiresFile = open(wiresFileName)
+    wiresInfo = wiresFile.read()
+    wiresFile.close()
+    modulesToBuild = list(set(re.findall(r"PR_L\w+",wiresInfo))) # FIXME ProjectionRouterTop currently won't compile if DISK modules are included
+    # modulesToBuild = list(set(re.findall(r"PR_\w+",wiresInfo))) # Use this one once DISK is working for ProjectionRouter
+    return modulesToBuild
 
 def getNTProjAndNVMProj(module, wiresFileName):
     wiresFile = open(wiresFileName)
     wiresInfo = wiresFile.read()
+    wiresFile.close()
     TProjCount = wiresInfo.count(module + ".projin")
     VMProjCount = wiresInfo.count(module + ".vmprojout")
     return TProjCount, VMProjCount
@@ -89,7 +96,8 @@ wiresFileName = sys.argv[1]
 headerString = writeHeaderPreamble()
 sourceString = writeSourcePreamble()
 
-for module in modules_to_build:
+modulesToBuild = getListOfModules(wiresFileName)
+for module in modulesToBuild:
     headerString += writeHeaderModuleInstance(module)
     sourceString += writeSourceModuleInstance(module, wiresFileName)
 

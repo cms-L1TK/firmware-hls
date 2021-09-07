@@ -7,7 +7,18 @@
 source env_hls.tcl
 
 set modules_to_test {
+  {PR_L1PHIB}
+  {PR_L2PHIB}
+  {PR_L3PHIB}
+  {PR_L4PHIB}
+  {PR_L5PHIB}
+  {PR_L6PHIB}
+  {PR_L1PHIC}
+  {PR_L2PHIC}
   {PR_L3PHIC}
+  {PR_L4PHIC}
+  {PR_L5PHIC}
+  {PR_L6PHIC}
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
