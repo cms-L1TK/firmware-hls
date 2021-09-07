@@ -115,18 +115,18 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
       return;
     } else {
       if (split(line,' ').size()==4) {
-       #ifdef CMSSW_GIT_HASH
+      #ifdef CMSSW_GIT_HASH
        memory.write_mem(0, line, base);
        #else
        memory.write_mem(ievt, line, base);
        #endif
       } else {
 	const std::string datastr = split(line, ' ').back();
-        #ifdef CMSSW_GIT_HASH
+	#ifdef CMSSW_GIT_HASH
 	memory.write_mem(0, datastr, base);
-        #else
-        memory.write_mem(ievt, datastr, base);
-        #endif
+	#else
+	memory.write_mem(ievt, datastr, base);
+	#endif
       }
     }	
   }
