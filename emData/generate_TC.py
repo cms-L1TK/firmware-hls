@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script generates TrackletCalculator_parameters.h,
 # TrackletCalculatorTop.h, and TrackletCalculatorTop.cc in the
 # TrackletAlgorithm/ directory. Currently supports all TCs for L1L2, as well as
 # TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
-import sys, re
+from __future__ import absolute_import, print_function
+import sys, re, os
 from enum import Enum
 
 # These enums must match those defined in
@@ -104,7 +105,8 @@ for line in wiresFile:
 wiresFile.close()
 
 # Open and print out preambles for the parameters and top files.
-parametersFile = open("TrackletCalculator_parameters.h", "w")
+dirname = os.path.dirname(os.path.realpath('__file__'))
+parametersFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculator_parameters.h"), "w")
 parametersFile.write(
     "#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h\n"
     "#define TrackletAlgorithm_TrackletCalculator_parameters_h\n"
@@ -129,14 +131,14 @@ parametersFile.write(
     "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
     "// in the same way.\n"
 )
-topHeaderFile = open("TrackletCalculatorTop.h", "w")
+topHeaderFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.h"), "w")
 topHeaderFile.write(
     "#ifndef TrackletAlgorithm_TrackletCalculatorTop_h\n"
     "#define TrackletAlgorithm_TrackletCalculatorTop_h\n"
     "\n"
     "#include \"TrackletCalculator.h\"\n"
 )
-topFile = open("TrackletCalculatorTop.cc", "w")
+topFile = open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.cc"), "w")
 topFile.write(
     "#include \"TrackletCalculatorTop.h\"\n"
     "\n"
@@ -203,15 +205,6 @@ for tcName in sorted(asInnerMems.keys()):
     parametersFile.write(
         ("\n"
         "// magic numbers for " + tcName + "\n"
-        "template<> constexpr uint8_t NASMemInner<TF::" + seed + ", TC::" + iTC + ">() {\n"
-        "  return " + str(nASMemInner) + ";\n"
-        "}\n"
-        "template<> constexpr uint8_t NASMemOuter<TF::" + seed + ", TC::" + iTC + ">() {\n"
-        "  return " + str(nASMemOuter) + ";\n"
-        "}\n"
-        "template<> constexpr uint8_t NSPMem<TF::" + seed + ", TC::" + iTC + ">() {\n"
-        "  return " + str(nSPMem) + ";\n"
-        "}\n"
         "template<> constexpr uint32_t ASInnerMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
         "  return 0x%X;\n"
         "}\n"
@@ -248,9 +241,9 @@ for tcName in sorted(asInnerMems.keys()):
         "\n"
         "void TrackletCalculator_" + seed + iTC + "(\n"
         "    const BXType bx,\n"
-        "    const AllStubMemory<InnerRegion<TF::" + seed + ">()> innerStubs[NASMemInner<TF::" + seed + ", TC::" + iTC + ">()],\n"
-        "    const AllStubMemory<OuterRegion<TF::" + seed + ">()> outerStubs[NASMemOuter<TF::" + seed + ", TC::" + iTC + ">()],\n"
-        "    const StubPairMemory stubPairs[NSPMem<TF::" + seed + ", TC::" + iTC + ">()],\n"
+        "    const AllStubMemory<InnerRegion<TF::" + seed + ">()> innerStubs[" + str(nASMemInner) + "],\n"
+        "    const AllStubMemory<OuterRegion<TF::" + seed + ">()> outerStubs[" + str(nASMemOuter) + "],\n"
+        "    const StubPairMemory stubPairs[" + str(nSPMem) + "],\n"
         "    BXType& bx_o,\n"
         "    TrackletParameterMemory * trackletParameters,\n"
         "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
@@ -262,21 +255,12 @@ for tcName in sorted(asInnerMems.keys()):
         "#pragma HLS array_partition variable=outerStubs complete dim=1\n"
         "#pragma HLS array_partition variable=stubPairs complete dim=1\n"
     )
-    if nASMemInner == 1:
-        topFile.write("#pragma HLS resource variable=innerStubs.get_mem() latency=2\n")
-    else:
-        for i in range(0, nASMemInner):
-            topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
-    if nASMemOuter == 1:
-        topFile.write("#pragma HLS resource variable=outerStubs.get_mem() latency=2\n")
-    else:
-        for i in range(0, nASMemOuter):
-            topFile.write("#pragma HLS resource variable=outerStubs[" + str(i) + "].get_mem() latency=2\n")
-    if nSPMem == 1:
-        topFile.write("#pragma HLS resource variable=stubPairs.get_mem() latency=2\n")
-    else:
-        for i in range(0, nSPMem):
-            topFile.write("#pragma HLS resource variable=stubPairs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(0, nASMemInner):
+        topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(0, nASMemOuter):
+        topFile.write("#pragma HLS resource variable=outerStubs[" + str(i) + "].get_mem() latency=2\n")
+    for i in range(0, nSPMem):
+        topFile.write("#pragma HLS resource variable=stubPairs[" + str(i) + "].get_mem() latency=2\n")
     topFile.write(
         "#pragma HLS interface register port=bx_o\n"
         "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
@@ -286,7 +270,7 @@ for tcName in sorted(asInnerMems.keys()):
         "TC_" + seed + iTC + ": TrackletCalculator<\n"
         "  TF::" + seed + ",\n"
         "  TC::" + iTC + ",\n"
-        "  NSPMem<TF::" + seed + ", TC::" + iTC + ">()\n"
+        "  " + str(nSPMem) + "\n"
         " >(\n"
         "    bx,\n"
         "    innerStubs,\n"

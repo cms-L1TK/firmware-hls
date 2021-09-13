@@ -112,6 +112,12 @@ declare -a processing_modules=(
   "ME_D5PHIC12"
 
   # MatchCalculator
+  "MC_L1PHIB"
+  "MC_L2PHIB"
+  "MC_L3PHIB"
+  "MC_L4PHIB"
+  "MC_L5PHIB"
+  "MC_L6PHIB"
   "MC_L1PHIC"
   "MC_L2PHIC"
   "MC_L3PHIC"
@@ -194,8 +200,13 @@ then
   rm -f LUTs.tar.gz
 fi
 
+# Run scripts to generate top functions in TrackletAlgorithm/
 ./generate_IR.py
 ./generate_VMR.py -a -w LUTs/wires.dat
+./generate_TC.py LUTs/wires.dat
+./generate_PR.py LUTs/wires.dat
+./generate_MC.py LUTs/wires.dat
+./generate_TB.py LUTs/wires.dat
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
