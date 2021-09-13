@@ -31,10 +31,10 @@ int main()
   const string vmProjectionPattern = "VMProjections*";
 
   // Define region according to which layer is being tested
-  assert(MODULE_ >= 413 && MODULE_ <= 440); // Select for PR modules
+  assert(MODULE_ >= PR_L1PHIA_ && MODULE_ <= PR_L6PHID_); // Select for PR modules
   assert(std::string(module_name[MODULE_]).find("PHIB") != string::npos ||
          std::string(module_name[MODULE_]).find("PHIC") != string::npos); // Select for PHIB and PHIC modules
-  const auto projMemType = (MODULE_ >= 413 && MODULE_ <= 428) ? BARRELPS : BARREL2S;
+  const auto projMemType = (MODULE_ >= PR_L1PHIA_ && MODULE_ <= PR_L3PHID_) ? BARRELPS : BARREL2S;
   const auto vmProjMemType = BARREL;
   TBHelper tb(std::string("PR/") + module_name[MODULE_]);
 
