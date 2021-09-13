@@ -435,7 +435,7 @@ ap_uint<kLINKMAPwidth> getLnkWrd(CablingMap pDtcMap
   std::string cDtcName = getDTCName( pDtcMap, pLinkId ); 
   std::vector<uint8_t> cLyrs = getLyrs( pDtcMap, pLinkId );
   int cOffst=0; 
-  ap_uint<kLINKMAPwidth> cLnkWrd;
+  ap_uint<kLINKMAPwidth> cLnkWrd=0;
   for( auto cLyr : cLyrs )
   {
     bool cIsBrl = (cLyr<11);
@@ -638,10 +638,15 @@ int main(int argc, char * argv[])
       << std::hex
       << cLnkWrd 
       << std::dec
+      << " Bin Word is "
+      << std::hex 
+      << cPhBnWord 
+      << std::dec 
       << "\t connected to "
       << cNmemories 
       << " memories."
       << "\n";
+  
   // bns 
   std::vector<int> nStubs(cNmemories,0);
   auto cBns= getBns( cMap
@@ -798,7 +803,7 @@ int main(int argc, char * argv[])
         , hMemories); 
         break;
       case 16: 
-        InputRouterTop_IR_DTC_2S_4_A( hBx
+        InputRouterTop_IR_DTC_2S_4_B( hBx
         , cLnkWrd // input link LUT 
         , cPhBnWord  // n phi bins LUT 
         , hInputStubs // input stub stream 

@@ -29,6 +29,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS10G_1_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 1
@@ -40,6 +41,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS10G_2_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 2
@@ -51,6 +53,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS10G_2_B
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # # Link 3
@@ -62,6 +65,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS10G_3_A
 csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 4 
@@ -73,6 +77,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS10G_3_B
 csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 5
@@ -84,6 +89,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS_1_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 6
@@ -95,6 +101,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS_1_B
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 7 
@@ -106,6 +113,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS_2_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 8 
@@ -117,6 +125,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_PS_2_B
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 9
@@ -128,6 +137,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_1_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 10
@@ -139,6 +149,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_1_B
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 11 
@@ -150,6 +161,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_2_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 12 
@@ -161,6 +173,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_2_B
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 13
@@ -172,6 +185,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_3_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 14
@@ -181,8 +195,9 @@ source settings_hls.tcl
 create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_3_B
-# csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 csynth_design
+# csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 export_design -format ip_catalog
 
 # Link 15
@@ -194,6 +209,7 @@ create_clock -period 360MHz -name fast_clock
 set_top InputRouterTop_IR_DTC_2S_4_A
 # csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
 csynth_design
+# cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 # Link 16
@@ -202,9 +218,10 @@ open_solution "solution_2S_4_B"
 source settings_hls.tcl
 create_clock -period 240MHz -name slow_clock
 create_clock -period 360MHz -name fast_clock
-set_top InputRouterTop_IR_DTC_2S_4_B
-# csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
-csynth_design
+set_top InputRouterTop_IR_DTC_2S_4_B 
+#csim_design -mflags "-j$nProc" -argv "--link,$LinkId --tkNonant,$tkNonant"
+csynth_design 
+#cosim_design -coverage -argv "--link,$LinkId --tkNonant,$tkNonant" -rtl vhdl -wave_debug -trace_level all
 export_design -format ip_catalog
 
 exit
