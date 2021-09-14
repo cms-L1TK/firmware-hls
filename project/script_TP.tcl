@@ -19,7 +19,7 @@ open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
-set_clock_uncertainty .05
+#set_clock_uncertainty .05
 
 # data files
 add_files -tb ../emData/TP/tables/
