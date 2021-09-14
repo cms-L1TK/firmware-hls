@@ -132,7 +132,7 @@ edm::LogWarning("L1trackHLS") << "Warning out of range: adress within bin " << n
   bool write_mem(BunchXingT bx, const std::string& line, int base=16)
   {
 
-    if(!NBIT_BX) ibx = 0;
+    if(!NBIT_BX) bx = 0;
     std::string datastr = split(line, ' ').back();
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
