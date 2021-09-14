@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script generates MatchCalculator_parameters.h,
 # MatchCalculatorTop.h, and MatchCalculatorTop.cc in the

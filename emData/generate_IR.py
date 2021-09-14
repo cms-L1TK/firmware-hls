@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import absolute_import, print_function
 import re
@@ -24,6 +24,7 @@ def getNmemsPerIR(wiresFiles='./LUTs/wires.dat') :
       if re.search(dtcName, line, re.IGNORECASE) and ("neg" in dtcName) == ("neg" in line) : 
           irLines.append(line)
     nMemories.append(len(irLines))
+  dtcNames, nMemories = (list(t) for t in zip(*sorted(zip(dtcNames, nMemories))))
   return zip(dtcNames, nMemories)
 
 # generate TopLevel declaration template 

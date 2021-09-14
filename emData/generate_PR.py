@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __future__ import absolute_import, print_function
 
 # Automatically generates ProjectionRouterTop.h, and ProjectionRouterTop.cc
@@ -10,6 +10,7 @@ def getListOfModules(wiresFileName):
     wiresFile.close()
     modulesToBuild = list(set(re.findall(r"PR_L\w+",wiresInfo))) # FIXME ProjectionRouterTop currently won't compile if DISK modules are included
     # modulesToBuild = list(set(re.findall(r"PR_\w+",wiresInfo))) # Use this one once DISK is working for ProjectionRouter
+    modulesToBuild.sort()
     return modulesToBuild
 
 def getNTProjAndNVMProj(module, wiresFileName):
