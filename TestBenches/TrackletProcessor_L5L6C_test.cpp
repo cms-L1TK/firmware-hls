@@ -8,7 +8,7 @@
 #include "FileReadUtility.h"
 #include "Constants.h"
 
-const int nevents = 10;  //number of events to ru
+const int nevents = 100;  //number of events to ru
 
 using namespace std;
 

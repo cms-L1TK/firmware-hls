@@ -362,8 +362,8 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
   bool valid_z0=abs(*z0) < ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
 
-  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*469;//fixme, calculation adjusted to match emulation
-  const bool keep = (phicrit > 10190) && (phicrit < 55345);
+  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
+  const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
 
   return valid_rinv && valid_z0 && keep;
 }
@@ -404,8 +404,8 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
     projout[0].write_mem(bx, proj, nproj[0]++);
   if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
     projout[1].write_mem(bx, proj, nproj[1]++);
-  if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2){
-    projout[2].write_mem(bx, proj, nproj[2]++);}
+  if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2)
+    projout[2].write_mem(bx, proj, nproj[2]++);
   if (NProjOut > 3 && TPROJMask & (0x1 << 3) && success && proj_success && phi == 3)
     projout[3].write_mem(bx, proj, nproj[3]++);
   if (NProjOut > 4 && TPROJMask & (0x1 << 4) && success && proj_success && phi == 4)
@@ -494,6 +494,7 @@ TC::processStubPair(
         const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL[1], zL[1], der_phiL, der_zL);
         const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL[2], zL[2], der_phiL, der_zL);
         const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL[3], zL[3], der_phiL, der_zL);
+
 	TC::addProj<BARRELPS, nproj_L1, ((TPROJMaskBarrel & mask_L1) >> shift_L1)> (tproj_L1, bx, &projout_barrel_ps[L1PHIA], &nproj_barrel_ps[L1PHIA], success && valid_proj[0]);
 	addL4 = TC::addProj<BARREL2S, nproj_L4, ((TPROJMaskBarrel & mask_L4) >> shift_L4)> (tproj_L4, bx, &projout_barrel_2s[L4PHIA], &nproj_barrel_2s[L4PHIA], success && valid_proj[1]);
         addL5 = TC::addProj<BARREL2S, nproj_L5, ((TPROJMaskBarrel & mask_L5) >> shift_L5)> (tproj_L5, bx, &projout_barrel_2s[L5PHIA], &nproj_barrel_2s[L5PHIA], success && valid_proj[2]);
@@ -704,8 +705,7 @@ TrackletProcessor(
     typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS innerIndex, outerIndex;
     (outerIndex, innerStub, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
     teunits[iTE].readindex_=teureadindex[iTE]+HaveTEData;
-    //fix later
-    const TrackletProjection<BARRELPS>::TProjTCID TCId(iTC+Seed*16);
+    const TrackletProjection<BARRELPS>::TProjTCID TCId(iTC+(Seed << TrackletProjection<BARRELPS>::kTProjITCSize));
       
     const auto &outerStub = outerStubs->read_mem(bx, outerIndex);
 

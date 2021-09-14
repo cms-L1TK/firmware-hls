@@ -34,9 +34,9 @@ class TrackletEngineUnit {
 /////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
 
     if (Seed==TF::L1L2&&iTC==3){
-      ap_uint<1> stubptinnertmp[256]=
+      const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
-      ap_uint<1> stubptoutertmp[256]=
+      const ap_uint<1> stubptoutertmp[]=
 #include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
@@ -44,9 +44,9 @@ class TrackletEngineUnit {
       }
     }
     else if (Seed==TF::L2L3&&iTC==2){
-      ap_uint<1> stubptinnertmp[256]=
+      const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
-      ap_uint<1> stubptoutertmp[256]=
+      const ap_uint<1> stubptoutertmp[]=
 #include "../emData/TP/tables/TP_L2L3C_stubptoutercut.tab"
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
@@ -54,9 +54,9 @@ class TrackletEngineUnit {
       }  
     }
    else if (Seed==TF::L3L4&&iTC==2){
-      ap_uint<1> stubptinnertmp[256]=
+      const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
-      ap_uint<1> stubptoutertmp[512]=
+      const ap_uint<1> stubptoutertmp[]=
 #include "../emData/TP/tables/TP_L3L4C_stubptoutercut.tab"
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
@@ -66,9 +66,9 @@ class TrackletEngineUnit {
       }
     }
     else if (Seed==TF::L5L6&&iTC==2){
-      ap_uint<1> stubptinnertmp[1024]=
+      const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
-      ap_uint<1> stubptoutertmp[1024]=
+      const ap_uint<1> stubptoutertmp[]=
 #include "../emData/TP/tables/TP_L5L6C_stubptoutercut.tab"
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
