@@ -203,6 +203,7 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
     for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
       auto data_ref = memory_ref.read_mem(ievt,j,i).raw();
       auto data_com = memory.read_mem(ievt,j,i).raw();
+
       // If have reached the end of valid entries in both computed and reference, don't bother printing further
       if (data_com == 0 && data_ref == 0) continue;
 
@@ -260,6 +261,7 @@ unsigned int compareBinnedMemCMWithFile(const MemType& memory,
       for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
         auto data_ref = memory_ref.read_mem(k,ievt,j,i).raw();
         auto data_com = memory.read_mem(k,ievt,j,i).raw();
+
         // If have reached the end of valid entries in both computed and reference, don't bother printing further
         if (data_com == 0 && data_ref == 0) continue;
 

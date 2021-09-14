@@ -245,13 +245,13 @@ class MemoryTemplateBinnedCM{
 #endif
 
 #ifdef CMSSW_GIT_HASH
-  /*std::string name_;
+  std::string name_;
   void setName(std::string name) { name_ = name;}
   std::string const& getName() const { return name_;}
 
   unsigned int iSector_;
   void setSector(unsigned int iS) { iSector_ = iS;}
-  unsigned int getSector() const { return iSector_;}*/
+  unsigned int getSector() const { return iSector_;}
 #endif
   
 };
