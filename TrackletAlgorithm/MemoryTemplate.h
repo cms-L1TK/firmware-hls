@@ -124,8 +124,8 @@ public:
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
   {
-        if(!NBIT_BX) ibx = 0;
-        DataType data(datastr.c_str(), base);
+	if(!NBIT_BX) ibx = 0;
+	DataType data(datastr.c_str(), base);
 	int nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);
 
