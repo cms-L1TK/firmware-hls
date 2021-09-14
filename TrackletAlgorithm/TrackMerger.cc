@@ -101,10 +101,88 @@ void TrackMergerHelper(const BXType bx,
           }
           std::cout << "StubIndex: " << stubIndex << std::endl;
         }
-
     }
   
   
     bx_o = bx;
   
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//overall module should only read in a track and pass it to the comparison module
+void TrackMergerModule(const BXType bx,
+  const TrackFit::TrackWord trackWord [kMaxProc],
+  const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
+  const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
+  BXType &bx_o,
+  TrackFit::TrackWord trackWord_o,
+  TrackFit::BarrelStubWord barrelStubWords_o[4],
+  TrackFit::DiskStubWord diskStubWords_o[4]){
+
+    // null master track initialisation 
+    TrackFit duplicateCandidate; //need to change from using TrackFit class
+
+
+
+    for (unsigned int i = 0; i < kMaxProc; i++){
+      masterTrack.setTrackWord(trackWord[i]);
+    }
+
+  
+    int trackIndex = 0;
+    int numberCandidates = 0;
+    
+    // find the candidates - will update the number of candidates and the duplicate candidate
+    for(int i = 1; i < kMaxProc; i++){
+      TrackFit trk;
+      trk.setTrackWord(trackWord[i]);
+
+    }
+
+    bool isMatch = false;
+
+    bool ComparisonModule::CompareTracks(masterTrack, trk, &isMatch){
+      #pragma HLS inline
+
+      //compare the two tracks, masterTrack and trk
+      // if they have > 3 stubs in common, update isMatch, else isMatch = false
+      //now compare two tracks - the master track and the second input track
+
+      if (isMatch){
+        duplicateCandidate.setTrackWord(trackWord[i]);
+        numberCandidates++;
+        trackIndex = i;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    void ComparisonModule::MergeTrack(TrackFit &masterTrack, TrackFit::BarrelStubWord &masterTrackBarrelWords[4][7],
+    TrackFit::DiskStubWord &masterTrackDiskStubWords[4][7], TrackFit trk, TrackFit::BarrelStubWord
+    trkBarrelStubWords[4][7], TrackFit::DiskStubWord trkDiskStubWords[4][7]){
+      #pragma HLS inline
+      //Will merge both tracks to produce the merged track word - update masterTrack
+      //and its barrel/disk stubs
+      // UPDATE just change the master track - the output stub words will then become a 2D array, up to 7 hits per layer
+
+      if (ComparisonModule::CompareTracks(masterTrack, trk, isMatch) == true) //merge
+    }
+  
+
+    if (numberCandidates > 0 ){
+      // merge
+      MergeTrack(masterTrack, barrelStubWords[0], diskStubWords[0], duplicateCandidate,
+      barrelStubWords[trackIndex], diskStubWords[trackIndex],trackWord_o, barrelStubWords_o,
+      diskStubWords_o);
+      //need for both tracks, need trackWord, barrel and disk stub words
+      //output is merged track, along with barrel and disk stub words for that track
+    } else { //UPDATE if the track is not merged, pass it along to the next comparison module
+      trackWord_o = masterTrack;
+      barrelStubWords_o = barrelStubWords[trackIndex];
+      diskStubWords_o = diskStubWords[trackIndex];
+    }
+
+
   }
