@@ -53,6 +53,7 @@ public:
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
 	// TODO: check if valid
+	if(!NBIT_BX) ibx = 0;
 	return dataarray_[ibx][index];
   }
 
@@ -60,6 +61,7 @@ public:
   bool write_mem(BunchXingT ibx, SpecType data, int addr_index)
   {
 #pragma HLS inline
+    if(!NBIT_BX) ibx = 0;
     static_assert(
       std::is_same<DataType, SpecType>::value
       || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
@@ -72,6 +74,7 @@ public:
   bool write_mem(BunchXingT ibx, DataType data, int addr_index)
   {
 #pragma HLS inline
+    if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
       dataarray_[ibx][addr_index] = data;
       
@@ -107,7 +110,8 @@ public:
 
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
-  {
+  { 
+        if(!NBIT_BX) ibx = 0;
 	DataType data(datastr, base);
 	int nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
@@ -120,6 +124,7 @@ public:
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
   {
+	if(!NBIT_BX) ibx = 0;
 	DataType data(datastr.c_str(), base);
 	int nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);

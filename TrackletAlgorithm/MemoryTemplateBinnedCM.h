@@ -92,6 +92,7 @@ class MemoryTemplateBinnedCM{
   DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
+    if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][index];
   }
   
@@ -99,6 +100,7 @@ class MemoryTemplateBinnedCM{
 		    ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
+    if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
   
@@ -106,7 +108,8 @@ class MemoryTemplateBinnedCM{
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 
 #pragma HLS inline
-
+    
+    if(!NBIT_BX) ibx = 0;
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
   
@@ -180,6 +183,7 @@ class MemoryTemplateBinnedCM{
   bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
   {
 
+    if(!NBIT_BX) ibx = 0;
     std::string datastr = split(line, ' ').back();
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int

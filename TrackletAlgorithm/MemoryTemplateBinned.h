@@ -59,6 +59,7 @@ public:
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
     // TODO: check if valid
+    if(!NBIT_BX) ibx = 0;
     return dataarray_[ibx][index];
   }
   
@@ -66,6 +67,7 @@ public:
 		    ap_uint<NBIT_ADDR> index) const
   {
     // TODO: check if valid
+    if(!NBIT_BX) ibx = 0;
     return dataarray_[ibx][(1<<(kNBitDataAddr))*slot+index];
   }
 
@@ -74,6 +76,7 @@ public:
 #pragma HLS inline
 	if (nentry_ibx < ((1<<kNBitDataAddr)-1)) { // Temporary "-1" to only allow 15 (7 for VMSME DISK) stubs per bin instead of 16 (8) to match emulation
 	  // write address for slot: 1<<(kNBitDataAddr) * slot + nentry_ibx
+	  if(!NBIT_BX) ibx = 0;
 	  dataarray_[ibx][(1<<(kNBitDataAddr))*slot+nentry_ibx] = data;
 	  #ifdef CMSSW_GIT_HASH
 	  nentries_[ibx][slot]++;
@@ -129,6 +132,7 @@ edm::LogWarning("L1trackHLS") << "Warning out of range: adress within bin " << n
   bool write_mem(BunchXingT bx, const std::string& line, int base=16)
   {
 
+    if(!NBIT_BX) bx = 0;
     std::string datastr = split(line, ' ').back();
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
