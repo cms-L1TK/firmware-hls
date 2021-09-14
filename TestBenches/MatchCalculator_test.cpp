@@ -15,6 +15,9 @@
 #if !defined MODULE_
   #define MODULE_ MC_L3PHIC_
 #endif
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ MatchCalculator_L3PHIC
+#endif
 
 const int nevents = 100;  //number of events to run
 
@@ -44,34 +47,7 @@ int main()
 #else
   #error "Undefined Module"
 #endif
-
-#if MODULE_ == MC_L1PHIB_
-  TBHelper tb("MC/MC_L1PHIB");
-#elif MODULE_ == MC_L2PHIB_
-  TBHelper tb("MC/MC_L2PHIB");
-#elif MODULE_ == MC_L3PHIB_
-  TBHelper tb("MC/MC_L3PHIB");
-#elif MODULE_ == MC_L4PHIB_
-  TBHelper tb("MC/MC_L4PHIB");
-#elif MODULE_ == MC_L5PHIB_
-  TBHelper tb("MC/MC_L5PHIB");
-#elif MODULE_ == MC_L6PHIB_
-  TBHelper tb("MC/MC_L6PHIB");
-#elif MODULE_ == MC_L1PHIC_
-  TBHelper tb("MC/MC_L1PHIC");
-#elif MODULE_ == MC_L2PHIC_
-  TBHelper tb("MC/MC_L2PHIC");
-#elif MODULE_ == MC_L3PHIC_
-  TBHelper tb("MC/MC_L3PHIC");
-#elif MODULE_ == MC_L4PHIC_
-  TBHelper tb("MC/MC_L4PHIC");
-#elif MODULE_ == MC_L5PHIC_
-  TBHelper tb("MC/MC_L5PHIC");
-#elif MODULE_ == MC_L6PHIC_
-  TBHelper tb("MC/MC_L6PHIC");
-#else
-  #error "Undefined Module"
-#endif
+  TBHelper tb(std::string("MC/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
@@ -88,6 +64,18 @@ int main()
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
   vector<FullMatchMemory<vmProjMemType> > fullmatcharray(nFullMatches);
+
+  // print the input files loaded
+  std::cout << "Loaded the input files:\n";
+  for (unsigned i = 0; i < nCandidateMatches; i++)
+    std::cout << "\t" << tb.fileNames(candidateMatchPattern).at(i) << "\n";
+  for (unsigned i = 0; i < nAllProjections; i++)
+    std::cout << "\t" << tb.fileNames(allProjectionPatternarray).at(i) << "\n";
+  for (unsigned i = 0; i < nAllStubs; i++)
+    std::cout << "\t" << tb.fileNames(allStubPatternarray).at(i) << "\n";
+  for (unsigned i = 0; i < nFullMatches; i++)
+    std::cout << "\t" << tb.fileNames(fullMatchPattern).at(i) << "\n";
+  std::cout << std::endl;
 
   // loop over events
   cout << "Start event loop ..." << endl;
@@ -114,33 +102,7 @@ int main()
     BXType bx_out;
 
     // Unit Under Test
-#if MODULE_ == MC_L1PHIB_
-    MatchCalculator_L1PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L2PHIB_
-    MatchCalculator_L2PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L3PHIB_
-    MatchCalculator_L3PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L4PHIB_
-    MatchCalculator_L4PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L5PHIB_
-    MatchCalculator_L5PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L6PHIB_
-    MatchCalculator_L6PHIB(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L1PHIC_
-    MatchCalculator_L1PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L2PHIC_
-    MatchCalculator_L2PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L3PHIC_
-    MatchCalculator_L3PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L4PHIC_
-    MatchCalculator_L4PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L5PHIC_
-    MatchCalculator_L5PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#elif MODULE_ == MC_L6PHIC_
-    MatchCalculator_L6PHIC(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
-#else
-  #error "Undefined MC"
-#endif
+    TOP_FUNC_(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
 
     bool truncation = false;
     auto &fout_fullmatch = tb.files(fullMatchPattern);

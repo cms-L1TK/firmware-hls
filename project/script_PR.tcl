@@ -39,12 +39,13 @@ add_files -tb ../emData/PR/
 foreach i $modules_to_test {
   puts [join [list "======== TESTING " $i " ========"] ""]
   set module $i
+  set top_func [join [list "ProjectionRouterTop_" [string range $i 3 8]] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"MODULE_=" $module "_\""] ""]
+  set ::env(CCFLAG) [join [list "-D \"MODULE_=" $module "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
 
   # run C-simulation for each module in modules_to_test
-  set_top [join [list "ProjectionRouterTop_" [string range $i 3 8]] ""]
+  set_top $top_func
   open_solution [join [list "solution_" $module] ""]
 
   # Define FPGA, clock frequency & common HLS settings.

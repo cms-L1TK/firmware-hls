@@ -18,6 +18,9 @@
 #if !defined MODULE_
   #define MODULE_ TC_L1L2E_
 #endif
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ TrackletCalculator_L1L2E
+#endif
 
 const int nevents = 100;  //number of events to run
 
@@ -44,41 +47,7 @@ int main()
 #else
   #error "Undefined seed"
 #endif
-#if MODULE_ == TC_L1L2A_
-  TBHelper tb("TC/TC_L1L2A");
-#elif MODULE_ == TC_L1L2B_
-  TBHelper tb("TC/TC_L1L2B");
-#elif MODULE_ == TC_L1L2C_
-  TBHelper tb("TC/TC_L1L2C");
-#elif MODULE_ == TC_L1L2D_
-  TBHelper tb("TC/TC_L1L2D");
-#elif MODULE_ == TC_L1L2E_
-  TBHelper tb("TC/TC_L1L2E");
-#elif MODULE_ == TC_L1L2F_
-  TBHelper tb("TC/TC_L1L2F");
-#elif MODULE_ == TC_L1L2G_
-  TBHelper tb("TC/TC_L1L2G");
-#elif MODULE_ == TC_L1L2H_
-  TBHelper tb("TC/TC_L1L2H");
-#elif MODULE_ == TC_L1L2I_
-  TBHelper tb("TC/TC_L1L2I");
-#elif MODULE_ == TC_L1L2J_
-  TBHelper tb("TC/TC_L1L2J");
-#elif MODULE_ == TC_L1L2K_
-  TBHelper tb("TC/TC_L1L2K");
-#elif MODULE_ == TC_L1L2L_
-  TBHelper tb("TC/TC_L1L2L");
-#elif MODULE_ == TC_L3L4A_
-  TBHelper tb("TC/TC_L3L4A");
-#elif MODULE_ == TC_L3L4D_
-  TBHelper tb("TC/TC_L3L4D");
-#elif MODULE_ == TC_L5L6A_
-  TBHelper tb("TC/TC_L5L6A");
-#elif MODULE_ == TC_L5L6D_
-  TBHelper tb("TC/TC_L5L6D");
-#else
-  #error "Undefined TC"
-#endif
+  TBHelper tb(std::string("TC/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
@@ -104,6 +73,16 @@ int main()
   auto &fout_tpar = tb.files("TrackletParameters*");
   auto &fout_tproj = tb.files("TrackletProjections*");
   const auto &tproj_names = tb.fileNames("TrackletProjections*");
+
+  // print the input files loaded
+  std::cout << "Loaded the input files:\n";
+  for (unsigned i = 0; i < nInnerStubMems; i++)
+    std::cout << "\t" << tb.fileNames(innerStubPattern).at(i) << "\n";
+  for (unsigned i = 0; i < nOuterStubMems; i++)
+    std::cout << "\t" << tb.fileNames(outerStubPattern).at(i) << "\n";
+  for (unsigned i = 0; i < nStubPairMems; i++)
+    std::cout << "\t" << tb.fileNames("StubPairs*").at(i) << "\n";
+  std::cout << std::endl;
 
   // loop over events
   cout << "Start event loop ..." << endl;
@@ -132,41 +111,7 @@ int main()
     BXType bx_o;
 
     // Unit Under Test
-#if MODULE_ == TC_L1L2A_
-    TrackletCalculator_L1L2A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2B_
-    TrackletCalculator_L1L2B(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2C_
-    TrackletCalculator_L1L2C(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2D_
-    TrackletCalculator_L1L2D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2E_
-    TrackletCalculator_L1L2E(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2F_
-    TrackletCalculator_L1L2F(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2G_
-    TrackletCalculator_L1L2G(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2H_
-    TrackletCalculator_L1L2H(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2I_
-    TrackletCalculator_L1L2I(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2J_
-    TrackletCalculator_L1L2J(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2K_
-    TrackletCalculator_L1L2K(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L1L2L_
-    TrackletCalculator_L1L2L(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4A_
-    TrackletCalculator_L3L4A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L3L4D_
-    TrackletCalculator_L3L4D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L5L6A_
-    TrackletCalculator_L5L6A(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#elif MODULE_ == TC_L5L6D_
-    TrackletCalculator_L5L6D(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
-#else
-  #error "Undefined TC"
-#endif
+    TOP_FUNC_(bx, innerStubs.data(), outerStubs.data(), stubPairs.data(), bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 
     bool truncation = false;
 
