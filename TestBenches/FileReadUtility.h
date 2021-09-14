@@ -115,18 +115,10 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
       return;
     } else {
       if (split(line,' ').size()==4) {
-      #ifdef CMSSW_GIT_HASH
-       memory.write_mem(0, line, base);
-       #else
        memory.write_mem(ievt, line, base);
-       #endif
       } else {
 	const std::string datastr = split(line, ' ').back();
-	#ifdef CMSSW_GIT_HASH
-	memory.write_mem(0, datastr, base);
-	#else
 	memory.write_mem(ievt, datastr, base);
-	#endif
       }
     }	
   }
@@ -150,13 +142,8 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
   for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
-    #ifdef CMSSW_GIT_HASH
-    auto data_ref = memory_ref.read_mem(0,i).raw();
-    auto data_com = memory.read_mem(0,i).raw();
-    #else
     auto data_ref = memory_ref.read_mem(ievt,i).raw().range(msb,lsb);
     auto data_com = memory.read_mem(ievt,i).raw().range(msb,lsb);
-    #endif
     if (i==0) {
       // If both reference and computed memories are completely empty, skip it
       if (data_com == 0 && data_ref == 0) break;
@@ -214,13 +201,8 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   for (unsigned int j = 0; j < memory_ref.getNBins(); ++j ) {
     std::cout << "Bin " << std::dec << j << std::endl;
     for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
-      #ifdef CMSSW_GIT_HASH
-      auto data_ref = memory_ref.read_mem(0,j,i).raw();
-      auto data_com = memory.read_mem(0,j,i).raw();
-      #else
       auto data_ref = memory_ref.read_mem(ievt,j,i).raw();
       auto data_com = memory.read_mem(ievt,j,i).raw();
-      #endif
       // If have reached the end of valid entries in both computed and reference, don't bother printing further
       if (data_com == 0 && data_ref == 0) continue;
 
@@ -276,13 +258,8 @@ unsigned int compareBinnedMemCMWithFile(const MemType& memory,
     for (unsigned int j = 0; j < memory_ref.getNBins(); ++j ) {
       std::cout << "Bin " << std::dec << j << std::endl;
       for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
-        #ifdef CMSSW_GIT_HASH
-        auto data_ref = memory_ref.read_mem(k,0,j,i).raw();
-        auto data_com = memory.read_mem(k,0,j,i).raw();
-        #else
         auto data_ref = memory_ref.read_mem(k,ievt,j,i).raw();
         auto data_com = memory.read_mem(k,ievt,j,i).raw();
-        #endif
         // If have reached the end of valid entries in both computed and reference, don't bother printing further
         if (data_com == 0 && data_ref == 0) continue;
 
