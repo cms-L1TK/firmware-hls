@@ -6,6 +6,7 @@ variables:
   CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
 
 stages: # ---------------------------------------------------------------------
+  - lint
   - download
   - quality-check
   - hls-build
@@ -21,6 +22,7 @@ stages: # ---------------------------------------------------------------------
     - source $VIVADO_PATH_SH
 
 .job_template: &template_quality-check
+  needs: ["download"]
   tags:
     - xilinx-tools
   stage: quality-check
@@ -93,6 +95,19 @@ stages: # ---------------------------------------------------------------------
     expire_in: 1 week
     
 # Jobs ------------------------------------------------------------------------
+# Lint ------------
+lint:
+  tags:
+    - xilinx-tools
+  stage: lint
+  before_script:
+    - which python3
+    - python3 --version
+    - python3 -m pylint --version
+  script:
+    # If changes need to be made you might refer to: https://portingguide.readthedocs.io/en/latest/tools.html#automated-fixer-python-modernize
+    - python3 -m pylint --py3k emData/*.py # Check for python3 compatibility
+    - python3 -m pylint emData/*.py # Static code checker
 # Download ------------
 download:
   tags:
@@ -167,54 +182,63 @@ TB-quality-check:
 # HLS builds ---------------
 IR-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "IR-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IR"
 VMR-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "VMR-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMR"
 VMRCM-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "VMRCM-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMRCM"
 TE-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "TE-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TE"
 TC-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "TC-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TC"
 TP-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "TP-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TP"
 PR-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "PR-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PR"
 ME-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "ME-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ME"
 ME-vitis-hls-build:
   <<: *template_hls-build
+  needs: ["download", "ME-quality-check"]
   allow_failure: true # FIXME: remove after avitis updated to 2021.1 and confirmed that pre-synthesis failure is gone.
   variables:
     EXECUTABLE: 'vivado_hls'
@@ -223,12 +247,14 @@ ME-vitis-hls-build:
     PROJ_NAME: "ME"
 MC-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "MC-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MC"
 MP-vivado-hls-build:
   <<: *template_hls-build
+  needs: ["download", "MP-quality-check"]
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     EXECUTABLE: 'vivado_hls'
@@ -236,6 +262,7 @@ MP-vivado-hls-build:
     PROJ_NAME: "MP"
 TB-hls-build:
   <<: *template_hls-build
+  needs: ["download", "TB-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
@@ -246,7 +273,7 @@ topPRMEMC-sim:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
-  dependencies: # needed to avoid interference from ME-vitis-hls-build
+  needs: # needed to avoid interference from ME-vitis-hls-build
     - download
     - PR-vivado-hls-build
     - ME-vivado-hls-build
@@ -256,7 +283,7 @@ topIRVMR-sim:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
-  dependencies:
+  needs:
     - download
     - IR-vivado-hls-build
     - VMR-vivado-hls-build
@@ -267,7 +294,7 @@ topPRMEMC-check-results:
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
     PROJ_NAME: "PRMEMC"
-  dependencies:
+  needs:
     - download
     - PR-vivado-hls-build
     - ME-vivado-hls-build
@@ -279,7 +306,7 @@ topIRVMR-check-results:
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
     PROJ_NAME: "IRVMR"
-  dependencies:
+  needs:
     - download
     - IR-vivado-hls-build
     - VMR-vivado-hls-build
@@ -290,7 +317,7 @@ topPRMEMC-synth:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
-  dependencies:
+  needs:
     - PR-vivado-hls-build
     - ME-vivado-hls-build
     - MC-vivado-hls-build
@@ -301,7 +328,7 @@ topIRVMR-synth:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
-  dependencies:
+  needs:
     - IR-vivado-hls-build
     - VMR-vivado-hls-build
     - topIRVMR-sim

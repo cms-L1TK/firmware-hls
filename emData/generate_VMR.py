@@ -3,18 +3,18 @@
 ## python 2/3 inter-compatibility
 from __future__ import absolute_import, print_function
 
-# This script generates VMRouter_parameters.h, VMRouterTop.h, 
-# and VMRouterTop.cc in the TrackletAlgorithm/ directory. 
+# This script generates VMRouter_parameters.h, VMRouterTop.h,
+# and VMRouterTop.cc in the TrackletAlgorithm/ directory.
 # Supports all VMRs, but creates separate top function files each
-# VMR specified. VMRouter_parameters.h contains magic numbers 
+# VMR specified. VMRouter_parameters.h contains magic numbers
 # for all "default" VMRs plus additonals VMR if specified.
 
 import argparse
 import collections
 
 # Constants
-num_layers = 6
-num_disks = 5
+nLayers = 6
+nDisks = 5
 
 # The VMRs specified in download.sh
 default_vmr_list = ["VMR_L1PHID", "VMR_L2PHIA", "VMR_L2PHIB", "VMR_L3PHIA" ,"VMR_L4PHIA", "VMR_L5PHIA", "VMR_L6PHIA", "VMR_D1PHIA", "VMR_D2PHIA", "VMR_D3PHIA", "VMR_D4PHIA", "VMR_D5PHIA"]
@@ -40,47 +40,45 @@ def getDictOfMemories(wireconfig, vmr_list):
     mem_dict = {}
 
     # Open wiring file
-    wires_file = open(wireconfig)
+    with open(wireconfig, "r") as wires_file:
 
-    # Loop over each line in the wiring
-    for line in wires_file:
-        # Check if any of the VMRs exist in the line
+        # Loop over each line in the wiring
+        for line in wires_file:
+            # Check if any of the VMRs exist in the line
+            for vmr in vmr_list:
+                if vmr in line:
+                    mem_name = line.split()[0]
+                    mem_type = mem_name.split("_")[0]
+                    # Check if memory type is VMSTE or IL DISK2S
+                    if "IL_D" in mem_name and "2S" in mem_name:
+                        mem_type = mem_type + "_DISK2S_" + vmr
+                    elif "TEI" in line:
+                        phi_region = mem_name.split("PHI")[1]
+                        if phi_region <= "L":
+                            mem_type = mem_type + "I_" + vmr
+                        else: # Overlap
+                            mem_type = mem_type + "OL_" + vmr
+                    elif "TEO" in line:
+                        mem_type = mem_type + "O_" + vmr
+                    else:
+                        mem_type = mem_type + "_" + vmr
+                    # Add memory and memory type to dictionary
+                    if mem_type not in mem_dict:
+                        mem_dict[mem_type] = [mem_name]
+                    else:
+                        mem_dict[mem_type].append(mem_name)
+                    break
+
+        # Loop over all memories and add an empty IL DISK2S and VMSTE memory lists if missing in dictionary
         for vmr in vmr_list:
-            if vmr in line:
-                mem_name = line.split()[0]
-                mem_type = mem_name.split("_")[0]
-                # Check if memory type is VMSTE or IL DISK2S
-                if "IL_D" in mem_name and "2S" in mem_name:
-                    mem_type = mem_type + "_DISK2S_" + vmr
-                elif "TEI" in line:
-                    phi_region = mem_name.split("PHI")[1]
-                    if phi_region <= "L":
-                        mem_type = mem_type + "I_" + vmr
-                    else: # Overlap
-                        mem_type = mem_type + "OL_" + vmr
-                elif "TEO" in line:
-                    mem_type = mem_type + "O_" + vmr
-                else: 
-                    mem_type = mem_type + "_" + vmr
-                # Add memory and memory type to dictionary
-                if mem_type not in mem_dict:
-                    mem_dict[mem_type] = [mem_name]
-                else:
-                    mem_dict[mem_type].append(mem_name)
-                break
-
-    # Loop over all memories and add an empty IL DISK2S and VMSTE memory lists if missing in dictionary
-    for vmr in vmr_list:
-        if "IL_DISK2S_" + vmr not in mem_dict:
-            mem_dict["IL_DISK2S_" + vmr] = []
-        if "VMSTEI_" + vmr not in mem_dict:
-            mem_dict["VMSTEI_" + vmr] = []
-        if "VMSTEOL_" + vmr not in mem_dict:
-            mem_dict["VMSTEOL_" + vmr] = []
-        if "VMSTEO_" + vmr not in mem_dict:
-            mem_dict["VMSTEO_" + vmr] = []
-
-    wires_file.close()
+            if "IL_DISK2S_" + vmr not in mem_dict:
+                mem_dict["IL_DISK2S_" + vmr] = []
+            if "VMSTEI_" + vmr not in mem_dict:
+                mem_dict["VMSTEI_" + vmr] = []
+            if "VMSTEOL_" + vmr not in mem_dict:
+                mem_dict["VMSTEOL_" + vmr] = []
+            if "VMSTEO_" + vmr not in mem_dict:
+                mem_dict["VMSTEO_" + vmr] = []
 
     return mem_dict
 
@@ -114,16 +112,14 @@ def getAllVMRs(wireconfig):
     vmr_list = []
 
     # Open wiring file
-    wires_file = open(wireconfig)
+    with open(wireconfig, "r") as wires_file:
 
-    # Loop over each line in the wiring
-    for line in wires_file:
-        module_name = line.split(" ")[-1].split(".")[0]
-        # Add module name if not already in vmr_list
-        if "VMR" in module_name and module_name not in vmr_list:
-            vmr_list.append(module_name)
-
-    wires_file.close()
+        # Loop over each line in the wiring
+        for line in wires_file:
+            module_name = line.split(" ")[-1].split(".")[0]
+            # Add module name if not already in vmr_list
+            if "VMR" in module_name and module_name not in vmr_list:
+                vmr_list.append(module_name)
 
     return vmr_list
 
@@ -182,10 +178,10 @@ def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max
 
 def writeParameterFile(vmr_list, mem_dict):
 
-    parameter_file = open("../TrackletAlgorithm/VMRouter_parameters.h", "w")
+    with open("../TrackletAlgorithm/VMRouter_parameters.h", "w") as parameter_file:
 
-    # Write preamble
-    parameter_file.write(
+        # Write preamble
+        parameter_file.write(
 """#ifndef TrackletAlgorithm_VMRouter_parameters_h
 #define TrackletAlgorithm_VMRouter_parameters_h
 
@@ -193,10 +189,10 @@ def writeParameterFile(vmr_list, mem_dict):
 // Generated by generate_VMR.py
 """)
 
-    parameter_file.write("// Contains number for the following VMRs: " + " ".join(vmr for vmr in vmr_list) + "\n")
+        parameter_file.write("// Contains number for the following VMRs: " + " ".join(vmr for vmr in vmr_list) + "\n")
 
-    # Declare functions
-    parameter_file.write("""
+        # Declare functions
+        parameter_file.write("""
 // Enums used to get the correct parameters
 enum class phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};
 
@@ -232,133 +228,131 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
 
 // VMPhiCorr LUTs
 """
-    )
-
-    # Write phi correction LUTs functions
-    for i in range(num_layers):
-        parameter_file.write(
-            "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
-            "  static int lut[] = \n"
-            "#if __has_include(\"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n"
-            "  return lut;\n"
-            "}\n"
-        )
-    for i in range(num_disks):
-        parameter_file.write(
-            "template<> inline const int* getPhiCorrTable<TF::D" + str(i+1) + ">(){\n"
-            "  return nullptr;\n"
-            "}\n"
         )
 
-    # Write VMTableInner
-    parameter_file.write("\n// VMTableInner\n")
-    for i in range(num_layers):
-        parameter_file.write(
-            "template<> inline const int* getRzBitsInnerTable<TF::L" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_inner[i] else "  return nullptr;\n")+
-            "}\n"
-        )
-    for i in range(num_disks):
-        parameter_file.write(
-            "template<> inline const int* getRzBitsInnerTable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_inner[i+num_layers] else "  return nullptr;\n")+
-            "}\n"
-        )
-
-    # Write VMRTableInner - Overlap
-    parameter_file.write("\n// VMTableInner - Overlap\n")
-    for i in range(num_layers):
-        parameter_file.write(
-            "template<> inline const int* getRzBitsOverlapTable<TF::L" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\")\n#  include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_overlap[i] else "  return nullptr;\n")+
-            "}\n"
-        )
-    for i in range(num_disks):
-        parameter_file.write(
-            "template<> inline const int* getRzBitsOverlapTable<TF::D" + str(i+1) + ">(){\n"
-            "  return nullptr;\n"
-            "}\n"
-        )
-
-    # Write VMTableOuter
-    parameter_file.write("\n// VMTableOuter\n")
-    for i in range(num_layers):
-        parameter_file.write(
-            "template<> inline const int* getRzBitsOuterTable<TF::L" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i] else "  return nullptr;\n")+
-            "}\n"
-        )
-    for i in range(num_disks):
-        parameter_file.write(
-            "template<> inline const int* getRzBitsOuterTable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
-            "}\n"
-        )
-
-    # Write VMR specific functions
-    for vmr in vmr_list:
-
-        layer_disk_char = vmr.split("_")[1][0] # 'L' or 'D'
-        layer_disk_num = int(vmr.split("_")[1][1])
-        phi_region= vmr.split("PHI")[1]
-
-        parameter_file.write(
-            "\n////////////////\n// " + vmr + " //\n////////////////\n"
-            "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
-            "  return " + str(len(mem_dict["IL_"+vmr])) + ";\n"
-            "}\n"
-            "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of DISK2S input memories\n"
-            "  return " + str(len(mem_dict["IL_DISK2S_"+vmr])) + ";\n"
-            "}\n"
-            "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub memory\n"
-            "  return " + str(len(mem_dict["AS_"+vmr])) + ";\n"
-            "}\n"
-            "template<> constexpr int getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
-            "  return " + str(bendcuttable_size[layer_disk_num-1]) + ";\n"
-            "}\n"
-            )
-
-        for te_mem_type in ["VMSTEI", "VMSTEOL", "VMSTEO"]:
-
-            if te_mem_type == "VMSTEI":
-                te_mem_region = "Inner"
-            elif te_mem_type == "VMSTEOL":
-                te_mem_region = "Overlap"
-            elif te_mem_type == "VMSTEO":
-                te_mem_region = "Outer"
-
-            # Get the number of copies for the specified TE memory type
-            mem_copy_dict = getDictOfCopies(mem_dict[te_mem_type + "_" + vmr])
-            max_copy_count = max(mem_copy_dict.values()) if mem_copy_dict else 1
-            
+        # Write phi correction LUTs functions
+        for i in range(nLayers):
             parameter_file.write(
-                "template<> constexpr int getNum" + te_mem_type + "Copies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE" + te_mem_region + "memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.\n"
-                "  return " + str(max_copy_count) + ";\n"
+                "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
+                "  static int lut[] = \n"
+                "#if __has_include(\"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n"
+                "  return lut;\n"
+                "}\n"
+            )
+        for i in range(nDisks):
+            parameter_file.write(
+                "template<> inline const int* getPhiCorrTable<TF::D" + str(i+1) + ">(){\n"
+                "  return nullptr;\n"
                 "}\n"
             )
 
-            # Bendcut tables
-            if mem_dict[te_mem_type + "_" + vmr]: 
-                parameter_file.write(getBendCutTable(te_mem_region, layer_disk_char, layer_disk_num, phi_region, max_copy_count, mem_copy_dict, mem_dict[te_mem_type + "_" + vmr]))
-            else:
-                parameter_file.write(
-                "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">()>* getBendCut" + te_mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+        # Write VMTableInner
+        parameter_file.write("\n// VMTableInner\n")
+        for i in range(nLayers):
+            parameter_file.write(
+                "template<> inline const int* getRzBitsInnerTable<TF::L" + str(i+1) + ">(){\n"
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "L" + str(i+2) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_inner[i] else "  return nullptr;\n")+
+                "}\n"
+            )
+        for i in range(nDisks):
+            parameter_file.write(
+                "template<> inline const int* getRzBitsInnerTable<TF::D" + str(i+1) + ">(){\n"
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableInnerD" + str(i+1) + "D" + str(i+2) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_inner[i+nLayers] else "  return nullptr;\n")+
+                "}\n"
+            )
+
+        # Write VMRTableInner - Overlap
+        parameter_file.write("\n// VMTableInner - Overlap\n")
+        for i in range(nLayers):
+            parameter_file.write(
+                "template<> inline const int* getRzBitsOverlapTable<TF::L" + str(i+1) + ">(){\n"
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\")\n#  include \"../emData/VMR/tables/VMTableInnerL" + str(i+1) + "D1.tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_overlap[i] else "  return nullptr;\n")+
+                "}\n"
+            )
+        for i in range(nDisks):
+            parameter_file.write(
+                "template<> inline const int* getRzBitsOverlapTable<TF::D" + str(i+1) + ">(){\n"
                 "  return nullptr;\n"
+                "}\n"
+            )
+
+        # Write VMTableOuter
+        parameter_file.write("\n// VMTableOuter\n")
+        for i in range(nLayers):
+            parameter_file.write(
+                "template<> inline const int* getRzBitsOuterTable<TF::L" + str(i+1) + ">(){\n"
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableOuterL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i] else "  return nullptr;\n")+
+                "}\n"
+            )
+        for i in range(nDisks):
+            parameter_file.write(
+                "template<> inline const int* getRzBitsOuterTable<TF::D" + str(i+1) + ">(){\n"
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\")\n#  include \"../emData/VMR/tables/VMTableOuterD" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+nLayers] else "  return nullptr;\n")+
+                "}\n"
+            )
+
+        # Write VMR specific functions
+        for vmr in vmr_list:
+
+            layer_disk_char = vmr.split("_")[1][0] # 'L' or 'D'
+            layer_disk_num = int(vmr.split("_")[1][1])
+            phi_region= vmr.split("PHI")[1]
+
+            parameter_file.write(
+                "\n////////////////\n// " + vmr + " //\n////////////////\n"
+                "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
+                "  return " + str(len(mem_dict["IL_"+vmr])) + ";\n"
+                "}\n"
+                "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of DISK2S input memories\n"
+                "  return " + str(len(mem_dict["IL_DISK2S_"+vmr])) + ";\n"
+                "}\n"
+                "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub memory\n"
+                "  return " + str(len(mem_dict["AS_"+vmr])) + ";\n"
+                "}\n"
+                "template<> constexpr int getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+                "  return " + str(bendcuttable_size[layer_disk_num-1]) + ";\n"
                 "}\n"
                 )
 
-        parameter_file.write(
-            "template<> inline const int* getFineBinTable<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
-            "  static int lut[] =\n"
-            "#if __has_include(\"../emData/VMR/tables/" + vmr + "_finebin.tab\")\n#  include \"../emData/VMR/tables/" + vmr + "_finebin.tab\"\n#else\n  {};\n#endif\n"
-            "  return lut;\n"
-            "}\n"
-        )
+            for te_mem_type in ["VMSTEI", "VMSTEOL", "VMSTEO"]:
 
-    # End parameter file
-    parameter_file.write("\n#endif // TrackletAlgorithm_VMRouter_parameters_h\n")
-    parameter_file.close()
+                if te_mem_type == "VMSTEI":
+                    te_mem_region = "Inner"
+                elif te_mem_type == "VMSTEOL":
+                    te_mem_region = "Overlap"
+                elif te_mem_type == "VMSTEO":
+                    te_mem_region = "Outer"
 
+                # Get the number of copies for the specified TE memory type
+                mem_copy_dict = getDictOfCopies(mem_dict[te_mem_type + "_" + vmr])
+                max_copy_count = max(mem_copy_dict.values()) if mem_copy_dict else 1
+
+                parameter_file.write(
+                    "template<> constexpr int getNum" + te_mem_type + "Copies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE" + te_mem_region + "memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.\n"
+                    "  return " + str(max_copy_count) + ";\n"
+                    "}\n"
+                )
+
+                # Bendcut tables
+                if mem_dict[te_mem_type + "_" + vmr]:
+                    parameter_file.write(getBendCutTable(te_mem_region, layer_disk_char, layer_disk_num, phi_region, max_copy_count, mem_copy_dict, mem_dict[te_mem_type + "_" + vmr]))
+                else:
+                    parameter_file.write(
+                    "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">()>* getBendCut" + te_mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+                    "  return nullptr;\n"
+                    "}\n"
+                    )
+
+            parameter_file.write(
+                "template<> inline const int* getFineBinTable<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+                "  static int lut[] =\n"
+                "#if __has_include(\"../emData/VMR/tables/" + vmr + "_finebin.tab\")\n#  include \"../emData/VMR/tables/" + vmr + "_finebin.tab\"\n#else\n  {};\n#endif\n"
+                "  return lut;\n"
+                "}\n"
+            )
+
+        # End parameter file
+        parameter_file.write("\n#endif // TrackletAlgorithm_VMRouter_parameters_h\n")
 
 #################################
 # Writes the VMRouterTop.h file
@@ -373,12 +367,12 @@ def writeTopHeader(vmr_specific_name, vmr):
     # Top file name
     file_name = "VMRouterTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
 
-    header_file = open("../TrackletAlgorithm/" + file_name  + ".h", "w")
+    with open("../TrackletAlgorithm/" + file_name  + ".h", "w") as header_file:
 
-    # Write preamble
-    header_file.write(
-"#ifndef TrackletAlgorithm_" + file_name + "_h\n" +\
-"#define TrackletAlgorithm_" + file_name + "_h\n" +\
+        # Write preamble
+        header_file.write(
+"#ifndef TrackletAlgorithm_" + file_name + "_h\n" + \
+"#define TrackletAlgorithm_" + file_name + "_h\n" + \
 """
 #include "VMRouter.h"
 #include "VMRouter_parameters.h"
@@ -399,18 +393,18 @@ def writeTopHeader(vmr_specific_name, vmr):
 // Variables for that are specified with regards to the VMR region
 
 """
-    )
+        )
 
-    # Write the configuration
-    header_file.write(
+        # Write the configuration
+        header_file.write(
 "#define kLAYER " + str(layer) + " // Which barrel layer number the data is coming from\n"
 "#define kDISK " + str(disk) + " // Which disk number the data is coming from, 0 if not disk\n\n"
 
 "constexpr phiRegions phiRegion = phiRegions::" + phi_region+ "; // Which AllStub/PhiRegion\n"
-    )
+        )
 
-    # Write the rest...
-    header_file.write("""
+        # Write the rest...
+        header_file.write("""
 
 ///////////////////////////////////////////////
 // Variables that don't need changing
@@ -489,10 +483,7 @@ void %s(const BXType bx, BXType& bx_o,
 	);
 #endif // TrackletAlgorithm_VMRouterTop_h
 """ % file_name
-    )
-
-    header_file.close()
-
+        )
 
 # Writes the VMRouterTop.cc file
 def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
@@ -500,10 +491,10 @@ def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
     # Top file name
     file_name = "VMRouterTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
 
-    top_file = open("../TrackletAlgorithm/" + file_name  + ".cc", "w")
+    with open("../TrackletAlgorithm/" + file_name  + ".cc", "w") as top_file:
 
-    # Write preamble
-    top_file.write("#include \"" + file_name + ".h\"" +\
+        # Write preamble
+        top_file.write("#include \"" + file_name + ".h\"" + \
 """
 
 // VMRouter Top Function
@@ -539,14 +530,14 @@ void %s(const BXType bx, BXType& bx_o,
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
 """ % file_name
-    )
+        )
 
-    for i in range(num_inputs):
-        top_file.write("#pragma HLS resource variable=inputStubs[" + str(i) + "].get_mem() latency=2\n")
-    for i in range(num_inputs_disk2s):
-        top_file.write("#pragma HLS resource variable=inputStubsDisk2S[" + str(i) + "].get_mem() latency=2\n")
+        for i in range(num_inputs):
+            top_file.write("#pragma HLS resource variable=inputStubs[" + str(i) + "].get_mem() latency=2\n")
+        for i in range(num_inputs_disk2s):
+            top_file.write("#pragma HLS resource variable=inputStubsDisk2S[" + str(i) + "].get_mem() latency=2\n")
 
-    top_file.write("""
+        top_file.write("""
 #pragma HLS interface register port=bx_o
 
 	///////////////////////////
@@ -638,10 +629,7 @@ void %s(const BXType bx, BXType& bx_o,
 	return;
 }
 """
-    )
-
-    top_file.close()
-
+        )
 
 ###############################
 # Main execution
@@ -673,10 +661,7 @@ python3 generate_VMR.py -a
     args = parser.parse_args()
 
     # Include the VMR name in the names of VMRouterCMTop files
-    if len(args.uut) > 1 or not args.overwrite or args.all:
-        vmr_specific_name = True
-    else:
-        vmr_specific_name = False
+    vmr_specific_name = bool(len(args.uut) > 1 or not args.overwrite or args.all)
 
     # Get a list of the Units Under Test
     if args.all:
@@ -685,7 +670,8 @@ python3 generate_VMR.py -a
         vmr_list = default_vmr_list.copy()
         # Add explicitly defined UUTs if any
         for vmr in args.uut:
-            if vmr not in vmr_list: vmr_list.append(vmr)
+            if vmr not in vmr_list:
+                vmr_list.append(vmr)
     else:
         vmr_list = args.uut
     vmr_list.sort()
