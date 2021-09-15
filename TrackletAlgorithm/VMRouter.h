@@ -589,6 +589,8 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 		const ap_uint<maskTEOsize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies]) {
 
 #pragma HLS inline
+
+// Partition arrays
 #pragma HLS array_partition variable=bendCutInnerTable complete dim=1
 #pragma HLS array_partition variable=bendCutOverlapTable complete dim=1
 #pragma HLS array_partition variable=bendCutOuterTable complete dim=1
@@ -603,6 +605,11 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 #pragma HLS array_partition variable=memoriesTEO complete dim=1
 #pragma HLS array_partition variable=memoriesTEO complete dim=2
 
+// Take 2 clock cycles before on gets data, used at high frequencies
+#pragma HLS resource variable=fineBinTable latency=2
+#pragma HLS resource variable=rzbitsInnerTable latency=2
+#pragma HLS resource variable=rzbitsOverlapTable latency=2
+#pragma HLS resource variable=rzbitsOuterTable latency=2
 
 	// The first memory numbers, the position of the first non-zero bit in the mask
 	// Do not change these to ap_uint as cosim will fail
