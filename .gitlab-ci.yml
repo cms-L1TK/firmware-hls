@@ -107,7 +107,7 @@ lint:
   script:
     # If changes need to be made you might refer to: https://portingguide.readthedocs.io/en/latest/tools.html#automated-fixer-python-modernize
     - python3 -m pylint --py3k emData/*.py # Check for python3 compatibility
-    - python3 -m pylint emData/*.py # Static code checker
+    - python3 -m pylint --exit-zero emData/*.py # Static code checker
 # Download ------------
 download:
   tags:
