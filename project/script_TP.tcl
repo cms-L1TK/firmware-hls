@@ -11,18 +11,19 @@ open_project -reset trackletProcessor
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-set_top TrackletProcessor_L1L2D
+set_top TrackletProcessor_L3L4C
 add_files ../TrackletAlgorithm/TrackletProcessor.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/TrackletProcessor_L1L2D_test.cpp -cflags "$CFLAGS"
+add_files -tb ../TestBenches/TrackletProcessor_L3L4C_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+#set_clock_uncertainty .05
 
 # data files
 add_files -tb ../emData/TP/tables/
-add_files -tb ../emData/TP/TP_L1L2D/
+add_files -tb ../emData/TP/TP_L3L4C/
 
 csim_design -mflags "-j8"
 csynth_design

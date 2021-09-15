@@ -14,7 +14,7 @@ inline const int floatToInt(const double x, const double k) {
   return static_cast<int>(x / k + 1.0e-1);
 }
 
-constexpr int kNTEUnits = 5;
+constexpr int kNTEUnits[12] = {5, 2, 5, 3, 3, 2, 3, 2, 0, 0, 0, 0};
 constexpr int kNbitsrzbin = 3;
 constexpr int kNbitsphibin = 3;
 
@@ -104,6 +104,11 @@ constexpr double kphiprojderdisk = 1.64665e-05;
 constexpr double krprojdisk = 0.0585938;
 constexpr double krprojderdisk = 0.0078125;
 
+// cut constants for TC
+constexpr int ifactor = 469;
+constexpr int phicritmincut=10190;
+constexpr int phicritmaxcut=55345;
+
 // cut constants
 constexpr double ptcut = 1.91; // GeV
 constexpr double rinvcut = 0.01 * c * bfield / ptcut; // 0.01 to convert to 1/cm
@@ -118,7 +123,6 @@ constexpr double VMROUTERCUTZL1 = 70.0;      //Max z for L1 barrel seeding in cm
 constexpr double VMROUTERCUTRD1D3 = 55.0;    //Max r for disk seeds in cm
 }
 #endif
-
 // various bit widths
 constexpr unsigned nbitsallstubs[trklet::N_LAYER + trklet::N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)

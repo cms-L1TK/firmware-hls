@@ -3,8 +3,7 @@
 
 #include "Constants.h"
 #include "VMStubTEOuterMemoryCM.h"
-
-template<int VMSTEType>
+template<TF::seed Seed, int iTC, regionType innerRegion,regionType VMSTEType>
 class TrackletEngineUnit {
 
  public:
@@ -13,10 +12,11 @@ class TrackletEngineUnit {
     kNBitsRZBin=3,
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
-    kNBitsPTLut=256
+    kNBitsPTLutInner=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
+    kNBitsPTLutOuter=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
   };
 
-  typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<BARRELPS>::kAllStubSize> STUBID;
+  typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;
   typedef ap_uint<kNBitsRZBin> RZBIN;
@@ -31,22 +31,52 @@ class TrackletEngineUnit {
 
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
+/////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
 
-
-    idle_ = true;
-
-    ap_uint<1> stubptinnertmp[kNBitsPTLut] =
+    if (Seed==TF::L1L2&&iTC==3){
+      const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
-    
-    ap_uint<1> stubptoutertmp[kNBitsPTLut] =
+      const ap_uint<1> stubptoutertmp[]=
 #include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
-
- for(unsigned int i=0;i<kNBitsPTLut;i++) {
-   stubptinnerlutnew_[i] = stubptinnertmp[i];
-   stubptouterlutnew_[i] = stubptoutertmp[i];
- }
-
-  }
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+    else if (Seed==TF::L2L3&&iTC==2){
+      const ap_uint<1> stubptinnertmp[]=
+#include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
+      const ap_uint<1> stubptoutertmp[]=
+#include "../emData/TP/tables/TP_L2L3C_stubptoutercut.tab"
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }  
+    }
+   else if (Seed==TF::L3L4&&iTC==2){
+      const ap_uint<1> stubptinnertmp[]=
+#include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
+      const ap_uint<1> stubptoutertmp[]=
+#include "../emData/TP/tables/TP_L3L4C_stubptoutercut.tab"
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+    else if (Seed==TF::L5L6&&iTC==2){
+      const ap_uint<1> stubptinnertmp[]=
+#include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
+      const ap_uint<1> stubptoutertmp[]=
+#include "../emData/TP/tables/TP_L5L6C_stubptoutercut.tab"
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+    idle_ = true;
+    }
 
 
  MEMSTUBS nstub16() const {
@@ -131,7 +161,7 @@ void write(STUBID stubs) {
 
  MEMINDEX lastmemindex;
 
- AllStubInner<BARRELPS> innerstub__, innerstub___;
+ AllStubInner<innerRegion> innerstub__, innerstub___;
  ap_uint<1> good__, good___;
  ap_uint<1> next__, next___;
  PHIBIN ireg__, ireg___;
@@ -149,8 +179,8 @@ void write(STUBID stubs) {
 
  int instance_;
 
- ap_uint<1> stubptinnerlutnew_[kNBitsPTLut];    
- ap_uint<1> stubptouterlutnew_[kNBitsPTLut];
+ ap_uint<1> stubptinnerlutnew_[kNBitsPTLutInner];    
+ ap_uint<1> stubptouterlutnew_[kNBitsPTLutOuter];
 
 
  private:

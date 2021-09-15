@@ -61,9 +61,9 @@ static const ap_int<10> plus2 = 256;
 // units 2^(0)Kr^(1)	0.0292969
 const ap_int<8> r1 = ap_int<8>(r1_input)<<1;
 // units 2^(0)Kphi^(1)	7.84121e-06
-const ap_int<18> phi2 = ap_int<18>(phi2_input)<<((Seed == TF::L1L2) ? 3 : 0);
+const ap_int<18> phi2 = ap_int<18>(phi2_input)<<((Seed == TF::L1L2 || Seed == TF::L2L3) ? 3 : 0);
 // units 2^(0)Kphi^(1)	7.84121e-06
-const ap_int<18> phi1 = ap_int<18>(phi1_input)<<((Seed == TF::L1L2 || Seed == TF::L3L4) ? 3 : 0);
+const ap_int<18> phi1 = ap_int<18>(phi1_input)<<((Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4) ? 3 : 0);
 // units 2^(0)Kr^(1)	0.0292969
 const ap_int<8> r2 = ap_int<8>(r2_input)<<1;
 //
@@ -93,6 +93,15 @@ switch (Seed) {
       drinv = LUT_drinv[addr_drinv];
       break;
     }
+  case TF::L2L3:
+    {
+      static const ap_int<18> LUT_drinv[512] = {
+#include "../emData/TC/tables/TC_L2L3_drinv.tab"
+      };
+      drinv = LUT_drinv[addr_drinv];
+      break;
+    }
+
   case TF::L3L4:
     {
       static const ap_int<18> LUT_drinv[512] = {
@@ -1117,6 +1126,15 @@ switch (Seed) {
       invt = LUT_invt[addr_invt];
       break;
     }
+  case TF::L2L3:
+    {
+      static const ap_int<18> LUT_invt[4096] = {
+#include "../emData/TC/tables/TC_L2L3_invt.tab"
+      };
+      invt = LUT_invt[addr_invt];
+      break;
+    }
+
   case TF::L3L4:
     {
       static const ap_int<18> LUT_invt[4096] = {

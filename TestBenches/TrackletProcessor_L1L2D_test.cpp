@@ -27,7 +27,7 @@ int main()
   // input memories
   static AllStubInnerMemory<BARRELPS> innerStubs[2];
   static AllStubMemory<BARRELPS> outerStubs;
-  static VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> outervmStubs;
+  static VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, 5> outervmStubs;
 
 
   // output memories
@@ -144,7 +144,7 @@ int main()
     writeMemFromFile<AllStubInnerMemory<BARRELPS> >(innerStubs[1], fin_innerStubs1, ievt);
     writeMemFromFile<AllStubMemory<BARRELPS> >(outerStubs, fin_outerStubs, ievt);
     cout << "Will read vmstubs"<<endl;
-    writeMemFromFile<VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, kNTEUnits> >(outervmStubs, fin_outervmstubs, ievt);
+    writeMemFromFile<VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, 5> >(outervmStubs, fin_outervmstubs, ievt);
 
     // bx
     BXType bx = ievt;
