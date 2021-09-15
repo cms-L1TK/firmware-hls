@@ -105,6 +105,22 @@ def getDictOfCopies(mem_list):
 
 
 ###################################
+# Returns a number corresponding to the memory masks
+
+def getMask(mem_list):
+
+    mask = 0
+
+    for i in range(32): # 32 is the maximum number of ME/TE memories in a sector layer
+        for mem in mem_list:
+            mem_number = int(mem.split("PHI")[1].split("n")[0][1:])
+            if (i == mem_number - 1):
+                mask += 2**i
+                break;
+
+    return mask
+
+###################################
 # Returns a list of all VMRs in the given wiring
 
 def getAllVMRs(wireconfig):
@@ -213,6 +229,11 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumVMSTEICopi
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumVMSTEOLCopies();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumVMSTEOCopies();
 
+template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskME();
+template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskTEI();
+template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskOL();
+template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskTEO();
+
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getBendCutTableSize();
 
 // Help function that converts an array of 0s and 1s to an ap_uint
@@ -312,16 +333,22 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
                 "template<> constexpr int getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
                 "  return " + str(bendcuttable_size[layer_disk_num-1]) + ";\n"
                 "}\n"
+                "template<> inline const ap_uint<maskMEsize> getMaskME<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", maskMEsize>(){\n"
+                "  return " + (str(getMask(mem_dict["VMSME_" + vmr])) if ("VMSME_" + vmr in mem_dict) else "0") + ";\n"
+                "}\n"
                 )
 
             for te_mem_type in ["VMSTEI", "VMSTEOL", "VMSTEO"]:
 
                 if te_mem_type == "VMSTEI":
                     te_mem_region = "Inner"
+                    te_mem_short = "TEI"
                 elif te_mem_type == "VMSTEOL":
                     te_mem_region = "Overlap"
+                    te_mem_short = "OL"
                 elif te_mem_type == "VMSTEO":
                     te_mem_region = "Outer"
+                    te_mem_short = "TEO"
 
                 # Get the number of copies for the specified TE memory type
                 mem_copy_dict = getDictOfCopies(mem_dict[te_mem_type + "_" + vmr])
@@ -330,6 +357,9 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
                 parameter_file.write(
                     "template<> constexpr int getNum" + te_mem_type + "Copies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE" + te_mem_region + "memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.\n"
                     "  return " + str(max_copy_count) + ";\n"
+                    "}\n"
+                    "template<> inline const ap_uint<mask" + te_mem_short + "size> getMask" + te_mem_short + "<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", mask" + te_mem_short + "size>(){\n"
+                    "  return " + (str(getMask(mem_dict[te_mem_type + "_" + vmr])) if (te_mem_type + "_" + vmr in mem_dict) else "0") + ";\n"
                     "}\n"
                 )
 
@@ -575,21 +605,15 @@ void %s(const BXType bx, BXType& bx_o,
 	static const ap_uint<bendCutTableSize>* bendCutOuterTable = getBendCutOuterTable<layerdisk, phiRegion, bendCutTableSize>();
 
 	//////////////////////////////////
-	// Create memory masks
+	// Get memory masks
 	// Masks of which memories that are being used. The first memory is represented by the LSB
 	// and a "1" implies that the specified memory is used for this phi region
 	// Create "nvm" 1s, e.g. "1111", shift the mask until it corresponds to the correct phi region
 
-	static const ap_uint<maskMEsize> maskME = ((1 << nvmME) - 1) << (nvmME * (static_cast<char>(phiRegion) - 'A')); // ME memories
-	static const ap_uint<maskTEIsize> maskTEI =
-		(kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3) ?
-				((1 << nvmTEI) - 1) << (nvmTEI * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner memories, only used for odd layers/disk and layer 2
-	static const ap_uint<maskOLsize> maskOL =
-		((kLAYER == 1) || (kLAYER == 2)) ?
-				((1 << nvmOL) - 1) << (nvmOL * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Inner Overlap memories, only used for layer 1 and 2
-	static const ap_uint<maskTEOsize> maskTEO =
-		(kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4) ?
-				((1 << nvmTEO) - 1) << (nvmTEO * (static_cast<char>(phiRegion) - 'A')) : 0x0; // TE Outer memories, only for even layers/disks, and layer and disk 1
+	static const ap_uint<maskMEsize> maskME = getMaskME<layerdisk, phiRegion, maskMEsize>(); // ME memories
+	static const ap_uint<maskTEIsize> maskTEI = getMaskTEI<layerdisk, phiRegion, maskTEIsize>(); // TE Inner memories, only used for odd layers/disk and layer 2
+	static const ap_uint<maskOLsize> maskOL = getMaskOL<layerdisk, phiRegion, maskOLsize>(); // TE Inner Overlap memories, only used for layer 1 and 2
+	static const ap_uint<maskTEOsize> maskTEO = getMaskTEO<layerdisk, phiRegion, maskTEOsize>(); // TE Outer memories, only for even layers/disks, and layer and disk 1
 
 	/////////////////////////
 	// Main function

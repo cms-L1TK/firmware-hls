@@ -157,7 +157,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterTop_L1PHID(bx, bx_out, inputStubs
+    VMRouterTop_L2PHIA(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
