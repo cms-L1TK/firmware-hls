@@ -64,8 +64,8 @@ with open(os.path.join(dirname, "../TrackletAlgorithm/TrackBuilderTop.h"), "w") 
         nDiskFMMem = len(diskFMMems[tbName])
 
         # numbers of output stubs
-        nBarrelStubs = len({[fm[0:10] for fm in barrelFMMems[tbName]]})
-        nDiskStubs = len({[fm[0:10] for fm in diskFMMems[tbName]]})
+        nBarrelStubs = len({fm[0:10] for fm in barrelFMMems[tbName]})
+        nDiskStubs = len({fm[0:10] for fm in diskFMMems[tbName]})
 
         # Print out prototype for top function for this TB.
         topHeaderFile.write(
