@@ -137,10 +137,30 @@ declare -a processing_modules=(
   "FT_L1L2"
 
   # Tracklet Processor
+  "TP_L1L2A" 
+  "TP_L1L2B" 
+  "TP_L1L2C" 
   "TP_L1L2D" 
+  "TP_L1L2E" 
+  "TP_L1L2F" 
+  "TP_L1L2G" 
+  "TP_L1L2H" 
+  "TP_L1L2I" 
+  "TP_L1L2J" 
+  "TP_L1L2K" 
+  "TP_L1L2L" 
+  "TP_L2L3A" 
+  "TP_L2L3B" 
   "TP_L2L3C" 
+  "TP_L2L3D" 
+  "TP_L3L4A"
+  "TP_L3L4B"
   "TP_L3L4C"
+  "TP_L3L4D"
+  "TP_L5L6A"
+  "TP_L5L6B"
   "TP_L5L6C"
+  "TP_L5L6D"
 
 )
 

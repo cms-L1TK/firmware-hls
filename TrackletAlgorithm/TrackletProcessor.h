@@ -10,7 +10,7 @@
 #include "VMStubTEOuterMemoryCM.h"
 #include "TEBuffer.h"
 #include "TrackletEngineUnit.h"
-
+#include "TrackletProcessor_parameters.h"
 
 namespace TC {
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,6 @@ namespace TC {
     typedef ap_uint<1> flag;
   }
 
-  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
   enum projout_index_barrel_ps {L1PHIA = 0, L1PHIB = 1, L1PHIC = 2, L1PHID = 3, L1PHIE = 4, L1PHIF = 5, L1PHIG = 6, L1PHIH = 7, L2PHIA = 8, L2PHIB = 9, L2PHIC = 10, L2PHID = 11, L3PHIA = 12, L3PHIB = 13, L3PHIC = 14, L3PHID = 15, N_PROJOUT_BARRELPS = 16};
   enum projout_index_barrel_2s {L4PHIA = 0, L4PHIB = 1, L4PHIC = 2, L4PHID = 3, L5PHIA = 4, L5PHIB = 5, L5PHIC = 6, L5PHID = 7, L6PHIA = 8, L6PHIB = 9, L6PHIC = 10, L6PHID = 11, N_PROJOUT_BARREL2S = 12};
   enum projout_index_disk      {D1PHIA = 0, D1PHIB = 1, D1PHIC = 2, D1PHID = 3, D2PHIA = 4, D2PHIB = 5, D2PHIC = 6, D2PHID = 7, D3PHIA = 8, D3PHIB = 9, D3PHIC = 10, D3PHID = 11, D4PHIA = 12, D4PHIB = 13, D4PHIC = 14, D4PHID = 15, N_PROJOUT_DISK = 16};
@@ -166,64 +165,13 @@ template<TF::seed Seed> constexpr regionType OuterRegion() {
     )
   );
 }
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
 
 ap_uint<1> nearFullTEBuff(const ap_uint<3>&, const ap_uint<3>&);
 ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::D,BARRELPS,BARRELPS>::kNBitsBuffer))> nearFullTEUnitInit();
 
-void TrackletProcessor_L1L2D(const BXType bx,
-			     const ap_uint<1+2*TrackletEngineUnit<TF::L1L2, TC::D,BARRELPS,BARRELPS>::kNBitsRZFine+TrackletEngineUnit<TF::L1L2, TC::D,BARRELPS,BARRELPS>::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],
-			     const ap_uint<(1<<TrackletEngineUnit<TF::L1L2, TC::D,BARRELPS,BARRELPS>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARRELPS>::kASBendSize+AllStubInner<BARRELPS>::kASFinePhiSize)],
-			     const AllStubInnerMemory<BARRELPS> innerStubs[2],
-			     const AllStubMemory<BARRELPS>* outerStubs,
-			     const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, 5> outerVMStubs,
-			     TrackletParameterMemory * trackletParameters,
-			     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-			     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-			     TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-			     );
-
-void TrackletProcessor_L2L3C(const BXType bx,
-                             const ap_uint<1+2*TrackletEngineUnit<TF::L2L3, TC::C,BARRELPS,BARRELPS>::kNBitsRZFine+TrackletEngineUnit<TF::L3L4, TC::C,BARRELPS,BARRELPS>::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],
-                             const ap_uint<(1<<TrackletEngineUnit<TF::L2L3, TC::C,BARRELPS,BARRELPS>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARRELPS>::kASBendSize+AllStubInner<BARRELPS>::kASFinePhiSize)],
-                             const AllStubInnerMemory<BARRELPS> innerStubs[3],
-                             const AllStubMemory<BARRELPS>* outerStubs,
-                             const VMStubTEOuterMemoryCM<BARRELPS, kNbitsrzbin, kNbitsphibin, 2> outerVMStubs,
-                             TrackletParameterMemory * trackletParameters,
-                             TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-                             TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-                             TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-                             );
-
-void TrackletProcessor_L3L4C(const BXType bx,
-                             const ap_uint<1+2*TrackletEngineUnit<TF::L3L4, TC::C,BARRELPS,BARREL2S>::kNBitsRZFine+TrackletEngineUnit<TF::L3L4, TC::C,BARRELPS,BARREL2S>::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],
-                             const ap_uint<(1<<TrackletEngineUnit<TF::L3L4, TC::C,BARRELPS,BARREL2S>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARRELPS>::kASBendSize+AllStubInner<BARRELPS>::kASFinePhiSize)],
-                             const AllStubInnerMemory<BARRELPS> innerStubs[3],
-                             const AllStubMemory<BARREL2S>* outerStubs,
-                             const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, 5> outerVMStubs,
-                             TrackletParameterMemory * trackletParameters,
-                             TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-                             TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-                             TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-                             );
-
-void TrackletProcessor_L5L6C(const BXType bx,
-                             const ap_uint<1+2*TrackletEngineUnit<TF::L5L6, TC::C,BARREL2S,BARREL2S>::kNBitsRZFine+TrackletEngineUnit<TF::L3L4, TC::C,BARREL2S,BARREL2S>::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],
-                             const ap_uint<(1<<TrackletEngineUnit<TF::L5L6, TC::C,BARREL2S,BARREL2S>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<BARREL2S>::kASBendSize+AllStubInner<BARREL2S>::kASFinePhiSize)],
-                             const AllStubInnerMemory<BARREL2S> innerStubs[3],
-                             const AllStubMemory<BARREL2S>* outerStubs,
-                             const VMStubTEOuterMemoryCM<BARREL2S, kNbitsrzbin, kNbitsphibin, 3> outerVMStubs,
-                             TrackletParameterMemory * trackletParameters,
-                             TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-                             TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-                             TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-                             );
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "TrackletCalculator_calculate_LXLY.h"
-#include "TrackletProcessor_parameters.h"
 
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.

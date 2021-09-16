@@ -1,5 +1,5 @@
 // Test bench for TrackletProcessor
-#include "TrackletProcessor.h"
+#include "TrackletProcessorTop.h"
 
 #include <algorithm>
 #include <iterator>
