@@ -3,39 +3,45 @@
 
 #include "TrackFitMemory.h"
 
-template<class>
 class TrackHandler{
+  public:
+    TrackHandler();
+    TrackHandler(TrackFit trk)
+    {
+      //prepare the TrackHandler members
+    }
+
+  private:
+
   //formats the input tracks
-  //duplicate TrackFitMemory
-}
+  //duplicate TrackFitMemory fns
+};
 
 
-template<class>
 class ComparisonModule{
   public:
-    void InputTrack(TrackFit trk){
-    //input buffer for each comparison module
-    } 
+    ComparisonModule()
+    {
+      bufferIndex=0;
+    }
+    ~ComparisonModule();
+
+    void InputTrack(TrackHandler trk); //the tracks are read in from TrackBuilder output
+    //input buffer for each comparison module 
+    
   private:
-    bool CompareTracks(TrackFit masterTrack, TrackFit trk, bool &isMatch){
-    }
+    bool CompareTracks(const TrackHandler masterTrack, const TrackHandler trk);
+    
 
-    void MergeTrack(TrackFit &masterTrack, const TrackFit trk){
-    }
+    void MergeTrack(TrackHandler &masterTrack, const TrackHandler trk);
+    
 
+    TrackHandler inputBuffer[kMaxProc];
+    unsigned int bufferIndex;
 
 };
 
 
-
-void TrackMergerHelper(const BXType bx,
-  const TrackFit::TrackWord trackWord [kMaxProc],
-  const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
-  const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
-  BXType &bx_o,
-  TrackFit::TrackWord trackWord_o [kMaxProc],
-  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]);
 
 void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
