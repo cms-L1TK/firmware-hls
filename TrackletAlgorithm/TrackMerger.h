@@ -9,19 +9,18 @@ class TrackHandler{
   //duplicate TrackFitMemory
 }
 
+
 template<class>
 class ComparisonModule{
+  public:
+    void InputTrack(TrackFit trk){
+    //input buffer for each comparison module
+    } 
   private:
     bool CompareTracks(TrackFit masterTrack, TrackFit trk, bool &isMatch){
     }
 
-    void MergeTrack(TrackFit &masterTrack, TrackFit::BarrelStubWord &masterTrackBarrelWords[4][7],
-    TrackFit::DiskStubWord &masterTrackDiskStubWords[4][7], TrackFit trk, TrackFit::BarrelStubWord
-    trkBarrelStubWords[4][7], TrackFit::DiskStubWord trkDiskStubWords[4][7]){
-    }
-
-    void WriteToBufferArray(TrackFit masterTrack){
-
+    void MergeTrack(TrackFit &masterTrack, const TrackFit trk){
     }
 
 
