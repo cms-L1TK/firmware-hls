@@ -120,6 +120,7 @@ download:
   tags:
     - xilinx-tools
   stage: download
+  needs: ["py3check", "lint"]
   script:
     - cd emData
     - ./download.sh
