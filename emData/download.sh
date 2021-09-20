@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 #### fw_synch_210611 ####
 # Standard configuration
