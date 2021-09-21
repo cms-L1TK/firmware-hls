@@ -10,7 +10,7 @@ source env_hls.tcl
 open_project -reset trackletengine
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
 set_top TrackletEngineTop
 add_files ../TrackletAlgorithm/TrackletEngineTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "$CFLAGS"

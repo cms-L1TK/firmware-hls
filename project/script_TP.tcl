@@ -20,7 +20,7 @@ set module_to_export TP_L1L2D
 open_project -reset trackletProcessor
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
 add_files ../TrackletAlgorithm/TrackletProcessorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletProcessor_test.cpp -cflags "$CFLAGS"
 

@@ -10,9 +10,9 @@ source env_hls.tcl
 open_project -reset vmrouterCM
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
 set_top VMRouterCMTop_L2PHIA
-add_files ../TrackletAlgorithm/VMRouterCMTop_L2PHIA.cc -cflags "$CFLAGS"
+add_files ../TopFunctions/VMRouterCMTop_L2PHIA.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/VMRouterCM_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
