@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # This script generates TrackBuilderTop.h and TrackBuilderTop.cc in the
-# TrackletAlgorithm/ directory.
+# TopFunctions/ directory.
 
 from __future__ import absolute_import
 import os
@@ -42,11 +42,11 @@ with open(wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/TrackBuilderTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/TrackBuilderTop.cc"), "w") as topFile:
+with open(os.path.join(dirname, "../TopFunctions/TrackBuilderTop.h"), "w") as topHeaderFile, \
+     open(os.path.join(dirname, "../TopFunctions/TrackBuilderTop.cc"), "w") as topFile:
     topHeaderFile.write(
-        "#ifndef TrackletAlgorithm_TrackBuilderTop_h\n"
-        "#define TrackletAlgorithm_TrackBuilderTop_h\n"
+        "#ifndef TopFunctions_TrackBuilderTop_h\n"
+        "#define TopFunctions_TrackBuilderTop_h\n"
         "\n"
         "#include \"TrackBuilder.h\"\n"
     )

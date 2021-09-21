@@ -50,8 +50,8 @@ def writeHeaderModuleInstance(module):
 
 def writeHeaderPreamble():
     strPreamble = ""
-    strPreamble += "#ifndef TrackletAlgorithm_ProjectionRouterTop_h\n"
-    strPreamble += "#define TrackletAlgorithm_ProjectionRouterTop_h\n\n"
+    strPreamble += "#ifndef TopFunctions_ProjectionRouterTop_h\n"
+    strPreamble += "#define TopFunctions_ProjectionRouterTop_h\n\n"
     strPreamble += "#include \"ProjectionRouter.h\"\n\n"
     return strPreamble
 
@@ -105,7 +105,7 @@ for module in modulesToBuild:
 headerString += writeHeaderPostamble()
 
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/ProjectionRouterTop.h"), "w") as headerFile:
+with open(os.path.join(dirname, "../TopFunctions/ProjectionRouterTop.h"), "w") as headerFile:
     headerFile.write(headerString)
-with open(os.path.join(dirname, "../TrackletAlgorithm/ProjectionRouterTop.cc"), "w") as sourceFile:
+with open(os.path.join(dirname, "../TopFunctions/ProjectionRouterTop.cc"), "w") as sourceFile:
     sourceFile.write(sourceString)

@@ -2,7 +2,7 @@
 
 # This script generates MatchCalculator_parameters.h,
 # MatchCalculatorTop.h, and MatchCalculatorTop.cc in the
-# TrackletAlgorithm/ directory. Currently supports all MCs for L3_PHIC.
+# TopFunctions/ directory. Currently supports all MCs for L3_PHIC.
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -64,12 +64,12 @@ with open(wiresFileName) as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters.h"), "w") as parametersFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.cc"), "w") as topFile:
+with open(os.path.join(dirname, "../TopFunctions/MatchCalculator_parameters.h"), "w") as parametersFile, \
+     open(os.path.join(dirname, "../TopFunctions/MatchCalculatorTop.h"), "w") as topHeaderFile, \
+     open(os.path.join(dirname, "../TopFunctions/MatchCalculatorTop.cc"), "w") as topFile:
     parametersFile.write(
-        "#ifndef TrackletAlgorithm_MatchCalculator_parameters_h\n"
-        "#define TrackletAlgorithm_MatchCalculator_parameters_h\n"
+        "#ifndef TopFunctions_MatchCalculator_parameters_h\n"
+        "#define TopFunctions_MatchCalculator_parameters_h\n"
         "\n"
         "// This file contains numbers of memories and bit masks that are specific to\n"
         "// each MatchCalculator and that come directly from the wiring.\n"
@@ -82,8 +82,8 @@ with open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters
         "// valid, if it is not, the corresponding memory is not valid.\n"
     )
     topHeaderFile.write(
-        "#ifndef TrackletAlgorithm_MatchCalculatorTop_h\n"
-        "#define TrackletAlgorithm_MatchCalculatorTop_h\n"
+        "#ifndef TopFunctions_MatchCalculatorTop_h\n"
+        "#define TopFunctions_MatchCalculatorTop_h\n"
         "\n"
         "#include \"MatchCalculator.h\"\n"
         "\n"

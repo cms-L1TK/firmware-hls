@@ -2,7 +2,7 @@
 
 # This script generates TrackletCalculator_parameters.h,
 # TrackletCalculatorTop.h, and TrackletCalculatorTop.cc in the
-# TrackletAlgorithm/ directory. Currently supports all TCs for L1L2, as well as
+# TopFunctions/ directory. Currently supports all TCs for L1L2, as well as
 # TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
 from __future__ import absolute_import, print_function
@@ -12,7 +12,7 @@ import sys
 from enum import Enum
 
 # These enums must match those defined in
-# TrackletAlgorithm/TrackletCalculator.h.
+# TopFunctions/TrackletCalculator.h.
 class ProjoutIndexBarrel(Enum):
     L1PHIA = 0
     L1PHIB = 1
@@ -107,12 +107,12 @@ with open(wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculator_parameters.h"), "w") as parametersFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.cc"), "w") as topFile:
+with open(os.path.join(dirname, "../TopFunctions/TrackletCalculator_parameters.h"), "w") as parametersFile, \
+     open(os.path.join(dirname, "../TopFunctions/TrackletCalculatorTop.h"), "w") as topHeaderFile, \
+     open(os.path.join(dirname, "../TopFunctions/TrackletCalculatorTop.cc"), "w") as topFile:
     parametersFile.write(
-        "#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h\n"
-        "#define TrackletAlgorithm_TrackletCalculator_parameters_h\n"
+        "#ifndef TopFunctions_TrackletCalculator_parameters_h\n"
+        "#define TopFunctions_TrackletCalculator_parameters_h\n"
         "\n"
         "// This file contains numbers of memories and bit masks that are specific to\n"
         "// each TrackletCalculator and that come directly from the wiring.\n"
@@ -135,8 +135,8 @@ with open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculator_paramet
         "// in the same way.\n"
     )
     topHeaderFile.write(
-        "#ifndef TrackletAlgorithm_TrackletCalculatorTop_h\n"
-        "#define TrackletAlgorithm_TrackletCalculatorTop_h\n"
+        "#ifndef TopFunctions_TrackletCalculatorTop_h\n"
+        "#define TopFunctions_TrackletCalculatorTop_h\n"
         "\n"
         "#include \"TrackletCalculator.h\"\n"
     )

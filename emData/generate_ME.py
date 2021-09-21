@@ -47,8 +47,8 @@ def parseWiresFile(wiresFileName):
 
 def writePreambles(topHeaderFile, topFile):
     topHeaderFile.write(
-        "#ifndef TrackletAlgorithm_MatchEngineTop_h\n"
-        "#define TrackletAlgorithm_MatchEngineTop_h\n"
+        "#ifndef TopFunctions_MatchEngineTop_h\n"
+        "#define TopFunctions_MatchEngineTop_h\n"
         "\n"
         "#include \"MatchEngine.h\"\n"
         "\n"
@@ -174,13 +174,13 @@ def generateME(args = argparse.Namespace()):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="This script generates MatchEngineTop.h and MatchEngineTop.cc \
-in the TrackletAlgorithm/ directory. Currently supports all MEs in all layers/disks.",
+in the TopFunctions/ directory. Currently supports all MEs in all layers/disks.",
                                      epilog="")
     parser.add_argument("-d", "--debug", action="store_true", help="Shows some extra information in order to debug this program (default=%(default)s)")
     parser.add_argument("-g", "--grep", default=None, type=str, nargs='+', help="Space separated list of patterns to select for (default = %(default)s)")
     parser.add_argument("-ild", "--iLayerDisk", choices=[1,2,3,4,5,6], nargs='+', type=int, help="Select the region for which to generate the top functions (default=%(default)s)")
     parser.add_argument("-ldt", "--layerDiskType", choices=["layer","disk","both"], default="both", help="Select the region for which to generate the top functions (default=%(default)s)")
-    parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TrackletAlgorithm/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+    parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
     parser.add_argument("-s", "--sparse", action="store_true", help="Only generate one module per layer/disk (default=%(default)s)")
     parser.add_argument("-v", "--vgrep", default=None, type=str, nargs='+', help="Space separated list of patterns to ignore (default = %(default)s)")
     parser.add_argument("-V", "--verbose", action="store_true", help="Prints out extra information while running (default=%(default)s)")

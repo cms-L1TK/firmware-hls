@@ -81,9 +81,9 @@ def createParametersTemplate():
 def createParameters(wiresFiles='./LUTs/wires.dat'):
     IRs = getNmemsPerIR(wiresFiles)
     templateName = createParametersTemplate()
-    file = open('../TrackletAlgorithm/InputRouter_parameters.h', 'w')
-    file.write('#ifndef TrackletAlgorithm_InputRouter_parameters_h\n')
-    file.write('#define TrackletAlgorithm_InputRouter_parameters_h\n')
+    file = open('../TopFunctions/InputRouter_parameters.h', 'w')
+    file.write('#ifndef TopFunctions_InputRouter_parameters_h\n')
+    file.write('#define TopFunctions_InputRouter_parameters_h\n')
     for dtcName, nMemories in IRs:
         d = {}
         d['LinkName'] = "DTC_" + dtcName
@@ -99,9 +99,9 @@ def createParameters(wiresFiles='./LUTs/wires.dat'):
 def createDeclarations(wiresFiles='./LUTs/wires.dat'):
     IRs = getNmemsPerIR(wiresFiles)
     templateName = createDeclarationTemplate()
-    file = open('../TrackletAlgorithm/InputRouterTop.h', 'w')
-    file.write('#ifndef TrackletAlgorithm_InputRouterTop_h\n')
-    file.write('#define TrackletAlgorithm_InputRouterTop_h\n')
+    file = open('../TopFunctions/InputRouterTop.h', 'w')
+    file.write('#ifndef TopFunctions_InputRouterTop_h\n')
+    file.write('#define TopFunctions_InputRouterTop_h\n')
     file.write('#include \"InputRouter.h\"\n')
     file.write('#include \"InputRouter_parameters.h\"\n')
     for dtcName, _ in IRs:
@@ -118,7 +118,7 @@ def createDeclarations(wiresFiles='./LUTs/wires.dat'):
 def createDefinitions(wiresFiles='./LUTs/wires.dat'):
     IRs = getNmemsPerIR(wiresFiles)
     templateName = createDefinitionsTemplate()
-    file = open('../TrackletAlgorithm/InputRouterTop.cc', 'w')
+    file = open('../TopFunctions/InputRouterTop.cc', 'w')
     file.write('#include \"InputRouterTop.h\"\n')
     for dtcName, _ in IRs:
         d = {}
