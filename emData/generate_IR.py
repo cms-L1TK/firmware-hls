@@ -3,6 +3,7 @@
 from __future__ import absolute_import, print_function
 import re
 import os
+import sys
 
 # return number of memories filled by each IR
 def getNmemsPerIR(wiresFiles='./LUTs/wires.dat'):
@@ -128,7 +129,11 @@ def createDefinitions(wiresFiles='./LUTs/wires.dat'):
     file.close()
     os.remove(templateName)
 
-wiresFile = './LUTs/wires.dat'
+if len(sys.argv) < 2:
+    print("Usage: " + sys.argv[0] + " WIRES_FILE")
+    sys.exit(1)
+wiresFile = sys.argv[1]
+
 # create InputRouter_parameters.h :
 # contains constants that define number of output memories per link
 createParameters(wiresFile)
