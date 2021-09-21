@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
+#### reduced config ####
+# 1 event
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/AS6IMzwDGWnXpIF/download"
+# 100 events
+#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/6FAsw84hlQjda3J/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
+
 #### fw_synch_210611 ####
 # Standard configuration
 memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
@@ -220,6 +227,10 @@ fi
 # Download and unpack LUTs.tar.gz.
 if [[ $memprints_only == 0 ]]
 then
+  wget -O LUTs.tgz --quiet ${luts_url_reduced}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsReduced
+  rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
   mv LUTs LUTsCM
@@ -229,14 +240,24 @@ then
   rm -f LUTs.tar.gz
 fi
 
-# Run scripts to generate top functions in TrackletAlgorithm/
-./generate_IR.py
+# Run scripts to generate top functions in TopFunctions/
+mkdir -p ../TopFunctions/ReducedConfig
+./generate_IR.py LUTsReduced/wires.dat
+./generate_VMR.py -a -w LUTsReduced/wires.dat
+./generate_TC.py LUTsReduced/wires.dat
+./generate_PR.py LUTsReduced/wires.dat
+./generate_MC.py LUTsReduced/wires.dat
+./generate_TB.py LUTsReduced/wires.dat
+./generate_ME.py -s -w LUTsReduced/wires.dat
+./generate_VMRCM.py -d -w LUTsReduced/wires.dat
+mv ../TopFunctions/*.h ../TopFunctions/*.cc ../TopFunctions/ReducedConfig/
+./generate_IR.py LUTs/wires.dat
 ./generate_VMR.py -a -w LUTs/wires.dat
 ./generate_TC.py LUTs/wires.dat
 ./generate_PR.py LUTs/wires.dat
 ./generate_MC.py LUTs/wires.dat
 ./generate_TB.py LUTs/wires.dat
-./generate_ME.py -s
+./generate_ME.py -s -w LUTs/wires.dat
 ./generate_VMRCM.py -d -w LUTsCM/wires.dat
 ./generate_TP.py LUTsCM/wires.dat
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
@@ -266,6 +287,7 @@ do
   echo ${module}
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
+  memprint_location_reduced="MemPrintsReduced"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
@@ -281,11 +303,12 @@ do
   target_dir=${module_type}/${module}
 
   rm -rf ${target_dir}
-  mkdir -p ${target_dir}
+  mkdir -p ${target_dir}/ReducedConfig
 
   for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
   do
     find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+    find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ReducedConfig/ \;
   done
 
   # Table linking logic specific to each module type
