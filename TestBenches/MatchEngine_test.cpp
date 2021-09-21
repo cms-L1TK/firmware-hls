@@ -37,7 +37,7 @@ int main() {
 
 	// Declare input memory arrays to be read from the emulation files
 	VMProjectionMemory<ProjectionType<kLayerDisk>()> inputvmprojs;
-	VMStubMEMemory<ModuleType<kLayerDisk>(), NBitBin<kLayerDisk>()> inputvmstubs;
+	VMStubMEMemory<ModuleType<kLayerDisk>(), NBitMemAddr<kLayerDisk>(), NBitBin<kLayerDisk>()> inputvmstubs;
 	//CandidateMatchMemory inputcandmatches;
 
 	// Declare output memory array to be filled by hls simulation
@@ -84,7 +84,7 @@ int main() {
 		outputcandmatches.clear();
 
 		writeMemFromFile<VMProjectionMemory<ProjectionType<kLayerDisk>()> >(inputvmprojs, fin_vmproj, ievt);
-		writeMemFromFile<VMStubMEMemory<ModuleType<kLayerDisk>(), NBitBin<kLayerDisk>()> >(inputvmstubs, fin_vmstub, ievt);
+		writeMemFromFile<VMStubMEMemory<ModuleType<kLayerDisk>(), NBitMemAddr<kLayerDisk>(), NBitBin<kLayerDisk>()> >(inputvmstubs, fin_vmstub, ievt);
 
 		//Set bunch crossing
 		BXType bx=ievt&0x7;

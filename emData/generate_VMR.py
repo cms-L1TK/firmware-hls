@@ -433,7 +433,10 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 	constexpr int nvmOL = kLAYER == 1 ? nvmollayers[0] : (kLAYER == 2 ? nvmollayers[1] : 1); // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
 	constexpr int nvmTEO = (kLAYER != 3) ? nvmtelayers[kLAYER-1] : nvmteextralayers[2]; // TE Outer memories
 
-	// Number of bits used for the bins in VMStubeME memories
+	// Number of bits used to address the stubs
+	constexpr int nbitsmemaddr = kNBits_MemAddr;
+
+	// Number of bits used for the bins in VMStubME memories
 	constexpr int nbitsbin = 3;
 
 	// What regionType the input/output is
@@ -447,7 +450,10 @@ constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>(); //
 	constexpr int nvmOL = 1; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories
 	constexpr int nvmTEO = nvmtedisks[kDISK-1]; // TE Outer memories
 
-	// Number of bits used for the bins in VMStubeME memories
+	// Number of bits used to address the stubs
+	constexpr int nbitsmemaddr = kNBits_MemAddr + 1;
+
+	// Number of bits used for the bins in VMStubME memories
 	constexpr int nbitsbin = 4;
 
 	// What regionType the input/output is
@@ -470,7 +476,7 @@ void %s(const BXType bx, BXType& bx_o,
 #endif
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[maxASCopies]
-	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+	, VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin> memoriesME[nvmME]
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
 #endif
@@ -516,7 +522,7 @@ void %s(const BXType bx, BXType& bx_o,
 #endif
 	// Output memories
 	, AllStubMemory<outputType> memoriesAS[maxASCopies]
-	, VMStubMEMemory<outputType, nbitsbin> memoriesME[nvmME]
+	, VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin> memoriesME[nvmME]
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]
 #endif
@@ -588,7 +594,7 @@ void %s(const BXType bx, BXType& bx_o,
 	/////////////////////////
 	// Main function
 
-	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsbin, bendCutTableSize>
+	VMRouter<inputType, outputType, kLAYER, kDISK, numInputs, numInputsDisk2S, maxASCopies, maxTEICopies, maxOLCopies, maxTEOCopies, nbitsmemaddr, nbitsbin, bendCutTableSize>
 	(bx, bx_o, fineBinTable, phiCorrTable,
 		rzBitsInnerTable, rzBitsOverlapTable, rzBitsOuterTable,
 		bendCutInnerTable, bendCutOverlapTable, bendCutOuterTable,

@@ -572,8 +572,9 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 // 		According to wiring script, there's two DISK2S and half the inputs are for negative disks.
 // Layer Disk - Specifies the layer or disk number
 // MAXCopies - The maximum number of copies of a memory type
+// NBitsMemAddr number of bits used to address the stubs
 // NBitsBin number of bits used for the bins in MEMemories
-template<regionType InType, regionType OutType, int Layer, int Disk, int nInputMems, int nInputDisk2SMems, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsBin, int BendCutTableSize>
+template<regionType InType, regionType OutType, int Layer, int Disk, int nInputMems, int nInputDisk2SMems, int MaxAllCopies, int MaxTEICopies, int MaxOLCopies, int MaxTEOCopies, int NBitsMemAddr, int NBitsBin, int BendCutTableSize>
 void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int phiCorrTable[],
 		// rzbitstables, aka binlookup in emulation
 		const int rzbitsInnerTable[], const int rzbitsOverlapTable[], const int rzbitsOuterTable[],
@@ -585,7 +586,7 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 		// AllStub memory
 		AllStubMemory<OutType> memoriesAS[],
 		// ME memories
-		const ap_uint<maskMEsize>& maskME, VMStubMEMemory<OutType, NBitsBin> memoriesME[],
+		const ap_uint<maskMEsize>& maskME, VMStubMEMemory<OutType, NBitsMemAddr, NBitsBin> memoriesME[],
 		// Inner TE memories, non-overlap
 		const ap_uint<maskTEIsize>& maskTEI, VMStubTEInnerMemory<OutType> memoriesTEI[][MaxTEICopies],
 		// TE Inner memories, overlap

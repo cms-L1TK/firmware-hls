@@ -85,7 +85,7 @@ public:
 	}
 	else {
 #ifndef __SYNTHESIS__
-edm::LogWarning("L1trackHLS") << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << std::endl;
+edm::LogWarning("L1trackHLS") << "Warning out of range: adress within bin " << nentry_ibx << ", stub " << data.raw() << " (" << data.raw().to_string(2) << ")" << std::endl;
 #endif
 	  return false;
 	}

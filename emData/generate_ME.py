@@ -60,7 +60,7 @@ def writePreambles(topHeaderFile, topFile):
 def writeModuleToHeader(topHeaderFile, funcName, prefix, layerDisk):
     topHeaderFile.write(
         "void " + funcName + "(const BXType bx, BXType& bx_o,\n"
-        + prefix + "const VMStubMEMemory<ModuleType<TF::" + layerDisk + ">(), NBitBin<TF::" + layerDisk + ">()>& inputStubData,\n"
+        + prefix + "const VMStubMEMemory<ModuleType<TF::" + layerDisk + ">(), NBitMemAddr<TF::" + layerDisk + ">(), NBitBin<TF::" + layerDisk + ">()>& inputStubData,\n"
         + prefix + "const VMProjectionMemory<ProjectionType<TF::" + layerDisk + ">()>& inputProjectionData,\n"
         + prefix + "CandidateMatchMemory& outputCandidateMatch);\n\n"
     )
@@ -68,7 +68,7 @@ def writeModuleToHeader(topHeaderFile, funcName, prefix, layerDisk):
 def writeModuleToImplementation(topFile, funcName, prefix, layerDisk, label):
     topFile.write(
         "\nvoid " + funcName + "(const BXType bx, BXType& bx_o,\n"
-        + prefix + "const VMStubMEMemory<ModuleType<TF::" + layerDisk + ">(), NBitBin<TF::" + layerDisk + ">()>& inputStubData,\n"
+        + prefix + "const VMStubMEMemory<ModuleType<TF::" + layerDisk + ">(), NBitMemAddr<TF::" + layerDisk + ">(), NBitBin<TF::" + layerDisk + ">()>& inputStubData,\n"
         + prefix + "const VMProjectionMemory<ProjectionType<TF::" + layerDisk + ">()>& inputProjectionData,\n"
         + prefix + "CandidateMatchMemory& outputCandidateMatch) {\n"
         "\n"
