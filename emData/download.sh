@@ -267,6 +267,11 @@ then
 fi
 
 # Download and unpack the tarball.
+wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
+tar -xzf MemPrints.tgz
+mv MemPrints MemPrintsReduced
+rm -f MemPrints.tgz
+
 wget -O MemPrints.tgz --quiet ${memprints_url_cm}
 tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsCM
