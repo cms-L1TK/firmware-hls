@@ -1,10 +1,10 @@
 # Execute download.sh in the emData/ directory.
-set cwd [pwd]
+set settings_cwd [pwd]
 cd ../emData/
 if { [catch { exec ./download.sh } msg] } {
   puts $msg
 }
-cd $cwd
+cd $settings_cwd
 
 # Allow HLS to use longer (easier to understand) names in resource/latency usage profiles.
 config_compile -name_max_length 100
