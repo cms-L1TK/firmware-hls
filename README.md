@@ -22,7 +22,7 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 ## Running chains (illustrated for PR-ME-MC)
 
 1) cd IntegrationTests/PRMEMC/script/
-2) ./compileHLS.sh (makes HLS IP cores).
+2) vivado_hls -f compileHLS.tcl (makes HLS IP cores).
 3) vivado -mode batch -source makeProject.tcl (creates Vivado project).
 4) vivado -mode batch -source runSim.tcl (runs Vivado simulation,
    which writes data output from chain to dataOut/*.txt).
