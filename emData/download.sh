@@ -313,7 +313,7 @@ do
   for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
   do
     find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-    find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ReducedConfig/ \;
+    find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
   done
 
   # Table linking logic specific to each module type
