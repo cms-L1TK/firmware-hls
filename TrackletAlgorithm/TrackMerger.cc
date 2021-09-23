@@ -2,7 +2,7 @@
 #include <bitset>
 
 
-bool ComparisonModule::CompareTracks(TrackHandler masterTrack, TrackHandler trk){
+bool ComparisonModule::CompareTracks(TrackHandler masterTrack, TrackHandler track){
   #pragma HLS inline
   
   //compare the two tracks, masterTrack and trk
@@ -11,18 +11,23 @@ bool ComparisonModule::CompareTracks(TrackHandler masterTrack, TrackHandler trk)
   return false;
 }
 
-void ComparisonModule::MergeTrack(TrackHandler &masterTrack, const TrackHandler trk){
+void ComparisonModule::MergeTrack(TrackHandler &masterTrack, const TrackHandler track){
   #pragma HLS inline
   //Will merge both tracks to produce the merged track word - update masterTrack
   //and its barrel/disk stubs
   // UPDATE just change the master track - the output stub words will then become a 2D array, up to 7 hits per layer
 
-  if (ComparisonModule::CompareTracks(masterTrack, trk) == true) //merge
+  if (ComparisonModule::CompareTracks(masterTrack, track) == true) //merge
+  {
+    #ifndef _SYNTHESIS_
+    std::cout << "It's a merge" << std::endl;
+    #endif
+  }
 }
 
-void ComparisonModule::InputTrack(TrackFit trk){
+void ComparisonModule::InputTrack(TrackFit::TrackFitData data){
   //put track into buffer
-  TrackHandler nextTrack(trk);
+  TrackHandler nextTrack(data);
   inputBuffer[bufferIndex] = nextTrack;
   bufferIndex++;
   assert(bufferIndex < kMaxProc);
@@ -40,11 +45,9 @@ void TrackMergerModule(const BXType bx,
 
     ComparisonModule comparisonModule[16];
     for (int i = 0; i < kMaxProc; i++){
-      TrackFit trk;// 
-      trk.setTrackWord(trackWord[i]); //all the information from the track and stub words;
-      trk.setDiskStubWord(diskStubWords[i]);
-      trk.setBarrelStubWord(barrelStubWords[i]);
-      comparisonModule[0].InputTrack(trk); //how to make input track from constructor the input
+      TrackFit trk;
+      //trk.setTrackWord(trackWord[i]); //all the information from the track and stub words;
+      comparisonModule[0].InputTrack(trackWord[i].raw()); //how to make input track from constructor the input
       //fill what to keep from InputTrack
     }
     

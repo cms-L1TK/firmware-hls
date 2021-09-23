@@ -2,19 +2,48 @@
 #define TrackletAlgorithm_TrackMerger_h
 
 #include "TrackFitMemory.h"
+#include <cassert>
 
-class TrackHandler{
+class TrackHandler : public TrackFit{
   public:
     TrackHandler();
-    TrackHandler(TrackFit trk)
+    TrackHandler(TrackFitData data)
     {
       //prepare the TrackHandler members
+      track = data;
+    }
+    ~TrackHandler();
+    
+    TrackFitData track;
+
+    TFSTUBINDEX getStubIndex(int Hit) const {
+      assert(Hit >= 0 && Hit <= kNStubs - 1);
+      return track.range(TrackFitBits::kTFStubIndexMSB(Hit),TrackFitBits::kTFStubIndexLSB(Hit));
+    }
+    TFSTUBPHIRESID getStubPhiResid(int Hit) const {
+      assert(Hit >= 0 && Hit <= kNStubs - 1);
+      return track.range(TrackFitBits::kTFStubPhiResidMSB(Hit),TrackFitBits::kTFStubPhiResidLSB(Hit));
+    }
+    BarrelStubWord getBarrelStubWord(int Hit) const {
+      assert(Hit >= 0 && Hit <= kNBarrelStubs - 1);
+      return track.range(TrackFitBits::kTFStubValidMSB(Hit),TrackFitBits::kTFStubRZResidLSB(Hit));
+    }
+    DiskStubWord getDiskStubWord(int Hit) const {
+      assert(Hit >= kNBarrelStubs && Hit <= kNStubs - 1);
+      return track.range(TrackFitBits::kTFStubValidMSB(Hit),TrackFitBits::kTFStubRZResidLSB(Hit));
+    }
+    void setBarrelStubWord(const BarrelStubWord &word, int Hit) {
+      assert(Hit >= 0 && Hit <= kNBarrelStubs - 1);
+      track.range(TrackFitBits::kTFStubValidMSB(Hit),TrackFitBits::kTFStubRZResidLSB(Hit)) = word;
+    }
+    void setDiskStubWord(const DiskStubWord &word, int Hit) {
+      assert(Hit >= kNBarrelStubs && Hit <= kNStubs - 1);
+      track.range(TrackFitBits::kTFStubValidMSB(Hit),TrackFitBits::kTFStubRZResidLSB(Hit)) = word;
     }
 
-  private:
 
-  //formats the input tracks
-  //duplicate TrackFitMemory fns
+
+  private:
 };
 
 
@@ -22,20 +51,21 @@ class ComparisonModule{
   public:
     ComparisonModule()
     {
-      bufferIndex=0;
+      bufferIndex = 0;
     }
     ~ComparisonModule();
 
-    void InputTrack(TrackHandler trk); //the tracks are read in from TrackBuilder output
-    //input buffer for each comparison module 
+    void InputTrack(TrackFit::TrackFitData data); //the tracks are read in from TrackBuilder output
+    
     
   private:
-    bool CompareTracks(const TrackHandler masterTrack, const TrackHandler trk);
+    bool CompareTracks(const TrackHandler masterTrack, const TrackHandler track);
     
 
-    void MergeTrack(TrackHandler &masterTrack, const TrackHandler trk);
+    void MergeTrack(TrackHandler &masterTrack, const TrackHandler track);
     
 
+    //input buffer for each comparison module 
     TrackHandler inputBuffer[kMaxProc];
     unsigned int bufferIndex;
 
