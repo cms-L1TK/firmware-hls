@@ -36,7 +36,7 @@ constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
 #endif
 template<TF::layerDisk LayerDisk> constexpr int getLayerDiskNumber() {
 	// Convert from the enum index (0-based) to the module name indexing (1-based)
-  return LayerDisk <= TF::L6 ? LayerDisk + 1 : LayerDisk - 5;
+  return LayerDisk <= TF::L6 ? LayerDisk + 1 : LayerDisk - (trklet::N_LAYER - 1);
 }
 
 int main() {
