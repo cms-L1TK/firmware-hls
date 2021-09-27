@@ -16,7 +16,7 @@ export_design -format ip_catalog
 
 # Build VMR_L2PHIA
 open_project -reset vmrouter
-add_files ../../../TopFunctions/VMRouterTop.cc -cflags "$CFLAGS"
+add_files ../../../TopFunctions/VMRouterTop_L2PHIA.cc -cflags "$CFLAGS"
 set_top VMRouterTop_L2PHIA
 open_solution solution_L2PHIA
 cd ../../../project
