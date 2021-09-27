@@ -39,8 +39,11 @@ add_files -tb ../TestBenches/MatchEngine_test.cpp -cflags "$CFLAGS"
 add_files -tb ../emData/ME/
 
 foreach i $modules_to_test {
+  # Pick out  the layer/disk type and number (i.e. L3)
   set layerDisk [string range $i 3 4]
+  # Pick out the phi sector (i.e. C20)
   set iME [string range $i 8 11]
+  # Convert from the module name indexing (1-based) to the enum index (0-based)
   if {[string first "L" $layerDisk] != -1} {
     set kLayerDisk [expr {[string range $i 4 4] - 1}]
   } else {
@@ -53,7 +56,7 @@ foreach i $modules_to_test {
   puts [join [list "top function = " $topfunction] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"KLAYERDISK=" $kLayerDisk "\" -D \"TOPFUNCTION=" $topfunction "\""] ""]
+  set ::env(CCFLAG) [join [list "-D \"KLAYERDISK=" $kLayerDisk "\" -D \"KMODULE=" $i "_\" -D \"TOPFUNCTION=" $topfunction "\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $topfunction

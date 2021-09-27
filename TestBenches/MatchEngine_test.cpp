@@ -6,6 +6,7 @@
 #include "VMProjectionMemory.h"
 #include "VMStubMEMemory.h"
 #include "FileReadUtility.h"
+#include "Macros.h"
 
 // HLS Headers
 #include "hls_math.h"
@@ -27,9 +28,16 @@ using namespace std;
   #define KLAYERDISK 2 // Corresponds to TF::L3
 #endif
 constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
+#if !defined KMODULE
+	#define KMODULE ME_L3PHIC20_
+#endif
 #if !defined TOPFUNCTION
   #define TOPFUNCTION MatchEngineTop_L3
 #endif
+template<TF::layerDisk LayerDisk> constexpr int getLayerDiskNumber() {
+	// Convert from the enum index (0-based) to the module name indexing (1-based)
+  return LayerDisk <= TF::L6 ? LayerDisk + 1 : LayerDisk - (trklet::N_LAYER - 1);
+}
 
 int main() {
 	// Error counter
@@ -47,20 +55,13 @@ int main() {
 	const string vmProjectionsPattern = "VMProjections*";
 	const string vmStubsPattern = "VMStubs*";
 	const string candidateMatchPattern = "CandidateMatches*";
-        string meName = "";
+	string meName = module_name[KMODULE];
 
-	if (kLayerDisk == TF::L1) meName = "ME_L1PHIC12";
-	else if (kLayerDisk == TF::L2) meName = "ME_L2PHIC20";
-	else if (kLayerDisk == TF::L3) meName = "ME_L3PHIC20";
-	else if (kLayerDisk == TF::L4) meName = "ME_L4PHIC20";
-	else if (kLayerDisk == TF::L5) meName = "ME_L5PHIC20";
-	else if (kLayerDisk == TF::L6) meName = "ME_L6PHIC20";
-	else if (kLayerDisk == TF::D1) meName = "ME_D1PHIC20";
-	else if (kLayerDisk == TF::D2) meName = "ME_D2PHIC12";
-	else if (kLayerDisk == TF::D3) meName = "ME_D3PHIC12";
-	else if (kLayerDisk == TF::D4) meName = "ME_D4PHIC12";
-	else if (kLayerDisk == TF::D5) meName = "ME_D5PHIC12";
-        assert(!meName.empty());
+	// Check that the module name is valid and consistent
+	std::cout << "Using the module " << meName << " (layer/disk 0-index enum = " << kLayerDisk
+						<< ", label = " << getLayerDiskNumber<kLayerDisk>() << ")" << std::endl;
+	assert(!meName.empty()); // Make sure the x-macros returned a name
+	assert(meName.find(std::to_string(getLayerDiskNumber<kLayerDisk>())) != std::string::npos); // Make sure the kLayerDisk matches the module name
 
 	// Open the file(s) with the input projections, the stubs, and the reference results
 	TBHelper tbh("ME/" + meName);
