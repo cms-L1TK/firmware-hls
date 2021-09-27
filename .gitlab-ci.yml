@@ -65,6 +65,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
+    - vivado_hls -f ./compileHLS.tcl
     - vivado -mode tcl -source ./makeProject.tcl
     - vivado -mode tcl -source ./runSim.tcl
   artifacts:
@@ -281,11 +282,20 @@ topPRMEMC-sim:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
-  needs: # needed to avoid interference from ME-vitis-hls-build
+  needs:
     - download
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
+    - PR-quality-check
+    - ME-quality-check
+    - MC-quality-check
+topTETC-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TETC"
+  needs:
+    - download
+    - TE-quality-check
+    - TC-quality-check
 topIRVMR-sim:
   <<: *template_topTF-sim
   variables:
@@ -293,31 +303,35 @@ topIRVMR-sim:
     PROJ_NAME: "IRVMR"
   needs:
     - download
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
+    - IR-quality-check
+    - VMR-quality-check
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "PRMEMC"
   needs:
     - download
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
     - topPRMEMC-sim
+topTETC-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "TETC"
+  needs:
+    - download
+    - topTETC-sim
 topIRVMR-check-results:
   <<: *template_check-results
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "IRVMR"
   needs:
     - download
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
     - topIRVMR-sim
 # FW synthesis ---------------
 topPRMEMC-synth:
@@ -326,18 +340,21 @@ topPRMEMC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
     - topPRMEMC-sim
     - topPRMEMC-check-results
+topTETC-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TETC"
+  needs:
+    - topTETC-sim
+    - topTETC-check-results
 topIRVMR-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
     - topIRVMR-sim
     - topIRVMR-check-results
