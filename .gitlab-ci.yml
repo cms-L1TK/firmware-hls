@@ -130,7 +130,7 @@ download:
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
       - ./emData/
-      - ./TrackletAlgorithm/
+      - ./TopFunctions/
     expire_in: 1 week
 # Quality checks ------------
 IR-quality-check:
