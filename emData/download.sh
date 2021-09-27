@@ -241,6 +241,8 @@ then
 fi
 
 # Run scripts to generate top functions in TopFunctions/
+mkdir -p ../TopFunctions/tmp
+mv ../TopFunctions/*.{h,cc} ../TopFunctions/tmp/
 mkdir -p ../TopFunctions/ReducedConfig
 ./generate_IR.py LUTsReduced/wires.dat
 ./generate_VMR.py -a -w LUTsReduced/wires.dat
@@ -250,7 +252,7 @@ mkdir -p ../TopFunctions/ReducedConfig
 ./generate_TB.py LUTsReduced/wires.dat
 ./generate_ME.py -s -w LUTsReduced/wires.dat
 ./generate_VMRCM.py -d -w LUTsReduced/wires.dat
-mv ../TopFunctions/*.h ../TopFunctions/*.cc ../TopFunctions/ReducedConfig/
+mv ../TopFunctions/*.{h,cc} ../TopFunctions/ReducedConfig/
 ./generate_IR.py LUTs/wires.dat
 ./generate_VMR.py -a -w LUTs/wires.dat
 ./generate_TC.py LUTs/wires.dat
@@ -260,6 +262,9 @@ mv ../TopFunctions/*.h ../TopFunctions/*.cc ../TopFunctions/ReducedConfig/
 ./generate_ME.py -s -w LUTs/wires.dat
 ./generate_VMRCM.py -d -w LUTsCM/wires.dat
 ./generate_TP.py LUTsCM/wires.dat
+mv ../TopFunctions/tmp/*.{h,cc} ../TopFunctions/
+rm -rf ../TopFunctions/tmp
+
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
 then
