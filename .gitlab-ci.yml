@@ -137,57 +137,57 @@ IR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TrackletAlgorithm/InputRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/InputRouterTop.cc'
 VMR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop_L2PHIA.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TopFunctions/VMRouterTop_L2PHIA.cc'
 VMRCM-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TrackletAlgorithm/VMRouterCMTop_L2PHIA.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/VMRouterCMTop_L2PHIA.cc'
 TE-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TrackletAlgorithm/TrackletEngineTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TopFunctions/TrackletEngineTop.cc'
 TC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TrackletAlgorithm/TrackletCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TopFunctions/TrackletCalculatorTop.cc'
 TP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TrackletAlgorithm/TrackletProcessorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/TrackletProcessorTop.cc'
 PR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/ProjectionRouter_test.cpp ../TrackletAlgorithm/ProjectionRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/ProjectionRouter_test.cpp ../TopFunctions/ProjectionRouterTop.cc'
 ME-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngineTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TopFunctions/MatchEngineTop.cc'
 MC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TopFunctions/MatchCalculatorTop.cc'
 MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TrackletAlgorithm/MatchProcessorTopL3.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TopFunctions/MatchProcessorTopL3.cpp'
 TB-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TrackletAlgorithm/TrackBuilderTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/TrackBuilderTop.cc'
 # HLS builds ---------------
 IR-vivado-hls-build:
   <<: *template_hls-build
