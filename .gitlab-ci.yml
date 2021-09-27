@@ -3,7 +3,7 @@ variables:
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
   CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7.0/root/bin/clang-tidy'
   CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
-  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
+  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TopFunctions -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
 
 stages: # ---------------------------------------------------------------------
   - lint
