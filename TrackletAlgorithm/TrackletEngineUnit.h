@@ -35,7 +35,7 @@ class TrackletEngineUnit {
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 
 /////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
-    if (Seed==TF::L1L2&&TC::A){
+    if (Seed==TF::L1L2&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2A_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -47,7 +47,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::B){
+    else if (Seed==TF::L1L2&& iTC==TC::B){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2B_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -59,7 +59,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::C){
+    else if (Seed==TF::L1L2&& iTC==TC::C){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2C_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -71,7 +71,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::D){
+    else if (Seed==TF::L1L2&& iTC==TC::D){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -83,7 +83,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::E){
+    else if (Seed==TF::L1L2&& iTC==TC::E){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2E_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -95,7 +95,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::F){
+    else if (Seed==TF::L1L2&& iTC==TC::F){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2F_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -107,7 +107,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::G){
+    else if (Seed==TF::L1L2&& iTC==TC::G){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2G_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -119,7 +119,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::H){
+    else if (Seed==TF::L1L2&& iTC==TC::H){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2H_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -131,7 +131,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::I){
+    else if (Seed==TF::L1L2&& iTC==TC::I){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2I_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -143,7 +143,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::J){
+    else if (Seed==TF::L1L2&& iTC==TC::J){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2J_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -155,7 +155,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::K){
+    else if (Seed==TF::L1L2&& iTC==TC::K){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2K_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -167,7 +167,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L1L2&&TC::L){
+    else if (Seed==TF::L1L2&& iTC==TC::L){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L1L2L_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -179,7 +179,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L2L3&&TC::A){
+    else if (Seed==TF::L2L3&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L2L3A_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -191,7 +191,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L2L3&&TC::B){
+    else if (Seed==TF::L2L3&& iTC==TC::B){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L2L3B_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -203,7 +203,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L2L3&&TC::C){
+    else if (Seed==TF::L2L3&& iTC==TC::C){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -215,7 +215,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L2L3&&TC::D){
+    else if (Seed==TF::L2L3&& iTC==TC::D){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L2L3D_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -227,7 +227,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L3L4&&TC::A){
+    else if (Seed==TF::L3L4&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L3L4A_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -239,7 +239,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L3L4&&TC::B){
+    else if (Seed==TF::L3L4&& iTC==TC::B){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L3L4B_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -251,7 +251,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L3L4&&TC::C){
+    else if (Seed==TF::L3L4&& iTC==TC::C){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -263,7 +263,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L3L4&&TC::D){
+    else if (Seed==TF::L3L4&& iTC==TC::D){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L3L4D_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -275,7 +275,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L5L6&&TC::A){
+    else if (Seed==TF::L5L6&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L5L6A_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -287,7 +287,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L5L6&&TC::B){
+    else if (Seed==TF::L5L6&& iTC==TC::B){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L5L6B_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -299,7 +299,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L5L6&&TC::C){
+    else if (Seed==TF::L5L6&& iTC==TC::C){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
@@ -311,7 +311,7 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L5L6&&TC::D){
+    else if (Seed==TF::L5L6&& iTC==TC::D){
       const ap_uint<1> stubptinnertmp[]=
 #include "../emData/TP/tables/TP_L5L6D_stubptinnercut.tab"
       const ap_uint<1> stubptoutertmp[]=
