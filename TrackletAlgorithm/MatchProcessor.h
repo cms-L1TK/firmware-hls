@@ -337,6 +337,7 @@ void MatchCalculator(BXType bx,
   // probably should move these to constants file
   const ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
   const ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
+  const ap_uint<4> kNbitsphiprojD  = 14; // nbitsphiprojD in emulation (defined in constants) 
   const ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
   const ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
   const ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
@@ -349,11 +350,13 @@ void MatchCalculator(BXType bx,
   const auto kPhi0_shift         = (LAYER < TF::L4)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
   const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
-  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 + kNbitsrL456;                                           // icorrshift for L456
-  const auto kPhi_corr_shift     = (LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
+  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456; //FIXME was  + kNbitsrL456;                                           // icorrshift for L456
+  const auto kPhi_corr_shift     = (LAYER < TF::D1) ? ((LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456) : ap_uint<10>(6);                            // icorrshift_/shifttmp  in emulation
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
+  const auto kr_corr_shift       = (LAYER < TF::D1)? 0 : 7;                                  // shifttmp2 in emulation
+
 
   const auto LUT_matchcut_phi_width = 17;
   const auto LUT_matchcut_phi_depth = 12;
@@ -373,10 +376,11 @@ void MatchCalculator(BXType bx,
   AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
   
   // Stub parameters
-  typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
-  typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
-  typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
-  typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
+  typename AllStub<ASTYPE>::ASR     stub_r     = stub.getR();
+  typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
+  typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
+  typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
+  typename AllStub<ASTYPE>::ASALPHA stub_alpha = stub.getAlpha();
 
   // Projection parameters
   typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
@@ -391,23 +395,31 @@ void MatchCalculator(BXType bx,
   // Get phi and z correction
   ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
   ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
+  ap_int<18> full_r_corr   = stub_z * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
   ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
+  ap_int<12> r_corr        = full_r_corr >> kr_corr_shift; // only keep needed bits
    
   // Apply the corrections
   const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
-  ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
+  ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction iphi in emulation
   ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
+  ap_int<13> proj_r_corr   = proj_z + r_corr;      // original proj r plus r correction ir in emulation
 
   // Get phi and z difference between the projection and stub
-  ap_int<10> delta_z         = stub_z - proj_z_corr;
+  ap_int<10> delta_z        = stub_z - proj_z_corr;
   ap_int<14> delta_z_fact   = delta_z * kFact;
+  ap_int<10> delta_r        = (stub_r >> 1) - proj_r_corr;
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-  ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
+  ap_int<17> delta_phi      = (LAYER < TF::D1) ? shiftstubphi - shiftprojphi : stub_phi * kphi - proj_phi_corr;
+  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
   ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
+  ap_uint<4> alpha_fact     = 0;// (LAYER >= TF::D3) ? ialphafactouter_[irstub] : ialphafactinner_[irstub];
+  ap_uint<4> shiftalphaphi  = 12;
+  ap_int<14> alpha_corr = (LAYER < TF::D3) ? ap_int<14>(0) : delta_r * stub_alpha * alpha_fact >> shiftalphaphi;
 
   // Full match parameters
   const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -434,7 +446,7 @@ void MatchCalculator(BXType bx,
   best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
 
   // Check that matches fall within the selection window of the projection 
-  if ((delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+  if (LAYER <  TF::D1 && (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     best_delta_phi = abs_delta_phi;
