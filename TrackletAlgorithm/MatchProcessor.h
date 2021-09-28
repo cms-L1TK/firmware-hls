@@ -918,14 +918,13 @@ void MatchCalculator(BXType bx,
   const auto kPhi0_shift         = (LAYER < TF::L4)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
   const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
-  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 + kNbitsrL456;
-  const auto kPhi_corr_shift     = (LAYER < TF::D1) ? 
-                                   ((LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456) // barrel
-                                   : ap_uint<10>(6); // disk                        // icorrshift_/shifttmp  in emulation
+  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456; //FIXME was  + kNbitsrL456;                                           // icorrshift for L456
+  const auto kPhi_corr_shift     = (LAYER < TF::D1) ? ((LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456) : ap_uint<10>(6);                            // icorrshift_/shifttmp  in emulation
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
   const auto kr_corr_shift       = (LAYER < TF::D1)? 0 : 7;                                  // shifttmp2 in emulation
+
 
   const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
   const auto LUT_matchcut_phi_width = 17;
@@ -981,16 +980,7 @@ void MatchCalculator(BXType bx,
   typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
   typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
   typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
-  typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
-  typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
-  typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
-  typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
-  ap_uint<12>                      stub_2s_r    = stub_2s.getR();
-  typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
-  typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
-  typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
-  typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
-  auto isPSStub = stub_ps.isPSStub();
+  typename AllStub<ASTYPE>::ASALPHA stub_alpha = stub.getAlpha();
 
   // Projection parameters
   typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
@@ -1021,43 +1011,22 @@ void MatchCalculator(BXType bx,
   const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
   ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction iphi in emulation
   ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
+  ap_int<13> proj_r_corr   = proj_z + r_corr;      // original proj r plus r correction ir in emulation
 
   // Get phi and z difference between the projection and stub
-  ap_int<12> delta_z        = stub_z - proj_z_corr;
+  ap_int<10> delta_z        = stub_z - proj_z_corr;
   ap_int<14> delta_z_fact   = delta_z * kFact;
-  const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
+  ap_int<10> delta_r        = (stub_r >> 1) - proj_r_corr;
+  ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
-  ap_int<18> shiftstubphi   = kPhi0_shift > 0 ? stub_phi_long << kPhi0_shift : stub_phi_long;                        // shift
-  shiftstubphi = (isDisk && isPSStub) ? ap_int<18>(stub_ps_phi) : shiftstubphi;
-  shiftstubphi = (isDisk && !isPSStub) ? ap_int<18>(stub_2s_phi) : shiftstubphi;
-  ap_int<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-  constexpr int dphibit = 20;
-  ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
-  ap_uint<3> shiftprojz     = 7;
-  ap_int<7> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
-  if(isDisk && isPSStub)
-    proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
-  else if(isDisk)
-    proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
-  const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
-  ap_uint<1> shiftr         = 1;
-  ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
-  ap_uint<12> disk_stubr2s = LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)];
-
-  if(isDisk && isPSStub) {
-    delta_r   = (ap_uint<12>(stub_ps_r) >> shiftr) - proj_r_long; // proj_z = RZ
-  }
-  else if(isDisk && !isPSStub) {
-    auto alpha_fact = LUT_matchcut_alpha[ap_uint<12>(stub_2s_r)];
-    disk_stubr2s = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
-    delta_r   = ((disk_stubr2s >> shiftr) - proj_r_long); // proj_z = RZ
-    ap_uint<4> alpha_shift = 12;
-    ap_uint<12> alpha_corr = ap_int<24>(ap_int<24>(delta_r) * stub_2s_alpha * alpha_fact) >> alpha_shift;
-    delta_phi += alpha_corr;
-  }
-  constexpr int adphibit = isDisk ? 12 : 17;
-  ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
-  ap_int<12> abs_delta_r    = iabs<11>( delta_r );
+  ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
+  ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
+  ap_int<17> delta_phi      = (LAYER < TF::D1) ? shiftstubphi - shiftprojphi : stub_phi * kphi - proj_phi_corr;
+  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
+  ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
+  ap_uint<4> alpha_fact     = 0;// (LAYER >= TF::D3) ? ialphafactouter_[irstub] : ialphafactinner_[irstub];
+  ap_uint<4> shiftalphaphi  = 12;
+  ap_int<14> alpha_corr = (LAYER < TF::D3) ? ap_int<14>(0) : delta_r * stub_alpha * alpha_fact >> shiftalphaphi;
 
   // Full match parameters
   const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -1097,11 +1066,7 @@ void MatchCalculator(BXType bx,
   }
 
   // Check that matches fall within the selection window of the projection 
-  bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi < best_delta_phi);
-  bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(disk_stubr2s)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
-  disk_match = isMatch ? disk_match && (abs_delta_phi < best_delta_phi) : disk_match;
-  isMatch |= disk_match;
-  if ((!isDisk && barrel_match) || (isDisk && disk_match)){
+  if (LAYER <  TF::D1 && (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     if(isDisk) {
