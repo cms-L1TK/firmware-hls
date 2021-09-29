@@ -130,7 +130,7 @@ class MemoryTemplateBinnedCM{
     else {
 #ifndef __SYNTHESIS__
       if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-	edm::LogWarning("L1trackHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
+	edm::LogVerbatim("L1trackHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
       }
 #endif
       return false;
