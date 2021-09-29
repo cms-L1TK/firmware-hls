@@ -366,7 +366,7 @@ constexpr int rzSizeTE(3);
 /////////////////////////////////////////////////////
 // VMRouterCM Top Function
 
-void VMRouterCMTop(const BXType bx, BXType& bx_o
+void %s(const BXType bx, BXType& bx_o
 	// Input memories
 	, const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
@@ -380,12 +380,12 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 #endif
 	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits[layerdisk-1]> memoriesTEO[numTEOCopies]
+	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
 #endif
 	);
 
-#endif // TrackletAlgorithm_VMRouterCMTop_h
-"""
+#endif // TrackletAlgorithm_VMRouterCM_h
+""" % file_name
     )
 
     header_file.close()
@@ -414,7 +414,7 @@ def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
 //          OR
 //          - run emData/generateCM_VMR.py to generate new top and parameters files
 
-void VMRouterCMTop(const BXType bx, BXType& bx_o
+void %s(const BXType bx, BXType& bx_o
 	// Input memories
 	, const InputStubMemory<inputType> inputStubs[numInputs]
 #if kDISK > 0
@@ -428,12 +428,12 @@ void VMRouterCMTop(const BXType bx, BXType& bx_o
 #endif
 	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits[layerdisk-1]> memoriesTEO[numTEOCopies]
+	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
 #endif
 	) {
 
 // Takes 2 clock cycles before on gets data, used at high frequencies
-"""
+""" % file_name
     )
 
     for i in range(num_inputs):

@@ -1,5 +1,5 @@
 // Test bench for VMRouter Combined Modules
-#include "VMRouterCMTop.h"
+#include "VMRouterCMTop_L2PHIA.h"
 
 #include <algorithm>
 #include <iterator>
@@ -77,7 +77,7 @@ int main() {
   static AllStubMemory<outputType> memoriesAS[numASCopies];
   static AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies];
   static VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> memoryME;
-  static VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits[(kLAYER) ? kLAYER-2 : kDISK+4]> memoriesTEO[numTEOCopies];
+  static VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies];
 
 
   ///////////////////////////
@@ -119,7 +119,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterCMTop(bx, bx_out, inputStubs
+    VMRouterCMTop_L2PHIA(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
@@ -152,7 +152,7 @@ int main() {
     //TE Outer memories
     if (nVMSTE) {
       for (unsigned int i = 0; i < nVMSTE; i++) {
-        err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnits[(kLAYER) ? kLAYER-2 : kDISK+4]>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
+        err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
       }
     }
   } // End of event loop
