@@ -16,7 +16,7 @@ inline const int floatToInt(const double x, const double k) {
 
 constexpr int kNTEUnits[8] = {5, 2, 5, 3, 3, 2, 3, 2}; // Number of TE units w.r.t. seed type
 constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Number of TE units w.r.t. the layer/disk number. 
-// The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types, took the largest value for now...
+// The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types (L1D1, L2D1), take the largest value for now...
 constexpr int kNbitsrzbin = 3;
 constexpr int kNbitsphibin = 3;
 

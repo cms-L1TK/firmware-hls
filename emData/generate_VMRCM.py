@@ -384,7 +384,7 @@ void %s(const BXType bx, BXType& bx_o
 #endif
 	);
 
-#endif // TrackletAlgorithm_VMRouterCM_h
+#endif // TrackletAlgorithm_VMRouterCMTop_h
 """ % file_name
     )
 
