@@ -217,6 +217,7 @@ fi
 ./generate_MC.py LUTs/wires.dat
 ./generate_TB.py LUTs/wires.dat
 ./generate_ME.py -s
+./generate_VMRCM.py -d -w LUTsCM/wires.dat
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
