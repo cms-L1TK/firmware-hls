@@ -30,14 +30,9 @@ class TrackHandler{
     TrackFit::TrackWord trkWord;
     TrackFit::BarrelStubWord barrelStubArray[4][10]; //adding extra dimension to array of size 10
     TrackFit::DiskStubWord diskStubArray[4][10];
+
     
-    //masterTrack;
-    //track;
-
-    //Buffer 1D array of TH objects, each containing the 2d array of stubs
     
-
-
     //TrackFit::TFSTUBINDEX getStubIndex(int Hit) const {
     //  assert(Hit >= 0 && Hit <= kNStubs - 1);
     //  return track.range(TrackFitBits::kTFStubIndexMSB(Hit),TrackFitBits::kTFStubIndexLSB(Hit));
@@ -66,4 +61,8 @@ class TrackHandler{
 
 
   private:
+
+  bool CompareTrack(TrackHandler track, unsigned int& matchFound);
+
+  void MergeTrack(TrackHandler track, TrackHandler mergedTrack, unsigned int& matchFound);
 };
