@@ -29,7 +29,8 @@ const TrackFit::BarrelStubWord barrelStubWords[4],
 const TrackFit::DiskStubWord diskStubWords[4]){
   //put tracks into buffer
   for (bufferIndex = 0; bufferIndex < kMaxProc; bufferIndex++){
-    TrackHandler nextTrack(trackWord, barrelStubWords, diskStubWords) = inputBuffer[bufferIndex];
+    TrackHandler nextTrack[8][10];
+    
   }
 
   //inputBuffer[bufferIndex] = nextTrack;
@@ -54,7 +55,7 @@ void TrackMerger(const BXType bx,
       TrackFit::BarrelStubWord brlStubs[4]={barrelStubWords[0][i],barrelStubWords[1][i],barrelStubWords[2][i],barrelStubWords[3][i]};
       TrackFit::DiskStubWord diskStubs[4]={diskStubWords[0][i],diskStubWords[1][i],diskStubWords[2][i],diskStubWords[3][i]} ;
       
-      comparisonModule[0].InputTrack(trackWord[i] ,  brlStubs , diskStubs); //how to make input track from constructor the input
+      comparisonModule[0].InputTrack(trackWord[i], brlStubs, diskStubs); //how to make input track from constructor the input
       //fill what to keep from InputTrack
     }
 
