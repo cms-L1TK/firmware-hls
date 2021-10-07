@@ -17,26 +17,31 @@ class TrackHandler{
       //all the information from the track and stub words;
       trkWord = trackWord;
       for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
-        barrelStubArray[j] = barrelStubWords[j];
+        barrelStubArray[j][0] = barrelStubWords[j];
       }
 
     for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
-        diskStubArray[k] = diskStubWords[k];
+        diskStubArray[k][0] = diskStubWords[k];
     }
     
     }
   
     ~TrackHandler(){};
     TrackFit::TrackWord trkWord;
-    TrackFit::BarrelStubWord barrelStubArray[4];
-    TrackFit::DiskStubWord diskStubArray[4];
-    nextTrack;
+    TrackFit::BarrelStubWord barrelStubArray[4][10]; //adding extra dimension to array of size 10
+    TrackFit::DiskStubWord diskStubArray[4][10];
+    
+    //masterTrack;
+    //track;
+
+    //Buffer 1D array of TH objects, each containing the 2d array of stubs
+    
 
 
-    TrackFit::TFSTUBINDEX getStubIndex(int Hit) const {
-      assert(Hit >= 0 && Hit <= kNStubs - 1);
-      return track.range(TrackFitBits::kTFStubIndexMSB(Hit),TrackFitBits::kTFStubIndexLSB(Hit));
-    }
+    //TrackFit::TFSTUBINDEX getStubIndex(int Hit) const {
+    //  assert(Hit >= 0 && Hit <= kNStubs - 1);
+    //  return track.range(TrackFitBits::kTFStubIndexMSB(Hit),TrackFitBits::kTFStubIndexLSB(Hit));
+    //}
     // TFSTUBPHIRESID getStubPhiResid(int Hit) const {
     //   assert(Hit >= 0 && Hit <= kNStubs - 1);
     //   return track.range(TrackFitBits::kTFStubPhiResidMSB(Hit),TrackFitBits::kTFStubPhiResidLSB(Hit));
