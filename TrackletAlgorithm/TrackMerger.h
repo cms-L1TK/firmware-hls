@@ -18,24 +18,14 @@ class ComparisonModule{
     
     
   private:
-    bool CompareTracks(const TrackHandler masterTrack, const TrackHandler track);
-    
-
-    void MergeTrack(TrackHandler &masterTrack, const TrackHandler track);
-    
-
     //input buffer for each comparison module 
     TrackHandler inputBuffer[kMaxProc];
     unsigned int bufferIndex;
 
 };
-// could change the member functions in the scope of the comparison module
+
 // make compare track a member of track handler, to get stub IDs (with a parameter that is a layer) - returns an array of const stub IDs
-// masterTrack.compareTrack(track) ? as it has access to info of master, need to find a way to getting info of second track, accessing by the interface
-//OR keep it as CM member fn, or keep it in the scope and pass it 2 track handler objects
-// always make data memebers private, as otherwise they can be changed by accident
-
-
+// masterTrack.compareTrack(track)  as it has access to info of master, need to find a way to getting info of second track, accessing by the interface
 
 
 void TrackMerger(const BXType bx,
