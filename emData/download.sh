@@ -251,7 +251,7 @@ mkdir -p ../TopFunctions/ReducedConfig
 ./generate_MC.py LUTsReduced/wires.dat
 ./generate_TB.py LUTsReduced/wires.dat
 ./generate_ME.py -s -w LUTsReduced/wires.dat
-./generate_VMRCM.py -d -w LUTsReduced/wires.dat
+#./generate_VMRCM.py -d -w LUTsReduced/wires.dat
 mv ../TopFunctions/*.{h,cc} ../TopFunctions/ReducedConfig/
 ./generate_IR.py LUTs/wires.dat
 ./generate_VMR.py -a -w LUTs/wires.dat
