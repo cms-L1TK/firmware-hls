@@ -17,12 +17,12 @@ entity SectorProcessor is
     DL_39_link_AV_dout       : in t_arr_DL_39_DATA;
     DL_39_link_empty_neg     : in t_arr_DL_39_1b;
     DL_39_link_read          : out t_arr_DL_39_1b;
-    BW_46_stream_AV_din       : out t_arr_BW_46_DATA;
-    BW_46_stream_A_full_neg   : in t_arr_BW_46_1b;
-    BW_46_stream_A_write      : out t_arr_BW_46_1b;
     TW_84_stream_AV_din       : out t_arr_TW_84_DATA;
     TW_84_stream_A_full_neg   : in t_arr_TW_84_1b;
-    TW_84_stream_A_write      : out t_arr_TW_84_1b
+    TW_84_stream_A_write      : out t_arr_TW_84_1b;
+    BW_46_stream_AV_din       : out t_arr_BW_46_DATA;
+    BW_46_stream_A_full_neg   : in t_arr_BW_46_1b;
+    BW_46_stream_A_write      : out t_arr_BW_46_1b
   );
 end SectorProcessor;
 
@@ -662,13 +662,15 @@ begin
       bx_V          => IR_bx_in,
       bx_o_V        => IR_bx_out,
       bx_o_V_ap_vld => IR_bx_out_vld,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS10G_1_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS10G_1_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS10G_1_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS10G_1_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS10G_1_A),
+      hInputStubs_V_read     => DL_39_link_read(PS10G_1_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L1PHID_PS10G_1_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L1PHID_PS10G_1_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L1PHID_PS10G_1_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L1PHID_PS10G_1_A),
+      hLinkWord_V => "00100000000000000011",
+      hPhBnWord_V => "00000000000000000000000000001000"
   );
 
   IR_PS10G_2_A : entity work.IR_PS10G_2_A
@@ -680,13 +682,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS10G_2_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS10G_2_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS10G_2_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS10G_2_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS10G_2_A),
+      hInputStubs_V_read     => DL_39_link_read(PS10G_2_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L1PHID_PS10G_2_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L1PHID_PS10G_2_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L1PHID_PS10G_2_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L1PHID_PS10G_2_A),
+      hLinkWord_V => "00100000000000000011",
+      hPhBnWord_V => "00000000000000000000000000001000"
   );
 
   IR_PS10G_2_B : entity work.IR_PS10G_2_B
@@ -698,13 +702,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS10G_2_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS10G_2_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS10G_2_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS10G_2_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS10G_2_B),
+      hInputStubs_V_read     => DL_39_link_read(PS10G_2_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L1PHID_PS10G_2_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L1PHID_PS10G_2_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L1PHID_PS10G_2_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L1PHID_PS10G_2_B),
+      hLinkWord_V => "00100000000000000011",
+      hPhBnWord_V => "00000000000000000000000000001000"
   );
 
   IR_PS10G_3_A : entity work.IR_PS10G_3_A
@@ -716,13 +722,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS10G_3_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS10G_3_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS10G_3_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS10G_3_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS10G_3_A),
+      hInputStubs_V_read     => DL_39_link_read(PS10G_3_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L2PHIB_PS10G_3_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L2PHIB_PS10G_3_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L2PHIB_PS10G_3_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L2PHIB_PS10G_3_A),
+      hLinkWord_V => "00100000000000000101",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_PS10G_3_B : entity work.IR_PS10G_3_B
@@ -734,13 +742,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS10G_3_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS10G_3_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS10G_3_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS10G_3_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS10G_3_B),
+      hInputStubs_V_read     => DL_39_link_read(PS10G_3_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L2PHIB_PS10G_3_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L2PHIB_PS10G_3_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L2PHIB_PS10G_3_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L2PHIB_PS10G_3_B),
+      hLinkWord_V => "00100000000000000101",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_PS_1_A : entity work.IR_PS_1_A
@@ -752,13 +762,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS_1_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS_1_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS_1_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS_1_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS_1_A),
+      hInputStubs_V_read     => DL_39_link_read(PS_1_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L3PHIB_PS_1_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L3PHIB_PS_1_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_1_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_1_A),
+      hLinkWord_V => "00100000000000000111",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_PS_1_B : entity work.IR_PS_1_B
@@ -770,13 +782,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS_1_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS_1_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS_1_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS_1_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS_1_B),
+      hInputStubs_V_read     => DL_39_link_read(PS_1_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L3PHIB_PS_1_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L3PHIB_PS_1_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_1_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_1_B),
+      hLinkWord_V => "00100000000000000111",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_PS_2_A : entity work.IR_PS_2_A
@@ -788,13 +802,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS_2_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS_2_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS_2_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS_2_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS_2_A),
+      hInputStubs_V_read     => DL_39_link_read(PS_2_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L3PHIB_PS_2_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L3PHIB_PS_2_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_2_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_2_A),
+      hLinkWord_V => "00100000000000000111",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_PS_2_B : entity work.IR_PS_2_B
@@ -806,13 +822,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_PS_2_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_PS_2_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_PS_2_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(PS_2_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(PS_2_B),
+      hInputStubs_V_read     => DL_39_link_read(PS_2_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L3PHIB_PS_2_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L3PHIB_PS_2_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_2_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L3PHIB_PS_2_B),
+      hLinkWord_V => "00100000000000000111",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_1_A : entity work.IR_2S_1_A
@@ -824,9 +842,9 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_1_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_1_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_1_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_1_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_1_A),
+      hInputStubs_V_read     => DL_39_link_read(twoS_1_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L4PHIB_2S_1_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L4PHIB_2S_1_A),
@@ -836,7 +854,7 @@ begin
       hOutputStubs_1_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L5PHIB_2S_1_A),
       hOutputStubs_1_dataarray_data_V_d0        => IL_36_mem_AV_din(L5PHIB_2S_1_A),
       hLinkWord_V => "01010000000010111001",
-      hPhBnWord_V => "000000000000"
+      hPhBnWord_V => "00000000000000000000001000000010"
   );
 
   IR_2S_1_B : entity work.IR_2S_1_B
@@ -848,13 +866,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_1_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_1_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_1_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_1_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_1_B),
+      hInputStubs_V_read     => DL_39_link_read(twoS_1_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L4PHIB_2S_1_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L4PHIB_2S_1_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L4PHIB_2S_1_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L4PHIB_2S_1_B),
+      hLinkWord_V => "00110000000000001001",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_2_A : entity work.IR_2S_2_A
@@ -866,13 +886,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_2_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_2_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_2_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_2_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_2_A),
+      hInputStubs_V_read     => DL_39_link_read(twoS_2_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L5PHIB_2S_2_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L5PHIB_2S_2_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L5PHIB_2S_2_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L5PHIB_2S_2_A),
+      hLinkWord_V => "00110000000000001011",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_2_B : entity work.IR_2S_2_B
@@ -884,13 +906,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_2_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_2_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_2_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_2_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_2_B),
+      hInputStubs_V_read     => DL_39_link_read(twoS_2_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L5PHIB_2S_2_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L5PHIB_2S_2_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L5PHIB_2S_2_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L5PHIB_2S_2_B),
+      hLinkWord_V => "00110000000000001011",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_3_A : entity work.IR_2S_3_A
@@ -902,13 +926,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_3_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_3_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_3_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_3_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_3_A),
+      hInputStubs_V_read     => DL_39_link_read(twoS_3_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L6PHIB_2S_3_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L6PHIB_2S_3_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_3_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_3_A),
+      hLinkWord_V => "00110000000000001101",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_3_B : entity work.IR_2S_3_B
@@ -920,13 +946,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_3_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_3_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_3_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_3_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_3_B),
+      hInputStubs_V_read     => DL_39_link_read(twoS_3_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L6PHIB_2S_3_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L6PHIB_2S_3_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_3_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_3_B),
+      hLinkWord_V => "00110000000000001101",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_4_A : entity work.IR_2S_4_A
@@ -938,13 +966,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_4_A),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_4_A),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_4_A),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_4_A),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_4_A),
+      hInputStubs_V_read     => DL_39_link_read(twoS_4_A),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L6PHIB_2S_4_A),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L6PHIB_2S_4_A),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_4_A)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_4_A),
+      hLinkWord_V => "00110000000000001101",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   IR_2S_4_B : entity work.IR_2S_4_B
@@ -956,13 +986,15 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_in,
-      hInputStubs_V_dout     => DL_39_link_AV_dout(DTC_2S_4_B),
-      hInputStubs_V_empty_n  => DL_39_link_empty_neg(DTC_2S_4_B),
-      hInputStubs_V_read     => DL_39_link_read(DTC_2S_4_B),
+      hInputStubs_V_dout     => DL_39_link_AV_dout(twoS_4_B),
+      hInputStubs_V_empty_n  => DL_39_link_empty_neg(twoS_4_B),
+      hInputStubs_V_read     => DL_39_link_read(twoS_4_B),
       hOutputStubs_0_dataarray_data_V_ce0       => open,
       hOutputStubs_0_dataarray_data_V_we0       => IL_36_mem_A_wea(L6PHIB_2S_4_B),
       hOutputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(L6PHIB_2S_4_B),
-      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_4_B)
+      hOutputStubs_0_dataarray_data_V_d0        => IL_36_mem_AV_din(L6PHIB_2S_4_B),
+      hLinkWord_V => "00110000000000001101",
+      hPhBnWord_V => "00000000000000000000000000000010"
   );
 
   TE_start <= '1' when VMR_done = '1';
@@ -1352,7 +1384,7 @@ begin
 
   TE_L1PHID14_L2PHIB15_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID14_L2PHIB15_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB15_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1366,7 +1398,7 @@ begin
 
   TE_L1PHID14_L2PHIB15_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID14_L2PHIB15_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB15_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1429,7 +1461,7 @@ begin
 
   TE_L1PHID14_L2PHIB16_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID14_L2PHIB16_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB16_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1443,7 +1475,7 @@ begin
 
   TE_L1PHID14_L2PHIB16_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID14_L2PHIB16_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB16_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1502,7 +1534,7 @@ begin
 
   TE_L1PHID15_L2PHIB13_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB13_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB13_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1516,7 +1548,7 @@ begin
 
   TE_L1PHID15_L2PHIB13_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB13_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB13_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1575,7 +1607,7 @@ begin
 
   TE_L1PHID15_L2PHIB14_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB14_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB14_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1589,7 +1621,7 @@ begin
 
   TE_L1PHID15_L2PHIB14_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB14_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB14_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1648,7 +1680,7 @@ begin
 
   TE_L1PHID15_L2PHIB15_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB15_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB15_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1662,7 +1694,7 @@ begin
 
   TE_L1PHID15_L2PHIB15_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB15_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB15_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1721,7 +1753,7 @@ begin
 
   TE_L1PHID15_L2PHIB16_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB16_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB16_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1735,7 +1767,7 @@ begin
 
   TE_L1PHID15_L2PHIB16_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID15_L2PHIB16_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB16_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1794,7 +1826,7 @@ begin
 
   TE_L1PHID16_L2PHIB14_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID16_L2PHIB14_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB14_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1808,7 +1840,7 @@ begin
 
   TE_L1PHID16_L2PHIB14_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID16_L2PHIB14_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB14_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1867,7 +1899,7 @@ begin
 
   TE_L1PHID16_L2PHIB15_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID16_L2PHIB15_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB15_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1881,7 +1913,7 @@ begin
 
   TE_L1PHID16_L2PHIB15_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID16_L2PHIB15_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB15_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1940,7 +1972,7 @@ begin
 
   TE_L1PHID16_L2PHIB16_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID16_L2PHIB16_stubptinnercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB16_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1954,7 +1986,7 @@ begin
 
   TE_L1PHID16_L2PHIB16_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => "../../../emData/LUTs/TE_L1PHID16_L2PHIB16_stubptoutercut.tab",
+      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB16_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -5363,21 +5395,33 @@ begin
       barrelFullMatches_0_dataarray_data_V_q0        => FM_52_mem_AV_dout(L1L2_L3PHIB),
       barrelFullMatches_0_nentries_0_V               => FM_52_mem_AAV_dout_nent(L1L2_L3PHIB)(0),
       barrelFullMatches_0_nentries_1_V               => FM_52_mem_AAV_dout_nent(L1L2_L3PHIB)(1),
+      barrelFullMatches_0_dataarray_data_V_ce1       => FM_52_mem_A_enb(L1L2_L3PHIB),
+      barrelFullMatches_0_dataarray_data_V_address1  => FM_52_mem_AV_readaddr(L1L2_L3PHIB),
+      barrelFullMatches_0_dataarray_data_V_q1        => FM_52_mem_AV_dout(L1L2_L3PHIB),
       barrelFullMatches_1_dataarray_data_V_ce0       => FM_52_mem_A_enb(L1L2_L4PHIB),
       barrelFullMatches_1_dataarray_data_V_address0  => FM_52_mem_AV_readaddr(L1L2_L4PHIB),
       barrelFullMatches_1_dataarray_data_V_q0        => FM_52_mem_AV_dout(L1L2_L4PHIB),
       barrelFullMatches_1_nentries_0_V               => FM_52_mem_AAV_dout_nent(L1L2_L4PHIB)(0),
       barrelFullMatches_1_nentries_1_V               => FM_52_mem_AAV_dout_nent(L1L2_L4PHIB)(1),
+      barrelFullMatches_1_dataarray_data_V_ce1       => FM_52_mem_A_enb(L1L2_L4PHIB),
+      barrelFullMatches_1_dataarray_data_V_address1  => FM_52_mem_AV_readaddr(L1L2_L4PHIB),
+      barrelFullMatches_1_dataarray_data_V_q1        => FM_52_mem_AV_dout(L1L2_L4PHIB),
       barrelFullMatches_2_dataarray_data_V_ce0       => FM_52_mem_A_enb(L1L2_L5PHIB),
       barrelFullMatches_2_dataarray_data_V_address0  => FM_52_mem_AV_readaddr(L1L2_L5PHIB),
       barrelFullMatches_2_dataarray_data_V_q0        => FM_52_mem_AV_dout(L1L2_L5PHIB),
       barrelFullMatches_2_nentries_0_V               => FM_52_mem_AAV_dout_nent(L1L2_L5PHIB)(0),
       barrelFullMatches_2_nentries_1_V               => FM_52_mem_AAV_dout_nent(L1L2_L5PHIB)(1),
+      barrelFullMatches_2_dataarray_data_V_ce1       => FM_52_mem_A_enb(L1L2_L5PHIB),
+      barrelFullMatches_2_dataarray_data_V_address1  => FM_52_mem_AV_readaddr(L1L2_L5PHIB),
+      barrelFullMatches_2_dataarray_data_V_q1        => FM_52_mem_AV_dout(L1L2_L5PHIB),
       barrelFullMatches_3_dataarray_data_V_ce0       => FM_52_mem_A_enb(L1L2_L6PHIB),
       barrelFullMatches_3_dataarray_data_V_address0  => FM_52_mem_AV_readaddr(L1L2_L6PHIB),
       barrelFullMatches_3_dataarray_data_V_q0        => FM_52_mem_AV_dout(L1L2_L6PHIB),
       barrelFullMatches_3_nentries_0_V               => FM_52_mem_AAV_dout_nent(L1L2_L6PHIB)(0),
       barrelFullMatches_3_nentries_1_V               => FM_52_mem_AAV_dout_nent(L1L2_L6PHIB)(1),
+      barrelFullMatches_3_dataarray_data_V_ce1       => FM_52_mem_A_enb(L1L2_L6PHIB),
+      barrelFullMatches_3_dataarray_data_V_address1  => FM_52_mem_AV_readaddr(L1L2_L6PHIB),
+      barrelFullMatches_3_dataarray_data_V_q1        => FM_52_mem_AV_dout(L1L2_L6PHIB),
       trackWord_V_din       => TW_84_stream_AV_din(L1L2),
       trackWord_V_full_n    => TW_84_stream_A_full_neg(L1L2),
       trackWord_V_write     => TW_84_stream_A_write(L1L2),

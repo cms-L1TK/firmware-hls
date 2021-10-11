@@ -8,7 +8,7 @@ package memUtil_pkg is
 
   -- ########################### Types ###########################
 
-  type enum_DL_39 is (DTC_PS10G_1_A,DTC_PS10G_2_A,DTC_PS10G_2_B,DTC_PS10G_3_A,DTC_PS10G_3_B,DTC_PS_1_A,DTC_PS_1_B,DTC_PS_2_A,DTC_PS_2_B,DTC_2S_1_A,DTC_2S_1_B,DTC_2S_2_A,DTC_2S_2_B,DTC_2S_3_A,DTC_2S_3_B,DTC_2S_4_A,DTC_2S_4_B);
+  type enum_DL_39 is (PS10G_1_A,PS10G_2_A,PS10G_2_B,PS10G_3_A,PS10G_3_B,PS_1_A,PS_1_B,PS_2_A,PS_2_B,twoS_1_A,twoS_1_B,twoS_2_A,twoS_2_B,twoS_3_A,twoS_3_B,twoS_4_A,twoS_4_B);
 
   type enum_IL_36 is (L1PHID_PS10G_1_A,L1PHID_PS10G_2_A,L1PHID_PS10G_2_B,L2PHIB_PS10G_3_A,L2PHIB_PS10G_3_B,L3PHIB_PS_1_A,L3PHIB_PS_1_B,L3PHIB_PS_2_A,L3PHIB_PS_2_B,L4PHIB_2S_1_A,L4PHIB_2S_1_B,L5PHIB_2S_1_A,L5PHIB_2S_2_A,L5PHIB_2S_2_B,L6PHIB_2S_3_A,L6PHIB_2S_3_B,L6PHIB_2S_4_A,L6PHIB_2S_4_B);
 
@@ -40,9 +40,9 @@ package memUtil_pkg is
 
   type enum_FM_52 is (L1L2_L3PHIB,L1L2_L4PHIB,L1L2_L5PHIB,L1L2_L6PHIB);
 
-  type enum_BW_46 is (L1L2_L3,L1L2_L4,L1L2_L5,L1L2_L6);
-
   type enum_TW_84 is (L1L2);
+
+  type enum_BW_46 is (L1L2_L3,L1L2_L4,L1L2_L5,L1L2_L6);
 
   type t_arr_DL_39_1b is array(enum_DL_39) of std_logic;
   type t_arr_DL_39_DATA is array(enum_DL_39) of std_logic_vector(38 downto 0);
@@ -106,10 +106,10 @@ package memUtil_pkg is
   type t_arr_FM_52_ADDR is array(enum_FM_52) of std_logic_vector(7 downto 0);
   type t_arr_FM_52_DATA is array(enum_FM_52) of std_logic_vector(51 downto 0);
   type t_arr_FM_52_NENT is array(enum_FM_52) of t_arr2_7b;
-  type t_arr_BW_46_1b is array(enum_BW_46) of std_logic;
-  type t_arr_BW_46_DATA is array(enum_BW_46) of std_logic_vector(45 downto 0);
   type t_arr_TW_84_1b is array(enum_TW_84) of std_logic;
   type t_arr_TW_84_DATA is array(enum_TW_84) of std_logic_vector(83 downto 0);
+  type t_arr_BW_46_1b is array(enum_BW_46) of std_logic;
+  type t_arr_BW_46_DATA is array(enum_BW_46) of std_logic_vector(45 downto 0);
 
   -- ########################### Functions ###########################
 
@@ -130,8 +130,8 @@ package memUtil_pkg is
   function memory_enum_to_string(val: enum_AP_58) return string;
   function memory_enum_to_string(val: enum_CM_14) return string;
   function memory_enum_to_string(val: enum_FM_52) return string;
-  function memory_enum_to_string(val: enum_BW_46) return string;
   function memory_enum_to_string(val: enum_TW_84) return string;
+  function memory_enum_to_string(val: enum_BW_46) return string;
 
 end package memUtil_pkg;
 
@@ -142,23 +142,23 @@ package body memUtil_pkg is
   function memory_enum_to_string(val: enum_DL_39) return string is
   begin
     case val is
-       when DTC_PS10G_1_A => return "PS10G_1_A";
-       when DTC_PS10G_2_A => return "PS10G_2_A";
-       when DTC_PS10G_2_B => return "PS10G_2_B";
-       when DTC_PS10G_3_A => return "PS10G_3_A";
-       when DTC_PS10G_3_B => return "PS10G_3_B";
-       when DTC_PS_1_A => return "PS_1_A";
-       when DTC_PS_1_B => return "PS_1_B";
-       when DTC_PS_2_A => return "PS_2_A";
-       when DTC_PS_2_B => return "PS_2_B";
-       when DTC_2S_1_A => return "2S_1_A";
-       when DTC_2S_1_B => return "2S_1_B";
-       when DTC_2S_2_A => return "2S_2_A";
-       when DTC_2S_2_B => return "2S_2_B";
-       when DTC_2S_3_A => return "2S_3_A";
-       when DTC_2S_3_B => return "2S_3_B";
-       when DTC_2S_4_A => return "2S_4_A";
-       when DTC_2S_4_B => return "2S_4_B";
+       when PS10G_1_A => return "PS10G_1_A";
+       when PS10G_2_A => return "PS10G_2_A";
+       when PS10G_2_B => return "PS10G_2_B";
+       when PS10G_3_A => return "PS10G_3_A";
+       when PS10G_3_B => return "PS10G_3_B";
+       when PS_1_A => return "PS_1_A";
+       when PS_1_B => return "PS_1_B";
+       when PS_2_A => return "PS_2_A";
+       when PS_2_B => return "PS_2_B";
+       when twoS_1_A => return "2S_1_A";
+       when twoS_1_B => return "2S_1_B";
+       when twoS_2_A => return "2S_2_A";
+       when twoS_2_B => return "2S_2_B";
+       when twoS_3_A => return "2S_3_A";
+       when twoS_3_B => return "2S_3_B";
+       when twoS_4_A => return "2S_4_A";
+       when twoS_4_B => return "2S_4_B";
     end case;
     return "No conversion found.";
   end memory_enum_to_string;
@@ -428,6 +428,14 @@ package body memUtil_pkg is
     return "No conversion found.";
   end memory_enum_to_string;
 
+  function memory_enum_to_string(val: enum_TW_84) return string is
+  begin
+    case val is
+       when L1L2 => return "L1L2";
+    end case;
+    return "No conversion found.";
+  end memory_enum_to_string;
+
   function memory_enum_to_string(val: enum_BW_46) return string is
   begin
     case val is
@@ -435,14 +443,6 @@ package body memUtil_pkg is
        when L1L2_L4 => return "L1L2_L4";
        when L1L2_L5 => return "L1L2_L5";
        when L1L2_L6 => return "L1L2_L6";
-    end case;
-    return "No conversion found.";
-  end memory_enum_to_string;
-
-  function memory_enum_to_string(val: enum_TW_84) return string is
-  begin
-    case val is
-       when L1L2 => return "L1L2";
     end case;
     return "No conversion found.";
   end memory_enum_to_string;
