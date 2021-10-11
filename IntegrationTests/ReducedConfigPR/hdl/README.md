@@ -1,6 +1,6 @@
 Recipe for generating these files:
 ```bash
-git clone https://github.com/cms-L1TK/project_generation_scripts.git
+git clone -b ir_phibinword_update https://github.com/cms-L1TK/project_generation_scripts.git
 git clone https://github.com/cms-L1TK/firmware-hls.git
 
 cd firmware-hls/emData/
