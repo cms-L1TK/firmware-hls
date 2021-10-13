@@ -3,7 +3,7 @@ variables:
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
   CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7.0/root/bin/clang-tidy'
   CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
-  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TopFunctions -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
+  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TopFunctions -I../TopFunctions/CombinedConfig -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
 
 stages: # ---------------------------------------------------------------------
   - lint
@@ -147,7 +147,7 @@ VMRCM-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/VMRouterCMTop_L2PHIA.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig/VMRouterCMTop_L2PHIA.cc'
 TE-quality-check:
   <<: *template_quality-check
   variables:
@@ -182,7 +182,7 @@ MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TopFunctions/MatchProcessorTopL3.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TopFunctions/CombinedConfig/MatchProcessorTopL3.cpp'
 TB-quality-check:
   <<: *template_quality-check
   variables:
