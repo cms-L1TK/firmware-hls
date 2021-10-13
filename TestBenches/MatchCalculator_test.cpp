@@ -89,7 +89,6 @@ int main()
     BXType bx_out;
 
     // Unit Under Test
-    std::cout << "stubMemType=" << stubMemType << std::endl;
     TOP_FUNC_(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
 
     bool truncation = false;
