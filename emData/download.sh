@@ -242,29 +242,27 @@ then
 fi
 
 # Run scripts to generate top functions in TopFunctions/
-mkdir -p ../TopFunctions/tmp
-mv ../TopFunctions/*.{h,cc} ../TopFunctions/tmp/
+### full config
+./generate_IR.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_VMR.py -a -w LUTs/wires.dat -o ../TopFunctions
+./generate_TC.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_PR.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_ME.py -s  -w LUTs/wires.dat -o ../TopFunctions
+./generate_MC.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_TB.py     -w LUTs/wires.dat -o ../TopFunctions
+### reduced config
 mkdir -p ../TopFunctions/ReducedConfig
-./generate_IR.py LUTsReduced/wires.dat
-./generate_VMR.py -a -w LUTsReduced/wires.dat
-./generate_TC.py LUTsReduced/wires.dat
-./generate_PR.py LUTsReduced/wires.dat
-./generate_MC.py LUTsReduced/wires.dat
-./generate_TB.py LUTsReduced/wires.dat
-./generate_ME.py -s -w LUTsReduced/wires.dat
-#./generate_VMRCM.py -d -w LUTsReduced/wires.dat
-mv ../TopFunctions/*.{h,cc} ../TopFunctions/ReducedConfig/
-./generate_IR.py LUTs/wires.dat
-./generate_VMR.py -a -w LUTs/wires.dat
-./generate_TC.py LUTs/wires.dat
-./generate_PR.py LUTs/wires.dat
-./generate_MC.py LUTs/wires.dat
-./generate_TB.py LUTs/wires.dat
-./generate_ME.py -s -w LUTs/wires.dat
-./generate_VMRCM.py -d -w LUTsCM/wires.dat
-./generate_TP.py LUTsCM/wires.dat
-mv ../TopFunctions/tmp/*.{h,cc} ../TopFunctions/
-rm -rf ../TopFunctions/tmp
+./generate_IR.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_VMR.py -a -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_TC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_PR.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_ME.py -s  -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_MC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_TB.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+### combined config
+mkdir -p ../TopFunctions/CombinedConfig
+./generate_VMRCM.py -d -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
