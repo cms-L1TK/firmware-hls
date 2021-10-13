@@ -269,7 +269,7 @@ MP-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MP"
-TB-hls-build:
+TB-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TB-quality-check"]
   variables:
