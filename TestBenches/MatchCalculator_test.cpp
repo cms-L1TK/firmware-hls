@@ -31,22 +31,9 @@ int main()
   const string allStubPatternarray = "AllStub*";
   const string fullMatchPattern = "FullMatches*";
 
-  // Define region according to which layer is being tested
-#if MODULE_ == MC_L1PHIB_ || MODULE_ == MC_L2PHIB_ || MODULE_ == MC_L3PHIB_ || MODULE_ == MC_L1PHIC_ || MODULE_ == MC_L2PHIC_ || MODULE_ == MC_L3PHIC_
-  const auto projMemType = BARRELPS;
-  const auto stubMemType = BARRELPS;
-#elif MODULE_ == MC_L4PHIB_ || MODULE_ == MC_L5PHIB_ || MODULE_ == MC_L6PHIB_ || MODULE_ == MC_L4PHIC_ || MODULE_ == MC_L5PHIC_ || MODULE_ == MC_L6PHIC_
-  const auto projMemType = BARREL2S;
-  const auto stubMemType = BARREL2S;
-#else
-  #error "Undefined Module"
-#endif
-
-#if MODULE_ == MC_L1PHIB_ || MODULE_ == MC_L2PHIB_ || MODULE_ == MC_L3PHIB_ || MODULE_ == MC_L4PHIB_ || MODULE_ == MC_L5PHIB_ || MODULE_ == MC_L6PHIB_ || MODULE_ == MC_L1PHIC_ || MODULE_ == MC_L2PHIC_ || MODULE_ == MC_L3PHIC_ || MODULE_ == MC_L4PHIC_ || MODULE_ == MC_L5PHIC_ || MODULE_ == MC_L6PHIC_
-  const auto vmProjMemType = BARREL;
-#else
-  #error "Undefined Module"
-#endif
+  const auto stubMemType = (MODULE_ >= MC_L1PHIA_ && MODULE_ <= MC_L3PHID_) ? BARRELPS : (MODULE_ > MC_D5PHID_) ? BARREL2S : (MODULE_ >= MC_D3PHIA_) ? DISK2S : DISKPS;
+  const auto projMemType = (MODULE_ >= MC_L1PHIA_ && MODULE_ <= MC_L3PHID_) ? BARRELPS : (MODULE_ > MC_D5PHID_) ? BARREL2S : DISK;
+  const auto fmProjMemType = (MODULE_ >= MC_L1PHIA_ && MODULE_) ? BARREL : DISK;
   TBHelper tb(std::string("MC/") + module_name[MODULE_]);
 
   // error counts
@@ -63,7 +50,7 @@ int main()
 
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
-  vector<FullMatchMemory<vmProjMemType> > fullmatcharray(nFullMatches);
+  vector<FullMatchMemory<fmProjMemType> > fullmatcharray(nFullMatches);
 
   // print the input files loaded
   std::cout << "Loaded the input files:\n";
@@ -102,6 +89,7 @@ int main()
     BXType bx_out;
 
     // Unit Under Test
+    std::cout << "stubMemType=" << stubMemType << std::endl;
     TOP_FUNC_(bx, cmatcharray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
 
     bool truncation = false;
@@ -113,7 +101,7 @@ int main()
       const auto &fullmatch_name = fullmatch_names.at(i);
       auto &fout = fout_fullmatch.at(i);
       string label = "FullMatch " + to_string(i);
-      err += compareMemWithFile<FullMatchMemory<vmProjMemType> >
+      err += compareMemWithFile<FullMatchMemory<fmProjMemType> >
         (fullmatcharray[i], fout, ievt, label, truncation);
     }
     
