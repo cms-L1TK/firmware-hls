@@ -3,7 +3,7 @@
 from __future__ import absolute_import, print_function
 import re
 import os
-import sys
+import argparse
 
 # return number of memories filled by each IR
 def getNmemsPerIR(wiresFiles='./LUTs/wires.dat'):
@@ -78,10 +78,10 @@ def createParametersTemplate():
     return fileName
 
 # generate all TopLevel parameters InputRouter_parameters.h
-def createParameters(wiresFiles='./LUTs/wires.dat'):
+def createParameters(wiresFiles='./LUTs/wires.dat', outputDirectory='../TopFunctions/'):
     IRs = getNmemsPerIR(wiresFiles)
     templateName = createParametersTemplate()
-    file = open('../TopFunctions/InputRouter_parameters.h', 'w')
+    file = open(outputDirectory + '/InputRouter_parameters.h', 'w')
     file.write('#ifndef TopFunctions_InputRouter_parameters_h\n')
     file.write('#define TopFunctions_InputRouter_parameters_h\n')
     for dtcName, nMemories in IRs:
@@ -96,10 +96,10 @@ def createParameters(wiresFiles='./LUTs/wires.dat'):
     os.remove(templateName)
 
 # generate all TopLevel declarations InputRouterTop.cc
-def createDeclarations(wiresFiles='./LUTs/wires.dat'):
+def createDeclarations(wiresFiles='./LUTs/wires.dat', outputDirectory='../TopFunctions/'):
     IRs = getNmemsPerIR(wiresFiles)
     templateName = createDeclarationTemplate()
-    file = open('../TopFunctions/InputRouterTop.h', 'w')
+    file = open(outputDirectory + '/InputRouterTop.h', 'w')
     file.write('#ifndef TopFunctions_InputRouterTop_h\n')
     file.write('#define TopFunctions_InputRouterTop_h\n')
     file.write('#include \"InputRouter.h\"\n')
@@ -115,10 +115,10 @@ def createDeclarations(wiresFiles='./LUTs/wires.dat'):
     os.remove(templateName)
 
 # generate all TopLevel definitions InputRouterTop.h
-def createDefinitions(wiresFiles='./LUTs/wires.dat'):
+def createDefinitions(wiresFiles='./LUTs/wires.dat', outputDirectory='../TopFunctions/'):
     IRs = getNmemsPerIR(wiresFiles)
     templateName = createDefinitionsTemplate()
-    file = open('../TopFunctions/InputRouterTop.cc', 'w')
+    file = open(outputDirectory + '/InputRouterTop.cc', 'w')
     file.write('#include \"InputRouterTop.h\"\n')
     for dtcName, _ in IRs:
         d = {}
@@ -129,17 +129,19 @@ def createDefinitions(wiresFiles='./LUTs/wires.dat'):
     file.close()
     os.remove(templateName)
 
-if len(sys.argv) < 2:
-    print("Usage: " + sys.argv[0] + " WIRES_FILE")
-    sys.exit(1)
-wiresFile = sys.argv[1]
+parser = argparse.ArgumentParser(description="This script generates InputRouterTop.h, InputRouterTop.cc, and\
+InputRouter_parameters.h in the TopFunctions/ directory.",
+                                 epilog="")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+arguments = parser.parse_args()
 
 # create InputRouter_parameters.h :
 # contains constants that define number of output memories per link
-createParameters(wiresFile)
+createParameters(arguments.wiresFileName, arguments.outputDirectory)
 # create InputRouterTop.h
 # declaration of top level function for each instance of the IR
-createDeclarations(wiresFile)
+createDeclarations(arguments.wiresFileName, arguments.outputDirectory)
 # create InputRouterTop.cc
 # definition of top level function for each instance of the IR
-createDefinitions(wiresFile)
+createDefinitions(arguments.wiresFileName, arguments.outputDirectory)

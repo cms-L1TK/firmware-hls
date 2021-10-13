@@ -176,9 +176,9 @@ def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max
 # and the specified units under test if non-default. Make sure to add
 # non-default VMRs to download.sh and run it before running Vivado HLS
 
-def writeParameterFile(vmr_list, mem_dict):
+def writeParameterFile(vmr_list, mem_dict, output_dir):
 
-    with open("../TopFunctions/VMRouter_parameters.h", "w") as parameter_file:
+    with open(output_dir + "/VMRouter_parameters.h", "w") as parameter_file:
 
         # Write preamble
         parameter_file.write(
@@ -357,7 +357,7 @@ inline ap_uint<arraySize> arrayToInt(ap_uint<1> array[arraySize]) {
 #################################
 # Writes the VMRouterTop.h file
 
-def writeTopHeader(vmr_specific_name, vmr):
+def writeTopHeader(vmr_specific_name, vmr, output_dir):
 
     # Get layer/disk number and phi region
     layer = vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0
@@ -367,7 +367,7 @@ def writeTopHeader(vmr_specific_name, vmr):
     # Top file name
     file_name = "VMRouterTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
 
-    with open("../TopFunctions/" + file_name  + ".h", "w") as header_file:
+    with open(output_dir + "/" + file_name  + ".h", "w") as header_file:
 
         # Write preamble
         header_file.write(
@@ -492,12 +492,12 @@ void %s(const BXType bx, BXType& bx_o,
         )
 
 # Writes the VMRouterTop.cc file
-def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s):
+def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s, output_dir):
 
     # Top file name
     file_name = "VMRouterTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
 
-    with open("../TopFunctions/" + file_name  + ".cc", "w") as top_file:
+    with open(output_dir + "/" + file_name  + ".cc", "w") as top_file:
 
         # Write preamble
         top_file.write("#include \"" + file_name + ".h\"" + \
@@ -659,8 +659,9 @@ python3 generate_VMR.py -a
 
     parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMRouters in a nonant.")
     parser.add_argument("-d", "--default", default=False, action="store_true", help="Create files for VMRs: " + " ".join(vmr for vmr in default_vmr_list) + "(default = %(default)s)")
-    parser.add_argument("-o", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterTop.h/cc files (instead of creating files e.g. VMRouterTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
+    parser.add_argument("-O", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterTop.h/cc files (instead of creating files e.g. VMRouterTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
     parser.add_argument("--uut", default=["VMR_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
+    parser.add_argument("-o", "--outputdir", type=str, default="../TopFunctions/", help="The directory in which to write the output files (default=%(default)s)")
     parser.add_argument("-w", "--wireconfig", type=str, default="LUTs/wires.dat",
                         help="Name and directory of the configuration file for wiring (default = %(default)s)")
 
@@ -696,8 +697,8 @@ python3 generate_VMR.py -a
             print("Make sure to add " + vmr + " to download.sh and run it before running Vivado HLS.")
 
         # Create and write the files
-        writeTopHeader(vmr_specific_name, vmr)
-        writeTopFile(vmr_specific_name, vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]))
+        writeTopHeader(vmr_specific_name, vmr, args.outputdir)
+        writeTopFile(vmr_specific_name, vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]), args.outputdir)
 
     # Write parameters file
-    writeParameterFile(vmr_list, mem_dict)
+    writeParameterFile(vmr_list, mem_dict, args.outputdir)

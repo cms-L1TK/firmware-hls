@@ -6,16 +6,18 @@
 from __future__ import absolute_import
 import os
 import re
-import sys
+import argparse
 
-if len(sys.argv) < 2:
-    print("Usage: " + sys.argv[0] + " WIRES_FILE")
-    sys.exit(1)
-wiresFileName = sys.argv[1]
+parser = argparse.ArgumentParser(description="This script generates TrackBuilderTop.h and TrackBuilderTop.cc in the\
+TopFunctions/ directory.",
+                                 epilog="")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with TBs in
 # dictionaries with the TB names as keys.
-with open(wiresFileName, "r") as wiresFile:
+with open(arguments.wiresFileName, "r") as wiresFile:
     tparMems = {}
     barrelFMMems = {}
     diskFMMems = {}
@@ -42,8 +44,8 @@ with open(wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TopFunctions/TrackBuilderTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, "../TopFunctions/TrackBuilderTop.cc"), "w") as topFile:
+with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"), "w") as topHeaderFile, \
+     open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.cc"), "w") as topFile:
     topHeaderFile.write(
         "#ifndef TopFunctions_TrackBuilderTop_h\n"
         "#define TopFunctions_TrackBuilderTop_h\n"
