@@ -10,9 +10,9 @@ source env_hls.tcl
 open_project -reset match_processor
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
 set_top MatchProcessorTopL3
-add_files ../TrackletAlgorithm/MatchProcessorTopL3.cc -cflags "$CFLAGS"
+add_files ../TopFunctions/CombinedConfig/MatchProcessorTopL3.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchProcessorL3_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"
