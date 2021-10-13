@@ -284,9 +284,9 @@ topPRMEMC-sim:
     PROJ_NAME: "PRMEMC"
   needs:
     - download
-    - PR-quality-check
-    - ME-quality-check
-    - MC-quality-check
+    - PR-hls-build
+    - ME-hls-build
+    - MC-hls-build
 topTETC-sim:
   <<: *template_topTF-sim
   variables:
@@ -294,8 +294,8 @@ topTETC-sim:
     PROJ_NAME: "TETC"
   needs:
     - download
-    - TE-quality-check
-    - TC-quality-check
+    - TE-hls-build
+    - TC-hls-build
 topIRVMR-sim:
   <<: *template_topTF-sim
   variables:
@@ -303,8 +303,8 @@ topIRVMR-sim:
     PROJ_NAME: "IRVMR"
   needs:
     - download
-    - IR-quality-check
-    - VMR-quality-check
+    - IR-hls-build
+    - VMR-hls-build
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
