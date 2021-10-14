@@ -96,7 +96,9 @@ switch (Seed) {
   case TF::L2L3:
     {
       static const ap_int<18> LUT_drinv[512] = {
-#include "../emData/TC/tables/TC_L2L3_drinv.tab"
+#if __has_include("../emData/TC/tables/TC_L2L3_drinv.tab")
+#  include "../emData/TC/tables/TC_L2L3_drinv.tab"
+#endif
       };
       drinv = LUT_drinv[addr_drinv];
       break;
@@ -1129,7 +1131,9 @@ switch (Seed) {
   case TF::L2L3:
     {
       static const ap_int<18> LUT_invt[4096] = {
-#include "../emData/TC/tables/TC_L2L3_invt.tab"
+#if __has_include("../emData/TC/tables/TC_L2L3_invt.tab")
+#  include "../emData/TC/tables/TC_L2L3_invt.tab"
+#endif
       };
       invt = LUT_invt[addr_invt];
       break;
