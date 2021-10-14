@@ -116,6 +116,13 @@ N.B. In future, better agreement with FW can be achieved by also setting the fol
 …
 ```
 
+In addition, if you'd like to run the Summer Chain configuration, you can do this by setting
+```c++
+…
+    bool reduced_{true};        // use reduced (Summer Chain) config
+…
+```
+
 Then compilation was done with the usual command:
 
 ```bash
