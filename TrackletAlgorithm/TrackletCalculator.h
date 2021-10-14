@@ -573,8 +573,8 @@ TrackletCalculator(
 // all-stubs memory to use based on iSPMem:
       const StubPair::SPInnerIndex innerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getInnerIndex();
       const StubPair::SPOuterIndex outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
-      const AllStub<InnerRegion<Seed>()> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
-      const AllStub<OuterRegion<Seed>()> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
+      const AllStub<InnerRegion<Seed>()> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & (3 << (2 * iSPMem))) >> (2 * iSPMem)].read_mem(bx, innerIndex);
+      const AllStub<OuterRegion<Seed>()> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & (3 << (2 * iSPMem))) >> (2 * iSPMem)].read_mem(bx, outerIndex);
 
       TC::processStubPair<Seed, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }

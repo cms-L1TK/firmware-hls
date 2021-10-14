@@ -78,14 +78,9 @@ with open(arguments.wiresFileName, "r") as wiresFile:
     spMems = {}
     tprojMems = {}
     for line in wiresFile:
-        # Only barrel-only seeds are supported right now. And for L3L4 and L5L6,
-        # only TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D are supported because we
-        # currently assume the inner stubs and outer stubs each have up to two
-        # all-stubs memories associated with them. However, the other L3L4 and L5L6
-        # TCs have up to three.
-        if "TC_L1L2" not in line \
-          and "TC_L3L4A" not in line and "TC_L3L4D" not in line \
-          and "TC_L5L6A" not in line and "TC_L5L6D" not in line:
+        # Only barrel-only seeds are supported right now.
+        if "TC_L1L2" not in line and "TC_L3L4" not in line \
+          and "TC_L5L6" not in line:
             continue
         line = line.rstrip()
         tcName = re.sub(r".*TC_(.....).*", r"TC_\1", line)
@@ -166,29 +161,30 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
         nASMemInner = len(asInnerMems[tcName])
         nASMemOuter = len(asOuterMems[tcName])
         nSPMem = len(spMems[tcName])
+        #print("tcName: " + tcName)
+        #print("nSPMem: " + str(nSPMem))
+        assert nSPMem <= 32
 
         # AS inner and outer masks
         asInnerMask = 0
         asOuterMask = 0
         asInnerMems[tcName].sort()
         asOuterMems[tcName].sort()
-        for i in range(0, len(spMems[tcName])):
+        for i in range(0, nSPMem):
             innerPart = re.sub(r".*_(..PHI.).*_(..PHI.).*", r"\1", spMems[tcName][i])
             outerPart = re.sub(r".*_(..PHI.).*_(..PHI.).*", r"\2", spMems[tcName][i])
             innerIndex = -1
             outerIndex = -1
-            for j in range(0, len(asInnerMems[tcName])):
+            for j in range(0, nASMemInner):
                 if innerPart in asInnerMems[tcName][j]:
                     innerIndex = j
                     break
-            assert innerIndex in (0, 1)
-            asInnerMask = asInnerMask | (innerIndex << i)
-            for j in range(0, len(asOuterMems[tcName])):
+            asInnerMask = asInnerMask | (innerIndex << (2 * i))
+            for j in range(0, nASMemOuter):
                 if outerPart in asOuterMems[tcName][j]:
                     outerIndex = j
                     break
-            assert outerIndex in (0, 1)
-            asOuterMask = asOuterMask | (outerIndex << i)
+            asOuterMask = asOuterMask | (outerIndex << (2 * i))
 
         # TPROJ masks for barrel and disks
         tprojMaskBarrel = 0
@@ -208,10 +204,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
         parametersFile.write(
             ("\n"
             "// magic numbers for " + tcName + "\n"
-            "template<> constexpr uint32_t ASInnerMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
+            "template<> constexpr uint64_t ASInnerMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
             "  return 0x%X;\n"
             "}\n"
-            "template<> constexpr uint32_t ASOuterMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
+            "template<> constexpr uint64_t ASOuterMask<TF::" + seed + ", TC::" + iTC + ">() {\n"
             "  return 0x%X;\n"
             "}\n"
             "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TC::" + iTC + ">() {\n"
