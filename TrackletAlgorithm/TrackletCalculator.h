@@ -175,8 +175,8 @@ namespace TC {
   );
 }
 
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t ASInnerMask();
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t ASOuterMask();
+template<TF::seed Seed, TC::itc iTC> constexpr uint64_t ASInnerMask();
+template<TF::seed Seed, TC::itc iTC> constexpr uint64_t ASOuterMask();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
 
