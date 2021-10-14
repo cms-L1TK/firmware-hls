@@ -316,8 +316,8 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
   if (abs(*z0) >= ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5 * z0cut, kz0)))
     success = false;
 
-  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
-  const bool keep = (phicrit > 9253) && (phicrit < 56269);
+  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
+  const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
   success = success && keep;
 
   return success;
