@@ -56,8 +56,8 @@ constexpr unsigned int kNMatchEngines=4;
 constexpr int kNBits_MemAddrBinned = 4;
 constexpr int kMemDepthBinned = (1<<kNBits_MemAddrBinned);
 
-constexpr int kNBits_bendinnertableTE = 8;
-constexpr int kNBits_bendoutertableTE = 8;
+constexpr int kNBits_bendinnertableTE[] = {8, 8, 8, 9, 11, 11, 11, 11};
+constexpr int kNBits_bendoutertableTE[] = {8, 8, 9, 9, 11, 11, 11, 11};
 
 constexpr int MEBinsBits = 3;
 constexpr int TEBinsBits = 3;
