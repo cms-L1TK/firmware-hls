@@ -34,9 +34,9 @@ int main(){
   auto &fin_vmstubsouter = tb.files("VMStubs_VMSTE_L2*");
   auto &fin_stubpairs = tb.files("StubPairs_SP_*");
 
-  ap_uint<1> bendinnertable[256] =
+  ap_uint<1> bendinnertable[] =
 #include "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptinnercut.tab"
-  ap_uint<1> bendoutertable[256] =
+  ap_uint<1> bendoutertable[] =
 #include "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptoutercut.tab"
 
   // loop over events
