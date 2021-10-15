@@ -2,6 +2,7 @@
 #define TrackletAlgorithm_TrackMergerTop_h
 
 #include "TrackMerger.h"
+#include "TrackHandler.h"
 
 void TrackMergerTop(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],

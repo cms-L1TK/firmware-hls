@@ -1,3 +1,5 @@
+#ifndef TrackletAlgorithm_TrackHandler_h
+#define TrackletAlgorithm_TrackHandler_h
 #include "TrackFitMemory.h"
 
 const unsigned int kFullBarrelStubSize = TrackFit::kBarrelStubSize * 4;
@@ -7,7 +9,7 @@ const unsigned int kFullTrackWordSize = TrackFit::kTrackWordSize;
 class TrackHandler{
   public:
     TrackHandler(){};
-    TrackHandler(const TrackFit::TrackWord trackWord,
+    TrackHandler(const TrackFit::TrackWord trackWord[kMaxProc],
       const TrackFit::BarrelStubWord barrelStubWords[4],
       const TrackFit::DiskStubWord diskStubWords[4])
     {
@@ -20,19 +22,22 @@ class TrackHandler{
         barrelStubArray[j][0] = barrelStubWords[j];
       }
 
-    for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
+      for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
         diskStubArray[k][0] = diskStubWords[k];
-    }
+      }
     
     }
   
     ~TrackHandler(){};
-    TrackFit::TrackWord trkWord;
-    TrackFit::BarrelStubWord barrelStubArray[4][10]; //adding extra dimension to array of size 10
-    TrackFit::DiskStubWord diskStubArray[4][10];
 
+    TrackFit::TrackWord getTrackWord(){
+      return trkWord;
+    }
     
-    
+    void CompareTrack(TrackHandler track, unsigned int& matchFound);
+
+    void MergeTrack(TrackHandler track, unsigned int matchFound, unsigned int mergeCondition);
+
     //TrackFit::TFSTUBINDEX getStubIndex(int Hit) const {
     //  assert(Hit >= 0 && Hit <= kNStubs - 1);
     //  return track.range(TrackFitBits::kTFStubIndexMSB(Hit),TrackFitBits::kTFStubIndexLSB(Hit));
@@ -61,8 +66,8 @@ class TrackHandler{
 
 
   private:
-
-  bool CompareTrack(TrackHandler track, unsigned int& matchFound);
-
-  void MergeTrack(TrackHandler track, TrackHandler mergedTrack, unsigned int& matchFound);
+    TrackFit::TrackWord trkWord;
+    TrackFit::BarrelStubWord barrelStubArray[4][10]; 
+    TrackFit::DiskStubWord diskStubArray[4][10];
 };
+#endif

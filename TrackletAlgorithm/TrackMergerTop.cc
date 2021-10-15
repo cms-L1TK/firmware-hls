@@ -1,4 +1,5 @@
 #include "TrackMergerTop.h"
+#include "TrackHandler.h"
 
 void TrackMergerTop(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],

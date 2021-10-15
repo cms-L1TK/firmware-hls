@@ -4,28 +4,36 @@
 #include <cassert>
 #include "TrackHandler.h"
 
+
 class ComparisonModule{
   public:
     ComparisonModule()
     {
-      bufferIndex = 0;
+      readIndex = 0;
+      writeIndex = 0;
     }
     ~ComparisonModule(){};
 
-    void InputTrack(const TrackFit::TrackWord trackWord,
-    const TrackFit::BarrelStubWord barrelStubWords[4],
-    const TrackFit::DiskStubWord diskStubWords[4]); //the tracks are read in from TrackBuilder output
+    void InputTrack(const TrackHandler track);
+
+    void CheckMaster();
+
+    TrackHandler getTrack();
     
+    void processTrack();
     
   private:
     //input buffer for each comparison module 
-    TrackHandler inputBuffer[kMaxProc];
-    unsigned int bufferIndex;
+    TrackHandler inputBuffer[10]; 
+    unsigned int readIndex;
+    unsigned int writeIndex; 
+    unsigned int matchFound;
+    unsigned int mergeCondition = 3;
+
+    TrackHandler masterTrack;
+    TrackHandler track;
 
 };
-
-// make compare track a member of track handler, to get stub IDs (with a parameter that is a layer) - returns an array of const stub IDs
-// masterTrack.compareTrack(track)  as it has access to info of master, need to find a way to getting info of second track, accessing by the interface
 
 
 void TrackMerger(const BXType bx,
