@@ -1,35 +1,35 @@
 #include "TrackMerger.h"
+#include "TrackHandler.cc"
 #include <bitset>
 
-bool TrackHandler::CompareTrack(TrackHandler track, unsigned int& matchFound){
-  #pragma HLS inline
-  //compare the two tracks, masterTrack and trk
-  // if they have > 3 stubs in common, update isMatch, else isMatch = false
-  return false;
-}
 
-void TrackHandler::MergeTrack(TrackHandler track, TrackHandler mergedTrack, unsigned int& matchFound){
-  #pragma HLS inline
-  
+void ComparisonModule::CheckMaster(){
+  //masterTrack, a private member variable - with a flag.
+  //if no masterTrack, read in next track, if already have one then do CompareTrack
+  //get false return of first CM to send the next track to the next module
 
-  if (TrackHandler::CompareTrack(track, matchFound) == true) //merge
-  {
-    #ifndef _SYNTHESIS_
-    std::cout << "It's a merge" << std::endl;
-    #endif
+  if (masterTrack.getTrackWord() == 0){
+   masterTrack = getTrack();
   }
+
 }
 
-void ComparisonModule::InputTrack(const TrackFit::TrackWord trackWord,
-const TrackFit::BarrelStubWord barrelStubWords[4],
-const TrackFit::DiskStubWord diskStubWords[4]){
+void ComparisonModule::InputTrack(const TrackHandler track){ 
   //put tracks into buffer
-  TrackHandler barrelStubArray[4][0];
-  TrackHandler diskStubArray[4][0];
-  
-  //inputBuffer[bufferIndex] = nextTrack;
-  //bufferIndex++;
-  //assert(bufferIndex < kMaxProc);
+
+  inputBuffer[writeIndex] = track;
+  writeIndex++;
+
+}
+void ComparisonModule::processTrack(){
+  masterTrack.CompareTrack(track, matchFound);
+  masterTrack.MergeTrack(track, matchFound, mergeCondition);
+}
+
+TrackHandler ComparisonModule::getTrack(){
+  TrackHandler track = inputBuffer[readIndex];
+  readIndex++;
+  return track;
 }
 
 //overall module only reads in a track and pass it to the comparison module
@@ -46,10 +46,13 @@ void TrackMerger(const BXType bx,
     ComparisonModule comparisonModule[16];
 
     for (int i = 0; i < kMaxProc; i++){
-      TrackFit::BarrelStubWord brlStubs[4]={barrelStubWords[0][i],barrelStubWords[1][i],barrelStubWords[2][i],barrelStubWords[3][i]};
-      TrackFit::DiskStubWord diskStubs[4]={diskStubWords[0][i],diskStubWords[1][i],diskStubWords[2][i],diskStubWords[3][i]} ;
+      const TrackFit::BarrelStubWord barrelStubWordsArray[4] = {barrelStubWords[0][i], barrelStubWords[1][i], barrelStubWords[2][i], barrelStubWords[3][i]};
+      const TrackFit::DiskStubWord diskStubWordsArray[4] = {diskStubWords[0][i], diskStubWords[1][i], diskStubWords[2][i], diskStubWords[3][i]};
+      TrackHandler track(trackWord, barrelStubWordsArray, diskStubWordsArray);
+        
+      //load all info into a track handler object and pass that to the InputTrack function
+      comparisonModule[0].InputTrack(track);
       
-      comparisonModule[0].InputTrack(trackWord[i], brlStubs, diskStubs);
     
     }
 
