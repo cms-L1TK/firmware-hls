@@ -19,6 +19,10 @@ set modules_to_test {
   {TC_L1L2J}
   {TC_L1L2K}
   {TC_L1L2L}
+  {TC_L2L3A}
+  {TC_L2L3B}
+  {TC_L2L3C}
+  {TC_L2L3D}
   {TC_L3L4A}
   {TC_L3L4B}
   {TC_L3L4C}

@@ -79,8 +79,8 @@ with open(arguments.wiresFileName, "r") as wiresFile:
     tprojMems = {}
     for line in wiresFile:
         # Only barrel-only seeds are supported right now.
-        if "TC_L1L2" not in line and "TC_L3L4" not in line \
-          and "TC_L5L6" not in line:
+        if "TC_L1L2" not in line and "TC_L2L3" not in line \
+          and "TC_L3L4" not in line and "TC_L5L6" not in line:
             continue
         line = line.rstrip()
         tcName = re.sub(r".*TC_(.....).*", r"TC_\1", line)
