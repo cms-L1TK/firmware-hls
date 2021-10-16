@@ -1,12 +1,12 @@
 #include "TrackletEngineTop.h"
 
-void TrackletEngine_L1L2(const BXType bx,
-                         const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
-                         const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
-                         const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE[TF::L1L2]],
-                         const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE[TF::L1L2]],
-                         BXType& bx_o,
-                         StubPairMemory& outstubpair)
+void TrackletEngine_PS_PS(const BXType bx,
+                          const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
+                          const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
+                          const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE[TF::L1L2]],
+                          const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE[TF::L1L2]],
+                          BXType& bx_o,
+                          StubPairMemory& outstubpair)
 {
 #pragma HLS resource variable=instubinnerdata.get_mem() latency=2
 #pragma HLS resource variable=instubouterdata.get_mem() latency=2
@@ -17,13 +17,13 @@ void TrackletEngine_L1L2(const BXType bx,
   (bx, instubinnerdata, instubouterdata, bendinnertable, bendoutertable, bx_o, outstubpair);
 }
 
-void TrackletEngine_L3L4(const BXType bx,
-                         const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
-                         const VMStubTEOuterMemory<BARREL2S>& instubouterdata,
-                         const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE[TF::L3L4]],
-                         const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE[TF::L3L4]],
-                         BXType& bx_o,
-                         StubPairMemory& outstubpair)
+void TrackletEngine_PS_2S(const BXType bx,
+                          const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
+                          const VMStubTEOuterMemory<BARREL2S>& instubouterdata,
+                          const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE[TF::L3L4]],
+                          const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE[TF::L3L4]],
+                          BXType& bx_o,
+                          StubPairMemory& outstubpair)
 {
 #pragma HLS resource variable=instubinnerdata.get_mem() latency=2
 #pragma HLS resource variable=instubouterdata.get_mem() latency=2
@@ -34,13 +34,13 @@ void TrackletEngine_L3L4(const BXType bx,
   (bx, instubinnerdata, instubouterdata, bendinnertable, bendoutertable, bx_o, outstubpair);
 }
 
-void TrackletEngine_L5L6(const BXType bx,
-                         const VMStubTEInnerMemory<BARREL2S>& instubinnerdata,
-                         const VMStubTEOuterMemory<BARREL2S>& instubouterdata,
-                         const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE[TF::L5L6]],
-                         const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE[TF::L5L6]],
-                         BXType& bx_o,
-                         StubPairMemory& outstubpair)
+void TrackletEngine_2S_2S(const BXType bx,
+                          const VMStubTEInnerMemory<BARREL2S>& instubinnerdata,
+                          const VMStubTEOuterMemory<BARREL2S>& instubouterdata,
+                          const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE[TF::L5L6]],
+                          const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE[TF::L5L6]],
+                          BXType& bx_o,
+                          StubPairMemory& outstubpair)
 {
 #pragma HLS resource variable=instubinnerdata.get_mem() latency=2
 #pragma HLS resource variable=instubouterdata.get_mem() latency=2

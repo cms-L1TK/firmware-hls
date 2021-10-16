@@ -54,7 +54,7 @@ int main(){
     BXType bx_o;
 
     // Unit Under Test
-    TrackletEngine_L1L2(bx, inputvmstubsinner, inputvmstubsouter, bendinnertable, bendoutertable, bx_o, outputstubpairs);
+    TrackletEngine_PS_PS(bx, inputvmstubsinner, inputvmstubsouter, bendinnertable, bendoutertable, bx_o, outputstubpairs);
 
     bool truncation = false;
 
