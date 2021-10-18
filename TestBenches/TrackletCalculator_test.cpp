@@ -34,6 +34,11 @@ int main()
   const auto OuterStubType = BARRELPS;
   const string innerStubPattern = "AllStubs*_L1*";
   const string outerStubPattern = "AllStubs*_L2*";
+#elif SEED_ == L2L3_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = BARRELPS;
+  const string innerStubPattern = "AllStubs*_L2*";
+  const string outerStubPattern = "AllStubs*_L3*";
 #elif SEED_ == L3L4_
   const auto InnerStubType = BARRELPS;
   const auto OuterStubType = BARREL2S;

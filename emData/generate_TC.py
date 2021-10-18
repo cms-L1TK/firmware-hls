@@ -85,11 +85,13 @@ with open(arguments.wiresFileName, "r") as wiresFile:
         line = line.rstrip()
         tcName = re.sub(r".*TC_(.....).*", r"TC_\1", line)
         memName = line.split()[0]
-        if memName.startswith("AS_L1") or memName.startswith("AS_L3") or memName.startswith("AS_L5"):
+        if ("TC_L2L3" in line and memName.startswith("AS_L2")) or ("TC_L2L3" not in line and \
+          (memName.startswith("AS_L1") or memName.startswith("AS_L3") or memName.startswith("AS_L5"))):
             if tcName not in asInnerMems:
                 asInnerMems[tcName] = []
             asInnerMems[tcName].append(memName)
-        if memName.startswith("AS_L2") or memName.startswith("AS_L4") or memName.startswith("AS_L6"):
+        if ("TC_L2L3" in line and memName.startswith("AS_L3")) or ("TC_L2L3" not in line and \
+          (memName.startswith("AS_L2") or memName.startswith("AS_L4") or memName.startswith("AS_L6"))):
             if tcName not in asOuterMems:
                 asOuterMems[tcName] = []
             asOuterMems[tcName].append(memName)
@@ -175,6 +177,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             outerPart = re.sub(r".*_(..PHI.).*_(..PHI.).*", r"\2", spMems[tcName][i])
             innerIndex = -1
             outerIndex = -1
+
+            # for L2L3, the letters in the AS names are shifted relative to
+            # those in the SP names
+            innerPart = re.sub(r"PHII", r"PHIA", innerPart)
+            innerPart = re.sub(r"PHIJ", r"PHIB", innerPart)
+            innerPart = re.sub(r"PHIK", r"PHIC", innerPart)
+            innerPart = re.sub(r"PHIL", r"PHID", innerPart)
+            outerPart = re.sub(r"PHII", r"PHIA", outerPart)
+            outerPart = re.sub(r"PHIJ", r"PHIB", outerPart)
+            outerPart = re.sub(r"PHIK", r"PHIC", outerPart)
+            outerPart = re.sub(r"PHIL", r"PHID", outerPart)
+
             for j in range(0, nASMemInner):
                 if innerPart in asInnerMems[tcName][j]:
                     innerIndex = j
