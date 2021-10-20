@@ -923,17 +923,6 @@ void MatchCalculator(BXType bx,
 
   bx_o = bx;
 
-  /*
-  // finish by writing out the last match made (to minimize truncation) -- can't do this because not in the loop 
-  fullmatch[0].write_mem(bx,bestmatch,(goodmatch=true && projseed==0)); // L1L2 seed
-  fullmatch[1].write_mem(bx,bestmatch,(goodmatch=true && projseed==1)); // L3L4 seed
-  fullmatch[2].write_mem(bx,bestmatch,(goodmatch=true && projseed==2)); // L5L6 seed
-  fullmatch[3].write_mem(bx,bestmatch,(goodmatch=true && projseed==3)); // D1D2 seed
-  fullmatch[4].write_mem(bx,bestmatch,(goodmatch=true && projseed==4)); // D3D4 seed
-  fullmatch[5].write_mem(bx,bestmatch,(goodmatch=true && projseed==5)); // L1D1 seed
-  fullmatch[6].write_mem(bx,bestmatch,(goodmatch=true && projseed==6)); // L2D1 seed
-  */
-
 }// end MatchCalculator
 
 #endif
