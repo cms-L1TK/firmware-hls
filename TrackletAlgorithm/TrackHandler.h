@@ -9,7 +9,7 @@ const unsigned int kFullTrackWordSize = TrackFit::kTrackWordSize;
 class TrackHandler{
   public:
     TrackHandler(){};
-    TrackHandler(const TrackFit::TrackWord trackWord[kMaxProc],
+    TrackHandler(const TrackFit::TrackWord trackWord,
       const TrackFit::BarrelStubWord barrelStubWords[4],
       const TrackFit::DiskStubWord diskStubWords[4])
     {
@@ -30,13 +30,21 @@ class TrackHandler{
   
     ~TrackHandler(){};
 
-    TrackFit::TrackWord getTrackWord(){
+    TrackFit::TrackWord getTrackWord() const{
       return trkWord;
+    }
+
+    void setTrackWord(TrackFit::TrackWord trackWord){
+      trkWord = trackWord;
     }
     
     void CompareTrack(TrackHandler track, unsigned int& matchFound);
 
     void MergeTrack(TrackHandler track, unsigned int matchFound, unsigned int mergeCondition);
+    
+    
+    //void getStubID(int layer);
+
 
     //TrackFit::TFSTUBINDEX getStubIndex(int Hit) const {
     //  assert(Hit >= 0 && Hit <= kNStubs - 1);
