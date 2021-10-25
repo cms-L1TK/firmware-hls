@@ -3,7 +3,9 @@
 
 #include "Constants.h"
 #include "VMStubTEOuterMemoryCM.h"
-template<TF::seed Seed, int iTC, regionType innerRegion,regionType VMSTEType>
+#include "TrackletProcessor_parameters.h"
+
+template<TF::seed Seed, TC::itc iTC, regionType innerRegion,regionType VMSTEType>
 class TrackletEngineUnit {
 
  public:
@@ -31,33 +33,21 @@ class TrackletEngineUnit {
 
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
-/////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
 
-    if (Seed==TF::L1L2&&iTC==3){
+/////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
+if (Seed==TF::L1L2&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
-#include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
+#if __has_include("../emData/TP/tables/TP_L1L2A_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2A_stubptinnercut.tab"
+#else
+    {};
+#endif
       const ap_uint<1> stubptoutertmp[]=
-#include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
-      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
-        stubptinnerlutnew_[i] = stubptinnertmp[i];
-        stubptouterlutnew_[i] = stubptoutertmp[i];
-      }
-    }
-    else if (Seed==TF::L2L3&&iTC==2){
-      const ap_uint<1> stubptinnertmp[]=
-#include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
-      const ap_uint<1> stubptoutertmp[]=
-#include "../emData/TP/tables/TP_L2L3C_stubptoutercut.tab"
-      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
-        stubptinnerlutnew_[i] = stubptinnertmp[i];
-        stubptouterlutnew_[i] = stubptoutertmp[i];
-      }  
-    }
-   else if (Seed==TF::L3L4&&iTC==2){
-      const ap_uint<1> stubptinnertmp[]=
-#include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
-      const ap_uint<1> stubptoutertmp[]=
-#include "../emData/TP/tables/TP_L3L4C_stubptoutercut.tab"
+#if __has_include("../emData/TP/tables/TP_L1L2A_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2A_stubptoutercut.tab"
+#else
+    {};
+#endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
@@ -65,16 +55,470 @@ class TrackletEngineUnit {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
-    else if (Seed==TF::L5L6&&iTC==2){
+else if (Seed==TF::L1L2&& iTC==TC::B){
       const ap_uint<1> stubptinnertmp[]=
-#include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
+#if __has_include("../emData/TP/tables/TP_L1L2B_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2B_stubptinnercut.tab"
+#else
+    {};
+#endif
       const ap_uint<1> stubptoutertmp[]=
-#include "../emData/TP/tables/TP_L5L6C_stubptoutercut.tab"
+#if __has_include("../emData/TP/tables/TP_L1L2B_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2B_stubptoutercut.tab"
+#else
+    {};
+#endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
         stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
+else if (Seed==TF::L1L2&& iTC==TC::C){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2C_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2C_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2C_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2C_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::D){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2D_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2D_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2D_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2D_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::E){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2E_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2E_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2E_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2E_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::F){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2F_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2F_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2F_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2F_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::G){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2G_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2G_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2G_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2G_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::H){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2H_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2H_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2H_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2H_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::I){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2I_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2I_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2I_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2I_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::J){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2J_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2J_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2J_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2J_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::K){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2K_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2K_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2K_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2K_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L1L2&& iTC==TC::L){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2L_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L1L2L_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L1L2L_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L1L2L_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L2L3&& iTC==TC::A){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3A_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L2L3A_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3A_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L2L3A_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L2L3&& iTC==TC::B){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3B_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L2L3B_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3B_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L2L3B_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L2L3&& iTC==TC::C){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3C_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L2L3C_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3C_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L2L3C_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L2L3&& iTC==TC::D){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3D_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L2L3D_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L2L3D_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L2L3D_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L3L4&& iTC==TC::A){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4A_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L3L4A_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4A_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L3L4A_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L3L4&& iTC==TC::B){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4B_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L3L4B_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4B_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L3L4B_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L3L4&& iTC==TC::C){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4C_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L3L4C_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4C_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L3L4C_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L3L4&& iTC==TC::D){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4D_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L3L4D_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L3L4D_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L3L4D_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L5L6&& iTC==TC::A){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6A_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L5L6A_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6A_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L5L6A_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L5L6&& iTC==TC::B){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6B_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L5L6B_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6B_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L5L6B_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L5L6&& iTC==TC::C){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6C_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L5L6C_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6C_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L5L6C_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+else if (Seed==TF::L5L6&& iTC==TC::D){
+      const ap_uint<1> stubptinnertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6D_stubptinnercut.tab")
+#  include "../emData/TP/tables/TP_L5L6D_stubptinnercut.tab"
+#else
+    {};
+#endif
+      const ap_uint<1> stubptoutertmp[]=
+#if __has_include("../emData/TP/tables/TP_L5L6D_stubptoutercut.tab")
+#  include "../emData/TP/tables/TP_L5L6D_stubptoutercut.tab"
+#else
+    {};
+#endif
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
+    }
+
+
+
+////
     idle_ = true;
     }
 

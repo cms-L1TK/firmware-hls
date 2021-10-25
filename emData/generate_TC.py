@@ -14,7 +14,7 @@ from enum import Enum
 # These enums must match those defined in
 # TrackletAlgorithm/TrackletCalculator.h.
 class ProjoutIndexBarrel(Enum):
-    LIPHIA = 0
+    L1PHIA = 0
     L1PHIB = 1
     L1PHIC = 2
     L1PHID = 3

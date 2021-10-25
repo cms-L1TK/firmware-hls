@@ -5,7 +5,7 @@
 #include "MemoryTemplate.h"
 #include "AllStubInnerMemory.h"
 #include "TrackletEngineUnit.h"
-template <TF::seed Seed,int iTC	, regionType innerRegion,regionType VMSTEType>
+template <TF::seed Seed,TC::itc iTC, regionType innerRegion,regionType VMSTEType>
 class TEData{
 
  public:
@@ -82,7 +82,7 @@ class TEData{
   
 
 // Data object definition
-template <TF::seed Seed, int iTC,regionType innerRegion,regionType VMSTEType>
+template <TF::seed Seed, TC::itc iTC,regionType innerRegion,regionType VMSTEType>
 class TEBuffer {
 
  public:
