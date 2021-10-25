@@ -401,7 +401,6 @@ begin
     )
     port map (
       CLK => CLK,
-      START => MC_DONE,
       DONE => FT_DONE,
       WRITE_EN => BW_46_stream_A_write(var),
       FULL_NEG => BW_46_stream_A_full_neg(var),
@@ -418,7 +417,6 @@ begin
     )
     port map (
       CLK => CLK,
-      START => MC_DONE,
       DONE => FT_DONE,
       WRITE_EN => TW_84_stream_A_write(var),
       FULL_NEG => TW_84_stream_A_full_neg(var),
@@ -435,7 +433,6 @@ begin
     )
     port map (
       CLK => CLK,
-      START => MC_DONE,
       DONE => FT_DONE,
       WRITE_EN => TW_84_stream_A_write(var),
       FULL_NEG => TW_84_stream_A_full_neg(var),
