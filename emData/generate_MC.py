@@ -159,7 +159,7 @@ with open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters
             "#pragma HLS resource variable=allproj->get_mem() latency=2\n"
             "\n"
             "MC_" + seed + "PHI" + iMC + ": MatchCalculator<"
-            "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(len(TF_index)) + ", " + str(len(TF_index)) + ",\n"
+            "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(nCMMem) + ", " + str(nFMMem) + ",\n"
             " TF::" + seed + ", "
             "TF::" + "D1" + ", "
             "MC::" + iMC + "> (\n"
