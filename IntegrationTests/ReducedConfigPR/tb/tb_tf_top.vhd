@@ -70,7 +70,6 @@ architecture behaviour of tb_tf_top is
   constant FILE_OUT_FM_52       : string := dataOutDir&"FM_";
   constant FILE_OUT_TW_84       : string := dataOutDir&"TW_";
   constant FILE_OUT_BW_46       : string := dataOutDir&"BW_";
-  constant FILE_OUT_TF_464      : string := dataOutDir&"TF_";
   -- Debug output files to check input was correctly read.
   constant FILE_OUT_DL_debug    : string := dataOutDir&"DL_";
 
@@ -79,6 +78,9 @@ architecture behaviour of tb_tf_top is
   constant outputFileNameEnding : string := ".txt";
   constant debugFileNameEnding  : string := ".debug.txt";
 
+  -- A bodge for TrackBuilder to write TF_464 concatenated track+stub data.
+  -- (Needed to compare with emData/).
+  constant FILE_OUT_TF_464      : string := dataOutDir&"TF_";
   -- Empty field in the output from FT_L1L2 corresponding to disk matches
   constant emptyDiskStub : std_logic_vector(48 downto 0) := (others => '0');
 
@@ -164,12 +166,12 @@ architecture behaviour of tb_tf_top is
   signal FM_52_mem_A_wea            : t_arr_FM_52_1b       := (others => '0');
   signal FM_52_mem_AV_writeaddr     : t_arr_FM_52_ADDR     := (others => (others => '0'));
   signal FM_52_mem_AV_din           : t_arr_FM_52_DATA     := (others => (others => '0'));
-  signal BW_46_stream_AV_din        : t_arr_BW_46_DATA     := (others => (others => '0'));
-  signal BW_46_stream_A_full_neg    : t_arr_BW_46_1b       := (others => '0');
-  signal BW_46_stream_A_write       : t_arr_BW_46_1b       := (others => '0');
-  signal TW_84_stream_AV_din        : t_arr_TW_84_DATA     := (others => (others => '0'));
-  signal TW_84_stream_A_full_neg    : t_arr_TW_84_1b       := (others => '0');
   signal TW_84_stream_A_write       : t_arr_TW_84_1b       := (others => '0');
+  signal TW_84_stream_A_full_neg    : t_arr_TW_84_1b       := (others => '0');
+  signal TW_84_stream_AV_din        : t_arr_TW_84_DATA     := (others => (others => '0'));
+  signal BW_46_stream_A_write       : t_arr_BW_46_1b       := (others => '0');
+  signal BW_46_stream_A_full_neg    : t_arr_BW_46_1b       := (others => '0');
+  signal BW_46_stream_AV_din        : t_arr_BW_46_DATA     := (others => (others => '0'));
 
   -- Indicates that reading of DL of first event has started.
   signal START_FIRST_LINK : std_logic := '0';
@@ -254,12 +256,12 @@ begin
         DL_39_link_empty_neg       => DL_39_link_empty_neg,
         DL_39_link_read            => DL_39_link_read,
         -- Output data
-        BW_46_stream_AV_din        => BW_46_stream_AV_din,
-        BW_46_stream_A_full_neg    => BW_46_stream_A_full_neg,
-        BW_46_stream_A_write       => BW_46_stream_A_write,
         TW_84_stream_AV_din        => TW_84_stream_AV_din,
         TW_84_stream_A_full_neg    => TW_84_stream_A_full_neg,
-        TW_84_stream_A_write       => TW_84_stream_A_write
+        TW_84_stream_A_write       => TW_84_stream_A_write,
+        BW_46_stream_AV_din        => BW_46_stream_AV_din,
+        BW_46_stream_A_full_neg    => BW_46_stream_A_full_neg,
+        BW_46_stream_A_write       => BW_46_stream_A_write
       );
   end generate sectorProc;
 
@@ -347,12 +349,12 @@ begin
         FM_52_mem_AV_writeaddr     => FM_52_mem_AV_writeaddr,
         FM_52_mem_AV_din           => FM_52_mem_AV_din,
         -- Output data
-        BW_46_stream_AV_din        => BW_46_stream_AV_din,
-        BW_46_stream_A_full_neg    => BW_46_stream_A_full_neg,
-        BW_46_stream_A_write       => BW_46_stream_A_write,
         TW_84_stream_AV_din        => TW_84_stream_AV_din,
         TW_84_stream_A_full_neg    => TW_84_stream_A_full_neg,
-        TW_84_stream_A_write       => TW_84_stream_A_write
+        TW_84_stream_A_write       => TW_84_stream_A_write,
+        BW_46_stream_AV_din        => BW_46_stream_AV_din,
+        BW_46_stream_A_full_neg    => BW_46_stream_A_full_neg,
+        BW_46_stream_A_write       => BW_46_stream_A_write
       );
   end generate sectorProcFull;
 
@@ -640,38 +642,22 @@ begin
 
   TW_84_loop : for var in enum_TW_84 generate
   begin
-    writeTW_84 : entity work.FileWriterFIFO 
+    writeTW_84 : entity work.FileWriterFIFO
     generic map (
-      FILE_NAME  => FILE_OUT_TW_84&memory_enum_to_string(var)&outputFileNameEnding,
-      FIFO_WIDTH  => 84
+      FILE_NAME => FILE_OUT_TW_84&memory_enum_to_string(var)&outputFileNameEnding,
+      FIFO_WIDTH=> 84
     )
     port map (
-      CLK => CLK,
-      START => MC_DONE,
-      DONE => FT_DONE,
-      WRITE_EN => TW_84_stream_A_write(var),
-      FULL_NEG => TW_84_stream_A_full_neg(var),
-      DATA => TW_84_stream_AV_din(var)
+      CLK       => CLK,
+      DONE      => FT_DONE,
+      WRITE_EN  => TW_84_stream_A_write(var),
+      FULL_NEG  => TW_84_stream_A_full_neg(var),
+      DATA      => TW_84_stream_AV_din(var)
     );
   end generate TW_84_loop;
 
-  BW_46_loop : for var in enum_BW_46 generate
-  begin
-    writeBW_46 : entity work.FileWriterFIFO 
-    generic map (
-      FILE_NAME  => FILE_OUT_BW_46&memory_enum_to_string(var)&outputFileNameEnding,
-      FIFO_WIDTH  => 46
-    )
-    port map (
-      CLK => CLK,
-      START => MC_DONE,
-      DONE => FT_DONE,
-      WRITE_EN => BW_46_stream_A_write(var),
-      FULL_NEG => BW_46_stream_A_full_neg(var),
-      DATA => BW_46_stream_AV_din(var)
-    );
-  end generate BW_46_loop;
-
+  -- A bodge for TrackBuilder to write TF_464 concatenated track+stub data.
+  -- (Needed to compare with emData/).
   TF_464_loop : for var in enum_TW_84 generate
   begin
     writeTF_464 : entity work.FileWriterFIFO
@@ -681,13 +667,29 @@ begin
     )
     port map (
       CLK => CLK,
-      START => MC_DONE,
       DONE => FT_DONE,
       WRITE_EN => TW_84_stream_A_write(var),
       FULL_NEG => TW_84_stream_A_full_neg(var),
-      DATA => TW_84_stream_AV_din(var)&BW_46_stream_AV_din(L1L2_L3)&BW_46_stream_AV_din(L1L2_L4)&BW_46_stream_AV_din(L1L2_L5)&BW_46_stream_AV_din(L1L2_L6)&emptyDiskStub&emptyDiskStub&emptyDiskStub&emptyDiskStub
+      DATA => TW_84_stream_AV_din(var)&BW_46_stream_AV_din(L1L2_L3)&BW_46_stream_AV_din(L1L2_L4)&BW_46_stream_AV_din
+(L1L2_L5)&BW_46_stream_AV_din(L1L2_L6)&emptyDiskStub&emptyDiskStub&emptyDiskStub&emptyDiskStub
     );
   end generate TF_464_loop;
+
+  BW_46_loop : for var in enum_BW_46 generate
+  begin
+    writeBW_46 : entity work.FileWriterFIFO
+    generic map (
+      FILE_NAME => FILE_OUT_BW_46&memory_enum_to_string(var)&outputFileNameEnding,
+      FIFO_WIDTH=> 46
+    )
+    port map (
+      CLK       => CLK,
+      DONE      => FT_DONE,
+      WRITE_EN  => BW_46_stream_A_write(var),
+      FULL_NEG  => BW_46_stream_A_full_neg(var),
+      DATA      => BW_46_stream_AV_din(var)
+    );
+  end generate BW_46_loop;
 
 
 end behaviour;

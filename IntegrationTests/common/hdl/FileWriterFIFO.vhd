@@ -24,8 +24,6 @@ entity FileWriterFIFO is
   );
   port (
     CLK      : in  std_logic;
-    START    : in std_logic;  --! Start signal of previous proc. module.
-                              --! (or Done signal of previous, previous proc. module).
     DONE     : in std_logic;  --! Done signal of previous proc. module.
     WRITE_EN : in std_logic;
     FULL_NEG : out std_logic;
@@ -38,7 +36,6 @@ architecture behavior of FileWriterFIFO is
 begin
 
 procFile : process(CLK)
-  variable START_LATCH : std_logic := '0';            
   variable INIT        : boolean := false; --! File not yet open
   variable FILE_STATUS : file_open_status;
   file     FILE_OUT    : text;   
@@ -57,10 +54,6 @@ begin
 
   if rising_edge(CLK) then
 
-    if (START = '1') then
-      START_LATCH := '1';
-    end if;
-
     -- Open and initialize file
 
     if (not INIT) then
@@ -78,27 +71,24 @@ begin
 
     -- Write data from events
 
-    if (START_LATCH = '1') then
+    if (WRITE_EN = '1' and BX_CNT < MAX_EVENTS) then 
+      -- Valid data, so write it to file.
+      write(LINE_OUT, NOW   , right, TXT_WIDTH); 
+      write(LINE_OUT, BX_CNT, right, TXT_WIDTH);
+      write(LINE_OUT, to_hexstring(ADDR), right, TXT_WIDTH);
+      write(LINE_OUT, to_hexstring(DATA), right, 11*TXT_WIDTH);
+      writeline(FILE_OUT, LINE_OUT);      
+      ADDR := std_logic_vector(unsigned(ADDR) + "1");
+    end if;
 
-      if (WRITE_EN = '1' and BX_CNT < MAX_EVENTS) then 
-        -- Valid data, so write it to file.
-        write(LINE_OUT, NOW   , right, TXT_WIDTH); 
-        write(LINE_OUT, BX_CNT, right, TXT_WIDTH);
-        write(LINE_OUT, to_hexstring(ADDR), right, TXT_WIDTH);
-        write(LINE_OUT, to_hexstring(DATA), right, 11*TXT_WIDTH);
-        writeline(FILE_OUT, LINE_OUT);      
-        ADDR := std_logic_vector(unsigned(ADDR) + "1");
-      end if;
+    if (DONE = '1') then
+      -- Module has finished event, so increment event counter.
+      BX_CNT := BX_CNT + 1;
+      ADDR := (others => '0');
 
-      if (DONE = '1') then
-        -- Module has finished event, so increment event counter.
-        BX_CNT := BX_CNT + 1;
-        ADDR := (others => '0');
-
-        if (BX_CNT = MAX_EVENTS) then
-          -- All events processed, so close file.
-          file_close(FILE_OUT);
-        end if;
+      if (BX_CNT = MAX_EVENTS) then
+        -- All events processed, so close file.
+        file_close(FILE_OUT);
       end if;
     end if;
   end if;
