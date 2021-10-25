@@ -29,14 +29,19 @@ int main(){
   static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
   static TrackFitMemory outputTracks;
 
+  TBHelper tb("../../../../../emData/PD/PD/");
+
   // Open input files
-  ifstream fin_inputTracks;
+  auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2_04.dat");
+  auto &fout_outputTracks = tb.files("TrackFit_TF_L1L2_04.dat"); // "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat"
+
+  /*ifstream fin_inputTracks;
   openDataFile(fin_inputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
   assert(fin_inputTracks.good());
 
   ifstream fout_outputTracks;
   openDataFile(fout_outputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");// "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
-  assert(fout_outputTracks.good());
+  assert(fout_outputTracks.good());*/
 
   // Loop over events
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
@@ -52,7 +57,7 @@ int main(){
     outputTracks.clear();
 
     // Read in next event from input
-    writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks, ievt);
+    writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
 
     // Set bunch crossing
     BXType bx = ievt;
@@ -108,6 +113,8 @@ int main(){
     barrelStubWords_o,
     diskStubWords_o);
 
+    bool truncation = false;
+
     // Filling outputs
     unsigned nTracks = 0;
     for (unsigned short i = 0; i < kMaxProc; i++){
@@ -127,13 +134,13 @@ int main(){
     }
 
     // Comparing outputs
-    err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks, ievt, "Tracks");
+    err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
 
   }
 
   // Close files
-  fin_inputTracks.close();
-  fout_outputTracks.close();
+  //fin_inputTracks.close();
+  //fout_outputTracks.close();
 
   // Handling case of err%256 == 0 
   if (err_count > 255) err_count = 255;

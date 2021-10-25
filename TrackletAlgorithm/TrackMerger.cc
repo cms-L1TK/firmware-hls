@@ -1,7 +1,7 @@
 #include "TrackMerger.h"
 #include <bitset>
 
-void TrackMergerHelper(const BXType bx,
+void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
@@ -21,7 +21,7 @@ void TrackMergerHelper(const BXType bx,
     for (unsigned int i = 0; i < kMaxProc; i++){
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
-        ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();   
+        //ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();   
         TrackFit::BarrelStubWord barrelStubWord;   
         for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
             switch (j){
