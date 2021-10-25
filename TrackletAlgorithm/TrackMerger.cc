@@ -21,9 +21,7 @@ void TrackMergerHelper(const BXType bx,
     for (unsigned int i = 0; i < kMaxProc; i++){
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
-        ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();
-        std::cout << "Track Stub Map: " << std::bitset<TrackFitBase::kTFHitMapSize>(trackStubMap) << std::endl;
-        
+        ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();   
         TrackFit::BarrelStubWord barrelStubWord;   
         for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
             switch (j){
@@ -45,7 +43,6 @@ void TrackMergerHelper(const BXType bx,
                 break;
 
             }
-            std::cout << "barrelStub: " << std::bitset <TrackFitBase::kBarrelStubSize> (barrelStubWord) << std::endl;
         }  
         TrackFit::DiskStubWord diskStubWord;    
         for (unsigned int k = TrackFit::kNDiskStubs; k < TrackFit::kNStubs; k++){
@@ -67,7 +64,6 @@ void TrackMergerHelper(const BXType bx,
                 diskStubWord = trkFit.getDiskStubWord<7>();
                 break;
             }
-            std::cout << "diskStubWord: " << std::bitset<TrackFitBase::kDiskStubSize> (diskStubWord) << std::endl;
         }
 
         // getting stub index
@@ -99,7 +95,6 @@ void TrackMergerHelper(const BXType bx,
               stubIndex = trkFit.getStubIndex<7>();
               break;
           }
-          std::cout << "StubIndex: " << stubIndex << std::endl;
         }
 
     }
