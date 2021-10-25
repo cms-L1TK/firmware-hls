@@ -142,8 +142,7 @@ public:
 	data_( ((((((tcid,trackletindex),stubphiid),stubid),stubr),phires),zres) )
   {}
 
-  FullMatch():
-    data_(0)
+  FullMatch()
   {}
 
   #ifndef __SYNTHESIS__
