@@ -603,10 +603,9 @@ TrackletCalculator(
       const StubPair::SPOuterIndex outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
 
       const auto maskShift = TC::kNBitsPerSPMem * iSPMem;
-      const auto iSPMemMask = TC::kSPMemMask << maskShift;
+      const auto iSPMemMask = ((uint64_t) TC::kSPMemMask) << maskShift;
       const AllStub<InnerRegion<Seed>()> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & iSPMemMask) >> maskShift].read_mem(bx, innerIndex);
       const AllStub<OuterRegion<Seed>()> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & iSPMemMask) >> maskShift].read_mem(bx, outerIndex);
-
 
       TC::processStubPair<Seed, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
