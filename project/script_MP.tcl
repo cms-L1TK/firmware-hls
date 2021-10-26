@@ -1,6 +1,6 @@
 # Script to generate project for MP
 #   vivado_hls -f script_MP.tcl
-#   vivado_hls -p match_calc
+#   vivado_hls -p match_processor
 # WARNING: this will wipe out the original project by the same name
 
 # get some information about the executable and environment
@@ -14,7 +14,7 @@ set modules_to_test {
 set module_to_export MP_L3PHIC
 
 # create new project (deleting any existing one of same name)
-open_project -reset match_calc
+open_project -reset match_processor
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
