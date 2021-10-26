@@ -433,7 +433,7 @@ void MatchCalculator(BXType bx,
   
   // Full match  
   typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
-  FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,(ap_uint<3>(2),fm_asid),fm_stubr,fm_phi,fm_z);
+  FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
 
   //-----------------------------------------------------------------------------------------------------------
   //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
