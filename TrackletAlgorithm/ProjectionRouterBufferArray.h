@@ -2,7 +2,7 @@
 #define PRBUFFERARRAY_HH
 
 #include "ProjectionRouterBuffer.h"
-#include "MatchProcessor_parameters.h"
+#include "MatchEngineUnit_parameters.h"
 
 template<int kNBitsBuffer,int AllProjectionType> class ProjectionRouterBufferArray {
 public:

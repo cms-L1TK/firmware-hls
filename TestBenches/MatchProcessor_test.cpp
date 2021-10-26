@@ -27,12 +27,12 @@ int main()
 {
   // Define memory patterns
   const string trackletProjectionPattern = "TrackletProjections*";
-  const string allProjectionPatternarray = "AllProj*";
   const string allStubPatternarray = "AllStub*";
+  const string vmStubPatternarray = "VMStubs_VMSME*";
   const string fullMatchPattern = "FullMatches*";
 
-  const auto stubMemType = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : (MODULE_ >= MP_D3PHIA_) ? DISK2S : DISKPS;
-  const auto projMemType = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : DISK;
+  const auto stubMemType   = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : (MODULE_ >= MP_D3PHIA_) ? DISK2S : DISKPS;
+  const auto tprojMemType  = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : DISK;
   const auto fmProjMemType = (MODULE_ >= MP_L1PHIA_ && MODULE_) ? BARREL : DISK;
   TBHelper tb(std::string("MP/") + module_name[MODULE_]);
 
@@ -42,11 +42,11 @@ int main()
   ///////////////////////////
   // input memories
   const auto nTrackletProjections = tb.nFiles(trackletProjectionPattern);
-  vector<CandidateMatchMemory> tprojarray(nTrackletProjections);
-  const auto nAllProjections = tb.nFiles(allProjectionPatternarray);
-  vector<AllProjectionMemory<projMemType>> allproj(nAllProjections);
-  const auto nAllStubs = tb.nFiles(allStubPatternarray);
-  vector<AllStubMemory<stubMemType>> allstub(nAllStubs);
+  vector<TrackletProjectionMemory<tprojMemType>> tprojarray(nTrackletProjections);
+  const auto nAllStub = tb.nFiles(allStubPatternarray);
+  vector<AllStubMemory<stubMemType>> allstub(nAllStub);
+  const auto nVMStubs = tb.nFiles(vmStubPatternarray);
+  VMStubMEMemoryCM<stubMemType, 3, 3, kNMatchEngines> vmstub;
 
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
@@ -56,10 +56,10 @@ int main()
   std::cout << "Loaded the input files:\n";
   for (unsigned i = 0; i < nTrackletProjections; i++)
     std::cout << "\t" << tb.fileNames(trackletProjectionPattern).at(i) << "\n";
-  for (unsigned i = 0; i < nAllProjections; i++)
-    std::cout << "\t" << tb.fileNames(allProjectionPatternarray).at(i) << "\n";
-  for (unsigned i = 0; i < nAllStubs; i++)
+  for (unsigned i = 0; i < nAllStub; i++)
     std::cout << "\t" << tb.fileNames(allStubPatternarray).at(i) << "\n";
+  for (unsigned i = 0; i < nVMStubs; i++)
+    std::cout << "\t" << tb.fileNames(vmStubPatternarray).at(i) << "\n";
   for (unsigned i = 0; i < nFullMatches; i++)
     std::cout << "\t" << tb.fileNames(fullMatchPattern).at(i) << "\n";
   std::cout << std::endl;
@@ -72,13 +72,12 @@ int main()
     // read event and write to memories
     auto &fin_TrackletProjections = tb.files(trackletProjectionPattern);
     for (unsigned int i = 0; i < nTrackletProjections; i++)
-      writeMemFromFile<CandidateMatchMemory>(tprojarray[i], fin_TrackletProjections.at(i), ievt);
-    auto &fin_AllProjections = tb.files(allProjectionPatternarray);
-    for (unsigned int i = 0; i < nAllProjections; i++)
-      writeMemFromFile<AllProjectionMemory<projMemType>>(allproj[i], fin_AllProjections.at(i), ievt);
-    auto &fin_AllStubs = tb.files(allStubPatternarray);
-    for (unsigned int i = 0; i < nAllStubs; i++)
-      writeMemFromFile<AllStubMemory<stubMemType>>(allstub[i], fin_AllStubs.at(i), ievt);
+      writeMemFromFile<TrackletProjectionMemory<tprojMemType>>(tprojarray[i], fin_TrackletProjections.at(i), ievt);
+    auto &fin_AllStub = tb.files(allStubPatternarray);
+    for (unsigned int i = 0; i < nAllStub; i++)
+      writeMemFromFile<AllStubMemory<stubMemType>>(allstub[i], fin_AllStub.at(i), ievt);
+    auto &fin_VMStubs = tb.files(vmStubPatternarray);
+    writeMemFromFile<VMStubMEMemoryCM<stubMemType, 3, 3, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
 
     // clear allarray, output memories before starting
     for (unsigned int i = 0; i < nFullMatches; i++)
@@ -89,7 +88,7 @@ int main()
     BXType bx_out;
 
     // Unit Under Test
-    TOP_FUNC_(bx, tprojarray.data(), allstub.data(), allproj.data(), bx_out, fullmatcharray.data());
+    TOP_FUNC_(bx, tprojarray.data(), vmstub, allstub.data(), bx_out, fullmatcharray.data());
 
     bool truncation = false;
     auto &fout_fullmatch = tb.files(fullMatchPattern);
