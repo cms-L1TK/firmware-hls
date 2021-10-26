@@ -6,7 +6,7 @@ set cwd [pwd]
 # Build TE_L1L2
 open_project -reset trackletengine
 add_files ../../../TopFunctions/TrackletEngineTop.cc -cflags "$CFLAGS"
-set_top TrackletEngineTop
+set_top TrackletEngine_PS_PS
 open_solution solution_L1L2
 cd ../../../project
 source settings_hls.tcl
