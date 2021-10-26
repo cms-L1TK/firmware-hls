@@ -22,8 +22,8 @@ set module_to_export TC_L1L2E
 open_project -reset trackletCalculator
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-add_files ../TrackletAlgorithm/TrackletCalculatorTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
+add_files ../TopFunctions/TrackletCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files

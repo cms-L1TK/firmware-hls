@@ -2,13 +2,13 @@
 
 # This script generates MatchCalculator_parameters.h,
 # MatchCalculatorTop.h, and MatchCalculatorTop.cc in the
-# TrackletAlgorithm/ directory. Currently supports all MCs for L3_PHIC.
+# TopFunctions/ directory. Currently supports all MCs for L3_PHIC.
 
 from __future__ import absolute_import
 from __future__ import print_function
 import os
 import re
-import sys
+import argparse
 
 TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
 TF_index = {k:v for v,k in enumerate(TF_index)}
@@ -35,14 +35,16 @@ def FMRegion(region):
     else:
         return 'DISK'
 
-if len(sys.argv) < 2:
-    print("Usage: " + sys.argv[0] + " WIRES_FILE")
-    sys.exit(1)
-wiresFileName = sys.argv[1]
+parser = argparse.ArgumentParser(description="This script generates MatchCalculatorTop.h, MatchCalculatorTop.cc, and\
+MatchCalculator_parameters.h in the TopFunctions/ directory.",
+                                 epilog="")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with MCs in
 # dictionaries with the MC names as keys.
-with open(wiresFileName) as wiresFile:
+with open(arguments.wiresFileName) as wiresFile:
     CMMems = {}
     FMMems = {}
     for line in wiresFile:
@@ -64,12 +66,12 @@ with open(wiresFileName) as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters.h"), "w") as parametersFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculatorTop.cc"), "w") as topFile:
+with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_parameters.h"), "w") as parametersFile, \
+     open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculatorTop.h"), "w") as topHeaderFile, \
+     open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculatorTop.cc"), "w") as topFile:
     parametersFile.write(
-        "#ifndef TrackletAlgorithm_MatchCalculator_parameters_h\n"
-        "#define TrackletAlgorithm_MatchCalculator_parameters_h\n"
+        "#ifndef TopFunctions_MatchCalculator_parameters_h\n"
+        "#define TopFunctions_MatchCalculator_parameters_h\n"
         "\n"
         "// This file contains numbers of memories and bit masks that are specific to\n"
         "// each MatchCalculator and that come directly from the wiring.\n"
@@ -82,8 +84,8 @@ with open(os.path.join(dirname, "../TrackletAlgorithm/MatchCalculator_parameters
         "// valid, if it is not, the corresponding memory is not valid.\n"
     )
     topHeaderFile.write(
-        "#ifndef TrackletAlgorithm_MatchCalculatorTop_h\n"
-        "#define TrackletAlgorithm_MatchCalculatorTop_h\n"
+        "#ifndef TopFunctions_MatchCalculatorTop_h\n"
+        "#define TopFunctions_MatchCalculatorTop_h\n"
         "\n"
         "#include \"MatchCalculator.h\"\n"
         "\n"

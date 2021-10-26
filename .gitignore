@@ -32,6 +32,7 @@ vmrouter_1
 vmrouter_2
 emData
 IntegrationTests/PRMEMC/*.txt
+TopFunctions
 
 # Precompiled Headers
 *.gch

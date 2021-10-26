@@ -17,8 +17,8 @@ set module_to_export MC_L3PHIC
 open_project -reset match_calc
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-add_files ../TrackletAlgorithm/MatchCalculatorTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
+add_files ../TopFunctions/MatchCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files

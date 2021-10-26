@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
+#### reduced config ####
+#### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
+# 1 event
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
+# 100 events
+#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
+
 #### fw_synch_210611 ####
 # Standard configuration
 memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
@@ -220,6 +228,10 @@ fi
 # Download and unpack LUTs.tar.gz.
 if [[ $memprints_only == 0 ]]
 then
+  wget -O LUTs.tgz --quiet ${luts_url_reduced}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsReduced
+  rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
   mv LUTs LUTsCM
@@ -229,16 +241,29 @@ then
   rm -f LUTs.tar.gz
 fi
 
-# Run scripts to generate top functions in TrackletAlgorithm/
-./generate_IR.py
-./generate_VMR.py -a -w LUTs/wires.dat
-./generate_TC.py LUTs/wires.dat
-./generate_PR.py LUTs/wires.dat
-./generate_MC.py LUTs/wires.dat
-./generate_TB.py LUTs/wires.dat
-./generate_ME.py -s
-./generate_VMRCM.py -d -w LUTsCM/wires.dat
-./generate_TP.py LUTsCM/wires.dat
+# Run scripts to generate top functions in TopFunctions/
+### full config
+./generate_IR.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_VMR.py -a -w LUTs/wires.dat -o ../TopFunctions
+./generate_TC.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_PR.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_ME.py -s  -w LUTs/wires.dat -o ../TopFunctions
+./generate_MC.py     -w LUTs/wires.dat -o ../TopFunctions
+./generate_TB.py     -w LUTs/wires.dat -o ../TopFunctions
+### reduced config
+mkdir -p ../TopFunctions/ReducedConfig
+./generate_IR.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_VMR.py -a -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_TC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_PR.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_ME.py -s  -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_MC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+./generate_TB.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+### combined config
+mkdir -p ../TopFunctions/CombinedConfig
+./generate_VMRCM.py -d -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
 then
@@ -246,6 +271,16 @@ then
 fi
 
 # Download and unpack the tarball.
+wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
+tar -xzf MemPrints.tgz
+mv MemPrints MemPrintsReduced
+rm -f MemPrints.tgz
+
+### Ugly hack to remove initial "0x" from input stub test vectors, in order to
+### be consistent with other sets of test vectors.
+### FIXME: Remove after next FW sync
+sed -i "s/^0x//g" MemPrintsReduced/InputStubs/InputStubs_*.dat
+
 wget -O MemPrints.tgz --quiet ${memprints_url_cm}
 tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsCM
@@ -266,6 +301,7 @@ do
   echo ${module}
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
+  memprint_location_reduced="MemPrintsReduced"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
@@ -281,11 +317,12 @@ do
   target_dir=${module_type}/${module}
 
   rm -rf ${target_dir}
-  mkdir -p ${target_dir}
+  mkdir -p ${target_dir}/ReducedConfig
 
   for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
   do
     find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+    find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
   done
 
   # Table linking logic specific to each module type

@@ -8,7 +8,7 @@ create_project -force ${projName} ./${projName} -part $FPGA
 set_property target_language VHDL [current_project]
 
 # Rebuild user HLS IP repos index before adding any source files
-set_property ip_repo_paths "../../../project/"  [get_filesets sources_1]
+set_property ip_repo_paths "./"  [get_filesets sources_1]
 update_ip_catalog -rebuild
 
 # Create .xci files for user HLS IP

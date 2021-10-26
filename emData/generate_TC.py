@@ -2,13 +2,13 @@
 
 # This script generates TrackletCalculator_parameters.h,
 # TrackletCalculatorTop.h, and TrackletCalculatorTop.cc in the
-# TrackletAlgorithm/ directory. Currently supports all TCs for L1L2, as well as
+# TopFunctions/ directory. Currently supports all TCs for L1L2, as well as
 # TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
 from __future__ import absolute_import, print_function
 import os
 import re
-import sys
+import argparse
 from enum import Enum
 
 # These enums must match those defined in
@@ -63,14 +63,16 @@ class ProjoutIndexDisk(Enum):
     D4PHID = 15
     N_PROJOUT_DISK = 16
 
-if len(sys.argv) < 2:
-    print("Usage: " + sys.argv[0] + " WIRES_FILE")
-    sys.exit(1)
-wiresFileName = sys.argv[1]
+parser = argparse.ArgumentParser(description="This script generates TrackletCalculatorTop.h, TrackletCalculatorTop.cc, and\
+TrackletCalculator_parameters.h in the TopFunctions/ directory.",
+                                 epilog="")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with TCs in
 # dictionaries with the TC names as keys.
-with open(wiresFileName, "r") as wiresFile:
+with open(arguments.wiresFileName, "r") as wiresFile:
     asInnerMems = {}
     asOuterMems = {}
     spMems = {}
@@ -107,12 +109,12 @@ with open(wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculator_parameters.h"), "w") as parametersFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculatorTop.cc"), "w") as topFile:
+with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_parameters.h"), "w") as parametersFile, \
+     open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculatorTop.h"), "w") as topHeaderFile, \
+     open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculatorTop.cc"), "w") as topFile:
     parametersFile.write(
-        "#ifndef TrackletAlgorithm_TrackletCalculator_parameters_h\n"
-        "#define TrackletAlgorithm_TrackletCalculator_parameters_h\n"
+        "#ifndef TopFunctions_TrackletCalculator_parameters_h\n"
+        "#define TopFunctions_TrackletCalculator_parameters_h\n"
         "\n"
         "// This file contains numbers of memories and bit masks that are specific to\n"
         "// each TrackletCalculator and that come directly from the wiring.\n"
@@ -135,8 +137,8 @@ with open(os.path.join(dirname, "../TrackletAlgorithm/TrackletCalculator_paramet
         "// in the same way.\n"
     )
     topHeaderFile.write(
-        "#ifndef TrackletAlgorithm_TrackletCalculatorTop_h\n"
-        "#define TrackletAlgorithm_TrackletCalculatorTop_h\n"
+        "#ifndef TopFunctions_TrackletCalculatorTop_h\n"
+        "#define TopFunctions_TrackletCalculatorTop_h\n"
         "\n"
         "#include \"TrackletCalculator.h\"\n"
     )

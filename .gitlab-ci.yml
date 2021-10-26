@@ -3,7 +3,7 @@ variables:
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
   CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7.0/root/bin/clang-tidy'
   CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
-  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
+  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TopFunctions -I../TopFunctions/CombinedConfig -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
 
 stages: # ---------------------------------------------------------------------
   - lint
@@ -65,6 +65,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
+    - vivado_hls -f ./compileHLS.tcl
     - vivado -mode tcl -source ./makeProject.tcl
     - vivado -mode tcl -source ./runSim.tcl
   artifacts:
@@ -129,64 +130,64 @@ download:
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
       - ./emData/
-      - ./TrackletAlgorithm/
+      - ./TopFunctions/
     expire_in: 1 week
 # Quality checks ------------
 IR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TrackletAlgorithm/InputRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/InputRouterTop.cc'
 VMR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TrackletAlgorithm/VMRouterTop_L2PHIA.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouter_test.cpp ../TopFunctions/VMRouterTop_L2PHIA.cc'
 VMRCM-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TrackletAlgorithm/VMRouterCMTop_L2PHIA.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig/VMRouterCMTop_L2PHIA.cc'
 TE-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TrackletAlgorithm/TrackletEngineTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletEngine_test.cpp ../TopFunctions/TrackletEngineTop.cc'
 TC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TrackletAlgorithm/TrackletCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletCalculator_test.cpp ../TopFunctions/TrackletCalculatorTop.cc'
 TP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TrackletAlgorithm/TrackletProcessorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/CombinedConfig/TrackletProcessorTop.cc'
 PR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/ProjectionRouter_test.cpp ../TrackletAlgorithm/ProjectionRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/ProjectionRouter_test.cpp ../TopFunctions/ProjectionRouterTop.cc'
 ME-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TrackletAlgorithm/MatchEngineTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/MatchEngine_test.cpp ../TopFunctions/MatchEngineTop.cc'
 MC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TrackletAlgorithm/MatchCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/MatchCalculator_test.cpp ../TopFunctions/MatchCalculatorTop.cc'
 MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TrackletAlgorithm/MatchProcessorTopL3.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TopFunctions/CombinedConfig/MatchProcessorTopL3.cpp'
 TB-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TrackletAlgorithm/TrackBuilderTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/TrackBuilderTop.cc'
 # HLS builds ---------------
 IR-vivado-hls-build:
   <<: *template_hls-build
@@ -268,7 +269,7 @@ MP-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MP"
-TB-hls-build:
+TB-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TB-quality-check"]
   variables:
@@ -281,11 +282,20 @@ topPRMEMC-sim:
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
-  needs: # needed to avoid interference from ME-vitis-hls-build
+  needs:
     - download
     - PR-vivado-hls-build
     - ME-vivado-hls-build
     - MC-vivado-hls-build
+topTETC-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TETC"
+  needs:
+    - download
+    - TE-vivado-hls-build
+    - TC-vivado-hls-build
 topIRVMR-sim:
   <<: *template_topTF-sim
   variables:
@@ -300,24 +310,28 @@ topPRMEMC-check-results:
   <<: *template_check-results
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "PRMEMC"
   needs:
     - download
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
     - topPRMEMC-sim
+topTETC-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "TETC"
+  needs:
+    - download
+    - topTETC-sim
 topIRVMR-check-results:
   <<: *template_check-results
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is parth of the path that is called
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "IRVMR"
   needs:
     - download
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
     - topIRVMR-sim
 # FW synthesis ---------------
 topPRMEMC-synth:
@@ -326,18 +340,21 @@ topPRMEMC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
     - topPRMEMC-sim
     - topPRMEMC-check-results
+topTETC-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TETC"
+  needs:
+    - topTETC-sim
+    - topTETC-check-results
 topIRVMR-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
     - topIRVMR-sim
     - topIRVMR-check-results

@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function
 # Automatically generates ProjectionRouterTop.h, and ProjectionRouterTop.cc
 import os
 import re
-import sys
+import argparse
 
 def getListOfModules(wiresFileName):
     with open(wiresFileName) as wiresFile:
@@ -50,8 +50,8 @@ def writeHeaderModuleInstance(module):
 
 def writeHeaderPreamble():
     strPreamble = ""
-    strPreamble += "#ifndef TrackletAlgorithm_ProjectionRouterTop_h\n"
-    strPreamble += "#define TrackletAlgorithm_ProjectionRouterTop_h\n\n"
+    strPreamble += "#ifndef TopFunctions_ProjectionRouterTop_h\n"
+    strPreamble += "#define TopFunctions_ProjectionRouterTop_h\n\n"
     strPreamble += "#include \"ProjectionRouter.h\"\n\n"
     return strPreamble
 
@@ -89,23 +89,25 @@ def writeSourcePreamble():
     strPreamble += "#include \"ProjectionRouterTop.h\"\n\n"
     return strPreamble
 
-if len(sys.argv) < 2:
-    print("Usage: " + sys.argv[0] + " WIRES_FILE")
-    sys.exit(1)
+parser = argparse.ArgumentParser(description="This script generates ProjectionRouterTop.h and ProjectionRouterTop.cc in the\
+TopFunctions/ directory.",
+                                 epilog="")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+arguments = parser.parse_args()
 
-wiresFileName = sys.argv[1]
 headerString = writeHeaderPreamble()
 sourceString = writeSourcePreamble()
 
-modulesToBuild = getListOfModules(wiresFileName)
+modulesToBuild = getListOfModules(arguments.wiresFileName)
 for module in modulesToBuild:
     headerString += writeHeaderModuleInstance(module)
-    sourceString += writeSourceModuleInstance(module, wiresFileName)
+    sourceString += writeSourceModuleInstance(module, arguments.wiresFileName)
 
 headerString += writeHeaderPostamble()
 
 dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, "../TrackletAlgorithm/ProjectionRouterTop.h"), "w") as headerFile:
+with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionRouterTop.h"), "w") as headerFile:
     headerFile.write(headerString)
-with open(os.path.join(dirname, "../TrackletAlgorithm/ProjectionRouterTop.cc"), "w") as sourceFile:
+with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionRouterTop.cc"), "w") as sourceFile:
     sourceFile.write(sourceString)

@@ -10,9 +10,9 @@ source env_hls.tcl
 open_project -reset trackBuilder
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
 set_top TrackBuilder_L1L2
-add_files ../TrackletAlgorithm/TrackBuilderTop.cc -cflags "$CFLAGS"
+add_files ../TopFunctions/TrackBuilderTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackBuilder_test.cpp -cflags "$CFLAGS"
 
 open_solution "solution1"

@@ -15,3 +15,8 @@ find -mindepth 1 -maxdepth 1 \
   ! -regex "^\.\/generate_[A-Z]*\.py$" \
     -exec rm -rfv {} \;
   #! -regex "^\.\/dtclinklayerdisk\.dat$" \
+
+# Remove everything in TopFunctions/, then restore the static top files
+# currently in the repo.
+rm -rfv ../TopFunctions/*
+git checkout -- ../TopFunctions
