@@ -10,13 +10,11 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
-
-#include <cassert>
-
+#include "hls_math.h"
 #include <iostream>
 #include <fstream>
 #include <bitset>
-#include "MatchProcessor_parameters.h"
+#include "MatchEngineUnit_parameters.h"
 
 template<int nbits>
 static const ap_uint<1 << nbits> hasOneStub() {
