@@ -24,6 +24,8 @@ void TrackMerger(const BXType bx,
     for (unsigned int i = 0; i < kMaxProc; i++){
         TrackFit trkFit;
         trkFit.setTrackWord(trackWord[i]);
+        trackWord_o = trkFit.getTrackWord();
+
         //ap_uint<TrackFitBase::kTFHitMapSize> trackStubMap = trkFit.getHitMap();   
         TrackFit::BarrelStubWord barrelStubWord;   
         for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
@@ -46,6 +48,7 @@ void TrackMerger(const BXType bx,
                 break;
 
             }
+            barrelStubWords_o[j] = {barrelStubWord[0][j], barrelStubWord[1][j], barrelStubWord[2][j], barrelStubWord[3][j]}
         }  
         TrackFit::DiskStubWord diskStubWord;    
         for (unsigned int k = TrackFit::kNDiskStubs; k < TrackFit::kNStubs; k++){
@@ -67,6 +70,7 @@ void TrackMerger(const BXType bx,
                 diskStubWord = trkFit.getDiskStubWord<7>();
                 break;
             }
+            diskStubWords_o[k] = {diskStubWord[0][k], diskStubWord[1][k], diskStubWord[2][k], diskStubWord[3][k]};
         }
 
         // getting stub index
@@ -101,7 +105,6 @@ void TrackMerger(const BXType bx,
         }
 
     }
-  
   
     bx_o = bx;
   
