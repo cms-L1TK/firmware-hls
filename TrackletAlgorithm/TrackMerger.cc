@@ -1,5 +1,8 @@
 #include "TrackMerger.h"
+#include "ap_int.h"
 #include <bitset>
+using namespace std;
+
 
 void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
