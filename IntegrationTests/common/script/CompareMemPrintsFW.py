@@ -255,7 +255,12 @@ def comparePredefined(args):
         ret_sum += compare(comparison_filename=comp, fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                            reference_filenames=[ref], save=args.save, verbose=args.verbose)
 
-    print("Accumulated number of errors =",ret_sum)
+    if args.save:
+      print("Summary of memories with errors")
+      print("=================================")
+      os.system('\grep "Bad events: [1-9]" dataOut/*cmp.txt')
+
+    print("\n Accumulated number of errors =",ret_sum)
 
     sys.exit(ret_sum)
 
