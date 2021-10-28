@@ -274,6 +274,7 @@ mkdir -p ../TopFunctions/ReducedConfig
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -d -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]
