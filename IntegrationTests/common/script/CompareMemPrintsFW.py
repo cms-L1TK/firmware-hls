@@ -130,7 +130,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         finally:
             reference_type = ReferenceType[reference_type_string]
 
-        print("Comparing TB results to ref. file "+str(reference_filename)+" ... ")
+        print("Comparing TB results "+str(comparison_filename)+" to ref. file "+str(reference_filename)+" ... ")
 
         # Read column names from file
         column_names = list(pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,nrows=1))
@@ -158,7 +158,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         reference_data = parse_reference_file(file_location+"/"+reference_filename, is_binned)
 
         for ievent,event in enumerate(reference_data):
-            print("Doing event "+str(ievent+1)+"/"+str(len(reference_data))+" ... ")
+            print("Doing event "+str(ievent)+"/"+str(len(reference_data))+" ... ")
             good = True
 
             # Select the correct event from the comparison data
@@ -166,7 +166,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             if len(selected_rows) == 0 and len(event) != 0:
                 good = False
                 number_of_missing_events += 1
-                message = "Event "+str(ievent+1)+" does not exist in the comparison data!"
+                message = "Event "+str(ievent)+" does not exist in the comparison data!"
                 if fail_on_error: raise Exception(message)
                 else:             print("\t"+message)
 
@@ -178,7 +178,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             if len(selected_rows) != len(event):
                 good = False
                 number_of_event_length_mismatches += 1
-                message = "The number of entries in the comparison data doesn't match the number of entries in the reference data for event "+str(ievent+1)+"!"\
+                message = "The number of entries in the comparison data doesn't match the number of entries in the reference data for event "+str(ievent)+"!"\
                           "\n\treference="+str(len(event))+" comparison="+str(len(selected_rows))
                 if fail_on_error: raise Exception(message)
                 else:             print("\t"+message.replace("\n","\n\t"))
@@ -242,7 +242,7 @@ def comparePredefined(args):
         raise FileNotFoundError("Please make sure that the directories " + comparison_dir + " and " + reference_dir + " exist from where this script is run with the predefined (-p) flag")
 
     # Find the lists of filenames
-    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f] # Remove debug and comparison files from file list
+    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
     reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
     try:
