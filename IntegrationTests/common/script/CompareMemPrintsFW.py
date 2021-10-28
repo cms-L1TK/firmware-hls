@@ -148,6 +148,10 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
+        # Sort data by ascending address
+        data.sort_values(by=['ADDR'], inplace = True)
+        data.reset_index(drop = True, inplace = True)
+
         selected_columns = data[column_selections]
 
         # Parse the reference data
@@ -169,7 +173,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             # Select only the comparison data where the valid bit is set
             #selected_rows = selected_rows.loc[selected_rows[selected_rows.columns[1]] == '0b1']
 
-            # Check the legnth of the two sets
+            # Check the length of the two sets
             # Raise an exception if the are fewer entries for a given event in the comparison data than in the reference data
             if len(selected_rows) != len(event):
                 good = False
