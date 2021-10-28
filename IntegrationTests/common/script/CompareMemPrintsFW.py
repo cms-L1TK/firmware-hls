@@ -149,7 +149,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         if verbose: print(data) # Can also just do data.head()
 
         # Sort data by ascending address
-        data.sort_values(by=['ADDR'], inplace = True)
+        data.sort_values(by=['BX','ADDR'], inplace = True)
         data.reset_index(drop = True, inplace = True)
 
         selected_columns = data[column_selections]
