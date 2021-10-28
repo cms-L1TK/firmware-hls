@@ -18,7 +18,7 @@ open_project -reset match_processor
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
-add_files ../TrackletAlgorithm/MatchProcessorTop.cc -cflags "$CFLAGS"
+add_files ../TopFunctions/MatchProcessorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchProcessor_test.cpp -cflags "$CFLAGS"
 
 # data files
