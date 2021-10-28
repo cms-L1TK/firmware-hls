@@ -32,8 +32,13 @@ int main(){
   TBHelper tb("../../../../../emData/PD/PD/");
 
   // Open input files
-  auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2_04.dat");
-  auto &fout_outputTracks = tb.files("TrackFit_TF_L1L2_04.dat"); // "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat"
+  auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
+  cout << "inputTrack_file#: " << tb.nFiles("TrackFit_TF_L1L2*") << endl;
+  auto fin_names = tb.fileNames("TrackFit_TF_L1L2*");
+  for (auto name : fin_names ){
+    cout << "fin_name: " << name << endl;
+  }
+  auto &fout_outputTracks = tb.files("TrackFit_TF_L1L2*"); // "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat"
 
   /*ifstream fin_inputTracks;
   openDataFile(fin_inputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
@@ -44,7 +49,7 @@ int main(){
   assert(fout_outputTracks.good());*/
 
   // Loop over events
-  for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
+  for (unsigned int ievt = 0; ievt < 1; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     for (unsigned short i = 0; i < kMaxProc; ++i){
@@ -58,7 +63,8 @@ int main(){
 
     // Read in next event from input
     writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
-
+    //writeMemFromFile<TrackFitMemory> (outputTracks, fout_outputTracks.at(0), ievt);
+   
     // Set bunch crossing
     BXType bx = ievt;
     BXType bx_o;
@@ -100,6 +106,7 @@ int main(){
             break;
         }
       }
+      if( i== 0 )std::cout << std::hex << track.raw() << std::dec << " -- " << std::hex << trackWord[i] << std::dec << "\n";
     }
 
 
@@ -117,9 +124,10 @@ int main(){
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < kMaxProc; i++){
+    for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
       TrackFit track;
       track.setTrackWord(trackWord[i]);
+      std::stringstream wrd;
       track.setBarrelStubWord<0>(barrelStubWords[0][i]);
       track.setBarrelStubWord<1>(barrelStubWords[1][i]);
       track.setBarrelStubWord<2>(barrelStubWords[2][i]);
@@ -128,11 +136,25 @@ int main(){
       track.setDiskStubWord<5>(diskStubWords[1][i]);
       track.setDiskStubWord<6>(diskStubWords[2][i]);
       track.setDiskStubWord<7>(diskStubWords[3][i]);
-      if (track.getTrackValid()){
-        outputTracks.write_mem(bx, track, nTracks++);
-      }
+    
+      //track.setTrackValid(InputTrack.getTrackValid());
+      if( i == 0 ) cout << "trackWord: " << std::hex << track.getTrackWord() << std::dec 
+        << "," << std::hex << trackWord[i] << std::dec 
+        << " -- " << std::hex << track.raw() << std::dec
+        << " -- " << wrd.str() 
+        << "\n";
+      //if (track.getTrackValid()){
+        outputTracks.write_mem(bx, "00020202" );
+      //}
     }
-
+    std::cout << "Output mmry contains " << outputTracks.getEntries(bx) << " entries\n";
+    // for(unsigned short i = 0; i < outputTracks.getEntries(bx); i++){
+    //   TrackFit track;
+    //   track = outputTracks.read_mem(bx, i);
+    //   cout << "trackWord out : " << std::hex << track.getTrackWord() << std::dec 
+    //        << "trackWord in : " << std::hex << inputTracks.read_mem(bx,i).getTrackWord() << std::dec
+    //     << endl;
+    // }
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
 
