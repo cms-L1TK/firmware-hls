@@ -105,11 +105,6 @@ namespace PR
   constexpr unsigned int zbins_adjust_PSseed = 1;
   constexpr unsigned int zbins_adjust_2Sseed = 4;
 
-  // Number of loop iterations subtracted from the full 108 so that the function
-  // stays synchronized with other functions in the chain. Once we get these
-  // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 0;
-
   inline void zbinLUTinit(ap_uint<2*MEBinsBits> zbinLUT[128], int zbins_adjust_PSseed, int zbins_adjust_2Sseed){
 
     for(unsigned int ibin=0; ibin<128; ibin++) {
@@ -617,7 +612,7 @@ void MatchProcessor(BXType bx,
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
 
- PROC_LOOP: for (int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+ PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 //rewind
 
     auto readptr = projbufferarray.getReadPtr();
