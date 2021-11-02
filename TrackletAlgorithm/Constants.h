@@ -30,7 +30,7 @@ constexpr unsigned int kNbitsrfinebintable = 4;
 
 // List of module types
 namespace module {
-  enum type {UNKNOWN, IR, VMR, TE, TC, PR, ME, MC, NMODULES};
+  enum type {UNKNOWN, IR, VMR, TE, TC, PR, ME, MC, MP, NMODULES};
 };
 
 // Map from a module type to an offset used to reduce the number of iterations
@@ -44,7 +44,8 @@ constexpr unsigned kMaxProcOffset(const module::type m) {
          (m == module::PR ? 0 :
          (m == module::ME ? 0 :
          (m == module::MC ? 0 :
-         (0)))))));
+         (m == module::MP ? 0 :
+         (0))))))));
 }
 
 // Memory
