@@ -6,13 +6,32 @@
 # get some information about the executable and environment
 source env_hls.tcl
 
+# FIXME: debug following modules and add to list of modules to test:
+#   TC_L2L3D
+#   TC_L3L4C
+#   TC_L3L4D
 set modules_to_test {
+  {TC_L1L2A}
+  {TC_L1L2B}
+  {TC_L1L2C}
   {TC_L1L2D}
   {TC_L1L2E}
   {TC_L1L2F}
   {TC_L1L2G}
   {TC_L1L2H}
   {TC_L1L2I}
+  {TC_L1L2J}
+  {TC_L1L2K}
+  {TC_L1L2L}
+  {TC_L2L3A}
+  {TC_L2L3B}
+  {TC_L2L3C}
+  {TC_L3L4A}
+  {TC_L3L4B}
+  {TC_L5L6A}
+  {TC_L5L6B}
+  {TC_L5L6C}
+  {TC_L5L6D}
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail

@@ -89,6 +89,11 @@ namespace TC {
   static const uint32_t mask_D3 = 0xF << shift_D3;
   static const uint32_t mask_D4 = 0xF << shift_D4;
 
+  // number of bits per SP memory in ASInnerMask and ASOuterMask
+  static const uint8_t kNBitsPerSPMem = 2;
+  // mask used to select specific SP memory in ASInnerMask and ASOuterMask
+  static const uint8_t kSPMemMask = (1 << kNBitsPerSPMem) - 1;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,8 +180,8 @@ namespace TC {
   );
 }
 
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t ASInnerMask();
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t ASOuterMask();
+template<TF::seed Seed, TC::itc iTC> constexpr uint64_t ASInnerMask();
+template<TF::seed Seed, TC::itc iTC> constexpr uint64_t ASOuterMask();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
 template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
 
@@ -209,6 +214,14 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
       r1mean   = rmean[TF::L1];
       r2mean   = rmean[TF::L2];
       rproj[0] = rmean[TF::L3];
+      rproj[1] = rmean[TF::L4];
+      rproj[2] = rmean[TF::L5];
+      rproj[3] = rmean[TF::L6];
+      break;
+    case TF::L2L3:
+      rproj[0] = rmean[TF::L1];
+      r1mean   = rmean[TF::L2];
+      r2mean   = rmean[TF::L3];
       rproj[1] = rmean[TF::L4];
       rproj[2] = rmean[TF::L5];
       rproj[3] = rmean[TF::L6];
@@ -316,8 +329,8 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
   if (abs(*z0) >= ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5 * z0cut, kz0)))
     success = false;
 
-  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv<<1);
-  const bool keep = (phicrit > 9253) && (phicrit < 56269);
+  const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
+  const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
   success = success && keep;
 
   return success;
@@ -464,6 +477,21 @@ TC::processStubPair(
 
       break;
 
+    case TF::L2L3:
+      {
+        const TrackletProjection<BARRELPS> tproj_L1(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
+        const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL[1], zL[1], der_phiL, der_zL);
+        const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL[2], zL[2], der_phiL, der_zL);
+        const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL[3], zL[3], der_phiL, der_zL);
+
+        TC::addProj<BARRELPS, nproj_L1, ((TPROJMaskBarrel & mask_L1) >> shift_L1)> (tproj_L1, bx, &projout_barrel_ps[L1PHIA], &nproj_barrel_ps[L1PHIA], success && valid_proj[0]);
+        addL4 = TC::addProj<BARREL2S, nproj_L4, ((TPROJMaskBarrel & mask_L4) >> shift_L4)> (tproj_L4, bx, &projout_barrel_2s[L4PHIA], &nproj_barrel_2s[L4PHIA], success && valid_proj[1]);
+        addL5 = TC::addProj<BARREL2S, nproj_L5, ((TPROJMaskBarrel & mask_L5) >> shift_L5)> (tproj_L5, bx, &projout_barrel_2s[L5PHIA], &nproj_barrel_2s[L5PHIA], success && valid_proj[2]);
+        addL6 = TC::addProj<BARREL2S, nproj_L6, ((TPROJMaskBarrel & mask_L6) >> shift_L6)> (tproj_L6, bx, &projout_barrel_2s[L6PHIA], &nproj_barrel_2s[L6PHIA], success && valid_proj[3]);
+      }
+
+      break;
+
     case TF::L3L4:
       {
         const TrackletProjection<BARRELPS> tproj_L1(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
@@ -530,7 +558,7 @@ TrackletCalculator(
     TrackletProjectionMemory<DISK> projout_disk[]
 )
 {
-  static_assert(Seed == TF::L1L2 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L3L4, and L5L6 seeds have been implemented so far.");
+  static_assert(Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L2L3, L3L4, and L5L6 seeds have been implemented so far.");
 
   ap_uint<kNBits_MemAddr> npar = 0;
   ap_uint<kNBits_MemAddr> nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
@@ -573,8 +601,11 @@ TrackletCalculator(
 // all-stubs memory to use based on iSPMem:
       const StubPair::SPInnerIndex innerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getInnerIndex();
       const StubPair::SPOuterIndex outerIndex = stubPairs[iSPMem].read_mem(bx, iSP).getOuterIndex();
-      const AllStub<InnerRegion<Seed>()> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, innerIndex);
-      const AllStub<OuterRegion<Seed>()> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & (1 << iSPMem)) >> iSPMem].read_mem(bx, outerIndex);
+
+      const auto maskShift = TC::kNBitsPerSPMem * iSPMem;
+      const auto iSPMemMask = ((uint64_t) TC::kSPMemMask) << maskShift;
+      const AllStub<InnerRegion<Seed>()> &innerStub = innerStubs[(ASInnerMask<Seed, iTC>() & iSPMemMask) >> maskShift].read_mem(bx, innerIndex);
+      const AllStub<OuterRegion<Seed>()> &outerStub = outerStubs[(ASOuterMask<Seed, iTC>() & iSPMemMask) >> maskShift].read_mem(bx, outerIndex);
 
       TC::processStubPair<Seed, TPROJMaskBarrel<Seed, iTC>(), TPROJMaskDisk<Seed, iTC>()>(bx, innerIndex, innerStub, outerIndex, outerStub, TCID, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }

@@ -3,12 +3,28 @@
 
 #include "TrackletEngine.h"
 
-void TrackletEngineTop(const BXType bx,
-                       const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
-                       const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
-                       const ap_uint<1> bendinnertable[1<<kNBits_bendinnertableTE],
-                       const ap_uint<1> bendoutertable[1<<kNBits_bendoutertableTE],
-                       BXType& bx_o,
-                       StubPairMemory& outstubpair);
+void TrackletEngine_PS_PS(const BXType bx,
+                          const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
+                          const VMStubTEOuterMemory<BARRELPS>& instubouterdata,
+                          const ap_uint<1> bendinnertable[],
+                          const ap_uint<1> bendoutertable[],
+                          BXType& bx_o,
+                          StubPairMemory& outstubpair);
+
+void TrackletEngine_PS_2S(const BXType bx,
+                          const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
+                          const VMStubTEOuterMemory<BARREL2S>& instubouterdata,
+                          const ap_uint<1> bendinnertable[],
+                          const ap_uint<1> bendoutertable[],
+                          BXType& bx_o,
+                          StubPairMemory& outstubpair);
+
+void TrackletEngine_2S_2S(const BXType bx,
+                          const VMStubTEInnerMemory<BARREL2S>& instubinnerdata,
+                          const VMStubTEOuterMemory<BARREL2S>& instubouterdata,
+                          const ap_uint<1> bendinnertable[],
+                          const ap_uint<1> bendoutertable[],
+                          BXType& bx_o,
+                          StubPairMemory& outstubpair);
 
 #endif

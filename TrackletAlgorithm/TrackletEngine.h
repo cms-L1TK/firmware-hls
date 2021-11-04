@@ -37,14 +37,13 @@ enum phireg {
 //----------------------------
 // Tracklet Engine main code
 //============================
-template<int innertype, int outertype,
-  unsigned int stubptinnerdepth, unsigned int stubptouterdepth>
+template<int innertype, int outertype>
 void TrackletEngine(
 		    const BXType bx,
 		    const VMStubTEInnerMemory<innertype>& instubinnerdata,
 		    const VMStubTEOuterMemory<outertype>& instubouterdata,
-                    const ap_uint<1> bendinnertable[stubptinnerdepth],
-                    const ap_uint<1> bendoutertable[stubptouterdepth],
+                    const ap_uint<1> bendinnertable[],
+                    const ap_uint<1> bendoutertable[],
                     BXType& bx_o,
 		    StubPairMemory& outstubpair) {
 

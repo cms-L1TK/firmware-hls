@@ -11,7 +11,7 @@ open_project -reset trackletengine
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
-set_top TrackletEngineTop
+set_top TrackletEngine_PS_PS
 add_files ../TopFunctions/TrackletEngineTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "$CFLAGS"
 
