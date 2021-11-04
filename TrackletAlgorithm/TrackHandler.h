@@ -5,6 +5,8 @@
 const unsigned int kFullBarrelStubSize = TrackFit::kBarrelStubSize * 4;
 const unsigned int kFullDiskStubSize = TrackFit::kDiskStubSize * 4;
 const unsigned int kFullTrackWordSize = TrackFit::kTrackWordSize;
+const unsigned int kStubIndexSizeMSB = TrackFit::kTFValidSize + TrackFit::kTFTrackIndexSize + TrackFit::kTFStubIndexSize;
+const unsigned int kStubIndexSizeLSB = TrackFit::kTFValidSize + TrackFit::kTFTrackIndexSize;
 
 class TrackHandler{
   public:
@@ -43,7 +45,7 @@ class TrackHandler{
     void MergeTrack(TrackHandler track, unsigned int matchFound, unsigned int mergeCondition);
     
     
-    //void getStubID(int layer);
+    void getStubID(int layer);
 
 
     //TrackFit::TFSTUBINDEX getStubIndex(int Hit) const {

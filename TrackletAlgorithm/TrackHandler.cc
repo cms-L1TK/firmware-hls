@@ -1,7 +1,13 @@
 #include "TrackHandler.h"
-/*void TrackHandler::getStubID(int layer){
+template<typename stubType>
+stubType void TrackHandler::getStubID(int layer){
+  //LSB valid + track index + stub index
+  //MSB valid + track index
+
+  barrelStubArray[layerIndex].range(kStubIndexSizeMSB, kStubIndexSizeLSB);
+  diskStubArray[layerIndex].range(kStubIndexSizeMSB, kStubIndexSizeLSB);
 }
-*/
+
 
 void TrackHandler::CompareTrack(TrackHandler track, unsigned int& matchFound){
   #pragma HLS inline
