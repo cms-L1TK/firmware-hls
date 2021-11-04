@@ -34,6 +34,7 @@ int main(){
   // Open input files
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
+
   auto &fout_outputTracks = tb.files("outputTrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
                                                                 //  since dummy module does nothing use the same input/output file
   // Loop over events
@@ -52,7 +53,7 @@ int main(){
 
     // Read in next event from input
     writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
-   
+    
     // Set bunch crossing
     BXType bx = ievt;
     BXType bx_o;
