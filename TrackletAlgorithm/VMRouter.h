@@ -652,10 +652,10 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	ap_uint<kNBits_MemAddr-NBitsBin+1> addrCountME[nvmME][nmaxbinsperpage]; // Writing of ME stubs
+	ap_uint<kNBits_MemAddr> addrCountME[nvmME][nmaxbinsperpage]; // Writing of ME stubs
 	ap_uint<kNBits_MemAddr> addrCountTEI[nvmTE][MaxTEICopies]; // Writing of TE Inner stubs
 	ap_uint<kNBits_MemAddr> addrCountOL[nvmOL][MaxOLCopies]; // Writing of TE Overlap stubs
-	ap_uint<kNBits_MemAddr-NBitsBinTEO+1> addrCountTEO[nvmTE][MaxTEOCopies][nmaxbinsperpage]; // Writing of TE Outer stubs
+	ap_uint<kNBits_MemAddr> addrCountTEO[nvmTE][MaxTEOCopies][nmaxbinsperpage]; // Writing of TE Outer stubs
 
 	if (maskME) {
 		clear2DArray(nvmME, addrCountME);
