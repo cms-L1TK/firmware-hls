@@ -193,6 +193,7 @@ TB-quality-check:
 IR-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "IR-quality-check"]
+  allow_failure: true
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
