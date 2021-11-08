@@ -72,6 +72,7 @@ stages: # ---------------------------------------------------------------------
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
+      - ./IntegrationTests/${PROJ_NAME}/script/common
       - ./IntegrationTests/${PROJ_NAME}/script/dataOut/
       - ./IntegrationTests/${PROJ_NAME}/script/Work/
     expire_in: 1 week
@@ -82,7 +83,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     # Compare HDL sim output with Mem/Prints
-    - python3 ../../common/script/CompareMemPrintsFW.py -p -s
+    - python3 common/script/CompareMemPrintsFW.py -p -s
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -96,7 +97,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode tcl -source ../../common/script/synth.tcl 
+    - vivado -mode tcl -source common/script/synth.tcl 
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -305,6 +306,30 @@ topIRVMR-sim:
     - download
     - IR-vivado-hls-build
     - VMR-vivado-hls-build
+topMCTB-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/MCTB"
+  needs:
+    - download
+    - MC-vivado-hls-build
+    - TB-vivado-hls-build
+topIRtoTB-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/IRtoTB"
+  needs:
+    - download
+    - IR-vivado-hls-build
+    - VMR-vivado-hls-build
+    - TE-vivado-hls-build
+    - TC-vivado-hls-build
+    - PR-vivado-hls-build
+    - ME-vivado-hls-build
+    - MC-vivado-hls-build
+    - TB-vivado-hls-build
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
@@ -333,6 +358,22 @@ topIRVMR-check-results:
   needs:
     - download
     - topIRVMR-sim
+topMCTB-check-results:
+  <<: *template_check-results
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "ReducedConfig/MCTB"
+  needs:
+    - download
+    - topMCTB-sim
+topIRtoTB-check-results:
+  <<: *template_check-results
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "ReducedConfig/IRtoTB"
+  needs:
+    - download
+    - topIRtoTB-sim
 # FW synthesis ---------------
 topPRMEMC-synth:
   <<: *template_topTF-synth
@@ -358,3 +399,19 @@ topIRVMR-synth:
   needs:
     - topIRVMR-sim
     - topIRVMR-check-results
+topMCTB-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/MCTB"
+  needs:
+    - topMCTB-sim
+    - topMCTB-check-results
+topIRtoTB-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/IRtoTB"
+  needs:
+    - topIRtoTB-sim
+    - topIRtoTB-check-results
