@@ -1,6 +1,7 @@
 # Common settings
 source ../../../project/env_hls.tcl
-source ../../common/script/build_ip.tcl
+file link -symbolic common ../../common
+source common/script/build_ip.tcl
 set CFLAGS {-std=c++11 -I../../../TrackletAlgorithm -I../../../TopFunctions}
 set cwd [pwd]
 
