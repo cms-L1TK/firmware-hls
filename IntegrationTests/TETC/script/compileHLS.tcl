@@ -8,11 +8,11 @@ set cwd [pwd]
 # Build TE_L1L2
 open_project -reset trackletengine
 add_files ../../../TopFunctions/TrackletEngineTop.cc -cflags "$CFLAGS"
-build_ip TrackletEngine_PS_PS ../../../../project
+build_ip TrackletEngine_PS_PS ../../../project
 
 # Build TC_L1L2E
 open_project -reset trackletCalculator
 add_files ../../../TopFunctions/TrackletCalculatorTop.cc -cflags "$CFLAGS"
-build_ip TrackletCalculator_L1L2E ../../../../project
+build_ip TrackletCalculator_L1L2E ../../../project
 
 exit

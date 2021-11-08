@@ -8,16 +8,16 @@ set cwd [pwd]
 # Build PR_L3PHIC
 open_project -reset projrouter
 add_files ../../../TopFunctions/ProjectionRouterTop.cc -cflags "$CFLAGS"
-build_ip ProjectionRouterTop_L3PHIC ../../../../project
+build_ip ProjectionRouterTop_L3PHIC ../../../project
 
 # Build ME_L3*
 open_project -reset matchengine
 add_files ../../../TopFunctions/MatchEngineTop.cc -cflags "$CFLAGS"
-build_ip MatchEngineTop_L3 ../../../../project
+build_ip MatchEngineTop_L3 ../../../project
 
 # Build MC_L3PHIC
 open_project -reset match_calc
 add_files ../../../TopFunctions/MatchCalculatorTop.cc -cflags "$CFLAGS"
-build_ip MatchCalculator_L3PHIC ../../../../project
+build_ip MatchCalculator_L3PHIC ../../../project
 
 exit
