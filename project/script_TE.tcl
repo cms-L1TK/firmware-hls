@@ -15,7 +15,7 @@ set_top TrackletEngine_PS_PS
 add_files ../TopFunctions/TrackletEngineTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletEngine_test.cpp -cflags "$CFLAGS"
 
-open_solution "solution_L1L2"
+open_solution "solution1"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
@@ -23,7 +23,11 @@ source settings_hls.tcl
 # data files
 add_files -tb ../emData/TE/
 
+csim_design -mflags "-j8"
 csynth_design
+cosim_design 
 export_design -format ip_catalog
+# Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
+#export_design -format ip_catalog -flow impl
 
 exit
