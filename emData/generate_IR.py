@@ -23,7 +23,6 @@ def getNmemsPerIR(wiresFiles='./LUTs/wires.dat'):
         irLines=[]
         for line in lines:
             if re.search(dtcName, line, re.IGNORECASE) and ("neg" in dtcName) == ("neg" in line):
-                print(idx, ' - ' , line, ' - ' , dtcName)
                 irLines.append(line)
         nMemories.append(len(irLines))
     dtcNames, nMemories = (list(t) for t in zip(*sorted(zip(dtcNames, nMemories))))
