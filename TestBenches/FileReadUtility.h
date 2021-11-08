@@ -200,7 +200,7 @@ unsigned int compareBinnedMemWithFile(const MemType& memory,
   std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
   for (unsigned int j = 0; j < memory_ref.getNBins(); ++j ) {
     std::cout << "Bin " << std::dec << j << std::endl;
-    for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
+    for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() - 1; ++i) { // Temporary "-1" to only allow 15 (7 for VMSME DISK) stubs per bin instead of 16 (8) to match emulation
       auto data_ref = memory_ref.read_mem(ievt,j,i).raw();
       auto data_com = memory.read_mem(ievt,j,i).raw();
 
@@ -258,7 +258,7 @@ unsigned int compareBinnedMemCMWithFile(const MemType& memory,
     std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
     for (unsigned int j = 0; j < memory_ref.getNBins(); ++j ) {
       std::cout << "Bin " << std::dec << j << std::endl;
-      for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() ; ++i) {
+      for (unsigned int i = 0; i < memory_ref.getNEntryPerBin() - 1; ++i) { // Max 15 stubs in each memory due to 4 bit nentries
         auto data_ref = memory_ref.read_mem(k,ievt,j,i).raw();
         auto data_com = memory.read_mem(k,ievt,j,i).raw();
 
