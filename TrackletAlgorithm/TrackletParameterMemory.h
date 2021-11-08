@@ -51,8 +51,7 @@ public:
     data_( (((((id1,id2),rinv),phi0),z0),t) )
   {}
   
-  TrackletParameters():
-    data_(0)
+  TrackletParameters()
   {}
 
   #ifndef __SYNTHESIS__

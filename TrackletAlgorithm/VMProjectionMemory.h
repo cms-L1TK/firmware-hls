@@ -91,8 +91,7 @@ public:
     static_assert(VMProjType == DISK, "Constructor should only be used for DISK projections");
   }
   
-  VMProjection():
-    data_(0)
+  VMProjection()
   {}
 
   #ifndef __SYNTHESIS__

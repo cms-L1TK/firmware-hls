@@ -31,8 +31,7 @@ enum BitLocations {
     data_(newdata)
   {}
 
-  DTCStub():
-    data_(0)
+  DTCStub()
   {}
 
   #ifndef __SYNTHESIS__

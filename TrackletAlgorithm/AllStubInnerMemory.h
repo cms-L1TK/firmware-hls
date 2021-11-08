@@ -143,8 +143,7 @@ public:
     static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
   }
 
-  AllStubInner():
-    data_(0)
+  AllStubInner()
   {}
 
   #ifndef __SYNTHESIS__
@@ -253,8 +252,7 @@ public:
     data_(newdata)
   {}
 
-  AllStubInner():
-    data_(0)
+  AllStubInner()
   {}
 
   #ifndef __SYNTHESIS__

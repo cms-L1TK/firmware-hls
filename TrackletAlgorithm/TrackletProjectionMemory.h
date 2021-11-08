@@ -114,8 +114,7 @@ public:
     data_( (((((tcid,trackletIndex),phi),z),phider),zder) )
   {}
   
-  TrackletProjection():
-    data_(0)
+  TrackletProjection()
   {}
 
   #ifndef __SYNTHESIS__

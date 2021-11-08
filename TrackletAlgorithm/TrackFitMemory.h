@@ -148,8 +148,7 @@ public:
 
   {}
 
-  TrackFit() :
-    data_(0)
+  TrackFit()
   {}
 
   #ifndef __SYNTHESIS__

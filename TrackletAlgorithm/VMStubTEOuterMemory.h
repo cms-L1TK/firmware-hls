@@ -85,8 +85,7 @@ public:
     data_( (((id,bend),finephi),finez) )
   {}
 
-  VMStubTEOuter():
-    data_(0)
+  VMStubTEOuter()
   {}
 
   #ifndef __SYNTHESIS__

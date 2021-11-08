@@ -35,8 +35,7 @@ public:
     data_( (innerindex,outerindex) )
   {}
   
-  StubPair():
-    data_(0)
+  StubPair()
   {}
 
   #ifndef __SYNTHESIS__
