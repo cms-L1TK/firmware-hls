@@ -33,7 +33,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 
 // TrackBuilder top template function
 // !!! CURRENTLY ONLY TESTED FOR L1L2 !!!
-template<unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs>
+template<unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -140,7 +140,7 @@ void TrackBuilder(
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const auto &tpar = trackletParameters[0].read_mem(bx, trackletIndex);
+    const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
     track.setRinv(tpar.getRinv());
     track.setPhi0(tpar.getPhi0());
     track.setZ0(tpar.getZ0());
