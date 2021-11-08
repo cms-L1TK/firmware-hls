@@ -9,56 +9,70 @@ memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/downl
 #memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
-# N.B. This uses a single event of test data from the reduced_config_pr
-# git repo. The same event or a set of 100 events can be obtained by
-# deleting the MemPrints/ taken from .git, then downloading with wget
-# the "memprints_url_reduced" cernbox files referred to in 
-# https://github.com/cms-L1TK/firmware-hls/blob/master/emData/download.sh ,
-# unpacking them into MemPrints with "tar -xzf", and removing one format
-# change with "sed -i "s/^0x//g" MemPrints/InputStubs/InputStubs_*.dat".
+#### fw_synch_210611 ####
+# Standard configuration
+memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
+luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
+# Combined modules
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
+
+#### fw_synch_210503 ####
+# Standard configuration
+#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+# Combined modules
+#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
+
+#### fw_synch_201005 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
+
+#### fw_synch_200515 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
 declare -a processing_modules=(
-  # InputRouter
-  "IR_PS10G_1_A"
-  "IR_PS10G_2_A"
-  "IR_PS10G_2_B"
-  "IR_PS10G_3_A"
-  "IR_PS10G_3_B"
-  "IR_PS_1_A"
-  "IR_PS_1_B"
-  "IR_PS_2_A"
-  "IR_PS_2_B"
-  "IR_2S_1_A"
-  "IR_2S_1_B"
-  "IR_2S_2_A"
-  "IR_2S_2_B"
-  "IR_2S_3_A"
-  "IR_2S_3_B"
-  "IR_2S_4_A"
-  "IR_2S_4_B"
-
   # VMRouter
   "VMR_L1PHID"
+  "VMR_L2PHIA"
   "VMR_L2PHIB"
-  "VMR_L3PHIB"
-  "VMR_L4PHIB"
-  "VMR_L5PHIB"
-  "VMR_L6PHIB"
+  "VMR_L3PHIA"
+  "VMR_L4PHIA"
+  "VMR_L5PHIA"
+  "VMR_L6PHIA"
+  "VMR_D1PHIA"
+  "VMR_D2PHIA"
+  "VMR_D3PHIA"
+  "VMR_D4PHIA"
+  "VMR_D5PHIA"
+
+  # VMRouter CM
+  "VMRCM_L1PHIA"
+  "VMRCM_L2PHIA"
+  "VMRCM_L3PHIA"
+  "VMRCM_L4PHIA"
+  "VMRCM_L5PHIA"
+  "VMRCM_L6PHIA"
+  "VMRCM_D1PHIA"
+  "VMRCM_D2PHIA"
+  "VMRCM_D3PHIA"
+  "VMRCM_D4PHIA"
+  "VMRCM_D5PHIA"
 
   # TrackletEngine
-  "TE_L1PHID14_L2PHIB15"
-  "TE_L1PHID14_L2PHIB16"
-  "TE_L1PHID15_L2PHIB13"
-  "TE_L1PHID15_L2PHIB14"
-  "TE_L1PHID15_L2PHIB15"
-  "TE_L1PHID15_L2PHIB16"
-  "TE_L1PHID16_L2PHIB14"
-  "TE_L1PHID16_L2PHIB15"
-  "TE_L1PHID16_L2PHIB16"
+  "TE_L1PHIC12_L2PHIB12"
+  "TE_L1PHIE18_L2PHIC17"
 
   # TrackletCalculator
+  "TC_L1L2A"
+  "TC_L1L2B"
+  "TC_L1L2C"
+  "TC_L1L2D"
+  "TC_L1L2E"
   "TC_L1L2F"
   "TC_L1L2G"
   "TC_L1L2H"
@@ -80,10 +94,18 @@ declare -a processing_modules=(
   "TC_L5L6D"
 
   # ProjectionRouter
+  "PR_L1PHIB"
+  "PR_L2PHIB"
   "PR_L3PHIB"
   "PR_L4PHIB"
   "PR_L5PHIB"
   "PR_L6PHIB"
+  "PR_L1PHIC"
+  "PR_L2PHIC"
+  "PR_L3PHIC"
+  "PR_L4PHIC"
+  "PR_L5PHIC"
+  "PR_L6PHIC"
 
   # MatchEngine
   "ME_L1PHIC12"
@@ -99,10 +121,21 @@ declare -a processing_modules=(
   "ME_D5PHIC12"
 
   # MatchCalculator
+  "MC_L1PHIB"
+  "MC_L2PHIB"
   "MC_L3PHIB"
   "MC_L4PHIB"
   "MC_L5PHIB"
   "MC_L6PHIB"
+  "MC_L1PHIC"
+  "MC_L2PHIC"
+  "MC_L3PHIC"
+  "MC_L4PHIC"
+  "MC_L5PHIC"
+  "MC_L6PHIC"
+
+  # MatchProcessor
+  "MP_L3PHIC"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
