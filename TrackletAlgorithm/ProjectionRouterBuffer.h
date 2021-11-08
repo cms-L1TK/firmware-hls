@@ -113,8 +113,7 @@ public:
     static_assert(VMProjType == DISK, "Constructor should only be used for DISK projections");
   }
 
-  ProjectionRouterBuffer():
-    data_(0)
+  ProjectionRouterBuffer()
   {}
   
   
