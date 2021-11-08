@@ -150,8 +150,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L1PHIB_phicut.tab")
-#  include "../emData/MC/tables/MC_L1PHIB_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L1PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -159,8 +159,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L2PHIB_phicut.tab")
-#  include "../emData/MC/tables/MC_L2PHIB_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L2PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -168,8 +168,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L3PHIB_phicut.tab")
-#  include "../emData/MC/tables/MC_L3PHIB_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L3PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -177,8 +177,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L4PHIB_phicut.tab")
-#  include "../emData/MC/tables/MC_L4PHIB_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L4PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -186,8 +186,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L5PHIB_phicut.tab")
-#  include "../emData/MC/tables/MC_L5PHIB_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L5PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -195,8 +195,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L6PHIB_phicut.tab")
-#  include "../emData/MC/tables/MC_L6PHIB_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L6PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -209,8 +209,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else { // z cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L1PHIB_zcut.tab")
-#  include "../emData/MC/tables/MC_L1PHIB_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L1PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -218,8 +218,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L2PHIB_zcut.tab")
-#  include "../emData/MC/tables/MC_L2PHIB_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L2PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -227,8 +227,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L3PHIB_zcut.tab")
-#  include "../emData/MC/tables/MC_L3PHIB_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L3PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -236,8 +236,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L4PHIB_zcut.tab")
-#  include "../emData/MC/tables/MC_L4PHIB_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L4PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -245,8 +245,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L5PHIB_zcut.tab")
-#  include "../emData/MC/tables/MC_L5PHIB_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L5PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -254,8 +254,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MC/tables/MC_L6PHIB_zcut.tab")
-#  include "../emData/MC/tables/MC_L6PHIB_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L6PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
 #else
       {};
 #endif
