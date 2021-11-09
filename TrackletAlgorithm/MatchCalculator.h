@@ -9,6 +9,11 @@
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
 
+namespace MC {
+  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
+  const auto cmzero = CandidateMatch::CandidateMatchData(0);
+}
+
 //////////////////////////////////////////////////////////////
 
 template<int layer, int part>
@@ -94,7 +99,7 @@ void merger(
         *sBnext   = (!(A.getProjIndex() <= inB.getProjIndex()) || !vA) && validB; // sB=true if inB is valid and (A > inB or A not valid)
         break;
     case START: // both in at same time
-        *outnext  = CandidateMatch();
+        *outnext  = CandidateMatch(MC::cmzero);
     	*voutnext = false;
     	*Anext    = inA;    // pipeline inA
     	*vAnext   = validA; // pipeline inA valid
@@ -104,11 +109,11 @@ void merger(
         *sBnext   = (!(inA.getProjIndex() <= inB.getProjIndex()) || !validA) && validB; // sB=true if inB is valid and (inA > inB or inA not valid)
         break;
     case DONE: // set everything to false 
-        *outnext  = CandidateMatch();
+        *outnext  = CandidateMatch(MC::cmzero);
         *voutnext = false;
-        *Anext    = CandidateMatch();
+        *Anext    = CandidateMatch(MC::cmzero);
         *vAnext   = false;
-        *Bnext    = CandidateMatch();
+        *Bnext    = CandidateMatch(MC::cmzero);
         *vBnext   = false;
         *sAnext   = false;
         *sBnext   = false;
@@ -273,9 +278,6 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //////////////////////////////////////////////////////////////
 
 // MatchCalculator
-namespace MC {
-  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
-}
 template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
 #include "MatchCalculator_parameters.h"
@@ -381,18 +383,18 @@ void MatchCalculator(BXType bx,
   bool read_L1_2 = false;
   bool read_L1_3 = false;
   bool read_L1_4 = false;
-  CandidateMatch cm_L1_1 = CandidateMatch();
-  CandidateMatch cm_L1_2 = CandidateMatch();
-  CandidateMatch cm_L1_3 = CandidateMatch();
-  CandidateMatch cm_L1_4 = CandidateMatch();
-  CandidateMatch tmpA_L1_1 = CandidateMatch();
-  CandidateMatch tmpA_L1_2 = CandidateMatch();
-  CandidateMatch tmpA_L1_3 = CandidateMatch();
-  CandidateMatch tmpA_L1_4 = CandidateMatch();
-  CandidateMatch tmpB_L1_1 = CandidateMatch();
-  CandidateMatch tmpB_L1_2 = CandidateMatch();
-  CandidateMatch tmpB_L1_3 = CandidateMatch();
-  CandidateMatch tmpB_L1_4 = CandidateMatch();
+  CandidateMatch cm_L1_1(MC::cmzero);
+  CandidateMatch cm_L1_2(MC::cmzero);
+  CandidateMatch cm_L1_3(MC::cmzero);
+  CandidateMatch cm_L1_4(MC::cmzero);
+  CandidateMatch tmpA_L1_1(MC::cmzero);
+  CandidateMatch tmpA_L1_2(MC::cmzero);
+  CandidateMatch tmpA_L1_3(MC::cmzero);
+  CandidateMatch tmpA_L1_4(MC::cmzero);
+  CandidateMatch tmpB_L1_1(MC::cmzero);
+  CandidateMatch tmpB_L1_2(MC::cmzero);
+  CandidateMatch tmpB_L1_3(MC::cmzero);
+  CandidateMatch tmpB_L1_4(MC::cmzero);
   bool valid_L1_1 = false; 
   bool valid_L1_2 = false; 
   bool valid_L1_3 = false; 
@@ -417,12 +419,12 @@ void MatchCalculator(BXType bx,
   // layer 2 variables
   bool read_L2_1 = false;
   bool read_L2_2 = false;
-  CandidateMatch cm_L2_1 = CandidateMatch();
-  CandidateMatch cm_L2_2 = CandidateMatch();
-  CandidateMatch tmpA_L2_1 = CandidateMatch();
-  CandidateMatch tmpA_L2_2 = CandidateMatch();
-  CandidateMatch tmpB_L2_1 = CandidateMatch();
-  CandidateMatch tmpB_L2_2 = CandidateMatch();
+  CandidateMatch cm_L2_1(MC::cmzero);
+  CandidateMatch cm_L2_2(MC::cmzero);
+  CandidateMatch tmpA_L2_1(MC::cmzero);
+  CandidateMatch tmpA_L2_2(MC::cmzero);
+  CandidateMatch tmpB_L2_1(MC::cmzero);
+  CandidateMatch tmpB_L2_2(MC::cmzero);
   bool valid_L2_1 = false; 
   bool valid_L2_2 = false; 
   bool vA_L2_1 = false; 
@@ -435,8 +437,8 @@ void MatchCalculator(BXType bx,
   bool sB_L2_2 = false; 
 
   // layer 3 variables
-  CandidateMatch tmpA_L3;
-  CandidateMatch tmpB_L3;
+  CandidateMatch tmpA_L3(MC::cmzero);
+  CandidateMatch tmpB_L3(MC::cmzero);
   bool valid_L3 = false;
   bool vA_L3 = false;
   bool vB_L3 = false;
@@ -444,12 +446,12 @@ void MatchCalculator(BXType bx,
   bool sB_L3 = false;
   
   // Setup candidate match data stream that goes into match calculations
-  CandidateMatch datastream = CandidateMatch();
+  CandidateMatch datastream(MC::cmzero);
 
   // Full match shift register to store best match
   typename AllProjection<APTYPE>::AProjTCSEED projseed;
-  FullMatch<FMTYPE> bestmatch      = FullMatch<FMTYPE>();
-  bool goodmatch                   = false;
+  FullMatch<FMTYPE> bestmatch;
+  bool goodmatch = false;
 
 
   //-----------------------------------------------------------------------------------------------------------
@@ -488,18 +490,18 @@ void MatchCalculator(BXType bx,
     bool read_L1_2_next = false;
     bool read_L1_3_next = false;
     bool read_L1_4_next = false;
-    CandidateMatch cm_L1_1_next = CandidateMatch();
-    CandidateMatch cm_L1_2_next = CandidateMatch();
-    CandidateMatch cm_L1_3_next = CandidateMatch();
-    CandidateMatch cm_L1_4_next = CandidateMatch();
-    CandidateMatch tmpA_L1_1_next = CandidateMatch();
-    CandidateMatch tmpA_L1_2_next = CandidateMatch();
-    CandidateMatch tmpA_L1_3_next = CandidateMatch();
-    CandidateMatch tmpA_L1_4_next = CandidateMatch();
-    CandidateMatch tmpB_L1_1_next = CandidateMatch();
-    CandidateMatch tmpB_L1_2_next = CandidateMatch();
-    CandidateMatch tmpB_L1_3_next = CandidateMatch();
-    CandidateMatch tmpB_L1_4_next = CandidateMatch();
+    CandidateMatch cm_L1_1_next(MC::cmzero);
+    CandidateMatch cm_L1_2_next(MC::cmzero);
+    CandidateMatch cm_L1_3_next(MC::cmzero);
+    CandidateMatch cm_L1_4_next(MC::cmzero);
+    CandidateMatch tmpA_L1_1_next(MC::cmzero);
+    CandidateMatch tmpA_L1_2_next(MC::cmzero);
+    CandidateMatch tmpA_L1_3_next(MC::cmzero);
+    CandidateMatch tmpA_L1_4_next(MC::cmzero);
+    CandidateMatch tmpB_L1_1_next(MC::cmzero);
+    CandidateMatch tmpB_L1_2_next(MC::cmzero);
+    CandidateMatch tmpB_L1_3_next(MC::cmzero);
+    CandidateMatch tmpB_L1_4_next(MC::cmzero);
     bool valid_L1_1_next = false;
     bool valid_L1_2_next = false;
     bool valid_L1_3_next = false;
@@ -523,12 +525,12 @@ void MatchCalculator(BXType bx,
 
     bool read_L2_1_next = false;
     bool read_L2_2_next = false;
-    CandidateMatch cm_L2_1_next = CandidateMatch();
-    CandidateMatch cm_L2_2_next = CandidateMatch();
-    CandidateMatch tmpA_L2_1_next = CandidateMatch();
-    CandidateMatch tmpA_L2_2_next = CandidateMatch();
-    CandidateMatch tmpB_L2_1_next = CandidateMatch();
-    CandidateMatch tmpB_L2_2_next = CandidateMatch();
+    CandidateMatch cm_L2_1_next(MC::cmzero);
+    CandidateMatch cm_L2_2_next(MC::cmzero);
+    CandidateMatch tmpA_L2_1_next(MC::cmzero);
+    CandidateMatch tmpA_L2_2_next(MC::cmzero);
+    CandidateMatch tmpB_L2_1_next(MC::cmzero);
+    CandidateMatch tmpB_L2_2_next(MC::cmzero);
     bool valid_L2_1_next = false; 
     bool valid_L2_2_next = false; 
     bool vA_L2_1_next = false; 
@@ -540,9 +542,9 @@ void MatchCalculator(BXType bx,
     bool sB_L2_1_next = false; 
     bool sB_L2_2_next = false; 
 
-    CandidateMatch cm_L3_next;
-    CandidateMatch tmpA_L3_next;
-    CandidateMatch tmpB_L3_next; 
+    CandidateMatch cm_L3_next(MC::cmzero);
+    CandidateMatch tmpA_L3_next(MC::cmzero);
+    CandidateMatch tmpB_L3_next(MC::cmzero); 
     bool valid_L3_next = false;
     bool vA_L3_next = false;
     bool vB_L3_next = false;
@@ -833,8 +835,8 @@ void MatchCalculator(BXType bx,
     //-----------------------------------------------------------------------------------------------------------
  
     typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
-    FullMatch<FMTYPE> bestmatch_next = FullMatch<FMTYPE>();
-    bool goodmatch_next              = false;
+    FullMatch<FMTYPE> bestmatch_next;
+    bool goodmatch_next = false;
 
     // For first tracklet, pick up the phi cut value
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
