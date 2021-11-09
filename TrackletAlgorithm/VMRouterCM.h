@@ -29,10 +29,8 @@
 /////////////////////////////////////////
 // Constants
 
-// Number of bits used for the VMs for different layers and disks
-// E.g. 32 VMs would use 5 vmbits
-constexpr int nbitsvmlayer[6] = { 2, 3, 3, 3, 3, 3 };
-constexpr int nbitsvmdisk[5] = { 3, 2, 2, 2, 2 };
+// Number of bits used for the TE in disks
+constexpr int nbitsvmtedisk[trklet::N_DISK] = { 3, 3, 0, 3, 0 };
 
 // Number of most significant bits (MSBs) of z and r used for index in the LUTs
 constexpr int nbitsztablelayer = 7;
@@ -113,7 +111,7 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	// Number of bits for table indices
 	constexpr int nbitsztable = (Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
 	constexpr int nbitsrtable = (Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
-	constexpr auto vmbits = (Layer) ? nbitsvmlayer[Layer-1] : nbitsvmdisk[Disk-1]; // Number of bits for standard VMs
+	constexpr auto vmbits = (Layer) ? nbits_vmmeall[Layer-1] : ((isMEStub) ? nbits_vmmeall[trklet::N_LAYER+Disk-1] : nbitsvmtedisk[Disk-1]); // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[trklet::N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Number of bits for the memory bins
