@@ -46,7 +46,7 @@ architecture behaviour of tb_tf_top is
 
   -- Paths of data files specified relative to Vivado project's xsim directory.
   -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-  constant emDataDir            : string := "../../../../../../../../emData/MemPrints/";
+  constant emDataDir            : string := "../../../../../../../../../emData/MemPrints/";
   constant dataOutDir           : string := "../../../../../dataOut/";
 
   -- File directories and the start of the file names that memories have in common
