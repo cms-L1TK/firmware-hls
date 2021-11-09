@@ -285,52 +285,69 @@ topPRMEMC-sim:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
-    - download
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
+    - job: download
+    - job: PR-vivado-hls-build
+      artifacts: false
+    - job: ME-vivado-hls-build
+      artifacts: false
+    - job: MC-vivado-hls-build
+      artifacts: false
 topTETC-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TETC"
   needs:
-    - download
-    - TE-vivado-hls-build
-    - TC-vivado-hls-build
+    - job: download
+    - job: TE-vivado-hls-build
+      artifacts: false
+    - job: TC-vivado-hls-build
+      artifacts: false
 topIRVMR-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
-    - download
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
+    - job: download
+    - job: IR-vivado-hls-build
+      artifacts: false
+    - job: VMR-vivado-hls-build
+      artifacts: false
 topMCTB-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/MCTB"
   needs:
-    - download
-    - MC-vivado-hls-build
-    - TB-vivado-hls-build
+    - job: download
+    - job: MC-vivado-hls-build
+      artifacts: false
+    - job: TB-vivado-hls-build
+      artifacts: false
 topIRtoTB-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/IRtoTB"
   needs:
-    - download
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
-    - TE-vivado-hls-build
-    - TC-vivado-hls-build
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
-    - TB-vivado-hls-build
+    - job: download
+    - job: IR-vivado-hls-build
+      artifacts: false
+    - job: VMR-vivado-hls-build
+      artifacts: false
+    - job: TE-vivado-hls-build
+      artifacts: false
+    - job: TC-vivado-hls-build
+      artifacts: false
+    - job: PR-vivado-hls-build
+      artifacts: false
+    - job: ME-vivado-hls-build
+      artifacts: false
+    - job: MC-vivado-hls-build
+      artifacts: false
+    - job: TB-vivado-hls-build
+      artifacts: false
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
@@ -382,37 +399,47 @@ topPRMEMC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
-    - topPRMEMC-sim
-    - topPRMEMC-check-results
+    - job: topPRMEMC-sim
+      artifacts: false
+    - job: topPRMEMC-check-results
+      artifacts: false
 topTETC-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TETC"
   needs:
-    - topTETC-sim
-    - topTETC-check-results
+    - job: topTETC-sim
+      artifacts: false
+    - job: topTETC-check-results
+      artifacts: false
 topIRVMR-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
-    - topIRVMR-sim
-    - topIRVMR-check-results
+    - job: topIRVMR-sim
+      artifacts: false
+    - job: topIRVMR-check-results
+      artifacts: false
 topMCTB-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/MCTB"
   needs:
-    - topMCTB-sim
-    - topMCTB-check-results
+    - job: topMCTB-sim
+      artifacts: false
+    - job: topMCTB-check-results
+      artifacts: false
 topIRtoTB-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/IRtoTB"
   needs:
-    - topIRtoTB-sim
-    - topIRtoTB-check-results
+    - job: topIRtoTB-sim
+      artifacts: false
+    - job: topIRtoTB-check-results
+      artifacts: false
