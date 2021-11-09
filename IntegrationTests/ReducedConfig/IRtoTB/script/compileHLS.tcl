@@ -59,7 +59,7 @@ build_ip VMRouterTop_L6PHIB ../../../../project
 # Build TE
 open_project -reset trackletengine
 add_files ../../../../TopFunctions/ReducedConfig/TrackletEngineTop.cc -cflags "$CFLAGS"
-build_ip TrackletEngineTop ../../../../project
+build_ip TrackletEngine_PS_PS ../../../../project
 
 # Build TC
 open_project -reset trackletCalculator
