@@ -241,6 +241,10 @@ def comparePredefined(args):
     if (not os.path.isdir(comparison_dir) or not os.path.isdir(reference_dir)):
         raise FileNotFoundError("Please make sure that the directories " + comparison_dir + " and " + reference_dir + " exist from where this script is run with the predefined (-p) flag")
 
+    # Check that the comparison files exist, exit if not
+    if not os.listdir(comparison_dir):
+        raise FileNotFoundError(comparison_dir + " is empty. No files to compare.")
+
     # Find the lists of filenames
     comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
