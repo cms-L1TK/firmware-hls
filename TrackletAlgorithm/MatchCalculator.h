@@ -352,14 +352,6 @@ void MatchCalculator(BXType bx,
   }
 
   // Read signals for the input candidate matches
-  bool read1 = false;
-  bool read2 = false;
-  bool read3 = false;
-  bool read4 = false;
-  bool read5 = false;
-  bool read6 = false;
-  bool read7 = false;
-  bool read8 = false;
   bool read[8];
   read_loop: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
 #pragma HLS unroll
@@ -598,7 +590,6 @@ void MatchCalculator(BXType bx,
       &tmpB_L1_1_next, &vB_L1_1_next, &sB_L1_1_next, // tmp variables internal to L1_1 merger
       &cm_L1_1_next, &valid_L1_1_next,               // outputs: out, vout
       &read_next[0], &read_next[1]                       // outputs: read1, read2 
-      //&read1_next, &read2_next                       // outputs: read1, read2 
     );
 
     // merger Layer 1 Part 2
@@ -611,7 +602,6 @@ void MatchCalculator(BXType bx,
       &tmpB_L1_2_next, &vB_L1_2_next, &sB_L1_2_next, // tmp variables internal to L1_2 merger
       &cm_L1_2_next, &valid_L1_2_next,               // outputs: out, vout
       &read_next[2], &read_next[3]                       // outputs: read3, read4 
-      //&read3_next, &read4_next                       // outputs: read3, read4 
     );
 
     // merger Layer 1 Part 3 
@@ -624,7 +614,6 @@ void MatchCalculator(BXType bx,
       &tmpB_L1_3_next, &vB_L1_3_next, &sB_L1_3_next, // tmp variables internal to L1_3 merger
       &cm_L1_3_next, &valid_L1_3_next,               // outputs: out, vout
       &read_next[4], &read_next[5]                       // outputs: read5, read6 
-      //&read5_next, &read6_next                       // outputs: read5, read6 
     );
 
     // merger Layer 1 Part 4  
@@ -637,7 +626,6 @@ void MatchCalculator(BXType bx,
       &tmpB_L1_4_next, &vB_L1_4_next, &sB_L1_4_next, // tmp variables internal to L1_4 merger
       &cm_L1_4_next, &valid_L1_4_next,               // outputs: out, vout
       &read_next[6], &read_next[7]                       // outputs: read7, read8 
-      //&read7_next, &read8_next                       // outputs: read7, read8 
     );
 
     // merger Layer 2 Part 1
@@ -682,14 +670,6 @@ void MatchCalculator(BXType bx,
     // pipeline the variables
     // set up the inputs for the next iteration of the loop
 
-    read1      = read1_next;
-    read2      = read2_next;
-    read3      = read3_next;
-    read4      = read4_next;
-    read5      = read5_next;
-    read6      = read6_next;
-    read7      = read7_next;
-    read8      = read8_next;
     read_next: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
 #pragma HLS unroll
         read[i] = read_next[i];
