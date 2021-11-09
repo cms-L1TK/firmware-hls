@@ -17,3 +17,5 @@ build_ip MatchCalculator_L6PHIB ../../../../project
 open_project -reset trackBuilder
 add_files ../../../../TopFunctions/ReducedConfig/TrackBuilderTop.cc -cflags "$CFLAGS"
 build_ip TrackBuilder_L1L2 ../../../../project
+
+exit
