@@ -35,7 +35,7 @@ create_ip -name VMRouterTop_L3PHIB -module_name VMR_L3PHIB -vendor xilinx.com -l
 create_ip -name VMRouterTop_L4PHIB -module_name VMR_L4PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name VMRouterTop_L5PHIB -module_name VMR_L5PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name VMRouterTop_L6PHIB -module_name VMR_L6PHIB -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackletEngineTop -module_name TE_L1L2 -vendor xilinx.com -library hls -version 1.0
+create_ip -name TrackletEngine_PS_PS -module_name TE_L1L2 -vendor xilinx.com -library hls -version 1.0
 create_ip -name TrackletCalculator_L1L2F -module_name TC_L1L2F -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop_L3PHIB -module_name PR_L3PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop_L4PHIB -module_name PR_L4PHIB -vendor xilinx.com -library hls -version 1.0
