@@ -72,10 +72,7 @@ stages: # ---------------------------------------------------------------------
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
-      - ./IntegrationTests/${PROJ_NAME}/script/common
-      - ./IntegrationTests/${PROJ_NAME}/script/MemPrints
-      - ./IntegrationTests/${PROJ_NAME}/script/dataOut/
-      - ./IntegrationTests/${PROJ_NAME}/script/Work/
+      - ./IntegrationTests/${PROJ_NAME}/script/
     expire_in: 1 week
 
 .job_template: &template_check-results
