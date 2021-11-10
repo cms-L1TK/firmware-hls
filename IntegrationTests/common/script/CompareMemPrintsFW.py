@@ -8,7 +8,7 @@
 #  ../../common/script/CompareMemPrintsFW.py -p -s
 #
 # Assumes txt files written by FW are in dataOut/
-# & C++ emulation expectations in ../../../emData/
+# & C++ emulation expectations in ./MemPrints/
 #================================================================
 
 import argparse
@@ -235,7 +235,7 @@ def comparePredefined(args):
     ret_sum = 0
 
     comparison_dir = "./dataOut/"
-    reference_dir = "../../../emData/MemPrints/"
+    reference_dir = args.memprints_location
 
     # Make sure the default directories exists
     if (not os.path.isdir(comparison_dir) or not os.path.isdir(reference_dir)):
@@ -289,8 +289,9 @@ python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.d
     parser.add_argument("-c","--comparison_filename",default="output.txt",help="The filename of the testbench output file (default = %(default)s)")
     parser.add_argument("-f","--fail_on_error",default=False,action="store_true",help="Raise an exception on the first error as opposed to simply printing a message (default = %(default)s)")
     parser.add_argument("-l","--file_location",default="./",help="Location of the input files (default = %(default)s)")
-    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons using the output files in ./dataOut. Make sure that the reference files are located in ../../../emData/MemPrints/ (default = %(default)s)")
+    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons using the output files in ./dataOut. Make sure that the reference files are located in ./MemPrints/ (default = %(default)s)")
     parser.add_argument("-r","--reference_filenames",default=[],nargs="+",help="A list of filenames for the reference files (default = %(default)s)")
+    parser.add_argument("-m","--memprints_location",default="./MemPrints/",help="Location of MemPrints directory for predefined comparisons (default = %(default)s)")
     parser.add_argument("-s","--save",default=False,action="store_true",help="Save the output to a file (default = %(default)s)")
     parser.add_argument("-v","--verbose",default=False,action="store_true",help="Print extra information to the console (default = %(default)s)")
 
