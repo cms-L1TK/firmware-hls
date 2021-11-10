@@ -67,7 +67,7 @@ stages: # ---------------------------------------------------------------------
     - pwd; ls -la; #debug
     - vivado_hls -f ./compileHLS.tcl
     - vivado -mode tcl -source ./makeProject.tcl
-    - vivado -mode tcl -source ./runSim.tcl
+    - vivado -mode tcl -source ./runSim.tcl | awk 'BEGIN{IGNORECASE=1} /error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
