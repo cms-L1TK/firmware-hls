@@ -56,7 +56,7 @@ package tf_pkg is
   -- ########################### Functions ################################################################
   function clogb2     (bit_depth : integer) return integer;
 
-  function getDirEMDATA return string;
+  function getDirSCRIPT return string;
 
 
   -- ########################### Types ###########################
@@ -171,17 +171,17 @@ package body tf_pkg is
   end;
 
 
-  --! @brief Returns directory path to emData/
-  function getDirEMDATA return string is
+  --! @brief Returns directory path to script/
+  function getDirSCRIPT return string is
   begin
     if IS_SIMULATION then
       -- Sim path specified relative to Vivado project's xsim directory. 
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-      return "../../../../../../../../emData/";
+      return "../../../../../";
     else
       -- Synth path specified relative to dir where you run Vivado.
       -- e.g. IntegrationTests/PRMEMC/script/
-      return "../../../emData/";
+      return "./";
     end if;
   end;
 

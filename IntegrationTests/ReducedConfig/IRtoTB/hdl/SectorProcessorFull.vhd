@@ -1384,7 +1384,7 @@ begin
 
   TE_L1PHID14_L2PHIB15_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB15_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID14_L2PHIB15_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1398,7 +1398,7 @@ begin
 
   TE_L1PHID14_L2PHIB15_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB15_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID14_L2PHIB15_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1461,7 +1461,7 @@ begin
 
   TE_L1PHID14_L2PHIB16_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB16_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID14_L2PHIB16_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1475,7 +1475,7 @@ begin
 
   TE_L1PHID14_L2PHIB16_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID14_L2PHIB16_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID14_L2PHIB16_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1534,7 +1534,7 @@ begin
 
   TE_L1PHID15_L2PHIB13_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB13_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB13_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1548,7 +1548,7 @@ begin
 
   TE_L1PHID15_L2PHIB13_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB13_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB13_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1607,7 +1607,7 @@ begin
 
   TE_L1PHID15_L2PHIB14_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB14_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB14_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1621,7 +1621,7 @@ begin
 
   TE_L1PHID15_L2PHIB14_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB14_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB14_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1680,7 +1680,7 @@ begin
 
   TE_L1PHID15_L2PHIB15_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB15_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB15_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1694,7 +1694,7 @@ begin
 
   TE_L1PHID15_L2PHIB15_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB15_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB15_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1753,7 +1753,7 @@ begin
 
   TE_L1PHID15_L2PHIB16_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB16_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB16_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1767,7 +1767,7 @@ begin
 
   TE_L1PHID15_L2PHIB16_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID15_L2PHIB16_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID15_L2PHIB16_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1826,7 +1826,7 @@ begin
 
   TE_L1PHID16_L2PHIB14_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB14_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID16_L2PHIB14_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1840,7 +1840,7 @@ begin
 
   TE_L1PHID16_L2PHIB14_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB14_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID16_L2PHIB14_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1899,7 +1899,7 @@ begin
 
   TE_L1PHID16_L2PHIB15_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB15_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID16_L2PHIB15_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1913,7 +1913,7 @@ begin
 
   TE_L1PHID16_L2PHIB15_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB15_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID16_L2PHIB15_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1972,7 +1972,7 @@ begin
 
   TE_L1PHID16_L2PHIB16_bendinnertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB16_stubptinnercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID16_L2PHIB16_stubptinnercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
@@ -1986,7 +1986,7 @@ begin
 
   TE_L1PHID16_L2PHIB16_bendoutertable : entity work.tf_lut
     generic map (
-      lut_file  => getDirEMDATA & "LUTs/TE_L1PHID16_L2PHIB16_stubptoutercut.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TE_L1PHID16_L2PHIB16_stubptoutercut.tab",
       lut_width => 1,
       lut_depth => 256
     )
