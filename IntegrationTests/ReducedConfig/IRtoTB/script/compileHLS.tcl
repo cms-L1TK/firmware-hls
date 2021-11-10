@@ -78,9 +78,9 @@ build_ip ProjectionRouterTop_L6PHIB ../../../../project
 open_project -reset matchengine
 add_files ../../../../TopFunctions/ReducedConfig/MatchEngineTop.cc -cflags "$CFLAGS"
 build_ip MatchEngineTop_L3 ../../../../project
-build_ip MatchEngineTop_L3 ../../../../project
-build_ip MatchEngineTop_L3 ../../../../project
-build_ip MatchEngineTop_L3 ../../../../project
+build_ip MatchEngineTop_L4 ../../../../project
+build_ip MatchEngineTop_L5 ../../../../project
+build_ip MatchEngineTop_L6 ../../../../project
 
 # Build MCs
 open_project -reset match_calc
