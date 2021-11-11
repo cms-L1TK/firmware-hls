@@ -399,7 +399,6 @@ topPRMEMC-synth:
     PROJ_NAME: "PRMEMC"
   needs:
     - job: topPRMEMC-sim
-      artifacts: false
     - job: topPRMEMC-check-results
       artifacts: false
 topTETC-synth:
@@ -409,7 +408,6 @@ topTETC-synth:
     PROJ_NAME: "TETC"
   needs:
     - job: topTETC-sim
-      artifacts: false
     - job: topTETC-check-results
       artifacts: false
 topIRVMR-synth:
@@ -419,7 +417,6 @@ topIRVMR-synth:
     PROJ_NAME: "IRVMR"
   needs:
     - job: topIRVMR-sim
-      artifacts: false
     - job: topIRVMR-check-results
       artifacts: false
 topMCTB-synth:
@@ -429,7 +426,6 @@ topMCTB-synth:
     PROJ_NAME: "ReducedConfig/MCTB"
   needs:
     - job: topMCTB-sim
-      artifacts: false
     - job: topMCTB-check-results
       artifacts: false
 topIRtoTB-synth:
@@ -439,6 +435,5 @@ topIRtoTB-synth:
     PROJ_NAME: "ReducedConfig/IRtoTB"
   needs:
     - job: topIRtoTB-sim
-      artifacts: false
     - job: topIRtoTB-check-results
       artifacts: false
