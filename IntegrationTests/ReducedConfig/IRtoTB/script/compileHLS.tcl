@@ -1,9 +1,10 @@
 # Common settings
 source ../../../../project/env_hls.tcl
-file link -symbolic common ../../../common
-file link -symbolic MemPrints ../../../../emData/MemPrintsReduced
-file link -symbolic LUTs ../../../../emData/LUTs
-source common/script/build_ip.tcl
+source ../../../common/script/tools.tcl
+source ../../../common/script/build_ip.tcl
+linkCreate ../../../common common
+linkCreate ../../../../emData/MemPrintsReduced MemPrints
+linkCreate ../../../../emData/LUTs LUTs
 set CFLAGS {-std=c++11 -I../../../../TrackletAlgorithm -I../../../../TopFunctions/ReducedConfig}
 set cwd [pwd]
 

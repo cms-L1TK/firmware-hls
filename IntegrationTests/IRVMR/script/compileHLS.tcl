@@ -1,8 +1,9 @@
 # Common settings
 source ../../../project/env_hls.tcl
-file link -symbolic common ../../common
-file link -symbolic MemPrints ../../../emData/MemPrints
-source common/script/build_ip.tcl
+source ../../common/script/tools.tcl
+source ../../common/script/build_ip.tcl
+linkCreate ../../common common
+linkCreate ../../../emData/MemPrints MemPrints
 set CFLAGS {-std=c++11 -I../../../TrackletAlgorithm -I../../../TopFunctions}
 set cwd [pwd]
 
