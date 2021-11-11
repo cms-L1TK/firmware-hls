@@ -384,7 +384,6 @@ topMCTB-check-results:
     - topMCTB-sim
 topIRtoTB-check-results:
   <<: *template_check-results
-  allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "ReducedConfig/IRtoTB"
