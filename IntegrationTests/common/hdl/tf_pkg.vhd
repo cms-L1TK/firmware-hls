@@ -180,8 +180,8 @@ package body tf_pkg is
       return "../../../../../";
     else
       -- Synth path specified relative to dir where you run Vivado.
-      -- e.g. IntegrationTests/PRMEMC/script/
-      return "./";
+      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/
+      return "../../../";
     end if;
   end;
 
