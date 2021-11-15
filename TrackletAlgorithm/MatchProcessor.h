@@ -151,7 +151,6 @@ void readTable(ap_uint<1> table[]){
     }
   }
 
-/* FIXME uncomment these out when testing L2,L5, and L6. Need to be added to download.sh to work.
   if (L==TF::L2) {
     bool tmp[256]=
 #include "../emData/ME/tables/METable_L2.tab"
@@ -160,7 +159,6 @@ void readTable(ap_uint<1> table[]){
       table[i]=tmp[i];
     }
   }
-*/
 
   if (L==TF::L3) {
     bool tmp[256]=
@@ -180,7 +178,6 @@ void readTable(ap_uint<1> table[]){
     }
   }
 
-/*
   if (L==TF::L5) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L5.tab"
@@ -198,7 +195,6 @@ void readTable(ap_uint<1> table[]){
       table[i]=tmp[i];
     }
   }
-*/
 
 
 
