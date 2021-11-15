@@ -406,6 +406,7 @@ topTETC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TETC"
   needs:
+    - job: download # needed for LUT files
     - job: topTETC-sim
     - job: topTETC-check-results
       artifacts: false
@@ -433,6 +434,7 @@ topIRtoTB-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/IRtoTB"
   needs:
+    - job: download # needed for LUT files
     - job: topIRtoTB-sim
     - job: topIRtoTB-check-results
       artifacts: false
