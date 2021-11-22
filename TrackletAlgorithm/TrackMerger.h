@@ -18,7 +18,7 @@ class ComparisonModule{
 
     void inputTrack(const TrackHandler track);
 
-    TrackHandler getTrack();
+    void getTrack();
     
     unsigned int getMatchFound(){return matchFound;}
 

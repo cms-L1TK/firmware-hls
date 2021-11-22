@@ -11,7 +11,7 @@ void ComparisonModule::inputTrack(const TrackHandler track){
   } else {
     endOfStream = 0;
     #ifndef _SYNTHESIS_
-    std::cout << "Module#: " << myIndex << " InputTrack#: " << writeIndex << " " << track.getTrackWord() << "\n";
+    // std::cout << "Module#: " << myIndex << " InputTrack#: " << writeIndex << " " << track.getTrackWord() << "\n";
     #endif
     assert(writeIndex < bufferSize);
     inputBuffer[writeIndex] = track;
@@ -24,16 +24,20 @@ void ComparisonModule::inputTrack(const TrackHandler track){
 }
 void ComparisonModule::processTrack(){
   if(endOfStream == 0){
-    masterTrack.CompareTrack(track, matchFound);
+   if (myIndex == 0){
+     masterTrack.setDebugFlag(1);
+   } else {
+    masterTrack.setDebugFlag(0);
+   }
+    masterTrack.CompareTrack(track);
     masterTrack.MergeTrack(track, matchFound, mergeCondition);
     tracksProcessed++;
   }
 }
 
-TrackHandler ComparisonModule::getTrack(){
-  TrackHandler track = inputBuffer[readIndex];
+void ComparisonModule::getTrack(){
+  track = inputBuffer[readIndex];
   readIndex++;
-  return track;
 }
 
 void ComparisonModule::endEvent(TrackHandler outputBuffer[16], unsigned int outputWriteIndex){
@@ -70,7 +74,7 @@ void TrackMerger(const BXType bx,
     modulesToRun[0] = 1;
     for (int i = 0; i < kMaxProc; i++){
       #ifndef _SYNTHESIS_
-            std::cout << "Step#: " << i << std::endl;
+            //std::cout << "Step#: " << i << std::endl;
       #endif
           
       const TrackFit::BarrelStubWord barrelStubWordsArray[4] = {barrelStubWords[0][i], barrelStubWords[1][i], barrelStubWords[2][i], barrelStubWords[3][i]};
@@ -113,12 +117,12 @@ void TrackMerger(const BXType bx,
       }
     }
     #ifndef _SYNTHESIS_
-     std::cout << "outputBuffer: " << outputBuffer[0].getTrackWord() << " firstTrackWord: " << trackWord[0] << "\n";
+    //  std::cout << "outputBuffer: " << outputBuffer[0].getTrackWord() << " firstTrackWord: " << trackWord[0] << "\n";
     #endif
     for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
     {
       #ifndef _SYNTHESIS_
-        std::cout << "\t\tModule#" << activeModule << " active " << modulesToRun[activeModule] << std::endl;
+        // std::cout << "\t\tModule#" << activeModule << " active " << modulesToRun[activeModule] << std::endl;
       #endif
     }
     bx_o = bx;

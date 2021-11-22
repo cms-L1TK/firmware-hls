@@ -39,7 +39,7 @@ int main(){
   assert(fout_outputTracks.good());
 
   // Loop over events
-  for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
+  for (unsigned int ievt = 0; ievt < 1; ++ievt) { //nevents
     cout << "Event: " << dec << ievt << endl;
 
     for (unsigned short i = 0; i < kMaxProc; ++i){
