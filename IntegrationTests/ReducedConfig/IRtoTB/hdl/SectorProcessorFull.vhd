@@ -649,7 +649,13 @@ begin
   end generate FM_52_loop;
 
 
-  VMR_start <= '1' when IR_done = '1';
+  LATCH_IR: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => IR_done,
+      start => VMR_start
+  );
 
   IR_PS10G_1_A : entity work.IR_PS10G_1_A
     port map (
@@ -997,7 +1003,13 @@ begin
       hPhBnWord_V => "00000000000000000000000000000010"
   );
 
-  TE_start <= '1' when VMR_done = '1';
+  LATCH_VMR: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => VMR_done,
+      start => TE_start
+  );
 
   VMR_L1PHID : entity work.VMR_L1PHID
     port map (
@@ -1409,7 +1421,13 @@ begin
       dout      => TE_L1PHID14_L2PHIB15_bendoutertable_dout
   );
 
-  TC_start <= '1' when TE_done = '1';
+  LATCH_TE: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => TE_done,
+      start => TC_start
+  );
 
   TE_L1PHID14_L2PHIB15 : entity work.TE_L1L2
     port map (
@@ -2042,7 +2060,13 @@ begin
       outstubpair_dataarray_data_V_d0        => SP_14_mem_AV_din(L1PHID16_L2PHIB16)
   );
 
-  PR_start <= '1' when TC_done = '1';
+  LATCH_TC: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => TC_done,
+      start => PR_start
+  );
 
   TC_L1L2F : entity work.TC_L1L2F
     port map (
@@ -2128,7 +2152,13 @@ begin
       projout_barrel_2s_9_dataarray_data_V_d0        => TPROJ_58_mem_AV_din(L1L2F_L6PHIB)
   );
 
-  ME_start <= '1' when PR_done = '1';
+  LATCH_PR: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => PR_done,
+      start => ME_start
+  );
 
   PR_L3PHIB : entity work.PR_L3PHIB
     port map (
@@ -2340,7 +2370,13 @@ begin
       vmprojout_7_dataarray_data_V_d0        => VMPROJ_24_mem_AV_din(L6PHIB16)
   );
 
-  MC_start <= '1' when ME_done = '1';
+  LATCH_ME: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => ME_done,
+      start => MC_start
+  );
 
   ME_L3PHIB9 : entity work.ME_L3PHIB
     port map (
@@ -5128,7 +5164,13 @@ begin
       outputCandidateMatch_dataarray_data_V_d0        => CM_14_mem_AV_din(L6PHIB16)
   );
 
-  FT_start <= '1' when MC_done = '1';
+  LATCH_MC: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => MC_done,
+      start => FT_start
+  );
 
   MC_L3PHIB : entity work.MC_L3PHIB
     port map (
