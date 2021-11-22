@@ -4,7 +4,7 @@ source ../../../common/script/tools.tcl
 source ../../../common/script/build_ip.tcl
 linkCreate ../../../common common
 linkCreate ../../../../emData/MemPrintsReduced MemPrints
-linkCreate ../../../../emData/LUTs LUTs
+linkCreate ../../../../emData/LUTsReduced LUTs
 set CFLAGS {-std=c++11 -I../../../../TrackletAlgorithm -I../../../../TopFunctions/ReducedConfig}
 set cwd [pwd]
 
