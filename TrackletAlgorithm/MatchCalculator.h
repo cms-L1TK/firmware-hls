@@ -558,7 +558,7 @@ void MatchCalculator(BXType bx,
 
     addr_inc: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
 #pragma HLS unroll
-      addr[i] = read[i] ? ++addr[i] : addr[i];
+      addr[i] = read[i] ? addr[i]+1 : addr[i];
     }
     
 
