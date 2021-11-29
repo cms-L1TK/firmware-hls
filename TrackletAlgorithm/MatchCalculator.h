@@ -293,6 +293,7 @@ void MatchCalculator(BXType bx,
 #pragma HLS inline
 #pragma HLS array_partition variable=match complete dim=1
 #pragma HLS array_partition variable=fullmatch complete dim=1
+  constexpr int totalMatchCopies(8);
 
   // Initialization
  
@@ -336,36 +337,28 @@ void MatchCalculator(BXType bx,
   CandidateMatch::CMProjIndex id;
   CandidateMatch::CMProjIndex id_next;
 
-  ap_uint<kNBits_MemAddr> ncm1 = 0; 
-  ap_uint<kNBits_MemAddr> ncm2 = 0;
-  ap_uint<kNBits_MemAddr> ncm3 = 0;
-  ap_uint<kNBits_MemAddr> ncm4 = 0;
-  ap_uint<kNBits_MemAddr> ncm5 = 0;
-  ap_uint<kNBits_MemAddr> ncm6 = 0;
-  ap_uint<kNBits_MemAddr> ncm7 = 0;
-  ap_uint<kNBits_MemAddr> ncm8 = 0;
+  ap_uint<kNBits_MemAddr> ncm[totalMatchCopies];
+#pragma HLS array_partition variable=ncm complete dim=0
+  ncm_loop: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+    ncm[i] = ap_uint<kNBits_MemAddr>(0);
+  }
   ap_uint<kNBits_MemAddr+1> total  = 0;
-  ap_uint<kNBits_MemAddr> ncm = 0;
 
   // Initialize read addresses for candidate matches
-  ap_uint<kNBits_MemAddr> addr1 = 0;  
-  ap_uint<kNBits_MemAddr> addr2 = 0;  
-  ap_uint<kNBits_MemAddr> addr3 = 0;  
-  ap_uint<kNBits_MemAddr> addr4 = 0;  
-  ap_uint<kNBits_MemAddr> addr5 = 0;  
-  ap_uint<kNBits_MemAddr> addr6 = 0;  
-  ap_uint<kNBits_MemAddr> addr7 = 0;  
-  ap_uint<kNBits_MemAddr> addr8 = 0; 
+  ap_uint<kNBits_MemAddr> addr[totalMatchCopies];
+#pragma HLS array_partition variable=addr complete dim=0
+  addr_loop: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+    addr[i] = 0;
+  }
 
   // Read signals for the input candidate matches
-  bool read1 = false;
-  bool read2 = false;
-  bool read3 = false;
-  bool read4 = false;
-  bool read5 = false;
-  bool read6 = false;
-  bool read7 = false;
-  bool read8 = false;
+  bool read[8];
+  read_loop: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+    read[i] = false;
+  }
 
   // MC_L3PHIC mask {1: on, 0: off}
   //static const uint16_t FML1L2 = 1 << shift_L1L2;
@@ -472,18 +465,12 @@ void MatchCalculator(BXType bx,
 #pragma HLS PIPELINE II=1 
 
     // Pick up number of candidate matches for each CM memory
-    ncm1 = match[0].getEntries(bx);
-    ncm2 = match[1].getEntries(bx);
-    ncm3 = match[2].getEntries(bx);
-    ncm4 = match[3].getEntries(bx);
-    ncm5 = match[4].getEntries(bx);
-    ncm6 = match[5].getEntries(bx);
-    ncm7 = match[6].getEntries(bx);
-    ncm8 = match[7].getEntries(bx);
-
-    // Count up total number of CMs *and protect incase of overflow)
-    total  = ncm1+ncm2+ncm3+ncm4+ncm5+ncm6+ncm7+ncm8; 
-    ncm    = (total > kMaxProc)? kMaxProc : total.range(7,0);
+    ncm_load: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+      ncm[i] = (i < MaxMatchCopies) ? match[i].getEntries(bx) : ap_uint<kNBits_MemAddr>(0);
+      // Count up total number of CMs *and protect incase of overflow)
+      total += ncm[i];
+    }
 
     // pipeline variables
     bool read_L1_1_next = false;
@@ -558,6 +545,11 @@ void MatchCalculator(BXType bx,
     bool read6_next = false;
     bool read7_next = false;
     bool read8_next = false;
+    bool read_next[8];
+    read_next_loop: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+      read_next[i] = false;
+    }
 
 
     //-----------------------------------------------------------------------------------------------------------
@@ -566,81 +558,76 @@ void MatchCalculator(BXType bx,
 
     // Increment the read addresses for the candidate matches
 
-    if (read1) addr1++;
-    if (read2) addr2++;
-    if (read3) addr3++;
-    if (read4) addr4++;
-    if (read5) addr5++;
-    if (read6) addr6++;
-    if (read7) addr7++;
-    if (read8) addr8++;
+    addr_inc: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+      if(read[i]) addr[i]++;
+    }
+    
 
     // Read in each candidate match
-    const CandidateMatch &cm1 = match[0].read_mem(bx,addr1);
-    const CandidateMatch &cm2 = match[1].read_mem(bx,addr2);
-    const CandidateMatch &cm3 = match[2].read_mem(bx,addr3); 
-    const CandidateMatch &cm4 = match[3].read_mem(bx,addr4); 
-    const CandidateMatch &cm5 = match[4].read_mem(bx,addr5); 
-    const CandidateMatch &cm6 = match[5].read_mem(bx,addr6); 
-    const CandidateMatch &cm7 = match[6].read_mem(bx,addr7); 
-    const CandidateMatch &cm8 = match[7].read_mem(bx,addr8); 
+    CandidateMatch cm[8];
+#pragma HLS array_partition variable=cm complete dim=0
+    cm_load: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+      cm[i] = (i < MaxMatchCopies) ? match[i].read_mem(bx,addr[i]) : CandidateMatch(-1);
+    }
 
     // Valid signal for the candidate match
-    bool valid1 = (addr1 < ncm1) && (ncm1 > 0);
-    bool valid2 = (addr2 < ncm2) && (ncm2 > 0);
-    bool valid3 = (addr3 < ncm3) && (ncm3 > 0);
-    bool valid4 = (addr4 < ncm4) && (ncm4 > 0);
-    bool valid5 = (addr5 < ncm5) && (ncm5 > 0);
-    bool valid6 = (addr6 < ncm6) && (ncm6 > 0);
-    bool valid7 = (addr7 < ncm7) && (ncm7 > 0);
-    bool valid8 = (addr8 < ncm8) && (ncm8 > 0);
+    bool valid1 = (addr[0] < ncm[0]) && (ncm[0] > 0);
+    bool valid2 = (addr[1] < ncm[1]) && (ncm[1] > 0);
+    bool valid3 = (addr[2] < ncm[2]) && (ncm[2] > 0);
+    bool valid4 = (addr[3] < ncm[3]) && (ncm[3] > 0);
+    bool valid5 = (addr[4] < ncm[4]) && (ncm[4] > 0);
+    bool valid6 = (addr[5] < ncm[5]) && (ncm[5] > 0);
+    bool valid7 = (addr[6] < ncm[6]) && (ncm[6] > 0);
+    bool valid8 = (addr[7] < ncm[7]) && (ncm[7] > 0);
 
     // merger Layer 1 Part 1
     merger<1,1>(
-      cm1, valid1, cm2, valid2,                      // inputs: inA, validA, inB, validB
+      cm[0], valid1, cm[1], valid2,                      // inputs: inA, validA, inB, validB
       cm_L1_1, valid_L1_1, read_L1_1,                // inputs: out, vout, inread from L2_1
       tmpA_L1_1, vA_L1_1, sA_L1_1,                   // tmp variables internal to L1_1 merger
       tmpB_L1_1, vB_L1_1, sB_L1_1,                   // tmp variables internal to L1_1 merger
       &tmpA_L1_1_next, &vA_L1_1_next, &sA_L1_1_next, // tmp variables internal to L1_1 merger
       &tmpB_L1_1_next, &vB_L1_1_next, &sB_L1_1_next, // tmp variables internal to L1_1 merger
       &cm_L1_1_next, &valid_L1_1_next,               // outputs: out, vout
-      &read1_next, &read2_next                       // outputs: read1, read2 
+      &read_next[0], &read_next[1]                       // outputs: read1, read2 
     );
 
     // merger Layer 1 Part 2
     merger<1,2>(
-      cm3, valid3, cm4, valid4,                      // inputs: inA, validA, inB, validB
+      cm[2], valid3, cm[3], valid4,                      // inputs: inA, validA, inB, validB
       cm_L1_2, valid_L1_2, read_L1_2,                // inputs: out, vout, inread from L2_1
       tmpA_L1_2, vA_L1_2, sA_L1_2,                   // tmp variables internal to L1_2 merger
       tmpB_L1_2, vB_L1_2, sB_L1_2,                   // tmp variables internal to L1_2 merger
       &tmpA_L1_2_next, &vA_L1_2_next, &sA_L1_2_next, // tmp variables internal to L1_2 merger
       &tmpB_L1_2_next, &vB_L1_2_next, &sB_L1_2_next, // tmp variables internal to L1_2 merger
       &cm_L1_2_next, &valid_L1_2_next,               // outputs: out, vout
-      &read3_next, &read4_next                       // outputs: read3, read4 
+      &read_next[2], &read_next[3]                       // outputs: read3, read4 
     );
 
     // merger Layer 1 Part 3 
     merger<1,3>(
-      cm5, valid5, cm6, valid6,                      // inputs: inA, validA, inB, validB
+      cm[4], valid5, cm[5], valid6,                      // inputs: inA, validA, inB, validB
       cm_L1_3, valid_L1_3, read_L1_3,                // inputs: out, vout, inread from L2_1
       tmpA_L1_3, vA_L1_3, sA_L1_3,                   // tmp variables internal to L1_3 merger
       tmpB_L1_3, vB_L1_3, sB_L1_3,                   // tmp variables internal to L1_3 merger
       &tmpA_L1_3_next, &vA_L1_3_next, &sA_L1_3_next, // tmp variables internal to L1_3 merger
       &tmpB_L1_3_next, &vB_L1_3_next, &sB_L1_3_next, // tmp variables internal to L1_3 merger
       &cm_L1_3_next, &valid_L1_3_next,               // outputs: out, vout
-      &read5_next, &read6_next                       // outputs: read5, read6 
+      &read_next[4], &read_next[5]                       // outputs: read5, read6 
     );
 
     // merger Layer 1 Part 4  
     merger<1,4>(
-      cm7, valid7, cm8, valid8,                      // inputs: inA, validA, inB, validB
+      cm[6], valid7, cm[7], valid8,                      // inputs: inA, validA, inB, validB
       cm_L1_4, valid_L1_4, read_L1_4,                // inputs: out, vout, inread from L2_1
       tmpA_L1_4, vA_L1_4, sA_L1_4,                   // tmp variables internal to L1_4 merger
       tmpB_L1_4, vB_L1_4, sB_L1_4,                   // tmp variables internal to L1_4 merger
       &tmpA_L1_4_next, &vA_L1_4_next, &sA_L1_4_next, // tmp variables internal to L1_4 merger
       &tmpB_L1_4_next, &vB_L1_4_next, &sB_L1_4_next, // tmp variables internal to L1_4 merger
       &cm_L1_4_next, &valid_L1_4_next,               // outputs: out, vout
-      &read7_next, &read8_next                       // outputs: read7, read8 
+      &read_next[6], &read_next[7]                       // outputs: read7, read8 
     );
 
     // merger Layer 2 Part 1
@@ -685,14 +672,10 @@ void MatchCalculator(BXType bx,
     // pipeline the variables
     // set up the inputs for the next iteration of the loop
 
-    read1      = read1_next;
-    read2      = read2_next;
-    read3      = read3_next;
-    read4      = read4_next;
-    read5      = read5_next;
-    read6      = read6_next;
-    read7      = read7_next;
-    read8      = read8_next;
+    read_next: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
+#pragma HLS unroll
+        read[i] = read_next[i];
+    }
 
     read_L1_1  = read_L1_1_next;
     read_L1_2  = read_L1_2_next;
@@ -924,17 +907,6 @@ void MatchCalculator(BXType bx,
   }// end MC_LOOP 
 
   bx_o = bx;
-
-  /*
-  // finish by writing out the last match made (to minimize truncation) -- can't do this because not in the loop 
-  fullmatch[0].write_mem(bx,bestmatch,(goodmatch=true && projseed==0)); // L1L2 seed
-  fullmatch[1].write_mem(bx,bestmatch,(goodmatch=true && projseed==1)); // L3L4 seed
-  fullmatch[2].write_mem(bx,bestmatch,(goodmatch=true && projseed==2)); // L5L6 seed
-  fullmatch[3].write_mem(bx,bestmatch,(goodmatch=true && projseed==3)); // D1D2 seed
-  fullmatch[4].write_mem(bx,bestmatch,(goodmatch=true && projseed==4)); // D3D4 seed
-  fullmatch[5].write_mem(bx,bestmatch,(goodmatch=true && projseed==5)); // L1D1 seed
-  fullmatch[6].write_mem(bx,bestmatch,(goodmatch=true && projseed==6)); // L2D1 seed
-  */
 
 }// end MatchCalculator
 

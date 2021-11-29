@@ -107,7 +107,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
 
         # numbers of memories
         nCMMem = len(CMMems[mcName])
-        nFMMem = 8#FIXME after TBHelper is added to the test bench len(FMMems[tpName])
+        nFMMem = len(FMMems[mcName])
         FMMask = 0
         for FM in FMMems[mcName]:
             FMMask = FMMask | (1 << TF_index[FM])
@@ -161,7 +161,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "#pragma HLS resource variable=allproj->get_mem() latency=2\n"
             "\n"
             "MC_" + seed + "PHI" + iMC + ": MatchCalculator<"
-            "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(len(TF_index)) + ", " + str(len(TF_index)) + ",\n"
+            "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(nCMMem) + ", " + str(nFMMem) + ",\n"
             " TF::" + seed + ", "
             "TF::" + "D1" + ", "
             "MC::" + iMC + "> (\n"
@@ -185,7 +185,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
         "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed>\n"
         "static const ap_uint<1 << Seed> FMCount() {\n"
         "  ap_uint<1<<Seed> bits(-1);\n"
-        "  return __builtin_popcount(bits & FMMask<Layer, PHI>())-1;\n"
+        "  ap_uint<1<<Seed> mask = bits & FMMask<Layer, PHI>();\n"
+        "  int slot = 0;\n"
+        "  for(int i = 0; i < Seed; ++i) {\n"
+        "    slot += mask.range(i,i);\n"
+        "  }\n"
+        "  return slot;\n"
         "}\n\n"
         "#endif\n"
     )
