@@ -66,14 +66,13 @@ stages: # ---------------------------------------------------------------------
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
     - vivado_hls -f ./compileHLS.tcl
-    - vivado -mode tcl -source ./makeProject.tcl
-    - vivado -mode tcl -source ./runSim.tcl
+    - vivado -mode batch -source ./makeProject.tcl
+    - vivado -mode batch -source ./runSim.tcl
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
     paths:
-      - ./IntegrationTests/${PROJ_NAME}/script/dataOut/
-      - ./IntegrationTests/${PROJ_NAME}/script/Work/
+      - ./IntegrationTests/${PROJ_NAME}/script/
     expire_in: 1 week
 
 .job_template: &template_check-results
@@ -82,7 +81,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     # Compare HDL sim output with Mem/Prints
-    - python3 ../../common/script/CompareMemPrintsFW.py -p -s
+    - python3 common/script/CompareMemPrintsFW.py -p -s
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -96,7 +95,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode tcl -source ../../common/script/synth.tcl 
+    - vivado -mode batch -source common/script/synth.tcl 
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -283,28 +282,69 @@ topPRMEMC-sim:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
-    - download
-    - PR-vivado-hls-build
-    - ME-vivado-hls-build
-    - MC-vivado-hls-build
+    - job: download
+    - job: PR-vivado-hls-build
+      artifacts: false
+    - job: ME-vivado-hls-build
+      artifacts: false
+    - job: MC-vivado-hls-build
+      artifacts: false
 topTETC-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TETC"
   needs:
-    - download
-    - TE-vivado-hls-build
-    - TC-vivado-hls-build
+    - job: download
+    - job: TE-vivado-hls-build
+      artifacts: false
+    - job: TC-vivado-hls-build
+      artifacts: false
 topIRVMR-sim:
   <<: *template_topTF-sim
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
-    - download
-    - IR-vivado-hls-build
-    - VMR-vivado-hls-build
+    - job: download
+    - job: IR-vivado-hls-build
+      artifacts: false
+    - job: VMR-vivado-hls-build
+      artifacts: false
+topMCTB-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/MCTB"
+  needs:
+    - job: download
+    - job: MC-vivado-hls-build
+      artifacts: false
+    - job: TB-vivado-hls-build
+      artifacts: false
+topIRtoTB-sim:
+  <<: *template_topTF-sim
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/IRtoTB"
+  needs:
+    - job: download
+    - job: IR-vivado-hls-build
+      artifacts: false
+    - job: VMR-vivado-hls-build
+      artifacts: false
+    - job: TE-vivado-hls-build
+      artifacts: false
+    - job: TC-vivado-hls-build
+      artifacts: false
+    - job: PR-vivado-hls-build
+      artifacts: false
+    - job: ME-vivado-hls-build
+      artifacts: false
+    - job: MC-vivado-hls-build
+      artifacts: false
+    - job: TB-vivado-hls-build
+      artifacts: false
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
@@ -333,6 +373,24 @@ topIRVMR-check-results:
   needs:
     - download
     - topIRVMR-sim
+topMCTB-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "ReducedConfig/MCTB"
+  needs:
+    - download
+    - topMCTB-sim
+topIRtoTB-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "ReducedConfig/IRtoTB"
+  needs:
+    - download
+    - topIRtoTB-sim
 # FW synthesis ---------------
 topPRMEMC-synth:
   <<: *template_topTF-synth
@@ -340,21 +398,44 @@ topPRMEMC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
-    - topPRMEMC-sim
-    - topPRMEMC-check-results
+    - job: topPRMEMC-sim
+    - job: topPRMEMC-check-results
+      artifacts: false
 topTETC-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TETC"
   needs:
-    - topTETC-sim
-    - topTETC-check-results
+    - job: download # needed for LUT files
+    - job: topTETC-sim
+    - job: topTETC-check-results
+      artifacts: false
 topIRVMR-synth:
   <<: *template_topTF-synth
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
-    - topIRVMR-sim
-    - topIRVMR-check-results
+    - job: topIRVMR-sim
+    - job: topIRVMR-check-results
+      artifacts: false
+topMCTB-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/MCTB"
+  needs:
+    - job: topMCTB-sim
+    - job: topMCTB-check-results
+      artifacts: false
+topIRtoTB-synth:
+  <<: *template_topTF-synth
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedConfig/IRtoTB"
+  needs:
+    - job: download # needed for LUT files
+    - job: topIRtoTB-sim
+    - job: topIRtoTB-check-results
+      artifacts: false

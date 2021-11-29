@@ -31,8 +31,7 @@ class TEData{
   typedef ap_uint<kNBitsIMem> IMEM;
   typedef ap_uint<kTEDataAllStubMSB+1> TEDATA;
 
- TEData():
-  data_(0)
+ TEData()
     {}
 
   typename AllStubInner<innerRegion>::AllStubInnerData getAllStub() const {

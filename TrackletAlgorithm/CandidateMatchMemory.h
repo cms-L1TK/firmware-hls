@@ -37,8 +37,7 @@ public:
     data_( (projindex,stubindex) )
   {}
   
-  CandidateMatch():
-    data_(0)
+  CandidateMatch()
   {}
 
   #ifndef __SYNTHESIS__

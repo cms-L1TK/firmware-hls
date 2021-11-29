@@ -109,8 +109,13 @@ begin
       findNextDataLine : while LOOPING loop
 
         if (not CREATE_DUMMY_DATA) then
-          -- Read next line in file.
-          readline (FILE_IN, LINE_IN);
+          if (not endFile(FILE_IN)) then
+            -- Read next line in file if not at end of file.
+            readline (FILE_IN, LINE_IN);
+          else
+            -- Assign an empty string if at end of file.
+            write (LINE_IN, string'(""));
+          end if;
         end if;
 
         if (LINE_IN.all(1 to 2) = "BX") then 

@@ -34,7 +34,7 @@ package tf_pkg is
   constant DEBUG                  : boolean := true; --! Debug off/on
   constant MAX_EVENTS             : natural := 100;  --! Max. number of BX events
   constant MAX_ENTRIES            : natural := 108;  --! Max. number of entries: 108 = BX period with 240 MHz
-  constant EMDATA_WIDTH           : natural := 68;   --! Max. bit width of emData
+  constant EMDATA_WIDTH           : natural := 72;   --! Max. bit width of emData
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
   constant N_MEM_BINS_ME_DISK     : natural := 16;   --! Number of memory bins for ME disk
@@ -56,7 +56,7 @@ package tf_pkg is
   -- ########################### Functions ################################################################
   function clogb2     (bit_depth : integer) return integer;
 
-  function getDirEMDATA return string;
+  function getDirSCRIPT return string;
 
 
   -- ########################### Types ###########################
@@ -171,17 +171,17 @@ package body tf_pkg is
   end;
 
 
-  --! @brief Returns directory path to emData/
-  function getDirEMDATA return string is
+  --! @brief Returns directory path to script/
+  function getDirSCRIPT return string is
   begin
     if IS_SIMULATION then
       -- Sim path specified relative to Vivado project's xsim directory. 
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-      return "../../../../../../../../emData/";
+      return "../../../../../";
     else
       -- Synth path specified relative to dir where you run Vivado.
-      -- e.g. IntegrationTests/PRMEMC/script/
-      return "../../../emData/";
+      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/
+      return "../../../";
     end if;
   end;
 

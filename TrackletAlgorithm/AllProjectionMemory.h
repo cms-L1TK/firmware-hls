@@ -114,8 +114,7 @@ public:
     data_( ((((((seed,vm),trackletindex),phi),rz),phider),rzder) )
   {}
 
-  AllProjection():
-    data_(0)
+  AllProjection()
   {}
 
   #ifndef __SYNTHESIS__

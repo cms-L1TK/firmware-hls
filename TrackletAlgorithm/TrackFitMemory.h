@@ -20,7 +20,7 @@ public:
     kTFZ0Size = 10,
     kTFTSize = 14,
     kTFHitCountSize = 3,
-    kTFHitMapSize = kTFHitCountSize * kNStubs,
+    kTFHitMapSize = kTFHitCountSize * 8,
     // Bit size for stub word fields
     kTFTrackIndexSize = 7,
     kTFStubIndexSize = 10,
@@ -84,7 +84,7 @@ public:
     return (kTFStubValidLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1);
   }
   static constexpr unsigned kTFHitCountLSB(const int i) {
-    return (kTFStubValidMSB(0) + (TrackFitBase<NBarrelStubs, NDiskStubs>::kNStubs - i - 1) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
+    return (kTFStubValidMSB(0) + (7 - i) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
   }
   static constexpr unsigned kTFHitCountMSB(const int i) {
     return (kTFHitCountLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize - 1);
@@ -143,21 +143,12 @@ public:
     data_(newdata)
   {}
 
-  TrackFit(const TFTRACKINDEX trackIndex, const TFSEEDTYPE seedtype) :
-    data_( ((((((((((((((((((((((((((((((((((((((((((((((((((((((0,seedtype),TFRINV(0)),TFPHI0(0)),TFZ0(0)),TFT(0)),TFHITMAP(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFBARRELSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBZRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFBARRELSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBZRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFBARRELSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBZRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFBARRELSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBZRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFDISKSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBRRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFDISKSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBRRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFDISKSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBRRESID(0)),
-             TFVALID(0)),trackIndex),TFSTUBINDEX(0)),TFDISKSTUBR(0)),TFSTUBPHIRESID(0)),TFSTUBRRESID(0)) )
+  TrackFit(const TFSEEDTYPE seedtype) :
+    data_( ((((((0,seedtype),TFRINV(0)),TFPHI0(0)),TFZ0(0)),TFT(0)),TFHITMAP(0)) )
 
   {}
 
-  TrackFit() :
-    data_(0)
+  TrackFit()
   {}
 
   #ifndef __SYNTHESIS__

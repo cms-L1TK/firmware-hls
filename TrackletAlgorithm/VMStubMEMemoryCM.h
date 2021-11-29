@@ -86,8 +86,7 @@ public:
     data_( (id, bend,finephi, finez) )
   {}
 
-  VMStubMECM():
-    data_(0)
+  VMStubMECM()
   {}
 
   #ifndef __SYNTHESIS__

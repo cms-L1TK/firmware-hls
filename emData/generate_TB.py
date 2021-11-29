@@ -65,6 +65,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         nBarrelFMMem = len(barrelFMMems[tbName])
         nDiskFMMem = len(diskFMMems[tbName])
 
+        # offset for input TPAR memories
+        firstTPAR = sorted(tparMems[tbName])[0]
+        tparOffset = ord(firstTPAR[-1]) - ord('A')
+
         # numbers of output stubs
         nBarrelStubs = len({fm[0:10] for fm in barrelFMMems[tbName]})
         nDiskStubs = len({fm[0:10] for fm in diskFMMems[tbName]})
@@ -116,7 +120,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<" + str(nBarrelFMMem) + ", " + str(nDiskFMMem) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<" + str(nBarrelFMMem) + ", " + str(nDiskFMMem) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
             "    bx,\n"
             "    trackletParameters,\n"
             "    barrelFullMatches,\n"

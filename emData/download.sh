@@ -4,9 +4,9 @@ set -e
 #### reduced config ####
 #### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
 # 1 event
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
+#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
 # 100 events
-#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
 #### fw_synch_210611 ####
@@ -41,9 +41,13 @@ declare -a processing_modules=(
   "VMR_L2PHIA"
   "VMR_L2PHIB"
   "VMR_L3PHIA"
+  "VMR_L3PHIB"
   "VMR_L4PHIA"
+  "VMR_L4PHIB"
   "VMR_L5PHIA"
+  "VMR_L5PHIB"
   "VMR_L6PHIA"
+  "VMR_L6PHIB"
   "VMR_D1PHIA"
   "VMR_D2PHIA"
   "VMR_D3PHIA"

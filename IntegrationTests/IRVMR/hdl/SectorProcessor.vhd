@@ -254,7 +254,7 @@ begin
       hOutputStubs_6_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(D2PHID_PS10G_3_A),
       hOutputStubs_6_dataarray_data_V_d0        => IL_36_mem_AV_din(D2PHID_PS10G_3_A),
       hLinkWord_V => "01000000000001000101",
-      hPhBnWord_V => "000000011010"
+      hPhBnWord_V => "00000000000000000000111100000111"
   );
 
   IR_negPS10G_3_A : entity work.IR_negPS10G_3_A
@@ -298,7 +298,7 @@ begin
       hOutputStubs_6_dataarray_data_V_address0  => IL_36_mem_AV_writeaddr(D2PHID_negPS10G_3_A),
       hOutputStubs_6_dataarray_data_V_d0        => IL_36_mem_AV_din(D2PHID_negPS10G_3_A),
       hLinkWord_V => "01000000000001000101",
-      hPhBnWord_V => "000000011010"
+      hPhBnWord_V => "00000000000000000000111100000111"
   );
 
   VMR_L2PHIA : entity work.VMR_L2PHIA

@@ -8,7 +8,7 @@
 #  ../../common/script/CompareMemPrintsFW.py -p -s
 #
 # Assumes txt files written by FW are in dataOut/
-# & C++ emulation expectations in ../../../emData/
+# & C++ emulation expectations in ./MemPrints/
 #================================================================
 
 import argparse
@@ -130,7 +130,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         finally:
             reference_type = ReferenceType[reference_type_string]
 
-        print("Comparing TB results to ref. file "+str(reference_filename)+" ... ")
+        print("Comparing TB results "+str(comparison_filename)+" to ref. file "+str(reference_filename)+" ... ")
 
         # Read column names from file
         column_names = list(pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,nrows=1))
@@ -148,13 +148,17 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
+        # Sort data by ascending address
+        data.sort_values(by=['BX','ADDR'], inplace = True)
+        data.reset_index(drop = True, inplace = True)
+
         selected_columns = data[column_selections]
 
         # Parse the reference data
         reference_data = parse_reference_file(file_location+"/"+reference_filename, is_binned)
 
         for ievent,event in enumerate(reference_data):
-            print("Doing event "+str(ievent+1)+"/"+str(len(reference_data))+" ... ")
+            print("Doing event "+str(ievent)+"/"+str(len(reference_data))+" ... ")
             good = True
 
             # Select the correct event from the comparison data
@@ -162,19 +166,19 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             if len(selected_rows) == 0 and len(event) != 0:
                 good = False
                 number_of_missing_events += 1
-                message = "Event "+str(ievent+1)+" does not exist in the comparison data!"
+                message = "Event "+str(ievent)+" does not exist in the comparison data!"
                 if fail_on_error: raise Exception(message)
                 else:             print("\t"+message)
 
             # Select only the comparison data where the valid bit is set
             #selected_rows = selected_rows.loc[selected_rows[selected_rows.columns[1]] == '0b1']
 
-            # Check the legnth of the two sets
+            # Check the length of the two sets
             # Raise an exception if the are fewer entries for a given event in the comparison data than in the reference data
             if len(selected_rows) != len(event):
                 good = False
                 number_of_event_length_mismatches += 1
-                message = "The number of entries in the comparison data doesn't match the number of entries in the reference data for event "+str(ievent+1)+"!"\
+                message = "The number of entries in the comparison data doesn't match the number of entries in the reference data for event "+str(ievent)+"!"\
                           "\n\treference="+str(len(event))+" comparison="+str(len(selected_rows))
                 if fail_on_error: raise Exception(message)
                 else:             print("\t"+message.replace("\n","\n\t"))
@@ -231,14 +235,18 @@ def comparePredefined(args):
     ret_sum = 0
 
     comparison_dir = "./dataOut/"
-    reference_dir = "../../../emData/MemPrints/"
+    reference_dir = args.memprints_location
 
     # Make sure the default directories exists
     if (not os.path.isdir(comparison_dir) or not os.path.isdir(reference_dir)):
         raise FileNotFoundError("Please make sure that the directories " + comparison_dir + " and " + reference_dir + " exist from where this script is run with the predefined (-p) flag")
 
+    # Check that the comparison files exist, exit if not
+    if not os.listdir(comparison_dir):
+        raise FileNotFoundError(comparison_dir + " is empty. No files to compare.")
+
     # Find the lists of filenames
-    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f] # Remove debug and comparison files from file list
+    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
     reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
     try:
@@ -251,7 +259,12 @@ def comparePredefined(args):
         ret_sum += compare(comparison_filename=comp, fail_on_error=False, file_location=args.file_location, predefined=args.predefined,
                            reference_filenames=[ref], save=args.save, verbose=args.verbose)
 
-    print("Accumulated number of errors =",ret_sum)
+    if args.save:
+      print("Summary of memories with errors")
+      print("=================================")
+      os.system('\grep "Bad events: [1-9]" dataOut/*cmp.txt')
+
+    print("\n Accumulated number of errors =",ret_sum)
 
     sys.exit(ret_sum)
 
@@ -276,8 +289,9 @@ python3 CompareMemPrintsFW.py -l testData/ -r VMProjections_VMPROJ_L3PHIC17_04.d
     parser.add_argument("-c","--comparison_filename",default="output.txt",help="The filename of the testbench output file (default = %(default)s)")
     parser.add_argument("-f","--fail_on_error",default=False,action="store_true",help="Raise an exception on the first error as opposed to simply printing a message (default = %(default)s)")
     parser.add_argument("-l","--file_location",default="./",help="Location of the input files (default = %(default)s)")
-    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons using the output files in ./dataOut. Make sure that the reference files are located in ../../../emData/MemPrints/ (default = %(default)s)")
+    parser.add_argument("-p","--predefined",default=False,action="store_true",help="Run predefined comparisons using the output files in ./dataOut. Make sure that the reference files are located in ./MemPrints/ (default = %(default)s)")
     parser.add_argument("-r","--reference_filenames",default=[],nargs="+",help="A list of filenames for the reference files (default = %(default)s)")
+    parser.add_argument("-m","--memprints_location",default="./MemPrints/",help="Location of MemPrints directory for predefined comparisons (default = %(default)s)")
     parser.add_argument("-s","--save",default=False,action="store_true",help="Save the output to a file (default = %(default)s)")
     parser.add_argument("-v","--verbose",default=False,action="store_true",help="Print extra information to the console (default = %(default)s)")
 

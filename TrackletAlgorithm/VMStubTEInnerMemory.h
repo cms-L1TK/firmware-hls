@@ -129,8 +129,7 @@ public:
     data_( (((id,bend),finephi),zbits) )
   {}
 
-  VMStubTEInner():
-    data_(0)
+  VMStubTEInner()
   {}
 
   #ifndef __SYNTHESIS__

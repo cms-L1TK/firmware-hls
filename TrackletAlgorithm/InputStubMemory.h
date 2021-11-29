@@ -117,8 +117,7 @@ public:
     static_assert(ISType == DISKPS, "Constructor should only be used for Disk 2S stubs");
   }
 
-  InputStub():
-    data_(0)
+  InputStub()
   {}
 
   #ifndef __SYNTHESIS__

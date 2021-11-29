@@ -33,7 +33,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 
 // TrackBuilder top template function
 // !!! CURRENTLY ONLY TESTED FOR L1L2 !!!
-template<unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs>
+template<unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -138,9 +138,9 @@ void TrackBuilder(
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
-    TrackFit<NBarrelStubs, NDiskStubs> track(nTracks, TCID >> kNBitsITC);
+    TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const auto &tpar = trackletParameters[TCID].read_mem(bx, trackletIndex);
+    const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
     track.setRinv(tpar.getRinv());
     track.setPhi0(tpar.getPhi0());
     track.setZ0(tpar.getZ0());
@@ -176,27 +176,35 @@ void TrackBuilder(
       switch (j) {
         case 0:
           track.template setBarrelStub<0>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<0>(nTracks);
           break;
         case 1:
           track.template setBarrelStub<1>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<1>(nTracks);
           break;
         case 2:
           track.template setBarrelStub<2>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<2>(nTracks);
           break;
         case 3:
           track.template setBarrelStub<3>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<3>(nTracks);
           break;
         case 4:
           track.template setBarrelStub<4>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<4>(nTracks);
           break;
         case 5:
           track.template setBarrelStub<5>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<5>(nTracks);
           break;
         case 6:
           track.template setBarrelStub<6>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<6>(nTracks);
           break;
         case 7:
           track.template setBarrelStub<7>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
+          track.template setTrackIndex<7>(nTracks);
           break;
       }
     }
@@ -226,27 +234,35 @@ void TrackBuilder(
       switch (j) {
         case 0:
           track.template setDiskStub<NBarrelStubs>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs>(nTracks);
           break;
         case 1:
           track.template setDiskStub<NBarrelStubs + 1>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 1>(nTracks);
           break;
         case 2:
           track.template setDiskStub<NBarrelStubs + 2>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 2>(nTracks);
           break;
         case 3:
           track.template setDiskStub<NBarrelStubs + 3>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 3>(nTracks);
           break;
         case 4:
           track.template setDiskStub<NBarrelStubs + 4>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 4>(nTracks);
           break;
         case 5:
           track.template setDiskStub<NBarrelStubs + 5>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 5>(nTracks);
           break;
         case 6:
           track.template setDiskStub<NBarrelStubs + 6>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 6>(nTracks);
           break;
         case 7:
           track.template setDiskStub<NBarrelStubs + 7>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
+          track.template setTrackIndex<NBarrelStubs + 7>(nTracks);
           break;
       }
     }
