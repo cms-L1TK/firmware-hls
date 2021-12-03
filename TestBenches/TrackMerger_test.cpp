@@ -29,18 +29,18 @@ int main(){
   static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
   static TrackFitMemory outputTracks;
 
+  TBHelper tb("../../../../../emData/PD/PD/");
+
   // Open input files
-  ifstream fin_inputTracks;
-  openDataFile(fin_inputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");
-  assert(fin_inputTracks.good());
+  auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
-  ifstream fout_outputTracks;
-  openDataFile(fout_outputTracks,"../../../../../emData/PD/PD/TrackFit_TF_L1L2_04.dat");// "../../../../../emData/PD/PD/CleanTrack_CT_L1L2_04.dat");
-  assert(fout_outputTracks.good());
 
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
+                                                                //  since dummy module does nothing use the same input/output file
   // Loop over events
-  for (unsigned int ievt = 0; ievt < 1; ++ievt) { //nevents
+  for (unsigned int ievt = 0; ievt < 1; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
+    
 
     for (unsigned short i = 0; i < kMaxProc; ++i){
       trackWord[i] = TrackFit::TrackWord(0);
@@ -52,8 +52,8 @@ int main(){
     outputTracks.clear();
 
     // Read in next event from input
-    writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks, ievt);
-
+    writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
+    
     // Set bunch crossing
     BXType bx = ievt;
     BXType bx_o;
@@ -103,15 +103,16 @@ int main(){
     trackWord,
     barrelStubWords,
     diskStubWords,
-    bx_o
-    //trackWord_o,
-    //barrelStubWords_o,
-    //diskStubWords_o
-    );
+    bx_o,
+    trackWord_o,
+    barrelStubWords_o,
+    diskStubWords_o);
+
+    bool truncation = false;
 
     // Filling outputs
     unsigned nTracks = 0;
-    /*for (unsigned short i = 0; i < kMaxProc; i++){
+    for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
       TrackFit track;
       track.setTrackWord(trackWord[i]);
       track.setBarrelStubWord<0>(barrelStubWords[0][i]);
@@ -122,23 +123,17 @@ int main(){
       track.setDiskStubWord<5>(diskStubWords[1][i]);
       track.setDiskStubWord<6>(diskStubWords[2][i]);
       track.setDiskStubWord<7>(diskStubWords[3][i]);
-      if (track.getTrackValid()){
-        outputTracks.write_mem(bx, track, nTracks++);
-      }
-    }*/
+    
+      outputTracks.write_mem(bx, track, i );
+    }
 
     // Comparing outputs
-    //err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks, ievt, "Tracks");
+    // err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
 
   }
 
-  // Close files
-  fin_inputTracks.close();
-  fout_outputTracks.close();
-
   // Handling case of err%256 == 0 
-  //if (err_count > 255) err_count = 255;
-  //return err_count;
-  return 0;
+  if (err_count > 255) err_count = 255;
+  return err_count;
 
 }

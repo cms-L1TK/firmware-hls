@@ -31,6 +31,18 @@ class ComparisonModule{
     void writeOutput(TrackHandler masterTrack);
 
     unsigned int myIndex;
+
+    unsigned int getEndOfStream(){return endOfStream;}
+
+    TrackFit::TrackWord getMasterTrackWord(){return masterTrack.getTrackWord();}
+
+    TrackFit::BarrelStubWord getMasterTrackBarrelStubs(unsigned int stubIndex, unsigned int layerIndex){
+      return masterTrack.getBarrelStubArray(layerIndex, stubIndex);}
+
+    TrackFit::DiskStubWord getMasterTrackDiskStubs(unsigned int stubIndex, unsigned int layerIndex){
+      return masterTrack.getDiskStubArray(layerIndex, stubIndex);}
+
+    unsigned int getEndOfModule(){return endOfModule;}
     
   private:
     // input buffer for each comparison module 
@@ -43,6 +55,7 @@ class ComparisonModule{
     unsigned int readIndex{0};
     unsigned int writeIndex{0};
     unsigned int endOfStream{0};
+    unsigned int endOfModule{0};
   
 
     TrackHandler masterTrack;
@@ -55,10 +68,10 @@ void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
-  BXType &bx_o
-  //TrackFit::TrackWord trackWord_o [kMaxProc],
-  //TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  //TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  BXType &bx_o,
+  TrackFit::TrackWord trackWord_o [kMaxProc],
+  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
 );
 
 
