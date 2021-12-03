@@ -51,7 +51,7 @@ int main(){
 
   auto &fout_outputTracks = tb.files("output_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged output_TrackFit_TF_L1L2*
   // Loop over events
-  for (unsigned int ievt = 0; ievt < 1; ++ievt) { //nevents
+  for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
     
     // Read in next event from input
