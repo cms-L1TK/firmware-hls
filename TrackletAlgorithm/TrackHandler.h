@@ -5,8 +5,10 @@
 const unsigned int kFullBarrelStubSize = TrackFit::kBarrelStubSize * 4;
 const unsigned int kFullDiskStubSize = TrackFit::kDiskStubSize * 4;
 const unsigned int kFullTrackWordSize = TrackFit::kTrackWordSize;
-const unsigned int kStubIndexSizeMSB = TrackFit::kTFValidSize + TrackFit::kTFTrackIndexSize + TrackFit::kTFStubIndexSize;
-const unsigned int kStubIndexSizeLSB = TrackFit::kTFValidSize + TrackFit::kTFTrackIndexSize;
+const unsigned int kBarrelStubIndexSizeMSB = TrackFit::kTFBarrelStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFZResidSize + TrackFit::kTFStubIndexSize;
+const unsigned int kBarrelStubIndexSizeLSB = TrackFit::kTFBarrelStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFZResidSize;
+const unsigned int kDiskStubIndexSizeMSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize + TrackFit::kTFStubIndexSize;
+const unsigned int kDiskStubIndexSizeLSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize;
 const int layerStubIndexSize = 10;
 
 class TrackHandler{
@@ -47,6 +49,14 @@ class TrackHandler{
 
     void setDebugFlag(unsigned int debugFlag){
       debug = debugFlag;
+    }
+
+    TrackFit::BarrelStubWord getBarrelStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
+      return barrelStubArray[layerIndex][stubIndex];
+    }
+
+    TrackFit::DiskStubWord getDiskStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
+      return diskStubArray[layerIndex][stubIndex];
     }
 
     

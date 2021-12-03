@@ -41,8 +41,11 @@ void ComparisonModule::getTrack(){
 }
 
 void ComparisonModule::endEvent(TrackHandler outputBuffer[16], unsigned int outputWriteIndex){
-  //std::cout << "endOfStream: " << endOfStream << " tracksProcessed: " << tracksProcessed << " writeIndex: " << writeIndex << std::endl;
   if(endOfStream == 1 && tracksProcessed == writeIndex){
+    endOfModule = 1;
+    #ifndef _SYNTHESIS_
+    std::cout << "endOfStream: " << endOfStream << " tracksProcessed: " << tracksProcessed << " writeIndex: " << writeIndex << std::endl;
+    #endif
     outputBuffer[outputWriteIndex] = masterTrack;
     writeIndex = 0;
     readIndex = 0;
@@ -57,14 +60,15 @@ void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
-  BXType &bx_o 
-  //TrackFit::TrackWord trackWord_o[kMaxProc],
-  //TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  //TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  BXType &bx_o, 
+  TrackFit::TrackWord trackWord_o[kMaxProc],
+  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
   ){
 
     ComparisonModule comparisonModule[kNComparisonModules];
-    for(unsigned int nModule = 0; nModule < kNComparisonModules ; nModule++)
+    unsigned int outputIndex{0};
+    for(unsigned int nModule = 0; nModule < kNComparisonModules; nModule++)
     {
       comparisonModule[nModule].myIndex=nModule;
     }
@@ -92,6 +96,7 @@ void TrackMerger(const BXType bx,
         activeModules[activeModule] = 1;
         // if it is active,  process this track 
         comparisonModule[activeModule].inputTrack(track);
+        comparisonModule[activeModule].getTrack();
         comparisonModule[activeModule].processTrack();
         comparisonModule[activeModule].endEvent(outputBuffer, activeModule);
 
@@ -104,16 +109,45 @@ void TrackMerger(const BXType bx,
         if(modulesToRun[activeModule+1] == 0 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1)
         {
           comparisonModule[activeModule+1].inputTrack(track);
+          comparisonModule[activeModule+1].getTrack();
           comparisonModule[activeModule+1].processTrack();
           comparisonModule[activeModule+1].endEvent(outputBuffer, activeModule);
           activeModules[activeModule+1] = 1;
         }
       }
-
+      
       // update global array that keeps track of which modules have been activated 
       for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
       {
         modulesToRun[activeModule] = activeModules[activeModule];
+      }
+
+      //output the master track from each comparison module as the output array
+      //also outputs any unmerged tracks from the last comparison module 
+      for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
+        if(activeModules[activeModule] == 0){continue;}
+        // if am not the last comparison module - when finished processing, output the master track
+        if(activeModule != kNComparisonModules-1 && comparisonModule[activeModule].getEndOfModule() == 1){
+          // trackWord_o[outputIndex] = comparisonModule[activeModule].getMasterTrackWord();
+          // for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
+          //   barrelStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackBarrelStubs(arrayIndex, 0);
+          //   diskStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackDiskStubs(arrayIndex, 0);
+          // }  
+          outputIndex++;
+        }
+        
+        //if this is the last comparison module 
+        //if it has found no duplicates - output this track (to keep track of unmerged tracks)
+        //or if the module has finished processing tracks, output the master
+        // if(activeModule == kNComparisonModules-1 && comparisonModule[activeModule].getMatchFound() == 0){
+        //   //fill the outputs with the trackWord, barrel and disk stubs
+        //   // trackWord_o[outputIndex] = trackWord[i];
+        //   // for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
+        //   //   barrelStubWords_o[arrayIndex][outputIndex] = barrelStubWords[arrayIndex][i];
+        //   //   diskStubWords_o[arrayIndex][outputIndex] = diskStubWords[arrayIndex][i];
+        //   // }
+        // }
+        
       }
     }
     #ifndef _SYNTHESIS_
@@ -126,4 +160,11 @@ void TrackMerger(const BXType bx,
       #endif
     }
     bx_o = bx;
+
+    #ifndef _SYNTHESIS_
+    std::cout << "no. trackWords: " << outputIndex << std::endl;
+    // for (unsigned int trackNumber = 0; trackNumber < outputIndex; trackNumber++){
+    //   std::cout << "trackWord: " << trackWord[trackNumber] << " trackNumber: " << trackNumber << std::endl;
+    // }
+    #endif
 }
