@@ -10,7 +10,7 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
-#include "hls_math.h"
+#include <assert.h>
 #include <iostream>
 #include <fstream>
 #include <bitset>

@@ -14,6 +14,9 @@ import argparse
 TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
 TF_index = {k:v for v,k in enumerate(TF_index)}
 
+maxTPMems = "constexpr int maxTPMemories["
+maxFMMems = "constexpr int maxFMMemories["
+
 def ASRegion(region):
     if region in ['L1', 'L2', 'L3']:
         return 'BARRELPS'
@@ -178,6 +181,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         "////////////////////////////////////////////////////////////////////////////////\n"
     )
 
+    maxTPMems += str(len(TPMems.keys())) + "] = {"
+    maxFMMems += str(len(TPMems.keys())) + "] = {"
+
     # Calculate parameters and print out parameters and top function for each MP.
     for mpName in sorted(TPMems.keys()):
         seed = re.sub(r"MP_(..)....", r"\1", mpName)
@@ -189,6 +195,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         FMMask = 0
         for FM in FMMems[mpName]:
             FMMask = FMMask | (1 << TF_index[FM])
+        
+        maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
+        maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
+        if mpName != sorted(TPMems.keys())[-1]:
+            maxTPMems += ",\n				   "
+            maxFMMems += ",\n				   " 
 
         # Print out parameters for this MP.
         parametersFile.write(
@@ -279,8 +291,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         "#endif\n"
     )
     topHeaderFile.write(
+        "\n" + maxTPMems + "};\n"
+        "\n" + maxFMMems + "};\n"
         "\n"
-        "#endif\n"
+        "\n#endif\n"
     )
     topFile.write(
         "\n"
