@@ -10,7 +10,6 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
-#include <assert.h>
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -103,7 +102,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   second_ = isSecond[index];
   phiPlus_ = isPhiPlus[index];
   nstubs_ = nstubsall_[index];
-  assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
   auto const qdata=projbuffer_;
@@ -154,14 +152,12 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
-  assert(!idle_||good_||good__);
   if (good__) {
     return projbuffer___.getTCID();
   }
   if (good_) {
     return projbuffer__.getTCID();
   } 
-  assert(tcid==projbuffer_.getTCID());
   return tcid;
 }
 
@@ -281,7 +277,6 @@ inline MATCH read() {
 	 second_ =  index[0];
 	 phiPlus_ =  index[1];
 	 nstubs_ = nstubsall_[index];
-	 assert(nstubs_!=0);
        }
      } else {
        istub_++;
