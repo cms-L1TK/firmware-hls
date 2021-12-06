@@ -11,7 +11,6 @@
 #include "AllStubMemory.h"
 #include "FullMatchMemory.h"
 #include "MatchEngineUnit.h"
-#include "hls_math.h"
 #include <iostream>
 #include <fstream>
 #include <bitset>

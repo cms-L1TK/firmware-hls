@@ -16,9 +16,6 @@
 #endif
 #endif
 
-// HLS Headers
-#include "hls_math.h"
-
 // STL Headers
 #include <iostream>
 #include <fstream>
