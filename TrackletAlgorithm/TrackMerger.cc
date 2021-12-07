@@ -80,7 +80,14 @@ void TrackMerger(const BXType bx,
       #ifndef _SYNTHESIS_
             //std::cout << "Step#: " << i << std::endl;
       #endif
-          
+      unsigned int moduleEnd{0};
+      for (activeModule = 0; activeModule < kNComparisonModules activeModule++){
+        if(comparisonModule[activeModule].getEndOfModule() == 1){
+          moduleEnd++;
+        }
+      } 
+      if(moduleEnd == kNComparisonModules){continue;}
+
       const TrackFit::BarrelStubWord barrelStubWordsArray[4] = {barrelStubWords[0][i], barrelStubWords[1][i], barrelStubWords[2][i], barrelStubWords[3][i]};
       const TrackFit::DiskStubWord diskStubWordsArray[4] = {diskStubWords[0][i], diskStubWords[1][i], diskStubWords[2][i], diskStubWords[3][i]};
       TrackHandler track(trackWord[i], barrelStubWordsArray, diskStubWordsArray);
@@ -127,12 +134,12 @@ void TrackMerger(const BXType bx,
       for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
         if(activeModules[activeModule] == 0){continue;}
         // if am not the last comparison module - when finished processing, output the master track
-        if(activeModule != kNComparisonModules-1 && comparisonModule[activeModule].getEndOfModule() == 1){
-          // trackWord_o[outputIndex] = comparisonModule[activeModule].getMasterTrackWord();
-          // for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
-          //   barrelStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackBarrelStubs(arrayIndex, 0);
-          //   diskStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackDiskStubs(arrayIndex, 0);
-          // }  
+        if(comparisonModule[activeModule].getEndOfModule() == 1){
+          trackWord_o[outputIndex] = comparisonModule[activeModule].getMasterTrackWord();
+          for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
+            barrelStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackBarrelStubs(arrayIndex, 0);
+            diskStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackDiskStubs(arrayIndex, 0);
+          }  
           outputIndex++;
         }
         
