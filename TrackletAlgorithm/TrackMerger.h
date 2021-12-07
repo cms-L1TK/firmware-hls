@@ -2,7 +2,6 @@
 #define TrackletAlgorithm_TrackMerger_h
 
 #include "TrackFitMemory.h"
-
 void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
