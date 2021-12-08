@@ -170,9 +170,9 @@ declare -a processing_modules=(
   "TP_L5L6C"
   "TP_L5L6D"
 
-
   # Purge Duplicates (TrackMerger)
   "PD"
+
 )
 
 # Function that prints information regarding the usage of this command
