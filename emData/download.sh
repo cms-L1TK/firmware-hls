@@ -170,7 +170,7 @@ declare -a processing_modules=(
   "TP_L5L6C"
   "TP_L5L6D"
 
-  # Purge Duplicates (TrackMerger)
+  #Purge Duplicates (Track Merger)
   "PD"
 
 )
