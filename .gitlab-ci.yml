@@ -187,6 +187,11 @@ TB-quality-check:
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/TrackBuilderTop.cc'
+TM-quality-check:
+  <<: *template_quality-check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    CLANG_TIDY_FILES: '../TestBenches/TrackMerger_test.cpp ../TopFunctions/TrackMergerTop.cc'
 # HLS builds ---------------
 IR-vivado-hls-build:
   <<: *template_hls-build
@@ -275,6 +280,13 @@ TB-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TB"
+TM-vivado-hls-build:
+  <<: *template_hls-build
+  needs: ["download", "TM-quality-check"]
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "TM"
 # FW simulation ---------------
 topPRMEMC-sim:
   <<: *template_topTF-sim
