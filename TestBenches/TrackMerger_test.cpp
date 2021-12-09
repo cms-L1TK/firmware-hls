@@ -18,16 +18,16 @@ int main(){
   int err_count = 0;
     
   // Input memories
-  static TrackFit::TrackWord trackWord[kMaxProc];
-  static TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc];
-  static TrackFit::DiskStubWord diskStubWords[4][kMaxProc];
-  static TrackFitMemory inputTracks;
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::TrackWord trackWord[kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::BarrelStubWord barrelStubWords[4][kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::DiskStubWord diskStubWords[4][kMaxProc];
+  static TrackFitMemory<kMaxBrlStbs,kMaxDskStbs> inputTracks;
 
   // Output memories
-  static TrackFit::TrackWord trackWord_o [kMaxProc];
-  static TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc];
-  static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
-  static TrackFitMemory outputTracks;
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::TrackWord trackWord_o [kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::BarrelStubWord barrelStubWords_o[4][kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::DiskStubWord diskStubWords_o[4][kMaxProc];
+  static TrackFitMemory<kMaxBrlStbs,kMaxDskStbs> outputTracks;
 
   TBHelper tb("../../../../../emData/PD/PD/");
 
@@ -43,16 +43,16 @@ int main(){
     
 
     for (unsigned short i = 0; i < kMaxProc; ++i){
-      trackWord[i] = TrackFit::TrackWord(0);
+      trackWord[i] = TrackFit<kMaxBrlStbs,kMaxDskStbs>::TrackWord(0);
       for (unsigned short j = 0; j < 4; j++){
-        barrelStubWords[j][i] = TrackFit::BarrelStubWord(0);
-        diskStubWords[j][i] = TrackFit::DiskStubWord(0);
+        barrelStubWords[j][i] = TrackFit<kMaxBrlStbs,kMaxDskStbs>::BarrelStubWord(0);
+        diskStubWords[j][i] = TrackFit<kMaxBrlStbs,kMaxDskStbs>::DiskStubWord(0);
       }
     }
     outputTracks.clear();
 
     // Read in next event from input
-    writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
+    writeMemFromFile<TrackFitMemory<kMaxBrlStbs,kMaxDskStbs>> (inputTracks, fin_inputTracks.at(0), ievt);
     
     // Set bunch crossing
     BXType bx = ievt;
@@ -60,7 +60,7 @@ int main(){
 
     // Set input memories into arrays of input track/stub words
     for(unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
-      TrackFit track;
+      TrackFit<kMaxBrlStbs,kMaxDskStbs> track;
       track = inputTracks.read_mem(bx, i);
       trackWord[i] = track.getTrackWord();
        for (unsigned short j = 0; j < 4; j++){
@@ -113,7 +113,7 @@ int main(){
     // Filling outputs
     unsigned nTracks = 0;
     for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
-      TrackFit track;
+      TrackFit<kMaxBrlStbs,kMaxDskStbs> track;
       track.setTrackWord(trackWord[i]);
       track.setBarrelStubWord<0>(barrelStubWords[0][i]);
       track.setBarrelStubWord<1>(barrelStubWords[1][i]);
@@ -128,7 +128,7 @@ int main(){
     }
 
     // Comparing outputs
-    err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
+    err_count += compareMemWithFile<TrackFitMemory<kMaxBrlStbs,kMaxDskStbs>>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
 
   }
 
