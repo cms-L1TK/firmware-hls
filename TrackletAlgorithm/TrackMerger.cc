@@ -113,7 +113,7 @@ void TrackMerger(const BXType bx,
         // if the next Comparison Module is inactive 
         // and a mismatch has been found 
         // next comparison module also processes this track
-        if(modulesToRun[activeModule+1] == 0 && comparisonModule[activeModule+1].getMatchFound() == 0 && comparisonModule[activeModule+1].getNProcessed() >1)
+        if(modulesToRun[activeModule+1] == 0 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1)
         {
           comparisonModule[activeModule+1].inputTrack(track);
           comparisonModule[activeModule+1].getTrack();
