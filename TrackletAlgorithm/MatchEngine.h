@@ -301,6 +301,9 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 			  istub = 0;
 			  tail_readindex++;
 			}
+			else if(istep == kMaxProc - kMaxProcOffset(module::ME) - 1){ // The last loop iteration
+				istub = 0; // Reset stub index for next bx, needed for VHDL top-level Vivado simulation
+			}
 			else {
 			  istub++;
 			}
