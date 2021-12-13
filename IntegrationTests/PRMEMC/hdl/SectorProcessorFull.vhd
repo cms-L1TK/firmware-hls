@@ -280,7 +280,13 @@ begin
   end generate FM_52_loop;
 
 
-  ME_start <= '1' when PR_done = '1';
+  LATCH_PR: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => PR_done,
+      start => ME_start
+  );
 
   PR_L3PHIC : entity work.PR_L3PHIC
     port map (
@@ -371,7 +377,13 @@ begin
       vmprojout_7_dataarray_data_V_d0        => VMPROJ_24_mem_AV_din(L3PHIC24)
   );
 
-  MC_start <= '1' when ME_done = '1';
+  LATCH_ME: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => ME_done,
+      start => MC_start
+  );
 
   ME_L3PHIC17 : entity work.ME_L3PHIC
     port map (
