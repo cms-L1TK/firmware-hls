@@ -445,7 +445,7 @@ void MatchCalculator(BXType bx,
     // Store bestmatch
     goodmatch = true;
   }
-  
+
   if(goodmatch) { // Write out only the best match, based on the seeding 
     switch (proj_seed) {
     case 0:
@@ -637,7 +637,16 @@ void MatchProcessor(BXType bx,
       emptys[iMEU] = matchengine[iMEU].empty();
       trkids[iMEU] = matchengine[iMEU].getTrkID();
     }
-   
+
+    //This printout exactly matches printout in emulation for tracking code differences
+    /*   
+    std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
+    for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
+		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
+    }
+    std::cout << std::endl;
+    */
     
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
@@ -769,10 +778,10 @@ void MatchProcessor(BXType bx,
 									  iphiproj.length()-nbits_all-nbits_vmme-3); 
       
       int nextrabits = 2;
-      int overlapbits = nbits_vmme + nextrabits;
+      int overlapbits = nbits_vmme + nbits_all + nextrabits;
       
       unsigned int extrabits = iphiproj.range(iphiproj.length() - overlapbits-1, iphiproj.length() - overlapbits - nextrabits);
-      
+
       unsigned int ivmPlus = iphi;
 	
       ap_int<2> shift = 0;
@@ -803,14 +812,14 @@ void MatchProcessor(BXType bx,
 	nstublastMinus = 0;
 	nstublastPlus = 0;
       }
-      
+
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getRZ(), projdata_.getPhiDer(), projdata_.getRZDer());
-      if (nstubs!=0) { 
+      if (nstubs!=0) {
 	ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
 	projbufferarray.addProjection(projbuffertmp);
       }

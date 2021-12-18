@@ -47,6 +47,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     stubmask_ = 0;
     nstubs_ = 0;
     idle_ = true;
+    empty_ = true;
     good_ = false;
     good__ = false;
   }
@@ -88,6 +89,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   idle_ = false;
   bx = bxin;
   istub_ = 0;
+  unit_ = unit;
   AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
   projbuffer_ = projbuffer;
   projindex = projbuffer.getIndex();
@@ -215,11 +217,10 @@ inline MATCH read() {
    good_ = idle_ ? false : good_;
    good_ = nearfull ? false : good_;
 
+
+
    bool process = (!idle_) && (!nearfull);
 
-   // vmproj index
-   //typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
-   
    // Buffer still has projections to read out
    //If the buffer is not empty we have a projection that we need to 
    //process. 
@@ -310,6 +311,7 @@ inline MATCH read() {
  ap_int<2> shift_;
  bool idle_;
  int ivmphi;
+ int unit_;  // only used for debugging to identify MEU
  ap_uint<3> iphi_;
  BXType bx;
  bool empty_;

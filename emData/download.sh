@@ -9,13 +9,23 @@ set -e
 memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
+#### test 211005/211217 ####
+# Standard configuration
+memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
+luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
+# Combined modules
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
+
+
+
 #### fw_synch_210611 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
+#memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
+#memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
+#luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
 
 #### fw_synch_210503 ####
 # Standard configuration
