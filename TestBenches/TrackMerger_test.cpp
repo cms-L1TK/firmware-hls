@@ -1,5 +1,5 @@
 // TrackMerger test bench
-#include "TrackMergerTop.h"
+#include "../TopFunctions/TrackMergerTop.h"
 #include "FileReadUtility.h"
 #include "hls_math.h"
 
