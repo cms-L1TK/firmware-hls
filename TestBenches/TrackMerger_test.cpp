@@ -18,9 +18,9 @@ int main(){
   int err_count = 0;
     
   // Input memories
-  static const TrackFit<kMaxBrlStbs,kMaxDskStbs>::TrackWord trackWord[kMaxProc];
-  static const TrackFit<kMaxBrlStbs,kMaxDskStbs>::BarrelStubWord barrelStubWords[4][kMaxProc];
-  static const TrackFit<kMaxBrlStbs,kMaxDskStbs>::DiskStubWord diskStubWords[4][kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::TrackWord trackWord[kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::BarrelStubWord barrelStubWords[4][kMaxProc];
+  static TrackFit<kMaxBrlStbs,kMaxDskStbs>::DiskStubWord diskStubWords[4][kMaxProc];
   static TrackFitMemory<kMaxBrlStbs,kMaxDskStbs> inputTracks;
 
   // Output memories
