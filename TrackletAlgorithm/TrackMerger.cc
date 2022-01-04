@@ -30,7 +30,7 @@ void ComparisonModule::processTrack(){
     masterTrack.setDebugFlag(0);
    }
     masterTrack.CompareTrack(track);
-    // masterTrack.MergeTrack(track, matchFound, mergeCondition);
+    masterTrack.MergeTrack(track, matchFound, mergeCondition);
     tracksProcessed++;
   }
 }
@@ -146,14 +146,14 @@ void TrackMerger(const BXType bx,
         //if this is the last comparison module 
         //if it has found no duplicates - output this track (to keep track of unmerged tracks)
         //or if the module has finished processing tracks, output the master
-        // if(activeModule == kNComparisonModules-1 && comparisonModule[activeModule].getMatchFound() == 0){
-        //   // fill the outputs with the trackWord, barrel and disk stubs
-        //   trackWord_o[outputIndex] = trackWord[i];
-        //   for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
-        //     barrelStubWords_o[arrayIndex][outputIndex] = barrelStubWords[arrayIndex][i];
-        //     diskStubWords_o[arrayIndex][outputIndex] = diskStubWords[arrayIndex][i];
-        //   }
-        // }
+        if(activeModule == kNComparisonModules-1 && comparisonModule[activeModule].getMatchFound() == 0){
+        // fill the outputs with the trackWord, barrel and disk stubs
+          trackWord_o[outputIndex] = trackWord[i];
+          for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
+            barrelStubWords_o[arrayIndex][outputIndex] = barrelStubWords[arrayIndex][i];
+            diskStubWords_o[arrayIndex][outputIndex] = diskStubWords[arrayIndex][i];
+          }
+        }
         
       }
     }
