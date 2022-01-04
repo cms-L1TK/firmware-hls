@@ -35,7 +35,7 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
+  auto &fout_outputTracks = tb.files("outputTracks_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
                                                                 //  since dummy module does nothing use the same input/output file
   // Loop over events
   for (unsigned int ievt = 0; ievt < 1; ++ievt) {
@@ -63,36 +63,50 @@ int main(){
       TrackFit track;
       track = inputTracks.read_mem(bx, i);
       trackWord[i] = track.getTrackWord();
+      ap_uint<TrackFit::kTFStubIndexSize> stubIndex;
        for (unsigned short j = 0; j < 4; j++){
         switch (j) {
           case 0:
             barrelStubWords[0][i] = track.getBarrelStubWord<0>();
+            stubIndex = track.getStubIndex<0>();
             break;
           case 1:
             barrelStubWords[1][i] = track.getBarrelStubWord<1>();
+            stubIndex = track.getStubIndex<1>();
             break;
           case 2:
             barrelStubWords[2][i] = track.getBarrelStubWord<2>();
+            stubIndex = track.getStubIndex<2>();
             break;
           case 3:
             barrelStubWords[3][i] = track.getBarrelStubWord<3>();
+            stubIndex = track.getStubIndex<3>();
             break;
+        } if(stubIndex != 0){
+          std::cout << "BarrelStubIndex: " << stubIndex << " at track:  " << i << std::endl;
         }
       }
       for (unsigned short k = 0; k < 4; k++){
         switch (k) {
           case 0:
             diskStubWords[0][i] = track.getDiskStubWord<4>();
+            stubIndex = track.getStubIndex<4>();
             break;
           case 1:
             diskStubWords[1][i] = track.getDiskStubWord<5>();
+            stubIndex = track.getStubIndex<5>();
             break;
           case 2:
             diskStubWords[2][i] = track.getDiskStubWord<6>();
+            stubIndex = track.getStubIndex<6>();
             break;
           case 3:
             diskStubWords[3][i] = track.getDiskStubWord<7>();
+            stubIndex = track.getStubIndex<7>();
             break;
+        }
+        if(stubIndex != 0){
+        std::cout << "DiskStubIndex: " << stubIndex << " at track:  " << i << std::endl;
         }
       }
     }
@@ -128,7 +142,7 @@ int main(){
     }
 
     // Comparing outputs
-    // err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
+    err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
 
   }
 

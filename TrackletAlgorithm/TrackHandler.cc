@@ -38,9 +38,9 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
   }
   if (matchesFound >= mergeCondition){
     matchFound = 1;
-    #ifndef _SYNTHESIS_
-    std::cout << "It's a merge" << std::endl;
-    #endif
+    // #ifndef _SYNTHESIS_
+    // std::cout << "It's a merge" << std::endl;
+    // #endif
     // update master track
     // check whether the stub word is non-zero in the compared track
     // then add stub into master track
