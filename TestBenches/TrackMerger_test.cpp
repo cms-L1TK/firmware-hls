@@ -35,7 +35,7 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("outputTrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
                                                                 //  since dummy module does nothing use the same input/output file
   // Loop over events
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
