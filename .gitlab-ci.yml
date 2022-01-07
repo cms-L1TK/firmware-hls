@@ -51,7 +51,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd project
     - pwd; ls -la; # Debug
-    - ${EXECUTABLE} -f "script_${PROJ_NAME}.tcl"
+    - faketime "2021-01-01 00:00:00" ${EXECUTABLE} -f "script_${PROJ_NAME}.tcl"
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -65,9 +65,9 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado_hls -f ./compileHLS.tcl
-    - vivado -mode batch -source ./makeProject.tcl
-    - vivado -mode batch -source ./runSim.tcl
+    - faketime "2021-01-01 00:00:00" vivado_hls -f ./compileHLS.tcl
+    - faketime "2021-01-01 00:00:00" vivado -mode batch -source ./makeProject.tcl
+    - faketime "2021-01-01 00:00:00" vivado -mode batch -source ./runSim.tcl
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -95,7 +95,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode batch -source common/script/synth.tcl 
+    - faketime "2021-01-01 00:00:00" vivado -mode batch -source common/script/synth.tcl 
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
