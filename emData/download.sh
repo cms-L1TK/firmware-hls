@@ -283,11 +283,6 @@ tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsReduced
 rm -f MemPrints.tgz
 
-### Ugly hack to remove initial "0x" from input stub test vectors, in order to
-### be consistent with other sets of test vectors.
-### FIXME: Remove after next FW sync
-sed -i "s/^0x//g" MemPrintsReduced/InputStubs/InputStubs_*.dat
-
 wget -O MemPrints.tgz --quiet ${memprints_url_cm}
 tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsCM
