@@ -712,7 +712,7 @@ void MatchProcessor(BXType bx,
       
     if (validin_) {
       auto iphiproj = projdata_.getPhi();
-      auto izproj = projdata_.getRZ();
+      auto izproj = projdata_.getZ();
       auto iphider = projdata_.getPhiDer();
       auto trackletid = projdata_.getTCID();
       
@@ -818,7 +818,7 @@ void MatchProcessor(BXType bx,
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
-				    projdata_.getRZ(), projdata_.getPhiDer(), projdata_.getRZDer());
+				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
       if (nstubs!=0) {
 	ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
 	projbufferarray.addProjection(projbuffertmp);

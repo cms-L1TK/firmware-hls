@@ -331,13 +331,13 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 
 // Reject projections with extreme r/z values.
   if (TProjType != DISK) {
-    if ((proj.getRZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getRZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
+    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
       proj_success = false;
-    if (abs(proj.getRZ()) > 2048)
+    if (abs(proj.getZ()) > 2048)
       proj_success = false;
   }
   else {
-    if (proj.getRZ() < 20.0/(2*kr) || proj.getRZ() > 120.0/(2*kr))
+    if (proj.getR() < 20.0/(2*kr) || proj.getR() > 120.0/(2*kr))
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
