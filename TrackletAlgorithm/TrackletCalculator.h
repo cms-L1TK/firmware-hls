@@ -311,13 +311,13 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
 // Determine which disk projections are valid.
  valid_proj_disk: for (ap_uint<3> i = 0; i < trklet::N_DISK - 1; i++) {
     valid_proj_disk[i] = true;
-    if (abs(*t) < floatToInt(1.0, kt)) // disk projections are invalid if |t| < 1
+    if (abs(*t) <= floatToInt(1.0, kt)) // disk projections are invalid if |t| <= 1
       valid_proj_disk[i] = false;
     if (phiD[i] <= 0)
       valid_proj_disk[i] = false;
     if (phiD[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
       valid_proj_disk[i] = false;
-    if (rD[i] <= floatToInt(rmindisk, krprojdisk) || rD[i] > floatToInt(rmaxdisk, krprojdisk))
+    if (rD[i] < floatToInt(rmindisk, krprojdisk) || rD[i] > floatToInt(rmaxdisk, krprojdisk))
       valid_proj_disk[i] = false;
   }
 
