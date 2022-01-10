@@ -28,7 +28,7 @@ namespace TC {
     typedef ap_int<11> der_phiL;
     typedef ap_int<10> der_zL;
     typedef ap_uint<16> phiD;
-    typedef ap_int<14> rD;
+    typedef ap_uint<14> rD;
     typedef ap_int<10> der_phiD;
     typedef ap_int<10> der_rD;
     typedef ap_uint<1> flag;
@@ -337,7 +337,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
       proj_success = false;
   }
   else {
-    if (proj.getR() < 20.0/(2*kr) || proj.getR() > 120.0/(2*kr))
+    if (proj.getR() < floatToInt(20.0, 2*kr) || proj.getR() > floatToInt(120.0, 2*kr))
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
