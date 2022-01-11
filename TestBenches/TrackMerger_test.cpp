@@ -29,19 +29,31 @@ int main(){
   static TrackFit<kMaxBrlStbs,kMaxDskStbs>::DiskStubWord diskStubWords_o[4][kMaxProc];
   static TrackFitMemory<kMaxBrlStbs,kMaxDskStbs> outputTracks;
 
-  TBHelper tb("../../../../../emData/PD/PD/");
+  // opening input file temporarily in order to copy it
+  TBHelper tb_tmp("../../../../../emData/PD/PD");
+
+  auto &fin_inputTracks_tmp = tb_tmp.files("TrackFit_TF_L1L2*");
+  auto filenames_tmp = tb_tmp.fileNames("TrackFit_TF_L1L2*");
+  // having to copy input file as TBHelper as unable to copy istream
+  // writeMemFromFile and compareMem functions would then refer to the same istream which causes problems
+  // as input/output file is the same for a dummy module
+  for (int i = 0 ; i < filenames_tmp.size(); i++){
+    string file_copy_name = filenames_tmp.at(i).insert(filenames_tmp.at(i).size()-23, "copy_");
+    ofstream  dst(file_copy_name,   ios::binary);
+    dst << fin_inputTracks_tmp.at(i).rdbuf();
+  }
+
+  tb_tmp.~TBHelper();
+  TBHelper tb("../../../../../emData/PD/PD");
 
   // Open input files
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
-
-
-  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
+  auto &fout_outputTracks = tb.files("copy_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
                                                                 //  since dummy module does nothing use the same input/output file
   // Loop over events
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
     
-
     for (unsigned short i = 0; i < kMaxProc; ++i){
       trackWord[i] = TrackFit<kMaxBrlStbs,kMaxDskStbs>::TrackWord(0);
       for (unsigned short j = 0; j < 4; j++){
