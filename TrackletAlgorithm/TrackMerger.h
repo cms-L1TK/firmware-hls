@@ -47,7 +47,6 @@ class ComparisonModule{
   private:
     // input buffer for each comparison module 
     TrackHandler inputBuffer[bufferSize];
-  
 
     unsigned int matchFound{0};
     unsigned int mergeCondition = 3;
@@ -56,7 +55,6 @@ class ComparisonModule{
     unsigned int writeIndex{0};
     unsigned int endOfStream{0};
     unsigned int endOfModule{0};
-  
 
     TrackHandler masterTrack;
     TrackHandler track;
