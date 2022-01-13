@@ -35,8 +35,8 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("outputTracks_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
-                                                                //  since dummy module does nothing use the same input/output file
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
+                                                                //  since dummy module does nothing use the same input/output file output_TrackFit_TF_L1L2*
   // Loop over events
   for (unsigned int ievt = 0; ievt < 1; ++ievt) {
     cout << "Event: " << dec << ievt << endl;

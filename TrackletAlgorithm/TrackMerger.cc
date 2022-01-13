@@ -78,7 +78,7 @@ void TrackMerger(const BXType bx,
     modulesToRun[0] = 1;
     for (int i = 0; i < kMaxProc; i++){
       #ifndef _SYNTHESIS_
-            //std::cout << "Step#: " << i << std::endl;
+      //std::cout << "Step#: " << i << std::endl;
       #endif
       unsigned int moduleEnd{0};
       for (unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
