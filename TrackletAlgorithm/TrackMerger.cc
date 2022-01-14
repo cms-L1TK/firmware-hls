@@ -88,8 +88,8 @@ void TrackMerger(const BXType bx,
     unsigned int modulesToRun[kNComparisonModules];
     modulesToRun[0] = 1;
     TrackFit::TrackWord unmergedTracks[kMaxProc];
-    TrackFit::BarrelStubWord unmergedBarrelStubs[4];
-    TrackFit::DiskStubWord unmergedDiskStubs[4];
+    TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
+    TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
 
     for (int i = 0; i < kMaxProc; i++){
       #ifndef _SYNTHESIS_
@@ -171,6 +171,9 @@ void TrackMerger(const BXType bx,
           for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
             unmergedBarrelStubs[arrayIndex][unmergedOutputIndex] = barrelStubWords[arrayIndex][i];
             unmergedDiskStubs[arrayIndex][unmergedOutputIndex] = diskStubWords[arrayIndex][i];
+            #ifndef _SYNTHESIS_
+            std::cout << "UnmergedbrlStubs: " << barrelStubWords[arrayIndex][i] << " UnmergeddiskStubs: " << diskStubWords[arrayIndex][i] << std::endl;
+            #endif
           }
           unmergedOutputIndex++;
         }
