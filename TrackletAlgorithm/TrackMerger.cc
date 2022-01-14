@@ -44,9 +44,12 @@ void ComparisonModule::endEvent(TrackHandler outputBuffer[16], unsigned int outp
   if(endOfStream == 1 && tracksProcessed == writeIndex){
     endOfModule = 1;
     #ifndef _SYNTHESIS_
-    std::cout << "endOfStream: " << endOfStream << " tracksProcessed: " << tracksProcessed << " writeIndex: " << writeIndex << std::endl;
+    std::cout << "endOfStream: " << endOfStream << " tracksProcessed: " << tracksProcessed << " writeIndex: " << writeIndex << " endEvent track: " << masterTrack.getTrackWord() << std::endl;
     #endif
     outputBuffer[outputWriteIndex] = masterTrack;
+    #ifndef _SYNTHESIS_
+    std::cout << "masterTrack to output: " << outputBuffer[outputWriteIndex].getTrackWord() << std::endl;
+    #endif
     writeIndex = 0;
     readIndex = 0;
     TrackFit::TrackWord nullWord(0);
@@ -63,7 +66,8 @@ void TrackMerger(const BXType bx,
   BXType &bx_o, 
   TrackFit::TrackWord trackWord_o[kMaxProc],
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc],
+  int &outputNumber
   ){
 
     ComparisonModule comparisonModule[kNComparisonModules];
@@ -78,7 +82,7 @@ void TrackMerger(const BXType bx,
     modulesToRun[0] = 1;
     for (int i = 0; i < kMaxProc; i++){
       #ifndef _SYNTHESIS_
-      //std::cout << "Step#: " << i << std::endl;
+      std::cout << "Step#: " << i << " masterTrackWord: " << trackWord[i] << std::endl;
       #endif
       unsigned int moduleEnd{0};
       for (unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
@@ -136,6 +140,9 @@ void TrackMerger(const BXType bx,
         // if am not the last comparison module - when finished processing, output the master track
         if(comparisonModule[activeModule].getEndOfModule() == 1){
           trackWord_o[outputIndex] = comparisonModule[activeModule].getMasterTrackWord();
+          #ifndef _SYNTHESIS_
+          std::cout << "final output trackWord: " << trackWord_o[outputIndex] << std::endl;
+          #endif
           for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
             barrelStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackBarrelStubs(arrayIndex, 0);
             diskStubWords_o[arrayIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackDiskStubs(arrayIndex, 0);
@@ -149,10 +156,14 @@ void TrackMerger(const BXType bx,
         if(activeModule == kNComparisonModules-1 && comparisonModule[activeModule].getMatchFound() == 0){
         // fill the outputs with the trackWord, barrel and disk stubs
           trackWord_o[outputIndex] = trackWord[i];
+          #ifndef _SYNTHESIS_
+          std::cout << "last CM trackWord: " << trackWord_o[outputIndex] << std::endl;
+          #endif
           for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
             barrelStubWords_o[arrayIndex][outputIndex] = barrelStubWords[arrayIndex][i];
             diskStubWords_o[arrayIndex][outputIndex] = diskStubWords[arrayIndex][i];
           }
+          outputIndex++;
         }
         
       }
@@ -167,8 +178,9 @@ void TrackMerger(const BXType bx,
       #endif
     }
     bx_o = bx;
-
+    outputNumber = outputIndex;
     #ifndef _SYNTHESIS_
+    std::cout << "outputNumber: " << outputNumber << std::endl;
     std::cout << "no. trackWords: " << outputIndex << std::endl;
     // for (unsigned int trackNumber = 0; trackNumber < outputIndex; trackNumber++){
     //   std::cout << "trackWord: " << trackWord[trackNumber] << " trackNumber: " << trackNumber << std::endl;

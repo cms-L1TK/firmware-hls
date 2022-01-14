@@ -28,6 +28,7 @@ int main(){
   static TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc];
   static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
   static TrackFitMemory outputTracks;
+  int outputNumber;
 
   TBHelper tb("../../../../../emData/PD/PD/");
 
@@ -35,8 +36,7 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
-                                                                //  since dummy module does nothing use the same input/output file output_TrackFit_TF_L1L2*
+  auto &fout_outputTracks = tb.files("output_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
   // Loop over events
   for (unsigned int ievt = 0; ievt < 1; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
@@ -83,7 +83,7 @@ int main(){
             stubIndex = track.getStubIndex<3>();
             break;
         } if(stubIndex != 0){
-          std::cout << "BarrelStubIndex: " << stubIndex << " at track:  " << i << std::endl;
+          // std::cout << "BarrelStubIndex: " << stubIndex << " at track:  " << i << std::endl;
         }
       }
       for (unsigned short k = 0; k < 4; k++){
@@ -106,9 +106,11 @@ int main(){
             break;
         }
         if(stubIndex != 0){
-        std::cout << "DiskStubIndex: " << stubIndex << " at track:  " << i << std::endl;
+        // std::cout << "DiskStubIndex: " << stubIndex << " at track:  " << i << std::endl;
         }
       }
+      std::cout << "i: " << i << " trkWord[i]: " << trackWord[i] << " brl1: " << barrelStubWords[0][i] << " brl2: " << barrelStubWords[1][i] << " brl3: " << barrelStubWords[2][i] << " brl4: " << barrelStubWords[3][i] <<  " disk1: " << diskStubWords[0][i] << " disk2: " << diskStubWords[1][i] << " disk3: " << diskStubWords[2][i] << " disk4: " << diskStubWords[3][i] <<  std::endl;
+
     }
 
 
@@ -120,25 +122,30 @@ int main(){
     bx_o,
     trackWord_o,
     barrelStubWords_o,
-    diskStubWords_o);
+    diskStubWords_o,
+    outputNumber);
 
     bool truncation = false;
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
+    for (unsigned short i = 0; i < outputNumber; i++){
       TrackFit track;
-      track.setTrackWord(trackWord[i]);
-      track.setBarrelStubWord<0>(barrelStubWords[0][i]);
-      track.setBarrelStubWord<1>(barrelStubWords[1][i]);
-      track.setBarrelStubWord<2>(barrelStubWords[2][i]);
-      track.setBarrelStubWord<3>(barrelStubWords[3][i]);
-      track.setDiskStubWord<4>(diskStubWords[0][i]);
-      track.setDiskStubWord<5>(diskStubWords[1][i]);
-      track.setDiskStubWord<6>(diskStubWords[2][i]);
-      track.setDiskStubWord<7>(diskStubWords[3][i]);
+      track.setTrackWord(trackWord_o[i]);
+      track.setBarrelStubWord<0>(barrelStubWords_o[0][i]);
+      track.setBarrelStubWord<1>(barrelStubWords_o[1][i]);
+      track.setBarrelStubWord<2>(barrelStubWords_o[2][i]);
+      track.setBarrelStubWord<3>(barrelStubWords_o[3][i]);
+      track.setDiskStubWord<4>(diskStubWords_o[0][i]);
+      track.setDiskStubWord<5>(diskStubWords_o[1][i]);
+      track.setDiskStubWord<6>(diskStubWords_o[2][i]);
+      track.setDiskStubWord<7>(diskStubWords_o[3][i]);
     
       outputTracks.write_mem(bx, track, i );
+
+      // if(trackWord_o[i] == 0 && barrelStubWords_o[0][i] == 0 && barrelStubWords_o[1][i] == 0 && barrelStubWords_o[2][i] == 0 && barrelStubWords_o[3][i] == 0){
+      std::cout << "i: " << i << " trkWord_o[i]: " << trackWord_o[i] << " brl1: " << barrelStubWords_o[0][i] << " brl2: " << barrelStubWords_o[1][i] << " brl3: " << barrelStubWords_o[2][i] << " brl4: " << barrelStubWords_o[3][i] <<  " disk1: " << diskStubWords_o[0][i] << " disk2: " << diskStubWords_o[1][i] << " disk3: " << diskStubWords_o[2][i] << " disk4: " << diskStubWords_o[3][i] <<  std::endl;
+      // }
     }
 
     // Comparing outputs
