@@ -13,6 +13,10 @@ class ComparisonModule{
       readIndex = 0;
       writeIndex = 0;
       tracksProcessed = 0;
+      TrackFit::TrackWord nullWord(0);
+      masterTrack.setTrackWord(nullWord);
+      track.setTrackWord(nullWord);
+
     }
     ~ComparisonModule(){};
 
