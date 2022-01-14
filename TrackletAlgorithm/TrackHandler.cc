@@ -2,7 +2,6 @@
 
 void TrackHandler::CompareTrack(TrackHandler track){
   #pragma HLS inline
-
   // compare the two tracks, masterTrack and trk
   // std::cout << "masterTrack: " << trkWord << std::endl;
   // std::cout << "track: " << track.trkWord << std::endl;
@@ -20,7 +19,7 @@ void TrackHandler::CompareTrack(TrackHandler track){
     } else {
       matchesFoundBarrel[layerIndex][0] = 0;
     }
-
+    
     if ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)){
     #ifndef _SYNTHESIS_
     // std::cout << "Match found in disk " << "masterDiskStub ID: " << masterDiskStubIndex << " trackDisk ID: " << inputDiskStubIndex << std::endl;
@@ -29,6 +28,8 @@ void TrackHandler::CompareTrack(TrackHandler track){
     } else {
       matchesFoundDisk[layerIndex][0] = 0;
     }
+    // std::cout << "layer: " << layerIndex << " masterTrackBrl: " << barrelStubArray[layerIndex][0] << " trkBrl: " << track.barrelStubArray[layerIndex][0] << " MatchFndBrl: " << matchesFoundBarrel[layerIndex][0] << std::endl;
+    // std::cout << "layer: " << layerIndex << " masterTrackDsk: " << diskStubArray[layerIndex][0] << " trkDsk: " << track.diskStubArray[layerIndex][0] << " MatchFndDsk: " << matchesFoundDisk[layerIndex][0] << std::endl;
   }
 }
 
@@ -49,40 +50,40 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
     // then add stub into master track
     for(int layerIndex = 0; layerIndex < 4; layerIndex++){
       #ifndef _SYNTHESIS_
-      std::cout << "layerIndex: " << layerIndex << " masterTrackBarrel:  " << barrelStubArray[layerIndex][0] << " comparedTrackBarrel: " << track.barrelStubArray[layerIndex][0] << std::endl;
-      std::cout << "layerIndex: " << layerIndex << " masterTrackDisk:  " << diskStubArray[layerIndex][0] << " comparedTrackDisk: " << track.diskStubArray[layerIndex][0] << std::endl;
+      // std::cout << "layerIndex: " << layerIndex << " masterTrackBarrel:  " << barrelStubArray[layerIndex][0] << " comparedTrackBarrel: " << track.barrelStubArray[layerIndex][0] << std::endl;
+      // std::cout << "layerIndex: " << layerIndex << " masterTrackDisk:  " << diskStubArray[layerIndex][0] << " comparedTrackDisk: " << track.diskStubArray[layerIndex][0] << std::endl;
       #endif
       if((barrelStubArray[layerIndex][0] == 0) && (track.barrelStubArray[layerIndex][0] != 0)){
         // print out if condition is matched
         #ifndef _SYNTHESIS_
-        std::cout << "condition met for barrel" << std::endl;
+        // std::cout << "condition met for barrel" << std::endl;
         #endif
-        barrelStubArray[layerIndex][0] = track.barrelStubArray[layerIndex][0];
+        // barrelStubArray[layerIndex][0] = track.barrelStubArray[layerIndex][0];
 
       }
       if((diskStubArray[layerIndex][0] == 0) && (track.diskStubArray[layerIndex][0] !=0)){
         #ifndef _SYNTHESIS_
-        std::cout << "condition met for disk" << std::endl;
+        // std::cout << "condition met for disk" << std::endl;
         #endif
-        diskStubArray[layerIndex][0] = track.diskStubArray[layerIndex][0];
+        // diskStubArray[layerIndex][0] = track.diskStubArray[layerIndex][0];
       }
       
       for (int stubIndex = 1; stubIndex < layerStubIndexSize; stubIndex++){
         if(barrelStubArray[layerIndex][stubIndex] == 0 && track.barrelStubArray[layerIndex][stubIndex] != 0){
-          barrelStubArray[layerIndex][stubIndex] = track.barrelStubArray[layerIndex][stubIndex];
+          // barrelStubArray[layerIndex][stubIndex] = track.barrelStubArray[layerIndex][stubIndex];
         } else {
           for (int bitIndex = 0; bitIndex < TrackFit::kBarrelStubSize; bitIndex++){
-            barrelStubArray[layerIndex][stubIndex] = barrelStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
+            // barrelStubArray[layerIndex][stubIndex] = barrelStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
             #ifndef _SYNTHESIS_
             // std::cout << "barrelStubArray[layerIndex][stubIndex]: " << barrelStubArray[layerIndex][stubIndex] << std::endl;
             #endif 
           }
         }
         if(diskStubArray[layerIndex][stubIndex] == 0 && track.diskStubArray[layerIndex][stubIndex] != 0){
-          diskStubArray[layerIndex][stubIndex] = track.diskStubArray[layerIndex][stubIndex];
+          // diskStubArray[layerIndex][stubIndex] = track.diskStubArray[layerIndex][stubIndex];
         } else {
           for (int bitIndex = 0; bitIndex < TrackFit::kDiskStubSize; bitIndex++){
-            diskStubArray[layerIndex][stubIndex] = diskStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
+            // diskStubArray[layerIndex][stubIndex] = diskStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
             #ifndef _SYNTHESIS_
             // std::cout << "diskStubArray[layerIndex][stubIndex]: " << diskStubArray[layerIndex][stubIndex] << std::endl;
             #endif

@@ -8,7 +8,8 @@ void TrackMergerTop(const BXType bx,
   BXType &bx_o,
   TrackFit::TrackWord trackWord_o [kMaxProc],
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc],
+  int &outputNumber
   ){
-    TrackMerger(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o);
+    TrackMerger(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o, outputNumber);
 }
