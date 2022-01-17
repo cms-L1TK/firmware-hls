@@ -273,7 +273,7 @@ uint8_t NSPMem(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint32_t ASInnerMask(const TF::seed Seed, const TC::itc iTC) {
+uint64_t ASInnerMask(const TF::seed Seed, const TC::itc iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -309,7 +309,7 @@ uint32_t ASInnerMask(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint32_t ASOuterMask(const TF::seed Seed, const TC::itc iTC) {
+uint64_t ASOuterMask(const TF::seed Seed, const TC::itc iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::B)
