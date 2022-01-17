@@ -165,14 +165,23 @@ void TrackBuilder(
       nMatches += (barrel_stub_valid ? 1 : 0);
 
       static_assert(NFMPerLayer <= 8, "Number of FM memories per layer cannot exceed eight.");
-      const auto &barrel_stub = ((NFMPerLayer > 7 && barrel_valid[j * NFMPerLayer + 7]) ? barrel_fm[j * NFMPerLayer + 7][barrel_read_index[j * NFMPerLayer + 7]] :
-                                ((NFMPerLayer > 6 && barrel_valid[j * NFMPerLayer + 6]) ? barrel_fm[j * NFMPerLayer + 6][barrel_read_index[j * NFMPerLayer + 6]] :
-                                ((NFMPerLayer > 5 && barrel_valid[j * NFMPerLayer + 5]) ? barrel_fm[j * NFMPerLayer + 5][barrel_read_index[j * NFMPerLayer + 5]] :
-                                ((NFMPerLayer > 4 && barrel_valid[j * NFMPerLayer + 4]) ? barrel_fm[j * NFMPerLayer + 4][barrel_read_index[j * NFMPerLayer + 4]] :
-                                ((NFMPerLayer > 3 && barrel_valid[j * NFMPerLayer + 3]) ? barrel_fm[j * NFMPerLayer + 3][barrel_read_index[j * NFMPerLayer + 3]] :
-                                ((NFMPerLayer > 2 && barrel_valid[j * NFMPerLayer + 2]) ? barrel_fm[j * NFMPerLayer + 2][barrel_read_index[j * NFMPerLayer + 2]] :
-                                ((NFMPerLayer > 1 && barrel_valid[j * NFMPerLayer + 1]) ? barrel_fm[j * NFMPerLayer + 1][barrel_read_index[j * NFMPerLayer + 1]] :
-                                                                                          barrel_fm[j * NFMPerLayer][barrel_read_index[j * NFMPerLayer]])))))));
+      const auto &i_mem = ((NFMPerLayer > 7 && barrel_valid[j * NFMPerLayer + 7]) ? (j * NFMPerLayer + 7) :
+                          ((NFMPerLayer > 6 && barrel_valid[j * NFMPerLayer + 6]) ? (j * NFMPerLayer + 6) :
+                          ((NFMPerLayer > 5 && barrel_valid[j * NFMPerLayer + 5]) ? (j * NFMPerLayer + 5) :
+                          ((NFMPerLayer > 4 && barrel_valid[j * NFMPerLayer + 4]) ? (j * NFMPerLayer + 4) :
+                          ((NFMPerLayer > 3 && barrel_valid[j * NFMPerLayer + 3]) ? (j * NFMPerLayer + 3) :
+                          ((NFMPerLayer > 2 && barrel_valid[j * NFMPerLayer + 2]) ? (j * NFMPerLayer + 2) :
+                          ((NFMPerLayer > 1 && barrel_valid[j * NFMPerLayer + 1]) ? (j * NFMPerLayer + 1) :
+                                                                                    (j * NFMPerLayer))))))));
+      const auto &i_fm = ((NFMPerLayer > 7 && barrel_valid[j * NFMPerLayer + 7]) ? (barrel_read_index[j * NFMPerLayer + 7]) :
+                         ((NFMPerLayer > 6 && barrel_valid[j * NFMPerLayer + 6]) ? (barrel_read_index[j * NFMPerLayer + 6]) :
+                         ((NFMPerLayer > 5 && barrel_valid[j * NFMPerLayer + 5]) ? (barrel_read_index[j * NFMPerLayer + 5]) :
+                         ((NFMPerLayer > 4 && barrel_valid[j * NFMPerLayer + 4]) ? (barrel_read_index[j * NFMPerLayer + 4]) :
+                         ((NFMPerLayer > 3 && barrel_valid[j * NFMPerLayer + 3]) ? (barrel_read_index[j * NFMPerLayer + 3]) :
+                         ((NFMPerLayer > 2 && barrel_valid[j * NFMPerLayer + 2]) ? (barrel_read_index[j * NFMPerLayer + 2]) :
+                         ((NFMPerLayer > 1 && barrel_valid[j * NFMPerLayer + 1]) ? (barrel_read_index[j * NFMPerLayer + 1]) :
+                                                                                   (barrel_read_index[j * NFMPerLayer]))))))));
+      const auto &barrel_stub = barrel_fm[i_mem][i_fm];
 
       const auto &barrel_stub_index = (barrel_stub_valid ? barrel_stub.getStubIndex() : FullMatch<BARREL>::FMSTUBINDEX(0));
       const auto &barrel_stub_r = (barrel_stub_valid ? barrel_stub.getStubR() : FullMatch<BARREL>::FMSTUBR(0));
@@ -223,14 +232,23 @@ void TrackBuilder(
       nMatches += (disk_stub_valid ? 1 : 0);
 
       static_assert(NFMPerDisk <= 6, "Number of FM memories per disk cannot exceed six.");
-      const auto &disk_stub = ((NFMPerDisk > 7 && disk_valid[j * NFMPerDisk + 7]) ? disk_fm[j * NFMPerDisk + 7][disk_read_index[j * NFMPerDisk + 7]] :
-                              ((NFMPerDisk > 6 && disk_valid[j * NFMPerDisk + 6]) ? disk_fm[j * NFMPerDisk + 6][disk_read_index[j * NFMPerDisk + 6]] :
-                              ((NFMPerDisk > 5 && disk_valid[j * NFMPerDisk + 5]) ? disk_fm[j * NFMPerDisk + 5][disk_read_index[j * NFMPerDisk + 5]] :
-                              ((NFMPerDisk > 4 && disk_valid[j * NFMPerDisk + 4]) ? disk_fm[j * NFMPerDisk + 4][disk_read_index[j * NFMPerDisk + 4]] :
-                              ((NFMPerDisk > 3 && disk_valid[j * NFMPerDisk + 3]) ? disk_fm[j * NFMPerDisk + 3][disk_read_index[j * NFMPerDisk + 3]] :
-                              ((NFMPerDisk > 2 && disk_valid[j * NFMPerDisk + 2]) ? disk_fm[j * NFMPerDisk + 2][disk_read_index[j * NFMPerDisk + 2]] :
-                              ((NFMPerDisk > 1 && disk_valid[j * NFMPerDisk + 1]) ? disk_fm[j * NFMPerDisk + 1][disk_read_index[j * NFMPerDisk + 1]] :
-                                                                                    disk_fm[j * NFMPerDisk][disk_read_index[j * NFMPerDisk]])))))));
+      const auto &i_mem = ((NFMPerDisk > 7 && disk_valid[j * NFMPerDisk + 7]) ? (j * NFMPerDisk + 7) :
+                          ((NFMPerDisk > 6 && disk_valid[j * NFMPerDisk + 6]) ? (j * NFMPerDisk + 6) :
+                          ((NFMPerDisk > 5 && disk_valid[j * NFMPerDisk + 5]) ? (j * NFMPerDisk + 5) :
+                          ((NFMPerDisk > 4 && disk_valid[j * NFMPerDisk + 4]) ? (j * NFMPerDisk + 4) :
+                          ((NFMPerDisk > 3 && disk_valid[j * NFMPerDisk + 3]) ? (j * NFMPerDisk + 3) :
+                          ((NFMPerDisk > 2 && disk_valid[j * NFMPerDisk + 2]) ? (j * NFMPerDisk + 2) :
+                          ((NFMPerDisk > 1 && disk_valid[j * NFMPerDisk + 1]) ? (j * NFMPerDisk + 1) :
+                                                                                (j * NFMPerDisk))))))));
+      const auto &i_fm = ((NFMPerDisk > 7 && disk_valid[j * NFMPerDisk + 7]) ? (disk_read_index[j * NFMPerDisk + 7]) :
+                         ((NFMPerDisk > 6 && disk_valid[j * NFMPerDisk + 6]) ? (disk_read_index[j * NFMPerDisk + 6]) :
+                         ((NFMPerDisk > 5 && disk_valid[j * NFMPerDisk + 5]) ? (disk_read_index[j * NFMPerDisk + 5]) :
+                         ((NFMPerDisk > 4 && disk_valid[j * NFMPerDisk + 4]) ? (disk_read_index[j * NFMPerDisk + 4]) :
+                         ((NFMPerDisk > 3 && disk_valid[j * NFMPerDisk + 3]) ? (disk_read_index[j * NFMPerDisk + 3]) :
+                         ((NFMPerDisk > 2 && disk_valid[j * NFMPerDisk + 2]) ? (disk_read_index[j * NFMPerDisk + 2]) :
+                         ((NFMPerDisk > 1 && disk_valid[j * NFMPerDisk + 1]) ? (disk_read_index[j * NFMPerDisk + 1]) :
+                                                                               (disk_read_index[j * NFMPerDisk]))))))));
+      const auto &disk_stub = disk_fm[i_mem][i_fm];
 
       const auto &disk_stub_index = (disk_stub_valid ? disk_stub.getStubIndex() : FullMatch<DISK>::FMSTUBINDEX(0));
       const auto &disk_stub_r = (disk_stub_valid ? disk_stub.getStubR() : FullMatch<DISK>::FMSTUBR(0));
