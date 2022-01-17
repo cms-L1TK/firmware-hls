@@ -62,6 +62,12 @@ void TrackBuilder(
   ap_uint<kNBitsTBBuffer> disk_read_index[NFMDisk];
   ap_uint<kNBitsTBBuffer> barrel_write_index[NFMBarrel];
   ap_uint<kNBitsTBBuffer> disk_write_index[NFMDisk];
+#pragma HLS array_partition variable=barrel_mem_index complete dim=0
+#pragma HLS array_partition variable=disk_mem_index complete dim=0
+#pragma HLS array_partition variable=barrel_read_index complete dim=0
+#pragma HLS array_partition variable=disk_read_index complete dim=0
+#pragma HLS array_partition variable=barrel_write_index complete dim=0
+#pragma HLS array_partition variable=disk_write_index complete dim=0
 
   initialize_barrel_indices : for (short i = 0; i < NFMBarrel; i++) {
 #pragma HLS unroll
