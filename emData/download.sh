@@ -11,11 +11,11 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
 #### test 211005/211217 ####
 # Standard configuration
-memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
-luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
+#memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
+#luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
 # Combined modules
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
-luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
+#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
+#luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
 
 
 

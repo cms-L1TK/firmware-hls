@@ -262,6 +262,7 @@ MC-vivado-hls-build:
     PROJ_NAME: "MC"
 MP-vivado-hls-build:
   <<: *template_hls-build
+  allow_failure: true
   needs: ["download", "MP-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
