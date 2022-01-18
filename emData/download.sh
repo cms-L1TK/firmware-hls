@@ -21,11 +21,11 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
 #### fw_synch_210611 ####
 # Standard configuration
-#memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
+luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
 # Combined modules
-#memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
-#luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
 
 #### fw_synch_210503 ####
 # Standard configuration
