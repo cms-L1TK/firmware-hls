@@ -209,7 +209,13 @@ begin
   end generate VMSTE_22_loop;
 
 
-  VMR_start <= '1' when IR_done = '1';
+  LATCH_IR: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => IR_done,
+      start => VMR_start
+  );
 
   IR_PS10G_3_A : entity work.IR_PS10G_3_A
     port map (

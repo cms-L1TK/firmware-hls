@@ -48,14 +48,14 @@ architecture behaviour of tb_tf_top is
 
   -- Paths of data files specified relative to Vivado project's xsim directory.
   -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-  constant emDataDir            : string := "../../../../../MemPrints/";
+  constant memPrintsDir         : string := "../../../../../MemPrints/";
   constant dataOutDir           : string := "../../../../../dataOut/";
 
   -- File directories and the start of the file names that memories have in common
   -- Input files
-  constant FILE_IN_AS           : string := emDataDir&"Stubs/AllStubs_AS_";
-  constant FILE_IN_VMSME        : string := emDataDir&"VMStubsME/VMStubs_VMSME_";
-  constant FILE_IN_TPROJ        : string := emDataDir&"TrackletProjections/TrackletProjections_TPROJ_";
+  constant FILE_IN_AS           : string := memPrintsDir&"Stubs/AllStubs_AS_";
+  constant FILE_IN_VMSME        : string := memPrintsDir&"VMStubsME/VMStubs_VMSME_";
+  constant FILE_IN_TPROJ        : string := memPrintsDir&"TrackletProjections/TrackletProjections_TPROJ_";
   -- Output files
   constant FILE_OUT_VMPROJ_24   : string := dataOutDir&"VMPROJ_";
   constant FILE_OUT_AP_60       : string := dataOutDir&"AP_";
@@ -199,7 +199,7 @@ begin
     variable v_line : line; -- Line for debug
   begin
 
-    if START_FIRST_WRITE= '1' then
+    if START_FIRST_WRITE = '1' then
       if rising_edge(CLK) then
         if (CLK_COUNT < MAX_ENTRIES) then
           CLK_COUNT := CLK_COUNT + 1;

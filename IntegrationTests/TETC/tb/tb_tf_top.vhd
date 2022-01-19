@@ -47,13 +47,13 @@ architecture behaviour of tb_tf_top is
 
   -- Paths of data files specified relative to Vivado project's xsim directory.
   -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-  constant emDataDir            : string := "../../../../../MemPrints/";
+  constant memPrintsDir         : string := "../../../../../MemPrints/";
   constant dataOutDir           : string := "../../../../../dataOut/";
 
   -- File directories and the start of the file names that memories have in common
   -- Input files
-  constant FILE_IN_AS           : string := emDataDir&"Stubs/AllStubs_AS_";
-  constant FILE_IN_VMSTE        : string := emDataDir&"VMStubsTE/VMStubs_VMSTE_";
+  constant FILE_IN_AS           : string := memPrintsDir&"Stubs/AllStubs_AS_";
+  constant FILE_IN_VMSTE        : string := memPrintsDir&"VMStubsTE/VMStubs_VMSTE_";
   -- Output files
   constant FILE_OUT_SP_14       : string := dataOutDir&"SP_";
   constant FILE_OUT_TPROJ_60    : string := dataOutDir&"TPROJ_";
@@ -200,7 +200,7 @@ begin
     variable v_line : line; -- Line for debug
   begin
 
-    if START_FIRST_WRITE= '1' then
+    if START_FIRST_WRITE = '1' then
       if rising_edge(CLK) then
         if (CLK_COUNT < MAX_ENTRIES) then
           CLK_COUNT := CLK_COUNT + 1;

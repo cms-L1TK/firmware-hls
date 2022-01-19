@@ -419,7 +419,13 @@ begin
       dout      => TE_L1PHIC12_L2PHIB10_bendoutertable_dout
   );
 
-  TC_start <= '1' when TE_done = '1';
+  LATCH_TE: entity work.CreateStartSignal
+    port map (
+      clk   => clk,
+      reset => reset,
+      done  => TE_done,
+      start => TC_start
+  );
 
   TE_L1PHIC12_L2PHIB10 : entity work.TE_L1L2
     port map (

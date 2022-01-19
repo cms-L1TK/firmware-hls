@@ -262,6 +262,7 @@ def comparePredefined(args):
     if args.save:
       print("Summary of memories with errors")
       print("=================================")
+      sys.stdout.flush()
       os.system('\grep "Bad events: [1-9]" dataOut/*cmp.txt')
 
     print("\n Accumulated number of errors =",ret_sum)
