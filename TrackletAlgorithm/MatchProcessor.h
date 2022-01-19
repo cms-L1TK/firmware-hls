@@ -11,7 +11,6 @@
 #include "AllStubMemory.h"
 #include "FullMatchMemory.h"
 #include "MatchEngineUnit.h"
-
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -105,11 +104,6 @@ namespace PR
   constexpr unsigned int zbins_adjust_PSseed = 1;
   constexpr unsigned int zbins_adjust_2Sseed = 4;
 
-  // Number of loop iterations subtracted from the full 108 so that the function
-  // stays synchronized with other functions in the chain. Once we get these
-  // functions to rewind correctly, this can be set to zero (or simply removed)
-  constexpr unsigned int LoopItersCut = 0;
-
   inline void zbinLUTinit(ap_uint<2*MEBinsBits> zbinLUT[128], int zbins_adjust_PSseed, int zbins_adjust_2Sseed){
 
     for(unsigned int ibin=0; ibin<128; ibin++) {
@@ -156,7 +150,6 @@ void readTable(ap_uint<1> table[]){
     }
   }
 
-/* FIXME uncomment these out when testing L2,L5, and L6. Need to be added to download.sh to work.
   if (L==TF::L2) {
     bool tmp[256]=
 #include "../emData/ME/tables/METable_L2.tab"
@@ -165,7 +158,6 @@ void readTable(ap_uint<1> table[]){
       table[i]=tmp[i];
     }
   }
-*/
 
   if (L==TF::L3) {
     bool tmp[256]=
@@ -185,7 +177,6 @@ void readTable(ap_uint<1> table[]){
     }
   }
 
-/*
   if (L==TF::L5) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L5.tab"
@@ -203,7 +194,6 @@ void readTable(ap_uint<1> table[]){
       table[i]=tmp[i];
     }
   }
-*/
 
 
 
@@ -229,17 +219,17 @@ ap_uint<width> iabs( ap_int<width> value )
 // Template to get look up tables
 
 // Table for phi or z cuts
-template<bool phi, int L, int width, int depth>
+template<bool phi, TF::layerDisk L, int width, int depth>
 void readTable_Cuts(ap_uint<width> table[depth]){
   if (phi){ // phi cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L1PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L2PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L3){
@@ -249,17 +239,17 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L4PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L5PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
+#include "../emData/MP/tables/MP_L6PHIC_phicut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -269,12 +259,12 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else { // z cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L1PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L2PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L3){
@@ -284,17 +274,17 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L4PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L5PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
+#include "../emData/MP/tables/MP_L6PHIC_zcut.tab"
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else {
@@ -313,8 +303,11 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 namespace MC {
   enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
+template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
+#include "MatchProcessor_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, int LAYER=TF::L1, MC::imc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& savedMatch,
@@ -354,9 +347,9 @@ void MatchCalculator(BXType bx,
 
   const auto kFact               = (LAYER < TF::L4)? 1 : (1<<(kNbitszprojL123-kNbitszprojL456)); // fact_ in emulation defined in MC
   const auto kPhi0_shift         = (LAYER < TF::L4)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
-  constexpr int  kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
+  const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
-  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456;                                           // icorrshift for L456
+  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 + kNbitsrL456;                                           // icorrshift for L456
   const auto kPhi_corr_shift     = (LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456;                            // icorrshift_ in emulation
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
@@ -412,7 +405,7 @@ void MatchCalculator(BXType bx,
   ap_int<10> delta_z         = stub_z - proj_z_corr;
   ap_int<14> delta_z_fact   = delta_z * kFact;
   ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
-  ap_int<18> proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
+  const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
@@ -430,7 +423,7 @@ void MatchCalculator(BXType bx,
   
   // Full match  
   typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
-  FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,(ap_uint<3>(2),fm_asid),fm_stubr,fm_phi,fm_z);
+  FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
 
   //-----------------------------------------------------------------------------------------------------------
   //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -452,41 +445,57 @@ void MatchCalculator(BXType bx,
     // Store bestmatch
     goodmatch = true;
   }
-  
+
   if(goodmatch) { // Write out only the best match, based on the seeding 
     switch (proj_seed) {
     case 0:
-      fullmatch[0].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
+    if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
       nmcout1+=1-savedMatch;
-      break;
+    }
+    break;
     case 1:
-      fullmatch[1].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
+    if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
       nmcout2+=1-savedMatch;
-      break;
+    }
+    break;
     case 2:
-      fullmatch[2].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
+    if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
       nmcout3+=1-savedMatch;
-      break;
+    }
+    break;
     case 3:
-      fullmatch[3].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
+    if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
       nmcout4+=1-savedMatch;
-      break;
+    }
+    break;
     case 4:
-      fullmatch[4].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
+    if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
       nmcout5+=1-savedMatch;
-      break;
+    }
+    break;
     case 5:
-      fullmatch[5].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
+    if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
       nmcout6+=1-savedMatch;
-      break;
+    }
+    break;
     case 6:
-      fullmatch[6].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
+    if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
       nmcout7+=1-savedMatch;
-      break;
+    }
+    break;
     case 7:
-      fullmatch[7].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
+    if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
       nmcout8+=1-savedMatch;
-      break;
+    }
+    break;
     }
     savedMatch = 1;
   }
@@ -517,7 +526,7 @@ void MatchProcessor(BXType bx,
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
-  readtable: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+  readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
@@ -572,6 +581,7 @@ void MatchProcessor(BXType bx,
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
+#pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 #pragma HLS dependence variable=istub inter false
 
@@ -598,7 +608,7 @@ void MatchProcessor(BXType bx,
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
 
- PROC_LOOP: for (unsigned int istep = 0; istep < kMaxProc-LoopItersCut; ++istep) {
+ PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 //rewind
 
     auto readptr = projbufferarray.getReadPtr();
@@ -619,7 +629,7 @@ void MatchProcessor(BXType bx,
 
     bool anyidle = false;
 
-  MEU_get_trkids: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+  MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
       matchengine[iMEU].set_empty();
       idles[iMEU] = matchengine[iMEU].idle();
@@ -627,13 +637,22 @@ void MatchProcessor(BXType bx,
       emptys[iMEU] = matchengine[iMEU].empty();
       trkids[iMEU] = matchengine[iMEU].getTrkID();
     }
-   
+
+    //This printout exactly matches printout in emulation for tracking code differences
+    /*   
+    std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
+    for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
+		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
+    }
+    std::cout << std::endl;
+    */
     
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
-  MEU_smallest1: for(unsigned int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
+  MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
-  MEU_smallest2: for(unsigned int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
+  MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
 #pragma HLS unroll
 	smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
         smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
@@ -747,10 +766,10 @@ void MatchProcessor(BXType bx,
       //memory the projection points to
       
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER!=0 ? nbitsallstubs[LAYER-1] : nbitsallstubs[trklet::N_LAYER + DISK-1];
+      auto nbits_all = LAYER < trklet::N_LAYER ? nbitsallstubs[LAYER] : nbitsallstubs[trklet::N_LAYER + DISK];
       
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER!=0 ? nbits_vmmeall[LAYER-1] : nbits_vmmeall[trklet::N_LAYER + DISK-1];
+      auto nbits_vmme = LAYER < trklet::N_LAYER ? nbits_vmmeall[LAYER] : nbits_vmmeall[trklet::N_LAYER + DISK];
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
@@ -759,10 +778,10 @@ void MatchProcessor(BXType bx,
 									  iphiproj.length()-nbits_all-nbits_vmme-3); 
       
       int nextrabits = 2;
-      int overlapbits = nbits_vmme + nextrabits;
+      int overlapbits = nbits_vmme + nbits_all + nextrabits;
       
       unsigned int extrabits = iphiproj.range(iphiproj.length() - overlapbits-1, iphiproj.length() - overlapbits - nextrabits);
-      
+
       unsigned int ivmPlus = iphi;
 	
       ap_int<2> shift = 0;
@@ -793,14 +812,14 @@ void MatchProcessor(BXType bx,
 	nstublastMinus = 0;
 	nstublastPlus = 0;
       }
-      
+
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getRZ(), projdata_.getPhiDer(), projdata_.getRZDer());
-      if (nstubs!=0) { 
+      if (nstubs!=0) {
 	ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
 	projbufferarray.addProjection(projbuffertmp);
       }

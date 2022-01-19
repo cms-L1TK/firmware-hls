@@ -181,7 +181,7 @@ MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessorL3_test.cpp ../TopFunctions/CombinedConfig/MatchProcessorTopL3.cpp'
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessor_test.cpp ../TopFunctions/CombinedConfig/MatchProcessorTop.cc'
 TB-quality-check:
   <<: *template_quality-check
   variables:
@@ -262,8 +262,8 @@ MC-vivado-hls-build:
     PROJ_NAME: "MC"
 MP-vivado-hls-build:
   <<: *template_hls-build
+  allow_failure: true
   needs: ["download", "MP-quality-check"]
-  allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"

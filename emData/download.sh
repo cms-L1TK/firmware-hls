@@ -9,6 +9,16 @@ set -e
 memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 
+#### test 211005/211217 ####
+# Standard configuration
+#memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
+#luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
+# Combined modules
+#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
+#luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
+
+
+
 #### fw_synch_210611 ####
 # Standard configuration
 memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
@@ -139,7 +149,18 @@ declare -a processing_modules=(
   "MC_L6PHIC"
 
   # MatchProcessor
+  "MP_L1PHIB"
+  "MP_L2PHIB"
+  "MP_L3PHIB"
+  "MP_L4PHIB"
+  "MP_L5PHIB"
+  "MP_L6PHIB"
+  "MP_L1PHIC"
+  "MP_L2PHIC"
   "MP_L3PHIC"
+  "MP_L4PHIC"
+  "MP_L5PHIC"
+  "MP_L6PHIC"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
@@ -263,6 +284,7 @@ mkdir -p ../TopFunctions/ReducedConfig
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -d -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 
 # Exit now if we are only downloading and unpacking LUTs.tar.gz.
 if [[ $tables_only != 0 ]]

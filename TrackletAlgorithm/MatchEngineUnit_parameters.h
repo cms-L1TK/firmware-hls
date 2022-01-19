@@ -1,5 +1,9 @@
-#ifndef TrackletAlgorithm_MatchProcessor_parameters_h
-#define TrackletAlgorithm_MatchProcessor_parameters_h
+#ifndef TrackAlgorithm_MatchEngineUnit_parameters_h
+#define TrackAlgorithm_MatchEngineUnit_parameters_h
+
+// This file contains numbers of memories and bit masks that are specific to
+// each MEU and that come directly from the wiring.
+//
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFullUnit() {
@@ -111,5 +115,4 @@ static const ap_uint<1 << 2*nbits> isLessThanSize() {
   }
   return tab;
 }
-
 #endif

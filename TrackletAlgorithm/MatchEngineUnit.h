@@ -10,13 +10,10 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
-
-#include <cassert>
-
 #include <iostream>
 #include <fstream>
 #include <bitset>
-#include "MatchProcessor_parameters.h"
+#include "MatchEngineUnit_parameters.h"
 
 template<int nbits>
 static const ap_uint<1 << nbits> hasOneStub() {
@@ -50,6 +47,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     stubmask_ = 0;
     nstubs_ = 0;
     idle_ = true;
+    empty_ = true;
     good_ = false;
     good__ = false;
   }
@@ -91,6 +89,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   idle_ = false;
   bx = bxin;
   istub_ = 0;
+  unit_ = unit;
   AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
   projbuffer_ = projbuffer;
   projindex = projbuffer.getIndex();
@@ -105,7 +104,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   second_ = isSecond[index];
   phiPlus_ = isPhiPlus[index];
   nstubs_ = nstubsall_[index];
-  assert(nstubs_!=0);
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
   auto const qdata=projbuffer_;
@@ -156,14 +154,12 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
-  assert(!idle_||good_||good__);
   if (good__) {
     return projbuffer___.getTCID();
   }
   if (good_) {
     return projbuffer__.getTCID();
   } 
-  assert(tcid==projbuffer_.getTCID());
   return tcid;
 }
 
@@ -221,11 +217,10 @@ inline MATCH read() {
    good_ = idle_ ? false : good_;
    good_ = nearfull ? false : good_;
 
+
+
    bool process = (!idle_) && (!nearfull);
 
-   // vmproj index
-   //typename VMProjection<VMPTYPE>::VMPZBIN projzbin;
-   
    // Buffer still has projections to read out
    //If the buffer is not empty we have a projection that we need to 
    //process. 
@@ -283,7 +278,6 @@ inline MATCH read() {
 	 second_ =  index[0];
 	 phiPlus_ =  index[1];
 	 nstubs_ = nstubsall_[index];
-	 assert(nstubs_!=0);
        }
      } else {
        istub_++;
@@ -317,6 +311,7 @@ inline MATCH read() {
  ap_int<2> shift_;
  bool idle_;
  int ivmphi;
+ int unit_;  // only used for debugging to identify MEU
  ap_uint<3> iphi_;
  BXType bx;
  bool empty_;
