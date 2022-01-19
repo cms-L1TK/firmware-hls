@@ -83,7 +83,7 @@ The files that are downloaded by emData/download.sh were created by the CMSSSW L
 cmsrel CMSSW_12_0_0_pre4
 cd CMSSW_12_0_0_pre4/src/
 cmsenv
-git cms-checkout-topic -u cms-L1TK:fw_synch_220106
+git cms-checkout-topic -u cms-L1TK:fw_synch_220119
 ```
 
 A few cfg changes were made in order to output test vectors & lookup tables, adjust truncation, and to disable multiple matches in the MatchCalculator. This required editing parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h to match the following excerpts:
