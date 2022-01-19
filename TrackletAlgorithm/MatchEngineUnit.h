@@ -54,31 +54,38 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   
   inline void processPipeLine(ap_uint<1> *table) {
 #pragma HLS inline
-    if (good__) {
-      auto stubindex=stubdata__.getIndex();
-      auto stubfinez=stubdata__.getFineZ();
-      auto stubfinephi=stubdata__.getFinePhi();
-      auto stubbend=stubdata__.getBend();
+    if (good___) {
+      auto stubindex=stubdata___.getIndex();
+      auto stubfinez=stubdata___.getFineZ();
+      auto stubfinephi=stubdata___.getFinePhi();
+      auto stubbend=stubdata___.getBend();
     
-      bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
+      bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi____,stubfinephi)];
     
       //Check if stub z position consistent
-      bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
+      bool pass = isPSseed___ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj___)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj___)];
 
-      auto const index=projrinv__.concat(stubbend);
+      auto const index=projrinv___.concat(stubbend);
 
       //Check if stub bend and proj rinv consistent
       if (passphi&&pass&&table[index]) {
-	matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
+	matches_[writeindex_++]=(stubindex,projbuffer____.getAllProj());
       }
     }
 
+    good___ = good__;
     good__ = good_;
+    stubdata___ = stubdata__;
     stubdata__ = stubdata_;
+    projfinephi____ = projfinephi___;
     projfinephi___ = projfinephi__;
+    projfinezadj___ = projfinezadj__;
     projfinezadj__ = projfinezadj_;
+    isPSseed___ = isPSseed__;
     isPSseed__ = isPSseed_;
+    projrinv___ = projrinv__;
     projrinv__ = projrinv_;
+    projbuffer____ = projbuffer___;
     projbuffer___ = projbuffer__;
   }
 
@@ -155,7 +162,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
     return allproj.getTCID();
   }
   if (good__) {
-    return projbuffer___.getTCID();
+    return projbuffer____.getTCID();
   }
   if (good_) {
     return projbuffer__.getTCID();
@@ -172,9 +179,13 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
-  if (idle_&&!good_&&!good__) {
+  if (idle_&&!good_&&!good__&&!good___) {
     typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID tmp(0);
     return ~tmp;
+  }
+  if (good___) {
+    AllProjection<AllProjectionType> allproj(projbuffer____.getAllProj());
+    return (projbuffer____.getTCID(), allproj.getTrackletIndex());
   }
   if (good__) {
     AllProjection<AllProjectionType> allproj(projbuffer___.getAllProj());
@@ -316,13 +327,13 @@ inline MATCH read() {
  BXType bx;
  bool empty_;
  NSTUBS istub_=0;
- VMStubMECM<VMSMEType> stubdata_, stubdata__; 
- bool good_, good__;
- ap_int<5> projfinephi__, projfinephi___;
- ap_int<5> projfinezadj_, projfinezadj__;
- bool isPSseed_, isPSseed__;
- VMProjection<BARREL>::VMPRINV projrinv_, projrinv__;
- ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___;
+ VMStubMECM<VMSMEType> stubdata_, stubdata__, stubdata___; 
+ bool good_, good__, good___;
+ ap_int<5> projfinephi__, projfinephi___, projfinephi____;
+ ap_int<5> projfinezadj_, projfinezadj__, projfinezadj___;
+ bool isPSseed_, isPSseed__, isPSseed___;
+ VMProjection<BARREL>::VMPRINV projrinv_, projrinv__, projrinv___;
+ ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___, projbuffer____;
 
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_int<5> projfinezadj; //FIXME Need replace 5 with const
