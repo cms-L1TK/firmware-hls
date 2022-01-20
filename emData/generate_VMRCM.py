@@ -340,10 +340,6 @@ constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Oute
 // NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
 static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<layerdisk, phiRegion>();
 
-//Bit size of phi and rz bins
-constexpr int phiRegSize(3);
-constexpr int rzSizeTE(3);
-
 #if kLAYER == kDISK
 #error kLAYER and kDISK can not be the same
 #elif kLAYER > 0
@@ -378,9 +374,9 @@ void %s(const BXType bx, BXType& bx_o
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 || kDISK == 3
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
+	, VMStubMEMemoryCM<outputType, rzSizeME, kNbitsphibin, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
+	, VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
 #endif
 	);
 
@@ -426,9 +422,9 @@ void %s(const BXType bx, BXType& bx_o
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME
+	, VMStubMEMemoryCM<outputType, rzSizeME, kNbitsphibin, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
-	, VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
+	, VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
 #endif
 	) {
 
@@ -462,7 +458,7 @@ void %s(const BXType bx, BXType& bx_o
 	/////////////////////////
 	// Main function
 
-	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSizeME, rzSizeTE, phiRegSize, numTEOCopies>
+	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSizeME, kNbitsrzbin, kNbitsphibin, numTEOCopies>
 	(bx, bx_o, 
 
 		// LUTs
@@ -562,10 +558,6 @@ python3 generate_VMRCM.py -a
         # Check that the Unit Under Test is a VMR
         if "VMR" not in vmr:
             raise IndexError("Unit under test has to be a VMR.")
-
-        # Check if one of the default VMRs
-        if vmr not in default_vmr_list:
-            print("Make sure to add " + vmr + " to download.sh and run it before running Vivado HLS.")
 
         # Create and write the files
         writeTopHeader(vmr_specific_name, vmr, args.outputdir)

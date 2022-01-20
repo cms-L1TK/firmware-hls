@@ -76,8 +76,8 @@ int main() {
   // Output memories
   static AllStubMemory<outputType> memoriesAS[numASCopies];
   static AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies];
-  static VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> memoryME;
-  static VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies];
+  static VMStubMEMemoryCM<outputType, rzSizeME, kNbitsphibin, kNMatchEngines> memoryME;
+  static VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies];
 
 
   ///////////////////////////
@@ -148,11 +148,11 @@ int main() {
       }
     }
     // ME memories
-    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
+    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, rzSizeME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
     //TE Outer memories
     if (nVMSTE) {
       for (unsigned int i = 0; i < nVMSTE; i++) {
-        err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
+        err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
       }
     }
   } // End of event loop
