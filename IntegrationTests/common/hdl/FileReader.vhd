@@ -63,7 +63,7 @@ procFile : process(CLK)
   variable MEM_BIN     : natural := 0;  --! Current bin in memory
   variable POS_IN_MEM_BIN : natural :=0; --! Current location in mem bin.
   constant NUM_X_CHAR_UNBINNED  : natural := 2;  --! Count of 'x' characters in line, before value to read
-  constant NUM_X_CHAR_BINNED    : natural := 1;  --! Count of 'x' characters in line, before value to read
+  constant NUM_X_CHAR_BINNED    : natural := 3;  --! Count of 'x' characters in line, before value to read
   variable CNT_X_CHAR  : natural := 0;  --! Current count of 'x' characters
   variable CHAR        : character;     --! Character
   variable FOUND_WORD  : boolean := false;
@@ -171,7 +171,6 @@ begin
             if (CHAR = 'x') then                   -- ... until the next x
               CNT_X_CHAR := CNT_X_CHAR + 1;
               if ((NUM_BINS > 1 and CNT_X_CHAR = NUM_X_CHAR_BINNED) or
-                  (NUM_BINS = 1 and CNT_X_CHAR = 1 and RAM_WIDTH = 36 and NUM_PAGES = 2) or -- Bodge for IL as they are unbinned but only contain one 'x'
                   (NUM_BINS = 1 and CNT_X_CHAR = NUM_X_CHAR_UNBINNED)) then -- No. of 'x' chars reached
                 -- Found data word.
                 FOUND_WORD := true;
