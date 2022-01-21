@@ -16,6 +16,10 @@ import collections
 num_layers = 6
 num_disks = 5
 
+# Number of bits for RZ bins, for the VMSME memories
+nbits_me_layer = 3
+nbits_me_disk = 4
+
 # The VMRs specified in download.sh
 default_vmr_list = ["VMR_L1PHIA", "VMR_L2PHIA", "VMR_L3PHIA" ,"VMR_L4PHIA", "VMR_L5PHIA", "VMR_L6PHIA", "VMR_D1PHIA", "VMR_D2PHIA", "VMR_D3PHIA", "VMR_D4PHIA", "VMR_D5PHIA"]
 
@@ -172,6 +176,7 @@ enum class phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = '
 template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();
 template<TF::layerDisk LayerDisk> const int* getMETable();
 template<TF::layerDisk LayerDisk> const int* getTETable();
+template<TF::layerDisk LayerDisk> constexpr int getMEBits();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputsDisk2S();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASCopies();
@@ -228,6 +233,20 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
         parameter_file.write(
             "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
             +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
+            "}\n"
+        )
+    # Write kNbitsrzbinME
+    parameter_file.write("\n// kNbitsrzbinME\n")
+    for i in range(num_layers):
+        parameter_file.write(
+            "template<> constexpr int getMEBits<TF::L" + str(i+1) + ">(){\n"
+            "  return " + str(nbits_me_layer) + ";\n"
+            "}\n"
+        )
+    for i in range(num_disks):
+        parameter_file.write(
+            "template<> constexpr int getMEBits<TF::D" + str(i+1) + ">(){\n"
+            "  return " + str(nbits_me_disk) + ";\n"
             "}\n"
         )
 
@@ -340,20 +359,18 @@ constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Oute
 // NOTE: read from right to left (OR, OM, OL, BR/DR, BM/DM, BL/DL, BF, BE, BD, BC, BB, BA)
 static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<layerdisk, phiRegion>();
 
+constexpr int kNbitsrzbinME = getMEBits<layerdisk>(); // Number of bits for the RZ bins, for the VMSME memories
+
 #if kLAYER == kDISK
 #error kLAYER and kDISK can not be the same
 #elif kLAYER > 0
-	constexpr int rzSizeME = 3;
 	// What regionType the input/output is
 	constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
 	constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
-
 #elif kDISK > 0
-	constexpr int rzSizeME = 4;
 	// What regionType the input/output is
 	constexpr regionType inputType = DISKPS;
 	constexpr regionType outputType = DISK;
-
 #else
 #error Need to have either kLAYER or kDISK larger than 0.
 #endif
@@ -374,7 +391,7 @@ void %s(const BXType bx, BXType& bx_o
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER ==  5 || kDISK == 1 || kDISK == 3
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSizeME, kNbitsphibin, kNMatchEngines> *memoryME
+	, VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 	, VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
 #endif
@@ -422,7 +439,7 @@ void %s(const BXType bx, BXType& bx_o
 #if kLAYER == 1 || kLAYER == 2 || kLAYER == 3 || kLAYER == 5 || kDISK == 1 || kDISK == 3
 	, AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies]
 #endif
-	, VMStubMEMemoryCM<outputType, rzSizeME, kNbitsphibin, kNMatchEngines> *memoryME
+	, VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME
 #if kLAYER == 2 || kLAYER == 3 || kLAYER == 4 || kLAYER == 6 || kDISK == 1 || kDISK == 2 || kDISK == 4
 	, VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]
 #endif
@@ -458,7 +475,7 @@ void %s(const BXType bx, BXType& bx_o
 	/////////////////////////
 	// Main function
 
-	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, rzSizeME, kNbitsrzbin, kNbitsphibin, numTEOCopies>
+	VMRouterCM<numInputs, numInputsDisk2S, numASCopies, numASInnerCopies, kLAYER, kDISK, inputType, outputType, kNbitsrzbinME, kNbitsrzbin, kNbitsphibin, numTEOCopies>
 	(bx, bx_o, 
 
 		// LUTs
