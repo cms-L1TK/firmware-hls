@@ -157,4 +157,7 @@ typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisite
 constexpr unsigned kBRAMwidth = 36; 
 constexpr int kNBits_DTC = 39; 
 
+//Future SW constants
+constexpr int nBarrelPS = 3;
+
 #endif
