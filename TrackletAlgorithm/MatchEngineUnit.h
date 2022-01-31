@@ -54,7 +54,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   
   inline void processPipeLine(ap_uint<1> *table) {
 #pragma HLS inline
-    if (good__) {
+    //if (good__) {
       auto stubindex=stubdata__.getIndex();
       auto stubfinez=stubdata__.getFineZ();
       auto stubfinephi=stubdata__.getFinePhi();
@@ -68,10 +68,22 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
       auto const index=projrinv__.concat(stubbend);
 
       //Check if stub bend and proj rinv consistent
+      projseqs_[writeindex_] = projseq___;
+      matches_[writeindex_] = (stubindex,projbuffer___.getAllProj());
+      INDEX writeindexnext = writeindex_ + 1;
+      //if (passphi&&pass&&table[index]) {
+      //	writeindex_++;
+      //}
+
+      writeindex_ = (good__&passphi&pass&table[index]) ? writeindexnext : writeindex_;
+
+      /*
       if (passphi&&pass&&table[index]) {
-	matches_[writeindex_++]=(stubindex,projbuffer___.getAllProj());
+	projseqs_[writeindex_] = projseq___;
+	matches_[writeindex_++] = (stubindex,projbuffer___.getAllProj());
       }
-    }
+      */
+      //}
 
     good__ = good_;
     stubdata__ = stubdata_;
@@ -80,18 +92,20 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     isPSseed__ = isPSseed_;
     projrinv__ = projrinv_;
     projbuffer___ = projbuffer__;
+    projseq___ = projseq__;
   }
 
 
- inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, int iphi, int unit) {
+  inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, ap_uint<kNBits_MemAddr> projseq, int iphi, int unit) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
   idle_ = false;
   bx = bxin;
   istub_ = 0;
   unit_ = unit;
-  AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
+  //AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
   projbuffer_ = projbuffer;
+  projseq_ = projseq;
   projindex = projbuffer.getIndex();
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   shift_ = projbuffer.shift();
@@ -99,10 +113,16 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   stubmask_[1] = nstubsall_[1]!=0;
   stubmask_[2] = nstubsall_[2]!=0;
   stubmask_[3] = nstubsall_[3]!=0;
+  //stubmask_[0] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[0]];
+  //stubmask_[1] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[1]];
+  //stubmask_[2] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[2]];
+  //stubmask_[3] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[3]];
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
-  second_ = isSecond[index];
-  phiPlus_ = isPhiPlus[index];
+  //second_ = isSecond[index];
+  //phiPlus_ = isPhiPlus[index];
+  second_ = index[0];
+  phiPlus_ = index[1];
   nstubs_ = nstubsall_[index];
   ivmphi = projbuffer.getPhi();
   iphi_ = iphi;
@@ -145,6 +165,7 @@ inline bool processing() {
   return !idle_||good_||good__;
 }
 
+/*
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID() {
 #pragma HLS inline
   if (!empty()) {
@@ -162,6 +183,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   } 
   return tcid;
 }
+*/
 
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkID() {
 #pragma HLS inline
@@ -188,6 +210,24 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
   return (tcid, allproj.getTrackletIndex());
 }
 
+inline ap_uint<kNBits_MemAddr> getProjSeq() {
+#pragma HLS inline
+  if (!empty()) {
+    return projseqs_[readindex_];
+  }
+  if (idle_&&!good_&&!good__) {
+    ap_uint<kNBits_MemAddr> tmp(0);
+    return ~tmp;
+  }
+  if (good__) {
+    return projseq___;
+  }
+  if (good_) {
+    return projseq__;
+  } 
+  return projseq_;
+}
+
 inline VMProjection<BARREL>::VMPID getProjindex() {
 #pragma HLS inline  
   return projbuffer_.getIndex();
@@ -205,7 +245,16 @@ inline int getIPhi() {
 inline MATCH read() {
 #pragma HLS inline  
   return matches_[readindex_++];
+}
 
+inline MATCH peek() {
+#pragma HLS inline  
+  return matches_[readindex_];
+}
+ 
+inline void advance() {
+#pragma HLS inline  
+  readindex_++;  
 }
 
  inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
@@ -230,7 +279,9 @@ inline MATCH read() {
    ap_uint<3> iphiSave = iphi_ + phiPlus_;
    auto secondSave = second_;
 
-   if(emptyUnit<kNBits_MemAddrBinned>()[istub_]) {
+   //if(emptyUnit<kNBits_MemAddrBinned>()[istub_]) {  //slack of 0.33 ns
+   //if(istub_ == 0) {   //slac of 0.65 ns
+   if(zero<kNBits_MemAddrBinned>()[istub_]) {
        
      //Need to read the information about the proj in the buffer
      //FIXME - should this not be in init method?
@@ -292,6 +343,7 @@ inline MATCH read() {
    isPSseed_ = isPSseed;
    projrinv_ = projrinv;
    projbuffer__ = projbuffer_;
+   projseq__ = projseq_;
    good_ =  process;
 
    
@@ -322,9 +374,14 @@ inline MATCH read() {
  ap_int<5> projfinezadj_, projfinezadj__;
  bool isPSseed_, isPSseed__;
  VMProjection<BARREL>::VMPRINV projrinv_, projrinv__;
- ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___;
+
+ ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_, projbuffer__, projbuffer___;
+
+ ap_uint<kNBits_MemAddr> projseq_, projseq__, projseq___;
 
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+ ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+
  ap_int<5> projfinezadj; //FIXME Need replace 5 with const
  ap_int<5> projfinephi_; //FIXME Need replace 5 with const
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid;
@@ -332,7 +389,7 @@ inline MATCH read() {
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::VMPZBINNOFLAG zbin;
  VMProjection<BARREL>::VMPRINV projrinv;
  VMProjection<BARREL>::VMPID projindex;
- ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
+
  ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
  bool isSecond[4] = {false, true, false, true};
  bool isPhiPlus[4] = {false, false, true, true};

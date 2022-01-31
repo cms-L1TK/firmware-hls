@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script generates MatchProcessor_parameters.h,
 # MatchProcessorTop.h, and MatchProcessorTop.cc in the
