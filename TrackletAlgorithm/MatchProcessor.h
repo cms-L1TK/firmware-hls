@@ -570,7 +570,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
-
   //These are used inside the MatchCalculator method and needs to be retained between iterations
   ap_uint<1> savedMatch;
   ap_uint<17> best_delta_phi;
@@ -620,6 +619,7 @@ void MatchProcessor(BXType bx,
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
+
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
     }
@@ -635,6 +635,23 @@ void MatchProcessor(BXType bx,
     */
 
     
+    ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
+    ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
+    ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
+
+    projseq01tmp = Bit01 ? projseqs[0] : projseqs[1];
+    projseq23tmp = Bit23 ? projseqs[2] : projseqs[3];
+    
+    ap_uint<1> Bit0123 = projseq01tmp < projseq23tmp;
+
+    projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
+    
+    ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+
+    ap_uint<1> hasMatch = !emptys[bestiMEU];
+
+    
+
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
     ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
