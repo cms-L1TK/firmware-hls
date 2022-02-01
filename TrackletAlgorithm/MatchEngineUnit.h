@@ -105,10 +105,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   stubmask_[1] = nstubsall_[1]!=0;
   stubmask_[2] = nstubsall_[2]!=0;
   stubmask_[3] = nstubsall_[3]!=0;
-  //stubmask_[0] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[0]];
-  //stubmask_[1] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[1]];
-  //stubmask_[2] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[2]];
-  //stubmask_[3] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[3]];
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index[0];
@@ -173,7 +169,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   } 
   return tcid;
 }
-*/
+
 
 
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkID() {
