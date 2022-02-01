@@ -24,6 +24,7 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/sZZkyWoanuxm7Dt/download"
 # Combined modules
 memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_220201.tgz"
 luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_220201.tgz"
+
 memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_220131.tgz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_220131.tgz"
 
