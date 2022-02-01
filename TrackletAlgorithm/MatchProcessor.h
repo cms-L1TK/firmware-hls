@@ -406,7 +406,6 @@ void MatchCalculator(BXType bx,
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
-  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
   ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
 
   // Full match parameters
@@ -434,7 +433,7 @@ void MatchCalculator(BXType bx,
   best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
 
   // Check that matches fall within the selection window of the projection 
-  if ((abs_delta_z <= LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+  if ((delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     best_delta_phi = abs_delta_phi;
