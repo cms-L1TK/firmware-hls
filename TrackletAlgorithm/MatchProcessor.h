@@ -543,7 +543,8 @@ void MatchProcessor(BXType bx,
 
   constexpr unsigned int kNBitsBuffer=3;
 
-  // declare counters for each of the 8 output VMProj // !!!
+  // declare counters for each of the 8 different seeds.
+  //FIXEM should have propoer seven bit type
   int nmcout1 = 0;
   int nmcout2 = 0;
   int nmcout3 = 0;
@@ -554,17 +555,6 @@ void MatchProcessor(BXType bx,
   int nmcout8 = 0;
 
   ap_uint<kNBits_MemAddr> nallproj = 0;
-
-  ////////////////////////////////////////////
-  //Some ME stuff
-  ////////////////////////////////////////////
-  //ap_uint<TEBinsBits> zbin=0;
-  //VMProjection<BARREL>::VMPFINEZ projfinez;
-  //ap_int<5> projfinezadj; //FIXME Need replace 5 with const
-  //VMProjection<BARREL>::VMPRINV projrinv;
-  //bool isPSseed;
-  //bool second;
-  //ap_uint<kNBits_MemAddrBinned> istub=0;
 
   ap_uint<kNBits_MemAddr> iproj=0; //counter
 
@@ -579,7 +569,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-  //#pragma HLS dependence variable=istub inter false
 
 
   //These are used inside the MatchCalculator method and needs to be retained between iterations
@@ -616,8 +605,7 @@ void MatchProcessor(BXType bx,
 
     ap_uint<kNMatchEngines> idles;
     ap_uint<kNMatchEngines> emptys;
-    //typename ProjectionRouterBuffer<BARREL, ASTYPE>::TRKID trkids[kNMatchEngines];
-    //#pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
+
     typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE>::MATCH matches[kNMatchEngines];
     #pragma HLS ARRAY_PARTITION variable=matches complete dim=0
     ap_uint<kNBits_MemAddr> projseqs[kNMatchEngines];
@@ -632,7 +620,6 @@ void MatchProcessor(BXType bx,
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
-      //trkids[iMEU] = matchengine[iMEU].getTrkID();
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
     }
@@ -646,26 +633,8 @@ void MatchProcessor(BXType bx,
     }
     std::cout << std::endl;
     */
+
     
-    //std::cout << "kNMatchEngines : " << kNMatchEngines << std::endl;
-    /*
-    typename ProjectionRouterBuffer<BARREL, ASTYPE>::TRKID trkid01tmp, trkid23tmp, trkid0123tmp;
-
-    ap_uint<1> bit01 = trkids[0]<trkids[1];
-    ap_uint<1> bit23 = trkids[2]<trkids[3];
-
-    trkid01tmp = bit01 ? trkids[0] : trkids[1];
-    trkid23tmp = bit23 ? trkids[2] : trkids[3];
-    
-    ap_uint<1> bit0123 = trkid01tmp < trkid23tmp;
-
-    trkid0123tmp = bit0123 ? trkid01tmp : trkid23tmp;
-    
-    ap_uint<2> bestiMEU = (~bit0123, bit0123 ? ~bit01 : ~bit23 );
-
-    ap_uint<1> hasMatch = !emptys[bestiMEU];
-    */
-
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
     ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
@@ -682,7 +651,7 @@ void MatchProcessor(BXType bx,
     ap_uint<1> hasMatch = !emptys[bestiMEU];
 
     
-    /*
+    /* old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
   MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
@@ -697,13 +666,6 @@ void MatchProcessor(BXType bx,
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
     */
-
-    //std::cout << "trkid : " << trkids[0] << " " << trkids[1] << " " << trkids[2] << " " << trkids[3] << std::endl;
-    //std::cout << "bit01 bit23 bit0123 : " << bit01 << " " << bit23 << " " << bit0123 << std::endl; 
-    //std::cout << "hasMatch: "<<hasMatch<<" "<<hasmatch<<"  bestiMEU: "<<bestiMEU<<" "<<bestimeu<<std::endl;
-
-    //assert(hasMatch == HasMatch);
-    //if (hasMatch) assert(bestiMEU == BestiMEU);
 
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff = projbufferarray.peek();;
     if (anyidle && !empty) {
@@ -731,18 +693,6 @@ void MatchProcessor(BXType bx,
     
     if(hasMatch) {
  
-      /*
-
-      auto trkindex=matchengine[bestiMEU].getTrkID();
-
-      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
-
-      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allproj;
-
-      (stubindex,allproj) = matchengine[bestiMEU].read();
-    
-      */
-
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
       
@@ -781,8 +731,6 @@ void MatchProcessor(BXType bx,
       // All seeding pairs are PS modules except L3L4 and L5L6
       bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
       
-      //////////////////////////
-      // hourglass configuration
       
       // vmproj index
       const typename VMProjection<VMPTYPE>::VMPID &index = nallproj;
@@ -894,8 +842,6 @@ void MatchProcessor(BXType bx,
 	nINMEM, kNBits_MemAddr+1>
 	(bx, mem_hasdata, numbersin, mem_read_addr,
          projin, projdata, nproj);
-
-
  
     } else {
       validin = false;

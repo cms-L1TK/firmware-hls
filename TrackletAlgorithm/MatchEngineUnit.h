@@ -54,37 +54,29 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   
   inline void processPipeLine(ap_uint<1> *table) {
 #pragma HLS inline
-    //if (good__) {
-      auto stubindex=stubdata__.getIndex();
-      auto stubfinez=stubdata__.getFineZ();
-      auto stubfinephi=stubdata__.getFinePhi();
-      auto stubbend=stubdata__.getBend();
+
+    auto stubindex=stubdata__.getIndex();
+    auto stubfinez=stubdata__.getFineZ();
+    auto stubfinephi=stubdata__.getFinePhi();
+    auto stubbend=stubdata__.getBend();
     
-      bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
+    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
     
-      //Check if stub z position consistent
-      bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
+    //Check if stub z position consistent
+    bool pass = isPSseed__ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
 
-      auto const index=projrinv__.concat(stubbend);
+    auto const index=projrinv__.concat(stubbend);
 
-      //Check if stub bend and proj rinv consistent
-      projseqs_[writeindex_] = projseq___;
-      matches_[writeindex_] = (stubindex,projbuffer___.getAllProj());
-      INDEX writeindexnext = writeindex_ + 1;
-      //if (passphi&&pass&&table[index]) {
-      //	writeindex_++;
-      //}
+    //Check if stub bend and proj rinv consistent
+    projseqs_[writeindex_] = projseq___;
+    matches_[writeindex_] = (stubindex,projbuffer___.getAllProj());
+    INDEX writeindexnext = writeindex_ + 1;
+    
+    //Though we did write to matches_ above only now do we increment
+    //the writeindex_ if we had a good stub that pass the various cuts
+    writeindex_ = (good__&passphi&pass&table[index]) ? writeindexnext : writeindex_;
 
-      writeindex_ = (good__&passphi&pass&table[index]) ? writeindexnext : writeindex_;
-
-      /*
-      if (passphi&&pass&&table[index]) {
-	projseqs_[writeindex_] = projseq___;
-	matches_[writeindex_++] = (stubindex,projbuffer___.getAllProj());
-      }
-      */
-      //}
-
+    //update pipeline variables
     good__ = good_;
     stubdata__ = stubdata_;
     projfinephi___ = projfinephi__;
@@ -103,7 +95,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   bx = bxin;
   istub_ = 0;
   unit_ = unit;
-  //AllProjection<AllProjectionType> aProj(projbuffer.getAllProj());
+
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   projindex = projbuffer.getIndex();
@@ -113,14 +105,8 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   stubmask_[1] = nstubsall_[1]!=0;
   stubmask_[2] = nstubsall_[2]!=0;
   stubmask_[3] = nstubsall_[3]!=0;
-  //stubmask_[0] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[0]];
-  //stubmask_[1] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[1]];
-  //stubmask_[2] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[2]];
-  //stubmask_[3] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[3]];
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
-  //second_ = isSecond[index];
-  //phiPlus_ = isPhiPlus[index];
   second_ = index[0];
   phiPlus_ = index[1];
   nstubs_ = nstubsall_[index];
@@ -165,7 +151,7 @@ inline bool processing() {
   return !idle_||good_||good__;
 }
 
-/*
+// This method is no longer used, but kept for possible debugging etc.
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID() {
 #pragma HLS inline
   if (!empty()) {
@@ -183,7 +169,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   } 
   return tcid;
 }
-*/
+
 
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkID() {
 #pragma HLS inline
@@ -257,97 +243,95 @@ inline void advance() {
   readindex_++;  
 }
 
- inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
+inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
-   bool nearfull = nearFull();
+  bool nearfull = nearFull();
+  
+  good_ = idle_ ? false : good_;
+  good_ = nearfull ? false : good_;
 
-   good_ = idle_ ? false : good_;
-   good_ = nearfull ? false : good_;
 
 
+  bool process = (!idle_) && (!nearfull);
 
-   bool process = (!idle_) && (!nearfull);
+  // Buffer still has projections to read out
+  //If the buffer is not empty we have a projection that we need to 
+  //process. 
+  
+  NSTUBS istubtmp=istub_;
 
-   // Buffer still has projections to read out
-   //If the buffer is not empty we have a projection that we need to 
-   //process. 
+  ap_uint<3> iphiSave = iphi_ + phiPlus_;
+  auto secondSave = second_;
 
-   NSTUBS istubtmp=istub_;
-
-   ap_uint<3> iphiSave = iphi_ + phiPlus_;
-   auto secondSave = second_;
-
-   //if(emptyUnit<kNBits_MemAddrBinned>()[istub_]) {  //slack of 0.33 ns
-   //if(istub_ == 0) {   //slac of 0.65 ns
-   if(zero<kNBits_MemAddrBinned>()[istub_]) {
-       
-     //Need to read the information about the proj in the buffer
-     //FIXME - should this not be in init method?
-     auto const qdata=projbuffer_;
-     tcid=qdata.getTCID();
-     VMProjection<BARREL> data(qdata.getProjection());
-     zbin=data.getZBin().range(3,1); //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
+  if(zero<kNBits_MemAddrBinned>()[istub_]) {
      
-     projindex=data.getIndex();
-     auto projfinez=data.getFineZ();
-     projfinephi_=data.getFinePhi();
-     projrinv=data.getRInv();
-     isPSseed=data.getIsPSSeed();
+    //Need to read the information about the proj in the buffer
+    //FIXME - should this not be in init method?
+    auto const qdata=projbuffer_;
+    tcid=qdata.getTCID();
+    VMProjection<BARREL> data(qdata.getProjection());
+    zbin=data.getZBin().range(3,1); //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
+    
+    projindex=data.getIndex();
+    auto projfinez=data.getFineZ();
+    projfinephi_=data.getFinePhi();
+    projrinv=data.getRInv();
+    isPSseed=data.getIsPSSeed();
      
-     //Calculate fine z position
-     if (second_) {
-       projfinezadj=projfinez-8;
-       zbin=zbin+1;
-     } else {
-       projfinezadj=projfinez;
-     }
+    //Calculate fine z position
+    if (second_) {
+      projfinezadj=projfinez-8;
+      zbin=zbin+1;
+    } else {
+      projfinezadj=projfinez;
+    }
 
-     if (!phiPlus_) {
-       if (shift_==-1) {
-         projfinephi_ -= 8;
-       }
-     } else {
-       //When we get here shift_ is either 1 or -1
-       if (shift_==1) {
-         projfinephi_ += 8;
-       }
-     }
+    if (!phiPlus_) {
+      if (shift_==-1) {
+	projfinephi_ -= 8;
+      }
+    } else {
+      //When we get here shift_ is either 1 or -1
+      if (shift_==1) {
+	projfinephi_ += 8;
+      }
+    }
 
-   }
+  }
    
-   //Check if last stub, if so, go to next buffer entry 
-   if (process) {
-     if (istub_+1>=nstubs_){
-       istub_=0;
-       if (!stubmask_) {
-	 idle_ = true;
-       } else {
-	 ap_uint<2> index = __builtin_ctz(stubmask_);
-	 stubmask_[index]=0;
-	 second_ =  index[0];
-	 phiPlus_ =  index[1];
-	 nstubs_ = nstubsall_[index];
-       }
-     } else {
-       istub_++;
-     }
-   }
-
-   //Read stub memory and extract data fields
-   ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
-   stubdata_ = stubmem[bx&1][stubadd];
-   projfinephi__ = projfinephi_;
-   projfinezadj_ = projfinezadj;
-   isPSseed_ = isPSseed;
-   projrinv_ = projrinv;
-   projbuffer__ = projbuffer_;
-   projseq__ = projseq_;
-   good_ =  process;
+  //Check if last stub, if so, go to next buffer entry 
+  if (process) {
+    if (istub_+1>=nstubs_){
+      istub_=0;
+      if (!stubmask_) {
+	idle_ = true;
+      } else {
+	ap_uint<2> index = __builtin_ctz(stubmask_);
+	stubmask_[index]=0;
+	second_ =  index[0];
+	phiPlus_ =  index[1];
+	nstubs_ = nstubsall_[index];
+      }
+    } else {
+      istub_++;
+    }
+  }
+  
+  //Read stub memory and extract data fields
+  ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
+  stubdata_ = stubmem[bx&1][stubadd];
+  projfinephi__ = projfinephi_;
+  projfinezadj_ = projfinezadj;
+  isPSseed_ = isPSseed;
+  projrinv_ = projrinv;
+  projbuffer__ = projbuffer_;
+  projseq__ = projseq_;
+  good_ =  process;
 
    
- } // end step
+} // end step
 
  bool Good_() const { return good_;}
  bool Good__() const { return good__;}
@@ -391,8 +375,7 @@ inline void advance() {
  VMProjection<BARREL>::VMPID projindex;
 
  ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
- bool isSecond[4] = {false, true, false, true};
- bool isPhiPlus[4] = {false, false, true, true};
+
  ap_uint<1<<(kNBits_MemAddrBinned+2)> onlyOneStub = hasOneStub<kNBits_MemAddrBinned+2>();
  
 }; // end class
