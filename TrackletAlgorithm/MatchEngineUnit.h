@@ -105,10 +105,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   stubmask_[1] = nstubsall_[1]!=0;
   stubmask_[2] = nstubsall_[2]!=0;
   stubmask_[3] = nstubsall_[3]!=0;
-  //stubmask_[0] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[0]];
-  //stubmask_[1] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[1]];
-  //stubmask_[2] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[2]];
-  //stubmask_[3] = nonzero<kNBits_MemAddrBinned>()[nstubsall_[3]];
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index[0];
@@ -156,7 +152,6 @@ inline bool processing() {
 }
 
 // This method is no longer used, but kept for possible debugging etc.
-/*
 inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID() {
 #pragma HLS inline
   if (!empty()) {
@@ -174,7 +169,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   } 
   return tcid;
 }
-*/
+
 
 
 
@@ -260,8 +255,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   good_ = idle_ ? false : good_;
   good_ = nearfull ? false : good_;
 
-
-
   bool process = (!idle_) && (!nearfull);
 
   // Buffer still has projections to read out
@@ -274,6 +267,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   auto secondSave = second_;
 
   if(zero<kNBits_MemAddrBinned>()[istub_]) {
+     
     //Need to read the information about the proj in the buffer
     //FIXME - should this not be in init method?
     auto const qdata=projbuffer_;
@@ -308,34 +302,34 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 
   }
    
-   //Check if last stub, if so, go to next buffer entry 
-   if (process) {
-     if (istub_+1>=nstubs_){
-       istub_=0;
-       if (!stubmask_) {
-	 idle_ = true;
-       } else {
-	 ap_uint<2> index = __builtin_ctz(stubmask_);
-	 stubmask_[index]=0;
-	 second_ =  index[0];
-	 phiPlus_ =  index[1];
-	 nstubs_ = nstubsall_[index];
-       }
-     } else {
-       istub_++;
-     }
-   }
-
-   //Read stub memory and extract data fields
-   ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
-   stubdata_ = stubmem[bx&1][stubadd];
-   projfinephi__ = projfinephi_;
-   projfinezadj_ = projfinezadj;
-   isPSseed_ = isPSseed;
-   projrinv_ = projrinv;
-   projbuffer__ = projbuffer_;
-   projseq__ = projseq_;
-   good_ =  process;
+  //Check if last stub, if so, go to next buffer entry 
+  if (process) {
+    if (istub_+1>=nstubs_){
+      istub_=0;
+      if (!stubmask_) {
+	idle_ = true;
+      } else {
+	ap_uint<2> index = __builtin_ctz(stubmask_);
+	stubmask_[index]=0;
+	second_ =  index[0];
+	phiPlus_ =  index[1];
+	nstubs_ = nstubsall_[index];
+      }
+    } else {
+      istub_++;
+    }
+  }
+  
+  //Read stub memory and extract data fields
+  ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
+  stubdata_ = stubmem[bx&1][stubadd];
+  projfinephi__ = projfinephi_;
+  projfinezadj_ = projfinezadj;
+  isPSseed_ = isPSseed;
+  projrinv_ = projrinv;
+  projbuffer__ = projbuffer_;
+  projseq__ = projseq_;
+  good_ =  process;
 
    
 } // end step

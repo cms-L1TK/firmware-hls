@@ -634,24 +634,6 @@ void MatchProcessor(BXType bx,
     std::cout << std::endl;
     */
 
-    
-    ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
-    ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
-    ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
-
-    projseq01tmp = Bit01 ? projseqs[0] : projseqs[1];
-    projseq23tmp = Bit23 ? projseqs[2] : projseqs[3];
-    
-    ap_uint<1> Bit0123 = projseq01tmp < projseq23tmp;
-
-    projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
-    
-    ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
-
-    ap_uint<1> hasMatch = !emptys[bestiMEU];
-
-    
-
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
     ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
