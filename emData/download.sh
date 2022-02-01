@@ -16,12 +16,14 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/sZZkyWoanuxm7Dt/download"
 
 #### fw_synch_210611 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
+#memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
 # Combined modules
 #memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
 #luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
 # Combined modules
+memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_220201.tgz"
+luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_220201.tgz"
 memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_220131.tgz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_220131.tgz"
 
