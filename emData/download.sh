@@ -9,8 +9,37 @@ luts_url="https://cernbox.cern.ch/index.php/s/QrErkEnyeofDGvz/download"
 memprints_url_reduced="https://cernbox.cern.ch/index.php/s/v4V0WnuYSI5jo6e/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/sZZkyWoanuxm7Dt/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/woYJVKwlTBACsI9/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/gWJOOkLuw9fZkag/download"
+#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
+#luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
+
+
+
+#### fw_synch_210611 ####
+# Standard configuration
+memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
+luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
+# Combined modules
+#memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
+#luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
+# Combined modules
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_220131.tgz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_220131.tgz"
+
+#### fw_synch_210503 ####
+# Standard configuration
+#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
+# Combined modules
+#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
+#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
+
+#### fw_synch_201005 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
+
+#### fw_synch_200515 ####
+#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
+#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
