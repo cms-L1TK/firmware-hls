@@ -5,9 +5,8 @@ from __future__ import absolute_import, print_function
 
 # This script generates VMRouterCM_parameters.h, VMRouterCMTop.h, 
 # and VMRouterCMTop.cc for the Combined Module VMR in the TopFunctions/ directory. 
-# Supports all VMRs, but creates separate top function files each
-# VMR specified. VMRouterCM_parameters.h contains magic numbers 
-# for all "default" VMRs plus additonals VMR if specified.
+# Supports all VMRs, but creates separate top function files foe each
+# VMR specified. VMRouterCM_parameters.h contains functions magic numbers.
 
 import argparse
 import collections
@@ -19,9 +18,6 @@ num_disks = 5
 # Number of bits for RZ bins, for the VMSME memories
 nbits_me_layer = 3
 nbits_me_disk = 4
-
-# The VMRs specified in download.sh
-default_vmr_list = ["VMR_L1PHIA", "VMR_L2PHIA", "VMR_L3PHIA" ,"VMR_L4PHIA", "VMR_L5PHIA", "VMR_L6PHIA", "VMR_D1PHIA", "VMR_D2PHIA", "VMR_D3PHIA", "VMR_D4PHIA", "VMR_D5PHIA"]
 
 # Lists of which layer/disk has AllStubInner ans VMSTE memories
 has_allstub_inner = [True, True, True, False, True, False, True, False, True, False, False]
@@ -149,9 +145,7 @@ def getAllStubInnerMaskString(mem_list):
 ##########################################
 # Writes the VMRouterCM_parameters.h file
 
-# Contains magic numbers for all default VMRs specified in download.sh
-# and the specified units under test if non-default. Make sure to add
-# non-default VMRs to download.sh and run it before running Vivado HLS
+# Contains magic numbers for all VMRs specified in download.sh
 
 def writeParameterFile(vmr_list, mem_dict, output_dir):
 
@@ -324,7 +318,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 #################################
 # Writes the VMRouterCMTop.h file
 
-def writeTopHeader(vmr_specific_name, vmr, output_dir):
+def writeTopHeader(vmr, output_dir):
 
     # Get layer/disk number and phi region
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
@@ -333,7 +327,7 @@ def writeTopHeader(vmr_specific_name, vmr, output_dir):
     phi_region = vmr.split("PHI")[1]
 
     # Top file name
-    file_name = "VMRouterCMTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
+    file_name = "VMRouterCMTop_" + vmr.split("_")[1]
 
     header_file = open(output_dir + "/" + file_name  + ".h", "w")
 
@@ -405,7 +399,7 @@ def writeTopHeader(vmr_specific_name, vmr, output_dir):
 
 
 # Writes the VMRouterCMTop.cc file
-def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s, output_dir):
+def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
 
     # Get layer/disk number
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
@@ -413,7 +407,7 @@ def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s, output_d
     layerdisk = layer-1 if layer else disk+num_layers-1
 
     # Top file name
-    file_name = "VMRouterCMTop" + ("_" + vmr.split("_")[1] if vmr_specific_name else "")
+    file_name = "VMRouterCMTop_" + vmr.split("_")[1]
 
     top_file = open(output_dir + "/" + file_name  + ".cc", "w")
 
@@ -503,7 +497,6 @@ VMRouterCM_parameters.h contains the magic numbers for the specified units under
 
 Examples:
 python3 generate_VMRCM.py
-python3 generate_VMRCM.py --uut VMR_L1PHIE -o
 python3 generate_VMRCM.py --uut VMR_L1PHIE VMR_L1PHID
 python3 generate_VMRCM.py -a
 """,
@@ -511,8 +504,6 @@ python3 generate_VMRCM.py -a
     )
 
     parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMRouterCMs in a nonant.")
-    parser.add_argument("-d", "--default", default=False, action="store_true", help="Create files for VMRs: " + " ".join(vmr for vmr in default_vmr_list) + "(default = %(default)s)")
-    parser.add_argument("-O", "--overwrite", default=False, action="store_true", help="Overwrite the default VMRouterCMTop.h/cc files (instead of creating files e.g. VMRouterCMTop_L1PHIE.h/cc). Only works if a single VMR has been specified (default = %(default)s)")
     parser.add_argument("--uut", default=["VMR_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
     parser.add_argument("-o", "--outputdir", type=str, default="../TopFunctions/", help="The directory in which to write the output files (default=%(default)s)")
     parser.add_argument("-w", "--wireconfig", type=str, default="LUTsCM/wires.dat",
@@ -520,20 +511,9 @@ python3 generate_VMRCM.py -a
 
     args = parser.parse_args()
 
-    # Include the VMR name in the names of VMRouterCMTop files
-    if len(args.uut) > 1 or not args.overwrite or args.all:
-        vmr_specific_name = True
-    else:
-        vmr_specific_name = False
-
     # Get a list of the Units Under Test
     if args.all:
         vmr_list = getAllVMRs(args.wireconfig)
-    elif args.default:
-        vmr_list = default_vmr_list.copy()
-        # Add explicitly defined UUTs if any
-        for vmr in args.uut:
-            if vmr not in vmr_list: vmr_list.append(vmr)
     else:
         vmr_list = args.uut
     vmr_list.sort()
@@ -548,8 +528,8 @@ python3 generate_VMRCM.py -a
             raise IndexError("Unit under test has to be a VMR.")
 
         # Create and write the files
-        writeTopHeader(vmr_specific_name, vmr, args.outputdir)
-        writeTopFile(vmr_specific_name, vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]), args.outputdir)
+        writeTopHeader(vmr, args.outputdir)
+        writeTopFile(vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]), args.outputdir)
 
     # Write parameters file
     writeParameterFile(vmr_list, mem_dict, args.outputdir)
