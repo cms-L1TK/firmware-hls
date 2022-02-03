@@ -59,6 +59,23 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
     # Calculate parameters and print out top function for each TB.
     for tbName in sorted(tparMems.keys()):
         seed = re.sub(r"FT_(....)", r"\1", tbName)
+        seedNumber = None
+        if seed == "L1L2":
+            seedNumber = 0
+        elif seed == "L2L3":
+            seedNumber = 1
+        elif seed == "L3L4":
+            seedNumber = 2
+        elif seed == "L5L6":
+            seedNumber = 3
+        elif seed == "D1D2":
+            seedNumber = 4
+        elif seed == "D3D4":
+            seedNumber = 5
+        elif seed == "L1D1":
+            seedNumber = 6
+        elif seed == "L2D1":
+            seedNumber = 7
 
         # numbers of memories
         nTPARMem = len(tparMems[tbName])
@@ -68,6 +85,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # offset for input TPAR memories
         firstTPAR = sorted(tparMems[tbName])[0]
         tparOffset = ord(firstTPAR[-1]) - ord('A')
+        tparOffset += (seedNumber << 4)
 
         # numbers of output stubs
         nBarrelStubs = len({fm[0:10] for fm in barrelFMMems[tbName]})
@@ -120,7 +138,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<" + str(nBarrelFMMem) + ", " + str(nDiskFMMem) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMem) + ", " + str(nDiskFMMem) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
             "    bx,\n"
             "    trackletParameters,\n"
             "    barrelFullMatches,\n"
