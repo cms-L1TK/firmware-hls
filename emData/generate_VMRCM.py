@@ -6,7 +6,7 @@ from __future__ import absolute_import, print_function
 # This script generates VMRouterCM_parameters.h, VMRouterCMTop.h, 
 # and VMRouterCMTop.cc for the Combined Module VMR in the TopFunctions/ directory. 
 # Supports all VMRs, but creates separate top function files foe each
-# VMR specified. VMRouterCM_parameters.h contains functions magic numbers.
+# VMR specified. VMRouterCM_parameters.h contains functions and magic numbers.
 
 import argparse
 import collections
@@ -145,7 +145,8 @@ def getAllStubInnerMaskString(mem_list):
 ##########################################
 # Writes the VMRouterCM_parameters.h file
 
-# Contains magic numbers for all VMRs specified in download.sh
+# Contains magic numbers for all VMRs specified.
+# Make sure to add VMRs to download.sh and run it before running Vivado HLS.
 
 def writeParameterFile(vmr_list, mem_dict, output_dir):
 
