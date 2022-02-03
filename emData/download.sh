@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_220119 ####
+#### fw_synch_220202 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/vAfyJjW9lnt2umq/download"
-luts_url="https://cernbox.cern.ch/index.php/s/qtjreIKNQptIx4C/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/RAtwceLeC71dWeJ/download"
+luts_url="https://cernbox.cern.ch/index.php/s/QrErkEnyeofDGvz/download"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/Ti0rvdEvO9eGjex/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/xDHW9JkScoaLZWQ/download"
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/TFeEIreRNioZwd4/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/hCx0O6H6XViPXZo/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/Re6LNnuYtkeQelx/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/HPrlPfUXpsBIAT6/download"
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/woYJVKwlTBACsI9/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/gWJOOkLuw9fZkag/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
