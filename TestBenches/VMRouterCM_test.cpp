@@ -1,7 +1,7 @@
 // Test bench for VMRouter Combined Modules
 
 // To run a different phi region, change the following:
-//          - change the top function and header file: TOP_FUNC_, HEADER_FILE_
+//          - change the top function and header file (TOP_FUNC_, HEADER_FILE_)
 //          - add the phi region in emData/download.sh, make sure to also run clean
 //          - run emData/generate_VMRCM.py to generate new top and parameters files
 

@@ -3,10 +3,10 @@
 ## python 2/3 inter-compatibility
 from __future__ import absolute_import, print_function
 
-# This script generates VMRouterCM_parameters.h, VMRouterCMTop.h, 
-# and VMRouterCMTop.cc for the Combined Module VMR in the TopFunctions/ directory. 
-# Supports all VMRs, but creates separate top function files foe each
-# VMR specified. VMRouterCM_parameters.h contains functions and magic numbers.
+# This script generates VMRouterCM_parameters.h, VMRouterCMTop.h,
+# and VMRouterCMTop.cc for the Combined Module VMR in the TopFunctions/ directory.
+# Supports all VMRs, but creates separate top function files foe each VMR specified.
+# VMRouterCM_parameters.h contains functions and magic numbers.
 
 import argparse
 import collections
@@ -364,8 +364,11 @@ def writeTopHeader(vmr, output_dir):
         "constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories\n"
         "// Number of bits for the RZ bins \n"
         "constexpr int kNbitsrzbinME = getMEBits<layerdisk>(); // For the VMSME memories\n"
-        "\n"
-        "\n"
+        "\n\n"
+    )
+
+    # Write the top function
+    header_file.write(
         "/////////////////////////////////////////////////////\n"
         "// VMRouterCM Top Function\n"
         "\n"
@@ -399,7 +402,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
 
     top_file = open(output_dir + "/" + file_name  + ".cc", "w")
 
-    # Write top function
+    # Write the top function
     top_file.write(
         "#include \"" + file_name + ".h\"\n\n" +\
         "// VMRouterCM Top Function\n"
