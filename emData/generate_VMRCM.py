@@ -177,6 +177,8 @@ template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();
 template<TF::layerDisk LayerDisk> const int* getMETable();
 template<TF::layerDisk LayerDisk> const int* getTETable();
 template<TF::layerDisk LayerDisk> constexpr int getMEBits();
+template<TF::layerDisk LayerDisk> constexpr regionType getInputType();
+template<TF::layerDisk LayerDisk> constexpr regionType getOutputType();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputsDisk2S();
 template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASCopies();
@@ -235,6 +237,7 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
             +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
             "}\n"
         )
+
     # Write kNbitsrzbinME
     parameter_file.write("\n// kNbitsrzbinME\n")
     for i in range(num_layers):
@@ -247,6 +250,36 @@ template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerM
         parameter_file.write(
             "template<> constexpr int getMEBits<TF::D" + str(i+1) + ">(){\n"
             "  return " + str(nbits_me_disk) + ";\n"
+            "}\n"
+        )
+
+    # Write InputType functions
+    parameter_file.write("\n// InputType\n")
+    for i in range(num_layers):
+        parameter_file.write(
+            "template<> constexpr regionType getInputType<TF::L" + str(i+1) + ">(){\n"
+            "  return " + ("BARRELPS" if i < 3 else "BARREL2S") + ";\n"
+            "}\n"
+        )
+    for i in range(num_disks):
+        parameter_file.write(
+            "template<> constexpr regionType getInputType<TF::D" + str(i+1) + ">(){\n"
+            "  return DISKPS;\n"
+            "}\n"
+        )
+
+    # Write OutputType functions
+    parameter_file.write("\n// OutputType\n")
+    for i in range(num_layers):
+        parameter_file.write(
+            "template<> constexpr regionType getOutputType<TF::L" + str(i+1) + ">(){\n"
+            "  return " + ("BARRELPS" if i < 3 else "BARREL2S") + ";\n"
+            "}\n"
+        )
+    for i in range(num_disks):
+        parameter_file.write(
+            "template<> constexpr regionType getOutputType<TF::D" + str(i+1) + ">(){\n"
+            "  return DISK;\n"
             "}\n"
         )
 
@@ -314,15 +347,6 @@ def writeTopHeader(vmr_specific_name, vmr, output_dir):
 // VMRouterCM Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 
-// To run a different phi region, change the following:
-//          - add the phi region in emData/download.sh, make sure to also run clean
-//
-//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
-//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
-//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
-//          OR
-//          - run emData/generate_VMRCM.py to generate new top and parameters files
-
 ////////////////////////////////////////////
 // Variables for that are specified with regards to the VMR region
 
@@ -345,6 +369,9 @@ def writeTopHeader(vmr_specific_name, vmr, output_dir):
 
 constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);
 
+constexpr regionType inputType = getInputType<layerdisk>();
+constexpr regionType outputType = getOutputType<layerdisk>();
+
 // Number of inputs
 constexpr int numInputs = getNumInputs<layerdisk, phiRegion>(); // Number of input memories, EXCLUDING DISK2S
 constexpr int numInputsDisk2S = getNumInputsDisk2S<layerdisk, phiRegion>(); // Number of DISK2S input memories
@@ -360,20 +387,6 @@ constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Oute
 static const ap_uint<maskASIsize> maskASI = getAllStubInnerMask<layerdisk, phiRegion>();
 
 constexpr int kNbitsrzbinME = getMEBits<layerdisk>(); // Number of bits for the RZ bins, for the VMSME memories
-
-#if kLAYER == kDISK
-#error kLAYER and kDISK can not be the same
-#elif kLAYER > 0
-	// What regionType the input/output is
-	constexpr regionType inputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
-	constexpr regionType outputType = (kLAYER > 3) ? BARREL2S : BARRELPS;
-#elif kDISK > 0
-	// What regionType the input/output is
-	constexpr regionType inputType = DISKPS;
-	constexpr regionType outputType = DISK;
-#else
-#error Need to have either kLAYER or kDISK larger than 0.
-#endif
 
 
 /////////////////////////////////////////////////////
@@ -418,14 +431,6 @@ def writeTopFile(vmr_specific_name, vmr, num_inputs, num_inputs_disk2s, output_d
 
 // VMRouterCM Top Function
 // Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-// To run a different phi region, change the following:
-//          - add the phi region in emData/download.sh, make sure to also run clean
-//
-//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
-//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
-//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
-//          OR
-//          - run emData/generateCM_VMR.py to generate new top and parameters files
 
 void %s(const BXType bx, BXType& bx_o
 	// Input memories
