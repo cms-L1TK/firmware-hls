@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_220202 ####
+#### reduced config ####
+#### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
+# 1 event
+#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
+# 100 events
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
+
+#### test 211005/211217 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/RAtwceLeC71dWeJ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/QrErkEnyeofDGvz/download"
-# Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/v4V0WnuYSI5jo6e/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/sZZkyWoanuxm7Dt/download"
+#memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
+#luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
 # Combined modules
 #memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
 #luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
