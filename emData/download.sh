@@ -2,6 +2,15 @@
 set -e
 
 #### cf02dd85ddc0d94cc472de3f9c927777ee776980 ####
+#### reduced config ####
+#### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
+# 1 event
+#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
+# 100 events
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
+
+#### test 211005/211217 ####
 # Standard configuration
 memprints_url="https://cernbox.cern.ch/index.php/s/Bpr6OgCy1RDpxhp/download"
 luts_url="https://cernbox.cern.ch/index.php/s/LOOp9YhohNTy80H/download"
