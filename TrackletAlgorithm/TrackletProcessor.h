@@ -299,7 +299,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
     bool valid_t=abs(*t)>floatToInt(1.0, kt);
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
-    bool valid_r=rD[i] >= 342 && rD[i] <= 2048;
+    bool valid_r=rD[i] >= 342 && rD[i] < 2048;
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
 
   }
@@ -337,7 +337,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
       proj_success = false;
   }
   else {
-    if (proj.getR() < floatToInt(20.0, 2*kr) || proj.getR() > floatToInt(120.0, 2*kr))
+    if (proj.getR() < floatToInt(20.0, 2*kr) || proj.getR() >= floatToInt(120.0, 2*kr))
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
