@@ -53,7 +53,7 @@ def getDictOfMemories(wireconfig, vmr_list):
                     if "IL_D" in mem_name and "2S" in mem_name:
                         mem_type = mem_type + "_DISK2S_" + vmr
                     elif "TEI" in line:
-                        phi_region = mem_name.split("PHI")[1]
+                        phi_region = mem_name.split("PHI")[1][0]
                         if phi_region <= "L":
                             mem_type = mem_type + "I_" + vmr
                         else: # Overlap
