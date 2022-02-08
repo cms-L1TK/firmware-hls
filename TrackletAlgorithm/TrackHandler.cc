@@ -43,28 +43,21 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
   if (matchesFound >= mergeCondition){
     matchFound = 1;
     #ifndef _SYNTHESIS_
-    std::cout << "It's a merge" << std::endl;
+    // std::cout << "It's a merge" << std::endl;
     #endif
     // update master track
     // check whether the stub word is non-zero in the compared track
     // then add stub into master track
     for(int layerIndex = 0; layerIndex < 4; layerIndex++){
       #ifndef _SYNTHESIS_
-      // std::cout << "layerIndex: " << layerIndex << " masterTrackBarrel:  " << barrelStubArray[layerIndex][0] << " comparedTrackBarrel: " << track.barrelStubArray[layerIndex][0] << std::endl;
-      // std::cout << "layerIndex: " << layerIndex << " masterTrackDisk:  " << diskStubArray[layerIndex][0] << " comparedTrackDisk: " << track.diskStubArray[layerIndex][0] << std::endl;
+      // std::cout << "masterTrackWord: " << trkWord << " trackWord: " << track.trkWord << " layerIndex: " << layerIndex << " masterTrackBarrel:  " << barrelStubArray[layerIndex][0] << " comparedTrackBarrel: " << track.barrelStubArray[layerIndex][0] << std::endl;
+      // std::cout << "masterTrackWord: " << trkWord << " trackWord: " << track.trkWord << " layerIndex: " << layerIndex << " masterTrackDisk:  " << diskStubArray[layerIndex][0] << " comparedTrackDisk: " << track.diskStubArray[layerIndex][0] << std::endl;
       #endif
       if((barrelStubArray[layerIndex][0] == 0) && (track.barrelStubArray[layerIndex][0] != 0)){
-        // print out if condition is matched
-        #ifndef _SYNTHESIS_
-        // std::cout << "condition met for barrel" << std::endl;
-        #endif
         barrelStubArray[layerIndex][0] = track.barrelStubArray[layerIndex][0];
 
       }
       if((diskStubArray[layerIndex][0] == 0) && (track.diskStubArray[layerIndex][0] !=0)){
-        #ifndef _SYNTHESIS_
-        // std::cout << "condition met for disk" << std::endl;
-        #endif
         diskStubArray[layerIndex][0] = track.diskStubArray[layerIndex][0];
       }
       

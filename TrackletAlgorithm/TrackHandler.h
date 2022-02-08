@@ -26,7 +26,7 @@ class TrackHandler{
       for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
         barrelStubArray[j][0] = barrelStubWords[j];
         #ifndef _SYNTHESIS_
-        std::cout << "brlStub: " << j << " " << barrelStubArray[j][0] << std::endl;
+        // std::cout << "brlStub: " << j << " " << barrelStubArray[j][0] << std::endl;
         #endif
       }
 
