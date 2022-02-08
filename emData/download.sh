@@ -6,8 +6,8 @@ set -e
 memprints_url="https://cernbox.cern.ch/index.php/s/RAtwceLeC71dWeJ/download"
 luts_url="https://cernbox.cern.ch/index.php/s/QrErkEnyeofDGvz/download"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/TFeEIreRNioZwd4/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/hCx0O6H6XViPXZo/download"
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/v4V0WnuYSI5jo6e/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/sZZkyWoanuxm7Dt/download"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/woYJVKwlTBACsI9/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/gWJOOkLuw9fZkag/download"
