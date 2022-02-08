@@ -36,7 +36,7 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("output_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged output_TrackFit_TF_L1L2*
   // Loop over events
   for (unsigned int ievt = 0; ievt < 1; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
@@ -61,7 +61,7 @@ int main(){
     // Set input memories into arrays of input track/stub words
     for(unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
       TrackFit track;
-      track = inputTracks.read_mem(bx, i);
+      track = inputTracks.read_mem(bx, i+1);
       trackWord[i] = track.getTrackWord();
       ap_uint<TrackFit::kTFStubIndexSize> stubIndex;
        for (unsigned short j = 0; j < 4; j++){
@@ -109,11 +109,9 @@ int main(){
         // std::cout << "DiskStubIndex: " << stubIndex << " at track:  " << i << std::endl;
         }
       }
-      std::cout << "i: " << i << " trkWord[i]: " << trackWord[i] << " brl1: " << barrelStubWords[0][i] << " brl2: " << barrelStubWords[1][i] << " brl3: " << barrelStubWords[2][i] << " brl4: " << barrelStubWords[3][i] <<  " disk1: " << diskStubWords[0][i] << " disk2: " << diskStubWords[1][i] << " disk3: " << diskStubWords[2][i] << " disk4: " << diskStubWords[3][i] <<  std::endl;
+      // std::cout << "i: " << i << " trkWord[i]: " << std::hex << trackWord[i] << " brl1: " << std::hex << barrelStubWords[0][i] << " brl2: " << std::hex << barrelStubWords[1][i] << " brl3: " << std::hex << barrelStubWords[2][i] <<  " brl4: " << std::hex << barrelStubWords[3][i] <<  " disk1: " << std::hex << diskStubWords[0][i] << " disk2: " << std::hex << diskStubWords[1][i] << " disk3: " << std::hex << diskStubWords[2][i] << " disk4: " << std::hex << diskStubWords[3][i] <<  std::endl;
 
     }
-
-
     // Unit under test
     TrackMergerTop(bx,
     trackWord,
@@ -140,17 +138,18 @@ int main(){
       track.setDiskStubWord<5>(diskStubWords_o[1][i]);
       track.setDiskStubWord<6>(diskStubWords_o[2][i]);
       track.setDiskStubWord<7>(diskStubWords_o[3][i]);
-    
+        
       outputTracks.write_mem(bx, track, i );
 
       // if(trackWord_o[i] == 0 && barrelStubWords_o[0][i] == 0 && barrelStubWords_o[1][i] == 0 && barrelStubWords_o[2][i] == 0 && barrelStubWords_o[3][i] == 0){
-      std::cout << "i: " << i << " trkWord_o[i]: " << trackWord_o[i] << " brl1: " << barrelStubWords_o[0][i] << " brl2: " << barrelStubWords_o[1][i] << " brl3: " << barrelStubWords_o[2][i] << " brl4: " << barrelStubWords_o[3][i] <<  " disk1: " << diskStubWords_o[0][i] << " disk2: " << diskStubWords_o[1][i] << " disk3: " << diskStubWords_o[2][i] << " disk4: " << diskStubWords_o[3][i] <<  std::endl;
-      // }
+      // std::cout << "i: " << i << " trkWord_o[i]: " << std::hex << trackWord_o[i] << " brl1: " << std::hex << barrelStubWords_o[0][i] << " brl2: " << std::hex << barrelStubWords_o[1][i] << " brl3: " << std::hex << barrelStubWords_o[2][i] << " brl4: " << std::hex << barrelStubWords_o[3][i] <<  " disk1: " << std::hex << diskStubWords_o[0][i] << " disk2: " << std::hex << diskStubWords_o[1][i] << " disk3: " << std::hex << diskStubWords_o[2][i] << " disk4: " << std::hex << diskStubWords_o[3][i] <<  std::endl;
+       // }
     }
-
+    
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
-
+    // return 0;
+    
   }
 
   // Handling case of err%256 == 0 
