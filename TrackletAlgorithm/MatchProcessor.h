@@ -570,6 +570,12 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
+#ifndef __SYNTHESIS__
+  for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+    matchengine[iMEU].setUnit(iMEU);
+  }
+#endif
+
   //These are used inside the MatchCalculator method and needs to be retained between iterations
   ap_uint<1> savedMatch;
   ap_uint<17> best_delta_phi;
@@ -680,8 +686,7 @@ void MatchProcessor(BXType bx,
 
       if(idle && !empty && !init) {
         init =  true;
-        auto iphi = tmpprojbuff.getPhi();
-        meu.init(bx, tmpprojbuff, istep, iphi, iMEU);
+        meu.init(bx, tmpprojbuff, istep);
       }
 
       else meu.step(instubdata.getMem(iMEU));

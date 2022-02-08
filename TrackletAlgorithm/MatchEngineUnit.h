@@ -15,12 +15,6 @@
 #include <bitset>
 #include "MatchEngineUnit_parameters.h"
 
-template<int nbits>
-static const ap_uint<1 << nbits> hasOneStub() {
-  ap_uint<1 << nbits> onlyOneStub(0);
-  onlyOneStub[1] = 1;
-  return onlyOneStub;
-}
 
 template<int VMProjType> class MatchEngineUnitBase {};
 
@@ -60,10 +54,10 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     auto stubfinephi=stubdata__.getFinePhi();
     auto stubbend=stubdata__.getBend();
     
-    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi__,stubfinephi)];
+    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
     
     //Check if stub z position consistent
-    bool pass = isPSseed___ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj__)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj__)];
+    bool pass = isPSseed___ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj___)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj___)];
 
     auto const index=projrinv___.concat(stubbend);
 
@@ -79,26 +73,30 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     //update pipeline variables
     good___ = good__;
     stubdata__ = stubdata_;
-    projfinephi__ = projfinephi_;
-    projfinezadj__ = projfinezadj_;
+    projfinephi___ = projfinephi__;
+    projfinezadj___ = projfinezadj__;
     isPSseed___ = isPSseed__;
     projrinv___ = projrinv__;
     projbuffer___ = projbuffer__;
     projseq___ = projseq__;
   }
 
+#ifndef __SYNTHESIS__
+  inline void setUnit(int unit) {
+    unit_ = unit;
+  }
 
-  inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, ap_uint<kNBits_MemAddr> projseq, int iphi, int unit) {
+#endif
+
+  inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, ap_uint<kNBits_MemAddr> projseq) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
   idle_ = false;
-  bx = bxin;
+  bx_ = bxin;
   istub_ = 0;
-  unit_ = unit;
 
   projbuffer_ = projbuffer;
   projseq_ = projseq;
-  projindex = projbuffer.getIndex();
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   shift_ = projbuffer.shift();
   stubmask_[0] = nstubsall_[0]!=0;
@@ -110,9 +108,8 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   second_ = index[0];
   phiPlus_ = index[1];
   nstubs_ = nstubsall_[index];
-  ivmphi = projbuffer.getPhi();
-  iphi_ = iphi;
-  tcid=projbuffer.getTCID();
+  iphi_ = projbuffer.getPhi();
+  tcid_ = projbuffer.getTCID();
 
   good__ = false;
 
@@ -128,7 +125,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
  }
  
  inline bool nearFull() {
-   return nearFullLUT[(readindex_,writeindex_)];
+   return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
  inline bool idle() {
@@ -166,7 +163,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   if (good__) {
     return projbuffer__.getTCID();
   } 
-  return tcid;
+  return tcid_;
 }
 
 
@@ -195,7 +192,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
     return (projbuffer__.getTCID(), allproj.getTrackletIndex());
   } 
   AllProjection<AllProjectionType> allproj(projbuffer_.getAllProj());
-  return (tcid, allproj.getTrackletIndex());
+  return (tcid_, allproj.getTrackletIndex());
 }
 
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
@@ -250,11 +247,8 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
   bool nearfull = nearFull();
-  
-  //good__ = idle_ ? false : good__;
-  //good__ = nearfull ? false : good__;
 
-  bool process = (!idle_) && (!nearfull);
+  good__ = (!idle_) && (!nearfull);
 
   // Buffer still has projections to read out
   //If the buffer is not empty we have a projection that we need to 
@@ -268,31 +262,30 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   if(zero<kNBits_MemAddrBinned>()[istub_]) {
      
     //Need to read the information about the proj in the buffer
-    //FIXME - should this not be in init method?
-
     VMProjection<BARREL> data(projbuffer_.getProjection());
-    zbin=data.getZBin().range(3,1); //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
+
+    //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
+    zbin = data.getZBin().range(3,1); 
     
-    projindex = data.getIndex();
     auto projfinez = data.getFineZ();
-    projfinephi_ = data.getFinePhi();
+    projfinephi__ = data.getFinePhi();
      
     //Calculate fine z position
     if (second_) {
-      projfinezadj_ = projfinez-8;
+      projfinezadj__ = projfinez-8;
       zbin=zbin+1;
     } else {
-      projfinezadj_ = projfinez;
+      projfinezadj__ = projfinez;
     }
 
     if (!phiPlus_) {
       if (shift_==-1) {
-	projfinephi_ -= 8;
+	projfinephi__ -= 8;
       }
     } else {
       //When we get here shift_ is either 1 or -1
       if (shift_==1) {
-	projfinephi_ += 8;
+	projfinephi__ += 8;
       }
     }
 
@@ -302,7 +295,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   }
    
   //Check if last stub, if so, go to next buffer entry 
-  if (process) {
+  if (good__) {
     if (istub_+1>=nstubs_){
       istub_=0;
       if (!stubmask_) {
@@ -321,55 +314,55 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   
   //Read stub memory and extract data fields
   ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
-  stubdata_ = stubmem[bx&1][stubadd];
+  stubdata_ = stubmem[bx_&1][stubadd];
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
-  good__ =  process;
 
    
 } // end step
 
  private:
 
-
+ //Buffers for the matches
  INDEX writeindex_, readindex_;
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+ ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
+ //Current projection
  ap_uint<4> nstubsall_[4];
- NSTUBS nstubs_;
+ NSTUBS nstubs_, istub_;
  ap_uint<4> stubmask_;
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
  ap_int<2> shift_;
  bool idle_;
- int ivmphi;
- int unit_;  // only used for debugging to identify MEU
  ap_uint<3> iphi_;
- BXType bx;
+ BXType bx_;
  bool empty_;
- NSTUBS istub_=0;
  VMStubMECM<VMSMEType> stubdata_, stubdata__; 
- bool good__, good___;
- ap_int<5> projfinephi_, projfinephi__; //FIXME Need replace 5 with const
- ap_int<5> projfinezadj_, projfinezadj__; //FIXME Need replace 5 with const
- bool isPSseed__, isPSseed___;
- VMProjection<BARREL>::VMPRINV projrinv__, projrinv___;
-
- ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_, projbuffer__, projbuffer___;
-
- ap_uint<kNBits_MemAddr> projseq_, projseq__, projseq___;
-
- ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
-
- typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid;
+ typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid_;
+ ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
+ ap_uint<kNBits_MemAddr> projseq_;
  bool isPSseed_;
+
+
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::VMPZBINNOFLAG zbin;
 
- VMProjection<BARREL>::VMPID projindex;
+ //Pipeline variables
+ bool good__, good___;
+ ap_int<5> projfinephi__, projfinephi___; //FIXME Need replace 5 with const
+ ap_int<5> projfinezadj__, projfinezadj___; //FIXME Need replace 5 with const
+ bool isPSseed__, isPSseed___;
+ VMProjection<BARREL>::VMPRINV projrinv__, projrinv___;
+ ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___;
+ ap_uint<kNBits_MemAddr> projseq__, projseq___;
 
- ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> nearFullLUT = nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
 
- ap_uint<1<<(kNBits_MemAddrBinned+2)> onlyOneStub = hasOneStub<kNBits_MemAddrBinned+2>();
+#ifndef __SYNTHESIS__
+ // only used for debugging to identify MEU
+ int unit_;  
+#endif
+
  
 }; // end class
 
