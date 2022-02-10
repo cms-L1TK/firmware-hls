@@ -26,21 +26,12 @@
 #include "DummyMessageLogger.h"
 #endif
 #endif
+
 /////////////////////////////////////////
 // Constants
 
 // Number of bits used for the TE in disks
 constexpr int nbitsvmtedisk[trklet::N_DISK] = { 3, 3, 0, 3, 0 };
-
-// Number of most significant bits (MSBs) of z and r used for index in the LUTs
-constexpr int nbitsztablelayer = 7;
-constexpr int nbitsrtablelayer = 4;
-
-constexpr int nbitsztabledisk = 3;
-constexpr int nbitsrtabledisk = 8;
-
-// Number of MSBs used for r index in phicorr LUTs
-constexpr int nbitsrphicorrtable = 3;
 
 // The length of the masks used for the memories
 constexpr int maskASIsize = 12; // Allstub Inner memories
@@ -72,9 +63,9 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 
 	if (InType == DISKPS || InType == DISK2S) return phi; // Do nothing if disks
 
-	constexpr auto nrbins = 1 << nbitsrphicorrtable; // The number of bins for r
+	constexpr auto nrbins = 1 << kNbitsrzbin; // The number of bins for r
 
-	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
+	ap_uint<kNbitsrzbin> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - kNbitsrzbin); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * nrbins + rbin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
@@ -109,8 +100,8 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	int nbitsfinephi = stub.getFinePhi().length();  // Number of bits for finephi
 
 	// Number of bits for table indices
-	constexpr int nbitsztable = (Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
-	constexpr int nbitsrtable = (Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
+	constexpr int nbitsztable = (Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of MSBs of z used in LUT table
+	constexpr int nbitsrtable = (Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of MSBs of r used in LUT table
 	constexpr auto vmbits = (Layer) ? nbits_vmmeall[Layer-1] : ((isMEStub) ? nbits_vmmeall[trklet::N_LAYER+Disk-1] : nbitsvmtedisk[Disk-1]); // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[trklet::N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
