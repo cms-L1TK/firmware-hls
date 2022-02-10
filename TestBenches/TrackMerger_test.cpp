@@ -38,7 +38,7 @@ int main(){
 
   auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged output_TrackFit_TF_L1L2*
   // Loop over events
-  for (unsigned int ievt = 0; ievt < 1; ++ievt) {
+  for (unsigned int ievt = 0; ievt < 10; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
     
 
@@ -148,7 +148,7 @@ int main(){
     
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
-    // return 0;
+
     
   }
 
