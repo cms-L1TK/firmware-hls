@@ -463,13 +463,13 @@ def writeTopHeader(vmr, output_dir):
 
         # Write the configuration
         if layer:
-            nvm_tei = "nvmtelayers[kLAYER-1]" if layer != 2 else "nvmteextralayers[1]"
-            nvm_ol = "nvmollayers[kLAYER-1]" if layer < 3 else "1"
-            nvm_teo = "nvmtelayers[kLAYER-1]" if layer != 3 else "nvmteextralayers[1]"
+            nvm_tei = "(1 << nbits_vmte[kLAYER-1])" if layer != 2 else "(1 << nbits_vmte_extra[kLAYER-1])"
+            nvm_ol = "(1 << nbits_vmte_overlap[kLAYER-1])" if layer < 3 else "1"
+            nvm_teo = "(1 << nbits_vmte[kLAYER-1])" if layer != 3 else "(1 << nbits_vmte_extra[kLAYER-1])"
         else:
-            nvm_tei = "nvmtedisks[kDISK-1]"
+            nvm_tei = "(1 << nbits_vmte[trklet::N_LAYER+kDISK-1])"
             nvm_ol = "1"
-            nvm_teo = "nvmtedisks[kDISK-1]"
+            nvm_teo = "(1 << nbits_vmte[trklet::N_LAYER+kDISK-1])"
 
         header_file.write(
             "#define kLAYER %s // Which barrel layer number the data is coming from\n" %str(layer) +\
@@ -488,7 +488,7 @@ def writeTopHeader(vmr, output_dir):
             "constexpr int maxOLCopies = getNumVMSTEOLCopies<layerdisk, phiRegion>(); // TE Inner memories\n"
             "constexpr int maxTEOCopies = getNumVMSTEOCopies<layerdisk, phiRegion>(); // TE Outer memories\n"
             "// Number of VMs\n"
-            "constexpr int nvmME = %s; // ME memories\n" % ("nvmmelayers[kLAYER-1]" if layer else "nvmmedisks[kDISK-1]") +\
+            "constexpr int nvmME = %s; // ME memories\n" % ("(1 << nbits_vmmeall[kLAYER-1])" if layer else "(1 << nbits_vmmeall[trklet::N_LAYER+kDISK-1])") +\
             "constexpr int nvmTEI = %s; // TE Inner memories\n" % nvm_tei +\
             "constexpr int nvmOL = %s; // TE Inner Overlap memories, can't use 0 when we don't have any OL memories\n" % nvm_ol +\
             "constexpr int nvmTEO = %s; // TE Outer memories\n" % nvm_teo +\
@@ -513,7 +513,7 @@ def writeTopHeader(vmr, output_dir):
             + ("  const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S],\n" if disk else "") +\
             "  // Output memories\n"
             "  AllStubMemory<outputType> memoriesAS[maxASCopies],\n"
-            "  VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME> memoriesME[nvmME],\n"
+            "  VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME> memoriesME[nvmME]" + ("\n" if disk == 5 else ",\n")
             + ("  VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]" + (",\n" if has_vmste_overlap[layerdisk] or has_vmste_outer[layerdisk] else "") if has_vmste_inner[layerdisk] else "")
             + ("  VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]" + (",\n" if has_vmste_outer[layerdisk] else "") if has_vmste_overlap[layerdisk] else "")
             + ("  VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
@@ -548,7 +548,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             + ("  const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S],\n" if disk else "") +\
             "  // Output memories\n"
             "  AllStubMemory<outputType> memoriesAS[maxASCopies],\n"
-            "  VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME> memoriesME[nvmME],\n"
+            "  VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME> memoriesME[nvmME]" + ("\n" if disk == 5 else ",\n")
             + ("  VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]" + (",\n" if has_vmste_overlap[layerdisk] or has_vmste_outer[layerdisk] else "") if has_vmste_inner[layerdisk] else "")
             + ("  VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]" + (",\n" if has_vmste_outer[layerdisk] else "") if has_vmste_overlap[layerdisk] else "")
             + ("  VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
