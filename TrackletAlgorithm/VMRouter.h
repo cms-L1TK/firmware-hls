@@ -40,13 +40,15 @@
 constexpr float maxvmbins = 1 << nbits_maxvm; // How many bins nbits_maxvm would correspond to
 constexpr float maxvmolbins = 1 << nbits_maxvm_overlap; // Overlap
 
-constexpr int nbitsphiraw = 7; // Number of bits used for calculating iPhiRawPlus/Minus
+constexpr unsigned int nbitsphiraw = 7; // Number of bits used for calculating iPhiRawPlus/Minus
+
+// Number of rz bin bits for ME
+constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
+constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 
 // The length of the masks used for the memories
-constexpr int maskMEsize = 1 << nbits_maxvm; // ME memories
-constexpr int maskTEIsize = 1 << nbits_maxvm; // TEInner memories
+constexpr int masksize = 1 << nbits_maxvm;
 constexpr int maskOLsize = 1 << nbits_maxvm_overlap; // TEInner Overlap memories
-constexpr int maskTEOsize = 1 << nbits_maxvm; // TEOuter memories
 
 //////////////////////////////////////
 // Functions used by the VMR
@@ -527,13 +529,13 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 		// AllStub memory
 		AllStubMemory<OutType> memoriesAS[],
 		// ME memories
-		const ap_uint<maskMEsize>& maskME, VMStubMEMemory<OutType, NBitsMemAddr, NBitsBin> memoriesME[],
+		const ap_uint<masksize>& maskME, VMStubMEMemory<OutType, NBitsMemAddr, NBitsBin> memoriesME[],
 		// Inner TE memories, non-overlap
-		const ap_uint<maskTEIsize>& maskTEI, VMStubTEInnerMemory<OutType> memoriesTEI[][MaxTEICopies],
+		const ap_uint<masksize>& maskTEI, VMStubTEInnerMemory<OutType> memoriesTEI[][MaxTEICopies],
 		// TE Inner memories, overlap
 		const ap_uint<maskOLsize>& maskOL, VMStubTEInnerMemory<BARRELOL> memoriesOL[][MaxOLCopies],
 		// TE Outer memories
-		const ap_uint<maskTEOsize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies]) {
+		const ap_uint<masksize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies]) {
 
 #pragma HLS inline
 

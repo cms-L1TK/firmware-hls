@@ -170,7 +170,6 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
         "template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();\n"
         "template<TF::layerDisk LayerDisk> const int* getMETable();\n"
         "template<TF::layerDisk LayerDisk> const int* getTETable();\n"
-        "template<TF::layerDisk LayerDisk> constexpr int getMEBits();\n"
         "template<TF::layerDisk LayerDisk> constexpr regionType getInputType();\n"
         "template<TF::layerDisk LayerDisk> constexpr regionType getOutputType();\n"
         "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();\n"
@@ -228,21 +227,6 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
         parameter_file.write(
             "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
             +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
-            "}\n"
-        )
-
-    # Write kNbitsrzbinME
-    parameter_file.write("\n// kNbitsrzbinME\n")
-    for i in range(num_layers):
-        parameter_file.write(
-            "template<> constexpr int getMEBits<TF::L" + str(i+1) + ">(){\n"
-            "  return " + str(nbits_me_layer) + ";\n"
-            "}\n"
-        )
-    for i in range(num_disks):
-        parameter_file.write(
-            "template<> constexpr int getMEBits<TF::D" + str(i+1) + ">(){\n"
-            "  return " + str(nbits_me_disk) + ";\n"
             "}\n"
         )
 
@@ -363,7 +347,7 @@ def writeTopHeader(vmr, output_dir):
         "constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory\n"
         "constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories\n"
         "// Number of bits for the RZ bins \n"
-        "constexpr int kNbitsrzbinME = getMEBits<layerdisk>(); // For the VMSME memories\n"
+        "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
         "\n\n"
     )
 

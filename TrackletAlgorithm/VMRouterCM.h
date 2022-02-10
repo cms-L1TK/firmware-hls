@@ -33,6 +33,10 @@
 // Number of bits used for the TE in disks
 constexpr int nbitsvmtedisk[trklet::N_DISK] = { 3, 3, 0, 3, 0 };
 
+// Number of rz bin bits for ME
+constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
+constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
+
 // The length of the masks used for the memories
 constexpr int maskASIsize = 12; // Allstub Inner memories
 

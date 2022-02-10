@@ -219,7 +219,6 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
             "template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutOverlapTable();\n"
             "template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutOuterTable();\n"
             "\n"
-            "template<TF::layerDisk LayerDisk> constexpr int getMEBits();\n"
             "template<TF::layerDisk LayerDisk> constexpr regionType getInputType();\n"
             "template<TF::layerDisk LayerDisk> constexpr regionType getOutputType();\n"
             "\n"
@@ -312,21 +311,6 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
                 "}\n"
             )
 
-        # Write kNbitsrzbinME
-        parameter_file.write("\n// kNbitsrzbinME\n")
-        for i in range(num_layers):
-            parameter_file.write(
-                "template<> constexpr int getMEBits<TF::L" + str(i+1) + ">(){\n"
-                "  return " + str(nbits_me_layer) + ";\n"
-                "}\n"
-            )
-        for i in range(num_disks):
-            parameter_file.write(
-                "template<> constexpr int getMEBits<TF::D" + str(i+1) + ">(){\n"
-                "  return " + str(nbits_me_disk) + ";\n"
-                "}\n"
-            )
-
         # Write InputType functions
         parameter_file.write("\n// InputType\n")
         for i in range(num_layers):
@@ -378,7 +362,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
                 "template<> constexpr int getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
                 "  return " + str(bendcuttable_size[layer_disk_num-1]) + ";\n"
                 "}\n"
-                "template<> inline const ap_uint<maskMEsize> getMaskME<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", maskMEsize>(){\n"
+                "template<> inline const ap_uint<masksize> getMaskME<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", masksize>(){\n"
                 "  return " + (str(getMask(mem_dict["VMSME_" + vmr])) if ("VMSME_" + vmr in mem_dict) else "0") + ";\n"
                 "}\n"
                 )
@@ -403,7 +387,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
                     "template<> constexpr int getNum" + te_mem_type + "Copies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE" + te_mem_region + "memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.\n"
                     "  return " + str(max_copy_count) + ";\n"
                     "}\n"
-                    "template<> inline const ap_uint<mask" + te_mem_short + "size> getMask" + te_mem_short + "<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", mask" + te_mem_short + "size>(){\n"
+                    "template<> inline const ap_uint<mask%ssize> getMask" % (te_mem_short if te_mem_short == "OL" else "") + te_mem_short + "<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", mask%ssize>(){\n" % (te_mem_short if te_mem_short == "OL" else "") +\
                     "  return " + (str(getMask(mem_dict[te_mem_type + "_" + vmr])) if (te_mem_type + "_" + vmr in mem_dict) else "0") + ";\n"
                     "}\n"
                 )
@@ -494,9 +478,9 @@ def writeTopHeader(vmr, output_dir):
             "constexpr int nvmTEO = %s; // TE Outer memories\n" % nvm_teo +\
             "\n"
             "// Number of bits used to address the stubs\n"
-            "constexpr int kNBits_MemAddrME = kNBits_MemAddr%s;\n" % ("" if layer else "+1") +\
+            "constexpr int kNBits_MemAddrME = kNBits_MemAddr%s;\n" % ("" if layer else " + 1") +\
             "// Number of bits for the RZ bins \n"
-            "constexpr int kNbitsrzbinME = getMEBits<layerdisk>(); // For the VMSME memories\n"
+            "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
             "// Number of entries in each bendcut table\n"
             "constexpr int bendCutTableSize = getBendCutTableSize<layerdisk, phiRegion>();\n"
             "\n"
@@ -599,10 +583,10 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             "  // and a \"1\" implies that the specified memory is used for this phi region\n"
             "  // Create \"nvm\" 1s, e.g. \"1111\", shift the mask until it corresponds to the correct phi region\n"
             "\n"
-            "  static const ap_uint<maskMEsize> maskME = getMaskME<layerdisk, phiRegion, maskMEsize>(); // ME memories\n"
-            "  static const ap_uint<maskTEIsize> maskTEI = getMaskTEI<layerdisk, phiRegion, maskTEIsize>(); // TE Inner memories, only used for odd layers/disk and layer 2\n"
+            "  static const ap_uint<masksize> maskME = getMaskME<layerdisk, phiRegion, masksize>(); // ME memories\n"
+            "  static const ap_uint<masksize> maskTEI = getMaskTEI<layerdisk, phiRegion, masksize>(); // TE Inner memories, only used for odd layers/disk and layer 2\n"
             "  static const ap_uint<maskOLsize> maskOL = getMaskOL<layerdisk, phiRegion, maskOLsize>(); // TE Inner Overlap memories, only used for layer 1 and 2\n"
-            "  static const ap_uint<maskTEOsize> maskTEO = getMaskTEO<layerdisk, phiRegion, maskTEOsize>(); // TE Outer memories, only for even layers/disks, and layer and disk 1\n"
+            "  static const ap_uint<masksize> maskTEO = getMaskTEO<layerdisk, phiRegion, masksize>(); // TE Outer memories, only for even layers/disks, and layer and disk 1\n"
             "\n"
             "  /////////////////////////\n"
             "  // Main function\n"
