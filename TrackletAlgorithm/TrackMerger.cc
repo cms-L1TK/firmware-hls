@@ -31,7 +31,7 @@ void ComparisonModule::processTrack(){
     }
     if(masterTrack.getTrackWord() != track.getTrackWord()){
       masterTrack.CompareTrack(track);
-      // masterTrack.MergeTrack(track, matchFound, mergeCondition);
+      masterTrack.MergeTrack(track, matchFound, mergeCondition);
     }
     tracksProcessed++;
   }
@@ -161,10 +161,10 @@ void TrackMerger(const BXType bx,
         //or if the module has finished processing tracks, output the master
         if(activeModule == kNComparisonModules-1 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1){
         // fill the outputs with the trackWord, barrel and disk stubs
-          // unmergedTracks[unmergedOutputIndex] = trackWord[i];
+          unmergedTracks[unmergedOutputIndex] = trackWord[i];
           for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
-            // unmergedBarrelStubs[arrayIndex][unmergedOutputIndex] = barrelStubWords[arrayIndex][i];
-            // unmergedDiskStubs[arrayIndex][unmergedOutputIndex] = diskStubWords[arrayIndex][i];
+            unmergedBarrelStubs[arrayIndex][unmergedOutputIndex] = barrelStubWords[arrayIndex][i];
+            unmergedDiskStubs[arrayIndex][unmergedOutputIndex] = diskStubWords[arrayIndex][i];
             #ifndef _SYNTHESIS_
             // std::cout << "UnmergedbrlStubs: " << barrelStubWords[arrayIndex][i] << " UnmergeddiskStubs: " << diskStubWords[arrayIndex][i] << std::endl;
             #endif
@@ -186,10 +186,10 @@ void TrackMerger(const BXType bx,
     bx_o = bx;
     outputNumber = outputIndex + unmergedOutputIndex;
     for (unsigned int i = 0; i < unmergedOutputIndex; i++){
-      // trackWord_o[outputIndex+i] = unmergedTracks[i];
+      trackWord_o[outputIndex+i] = unmergedTracks[i];
       for (unsigned int j = 0; j < 4; j++){
-        // barrelStubWords_o[j][outputIndex+i] = unmergedBarrelStubs[j][i];
-        // diskStubWords_o[j][outputIndex+i] = unmergedDiskStubs[j][i];
+        barrelStubWords_o[j][outputIndex+i] = unmergedBarrelStubs[j][i];
+        diskStubWords_o[j][outputIndex+i] = unmergedDiskStubs[j][i];
         #ifndef _SYNTHESIS_
         // std::cout << "j: " << j << " UnmergedBrlStubs: " << unmergedBarrelStubs[j][i] << std::endl;
         // std::cout << "j: " << j << " UnmergedDiskStubs: " << unmergedDiskStubs[j][i] << std::endl;
