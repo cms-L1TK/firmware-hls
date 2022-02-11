@@ -46,47 +46,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     good___ = false;
   }
   
-  inline void processPipeLine(ap_uint<1> *table) {
-#pragma HLS inline
-
-    auto stubindex=stubdata__.getIndex();
-    auto stubfinez=stubdata__.getFineZ();
-    auto stubfinephi=stubdata__.getFinePhi();
-    auto stubbend=stubdata__.getBend();
-    
-    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
-    
-    //Check if stub z position consistent
-    bool pass = isPSseed___ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj___)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj___)];
-
-    auto const index=projrinv___.concat(stubbend);
-
-    //Check if stub bend and proj rinv consistent
-    projseqs_[writeindex_] = projseq___;
-    matches_[writeindex_] = (stubindex,projbuffer___.getAllProj());
-    INDEX writeindexnext = writeindex_ + 1;
-    
-    //Though we did write to matches_ above only now do we increment
-    //the writeindex_ if we had a good stub that pass the various cuts
-    writeindex_ = (good___&passphi&pass&table[index]) ? writeindexnext : writeindex_;
-
-    //update pipeline variables
-    good___ = good__;
-    stubdata__ = stubdata_;
-    projfinephi___ = projfinephi__;
-    projfinezadj___ = projfinezadj__;
-    isPSseed___ = isPSseed__;
-    projrinv___ = projrinv__;
-    projbuffer___ = projbuffer__;
-    projseq___ = projseq__;
-  }
-
-#ifndef __SYNTHESIS__
-  inline void setUnit(int unit) {
-    unit_ = unit;
-  }
-
-#endif
 
   inline void init(BXType bxin, ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer, ap_uint<kNBits_MemAddr> projseq) {
 #pragma HLS inline
@@ -114,6 +73,132 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   good__ = false;
 
 }
+
+
+
+inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
+#pragma HLS inline
+#pragma HLS array_partition variable=nstubsall_ complete dim=1
+
+  bool nearfull = nearFull();
+
+  good__ = (!idle_) && (!nearfull);
+
+  // Buffer still has projections to read out
+  //If the buffer is not empty we have a projection that we need to 
+  //process. 
+  
+  NSTUBS istubtmp=istub_;
+
+  ap_uint<3> iphiSave = iphi_ + phiPlus_;
+  auto secondSave = second_;
+
+  if(zero<kNBits_MemAddrBinned>()[istub_]) {
+     
+    //Need to read the information about the proj in the buffer
+    VMProjection<BARREL> data(projbuffer_.getProjection());
+
+    //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
+    zbin = data.getZBin().range(3,1); 
+    
+    auto projfinez = data.getFineZ();
+    projfinephi__ = data.getFinePhi();
+     
+    //Calculate fine z position
+    if (second_) {
+      projfinezadj__ = projfinez-8;
+      zbin=zbin+1;
+    } else {
+      projfinezadj__ = projfinez;
+    }
+
+    if (!phiPlus_) {
+      if (shift_==-1) {
+	projfinephi__ -= 8;
+      }
+    } else {
+      //When we get here shift_ is either 1 or -1
+      if (shift_==1) {
+	projfinephi__ += 8;
+      }
+    }
+
+    isPSseed__ = data.getIsPSSeed();
+    projrinv__ = data.getRInv();
+
+  }
+   
+  //Check if last stub, if so, go to next buffer entry 
+  if (good__) {
+    if (istub_+1>=nstubs_){
+      istub_=0;
+      if (!stubmask_) {
+	idle_ = true;
+      } else {
+	ap_uint<2> index = __builtin_ctz(stubmask_);
+	stubmask_[index]=0;
+	second_ =  index[0];
+	phiPlus_ =  index[1];
+	nstubs_ = nstubsall_[index];
+      }
+    } else {
+      istub_++;
+    }
+  }
+  
+  //Read stub memory and extract data fields
+  ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
+  stubdata__ = stubmem[bx_&1][stubadd];
+  projbuffer__ = projbuffer_;
+  projseq__ = projseq_;
+
+   
+} // end step
+
+
+
+
+  inline void processPipeLine(ap_uint<1> *table) {
+#pragma HLS inline
+
+    auto stubindex=stubdata___.getIndex();
+    auto stubfinez=stubdata___.getFineZ();
+    auto stubfinephi=stubdata___.getFinePhi();
+    auto stubbend=stubdata___.getBend();
+    
+    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
+    
+    //Check if stub z position consistent
+    bool pass = isPSseed___ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj___)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj___)];
+
+    auto const index=projrinv___.concat(stubbend);
+
+    //Check if stub bend and proj rinv consistent
+    projseqs_[writeindex_] = projseq___;
+    matches_[writeindex_] = (stubindex,projbuffer___.getAllProj());
+    INDEX writeindexnext = writeindex_ + 1;
+    
+    //Though we did write to matches_ above only now do we increment
+    //the writeindex_ if we had a good stub that pass the various cuts
+    writeindex_ = (good___&passphi&pass&table[index]) ? writeindexnext : writeindex_;
+
+    //update pipeline variables
+    good___ = good__;
+    stubdata___ = stubdata__;
+    projfinephi___ = projfinephi__;
+    projfinezadj___ = projfinezadj__;
+    isPSseed___ = isPSseed__;
+    projrinv___ = projrinv__;
+    projbuffer___ = projbuffer__;
+    projseq___ = projseq__;
+  }
+
+#ifndef __SYNTHESIS__
+  inline void setUnit(int unit) {
+    unit_ = unit;
+  }
+
+#endif
 
  inline void set_empty() {
    empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
@@ -242,85 +327,6 @@ inline void advance() {
   readindex_++;  
 }
 
-inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
-#pragma HLS inline
-#pragma HLS array_partition variable=nstubsall_ complete dim=1
-
-  bool nearfull = nearFull();
-
-  good__ = (!idle_) && (!nearfull);
-
-  // Buffer still has projections to read out
-  //If the buffer is not empty we have a projection that we need to 
-  //process. 
-  
-  NSTUBS istubtmp=istub_;
-
-  ap_uint<3> iphiSave = iphi_ + phiPlus_;
-  auto secondSave = second_;
-
-  if(zero<kNBits_MemAddrBinned>()[istub_]) {
-     
-    //Need to read the information about the proj in the buffer
-    VMProjection<BARREL> data(projbuffer_.getProjection());
-
-    //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
-    zbin = data.getZBin().range(3,1); 
-    
-    auto projfinez = data.getFineZ();
-    projfinephi__ = data.getFinePhi();
-     
-    //Calculate fine z position
-    if (second_) {
-      projfinezadj__ = projfinez-8;
-      zbin=zbin+1;
-    } else {
-      projfinezadj__ = projfinez;
-    }
-
-    if (!phiPlus_) {
-      if (shift_==-1) {
-	projfinephi__ -= 8;
-      }
-    } else {
-      //When we get here shift_ is either 1 or -1
-      if (shift_==1) {
-	projfinephi__ += 8;
-      }
-    }
-
-    isPSseed__ = data.getIsPSSeed();
-    projrinv__ = data.getRInv();
-
-  }
-   
-  //Check if last stub, if so, go to next buffer entry 
-  if (good__) {
-    if (istub_+1>=nstubs_){
-      istub_=0;
-      if (!stubmask_) {
-	idle_ = true;
-      } else {
-	ap_uint<2> index = __builtin_ctz(stubmask_);
-	stubmask_[index]=0;
-	second_ =  index[0];
-	phiPlus_ =  index[1];
-	nstubs_ = nstubsall_[index];
-      }
-    } else {
-      istub_++;
-    }
-  }
-  
-  //Read stub memory and extract data fields
-  ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
-  stubdata_ = stubmem[bx_&1][stubadd];
-  projbuffer__ = projbuffer_;
-  projseq__ = projseq_;
-
-   
-} // end step
-
  private:
 
  //Buffers for the matches
@@ -339,7 +345,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
  ap_uint<3> iphi_;
  BXType bx_;
  bool empty_;
- VMStubMECM<VMSMEType> stubdata_, stubdata__; 
+ VMStubMECM<VMSMEType> stubdata__, stubdata___; 
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid_;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;

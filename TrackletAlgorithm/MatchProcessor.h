@@ -544,7 +544,7 @@ void MatchProcessor(BXType bx,
   constexpr unsigned int kNBitsBuffer=3;
 
   // declare counters for each of the 8 different seeds.
-  //FIXEM should have propoer seven bit type
+  //FIXME should have propoer seven bit type
   int nmcout1 = 0;
   int nmcout2 = 0;
   int nmcout3 = 0;
