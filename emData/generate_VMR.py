@@ -15,10 +15,6 @@ import collections
 num_layers = 6
 num_disks = 5
 
-# Number of bits for RZ bins, for the VMSME memories
-nbits_me_layer = 3
-nbits_me_disk = 4
-
 # Lists of which layer/disk has VMSTE memories
 has_vmste_inner = [True, True, True, False, True, False, True, False, True, False, False]
 has_vmste_overlap = [True, True, False, False, False, False, False, False, False, False, False]
