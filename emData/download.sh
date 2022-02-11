@@ -27,11 +27,15 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
 #memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
 #luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
 # Combined modules
-memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_220201.tgz"
-luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_220201.tgz"
+#memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_220201.tgz"
+#luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_220201.tgz"
+memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_220211.tgz"
+luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_220211.tgz"
 
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_220131.tgz"
-luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_220131.tgz"
+#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_220131.tgz"
+#luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_220131.tgz"
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_220210.tgz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_220210.tgz"
 
 #### fw_synch_210503 ####
 # Standard configuration
