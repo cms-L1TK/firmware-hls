@@ -446,6 +446,8 @@ void MatchCalculator(BXType bx,
   FullMatch<FMTYPE> bestmatch;
   bool goodmatch = false;
 
+  ap_uint<1> inc_fm = 1;
+
 
   //-----------------------------------------------------------------------------------------------------------
   //-------------------------------- DATA PROCESSING STARTS ---------------------------------------------------
@@ -459,8 +461,10 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> nmcout6 = 0;
   ap_uint<kNBits_MemAddr> nmcout7 = 0;
   ap_uint<kNBits_MemAddr> nmcout8 = 0;  
-  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
+  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC) - 2; istep++)
   {
+
+    //std::cout << "istep: " << istep << std::endl;
 
 #pragma HLS PIPELINE II=1 
 
@@ -763,6 +767,11 @@ void MatchCalculator(BXType bx,
     id_next = projid;  
     bool newtracklet = (istep==0 || (id_next != id))? true : false;
 
+    //increament full match memories
+    if (newtracklet) {
+      inc_fm = 1;
+    }
+
     // Stub parameters
     typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
     typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
@@ -777,6 +786,9 @@ void MatchCalculator(BXType bx,
     typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
     typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
     typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
+
+
+    //std::cout << "istep proj_seed inc_fm: "<<istep<<" "<<proj_seed<<" "<<inc_fm<<std::endl;
 
     // Calculate residuals
     // Get phi and z correction
@@ -834,68 +846,73 @@ void MatchCalculator(BXType bx,
       goodmatch_next = true;
       projseed_next  = proj_seed;
     }
-    else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
-      bestmatch_next = FullMatch<FMTYPE>();
-      goodmatch_next = false;
-      projseed_next  = -1;
-    }
-    else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
-      bestmatch_next = bestmatch;
-      goodmatch_next = goodmatch;
-      projseed_next  = projseed;
-    }
+    //else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
+    //  bestmatch_next = FullMatch<FMTYPE>();
+    //  goodmatch_next = false;
+    //  projseed_next  = -1;
+    //}
+    //else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
+    //  bestmatch_next = bestmatch;
+    //  goodmatch_next = goodmatch;
+    //  projseed_next  = projseed;
+    // }
 
-    if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-      switch (projseed) {
+    //if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
+    if(goodmatch_next) { 
+      switch (projseed_next) {
         case 0:
         if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch,nmcout1); // L1L2 seed
-          nmcout1++;
+	  //std::cout << "Writing L1L2 match to address: "<<nmcout1+inc_fm-1<<std::endl;
+          fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
+          nmcout1+=inc_fm;
         }
         break;
         case 1:
         if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch,nmcout2); // L2L3 seed
-          nmcout2++;
+	  //std::cout << "Writing L2L3 match to address: "<<nmcout2+inc_fm-1<<std::endl;
+          fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
+          nmcout2+=inc_fm;
         }
         break;
         case 2:
         if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch,nmcout3); // L3L4 seed
-          nmcout3++;
+	  //std::cout << "Writing L3L4 match to address: "<<nmcout3+inc_fm-1<<std::endl;
+          fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
+          nmcout3+=inc_fm;
         }
         break;
         case 3:
         if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch,nmcout4); // L5L6 seed
-          nmcout4++;
+          fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
+          nmcout4+=inc_fm;
         }
         break;
         case 4:
         if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch,nmcout5); // D1D2 seed
-          nmcout5++;
+          fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
+          nmcout5+=inc_fm;
         }
         break;
         case 5:
         if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch,nmcout6); // D3D4 seed
-          nmcout6++;
+          fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
+          nmcout6+=inc_fm;
         }
         break;
         case 6:
         if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch,nmcout7); // L1D1 seed
-          nmcout7++;
+          fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
+          nmcout7+=inc_fm;
         }
         break;
         case 7:
         if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
-          fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch,nmcout8); // L2D1 seed
-          nmcout8++;
+          fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
+          nmcout8+=inc_fm;
         }
         break;
       }
+      inc_fm=0;
     }
 
     // pipeline the bestmatch registers
