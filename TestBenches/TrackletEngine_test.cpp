@@ -1,43 +1,76 @@
 // TrackletEngine test bench
 #include "TrackletEngineTop.h"
-#include "StubPairMemory.h"
-#include "VMStubTEInnerMemory.h"
-#include "VMStubTEOuterMemory.h"
-#include "FileReadUtility.h"
-#include "hls_math.h"
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <algorithm>
-#include <iterator>
+#include "Macros.h"
+#include "FileReadUtility.h"
+
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined SEED_
+  #define SEED_ L1L2_
+#endif
+#if !defined MODULE_
+  #define MODULE_ TE_L1PHIC12_L2PHIB12_
+#endif
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ TrackletEngineTop_PS_PS
+#endif
+#if !defined INNER_TABLE_
+  #define INNER_TABLE_ "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptinnercut.tab"
+#endif
+#if !defined OUTER_TABLE_
+  #define OUTER_TABLE_ "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptoutercut.tab"
+#endif
 
 const int nevents = 100;  // number of events to run
 
 using namespace std;
 
 int main(){
-  TBHelper tb("TE/TE_L1PHIC12_L2PHIB12");
+#if SEED_ == L1L2_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = BARRELPS;
+  const string innerStubPattern = "VMStubs_VMSTE_L1*";
+  const string outerStubPattern = "VMStubs_VMSTE_L2*";
+#elif SEED_ == L2L3_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = BARRELPS;
+  const string innerStubPattern = "VMStubs_VMSTE_L2*";
+  const string outerStubPattern = "VMStubs_VMSTE_L3*";
+#elif SEED_ == L3L4_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = BARREL2S;
+  const string innerStubPattern = "VMStubs_VMSTE_L3*";
+  const string outerStubPattern = "VMStubs_VMSTE_L4*";
+#elif SEED_ == L5L6_
+  const auto InnerStubType = BARREL2S;
+  const auto OuterStubType = BARREL2S;
+  const string innerStubPattern = "VMStubs_VMSTE_L5*";
+  const string outerStubPattern = "VMStubs_VMSTE_L6*";
+#else
+  #error "Undefined seed"
+#endif
+  TBHelper tb(string("TE/") + module_name[MODULE_]);
 
   // error counter
   int err_count = 0;
   
   // declare input memory arrays to be read from emulations files
-  VMStubTEInnerMemory<BARRELPS> inputvmstubsinner;
-  VMStubTEOuterMemory<BARRELPS> inputvmstubsouter;
+  VMStubTEInnerMemory<InnerStubType> inputvmstubsinner;
+  VMStubTEOuterMemory<OuterStubType> inputvmstubsouter;
 
   // declare the output memory array for the sub pairs
   StubPairMemory outputstubpairs; //produced by hls simulation
 
   // open input files from emulation
-  auto &fin_vmstubsinner = tb.files("VMStubs_VMSTE_L1*");
-  auto &fin_vmstubsouter = tb.files("VMStubs_VMSTE_L2*");
+  auto &fin_vmstubsinner = tb.files(innerStubPattern);
+  auto &fin_vmstubsouter = tb.files(outerStubPattern);
   auto &fin_stubpairs = tb.files("StubPairs_SP_*");
 
   ap_uint<1> bendinnertable[] =
-#include "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptinnercut.tab"
+#include INNER_TABLE_
   ap_uint<1> bendoutertable[] =
-#include "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptoutercut.tab"
+#include OUTER_TABLE_
 
   // loop over events
   for (int ievt = 0; ievt < nevents; ++ievt) {
@@ -46,15 +79,15 @@ int main(){
     outputstubpairs.clear();
 
     //read next event from the input files
-    writeMemFromFile<VMStubTEInnerMemory<BARRELPS> >(inputvmstubsinner, fin_vmstubsinner.at(0), ievt);
-    writeMemFromFile<VMStubTEOuterMemory<BARRELPS> >(inputvmstubsouter, fin_vmstubsouter.at(0), ievt);
+    writeMemFromFile<VMStubTEInnerMemory<InnerStubType> >(inputvmstubsinner, fin_vmstubsinner.at(0), ievt);
+    writeMemFromFile<VMStubTEOuterMemory<OuterStubType> >(inputvmstubsouter, fin_vmstubsouter.at(0), ievt);
 
     //set the bunch crossing
     BXType bx=ievt&0x7;
     BXType bx_o;
 
     // Unit Under Test
-    TrackletEngine_PS_PS(bx, inputvmstubsinner, inputvmstubsouter, bendinnertable, bendoutertable, bx_o, outputstubpairs);
+    TOP_FUNC_(bx, inputvmstubsinner, inputvmstubsouter, bendinnertable, bendoutertable, bx_o, outputstubpairs);
 
     bool truncation = false;
 
