@@ -16,7 +16,7 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export MP_L6PHIC
+set module_to_export MP_L3PHIC
 
 # create new project (deleting any existing one of same name)
 open_project -reset match_processor
@@ -53,9 +53,9 @@ foreach i $modules_to_test {
   if { $i == $module_to_export } {
     csynth_design
     cosim_design
-    export_design -format ip_catalog
+    #export_design -format ip_catalog
     # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
-    #export_design -format ip_catalog -flow impl
+    export_design -format ip_catalog -flow impl
   }
 }
 

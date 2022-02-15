@@ -360,16 +360,6 @@ void MatchCalculator(BXType bx,
     read[i] = false;
   }
 
-  // MC_L3PHIC mask {1: on, 0: off}
-  //static const uint16_t FML1L2 = 1 << shift_L1L2;
-  //static const uint16_t FML2L3 = 0 << shift_L2L3;
-  //static const uint16_t FML3L4 = 0 << shift_L3L4;
-  //static const uint16_t FML5L6 = 1 << shift_L5L6;
-  //static const uint16_t FMD1D2 = 0 << shift_D1D2;
-  //static const uint16_t FMD3D4 = 0 << shift_D3D4;
-  //static const uint16_t FML1D1 = 0 << shift_L1D1;
-  //static const uint16_t FML2D1 = 0 << shift_L2D1;
-
   // Variables for the merger
   // layer 1 variables
   bool read_L1_1 = false;
@@ -464,10 +454,6 @@ void MatchCalculator(BXType bx,
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
    
-    //if (istep>105) {
-    //  std::cout << "istep: " << istep << std::endl;
-    //}
-
 #pragma HLS PIPELINE II=1 
 
     // Pick up number of candidate matches for each CM memory
@@ -791,8 +777,6 @@ void MatchCalculator(BXType bx,
     typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
 
 
-    //std::cout << "istep proj_seed inc_fm: "<<istep<<" "<<proj_seed<<" "<<inc_fm<<std::endl;
-
     // Calculate residuals
     // Get phi and z correction
     ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
@@ -849,40 +833,24 @@ void MatchCalculator(BXType bx,
       goodmatch_next = true;
       projseed_next  = proj_seed;
     }
-    //else if (newtracklet){ // if is a new tracklet, do not make a match because it didn't pass the cuts
-    //  bestmatch_next = FullMatch<FMTYPE>();
-    //  goodmatch_next = false;
-    //  projseed_next  = -1;
-    //}
-    //else { // if current match did not pass, but it is not a new tracklet, keep the previous best match for that tracklet
-    //  bestmatch_next = bestmatch;
-    //  goodmatch_next = goodmatch;
-    //  projseed_next  = projseed;
-    // }
 
-    //if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
     if(goodmatch_next&&valid_L3) { 
-
-      //std::cout << "Adding full match valid_L3 : "<<istep<<" "<<projseed_next<<" "<<valid_L3<<std::endl;
 
       switch (projseed_next) {
         case 0:
         if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-	  //std::cout << "Writing L1L2 match to address: "<<nmcout1+inc_fm-1<<std::endl;
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
           nmcout1+=inc_fm;
         }
         break;
         case 1:
         if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-	  //std::cout << "Writing L2L3 match to address: "<<nmcout2+inc_fm-1<<std::endl;
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
           nmcout2+=inc_fm;
         }
         break;
         case 2:
         if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-	  //std::cout << "Writing L3L4 match to address: "<<nmcout3+inc_fm-1<<std::endl;
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
           nmcout3+=inc_fm;
         }
