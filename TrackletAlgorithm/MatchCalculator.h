@@ -461,10 +461,12 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> nmcout6 = 0;
   ap_uint<kNBits_MemAddr> nmcout7 = 0;
   ap_uint<kNBits_MemAddr> nmcout8 = 0;  
-  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC) - 2; istep++)
+  MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
-
-    //std::cout << "istep: " << istep << std::endl;
+   
+    //if (istep>105) {
+    //  std::cout << "istep: " << istep << std::endl;
+    //}
 
 #pragma HLS PIPELINE II=1 
 
@@ -758,6 +760,7 @@ void MatchCalculator(BXType bx,
     auto projid = datastream.getProjIndex();
     auto stubid = datastream.getStubIndex();
     // Use the stub and projection indices to pick up the stub and projection
+    //std::cout << "readproj istep projid : "<<istep<<" "<<projid<<std::endl;
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
 
@@ -858,7 +861,10 @@ void MatchCalculator(BXType bx,
     // }
 
     //if(newtracklet && goodmatch==true) { // Write out only the best match, based on the seeding 
-    if(goodmatch_next) { 
+    if(goodmatch_next&&valid_L3) { 
+
+      //std::cout << "Adding full match valid_L3 : "<<istep<<" "<<projseed_next<<" "<<valid_L3<<std::endl;
+
       switch (projseed_next) {
         case 0:
         if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
