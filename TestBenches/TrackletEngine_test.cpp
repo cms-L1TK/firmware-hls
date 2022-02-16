@@ -10,16 +10,16 @@
   #define SEED_ L1L2_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TE_L1PHIC12_L2PHIB12_
+  #define MODULE_ TE_L1PHIG27_L2PHID27_
 #endif
 #if !defined TOP_FUNC_
   #define TOP_FUNC_ TrackletEngineTop_PS_PS
 #endif
 #if !defined INNER_TABLE_
-  #define INNER_TABLE_ "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptinnercut.tab"
+  #define INNER_TABLE_ "../emData/TE/tables/TE_L1PHIG27_L2PHID27_stubptinnercut.tab"
 #endif
 #if !defined OUTER_TABLE_
-  #define OUTER_TABLE_ "../emData/TE/tables/TE_L1PHIC12_L2PHIB12_stubptoutercut.tab"
+  #define OUTER_TABLE_ "../emData/TE/tables/TE_L1PHIG27_L2PHID27_stubptoutercut.tab"
 #endif
 
 const int nevents = 100;  // number of events to run
