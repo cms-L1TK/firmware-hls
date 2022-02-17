@@ -305,7 +305,9 @@ void InputRouter( const BXType bx
 
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	#ifndef __SYNTHESIS__
-      std::cout << "Nmemories is " << nOMems << "\n";
+		#if IR_DEBUG
+			std::cout << "Nmemories is " << nOMems << "\n";
+		#endif
     #endif
      
 	// count memories 
