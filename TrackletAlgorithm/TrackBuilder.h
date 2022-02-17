@@ -32,7 +32,6 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-// !!! CURRENTLY ONLY TESTED FOR L1L2 !!!
 template<unsigned Seed, unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
