@@ -36,9 +36,9 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged output_TrackFit_TF_L1L2*
+  auto &fout_outputTracks = tb.files("output_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged output_TrackFit_TF_L1L2*
   // Loop over events
-  for (unsigned int ievt = 0; ievt < 10; ++ievt) {
+  for (unsigned int ievt = 0; ievt < 1; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
     
 
@@ -61,7 +61,7 @@ int main(){
     // Set input memories into arrays of input track/stub words
     for(unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
       TrackFit track;
-      track = inputTracks.read_mem(bx, i+1);
+      track = inputTracks.read_mem(bx, i); //i+1 for merge
       trackWord[i] = track.getTrackWord();
       ap_uint<TrackFit::kTFStubIndexSize> stubIndex;
        for (unsigned short j = 0; j < 4; j++){
