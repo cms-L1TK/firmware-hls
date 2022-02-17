@@ -62,7 +62,6 @@ class TrackHandler{
     TrackFit::DiskStubWord getDiskStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
       return diskStubArray[layerIndex][stubIndex];
     }
-
     
   private:
     TrackFit::TrackWord trkWord;
@@ -72,5 +71,8 @@ class TrackHandler{
     ap_uint<1> matchesFoundDisk[4][layerStubIndexSize];
     ap_uint<1> stubPadding = 0;
     unsigned int debug = 0;
+    ap_uint<12> mergedBarrelStubsMap;
+    ap_uint<12> mergedDiskStubsMap;
+    ap_uint<24> totalHitMap;
 };
 #endif

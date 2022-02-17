@@ -3,8 +3,8 @@
 #include <bitset>
 
 void ComparisonModule::inputTrack(const TrackHandler track){ 
+  #pragma HLS inline
   // put tracks into buffer
-
   if(track.getTrackWord() == 0){
     endOfStream = 1;
    //std::cout << "endOfStream: " << endOfStream << std::endl;
@@ -23,6 +23,8 @@ void ComparisonModule::inputTrack(const TrackHandler track){
 
 }
 void ComparisonModule::processTrack(){
+  #pragma HLS inline
+  #pragma HLS pipeline
   if(endOfStream == 0){
     if (myIndex == 0){
       masterTrack.setDebugFlag(1);
@@ -31,18 +33,20 @@ void ComparisonModule::processTrack(){
     }
     if(masterTrack.getTrackWord() != track.getTrackWord()){
       masterTrack.CompareTrack(track);
-      masterTrack.MergeTrack(track, matchFound, mergeCondition);
+      // masterTrack.MergeTrack(track, matchFound, mergeCondition);
     }
     tracksProcessed++;
   }
 }
 
 void ComparisonModule::getTrack(){
+  #pragma HLS inline
   track = inputBuffer[readIndex];
   readIndex++;
 }
 
 void ComparisonModule::endEvent(TrackHandler outputBuffer[16], unsigned int outputWriteIndex){
+  #pragma HLS inline
   if(endOfStream == 1 && tracksProcessed == writeIndex){
     endOfModule = 1;
     #ifndef _SYNTHESIS_
@@ -69,12 +73,21 @@ void TrackMerger(const BXType bx,
   TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc],
   int &outputNumber
   ){
+    #pragma HLS stream variable=trackWord depth=1 dim=1
+    #pragma HLS stream variable=barrelStubWords depth=1 dim=2
+    #pragma HLS stream variable=diskStubWords depth=1 dim=2
+    #pragma HLS stream variable=trackWord_o depth=1 dim=1
+    #pragma HLS stream variable=barrelStubWords_o depth=1 dim=2
+    #pragma HLS stream variable=diskStubWords_o depth=1 dim=2
+
+    #pragma HLS inline
 
     ComparisonModule comparisonModule[kNComparisonModules];
     unsigned int outputIndex{0};
     unsigned int unmergedOutputIndex{0};
     for(unsigned int nModule = 0; nModule < kNComparisonModules; nModule++)
     {
+      #pragma HLS unroll
       comparisonModule[nModule].myIndex=nModule;
     }
     TrackHandler outputBuffer[kNComparisonModules];
@@ -85,12 +98,15 @@ void TrackMerger(const BXType bx,
     TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
     TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
 
-    for (int i = 0; i < kMaxProc; i++){
+    for (int i = 0; i < kMaxProc; i++){ 
+      #pragma HLS pipeline
       #ifndef _SYNTHESIS_
       // std::cout << "Step#: " << i << " masterTrackWord: " << trackWord[i] << " brl1: "<< barrelStubWords[0][i] << " brl2: " << barrelStubWords[1][i] << " brl3: " << barrelStubWords[2][i] << " brl4: " << barrelStubWords[3][i] << std::endl;
       #endif
       unsigned int moduleEnd{0};
+      Module_End:
       for (unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
+        #pragma HLS unroll
         if(comparisonModule[activeModule].getEndOfModule() == 1){
           moduleEnd++;
         }
@@ -103,8 +119,9 @@ void TrackMerger(const BXType bx,
       // run active modules 
       // local array to keep track of which modules have been activated
       unsigned int activeModules[kNComparisonModules];
-      for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
-      {
+      Active_Module:
+      for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++) //might not be able to unroll as processing
+      { 
         // if module has yet to be activated, carry on 
         if(modulesToRun[activeModule] == 0){ 
           continue;
@@ -122,7 +139,7 @@ void TrackMerger(const BXType bx,
         // if the next Comparison Module is inactive 
         // and a mismatch has been found 
         // next comparison module also processes this track
-        if(modulesToRun[activeModule+1] == 0 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1)
+        if(modulesToRun[activeModule+1] == 0 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1) //might not be able to unroll
         { 
           #ifndef _SYNTHESIS_
           // std::cout << "Activating Module# " << activeModule+1 << " trackWord: " << trackWord[i] << std::endl;
@@ -139,17 +156,20 @@ void TrackMerger(const BXType bx,
       // update global array that keeps track of which modules have been activated 
       for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
       {
+        #pragma HLS unroll
         modulesToRun[activeModule] = activeModules[activeModule];
       }
 
       //output the master track from each comparison module as the output array
       //also outputs any unmerged tracks from the last comparison module 
       for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
+        #pragma HLS unroll
         if(activeModules[activeModule] == 0){continue;}
         // if am not the last comparison module - when finished processing, output the master track
         if(comparisonModule[activeModule].getEndOfModule() == 1){
           trackWord_o[outputIndex] = comparisonModule[activeModule].getMasterTrackWord();
           for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
+            #pragma HLS unroll
             barrelStubWords_o[layerIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackBarrelStubs(0, layerIndex);
             diskStubWords_o[layerIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackDiskStubs(0, layerIndex);
           }  
@@ -163,6 +183,7 @@ void TrackMerger(const BXType bx,
         // fill the outputs with the trackWord, barrel and disk stubs
           unmergedTracks[unmergedOutputIndex] = trackWord[i];
           for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
+            #pragma HLS unroll
             unmergedBarrelStubs[arrayIndex][unmergedOutputIndex] = barrelStubWords[arrayIndex][i];
             unmergedDiskStubs[arrayIndex][unmergedOutputIndex] = diskStubWords[arrayIndex][i];
             #ifndef _SYNTHESIS_
@@ -186,8 +207,10 @@ void TrackMerger(const BXType bx,
     bx_o = bx;
     outputNumber = outputIndex + unmergedOutputIndex;
     for (unsigned int i = 0; i < unmergedOutputIndex; i++){
+      #pragma HLS unroll
       trackWord_o[outputIndex+i] = unmergedTracks[i];
       for (unsigned int j = 0; j < 4; j++){
+        #pragma HLS unroll
         barrelStubWords_o[j][outputIndex+i] = unmergedBarrelStubs[j][i];
         diskStubWords_o[j][outputIndex+i] = unmergedDiskStubs[j][i];
         #ifndef _SYNTHESIS_
