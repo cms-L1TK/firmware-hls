@@ -76,7 +76,7 @@ void compareStubsWithFile<0>(int &err, ifstream &fout, const int pos, const Trac
 
 int main()
 {
-  TBHelper tb(std::string("FT/") + module_name[MODULE_]);
+  TBHelper tb(string("FT/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
@@ -85,9 +85,8 @@ int main()
   // open input files
   cout << "Open files..." << endl;
 
-  const string seed_name = string(module_name[MODULE_]).substr(3);
-  const string barrelFM_query = string("FullMatches_FM_") + string(seed_name) + string("_L*");
-  const string diskFM_query = string("FullMatches_FM_") + string(seed_name) + string("_D*");
+  const string barrelFM_query = "FullMatches_FM_*_L*";
+  const string diskFM_query = "FullMatches_FM_*_D*";
 
   auto &fin_tpar = tb.files("TrackletParameters*");
   auto &fin_barrelFM = tb.files(barrelFM_query);
