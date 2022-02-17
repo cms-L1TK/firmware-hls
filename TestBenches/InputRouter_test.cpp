@@ -128,14 +128,14 @@ CablingMap getMap( std::string pInputWiresMap )
             auto cLyrIter = std::find( cLyrs.begin(), cLyrs.end(), cLayerId ); 
             if( cLyrIter == cLyrs.end() )
             {
-              std::cout << " found a new layer readout by " <<  cDtcName << "\n";
+              // std::cout << " found a new layer readout by " <<  cDtcName << "\n";
               cIterator->second.second.first.push_back( cLayerId );
               BnWrd cBnWrd(0);cBnWrd.range( cPhyId, cPhyId) = 1; 
               cIterator->second.second.second.push_back( cBnWrd ); 
             }
             else
             {
-              std::cout << " adding a memory to layer " << cLayerId << "\n";
+              // std::cout << " adding a memory to layer " << cLayerId << "\n";
               cIterator->second.second.second[cNBns.size()-1].range(cPhyId,cPhyId) =1 ; 
             }
           }
@@ -776,7 +776,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 12 : 
+      case 24 : 
         InputRouterTop_IR_DTC_2S_1_A( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -784,7 +784,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 13 : 
+      case 25 : 
         InputRouterTop_IR_DTC_2S_1_B( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -792,7 +792,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 14 : 
+      case 26: 
         InputRouterTop_IR_DTC_2S_2_A( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -800,7 +800,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 15 : 
+      case 27: 
         InputRouterTop_IR_DTC_2S_2_B( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -808,7 +808,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 16 : 
+      case 28 : 
         InputRouterTop_IR_DTC_2S_3_A( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -816,7 +816,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 17 : 
+      case 29 : 
         InputRouterTop_IR_DTC_2S_3_B( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -824,7 +824,7 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 18 : 
+      case 30 : 
         InputRouterTop_IR_DTC_2S_4_A( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
@@ -832,8 +832,40 @@ int main(int argc, char * argv[])
           , hBx_o // output bx 
           , hMemories);
         break;
-      case 19 : 
+      case 31 : 
         InputRouterTop_IR_DTC_2S_4_B( hBx
+          , cLnkWrd // input link LUT 
+          , cPhBnWord  // n phi bins LUT 
+          , hInputStubs // input stub stream 
+          , hBx_o // output bx 
+          , hMemories);
+        break;
+      case 32 : 
+        InputRouterTop_IR_DTC_2S_5_A( hBx
+          , cLnkWrd // input link LUT 
+          , cPhBnWord  // n phi bins LUT 
+          , hInputStubs // input stub stream 
+          , hBx_o // output bx 
+          , hMemories);
+        break;
+      case 33 : 
+        InputRouterTop_IR_DTC_2S_5_B( hBx
+          , cLnkWrd // input link LUT 
+          , cPhBnWord  // n phi bins LUT 
+          , hInputStubs // input stub stream 
+          , hBx_o // output bx 
+          , hMemories);
+        break;
+      case 34 : 
+        InputRouterTop_IR_DTC_2S_6_A( hBx
+          , cLnkWrd // input link LUT 
+          , cPhBnWord  // n phi bins LUT 
+          , hInputStubs // input stub stream 
+          , hBx_o // output bx 
+          , hMemories);
+        break;
+      case 35 : 
+        InputRouterTop_IR_DTC_2S_6_B( hBx
           , cLnkWrd // input link LUT 
           , cPhBnWord  // n phi bins LUT 
           , hInputStubs // input stub stream 
