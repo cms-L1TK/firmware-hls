@@ -13,7 +13,7 @@
   #define MODULE_ TE_L1PHIG27_L2PHID27_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackletEngineTop_PS_PS
+  #define TOP_FUNC_ TrackletEngine_PS_PS
 #endif
 #if !defined INNER_TABLE_
   #define INNER_TABLE_ "../emData/TE/tables/TE_L1PHIG27_L2PHID27_stubptinnercut.tab"
