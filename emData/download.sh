@@ -1,25 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-#### cf02dd85ddc0d94cc472de3f9c927777ee776980 ####
-#### reduced config ####
-#### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
-# 1 event
-#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
-# 100 events
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
-
-#### test 211005/211217 ####
+#### fw_synch_220217 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/Bpr6OgCy1RDpxhp/download"
-luts_url="https://cernbox.cern.ch/index.php/s/LOOp9YhohNTy80H/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/fZQE0PaDXUji5Bz/download"
+luts_url="https://cernbox.cern.ch/index.php/s/u1t8yqDMD0gLzgr/download"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/uDeIXKlrqNtb5Yi/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/n8I8V3o1O8xr4Rg/download"
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/TMuron8QybNDEpE/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/9Ql9P5pYd1MMmvq/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/JEChgDvODXS9KKF/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/8g7GJFZaTOFtjUg/download"
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/leVjjLorJfquGLs/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/HTGeajBcdJnBxnr/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
