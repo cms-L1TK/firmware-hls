@@ -756,7 +756,7 @@ void MatchCalculator(BXType bx,
     id_next = projid;  
     bool newtracklet = (istep==0 || (id_next != id))? true : false;
 
-    //increament full match memories
+    //increment full match memories
     if (newtracklet) {
       inc_fm = 1;
     }
