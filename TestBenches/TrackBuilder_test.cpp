@@ -39,6 +39,12 @@ using namespace std;
 typedef TrackFit<kNBarrelStubs, kNDiskStubs> TrackFit_t;
 typedef TrackFitMemory<kNBarrelStubs, kNDiskStubs> TrackFitMemory_t;
 
+// Base assumed for input test vector files
+constexpr int InputBase = 16;
+// Base used for output of comparison results
+//   (only base 2 and base 16 are supported)
+constexpr int OutputBase = 16;
+
 template<int I>
 void setBarrelStubs(TrackFit_t &track, const TrackFit_t::BarrelStubWord stubWords[][kMaxProc], const unsigned i) {
   track.setBarrelStubWord<I>(stubWords[I][i]);
@@ -64,14 +70,14 @@ void compareStubsWithFile(int &err, ifstream &fout, const int pos, const TrackFi
   fout.clear(), fout.seekg(pos);
   stringstream ss("");
   ss << "\nStub " << (I) << " word";
-  err += compareMemWithFile<TrackFitMemory_t,16,16,TrackFit_t::kTFStubRZResidLSB(I),TrackFit_t::kTFStubValidMSB(I)>(tracksMem, fout, ievt, ss.str(), true);
+  err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFStubRZResidLSB(I),TrackFit_t::kTFStubValidMSB(I)>(tracksMem, fout, ievt, ss.str(), true);
   compareStubsWithFile<I - 1>(err, fout, pos, tracksMem, ievt);
 }
 
 template<>
 void compareStubsWithFile<0>(int &err, ifstream &fout, const int pos, const TrackFitMemory_t &tracksMem, const unsigned ievt) {
   fout.clear(), fout.seekg(pos);
-  err += compareMemWithFile<TrackFitMemory_t,16,16,TrackFit_t::kTFStubRZResidLSB(0),TrackFit_t::kTFStubValidMSB(0)>(tracksMem, fout, ievt, "\nStub 0 word", true);
+  err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFStubRZResidLSB(0),TrackFit_t::kTFStubValidMSB(0)>(tracksMem, fout, ievt, "\nStub 0 word", true);
 }
 
 int main()
@@ -107,8 +113,8 @@ int main()
 
   // output memories
   TrackFit_t::TrackWord trackWord[kMaxProc];
-  TrackFit_t::BarrelStubWord barrelStubWords[4][kMaxProc];
-  TrackFit_t::DiskStubWord diskStubWords[4][kMaxProc];
+  TrackFit_t::BarrelStubWord barrelStubWords[kNBarrelStubs][kMaxProc];
+  TrackFit_t::DiskStubWord diskStubWords[kNDiskStubs][kMaxProc];
   TrackFitMemory_t tracksMem;
 
   ///////////////////////////
@@ -120,10 +126,10 @@ int main()
     // Clear all output memories before starting.
     for (unsigned short i = 0; i < kMaxProc; i++) {
       trackWord[i] = TrackFit_t::TrackWord(0);
-      for (unsigned short j = 0; j < 4; j++) {
+      for (unsigned short j = 0; j < kNBarrelStubs; j++)
         barrelStubWords[j][i] = TrackFit_t::BarrelStubWord(0);
+      for (unsigned short j = 0; j < kNDiskStubs; j++)
         diskStubWords[j][i] = TrackFit_t::DiskStubWord(0);
-      }
     }
     tracksMem.clear();
 
@@ -163,7 +169,7 @@ int main()
     const auto &pos = fout_tracks.at(0).tellg();
 
     // compare the computed outputs with the expected ones
-    err += compareMemWithFile<TrackFitMemory_t,16,16,TrackFit_t::kTFHitMapLSB,TrackFit_t::kTFTrackValidMSB>(tracksMem, fout_tracks.at(0), ievt, "\nTrack word", true);
+    err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFHitMapLSB,TrackFit_t::kTFTrackValidMSB>(tracksMem, fout_tracks.at(0), ievt, "\nTrack word", true);
     compareStubsWithFile<kNBarrelStubs + kNDiskStubs - 1>(err, fout_tracks.at(0), pos, tracksMem, ievt);
     cout << endl;
 
