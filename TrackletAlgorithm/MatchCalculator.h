@@ -746,7 +746,6 @@ void MatchCalculator(BXType bx,
     auto projid = datastream.getProjIndex();
     auto stubid = datastream.getStubIndex();
     // Use the stub and projection indices to pick up the stub and projection
-    //std::cout << "readproj istep projid : "<<istep<<" "<<projid<<std::endl;
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
 
