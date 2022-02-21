@@ -58,11 +58,14 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
       #endif
       if((barrelStubArray[layerIndex][0] == 0) && (track.barrelStubArray[layerIndex][0] != 0)){
         barrelStubArray[layerIndex][0] = track.barrelStubArray[layerIndex][0];
-
+        mergedBarrelStubsMap += (1 << 3*layerIndex);
       }
       if((diskStubArray[layerIndex][0] == 0) && (track.diskStubArray[layerIndex][0] !=0)){
         diskStubArray[layerIndex][0] = track.diskStubArray[layerIndex][0];
+        mergedDiskStubsMap += (1 << 3*layerIndex);
       }
+      totalHitMap = mergedBarrelStubsMap + mergedDiskStubsMap;
+      trkWord | totalHitMap;
       
       for (int stubIndex = 1; stubIndex < layerStubIndexSize; stubIndex++){
         #pragma HLS unroll
@@ -90,7 +93,6 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
         }
       }
     }
-    
   }
     
   else matchFound = 0;
