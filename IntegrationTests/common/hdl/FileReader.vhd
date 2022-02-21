@@ -63,7 +63,7 @@ procFile : process(CLK)
   variable MEM_BIN     : natural := 0;  --! Current bin in memory
   variable POS_IN_MEM_BIN : natural :=0; --! Current location in mem bin.
   constant NUM_X_CHAR_UNBINNED  : natural := 2;  --! Count of 'x' characters in line, before value to read
-  constant NUM_X_CHAR_BINNED    : natural := 3;  --! Count of 'x' characters in line, before value to read
+  constant NUM_X_CHAR_BINNED    : natural := 1;  --! Count of 'x' characters in line, before value to read
   variable CNT_X_CHAR  : natural := 0;  --! Current count of 'x' characters
   variable CHAR        : character;     --! Character
   variable FOUND_WORD  : boolean := false;
@@ -159,10 +159,16 @@ begin
 
           if (NUM_BINS > 1) then
             -- Get memory bin 
-            read(LINE_IN, CHAR);        
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- x
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- digit
             char2int(CHAR, MEM_BIN);
-            read(LINE_IN, CHAR);        
-            read(LINE_IN, CHAR);        
+            read(LINE_IN, CHAR);           -- space
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- x
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- digit
             char2int(CHAR, POS_IN_MEM_BIN);
           end if;
 
