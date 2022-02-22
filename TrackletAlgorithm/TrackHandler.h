@@ -23,14 +23,17 @@ class TrackHandler{
       // set the barrel and disk stub words in constructor using loop
       // all the information from the track and stub words;
       trkWord = trackWord;
+      LOOP_THInputsBarrel:
       for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
+        #pragma HLS unroll
         barrelStubArray[j][0] = barrelStubWords[j];
         #ifndef _SYNTHESIS_
         // std::cout << "brlStub: " << j << " " << barrelStubArray[j][0] << std::endl;
         #endif
       }
-
+      LOOP_THInputsDisk:
       for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
+        #pragma HLS unroll
         diskStubArray[k][0] = diskStubWords[k];
       }
     

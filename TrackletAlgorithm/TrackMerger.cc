@@ -111,6 +111,7 @@ void TrackMerger(const BXType bx,
 
       TrackFit::BarrelStubWord barrelStubWordsArray[4];
       TrackFit::DiskStubWord diskStubWordsArray[4];
+      LOOP_SetArrays:
       for(unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
         #pragma HLS unroll
         barrelStubWordsArray[layerIndex] = barrelStubWords[layerIndex][i];
@@ -127,6 +128,8 @@ void TrackMerger(const BXType bx,
       LOOP_ActiveModule:
       for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++) //might not be able to unroll as processing 
       { 
+        #pragma HLS pipeline
+
         // if module has yet to be activated, carry on 
         if(modulesToRun[activeModule] == 0){ 
           continue;
@@ -207,12 +210,12 @@ void TrackMerger(const BXType bx,
     #ifndef _SYNTHESIS_
     //  std::cout << "outputBuffer: " << outputBuffer[0].getTrackWord() << " firstTrackWord: " << trackWord[0] << "\n";
     #endif
-    for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
-    {
-      #ifndef _SYNTHESIS_
-        // std::cout << "\t\tModule#" << activeModule << " active " << modulesToRun[activeModule] << std::endl;
-      #endif
-    }
+    // for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
+    // {
+    //   #ifndef _SYNTHESIS_
+    //     // std::cout << "\t\tModule#" << activeModule << " active " << modulesToRun[activeModule] << std::endl;
+    //   #endif
+    // }
     bx_o = bx;
     outputNumber = outputIndex + unmergedOutputIndex;
     LOOP_OutputUnmergedTrackWord:

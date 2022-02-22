@@ -5,6 +5,7 @@ void TrackHandler::CompareTrack(TrackHandler track){
   // compare the two tracks, masterTrack and trk
   // std::cout << "masterTrack: " << trkWord << std::endl;
   // std::cout << "track: " << track.trkWord << std::endl;
+  LOOP_CompareTrack:
   for (int layerIndex = 0; layerIndex < 4; layerIndex++){
     #pragma HLS unroll
     auto masterBarrelStubIndex = ap_uint<TrackFit::kTFStubIndexSize>(barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
@@ -38,6 +39,7 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
   #pragma HLS inline
   // update #matches found 
   int matchesFound = 0;
+  LOOP_MatchesFound:
   for (int layerIndex = 0; layerIndex < 4; layerIndex++){
     #pragma HLS unroll
     matchesFound += matchesFoundBarrel[layerIndex][0] + matchesFoundDisk[layerIndex][0];
@@ -50,6 +52,7 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
     // update master track
     // check whether the stub word is non-zero in the compared track
     // then add stub into master track
+    LOOP_SetInputStubToMaster:
     for(int layerIndex = 0; layerIndex < 4; layerIndex++){
       #pragma HLS unroll
       #ifndef _SYNTHESIS_
@@ -67,11 +70,13 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
       totalHitMap = mergedBarrelStubsMap + mergedDiskStubsMap;
       trkWord | totalHitMap;
       
+      LOOP_MergeLoopOverStubIndicies:
       for (int stubIndex = 1; stubIndex < layerStubIndexSize; stubIndex++){
         #pragma HLS unroll
         if(barrelStubArray[layerIndex][stubIndex] == 0 && track.barrelStubArray[layerIndex][stubIndex] != 0){
           barrelStubArray[layerIndex][stubIndex] = track.barrelStubArray[layerIndex][stubIndex];
         } else {
+          LOOP_BitIndexBarrel:
           for (int bitIndex = 0; bitIndex < TrackFit::kBarrelStubSize; bitIndex++){
             #pragma HLS unroll
             barrelStubArray[layerIndex][stubIndex] = barrelStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
@@ -83,6 +88,7 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
         if(diskStubArray[layerIndex][stubIndex] == 0 && track.diskStubArray[layerIndex][stubIndex] != 0){
           diskStubArray[layerIndex][stubIndex] = track.diskStubArray[layerIndex][stubIndex];
         } else {
+          LOOP_BitIndexDisk:
           for (int bitIndex = 0; bitIndex < TrackFit::kDiskStubSize; bitIndex++){
             #pragma HLS unroll
             diskStubArray[layerIndex][stubIndex] = diskStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
@@ -97,4 +103,3 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
     
   else matchFound = 0;
 }
-// shift bit >> every 3 bits and OR after everytime it is shifted
