@@ -96,6 +96,7 @@ void TrackMerger(const BXType bx,
     
     LOOP_InputProc:
     for (int i = 0; i < kMaxProc; i++){ 
+      #pragma HLS pipeline
       #ifndef _SYNTHESIS_
       // std::cout << "Step#: " << i << " masterTrackWord: " << trackWord[i] << " brl1: "<< barrelStubWords[0][i] << " brl2: " << barrelStubWords[1][i] << " brl3: " << barrelStubWords[2][i] << " brl4: " << barrelStubWords[3][i] << std::endl;
       #endif
@@ -128,8 +129,6 @@ void TrackMerger(const BXType bx,
       LOOP_ActiveModule:
       for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++) //might not be able to unroll as processing 
       { 
-        #pragma HLS pipeline
-
         // if module has yet to be activated, carry on 
         if(modulesToRun[activeModule] == 0){ 
           continue;
