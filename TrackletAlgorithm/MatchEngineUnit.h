@@ -166,10 +166,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
     
-    bool passphi = isLessThanSize<5,3,false,5,3>()[(projfinephi___,stubfinephi)];
+    const int projfinephibits(5);
+    const int stubfinephibits(3);
+    bool passphi = isLessThanSize<projfinephibits,stubfinephibits,false,projfinephibits,stubfinephibits>()[(projfinephi___,stubfinephi)];
     
     //Check if stub z position consistent
-    bool pass = isPSseed___ ? isLessThanSize<5,1,true,3,5>()[(stubfinez,projfinezadj___)] : isLessThanSize<5,5,true,3,5>()[(stubfinez,projfinezadj___)];
+    const int stub2Sfinephibits(1);
+    bool pass = isPSseed___ ? isLessThanSize<projfinephibits,stub2Sfinephibits,true,stubfinephibits,projfinephibits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinephibits,projfinephibits,true,stubfinephibits,projfinephibits>()[(stubfinez,projfinezadj___)];
 
     auto const index=projrinv___.concat(stubbend);
 
