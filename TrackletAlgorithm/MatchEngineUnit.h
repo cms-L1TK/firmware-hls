@@ -147,7 +147,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   }
   
   //Read stub memory and extract data fields
-  ap_uint<10> stubadd=(iphiSave,zbin,istubtmp);
+  auto stubadd=(iphiSave,zbin,istubtmp);
   stubdata__ = stubmem[bx_&1][stubadd];
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
