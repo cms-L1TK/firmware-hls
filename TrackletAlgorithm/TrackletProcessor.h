@@ -301,7 +301,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= 342 && rD[i] < 2048;
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
-
   }
 
 // Reject tracklets with too high a curvature or with too large a longitudinal
@@ -312,7 +311,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
-
   return valid_rinv && valid_z0 && keep;
 }
 
@@ -337,7 +335,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
       proj_success = false;
   }
   else {
-    if (proj.getR() < floatToInt(20.0, 2*kr) || proj.getR() >= floatToInt(120.0, 2*kr))
+    if (abs(proj.getRZ()) < floatToInt(rmindiskvm, krprojdisk)  || abs(proj.getRZ()) > floatToInt(rmaxdisk, krprojdisk))
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
@@ -364,7 +362,6 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
     projout[6].write_mem(bx, proj, nproj[6]++);
   if (NProjOut > 7 && TPROJMask & (0x1 << 7) && success && proj_success && phi == 7)
     projout[7].write_mem(bx, proj, nproj[7]++);
-
   return (success && proj_success);
 }
 
