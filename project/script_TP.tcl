@@ -1,15 +1,34 @@
-# Script to generate project for TC
-#   vivado_hls -f script_TC.tcl
-#   vivado_hls -p trackletCalculator
+# Script to generate project for TP
+#   vivado_hls -f script_TP.tcl
+#   vivado_hls -p trackletProcessor
 # WARNING: this will wipe out the original project by the same name
 
 # get some information about the executable and environment
 source env_hls.tcl
 
 set modules_to_test {
+  {TP_L1L2A}
+  {TP_L1L2B}
   {TP_L1L2C}
-  {TP_L2L3C}
+  {TP_L1L2D}
+  {TP_L1L2E} 
+  {TP_L1L2F} 
+  {TP_L1L2G} 
+  {TP_L1L2H} 
+  {TP_L1L2I} 
+  {TP_L1L2J} 
+  {TP_L1L2K} 
+  {TP_L1L2L} 
+  {TP_L2L3A} 
+  {TP_L2L3B} 
+  {TP_L2L3C} 
+  {TP_L2L3D} 
+  {TP_L3L4A}
+  {TP_L3L4B}
   {TP_L3L4C}
+  {TP_L3L4D}
+  {TP_L5L6A}
+  {TP_L5L6B}
   {TP_L5L6C}
 }
 # module_to_export must correspond to the default macros set at the top of the
