@@ -93,7 +93,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + phiPlus_;
   auto secondSave = second_;
 
-  if(zero<kNBits_MemAddrBinned>()[istub_]) {
+  if(istub_ == 0) {
      
     //Need to read the information about the proj in the buffer
     VMProjection<BARREL> data(projbuffer_.getProjection());
