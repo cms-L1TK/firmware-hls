@@ -115,6 +115,10 @@ public:
     return data_.range(kVMProjZBinMSB,kVMProjZBinLSB);
   }
 
+  VMPZBIN getZBinNoFlag() const {
+    return data_.range(kVMProjZBinMSB,kVMProjZBinLSB+1);
+  }
+
   VMPFINEZ getFineZ() const {
     return data_.range(kVMProjFineZMSB,kVMProjFineZLSB);
   }

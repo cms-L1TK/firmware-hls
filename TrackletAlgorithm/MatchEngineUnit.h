@@ -99,7 +99,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
     VMProjection<BARREL> data(projbuffer_.getProjection());
 
     //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
-    zbin = data.getZBin().range(3,1); 
+    zbin = data.getZBinNoFlag();
     
     auto projfinez = data.getFineZ();
     projfinephi__ = data.getFinePhi();
