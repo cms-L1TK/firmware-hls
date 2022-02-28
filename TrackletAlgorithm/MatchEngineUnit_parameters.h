@@ -62,17 +62,6 @@ static const ap_uint<(1 << kNBits)> zero() {
   return lut;
 }
 
-template<int kNBits>
-static const ap_uint<(1 << kNBits)> nonzero() {
-  ap_uint<(1 << kNBits)> lut;
-  for(int i = 0; i < (1 << kNBits); ++i) {
-#pragma HLS unroll
-    lut[i] = (i != 0);
-  }
-  return lut;
-}
-
-
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> geq() {
   ap_uint<(1 << (2 * kNBitsBuffer))> lut;
