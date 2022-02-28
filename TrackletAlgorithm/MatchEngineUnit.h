@@ -90,7 +90,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   
   NSTUBS istubtmp=istub_;
 
-  ap_uint<3> iphiSave = iphi_ + phiPlus_;
+  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + phiPlus_;
   auto secondSave = second_;
 
   if(zero<kNBits_MemAddrBinned>()[istub_]) {
@@ -342,7 +342,7 @@ inline void advance() {
  ap_uint<1> phiPlus_;
  ap_int<2> shift_;
  bool idle_;
- ap_uint<3> iphi_;
+ ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;
  bool empty_;
  VMStubMECM<VMSMEType> stubdata__, stubdata___; 
