@@ -14,8 +14,6 @@ find -mindepth 1 -maxdepth 1 \
   ! -regex "^\.\/clean\.sh$" \
   ! -regex "^\.\/generate_[A-Z]*\.py$" \
   ! -regex "^\.\/project_generation_scripts$" \
-  ! -regex "^\.\/makeBarrelConfig\.py$" \
-  ! -regex "^\.\/LUTsBarrel$" \
     -exec rm -rfv {} \;
   #! -regex "^\.\/dtclinklayerdisk\.dat$" \
 
