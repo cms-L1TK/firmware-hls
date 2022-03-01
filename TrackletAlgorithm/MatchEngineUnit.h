@@ -167,13 +167,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
     
-    const int projfinephibits(5);
-    const int stubfinephibits(3);
-    bool passphi = isLessThanSize<projfinephibits,stubfinephibits,false,projfinephibits,stubfinephibits>()[(projfinephi___,stubfinephi)];
+    const int projfinebits(VMProjectionBase<BARREL>::kVMProjFinePhiWideSize);
+    const int stubfinebits(VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize);
+    bool passphi = isLessThanSize<projfinebits,stubfinebits,false,projfinebits,stubfinebits>()[(projfinephi___,stubfinephi)];
     
     //Check if stub z position consistent
-    const int stub2Sfinephibits(1);
-    bool pass = isPSseed___ ? isLessThanSize<projfinephibits,stub2Sfinephibits,true,stubfinephibits,projfinephibits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinephibits,projfinephibits,true,stubfinephibits,projfinephibits>()[(stubfinez,projfinezadj___)];
+    const int stub2Sfinebits(1);
+    bool pass = isPSseed___ ? isLessThanSize<projfinebits,stub2Sfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinebits,projfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)];
 
     auto const index=projrinv___.concat(stubbend);
 
@@ -360,8 +360,8 @@ inline void advance() {
 
  //Pipeline variables
  bool good__, good___;
- ap_int<5> projfinephi__, projfinephi___; //FIXME Need replace 5 with const
- ap_int<5> projfinezadj__, projfinezadj___; //FIXME Need replace 5 with const
+ ap_uint<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> projfinephi__, projfinephi___;
+ ap_uint<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> projfinezadj__, projfinezadj___;
  bool isPSseed__, isPSseed___;
  VMProjection<BARREL>::VMPRINV projrinv__, projrinv___;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___;
