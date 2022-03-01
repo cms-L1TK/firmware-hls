@@ -8,6 +8,9 @@ luts_url="https://cernbox.cern.ch/index.php/s/SUd6tEO970wKNnZ/download"
 # Reduced configuration
 memprints_url_reduced="https://cernbox.cern.ch/index.php/s/qBKvAmfu83SpAGD/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/GJZA1zLnWg3hP4y/download"
+# Barrel-only configuration
+memprints_url_barrel="https://cernbox.cern.ch/index.php/s/4bav5YoSOEK3NIg/download"
+luts_url_barrel="https://cernbox.cern.ch/index.php/s/myeIctCD1huekgq/download"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/YcqX3KUgFdZyMG6/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/lKrxzKJ0XmelE0j/download"
@@ -65,6 +68,10 @@ then
   wget -O LUTs.tgz --quiet ${luts_url_reduced}
   tar -xzf LUTs.tgz
   mv LUTs LUTsReduced
+  rm -f LUTs.tgz
+  wget -O LUTs.tgz --quiet ${luts_url_barrel}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsBarrel
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
@@ -159,6 +166,11 @@ then
   mv MemPrints MemPrintsReduced
   rm -f MemPrints.tgz
 
+  wget -O MemPrints.tgz --quiet ${memprints_url_barrel}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsBarrel
+  rm -f MemPrints.tgz
+
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzf MemPrints.tgz
   mv MemPrints MemPrintsCM
@@ -186,6 +198,7 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   memprint_location_reduced="MemPrintsReduced"
+  memprint_location_barrel="MemPrintsBarrel"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
@@ -205,11 +218,13 @@ do
 
     rm -rf ${target_dir}
     mkdir -p ${target_dir}/ReducedConfig
+    mkdir -p ${target_dir}/BarrelConfig
 
     for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
     do
       find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
       find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
+      find ${memprint_location_barrel} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/BarrelConfig/ \;
     done
   fi
 
