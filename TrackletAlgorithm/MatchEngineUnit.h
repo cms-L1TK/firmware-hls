@@ -105,8 +105,9 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
     projfinephi__ = data.getFinePhi();
      
     //Calculate fine z position
+    const int detectorshift(8);
     if (second_) {
-      projfinezadj__ = projfinez-8;
+      projfinezadj__ = projfinez-detectorshift;
       zbin=zbin+1;
     } else {
       projfinezadj__ = projfinez;
@@ -114,12 +115,12 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
 
     if (!phiPlus_) {
       if (shift_==-1) {
-	projfinephi__ -= 8;
+	projfinephi__ -= detectorshift;
       }
     } else {
       //When we get here shift_ is either 1 or -1
       if (shift_==1) {
-	projfinephi__ += 8;
+	projfinephi__ += detectorshift;
       }
     }
 
