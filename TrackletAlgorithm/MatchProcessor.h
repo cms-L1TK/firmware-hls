@@ -651,7 +651,7 @@ void MatchProcessor(BXType bx,
 
     projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
     
-    ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+    auto bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
 
     ap_uint<1> hasMatch = !emptys[bestiMEU];
 
