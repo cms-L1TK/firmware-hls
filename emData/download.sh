@@ -93,6 +93,15 @@ mkdir -p ../TopFunctions/ReducedConfig
 ./generate_ME.py -s  -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
 ./generate_MC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
 ./generate_TB.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+### barrel config
+mkdir -p ../TopFunctions/BarrelConfig
+./generate_IR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_VMR.py -a -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_TC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_PR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_ME.py -s  -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_MC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_TB.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
 ### combined config
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
