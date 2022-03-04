@@ -196,6 +196,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
                 if is_binned:
                     bin, data = val
+                    bin = bin.replace("0x","")
                 else:
                     data = val
 

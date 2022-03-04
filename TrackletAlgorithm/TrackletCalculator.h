@@ -44,7 +44,7 @@ namespace TC {
     typedef ap_int<11> der_phiL;
     typedef ap_int<10> der_zL;
     typedef ap_uint<16> phiD;
-    typedef ap_int<14> rD;
+    typedef ap_uint<14> rD;
     typedef ap_int<10> der_phiD;
     typedef ap_int<10> der_rD;
     typedef ap_uint<1> flag;
@@ -311,13 +311,13 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
 // Determine which disk projections are valid.
  valid_proj_disk: for (ap_uint<3> i = 0; i < trklet::N_DISK - 1; i++) {
     valid_proj_disk[i] = true;
-    if (abs(*t) < floatToInt(1.0, kt)) // disk projections are invalid if |t| < 1
+    if (abs(*t) <= floatToInt(1.0, kt)) // disk projections are invalid if |t| <= 1
       valid_proj_disk[i] = false;
     if (phiD[i] <= 0)
       valid_proj_disk[i] = false;
     if (phiD[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
       valid_proj_disk[i] = false;
-    if (rD[i] <= floatToInt(rmindisk, krprojdisk) || rD[i] > floatToInt(rmaxdisk, krprojdisk))
+    if (rD[i] < floatToInt(rmindisk, krprojdisk) || rD[i] >= floatToInt(rmaxdisk, krprojdisk))
       valid_proj_disk[i] = false;
   }
 
@@ -351,13 +351,13 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 
 // Reject projections with extreme r/z values.
   if (TProjType != DISK) {
-    if ((proj.getRZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getRZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
+    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
       proj_success = false;
-    if (abs(proj.getRZ()) > floatToInt(zlength, kz))
+    if (abs(proj.getZ()) > floatToInt(zlength, kz))
       proj_success = false;
   }
   else {
-    if (proj.getRZ() < floatToInt(rmindiskvm, krprojdisk) || proj.getRZ() > floatToInt(rmaxdisk, krprojdisk))
+    if (proj.getR() < floatToInt(rmindiskvm, krprojdisk) || proj.getR() >= floatToInt(rmaxdisk, krprojdisk))
       proj_success = false;
   }
 

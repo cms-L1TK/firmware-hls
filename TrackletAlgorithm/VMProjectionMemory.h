@@ -16,6 +16,7 @@ public:
     kVMProjIsPSSeedSize = 1,
     kVMProjRinvSize = 5,
     kVMProjFinePhiSize = 3,
+    kVMProjFinePhiWideSize = 5,
     kVMProjFineZSize = 4,
     kVMProjZBinSize = MEBinsBits+1,
     kVMProjIndexSize = 7,
@@ -33,6 +34,7 @@ public:
     kVMProjIsPSSeedSize = 0,
     kVMProjRinvSize = 5,
     kVMProjFinePhiSize = 3,
+    kVMProjFinePhiWideSize = 5,
     kVMProjFineZSize = 4,
     kVMProjZBinSize = MEBinsBits+1+1,
     kVMProjIndexSize = 7,
@@ -113,6 +115,10 @@ public:
 
   VMPZBIN getZBin() const {
     return data_.range(kVMProjZBinMSB,kVMProjZBinLSB);
+  }
+
+  VMPZBIN getZBinNoFlag() const {
+    return data_.range(kVMProjZBinMSB,kVMProjZBinLSB+1);
   }
 
   VMPFINEZ getFineZ() const {

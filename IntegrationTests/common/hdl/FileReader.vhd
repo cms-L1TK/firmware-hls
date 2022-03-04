@@ -159,10 +159,16 @@ begin
 
           if (NUM_BINS > 1) then
             -- Get memory bin 
-            read(LINE_IN, CHAR);        
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- x
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- digit
             char2int(CHAR, MEM_BIN);
-            read(LINE_IN, CHAR);        
-            read(LINE_IN, CHAR);        
+            read(LINE_IN, CHAR);           -- space
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- x
+            read(LINE_IN, CHAR);           -- 0
+            read(LINE_IN, CHAR);           -- digit
             char2int(CHAR, POS_IN_MEM_BIN);
           end if;
 
@@ -171,7 +177,6 @@ begin
             if (CHAR = 'x') then                   -- ... until the next x
               CNT_X_CHAR := CNT_X_CHAR + 1;
               if ((NUM_BINS > 1 and CNT_X_CHAR = NUM_X_CHAR_BINNED) or
-                  (NUM_BINS = 1 and CNT_X_CHAR = 1 and RAM_WIDTH = 36 and NUM_PAGES = 2) or -- Bodge for IL as they are unbinned but only contain one 'x'
                   (NUM_BINS = 1 and CNT_X_CHAR = NUM_X_CHAR_UNBINNED)) then -- No. of 'x' chars reached
                 -- Found data word.
                 FOUND_WORD := true;

@@ -1,47 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-#### reduced config ####
-#### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
-# 1 event
-#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
-# 100 events
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
-
-#### test 211005/211217 ####
+#### fw_synch_220220 ####
 # Standard configuration
-#memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
-#luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
+memprints_url="https://cernbox.cern.ch/index.php/s/7H3StfracwrVUAe/download"
+luts_url="https://cernbox.cern.ch/index.php/s/SUd6tEO970wKNnZ/download"
+# Reduced configuration
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/qBKvAmfu83SpAGD/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/GJZA1zLnWg3hP4y/download"
 # Combined modules
-#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
-#luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
-
-
-
-#### fw_synch_210611 ####
-# Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
-# Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
-
-#### fw_synch_210503 ####
-# Standard configuration
-#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
-# Combined modules
-#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
-#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
-
-#### fw_synch_201005 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
-
-#### fw_synch_200515 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/YcqX3KUgFdZyMG6/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/lKrxzKJ0XmelE0j/download"
 
 # The following modules will have dedicated directories of test-bench files
 # prepared for them.
@@ -151,32 +120,64 @@ declare -a processing_modules=(
   "ME_D5PHIC12"
 
   # MatchCalculator
+  "MC_L1PHIA"
   "MC_L1PHIB"
-  "MC_L2PHIB"
-  "MC_L3PHIB"
-  "MC_L4PHIB"
-  "MC_L5PHIB"
-  "MC_L6PHIB"
   "MC_L1PHIC"
+  "MC_L1PHID"
+  "MC_L1PHIE"
+  "MC_L1PHIF"
+  "MC_L1PHIG"
+  "MC_L1PHIH"
+  "MC_L2PHIA"
+  "MC_L2PHIB"
   "MC_L2PHIC"
+  "MC_L2PHID"
+  "MC_L3PHIA"
+  "MC_L3PHIB"
   "MC_L3PHIC"
+  "MC_L3PHID"
+  "MC_L4PHIA"
+  "MC_L4PHIB"
   "MC_L4PHIC"
+  "MC_L4PHID"
+  "MC_L5PHIA"
+  "MC_L5PHIB"
   "MC_L5PHIC"
+  "MC_L5PHID"
+  "MC_L6PHIA"
+  "MC_L6PHIB"
   "MC_L6PHIC"
+  "MC_L6PHID"
 
   # MatchProcessor
+  "MP_L1PHIA"
   "MP_L1PHIB"
-  "MP_L2PHIB"
-  "MP_L3PHIB"
-  "MP_L4PHIB"
-  "MP_L5PHIB"
-  "MP_L6PHIB"
   "MP_L1PHIC"
+  "MP_L1PHID"
+  "MP_L1PHIE"
+  "MP_L1PHIF"
+  "MP_L1PHIG"
+  "MP_L1PHIH"
+  "MP_L2PHIA"
+  "MP_L2PHIB"
   "MP_L2PHIC"
+  "MP_L2PHID"
+  "MP_L3PHIA"
+  "MP_L3PHIB"
   "MP_L3PHIC"
+  "MP_L3PHID"
+  "MP_L4PHIA"
+  "MP_L4PHIB"
   "MP_L4PHIC"
+  "MP_L4PHID"
+  "MP_L5PHIA"
+  "MP_L5PHIB"
   "MP_L5PHIC"
+  "MP_L5PHID"
+  "MP_L6PHIA"
+  "MP_L6PHIB"
   "MP_L6PHIC"
+  "MP_L6PHID"
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
@@ -313,11 +314,6 @@ wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
 tar -xzf MemPrints.tgz
 mv MemPrints MemPrintsReduced
 rm -f MemPrints.tgz
-
-### Ugly hack to remove initial "0x" from input stub test vectors, in order to
-### be consistent with other sets of test vectors.
-### FIXME: Remove after next FW sync
-sed -i "s/^0x//g" MemPrintsReduced/InputStubs/InputStubs_*.dat
 
 wget -O MemPrints.tgz --quiet ${memprints_url_cm}
 tar -xzf MemPrints.tgz

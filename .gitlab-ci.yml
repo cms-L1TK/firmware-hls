@@ -66,8 +66,8 @@ stages: # ---------------------------------------------------------------------
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
     - vivado_hls -f ./compileHLS.tcl
-    - vivado -mode batch -source ./makeProject.tcl
-    - vivado -mode batch -source ./runSim.tcl
+    - vivado -mode batch -source ./makeProject.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
+    - vivado -mode batch -source ./runSim.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -95,7 +95,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode batch -source common/script/synth.tcl 
+    - vivado -mode batch -source common/script/synth.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
@@ -262,7 +262,6 @@ MC-vivado-hls-build:
     PROJ_NAME: "MC"
 MP-vivado-hls-build:
   <<: *template_hls-build
-  allow_failure: true
   needs: ["download", "MP-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
@@ -357,7 +356,6 @@ topPRMEMC-check-results:
     - topPRMEMC-sim
 topTETC-check-results:
   <<: *template_check-results
-  allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "TETC"
@@ -366,7 +364,6 @@ topTETC-check-results:
     - topTETC-sim
 topIRVMR-check-results:
   <<: *template_check-results
-  allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "IRVMR"

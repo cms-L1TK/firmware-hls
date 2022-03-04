@@ -28,7 +28,7 @@ namespace TC {
     typedef ap_int<11> der_phiL;
     typedef ap_int<10> der_zL;
     typedef ap_uint<16> phiD;
-    typedef ap_int<14> rD;
+    typedef ap_uint<14> rD;
     typedef ap_int<10> der_phiD;
     typedef ap_int<10> der_rD;
     typedef ap_uint<1> flag;
@@ -299,7 +299,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
     bool valid_t=abs(*t)>floatToInt(1.0, kt);
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
-    bool valid_r=rD[i] >= 342 && rD[i] <= 2048;
+    bool valid_r=rD[i] >= 342 && rD[i] < 2048;
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
 
   }
@@ -331,13 +331,13 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 
 // Reject projections with extreme r/z values.
   if (TProjType != DISK) {
-    if ((proj.getRZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getRZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
+    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
       proj_success = false;
-    if (abs(proj.getRZ()) > 2048)
+    if (abs(proj.getZ()) > 2048)
       proj_success = false;
   }
   else {
-    if (proj.getRZ() < 20.0/(2*kr) || proj.getRZ() > 120.0/(2*kr))
+    if (proj.getR() < floatToInt(20.0, 2*kr) || proj.getR() >= floatToInt(120.0, 2*kr))
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
