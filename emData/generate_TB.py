@@ -88,8 +88,16 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         tparOffset += (seedNumber << 4)
 
         # numbers of output stubs
-        nBarrelStubs = len({fm[0:10] for fm in barrelFMMems[tbName]})
+        barrelFMs = sorted([fm[0:10] for fm in barrelFMMems[tbName]])
+        nBarrelStubs = len(set(barrelFMs))
         nDiskStubs = len({fm[0:10] for fm in diskFMMems[tbName]})
+
+        # numbers of memories per stub
+        barrelFM0 = barrelFMs[0] if len(barrelFMs) > 0 else ""
+        nBarrelFMMemPerStub0 = barrelFMs.count(barrelFM0)
+        barrelFMs = [fm for fm in barrelFMs if fm != barrelFM0]
+        nBarrelFMMemPerStub = int(len(barrelFMs) / (nBarrelStubs - 1)) if nBarrelStubs > 1 else 0
+        nDiskFMMemPerStub = int(nDiskFMMem / nDiskStubs) if nDiskStubs > 0 else 0
 
         # Print out prototype for top function for this TB.
         topHeaderFile.write(
@@ -138,7 +146,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMem) + ", " + str(nDiskFMMem) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
             "    bx,\n"
             "    trackletParameters,\n"
             "    barrelFullMatches,\n"

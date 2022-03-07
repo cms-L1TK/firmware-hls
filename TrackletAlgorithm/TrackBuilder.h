@@ -32,7 +32,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-template<unsigned Seed, unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
+template<unsigned Seed, unsigned NFMPerStubBarrel0, unsigned NFMPerStubBarrel, unsigned NFMPerStubDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -44,6 +44,9 @@ void TrackBuilder(
     typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord diskStubWords[][kMaxProc]
 )
 {
+
+  constexpr unsigned NFMBarrel = NFMPerStubBarrel0 + (NBarrelStubs - 1) * NFMPerStubBarrel;
+  constexpr unsigned NFMDisk = NDiskStubs * NFMPerStubDisk;
 
   // Circular buffers for each of the input full-match memories.
   FullMatch<BARREL> barrel_fm[NFMBarrel][1<<kNBitsTBBuffer];
@@ -153,10 +156,10 @@ void TrackBuilder(
     // object.
     ap_uint<3> nMatches = 0; // there can be up to eight matches (3 bits)
 
-    unsigned nFMCumulative = 0;
     barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
-      const unsigned nFM = ((Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L5L6) && j == 0 ? 8 : 4);
+      const unsigned nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
+      const unsigned nFMCumulative = (j == 0 ? 0 : (j == 1 ? NFMPerStubBarrel0 : NFMPerStubBarrel0 + (j - 1) * NFMPerStubBarrel));
 
       ap_uint<1> barrel_stub_valid = false;
       barrel_stub_valid : for (short k = 0; k < nFM; k++)
@@ -179,7 +182,6 @@ void TrackBuilder(
                          ((nFM > 2 && barrel_valid[nFMCumulative + 2]) ? (barrel_read_index[nFMCumulative + 2]) :
                          ((nFM > 1 && barrel_valid[nFMCumulative + 1]) ? (barrel_read_index[nFMCumulative + 1]) :
                                                                          (barrel_read_index[nFMCumulative]))))))));
-      nFMCumulative += nFM;
       const auto &barrel_stub = barrel_fm[i_mem][i_fm];
 
       const auto &barrel_stub_index = (barrel_stub_valid ? barrel_stub.getStubIndex() : FullMatch<BARREL>::FMSTUBINDEX(0));
@@ -225,29 +227,19 @@ void TrackBuilder(
 
     disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
 
-      const unsigned nFM = 4;
-
       ap_uint<1> disk_stub_valid = false;
-      disk_stub_valid : for (short k = 0; k < nFM; k++)
-        disk_stub_valid = (disk_stub_valid || disk_valid[j * nFM + k]);
+      disk_stub_valid : for (short k = 0; k < NFMPerStubDisk; k++)
+        disk_stub_valid = (disk_stub_valid || disk_valid[j * NFMPerStubDisk + k]);
       nMatches += (disk_stub_valid ? 1 : 0);
 
-      const auto &i_mem = ((nFM > 7 && disk_valid[j * nFM + 7]) ? (j * nFM + 7) :
-                          ((nFM > 6 && disk_valid[j * nFM + 6]) ? (j * nFM + 6) :
-                          ((nFM > 5 && disk_valid[j * nFM + 5]) ? (j * nFM + 5) :
-                          ((nFM > 4 && disk_valid[j * nFM + 4]) ? (j * nFM + 4) :
-                          ((nFM > 3 && disk_valid[j * nFM + 3]) ? (j * nFM + 3) :
-                          ((nFM > 2 && disk_valid[j * nFM + 2]) ? (j * nFM + 2) :
-                          ((nFM > 1 && disk_valid[j * nFM + 1]) ? (j * nFM + 1) :
-                                                                  (j * nFM))))))));
-      const auto &i_fm = ((nFM > 7 && disk_valid[j * nFM + 7]) ? (disk_read_index[j * nFM + 7]) :
-                         ((nFM > 6 && disk_valid[j * nFM + 6]) ? (disk_read_index[j * nFM + 6]) :
-                         ((nFM > 5 && disk_valid[j * nFM + 5]) ? (disk_read_index[j * nFM + 5]) :
-                         ((nFM > 4 && disk_valid[j * nFM + 4]) ? (disk_read_index[j * nFM + 4]) :
-                         ((nFM > 3 && disk_valid[j * nFM + 3]) ? (disk_read_index[j * nFM + 3]) :
-                         ((nFM > 2 && disk_valid[j * nFM + 2]) ? (disk_read_index[j * nFM + 2]) :
-                         ((nFM > 1 && disk_valid[j * nFM + 1]) ? (disk_read_index[j * nFM + 1]) :
-                                                                 (disk_read_index[j * nFM]))))))));
+      const auto &i_mem = ((disk_valid[j * NFMPerStubDisk + 3]) ? (j * NFMPerStubDisk + 3) :
+                          ((disk_valid[j * NFMPerStubDisk + 2]) ? (j * NFMPerStubDisk + 2) :
+                          ((disk_valid[j * NFMPerStubDisk + 1]) ? (j * NFMPerStubDisk + 1) :
+                                                                  (j * NFMPerStubDisk))));
+      const auto &i_fm = ((disk_valid[j * NFMPerStubDisk + 3]) ? (disk_read_index[j * NFMPerStubDisk + 3]) :
+                         ((disk_valid[j * NFMPerStubDisk + 2]) ? (disk_read_index[j * NFMPerStubDisk + 2]) :
+                         ((disk_valid[j * NFMPerStubDisk + 1]) ? (disk_read_index[j * NFMPerStubDisk + 1]) :
+                                                                 (disk_read_index[j * NFMPerStubDisk]))));
       const auto &disk_stub = disk_fm[i_mem][i_fm];
 
       const auto &disk_stub_index = (disk_stub_valid ? disk_stub.getStubIndex() : FullMatch<DISK>::FMSTUBINDEX(0));
