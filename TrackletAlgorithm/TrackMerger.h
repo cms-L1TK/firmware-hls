@@ -5,7 +5,7 @@
 #include "TrackHandler.h"
 
 const unsigned int bufferSize = 50; // chosen random buffer size - will need to see how many tracks are in test bench
-const unsigned int kNComparisonModules = 16;
+const unsigned int kNComparisonModules = 1;
 class ComparisonModule{
   public:
     ComparisonModule()
