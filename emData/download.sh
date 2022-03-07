@@ -239,22 +239,6 @@ do
   shift
 done
 
-# If the MemPrints directory exists, assume the script has already been run,
-# and simply exit.
-if [ -d "MemPrints" ]
-then
-  echo "The emData directory must be cleaned for this script to work."
-  exit 0
-fi
-
-# If the LUTs directory exists, assume LUTs.tar.gz has already been downloaded
-# and unpacked, and only download and unpack MemPrints.tar.gz.
-memprints_only=0
-if [ -d "LUTs" ]
-then
-  memprints_only=1
-fi
-
 # Exit with an error message if run from a directory other than emData/.
 cwd=`pwd | xargs basename`
 if [[ $cwd != "emData" ]]
@@ -263,8 +247,18 @@ then
   exit 1
 fi
 
-# Download and unpack LUTs.tar.gz.
-if [[ $memprints_only == 0 ]]
+# If the MemPrints directory exists, assume the script has already been run,
+# and simply exit.
+if [ -d "MemPrints" ]
+then
+  echo "The emData directory must be cleaned for this script to work."
+  exit 0
+fi
+
+# Download and unpack LUTs.tar.gz,
+# unless LUTS directory already exists (due to previous "download.sh -t" run).
+
+if [ ! -d "LUTs" ]
 then
   wget -O LUTs.tgz --quiet ${luts_url_reduced}
   tar -xzf LUTs.tgz
@@ -303,26 +297,24 @@ mkdir -p ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 
-# Exit now if we are only downloading and unpacking LUTs.tar.gz.
-if [[ $tables_only != 0 ]]
+if [[ $tables_only == 0 ]]
 then
-  exit 0
+  # Get memory test data: download and unpack the tarball.
+  wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsReduced
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_cm}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsCM
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tar.gz --quiet ${memprints_url}
+  tar -xzf MemPrints.tar.gz
+  rm -f MemPrints.tar.gz
+
 fi
-
-# Download and unpack the tarball.
-wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
-tar -xzf MemPrints.tgz
-mv MemPrints MemPrintsReduced
-rm -f MemPrints.tgz
-
-wget -O MemPrints.tgz --quiet ${memprints_url_cm}
-tar -xzf MemPrints.tgz
-mv MemPrints MemPrintsCM
-rm -f MemPrints.tgz
-
-wget -O MemPrints.tar.gz --quiet ${memprints_url}
-tar -xzf MemPrints.tar.gz
-rm -f MemPrints.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
@@ -348,18 +340,22 @@ do
   fi
   wires="${table_location}/wires.dat"
 
-  target_dir=${module_type}/${module}
+  if [[ $tables_only == 0 ]]
+  then
+    # Create directories containing memory test data specific to each module type.
+    target_dir=${module_type}/${module}
 
-  rm -rf ${target_dir}
-  mkdir -p ${target_dir}/ReducedConfig
+    rm -rf ${target_dir}
+    mkdir -p ${target_dir}/ReducedConfig
 
-  for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
-  do
-    find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-    find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
-  done
+    for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+    do
+      find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+      find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
+    done
+  fi
 
-  # Table linking logic specific to each module type
+  # Create directories containing LUT tables specific to each module type.
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
