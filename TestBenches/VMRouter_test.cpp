@@ -1,5 +1,18 @@
 // Test bench for VMRouter
-#include "VMRouterTop_L2PHIA.h"
+
+// To run a different phi region, change the following:
+//          - change the top function and header file (TOP_FUNC_, HEADER_FILE_)
+//          - add the phi region in emData/download.sh, make sure to also run clean
+//          - run emData/generate_VMR.py to generate new top and parameters files
+
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ VMRouterTop_L2PHIA
+  #define HEADER_FILE_ "VMRouterTop_L2PHIA.h"
+#endif
+
+#include HEADER_FILE_
 
 #include <algorithm>
 #include <iterator>
@@ -9,19 +22,6 @@
 using namespace std;
 
 const int nEvents = 100;  //number of events to run
-
-// VMRouter Test that works for all regions
-// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-
-// To run a different phi region, change the following:
-//          - add the phi region in emData/download.sh, make sure to also run clean
-//
-//          - kLAYER, kDISK, and phiRegion in VMRouterTop.h
-//          - add corresponding magic numbers to VMRouter_parameters.h if not already defined
-//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
-//          OR
-//          - run emData/generate_VMR.py to generate new top and parameters files
-
 
 // Count the number of copies of each memory in a file name vector
 vector<int> countCopies(const vector<string> &fileNames) {
@@ -104,7 +104,7 @@ int main() {
 
   // Output memories
   static AllStubMemory<outputType> memoriesAS[maxASCopies];
-  static VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin> memoriesME[nvmME];
+  static VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME> memoriesME[nvmME];
   static VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies];
   static VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies];
   static VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies];
@@ -157,7 +157,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterTop_L2PHIA(bx, bx_out, inputStubs
+    TOP_FUNC_(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
@@ -188,7 +188,7 @@ int main() {
     // ME Memories
     if (nTotVMSME) {
       for (unsigned int i = 0; i < nTotVMSME; i++) {
-        err += compareBinnedMemWithFile<VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
+        err += compareBinnedMemWithFile<VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
       }
     }
 

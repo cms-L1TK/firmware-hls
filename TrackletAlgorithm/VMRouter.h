@@ -32,62 +32,23 @@
 #include "DummyMessageLogger.h"
 #endif
 #endif
+
 /////////////////////////////////////////
 // Constants
 
-// from Constants.hh -- needs a final home?
-constexpr unsigned int nallstubslayers[6] = { 8, 4, 4, 4, 4, 4 }; // Number of AllStub memories, i.e. coarse phi regions, per sector
-constexpr unsigned int nallstubsdisks[5] = { 4, 4, 4, 4, 4 };
-
-constexpr unsigned int nvmmelayers[6] = { 4, 8, 8, 8, 8, 8 }; // Number of ME VM modules per coarse phi region
-constexpr unsigned int nvmmedisks[5] = { 8, 4, 4, 4, 4 };
-
-constexpr unsigned int nvmtelayers[6] = { 4, 8, 4, 8, 4, 8 }; // Number of TE VM modules per coarse phi region
-constexpr unsigned int nvmtedisks[5] = { 4, 4, 4, 4, 4 };
-
-constexpr unsigned int nvmollayers[2] = { 2, 2 }; // Number of Overlap VM modules per coarse phi region
-
-constexpr unsigned int nvmteextralayers[3] = { 0, 4, 4 }; // Number of extra TEInner L2 and TEOuter L3 modules per coarse phi region
-
-// Number of bits used for the VMs for different layers and disks
-// E.g. 32 VMs would use 5 vmbits
-constexpr int nbitsvmlayer[6] = { 5, 5, 5, 5, 5, 5 }; // Could be computed using the number of VMs...
-constexpr int nbitsvmdisk[5] = { 5, 4, 4, 4, 4 };
-constexpr int nbitsvmtelayer[6] = { 5, 5, 4, 5, 4, 5 }; // For TE (inner) memories
-constexpr int nbitsvmtedisk[5] = { 4, 4, 4, 4, 4 };
-constexpr int nbitsvmoverlap[2] = { 4, 3 };
-constexpr int nbitsvmextra[3] = { 0, 4, 4 };
-
-// Number of most significant bits (MSBs) of z and r used for index in the LUTs
-constexpr int nbitsztablelayer = 7;
-constexpr int nbitsrtablelayer = 4;
-
-constexpr int nbitsztabledisk = 3;
-constexpr int nbitsrtabledisk = 8;
-
-// Number of MSBs used for r index in phiCorr LUTs
-constexpr int nbitsrphicorrtable = 3; // Found hardcoded in VMRouterphiCorrTable.h
-
 // Constants used for calculating which VM a stub belongs to
-constexpr int nbits_maxvmol = 4; // Overlap
-
 constexpr float maxvmbins = 1 << nbits_maxvm; // How many bins nbits_maxvm would correspond to
-constexpr float maxvmolbins = 1 << nbits_maxvmol; // Overlap
+constexpr float maxvmolbins = 1 << nbits_maxvm_overlap; // Overlap
 
-constexpr int nbitsphiraw = 7; // Number of bits used for calculating iPhiRawPlus/Minus
+constexpr unsigned int nbitsphiraw = 7; // Number of bits used for calculating iPhiRawPlus/Minus
+
+// Number of rz bin bits for ME
+constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
+constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 
 // The length of the masks used for the memories
-constexpr int maskMEsize = 1 << nbits_maxvm; // ME memories
-constexpr int maskTEIsize = 1 << nbits_maxvm; // TEInner memories
-constexpr int maskOLsize = 1 << nbits_maxvmol; // TEInner Overlap memories
-constexpr int maskTEOsize = 1 << nbits_maxvm; // TEOuter memories
-
-// Number of bins per page in memories (may change in future)
-constexpr int nmaxbinsperpagelayer = 8;
-constexpr int nmaxbinsperpagedisk = 16;
-
-// Number of bits used for binning TE Outer memories, i.e. 1 << NBitsBinTEO bins
-constexpr int NBitsBinTEO = 3;
+constexpr int masksize = 1 << nbits_maxvm;
+constexpr int maskOLsize = 1 << nbits_maxvm_overlap; // TEInner Overlap memories
 
 //////////////////////////////////////
 // Functions used by the VMR
@@ -148,10 +109,10 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 	if (InType == DISKPS || InType == DISK2S)
 		return phi; // Do nothing if disks
 
-	constexpr auto rBins = 1 << nbitsrphicorrtable; // The number of bins for r
+	constexpr auto rBins = 1 << kNbitsrzbin; // The number of bins for r
 
-	ap_uint<nbitsrphicorrtable> rBin = (r + (1 << (r.length() - 1)))
-			>> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
+	ap_uint<kNbitsrzbin> rBin = (r + (1 << (r.length() - 1)))
+			>> (r.length() - kNbitsrzbin); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * rBins + rBin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
@@ -239,18 +200,15 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 
 	// Number of bits for table indices
 	constexpr int nbitszfinebintable =
-			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in finebintable
+			(Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of MSBs of z used in finebintable
 	constexpr int nbitsrfinebintable =
-			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in finebintable
+			(Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of MSBs of r used in finebintable
 
+	// Number of bits needed for all MEs in a layer/disk in a sector
 	constexpr auto vmbits =
-			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmdisk[Disk - 1]; // Number of bits for standard VMs
-
-	// Total number of VMs for ME for a layer/disk in a whole sector
-	constexpr int nvmTotME =
-			Layer != 0 ?
-					nallstubslayers[Layer - 1] * nvmmelayers[Layer - 1] :
-					nallstubsdisks[Disk - 1] * nvmmedisks[Disk - 1];
+			(Layer) ? nbitsallstubs[Layer - 1] + nbits_vmmeall[Layer - 1] : nbitsallstubs[trklet::N_LAYER + Disk - 1] + nbits_vmmeall[trklet::N_LAYER + Disk - 1];
+	// Total number of VMs for ME
+	constexpr int nvmTotME = 1 << vmbits;
 
 	// Some sort of normalisation thing used for determining which VM the stub belongs to
 	static const ap_ufixed<nbits_maxvm, nbits_maxvm-1> d_me = nvmTotME / maxvmbins;
@@ -346,23 +304,16 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 
 	// Number of bits used for table indices
 	constexpr auto nzbitsinnertable =
-			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of bits for zbins in Inner Table
+			(Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of bits for zbins in Inner Table
 	constexpr auto nrbitsinnertable =
-			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of bits for rbins in Inner Table
+			(Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of bits for rbins in Inner Table
 	constexpr auto vmbitsTmp =
-			(Layer) ? nbitsvmtelayer[Layer - 1] : nbitsvmtedisk[Disk - 1]; // Number of bits for standard VMs
+			(Layer) ? nbitsallstubs[Layer - 1] + nbits_vmte[Layer - 1] : nbitsallstubs[trklet::N_LAYER + Disk - 1] + nbits_vmte[trklet::N_LAYER + Disk - 1]; // Number of bits for standard VMs
 	constexpr auto vmbits =
-			(Layer != 2) ? vmbitsTmp : nbitsvmextra[Layer - 1]; // Number of bits for VMs
+			(Layer != 2) ? vmbitsTmp : nbitsallstubs[Layer - 1] + nbits_vmte_extra[Layer - 1]; // Number of bits for VMs
 
 	// Total number of VMs for TE in a whole sector
-	constexpr int nvmTmp =
-			(Layer) ?
-					nallstubslayers[Layer - 1] * nvmtelayers[Layer - 1] :
-					nallstubsdisks[Disk - 1] * nvmtedisks[Disk - 1];
-	constexpr int nvmTotTEI =
-			(Layer != 2) ?
-					nvmTmp :
-					nallstubslayers[Layer - 1] * nvmteextralayers[Layer - 1];
+	constexpr int nvmTotTEI = 1 << vmbits;
 
 	// Some sort of normalisation thing used for determining which VM the stub belongs to
 	static const ap_ufixed<nbits_maxvm, nbits_maxvm-1> d_te = nvmTotTEI / maxvmbins;
@@ -434,23 +385,16 @@ inline VMStubTEOuter<OutType> createStubTEOuter(const InputStub<InType> stub,
 
 	// Number of bits used for LUT indices
 	constexpr auto nzbitsoutertable =
-			(Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of bits for zbins in Outer Table
+			(Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of bits for zbins in Outer Table
 	constexpr auto nrbitsoutertable =
-			(Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of bits for rbins in Outer Table
+			(Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of bits for rbins in Outer Table
 	constexpr auto vmbitsTmp =
-			(Layer) ? nbitsvmlayer[Layer - 1] : nbitsvmtedisk[Disk - 1]; // Number of bits for standard VMs
+			(Layer) ? nbitsallstubs[Layer - 1] + nbits_vmte[Layer - 1] : nbitsallstubs[trklet::N_LAYER + Disk - 1] + nbits_vmte[trklet::N_LAYER + Disk - 1]; // Number of bits for standard VMs
 	constexpr auto vmbits =
-			(Layer != 3) ? vmbitsTmp : nbitsvmextra[Layer - 1]; // Number of bits for VMs
+			(Layer != 3) ? vmbitsTmp : nbitsallstubs[Layer - 1] + nbits_vmte_extra[Layer - 1]; // Number of bits for VMs
 
-			// Total number of VMs for TE in a whole sector
-			constexpr int nvmTmp =
-					(Layer) ?
-							nallstubslayers[Layer - 1] * nvmtelayers[Layer - 1] :
-							nallstubsdisks[Disk - 1] * nvmtedisks[Disk - 1];
-			constexpr int nvmTotTEO =
-					(Layer != 3) ?
-							nvmTmp :
-							nallstubslayers[Layer - 1] * nvmteextralayers[Layer - 1];
+	// Total number of VMs for TE in a whole sector
+	constexpr int nvmTotTEO = 1 << vmbits;
 
 	// Some sort of normalisation thing used for determining which VM the stub belongs to
 	static const ap_ufixed<nbits_maxvm, nbits_maxvm-1> d_te = nvmTotTEO / maxvmbins;
@@ -528,13 +472,12 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 	int nbendBits = bend.length(); // Number of bits for bend
 
 	// Number of bits
-	constexpr auto nvmTotOL =
-			((Layer == 1) || (Layer == 2))  ? nallstubslayers[Layer - 1] * nvmollayers[Layer - 1] : 0; // Total number of VMs for Overlap in a whole sector
-	constexpr auto vmbits = ((Layer == 1) || (Layer == 2)) ? nbitsvmoverlap[Layer - 1] : 0; // Number of bits used for VMs
+	constexpr auto vmbits = ((Layer == 1) || (Layer == 2)) ? nbitsallstubs[Layer - 1] + nbits_vmte_overlap[Layer - 1] : 0; // Number of bits used for VMs
+	constexpr auto nvmTotOL = 1 << vmbits; // Total number of VMs for Overlap in a whole sector
 	static const auto nFinePhiBits = stubOL.getFinePhi().length(); // Number of bits used for fine phi
 
 	// Some sort of normalisation thing used for determining which VM the stub belongs to
-	static const ap_ufixed<nbits_maxvm, nbits_maxvmol-1> d_ol = nvmTotOL / maxvmolbins;
+	static const ap_ufixed<nbits_maxvm, nbits_maxvm_overlap-1> d_ol = nvmTotOL / maxvmolbins;
 
 	// Set values to Overlap stub
 
@@ -543,14 +486,14 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 
 	ivm = iphiRawOl * d_ol; // Which VM it belongs to
 
-	constexpr auto rbins = (1 << nbitsrtablelayer); // Number of bins in r
+	constexpr auto rbins = (1 << kNbitsrfinebintable); // Number of bins in r
 
-	ap_uint<nbitsztablelayer> zbin = (z + (1 << (nzBits- 1)))
-			>> (nzBits- nbitsztablelayer); // Make z positive and take the 7 MSBs
-	ap_uint<nbitsrtablelayer> rbin = (r + (1 << (nrBits- 1)))
-			>> (nrBits- nbitsrtablelayer);
+	ap_uint<kNbitszfinebintable> zbin = (z + (1 << (nzBits- 1)))
+			>> (nzBits- kNbitszfinebintable); // Make z positive and take the 7 MSBs
+	ap_uint<kNbitsrfinebintable> rbin = (r + (1 << (nrBits- 1)))
+			>> (nrBits- kNbitsrfinebintable);
 
-	ap_uint<nbitsztablelayer + nbitsrtablelayer> rzbitsIndex = zbin * rbins + rbin; // Index for rzbitsoverlaptable
+	ap_uint<kNbitszfinebintable + kNbitsrfinebintable> rzbitsIndex = zbin * rbins + rbin; // Index for rzbitsoverlaptable
 
 	rzbits = rzbitsOverlapTable[rzbitsIndex];
 
@@ -586,13 +529,13 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 		// AllStub memory
 		AllStubMemory<OutType> memoriesAS[],
 		// ME memories
-		const ap_uint<maskMEsize>& maskME, VMStubMEMemory<OutType, NBitsMemAddr, NBitsBin> memoriesME[],
+		const ap_uint<masksize>& maskME, VMStubMEMemory<OutType, NBitsMemAddr, NBitsBin> memoriesME[],
 		// Inner TE memories, non-overlap
-		const ap_uint<maskTEIsize>& maskTEI, VMStubTEInnerMemory<OutType> memoriesTEI[][MaxTEICopies],
+		const ap_uint<masksize>& maskTEI, VMStubTEInnerMemory<OutType> memoriesTEI[][MaxTEICopies],
 		// TE Inner memories, overlap
 		const ap_uint<maskOLsize>& maskOL, VMStubTEInnerMemory<BARRELOL> memoriesOL[][MaxOLCopies],
 		// TE Outer memories
-		const ap_uint<maskTEOsize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies]) {
+		const ap_uint<masksize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies]) {
 
 #pragma HLS inline
 
@@ -625,11 +568,11 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 	static const int firstTEO = firstMemNumber(maskTEO); // TE Inner memory
 
 	// Number of memories/VMs for one coarse phi region
-	constexpr int nvmME = (Layer) ? nvmmelayers[Layer-1] : nvmmedisks[Disk-1]; // ME memories
-	constexpr int nvmTE = (Layer) ? nvmtelayers[Layer-1] : nvmtedisks[Disk-1]; // TE memories
-	constexpr int nvmOL = ((Layer == 1) || (Layer == 2)) ? nvmollayers[Layer-1] : 0; // TE Overlap memories
+	constexpr int nvmME = (Layer) ? (1 << nbits_vmmeall[Layer-1]) : (1 << nbits_vmmeall[trklet::N_LAYER + Disk-1]); // ME memories
+	constexpr int nvmTE = (Layer) ? (1 << nbits_vmte[Layer-1]) : (1 << nbits_vmte[trklet::N_LAYER + Disk-1]); // TE memories
+	constexpr int nvmOL = ((Layer == 1) || (Layer == 2)) ? (1 << nbits_vmte_overlap[Layer-1]) : 0; // TE Overlap memories
 
-	constexpr int nmaxbinsperpage = (Layer) ? nmaxbinsperpagelayer : nmaxbinsperpagedisk; // Number of bins per page in memories
+	constexpr int nmaxbinsperpage = (Layer) ? 1 << MEBinsBits : 1 << (MEBinsBits + 1); // Number of bins per page in memories
 
 	// Number of data in each input memory
 	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems + nInputDisk2SMems]; // Array containing the number of inputs. Last two indices are for DISK2S

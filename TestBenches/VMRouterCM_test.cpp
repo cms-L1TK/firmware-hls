@@ -1,5 +1,18 @@
 // Test bench for VMRouter Combined Modules
-#include "VMRouterCMTop_L2PHIA.h"
+
+// To run a different phi region, change the following:
+//          - change the top function and header file (TOP_FUNC_, HEADER_FILE_)
+//          - add the phi region in emData/download.sh, make sure to also run clean
+//          - run emData/generate_VMRCM.py to generate new top and parameters files
+
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ VMRouterCMTop_L2PHIA
+  #define HEADER_FILE_ "VMRouterCMTop_L2PHIA.h"
+#endif
+
+#include HEADER_FILE_
 
 #include <algorithm>
 #include <iterator>
@@ -9,19 +22,6 @@
 using namespace std;
 
 const int nEvents = 100;  //number of events to run
-
-// VMRouterCM Test that works for all regions
-// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-
-// To run a different phi region, change the following:
-//          - add the phi region in emData/download.sh, make sure to also run clean
-//
-//          - kLAYER, kDISK, and phiRegion in VMRouterCMTop.h
-//          - add corresponding magic numbers to VMRouterCM_parameters.h if not already defined
-//          - add/remove pragmas depending on inputStubs in VMRouterCMTop.cc (not necessary to run simulation)
-//          OR
-//          - run emData/generateCM_VMR.py to generate new top and parameters files
-
 
 int main() {
 
@@ -76,8 +76,8 @@ int main() {
   // Output memories
   static AllStubMemory<outputType> memoriesAS[numASCopies];
   static AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies];
-  static VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines> memoryME;
-  static VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies];
+  static VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
+  static VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies];
 
 
   ///////////////////////////
@@ -119,7 +119,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterCMTop_L2PHIA(bx, bx_out, inputStubs
+    TOP_FUNC_(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
@@ -148,11 +148,11 @@ int main() {
       }
     }
     // ME memories
-    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, rzSizeME, phiRegSize, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
+    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
     //TE Outer memories
     if (nVMSTE) {
       for (unsigned int i = 0; i < nVMSTE; i++) {
-        err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[layerdisk]>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
+        err += compareBinnedMemCMWithFile<VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]>>(memoriesTEO[i], fout_vmstubte[i], ievt, "VMStubTEOuter", truncation);
       }
     }
   } // End of event loop
