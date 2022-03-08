@@ -542,7 +542,7 @@ int main(int argc, char * argv[])
   // default values for test bench 
   int cLinkId = 12; 
   int cNonant=4;
-  int cLastBx = 0;
+  int cLastBx = 999;
   // if cmd line args are passed 
   // parse them and change defaults 
   if( argc > 1 )
