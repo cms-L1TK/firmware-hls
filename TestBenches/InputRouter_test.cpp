@@ -663,7 +663,7 @@ int main(int argc, char * argv[])
     // only compare the ones I want 
     if( cEvId < cFirstBx || cEvId > cLastBx ) continue;
     
-    std::cout << "Event#" << +cEvId << "\n";
+    std::cout << "Event#" << std::dec << +cEvId << "\n";
     // prepare input stub stream 
     ap_uint<kNBits_DTC> hInputStubs[kMaxProc];
     for( size_t cStubIndx=0; cStubIndx < kMaxProc; cStubIndx++)
