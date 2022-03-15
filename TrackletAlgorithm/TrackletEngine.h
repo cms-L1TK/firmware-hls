@@ -58,7 +58,7 @@ void TrackletEngine(
   //   * kBufferDataSize is the size of each element in the buffer. The element data consists of, in order of MSB to LSB:
   //       [# of outer stubs in z-bin][inner stub data][index of z-bin][z-bin flag]
   //
-  constexpr unsigned int kNBits_BufferAddr = 3;
+  constexpr unsigned int kNBits_BufferAddr = 2;
   constexpr unsigned int kNOuterStubsSize = 5;
   constexpr unsigned int kZBinFlagSize = 1;
   constexpr int kBufferDataSize =
