@@ -105,37 +105,38 @@ git submodule update
 cp -fv LUTs/wires.dat LUTs/memorymodules.dat LUTs/processingmodules.dat project_generation_scripts/
 cd project_generation_scripts/
 ./makeReducedConfig.py
-# IRVMR
+### IRVMR
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
 mkdir -p ../../IntegrationTests/IRVMR/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/IRVMR/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/IRVMR/tb/
-# PRMEMC
+### PRMEMC
 ./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2
 ./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2 -x
 mkdir -p ../../IntegrationTests/PRMEMC/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/PRMEMC/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/PRMEMC/tb/
-# TETC
+### TETC
 ./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0 -x
 mkdir -p ../../IntegrationTests/TETC/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/TETC/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/TETC/tb/
-# Reduced IRtoTB
+### Reduced IRtoTB
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/tb/
-# Reduced MCTB
+### Reduced MCTB
 ./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 
+# Removed untracked files and return to emData/
 rm -fv TrackletProject.pdf script_sectproc.tcl
 cd ../
 
