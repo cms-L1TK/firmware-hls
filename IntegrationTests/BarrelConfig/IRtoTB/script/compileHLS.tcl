@@ -4,7 +4,7 @@ source ../../../common/script/tools.tcl
 source ../../../common/script/build_ip.tcl
 linkCreate ../../../common common
 linkCreate ../../../../emData/MemPrintsBarrel MemPrints
-linkCreate ../../../../emData/LUTs LUTs
+linkCreate ../../../../emData/LUTsBarrel LUTs
 set CFLAGS {-std=c++11 -I../../../../TrackletAlgorithm -I../../../../TopFunctions/BarrelConfig}
 set cwd [pwd]
 
