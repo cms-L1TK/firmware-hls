@@ -250,6 +250,9 @@ declare -a processing_modules=(
 
   # TrackBuilder (aka FitTrack)
   "FT_L1L2"
+  "FT_L2L3"
+  "FT_L3L4"
+  "FT_L5L6"
 
   # Tracklet Processor
   "TP_L1L2A" 
