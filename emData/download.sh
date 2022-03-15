@@ -104,7 +104,7 @@ git submodule init
 git submodule update
 cp -fv LUTs/wires.dat LUTs/memorymodules.dat LUTs/processingmodules.dat project_generation_scripts/
 cd project_generation_scripts/
-./makeReducedConfig.py
+./makeReducedConfig.py --no-graph
 ### IRVMR
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
@@ -136,8 +136,8 @@ mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 
-# Removed untracked files and return to emData/
-rm -fv TrackletProject.pdf script_sectproc.tcl
+# Remove untracked file and return to emData/
+rm -fv script_sectproc.tcl
 cd ../
 
 if [[ $tables_only == 0 ]]
