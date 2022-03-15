@@ -8,12 +8,15 @@ luts_url="https://cernbox.cern.ch/index.php/s/SUd6tEO970wKNnZ/download"
 # Reduced configuration
 memprints_url_reduced="https://cernbox.cern.ch/index.php/s/qBKvAmfu83SpAGD/download"
 luts_url_reduced="https://cernbox.cern.ch/index.php/s/GJZA1zLnWg3hP4y/download"
-# Barrel-only configuration
-memprints_url_barrel="https://cernbox.cern.ch/index.php/s/4bav5YoSOEK3NIg/download"
-luts_url_barrel="https://cernbox.cern.ch/index.php/s/myeIctCD1huekgq/download"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/YcqX3KUgFdZyMG6/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/lKrxzKJ0XmelE0j/download"
+
+# Barrel-only configuration
+# N.B.: currently untagged but produced with following commit:
+# 16ac97bf7463ad54a5ca91afac44997b8cad1b3e
+memprints_url_barrel="https://cernbox.cern.ch/index.php/s/4bav5YoSOEK3NIg/download"
+luts_url_barrel="https://cernbox.cern.ch/index.php/s/myeIctCD1huekgq/download"
 
 # Function that prints information regarding the usage of this command
 function usage() {
@@ -188,7 +191,7 @@ unset LD_LIBRARY_PATH
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat | awk '{print $2}' | sort -u`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
