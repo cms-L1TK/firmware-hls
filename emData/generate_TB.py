@@ -15,6 +15,11 @@ parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFun
 parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
 arguments = parser.parse_args()
 
+# Keep in sync with
+# kTProjITCSize in TrackletAlgorithm/TrackletProjectionMemory.h and
+# kFMITCSize in TrackletAlgorithm/FullMatchMemory.h
+ITC_SIZE = 4
+
 # First, parse the wires file and store the memory names associated with TBs in
 # dictionaries with the TB names as keys.
 with open(arguments.wiresFileName, "r") as wiresFile:
@@ -85,7 +90,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # offset for input TPAR memories
         firstTPAR = sorted(tparMems[tbName])[0]
         tparOffset = ord(firstTPAR[-1]) - ord('A')
-        tparOffset += (seedNumber << 4)
+        tparOffset += (seedNumber << ITC_SIZE)
 
         # numbers of output stubs
         barrelFMs = sorted([fm[0:10] for fm in barrelFMMems[tbName]])
