@@ -18,7 +18,7 @@ def ASRegion(region):
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
         return 'BARREL2S'
-    elif region in ['D1', 'D2']:
+    elif region in ['D1', 'D2', 'D3']:
         return 'DISKPS'
     else:
         return 'DISK2S'
@@ -164,7 +164,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
         )
         topFile.write(
             " TF::" + seed + ", "
-            "TF::" + iMC + "> (\n"
+            "MC::" + iMC + "> (\n"
             "    bx,\n"
             "    match,\n"
             "    allstub,\n"
