@@ -18,8 +18,10 @@ def ASRegion(region):
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
         return 'BARREL2S'
+    elif region in ['D1', 'D2', 'D3']:
+        return 'DISKPS'
     else:
-        return 'DISK'
+        return 'DISK2S'
 
 def APRegion(region):
     if region in ['L1', 'L2', 'L3']:
@@ -48,9 +50,6 @@ with open(arguments.wiresFileName) as wiresFile:
     CMMems = {}
     FMMems = {}
     for line in wiresFile:
-        # Only barrel-only seeds are supported right now.
-        if "MC_D" in line:
-            continue # No disks for now
         line = line.rstrip()
         mcName = re.sub(r".*MC_(......).*", r"MC_\1", line)
         memName = line.split()[0]
@@ -162,9 +161,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "\n"
             "MC_" + seed + "PHI" + iMC + ": MatchCalculator<"
             "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(nCMMem) + ", " + str(nFMMem) + ",\n"
+        )
+        topFile.write(
             " TF::" + seed + ", "
-            "TF::" + "D1" + ", "
-            "TF::" + iMC + "> (\n"
+            "MC::" + iMC + "> (\n"
             "    bx,\n"
             "    match,\n"
             "    allstub,\n"
