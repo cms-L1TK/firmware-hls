@@ -34,7 +34,7 @@ class TrackletEngineUnit {
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 
-/////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
+/////  Grabs the appropriate lut based on seed and iTC
 if (Seed==TF::L1L2&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
 #if __has_include("../emData/TP/tables/TP_L1L2A_stubptinnercut.tab")
