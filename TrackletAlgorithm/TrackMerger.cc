@@ -76,6 +76,7 @@ void TrackMerger(const BXType bx,
     #pragma HLS array_partition variable=diskStubWords complete dim=1
     #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
     #pragma HLS array_partition variable=diskStubWords_o complete dim=1
+    #pragma HLS array_partition variable=trackWord_o complete dim=0
 
     ComparisonModule comparisonModule[kNComparisonModules];
     unsigned int outputIndex{0};
@@ -93,6 +94,8 @@ void TrackMerger(const BXType bx,
     TrackFit::TrackWord unmergedTracks[kMaxProc];
     TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
     TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
+    #pragma HLS array_partition variable=unmergedBarrelStubs complete dim=1
+    #pragma HLS array_partition variable=unmergedDiskStubs complete dim=1
     
     LOOP_InputProc:
     for (int i = 0; i < kMaxProc; i++){ 
@@ -204,7 +207,6 @@ void TrackMerger(const BXType bx,
           }
           unmergedOutputIndex++;
         }
-        
       }
     }
     #ifndef _SYNTHESIS_

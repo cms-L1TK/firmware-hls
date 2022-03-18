@@ -19,5 +19,9 @@ void TrackMergerTop(const BXType bx,
     #pragma HLS stream variable=trackWord_o depth=1 dim=1
     #pragma HLS stream variable=barrelStubWords_o depth=1 dim=2
     #pragma HLS stream variable=diskStubWords_o depth=1 dim=2
+    #pragma HLS array_partition variable=barrelStubWords complete dim=1
+    #pragma HLS array_partition variable=diskStubWords complete dim=1
+    #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
+    #pragma HLS array_partition variable=diskStubWords_o complete dim=1
     TrackMerger(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o, outputNumber);
 }
