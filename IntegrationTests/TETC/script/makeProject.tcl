@@ -12,7 +12,7 @@ set_property ip_repo_paths "./"  [get_filesets sources_1]
 update_ip_catalog -rebuild
 
 # Create .xci files for user HLS IP
-create_ip -name TrackletEngine_PS_PS -module_name TE_L1L2 -vendor xilinx.com -library hls -version 1.0
+create_ip -name TrackletEngine_PS_PS -module_name TE_PS_PS -vendor xilinx.com -library hls -version 1.0
 create_ip -name TrackletCalculator_L1L2E -module_name TC_L1L2E -vendor xilinx.com -library hls -version 1.0
 
 # Provide name of top-level HDL (without .vhd extension).
