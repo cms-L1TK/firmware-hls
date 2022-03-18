@@ -22,6 +22,8 @@ void TrackBuilder_L1L2(
 #pragma HLS interface register port=bx_o
 #pragma HLS array_partition variable=barrelStubWords complete dim=1
 #pragma HLS array_partition variable=diskStubWords complete dim=1
+#pragma HLS array_partition variable=unmergedBarrelStubs complete dim=1
+#pragma HLS array_partition variable=unmergedDiskStubs complete dim=1
 #pragma HLS stream variable=trackWord depth=1 dim=1
 #pragma HLS stream variable=barrelStubWords depth=1 dim=2
 #pragma HLS stream variable=diskStubWords depth=1 dim=2
