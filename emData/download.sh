@@ -11,6 +11,9 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/U84ZI1vGnVKkQKc/download"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/Nk0VWN7kRMZSFWm/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
+# Reduced Combined modules                                                                                                                     
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220309.tgz"
+luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220309.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -75,6 +78,9 @@ then
   wget -O LUTs.tgz --quiet ${luts_url_barrel}
   tar -xzf LUTs.tgz
   mv LUTs LUTsBarrel
+  wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
@@ -117,6 +123,14 @@ mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+### reduced combined config                                                                                                                    
+mkdir -p ../TopFunctions/ReducedCombinedConfig
+./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
 cd ../ # needed for older versions of git
@@ -181,6 +195,11 @@ then
   mv MemPrints MemPrintsBarrel
   rm -f MemPrints.tgz
 
+  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsReducedCM
+  rm -f MemPrints.tgz
+
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzf MemPrints.tgz
   mv MemPrints MemPrintsCM
@@ -189,7 +208,6 @@ then
   wget -O MemPrints.tar.gz --quiet ${memprints_url}
   tar -xzf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
-
 fi
 
 # Needed in order for awk to run successfully:
