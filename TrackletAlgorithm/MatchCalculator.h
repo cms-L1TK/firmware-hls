@@ -977,6 +977,7 @@ void MatchCalculator(BXType bx,
     cm_load: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
 #pragma HLS unroll
       cm[i] = (i < MaxMatchCopies) ? match[i].read_mem(bx,addr[i]) : CandidateMatch(-1);
+      std::cout << "Received cm=" << std::hex << cm[i].raw() << std::endl;
     }
 
     // Valid signal for the candidate match
@@ -1158,6 +1159,7 @@ void MatchCalculator(BXType bx,
     //-----------------------------------------------------------------------------------------------------------
 
     // Extract the stub and projection indices from the candidate match
+    std::cout << "==== New datasteram ====" << std::endl;
     auto projid = datastream.getProjIndex();
     auto stubid = datastream.getStubIndex();
     constexpr bool isDisk = LAYER >= TF::D1;
@@ -1195,6 +1197,9 @@ void MatchCalculator(BXType bx,
     auto isPSStub = stub.isPSStub();
 
     // Projection parameters
+    std::cout << std::hex << "stub=" << stub.raw() << std::endl;
+    std::cout << std::hex << "stub_2s=" << stub_2s.raw() << std::endl;
+    std::cout << std::hex << "proj=" << proj.raw() << std::endl;
     typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
     typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
     typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
@@ -1217,14 +1222,22 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
+    std::cout << std::dec << "(iz) stub_z=" << stub_z << "\t" << std::bitset<AllStubBase<ASTYPE>::kASZSize>(stub_z) << std::endl;
+    std::cout << "(iz) stub_ps_z=" << stub_ps_z << "\t" << std::bitset<AllStubBase<DISKPS>::kASZSize>(stub_ps_z) << std::endl;
+    std::cout << "(iz) stub_2s_z=" << stub_2s_z << "\t" << std::bitset<AllStubBase<DISK2S>::kASZSize>(stub_2s_z) << std::endl;
+    std::cout << "stub_z bits=" << AllStubBase<ASTYPE>::kASZSize << std::endl;
     // Apply the corrections
     const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
+    std::cout << "(iphi) proj_phi=" << proj_phi << std::endl;
+    std::cout << "(iphicorr) phi_corr=" << phi_corr << std::endl;
     ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
+    std::cout << "(iphi) proj_phi_corr=" << proj_phi_corr << std::endl;
     ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
     // Get phi and z difference between the projection and stub
     ap_int<12> delta_z        = stub_z - proj_z_corr;
     ap_int<14> delta_z_fact   = delta_z * kFact;
+    std::cout << "delta_z_fact=" << delta_z_fact << std::endl;
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
@@ -1275,6 +1288,8 @@ void MatchCalculator(BXType bx,
 
     // Full match
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
+    std::cout << std::hex << "fullmatch=" << fm.raw() << std::endl;
+
 
 
     //-----------------------------------------------------------------------------------------------------------
@@ -1324,50 +1339,74 @@ void MatchCalculator(BXType bx,
 
       switch (projseed_next) {
         case 0:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout1+=inc_fm;
         }
         break;
         case 1:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout2+=inc_fm;
         }
         break;
         case 2:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout3+=inc_fm;
         }
         break;
         case 3:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout4+=inc_fm;
         }
         break;
         case 4:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout5+=inc_fm;
         }
         break;
         case 5:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout6+=inc_fm;
         }
         break;
         case 6:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout7+=inc_fm;
         }
         break;
         case 7:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout8+=inc_fm;
         }
         break;
