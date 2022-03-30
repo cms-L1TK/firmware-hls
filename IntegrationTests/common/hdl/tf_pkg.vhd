@@ -40,6 +40,8 @@ package tf_pkg is
   constant N_MEM_BINS_ME_DISK     : natural := 16;   --! Number of memory bins for ME disk
   constant N_ENTRIES_PER_MEM_BINS_ME_DISK : natural := 8;   --! Number of entries per memory bin for ME disk
   constant PAGE_LENGTH            : natural := 128;  --! Page length of all memories
+  constant PAGE_LENGTH_CM         : natural := 1024; --! Page length of all CM
+                                                     -- binned memories
   constant MEM_READ_LATENCY       : natural := 2;    --! Memory read latency.
   -- Memory width constants
   constant RAM_WIDTH_AS    : natural := 36; --! Width for memories
@@ -68,6 +70,8 @@ package tf_pkg is
   type t_arr8_2b  is array(0 to 7) of std_logic_vector(1 downto 0);
   type t_arr8_3b  is array(0 to 7) of std_logic_vector(2 downto 0);
   type t_arr8_4b  is array(0 to 7) of std_logic_vector(3 downto 0);
+  type t_arr64_4b  is array(0 to 63) of std_logic_vector(3 downto 0);
+  type t_arr64_1b  is array(0 to 63) of std_logic;
   type t_arr8_5b  is array(0 to 7) of std_logic_vector(4 downto 0);
   type t_arr8_8b  is array(0 to 7) of std_logic_vector(7 downto 0);
   type t_arr8_9b  is array(0 to 7) of std_logic_vector(8 downto 0);
@@ -101,6 +105,14 @@ package tf_pkg is
   subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
 
+  type t_arr_64_4b  is array(integer range<>) of t_arr64_4b;
+  subtype t_arr2_64_4b is t_arr_64_4b(0 to 1);
+  subtype t_arr4_64_4b is t_arr_64_4b(0 to 3);
+
+  type t_arr_64_1b  is array(integer range<>) of t_arr64_1b;
+  subtype t_arr2_64_1b is t_arr_64_1b(0 to 1);
+  subtype t_arr4_64_1b is t_arr_64_1b(0 to 3);
+  
   -- Could be used in place of t_arr_7b. 
   -- type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
 

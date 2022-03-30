@@ -58,7 +58,7 @@ public:
   }
 
   template<class SpecType>
-  bool write_mem(BunchXingT ibx, SpecType data, int addr_index)
+  bool write_mem(BunchXingT ibx, SpecType data, NEntryT addr_index)
   {
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
@@ -71,7 +71,7 @@ public:
     return write_mem(ibx,sameData,addr_index);
   }
 
-  bool write_mem(BunchXingT ibx, DataType data, int addr_index)
+  bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index)
   {
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
@@ -113,7 +113,7 @@ public:
   { 
         if(!NBIT_BX) ibx = 0;
 	DataType data(datastr, base);
-	int nent = nentries_[ibx]; 
+	NEntryT nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
 
 	#ifndef CMSSW_GIT_HASH
@@ -126,7 +126,7 @@ public:
   {
 	if(!NBIT_BX) ibx = 0;
 	DataType data(datastr.c_str(), base);
-	int nent = nentries_[ibx];
+	NEntryT nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);
 
 	#ifndef CMSSW_GIT_HASH
@@ -142,7 +142,7 @@ public:
         // TODO: overload '<<' in data class
   }
 
-  void print_entry(BunchXingT bx, ap_uint<NBIT_ADDR> index) const
+  void print_entry(BunchXingT bx, NEntryT index) const
   {
 	print_data(dataarray_[bx][index]);
   }
