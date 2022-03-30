@@ -31,9 +31,9 @@ public:
   enum BitWidths {
     // Bit size for AllStubMemory fields
     kASBendSize = 4,
-    kASAlphaSize = 0,
-    kASPhiSize = 17,
-    kASZSize = 8,
+    kASAlphaSize = 4,
+    kASPhiSize = 14,
+    kASZSize = 7,
     kASRSize = 7,
     // Bit size for full AllStubMemory
     kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
@@ -66,7 +66,7 @@ public:
     kASAlphaSize = 4,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 7,
+    kASRSize = 12,
     // Bit size for full AllStubMemory
    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
   };
@@ -100,7 +100,7 @@ public:
     kASRMSB = kASRLSB + AllStubBase<ASType>::kASRSize - 1
   };
   
-  typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
+  typedef ap_uint<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
   typedef ap_int<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
@@ -119,10 +119,10 @@ public:
   }
 
   // This constructor is only used for stubs in DISK2S
-  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASALPHA alpha, const ASBEND bend):
+  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend, const ASALPHA alpha):
     data_( ((((r,z),phi),alpha),bend) )
   {
-    static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
+    //static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
   }
 
   AllStub()

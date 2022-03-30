@@ -8,10 +8,10 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
+#include <bitset>
 
 namespace MC {
   const auto cmzero = CandidateMatch::CandidateMatchData(0);
-  const auto cmhigh = CandidateMatch::CandidateMatchData(-1);
   enum lutType {PHICUT, ZCUT, PSPHICUT, SSPHICUT, PSRCUT, SSRCUT, ALPHAINNERCUT, ALPHAOUTERCUT, RDSSINNERCUT, RDSSOUTERCUT};
 }
 
@@ -213,7 +213,9 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
   } // end phi cuts
   else if(type==MC::PSPHICUT) { // PSphi cuts
+    std::cout << "PSRCUT" << std::endl;
     if (L==TF::D1){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D1PHIC_PSphicut.tab")
 #  include "../emData/MC/tables/MC_D1PHIC_PSphicut.tab"
@@ -223,6 +225,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D2PHIC_PSphicut.tab")
 #  include "../emData/MC/tables/MC_D2PHIC_PSphicut.tab"
@@ -232,6 +235,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D3){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D3PHIC_PSphicut.tab")
 #  include "../emData/MC/tables/MC_D3PHIC_PSphicut.tab"
@@ -241,6 +245,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D4){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D4PHIC_PSphicut.tab")
 #  include "../emData/MC/tables/MC_D4PHIC_PSphicut.tab"
@@ -250,6 +255,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D5){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D5PHIC_PSphicut.tab")
 #  include "../emData/MC/tables/MC_D5PHIC_PSphicut.tab"
@@ -264,7 +270,9 @@ void readTable_Cuts(ap_uint<width> table[depth]){
  
   } // end PSphi
   else if(type==MC::SSPHICUT) { // 2Sphi cuts
+    std::cout << "2SRCUT" << std::endl;
     if (L==TF::D1){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D1PHIC_2Sphicut.tab")
 #  include "../emData/MC/tables/MC_D1PHIC_2Sphicut.tab"
@@ -274,6 +282,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D2PHIC_2Sphicut.tab")
 #  include "../emData/MC/tables/MC_D2PHIC_2Sphicut.tab"
@@ -283,6 +292,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D3){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D3PHIC_2Sphicut.tab")
 #  include "../emData/MC/tables/MC_D3PHIC_2Sphicut.tab"
@@ -292,6 +302,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D4){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D4PHIC_2Sphicut.tab")
 #  include "../emData/MC/tables/MC_D4PHIC_2Sphicut.tab"
@@ -301,6 +312,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D5){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D5PHIC_2Sphicut.tab")
 #  include "../emData/MC/tables/MC_D5PHIC_2Sphicut.tab"
@@ -371,7 +383,9 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
   } // end z cuts
   else if(type==MC::PSRCUT) { // PSr cuts
+    std::cout << "PSRCUT" << std::endl;
     if (L==TF::D1){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D1PHIC_PSrcut.tab")
 #  include "../emData/MC/tables/MC_D1PHIC_PSrcut.tab"
@@ -381,6 +395,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D2PHIC_PSrcut.tab")
 #  include "../emData/MC/tables/MC_D2PHIC_PSrcut.tab"
@@ -390,6 +405,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D3){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D3PHIC_PSrcut.tab")
 #  include "../emData/MC/tables/MC_D3PHIC_PSrcut.tab"
@@ -399,6 +415,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D4){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D4PHIC_PSrcut.tab")
 #  include "../emData/MC/tables/MC_D4PHIC_PSrcut.tab"
@@ -408,6 +425,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     if (L==TF::D5){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D5PHIC_PSrcut.tab")
 #  include "../emData/MC/tables/MC_D5PHIC_PSrcut.tab"
@@ -419,7 +437,112 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     else {
       static_assert(true, "Only LAYERS 1 to 6 are valid");
     }
-
+ 
+  } // end PSr
+  else if(type==MC::SSRCUT) { // 2Sr cuts
+    std::cout << "2SRCUT" << std::endl;
+    if (L==TF::D1){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D1PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D2PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D3){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D3PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D4){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D4PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D5){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D5PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only LAYERS 1 to 6 are valid");
+    }
+ 
+  } // end 2Sr
+  else if(type==MC::ALPHAINNERCUT) { // alphainner cuts (//for disks only)
+    if (L==TF::D1){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphainner.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphainner.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only DISKS 1 and 2 are valid for alpha inner");
+    }
+  }
+  else if(type==MC::ALPHAOUTERCUT) { // alphaouter cuts (//for disks only)
+    if (L==TF::D1){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphaouter.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphaouter.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only DISKS 1 and 2 are valid for alpha outer");
+    }
   }
 
 } // end readTable_Cuts
@@ -437,6 +560,7 @@ void readTable_disk(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D2PHIC_alphainner.tab")
 #  include "../emData/MC/tables/MC_D2PHIC_alphainner.tab"
@@ -446,6 +570,7 @@ void readTable_disk(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D3){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D3PHIC_alphainner.tab")
 #  include "../emData/MC/tables/MC_D3PHIC_alphainner.tab"
@@ -469,6 +594,7 @@ void readTable_disk(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D4){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D4PHIC_alphaouter.tab")
 #  include "../emData/MC/tables/MC_D4PHIC_alphaouter.tab"
@@ -478,6 +604,7 @@ void readTable_disk(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D5){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D5PHIC_alphaouter.tab")
 #  include "../emData/MC/tables/MC_D5PHIC_alphaouter.tab"
@@ -505,6 +632,7 @@ void readTable_rDSS(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D2){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D2PHIC_rDSSinner.tab")
 #  include "../emData/MC/tables/MC_D2PHIC_rDSSinner.tab"
@@ -514,6 +642,7 @@ void readTable_rDSS(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D3){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D3PHIC_rDSSinner.tab")
 #  include "../emData/MC/tables/MC_D3PHIC_rDSSinner.tab"
@@ -537,6 +666,7 @@ void readTable_rDSS(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D4){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D4PHIC_rDSSouter.tab")
 #  include "../emData/MC/tables/MC_D4PHIC_rDSSouter.tab"
@@ -546,6 +676,7 @@ void readTable_rDSS(ap_uint<width> table[depth]){
       for (int i = 0; i < depth; i++) table[i] = tmp[i];
     }
     else if (L==TF::D5){
+      std::cout << "layer=" << L << std::endl;
       ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MC/tables/MC_D5PHIC_rDSSouter.tab")
 #  include "../emData/MC/tables/MC_D5PHIC_rDSSouter.tab"
@@ -568,7 +699,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool F
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
@@ -613,10 +744,10 @@ void MatchCalculator(BXType bx,
   const auto LUT_matchcut_rphi_depth = 12;
   const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
   const auto LUT_matchcut_alpha_depth = 10;
-  const auto LUT_matchcut_r_width = 12;
+  const auto LUT_matchcut_r_width = 8;
   const auto LUT_matchcut_r_depth = 12;
-  const auto LUT_matchcut_rDSS_width = 13;
-  const auto LUT_matchcut_rDSS_depth = 12;
+  const auto LUT_matchcut_rDSS_width = 12;
+  const auto LUT_matchcut_rDSS_depth = 10;
 
   // Setup look up tables for match cuts
   ap_uint<LUT_matchcut_phi_width> LUT_matchcut_phi[LUT_matchcut_phi_depth];
@@ -879,6 +1010,7 @@ void MatchCalculator(BXType bx,
     cm_load: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
 #pragma HLS unroll
       cm[i] = (i < MaxMatchCopies) ? match[i].read_mem(bx,addr[i]) : CandidateMatch(-1);
+      std::cout << "Received cm=" << std::hex << cm[i].raw() << std::endl;
     }
 
     // Valid signal for the candidate match
@@ -1060,8 +1192,12 @@ void MatchCalculator(BXType bx,
     //-----------------------------------------------------------------------------------------------------------
 
     // Extract the stub and projection indices from the candidate match
+    std::cout << "==== New datasteram ====" << std::endl;
     auto projid = datastream.getProjIndex();
     auto stubid = datastream.getStubIndex();
+    auto isPSStub = datastream.getIsPSStub();
+    std::cout << datastream.raw() << "\t" << std::bitset<15>(datastream.raw()) << std::endl;
+    bool isDisk = LAYER >= TF::D1;
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
@@ -1084,26 +1220,28 @@ void MatchCalculator(BXType bx,
     typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
     typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
     typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
-    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();
+    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
     typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
     typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
     typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
     typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
-    ap_uint<12>                      stub_2s_r    = stub_2s.getR();
+    typename AllStub<DISK2S>::ASR    stub_2s_r    = stub_2s.getR();
     typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
     typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
     typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
     typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
-    auto isPSStub = stub_ps.isPSStub();
 
     // Projection parameters
+    std::cout << std::hex << "stub=" << stub.raw() << std::endl;
+    std::cout << std::hex << "stub_2s=" << stub_2s.raw() << std::endl;
+    std::cout << std::hex << "proj=" << proj.raw() << std::endl;
     typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
     typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
     typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
     typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
     typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
     typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
-    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer();
+    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
     bool isProjDisk = proj_seed >= TF::D1;
 
 
@@ -1117,16 +1255,32 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
     else if(isDisk && !isPSStub)
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
+    char* ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
+    std::cout << "layer=" << ld[LAYER] << std::endl;
+    std::cout << "istep=" << istep << std::endl;
+    std::cout << "projid=" << projid << std::endl;
+    std::cout << "stubid=" << stubid << std::endl;
+    std::cout << "cmatch=" << std::bitset<7>(projid) << "|" << isPSStub << "|" << std::bitset<7>(stubid) << std::endl;
+    std::cout << "proj_seed=" << proj_seed << "\t" << ld[proj_seed] << std::endl;
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
-
+     
+    std::cout << std::dec << "(iz) stub_z=" << stub_z << "\t" << std::bitset<AllStubBase<ASTYPE>::kASZSize>(stub_z) << std::endl;
+    std::cout << "(iz) stub_ps_z=" << stub_ps_z << "\t" << std::bitset<AllStubBase<DISKPS>::kASZSize>(stub_ps_z) << std::endl;
+    std::cout << "(iz) stub_2s_z=" << stub_2s_z << "\t" << std::bitset<AllStubBase<DISK2S>::kASZSize>(stub_2s_z) << std::endl;
+    std::cout << "stub_z bits=" << AllStubBase<ASTYPE>::kASZSize << std::endl;
     // Apply the corrections
     const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
+    std::cout << "(iphi) proj_phi=" << proj_phi << std::endl;
+    std::cout << "(iphicorr) phi_corr=" << phi_corr << std::endl;
     ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
+    std::cout << "(iphi) proj_phi_corr=" << proj_phi_corr << std::endl;
     ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
 
     // Get phi and z difference between the projection and stub
     ap_int<12> delta_z        = stub_z - proj_z_corr;
+    std::cout << "delta_z=" << delta_z << std::endl;
     ap_int<14> delta_z_fact   = delta_z * kFact;
+    std::cout << "delta_z_fact=" << delta_z_fact << std::endl;
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
@@ -1136,33 +1290,45 @@ void MatchCalculator(BXType bx,
       shiftstubphi = stub_2s_phi << kPhi0_shift;
     }
     ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-    constexpr int dphibit = 20;
-    ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
+    ap_int<17> delta_phi      = shiftstubphi - shiftprojphi;
+    if(isDisk && isPSStub)
+      delta_phi = stub_ps_phi - proj_phi_corr;
+    else if(isDisk && !isPSStub) {
+      delta_phi = stub_2s_phi - proj_phi_corr;
+    }
+    ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
     ap_uint<3> shiftprojz     = 7;
-    ap_int<7> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
+    ap_int<14> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
     if(isDisk && isPSStub)
       proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
     else if(isDisk)
       proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
-    const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
+    const ap_int<15> &proj_r_long  = proj_z + proj_r_corr;
+    std::cout << "(ir) proj_r_long=" << proj_r_long << std::endl;
     ap_uint<1> shiftr         = 1;
+    std::cout << "isPSStub=" << isPSStub << std::endl;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
-    ap_uint<12> disk_stubr = LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)];
-
     if(isDisk && isPSStub) {
-      delta_r   = (ap_uint<12>(stub_ps_r) >> shiftr) - proj_r_long; // proj_z = RZ
+      delta_r   = (stub_ps_r >> shiftr) - proj_r_long; // proj_z = RZ
     }
     else if(isDisk && !isPSStub) {
-      auto alpha_fact = LUT_matchcut_alpha[ap_uint<12>(stub_2s_r)];
-      disk_stubr = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
-      delta_r   = ((disk_stubr >> shiftr) - proj_r_long); // proj_z = RZ
+      auto alpha_fact = LUT_matchcut_alpha[stub_2s_r];
+      stub_2s_r = LUT_matchcut_rDSS[stub_2s_r];
+      delta_r   = (stub_2s_r >> shiftr) - proj_r_long; // proj_z = RZ
       ap_uint<4> alpha_shift = 12;
-      ap_uint<12> alpha_corr = (ap_int<12>(delta_r) * stub_2s_alpha * alpha_fact) >> alpha_shift;
+      auto alpha_corr = (delta_r * stub_2s_alpha * alpha_fact) >> alpha_shift;
+      std::cout << "(ialpha) stub_2s_alpha=" << stub_2s_alpha << std::endl;
+      std::cout << "(ialphafact) alpha_fact=" << alpha_fact << std::endl;
+      std::cout << "(iphialphacor) alpha_corr=" << alpha_corr << std::endl;
       delta_phi += alpha_corr;
     }
-    constexpr int adphibit = isDisk ? 12 : 17;
-    ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
-    ap_int<12> abs_delta_r    = iabs<11>( delta_r );
+    std::cout << "(ircorr) proj_r_corr=" << proj_r_corr << std::endl;
+    ap_int<12> abs_delta_r    = iabs<12>( delta_r );
+    std::cout << "(ideltaphi) delta_phi=" << delta_phi << std::endl;
+    std::cout << "(irstub) stub_r=" << stub_r << std::endl;
+    std::cout << "(irstub) stub_ps_r=" << stub_ps_r << std::endl;
+    std::cout << "(irstub) stub_2s_r=" << stub_2s_r << std::endl;
+    std::cout << "(ideltar) delta_r=" << delta_r << "\t" << std::bitset<11>(delta_r) << std::endl;
 
     // Full match parameters
     const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -1171,12 +1337,25 @@ void MatchCalculator(BXType bx,
     const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid = stubid;
     typename FullMatch<FMTYPE>::FMSTUBR               fm_stubr = stub_r;
     if(isDisk && isPSStub) fm_stubr = stub_ps_r;
-    else if(isDisk) fm_stubr = stub_2s_r;
+    //else if(isDisk) fm_stubr = stub_2s_r;
     const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
-    const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : ap_int<12>(delta_r);
+    const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : delta_r;
+    //if(isDisk) fm_z = delta_r;
+    std::cout << "fm_tcid=" << std::bitset<7>(fm_tcid) << "\t"
+              << "fm_tkid=" << std::bitset<7>(fm_tkid) << "\t"
+              << "fm_asphi=" << std::bitset<3>(fm_asphi) << "\t"
+              << "fm_asid=" << std::bitset<7>(fm_asid) << "\t"
+              << "fm_stubr=" << std::bitset<12>(fm_stubr) << "\t"
+              << "delta_phi=" << std::bitset<12>(delta_phi) << "\t";
+     if(!isDisk)
+              std::cout << "delta_z=" << std::bitset<9>(delta_z) << std::endl;
+     else
+              std::cout << "delta_r=" << std::bitset<9>(delta_r) << std::endl;
 
     // Full match
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
+    std::cout << std::hex << "fullmatch=" << fm.raw() << std::endl;
+
 
 
     //-----------------------------------------------------------------------------------------------------------
@@ -1189,13 +1368,19 @@ void MatchCalculator(BXType bx,
 
     // For first tracklet, pick up the phi cut value
     best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
-
-    if (newtracklet) {
-      best_delta_phi = LUT_matchcut_phi[proj_seed];
-    }
-
-    // Check that matches fall within the selection window of the projection
-    if ((delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi)){
+    best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
+  
+    // Check that matches fall within the selection window of the projection 
+    bool barrel_match = (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
+    std::cout << "abs_delta_phi * stub_r=" << abs_delta_phi * stub_r << std::endl;
+    std::cout << "LUT_matchcut_2Srphi[proj_seed]=" << LUT_matchcut_2Srphi[proj_seed] << std::endl;
+    std::cout << "((abs_delta_phi * stub_r) < LUT_matchcut_2Srphi[proj_seed])=" << ((abs_delta_phi * stub_r) < LUT_matchcut_2Srphi[proj_seed]) << std::endl;
+    std::cout << "abs_delta_r=" << abs_delta_r << std::endl;
+    std::cout << "LUT_matchcut_2Sr[proj_seed]=" << LUT_matchcut_2Sr[proj_seed] << std::endl;
+    std::cout << "(abs_delta_r < LUT_matchcut_2Sr[proj_seed])=" << (abs_delta_r < LUT_matchcut_2Sr[proj_seed]) << std::endl;
+    bool disk_match = isPSStub ? ((abs_delta_phi * stub_r) < LUT_matchcut_PSrphi[proj_seed]) && (abs_delta_r < LUT_matchcut_2Sr[proj_seed]) : ((abs_delta_phi * stub_r) < LUT_matchcut_2Srphi[proj_seed]) && (abs_delta_r < LUT_matchcut_2Sr[proj_seed]);
+    std::cout << "disk_match=" << disk_match << std::endl;
+    if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
       if(isDisk) {
@@ -1217,50 +1402,74 @@ void MatchCalculator(BXType bx,
 
       switch (projseed_next) {
         case 0:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout1+=inc_fm;
         }
         break;
         case 1:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout2+=inc_fm;
         }
         break;
         case 2:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout3+=inc_fm;
         }
         break;
         case 3:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout4+=inc_fm;
         }
         break;
         case 4:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout5+=inc_fm;
         }
         break;
         case 5:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout6+=inc_fm;
         }
         break;
         case 6:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout7+=inc_fm;
         }
         break;
         case 7:
+        std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
         if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
+          std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
+          std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
           nmcout8+=inc_fm;
         }
         break;
