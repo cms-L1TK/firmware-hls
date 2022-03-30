@@ -496,6 +496,13 @@ TC::processStubPair(
 }
 
 
+#define LUTTYPE ap_uint<1+2*TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZFine+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZBin>
+#define REGIONLUTTYPE ap_uint<(1<<TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins)>
+#define lutsize  (1<<(kNbitszfinebintable+kNbitsrfinebintable))
+#define regionlutsize (1<<(AllStubInner<InnerRegion>::kASBendSize+AllStubInner<InnerRegion>::kASFinePhiSize))
+
+
+
 
 // This is the primary interface for the TrackletProcessor.
 template<
@@ -512,20 +519,8 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   uint8_t NASMemInner, // number of inner all-stub memories
   uint16_t N // maximum number of steps
 > void
-TrackletProcessor(
-    const BXType bx,
-    const ap_uint<1+2*TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZFine+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],
-    const ap_uint<(1<<TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins)> regionlut[1<<(AllStubInner<InnerRegion>::kASBendSize+AllStubInner<InnerRegion>::kASFinePhiSize)],
-    const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner],
-    const AllStubMemory<OuterRegion>* outerStubs,
-    const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>& outerVMStubs,
-    TrackletParameterMemory * const trackletParameters,
-    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],
-    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],
-    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
-
-
-)
+  TrackletProcessor(
+		    const BXType bx, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner], const AllStubMemory<OuterRegion>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>& outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
 {
   static_assert(Seed == TF::L1L2||Seed==TF::L2L3||Seed==TF::L3L4||Seed==TF::L5L6, "Only L1L2 and L2L3  seeds have been implemented so far.");
 

@@ -281,9 +281,11 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		AllStub<OutType> allstub = (disk2S) ? stubDisk2S.raw() : stub.raw();
 
 		// Write stub to all memory copies
-		for (int n = 0; n < nAllCopies; n++) {
+		if (nAllCopies > 0) {
+		  for (int n = 0; n < nAllCopies; n++) {
 #pragma HLS UNROLL
-			memoriesAS[n].write_mem(bx, allstub, i);
+		    memoriesAS[n].write_mem(bx, allstub, i);
+		  }
 		}
 
 #if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
