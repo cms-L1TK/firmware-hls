@@ -32,9 +32,9 @@ public:
   enum BitWidths {
     // Bit size for AllStubMemory fields
     kASBendSize = 4,
-    kASAlphaSize = 4,
-    kASPhiSize = 14,
-    kASZSize = 7,
+    kASAlphaSize = 0,
+    kASPhiSize = 17,
+    kASZSize = 8,
     kASRSize = 7,
     // Bit size for full AllStubMemory
     kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
@@ -67,7 +67,7 @@ public:
     kASAlphaSize = 4,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 12,
+    kASRSize = 7,
     // Bit size for full AllStubMemory
    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
   };
@@ -101,11 +101,11 @@ public:
     kASRMSB = kASRLSB + AllStubBase<ASType>::kASRSize - 1
   };
   
-  typedef ap_uint<AllStubBase<ASType>::kASRSize> ASR;
+  typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
   typedef ap_int<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
-  typedef ap_uint<AllStubBase<ASType>::kASBendSize> ASBEND;
+  typedef ap_int<AllStubBase<ASType>::kASBendSize> ASBEND;
   typedef ap_uint<AllStubBase<ASType>::kAllStubSize> AllStubData;
 
   // Constructors
