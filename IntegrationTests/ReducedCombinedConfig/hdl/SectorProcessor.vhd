@@ -968,7 +968,7 @@ begin
 
   TP_L1L2C_lut : entity work.tf_lut
     generic map (
-      lut_file  => getDirSCRIPT & "LUTsCMReduced/TP_L1L2.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TP_L1L2.tab",
       lut_width => 10,
       lut_depth => 2048
     )
@@ -982,7 +982,7 @@ begin
 
   TP_L1L2C_regionlut : entity work.tf_lut
     generic map (
-      lut_file  => getDirSCRIPT & "LUTsCMReduced/TP_L1L2C_usereg.tab",
+      lut_file  => getDirSCRIPT & "LUTs/TP_L1L2C_usereg.tab",
       lut_width => 8,
       lut_depth => 2048
     )
