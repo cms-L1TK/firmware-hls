@@ -328,6 +328,7 @@ void MatchCalculator(BXType bx,
 ){
 
 #pragma HLS inline
+#pragma HLS array_partition variable=fullmatch complete dim=1
 
   using namespace PR;
 

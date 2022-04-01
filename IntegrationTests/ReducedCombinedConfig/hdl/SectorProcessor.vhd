@@ -1016,9 +1016,9 @@ begin
       regionlut_V_address0                  => TP_L1L2C_regionlut_addr,
       regionlut_V_ce0                       => TP_L1L2C_regionlut_ce,
       regionlut_V_q0                        => TP_L1L2C_regionlut_dout,
-      innerStubs_dataarray_data_V_ce0       => AS_51_mem_A_enb(L1PHIB_BC),
-      innerStubs_dataarray_data_V_address0  => AS_51_mem_AV_readaddr(L1PHIB_BC),
-      innerStubs_dataarray_data_V_q0        => AS_51_mem_AV_dout(L1PHIB_BC),
+      innerStubs_0_dataarray_data_V_ce0       => AS_51_mem_A_enb(L1PHIB_BC),
+      innerStubs_0_dataarray_data_V_address0  => AS_51_mem_AV_readaddr(L1PHIB_BC),
+      innerStubs_0_dataarray_data_V_q0        => AS_51_mem_AV_dout(L1PHIB_BC),
       innerStubs_0_nentries_0_V               => AS_51_mem_AAV_dout_nent(L1PHIB_BC)(0),
       innerStubs_0_nentries_1_V               => AS_51_mem_AAV_dout_nent(L1PHIB_BC)(1),
       outerStubs_dataarray_data_V_ce0       => AS_36_mem_A_enb(L2PHIA_B_L1C),
@@ -1164,10 +1164,10 @@ begin
       allstub_dataarray_data_V_ce0       => AS_36_mem_A_enb(L3PHIAn1),
       allstub_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L3PHIAn1),
       allstub_dataarray_data_V_q0        => AS_36_mem_AV_dout(L3PHIAn1),
-      fullmatch_dataarray_data_V_ce0       => open,
-      fullmatch_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L3PHIA),
-      fullmatch_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L3PHIA),
-      fullmatch_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L3PHIA)
+      fullmatch_0_dataarray_data_V_ce0       => open,
+      fullmatch_0_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L3PHIA),
+      fullmatch_0_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L3PHIA),
+      fullmatch_0_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L3PHIA)
   );
 
   MP_L4PHIA : entity work.MP_L4PHIA
@@ -1231,10 +1231,10 @@ begin
       allstub_dataarray_data_V_ce0       => AS_36_mem_A_enb(L4PHIAn1),
       allstub_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L4PHIAn1),
       allstub_dataarray_data_V_q0        => AS_36_mem_AV_dout(L4PHIAn1),
-      fullmatch_dataarray_data_V_ce0       => open,
-      fullmatch_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L4PHIA),
-      fullmatch_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L4PHIA),
-      fullmatch_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L4PHIA)
+      fullmatch_0_dataarray_data_V_ce0       => open,
+      fullmatch_0_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L4PHIA),
+      fullmatch_0_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L4PHIA),
+      fullmatch_0_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L4PHIA)
   );
 
   MP_L5PHIA : entity work.MP_L5PHIA
@@ -1298,10 +1298,10 @@ begin
       allstub_dataarray_data_V_ce0       => AS_36_mem_A_enb(L5PHIAn1),
       allstub_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L5PHIAn1),
       allstub_dataarray_data_V_q0        => AS_36_mem_AV_dout(L5PHIAn1),
-      fullmatch_dataarray_data_V_ce0       => open,
-      fullmatch_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L5PHIA),
-      fullmatch_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L5PHIA),
-      fullmatch_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L5PHIA)
+      fullmatch_0_dataarray_data_V_ce0       => open,
+      fullmatch_0_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L5PHIA),
+      fullmatch_0_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L5PHIA),
+      fullmatch_0_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L5PHIA)
   );
 
   MP_L6PHIA : entity work.MP_L6PHIA
@@ -1365,10 +1365,10 @@ begin
       allstub_dataarray_data_V_ce0       => AS_36_mem_A_enb(L6PHIAn1),
       allstub_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L6PHIAn1),
       allstub_dataarray_data_V_q0        => AS_36_mem_AV_dout(L6PHIAn1),
-      fullmatch_dataarray_data_V_ce0       => open,
-      fullmatch_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L6PHIA),
-      fullmatch_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L6PHIA),
-      fullmatch_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L6PHIA)
+      fullmatch_0_dataarray_data_V_ce0       => open,
+      fullmatch_0_dataarray_data_V_we0       => FM_52_mem_A_wea(L1L2_L6PHIA),
+      fullmatch_0_dataarray_data_V_address0  => FM_52_mem_AV_writeaddr(L1L2_L6PHIA),
+      fullmatch_0_dataarray_data_V_d0        => FM_52_mem_AV_din(L1L2_L6PHIA)
   );
 
   FT_L1L2 : entity work.FT_L1L2
