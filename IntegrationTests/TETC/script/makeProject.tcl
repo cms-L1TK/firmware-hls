@@ -27,6 +27,9 @@ add_files -fileset sources_1 [glob common/hdl/*.vhd]
 # Add HDL for TB
 add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
 
+# Add utility files
+add_files -fileset utils_1 [glob ./pre.tcl]
+
 # Add constraints (clock etc.)
 add_files -fileset constrs_1 [glob common/hdl/constraints.xdc]
 
