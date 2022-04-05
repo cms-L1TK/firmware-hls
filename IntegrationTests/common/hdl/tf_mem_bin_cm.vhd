@@ -27,7 +27,7 @@ use unisim.vcomponents.all;
 --! User packages
 use work.tf_pkg.all;
 
-entity tf_mem_bin_cm5 is
+entity tf_mem_bin_cm is
   generic (
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
@@ -36,56 +36,34 @@ entity tf_mem_bin_cm5 is
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH_CM/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    NCOPY           : natural := 4                 --! Number of memory copies
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
     clkb      : in  std_logic;                                      --! Read clock
-    wea0       : in  std_logic;                                      --! Write enable
-    wea1       : in  std_logic;                                      --! Write enable
-    wea2       : in  std_logic;                                      --! Write enable
-    wea3       : in  std_logic;                                      --! Write enable
-    wea4       : in  std_logic;                                      --! Write enable
-    enb0       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
-    enb1       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
-    enb2       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
-    enb3       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
-    enb4       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    wea       : in  std_logic;                                      --! Write enable
+    enb       : in  std_logic_vector(NCOPY-1 downto 0);              --! Read Enable, for additional power savings, disable when not in use
     rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
     regceb    : in  std_logic;                                      --! Output register enable
-    addra0     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
-    addra1     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
-    addra2     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
-    addra3     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
-    addra4     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
-    dina0      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
-    dina1      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
-    dina2      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
-    dina3      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
-    dina4      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
-    addrb0     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
-    addrb1     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
-    addrb2     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
-    addrb3     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
-    addrb4     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
-    doutb0     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    doutb1     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    doutb2     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    doutb3     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
-    doutb4     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
+    addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
+    dina      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
+    addrb     : in  std_logic_aoa(NCOPY-1 downto 0)(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
+    doutb     : out  std_logic_aoa(NCOPY-1 downto 0)(RAM_WIDTH-1 downto 0); --!
+                                                                           --RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
     nent_o    : out t_arr_64_4b(0 to NUM_PAGES-1) := (others => (others => (others => '0'))); --! entries(page)(bin)
     mask_o    : out t_arr_64_1b(0 to NUM_PAGES-1) := (others => (others => '0')) --! mask(page)(bin)
     );
-end tf_mem_bin_cm5;
+end tf_mem_bin_cm;
 
-architecture rtl of tf_mem_bin_cm5 is
+architecture rtl of tf_mem_bin_cm is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
 
 -- ########################### Function ##########################
---! @brief TextIO function to read memory data to initialize tf_mem_bin_cm5. Needed here because of variable slv width!
+--! @brief TextIO function to read memory data to initialize tf_mem_bin_cm. Needed here because of variable slv width!
 impure function read_tf_mem_data (
 file_path : string;      --! File path as string
 hex_val   : boolean)     --! Read file vales as hex or bin
@@ -121,24 +99,28 @@ begin
 end read_tf_mem_data;
 
 -- ########################### Signals ###########################
+type mem_array is array (NCOPY-1 downto 0) of t_arr_1d_slv_mem;
+type data_array is array (NCOPY-1 downto 0) of std_logic_vector(RAM_WIDTH-1 downto 0);
+
+signal sa_RAM_data : mem_array := (others => read_tf_mem_data(INIT_FILE, INIT_HEX)); --! Ram data content
+signal sv_RAM_row  : data_array := (others => (others =>'0'));          --! RAM data row
+
 signal sa_RAM_data0 : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sa_RAM_data1 : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sa_RAM_data2 : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sa_RAM_data3 : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
-signal sa_RAM_data4 : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row0  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row1  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row2  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row3  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
-signal sv_RAM_row4  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
+attribute ram_style of sa_RAM_data : signal is "block";
 attribute ram_style of sa_RAM_data0 : signal is "block";
 attribute ram_style of sa_RAM_data1 : signal is "block";
 attribute ram_style of sa_RAM_data2 : signal is "block";
 attribute ram_style of sa_RAM_data3 : signal is "block";
-attribute ram_style of sa_RAM_data4 : signal is "block";
 
 begin
 
@@ -162,8 +144,8 @@ begin
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      nent_o(vi_page_cnt) <= (others => (others => '0'));
-      mask_o(vi_page_cnt) <= (others => '0'); 
+      nent_o(vi_page_cnt) <= (others => (others => '0'));    
+      mask_o(vi_page_cnt) <= (others => '0');    
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
         vi_page_cnt := vi_page_cnt +1;
@@ -171,18 +153,16 @@ begin
         vi_page_cnt := 0;
       end if;
     end if;
-    if (wea0='1') then
-      sa_RAM_data0(to_integer(unsigned(addra0))) <= dina0; -- Write data
-      sa_RAM_data1(to_integer(unsigned(addra1))) <= dina1; -- Write data
-      sa_RAM_data2(to_integer(unsigned(addra2))) <= dina2; -- Write data
-      sa_RAM_data3(to_integer(unsigned(addra3))) <= dina3; -- Write data
-      sa_RAM_data4(to_integer(unsigned(addra4))) <= dina4; -- Write data
+    if (wea='1') then
+      for imem in (NCOPY-1) downto 0 loop
+        sa_RAM_data(imem)(to_integer(unsigned(addra))) <= dina; -- Write data
+      end loop;
       -- Count entries
-      vi_nent_idx := to_integer(shift_right(unsigned(addra0), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
-      page := to_integer(unsigned(addra0(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra0(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
+      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(vi_nent_idx) <= '1'; -- <= 1 (slv)
       if (addr_in_page = 0) then
@@ -197,47 +177,32 @@ end process;
 process(clkb)
 begin
   if rising_edge(clkb) then
-    if (enb0='1') then
-      sv_RAM_row0 <= sa_RAM_data0(to_integer(unsigned(addrb0)));
-    end if;
-    if (enb1='1') then
-      sv_RAM_row1 <= sa_RAM_data1(to_integer(unsigned(addrb1)));
-    end if;
-    if (enb2='1') then
-      sv_RAM_row2 <= sa_RAM_data2(to_integer(unsigned(addrb2)));
-    end if;
-    if (enb3='1') then
-      sv_RAM_row3 <= sa_RAM_data3(to_integer(unsigned(addrb3)));
-    end if;
-    if (enb4='1') then
-      sv_RAM_row4 <= sa_RAM_data4(to_integer(unsigned(addrb4)));
-    end if;
+    for imem in (NCOPY-1) downto 0 loop
+      if (enb(imem)='1') then
+        sv_RAM_row(imem) <= sa_RAM_data(imem)(to_integer(unsigned(addrb(imem))));
+      end if;
+    end loop;
   end if;
 end process;
 
 -- The following code generates HIGH_PERFORMANCE (use output register) or LOW_LATENCY (no output register)
 MODE : if (RAM_PERFORMANCE = "LOW_LATENCY") generate -- no_output_register; 1 clock cycle read latency at the cost of a longer clock-to-out timing
-  doutb0 <= sv_RAM_row0;
-  doutb1 <= sv_RAM_row1;
-  doutb2 <= sv_RAM_row2;
-  doutb3 <= sv_RAM_row3;
-  doutb4 <= sv_RAM_row4;
+  process(clkb)
+  begin
+    for imem in (NCOPY-1) downto 0 loop
+      doutb(imem) <= sv_RAM_row(imem);
+    end loop;
+  end process;
 else generate -- output_register; 2 clock cycle read latency with improve clock-to-out timing
   process(clkb)
   begin
     if rising_edge(clkb) then
       if (rstb='1') then
-        doutb0 <= (others => '0');
-        doutb1 <= (others => '0');
-        doutb2 <= (others => '0');
-        doutb3 <= (others => '0');
-        doutb4 <= (others => '0');
+        doutb <= (others => (others => '0'));
       elsif (regceb='1') then
-        doutb0 <= sv_RAM_row0;
-        doutb1 <= sv_RAM_row1;
-        doutb2 <= sv_RAM_row2;
-        doutb3 <= sv_RAM_row3;
-        doutb4 <= sv_RAM_row4;
+        for imem in (NCOPY-1) downto 0 loop
+          doutb(imem) <= sv_RAM_row(imem);
+        end loop;
       end if;
     end if;
   end process;

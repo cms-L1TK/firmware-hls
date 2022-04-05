@@ -48,88 +48,48 @@ architecture rtl of SectorProcessor is
   signal AS_51_mem_AV_readaddr    : t_arr_AS_51_ADDR;
   signal AS_51_mem_AV_dout        : t_arr_AS_51_DATA;
   signal AS_51_mem_AAV_dout_nent  : t_arr_AS_51_NENT; -- (#page)
-  signal VMSME_16_mem0_A_wea          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem0_AV_writeaddr   : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem0_AV_din         : t_arr_VMSME_16_DATA;
-  signal VMSME_16_mem1_A_wea          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem1_AV_writeaddr   : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem1_AV_din         : t_arr_VMSME_16_DATA;
-  signal VMSME_16_mem2_A_wea          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem2_AV_writeaddr   : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem2_AV_din         : t_arr_VMSME_16_DATA;
-  signal VMSME_16_mem3_A_wea          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem3_AV_writeaddr   : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem3_AV_din         : t_arr_VMSME_16_DATA;
+  signal VMSME_16_mem_A_wea          : t_arr_VMSME_16_1b;
+  signal VMSME_16_mem_AV_writeaddr   : t_arr_VMSME_16_ADDR;
+  signal VMSME_16_mem_AV_din         : t_arr_VMSME_16_DATA;
   signal VMSME_16_mem0_A_enb          : t_arr_VMSME_16_1b;
   signal VMSME_16_mem0_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem0_AV_dout        : t_arr_VMSME_16_DATA;
   signal VMSME_16_mem1_A_enb          : t_arr_VMSME_16_1b;
   signal VMSME_16_mem1_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem1_AV_dout        : t_arr_VMSME_16_DATA;
   signal VMSME_16_mem2_A_enb          : t_arr_VMSME_16_1b;
   signal VMSME_16_mem2_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem2_AV_dout        : t_arr_VMSME_16_DATA;
   signal VMSME_16_mem3_A_enb          : t_arr_VMSME_16_1b;
   signal VMSME_16_mem3_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem3_AV_dout        : t_arr_VMSME_16_DATA;
+  signal VMSME_16_mem_AAV_dout        : t_arr_VMSME_16_ADATA; 
   signal VMSME_16_mem_AAV_dout_mask : t_arr_VMSME_16_MASK; -- (#page)(#bin)
   signal VMSME_16_mem_AAAV_dout_nent : t_arr_VMSME_16_NENT; -- (#page)(#bin)
-  signal VMSME_17_mem0_A_wea          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem0_AV_writeaddr   : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem0_AV_din         : t_arr_VMSME_17_DATA;
-  signal VMSME_17_mem1_A_wea          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem1_AV_writeaddr   : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem1_AV_din         : t_arr_VMSME_17_DATA;
-  signal VMSME_17_mem2_A_wea          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem2_AV_writeaddr   : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem2_AV_din         : t_arr_VMSME_17_DATA;
-  signal VMSME_17_mem3_A_wea          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem3_AV_writeaddr   : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem3_AV_din         : t_arr_VMSME_17_DATA;
+  signal VMSME_17_mem_A_wea          : t_arr_VMSME_17_1b;
+  signal VMSME_17_mem_AV_writeaddr   : t_arr_VMSME_17_ADDR;
+  signal VMSME_17_mem_AV_din         : t_arr_VMSME_17_DATA;
   signal VMSME_17_mem0_A_enb          : t_arr_VMSME_17_1b;
   signal VMSME_17_mem0_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem0_AV_dout        : t_arr_VMSME_17_DATA;
   signal VMSME_17_mem1_A_enb          : t_arr_VMSME_17_1b;
   signal VMSME_17_mem1_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem1_AV_dout        : t_arr_VMSME_17_DATA;
   signal VMSME_17_mem2_A_enb          : t_arr_VMSME_17_1b;
   signal VMSME_17_mem2_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem2_AV_dout        : t_arr_VMSME_17_DATA;
   signal VMSME_17_mem3_A_enb          : t_arr_VMSME_17_1b;
   signal VMSME_17_mem3_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem3_AV_dout        : t_arr_VMSME_17_DATA;
+  signal VMSME_17_mem_AAV_dout        : t_arr_VMSME_17_ADATA;
   signal VMSME_17_mem_AAV_dout_mask : t_arr_VMSME_17_MASK; -- (#page)(#bin)
   signal VMSME_17_mem_AAAV_dout_nent : t_arr_VMSME_17_NENT; -- (#page)(#bin)
-  signal VMSTE_16_mem0_A_wea          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem0_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem0_AV_din         : t_arr_VMSTE_16_DATA;
-  signal VMSTE_16_mem1_A_wea          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem1_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem1_AV_din         : t_arr_VMSTE_16_DATA;
-  signal VMSTE_16_mem2_A_wea          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem2_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem2_AV_din         : t_arr_VMSTE_16_DATA;
-  signal VMSTE_16_mem3_A_wea          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem3_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem3_AV_din         : t_arr_VMSTE_16_DATA;
-  signal VMSTE_16_mem4_A_wea          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem4_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem4_AV_din         : t_arr_VMSTE_16_DATA;
+  signal VMSTE_16_mem_A_wea          : t_arr_VMSTE_16_1b;
+  signal VMSTE_16_mem_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
+  signal VMSTE_16_mem_AV_din         : t_arr_VMSTE_16_DATA;
   signal VMSTE_16_mem0_A_enb          : t_arr_VMSTE_16_1b;
   signal VMSTE_16_mem0_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem0_AV_dout        : t_arr_VMSTE_16_DATA;
   signal VMSTE_16_mem1_A_enb          : t_arr_VMSTE_16_1b;
   signal VMSTE_16_mem1_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem1_AV_dout        : t_arr_VMSTE_16_DATA;
   signal VMSTE_16_mem2_A_enb          : t_arr_VMSTE_16_1b;
   signal VMSTE_16_mem2_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem2_AV_dout        : t_arr_VMSTE_16_DATA;
   signal VMSTE_16_mem3_A_enb          : t_arr_VMSTE_16_1b;
   signal VMSTE_16_mem3_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem3_AV_dout        : t_arr_VMSTE_16_DATA;
   signal VMSTE_16_mem4_A_enb          : t_arr_VMSTE_16_1b;
   signal VMSTE_16_mem4_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem4_AV_dout        : t_arr_VMSTE_16_DATA;
+  signal VMSTE_16_mem_AAV_dout        : t_arr_VMSTE_16_ADATA;
   signal VMSTE_16_mem_AAV_dout_mask : t_arr_VMSTE_16_MASK; -- (#page)(#bin)
   signal VMSTE_16_mem_AAAV_dout_nent : t_arr_VMSTE_16_NENT; -- (#page)(#bin)
   signal TPROJ_60_mem_A_wea          : t_arr_TPROJ_60_1b;
@@ -274,43 +234,26 @@ begin
   VMSME_16_loop : for var in enum_VMSME_16 generate
   begin
 
-    VMSME_16 : entity work.tf_mem_bin_cm4
+    VMSME_16 : entity work.tf_mem_bin_cm
       generic map (
         RAM_WIDTH       => 16,
         NUM_PAGES       => 4,
         INIT_FILE       => "",
         INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+        NCOPY           => 4
       )
       port map (
         clka      => clk,
-        wea0       => VMSME_16_mem0_A_wea(var),
-        addra0     => VMSME_16_mem0_AV_writeaddr(var),
-        dina0      => VMSME_16_mem0_AV_din(var),
-        wea1       => VMSME_16_mem1_A_wea(var),
-        addra1     => VMSME_16_mem1_AV_writeaddr(var),
-        dina1      => VMSME_16_mem1_AV_din(var),
-        wea2       => VMSME_16_mem2_A_wea(var),
-        addra2     => VMSME_16_mem2_AV_writeaddr(var),
-        dina2      => VMSME_16_mem2_AV_din(var),
-        wea3       => VMSME_16_mem3_A_wea(var),
-        addra3     => VMSME_16_mem3_AV_writeaddr(var),
-        dina3      => VMSME_16_mem3_AV_din(var),
+        wea       => VMSME_16_mem_A_wea(var),
+        addra     => VMSME_16_mem_AV_writeaddr(var),
+        dina      => VMSME_16_mem_AV_din(var),
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb0       => VMSME_16_mem0_A_enb(var),
-        addrb0     => VMSME_16_mem0_AV_readaddr(var),
-        doutb0     => VMSME_16_mem0_AV_dout(var),
-        enb1       => VMSME_16_mem1_A_enb(var),
-        addrb1     => VMSME_16_mem1_AV_readaddr(var),
-        doutb1     => VMSME_16_mem1_AV_dout(var),
-        enb2       => VMSME_16_mem2_A_enb(var),
-        addrb2     => VMSME_16_mem2_AV_readaddr(var),
-        doutb2     => VMSME_16_mem2_AV_dout(var),
-        enb3       => VMSME_16_mem3_A_enb(var),
-        addrb3     => VMSME_16_mem3_AV_readaddr(var),
-        doutb3     => VMSME_16_mem3_AV_dout(var),
+        enb        => (VMSME_16_mem0_A_enb(var), VMSME_16_mem1_A_enb(var), VMSME_16_mem2_A_enb(var), VMSME_16_mem3_A_enb(var)),
+        addrb     => (VMSME_16_mem0_AV_readaddr(var), VMSME_16_mem1_AV_readaddr(var), VMSME_16_mem2_AV_readaddr(var), VMSME_16_mem3_AV_readaddr(var)),
+        doutb      => VMSME_16_mem_AAV_dout(var),
         sync_nent => MP_start,
         nent_o    => VMSME_16_mem_AAAV_dout_nent(var),
         mask_o    => VMSME_16_mem_AAV_dout_mask(var)
@@ -322,43 +265,26 @@ begin
   VMSME_17_loop : for var in enum_VMSME_17 generate
   begin
 
-    VMSME_17 : entity work.tf_mem_bin_cm4
+    VMSME_17 : entity work.tf_mem_bin_cm
       generic map (
         RAM_WIDTH       => 17,
         NUM_PAGES       => 4,
         INIT_FILE       => "",
         INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+        NCOPY           => 4
       )
       port map (
         clka      => clk,
-        wea0       => VMSME_17_mem0_A_wea(var),
-        addra0     => VMSME_17_mem0_AV_writeaddr(var),
-        dina0      => VMSME_17_mem0_AV_din(var),
-        wea1       => VMSME_17_mem1_A_wea(var),
-        addra1     => VMSME_17_mem1_AV_writeaddr(var),
-        dina1      => VMSME_17_mem1_AV_din(var),
-        wea2       => VMSME_17_mem2_A_wea(var),
-        addra2     => VMSME_17_mem2_AV_writeaddr(var),
-        dina2      => VMSME_17_mem2_AV_din(var),
-        wea3       => VMSME_17_mem3_A_wea(var),
-        addra3     => VMSME_17_mem3_AV_writeaddr(var),
-        dina3      => VMSME_17_mem3_AV_din(var),
+        wea       => VMSME_17_mem_A_wea(var),
+        addra     => VMSME_17_mem_AV_writeaddr(var),
+        dina      => VMSME_17_mem_AV_din(var),
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb0       => VMSME_17_mem0_A_enb(var),
-        addrb0     => VMSME_17_mem0_AV_readaddr(var),
-        doutb0     => VMSME_17_mem0_AV_dout(var),
-        enb1       => VMSME_17_mem1_A_enb(var),
-        addrb1     => VMSME_17_mem1_AV_readaddr(var),
-        doutb1     => VMSME_17_mem1_AV_dout(var),
-        enb2       => VMSME_17_mem2_A_enb(var),
-        addrb2     => VMSME_17_mem2_AV_readaddr(var),
-        doutb2     => VMSME_17_mem2_AV_dout(var),
-        enb3       => VMSME_17_mem3_A_enb(var),
-        addrb3     => VMSME_17_mem3_AV_readaddr(var),
-        doutb3     => VMSME_17_mem3_AV_dout(var),
+        enb        => (VMSME_17_mem0_A_enb(var),VMSME_17_mem1_A_enb(var),VMSME_17_mem2_A_enb(var),VMSME_17_mem3_A_enb(var)),
+        addrb     => (VMSME_17_mem0_AV_readaddr(var), VMSME_17_mem1_AV_readaddr(var), VMSME_17_mem2_AV_readaddr(var), VMSME_17_mem3_AV_readaddr(var)),
+        doutb      => VMSME_17_mem_AAV_dout(var),
         sync_nent => MP_start,
         nent_o    => VMSME_17_mem_AAAV_dout_nent(var),
         mask_o    => VMSME_17_mem_AAV_dout_mask(var)
@@ -370,49 +296,26 @@ begin
   VMSTE_16_loop : for var in enum_VMSTE_16 generate
   begin
 
-    VMSTE_16 : entity work.tf_mem_bin_cm5
+    VMSTE_16 : entity work.tf_mem_bin_cm
       generic map (
         RAM_WIDTH       => 16,
         NUM_PAGES       => 2,
         INIT_FILE       => "",
         INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+        NCOPY           => 5
       )
       port map (
         clka      => clk,
-        wea0       => VMSTE_16_mem0_A_wea(var),
-        addra0     => VMSTE_16_mem0_AV_writeaddr(var),
-        dina0      => VMSTE_16_mem0_AV_din(var),
-        wea1       => VMSTE_16_mem1_A_wea(var),
-        addra1     => VMSTE_16_mem1_AV_writeaddr(var),
-        dina1      => VMSTE_16_mem1_AV_din(var),
-        wea2       => VMSTE_16_mem2_A_wea(var),
-        addra2     => VMSTE_16_mem2_AV_writeaddr(var),
-        dina2      => VMSTE_16_mem2_AV_din(var),
-        wea3       => VMSTE_16_mem3_A_wea(var),
-        addra3     => VMSTE_16_mem3_AV_writeaddr(var),
-        dina3      => VMSTE_16_mem3_AV_din(var),
-        wea4       => VMSTE_16_mem4_A_wea(var),
-        addra4     => VMSTE_16_mem4_AV_writeaddr(var),
-        dina4      => VMSTE_16_mem4_AV_din(var),
+        wea       => VMSTE_16_mem_A_wea(var),
+        addra     => VMSTE_16_mem_AV_writeaddr(var),
+        dina      => VMSTE_16_mem_AV_din(var),
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb0       => VMSTE_16_mem0_A_enb(var),
-        addrb0     => VMSTE_16_mem0_AV_readaddr(var),
-        doutb0     => VMSTE_16_mem0_AV_dout(var),
-        enb1       => VMSTE_16_mem1_A_enb(var),
-        addrb1     => VMSTE_16_mem1_AV_readaddr(var),
-        doutb1     => VMSTE_16_mem1_AV_dout(var),
-        enb2       => VMSTE_16_mem2_A_enb(var),
-        addrb2     => VMSTE_16_mem2_AV_readaddr(var),
-        doutb2     => VMSTE_16_mem2_AV_dout(var),
-        enb3       => VMSTE_16_mem3_A_enb(var),
-        addrb3     => VMSTE_16_mem3_AV_readaddr(var),
-        doutb3     => VMSTE_16_mem3_AV_dout(var),
-        enb4       => VMSTE_16_mem4_A_enb(var),
-        addrb4     => VMSTE_16_mem4_AV_readaddr(var),
-        doutb4     => VMSTE_16_mem4_AV_dout(var),
+        enb       => (VMSTE_16_mem0_A_enb(var),VMSTE_16_mem1_A_enb(var),VMSTE_16_mem2_A_enb(var),VMSTE_16_mem3_A_enb(var),VMSTE_16_mem4_A_enb(var)),
+        addrb     => (VMSTE_16_mem0_AV_readaddr(var),VMSTE_16_mem1_AV_readaddr(var),VMSTE_16_mem2_AV_readaddr(var),VMSTE_16_mem3_AV_readaddr(var),VMSTE_16_mem4_AV_readaddr(var)),
+        doutb     => VMSTE_16_mem_AAV_dout(var),
         sync_nent => TP_start,
         nent_o    => VMSTE_16_mem_AAAV_dout_nent(var),
         mask_o    => VMSTE_16_mem_AAV_dout_mask(var)
@@ -785,25 +688,9 @@ begin
       memoriesAS_0_dataarray_data_V_address0  => AS_36_mem_AV_writeaddr(L2PHIA_B_L1C),
       memoriesAS_0_dataarray_data_V_d0        => AS_36_mem_AV_din(L2PHIA_B_L1C),
       memoriesTEO_0_dataarray_0_data_V_ce0       => open,
-      memoriesTEO_0_dataarray_0_data_V_we0       => VMSTE_16_mem0_A_wea(L2PHIAn3),
-      memoriesTEO_0_dataarray_0_data_V_address0  => VMSTE_16_mem0_AV_writeaddr(L2PHIAn3),
-      memoriesTEO_0_dataarray_0_data_V_d0        => VMSTE_16_mem0_AV_din(L2PHIAn3),
-      memoriesTEO_0_dataarray_1_data_V_ce0       => open,
-      memoriesTEO_0_dataarray_1_data_V_we0       => VMSTE_16_mem1_A_wea(L2PHIAn3),
-      memoriesTEO_0_dataarray_1_data_V_address0  => VMSTE_16_mem1_AV_writeaddr(L2PHIAn3),
-      memoriesTEO_0_dataarray_1_data_V_d0        => VMSTE_16_mem1_AV_din(L2PHIAn3),
-      memoriesTEO_0_dataarray_2_data_V_ce0       => open,
-      memoriesTEO_0_dataarray_2_data_V_we0       => VMSTE_16_mem2_A_wea(L2PHIAn3),
-      memoriesTEO_0_dataarray_2_data_V_address0  => VMSTE_16_mem2_AV_writeaddr(L2PHIAn3),
-      memoriesTEO_0_dataarray_2_data_V_d0        => VMSTE_16_mem2_AV_din(L2PHIAn3),
-      memoriesTEO_0_dataarray_3_data_V_ce0       => open,
-      memoriesTEO_0_dataarray_3_data_V_we0       => VMSTE_16_mem3_A_wea(L2PHIAn3),
-      memoriesTEO_0_dataarray_3_data_V_address0  => VMSTE_16_mem3_AV_writeaddr(L2PHIAn3),
-      memoriesTEO_0_dataarray_3_data_V_d0        => VMSTE_16_mem3_AV_din(L2PHIAn3),
-      memoriesTEO_0_dataarray_4_data_V_ce0       => open,
-      memoriesTEO_0_dataarray_4_data_V_we0       => VMSTE_16_mem4_A_wea(L2PHIAn3),
-      memoriesTEO_0_dataarray_4_data_V_address0  => VMSTE_16_mem4_AV_writeaddr(L2PHIAn3),
-      memoriesTEO_0_dataarray_4_data_V_d0        => VMSTE_16_mem4_AV_din(L2PHIAn3)
+      memoriesTEO_0_dataarray_0_data_V_we0       => VMSTE_16_mem_A_wea(L2PHIAn3),
+      memoriesTEO_0_dataarray_0_data_V_address0  => VMSTE_16_mem_AV_writeaddr(L2PHIAn3),
+      memoriesTEO_0_dataarray_0_data_V_d0        => VMSTE_16_mem_AV_din(L2PHIAn3)
   );
 
   VMR_L3PHIA : entity work.VMR_L3PHIA
@@ -830,21 +717,9 @@ begin
       memoriesAS_0_dataarray_data_V_address0  => AS_36_mem_AV_writeaddr(L3PHIAn1),
       memoriesAS_0_dataarray_data_V_d0        => AS_36_mem_AV_din(L3PHIAn1),
       memoryME_dataarray_0_data_V_ce0       => open,
-      memoryME_dataarray_0_data_V_we0       => VMSME_16_mem0_A_wea(L3PHIAn1),
-      memoryME_dataarray_0_data_V_address0  => VMSME_16_mem0_AV_writeaddr(L3PHIAn1),
-      memoryME_dataarray_0_data_V_d0        => VMSME_16_mem0_AV_din(L3PHIAn1),
-      memoryME_dataarray_1_data_V_ce0       => open,
-      memoryME_dataarray_1_data_V_we0       => VMSME_16_mem1_A_wea(L3PHIAn1),
-      memoryME_dataarray_1_data_V_address0  => VMSME_16_mem1_AV_writeaddr(L3PHIAn1),
-      memoryME_dataarray_1_data_V_d0        => VMSME_16_mem1_AV_din(L3PHIAn1),
-      memoryME_dataarray_2_data_V_ce0       => open,
-      memoryME_dataarray_2_data_V_we0       => VMSME_16_mem2_A_wea(L3PHIAn1),
-      memoryME_dataarray_2_data_V_address0  => VMSME_16_mem2_AV_writeaddr(L3PHIAn1),
-      memoryME_dataarray_2_data_V_d0        => VMSME_16_mem2_AV_din(L3PHIAn1),
-      memoryME_dataarray_3_data_V_ce0       => open,
-      memoryME_dataarray_3_data_V_we0       => VMSME_16_mem3_A_wea(L3PHIAn1),
-      memoryME_dataarray_3_data_V_address0  => VMSME_16_mem3_AV_writeaddr(L3PHIAn1),
-      memoryME_dataarray_3_data_V_d0        => VMSME_16_mem3_AV_din(L3PHIAn1)
+      memoryME_dataarray_0_data_V_we0       => VMSME_16_mem_A_wea(L3PHIAn1),
+      memoryME_dataarray_0_data_V_address0  => VMSME_16_mem_AV_writeaddr(L3PHIAn1),
+      memoryME_dataarray_0_data_V_d0        => VMSME_16_mem_AV_din(L3PHIAn1)
   );
 
   VMR_L4PHIA : entity work.VMR_L4PHIA
@@ -866,21 +741,9 @@ begin
       memoriesAS_0_dataarray_data_V_address0  => AS_36_mem_AV_writeaddr(L4PHIAn1),
       memoriesAS_0_dataarray_data_V_d0        => AS_36_mem_AV_din(L4PHIAn1),
       memoryME_dataarray_0_data_V_ce0       => open,
-      memoryME_dataarray_0_data_V_we0       => VMSME_17_mem0_A_wea(L4PHIAn1),
-      memoryME_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_writeaddr(L4PHIAn1),
-      memoryME_dataarray_0_data_V_d0        => VMSME_17_mem0_AV_din(L4PHIAn1),
-      memoryME_dataarray_1_data_V_ce0       => open,
-      memoryME_dataarray_1_data_V_we0       => VMSME_17_mem1_A_wea(L4PHIAn1),
-      memoryME_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_writeaddr(L4PHIAn1),
-      memoryME_dataarray_1_data_V_d0        => VMSME_17_mem1_AV_din(L4PHIAn1),
-      memoryME_dataarray_2_data_V_ce0       => open,
-      memoryME_dataarray_2_data_V_we0       => VMSME_17_mem2_A_wea(L4PHIAn1),
-      memoryME_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_writeaddr(L4PHIAn1),
-      memoryME_dataarray_2_data_V_d0        => VMSME_17_mem2_AV_din(L4PHIAn1),
-      memoryME_dataarray_3_data_V_ce0       => open,
-      memoryME_dataarray_3_data_V_we0       => VMSME_17_mem3_A_wea(L4PHIAn1),
-      memoryME_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_writeaddr(L4PHIAn1),
-      memoryME_dataarray_3_data_V_d0        => VMSME_17_mem3_AV_din(L4PHIAn1)
+      memoryME_dataarray_0_data_V_we0       => VMSME_17_mem_A_wea(L4PHIAn1),
+      memoryME_dataarray_0_data_V_address0  => VMSME_17_mem_AV_writeaddr(L4PHIAn1),
+      memoryME_dataarray_0_data_V_d0        => VMSME_17_mem_AV_din(L4PHIAn1)
   );
 
   VMR_L5PHIA : entity work.VMR_L5PHIA
@@ -907,21 +770,9 @@ begin
       memoriesAS_0_dataarray_data_V_address0  => AS_36_mem_AV_writeaddr(L5PHIAn1),
       memoriesAS_0_dataarray_data_V_d0        => AS_36_mem_AV_din(L5PHIAn1),
       memoryME_dataarray_0_data_V_ce0       => open,
-      memoryME_dataarray_0_data_V_we0       => VMSME_17_mem0_A_wea(L5PHIAn1),
-      memoryME_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_writeaddr(L5PHIAn1),
-      memoryME_dataarray_0_data_V_d0        => VMSME_17_mem0_AV_din(L5PHIAn1),
-      memoryME_dataarray_1_data_V_ce0       => open,
-      memoryME_dataarray_1_data_V_we0       => VMSME_17_mem1_A_wea(L5PHIAn1),
-      memoryME_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_writeaddr(L5PHIAn1),
-      memoryME_dataarray_1_data_V_d0        => VMSME_17_mem1_AV_din(L5PHIAn1),
-      memoryME_dataarray_2_data_V_ce0       => open,
-      memoryME_dataarray_2_data_V_we0       => VMSME_17_mem2_A_wea(L5PHIAn1),
-      memoryME_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_writeaddr(L5PHIAn1),
-      memoryME_dataarray_2_data_V_d0        => VMSME_17_mem2_AV_din(L5PHIAn1),
-      memoryME_dataarray_3_data_V_ce0       => open,
-      memoryME_dataarray_3_data_V_we0       => VMSME_17_mem3_A_wea(L5PHIAn1),
-      memoryME_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_writeaddr(L5PHIAn1),
-      memoryME_dataarray_3_data_V_d0        => VMSME_17_mem3_AV_din(L5PHIAn1)
+      memoryME_dataarray_0_data_V_we0       => VMSME_17_mem_A_wea(L5PHIAn1),
+      memoryME_dataarray_0_data_V_address0  => VMSME_17_mem_AV_writeaddr(L5PHIAn1),
+      memoryME_dataarray_0_data_V_d0        => VMSME_17_mem_AV_din(L5PHIAn1)
   );
 
   VMR_L6PHIA : entity work.VMR_L6PHIA
@@ -948,21 +799,9 @@ begin
       memoriesAS_0_dataarray_data_V_address0  => AS_36_mem_AV_writeaddr(L6PHIAn1),
       memoriesAS_0_dataarray_data_V_d0        => AS_36_mem_AV_din(L6PHIAn1),
       memoryME_dataarray_0_data_V_ce0       => open,
-      memoryME_dataarray_0_data_V_we0       => VMSME_17_mem0_A_wea(L6PHIAn1),
-      memoryME_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_writeaddr(L6PHIAn1),
-      memoryME_dataarray_0_data_V_d0        => VMSME_17_mem0_AV_din(L6PHIAn1),
-      memoryME_dataarray_1_data_V_ce0       => open,
-      memoryME_dataarray_1_data_V_we0       => VMSME_17_mem1_A_wea(L6PHIAn1),
-      memoryME_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_writeaddr(L6PHIAn1),
-      memoryME_dataarray_1_data_V_d0        => VMSME_17_mem1_AV_din(L6PHIAn1),
-      memoryME_dataarray_2_data_V_ce0       => open,
-      memoryME_dataarray_2_data_V_we0       => VMSME_17_mem2_A_wea(L6PHIAn1),
-      memoryME_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_writeaddr(L6PHIAn1),
-      memoryME_dataarray_2_data_V_d0        => VMSME_17_mem2_AV_din(L6PHIAn1),
-      memoryME_dataarray_3_data_V_ce0       => open,
-      memoryME_dataarray_3_data_V_we0       => VMSME_17_mem3_A_wea(L6PHIAn1),
-      memoryME_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_writeaddr(L6PHIAn1),
-      memoryME_dataarray_3_data_V_d0        => VMSME_17_mem3_AV_din(L6PHIAn1)
+      memoryME_dataarray_0_data_V_we0       => VMSME_17_mem_A_wea(L6PHIAn1),
+      memoryME_dataarray_0_data_V_address0  => VMSME_17_mem_AV_writeaddr(L6PHIAn1),
+      memoryME_dataarray_0_data_V_d0        => VMSME_17_mem_AV_din(L6PHIAn1)
   );
 
 
@@ -1026,19 +865,19 @@ begin
       outerStubs_dataarray_data_V_q0        => AS_36_mem_AV_dout(L2PHIA_B_L1C),
       outerVMStubs_dataarray_data_V_0_ce0       => VMSTE_16_mem0_A_enb(L2PHIAn3),
       outerVMStubs_dataarray_data_V_0_address0  => VMSTE_16_mem0_AV_readaddr(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_0_q0        => VMSTE_16_mem0_AV_dout(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_0_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(0),
       outerVMStubs_dataarray_data_V_1_ce0       => VMSTE_16_mem1_A_enb(L2PHIAn3),
       outerVMStubs_dataarray_data_V_1_address0  => VMSTE_16_mem1_AV_readaddr(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_1_q0        => VMSTE_16_mem1_AV_dout(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_1_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(1),
       outerVMStubs_dataarray_data_V_2_ce0       => VMSTE_16_mem2_A_enb(L2PHIAn3),
       outerVMStubs_dataarray_data_V_2_address0  => VMSTE_16_mem2_AV_readaddr(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_2_q0        => VMSTE_16_mem2_AV_dout(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_2_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(2),
       outerVMStubs_dataarray_data_V_3_ce0       => VMSTE_16_mem3_A_enb(L2PHIAn3),
       outerVMStubs_dataarray_data_V_3_address0  => VMSTE_16_mem3_AV_readaddr(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_3_q0        => VMSTE_16_mem3_AV_dout(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_3_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(3),
       outerVMStubs_dataarray_data_V_4_ce0       => VMSTE_16_mem4_A_enb(L2PHIAn3),
       outerVMStubs_dataarray_data_V_4_address0  => VMSTE_16_mem4_AV_readaddr(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_4_q0        => VMSTE_16_mem4_AV_dout(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_4_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(4),
       outerVMStubs_binmask8_V_0_0     => (VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(0), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(1), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(2), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(3), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(4), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(5), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(6), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(7)),
       outerVMStubs_binmask8_V_0_1     => (VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(8), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(9), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(10), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(11), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(12), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(13), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(14), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(15)),
       outerVMStubs_binmask8_V_0_2     => (VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(16), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(17), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(18), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(19), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(20), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(21), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(22), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(23)),
@@ -1119,16 +958,16 @@ begin
       projin_0_nentries_1_V               => TPROJ_60_mem_AAV_dout_nent(L1L2C_L3PHIA)(1),
       instubdata_dataarray_0_data_V_ce0       => VMSME_16_mem0_A_enb(L3PHIAn1),
       instubdata_dataarray_0_data_V_address0  => VMSME_16_mem0_AV_readaddr(L3PHIAn1),
-      instubdata_dataarray_0_data_V_q0        => VMSME_16_mem0_AV_dout(L3PHIAn1),
+      instubdata_dataarray_0_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(0),
       instubdata_dataarray_1_data_V_ce0       => VMSME_16_mem1_A_enb(L3PHIAn1),
       instubdata_dataarray_1_data_V_address0  => VMSME_16_mem1_AV_readaddr(L3PHIAn1),
-      instubdata_dataarray_1_data_V_q0        => VMSME_16_mem1_AV_dout(L3PHIAn1),
+      instubdata_dataarray_1_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(1),
       instubdata_dataarray_2_data_V_ce0       => VMSME_16_mem2_A_enb(L3PHIAn1),
       instubdata_dataarray_2_data_V_address0  => VMSME_16_mem2_AV_readaddr(L3PHIAn1),
-      instubdata_dataarray_2_data_V_q0        => VMSME_16_mem2_AV_dout(L3PHIAn1),
+      instubdata_dataarray_2_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(2),
       instubdata_dataarray_3_data_V_ce0       => VMSME_16_mem3_A_enb(L3PHIAn1),
       instubdata_dataarray_3_data_V_address0  => VMSME_16_mem3_AV_readaddr(L3PHIAn1),
-      instubdata_dataarray_3_data_V_q0        => VMSME_16_mem3_AV_dout(L3PHIAn1),
+      instubdata_dataarray_3_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_16_mem_AAAV_dout_nent(L3PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_16_mem_AAAV_dout_nent(L3PHIAn1)(0)(1),
       instubdata_nentries8_0_V_2     => VMSME_16_mem_AAAV_dout_nent(L3PHIAn1)(0)(2),
@@ -1186,16 +1025,16 @@ begin
       projin_0_nentries_1_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L4PHIA)(1),
       instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem0_A_enb(L4PHIAn1),
       instubdata_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_readaddr(L4PHIAn1),
-      instubdata_dataarray_0_data_V_q0        => VMSME_17_mem0_AV_dout(L4PHIAn1),
+      instubdata_dataarray_0_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(0),
       instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem1_A_enb(L4PHIAn1),
       instubdata_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_readaddr(L4PHIAn1),
-      instubdata_dataarray_1_data_V_q0        => VMSME_17_mem1_AV_dout(L4PHIAn1),
+      instubdata_dataarray_1_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(1),
       instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem2_A_enb(L4PHIAn1),
       instubdata_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_readaddr(L4PHIAn1),
-      instubdata_dataarray_2_data_V_q0        => VMSME_17_mem2_AV_dout(L4PHIAn1),
+      instubdata_dataarray_2_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(1),
       instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem3_A_enb(L4PHIAn1),
       instubdata_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_readaddr(L4PHIAn1),
-      instubdata_dataarray_3_data_V_q0        => VMSME_17_mem3_AV_dout(L4PHIAn1),
+      instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_17_mem_AAAV_dout_nent(L4PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_17_mem_AAAV_dout_nent(L4PHIAn1)(0)(1),
       instubdata_nentries8_0_V_2     => VMSME_17_mem_AAAV_dout_nent(L4PHIAn1)(0)(2),
@@ -1253,16 +1092,16 @@ begin
       projin_0_nentries_1_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L5PHIA)(1),
       instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem0_A_enb(L5PHIAn1),
       instubdata_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_readaddr(L5PHIAn1),
-      instubdata_dataarray_0_data_V_q0        => VMSME_17_mem0_AV_dout(L5PHIAn1),
+      instubdata_dataarray_0_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(0),
       instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem1_A_enb(L5PHIAn1),
       instubdata_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_readaddr(L5PHIAn1),
-      instubdata_dataarray_1_data_V_q0        => VMSME_17_mem1_AV_dout(L5PHIAn1),
+      instubdata_dataarray_1_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(1),
       instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem2_A_enb(L5PHIAn1),
       instubdata_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_readaddr(L5PHIAn1),
-      instubdata_dataarray_2_data_V_q0        => VMSME_17_mem2_AV_dout(L5PHIAn1),
+      instubdata_dataarray_2_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(2),
       instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem3_A_enb(L5PHIAn1),
       instubdata_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_readaddr(L5PHIAn1),
-      instubdata_dataarray_3_data_V_q0        => VMSME_17_mem3_AV_dout(L5PHIAn1),
+      instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_17_mem_AAAV_dout_nent(L5PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_17_mem_AAAV_dout_nent(L5PHIAn1)(0)(1),
       instubdata_nentries8_0_V_2     => VMSME_17_mem_AAAV_dout_nent(L5PHIAn1)(0)(2),
@@ -1320,16 +1159,16 @@ begin
       projin_0_nentries_1_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L6PHIA)(1),
       instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem0_A_enb(L6PHIAn1),
       instubdata_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_readaddr(L6PHIAn1),
-      instubdata_dataarray_0_data_V_q0        => VMSME_17_mem0_AV_dout(L6PHIAn1),
+      instubdata_dataarray_0_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(0),
       instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem1_A_enb(L6PHIAn1),
       instubdata_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_readaddr(L6PHIAn1),
-      instubdata_dataarray_1_data_V_q0        => VMSME_17_mem1_AV_dout(L6PHIAn1),
+      instubdata_dataarray_1_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(1),
       instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem2_A_enb(L6PHIAn1),
       instubdata_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_readaddr(L6PHIAn1),
-      instubdata_dataarray_2_data_V_q0        => VMSME_17_mem2_AV_dout(L6PHIAn1),
+      instubdata_dataarray_2_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(2),
       instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem3_A_enb(L6PHIAn1),
       instubdata_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_readaddr(L6PHIAn1),
-      instubdata_dataarray_3_data_V_q0        => VMSME_17_mem3_AV_dout(L6PHIAn1),
+      instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_17_mem_AAAV_dout_nent(L6PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_17_mem_AAAV_dout_nent(L6PHIAn1)(0)(1),
       instubdata_nentries8_0_V_2     => VMSME_17_mem_AAAV_dout_nent(L6PHIAn1)(0)(2),
