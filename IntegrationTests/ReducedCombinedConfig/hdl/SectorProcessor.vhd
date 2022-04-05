@@ -51,44 +51,24 @@ architecture rtl of SectorProcessor is
   signal VMSME_16_mem_A_wea          : t_arr_VMSME_16_1b;
   signal VMSME_16_mem_AV_writeaddr   : t_arr_VMSME_16_ADDR;
   signal VMSME_16_mem_AV_din         : t_arr_VMSME_16_DATA;
-  signal VMSME_16_mem0_A_enb          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem0_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem1_A_enb          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem1_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem2_A_enb          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem2_AV_readaddr    : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem3_A_enb          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem3_AV_readaddr    : t_arr_VMSME_16_ADDR;
+  signal VMSME_16_mem_AA_enb          : t_arr_VMSME_16_A1b;
+  signal VMSME_16_mem_AAV_readaddr    : t_arr_VMSME_16_AADDR;
   signal VMSME_16_mem_AAV_dout        : t_arr_VMSME_16_ADATA; 
   signal VMSME_16_mem_AAV_dout_mask : t_arr_VMSME_16_MASK; -- (#page)(#bin)
   signal VMSME_16_mem_AAAV_dout_nent : t_arr_VMSME_16_NENT; -- (#page)(#bin)
   signal VMSME_17_mem_A_wea          : t_arr_VMSME_17_1b;
   signal VMSME_17_mem_AV_writeaddr   : t_arr_VMSME_17_ADDR;
   signal VMSME_17_mem_AV_din         : t_arr_VMSME_17_DATA;
-  signal VMSME_17_mem0_A_enb          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem0_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem1_A_enb          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem1_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem2_A_enb          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem2_AV_readaddr    : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem3_A_enb          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem3_AV_readaddr    : t_arr_VMSME_17_ADDR;
+  signal VMSME_17_mem_AA_enb          : t_arr_VMSME_17_A1b;
+  signal VMSME_17_mem_AAV_readaddr    : t_arr_VMSME_17_AADDR;
   signal VMSME_17_mem_AAV_dout        : t_arr_VMSME_17_ADATA;
   signal VMSME_17_mem_AAV_dout_mask : t_arr_VMSME_17_MASK; -- (#page)(#bin)
   signal VMSME_17_mem_AAAV_dout_nent : t_arr_VMSME_17_NENT; -- (#page)(#bin)
   signal VMSTE_16_mem_A_wea          : t_arr_VMSTE_16_1b;
   signal VMSTE_16_mem_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
   signal VMSTE_16_mem_AV_din         : t_arr_VMSTE_16_DATA;
-  signal VMSTE_16_mem0_A_enb          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem0_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem1_A_enb          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem1_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem2_A_enb          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem2_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem3_A_enb          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem3_AV_readaddr    : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem4_A_enb          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem4_AV_readaddr    : t_arr_VMSTE_16_ADDR;
+  signal VMSTE_16_mem_AA_enb          : t_arr_VMSTE_16_A1b;
+  signal VMSTE_16_mem_AAV_readaddr    : t_arr_VMSTE_16_AADDR;
   signal VMSTE_16_mem_AAV_dout        : t_arr_VMSTE_16_ADATA;
   signal VMSTE_16_mem_AAV_dout_mask : t_arr_VMSTE_16_MASK; -- (#page)(#bin)
   signal VMSTE_16_mem_AAAV_dout_nent : t_arr_VMSTE_16_NENT; -- (#page)(#bin)
@@ -251,8 +231,8 @@ begin
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb        => (VMSME_16_mem0_A_enb(var), VMSME_16_mem1_A_enb(var), VMSME_16_mem2_A_enb(var), VMSME_16_mem3_A_enb(var)),
-        addrb     => (VMSME_16_mem0_AV_readaddr(var), VMSME_16_mem1_AV_readaddr(var), VMSME_16_mem2_AV_readaddr(var), VMSME_16_mem3_AV_readaddr(var)),
+        enb        => VMSME_16_mem_AA_enb(var),
+        addrb     =>  VMSME_16_mem_AAV_readaddr(var),
         doutb      => VMSME_16_mem_AAV_dout(var),
         sync_nent => MP_start,
         nent_o    => VMSME_16_mem_AAAV_dout_nent(var),
@@ -282,8 +262,8 @@ begin
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb        => (VMSME_17_mem0_A_enb(var),VMSME_17_mem1_A_enb(var),VMSME_17_mem2_A_enb(var),VMSME_17_mem3_A_enb(var)),
-        addrb     => (VMSME_17_mem0_AV_readaddr(var), VMSME_17_mem1_AV_readaddr(var), VMSME_17_mem2_AV_readaddr(var), VMSME_17_mem3_AV_readaddr(var)),
+        enb        => VMSME_17_mem_AA_enb(var),
+        addrb     =>  VMSME_17_mem_AAV_readaddr(var),
         doutb      => VMSME_17_mem_AAV_dout(var),
         sync_nent => MP_start,
         nent_o    => VMSME_17_mem_AAAV_dout_nent(var),
@@ -313,8 +293,8 @@ begin
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb       => (VMSTE_16_mem0_A_enb(var),VMSTE_16_mem1_A_enb(var),VMSTE_16_mem2_A_enb(var),VMSTE_16_mem3_A_enb(var),VMSTE_16_mem4_A_enb(var)),
-        addrb     => (VMSTE_16_mem0_AV_readaddr(var),VMSTE_16_mem1_AV_readaddr(var),VMSTE_16_mem2_AV_readaddr(var),VMSTE_16_mem3_AV_readaddr(var),VMSTE_16_mem4_AV_readaddr(var)),
+        enb       => VMSTE_16_mem_AA_enb(var),
+        addrb     => VMSTE_16_mem_AAV_readaddr(var),
         doutb     => VMSTE_16_mem_AAV_dout(var),
         sync_nent => TP_start,
         nent_o    => VMSTE_16_mem_AAAV_dout_nent(var),
@@ -863,20 +843,20 @@ begin
       outerStubs_dataarray_data_V_ce0       => AS_36_mem_A_enb(L2PHIA_B_L1C),
       outerStubs_dataarray_data_V_address0  => AS_36_mem_AV_readaddr(L2PHIA_B_L1C),
       outerStubs_dataarray_data_V_q0        => AS_36_mem_AV_dout(L2PHIA_B_L1C),
-      outerVMStubs_dataarray_data_V_0_ce0       => VMSTE_16_mem0_A_enb(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_0_address0  => VMSTE_16_mem0_AV_readaddr(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_0_ce0       => VMSTE_16_mem_AA_enb(L2PHIAn3)(0),
+      outerVMStubs_dataarray_data_V_0_address0  => VMSTE_16_mem_AAV_readaddr(L2PHIAn3)(0),
       outerVMStubs_dataarray_data_V_0_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(0),
-      outerVMStubs_dataarray_data_V_1_ce0       => VMSTE_16_mem1_A_enb(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_1_address0  => VMSTE_16_mem1_AV_readaddr(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_1_ce0       => VMSTE_16_mem_AA_enb(L2PHIAn3)(1),
+      outerVMStubs_dataarray_data_V_1_address0  => VMSTE_16_mem_AAV_readaddr(L2PHIAn3)(1),
       outerVMStubs_dataarray_data_V_1_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(1),
-      outerVMStubs_dataarray_data_V_2_ce0       => VMSTE_16_mem2_A_enb(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_2_address0  => VMSTE_16_mem2_AV_readaddr(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_2_ce0       => VMSTE_16_mem_AA_enb(L2PHIAn3)(2),
+      outerVMStubs_dataarray_data_V_2_address0  => VMSTE_16_mem_AAV_readaddr(L2PHIAn3)(2),
       outerVMStubs_dataarray_data_V_2_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(2),
-      outerVMStubs_dataarray_data_V_3_ce0       => VMSTE_16_mem3_A_enb(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_3_address0  => VMSTE_16_mem3_AV_readaddr(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_3_ce0       => VMSTE_16_mem_AA_enb(L2PHIAn3)(3),
+      outerVMStubs_dataarray_data_V_3_address0  => VMSTE_16_mem_AAV_readaddr(L2PHIAn3)(3),
       outerVMStubs_dataarray_data_V_3_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(3),
-      outerVMStubs_dataarray_data_V_4_ce0       => VMSTE_16_mem4_A_enb(L2PHIAn3),
-      outerVMStubs_dataarray_data_V_4_address0  => VMSTE_16_mem4_AV_readaddr(L2PHIAn3),
+      outerVMStubs_dataarray_data_V_4_ce0       => VMSTE_16_mem_AA_enb(L2PHIAn3)(4),
+      outerVMStubs_dataarray_data_V_4_address0  => VMSTE_16_mem_AAV_readaddr(L2PHIAn3)(4),
       outerVMStubs_dataarray_data_V_4_q0        => VMSTE_16_mem_AAV_dout(L2PHIAn3)(4),
       outerVMStubs_binmask8_V_0_0     => (VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(0), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(1), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(2), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(3), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(4), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(5), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(6), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(7)),
       outerVMStubs_binmask8_V_0_1     => (VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(8), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(9), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(10), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(11), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(12), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(13), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(14), VMSTE_16_mem_AAV_dout_mask(L2PHIAn3)(0)(15)),
@@ -956,17 +936,17 @@ begin
       projin_0_dataarray_data_V_q0        => TPROJ_60_mem_AV_dout(L1L2C_L3PHIA),
       projin_0_nentries_0_V               => TPROJ_60_mem_AAV_dout_nent(L1L2C_L3PHIA)(0),
       projin_0_nentries_1_V               => TPROJ_60_mem_AAV_dout_nent(L1L2C_L3PHIA)(1),
-      instubdata_dataarray_0_data_V_ce0       => VMSME_16_mem0_A_enb(L3PHIAn1),
-      instubdata_dataarray_0_data_V_address0  => VMSME_16_mem0_AV_readaddr(L3PHIAn1),
+      instubdata_dataarray_0_data_V_ce0       => VMSME_16_mem_AA_enb(L3PHIAn1)(0),
+      instubdata_dataarray_0_data_V_address0  => VMSME_16_mem_AAV_readaddr(L3PHIAn1)(0),
       instubdata_dataarray_0_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(0),
-      instubdata_dataarray_1_data_V_ce0       => VMSME_16_mem1_A_enb(L3PHIAn1),
-      instubdata_dataarray_1_data_V_address0  => VMSME_16_mem1_AV_readaddr(L3PHIAn1),
+      instubdata_dataarray_1_data_V_ce0       => VMSME_16_mem_AA_enb(L3PHIAn1)(1),
+      instubdata_dataarray_1_data_V_address0  => VMSME_16_mem_AAV_readaddr(L3PHIAn1)(1),
       instubdata_dataarray_1_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(1),
-      instubdata_dataarray_2_data_V_ce0       => VMSME_16_mem2_A_enb(L3PHIAn1),
-      instubdata_dataarray_2_data_V_address0  => VMSME_16_mem2_AV_readaddr(L3PHIAn1),
+      instubdata_dataarray_2_data_V_ce0       => VMSME_16_mem_AA_enb(L3PHIAn1)(2),
+      instubdata_dataarray_2_data_V_address0  => VMSME_16_mem_AAV_readaddr(L3PHIAn1)(2),
       instubdata_dataarray_2_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(2),
-      instubdata_dataarray_3_data_V_ce0       => VMSME_16_mem3_A_enb(L3PHIAn1),
-      instubdata_dataarray_3_data_V_address0  => VMSME_16_mem3_AV_readaddr(L3PHIAn1),
+      instubdata_dataarray_3_data_V_ce0       => VMSME_16_mem_AA_enb(L3PHIAn1)(3),
+      instubdata_dataarray_3_data_V_address0  => VMSME_16_mem_AAV_readaddr(L3PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_16_mem_AAAV_dout_nent(L3PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_16_mem_AAAV_dout_nent(L3PHIAn1)(0)(1),
@@ -1023,17 +1003,17 @@ begin
       projin_0_dataarray_data_V_q0        => TPROJ_58_mem_AV_dout(L1L2C_L4PHIA),
       projin_0_nentries_0_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L4PHIA)(0),
       projin_0_nentries_1_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L4PHIA)(1),
-      instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem0_A_enb(L4PHIAn1),
-      instubdata_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_readaddr(L4PHIAn1),
+      instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem_AA_enb(L4PHIAn1)(0),
+      instubdata_dataarray_0_data_V_address0  => VMSME_17_mem_AAV_readaddr(L4PHIAn1)(0),
       instubdata_dataarray_0_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(0),
-      instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem1_A_enb(L4PHIAn1),
-      instubdata_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_readaddr(L4PHIAn1),
+      instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem_AA_enb(L4PHIAn1)(1),
+      instubdata_dataarray_1_data_V_address0  => VMSME_17_mem_AAV_readaddr(L4PHIAn1)(1),
       instubdata_dataarray_1_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(1),
-      instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem2_A_enb(L4PHIAn1),
-      instubdata_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_readaddr(L4PHIAn1),
+      instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem_AA_enb(L4PHIAn1)(2),
+      instubdata_dataarray_2_data_V_address0  => VMSME_17_mem_AAV_readaddr(L4PHIAn1)(2),
       instubdata_dataarray_2_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(1),
-      instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem3_A_enb(L4PHIAn1),
-      instubdata_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_readaddr(L4PHIAn1),
+      instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem_AA_enb(L4PHIAn1)(3),
+      instubdata_dataarray_3_data_V_address0  => VMSME_17_mem_AAV_readaddr(L4PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_17_mem_AAAV_dout_nent(L4PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_17_mem_AAAV_dout_nent(L4PHIAn1)(0)(1),
@@ -1090,17 +1070,17 @@ begin
       projin_0_dataarray_data_V_q0        => TPROJ_58_mem_AV_dout(L1L2C_L5PHIA),
       projin_0_nentries_0_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L5PHIA)(0),
       projin_0_nentries_1_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L5PHIA)(1),
-      instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem0_A_enb(L5PHIAn1),
-      instubdata_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_readaddr(L5PHIAn1),
+      instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem_AA_enb(L5PHIAn1)(0),
+      instubdata_dataarray_0_data_V_address0  => VMSME_17_mem_AAV_readaddr(L5PHIAn1)(0),
       instubdata_dataarray_0_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(0),
-      instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem1_A_enb(L5PHIAn1),
-      instubdata_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_readaddr(L5PHIAn1),
+      instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem_AA_enb(L5PHIAn1)(1),
+      instubdata_dataarray_1_data_V_address0  => VMSME_17_mem_AAV_readaddr(L5PHIAn1)(1),
       instubdata_dataarray_1_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(1),
-      instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem2_A_enb(L5PHIAn1),
-      instubdata_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_readaddr(L5PHIAn1),
+      instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem_AA_enb(L5PHIAn1)(2),
+      instubdata_dataarray_2_data_V_address0  => VMSME_17_mem_AAV_readaddr(L5PHIAn1)(2),
       instubdata_dataarray_2_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(2),
-      instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem3_A_enb(L5PHIAn1),
-      instubdata_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_readaddr(L5PHIAn1),
+      instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem_AA_enb(L5PHIAn1)(3),
+      instubdata_dataarray_3_data_V_address0  => VMSME_17_mem_AAV_readaddr(L5PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_17_mem_AAAV_dout_nent(L5PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_17_mem_AAAV_dout_nent(L5PHIAn1)(0)(1),
@@ -1157,17 +1137,17 @@ begin
       projin_0_dataarray_data_V_q0        => TPROJ_58_mem_AV_dout(L1L2C_L6PHIA),
       projin_0_nentries_0_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L6PHIA)(0),
       projin_0_nentries_1_V               => TPROJ_58_mem_AAV_dout_nent(L1L2C_L6PHIA)(1),
-      instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem0_A_enb(L6PHIAn1),
-      instubdata_dataarray_0_data_V_address0  => VMSME_17_mem0_AV_readaddr(L6PHIAn1),
+      instubdata_dataarray_0_data_V_ce0       => VMSME_17_mem_AA_enb(L6PHIAn1)(0),
+      instubdata_dataarray_0_data_V_address0  => VMSME_17_mem_AAV_readaddr(L6PHIAn1)(0),
       instubdata_dataarray_0_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(0),
-      instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem1_A_enb(L6PHIAn1),
-      instubdata_dataarray_1_data_V_address0  => VMSME_17_mem1_AV_readaddr(L6PHIAn1),
+      instubdata_dataarray_1_data_V_ce0       => VMSME_17_mem_AA_enb(L6PHIAn1)(1),
+      instubdata_dataarray_1_data_V_address0  => VMSME_17_mem_AAV_readaddr(L6PHIAn1)(1),
       instubdata_dataarray_1_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(1),
-      instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem2_A_enb(L6PHIAn1),
-      instubdata_dataarray_2_data_V_address0  => VMSME_17_mem2_AV_readaddr(L6PHIAn1),
+      instubdata_dataarray_2_data_V_ce0       => VMSME_17_mem_AA_enb(L6PHIAn1)(2),
+      instubdata_dataarray_2_data_V_address0  => VMSME_17_mem_AAV_readaddr(L6PHIAn1)(2),
       instubdata_dataarray_2_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(2),
-      instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem3_A_enb(L6PHIAn1),
-      instubdata_dataarray_3_data_V_address0  => VMSME_17_mem3_AV_readaddr(L6PHIAn1),
+      instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem_AA_enb(L6PHIAn1)(3),
+      instubdata_dataarray_3_data_V_address0  => VMSME_17_mem_AAV_readaddr(L6PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(3),
       instubdata_nentries8_0_V_0     => VMSME_17_mem_AAAV_dout_nent(L6PHIAn1)(0)(0),
       instubdata_nentries8_0_V_1     => VMSME_17_mem_AAAV_dout_nent(L6PHIAn1)(0)(1),
