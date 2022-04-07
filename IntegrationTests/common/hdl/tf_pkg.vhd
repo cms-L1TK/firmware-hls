@@ -63,7 +63,7 @@ package tf_pkg is
 
   -- ########################### Types ###########################
 
-  type std_logic_aoa is array(natural range <>) of std_logic_vector;
+  -- type std_logic_aoa is array(natural range <>) of std_logic_vector;
   
   -- 2D
   type t_arr2_1b  is array(0 to 1) of std_logic;
@@ -71,8 +71,8 @@ package tf_pkg is
   type t_arr4_12b  is array(0 to 3) of std_logic_vector(11 downto 0);
   type t_arr4_16b  is array(0 to 3) of std_logic_vector(15 downto 0);
   type t_arr4_17b  is array(0 to 3) of std_logic_vector(16 downto 0);
-  type t_arr5_11b  is array(0 to 3) of std_logic_vector(10 downto 0);
-  type t_arr5_16b  is array(0 to 3) of std_logic_vector(15 downto 0);
+  type t_arr5_11b  is array(0 to 4) of std_logic_vector(10 downto 0);
+  type t_arr5_16b  is array(0 to 4) of std_logic_vector(15 downto 0);
   type t_arr8_1b  is array(0 to 7) of std_logic;
   type t_arr8_2b  is array(0 to 7) of std_logic_vector(1 downto 0);
   type t_arr8_3b  is array(0 to 7) of std_logic_vector(2 downto 0);

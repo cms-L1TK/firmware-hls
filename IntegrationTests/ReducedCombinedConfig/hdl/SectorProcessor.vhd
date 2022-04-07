@@ -214,14 +214,13 @@ begin
   VMSME_16_loop : for var in enum_VMSME_16 generate
   begin
 
-    VMSME_16 : entity work.tf_mem_bin_cm
+    VMSME_16 : entity work.tf_mem_bin_cm4
       generic map (
         RAM_WIDTH       => 16,
         NUM_PAGES       => 4,
         INIT_FILE       => "",
         INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NCOPY           => 4
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
       )
       port map (
         clka      => clk,
@@ -231,9 +230,18 @@ begin
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb        => VMSME_16_mem_AA_enb(var),
-        addrb     =>  VMSME_16_mem_AAV_readaddr(var),
-        doutb      => VMSME_16_mem_AAV_dout(var),
+        enb0        => VMSME_16_mem_AA_enb(var)(0),
+        enb1        => VMSME_16_mem_AA_enb(var)(1),
+        enb2        => VMSME_16_mem_AA_enb(var)(2),
+        enb3        => VMSME_16_mem_AA_enb(var)(3),
+        addrb0     =>  VMSME_16_mem_AAV_readaddr(var)(0),
+        addrb1     =>  VMSME_16_mem_AAV_readaddr(var)(1),
+        addrb2     =>  VMSME_16_mem_AAV_readaddr(var)(2),
+        addrb3     =>  VMSME_16_mem_AAV_readaddr(var)(3),
+        doutb0      => VMSME_16_mem_AAV_dout(var)(0),
+        doutb1      => VMSME_16_mem_AAV_dout(var)(1),
+        doutb2      => VMSME_16_mem_AAV_dout(var)(2),
+        doutb3      => VMSME_16_mem_AAV_dout(var)(3),
         sync_nent => MP_start,
         nent_o    => VMSME_16_mem_AAAV_dout_nent(var),
         mask_o    => VMSME_16_mem_AAV_dout_mask(var)
@@ -245,14 +253,13 @@ begin
   VMSME_17_loop : for var in enum_VMSME_17 generate
   begin
 
-    VMSME_17 : entity work.tf_mem_bin_cm
+    VMSME_17 : entity work.tf_mem_bin_cm4
       generic map (
         RAM_WIDTH       => 17,
         NUM_PAGES       => 4,
         INIT_FILE       => "",
         INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NCOPY           => 4
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
       )
       port map (
         clka      => clk,
@@ -262,9 +269,18 @@ begin
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb        => VMSME_17_mem_AA_enb(var),
-        addrb     =>  VMSME_17_mem_AAV_readaddr(var),
-        doutb      => VMSME_17_mem_AAV_dout(var),
+        enb0        => VMSME_17_mem_AA_enb(var)(0),
+        enb1        => VMSME_17_mem_AA_enb(var)(1),
+        enb2        => VMSME_17_mem_AA_enb(var)(2),
+        enb3        => VMSME_17_mem_AA_enb(var)(3),
+        addrb0     =>  VMSME_17_mem_AAV_readaddr(var)(0),
+        addrb1     =>  VMSME_17_mem_AAV_readaddr(var)(1),
+        addrb2     =>  VMSME_17_mem_AAV_readaddr(var)(2),
+        addrb3     =>  VMSME_17_mem_AAV_readaddr(var)(3),
+        doutb0      => VMSME_17_mem_AAV_dout(var)(0),
+        doutb1      => VMSME_17_mem_AAV_dout(var)(1),
+        doutb2      => VMSME_17_mem_AAV_dout(var)(2),
+        doutb3      => VMSME_17_mem_AAV_dout(var)(3),
         sync_nent => MP_start,
         nent_o    => VMSME_17_mem_AAAV_dout_nent(var),
         mask_o    => VMSME_17_mem_AAV_dout_mask(var)
@@ -276,14 +292,13 @@ begin
   VMSTE_16_loop : for var in enum_VMSTE_16 generate
   begin
 
-    VMSTE_16 : entity work.tf_mem_bin_cm
+    VMSTE_16 : entity work.tf_mem_bin_cm5
       generic map (
         RAM_WIDTH       => 16,
         NUM_PAGES       => 2,
         INIT_FILE       => "",
         INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NCOPY           => 5
+        RAM_PERFORMANCE => "HIGH_PERFORMANCE"
       )
       port map (
         clka      => clk,
@@ -293,9 +308,21 @@ begin
         clkb      => clk,
         rstb      => '0',
         regceb    => '1',
-        enb       => VMSTE_16_mem_AA_enb(var),
-        addrb     => VMSTE_16_mem_AAV_readaddr(var),
-        doutb     => VMSTE_16_mem_AAV_dout(var),
+        enb0       => VMSTE_16_mem_AA_enb(var)(0),
+        enb1       => VMSTE_16_mem_AA_enb(var)(1),
+        enb2       => VMSTE_16_mem_AA_enb(var)(2),
+        enb3       => VMSTE_16_mem_AA_enb(var)(3),
+        enb4       => VMSTE_16_mem_AA_enb(var)(4),
+        addrb0     => VMSTE_16_mem_AAV_readaddr(var)(0),
+        addrb1     => VMSTE_16_mem_AAV_readaddr(var)(1),
+        addrb2     => VMSTE_16_mem_AAV_readaddr(var)(2),
+        addrb3     => VMSTE_16_mem_AAV_readaddr(var)(3),
+        addrb4     => VMSTE_16_mem_AAV_readaddr(var)(4),
+        doutb0     => VMSTE_16_mem_AAV_dout(var)(0),
+        doutb1     => VMSTE_16_mem_AAV_dout(var)(1),
+        doutb2     => VMSTE_16_mem_AAV_dout(var)(2),
+        doutb3     => VMSTE_16_mem_AAV_dout(var)(3),
+        doutb4     => VMSTE_16_mem_AAV_dout(var)(4),
         sync_nent => TP_start,
         nent_o    => VMSTE_16_mem_AAAV_dout_nent(var),
         mask_o    => VMSTE_16_mem_AAV_dout_mask(var)
