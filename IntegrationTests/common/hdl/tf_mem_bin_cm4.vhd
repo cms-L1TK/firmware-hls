@@ -125,8 +125,8 @@ attribute ram_style of sa_RAM_data3 : signal is "block";
 begin
 
 -- Check user didn't change values of derived generics.
-assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
-assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH/NUM_MEM_BINS) report "User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
+assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH_CM) report "User changed RAM_DEPTH" severity FAILURE;
+assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH_CM/NUM_MEM_BINS) report "tf_mem_bin_cm4: User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
 
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
