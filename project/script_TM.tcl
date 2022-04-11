@@ -20,7 +20,9 @@ add_files -tb ../emData/PD/
 
 csim_design -compiler gcc -mflags "-j8"
 csynth_design
-cosim_design -trace_level all -rtl verilog -verbose
-export_design -format ip_catalog
+cosim_design 
+#-trace_level all -rtl verilog -verbose
+#export_design -format ip_catalog
+export_design -flow impl -rtl vhdl
 
 exit

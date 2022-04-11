@@ -5,13 +5,38 @@
 #include "TrackHandler.h"
 
 const unsigned int bufferSize = 50; // chosen random buffer size - will need to see how many tracks are in test bench
-const unsigned int kNComparisonModules = 1;
+const unsigned int kNComparisonModules = 16;
+const unsigned int kNBuffers = kNComparisonModules + 1;
+
+
+class ModuleBuffer{
+  public:
+    ModuleBuffer(){
+      readIndex = 0;
+      writeIndex = 0;
+    }
+
+    ~ModuleBuffer(){};
+    TrackHandler moduleBuffer[bufferSize][kNBuffers];
+
+    void insertTrack(const TrackHandler track, unsigned int wIndex, unsigned int nBuffer);
+
+    TrackHandler readTrack(unsigned int rIndex, unsigned int nBuffer);
+
+    bool isEmpty();
+
+    void clearBuffer();
+
+    private:
+      unsigned int readIndex{0};
+      unsigned int writeIndex{0};
+      TrackHandler track;
+};
+
 class ComparisonModule{
   public:
     ComparisonModule()
     {
-      readIndex = 0;
-      writeIndex = 0;
       tracksProcessed = 0;
       TrackFit::TrackWord nullWord(0);
       masterTrack.setTrackWord(nullWord);
@@ -20,19 +45,12 @@ class ComparisonModule{
     }
     ~ComparisonModule(){};
 
-    void inputTrack(const TrackHandler track);
-
-    void getTrack();
     
     unsigned int getMatchFound(){return matchFound;}
 
     unsigned int getNProcessed(){return tracksProcessed;}
 
     void processTrack();
-
-    void endEvent(TrackHandler outputBuffer[kNComparisonModules], unsigned int outputWriteIndex);
-
-    void writeOutput(TrackHandler masterTrack);
 
     unsigned int myIndex;
 
@@ -47,16 +65,14 @@ class ComparisonModule{
       return masterTrack.getDiskStubArray(layerIndex, stubIndex);}
 
     unsigned int getEndOfModule(){return endOfModule;}
+
+    bool doNothing(){return false;}
     
   private:
-    // input buffer for each comparison module 
-    TrackHandler inputBuffer[bufferSize];
 
     unsigned int matchFound{0};
     unsigned int mergeCondition = 3;
     unsigned int tracksProcessed{0};
-    unsigned int readIndex{0};
-    unsigned int writeIndex{0};
     unsigned int endOfStream{0};
     unsigned int endOfModule{0};
 

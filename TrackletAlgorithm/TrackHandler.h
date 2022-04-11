@@ -13,7 +13,7 @@ const int layerStubIndexSize = 10;
 
 class TrackHandler{
   public:
-    TrackHandler(){};
+    // TrackHandler(){};
     TrackHandler(const TrackFit::TrackWord trackWord,
       const TrackFit::BarrelStubWord barrelStubWords[4],
       const TrackFit::DiskStubWord diskStubWords[4])
@@ -35,6 +35,22 @@ class TrackHandler{
       for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
         #pragma HLS unroll
         diskStubArray[k][0] = diskStubWords[k];
+      }
+    
+    }
+
+    TrackHandler()
+    { // sets words to 0
+      trkWord = 0;
+      LOOP_THInputsBarrel:
+      for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
+        #pragma HLS unroll
+        barrelStubArray[j][0] = 0;
+      }
+      LOOP_THInputsDisk:
+      for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
+        #pragma HLS unroll
+        diskStubArray[k][0] = 0;
       }
     
     }
