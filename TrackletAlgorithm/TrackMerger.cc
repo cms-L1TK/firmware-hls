@@ -2,26 +2,40 @@
 #include "TrackHandler.cc"
 #include <bitset>
 
-void ComparisonModule::inputTrack(const TrackHandler track){ 
-  #pragma HLS inline
-  // put tracks into buffer
-  if(track.getTrackWord() == 0){
-    endOfStream = 1;
-   //std::cout << "endOfStream: " << endOfStream << std::endl;
-  } else {
-    endOfStream = 0;
-    assert(writeIndex < bufferSize);
-    inputBuffer[writeIndex] = track;
-    if (writeIndex == 0){
-      masterTrack = track;
-      #ifndef _SYNTHESIS_
-      // std::cout << "Module#: " << myIndex << " InputTrack#: " << writeIndex << " " << " masterTrack: " << masterTrack.getTrackWord() << " track: " << track.getTrackWord() << "\n";
-      #endif
-    }
-    writeIndex++;
-  }
 
+void ModuleBuffer::insertTrack(const TrackHandler track, unsigned int wIndex, unsigned int nBuffer){
+  moduleBuffer[wIndex][nBuffer] = track;
+  assert(writeIndex < bufferSize);
+  writeIndex++;
 }
+
+TrackHandler ModuleBuffer::readTrack(unsigned int rIndex, unsigned int nBuffer){
+  track = moduleBuffer[rIndex][nBuffer];
+  readIndex++;
+  return track;
+}
+
+bool ModuleBuffer::isEmpty(){
+  for(unsigned int i = 0; i < bufferSize; i++){
+    for(unsigned int j = 0; j < kNBuffers; j++){
+        if(readTrack(i, j).getTrackWord() != 0){
+          return 0;
+        }
+    }
+  }
+  return 1;
+}
+
+void ModuleBuffer::clearBuffer(){
+  TrackHandler track;
+  for(unsigned int i = 0; i < bufferSize; i++){
+    for(unsigned int j = 0; j < kNBuffers; j++){
+      insertTrack(track, i, j);
+    }
+  }
+}
+
+
 void ComparisonModule::processTrack(){
   #pragma HLS inline
   #pragma HLS pipeline
@@ -32,34 +46,14 @@ void ComparisonModule::processTrack(){
       masterTrack.setDebugFlag(0);
     }
     if(masterTrack.getTrackWord() != track.getTrackWord()){
-      masterTrack.CompareTrack(track);
+      // masterTrack.CompareTrack(track);
       // masterTrack.MergeTrack(track, matchFound, mergeCondition);
     }
     tracksProcessed++;
   }
 }
 
-void ComparisonModule::getTrack(){
-  #pragma HLS inline
-  track = inputBuffer[readIndex];
-  readIndex++;
-}
 
-void ComparisonModule::endEvent(TrackHandler outputBuffer[16], unsigned int outputWriteIndex){
-  #pragma HLS inline
-  if(endOfStream == 1 && tracksProcessed == writeIndex){
-    endOfModule = 1;
-    #ifndef _SYNTHESIS_
-    // std::cout << "endOfStream: " << endOfStream << " tracksProcessed: " << tracksProcessed << " writeIndex: " << writeIndex << " endEvent track: " << masterTrack.getTrackWord() << std::endl;
-    #endif
-    outputBuffer[outputWriteIndex] = masterTrack;
-    #ifndef _SYNTHESIS_
-    // std::cout << "masterTrack to output: " << outputBuffer[outputWriteIndex].getTrackWord() << std::endl;
-    #endif
-    writeIndex = 0;
-    readIndex = 0;
-  }
-}
 
 // overall module only reads in a track and pass it to the comparison module
 void TrackMerger(const BXType bx,
@@ -79,39 +73,16 @@ void TrackMerger(const BXType bx,
     #pragma HLS array_partition variable=trackWord_o complete dim=0
 
     ComparisonModule comparisonModule[kNComparisonModules];
-    unsigned int outputIndex{0};
-    unsigned int unmergedOutputIndex{0};
-    LOOP_ModuleIndex:
-    for(unsigned int nModule = 0; nModule < kNComparisonModules; nModule++)
-    {
-      #pragma HLS unroll
-      comparisonModule[nModule].myIndex=nModule;
-    }
-    TrackHandler outputBuffer[kNComparisonModules];
-    unsigned int nActiveModules = 1;
-    unsigned int modulesToRun[kNComparisonModules];
-    modulesToRun[0] = 1;
+
     TrackFit::TrackWord unmergedTracks[kMaxProc];
     TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
     TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
     #pragma HLS array_partition variable=unmergedBarrelStubs complete dim=1
     #pragma HLS array_partition variable=unmergedDiskStubs complete dim=1
-    
+
     LOOP_InputProc:
     for (int i = 0; i < kMaxProc; i++){ 
-      #pragma HLS pipeline II=1 REWIND
-      #ifndef _SYNTHESIS_
-      // std::cout << "Step#: " << i << " masterTrackWord: " << trackWord[i] << " brl1: "<< barrelStubWords[0][i] << " brl2: " << barrelStubWords[1][i] << " brl3: " << barrelStubWords[2][i] << " brl4: " << barrelStubWords[3][i] << std::endl;
-      #endif
-      unsigned int moduleEnd{0};
-      LOOP_ModuleEndFlag:
-      for (unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
-        #pragma HLS unroll
-        if(comparisonModule[activeModule].getEndOfModule() == 1){
-          moduleEnd++;
-        }
-      } 
-      if(moduleEnd == kNComparisonModules){continue;}
+      // #pragma HLS pipeline II=1 REWIND
 
       TrackFit::BarrelStubWord barrelStubWordsArray[4];
       TrackFit::DiskStubWord diskStubWordsArray[4];
@@ -122,125 +93,41 @@ void TrackMerger(const BXType bx,
         diskStubWordsArray[layerIndex] = diskStubWords[layerIndex][i];
       }
 
-      // TrackFit::BarrelStubWord barrelStubWordsArray[4] = {barrelStubWords[0][i], barrelStubWords[1][i], barrelStubWords[2][i], barrelStubWords[3][i]};
-      // TrackFit::DiskStubWord diskStubWordsArray[4] = {diskStubWords[0][i], diskStubWords[1][i], diskStubWords[2][i], diskStubWords[3][i]};
       TrackHandler track(trackWord[i], barrelStubWordsArray, diskStubWordsArray);
+      ModuleBuffer buffer;
 
-      // run active modules 
-      // local array to keep track of which modules have been activated
-      unsigned int activeModules[kNComparisonModules];
-      LOOP_ActiveModule:
-      for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++) //might not be able to unroll as processing 
-      { 
+      // put that track into input buffer 0 for CM zero
+      // first track in input buffer is master, then comapre against the rest
+      buffer.insertTrack(track, 0, 0);
+      buffer.readTrack(0,0);
+
+      for(int j = 0; j < kNComparisonModules; j++){
         #pragma HLS unroll
-        // if module has yet to be activated, carry on 
-        if(modulesToRun[activeModule] == 0){ 
-          continue;
-        }
-        activeModules[activeModule] = 1;
-        // if it is active,  process this track 
-        comparisonModule[activeModule].inputTrack(track);
-        comparisonModule[activeModule].getTrack();
-        comparisonModule[activeModule].processTrack();
-        comparisonModule[activeModule].endEvent(outputBuffer, activeModule);
 
-        // if it's the last Comparison Module 
-        // nothing to pass an unmatched track to
-        if(activeModule == kNComparisonModules-1) continue;
-        // if the next Comparison Module is inactive 
-        // and a mismatch has been found 
-        // next comparison module also processes this track
-        if(modulesToRun[activeModule+1] == 0 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1)
-        { 
-          #ifndef _SYNTHESIS_
-          // std::cout << "Activating Module# " << activeModule+1 << " trackWord: " << trackWord[i] << std::endl;
-          #endif
-
-          comparisonModule[activeModule+1].inputTrack(track);
-          comparisonModule[activeModule+1].getTrack();
-          comparisonModule[activeModule+1].processTrack();
-          comparisonModule[activeModule+1].endEvent(outputBuffer, activeModule);
-          activeModules[activeModule+1] = 1;
-        }
-      }
+        // dummy function
+        comparisonModule[j].doNothing();
       
-      // update global array that keeps track of which modules have been activated 
-      LOOP_ModulesToRun:
-      for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
-      {
-        #pragma HLS unroll
-        modulesToRun[activeModule] = activeModules[activeModule];
+        // CM takes track from buffer
+        // if there is an unmerged track pass it to the next buffer
+        
+        // if(comparisonModule[j].getMatchFound() == 0 && comparisonModule[j].getNProcessed() > 1){
+        //   moduleBuffer[j+1][kNBuffers].readTrack(track);
+        //   }
+
+        
       }
 
-      //output the master track from each comparison module as the output array
-      //also outputs any unmerged tracks from the last comparison module 
-      LOOP_LastCMOut:
-      for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++){
-        #pragma HLS unroll
-        if(activeModules[activeModule] == 0){continue;}
-        // if am not the last comparison module - when finished processing, output the master track
-        if(comparisonModule[activeModule].getEndOfModule() == 1){
-          trackWord_o[outputIndex] = comparisonModule[activeModule].getMasterTrackWord();
-          LOOP_OutputStubWords:
-          for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
-            #pragma HLS unroll
-            barrelStubWords_o[layerIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackBarrelStubs(0, layerIndex);
-            diskStubWords_o[layerIndex][outputIndex] = comparisonModule[activeModule].getMasterTrackDiskStubs(0, layerIndex);
-          }  
-          outputIndex++;
-        }
-        
-        //if this is the last comparison module 
-        //if it has found no duplicates - output this track (to keep track of unmerged tracks)
-        //or if the module has finished processing tracks, output the master
-        if(activeModule == kNComparisonModules-1 && comparisonModule[activeModule].getMatchFound() == 0 && comparisonModule[activeModule].getNProcessed() >1){
-        // fill the outputs with the trackWord, barrel and disk stubs
-          unmergedTracks[unmergedOutputIndex] = trackWord[i];
-          LOOP_UnmergedStubs:
-          for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
-            #pragma HLS unroll
-            unmergedBarrelStubs[arrayIndex][unmergedOutputIndex] = barrelStubWords[arrayIndex][i];
-            unmergedDiskStubs[arrayIndex][unmergedOutputIndex] = diskStubWords[arrayIndex][i];
-            #ifndef _SYNTHESIS_
-            // std::cout << "UnmergedbrlStubs: " << barrelStubWords[arrayIndex][i] << " UnmergeddiskStubs: " << diskStubWords[arrayIndex][i] << std::endl;
-            #endif
-          }
-          unmergedOutputIndex++;
-        }
-      }
-    }
-    #ifndef _SYNTHESIS_
-    //  std::cout << "outputBuffer: " << outputBuffer[0].getTrackWord() << " firstTrackWord: " << trackWord[0] << "\n";
-    #endif
-    // for(unsigned int activeModule = 0; activeModule < kNComparisonModules; activeModule++)
-    // {
-    //   #ifndef _SYNTHESIS_
-    //     // std::cout << "\t\tModule#" << activeModule << " active " << modulesToRun[activeModule] << std::endl;
-    //   #endif
-    // }
+        // create a last buffer (so 17 in total) the last buffer is for the output
+       // then in main proc loop handle the output buffer - could read it out at the end of the event or in real time
+       // needs to be a way of signalling when they have processed the track word (end of input) - 
+       // passed from CM to CM, if nothing in buffer and see signal, read out track (also pass on signal to next CM)
+       // create a fn to read out master
+      
+
+
+      
+
     bx_o = bx;
-    outputNumber = outputIndex + unmergedOutputIndex;
-    LOOP_OutputUnmergedTrackWord:
-    for (unsigned int i = 0; i < kMaxProc; i++){
-      #pragma HLS unroll
-      if(i >= unmergedOutputIndex) continue;
-      trackWord_o[outputIndex+i] = unmergedTracks[i];
-      LOOP_OutputUnmergedStubWords:
-      for (unsigned int j = 0; j < 4; j++){
-        #pragma HLS unroll
-        barrelStubWords_o[j][outputIndex+i] = unmergedBarrelStubs[j][i];
-        diskStubWords_o[j][outputIndex+i] = unmergedDiskStubs[j][i];
-        #ifndef _SYNTHESIS_
-        // std::cout << "j: " << j << " UnmergedBrlStubs: " << unmergedBarrelStubs[j][i] << std::endl;
-        // std::cout << "j: " << j << " UnmergedDiskStubs: " << unmergedDiskStubs[j][i] << std::endl;
-        #endif
-      }
     }
-    #ifndef _SYNTHESIS_
-    // std::cout << "outputNumber: " << outputNumber << std::endl;
-    // std::cout << "no. trackWords: " << outputIndex << std::endl;
-    // for (unsigned int trackNumber = 0; trackNumber < outputIndex; trackNumber++){
-    //   std::cout << "trackWord: " << trackWord[trackNumber] << " trackNumber: " << trackNumber << std::endl;
-    // }
-    #endif
+
 }
