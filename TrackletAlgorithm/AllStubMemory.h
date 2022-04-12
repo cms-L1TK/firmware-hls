@@ -120,10 +120,10 @@ public:
   }
 
   // This constructor is only used for stubs in DISK2S
-  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend, const ASALPHA alpha):
+  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASALPHA alpha, const ASBEND bend):
     data_( ((((r,z),phi),alpha),bend) )
   {
-    //static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
+    static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
   }
 
   AllStub()
