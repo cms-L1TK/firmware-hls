@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 #include "globalFunctions.h"
+#include <bitset>
 
 // AllStubBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubBase {};
@@ -119,10 +120,10 @@ public:
   }
 
   // This constructor is only used for stubs in DISK2S
-  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend, const ASALPHA alpha):
+  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASALPHA alpha, const ASBEND bend):
     data_( ((((r,z),phi),alpha),bend) )
   {
-    //static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
+    static_assert(ASType == DISK2S, "Constructor should only be used for Disk 2S stubs");
   }
 
   AllStub()
@@ -161,6 +162,10 @@ public:
 
   ASBEND getBend() const {
     return data_.range(kASBendMSB,kASBendLSB);
+  }
+
+  bool isPSStub() const {
+     return data_.range(getWidth()-1, getWidth()-3) > 0; // Check highest 3 bits regardless of template type
   }
 
   // Setter
