@@ -130,6 +130,7 @@ download:
     paths:
       - ./emData/
       - ./TopFunctions/
+      - ./IntegrationTests/
     expire_in: 1 week
 # Quality checks ------------
 IR-quality-check:
@@ -395,6 +396,7 @@ topPRMEMC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PRMEMC"
   needs:
+    - job: download
     - job: topPRMEMC-sim
     - job: topPRMEMC-check-results
       artifacts: false
@@ -404,7 +406,7 @@ topTETC-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TETC"
   needs:
-    - job: download # needed for LUT files
+    - job: download
     - job: topTETC-sim
     - job: topTETC-check-results
       artifacts: false
@@ -414,6 +416,7 @@ topIRVMR-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IRVMR"
   needs:
+    - job: download
     - job: topIRVMR-sim
     - job: topIRVMR-check-results
       artifacts: false
@@ -423,6 +426,7 @@ topMCTB-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/MCTB"
   needs:
+    - job: download
     - job: topMCTB-sim
     - job: topMCTB-check-results
       artifacts: false
@@ -432,7 +436,7 @@ topIRtoTB-synth:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedConfig/IRtoTB"
   needs:
-    - job: download # needed for LUT files
+    - job: download
     - job: topIRtoTB-sim
     - job: topIRtoTB-check-results
       artifacts: false
