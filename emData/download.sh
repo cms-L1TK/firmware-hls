@@ -100,8 +100,10 @@ mkdir -p ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
+cd ../ # needed for older versions of git
 git submodule init
 git submodule update
+cd emData/
 cp -fv LUTs/wires.dat LUTs/memorymodules.dat LUTs/processingmodules.dat project_generation_scripts/
 cd project_generation_scripts/
 ./makeReducedConfig.py --no-graph
