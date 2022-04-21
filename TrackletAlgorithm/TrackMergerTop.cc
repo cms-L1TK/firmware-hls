@@ -8,8 +8,7 @@ void TrackMergerTop(const BXType bx,
   BXType &bx_o,
   TrackFit::TrackWord trackWord_o [kMaxProc],
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc],
-  int &outputNumber
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
   ){
     #pragma HLS inline recursive
     #pragma HLS interface register port=bx_o
@@ -23,5 +22,5 @@ void TrackMergerTop(const BXType bx,
     #pragma HLS array_partition variable=diskStubWords complete dim=1
     #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
     #pragma HLS array_partition variable=diskStubWords_o complete dim=1
-    TrackMerger(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o, outputNumber);
+    TrackMerger::TrackMergerMain(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o);
 }
