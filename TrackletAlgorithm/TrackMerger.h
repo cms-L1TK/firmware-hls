@@ -4,7 +4,7 @@
 #include <cassert>
 #include "TrackHandler.h"
 
-const unsigned int bufferSize = 50; // chosen random buffer size - will need to see how many tracks are in test bench
+const unsigned int bufferSize = 108; // chosen random buffer size - will need to see how many tracks are in test bench
 const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
 
@@ -17,11 +17,10 @@ class ModuleBuffer{
     }
 
     ~ModuleBuffer(){};
-    TrackHandler moduleBuffer[bufferSize][kNBuffers];
+    
+    void insertTrack(const TrackHandler track);
 
-    void insertTrack(const TrackHandler track, unsigned int wIndex, unsigned int nBuffer);
-
-    TrackHandler readTrack(unsigned int rIndex, unsigned int nBuffer);
+    TrackHandler readTrack();
 
     bool isEmpty();
 
@@ -30,7 +29,7 @@ class ModuleBuffer{
     private:
       unsigned int readIndex{0};
       unsigned int writeIndex{0};
-      TrackHandler track;
+      TrackHandler moduleBuffer[bufferSize];
 };
 
 class ComparisonModule{
@@ -66,7 +65,10 @@ class ComparisonModule{
 
     unsigned int getEndOfModule(){return endOfModule;}
 
-    bool doNothing(){return false;}
+    void process();
+
+    void setInputBuffer(ModuleBuffer *buffer);
+    void setOutputBuffer(ModuleBuffer *buffer);
     
   private:
 
@@ -78,20 +80,42 @@ class ComparisonModule{
 
     TrackHandler masterTrack;
     TrackHandler track;
+    ModuleBuffer* inputBuffer;
+    ModuleBuffer* outputBuffer;
 
 };
 
+class TrackMerger{
+  public:
+  TrackMerger(){
+    bufferPtr = buffer;
+    // loop over the CMs to set the input/output buffer variables for each CM
+    LOOP_SetBuffers:
+    for (unsigned int i = 0; i < kNComparisonModules; i++){
+      #pragma HLS unroll
+      comparisonModule[i].setInputBuffer(&bufferPtr[i]);
+      comparisonModule[i].setOutputBuffer(&bufferPtr[i]);
+    }
+  };
 
-void TrackMerger(const BXType bx,
+  ~TrackMerger(){};
+
+  void TrackMergerMain(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
-  BXType &bx_o,
-  TrackFit::TrackWord trackWord_o [kMaxProc],
+  BXType &bx_o, 
+  TrackFit::TrackWord trackWord_o[kMaxProc],
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc],
-  int &outputNumber
-);
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  );
+
+  private:
+  ModuleBuffer buffer[kNBuffers];
+  ComparisonModule comparisonModule[kNComparisonModules];
+  ModuleBuffer *bufferPtr;
+
+};
 
 
 

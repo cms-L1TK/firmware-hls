@@ -3,87 +3,111 @@
 #include <bitset>
 
 
-void ModuleBuffer::insertTrack(const TrackHandler track, unsigned int wIndex, unsigned int nBuffer){
-  moduleBuffer[wIndex][nBuffer] = track;
+void ModuleBuffer::insertTrack(const TrackHandler track){
+  #pragma HLS inline
   assert(writeIndex < bufferSize);
+  moduleBuffer[writeIndex] = track;
   writeIndex++;
 }
 
-TrackHandler ModuleBuffer::readTrack(unsigned int rIndex, unsigned int nBuffer){
-  track = moduleBuffer[rIndex][nBuffer];
-  readIndex++;
-  return track;
+TrackHandler ModuleBuffer::readTrack(){
+  #pragma HLS inline
+  assert(readIndex < writeIndex);
+  if (readIndex < writeIndex){
+    TrackHandler track = moduleBuffer[readIndex];
+    readIndex++;
+    return track;
+  } // else return a null track
+   else { return TrackHandler();}
 }
 
-bool ModuleBuffer::isEmpty(){
-  for(unsigned int i = 0; i < bufferSize; i++){
-    for(unsigned int j = 0; j < kNBuffers; j++){
-        if(readTrack(i, j).getTrackWord() != 0){
-          return 0;
-        }
-    }
-  }
-  return 1;
-}
+// bool ModuleBuffer::isEmpty(){
+//   if(readTrack().getTrackWord() != 0){
+//     return 0;
+//   }
+// }
 
 void ModuleBuffer::clearBuffer(){
+  #pragma HLS inline
   TrackHandler track;
-  for(unsigned int i = 0; i < bufferSize; i++){
-    for(unsigned int j = 0; j < kNBuffers; j++){
-      insertTrack(track, i, j);
-    }
-  }
+  readIndex = 0;
+  writeIndex = 0;
+
 }
 
 
-void ComparisonModule::processTrack(){
+// void ComparisonModule::processTrack(){
+//   #pragma HLS inline
+//   #pragma HLS pipeline
+//   if(endOfStream == 0){
+//     if (myIndex == 0){
+//       masterTrack.setDebugFlag(1);
+//     } else {
+//       masterTrack.setDebugFlag(0);
+//     }
+//     if(masterTrack.getTrackWord() != track.getTrackWord()){
+//       // masterTrack.CompareTrack(track);
+//       // masterTrack.MergeTrack(track, matchFound, mergeCondition);
+//     }
+//     tracksProcessed++;
+//   }
+// }
+
+void ComparisonModule::process(){
   #pragma HLS inline
   #pragma HLS pipeline
-  if(endOfStream == 0){
-    if (myIndex == 0){
-      masterTrack.setDebugFlag(1);
-    } else {
-      masterTrack.setDebugFlag(0);
-    }
-    if(masterTrack.getTrackWord() != track.getTrackWord()){
-      // masterTrack.CompareTrack(track);
-      // masterTrack.MergeTrack(track, matchFound, mergeCondition);
-    }
-    tracksProcessed++;
-  }
+  TrackHandler track = inputBuffer->readTrack();
+  outputBuffer->insertTrack(track);
 }
 
+void ComparisonModule::setInputBuffer(ModuleBuffer *buffer){
+  #pragma HLS inline
+  inputBuffer = buffer;
+}
+
+void ComparisonModule::setOutputBuffer(ModuleBuffer *buffer){
+  #pragma HLS inline
+  outputBuffer = buffer;
+}
 
 
 // overall module only reads in a track and pass it to the comparison module
-void TrackMerger(const BXType bx,
+void TrackMerger::TrackMergerMain(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
   BXType &bx_o, 
   TrackFit::TrackWord trackWord_o[kMaxProc],
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc],
-  int &outputNumber
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
   ){
+    #pragma HLS inline
     #pragma HLS array_partition variable=barrelStubWords complete dim=1
     #pragma HLS array_partition variable=diskStubWords complete dim=1
     #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
     #pragma HLS array_partition variable=diskStubWords_o complete dim=1
     #pragma HLS array_partition variable=trackWord_o complete dim=0
 
-    ComparisonModule comparisonModule[kNComparisonModules];
+    // ComparisonModule comparisonModule[kNComparisonModules];
+    // ModuleBuffer buffer[kNBuffers];
 
-    TrackFit::TrackWord unmergedTracks[kMaxProc];
-    TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
-    TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
-    #pragma HLS array_partition variable=unmergedBarrelStubs complete dim=1
-    #pragma HLS array_partition variable=unmergedDiskStubs complete dim=1
+    // loop over the CMs to set the input/output buffer variables for each CM - put in constructor?
+    // LOOP_SetBuffers:
+    // for (unsigned int i = 0; i < kNComparisonModules; i++){
+    //   #pragma HLS unroll
+    //   comparisonModule[i].setInputBuffer(&bufferPtr[i]);
+    //   comparisonModule[i].setOutputBuffer(&bufferPtr[i]);
+    // }
+
+    // TrackFit::TrackWord unmergedTracks[kMaxProc];
+    // TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
+    // TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
+    // #pragma HLS array_partition variable=unmergedBarrelStubs complete dim=1
+    // #pragma HLS array_partition variable=unmergedDiskStubs complete dim=1
 
     LOOP_InputProc:
     for (int i = 0; i < kMaxProc; i++){ 
-      // #pragma HLS pipeline II=1 REWIND
-
+      #pragma HLS pipeline II=1 REWIND
       TrackFit::BarrelStubWord barrelStubWordsArray[4];
       TrackFit::DiskStubWord diskStubWordsArray[4];
       LOOP_SetArrays:
@@ -94,27 +118,18 @@ void TrackMerger(const BXType bx,
       }
 
       TrackHandler track(trackWord[i], barrelStubWordsArray, diskStubWordsArray);
-      ModuleBuffer buffer;
 
       // put that track into input buffer 0 for CM zero
       // first track in input buffer is master, then comapre against the rest
-      buffer.insertTrack(track, 0, 0);
-      buffer.readTrack(0,0);
+      // buffer[0].insertTrack(track);
 
       for(int j = 0; j < kNComparisonModules; j++){
         #pragma HLS unroll
+        // comparisonModule[j].process();
 
-        // dummy function
-        comparisonModule[j].doNothing();
-      
-        // CM takes track from buffer
-        // if there is an unmerged track pass it to the next buffer
-        
-        // if(comparisonModule[j].getMatchFound() == 0 && comparisonModule[j].getNProcessed() > 1){
-        //   moduleBuffer[j+1][kNBuffers].readTrack(track);
-        //   }
+      //   CM takes track from buffer + reads track from input buffer, then outputs to output buffer when the track is unmerged
+      //   if there is an unmerged track pass it to the next buffer
 
-        
       }
 
         // create a last buffer (so 17 in total) the last buffer is for the output
@@ -122,12 +137,7 @@ void TrackMerger(const BXType bx,
        // needs to be a way of signalling when they have processed the track word (end of input) - 
        // passed from CM to CM, if nothing in buffer and see signal, read out track (also pass on signal to next CM)
        // create a fn to read out master
-      
-
-
-      
-
-    bx_o = bx;
     }
+    bx_o = bx;
 
 }

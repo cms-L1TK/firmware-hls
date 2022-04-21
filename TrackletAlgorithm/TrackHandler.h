@@ -42,12 +42,12 @@ class TrackHandler{
     TrackHandler()
     { // sets words to 0
       trkWord = 0;
-      LOOP_THInputsBarrel:
+      LOOP_THInputsBarrel0:
       for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
         #pragma HLS unroll
         barrelStubArray[j][0] = 0;
       }
-      LOOP_THInputsDisk:
+      LOOP_THInputsDisk0:
       for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
         #pragma HLS unroll
         diskStubArray[k][0] = 0;

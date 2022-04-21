@@ -28,7 +28,7 @@ int main(){
   static TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc];
   static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
   static TrackFitMemory outputTracks;
-  int outputNumber;
+  // int outputNumber;
 
   TBHelper tb("../../../../../emData/PD/PD/");
 
@@ -63,51 +63,51 @@ int main(){
       TrackFit track;
       track = inputTracks.read_mem(bx, i); //i+1 for merge
       trackWord[i] = track.getTrackWord();
-      ap_uint<TrackFit::kTFStubIndexSize> stubIndex;
+      // ap_uint<TrackFit::kTFStubIndexSize> stubIndex;
        for (unsigned short j = 0; j < 4; j++){
         switch (j) {
           case 0:
             barrelStubWords[0][i] = track.getBarrelStubWord<0>();
-            stubIndex = track.getStubIndex<0>();
+            // stubIndex = track.getStubIndex<0>();
             break;
           case 1:
             barrelStubWords[1][i] = track.getBarrelStubWord<1>();
-            stubIndex = track.getStubIndex<1>();
+            // stubIndex = track.getStubIndex<1>();
             break;
           case 2:
             barrelStubWords[2][i] = track.getBarrelStubWord<2>();
-            stubIndex = track.getStubIndex<2>();
+            // stubIndex = track.getStubIndex<2>();
             break;
           case 3:
             barrelStubWords[3][i] = track.getBarrelStubWord<3>();
-            stubIndex = track.getStubIndex<3>();
+            // stubIndex = track.getStubIndex<3>();
             break;
-        } if(stubIndex != 0){
-          // std::cout << "BarrelStubIndex: " << stubIndex << " at track:  " << i << std::endl;
-        }
+        } //if(stubIndex != 0){
+        //   // std::cout << "BarrelStubIndex: " << stubIndex << " at track:  " << i << std::endl;
+        // }
       }
       for (unsigned short k = 0; k < 4; k++){
         switch (k) {
           case 0:
             diskStubWords[0][i] = track.getDiskStubWord<4>();
-            stubIndex = track.getStubIndex<4>();
+            // stubIndex = track.getStubIndex<4>();
             break;
           case 1:
             diskStubWords[1][i] = track.getDiskStubWord<5>();
-            stubIndex = track.getStubIndex<5>();
+            // stubIndex = track.getStubIndex<5>();
             break;
           case 2:
             diskStubWords[2][i] = track.getDiskStubWord<6>();
-            stubIndex = track.getStubIndex<6>();
+            // stubIndex = track.getStubIndex<6>();
             break;
           case 3:
             diskStubWords[3][i] = track.getDiskStubWord<7>();
-            stubIndex = track.getStubIndex<7>();
+            // stubIndex = track.getStubIndex<7>();
             break;
         }
-        if(stubIndex != 0){
-        // std::cout << "DiskStubIndex: " << stubIndex << " at track:  " << i << std::endl;
-        }
+        // if(stubIndex != 0){
+        // // std::cout << "DiskStubIndex: " << stubIndex << " at track:  " << i << std::endl;
+        // }
       }
       // std::cout << "i: " << i << " trkWord[i]: " << std::hex << trackWord[i] << " brl1: " << std::hex << barrelStubWords[0][i] << " brl2: " << std::hex << barrelStubWords[1][i] << " brl3: " << std::hex << barrelStubWords[2][i] <<  " brl4: " << std::hex << barrelStubWords[3][i] <<  " disk1: " << std::hex << diskStubWords[0][i] << " disk2: " << std::hex << diskStubWords[1][i] << " disk3: " << std::hex << diskStubWords[2][i] << " disk4: " << std::hex << diskStubWords[3][i] <<  std::endl;
 
@@ -120,14 +120,13 @@ int main(){
     bx_o,
     trackWord_o,
     barrelStubWords_o,
-    diskStubWords_o,
-    outputNumber);
+    diskStubWords_o);
 
     bool truncation = false;
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < outputNumber; i++){
+    for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){ 
       TrackFit track;
       track.setTrackWord(trackWord_o[i]);
       track.setBarrelStubWord<0>(barrelStubWords_o[0][i]);
@@ -153,7 +152,7 @@ int main(){
   }
 
   // Handling case of err%256 == 0 
-  if (err_count > 255) err_count = 255;
-  return err_count;
+  // if (err_count > 255) err_count = 255;
+  // return err_count;
 
 }
