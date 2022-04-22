@@ -12,8 +12,10 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/U84ZI1vGnVKkQKc/download"
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/Nk0VWN7kRMZSFWm/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
 # Reduced Combined modules                                                                                                                     
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220309.tgz"
-luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220309.tgz"
+#memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220309.tgz"
+#luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220309.tgz"
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220411.tgz"
+luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220411.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -276,6 +278,8 @@ do
           seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TP_${seed}.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;

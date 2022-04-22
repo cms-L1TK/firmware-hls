@@ -36,7 +36,8 @@ entity tf_mem_bin_cm5 is
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH_CM/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    NAME            : string := "MEMNAME"          --! Memory name
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -71,6 +72,52 @@ architecture rtl of tf_mem_bin_cm5 is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
+
+function to_bstring1(sl : std_logic) return string is
+  variable sl_str_v : string(1 to 3);  -- std_logic image with quotes around
+begin
+  sl_str_v := std_logic'image(sl);
+  return "" & sl_str_v(2);  -- "" & character to get string
+end function;
+
+function to_bstring(slv : std_logic_vector) return string is
+  alias    slv_norm : std_logic_vector(1 to slv'length) is slv;
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(1 to slv'length);
+begin
+  for idx in slv_norm'range loop
+    sl_str_v := to_bstring1(slv_norm(idx));
+    res_v(idx) := sl_str_v(1);
+  end loop;
+  return res_v;
+end function;
+
+function to_bstring(slv : t_arr64_1b) return string is
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(0 to 63);
+begin
+  for idx in 63 downto 0 loop
+    sl_str_v := to_bstring1(slv(idx));
+    res_v(idx) := sl_str_v(1);
+  end loop;
+  return res_v;
+end function;
+
+function to_bstring(slv : t_arr64_4b) return string is
+  variable sl_str_v : string(1 to 4);  -- String of std_logic
+  variable res_v    : string(0 to 319);
+begin
+  for idx in 63 downto 0 loop
+    sl_str_v := to_bstring(slv(idx));
+    res_v(idx*5) := sl_str_v(1);
+    res_v(idx*5+1) := sl_str_v(2);
+    res_v(idx*5+2) := sl_str_v(3);
+    res_v(idx*5+3) := sl_str_v(4);
+    res_v(idx*5+4) := '-';
+  end loop;
+  return res_v;
+end function;
+
 
 -- ########################### Function ##########################
 --! @brief TextIO function to read memory data to initialize tf_mem_bin_cm5. Needed here because of variable slv width!
@@ -119,6 +166,7 @@ signal sv_RAM_row1  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0'); 
 signal sv_RAM_row2  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row3  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row4  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
+signal addrb_row0  : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0) := (others =>'0');          --! addrb0
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
@@ -143,6 +191,7 @@ process(clka)
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
+    report "tf_mem_bin_cm5 "&NAME&" vi_clk_cnt "&integer'image(vi_clk_cnt)&" "&to_bstring(nent_o(page)(0));      
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -169,10 +218,11 @@ begin
       vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
-      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
+      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH_CM)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(vi_nent_idx) <= '1'; -- <= 1 (slv)
+      report "tf_mem_bin_cm5 write "&NAME&" page= "&integer'image(page)&" vi_nent_idx= "&integer'image(vi_nent_idx)&" addra = "&to_bstring(addra)&" data = "&to_bstring(dina);      
       if (addr_in_page = 0) then
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
       else
@@ -185,8 +235,14 @@ end process;
 process(clkb)
 begin
   if rising_edge(clkb) then
+      report "tf_mem_bin_cm5 "&NAME&" mask(0)= "&to_bstring(mask_o(0));      
+      report "tf_mem_bin_cm5 "&NAME&" mask(1)= "&to_bstring(mask_o(1));      
+      report "tf_mem_bin_cm5 "&NAME&" nent(0)= "&to_bstring(nent_o(0));      
+      report "tf_mem_bin_cm5 "&NAME&" nent(1)= "&to_bstring(nent_o(1));      
     if (enb0='1') then
+      addrb_row0 <= addrb0;
       sv_RAM_row0 <= sa_RAM_data0(to_integer(unsigned(addrb0)));
+      report "tf_mem_bin_cm5 read "&NAME&" address= "&to_bstring(addrb0)&" data= "&to_bstring(sv_RAM_row0);            
     end if;
     if (enb1='1') then
       sv_RAM_row1 <= sa_RAM_data1(to_integer(unsigned(addrb1)));
@@ -226,6 +282,7 @@ else generate -- output_register; 2 clock cycle read latency with improve clock-
         doutb2 <= sv_RAM_row2;
         doutb3 <= sv_RAM_row3;
         doutb4 <= sv_RAM_row4;
+        report "tf_mem_bin_cm5 READ2 "&NAME&" address= "&to_bstring(addrb_row0)&" data= "&to_bstring(doutb0)&" "&to_bstring(sv_RAM_row0);            
       end if;
     end if;
   end process;

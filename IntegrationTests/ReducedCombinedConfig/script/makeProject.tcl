@@ -46,7 +46,7 @@ add_files -fileset sources_1 [glob common/hdl/*.vhd]
 remove_files -fileset sources_1 [glob common/hdl/latency_monitor.vhd]
 
 # Add HDL for TB
-#add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
+add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
 
 # Add constraints (clock etc.)
 add_files -fileset constrs_1 [glob common/hdl/constraints.xdc]
@@ -54,7 +54,7 @@ add_files -fileset constrs_1 [glob common/hdl/constraints.xdc]
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
 set_property top -value ${topLevelHDL} -objects [get_filesets sim_1]
-#set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
+set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
 set_property xsim.simulate.runtime -value "0us" -objects  [get_filesets sim_1]
 
 update_compile_order -fileset sources_1 

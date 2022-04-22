@@ -33,7 +33,8 @@ namespace PR
 #pragma HLS unroll
       ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
       nentries[i] = num;
-      if (num > 0) mem_hasdata.set(i);
+      //if (num > 0) mem_hasdata.set(i);
+      mem_hasdata[i] = (num > 0); //can't use if statement with rewind
     }
   }
   
@@ -565,7 +566,8 @@ void MatchProcessor(BXType bx,
 
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
-  MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
+  //Made static to avoid loop to allow rewind
+  static MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
@@ -600,7 +602,7 @@ void MatchProcessor(BXType bx,
   }
 
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
-#pragma HLS PIPELINE II=1 //rewind
+#pragma HLS PIPELINE II=1 rewind
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -689,8 +691,10 @@ void MatchProcessor(BXType bx,
         init =  true;
         meu.init(bx, tmpprojbuff, istep);
       }
-
-      else meu.step(instubdata.getMem(iMEU));
+      //can not get to here on first cycle, but compile don't seem to realize 
+      //this and fail to reach II=1
+      else if (istep != 0) meu.step(instubdata.getMem(iMEU));
+      
 
       meu.processPipeLine(table[iMEU]);      
 

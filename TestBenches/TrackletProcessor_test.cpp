@@ -28,17 +28,17 @@
   #define SEED_ L1L2_
 #endif
 #if !defined ITC_
-  #define ITC_ D_
+  #define ITC_ C_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TP_L1L2D_
+  #define MODULE_ TP_L1L2C_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackletProcessor_L1L2D
+  #define TOP_FUNC_ TrackletProcessor_L1L2C
 #endif
 
 
-const int nevents = 100;  //number of events to run
+const int nevents = 1;  //number of events to run
 
 using namespace std;
 
@@ -243,7 +243,7 @@ std::cout<<module_name[MODULE_];
     BXType bx_o;
 
     // Unit Under Test
-    TOP_FUNC_(bx, innervmtable ,useregion, innerStubs.data(), outerStubs.data(), *outervmStubs.data(),  &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    TOP_FUNC_(bx, bx_o, innervmtable ,useregion, innerStubs.data(), outerStubs.data(), outervmStubs.data(),  &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 
     bool truncation = false;
 

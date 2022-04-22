@@ -520,18 +520,35 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner], const AllStubMemory<OuterRegion>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>& outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
+		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner], const AllStubMemory<OuterRegion>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
 {
   static_assert(Seed == TF::L1L2||Seed==TF::L2L3||Seed==TF::L3L4||Seed==TF::L5L6, "Only L1L2 and L2L3  seeds have been implemented so far.");
 
   int npar = 0;
-  int nproj_barrel_ps[TC::N_PROJOUT_BARRELPS] = {0};
-  int nproj_barrel_2s[TC::N_PROJOUT_BARREL2S] = {0};
-  int nproj_disk[TC::N_PROJOUT_DISK] = {0};
+  int nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
+  int nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
+  int nproj_disk[TC::N_PROJOUT_DISK];
 #pragma HLS array_partition variable=nproj_barrel_ps complete
 #pragma HLS array_partition variable=nproj_barrel_2s complete
 #pragma HLS array_partition variable=nproj_disk complete
 #pragma HLS array_partition variable=innerStubs complete dim=1
+  
+  for (unsigned int i = 0; i < TC::N_PROJOUT_BARRELPS; i++) {
+#pragma HLS unroll
+    nproj_barrel_ps[i] = 0;
+  }
+  
+  for (unsigned int i = 0; i < TC::N_PROJOUT_BARREL2S; i++) {
+#pragma HLS unroll
+    nproj_barrel_2s[i] = 0;
+  }
+ 
+  for (unsigned int i = 0; i < TC::N_PROJOUT_DISK; i++) {
+#pragma HLS unroll
+    nproj_disk[i] = 0;
+  }
+  
+
 
   bool trace=true;
 
@@ -546,7 +563,19 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 
   tebuffer.reset();
 
-  TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion> teunits[NTEUnits];
+  constexpr unsigned int kNBitsPTLutInner = (Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512);
+  constexpr unsigned int kNBitsPTLutOuter = (Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512);
+
+  static ap_uint<1> stubptinnerlut[kNBitsPTLutInner] =
+#  include "../emData/TP/tables/TP_L1L2C_stubptinnercut.tab"    
+  static ap_uint<1> stubptouterlut[kNBitsPTLutOuter] =
+#  include "../emData/TP/tables/TP_L1L2C_stubptoutercut.tab"    
+
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlut complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlut complete dim=1
+
+
+  static TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion> teunits[NTEUnits];
 #pragma HLS array_partition variable=teunits complete dim=1
 
  reset_teunits: for (unsigned i = 0; i < NTEUnits; i++) {
@@ -577,17 +606,21 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 #pragma HLS array_partition variable=vmstubsmask complete dim=1
  entriesloop:for(unsigned int i=0;i<NRZBINS-1;i++) {
 #pragma HLS unroll
-  vmstubsentries[i]=(outerVMStubs.getEntries8(bx,i+1),outerVMStubs.getEntries8(bx,i));
-  vmstubsmask[i]=(outerVMStubs.getBinMask8(bx,i+1),outerVMStubs.getBinMask8(bx,i));
+  vmstubsentries[i]=(outerVMStubs->getEntries8(bx,i+1),outerVMStubs->getEntries8(bx,i));
+  vmstubsmask[i]=(outerVMStubs->getBinMask8(bx,i+1),outerVMStubs->getBinMask8(bx,i));
 }
-  vmstubsentries[NRZBINS-1]=(ap_uint<32>(0),outerVMStubs.getEntries8(bx,NRZBINS-1));
-  vmstubsmask[NRZBINS-1]=(ap_uint<8>(0),outerVMStubs.getBinMask8(bx,NRZBINS-1));
+  vmstubsentries[NRZBINS-1]=(ap_uint<32>(0),outerVMStubs->getEntries8(bx,NRZBINS-1));
+  vmstubsmask[NRZBINS-1]=(ap_uint<8>(0),outerVMStubs->getBinMask8(bx,NRZBINS-1));
 
 
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
-#pragma HLS pipeline II=1
+#pragma HLS pipeline II=1 rewind
 
-    
+    //Hack - not correct!
+    if (istep == 90) { 
+      bx_o = bx;  
+    }
+
     /*
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
               << tebuffer.readptr()<<" "<<tebuffer.writeptr()<<std::endl;
@@ -700,8 +733,11 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
       
       auto ptinnerindex = (idphitmp, innerbend);
       auto ptouterindex = (idphitmp, outerbend);
-      ap_uint<1> lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
-      ap_uint<1> lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
+      //ap_uint<1> lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
+      //ap_uint<1> lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
+      
+      ap_uint<1> lutinner = stubptinnerlut[ptinnerindex];
+      ap_uint<1> lutouter = stubptouterlut[ptouterindex];
       
       ap_uint<1> savestub = teunits[k].good___ && inrange && lutinner && lutouter && rzcut;
       //std::cout<<" teunits[k].good: "<<teunits[k].good___<<" savestub: "<<savestub<<" inrange: "<<inrange<<" lutinner:  "<<lutinner<<" lutouter: "<<lutouter<<" rzcut: "<<rzcut<<std::endl;
@@ -768,7 +804,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 
       //Fill the result
 
-      teunits[k].outervmstub__ = outerVMStubs.read_mem(k, bx, init?
+      teunits[k].outervmstub__ = outerVMStubs->read_mem(k, bx, init?
 						       (ireg_init, ibin_init,typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS(0)):
 						       (ireg_reg, ibin_reg, istub_tmp_reg));
       teunits[k].next__ = init?next_init:next_reg;
@@ -888,7 +924,8 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
     //Read stub from memory - BRAM with latency of one or two clks
     stub__ = innerStubs[imem].read_mem(bx,istub__);
   } //end of istep
-  
+
+
 }
 
 #endif

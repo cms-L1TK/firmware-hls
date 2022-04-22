@@ -31,9 +31,10 @@ class TrackletEngineUnit {
 
  TrackletEngineUnit() {
 
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
+   //#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
+   //#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 
+   /*
 /////  Grabs the appropriate lut based on seed and iTC
 if (Seed==TF::L1L2&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
@@ -516,7 +517,7 @@ else if (Seed==TF::L5L6&& iTC==TC::D){
       }
     }
 
-
+   */
 
 ////
     idle_ = true;
@@ -623,8 +624,8 @@ void write(STUBID stubs) {
 
  int instance_;
 
- ap_uint<1> stubptinnerlutnew_[kNBitsPTLutInner];    
- ap_uint<1> stubptouterlutnew_[kNBitsPTLutOuter];
+ //ap_uint<1> stubptinnerlutnew_[kNBitsPTLutInner];    
+ //ap_uint<1> stubptouterlutnew_[kNBitsPTLutOuter];
 
 
  private:
