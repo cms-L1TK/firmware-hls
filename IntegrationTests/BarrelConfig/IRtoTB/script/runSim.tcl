@@ -1,4 +1,5 @@
 # Open project
+exec ./common/script/setlimits.sh
 set projName "Work"
 open_project $projName/$projName.xpr
 
