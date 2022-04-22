@@ -36,7 +36,8 @@ entity tf_mem_bin_cm4 is
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH_CM/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    NAME            : string := "MEMNAME"          --! Memory name
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -137,6 +138,7 @@ process(clka)
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
+    report "tm_mem_bin_cm4 vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -162,8 +164,8 @@ begin
       vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
-      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
+      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH_CM)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(vi_nent_idx) <= '1'; -- <= 1 (slv)
       if (addr_in_page = 0) then

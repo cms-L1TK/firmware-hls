@@ -34,7 +34,8 @@ entity tf_mem is
     RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    NAME            : string := "MEMNAME"          --! Name of mem for printout
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -57,6 +58,26 @@ architecture rtl of tf_mem is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
+
+function to_bstring(sl : std_logic) return string is
+  variable sl_str_v : string(1 to 3);  -- std_logic image with quotes around
+begin
+  sl_str_v := std_logic'image(sl);
+  return "" & sl_str_v(2);  -- "" & character to get string
+end function;
+
+function to_bstring(slv : std_logic_vector) return string is
+  alias    slv_norm : std_logic_vector(1 to slv'length) is slv;
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(1 to slv'length);
+begin
+  for idx in slv_norm'range loop
+    sl_str_v := to_bstring(slv_norm(idx));
+    res_v(idx) := sl_str_v(1);
+  end loop;
+  return res_v;
+end function;
+
 
 -- ########################### Function ##########################
 --! @brief TextIO function to read memory data to initialize tf_mem. Needed here because of variable slv width!
@@ -114,6 +135,7 @@ process(clka)
   variable addr_in_page : integer := 0;
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
+    report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));  
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -130,6 +152,7 @@ begin
       end if;
     end if;
     if (wea='1') then
+      report "tm_mem "&NAME&" writeaddr "&to_bstring(addra)&" "&to_bstring(dina);  
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
@@ -148,6 +171,7 @@ process(clkb)
 begin
   if rising_edge(clkb) then
     if (enb='1') then
+      report "tm_mem "&NAME&" readaddr "&to_bstring(addrb);  
       sv_RAM_row <= sa_RAM_data(to_integer(unsigned(addrb)));
     end if;
   end if;
