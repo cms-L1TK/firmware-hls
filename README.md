@@ -167,7 +167,7 @@ Purpose: Automatically run SW quality checks and build the HLS projects (csim, c
 
 In order to keep the GitHub repository public we use GitHub Actions and GitLab CI/CD:
 
-* GitHub Actions uses a public runner, the workflow is defined in .github/workflows/GitLab_CI.yml
+* GitHub Actions uses a public runner, the workflow is defined in .github/workflows/github_CI.yml
 * GitHub Actions mirrors the repository to GitLab and runs GitLab CI/CD
 * GitLab CI/CD uses a private runner (lnxfarm327.colorado.edu) and performs the SW quality checks and the HLS builds as defined in .gitlab-ci.yml
     - SW quality checks are based on clang-tidy (llvm-toolset-7.0) and are defined in .clang-tidy and .clang-format very similar to CMSSW
