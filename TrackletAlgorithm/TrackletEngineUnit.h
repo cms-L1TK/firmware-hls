@@ -564,6 +564,7 @@ else if (Seed==TF::L5L6&& iTC==TC::D){
    good__ = 0;
    good___ = 0;
    memmask_ = 0;
+   istub_ = 0;
    instance_ = instance;
  }
 
@@ -619,7 +620,7 @@ void write(STUBID stubs) {
  INDEX readindex_;
  bool idle_;
  
- NSTUBS istub_=0;
+ NSTUBS istub_;
  STUBID stubids_[1<<kNBitsBuffer];
 
  int instance_;

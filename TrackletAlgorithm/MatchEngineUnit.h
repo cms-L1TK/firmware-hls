@@ -34,7 +34,9 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
-  inline MatchEngineUnit() {
+  inline MatchEngineUnit() {}
+
+  inline void reset() {
 #pragma HLS inline
     writeindex_ = 0;
     readindex_ = 0;
@@ -76,7 +78,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
 
 
-inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
+inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
@@ -150,7 +152,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[2][1024]) {
   //Read stub memory and extract data fields
   auto stubtmp=(iphiSave,zbin);
   auto stubadd=(stubtmp,istubtmp);
-  stubdata__ = stubmem[bx_&1][stubadd];
+  stubdata__ = stubmem[bx_&3][stubadd];
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
 
