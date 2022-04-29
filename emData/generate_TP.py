@@ -290,6 +290,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
           ") {\n"
           "#pragma HLS inline recursive\n"
+          "#pragma HLS interface register port=bx_o\n"
           "#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2\n"
           "#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2\n"
       )

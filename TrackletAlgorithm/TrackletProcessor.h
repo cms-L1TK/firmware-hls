@@ -575,7 +575,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 #pragma HLS ARRAY_PARTITION variable=stubptouterlut complete dim=1
 
 
-  static TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion> teunits[NTEUnits];
+  TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion> teunits[NTEUnits];
 #pragma HLS array_partition variable=teunits complete dim=1
 
  reset_teunits: for (unsigned i = 0; i < NTEUnits; i++) {
@@ -615,11 +615,6 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
 #pragma HLS pipeline II=1 rewind
-
-    //Hack - not correct!
-    if (istep == 90) { 
-      bx_o = bx;  
-    }
 
     /*
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
@@ -925,6 +920,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
     stub__ = innerStubs[imem].read_mem(bx,istub__);
   } //end of istep
 
+  bx_o = bx;
 
 }
 
