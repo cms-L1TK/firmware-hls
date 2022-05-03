@@ -4,19 +4,16 @@
 #include <cassert>
 #include "TrackHandler.h"
 
-const unsigned int bufferSize = 108; // chosen random buffer size - will need to see how many tracks are in test bench
+
 const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
-
+const unsigned int kNBufferSize = 108; // total no. of tracks
 
 class ModuleBuffer{
   public:
-    ModuleBuffer(){
-      readIndex = 0;
-      writeIndex = 0;
-    }
+    ModuleBuffer();
 
-    ~ModuleBuffer(){};
+    ~ModuleBuffer();
     
     void insertTrack(const TrackHandler track);
 
@@ -29,7 +26,7 @@ class ModuleBuffer{
     private:
       unsigned int readIndex{0};
       unsigned int writeIndex{0};
-      TrackHandler moduleBuffer[bufferSize];
+      TrackHandler _moduleBuffer[kNBufferSize];
 };
 
 class ComparisonModule{
@@ -85,22 +82,7 @@ class ComparisonModule{
 
 };
 
-class TrackMerger{
-  public:
-  TrackMerger(){
-    bufferPtr = buffer;
-    // loop over the CMs to set the input/output buffer variables for each CM
-    LOOP_SetBuffers:
-    for (unsigned int i = 0; i < kNComparisonModules; i++){
-      #pragma HLS unroll
-      comparisonModule[i].setInputBuffer(&bufferPtr[i]);
-      comparisonModule[i].setOutputBuffer(&bufferPtr[i]);
-    }
-  };
-
-  ~TrackMerger(){};
-
-  void TrackMergerMain(const BXType bx,
+void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
@@ -109,13 +91,6 @@ class TrackMerger{
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
   TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
   );
-
-  private:
-  ModuleBuffer buffer[kNBuffers];
-  ComparisonModule comparisonModule[kNComparisonModules];
-  ModuleBuffer *bufferPtr;
-
-};
 
 
 

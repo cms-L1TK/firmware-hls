@@ -22,5 +22,5 @@ void TrackMergerTop(const BXType bx,
     #pragma HLS array_partition variable=diskStubWords complete dim=1
     #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
     #pragma HLS array_partition variable=diskStubWords_o complete dim=1
-    TrackMerger::TrackMergerMain(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o);
+    TrackMerger(bx, trackWord, barrelStubWords, diskStubWords, bx_o, trackWord_o, barrelStubWords_o, diskStubWords_o);
 }
