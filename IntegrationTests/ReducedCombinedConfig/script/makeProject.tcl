@@ -36,11 +36,12 @@ create_ip -name TrackBuilder_L1L2 -module_name FT_L1L2 -vendor xilinx.com -libra
 
 
 # Provide name of top-level HDL (without .vhd extension).
-set topLevelHDL "SectorProcessor"
-#set topLevelHDL "SectorProcessorFull"
+#set topLevelHDL "SectorProcessor"
+set topLevelHDL "SectorProcessorFull"
 
 # Add HDL for algo
 add_files -fileset sources_1 [glob ../hdl/SectorProcessor.vhd]
+add_files -fileset sources_1 [glob ../hdl/SectorProcessorFull.vhd]
 add_files -fileset sources_1 [glob ../hdl/memUtil_pkg.vhd]
 add_files -fileset sources_1 [glob common/hdl/*.vhd]
 remove_files -fileset sources_1 [glob common/hdl/latency_monitor.vhd]

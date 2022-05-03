@@ -37,10 +37,10 @@ architecture behaviour of tb_tf_top is
   --    0 = SectorProcessor.vhd from python script.
   --    1 = SectorProcessorFull.vhd from python script (gives intermediate MemPrints).
   --    N.B. Change this also in makeProject.tcl !
-  constant INST_TOP_TF          : integer := 0; 
+  constant INST_TOP_TF          : integer := 1; 
   --=========================================================================
 
-  constant CLK_PERIOD           : time    := 10 ns;       --! 250 MHz
+  constant CLK_PERIOD           : time    := 4 ns;       --! 250 MHz
   constant DEBUG                : boolean := false;      --! Debug off/on
   constant DL_DELAY             : integer := 0;          --! Number of BX delays
 
@@ -236,6 +236,75 @@ begin
       );
   end generate sectorProc;
 
+  sectorProcFull : if INST_TOP_TF = 1 generate
+  begin
+    uut : entity work.SectorProcessorFull
+      port map(
+        clk                        => clk,
+        reset                      => reset,
+        IR_start                   => IR_start,
+        IR_bx_in                   => IR_bx_in,
+        FT_bx_out                  => FT_bx_out,
+        FT_bx_out_vld              => FT_bx_out_vld,
+        FT_done                    => FT_done,
+        -- Debug control signals
+        IR_bx_out                  => IR_bx_out,
+        IR_bx_out_vld              => IR_bx_out_vld,
+        IR_done                    => IR_done,
+        VMR_bx_out                 => VMR_bx_out,
+        VMR_bx_out_vld             => VMR_bx_out_vld,
+        VMR_done                   => VMR_done,
+        TP_bx_out                  => TP_bx_out,
+        TP_bx_out_vld              => TP_bx_out_vld,
+        TP_done                    => TP_done,
+        MP_bx_out                  => MP_bx_out,
+        MP_bx_out_vld              => MP_bx_out_vld,
+        MP_done                    => MP_done,
+        -- Input data
+        DL_39_link_AV_dout         => DL_39_link_AV_dout,
+        DL_39_link_empty_neg       => DL_39_link_empty_neg,
+        DL_39_link_read            => DL_39_link_read,
+        -- Debug output data
+        IL_36_mem_A_wea            => IL_36_mem_A_wea,
+        IL_36_mem_AV_writeaddr     => IL_36_mem_AV_writeaddr,
+        IL_36_mem_AV_din           => IL_36_mem_AV_din,
+        AS_36_mem_A_wea            => AS_36_mem_A_wea,
+        AS_36_mem_AV_writeaddr     => AS_36_mem_AV_writeaddr,
+        AS_36_mem_AV_din           => AS_36_mem_AV_din,
+        AS_51_mem_A_wea            => AS_51_mem_A_wea,
+        AS_51_mem_AV_writeaddr     => AS_51_mem_AV_writeaddr,
+        AS_51_mem_AV_din           => AS_51_mem_AV_din,
+        VMSME_16_mem_A_wea         => VMSME_16_mem_A_wea,
+        VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
+        VMSME_16_mem_AV_din        => VMSME_16_mem_AV_din,
+        VMSME_17_mem_A_wea         => VMSME_17_mem_A_wea,
+        VMSME_17_mem_AV_writeaddr  => VMSME_17_mem_AV_writeaddr,
+        VMSME_17_mem_AV_din        => VMSME_17_mem_AV_din,
+        VMSTE_16_mem_A_wea         => VMSTE_16_mem_A_wea,
+        VMSTE_16_mem_AV_writeaddr  => VMSTE_16_mem_AV_writeaddr,
+        VMSTE_16_mem_AV_din        => VMSTE_16_mem_AV_din,
+        TPROJ_60_mem_A_wea         => TPROJ_60_mem_A_wea,
+        TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+        TPROJ_60_mem_AV_din        => TPROJ_60_mem_AV_din,
+        TPROJ_58_mem_A_wea         => TPROJ_58_mem_A_wea,
+        TPROJ_58_mem_AV_writeaddr  => TPROJ_58_mem_AV_writeaddr,
+        TPROJ_58_mem_AV_din        => TPROJ_58_mem_AV_din,
+        TPAR_70_mem_A_wea          => TPAR_70_mem_A_wea,
+        TPAR_70_mem_AV_writeaddr   => TPAR_70_mem_AV_writeaddr,
+        TPAR_70_mem_AV_din         => TPAR_70_mem_AV_din,
+        FM_52_mem_A_wea            => FM_52_mem_A_wea,
+        FM_52_mem_AV_writeaddr     => FM_52_mem_AV_writeaddr,
+        FM_52_mem_AV_din           => FM_52_mem_AV_din,
+        -- Output data
+        TW_84_stream_AV_din        => TW_84_stream_AV_din,
+        TW_84_stream_A_full_neg    => TW_84_stream_A_full_neg,
+        TW_84_stream_A_write       => TW_84_stream_A_write,
+        BW_46_stream_AV_din        => BW_46_stream_AV_din,
+        BW_46_stream_A_full_neg    => BW_46_stream_A_full_neg,
+        BW_46_stream_A_write       => BW_46_stream_A_write
+      );
+  end generate sectorProcFull;
+
   -- Write signals to output .txt files
 
   writeIntermediateRAMs : if INST_TOP_TF = 1 generate
@@ -303,6 +372,7 @@ begin
       generic map (
         FILE_NAME => FILE_OUT_VMSME_16&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH => 16,
+        PAGE_LENGTH=> 1024,
         NUM_PAGES => 4
       )
       port map (
@@ -321,6 +391,7 @@ begin
       generic map (
         FILE_NAME => FILE_OUT_VMSME_17&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH => 17,
+        PAGE_LENGTH=> 1024,
         NUM_PAGES => 4
       )
       port map (
@@ -339,6 +410,7 @@ begin
       generic map (
         FILE_NAME => FILE_OUT_VMSTE_16&memory_enum_to_string(var)&outputFileNameEnding,
         RAM_WIDTH => 16,
+        PAGE_LENGTH=> 1024,
         NUM_PAGES => 2
       )
       port map (
