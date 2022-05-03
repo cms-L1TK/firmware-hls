@@ -5,8 +5,8 @@
 
 void ModuleBuffer::insertTrack(const TrackHandler track){
   #pragma HLS inline
-  assert(writeIndex < bufferSize);
-  moduleBuffer[writeIndex] = track;
+  assert(writeIndex < kNBufferSize);
+  _moduleBuffer[writeIndex] = track;
   writeIndex++;
 }
 
@@ -14,11 +14,15 @@ TrackHandler ModuleBuffer::readTrack(){
   #pragma HLS inline
   assert(readIndex < writeIndex);
   if (readIndex < writeIndex){
-    TrackHandler track = moduleBuffer[readIndex];
+    TrackHandler track = _moduleBuffer[readIndex];
     readIndex++;
     return track;
   } // else return a null track
-   else { return TrackHandler();}
+   else { 
+    #ifndef _SYNTHESIS_
+     std::cout << "writeIndex: " << writeIndex << " readIndex: " << readIndex << std::endl;
+    #endif
+     return TrackHandler();}
 }
 
 // bool ModuleBuffer::isEmpty(){
@@ -58,6 +62,7 @@ void ComparisonModule::process(){
   #pragma HLS pipeline
   TrackHandler track = inputBuffer->readTrack();
   outputBuffer->insertTrack(track);
+  tracksProcessed++;
 }
 
 void ComparisonModule::setInputBuffer(ModuleBuffer *buffer){
@@ -70,9 +75,13 @@ void ComparisonModule::setOutputBuffer(ModuleBuffer *buffer){
   outputBuffer = buffer;
 }
 
+ModuleBuffer::ModuleBuffer() : _moduleBuffer() {}
+
+ModuleBuffer::~ModuleBuffer(){
+}
 
 // overall module only reads in a track and pass it to the comparison module
-void TrackMerger::TrackMergerMain(const BXType bx,
+void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxProc],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
   const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
@@ -88,22 +97,18 @@ void TrackMerger::TrackMergerMain(const BXType bx,
     #pragma HLS array_partition variable=diskStubWords_o complete dim=1
     #pragma HLS array_partition variable=trackWord_o complete dim=0
 
-    // ComparisonModule comparisonModule[kNComparisonModules];
-    // ModuleBuffer buffer[kNBuffers];
+    ComparisonModule comparisonModule[kNComparisonModules];
+    ModuleBuffer buffer[kNBuffers];
+    ModuleBuffer *bufferPtr;
+    bufferPtr = buffer;
 
-    // loop over the CMs to set the input/output buffer variables for each CM - put in constructor?
-    // LOOP_SetBuffers:
-    // for (unsigned int i = 0; i < kNComparisonModules; i++){
-    //   #pragma HLS unroll
-    //   comparisonModule[i].setInputBuffer(&bufferPtr[i]);
-    //   comparisonModule[i].setOutputBuffer(&bufferPtr[i]);
-    // }
-
-    // TrackFit::TrackWord unmergedTracks[kMaxProc];
-    // TrackFit::BarrelStubWord unmergedBarrelStubs[4][kMaxProc];
-    // TrackFit::DiskStubWord unmergedDiskStubs[4][kMaxProc];
-    // #pragma HLS array_partition variable=unmergedBarrelStubs complete dim=1
-    // #pragma HLS array_partition variable=unmergedDiskStubs complete dim=1
+    // loop over the CMs to set the input/output buffer variables for each CM
+    LOOP_SetBuffers:
+    for (unsigned int i = 0; i < kNComparisonModules; i++){
+      #pragma HLS unroll
+      comparisonModule[i].setInputBuffer(&bufferPtr[i]);
+      comparisonModule[i].setOutputBuffer(&bufferPtr[i+1]);
+    }
 
     LOOP_InputProc:
     for (int i = 0; i < kMaxProc; i++){ 
@@ -119,13 +124,15 @@ void TrackMerger::TrackMergerMain(const BXType bx,
 
       TrackHandler track(trackWord[i], barrelStubWordsArray, diskStubWordsArray);
 
-      // put that track into input buffer 0 for CM zero
+      // put track into input buffer 0 for CM zero
       // first track in input buffer is master, then comapre against the rest
-      // buffer[0].insertTrack(track);
+      buffer[0].insertTrack(track); // pragmas to write in parallel?
+  
 
+      LOOP_ProcTracks:
       for(int j = 0; j < kNComparisonModules; j++){
         #pragma HLS unroll
-        // comparisonModule[j].process();
+        comparisonModule[j].process();
 
       //   CM takes track from buffer + reads track from input buffer, then outputs to output buffer when the track is unmerged
       //   if there is an unmerged track pass it to the next buffer
@@ -137,6 +144,8 @@ void TrackMerger::TrackMergerMain(const BXType bx,
        // needs to be a way of signalling when they have processed the track word (end of input) - 
        // passed from CM to CM, if nothing in buffer and see signal, read out track (also pass on signal to next CM)
        // create a fn to read out master
+
+
     }
     bx_o = bx;
 
