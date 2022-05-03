@@ -22,6 +22,7 @@ entity FileWriter is
     FILE_NAME  : string;   --! Name of .txt file to be written
     RAM_WIDTH  : natural := 18;    --! RAM data width
     NUM_PAGES  : natural := 2;     --! Number of pages in RAM memory
+    PAGE_LENGTH : natural := 128;     --! Page length
     -- Leave following parameters at their default values.
     RAM_DEPTH  : natural := NUM_PAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
     ADDR_WIDTH : natural := clogb2(RAM_DEPTH)      --! RAM address

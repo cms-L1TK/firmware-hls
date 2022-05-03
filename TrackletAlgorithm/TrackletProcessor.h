@@ -612,6 +612,32 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   vmstubsentries[NRZBINS-1]=(ap_uint<32>(0),outerVMStubs->getEntries8(bx,NRZBINS-1));
   vmstubsmask[NRZBINS-1]=(ap_uint<8>(0),outerVMStubs->getBinMask8(bx,NRZBINS-1));
 
+  constexpr int NTEUBits=3; //ceil(log2(NTEUnits));
+
+  ap_uint<NTEUBits> iTEfirstidle = 0;
+  ap_uint<NTEUBits> iTE = 0;
+  ap_uint<1> HaveTEData = false;    
+  ap_uint<1> idlete = true;
+  
+  typename AllStub<InnerRegion>::AllStubData innerStub = 0;
+  typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS innerIndex = 0;
+  typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS outerIndex = 0;
+
+  ap_uint<NTEUnits> teunearfull = 0;
+  ap_uint<NTEUnits> teuidle = 0;
+  teuidle = ~teuidle;
+
+  typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::INDEX teuwriteindex[NTEUnits];
+#pragma HLS array_partition variable=teuwriteindex complete dim=1
+
+  typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::INDEX teureadindex[NTEUnits];
+#pragma HLS array_partition variable=teureadindex complete dim=1
+
+  for (unsigned k = 0; k < NTEUnits; k++){
+#pragma HLS unroll
+    teuwriteindex[k] = 0;
+    teureadindex[k] = 0;
+  }
 
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
 #pragma HLS pipeline II=1 rewind
@@ -637,16 +663,10 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
     typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::TEBUFFERINDEX writeptrnext = writeptr+1;
     bool tebufferfull = nearFullTEBuff(writeptr,readptr);
     ap_uint<1> TEBufferData = (writeptr!=readptr);
+
+    /*
     
-    typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::INDEX teuwriteindex[NTEUnits];
-#pragma HLS array_partition variable=teuwriteindex complete dim=1
-
-    typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::INDEX teureadindex[NTEUnits];
-#pragma HLS array_partition variable=teureadindex complete dim=1
-
-    ap_uint<NTEUnits> teunearfull, teunotempty, teuidle;
-
-    constexpr int NTEUBits=3; //ceil(log2(NTEUnits));
+    ap_uint<NTEUnits> teunotempty;
 
   prefetchteudata: for (unsigned k = 0; k < NTEUnits; k++){
 #pragma HLS unroll
@@ -657,11 +677,16 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
       teuidle[k]=teunits[k].idle_;
     }
 
-    ap_uint<NTEUBits> iTEfirstidle = __builtin_ctz(teuidle);
-    ap_uint<NTEUBits> iTE = (((1<<NTEUBits)-1)&__builtin_clz(teunotempty));
+    iTEfirstidle = __builtin_ctz(teuidle);
+    iTE = (((1<<NTEUBits)-1)&__builtin_clz(teunotempty));
     iTE=~iTE;
-    ap_uint<1> HaveTEData = teunotempty.or_reduce();    
-    ap_uint<1> idlete = teuidle.or_reduce();
+    HaveTEData = teunotempty.or_reduce();    
+    idlete = teuidle.or_reduce();
+
+    (outerIndex, innerStub, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
+
+    */
+
     tebuffer.readptr_ = (idlete&&TEBufferData)?readptrnext:readptr;
 
 
@@ -671,11 +696,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
     
     
     // Check if TE unit has data - find the first instance with data
-
       
-    typename AllStub<InnerRegion>::AllStubData innerStub;
-    typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS innerIndex, outerIndex;
-    (outerIndex, innerStub, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
     teunits[iTE].readindex_=teureadindex[iTE]+HaveTEData;
     const TrackletProjection<BARRELPS>::TProjTCID TCId(iTC+(Seed << TrackletProjection<BARRELPS>::kTProjITCSize));
       
@@ -918,6 +939,30 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
     
     //Read stub from memory - BRAM with latency of one or two clks
     stub__ = innerStubs[imem].read_mem(bx,istub__);
+
+
+    //Update TEUnit data for next loop
+
+    ap_uint<NTEUnits> teunotempty;
+
+  prefetchteudata: for (unsigned k = 0; k < NTEUnits; k++){
+#pragma HLS unroll
+      teuwriteindex[k]=teunits[k].writeindex_;
+      teureadindex[k]=teunits[k].readindex_;
+      teunearfull[k]=TENearFullUINT[ (teureadindex[k], teuwriteindex[k]) ];
+      teunotempty[k]=teuwriteindex[k]!=teureadindex[k];
+      teuidle[k]=teunits[k].idle_;
+    }
+
+    iTEfirstidle = __builtin_ctz(teuidle);
+    iTE = (((1<<NTEUBits)-1)&__builtin_clz(teunotempty));
+    iTE=~iTE;
+    HaveTEData = teunotempty.or_reduce();    
+    idlete = teuidle.or_reduce();
+
+    (outerIndex, innerStub, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
+
+
   } //end of istep
 
   bx_o = bx;
