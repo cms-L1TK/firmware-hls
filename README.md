@@ -19,9 +19,9 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 
         vivado_hls -p <project>
 
-## Running chains (illustrated for PR-ME-MC)
+## Running chains (illustrated for IR to TB skinny chain)
 
-1) cd IntegrationTests/PRMEMC/script/
+1) cd IntegrationTests/ReducedConfig/IRtoTB/script/
 2) vivado_hls -f compileHLS.tcl (makes HLS IP cores).
 3) vivado -mode batch -source makeProject.tcl (creates Vivado project).
 4) vivado -mode batch -source runSim.tcl (runs Vivado simulation,
