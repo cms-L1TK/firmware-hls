@@ -12,6 +12,12 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/GJZA1zLnWg3hP4y/download"
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/YcqX3KUgFdZyMG6/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/lKrxzKJ0XmelE0j/download"
 
+# Barrel-only configuration
+# N.B.: currently untagged but produced with following commit:
+# 16ac97bf7463ad54a5ca91afac44997b8cad1b3e
+memprints_url_barrel="https://cernbox.cern.ch/index.php/s/4bav5YoSOEK3NIg/download"
+luts_url_barrel="https://cernbox.cern.ch/index.php/s/myeIctCD1huekgq/download"
+
 # Function that prints information regarding the usage of this command
 function usage() {
   echo "$(basename $0) [-h|--help] [-t|--tables]"
@@ -66,6 +72,10 @@ then
   tar -xzf LUTs.tgz
   mv LUTs LUTsReduced
   rm -f LUTs.tgz
+  wget -O LUTs.tgz --quiet ${luts_url_barrel}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsBarrel
+  rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
   mv LUTs LUTsCM
@@ -93,6 +103,15 @@ mkdir -p ../TopFunctions/ReducedConfig
 ./generate_ME.py -s  -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
 ./generate_MC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
 ./generate_TB.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+### barrel config
+mkdir -p ../TopFunctions/BarrelConfig
+./generate_IR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_VMR.py -a -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_TC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_PR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_ME.py -s  -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_MC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_TB.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
 ### combined config
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
@@ -107,6 +126,7 @@ cd emData/
 cp -fv LUTs/wires.dat LUTs/memorymodules.dat LUTs/processingmodules.dat project_generation_scripts/
 cd project_generation_scripts/
 ./makeReducedConfig.py --no-graph
+./makeBarrelConfig.py
 ### IRVMR
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
@@ -137,6 +157,12 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/tb/
 mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
+### Barrel IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -148,6 +174,11 @@ then
   wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
   tar -xzf MemPrints.tgz
   mv MemPrints MemPrintsReduced
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_barrel}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsBarrel
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
@@ -167,7 +198,7 @@ unset LD_LIBRARY_PATH
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat | awk '{print $2}' | sort -u`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
@@ -177,6 +208,7 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   memprint_location_reduced="MemPrintsReduced"
+  memprint_location_barrel="MemPrintsBarrel"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
@@ -196,11 +228,13 @@ do
 
     rm -rf ${target_dir}
     mkdir -p ${target_dir}/ReducedConfig
+    mkdir -p ${target_dir}/BarrelConfig
 
     for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
     do
       find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
       find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
+      find ${memprint_location_barrel} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/BarrelConfig/ \;
     done
   fi
 
