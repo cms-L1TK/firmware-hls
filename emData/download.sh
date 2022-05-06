@@ -14,7 +14,8 @@ luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
 # Reduced Combined modules                                                                                                                     
 #memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220309.tgz"
 #luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220309.tgz"
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220411.tgz"
+#memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220411.tgz"
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220503.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220411.tgz"
 
 # Barrel-only configuration
