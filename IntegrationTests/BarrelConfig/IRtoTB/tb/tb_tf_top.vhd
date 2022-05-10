@@ -55,15 +55,15 @@ architecture behaviour of tb_tf_top is
   -- Output files
   constant FILE_OUT_IL_36       : string := dataOutDir&"IL_";
   constant FILE_OUT_AS_36       : string := dataOutDir&"AS_";
-  constant FILE_OUT_VMSME_17    : string := dataOutDir&"VMSME_";
   constant FILE_OUT_VMSME_16    : string := dataOutDir&"VMSME_";
+  constant FILE_OUT_VMSME_17    : string := dataOutDir&"VMSME_";
   constant FILE_OUT_VMSTE_22    : string := dataOutDir&"VMSTE_";
-  constant FILE_OUT_VMSTE_17    : string := dataOutDir&"VMSTE_";
   constant FILE_OUT_VMSTE_23    : string := dataOutDir&"VMSTE_";
   constant FILE_OUT_VMSTE_16    : string := dataOutDir&"VMSTE_";
+  constant FILE_OUT_VMSTE_17    : string := dataOutDir&"VMSTE_";
   constant FILE_OUT_SP_14       : string := dataOutDir&"SP_";
-  constant FILE_OUT_TPROJ_60    : string := dataOutDir&"TPROJ_";
   constant FILE_OUT_TPROJ_58    : string := dataOutDir&"TPROJ_";
+  constant FILE_OUT_TPROJ_60    : string := dataOutDir&"TPROJ_";
   constant FILE_OUT_TPAR_70     : string := dataOutDir&"TPAR_";
   constant FILE_OUT_VMPROJ_24   : string := dataOutDir&"VMPROJ_";
   constant FILE_OUT_AP_60       : string := dataOutDir&"AP_";
@@ -129,33 +129,33 @@ architecture behaviour of tb_tf_top is
   signal AS_36_mem_A_wea            : t_arr_AS_36_1b       := (others => '0');
   signal AS_36_mem_AV_writeaddr     : t_arr_AS_36_ADDR     := (others => (others => '0'));
   signal AS_36_mem_AV_din           : t_arr_AS_36_DATA     := (others => (others => '0'));
-  signal VMSME_17_mem_A_wea         : t_arr_VMSME_17_1b    := (others => '0');
-  signal VMSME_17_mem_AV_writeaddr  : t_arr_VMSME_17_ADDR  := (others => (others => '0'));
-  signal VMSME_17_mem_AV_din        : t_arr_VMSME_17_DATA  := (others => (others => '0'));
   signal VMSME_16_mem_A_wea         : t_arr_VMSME_16_1b    := (others => '0');
   signal VMSME_16_mem_AV_writeaddr  : t_arr_VMSME_16_ADDR  := (others => (others => '0'));
   signal VMSME_16_mem_AV_din        : t_arr_VMSME_16_DATA  := (others => (others => '0'));
+  signal VMSME_17_mem_A_wea         : t_arr_VMSME_17_1b    := (others => '0');
+  signal VMSME_17_mem_AV_writeaddr  : t_arr_VMSME_17_ADDR  := (others => (others => '0'));
+  signal VMSME_17_mem_AV_din        : t_arr_VMSME_17_DATA  := (others => (others => '0'));
   signal VMSTE_22_mem_A_wea         : t_arr_VMSTE_22_1b    := (others => '0');
   signal VMSTE_22_mem_AV_writeaddr  : t_arr_VMSTE_22_ADDR  := (others => (others => '0'));
   signal VMSTE_22_mem_AV_din        : t_arr_VMSTE_22_DATA  := (others => (others => '0'));
-  signal VMSTE_17_mem_A_wea         : t_arr_VMSTE_17_1b    := (others => '0');
-  signal VMSTE_17_mem_AV_writeaddr  : t_arr_VMSTE_17_ADDR  := (others => (others => '0'));
-  signal VMSTE_17_mem_AV_din        : t_arr_VMSTE_17_DATA  := (others => (others => '0'));
   signal VMSTE_23_mem_A_wea         : t_arr_VMSTE_23_1b    := (others => '0');
   signal VMSTE_23_mem_AV_writeaddr  : t_arr_VMSTE_23_ADDR  := (others => (others => '0'));
   signal VMSTE_23_mem_AV_din        : t_arr_VMSTE_23_DATA  := (others => (others => '0'));
   signal VMSTE_16_mem_A_wea         : t_arr_VMSTE_16_1b    := (others => '0');
   signal VMSTE_16_mem_AV_writeaddr  : t_arr_VMSTE_16_ADDR  := (others => (others => '0'));
   signal VMSTE_16_mem_AV_din        : t_arr_VMSTE_16_DATA  := (others => (others => '0'));
+  signal VMSTE_17_mem_A_wea         : t_arr_VMSTE_17_1b    := (others => '0');
+  signal VMSTE_17_mem_AV_writeaddr  : t_arr_VMSTE_17_ADDR  := (others => (others => '0'));
+  signal VMSTE_17_mem_AV_din        : t_arr_VMSTE_17_DATA  := (others => (others => '0'));
   signal SP_14_mem_A_wea            : t_arr_SP_14_1b       := (others => '0');
   signal SP_14_mem_AV_writeaddr     : t_arr_SP_14_ADDR     := (others => (others => '0'));
   signal SP_14_mem_AV_din           : t_arr_SP_14_DATA     := (others => (others => '0'));
-  signal TPROJ_60_mem_A_wea         : t_arr_TPROJ_60_1b    := (others => '0');
-  signal TPROJ_60_mem_AV_writeaddr  : t_arr_TPROJ_60_ADDR  := (others => (others => '0'));
-  signal TPROJ_60_mem_AV_din        : t_arr_TPROJ_60_DATA  := (others => (others => '0'));
   signal TPROJ_58_mem_A_wea         : t_arr_TPROJ_58_1b    := (others => '0');
   signal TPROJ_58_mem_AV_writeaddr  : t_arr_TPROJ_58_ADDR  := (others => (others => '0'));
   signal TPROJ_58_mem_AV_din        : t_arr_TPROJ_58_DATA  := (others => (others => '0'));
+  signal TPROJ_60_mem_A_wea         : t_arr_TPROJ_60_1b    := (others => '0');
+  signal TPROJ_60_mem_AV_writeaddr  : t_arr_TPROJ_60_ADDR  := (others => (others => '0'));
+  signal TPROJ_60_mem_AV_din        : t_arr_TPROJ_60_DATA  := (others => (others => '0'));
   signal TPAR_70_mem_A_wea          : t_arr_TPAR_70_1b     := (others => '0');
   signal TPAR_70_mem_AV_writeaddr   : t_arr_TPAR_70_ADDR   := (others => (others => '0'));
   signal TPAR_70_mem_AV_din         : t_arr_TPAR_70_DATA   := (others => (others => '0'));
@@ -317,33 +317,33 @@ begin
         AS_36_mem_A_wea            => AS_36_mem_A_wea,
         AS_36_mem_AV_writeaddr     => AS_36_mem_AV_writeaddr,
         AS_36_mem_AV_din           => AS_36_mem_AV_din,
-        VMSME_17_mem_A_wea         => VMSME_17_mem_A_wea,
-        VMSME_17_mem_AV_writeaddr  => VMSME_17_mem_AV_writeaddr,
-        VMSME_17_mem_AV_din        => VMSME_17_mem_AV_din,
         VMSME_16_mem_A_wea         => VMSME_16_mem_A_wea,
         VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
         VMSME_16_mem_AV_din        => VMSME_16_mem_AV_din,
+        VMSME_17_mem_A_wea         => VMSME_17_mem_A_wea,
+        VMSME_17_mem_AV_writeaddr  => VMSME_17_mem_AV_writeaddr,
+        VMSME_17_mem_AV_din        => VMSME_17_mem_AV_din,
         VMSTE_22_mem_A_wea         => VMSTE_22_mem_A_wea,
         VMSTE_22_mem_AV_writeaddr  => VMSTE_22_mem_AV_writeaddr,
         VMSTE_22_mem_AV_din        => VMSTE_22_mem_AV_din,
-        VMSTE_17_mem_A_wea         => VMSTE_17_mem_A_wea,
-        VMSTE_17_mem_AV_writeaddr  => VMSTE_17_mem_AV_writeaddr,
-        VMSTE_17_mem_AV_din        => VMSTE_17_mem_AV_din,
         VMSTE_23_mem_A_wea         => VMSTE_23_mem_A_wea,
         VMSTE_23_mem_AV_writeaddr  => VMSTE_23_mem_AV_writeaddr,
         VMSTE_23_mem_AV_din        => VMSTE_23_mem_AV_din,
         VMSTE_16_mem_A_wea         => VMSTE_16_mem_A_wea,
         VMSTE_16_mem_AV_writeaddr  => VMSTE_16_mem_AV_writeaddr,
         VMSTE_16_mem_AV_din        => VMSTE_16_mem_AV_din,
+        VMSTE_17_mem_A_wea         => VMSTE_17_mem_A_wea,
+        VMSTE_17_mem_AV_writeaddr  => VMSTE_17_mem_AV_writeaddr,
+        VMSTE_17_mem_AV_din        => VMSTE_17_mem_AV_din,
         SP_14_mem_A_wea            => SP_14_mem_A_wea,
         SP_14_mem_AV_writeaddr     => SP_14_mem_AV_writeaddr,
         SP_14_mem_AV_din           => SP_14_mem_AV_din,
-        TPROJ_60_mem_A_wea         => TPROJ_60_mem_A_wea,
-        TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
-        TPROJ_60_mem_AV_din        => TPROJ_60_mem_AV_din,
         TPROJ_58_mem_A_wea         => TPROJ_58_mem_A_wea,
         TPROJ_58_mem_AV_writeaddr  => TPROJ_58_mem_AV_writeaddr,
         TPROJ_58_mem_AV_din        => TPROJ_58_mem_AV_din,
+        TPROJ_60_mem_A_wea         => TPROJ_60_mem_A_wea,
+        TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+        TPROJ_60_mem_AV_din        => TPROJ_60_mem_AV_din,
         TPAR_70_mem_A_wea          => TPAR_70_mem_A_wea,
         TPAR_70_mem_AV_writeaddr   => TPAR_70_mem_AV_writeaddr,
         TPAR_70_mem_AV_din         => TPAR_70_mem_AV_din,
@@ -415,24 +415,6 @@ begin
       );
     end generate AS_36_loop;
 
-    VMSME_17_loop : for var in enum_VMSME_17 generate
-    begin
-      writeVMSME_17 : entity work.FileWriter
-      generic map (
-        FILE_NAME => FILE_OUT_VMSME_17&memory_enum_to_string(var)&outputFileNameEnding,
-        RAM_WIDTH => 17,
-        NUM_PAGES => 8
-      )
-      port map (
-        CLK       => CLK,
-        ADDR      => VMSME_17_mem_AV_writeaddr(var),
-        DATA      => VMSME_17_mem_AV_din(var),
-        WRITE_EN  => VMSME_17_mem_A_wea(var),
-        START     => IR_DONE,
-        DONE      => VMR_DONE
-      );
-    end generate VMSME_17_loop;
-
     VMSME_16_loop : for var in enum_VMSME_16 generate
     begin
       writeVMSME_16 : entity work.FileWriter
@@ -451,6 +433,24 @@ begin
       );
     end generate VMSME_16_loop;
 
+    VMSME_17_loop : for var in enum_VMSME_17 generate
+    begin
+      writeVMSME_17 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_VMSME_17&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 17,
+        NUM_PAGES => 8
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => VMSME_17_mem_AV_writeaddr(var),
+        DATA      => VMSME_17_mem_AV_din(var),
+        WRITE_EN  => VMSME_17_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate VMSME_17_loop;
+
     VMSTE_22_loop : for var in enum_VMSTE_22 generate
     begin
       writeVMSTE_22 : entity work.FileWriter
@@ -468,24 +468,6 @@ begin
         DONE      => VMR_DONE
       );
     end generate VMSTE_22_loop;
-
-    VMSTE_17_loop : for var in enum_VMSTE_17 generate
-    begin
-      writeVMSTE_17 : entity work.FileWriter
-      generic map (
-        FILE_NAME => FILE_OUT_VMSTE_17&memory_enum_to_string(var)&outputFileNameEnding,
-        RAM_WIDTH => 17,
-        NUM_PAGES => 2
-      )
-      port map (
-        CLK       => CLK,
-        ADDR      => VMSTE_17_mem_AV_writeaddr(var),
-        DATA      => VMSTE_17_mem_AV_din(var),
-        WRITE_EN  => VMSTE_17_mem_A_wea(var),
-        START     => IR_DONE,
-        DONE      => VMR_DONE
-      );
-    end generate VMSTE_17_loop;
 
     VMSTE_23_loop : for var in enum_VMSTE_23 generate
     begin
@@ -523,6 +505,24 @@ begin
       );
     end generate VMSTE_16_loop;
 
+    VMSTE_17_loop : for var in enum_VMSTE_17 generate
+    begin
+      writeVMSTE_17 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_VMSTE_17&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 17,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => VMSTE_17_mem_AV_writeaddr(var),
+        DATA      => VMSTE_17_mem_AV_din(var),
+        WRITE_EN  => VMSTE_17_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate VMSTE_17_loop;
+
     SP_14_loop : for var in enum_SP_14 generate
     begin
       writeSP_14 : entity work.FileWriter
@@ -541,24 +541,6 @@ begin
       );
     end generate SP_14_loop;
 
-    TPROJ_60_loop : for var in enum_TPROJ_60 generate
-    begin
-      writeTPROJ_60 : entity work.FileWriter
-      generic map (
-        FILE_NAME => FILE_OUT_TPROJ_60&memory_enum_to_string(var)&outputFileNameEnding,
-        RAM_WIDTH => 60,
-        NUM_PAGES => 2
-      )
-      port map (
-        CLK       => CLK,
-        ADDR      => TPROJ_60_mem_AV_writeaddr(var),
-        DATA      => TPROJ_60_mem_AV_din(var),
-        WRITE_EN  => TPROJ_60_mem_A_wea(var),
-        START     => TE_DONE,
-        DONE      => TC_DONE
-      );
-    end generate TPROJ_60_loop;
-
     TPROJ_58_loop : for var in enum_TPROJ_58 generate
     begin
       writeTPROJ_58 : entity work.FileWriter
@@ -576,6 +558,24 @@ begin
         DONE      => TC_DONE
       );
     end generate TPROJ_58_loop;
+
+    TPROJ_60_loop : for var in enum_TPROJ_60 generate
+    begin
+      writeTPROJ_60 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_TPROJ_60&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 60,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => TPROJ_60_mem_AV_writeaddr(var),
+        DATA      => TPROJ_60_mem_AV_din(var),
+        WRITE_EN  => TPROJ_60_mem_A_wea(var),
+        START     => TE_DONE,
+        DONE      => TC_DONE
+      );
+    end generate TPROJ_60_loop;
 
     TPAR_70_loop : for var in enum_TPAR_70 generate
     begin
