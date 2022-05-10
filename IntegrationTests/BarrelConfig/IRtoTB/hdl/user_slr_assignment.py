@@ -67,4 +67,5 @@ fin.close()
 
 for proc in procMems:
     mems = procMems[proc]
-    print("set_property USER_SLR_ASSIGNMENT " + proc + "_group [get_cells {" + proc + " " + " ".join(mems) + "}]")
+    if len(mems) > 0:
+        print("set_property USER_SLR_ASSIGNMENT " + proc + "_group [get_cells {" + proc + " " + " ".join(mems) + "}]")
