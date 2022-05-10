@@ -22,6 +22,7 @@ entity CreateStartSignal is
     CLK   : in  std_logic;
     RESET : in  std_logic;
     DONE  : in  std_logic; --! Done signal of last algo module in chain
+    VLD   : in  std_logic;
     START : out std_logic  --! Start signal of next algo module in chain
   ); 
 end CreateStartSignal;
@@ -38,8 +39,10 @@ begin
 
   if rising_edge(CLK) then
 
-    if DONE = '1' then
-      DONE_LATCH <= DONE;
+    if VLD = '1' then
+      if DONE = '1' then
+        DONE_LATCH <= DONE;
+      end if;
     end if;
 
     if (RESET = '1') then
