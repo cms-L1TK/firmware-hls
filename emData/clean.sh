@@ -28,4 +28,6 @@ find ../IntegrationTests/ -type f \( \
   -o -regex "^.*\/SectorProcessorFull\.vhd$" \
   -o -regex "^.*\/memUtil_pkg\.vhd$" \
   -o -regex "^.*\/tb_tf_top\.vhd$" \
-  \) -exec rm -fv {} \;
+  \) \
+  -a ! -regex ".*BarrelConfig.*" \
+  -exec rm -fv {} \;
