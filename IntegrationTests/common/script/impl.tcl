@@ -30,7 +30,7 @@ wait_on_run impl_1
 
 # Make reports
 open_run impl_1
-report_timing_summary -file timing_impl.rpt
+report_timing_summary -max_paths 999 -nworst 999 -file timing_impl.rpt
 report_utilization -hierarchical -file utilization_impl.rpt
 
 exit
