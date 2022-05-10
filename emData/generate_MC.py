@@ -133,7 +133,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
             "    const AllProjectionMemory<" + APRegion(seed) + ">* allproj,\n"
             "    BXType& bx_o,\n"
-            "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies]\n"
+            "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies],\n"
+            "    ap_uint<1> &almost_done\n"
             ");\n"
         )
 
@@ -146,7 +147,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
             "    const AllProjectionMemory<" + APRegion(seed) + ">* allproj,\n"
             "    BXType& bx_o,\n"
-            "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies]\n"
+            "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies],\n"
+            "    ap_uint<1> &almost_done\n"
             ") {\n"
             "#pragma HLS inline off\n"
             "#pragma HLS interface register port=bx_o\n"
@@ -170,7 +172,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "    allstub,\n"
             "    allproj,\n"
             "    bx_o,\n"
-            "    fullmatch\n"
+            "    fullmatch,\n"
+            "    almost_done\n"
             "  );\n"
             "}\n"
         )

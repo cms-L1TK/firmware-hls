@@ -39,7 +39,8 @@ def createDefinitionsTemplate():
               "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
               "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc]//input stubs \n"
               "    , BXType & bx_o // output bx  \n"
-              "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}])"
+              "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}]"
+              "    , ap_uint<1> &almost_done)"
               "\n{{\n"
               "     #pragma HLS clock domain = slow_clock\n"
               "     #pragma HLS stream variable = hInputStubs depth = 108\n"
@@ -49,7 +50,8 @@ def createDefinitionsTemplate():
               "       , hPhBnWord\n"
               "       , hInputStubs\n"
               "       , bx_o\n"
-              "       , hOutputStubs);\n"
+              "       , hOutputStubs\n"
+              "       , almost_done);\n"
               "}}\n"
               )
     return fileName
@@ -66,6 +68,7 @@ def createDeclarationTemplate():
               "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc]//input stubs \n"
               "    , BXType & bx_o // output bx  \n"
               "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}]"
+              "    , ap_uint<1> &almost_done"
               ");\n")
     return fileName
 

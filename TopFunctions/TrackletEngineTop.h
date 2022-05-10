@@ -9,7 +9,8 @@ void TrackletEngine_PS_PS(const BXType bx,
                           const ap_uint<1> bendinnertable[],
                           const ap_uint<1> bendoutertable[],
                           BXType& bx_o,
-                          StubPairMemory& outstubpair);
+                          StubPairMemory& outstubpair,
+                          ap_uint<1> &almost_done);
 
 void TrackletEngine_PS_2S(const BXType bx,
                           const VMStubTEInnerMemory<BARRELPS>& instubinnerdata,
@@ -17,7 +18,8 @@ void TrackletEngine_PS_2S(const BXType bx,
                           const ap_uint<1> bendinnertable[],
                           const ap_uint<1> bendoutertable[],
                           BXType& bx_o,
-                          StubPairMemory& outstubpair);
+                          StubPairMemory& outstubpair,
+                          ap_uint<1> &almost_done);
 
 void TrackletEngine_2S_2S(const BXType bx,
                           const VMStubTEInnerMemory<BARREL2S>& instubinnerdata,
@@ -25,6 +27,7 @@ void TrackletEngine_2S_2S(const BXType bx,
                           const ap_uint<1> bendinnertable[],
                           const ap_uint<1> bendoutertable[],
                           BXType& bx_o,
-                          StubPairMemory& outstubpair);
+                          StubPairMemory& outstubpair,
+                          ap_uint<1> &almost_done);
 
 #endif

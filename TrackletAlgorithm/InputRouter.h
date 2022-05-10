@@ -297,7 +297,8 @@ void InputRouter( const BXType bx
 	, const ap_uint<kBINMAPwidth> hPhBnWord 
 	, ap_uint<kNBits_DTC>* hInputStubs
 	, BXType & bx_o // output bx 
-	, DTCStubMemory hOutputStubs[nOMems])
+	, DTCStubMemory hOutputStubs[nOMems]
+	, ap_uint<1> &almost_done)
 {
 	
 #pragma HLS inline
@@ -323,6 +324,9 @@ void InputRouter( const BXType bx
 	{
 #pragma HLS pipeline II = 1
 #pragma HLS PIPELINE rewind
+
+          almost_done = (cStubCounter < kMaxProc - 2) ? 0 : 1;
+
 	  // decode stub
 	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 

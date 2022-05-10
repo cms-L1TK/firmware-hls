@@ -133,7 +133,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    BXType &bx_o,\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::TrackWord trackWord[],\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::BarrelStubWord barrelStubWords[][kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[][kMaxProc]\n"
+            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[][kMaxProc],\n"
+            "    ap_uint<1> &almost_done\n"
             ");\n"
         )
 
@@ -182,7 +183,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    BXType &bx_o,\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::TrackWord trackWord[kMaxProc],\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::BarrelStubWord barrelStubWords[" + str(nBarrelStubs) + "][kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[" + str(nDiskStubs) + "][kMaxProc]\n"
+            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[" + str(nDiskStubs) + "][kMaxProc],\n"
+            "    ap_uint<1> &almost_done\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
             "#pragma HLS array_partition variable=trackletParameters complete dim=1\n"
@@ -211,7 +213,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    bx_o,\n"
             "    trackWord,\n"
             "    barrelStubWords,\n"
-            "    diskStubWords\n"
+            "    diskStubWords,\n"
+            "    almost_done\n"
             "  );\n"
             "}\n"
         )

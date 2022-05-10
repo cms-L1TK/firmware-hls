@@ -287,7 +287,8 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjectionMemory<APTYPE>* allproj,
                      BXType& bx_o,
-                     FullMatchMemory<FMTYPE> fullmatch[MaxFullMatchCopies]
+                     FullMatchMemory<FMTYPE> fullmatch[MaxFullMatchCopies],
+                     ap_uint<1> &almost_done
 ){
 #pragma HLS inline
 #pragma HLS array_partition variable=match complete dim=1
@@ -454,6 +455,8 @@ void MatchCalculator(BXType bx,
   {
 
 #pragma HLS PIPELINE II=1
+
+    almost_done = (istep < kMaxProc - kMaxProcOffset(module::MC) - 2) ? 0 : 1;
 
     // Pick up number of candidate matches for each CM memory
     ncm_load: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8

@@ -67,7 +67,8 @@ void ProjectionRouter(BXType bx,
                       const TrackletProjectionMemory<PROJTYPE> projin[],
                       BXType& bx_o,
                       AllProjectionMemory<PROJTYPE>& allprojout,
-                      VMProjectionMemory<VMPTYPE> vmprojout[])
+                      VMProjectionMemory<VMPTYPE> vmprojout[],
+                      ap_uint<1> &almost_done)
 {
 #pragma HLS inline
 #pragma HLS array_partition variable=projin complete dim=1
@@ -84,6 +85,7 @@ void ProjectionRouter(BXType bx,
 
   PROC_LOOP: for (int istep = 0; istep < kMaxProc - kMaxProcOffset(module::PR); ++istep) {
 #pragma HLS PIPELINE II=1 rewind
+    almost_done = (istep < kMaxProc - kMaxProcOffset(module::PR) - 2) ? 0 : 1;
     if (istep == 0) {
 
       // reset output memories & counters

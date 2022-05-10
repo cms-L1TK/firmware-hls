@@ -41,7 +41,8 @@ void TrackBuilder(
     BXType &bx_o,
     typename TrackFit<NBarrelStubs, NDiskStubs>::TrackWord trackWord[],
     typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord barrelStubWords[][kMaxProc],
-    typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord diskStubWords[][kMaxProc]
+    typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord diskStubWords[][kMaxProc],
+    ap_uint<1> &almost_done
 )
 {
 
@@ -86,6 +87,8 @@ void TrackBuilder(
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
+
+    almost_done = (i < kMaxProc - 2) ? 0 : 1;
 
     const ap_uint<1> empty = (i == 0);
     TrackletIDType min_id = kInvalidTrackletID;

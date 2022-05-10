@@ -45,7 +45,8 @@ def writeHeaderModuleInstance(module):
     strHeader += "                         const TrackletProjectionMemory<" + TProjRegion + ">*,\n"
     strHeader += "                         BXType&,\n"
     strHeader += "                         AllProjectionMemory<" + TProjRegion + ">&,\n"
-    strHeader += "                         VMProjectionMemory<" + VMProjRegion + ">*);\n\n"
+    strHeader += "                         VMProjectionMemory<" + VMProjRegion + ">*,\n"
+    strHeader += "                         ap_uint<1> &);\n\n"
     return strHeader
 
 def writeHeaderPreamble():
@@ -69,7 +70,8 @@ def writeSourceModuleInstance(module, wiresFileName):
     strSource += "                         const TrackletProjectionMemory<" + TProjRegion + "> projin[" + str(TProjCount) + "],\n"
     strSource += "                         BXType& bx_o,\n"
     strSource += "                         AllProjectionMemory<" + TProjRegion + ">& allprojout,\n"
-    strSource += "                         VMProjectionMemory<" + VMProjRegion + "> vmprojout[" + str(VMProjCount) + "])\n"
+    strSource += "                         VMProjectionMemory<" + VMProjRegion + "> vmprojout[" + str(VMProjCount) + "],\n"
+    strSource += "                         ap_uint<1> &almost_done)\n"
     strSource += "{\n"
     strSource += "#pragma HLS inline off\n"
     strSource += "#pragma HLS interface register port=bx_o\n"
@@ -80,7 +82,7 @@ def writeSourceModuleInstance(module, wiresFileName):
     strSource += "  constexpr int layer = " + str(layer) + ";\n"
     strSource += "  constexpr int disk = " + str(disk) + ";\n"
     strSource += module + ": ProjectionRouter<" + TProjRegion + ", " + VMProjRegion + ", nInMem, nOutMem, layer, disk>\n"
-    strSource += "    (bx, projin, bx_o, allprojout, vmprojout);\n"
+    strSource += "    (bx, projin, bx_o, allprojout, vmprojout, almost_done);\n"
     strSource += "}\n\n"
     return strSource
 
