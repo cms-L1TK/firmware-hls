@@ -32,7 +32,7 @@ architecture behavior of CreateStartSignal is
   signal DONE_LATCH : std_logic := '0';
 begin
 
-START <= DONE or DONE_LATCH; --! Latch goes high 1 clk after "done", so need OR of both.
+START <= DONE_LATCH; --! Latch goes high 1 clk after "done", so need OR of both.
 
 procLatch : process(CLK)
 begin
