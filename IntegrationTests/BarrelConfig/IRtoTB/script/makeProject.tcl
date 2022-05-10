@@ -171,8 +171,8 @@ create_ip -name TrackBuilder_L3L4 -module_name FT_L3L4 -vendor xilinx.com -libra
 create_ip -name TrackBuilder_L5L6 -module_name FT_L5L6 -vendor xilinx.com -library hls -version 1.0
 
 # Provide name of top-level HDL (without .vhd extension).
-#set topLevelHDL "SectorProcessor"
-set topLevelHDL "SectorProcessorFull"
+set topLevelHDL "SectorProcessor"
+#set topLevelHDL "SectorProcessorFull"
 
 # Add HDL for algo
 add_files -fileset sources_1 [glob ../hdl/SectorProcessor*.vhd]
