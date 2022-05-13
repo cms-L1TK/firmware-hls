@@ -62,7 +62,13 @@ set modules_to_test {
 set module_to_export VMRCM_L2PHIA
 
 # create new project (deleting any existing one of same name)
-open_project -reset vmrouterCM
+if { $tool == "Vivado" } {
+        open_project -reset vmrouterCM_vivado
+} elseif { $tool == "Vitis" } {
+        open_project -reset vmrouterCM_vitis
+} else {
+        puts "Neither vivado nor vitis is being used."
+}
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}

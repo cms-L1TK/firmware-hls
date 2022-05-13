@@ -13,3 +13,13 @@ if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
 	interp alias {} cosim_design {} interp invokehidden {} -- cosim_design -verbose
 }
 
+
+if {[regexp Vivado $exepath tool]} {
+  puts "Compiling under Vivado"
+  puts $tool
+} elseif {[regexp Vitis $exepath tool]} {
+  puts "Compiling under Vitis"
+  puts $tool
+} else {
+  puts "Compiling under neither Vivado nor Vitis."
+}

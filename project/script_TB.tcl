@@ -17,7 +17,13 @@ set modules_to_test {
 set module_to_export FT_L1L2
 
 # create new project (deleting any existing one of same name)
-open_project -reset trackBuilder
+if { $tool == "Vivado" } {
+        open_project -reset trackBuilder_vivado
+} elseif { $tool == "Vitis" } {
+        open_project -reset trackBuilder_vitis
+} else {
+        puts "Neither vivado nor vitis is being used."
+}
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
