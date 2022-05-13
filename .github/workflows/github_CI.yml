@@ -39,7 +39,6 @@ jobs:
     - name: Trigger gitlab CI run
       # Communicate between gitlab & github, and trigger gitlab CI run.
       # (Forked from https://github.com/SvanBoxel/gitlab-mirror-and-ci-action).
-      #uses: aperloff/gitlab-mirror-and-ci-action@master
       uses: cms-L1TK/gitlab-mirror-and-ci-action@master
       #with:
       #  args: "https://gitlab.cern.ch/cms-l1tk/firmware-hls"
