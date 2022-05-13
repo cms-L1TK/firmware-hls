@@ -33,7 +33,14 @@ set modules_to_test {
 set module_to_export TE_L1PHIG27_L2PHID27
 
 # create new project (deleting any existing one of same name)
-open_project -reset trackletEngine
+if { $tool == "Vivado" } {
+        open_project -reset trackletengine_vivado
+} elseif { $tool == "Vitis" } {
+        open_project -reset trackletengine_vitis
+} else {
+        puts "Neither vivado nor vitis is being used."
+}
+
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
