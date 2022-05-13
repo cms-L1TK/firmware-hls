@@ -7,7 +7,14 @@
 source env_hls.tcl
 
 # create new project (deleting any existing one of same name)
-open_project -reset inputrouter
+if { $tool == "Vivado" } {
+        open_project -reset inputroutervivado
+} elseif { $tool == "Vitis" } {
+        open_project -reset inputroutervitis
+} else {
+        puts "Neither vivado nor vitis is being used."
+}
+
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}

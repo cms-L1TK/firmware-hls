@@ -41,7 +41,14 @@ set modules_to_test {
 set module_to_export PR_L3PHIC
 
 # create new project (deleting any existing one of same name)
-open_project -reset projrouter
+if { $tool == "Vivado" } {
+        open_project -reset projrouter_vivado
+} elseif { $tool == "Vitis" } {
+        open_project -reset projrouter_vitis
+} else {
+        puts "Neither vivado nor vitis is being used."
+}
+
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
