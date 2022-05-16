@@ -45,8 +45,7 @@ void TrackletEngine(
                     const ap_uint<1> bendinnertable[],
                     const ap_uint<1> bendoutertable[],
                     BXType& bx_o,
-		    StubPairMemory& outstubpair,
-                    ap_uint<1> &almost_done) {
+		    StubPairMemory& outstubpair) {
 
 #pragma HLS inline
   ap_uint<kNBits_MemAddr> nstubpairs = 0;
@@ -107,8 +106,6 @@ void TrackletEngine(
   // cycles. Pipeline rewinding does not currently work.
   for (unsigned int istep=0; istep<kMaxProc - kMaxProcOffset(module::TE); istep++) {
 #pragma HLS pipeline II=1 rewind
-
-          almost_done = (istep<kMaxProc - kMaxProcOffset(module::TE) - 2) ? 0 : 1;
 
 	  // pre-fetch element from buffer
 	  auto const bufdata = teBuffer[readindex];

@@ -245,8 +245,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "    TrackletParameterMemory * trackletParameters,\n"
             "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
             "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
-            "    TrackletProjectionMemory<DISK> projout_disk[],\n"
-            "    ap_uint<1> &almost_done\n"
+            "    TrackletProjectionMemory<DISK> projout_disk[]\n"
             ");\n"
         )
 
@@ -262,8 +261,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "    TrackletParameterMemory * trackletParameters,\n"
             "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
             "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
-            "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK],\n"
-            "    ap_uint<1> &almost_done\n"
+            "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
             "#pragma HLS array_partition variable=innerStubs complete dim=1\n"
@@ -295,8 +293,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "    trackletParameters,\n"
             "    projout_barrel_ps,\n"
             "    projout_barrel_2s,\n"
-            "    projout_disk,\n"
-            "    almost_done\n"
+            "    projout_disk\n"
             "  );\n"
             "}\n"
         )

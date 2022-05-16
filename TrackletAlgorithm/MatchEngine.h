@@ -116,8 +116,7 @@ template<TF::layerDisk LayerDisk>
 void MatchEngine(const BXType bx, BXType& bx_o,
 				 const VMStubMEMemory<ModuleType<LayerDisk>(), NBitMemAddr<LayerDisk>(), NBitBin<LayerDisk>()>& inputStubData,
 				 const VMProjectionMemory<ProjectionType<LayerDisk>()>& inputProjectionData,
-				 CandidateMatchMemory& outputCandidateMatch,
-                                 ap_uint<1> &almost_done) {
+				 CandidateMatchMemory& outputCandidateMatch) {
 #pragma HLS inline
 
 	//
@@ -216,8 +215,6 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	STEP_LOOP: for (ap_uint<kNBits_MemAddr> istep=0; istep<kMaxProc - kMaxProcOffset(module::ME); istep++) {
 		#pragma HLS PIPELINE II=1 rewind
 		#pragma HLS DEPENDENCE variable=tail_readindex inter false
-
-                almost_done = (istep<kMaxProc - kMaxProcOffset(module::ME) - 2) ? 0 : 1;
 
 #ifdef DEBUG
 		std::cout << "Circular buffer iteration: " << istep << std::endl;

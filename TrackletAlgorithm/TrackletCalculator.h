@@ -554,8 +554,7 @@ TrackletCalculator(
     TrackletParameterMemory * const trackletParameters,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],
-    TrackletProjectionMemory<DISK> projout_disk[],
-    ap_uint<1> &almost_done
+    TrackletProjectionMemory<DISK> projout_disk[]
 )
 {
   static_assert(Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L2L3, L3L4, and L5L6 seeds have been implemented so far.");
@@ -587,8 +586,6 @@ TrackletCalculator(
 // Loop over all stub pairs.
   stub_pairs: for (TC::Types::nSP i = 0; i < kMaxProc - kMaxProcOffset(module::TC); i++) {
 #pragma HLS pipeline II=1 rewind
-
-    almost_done = (i < kMaxProc - kMaxProcOffset(module::TC) - 2) ? 0 : 1;
 
 // The first iteration is sacrificed to clearing the output memories and
 // zeroing the number of tracklets and projections. Therefore, only

@@ -495,7 +495,6 @@ def writeTopHeader(vmr, output_dir):
             + ("  VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]" + (",\n" if has_vmste_overlap[layerdisk] or has_vmste_outer[layerdisk] else "") if has_vmste_inner[layerdisk] else "")
             + ("  VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]" + (",\n" if has_vmste_outer[layerdisk] else "") if has_vmste_overlap[layerdisk] else "")
             + ("  VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
-            "  , ap_uint<1> &almost_done"
             "  );\n"
             "\n"
             "#endif // TopFunctions_%s_h\n" % file_name
@@ -531,7 +530,6 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             + ("  VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies]" + (",\n" if has_vmste_overlap[layerdisk] or has_vmste_outer[layerdisk] else "") if has_vmste_inner[layerdisk] else "")
             + ("  VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies]" + (",\n" if has_vmste_outer[layerdisk] else "") if has_vmste_overlap[layerdisk] else "")
             + ("  VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
-            "  , ap_uint<1> &almost_done"
             ") {\n"
             "\n"
             "// Takes 2 clock cycles before on gets data, used at high frequencies\n"
@@ -604,7 +602,6 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             "    maskOL, " + ("memoriesOL,\n" if has_vmste_overlap[layerdisk] else "nullptr,\n") +\
             "    // TEOuter memories\n"
             "    maskTEO, " + ("memoriesTEO\n" if has_vmste_outer[layerdisk] else "nullptr\n") +\
-            "    , almost_done"
             "    );\n\n"
             "  return;\n"
             "}\n"

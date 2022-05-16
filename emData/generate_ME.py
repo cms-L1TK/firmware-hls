@@ -62,8 +62,7 @@ def writeModuleToHeader(topHeaderFile, funcName, prefix, layerDisk):
         "void " + funcName + "(const BXType bx, BXType& bx_o,\n"
         + prefix + "const VMStubMEMemory<ModuleType<TF::" + layerDisk + ">(), NBitMemAddr<TF::" + layerDisk + ">(), NBitBin<TF::" + layerDisk + ">()>& inputStubData,\n"
         + prefix + "const VMProjectionMemory<ProjectionType<TF::" + layerDisk + ">()>& inputProjectionData,\n"
-        + prefix + "CandidateMatchMemory& outputCandidateMatch,\n"
-        + prefix + "ap_uint<1> &almost_done);\n\n"
+        + prefix + "CandidateMatchMemory& outputCandidateMatch);\n\n"
     )
 
 def writeModuleToImplementation(topFile, funcName, prefix, layerDisk, label):
@@ -71,8 +70,7 @@ def writeModuleToImplementation(topFile, funcName, prefix, layerDisk, label):
         "\nvoid " + funcName + "(const BXType bx, BXType& bx_o,\n"
         + prefix + "const VMStubMEMemory<ModuleType<TF::" + layerDisk + ">(), NBitMemAddr<TF::" + layerDisk + ">(), NBitBin<TF::" + layerDisk + ">()>& inputStubData,\n"
         + prefix + "const VMProjectionMemory<ProjectionType<TF::" + layerDisk + ">()>& inputProjectionData,\n"
-        + prefix + "CandidateMatchMemory& outputCandidateMatch,\n"
-        + prefix + "ap_uint<1> &almost_done) {\n"
+        + prefix + "CandidateMatchMemory& outputCandidateMatch) {\n"
         "\n"
         "#ifdef  __VITIS_HLS__\n"
         "\t// For use with Vitis >=2020.1\n"
@@ -85,7 +83,7 @@ def writeModuleToImplementation(topFile, funcName, prefix, layerDisk, label):
         "\t#pragma HLS resource variable=inputProjectionData->get_mem() latency=2\n"
         "#endif\n"
         "\n"
-        "\t" + label + ": MatchEngine<TF::" + layerDisk + ">(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch, almost_done);\n"
+        "\t" + label + ": MatchEngine<TF::" + layerDisk + ">(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch);\n"
         "}\n"
     )
 

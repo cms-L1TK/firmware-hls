@@ -536,8 +536,7 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 		// TE Inner memories, overlap
 		const ap_uint<maskOLsize>& maskOL, VMStubTEInnerMemory<BARRELOL> memoriesOL[][MaxOLCopies],
 		// TE Outer memories
-		const ap_uint<masksize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies],
-                ap_uint<1> &almost_done) {
+		const ap_uint<masksize>& maskTEO, VMStubTEOuterMemory<OutType> memoriesTEO[][MaxTEOCopies]) {
 
 #pragma HLS inline
 
@@ -609,8 +608,6 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 
 	TOPLEVEL: for (int i = -1; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
-
-                almost_done = (i < maxLoop - 2) ? 0 : 1;
 
 		// Use first loop iteration to clear the address count arrays.
 		// Putting this inside the loop rather than outside reduces errors when simulating the VHDL top-level in Vivado for bxs
