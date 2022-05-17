@@ -19,13 +19,9 @@ set modules_to_test {
 set module_to_export MC_L3PHIC
 
 # create new project (deleting any existing one of same name)
-if { $tool == "Vivado" } {
-        open_project -reset match_calc_vivado
-} elseif { $tool == "Vitis" } {
-        open_project -reset match_calc_vitis
-} else {
-        puts "Neither vivado nor vitis is being used."
-}
+set project_name "match_calc"
+append project_name $VitisOrVivado
+open_project -reset $project_name
 
 
 # source files

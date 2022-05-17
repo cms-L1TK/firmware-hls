@@ -33,13 +33,9 @@ set modules_to_test {
 set module_to_export TE_L1PHIG27_L2PHID27
 
 # create new project (deleting any existing one of same name)
-if { $tool == "Vivado" } {
-        open_project -reset trackletengine_vivado
-} elseif { $tool == "Vitis" } {
-        open_project -reset trackletengine_vitis
-} else {
-        puts "Neither vivado nor vitis is being used."
-}
+set project_name "trackletengine"
+append project_name $VitisOrVivado
+open_project -reset $project_name
 
 
 # source files

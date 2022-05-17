@@ -26,13 +26,9 @@ if { [file exists ../TrackQuality/parameters.h ] == 1} {
     }
 
 # create new project (deleting any existing one of same name)
-if { $tool == "Vivado" } {
-        open_project -reset trackquality_vivado
-} elseif { $tool == "Vitis" } {
-        open_project -reset trackquality_vitis
-} else {
-        puts "Neither vivado nor vitis is being used."
-}
+set project_name "trackquality"
+append project_name $VitisOrVivado
+open_project -reset $project_name
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackQuality}

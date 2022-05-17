@@ -41,13 +41,9 @@ set modules_to_test {
 set module_to_export PR_L3PHIC
 
 # create new project (deleting any existing one of same name)
-if { $tool == "Vivado" } {
-        open_project -reset projrouter_vivado
-} elseif { $tool == "Vitis" } {
-        open_project -reset projrouter_vitis
-} else {
-        puts "Neither vivado nor vitis is being used."
-}
+set project_name "projrouter"
+append project_name $VitisOrVivado
+open_project -reset $project_name
 
 
 # source files

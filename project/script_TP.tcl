@@ -17,13 +17,10 @@ set modules_to_test {
 set module_to_export TP_L1L2C
 
 # create new project (deleting any existing one of same name)
-if { $tool == "Vivado" } {
-        open_project -reset trackletProcessor_vivado
-} elseif { $tool == "Vitis" } {
-        open_project -reset trackletProcessor_vitis
-} else {
-        puts "Neither vivado nor vitis is being used."
-}
+set project_name "trackletProcessor"
+append project_name $VitisOrVivado
+open_project -reset $project_name
+
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
