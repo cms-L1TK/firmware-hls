@@ -7,13 +7,9 @@
 source env_hls.tcl
 
 # create new project (deleting any existing one of same name)
-if { $tool == "Vivado" } {
-        open_project -reset inputroutervivado
-} elseif { $tool == "Vitis" } {
-        open_project -reset inputroutervitis
-} else {
-        puts "Neither vivado nor vitis is being used."
-}
+set project_name "inputrouter"
+append project_name $VitisOrVivado
+open_project -reset $project_name
 
 
 # source files

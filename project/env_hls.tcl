@@ -15,11 +15,10 @@ if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
 
 
 if {[regexp Vivado $exepath tool]} {
-  puts "Compiling under Vivado"
-  puts $tool
+  set VitisOrVivado "_Vivado"
 } elseif {[regexp Vitis $exepath tool]} {
-  puts "Compiling under Vitis"
-  puts $tool
+  set VitisOrVivado "_Vitis"
 } else {
   puts "Compiling under neither Vivado nor Vitis."
 }
+
