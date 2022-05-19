@@ -19,18 +19,16 @@ class ModuleBuffer{
 
     TrackHandler readTrack();
 
-    bool isEmpty();
-
     void clearBuffer();
 
     private:
       unsigned int readIndex{0};
       unsigned int writeIndex{0};
-      TrackHandler _moduleBuffer[kNBufferSize];
+      TrackHandler trackArray[kNBufferSize];
 };
 
 class ComparisonModule{
-  public:
+    public:
     ComparisonModule()
     {
       tracksProcessed = 0;
@@ -64,8 +62,15 @@ class ComparisonModule{
 
     void process();
 
-    void setInputBuffer(ModuleBuffer *buffer);
-    void setOutputBuffer(ModuleBuffer *buffer);
+    void setInputBuffer(ModuleBuffer* buffer);
+
+    void setOutputBuffer(ModuleBuffer* buffer);
+
+    ModuleBuffer* getInputBuffer();
+
+    ModuleBuffer* getOutputBuffer();
+
+
     
   private:
 
