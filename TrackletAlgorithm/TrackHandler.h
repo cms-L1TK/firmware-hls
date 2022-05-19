@@ -68,7 +68,7 @@ class TrackHandler{
     
     void CompareTrack(TrackHandler track);
 
-    void MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition);
+    bool MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition);
 
     void setDebugFlag(unsigned int debugFlag){
       debug = debugFlag;

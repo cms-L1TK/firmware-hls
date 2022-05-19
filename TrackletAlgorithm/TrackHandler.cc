@@ -35,7 +35,7 @@ void TrackHandler::CompareTrack(TrackHandler track){
   }
 }
 
-void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition){
+bool TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition){
   #pragma HLS inline
   // update #matches found 
   int matchesFound = 0;
@@ -46,6 +46,7 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
   }
   if (matchesFound >= mergeCondition){
     matchFound = 1;
+    return 1;
     #ifndef _SYNTHESIS_
     // std::cout << "It's a merge" << std::endl;
     #endif
@@ -101,5 +102,8 @@ void TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsi
     }
   }
     
-  else matchFound = 0;
+  else {
+    matchFound = 0;
+    return 0; }
+
 }
