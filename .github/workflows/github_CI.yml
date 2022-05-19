@@ -1,0 +1,64 @@
+name: Mirror and run GitLab CI
+
+######################################################################
+# Runs CI on github that triggers CI to run on a mirror gitlab repo. #
+######################################################################
+
+on: # Controls when the action will run.
+  workflow_dispatch:
+  push: # Please add your branch down here if wanted. A build will be triggerd for each push.
+    branches: [HDLTopSim]
+  pull_request:
+    branches: [master, HDLTopSim]
+    
+env:
+  mirror_repo: "https://gitlab.cern.ch/cms-l1tk/firmware-hls" # gitlab mirror
+  current_branch: 'master' # fallback branch
+
+jobs:
+  trigger_gitlab_CI: # https://github.com/marketplace/actions/mirror-to-gitlab-and-run-gitlab-ci
+    name: trigger_gitlab_CI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: DebugPrint
+      run: |
+        echo "github.ref = ${{ github.ref }}"
+
+    - name: Redefine branch on pull_request
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "current_branch=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+
+    - name: Redefine branch on push
+      if: github.event_name == 'push'
+      run: |
+        echo "current_branch=$(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')" >> $GITHUB_ENV
+
+    - name: Trigger gitlab CI run
+      # Communicate between gitlab & github, and trigger gitlab CI run.
+      # (Forked from https://github.com/SvanBoxel/gitlab-mirror-and-ci-action).
+      uses: cms-L1TK/gitlab-mirror-and-ci-action@master
+      env:
+        GITLAB_HOSTNAME: "gitlab.cern.ch"
+        GITLAB_USERNAME: "cms-l1tk"
+        GITLAB_PASSWORD: ${{ secrets.GITLAB_PASSWORD }} # Generate token here: https://gitlab.cern.ch/cms-l1tk/firmware-hls/-/settings/access_tokens and add to GitHub secrets https://github.com/cms-L1TK/firmware-hls/settings/secrets/actions
+        GITLAB_PROJECT_ID: "89897" # ID visible at https://gitlab.cern.ch/cms-l1tk/firmware-hls
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret
+        MIRROR_REPO: ${{ env.mirror_repo }} # gitlab mirror.
+        IS_CMSSW: "false" # Is repo CMSSW or something else (e.g. HLS)?
+        CHECKOUT_BRANCH: ${{ env.current_branch }} # New non-GITHUB variable to make push and PR work
+        REMOVE_BRANCH: "true"
+        REBASE_MASTER: "true"
+        RETURN_FILE: "pipeline_url.txt" # Output file with gitlab pipeline url
+
+    - name: print summary
+      if: always()
+      run: |
+        echo ""
+        echo "==========================================================="
+        echo "DETAILED OUTPUT FROM CMSSW COMPILATION & RUN AVAILABLE "
+        echo "AT FOLLOWING GITLAB CI URL:"
+        cat pipeline_url.txt
+
