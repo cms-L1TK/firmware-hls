@@ -20,7 +20,7 @@ class ModuleBuffer{
     TrackHandler readTrack();
 
     void clearBuffer();
-
+    
     private:
       unsigned int readIndex{0};
       unsigned int writeIndex{0};
@@ -62,13 +62,13 @@ class ComparisonModule{
 
     void process();
 
-    void setInputBuffer(ModuleBuffer* buffer);
+    void setInputBuffer(ModuleBuffer &buffer);
 
-    void setOutputBuffer(ModuleBuffer* buffer);
+    void setOutputBuffer(ModuleBuffer &buffer);
 
-    ModuleBuffer* getInputBuffer();
+    ModuleBuffer getInputBuffer();
 
-    ModuleBuffer* getOutputBuffer();
+    ModuleBuffer getOutputBuffer();
 
 
     
@@ -82,8 +82,8 @@ class ComparisonModule{
 
     TrackHandler masterTrack;
     TrackHandler track;
-    ModuleBuffer* inputBuffer;
-    ModuleBuffer* outputBuffer;
+    ModuleBuffer inputBuffer;
+    ModuleBuffer outputBuffer;
 
 };
 

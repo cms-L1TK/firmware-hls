@@ -3,7 +3,7 @@
 #include <bitset>
 
 void ModuleBuffer::insertTrack(const TrackHandler track){
-  // #pragma HLS inline
+  #pragma HLS inline
   assert(writeIndex < kNBufferSize);
   trackArray[writeIndex] = track;
   #ifndef _SYNTHESIS_ 
@@ -18,7 +18,7 @@ void ModuleBuffer::insertTrack(const TrackHandler track){
 }
 
 TrackHandler ModuleBuffer::readTrack(){
-  // #pragma HLS inline
+  #pragma HLS inline
   #ifndef _SYNTHESIS_
   std::cout << "reading track..." << std::endl;
   #endif
@@ -54,59 +54,61 @@ void ModuleBuffer::clearBuffer(){
 
 
 void ComparisonModule::process(){
-  // #pragma HLS inline
-  // #pragma HLS pipeline
-  TrackHandler track = inputBuffer->readTrack();
+  #pragma HLS inline
+  #pragma HLS pipeline
+  TrackHandler track = inputBuffer.readTrack();
 
-  #ifndef _SYNTHESIS_
-  // std::cout << "inputBufferTrack: " << track.getTrackWord() << std::endl;
-  #endif
-  // if masterTrack is not set and track is not null, set as master
-  // else then if null, do nothing
-  // if track is not null and also have a master set then do compare, merge
+  if (track.getTrackWord() != NULL){
+    #ifndef _SYNTHESIS_
+    std::cout << "inputBufferTrack: " << track.getTrackWord() << std::endl;
+    #endif
+    // if masterTrack is not set and track is not null, set as master
+    // else then if null, do nothing
+    // if track is not null and also have a master set then do compare, merge
 
-  // if (masterTrack.getTrackWord() == NULL && track.getTrackWord() != NULL){
-  //   track = masterTrack;
-  // }
-  // if (masterTrack.getTrackWord() != NULL && track.getTrackWord() != NULL){
-  //   if (masterTrack.getTrackWord() != track.getTrackWord()){
-  //     masterTrack.CompareTrack(track);
-  //     masterTrack.MergeTrack(track, matchFound, mergeCondition);
-  //   }
-  //   if (masterTrack.MergeTrack(track, matchFound, mergeCondition) ==  false){
-  //     outputBuffer.insertTrack(track);
+    // if (masterTrack.getTrackWord() == NULL && track.getTrackWord() != NULL){
+    //   track = masterTrack;
+    // }
+    // if (masterTrack.getTrackWord() != NULL && track.getTrackWord() != NULL){
+    //   if (masterTrack.getTrackWord() != track.getTrackWord()){
+    //     masterTrack.CompareTrack(track);
+    //     masterTrack.MergeTrack(track, matchFound, mergeCondition);
+    //   }
+    //   if (masterTrack.MergeTrack(track, matchFound, mergeCondition) ==  false){
+    //     outputBuffer.insertTrack(track);
 
-  //     #ifndef _SYNTHESIS_
-  //     std::cout << "outputBufferTrack: " << outputBuffer.readTrack().getTrackWord() << std::endl;
-  //     #endif
-  //   }
-  // }
+      #ifndef _SYNTHESIS_
+      std::cout << "outputBufferTrack: " << outputBuffer.readTrack().getTrackWord() << std::endl;
+      #endif
+    //   }
+    // }
 
-  outputBuffer->insertTrack(track);
+    outputBuffer.insertTrack(track);
+    #ifndef _SYNTHESIS_
+    // std::cout << "outputBufferTrack: " << outputBuffer->readTrack().getTrackWord() << std::endl;
+    #endif
+    tracksProcessed++;
+  }
 
-  #ifndef _SYNTHESIS_
-  // std::cout << "outputBufferTrack: " << outputBuffer->readTrack().getTrackWord() << std::endl;
-  #endif
-  tracksProcessed++;
 }
 
-void ComparisonModule::setInputBuffer(ModuleBuffer* buffer){
-  // #pragma HLS inline
+void ComparisonModule::setInputBuffer(ModuleBuffer &buffer){
+  #pragma HLS inline
   inputBuffer = buffer;
 }
 
-void ComparisonModule::setOutputBuffer(ModuleBuffer* buffer){
-  // #pragma HLS inline
+void ComparisonModule::setOutputBuffer(ModuleBuffer &buffer){
+  #pragma HLS inline
   outputBuffer = buffer;
 }
 
-ModuleBuffer* ComparisonModule::getInputBuffer(){
-  // #pragma HLS inline
+ModuleBuffer ComparisonModule::getInputBuffer(){
+  #pragma HLS inline
   return inputBuffer;
 }
 
-ModuleBuffer* ComparisonModule::getOutputBuffer(){
-  // #pragma HLS inline
+ModuleBuffer ComparisonModule::getOutputBuffer(){
+  #pragma HLS inline
   return outputBuffer;
 }
 
@@ -124,27 +126,26 @@ void TrackMerger(const BXType bx,
   TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
   TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
   ){
-    // #pragma HLS inline
-    // #pragma HLS array_partition variable=barrelStubWords complete dim=1
-    // #pragma HLS array_partition variable=diskStubWords complete dim=1
-    // #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
-    // #pragma HLS array_partition variable=diskStubWords_o complete dim=1
-    // #pragma HLS array_partition variable=trackWord_o complete dim=0
+    #pragma HLS inline
+    #pragma HLS array_partition variable=barrelStubWords complete dim=1
+    #pragma HLS array_partition variable=diskStubWords complete dim=1
+    #pragma HLS array_partition variable=barrelStubWords_o complete dim=1
+    #pragma HLS array_partition variable=diskStubWords_o complete dim=1
+    #pragma HLS array_partition variable=trackWord_o complete dim=0
 
     ComparisonModule comparisonModule[kNComparisonModules];
-    // #pragma HLS array_partition variable=comparisonModule complete dim=0
+    #pragma HLS array_partition variable=comparisonModule complete dim=0
 
     ModuleBuffer buffer[kNBuffers];
 
     unsigned int outputIndex{0};
-    unsigned int moduleCounter{1};
 
     // loop over the CMs to set the input/output buffer variables for each CM
     LOOP_SetBuffers:
     for (unsigned int i = 0; i < kNComparisonModules; i++){
-      // #pragma HLS unroll
-      comparisonModule[i].setInputBuffer(&(buffer[i]));
-      comparisonModule[i].setOutputBuffer(&(buffer[i+1]));
+      #pragma HLS unroll
+      comparisonModule[i].setInputBuffer(buffer[i]);
+      comparisonModule[i].setOutputBuffer(buffer[i+1]);
     }
 
     LOOP_InputProc:
@@ -153,12 +154,12 @@ void TrackMerger(const BXType bx,
       std::cout << "track no. : " << i << std::endl;
       #endif
 
-      // #pragma HLS pipeline II=1 REWIND
+      #pragma HLS pipeline II=1 REWIND
       TrackFit::BarrelStubWord barrelStubWordsArray[4];
       TrackFit::DiskStubWord diskStubWordsArray[4];
       LOOP_SetArrays:
       for(unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
-        // #pragma HLS unroll
+        #pragma HLS unroll
         barrelStubWordsArray[layerIndex] = barrelStubWords[layerIndex][i];
         diskStubWordsArray[layerIndex] = diskStubWords[layerIndex][i];
       }
@@ -167,19 +168,17 @@ void TrackMerger(const BXType bx,
 
       // put track into input buffer 0 for CM zero
       // first track in input buffer is master, then comapre against the rest
-      comparisonModule[0].getInputBuffer()->insertTrack(track); // pragmas to write in parallel?
+      comparisonModule[0].getInputBuffer().insertTrack(track); // pragmas to write in parallel?
   
 
       LOOP_ProcTracks:
-      for(unsigned int j = 0; j < moduleCounter; j++){
+      for(unsigned int j = 0; j < kNComparisonModules; j++){
+        #pragma HLS unroll
         #ifndef _SYNTHESIS_
         std::cout << "comparisonModule no. : " << j << std::endl;
         #endif
-        // #pragma HLS unroll
         comparisonModule[j].process();
       }
-      if (moduleCounter != kNComparisonModules){moduleCounter++;}
-
 
         // create a last buffer (so 17 in total) the last buffer is for the output
        // then in main proc loop handle the output buffer - could read it out at the end of the event or in real time
