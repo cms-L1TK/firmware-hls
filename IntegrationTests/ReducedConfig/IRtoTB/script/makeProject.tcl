@@ -12,10 +12,8 @@ set_property ip_repo_paths "./"  [get_filesets sources_1]
 update_ip_catalog -rebuild
 
 # Create .xci files for user HLS IP
-create_ip -name InputRouterTop_IR_DTC_PS_1_B -module_name IR_PS_1_B -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_2S_3_A -module_name IR_2S_3_A -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_PS10G_2_B -module_name IR_PS10G_2_B -vendor xilinx.com -library hls -version 1.0
-create_ip -name InputRouterTop_IR_DTC_2S_3_B -module_name IR_2S_3_B -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_PS10G_1_A -module_name IR_PS10G_1_A -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_2S_2_B -module_name IR_2S_2_B -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_2S_1_A -module_name IR_2S_1_A -vendor xilinx.com -library hls -version 1.0
