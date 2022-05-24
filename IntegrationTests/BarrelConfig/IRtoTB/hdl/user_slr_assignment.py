@@ -38,11 +38,11 @@ for line in fin:
     elif inMem:
         if "entity work" in line:
             currentMemName = line.split()[0]
-        elif " wea " in line:
-            weaName = line.split()[2].split("(")[0]
-            memLoopNames[weaName] = currentLoopName
-            memEnumNames[weaName] = currentEnumName
-            memNames[weaName] = currentMemName
+        elif " enb " in line:
+            enbName = line.split()[2].split("(")[0]
+            memLoopNames[enbName] = currentLoopName
+            memEnumNames[enbName] = currentEnumName
+            memNames[enbName] = currentMemName
         elif "end generate" in line:
             inMem = False
 
@@ -52,12 +52,12 @@ for line in fin:
         if currentProcName not in procMems:
             procMems[currentProcName] = []
     elif inProc:
-        if "_wea" in line:
-            weaName = line.split()[2].split("(")[0]
+        if "_enb" in line:
+            enbName = line.split()[2].split("(")[0]
             enumVal = line.split()[2].split("(")[1].split(")")[0]
-            memLoopName = memLoopNames[weaName]
-            memEnumName = memEnumNames[weaName]
-            memName = memNames[weaName]
+            memLoopName = memLoopNames[enbName]
+            memEnumName = memEnumNames[enbName]
+            memName = memNames[enbName]
             enumIndex = enumVals[memEnumName].index(enumVal)
             cellName = memLoopName + "[" + str(enumIndex) + "]." + memName
             procMems[currentProcName].append(cellName)
