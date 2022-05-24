@@ -98,6 +98,10 @@ end read_tf_ultra_data;
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_ultra_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
+signal wea0 : std_logic;
+signal addra0 : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+signal dina0 : std_logic_vector(RAM_WIDTH-1 downto 0);
+
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 attribute ram_style of sa_RAM_data : signal is "ultra";
@@ -130,10 +134,15 @@ begin
       end if;
     end if;
     if (wea='1') then
-      sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
+      wea0 <= wea;
+      addra0 <= addra;
+      dina0 <= dina;
+    end if;
+    if (wea0='1') then
+      sa_RAM_data(to_integer(unsigned(addra0))) <= dina0; -- Write data
       -- Count entries
-      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra0(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
+      addr_in_page := to_integer(unsigned(addra0(clogb2(PAGE_LENGTH)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       if (addr_in_page = 0) then
         nent_o(page) <= std_logic_vector(to_unsigned(1, nent_o(page)'length)); -- <= 1 (slv)

@@ -100,6 +100,10 @@ end read_tf_mem_data;
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
+signal wea0 : std_logic;
+signal addra0 : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+signal dina0 : std_logic_vector(RAM_WIDTH-1 downto 0);
+
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 attribute ram_style of sa_RAM_data : signal is "block";
@@ -135,20 +139,25 @@ begin
       end if;
     end if;
     if (wea='1') then
-      sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
+      wea0 <= wea;
+      addra0 <= addra;
+      dina0 <= dina;
+    end if;
+    if (wea0='1') then
+      sa_RAM_data(to_integer(unsigned(addra0))) <= dina0; -- Write data
       -- Count entries
-      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      vi_nent_idx := to_integer(shift_right(unsigned(addra0), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
-      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra0(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
+      addr_in_page := to_integer(unsigned(addra0(clogb2(PAGE_LENGTH)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       if (addr_in_page = 0) then
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
       else
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
       end if; 
-    end if; -- (wea='1')
+    end if; -- (wea0='1')
   end if;
 end process;
 
