@@ -22,27 +22,29 @@ entity CreateStartSignal is
     CLK   : in  std_logic;
     RESET : in  std_logic;
     DONE  : in  std_logic; --! Done signal of last algo module in chain
-    VLD   : in  std_logic;
-    START : out std_logic  --! Start signal of next algo module in chain
+    BX_OUT  : in  std_logic_vector(2 downto 0);
+    START : out std_logic;  --! Start signal of next algo module in chain
+    BX : out std_logic_vector(2 downto 0)
   ); 
 end CreateStartSignal;
 
 
 architecture behavior of CreateStartSignal is
   signal DONE_LATCH : std_logic := '0';
+  signal BX_LATCH : std_logic_vector(2 downto 0);
 begin
 
 START <= DONE_LATCH; --! Latch goes high 1 clk after "done", so need OR of both.
+BX <= BX_LATCH;
 
 procLatch : process(CLK)
 begin
 
   if rising_edge(CLK) then
 
-    if VLD = '1' then
-      if DONE = '1' then
-        DONE_LATCH <= DONE;
-      end if;
+    if DONE = '1' then
+      DONE_LATCH <= DONE;
+      BX_LATCH <= BX_OUT;
     end if;
 
     if (RESET = '1') then
