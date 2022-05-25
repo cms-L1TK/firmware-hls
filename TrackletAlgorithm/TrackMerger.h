@@ -7,7 +7,8 @@
 
 const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kNBufferSize = 108; // total no. of tracks
+const unsigned int kNBufferSize = 1;
+const unsigned int kNLastBufferSize = 108;
 
 class ModuleBuffer{
   public:
@@ -60,17 +61,11 @@ class ComparisonModule{
 
     unsigned int getEndOfModule(){return endOfModule;}
 
-    void process();
+    void process(ModuleBuffer &inputBuffer, ModuleBuffer &outputBuffer);
 
-    void setInputBuffer(ModuleBuffer &buffer);
+    // void setInputBuffer(ModuleBuffer &buffer);
 
-    void setOutputBuffer(ModuleBuffer &buffer);
-
-    ModuleBuffer getInputBuffer();
-
-    ModuleBuffer getOutputBuffer();
-
-
+    // void setOutputBuffer(ModuleBuffer &buffer);
     
   private:
 
@@ -82,8 +77,8 @@ class ComparisonModule{
 
     TrackHandler masterTrack;
     TrackHandler track;
-    ModuleBuffer inputBuffer;
-    ModuleBuffer outputBuffer;
+    // ModuleBuffer inputBuffer;
+    // ModuleBuffer outputBuffer;
 
 };
 
