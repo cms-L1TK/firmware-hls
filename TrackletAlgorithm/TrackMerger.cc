@@ -127,8 +127,7 @@ void TrackMerger(const BXType bx,
     #pragma HLS array_partition variable=comparisonModule complete dim=0
 
     ModuleBuffer buffer[kNBuffers];
-    ModuleBuffer lastBuffer[kNLastBufferSize];
-    #pragma HLS array_partition variable=lastBuffer complete dim=0
+    #pragma HLS array_partition variable=buffer complete dim=0
 
 
     unsigned int outputIndex{0};

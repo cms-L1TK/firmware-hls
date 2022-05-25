@@ -42,7 +42,7 @@ int main(){
     cout << "Event: " << dec << ievt << endl;
     
 
-    for (unsigned short i = 0; i < kMaxProc; ++i){
+    for (unsigned short i = 0; i < kMaxProc; ++i){ 
       trackWord[i] = TrackFit::TrackWord(0);
       for (unsigned short j = 0; j < 4; j++){
         barrelStubWords[j][i] = TrackFit::BarrelStubWord(0);

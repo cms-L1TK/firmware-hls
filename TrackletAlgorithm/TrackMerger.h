@@ -7,8 +7,7 @@
 
 const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kNBufferSize = 1;
-const unsigned int kNLastBufferSize = 108;
+const unsigned int kNBufferSize = 108;
 
 class ModuleBuffer{
   public:

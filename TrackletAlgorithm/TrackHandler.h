@@ -9,7 +9,7 @@ const unsigned int kBarrelStubIndexSizeMSB = TrackFit::kTFBarrelStubRSize + Trac
 const unsigned int kBarrelStubIndexSizeLSB = TrackFit::kTFBarrelStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFZResidSize;
 const unsigned int kDiskStubIndexSizeMSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize + TrackFit::kTFStubIndexSize;
 const unsigned int kDiskStubIndexSizeLSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize;
-const int layerStubIndexSize = 10;
+const int layerStubIndexSize = 10; //7
 
 class TrackHandler{
   public:
