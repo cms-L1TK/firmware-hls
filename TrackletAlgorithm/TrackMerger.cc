@@ -29,9 +29,9 @@ TrackHandler ModuleBuffer::readTrack(){
     std::cout << "trackArray[readIndex]: " << trackArray[readIndex].getTrackWord() << " writeIndex: " << writeIndex << " readIndex: " << readIndex << std::endl;
     #endif
     readIndex++;
-      #ifndef _SYNTHESIS_
-      std::cout << "readIndex: " << readIndex << std::endl;
-      #endif
+    #ifndef _SYNTHESIS_
+    std::cout << "readIndex: " << readIndex << std::endl;
+    #endif
     return track;
   } // else return a null track
   else if (readIndex == writeIndex){ 
@@ -53,14 +53,17 @@ void ModuleBuffer::clearBuffer(){
 }
 
 
-void ComparisonModule::process(){
+void ComparisonModule::process(ModuleBuffer &inputBuffer, ModuleBuffer &outputBuffer){
   #pragma HLS inline
   #pragma HLS pipeline
   TrackHandler track = inputBuffer.readTrack();
-
-  if (track.getTrackWord() != NULL){
     #ifndef _SYNTHESIS_
     std::cout << "inputBufferTrack: " << track.getTrackWord() << std::endl;
+    #endif
+
+  if (track.getTrackWord() != 0){
+    #ifndef _SYNTHESIS_
+    std::cout << "condition met, inputBufferTrack: " << track.getTrackWord() << std::endl;
     #endif
     // if masterTrack is not set and track is not null, set as master
     // else then if null, do nothing
@@ -76,41 +79,28 @@ void ComparisonModule::process(){
     //   }
     //   if (masterTrack.MergeTrack(track, matchFound, mergeCondition) ==  false){
     //     outputBuffer.insertTrack(track);
-
-      #ifndef _SYNTHESIS_
-      std::cout << "outputBufferTrack: " << outputBuffer.readTrack().getTrackWord() << std::endl;
-      #endif
     //   }
     // }
 
     outputBuffer.insertTrack(track);
     #ifndef _SYNTHESIS_
-    // std::cout << "outputBufferTrack: " << outputBuffer->readTrack().getTrackWord() << std::endl;
+    // std::cout << "outputBufferTrack: " << outputBuffer.readTrack().getTrackWord() << std::endl;
     #endif
     tracksProcessed++;
   }
 
 }
 
-void ComparisonModule::setInputBuffer(ModuleBuffer &buffer){
-  #pragma HLS inline
-  inputBuffer = buffer;
-}
+// void ComparisonModule::setInputBuffer(ModuleBuffer &buffer){
+//   #pragma HLS inline
+//   inputBuffer = buffer;
+// }
 
-void ComparisonModule::setOutputBuffer(ModuleBuffer &buffer){
-  #pragma HLS inline
-  outputBuffer = buffer;
-}
+// void ComparisonModule::setOutputBuffer(ModuleBuffer &buffer){
+//   #pragma HLS inline
+//   outputBuffer = buffer;
+// }
 
-ModuleBuffer ComparisonModule::getInputBuffer(){
-  #pragma HLS inline
-  return inputBuffer;
-}
-
-ModuleBuffer ComparisonModule::getOutputBuffer(){
-  #pragma HLS inline
-  return outputBuffer;
-}
 
 ModuleBuffer::ModuleBuffer() : trackArray() {}
 
@@ -137,16 +127,19 @@ void TrackMerger(const BXType bx,
     #pragma HLS array_partition variable=comparisonModule complete dim=0
 
     ModuleBuffer buffer[kNBuffers];
+    ModuleBuffer lastBuffer[kNLastBufferSize];
+    #pragma HLS array_partition variable=lastBuffer complete dim=0
+
 
     unsigned int outputIndex{0};
 
     // loop over the CMs to set the input/output buffer variables for each CM
-    LOOP_SetBuffers:
-    for (unsigned int i = 0; i < kNComparisonModules; i++){
-      #pragma HLS unroll
-      comparisonModule[i].setInputBuffer(buffer[i]);
-      comparisonModule[i].setOutputBuffer(buffer[i+1]);
-    }
+    // LOOP_SetBuffers:
+    // for (unsigned int i = 0; i < kNComparisonModules; i++){
+    //   #pragma HLS unroll
+    //   comparisonModule[i].setInputBuffer(buffer[i]);
+    //   comparisonModule[i].setOutputBuffer(buffer[i+1]);
+    // }
 
     LOOP_InputProc:
     for (int i = 0; i < kMaxProc; i++){ 
@@ -168,7 +161,9 @@ void TrackMerger(const BXType bx,
 
       // put track into input buffer 0 for CM zero
       // first track in input buffer is master, then comapre against the rest
-      comparisonModule[0].getInputBuffer().insertTrack(track); // pragmas to write in parallel?
+      
+      // pragmas to write in parallel?
+      buffer[0].insertTrack(track);
   
 
       LOOP_ProcTracks:
@@ -177,8 +172,11 @@ void TrackMerger(const BXType bx,
         #ifndef _SYNTHESIS_
         std::cout << "comparisonModule no. : " << j << std::endl;
         #endif
-        comparisonModule[j].process();
+        comparisonModule[j].process(buffer[j], buffer[j+1]);
+
       }
+      
+
 
         // create a last buffer (so 17 in total) the last buffer is for the output
        // then in main proc loop handle the output buffer - could read it out at the end of the event or in real time
