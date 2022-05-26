@@ -566,15 +566,6 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   constexpr unsigned int kNBitsPTLutInner = (Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512);
   constexpr unsigned int kNBitsPTLutOuter = (Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512);
 
-  static ap_uint<1> stubptinnerlut[kNBitsPTLutInner] =
-#  include "../emData/TP/tables/TP_L1L2C_stubptinnercut.tab"    
-  static ap_uint<1> stubptouterlut[kNBitsPTLutOuter] =
-#  include "../emData/TP/tables/TP_L1L2C_stubptoutercut.tab"    
-
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlut complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptouterlut complete dim=1
-
-
   TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion> teunits[NTEUnits];
 #pragma HLS array_partition variable=teunits complete dim=1
 
@@ -749,11 +740,11 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
       
       auto ptinnerindex = (idphitmp, innerbend);
       auto ptouterindex = (idphitmp, outerbend);
-      //ap_uint<1> lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
-      //ap_uint<1> lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
+      ap_uint<1> lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
+      ap_uint<1> lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
       
-      ap_uint<1> lutinner = stubptinnerlut[ptinnerindex];
-      ap_uint<1> lutouter = stubptouterlut[ptouterindex];
+      //ap_uint<1> lutinner = stubptinnerlut[ptinnerindex];
+      //ap_uint<1> lutouter = stubptouterlut[ptouterindex];
       
       ap_uint<1> savestub = teunits[k].good___ && inrange && lutinner && lutouter && rzcut;
       //std::cout<<" teunits[k].good: "<<teunits[k].good___<<" savestub: "<<savestub<<" inrange: "<<inrange<<" lutinner:  "<<lutinner<<" lutouter: "<<lutouter<<" rzcut: "<<rzcut<<std::endl;
