@@ -37,6 +37,7 @@ entity tf_mem is
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
     DEBUG           : boolean := false;             --! If true prints debug info
+    RAM_TYPE : string := "BLOCK";
     DELAY : natural := 0
     );
   port (
@@ -110,7 +111,7 @@ signal dina_pipe : t_dina;
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
-attribute ram_style of sa_RAM_data : signal is "block";
+attribute ram_style of sa_RAM_data : signal is RAM_TYPE;
 
 begin
 
