@@ -18,6 +18,9 @@ use work.tf_pkg.all;
 -- ==================================================================
 
 entity CreateStartSignal is
+  generic (
+    DELAY : natural := 0
+  );
   port (
     CLK   : in  std_logic;
     RESET : in  std_logic;
@@ -30,12 +33,14 @@ end CreateStartSignal;
 
 
 architecture behavior of CreateStartSignal is
-  signal DONE_LATCH : std_logic := '0';
-  signal BX_LATCH : std_logic_vector(2 downto 0);
+  type t_DONE_LATCH is array(0 to DELAY-1) of std_logic;
+  signal DONE_LATCH : t_DONE_LATCH := (others => '0');
+  type t_BX_LATCH is array(0 to DELAY-1) of std_logic_vector(2 downto 0);
+  signal BX_LATCH : t_BX_LATCH;
 begin
 
-START <= DONE_LATCH; --! Latch goes high 1 clk after "done", so need OR of both.
-BX <= BX_LATCH;
+START <= DONE_LATCH(DELAY-1);
+BX <= BX_LATCH(DELAY-1);
 
 procLatch : process(CLK)
 begin
@@ -43,13 +48,18 @@ begin
   if rising_edge(CLK) then
 
     if DONE = '1' then
-      DONE_LATCH <= DONE;
-      BX_LATCH <= BX_OUT;
+      DONE_LATCH(0) <= DONE;
+      BX_LATCH(0) <= BX_OUT;
     end if;
 
     if (RESET = '1') then
-      DONE_LATCH <= '0';
+      DONE_LATCH(0) <= '0';
     end if;
+
+    for ii in 1 to DELAY-1 loop
+      DONE_LATCH(ii) <= DONE_LATCH(ii-1);
+      BX_LATCH(ii) <= BX_LATCH(ii-1);
+    end loop;
 
   end if;
 

@@ -36,7 +36,8 @@ entity tf_mem is
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
-    DEBUG           : boolean := false             --! If true prints debug info
+    DEBUG           : boolean := false;             --! If true prints debug info
+    DELAY : natural := 0
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -100,9 +101,12 @@ end read_tf_mem_data;
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
-signal wea0 : std_logic;
-signal addra0 : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
-signal dina0 : std_logic_vector(RAM_WIDTH-1 downto 0);
+type t_wea is array (0 to DELAY-1) of std_logic;
+type t_addra is array (0 to DELAY-1) of std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+type t_dina is array (0 to DELAY-1) of std_logic_vector(RAM_WIDTH-1 downto 0);
+signal wea_pipe : t_wea;
+signal addra_pipe : t_addra;
+signal dina_pipe : t_dina;
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
@@ -138,19 +142,27 @@ begin
         vi_page_cnt := 0;
       end if;
     end if;
+
     if (wea='1') then
-      wea0 <= wea;
-      addra0 <= addra;
-      dina0 <= dina;
+      wea_pipe(0) <= wea;
+      addra_pipe(0) <= addra;
+      dina_pipe(0) <= dina;
     end if;
-    if (wea0='1') then
+
+    for ii in 1 to DELAY-1 loop
+      wea_pipe(ii) <= wea_pipe(ii-1);
+      addra_pipe(ii) <= addra_pipe(ii-1);
+      dina_pipe(ii) <= dina_pipe(ii-1);
+    end loop;
+
+    if (wea_pipe(DELAY-1)='1') then
       if DEBUG then
-        report "tm_mem "&NAME&" writeaddr "&to_bstring(addra0)&" "&to_bstring(dina0);
+        report "tm_mem "&NAME&" writeaddr "&to_bstring(addra_pipe(DELAY-1))&" "&to_bstring(dina_pipe(DELAY-1));
       end if;
-      sa_RAM_data(to_integer(unsigned(addra0))) <= dina0; -- Write data
+      sa_RAM_data(to_integer(unsigned(addra_pipe(DELAY-1)))) <= dina_pipe(DELAY-1); -- Write data
       -- Count entries
-      page := to_integer(unsigned(addra0(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra0(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra_pipe(DELAY-1)(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
+      addr_in_page := to_integer(unsigned(addra_pipe(DELAY-1)(clogb2(PAGE_LENGTH)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       if (addr_in_page = 0) then
         nent_o(page) <= std_logic_vector(to_unsigned(1, nent_o(page)'length)); -- <= 1 (slv)
