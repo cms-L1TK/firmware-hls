@@ -77,6 +77,8 @@ These correspond to LUT used internally by the algo steps.
 
 ## Corresponding CMSSW L1 track emulation
 
+### Full configuration
+
 The files that are downloaded by emData/download.sh were created by the CMSSSW L1 track emulation, with the the following recipe (adapted from the [L1TrackSoftware TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/L1TrackSoftware)).
 
 ```bash
@@ -104,14 +106,6 @@ A few configuration changes were made in order to output test vectors and lookup
 …
 ```
 
-In addition, if you would like to run the configuration with the combined modules (i.e., the TrackletProcessor and MatchProcessor), you can do this by setting
-
-```c++
-…
-    bool combined_{true};  // use combined TP (TE+TC) and MP (PR+ME+MC) configuration
-…
-```
-
 Then compilation was done with the usual command:
 
 ```bash
@@ -126,22 +120,46 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 …
 ```
 
-Also, the following customization is needed:
+Also, in the same file, the algorithm was set to HYBRID_NEWKF:
 
 ```python
 …
-# HYBRID: prompt tracking
-if (L1TRKALGO == 'HYBRID'):
-    process.TTTracksEmulation = cms.Path(process.L1HybridTracks)
-    process.TTTracksEmulationWithTruth = cms.Path(process.L1HybridTracksWithAssociators)
-
-    # Add the following two lines
-    from L1Trigger.TrackFindingTracklet.Customize_cff import *
-    fwConfig( process )
+# Set L1 tracking algorithm:
+# 'HYBRID' (baseline, 4par fit) or 'HYBRID_DISPLACED' (extended, 5par fit).
+# 'HYBRID_NEWKF' (baseline, 4par fit, with bit-accurate KF emulation),
+# 'HYBRID_REDUCED' to use the "Summer Chain" configuration with reduced inputs.
+# (Or legacy algos 'TMTT' or 'TRACKLET').
+L1TRKALGO = 'HYBRID_NEWKF'
 …
 ```
 
-Finally, if you would like to run the reduced configuration used for the summer/skinny chain, change the algorithm to HYBRID_REDUCED:
+Finally, the emulation was run with:
+
+```bash
+cd L1Trigger/TrackFindingTracklet/test/
+cmsRun L1TrackNtupleMaker_cfg.py
+```
+
+### Reduced configuration
+
+The files for the reduced configuration used for the summer/skinny chain were
+created by first running the full configuration as described above. Then, the
+[project_generation_scripts](https://github.com/cms-L1TK/project_generation_scripts)
+repo was cloned, the wiring files for the full configuration were copied, the
+makeReducedConfig.py script was run, and the wiring files for the reduced
+configuration were copied back into the release:
+
+```bash
+cd $CMSSW_BASE/../
+git clone https://github.com/cms-L1TK/project_generation_scripts.git
+cd project_generation_scripts/
+cp $CMSSW_BASE/src/L1Trigger/TrackFindingTracklet/data/LUTs/*.dat ./
+./makeReducedConfig.py --no-graph
+cp -fv reduced_*.dat $CMSSW_BASE/src/L1Trigger/TrackFindingTracklet/data/
+cd -
+```
+
+The algorithm was changed to HYBRID_REDUCED:
 
 ```python
 …
@@ -154,10 +172,98 @@ L1TRKALGO = 'HYBRID_REDUCED'
 …
 ```
 
-The emulation is then run with:
+Finally, the emulation was rerun as for the full configuration:
 
 ```bash
-cd L1Trigger/TrackFindingTracklet/test/
+cmsRun L1TrackNtupleMaker_cfg.py
+```
+
+### Configuration with combined modules
+
+The files for the configuration with combined modules (i.e., the
+TrackletProcessor and MatchProcessor) were created with the same recipe as for
+the full configuration described above, except the `combined_` parameter was
+also set to true in L1Trigger/TrackFindingTracklet/interface/Settings.h:
+
+```c++
+…
+    bool combined_{true};  // use combined TP (TE+TC) and MP (PR+ME+MC) configuration
+…
+```
+
+Compilation was done again with the usual command:
+
+```bash
+cd $CMSSW_BASE/src/
+scram b -j8
+cd -
+```
+
+The algorithm was reset to HYBRID_NEWKF:
+
+```python
+…
+# Set L1 tracking algorithm:
+# 'HYBRID' (baseline, 4par fit) or 'HYBRID_DISPLACED' (extended, 5par fit).
+# 'HYBRID_NEWKF' (baseline, 4par fit, with bit-accurate KF emulation),
+# 'HYBRID_REDUCED' to use the "Summer Chain" configuration with reduced inputs.
+# (Or legacy algos 'TMTT' or 'TRACKLET').
+L1TRKALGO = 'HYBRID_NEWKF'
+…
+```
+
+Finally, the emulation was rerun as before:
+
+```bash
+cmsRun L1TrackNtupleMaker_cfg.py
+```
+
+### Barrel-only configuration (very preliminary)
+
+The files for the barrel-only configuration were created by first running the
+full configuration as described above. Then, the head of the barrel_config
+branch of the emulation was checked out and compiled:
+
+```bash
+cd $CMSSW_BASE/src/
+git ls-files -m | xargs git checkout --
+git cms-checkout-topic -u cms-L1TK:e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
+scram b -j8
+cd -
+```
+
+The
+[project_generation_scripts](https://github.com/cms-L1TK/project_generation_scripts)
+repo was cloned, the wiring files for the full configuration were copied, the
+makeBarrelConfig.py script was run, and the wiring files for the barrel-only
+configuration were copied back into the release:
+
+```bash
+cd $CMSSW_BASE/../
+git clone https://github.com/cms-L1TK/project_generation_scripts.git
+cd project_generation_scripts/
+cp $CMSSW_BASE/src/L1Trigger/TrackFindingTracklet/data/LUTs/*.dat ./
+./makeBarrelConfig.py
+cp -fv barrel_*.dat $CMSSW_BASE/src/L1Trigger/TrackFindingTracklet/data/
+cd -
+```
+
+The algorithm was reset to HYBRID_NEWKF:
+
+```python
+…
+# Set L1 tracking algorithm:
+# 'HYBRID' (baseline, 4par fit) or 'HYBRID_DISPLACED' (extended, 5par fit).
+# 'HYBRID_NEWKF' (baseline, 4par fit, with bit-accurate KF emulation),
+# 'HYBRID_REDUCED' to use the "Summer Chain" configuration with reduced inputs.
+# (Or legacy algos 'TMTT' or 'TRACKLET').
+L1TRKALGO = 'HYBRID_NEWKF'
+…
+```
+
+Finally, the emulation was rerun as before:
+
+```bash
 cmsRun L1TrackNtupleMaker_cfg.py
 ```
 

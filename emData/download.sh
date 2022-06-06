@@ -14,7 +14,7 @@ luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
-# 67c7c4e4d57c09b925b683cf1d2552c63c6ee62d
+# e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
 memprints_url_barrel="https://cernbox.cern.ch/index.php/s/2Ju0bMoBnRK1B8n/download"
 luts_url_barrel="https://cernbox.cern.ch/index.php/s/DLJv9VGrjFrZUSQ/download"
 
