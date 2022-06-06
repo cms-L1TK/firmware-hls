@@ -691,7 +691,7 @@ begin
       ap_start => VMR_start,
       ap_idle  => open,
       ap_ready => open,
-      ap_done  => open,
+      ap_done  => VMR_done,
       bx_V          => IR_bx_out,
       bx_o_V        => VMR_bx_out,
       bx_o_V_ap_vld => VMR_bx_out_vld,
