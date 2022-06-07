@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_220220 ####
+#### fw_synch_220523 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/7H3StfracwrVUAe/download"
-luts_url="https://cernbox.cern.ch/index.php/s/SUd6tEO970wKNnZ/download"
+memprints_url="https://cernbox.cern.ch/index.php/s/pmcFjHWj2oPgESW/download"
+luts_url="https://cernbox.cern.ch/index.php/s/i0kr2DI0SFY5m1A/download"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/qBKvAmfu83SpAGD/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/GJZA1zLnWg3hP4y/download"
+memprints_url_reduced="https://cernbox.cern.ch/index.php/s/6pM48rxtsxrN9tg/download"
+luts_url_reduced="https://cernbox.cern.ch/index.php/s/U84ZI1vGnVKkQKc/download"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/YcqX3KUgFdZyMG6/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/lKrxzKJ0XmelE0j/download"
+memprints_url_cm="https://cernbox.cern.ch/index.php/s/Nk0VWN7kRMZSFWm/download"
+luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
-# 16ac97bf7463ad54a5ca91afac44997b8cad1b3e
-memprints_url_barrel="https://cernbox.cern.ch/index.php/s/4bav5YoSOEK3NIg/download"
-luts_url_barrel="https://cernbox.cern.ch/index.php/s/myeIctCD1huekgq/download"
+# e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
+memprints_url_barrel="https://cernbox.cern.ch/index.php/s/2Ju0bMoBnRK1B8n/download"
+luts_url_barrel="https://cernbox.cern.ch/index.php/s/DLJv9VGrjFrZUSQ/download"
 
 # Function that prints information regarding the usage of this command
 function usage() {
