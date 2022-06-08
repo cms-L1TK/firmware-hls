@@ -1308,6 +1308,7 @@ void MatchCalculator(BXType bx,
     std::cout << "isPSStub=" << isPSStub << std::endl;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
     typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
+
     if(isDisk && isPSStub) {
       delta_r   = (stub_ps_r >> shiftr) - proj_r_long; // proj_z = RZ
     }
@@ -1328,6 +1329,7 @@ void MatchCalculator(BXType bx,
     std::cout << "(irstub) stub_r=" << stub_r << std::endl;
     std::cout << "(irstub) stub_ps_r=" << stub_ps_r << std::endl;
     std::cout << "(irstub) stub_2s_r=" << stub_2s_r << std::endl;
+    std::cout << "(irstubr) tmp_stubr=" << tmp_stubr << std::endl;
     std::cout << "(ideltar) delta_r=" << delta_r << "\t" << std::bitset<11>(delta_r) << std::endl;
 
     // Full match parameters
@@ -1379,8 +1381,9 @@ void MatchCalculator(BXType bx,
     std::cout << "((abs_delta_phi * stub_r) < LUT_matchcut_2Srphi[proj_seed])=" << ((abs_delta_phi * stub_r) < LUT_matchcut_2Srphi[proj_seed]) << std::endl;
     std::cout << "abs_delta_r=" << abs_delta_r << std::endl;
     std::cout << "LUT_matchcut_2Sr[proj_seed]=" << LUT_matchcut_2Sr[proj_seed] << std::endl;
+    std::cout << "(idrcut) LUT_matchcut_2Sr[proj_seed]=" << LUT_matchcut_2Sr[proj_seed] << std::endl;
     std::cout << "(abs_delta_r < LUT_matchcut_2Sr[proj_seed])=" << (abs_delta_r < LUT_matchcut_2Sr[proj_seed]) << std::endl;
-    bool disk_match = isPSStub ? ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < LUT_matchcut_2Srphi[proj_seed]) && (abs_delta_r < best_delta_r);
+    bool disk_match = isPSStub ? ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     std::cout << "disk_match=" << disk_match << std::endl;
     if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
