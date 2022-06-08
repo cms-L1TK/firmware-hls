@@ -744,7 +744,7 @@ void MatchCalculator(BXType bx,
   const auto LUT_matchcut_rphi_depth = 12;
   const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
   const auto LUT_matchcut_alpha_depth = 10;
-  const auto LUT_matchcut_r_width = 8;
+  const auto LUT_matchcut_r_width = 12;
   const auto LUT_matchcut_r_depth = 12;
   const auto LUT_matchcut_rDSS_width = 12;
   const auto LUT_matchcut_rDSS_depth = 10;
@@ -776,10 +776,9 @@ void MatchCalculator(BXType bx,
   readTable_rDSS<RDSS,LAYER,LUT_matchcut_rDSS_width,LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
 
   // Initialize MC delta phi cut variables
-  ap_uint<LUT_matchcut_z_width> best_delta_z;
-  ap_uint<LUT_matchcut_phi_width> best_delta_phi;
-  ap_uint<LUT_matchcut_rphi_width> best_delta_rphi;
-  ap_uint<LUT_matchcut_r_width> best_delta_r;
+  ap_uint<17> best_delta_phi;
+  ap_uint<20> best_delta_rphi;
+  ap_uint<12> best_delta_r;
 
   // Bool and ID needed for determining if processing a new tracklet
   CandidateMatch::CMProjIndex id;
@@ -1324,6 +1323,7 @@ void MatchCalculator(BXType bx,
     }
     std::cout << "(ircorr) proj_r_corr=" << proj_r_corr << std::endl;
     ap_int<12> abs_delta_r    = iabs<12>( delta_r );
+    typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
     std::cout << "(ideltaphi) delta_phi=" << delta_phi << std::endl;
     std::cout << "(irstub) stub_r=" << stub_r << std::endl;
     std::cout << "(irstub) stub_ps_r=" << stub_ps_r << std::endl;
@@ -1369,6 +1369,8 @@ void MatchCalculator(BXType bx,
     // For first tracklet, pick up the phi cut value
     best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
+    best_delta_rphi = (newtracklet && isPSStub)? LUT_matchcut_PSrphi[proj_seed] : (isPSStub)? best_delta_rphi : (newtracklet)? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi;
+    best_delta_r    = (newtracklet)? LUT_matchcut_2Sr[proj_seed] : best_delta_r;
   
     // Check that matches fall within the selection window of the projection 
     bool barrel_match = (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
@@ -1378,19 +1380,14 @@ void MatchCalculator(BXType bx,
     std::cout << "abs_delta_r=" << abs_delta_r << std::endl;
     std::cout << "LUT_matchcut_2Sr[proj_seed]=" << LUT_matchcut_2Sr[proj_seed] << std::endl;
     std::cout << "(abs_delta_r < LUT_matchcut_2Sr[proj_seed])=" << (abs_delta_r < LUT_matchcut_2Sr[proj_seed]) << std::endl;
-    bool disk_match = isPSStub ? ((abs_delta_phi * stub_r) < LUT_matchcut_PSrphi[proj_seed]) && (abs_delta_r < LUT_matchcut_2Sr[proj_seed]) : ((abs_delta_phi * stub_r) < LUT_matchcut_2Srphi[proj_seed]) && (abs_delta_r < LUT_matchcut_2Sr[proj_seed]);
+    bool disk_match = isPSStub ? ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < LUT_matchcut_2Srphi[proj_seed]) && (abs_delta_r < best_delta_r);
     std::cout << "disk_match=" << disk_match << std::endl;
     if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
-      if(isDisk) {
-        best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * ap_uint<12>(stub_ps_r)) : ap_uint<20>(abs_delta_phi * disk_stubr);
-        best_delta_r    = abs_delta_r;
-      }
-      else {
-        best_delta_z = iabs<14>(delta_z_fact);
-        best_delta_phi = abs_delta_phi;
-      }
+      best_delta_phi = abs_delta_phi;
+      best_delta_rphi = abs_delta_phi * tmp_stubr;
+      best_delta_r    = abs_delta_r;
 
       // Store bestmatch
       bestmatch_next = fm;
