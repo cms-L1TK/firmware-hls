@@ -1194,7 +1194,6 @@ void MatchCalculator(BXType bx,
     std::cout << "==== New datasteram ====" << std::endl;
     auto projid = datastream.getProjIndex();
     auto stubid = datastream.getStubIndex();
-    auto isPSStub = datastream.getIsPSStub();
     std::cout << datastream.raw() << "\t" << std::bitset<15>(datastream.raw()) << std::endl;
     bool isDisk = LAYER >= TF::D1;
     // Use the stub and projection indices to pick up the stub and projection
@@ -1228,6 +1227,7 @@ void MatchCalculator(BXType bx,
     typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
     typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
     typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
+    auto isPSStub = stub.isPSStub();
 
     // Projection parameters
     std::cout << std::hex << "stub=" << stub.raw() << std::endl;
@@ -1255,10 +1255,10 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
     char* ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
     std::cout << "layer=" << ld[LAYER] << std::endl;
-    std::cout << "istep=" << istep << std::endl;
     std::cout << "projid=" << projid << std::endl;
     std::cout << "stubid=" << stubid << std::endl;
     std::cout << "cmatch=" << std::bitset<7>(projid) << "|" << isPSStub << "|" << std::bitset<7>(stubid) << std::endl;
+    std::cout << "istep=" << istep << std::endl;
     std::cout << "proj_seed=" << proj_seed << "\t" << ld[proj_seed] << std::endl;
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
