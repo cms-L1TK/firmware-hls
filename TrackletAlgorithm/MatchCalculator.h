@@ -1307,15 +1307,16 @@ void MatchCalculator(BXType bx,
     ap_uint<1> shiftr         = 1;
     std::cout << "isPSStub=" << isPSStub << std::endl;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
+    typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
     if(isDisk && isPSStub) {
       delta_r   = (stub_ps_r >> shiftr) - proj_r_long; // proj_z = RZ
     }
     else if(isDisk && !isPSStub) {
       auto alpha_fact = LUT_matchcut_alpha[stub_2s_r];
       stub_2s_r = LUT_matchcut_rDSS[stub_2s_r];
-      delta_r   = (stub_2s_r >> shiftr) - proj_r_long; // proj_z = RZ
+      delta_r   = ((tmp_stubr >> shiftr) - proj_r_long); // proj_z = RZ
       ap_uint<4> alpha_shift = 12;
-      auto alpha_corr = (delta_r * stub_2s_alpha * alpha_fact) >> alpha_shift;
+      ap_uint<12> alpha_corr = (delta_r * stub_2s_alpha * alpha_fact) >> alpha_shift;
       std::cout << "(ialpha) stub_2s_alpha=" << stub_2s_alpha << std::endl;
       std::cout << "(ialphafact) alpha_fact=" << alpha_fact << std::endl;
       std::cout << "(iphialphacor) alpha_corr=" << alpha_corr << std::endl;
@@ -1323,7 +1324,6 @@ void MatchCalculator(BXType bx,
     }
     std::cout << "(ircorr) proj_r_corr=" << proj_r_corr << std::endl;
     ap_int<12> abs_delta_r    = iabs<12>( delta_r );
-    typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
     std::cout << "(ideltaphi) delta_phi=" << delta_phi << std::endl;
     std::cout << "(irstub) stub_r=" << stub_r << std::endl;
     std::cout << "(irstub) stub_ps_r=" << stub_ps_r << std::endl;
