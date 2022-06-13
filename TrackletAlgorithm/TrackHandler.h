@@ -81,6 +81,7 @@ class TrackHandler{
     TrackFit::DiskStubWord getDiskStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
       return diskStubArray[layerIndex][stubIndex];
     }
+
     
   private:
     TrackFit::TrackWord trkWord;

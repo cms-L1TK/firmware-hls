@@ -4,10 +4,11 @@
 #include <cassert>
 #include "TrackHandler.h"
 
-
-const unsigned int kNComparisonModules = 16;
+const unsigned int kNComparisonModules = 3;
 const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kNBufferSize = 108;
+const unsigned int kNBufferSize = 6;
+const unsigned int kMaxTracks = 6;
+
 
 class ModuleBuffer{
   public:
@@ -65,7 +66,7 @@ class ComparisonModule{
     // void setInputBuffer(ModuleBuffer &buffer);
 
     // void setOutputBuffer(ModuleBuffer &buffer);
-    
+
   private:
 
     unsigned int matchFound{0};
@@ -82,13 +83,14 @@ class ComparisonModule{
 };
 
 void TrackMerger(const BXType bx,
-  const TrackFit::TrackWord trackWord [kMaxProc],
-  const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
-  const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
+  const TrackFit::TrackWord trackWord [kMaxTracks],
+  const TrackFit::BarrelStubWord barrelStubWords[4][kMaxTracks],
+  const TrackFit::DiskStubWord diskStubWords[4][kMaxTracks],
   BXType &bx_o, 
-  TrackFit::TrackWord trackWord_o[kMaxProc],
-  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  TrackFit::TrackWord trackWord_o[kMaxTracks],
+  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxTracks],
+  TrackFit::DiskStubWord diskStubWords_o[4][kMaxTracks],
+  int &outputNumber
   );
 
 

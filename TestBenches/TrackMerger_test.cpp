@@ -18,17 +18,17 @@ int main(){
   int err_count = 0;
     
   // Input memories
-  static TrackFit::TrackWord trackWord[kMaxProc];
-  static TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc];
-  static TrackFit::DiskStubWord diskStubWords[4][kMaxProc];
+  static TrackFit::TrackWord trackWord[kMaxTracks];
+  static TrackFit::BarrelStubWord barrelStubWords[4][kMaxTracks];
+  static TrackFit::DiskStubWord diskStubWords[4][kMaxTracks];
   static TrackFitMemory inputTracks;
 
   // Output memories
-  static TrackFit::TrackWord trackWord_o [kMaxProc];
-  static TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc];
-  static TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc];
+  static TrackFit::TrackWord trackWord_o [kMaxTracks];
+  static TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxTracks];
+  static TrackFit::DiskStubWord diskStubWords_o[4][kMaxTracks];
   static TrackFitMemory outputTracks;
-  // int outputNumber;
+  int outputNumber;
 
   TBHelper tb("../../../../../emData/PD/PD/");
 
@@ -42,7 +42,7 @@ int main(){
     cout << "Event: " << dec << ievt << endl;
     
 
-    for (unsigned short i = 0; i < kMaxProc; ++i){ 
+    for (unsigned short i = 0; i < kNComparisonModules; ++i){
       trackWord[i] = TrackFit::TrackWord(0);
       for (unsigned short j = 0; j < 4; j++){
         barrelStubWords[j][i] = TrackFit::BarrelStubWord(0);
@@ -52,6 +52,7 @@ int main(){
     outputTracks.clear();
 
     // Read in next event from input
+    std::cout << "Next input .. "<< fin_inputTracks.size() << std::endl;
     writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
     
     // Set bunch crossing
@@ -120,13 +121,14 @@ int main(){
     bx_o,
     trackWord_o,
     barrelStubWords_o,
-    diskStubWords_o);
+    diskStubWords_o,
+    outputNumber);
 
     bool truncation = false;
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){ 
+    for (unsigned short i = 0; i < inputTracks.getEntries(bx); i++){ // i < outputNumber
       TrackFit track;
       track.setTrackWord(trackWord_o[i]);
       track.setBarrelStubWord<0>(barrelStubWords_o[0][i]);
