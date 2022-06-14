@@ -1178,6 +1178,9 @@ void MatchCalculator(BXType bx,
     //increment full match memories
     if (newtracklet) {
       inc_fm = 1;
+      std::cout << "/////////////////" << std::endl;
+      std::cout << "New tracklet!" << std::endl;
+      std::cout << "/////////////////" << std::endl;
     }
 
     // Stub parameters
@@ -1222,7 +1225,7 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
-    std::cout << std::dec << "(iz) stub_z=" << stub_z << "\t" << std::bitset<AllStubBase<ASTYPE>::kASZSize>(stub_z) << std::endl;
+    std::cout << std::hex << "(iz) stub_z=" << stub_z << "\t" << std::bitset<AllStubBase<ASTYPE>::kASZSize>(stub_z) << std::endl;
     std::cout << "(iz) stub_ps_z=" << stub_ps_z << "\t" << std::bitset<AllStubBase<DISKPS>::kASZSize>(stub_ps_z) << std::endl;
     std::cout << "(iz) stub_2s_z=" << stub_2s_z << "\t" << std::bitset<AllStubBase<DISK2S>::kASZSize>(stub_2s_z) << std::endl;
     std::cout << "stub_z bits=" << AllStubBase<ASTYPE>::kASZSize << std::endl;
@@ -1233,6 +1236,7 @@ void MatchCalculator(BXType bx,
     ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
     std::cout << "(iphi) proj_phi_corr=" << proj_phi_corr << std::endl;
     ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
+    std::cout << "stub_phi=" << stub_phi << std::endl;
 
     // Get phi and z difference between the projection and stub
     ap_int<12> delta_z        = stub_z - proj_z_corr;
@@ -1340,7 +1344,7 @@ void MatchCalculator(BXType bx,
       switch (projseed_next) {
         case 0:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
+        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1349,7 +1353,7 @@ void MatchCalculator(BXType bx,
         break;
         case 1:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
+        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1358,7 +1362,7 @@ void MatchCalculator(BXType bx,
         break;
         case 2:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
+        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1367,7 +1371,7 @@ void MatchCalculator(BXType bx,
         break;
         case 3:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
+        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1376,7 +1380,7 @@ void MatchCalculator(BXType bx,
         break;
         case 4:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
+        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1385,7 +1389,7 @@ void MatchCalculator(BXType bx,
         break;
         case 5:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
+        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1394,7 +1398,7 @@ void MatchCalculator(BXType bx,
         break;
         case 6:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
+        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
@@ -1403,7 +1407,7 @@ void MatchCalculator(BXType bx,
         break;
         case 7:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
+        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
