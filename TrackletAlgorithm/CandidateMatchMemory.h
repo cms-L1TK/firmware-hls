@@ -11,14 +11,13 @@ public:
 
   enum BitWidths {
     // Bit size for full CandidateMatchMemory
-    kCandidateMatchSize = 2*kNBits_MemAddr + 1
+    kCandidateMatchSize = 2*kNBits_MemAddr
   };
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the CandidateMatchMemory word for different fields
     kCMStubIndexLSB = 0,
     kCMStubIndexMSB = kCMStubIndexLSB + kNBits_MemAddr - 1,
-    kCMIsPSStubLSB = kCMStubIndexMSB + 1,
-    kCMProjIndexLSB = kCMIsPSStubLSB + 1,
+    kCMProjIndexLSB = kCMStubIndexMSB + 1,
     kCMProjIndexMSB = kCMProjIndexLSB + kNBits_MemAddr - 1
   };
   
@@ -35,11 +34,7 @@ public:
   {}
 
   CandidateMatch(const CMProjIndex projindex, const CMStubIndex stubindex):
-    data_( ((projindex,1),stubindex) )
-  {}
-
-  CandidateMatch(const CMProjIndex projindex, bool isPSStub, const CMStubIndex stubindex):
-    data_( ((projindex,isPSStub),stubindex) )
+    data_( (projindex,stubindex) )
   {}
   
   CandidateMatch()
@@ -62,10 +57,6 @@ public:
     return data_.range(kCMProjIndexMSB,kCMProjIndexLSB);
   }
 
-  bool getIsPSStub() const {
-    return data_.range(kCMIsPSStubLSB,kCMIsPSStubLSB);
-  }
-
   CMStubIndex getStubIndex() const {
     return data_.range(kCMStubIndexMSB,kCMStubIndexLSB);
   }
@@ -73,10 +64,6 @@ public:
   // Setter
   void setProjIndex(const CMProjIndex id) {
     data_.range(kCMProjIndexMSB,kCMProjIndexLSB) = id;
-  }
-
-  void setIsPSStub(const bool isPSStub) {
-    data_.range(kCMIsPSStubLSB,kCMIsPSStubLSB) = isPSStub;;
   }
 
   void setStubIndex(const CMStubIndex id) {
