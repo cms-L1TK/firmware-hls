@@ -1195,7 +1195,7 @@ void MatchCalculator(BXType bx,
     auto projid = datastream.getProjIndex();
     auto stubid = datastream.getStubIndex();
     std::cout << datastream.raw() << "\t" << std::bitset<15>(datastream.raw()) << std::endl;
-    bool isDisk = LAYER >= TF::D1;
+    constexpr bool isDisk = LAYER >= TF::D1;
     // Use the stub and projection indices to pick up the stub and projection
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
@@ -1324,7 +1324,8 @@ void MatchCalculator(BXType bx,
       std::cout << "(iphialphacor) alpha_corr=" << alpha_corr << std::endl;
       delta_phi += alpha_corr;
     }
-    ap_uint<9> abs_delta_phi = iabs<9>( delta_phi );    // absolute value of delta phi
+    constexpr int adphibit = isDisk ? 9 : 17;
+    ap_uint<adphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
     std::cout << "(ircorr) proj_r_corr=" << proj_r_corr << std::endl;
     ap_int<12> abs_delta_r    = iabs<12>( delta_r );
     std::cout << "(ideltaphi) delta_phi=" << delta_phi << "\t" << std::bitset<9>(delta_phi) << std::endl;
