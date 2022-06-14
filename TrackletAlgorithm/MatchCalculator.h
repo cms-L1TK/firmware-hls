@@ -1241,6 +1241,7 @@ void MatchCalculator(BXType bx,
     // Get phi and z difference between the projection and stub
     ap_int<12> delta_z        = stub_z - proj_z_corr;
     ap_int<14> delta_z_fact   = delta_z * kFact;
+    std::cout << "kFact=" << kFact << std::endl;
     std::cout << "delta_z_fact=" << delta_z_fact << std::endl;
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
@@ -1344,73 +1345,81 @@ void MatchCalculator(BXType bx,
       switch (projseed_next) {
         case 0:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout1=" << nmcout1 <<std::endl;
           nmcout1+=inc_fm;
         }
         break;
         case 1:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout2=" << nmcout2 <<std::endl;
           nmcout2+=inc_fm;
         }
         break;
         case 2:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout3=" << nmcout3 <<std::endl;
           nmcout3+=inc_fm;
         }
         break;
         case 3:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout4=" << nmcout4 <<std::endl;
           nmcout4+=inc_fm;
         }
         break;
         case 4:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout5=" << nmcout5 <<std::endl;
           nmcout5+=inc_fm;
         }
         break;
         case 5:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout6=" << nmcout6 <<std::endl;
           nmcout6+=inc_fm;
         }
         break;
         case 6:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout7=" << nmcout7 <<std::endl;
           nmcout7+=inc_fm;
         }
         break;
         case 7:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout8=" << nmcout8 <<std::endl;
           nmcout8+=inc_fm;
         }
         break;
