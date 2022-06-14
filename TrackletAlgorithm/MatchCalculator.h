@@ -738,7 +738,7 @@ void MatchCalculator(BXType bx,
 
   const auto LUT_matchcut_phi_width = 17;
   const auto LUT_matchcut_phi_depth = 12;
-  const auto LUT_matchcut_z_width = 13;
+  const auto LUT_matchcut_z_width = 14;
   const auto LUT_matchcut_z_depth = 12;
   const auto LUT_matchcut_rphi_width = 20;
   const auto LUT_matchcut_rphi_depth = 12;
@@ -776,6 +776,7 @@ void MatchCalculator(BXType bx,
   readTable_rDSS<RDSS,LAYER,LUT_matchcut_rDSS_width,LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
 
   // Initialize MC delta phi cut variables
+  ap_uint<14> best_delta_z;
   ap_uint<17> best_delta_phi;
   ap_uint<20> best_delta_rphi;
   ap_uint<12> best_delta_r;
@@ -1282,6 +1283,7 @@ void MatchCalculator(BXType bx,
     ap_int<12> delta_z        = stub_z - proj_z_corr;
     std::cout << "delta_z=" << delta_z << std::endl;
     ap_int<14> delta_z_fact   = delta_z * kFact;
+    std::cout << "kFact=" << kFact << std::endl;
     std::cout << "delta_z_fact=" << delta_z_fact << std::endl;
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
@@ -1291,7 +1293,7 @@ void MatchCalculator(BXType bx,
     std::cout << "(iphi) shiftstubphi=" << shiftstubphi << std::endl;
     constexpr int dphibit = 20;
     ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
-    std::cout << "deltaphi=" << delta_phi << "\t" << std::bitset<12>(delta_phi) << std::endl;
+    std::cout << "deltaphi=" << delta_phi << "\t" << std::bitset<dphibit>(delta_phi) << std::endl;
     if(isDisk && isPSStub)
       delta_phi = stub_ps_phi - proj_phi_corr;
     else if(isDisk && !isPSStub) {
@@ -1304,7 +1306,8 @@ void MatchCalculator(BXType bx,
     else if(isDisk)
       proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
     const ap_int<15> &proj_r_long  = proj_z + proj_r_corr;
-    std::cout << "(ir) proj_r_long=" << proj_r_long << std::endl;
+    std::cout << "(ir) proj_r_corr=" << proj_r_corr << std::endl;
+    std::cout << "(ircorr) proj_r_long=" << proj_r_long << std::endl;
     ap_uint<1> shiftr         = 1;
     std::cout << "isPSStub=" << isPSStub << std::endl;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
@@ -1372,12 +1375,25 @@ void MatchCalculator(BXType bx,
     bool goodmatch_next = false;
 
     // For first tracklet, pick up the phi cut value
+    std::cout << "best_delta_z=" << best_delta_z << std::endl;
+    best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
+    std::cout << "best_delta_z=" << best_delta_z << std::endl;
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
     best_delta_rphi = (newtracklet && isPSStub)? LUT_matchcut_PSrphi[proj_seed] : (isPSStub)? best_delta_rphi : (newtracklet)? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi;
     best_delta_r    = (newtracklet)? LUT_matchcut_2Sr[proj_seed] : best_delta_r;
   
     // Check that matches fall within the selection window of the projection 
-    bool barrel_match = (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
+    //bool barrel_match = (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
+    bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
+    std::cout << "LUT_matchcut_z[proj_seed]=" << LUT_matchcut_z[proj_seed] << std::endl;
+    std::cout << "delta_z_fact < LUT_matchcut_z[proj_seed]=" << (delta_z_fact < LUT_matchcut_z[proj_seed]) << std::endl;
+    std::cout << "delta_z_fact >= -LUT_matchcut_z[proj_seed]=" << (delta_z_fact >= -LUT_matchcut_z[proj_seed]) << std::endl;
+    std::cout << "delta_z_fact < best_delta_z=" << (delta_z_fact < best_delta_z) << std::endl;
+    std::cout << "delta_z_fact >= -best_delta_z=" << (delta_z_fact >= -best_delta_z) << std::endl;
+    std::cout << "best_delta_z=" << best_delta_z << std::endl;
+    std::cout << "-best_delta_z=" << -best_delta_z << std::endl;
+    std::cout << "abs_delta_phi <= best_delta_phi=" << (abs_delta_phi <= best_delta_phi) << std::endl;
+    std::cout << "best_delta_phi=" << best_delta_phi << std::endl;
     std::cout << "abs_delta_r=" << abs_delta_r << std::endl;
     std::cout << "best_delta_r=" << best_delta_r << std::endl;
     std::cout << "best_delta_rphi=" << best_delta_rphi << std::endl;
@@ -1390,13 +1406,20 @@ void MatchCalculator(BXType bx,
     std::cout << "((delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r)=" << (((delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r)) << std::endl;
     //bool disk_match = isPSStub ? (iabs<18>(delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     bool disk_match = isPSStub ? ((abs_delta_phi * stub_ps_r) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+    std::cout << "barrel_match=" << barrel_match << std::endl;
     std::cout << "disk_match=" << disk_match << std::endl;
     if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
-      best_delta_phi = abs_delta_phi;
-      best_delta_rphi = delta_phi * tmp_stubr;
-      best_delta_r    = abs_delta_r;
+      if(isDisk) {
+        best_delta_rphi = delta_phi * tmp_stubr;
+        best_delta_r    = abs_delta_r;
+      }
+      else {
+        std::cout << "Overwriting best_delta_z with " << delta_z_fact << std::endl;
+        best_delta_z = iabs<14>(delta_z_fact);
+        best_delta_phi = abs_delta_phi;
+      }
 
       // Store bestmatch
       bestmatch_next = fm;
@@ -1409,73 +1432,81 @@ void MatchCalculator(BXType bx,
       switch (projseed_next) {
         case 0:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout1=" << nmcout1 <<std::endl;
           nmcout1+=inc_fm;
         }
         break;
         case 1:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout2=" << nmcout2 <<std::endl;
           nmcout2+=inc_fm;
         }
         break;
         case 2:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout3=" << nmcout3 <<std::endl;
           nmcout3+=inc_fm;
         }
         break;
         case 3:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout4=" << nmcout4 <<std::endl;
           nmcout4+=inc_fm;
         }
         break;
         case 4:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout5=" << nmcout5 <<std::endl;
           nmcout5+=inc_fm;
         }
         break;
         case 5:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout6=" << nmcout6 <<std::endl;
           nmcout6+=inc_fm;
         }
         break;
         case 6:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout7=" << nmcout7 <<std::endl;
           nmcout7+=inc_fm;
         }
         break;
         case 7:
         std::cout << "found fm=" << bestmatch_next.raw() << std::endl;
-        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (!isDisk || newtracklet || inc_fm)) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
           std::cout << "writing fm=" << bestmatch_next.raw() << std::endl;
           std::cout << (inc_fm ? "" : "NOT ") << "saved!" << std::endl;
+          std::cout << "nmcout8=" << nmcout8 <<std::endl;
           nmcout8+=inc_fm;
         }
         break;
