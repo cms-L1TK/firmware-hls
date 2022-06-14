@@ -7,6 +7,7 @@
 source env_hls.tcl
 
 set modules_to_test {
+  {MC_D5PHIC}
   {MC_L1PHIC}
   {MC_L2PHIC}
   {MC_L3PHIC}
