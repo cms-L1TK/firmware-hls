@@ -1216,7 +1216,6 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
     else if(isDisk && !isPSStub)
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
-    char* ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
     // Apply the corrections
@@ -1230,12 +1229,12 @@ void MatchCalculator(BXType bx,
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
+    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     if(isDisk && isPSStub)
       shiftstubphi = stub_ps_phi << kPhi0_shift;
     else if(isDisk && !isPSStub) {
       shiftstubphi = stub_2s_phi << kPhi0_shift;
     }
-    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     constexpr int dphibit = 20;
     ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
     ap_uint<3> shiftprojz     = 7;
@@ -1244,7 +1243,7 @@ void MatchCalculator(BXType bx,
       proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
     else if(isDisk)
       proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
-    const ap_uint<15> &proj_r_long  = proj_z + proj_r_corr;
+    const ap_int<15> &proj_r_long  = proj_z + proj_r_corr;
     ap_uint<1> shiftr         = 1;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
     typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
@@ -1261,7 +1260,7 @@ void MatchCalculator(BXType bx,
       delta_phi += alpha_corr;
     }
     constexpr int adphibit = isDisk ? 12 : 17;
-    ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
+    ap_uint<adphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
     ap_int<12> abs_delta_r    = iabs<11>( delta_r );
 
     // Full match parameters
@@ -1271,17 +1270,8 @@ void MatchCalculator(BXType bx,
     const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid = stubid;
     typename FullMatch<FMTYPE>::FMSTUBR               fm_stubr = stub_r;
     if(isDisk && isPSStub) fm_stubr = stub_ps_r;
-    //else if(isDisk) fm_stubr = stub_2s_r;
     const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
     const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : delta_r;
-    //if(isDisk) fm_z = delta_r;
-              << "fm_tkid=" << std::bitset<7>(fm_tkid) << "\t"
-              << "fm_asphi=" << std::bitset<3>(fm_asphi) << "\t"
-              << "fm_asid=" << std::bitset<7>(fm_asid) << "\t"
-              << "fm_stubr=" << std::bitset<12>(fm_stubr) << "\t"
-              << "delta_phi=" << std::bitset<12>(delta_phi) << "\t";
-     if(!isDisk)
-     else
 
     // Full match
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
@@ -1299,13 +1289,6 @@ void MatchCalculator(BXType bx,
     // For first tracklet, pick up the phi cut value
     best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-    /*
-    best_delta_rphi = (newtracklet && isPSStub) ? LUT_matchcut_PSrphi[proj_seed] : 
-                      (isPSStub) ? best_delta_rphi : 
-                      (newtracklet) ? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi;
-    best_delta_rphi = isPSStub ? (newtracklet ? LUT_matchcut_PSrphi[proj_seed] : best_delta_rphi) : (newtracklet ? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi);
-    best_delta_r    = (newtracklet)? LUT_matchcut_2Sr[proj_seed] : best_delta_r;
-    */
     if(newtracklet) {
       if(isPSStub) {
         best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
@@ -1318,9 +1301,7 @@ void MatchCalculator(BXType bx,
     }
   
     // Check that matches fall within the selection window of the projection 
-    //bool barrel_match = (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
     bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
-    //bool disk_match = isPSStub ? (iabs<18>(delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     bool disk_match = isPSStub ? ((abs_delta_phi * stub_ps_r) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
@@ -1330,8 +1311,7 @@ void MatchCalculator(BXType bx,
         best_delta_r    = abs_delta_r;
       }
       else {
-        best_delta_z = delta_z_fact;
-        //best_delta_z = iabs<14>(delta_z_fact);
+        best_delta_z = iabs<14>(delta_z_fact);
         best_delta_phi = abs_delta_phi;
       }
 
