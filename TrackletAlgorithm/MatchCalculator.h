@@ -1228,12 +1228,12 @@ void MatchCalculator(BXType bx,
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
-    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     if(isDisk && isPSStub)
       shiftstubphi = stub_ps_phi << kPhi0_shift;
     else if(isDisk && !isPSStub) {
       shiftstubphi = stub_2s_phi << kPhi0_shift;
     }
+    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     constexpr int dphibit = 20;
     ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
     ap_uint<3> shiftprojz     = 7;
@@ -1259,8 +1259,8 @@ void MatchCalculator(BXType bx,
       delta_phi += alpha_corr;
     }
     constexpr int adphibit = isDisk ? 12 : 17;
-    ap_uint<adphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
-    ap_int<12> abs_delta_r    = iabs<11>( delta_r );
+    ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
+    ap_int<12> abs_delta_r    = iabs<12>( delta_r );
 
     // Full match parameters
     const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
