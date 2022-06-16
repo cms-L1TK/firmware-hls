@@ -1215,6 +1215,7 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
     else if(isDisk && !isPSStub)
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
+    char* ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
     // Apply the corrections
@@ -1311,7 +1312,8 @@ void MatchCalculator(BXType bx,
         best_delta_r    = abs_delta_r;
       }
       else {
-        best_delta_z = iabs<14>(delta_z_fact);
+        best_delta_z = delta_z_fact;
+        //best_delta_z = iabs<14>(delta_z_fact);
         best_delta_phi = abs_delta_phi;
       }
 
@@ -1325,49 +1327,49 @@ void MatchCalculator(BXType bx,
 
       switch (projseed_next) {
         case 0:
-        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
           nmcout1+=inc_fm;
         }
         break;
         case 1:
-        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
           nmcout2+=inc_fm;
         }
         break;
         case 2:
-        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
           nmcout3+=inc_fm;
         }
         break;
         case 3:
-        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
           nmcout4+=inc_fm;
         }
         break;
         case 4:
-        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
           nmcout5+=inc_fm;
         }
         break;
         case 5:
-        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
           nmcout6+=inc_fm;
         }
         break;
         case 6:
-        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
           nmcout7+=inc_fm;
         }
         break;
         case 7:
-        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
           nmcout8+=inc_fm;
         }
