@@ -1216,7 +1216,6 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
     else if(isDisk && !isPSStub)
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
-    char* ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
     // Apply the corrections
@@ -1230,12 +1229,12 @@ void MatchCalculator(BXType bx,
     const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
     const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
     ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
+    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     if(isDisk && isPSStub)
       shiftstubphi = stub_ps_phi << kPhi0_shift;
     else if(isDisk && !isPSStub) {
       shiftstubphi = stub_2s_phi << kPhi0_shift;
     }
-    ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     constexpr int dphibit = 20;
     ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
     ap_uint<3> shiftprojz     = 7;
@@ -1261,7 +1260,7 @@ void MatchCalculator(BXType bx,
       delta_phi += alpha_corr;
     }
     constexpr int adphibit = isDisk ? 12 : 17;
-    ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
+    ap_uint<adphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
     ap_int<12> abs_delta_r    = iabs<11>( delta_r );
 
     // Full match parameters
@@ -1314,8 +1313,7 @@ void MatchCalculator(BXType bx,
         best_delta_r    = abs_delta_r;
       }
       else {
-        best_delta_z = delta_z_fact;
-        //best_delta_z = iabs<14>(delta_z_fact);
+        best_delta_z = iabs<14>(delta_z_fact);
         best_delta_phi = abs_delta_phi;
       }
 
