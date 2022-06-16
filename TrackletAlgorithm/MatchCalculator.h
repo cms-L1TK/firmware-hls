@@ -12,6 +12,7 @@
 
 namespace MC {
   const auto cmzero = CandidateMatch::CandidateMatchData(0);
+  const auto cmhigh = CandidateMatch::CandidateMatchData(-1);
   enum lutType {PHICUT, ZCUT, PSPHICUT, SSPHICUT, PSRCUT, SSRCUT, ALPHAINNERCUT, ALPHAOUTERCUT, RDSSINNERCUT, RDSSOUTERCUT};
 }
 
@@ -109,8 +110,8 @@ void merger(
         *sAnext   = ((inA.getProjIndex() <= inB.getProjIndex()) || !validB) && validA;  // sA=true if inA is valid and (inA <= inB or inB not valid)
         *sBnext   = (!(inA.getProjIndex() <= inB.getProjIndex()) || !validA) && validB; // sB=true if inB is valid and (inA > inB or inA not valid)
         break;
-    case DONE: // set everything to false
-        *outnext  = CandidateMatch(MC::cmzero);
+    case DONE: // set everything to false 
+        *outnext  = CandidateMatch(MC::cmhigh);
         *voutnext = false;
         *Anext    = CandidateMatch(MC::cmhigh);
         *vAnext   = false;
@@ -742,10 +743,10 @@ void MatchCalculator(BXType bx,
   readTable_rDSS<RDSS,LAYER,LUT_matchcut_rDSS_width,LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
 
   // Initialize MC delta phi cut variables
-  ap_uint<14> best_delta_z;
-  ap_uint<17> best_delta_phi;
-  ap_uint<20> best_delta_rphi;
-  ap_uint<12> best_delta_r;
+  ap_uint<LUT_matchcut_z_width> best_delta_z;
+  ap_uint<LUT_matchcut_phi_width> best_delta_phi;
+  ap_uint<LUT_matchcut_rphi_width> best_delta_rphi;
+  ap_uint<LUT_matchcut_r_width> best_delta_r;
 
   // Bool and ID needed for determining if processing a new tracklet
   CandidateMatch::CMProjIndex id;
@@ -780,58 +781,58 @@ void MatchCalculator(BXType bx,
   bool read_L1_2 = false;
   bool read_L1_3 = false;
   bool read_L1_4 = false;
-  CandidateMatch cm_L1_1(MC::cmzero);
-  CandidateMatch cm_L1_2(MC::cmzero);
-  CandidateMatch cm_L1_3(MC::cmzero);
-  CandidateMatch cm_L1_4(MC::cmzero);
-  CandidateMatch tmpA_L1_1(MC::cmzero);
-  CandidateMatch tmpA_L1_2(MC::cmzero);
-  CandidateMatch tmpA_L1_3(MC::cmzero);
-  CandidateMatch tmpA_L1_4(MC::cmzero);
-  CandidateMatch tmpB_L1_1(MC::cmzero);
-  CandidateMatch tmpB_L1_2(MC::cmzero);
-  CandidateMatch tmpB_L1_3(MC::cmzero);
-  CandidateMatch tmpB_L1_4(MC::cmzero);
-  bool valid_L1_1 = false;
-  bool valid_L1_2 = false;
-  bool valid_L1_3 = false;
-  bool valid_L1_4 = false;
-  bool vA_L1_1 = false;
-  bool vA_L1_2 = false;
-  bool vA_L1_3 = false;
-  bool vA_L1_4 = false;
-  bool vB_L1_1 = false;
-  bool vB_L1_2 = false;
-  bool vB_L1_3 = false;
-  bool vB_L1_4 = false;
-  bool sA_L1_1 = false;
-  bool sA_L1_2 = false;
-  bool sA_L1_3 = false;
-  bool sA_L1_4 = false;
-  bool sB_L1_1 = false;
-  bool sB_L1_2 = false;
-  bool sB_L1_3 = false;
-  bool sB_L1_4 = false;
+  CandidateMatch cm_L1_1(MC::cmhigh);
+  CandidateMatch cm_L1_2(MC::cmhigh);
+  CandidateMatch cm_L1_3(MC::cmhigh);
+  CandidateMatch cm_L1_4(MC::cmhigh);
+  CandidateMatch tmpA_L1_1(MC::cmhigh);
+  CandidateMatch tmpA_L1_2(MC::cmhigh);
+  CandidateMatch tmpA_L1_3(MC::cmhigh);
+  CandidateMatch tmpA_L1_4(MC::cmhigh);
+  CandidateMatch tmpB_L1_1(MC::cmhigh);
+  CandidateMatch tmpB_L1_2(MC::cmhigh);
+  CandidateMatch tmpB_L1_3(MC::cmhigh);
+  CandidateMatch tmpB_L1_4(MC::cmhigh);
+  bool valid_L1_1 = false; 
+  bool valid_L1_2 = false; 
+  bool valid_L1_3 = false; 
+  bool valid_L1_4 = false; 
+  bool vA_L1_1 = false; 
+  bool vA_L1_2 = false; 
+  bool vA_L1_3 = false; 
+  bool vA_L1_4 = false; 
+  bool vB_L1_1 = false; 
+  bool vB_L1_2 = false; 
+  bool vB_L1_3 = false; 
+  bool vB_L1_4 = false; 
+  bool sA_L1_1 = false; 
+  bool sA_L1_2 = false; 
+  bool sA_L1_3 = false; 
+  bool sA_L1_4 = false; 
+  bool sB_L1_1 = false; 
+  bool sB_L1_2 = false; 
+  bool sB_L1_3 = false; 
+  bool sB_L1_4 = false; 
 
   // layer 2 variables
   bool read_L2_1 = false;
   bool read_L2_2 = false;
-  CandidateMatch cm_L2_1(MC::cmzero);
-  CandidateMatch cm_L2_2(MC::cmzero);
-  CandidateMatch tmpA_L2_1(MC::cmzero);
-  CandidateMatch tmpA_L2_2(MC::cmzero);
-  CandidateMatch tmpB_L2_1(MC::cmzero);
-  CandidateMatch tmpB_L2_2(MC::cmzero);
-  bool valid_L2_1 = false;
-  bool valid_L2_2 = false;
-  bool vA_L2_1 = false;
-  bool vA_L2_2 = false;
-  bool vB_L2_1 = false;
-  bool vB_L2_2 = false;
-  bool sA_L2_1 = false;
-  bool sA_L2_2 = false;
-  bool sB_L2_1 = false;
-  bool sB_L2_2 = false;
+  CandidateMatch cm_L2_1(MC::cmhigh);
+  CandidateMatch cm_L2_2(MC::cmhigh);
+  CandidateMatch tmpA_L2_1(MC::cmhigh);
+  CandidateMatch tmpA_L2_2(MC::cmhigh);
+  CandidateMatch tmpB_L2_1(MC::cmhigh);
+  CandidateMatch tmpB_L2_2(MC::cmhigh);
+  bool valid_L2_1 = false; 
+  bool valid_L2_2 = false; 
+  bool vA_L2_1 = false; 
+  bool vA_L2_2 = false; 
+  bool vB_L2_1 = false; 
+  bool vB_L2_2 = false; 
+  bool sA_L2_1 = false; 
+  bool sA_L2_2 = false; 
+  bool sB_L2_1 = false; 
+  bool sB_L2_2 = false; 
 
   // layer 3 variables
   CandidateMatch tmpA_L3(MC::cmhigh);
@@ -918,26 +919,26 @@ void MatchCalculator(BXType bx,
 
     bool read_L2_1_next = false;
     bool read_L2_2_next = false;
-    CandidateMatch cm_L2_1_next(MC::cmzero);
-    CandidateMatch cm_L2_2_next(MC::cmzero);
-    CandidateMatch tmpA_L2_1_next(MC::cmzero);
-    CandidateMatch tmpA_L2_2_next(MC::cmzero);
-    CandidateMatch tmpB_L2_1_next(MC::cmzero);
-    CandidateMatch tmpB_L2_2_next(MC::cmzero);
-    bool valid_L2_1_next = false;
-    bool valid_L2_2_next = false;
-    bool vA_L2_1_next = false;
-    bool vA_L2_2_next = false;
-    bool vB_L2_1_next = false;
-    bool vB_L2_2_next = false;
-    bool sA_L2_1_next = false;
-    bool sA_L2_2_next = false;
-    bool sB_L2_1_next = false;
-    bool sB_L2_2_next = false;
+    CandidateMatch cm_L2_1_next(MC::cmhigh);
+    CandidateMatch cm_L2_2_next(MC::cmhigh);
+    CandidateMatch tmpA_L2_1_next(MC::cmhigh);
+    CandidateMatch tmpA_L2_2_next(MC::cmhigh);
+    CandidateMatch tmpB_L2_1_next(MC::cmhigh);
+    CandidateMatch tmpB_L2_2_next(MC::cmhigh);
+    bool valid_L2_1_next = false; 
+    bool valid_L2_2_next = false; 
+    bool vA_L2_1_next = false; 
+    bool vA_L2_2_next = false; 
+    bool vB_L2_1_next = false; 
+    bool vB_L2_2_next = false; 
+    bool sA_L2_1_next = false; 
+    bool sA_L2_2_next = false; 
+    bool sB_L2_1_next = false; 
+    bool sB_L2_2_next = false; 
 
-    CandidateMatch cm_L3_next(MC::cmzero);
-    CandidateMatch tmpA_L3_next(MC::cmzero);
-    CandidateMatch tmpB_L3_next(MC::cmzero);
+    CandidateMatch cm_L3_next(MC::cmhigh);
+    CandidateMatch tmpA_L3_next(MC::cmhigh);
+    CandidateMatch tmpB_L3_next(MC::cmhigh); 
     bool valid_L3_next = false;
     bool vA_L3_next = false;
     bool vB_L3_next = false;
@@ -1215,6 +1216,7 @@ void MatchCalculator(BXType bx,
       phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
     else if(isDisk && !isPSStub)
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
+    char* ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
      
     // Apply the corrections
@@ -1236,18 +1238,13 @@ void MatchCalculator(BXType bx,
     ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
     constexpr int dphibit = 20;
     ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
-    if(isDisk && isPSStub)
-      delta_phi = stub_ps_phi - proj_phi_corr;
-    else if(isDisk && !isPSStub) {
-      delta_phi = stub_2s_phi - proj_phi_corr;
-    }
     ap_uint<3> shiftprojz     = 7;
     ap_int<14> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
     if(isDisk && isPSStub)
       proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
     else if(isDisk)
       proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
-    const ap_int<15> &proj_r_long  = proj_z + proj_r_corr;
+    const ap_uint<15> &proj_r_long  = proj_z + proj_r_corr;
     ap_uint<1> shiftr         = 1;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
     typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
@@ -1263,9 +1260,9 @@ void MatchCalculator(BXType bx,
       ap_uint<12> alpha_corr = (delta_r * stub_2s_alpha * alpha_fact) >> alpha_shift;
       delta_phi += alpha_corr;
     }
-    constexpr int adphibit = isDisk ? 9 : 17;
-    ap_uint<adphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
-    ap_int<12> abs_delta_r    = iabs<12>( delta_r );
+    constexpr int adphibit = isDisk ? 12 : 17;
+    ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
+    ap_int<12> abs_delta_r    = iabs<11>( delta_r );
 
     // Full match parameters
     const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -1278,6 +1275,13 @@ void MatchCalculator(BXType bx,
     const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
     const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : delta_r;
     //if(isDisk) fm_z = delta_r;
+              << "fm_tkid=" << std::bitset<7>(fm_tkid) << "\t"
+              << "fm_asphi=" << std::bitset<3>(fm_asphi) << "\t"
+              << "fm_asid=" << std::bitset<7>(fm_asid) << "\t"
+              << "fm_stubr=" << std::bitset<12>(fm_stubr) << "\t"
+              << "delta_phi=" << std::bitset<12>(delta_phi) << "\t";
+     if(!isDisk)
+     else
 
     // Full match
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
@@ -1295,22 +1299,39 @@ void MatchCalculator(BXType bx,
     // For first tracklet, pick up the phi cut value
     best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-    best_delta_rphi = (newtracklet && isPSStub)? LUT_matchcut_PSrphi[proj_seed] : (isPSStub)? best_delta_rphi : (newtracklet)? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi;
+    /*
+    best_delta_rphi = (newtracklet && isPSStub) ? LUT_matchcut_PSrphi[proj_seed] : 
+                      (isPSStub) ? best_delta_rphi : 
+                      (newtracklet) ? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi;
+    best_delta_rphi = isPSStub ? (newtracklet ? LUT_matchcut_PSrphi[proj_seed] : best_delta_rphi) : (newtracklet ? LUT_matchcut_2Srphi[proj_seed] : best_delta_rphi);
     best_delta_r    = (newtracklet)? LUT_matchcut_2Sr[proj_seed] : best_delta_r;
+    */
+    if(newtracklet) {
+      if(isPSStub) {
+        best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
+        best_delta_r = LUT_matchcut_PSr[proj_seed];
+      }
+      else  {
+        best_delta_rphi = LUT_matchcut_2Srphi[proj_seed];
+        best_delta_r = LUT_matchcut_2Sr[proj_seed];
+      }
+    }
   
     // Check that matches fall within the selection window of the projection 
     //bool barrel_match = (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi);
     bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
+    //bool disk_match = isPSStub ? (iabs<18>(delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     bool disk_match = isPSStub ? ((abs_delta_phi * stub_ps_r) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
       if(isDisk) {
-        best_delta_rphi = delta_phi * tmp_stubr;
+        best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * stub_ps_r) : ap_uint<20>(abs_delta_phi * tmp_stubr);
         best_delta_r    = abs_delta_r;
       }
       else {
-        best_delta_z = iabs<14>(delta_z_fact);
+        best_delta_z = delta_z_fact;
+        //best_delta_z = iabs<14>(delta_z_fact);
         best_delta_phi = abs_delta_phi;
       }
 
@@ -1324,49 +1345,49 @@ void MatchCalculator(BXType bx,
 
       switch (projseed_next) {
         case 0:
-        if(FMMask<LAYER, PHISEC, TF::L1L2>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,bestmatch_next,nmcout1+inc_fm-1); // L1L2 seed
           nmcout1+=inc_fm;
         }
         break;
         case 1:
-        if(FMMask<LAYER, PHISEC, TF::L2L3>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,bestmatch_next,nmcout2+inc_fm-1); // L2L3 seed
           nmcout2+=inc_fm;
         }
         break;
         case 2:
-        if(FMMask<LAYER, PHISEC, TF::L3L4>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,bestmatch_next,nmcout3+inc_fm-1); // L3L4 seed
           nmcout3+=inc_fm;
         }
         break;
         case 3:
-        if(FMMask<LAYER, PHISEC, TF::L5L6>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,bestmatch_next,nmcout4+inc_fm-1); // L5L6 seed
           nmcout4+=inc_fm;
         }
         break;
         case 4:
-        if(FMMask<LAYER, PHISEC, TF::D1D2>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,bestmatch_next,nmcout5+inc_fm-1); // D1D2 seed
           nmcout5+=inc_fm;
         }
         break;
         case 5:
-        if(FMMask<LAYER, PHISEC, TF::D3D4>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,bestmatch_next,nmcout6+inc_fm-1); // D3D4 seed
           nmcout6+=inc_fm;
         }
         break;
         case 6:
-        if(FMMask<LAYER, PHISEC, TF::L1D1>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,bestmatch_next,nmcout7+inc_fm-1); // L1D1 seed
           nmcout7+=inc_fm;
         }
         break;
         case 7:
-        if(FMMask<LAYER, PHISEC, TF::L2D1>() && (!isDisk || newtracklet || inc_fm)) {
+        if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
           fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,bestmatch_next,nmcout8+inc_fm-1); // L2D1 seed
           nmcout8+=inc_fm;
         }
