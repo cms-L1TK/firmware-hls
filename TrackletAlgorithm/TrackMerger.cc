@@ -56,38 +56,58 @@ void ModuleBuffer::clearBuffer(){
 
 }
 
+TrackFit::TrackWord ModuleBuffer::outputTrackFromBuffer(unsigned int trackIndex){
+  #pragma HLS inline
+  return trackArray[trackIndex].getTrackWord();
+}
+
+TrackFit::BarrelStubWord ModuleBuffer::outputBufferBarrelStubs(unsigned int trackIndex, unsigned int stubIndex, unsigned int layerIndex){
+  #pragma HLS inline
+  return trackArray[trackIndex].getBarrelStubArray(layerIndex, stubIndex);
+}
+
+TrackFit::DiskStubWord ModuleBuffer::outputBufferDiskStubs(unsigned int trackIndex, unsigned int stubIndex, unsigned int layerIndex){
+  #pragma HLS inline
+  return trackArray[trackIndex].getDiskStubArray(layerIndex, stubIndex);
+}
+
 
 void ComparisonModule::process(ModuleBuffer &inputBuffer, ModuleBuffer &outputBuffer){
   #pragma HLS inline
   #pragma HLS pipeline
-  TrackHandler track = inputBuffer.readTrack();
+    // if masterTrack is not set and track is not null, set as master
+    // else then if null, do nothing
+    // if track is not null and also have a master set then do compare, merge
+    TrackHandler track = inputBuffer.readTrack();
     #ifndef _SYNTHESIS_
     std::cout << "inputBufferTrack: " << std::hex << track.getTrackWord() << std::endl;
     #endif
 
-  if (track.getTrackWord() != 0){
+  if (track.getTrackWord() != 0 && masterTrack.getTrackWord() == 0){
     #ifndef _SYNTHESIS_
     std::cout << "condition met, inputBufferTrack: " << std::hex << track.getTrackWord() << std::endl;
     #endif
-    // if masterTrack is not set and track is not null, set as master
-    // else then if null, do nothing
-    // if track is not null and also have a master set then do compare, merge
-
-    // #ifndef _SYNTHESIS_
-    //   std::cout << "masterTrack: " << std::hex << masterTrack.getTrackWord() << std::endl;
-    // #endif
 
     masterTrack = track;
-    
 
-    outputBuffer.insertTrack(track);
-    #ifndef _SYNTHESIS_
-    // std::cout << "outputBufferTrack: " << outputBuffer.readTrack().getTrackWord() << std::endl;
-    #endif
-    tracksProcessed++;
-  }
+    } else if (track.getTrackWord() != 0 && masterTrack.getTrackWord() != 0){
+      assert(masterTrack.getTrackWord() != track.getTrackWord());
+      // masterTrack.CompareTrack(track);
+      // masterTrack.MergeTrack(track, matchFound, mergeCondition);
+      // if (matchFound == 0){
+        outputBuffer.insertTrack(track);
+      // }
+    }
+  tracksProcessed++;
 
 }
+
+
+// void ComparisonModule::endEvent(){
+//   #pragma HLS inline
+//   writeIndex = 0;
+//   readIndex = 0;
+// }
 
 // void ComparisonModule::setInputBuffer(ModuleBuffer &buffer){
 //   #pragma HLS inline
@@ -137,7 +157,7 @@ void TrackMerger(const BXType bx,
 
 
     unsigned int outputIndex{0};
-    unsigned int unmergedOutputIndex{0};
+    unsigned int bufferIndex{0};
 
     // loop over the CMs to set the input/output buffer variables for each CM
     // LOOP_SetBuffers:
@@ -161,20 +181,24 @@ void TrackMerger(const BXType bx,
         #pragma HLS unroll
         barrelStubWordsArray[layerIndex] = barrelStubWords[layerIndex][i];
         diskStubWordsArray[layerIndex] = diskStubWords[layerIndex][i];
+        #ifndef _SYNTHESIS_
+        std::cout << "barrel_in:  " << std::hex << barrelStubWordsArray[layerIndex] << std::endl;
+        std::cout << "disk_in:  " << std::hex << diskStubWordsArray[layerIndex] << std::endl;
+        #endif
       }
 
       TrackHandler track(trackWord[i], barrelStubWordsArray, diskStubWordsArray);
 
       // put track into input buffer 0 for CM zero
-      // first track in input buffer is master, then comapre against the rest
-      
-      // pragmas to write in parallel?
       buffer[0].insertTrack(track);
     }
   
 
     LOOP_Clks:
     for (int i = 0; i < kMaxProc; i++){ 
+        #ifndef _SYNTHESIS_
+        std::cout << "clock no. : " << i << std::endl;
+        #endif
       #pragma HLS pipeline II=1 REWIND
       LOOP_ProcTracks:
       for (unsigned int j = 0; j < kNComparisonModules; j++){
@@ -183,51 +207,65 @@ void TrackMerger(const BXType bx,
         std::cout << "comparisonModule no. : " << j << std::endl;
         #endif
         comparisonModule[j].process(buffer[j], buffer[j+1]);
-        trackWord_o[outputIndex] = comparisonModule[j].getMasterTrackWord();
-        #ifndef _SYNTHESIS_
-        std::cout << "trackWord_o:  " << std::hex << trackWord_o[outputIndex] << std::endl;
-        #endif
-        LOOP_OutputStubWords:
-        for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
-          #pragma HLS unroll
-          barrelStubWords_o[layerIndex][outputIndex] = comparisonModule[j].getMasterTrackBarrelStubs(0, layerIndex);
-          diskStubWords_o[layerIndex][outputIndex] = comparisonModule[j].getMasterTrackDiskStubs(0, layerIndex);
-        #ifndef _SYNTHESIS_
-        std::cout << "barrel_o:  " << std::hex << barrelStubWords_o[layerIndex][outputIndex] << std::endl;
-        std::cout << "disk_o:  " << std::hex << diskStubWords_o[layerIndex][outputIndex] << std::endl;
-        #endif
-        }
-        outputIndex++;
-
-        // if (j == kNComparisonModules){
-        //   unmergedTracks[unmergedOutputIndex] = trackWord[i];
-        //   LOOP_UnmergedStubs:
-        //   for (unsigned int arrayIndex = 0; arrayIndex < 4; arrayIndex++){
-        //     #pragma HLS unroll
-        //     unmergedBarrelStubs[arrayIndex][unmergedOutputIndex] = barrelStubWords[arrayIndex][i];
-        //     unmergedDiskStubs[arrayIndex][unmergedOutputIndex] = diskStubWords[arrayIndex][i];
-        //   }
-        //   unmergedOutputIndex++;
-        // }
       }
     }
 
-      
-    // outputNumber = outputIndex + unmergedOutputIndex;
-    // LOOP_OutputUnmergedTW:
-    // for (unsigned int i = 0; i < kMaxProc; i++){
-    //   for (unsigned int j = 0; j < kMaxTracks; j++){
-    //     #pragma HLS unroll
-    //     if ( j >= unmergedOutputIndex) continue;
-    //     trackWord_o[outputIndex+j] = unmergedTracks[j];
-    //     LOOP_OutputUnmergedStubs:
-    //     for (unsigned int k = 0; k < 4; k++){
-    //       #pragma HLS unroll
-    //       barrelStubWords_o[k][outputIndex+j] = unmergedBarrelStubs[k][j];
-    //       diskStubWords_o[k][outputIndex+j] = unmergedDiskStubs[k][j];
-    //     }
-    //   }
-    // }
+    LOOP_OutputsCM:
+    for (unsigned int i = 0; i < kNComparisonModules; i++){
+      #pragma HLS pipeline II=1 REWIND
+      trackWord_o[outputIndex] = comparisonModule[i].getMasterTrackWord();
+      #ifndef _SYNTHESIS_
+      std::cout << "trackWord_o:  " << std::hex << trackWord_o[outputIndex] << std::endl;
+      #endif
+      LOOP_OutputStubWords:
+      for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
+        #pragma HLS unroll
+        barrelStubWords_o[layerIndex][outputIndex] = comparisonModule[i].getMasterTrackBarrelStubs(0, layerIndex);
+        diskStubWords_o[layerIndex][outputIndex] = comparisonModule[i].getMasterTrackDiskStubs(0, layerIndex);
+        #ifndef _SYNTHESIS_
+        // std::cout << "barrel_o:  " << std::hex << barrelStubWords_o[layerIndex][outputIndex] << std::endl;
+        // std::cout << "disk_o:  " << std::hex << diskStubWords_o[layerIndex][outputIndex] << std::endl;
+        #endif
+      }
+      outputIndex++;
+    }
+
+    LOOP_UnmergedTracks:
+    for (unsigned int bufferSizeIndex = 0; bufferSizeIndex < kNBufferSize; bufferSizeIndex++){
+      #pragma HLS unroll
+      unmergedTracks[bufferSizeIndex] = buffer[kNBuffers-1].outputTrackFromBuffer(bufferSizeIndex);
+      #ifndef _SYNTHESIS_
+      std::cout << "tw_o:  " << std::hex << trackWord_o[bufferSizeIndex] << std::endl;
+      #endif
+      LOOP_UnmergedStubs:
+      for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
+        #pragma HLS unroll
+        unmergedBarrelStubs[layerIndex][bufferSizeIndex] = buffer[kNBuffers-1].outputBufferBarrelStubs(bufferSizeIndex, 0, layerIndex);
+        unmergedDiskStubs[layerIndex][bufferSizeIndex] = buffer[kNBuffers-1].outputBufferDiskStubs(bufferSizeIndex, 0, layerIndex);
+      }
+      bufferIndex++;
+    }
+
+
+
+    // outputNumber = outputIndex + bufferIndex;
+
+    LOOP_OutputBufferTracks:
+    for (unsigned int i = 0; i < kNBufferSize-kNComparisonModules; i++){
+      #pragma HLS unroll
+      if(i >= bufferIndex) continue;
+      trackWord_o[outputIndex+i] = unmergedTracks[i];
+      LOOP_OutputBufferStubs:
+      for (unsigned int layers = 0; layers < 4; layers++){
+        #pragma HLS unroll
+        barrelStubWords_o[layers][outputIndex+i] = unmergedBarrelStubs[layers][i];
+        diskStubWords_o[layers][outputIndex+i] = unmergedDiskStubs[layers][i];
+        #ifndef _SYNTHESIS_
+        // std::cout << "j: " << j << " UnmergedBrlStubs: " << unmergedBarrelStubs[j][i] << std::endl;
+        // std::cout << "j: " << j << " UnmergedDiskStubs: " << unmergedDiskStubs[j][i] << std::endl;
+        #endif
+      }
+    }
 
     bx_o = bx;
 

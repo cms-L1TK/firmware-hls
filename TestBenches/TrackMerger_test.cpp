@@ -42,7 +42,7 @@ int main(){
     cout << "Event: " << dec << ievt << endl;
     
 
-    for (unsigned short i = 0; i < kNComparisonModules; ++i){
+    for (unsigned short i = 0; i < kMaxTracks; ++i){
       trackWord[i] = TrackFit::TrackWord(0);
       for (unsigned short j = 0; j < 4; j++){
         barrelStubWords[j][i] = TrackFit::BarrelStubWord(0);
@@ -52,7 +52,7 @@ int main(){
     outputTracks.clear();
 
     // Read in next event from input
-    std::cout << "Next input .. "<< fin_inputTracks.size() << std::endl;
+    std::cout << "Next input .. " << fin_inputTracks.size() << std::endl;
     writeMemFromFile<TrackFitMemory> (inputTracks, fin_inputTracks.at(0), ievt);
     
     // Set bunch crossing

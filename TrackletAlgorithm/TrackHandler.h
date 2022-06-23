@@ -68,7 +68,7 @@ class TrackHandler{
     
     void CompareTrack(TrackHandler track);
 
-    bool MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition);
+    int MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition);
 
     void setDebugFlag(unsigned int debugFlag){
       debug = debugFlag;
@@ -81,6 +81,7 @@ class TrackHandler{
     TrackFit::DiskStubWord getDiskStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
       return diskStubArray[layerIndex][stubIndex];
     }
+
 
     
   private:

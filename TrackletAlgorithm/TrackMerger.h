@@ -4,10 +4,10 @@
 #include <cassert>
 #include "TrackHandler.h"
 
-const unsigned int kNComparisonModules = 3;
+const unsigned int kNComparisonModules = 3; //check no. which causes synthesis to hang
 const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kNBufferSize = 6;
-const unsigned int kMaxTracks = 6;
+const unsigned int kNBufferSize = 32;
+const unsigned int kMaxTracks = 32;
 
 
 class ModuleBuffer{
@@ -21,6 +21,12 @@ class ModuleBuffer{
     TrackHandler readTrack();
 
     void clearBuffer();
+
+    TrackFit::TrackWord outputTrackFromBuffer(unsigned int trackIndex);
+
+    TrackFit::BarrelStubWord outputBufferBarrelStubs(unsigned int trackIndex, unsigned int stubIndex, unsigned int layerIndex);
+
+    TrackFit::DiskStubWord outputBufferDiskStubs(unsigned int trackIndex, unsigned int stubIndex, unsigned int layerIndex);
     
     private:
       unsigned int readIndex{0};
@@ -45,8 +51,6 @@ class ComparisonModule{
 
     unsigned int getNProcessed(){return tracksProcessed;}
 
-    void processTrack();
-
     unsigned int myIndex;
 
     unsigned int getEndOfStream(){return endOfStream;}
@@ -62,6 +66,8 @@ class ComparisonModule{
     unsigned int getEndOfModule(){return endOfModule;}
 
     void process(ModuleBuffer &inputBuffer, ModuleBuffer &outputBuffer);
+
+    void endEvent();
 
     // void setInputBuffer(ModuleBuffer &buffer);
 
