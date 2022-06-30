@@ -73,8 +73,7 @@ TrackFit::DiskStubWord ModuleBuffer::outputBufferDiskStubs(unsigned int trackInd
 
 
 void ComparisonModule::process(ModuleBuffer &inputBuffer, ModuleBuffer &outputBuffer){
-  #pragma HLS inline
-  #pragma HLS pipeline
+    #pragma HLS inline
     // if masterTrack is not set and track is not null, set as master
     // else then if null, do nothing
     // if track is not null and also have a master set then do compare, merge
@@ -124,7 +123,6 @@ ModuleBuffer::ModuleBuffer() : trackArray() {}
 
 ModuleBuffer::~ModuleBuffer(){}
 
-// overall module only reads in a track and pass it to the comparison module
 void TrackMerger(const BXType bx,
   const TrackFit::TrackWord trackWord [kMaxTracks],
   const TrackFit::BarrelStubWord barrelStubWords[4][kMaxTracks],
@@ -193,16 +191,17 @@ void TrackMerger(const BXType bx,
       buffer[0].insertTrack(track);
     }
   
-
     LOOP_Clks:
-    for (int i = 0; i < kMaxProc; i++){ 
+    for (int i = 0; i < kMaxProc; i++){
         #ifndef _SYNTHESIS_
         std::cout << "clock no. : " << i << std::endl;
         #endif
       #pragma HLS pipeline II=1 REWIND
       LOOP_ProcTracks:
       for (unsigned int j = 0; j < kNComparisonModules; j++){
-        #pragma HLS unroll
+        #pragma HLS dependence variable=buffer intra true WAR 
+        #pragma HLS dependence variable=comparisonModule intra true WAR
+        #pragma HLS pipeline II=1 REWIND
         #ifndef _SYNTHESIS_
         std::cout << "comparisonModule no. : " << j << std::endl;
         #endif
@@ -235,7 +234,7 @@ void TrackMerger(const BXType bx,
       #pragma HLS unroll
       unmergedTracks[bufferSizeIndex] = buffer[kNBuffers-1].outputTrackFromBuffer(bufferSizeIndex);
       #ifndef _SYNTHESIS_
-      std::cout << "tw_o:  " << std::hex << trackWord_o[bufferSizeIndex] << std::endl;
+      // std::cout << "tw_o:  " << std::hex << trackWord_o[bufferSizeIndex] << std::endl;
       #endif
       LOOP_UnmergedStubs:
       for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){

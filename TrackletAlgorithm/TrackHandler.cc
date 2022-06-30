@@ -7,6 +7,8 @@ void TrackHandler::CompareTrack(TrackHandler track){
   // std::cout << "track: " << track.trkWord << std::endl;
   LOOP_CompareTrack:
   for (int layerIndex = 0; layerIndex < 4; layerIndex++){
+    #pragma HLS dependence variable=matchesFoundBarrel inter false
+    #pragma HLS dependence variable=matchesFoundDisk inter false
     #pragma HLS unroll
     auto masterBarrelStubIndex = ap_uint<TrackFit::kTFStubIndexSize>(barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
     auto inputBarrelStubIndex = ap_uint<TrackFit::kTFStubIndexSize>(track.barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
@@ -37,6 +39,8 @@ void TrackHandler::CompareTrack(TrackHandler track){
 
 int TrackHandler::MergeTrack(TrackHandler track, unsigned int& matchFound, unsigned int mergeCondition){
   #pragma HLS inline
+  #pragma HLS dependence variable=matchesFoundBarrel inter false
+  #pragma HLS dependence variable=matchesFoundDisk inter false
   // update #matches found 
   int matchesFound = 0;
   LOOP_MatchesFound:
