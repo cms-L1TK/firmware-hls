@@ -56,6 +56,7 @@ bool getIsPSModule(const typename VMProjection<ProjectionType>::VMPZBIN & rzbin,
 template<TF::layerDisk LayerDisk> inline const ap_uint<1>* readTable() {
 	printf("The LayerDisk value must be between TF::L1 (0) and TF::D5 (10)");
 	static ap_uint<1> lut[] = {};
+	printf("lut = ", lut);
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::L1>() {
@@ -114,29 +115,35 @@ template<> inline const ap_uint<1>* readTable<TF::D5>() {
 	return lut;
 }
 
-
+/*
 //To get the number of elements in each table
+//template<TF::layerDisk LayerDisk> inline const int nElementsInTable() {
 template<TF::layerDisk LayerDisk> inline const ap_uint<1>* nElementsInTable() {
         printf("The LayerDisk value must be between TF::L1 (0) and TF::D5 (10)");
         static ap_uint<1> lut[] = {};
+
+	printf("lut = ", lut);
+	//int lut[] = {};
         return lut;
 }
 
 
-template<> inline const ap_uint<1>* nElementsInTable<TF::D1>() {
-
+//template<> inline const int nElementsInTable<TF::D1>() {
+template<> inline const ap_uint<1>* nElementsInTable<TF::D1>(){
+ 
 	static ap_uint<1> lut[] = 
 #include "../emData/ME/tables/METable_D1.tab"
 
+	//printf("lut = ", lut);
+
 	auto lutArrayLength = sizeof(lut) / sizeof(int);
 
-	std::cout << "lutArrayLength = " << lutArrayLength << std::endl;
+	printf("lutArrayLength = ", lutArrayLength);
 
-	return 0;
-	//return lutArrayLength;
+	return lutArrayLength;
 
 }
-
+*/
 
 
 template<TF::layerDisk LayerDisk>
@@ -197,9 +204,9 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	//Initialize table for bend-rinv consistency
 	//
 	static const ap_uint<1>* table = readTable<LayerDisk>();
-	auto NumTableElements = nElementsInTable<LayerDisk>();
+	//auto NumTableElements = nElementsInTable<LayerDisk>();
 
-	std::cout << "NumTableElements = " << NumTableElements << std::endl;
+	//std::cout << "NumTableElements = " << NumTableElements << std::endl;
 
 	//
 	// Set up a FIFO based on a circular buffer structure.
