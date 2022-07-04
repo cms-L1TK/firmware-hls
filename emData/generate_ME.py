@@ -83,7 +83,12 @@ def writeModuleToImplementation(topFile, funcName, prefix, layerDisk, label):
         "\t#pragma HLS resource variable=inputProjectionData->get_mem() latency=2\n"
         "#endif\n"
         "\n"
+	"#ifdef  __VITIS_HLS__\n"
+	"\tBXType * bx_o_ = &bx_o;\n"
+	"\t" + label + ": MatchEngine<TF::" + layerDisk + ">(bx, bx_o, *&inputStubData, *&inputProjectionData, outputCandidateMatch);\n"
+	"#else\n"
         "\t" + label + ": MatchEngine<TF::" + layerDisk + ">(bx, bx_o, inputStubData, inputProjectionData, outputCandidateMatch);\n"
+	"#endif\n"
         "}\n"
     )
 
