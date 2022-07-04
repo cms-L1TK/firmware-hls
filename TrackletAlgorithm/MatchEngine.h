@@ -132,7 +132,8 @@ template<> inline const ap_uint<1>* nElementsInTable<TF::D1>() {
 
 	std::cout << "lutArrayLength = " << lutArrayLength << std::endl;
 
-	return lutArrayLength;
+	return 0;
+	//return lutArrayLength;
 
 }
 
