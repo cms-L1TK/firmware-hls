@@ -1,13 +1,15 @@
 #ifndef TrackletAlgorithm_TrackMerger_h
 #define TrackletAlgorithm_TrackMerger_h
 
+#include "hls_stream.h"
 #include <cassert>
 #include "TrackHandler.h"
 
 
-const unsigned int kNComparisonModules = 16;
+const unsigned int kNComparisonModules = 1;
 const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kNBufferSize = 108;
+const unsigned int kNTracks = 10;
+const unsigned int kNBufferSize = kNTracks;
 
 class ModuleBuffer{
   public:
@@ -62,6 +64,9 @@ class ComparisonModule{
 
     void process(ModuleBuffer &inputBuffer, ModuleBuffer &outputBuffer);
 
+    void process(hls::stream<TrackHandler>& inputBuffer,hls::stream<TrackHandler>& outputBuffer);
+    void process(hls::stream<TrackFit::TrackWord>& inputBuffer,hls::stream<TrackFit::TrackWord>& outputBuffer);
+
     // void setInputBuffer(ModuleBuffer &buffer);
 
     // void setOutputBuffer(ModuleBuffer &buffer);
@@ -82,13 +87,25 @@ class ComparisonModule{
 };
 
 void TrackMerger(const BXType bx,
-  const TrackFit::TrackWord trackWord [kMaxProc],
-  const TrackFit::BarrelStubWord barrelStubWords[4][kMaxProc],
-  const TrackFit::DiskStubWord diskStubWords[4][kMaxProc],
-  BXType &bx_o, 
-  TrackFit::TrackWord trackWord_o[kMaxProc],
-  TrackFit::BarrelStubWord barrelStubWords_o[4][kMaxProc],
-  TrackFit::DiskStubWord diskStubWords_o[4][kMaxProc]
+  hls::stream<TrackFit::TrackWord> &trackWord,
+  // const hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0,
+  // const hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_1,
+  // const hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_2,
+  // const hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_3,
+  // const hls::stream<TrackFit::DiskStubWord> &diskStubWords_0,
+  // const hls::stream<TrackFit::DiskStubWord> &diskStubWords_1,
+  // const hls::stream<TrackFit::DiskStubWord> &diskStubWords_2,
+  // const hls::stream<TrackFit::DiskStubWord> &diskStubWords_3,
+  BXType bx_o,
+  hls::stream<TrackFit::TrackWord> &trackWord_o
+  // hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0_o, 
+  // hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_1_o, 
+  // hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_2_o, 
+  // hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_3_o, 
+  // hls::stream<TrackFit::DiskStubWord> &diskStubWords_0_o, 
+  // hls::stream<TrackFit::DiskStubWord> &diskStubWords_1_o, 
+  // hls::stream<TrackFit::DiskStubWord> &diskStubWords_2_o, 
+  // hls::stream<TrackFit::DiskStubWord> &diskStubWords_3_o 
   );
 
 
