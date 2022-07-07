@@ -102,8 +102,8 @@ void TrackMerger(const BXType bx,
     unsigned int nIn = 0;
     unsigned int nOut = 0;
 
-    assert(buffer[0].empty());
-    assert(buffer[1].empty());
+    // assert(buffer[0].empty());
+    // assert(buffer[1].empty());
 
     LOOP_PROCESS:
     for (int i = 0; i < kMaxProc; i++){ 
