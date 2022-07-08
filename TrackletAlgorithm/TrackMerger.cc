@@ -97,7 +97,7 @@ void TrackMerger(const BXType bx,
     // ModuleBuffer buffer[kNBuffers];
     // #pragma HLS array_partition variable=buffer complete dim=0
     hls::stream<TrackFit::TrackWord> buffer[kNBuffers];
-    #pragma HLS STREAM variable=buffer depth=7
+    #pragma HLS STREAM variable=buffer depth=3
 
     unsigned int nIn = 0;
     unsigned int nOut = 0;
