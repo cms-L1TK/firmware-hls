@@ -6,9 +6,9 @@
 #include "TrackHandler.h"
 
 
-const unsigned int kNComparisonModules = 1;
+const unsigned int kNComparisonModules = 10;
 const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kNTracks = 10;
+const unsigned int kNTracks = 50;
 const unsigned int kNBufferSize = kNTracks;
 
 class ModuleBuffer{
