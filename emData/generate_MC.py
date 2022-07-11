@@ -18,7 +18,7 @@ def ASRegion(region):
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
         return 'BARREL2S'
-    elif region in ['D1', 'D2', 'D3']:
+    elif region in ['D1', 'D2']:
         return 'DISKPS'
     else:
         return 'DISK2S'
