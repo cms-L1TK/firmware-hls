@@ -713,8 +713,8 @@ void MatchCalculator(BXType bx,
   const auto LUT_matchcut_alpha_depth = 10;
   const auto LUT_matchcut_r_width = 12;
   const auto LUT_matchcut_r_depth = 12;
-  const auto LUT_matchcut_rDSS_width = 12;
-  const auto LUT_matchcut_rDSS_depth = 10;
+  const auto LUT_matchcut_rDSS_width = 13;
+  const auto LUT_matchcut_rDSS_depth = 12;
 
   // Setup look up tables for match cuts
   ap_uint<LUT_matchcut_phi_width> LUT_matchcut_phi[LUT_matchcut_phi_depth];
@@ -1188,7 +1188,7 @@ void MatchCalculator(BXType bx,
     typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
     typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
     typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
-    typename AllStub<DISK2S>::ASR    stub_2s_r    = stub_2s.getR();
+    ap_uint<12>    stub_2s_r    = stub_2s.getR();
     typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
     typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
     typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
@@ -1238,7 +1238,7 @@ void MatchCalculator(BXType bx,
     constexpr int dphibit = 20;
     ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
     ap_uint<3> shiftprojz     = 7;
-    ap_int<6> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
+    ap_int<7> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
     if(isDisk && isPSStub)
       proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
     else if(isDisk)
@@ -1246,22 +1246,22 @@ void MatchCalculator(BXType bx,
     const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
     ap_uint<1> shiftr         = 1;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
-    typename FullMatch<FMTYPE>::FMSTUBR tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[stub_2s_r] : LUT_matchcut_rDSS[stub_r]; //FIXME
+    ap_uint<12> tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)] : LUT_matchcut_rDSS[ap_uint<12>(stub_r)]; //FIXME
 
     if(isDisk && isPSStub) {
-      delta_r   = (stub_ps_r >> shiftr) - proj_r_long; // proj_z = RZ
+      delta_r   = (ap_uint<12>(stub_ps_r) >> shiftr) - proj_r_long; // proj_z = RZ
     }
     else if(isDisk && !isPSStub) {
-      auto alpha_fact = LUT_matchcut_alpha[stub_2s_r];
-      stub_2s_r = LUT_matchcut_rDSS[stub_2s_r];
+      auto alpha_fact = LUT_matchcut_alpha[ap_uint<12>(stub_2s_r)];
+      tmp_stubr = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
       delta_r   = ((tmp_stubr >> shiftr) - proj_r_long); // proj_z = RZ
       ap_uint<4> alpha_shift = 12;
-      ap_uint<12> alpha_corr = (delta_r * stub_2s_alpha * alpha_fact) >> alpha_shift;
+      ap_uint<12> alpha_corr = (ap_int<12>(delta_r) * stub_2s_alpha * alpha_fact) >> alpha_shift;
       delta_phi += alpha_corr;
     }
     constexpr int adphibit = isDisk ? 12 : 17;
     ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
-    ap_int<12> abs_delta_r    = iabs<12>( delta_r );
+    ap_int<12> abs_delta_r    = iabs<11>( delta_r );
 
     // Full match parameters
     const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -1270,8 +1270,9 @@ void MatchCalculator(BXType bx,
     const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid = stubid;
     typename FullMatch<FMTYPE>::FMSTUBR               fm_stubr = stub_r;
     if(isDisk && isPSStub) fm_stubr = stub_ps_r;
+    else if(isDisk) fm_stubr = stub_2s_r;
     const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
-    const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : delta_r;
+    const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : ap_int<12>(delta_r);
 
     // Full match
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
@@ -1302,12 +1303,12 @@ void MatchCalculator(BXType bx,
   
     // Check that matches fall within the selection window of the projection 
     bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
-    bool disk_match = isPSStub ? ((abs_delta_phi * stub_ps_r) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+    bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
     if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
       if(isDisk) {
-        best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * stub_ps_r) : ap_uint<20>(abs_delta_phi * tmp_stubr);
+        best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * ap_uint<12>(stub_ps_r)) : ap_uint<20>(abs_delta_phi * tmp_stubr);
         best_delta_r    = abs_delta_r;
       }
       else {
