@@ -1261,7 +1261,7 @@ void MatchCalculator(BXType bx,
     }
     constexpr int adphibit = isDisk ? 12 : 17;
     ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
-    ap_int<12> abs_delta_r    = iabs<12>( delta_r );
+    ap_int<12> abs_delta_r    = iabs<11>( delta_r );
 
     // Full match parameters
     const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
