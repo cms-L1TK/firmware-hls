@@ -6,7 +6,7 @@
 #include "TrackFitMemory.h"
 #include "TrackHandler.h"
 
-const unsigned int kNComparisonModules = 16;
+const unsigned int kNComparisonModules = 2;
 const unsigned int kNBuffers = kNComparisonModules + 1;
 const unsigned int kMaxTrack = 50;
 const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
