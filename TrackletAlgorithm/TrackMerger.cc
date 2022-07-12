@@ -5,11 +5,10 @@ void ComparisonModule::process(hls::stream<track_struct> &inputBuffer, hls::stre
   #pragma HLS inline
   #pragma HLS pipeline
   track_struct track;
-  if (inputBuffer.read_nb(track)) {
-    assert(track._trackWord !=0 && "Null track in CM");
-    outputBuffer.write(track);
-    tracksProcessed++;
-  }
+  inputBuffer.read(track);
+  //assert(track._trackWord !=0 && "Null track in CM");
+  outputBuffer.write(track);
+  tracksProcessed++;
 }
 
 void TrackMerger(const BXType bx,
@@ -34,51 +33,46 @@ void TrackMerger(const BXType bx,
   hls::stream<TrackFit::DiskStubWord> &diskStubWords_3_o 
   )
 {
-    #pragma HLS inline
+  #pragma HLS inline
 
-    ComparisonModule comparisonModule[kNComparisonModules];
-    #pragma HLS array_partition variable=comparisonModule complete dim=0
+  ComparisonModule comparisonModule[kNComparisonModules];
+  #pragma HLS array_partition variable=comparisonModule complete dim=0
 
-    hls::stream<track_struct> buffer[kNBuffers];
-    #pragma HLS STREAM variable=buffer depth=2
+  hls::stream<track_struct> buffer[kNBuffers];
+  #pragma HLS STREAM variable=buffer depth=2
 
-    LOOP_PROCESS:
-    for (int i = 0; i < kMaxProc; i++){ 
-      #pragma HLS pipeline II=1 REWIND
-      track_struct theTrack;
-      if (trackWord.read_nb(theTrack._trackWord)) {
-        assert(barrelStubWords_0.read_nb(theTrack._barrelStub_0));
-        assert(barrelStubWords_1.read_nb(theTrack._barrelStub_1));
-        assert(barrelStubWords_2.read_nb(theTrack._barrelStub_2));
-        assert(barrelStubWords_3.read_nb(theTrack._barrelStub_3));
-        assert(diskStubWords_0.read_nb(theTrack._diskStub_0));        
-        assert(diskStubWords_1.read_nb(theTrack._diskStub_1));        
-        assert(diskStubWords_2.read_nb(theTrack._diskStub_2));        
-        assert(diskStubWords_3.read_nb(theTrack._diskStub_3));        
-        buffer[0].write(theTrack);
-      }
+  LOOP_INPUT:
+  for (int i = 0; i < kMaxTrack; i++){ 
+    #pragma HLS dataflow
+    track_struct theTrack;
+    trackWord.read(theTrack._trackWord);
+    barrelStubWords_0.read(theTrack._barrelStub_0);
+    barrelStubWords_1.read(theTrack._barrelStub_1);
+    barrelStubWords_2.read(theTrack._barrelStub_2);
+    barrelStubWords_3.read(theTrack._barrelStub_3);
+    diskStubWords_0.read(theTrack._diskStub_0);        
+    diskStubWords_1.read(theTrack._diskStub_1);        
+    diskStubWords_2.read(theTrack._diskStub_2);        
+    diskStubWords_3.read(theTrack._diskStub_3);        
+    buffer[0].write(theTrack);
 
-      LOOP_ProcTracks:
-      for(unsigned int j = 0; j < kNComparisonModules; j++){
-        #pragma HLS unroll
-        comparisonModule[j].process(buffer[j], buffer[j+1]);
-      } 
+    LOOP_CM:
+    for(unsigned int j = 0; j < kNComparisonModules; j++){
+      comparisonModule[j].process(buffer[j], buffer[j+1]);
+    } 
 
-      track_struct track_o; 
-      if (!buffer[kNBuffers-1].empty()) {
-        if (buffer[kNBuffers-1].read_nb(track_o)) {
-          assert(track_o._trackWord != 0 && "Null track in FIFO"); // Check it is not a null track
-          trackWord_o.write(track_o._trackWord);
-          barrelStubWords_0_o.write(track_o._barrelStub_0);
-          barrelStubWords_1_o.write(track_o._barrelStub_1);
-          barrelStubWords_2_o.write(track_o._barrelStub_2);
-          barrelStubWords_3_o.write(track_o._barrelStub_3);
-          diskStubWords_0_o.write(track_o._diskStub_0);
-          diskStubWords_1_o.write(track_o._diskStub_1);
-          diskStubWords_2_o.write(track_o._diskStub_2);
-          diskStubWords_3_o.write(track_o._diskStub_3);
-        }
-      } 
-    }
+    track_struct track_o; 
+    buffer[kNBuffers-1].read(track_o);
+    //assert(track_o._trackWord != 0 && "Null track in FIFO"); // Check it is not a null track
+    trackWord_o.write(track_o._trackWord);
+    barrelStubWords_0_o.write(track_o._barrelStub_0);
+    barrelStubWords_1_o.write(track_o._barrelStub_1);
+    barrelStubWords_2_o.write(track_o._barrelStub_2);
+    barrelStubWords_3_o.write(track_o._barrelStub_3);
+    diskStubWords_0_o.write(track_o._diskStub_0);
+    diskStubWords_1_o.write(track_o._diskStub_1);
+    diskStubWords_2_o.write(track_o._diskStub_2);
+    diskStubWords_3_o.write(track_o._diskStub_3);
+  }
   bx_o = bx;
 }

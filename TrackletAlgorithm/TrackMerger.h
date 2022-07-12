@@ -7,6 +7,7 @@
 
 const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
+const unsigned int kMaxTrack = 50;
 
 typedef struct {
   TrackFit::TrackWord _trackWord;
