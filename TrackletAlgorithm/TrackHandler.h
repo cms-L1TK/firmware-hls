@@ -22,11 +22,11 @@ class TrackHandler{
       // assign the bits to trackWord, barrelStubsWord, diskStubsWord
       // set the barrel and disk stub words in constructor using loop
       // all the information from the track and stub words;
-      trkWord = trackWord;
+      _trkWord = trackWord;
       LOOP_THInputsBarrel:
       for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
         #pragma HLS unroll
-        barrelStubArray[j][0] = barrelStubWords[j];
+        _barrelStubArray[j][0] = barrelStubWords[j];
         #ifndef _SYNTHESIS_
         // std::cout << "brlStub: " << j << " " << barrelStubArray[j][0] << std::endl;
         #endif
@@ -34,23 +34,23 @@ class TrackHandler{
       LOOP_THInputsDisk:
       for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
         #pragma HLS unroll
-        diskStubArray[k][0] = diskStubWords[k];
+        _diskStubArray[k][0] = diskStubWords[k];
       }
     
     }
 
     TrackHandler()
     { // sets words to 0
-      trkWord = 0;
+      _trkWord = 0;
       LOOP_THInputsBarrel0:
       for (unsigned int j = 0; j < TrackFit::kNBarrelStubs; j++){ 
         #pragma HLS unroll
-        barrelStubArray[j][0] = 0;
+        _barrelStubArray[j][0] = 0;
       }
       LOOP_THInputsDisk0:
       for (unsigned int k = 0; k < TrackFit::kNDiskStubs; k++){
         #pragma HLS unroll
-        diskStubArray[k][0] = 0;
+        _diskStubArray[k][0] = 0;
       }
     
     }
@@ -59,11 +59,11 @@ class TrackHandler{
     ~TrackHandler(){};
 
     TrackFit::TrackWord getTrackWord() const{
-      return trkWord;
+      return _trkWord;
     }
 
     void setTrackWord(TrackFit::TrackWord trackWord){
-      trkWord = trackWord;
+      _trkWord = trackWord;
     }
     
     void CompareTrack(TrackHandler track);
@@ -75,19 +75,19 @@ class TrackHandler{
     }
 
     TrackFit::BarrelStubWord getBarrelStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
-      return barrelStubArray[layerIndex][stubIndex];
+      return _barrelStubArray[layerIndex][stubIndex];
     }
 
     TrackFit::DiskStubWord getDiskStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
-      return diskStubArray[layerIndex][stubIndex];
+      return _diskStubArray[layerIndex][stubIndex];
     }
 
 
     
   private:
-    TrackFit::TrackWord trkWord;
-    TrackFit::BarrelStubWord barrelStubArray[4][layerStubIndexSize]; 
-    TrackFit::DiskStubWord diskStubArray[4][layerStubIndexSize];
+    TrackFit::TrackWord _trkWord;
+    TrackFit::BarrelStubWord _barrelStubArray[4][layerStubIndexSize]; 
+    TrackFit::DiskStubWord _diskStubArray[4][layerStubIndexSize];
     ap_uint<1> matchesFoundBarrel[4][layerStubIndexSize];
     ap_uint<1> matchesFoundDisk[4][layerStubIndexSize];
     ap_uint<1> stubPadding = 0;

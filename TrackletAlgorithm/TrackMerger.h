@@ -16,9 +16,9 @@ class ModuleBuffer{
 
     ~ModuleBuffer();
     
-    void insertTrack(const TrackHandler track);
+    void insertTrack(const TrackHandler& track);
 
-    TrackHandler readTrack();
+    const TrackHandler& readTrack();
 
     void clearBuffer();
 
@@ -31,7 +31,8 @@ class ModuleBuffer{
     private:
       unsigned int readIndex{0};
       unsigned int writeIndex{0};
-      TrackHandler trackArray[kNBufferSize];
+      TrackHandler _trackArray[kNBufferSize];
+      TrackHandler _nullArray; //static
 };
 
 class ComparisonModule{
