@@ -62,9 +62,13 @@ int main(){
     BXType bx_o;
 
     // Set input memories
-    for(unsigned short i = 0; i < inputTracks.getEntries(bx); i++){
+    for(unsigned short i = 0; i < kMaxTrack; i++){
       TrackFit track;
-      track = inputTracks.read_mem(bx, i); //i+1 for merge
+      if (i<inputTracks.getEntries(bx)) {
+        track = inputTracks.read_mem(bx, i); //i+1 for merge
+      } else {
+        track = TrackFit();
+      }
       trackWord << track.getTrackWord();
       barrelStubWords_0 << track.getBarrelStubWord<0>();
       barrelStubWords_1 << track.getBarrelStubWord<1>();
@@ -92,50 +96,21 @@ int main(){
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < kMaxProc; i++){ 
+    for (unsigned short i = 0; i < kMaxTrack; i++){ 
       TrackFit track;
-      TrackFit::TrackWord theWord;
-      TrackFit::BarrelStubWord theBarrelStub;
-      TrackFit::DiskStubWord theDiskStub;
-      if (trackWord_o.read_nb(theWord)) {
-        assert(theWord != 0); // Expect no situation would track word be null.
-        track.setTrackWord(theWord);
-        assert(barrelStubWords_0_o.read_nb(theBarrelStub));
-        track.setBarrelStubWord<0>(theBarrelStub);
-        assert(barrelStubWords_1_o.read_nb(theBarrelStub));
-        track.setBarrelStubWord<1>(theBarrelStub);
-        assert(barrelStubWords_2_o.read_nb(theBarrelStub));
-        track.setBarrelStubWord<2>(theBarrelStub);
-        assert(barrelStubWords_3_o.read_nb(theBarrelStub));
-        track.setBarrelStubWord<3>(theBarrelStub);
-       
-        assert(diskStubWords_0_o.read_nb(theDiskStub));
-        track.setDiskStubWord<4>(theDiskStub);
-        assert(diskStubWords_1_o.read_nb(theDiskStub));
-        track.setDiskStubWord<5>(theDiskStub);
-        assert(diskStubWords_2_o.read_nb(theDiskStub));
-        track.setDiskStubWord<6>(theDiskStub);
-        assert(diskStubWords_3_o.read_nb(theDiskStub));
-        track.setDiskStubWord<7>(theDiskStub);
+      track.setTrackWord(trackWord_o.read());
+      track.setBarrelStubWord<0>(barrelStubWords_0_o.read());
+      track.setBarrelStubWord<1>(barrelStubWords_1_o.read());
+      track.setBarrelStubWord<2>(barrelStubWords_2_o.read());
+      track.setBarrelStubWord<3>(barrelStubWords_3_o.read());
+      track.setDiskStubWord<4>(diskStubWords_0_o.read());
+      track.setDiskStubWord<5>(diskStubWords_1_o.read());
+      track.setDiskStubWord<6>(diskStubWords_2_o.read());
+      track.setDiskStubWord<7>(diskStubWords_3_o.read());
       
-        outputTracks.write_mem(bx, track, nTracks );
-        ++nTracks;
-      } else {       // If there is no track word in the FIFO, there should be no other data either
-       assert(barrelStubWords_0_o.empty());
-       assert(barrelStubWords_1_o.empty());
-       assert(barrelStubWords_2_o.empty());
-       assert(barrelStubWords_3_o.empty());
-       assert(diskStubWords_0_o.empty());
-       assert(diskStubWords_1_o.empty());
-       assert(diskStubWords_2_o.empty());
-       assert(diskStubWords_3_o.empty());
-      }
-    }
-
-    // Need to zero the rest of the outputs
-    for (int i=nTracks;i<kMaxProc;++i) {
-      outputTracks.write_mem(bx,TrackFit(),i);
-    }
+      outputTracks.write_mem(bx, track, nTracks );
+      ++nTracks;
+    } 
 
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
