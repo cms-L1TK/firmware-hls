@@ -10,7 +10,7 @@ add_files ../TrackletAlgorithm/TrackMergerTop.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/TrackMerger.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackMerger_test.cpp -cflags "$CFLAGS"
 
-open_solution "solution1"
+open_solution "stubs"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
