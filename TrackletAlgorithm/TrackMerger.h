@@ -5,7 +5,7 @@
 #include <cassert>
 #include "TrackFitMemory.h"
 
-const unsigned int kNComparisonModules = 2;
+const unsigned int kNComparisonModules = 10;
 const unsigned int kNBuffers = kNComparisonModules + 1;
 const unsigned int kMaxTrack = 50;
 
@@ -51,7 +51,9 @@ class ComparisonModule{
     unsigned int getEndOfModule(){return endOfModule;}
 
     void process(hls::stream<track_struct>& inputBuffer,hls::stream<track_struct>& outputBuffer);
-    
+    void process(track_struct &inTrack,track_struct &outTrack);
+
+
   private:
 
     unsigned int matchFound{0};
@@ -61,6 +63,32 @@ class ComparisonModule{
     unsigned int endOfModule{0};
 
     track_struct masterTrack;
+
+    void loadTrack(
+      hls::stream<TrackFit::TrackWord> &trackWord,
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0,
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_1,
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_2,
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_3,
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_0,
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_1,
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_2,
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_3,
+      track_struct& aTrack
+    );
+
+    void unloadTrack(
+      track_struct& aTrack,
+      hls::stream<TrackFit::TrackWord> &trackWord_o,
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0_o, 
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_1_o, 
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_2_o, 
+      hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_3_o, 
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_0_o, 
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_1_o, 
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_2_o, 
+      hls::stream<TrackFit::DiskStubWord> &diskStubWords_3_o 
+    );
 
 };
 
