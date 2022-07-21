@@ -285,12 +285,11 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			memoriesAS[n].write_mem(bx, allstub, i);
 		}
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
+#ifdef VMRCM_DEBUG
 		edm::LogVerbatim("L1trackHLS") << std::endl << "Stub index no. " << i << std::endl
 				<< "Out put stub: " << std::hex << allstub.raw() << std::dec
 				<< std::endl;
-#endif // DEBUG
+#endif // VMRCM_DEBUG
 
 		////////////////////////////////////////
 		// AllStubInner memories
@@ -368,11 +367,10 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					}
 				}
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
+#ifdef VMRCM_DEBUG
 				edm::LogVerbatim("L1trackHLS") << std::endl << "Allstub Inner: " << std::hex
 						<< allstubinner.raw() << std::dec << std::endl;
-#endif // DEBUG
+#endif // VMRCM_DEBUG
 
 			}
 		}
@@ -391,11 +389,10 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
 		addrCountME[slotME] += 1;
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
+#ifdef VMRCM_DEBUG
 		edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::dec
 				<< "       to slot " << slotME << std::endl;
-#endif // DEBUG
+#endif // VMRCM_DEBUG
 		// End ME memories
 
 		////////////////////////////////////
@@ -417,11 +414,10 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			}
 			addrCountTE[slotTE] += 1;
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
+#ifdef VMRCM_DEBUG
 			edm::LogVerbatim("L1trackHLS") << "TEOuter stub " << std::hex << stubTEO.raw()
 					<< std::dec << "       to slot " << slotTE << std::endl;
-#endif // DEBUG
+#endif // VMRCM_DEBUG
 
 		} // End TE Outer memories
 
