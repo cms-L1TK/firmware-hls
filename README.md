@@ -164,3 +164,69 @@ In order to keep the GitHub repository public we use GitHub Actions and GitLab C
 * Add your branch name to the "on:" section of .github/workflows/GitLab_CI.yml 
     - In the "push:" subsection to trigger CI on each push, e.g. "branches: [feat_CI,<your_branch_name>]" and/or
     - in the "pull_request:" subsection to trigger CI on each PR, e.g. "branches: [master,<your_branch_name>]"
+
+## EMP
+
+Summer Chain with EMP can bu built using this repository.
+
+Currently the project is built against the Apollo board with VU7P FPGA.
+
+### Prerequisites
+
+* Xilinx Vivado 2020.1 (HLS build) and 2021.2 (project build)
+* ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb). Tested with dev/2021j
+* Python 3
+
+### Quick instructions
+
+**Step 1: Setup the work area**
+
+First source Xilinx Vivado 2020.1
+
+```
+ipbb init work
+cd work
+kinit myusername@CERN.CH
+ipbb add git https://:@gitlab.cern.ch:8443/p2-xware/firmware/emp-fwk.git -b v0.7.0-alpha
+ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v1.2.2
+ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
+ipbb add git https://:@gitlab.cern.ch:8443/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
+ipbb add git https://gitlab.cern.ch/HPTD/tclink.git -r fda0bcf
+ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.9
+ipbb add git https://github.com/FilMarini/firmware-hls -b for_emp # Be ready to wait a long time
+```
+
+*Note: You need to be a member of the `cms-tcds2-users` egroup in order to clone the `cms-tcds2-firmware` repository. In order to add yourself to that egroup, go to the "Members" tab of [this page](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10380295), and click on the "Add me" button; you may need to wait ~ 24 hours to get access to the GitLab repo.*
+
+replace
+```
+set_false_path -through [get_nets {ttc/tcds2_interface_stat[channel0_ttc2]*}] -to [get_clocks {clk_40_extern0 clk_40_pseudo}]
+```
+in
+
+```
+emp-fw/components/top/firmware/ucf/clock_constraints_tcds2.tcl
+```
+with
+```
+set_false_path -through [get_nets {ttc/*tcds2_interface_stat[channel0_ttc2]*}] -to [get_clocks {clk_40_extern0 clk_40_pseudo}]
+```
+
+**Step 2: Create an ipbb project area**
+
+For vivado simulation testbench:
+```
+ipbb proj create vivado vsim firmware-hls: 'vsim.dep'
+cd proj/vsim
+```
+
+**Step 3: Simulation**
+
+```
+ipbb vivado generate-project
+cd vsim
+vivado vsim.xpr
+```
+
+and start the simulation from GUI.
+

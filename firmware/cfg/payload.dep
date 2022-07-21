@@ -1,0 +1,66 @@
+src payload.vhd
+src linktosecproc.vhd
+src secproctolink.vhd
+src memUtil_pkg.vhd
+src SectorProcessor.vhd
+
+src tracklet_format/tracklet_format_in.vhd
+src tracklet_format/tracklet_format_out.vhd
+
+src tracklet_isolation/tracklet_isolation_in_node2S.vhd
+src tracklet_isolation/tracklet_isolation_in_nodePS.vhd
+src tracklet_isolation/tracklet_isolation_in_quad.vhd
+src tracklet_isolation/tracklet_isolation_in.vhd
+src tracklet_isolation/tracklet_isolation_out.vhd
+src tracklet_isolation/tracklet_isolation_out_stub.vhd
+src tracklet_isolation/tracklet_isolation_out_track.vhd
+
+src pkgs/hybrid_config.vhd
+src pkgs/hybrid_tools.vhd
+src pkgs/hybrid_data_formats.vhd
+src pkgs/hybrid_data_types.vhd
+src pkgs/tracklet_config.vhd
+src pkgs/tracklet_data_types.vhd
+src pkgs/GCU_utils.vhd
+
+src common/hdl/CreateStartSignal.vhd
+src common/hdl/FileReaderFIFO.vhd
+src common/hdl/FileReader.vhd
+src common/hdl/FileWriterFIFO.vhd
+src common/hdl/FileWriterFromRAMBinned.vhd
+src common/hdl/FileWriterFromRAM.vhd
+src common/hdl/FileWriter.vhd
+src common/hdl/latency_monitor.vhd
+src --vhdl2008 common/hdl/tf_lut.vhd
+src --vhdl2008 common/hdl/tf_mem_bin.vhd
+src --vhdl2008 common/hdl/tf_mem.vhd
+src common/hdl/tf_pkg_emp.vhd
+
+# Surf subset
+src -l surf surf_subset/hdl/AxiStreamFifoV2.vhd
+src -l surf surf_subset/hdl/AxiStreamFifo.vhd
+src -l surf surf_subset/hdl/AxiStreamGearbox.vhd
+src -l surf surf_subset/hdl/AxiStreamMux.vhd
+src -l surf surf_subset/hdl/AxiStreamPipeline.vhd
+src -l surf surf_subset/hdl/AxiStreamResizeBE.vhd
+src -l surf surf_subset/hdl/AxiStreamResize.vhd
+src -l surf surf_subset/hdl/FifoAsync.vhd
+src -l surf surf_subset/hdl/FifoCascade.vhd
+src -l surf surf_subset/hdl/FifoOutputPipeline.vhd
+src -l surf surf_subset/hdl/FifoRdFsm.vhd
+src -l surf surf_subset/hdl/FifoSync.vhd
+src -l surf surf_subset/hdl/Fifo.vhd
+src -l surf surf_subset/hdl/FifoWrFsm.vhd
+src -l surf surf_subset/hdl/RstSync.vhd
+src -l surf surf_subset/hdl/SimpleDualPortRam.vhd
+src -l surf surf_subset/hdl/SynchronizerVector.vhd
+src -l surf surf_subset/hdl/Synchronizer.vhd
+
+src -l surf surf_subset/pkgs/ArbiterPkg.vhd
+src -l surf surf_subset/pkgs/AxiStreamPkg.vhd
+src -l surf surf_subset/pkgs/StdRtlPkg.vhd
+
+################
+# Include Cores
+################
+setup include_cores.tcl
