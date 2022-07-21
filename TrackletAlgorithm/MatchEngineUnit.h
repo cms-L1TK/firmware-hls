@@ -318,15 +318,12 @@ inline ap_uint<kNBits_MemAddr> getProjSeq() {
   if (!empty()) {
     return projseqs_[readindex_];
   }
-  if (idle_&&!good__&&good__t&&!good___) {
+  if (idle_&&!good__&&!good___) {
     ap_uint<kNBits_MemAddr> tmp(0);
     return ~tmp;
   }
   if (good___) {
     return projseq___;
-  }
-  if (good__t) {
-    return projseq__t;
   }
   if (good__) {
     return projseq__;

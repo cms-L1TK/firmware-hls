@@ -540,7 +540,6 @@ void MatchProcessor(BXType bx,
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin, projin);
 
-  
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -604,16 +603,8 @@ void MatchProcessor(BXType bx,
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
 
-
-
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
-
-//    if (istep == 0){
-
-
-//    continue;
-//    }
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -657,26 +648,9 @@ void MatchProcessor(BXType bx,
      
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
-//parallelize this comparison to save time (?) jf
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
-    //bool Bit02 = projseqs[0]<projseqs[2];
-    //bool Bit03 = projseqs[0]<projseqs[3];
-    //bool Bit12 = projseqs[1]<projseqs[2];
-    //bool Bit13 = projseqs[1]<projseqs[3];
     ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
-    //ap_uint<2> bestiMEU;
-    //if (Bit01&&Bit02&&Bit03){
-    //  bestiMEU = 0;
-    //}
-    //else if (Bit12&&Bit13){
-    //  bestiMEU = 1;
-    //}
-    //else if (Bit23){
-    //  bestiMEU = 2;
-    //}
-    //else{
-    //  bestiMEU = 3;
-    //}
+
     projseq01tmp = Bit01 ? projseqs[0] : projseqs[1];
     projseq23tmp = Bit23 ? projseqs[2] : projseqs[3];
     
