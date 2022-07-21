@@ -18,6 +18,7 @@ build_ip InputRouterTop_IR_DTC_PS10G_2_B ../../project
 build_ip InputRouterTop_IR_DTC_PS10G_3_A ../../project
 build_ip InputRouterTop_IR_DTC_PS10G_3_B ../../project
 build_ip InputRouterTop_IR_DTC_PS_1_A ../../project
+build_ip InputRouterTop_IR_DTC_PS_1_B ../../project
 build_ip InputRouterTop_IR_DTC_PS_2_A ../../project
 build_ip InputRouterTop_IR_DTC_PS_2_B ../../project
 build_ip InputRouterTop_IR_DTC_2S_1_A ../../project
@@ -25,6 +26,7 @@ build_ip InputRouterTop_IR_DTC_2S_1_B ../../project
 build_ip InputRouterTop_IR_DTC_2S_2_A ../../project
 build_ip InputRouterTop_IR_DTC_2S_2_B ../../project
 build_ip InputRouterTop_IR_DTC_2S_3_A ../../project
+build_ip InputRouterTop_IR_DTC_2S_3_B ../../project
 build_ip InputRouterTop_IR_DTC_2S_4_A ../../project
 build_ip InputRouterTop_IR_DTC_2S_4_B ../../project
 
