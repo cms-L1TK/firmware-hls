@@ -240,7 +240,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
-
+#pragma HLS latency min = 12 //this ensures latencies of different vmrs match in a reduced configuration.
 		bool noStubsLeft = !hasStubs.or_reduce(); // Determines if we have processed all stubs. Is true if hasStubs is all 0s
 		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S

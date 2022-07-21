@@ -65,7 +65,7 @@ namespace PR
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // memory pointers
                        const MemType mem[nMEM],
-                       DataType& data, int& nproj)
+                       DataType& data)
   {
 #pragma HLS inline
     if (mem_hasdata == 0) return false;
@@ -84,7 +84,6 @@ namespace PR
       // Prepare to move to the next non-empty memory
       read_addr = 0;
       mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
-      nproj++;
     } else {
       read_addr = read_addr_next;
     }
@@ -529,7 +528,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
-
+  //FIXME moved this into main loop - jf
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
@@ -540,6 +539,7 @@ void MatchProcessor(BXType bx,
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin, projin);
+
   
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
@@ -563,7 +563,6 @@ void MatchProcessor(BXType bx,
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
-  auto nproj=0;
 
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
@@ -605,8 +604,16 @@ void MatchProcessor(BXType bx,
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
 
+
+
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
+
+//    if (istep == 0){
+
+
+//    continue;
+//    }
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -650,9 +657,26 @@ void MatchProcessor(BXType bx,
      
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
+//parallelize this comparison to save time (?) jf
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
+    //bool Bit02 = projseqs[0]<projseqs[2];
+    //bool Bit03 = projseqs[0]<projseqs[3];
+    //bool Bit12 = projseqs[1]<projseqs[2];
+    //bool Bit13 = projseqs[1]<projseqs[3];
     ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
-
+    //ap_uint<2> bestiMEU;
+    //if (Bit01&&Bit02&&Bit03){
+    //  bestiMEU = 0;
+    //}
+    //else if (Bit12&&Bit13){
+    //  bestiMEU = 1;
+    //}
+    //else if (Bit23){
+    //  bestiMEU = 2;
+    //}
+    //else{
+    //  bestiMEU = 3;
+    //}
     projseq01tmp = Bit01 ? projseqs[0] : projseqs[1];
     projseq23tmp = Bit23 ? projseqs[2] : projseqs[3];
     
@@ -863,7 +887,7 @@ void MatchProcessor(BXType bx,
 	TrackletProjectionMemory<PROJTYPE>,
 	nINMEM, kNBits_MemAddr+1>
 	(bx, mem_hasdata, numbersin, mem_read_addr,
-         projin, projdata, nproj);
+         projin, projdata);
  
     } else {
       validin = false;
