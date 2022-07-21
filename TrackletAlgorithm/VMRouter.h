@@ -676,11 +676,10 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 				memoriesAS[n].write_mem(bx, allstub, i);
 			}
 
-// For debugging
-#ifndef __SYNTHESIS__
+#ifndef VMR_DEBUG
 			edm::LogVerbatim("L1trackHLS") << std::endl << "Stub index no. " << i << std::endl << "Out put stub: " << std::hex << allstub.raw() << std::dec
 					<< std::endl;
-#endif // DEBUG
+#endif // VMR_DEBUG
 
 
 		/////////////////////////////////////////////
@@ -699,8 +698,7 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 					createStubME<DISK2S, OutType, Layer, Disk>(stubDisk2S, i, negDisk, fineBinTable, phiCorrTable, ivmPlus, ivmMinus, bin) :
 					createStubME<InType, OutType, Layer, Disk>(stub, i, negDisk, fineBinTable, phiCorrTable, ivmPlus, ivmMinus, bin);;
 
-// For debugging
-#ifndef __SYNTHESIS__
+#ifndef VMR_DEBUG
 			edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::endl;
 			edm::LogVerbatim("L1trackHLS") << "ivm Minus,Plus = " << std::dec << ivmMinus << " " << ivmPlus << " " << "\t0x"
 					<< std::setfill('0') << std::setw(4) << std::hex
@@ -711,7 +709,7 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 			if (!maskME[ivmMinus]) {
 				std::cerr << "Trying to write to non-existent memory for ivm = " << ivmMinus << std::endl;
 			}
-#endif // DEBUG
+#endif // VMR_DEBUG
 
 			// Write the ME stub to the correct memory.
 			// If stub is close to a border (ivmPlus != ivmMinus)
@@ -748,13 +746,12 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 			// Create the TE Inner stub to save
 			VMStubTEInner<OutType> stubTEI = createStubTEInner<InType, OutType, Layer, Disk>(stub, i, negDisk, rzbitsInnerTable, phiCorrTable, ivm, rzbits);
 
-// For debugging
-#ifndef __SYNTHESIS__
+#ifndef VMR_DEBUG
 			edm::LogVerbatim("L1trackHLS") << "TEInner stub " << std::hex << stubTEI.raw()
 					<< std::endl;
 			edm::LogVerbatim("L1trackHLS") << "ivm: " << std::dec << ivm <<std::endl
 					<< std::endl;
-#endif // DEBUG
+#endif // VMR_DEBUG
 
 			// Write the TE Inner stub to the correct memory
 			// Only if it has a valid rzbits/binlookup value, i.e. not -1,
@@ -788,12 +785,11 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 			// Create the TE Outer stub to save
 			VMStubTEOuter<OutType> stubTEO = createStubTEOuter<InType, OutType, Layer, Disk>(stub, i, negDisk, rzbitsOuterTable, phiCorrTable, ivm, bin);
 
-// For debugging
-#ifndef __SYNTHESIS__
+#ifndef VMR_DEBUG
 			edm::LogVerbatim("L1trackHLS") << "TEOuter stub " << std::hex << stubTEO.raw()
 					<< std::endl;
 			edm::LogVerbatim("L1trackHLS") << "    ivm: " << std::dec << ivm << "       to bin " << bin << std::endl;
-#endif // DEBUG
+#endif // VMR_DEBUG
 
 			// Write the TE Outer stub to the correct memory
 			// Only if it has a valid bend
@@ -832,13 +828,12 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 			// Create the TE Inner Overlap stub to save
 			VMStubTEInner<BARRELOL> stubOL = createStubTEOverlap<InType, Layer>(stub, i, rzbitsOverlapTable, phiCorrTable, ivm, rzbits);
 
-// For debugging
-#ifndef __SYNTHESIS__
+#ifndef VMR_DEBUG
 			edm::LogVerbatim("L1trackHLS") << "Overlap stub " << " " << std::hex
 					<< stubOL.raw() << std::endl;
 			edm::LogVerbatim("L1trackHLS") << "ivm: " << std::dec << ivm << std::endl
 					<< std::endl;
-#endif // DEBUG
+#endif // VMR_DEBUG
 
 			// Save stub to Overlap memories
 			if (maskOL[ivm] && (rzbits != -1)) {
@@ -856,12 +851,11 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 				}
 			}
 
-// For debugging
-#ifndef __SYNTHESIS__
+#ifndef VMR_DEBUG
 			else {
 			  edm::LogVerbatim("L1trackHLS") << "NO OVERLAP" << std::endl << std::endl;
 			}
-#endif // DEBUG
+#endif // VMR_DEBUG
 
 		} // End TE Overlap memories
 	} // Outside main loop
