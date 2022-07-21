@@ -114,12 +114,11 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
-  
-    writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {
+      writememloop: for (signed int icopy=0; icopy< (signed) NCOPY;icopy++) { // Casting to signed int to avoid unsigned int comparison compilation error
 #pragma HLS unroll
-	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
+        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
-
+      
       #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNbitsphibin> ireg;
