@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-27
--- Last update: 2022-07-21
+-- Last update: 2022-07-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ use work.memUtil_pkg.all;
 entity linktosecproc is
   port (
     clk_i                : in  std_logic;
+    rst_i                : in  std_logic;
     ttc_i                : in  ttc_stuff_array(N_REGION - 1 downto 0);
     din_i                : in  ldata(4 * N_REGION - 1 downto 0);
     ir_start_o           : out std_logic;
@@ -52,8 +53,9 @@ architecture rtl of linktosecproc is
   -- signal s_tracklet_reset : t_resets(numPPquads - 1 downto 0);
   -- signal s_tracklet_isol  : t_stubsDTC;
   -- signal s_tracklet_data  : t_datas(numInputsIR - 1 downto 0);
-  signal s_ir_start       : std_logic;
-  signal s_ir_start_srff  : std_logic;
+  signal s_ir_start      : std_logic;
+  signal s_ir_start_srff : std_logic;
+  signal s_din_d         : ldata(4 * N_REGION - 1 downto 0);
 
 begin  -- architecture rtl
 
@@ -74,26 +76,35 @@ begin  -- architecture rtl
   --     in_dout  => s_tracklet_data
   --     );
 
+  GEN_DELAYED_DATA: for i in 0 to 16 generate
+    p_delay_data: process (clk_i) is
+    begin  -- process p_delay_data
+      if rising_edge(clk_i) then     -- rising clock edge
+        s_din_d(i).data <= din_i(i).data;
+      end if;
+    end process p_delay_data;
+  end generate GEN_DELAYED_DATA;
+
   -----------------------------------------------------------------------------
   -- Connect input link data to IR in Sector Processor
   -----------------------------------------------------------------------------
-  DL_39_link_AV_DOUT(PS10G_1_A) <= din_i(0).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_A) <= din_i(1).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_B) <= din_i(2).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_A) <= din_i(3).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_B) <= din_i(4).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_A)    <= din_i(5).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_B)    <= din_i(6).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_A)    <= din_i(7).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_B)    <= din_i(8).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_A)  <= din_i(9).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_B)  <= din_i(10).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_A)  <= din_i(11).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_B)  <= din_i(12).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_A)  <= din_i(13).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_B)  <= din_i(14).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_A)  <= din_i(15).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_B)  <= din_i(16).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_A) <= s_din_d(0).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_A) <= s_din_d(1).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_B) <= s_din_d(2).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_d(3).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_B) <= s_din_d(4).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_d(5).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_B)    <= s_din_d(6).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_d(7).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_B)    <= s_din_d(8).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_d(9).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_B)  <= s_din_d(10).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_d(11).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_B)  <= s_din_d(12).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(13).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_B)  <= s_din_d(14).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(15).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_B)  <= s_din_d(16).data(38 downto 0);
 
   -----------------------------------------------------------------------------
   -- Generate start signal
@@ -102,7 +113,7 @@ begin  -- architecture rtl
     port map (
       clk_i   => clk_i,
       set_i   => din_i(0).valid,
-      reset_i => '0',
+      reset_i => rst_i,
       q_o     => s_ir_start_srff
       );
 

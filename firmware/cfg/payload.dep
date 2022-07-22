@@ -4,23 +4,23 @@ src secproctolink.vhd
 src memUtil_pkg.vhd
 src SectorProcessor.vhd
 
-src tracklet_format/tracklet_format_in.vhd
-src tracklet_format/tracklet_format_out.vhd
+#src tracklet_format/tracklet_format_in.vhd
+#src tracklet_format/tracklet_format_out.vhd
 
-src tracklet_isolation/tracklet_isolation_in_node2S.vhd
-src tracklet_isolation/tracklet_isolation_in_nodePS.vhd
-src tracklet_isolation/tracklet_isolation_in_quad.vhd
-src tracklet_isolation/tracklet_isolation_in.vhd
-src tracklet_isolation/tracklet_isolation_out.vhd
-src tracklet_isolation/tracklet_isolation_out_stub.vhd
-src tracklet_isolation/tracklet_isolation_out_track.vhd
+#src tracklet_isolation/tracklet_isolation_in_node2S.vhd
+#src tracklet_isolation/tracklet_isolation_in_nodePS.vhd
+#src tracklet_isolation/tracklet_isolation_in_quad.vhd
+#src tracklet_isolation/tracklet_isolation_in.vhd
+#src tracklet_isolation/tracklet_isolation_out.vhd
+#src tracklet_isolation/tracklet_isolation_out_stub.vhd
+#src tracklet_isolation/tracklet_isolation_out_track.vhd
 
-src pkgs/hybrid_config.vhd
-src pkgs/hybrid_tools.vhd
-src pkgs/hybrid_data_formats.vhd
-src pkgs/hybrid_data_types.vhd
-src pkgs/tracklet_config.vhd
-src pkgs/tracklet_data_types.vhd
+#src pkgs/hybrid_config.vhd
+#src pkgs/hybrid_tools.vhd
+#src pkgs/hybrid_data_formats.vhd
+#src pkgs/hybrid_data_types.vhd
+#src pkgs/tracklet_config.vhd
+#src pkgs/tracklet_data_types.vhd
 src pkgs/GCU_utils.vhd
 
 src common/hdl/CreateStartSignal.vhd

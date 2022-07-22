@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-21
--- Last update: 2022-07-14
+-- Last update: 2022-07-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -64,6 +64,7 @@ begin  -- architecture rtl
   linktosecproc_1 : entity work.linktosecproc
     port map (
       clk_i                => clk_p,
+      rst_i                => rst,
       ttc_i                => ctrs,
       din_i                => d,
       ir_start_o           => s_ir_start,
