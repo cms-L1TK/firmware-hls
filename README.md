@@ -228,5 +228,5 @@ cd vsim
 vivado vsim.xpr
 ```
 
-and start the simulation from GUI.
+and start the simulation from GUI (first time will take long).
 
