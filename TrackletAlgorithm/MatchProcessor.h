@@ -375,12 +375,12 @@ void MatchCalculator(BXType bx,
 
   AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
   
+  constexpr bool isDisk = LAYER >= TF::D1;
   // Stub parameters
   typename AllStub<ASTYPE>::ASR     stub_r     = stub.getR();
   typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
   typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
   typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
-  typename AllStub<ASTYPE>::ASALPHA stub_alpha = stub.getAlpha();
 
   // Projection parameters
   typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
@@ -414,12 +414,11 @@ void MatchCalculator(BXType bx,
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-  ap_int<17> delta_phi      = (LAYER < TF::D1) ? shiftstubphi - shiftprojphi : stub_phi * kphi - proj_phi_corr;
+  ap_int<17> delta_phi      = (LAYER < TF::D1) ? ap_int<17>(shiftstubphi - shiftprojphi) : ap_int<17>(stub_phi * kphi - proj_phi_corr);
   ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
   ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
   ap_uint<4> alpha_fact     = 0;// (LAYER >= TF::D3) ? ialphafactouter_[irstub] : ialphafactinner_[irstub];
   ap_uint<4> shiftalphaphi  = 12;
-  ap_int<14> alpha_corr = (LAYER < TF::D3) ? ap_int<14>(0) : delta_r * stub_alpha * alpha_fact >> shiftalphaphi;
 
   // Full match parameters
   const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
