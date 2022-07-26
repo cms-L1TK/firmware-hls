@@ -1376,7 +1376,7 @@ void MatchProcessor(BXType bx,
       lastTrkID = trkindex;
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
+        (bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, stubindex, bx_o,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
@@ -1472,8 +1472,8 @@ void MatchProcessor(BXType bx,
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
       
-      constexpr int kNfineBits = 3;
-      typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = (iphiproj >> (iphiproj.length() - (nvmbits_ + kNfineBits))) & ((1 << kNfineBits) - 1);
+      typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,
+                                      iphiproj.length()-nbits_all-nbits_vmme-3); 
       
       constexpr int nextrabits = 2;
       constexpr int overlapbits = nbits_vmme + nbits_all + nextrabits;
@@ -1532,6 +1532,10 @@ void MatchProcessor(BXType bx,
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
+      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
+
+      projbuffer__ = projbuffertmp;
+
       ap_uint<1> useSecond = zbin.range(0,0) == 1;
 
       ap_uint<1> usefirstMinus = vmstubsmask[slot][ivmMinus];
@@ -1559,7 +1563,7 @@ void MatchProcessor(BXType bx,
       TrackletProjectionMemory<PROJTYPE>,
       nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
-         projin, projdata);
+         projin, projdata, nproj);
  
     } else {
       validin = false;

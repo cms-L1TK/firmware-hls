@@ -166,26 +166,18 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   auto stubadd=(slot,istubtmp);
   stubdata__ = stubmem[bx_&3][stubadd];
    
-   if (good__) {
-    if (istubtmp+1>=nstubs_) {
-      iuse_++;
-      istub_ = 0;
-      auto nstubstmp = nstubs_;
-      if (!stubmask_ && iusetmp+1 >= nuse_) {
+  //Check if last stub, if so, go to next buffer entry 
+  if (good__) {
+    if (istub_+1>=nstubs_){
+      istub_=0;
+      if (!stubmask_) {
         idle_ = true;
-      }
-      else if (stubmask_) {
-           ap_uint<2> index = __builtin_ctz(stubmask_);
-           stubmask_[index]=0;
-           second_ =  index[0];
-           phiPlus_ =  index[1];
-           nstubs_ = nstubsall_[index];
-      }
-      if(iusetmp+1 < nuse_) {
-        istub_ = 0;
-      }
-      else {
-           iuse_ = 0;
+      } else {
+          ap_uint<2> index = __builtin_ctz(stubmask_);
+          stubmask_[index]=0;
+          second_ =  index[0];
+          phiPlus_ =  index[1];
+          nstubs_ = nstubsall_[index];
       }
     } else {
       istub_++;
