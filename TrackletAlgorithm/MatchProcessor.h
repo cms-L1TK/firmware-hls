@@ -596,6 +596,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
 
+  /*
   ap_uint<4> nvmstubs[8][8]; 
 #pragma HLS ARRAY_PARTITION variable=nvmstubs complete dim=0
   
@@ -604,6 +605,7 @@ void MatchProcessor(BXType bx,
     (nvmstubs[izbin][7],nvmstubs[izbin][6],nvmstubs[izbin][5],nvmstubs[izbin][4],
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
+  */
 
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
@@ -822,11 +824,32 @@ void MatchProcessor(BXType bx,
       
       ///////////////
       // VMProjection
-      
-      ap_uint<4> nstubfirstMinus=nvmstubs[zfirst][ivmMinus];
-      ap_uint<4> nstublastMinus=nvmstubs[zlast][ivmMinus];
-      ap_uint<4> nstubfirstPlus=nvmstubs[zfirst][ivmPlus];
-      ap_uint<4> nstublastPlus=nvmstubs[zlast][ivmPlus];
+
+      ap_uint<4> entries_zfirst[8];
+      ap_uint<4> entries_zlast[8];
+
+      (entries_zfirst[7], entries_zfirst[6], entries_zfirst[5],
+       entries_zfirst[4], entries_zfirst[3], entries_zfirst[2],
+       entries_zfirst[1],entries_zfirst[0]) = 
+	//instubdata.get_mem_entries8A()[bx][zfirst];      
+	instubdata.get_mem_entries8A()[bx*8+zfirst];      
+
+      (entries_zlast[7], entries_zlast[6], entries_zlast[5],
+       entries_zlast[4], entries_zlast[3], entries_zlast[2],
+       entries_zlast[1],entries_zlast[0]) = 
+	//instubdata.get_mem_entries8B()[bx][zlast];      
+	instubdata.get_mem_entries8B()[bx*8+zlast];      
+
+      /*
+      std::cout << " z phi: " << zfirst << " " << ivmMinus << " "
+           << nvmstubs[zfirst][ivmMinus]<< " " << entries_zfirst[ivmMinus]
+      << std::endl;
+      */
+
+      ap_uint<4> nstubfirstMinus = entries_zfirst[ivmMinus];
+      ap_uint<4> nstubfirstPlus = entries_zfirst[ivmPlus];
+      ap_uint<4> nstublastMinus = entries_zlast[ivmMinus];
+      ap_uint<4> nstublastPlus = entries_zlast[ivmPlus];
       
       if (ivmMinus==ivmPlus) {
 	nstubfirstPlus = 0;
