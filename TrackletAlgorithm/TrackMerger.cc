@@ -1,19 +1,19 @@
 #include "TrackMerger.h"
 #include <bitset>
 
-void ComparisonModule::process(hls::stream<track_struct> &inputBuffer, hls::stream<track_struct> &outputBuffer){
-  #pragma HLS inline
-  #pragma HLS pipeline
-  track_struct track;
-  inputBuffer.read(track);
-  //assert(track._trackWord !=0 && "Null track in CM");
-  outputBuffer.write(track);
-  tracksProcessed++;
-}
+ComparisonModule::ComparisonModule()
+    {
+      masterTrack = {0,0,0,0,0,0,0,0,0};
+    }
 
 void ComparisonModule::process(track_struct &inTrack, track_struct &outTrack) {
-  outTrack = inTrack;
-  tracksProcessed++;
+  #pragma HLS inline off
+  if (inTrack._trackWord != 0 && masterTrack._trackWord == 0) {
+    masterTrack = inTrack;
+    outTrack = {0,0,0,0,0,0,0,0,0};
+  } else {
+    outTrack = inTrack;
+  }
 }
 
 void loadTrack(
@@ -94,19 +94,27 @@ void TrackMerger(const BXType bx,
     #pragma HLS dataflow
     track_struct tracks[kNBuffers];
     #pragma HLS array_partition variable=tracks
+    
     loadTrack(trackWord,barrelStubWords_0,barrelStubWords_1,barrelStubWords_2,barrelStubWords_3,diskStubWords_0,
         diskStubWords_1,diskStubWords_2,diskStubWords_3,tracks[0]);
+    // std::cout <<"Input Track: "<< i << " " << tracks[0]._trackWord <<std::endl;
     LOOP_CM:
     for (uint j=0;j<kNComparisonModules;++j) {
       #pragma HLS unroll
       comparisonModule[j].process(tracks[j],tracks[j+1]);
+    //   // std::cout << "CM "<<j<<" outputs "<<tracks[j+1]._trackWord <<std::endl;
     }
-    // comparisonModule[0].process(tracks[0],tracks[1]);
-    // comparisonModule[1].process(tracks[1],tracks[2]);
 
     unloadTrack(tracks[kNComparisonModules],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
         diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
     
+  }
+  LOOP_MASTERS:
+  for (int j=0;j<kNComparisonModules;++j) {
+    #pragma HLS pipeline II=1
+    track_struct theMaster = comparisonModule[j].getMasterTrackStruct();
+    unloadTrack(theMaster,trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
+        diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
   }
   bx_o = bx;
 }

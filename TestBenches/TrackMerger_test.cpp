@@ -28,7 +28,7 @@ int main(){
   static hls::stream<TrackFit::DiskStubWord> diskStubWords_1;
   static hls::stream<TrackFit::DiskStubWord> diskStubWords_2;
   static hls::stream<TrackFit::DiskStubWord> diskStubWords_3;
-  static TrackFitMemory inputTracks;
+  TrackFitMemory inputTracks;
 
   // Output memories
   hls::stream<TrackFit::TrackWord> trackWord_o;
@@ -40,7 +40,7 @@ int main(){
   static hls::stream<TrackFit::DiskStubWord> diskStubWords_1_o;
   static hls::stream<TrackFit::DiskStubWord> diskStubWords_2_o;
   static hls::stream<TrackFit::DiskStubWord> diskStubWords_3_o;
-  static TrackFitMemory outputTracks;
+  TrackFitMemory outputTracks;
   // int outputNumber;
 
   TBHelper tb("../../../../../emData/PD/PD/");
@@ -96,7 +96,7 @@ int main(){
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < kMaxTrack; i++){ 
+    for (unsigned short i = 0; i < kMaxTrack+kNComparisonModules; i++){ 
       TrackFit track;
       track.setTrackWord(trackWord_o.read());
       track.setBarrelStubWord<0>(barrelStubWords_0_o.read());
@@ -107,7 +107,6 @@ int main(){
       track.setDiskStubWord<5>(diskStubWords_1_o.read());
       track.setDiskStubWord<6>(diskStubWords_2_o.read());
       track.setDiskStubWord<7>(diskStubWords_3_o.read());
-      
       outputTracks.write_mem(bx, track, nTracks );
       ++nTracks;
     } 

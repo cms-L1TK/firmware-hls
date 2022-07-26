@@ -23,24 +23,13 @@ typedef struct {
 
 class ComparisonModule{
     public:
-    ComparisonModule()
-    {
-      tracksProcessed = 0;
-      masterTrack._trackWord = 0;
-    }
+    ComparisonModule();
     ~ComparisonModule(){};
-
-    unsigned int getMatchFound(){return matchFound;}
-
-    unsigned int getNProcessed(){return tracksProcessed;}
 
     void processTrack();
 
-    unsigned int myIndex;
-
-    unsigned int getEndOfStream(){return endOfStream;}
-
     TrackFit::TrackWord getMasterTrackWord(){return masterTrack._trackWord;}
+    track_struct getMasterTrackStruct(){return masterTrack;}
 
     // TrackFit::BarrelStubWord getMasterTrackBarrelStubs(unsigned int stubIndex, unsigned int layerIndex){
     //   return masterTrack.getBarrelStubArray(layerIndex, stubIndex);}
@@ -48,19 +37,10 @@ class ComparisonModule{
     // TrackFit::DiskStubWord getMasterTrackDiskStubs(unsigned int stubIndex, unsigned int layerIndex){
     //   return masterTrack.getDiskStubArray(layerIndex, stubIndex);}
 
-    unsigned int getEndOfModule(){return endOfModule;}
-
-    void process(hls::stream<track_struct>& inputBuffer,hls::stream<track_struct>& outputBuffer);
     void process(track_struct &inTrack,track_struct &outTrack);
 
 
   private:
-
-    unsigned int matchFound{0};
-    unsigned int mergeCondition = 3;
-    unsigned int tracksProcessed{0};
-    unsigned int endOfStream{0};
-    unsigned int endOfModule{0};
 
     track_struct masterTrack;
 

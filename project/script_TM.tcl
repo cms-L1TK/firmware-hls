@@ -10,10 +10,12 @@ add_files ../TrackletAlgorithm/TrackMergerTop.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/TrackMerger.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackMerger_test.cpp -cflags "$CFLAGS"
 
-open_solution "soln_df1"
+open_solution "soln_df2"
 
 # Define FPGA, clock frequency & common HLS settings.
 source settings_hls.tcl
+# A little specific configuration
+config_dataflow -default_channel fifo -fifo_depth 2
 
 # data files
 add_files -tb ../emData/PD/
