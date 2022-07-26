@@ -124,12 +124,12 @@ namespace PR
 
       // Lower Bound
       auto zbinlower = zbinpos6<zbins_adjust ?
-	ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
-	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6-zbins_adjust);
+      ap_uint<MEBinsBits+zbins_nbitsextra>(0) :
+      ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6-zbins_adjust);
       // Upper Bound
       auto zbinupper = zbinpos6>((1<<(MEBinsBits+zbins_nbitsextra))-1-zbins_adjust) ? 
-	ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
-	ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6+zbins_adjust);
+      ap_uint<MEBinsBits+zbins_nbitsextra>((1<<(MEBinsBits+zbins_nbitsextra))-1) :
+      ap_uint<MEBinsBits+zbins_nbitsextra>(zbinpos6+zbins_adjust);
       
       ap_uint<MEBinsBits> zbin1 = zbinlower >> zbins_nbitsextra;
       ap_uint<MEBinsBits> zbin2 = zbinupper >> zbins_nbitsextra;
@@ -697,10 +697,8 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll
   MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
 #pragma HLS unroll
-	//smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
-        //smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
-	smallest[iMEU1] = smallest[iMEU1] & (projseqs[iMEU1]<projseqs[iMEU2]);
-        smallest[iMEU2] = smallest[iMEU2] & (projseqs[iMEU2]<projseqs[iMEU1]);
+        smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
+        smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
       }
     }
       
@@ -754,9 +752,9 @@ void MatchProcessor(BXType bx,
       lastTrkID = trkindex;
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, stubindex,
-	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
-	 fullmatch);
+        (bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, stubindex, bx_o,
+         nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
+         fullmatch);
     } //end MC if
     if (validproj__) {
 
@@ -829,7 +827,7 @@ void MatchProcessor(BXType bx,
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
       
       typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,
-									  iphiproj.length()-nbits_all-nbits_vmme-3); 
+                                      iphiproj.length()-nbits_all-nbits_vmme-3); 
       
       int nextrabits = 2;
       int overlapbits = nbits_vmme + nbits_all + nextrabits;
@@ -913,7 +911,7 @@ void MatchProcessor(BXType bx,
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
-				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
+                    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
       ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
@@ -938,10 +936,10 @@ void MatchProcessor(BXType bx,
       
       // read inputs
       validin = read_input_mems<TrackletProjection<PROJTYPE>,
-	TrackletProjectionMemory<PROJTYPE>,
-	nINMEM, kNBits_MemAddr+1>
-	(bx, mem_hasdata, numbersin, mem_read_addr,
-         projin, projdata);
+      TrackletProjectionMemory<PROJTYPE>,
+      nINMEM, kNBits_MemAddr+1>
+      (bx, mem_hasdata, numbersin, mem_read_addr,
+         projin, projdata, nproj);
  
     } else {
       validin = false;

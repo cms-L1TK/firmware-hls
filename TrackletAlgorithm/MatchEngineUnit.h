@@ -143,13 +143,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     if (istub_+1>=nstubs_){
       istub_=0;
       if (!stubmask_) {
-	idle_ = true;
+        idle_ = true;
       } else {
-	ap_uint<2> index = __builtin_ctz(stubmask_);
-	stubmask_[index]=0;
-	second_ =  index[0];
-	phiPlus_ =  index[1];
-	nstubs_ = nstubsall_[index];
+          ap_uint<2> index = __builtin_ctz(stubmask_);
+          stubmask_[index]=0;
+          second_ =  index[0];
+          phiPlus_ =  index[1];
+          nstubs_ = nstubsall_[index];
       }
     } else {
       istub_++;
