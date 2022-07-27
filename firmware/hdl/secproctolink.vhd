@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-07-13
--- Last update: 2022-07-14
+-- Last update: 2022-07-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -89,10 +89,11 @@ begin  -- architecture rtl
   BW_46_stream_full_neg_i(L1L2_L6) <= s_fifo_ready;
   s_fifo_data                      <= x"805A0123456" &
                  TW_84_stream_data_i(L1L2) &
-                 "00" & BW_46_stream_data_i(L1L2_L3) &
-                 "00" & BW_46_stream_data_i(L1L2_L4) &
-                 "00" & BW_46_stream_data_i(L1L2_L5) &
-                 "00" & BW_46_stream_data_i(L1L2_L6);
+                 BW_46_stream_data_i(L1L2_L3) &
+                 BW_46_stream_data_i(L1L2_L4) &
+                 BW_46_stream_data_i(L1L2_L5) &
+                 BW_46_stream_data_i(L1L2_L6) &
+                 x"00";
 
   -----------------------------------------------------------------------------
   -- FIFO
