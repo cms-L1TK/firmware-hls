@@ -72,8 +72,9 @@ public:
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> VMSMEID;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
-  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize - 1> VMSMEBENDPSDISK;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMStubMECMSize> VMStubMECMData;
 
@@ -108,6 +109,11 @@ public:
 
   VMSMEBEND getBend() const {
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
+  }
+
+
+  VMSMEBENDPSDISK getBendPSDisk() const {
+    return data_.range(kVMSMEBendMSB - 1,kVMSMEBendLSB);
   }
 
   VMSMEFINEPHI getFinePhi() const {

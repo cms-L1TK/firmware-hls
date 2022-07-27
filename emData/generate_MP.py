@@ -22,8 +22,10 @@ def ASRegion(region):
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
         return 'BARREL2S'
+    elif region in ['D1', 'D2']:
+        return 'DISKPS'
     else:
-        return 'DISK'
+        return 'DISK2S'
 
 def APRegion(region):
     if region in ['L1', 'L2', 'L3']:
@@ -75,9 +77,6 @@ with open(arguments.wiresFileName) as wiresFile:
     TPMems = {}
     FMMems = {}
     for line in wiresFile:
-        # Only barrel-only seeds are supported right now.
-        if "MP_D" in line:
-            continue # No disks for now
         line = line.rstrip()
         mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
         memName = line.split()[0]

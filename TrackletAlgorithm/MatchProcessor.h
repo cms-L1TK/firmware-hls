@@ -324,7 +324,7 @@ void MatchCalculator(BXType bx,
                      int &nmcout6,
                      int &nmcout7,
                      int &nmcout8,
-                     FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
+                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
 ){
 
 #pragma HLS inline
@@ -522,7 +522,7 @@ void MatchProcessor(BXType bx,
                       const VMStubMEMemoryCM<VMSMEType, 3, 3, kNMatchEngines>& instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       BXType& bx_o,
-                      FullMatchMemory<BARREL> fullmatch[maxFullMatchCopies]
+                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
 ){
 #pragma HLS inline
 
@@ -571,9 +571,10 @@ void MatchProcessor(BXType bx,
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
 
-  ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
+  constexpr int nPRBAbits = 3;
+  ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
 
-  MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
+  MatchEngineUnit<VMSMEType, VMPTYPE, APTYPE, LAYER> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
@@ -592,7 +593,7 @@ void MatchProcessor(BXType bx,
   //These are used inside the MatchCalculator method and needs to be retained between iterations
   ap_uint<1> savedMatch;
   ap_uint<17> best_delta_phi;
-  typename ProjectionRouterBuffer<BARREL, APTYPE>::TRKID lastTrkID(-1);
+  typename ProjectionRouterBuffer<VMPTYPE, APTYPE>::TRKID lastTrkID(-1);
 
   TrackletProjection<PROJTYPE> projdata, projdata_;
   bool validin = false; 
@@ -644,7 +645,7 @@ void MatchProcessor(BXType bx,
     ap_uint<kNMatchEngines> idles;
     ap_uint<kNMatchEngines> emptys;
 
-    typename MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE>::MATCH matches[kNMatchEngines];
+    typename MatchEngineUnit<VMSMEType, VMPTYPE, APTYPE, LAYER>::MATCH matches[kNMatchEngines];
     #pragma HLS ARRAY_PARTITION variable=matches complete dim=0
     ap_uint<kNBits_MemAddr> projseqs[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
@@ -711,7 +712,7 @@ void MatchProcessor(BXType bx,
     }
 
 
-    ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff = projbufferarray.peek();;
+    ProjectionRouterBuffer<VMPTYPE,APTYPE> tmpprojbuff = projbufferarray.peek();
     if (anyidle && !empty) {
       projbufferarray.advance();
     }
@@ -818,10 +819,10 @@ void MatchProcessor(BXType bx,
       //memory the projection points to
       
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER < trklet::N_LAYER ? nbitsallstubs[LAYER] : nbitsallstubs[trklet::N_LAYER + DISK];
+      auto nbits_all = LAYER < trklet::N_LAYER ? nbitsallstubs[LAYER] : nbitsallstubs[DISK];
       
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER < trklet::N_LAYER ? nbits_vmmeall[LAYER] : nbits_vmmeall[trklet::N_LAYER + DISK];
+      auto nbits_vmme = LAYER < trklet::N_LAYER ? nbits_vmmeall[LAYER] : nbits_vmmeall[DISK];
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
@@ -908,7 +909,7 @@ void MatchProcessor(BXType bx,
 */
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
-      VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
+      VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
