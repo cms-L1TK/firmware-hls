@@ -86,7 +86,7 @@ then
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
-  tar -xzf LUTs.tgz
+  tar -xzf LUTs.tar.gz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm2}

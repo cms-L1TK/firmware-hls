@@ -670,6 +670,19 @@ enum StubZPositionBarrelConsistency {
  };
 
 
+enum StubZPositionBarrelConsistency {
+  kBarrelPSMax = 1,
+  kBarrel2SMax = 5
+};
+ enum StubZPositionDiskConsistency {
+   kDiskPSMax = 1,
+   kDisk2SMax = 3
+};
+ enum StubPhiPositionConsistency {
+   kMax = 3
+ };
+
+
 
 #ifndef __SYNTHESIS__
  // only used for debugging to identify MEU
