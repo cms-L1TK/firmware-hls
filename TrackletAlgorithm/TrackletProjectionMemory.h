@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 #include "globalFunctions.h"
+#include <bitset>
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
@@ -123,6 +124,13 @@ public:
   {
     TrackletProjectionData newdata(datastr, base);
     data_ = newdata;
+  }
+  #endif
+
+  #ifndef __SYNTHESIS__
+  void Print()
+  {
+    std::cout << std::bitset<TrackletProjectionBase<TProjType>::kTProjTCIDSize>(getTCID()) << "|" << std::bitset<TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize>(getTrackletIndex()) << "|" << std::bitset<TrackletProjectionBase<TProjType>::kTProjPhiSize>(getPhi()) << "|" << std::bitset<TrackletProjectionBase<TProjType>::kTProjRZSize>(getZ()) << "|" << std::bitset<TrackletProjectionBase<TProjType>::kTProjPhiDSize>(getPhiDer()) << "|" << std::bitset<TrackletProjectionBase<TProjType>::kTProjRZDSize>(getRZDer()) << std::endl;
   }
   #endif
 

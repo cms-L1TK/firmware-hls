@@ -83,7 +83,7 @@ then
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
-  tar -xzmf LUTs.tgz
+  tar -xzf LUTs.tar.gz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
@@ -291,10 +291,17 @@ do
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MP" ]]
   then
-          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "PR_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ls -lrth {} \;
+          #find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          #find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          #find ${table_location} -type f -name "${module}_alphainner" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          #find ${table_location} -type f -name "${module}_alphaouter" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          #find ${table_location} -type f -name "${module}_rDSSinner" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          #find ${table_location} -type f -name "${module}_rDSSouter" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`

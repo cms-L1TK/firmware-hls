@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include <bitset>
 
 // AllProjectionBase is where we define the bit widths, which depend on the class template parameter.
 template<int AProjType> class AllProjectionBase {};
@@ -122,6 +123,13 @@ public:
   {
     AllProjectionData newdata(datastr, base);
     data_ = newdata;
+  }
+  #endif
+
+  #ifndef __SYNTHESIS__
+  void Print()
+  {
+    std::cout << std::bitset<AllProjectionBase<AProjType>::kAProjTCIDSize>(getTCID()) << "|" << std::bitset<AllProjectionBase<AProjType>::kAProjTrackletIndexSize>(getTrackletIndex()) << "|" << std::bitset<AllProjectionBase<AProjType>::kAProjPhiSize>(getPhi()) << "|" << std::bitset<AllProjectionBase<AProjType>::kAProjRZSize>(getRZ()) << "|" << std::bitset<AllProjectionBase<AProjType>::kAProjPhiDSize>(getPhiDer()) << "|" << std::bitset<AllProjectionBase<AProjType>::kAProjRZDSize>(getRZDer()) << std::endl;
   }
   #endif
 

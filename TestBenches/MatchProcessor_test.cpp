@@ -32,6 +32,7 @@ int main()
   const string fullMatchPattern = "FullMatches*";
 
   const auto stubMemType   = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : (MODULE_ >= MP_D3PHIA_) ? DISK2S : DISKPS;
+  const auto vmStubMemType  = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : DISK;
   const auto tprojMemType  = (MODULE_ >= MP_L1PHIA_ && MODULE_ <= MP_L3PHID_) ? BARRELPS : (MODULE_ > MP_D5PHID_) ? BARREL2S : DISK;
   const auto fmProjMemType = (MODULE_ >= MP_L1PHIA_ && MODULE_) ? BARREL : DISK;
   TBHelper tb(std::string("MP/") + module_name[MODULE_]);
@@ -46,7 +47,7 @@ int main()
   const auto nAllStub = tb.nFiles(allStubPatternarray);
   vector<AllStubMemory<stubMemType>> allstub(nAllStub);
   const auto nVMStubs = tb.nFiles(vmStubPatternarray);
-  VMStubMEMemoryCM<stubMemType, 3, 3, kNMatchEngines> vmstub;
+  VMStubMEMemoryCM<vmStubMemType, 3, 3, kNMatchEngines> vmstub;
 
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
@@ -77,7 +78,7 @@ int main()
     for (unsigned int i = 0; i < nAllStub; i++)
       writeMemFromFile<AllStubMemory<stubMemType>>(allstub[i], fin_AllStub.at(i), ievt);
     auto &fin_VMStubs = tb.files(vmStubPatternarray);
-    writeMemFromFile<VMStubMEMemoryCM<stubMemType, 3, 3, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
+    writeMemFromFile<VMStubMEMemoryCM<vmStubMemType, 3, 3, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
 
     // clear allarray, output memories before starting
     for (unsigned int i = 0; i < nFullMatches; i++)
