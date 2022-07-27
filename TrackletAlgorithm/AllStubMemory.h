@@ -104,8 +104,8 @@ public:
   typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
-  typedef ap_int<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
-  typedef ap_int<AllStubBase<ASType>::kASBendSize> ASBEND;
+  typedef ap_uint<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
+  typedef ap_uint<AllStubBase<ASType>::kASBendSize> ASBEND;
   typedef ap_uint<AllStubBase<ASType>::kAllStubSize> AllStubData;
 
   // Constructors
