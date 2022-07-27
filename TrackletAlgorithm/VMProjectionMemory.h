@@ -147,7 +147,7 @@ public:
     if(VMProjType == BARREL)
       return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
     else
-      return 0;
+      return false;
   }
   
   // Setter
