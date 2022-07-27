@@ -83,13 +83,16 @@ public:
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv, const bool ps):
     data_( (id, zbin, finez, finephi, rinv, ps) )
   {
+    //static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
+  /*
   // This constructor is only used for projections in DISK
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv):
     data_( (id, zbin ,finez , finephi, rinv) )
   {
   }
+  */
   
   VMProjection()
   {}
@@ -102,6 +105,13 @@ public:
   }
   #endif
   
+  #ifndef __SYNTHESIS__
+  void Print() {
+    edm::LogVerbatim("L1trackHLS") << "VMProjection:" << std::endl;
+    edm::LogVerbatim("L1trackHLS") << std::hex << "VMProjType=" << VMProjType << "\tid=" << getIndex() << "\tzbin=" << getZBin() << "\tfinez" << getFineZ() << "\tfinephi=" << getFinePhi() << "\trinv=" << getRInv() << "\tisPS=" << getIsPSSeed() << std::endl;
+  }
+  #endif
+
   // Getter
   static constexpr int getWidth() {return VMProjectionBase<VMProjType>::kVMProjectionSize;}
 
@@ -133,8 +143,11 @@ public:
 
   // This getter is only used for projections in BARREL
   bool getIsPSSeed() const {
-    static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
-    return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
+    //static_assert("VMProjType == BARREL", "Getter should only be used for BARREL projections");
+    if(VMProjType == BARREL)
+      return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
+    else
+      return 0;
   }
   
   // Setter

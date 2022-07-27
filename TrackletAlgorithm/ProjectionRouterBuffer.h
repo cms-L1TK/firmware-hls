@@ -12,6 +12,7 @@
 #include "DummyMessageLogger.h"
 #endif
 #endif
+#include <bitset>
 
 // ProjectionRouterBufferBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMProjType, int AllProjetionType> class ProjectionRouterBufferBase {};
@@ -87,14 +88,14 @@ public:
     kPRBufferPhiMSB = kPRBufferPhiLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferPhiSize - 1,
     kPRBufferAllProjLSB = kPRBufferPhiMSB + 1,
     kPRBufferAllProjMSB = kPRBufferAllProjLSB + AllProjection<AllProjectionType>::kAllProjectionSize - 1,
-    kPRBufferUseSecondPlusLSB = kPRBufferAllProjMSB + 1,
-    kPRBufferUseSecondPlusMSB = kPRBufferUseSecondPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
-    kPRBufferUseFirstPlusLSB = kPRBufferUseSecondPlusMSB + 1,
-    kPRBufferUseFirstPlusMSB = kPRBufferUseFirstPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
-    kPRBufferUseSecondMinusLSB = kPRBufferUseFirstPlusMSB + 1,
-    kPRBufferUseSecondMinusMSB = kPRBufferUseSecondMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
-    kPRBufferUseFirstMinusLSB = kPRBufferUseSecondMinusMSB + 1,
+    kPRBufferUseFirstMinusLSB = kPRBufferAllProjMSB + 1,
     kPRBufferUseFirstMinusMSB = kPRBufferUseFirstMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
+    kPRBufferUseSecondMinusLSB = kPRBufferUseFirstMinusMSB + 1,
+    kPRBufferUseSecondMinusMSB = kPRBufferUseSecondMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
+    kPRBufferUseFirstPlusLSB = kPRBufferUseSecondMinusMSB + 1,
+    kPRBufferUseFirstPlusMSB = kPRBufferUseFirstPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
+    kPRBufferUseSecondPlusLSB = kPRBufferUseFirstPlusMSB + 1,
+    kPRBufferUseSecondPlusMSB = kPRBufferUseSecondPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
   };
   
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferIndexSize> VMPID;

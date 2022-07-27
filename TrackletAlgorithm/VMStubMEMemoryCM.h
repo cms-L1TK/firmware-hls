@@ -111,6 +111,7 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
+
   VMSMEBENDPSDISK getBendPSDisk() const {
     return data_.range(kVMSMEBendMSB - 1,kVMSMEBendLSB);
   }
