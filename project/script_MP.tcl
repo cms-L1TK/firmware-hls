@@ -8,7 +8,6 @@ source env_hls.tcl
 
 set modules_to_test {
     {MP_L1PHIC}
-    {MP_L1PHIC}
     {MP_L2PHIC}
     {MP_L3PHIC}
     {MP_L4PHIC}
