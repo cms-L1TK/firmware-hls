@@ -3,7 +3,7 @@ core_dir = cgn
 input_file = mem/in.txt
 core_append = /impl/ip/component.xml
 core_path = ../../../src/firmware-hls/firmware
-proj_path = ../../../proj
+proj_path = ../../../../proj
 hls_script_path = ../IntegrationTests/ReducedConfig/IRtoTB/script
 
 all: $(core_file) hdl_add_files $(input_file)
@@ -21,7 +21,7 @@ hdl_add_files: $(core_file)
 $(input_file): $(core_dir)
 	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReduced/InputStubs -o $(input_file)
 
-sim: all
+sim: $(input_file) $(core_file) $(core_dir)
 	@ln -s $(proj_path)/vsim/vsim/vsim.sim/sim_1/behav/xsim/out.txt mem/out.txt
 	@cd $(hls_script_path); vivado_hls -f compileHLS.tcl
 	@cd $(hls_script_path); vivado -mode batch -source makeProject.tcl

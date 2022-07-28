@@ -48,6 +48,6 @@ for x in range(events):
         mismatches = mismatches + 1
 
 if (mismatches == 0):
-    print("ok")
+    print("Test passed!!")
 else:
-    print("not ok")
+    print("Test not passed!!")
