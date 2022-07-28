@@ -23,9 +23,12 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@ln -s $(proj_path)/vsim/vsim/vsim.sim/sim_1/behav/xsim/out.txt mem/out.txt
 	@$(eval CORE_DIRS= $(wildcard $(core_dir)/*))
 	@$(foreach core_dir,$(CORE_DIRS),ln -s ../../../../firmware/$(core_dir) $(hls_script_path);)
+	@ln -s ../../../common $(hls_script_path)
+	@ln -s ../../../../emData/MemPrintsReduced $(hls_script_path)/MemPrints
+	@ln -s ../../../../emData/LUTsReduced $(hls_script_path)/LUTs
 	@$(eval CORE_DIRS= $(wildcard $(core_dir)/*))
 	@cd $(hls_script_path); vivado -mode batch -source makeProject.tcl
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
-	python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
+	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
 .PHONY: sim all hdl_add_files
