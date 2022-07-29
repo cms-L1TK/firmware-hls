@@ -181,7 +181,7 @@ package body tf_pkg is
     else
       -- Synth path specified relative to dir where you run Vivado.
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/
-      return "../../src/firmware-hls/firmware/mem";
+      return "../../../../../src/firmware-hls/firmware/mem/";
     end if;
   end;
 
