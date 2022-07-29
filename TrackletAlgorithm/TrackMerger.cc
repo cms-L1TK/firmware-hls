@@ -1,18 +1,43 @@
 #include "TrackMerger.h"
 #include <bitset>
 
-void ComparisonModule::process(hls::stream<track_struct> &inputBuffer, hls::stream<track_struct> &outputBuffer){
-  #pragma HLS inline
-  #pragma HLS pipeline
-  track_struct track;
-  inputBuffer.read(track);
-  //assert(track._trackWord !=0 && "Null track in CM");
-  outputBuffer.write(track);
-  tracksProcessed++;
+// void ComparisonModule::process(hls::stream<TrackStruct> &inputBuffer, hls::stream<TrackStruct> &outputBuffer){
+//   #pragma HLS inline
+//   #pragma HLS pipeline
+//   TrackStruct track;
+//   inputBuffer.read(track);
+//   TrackHandler trk = TrackHandler(track);
+//   //assert(track._trackWord !=0 && "Null track in CM");
+//   if (track._trackWord != 0){
+//     if (masterTrack._trackWord == 0){
+//       masterTrack = track; 
+//      } else {
+//     assert(masterTrack._trackWord != track._trackWord);
+//     outputBuffer.write(track);
+//   }
+//   tracksProcessed++;
+// }
+
+TrackStruct ComparisonModule::getMasterTrackStruct(){
+  return masterTrack;
 }
 
-void ComparisonModule::process(track_struct &inTrack, track_struct &outTrack) {
-  outTrack = inTrack;
+void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
+  TrackHandler trk = TrackHandler(inTrack);
+  //assert(track._trackWord !=0 && "Null track in CM");
+  if (inTrack._trackWord != 0){
+    if (masterTrack._trackWord == 0){
+      masterTrack = inTrack; 
+    } else {
+      TrackHandler masterTrk = TrackHandler(masterTrack);
+      #ifndef _SYNTHESIS_
+      std::cout << "inTrack: " << trk.getTrackWord() << " masterTrack: " << masterTrk.getTrackWord() << std::endl;
+      #endif
+      assert(masterTrack._trackWord != inTrack._trackWord);
+      // masterTrk.CompareTrack(trk);
+      outTrack = inTrack;
+    }
+  }
   tracksProcessed++;
 }
 
@@ -26,7 +51,7 @@ void loadTrack(
   hls::stream<TrackFit::DiskStubWord> &diskStubWords_1,
   hls::stream<TrackFit::DiskStubWord> &diskStubWords_2,
   hls::stream<TrackFit::DiskStubWord> &diskStubWords_3,
-  track_struct& aTrack
+  TrackStruct& aTrack
 ) {
   trackWord.read(aTrack._trackWord);
   barrelStubWords_0.read(aTrack._barrelStub_0);
@@ -40,7 +65,7 @@ void loadTrack(
 }  
 
 void unloadTrack(
-  track_struct& aTrack,
+  TrackStruct& aTrack,
   hls::stream<TrackFit::TrackWord> &trackWord_o,
   hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0_o, 
   hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_1_o, 
@@ -88,25 +113,43 @@ void TrackMerger(const BXType bx,
 
   ComparisonModule comparisonModule[kNComparisonModules];
   #pragma HLS array_partition variable=comparisonModule complete dim=0
+  TrackStruct unmergedTracks[kMaxTrack] = {TrackStruct()};
+  #pragma HLS array_partition variable=unmergedTracks complete dim=1
+  TrackStruct masterTracks[kNComparisonModules] = {TrackStruct()};
+  #pragma HLS array_partition variable=masterTracks complete dim=1
 
-  LOOP_INPUT:
-  for (int i = 0; i < kMaxTrack; i++){ 
+  LOOP_Input:
+  for (unsigned int i = 0; i < kMaxTrack; i++){ 
+    TrackStruct tracks[kNBuffers] = {TrackStruct()}; 
+    #pragma HLS array_partition variable=tracks complete dim=1
     #pragma HLS dataflow
-    track_struct tracks[kNBuffers];
-    #pragma HLS array_partition variable=tracks
     loadTrack(trackWord,barrelStubWords_0,barrelStubWords_1,barrelStubWords_2,barrelStubWords_3,diskStubWords_0,
         diskStubWords_1,diskStubWords_2,diskStubWords_3,tracks[0]);
-    LOOP_CM:
-    for (uint j=0;j<kNComparisonModules;++j) {
+    LOOP_ProcTracks:
+    for (unsigned int j = 0; j < kNComparisonModules; j++){
       #pragma HLS unroll
       comparisonModule[j].process(tracks[j],tracks[j+1]);
     }
-    // comparisonModule[0].process(tracks[0],tracks[1]);
-    // comparisonModule[1].process(tracks[1],tracks[2]);
 
-    unloadTrack(tracks[kNComparisonModules],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
-        diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
-    
+    unmergedTracks[i] = tracks[kNComparisonModules];
+
   }
+
+
+  LOOP_OutputCM:
+  for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
+    #pragma HLS unroll
+    masterTracks[nModule] = comparisonModule[nModule].getMasterTrackStruct();
+    unloadTrack(masterTracks[nModule],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
+    diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
+  }
+
+  LOOP_OutputUnmergedTracks:
+  for (unsigned int bufferIndex = kNComparisonModules; bufferIndex < kMaxTrack; bufferIndex++){
+    #pragma HLS unroll
+    unloadTrack(unmergedTracks[bufferIndex],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
+    diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
+  }
+    
   bx_o = bx;
 }

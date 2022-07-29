@@ -4,22 +4,12 @@
 #include "hls_stream.h"
 #include <cassert>
 #include "TrackFitMemory.h"
+#include "TrackHandler.h"
 
 const unsigned int kNComparisonModules = 10;
 const unsigned int kNBuffers = kNComparisonModules + 1;
 const unsigned int kMaxTrack = 50;
-
-typedef struct {
-  TrackFit::TrackWord _trackWord;
-  TrackFit::BarrelStubWord _barrelStub_0;  
-  TrackFit::BarrelStubWord _barrelStub_1;  
-  TrackFit::BarrelStubWord _barrelStub_2;  
-  TrackFit::BarrelStubWord _barrelStub_3;  
-  TrackFit::DiskStubWord _diskStub_0;
-  TrackFit::DiskStubWord _diskStub_1;
-  TrackFit::DiskStubWord _diskStub_2;
-  TrackFit::DiskStubWord _diskStub_3;
-} track_struct;
+const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
 
 class ComparisonModule{
     public:
@@ -50,8 +40,9 @@ class ComparisonModule{
 
     unsigned int getEndOfModule(){return endOfModule;}
 
-    void process(hls::stream<track_struct>& inputBuffer,hls::stream<track_struct>& outputBuffer);
-    void process(track_struct &inTrack,track_struct &outTrack);
+    // void process(hls::stream<TrackStruct>& inputBuffer,hls::stream<TrackStruct>& outputBuffer);
+    void process( TrackStruct &inTrack,  TrackStruct &outTrack);
+     TrackStruct getMasterTrackStruct();
 
 
   private:
@@ -62,7 +53,9 @@ class ComparisonModule{
     unsigned int endOfStream{0};
     unsigned int endOfModule{0};
 
-    track_struct masterTrack;
+    TrackStruct masterTrack;
+    TrackStruct track;
+
 
     void loadTrack(
       hls::stream<TrackFit::TrackWord> &trackWord,
@@ -74,11 +67,11 @@ class ComparisonModule{
       hls::stream<TrackFit::DiskStubWord> &diskStubWords_1,
       hls::stream<TrackFit::DiskStubWord> &diskStubWords_2,
       hls::stream<TrackFit::DiskStubWord> &diskStubWords_3,
-      track_struct& aTrack
+       TrackStruct& aTrack
     );
 
     void unloadTrack(
-      track_struct& aTrack,
+       TrackStruct& aTrack,
       hls::stream<TrackFit::TrackWord> &trackWord_o,
       hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0_o, 
       hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_1_o, 

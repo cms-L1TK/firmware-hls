@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <iterator>
 
-const int nevents = 5;
+const int nevents = 1;
 
 using namespace std;
 
