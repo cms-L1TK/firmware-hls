@@ -37,7 +37,7 @@ architecture behaviour of tb_tf_top is
   --    0 = SectorProcessor.vhd from python script.
   --    1 = SectorProcessorFull.vhd from python script (gives intermediate MemPrints).
   --    N.B. Change this also in makeProject.tcl !
-  constant INST_TOP_TF          : integer := 0; 
+  constant INST_TOP_TF          : integer := 1; 
   --=========================================================================
 
   constant CLK_PERIOD           : time    := 4 ns;       --! 250 MHz
@@ -235,6 +235,267 @@ begin
         BW_46_stream_A_write       => BW_46_stream_A_write
       );
   end generate sectorProc;
+
+  sectorProcFull : if INST_TOP_TF = 1 generate
+  begin
+    uut : entity work.SectorProcessorFull
+      port map(
+        clk                        => clk,
+        reset                      => reset,
+        IR_start                   => IR_start,
+        IR_bx_in                   => IR_bx_in,
+        FT_bx_out                  => FT_bx_out,
+        FT_bx_out_vld              => FT_bx_out_vld,
+        FT_done                    => FT_done,
+        -- Debug control signals
+        IR_bx_out                  => IR_bx_out,
+        IR_bx_out_vld              => IR_bx_out_vld,
+        IR_done                    => IR_done,
+        VMR_bx_out                 => VMR_bx_out,
+        VMR_bx_out_vld             => VMR_bx_out_vld,
+        VMR_done                   => VMR_done,
+        TP_bx_out                  => TP_bx_out,
+        TP_bx_out_vld              => TP_bx_out_vld,
+        TP_done                    => TP_done,
+        MP_bx_out                  => MP_bx_out,
+        MP_bx_out_vld              => MP_bx_out_vld,
+        MP_done                    => MP_done,
+        -- Input data
+        DL_39_link_AV_dout         => DL_39_link_AV_dout,
+        DL_39_link_empty_neg       => DL_39_link_empty_neg,
+        DL_39_link_read            => DL_39_link_read,
+        -- Debug output data
+        IL_36_mem_A_wea            => IL_36_mem_A_wea,
+        IL_36_mem_AV_writeaddr     => IL_36_mem_AV_writeaddr,
+        IL_36_mem_AV_din           => IL_36_mem_AV_din,
+        AS_36_mem_A_wea            => AS_36_mem_A_wea,
+        AS_36_mem_AV_writeaddr     => AS_36_mem_AV_writeaddr,
+        AS_36_mem_AV_din           => AS_36_mem_AV_din,
+        AS_51_mem_A_wea            => AS_51_mem_A_wea,
+        AS_51_mem_AV_writeaddr     => AS_51_mem_AV_writeaddr,
+        AS_51_mem_AV_din           => AS_51_mem_AV_din,
+        VMSME_16_mem_A_wea         => VMSME_16_mem_A_wea,
+        VMSME_16_mem_AV_writeaddr  => VMSME_16_mem_AV_writeaddr,
+        VMSME_16_mem_AV_din        => VMSME_16_mem_AV_din,
+        VMSME_17_mem_A_wea         => VMSME_17_mem_A_wea,
+        VMSME_17_mem_AV_writeaddr  => VMSME_17_mem_AV_writeaddr,
+        VMSME_17_mem_AV_din        => VMSME_17_mem_AV_din,
+        VMSTE_16_mem_A_wea         => VMSTE_16_mem_A_wea,
+        VMSTE_16_mem_AV_writeaddr  => VMSTE_16_mem_AV_writeaddr,
+        VMSTE_16_mem_AV_din        => VMSTE_16_mem_AV_din,
+        TPROJ_60_mem_A_wea         => TPROJ_60_mem_A_wea,
+        TPROJ_60_mem_AV_writeaddr  => TPROJ_60_mem_AV_writeaddr,
+        TPROJ_60_mem_AV_din        => TPROJ_60_mem_AV_din,
+        TPROJ_58_mem_A_wea         => TPROJ_58_mem_A_wea,
+        TPROJ_58_mem_AV_writeaddr  => TPROJ_58_mem_AV_writeaddr,
+        TPROJ_58_mem_AV_din        => TPROJ_58_mem_AV_din,
+        TPAR_70_mem_A_wea          => TPAR_70_mem_A_wea,
+        TPAR_70_mem_AV_writeaddr   => TPAR_70_mem_AV_writeaddr,
+        TPAR_70_mem_AV_din         => TPAR_70_mem_AV_din,
+        FM_52_mem_A_wea            => FM_52_mem_A_wea,
+        FM_52_mem_AV_writeaddr     => FM_52_mem_AV_writeaddr,
+        FM_52_mem_AV_din           => FM_52_mem_AV_din,
+        -- Output data
+        TW_84_stream_AV_din        => TW_84_stream_AV_din,
+        TW_84_stream_A_full_neg    => TW_84_stream_A_full_neg,
+        TW_84_stream_A_write       => TW_84_stream_A_write,
+        BW_46_stream_AV_din        => BW_46_stream_AV_din,
+        BW_46_stream_A_full_neg    => BW_46_stream_A_full_neg,
+        BW_46_stream_A_write       => BW_46_stream_A_write
+      );
+  end generate sectorProcFull;
+
+  -- Write signals to output .txt files
+
+  writeIntermediateRAMs : if INST_TOP_TF = 1 generate
+  begin
+
+    -- This writes signals going to intermediate memories in chain.
+
+    IL_36_loop : for var in enum_IL_36 generate
+    begin
+      writeIL_36 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_IL_36&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 36,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => IL_36_mem_AV_writeaddr(var),
+        DATA      => IL_36_mem_AV_din(var),
+        WRITE_EN  => IL_36_mem_A_wea(var),
+        START     => IR_START,
+        DONE      => IR_DONE
+      );
+    end generate IL_36_loop;
+
+    AS_36_loop : for var in enum_AS_36 generate
+    begin
+      writeAS_36 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_AS_36&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 36,
+        NUM_PAGES => 8
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => AS_36_mem_AV_writeaddr(var),
+        DATA      => AS_36_mem_AV_din(var),
+        WRITE_EN  => AS_36_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate AS_36_loop;
+
+    AS_51_loop : for var in enum_AS_51 generate
+    begin
+      writeAS_51 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_AS_51&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 51,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => AS_51_mem_AV_writeaddr(var),
+        DATA      => AS_51_mem_AV_din(var),
+        WRITE_EN  => AS_51_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate AS_51_loop;
+
+    VMSME_16_loop : for var in enum_VMSME_16 generate
+    begin
+      writeVMSME_16 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_VMSME_16&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 16,
+        PAGE_LENGTH=> 1024,
+        NUM_PAGES => 4
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => VMSME_16_mem_AV_writeaddr(var),
+        DATA      => VMSME_16_mem_AV_din(var),
+        WRITE_EN  => VMSME_16_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate VMSME_16_loop;
+
+    VMSME_17_loop : for var in enum_VMSME_17 generate
+    begin
+      writeVMSME_17 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_VMSME_17&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 17,
+        PAGE_LENGTH=> 1024,
+        NUM_PAGES => 4
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => VMSME_17_mem_AV_writeaddr(var),
+        DATA      => VMSME_17_mem_AV_din(var),
+        WRITE_EN  => VMSME_17_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate VMSME_17_loop;
+
+    VMSTE_16_loop : for var in enum_VMSTE_16 generate
+    begin
+      writeVMSTE_16 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_VMSTE_16&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 16,
+        PAGE_LENGTH=> 1024,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => VMSTE_16_mem_AV_writeaddr(var),
+        DATA      => VMSTE_16_mem_AV_din(var),
+        WRITE_EN  => VMSTE_16_mem_A_wea(var),
+        START     => IR_DONE,
+        DONE      => VMR_DONE
+      );
+    end generate VMSTE_16_loop;
+
+    TPROJ_60_loop : for var in enum_TPROJ_60 generate
+    begin
+      writeTPROJ_60 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_TPROJ_60&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 60,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => TPROJ_60_mem_AV_writeaddr(var),
+        DATA      => TPROJ_60_mem_AV_din(var),
+        WRITE_EN  => TPROJ_60_mem_A_wea(var),
+        START     => VMR_DONE,
+        DONE      => TP_DONE
+      );
+    end generate TPROJ_60_loop;
+
+    TPROJ_58_loop : for var in enum_TPROJ_58 generate
+    begin
+      writeTPROJ_58 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_TPROJ_58&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 58,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => TPROJ_58_mem_AV_writeaddr(var),
+        DATA      => TPROJ_58_mem_AV_din(var),
+        WRITE_EN  => TPROJ_58_mem_A_wea(var),
+        START     => VMR_DONE,
+        DONE      => TP_DONE
+      );
+    end generate TPROJ_58_loop;
+
+    TPAR_70_loop : for var in enum_TPAR_70 generate
+    begin
+      writeTPAR_70 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_TPAR_70&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 70,
+        NUM_PAGES => 8
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => TPAR_70_mem_AV_writeaddr(var),
+        DATA      => TPAR_70_mem_AV_din(var),
+        WRITE_EN  => TPAR_70_mem_A_wea(var),
+        START     => VMR_DONE,
+        DONE      => TP_DONE
+      );
+    end generate TPAR_70_loop;
+
+    FM_52_loop : for var in enum_FM_52 generate
+    begin
+      writeFM_52 : entity work.FileWriter
+      generic map (
+        FILE_NAME => FILE_OUT_FM_52&memory_enum_to_string(var)&outputFileNameEnding,
+        RAM_WIDTH => 52,
+        NUM_PAGES => 2
+      )
+      port map (
+        CLK       => CLK,
+        ADDR      => FM_52_mem_AV_writeaddr(var),
+        DATA      => FM_52_mem_AV_din(var),
+        WRITE_EN  => FM_52_mem_A_wea(var),
+        START     => TP_DONE,
+        DONE      => MP_DONE
+      );
+    end generate FM_52_loop;
+
+  end generate writeIntermediateRAMs;
 
 
   -- Write memories from end of chain.

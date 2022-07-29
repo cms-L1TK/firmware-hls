@@ -210,38 +210,40 @@ begin
       vi_nent_idx := addra(9 downto 4); -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
-      upperbits := vi_nent_idx(5 downto 3);
-      lowerbits := vi_nent_idx(2 downto 0);
+      upperbits := vi_nent_idx(5 downto 3); --phi position
+      lowerbits := vi_nent_idx(2 downto 0); --rz position
       
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
       addr_in_bin := addra(BIN_ADDR_WIDTH-1 downto 0);
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
-      case lowerbits is
+
+      case upperbits is
         when "000" =>
-          sa_RAM_nentA0(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB0(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA0(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB0(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          report "WRITE tm_mem_bin_cm4_new addr_nent "&integer'image(page*8+to_integer(unsigned(lowerbits)))&" "&integer'image(to_integer(unsigned(addr_in_bin)));
         when "001" =>
-          sa_RAM_nentA1(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB1(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA1(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB1(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
         when "010" =>
-          sa_RAM_nentA2(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB2(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA2(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB2(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
         when "011" =>
-          sa_RAM_nentA3(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB3(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA3(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB3(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
         when "100" =>
-          sa_RAM_nentA4(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB4(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA4(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB4(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
         when "101" =>
-          sa_RAM_nentA5(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB5(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA5(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB5(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
         when "110" =>
-          sa_RAM_nentA6(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB6(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA6(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB6(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
         when others =>
-          sa_RAM_nentA7(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB7(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentA7(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB7(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
       end case;
     end if; -- (wea='1')
   end if;
@@ -264,6 +266,7 @@ begin
     end if;
     if (enb_nentA='1') then
       dout_nentA <= sa_RAM_nentA7(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA6(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA5(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA4(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA3(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA2(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA1(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA0(to_integer(unsigned(addr_nentA)));
+      report "READ tm_mem_bin_cm4_new addr_nent "&integer'image(to_integer(unsigned(addr_nentA)))&" "&integer'image(to_integer(unsigned(dout_nentA)));
     end if;
     if (enb_nentB='1') then
       dout_nentB <= sa_RAM_nentB7(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB6(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB5(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB4(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB3(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB2(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB1(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB0(to_integer(unsigned(addr_nentB)));

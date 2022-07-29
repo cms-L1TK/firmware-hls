@@ -14,9 +14,51 @@ entity SectorProcessorFull is
     FT_bx_out : out std_logic_vector(2 downto 0);
     FT_bx_out_vld : out std_logic;
     FT_done   : out std_logic;
+    IR_bx_out : out std_logic_vector(2 downto 0);
+    IR_bx_out_vld : out std_logic;
+    IR_done   : out std_logic;
+    VMR_bx_out : out std_logic_vector(2 downto 0);
+    VMR_bx_out_vld : out std_logic;
+    VMR_done   : out std_logic;
+    TP_bx_out : out std_logic_vector(2 downto 0);
+    TP_bx_out_vld : out std_logic;
+    TP_done   : out std_logic;
+    MP_bx_out : out std_logic_vector(2 downto 0);
+    MP_bx_out_vld : out std_logic;
+    MP_done   : out std_logic;
     DL_39_link_AV_dout       : in t_arr_DL_39_DATA;
     DL_39_link_empty_neg     : in t_arr_DL_39_1b;
     DL_39_link_read          : out t_arr_DL_39_1b;
+    IL_36_mem_A_wea        : out t_arr_IL_36_1b;
+    IL_36_mem_AV_writeaddr : out t_arr_IL_36_ADDR;
+    IL_36_mem_AV_din       : out t_arr_IL_36_DATA;
+    AS_36_mem_A_wea        : out t_arr_AS_36_1b;
+    AS_36_mem_AV_writeaddr : out t_arr_AS_36_ADDR;
+    AS_36_mem_AV_din       : out t_arr_AS_36_DATA;
+    AS_51_mem_A_wea        : out t_arr_AS_51_1b;
+    AS_51_mem_AV_writeaddr : out t_arr_AS_51_ADDR;
+    AS_51_mem_AV_din       : out t_arr_AS_51_DATA;
+    VMSME_16_mem_A_wea        : out t_arr_VMSME_16_1b;
+    VMSME_16_mem_AV_writeaddr : out t_arr_VMSME_16_ADDR;
+    VMSME_16_mem_AV_din       : out t_arr_VMSME_16_DATA;
+    VMSME_17_mem_A_wea        : out t_arr_VMSME_17_1b;
+    VMSME_17_mem_AV_writeaddr : out t_arr_VMSME_17_ADDR;
+    VMSME_17_mem_AV_din       : out t_arr_VMSME_17_DATA;
+    VMSTE_16_mem_A_wea        : out t_arr_VMSTE_16_1b;
+    VMSTE_16_mem_AV_writeaddr : out t_arr_VMSTE_16_ADDR;
+    VMSTE_16_mem_AV_din       : out t_arr_VMSTE_16_DATA;
+    TPROJ_60_mem_A_wea        : out t_arr_TPROJ_60_1b;
+    TPROJ_60_mem_AV_writeaddr : out t_arr_TPROJ_60_ADDR;
+    TPROJ_60_mem_AV_din       : out t_arr_TPROJ_60_DATA;
+    TPROJ_58_mem_A_wea        : out t_arr_TPROJ_58_1b;
+    TPROJ_58_mem_AV_writeaddr : out t_arr_TPROJ_58_ADDR;
+    TPROJ_58_mem_AV_din       : out t_arr_TPROJ_58_DATA;
+    TPAR_70_mem_A_wea        : out t_arr_TPAR_70_1b;
+    TPAR_70_mem_AV_writeaddr : out t_arr_TPAR_70_ADDR;
+    TPAR_70_mem_AV_din       : out t_arr_TPAR_70_DATA;
+    FM_52_mem_A_wea        : out t_arr_FM_52_1b;
+    FM_52_mem_AV_writeaddr : out t_arr_FM_52_ADDR;
+    FM_52_mem_AV_din       : out t_arr_FM_52_DATA;
     TW_84_stream_AV_din       : out t_arr_TW_84_DATA;
     TW_84_stream_A_full_neg   : in t_arr_TW_84_1b;
     TW_84_stream_A_write      : out t_arr_TW_84_1b;
@@ -28,98 +70,59 @@ end SectorProcessorFull;
 
 architecture rtl of SectorProcessorFull is
 
-  signal IL_36_mem_A_wea          : t_arr_IL_36_1b;
-  signal IL_36_mem_AV_writeaddr   : t_arr_IL_36_ADDR;
-  signal IL_36_mem_AV_din         : t_arr_IL_36_DATA;
   signal IL_36_mem_A_enb          : t_arr_IL_36_1b;
   signal IL_36_mem_AV_readaddr    : t_arr_IL_36_ADDR;
   signal IL_36_mem_AV_dout        : t_arr_IL_36_DATA;
   signal IL_36_mem_AAV_dout_nent  : t_arr_IL_36_NENT; -- (#page)
-  signal AS_36_mem_A_wea          : t_arr_AS_36_1b;
-  signal AS_36_mem_AV_writeaddr   : t_arr_AS_36_ADDR;
-  signal AS_36_mem_AV_din         : t_arr_AS_36_DATA;
   signal AS_36_mem_A_enb          : t_arr_AS_36_1b;
   signal AS_36_mem_AV_readaddr    : t_arr_AS_36_ADDR;
   signal AS_36_mem_AV_dout        : t_arr_AS_36_DATA;
-  signal AS_51_mem_A_wea          : t_arr_AS_51_1b;
-  signal AS_51_mem_AV_writeaddr   : t_arr_AS_51_ADDR;
-  signal AS_51_mem_AV_din         : t_arr_AS_51_DATA;
   signal AS_51_mem_A_enb          : t_arr_AS_51_1b;
   signal AS_51_mem_AV_readaddr    : t_arr_AS_51_ADDR;
   signal AS_51_mem_AV_dout        : t_arr_AS_51_DATA;
   signal AS_51_mem_AAV_dout_nent  : t_arr_AS_51_NENT; -- (#page)
-  signal VMSME_16_mem_A_wea          : t_arr_VMSME_16_1b;
-  signal VMSME_16_mem_AV_writeaddr   : t_arr_VMSME_16_ADDR;
-  signal VMSME_16_mem_AV_din         : t_arr_VMSME_16_DATA;
   signal VMSME_16_mem_AA_enb         : t_arr_VMSME_16_A1b;
   signal VMSME_16_mem_AAV_readaddr   : t_arr_VMSME_16_AADDR;
   signal VMSME_16_mem_AAV_dout       : t_arr_VMSME_16_ADATA;
   signal VMSME_16_mem_AAV_dout_mask : t_arr_VMSME_16_MASK; -- (#page)(#bin)
-  signal VMSME_16_mem_A_enb_nentA    : t_arr_VMSME_16_1b; 
-  signal VMSME_16_mem_A_enb_nentB    : t_arr_VMSME_16_1b; 
-  signal VMSME_16_mem_AV_addr_nentA    : t_arr_VMSME_16_NENTADDR; 
-  signal VMSME_16_mem_AV_addr_nentB    : t_arr_VMSME_16_NENTADDR; 
-  signal VMSME_16_mem_AV_dout_nentA : t_arr_VMSME_16_NENT; 
-  signal VMSME_16_mem_AV_dout_nentB : t_arr_VMSME_16_NENT; 
-  signal VMSME_17_mem_A_wea          : t_arr_VMSME_17_1b;
-  signal VMSME_17_mem_AV_writeaddr   : t_arr_VMSME_17_ADDR;
-  signal VMSME_17_mem_AV_din         : t_arr_VMSME_17_DATA;
+  signal VMSME_16_mem_A_enb_nentA : t_arr_VMSME_16_1b;
+  signal VMSME_16_mem_A_enb_nentB : t_arr_VMSME_16_1b;
+  signal VMSME_16_mem_AV_addr_nentA : t_arr_VMSME_16_NENTADDR;
+  signal VMSME_16_mem_AV_addr_nentB : t_arr_VMSME_16_NENTADDR;
+  signal VMSME_16_mem_AV_dout_nentA : t_arr_VMSME_16_NENT;
+  signal VMSME_16_mem_AV_dout_nentB : t_arr_VMSME_16_NENT;
   signal VMSME_17_mem_AA_enb         : t_arr_VMSME_17_A1b;
   signal VMSME_17_mem_AAV_readaddr   : t_arr_VMSME_17_AADDR;
   signal VMSME_17_mem_AAV_dout       : t_arr_VMSME_17_ADATA;
   signal VMSME_17_mem_AAV_dout_mask : t_arr_VMSME_17_MASK; -- (#page)(#bin)
-  signal VMSME_17_mem_A_enb_nentA    : t_arr_VMSME_17_1b; 
-  signal VMSME_17_mem_A_enb_nentB    : t_arr_VMSME_17_1b; 
-  signal VMSME_17_mem_AV_addr_nentA    : t_arr_VMSME_17_NENTADDR; 
-  signal VMSME_17_mem_AV_addr_nentB    : t_arr_VMSME_17_NENTADDR; 
-  signal VMSME_17_mem_AV_dout_nentA : t_arr_VMSME_17_NENT; 
-  signal VMSME_17_mem_AV_dout_nentB : t_arr_VMSME_17_NENT; 
-  signal VMSTE_16_mem_A_wea          : t_arr_VMSTE_16_1b;
-  signal VMSTE_16_mem_AV_writeaddr   : t_arr_VMSTE_16_ADDR;
-  signal VMSTE_16_mem_AV_din         : t_arr_VMSTE_16_DATA;
+  signal VMSME_17_mem_A_enb_nentA : t_arr_VMSME_17_1b;
+  signal VMSME_17_mem_A_enb_nentB : t_arr_VMSME_17_1b;
+  signal VMSME_17_mem_AV_addr_nentA : t_arr_VMSME_17_NENTADDR;
+  signal VMSME_17_mem_AV_addr_nentB : t_arr_VMSME_17_NENTADDR;
+  signal VMSME_17_mem_AV_dout_nentA : t_arr_VMSME_17_NENT;
+  signal VMSME_17_mem_AV_dout_nentB : t_arr_VMSME_17_NENT;
   signal VMSTE_16_mem_AA_enb         : t_arr_VMSTE_16_A1b;
   signal VMSTE_16_mem_AAV_readaddr   : t_arr_VMSTE_16_AADDR;
   signal VMSTE_16_mem_AAV_dout       : t_arr_VMSTE_16_ADATA;
   signal VMSTE_16_mem_AAV_dout_mask : t_arr_VMSTE_16_MASK; -- (#page)(#bin)
   signal VMSTE_16_mem_AAAV_dout_nent : t_arr_VMSTE_16_NENT; -- (#page)(#bin)
-  signal TPROJ_60_mem_A_wea          : t_arr_TPROJ_60_1b;
-  signal TPROJ_60_mem_AV_writeaddr   : t_arr_TPROJ_60_ADDR;
-  signal TPROJ_60_mem_AV_din         : t_arr_TPROJ_60_DATA;
   signal TPROJ_60_mem_A_enb          : t_arr_TPROJ_60_1b;
   signal TPROJ_60_mem_AV_readaddr    : t_arr_TPROJ_60_ADDR;
   signal TPROJ_60_mem_AV_dout        : t_arr_TPROJ_60_DATA;
   signal TPROJ_60_mem_AAV_dout_nent  : t_arr_TPROJ_60_NENT; -- (#page)
-  signal TPROJ_58_mem_A_wea          : t_arr_TPROJ_58_1b;
-  signal TPROJ_58_mem_AV_writeaddr   : t_arr_TPROJ_58_ADDR;
-  signal TPROJ_58_mem_AV_din         : t_arr_TPROJ_58_DATA;
   signal TPROJ_58_mem_A_enb          : t_arr_TPROJ_58_1b;
   signal TPROJ_58_mem_AV_readaddr    : t_arr_TPROJ_58_ADDR;
   signal TPROJ_58_mem_AV_dout        : t_arr_TPROJ_58_DATA;
   signal TPROJ_58_mem_AAV_dout_nent  : t_arr_TPROJ_58_NENT; -- (#page)
-  signal TPAR_70_mem_A_wea          : t_arr_TPAR_70_1b;
-  signal TPAR_70_mem_AV_writeaddr   : t_arr_TPAR_70_ADDR;
-  signal TPAR_70_mem_AV_din         : t_arr_TPAR_70_DATA;
   signal TPAR_70_mem_A_enb          : t_arr_TPAR_70_1b;
   signal TPAR_70_mem_AV_readaddr    : t_arr_TPAR_70_ADDR;
   signal TPAR_70_mem_AV_dout        : t_arr_TPAR_70_DATA;
-  signal FM_52_mem_A_wea          : t_arr_FM_52_1b;
-  signal FM_52_mem_AV_writeaddr   : t_arr_FM_52_ADDR;
-  signal FM_52_mem_AV_din         : t_arr_FM_52_DATA;
   signal FM_52_mem_A_enb          : t_arr_FM_52_1b;
   signal FM_52_mem_AV_readaddr    : t_arr_FM_52_ADDR;
   signal FM_52_mem_AV_dout        : t_arr_FM_52_DATA;
   signal FM_52_mem_AAV_dout_nent  : t_arr_FM_52_NENT; -- (#page)
-  signal IR_done : std_logic := '0';
-  signal IR_bx_out : std_logic_vector(2 downto 0);
-  signal IR_bx_out_vld : std_logic;
   signal VMR_start : std_logic := '0';
-  signal VMR_done : std_logic := '0';
-  signal VMR_bx_out : std_logic_vector(2 downto 0);
-  signal VMR_bx_out_vld : std_logic;
   signal TP_start : std_logic := '0';
-  signal TP_done : std_logic := '0';
-  signal TP_bx_out : std_logic_vector(2 downto 0);
-  signal TP_bx_out_vld : std_logic;
   signal MP_start : std_logic := '0';
   signal TP_L1L2C_lut_addr       : std_logic_vector(10 downto 0);
   signal TP_L1L2C_lut_ce       : std_logic;
@@ -127,9 +130,6 @@ architecture rtl of SectorProcessorFull is
   signal TP_L1L2C_regionlut_addr       : std_logic_vector(10 downto 0);
   signal TP_L1L2C_regionlut_ce       : std_logic;
   signal TP_L1L2C_regionlut_dout : std_logic_vector(7 downto 0);
-  signal MP_done : std_logic := '0';
-  signal MP_bx_out : std_logic_vector(2 downto 0);
-  signal MP_bx_out_vld : std_logic;
   signal FT_start : std_logic := '0';
 
 begin
@@ -256,13 +256,13 @@ begin
         enb3       => VMSME_16_mem_AA_enb(var)(3),
         addrb3     => VMSME_16_mem_AAV_readaddr(var)(3),
         doutb3     => VMSME_16_mem_AAV_dout(var)(3),
-        sync_nent  => MP_start,
+        sync_nent => MP_start,
         enb_nentA  => VMSME_16_mem_A_enb_nentA(var),
         enb_nentB  => VMSME_16_mem_A_enb_nentB(var),
         addr_nentA  => VMSME_16_mem_AV_addr_nentA(var),
         addr_nentB  => VMSME_16_mem_AV_addr_nentB(var),
-        dout_nentA  => VMSME_16_mem_AV_dout_nentA(var),
-        dout_nentB  => VMSME_16_mem_AV_dout_nentB(var),
+        dout_nentA    => VMSME_16_mem_AV_dout_nentA(var),
+        dout_nentB    => VMSME_16_mem_AV_dout_nentB(var),
         mask_o    => VMSME_16_mem_AAV_dout_mask(var)
       );
 
@@ -686,8 +686,10 @@ begin
       ap_start => VMR_start,
       ap_idle  => open,
       ap_ready => open,
-      ap_done  => open,
+      ap_done  => VMR_done,
       bx_V          => IR_bx_out,
+      bx_o_V        => VMR_bx_out,
+      bx_o_V_ap_vld => VMR_bx_out_vld,
       inputStubs_0_dataarray_data_V_ce0       => IL_36_mem_A_enb(L1PHIB_PS10G_1_A),
       inputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_readaddr(L1PHIB_PS10G_1_A),
       inputStubs_0_dataarray_data_V_q0        => IL_36_mem_AV_dout(L1PHIB_PS10G_1_A),
@@ -713,8 +715,6 @@ begin
       ap_ready => open,
       ap_done  => open,
       bx_V          => IR_bx_out,
-      bx_o_V        => VMR_bx_out,
-      bx_o_V_ap_vld => VMR_bx_out_vld,
       inputStubs_0_dataarray_data_V_ce0       => IL_36_mem_A_enb(L2PHIA_PS10G_3_A),
       inputStubs_0_dataarray_data_V_address0  => IL_36_mem_AV_readaddr(L2PHIA_PS10G_3_A),
       inputStubs_0_dataarray_data_V_q0        => IL_36_mem_AV_dout(L2PHIA_PS10G_3_A),
@@ -1007,7 +1007,7 @@ begin
       instubdata_dataarray_3_data_V_ce0       => VMSME_16_mem_AA_enb(L3PHIAn1)(3),
       instubdata_dataarray_3_data_V_address0  => VMSME_16_mem_AAV_readaddr(L3PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_16_mem_AAV_dout(L3PHIAn1)(3),
-      instubdata_nentries8a_v_q0              => VMSME_16_mem_AV_dout_nentA(L3PHIAn1), 
+      instubdata_nentries8a_v_q0              => VMSME_16_mem_AV_dout_nentA(L3PHIAn1),
       instubdata_nentries8a_v_address0        => VMSME_16_mem_AV_addr_nentA(L3PHIAn1),
       instubdata_nentries8a_v_ce0             => VMSME_16_mem_A_enb_nentA(L3PHIAn1),
       instubdata_nentries8b_v_q0              => VMSME_16_mem_AV_dout_nentB(L3PHIAn1),
@@ -1048,7 +1048,7 @@ begin
       instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem_AA_enb(L4PHIAn1)(3),
       instubdata_dataarray_3_data_V_address0  => VMSME_17_mem_AAV_readaddr(L4PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L4PHIAn1)(3),
-      instubdata_nentries8a_v_q0              => VMSME_17_mem_AV_dout_nentA(L4PHIAn1), 
+      instubdata_nentries8a_v_q0              => VMSME_17_mem_AV_dout_nentA(L4PHIAn1),
       instubdata_nentries8a_v_address0        => VMSME_17_mem_AV_addr_nentA(L4PHIAn1),
       instubdata_nentries8a_v_ce0             => VMSME_17_mem_A_enb_nentA(L4PHIAn1),
       instubdata_nentries8b_v_q0              => VMSME_17_mem_AV_dout_nentB(L4PHIAn1),
@@ -1089,7 +1089,7 @@ begin
       instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem_AA_enb(L5PHIAn1)(3),
       instubdata_dataarray_3_data_V_address0  => VMSME_17_mem_AAV_readaddr(L5PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L5PHIAn1)(3),
-      instubdata_nentries8a_v_q0              => VMSME_17_mem_AV_dout_nentA(L5PHIAn1), 
+      instubdata_nentries8a_v_q0              => VMSME_17_mem_AV_dout_nentA(L5PHIAn1),
       instubdata_nentries8a_v_address0        => VMSME_17_mem_AV_addr_nentA(L5PHIAn1),
       instubdata_nentries8a_v_ce0             => VMSME_17_mem_A_enb_nentA(L5PHIAn1),
       instubdata_nentries8b_v_q0              => VMSME_17_mem_AV_dout_nentB(L5PHIAn1),
@@ -1130,7 +1130,7 @@ begin
       instubdata_dataarray_3_data_V_ce0       => VMSME_17_mem_AA_enb(L6PHIAn1)(3),
       instubdata_dataarray_3_data_V_address0  => VMSME_17_mem_AAV_readaddr(L6PHIAn1)(3),
       instubdata_dataarray_3_data_V_q0        => VMSME_17_mem_AAV_dout(L6PHIAn1)(3),
-      instubdata_nentries8a_v_q0              => VMSME_17_mem_AV_dout_nentA(L6PHIAn1), 
+      instubdata_nentries8a_v_q0              => VMSME_17_mem_AV_dout_nentA(L6PHIAn1),
       instubdata_nentries8a_v_address0        => VMSME_17_mem_AV_addr_nentA(L6PHIAn1),
       instubdata_nentries8a_v_ce0             => VMSME_17_mem_A_enb_nentA(L6PHIAn1),
       instubdata_nentries8b_v_q0              => VMSME_17_mem_AV_dout_nentB(L6PHIAn1),

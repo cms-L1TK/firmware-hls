@@ -54,8 +54,8 @@ package memUtil_pkg is
   type t_arr_VMSME_16_AADDR is array(enum_VMSME_16) of t_arr4_12b;
   type t_arr_VMSME_16_DATA is array(enum_VMSME_16) of std_logic_vector(15 downto 0);
   type t_arr_VMSME_16_ADATA is array(enum_VMSME_16) of t_arr4_16b;
-  type t_arr_VMSME_16_NENTADDR is array(enum_VMSME_16) of std_logic_vector(4 downto 0);
   type t_arr_VMSME_16_NENT is array(enum_VMSME_16) of std_logic_vector(31 downto 0);
+  type t_arr_VMSME_16_NENTADDR is array(enum_VMSME_16) of std_logic_vector(4 downto 0);
   type t_arr_VMSME_16_MASK is array(enum_VMSME_16) of t_arr4_64_1b;
   type t_arr_VMSME_17_1b is array(enum_VMSME_17) of std_logic;
   type t_arr_VMSME_17_A1b is array(enum_VMSME_17) of std_logic_vector(3 downto 0);
@@ -63,8 +63,8 @@ package memUtil_pkg is
   type t_arr_VMSME_17_AADDR is array(enum_VMSME_17) of t_arr4_12b;
   type t_arr_VMSME_17_DATA is array(enum_VMSME_17) of std_logic_vector(16 downto 0);
   type t_arr_VMSME_17_ADATA is array(enum_VMSME_17) of t_arr4_17b;
-  type t_arr_VMSME_17_NENTADDR is array(enum_VMSME_17) of std_logic_vector(4 downto 0);
   type t_arr_VMSME_17_NENT is array(enum_VMSME_17) of std_logic_vector(31 downto 0);
+  type t_arr_VMSME_17_NENTADDR is array(enum_VMSME_17) of std_logic_vector(4 downto 0);
   type t_arr_VMSME_17_MASK is array(enum_VMSME_17) of t_arr4_64_1b;
   type t_arr_VMSTE_16_1b is array(enum_VMSTE_16) of std_logic;
   type t_arr_VMSTE_16_A1b is array(enum_VMSTE_16) of std_logic_vector(4 downto 0);

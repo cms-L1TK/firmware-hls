@@ -826,19 +826,21 @@ void MatchProcessor(BXType bx,
       // VMProjection
 
       ap_uint<4> entries_zfirst[8];
+#pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
       ap_uint<4> entries_zlast[8];
+#pragma HLS ARRAY_PARTITION variable=entries_zlast dim=0 complete
 
       (entries_zfirst[7], entries_zfirst[6], entries_zfirst[5],
        entries_zfirst[4], entries_zfirst[3], entries_zfirst[2],
        entries_zfirst[1],entries_zfirst[0]) = 
 	//instubdata.get_mem_entries8A()[bx][zfirst];      
-	instubdata.get_mem_entries8A()[bx*8+zfirst];      
+	instubdata.get_mem_entries8A()[(bx&3)*8+zfirst];      
 
       (entries_zlast[7], entries_zlast[6], entries_zlast[5],
        entries_zlast[4], entries_zlast[3], entries_zlast[2],
        entries_zlast[1],entries_zlast[0]) = 
 	//instubdata.get_mem_entries8B()[bx][zlast];      
-	instubdata.get_mem_entries8B()[bx*8+zlast];      
+	instubdata.get_mem_entries8B()[(bx&3)*8+zlast];      
 
       /*
       std::cout << " z phi: " << zfirst << " " << ivmMinus << " "
