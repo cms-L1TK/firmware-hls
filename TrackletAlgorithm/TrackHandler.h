@@ -12,16 +12,16 @@ const unsigned int kDiskStubIndexSizeMSB = TrackFit::kTFDiskStubRSize + TrackFit
 const unsigned int kDiskStubIndexSizeLSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize;
 const int layerStubIndexSize = 10; //7
 
-struct EmptyTrackStruct {
-  TrackFit::TrackWord _trackWord = {0};
-  TrackFit::BarrelStubWord _barrelStub_0 = {0};  
-  TrackFit::BarrelStubWord _barrelStub_1 = {0}; 
-  TrackFit::BarrelStubWord _barrelStub_2 = {0};
-  TrackFit::BarrelStubWord _barrelStub_3 = {0};  
-  TrackFit::DiskStubWord _diskStub_0 = {0};
-  TrackFit::DiskStubWord _diskStub_1 = {0};
-  TrackFit::DiskStubWord _diskStub_2 = {0};
-  TrackFit::DiskStubWord _diskStub_3 = {0};
+struct TrackStruct {
+  TrackFit::TrackWord _trackWord = 0;
+  TrackFit::BarrelStubWord _barrelStub_0 = 0;  
+  TrackFit::BarrelStubWord _barrelStub_1 = 0; 
+  TrackFit::BarrelStubWord _barrelStub_2 = 0;
+  TrackFit::BarrelStubWord _barrelStub_3 = 0;  
+  TrackFit::DiskStubWord _diskStub_0 = 0;
+  TrackFit::DiskStubWord _diskStub_1 = 0;
+  TrackFit::DiskStubWord _diskStub_2 = 0;
+  TrackFit::DiskStubWord _diskStub_3 = 0;
 };
 
 // struct TrackStruct {
@@ -48,9 +48,9 @@ struct EmptyTrackStruct {
 
 // };
 
-struct EmptyTrackStruct : TrackStruct{
-  EmptyTrackStruct() : TrackStruct() {}
-  };
+// struct EmptyTrackStruct : TrackStruct{
+//   EmptyTrackStruct() : TrackStruct() {}
+//   };
 
 
 
