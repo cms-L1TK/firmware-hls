@@ -41,6 +41,8 @@ void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
   tracksProcessed++;
 }
 
+void fillUnmerged(TrackStruct& inTrack,TrackStruct& outTrack) {outTrack = inTrack;}
+
 void loadTrack(
   hls::stream<TrackFit::TrackWord> &trackWord,
   hls::stream<TrackFit::BarrelStubWord> &barrelStubWords_0,
@@ -113,14 +115,14 @@ void TrackMerger(const BXType bx,
 
   ComparisonModule comparisonModule[kNComparisonModules];
   #pragma HLS array_partition variable=comparisonModule complete dim=0
-  TrackStruct unmergedTracks[kMaxTrack] = {TrackStruct()};
+  TrackStruct unmergedTracks[kMaxTrack];
   #pragma HLS array_partition variable=unmergedTracks complete dim=1
-  TrackStruct masterTracks[kNComparisonModules] = {TrackStruct()};
+  TrackStruct masterTracks[kNComparisonModules];
   #pragma HLS array_partition variable=masterTracks complete dim=1
 
   LOOP_Input:
   for (unsigned int i = 0; i < kMaxTrack; i++){ 
-    TrackStruct tracks[kNBuffers] = {TrackStruct()}; 
+    TrackStruct tracks[kNBuffers]; 
     #pragma HLS array_partition variable=tracks complete dim=1
     #pragma HLS dataflow
     loadTrack(trackWord,barrelStubWords_0,barrelStubWords_1,barrelStubWords_2,barrelStubWords_3,diskStubWords_0,
@@ -130,8 +132,8 @@ void TrackMerger(const BXType bx,
       #pragma HLS unroll
       comparisonModule[j].process(tracks[j],tracks[j+1]);
     }
-
-    unmergedTracks[i] = tracks[kNComparisonModules];
+    fillUnmerged(tracks[kNComparisonModules],unmergedTracks[i]);
+    // unmergedTracks[i] = tracks[kNComparisonModules];
 
   }
 

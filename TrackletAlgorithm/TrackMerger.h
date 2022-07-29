@@ -56,6 +56,7 @@ class ComparisonModule{
     TrackStruct masterTrack;
     TrackStruct track;
 
+    void fillUnmerged(TrackStruct& inTrack,TrackStruct& outTrack);
 
     void loadTrack(
       hls::stream<TrackFit::TrackWord> &trackWord,
