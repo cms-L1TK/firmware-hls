@@ -1,7 +1,7 @@
+include payload.dep
 setup ../ucf/vsim.tcl
 
 include -c emp-fwk:boards/testbench
-include payload.dep
 
 src -c emp-fwk:components/datapath emp_data_types.vhd
 src -c emp-fwk:components/ttc emp_ttc_decl.vhd

@@ -9,12 +9,13 @@ sub_tos = ["", "IR", "VMR", "TE_L1L2", "TC", "PR", "ME", "MC", "FT"]
 #create file and write first line
 core_file = 'cfg/include_cores.tcl'
 f = open(core_file, "w")
-f.write("source ../../src/firmware-hls/firmware/cfg/ip_tools.tcl\n")
+f.write("cd [get_property DIRECTORY [current_project]]\n")
+f.write("source ../../../src/firmware-hls/firmware/cfg/ip_tools.tcl\n")
 
 # Get paths to the cores "component.xml" files
 core_dir = iglob('cgn/*/*')
 core_suffix = '/impl/ip/component.xml'
-core_prefix = '../../src/firmware-hls/firmware/'
+core_prefix = '../../../src/firmware-hls/firmware/'
 core_dirs = [x for x in core_dir if os.path.isdir(x)]
 
 # Get proper paths and nicknames and write them to tcl script
