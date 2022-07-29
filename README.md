@@ -212,6 +212,8 @@ with
 set_false_path -through [get_nets {ttc/*tcds2_interface_stat[channel0_ttc2]*}] -to [get_clocks {clk_40_extern0 clk_40_pseudo}]
 ```
 
+### Vivado Simulation
+
 **Step 2: Create an ipbb project area**
 
 For vivado simulation testbench:
@@ -229,4 +231,19 @@ vivado vsim.xpr
 ```
 
 and start the simulation from GUI (first time will take long).
+
+### Synthesis
+
+**Step 2: Create an ipbb project area**
+
+```
+ipbb proj create vivado apollo firmware-hls: 'apollo.dep'
+cd proj/apollo
+```
+
+**Step 3: Compile**
+
+```
+ipbb vivado generate-project synth impl package
+```
 
