@@ -149,6 +149,8 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	if (negDisk) bin += 1 << (nbitsbin-1); // The upper half of the bins are for negative disks
 	
 	auto ivm = phicorr.range(phicorr.length() - nbitsall - 1, phicorr.length() - (nbitsall + vmbits)); //get the phi bits that corresponds to the old vms
+
+	// phi most significant part, rz least significant	
 	slot = ivm * (1 << nbitsbin) + bin;
 
 	// Set rzfine, i.e. the r/z bits within a coarse r/z region
