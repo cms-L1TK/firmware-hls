@@ -57,14 +57,16 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   bx_ = bxin;
   istub_ = 0;
 
+
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   shift_ = projbuffer.shift();
-  stubmask_[0] = nstubsall_[0]!=0;
-  stubmask_[1] = nstubsall_[1]!=0;
-  stubmask_[2] = nstubsall_[2]!=0;
-  stubmask_[3] = nstubsall_[3]!=0;
+  stubmask_ = projbuffer.getMaskStubs();
+  //stubmask_[0] = nstubsall_[0]!=0;
+  //stubmask_[1] = nstubsall_[1]!=0;
+  //stubmask_[2] = nstubsall_[2]!=0;
+  //stubmask_[3] = nstubsall_[3]!=0;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index[0];

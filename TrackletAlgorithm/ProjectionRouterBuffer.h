@@ -25,12 +25,13 @@ public:
     kPRBufferIsPSSeedSize = 1,
     kPRBufferZBinSize = MEBinsBits+1,
     kPRBufferNStubsSize = 4*kNBits_MemAddrBinned,
+    kPRBufferMaskStubsSize = 4,
     kPRBufferIndexSize = 7,
     kPRBufferShiftSize = 2,
     kPRBufferTCIDSize = 7,
     kPRBufferPhiSize = 3,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferPhiSize + kPRBufferTCIDSize + kPRBufferShiftSize + kPRBufferIndexSize + kPRBufferNStubsSize + kPRBufferZBinSize + kPRBufferIsPSSeedSize + VMProjectionBase<BARREL>::kVMProjectionSize + AllProjection<AllProjectionType>::kAllProjectionSize
+    kProjectionRouterBufferSize = kPRBufferPhiSize + kPRBufferTCIDSize + kPRBufferShiftSize + kPRBufferIndexSize + kPRBufferNStubsSize + kPRBufferMaskStubsSize + kPRBufferZBinSize + kPRBufferIsPSSeedSize + VMProjectionBase<BARREL>::kVMProjectionSize + AllProjection<AllProjectionType>::kAllProjectionSize
   };
 };
 
@@ -44,11 +45,12 @@ public:
     //kPRProjSize = VMProjection<VMPTYPE>::kVMProjectionSize,
     kPRBufferZBinSize = MEBinsBits+1+1,
     kPRBufferNStubsSize = 4*kNBits_MemAddrBinned,
+    kPRBufferMaskStubsSize = 4,
     kPRBufferIndexSize = 7,
     kPRBufferShiftSize = 2,
     kPRBufferTCIDSize = 7,
     // Bit size for full ProjectionRouterBufferMemory
-    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + VMProjectionBase<DISK>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferNStubsSize + kPRBufferShiftSize + AllProjection<AllProjectionType>::kAllProjectionSize
+    kProjectionRouterBufferSize = kPRBufferTCIDSize + kPRBufferIsPSSeedSize + kPRBufferIndexSize + VMProjectionBase<DISK>::kVMProjectionSize + kPRBufferZBinSize + kPRBufferNStubsSize + kPRBufferMaskStubsSize + kPRBufferShiftSize + AllProjection<AllProjectionType>::kAllProjectionSize
   };
 };
 
@@ -68,7 +70,9 @@ public:
     kPRProjMSB = kPRProjLSB + VMProjectionBase<VMProjType>::kVMProjectionSize - 1,
     kPRProjNStubsLSB = kPRProjMSB + 1,
     kPRProjNStubsMSB = kPRProjNStubsLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferNStubsSize - 1,
-    kPRBufferIndexLSB = kPRProjNStubsMSB + 1,
+    kPRProjMaskStubsLSB = kPRProjNStubsMSB + 1,
+    kPRProjMaskStubsMSB = kPRProjMaskStubsLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferMaskStubsSize - 1,
+    kPRBufferIndexLSB = kPRProjMaskStubsMSB + 1,
     kPRBufferIndexMSB = kPRBufferIndexLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferIndexSize - 1,
     kPRBufferShiftLSB = kPRBufferIndexMSB + 1,
     kPRBufferShiftMSB = kPRBufferShiftLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferShiftSize - 1,
@@ -100,15 +104,15 @@ public:
   {}
   
   // This constructor is only used for projections in BARREL
- ProjectionRouterBuffer(const ALLPROJ allproj, const PRPHI phi, const SHIFT shift, const TCID tcid, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
-  data_( (allproj, phi, tcid, shift, projdata.getIndex(), nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
+ ProjectionRouterBuffer(const ALLPROJ allproj, const PRPHI phi, const SHIFT shift, const TCID tcid, const PRNSTUB nstub, const ap_uint<4> maskstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
+  data_( (allproj, phi, tcid, shift, projdata.getIndex(), maskstub, nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
   {
     static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
   // This constructor is only used for projections in DISK
-  ProjectionRouterBuffer(const SHIFT shift, const VMPID index, const PRNSTUB nstub, const VMPZBIN zbin, const VMProjData projdata):
-    data_( ((((shift,index),nstub),projdata),zbin) )
+ ProjectionRouterBuffer(const SHIFT shift, const VMPID index, const PRNSTUB nstub, const ap_uint<4> maskstub, const VMPZBIN zbin, const VMProjData projdata):
+  data_( (((((shift,index),maskstub), nstub), projdata),zbin) )
   {
     static_assert(VMProjType == DISK, "Constructor should only be used for DISK projections");
   }
@@ -155,6 +159,10 @@ public:
 
   PRNSTUB getNStubs() const {
     return data_.range(kPRProjNStubsMSB,kPRProjNStubsLSB);
+  }
+
+  ap_uint<4> getMaskStubs() const {
+    return data_.range(kPRProjMaskStubsMSB,kPRProjMaskStubsLSB);
   }
 
   VMPID getIndex() const {

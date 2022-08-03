@@ -591,6 +591,15 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
 
+
+  ap_uint<8> vmstubsmask[8];
+#pragma HLS array_partition variable=vmstubsmask complete dim=1
+
+ entriesloop:for(unsigned int i=0;i<8;i++) {
+#pragma HLS unroll
+    vmstubsmask[i]=instubdata.getBinMask8(bx,i);
+  }
+
   /*
   ap_uint<4> nvmstubs[8][8]; 
 #pragma HLS ARRAY_PARTITION variable=nvmstubs complete dim=0
@@ -644,6 +653,7 @@ void MatchProcessor(BXType bx,
     std::cout << std::endl;
     */
 
+    /*
      
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
@@ -660,12 +670,8 @@ void MatchProcessor(BXType bx,
     ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
 
     ap_uint<1> hasMatch = !emptys[bestiMEU];
-    
-    if (hasMatch) {
-      matchengine[bestiMEU].advance();
-    }
+    */
 
-    /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
@@ -682,8 +688,12 @@ void MatchProcessor(BXType bx,
       
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
+    
 
-    */
+    if (hasMatch) {
+      matchengine[bestiMEU].advance();
+    }
+
 
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff = projbufferarray.peek();;
     if (anyidle && !empty) {
@@ -705,7 +715,6 @@ void MatchProcessor(BXType bx,
       //this and fail to reach II=1
       else if (istep != 0) meu.step(instubdata.getMem(iMEU));
       
-
       meu.processPipeLine(table[iMEU]);      
 
     } //end MEU loop
@@ -841,20 +850,33 @@ void MatchProcessor(BXType bx,
       << std::endl;
       */
 
+      ap_uint<1> stubfirstMinus = vmstubsmask[zfirst][ivmMinus];
+      ap_uint<1> stubfirstPlus = vmstubsmask[zfirst][ivmMinus]&&
+                                 (ivmMinus!=ivmPlus);
+      ap_uint<1> stublastMinus = vmstubsmask[zlast][ivmMinus]&&
+                                 (zfirst!=zlast);
+      ap_uint<1> stublastPlus = vmstubsmask[zlast][ivmPlus]&&
+                                 (zfirst!=zlast)&&(ivmMinus!=ivmPlus);;
+      
+
       ap_uint<4> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<4> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<4> nstublastMinus = entries_zlast[ivmMinus];
       ap_uint<4> nstublastPlus = entries_zlast[ivmPlus];
       
-      if (ivmMinus==ivmPlus) {
-	nstubfirstPlus = 0;
-	nstublastPlus = 0;
-      }
-      if (zfirst==zlast) {
-	nstublastMinus = 0;
-	nstublastPlus = 0;
-      }
 
+
+      //if (ivmMinus==ivmPlus) {
+      //	nstubfirstPlus = 0;
+      //	nstublastPlus = 0;
+      //}
+      //if (zfirst==zlast) {
+      //	nstublastMinus = 0;
+      //	nstublastPlus = 0;
+      //}
+
+      ap_uint<4> maskstubs=(stublastPlus, stubfirstPlus, stublastMinus, stubfirstMinus);
+      
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
@@ -862,10 +884,10 @@ void MatchProcessor(BXType bx,
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
-      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
+      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
       projbufferarray.saveProjection(projbuffertmp);
 
-      if (nstubs!=0) {
+      if (maskstubs!=0) {
 	projbufferarray.incProjection();
       }
       
