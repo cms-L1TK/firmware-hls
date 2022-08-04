@@ -274,35 +274,18 @@ namespace MC {
   const auto LUT_matchcut_r_depth = 12;
   const auto LUT_matchcut_rDSS_width = 12;
   const auto LUT_matchcut_rDSS_depth = 10;
-
 }
 
 // Template to get look up tables
 
 // Table for phi or z cuts
-template<TF::layerDisk L, int width, int depth>
-void readRbin_LUT(ap_uint<width> table[depth]) {
-  if (L>=TF::D1){
-    ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/ProjectionDiskRadius.tab")
-#  include "../emData/MP/tables/ProjectionDiskRadius.tab"
-#else
-    {};
-#endif
-    for (int i = 0; i < depth; i++) table[i] = tmp[i];
-  }
-  else {
-      static_assert(true, "Only DISKS 1 to 5 are valid");
-  }
-}
-
 template<MC::lutType type, TF::layerDisk L, int width, int depth>
 void readTable_Cuts(ap_uint<width> table[depth]){
   if (type==MC::PHICUT){ // phi cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L1PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L1PHIC_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L1PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L1PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -310,8 +293,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L2PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L2PHIC_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L2PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L2PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -319,8 +302,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L3PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L3PHIC_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L3PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L3PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -328,8 +311,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L4PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L4PHIC_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L4PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L4PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -337,8 +320,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L5PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L5PHIC_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L5PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L5PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -346,8 +329,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L6PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L6PHIC_phicut.tab"
+#if __has_include("../emData/MC/tables/MC_L6PHIC_phicut.tab")
+#  include "../emData/MC/tables/MC_L6PHIC_phicut.tab"
 #else
       {};
 #endif
@@ -360,8 +343,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if(type==MC::PSPHICUT) { // PSphi cuts
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_PSphicut.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_PSphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_PSphicut.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_PSphicut.tab"
 #else
       {};
 #endif
@@ -369,8 +352,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_PSphicut.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_PSphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_PSphicut.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_PSphicut.tab"
 #else
       {};
 #endif
@@ -378,8 +361,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_PSphicut.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_PSphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_PSphicut.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_PSphicut.tab"
 #else
       {};
 #endif
@@ -387,8 +370,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D4PHIC_PSphicut.tab")
-#  include "../emData/MP/tables/MP_D4PHIC_PSphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D4PHIC_PSphicut.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_PSphicut.tab"
 #else
       {};
 #endif
@@ -396,8 +379,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D5PHIC_PSphicut.tab")
-#  include "../emData/MP/tables/MP_D5PHIC_PSphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D5PHIC_PSphicut.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_PSphicut.tab"
 #else
       {};
 #endif
@@ -411,8 +394,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if(type==MC::SSPHICUT) { // 2Sphi cuts
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_2Sphicut.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_2Sphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_2Sphicut.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_2Sphicut.tab"
 #else
       {};
 #endif
@@ -420,8 +403,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_2Sphicut.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_2Sphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_2Sphicut.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_2Sphicut.tab"
 #else
       {};
 #endif
@@ -429,8 +412,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_2Sphicut.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_2Sphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_2Sphicut.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_2Sphicut.tab"
 #else
       {};
 #endif
@@ -438,8 +421,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D4PHIC_2Sphicut.tab")
-#  include "../emData/MP/tables/MP_D4PHIC_2Sphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D4PHIC_2Sphicut.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_2Sphicut.tab"
 #else
       {};
 #endif
@@ -447,8 +430,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D5PHIC_2Sphicut.tab")
-#  include "../emData/MP/tables/MP_D5PHIC_2Sphicut.tab"
+#if __has_include("../emData/MC/tables/MC_D5PHIC_2Sphicut.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_2Sphicut.tab"
 #else
       {};
 #endif
@@ -462,8 +445,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if (type==MC::ZCUT) { // z cuts
     if (L==TF::L1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L1PHIC_zcut.tab")
-#  include "../emData/MP/tables/MP_L1PHIC_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L1PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L1PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -471,8 +454,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L2PHIC_zcut.tab")
-#  include "../emData/MP/tables/MP_L2PHIC_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L2PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L2PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -480,8 +463,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L3PHIC_zcut.tab")
-#  include "../emData/MP/tables/MP_L3PHIC_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L3PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L3PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -489,8 +472,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L4PHIC_zcut.tab")
-#  include "../emData/MP/tables/MP_L4PHIC_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L4PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L4PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -498,8 +481,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L5PHIC_zcut.tab")
-#  include "../emData/MP/tables/MP_L5PHIC_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L5PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L5PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -507,8 +490,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::L6){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L6PHIC_zcut.tab")
-#  include "../emData/MP/tables/MP_L6PHIC_zcut.tab"
+#if __has_include("../emData/MC/tables/MC_L6PHIC_zcut.tab")
+#  include "../emData/MC/tables/MC_L6PHIC_zcut.tab"
 #else
       {};
 #endif
@@ -518,8 +501,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if(type==MC::PSRCUT) { // PSr cuts
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_PSrcut.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_PSrcut.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_PSrcut.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_PSrcut.tab"
 #else
       {};
 #endif
@@ -527,8 +510,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_PSrcut.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_PSrcut.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_PSrcut.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_PSrcut.tab"
 #else
       {};
 #endif
@@ -536,8 +519,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_PSrcut.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_PSrcut.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_PSrcut.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_PSrcut.tab"
 #else
       {};
 #endif
@@ -545,8 +528,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D4PHIC_PSrcut.tab")
-#  include "../emData/MP/tables/MP_D4PHIC_PSrcut.tab"
+#if __has_include("../emData/MC/tables/MC_D4PHIC_PSrcut.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_PSrcut.tab"
 #else
       {};
 #endif
@@ -554,8 +537,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D5PHIC_PSrcut.tab")
-#  include "../emData/MP/tables/MP_D5PHIC_PSrcut.tab"
+#if __has_include("../emData/MC/tables/MC_D5PHIC_PSrcut.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_PSrcut.tab"
 #else
       {};
 #endif
@@ -569,8 +552,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if(type==MC::SSRCUT) { // 2Sr cuts
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_2Srcut.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_2Srcut.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_2Srcut.tab"
 #else
       {};
 #endif
@@ -578,8 +561,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_2Srcut.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_2Srcut.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_2Srcut.tab"
 #else
       {};
 #endif
@@ -587,8 +570,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_2Srcut.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_2Srcut.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_2Srcut.tab"
 #else
       {};
 #endif
@@ -596,8 +579,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D4PHIC_2Srcut.tab")
-#  include "../emData/MP/tables/MP_D4PHIC_2Srcut.tab"
+#if __has_include("../emData/MC/tables/MC_D4PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_2Srcut.tab"
 #else
       {};
 #endif
@@ -605,8 +588,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D5PHIC_2Srcut.tab")
-#  include "../emData/MP/tables/MP_D5PHIC_2Srcut.tab"
+#if __has_include("../emData/MC/tables/MC_D5PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_2Srcut.tab"
 #else
       {};
 #endif
@@ -620,8 +603,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if(type==MC::ALPHAINNERCUT) { // alphainner cuts (//for disks only)
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_alphainner.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_alphainner.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphainner.tab"
 #else
       {};
 #endif
@@ -629,8 +612,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_alphainner.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_alphainner.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphainner.tab"
 #else
       {};
 #endif
@@ -643,8 +626,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
   else if(type==MC::ALPHAOUTERCUT) { // alphaouter cuts (//for disks only)
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_alphaouter.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_alphaouter.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphaouter.tab"
 #else
       {};
 #endif
@@ -652,8 +635,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     }
     else if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_alphaouter.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_alphaouter.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphaouter.tab"
 #else
       {};
 #endif
@@ -671,8 +654,8 @@ void readTable_disk(ap_uint<width> table[depth]){
   if(type==MC::ALPHAINNERCUT) { // alphainner cuts (//for disks only)
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_alphainner.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_alphainner.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphainner.tab"
 #else
       {};
 #endif
@@ -680,8 +663,8 @@ void readTable_disk(ap_uint<width> table[depth]){
     }
     else if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_alphainner.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_alphainner.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphainner.tab"
 #else
       {};
 #endif
@@ -689,8 +672,8 @@ void readTable_disk(ap_uint<width> table[depth]){
     }
     else if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_alphainner.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_alphainner.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_alphainner.tab"
 #else
       {};
 #endif
@@ -703,8 +686,8 @@ void readTable_disk(ap_uint<width> table[depth]){
   else if(type==MC::ALPHAOUTERCUT) { // alphaouter cuts (//for disks only)
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_alphaouter.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_alphaouter.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_alphaouter.tab"
 #else
       {};
 #endif
@@ -712,8 +695,8 @@ void readTable_disk(ap_uint<width> table[depth]){
     }
     else if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D4PHIC_alphaouter.tab")
-#  include "../emData/MP/tables/MP_D4PHIC_alphaouter.tab"
+#if __has_include("../emData/MC/tables/MC_D4PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_alphaouter.tab"
 #else
       {};
 #endif
@@ -721,8 +704,8 @@ void readTable_disk(ap_uint<width> table[depth]){
     }
     else if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D5PHIC_alphaouter.tab")
-#  include "../emData/MP/tables/MP_D5PHIC_alphaouter.tab"
+#if __has_include("../emData/MC/tables/MC_D5PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_alphaouter.tab"
 #else
       {};
 #endif
@@ -739,8 +722,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
   if(type==MC::RBEND) { // alphainner cuts (//for disks only)
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D1.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D1.tab"
+#if __has_include("../emData/MP/tables/PR_ProjectionBend_D1.tab")
+#  include "../emData/MP/tables/PR_ProjectionBend_D1.tab"
 #else
       {};
 #endif
@@ -748,8 +731,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D2.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D2.tab"
+#if __has_include("../emData/MP/tables/PR_ProjectionBend_D2.tab")
+#  include "../emData/MP/tables/PR_ProjectionBend_D2.tab"
 #else
       {};
 #endif
@@ -757,8 +740,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D3.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D3.tab"
+#if __has_include("../emData/MP/tables/PR_ProjectionBend_D3.tab")
+#  include "../emData/MP/tables/PR_ProjectionBend_D3.tab"
 #else
       {};
 #endif
@@ -766,8 +749,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D3.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D3.tab"
+#if __has_include("../emData/MP/tables/PR_ProjectionBend_D3.tab")
+#  include "../emData/MP/tables/PR_ProjectionBend_D3.tab"
 #else
       {};
 #endif
@@ -775,8 +758,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D4.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D4.tab"
+#if __has_include("../emData/MP/tables/PR_ProjectionBend_D4.tab")
+#  include "../emData/MP/tables/PR_ProjectionBend_D4.tab"
 #else
       {};
 #endif
@@ -784,8 +767,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D5.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D5.tab"
+#if __has_include("../emData/MP/tables/PR_ProjectionBend_D5.tab")
+#  include "../emData/MP/tables/PR_ProjectionBend_D5.tab"
 #else
       {};
 #endif
@@ -802,8 +785,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
   if(type==MC::RDSSINNERCUT) { // rDSSinner cuts (//for disks only)
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D1PHIC_rDSSinner.tab")
-#  include "../emData/MP/tables/MP_D1PHIC_rDSSinner.tab"
+#if __has_include("../emData/MC/tables/MC_D1PHIC_rDSSinner.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_rDSSinner.tab"
 #else
       {};
 #endif
@@ -811,8 +794,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
     }
     else if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D2PHIC_rDSSinner.tab")
-#  include "../emData/MP/tables/MP_D2PHIC_rDSSinner.tab"
+#if __has_include("../emData/MC/tables/MC_D2PHIC_rDSSinner.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_rDSSinner.tab"
 #else
       {};
 #endif
@@ -820,8 +803,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
     }
     else if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_rDSSinner.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_rDSSinner.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_rDSSinner.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_rDSSinner.tab"
 #else
       {};
 #endif
@@ -834,8 +817,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
   else if(type==MC::RDSSOUTERCUT) { // rDSSouter cuts (//for disks only)
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D3PHIC_rDSSouter.tab")
-#  include "../emData/MP/tables/MP_D3PHIC_rDSSouter.tab"
+#if __has_include("../emData/MC/tables/MC_D3PHIC_rDSSouter.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_rDSSouter.tab"
 #else
       {};
 #endif
@@ -843,8 +826,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
     }
     else if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D4PHIC_rDSSouter.tab")
-#  include "../emData/MP/tables/MP_D4PHIC_rDSSouter.tab"
+#if __has_include("../emData/MC/tables/MC_D4PHIC_rDSSouter.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_rDSSouter.tab"
 #else
       {};
 #endif
@@ -852,8 +835,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
     }
     else if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_D5PHIC_rDSSouter.tab")
-#  include "../emData/MP/tables/MP_D5PHIC_rDSSouter.tab"
+#if __has_include("../emData/MC/tables/MC_D5PHIC_rDSSouter.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_rDSSouter.tab"
 #else
       {};
 #endif
@@ -868,9 +851,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
 //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 
-// MatchCalculator
-template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
-template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
+template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
@@ -925,7 +907,6 @@ void MatchCalculator(BXType bx,
   const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
   const auto kr_corr_shift       = (LAYER < TF::D1)? 0 : 7;                                  // shifttmp2 in emulation
 
-
   const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
   const auto LUT_matchcut_phi_width = 17;
   const auto LUT_matchcut_phi_depth = 12;
@@ -957,27 +938,31 @@ void MatchCalculator(BXType bx,
   ap_uint<MC::LUT_matchcut_rDSS_width> LUT_matchcut_rDSS[MC::LUT_matchcut_rDSS_depth];
   constexpr enum MC::lutType RDSS = (LAYER < TF::D3) ? MC::RDSSINNERCUT : MC::RDSSOUTERCUT;
   readTable_rDSS<RDSS,LAYER,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS dim=0 complete
 
   bool goodmatch                   = false;
 
   // Use the stub and projection indices to pick up the stub and projection
 
   AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
-  
+  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allstub->read_mem(bx,stubid).raw());
+  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allstub->read_mem(bx,stubid).raw());
+
   constexpr bool isDisk = LAYER >= TF::D1;
   // Stub parameters
   typename AllStub<ASTYPE>::ASR     stub_r     = stub.getR();
   typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
   typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
   typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
+  typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
+  typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
+  typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
+  typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
+  ap_uint<12>    stub_2s_r    = stub_2s.getR();
+  typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
+  typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
+  typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
+  typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
+  auto isPSStub = stub.isPSStub();
 
   // Projection parameters
   typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
@@ -1008,21 +993,46 @@ void MatchCalculator(BXType bx,
   const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
   ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction iphi in emulation
   ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
-  ap_int<13> proj_r_corr   = proj_z + r_corr;      // original proj r plus r correction ir in emulation
 
   // Get phi and z difference between the projection and stub
-  ap_int<10> delta_z        = stub_z - proj_z_corr;
+  ap_int<12> delta_z        = stub_z - proj_z_corr;
   ap_int<14> delta_z_fact   = delta_z * kFact;
-  ap_int<10> delta_r        = (stub_r >> 1) - proj_r_corr;
-  ap_int<18> stub_phi_long  = stub_phi;         // make longer to allow for shifting
+  const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
+  if(isDisk && isPSStub)
+    shiftstubphi = stub_ps_phi << kPhi0_shift;
+  else if(isDisk && !isPSStub) {
+    shiftstubphi = stub_2s_phi << kPhi0_shift;
+  }
   ap_int<18> shiftprojphi   = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-  ap_int<17> delta_phi      = (LAYER < TF::D1) ? ap_int<17>(shiftstubphi - shiftprojphi) : ap_int<17>(stub_phi * kphi - proj_phi_corr);
-  ap_uint<13> abs_delta_z   = iabs<13>( delta_z_fact ); // absolute value of delta z
-  ap_uint<17> abs_delta_phi = iabs<17>( delta_phi );    // absolute value of delta phi
-  ap_uint<4> alpha_fact     = 0;// (LAYER >= TF::D3) ? ialphafactouter_[irstub] : ialphafactinner_[irstub];
-  ap_uint<4> shiftalphaphi  = 12;
+  constexpr int dphibit = 20;
+  ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
+  ap_uint<3> shiftprojz     = 7;
+  ap_int<7> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
+  if(isDisk && isPSStub)
+    proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
+  else if(isDisk)
+    proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
+  const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
+  ap_uint<1> shiftr         = 1;
+  ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
+  ap_uint<12> tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)] : LUT_matchcut_rDSS[ap_uint<12>(stub_r)]; //FIXME
+
+  if(isDisk && isPSStub) {
+    delta_r   = (ap_uint<12>(stub_ps_r) >> shiftr) - proj_r_long; // proj_z = RZ
+  }
+  else if(isDisk && !isPSStub) {
+    auto alpha_fact = LUT_matchcut_alpha[ap_uint<12>(stub_2s_r)];
+    tmp_stubr = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
+    delta_r   = ((tmp_stubr >> shiftr) - proj_r_long); // proj_z = RZ
+    ap_uint<4> alpha_shift = 12;
+    ap_uint<12> alpha_corr = (ap_int<12>(delta_r) * stub_2s_alpha * alpha_fact) >> alpha_shift;
+    delta_phi += alpha_corr;
+  }
+  constexpr int adphibit = isDisk ? 12 : 17;
+  ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
+  ap_int<12> abs_delta_r    = iabs<11>( delta_r );
 
   // Full match parameters
   const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -1062,13 +1072,14 @@ void MatchCalculator(BXType bx,
   }
 
   // Check that matches fall within the selection window of the projection 
-  if (LAYER <  TF::D1 && (delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+  bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
+  bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+  if ((!isDisk && barrel_match) || (isDisk && disk_match)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     if(isDisk) {
-      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * disk_stubr2s;
+      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * ap_uint<12>(stub_ps_r)) : ap_uint<20>(abs_delta_phi * tmp_stubr);
       best_delta_r    = abs_delta_r;
-      best_delta_phi = abs_delta_phi;
     }
     else {
       best_delta_z = iabs<14>(delta_z_fact);
@@ -1080,6 +1091,7 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding 
+    std::cout << "FullMatch with proj=" << proj.raw() << std::endl;
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
@@ -1225,7 +1237,6 @@ void MatchProcessor(BXType bx,
 
   //These are used inside the MatchCalculator method and needs to be retained between iterations
   ap_uint<1> savedMatch;
-  ap_uint<17> best_delta_phi;
   typename ProjectionRouterBuffer<VMPTYPE, APTYPE>::TRKID lastTrkID(-1);
 
   TrackletProjection<PROJTYPE> projdata, projdata_;
@@ -1377,7 +1388,7 @@ void MatchProcessor(BXType bx,
       lastTrkID = trkindex;
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, stubindex, bx_o,
+        (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex, bx_o,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
@@ -1453,6 +1464,7 @@ void MatchProcessor(BXType bx,
         int phiderindex = (phiprojder >> (AllProjectionBase<APTYPE>::kAProjPhiDSize - nphiderbits_)) & ((1 << nphiderbits_) - 1);
         int bendindex = (signindex << (nphiderbits_ + nrbits_)) + (rindex << (nphiderbits_)) + phiderindex;
         rinv = LUT_matchcut_rbend[bendindex];
+        //projdata_.setRZ(rinv);
       }
       
       ///////////////////////////////////
@@ -1463,10 +1475,10 @@ void MatchProcessor(BXType bx,
       //memory the projection points to
       
       // number of bits used to distinguish the different modules in each layer/disk
-      auto nbits_all = LAYER < trklet::N_LAYER ? nbitsallstubs[LAYER] : nbitsallstubs[DISK];
+      constexpr auto nbits_all = LAYER < trklet::N_LAYER ? nbitsallstubs[LAYER] : nbitsallstubs[DISK];
       
       // number of bits used to distinguish between VMs within a module
-      auto nbits_vmme = LAYER < trklet::N_LAYER ? nbits_vmmeall[LAYER] : nbits_vmmeall[DISK];
+      constexpr auto nbits_vmme = LAYER < trklet::N_LAYER ? nbits_vmmeall[LAYER] : nbits_vmmeall[DISK];
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
@@ -1478,6 +1490,7 @@ void MatchProcessor(BXType bx,
       constexpr int overlapbits = nbits_vmme + nbits_all + nextrabits;
       
       unsigned int extrabits = (iphiproj >> (iphiproj.length() - overlapbits -  nextrabits)) & ((1<<nextrabits) - 1);
+      //unsigned int extrabits = iphiproj.range(iphiproj.length() - overlapbits, iphiproj.length() - overlapbits - nextrabits);
 
       unsigned int ivmPlus = iphi;
 
@@ -1524,10 +1537,18 @@ void MatchProcessor(BXType bx,
 
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
+      
       VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
+#ifdef DEBUG
+      std::cout << "proj=" << allproj.raw() << std::endl;
+      std::cout << "iphiproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj) << std::endl;
+      std::cout << "iphiproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj >> (iphiproj.length() - overlapbits -  nextrabits)) << std::endl;
+      std::cout << "extrabits=" << ((1<<nextrabits) - 1) << "\t" << std::bitset<nextrabits+1>((1<<nextrabits) - 1) << std::endl;
+      std::cout << "overlapbits=" << overlapbits << "\textrabits=" << extrabits << std::endl;
+#endif
 
       ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
