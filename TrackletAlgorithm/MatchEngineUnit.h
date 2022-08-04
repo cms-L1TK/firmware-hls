@@ -107,7 +107,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     zbin = data.getZBinNoFlag();
     
     auto projfinez = data.getFineZ();
-    projfinephi__ = data.getFinePhi();
      
     //Calculate fine z position
     const int detectorshift(8);
@@ -118,25 +117,21 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
       projfinezadj__ = projfinez;
     }
 
-    if (phiPlus_ && phiProjBin_ == 0 ) {
-	projfinephi__ += detectorshift;      
-    }
-    if (!phiPlus_ && phiProjBin_ == 1 ) {
-	projfinephi__ -= detectorshift;      
-    }
 
-    /*
-    if (!phiPlus_) {
-      if (shift_==-1) {
-	projfinephi__ -= detectorshift;
-      }
-    } else {
-      //When we get here shift_ is either 1 or -1
-      if (shift_==1) {
-	projfinephi__ += detectorshift;
-      }
-    }
-    */
+    //The three lines of code below replaces this logic:
+    //projfinephi__ = data.getFinePhi();
+    //const int detectorshift(8);
+    //if (phiPlus_ && !phiProjBin_ ) {
+    //	projfinephi__ += detectorshift;      
+    //}
+    //if (!phiPlus_ && phiProjBin_ ) {
+    //	projfinephi__ -= detectorshift;      
+    //}
+
+    ap_uint<1> signBit(!phiPlus_ && phiProjBin_);
+    ap_uint<1> addBit(phiPlus_!=phiProjBin_);
+    
+    projfinephi__ = (signBit, addBit, data.getFinePhi());
 
     isPSseed__ = data.getIsPSSeed();
     projrinv__ = data.getRInv();
