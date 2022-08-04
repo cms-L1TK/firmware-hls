@@ -823,15 +823,20 @@ void MatchProcessor(BXType bx,
 
       unsigned int ivmPlus = iphi;
 	
-      ap_int<2> shift = 0;
+      //ap_int<2> shift = 0;
       
+      //If the projection goes to the first (ivmMinus) phiProjBin is zero but
+      //if the projection goes to the second bin ivmMinus+1 phiProjBin is one
+      ap_uint<1> phiProjBin = 0; 
+
       if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
-	shift = 1;
+	//shift = 1;
 	ivmPlus++;
       }
       unsigned int ivmMinus = iphi;
       if (extrabits == 0 && iphi != 0) {
-	shift = -1;
+	phiProjBin = 1; //projection is to next been, but we also search here
+	//shift = -1;
 	ivmMinus--;
       }
       
@@ -893,7 +898,7 @@ void MatchProcessor(BXType bx,
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
-      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
+      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
       projbuffer__ = projbuffertmp;
 
