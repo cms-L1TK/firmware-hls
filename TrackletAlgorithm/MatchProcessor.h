@@ -591,6 +591,9 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
 
+  bool validproj__ = false;
+  ProjectionRouterBuffer<BARREL, APTYPE> projbuffer__;
+
 
   ap_uint<8> vmstubsmask[8];
 #pragma HLS array_partition variable=vmstubsmask complete dim=1
@@ -740,6 +743,12 @@ void MatchProcessor(BXType bx,
 	 fullmatch);
     } //end MC if
     
+    if (validproj__) {
+
+      projbufferarray.saveProjection(projbuffer__);
+      projbufferarray.incProjection();
+     
+    }
 
       
     if (validin_) {
@@ -885,14 +894,21 @@ void MatchProcessor(BXType bx,
 				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
       ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
-      projbufferarray.saveProjection(projbuffertmp);
 
-      if (maskstubs!=0) {
-	projbufferarray.incProjection();
-      }
+      projbuffer__ = projbuffertmp;
+
+      validproj__ = maskstubs != 0;
+
+      //projbufferarray.saveProjection(projbuffertmp);
+
+      //if (maskstubs!=0) {
+      //	projbufferarray.incProjection();
+      //}
       
-    } // end if(validin)
-
+    } else {
+      validproj__ = false;
+    }// end if(validin)
+    
     projdata_ = projdata;
     validin_ = validin;
 

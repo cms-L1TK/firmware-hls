@@ -214,7 +214,7 @@ begin
       lowerbits := vi_nent_idx(2 downto 0);
       
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
-      addr_in_bin := addra(BIN_ADDR_WIDTH-1 downto 0);
+      addr_in_bin := std_logic_vector(unsigned(addra(BIN_ADDR_WIDTH-1 downto 0)) + 1);
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
       case lowerbits is
