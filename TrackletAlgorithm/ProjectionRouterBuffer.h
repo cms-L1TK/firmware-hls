@@ -88,14 +88,14 @@ public:
     kPRBufferPhiMSB = kPRBufferPhiLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferPhiSize - 1,
     kPRBufferAllProjLSB = kPRBufferPhiMSB + 1,
     kPRBufferAllProjMSB = kPRBufferAllProjLSB + AllProjection<AllProjectionType>::kAllProjectionSize - 1,
-    kPRBufferUseFirstMinusLSB = kPRBufferAllProjMSB + 1,
-    kPRBufferUseFirstMinusMSB = kPRBufferUseFirstMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
-    kPRBufferUseSecondMinusLSB = kPRBufferUseFirstMinusMSB + 1,
-    kPRBufferUseSecondMinusMSB = kPRBufferUseSecondMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
-    kPRBufferUseFirstPlusLSB = kPRBufferUseSecondMinusMSB + 1,
-    kPRBufferUseFirstPlusMSB = kPRBufferUseFirstPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
-    kPRBufferUseSecondPlusLSB = kPRBufferUseFirstPlusMSB + 1,
+    kPRBufferUseSecondPlusLSB = kPRBufferAllProjMSB + 1,
     kPRBufferUseSecondPlusMSB = kPRBufferUseSecondPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
+    kPRBufferUseFirstPlusLSB = kPRBufferUseSecondPlusMSB + 1,
+    kPRBufferUseFirstPlusMSB = kPRBufferUseFirstPlusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
+    kPRBufferUseSecondMinusLSB = kPRBufferUseFirstPlusMSB + 1,
+    kPRBufferUseSecondMinusMSB = kPRBufferUseSecondMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
+    kPRBufferUseFirstMinusLSB = kPRBufferUseSecondMinusMSB + 1,
+    kPRBufferUseFirstMinusMSB = kPRBufferUseFirstMinusLSB + ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferUseSize - 1,
   };
   
   typedef ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferIndexSize> VMPID;
@@ -122,6 +122,19 @@ public:
  ProjectionRouterBuffer(const ALLPROJ allproj, const PRPHI phi, const PHIPROJBIN phiProjBin, const TCID tcid, const PRNSTUB nstub, const ap_uint<4> maskstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
   data_( (allproj, phi, tcid, phiProjBin, projdata.getIndex(), maskstub, nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
   {
+    /*
+    assert(usefirstMinus == getUseFirstMinus() && "usefirstMinus");
+    assert(usesecondMinus == getUseSecondMinus() && "usesecondMinus");
+    assert(usefirstPlus == getUseFirstPlus() && "usefirstPlus");
+    assert(usesecondPlus == getUseSecondPlus() && "usesecondPlus");
+    */
+#ifdef DEBUG
+    std::cout << std::hex << "PRBuffer proj=" << getAllProj() << std::endl;
+    std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<  getUseFirstMinus();
+    std::cout << "usesecondMinus=" << usesecondMinus << "\t" <<  getUseSecondMinus();
+    std::cout << "usefirstPlus=" << usefirstPlus << "\t" <<  getUseFirstPlus();
+    std::cout << "usesecondPlus=" << usesecondPlus << "\t" <<  getUseSecondPlus() << std::endl;
+#endif
   }
 
   // This constructor is only used for projections in DISK
