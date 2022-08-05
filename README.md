@@ -186,11 +186,10 @@ First source Xilinx Vivado 2020.1
 ```
 ipbb init work
 cd work
-kinit myusername@CERN.CH
-ipbb add git https://:@gitlab.cern.ch:8443/p2-xware/firmware/emp-fwk.git -b v0.7.0-alpha
+ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.0-alpha
 ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v1.2.2
 ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
-ipbb add git https://:@gitlab.cern.ch:8443/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
+ipbb add git ssh://git@gitlab.cern.ch:7999/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
 ipbb add git https://gitlab.cern.ch/HPTD/tclink.git -r fda0bcf
 ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.9
 ipbb add git https://github.com/FilMarini/firmware-hls -b emp_for_sc #LONG WAIT!
