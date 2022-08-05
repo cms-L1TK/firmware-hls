@@ -244,6 +244,7 @@ cd proj/apollo
 **Step 3: Compile**
 
 ```
+ipbb ipbus gendecoders
 ipbb vivado generate-project synth impl package
 ```
 
