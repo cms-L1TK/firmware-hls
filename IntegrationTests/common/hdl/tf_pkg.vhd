@@ -55,12 +55,6 @@ package tf_pkg is
 -- pragma synthesis_on
   ;
   
-  -- ########################### Functions ################################################################
-  function clogb2     (bit_depth : integer) return integer;
-
-  function getDirSCRIPT return string;
-
-
   -- ########################### Types ###########################
 
   -- 2D
@@ -87,7 +81,6 @@ package tf_pkg is
   type t_arr8_60b is array(0 to 7) of std_logic_vector(59 downto 0);
   -- 3D
   type t_arr2_8_1b is array(0 to 1) of t_arr8_1b;
-  --type t_arr2_8_7b is array(0 to 1) of t_arr8_7b;
   type t_arr2_8_8b is array(0 to 1) of t_arr8_8b;
   type t_arr8_8_1b is array(0 to 7) of t_arr8_1b;
   type t_arr8_8_4b is array(0 to 7) of t_arr8_4b;
@@ -121,6 +114,18 @@ package tf_pkg is
   -- Could be used in place of t_arr_7b. 
   -- type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
 
+  -- ########################### Functions ################################################################
+  function clogb2     (bit_depth : integer) return integer;
+
+  function getDirSCRIPT return string;
+
+  function to_bstring(sl : std_logic) return string;
+
+  function to_bstring(slv : std_logic_vector) return string;
+
+  function to_bstring(slv : t_arr64_1b) return string;
+
+  function to_bstring(slv : t_arr64_4b) return string;
 
   -- -- ########################### Procedures #######################
   procedure char2int (
@@ -201,6 +206,52 @@ package body tf_pkg is
       return "../../../";
     end if;
   end;
+
+  function to_bstring(sl : std_logic) return string is
+  variable sl_str_v : string(1 to 3);  -- std_logic image with quotes around
+  begin
+    sl_str_v := std_logic'image(sl);
+    return "" & sl_str_v(2);  -- "" & character to get strings
+  end function;
+
+  function to_bstring(slv : std_logic_vector) return string is
+  alias    slv_norm : std_logic_vector(1 to slv'length) is slv;
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(1 to slv'length);
+  begin
+    for idx in slv_norm'range loop
+      sl_str_v := to_bstring(slv_norm(idx));
+      res_v(idx) := sl_str_v(1);
+    end loop;
+    return res_v;
+  end function;
+
+  function to_bstring(slv : t_arr64_1b) return string is
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(0 to 63);
+  begin
+    for idx in 63 downto 0 loop
+      sl_str_v := to_bstring(slv(idx));
+      res_v(idx) := sl_str_v(1);
+    end loop;
+    return res_v;
+  end function;
+
+  function to_bstring(slv : t_arr64_4b) return string is
+  variable sl_str_v : string(1 to 4);  -- String of std_logic
+  variable res_v    : string(0 to 319);
+  begin
+    for idx in 63 downto 0 loop
+      sl_str_v := to_bstring(slv(idx));
+      res_v(idx*5) := sl_str_v(1);
+      res_v(idx*5+1) := sl_str_v(2);
+      res_v(idx*5+2) := sl_str_v(3);
+      res_v(idx*5+3) := sl_str_v(4);
+      res_v(idx*5+4) := '-';
+    end loop;
+    return res_v;
+  end function;
+
 
 
   -- ########################### Procedures ################################################################
