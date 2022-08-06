@@ -281,6 +281,8 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		AllStub<OutType> allstub = (disk2S) ? stubDisk2S.raw() : stub.raw();
 
 		// Write stub to all memory copies
+		// It seems that the if (nAllCopies > 0) should not be needed,
+		// but if nAllCopies is zero it generates an error in vivado_hls
 		if (nAllCopies > 0) {
 		  for (int n = 0; n < nAllCopies; n++) {
 #pragma HLS UNROLL
