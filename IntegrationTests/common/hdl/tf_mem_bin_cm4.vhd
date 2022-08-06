@@ -138,7 +138,6 @@ process(clka)
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
-    report "tm_mem_bin_cm4 vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;

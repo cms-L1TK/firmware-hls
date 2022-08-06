@@ -37,7 +37,8 @@ entity tf_mem_bin_cm5 is
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
-    NAME            : string := "MEMNAME"          --! Memory name
+    NAME            : string := "MEMNAME";         --! Memory name
+    DEBUG           : boolean := false             --! If true writes debug info
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -147,7 +148,9 @@ process(clka)
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
-    report "tf_mem_bin_cm5 "&NAME&" vi_clk_cnt "&integer'image(vi_clk_cnt)&" "&to_bstring(nent_o(page)(0));      
+    if DEBUG then
+      report "tf_mem_bin_cm5 "&NAME&" vi_clk_cnt "&integer'image(vi_clk_cnt)&" "&to_bstring(nent_o(page)(0));
+    end if;
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -178,8 +181,10 @@ begin
       addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH_CM)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(vi_nent_idx) <= '1'; -- <= 1 (slv)
-      report "tf_mem_bin_cm5 write "&NAME&" page= "&integer'image(page)&" vi_nent_idx= "&integer'image(vi_nent_idx)&" addra = "&to_bstring(addra)&" data = "&to_bstring(dina);      
-      if (addr_in_page = 0) then
+      if DEBUG then
+        report "tf_mem_bin_cm5 write "&NAME&" page= "&integer'image(page)&" vi_nent_idx= "&integer'image(vi_nent_idx)&" addra = "&to_bstring(addra)&" data = "&to_bstring(dina);      
+        end if;
+        if (addr_in_page = 0) then
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
       else
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
@@ -191,14 +196,18 @@ end process;
 process(clkb)
 begin
   if rising_edge(clkb) then
+    if DEBUG then
       report "tf_mem_bin_cm5 "&NAME&" mask(0)= "&to_bstring(mask_o(0));      
       report "tf_mem_bin_cm5 "&NAME&" mask(1)= "&to_bstring(mask_o(1));      
       report "tf_mem_bin_cm5 "&NAME&" nent(0)= "&to_bstring(nent_o(0));      
-      report "tf_mem_bin_cm5 "&NAME&" nent(1)= "&to_bstring(nent_o(1));      
+      report "tf_mem_bin_cm5 "&NAME&" nent(1)= "&to_bstring(nent_o(1));
+    end if;
     if (enb0='1') then
       addrb_row0 <= addrb0;
       sv_RAM_row0 <= sa_RAM_data0(to_integer(unsigned(addrb0)));
-      report "tf_mem_bin_cm5 read "&NAME&" address= "&to_bstring(addrb0)&" data= "&to_bstring(sv_RAM_row0);            
+      if DEBUG then
+        report "tf_mem_bin_cm5 read "&NAME&" address= "&to_bstring(addrb0)&" data= "&to_bstring(sv_RAM_row0);
+       end if;
     end if;
     if (enb1='1') then
       sv_RAM_row1 <= sa_RAM_data1(to_integer(unsigned(addrb1)));
@@ -238,7 +247,9 @@ else generate -- output_register; 2 clock cycle read latency with improve clock-
         doutb2 <= sv_RAM_row2;
         doutb3 <= sv_RAM_row3;
         doutb4 <= sv_RAM_row4;
-        report "tf_mem_bin_cm5 READ2 "&NAME&" address= "&to_bstring(addrb_row0)&" data= "&to_bstring(doutb0)&" "&to_bstring(sv_RAM_row0);            
+        if DEBUG then
+          report "tf_mem_bin_cm5_bin_cm5 READ2 "&NAME&" address= "&to_bstring(addrb_row0)&" data= "&to_bstring(doutb0)&" "&to_bstring(sv_RAM_row0);            
+        end if;
       end if;
     end if;
   end process;
