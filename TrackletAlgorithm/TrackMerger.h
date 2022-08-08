@@ -41,8 +41,8 @@ class ComparisonModule{
     unsigned int getEndOfModule(){return endOfModule;}
 
     // void process(hls::stream<TrackStruct>& inputBuffer,hls::stream<TrackStruct>& outputBuffer);
-    void process( TrackStruct &inTrack,  TrackStruct &outTrack);
-     TrackStruct getMasterTrackStruct();
+    void process(TrackStruct &inTrack, TrackStruct &outTrack);
+    TrackStruct& getMasterTrackStruct();
 
 
   private:
@@ -56,7 +56,7 @@ class ComparisonModule{
     TrackStruct masterTrack;
     TrackStruct track;
 
-    void fillUnmerged(TrackStruct& inTrack,TrackStruct& outTrack);
+    void fillUnmerged(TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i);
 
     void loadTrack(
       hls::stream<TrackFit::TrackWord> &trackWord,

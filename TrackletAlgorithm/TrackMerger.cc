@@ -18,7 +18,7 @@
 //   tracksProcessed++;
 // }
 
-TrackStruct ComparisonModule::getMasterTrackStruct(){
+TrackStruct& ComparisonModule::getMasterTrackStruct(){
   return masterTrack;
 }
 
@@ -39,9 +39,10 @@ void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
     }
   }
   tracksProcessed++;
+  return;
 }
 
-void fillUnmerged(TrackStruct& inTrack,TrackStruct& outTrack) {outTrack = inTrack;}
+void fillUnmerged(TrackStruct& inTrack,TrackStruct* outTrack, unsigned int i) {outTrack[i] = inTrack;}
 
 void loadTrack(
   hls::stream<TrackFit::TrackWord> &trackWord,
@@ -63,7 +64,9 @@ void loadTrack(
   diskStubWords_0.read(aTrack._diskStub_0);        
   diskStubWords_1.read(aTrack._diskStub_1);        
   diskStubWords_2.read(aTrack._diskStub_2);        
-  diskStubWords_3.read(aTrack._diskStub_3);        
+  diskStubWords_3.read(aTrack._diskStub_3);  
+
+  return;      
 }  
 
 void unloadTrack(
@@ -87,6 +90,8 @@ void unloadTrack(
   diskStubWords_1_o.write(aTrack._diskStub_1);
   diskStubWords_2_o.write(aTrack._diskStub_2);
   diskStubWords_3_o.write(aTrack._diskStub_3);
+
+  return;
 }
 
 void TrackMerger(const BXType bx,
@@ -115,43 +120,78 @@ void TrackMerger(const BXType bx,
 
   ComparisonModule comparisonModule[kNComparisonModules];
   #pragma HLS array_partition variable=comparisonModule complete dim=0
-  TrackStruct unmergedTracks[kMaxTrack];
-  #pragma HLS array_partition variable=unmergedTracks complete dim=1
-  TrackStruct masterTracks[kNComparisonModules];
-  #pragma HLS array_partition variable=masterTracks complete dim=1
+  
+  // TrackStruct unmergedTracks[kMaxTrack];
+  // #pragma HLS array_partition variable=unmergedTracks complete dim=1
+
+  // TrackStruct masterTracks[kNComparisonModules];
+  // #pragma HLS array_partition variable=masterTracks complete dim=1
+
+  
+  
 
   LOOP_Input:
   for (unsigned int i = 0; i < kMaxTrack; i++){ 
     TrackStruct tracks[kNBuffers]; 
     #pragma HLS array_partition variable=tracks complete dim=1
     #pragma HLS dataflow
-    loadTrack(trackWord,barrelStubWords_0,barrelStubWords_1,barrelStubWords_2,barrelStubWords_3,diskStubWords_0,
-        diskStubWords_1,diskStubWords_2,diskStubWords_3,tracks[0]);
+    loadTrack(trackWord,
+              barrelStubWords_0,
+              barrelStubWords_1,
+              barrelStubWords_2,
+              barrelStubWords_3,
+              diskStubWords_0,
+              diskStubWords_1,
+              diskStubWords_2,
+              diskStubWords_3,
+              tracks[0]);
     LOOP_ProcTracks:
     for (unsigned int j = 0; j < kNComparisonModules; j++){
       #pragma HLS unroll
       comparisonModule[j].process(tracks[j],tracks[j+1]);
-    }
-    fillUnmerged(tracks[kNComparisonModules],unmergedTracks[i]);
-    // unmergedTracks[i] = tracks[kNComparisonModules];
 
+    }
+    //putting straight into fifo in dataflow region
+    // fillUnmerged(tracks[kNComparisonModules],unmergedTracks, i);
+
+    unloadTrack(tracks[kNComparisonModules],
+                trackWord_o,
+                barrelStubWords_0_o,
+                barrelStubWords_1_o,
+                barrelStubWords_2_o,
+                barrelStubWords_3_o,
+                diskStubWords_0_o,
+                diskStubWords_1_o,
+                diskStubWords_2_o,
+                diskStubWords_3_o);
   }
+
 
 
   LOOP_OutputCM:
   for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
     #pragma HLS unroll
-    masterTracks[nModule] = comparisonModule[nModule].getMasterTrackStruct();
-    unloadTrack(masterTracks[nModule],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
-    diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
+    // masterTracks[nModule] = comparisonModule[nModule].getMasterTrackStruct();
+    TrackStruct& masterTk = comparisonModule[nModule].getMasterTrackStruct();
+    std::cout << "masterTrack: " << " " << nModule << " " << masterTk._trackWord << std::endl;
+    unloadTrack(masterTk,
+                trackWord_o,
+                barrelStubWords_0_o,
+                barrelStubWords_1_o,
+                barrelStubWords_2_o,
+                barrelStubWords_3_o,
+                diskStubWords_0_o,
+                diskStubWords_1_o,
+                diskStubWords_2_o,
+                diskStubWords_3_o); //read out master tracks last
   }
 
-  LOOP_OutputUnmergedTracks:
-  for (unsigned int bufferIndex = kNComparisonModules; bufferIndex < kMaxTrack; bufferIndex++){
-    #pragma HLS unroll
-    unloadTrack(unmergedTracks[bufferIndex],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
-    diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o);
-  }
+  // LOOP_OutputUnmergedTracks:
+  // for (unsigned int bufferIndex = kNComparisonModules; bufferIndex < kMaxTrack; bufferIndex++){
+  //   #pragma HLS unroll 
+  //   unloadTrack(unmergedTracks[bufferIndex],trackWord_o,barrelStubWords_0_o,barrelStubWords_1_o,barrelStubWords_2_o,barrelStubWords_3_o,
+  //   diskStubWords_0_o,diskStubWords_1_o,diskStubWords_2_o,diskStubWords_3_o); 
+  // }
     
   bx_o = bx;
 }
