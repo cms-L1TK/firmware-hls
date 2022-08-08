@@ -19,27 +19,27 @@ int main(){
   int err_count = 0;
     
   // Input memories
-  hls::stream<TrackFit::TrackWord> trackWord;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_0;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_1;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_2;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_3;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_0;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_1;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_2;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_3;
+  hls::stream<TrackFit::TrackWord> trackWord("input_stream_1");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_0("input_stream_2");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_1("input_stream_3");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_2("input_stream_4");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_3("input_stream_5");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_0("input_stream_6");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_1("input_stream_7");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_2("input_stream_8");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_3("input_stream_9");
   static TrackFitMemory inputTracks;
 
   // Output memories
-  hls::stream<TrackFit::TrackWord> trackWord_o;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_0_o;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_1_o;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_2_o;
-  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_3_o;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_0_o;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_1_o;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_2_o;
-  static hls::stream<TrackFit::DiskStubWord> diskStubWords_3_o;
+  hls::stream<TrackFit::TrackWord> trackWord_o("output_stream_1");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_0_o("output_stream_2");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_1_o("output_stream_3");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_2_o("output_stream_4");
+  static hls::stream<TrackFit::BarrelStubWord> barrelStubWords_3_o("output_stream_5");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_0_o("output_stream_6");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_1_o("output_stream_7");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_2_o("output_stream_8");
+  static hls::stream<TrackFit::DiskStubWord> diskStubWords_3_o("output_stream_9");
   static TrackFitMemory outputTracks;
   // int outputNumber;
 
@@ -64,7 +64,7 @@ int main(){
     // Set input memories
     for(unsigned short i = 0; i < kMaxTrack; i++){
       TrackFit track;
-      if (i<inputTracks.getEntries(bx)) {
+      if (i < inputTracks.getEntries(bx)) {
         track = inputTracks.read_mem(bx, i); //i+1 for merge
       } else {
         track = TrackFit();
@@ -84,12 +84,23 @@ int main(){
     TrackMergerTop(bx,
     trackWord,
     barrelStubWords_0, 
-    barrelStubWords_1, barrelStubWords_2, barrelStubWords_3,
-    diskStubWords_0, diskStubWords_1, diskStubWords_2, diskStubWords_3,
+    barrelStubWords_1,
+    barrelStubWords_2,
+    barrelStubWords_3,
+    diskStubWords_0,
+    diskStubWords_1,
+    diskStubWords_2,
+    diskStubWords_3,
     bx_o,
     trackWord_o,
-    barrelStubWords_0_o, barrelStubWords_1_o, barrelStubWords_2_o, barrelStubWords_3_o,
-    diskStubWords_0_o, diskStubWords_1_o, diskStubWords_2_o, diskStubWords_3_o
+    barrelStubWords_0_o,
+    barrelStubWords_1_o,
+    barrelStubWords_2_o,
+    barrelStubWords_3_o,
+    diskStubWords_0_o,
+    diskStubWords_1_o,
+    diskStubWords_2_o, 
+    diskStubWords_3_o
     );
 
     bool truncation = false;
@@ -106,7 +117,7 @@ int main(){
       track.setDiskStubWord<4>(diskStubWords_0_o.read());
       track.setDiskStubWord<5>(diskStubWords_1_o.read());
       track.setDiskStubWord<6>(diskStubWords_2_o.read());
-      track.setDiskStubWord<7>(diskStubWords_3_o.read());
+      track.setDiskStubWord<7>(diskStubWords_3_o.read()); //changing number of times outputs are read + look at which dataflow process is inc latency
       
       outputTracks.write_mem(bx, track, nTracks );
       ++nTracks;
