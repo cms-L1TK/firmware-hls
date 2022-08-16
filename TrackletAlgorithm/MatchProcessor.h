@@ -658,8 +658,7 @@ void MatchProcessor(BXType bx,
     std::cout << std::endl;
     */
 
-    /*
-     
+    
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
@@ -675,8 +674,8 @@ void MatchProcessor(BXType bx,
     ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
 
     ap_uint<1> hasMatch = !emptys[bestiMEU];
-    */
-
+    
+/*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
@@ -693,7 +692,7 @@ void MatchProcessor(BXType bx,
       
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
-    
+*/    
 
     if (hasMatch) {
       matchengine[bestiMEU].advance();
