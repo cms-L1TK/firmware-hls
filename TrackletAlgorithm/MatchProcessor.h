@@ -596,6 +596,9 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
 
+  bool validproj__ = false;
+  ProjectionRouterBuffer<BARREL, APTYPE> projbuffer__;
+
 
   ap_uint<8> vmstubsmask[8];
 #pragma HLS array_partition variable=vmstubsmask complete dim=1
@@ -744,6 +747,12 @@ void MatchProcessor(BXType bx,
 	 fullmatch);
     } //end MC if
     
+    if (validproj__) {
+
+      projbufferarray.saveProjection(projbuffer__);
+      projbufferarray.incProjection();
+     
+    }
 
       
     if (validin_) {
@@ -818,15 +827,20 @@ void MatchProcessor(BXType bx,
 
       unsigned int ivmPlus = iphi;
 	
-      ap_int<2> shift = 0;
+      //ap_int<2> shift = 0;
       
+      //If the projection goes to the first (ivmMinus) phiProjBin is zero but
+      //if the projection goes to the second bin ivmMinus+1 phiProjBin is one
+      ap_uint<1> phiProjBin = 0; 
+
       if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
-	shift = 1;
+	//shift = 1;
 	ivmPlus++;
       }
       unsigned int ivmMinus = iphi;
       if (extrabits == 0 && iphi != 0) {
-	shift = -1;
+	phiProjBin = 1; //projection is to next been, but we also search here
+	//shift = -1;
 	ivmMinus--;
       }
       
@@ -890,15 +904,22 @@ void MatchProcessor(BXType bx,
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
-      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
-      projbufferarray.saveProjection(projbuffertmp);
+      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
-      if (maskstubs!=0) {
-	projbufferarray.incProjection();
-      }
+      projbuffer__ = projbuffertmp;
+
+      validproj__ = maskstubs != 0;
+
+      //projbufferarray.saveProjection(projbuffertmp);
+
+      //if (maskstubs!=0) {
+      //	projbufferarray.incProjection();
+      //}
       
-    } // end if(validin)
-
+    } else {
+      validproj__ = false;
+    }// end if(validin)
+    
     projdata_ = projdata;
     validin_ = validin;
 

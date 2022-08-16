@@ -61,7 +61,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
-  shift_ = projbuffer.shift();
+  phiProjBin_ = projbuffer.phiProjBin();
   stubmask_ = projbuffer.getMaskStubs();
   //stubmask_[0] = nstubsall_[0]!=0;
   //stubmask_[1] = nstubsall_[1]!=0;
@@ -107,7 +107,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     zbin = data.getZBinNoFlag();
     
     auto projfinez = data.getFineZ();
-    projfinephi__ = data.getFinePhi();
      
     //Calculate fine z position
     const int detectorshift(8);
@@ -118,16 +117,21 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
       projfinezadj__ = projfinez;
     }
 
-    if (!phiPlus_) {
-      if (shift_==-1) {
-	projfinephi__ -= detectorshift;
-      }
-    } else {
-      //When we get here shift_ is either 1 or -1
-      if (shift_==1) {
-	projfinephi__ += detectorshift;
-      }
-    }
+
+    //The three lines of code below replaces this logic:
+    //projfinephi__ = data.getFinePhi();
+    //const int detectorshift(8);
+    //if (phiPlus_ && !phiProjBin_ ) {
+    //	projfinephi__ += detectorshift;      
+    //}
+    //if (!phiPlus_ && phiProjBin_ ) {
+    //	projfinephi__ -= detectorshift;      
+    //}
+
+    ap_uint<1> signBit(!phiPlus_ && phiProjBin_);
+    ap_uint<1> addBit(phiPlus_!=phiProjBin_);
+    
+    projfinephi__ = (signBit, addBit, data.getFinePhi());
 
     isPSseed__ = data.getIsPSSeed();
     projrinv__ = data.getRInv();
@@ -375,7 +379,7 @@ inline void advance() {
  ap_uint<4> stubmask_;
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
- ap_int<2> shift_;
+ ap_uint<1> phiProjBin_;
  bool idle_;
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;
