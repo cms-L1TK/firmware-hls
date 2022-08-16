@@ -1043,7 +1043,9 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding 
+#ifdef DEBUG
     std::cout << "FullMatch with proj=" << proj.raw() << std::endl;
+#endif
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
