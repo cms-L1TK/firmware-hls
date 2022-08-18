@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-07-13
--- Last update: 2022-07-26
+-- Last update: 2022-08-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -103,9 +103,9 @@ begin  -- architecture rtl
   s_sAxisMaster_sp.tValid                                              <= s_fifo_valid;
   s_sAxisMaster_sp.tKeep                                               <= x"000000FFFFFFFFFF";
   s_fifo_ready                                                         <= s_sAxisSlave_sp.tReady;
-  dout_o(0).data                                                       <= s_mAxisMaster_l.tData(63 downto 0);
-  dout_o(0).valid                                                      <= s_mAxisMaster_l.tValid;
-  dout_o(0).strobe                                                     <= '1';
+  dout_o(4).data                                                       <= s_mAxisMaster_l.tData(63 downto 0);
+  dout_o(4).valid                                                      <= s_mAxisMaster_l.tValid;
+  dout_o(4).strobe                                                     <= '1';
   s_mAxisSlave_l.tReady                                                <= '1';
 
   AxiStreamFifoV2_1 : entity surf.AxiStreamFifoV2
