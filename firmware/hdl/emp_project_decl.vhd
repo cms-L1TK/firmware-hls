@@ -26,6 +26,7 @@ constant REGION_CONF : region_conf_array_t := (
   3  => (gty25, buf, no_fmt, buf, gty25),
   4  => kDummyRegion, -- tcds
   5  => (gty25, buf, no_fmt, buf, gty25),
+  6  => (gty25, buf, no_fmt, buf, gty25),
   others => kDummyRegion
 );
 
