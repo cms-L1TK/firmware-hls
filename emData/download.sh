@@ -136,9 +136,10 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig
 cd ../ # needed for older versions of git
 git submodule init
 git submodule update
-cd emData/
-cp -fv LUTs/wires.dat LUTs/memorymodules.dat LUTs/processingmodules.dat project_generation_scripts/
-cd project_generation_scripts/
+cd emData/project_generation_scripts/
+cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
+./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
+cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
 ### IRVMR
@@ -177,6 +178,12 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
+### Reduced Combined IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
