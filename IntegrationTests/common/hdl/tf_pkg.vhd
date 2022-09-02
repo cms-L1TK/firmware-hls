@@ -55,6 +55,15 @@ package tf_pkg is
 -- pragma synthesis_on
   ;
   
+  -- ########################### Functions ################################################################
+  function clogb2     (bit_depth : integer) return integer;
+
+  function incr ( s: std_logic_vector ) return std_logic_vector;
+
+  function uint ( s: std_logic_vector ) return integer;
+
+  function resize ( s: std_logic_vector; n: natural ) return std_logic_vector;
+
   -- ########################### Types ###########################
 
   -- 2D
@@ -115,8 +124,6 @@ package tf_pkg is
   -- type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
 
   -- ########################### Functions ################################################################
-  function clogb2     (bit_depth : integer) return integer;
-
   function to_bstring(sl : std_logic) return string;
 
   function to_bstring(slv : std_logic_vector) return string;
@@ -236,6 +243,23 @@ package body tf_pkg is
   end function;
 
 
+
+  function incr ( s: std_logic_vector ) return std_logic_vector is
+  begin
+    return std_logic_vector( unsigned( s ) + 1 );
+  end function;
+
+
+  function uint ( s: std_logic_vector ) return integer is
+  begin
+    return to_integer( unsigned( s ) );
+  end function;
+
+
+  function resize ( s: std_logic_vector; n: natural ) return std_logic_vector is
+  begin
+    return std_logic_vector( resize( signed( s ), n ) );
+  end function;
 
   -- ########################### Procedures ################################################################
   --! @brief Convert character to integer
