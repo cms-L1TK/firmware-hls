@@ -47,19 +47,17 @@ begin
 
   if rising_edge(CLK) then
 
-    if DONE = '1' then
-      DONE_LATCH(0) <= DONE;
-      BX_LATCH(0) <= BX_OUT;
-    end if;
-
-    if (RESET = '1') then
-      DONE_LATCH(0) <= '0';
-    end if;
-
     for ii in 1 to DELAY-1 loop
       DONE_LATCH(ii) <= DONE_LATCH(ii-1);
       BX_LATCH(ii) <= BX_LATCH(ii-1);
     end loop;
+
+    if (RESET = '1') then
+      DONE_LATCH(0) <= '0';
+    else
+      DONE_LATCH(0) <= DONE;
+    end if;
+    BX_LATCH(0) <= BX_OUT;
 
   end if;
 
