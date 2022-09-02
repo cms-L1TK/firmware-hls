@@ -37,8 +37,7 @@ entity tf_mem_bin is
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
-    NAME            : string := "MEMNAME";         --! Memory name
-    DELAY : natural := 0
+    NAME            : string := "MEMNAME"          --! Memory name
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -101,13 +100,6 @@ end read_tf_mem_data;
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
-type t_wea is array (0 to DELAY-1) of std_logic;
-type t_addra is array (0 to DELAY-1) of std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
-type t_dina is array (0 to DELAY-1) of std_logic_vector(RAM_WIDTH-1 downto 0);
-signal wea_pipe : t_wea;
-signal addra_pipe : t_addra;
-signal dina_pipe : t_dina;
-
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 attribute ram_style of sa_RAM_data : signal is "block";
@@ -144,32 +136,20 @@ begin
     end if;
 
     if (wea='1') then
-      wea_pipe(0) <= wea;
-      addra_pipe(0) <= addra;
-      dina_pipe(0) <= dina;
-    end if;
-
-    for ii in 1 to DELAY-1 loop
-      wea_pipe(ii) <= wea_pipe(ii-1);
-      addra_pipe(ii) <= addra_pipe(ii-1);
-      dina_pipe(ii) <= dina_pipe(ii-1);
-    end loop;
-
-    if (wea_pipe(DELAY-1)='1') then
-      sa_RAM_data(to_integer(unsigned(addra_pipe(DELAY-1)))) <= dina_pipe(DELAY-1); -- Write data
+      sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
-      vi_nent_idx := to_integer(shift_right(unsigned(addra_pipe(DELAY-1)), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
-      page := to_integer(unsigned(addra_pipe(DELAY-1)(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      addr_in_page := to_integer(unsigned(addra_pipe(DELAY-1)(clogb2(PAGE_LENGTH)-1 downto 0)));
+      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
+      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
       assert (page < NUM_PAGES) report "page out of range" severity error;
       if (addr_in_page = 0) then
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
       else
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
       end if; 
-    end if; -- (wea_pipe(DELAY-1)='1')
+    end if; -- (wea='1')
   end if;
 end process;
 
