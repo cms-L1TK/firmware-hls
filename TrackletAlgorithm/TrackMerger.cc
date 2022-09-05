@@ -172,20 +172,6 @@ void TrackMerger(const BXType bx,
                 diskStubWords_3_o);
   }
 
-  // for (unsigned int nTrack = 0; nTrack < kMaxTrack; nTrack++){
-  //   #pragma HLS unroll
-  //   unloadTrack(unmergedTracks[nTrack],
-  //               trackWord_o,
-  //               barrelStubWords_0_o,
-  //               barrelStubWords_1_o,
-  //               barrelStubWords_2_o,
-  //               barrelStubWords_3_o,
-  //               diskStubWords_0_o,
-  //               diskStubWords_1_o,
-  //               diskStubWords_2_o,
-  //               diskStubWords_3_o);
-  // }
-
     
   bx_o = bx;
 }
