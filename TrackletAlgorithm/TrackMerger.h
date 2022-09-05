@@ -6,7 +6,7 @@
 #include "TrackFitMemory.h"
 #include "TrackHandler.h"
 
-const unsigned int kNComparisonModules = 10;
+const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
 const unsigned int kMaxTrack = 50;
 const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
@@ -14,17 +14,16 @@ const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
 class ComparisonModule{
     public:
     ComparisonModule()
-    {
-      tracksProcessed = 0;
-      masterTrack._trackWord = 0;
-    }
+     {  tracksProcessed = 0;
+        masterTrack._trackWord = 0;
+      }
     ~ComparisonModule(){};
 
     unsigned int getMatchFound(){return matchFound;}
 
     unsigned int getNProcessed(){return tracksProcessed;}
 
-    void processTrack();
+    // void processTrack();
 
     unsigned int myIndex;
 
@@ -54,7 +53,7 @@ class ComparisonModule{
     unsigned int endOfModule{0};
 
     TrackStruct masterTrack;
-    TrackStruct track;
+    TrackHandler trackHandler;
 
     void fillUnmerged(TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i);
 

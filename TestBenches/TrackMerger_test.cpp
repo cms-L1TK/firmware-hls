@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <iterator>
 
-const int nevents = 1;
+const int nevents = 100;
 
 using namespace std;
 
@@ -65,7 +65,7 @@ int main(){
     for(unsigned short i = 0; i < kMaxTrack; i++){
       TrackFit track;
       if (i < inputTracks.getEntries(bx)) {
-        track = inputTracks.read_mem(bx, i); //i+1 for merge
+        track = inputTracks.read_mem(bx, i+1); //i+1 for merge
       } else {
         track = TrackFit();
       }
@@ -107,7 +107,7 @@ int main(){
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < kMaxTrack; i++){ 
+    for (unsigned short i = 0; i < kMaxTrack+kNComparisonModules; i++){ //because first 16 CMs don't appear in output first if outputting unmerged tracks first ( kMaxTrack+kNComparisonModule)
       TrackFit track;
       track.setTrackWord(trackWord_o.read());
       track.setBarrelStubWord<0>(barrelStubWords_0_o.read());
