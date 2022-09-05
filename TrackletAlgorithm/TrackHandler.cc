@@ -1,27 +1,5 @@
 #include "TrackHandler.h"
 
-// void TrackHandler::setTrkWord(TrackStruct track){
-//   #pragma HLS inline
-//   trkWord = track._trackWord;
-// }
-
-// void TrackHandler::setBarrelArray(TrackStruct track){
-//     #pragma HLS inline
-//     barrelStubArray[1][0] = track._barrelStub_0;
-//     barrelStubArray[2][0] = track._barrelStub_1;
-//     barrelStubArray[3][0] = track._barrelStub_2;
-//     barrelStubArray[4][0] = track._barrelStub_3;
-// }   
-
-// void TrackHandler::setDiskArray(TrackStruct track){
-//     #pragma HLS inline
-//     diskStubArray[0][0] = track._diskStub_0;
-//     diskStubArray[1][0] = track._diskStub_1;
-//     diskStubArray[2][0] = track._diskStub_2;
-//     diskStubArray[3][0] = track._diskStub_3;
-// }
-
-
 bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsigned int& matchFound, unsigned int mergeCondition){
   #pragma HLS inline
   #pragma HLS array_partition variable=masterTrk._barrelStubArray complete dim=0
