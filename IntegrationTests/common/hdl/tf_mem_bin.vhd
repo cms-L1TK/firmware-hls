@@ -36,7 +36,8 @@ entity tf_mem_bin is
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    NAME            : string := "MEMNAME"          --! Memory name
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
