@@ -10,7 +10,6 @@
 #include "FullMatchMemory.h"
 
 namespace MC {
-  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
   const auto cmzero = CandidateMatch::CandidateMatchData(0);
 }
 
@@ -45,11 +44,11 @@ void merger(
      bool * readB
 ){
 
-#pragma HLS inline 
+#pragma HLS inline
 #pragma HLS pipeline II=1 rewind
-#pragma HLS interface ap_ctrl_none port=return 
-#pragma HLS interface ap_ctrl_none port=inA,validA,inB,validB,out,vout,inread,A,vA,sA,B,vB,sB 
-#pragma HLS interface ap_ctrl_none port=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,voutnext 
+#pragma HLS interface ap_ctrl_none port=return
+#pragma HLS interface ap_ctrl_none port=inA,validA,inB,validB,out,vout,inread,A,vA,sA,B,vB,sB
+#pragma HLS interface ap_ctrl_none port=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,voutnext
 
     // Set read enables for A and B
     *readA = (((inread || !vout) && sA) || !vA) && validA;
@@ -58,21 +57,21 @@ void merger(
     // Setup state machine
     static enum {HOLD, PROC_A, PROC_B, START, DONE} state;
     if (sA && (inread || !vout))                          state = PROC_A;
-    else if (sB && (inread || !vout))                     state = PROC_B; 
+    else if (sB && (inread || !vout))                     state = PROC_B;
     else if ((!sA && !sB) && (validA || validB) && !vout) state = START;
-    else if (!sB && !sA && vout && inread)                state = DONE;              
-    else                                                  state = HOLD; 
+    else if (!sB && !sA && vout && inread)                state = DONE;
+    else                                                  state = HOLD;
 
     //------------- Explanation of the states -------------
     // START:  Either inA or inB is valid & there is no valid output & neither sA or sB is set
-    //         No output yet, but set the next sA and sB and pipeline the inputs  
+    //         No output yet, but set the next sA and sB and pipeline the inputs
     // PROC_A: sA is set & either there is an inread from the next layer or not valid output
-    //         Output is the pipelined A, and set the next sA and sB   
+    //         Output is the pipelined A, and set the next sA and sB
     // PROC_B: sB is set & either there is an inread from the next layer or not valid output
     //         Output is the pipelined B, and set the next sA and sB
     // DONE:   There is an valid output & there is no inread from the next layer and neither sA or sB is set
     //         No output, and set all reads to false
-    // HOLD:   In all other cases, pipeline everthing 
+    // HOLD:   In all other cases, pipeline everthing
     //-----------------------------------------------------
 
     // Case statements
@@ -95,7 +94,7 @@ void merger(
     	*vBnext   = validB; // pipeline inB valid
         *Anext    = A;      // pipeline A
         *vAnext   = vA;     // pipeline vA
-        *sAnext   = ((A.getProjIndex() <= inB.getProjIndex()) || !validB) && vA;  // sA=true if A is valid and (A <= inB or inB not valid) 
+        *sAnext   = ((A.getProjIndex() <= inB.getProjIndex()) || !validB) && vA;  // sA=true if A is valid and (A <= inB or inB not valid)
         *sBnext   = (!(A.getProjIndex() <= inB.getProjIndex()) || !vA) && validB; // sB=true if inB is valid and (A > inB or A not valid)
         break;
     case START: // both in at same time
@@ -108,7 +107,7 @@ void merger(
         *sAnext   = ((inA.getProjIndex() <= inB.getProjIndex()) || !validB) && validA;  // sA=true if inA is valid and (inA <= inB or inB not valid)
         *sBnext   = (!(inA.getProjIndex() <= inB.getProjIndex()) || !validA) && validB; // sB=true if inB is valid and (inA > inB or inA not valid)
         break;
-    case DONE: // set everything to false 
+    case DONE: // set everything to false
         *outnext  = CandidateMatch(MC::cmzero);
         *voutnext = false;
         *Anext    = CandidateMatch(MC::cmzero);
@@ -118,7 +117,7 @@ void merger(
         *sAnext   = false;
         *sBnext   = false;
         break;
-    case HOLD: // pipeline all 
+    case HOLD: // pipeline all
         *outnext  = out;
         *voutnext = vout;
         *Anext    = A;
@@ -126,7 +125,7 @@ void merger(
         *vAnext   = vA;
         *vBnext   = vB;
         *sAnext   = sA;
-        *sBnext   = sB; 
+        *sBnext   = sB;
         break;
     }
 
@@ -269,7 +268,7 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     else {
       static_assert(true, "Only LAYERS 1 to 6 are valid");
     }
- 
+
   }
 
 } // end readTable_Cuts
@@ -278,11 +277,11 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //////////////////////////////////////////////////////////////
 
 // MatchCalculator
-template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
-template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegions PHI, TF::seed Seed> constexpr bool FMMask();
+template<TF::layerDisk Layer, TF::phiRegions PHI> constexpr uint32_t FMMask();
 #include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, MC::imc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, TF::phiRegions PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
@@ -296,16 +295,16 @@ void MatchCalculator(BXType bx,
   constexpr int totalMatchCopies(8);
 
   // Initialization
- 
+
   // Setup constants depending on which layer/disk working on
   // probably should move these to constants file
-  const ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
+  const ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants)
   const ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
   const ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
   const ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
   const ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
   const ap_uint<3> kNbitsrL123 = 7;      // nbitsrL123     in emulation (defined in constants)
-  const ap_uint<3> kNbitsrL456 = 7;      // nbitsrL456     in emulation (defined in constants) 
+  const ap_uint<3> kNbitsrL456 = 7;      // nbitsrL456     in emulation (defined in constants)
   const ap_int<4>  kShift_PS_zderL = -7; // PS_zderL_shift in emulation (defined in constants)
   const ap_int<4>  kShift_2S_zderL = -7; // SS_zderL_shift in emulation (defined in constants)
 
@@ -378,26 +377,26 @@ void MatchCalculator(BXType bx,
   CandidateMatch tmpB_L1_2(MC::cmzero);
   CandidateMatch tmpB_L1_3(MC::cmzero);
   CandidateMatch tmpB_L1_4(MC::cmzero);
-  bool valid_L1_1 = false; 
-  bool valid_L1_2 = false; 
-  bool valid_L1_3 = false; 
-  bool valid_L1_4 = false; 
-  bool vA_L1_1 = false; 
-  bool vA_L1_2 = false; 
-  bool vA_L1_3 = false; 
-  bool vA_L1_4 = false; 
-  bool vB_L1_1 = false; 
-  bool vB_L1_2 = false; 
-  bool vB_L1_3 = false; 
-  bool vB_L1_4 = false; 
-  bool sA_L1_1 = false; 
-  bool sA_L1_2 = false; 
-  bool sA_L1_3 = false; 
-  bool sA_L1_4 = false; 
-  bool sB_L1_1 = false; 
-  bool sB_L1_2 = false; 
-  bool sB_L1_3 = false; 
-  bool sB_L1_4 = false; 
+  bool valid_L1_1 = false;
+  bool valid_L1_2 = false;
+  bool valid_L1_3 = false;
+  bool valid_L1_4 = false;
+  bool vA_L1_1 = false;
+  bool vA_L1_2 = false;
+  bool vA_L1_3 = false;
+  bool vA_L1_4 = false;
+  bool vB_L1_1 = false;
+  bool vB_L1_2 = false;
+  bool vB_L1_3 = false;
+  bool vB_L1_4 = false;
+  bool sA_L1_1 = false;
+  bool sA_L1_2 = false;
+  bool sA_L1_3 = false;
+  bool sA_L1_4 = false;
+  bool sB_L1_1 = false;
+  bool sB_L1_2 = false;
+  bool sB_L1_3 = false;
+  bool sB_L1_4 = false;
 
   // layer 2 variables
   bool read_L2_1 = false;
@@ -408,16 +407,16 @@ void MatchCalculator(BXType bx,
   CandidateMatch tmpA_L2_2(MC::cmzero);
   CandidateMatch tmpB_L2_1(MC::cmzero);
   CandidateMatch tmpB_L2_2(MC::cmzero);
-  bool valid_L2_1 = false; 
-  bool valid_L2_2 = false; 
-  bool vA_L2_1 = false; 
-  bool vA_L2_2 = false; 
-  bool vB_L2_1 = false; 
-  bool vB_L2_2 = false; 
-  bool sA_L2_1 = false; 
-  bool sA_L2_2 = false; 
-  bool sB_L2_1 = false; 
-  bool sB_L2_2 = false; 
+  bool valid_L2_1 = false;
+  bool valid_L2_2 = false;
+  bool vA_L2_1 = false;
+  bool vA_L2_2 = false;
+  bool vB_L2_1 = false;
+  bool vB_L2_2 = false;
+  bool sA_L2_1 = false;
+  bool sA_L2_2 = false;
+  bool sB_L2_1 = false;
+  bool sB_L2_2 = false;
 
   // layer 3 variables
   CandidateMatch tmpA_L3(MC::cmzero);
@@ -427,7 +426,7 @@ void MatchCalculator(BXType bx,
   bool vB_L3 = false;
   bool sA_L3 = false;
   bool sB_L3 = false;
-  
+
   // Setup candidate match data stream that goes into match calculations
   CandidateMatch datastream(MC::cmzero);
 
@@ -450,11 +449,11 @@ void MatchCalculator(BXType bx,
   ap_uint<kNBits_MemAddr> nmcout5 = 0;
   ap_uint<kNBits_MemAddr> nmcout6 = 0;
   ap_uint<kNBits_MemAddr> nmcout7 = 0;
-  ap_uint<kNBits_MemAddr> nmcout8 = 0;  
+  ap_uint<kNBits_MemAddr> nmcout8 = 0;
   MC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MC); istep++)
   {
-   
-#pragma HLS PIPELINE II=1 
+
+#pragma HLS PIPELINE II=1
 
     // Pick up number of candidate matches for each CM memory
     ncm_load: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
@@ -485,22 +484,22 @@ void MatchCalculator(BXType bx,
     bool valid_L1_2_next = false;
     bool valid_L1_3_next = false;
     bool valid_L1_4_next = false;
-    bool vA_L1_1_next = false; 
-    bool vA_L1_2_next = false; 
-    bool vA_L1_3_next = false; 
-    bool vA_L1_4_next = false; 
-    bool vB_L1_1_next = false; 
-    bool vB_L1_2_next = false; 
-    bool vB_L1_3_next = false; 
-    bool vB_L1_4_next = false; 
-    bool sA_L1_1_next = false; 
-    bool sA_L1_2_next = false; 
-    bool sA_L1_3_next = false; 
-    bool sA_L1_4_next = false; 
-    bool sB_L1_1_next = false; 
-    bool sB_L1_2_next = false; 
-    bool sB_L1_3_next = false; 
-    bool sB_L1_4_next = false; 
+    bool vA_L1_1_next = false;
+    bool vA_L1_2_next = false;
+    bool vA_L1_3_next = false;
+    bool vA_L1_4_next = false;
+    bool vB_L1_1_next = false;
+    bool vB_L1_2_next = false;
+    bool vB_L1_3_next = false;
+    bool vB_L1_4_next = false;
+    bool sA_L1_1_next = false;
+    bool sA_L1_2_next = false;
+    bool sA_L1_3_next = false;
+    bool sA_L1_4_next = false;
+    bool sB_L1_1_next = false;
+    bool sB_L1_2_next = false;
+    bool sB_L1_3_next = false;
+    bool sB_L1_4_next = false;
 
     bool read_L2_1_next = false;
     bool read_L2_2_next = false;
@@ -510,20 +509,20 @@ void MatchCalculator(BXType bx,
     CandidateMatch tmpA_L2_2_next(MC::cmzero);
     CandidateMatch tmpB_L2_1_next(MC::cmzero);
     CandidateMatch tmpB_L2_2_next(MC::cmzero);
-    bool valid_L2_1_next = false; 
-    bool valid_L2_2_next = false; 
-    bool vA_L2_1_next = false; 
-    bool vA_L2_2_next = false; 
-    bool vB_L2_1_next = false; 
-    bool vB_L2_2_next = false; 
-    bool sA_L2_1_next = false; 
-    bool sA_L2_2_next = false; 
-    bool sB_L2_1_next = false; 
-    bool sB_L2_2_next = false; 
+    bool valid_L2_1_next = false;
+    bool valid_L2_2_next = false;
+    bool vA_L2_1_next = false;
+    bool vA_L2_2_next = false;
+    bool vB_L2_1_next = false;
+    bool vB_L2_2_next = false;
+    bool sA_L2_1_next = false;
+    bool sA_L2_2_next = false;
+    bool sB_L2_1_next = false;
+    bool sB_L2_2_next = false;
 
     CandidateMatch cm_L3_next(MC::cmzero);
     CandidateMatch tmpA_L3_next(MC::cmzero);
-    CandidateMatch tmpB_L3_next(MC::cmzero); 
+    CandidateMatch tmpB_L3_next(MC::cmzero);
     bool valid_L3_next = false;
     bool vA_L3_next = false;
     bool vB_L3_next = false;
@@ -554,7 +553,7 @@ void MatchCalculator(BXType bx,
 #pragma HLS unroll
       if(read[i]) addr[i]++;
     }
-    
+
 
     // Read in each candidate match
     CandidateMatch cm[8];
@@ -583,7 +582,7 @@ void MatchCalculator(BXType bx,
       &tmpA_L1_1_next, &vA_L1_1_next, &sA_L1_1_next, // tmp variables internal to L1_1 merger
       &tmpB_L1_1_next, &vB_L1_1_next, &sB_L1_1_next, // tmp variables internal to L1_1 merger
       &cm_L1_1_next, &valid_L1_1_next,               // outputs: out, vout
-      &read_next[0], &read_next[1]                       // outputs: read1, read2 
+      &read_next[0], &read_next[1]                       // outputs: read1, read2
     );
 
     // merger Layer 1 Part 2
@@ -595,10 +594,10 @@ void MatchCalculator(BXType bx,
       &tmpA_L1_2_next, &vA_L1_2_next, &sA_L1_2_next, // tmp variables internal to L1_2 merger
       &tmpB_L1_2_next, &vB_L1_2_next, &sB_L1_2_next, // tmp variables internal to L1_2 merger
       &cm_L1_2_next, &valid_L1_2_next,               // outputs: out, vout
-      &read_next[2], &read_next[3]                       // outputs: read3, read4 
+      &read_next[2], &read_next[3]                       // outputs: read3, read4
     );
 
-    // merger Layer 1 Part 3 
+    // merger Layer 1 Part 3
     merger<1,3>(
       cm[4], valid5, cm[5], valid6,                      // inputs: inA, validA, inB, validB
       cm_L1_3, valid_L1_3, read_L1_3,                // inputs: out, vout, inread from L2_1
@@ -607,10 +606,10 @@ void MatchCalculator(BXType bx,
       &tmpA_L1_3_next, &vA_L1_3_next, &sA_L1_3_next, // tmp variables internal to L1_3 merger
       &tmpB_L1_3_next, &vB_L1_3_next, &sB_L1_3_next, // tmp variables internal to L1_3 merger
       &cm_L1_3_next, &valid_L1_3_next,               // outputs: out, vout
-      &read_next[4], &read_next[5]                       // outputs: read5, read6 
+      &read_next[4], &read_next[5]                       // outputs: read5, read6
     );
 
-    // merger Layer 1 Part 4  
+    // merger Layer 1 Part 4
     merger<1,4>(
       cm[6], valid7, cm[7], valid8,                      // inputs: inA, validA, inB, validB
       cm_L1_4, valid_L1_4, read_L1_4,                // inputs: out, vout, inread from L2_1
@@ -619,7 +618,7 @@ void MatchCalculator(BXType bx,
       &tmpA_L1_4_next, &vA_L1_4_next, &sA_L1_4_next, // tmp variables internal to L1_4 merger
       &tmpB_L1_4_next, &vB_L1_4_next, &sB_L1_4_next, // tmp variables internal to L1_4 merger
       &cm_L1_4_next, &valid_L1_4_next,               // outputs: out, vout
-      &read_next[6], &read_next[7]                       // outputs: read7, read8 
+      &read_next[6], &read_next[7]                       // outputs: read7, read8
     );
 
     // merger Layer 2 Part 1
@@ -637,7 +636,7 @@ void MatchCalculator(BXType bx,
 
     // merger Layer 2 Part 2
     merger<2,2>(
-      cm_L1_3_next, valid_L1_3_next,                 // inputs: inA, validA 
+      cm_L1_3_next, valid_L1_3_next,                 // inputs: inA, validA
       cm_L1_4_next, valid_L1_4_next,                 // inputs: inB, validB
       cm_L2_2, valid_L2_2, read_L2_2,                // inputs: out, vout, inread from L3_1
       tmpA_L2_2, vA_L2_2, sA_L2_2,                   // tmp variables internal to L2_2 merger
@@ -650,7 +649,7 @@ void MatchCalculator(BXType bx,
 
     // merger Layer 3 Part 1
     merger<3,1>(
-      cm_L2_1_next, valid_L2_1_next,           // inputs: inA, validA 
+      cm_L2_1_next, valid_L2_1_next,           // inputs: inA, validA
       cm_L2_2_next, valid_L2_2_next,           // inputs: inB, validB
       datastream, valid_L3, true,              // inputs: out, vout, true inread because last layer
       tmpA_L3, vA_L3, sA_L3,                   // tmp variables internal to L3_1 merger
@@ -707,36 +706,36 @@ void MatchCalculator(BXType bx,
     tmpB_L2_2 = tmpB_L2_2_next;
     tmpA_L3   = tmpA_L3_next;
     tmpB_L3   = tmpB_L3_next;
-    
-    vA_L1_1   = vA_L1_1_next; 
-    vA_L1_2   = vA_L1_2_next; 
-    vA_L1_3   = vA_L1_3_next; 
-    vA_L1_4   = vA_L1_4_next; 
-    vB_L1_1   = vB_L1_1_next; 
-    vB_L1_2   = vB_L1_2_next; 
-    vB_L1_3   = vB_L1_3_next; 
-    vB_L1_4   = vB_L1_4_next; 
-    vA_L2_1   = vA_L2_1_next; 
-    vA_L2_2   = vA_L2_2_next; 
-    vB_L2_1   = vB_L2_1_next; 
+
+    vA_L1_1   = vA_L1_1_next;
+    vA_L1_2   = vA_L1_2_next;
+    vA_L1_3   = vA_L1_3_next;
+    vA_L1_4   = vA_L1_4_next;
+    vB_L1_1   = vB_L1_1_next;
+    vB_L1_2   = vB_L1_2_next;
+    vB_L1_3   = vB_L1_3_next;
+    vB_L1_4   = vB_L1_4_next;
+    vA_L2_1   = vA_L2_1_next;
+    vA_L2_2   = vA_L2_2_next;
+    vB_L2_1   = vB_L2_1_next;
     vB_L2_2   = vB_L2_2_next;
     vA_L3     = vA_L3_next;
-    vB_L3     = vB_L3_next; 
+    vB_L3     = vB_L3_next;
 
-    sA_L1_1   = sA_L1_1_next; 
-    sA_L1_2   = sA_L1_2_next; 
-    sA_L1_3   = sA_L1_3_next; 
-    sA_L1_4   = sA_L1_4_next; 
-    sB_L1_1   = sB_L1_1_next; 
-    sB_L1_2   = sB_L1_2_next; 
-    sB_L1_3   = sB_L1_3_next; 
-    sB_L1_4   = sB_L1_4_next; 
-    sA_L2_1   = sA_L2_1_next; 
-    sA_L2_2   = sA_L2_2_next; 
-    sB_L2_1   = sB_L2_1_next; 
+    sA_L1_1   = sA_L1_1_next;
+    sA_L1_2   = sA_L1_2_next;
+    sA_L1_3   = sA_L1_3_next;
+    sA_L1_4   = sA_L1_4_next;
+    sB_L1_1   = sB_L1_1_next;
+    sB_L1_2   = sB_L1_2_next;
+    sB_L1_3   = sB_L1_3_next;
+    sB_L1_4   = sB_L1_4_next;
+    sA_L2_1   = sA_L2_1_next;
+    sA_L2_2   = sA_L2_2_next;
+    sB_L2_1   = sB_L2_1_next;
     sB_L2_2   = sB_L2_2_next;
     sA_L3     = sA_L3_next;
-    sB_L3     = sB_L3_next; 
+    sB_L3     = sB_L3_next;
 
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
@@ -749,10 +748,10 @@ void MatchCalculator(BXType bx,
     AllProjection<APTYPE> proj = allproj->read_mem(bx,projid);
     AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
 
-    // Check if processing a new tracklet or not 
+    // Check if processing a new tracklet or not
     // Later we only want to store the single best match per tracklet
     id      = id_next; // pipelined id
-    id_next = projid;  
+    id_next = projid;
     bool newtracklet = (istep==0 || (id_next != id))? true : false;
 
     //increment full match memories
@@ -764,7 +763,7 @@ void MatchCalculator(BXType bx,
     typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
     typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
     typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
-    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
+    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();
 
     // Projection parameters
     typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
@@ -773,7 +772,7 @@ void MatchCalculator(BXType bx,
     typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
     typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
     typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
-    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
+    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer();
 
 
     // Calculate residuals
@@ -782,7 +781,7 @@ void MatchCalculator(BXType bx,
     ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
     ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
-     
+
     // Apply the corrections
     const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
     ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
@@ -807,21 +806,21 @@ void MatchCalculator(BXType bx,
     const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
     const typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
 
-    // Full match  
+    // Full match
     FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
 
     //-----------------------------------------------------------------------------------------------------------
     //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
     //-----------------------------------------------------------------------------------------------------------
- 
+
     typename AllProjection<APTYPE>::AProjTCSEED projseed_next;
     FullMatch<FMTYPE> bestmatch_next;
     bool goodmatch_next = false;
 
     // For first tracklet, pick up the phi cut value
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-  
-    // Check that matches fall within the selection window of the projection 
+
+    // Check that matches fall within the selection window of the projection
     if ((delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
@@ -833,7 +832,7 @@ void MatchCalculator(BXType bx,
       projseed_next  = proj_seed;
     }
 
-    if(goodmatch_next&&valid_L3) { 
+    if(goodmatch_next&&valid_L3) {
 
       switch (projseed_next) {
         case 0:
@@ -893,7 +892,7 @@ void MatchCalculator(BXType bx,
     goodmatch      = goodmatch_next;
     projseed       = projseed_next;
 
-  }// end MC_LOOP 
+  }// end MC_LOOP
 
   bx_o = bx;
 
