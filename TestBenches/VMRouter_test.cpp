@@ -33,7 +33,7 @@ vector<int> countCopies(const vector<string> &fileNames) {
     if (f->find(fileName) ==  string::npos) {
       fileName = f->substr(0, f->find("n")); // File name up to the copy number "nX"
       numCopies.push_back(1);
-    } 
+    }
     else numCopies.back() += 1;
   }
   return numCopies;
@@ -43,14 +43,14 @@ vector<int> countCopies(const vector<string> &fileNames) {
 int main() {
 
   constexpr int sector = 4; //  Specifies the sector
-  constexpr char phi = static_cast<char>(phiRegion);
+  constexpr char phi = 'A' + phiRegion; // Converts phiRegion to char
 
   char overlapPhiRegion[] = {'X', 'Y', 'Z', 'W', 'Q', 'R', 'S', 'T'}; // Special naming for the TE overlap memories, and outer memories in Disk 1
   char extraPhiRegion[] = {'I', 'J', 'K', 'L'}; // Special naming for the extra memories TEInner L2 and TEOuter L3.
 
-  char teiPhiRegion = (kLAYER != 2) ? phi : extraPhiRegion[phi - 'A'];
-  char teolPhiRegion = (kLAYER == 1 || kLAYER == 2) ? overlapPhiRegion[phi - 'A'] : ' ';
-  char teoPhiRegion = (kDISK == 1) ? overlapPhiRegion[phi - 'A'] : ((kLAYER == 3) ? extraPhiRegion[phi - 'A'] : phi);
+  char teiPhiRegion = (kLAYER != 2) ? phi : extraPhiRegion[phiRegion];
+  char teolPhiRegion = (kLAYER == 1 || kLAYER == 2) ? overlapPhiRegion[phiRegion] : ' ';
+  char teoPhiRegion = (kDISK == 1) ? overlapPhiRegion[phiRegion] : ((kLAYER == 3) ? extraPhiRegion[phiRegion] : phi);
 
 
   ////////////////////////////////////////////////////////////////
@@ -62,13 +62,13 @@ int main() {
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
   const string inputDisk2SPattern = "InputStubs*_D*2S*";
-  
+
   const string allStubPattern = "AllStubs*";
   const string mePattern = "VMStubs_VMSME*";
   const string teiPattern = (nvmTEI && maxTEICopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teiPhiRegion) + "*" : "No TEInner.";
   const string teolPattern = (nvmOL && maxOLCopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teolPhiRegion) + "*" : "No TEInner Overlap.";
   const string teoPattern = (nvmTEO && maxTEOCopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teoPhiRegion) + "*" : "No TEOuter.";
-  
+
   // Total number of files according to wiring, including copies
   const auto nTotAS = tb.nFiles(allStubPattern);
   const auto nTotVMSME = tb.nFiles(mePattern);
@@ -81,7 +81,7 @@ int main() {
 
   auto &fin_inputstubs = tb.files(inputPattern);
   auto &fin_inputstubs_disk2s = tb.files(inputDisk2SPattern);
-  
+
   auto &fout_allstubs = tb.files(allStubPattern);
   auto &fout_vmstubme = tb.files(mePattern);
   auto &fout_vmstubtei = tb.files(teiPattern);

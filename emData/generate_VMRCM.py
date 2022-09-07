@@ -46,7 +46,7 @@ def getDictOfMemories(wireconfig, vmr_list):
                     mem_type = mem_type + "_DISK2S_" + vmr
                 elif "innerallstubin" in line:
                     mem_type = mem_type + "I_" + vmr
-                else: 
+                else:
                     mem_type = mem_type + "_" + vmr
                 # Add memory and memory type to dictionary
                 if mem_type not in mem_dict:
@@ -160,7 +160,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
     # Declare functions
     parameter_file.write(
         "// Enums used to get the correct parameters\n"
-        "enum class phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};\n"
+        "enum class TF::phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};\n"
         "\n"
         "// The functions that returns parameters and LUTs\n"
         "template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();\n"
@@ -168,12 +168,12 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
         "template<TF::layerDisk LayerDisk> const int* getTETable();\n"
         "template<TF::layerDisk LayerDisk> constexpr regionType getInputType();\n"
         "template<TF::layerDisk LayerDisk> constexpr regionType getOutputType();\n"
-        "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();\n"
-        "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputsDisk2S();\n"
-        "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASCopies();\n"
-        "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASInnerCopies();\n"
-        "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumTEOCopies();\n"
-        "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getAllStubInnerMask();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegions Phi> constexpr int getNumInputs();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegions Phi> constexpr int getNumInputsDisk2S();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegions Phi> constexpr int getNumASCopies();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegions Phi> constexpr int getNumASInnerCopies();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegions Phi> constexpr int getNumTEOCopies();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegions Phi> constexpr int getAllStubInnerMask();\n"
         "\n"
         "// VMPhiCorr LUTs\n"
     )
@@ -269,22 +269,22 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
         parameter_file.write(
             "\n////////////////\n// " + vmr + " //\n////////////////\n"
-            "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
+            "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::phiRegions::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
             "  return " + str(len(mem_dict["IL_"+vmr])) + ";\n"
             "}\n"
-            "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of DISK2S input memories\n"
+            "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::phiRegions::" + phi_region + ">(){ // Number of DISK2S input memories\n"
             "  return " + str(len(mem_dict["IL_DISK2S_"+vmr])) + ";\n"
             "}\n"
-            "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub memory\n"
+            "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::phiRegions::" + phi_region + ">(){ // Allstub memory\n"
             "  return " + str(len(mem_dict["AS_"+vmr])) + ";\n"
             "}\n"
-            "template<> constexpr int getNumASInnerCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub Inner memory\n"
+            "template<> constexpr int getNumASInnerCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::phiRegions::" + phi_region + ">(){ // Allstub Inner memory\n"
             "  return " + str(len(mem_dict["ASI_"+vmr]) if mem_dict["ASI_"+vmr] else 1) + ";\n"
             "}\n"
-            "template<> constexpr int getNumTEOCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE Outer memories\n"
+            "template<> constexpr int getNumTEOCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::phiRegions::" + phi_region + ">(){ // TE Outer memories\n"
             "  return " + str(max_copy_count) + ";\n"
             "}\n"
-            "template<> constexpr int getAllStubInnerMask<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+            "template<> constexpr int getAllStubInnerMask<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::phiRegions::" + phi_region + ">(){\n"
             "  return " + getAllStubInnerMaskString(mem_dict["ASI_"+vmr]) + ";\n"
             "}\n"
         )
@@ -330,7 +330,7 @@ def writeTopHeader(vmr, output_dir):
     header_file.write(
         "#define kLAYER " + str(layer) + " // Which barrel layer number the data is coming from\n"
         "#define kDISK " + str(disk) + " // Which disk number the data is coming from, 0 if not disk\n"
-        "constexpr phiRegions phiRegion = phiRegions::" + phi_region+ "; // Which AllStub/PhiRegion\n"
+        "constexpr TF::phiRegions phiRegion = TF::phiRegions::" + phi_region+ "; // Which AllStub/PhiRegion\n"
         "\n"
         "constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);\n"
         "constexpr regionType inputType = getInputType<layerdisk>();\n"
