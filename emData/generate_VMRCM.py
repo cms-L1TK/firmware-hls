@@ -159,9 +159,6 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
     # Declare functions
     parameter_file.write(
-        "// Enums used to get the correct parameters\n"
-        "enum class TF::phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};\n"
-        "\n"
         "// The functions that returns parameters and LUTs\n"
         "template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();\n"
         "template<TF::layerDisk LayerDisk> const int* getMETable();\n"
@@ -323,6 +320,7 @@ def writeTopHeader(vmr, output_dir):
         "\n"
         "////////////////////////////////////////////\n"
         "// Variables for that are specified with regards to the VMR region\n"
+        "// Some are used by the Test Bench\n"
         "\n"
     )
 

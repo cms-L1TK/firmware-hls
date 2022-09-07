@@ -435,6 +435,7 @@ def writeTopHeader(vmr, output_dir):
             "\n"
             "////////////////////////////////////////////\n"
             "// Variables for that are specified with regards to the VMR region\n"
+            "// Some are used by the Test Bench\n"
             "\n"
         )
 
