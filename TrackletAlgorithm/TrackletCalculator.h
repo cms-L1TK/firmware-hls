@@ -50,7 +50,6 @@ namespace TC {
     typedef ap_uint<1> flag;
   }
 
-  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
   enum projout_index_barrel_ps {L1PHIA = 0, L1PHIB = 1, L1PHIC = 2, L1PHID = 3, L1PHIE = 4, L1PHIF = 5, L1PHIG = 6, L1PHIH = 7, L2PHIA = 8, L2PHIB = 9, L2PHIC = 10, L2PHID = 11, L3PHIA = 12, L3PHIB = 13, L3PHIC = 14, L3PHID = 15, N_PROJOUT_BARRELPS = 16};
   enum projout_index_barrel_2s {L4PHIA = 0, L4PHIB = 1, L4PHIC = 2, L4PHID = 3, L5PHIA = 4, L5PHIB = 5, L5PHIC = 6, L5PHID = 7, L6PHIA = 8, L6PHIB = 9, L6PHIC = 10, L6PHID = 11, N_PROJOUT_BARREL2S = 12};
   enum projout_index_disk      {D1PHIA = 0, D1PHIB = 1, D1PHIC = 2, D1PHID = 3, D2PHIA = 4, D2PHIB = 5, D2PHIC = 6, D2PHID = 7, D3PHIA = 8, D3PHIB = 9, D3PHIC = 10, D3PHID = 11, D4PHIA = 12, D4PHIB = 13, D4PHIC = 14, D4PHID = 15, N_PROJOUT_DISK = 16};
@@ -147,7 +146,7 @@ namespace TC {
 
   template<TF::seed Seed> bool barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<OuterRegion<Seed>()> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
-  template<TF::seed Seed, TC::itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
+  template<TF::seed Seed, TF::phiRegions iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
   template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], ap_uint<kNBits_MemAddr> nproj[NProjOut], const bool success);
 
@@ -180,12 +179,12 @@ namespace TC {
   );
 }
 
-template<TF::seed Seed, TC::itc iTC> constexpr uint64_t ASInnerMask();
-template<TF::seed Seed, TC::itc iTC> constexpr uint64_t ASOuterMask();
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();
-template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();
+template<TF::seed Seed, TF::phiRegions iTC> constexpr uint64_t ASInnerMask();
+template<TF::seed Seed, TF::phiRegions iTC> constexpr uint64_t ASOuterMask();
+template<TF::seed Seed, TF::phiRegions iTC> constexpr uint32_t TPROJMaskBarrel();
+template<TF::seed Seed, TF::phiRegions iTC> constexpr uint32_t TPROJMaskDisk();
 
-template<TF::seed Seed, TC::itc iTC, uint8_t NSPMem> void
+template<TF::seed Seed, TF::phiRegions iTC, uint8_t NSPMem> void
 TrackletCalculator(
     const BXType bx,
     const AllStubMemory<InnerRegion<Seed>()> innerStubs[],
@@ -337,7 +336,7 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
 }
 
 // Returns a unique identifier assigned to each TC.
-template<TF::seed Seed, TC::itc iTC> const TrackletProjection<BARRELPS>::TProjTCID
+template<TF::seed Seed, TF::phiRegions iTC> const TrackletProjection<BARRELPS>::TProjTCID
 TC::ID()
 {
   return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC);
@@ -541,7 +540,7 @@ TC::processStubPair(
 // This is the primary interface for the TrackletCalculator.
 template<
 TF::seed Seed, // seed layer combination (TF::L1L2, TF::L3L4, etc.)
-TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
+TF::phiRegions iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
              // the same iTC); generally indicates the region of the phi sector
              // being processed
 uint8_t NSPMem // number of stub-pair memories
