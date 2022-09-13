@@ -96,6 +96,11 @@ public:
     VMStubMECMData newdata(datastr, base);
     data_ = newdata;
   }
+  void Print()
+  {
+    std::cout << std::hex << data_ << std::endl;
+    std::cout << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEIDSize>(getIndex()) << "|" << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEBendSize>(getBend()) << "|" << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize>(getFinePhi()) << "|" << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize>(getFineZ()) << std::endl;
+  }
   #endif
 
   // Getter
@@ -111,6 +116,12 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
+  bool isPSStub() const {
+    if(VMSMEType == BARRELPS) return true;
+    else if(VMSMEType == BARREL2S) return false;
+    else if(VMSMEType == DISK) return (getBend() & (1 << (VMStubMECMBase<VMSMEType>::kVMSMEBendSize-1))) == 0 && getBend() != 0; // Check highest 1 bits regardless of template type
+    static_assert(true, "Should not be possible!");
+  }
 
   VMSMEBENDPSDISK getBendPSDisk() const {
     return data_.range(kVMSMEBendMSB - 1,kVMSMEBendLSB);
@@ -141,7 +152,7 @@ public:
     data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
   }
 
-#ifdef CMSSW_GIT_HASH
+#ifdef CMSSW_GIT_HVMSMEH
   std::string getBitStr() const {
     std::string str = decodeToBits(getIndex());
     str += "|"+decodeToBits(getBend());

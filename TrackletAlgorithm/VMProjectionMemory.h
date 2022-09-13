@@ -31,12 +31,12 @@ class VMProjectionBase<DISK>
 public:
   enum BitWidths {
     // Bit sizes for VMProjectionMemory fields
-    kVMProjIsPSSeedSize = 0,
+    kVMProjIsPSSeedSize = 1,
     kVMProjRinvSize = 5,
     kVMProjFinePhiSize = 3,
     kVMProjFinePhiWideSize = 5,
     kVMProjFineZSize = 4,
-    kVMProjZBinSize = MEBinsBits+1+1,
+    kVMProjZBinSize = MEBinsBits+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
     kVMProjectionSize = kVMProjIsPSSeedSize + kVMProjRinvSize + kVMProjFineZSize + kVMProjFinePhiSize + kVMProjZBinSize + kVMProjIndexSize
@@ -83,6 +83,14 @@ public:
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv, const bool ps):
     data_( (id, zbin, finez, finephi, rinv, ps) )
   {
+#define DEBUG
+#ifdef DEBUG
+    std::cout << "VMProj received zbin=" << zbin << "\tset zbin=" << getZBin() << std::endl;
+    std::cout << "VMProj received finephi=" << finephi << "\tset finephi=" << getFinePhi() << std::endl;
+    std::cout << "VMProj received finez=" << finez << "\tset finez=" << getFineZ() << std::endl;
+    std::cout << "VMProj received PS=" << ps << "\tset PS=" << getIsPSSeed() << std::endl;
+#endif
+    //setIsPSSeed(ps); // band-aid until I can track down why data_ has the wrong zbin (seems to save zbin<<1)
     //static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
@@ -109,7 +117,8 @@ public:
   #ifndef __SYNTHESIS__
   void Print() {
     edm::LogVerbatim("L1trackHLS") << "VMProjection:" << std::endl;
-    edm::LogVerbatim("L1trackHLS") << std::hex << "VMProjType=" << VMProjType << "\tid=" << getIndex() << "\tzbin=" << getZBin() << "\tfinez" << getFineZ() << "\tfinephi=" << getFinePhi() << "\trinv=" << getRInv() << "\tisPS=" << getIsPSSeed() << std::endl;
+    edm::LogVerbatim("L1trackHLS") << std::hex << "VMProjType=" << VMProjType << "\tid=" << getIndex() << "\tzbin=" << getZBin() << "\tfinez=" << getFineZ() << "\tfinephi=" << getFinePhi() << "\trinv=" << getRInv() << "\tisPS=" << getIsPSSeed() << std::endl;
+    std::cout << "VMProj zbinbits=" << VMProjectionBase<VMProjType>::kVMProjZBinSize << std::endl;
   }
   #endif
 
@@ -145,10 +154,7 @@ public:
   // This getter is only used for projections in BARREL
   bool getIsPSSeed() const {
     //static_assert("VMProjType == BARREL", "Getter should only be used for BARREL projections");
-    if(VMProjType == BARREL)
-      return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
-    else
-      return false;
+    return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
   }
   
   // Setter
