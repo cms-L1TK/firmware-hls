@@ -262,6 +262,51 @@ void readTable(ap_uint<1> table[]){
     }
   }
 
+  if (L==TF::D1) {
+    bool tmp[768]=
+#include "../emData/MP/tables/METable_D1.tab"
+    for (int i=0;i<768;++i){
+#pragma HLS unroll
+      table[i]=tmp[i];
+    }
+  }
+
+  if (L==TF::D2) {
+    bool tmp[768]=
+#include "../emData/MP/tables/METable_D2.tab"
+    for (int i=0;i<768;++i){
+#pragma HLS unroll
+      table[i]=tmp[i];
+    }
+  }
+
+  if (L==TF::D3) {
+    bool tmp[768]=
+#include "../emData/MP/tables/METable_D3.tab"
+    for (int i=0;i<768;++i){
+#pragma HLS unroll
+      table[i]=tmp[i];
+    }
+  }
+
+  if (L==TF::D4) {
+    bool tmp[768]=
+#include "../emData/MP/tables/METable_D4.tab"
+    for (int i=0;i<768;++i){
+#pragma HLS unroll
+      table[i]=tmp[i];
+    }
+  }
+
+  if (L==TF::D5) {
+    bool tmp[768]=
+#include "../emData/MP/tables/METable_D5.tab"
+#pragma HLS unroll
+    for (int i=0;i<768;++i){
+      table[i]=tmp[i];
+    }
+  }
+
 
 
 }
