@@ -16,7 +16,7 @@
 #include "MatchEngineUnit_parameters.h"
 #include "Macros.h"
 
-//#define DEBUG
+#define DEBUG
 //#define DEBUG_ALL
 
 template<int VMProjType> class MatchEngineUnitBase {};
@@ -37,7 +37,7 @@ class MatchEngineUnitBase<DISK> {
   };
 };
 
-template<int VMSMEType, int VMProjType, int AllProjectionType, TF::layerDisk LAYER>
+template<int VMSMEType, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE> //FIXME Remove ASTYPE!
 class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
@@ -104,10 +104,19 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     use_[iuse] = 0;
   } 
   nuse_ = 0;
+  std::cout << "proj=" << projbuffer_.getAllProj() << std::endl;
   if(usefirstMinus) use_[nuse_++] = 0;//(0, 0);
+  if(usefirstMinus) std::cout << "HERE usefirstMinus" << std::endl;
+  std::cout << "nuse_=" << nuse_ << std::endl;
   if(usesecondMinus) use_[nuse_++] = 2;//(1, 0);
+  if(usesecondMinus) std::cout << "HERE usesecondMinus" << std::endl;
+  std::cout << "nuse_=" << nuse_ << std::endl;
   if(usefirstPlus) use_[nuse_++] = 1;//(0, 1);
+  if(usefirstPlus) std::cout << "HERE usefirstPlus" << std::endl;
+  std::cout << "nuse_=" << nuse_ << std::endl;
   if(usesecondPlus) use_[nuse_++] = 3;//(1, 1);
+  if(usesecondPlus) std::cout << "HERE usesecondPlus" << std::endl;
+  std::cout << "proj=" << projbuffer_.getAllProj() << " nuse_=" << nuse_ << " iuse_=" << iuse_ << std::endl;
 
 }
 
@@ -171,13 +180,15 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 #endif
   bool first = usefirstPlus || usefirstMinus;
   bool second = usefirstPlus || usesecondPlus;
-#ifdef DEBUG
+#ifdef DEBUG_ALL
+  if(!empty()){
   std::cout << "use[" << iuse_ << "]=" << use_[iuse_] << std::endl;
   std::cout << "phibin=" << iphi_ << " (iphiSave=" << iphiSave << ") usesecond=" << second << " second_=" << second_ << " equal=" << (second==second_) << std::endl;
   std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
                "usesecondMinus=" << usesecondMinus << "\t" <<
                "usefirstPlus=" << usefirstPlus << "\t" <<
                "usesecondPlus=" << usesecondPlus << std::endl;
+  }
 #endif
 
   //std::cout << "building slot " << (projfinephi__ + sign) << "*" << nbins << "+" << zbin << "+" << useSecond << std::endl;
@@ -207,11 +218,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
      
     //Calculate fine z position
     const int detectorshift(8);
-    if (use_[iusetmp].range(1,1)) {
+    std::cout << "proj=" << projbuffer_.getAllProj() << " before projfinezadj__=" << projfinez << std::endl;
+    if (second_) {
       projfinezadj__ = projfinez-detectorshift;
     } else {
       projfinezadj__ = projfinez;
     }
+    std::cout << "after projfinezadj__=" << projfinezadj__ << " use=(" << use_[iuse_].range(1,1) << "," << use_[iuse_].range(0,0) << ")" << std::endl;
 #ifdef DEBUG_ALL
     std::cout << "post correction projfinez=" << projfinez << std::endl;
 #endif
@@ -226,11 +239,15 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
   }
   //ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphitmp = iphi_;
-#ifdef DEBUG
-  std::cout << iphi_ << "+" << use_[iuse_].range(0,0) << "*" << nbins << "=" << (iphi_ + use_[iuse_].range(0,0)) * nbins << std::endl;
+#ifdef DEBUG_ALL
+  if(!empty()){
+  std::cout << iphi_ << "+" << use_[iuse_].range(0,0) << "*" << nbins << "=" << (iphi_ + use_[iuse_].range(1,1)) * nbins << std::endl;
+  }
 #endif
+  //ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + use_[iuse_].range(1,1);
   ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + (second_ ? -1 : 0) + use_[iuse_].range(1,1);
-#ifdef DEBUG
+#ifdef DEBUG_ALL
+  if(!empty()){
   //std::cout << "use_=" << use_[iuse_].first << ", " << use_[iuse_].second << std::endl;
   std::cout << std::hex << "proj=" << projbuffer_.getAllProj() << std::endl;
   std::cout << "first=" << use_[iuse_].range(1,1) << " second=" << use_[iuse_].range(0,0) << std::endl;
@@ -241,12 +258,15 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   std::cout << "first=" << first << "\tsecond=" << second << std::endl;
   std::cout << "building slot " << (iphi_ + sign) << "*" << nbins << "+" << zbin + (second_ ? -1 : 0) << "+" << useSecond << std::endl;
   std::cout << "building slot " << (iphi_ + second) << "*" << nbins << "+" << zbin + (second_ ? -1 : 0) << "+" << first << std::endl;
-  std::cout << "building slot " << (iphi_  << "+" <<  use_[iuse_].range(0,0)) << "*" << nbins  << "+" <<  zbin + (second_ ? -1 : 0)  << "+" <<  use_[iuse_].range(1,1) << std::endl;
+  std::cout << "building slot " << "(" << iphi_  << "+" <<  use_[iuse_].range(0,0) << ")" << "*" << nbins  << "+" <<  zbin << "+" <<  use_[iuse_].range(1,1) << std::endl;
+  //std::cout << "building slot " << "(" << iphi_  << "+" <<  use_[iuse_].range(0,0) << ")" << "*" << nbins  << "+" <<  zbin + (second_ ? -1 : 0)  << "+" <<  use_[iuse_].range(1,1) << std::endl;
+  std::cout << "slot=" << slot << std::endl;
   std::cout << "istub_=" << istubtmp << std::endl;
   std::cout << "iuse_=" << iuse_ << std::endl;
   std::cout << "nuse_=" << nuse_ << std::endl;
   //std::cout << "iphiSave=" << iphiSave << std::endl;
   //std::cout << "zbin=" << zbin << std::endl;
+  }
 #endif
 #ifdef DEBUG_ALL
   std::cout << std::hex << "slot=" << slot << " istubtmp=" << istubtmp << " zbin=" << zbin << std::endl;
@@ -285,6 +305,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   //auto stubadd=(stubtmp,istubtmp);
   stubdata__ = stubmem[bx_&1][stubadd];
 #ifdef DEBUG
+  if(!empty()){
   if(istub_ == 0 && 0) {
     std::cout << "Stubs in MEU " << unit_ << std::endl;
     for(int i = 0; i < 1024; i++) {
@@ -300,13 +321,16 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
             << std::bitset<kNBits_MemAddrBinned>(istubtmp) << std::endl
             << std::bitset<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize - 1 + kNBits_MemAddrBinned>(slot) << "|"
             << std::bitset<kNBits_MemAddrBinned>(istubtmp) << std::endl;
+  }
 #endif
-#ifdef DEBUG_ALL
-  if(good__) std::cout << std::hex << "MEU " << unit_ << " pipelining stub=" << stubdata__.raw() << " with stubadd=(" << slot << "," << istubtmp << ") stubid=" << stubdata__.getIndex() << " against proj=" << projbuffer_.getAllProj() << std::endl;
-  if(good__) std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
+#ifdef DEBUG
+  if(1){//!empty()){// && good__){
+  std::cout << std::hex << "MEU " << unit_ << " pipelining vmstub=" << stubdata__.raw() << " isPS=" << stubdata__.isPSStub() << " bend=" << stubdata__.getBend() << " stub=" << allstub->read_mem(bx_,stubdata__.getIndex()).raw() << " with stubaddr=(" << slot << "," << istubtmp << ") stubid=" << stubdata__.getIndex() << " against proj=" << projbuffer_.getAllProj() << std::endl;
+  std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
                 "usesecondMinus=" << usesecondMinus << "\t" <<
                 "usefirstPlus=" << usefirstPlus << "\t" <<
                 "usesecondPlus=" << usesecondPlus << std::endl;
+  }
 #endif
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
@@ -317,13 +341,16 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
 
 
-  inline void processPipeLine(ap_uint<1> *table) {
+  inline void processPipeLine(ap_uint<1> *table, const AllStubMemory<ASTYPE>* allstub) {
 #pragma HLS inline
 
     auto stubindex=stubdata___.getIndex();
     auto stubfinez=stubdata___.getFineZ();
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
+    auto isPSStub=allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
+    //auto isPSStub=stubdata___.isPSStub();
+    
     auto stubbendReduced=stubdata___.getBendPSDisk();
 
     const int projfinephibits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
@@ -339,6 +366,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     const int projfinebits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
     const int stubfinebits(VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize);
     bool passphi = isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>()[(projfinephi___,stubfinephi)];
+#ifdef DEBUG_ALL
+    static auto runOnce = false;
+    if(!runOnce) {
+      std::cout << "passphi using" << " projfinephibits=" << projfinephibits <<" StubPhiPositionConsistency::kMax=" << StubPhiPositionConsistency::kMax <<" false=" << false <<" projfinephibits=" << projfinephibits << " stubfinephibits=" << stubfinephibits << std::endl;
+      runOnce = true;
+    }
+#endif
     //std::cout << "passphi=" << passphi << "\t" << isLessThanSize<projfinebits,stubfinebits,false,projfinebits,stubfinebits>()[(projfinephi___,stubfinephi)] << std::endl;
     
     //Check if stub z position consistent
@@ -349,14 +383,22 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     }
     else {
       // check if abs(projfinezadj___ - stubfinez) < StubZPositionBarrelConsistency::kDisk(PS|2S)Max
-      pass = isPSseed___ ? isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)];
+      pass = isPSStub ? isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)];
     }
 
-    auto const index=projrinv___.concat(stubbend);
+    //ap_uint<9> const index=projrinv___.concat(stubbend);
+    //auto const index=projrinv___.concat(stubbend);
+    //ap_uint<VMProjectionBase<VMProjType>::kVMProjRinvSize + VMStubMECMBase<VMSMEType>::kVMSMEBendSize> index = projrinv___.concat(stubbend);
+    //index.range(index.length()-1, index.length()-1) = (isDisk) && isPSseed___;
+    //here we always use the larger number of bits for the bend
 	// Check if stub bend and proj rinv consistent
 	auto const index_part1 = (VMProjType == DISK && isPSseed___) ? projrinv___.concat(stubbendReduced) : projrinv___.concat(stubbend);
 	auto const index_part2 = ((VMProjType == DISK && isPSseed___) ? (1 << (kRInvBits + kNBitBin)) : 0);
-	//auto const index = index_part1 + index_part2;
+	//auto const index = index_part2 + projrinv___.concat(stubbend);//index_part1 + index_part2;
+    const ap_int<1> diskps = isDisk && isPSStub;// (stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1);
+    ///auto const index1 = projrinv___.concat(stubbend);
+    auto const index = (diskps,projrinv___,stubbend);
+    //auto const index = ((stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1),projrinv___,stubbend);
 
     //Check if stub bend and proj rinv consistent
     projseqs_[writeindex_] = projseq____;
@@ -365,18 +407,37 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     
     //Though we did write to matches_ above only now do we increment
     //the writeindex_ if we had a good stub that pass the various cuts
+#ifdef DEBUG
+  if(!empty() || 1){
+    std:: cout << "allpass=" << (good___&passphi&pass&table[index]) << "\tproj=" << projbuffer___.getAllProj() << "\tgood___=" << good___ << "\tpassphi=" << passphi << " (projfinephi=" << projfinephi___ << " - stubfinephi=" << stubfinephi << ") < " << StubPhiPositionConsistency::kMax << "\tpass=" << pass << " (";
+      if(!isDisk) {
+        if(isPSseed___) 
+          std::cout << "projfinezadj___=" << projfinezadj___ << " - stubfinez=" << stubfinez << ") < " << StubZPositionBarrelConsistency::kBarrelPSMax;
+        else
+          std::cout << "projfinezadj___=" << projfinezadj___ << " - stubfinez=" << stubfinez << ") < " << StubZPositionBarrelConsistency::kBarrel2SMax;
+      }
+      else {
+        if(isPSStub) 
+          std::cout << "projfinezadj___=" << projfinezadj___ << " - stubfinez=" << stubfinez << ") < " << StubZPositionDiskConsistency::kDiskPSMax;
+        else
+          std::cout << "projfinezadj___=" << projfinezadj___ << " - stubfinez=" << stubfinez << ") < " << StubZPositionDiskConsistency::kDisk2SMax;
+      }
+      std::cout << "\ttable[" << index << "]=" << table[index] << " (diskps=" << diskps << " projrinv___=" << projrinv___ << " stubbend=" << stubbend << ")" << "\tfor stub=" << allstub->read_mem(bx_,stubdata___.getIndex()).raw() << " with PS=" << stubdata___.isPSStub() << std::endl;
+      stubdata___.Print();
+  }
+#endif
     writeindex_ = (good___&passphi&pass&table[index]) ? writeindexnext : writeindex_;
-#ifdef DEBUG_ALL
+#ifdef DEBUG
     if(writeindex_ == writeindexnext) {
     ap_uint<VMProjectionBase<VMProjType>::kVMProjFineZSize+1> idz = stubfinez - projfinezadj___;
-    std::cout << std::hex << "MEU " << unit_ << " checking stubid=" << stubindex << " (" << std::bitset<8>(stubindex) << ")" << " stub=" << stubdata___.raw() << " against proj=" << projbuffer___.getAllProj() << " with vmproj=" << projbuffer___.getProjection() << std::endl;
+    std::cout << std::hex << "MEU " << unit_ << " checking stubid=" << stubindex << " (" << std::bitset<8>(stubindex) << ")" << " stub=" << allstub->read_mem(bx_,stubdata___.getIndex()).raw() << " vmstub=" << stubdata___.raw() << " against proj=" << projbuffer___.getAllProj() << " with vmproj=" << projbuffer___.getProjection() << std::endl;
     std::cout << "stubfinez=" << stubfinez << " (" << std::bitset<stubfinezbits>(stubfinez) << ")\t" << "projfinezadj___=" << projfinezadj___ << " (" << std::bitset<projfinezbits>(projfinezadj___) << ")\t" << idz << "\t";
     if (!isDisk) {
       if (isPSseed___) std::cout << StubZPositionBarrelConsistency::kBarrelPSMax;
       else std::cout << StubZPositionBarrelConsistency::kBarrel2SMax;
     }
     else {
-      if (isPSseed___) std::cout << StubZPositionDiskConsistency::kDiskPSMax;
+      if (isPSStub) std::cout << StubZPositionDiskConsistency::kDiskPSMax;
       else std::cout << StubZPositionDiskConsistency::kDisk2SMax;
     }
     std::cout << std::endl;

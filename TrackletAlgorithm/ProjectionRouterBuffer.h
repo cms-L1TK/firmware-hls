@@ -135,6 +135,8 @@ public:
     std::cout << "usesecondMinus=" << usesecondMinus << "\t" <<  getUseSecondMinus();
     std::cout << "usefirstPlus=" << usefirstPlus << "\t" <<  getUseFirstPlus();
     std::cout << "usesecondPlus=" << usesecondPlus << "\t" <<  getUseSecondPlus() << std::endl;
+    std::cout << "zbinbits=" << ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize << std::endl;
+    edm::LogVerbatim("L1trackHLS") << std::hex << "PRBufer received " << "usefirstMinus=" << usefirstMinus << "\t" << "usesecondMinus=" << usesecondMinus << "\t" << "usefirstPlus=" << usefirstPlus << "\t" << "usesecondPlus=" << usesecondPlus << "\t" << "allproj=" << allproj << "\t" << "phi=" << phi << "\tivmPlus=" << ivmPlus << "\t" << "tcid=" << tcid << " shift=" << shift << " nstub=" << nstub << " zbin=" << zbin.range(zbin.length()-1,1) << " VMProj zbin=" << VMProjection<VMProjType>(getProjection()).getZBin() << " projid=" << projdata.getIndex() << " proj=" << projdata.raw() << " isPS=" << ps << std::endl;
 #endif
   }
 
