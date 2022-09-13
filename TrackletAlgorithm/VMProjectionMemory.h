@@ -36,7 +36,7 @@ public:
     kVMProjFinePhiSize = 3,
     kVMProjFinePhiWideSize = 5,
     kVMProjFineZSize = 4,
-    kVMProjZBinSize = MEBinsBits+1+1,
+    kVMProjZBinSize = MEBinsBits+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
     kVMProjectionSize = kVMProjIsPSSeedSize + kVMProjRinvSize + kVMProjFineZSize + kVMProjFinePhiSize + kVMProjZBinSize + kVMProjIndexSize
