@@ -1006,7 +1006,7 @@ void MatchCalculator(BXType bx,
   typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
   typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
   typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
-  auto isPSStub = stub.isPSStub();
+  auto isPSStub = stub_ps.isPSStub();
 
   // Projection parameters
 #ifdef DEBUG
@@ -1155,7 +1155,7 @@ void MatchCalculator(BXType bx,
   const typename FullMatch<FMTYPE>::FMTrackletIndex &fm_tkid  = proj_tkid;
   const typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
   const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid  = stubid;
-  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = stub_r;
+  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = (isDisk && isPSStub) ? ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_ps_r) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_r);
   const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
   //const typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
   const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : ap_int<12>(delta_r);
@@ -1736,15 +1736,17 @@ void MatchProcessor(BXType bx,
       ap_uint<4> nstublastMinus= (LAYER < trklet::N_LAYER) ? nvmstubs[zlast][ivmMinus] : nvmstubs[rfirst+rsecond][ivmMinus];
       ap_uint<4> nstubfirstPlus= (LAYER < trklet::N_LAYER) ? nvmstubs[zfirst][ivmPlus] : nvmstubs[rfirst][ivmPlus];
       ap_uint<4> nstublastPlus= (LAYER < trklet::N_LAYER) ? nvmstubs[zlast][ivmPlus] : nvmstubs[rfirst+rsecond][ivmPlus];
+      constexpr bool isDisk = LAYER > TF::L6;
+      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
+      auto slot = zbin.range(zbin.length()-1, 1);
+      nstubfirstMinus = instubdata.getEntries(bx, ivmMinus*nbins + slot);
+      nstublastMinus = instubdata.getEntries(bx, ivmMinus*nbins + slot + 1);
+      nstubfirstPlus = instubdata.getEntries(bx, ivmPlus*nbins + slot);
+      nstublastPlus = instubdata.getEntries(bx, ivmPlus*nbins + slot + 1);
       
       /*
       */
       std::cout << "zfirst=" << zfirst << "\tzlast=" << zlast << "\tivmMinus=" << ivmMinus << "\tivmPlus=" << ivmPlus << std::endl;
-      std::cout << "nstubs=\t"
-                << "nstubfirstMinus=" << nstubfirstMinus << "\t"
-                << "nstublastMinus=" << nstublastMinus << "\t"
-                << "nstubfirstPlus=" << nstubfirstPlus << "\t"
-                << "nstublastPlus=" << nstublastPlus << std::endl;
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
         nstublastPlus = 0;
@@ -1771,15 +1773,12 @@ void MatchProcessor(BXType bx,
 #endif
 
       ap_uint<1> useSecond = zbin.range(0,0) == 1;
-      constexpr bool isDisk = LAYER > TF::L6;
-      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
       /*
       ap_uint<1> usefirstMinus = nstubfirstMinus != 0;
       ap_uint<1> usesecondMinus = (useSecond && (nstublastMinus != 0));
       ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (nstubfirstPlus != 0);
       ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && (useSecond && (nstublastPlus != 0));
       */
-      auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<1> usefirstMinus = instubdata.getEntries(bx, ivmMinus*nbins + slot) != 0;//nstubfirstMinus != 0;
       ap_uint<1> usesecondMinus = useSecond && (instubdata.getEntries(bx, ivmMinus*nbins + slot + 1) != 0);//(useSecond && nstublastMinus != 0);
       ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (instubdata.getEntries(bx, ivmPlus*nbins + slot) != 0);//ivmPlus != ivmMinus && nstubfirstPlus != 0;
@@ -1812,14 +1811,21 @@ void MatchProcessor(BXType bx,
       std::cout << "izproj=" << izproj << "\tzfirstlast=" << zbin << "\t" << "zbin=" << zbin(zbin.length()-1, 1) << "\tsecond=" << useSecond << "\tfinez=" << finez << std::endl;
         std::cout << "Sending " << allproj.raw() << " to PR buffer ";
         std::cout << "rinv=" << rinv << "\t" << " ";
-        std::cout << "VMProj with zbin=" << zbin << "\t" << std::endl;
+        std::cout << "VMProj with zbin=" << zbin << "\t";
+      std::cout << "nstubs=\t"
+                << "nstubfirstMinus=" << nstubfirstMinus << "\t"
+                << "nstublastMinus=" << nstublastMinus << "\t"
+                << "nstubfirstPlus=" << nstubfirstPlus << "\t"
+                << "nstublastPlus=" << nstublastPlus << std::endl;
+        std::cout << "instub entries[rfirst]=" << instubdata.getEntries(bx, ivmMinus*nbins + rfirst) << std::endl;
+        //std::cout << "instub entries[ivmMinus][rfirst]=" << instubdata.getEntries(bx, ivmMinus)[rfirst] << std::endl;
         std::cout << "ProjBuffer with zbin=" << projbuffertmp.getPhi() << " (ivmPlus=" << ivmPlus << " ivmMinus=" << ivmMinus << ")" << " type=" << VMPTYPE << std::endl;
         std::cout << "useSecond=" << useSecond << "\t" << zbin.range(0,0) << std::endl;
         std::cout << "nstubs=" << nstublastPlus << "\t" << nstubfirstPlus << "\t" << nstublastMinus << "\t" << nstubfirstMinus << std::endl;
-        std::cout << instubdata.getEntries(bx, ivmMinus*nbins + zfirst) << "\t"
-                  << instubdata.getEntries(bx, ivmMinus*nbins + zfirst + 1) << "\t"
-                  << instubdata.getEntries(bx, ivmPlus*nbins + zfirst) << "\t"
-                  << instubdata.getEntries(bx, ivmPlus*nbins + zfirst + 1) << "\t" << std::endl;
+        std::cout << instubdata.getEntries(bx, ivmMinus*nbins + rfirst) << "\t"
+                  << instubdata.getEntries(bx, ivmMinus*nbins + rfirst + 1) << "\t"
+                  << instubdata.getEntries(bx, ivmPlus*nbins + rfirst) << "\t"
+                  << instubdata.getEntries(bx, ivmPlus*nbins + rfirst + 1) << "\t" << std::endl;
         std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
                      "usesecondMinus=" << usesecondMinus << "\t" <<
                      "usefirstPlus=" << usefirstPlus << "\t" <<
