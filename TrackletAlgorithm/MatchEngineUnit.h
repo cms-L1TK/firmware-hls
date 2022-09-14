@@ -129,8 +129,8 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   bool nearfull = nearFull();
 
   good__ = (!idle_) && (!nearfull);
-#ifdef DEBUG_ALL
-  std::cout << "good__=" << good__ << "(!idle_=" << !idle_ << " !nearfull=" << !nearfull << ")" << std::endl;
+#ifdef DEBUG
+  std::cout << std::hex << "proj=" << projbuffer_.getAllProj() << "good__=" << good__ << "(!idle_=" << !idle_ << " !nearfull=" << !nearfull << ")" << std::endl;
 #endif
 
   // Buffer still has projections to read out
@@ -153,7 +153,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   constexpr regionType APTYPE = TF::layerDiskRegion[LAYER];
   //auto tmpproj = AllProjection<APTYPE>(projbuffer_.getAllProj());
   int sign = isDisk ? (projbuffer_.getPhiDer() < 0 ? -1 : 1) : 0;
-#ifdef DEBUG_ALL
+#ifdef DEBUG
   std::cout << "projfinephi__=" << projfinephi__ << " sign=" << sign << std::endl;
   //int sign = 1;
   std::cout << "usesecondMinus=(useSecond=" << useSecond << " & " << (nstubs_.range(7,4) != 0) << ")" << std::endl;
@@ -246,7 +246,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 #endif
   //ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + use_[iuse_].range(1,1);
   ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + (second_ ? -1 : 0) + use_[iuse_].range(1,1);
-#ifdef DEBUG_ALL
+#ifdef DEBUG
   if(!empty()){
   //std::cout << "use_=" << use_[iuse_].first << ", " << use_[iuse_].second << std::endl;
   std::cout << std::hex << "proj=" << projbuffer_.getAllProj() << std::endl;
@@ -307,7 +307,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 #ifdef DEBUG
   if(!empty()){
   if(istub_ == 0 && 0) {
-    std::cout << "Stubs in MEU " << unit_ << std::endl;
+    std::cout << "Stubs in MEU " << unit_ << " for proj=" << projbuffer_.getAllProj() << std::endl;
     for(int i = 0; i < 1024; i++) {
       std::cout << "stubmem[" << (bx_&1) << "][" << i << "]=" << stubmem[bx_&1][i].raw() << std::endl;
       //if(stubmem[bx_&1][i].raw() > 0) std::cout << "stubmem[" << (bx_&1) << "][" << i << "]=" << stubmem[bx_&1][i].raw() << std::endl;
@@ -326,6 +326,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 #ifdef DEBUG
   if(1){//!empty()){// && good__){
   std::cout << std::hex << "MEU " << unit_ << " pipelining vmstub=" << stubdata__.raw() << " isPS=" << stubdata__.isPSStub() << " bend=" << stubdata__.getBend() << " stub=" << allstub->read_mem(bx_,stubdata__.getIndex()).raw() << " with stubaddr=(" << slot << "," << istubtmp << ") stubid=" << stubdata__.getIndex() << " against proj=" << projbuffer_.getAllProj() << std::endl;
+  stubdata__.Print();
   std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
                 "usesecondMinus=" << usesecondMinus << "\t" <<
                 "usefirstPlus=" << usefirstPlus << "\t" <<
@@ -397,7 +398,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 	//auto const index = index_part2 + projrinv___.concat(stubbend);//index_part1 + index_part2;
     const ap_int<1> diskps = isDisk && isPSStub;// (stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1);
     ///auto const index1 = projrinv___.concat(stubbend);
-    auto const index = (diskps,projrinv___,stubbend);
+    auto const index = diskps ? (diskps,projrinv___,stubbendReduced) : (diskps,projrinv___,stubbend);
     //auto const index = ((stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1),projrinv___,stubbend);
 
     //Check if stub bend and proj rinv consistent
