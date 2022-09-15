@@ -174,7 +174,6 @@ public:
     if(ASType == BARRELPS) return true;
     else if(ASType == BARREL2S) return false;
     else if(ASType == DISKPS || ASType == DISK2S) {
-      std::cout << std::hex << "stub=" << data_ << " PS bits not 000 " << data_.range(kASRMSB-1, kASRMSB-3) << std::endl; // Check highest 3 bits regardless of template type
       return data_.range(getWidth()-1, getWidth()-3) > 0; // Check highest 3 bits regardless of template type
     }
   }
