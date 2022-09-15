@@ -36,7 +36,7 @@ public:
     kVMProjFinePhiSize = 3,
     kVMProjFinePhiWideSize = 5,
     kVMProjFineZSize = 4,
-    kVMProjZBinSize = MEBinsBits+1,
+    kVMProjZBinSize = MEBinsBits+1+1,
     kVMProjIndexSize = 7,
     // Bit size for full VMProjectionMemory
     kVMProjectionSize = kVMProjIsPSSeedSize + kVMProjRinvSize + kVMProjFineZSize + kVMProjFinePhiSize + kVMProjZBinSize + kVMProjIndexSize
@@ -83,7 +83,6 @@ public:
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv, const bool ps):
     data_( (id, zbin, finez, finephi, rinv, ps) )
   {
-#define DEBUG
 #ifdef DEBUG
     std::cout << "VMProj received zbin=" << zbin << "\tset zbin=" << getZBin() << std::endl;
     std::cout << "VMProj received finephi=" << finephi << "\tset finephi=" << getFinePhi() << std::endl;
