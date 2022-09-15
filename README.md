@@ -231,7 +231,9 @@ vivado vsim.xpr
 
 and start the simulation from GUI (first time will take long).
 
-### Synthesis
+### Implementation
+
+#### Apollo
 
 **Step 2: Create an ipbb project area**
 
@@ -247,3 +249,18 @@ ipbb ipbus gendecoders
 ipbb vivado generate-project synth -j8 impl -j8 package
 ```
 
+#### Serenity
+
+**Step 2: Create an ipbb project area**
+
+```
+ipbb proj create vivado serenity firmware-hls: 'serenity.dep'
+cd proj/serenity
+```
+
+**Step 3: Compile**
+
+```
+ipbb ipbus gendecoders
+ipbb vivado generate-project synth -j8 impl -j8 package
+```
