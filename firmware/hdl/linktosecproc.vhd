@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-27
--- Last update: 2022-08-18
+-- Last update: 2022-07-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ begin  -- architecture rtl
   --     in_dout  => s_tracklet_data
   --     );
 
-  GEN_DELAYED_DATA: for i in 0 to 24 generate
+  GEN_DELAYED_DATA: for i in 0 to 16 generate
     p_delay_data: process (clk_i) is
     begin  -- process p_delay_data
       if rising_edge(clk_i) then     -- rising clock edge
@@ -88,23 +88,23 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   -- Connect input link data to IR in Sector Processor
   -----------------------------------------------------------------------------
-  DL_39_link_AV_DOUT(PS10G_1_A) <= s_din_d(4).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_A) <= s_din_d(5).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_B) <= s_din_d(6).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_d(7).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_B) <= s_din_d(8).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_d(9).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_B)    <= s_din_d(10).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_d(11).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_B)    <= s_din_d(12).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_d(13).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_B)  <= s_din_d(14).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_d(15).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_B)  <= s_din_d(20).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(21).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_B)  <= s_din_d(22).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(23).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_B)  <= s_din_d(24).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_A) <= s_din_d(0).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_A) <= s_din_d(1).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_B) <= s_din_d(2).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_d(3).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_B) <= s_din_d(4).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_d(5).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_B)    <= s_din_d(6).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_d(7).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_B)    <= s_din_d(8).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_d(9).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_B)  <= s_din_d(10).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_d(11).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_B)  <= s_din_d(12).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(13).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_B)  <= s_din_d(14).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(15).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_B)  <= s_din_d(16).data(38 downto 0);
 
   -----------------------------------------------------------------------------
   -- Generate start signal
@@ -112,13 +112,13 @@ begin  -- architecture rtl
   set_reset_ffd_1 : entity work.set_reset_ffd
     port map (
       clk_i   => clk_i,
-      set_i   => din_i(4).valid,
+      set_i   => din_i(0).valid,
       reset_i => rst_i,
       q_o     => s_ir_start_srff
       );
 
 
-  s_ir_start <= din_i(4).valid or s_ir_start_srff;
+  s_ir_start <= din_i(0).valid or s_ir_start_srff;
   ir_start_o <= s_ir_start;
 
   p_bx_count : process (clk_i) is

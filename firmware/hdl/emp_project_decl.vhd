@@ -20,13 +20,8 @@ constant CLOCK_RATIO       : integer               :=  6;
 constant PAYLOAD_LATENCY: integer := 816;
 
 constant REGION_CONF : region_conf_array_t := (
-  0  => kDummyRegion, -- service
-  1  => (gty25, buf, no_fmt, buf, gty25),
-  2  => (gty25, buf, no_fmt, buf, gty25),
-  3  => (gty25, buf, no_fmt, buf, gty25),
-  4  => kDummyRegion, -- tcds
-  5  => (gty25, buf, no_fmt, buf, gty25),
-  6  => (gty25, buf, no_fmt, buf, gty25),
+  0 to 1 => ( no_mgt, buf, no_fmt, buf,    no_mgt ),
+  2 to 4 => ( no_mgt, buf, no_fmt, no_buf, no_mgt ),
   others => kDummyRegion
 );
 
