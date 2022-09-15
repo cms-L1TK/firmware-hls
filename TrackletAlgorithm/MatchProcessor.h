@@ -1045,11 +1045,6 @@ void MatchCalculator(BXType bx,
   auto isPSStub = stub_ps.isPSStub();
 
   // Projection parameters
-#ifdef DEBUG
-    std::cout << std::hex << "stub=" << stub.raw() << std::endl;
-    std::cout << std::hex << "stub_2s=" << stub_2s.raw() << std::endl;
-    std::cout << std::hex << "proj=" << proj.raw() << std::endl;
-#endif
   typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
   typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
   typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
@@ -1074,43 +1069,15 @@ void MatchCalculator(BXType bx,
   ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
   ap_int<12> r_corr        = full_r_corr >> kr_corr_shift; // only keep needed bits
     std::string ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
-#ifdef DEBUG
-    std::cout << "layer=" << ld[LAYER] << std::endl;
-    std::cout << std::hex << "proj=" << proj.raw() << std::endl;
-    std::cout << "stubid=" << stubid << std::endl;
-    std::cout << "proj_seed=" << proj_seed << "\t" << ld[proj_seed] << std::endl;
-    std::cout << std::hex << "(iz) stub_z=" << stub_z << "\t" << std::bitset<AllStubBase<ASTYPE>::kASZSize>(stub_z) << std::endl;
-    std::cout << "(iz) stub_ps_z=" << stub_ps_z << "\t" << std::bitset<AllStubBase<DISKPS>::kASZSize>(stub_ps_z) << std::endl;
-    std::cout << "(iz) stub_2s_z=" << stub_2s_z << "\t" << std::bitset<AllStubBase<DISK2S>::kASZSize>(stub_2s_z) << std::endl;
-    std::cout << "stub_z bits=" << AllStubBase<ASTYPE>::kASZSize << std::endl;
-#endif
    
   // Apply the corrections
   const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
-#ifdef DEBUG
-    std::cout << "(iphi) proj_phi=" << proj_phi << "\t" << std::bitset<AllProjectionBase<APTYPE>::kAProjPhiSize>(proj_phi) << std::endl;
-    std::cout << "(iphicorr) phi_corr=" << phi_corr << std::endl;
-#endif
   ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction iphi in emulation
-#ifdef DEBUG
-    std::cout << "(iphi) proj_phi_corr=" << proj_phi_corr << "\t" << std::bitset<kProj_phi_len>(proj_phi_corr) << std::endl;
-#endif
   ap_int<13> proj_z_corr   = proj_z + z_corr;      // original proj z plus z correction
-#ifdef DEBUG
-    std::cout << "stub_phi=" << stub_phi << std::endl;
-    std::cout << "stub_2s_phi=" << stub_2s_phi << std::endl;
-#endif
 
   // Get phi and z difference between the projection and stub
   ap_int<12> delta_z        = stub_z - proj_z_corr;
-#ifdef DEBUG
-    std::cout << "delta_z=" << delta_z << "\t" << std::bitset<12>(delta_z) << std::endl;
-#endif
   ap_int<14> delta_z_fact   = delta_z * kFact;
-#ifdef DEBUG
-    std::cout << "kFact=" << kFact << std::endl;
-    std::cout << "delta_z_fact=" << delta_z_fact << "\t" << std::bitset<12>(delta_z_fact) << std::endl;
-#endif
   const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   //ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
@@ -1123,15 +1090,8 @@ void MatchCalculator(BXType bx,
     shiftstubphi = kPhi0_shift > 0 ? stub_2s_phi << kPhi0_shift : stub_2s_phi;                        // shift
   }
   ap_int<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
-#ifdef DEBUG
-    std::cout << "(iphi) shiftprojphi=" << shiftprojphi << std::endl;
-    std::cout << "(iphi) shiftstubphi=" << shiftstubphi << std::endl;
-#endif
   constexpr int dphibit = 20;
   ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
-#ifdef DEBUG
-    std::cout << "deltaphi=" << delta_phi << "\t" << std::bitset<dphibit>(delta_phi) << std::endl;
-#endif
   ap_uint<3> shiftprojz     = 7;
   ap_int<7> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
   if(isDisk && isPSStub)
@@ -1139,14 +1099,7 @@ void MatchCalculator(BXType bx,
   else if(isDisk)
     proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
   const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
-#ifdef DEBUG
-    std::cout << "(ircorr) proj_r_corr=" << proj_r_corr << std::endl;
-    std::cout << "(ir) proj_r_long=" << proj_r_long << std::endl;
-#endif
   ap_uint<1> shiftr         = 1;
-#ifdef DEBUG
-    std::cout << "isPSStub=" << isPSStub << std::endl;
-#endif
   ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
   ap_uint<12> tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)] : LUT_matchcut_rDSS[ap_uint<12>(stub_r)]; //FIXME
 
@@ -1158,33 +1111,12 @@ void MatchCalculator(BXType bx,
     tmp_stubr = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
     delta_r   = ((tmp_stubr >> shiftr) - proj_r_long); // proj_z = RZ
     ap_uint<4> alpha_shift = 12;
-    std::cout << "alpha_cor=" << ap_int<24>(delta_r)  << "*" << stub_2s_alpha << "*" << alpha_fact << "=" << ap_int<24>(delta_r) * stub_2s_alpha * alpha_fact << std::endl;
-    std::cout << "alpha_cor=" << ap_int<24>(delta_r)  << "*" << stub_2s_alpha << "*" << alpha_fact << ">> 12 =" << ((ap_int<24>(delta_r) * stub_2s_alpha * alpha_fact)>>12) << std::endl;
     ap_uint<12> alpha_corr = ap_int<24>(ap_int<24>(delta_r) * stub_2s_alpha * alpha_fact) >> alpha_shift;
-#ifdef DEBUG
-      std::cout << "(ialpha) stub_2s_alpha=" << stub_2s_alpha << "\t" << std::bitset<AllStub<DISK2S>::kASAlphaSize>(stub_2s_alpha) << std::endl;
-      std::cout << "(ialphafact) alpha_fact=" << alpha_fact << "\t" << std::bitset<LUT_matchcut_alpha_width>(alpha_fact) << std::endl;
-      std::cout << "(iphialphacor) alpha_corr=" << alpha_corr << "\t" << std::bitset<12>(alpha_corr) << std::endl;
-#endif
     delta_phi += alpha_corr;
-    std::cout << "deltaphi=" << delta_phi << "\t" << std::bitset<dphibit>(delta_phi) << std::endl;
   }
   constexpr int adphibit = isDisk ? 12 : 17;
-#ifdef DEBUG
-    std::cout << "(ircorr) proj_r_corr=" << proj_r_corr << std::endl;
-#endif
   ap_uint<dphibit> abs_delta_phi = iabs<adphibit>( delta_phi );    // absolute value of delta phi
   ap_int<12> abs_delta_r    = iabs<11>( delta_r );
-#ifdef DEBUG
-    std::cout << "(ideltaphi) delta_phi=" << delta_phi << "\t" << std::bitset<9>(delta_phi) << std::endl;
-    std::cout << "|(ideltaphi)| abs_delta_phi=" << abs_delta_phi << "\t" << std::bitset<9>(abs_delta_phi) << std::endl;
-    std::cout << "(irstub) stub_r=" << stub_r << "\t" << std::bitset<AllStub<ASTYPE>::kASRSize>(stub_r) << std::endl;
-    std::cout << "(irstub) stub_ps_r=" << stub_ps_r << "\t" << std::bitset<AllStub<DISKPS>::kASRSize>(stub_ps_r) << std::endl;
-    std::cout << "(irstub) stub_2s_r=" << stub_2s_r << "\t" << std::bitset<AllStub<DISK2S>::kASRSize>(stub_2s_r) << std::endl;
-    std::cout << "(irstubr) tmp_stubr=" << tmp_stubr << "\t" << std::bitset<AllStub<DISK2S>::kASRSize>(tmp_stubr) << std::endl;
-    std::cout << "(ideltar) delta_r=" << delta_r << "\t" << std::bitset<12>(delta_r) << std::endl;
-    std::cout << "|(ideltar)| delta_r=" << delta_r << "\t" << std::bitset<12>(abs_delta_r) << std::endl;
-#endif
 
   // Full match parameters
   const typename FullMatch<FMTYPE>::FMTCID          &fm_tcid  = proj_tcid;
@@ -1198,18 +1130,6 @@ void MatchCalculator(BXType bx,
   
   // Full match  
   FullMatch<FMTYPE> fm(fm_tcid,fm_tkid,fm_asphi,fm_asid,fm_stubr,fm_phi,fm_z);
-#ifdef DEBUG
-    std::cout << "fm_tcid=" << std::bitset<7>(fm_tcid) << "\t"
-              << "fm_tkid=" << std::bitset<7>(fm_tkid) << "\t"
-              << "fm_asphi=" << std::bitset<3>(fm_asphi) << "\t"
-              << "fm_asid=" << std::bitset<7>(fm_asid) << "\t"
-              << "fm_stubr=" << std::bitset<12>(fm_stubr) << "\t"
-              << "delta_phi=" << std::bitset<12>(delta_phi) << "\t";
-     if(!isDisk)
-              std::cout << "delta_z=" << std::bitset<9>(delta_z) << std::endl;
-     else
-              std::cout << "delta_r=" << std::bitset<7>(delta_r) << std::endl;
-#endif
 
   //-----------------------------------------------------------------------------------------------------------
   //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
@@ -1220,13 +1140,7 @@ void MatchCalculator(BXType bx,
   }
   
   // For first tracklet, pick up the phi cut value
-#ifdef DEBUG
-    std::cout << "best_delta_z=" << best_delta_z << std::endl;
-#endif
   best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
-#ifdef DEBUG
-    std::cout << "best_delta_z=" << best_delta_z << std::endl;
-#endif
   best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
   if(newtracklet) {
     //Initialize to LUT value +1. We accept matches with delta phi <= LUT value, but
@@ -1236,68 +1150,17 @@ void MatchCalculator(BXType bx,
     if(isPSStub) {
       best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
       best_delta_r = LUT_matchcut_PSr[proj_seed];
-#ifdef DEBUG
-        std::cout << "best_delta_r=" << best_delta_r << std::endl;
-#endif
     }
     else  {
       best_delta_rphi = LUT_matchcut_2Srphi[proj_seed];
       best_delta_r = LUT_matchcut_2Sr[proj_seed];
-#ifdef DEBUG
-        std::cout << "best_delta_r=" << best_delta_r << std::endl;
-#endif
     }
   }
 
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
-#ifdef DEBUG
-    std::cout << "LUT_matchcut_z[proj_seed]=" << LUT_matchcut_z[proj_seed] << std::endl;
-    std::cout << "delta_z_fact < LUT_matchcut_z[proj_seed]=" << (delta_z_fact < LUT_matchcut_z[proj_seed]) << std::endl;
-    std::cout << "delta_z_fact >= -LUT_matchcut_z[proj_seed]=" << (delta_z_fact >= -LUT_matchcut_z[proj_seed]) << std::endl;
-    std::cout << "delta_z_fact < best_delta_z=" << (delta_z_fact < best_delta_z) << std::endl;
-    std::cout << "delta_z_fact >= -best_delta_z=" << (delta_z_fact >= -best_delta_z) << std::endl;
-    std::cout << "best_delta_z=" << best_delta_z << std::endl;
-    std::cout << "-best_delta_z=" << -best_delta_z << std::endl;
-    std::cout << "abs_delta_phi <= best_delta_phi=" << (abs_delta_phi <= best_delta_phi) << std::endl;
-    std::cout << "best_delta_phi=" << best_delta_phi << std::endl;
-    std::cout << "LUT_matchcut_PSr[proj_seed]=" << LUT_matchcut_PSr[proj_seed] << std::endl;
-    std::cout << "LUT_matchcut_2Sr[proj_seed]=" << LUT_matchcut_2Sr[proj_seed] << std::endl;
-    std::cout << "abs_delta_r=" << abs_delta_r << std::endl;
-    std::cout << "best_delta_r=" << best_delta_r << std::endl;
-    std::cout << "best_delta_rphi=" << best_delta_rphi << "\t" << std::bitset<20>(best_delta_rphi) << std::endl;
-    std::cout << "(idrphicut) LUT_matchcut_PSrphi[proj_seed]=" << LUT_matchcut_PSrphi[proj_seed] << std::endl;
-    std::cout << "(idrphicut) LUT_matchcut_2Srphi[proj_seed]=" << LUT_matchcut_2Srphi[proj_seed] << std::endl;
-    std::cout << "(idrcut) LUT_matchcut_2Sr[proj_seed]=" << LUT_matchcut_2Sr[proj_seed] << std::endl;
-    std::cout << "((abs_delta_phi * stub_ps_r) < best_delta_rphi)=" << ((abs_delta_phi * stub_ps_r) < best_delta_rphi) << std::endl;
-    std::cout << "(abs_delta_phi * stub_ps_r)=" << (abs_delta_phi * stub_ps_r) << std::endl;
-    std::cout << "(abs_delta_phi * tmp_stubr)=" << (abs_delta_phi * tmp_stubr) << std::endl;
-    std::cout << "((abs_delta_phi * tmp_stubr) \t best_delta_rphi)=" << (abs_delta_phi * tmp_stubr) << "\t" << best_delta_rphi << std::endl;
-    std::cout << "((abs_delta_phi * tmp_stubr) < best_delta_rphi)=" << ((abs_delta_phi * tmp_stubr) < best_delta_rphi) << std::endl;
-    std::cout << "(abs_delta_r < best_delta_r)=" << (abs_delta_r < best_delta_r) << std::endl;
-    std::cout << "((delta_phi * stub_ps_r) < best_delta_rphi) && (abs_delta_r < best_delta_r)=" << (((delta_phi * stub_ps_r) < best_delta_rphi) && (abs_delta_r < best_delta_r)) << std::endl;
-    std::cout << "((delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r)=" << (((delta_phi * tmp_stubr) < best_delta_rphi) && (abs_delta_r < best_delta_r)) << std::endl;
-    std::cout << "isPSStub=" << isPSStub << std::endl;
-#endif
   bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
-#ifdef DEBUG
-    std::cout << "barrel_match=" << barrel_match << std::endl;
-    std::cout << "disk_match=" << disk_match << std::endl;
-#endif
   if ((!isDisk && barrel_match) || (isDisk && disk_match)){
-#ifdef DEBUG
-    std::cout << "FullMatch=" << fm.raw() << std::endl;
-    std::cout << "FullMatch=" << std::bitset<7>(fm_tcid) << "|"
-              << std::bitset<7>(fm_tkid) << "|"
-              << std::bitset<3>(fm_asphi) << "|"
-              << std::bitset<7>(fm_asid) << "|"
-              << std::bitset<12>(fm_stubr) << "|"
-              << std::bitset<12>(fm_phi) << "|";
-    if(!isDisk)
-              std::cout << std::bitset<9>(fm_z) << std::endl;
-    else
-              std::cout << std::bitset<7>(fm_z) << std::endl;
-#endif
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     if(isDisk) {
@@ -1314,9 +1177,6 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding 
-#ifdef DEBUG
-    std::cout << "FullMatch with proj=" << proj.raw() << std::endl;
-#endif
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
@@ -1507,7 +1367,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll      
     (nvmstubs[izbin][7],nvmstubs[izbin][6],nvmstubs[izbin][5],nvmstubs[izbin][4],
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
-    std::cout << "izbin=" << izbin << "\t" << nvmstubs[izbin][7] << "\t" << nvmstubs[izbin][6] << "\t" << nvmstubs[izbin][5] << "\t" << nvmstubs[izbin][4] << "\t" << nvmstubs[izbin][3] << "\t" << nvmstubs[izbin][2] << "\t" << nvmstubs[izbin][1] << "\t" << nvmstubs[izbin][0] << "\t" << std::endl;
   }
   */
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
@@ -1540,13 +1399,6 @@ void MatchProcessor(BXType bx,
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
-#ifdef DEBUG
-      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
-      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
-      
-      if(!emptys[iMEU]) (stubindex,allprojdata) = matchengine[iMEU].peek();
-      if(!emptys[iMEU]) std::cout << std::hex << "MEU " << iMEU << " with proj=" << matchengine[iMEU].getProjection() << " has a match!" << " with stub=" << allstub->read_mem(bx,stubindex).raw() << " stubid=" << stubindex << std::endl;
-#endif
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
     }
@@ -1609,7 +1461,6 @@ void MatchProcessor(BXType bx,
 
       if(idle && !empty && !init) {
         init =  true;
-        std::cout << "Sending to MEU proj=" << tmpprojbuff.getAllProj() << " zbin=" << VMProjection<VMPTYPE>(tmpprojbuff.getProjection()).getZBinNoFlag() << std::endl;
         meu.init(bx, tmpprojbuff, istep);
       }
       //can not get to here on first cycle, but compile don't seem to realize 
@@ -1635,10 +1486,6 @@ void MatchProcessor(BXType bx,
       
       lastTrkID = trkindex;
 
-#ifdef DEBUG
-      std::cout << "MEU " << bestiMEU << " had a match!" << std::endl;
-      std::cout << "Sending to MC proj=" << allproj.raw() << " with stub=" << allstub->read_mem(bx,stubindex).raw() << " stubid=" << stubindex << std::endl;
-#endif
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
         (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
@@ -1679,7 +1526,6 @@ void MatchProcessor(BXType bx,
       ap_int<6> zbin6 = izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
       //The -1 here is due to not using the full range of bits. Should be fixed.
       ap_uint<8> rbin8 = izproj >> (izproj.length()-8-1);//izproj.range(izproj.length()-1,izproj.length()-8-1);
-      std::cout << "proj=" << projdata_.raw() << " izproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjRZSize>(izproj) << "\t" << "rbin8=" << std::bitset<8>(rbin8) << std::endl;
 
       //The first and last zbin the projection points to
       constexpr int nZbinBits = ProjectionRouterBuffer<VMPTYPE, APTYPE>::kPRBufferZBinSize - 1; // zbin = (zfirst,zflag)
@@ -1688,7 +1534,6 @@ void MatchProcessor(BXType bx,
 
       //(zfirst, zlast) = zbinLUT[(psseed,zbin6)];
       ap_uint<nRbinBits> rbin = rbinLUT[rbin8];
-      std::cout << "rbinLUT[" << rbin8 << "]=" << std::bitset<8>(rbinLUT[rbin8]) << std::endl;
       typename VMProjection<VMPTYPE>::VMPFINEZ finer = rbin >> nZbinBits;
       rtmp = rbin.range(nZbinBits, 0);
       rfirst = rtmp >> 1;
@@ -1698,8 +1543,6 @@ void MatchProcessor(BXType bx,
       rfirst = (izder.range(izder.length()-1, izder.length()-1)  == 1) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
       //rfirst = (projdata_.getRZDer()>0) ? rfirst : ap_uint<nZbinBits>(rfirst + (1<<nRbinBits));
-      std::cout << "proj=" << projdata_.raw() << "\tizder=" << izder << "\t" << std::bitset<TrackletProjectionBase<APTYPE>::kTProjRZDSize>(izder) << "\trfirst=" << rfirst << std::endl;
-      std::cout << "finer=" << finer << "\t" << "rfirst=" << rfirst << "\t" << "rsecond=" << rsecond << std::endl;
       //rbin.range(nZbinBits+1, 1) = (projdata_.getRZDer()>0) ? rbin.range(nZbinBits, 1) : rbin.range(nZbinBits+1, 1) + (1<<kNbitsrzbin);
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (LAYER < trklet::N_LAYER) ? (zfirst, zfirst!=zlast) : (rfirst,rsecond);
@@ -1745,25 +1588,13 @@ void MatchProcessor(BXType bx,
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
-#ifdef DEBUG
-      if(LAYER < trklet::N_LAYER) std::cout << "LAYER=L" << LAYER + 1 << std::endl;
-      else std::cout << "DISK=D" << LAYER - trklet::N_LAYER + 1 << std::endl;
-      std::cout << "iphiproj.length()=" << iphiproj.length() << "\tnbins_vmme=" << nbins_vmme << "\tnbits_vmme=" << nbits_vmme << "\tnbits_all=" << nbits_all << std::endl;
-#endif
       //iphi = iphiproj.range(iphiproj.length()-nbins_vmme-1,iphiproj.length()-nbits_all-nbits_vmme);
       //iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
       //iphi = (iphiproj >> (iphiproj.length() - 1 - (nbits_vmme + nbits_all))) & (nbins_vmme - 1);//iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
                 //<< (iphiproj >> (iphiproj.length() - 1 - (nbits_vmme + nbits_all)) & (nbins_vmme - 1)) << std::endl;
       
       constexpr int kNfineBits = 3;
-#ifdef DEBUG
-      std::cout << "proj=" << projdata_.raw() << " iphiproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj) << std::endl;
-      std::cout << "(iphiproj >> (" << iphiproj.length() << " - " << (nvmbits_ + kNfineBits) << ")=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj>> (iphiproj.length() - (nvmbits_ + kNfineBits))) << std::endl;
-#endif
       typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = (iphiproj >> (iphiproj.length() - (nvmbits_ + kNfineBits))) & ((1 << kNfineBits) - 1);
-#ifdef DEBUG
-      std::cout << "proj=" << projdata_.raw() << " finephi=" << finephi << std::endl;
-#endif
       /*
       typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,
                                       iphiproj.length()-nbits_all-nbits_vmme-3); 
@@ -1826,13 +1657,6 @@ void MatchProcessor(BXType bx,
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
-#ifdef DEBUG
-      std::cout << "finez=" << finez << "\t" << "finer=" << finer << std::endl;
-      std::cout << "iphiproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj) << std::endl;
-      std::cout << "iphiproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj >> (iphiproj.length() - overlapbits -  nextrabits)) << std::endl;
-      std::cout << "extrabits=" << ((1<<nextrabits) - 1) << "\t" << std::bitset<nextrabits+1>((1<<nextrabits) - 1) << std::endl;
-      std::cout << "overlapbits=" << overlapbits << "\textrabits=" << extrabits << std::endl;
-#endif
 
       ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
