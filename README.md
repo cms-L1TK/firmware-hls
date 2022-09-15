@@ -244,6 +244,6 @@ cd proj/apollo
 
 ```
 ipbb ipbus gendecoders
-ipbb vivado generate-project synth impl package
+ipbb vivado generate-project synth -j8 impl -j8 package
 ```
 
