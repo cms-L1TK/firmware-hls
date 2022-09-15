@@ -16,8 +16,8 @@
 #include "MatchEngineUnit_parameters.h"
 #include "Macros.h"
 
-#define DEBUG
-//#define DEBUG_ALL
+#define DEBUG false
+#define DEBUG_ALL false
 
 template<int VMProjType> class MatchEngineUnitBase {};
 
@@ -98,7 +98,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   bool usefirstPlus = projbuffer_.getUseFirstPlus();
   bool usesecondPlus = projbuffer_.getUseSecondPlus();
 #ifdef DEBUG
-  std::cout << "received" << std::endl;
+  std::cout << "received" << " zbin=" << VMProjection<VMProjType>(projbuffer_.getProjection()).getZBinNoFlag() << std::endl;
         std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
                      "usesecondMinus=" << usesecondMinus << "\t" <<
                      "usefirstPlus=" << usefirstPlus << "\t" <<
@@ -110,19 +110,19 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     use_[iuse] = 0;
   } 
   nuse_ = 0;
-  std::cout << "proj=" << projbuffer_.getAllProj() << std::endl;
+  //std::cout << "proj=" << projbuffer_.getAllProj() << std::endl;
   if(usefirstMinus) use_[nuse_++] = 0;//(0, 0);
-  if(usefirstMinus) std::cout << "HERE usefirstMinus" << std::endl;
-  std::cout << "nuse_=" << nuse_ << std::endl;
+  //if(usefirstMinus) std::cout << "HERE usefirstMinus" << std::endl;
+  //std::cout << "nuse_=" << nuse_ << std::endl;
   if(usesecondMinus) use_[nuse_++] = 2;//(1, 0);
-  if(usesecondMinus) std::cout << "HERE usesecondMinus" << std::endl;
-  std::cout << "nuse_=" << nuse_ << std::endl;
+  //if(usesecondMinus) std::cout << "HERE usesecondMinus" << std::endl;
+  //std::cout << "nuse_=" << nuse_ << std::endl;
   if(usefirstPlus) use_[nuse_++] = 1;//(0, 1);
-  if(usefirstPlus) std::cout << "HERE usefirstPlus" << std::endl;
-  std::cout << "nuse_=" << nuse_ << std::endl;
+  //if(usefirstPlus) std::cout << "HERE usefirstPlus" << std::endl;
+  //std::cout << "nuse_=" << nuse_ << std::endl;
   if(usesecondPlus) use_[nuse_++] = 3;//(1, 1);
   if(usesecondPlus) std::cout << "HERE usesecondPlus" << std::endl;
-  std::cout << "proj=" << projbuffer_.getAllProj() << " nuse_=" << nuse_ << " iuse_=" << iuse_ << std::endl;
+  //std::cout << "proj=" << projbuffer_.getAllProj() << " nuse_=" << nuse_ << " iuse_=" << iuse_ << std::endl;
 
 }
 
@@ -188,7 +188,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
   bool second = usefirstPlus || usesecondPlus;
 #ifdef DEBUG_ALL
   if(!empty()){
-  std::cout << "use[" << iuse_ << "]=" << use_[iuse_] << std::endl;
+  std::cout << std::hex << "proj=" << projbuffer_.getAllProj() << " use_[" << iuse_ << "]=" << use_[iuse_] << std::endl;
   std::cout << "phibin=" << iphi_ << " (iphiSave=" << iphiSave << ") usesecond=" << second << " second_=" << second_ << " equal=" << (second==second_) << std::endl;
   std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<
                "usesecondMinus=" << usesecondMinus << "\t" <<
@@ -226,7 +226,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     std::cout << "proj=" << projbuffer_.getAllProj() << " before projfinezadj__=" << projfinez << std::endl;
     if (second_) {
       projfinezadj__ = projfinez-detectorshift;
-      zbin=zbin+1;
+      //zbin=zbin+1;
     } else {
       projfinezadj__ = projfinez;
     }
@@ -261,10 +261,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
   std::cout << iphi_ << "+" << use_[iuse_].range(0,0) << "*" << nbins << "=" << (iphi_ + use_[iuse_].range(1,1)) * nbins << std::endl;
   }
 #endif
-  //ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + use_[iuse_].range(1,1);
-  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + (second_ ? -1 : 0) + use_[iuse_].range(1,1);
+  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + use_[iuse_].range(1,1);
+  //ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + (second_ ? -1 : 0) + use_[iuse_].range(1,1);
 #ifdef DEBUG
-  if(!empty()){
+  if(!empty() || 1){
   //std::cout << "use_=" << use_[iuse_].first << ", " << use_[iuse_].second << std::endl;
   std::cout << std::hex << "proj=" << projbuffer_.getAllProj() << std::endl;
   std::cout << "first=" << use_[iuse_].range(1,1) << " second=" << use_[iuse_].range(0,0) << std::endl;
@@ -273,9 +273,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
                "usefirstPlus=" << usefirstPlus << "\t" <<
                "usesecondPlus=" << usesecondPlus << std::endl;
   std::cout << "first=" << first << "\tsecond=" << second << std::endl;
+  std::cout << std::hex << "proj=" << projbuffer_.getAllProj() << std::endl;
+  std::cout << "zbin=" << zbin << std::endl;
+  std::cout << "use_[" << iuse_ << "]=" << use_[iuse_] << std::endl;
   std::cout << "building slot " << (iphi_ + sign) << "*" << nbins << "+" << zbin + (second_ ? -1 : 0) << "+" << useSecond << std::endl;
   std::cout << "building slot " << (iphi_ + second) << "*" << nbins << "+" << zbin + (second_ ? -1 : 0) << "+" << first << std::endl;
   std::cout << "building slot " << "(" << iphi_  << "+" <<  use_[iuse_].range(0,0) << ")" << "*" << nbins  << "+" <<  zbin << "+" <<  use_[iuse_].range(1,1) << std::endl;
+  std::cout << "stubtmp=" << (iphiSave,zbin) << std::endl;
   //std::cout << "building slot " << "(" << iphi_  << "+" <<  use_[iuse_].range(0,0) << ")" << "*" << nbins  << "+" <<  zbin + (second_ ? -1 : 0)  << "+" <<  use_[iuse_].range(1,1) << std::endl;
   std::cout << "slot=" << slot << std::endl;
   std::cout << "istub_=" << istubtmp << std::endl;

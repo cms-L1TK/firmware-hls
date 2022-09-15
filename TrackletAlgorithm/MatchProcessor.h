@@ -1555,6 +1555,7 @@ void MatchProcessor(BXType bx,
 
       if(idle && !empty && !init) {
         init =  true;
+        std::cout << "Sending to MEU proj=" << tmpprojbuff.getAllProj() << " zbin=" << VMProjection<VMPTYPE>(tmpprojbuff.getProjection()).getZBinNoFlag() << std::endl;
         meu.init(bx, tmpprojbuff, istep);
       }
       //can not get to here on first cycle, but compile don't seem to realize 
@@ -1602,6 +1603,7 @@ void MatchProcessor(BXType bx,
       auto iphiproj = projdata_.getPhi();
       auto izproj = projdata_.getZ();
       auto iphider = projdata_.getPhiDer();
+      auto izder = projdata_.getRZDer();
       auto trackletid = projdata_.getTCID();
       
       // PS seed
@@ -1648,10 +1650,12 @@ void MatchProcessor(BXType bx,
       rfirst = rtmp >> 1;
       rsecond = rtmp & 1;
       //(finer,rfirst,rsecond) = rbin;//.range(nZbinBits, 0);
-      rfirst = (iphider < 0) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
-      std::cout << "finer=" << finer << "\t" << "rfirst=" << rfirst << "\t" << "rsecond=" << rsecond << std::endl;
+      //rfirst = izder < 0 ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
+      rfirst = (izder.range(izder.length()-1, izder.length()-1)  == 1) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
       //rfirst = (projdata_.getRZDer()>0) ? rfirst : ap_uint<nZbinBits>(rfirst + (1<<nRbinBits));
+      std::cout << "proj=" << projdata_.raw() << "\tizder=" << izder << "\t" << std::bitset<TrackletProjectionBase<APTYPE>::kTProjRZDSize>(izder) << "\trfirst=" << rfirst << std::endl;
+      std::cout << "finer=" << finer << "\t" << "rfirst=" << rfirst << "\t" << "rsecond=" << rsecond << std::endl;
       //rbin.range(nZbinBits+1, 1) = (projdata_.getRZDer()>0) ? rbin.range(nZbinBits, 1) : rbin.range(nZbinBits+1, 1) + (1<<kNbitsrzbin);
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (LAYER < trklet::N_LAYER) ? (zfirst, zfirst!=zlast) : (rfirst,rsecond);
@@ -1708,10 +1712,14 @@ void MatchProcessor(BXType bx,
                 //<< (iphiproj >> (iphiproj.length() - 1 - (nbits_vmme + nbits_all)) & (nbins_vmme - 1)) << std::endl;
       
       constexpr int kNfineBits = 3;
+#ifdef DEBUG
       std::cout << "proj=" << projdata_.raw() << " iphiproj=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj) << std::endl;
       std::cout << "(iphiproj >> (" << iphiproj.length() << " - " << (nvmbits_ + kNfineBits) << ")=" << std::bitset<TrackletProjectionBase<PROJTYPE>::kTProjPhiSize>(iphiproj>> (iphiproj.length() - (nvmbits_ + kNfineBits))) << std::endl;
+#endif
       typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = (iphiproj >> (iphiproj.length() - (nvmbits_ + kNfineBits))) & ((1 << kNfineBits) - 1);
+#ifdef DEBUG
       std::cout << "proj=" << projdata_.raw() << " finephi=" << finephi << std::endl;
+#endif
       /*
       typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,
                                       iphiproj.length()-nbits_all-nbits_vmme-3); 
@@ -1838,7 +1846,7 @@ void MatchProcessor(BXType bx,
       nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
          projin, projdata, nproj);
-      std::cout << "Loading proj=" << projdata.raw() << " into MP" << std::endl;
+      //std::cout << "Loading proj=" << projdata.raw() << " into MP" << std::endl;
  
     } else {
       validin = false;
