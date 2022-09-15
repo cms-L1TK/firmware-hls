@@ -83,12 +83,6 @@ public:
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv, const bool ps):
     data_( (id, zbin, finez, finephi, rinv, ps) )
   {
-#ifdef DEBUG
-    std::cout << "VMProj received zbin=" << zbin << "\tset zbin=" << getZBin() << std::endl;
-    std::cout << "VMProj received finephi=" << finephi << "\tset finephi=" << getFinePhi() << std::endl;
-    std::cout << "VMProj received finez=" << finez << "\tset finez=" << getFineZ() << std::endl;
-    std::cout << "VMProj received PS=" << ps << "\tset PS=" << getIsPSSeed() << std::endl;
-#endif
     //setIsPSSeed(ps); // band-aid until I can track down why data_ has the wrong zbin (seems to save zbin<<1)
     //static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
@@ -117,7 +111,6 @@ public:
   void Print() {
     edm::LogVerbatim("L1trackHLS") << "VMProjection:" << std::endl;
     edm::LogVerbatim("L1trackHLS") << std::hex << "VMProjType=" << VMProjType << "\tid=" << getIndex() << "\tzbin=" << getZBin() << "\tfinez=" << getFineZ() << "\tfinephi=" << getFinePhi() << "\trinv=" << getRInv() << "\tisPS=" << getIsPSSeed() << std::endl;
-    std::cout << "VMProj zbinbits=" << VMProjectionBase<VMProjType>::kVMProjZBinSize << std::endl;
   }
   #endif
 
