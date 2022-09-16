@@ -1834,7 +1834,7 @@ void MatchProcessor(BXType bx,
       ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (instubdata.getEntries(bx, ivmPlus*nbins + slot) != 0);//ivmPlus != ivmMinus && nstubfirstPlus != 0;
       ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && (useSecond && (instubdata.getEntries(bx, ivmPlus*nbins + slot + 1) != 0));//ivmPlus != ivmMinus && (useSecond && nstublastPlus != 0);
 
-      ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), iphi, ivmMinus, ivmPlus, shift, trackletid, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
+      ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, shift, trackletid, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
       //ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, shift, trackletid, nstubs, zbin.range(zbin.length()-1, 1), vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
       //projbuffertmp.Print();
       projbufferarray.saveProjection(projbuffertmp);
