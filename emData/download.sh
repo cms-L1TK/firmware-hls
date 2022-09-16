@@ -327,8 +327,9 @@ do
   elif [[ ${module_type} == "MP" ]]
   then
           layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "ProjectionDiskRadius.tab" -exec ls -lrth {} \;
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "PR_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "MP_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ls -lrth {} \;
           #find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
