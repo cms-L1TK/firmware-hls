@@ -300,9 +300,6 @@ namespace MC {
   const auto LUT_matchcut_rDSS_width = 12;
   const auto LUT_matchcut_rDSS_depth = 10;
 
-  constexpr int log2(int number, int acc = 0) {
-      return number <= 1 ? acc : log2(number / 2, acc + 1);
-  }
 }
 
 // Template to get look up tables
@@ -767,8 +764,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
   if(type==MC::RBEND) { // alphainner cuts (//for disks only)
     if (L==TF::D1){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/PR_ProjectionBend_D1.tab")
-#  include "../emData/MP/tables/PR_ProjectionBend_D1.tab"
+#if __has_include("../emData/MP/tables/MP_ProjectionBend_D1.tab")
+#  include "../emData/MP/tables/MP_ProjectionBend_D1.tab"
 #else
       {};
 #endif
@@ -776,8 +773,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D2){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/PR_ProjectionBend_D2.tab")
-#  include "../emData/MP/tables/PR_ProjectionBend_D2.tab"
+#if __has_include("../emData/MP/tables/MP_ProjectionBend_D2.tab")
+#  include "../emData/MP/tables/MP_ProjectionBend_D2.tab"
 #else
       {};
 #endif
@@ -785,8 +782,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/PR_ProjectionBend_D3.tab")
-#  include "../emData/MP/tables/PR_ProjectionBend_D3.tab"
+#if __has_include("../emData/MP/tables/MP_ProjectionBend_D3.tab")
+#  include "../emData/MP/tables/MP_ProjectionBend_D3.tab"
 #else
       {};
 #endif
@@ -794,8 +791,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     if (L==TF::D3){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/PR_ProjectionBend_D3.tab")
-#  include "../emData/MP/tables/PR_ProjectionBend_D3.tab"
+#if __has_include("../emData/MP/tables/MP_ProjectionBend_D3.tab")
+#  include "../emData/MP/tables/MP_ProjectionBend_D3.tab"
 #else
       {};
 #endif
@@ -803,8 +800,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D4){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/PR_ProjectionBend_D4.tab")
-#  include "../emData/MP/tables/PR_ProjectionBend_D4.tab"
+#if __has_include("../emData/MP/tables/MP_ProjectionBend_D4.tab")
+#  include "../emData/MP/tables/MP_ProjectionBend_D4.tab"
 #else
       {};
 #endif
@@ -812,8 +809,8 @@ void readTable_rbend(ap_uint<width> table[depth]){
     }
     else if (L==TF::D5){
       ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/PR_ProjectionBend_D5.tab")
-#  include "../emData/MP/tables/PR_ProjectionBend_D5.tab"
+#if __has_include("../emData/MP/tables/MP_ProjectionBend_D5.tab")
+#  include "../emData/MP/tables/MP_ProjectionBend_D5.tab"
 #else
       {};
 #endif
@@ -1030,7 +1027,7 @@ void MatchCalculator(BXType bx,
   ap_int<18> full_r_corr   = stub_z * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
   //ap_uint<3> shifttmp = 6;
-  constexpr auto shifttmp = (LAYER < trklet::N_LAYER) ? MC::log2(kphi / (krprojdisk * kphider)) : MC::log2(kphi / (kz * kphiderdisk));
+  constexpr auto shifttmp = (LAYER < trklet::N_LAYER) ? log2barrel : log2disk;
   if(isDisk && isPSStub)
     phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
   else if(isDisk && !isPSStub)
@@ -1155,7 +1152,7 @@ void MatchCalculator(BXType bx,
   const typename FullMatch<FMTYPE>::FMTrackletIndex &fm_tkid  = proj_tkid;
   const typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
   const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid  = stubid;
-  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = (isDisk && isPSStub) ? ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_ps_r) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_r);
+  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = isDisk ? (isPSStub ? ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_ps_r) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_2s_r)) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_r);
   const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
   //const typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
   const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : ap_int<12>(delta_r);
