@@ -91,6 +91,9 @@ then
   rm -f LUTs.tar.gz
 fi
 
+# Temporarily use an outdated wiring for the barrel-only config
+cp -fv old_barrel_config_wiring/*.dat LUTsBarrel/
+
 # Run scripts to generate top functions in TopFunctions/
 ### full config
 ./generate_IR.py     -w LUTs/wires.dat -o ../TopFunctions
