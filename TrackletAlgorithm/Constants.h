@@ -109,8 +109,8 @@ constexpr double kphiprojdisk = 6.17494e-05;
 constexpr double kphiprojderdisk = 1.64665e-05;
 constexpr double krprojdisk = 0.0585938;
 constexpr double krprojderdisk = 0.0078125;
-constexpr int log2barrel = 3;//log2(kphi / (krprojdisk * kphider));
-constexpr int log2disk = 6;//log2(kphi / (kz * kphiderdisk));
+constexpr int log2barrel = log2(kphi / (krprojdisk * kphider));
+constexpr int log2disk = log2(kphi / (kz * kphiderdisk));
 
 // cut constants for TC
 constexpr int ifactor = 469;
