@@ -33,7 +33,8 @@ namespace PR
 #pragma HLS unroll
       ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
       nentries[i] = num;
-      if (num > 0) mem_hasdata.set(i);
+      //if (num > 0) mem_hasdata.set(i);
+      mem_hasdata[i] = (num > 0); //can't use if statement with rewind
     }
   }
   
@@ -45,13 +46,16 @@ namespace PR
                   const MemType inmem[nMEM])
   {
 #pragma HLS inline
-    for(int i = 0; i < nMEM; ++i) {
-#pragma HLS unroll
-    
-      if (read_imem == i) {
-        data = inmem[i].read_mem(bx, read_addr);
-      }
-    }
+
+    data = inmem[read_imem].read_mem(bx, read_addr);
+
+    //for(int i = 0; i < nMEM; ++i) {
+    //#pragma HLS unroll
+    //
+    //  if (read_imem == i) {
+    //    data = inmem[i].read_mem(bx, read_addr);
+    //  }
+    //}
   }
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
@@ -61,10 +65,12 @@ namespace PR
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // memory pointers
                        const MemType mem[nMEM],
-                       DataType& data, int& nproj)
+                       DataType& data)
   {
 #pragma HLS inline
     if (mem_hasdata == 0) return false;
+
+    ap_uint<kNBits_MemAddr> read_addr_next = read_addr + 1;
 
     // 5 bits memory index for up to 32 input memories
     // priority encoder
@@ -73,15 +79,13 @@ namespace PR
     // read the memory "read_imem" with the address "read_addr"
     read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, mem);
 
-    // Increase the read address
-    ++read_addr;
-
-    if (read_addr >= nentries[read_imem]) {
+    if (read_addr_next >= nentries[read_imem]) {
       // All entries in the memory[read_imem] have been read out
       // Prepare to move to the next non-empty memory
       read_addr = 0;
       mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
-      nproj++;
+    } else {
+      read_addr = read_addr_next;
     }
 
     return true;
@@ -180,8 +184,8 @@ void readTable(ap_uint<1> table[]){
   if (L==TF::L5) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L5.tab"
-#pragma HLS unroll
     for (int i=0;i<512;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -189,8 +193,8 @@ void readTable(ap_uint<1> table[]){
   if (L==TF::L6) {
     bool tmp[512]=
 #include "../emData/ME/tables/METable_L6.tab"
-#pragma HLS unroll
     for (int i=0;i<512;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
@@ -315,7 +319,6 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubid,
-                     BXType& bx_o,
                      int &nmcout1,
                      int &nmcout2,
                      int &nmcout3,
@@ -328,6 +331,7 @@ void MatchCalculator(BXType bx,
 ){
 
 #pragma HLS inline
+#pragma HLS array_partition variable=fullmatch complete dim=1
 
   using namespace PR;
 
@@ -496,8 +500,6 @@ void MatchCalculator(BXType bx,
     savedMatch = 1;
   }
   
-  bx_o = bx;
-  
 } //end MC
 
 //////////////////////////////
@@ -526,7 +528,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
-
+  //FIXME moved this into main loop - jf
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
@@ -537,7 +539,7 @@ void MatchProcessor(BXType bx,
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin, projin);
-  
+
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -560,7 +562,6 @@ void MatchProcessor(BXType bx,
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
-  auto nproj=0;
 
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
@@ -569,12 +570,16 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+  
 
-#ifndef __SYNTHESIS__
+
   for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll
+  matchengine[iMEU].reset();
+#ifndef __SYNTHESIS__
     matchengine[iMEU].setUnit(iMEU);
-  }
 #endif
+  }
 
   //These are used inside the MatchCalculator method and needs to be retained between iterations
   ap_uint<1> savedMatch;
@@ -599,7 +604,7 @@ void MatchProcessor(BXType bx,
   }
 
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
-#pragma HLS PIPELINE II=1 //rewind
+#pragma HLS PIPELINE II=1 rewind
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -640,6 +645,8 @@ void MatchProcessor(BXType bx,
     std::cout << std::endl;
     */
 
+     
+    //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
     ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
@@ -654,22 +661,29 @@ void MatchProcessor(BXType bx,
     ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
 
     ap_uint<1> hasMatch = !emptys[bestiMEU];
-
     
-    /* old code - keep for now
+    if (hasMatch) {
+      matchengine[bestiMEU].advance();
+    }
+
+    /*
+    // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
-#pragma HLS ARRAY_PARTITION variable=trkids complete dim=0
+#pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
   MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
   MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
 #pragma HLS unroll
-	smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
-        smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
+	//smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
+        //smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
+	smallest[iMEU1] = smallest[iMEU1] & (projseqs[iMEU1]<projseqs[iMEU2]);
+        smallest[iMEU2] = smallest[iMEU2] & (projseqs[iMEU2]<projseqs[iMEU1]);
       }
     }
       
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
+
     */
 
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff = projbufferarray.peek();;
@@ -688,8 +702,10 @@ void MatchProcessor(BXType bx,
         init =  true;
         meu.init(bx, tmpprojbuff, istep);
       }
-
-      else meu.step(instubdata.getMem(iMEU));
+      //can not get to here on first cycle, but compile don't seem to realize 
+      //this and fail to reach II=1
+      else if (istep != 0) meu.step(instubdata.getMem(iMEU));
+      
 
       meu.processPipeLine(table[iMEU]);      
 
@@ -701,7 +717,7 @@ void MatchProcessor(BXType bx,
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
       
       (stubindex,allprojdata) = matches[bestiMEU];
-      matchengine[bestiMEU].advance();
+      //matchengine[bestiMEU].advance();
       AllProjection<APTYPE> allproj(allprojdata);
 
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
@@ -711,7 +727,7 @@ void MatchProcessor(BXType bx,
       lastTrkID = trkindex;
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, stubindex, bx_o,
+	(bx, newtracklet, savedMatch, best_delta_phi, allstub, allproj, stubindex,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
 	 fullmatch);
     } //end MC if
@@ -845,7 +861,7 @@ void MatchProcessor(BXType bx,
 	TrackletProjectionMemory<PROJTYPE>,
 	nINMEM, kNBits_MemAddr+1>
 	(bx, mem_hasdata, numbersin, mem_read_addr,
-         projin, projdata, nproj);
+         projin, projdata);
  
     } else {
       validin = false;
@@ -853,6 +869,7 @@ void MatchProcessor(BXType bx,
 
   } //end loop
 
+  bx_o = bx;
 
 } // end MatchProcessor()
 

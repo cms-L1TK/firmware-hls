@@ -240,7 +240,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
-
+#pragma HLS latency min = 12 //this ensures latencies of different vmrs match in a reduced configuration.
 		bool noStubsLeft = !hasStubs.or_reduce(); // Determines if we have processed all stubs. Is true if hasStubs is all 0s
 		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S
@@ -281,9 +281,13 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		AllStub<OutType> allstub = (disk2S) ? stubDisk2S.raw() : stub.raw();
 
 		// Write stub to all memory copies
-		for (int n = 0; n < nAllCopies; n++) {
+		// It seems that the if (nAllCopies > 0) should not be needed,
+		// but if nAllCopies is zero it generates an error in vivado_hls
+		if (nAllCopies > 0) {
+		  for (int n = 0; n < nAllCopies; n++) {
 #pragma HLS UNROLL
-			memoriesAS[n].write_mem(bx, allstub, i);
+		    memoriesAS[n].write_mem(bx, allstub, i);
+		  }
 		}
 
 #if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)

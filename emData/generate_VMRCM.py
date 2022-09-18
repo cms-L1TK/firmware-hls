@@ -61,6 +61,8 @@ def getDictOfMemories(wireconfig, vmr_list):
             mem_dict["IL_DISK2S_" + vmr] = []
         if "VMSTE_" + vmr not in mem_dict:
             mem_dict["VMSTE_" + vmr] = []
+        if "AS_" + vmr not in mem_dict:
+            mem_dict["AS_" + vmr] = []
         if "ASI_" + vmr not in mem_dict:
             mem_dict["ASI_" + vmr] = []
 

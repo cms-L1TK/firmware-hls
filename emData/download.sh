@@ -11,6 +11,9 @@ luts_url_reduced="https://cernbox.cern.ch/index.php/s/U84ZI1vGnVKkQKc/download"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/index.php/s/Nk0VWN7kRMZSFWm/download"
 luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
+# Reduced Combined modules                                                      
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
+luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -75,6 +78,9 @@ then
   wget -O LUTs.tgz --quiet ${luts_url_barrel}
   tar -xzf LUTs.tgz
   mv LUTs LUTsBarrel
+  wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
@@ -117,14 +123,23 @@ mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+### reduced combined config                                                                                                                    
+mkdir -p ../TopFunctions/ReducedCombinedConfig
+./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
 cd ../ # needed for older versions of git
 git submodule init
 git submodule update
-cd emData/
-cp -fv LUTs/wires.dat LUTs/memorymodules.dat LUTs/processingmodules.dat project_generation_scripts/
-cd project_generation_scripts/
+cd emData/project_generation_scripts/
+cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
+./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
+cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
 ### IRVMR
@@ -163,6 +178,12 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
+### Reduced Combined IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -181,6 +202,11 @@ then
   mv MemPrints MemPrintsBarrel
   rm -f MemPrints.tgz
 
+  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsReducedCM
+  rm -f MemPrints.tgz
+
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzf MemPrints.tgz
   mv MemPrints MemPrintsCM
@@ -189,7 +215,6 @@ then
   wget -O MemPrints.tar.gz --quiet ${memprints_url}
   tar -xzf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
-
 fi
 
 # Needed in order for awk to run successfully:
@@ -258,6 +283,8 @@ do
           seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TP_${seed}.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;

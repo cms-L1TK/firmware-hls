@@ -34,7 +34,9 @@ entity tf_mem is
     RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
-    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE" --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
+    NAME            : string := "MEMNAME";          --! Name of mem for printout
+    DEBUG           : boolean := false             --! If true prints debug info
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -114,6 +116,9 @@ process(clka)
   variable addr_in_page : integer := 0;
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
+    if DEBUG then
+      report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+    end if;
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -130,6 +135,9 @@ begin
       end if;
     end if;
     if (wea='1') then
+      if DEBUG then
+        report "tm_mem "&NAME&" writeaddr "&to_bstring(addra)&" "&to_bstring(dina);
+      end if;
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
@@ -148,6 +156,9 @@ process(clkb)
 begin
   if rising_edge(clkb) then
     if (enb='1') then
+      if DEBUG then
+        report "tm_mem "&NAME&" readaddr "&to_bstring(addrb);
+      end if;
       sv_RAM_row <= sa_RAM_data(to_integer(unsigned(addrb)));
     end if;
   end if;
