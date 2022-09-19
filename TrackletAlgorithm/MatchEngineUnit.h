@@ -370,9 +370,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     auto stubfinez=stubdata___.getFineZ();
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
-    auto isPSStub=allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
-    //auto isPSStub=stubdata___.isPSStub();
-    
+    auto isPSStub=stubdata___.isPSStub();
     auto stubbendReduced=stubdata___.getBendPSDisk();
 
     const int projfinephibits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
@@ -418,9 +416,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 	auto const index_part2 = ((VMProjType == DISK && isPSseed___) ? (1 << (kRInvBits + kNBitBin)) : 0);
 	//auto const index = index_part2 + projrinv___.concat(stubbend);//index_part1 + index_part2;
     const ap_int<1> diskps = isDisk && isPSStub;// (stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1);
-    ///auto const index1 = projrinv___.concat(stubbend);
     auto const index = diskps ? (diskps,projrinv___,stubbendReduced) : (diskps,projrinv___,stubbend);
-    //auto const index = ((stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1),projrinv___,stubbend);
 
     //Check if stub bend and proj rinv consistent
     projseqs_[writeindex_] = projseq___;
