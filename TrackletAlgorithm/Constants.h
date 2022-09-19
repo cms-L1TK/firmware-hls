@@ -99,7 +99,6 @@ constexpr double kz0 = 0.0585938;
 
 // layer projection digitization constants
 constexpr double kphiproj456 = 7.71867e-06;
-constexpr double kphiderdisk = kphi / kr / 128;
 constexpr double kphider = 8.23325e-06;
 constexpr double kzproj = 0.0585938;
 constexpr double kzder = 0.015625;
@@ -109,8 +108,8 @@ constexpr double kphiprojdisk = 6.17494e-05;
 constexpr double kphiprojderdisk = 1.64665e-05;
 constexpr double krprojdisk = 0.0585938;
 constexpr double krprojderdisk = 0.0078125;
-constexpr int log2barrel = log2(kphi / (krprojdisk * kphider));
-constexpr int log2disk = log2(kphi / (kz * kphiderdisk));
+constexpr int log2barrel = 3;
+constexpr int log2disk = 6;
 
 // cut constants for TC
 constexpr int ifactor = 469;
