@@ -779,7 +779,7 @@ set_property USER_SLR_ASSIGNMENT VMR_L6PHID_group [get_cells {VMR_L6PHID  VMR_L6
 
 # Implementation
 update_compile_order -fileset sources_1
-launch_runs impl_1 -jobs 8
+launch_runs impl_1 -jobs 21
 wait_on_run impl_1
 
 # Make reports

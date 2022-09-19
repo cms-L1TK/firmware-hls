@@ -28,7 +28,7 @@ set_property -name {STEPS.SYNTH_DESIGN.TCL.PRE} -value [get_files pre.tcl -of [g
 
 # Synthesis
 update_compile_order -fileset sources_1
-launch_runs synth_1 -jobs 8
+launch_runs synth_1 -jobs 21
 wait_on_run synth_1
 
 # Make reports
