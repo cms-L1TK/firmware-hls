@@ -1584,7 +1584,7 @@ void MatchProcessor(BXType bx,
       std::cout << "Sending to MC proj=" << allproj.raw() << " with stub=" << allstub->read_mem(bx,stubindex).raw() << " stubid=" << stubindex << std::endl;
 #endif
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex, bx_o,
+        (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
@@ -1842,7 +1842,7 @@ void MatchProcessor(BXType bx,
       TrackletProjectionMemory<PROJTYPE>,
       nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
-         projin, projdata, nproj);
+         projin, projdata);
       //std::cout << "Loading proj=" << projdata.raw() << " into MP" << std::endl;
  
     } else {

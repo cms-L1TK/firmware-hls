@@ -128,7 +128,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
 
 
-inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
+inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024], const AllStubMemory<ASTYPE>* allstub) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
@@ -564,7 +564,7 @@ inline typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TRKID get
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
   if (idle_&&!good__&&!good__t&&!good___) {
-    typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID tmp(0);
+    typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TRKID tmp(0);
     return ~tmp;
   }
   if (good___) {
@@ -656,7 +656,7 @@ inline void advance() {
  bool empty_;
  VMStubMECM<VMSMEType> stubdata__, stubdata__t, stubdata___; 
  typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TCID tcid_;
- ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
+ ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;
  bool isPSseed_;
 
@@ -669,12 +669,12 @@ inline void advance() {
  typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::VMPZBINNOFLAG zbin;
 
  //Pipeline variables
- bool good__, good___;
- ap_uint<VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize> projfinephi__, projfinephi___;
+ bool good__, good__t, good___;
+ ap_uint<VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize> projfinephi__, projfinephi___, projfinephi__t;
  ap_uint<VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize> projfinezadj__, projfinezadj__t, projfinezadj___;
- bool isPSseed__, isPSseed___;
- typename VMProjection<VMProjType>::VMPRINV projrinv__, projrinv___;
- ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer__, projbuffer___;
+ bool isPSseed__, isPSseed__t, isPSseed___;
+ typename VMProjection<VMProjType>::VMPRINV projrinv__, projrinv___, projrinv__t;
+ ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer__, projbuffer___, projbuffer__t;
  ap_uint<kNBits_MemAddr> projseq__, projseq__t, projseq___;
 
 enum StubZPositionBarrelConsistency {
