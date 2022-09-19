@@ -62,18 +62,23 @@ void TrackBuilder(
   ap_uint<kNBitsTBBuffer> disk_read_index[NFMDisk];
   ap_uint<kNBitsTBBuffer> barrel_write_index[NFMBarrel];
   ap_uint<kNBitsTBBuffer> disk_write_index[NFMDisk];
+  ap_uint<1> barrel_valid[NFMBarrel];
+  ap_uint<1> disk_valid[NFMDisk];
 #pragma HLS array_partition variable=barrel_mem_index complete dim=0
 #pragma HLS array_partition variable=disk_mem_index complete dim=0
 #pragma HLS array_partition variable=barrel_read_index complete dim=0
 #pragma HLS array_partition variable=disk_read_index complete dim=0
 #pragma HLS array_partition variable=barrel_write_index complete dim=0
 #pragma HLS array_partition variable=disk_write_index complete dim=0
+#pragma HLS array_partition variable=barrel_valid complete dim=0
+#pragma HLS array_partition variable=disk_valid complete dim=0
 
   initialize_barrel_indices : for (short i = 0; i < NFMBarrel; i++) {
 #pragma HLS unroll
     barrel_mem_index[i] = 0;
     barrel_read_index[i] = 0;
     barrel_write_index[i] = 0;
+    barrel_valid[i] = 0;
   }
 
   initialize_disk_indices : for (short i = 0; i < NFMDisk; i++) {
@@ -81,6 +86,7 @@ void TrackBuilder(
     disk_mem_index[i] = 0;
     disk_read_index[i] = 0;
     disk_write_index[i] = 0;
+    disk_valid[i] = 0;
   }
 
   IndexType nTracks = 0;
@@ -90,10 +96,6 @@ void TrackBuilder(
 
     const ap_uint<1> empty = (i < kNStages);
     TrackletIDType min_id = kInvalidTrackletID;
-    ap_uint<1> barrel_valid[NFMBarrel];
-    ap_uint<1> disk_valid[NFMDisk];
-#pragma HLS array_partition variable=barrel_valid complete dim=0
-#pragma HLS array_partition variable=disk_valid complete dim=0
 
     // First determine the minimum tracklet ID from the current set of full
     // matches.
