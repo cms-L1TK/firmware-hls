@@ -190,11 +190,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
         )
         for i in range(0, nTPARMem):
-            topFile.write("#pragma HLS resource variable=trackletParameters[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS resource variable=trackletParameters[" + str(i) + "].get_mem() latency=3\n")
         for i in range(0, nBarrelFMMem):
-            topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=3\n")
         for i in range(0, nDiskFMMem):
-            topFile.write("#pragma HLS resource variable=diskFullMatches[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS resource variable=diskFullMatches[" + str(i) + "].get_mem() latency=3\n")
         topFile.write(
             "#pragma HLS interface register port=bx_o\n"
             "#pragma HLS array_partition variable=barrelStubWords complete dim=1\n"
