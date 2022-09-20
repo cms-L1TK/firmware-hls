@@ -117,8 +117,6 @@ package tf_pkg is
   -- ########################### Functions ################################################################
   function clogb2     (bit_depth : integer) return integer;
 
-  function getDirSCRIPT return string;
-
   function to_bstring(sl : std_logic) return string;
 
   function to_bstring(slv : std_logic_vector) return string;
@@ -190,21 +188,6 @@ package body tf_pkg is
   function clogb2 (bit_depth : integer) return integer is
   begin
     return integer( ceil( log2( real( bit_depth ) ) ) );
-  end;
-
-
-  --! @brief Returns directory path to script/
-  function getDirSCRIPT return string is
-  begin
-    if IS_SIMULATION then
-      -- Sim path specified relative to Vivado project's xsim directory. 
-      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-      return "../../../../../";
-    else
-      -- Synth path specified relative to dir where you run Vivado.
-      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/
-      return "../../../";
-    end if;
   end;
 
   function to_bstring(sl : std_logic) return string is
