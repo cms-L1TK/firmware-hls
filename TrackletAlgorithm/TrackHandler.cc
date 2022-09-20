@@ -24,6 +24,10 @@
 
 bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsigned int& matchFound, unsigned int mergeCondition){
   #pragma HLS inline
+  #pragma HLS array_partition variable=masterTrk._barrelStubArray complete dim=0
+  #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
+  #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
+    #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
   // compare the two tracks, masterTrack and trk
   LOOP_CompareTrack:
   for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
@@ -72,6 +76,10 @@ bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsign
 
 void TrackHandler::mergeTrack(TrackStruct& trk, TrackStruct& masterTrk){
   #pragma HLS inline
+  #pragma HLS array_partition variable=masterTrk._barrelStubArray complete dim=0
+  #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
+  #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
+  #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
   // update #matches found 
   // update master track
   // check whether the stub word is non-zero in the compared track
