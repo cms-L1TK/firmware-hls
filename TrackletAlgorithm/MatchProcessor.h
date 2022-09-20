@@ -1652,7 +1652,7 @@ void MatchProcessor(BXType bx,
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       
-      VMProjection<VMPTYPE> vmproj(index, zbin, finez, finephi, rinv, psseed);
+      VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv);
       //vmproj.Print();
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),

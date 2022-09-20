@@ -31,7 +31,7 @@ class VMProjectionBase<DISK>
 public:
   enum BitWidths {
     // Bit sizes for VMProjectionMemory fields
-    kVMProjIsPSSeedSize = 1,
+    kVMProjIsPSSeedSize = 0,
     kVMProjRinvSize = 5,
     kVMProjFinePhiSize = 3,
     kVMProjFinePhiWideSize = 5,
@@ -87,13 +87,12 @@ public:
     //static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
-  /*
   // This constructor is only used for projections in DISK
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv):
     data_( (id, zbin ,finez , finephi, rinv) )
   {
+    //static_assert(VMProjType == DISK, "Constructor should only be used for DISK projections");
   }
-  */
   
   VMProjection()
   {}

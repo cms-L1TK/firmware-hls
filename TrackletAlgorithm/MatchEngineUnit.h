@@ -171,7 +171,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024], const AllStubMemo
 
     projfinephi__ = (signBit, addBit, data.getFinePhi());
 
-    isPSseed__ = (LAYER < TF::D1) ? projbuffer_.getIsPSSeed() : 0;
+    isPSseed__ = projbuffer_.getIsPSSeed();
     projrinv__ = data.getRInv();
 
   }
