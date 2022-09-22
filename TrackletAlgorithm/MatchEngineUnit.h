@@ -225,7 +225,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024], const AllStubMemo
   auto stubtmp=(iphiSave,zbin);
   auto stubadd=(slot,istubtmp);
   //auto stubadd=(stubtmp,istubtmp);
-  stubdata__ = stubmem[bx_&1][stubadd];
+  stubdata__ = stubmem[bx_&3][stubadd];
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
 
