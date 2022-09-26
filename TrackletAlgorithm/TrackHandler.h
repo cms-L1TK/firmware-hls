@@ -10,7 +10,7 @@ const unsigned int kBarrelStubIndexSizeMSB = TrackFit::kTFBarrelStubRSize + Trac
 const unsigned int kBarrelStubIndexSizeLSB = TrackFit::kTFBarrelStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFZResidSize;
 const unsigned int kDiskStubIndexSizeMSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize + TrackFit::kTFStubIndexSize;
 const unsigned int kDiskStubIndexSizeLSB = TrackFit::kTFDiskStubRSize + TrackFit::kTFPhiResidSize + TrackFit::kTFRResidSize;
-const unsigned int layerStubIndexSize = 1; //7
+const unsigned int layerStubIndexSize = 1; // 7 stubs per layer
 
 struct TrackStruct {
   
@@ -25,13 +25,6 @@ class TrackHandler {
     
     ~TrackHandler(){};
 
-    // TrackFit::TrackWord getTrackWord() const{
-    //   return trkWord;
-    // }
-
-    // void setTrackWord(TrackFit::TrackWord trackWord){
-    //   trkWord = trackWord;
-    // }
     
     bool compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsigned int& matchFound, unsigned int mergeCondition);
 
@@ -41,18 +34,8 @@ class TrackHandler {
       debug = debugFlag;
     }
 
-    // TrackFit::BarrelStubWord getBarrelStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
-    //   return _barrelStubArray[layerIndex][stubIndex];
-    // }
-
-    // TrackFit::DiskStubWord getDiskStubArray(unsigned int layerIndex, unsigned int stubIndex) const {
-    //   return _diskStubArray[layerIndex][stubIndex];
-    // }
     
   private:
-    // TrackFit::TrackWord trkWord;
-    // TrackFit::BarrelStubWord barrelStubArray[4][layerStubIndexSize]; 
-    // TrackFit::DiskStubWord diskStubArray[4][layerStubIndexSize];
     ap_uint<1> matchesFoundBarrel[4][layerStubIndexSize];
     ap_uint<1> matchesFoundDisk[4][layerStubIndexSize];
     ap_uint<1> stubPadding = 0;

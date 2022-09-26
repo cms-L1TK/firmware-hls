@@ -2,10 +2,7 @@
 
 bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsigned int& matchFound, unsigned int mergeCondition){
   #pragma HLS inline
-  #pragma HLS array_partition variable=masterTrk._barrelStubArray complete dim=0
-  #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
-  #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
-    #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
+
   // compare the two tracks, masterTrack and trk
   LOOP_CompareTrack:
   for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
@@ -16,24 +13,16 @@ bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsign
     auto inputDiskStubIndex = ap_uint<TrackFit::kTFStubIndexSize>(trk._diskStubArray[layerIndex][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
 
     if((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)){
-      #ifndef _SYNTHESIS_
-      // std::cout << "Match found in barrel " << "masterBarrelStub ID: " << masterBarrelStubIndex << " trackBarrel ID: " << inputBarrelStubIndex << std::endl;
-      #endif 
       matchesFoundBarrel[layerIndex][0] = 1;
     } else {
       matchesFoundBarrel[layerIndex][0] = 0;
     }
     
     if ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)){
-    #ifndef _SYNTHESIS_
-    // std::cout << "Match found in disk " << "masterDiskStub ID: " << masterDiskStubIndex << " trackDisk ID: " << inputDiskStubIndex << std::endl;
-    #endif 
-    matchesFoundDisk[layerIndex][0] = 1;
+      matchesFoundDisk[layerIndex][0] = 1;
     } else {
       matchesFoundDisk[layerIndex][0] = 0;
     }
-    // std::cout << "layer: " << layerIndex << " masterTrackBrl: " << barrelStubArray[layerIndex][0] << " trkBrl: " << track.barrelStubArray[layerIndex][0] << " MatchFndBrl: " << matchesFoundBarrel[layerIndex][0] << std::endl;
-    // std::cout << "layer: " << layerIndex << " masterTrackDsk: " << diskStubArray[layerIndex][0] << " trkDsk: " << track.diskStubArray[layerIndex][0] << " MatchFndDsk: " << matchesFoundDisk[layerIndex][0] << std::endl;
   }
 
   // update #matches found 
@@ -58,17 +47,12 @@ void TrackHandler::mergeTrack(TrackStruct& trk, TrackStruct& masterTrk){
   #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
   #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
   #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
-  // update #matches found 
   // update master track
   // check whether the stub word is non-zero in the compared track
-  // then add stub into master track
+  // then add stub into master track if share > 3 stubs in common
   LOOP_SetInputStubToMaster:
   for(unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
     #pragma HLS unroll
-    #ifndef _SYNTHESIS_
-    // std::cout << "masterTrackWord: " << trkWord << " trackWord: " << track.trkWord << " layerIndex: " << layerIndex << " masterTrackBarrel:  " << barrelStubArray[layerIndex][0] << " comparedTrackBarrel: " << track.barrelStubArray[layerIndex][0] << std::endl;
-    // std::cout << "masterTrackWord: " << trkWord << " trackWord: " << track.trkWord << " layerIndex: " << layerIndex << " masterTrackDisk:  " << diskStubArray[layerIndex][0] << " comparedTrackDisk: " << track.diskStubArray[layerIndex][0] << std::endl;
-    #endif
     if((masterTrk._barrelStubArray[layerIndex][0] == 0) && (trk._barrelStubArray[layerIndex][0] != 0)){
       masterTrk._barrelStubArray[layerIndex][0] = trk._barrelStubArray[layerIndex][0];
       mergedBarrelStubsMap += (1 << 3*layerIndex);
@@ -90,9 +74,6 @@ void TrackHandler::mergeTrack(TrackStruct& trk, TrackStruct& masterTrk){
         for (int bitIndex = 0; bitIndex < TrackFit::kBarrelStubSize; bitIndex++){
           #pragma HLS unroll
           masterTrk._barrelStubArray[layerIndex][stubIndex] = trk._barrelStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
-          #ifndef _SYNTHESIS_
-          // std::cout << "barrelStubArray[layerIndex][stubIndex]: " << barrelStubArray[layerIndex][stubIndex] << std::endl;
-          #endif 
         }
       }
       if((masterTrk._diskStubArray[layerIndex][stubIndex] == 0) && (trk._diskStubArray[layerIndex][stubIndex] != 0)){
@@ -102,9 +83,7 @@ void TrackHandler::mergeTrack(TrackStruct& trk, TrackStruct& masterTrk){
         for (int bitIndex = 0; bitIndex < TrackFit::kDiskStubSize; bitIndex++){
           #pragma HLS unroll
           masterTrk._diskStubArray[layerIndex][stubIndex] = masterTrk._diskStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
-          #ifndef _SYNTHESIS_
-          // std::cout << "diskStubArray[layerIndex][stubIndex]: " << diskStubArray[layerIndex][stubIndex] << std::endl;
-          #endif
+
         }
       }
     }

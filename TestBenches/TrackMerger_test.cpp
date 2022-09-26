@@ -49,7 +49,7 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("output_TrackFit_TF_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged output_TrackFit_TF_L1L2*
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged or if no merge make a copy e.g. output_TrackFit_TF_L1L2*
   // Loop over events
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
@@ -107,7 +107,7 @@ int main(){
 
     // Filling outputs
     unsigned nTracks = 0;
-    for (unsigned short i = 0; i < kMaxTrack+kNComparisonModules; i++){ //because first 16 CMs don't appear in output first if outputting unmerged tracks first ( kMaxTrack+kNComparisonModule)
+    for (unsigned short i = 0; i < kMaxTrack+kNComparisonModules; i++){ //first 16 CMs don't appear in output first if outputting unmerged tracks first
       TrackFit track;
       track.setTrackWord(trackWord_o.read());
       track.setBarrelStubWord<0>(barrelStubWords_0_o.read());
@@ -117,7 +117,7 @@ int main(){
       track.setDiskStubWord<4>(diskStubWords_0_o.read());
       track.setDiskStubWord<5>(diskStubWords_1_o.read());
       track.setDiskStubWord<6>(diskStubWords_2_o.read());
-      track.setDiskStubWord<7>(diskStubWords_3_o.read()); //changing number of times outputs are read + look at which dataflow process is inc latency
+      track.setDiskStubWord<7>(diskStubWords_3_o.read());
       
       outputTracks.write_mem(bx, track, nTracks );
       ++nTracks;
