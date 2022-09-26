@@ -25,7 +25,6 @@ class TrackHandler {
     
     ~TrackHandler(){};
 
-    
     bool compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsigned int& matchFound, unsigned int mergeCondition);
 
     void mergeTrack(TrackStruct& trk, TrackStruct& masterTrk);

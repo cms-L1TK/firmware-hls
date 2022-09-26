@@ -23,22 +23,12 @@ class ComparisonModule{
 
     unsigned int getNProcessed(){return tracksProcessed;}
 
-    unsigned int myIndex;
-
     unsigned int getEndOfStream(){return endOfStream;}
 
     TrackFit::TrackWord getMasterTrackWord(){return masterTrack._trackWord;}
 
-    // TrackFit::BarrelStubWord getMasterTrackBarrelStubs(unsigned int stubIndex, unsigned int layerIndex){
-    //   return masterTrack.getBarrelStubArray(layerIndex, stubIndex);}
-
-    // TrackFit::DiskStubWord getMasterTrackDiskStubs(unsigned int stubIndex, unsigned int layerIndex){
-    //   return masterTrack.getDiskStubArray(layerIndex, stubIndex);}
-
-    unsigned int getEndOfModule(){return endOfModule;}
-
-    // void process(hls::stream<TrackStruct>& inputBuffer,hls::stream<TrackStruct>& outputBuffer);
     void process(TrackStruct &inTrack, TrackStruct &outTrack);
+    
     TrackStruct& getMasterTrackStruct();
 
 
