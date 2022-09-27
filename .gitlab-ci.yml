@@ -474,6 +474,6 @@ topReducedCombined-synth:
     PROJ_NAME: "ReducedCombinedConfig"
   needs:
     - job: download
-    - job: topReducedCombinedConfig-sim
-    - job: topReducedCombinedConfig-check-results
+    - job: topReducedCombined-sim
+    - job: topReducedCombined-check-results
       artifacts: false
