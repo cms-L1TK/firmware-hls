@@ -131,13 +131,20 @@ mkdir -p ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
-### reduced combined config                                                                                                                    
+### reduced combined config                      
 mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+### reduced combined config                      
+mkdir -p ../TopFunctions/ReducedCombinedConfig2
+./generate_IR.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_VMRCM.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_TB.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -237,7 +244,7 @@ then
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm2}
+  wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM2
   rm -f MemPrints.tgz
@@ -250,6 +257,7 @@ then
   wget -O MemPrints.tar.gz --quiet ${memprints_url}
   tar -xzf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
+
 fi
 
 # Needed in order for awk to run successfully:
