@@ -116,7 +116,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
         parametersFile.write(
             "\n"
             "// magic numbers for " + mcName + "\n"
-            "template<> constexpr uint32_t FMMask<TF::" + seed + ", MC::" + iMC + ">() {\n"
+            "template<> constexpr uint32_t FMMask<TF::" + seed + ", TF::" + iMC + ">() {\n"
             "  return 0x%X;\n"
             "}\n" % FMMask
         )
@@ -164,7 +164,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(nCMMem) + ", " + str(nFMMem) + ",\n"
             " TF::" + seed + ", "
             "TF::" + "D1" + ", "
-            "MC::" + iMC + "> (\n"
+            "TF::" + iMC + "> (\n"
             "    bx,\n"
             "    match,\n"
             "    allstub,\n"
@@ -179,10 +179,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
     parametersFile.write(
         "\n"
         "// return mask bit AND mask\n"
-        "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {\n"
+        "template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask() {\n"
         "  return FMMask<Layer, PHI>() & (1<<Seed);\n"
         "}\n\n"
-        "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed>\n"
+        "template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed>\n"
         "static const ap_uint<1 << Seed> FMCount() {\n"
         "  ap_uint<1<<Seed> bits(-1);\n"
         "  ap_uint<1<<Seed> mask = bits & FMMask<Layer, PHI>();\n"

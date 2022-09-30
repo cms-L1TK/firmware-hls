@@ -30,18 +30,19 @@ int main() {
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
-  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + static_cast<char>(phiRegion);
+  constexpr char phi = 'A' + phiRegion; // Converts phiRegion to char
+  const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phi;
   TBHelper tb("VMRCM/VMR_" + vmrID);
 
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
   const string inputDisk2SPattern = "InputStubs*_D*2S*";
-  
+
   const string allStubPattern = "AllStubs*";
   const string allStubInnerPattern = "AllInnerStubs*";
   const string mePattern = "VMStubs_VMSME*";
   const string tePattern = "VMStubs_VMSTE*";
-  
+
   // Number of files
   const auto nInputStubs = tb.nFiles(inputPattern);
   const auto nInputStubsDisk2S = tb.nFiles(inputDisk2SPattern);
@@ -50,7 +51,7 @@ int main() {
   const auto nASInnerCopies = tb.nFiles(allStubInnerPattern);
   const auto nVMSME = tb.nFiles(mePattern);
   const auto nVMSTE = tb.nFiles(tePattern);
-  
+
   // Make sure that the number of input and output memories are correct
   assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies) && (nVMSTE == numTEOCopies));
 
@@ -83,7 +84,7 @@ int main() {
   ///////////////////////////
   // Loop over events
 
-  cout << "Start event loop ..." << endl;  
+  cout << "Start event loop ..." << endl;
 
   // Error count
   int err = 0;
@@ -105,7 +106,7 @@ int main() {
       }
 
     }
-    
+
     // Read event and write to memories
     for (unsigned int i = 0; i < numInputs; i++) {
       writeMemFromFile<InputStubMemory<inputType>>(inputStubs[i], fin_inputstubs[i], ievt);
@@ -148,7 +149,7 @@ int main() {
       }
     }
     // ME memories
-    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);  
+    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
     //TE Outer memories
     if (nVMSTE) {
       for (unsigned int i = 0; i < nVMSTE; i++) {

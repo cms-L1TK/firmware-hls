@@ -144,8 +144,8 @@ def getAllVMRs(wireconfig):
 
 def getBendCutTable(mem_region, layer_disk_char, layer_disk_num, phi_region, max_copy_count, mem_copy_dict, mem_list):
 
-    table_string = "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">()>* getBendCut" + mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n" +\
-                   "  const int bendCutTableSize = getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">();\n"
+    table_string = "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">()>* getBendCut" + mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){\n" +\
+                   "  const int bendCutTableSize = getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">();\n"
 
     # Sort memory list
     mem_list.sort(key=lambda mem: int("".join([i for i in mem[:-2] if i.isdigit()]))) # Sort by number (excluding the "copy" number nX)
@@ -202,35 +202,32 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
         # Declare functions
         parameter_file.write(
-            "// Enums used to get the correct parameters\n"
-            "enum class phiRegions : char {A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H'};\n"
-            "\n"
             "// The functions that returns the LUTs and parameters\n"
             "template<TF::layerDisk LayerDisk> const int* getPhiCorrTable();\n"
             "template<TF::layerDisk LayerDisk> const int* getRzBitsInnerTable();\n"
             "template<TF::layerDisk LayerDisk> const int* getRzBitsOverlapTable();\n"
             "template<TF::layerDisk LayerDisk> const int* getRzBitsOuterTable();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> const int* getFineBinTable();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutInnerTable();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutOverlapTable();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int size> const ap_uint<size>* getBendCutOuterTable();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> const int* getFineBinTable();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int size> const ap_uint<size>* getBendCutInnerTable();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int size> const ap_uint<size>* getBendCutOverlapTable();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int size> const ap_uint<size>* getBendCutOuterTable();\n"
             "\n"
             "template<TF::layerDisk LayerDisk> constexpr regionType getInputType();\n"
             "template<TF::layerDisk LayerDisk> constexpr regionType getOutputType();\n"
             "\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputs();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumInputsDisk2S();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumASCopies();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumVMSTEICopies();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumVMSTEOLCopies();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getNumVMSTEOCopies();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumInputs();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumInputsDisk2S();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumASCopies();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumVMSTEICopies();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumVMSTEOLCopies();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumVMSTEOCopies();\n"
             "\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskME();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskTEI();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskOL();\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi, int MaskSize> const ap_uint<MaskSize> getMaskTEO();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int MaskSize> const ap_uint<MaskSize> getMaskME();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int MaskSize> const ap_uint<MaskSize> getMaskTEI();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int MaskSize> const ap_uint<MaskSize> getMaskOL();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi, int MaskSize> const ap_uint<MaskSize> getMaskTEO();\n"
             "\n"
-            "template<TF::layerDisk LayerDisk, phiRegions Phi> constexpr int getBendCutTableSize();\n"
+            "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getBendCutTableSize();\n"
             "\n\n"
             "// Help function that converts an array of 0s and 1s to an ap_uint\n"
             "template<int arraySize>\n"
@@ -346,19 +343,19 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
             parameter_file.write(
                 "\n////////////////\n// " + vmr + " //\n////////////////\n"
-                "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
+                "template<> constexpr int getNumInputs<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
                 "  return " + str(len(mem_dict["IL_"+vmr])) + ";\n"
                 "}\n"
-                "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Number of DISK2S input memories\n"
+                "template<> constexpr int getNumInputsDisk2S<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // Number of DISK2S input memories\n"
                 "  return " + str(len(mem_dict["IL_DISK2S_"+vmr])) + ";\n"
                 "}\n"
-                "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // Allstub memory\n"
+                "template<> constexpr int getNumASCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // Allstub memory\n"
                 "  return " + str(len(mem_dict["AS_"+vmr])) + ";\n"
                 "}\n"
-                "template<> constexpr int getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+                "template<> constexpr int getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){\n"
                 "  return " + str(bendcuttable_size[layer_disk_num-1]) + ";\n"
                 "}\n"
-                "template<> inline const ap_uint<masksize> getMaskME<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", masksize>(){\n"
+                "template<> inline const ap_uint<masksize> getMaskME<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ", masksize>(){\n"
                 "  return " + (str(getMask(mem_dict["VMSME_" + vmr])) if ("VMSME_" + vmr in mem_dict) else "0") + ";\n"
                 "}\n"
                 )
@@ -380,10 +377,10 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
                 max_copy_count = max(mem_copy_dict.values()) if mem_copy_dict else 1
 
                 parameter_file.write(
-                    "template<> constexpr int getNum" + te_mem_type + "Copies<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){ // TE" + te_mem_region + "memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.\n"
+                    "template<> constexpr int getNum" + te_mem_type + "Copies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // TE" + te_mem_region + "memory. NOTE: can't use 0 if we don't have any memories of a certain type. Use 1.\n"
                     "  return " + str(max_copy_count) + ";\n"
                     "}\n"
-                    "template<> inline const ap_uint<mask%ssize> getMask" % (te_mem_short if te_mem_short == "OL" else "") + te_mem_short + "<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ", mask%ssize>(){\n" % (te_mem_short if te_mem_short == "OL" else "") +\
+                    "template<> inline const ap_uint<mask%ssize> getMask" % (te_mem_short if te_mem_short == "OL" else "") + te_mem_short + "<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ", mask%ssize>(){\n" % (te_mem_short if te_mem_short == "OL" else "") +\
                     "  return " + (str(getMask(mem_dict[te_mem_type + "_" + vmr])) if (te_mem_type + "_" + vmr in mem_dict) else "0") + ";\n"
                     "}\n"
                 )
@@ -393,13 +390,13 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
                     parameter_file.write(getBendCutTable(te_mem_region, layer_disk_char, layer_disk_num, phi_region, max_copy_count, mem_copy_dict, mem_dict[te_mem_type + "_" + vmr]))
                 else:
                     parameter_file.write(
-                    "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">()>* getBendCut" + te_mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+                    "template<> inline const ap_uint<getBendCutTableSize<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">()>* getBendCut" + te_mem_region + "Table<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){\n"
                     "  return nullptr;\n"
                     "}\n"
                     )
 
             parameter_file.write(
-                "template<> inline const int* getFineBinTable<TF::" + layer_disk_char + str(layer_disk_num) + ", phiRegions::" + phi_region + ">(){\n"
+                "template<> inline const int* getFineBinTable<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){\n"
                 "  static int lut[] =\n"
                 "#if __has_include(\"../emData/VMR/tables/" + vmr + "_finebin.tab\")\n#  include \"../emData/VMR/tables/" + vmr + "_finebin.tab\"\n#else\n  {};\n#endif\n"
                 "  return lut;\n"
@@ -438,6 +435,7 @@ def writeTopHeader(vmr, output_dir):
             "\n"
             "////////////////////////////////////////////\n"
             "// Variables for that are specified with regards to the VMR region\n"
+            "// Some are used by the Test Bench\n"
             "\n"
         )
 
@@ -454,7 +452,7 @@ def writeTopHeader(vmr, output_dir):
         header_file.write(
             "#define kLAYER %s // Which barrel layer number the data is coming from\n" %str(layer) +\
             "#define kDISK %s // Which disk number the data is coming from, 0 if not disk\n\n" %str(disk) +\
-            "constexpr phiRegions phiRegion = phiRegions::%s; // Which AllStub/PhiRegion\n" % phi_region +\
+            "constexpr TF::phiRegion phiRegion = TF::%s; // Which AllStub/PhiRegion\n" % phi_region +\
             "\n"
             "constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);\n"
             "constexpr regionType inputType = getInputType<layerdisk>();\n"
