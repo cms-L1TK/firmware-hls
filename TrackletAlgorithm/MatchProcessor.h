@@ -300,11 +300,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //-----------------------------------------------------------------------------------------------------------
 
 // MatchCalculator
-namespace MC {
-  enum imc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
-}
-template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask();
-template<TF::layerDisk Layer, MC::imc PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegions PHI, TF::seed Seed> constexpr bool FMMask();
+template<TF::layerDisk Layer, TF::phiRegions PHI> constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
