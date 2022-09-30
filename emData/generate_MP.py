@@ -222,10 +222,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
     parametersFile.write(
         "\n"
         "// return mask bit AND mask\n"
-        "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed> constexpr bool FMMask() {\n"
+        "template<TF::layerDisk Layer, TF::phiRegions PHI, TF::seed Seed> constexpr bool FMMask() {\n"
         "  return FMMask<Layer, PHI>() & (1<<Seed);\n"
         "}\n\n"
-        "template<TF::layerDisk Layer, MC::imc PHI, TF::seed Seed>\n"
+        "template<TF::layerDisk Layer, TF::phiRegions PHI, TF::seed Seed>\n"
         "static const ap_uint<1 << Seed> FMCount() {\n"
         "  ap_uint<1<<Seed> bits(-1);\n"
         "  ap_uint<1<<Seed> mask = bits & FMMask<Layer, PHI>();\n"
