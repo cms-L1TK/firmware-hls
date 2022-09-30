@@ -300,8 +300,8 @@ void readTable_Cuts(ap_uint<width> table[depth]){
 //-----------------------------------------------------------------------------------------------------------
 
 // MatchCalculator
-template<TF::layerDisk Layer, TF::phiRegions PHI, TF::seed Seed> constexpr bool FMMask();
-template<TF::layerDisk Layer, TF::phiRegions PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
