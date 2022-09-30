@@ -153,7 +153,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         parametersFile.write(
             "\n"
             "// magic numbers for " + mpName + "\n"
-            "template<> constexpr uint32_t FMMask<TF::" + seed + ", MC::" + iMP + ">() {\n"
+            "template<> constexpr uint32_t FMMask<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
             "}\n" % FMMask
         )
@@ -207,7 +207,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "" + TProjRegion + ", " + VMStubRegion + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
             " TF::" + seed + ", "
             "TF::" + "D1" + ", "
-            "MC::" + iMP + "> (\n"
+            "TF::" + iMP + "> (\n"
             "    bx,\n"
             "    projin,\n"
             "    instubdata,\n"
