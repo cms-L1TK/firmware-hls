@@ -304,7 +304,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool F
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& savedMatch,
@@ -500,7 +500,7 @@ void MatchCalculator(BXType bx,
 //////////////////////////////
 // MatchProcessor
 template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
-         TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, MC::imc PHISEC=MC::A>
+         TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, TF::phiRegion PHISEC=TF::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
