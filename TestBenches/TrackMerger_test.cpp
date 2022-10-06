@@ -126,6 +126,7 @@ int main(){
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory<NBarrelStub, NDiskStub>>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
     
+    
   }
 
   // Handling case of err%256 == 0 

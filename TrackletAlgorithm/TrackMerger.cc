@@ -8,8 +8,8 @@ TrackStruct& ComparisonModule::getMasterTrackStruct(){
 }
 
 void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
-  // assert(inTrack._trackWord !=0);
   #pragma HLS inline
+  // assert(inTrack._trackWord !=0);
   // assert (tracksProcessed <= kMaxTrack);
   trackHandler = TrackHandler();
   if (inTrack._trackWord != 0){
@@ -116,7 +116,6 @@ void TrackMerger(const BXType bx,
 
   // TrackStruct unmergedTracks[kMaxTrack];
   // #pragma HLS array_partition variable=unmergedTracks complete dim=0
-
   LOOP_Input:
   for (unsigned int i = 0; i < kMaxTrack; i++){ 
     #pragma HLS pipeline II=1
@@ -159,7 +158,6 @@ void TrackMerger(const BXType bx,
   for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
     #pragma HLS unroll
     TrackStruct& masterTk = comparisonModule[nModule].getMasterTrackStruct();
-    std::cout << "masterTk: " << masterTk._trackWord << std::endl;
     unloadTrack(masterTk,
                 trackWord_o,
                 barrelStubWords_0_o,
@@ -170,6 +168,7 @@ void TrackMerger(const BXType bx,
                 diskStubWords_1_o,
                 diskStubWords_2_o,
                 diskStubWords_3_o);
+
   }
 
     

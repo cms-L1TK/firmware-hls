@@ -20,10 +20,10 @@ source settings_hls.tcl
 add_files -tb ../emData/PD/
 config_dataflow -scalar_fifo_depth 50
 csim_design -compiler gcc -mflags "-j8"
-csynth_design
-cosim_design 
+#csynth_design
+#cosim_design 
 #-trace_level all -rtl verilog -verbose
 #export_design -format ip_catalog
-export_design -flow impl -rtl vhdl
+#export_design -flow impl -rtl vhdl
 
 exit

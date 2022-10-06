@@ -31,7 +31,6 @@ class ComparisonModule{
     
     TrackStruct& getMasterTrackStruct();
 
-
   private:
 
     unsigned int matchFound{0};
