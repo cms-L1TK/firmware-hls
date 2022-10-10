@@ -133,27 +133,32 @@ switch (Seed) {
 
 // 18 bits 	 2^(-12)Kphi^(1)Kr^(-1)	6.53434e-08
 const ap_int<30> delta0_tmp = dphi * drinv;
+#pragma HLS resource variable=delta0_tmp latency=1
 const ap_int<18> delta0 = delta0_tmp >> 12;
 //
 // STEP 5
 
 // 18 bits 	 2^(1)Kphi^(1)Kr^(0)	1.56824e-05
 const ap_int<31> delta1_tmp = r1abs * delta0;
+#pragma HLS resource variable=delta1_tmp latency=1
 const ap_int<18> delta1 = delta1_tmp >> 13;
 // 18 bits 	 2^(1)Kphi^(1)Kr^(0)	1.56824e-05
 const ap_int<31> delta2_tmp = r2abs * delta0;
+#pragma HLS resource variable=delta2_tmp latency=1
 const ap_int<18> delta2 = delta2_tmp >> 13;
 //
 // STEP 6
 
 // 18 bits 	 2^(14)Kphi^(2)Kr^(0)	1.00736e-06
 const ap_int<30> a2a_tmp = delta1 * delta2;
+#pragma HLS resource variable=a2a_tmp latency=1
 const ap_int<18> a2a = a2a_tmp >> 12;
 //
 // STEP 7
 
 // 18 bits 	 2^(-19)	1.90735e-06
 const ap_int<35> a2b_tmp = (a2a * 69225);
+#pragma HLS resource variable=a2b_tmp latency=1
 const ap_int<18> a2b = a2b_tmp >> 17;
 //
 // STEP 8
@@ -172,6 +177,7 @@ const ap_int<18> a2n = -a2;
 
 // 18 bits 	 2^(-11)Kphi^(1)Kr^(-1)	1.30687e-07
 const ap_int<34> rinv_tmp = a2n * delta0;
+#pragma HLS resource variable=rinv_tmp latency=1
 const ap_int<18> rinv = rinv_tmp >> 16;
 //
 // STEP 11
@@ -200,6 +206,7 @@ const ap_int<14> Rabs = r1abs + r2abs;
 
 // 14 bits 	 2^(-2)Kr^(1)	0.00732422
 const ap_int<26> R6_tmp = (Rabs * 2730);
+#pragma HLS resource variable=R6_tmp latency=1
 const ap_int<14> R6 = R6_tmp >> 12;
 //
 // STEP 4
@@ -209,18 +216,21 @@ const ap_int<14> R6 = R6_tmp >> 12;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<32> x4_tmp = R6 * delta0;
+#pragma HLS resource variable=x4_tmp latency=1
 const ap_int<18> x4 = x4_tmp >> 14;
 //
 // STEP 6
 
 // 18 bits 	 2^(13)Kphi^(2)Kr^(0)	5.03682e-07
 const ap_int<30> x6a_tmp = delta2 * x4;
+#pragma HLS resource variable=x6a_tmp latency=1
 const ap_int<18> x6a = x6a_tmp >> 12;
 //
 // STEP 7
 
 // 18 bits 	 2^(-20)	9.53674e-07
 const ap_int<35> x6b_tmp = (x6a * 69225);
+#pragma HLS resource variable=x6b_tmp latency=1
 const ap_int<18> x6b = x6b_tmp >> 17;
 //
 // STEP 8
@@ -233,6 +243,7 @@ const ap_int<18> x6m = x6m_tmp >> 5;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<32> phi0a_tmp = delta1 * x6m;
+#pragma HLS resource variable=phi0a_tmp latency=1
 const ap_int<18> phi0a = phi0a_tmp >> 14;
 //
 // STEP 10
@@ -272,6 +283,7 @@ const ap_int<11> dz = z2 - z1;
 
 // 18 bits 	 2^(-13)Kr^(-1)Kz^(1)	0.000244141
 const ap_int<29> deltaZ_tmp = dz * drinv;
+#pragma HLS resource variable=deltaZ_tmp latency=1
 const ap_int<18> deltaZ = deltaZ_tmp >> 11;
 //
 // STEP 5
@@ -293,6 +305,7 @@ const ap_int<17> a = a2>>1;
 ;
 // 18 bits 	 2^(-15)Kr^(-1)Kz^(1)	6.10352e-05
 const ap_int<31> t_tmp = a * deltaZ;
+#pragma HLS resource variable=t_tmp latency=1
 const ap_int<18> t = t_tmp >> 13;
 //
 // STEP 10
@@ -323,6 +336,7 @@ const ap_int<13> t_final = ( (t>>4)+1)>>1;
 
 // 18 bits 	 2^(-5)Kr^(0)Kz^(1)	0.00183105
 const ap_int<26> z0a_tmp = r1abs * deltaZ;
+#pragma HLS resource variable=z0a_tmp latency=1
 const ap_int<18> z0a = z0a_tmp >> 8;
 //
 // STEP 6
@@ -338,6 +352,7 @@ const ap_int<18> z0a = z0a_tmp >> 8;
 
 // 18 bits 	 2^(-5)Kr^(0)Kz^(1)	0.00183105
 const ap_int<33> z0b_tmp = z0a * x6m;
+#pragma HLS resource variable=z0b_tmp latency=1
 const ap_int<18> z0b = z0b_tmp >> 15;
 //
 // STEP 10
@@ -380,6 +395,7 @@ const ap_int<17> x2 = delta0>>1;
 ;
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<30> x1_0_tmp = x2 * rproj0;
+#pragma HLS resource variable=x1_0_tmp latency=1
 const ap_int<18> x1_0 = x1_0_tmp >> 12;
 //
 // STEP 6
@@ -398,24 +414,28 @@ const ap_int<18> x1_0 = x1_0_tmp >> 12;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x8_0_tmp = x1_0 * a2n;
+#pragma HLS resource variable=x8_0_tmp latency=1
 const ap_int<18> x8_0 = x8_0_tmp >> 15;
 //
 // STEP 11
 
 // 18 bits 	 2^(18)Kphi^(2)Kr^(0)	1.61178e-05
 const ap_int<36> x12_0_tmp = x8_0 * x8_0;
+#pragma HLS resource variable=x12_0_tmp latency=1
 const ap_int<18> x12_0 = x12_0_tmp >> 18;
 //
 // STEP 12
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x12A_0_tmp = (x12_0 * 69225);
+#pragma HLS resource variable=x12A_0_tmp latency=1
 const ap_int<18> x12A_0 = x12A_0_tmp >> 17;
 //
 // STEP 13
 
 // 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x20_0_tmp = (x12A_0 * 87381);
+#pragma HLS resource variable=x20_0_tmp latency=1
 const ap_int<18> x20_0 = x20_0_tmp >> 17;
 //
 // STEP 14
@@ -428,6 +448,7 @@ const ap_int<18> x10_0 = x10_0_tmp >> 2;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x22_0_tmp = x8_0 * x10_0;
+#pragma HLS resource variable=x22_0_tmp latency=1
 const ap_int<18> x22_0 = x22_0_tmp >> 15;
 //
 // STEP 16
@@ -466,6 +487,7 @@ const ap_int<13> &rproj1 = rproj1_input;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<30> x1_1_tmp = x2 * rproj1;
+#pragma HLS resource variable=x1_1_tmp latency=1
 const ap_int<18> x1_1 = x1_1_tmp >> 12;
 //
 // STEP 6
@@ -484,24 +506,28 @@ const ap_int<18> x1_1 = x1_1_tmp >> 12;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x8_1_tmp = x1_1 * a2n;
+#pragma HLS resource variable=x8_1_tmp latency=1
 const ap_int<18> x8_1 = x8_1_tmp >> 15;
 //
 // STEP 11
 
 // 18 bits 	 2^(18)Kphi^(2)Kr^(0)	1.61178e-05
 const ap_int<36> x12_1_tmp = x8_1 * x8_1;
+#pragma HLS resource variable=x12_1_tmp latency=1
 const ap_int<18> x12_1 = x12_1_tmp >> 18;
 //
 // STEP 12
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x12A_1_tmp = (x12_1 * 69225);
+#pragma HLS resource variable=x12A_1_tmp latency=1
 const ap_int<18> x12A_1 = x12A_1_tmp >> 17;
 //
 // STEP 13
 
 // 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x20_1_tmp = (x12A_1 * 87381);
+#pragma HLS resource variable=x20_1_tmp latency=1
 const ap_int<18> x20_1 = x20_1_tmp >> 17;
 //
 // STEP 14
@@ -514,6 +540,7 @@ const ap_int<18> x10_1 = x10_1_tmp >> 2;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x22_1_tmp = x8_1 * x10_1;
+#pragma HLS resource variable=x22_1_tmp latency=1
 const ap_int<18> x22_1 = x22_1_tmp >> 15;
 //
 // STEP 16
@@ -552,6 +579,7 @@ const ap_int<13> &rproj2 = rproj2_input;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<30> x1_2_tmp = x2 * rproj2;
+#pragma HLS resource variable=x1_2_tmp latency=1
 const ap_int<18> x1_2 = x1_2_tmp >> 12;
 //
 // STEP 6
@@ -570,24 +598,28 @@ const ap_int<18> x1_2 = x1_2_tmp >> 12;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x8_2_tmp = x1_2 * a2n;
+#pragma HLS resource variable=x8_2_tmp latency=1
 const ap_int<18> x8_2 = x8_2_tmp >> 15;
 //
 // STEP 11
 
 // 18 bits 	 2^(18)Kphi^(2)Kr^(0)	1.61178e-05
 const ap_int<36> x12_2_tmp = x8_2 * x8_2;
+#pragma HLS resource variable=x12_2_tmp latency=1
 const ap_int<18> x12_2 = x12_2_tmp >> 18;
 //
 // STEP 12
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x12A_2_tmp = (x12_2 * 69225);
+#pragma HLS resource variable=x12A_2_tmp latency=1
 const ap_int<18> x12A_2 = x12A_2_tmp >> 17;
 //
 // STEP 13
 
 // 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x20_2_tmp = (x12A_2 * 87381);
+#pragma HLS resource variable=x20_2_tmp latency=1
 const ap_int<18> x20_2 = x20_2_tmp >> 17;
 //
 // STEP 14
@@ -600,6 +632,7 @@ const ap_int<18> x10_2 = x10_2_tmp >> 2;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x22_2_tmp = x8_2 * x10_2;
+#pragma HLS resource variable=x22_2_tmp latency=1
 const ap_int<18> x22_2 = x22_2_tmp >> 15;
 //
 // STEP 16
@@ -638,6 +671,7 @@ const ap_int<13> &rproj3 = rproj3_input;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<30> x1_3_tmp = x2 * rproj3;
+#pragma HLS resource variable=x1_3_tmp latency=1
 const ap_int<18> x1_3 = x1_3_tmp >> 12;
 //
 // STEP 6
@@ -656,24 +690,28 @@ const ap_int<18> x1_3 = x1_3_tmp >> 12;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x8_3_tmp = x1_3 * a2n;
+#pragma HLS resource variable=x8_3_tmp latency=1
 const ap_int<18> x8_3 = x8_3_tmp >> 15;
 //
 // STEP 11
 
 // 18 bits 	 2^(18)Kphi^(2)Kr^(0)	1.61178e-05
 const ap_int<36> x12_3_tmp = x8_3 * x8_3;
+#pragma HLS resource variable=x12_3_tmp latency=1
 const ap_int<18> x12_3 = x12_3_tmp >> 18;
 //
 // STEP 12
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x12A_3_tmp = (x12_3 * 69225);
+#pragma HLS resource variable=x12A_3_tmp latency=1
 const ap_int<18> x12A_3 = x12A_3_tmp >> 17;
 //
 // STEP 13
 
 // 18 bits 	 2^(-17)	7.62939e-06
 const ap_int<35> x20_3_tmp = (x12A_3 * 87381);
+#pragma HLS resource variable=x20_3_tmp latency=1
 const ap_int<18> x20_3 = x20_3_tmp >> 17;
 //
 // STEP 14
@@ -686,6 +724,7 @@ const ap_int<18> x10_3 = x10_3_tmp >> 2;
 
 // 18 bits 	 2^(0)Kphi^(1)Kr^(0)	7.84121e-06
 const ap_int<33> x22_3_tmp = x8_3 * x10_3;
+#pragma HLS resource variable=x22_3_tmp latency=1
 const ap_int<18> x22_3 = x22_3_tmp >> 15;
 //
 // STEP 16
@@ -737,6 +776,7 @@ const ap_int<20> phiL_3_final = phiL_3 << 1;
 
 // 18 bits 	 2^(-2)Kr^(0)Kz^(1)	0.0146484
 const ap_int<31> x11_0_tmp = rproj0 * t;
+#pragma HLS resource variable=x11_0_tmp latency=1
 const ap_int<18> x11_0 = x11_0_tmp >> 13;
 //
 // STEP 11
@@ -755,6 +795,7 @@ const ap_int<18> x11_0 = x11_0_tmp >> 13;
 
 // 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
 const ap_int<31> x23_0_tmp = x11_0 * x10_0;
+#pragma HLS resource variable=x23_0_tmp latency=1
 const ap_int<18> x23_0 = x23_0_tmp >> 13;
 //
 // STEP 16
@@ -806,6 +847,7 @@ const ap_int<15> zL_0_final = ( (zL_0>>2)+1)>>1;
 
 // 18 bits 	 2^(-2)Kr^(0)Kz^(1)	0.0146484
 const ap_int<31> x11_1_tmp = rproj1 * t;
+#pragma HLS resource variable=x11_1_tmp latency=1
 const ap_int<18> x11_1 = x11_1_tmp >> 13;
 //
 // STEP 11
@@ -824,6 +866,7 @@ const ap_int<18> x11_1 = x11_1_tmp >> 13;
 
 // 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
 const ap_int<31> x23_1_tmp = x11_1 * x10_1;
+#pragma HLS resource variable=x23_1_tmp latency=1
 const ap_int<18> x23_1 = x23_1_tmp >> 13;
 //
 // STEP 16
@@ -875,6 +918,7 @@ const ap_int<15> zL_1_final = ( (zL_1>>2)+1)>>1;
 
 // 18 bits 	 2^(-2)Kr^(0)Kz^(1)	0.0146484
 const ap_int<31> x11_2_tmp = rproj2 * t;
+#pragma HLS resource variable=x11_2_tmp latency=1
 const ap_int<18> x11_2 = x11_2_tmp >> 13;
 //
 // STEP 11
@@ -893,6 +937,7 @@ const ap_int<18> x11_2 = x11_2_tmp >> 13;
 
 // 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
 const ap_int<31> x23_2_tmp = x11_2 * x10_2;
+#pragma HLS resource variable=x23_2_tmp latency=1
 const ap_int<18> x23_2 = x23_2_tmp >> 13;
 //
 // STEP 16
@@ -944,6 +989,7 @@ const ap_int<15> zL_2_final = ( (zL_2>>2)+1)>>1;
 
 // 18 bits 	 2^(-2)Kr^(0)Kz^(1)	0.0146484
 const ap_int<31> x11_3_tmp = rproj3 * t;
+#pragma HLS resource variable=x11_3_tmp latency=1
 const ap_int<18> x11_3 = x11_3_tmp >> 13;
 //
 // STEP 11
@@ -962,6 +1008,7 @@ const ap_int<18> x11_3 = x11_3_tmp >> 13;
 
 // 18 bits 	 2^(-4)Kr^(0)Kz^(1)	0.00366211
 const ap_int<31> x23_3_tmp = x11_3 * x10_3;
+#pragma HLS resource variable=x23_3_tmp latency=1
 const ap_int<18> x23_3 = x23_3_tmp >> 13;
 //
 // STEP 16
@@ -1105,6 +1152,7 @@ const ap_int<14> zproj0 = t > 0 ? ap_int<14>(zproj0_input) : ap_int<14>(-zproj0_
 
 // 18 bits 	 2^(-10)Kphi^(1)Kr^(-1)	2.61374e-07
 const ap_int<35> x7_tmp = x2 * a2;
+#pragma HLS resource variable=x7_tmp latency=1
 const ap_int<18> x7 = x7_tmp >> 17;
 //
 // STEP 10
@@ -1168,12 +1216,14 @@ switch (Seed) {
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<34> x13_0_tmp = x5_0 * invt;
+#pragma HLS resource variable=x13_0_tmp latency=1
 const ap_int<18> x13_0 = x13_0_tmp >> 16;
 //
 // STEP 14
 
 // 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56824e-05
 const ap_int<32> x25_0_tmp = x13_0 * x7;
+#pragma HLS resource variable=x25_0_tmp latency=1
 const ap_int<18> x25_0 = x25_0_tmp >> 14;
 //
 // STEP 15
@@ -1238,12 +1288,14 @@ const ap_int<18> x5_1 = x5_1_tmp >> 2;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<34> x13_1_tmp = x5_1 * invt;
+#pragma HLS resource variable=x13_1_tmp latency=1
 const ap_int<18> x13_1 = x13_1_tmp >> 16;
 //
 // STEP 14
 
 // 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56824e-05
 const ap_int<32> x25_1_tmp = x13_1 * x7;
+#pragma HLS resource variable=x25_1_tmp latency=1
 const ap_int<18> x25_1 = x25_1_tmp >> 14;
 //
 // STEP 15
@@ -1308,12 +1360,14 @@ const ap_int<18> x5_2 = x5_2_tmp >> 2;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<34> x13_2_tmp = x5_2 * invt;
+#pragma HLS resource variable=x13_2_tmp latency=1
 const ap_int<18> x13_2 = x13_2_tmp >> 16;
 //
 // STEP 14
 
 // 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56824e-05
 const ap_int<32> x25_2_tmp = x13_2 * x7;
+#pragma HLS resource variable=x25_2_tmp latency=1
 const ap_int<18> x25_2 = x25_2_tmp >> 14;
 //
 // STEP 15
@@ -1378,12 +1432,14 @@ const ap_int<18> x5_3 = x5_3_tmp >> 2;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<34> x13_3_tmp = x5_3 * invt;
+#pragma HLS resource variable=x13_3_tmp latency=1
 const ap_int<18> x13_3 = x13_3_tmp >> 16;
 //
 // STEP 14
 
 // 18 bits 	 2^(1)Kphi^(1)Kr^(0)Kz^(0)	1.56824e-05
 const ap_int<32> x25_3_tmp = x13_3 * x7;
+#pragma HLS resource variable=x25_3_tmp latency=1
 const ap_int<18> x25_3 = x25_3_tmp >> 14;
 //
 // STEP 15
@@ -1449,18 +1505,21 @@ const ap_int<16> phiD_3_final = phiD_3 >> 2;
 
 // 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.44712e-05
 const ap_int<36> x26_0_tmp = x25_0 * x25_0;
+#pragma HLS resource variable=x26_0_tmp latency=1
 const ap_int<18> x26_0 = x26_0_tmp >> 18;
 //
 // STEP 16
 
 // 18 bits 	 2^(-13)	0.00012207
 const ap_int<35> x26A_0_tmp = (x26_0 * 69225);
+#pragma HLS resource variable=x26A_0_tmp latency=1
 const ap_int<18> x26A_0 = x26A_0_tmp >> 17;
 //
 // STEP 17
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x9_0_tmp = (x26A_0 * 87381);
+#pragma HLS resource variable=x9_0_tmp latency=1
 const ap_int<18> x9_0 = x9_0_tmp >> 17;
 //
 // STEP 18
@@ -1473,6 +1532,7 @@ const ap_int<18> x27_0 = x27_0_tmp >> 1;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<32> rD_0_tmp = x13_0 * x27_0;
+#pragma HLS resource variable=rD_0_tmp latency=1
 const ap_int<18> rD_0 = rD_0_tmp >> 14;
 //
 // STEP 20
@@ -1533,18 +1593,21 @@ const ap_int<14> rD_0_final = rD_0 >> 4;
 
 // 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.44712e-05
 const ap_int<36> x26_1_tmp = x25_1 * x25_1;
+#pragma HLS resource variable=x26_1_tmp latency=1
 const ap_int<18> x26_1 = x26_1_tmp >> 18;
 //
 // STEP 16
 
 // 18 bits 	 2^(-13)	0.00012207
 const ap_int<35> x26A_1_tmp = (x26_1 * 69225);
+#pragma HLS resource variable=x26A_1_tmp latency=1
 const ap_int<18> x26A_1 = x26A_1_tmp >> 17;
 //
 // STEP 17
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x9_1_tmp = (x26A_1 * 87381);
+#pragma HLS resource variable=x9_1_tmp latency=1
 const ap_int<18> x9_1 = x9_1_tmp >> 17;
 //
 // STEP 18
@@ -1557,6 +1620,7 @@ const ap_int<18> x27_1 = x27_1_tmp >> 1;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<32> rD_1_tmp = x13_1 * x27_1;
+#pragma HLS resource variable=rD_1_tmp latency=1
 const ap_int<18> rD_1 = rD_1_tmp >> 14;
 //
 // STEP 20
@@ -1617,18 +1681,21 @@ const ap_int<14> rD_1_final = rD_1 >> 4;
 
 // 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.44712e-05
 const ap_int<36> x26_2_tmp = x25_2 * x25_2;
+#pragma HLS resource variable=x26_2_tmp latency=1
 const ap_int<18> x26_2 = x26_2_tmp >> 18;
 //
 // STEP 16
 
 // 18 bits 	 2^(-13)	0.00012207
 const ap_int<35> x26A_2_tmp = (x26_2 * 69225);
+#pragma HLS resource variable=x26A_2_tmp latency=1
 const ap_int<18> x26A_2 = x26A_2_tmp >> 17;
 //
 // STEP 17
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x9_2_tmp = (x26A_2 * 87381);
+#pragma HLS resource variable=x9_2_tmp latency=1
 const ap_int<18> x9_2 = x9_2_tmp >> 17;
 //
 // STEP 18
@@ -1641,6 +1708,7 @@ const ap_int<18> x27_2 = x27_2_tmp >> 1;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<32> rD_2_tmp = x13_2 * x27_2;
+#pragma HLS resource variable=rD_2_tmp latency=1
 const ap_int<18> rD_2 = rD_2_tmp >> 14;
 //
 // STEP 20
@@ -1701,18 +1769,21 @@ const ap_int<14> rD_2_final = rD_2 >> 4;
 
 // 18 bits 	 2^(20)Kphi^(2)Kr^(0)Kz^(0)	6.44712e-05
 const ap_int<36> x26_3_tmp = x25_3 * x25_3;
+#pragma HLS resource variable=x26_3_tmp latency=1
 const ap_int<18> x26_3 = x26_3_tmp >> 18;
 //
 // STEP 16
 
 // 18 bits 	 2^(-13)	0.00012207
 const ap_int<35> x26A_3_tmp = (x26_3 * 69225);
+#pragma HLS resource variable=x26A_3_tmp latency=1
 const ap_int<18> x26A_3 = x26A_3_tmp >> 17;
 //
 // STEP 17
 
 // 18 bits 	 2^(-15)	3.05176e-05
 const ap_int<35> x9_3_tmp = (x26A_3 * 87381);
+#pragma HLS resource variable=x9_3_tmp latency=1
 const ap_int<18> x9_3 = x9_3_tmp >> 17;
 //
 // STEP 18
@@ -1725,6 +1796,7 @@ const ap_int<18> x27_3 = x27_3_tmp >> 1;
 
 // 18 bits 	 2^(-3)Kr^(1)Kz^(0)	0.00366211
 const ap_int<32> rD_3_tmp = x13_3 * x27_3;
+#pragma HLS resource variable=rD_3_tmp latency=1
 const ap_int<18> rD_3 = rD_3_tmp >> 14;
 //
 // STEP 20
@@ -1779,6 +1851,7 @@ const ap_int<14> rD_3_final = rD_3 >> 4;
 
 // 18 bits 	 2^(-11)Kphi^(1)Kr^(0)Kz^(-1)	6.53434e-08
 const ap_int<33> der_phiD_tmp = x7 * invt;
+#pragma HLS resource variable=der_phiD_tmp latency=1
 const ap_int<18> der_phiD = der_phiD_tmp >> 15;
 //
 // STEP 14
