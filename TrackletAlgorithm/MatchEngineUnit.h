@@ -242,7 +242,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
  }
  
  inline bool nearFull() {
-   return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+   return nearFull4Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
  inline bool idle() {

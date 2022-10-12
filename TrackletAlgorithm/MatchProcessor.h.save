@@ -1,3 +1,4 @@
+
 #ifndef MATCHPROCESSOR_H
 #define MATCHPROCESSOR_H
 
@@ -628,13 +629,14 @@ void MatchProcessor(BXType bx,
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
   */
+
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<kNBitsBuffer>()[(readptr,writeptr)];
-    bool projBuffNearFull = nearFull4Unit<kNBitsBuffer>()[(readptr,writeptr)];
+    bool projBuffNearFull = nearFull3Unit<kNBitsBuffer>()[(readptr,writeptr)];
     
     ap_uint<3> iphi = 0;
 
@@ -648,10 +650,6 @@ void MatchProcessor(BXType bx,
 
 
     bool anyidle = false;
-
-
-///////////////////////MANUAL PIPELINING TEST
-
     if (hasMatch_){
       AllProjection<APTYPE> allproj(allprojdata_);
 
@@ -666,6 +664,7 @@ void MatchProcessor(BXType bx,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
 	 fullmatch);
     } //end MC if
+    
     if (validproj__) {
 
       projbufferarray.saveProjection(projbuffer__);
@@ -790,13 +789,14 @@ void MatchProcessor(BXType bx,
       */
 
       ap_uint<1> stubfirstMinus = vmstubsmask[zfirst][ivmMinus];
-      ap_uint<1> stubfirstPlus = vmstubsmask[zfirst][ivmPlus]&&
+      ap_uint<1> stubfirstPlus = vmstubsmask[zfirst][ivmMinus]&&
                                  (ivmMinus!=ivmPlus);
       ap_uint<1> stublastMinus = vmstubsmask[zlast][ivmMinus]&&
                                  (zfirst!=zlast);
       ap_uint<1> stublastPlus = vmstubsmask[zlast][ivmPlus]&&
                                  (zfirst!=zlast)&&(ivmMinus!=ivmPlus);;
       
+
       ap_uint<4> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<4> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<4> nstublastMinus = entries_zlast[ivmMinus];
@@ -815,12 +815,6 @@ void MatchProcessor(BXType bx,
 
       ap_uint<4> maskstubs=(stublastPlus, stubfirstPlus, stublastMinus, stubfirstMinus);
       
-/*
-      for (int i = 0; i<4; i++){
-        std::cout<<"maskstubs"<<i<<": "<<((maskstubs<<i)&1)<<" | ";
-      }
-      std::cout<<std::endl;
-*/
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
@@ -860,7 +854,7 @@ void MatchProcessor(BXType bx,
       validin = false;
     }// end if not near full
 
-///////////////////////////////////////////////////////////////////PIPELINE TEST END
+
   MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
       matchengine[iMEU].set_empty();
@@ -873,13 +867,14 @@ void MatchProcessor(BXType bx,
     }
 
     //This printout exactly matches printout in emulation for tracking code differences
-       
+    /*   
     std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
     for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-      std::cout << " MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
+      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
 		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
     }
     std::cout << std::endl;
+    */
 
     
     //New code
@@ -957,7 +952,7 @@ void MatchProcessor(BXType bx,
       }
       hasMatch_ = hasMatch;
       //matchengine[bestiMEU].advance();
-     
+
   } //end loop
 
   bx_o = bx;

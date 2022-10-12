@@ -181,9 +181,16 @@ process(clka)
   variable addr_in_page : integer := 0;
   variable addr_in_bin  : std_logic_vector(BIN_ADDR_WIDTH-1 downto 0);
   variable upperbits, lowerbits : std_logic_vector(2 downto 0);
+    variable wea2: std_logic  := '0';
+  variable addra2: std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0) := (others => '0');
+
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
+      for pipeline_step in 0 to 1 LOOP
+        case pipeline_step is
+            when 0 =>
+
     report "tm_mem_bin_cm4_new vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
@@ -200,21 +207,27 @@ begin
         vi_page_cnt := 0;
       end if;
     end if;
+    wea2 := wea;
+    addra2 := addra;
     if (wea='1') then
       sa_RAM_data0(to_integer(unsigned(addra))) <= dina; -- Write data
       sa_RAM_data1(to_integer(unsigned(addra))) <= dina; -- Write data
       sa_RAM_data2(to_integer(unsigned(addra))) <= dina; -- Write data
       sa_RAM_data3(to_integer(unsigned(addra))) <= dina; -- Write data
+    end if;
+                when 1 =>
+                if (wea2='1') then
+
       -- Count entries
       -- vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
-      vi_nent_idx := addra(9 downto 4); -- Calculate bin index
+      vi_nent_idx := addra2(9 downto 4); -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
       upperbits := vi_nent_idx(5 downto 3); --phi position
       lowerbits := vi_nent_idx(2 downto 0); --rz position
       
-      page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
-      addr_in_bin := std_logic_vector(unsigned(addra(BIN_ADDR_WIDTH-1 downto 0)) + 1);
+      page := to_integer(unsigned(addra2(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
+      addr_in_bin := std_logic_vector(unsigned(addra2(BIN_ADDR_WIDTH-1 downto 0)) + 1);
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
 
@@ -246,6 +259,9 @@ begin
           sa_RAM_nentB7(page*8+to_integer(unsigned(lowerbits))) <= addr_in_bin; -- <= address
       end case;
     end if; -- (wea='1')
+    when others => null;
+    end case;
+    end loop;
   end if;
 end process;
 
