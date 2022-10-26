@@ -2,7 +2,7 @@
 
 // Returns a unique identifier assigned to each TC.
 const TrackletProjection<BARRELPS>::TProjTCID
-TC::ID(const TF::seed Seed, const TC::itc iTC)
+TC::ID(const TF::seed Seed, const TF::phiRegion iTC)
 {
   return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC);
 }
@@ -37,7 +37,7 @@ TC::getIndices(
 void
 TrackletCalculator(
     const TF::seed Seed,
-    const TC::itc iTC,
+    const TF::phiRegion iTC,
     const uint8_t NSPMem,
     const ap_int<18> LUT_drinv[],
     const ap_int<18> LUT_invt[],
@@ -74,7 +74,7 @@ TrackletCalculator(
 void
 TrackletCalculator(
     const TF::seed Seed,
-    const TC::itc iTC,
+    const TF::phiRegion iTC,
     const uint8_t NSPMem,
     const ap_int<18> LUT_drinv[],
     const ap_int<18> LUT_invt[],
@@ -111,7 +111,7 @@ TrackletCalculator(
 void
 TrackletCalculator(
     const TF::seed Seed,
-    const TC::itc iTC,
+    const TF::phiRegion iTC,
     const uint8_t NSPMem,
     const ap_int<18> LUT_drinv[],
     const ap_int<18> LUT_invt[],
@@ -165,7 +165,7 @@ TrackletCalculator(
 // validity of each of the disk TPROJ memories is determined by TPROJMaskDisk
 // in the same way.
 
-uint8_t NASMemInner(const TF::seed Seed, const TC::itc iTC) {
+uint8_t NASMemInner(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 1;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -201,7 +201,7 @@ uint8_t NASMemInner(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint8_t NASMemOuter(const TF::seed Seed, const TC::itc iTC) {
+uint8_t NASMemOuter(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 1;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -237,7 +237,7 @@ uint8_t NASMemOuter(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint8_t NSPMem(const TF::seed Seed, const TC::itc iTC) {
+uint8_t NSPMem(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 13;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -273,7 +273,7 @@ uint8_t NSPMem(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint64_t ASInnerMask(const TF::seed Seed, const TC::itc iTC) {
+uint64_t ASInnerMask(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -309,7 +309,7 @@ uint64_t ASInnerMask(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint64_t ASOuterMask(const TF::seed Seed, const TC::itc iTC) {
+uint64_t ASOuterMask(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x0;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -345,7 +345,7 @@ uint64_t ASOuterMask(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint32_t TPROJMaskBarrel(const TF::seed Seed, const TC::itc iTC) {
+uint32_t TPROJMaskBarrel(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x2311000;
   else if (Seed == TF::L1L2 && iTC == TC::B)
@@ -381,7 +381,7 @@ uint32_t TPROJMaskBarrel(const TF::seed Seed, const TC::itc iTC) {
   return 0;
 }
 
-uint32_t TPROJMaskDisk(const TF::seed Seed, const TC::itc iTC) {
+uint32_t TPROJMaskDisk(const TF::seed Seed, const TF::phiRegion iTC) {
   if (Seed == TF::L1L2 && iTC == TC::A)
     return 0x3333;
   else if (Seed == TF::L1L2 && iTC == TC::B)
