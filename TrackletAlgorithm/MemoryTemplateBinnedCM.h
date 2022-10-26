@@ -15,9 +15,9 @@
 
 #ifdef CMSSW_GIT_HASH
 #define NBIT_BX 0
-template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
+template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNbitsphibinCM, unsigned int NCOPY>
 #else
-template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
+template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNbitsphibinCM, unsigned int NCOPY>
 #endif
 
 // DataType: type of data object stored in the array
@@ -61,8 +61,12 @@ class MemoryTemplateBinnedCM{
 
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
+    ap_uint<kNbitsphibinCM> ireg;
     (ireg,ibin)=slot;
+    if(ap_uint<NBIT_BIN+1>(slot) < slot || ireg < (slot>>kNBitsRZBinCM)) {
+      std::cout << "Warning: " << slot << " is too large!" << std::endl;
+      return 0;
+    }
     return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
@@ -159,7 +163,7 @@ class MemoryTemplateBinnedCM{
       
       #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
-      ap_uint<kNBitsphibinCM> ireg;
+      ap_uint<kNbitsphibinCM> ireg;
       (ireg,ibin)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
@@ -235,10 +239,13 @@ class MemoryTemplateBinnedCM{
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
 
     ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
+    ap_uint<kNbitsphibinCM> ireg;
     (ireg,ibin)=slot;
     ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
-
+    
+    if(ap_uint<NBIT_BIN+1>(slot) < slot || ireg < (slot>>kNBitsRZBinCM)) {
+      return false;
+    }
     DataType data(datastr.c_str(), base);
 
     bool success = write_mem(ibx, slot, data, nentry_ibx);

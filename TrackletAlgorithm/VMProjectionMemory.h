@@ -109,6 +109,7 @@ public:
   void Print() {
     edm::LogVerbatim("L1trackHLS") << "VMProjection:" << std::endl;
     edm::LogVerbatim("L1trackHLS") << std::hex << "VMProjType=" << VMProjType << "\tid=" << getIndex() << "\tzbin=" << getZBin() << "\tfinez=" << getFineZ() << "\tfinephi=" << getFinePhi() << "\trinv=" << getRInv() << "\tisPS=" << getIsPSSeed() << std::endl;
+    std::cout << "VMProj zbinbits=" << VMProjectionBase<VMProjType>::kVMProjZBinSize << std::endl;
   }
   #endif
 
