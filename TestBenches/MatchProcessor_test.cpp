@@ -19,7 +19,7 @@
   #define TOP_FUNC_ MatchProcessor_L3PHIC
 #endif
 
-const int nevents = 100;  //number of events to run
+const int nevents = 2;  //number of events to run
 
 using namespace std;
 
@@ -47,7 +47,7 @@ int main()
   const auto nAllStub = tb.nFiles(allStubPatternarray);
   vector<AllStubMemory<stubMemType>> allstub(nAllStub);
   const auto nVMStubs = tb.nFiles(vmStubPatternarray);
-  VMStubMEMemoryCM<vmStubMemType, 3, 3, kNMatchEngines> vmstub;
+  VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines> vmstub;
 
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
@@ -78,7 +78,7 @@ int main()
     for (unsigned int i = 0; i < nAllStub; i++)
       writeMemFromFile<AllStubMemory<stubMemType>>(allstub[i], fin_AllStub.at(i), ievt);
     auto &fin_VMStubs = tb.files(vmStubPatternarray);
-    writeMemFromFile<VMStubMEMemoryCM<vmStubMemType, 3, 3, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
+    writeMemFromFile<VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
 
     // clear allarray, output memories before starting
     for (unsigned int i = 0; i < nFullMatches; i++)

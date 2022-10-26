@@ -119,7 +119,7 @@ public:
 
   typedef ap_int<FullMatchBase<FMType>::kFMZResSize> FMZRES;
   typedef ap_int<FullMatchBase<FMType>::kFMPhiResSize> FMPHIRES;
-  typedef ap_uint<FullMatchBase<FMType>::kFMStubRSize> FMSTUBR;
+  typedef ap_int<FullMatchBase<FMType>::kFMStubRSize> FMSTUBR;
   typedef ap_uint<FullMatchBase<FMType>::kFMStubIndexSize> FMSTUBINDEX;
   typedef ap_uint<FullMatchBase<FMType>::kFMStubIDSize> FMSTUBID;        // subdivision of StubIndex 
   typedef ap_uint<FullMatchBase<FMType>::kFMStubPhiIDSize> FMSTUBPHIID;  // subdivision of StubIndex

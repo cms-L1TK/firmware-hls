@@ -19,6 +19,8 @@ constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Numbe
 // The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types (L1D1, L2D1), take the largest value for now...
 constexpr int kNbitsrzbin = 3;
 constexpr int kNbitsphibin = 3;
+constexpr unsigned kNbitsrzbinMP = kNbitsrzbin + 1;
+constexpr unsigned kNbitsphibinMP = kNbitsphibin + 1;
 
 constexpr int kMaxStubsFromLink = 256;
 
@@ -99,6 +101,7 @@ constexpr double kz0 = 0.0585938;
 
 // layer projection digitization constants
 constexpr double kphiproj456 = 7.71867e-06;
+constexpr double kphiderdisk = kphi / kr / 128;
 constexpr double kphider = 8.23325e-06;
 constexpr double kzproj = 0.0585938;
 constexpr double kzder = 0.015625;
@@ -108,8 +111,8 @@ constexpr double kphiprojdisk = 6.17494e-05;
 constexpr double kphiprojderdisk = 1.64665e-05;
 constexpr double krprojdisk = 0.0585938;
 constexpr double krprojderdisk = 0.0078125;
-constexpr int log2barrel = 3;
-constexpr int log2disk = 6;
+constexpr int log2barrel = log2(kphi / (krprojdisk * kphider));
+constexpr int log2disk = log2(kphi / (kz * kphiderdisk));
 
 // cut constants for TC
 constexpr int ifactor = 469;

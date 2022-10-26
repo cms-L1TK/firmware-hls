@@ -168,6 +168,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 2, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>;
+template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 2, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, PhiRegSize, NCOPY>;
 
 #endif
