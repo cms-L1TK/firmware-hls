@@ -49,13 +49,6 @@ namespace PR
 
     data = inmem[read_imem].read_mem(bx, read_addr);
 
-    //for(int i = 0; i < nMEM; ++i) {
-    //#pragma HLS unroll
-    //
-    //  if (read_imem == i) {
-    //    data = inmem[i].read_mem(bx, read_addr);
-    //  }
-    //}
   }
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
@@ -139,24 +132,6 @@ namespace PR
     }
   }
 
-/*
-  inline void rbinLUTinit(ap_uint<2*MEBinsBits> zbinLUT[128], int rbins_adjust){
-
-    constexpr unsigned int rbin_const = 8; // can this be derived from other constants?
-
-    for(unsigned int ibin=0; ibin<128; ibin++) {
-
-      ap_uint<7> bin(ibin);
-
-      constexpr double projshiftdisk = 2 * kr;
-
-      ap_uint<MEBinsBits> rbin1 = rbin_const * (
-      ap_uint<MEBinsBits> rbin2 = zbinupper >> zbins_nbitsextra;
-
-  }
-*/
-
-
 } // namesapce PR
 
 
@@ -213,51 +188,6 @@ void readTable(ap_uint<1> table[]){
 #include "../emData/ME/tables/METable_L6.tab"
     for (int i=0;i<512;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
-  }
-
-  if (L==TF::D1) {
-    bool tmp[768]=
-#include "../emData/MP/tables/METable_D1.tab"
-    for (int i=0;i<768;++i){
-#pragma HLS unroll
-      table[i]=tmp[i];
-    }
-  }
-
-  if (L==TF::D2) {
-    bool tmp[768]=
-#include "../emData/MP/tables/METable_D2.tab"
-    for (int i=0;i<768;++i){
-#pragma HLS unroll
-      table[i]=tmp[i];
-    }
-  }
-
-  if (L==TF::D3) {
-    bool tmp[768]=
-#include "../emData/MP/tables/METable_D3.tab"
-    for (int i=0;i<768;++i){
-#pragma HLS unroll
-      table[i]=tmp[i];
-    }
-  }
-
-  if (L==TF::D4) {
-    bool tmp[768]=
-#include "../emData/MP/tables/METable_D4.tab"
-    for (int i=0;i<768;++i){
-#pragma HLS unroll
-      table[i]=tmp[i];
-    }
-  }
-
-  if (L==TF::D5) {
-    bool tmp[768]=
-#include "../emData/MP/tables/METable_D5.tab"
-#pragma HLS unroll
-    for (int i=0;i<768;++i){
       table[i]=tmp[i];
     }
   }
@@ -986,7 +916,7 @@ void MatchCalculator(BXType bx,
   const auto kPhi0_shift         = (LAYER < TF::L4)? 3 : 0;                                      // phi0shift_ in emulation defined in MC
   const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
-  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 + kNbitsrL456; //FIXME was  + kNbitsrL456;                                           // icorrshift for L456
+  const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 - kNbitsrL456; //FIXME was  + kNbitsrL456;                                           // icorrshift for L456
   const auto kPhi_corr_shift     = (LAYER < TF::D1) ? ((LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456) : ap_uint<10>(6);                            // icorrshift_/shifttmp  in emulation
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
@@ -1086,13 +1016,10 @@ void MatchCalculator(BXType bx,
   ap_int<14> delta_z_fact   = delta_z * kFact;
   const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
-  //ap_int<18> shiftstubphi   = stub_phi_long << kPhi0_shift;                        // shift
   ap_int<18> shiftstubphi   = kPhi0_shift > 0 ? stub_phi_long << kPhi0_shift : stub_phi_long;                        // shift
   if(isDisk && isPSStub)
-    //shiftstubphi = stub_ps_phi << kPhi0_shift;
     shiftstubphi = kPhi0_shift > 0 ? stub_ps_phi << kPhi0_shift : stub_ps_phi;                        // shift
   else if(isDisk && !isPSStub) {
-    //shiftstubphi = stub_2s_phi << kPhi0_shift;
     shiftstubphi = kPhi0_shift > 0 ? stub_2s_phi << kPhi0_shift : stub_2s_phi;                        // shift
   }
   ap_int<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
@@ -1243,7 +1170,7 @@ void MatchProcessor(BXType bx,
                       // pointers that point to stuff other than scalar or
                       // array of scalar ...
                       const TrackletProjectionMemory<PROJTYPE> projin[nINMEM],
-                      const VMStubMEMemoryCM<VMSMEType, 3, 3, kNMatchEngines>& instubdata,
+                      const VMStubMEMemoryCM<VMSMEType, kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines>& instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       BXType& bx_o,
                       FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
@@ -1383,6 +1310,12 @@ void MatchProcessor(BXType bx,
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
+#ifdef DEBUG
+      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
+      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
+      
+      if(!emptys[iMEU]) (stubindex,allprojdata) = matchengine[iMEU].peek();
+#endif
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
     }
@@ -1394,7 +1327,6 @@ void MatchProcessor(BXType bx,
       std::cout << " MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
 		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
     }
-    std::cout << std::endl;
     */
     
     //New code
@@ -1475,6 +1407,8 @@ void MatchProcessor(BXType bx,
       
       lastTrkID = trkindex;
 
+#ifdef DEBUG
+#endif
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
         (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
@@ -1530,18 +1464,13 @@ void MatchProcessor(BXType bx,
       ap_uint<nZbinBits> zfirst, zlast, rtmp, rfirst;
       ap_uint<1> rsecond;
 
-      //(zfirst, zlast) = zbinLUT[(psseed,zbin6)];
       ap_uint<nRbinBits> rbin = rbinLUT[rbin8];
       typename VMProjection<VMPTYPE>::VMPFINEZ finer = rbin >> nZbinBits;
       rtmp = rbin.range(nZbinBits, 0);
       rfirst = rtmp >> 1;
       rsecond = rtmp & 1;
-      //(finer,rfirst,rsecond) = rbin;//.range(nZbinBits, 0);
-      //rfirst = izder < 0 ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       rfirst = (izder.range(izder.length()-1, izder.length()-1)  == 1) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
-      //rfirst = (projdata_.getRZDer()>0) ? rfirst : ap_uint<nZbinBits>(rfirst + (1<<nRbinBits));
-      //rbin.range(nZbinBits+1, 1) = (projdata_.getRZDer()>0) ? rbin.range(nZbinBits, 1) : rbin.range(nZbinBits+1, 1) + (1<<kNbitsrzbin);
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (LAYER < trklet::N_LAYER) ? (zfirst, zfirst!=zlast) : (rfirst,rsecond);
 
@@ -1586,23 +1515,14 @@ void MatchProcessor(BXType bx,
       
       // bits used for routing
       iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
-      //iphi = iphiproj.range(iphiproj.length()-nbins_vmme-1,iphiproj.length()-nbits_all-nbits_vmme);
-      //iphi = iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
-      //iphi = (iphiproj >> (iphiproj.length() - 1 - (nbits_vmme + nbits_all))) & (nbins_vmme - 1);//iphiproj.range(iphiproj.length()-nbits_all-1,iphiproj.length()-nbits_all-nbits_vmme);
-                //<< (iphiproj >> (iphiproj.length() - 1 - (nbits_vmme + nbits_all)) & (nbins_vmme - 1)) << std::endl;
       
       constexpr int kNfineBits = 3;
       typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = (iphiproj >> (iphiproj.length() - (nvmbits_ + kNfineBits))) & ((1 << kNfineBits) - 1);
-      /*
-      typename VMProjection<VMPTYPE>::VMPFINEPHI finephi = iphiproj.range(iphiproj.length()-nbits_all-nbits_vmme-1,
-                                      iphiproj.length()-nbits_all-nbits_vmme-3); 
-      */
       
       constexpr int nextrabits = 2;
       constexpr int overlapbits = nbits_vmme + nbits_all + nextrabits;
       
       unsigned int extrabits = (iphiproj >> (iphiproj.length() - overlapbits -  nextrabits)) & ((1<<nextrabits) - 1);
-      //unsigned int extrabits = iphiproj.range(iphiproj.length() - overlapbits, iphiproj.length() - overlapbits - nextrabits);
 
       unsigned int ivmPlus = iphi;
 	
@@ -1680,10 +1600,11 @@ void MatchProcessor(BXType bx,
       
       
       VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv);
-      //vmproj.Print();
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
+#ifdef DEBUG
+#endif
 
       ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
@@ -1712,7 +1633,6 @@ void MatchProcessor(BXType bx,
       nINMEM, kNBits_MemAddr+1>
       (bx, mem_hasdata, numbersin, mem_read_addr,
          projin, projdata);
-      //std::cout << "Loading proj=" << projdata.raw() << " into MP" << std::endl;
  
     } else {
       validin = false;
