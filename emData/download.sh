@@ -3,14 +3,14 @@ set -e
 
 #### fw_synch_220523 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/pmcFjHWj2oPgESW/download"
-luts_url="https://cernbox.cern.ch/index.php/s/i0kr2DI0SFY5m1A/download"
+memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/pmcFjHWj2oPgESW/MemPrints.tar.gz"
+luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/i0kr2DI0SFY5m1A/LUTs.tar.gz"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/6pM48rxtsxrN9tg/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/U84ZI1vGnVKkQKc/download"
+memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/6pM48rxtsxrN9tg/MemPrints.tar.gz"
+luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/U84ZI1vGnVKkQKc/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/Nk0VWN7kRMZSFWm/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/LoqjBIg2ARZav8u/download"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/Nk0VWN7kRMZSFWm/MemPrints.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/LoqjBIg2ARZav8u/LUTs.tar.gz"
 # Reduced Combined modules                                                      
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
@@ -18,8 +18,8 @@ luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tg
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
 # e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
-memprints_url_barrel="https://cernbox.cern.ch/index.php/s/2Ju0bMoBnRK1B8n/download"
-luts_url_barrel="https://cernbox.cern.ch/index.php/s/DLJv9VGrjFrZUSQ/download"
+memprints_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/2Ju0bMoBnRK1B8n/MemPrints.tar.gz"
+luts_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/DLJv9VGrjFrZUSQ/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
