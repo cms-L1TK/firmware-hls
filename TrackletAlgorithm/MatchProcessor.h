@@ -1004,7 +1004,6 @@ void MatchCalculator(BXType bx,
     phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
   ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
   ap_int<12> r_corr        = full_r_corr >> kr_corr_shift; // only keep needed bits
-    std::string ld[] = {"L1", "L2", "L3", "L4", "L5", "L6", "D1", "D2", "D3", "D4", "D5"};
    
   // Apply the corrections
   const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
