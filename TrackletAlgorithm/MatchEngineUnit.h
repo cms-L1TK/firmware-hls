@@ -113,6 +113,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   //process. 
   
   NSTUB istubtmp=istub_;
+  NSTUB iusetmp=iuse_;
 
   ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
   auto secondSave = second_;
@@ -123,10 +124,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
   constexpr regionType APTYPE = TF::layerDiskRegion[LAYER];
   int sign = isDisk ? (projbuffer_.getPhiDer() < 0 ? -1 : 1) : 0;
-  bool usefirstMinus = use_[iuse_] == 0;
-  bool usesecondMinus = use_[iuse_] == 2;
-  bool usefirstPlus = use_[iuse_] == 1;
-  bool usesecondPlus = use_[iuse_] == 3;
+  bool usefirstMinus = use_[iusetmp] == 0;
+  bool usesecondMinus = use_[iusetmp] == 2;
+  bool usefirstPlus = use_[iusetmp] == 1;
+  bool usesecondPlus = use_[iusetmp] == 3;
   bool first = usefirstPlus || usefirstMinus;
   bool second = usefirstPlus || usesecondPlus;
 
@@ -143,7 +144,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
      
     //Calculate fine z position
     const int detectorshift(8);
-    if (second_) {
+    if (use_[iusetmp].range(1,1)) {
       projfinezadj__ = projfinez-detectorshift;
     } else {
       projfinezadj__ = projfinez;
@@ -158,28 +159,31 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     projrinv__ = data.getRInv();
 
   }
-  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iuse_].range(0,0)) * nbins + zbin + use_[iuse_].range(1,1);
+  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iusetmp].range(0,0)) * nbins + zbin + use_[iusetmp].range(1,1);
    
   //Check if last stub, if so, go to next buffer entry 
   if (good__) {
-    if (istub_ >= nstubs_) {
-      iuse_++;
-      if (iuse_ < nuse_) {
-          istub_ = 0;
+   if (istub_>=nstubs_){
+     iuse_++;
+     if(iusetmp < nuse_) {
+       istub_ = 0;
+     }
+     else {
+       idle_ = true;
+     }
+     if (!stubmask_) {
+       idle_ = true;
+     } else {
+          iusetmp = 0;
           ap_uint<2> index = __builtin_ctz(stubmask_);
           stubmask_[index]=0;
           second_ =  index[0];
           phiPlus_ =  index[1];
           nstubs_ = nstubsall_[index];
       }
-      else if (!stubmask_) {
-        idle_ = true;
-      }
-      else {
-      }
+   } else {
+     istub_++;
     }
-    else
-      istub_++;
   }
   
   //Read stub memory and extract data fields
