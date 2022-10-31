@@ -1093,16 +1093,17 @@ void MatchCalculator(BXType bx,
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
   bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+  disk_match = disk_match && (abs_delta_phi < best_delta_phi);
   if ((!isDisk && barrel_match) || (isDisk && disk_match)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
+    best_delta_phi = abs_delta_phi;
     if(isDisk) {
       best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * ap_uint<12>(stub_ps_r)) : ap_uint<20>(abs_delta_phi * tmp_stubr);
       best_delta_r    = abs_delta_r;
     }
     else {
       best_delta_z = iabs<14>(delta_z_fact);
-      best_delta_phi = abs_delta_phi;
     }
 
     // Store bestmatch
