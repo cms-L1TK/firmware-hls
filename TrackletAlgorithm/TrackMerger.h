@@ -10,6 +10,8 @@ const unsigned int kNComparisonModules = 16;
 const unsigned int kNBuffers = kNComparisonModules + 1;
 const unsigned int kMaxTrack = 50;
 const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
+using namespace hls;
+
 
 class ComparisonModule{
     public:
@@ -25,7 +27,7 @@ class ComparisonModule{
 
     unsigned int getEndOfStream(){return endOfStream;}
 
-    TrackFit<NBarrelStub, NDiskStub>::TrackWord getMasterTrackWord(){return masterTrack._trackWord;}
+    TrackFitType::TrackWord getMasterTrackWord(){return masterTrack._trackWord;}
 
     void process(TrackStruct &inTrack, TrackStruct &outTrack);
     
@@ -45,53 +47,53 @@ class ComparisonModule{
     void fillUnmerged(TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i);
 
     void loadTrack(
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3,
+      stream<TrackFitType::TrackWord> &trackWord,
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_0,
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_1,
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_2,
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_3,
+      stream<TrackFitType::DiskStubWord> &diskStubWords_0,
+      stream<TrackFitType::DiskStubWord> &diskStubWords_1,
+      stream<TrackFitType::DiskStubWord> &diskStubWords_2,
+      stream<TrackFitType::DiskStubWord> &diskStubWords_3,
       TrackStruct& aTrack
     );
 
     void unloadTrack(
        TrackStruct& aTrack,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord_o,
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2_o, 
-      hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3_o 
+      stream<TrackFitType::TrackWord> &trackWord_o,
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_0_o, 
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_1_o, 
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_2_o, 
+      stream<TrackFitType::BarrelStubWord> &barrelStubWords_3_o, 
+      stream<TrackFitType::DiskStubWord> &diskStubWords_0_o, 
+      stream<TrackFitType::DiskStubWord> &diskStubWords_1_o, 
+      stream<TrackFitType::DiskStubWord> &diskStubWords_2_o, 
+      stream<TrackFitType::DiskStubWord> &diskStubWords_3_o 
     );
 
 };
 
 void TrackMerger(const BXType bx,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3,
+  stream<TrackFitType::TrackWord> &trackWord,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_0,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_1,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_2,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_3,
   BXType bx_o,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord_o,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3_o 
+  stream<TrackFitType::TrackWord> &trackWord_o,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_0_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_1_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_2_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_3_o 
   );
 
 

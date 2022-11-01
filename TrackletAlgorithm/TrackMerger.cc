@@ -3,25 +3,25 @@
 #include <bitset>
 
 TrackStruct& ComparisonModule::getMasterTrackStruct(){
-  #pragma HLS inline
   return masterTrack;
 }
 
 void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
-  #pragma HLS inline
   // assert(inTrack._trackWord !=0);
   // assert (tracksProcessed <= kMaxTrack);
   trackHandler = TrackHandler();
-  if (inTrack._trackWord != 0){
+  if (inTrack._trackWord != 0 && tracksProcessed <= kMaxTrack){
     if (masterTrack._trackWord == 0){
       masterTrack = inTrack;
     } else {
-      assert(masterTrack._trackWord != inTrack._trackWord);
-      trackHandler.compareTrack(inTrack, masterTrack, matchFound, mergeCondition);
-      if (matchFound){
-        trackHandler.mergeTrack(inTrack, masterTrack);
-      } else {
-        outTrack = inTrack;
+      // assert(masterTrack._trackWord != inTrack._trackWord);
+      if(masterTrack._trackWord != inTrack._trackWord){
+        trackHandler.compareTrack(inTrack, masterTrack, matchFound, mergeCondition);
+        if (matchFound){
+          trackHandler.mergeTrack(inTrack, masterTrack);
+        } else {
+          outTrack = inTrack;
+        }
       }
     }
   }
@@ -31,23 +31,21 @@ void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
 }
 
 void fillUnmerged(TrackStruct& inTrack,TrackStruct* outTrack, unsigned int i){
-  #pragma HLS inline
   outTrack[i] = inTrack;}
 
 
 void loadTrack(
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3,
+  stream<TrackFitType::TrackWord> &trackWord,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_0,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_1,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_2,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_3,
   TrackStruct& aTrack
 ) {
-  #pragma HLS inline
   trackWord.read(aTrack._trackWord);
   barrelStubWords_0.read(aTrack._barrelStubArray[0][0]);
   barrelStubWords_1.read(aTrack._barrelStubArray[1][0]);
@@ -64,17 +62,16 @@ void loadTrack(
 
 void unloadTrack(
   TrackStruct& aTrack,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord_o,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3_o 
+  stream<TrackFitType::TrackWord> &trackWord_o,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_0_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_1_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_2_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_3_o 
 ) {
-  #pragma HLS inline
   trackWord_o.write(aTrack._trackWord);
   barrelStubWords_0_o.write(aTrack._barrelStubArray[0][0]);
   barrelStubWords_1_o.write(aTrack._barrelStubArray[1][0]);
@@ -89,28 +86,27 @@ void unloadTrack(
 }
 
 void TrackMerger(const BXType bx,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3,
+  stream<TrackFitType::TrackWord> &trackWord,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_0,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_1,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_2,
+  stream<TrackFitType::DiskStubWord> &diskStubWords_3,
   BXType bx_o,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> &trackWord_o,
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_0_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_1_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_2_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> &barrelStubWords_3_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_0_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_1_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_2_o, 
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> &diskStubWords_3_o 
+  stream<TrackFitType::TrackWord> &trackWord_o,
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2_o, 
+  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_0_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_1_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_2_o, 
+  stream<TrackFitType::DiskStubWord> &diskStubWords_3_o 
   )
 {
-  #pragma HLS inline
   static ComparisonModule comparisonModule[kNComparisonModules];
   #pragma HLS array_partition variable=comparisonModule complete dim=0
 
@@ -118,7 +114,7 @@ void TrackMerger(const BXType bx,
   // #pragma HLS array_partition variable=unmergedTracks complete dim=0
   LOOP_Input:
   for (unsigned int i = 0; i < kMaxTrack; i++){ 
-    #pragma HLS pipeline II=1
+    #pragma HLS pipeline II=1 REWIND
     TrackStruct tracks[kNBuffers]; 
     #pragma HLS array_partition variable=tracks complete dim=0
     loadTrack(trackWord,

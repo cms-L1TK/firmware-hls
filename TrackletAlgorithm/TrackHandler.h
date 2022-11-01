@@ -4,20 +4,24 @@
 #include "hls_stream.h"
 const int NBarrelStub = 4;
 const int NDiskStub = 4;
-const unsigned int kFullBarrelStubSize = TrackFit<NBarrelStub, NDiskStub>::kBarrelStubSize * 4;
-const unsigned int kFullDiskStubSize = TrackFit<NBarrelStub, NDiskStub>::kDiskStubSize * 4;
-const unsigned int kFullTrackWordSize = TrackFit<NBarrelStub, NDiskStub>::kTrackWordSize;
-const unsigned int kBarrelStubIndexSizeMSB = TrackFit<NBarrelStub, NDiskStub>::kTFBarrelStubRSize + TrackFit<NBarrelStub, NDiskStub>::kTFPhiResidSize + TrackFit<NBarrelStub, NDiskStub>::kTFZResidSize + TrackFit<NBarrelStub, NDiskStub>::kTFStubIndexSize;
-const unsigned int kBarrelStubIndexSizeLSB = TrackFit<NBarrelStub, NDiskStub>::kTFBarrelStubRSize + TrackFit<NBarrelStub, NDiskStub>::kTFPhiResidSize + TrackFit<NBarrelStub, NDiskStub>::kTFZResidSize;
-const unsigned int kDiskStubIndexSizeMSB = TrackFit<NBarrelStub, NDiskStub>::kTFDiskStubRSize + TrackFit<NBarrelStub, NDiskStub>::kTFPhiResidSize + TrackFit<NBarrelStub, NDiskStub>::kTFRResidSize + TrackFit<NBarrelStub, NDiskStub>::kTFStubIndexSize;
-const unsigned int kDiskStubIndexSizeLSB = TrackFit<NBarrelStub, NDiskStub>::kTFDiskStubRSize + TrackFit<NBarrelStub, NDiskStub>::kTFPhiResidSize + TrackFit<NBarrelStub, NDiskStub>::kTFRResidSize;
+typedef TrackFit<NBarrelStub, NDiskStub> TrackFitType;
+const unsigned int kFullBarrelStubSize = TrackFitType::kBarrelStubSize * NBarrelStub;
+const unsigned int kFullDiskStubSize = TrackFitType::kDiskStubSize * NDiskStub;
+const unsigned int kFullTrackWordSize = TrackFitType::kTrackWordSize;
+const unsigned int kBarrelStubIndexSizeMSB = TrackFitType::kTFBarrelStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFZResidSize + TrackFitType::kTFStubIndexSize;
+const unsigned int kBarrelStubIndexSizeLSB = TrackFitType::kTFBarrelStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFZResidSize;
+const unsigned int kDiskStubIndexSizeMSB = TrackFitType::kTFDiskStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFRResidSize + TrackFitType::kTFStubIndexSize;
+const unsigned int kDiskStubIndexSizeLSB = TrackFitType::kTFDiskStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFRResidSize;
 const unsigned int layerStubIndexSize = 1; // 7 stubs per layer
+const unsigned int kBarrelStubMap = TrackFitType::kTFHitCountSize * NBarrelStub;
+const unsigned int kDiskStubMap = TrackFitType::kTFHitCountSize * NBarrelStub;
+const unsigned int kTotHitMap = kBarrelStubMap + kDiskStubMap;
 
 struct TrackStruct {
   
-  TrackFit<NBarrelStub, NDiskStub>::TrackWord _trackWord = 0; 
-  TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord _barrelStubArray[4][layerStubIndexSize] = {0}; 
-  TrackFit<NBarrelStub, NDiskStub>::DiskStubWord _diskStubArray[4][layerStubIndexSize] = {0};
+  TrackFitType::TrackWord _trackWord = 0; 
+  TrackFitType::BarrelStubWord _barrelStubArray[NBarrelStub][layerStubIndexSize] = {0}; 
+  TrackFitType::DiskStubWord _diskStubArray[NDiskStub][layerStubIndexSize] = {0};
 };
 
 class TrackHandler {
@@ -36,13 +40,13 @@ class TrackHandler {
 
     
   private:
-    ap_uint<1> matchesFoundBarrel[4][layerStubIndexSize];
-    ap_uint<1> matchesFoundDisk[4][layerStubIndexSize];
+    ap_uint<1> matchesFoundBarrel[NBarrelStub][layerStubIndexSize];
+    ap_uint<1> matchesFoundDisk[NDiskStub][layerStubIndexSize];
     ap_uint<1> stubPadding = 0;
     unsigned int debug = 0;
-    ap_uint<12> mergedBarrelStubsMap;
-    ap_uint<12> mergedDiskStubsMap;
-    ap_uint<24> totalHitMap;
+    ap_uint<kDiskStubMap> mergedBarrelStubsMap;
+    ap_uint<kBarrelStubMap> mergedDiskStubsMap;
+    ap_uint<kTotHitMap> totalHitMap;
 };
 
 

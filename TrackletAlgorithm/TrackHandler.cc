@@ -1,26 +1,26 @@
 #include "TrackHandler.h"
 
 bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsigned int& matchFound, unsigned int mergeCondition){
-  #pragma HLS inline
   // compare the two tracks, masterTrack and trk
-  LOOP_CompareTrack:
-  for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
-    #pragma HLS unroll
-    auto masterBarrelStubIndex = ap_uint<TrackFit<NBarrelStub, NDiskStub>::kTFStubIndexSize>(masterTrk._barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
-    auto inputBarrelStubIndex = ap_uint<TrackFit<NBarrelStub, NDiskStub>::kTFStubIndexSize>(trk._barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
-    auto masterDiskStubIndex = ap_uint<TrackFit<NBarrelStub, NDiskStub>::kTFStubIndexSize>(masterTrk._diskStubArray[layerIndex][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
-    auto inputDiskStubIndex = ap_uint<TrackFit<NBarrelStub, NDiskStub>::kTFStubIndexSize>(trk._diskStubArray[layerIndex][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
+  LOOP_CompareTrackBarrel:
+  for (unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){
+    auto masterBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
+    auto inputBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
 
     if((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)){
-      matchesFoundBarrel[layerIndex][0] = 1;
+      matchesFoundBarrel[barrelStubNum][0] = 1;
     } else {
-      matchesFoundBarrel[layerIndex][0] = 0;
+      matchesFoundBarrel[barrelStubNum][0] = 0;
     }
-    
+  }
+  LOOP_CompareTrackDisk:
+  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){  
+    auto masterDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
+    auto inputDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
     if ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)){
-      matchesFoundDisk[layerIndex][0] = 1;
+      matchesFoundDisk[diskStubNum][0] = 1;
     } else {
-      matchesFoundDisk[layerIndex][0] = 0;
+      matchesFoundDisk[diskStubNum][0] = 0;
     }
   }
 
@@ -28,7 +28,6 @@ bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsign
   unsigned int matchesFound = 0;
   LOOP_MatchesFound:
   for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
-    #pragma HLS unroll
     matchesFound += matchesFoundBarrel[layerIndex][0] + matchesFoundDisk[layerIndex][0];
   }
   if (matchesFound >= mergeCondition){
@@ -41,43 +40,50 @@ bool TrackHandler::compareTrack(TrackStruct& trk, TrackStruct& masterTrk, unsign
 }
 
 void TrackHandler::mergeTrack(TrackStruct& trk, TrackStruct& masterTrk){
-  #pragma HLS inline
   // update master track
   // check whether the stub word is non-zero in the compared track
   // then add stub into master track if share > 3 stubs in common
-  LOOP_SetInputStubToMaster:
-  for(unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
-    #pragma HLS unroll
-    if((masterTrk._barrelStubArray[layerIndex][0] == 0) && (trk._barrelStubArray[layerIndex][0] != 0)){
-      masterTrk._barrelStubArray[layerIndex][0] = trk._barrelStubArray[layerIndex][0];
-      mergedBarrelStubsMap += (1 << 3*layerIndex);
+  LOOP_SetInputBarrelStubToMaster:
+  for(unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){
+    if((masterTrk._barrelStubArray[barrelStubNum][0] == 0) && (trk._barrelStubArray[barrelStubNum][0] != 0)){
+      masterTrk._barrelStubArray[barrelStubNum][0] = trk._barrelStubArray[barrelStubNum][0];
+      mergedBarrelStubsMap += (1 << TrackFitType::kTFHitCountSize*barrelStubNum);
     }
-    if((masterTrk._diskStubArray[layerIndex][0] == 0) && (trk._diskStubArray[layerIndex][0] !=0 )){
-      masterTrk._diskStubArray[layerIndex][0] = trk._diskStubArray[layerIndex][0];
-      mergedDiskStubsMap += (1 << 3*layerIndex);
+  }
+  LOOP_SetInputDiskStubToMaster:
+  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
+    if((masterTrk._diskStubArray[diskStubNum][0] == 0) && (trk._diskStubArray[diskStubNum][0] !=0 )){
+      masterTrk._diskStubArray[diskStubNum][0] = trk._diskStubArray[diskStubNum][0];
+      mergedDiskStubsMap += (1 << TrackFitType::kTFHitCountSize*diskStubNum);
     }
-    totalHitMap = mergedBarrelStubsMap + mergedDiskStubsMap;
-    masterTrk._trackWord | totalHitMap;
-      
-    LOOP_MergeLoopOverStubIndicies:
-    for (unsigned int stubIndex = 1; stubIndex < layerStubIndexSize; stubIndex++){
-      #pragma HLS unroll
-      if((masterTrk._barrelStubArray[layerIndex][stubIndex] == 0) && (trk._barrelStubArray[layerIndex][stubIndex] != 0)){
-        masterTrk._barrelStubArray[layerIndex][stubIndex] = trk._barrelStubArray[layerIndex][stubIndex];
+  }
+
+  totalHitMap = mergedBarrelStubsMap + mergedDiskStubsMap;
+  masterTrk._trackWord | totalHitMap;
+  LOOP_BarrelStubs:
+  for (unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){    
+    LOOP_MergeBarrelStubs:
+    for (unsigned int barrelStubIndex = 1; barrelStubIndex < layerStubIndexSize; barrelStubIndex++){
+      if((masterTrk._barrelStubArray[barrelStubNum][barrelStubIndex] == 0) && (trk._barrelStubArray[barrelStubNum][barrelStubIndex] != 0)){
+        masterTrk._barrelStubArray[barrelStubNum][barrelStubIndex] = trk._barrelStubArray[barrelStubNum][barrelStubIndex];
       } else {
         LOOP_BitIndexBarrel:
-        for (int bitIndex = 0; bitIndex < TrackFit<NBarrelStub, NDiskStub>::kBarrelStubSize; bitIndex++){
-          #pragma HLS unroll
-          masterTrk._barrelStubArray[layerIndex][stubIndex] = trk._barrelStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
+        for (int bitIndex = 0; bitIndex < TrackFitType::kBarrelStubSize; bitIndex++){
+          masterTrk._barrelStubArray[barrelStubNum][barrelStubIndex] = trk._barrelStubArray[barrelStubNum][barrelStubIndex] | (stubPadding << bitIndex);
         }
       }
-      if((masterTrk._diskStubArray[layerIndex][stubIndex] == 0) && (trk._diskStubArray[layerIndex][stubIndex] != 0)){
-        masterTrk._diskStubArray[layerIndex][stubIndex] = trk._diskStubArray[layerIndex][stubIndex];
+    }
+  }
+  LOOP_DiskStubs:
+  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
+    LOOP_MergeDiskStubs:
+    for (unsigned int diskStubIndex = 1; diskStubIndex < layerStubIndexSize; diskStubIndex++){
+      if((masterTrk._diskStubArray[diskStubNum][diskStubIndex] == 0) && (trk._diskStubArray[diskStubNum][diskStubIndex] != 0)){
+        masterTrk._diskStubArray[diskStubNum][diskStubIndex] = trk._diskStubArray[diskStubNum][diskStubIndex];
       } else {
         LOOP_BitIndexDisk:
-        for (int bitIndex = 0; bitIndex < TrackFit<NBarrelStub, NDiskStub>::kDiskStubSize; bitIndex++){
-          #pragma HLS unroll
-          masterTrk._diskStubArray[layerIndex][stubIndex] = masterTrk._diskStubArray[layerIndex][stubIndex] | (stubPadding << bitIndex);
+        for (int bitIndex = 0; bitIndex < TrackFitType::kDiskStubSize; bitIndex++){
+          masterTrk._diskStubArray[diskStubNum][diskStubIndex] = masterTrk._diskStubArray[diskStubNum][diskStubIndex] | (stubPadding << bitIndex);
 
         }
       }

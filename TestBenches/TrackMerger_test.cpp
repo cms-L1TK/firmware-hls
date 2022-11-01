@@ -1,5 +1,5 @@
 // TrackMerger test bench
-#include "TrackMergerTop.h"
+#include "../TopFunctions/TrackMergerTop.h"
 #include "FileReadUtility.h"
 #include "hls_math.h"
 #include "hls_stream.h"
@@ -13,33 +13,34 @@
 const int nevents = 100;
 
 using namespace std;
+using namespace hls;
 
 int main(){
   //Error counter
   int err_count = 0;
     
   // Input memories
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> trackWord("input_stream_1");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_0("input_stream_2");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_1("input_stream_3");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_2("input_stream_4");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_3("input_stream_5");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_0("input_stream_6");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_1("input_stream_7");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_2("input_stream_8");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_3("input_stream_9");
+  stream<TrackFitType::TrackWord> trackWord("input_stream_1");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_0("input_stream_2");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_1("input_stream_3");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_2("input_stream_4");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_3("input_stream_5");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_0("input_stream_6");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_1("input_stream_7");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_2("input_stream_8");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_3("input_stream_9");
   static TrackFitMemory<NBarrelStub, NDiskStub> inputTracks;
 
   // Output memories
-  hls::stream<TrackFit<NBarrelStub, NDiskStub>::TrackWord> trackWord_o("output_stream_1");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_0_o("output_stream_2");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_1_o("output_stream_3");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_2_o("output_stream_4");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::BarrelStubWord> barrelStubWords_3_o("output_stream_5");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_0_o("output_stream_6");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_1_o("output_stream_7");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_2_o("output_stream_8");
-  static hls::stream<TrackFit<NBarrelStub, NDiskStub>::DiskStubWord> diskStubWords_3_o("output_stream_9");
+  stream<TrackFitType::TrackWord> trackWord_o("output_stream_1");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_0_o("output_stream_2");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_1_o("output_stream_3");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_2_o("output_stream_4");
+  static stream<TrackFitType::BarrelStubWord> barrelStubWords_3_o("output_stream_5");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_0_o("output_stream_6");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_1_o("output_stream_7");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_2_o("output_stream_8");
+  static stream<TrackFitType::DiskStubWord> diskStubWords_3_o("output_stream_9");
   static TrackFitMemory<NBarrelStub, NDiskStub> outputTracks;
   // int outputNumber;
 
@@ -63,11 +64,11 @@ int main(){
 
     // Set input memories
     for(unsigned short i = 0; i < kMaxTrack; i++){
-      TrackFit<NBarrelStub, NDiskStub> track;
+      TrackFitType track;
       if (i < inputTracks.getEntries(bx)) {
         track = inputTracks.read_mem(bx, i+1); //i+1 for merge
       } else {
-        track = TrackFit<NBarrelStub, NDiskStub>();
+        track = TrackFitType();
       }
       trackWord << track.getTrackWord();
       barrelStubWords_0 << track.getBarrelStubWord<0>();
@@ -108,7 +109,7 @@ int main(){
     // Filling outputs
     unsigned nTracks = 0;
     for (unsigned short i = 0; i < kMaxTrack+kNComparisonModules; i++){ //first 16 CMs don't appear in output first if outputting unmerged tracks first
-      TrackFit<NBarrelStub, NDiskStub> track;
+      TrackFitType track;
       track.setTrackWord(trackWord_o.read());
       track.setBarrelStubWord<0>(barrelStubWords_0_o.read());
       track.setBarrelStubWord<1>(barrelStubWords_1_o.read());
