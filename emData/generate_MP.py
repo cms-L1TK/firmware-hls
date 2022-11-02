@@ -158,6 +158,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         )
 
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)
+        nrz = 'kNbitsrzbinMPBarrel' if 'BARREL' in VMStubRegion else 'kNbitsrzbinMPDisk'
+        nphi = 'kNbitsphibinMPBarrel' if 'BARREL' in VMStubRegion else 'kNbitsphibinMPDisk'
         # Print out prototype for top function for this MP.
         topHeaderFile.write(
             "\n"
@@ -167,7 +169,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "void MatchProcessor_" + seed + "PHI" + iMP + "(\n"
             "    const BXType bx,\n"
             "    const TrackletProjectionMemory<" + TProjRegion + "> projin[" + seed + "PHI" + iMP + "maxTrackletProjections],\n"
-            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", 3, 3, kNMatchEngines>& instubdata,\n"
+            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines>& instubdata,\n"
             "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
             "    BXType& bx_o,\n"
             "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
@@ -180,7 +182,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "void MatchProcessor_" + seed + "PHI" + iMP + "(\n"
             "    const BXType bx,\n"
             "    const TrackletProjectionMemory<" + TProjRegion + "> projin[" + seed + "PHI" + iMP + "maxTrackletProjections],\n"
-            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", 3, 3, kNMatchEngines>& instubdata,\n"
+            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines>& instubdata,\n"
             "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
             "    BXType& bx_o,\n"
             "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
