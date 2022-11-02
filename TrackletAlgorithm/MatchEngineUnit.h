@@ -45,8 +45,8 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     idle_ = true;
     empty_ = true;
     good__ = false;
-    good__t = false;
     good___ = false;
+    good____ = false;
   }
   
 
@@ -172,57 +172,49 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
   inline void processPipeLine(ap_uint<1> *table) {
 #pragma HLS inline
 
-    auto stubindex=stubdata___.getIndex();
-    auto stubfinez=stubdata___.getFineZ();
-    auto stubfinephi=stubdata___.getFinePhi();
-    auto stubbend=stubdata___.getBend();
+    auto stubindex=stubdata____.getIndex();
+    auto stubfinez=stubdata____.getFineZ();
+    auto stubfinephi=stubdata____.getFinePhi();
+    auto stubbend=stubdata____.getBend();
     
     const int projfinebits(VMProjectionBase<BARREL>::kVMProjFinePhiWideSize);
     const int stubfinebits(VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize);
-    bool passphi = isLessThanSize<projfinebits,stubfinebits,false,projfinebits,stubfinebits>()[(projfinephi___,stubfinephi)];
+    bool passphi = isLessThanSize<projfinebits,stubfinebits,false,projfinebits,stubfinebits>()[(projfinephi____,stubfinephi)];
     
     //Check if stub z position consistent
     const int stub2Sfinebits(1);
-    bool pass = isPSseed___ ? isLessThanSize<projfinebits,stub2Sfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinebits,projfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)];
+    bool pass = isPSseed____ ? isLessThanSize<projfinebits,stub2Sfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj____)] : isLessThanSize<projfinebits,projfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj____)];
 
-    auto const index=projrinv___.concat(stubbend);
+    auto const index=projrinv____.concat(stubbend);
 
     //Check if stub bend and proj rinv consistent
-    projseqs_[writeindex_] = projseq___;
-    matches_[writeindex_] = (stubindex,projbuffer___.getAllProj());
+    projseqs_[writeindex_] = projseq____;
+    matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
     INDEX writeindexnext = writeindex_ + 1;
     
     //Though we did write to matches_ above only now do we increment
     //the writeindex_ if we had a good stub that pass the various cuts
-    writeindex_ = (good___&passphi&pass&table[index]) ? writeindexnext : writeindex_;
+    writeindex_ = (good____&passphi&pass&table[index]) ? writeindexnext : writeindex_;
 
     //update pipeline variables
-    //good___ = good__;
-    //stubdata___ = stubdata__;
-    //projfinephi___ = projfinephi__;
-    //projfinezadj___ = projfinezadj__;
-    //isPSseed___ = isPSseed__;
-    //projrinv___ = projrinv__;
-    //projbuffer___ = projbuffer__;
-    //projseq___ = projseq__;
 
-    good___ = good__t;
-    stubdata___ = stubdata__t;
-    projfinephi___ = projfinephi__t;
-    projfinezadj___ = projfinezadj__t;
-    isPSseed___ = isPSseed__t;
-    projrinv___ = projrinv__t;
-    projbuffer___ = projbuffer__t;
-    projseq___ = projseq__t;
+    good____ = good___;
+    stubdata____ = stubdata___;
+    projfinephi____ = projfinephi___;
+    projfinezadj____ = projfinezadj___;
+    isPSseed____ = isPSseed___;
+    projrinv____ = projrinv___;
+    projbuffer____ = projbuffer___;
+    projseq____ = projseq___;
 
-    good__t = good__;
-    stubdata__t = stubdata__;
-    projfinephi__t = projfinephi__;
-    projfinezadj__t = projfinezadj__;
-    isPSseed__t = isPSseed__;
-    projrinv__t = projrinv__;
-    projbuffer__t = projbuffer__;
-    projseq__t = projseq__;
+    good___ = good__;
+    stubdata___ = stubdata__;
+    projfinephi___ = projfinephi__;
+    projfinezadj___ = projfinezadj__;
+    isPSseed___ = isPSseed__;
+    projrinv___ = projrinv__;
+    projbuffer___ = projbuffer__;
+    projseq___ = projseq__;
   }
 
 #ifndef __SYNTHESIS__
@@ -261,7 +253,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 
 inline bool processing() {
 #pragma HLS inline  
-  return !idle_||good__||good__t||good___;
+  return !idle_||good__||good___||good____;
   }
 
 // This method is no longer used, but kept for possible debugging etc.
@@ -274,11 +266,11 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
+  if (good____) {
+    return projbuffer____.getTCID();
+  }
   if (good___) {
     return projbuffer___.getTCID();
-  }
-  if (good__t) {
-    return projbuffer__t.getTCID();
   }
   if (good__) {
     return projbuffer__.getTCID();
@@ -299,17 +291,17 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
-  if (idle_&&!good__&&!good__t&&!good___) {
+  if (idle_&&!good__&&!good___&&!good____) {
     typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID tmp(0);
     return ~tmp;
+  }
+  if (good____) {
+    AllProjection<AllProjectionType> allproj(projbuffer____.getAllProj());
+    return (projbuffer____.getTCID(), allproj.getTrackletIndex());
   }
   if (good___) {
     AllProjection<AllProjectionType> allproj(projbuffer___.getAllProj());
     return (projbuffer___.getTCID(), allproj.getTrackletIndex());
-  }
-  if (good__t) {
-    AllProjection<AllProjectionType> allproj(projbuffer__t.getAllProj());
-    return (projbuffer__t.getTCID(), allproj.getTrackletIndex());
   } 
   if (good__) {
     AllProjection<AllProjectionType> allproj(projbuffer__.getAllProj());
@@ -324,12 +316,12 @@ inline ap_uint<kNBits_MemAddr> getProjSeq() {
   if (!empty()) {
     return projseqs_[readindex_];
   }
-  if (idle_&&!good__&&!good___) {
+  if (idle_&&!good__&&!good____) {
     ap_uint<kNBits_MemAddr> tmp(0);
     return ~tmp;
   }
-  if (good___) {
-    return projseq___;
+  if (good____) {
+    return projseq____;
   }
   if (good__) {
     return projseq__;
@@ -384,7 +376,7 @@ inline void advance() {
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;
  bool empty_;
- VMStubMECM<VMSMEType> stubdata__, stubdata__t, stubdata___; 
+ VMStubMECM<VMSMEType> stubdata__, stubdata___, stubdata____; 
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid_;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;
@@ -394,13 +386,13 @@ inline void advance() {
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::VMPZBINNOFLAG zbin;
 
  //Pipeline variables
- bool good__, good__t, good___;
- ap_uint<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> projfinephi__, projfinephi___, projfinephi__t;
- ap_uint<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> projfinezadj__, projfinezadj__t, projfinezadj___;
- bool isPSseed__, isPSseed__t, isPSseed___;
- VMProjection<BARREL>::VMPRINV projrinv__, projrinv__t, projrinv___;
- ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer__t,  projbuffer___;
- ap_uint<kNBits_MemAddr> projseq__, projseq__t, projseq___;
+ bool good__, good___, good____;
+ ap_uint<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> projfinephi__, projfinephi____, projfinephi___;
+ ap_uint<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> projfinezadj__, projfinezadj___, projfinezadj____;
+ bool isPSseed__, isPSseed___, isPSseed____;
+ VMProjection<BARREL>::VMPRINV projrinv__, projrinv___, projrinv____;
+ ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer___,  projbuffer____;
+ ap_uint<kNBits_MemAddr> projseq__, projseq___, projseq____;
 
 #ifndef __SYNTHESIS__
  // only used for debugging to identify MEU
