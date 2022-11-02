@@ -163,7 +163,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
    
   //Check if last stub, if so, go to next buffer entry 
   if (good__) {
-   if (istub_>=nstubs_){
+   if (istub_+1>=nstubs_){
      iuse_++;
      if(iusetmp < nuse_) {
        istub_ = 0;
