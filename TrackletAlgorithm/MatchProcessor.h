@@ -568,7 +568,7 @@ void MatchProcessor(BXType bx,
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
   MatchEngineUnit<VMSMEType, BARREL, VMPTYPE, APTYPE> matchengine[kNMatchEngines];
-#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
+#pragma HLS ARRAY_PARTITION variable=matchengine complete
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
@@ -944,6 +944,8 @@ void MatchProcessor(BXType bx,
       
       meu.processPipeLine(table[iMEU]);      
 
+      meu.cache();
+      
     } //end MEU loop
     
     if(hasMatch) {
@@ -957,7 +959,8 @@ void MatchProcessor(BXType bx,
       }
       hasMatch_ = hasMatch;
       //matchengine[bestiMEU].advance();
-     
+  
+       
   } //end loop
 
   bx_o = bx;

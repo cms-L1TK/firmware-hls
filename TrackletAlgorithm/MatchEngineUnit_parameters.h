@@ -57,6 +57,25 @@ static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull4Unit() {
 }
 
 template<int kNBitsBuffer>
+static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull5Unit() {
+  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
+#pragma HLS unroll
+    ap_uint<kNBitsBuffer> wptr, rptr;
+    ap_uint<2 * kNBitsBuffer> address(i);
+    (rptr,wptr) = address;
+    ap_uint<kNBitsBuffer> wptr1 = wptr+1;
+    ap_uint<kNBitsBuffer> wptr2 = wptr+2;
+    ap_uint<kNBitsBuffer> wptr3 = wptr+3;
+    ap_uint<kNBitsBuffer> wptr4 = wptr+4;
+    ap_uint<kNBitsBuffer> wptr5 = wptr+5;
+    bool result = wptr1==rptr || wptr2==rptr || wptr3==rptr || wptr4==rptr || wptr5==rptr;
+    lut[i] = result;
+  }
+  return lut;
+}
+
+template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> emptyUnit() {
   ap_uint<(1 << (2 * kNBitsBuffer))> lut;
   for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {

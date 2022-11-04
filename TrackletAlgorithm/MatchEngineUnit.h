@@ -188,13 +188,19 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     auto const index=projrinv____.concat(stubbend);
 
     //Check if stub bend and proj rinv consistent
+    if (empty_) {
+      projseqsNext_ = projseq____;
+      matchesNext_ = (stubindex, projbuffer____.getAllProj());
+    }
     projseqs_[writeindex_] = projseq____;
     matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
     INDEX writeindexnext = writeindex_ + 1;
     
     //Though we did write to matches_ above only now do we increment
     //the writeindex_ if we had a good stub that pass the various cuts
-    writeindex_ = (good____&passphi&pass&table[index]) ? writeindexnext : writeindex_;
+    bool goodMatch = good____&passphi&pass&table[index]; 
+    writeindex_ = (goodMatch&&!empty_) ? writeindexnext : writeindex_;
+    empty_ = empty_ && !goodMatch;
 
     //update pipeline variables
 
@@ -225,7 +231,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 #endif
 
  inline void set_empty() {
-   empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+   //empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
  inline bool empty() const {
@@ -234,7 +240,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
  }
  
  inline bool nearFull() {
-   return nearFull4Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+   return nearFull5Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
  inline bool idle() {
@@ -262,7 +268,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   if (!empty()) {
     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
     ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
-    (vmstub,allprojdata) = matches_[readindex_];
+    (vmstub,allprojdata) = matchesNext_;
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
@@ -287,7 +293,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
   if (!empty()) {
     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
     ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
-    (vmstub,allprojdata) = matches_[readindex_];
+    (vmstub,allprojdata) = matchesNext_;
     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
@@ -314,7 +320,7 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
   if (!empty()) {
-    return projseqs_[readindex_];
+    return projseqsNext_;
   }
   if (idle_&&!good__&&!good____) {
     ap_uint<kNBits_MemAddr> tmp(0);
@@ -343,25 +349,49 @@ inline int getIPhi() {
   return iphi_;
 }
 
-inline MATCH read() {
-#pragma HLS inline  
-  return matches_[readindex_++];
-}
+//inline MATCH read() {
+//#pragma HLS inline  
+//  MATCH matchtmp = matchesNext_;
+//  if (readindex_ == writeindex_) {
+//    empty_ = true;
+//  } else {
+//    matchesNext_ =  matches_[readindex_++];
+//  } 
+//  return matchtmp;
+//}
 
 inline MATCH peek() {
 #pragma HLS inline  
-  return matches_[readindex_];
+  return matchesNext_;
 }
  
 inline void advance() {
 #pragma HLS inline  
-  readindex_++;  
+  if (readindex_ == writeindex_) {
+    empty_ = true;
+  } else {
+    projseqsNext_ =  projseqsCache_;
+    matchesNext_ =  matchesCache_;
+    readindex_++;
+  } 
+}
+
+inline void cache() {
+#pragma HLS inline  
+  if (readindex_ != writeindex_) {
+    projseqsCache_ =  projseqs_[readindex_];
+    matchesCache_ =  matches_[readindex_];
+  }
 }
 
  private:
 
  //Buffers for the matches
  INDEX writeindex_, readindex_;
+ bool empty_;
+ MATCH matchesNext_, matchesCache_;
+ ap_uint<kNBits_MemAddr> projseqsNext_, projseqsCache_;
+
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
@@ -375,7 +405,6 @@ inline void advance() {
  bool idle_;
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;
- bool empty_;
  VMStubMECM<VMSMEType> stubdata__, stubdata___, stubdata____; 
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID tcid_;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer_;

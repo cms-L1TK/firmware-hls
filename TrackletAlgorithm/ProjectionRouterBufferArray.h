@@ -8,19 +8,19 @@ template<int kNBitsBuffer,int AllProjectionType> class ProjectionRouterBufferArr
 public:
   inline ProjectionRouterBuffer<BARREL,AllProjectionType> read() {
 #pragma HLS inline
-#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
+    //#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
     return projbuffer_[readptr_++];
   }
 
   inline ProjectionRouterBuffer<BARREL,AllProjectionType> peek() {
 #pragma HLS inline
-#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
+    //#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
     return projbuffer_[readptr_];
   }
 
   inline void advance() {
 #pragma HLS inline
-#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
+    //#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
     readptr_++;
   }
 
@@ -28,7 +28,7 @@ public:
 
   inline void saveProjection(ProjectionRouterBuffer<BARREL,AllProjectionType> &proj) {
 #pragma HLS inline
-#pragma HLS array_partition variable=projbuffer_ complete
+    //#pragma HLS array_partition variable=projbuffer_ complete
     projbuffer_[writeptr_] = proj;
   }
 
