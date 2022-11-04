@@ -238,9 +238,13 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 #pragma HLS inline  
    return empty_;
  }
- 
+
+ inline bool setNearFull() {
+   nearFull_ = nearFull5Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+ }
+
  inline bool nearFull() {
-   return nearFull5Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+   return nearFull_;
  }
 
  inline bool idle() {
@@ -394,6 +398,8 @@ inline void cache() {
 
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+
+ bool nearFull_;
 
  //Current projection
  ap_uint<4> nstubsall_[4];
