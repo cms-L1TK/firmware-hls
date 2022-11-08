@@ -3,11 +3,11 @@ src linktosecproc.vhd
 src secproctolink.vhd
 src memUtil_pkg.vhd
 src SectorProcessor.vhd
-src tf_to_kf.vhd
-src kf_wrapper.vhd
+#src tf_to_kf.vhd
+#src kf_wrapper.vhd
 
 src pkgs/GCU_utils.vhd
-src pkgs/tf_interface_pkg.vhd
+#src pkgs/tf_interface_pkg.vhd
 
 src common/hdl/CreateStartSignal.vhd
 src --vhdl2008 common/hdl/tf_lut.vhd
@@ -40,13 +40,14 @@ src -l surf surf_subset/pkgs/AxiStreamPkg.vhd
 src -l surf surf_subset/pkgs/StdRtlPkg.vhd
 
 # KF
-include -c firmware-hls:KalmanFilter/common components.dep 
-include -c firmware-hls:KalmanFilter/kfin components.dep 
-include -c firmware-hls:KalmanFilter/kf components.dep 
-include -c firmware-hls:KalmanFilter/kfout components.dep 
-include -c firmware-hls:KalmanFilter/tq components.dep 
+#include -c firmware-hls:KalmanFilter/common components.dep 
+#include -c firmware-hls:KalmanFilter/kfin components.dep 
+#include -c firmware-hls:KalmanFilter/kf components.dep 
+#include -c firmware-hls:KalmanFilter/kfout components.dep 
+#include -c firmware-hls:KalmanFilter/tq components.dep 
 
 ################
 # Include Cores
 ################
-setup include_cores.tcl
+iprepo *
+src ../cgn/*/*/*.xci
