@@ -11,6 +11,7 @@ $(core_dir):
 	cd $(hls_script_path); vivado_hls -f compileHLS.tcl;
 	ln -s ../../emData/LUTsReduced mem/LUTs
 	ln -s ../../emData/MemPrintsReduced mem/MemPrintsReduced
+	ln -s ../../IntegrationTests/common hdl/common
 
 $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py
