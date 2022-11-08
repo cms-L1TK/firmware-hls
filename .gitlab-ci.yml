@@ -65,8 +65,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado_hls -f ./compileHLS.tcl
-    - vivado -mode batch -source ./makeProject.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
+    - make -j4
     - vivado -mode batch -source ./runSim.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
   artifacts:
     when: on_success
