@@ -15,11 +15,11 @@ create_clock -period 250MHz -name default
 switch -glob -- $exe {
     *vitis* {
         # Set the FPGA part number
-        set_part {xcvu7p-flvb2104-1-e}
+        set_part {xcvu7p-flvb2104-2-e}
     }
     default {
         # Set the FPGA part number
-        set_part {xcvu7p-flvb2104-1-e} -tool vivado
+        set_part {xcvu7p-flvb2104-2-e} -tool vivado
         #set_part {xcku115-flvb2104-1-e} -tool vivado
 
         # Remove variables from IP interface if they are never used by HLS algo.
