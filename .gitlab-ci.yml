@@ -65,7 +65,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - make -j4
+    - make -j4 Work
     - vivado -mode batch -source ./runSim.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
   artifacts:
     when: on_success
@@ -94,7 +94,7 @@ stages: # ---------------------------------------------------------------------
   script:
     - cd IntegrationTests/${PROJ_NAME}/script
     - pwd; ls -la; #debug
-    - vivado -mode batch -source common/script/synth.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
+    - make Work/Work.runs/synth_1 | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
   artifacts:
     when: on_success
     name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
