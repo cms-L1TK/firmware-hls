@@ -177,7 +177,7 @@ package body tf_pkg is
     if IS_SIMULATION then
       -- Sim path specified relative to Vivado project's xsim directory. 
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-      return "../../../../../../../src/firmware-hls/firmware/mem/";
+      return "../../src/firmware-hls/firmware/mem/";
     else
       -- Synth path specified relative to dir where you run Vivado.
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/

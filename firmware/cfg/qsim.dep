@@ -1,5 +1,5 @@
 # Sim config
-@sim.library=xil_defaultlib
+@sim.library = "xil_defaultlib"
 
 # Dependancies
 include -c emp-fwk:boards/testbench top.dep
