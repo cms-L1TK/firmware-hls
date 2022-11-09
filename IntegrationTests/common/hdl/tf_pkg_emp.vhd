@@ -123,7 +123,7 @@ package tf_pkg is
   procedure write_header_line (
     file_path       : in string;  --! File path as string
     signal_name     : in string;  --! Signal name that will be printed in output file
-    N_PAGES         : in natural  --! Number of pages
+    N_PAGES         : in integer  --! Number of pages
   );
   procedure write_emData_line_2p (
     reset           : in std_logic;        --! HDL (global) reset

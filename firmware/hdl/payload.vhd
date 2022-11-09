@@ -28,10 +28,10 @@ use work.emp_slink_types.all;
 -- tf
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
-use work.tf_interface_pkg.all;
-use work.hybrid_data_types.all;
-use work.hybrid_config.all;
-use work.hybrid_data_formats.all;
+-- use work.tf_interface_pkg.all;
+-- use work.hybrid_data_types.all;
+-- use work.hybrid_config.all;
+-- use work.hybrid_data_formats.all;
 
 entity emp_payload is
   port (
@@ -66,9 +66,9 @@ architecture rtl of emp_payload is
   signal s_BW_46_stream_data  : t_arr_BW_46_DATA;
   signal s_BW_46_stream_valid : t_arr_BW_46_1b;
   signal s_FT_bx_out_vld      : std_logic;
-  signal s_tftokf             : t_channlesTB(numTW_84 - 1 downto 0);
-  signal s_kfout              : t_frames(numLinksTFP - 1 downto 0);
-  signal s_tfout              : ldata(numLinksTFP - 1 downto 0);
+  -- signal s_tftokf             : t_channlesTB(numTW_84 - 1 downto 0);
+  -- signal s_kfout              : t_frames(numLinksTFP - 1 downto 0);
+  -- signal s_tfout              : ldata(numLinksTFP - 1 downto 0);
 
 begin  -- architecture rtl
 
