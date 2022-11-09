@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-21
--- Last update: 2022-11-04
+-- Last update: 2022-11-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -123,58 +123,58 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   -- Sector Processor to Link formatter
   -----------------------------------------------------------------------------
-  -- secproctolink_1 : entity work.secproctolink
-  --   port map (
-  --     clk_i                   => clk_p,
-  --     TW_84_stream_data_i     => s_TW_84_stream_data,
-  --     TW_84_stream_write_i    => s_TW_84_stream_valid,
-  --     TW_84_stream_full_neg_o => open,
-  --     BW_46_stream_data_i     => s_BW_46_stream_data,
-  --     BW_46_stream_write_i    => s_BW_46_stream_valid,
-  --     BW_46_stream_full_neg_i => open,
-  --     dout_o                  => q
-  --     );
+  secproctolink_1 : entity work.secproctolink
+    port map (
+      clk_i                   => clk_p,
+      TW_84_stream_data_i     => s_TW_84_stream_data,
+      TW_84_stream_write_i    => s_TW_84_stream_valid,
+      TW_84_stream_full_neg_o => open,
+      BW_46_stream_data_i     => s_BW_46_stream_data,
+      BW_46_stream_write_i    => s_BW_46_stream_valid,
+      BW_46_stream_full_neg_i => open,
+      dout_o                  => q
+      );
 
   -----------------------------------------------------------------------------
   -- Sector Processor to KF formatter
   -----------------------------------------------------------------------------
-  tf_to_kf_1 : entity work.tf_to_kf
-    port map (
-      clk_i         => clk_p,
-      TW_84_data_i  => s_TW_84_stream_data,
-      TW_84_valid_i => s_TW_84_stream_valid,
-      BW_46_data_i  => s_BW_46_stream_data,
-      BW_46_valid_i => s_BW_46_stream_valid,
-      kf_reset_i    => s_FT_bx_out_vld,
-      tftokf_o      => s_tftokf
-      );
+  -- tf_to_kf_1 : entity work.tf_to_kf
+  --   port map (
+  --     clk_i         => clk_p,
+  --     TW_84_data_i  => s_TW_84_stream_data,
+  --     TW_84_valid_i => s_TW_84_stream_valid,
+  --     BW_46_data_i  => s_BW_46_stream_data,
+  --     BW_46_valid_i => s_BW_46_stream_valid,
+  --     kf_reset_i    => s_FT_bx_out_vld,
+  --     tftokf_o      => s_tftokf
+  --     );
 
   -----------------------------------------------------------------------------
   -- KF
   -----------------------------------------------------------------------------
-  kf_wrapper_1 : entity work.kf_wrapper
-    port map (
-      clk_i   => clk_p,
-      kfin_i  => s_tftokf,
-      kfout_o => s_kfout
-      );
+  -- kf_wrapper_1 : entity work.kf_wrapper
+  --   port map (
+  --     clk_i   => clk_p,
+  --     kfin_i  => s_tftokf,
+  --     kfout_o => s_kfout
+  --     );
 
   -----------------------------------------------------------------------------
   -- Output step
   -----------------------------------------------------------------------------
-  kfout_isolation_out_1 : entity work.kfout_isolation_out
-    port map (
-      clk        => clk_p,
-      out_packet => conv(d),
-      out_din    => s_kfout,
-      out_dout   => s_tfout
-      );
+  -- kfout_isolation_out_1 : entity work.kfout_isolation_out
+  --   port map (
+  --     clk        => clk_p,
+  --     out_packet => conv(d),
+  --     out_din    => s_kfout,
+  --     out_dout   => s_tfout
+  --     );
 
-  q(0)        <= s_tfout(0);
-  q(1)        <= s_tfout(1);
-  q(0).strobe <= '1';
-  q(0).start  <= '0';
-  q(1).strobe <= '1';
-  q(1).start  <= '0';
+  -- q(0)        <= s_tfout(0);
+  -- q(1)        <= s_tfout(1);
+  -- q(0).strobe <= '1';
+  -- q(0).start  <= '0';
+  -- q(1).strobe <= '1';
+  -- q(1).start  <= '0';
 
 end architecture rtl;
