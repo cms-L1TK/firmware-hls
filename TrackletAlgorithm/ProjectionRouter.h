@@ -112,7 +112,7 @@ void ProjectionRouter(BXType bx,
     if (validin) {
 
       auto iphiproj = tproj.getPhi();
-      auto izproj = tproj.getRZ();
+      auto izproj = tproj.getZ();
       auto iphider = tproj.getPhiDer();
       auto iseed = tproj.getSeed();
 

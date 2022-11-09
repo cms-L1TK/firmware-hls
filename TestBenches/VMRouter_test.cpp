@@ -1,5 +1,18 @@
 // Test bench for VMRouter
-#include "VMRouterTop_L2PHIA.h"
+
+// To run a different phi region, change the following:
+//          - change the top function and header file (TOP_FUNC_, HEADER_FILE_)
+//          - add the phi region in emData/download.sh, make sure to also run clean
+//          - run emData/generate_VMR.py to generate new top and parameters files
+
+// No macros can be defined from the command line in the case of C/RTL
+// cosimulation, so we define defaults here.
+#if !defined TOP_FUNC_
+  #define TOP_FUNC_ VMRouterTop_L2PHIA
+  #define HEADER_FILE_ "VMRouterTop_L2PHIA.h"
+#endif
+
+#include HEADER_FILE_
 
 #include <algorithm>
 #include <iterator>
@@ -9,19 +22,6 @@
 using namespace std;
 
 const int nEvents = 100;  //number of events to run
-
-// VMRouter Test that works for all regions
-// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-
-// To run a different phi region, change the following:
-//          - add the phi region in emData/download.sh, make sure to also run clean
-//
-//          - kLAYER, kDISK, and phiRegion in VMRouterTop.h
-//          - add corresponding magic numbers to VMRouter_parameters.h if not already defined
-//          - add/remove pragmas depending on inputStubs in VMRouterTop.cc (not necessary to run simulation)
-//          OR
-//          - run emData/generate_VMR.py to generate new top and parameters files
-
 
 // Count the number of copies of each memory in a file name vector
 vector<int> countCopies(const vector<string> &fileNames) {
@@ -33,7 +33,7 @@ vector<int> countCopies(const vector<string> &fileNames) {
     if (f->find(fileName) ==  string::npos) {
       fileName = f->substr(0, f->find("n")); // File name up to the copy number "nX"
       numCopies.push_back(1);
-    } 
+    }
     else numCopies.back() += 1;
   }
   return numCopies;
@@ -43,14 +43,14 @@ vector<int> countCopies(const vector<string> &fileNames) {
 int main() {
 
   constexpr int sector = 4; //  Specifies the sector
-  constexpr char phi = static_cast<char>(phiRegion);
+  constexpr char phi = 'A' + phiRegion; // Converts phiRegion to char
 
   char overlapPhiRegion[] = {'X', 'Y', 'Z', 'W', 'Q', 'R', 'S', 'T'}; // Special naming for the TE overlap memories, and outer memories in Disk 1
   char extraPhiRegion[] = {'I', 'J', 'K', 'L'}; // Special naming for the extra memories TEInner L2 and TEOuter L3.
 
-  char teiPhiRegion = (kLAYER != 2) ? phi : extraPhiRegion[phi - 'A'];
-  char teolPhiRegion = (kLAYER == 1 || kLAYER == 2) ? overlapPhiRegion[phi - 'A'] : ' ';
-  char teoPhiRegion = (kDISK == 1) ? overlapPhiRegion[phi - 'A'] : ((kLAYER == 3) ? extraPhiRegion[phi - 'A'] : phi);
+  char teiPhiRegion = (kLAYER != 2) ? phi : extraPhiRegion[phiRegion];
+  char teolPhiRegion = (kLAYER == 1 || kLAYER == 2) ? overlapPhiRegion[phiRegion] : ' ';
+  char teoPhiRegion = (kDISK == 1) ? overlapPhiRegion[phiRegion] : ((kLAYER == 3) ? extraPhiRegion[phiRegion] : phi);
 
 
   ////////////////////////////////////////////////////////////////
@@ -62,13 +62,13 @@ int main() {
   // String patterns of the memory file names
   const string inputPattern = (kLAYER) ? "InputStubs*" : "InputStubs*PS*";
   const string inputDisk2SPattern = "InputStubs*_D*2S*";
-  
+
   const string allStubPattern = "AllStubs*";
   const string mePattern = "VMStubs_VMSME*";
   const string teiPattern = (nvmTEI && maxTEICopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teiPhiRegion) + "*" : "No TEInner.";
   const string teolPattern = (nvmOL && maxOLCopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teolPhiRegion) + "*" : "No TEInner Overlap.";
   const string teoPattern = (nvmTEO && maxTEOCopies > 1) ? "VMStubs_VMSTE*PHI" + string(1,teoPhiRegion) + "*" : "No TEOuter.";
-  
+
   // Total number of files according to wiring, including copies
   const auto nTotAS = tb.nFiles(allStubPattern);
   const auto nTotVMSME = tb.nFiles(mePattern);
@@ -81,7 +81,7 @@ int main() {
 
   auto &fin_inputstubs = tb.files(inputPattern);
   auto &fin_inputstubs_disk2s = tb.files(inputDisk2SPattern);
-  
+
   auto &fout_allstubs = tb.files(allStubPattern);
   auto &fout_vmstubme = tb.files(mePattern);
   auto &fout_vmstubtei = tb.files(teiPattern);
@@ -104,7 +104,7 @@ int main() {
 
   // Output memories
   static AllStubMemory<outputType> memoriesAS[maxASCopies];
-  static VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin> memoriesME[nvmME];
+  static VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME> memoriesME[nvmME];
   static VMStubTEInnerMemory<outputType> memoriesTEI[nvmTEI][maxTEICopies];
   static VMStubTEInnerMemory<BARRELOL> memoriesOL[nvmOL][maxOLCopies];
   static VMStubTEOuterMemory<outputType> memoriesTEO[nvmTEO][maxTEOCopies];
@@ -157,7 +157,7 @@ int main() {
     BXType bx_out;
 
     // Unit Under Test
-    VMRouterTop_L2PHIA(bx, bx_out, inputStubs
+    TOP_FUNC_(bx, bx_out, inputStubs
 #if kDISK > 0
         , inputStubsDisk2S
 #endif
@@ -188,7 +188,7 @@ int main() {
     // ME Memories
     if (nTotVMSME) {
       for (unsigned int i = 0; i < nTotVMSME; i++) {
-        err += compareBinnedMemWithFile<VMStubMEMemory<outputType, nbitsmemaddr, nbitsbin>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
+        err += compareBinnedMemWithFile<VMStubMEMemory<outputType, kNBits_MemAddrME, kNbitsrzbinME>>(memoriesME[i], fout_vmstubme[i], ievt, "VMStubME" + to_string(i), truncation);
       }
     }
 

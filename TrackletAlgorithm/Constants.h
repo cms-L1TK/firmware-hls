@@ -15,7 +15,7 @@ inline const int floatToInt(const double x, const double k) {
 }
 
 constexpr int kNTEUnits[8] = {5, 2, 5, 3, 3, 2, 3, 2}; // Number of TE units w.r.t. seed type
-constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Number of TE units w.r.t. the layer/disk number. 
+constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Number of TE units w.r.t. the layer/disk number.
 // The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types (L1D1, L2D1), take the largest value for now...
 constexpr int kNbitsrzbin = 3;
 constexpr int kNbitsphibin = 3;
@@ -27,6 +27,8 @@ constexpr int kMaxProc = kTMUX * 6;
 
 constexpr unsigned int kNbitszfinebintable = 7;
 constexpr unsigned int kNbitsrfinebintable = 4;
+constexpr unsigned int kNbitszfinebintableDisk = 3;
+constexpr unsigned int kNbitsrfinebintableDisk = 8;
 
 // List of module types
 namespace module {
@@ -128,9 +130,15 @@ constexpr double VMROUTERCUTRD1D3 = 55.0;    //Max r for disk seeds in cm
 #endif
 // various bit widths
 constexpr unsigned nbitsallstubs[trklet::N_LAYER + trklet::N_DISK] = {3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)
 // number of bits used to distinguish VMs in one allstub block for each layer
-constexpr unsigned int nbits_vmmeall[trklet::N_LAYER + trklet::N_DISK]={2,3,3,3,3,3,3,2,2,2,2};
+constexpr unsigned int nbits_vmmeall[trklet::N_LAYER + trklet::N_DISK] = {2, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2}; // ME memories
+constexpr unsigned int nbits_vmte[trklet::N_LAYER + trklet::N_DISK] = {2, 3, 2, 3, 2, 3, 2, 2, 2, 2, 2}; // TE Inner and Outer memories
+constexpr unsigned int nbits_vmte_overlap[trklet::N_LAYER + trklet::N_DISK] = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Overlap memories for L1D1 and L2D1 seeding
+constexpr unsigned int nbits_vmte_extra[trklet::N_LAYER + trklet::N_DISK] = {0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0}; // Extra memories for L2L3 seeding
+
+constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)
+constexpr unsigned int nbits_maxvm_overlap = 4; // Overlap
+
 
 // List of regions for memory template parameters
 enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK, BARREL_FOR_MC, DISK_FOR_MC};
@@ -147,15 +155,18 @@ namespace TF {
 
   // List of layer and disk regions
   constexpr regionType layerDiskRegion[trklet::N_LAYER + trklet::N_DISK] = {BARREL, BARREL, BARREL, BARREL, BARREL, BARREL, DISK, DISK, DISK, DISK, DISK};
+
+  // List of phi regions
+  enum phiRegion {UNDEF_PHI, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
 
 
-// FPGA constants 
-constexpr unsigned kBRAMwidth = 36; 
-constexpr int kNBits_DTC = 39; 
+// FPGA constants
+constexpr unsigned kBRAMwidth = 36;
+constexpr int kNBits_DTC = 39;
 
 //Future SW constants
 constexpr int nBarrelPS = 3;

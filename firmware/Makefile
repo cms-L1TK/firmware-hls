@@ -4,20 +4,26 @@ input_file = mem/in.txt
 proj_path = ../../../../proj
 hls_script_path = ../IntegrationTests/ReducedConfig/IRtoTB/script
 
-all: $(core_file) hdl_add_files $(input_file)
+all: $(core_file) hdl_add_files xciCreation
 
 $(core_dir):
 	@mkdir cgn mem
-	cd $(hls_script_path); vivado_hls -f compileHLSforEMP.tcl;
+	cd $(hls_script_path); vivado_hls -f compileHLS.tcl;
+	ln -s ../../emData/LUTsReduced mem/LUTs
+	ln -s ../../emData/MemPrintsReduced mem/MemPrintsReduced
+	ln -s ../../IntegrationTests/common hdl/common
 
 $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py
 
+xciCreation: $(core_file)
+	make -f scripts/xciMaker -j 8 all
+
 hdl_add_files: $(core_file)
 	cd hdl; ln -s ../$(hls_script_path)/../hdl/*.vhd .
 
-$(input_file): $(core_dir)
-	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReduced/InputStubs -o $(input_file)
+#$(input_file): $(core_dir)
+#	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReduced/InputStubs -o $(input_file)
 
 sim: $(input_file) $(core_file) $(core_dir)
 	@ln -s $(proj_path)/vsim/vsim/vsim.sim/sim_1/behav/xsim/out.txt mem/out.txt
@@ -31,4 +37,4 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
 	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
-.PHONY: sim all hdl_add_files
+.PHONY: sim all hdl_add_files xciCreation

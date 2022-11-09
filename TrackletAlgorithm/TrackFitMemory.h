@@ -144,9 +144,10 @@ public:
   {}
 
   TrackFit(const TFSEEDTYPE seedtype) :
-    data_( ((((((0,seedtype),TFRINV(0)),TFPHI0(0)),TFZ0(0)),TFT(0)),TFHITMAP(0)) )
-
-  {}
+    data_(0)
+  {
+    setSeedType(seedtype);
+  }
 
   TrackFit()
   {}

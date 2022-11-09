@@ -123,7 +123,7 @@ package tf_pkg is
   procedure write_header_line (
     file_path       : in string;  --! File path as string
     signal_name     : in string;  --! Signal name that will be printed in output file
-    N_PAGES         : in natural  --! Number of pages
+    N_PAGES         : in integer  --! Number of pages
   );
   procedure write_emData_line_2p (
     reset           : in std_logic;        --! HDL (global) reset
@@ -177,7 +177,7 @@ package body tf_pkg is
     if IS_SIMULATION then
       -- Sim path specified relative to Vivado project's xsim directory. 
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-      return "../../../../../../../src/firmware-hls/firmware/mem/";
+      return "../../src/firmware-hls/firmware/mem/";
     else
       -- Synth path specified relative to dir where you run Vivado.
       -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/

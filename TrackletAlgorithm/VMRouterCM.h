@@ -26,21 +26,17 @@
 #include "DummyMessageLogger.h"
 #endif
 #endif
+// #define VMRCM_DEBUG
+
 /////////////////////////////////////////
 // Constants
 
 // Number of bits used for the TE in disks
 constexpr int nbitsvmtedisk[trklet::N_DISK] = { 3, 3, 0, 3, 0 };
 
-// Number of most significant bits (MSBs) of z and r used for index in the LUTs
-constexpr int nbitsztablelayer = 7;
-constexpr int nbitsrtablelayer = 4;
-
-constexpr int nbitsztabledisk = 3;
-constexpr int nbitsrtabledisk = 8;
-
-// Number of MSBs used for r index in phicorr LUTs
-constexpr int nbitsrphicorrtable = 3;
+// Number of rz bin bits for ME
+constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
+constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 
 // The length of the masks used for the memories
 constexpr int maskASIsize = 12; // Allstub Inner memories
@@ -72,9 +68,9 @@ inline typename AllStub<InType>::ASPHI getPhiCorr(
 
 	if (InType == DISKPS || InType == DISK2S) return phi; // Do nothing if disks
 
-	constexpr auto nrbins = 1 << nbitsrphicorrtable; // The number of bins for r
+	constexpr auto nrbins = 1 << kNbitsrzbin; // The number of bins for r
 
-	ap_uint<nbitsrphicorrtable> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - nbitsrphicorrtable); // Which bin r belongs to. Note r = 0 is mid radius
+	ap_uint<kNbitsrzbin> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - kNbitsrzbin); // Which bin r belongs to. Note r = 0 is mid radius
 	auto index = bend * nrbins + rbin; // Index for where we find our correction value
 	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
 
@@ -109,8 +105,8 @@ inline T createVMStub(const InputStub<InType> inputStub,
 	int nbitsfinephi = stub.getFinePhi().length();  // Number of bits for finephi
 
 	// Number of bits for table indices
-	constexpr int nbitsztable = (Layer) ? nbitsztablelayer : nbitsztabledisk; // Number of MSBs of z used in LUT table
-	constexpr int nbitsrtable = (Layer) ? nbitsrtablelayer : nbitsrtabledisk; // Number of MSBs of r used in LUT table
+	constexpr int nbitsztable = (Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of MSBs of z used in LUT table
+	constexpr int nbitsrtable = (Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of MSBs of r used in LUT table
 	constexpr auto vmbits = (Layer) ? nbits_vmmeall[Layer-1] : ((isMEStub) ? nbits_vmmeall[trklet::N_LAYER+Disk-1] : nbitsvmtedisk[Disk-1]); // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[trklet::N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
@@ -244,7 +240,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
-
+#pragma HLS latency min = 12 //this ensures latencies of different vmrs match in a reduced configuration.
 		bool noStubsLeft = !hasStubs.or_reduce(); // Determines if we have processed all stubs. Is true if hasStubs is all 0s
 		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S
@@ -285,22 +281,23 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		AllStub<OutType> allstub = (disk2S) ? stubDisk2S.raw() : stub.raw();
 
 		// Write stub to all memory copies
-		for (int n = 0; n < nAllCopies; n++) {
+		// It seems that the if (nAllCopies > 0) should not be needed,
+		// but if nAllCopies is zero it generates an error in vivado_hls
+		if (nAllCopies > 0) {
+		  for (int n = 0; n < nAllCopies; n++) {
 #pragma HLS UNROLL
-			memoriesAS[n].write_mem(bx, allstub, i);
+		    memoriesAS[n].write_mem(bx, allstub, i);
+		  }
 		}
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		edm::LogVerbatim("L1trackHLS") << std::endl << "Stub index no. " << i << std::endl
-				<< "Out put stub: " << std::hex << allstub.raw() << std::dec
-				<< std::endl;
-#endif // DEBUG
+#if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
+		edm::LogVerbatim("L1trackHLS") << std::endl << "Stub index no. " << i << std::endl << "Out put stub: " << std::hex << allstub.raw() << std::dec;
+#endif // VMRCM_DEBUG
 
 		////////////////////////////////////////
 		// AllStubInner memories
 
-		if (maskASI) {
+		if (maskASI && !disk2S) {
 
 			int comparison_rz = (Layer) ? static_cast<int>(abs(stub.getZ())) : static_cast<int>(stub.getR());
 			bool passRZCut = false;
@@ -373,11 +370,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 					}
 				}
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-				edm::LogVerbatim("L1trackHLS") << std::endl << "Allstub Inner: " << std::hex
-						<< allstubinner.raw() << std::dec << std::endl;
-#endif // DEBUG
+#if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
+				edm::LogVerbatim("L1trackHLS") << std::endl << "Allstub Inner: " << std::hex << allstubinner.raw() << std::dec;
+#endif // VMRCM_DEBUG
 
 			}
 		}
@@ -396,11 +391,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
 		addrCountME[slotME] += 1;
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-		edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::dec
-				<< "       to slot " << slotME << std::endl;
-#endif // DEBUG
+#if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
+		edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::dec << "       to slot " << slotME;
+#endif // VMRCM_DEBUG
 		// End ME memories
 
 		////////////////////////////////////
@@ -422,11 +415,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			}
 			addrCountTE[slotTE] += 1;
 
-// For debugging
-#if !(defined(__SYNTHESIS__) || defined(CMSSW_GIT_HASH))
-			edm::LogVerbatim("L1trackHLS") << "TEOuter stub " << std::hex << stubTEO.raw()
-					<< std::dec << "       to slot " << slotTE << std::endl;
-#endif // DEBUG
+#if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
+			edm::LogVerbatim("L1trackHLS") << "TEOuter stub " << std::hex << stubTEO.raw() << std::dec << "       to slot " << slotTE;
+#endif // VMRCM_DEBUG
 
 		} // End TE Outer memories
 

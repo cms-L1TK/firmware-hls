@@ -288,6 +288,6 @@ private:
 };
 
 // Memory definition
-template<int ASType> using AllStubInnerMemory = MemoryTemplate<AllStubInner<ASType>, 3, kNBits_MemAddr>;
+template<int ASType> using AllStubInnerMemory = MemoryTemplate<AllStubInner<ASType>, 1, kNBits_MemAddr>;
 
 #endif

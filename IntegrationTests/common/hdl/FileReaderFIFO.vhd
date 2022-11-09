@@ -53,12 +53,16 @@ procFile : process(CLK)
   variable LINE_IN     : line;                              
   variable BX_CNT      : integer := -1; --! Event counter
   variable DATA_CNT    : natural := MAX_ENTRIES;  --! Current count of data from within current page.
+  constant NUM_X_CHAR  : natural := 2;  --! Count of 'x' characters in line, before value to read
+  variable CNT_X_CHAR  : natural := 0;  --! Current count of 'x' characters
   variable CHAR        : character;     --! Character
   variable FOUND_WORD  : boolean := false;
   variable emDATA      : std_logic_vector(EMDATA_WIDTH-1 downto 0) := (others => '0');
   variable LOOPING     : boolean := true; --! Need another loop to make output.
   variable CREATE_DUMMY_DATA  : boolean := false; --! Inventing null data. 
   variable line_is_read : boolean := true; -- LINE_IN has been read by external module
+
+
 begin
 
   if rising_edge(CLK) then
@@ -147,13 +151,17 @@ begin
 
           FOUND_WORD := false;
           EMPTY_NEG <= '1';  -- There is stub to be read
+          CNT_X_CHAR := 0; -- Reset 'x' character counter
 
           rd_col : while (LINE_IN'length > 0) loop -- Loop over the columns
             read(LINE_IN, CHAR);                 -- Read chars ...
             if (CHAR = 'x') then                   -- ... until the x
-              -- Found data word.
-              FOUND_WORD := true;
-              hread(line_in, emDATA(LINE_IN'length*4-1 downto 0)); -- Read remainer of line as hex. 
+              CNT_X_CHAR := CNT_X_CHAR + 1;
+              if (CNT_X_CHAR = NUM_X_CHAR) then
+                -- Found data word.
+                FOUND_WORD := true;
+                hread(line_in, emDATA(LINE_IN'length*4-1 downto 0)); -- Read remainer of line as hex. 
+              end if;
             end if;
           end loop rd_col;
 

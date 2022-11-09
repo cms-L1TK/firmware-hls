@@ -34,7 +34,7 @@ class TrackletEngineUnit {
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 
-/////  Grabs the appropriate lut based on seed and iTC (need to be included in download.sh)
+/////  Grabs the appropriate lut based on seed and iTC
 if (Seed==TF::L1L2&& iTC==TC::A){
       const ap_uint<1> stubptinnertmp[]=
 #if __has_include("../emData/TP/tables/TP_L1L2A_stubptinnercut.tab")
@@ -49,9 +49,11 @@ if (Seed==TF::L1L2&& iTC==TC::A){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -69,9 +71,11 @@ else if (Seed==TF::L1L2&& iTC==TC::B){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -89,9 +93,11 @@ else if (Seed==TF::L1L2&& iTC==TC::C){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -109,9 +115,11 @@ else if (Seed==TF::L1L2&& iTC==TC::D){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -129,9 +137,11 @@ else if (Seed==TF::L1L2&& iTC==TC::E){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -149,9 +159,11 @@ else if (Seed==TF::L1L2&& iTC==TC::F){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -169,9 +181,11 @@ else if (Seed==TF::L1L2&& iTC==TC::G){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -189,9 +203,11 @@ else if (Seed==TF::L1L2&& iTC==TC::H){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -209,9 +225,11 @@ else if (Seed==TF::L1L2&& iTC==TC::I){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -229,9 +247,11 @@ else if (Seed==TF::L1L2&& iTC==TC::J){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -249,9 +269,11 @@ else if (Seed==TF::L1L2&& iTC==TC::K){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -269,9 +291,11 @@ else if (Seed==TF::L1L2&& iTC==TC::L){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -289,9 +313,11 @@ else if (Seed==TF::L2L3&& iTC==TC::A){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -309,9 +335,11 @@ else if (Seed==TF::L2L3&& iTC==TC::B){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -329,9 +357,11 @@ else if (Seed==TF::L2L3&& iTC==TC::C){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -349,9 +379,11 @@ else if (Seed==TF::L2L3&& iTC==TC::D){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -369,9 +401,11 @@ else if (Seed==TF::L3L4&& iTC==TC::A){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -389,9 +423,11 @@ else if (Seed==TF::L3L4&& iTC==TC::B){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -409,9 +445,11 @@ else if (Seed==TF::L3L4&& iTC==TC::C){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -429,9 +467,11 @@ else if (Seed==TF::L3L4&& iTC==TC::D){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -449,9 +489,11 @@ else if (Seed==TF::L5L6&& iTC==TC::A){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -469,9 +511,11 @@ else if (Seed==TF::L5L6&& iTC==TC::B){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -489,9 +533,11 @@ else if (Seed==TF::L5L6&& iTC==TC::C){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
@@ -509,14 +555,16 @@ else if (Seed==TF::L5L6&& iTC==TC::D){
     {};
 #endif
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
         stubptouterlutnew_[i] = stubptoutertmp[i];
       }
     }
 
-
+ 
 
 ////
     idle_ = true;
@@ -563,6 +611,7 @@ else if (Seed==TF::L5L6&& iTC==TC::D){
    good__ = 0;
    good___ = 0;
    memmask_ = 0;
+   istub_ = 0;
    instance_ = instance;
  }
 
@@ -618,7 +667,7 @@ void write(STUBID stubs) {
  INDEX readindex_;
  bool idle_;
  
- NSTUBS istub_=0;
+ NSTUBS istub_;
  STUBID stubids_[1<<kNBitsBuffer];
 
  int instance_;

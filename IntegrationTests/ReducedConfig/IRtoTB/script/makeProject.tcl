@@ -12,10 +12,8 @@ set_property ip_repo_paths "./"  [get_filesets sources_1]
 update_ip_catalog -rebuild
 
 # Create .xci files for user HLS IP
-create_ip -name InputRouterTop_IR_DTC_PS_1_B -module_name IR_PS_1_B -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_2S_3_A -module_name IR_2S_3_A -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_PS10G_2_B -module_name IR_PS10G_2_B -vendor xilinx.com -library hls -version 1.0
-create_ip -name InputRouterTop_IR_DTC_2S_3_B -module_name IR_2S_3_B -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_PS10G_1_A -module_name IR_PS10G_1_A -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_2S_2_B -module_name IR_2S_2_B -vendor xilinx.com -library hls -version 1.0
 create_ip -name InputRouterTop_IR_DTC_2S_1_A -module_name IR_2S_1_A -vendor xilinx.com -library hls -version 1.0
@@ -35,16 +33,16 @@ create_ip -name VMRouterTop_L3PHIB -module_name VMR_L3PHIB -vendor xilinx.com -l
 create_ip -name VMRouterTop_L4PHIB -module_name VMR_L4PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name VMRouterTop_L5PHIB -module_name VMR_L5PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name VMRouterTop_L6PHIB -module_name VMR_L6PHIB -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackletEngine_PS_PS -module_name TE_L1L2 -vendor xilinx.com -library hls -version 1.0
+create_ip -name TrackletEngine_PS_PS -module_name TE_PS_PS -vendor xilinx.com -library hls -version 1.0
 create_ip -name TrackletCalculator_L1L2F -module_name TC_L1L2F -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop_L3PHIB -module_name PR_L3PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop_L4PHIB -module_name PR_L4PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop_L5PHIB -module_name PR_L5PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name ProjectionRouterTop_L6PHIB -module_name PR_L6PHIB -vendor xilinx.com -library hls -version 1.0
-create_ip -name MatchEngineTop_L3 -module_name ME_L3PHIB -vendor xilinx.com -library hls -version 1.0
-create_ip -name MatchEngineTop_L4 -module_name ME_L4PHIB -vendor xilinx.com -library hls -version 1.0
-create_ip -name MatchEngineTop_L5 -module_name ME_L5PHIB -vendor xilinx.com -library hls -version 1.0
-create_ip -name MatchEngineTop_L6 -module_name ME_L6PHIB -vendor xilinx.com -library hls -version 1.0
+create_ip -name MatchEngineTop_L3 -module_name ME_L3 -vendor xilinx.com -library hls -version 1.0
+create_ip -name MatchEngineTop_L4 -module_name ME_L4 -vendor xilinx.com -library hls -version 1.0
+create_ip -name MatchEngineTop_L5 -module_name ME_L5 -vendor xilinx.com -library hls -version 1.0
+create_ip -name MatchEngineTop_L6 -module_name ME_L6 -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchCalculator_L3PHIB -module_name MC_L3PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchCalculator_L4PHIB -module_name MC_L4PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchCalculator_L5PHIB -module_name MC_L5PHIB -vendor xilinx.com -library hls -version 1.0

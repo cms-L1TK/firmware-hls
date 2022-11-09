@@ -40,6 +40,8 @@ package tf_pkg is
   constant N_MEM_BINS_ME_DISK     : natural := 16;   --! Number of memory bins for ME disk
   constant N_ENTRIES_PER_MEM_BINS_ME_DISK : natural := 8;   --! Number of entries per memory bin for ME disk
   constant PAGE_LENGTH            : natural := 128;  --! Page length of all memories
+  constant PAGE_LENGTH_CM         : natural := 1024; --! Page length of all CM
+                                                     -- binned memories
   constant MEM_READ_LATENCY       : natural := 2;    --! Memory read latency.
   -- Memory width constants
   constant RAM_WIDTH_AS    : natural := 36; --! Width for memories
@@ -53,21 +55,22 @@ package tf_pkg is
 -- pragma synthesis_on
   ;
   
-  -- ########################### Functions ################################################################
-  function clogb2     (bit_depth : integer) return integer;
-
-  function getDirSCRIPT return string;
-
-
   -- ########################### Types ###########################
 
   -- 2D
   type t_arr2_1b  is array(0 to 1) of std_logic;
   type t_arr2_8b  is array(0 to 1) of std_logic_vector(7 downto 0);
+  type t_arr4_12b  is array(0 to 3) of std_logic_vector(11 downto 0);
+  type t_arr4_16b  is array(0 to 3) of std_logic_vector(15 downto 0);
+  type t_arr4_17b  is array(0 to 3) of std_logic_vector(16 downto 0);
+  type t_arr5_11b  is array(0 to 4) of std_logic_vector(10 downto 0);
+  type t_arr5_16b  is array(0 to 4) of std_logic_vector(15 downto 0);
   type t_arr8_1b  is array(0 to 7) of std_logic;
   type t_arr8_2b  is array(0 to 7) of std_logic_vector(1 downto 0);
   type t_arr8_3b  is array(0 to 7) of std_logic_vector(2 downto 0);
   type t_arr8_4b  is array(0 to 7) of std_logic_vector(3 downto 0);
+  type t_arr64_4b  is array(0 to 63) of std_logic_vector(3 downto 0);
+  type t_arr64_1b  is array(0 to 63) of std_logic;
   type t_arr8_5b  is array(0 to 7) of std_logic_vector(4 downto 0);
   type t_arr8_8b  is array(0 to 7) of std_logic_vector(7 downto 0);
   type t_arr8_9b  is array(0 to 7) of std_logic_vector(8 downto 0);
@@ -78,7 +81,6 @@ package tf_pkg is
   type t_arr8_60b is array(0 to 7) of std_logic_vector(59 downto 0);
   -- 3D
   type t_arr2_8_1b is array(0 to 1) of t_arr8_1b;
-  --type t_arr2_8_7b is array(0 to 1) of t_arr8_7b;
   type t_arr2_8_8b is array(0 to 1) of t_arr8_8b;
   type t_arr8_8_1b is array(0 to 7) of t_arr8_1b;
   type t_arr8_8_4b is array(0 to 7) of t_arr8_4b;
@@ -101,9 +103,27 @@ package tf_pkg is
   subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
   type t_arr8_8_8_5b is array(0 to 7) of t_arr8_8_5b;
 
+  type t_arr_64_4b  is array(integer range<>) of t_arr64_4b;
+  subtype t_arr2_64_4b is t_arr_64_4b(0 to 1);
+  subtype t_arr4_64_4b is t_arr_64_4b(0 to 3);
+
+  type t_arr_64_1b  is array(integer range<>) of t_arr64_1b;
+  subtype t_arr2_64_1b is t_arr_64_1b(0 to 1);
+  subtype t_arr4_64_1b is t_arr_64_1b(0 to 3);
+  
   -- Could be used in place of t_arr_7b. 
   -- type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
 
+  -- ########################### Functions ################################################################
+  function clogb2     (bit_depth : integer) return integer;
+
+  function to_bstring(sl : std_logic) return string;
+
+  function to_bstring(slv : std_logic_vector) return string;
+
+  function to_bstring(slv : t_arr64_1b) return string;
+
+  function to_bstring(slv : t_arr64_4b) return string;
 
   -- -- ########################### Procedures #######################
   procedure char2int (
@@ -170,20 +190,51 @@ package body tf_pkg is
     return integer( ceil( log2( real( bit_depth ) ) ) );
   end;
 
-
-  --! @brief Returns directory path to script/
-  function getDirSCRIPT return string is
+  function to_bstring(sl : std_logic) return string is
+  variable sl_str_v : string(1 to 3);  -- std_logic image with quotes around
   begin
-    if IS_SIMULATION then
-      -- Sim path specified relative to Vivado project's xsim directory. 
-      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.sim/sim_1/behav/xsim/
-      return "../../../../../";
-    else
-      -- Synth path specified relative to dir where you run Vivado.
-      -- e.g. IntegrationTests/PRMEMC/script/Work/Work.runs/synth_1/
-      return "../../../";
-    end if;
-  end;
+    sl_str_v := std_logic'image(sl);
+    return "" & sl_str_v(2);  -- "" & character to get strings
+  end function;
+
+  function to_bstring(slv : std_logic_vector) return string is
+  alias    slv_norm : std_logic_vector(1 to slv'length) is slv;
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(1 to slv'length);
+  begin
+    for idx in slv_norm'range loop
+      sl_str_v := to_bstring(slv_norm(idx));
+      res_v(idx) := sl_str_v(1);
+    end loop;
+    return res_v;
+  end function;
+
+  function to_bstring(slv : t_arr64_1b) return string is
+  variable sl_str_v : string(1 to 1);  -- String of std_logic
+  variable res_v    : string(0 to 63);
+  begin
+    for idx in 63 downto 0 loop
+      sl_str_v := to_bstring(slv(idx));
+      res_v(idx) := sl_str_v(1);
+    end loop;
+    return res_v;
+  end function;
+
+  function to_bstring(slv : t_arr64_4b) return string is
+  variable sl_str_v : string(1 to 4);  -- String of std_logic
+  variable res_v    : string(0 to 319);
+  begin
+    for idx in 63 downto 0 loop
+      sl_str_v := to_bstring(slv(idx));
+      res_v(idx*5) := sl_str_v(1);
+      res_v(idx*5+1) := sl_str_v(2);
+      res_v(idx*5+2) := sl_str_v(3);
+      res_v(idx*5+3) := sl_str_v(4);
+      res_v(idx*5+4) := '-';
+    end loop;
+    return res_v;
+  end function;
+
 
 
   -- ########################### Procedures ################################################################

@@ -99,7 +99,8 @@ public:
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjITCSize> TProjITC;
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjTrackletIndexSize> TProjTrackletIndex;
   typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjPhiSize> TProjPHI;
-  typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZSize> TProjRZ;
+  typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZSize> TProjZ;
+  typedef ap_uint<TrackletProjectionBase<TProjType>::kTProjRZSize> TProjR;
   typedef ap_int<TrackletProjectionBase<TProjType>::kTProjPhiDSize> TProjPHIDER;
   typedef ap_int<TrackletProjectionBase<TProjType>::kTProjRZDSize> TProjRZDER;
   
@@ -110,10 +111,10 @@ public:
     data_(newdata)
   {}
 
-  TrackletProjection(const TProjTCID tcid, const TProjTrackletIndex trackletIndex, const TProjPHI phi, const TProjRZ z, const TProjPHIDER phider, const TProjRZDER zder):
+  TrackletProjection(const TProjTCID tcid, const TProjTrackletIndex trackletIndex, const TProjPHI phi, const TProjZ z, const TProjPHIDER phider, const TProjRZDER zder):
     data_( (((((tcid,trackletIndex),phi),z),phider),zder) )
   {}
-  
+
   TrackletProjection()
   {}
 
@@ -173,7 +174,11 @@ public:
     return data_.range(kTProjPhiMSB,kTProjPhiLSB);
   }
 
-  TProjRZ getRZ() const {
+  TProjZ getZ() const {
+    return data_.range(kTProjRZMSB,kTProjRZLSB);
+  }
+
+  TProjR getR() const {
     return data_.range(kTProjRZMSB,kTProjRZLSB);
   }
 
@@ -201,7 +206,7 @@ public:
     data_.range(kTProjPhiMSB,kTProjPhiLSB) = phi;
   }
 
-  void setRZ(const TProjRZ z) {
+  void setRZ(const TProjZ z) {
     data_.range(kTProjRZMSB,kTProjRZLSB) = z;
   }
 
@@ -218,7 +223,10 @@ public:
     std::string str = decodeToBits(getTCID());
     str += "|"+decodeToBits(getTrackletIndex());
     str += "|"+decodeToBits(getPhi());
-    str += "|"+decodeToBits(getRZ());
+    if (TProjType != DISK)
+      str += "|"+decodeToBits(getZ());
+    else
+      str += "|"+decodeToBits(getR());
     str += "|"+decodeToBits(getPhiDer());
     str += "|"+decodeToBits(getRZDer());
     return str;

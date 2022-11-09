@@ -12,10 +12,29 @@ public:
     return projbuffer_[readptr_++];
   }
 
-  inline void addProjection(ProjectionRouterBuffer<BARREL,AllProjectionType> &proj) {
+  inline ProjectionRouterBuffer<BARREL,AllProjectionType> peek() {
+#pragma HLS inline
+#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
+    return projbuffer_[readptr_];
+  }
+
+  inline void advance() {
+#pragma HLS inline
+#pragma HLS ARRAY_PARTITION variable=projbuffer_ complete
+    readptr_++;
+  }
+
+
+
+  inline void saveProjection(ProjectionRouterBuffer<BARREL,AllProjectionType> &proj) {
 #pragma HLS inline
 #pragma HLS array_partition variable=projbuffer_ complete
-    projbuffer_[writeptr_++] = proj;
+    projbuffer_[writeptr_] = proj;
+  }
+
+  inline void incProjection() {
+#pragma HLS inline
+    writeptr_++;
   }
 
   inline bool empty() { 

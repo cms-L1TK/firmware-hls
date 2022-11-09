@@ -32,8 +32,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-// !!! CURRENTLY ONLY TESTED FOR L1L2 !!!
-template<unsigned NFMBarrel, unsigned NFMDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
+template<unsigned Seed, unsigned NFMPerStubBarrel0, unsigned NFMPerStubBarrel, unsigned NFMPerStubDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -46,8 +45,8 @@ void TrackBuilder(
 )
 {
 
-  constexpr unsigned NFMPerLayer = (NBarrelStubs > 0) ? (NFMBarrel / NBarrelStubs) : 0;
-  constexpr unsigned NFMPerDisk = (NDiskStubs > 0) ? (NFMDisk / NDiskStubs) : 0;
+  constexpr unsigned NFMBarrel = NFMPerStubBarrel0 + (NBarrelStubs - 1) * NFMPerStubBarrel;
+  constexpr unsigned NFMDisk = NDiskStubs * NFMPerStubDisk;
 
   // Circular buffers for each of the input full-match memories.
   FullMatch<BARREL> barrel_fm[NFMBarrel][1<<kNBitsTBBuffer];
@@ -62,6 +61,12 @@ void TrackBuilder(
   ap_uint<kNBitsTBBuffer> disk_read_index[NFMDisk];
   ap_uint<kNBitsTBBuffer> barrel_write_index[NFMBarrel];
   ap_uint<kNBitsTBBuffer> disk_write_index[NFMDisk];
+#pragma HLS array_partition variable=barrel_mem_index complete dim=0
+#pragma HLS array_partition variable=disk_mem_index complete dim=0
+#pragma HLS array_partition variable=barrel_read_index complete dim=0
+#pragma HLS array_partition variable=disk_read_index complete dim=0
+#pragma HLS array_partition variable=barrel_write_index complete dim=0
+#pragma HLS array_partition variable=disk_write_index complete dim=0
 
   initialize_barrel_indices : for (short i = 0; i < NFMBarrel; i++) {
 #pragma HLS unroll
@@ -137,7 +142,7 @@ void TrackBuilder(
 
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
-    const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
+    const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(TPAROffset);
     TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
     const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
@@ -153,20 +158,31 @@ void TrackBuilder(
 
     barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
+      const unsigned nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
+      const unsigned nFMCumulative = (j == 0 ? 0 : (j == 1 ? NFMPerStubBarrel0 : NFMPerStubBarrel0 + (j - 1) * NFMPerStubBarrel));
+
       ap_uint<1> barrel_stub_valid = false;
-      barrel_stub_valid : for (short k = 0; k < NFMPerLayer; k++)
-        barrel_stub_valid = (barrel_stub_valid || barrel_valid[j * NFMPerLayer + k]);
+      barrel_stub_valid : for (short k = 0; k < nFM; k++)
+        barrel_stub_valid = (barrel_stub_valid || barrel_valid[nFMCumulative + k]);
       nMatches += (barrel_stub_valid ? 1 : 0);
 
-      static_assert(NFMPerLayer <= 8, "Number of FM memories per layer cannot exceed eight.");
-      const auto &barrel_stub = ((NFMPerLayer > 7 && barrel_valid[j * NFMPerLayer + 7]) ? barrel_fm[j * NFMPerLayer + 7][barrel_read_index[j * NFMPerLayer + 7]] :
-                                ((NFMPerLayer > 6 && barrel_valid[j * NFMPerLayer + 6]) ? barrel_fm[j * NFMPerLayer + 6][barrel_read_index[j * NFMPerLayer + 6]] :
-                                ((NFMPerLayer > 5 && barrel_valid[j * NFMPerLayer + 5]) ? barrel_fm[j * NFMPerLayer + 5][barrel_read_index[j * NFMPerLayer + 5]] :
-                                ((NFMPerLayer > 4 && barrel_valid[j * NFMPerLayer + 4]) ? barrel_fm[j * NFMPerLayer + 4][barrel_read_index[j * NFMPerLayer + 4]] :
-                                ((NFMPerLayer > 3 && barrel_valid[j * NFMPerLayer + 3]) ? barrel_fm[j * NFMPerLayer + 3][barrel_read_index[j * NFMPerLayer + 3]] :
-                                ((NFMPerLayer > 2 && barrel_valid[j * NFMPerLayer + 2]) ? barrel_fm[j * NFMPerLayer + 2][barrel_read_index[j * NFMPerLayer + 2]] :
-                                ((NFMPerLayer > 1 && barrel_valid[j * NFMPerLayer + 1]) ? barrel_fm[j * NFMPerLayer + 1][barrel_read_index[j * NFMPerLayer + 1]] :
-                                                                                          barrel_fm[j * NFMPerLayer][barrel_read_index[j * NFMPerLayer]])))))));
+      const auto &i_mem = ((nFM > 7 && barrel_valid[nFMCumulative + 7]) ? (nFMCumulative + 7) :
+                          ((nFM > 6 && barrel_valid[nFMCumulative + 6]) ? (nFMCumulative + 6) :
+                          ((nFM > 5 && barrel_valid[nFMCumulative + 5]) ? (nFMCumulative + 5) :
+                          ((nFM > 4 && barrel_valid[nFMCumulative + 4]) ? (nFMCumulative + 4) :
+                          ((nFM > 3 && barrel_valid[nFMCumulative + 3]) ? (nFMCumulative + 3) :
+                          ((nFM > 2 && barrel_valid[nFMCumulative + 2]) ? (nFMCumulative + 2) :
+                          ((nFM > 1 && barrel_valid[nFMCumulative + 1]) ? (nFMCumulative + 1) :
+                                                                          (nFMCumulative))))))));
+      const auto &i_fm = ((nFM > 7 && barrel_valid[nFMCumulative + 7]) ? (barrel_read_index[nFMCumulative + 7]) :
+                         ((nFM > 6 && barrel_valid[nFMCumulative + 6]) ? (barrel_read_index[nFMCumulative + 6]) :
+                         ((nFM > 5 && barrel_valid[nFMCumulative + 5]) ? (barrel_read_index[nFMCumulative + 5]) :
+                         ((nFM > 4 && barrel_valid[nFMCumulative + 4]) ? (barrel_read_index[nFMCumulative + 4]) :
+                         ((nFM > 3 && barrel_valid[nFMCumulative + 3]) ? (barrel_read_index[nFMCumulative + 3]) :
+                         ((nFM > 2 && barrel_valid[nFMCumulative + 2]) ? (barrel_read_index[nFMCumulative + 2]) :
+                         ((nFM > 1 && barrel_valid[nFMCumulative + 1]) ? (barrel_read_index[nFMCumulative + 1]) :
+                                                                         (barrel_read_index[nFMCumulative]))))))));
+      const auto &barrel_stub = barrel_fm[i_mem][i_fm];
 
       const auto &barrel_stub_index = (barrel_stub_valid ? barrel_stub.getStubIndex() : FullMatch<BARREL>::FMSTUBINDEX(0));
       const auto &barrel_stub_r = (barrel_stub_valid ? barrel_stub.getStubR() : FullMatch<BARREL>::FMSTUBR(0));
@@ -212,19 +228,19 @@ void TrackBuilder(
     disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
 
       ap_uint<1> disk_stub_valid = false;
-      disk_stub_valid : for (short k = 0; k < NFMPerDisk; k++)
-        disk_stub_valid = (disk_stub_valid || disk_valid[j * NFMPerDisk + k]);
+      disk_stub_valid : for (short k = 0; k < NFMPerStubDisk; k++)
+        disk_stub_valid = (disk_stub_valid || disk_valid[j * NFMPerStubDisk + k]);
       nMatches += (disk_stub_valid ? 1 : 0);
 
-      static_assert(NFMPerDisk <= 6, "Number of FM memories per disk cannot exceed six.");
-      const auto &disk_stub = ((NFMPerDisk > 7 && disk_valid[j * NFMPerDisk + 7]) ? disk_fm[j * NFMPerDisk + 7][disk_read_index[j * NFMPerDisk + 7]] :
-                              ((NFMPerDisk > 6 && disk_valid[j * NFMPerDisk + 6]) ? disk_fm[j * NFMPerDisk + 6][disk_read_index[j * NFMPerDisk + 6]] :
-                              ((NFMPerDisk > 5 && disk_valid[j * NFMPerDisk + 5]) ? disk_fm[j * NFMPerDisk + 5][disk_read_index[j * NFMPerDisk + 5]] :
-                              ((NFMPerDisk > 4 && disk_valid[j * NFMPerDisk + 4]) ? disk_fm[j * NFMPerDisk + 4][disk_read_index[j * NFMPerDisk + 4]] :
-                              ((NFMPerDisk > 3 && disk_valid[j * NFMPerDisk + 3]) ? disk_fm[j * NFMPerDisk + 3][disk_read_index[j * NFMPerDisk + 3]] :
-                              ((NFMPerDisk > 2 && disk_valid[j * NFMPerDisk + 2]) ? disk_fm[j * NFMPerDisk + 2][disk_read_index[j * NFMPerDisk + 2]] :
-                              ((NFMPerDisk > 1 && disk_valid[j * NFMPerDisk + 1]) ? disk_fm[j * NFMPerDisk + 1][disk_read_index[j * NFMPerDisk + 1]] :
-                                                                                    disk_fm[j * NFMPerDisk][disk_read_index[j * NFMPerDisk]])))))));
+      const auto &i_mem = ((disk_valid[j * NFMPerStubDisk + 3]) ? (j * NFMPerStubDisk + 3) :
+                          ((disk_valid[j * NFMPerStubDisk + 2]) ? (j * NFMPerStubDisk + 2) :
+                          ((disk_valid[j * NFMPerStubDisk + 1]) ? (j * NFMPerStubDisk + 1) :
+                                                                  (j * NFMPerStubDisk))));
+      const auto &i_fm = ((disk_valid[j * NFMPerStubDisk + 3]) ? (disk_read_index[j * NFMPerStubDisk + 3]) :
+                         ((disk_valid[j * NFMPerStubDisk + 2]) ? (disk_read_index[j * NFMPerStubDisk + 2]) :
+                         ((disk_valid[j * NFMPerStubDisk + 1]) ? (disk_read_index[j * NFMPerStubDisk + 1]) :
+                                                                 (disk_read_index[j * NFMPerStubDisk]))));
+      const auto &disk_stub = disk_fm[i_mem][i_fm];
 
       const auto &disk_stub_index = (disk_stub_valid ? disk_stub.getStubIndex() : FullMatch<DISK>::FMSTUBINDEX(0));
       const auto &disk_stub_r = (disk_stub_valid ? disk_stub.getStubR() : FullMatch<DISK>::FMSTUBR(0));
@@ -293,16 +309,16 @@ void TrackBuilder(
       disk_stub_words: for (short j = 0 ; j < NDiskStubs; j++) {
         switch (j) {
           case 0:
-            diskStubWords[j][nTracks] = track.template getStubValid<4>() ? track.template getDiskStubWord<4>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
             break;
           case 1:
-            diskStubWords[j][nTracks] = track.template getStubValid<5>() ? track.template getDiskStubWord<5>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 1>() ? track.template getDiskStubWord<NBarrelStubs + 1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
             break;
           case 2:
-            diskStubWords[j][nTracks] = track.template getStubValid<6>() ? track.template getDiskStubWord<6>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 2>() ? track.template getDiskStubWord<NBarrelStubs + 2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
             break;
           case 3:
-            diskStubWords[j][nTracks] = track.template getStubValid<7>() ? track.template getDiskStubWord<7>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 3>() ? track.template getDiskStubWord<NBarrelStubs + 3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
             break;
         }
       }

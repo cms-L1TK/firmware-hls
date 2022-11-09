@@ -1,197 +1,25 @@
 #!/usr/bin/env bash
 set -e
 
-#### reduced config ####
-#### https://github.com/trholmes/cmssw/tree/7fa70ef966862a47357263173e482bc102511037 ####
-# 1 event
-#memprints_url_reduced="https://cernbox.cern.ch/index.php/s/lzpcKjd1oekoYBI/download"
-# 100 events
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/LkVZR8WRYGPJcPe/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/2zppC0iJ3eEy5C9/download"
-
-#### test 211005/211217 ####
+#### fw_synch_220523 ####
 # Standard configuration
-#memprints_url="https://aryd.web.cern.ch/aryd/MemPrints_Standard_211005.tgz"
-#luts_url="https://aryd.web.cern.ch/aryd/LUTs_Standard_211005.tgz"
+memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/pmcFjHWj2oPgESW/MemPrints.tar.gz"
+luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/i0kr2DI0SFY5m1A/LUTs.tar.gz"
+# Reduced configuration
+memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/6pM48rxtsxrN9tg/MemPrints.tar.gz"
+luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/U84ZI1vGnVKkQKc/LUTs.tar.gz"
 # Combined modules
-#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_211217.tgz"
-#luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_211217.tgz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/Nk0VWN7kRMZSFWm/MemPrints.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/LoqjBIg2ARZav8u/LUTs.tar.gz"
+# Reduced Combined modules                                                      
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
+luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
 
-
-
-#### fw_synch_210611 ####
-# Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/hUJUsqvCnKv2YdQ/download"
-luts_url="https://cernbox.cern.ch/index.php/s/9Yms3LCKJsg7UmF/download"
-# Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/RFpmFiSnFC84x0O/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/kqZu8R7Ftu0YPoO/download"
-
-#### fw_synch_210503 ####
-# Standard configuration
-#memprints_url="https://cernbox.cern.ch/index.php/s/CipX7CfTXIj1lcK/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/UDSvClVZksBr1Pq/download"
-# Combined modules
-#memprints_url_cm="https://www.dropbox.com/s/lf088lvyvg2t6jh/MemPrintsCombined_210319.tgz?dl=0"
-#luts_url_cm="https://www.dropbox.com/s/legrvm3gyu5hrth/LUTsCombined_210319.tgz?dl=0"
-
-#### fw_synch_201005 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/y7IWeDG4x7Sg7Im/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/DuhCjcykSHZLRhM/download"
-
-#### fw_synch_200515 ####
-#memprints_url="https://cernbox.cern.ch/index.php/s/QvV86Qcc8n9R4sg/download"
-#luts_url="https://cernbox.cern.ch/index.php/s/YSER9ne7WVxiKXI/download"
-
-# The following modules will have dedicated directories of test-bench files
-# prepared for them.
-declare -a processing_modules=(
-  # VMRouter
-  "VMR_L1PHID"
-  "VMR_L2PHIA"
-  "VMR_L2PHIB"
-  "VMR_L3PHIA"
-  "VMR_L3PHIB"
-  "VMR_L4PHIA"
-  "VMR_L4PHIB"
-  "VMR_L5PHIA"
-  "VMR_L5PHIB"
-  "VMR_L6PHIA"
-  "VMR_L6PHIB"
-  "VMR_D1PHIA"
-  "VMR_D2PHIA"
-  "VMR_D3PHIA"
-  "VMR_D4PHIA"
-  "VMR_D5PHIA"
-
-  # VMRouter CM
-  "VMRCM_L1PHIA"
-  "VMRCM_L2PHIA"
-  "VMRCM_L3PHIA"
-  "VMRCM_L4PHIA"
-  "VMRCM_L5PHIA"
-  "VMRCM_L6PHIA"
-  "VMRCM_D1PHIA"
-  "VMRCM_D2PHIA"
-  "VMRCM_D3PHIA"
-  "VMRCM_D4PHIA"
-  "VMRCM_D5PHIA"
-
-  # TrackletEngine
-  "TE_L1PHIC12_L2PHIB12"
-  "TE_L1PHIE18_L2PHIC17"
-
-  # TrackletCalculator
-  "TC_L1L2A"
-  "TC_L1L2B"
-  "TC_L1L2C"
-  "TC_L1L2D"
-  "TC_L1L2E"
-  "TC_L1L2F"
-  "TC_L1L2G"
-  "TC_L1L2H"
-  "TC_L1L2I"
-  "TC_L1L2J"
-  "TC_L1L2K"
-  "TC_L1L2L"
-  "TC_L2L3A"
-  "TC_L2L3B"
-  "TC_L2L3C"
-  "TC_L2L3D"
-  "TC_L3L4A"
-  "TC_L3L4B"
-  "TC_L3L4C"
-  "TC_L3L4D"
-  "TC_L5L6A"
-  "TC_L5L6B"
-  "TC_L5L6C"
-  "TC_L5L6D"
-
-  # ProjectionRouter
-  "PR_L1PHIB"
-  "PR_L2PHIB"
-  "PR_L3PHIB"
-  "PR_L4PHIB"
-  "PR_L5PHIB"
-  "PR_L6PHIB"
-  "PR_L1PHIC"
-  "PR_L2PHIC"
-  "PR_L3PHIC"
-  "PR_L4PHIC"
-  "PR_L5PHIC"
-  "PR_L6PHIC"
-
-  # MatchEngine
-  "ME_L1PHIC12"
-  "ME_L2PHIC20"
-  "ME_L3PHIC20"
-  "ME_L4PHIC20"
-  "ME_L5PHIC20"
-  "ME_L6PHIC20"
-  "ME_D1PHIC20"
-  "ME_D2PHIC12"
-  "ME_D3PHIC12"
-  "ME_D4PHIC12"
-  "ME_D5PHIC12"
-
-  # MatchCalculator
-  "MC_L1PHIB"
-  "MC_L2PHIB"
-  "MC_L3PHIB"
-  "MC_L4PHIB"
-  "MC_L5PHIB"
-  "MC_L6PHIB"
-  "MC_L1PHIC"
-  "MC_L2PHIC"
-  "MC_L3PHIC"
-  "MC_L4PHIC"
-  "MC_L5PHIC"
-  "MC_L6PHIC"
-
-  # MatchProcessor
-  "MP_L1PHIB"
-  "MP_L2PHIB"
-  "MP_L3PHIB"
-  "MP_L4PHIB"
-  "MP_L5PHIB"
-  "MP_L6PHIB"
-  "MP_L1PHIC"
-  "MP_L2PHIC"
-  "MP_L3PHIC"
-  "MP_L4PHIC"
-  "MP_L5PHIC"
-  "MP_L6PHIC"
-
-  # TrackBuilder (aka FitTrack)
-  "FT_L1L2"
-
-  # Tracklet Processor
-  "TP_L1L2A" 
-  "TP_L1L2B" 
-  "TP_L1L2C" 
-  "TP_L1L2D" 
-  "TP_L1L2E" 
-  "TP_L1L2F" 
-  "TP_L1L2G" 
-  "TP_L1L2H" 
-  "TP_L1L2I" 
-  "TP_L1L2J" 
-  "TP_L1L2K" 
-  "TP_L1L2L" 
-  "TP_L2L3A" 
-  "TP_L2L3B" 
-  "TP_L2L3C" 
-  "TP_L2L3D" 
-  "TP_L3L4A"
-  "TP_L3L4B"
-  "TP_L3L4C"
-  "TP_L3L4D"
-  "TP_L5L6A"
-  "TP_L5L6B"
-  "TP_L5L6C"
-  "TP_L5L6D"
-
-)
+# Barrel-only configuration
+# N.B.: currently untagged but produced with following commit:
+# e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
+memprints_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/2Ju0bMoBnRK1B8n/MemPrints.tar.gz"
+luts_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/DLJv9VGrjFrZUSQ/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
@@ -222,22 +50,6 @@ do
   shift
 done
 
-# If the MemPrints directory exists, assume the script has already been run,
-# and simply exit.
-if [ -d "MemPrints" ]
-then
-  echo "The emData directory must be cleaned for this script to work."
-  exit 0
-fi
-
-# If the LUTs directory exists, assume LUTs.tar.gz has already been downloaded
-# and unpacked, and only download and unpack MemPrints.tar.gz.
-memprints_only=0
-if [ -d "LUTs" ]
-then
-  memprints_only=1
-fi
-
 # Exit with an error message if run from a directory other than emData/.
 cwd=`pwd | xargs basename`
 if [[ $cwd != "emData" ]]
@@ -246,12 +58,29 @@ then
   exit 1
 fi
 
-# Download and unpack LUTs.tar.gz.
-if [[ $memprints_only == 0 ]]
+# If the MemPrints directory exists, assume the script has already been run,
+# and simply exit.
+if [ -d "MemPrints" ]
+then
+  echo "The emData directory must be cleaned for this script to work."
+  exit 0
+fi
+
+# Download and unpack LUTs.tar.gz,
+# unless LUTS directory already exists (due to previous "download.sh -t" run).
+
+if [ ! -d "LUTs" ]
 then
   wget -O LUTs.tgz --quiet ${luts_url_reduced}
   tar -xzf LUTs.tgz
   mv LUTs LUTsReduced
+  rm -f LUTs.tgz
+  wget -O LUTs.tgz --quiet ${luts_url_barrel}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsBarrel
+  wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
+  tar -xzf LUTs.tgz
+  mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
@@ -280,41 +109,121 @@ mkdir -p ../TopFunctions/ReducedConfig
 ./generate_ME.py -s  -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
 ./generate_MC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
 ./generate_TB.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
+### barrel config
+mkdir -p ../TopFunctions/BarrelConfig
+./generate_IR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_VMR.py -a -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_TC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_PR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_ME.py -s  -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_MC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
+./generate_TB.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
 ### combined config
 mkdir -p ../TopFunctions/CombinedConfig
-./generate_VMRCM.py -d -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+### reduced combined config                                                                                                                    
+mkdir -p ../TopFunctions/ReducedCombinedConfig
+./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 
-# Exit now if we are only downloading and unpacking LUTs.tar.gz.
-if [[ $tables_only != 0 ]]
+
+# Run scripts to generate HDL top modules and test benches in IntegrationTests/
+cd ../ # needed for older versions of git
+git submodule init
+git submodule update
+cd emData/project_generation_scripts/
+cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
+./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
+cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
+./makeReducedConfig.py --no-graph
+./makeBarrelConfig.py
+### IRVMR
+./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
+./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
+mkdir -p ../../IntegrationTests/IRVMR/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/IRVMR/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/IRVMR/tb/
+### PRMEMC
+./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2
+./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2 -x
+mkdir -p ../../IntegrationTests/PRMEMC/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/PRMEMC/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/PRMEMC/tb/
+### TETC
+./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0
+./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0 -x
+mkdir -p ../../IntegrationTests/TETC/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/TETC/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/TETC/tb/
+### Reduced IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/ReducedConfig/IRtoTB/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/tb/
+### Reduced MCTB
+./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
+### Barrel IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
+### Reduced Combined IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
+
+# Remove untracked file and return to emData/
+rm -fv script_sectproc.tcl
+cd ../
+
+if [[ $tables_only == 0 ]]
 then
-  exit 0
+  # Get memory test data: download and unpack the tarball.
+  wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsReduced
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_barrel}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsBarrel
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsReducedCM
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_cm}
+  tar -xzf MemPrints.tgz
+  mv MemPrints MemPrintsCM
+  rm -f MemPrints.tgz
+
+  wget -O MemPrints.tar.gz --quiet ${memprints_url}
+  tar -xzf MemPrints.tar.gz
+  rm -f MemPrints.tar.gz
 fi
-
-# Download and unpack the tarball.
-wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
-tar -xzf MemPrints.tgz
-mv MemPrints MemPrintsReduced
-rm -f MemPrints.tgz
-
-### Ugly hack to remove initial "0x" from input stub test vectors, in order to
-### be consistent with other sets of test vectors.
-### FIXME: Remove after next FW sync
-sed -i "s/^0x//g" MemPrintsReduced/InputStubs/InputStubs_*.dat
-
-wget -O MemPrints.tgz --quiet ${memprints_url_cm}
-tar -xzf MemPrints.tgz
-mv MemPrints MemPrintsCM
-rm -f MemPrints.tgz
-
-wget -O MemPrints.tar.gz --quiet ${memprints_url}
-tar -xzf MemPrints.tar.gz
-rm -f MemPrints.tar.gz
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
+
+# Create a list of all processing modules. The VMRs in the combined config get
+# a special name.
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
@@ -324,6 +233,7 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   memprint_location_reduced="MemPrintsReduced"
+  memprint_location_barrel="MemPrintsBarrel"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
   then
@@ -336,18 +246,24 @@ do
   fi
   wires="${table_location}/wires.dat"
 
-  target_dir=${module_type}/${module}
+  if [[ $tables_only == 0 ]]
+  then
+    # Create directories containing memory test data specific to each module type.
+    target_dir=${module_type}/${module}
 
-  rm -rf ${target_dir}
-  mkdir -p ${target_dir}/ReducedConfig
+    rm -rf ${target_dir}
+    mkdir -p ${target_dir}/ReducedConfig
+    mkdir -p ${target_dir}/BarrelConfig
 
-  for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
-  do
-    find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-    find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
-  done
+    for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+    do
+      find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
+      find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
+      find ${memprint_location_barrel} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/BarrelConfig/ \;
+    done
+  fi
 
-  # Table linking logic specific to each module type
+  # Create directories containing LUT tables specific to each module type.
   table_target_dir="${module_type}/tables"
   if [[ ! -d "${table_target_dir}" ]]
   then
@@ -367,6 +283,8 @@ do
           seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TP_${seed}.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
