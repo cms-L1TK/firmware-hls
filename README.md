@@ -402,7 +402,7 @@ Currently the project is built against the Apollo board with VU7P FPGA.
 ### Prerequisites
 
 * Xilinx Vivado 2020.1 (HLS build) and 2021.2 (project build)
-* ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb). Tested with dev/2021j
+* ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb). Tested with dev/2022g
 * Python 3
 
 ### Quick instructions
