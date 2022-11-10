@@ -2,12 +2,12 @@ src payload.vhd
 src linktosecproc.vhd
 src secproctolink.vhd
 src SectorProcessor.vhd
+src pkgs/tf_interface_pkg.vhd
 src memUtil_pkg.vhd
 src tf_to_kf.vhd
 src kf_wrapper.vhd
 
 src pkgs/GCU_utils.vhd
-src pkgs/tf_interface_pkg.vhd
 
 src common/hdl/CreateStartSignal.vhd
 src --vhdl2008 common/hdl/tf_lut.vhd
