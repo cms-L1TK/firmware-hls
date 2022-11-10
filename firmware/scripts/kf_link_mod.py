@@ -13,7 +13,6 @@ replace_line_string = '  file f: text open read_mode is "' + replace_line_path +
 for line in fileinput.input(file_to_mod, inplace=1):
     if search_line_string in line:
         line = line.replace(search_line_string, replace_line_string)
-        print ("line found")
     sys.stdout.write(line)
 
 
