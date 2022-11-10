@@ -414,30 +414,21 @@ First source Xilinx Vivado 2020.1
 ```
 ipbb init work
 cd work
-ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.0-alpha
+ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.2
 ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v1.2.2
 ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
 ipbb add git ssh://git@gitlab.cern.ch:7999/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
 ipbb add git https://gitlab.cern.ch/HPTD/tclink.git -r fda0bcf
 ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.9
+ipbb add git https://gitlab.cern.ch/dth_p1-v2/slinkrocket_ips.git -b v03.09
+ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket.git -b 03.10
+ipbb add git https://gitlab.cern.ch/gbt-fpga/gbt-fpga.git -b gbt_fpga_6_1_0
+ipbb add git https://gitlab.cern.ch/gbt-fpga/lpgbt-fpga.git -b v.2.1
+ipbb add git https://:@gitlab.cern.ch:8443/gbtsc-fpga-support/gbt-sc.git -b gbt_sc_4_1
 ipbb add git https://github.com/FilMarini/firmware-hls -b emp_for_sc #LONG WAIT!
 ```
 
 *Note: You need to be a member of the `cms-tcds2-users` egroup in order to clone the `cms-tcds2-firmware` repository. In order to add yourself to that egroup, go to the "Members" tab of [this page](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10380295), and click on the "Add me" button; you may need to wait ~ 24 hours to get access to the GitLab repo.*
-
-replace
-```
-set_false_path -through [get_nets {ttc/tcds2_interface_stat[channel0_ttc2]*}] -to [get_clocks {clk_40_extern0 clk_40_pseudo}]
-```
-in
-
-```
-emp-fw/components/top/firmware/ucf/clock_constraints_tcds2.tcl
-```
-with
-```
-set_false_path -through [get_nets {ttc/*tcds2_interface_stat[channel0_ttc2]*}] -to [get_clocks {clk_40_extern0 clk_40_pseudo}]
-```
 
 ### Vivado Simulation
 
@@ -451,6 +442,21 @@ cd proj/vsim
 
 **Step 3: Simulation**
 
+* For questa simulation testbench:
+```
+ipbb proj create sim qsim firmware-hls: 'qsim.dep'
+cd proj/qsim
+ipbb sim setup-simlib
+ipbb sim ipcores
+ipbb sim fli-udp
+ipbb sim generate-project #(rerun this if you change VHDL)
+
+./run_sim -c work.top -Gsourcefile=<input.txt> -Gsinkfile=<out.txt> -Gplaylen=xyz -Gcaplen=xyz -do 'run 50.0us' -do quit 
+```
+where `xyz = number of events * 108`, where default is 9 events.
+where `input.txt` follows the standard EMP pattern file convention. 
+
+* For vivado simulation testbench
 ```
 ipbb vivado generate-project
 cd vsim

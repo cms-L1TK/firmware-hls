@@ -4,7 +4,7 @@ input_file = mem/in.txt
 proj_path = ../../../../proj
 hls_script_path = ../IntegrationTests/ReducedConfig/IRtoTB/script
 
-all: $(core_file) hdl_add_files xciCreation
+all: $(core_file) hdl_add_files xciCreation kfin_adj
 
 $(core_dir):
 	@mkdir cgn mem
@@ -15,6 +15,9 @@ $(core_dir):
 
 $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py
+
+kfin_adj:
+	@python3 scripts/kf_link_mod.py
 
 xciCreation: $(core_file)
 	make -f scripts/xciMaker -j 8 all
@@ -37,4 +40,4 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
 	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
-.PHONY: sim all hdl_add_files xciCreation
+.PHONY: sim all hdl_add_files xciCreation kfin_adj
