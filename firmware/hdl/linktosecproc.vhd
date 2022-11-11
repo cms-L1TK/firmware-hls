@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-27
--- Last update: 2022-11-09
+-- Last update: 2022-11-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ begin  -- architecture rtl
   ir_start_o <= s_ir_start;
 
   p_bx_count : process (clk_i) is
-    variable v_bx         : integer;
+    variable v_bx         : natural;
     variable v_word_count : natural := 1;
   begin  -- process p_bx_count
     if rising_edge(clk_i) then          -- rising clock edge
