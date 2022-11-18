@@ -870,7 +870,10 @@ void MatchProcessor(BXType bx,
       emptys[iMEU] = matchengine[iMEU].empty();
 
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
-      matches[iMEU] =  matchengine[iMEU].peek();
+
+      ap_uint<kNBits_MemAddr> projSeqDummy;
+      (matches[iMEU], projSeqDummy) =  matchengine[iMEU].peek();
+
     }
 
     //This printout exactly matches printout in emulation for tracking code differences

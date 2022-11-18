@@ -10,6 +10,7 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
+#include "CircularBuffer.h"
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -202,6 +203,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     writeindex_ = (goodMatch&&!empty_) ? writeindexnext : writeindex_;
     empty_ = empty_ && !goodMatch;
 
+    if (goodMatch) {
+      matchBuffer_.store((stubindex,projbuffer____.getAllProj(),projseq____));
+    }
+
     //update pipeline variables
 
     good____ = good___;
@@ -240,6 +245,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
  }
 
  inline bool setNearFull() {
+   matchBuffer_.loopInit();
    nearFull_ = nearFull5Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
@@ -324,7 +330,9 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
   if (!empty()) {
-    return projseqsNext_;
+    assert(projseqsNext_==matchBuffer_.peek().range(kNBits_MemAddr-1,0));
+    return matchBuffer_.peek().range(kNBits_MemAddr-1,0);
+    //return projseqsNext_;
   }
   if (idle_&&!good__&&!good____) {
     ap_uint<kNBits_MemAddr> tmp(0);
@@ -364,13 +372,24 @@ inline int getIPhi() {
 //  return matchtmp;
 //}
 
-inline MATCH peek() {
+
+//inline MATCH peek() {
+
+ inline ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize+kNBits_MemAddr> peek() {
 #pragma HLS inline  
-  return matchesNext_;
+  assert(empty_==matchBuffer_.empty());
+  if (!empty_ || !matchBuffer_.empty()) {
+    std::cout << "empty_: " << empty_ << " " << matchBuffer_.empty() << std::endl;
+    std::cout << "peek:" << matchesNext_.to_string(2) 
+	      << " " << matchBuffer_.peek().to_string(2) << std::endl;
+    assert((matchesNext_,projseqsNext_)==matchBuffer_.peek());
+  }
+  return (matchesNext_,projseqsNext_);
 }
  
 inline void advance() {
 #pragma HLS inline  
+  matchBuffer_.advance();
   if (readindex_ == writeindex_) {
     empty_ = true;
   } else {
@@ -381,7 +400,8 @@ inline void advance() {
 }
 
 inline void cache() {
-#pragma HLS inline  
+#pragma HLS inline 
+  matchBuffer_.loopEnd();
   if (readindex_ != writeindex_) {
     projseqsCache_ =  projseqs_[readindex_];
     matchesCache_ =  matches_[readindex_];
@@ -395,6 +415,8 @@ inline void cache() {
  bool empty_;
  MATCH matchesNext_, matchesCache_;
  ap_uint<kNBits_MemAddr> projseqsNext_, projseqsCache_;
+
+ CircularBuffer<(VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize+kNBits_MemAddr),MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
 
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
