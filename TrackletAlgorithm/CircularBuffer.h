@@ -103,6 +103,10 @@ class CircularBuffer {
     return writeptrnext == readptr_;
   }
 
+  bool nearFull() const {
+    return loopInitNearFull_;
+  }
+
   bool empty() const {
     return empty_;
   }
