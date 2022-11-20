@@ -142,8 +142,10 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
   for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
-    auto data_ref = memory_ref.read_mem(ievt,i).raw().range(msb,lsb);
-    auto data_com = memory.read_mem(ievt,i).raw().range(msb,lsb);
+    auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
+    auto data_com_raw = memory.read_mem(ievt,i).raw();
+    auto data_ref = data_ref_raw.range(msb,lsb);
+    auto data_com = data_com_raw.range(msb,lsb);
     if (i==0) {
       // If both reference and computed memories are completely empty, skip it
       if (data_com == 0 && data_ref == 0) break;
