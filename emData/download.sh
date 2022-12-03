@@ -3,14 +3,14 @@ set -e
 
 #### fw_synch_220220 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/index.php/s/7H3StfracwrVUAe/download"
-luts_url="https://cernbox.cern.ch/index.php/s/SUd6tEO970wKNnZ/download"
+memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/7H3StfracwrVUAe/MemPrints.tar.gz"
+luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/SUd6tEO970wKNnZ/LUTs.tar.gz"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/index.php/s/qBKvAmfu83SpAGD/download"
-luts_url_reduced="https://cernbox.cern.ch/index.php/s/GJZA1zLnWg3hP4y/download"
+memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/qBKvAmfu83SpAGD/MemPrints.tar.gz"
+luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/GJZA1zLnWg3hP4y/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/index.php/s/YcqX3KUgFdZyMG6/download"
-luts_url_cm="https://cernbox.cern.ch/index.php/s/lKrxzKJ0XmelE0j/download"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/YcqX3KUgFdZyMG6/MemPrints.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/lKrxzKJ0XmelE0j/LUTs.tar.gz"
 # Reduced Combined modules                                                                                                                     
 #memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220309.tgz"
 #luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220309.tgz"
@@ -21,8 +21,8 @@ luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220411.tg
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
 # 16ac97bf7463ad54a5ca91afac44997b8cad1b3e
-memprints_url_barrel="https://cernbox.cern.ch/index.php/s/4bav5YoSOEK3NIg/download"
-luts_url_barrel="https://cernbox.cern.ch/index.php/s/myeIctCD1huekgq/download"
+memprints_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/4bav5YoSOEK3NIg/MemPrints.tar.gz"
+luts_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/myeIctCD1huekgq/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
@@ -53,6 +53,8 @@ do
   shift
 done
 
+echo Here001
+
 # Exit with an error message if run from a directory other than emData/.
 cwd=`pwd | xargs basename`
 if [[ $cwd != "emData" ]]
@@ -60,6 +62,8 @@ then
   echo "Must be run from emData directory."
   exit 1
 fi
+
+echo Here002
 
 # If the MemPrints directory exists, assume the script has already been run,
 # and simply exit.
@@ -72,27 +76,37 @@ fi
 # Download and unpack LUTs.tar.gz,
 # unless LUTS directory already exists (due to previous "download.sh -t" run).
 
+echo Here003
+
 if [ ! -d "LUTs" ]
 then
+  echo Here991
+  echo ${luts_url_reduced}
   wget -O LUTs.tgz --quiet ${luts_url_reduced}
   tar -xzf LUTs.tgz
   mv LUTs LUTsReduced
   rm -f LUTs.tgz
+  echo Here992
   wget -O LUTs.tgz --quiet ${luts_url_barrel}
   tar -xzf LUTs.tgz
   mv LUTs LUTsBarrel
+  echo Here993
   wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
   tar -xzf LUTs.tgz
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
+  echo Here994
   wget -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
+  echo Here995
   wget -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzf LUTs.tar.gz
   rm -f LUTs.tar.gz
 fi
+
+echo Here004
 
 # Run scripts to generate top functions in TopFunctions/
 ### full config
@@ -134,6 +148,7 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 
+echo Here005
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
 cd ../ # needed for older versions of git

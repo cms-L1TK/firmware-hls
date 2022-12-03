@@ -30,24 +30,31 @@ class CircularBuffer {
  CircularBuffer():
   writeptr_(0), readptr_(0), empty_(true)
     {
-      //Initialize nearFullLUT
-      for(unsigned int iwrt=0; iwrt<(1<<AddressWidth); iwrt++) {
+    }
+	
+  static const ap_uint<(1<<(2*AddressWidth))> nearFullInit() {
+
+     ap_uint<(1<<(2*AddressWidth))> nearFulltmp;
+
+    //Initialize nearFullLUT
+    for(unsigned int iwrt=0; iwrt<(1<<AddressWidth); iwrt++) {
 #pragma HLS unroll 
-	for(unsigned int iread=0; iread<(1<<AddressWidth); iread++) {
+      for(unsigned int iread=0; iread<(1<<AddressWidth); iread++) {
 #pragma HLS unroll 
-	  ADDR writeptr(iwrt);
-	  ADDR readptr(iread);
-	  nearFullLUT_[(writeptr,readptr)] = false;
-	  for(unsigned i=1; i<NearFullCount; i++) {
+	ADDR writeptr(iwrt);
+	ADDR readptr(iread);
+	nearFulltmp[(writeptr,readptr)] = false;
+	for(unsigned i=1; i<NearFullCount; i++) {
 #pragma HLS unroll 
-	    if (writeptr+i == readptr) {
-	      nearFullLUT_[(writeptr, readptr)] = true;
-	    }
+	  if (writeptr+i == readptr) {
+	    nearFulltmp[(writeptr, readptr)] = true;
 	  }
 	}
       }
     }
-	
+    return nearFulltmp;
+  }
+
   void reset() {
     writeptr_ = 0;
     readptr_ = 0;
@@ -55,16 +62,21 @@ class CircularBuffer {
   }
 
   void loopInit() {
-    loopInitNearFull_ = nearFullLUT_[(writeptr_, readptr_)];
+    static const ap_uint<(1<<(2*AddressWidth))> nearFullLUT = nearFullInit();
+    loopInitNearFull_ = nearFullLUT[(writeptr_, readptr_)];
   }
 
   void loopEnd() {
-    readcache_ = buffer_[readptr_];
+    //#pragma HLS dependence variable=buffer_ intra false
+    if (readptr_ != writeptr_) {
+      readcache_ = buffer_[readptr_];
+    }
   }
 
   void store(const BUFFERWORD data) {
+    //#pragma HLS dependence variable=buffer_ intra false
     if (empty_) {
-      assert(writeptr_ == readptr_);
+      //assert(writeptr_ == readptr_);
       nextword_ =  data;
       empty_ = false;
     } else {
@@ -78,7 +90,7 @@ class CircularBuffer {
 
   BUFFERWORD read() {
     BUFFERWORD tmp = nextword_;
-    assert(!empty_);
+    //assert(!empty_);
     if (readptr_ == writeptr_) {
       empty_ = true;
     } else {
@@ -89,7 +101,7 @@ class CircularBuffer {
   }
 
   void advance() {
-    assert(!empty_);
+    //assert(!empty_);
     if (readptr_ == writeptr_) {
       empty_ = true;
     } else {
@@ -131,7 +143,7 @@ class CircularBuffer {
   
   BUFFERWORD buffer_[1<<AddressWidth];
 
-  bool nearFullLUT_[1<<(2*AddressWidth)];
+  ap_uint<(1<<(2*AddressWidth))> nearFullLUT_;
 
 };
 

@@ -863,7 +863,6 @@ void MatchProcessor(BXType bx,
 ///////////////////////////////////////////////////////////////////PIPELINE TEST END
   MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
-      matchengine[iMEU].set_empty();
       matchengine[iMEU].setNearFull();
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
@@ -878,13 +877,14 @@ void MatchProcessor(BXType bx,
 
     //This printout exactly matches printout in emulation for tracking code differences
        
+    /*
     std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
     for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       std::cout << " MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
 		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
     }
     std::cout << std::endl;
-
+    */
     
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
