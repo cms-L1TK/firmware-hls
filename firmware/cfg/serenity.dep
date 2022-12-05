@@ -1,7 +1,7 @@
 src ../ucf/serenity.tcl
-
 include payload.dep
 src emp_project_decl.vhd
+setup ../ucf/ip.tcl
 
 src -c emp-fwk:components/datapath emp_data_types.vhd
 src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_v.vhd ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd

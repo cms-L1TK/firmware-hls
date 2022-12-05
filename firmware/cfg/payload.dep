@@ -14,6 +14,14 @@ src --vhdl2008 common/hdl/tf_mem_bin.vhd
 src --vhdl2008 common/hdl/tf_mem.vhd
 src common/hdl/tf_pkg_emp.vhd
 
+# KF
+include -c firmware-hls:KalmanFilter/kfin components.dep 
+include -c firmware-hls:KalmanFilter/kf components.dep 
+include -c firmware-hls:KalmanFilter/kfout components.dep 
+include -c firmware-hls:KalmanFilter/tq components.dep 
+include -c firmware-hls:KalmanFilter/common components.dep 
+src conv96to64.vhd
+
 # Surf subset
 src -l surf surf_subset/hdl/AxiStreamMux.vhd
 src -l surf surf_subset/hdl/AxiStreamFifoV2.vhd
@@ -37,13 +45,6 @@ src -l surf surf_subset/hdl/AxiStreamPipeline.vhd
 src -l surf surf_subset/pkgs/ArbiterPkg.vhd
 src -l surf surf_subset/pkgs/AxiStreamPkg.vhd
 src -l surf surf_subset/pkgs/StdRtlPkg.vhd
-
-# KF
-include -c firmware-hls:KalmanFilter/kfin components.dep 
-include -c firmware-hls:KalmanFilter/kf components.dep 
-include -c firmware-hls:KalmanFilter/kfout components.dep 
-include -c firmware-hls:KalmanFilter/tq components.dep 
-include -c firmware-hls:KalmanFilter/common components.dep 
 
 ################
 # Include Cores
