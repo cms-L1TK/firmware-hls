@@ -83,11 +83,11 @@ public:
   static constexpr unsigned kTFStubValidMSB(const int i) {
     return (kTFStubValidLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1);
   }
-  static constexpr unsigned kTFHitCountLSB(const int i) {
+  static constexpr unsigned kTFHitCountSizeLSB(const int i) {
     return (kTFStubValidMSB(0) + (7 - i) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
   }
-  static constexpr unsigned kTFHitCountMSB(const int i) {
-    return (kTFHitCountLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize - 1);
+  static constexpr unsigned kTFHitCountSizeMSB(const int i) {
+    return (kTFHitCountSizeLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize - 1);
   }
 };
 
@@ -205,7 +205,7 @@ public:
   template<uint8_t Hit>
   TFHITCOUNT getHitCount() const {
     //static_assert(Hit >= 0 && Hit <= TrackFitBase<NBarrelStubs, NDiskStubs>::kNStubs - 1, "Invalid hit number.");
-    return data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountLSB(Hit));
+    return data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountSizeMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountSizeLSB(Hit));
   }
 
   template<uint8_t Hit>
@@ -304,7 +304,7 @@ public:
   template<uint8_t Hit>
   void setHitCount(const TFHITCOUNT hitcount) {
     //static_assert(Hit >= 0 && Hit <= TrackFitBase<NBarrelStubs, NDiskStubs>::kNStubs - 1, "Invalid hit number.");
-    data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountLSB(Hit)) = hitcount;
+    data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountSizeMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFHitCountSizeLSB(Hit)) = hitcount;
   }
 
   template<uint8_t Hit>

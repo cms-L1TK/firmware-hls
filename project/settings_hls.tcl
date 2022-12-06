@@ -21,6 +21,7 @@ switch -glob -- $exe {
         # Set the FPGA part number
         set_part {xcvu7p-flvb2104-1-e} -tool vivado
         #set_part {xcku115-flvb2104-1-e} -tool vivado
+        #set_part {xcvu9p-flgc2104-1-e} -tool vivado
 
         # Remove variables from IP interface if they are never used by HLS algo.
         config_interface -trim_dangling_port
