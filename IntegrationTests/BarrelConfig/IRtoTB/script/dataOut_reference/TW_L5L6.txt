@@ -1,1 +1,15 @@
   TIME (ns)         BX       ADDR                                                                                                                     DATA
+    3386 ns          0       0x00                                                                                                  0xBAE7C85BCF1821D249000
+    3390 ns          0       0x01                                                                                                  0xBADC890AD217F87248000
+    3818 ns          1       0x00                                                                                                  0xBC02C3419AE027C248000
+    3822 ns          1       0x01                                                                                                  0xB4B9CBA8D0F80C7248000
+    4262 ns          2       0x00                                                                                                  0xBACBC5A5C167DEE208000
+    4266 ns          2       0x01                                                                                                  0xBAC945A38BC7E4E208000
+    5122 ns          4       0x00                                                                                                  0xBAA8C7C82E37EEE240000
+    5558 ns          5       0x00                                                                                                  0xBB4E48004FB806C240000
+   15046 ns         27       0x00                                                                                                  0xB4138F578200000248000
+   22394 ns         44       0x00                                                                                                  0xB3F74F022347DFB240000
+   25854 ns         52       0x00                                                                                                  0xB3430E9AC05007C240000
+   28010 ns         57       0x00                                                                                                  0xB318CE7B7E00000240000
+   30190 ns         62       0x00                                                                                                  0xB3F88EDFDE9406A240000
+   36218 ns         76       0x00                                                                                                  0xBB69807FAEF0221240000

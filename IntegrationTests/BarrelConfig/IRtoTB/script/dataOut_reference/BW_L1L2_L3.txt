@@ -1,1 +1,4 @@
   TIME (ns)         BX       ADDR                                                                                                                     DATA
+    3382 ns          0       0x00                                                                                                           0x20007C3F31FE
+    3838 ns          1       0x00                                                                                                           0x201001A0B003
+    5110 ns          4       0x00                                                                                                           0x000000000000
