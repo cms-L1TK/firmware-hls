@@ -73,6 +73,22 @@ class CircularBuffer {
     }
   }
 
+  void inc() {
+    if (empty_) {
+      empty_ = false;
+    } else {
+      writeptr_++;
+    }
+  }
+
+  void save(const BUFFERWORD data) {
+    if (empty_) {
+      nextword_ =  data;
+    } else {
+      buffer_[writeptr_]=data;
+    }
+  }
+
   void store(const BUFFERWORD data) {
     //#pragma HLS dependence variable=buffer_ intra false
     if (empty_) {

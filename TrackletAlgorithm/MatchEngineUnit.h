@@ -178,8 +178,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 
     bool goodMatch = good____&passphi&pass&table[index]; 
 
+    matchBuffer_.save((stubindex,projbuffer____.getAllProj(),projseq____));
+
     if (goodMatch) {
-      matchBuffer_.store((stubindex,projbuffer____.getAllProj(),projseq____));
+      matchBuffer_.inc();
     }
 
     //update pipeline variables
