@@ -68,9 +68,9 @@ class CircularBuffer {
 
   void loopEnd() {
     //#pragma HLS dependence variable=buffer_ intra false
-    if (readptr_ != writeptr_) {
+    //if (readptr_ != writeptr_) {
       readcache_ = buffer_[readptr_];
-    }
+      //}
   }
 
   void inc() {
