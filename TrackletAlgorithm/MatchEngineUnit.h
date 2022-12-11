@@ -5,7 +5,7 @@
 #include "TrackletProjectionMemory.h"
 #include "VMStubMEMemoryCM.h"
 #include "AllProjectionMemory.h"
-#include "CircularBuffer.h"
+#include "CircularBuffer2.h"
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -176,9 +176,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 
     auto const index=projrinv____.concat(stubbend);
 
+    matchBuffer_.save((stubindex,projbuffer____.getAllProj()),projseq____);
+
     bool goodMatch = good____&passphi&pass&table[index]; 
 
-    matchBuffer_.save((stubindex,projbuffer____.getAllProj(),projseq____));
 
     if (goodMatch) {
       matchBuffer_.inc();
@@ -250,8 +251,8 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
    if (!empty()) {
      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
      ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
-     ap_uint<kNBits_MemAddr> projseq;
-     (vmstub,allprojdata,projseq) = matchBuffer_.peek();
+     //ap_uint<kNBits_MemAddr> projseq;
+     (vmstub,allprojdata) = matchBuffer_.peekmatch();
      AllProjection<AllProjectionType> allproj(allprojdata);
      return allproj.getTCID();
    }
@@ -276,8 +277,8 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
    if (!empty()) {
      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
      ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
-     ap_uint<kNBits_MemAddr> projseq;
-     (vmstub,allprojdata,projseq) = matchBuffer_.peek();
+     //ap_uint<kNBits_MemAddr> projseq;
+     (vmstub,allprojdata) = matchBuffer_.peekmatch();
      AllProjection<AllProjectionType> allproj(allprojdata);
      return (allproj.getTCID(), allproj.getTrackletIndex());
    }
@@ -304,7 +305,12 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
  inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
    if (!empty()) {
-     return matchBuffer_.peek().range(kNBits_MemAddr-1,0);
+     //ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
+     //ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
+     ap_uint<kNBits_MemAddr> projseq;
+     projseq = matchBuffer_.peekprojseq();
+     return projseq;
+     //return matchBuffer_.peek().range(kNBits_MemAddr-1,0);
    }
    if (idle_&&!good__&&!good____) {
      ap_uint<kNBits_MemAddr> tmp(0);
@@ -336,7 +342,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 
  inline ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize+kNBits_MemAddr> peek() {
 #pragma HLS inline  
-  return matchBuffer_.peek();
+   return (matchBuffer_.peekmatch(),matchBuffer_.peekprojseq());
  }
  
  inline void advance() {
@@ -352,7 +358,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
  private:
  
  //Buffer for the found matches
- CircularBuffer<(VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize+kNBits_MemAddr),MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
+ CircularBuffer2<(VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize),kNBits_MemAddr,MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
  
  //Current projection
  ap_uint<4> nstubsall_[4];
