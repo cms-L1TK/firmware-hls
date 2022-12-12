@@ -14,6 +14,7 @@
 #include <fstream>
 #include <bitset>
 #include "MatchEngineUnit_parameters.h"
+#include "CircularBuffer2.h"
 
 
 template<int VMProjType> class MatchEngineUnitBase {};
@@ -192,8 +193,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
       projseqsNext_ = projseq____;
       matchesNext_ = (stubindex, projbuffer____.getAllProj());
     }
-    projseqs_[writeindex_] = projseq____;
-    matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
+    //projseqs_[writeindex_] = projseq____;
+    //matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
+    matchBuffer_.bufferprojseq_[writeindex_] = projseq____;
+    matchBuffer_.buffermatch_[writeindex_] = (stubindex,projbuffer____.getAllProj());
     INDEX writeindexnext = writeindex_ + 1;
     
     //Though we did write to matches_ above only now do we increment
@@ -239,7 +242,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
    return empty_;
  }
 
- inline bool setNearFull() {
+ inline void setNearFull() {
    nearFull_ = nearFull5Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
@@ -383,8 +386,10 @@ inline void advance() {
 inline void cache() {
 #pragma HLS inline  
   if (readindex_ != writeindex_) {
-    projseqsCache_ =  projseqs_[readindex_];
-    matchesCache_ =  matches_[readindex_];
+    //projseqsCache_ =  projseqs_[readindex_];
+    //matchesCache_ =  matches_[readindex_];
+    projseqsCache_ =  matchBuffer_.bufferprojseq_[readindex_];
+    matchesCache_ =  matchBuffer_.buffermatch_[readindex_];
   }
 }
 
@@ -396,8 +401,10 @@ inline void cache() {
  MATCH matchesNext_, matchesCache_;
  ap_uint<kNBits_MemAddr> projseqsNext_, projseqsCache_;
 
- MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
- ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+ //MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+ //ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+
+ CircularBuffer2<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize,kNBits_MemAddr,MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
 
  bool nearFull_;
 
