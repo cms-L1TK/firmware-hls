@@ -14,7 +14,7 @@
 #include <fstream>
 #include <bitset>
 #include "MatchEngineUnit_parameters.h"
-#include "CircularBuffer2.h"
+#include "CircularBuffer.h"
 
 
 template<int VMProjType> class MatchEngineUnitBase {};
@@ -203,7 +203,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     //matchBuffer_.bufferprojseq_[matchBuffer_.writeptr_] = projseq____;
     //matchBuffer_.buffermatch_[matchBuffer_.writeptr_] = (stubindex,projbuffer____.getAllProj());
 
-    matchBuffer_.save( (stubindex,projbuffer____.getAllProj()), projseq____);
+    matchBuffer_.save( (stubindex,projbuffer____.getAllProj(), projseq____));
 
     //INDEX writeindexnext = matchBuffer_.writeptr_ + 1;
     
@@ -291,9 +291,10 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TCID getTCID(
   if (!empty()) {
     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
     ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
+    ap_uint<kNBits_MemAddr> projseq;
     //(vmstub,allprojdata) = matchesNext_;
     //(vmstub,allprojdata) = matchBuffer_.nextwordmatch_;
-    (vmstub,allprojdata) = matchBuffer_.peekmatch();
+    (vmstub,allprojdata,projseq) = matchBuffer_.peek();
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
@@ -318,9 +319,10 @@ inline typename ProjectionRouterBuffer<BARREL, AllProjectionType>::TRKID getTrkI
   if (!empty()) {
     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
     ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
+    ap_uint<kNBits_MemAddr> projseq;
     //(vmstub,allprojdata) = matchesNext_;
     //(vmstub,allprojdata) = matchBuffer_.nextwordmatch_;
-    (vmstub,allprojdata) = matchBuffer_.peekmatch();
+    (vmstub,allprojdata,projseq) = matchBuffer_.peek();
     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
@@ -349,7 +351,10 @@ inline ap_uint<kNBits_MemAddr> getProjSeq() {
   if (!empty()) {
     //return projseqsNext_;
     //return matchBuffer_.nextwordprojseq_;
-    return matchBuffer_.peekprojseq();
+    MATCH match;
+    ap_uint<kNBits_MemAddr> projseq;
+    (match, projseq) = matchBuffer_.peek();
+    return projseq;
   }
   if (idle_&&!good__&&!good____) {
     ap_uint<kNBits_MemAddr> tmp(0);
@@ -393,7 +398,10 @@ inline MATCH peek() {
 #pragma HLS inline  
   //return matchesNext_;
   //return matchBuffer_.nextwordmatch_;
-  return matchBuffer_.peekmatch();
+  ap_uint<kNBits_MemAddr> projseq;
+  MATCH match;
+  (match, projseq) = matchBuffer_.peek();
+  return match;
 }
  
 inline void advance() {
@@ -431,7 +439,7 @@ inline void cache() {
  //MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  //ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
- CircularBuffer2<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize,kNBits_MemAddr,MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
+ CircularBuffer<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize+kNBits_MemAddr,MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
 
  //bool nearFull_;
 

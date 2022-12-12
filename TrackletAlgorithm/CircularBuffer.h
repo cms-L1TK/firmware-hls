@@ -18,18 +18,17 @@
 //
 //
 
-template <int BufferWidthMatch, int BufferWidthProjSeq, 
-  int AddressWidth, int NearFullCount>
-class CircularBuffer2 {
+template <int BufferWidth, int AddressWidth, int NearFullCount>
+class CircularBuffer {
 
  public:
 
-  typedef ap_uint<BufferWidthMatch> BUFFERWORDMATCH;
-  typedef ap_uint<BufferWidthProjSeq> BUFFERWORDPROJSEQ;
+  typedef ap_uint<BufferWidth> BUFFERWORD;
+  //typedef ap_uint<BufferWidthProjSeq> BUFFERWORDPROJSEQ;
   typedef ap_uint<AddressWidth> ADDR;
 
   // Constructors
- CircularBuffer2():
+ CircularBuffer():
   writeptr_(0), readptr_(0), empty_(true)
     {
     }
@@ -71,8 +70,8 @@ class CircularBuffer2 {
   void loopEnd() {
     //#pragma HLS dependence variable=buffer_ intra false
     //if (readptr_ != writeptr_) {
-      readcachematch_ = buffermatch_[readptr_];
-      readcacheprojseq_ = bufferprojseq_[readptr_];
+      readcache_ = buffer_[readptr_];
+      //readcacheprojseq_ = bufferprojseq_[readptr_];
       //}
   }
 
@@ -84,44 +83,44 @@ class CircularBuffer2 {
     }
   }
 
-  void save(const BUFFERWORDMATCH match, const BUFFERWORDPROJSEQ projseq) {
+  void save(const BUFFERWORD word) {
     if (empty_) {
-      nextwordmatch_ =  match;
-      nextwordprojseq_ =  projseq;
+      nextword_ =  word;
+      //nextwordprojseq_ =  projseq;
     } 
-    buffermatch_[writeptr_]=match;
-    bufferprojseq_[writeptr_]=projseq;
+    buffer_[writeptr_] = word;
+    //bufferprojseq_[writeptr_]=projseq;
   }
 
-  void store(const BUFFERWORDMATCH match, const BUFFERWORDPROJSEQ projseq) {
+  void store(const BUFFERWORD word) {
     //#pragma HLS dependence variable=buffer_ intra false
     if (empty_) {
       //assert(writeptr_ == readptr_);
-      nextwordmatch_ =  match;
-      nextwordprojseq_ =  projseq;
+      nextword_ =  word;
+      //nextwordprojseq_ =  projseq;
       empty_ = false;
     } else {
-      buffermatch_[writeptr_]=match;
-      bufferprojseq_[writeptr_++]=projseq;
+      buffer_[writeptr_]=word;
+      //bufferprojseq_[writeptr_++]=projseq;
     }
   }
 
-  BUFFERWORDMATCH peekmatch() const {
-    return nextwordmatch_;
+  BUFFERWORD peek() const {
+    return nextword_;
   }
 
-  BUFFERWORDPROJSEQ peekprojseq() const {
-    return nextwordprojseq_;
-  }
+  //BUFFERWORDPROJSEQ peekprojseq() const {
+  //  return nextwordprojseq_;
+  // }
 
-  BUFFERWORDMATCH readmatch() {
-    BUFFERWORDMATCH tmp = nextwordmatch_;
+  BUFFERWORD read() {
+    BUFFERWORD tmp = nextword_;
     //assert(!empty_);
     if (readptr_ == writeptr_) {
       empty_ = true;
     } else {
-      nextwordmatch_ = readcachematch_;
-      nextwordprojseq_ = readcacheprojseq_;
+      nextword_ = readcache_;
+      //nextwordprojseq_ = readcacheprojseq_;
       readptr_++;
     }
     return tmp;
@@ -132,8 +131,8 @@ class CircularBuffer2 {
     if (readptr_ == writeptr_) {
       empty_ = true;
     } else {
-      nextwordmatch_ = readcachematch_;
-      nextwordprojseq_ = readcacheprojseq_;
+      nextword_ = readcache_;
+      //nextwordprojseq_ = readcacheprojseq_;
       readptr_++;
     }
   }
@@ -166,14 +165,14 @@ class CircularBuffer2 {
   bool empty_;
   bool loopInitNearFull_;
 
-  BUFFERWORDMATCH nextwordmatch_;
-  BUFFERWORDMATCH readcachematch_;
+  BUFFERWORD nextword_;
+  BUFFERWORD readcache_;
   
-  BUFFERWORDPROJSEQ nextwordprojseq_;
-  BUFFERWORDPROJSEQ readcacheprojseq_;
+  //BUFFERWORDPROJSEQ nextwordprojseq_;
+  //BUFFERWORDPROJSEQ readcacheprojseq_;
   
-  BUFFERWORDMATCH buffermatch_[1<<AddressWidth];
-  BUFFERWORDPROJSEQ bufferprojseq_[1<<AddressWidth];
+  BUFFERWORD buffer_[1<<AddressWidth];
+  //BUFFERWORDPROJSEQ bufferprojseq_[1<<AddressWidth];
 
   ap_uint<(1<<(2*AddressWidth))> nearFullLUT_;
 
