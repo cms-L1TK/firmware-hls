@@ -88,10 +88,9 @@ class CircularBuffer2 {
     if (empty_) {
       nextwordmatch_ =  match;
       nextwordprojseq_ =  projseq;
-    } else {
-      buffermatch_[writeptr_]=match;
-      bufferprojseq_[writeptr_]=projseq;
-    }
+    } 
+    buffermatch_[writeptr_]=match;
+    bufferprojseq_[writeptr_]=projseq;
   }
 
   void store(const BUFFERWORDMATCH match, const BUFFERWORDPROJSEQ projseq) {
@@ -160,7 +159,7 @@ class CircularBuffer2 {
     return writeptr_;
   }
 
-  //private:
+  private:
 
   ADDR writeptr_, readptr_;
 
