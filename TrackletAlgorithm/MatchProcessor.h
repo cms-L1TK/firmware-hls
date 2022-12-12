@@ -863,7 +863,6 @@ void MatchProcessor(BXType bx,
 ///////////////////////////////////////////////////////////////////PIPELINE TEST END
   MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
-      matchengine[iMEU].set_empty();
       matchengine[iMEU].setNearFull();
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;

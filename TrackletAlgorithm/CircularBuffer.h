@@ -24,7 +24,6 @@ class CircularBuffer {
  public:
 
   typedef ap_uint<BufferWidth> BUFFERWORD;
-  //typedef ap_uint<BufferWidthProjSeq> BUFFERWORDPROJSEQ;
   typedef ap_uint<AddressWidth> ADDR;
 
   // Constructors
@@ -68,11 +67,7 @@ class CircularBuffer {
   }
 
   void loopEnd() {
-    //#pragma HLS dependence variable=buffer_ intra false
-    //if (readptr_ != writeptr_) {
-      readcache_ = buffer_[readptr_];
-      //readcacheprojseq_ = bufferprojseq_[readptr_];
-      //}
+    readcache_ = buffer_[readptr_];
   }
 
   void inc() {
@@ -86,22 +81,16 @@ class CircularBuffer {
   void save(const BUFFERWORD word) {
     if (empty_) {
       nextword_ =  word;
-      //nextwordprojseq_ =  projseq;
     } 
     buffer_[writeptr_] = word;
-    //bufferprojseq_[writeptr_]=projseq;
   }
 
   void store(const BUFFERWORD word) {
-    //#pragma HLS dependence variable=buffer_ intra false
     if (empty_) {
-      //assert(writeptr_ == readptr_);
       nextword_ =  word;
-      //nextwordprojseq_ =  projseq;
       empty_ = false;
     } else {
       buffer_[writeptr_]=word;
-      //bufferprojseq_[writeptr_++]=projseq;
     }
   }
 
@@ -109,30 +98,22 @@ class CircularBuffer {
     return nextword_;
   }
 
-  //BUFFERWORDPROJSEQ peekprojseq() const {
-  //  return nextwordprojseq_;
-  // }
-
   BUFFERWORD read() {
     BUFFERWORD tmp = nextword_;
-    //assert(!empty_);
     if (readptr_ == writeptr_) {
       empty_ = true;
     } else {
       nextword_ = readcache_;
-      //nextwordprojseq_ = readcacheprojseq_;
       readptr_++;
     }
     return tmp;
   }
 
   void advance() {
-    //assert(!empty_);
     if (readptr_ == writeptr_) {
       empty_ = true;
     } else {
       nextword_ = readcache_;
-      //nextwordprojseq_ = readcacheprojseq_;
       readptr_++;
     }
   }
@@ -158,21 +139,15 @@ class CircularBuffer {
     return writeptr_;
   }
 
-  private:
+ private:
 
   ADDR writeptr_, readptr_;
 
   bool empty_;
   bool loopInitNearFull_;
 
-  BUFFERWORD nextword_;
-  BUFFERWORD readcache_;
-  
-  //BUFFERWORDPROJSEQ nextwordprojseq_;
-  //BUFFERWORDPROJSEQ readcacheprojseq_;
-  
+  BUFFERWORD nextword_, readcache_;
   BUFFERWORD buffer_[1<<AddressWidth];
-  //BUFFERWORDPROJSEQ bufferprojseq_[1<<AddressWidth];
 
   ap_uint<(1<<(2*AddressWidth))> nearFullLUT_;
 
