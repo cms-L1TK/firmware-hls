@@ -22,7 +22,7 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 ## Running chains (illustrated for IR to TB skinny chain)
 
 1) cd IntegrationTests/ReducedConfig/IRtoTB/script/
-2) make -j9 Work (makes HLS IP cores; run as many jobs as you have CPU cores).
+2) make -j`nproc` Work (makes HLS IP cores; run as many jobs as you have CPU cores).
 3) vivado -mode batch -source runSim.tcl (runs Vivado simulation,
    which writes data output from chain to dataOut/*.txt).
 4) python ../../common/script/CompareMemPrintsFW.py -p -s (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt. Uses Python 3.).
