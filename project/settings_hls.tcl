@@ -13,7 +13,7 @@ config_compile -name_max_length 100
 create_clock -period 250MHz -name default
 
 # Set FPGA variable with part number
-source ../IntegrationTests/common/script/fpga.tcl
+source fpga.tcl
 
 switch -glob -- $exe {
     *vitis* {

@@ -3,7 +3,7 @@
 
 # Create project
 set projName "Work"
-source common/script/fpga.tcl
+source ../../../project/fpga.tcl
 create_project -force ${projName} ./${projName} -part $FPGA
 set_property target_language VHDL [current_project]
 
