@@ -54,64 +54,88 @@ bool getIsPSModule(const typename VMProjection<ProjectionType>::VMPZBIN & rzbin,
 template<TF::layerDisk LayerDisk> inline const ap_uint<1>* readTable() {
 	printf("The LayerDisk value must be between TF::L1 (0) and TF::D5 (10)");
 	static ap_uint<1> lut[] = {};
+<<<<<<< HEAD
+=======
+	//ap_uint<1> lut[] = {};
+>>>>>>> c636414... pointer to pointer bug fix
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::L1>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_L1.tab"
+
+	//for(ap_uint<1> i = 0; i < 512; i++){ printf("%i ", lut[i]); }
+
 	return lut;
 }
+
 template<> inline const ap_uint<1>* readTable<TF::L2>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_L2.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::L3>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_L3.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::L4>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_L4.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::L5>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_L5.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::L6>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_L6.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::D1>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_D1.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::D2>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_D2.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::D3>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_D3.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::D4>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_D4.tab"
 	return lut;
 }
 template<> inline const ap_uint<1>* readTable<TF::D5>() {
 	static ap_uint<1> lut[] = 
+	//ap_uint<1> lut[] =
 #include "../emData/ME/tables/METable_D5.tab"
 	return lut;
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> c636414... pointer to pointer bug fix
 template<TF::layerDisk LayerDisk>
 void MatchEngine(const BXType bx, BXType& bx_o,
 				 const VMStubMEMemory<ModuleType<LayerDisk>(), NBitMemAddr<LayerDisk>(), NBitBin<LayerDisk>()>& inputStubData,
@@ -169,7 +193,17 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	//
 	//Initialize table for bend-rinv consistency
 	//
+<<<<<<< HEAD
 	static const ap_uint<1>* table = readTable<LayerDisk>();
+=======
+
+	//static const ap_uint<1>* table = readTable<LayerDisk>();
+	const ap_uint<1>* table = readTable<LayerDisk>();
+
+	//auto NumTableElements = nElementsInTable<LayerDisk>();
+
+	//std::cout << "NumTableElements = " << NumTableElements << std::endl;
+>>>>>>> c636414... pointer to pointer bug fix
 
 	//
 	// Set up a FIFO based on a circular buffer structure.
