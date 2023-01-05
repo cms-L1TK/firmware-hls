@@ -72,11 +72,11 @@ LUTs:
 # Dependency files are created following the example in the manual for GNU make:
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html
 
-$(DEPS)/functions/%.d:
+$(DEPS)/functions/%.d: $(EMDATA)/MemPrints
 	@set -e; rm -f $@; mkdir -p $(DEPS)/functions; \
 	 TOP_FUNC=`echo $@ | sed 's,.*\/\([^/]*\)\.d,\1,g'`; \
 	 TOP_FILE=`grep -l $${TOP_FUNC} $(TOP_FUNCS)/*.cc | sed 's,.*\/\([^/]*\)\.cc,\1,g'`; \
-	 echo "$${TOP_FUNC}: $(DEPS)/files/$${TOP_FILE}.d" > $@; \
+	 echo "$${TOP_FUNC}: $(DEPS)/files/$${TOP_FILE}.d $(EMDATA)/MemPrints" > $@; \
 	 echo "	vivado_hls -f $(COMPILE_HLS) $(TOP_FUNCS)/$${TOP_FILE}.cc $${TOP_FUNC}" >> $@; \
 	 echo "" >> $@; \
 	 echo "include $(DEPS)/files/$${TOP_FILE}.d" >> $@
@@ -88,6 +88,14 @@ $(DEPS)/files/%.d: $(TOP_FUNCS)/%.cc
 	 rm -f $@.$$$$
 
 include $(MODULES:%=$(DEPS)/functions/%.d)
+
+### Run emData/download.sh before anything else ###
+
+$(EMDATA)/MemPrints: $(EMDATA)/download.sh
+	@cd $(EMDATA)/; \
+	  ./clean.sh; \
+	  ./download.sh; \
+	  touch MemPrints
 
 ### Other targets ###
 
