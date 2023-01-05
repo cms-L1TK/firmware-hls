@@ -77,7 +77,8 @@ $(DEPS)/functions/%.d: $(EMDATA)/MemPrints
 	 TOP_FUNC=`echo $@ | sed 's,.*\/\([^/]*\)\.d,\1,g'`; \
 	 TOP_FILE=`grep -l $${TOP_FUNC} $(TOP_FUNCS)/*.cc | sed 's,.*\/\([^/]*\)\.cc,\1,g'`; \
 	 echo "$${TOP_FUNC}: $(DEPS)/files/$${TOP_FILE}.d $(EMDATA)/MemPrints" > $@; \
-	 echo "	vivado_hls -f $(COMPILE_HLS) $(TOP_FUNCS)/$${TOP_FILE}.cc $${TOP_FUNC}" >> $@; \
+	 echo "	@rm -rfv $${TOP_FUNC}; \\" >> $@; \
+	 echo "	 vivado_hls -f $(COMPILE_HLS) $(TOP_FUNCS)/$${TOP_FILE}.cc $${TOP_FUNC}" >> $@; \
 	 echo "" >> $@; \
 	 echo "include $(DEPS)/files/$${TOP_FILE}.d" >> $@
 
