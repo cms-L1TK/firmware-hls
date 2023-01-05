@@ -15,21 +15,21 @@ XILINX_GCC=$(shell find $(XILINX_VIVADO)/tps -type f -name gcc)
 ### Synthesis and implementation ###
 
 Work/Work.runs/impl_1: Work/Work.runs/synth_1
-	vivado -mode batch -source ./common/script/impl.tcl
+	@vivado -mode batch -source ./common/script/impl.tcl
 
 Work/Work.runs/synth_1: Work ../hdl/*.vhd $(INT_TESTS)/common/hdl/*.vhd
-	vivado -mode batch -source ./common/script/synth.tcl
+	@vivado -mode batch -source ./common/script/synth.tcl
 
 ### Make Vivado project ###
 
 Work: common MemPrints LUTs $(MODULES)
-	rm -rfv Work/
-	vivado -mode batch -source ./makeProject.tcl
+	@rm -rfv Work/; \
+	 vivado -mode batch -source ./makeProject.tcl
 
 ### Make symbolic links ###
 
 common:
-	ln -sf $(INT_TESTS)/common common
+	@ln -sf $(INT_TESTS)/common common
 
 MemPrints:
 	@BASE_DIR=`echo ${TOP_FUNCS} | sed 's,.*\/\([^/]\+\)\/*,\1,g'`; \
@@ -101,4 +101,4 @@ $(EMDATA)/MemPrints: $(EMDATA)/download.sh
 
 .PHONY: clean
 clean:
-	rm -rfv common MemPrints LUTs vivado*.log vivado*.jou $(MODULES) Work/
+	@rm -rfv common MemPrints LUTs vivado*.log vivado*.jou $(MODULES) Work/
