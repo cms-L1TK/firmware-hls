@@ -94,8 +94,7 @@ include $(MODULES:%=$(DEPS)/functions/%.d)
 $(EMDATA)/MemPrints: $(EMDATA)/download.sh
 	@cd $(EMDATA)/; \
 	  ./clean.sh; \
-	  ./download.sh; \
-	  touch MemPrints
+	  ./download.sh
 
 ### Other targets ###
 
