@@ -101,4 +101,4 @@ $(EMDATA)/MemPrints: $(EMDATA)/download.sh
 
 .PHONY: clean
 clean:
-	@rm -rfv common MemPrints LUTs vivado*.log vivado*.jou $(MODULES) Work/
+	@rm -rfv common MemPrints LUTs vivado*.log vivado*.jou *.rpt .Xil $(MODULES) Work/
