@@ -32,10 +32,40 @@ common:
 	ln -sf $(INT_TESTS)/common common
 
 MemPrints:
-	ln -sf $(EMDATA)/MemPrints MemPrints
+	@BASE_DIR=`echo ${TOP_FUNCS} | sed 's,.*\/\([^/]\+\)\/*,\1,g'`; \
+	 if [[ $${BASE_DIR} == "BarrelConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/MemPrintsBarrel MemPrints; \
+	 elif [[ $${BASE_DIR} == "CombinedConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/MemPrintsCM MemPrints; \
+	 elif [[ $${BASE_DIR} == "ReducedCombinedConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/MemPrintsReducedCM MemPrints; \
+	 elif [[ $${BASE_DIR} == "ReducedConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/MemPrintsReduced MemPrints; \
+	 else \
+	   ln -sf $(EMDATA)/MemPrints MemPrints; \
+	 fi
 
 LUTs:
-	ln -sf $(EMDATA)/LUTs LUTs
+	@BASE_DIR=`echo ${TOP_FUNCS} | sed 's,.*\/\([^/]\+\)\/*,\1,g'`; \
+	 if [[ $${BASE_DIR} == "BarrelConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/LUTsBarrel LUTs; \
+	 elif [[ $${BASE_DIR} == "CombinedConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/LUTsCM LUTs; \
+	 elif [[ $${BASE_DIR} == "ReducedCombinedConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/LUTsCMReduced LUTs; \
+	 elif [[ $${BASE_DIR} == "ReducedConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/LUTsReduced LUTs; \
+	 else \
+	   ln -sf $(EMDATA)/LUTs LUTs; \
+	 fi
 
 ### Make HLS IPs ###
 
