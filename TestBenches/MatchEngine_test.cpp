@@ -40,7 +40,7 @@ constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
 	#elif (KLAYERDISK == 4)
 		#define KMODULE ME_L5PHIC20_
 	#elif (KLAYERDISK == 5)
-		#define KMODULE ME_D5PHIC12_
+		#define KMODULE ME_D6PHIC20_
 	#else
 		
 	#endif
