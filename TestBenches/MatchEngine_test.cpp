@@ -25,14 +25,42 @@ using namespace std;
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined KLAYERDISK
-  #define KLAYERDISK 2 // Corresponds to TF::L3
+  #define KLAYERDISK 4 // e.g. a value of 2 corresponds to TF::L3
 #endif
 constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
 #if !defined KMODULE
-	#define KMODULE ME_L3PHIC20_
+	#if (KLAYERDISK == 0)
+		#define KMODULE ME_L1PHIC12_
+	#elif (KLAYERDISK == 1)
+		#define KMODULE ME_L2PHIC20_
+	#elif (KLAYERDISK == 2)
+		#define KMODULE ME_L3PHIC20_
+	#elif (KLAYERDISK == 3)
+		#define KMODULE ME_L4PHIC20_
+	#elif (KLAYERDISK == 4)
+		#define KMODULE ME_L5PHIC20_
+	#elif (KLAYERDISK == 5)
+		#define KMODULE ME_D5PHIC12_
+	#else
+		
+	#endif
 #endif
 #if !defined TOPFUNCTION
-  #define TOPFUNCTION MatchEngineTop_L3
+	#if (KLAYERDISK == 0)
+		#define TOPFUNCTION MatchEngineTop_L1
+	#elif (KLAYERDISK == 1)
+		#define TOPFUNCTION MatchEngineTop_L2
+	#elif (KLAYERDISK == 2)
+		#define TOPFUNCTION MatchEngineTop_L3
+	#elif (KLAYERDISK == 3)
+		#define TOPFUNCTION MatchEngineTop_L4
+	#elif (KLAYERDISK == 4)
+		#define TOPFUNCTION MatchEngineTop_L5
+	#elif (KLAYERDISK == 5)
+		#define TOPFUNCTION MatchEngineTop_L6
+	#else
+		
+	#endif
 #endif
 template<TF::layerDisk LayerDisk> constexpr int getLayerDiskNumber() {
 	// Convert from the enum index (0-based) to the module name indexing (1-based)
