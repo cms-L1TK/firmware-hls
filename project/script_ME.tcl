@@ -7,29 +7,38 @@
 source env_hls.tcl
 
 # the set of modules to test
-set modules_to_test {
-  {ME_L1PHIC12}
-  {ME_L2PHIC20}
-  {ME_L3PHIC20}
-  {ME_L4PHIC20}
-  {ME_L5PHIC20}
-  {ME_L6PHIC20}
-  {ME_D1PHIC20}
-  {ME_D2PHIC12}
-  {ME_D3PHIC12}
-  {ME_D4PHIC12}
-  {ME_D5PHIC12}
-}
+#set modules_to_test {
+#  {ME_L1PHIC12}
+#  {ME_L2PHIC20}
+#  {ME_L3PHIC20}
+#  {ME_L4PHIC20}
+#  {ME_L5PHIC20}
+#  {ME_L6PHIC20}
+#  {ME_D1PHIC20}
+#  {ME_D2PHIC12}
+#  {ME_D3PHIC12}
+#  {ME_D4PHIC12}
+#  {ME_D5PHIC12}
+#}
+#
+
+#setting a single module to test
+set modules_to_test ME_D5PHIC12
+
+
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export ME_L3PHIC20
+#set modules_to_export ME_L1PHIC12
+set module_to_export $modules_to_test
 
 # create new project (deleting any existing one of same name)
-#open_project -reset matchengine
 set project_name "matchengine" 
 append project_name $VitisOrVivado
+append project_name "_"
+append project_name $module_to_export
 open_project -reset $project_name 
+
 
 
 # source files

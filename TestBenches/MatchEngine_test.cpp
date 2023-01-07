@@ -25,22 +25,47 @@ using namespace std;
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined KLAYERDISK
-  #define KLAYERDISK 4 // e.g. a value of 2 corresponds to TF::L3
+  #define KLAYERDISK 10 // e.g. a value of 2 corresponds to TF::L3
 #endif
+
 constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
+
+#define LAYER_1 ME_L1PHIC12_
+#define LAYER_2 ME_L2PHIC20_
+#define LAYER_3 ME_L3PHIC20_
+#define LAYER_4 ME_L4PHIC20_
+#define LAYER_5 ME_L5PHIC20_
+#define LAYER_6 ME_L6PHIC20_
+#define DISK_1 ME_D1PHIC20_
+#define DISK_2 ME_D2PHIC12_
+#define DISK_3 ME_D3PHIC12_
+#define DISK_4 ME_D4PHIC12_
+#define DISK_5 ME_D5PHIC12_
+
+
 #if !defined KMODULE
 	#if (KLAYERDISK == 0)
-		#define KMODULE ME_L1PHIC12_
+		#define KMODULE LAYER_1
 	#elif (KLAYERDISK == 1)
-		#define KMODULE ME_L2PHIC20_
+		#define KMODULE LAYER_2
 	#elif (KLAYERDISK == 2)
-		#define KMODULE ME_L3PHIC20_
+		#define KMODULE LAYER_3
 	#elif (KLAYERDISK == 3)
-		#define KMODULE ME_L4PHIC20_
+		#define KMODULE LAYER_4
 	#elif (KLAYERDISK == 4)
-		#define KMODULE ME_L5PHIC20_
+		#define KMODULE LAYER_5
 	#elif (KLAYERDISK == 5)
-		#define KMODULE ME_L6PHIC20_
+		#define KMODULE LAYER_6
+	#elif (KLAYERDISK == 6)
+                #define KMODULE DISK_1
+	#elif (KLAYERDISK == 7)
+                #define KMODULE DISK_2
+	#elif (KLAYERDISK == 8)
+                #define KMODULE DISK_3
+	#elif (KLAYERDISK == 9)
+                #define KMODULE DISK_4
+	#elif (KLAYERDISK == 10)
+                #define KMODULE DISK_5
 	#else
 		
 	#endif
@@ -58,10 +83,22 @@ constexpr auto kLayerDisk = static_cast<TF::layerDisk>(KLAYERDISK);
 		#define TOPFUNCTION MatchEngineTop_L5
 	#elif (KLAYERDISK == 5)
 		#define TOPFUNCTION MatchEngineTop_L6
+	#elif (KLAYERDISK == 6)
+                #define TOPFUNCTION MatchEngineTop_D1
+        #elif (KLAYERDISK == 7)
+                #define TOPFUNCTION MatchEngineTop_D2
+        #elif (KLAYERDISK == 8)
+                #define TOPFUNCTION MatchEngineTop_D3
+        #elif (KLAYERDISK == 9)
+                #define TOPFUNCTION MatchEngineTop_D4
+        #elif (KLAYERDISK == 10)
+                #define TOPFUNCTION MatchEngineTop_D5
 	#else
 		
 	#endif
 #endif
+
+
 template<TF::layerDisk LayerDisk> constexpr int getLayerDiskNumber() {
 	// Convert from the enum index (0-based) to the module name indexing (1-based)
   return LayerDisk <= TF::L6 ? LayerDisk + 1 : LayerDisk - (trklet::N_LAYER - 1);
