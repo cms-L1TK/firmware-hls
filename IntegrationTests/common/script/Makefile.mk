@@ -45,6 +45,9 @@ MemPrints:
 	 elif [[ $${BASE_DIR} == "ReducedConfig" ]]; \
 	 then \
 	   ln -sf $(EMDATA)/MemPrintsReduced MemPrints; \
+	 elif [[ $${BASE_DIR} == "CombinedBarrelConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/MemPrintsCMBarrel MemPrints; \
 	 else \
 	   ln -sf $(EMDATA)/MemPrints MemPrints; \
 	 fi
@@ -63,6 +66,9 @@ LUTs:
 	 elif [[ $${BASE_DIR} == "ReducedConfig" ]]; \
 	 then \
 	   ln -sf $(EMDATA)/LUTsReduced LUTs; \
+	 elif [[ $${BASE_DIR} == "CombinedBarrelConfig" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/LUTsCMBarrel LUTs; \
 	 else \
 	   ln -sf $(EMDATA)/LUTs LUTs; \
 	 fi
