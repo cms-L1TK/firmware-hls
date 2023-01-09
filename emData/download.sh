@@ -19,8 +19,8 @@ luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
 luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
 # Combined barrel
-memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_221216.tgz"
-luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_221216.tgz"
+memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_230106.tgz"
+luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_230106.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
