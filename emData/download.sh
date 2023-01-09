@@ -19,8 +19,8 @@ luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HT8q7fk4
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/VOictG2TTAaWD9c/MemPrints.tar.gz"
 luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/nbz2P7cxAOF15aB/LUTs.tar.gz"
 # Combined barrel
-memprints_url_cm_barrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_230106.tgz"
-luts_url_cm_barrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_230106.tgz"
+memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_230106.tgz"
+luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_230106.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -98,7 +98,7 @@ then
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm_barrel}
+  wget -O LUTs.tgz --quiet ${luts_url_cmbarrel}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
