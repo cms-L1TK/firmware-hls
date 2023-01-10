@@ -21,14 +21,13 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 
 ## Running chains (illustrated for IR to TB skinny chain)
 
-1) cd IntegrationTests/ReducedConfig/IRtoTB/script/
-2) vivado_hls -f compileHLS.tcl (makes HLS IP cores).
-3) vivado -mode batch -source makeProject.tcl (creates Vivado project).
-4) vivado -mode batch -source runSim.tcl (runs Vivado simulation,
+1) `cd IntegrationTests/ReducedConfig/IRtoTB/script/`
+2) `make -j $(nproc) Work` (makes HLS IP cores; run as many jobs as you have CPU cores).
+3) `vivado -mode batch -source runSim.tcl` (runs Vivado simulation,
    which writes data output from chain to dataOut/*.txt).
-5) python ../../common/script/CompareMemPrintsFW.py -p -s (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt. Uses Python 3.).
-6) vivado -mode batch -source ../../common/script/synth.tcl (runs synthesis, writes utilization & timing reports to current directory).
-7) vivado -mode batch -source ../../common/script/impl.tcl (runs implementation, writes utilization & timing reports to current directory). N.B. This step is optional, and not required for code validation.
+4) `python ../../../common/script/CompareMemPrintsFW.py -p -s` (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt. Uses Python 3.).
+5) `make Work/Work.runs/synth_1` (runs synthesis, writes utilization & timing reports to current directory).
+6) `make Work/Work.runs/impl_1` (runs implementation, writes utilization & timing reports to current directory). N.B. This step is optional, and not required for code validation.
 
 ## Track Quality Specific Instructions
 In the TrackQuality directory first run: 

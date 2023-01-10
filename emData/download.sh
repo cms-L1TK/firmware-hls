@@ -72,22 +72,22 @@ fi
 if [ ! -d "LUTs" ]
 then
   wget -O LUTs.tgz --quiet ${luts_url_reduced}
-  tar -xzf LUTs.tgz
+  tar -xzmf LUTs.tgz
   mv LUTs LUTsReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_barrel}
-  tar -xzf LUTs.tgz
+  tar -xzmf LUTs.tgz
   mv LUTs LUTsBarrel
   wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
-  tar -xzf LUTs.tgz
+  tar -xzmf LUTs.tgz
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
-  tar -xzf LUTs.tgz
+  tar -xzmf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
-  tar -xzf LUTs.tar.gz
+  tar -xzmf LUTs.tar.gz
   rm -f LUTs.tar.gz
 fi
 
@@ -193,27 +193,27 @@ if [[ $tables_only == 0 ]]
 then
   # Get memory test data: download and unpack the tarball.
   wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
-  tar -xzf MemPrints.tgz
+  tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReduced
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tgz --quiet ${memprints_url_barrel}
-  tar -xzf MemPrints.tgz
+  tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsBarrel
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
-  tar -xzf MemPrints.tgz
+  tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
-  tar -xzf MemPrints.tgz
+  tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCM
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tar.gz --quiet ${memprints_url}
-  tar -xzf MemPrints.tar.gz
+  tar -xzmf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
 fi
 
