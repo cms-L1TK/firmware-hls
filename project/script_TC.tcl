@@ -32,6 +32,10 @@ set modules_to_test {
   {TC_L5L6C}
   {TC_L5L6D}
 }
+# delete me
+set modules_to_test {
+  {TC_L1L2E}
+}
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export TC_L1L2E

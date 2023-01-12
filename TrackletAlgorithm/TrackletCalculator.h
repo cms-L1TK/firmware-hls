@@ -310,7 +310,7 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
 // Determine which disk projections are valid.
  valid_proj_disk: for (ap_uint<3> i = 0; i < trklet::N_DISK - 1; i++) {
     valid_proj_disk[i] = true;
-    if (abs(*t) <= floatToInt(1.0, kt)) // disk projections are invalid if |t| <= 1
+    if (std::abs(*t) <= floatToInt(1.0, kt)) // disk projections are invalid if |t| <= 1
       valid_proj_disk[i] = false;
     if (phiD[i] <= 0)
       valid_proj_disk[i] = false;
@@ -323,9 +323,9 @@ TC::barrelSeeding(const AllStub<InnerRegion<Seed>()> &innerStub, const AllStub<O
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
   bool success = true;
-  if (abs(*rinv) >= floatToInt(rinvcut, krinv))
+  if (std::abs(*rinv) >= floatToInt(rinvcut, krinv))
     success = false;
-  if (abs(*z0) >= ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5 * z0cut, kz0)))
+  if (std::abs(*z0) >= ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5 * z0cut, kz0)))
     success = false;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
@@ -352,7 +352,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
   if (TProjType != DISK) {
     if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
       proj_success = false;
-    if (abs(proj.getZ()) > floatToInt(zlength, kz))
+    if (std::abs(proj.getZ()) > floatToInt(zlength, kz))
       proj_success = false;
   }
   else {
@@ -585,7 +585,8 @@ TrackletCalculator(
 
 // Loop over all stub pairs.
   stub_pairs: for (TC::Types::nSP i = 0; i < kMaxProc - kMaxProcOffset(module::TC); i++) {
-#pragma HLS pipeline II=1 rewind
+//#pragma HLS pipeline II=1 rewind style=flp
+#pragma HLS PERFORMANCE target_ti=1
 
 // The first iteration is sacrificed to clearing the output memories and
 // zeroing the number of tracklets and projections. Therefore, only
