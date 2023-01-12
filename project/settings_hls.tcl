@@ -19,6 +19,8 @@ switch -glob -- $exe {
     *vitis* {
         # Set the FPGA part number
         set_part $FPGA
+        # this used to be 12.5% in Vivado, now it's 27% in vitis.
+        set_clock_uncertainty 0.5 
     }
     default {
         # Set the FPGA part number

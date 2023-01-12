@@ -49,7 +49,7 @@ void TrackletEngine(
 
 #pragma HLS inline
   ap_uint<kNBits_MemAddr> nstubpairs = 0;
-#pragma HLS dependence variable=nstubpairs intra WAR true
+#pragma HLS dependence variable=nstubpairs type=intra direction=WAR true
 
   //
   // Set up a FIFO based on a circular buffer structure
@@ -77,7 +77,7 @@ void TrackletEngine(
   constexpr unsigned int kNOuterStubsMSB = kNOuterStubsLSB + kNOuterStubsSize - 1;
 
   ap_uint<kBufferDataSize> teBuffer[1<<kNBits_BufferAddr];
-#pragma HLS ARRAY_PARTITION variable teBuffer complete dim=0
+#pragma HLS ARRAY_PARTITION variable=teBuffer type=complete dim=0
   ap_uint<kNBits_BufferAddr> writeindex = 0;     // handles current buffer index for writing
   ap_uint<kNBits_BufferAddr> readindex  = 0;     // handles current buffer index for reading
 
@@ -104,8 +104,9 @@ void TrackletEngine(
   //
   // Seven iterations are subtracted so that the total latency is 108 clock
   // cycles. Pipeline rewinding does not currently work.
-  for (unsigned int istep=0; istep<kMaxProc - kMaxProcOffset(module::TE); istep++) {
-#pragma HLS pipeline II=1 rewind
+ te_loop:for (unsigned int istep=0; istep<kMaxProc - kMaxProcOffset(module::TE); istep++) {
+    //#pragma HLS pipeline II=1 rewind
+#pragma HLS performance target_ti=1
 
 	  // pre-fetch element from buffer
 	  auto const bufdata = teBuffer[readindex];
