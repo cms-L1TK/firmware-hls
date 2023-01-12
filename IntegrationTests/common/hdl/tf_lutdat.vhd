@@ -48,6 +48,7 @@ architecture behavioral of tf_lutdat is
       -- Truncate data word to desired width.
       rom_data(I) := line_data(lut_width-1 downto 0);
     end loop;
+    file_close(data_file);
     return rom_data;
   end function;
 

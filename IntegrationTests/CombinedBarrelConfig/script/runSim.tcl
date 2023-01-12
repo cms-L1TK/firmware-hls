@@ -8,8 +8,12 @@ reset_simulation sim_1
 file delete -force dataOut/
 file mkdir dataOut/
 
+puts "Here01"
+
 # Launch Simulation
 launch_simulation
+
+puts "Here02"
 
 # Set default wave viewer cfg
 #open_wave_config {../tb/prmemc.wcfg}
