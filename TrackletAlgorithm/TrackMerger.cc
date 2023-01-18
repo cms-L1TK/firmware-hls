@@ -6,167 +6,160 @@ TrackStruct& ComparisonModule::getMasterTrackStruct(){
   return masterTrack;
 }
 
-void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
-  // assert(inTrack._trackWord !=0);
-  // assert (tracksProcessed <= kMaxTrack);
+void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack){
+  tracksProcessed++;
   trackHandler = TrackHandler();
   if (inTrack._trackWord != 0 && tracksProcessed <= kMaxTrack){
     if (masterTrack._trackWord == 0){
       masterTrack = inTrack;
     } else {
-      // assert(masterTrack._trackWord != inTrack._trackWord);
       if(masterTrack._trackWord != inTrack._trackWord){
         trackHandler.compareTrack(inTrack, masterTrack, matchFound, mergeCondition);
-        if (matchFound){
+        if (matchFound) {
           trackHandler.mergeTrack(inTrack, masterTrack);
         } else {
-          outTrack = inTrack;
+        outTrack = inTrack;
         }
       }
     }
   }
-
-  tracksProcessed++;
+  
   return;
 }
 
-void fillUnmerged(TrackStruct& inTrack,TrackStruct* outTrack, unsigned int i){
+void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i){
   outTrack[i] = inTrack;}
 
-
 void loadTrack(
-  stream<TrackFitType::TrackWord> &trackWord,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_0,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_1,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_2,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_3,
+  const TrackFitType::TrackWord& trackWordIn,
+  const TrackFitType::BarrelStubWord (&barrelStubWordsIn)[NBarrelStub],
+  const TrackFitType::DiskStubWord (&diskStubWordsIn)[NDiskStub],
   TrackStruct& aTrack
 ) {
-  trackWord.read(aTrack._trackWord);
-  barrelStubWords_0.read(aTrack._barrelStubArray[0][0]);
-  barrelStubWords_1.read(aTrack._barrelStubArray[1][0]);
-  barrelStubWords_2.read(aTrack._barrelStubArray[2][0]);
-  barrelStubWords_3.read(aTrack._barrelStubArray[3][0]);
-  diskStubWords_0.read(aTrack._diskStubArray[0][0]);        
-  diskStubWords_1.read(aTrack._diskStubArray[1][0]);        
-  diskStubWords_2.read(aTrack._diskStubArray[2][0]);        
-  diskStubWords_3.read(aTrack._diskStubArray[3][0]);  
+  aTrack._trackWord = trackWordIn;
+  #pragma HLS array_partition variable=barrelStubWordsIn
+  #pragma HLS array_partition variable=diskStubWordsIn
 
+  for (unsigned int i = 0; i < NBarrelStub; i++){
+    #pragma HLS unroll
+    aTrack._barrelStubArray[i][0] = barrelStubWordsIn[i];
+  }
+
+  for (unsigned int j = 0; j < NDiskStub; j++){
+    #pragma HLS unroll
+    aTrack._diskStubArray[j][0] = diskStubWordsIn[j];
+  }
+ 
   return;      
 }  
 
 
 void unloadTrack(
   TrackStruct& aTrack,
-  stream<TrackFitType::TrackWord> &trackWord_o,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0_o, 
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1_o, 
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2_o, 
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_0_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_1_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_2_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_3_o 
+  TrackFitType::TrackWord& trackWordOut,
+  TrackFitType::BarrelStubWord (&barrelStubWordsOut)[NBarrelStub], 
+  TrackFitType::DiskStubWord (&diskStubWordsOut)[NDiskStub]
 ) {
-  trackWord_o.write(aTrack._trackWord);
-  barrelStubWords_0_o.write(aTrack._barrelStubArray[0][0]);
-  barrelStubWords_1_o.write(aTrack._barrelStubArray[1][0]);
-  barrelStubWords_2_o.write(aTrack._barrelStubArray[2][0]);
-  barrelStubWords_3_o.write(aTrack._barrelStubArray[3][0]);
-  diskStubWords_0_o.write(aTrack._diskStubArray[0][0]);
-  diskStubWords_1_o.write(aTrack._diskStubArray[1][0]);
-  diskStubWords_2_o.write(aTrack._diskStubArray[2][0]);
-  diskStubWords_3_o.write(aTrack._diskStubArray[3][0]);
+
+  #pragma HLS array_partition variable=barrelStubWordsOut
+  #pragma HLS array_partition variable=diskStubWordsOut
+
+  trackWordOut = aTrack.getTrkWord(); 
+  for (unsigned int i = 0; i < NBarrelStub; i++){
+    #pragma HLS unroll
+    barrelStubWordsOut[i] = aTrack.getBarrelStub(i, 0);
+    }
+
+  for (unsigned int j = 0; j < NDiskStub; j++){
+    #pragma HLS unroll
+     diskStubWordsOut[j]= aTrack.getDiskStub(j, 0);
+  }
 
   return;
 }
 
 void TrackMerger(const BXType bx,
-  stream<TrackFitType::TrackWord> &trackWord,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_0,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_1,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_2,
-  stream<TrackFitType::DiskStubWord> &diskStubWords_3,
+  const TrackFitType::TrackWord trackWord[kMaxTrack],
+  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][NBarrelStub],
+  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][NDiskStub],
   BXType bx_o,
-  stream<TrackFitType::TrackWord> &trackWord_o,
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_0_o, 
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_1_o, 
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_2_o, 
-  stream<TrackFitType::BarrelStubWord> &barrelStubWords_3_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_0_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_1_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_2_o, 
-  stream<TrackFitType::DiskStubWord> &diskStubWords_3_o 
+  TrackFitType::TrackWord (&trackWord_o)[kMaxTrack],
+  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub],
+  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub]
   )
 {
   static ComparisonModule comparisonModule[kNComparisonModules];
-  #pragma HLS array_partition variable=comparisonModule complete dim=0
+  #pragma HLS array_partition variable=comparisonModule dim=1
 
-  // TrackStruct unmergedTracks[kMaxTrack];
-  // #pragma HLS array_partition variable=unmergedTracks complete dim=0
+  static TrackStruct unmergedTracks[kNLastTracks];
+  #pragma HLS array_partition variable=unmergedTracks dim=1
+
+  static TrackStruct cmTracks[kNComparisonModules];
+  #pragma HLS array_partition variable=cmTracks dim=1
+
+
+  unsigned int unmergedIndx{0};
+  
+  // Looping over all tracks
   LOOP_Input:
   for (unsigned int i = 0; i < kMaxTrack; i++){ 
-    #pragma HLS pipeline II=1 REWIND
-    TrackStruct tracks[kNBuffers]; 
-    #pragma HLS array_partition variable=tracks complete dim=0
-    loadTrack(trackWord,
-              barrelStubWords_0,
-              barrelStubWords_1,
-              barrelStubWords_2,
-              barrelStubWords_3,
-              diskStubWords_0,
-              diskStubWords_1,
-              diskStubWords_2,
-              diskStubWords_3,
+    #pragma HLS pipeline II=1
+    TrackStruct tracks[kNBuffers];
+    #pragma HLS array_partition variable=tracks dim=1
+    // Filling first element of the buffer with module input
+    loadTrack(trackWord[i],
+              barrelStubWords[i],
+              diskStubWords[i],
               tracks[0]);
+
+    // CM processing loop
     LOOP_ProcTracks:
     for (unsigned int j = 0; j < kNComparisonModules; j++){
-      #pragma HLS unroll
-      comparisonModule[j].process(tracks[j],tracks[j+1]);
-
+      comparisonModule[j].process(tracks[j], tracks[j+1]);
+      tracks[j] = TrackStruct();
     }
-    //putting straight into fifo in dataflow region
-    // fillUnmerged(tracks[kNComparisonModules],unmergedTracks, i);
-
-    // send unmerged tracks sent to output
-    unloadTrack(tracks[kNComparisonModules],
-                trackWord_o,
-                barrelStubWords_0_o,
-                barrelStubWords_1_o,
-                barrelStubWords_2_o,
-                barrelStubWords_3_o,
-                diskStubWords_0_o,
-                diskStubWords_1_o,
-                diskStubWords_2_o,
-                diskStubWords_3_o);
-
+    // When the unmerged track reaches the end of the buffer - put in unmerged tracks array to be output
+    if (tracks[kNComparisonModules].getTrkWord() != 0){
+      // fillTrackArray(tracks[kNComparisonModules], unmergedTracks, unmergedIndx);
+      unmergedTracks[unmergedIndx] = tracks[kNComparisonModules];
+      unmergedIndx++;
+    }
   }
-
-  LOOP_OutputCM:
+  // Getting CM master tracks
+  LOOP_CMTracks:
   for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
-    #pragma HLS unroll
-    TrackStruct& masterTk = comparisonModule[nModule].getMasterTrackStruct();
-    unloadTrack(masterTk,
-                trackWord_o,
-                barrelStubWords_0_o,
-                barrelStubWords_1_o,
-                barrelStubWords_2_o,
-                barrelStubWords_3_o,
-                diskStubWords_0_o,
-                diskStubWords_1_o,
-                diskStubWords_2_o,
-                diskStubWords_3_o);
-
+    #pragma HLS pipeline II=1
+    cmTracks[nModule] = comparisonModule[nModule].getMasterTrackStruct(); // This line fills CM array to be read out at same time as unmerged tracks
+    comparisonModule[nModule] = ComparisonModule(); // Resetting
   }
 
+  // Setting outputs in same loop
+  LOOP_SetOutputs:
+  for (unsigned int outputIndex = 0; outputIndex < kMaxTrack; outputIndex++) {
+    #pragma HLS pipeline II=1
+    TrackStruct trk;
+    if (outputIndex < kNComparisonModules) {
+      trk = cmTracks[outputIndex];
+      cmTracks[outputIndex] = TrackStruct(); // Resetting
+    } else {
+      if ((outputIndex - kNComparisonModules) < kNLastTracks){
+        trk = unmergedTracks[outputIndex-kNComparisonModules];
+        unmergedTracks[outputIndex-kNComparisonModules] = TrackStruct(); // Resetting
+      }
+      
+    }
     
+    // Check if trk is 0, if so do not unload
+    if (trk.getTrkWord() !=0){
+    // Sending to output
+      unloadTrack(trk, 
+                  trackWord_o[outputIndex], 
+                  barrelStubWords_o[outputIndex], 
+                  diskStubWords_o[outputIndex]);
+    }
+    
+  }
   bx_o = bx;
+
+  return;
 }
