@@ -36,9 +36,10 @@ void loadTrack(
   const TrackFitType::DiskStubWord (&diskStubWordsIn)[NDiskStub],
   TrackStruct& aTrack
 ) {
-  aTrack._trackWord = trackWordIn;
+
   #pragma HLS array_partition variable=barrelStubWordsIn
   #pragma HLS array_partition variable=diskStubWordsIn
+  aTrack._trackWord = trackWordIn;
 
   for (unsigned int i = 0; i < NBarrelStub; i++){
     #pragma HLS unroll
@@ -72,7 +73,7 @@ void unloadTrack(
 
   for (unsigned int j = 0; j < NDiskStub; j++){
     #pragma HLS unroll
-     diskStubWordsOut[j]= aTrack.getDiskStub(j, 0);
+    diskStubWordsOut[j]= aTrack.getDiskStub(j, 0);
   }
 
   return;
@@ -92,12 +93,12 @@ void TrackMerger(const BXType bx,
   #pragma HLS array_partition variable=comparisonModule dim=1
 
   static TrackStruct unmergedTracks[kNLastTracks];
-  #pragma HLS array_partition variable=unmergedTracks dim=1
+  #pragma HLS data_pack variable=unmergedTracks
 
   static TrackStruct cmTracks[kNComparisonModules];
-  #pragma HLS array_partition variable=cmTracks dim=1
-
-
+  #pragma HLS data_pack variable=cmTracks
+  
+  
   unsigned int unmergedIndx{0};
   
   // Looping over all tracks
@@ -105,7 +106,7 @@ void TrackMerger(const BXType bx,
   for (unsigned int i = 0; i < kMaxTrack; i++){ 
     #pragma HLS pipeline II=1
     TrackStruct tracks[kNBuffers];
-    #pragma HLS array_partition variable=tracks dim=1
+    #pragma HLS data_pack variable=tracks
     // Filling first element of the buffer with module input
     loadTrack(trackWord[i],
               barrelStubWords[i],
@@ -120,11 +121,12 @@ void TrackMerger(const BXType bx,
     }
     // When the unmerged track reaches the end of the buffer - put in unmerged tracks array to be output
     if (tracks[kNComparisonModules].getTrkWord() != 0){
-      // fillTrackArray(tracks[kNComparisonModules], unmergedTracks, unmergedIndx);
-      unmergedTracks[unmergedIndx] = tracks[kNComparisonModules];
+      fillTrackArray(tracks[kNComparisonModules], unmergedTracks, unmergedIndx);
       unmergedIndx++;
     }
+
   }
+
   // Getting CM master tracks
   LOOP_CMTracks:
   for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
@@ -135,8 +137,8 @@ void TrackMerger(const BXType bx,
 
   // Setting outputs in same loop
   LOOP_SetOutputs:
-  for (unsigned int outputIndex = 0; outputIndex < kMaxTrack; outputIndex++) {
-    #pragma HLS pipeline II=1
+  for (unsigned int outputIndex = 0; outputIndex < kMaxTrack; outputIndex++){
+    #pragma HLS pipeline II=1 
     TrackStruct trk;
     if (outputIndex < kNComparisonModules) {
       trk = cmTracks[outputIndex];

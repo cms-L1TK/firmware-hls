@@ -19,7 +19,8 @@ switch -glob -- $exe {
     }
     default {
         # Set the FPGA part number
-        set_part {xcvu7p-flvb2104-1-e} -tool vivado
+        set_part {xcvu13p-fsga2577-1-e}
+        #set_part {xcvu7p-flvb2104-1-e} -tool vivado
         #set_part {xcku115-flvb2104-1-e} -tool vivado
         #set_part {xcvu9p-flgc2104-1-e} -tool vivado
 
