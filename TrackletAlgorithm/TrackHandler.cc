@@ -8,17 +8,21 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
   #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
   #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
   #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
-  LOOP_CompareStubs:
-  for (unsigned int layerIndex = 0; layerIndex < 4; layerIndex++){
+  LOOP_CompareBarrelStubs:
+  for (unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){
     #pragma HLS unroll
-    ap_uint<TrackFitType::kTFStubIndexSize> masterBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
-    ap_uint<TrackFitType::kTFStubIndexSize> inputBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._barrelStubArray[layerIndex][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
-    ap_uint<TrackFitType::kTFStubIndexSize> masterDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._diskStubArray[layerIndex][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
-    ap_uint<TrackFitType::kTFStubIndexSize> inputDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._diskStubArray[layerIndex][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
+    ap_uint<TrackFitType::kTFStubIndexSize> masterBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
+    ap_uint<TrackFitType::kTFStubIndexSize> inputBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
+    
+    ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ? matchesFoundBarrel[barrelStubNum][0] = 1 : matchesFoundBarrel[barrelStubNum][0] = 0;
+  }
+  LOOP_CompareDiskStubs:
+  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
+    #pragma HLS unroll
+    ap_uint<TrackFitType::kTFStubIndexSize> masterDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
+    ap_uint<TrackFitType::kTFStubIndexSize> inputDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
 
-    ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ? matchesFoundBarrel[layerIndex][0] = 1 : matchesFoundBarrel[layerIndex][0] = 0;
-
-    ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)) ? matchesFoundDisk[layerIndex][0] = 1 : matchesFoundDisk[layerIndex][0] = 0;
+    ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)) ? matchesFoundDisk[diskStubNum][0] = 1 : matchesFoundDisk[diskStubNum][0] = 0;
     
   }
 
