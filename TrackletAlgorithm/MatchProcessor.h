@@ -65,7 +65,7 @@ namespace PR
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // memory pointers
                        const MemType mem[nMEM],
-                       DataType& data, int& nproj)
+                       DataType& data)
   {
 #pragma HLS inline
     if (mem_hasdata == 0) return false;
@@ -84,7 +84,6 @@ namespace PR
       // Prepare to move to the next non-empty memory
       read_addr = 0;
       mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
-      nproj++;
     } else {
       read_addr = read_addr_next;
     }
@@ -560,7 +559,6 @@ void MatchProcessor(BXType bx,
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
-  auto nproj=0;
 
   ProjectionRouterBufferArray<3,APTYPE> projbufferarray;
 
@@ -930,7 +928,7 @@ void MatchProcessor(BXType bx,
 	TrackletProjectionMemory<PROJTYPE>,
 	nINMEM, kNBits_MemAddr+1>
 	(bx, mem_hasdata, numbersin, mem_read_addr,
-         projin, projdata, nproj);
+         projin, projdata);
  
     } else {
       validin = false;
