@@ -3,8 +3,8 @@ set cwd [file tail [pwd]]
 file delete -force ./LUTs
 if {$cwd == "xsim"} {
   # xsim
-  file copy -force ../../../../../../../../emData/LUTsCMReduced ./LUTs
+  file copy -force ../../../../../../../../emData/LUTsCM2 ./LUTs
 } else {
   # synth_1
-  file copy -force ../../../../../../emData/LUTsCMReduced ./LUTs
+  file copy -force ../../../../../../emData/LUTsCM2 ./LUTs
 }
