@@ -14,6 +14,9 @@ luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/LoqjBIg2ARZav8u
 # Reduced Combined modules                                                      
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
+# Reduced Combined modules2
+memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced2_220829.tgz"
+luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced2_220829.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -86,6 +89,10 @@ then
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
+  wget -O LUTs.tgz --quiet ${luts_url_cm2}
+  tar -xzmf LUTs.tgz
+  mv LUTs LUTsCM2
+  rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzmf LUTs.tar.gz
   rm -f LUTs.tar.gz
@@ -140,6 +147,8 @@ git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
+cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
+./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm2_"
 cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
@@ -185,6 +194,12 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
+### Reduced Combined IRtoTB
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig2/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig2/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -208,6 +223,11 @@ then
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
+  wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
+  tar -xzmf MemPrints.tgz
+  mv MemPrints MemPrintsReducedCM2
+  rm -f MemPrints.tgz
+
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCM
@@ -224,7 +244,7 @@ unset LD_LIBRARY_PATH
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsCM2/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
