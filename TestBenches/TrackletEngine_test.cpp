@@ -7,19 +7,21 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
-  #define SEED_ L1L2_
+  #define SEED_ L5L6_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TE_L1PHIG27_L2PHID27_
+  #define MODULE_ TE_L5PHID14_L6PHID28_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackletEngine_PS_PS
+//  #define TOP_FUNC_ TrackletEngine_PS_PS
+//  #define TOP_FUNC_ TrackletEngine_PS_2S
+  #define TOP_FUNC_ TrackletEngine_2S_2S
 #endif
 #if !defined INNER_TABLE_
-  #define INNER_TABLE_ "../emData/TE/tables/TE_L1PHIG27_L2PHID27_stubptinnercut.tab"
+  #define INNER_TABLE_ "../emData/TE/tables/TE_L5PHID14_L6PHID28_stubptinnercut.tab"
 #endif
 #if !defined OUTER_TABLE_
-  #define OUTER_TABLE_ "../emData/TE/tables/TE_L1PHIG27_L2PHID27_stubptoutercut.tab"
+  #define OUTER_TABLE_ "../emData/TE/tables/TE_L5PHID14_L6PHID28_stubptoutercut.tab"
 #endif
 
 const int nevents = 100;  // number of events to run

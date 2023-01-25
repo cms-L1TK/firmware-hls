@@ -6,19 +6,27 @@
 # get some information about the executable and environment
 source env_hls.tcl
 
-set modules_to_test {
-  {FT_L1L2}
-  {FT_L2L3}
-  {FT_L3L4}
-  {FT_L5L6}
-}
+#set modules_to_test {
+#  {FT_L1L2}
+#  {FT_L2L3}
+#  {FT_L3L4}
+#  {FT_L5L6}
+#}
+
+#setting a single module to test
+set modules_to_test FT_L3L4
+
+
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export FT_L1L2
+#set module_to_export FT_L1L2
+set module_to_export $modules_to_test
 
 # create new project (deleting any existing one of same name)
 set project_name "trackBuilder"
 append project_name $VitisOrVivado
+append project_name "_"
+append project_name $module_to_export
 open_project -reset $project_name
 
 # source files
