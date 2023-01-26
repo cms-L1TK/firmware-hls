@@ -155,10 +155,13 @@ cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
-./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm2_"
+mv wires.dat reducedcm2_wires.dat
+mv memorymodules.dat reducedcm2_memorymodules.dat
+mv processingmodules.dat reducedcm2_processingmodules.dat
 cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
+
 ### IRVMR
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
@@ -201,7 +204,7 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
-### Reduced Combined IRtoTB
+### Reduced Combined 2 IRtoTB
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
