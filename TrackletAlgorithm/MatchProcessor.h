@@ -839,7 +839,7 @@ void MatchProcessor(BXType bx,
       
       ///////////////
       // VMProjection
-
+      // New code for using new VMSME memory module
       ap_uint<4> entries_zfirst[8];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
       ap_uint<4> entries_zlast[8];

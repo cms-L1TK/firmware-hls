@@ -161,7 +161,6 @@ mv processingmodules.dat reducedcm2_processingmodules.dat
 cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
-
 ### IRVMR
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
