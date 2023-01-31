@@ -8,12 +8,15 @@ reset_simulation sim_1
 file delete -force dataOut/
 file mkdir dataOut/
 
+# Run pre.tcl if it exists
+set_property -name {xsim.compile.tcl.pre} -value [get_files pre.tcl -of [get_fileset utils_1]] -objects [get_filesets sim_1]
+
 # Launch Simulation
 launch_simulation
 
 # Set default wave viewer cfg
 #open_wave_config {../tb/prmemc.wcfg}
-open_wave_config {../tb/start_bx.wcfg}
+#open_wave_config {../tb/start_bx.wcfg}
 #open_wave_config {../tb/tf_top.wcfg}
 #open_wave_config {../tb/mem_tf.wcfg}
 #open_wave_config {../tb/mem_tf_wea.wcfg}

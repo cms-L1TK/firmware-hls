@@ -16,7 +16,7 @@ memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
 # Reduced Combined modules2
 memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced2_220829.tgz"
-luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced2_220829.tgz"
+luts_url_cm2="https://jafan.web.cern.ch/jafan/HLSFiles/LUTs_CombinedReduced2_230131.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -263,6 +263,8 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   memprint_location_reduced="MemPrintsReduced"
+  memprint_location_reducedcm="MemPrintsReducedCM"
+  memprint_location_reducedcm2="MemPrintsReducedCM2"
   memprint_location_barrel="MemPrintsBarrel"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
@@ -284,11 +286,15 @@ do
     rm -rf ${target_dir}
     mkdir -p ${target_dir}/ReducedConfig
     mkdir -p ${target_dir}/BarrelConfig
+    mkdir -p ${target_dir}/ReducedCombinedConfig
+    mkdir -p ${target_dir}/ReducedCombinedConfig2
 
     for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
     do
       find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
       find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
+      find ${memprint_location_reducedcm} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig/ \;
+      find ${memprint_location_reducedcm2} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig2/ \;
       find ${memprint_location_barrel} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/BarrelConfig/ \;
     done
   fi

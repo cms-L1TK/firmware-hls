@@ -44,10 +44,10 @@ MemPrints:
 	   ln -sf $(EMDATA)/MemPrintsReducedCM MemPrints; \
 	 elif [[ $${BASE_DIR} == "ReducedConfig" ]]; \
 	 then \
-	   ln -sf $(EMDATA)/MemPrintsReducedCM2 MemPrints; \
+	   ln -sf $(EMDATA)/ReducedConfig MemPrints; \
 	 elif [[ $${BASE_DIR} == "ReducedCombinedConfig2" ]]; \
 	 then \
-	   ln -sf $(EMDATA)/MemPrintsReduced MemPrints; \
+	   ln -sf $(EMDATA)/MemPrintsReducedCM2 MemPrints; \
 	 else \
 	   ln -sf $(EMDATA)/MemPrints MemPrints; \
 	 fi
