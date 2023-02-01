@@ -74,7 +74,7 @@ def writeSourceModuleInstance(module, wiresFileName):
     strSource += "#pragma HLS inline off\n"
     strSource += "#pragma HLS interface register port=bx_o\n"
     for i in range(TProjCount):
-        strSource += "#pragma HLS resource variable=projin[" + str(i) + "]->get_mem() latency=2\n"
+        strSource += "#pragma HLS resource variable=projin[" + str(i) + "].get_mem() latency=2\n"
     strSource += "  constexpr unsigned int nInMem = " + str(TProjCount) + ";\n"
     strSource += "  constexpr unsigned int nOutMem = " + str(VMProjCount) + ";\n"
     strSource += "  constexpr int layer = " + str(layer) + ";\n"
