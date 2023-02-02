@@ -67,13 +67,11 @@ int main(){
     for(unsigned short i = 0; i < kMaxTrack; i++){
       TrackFitType track;
       if (i < inputTracks.getEntries(bx)) {
-      track = inputTracks.read_mem(bx, i+1); //i+1 for merge
+      track = inputTracks.read_mem(bx, i);
       } else {
         track = TrackFitType();
       } 
-      // std::cout << "tbIn TrkWrd: " << std::hex << track.getTrackWord() << std::endl;
       trackWord[i] = track.getTrackWord();
-      // std::cout << "tbTrkSet: " << std::hex << trackWord[i] << std::endl;
       barrelStubWords[i][0] = track.getBarrelStubWord<0>();
       barrelStubWords[i][1] = track.getBarrelStubWord<1>();
       barrelStubWords[i][2] = track.getBarrelStubWord<2>();
