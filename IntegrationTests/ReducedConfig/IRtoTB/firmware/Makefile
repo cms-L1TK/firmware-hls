@@ -9,8 +9,8 @@ all: $(core_file) hdl_add_files xciCreation kfin_adj
 $(core_dir):
 	@mkdir cgn mem
 	cd $(hls_script_path); vivado_hls -f compileHLS.tcl;
-	ln -s ../../../../../emData/LUTsReduced mem/LUTs
-	ln -s ../../../../../emData/MemPrintsReduced mem/MemPrintsReduced
+	ln -s ../../../../../emData/LUTsReduced ../../../../emData/LUTs
+	ln -s ../../../../../emData/MemPrintsReduced ../../../../emData/MemPrints
 	ln -s ../../../../common hdl/common
 
 $(core_file): $(core_dir)
