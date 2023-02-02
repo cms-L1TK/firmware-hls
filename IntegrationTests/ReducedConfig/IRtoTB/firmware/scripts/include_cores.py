@@ -13,7 +13,7 @@ dir_path = 'cgn'
 f = open(core_file, "w")
 
 # Get paths to the cores "component.xml" files
-core_dir = iglob('../IntegrationTests/ReducedConfig/IRtoTB/script/*')
+core_dir = iglob('../script/*')
 core_dirs_lup = []
 for x in (x for x in core_dir if os.path.isdir(x) and not os.path.islink(x)):
     core_dir_lup = iglob(x + '/*')

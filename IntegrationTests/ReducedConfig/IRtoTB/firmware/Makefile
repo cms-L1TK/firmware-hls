@@ -1,17 +1,17 @@
-core_file = cfg/include_cores.tcl
+core_file = scripts/xciMaker
 core_dir = cgn
 input_file = mem/in.txt
 proj_path = ../../../../proj
-hls_script_path = ../IntegrationTests/ReducedConfig/IRtoTB/script
+hls_script_path = ../script
 
 all: $(core_file) hdl_add_files xciCreation kfin_adj
 
 $(core_dir):
 	@mkdir cgn mem
 	cd $(hls_script_path); vivado_hls -f compileHLS.tcl;
-	ln -s ../../emData/LUTsReduced mem/LUTs
-	ln -s ../../emData/MemPrintsReduced mem/MemPrintsReduced
-	ln -s ../../IntegrationTests/common hdl/common
+	ln -s ../../../../../emData/LUTsReduced mem/LUTs
+	ln -s ../../../../../emData/MemPrintsReduced mem/MemPrintsReduced
+	ln -s ../../../../common hdl/common
 
 $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py
@@ -23,7 +23,7 @@ xciCreation: $(core_file)
 	make -f scripts/xciMaker -j 8 all
 
 hdl_add_files: $(core_file)
-	cd hdl; ln -s ../$(hls_script_path)/../hdl/*.vhd .
+	cd hdl; ln -s ../../hdl/*.vhd .
 
 #$(input_file): $(core_dir)
 #	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReduced/InputStubs -o $(input_file)
