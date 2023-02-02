@@ -149,16 +149,16 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
             "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMC + "maxFullMatchCopies]\n"
             ") {\n"
             "#pragma HLS inline off\n"
-            "#pragma HLS interface register port=bx_o\n"
+            "#pragma HLS interface mode=ap_vld register port=bx_o\n"
         )
         if nCMMem == 1:
-            topFile.write("#pragma HLS resource variable=match.get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=match.get_mem() latency=2\n")
         else:
             for i in range(nCMMem):
-                topFile.write("#pragma HLS resource variable=match[" + str(i) + "].get_mem() latency=2\n")
+                topFile.write("#pragma HLS interface mode=ap_memory port=match[" + str(i) + "].get_mem() latency=2\n")
         topFile.write(
-            "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
-            "#pragma HLS resource variable=allproj->get_mem() latency=2\n"
+            "#pragma HLS interface mode=ap_memory port=allstub->get_mem() latency=2\n"
+            "#pragma HLS interface mode=ap_memory port=allproj->get_mem() latency=2\n"
             "\n"
             "MC_" + seed + "PHI" + iMC + ": MatchCalculator<"
             "" + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + str(nCMMem) + ", " + str(nFMMem) + ",\n"

@@ -271,11 +271,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
         for i in range(0, nASMemInner):
             topFile.write("#pragma HLS interface mode=ap_memory port=innerStubs[" + str(i) + "].get_mem() latency=2 storage_type=RAM_S2P\n")
         for i in range(0, nASMemOuter):
-            topFile.write("#pragma HLS interface mode=ap_memory port=outerStubs[" + str(i) + "].get_mem() latency=2\n storage_type=RAM_S2P")
+            topFile.write("#pragma HLS interface mode=ap_memory port=outerStubs[" + str(i) + "].get_mem() latency=2 storage_type=RAM_S2P\n")
         for i in range(0, nSPMem):
-            topFile.write("#pragma HLS interface mode=ap_memory port=stubPairs[" + str(i) + "].get_mem() latency=2\n storage_type=RAM_S2P")
+            topFile.write("#pragma HLS interface mode=ap_memory port=stubPairs[" + str(i) + "].get_mem() latency=2 storage_type=RAM_S2P\n")
         topFile.write(
-            "#pragma HLS interface register mode=ap_vld port=bx_o\n"
+            "#pragma HLS interface mode=ap_vld register mode=ap_vld port=bx_o\n"
             "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
             "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
             "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
