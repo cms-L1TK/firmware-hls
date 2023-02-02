@@ -190,18 +190,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
         )
         for i in range(0, nTPARMem):
-            topFile.write("#pragma HLS resource variable=trackletParameters[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=trackletParameters[" + str(i) + "].get_mem() latency=2\n")
         for i in range(0, nBarrelFMMem):
-            topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
         for i in range(0, nDiskFMMem):
-            topFile.write("#pragma HLS resource variable=diskFullMatches[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=diskFullMatches[" + str(i) + "].get_mem() latency=2\n")
         topFile.write(
-            "#pragma HLS interface register port=bx_o\n"
+            "#pragma HLS interface mode=ap_vld register port=bx_o\n"
             "#pragma HLS array_partition variable=barrelStubWords complete dim=1\n"
             "#pragma HLS array_partition variable=diskStubWords complete dim=1\n"
-            "#pragma HLS stream variable=trackWord depth=1 dim=1\n"
-            "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
-            "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
+            "#pragma HLS stream variable=trackWord depth=1 \n"
+            "#pragma HLS stream variable=barrelStubWords depth=1 \n"
+            "#pragma HLS stream variable=diskStubWords depth=1 \n"
             "\n"
             "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
             "    bx,\n"
