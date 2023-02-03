@@ -21,14 +21,13 @@ This would create a project directory \<project> ("projrouter" in case of the ab
 
 ## Running chains (illustrated for IR to TB skinny chain)
 
-1) cd IntegrationTests/ReducedConfig/IRtoTB/script/
-2) vivado_hls -f compileHLS.tcl (makes HLS IP cores).
-3) vivado -mode batch -source makeProject.tcl (creates Vivado project).
-4) vivado -mode batch -source runSim.tcl (runs Vivado simulation,
+1) `cd IntegrationTests/ReducedConfig/IRtoTB/script/`
+2) `make -j $(nproc) Work` (makes HLS IP cores; run as many jobs as you have CPU cores).
+3) `vivado -mode batch -source runSim.tcl` (runs Vivado simulation,
    which writes data output from chain to dataOut/*.txt).
-5) python ../../common/script/CompareMemPrintsFW.py -p -s (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt. Uses Python 3.).
-6) vivado -mode batch -source ../../common/script/synth.tcl (runs synthesis, writes utilization & timing reports to current directory).
-7) vivado -mode batch -source ../../common/script/impl.tcl (runs implementation, writes utilization & timing reports to current directory). N.B. This step is optional, and not required for code validation.
+4) `python ../../../common/script/CompareMemPrintsFW.py -p -s` (compares .txt files in emData and dataOut/ writing comparison to dataOut/*_cmp.txt. Uses Python 3.).
+5) `make Work/Work.runs/synth_1` (runs synthesis, writes utilization & timing reports to current directory).
+6) `make Work/Work.runs/impl_1` (runs implementation, writes utilization & timing reports to current directory). N.B. This step is optional, and not required for code validation.
 
 ## Track Quality Specific Instructions
 In the TrackQuality directory first run: 
@@ -436,7 +435,7 @@ ipbb add git https://github.com/FilMarini/firmware-hls -b emp_for_sc #LONG WAIT!
 
 For vivado simulation testbench:
 ```
-ipbb proj create vivado vsim firmware-hls: 'vsim.dep'
+ipbb proj create vivado vsim firmware-hls:IntegrationTests/ReducedConfig/IRtoTB 'vsim.dep'
 cd proj/vsim
 ```
 
@@ -444,7 +443,7 @@ cd proj/vsim
 
 * For questa simulation testbench:
 ```
-ipbb proj create sim qsim firmware-hls: 'qsim.dep'
+ipbb proj create sim qsim firmware-hls:IntegrationTests/ReducedConfig/IRtoTB 'qsim.dep'
 cd proj/qsim
 ipbb sim setup-simlib
 ipbb sim ipcores
@@ -472,7 +471,7 @@ and start the simulation from GUI (first time will take long).
 **Step 2: Create an ipbb project area**
 
 ```
-ipbb proj create vivado apollo firmware-hls: 'apollo.dep'
+ipbb proj create vivado apollo firmware-hls:IntegrationTests/ReducedConfig/IRtoTB 'apollo.dep'
 cd proj/apollo
 ```
 
@@ -488,7 +487,7 @@ ipbb vivado generate-project synth -j8 impl -j8 package
 **Step 2: Create an ipbb project area**
 
 ```
-ipbb proj create vivado serenity firmware-hls: 'serenity.dep'
+ipbb proj create vivado serenity firmware-hls:IntegrationTests/ReducedConfig/IRtoTB 'serenity.dep'
 cd proj/serenity
 ```
 
