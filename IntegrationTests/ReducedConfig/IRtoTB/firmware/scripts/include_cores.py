@@ -15,11 +15,15 @@ f = open(core_file, "w")
 # Get paths to the cores "component.xml" files
 core_dir = iglob('../script/*')
 core_dirs_lup = []
+banned_folders = ["Work"]
 for x in (x for x in core_dir if os.path.isdir(x) and not os.path.islink(x)):
-    core_dir_lup = iglob(x + '/*')
-    core_dirs_lup = core_dirs_lup + [x for x in core_dir_lup if os.path.isdir(x)]
-core_suffix = '/impl/ip/component.xml'
-core_suffix_folder = '/impl/ip'
+    if any(x.find(banned_folder) != -1 for banned_folder in banned_folders):
+        pass
+    else :
+        core_dir_lup = iglob(x)
+        core_dirs_lup = core_dirs_lup + [x for x in core_dir_lup if os.path.isdir(x)]
+core_suffix = '/solution/impl/ip/component.xml'
+core_suffix_folder = '/solution/impl/ip'
 #core_prefix = ''
 
 # Create symbolic links to the core folders in cgn
