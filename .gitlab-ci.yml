@@ -376,23 +376,6 @@ topReducedCombined-sim:
       artifacts: false
     - job: TB-vivado-hls-build
       artifacts: false
-topReducedCombined2-sim:
-  <<: *template_topTF-sim
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig2"
-  needs:
-    - job: download
-    - job: IR-vivado-hls-build
-      artifacts: false
-    - job: VMRCM-vivado-hls-build
-      artifacts: false
-    - job: TP-vivado-hls-build
-      artifacts: false
-    - job: MP-vivado-hls-build
-      artifacts: false
-    - job: TB-vivado-hls-build
-      artifacts: false
 # Check FW results ---------------
 topPRMEMC-check-results:
   <<: *template_check-results
@@ -446,15 +429,6 @@ topReducedCombined-check-results:
   needs:
     - download
     - topReducedCombined-sim
-topReducedCombined2-check-results:
-  <<: *template_check-results
-  allow_failure: true # FIXME: remove after all errors are fixed
-  variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
-    PROJ_NAME: "ReducedCombinedConfig2"
-  needs:
-    - download
-    - topReducedCombined2-sim
 # FW synthesis ---------------
 topPRMEMC-synth:
   <<: *template_topTF-synth
@@ -516,14 +490,4 @@ topReducedCombined-synth:
     - job: download
     - job: topReducedCombined-sim
     - job: topReducedCombined-check-results
-      artifacts: false
-topReducedCombined2-synth:
-  <<: *template_topTF-synth
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig2"
-  needs:
-    - job: download
-    - job: topReducedCombined2-sim
-    - job: topReducedCombined2-check-results
       artifacts: false
