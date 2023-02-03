@@ -30,7 +30,7 @@ public:
     kTFZResidSize = 9,
     kTFRResidSize = 7,
     // Bit size for track and stub words
-    kTrackWordSize =  kTFValidSize + kTFSeedTypeSize + kTFRinvSize + kTFPhi0Size + kTFZ0Size + kTFTSize + kTFHitMapSize,
+    kTrackWordSize =  kTFValidSize + kTFSeedTypeSize + 2 * kNBits_MemAddr + kTFRinvSize + kTFPhi0Size + kTFZ0Size + kTFTSize + kTFHitMapSize,
     kBarrelStubSize = kTFValidSize + kTFTrackIndexSize + kTFStubIndexSize + kTFBarrelStubRSize + kTFPhiResidSize + kTFZResidSize,
     kDiskStubSize =   kTFValidSize + kTFTrackIndexSize + kTFStubIndexSize + kTFDiskStubRSize + kTFPhiResidSize + kTFRResidSize,
     // Bit size for full TrackFitMemory
@@ -111,7 +111,11 @@ public:
     kTFPhi0MSB = kTFPhi0LSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhi0Size - 1,
     kTFRinvLSB = kTFPhi0MSB + 1,
     kTFRinvMSB = kTFRinvLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFRinvSize - 1,
-    kTFSeedTypeLSB = kTFRinvMSB + 1,
+    kTFStubIndexOuterLSB = kTFRinvMSB + 1,
+    kTFStubIndexOuterMSB = kTFStubIndexOuterLSB + kNBits_MemAddr - 1,
+    kTFStubIndexInnerLSB = kTFStubIndexOuterMSB + 1,
+    kTFStubIndexInnerMSB = kTFStubIndexInnerLSB + kNBits_MemAddr - 1,
+    kTFSeedTypeLSB = kTFStubIndexInnerMSB + 1,
     kTFSeedTypeMSB = kTFSeedTypeLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFSeedTypeSize - 1,
     kTFTrackValidLSB = kTFSeedTypeMSB + 1,
     kTFTrackValidMSB = kTFTrackValidLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1
@@ -119,6 +123,7 @@ public:
 
   typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize> TFVALID;
   typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFSeedTypeSize> TFSEEDTYPE;
+  typedef ap_uint<kNBits_MemAddr> TFSEEDSTUBINDEX;
   typedef ap_int<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFRinvSize> TFRINV;
   typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhi0Size> TFPHI0;
   typedef ap_int<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFZ0Size> TFZ0;
@@ -171,6 +176,14 @@ public:
 
   TFSEEDTYPE getSeedType() const {
     return data_.range(kTFSeedTypeMSB,kTFSeedTypeLSB);
+  }
+
+  TFSEEDSTUBINDEX getStubIndexInner() const {
+    return data_.range(kTFStubIndexInnerMSB,kTFStubIndexInnerLSB);
+  }
+
+  TFSEEDSTUBINDEX getStubIndexOuter() const {
+    return data_.range(kTFStubIndexOuterMSB,kTFStubIndexOuterLSB);
   }
 
   TFRINV getRinv() const {
@@ -279,6 +292,14 @@ public:
 
   void setSeedType(const TFSEEDTYPE seedtype) {
     data_.range(kTFSeedTypeMSB,kTFSeedTypeLSB) = seedtype;
+  }
+
+  void setStubIndexInner(const TFSEEDSTUBINDEX seedStubIndex) {
+    data_.range(kTFStubIndexInnerMSB,kTFStubIndexInnerLSB) = seedStubIndex;
+  }
+
+  void setStubIndexOuter(const TFSEEDSTUBINDEX seedStubIndex) {
+    data_.range(kTFStubIndexOuterMSB,kTFStubIndexOuterLSB) = seedStubIndex;
   }
 
   void setRinv(const TFRINV rinv) {
