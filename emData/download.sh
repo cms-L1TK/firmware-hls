@@ -90,7 +90,11 @@ then
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm2}
+<<<<<<< HEAD
   tar -xzmf LUTs.tgz
+=======
+  tar -xzf LUTs.tgz
+>>>>>>> bc16d6d... updating download.sh with CombinedModule2
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
@@ -153,6 +157,14 @@ git submodule init
 git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
+# Should these be auto generated? 
+cp ../LUTsCM/wires.dat reducedcm_wires.dat
+cp ../LUTsCM/processingmodules.dat reducedcm_processingmodules.dat
+cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
+cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
+cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
+cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
+
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
 mv wires.dat reducedcm2_wires.dat
@@ -162,48 +174,59 @@ cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
 ### IRVMR
+echo "IRVMR"
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
 mkdir -p ../../IntegrationTests/IRVMR/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/IRVMR/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/IRVMR/tb/
 ### PRMEMC
+echo "PRMEMC"
 ./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2
 ./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2 -x
 mkdir -p ../../IntegrationTests/PRMEMC/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/PRMEMC/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/PRMEMC/tb/
 ### TETC
+echo "TETC"
 ./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0 -x
 mkdir -p ../../IntegrationTests/TETC/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/TETC/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/TETC/tb/
 ### Reduced IRtoTB
+echo "IRtoTB"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/tb/
 ### Reduced MCTB
+echo "MCTB"
 ./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 ### Barrel IRtoTB
+echo "Barrel ITtoTB"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 ### Reduced Combined IRtoTB
+echo "Reduced CM"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
 ### Reduced Combined 2 IRtoTB
+<<<<<<< HEAD
+=======
+echo "Reduced CM2"
+>>>>>>> bc16d6d... updating download.sh with CombinedModule2
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
@@ -232,8 +255,13 @@ then
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
+<<<<<<< HEAD
   wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzmf MemPrints.tgz
+=======
+  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm2}
+  tar -xzf MemPrints.tgz
+>>>>>>> bc16d6d... updating download.sh with CombinedModule2
   mv MemPrints MemPrintsReducedCM2
   rm -f MemPrints.tgz
 
