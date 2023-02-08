@@ -18,33 +18,52 @@ use work.tf_pkg.all;
 -- ==================================================================
 
 entity CreateStartSignal is
+  generic (
+    DELAY : natural := 4
+  );
   port (
     CLK   : in  std_logic;
     RESET : in  std_logic;
     DONE  : in  std_logic; --! Done signal of last algo module in chain
-    START : out std_logic  --! Start signal of next algo module in chain
+    BX_OUT  : in  std_logic_vector(2 downto 0);
+    START : out std_logic;  --! Start signal of next algo module in chain
+    BX : out std_logic_vector(2 downto 0)
   ); 
 end CreateStartSignal;
 
 
 architecture behavior of CreateStartSignal is
-  signal DONE_LATCH : std_logic := '0';
+  attribute KEEP_HIERARCHY : string;
+  attribute KEEP_HIERARCHY of CreateStartSignal: entity is "TRUE";
+  attribute DONT_TOUCH : string;
+  attribute DONT_TOUCH of CreateStartSignal : entity is "TRUE";
+  type t_DONE_LATCH is array(0 to DELAY-1) of std_logic;
+  signal DONE_LATCH : t_DONE_LATCH := (others => '0');
+  type t_BX_LATCH is array(0 to DELAY-1) of std_logic_vector(2 downto 0);
+  signal BX_LATCH : t_BX_LATCH;
 begin
 
-START <= DONE or DONE_LATCH; --! Latch goes high 1 clk after "done", so need OR of both.
+START <= DONE_LATCH(DELAY-1);
+BX <= BX_LATCH(DELAY-1);
 
 procLatch : process(CLK)
 begin
 
   if rising_edge(CLK) then
 
-    if DONE = '1' then
-      DONE_LATCH <= DONE;
-    end if;
+    for ii in 1 to DELAY-1 loop
+      DONE_LATCH(ii) <= DONE_LATCH(ii-1);
+      BX_LATCH(ii) <= BX_LATCH(ii-1);
+    end loop;
 
     if (RESET = '1') then
-      DONE_LATCH <= '0';
+      DONE_LATCH(0) <= '0';
+    else
+      if Done = '1' then  
+        DONE_LATCH(0) <= DONE;
+      end if;
     end if;
+    BX_LATCH(0) <= BX_OUT;
 
   end if;
 
