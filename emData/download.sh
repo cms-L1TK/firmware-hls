@@ -18,6 +18,9 @@ luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY
 # Reduced Combined modules2
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
 luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
+# Combined barrel
+memprints_url_cm_barrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_221216.tgz"
+luts_url_cm_barrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_221216.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -94,6 +97,10 @@ then
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
+  wget -O LUTs.tgz --quiet ${luts_url_cm_barrel}
+  tar -xzmf LUTs.tgz
+  mv LUTs LUTsCMBarrel
+  rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzmf LUTs.tar.gz
   rm -f LUTs.tar.gz
@@ -146,6 +153,13 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig2
 ./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_TB.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+### combined barrel config                      
+mkdir -p ../TopFunctions/CombinedBarrelConfig
+./generate_IR.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_VMRCM.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_TP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -161,6 +175,9 @@ cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
 cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
 cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
 cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
+cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
+cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
+cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
 
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
@@ -226,6 +243,13 @@ echo "Reduced CM2"
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig2/tb/
+### Reduced Combined 2 IRtoTB
+echo "CM Barrel"
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -x
+mkdir -p ../../IntegrationTests/CombinedBarrelConfig/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -252,6 +276,10 @@ then
   wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM2
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
+  tar -xzmf MemPrints.tgz
+  mv MemPrints MemPrintsCMBarrel
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
