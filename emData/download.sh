@@ -97,7 +97,7 @@ then
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm_barrel}
+  wget -O LUTs.tgz --quiet ${luts_url_cmbarrel}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
