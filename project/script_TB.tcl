@@ -14,7 +14,7 @@ source env_hls.tcl
 #}
 
 #setting a single module to test
-set modules_to_test FT_L3L4
+set modules_to_test FT_L1L2
 
 
 # module_to_export must correspond to the default macros set at the top of the

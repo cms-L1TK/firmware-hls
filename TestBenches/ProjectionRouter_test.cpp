@@ -13,10 +13,10 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined MODULE_
-  #define MODULE_ PR_L3PHIC_
+  #define MODULE_ PR_L6PHIA_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ ProjectionRouterTop_L3PHIC
+  #define TOP_FUNC_ ProjectionRouterTop_L6PHIA
 #endif
 
 const int nevents = 100;  //number of events to run

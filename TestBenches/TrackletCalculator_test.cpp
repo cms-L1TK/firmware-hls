@@ -13,13 +13,13 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
-  #define SEED_ L1L2_
+  #define SEED_ L5L6_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TC_L1L2E_
+  #define MODULE_ TC_L5L6D_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackletCalculator_L1L2E
+  #define TOP_FUNC_ TrackletCalculator_L5L6D
 #endif
 
 const int nevents = 100;  //number of events to run

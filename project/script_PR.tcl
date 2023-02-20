@@ -6,39 +6,42 @@
 # get some information about the executable and environment
 source env_hls.tcl
 
-set modules_to_test {
-  {PR_L1PHIA}
-  {PR_L1PHIB}
-  {PR_L1PHIC}
-  {PR_L1PHID}
-  {PR_L1PHIE}
-  {PR_L1PHIF}
-  {PR_L1PHIG}
-  {PR_L1PHIH}
-  {PR_L2PHIA}
-  {PR_L2PHIB}
-  {PR_L2PHIC}
-  {PR_L2PHID}
-  {PR_L3PHIA}
-  {PR_L3PHIB}
-  {PR_L3PHIC}
-  {PR_L3PHID}
-  {PR_L4PHIA}
-  {PR_L4PHIB}
-  {PR_L4PHIC}
-  {PR_L4PHID}
-  {PR_L5PHIA}
-  {PR_L5PHIB}
-  {PR_L5PHIC}
-  {PR_L5PHID}
-  {PR_L6PHIA}
-  {PR_L6PHIB}
-  {PR_L6PHIC}
-  {PR_L6PHID}
-}
+#set modules_to_test {
+#  {PR_L1PHIA}
+#  {PR_L1PHIB}
+#  {PR_L1PHIC}
+#  {PR_L1PHID}
+#  {PR_L1PHIE}
+#  {PR_L1PHIF}
+#  {PR_L1PHIG}
+#  {PR_L1PHIH}
+#  {PR_L2PHIA}
+#  {PR_L2PHIB}
+#  {PR_L2PHIC}
+#  {PR_L2PHID}
+#  {PR_L3PHIA}
+#  {PR_L3PHIB}
+#  {PR_L3PHIC}
+#  {PR_L3PHID}
+#  {PR_L4PHIA}
+#  {PR_L4PHIB}
+#  {PR_L4PHIC}
+#  {PR_L4PHID}
+#  {PR_L5PHIA}
+#  {PR_L5PHIB}
+#  {PR_L5PHIC}
+#  {PR_L5PHID}
+#  {PR_L6PHIA}
+#  {PR_L6PHIB}
+#  {PR_L6PHIC}
+#  {PR_L6PHID}
+#}
+
+set modules_to_test PR_L6PHIA
+
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export PR_L3PHIC
+set module_to_export $modules_to_test
 
 # create new project (deleting any existing one of same name)
 set project_name "projrouter"

@@ -11,13 +11,13 @@ using namespace std;
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
-  #define SEED_ L3L4_
+  #define SEED_ L1L2_
 #endif
 #if !defined MODULE_
-  #define MODULE_ FT_L3L4_
+  #define MODULE_ FT_L1L2_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackBuilder_L3L4
+  #define TOP_FUNC_ TrackBuilder_L1L2
 #endif
 
 #if SEED_ == L1L2_
