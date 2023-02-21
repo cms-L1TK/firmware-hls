@@ -12,17 +12,17 @@ config_compile -name_max_length 100
 # Set clock frequency
 create_clock -period 250MHz -name default
 
+# Set FPGA variable with part number
+source fpga.tcl
+
 switch -glob -- $exe {
     *vitis* {
         # Set the FPGA part number
-        set_part {xcvu7p-flvb2104-1-e}
+        set_part $FPGA
     }
     default {
         # Set the FPGA part number
-        set_part {xcvu13p-fsga2577-1-e}
-        #set_part {xcvu7p-flvb2104-1-e} -tool vivado
-        #set_part {xcku115-flvb2104-1-e} -tool vivado
-        #set_part {xcvu9p-flgc2104-1-e} -tool vivado
+        set_part $FPGA -tool vivado
 
         # Remove variables from IP interface if they are never used by HLS algo.
         config_interface -trim_dangling_port

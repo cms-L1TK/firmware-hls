@@ -14,16 +14,14 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
     ap_uint<TrackFitType::kTFStubIndexSize> masterBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
     ap_uint<TrackFitType::kTFStubIndexSize> inputBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
     
-    ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ? matchesFoundBarrel[barrelStubNum][0] = 1 : matchesFoundBarrel[barrelStubNum][0] = 0;
-  }
+    matchesFoundBarrel[barrelStubNum][0] = ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ?  1 : 0;  }
   LOOP_CompareDiskStubs:
   for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
     #pragma HLS unroll
     ap_uint<TrackFitType::kTFStubIndexSize> masterDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
     ap_uint<TrackFitType::kTFStubIndexSize> inputDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
 
-    ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)) ? matchesFoundDisk[diskStubNum][0] = 1 : matchesFoundDisk[diskStubNum][0] = 0;
-    
+    matchesFoundDisk[diskStubNum][0] = ((masterDiskStubIndex == inputDiskStubIndex) && (masterDiskStubIndex > 0)) ?  1 : 0;    
   }
 
   // Update #matches found 
@@ -33,7 +31,7 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
     #pragma HLS unroll
     matchesFound += matchesFoundBarrel[layerIndex][0] + matchesFoundDisk[layerIndex][0];
   }
-  (matchesFound >= mergeCondition) ? matchFound = 1 : matchFound = 0; 
+  matchFound = (matchesFound >= mergeCondition) ? 1 : 0;
 
   return matchFound;
 }
@@ -51,7 +49,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
     #pragma HLS unroll
     if((masterTrk._barrelStubArray[barrelStubNum][0] == 0) && (trk._barrelStubArray[barrelStubNum][0] != 0)){
       masterTrk._barrelStubArray[barrelStubNum][0] = trk._barrelStubArray[barrelStubNum][0];
-      mergedBarrelStubsMap | (1 << TrackFitType::kTFHitCountSize*barrelStubNum);
+      mergedBarrelStubsMap = mergedBarrelStubsMap | (1 << TrackFitType::kTFHitCountSize*barrelStubNum);
     }
   }
   LOOP_SetInputDiskStubToMaster:
@@ -59,7 +57,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
     #pragma HLS unroll
     if((masterTrk._diskStubArray[diskStubNum][0] == 0) && (trk._diskStubArray[diskStubNum][0] !=0 )){
       masterTrk._diskStubArray[diskStubNum][0] = trk._diskStubArray[diskStubNum][0];
-      mergedDiskStubsMap | (1 << TrackFitType::kTFHitCountSize*diskStubNum);
+      mergedDiskStubsMap = mergedDiskStubsMap | (1 << TrackFitType::kTFHitCountSize*diskStubNum);
     }
   }
 
