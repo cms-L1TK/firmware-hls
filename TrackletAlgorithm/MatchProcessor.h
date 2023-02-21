@@ -868,6 +868,7 @@ void readTable_rDSS(ap_uint<width> table[depth]){
 //-------------------------------------- MATCH CALCULATION STEPS --------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 
+// MatchCalculator
 template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
@@ -875,6 +876,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
+                     ap_uint<1>& isMatch,
                      ap_uint<1>& savedMatch,
                      ap_uint<MC::LUT_matchcut_z_width>& best_delta_z,
                      ap_uint<MC::LUT_matchcut_phi_width>& best_delta_phi,
@@ -1088,17 +1090,19 @@ void MatchCalculator(BXType bx,
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi < best_delta_phi);
   bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
-  disk_match = disk_match && (abs_delta_phi < best_delta_phi);
+  disk_match = isMatch ? disk_match && (abs_delta_phi < best_delta_phi) : disk_match;
+  isMatch |= disk_match;
   if ((!isDisk && barrel_match) || (isDisk && disk_match)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
-    best_delta_phi = abs_delta_phi;
     if(isDisk) {
-      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi * ap_uint<12>(stub_ps_r)) : ap_uint<20>(abs_delta_phi * tmp_stubr);
+      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * tmp_stubr;
       best_delta_r    = abs_delta_r;
+      best_delta_phi = abs_delta_phi;
     }
     else {
       best_delta_z = iabs<14>(delta_z_fact);
+      best_delta_phi = abs_delta_phi;
     }
 
     // Store bestmatch
@@ -1310,12 +1314,6 @@ void MatchProcessor(BXType bx,
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
-#ifdef DEBUG
-      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
-      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
-      
-      if(!emptys[iMEU]) (stubindex,allprojdata) = matchengine[iMEU].peek();
-#endif
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
     }
@@ -1327,6 +1325,7 @@ void MatchProcessor(BXType bx,
       std::cout << " MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
 		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
     }
+    std::cout << std::endl;
     */
     
     //New code
@@ -1404,13 +1403,12 @@ void MatchProcessor(BXType bx,
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
     
       ap_uint<1> newtracklet = lastTrkID != trkindex;
+      isMatch = newtracklet ? ap_uint<1>(0) : isMatch;
       
       lastTrkID = trkindex;
 
-#ifdef DEBUG
-#endif
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
+        (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
@@ -1464,13 +1462,18 @@ void MatchProcessor(BXType bx,
       ap_uint<nZbinBits> zfirst, zlast, rtmp, rfirst;
       ap_uint<1> rsecond;
 
+      //(zfirst, zlast) = zbinLUT[(psseed,zbin6)];
       ap_uint<nRbinBits> rbin = rbinLUT[rbin8];
       typename VMProjection<VMPTYPE>::VMPFINEZ finer = rbin >> nZbinBits;
       rtmp = rbin.range(nZbinBits, 0);
       rfirst = rtmp >> 1;
       rsecond = rtmp & 1;
+      //(finer,rfirst,rsecond) = rbin;//.range(nZbinBits, 0);
+      //rfirst = izder < 0 ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       rfirst = (izder.range(izder.length()-1, izder.length()-1)  == 1) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
+      //rfirst = (projdata_.getRZDer()>0) ? rfirst : ap_uint<nZbinBits>(rfirst + (1<<nRbinBits));
+      //rbin.range(nZbinBits+1, 1) = (projdata_.getRZDer()>0) ? rbin.range(nZbinBits, 1) : rbin.range(nZbinBits+1, 1) + (1<<kNbitsrzbinMP);
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (LAYER < trklet::N_LAYER) ? (zfirst, zfirst!=zlast) : (rfirst,rsecond);
 
@@ -1603,8 +1606,6 @@ void MatchProcessor(BXType bx,
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
-#ifdef DEBUG
-#endif
 
       ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 

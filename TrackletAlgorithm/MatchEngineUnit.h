@@ -34,7 +34,7 @@ class MatchEngineUnitBase<DISK> {
   };
 };
 
-template<int VMSMEType, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE> //FIXME Remove ASTYPE!
+template<int VMSMEType, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
 class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
@@ -98,9 +98,13 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   } 
   nuse_ = 0;
   if(usefirstMinus) use_[nuse_++] = 0;//(0, 0);
+  else stubmask_[0] = 0;
   if(usesecondMinus) use_[nuse_++] = 2;//(1, 0);
+  else stubmask_[1] = 0;
   if(usefirstPlus) use_[nuse_++] = 1;//(0, 1);
+  else stubmask_[2] = 0;
   if(usesecondPlus) use_[nuse_++] = 3;//(1, 1);
+  else stubmask_[3] = 0;
 
 }
 
@@ -121,7 +125,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   NSTUB istubtmp=istub_;
   NSTUB iusetmp=iuse_;
 
-  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + phiPlus_;
+  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);//phiPlus_;
   auto secondSave = second_;
 
   VMProjection<VMProjType> data(projbuffer_.getProjection());
@@ -176,37 +180,37 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
   }
   ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iusetmp].range(0,0)) * nbins + zbin + use_[iusetmp].range(1,1);
-   
-  //Check if last stub, if so, go to next buffer entry 
-  if (good__) {
-   if (istubtmp+1>=nstubs_){
-     iuse_++;
-     istub_ = 0;
-     if(iusetmp+1 < nuse_) {
-       istub_ = 0;
-     }
-     else {
-       iuse_ = 0;
-     }
-     if (!stubmask_) {
-       idle_ = true;
-     } else {
-          ap_uint<2> index = __builtin_ctz(stubmask_);
-          stubmask_[index]=0;
-          second_ =  index[0];
-          phiPlus_ =  index[1];
-          nstubs_ = nstubsall_[index];
-      }
-   } else {
-     istub_++;
-    }
-  }
-  
   //Read stub memory and extract data fields
-  //auto stubtmp=(iphiSave,slot);
   auto stubtmp=(iphiSave,zbin);
   auto stubadd=(slot,istubtmp);
   stubdata__ = stubmem[bx_&3][stubadd];
+   
+   if (good__) {
+    if (istubtmp+1>=nstubs_) {
+      iuse_++;
+      istub_ = 0;
+      auto nstubstmp = nstubs_;
+      if (!stubmask_ && iusetmp+1 >= nuse_) {
+        idle_ = true;
+      }
+      else if (stubmask_) {
+           ap_uint<2> index = __builtin_ctz(stubmask_);
+           stubmask_[index]=0;
+           second_ =  index[0];
+           phiPlus_ =  index[1];
+           nstubs_ = nstubsall_[index];
+      }
+      if(iusetmp+1 < nuse_) {
+        istub_ = 0;
+      }
+      else {
+           iuse_ = 0;
+      }
+    } else {
+      istub_++;
+     }
+   }
+
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
 
@@ -225,6 +229,29 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     auto stubbend=stubdata___.getBend();
     //auto isPSStub=stubdata___.isPSStub();
     auto isPSStub=allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
+    //const ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize-2> absz = -1;
+    const int absz = 7;
+    /*
+    bool isPSStub;
+    if (VMProjType==BARREL) {
+        isPSStub = LAYER <= TF::D3;
+    } else {
+      //if (layerdisk_ < N_LAYER + 2) {
+      if (LAYER <= TF::D2) {
+        isPSStub = ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3);
+        isPSStub = (zbin___ < 3) || (zbin___ == 3 && stubfinez <= 3);
+      } else {
+        isPSStub = ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
+        isPSStub = (zbin___ < 3) || (zbin___ == 3 && stubfinez <= 2);
+      }
+    }
+    */
+    /*
+    const bool isPSStub = VMProjType==BARREL ? LAYER <= TF::L3 : 
+                                               LAYER <= TF::D2 ? ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3) :
+                                                                 ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
+    const bool isPSStub = (zbin___ <=3);
+    */
     auto stubbendReduced=stubdata___.getBendPSDisk();
 
     const int projfinephibits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
@@ -260,7 +287,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 	// Check if stub bend and proj rinv consistent
 	auto const index_part1 = (VMProjType == DISK && isPSseed___) ? projrinv___.concat(stubbendReduced) : projrinv___.concat(stubbend);
 	auto const index_part2 = ((VMProjType == DISK && isPSseed___) ? (1 << (kRInvBits + kNBitBin)) : 0);
-    const ap_int<1> diskps = isDisk && isPSStub;// (stubbend.range(stubbend.length()-1,stubbend.length()-1) != 1);
+    const ap_int<1> diskps = isDisk && isPSStub;
     auto const index = diskps ? (diskps,projrinv___,stubbendReduced) : (diskps,projrinv___,stubbend);
 
     //Check if stub bend and proj rinv consistent
@@ -272,6 +299,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     //the writeindex_ if we had a good stub that pass the various cuts
     writeindex_ = (good___&passphi&pass&table[index]) ? writeindexnext : writeindex_;
 
+    //update pipeline variables
     good___ = good__t;
     stubdata___ = stubdata__t;
     projfinephi___ = projfinephi__t;
@@ -443,10 +471,10 @@ inline void advance() {
  ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
  //Current projection
- ap_uint<4> nstubsall_[4];
+ ap_uint<kNBits_MemAddrBinned> nstubsall_[4];
  NSTUB istub_;
  NSTUBS nstubs_;
- ap_uint<4> stubmask_;
+ ap_uint<kNBits_MemAddrBinned> stubmask_;
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
