@@ -45,7 +45,7 @@ class MemoryTemplateBinnedCM{
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
   ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
-  ap_uint<32> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
+  ap_uint<36> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
   
  public:
 
