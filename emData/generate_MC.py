@@ -164,7 +164,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchCalculator_para
         )
         topFile.write(
             " TF::" + seed + ", "
-            "MC::" + iMC + "> (\n"
+            "TF::" + iMC + "> (\n"
             "    bx,\n"
             "    match,\n"
             "    allstub,\n"
