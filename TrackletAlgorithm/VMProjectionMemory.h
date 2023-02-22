@@ -83,8 +83,6 @@ public:
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv, const bool ps):
     data_( (id, zbin, finez, finephi, rinv, ps) )
   {
-    //setIsPSSeed(ps); // band-aid until I can track down why data_ has the wrong zbin (seems to save zbin<<1)
-    //static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
   // This constructor is only used for projections in DISK
@@ -105,14 +103,6 @@ public:
   }
   #endif
   
-  #ifndef __SYNTHESIS__
-  void Print() {
-    edm::LogVerbatim("L1trackHLS") << "VMProjection:" << std::endl;
-    edm::LogVerbatim("L1trackHLS") << std::hex << "VMProjType=" << VMProjType << "\tid=" << getIndex() << "\tzbin=" << getZBin() << "\tfinez=" << getFineZ() << "\tfinephi=" << getFinePhi() << "\trinv=" << getRInv() << "\tisPS=" << getIsPSSeed() << std::endl;
-    std::cout << "VMProj zbinbits=" << VMProjectionBase<VMProjType>::kVMProjZBinSize << std::endl;
-  }
-  #endif
-
   // Getter
   static constexpr int getWidth() {return VMProjectionBase<VMProjType>::kVMProjectionSize;}
 

@@ -96,11 +96,6 @@ public:
     VMStubMECMData newdata(datastr, base);
     data_ = newdata;
   }
-  void Print()
-  {
-    std::cout << std::hex << data_ << std::endl;
-    std::cout << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEIDSize>(getIndex()) << "|" << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEBendSize>(getBend()) << "|" << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize>(getFinePhi()) << "|" << std::bitset<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize>(getFineZ()) << std::endl;
-  }
   #endif
 
   // Getter
