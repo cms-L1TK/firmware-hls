@@ -212,7 +212,9 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
     //auto isPSStub=stubdata___.isPSStub();
-    auto isPSStub=allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
+    bool isPSStub = VMProjType==BARREL ?
+                        LAYER <= TF::D3 ? true : false
+                    : allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
     //const ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize-2> absz = -1;
     const int absz = 7;
     /*
