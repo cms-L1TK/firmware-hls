@@ -110,8 +110,8 @@ void merger(
         *sAnext   = ((inA.getProjIndex() <= inB.getProjIndex()) || !validB) && validA;  // sA=true if inA is valid and (inA <= inB or inB not valid)
         *sBnext   = (!(inA.getProjIndex() <= inB.getProjIndex()) || !validA) && validB; // sB=true if inB is valid and (inA > inB or inA not valid)
         break;
-    case DONE: // set everything to false
-        *outnext  = CandidateMatch(MC::cmzero);
+    case DONE: // set everything to false 
+        *outnext  = CandidateMatch(MC::cmhigh);
         *voutnext = false;
         *Anext    = CandidateMatch(MC::cmhigh);
         *vAnext   = false;
@@ -420,7 +420,104 @@ void readTable_Cuts(ap_uint<width> table[depth]){
     else {
       static_assert(true, "Only LAYERS 1 to 6 are valid");
     }
-
+ 
+  } // end PSr
+  else if(type==MC::SSRCUT) { // 2Sr cuts
+    if (L==TF::D1){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D1PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D2){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D2PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D3){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D3PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D3PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D4){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D4PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D4PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    if (L==TF::D5){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D5PHIC_2Srcut.tab")
+#  include "../emData/MC/tables/MC_D5PHIC_2Srcut.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only LAYERS 1 to 6 are valid");
+    }
+ 
+  } // end 2Sr
+  else if(type==MC::ALPHAINNERCUT) { // alphainner cuts (//for disks only)
+    if (L==TF::D1){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphainner.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==TF::D2){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphainner.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphainner.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only DISKS 1 and 2 are valid for alpha inner");
+    }
+  }
+  else if(type==MC::ALPHAOUTERCUT) { // alphaouter cuts (//for disks only)
+    if (L==TF::D1){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D1PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D1PHIC_alphaouter.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else if (L==TF::D2){
+      ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MC/tables/MC_D2PHIC_alphaouter.tab")
+#  include "../emData/MC/tables/MC_D2PHIC_alphaouter.tab"
+#else
+      {};
+#endif
+      for (int i = 0; i < depth; i++) table[i] = tmp[i];
+    }
+    else {
+      static_assert(true, "Only DISKS 1 and 2 are valid for alpha outer");
+    }
   }
 
 } // end readTable_Cuts
@@ -569,7 +666,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool F
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, TF::phiRegion PHISEC=TF::A>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
@@ -684,58 +781,58 @@ void MatchCalculator(BXType bx,
   bool read_L1_2 = false;
   bool read_L1_3 = false;
   bool read_L1_4 = false;
-  CandidateMatch cm_L1_1(MC::cmzero);
-  CandidateMatch cm_L1_2(MC::cmzero);
-  CandidateMatch cm_L1_3(MC::cmzero);
-  CandidateMatch cm_L1_4(MC::cmzero);
-  CandidateMatch tmpA_L1_1(MC::cmzero);
-  CandidateMatch tmpA_L1_2(MC::cmzero);
-  CandidateMatch tmpA_L1_3(MC::cmzero);
-  CandidateMatch tmpA_L1_4(MC::cmzero);
-  CandidateMatch tmpB_L1_1(MC::cmzero);
-  CandidateMatch tmpB_L1_2(MC::cmzero);
-  CandidateMatch tmpB_L1_3(MC::cmzero);
-  CandidateMatch tmpB_L1_4(MC::cmzero);
-  bool valid_L1_1 = false;
-  bool valid_L1_2 = false;
-  bool valid_L1_3 = false;
-  bool valid_L1_4 = false;
-  bool vA_L1_1 = false;
-  bool vA_L1_2 = false;
-  bool vA_L1_3 = false;
-  bool vA_L1_4 = false;
-  bool vB_L1_1 = false;
-  bool vB_L1_2 = false;
-  bool vB_L1_3 = false;
-  bool vB_L1_4 = false;
-  bool sA_L1_1 = false;
-  bool sA_L1_2 = false;
-  bool sA_L1_3 = false;
-  bool sA_L1_4 = false;
-  bool sB_L1_1 = false;
-  bool sB_L1_2 = false;
-  bool sB_L1_3 = false;
-  bool sB_L1_4 = false;
+  CandidateMatch cm_L1_1(MC::cmhigh);
+  CandidateMatch cm_L1_2(MC::cmhigh);
+  CandidateMatch cm_L1_3(MC::cmhigh);
+  CandidateMatch cm_L1_4(MC::cmhigh);
+  CandidateMatch tmpA_L1_1(MC::cmhigh);
+  CandidateMatch tmpA_L1_2(MC::cmhigh);
+  CandidateMatch tmpA_L1_3(MC::cmhigh);
+  CandidateMatch tmpA_L1_4(MC::cmhigh);
+  CandidateMatch tmpB_L1_1(MC::cmhigh);
+  CandidateMatch tmpB_L1_2(MC::cmhigh);
+  CandidateMatch tmpB_L1_3(MC::cmhigh);
+  CandidateMatch tmpB_L1_4(MC::cmhigh);
+  bool valid_L1_1 = false; 
+  bool valid_L1_2 = false; 
+  bool valid_L1_3 = false; 
+  bool valid_L1_4 = false; 
+  bool vA_L1_1 = false; 
+  bool vA_L1_2 = false; 
+  bool vA_L1_3 = false; 
+  bool vA_L1_4 = false; 
+  bool vB_L1_1 = false; 
+  bool vB_L1_2 = false; 
+  bool vB_L1_3 = false; 
+  bool vB_L1_4 = false; 
+  bool sA_L1_1 = false; 
+  bool sA_L1_2 = false; 
+  bool sA_L1_3 = false; 
+  bool sA_L1_4 = false; 
+  bool sB_L1_1 = false; 
+  bool sB_L1_2 = false; 
+  bool sB_L1_3 = false; 
+  bool sB_L1_4 = false; 
 
   // layer 2 variables
   bool read_L2_1 = false;
   bool read_L2_2 = false;
-  CandidateMatch cm_L2_1(MC::cmzero);
-  CandidateMatch cm_L2_2(MC::cmzero);
-  CandidateMatch tmpA_L2_1(MC::cmzero);
-  CandidateMatch tmpA_L2_2(MC::cmzero);
-  CandidateMatch tmpB_L2_1(MC::cmzero);
-  CandidateMatch tmpB_L2_2(MC::cmzero);
-  bool valid_L2_1 = false;
-  bool valid_L2_2 = false;
-  bool vA_L2_1 = false;
-  bool vA_L2_2 = false;
-  bool vB_L2_1 = false;
-  bool vB_L2_2 = false;
-  bool sA_L2_1 = false;
-  bool sA_L2_2 = false;
-  bool sB_L2_1 = false;
-  bool sB_L2_2 = false;
+  CandidateMatch cm_L2_1(MC::cmhigh);
+  CandidateMatch cm_L2_2(MC::cmhigh);
+  CandidateMatch tmpA_L2_1(MC::cmhigh);
+  CandidateMatch tmpA_L2_2(MC::cmhigh);
+  CandidateMatch tmpB_L2_1(MC::cmhigh);
+  CandidateMatch tmpB_L2_2(MC::cmhigh);
+  bool valid_L2_1 = false; 
+  bool valid_L2_2 = false; 
+  bool vA_L2_1 = false; 
+  bool vA_L2_2 = false; 
+  bool vB_L2_1 = false; 
+  bool vB_L2_2 = false; 
+  bool sA_L2_1 = false; 
+  bool sA_L2_2 = false; 
+  bool sB_L2_1 = false; 
+  bool sB_L2_2 = false; 
 
   // layer 3 variables
   CandidateMatch tmpA_L3(MC::cmhigh);
@@ -822,26 +919,26 @@ void MatchCalculator(BXType bx,
 
     bool read_L2_1_next = false;
     bool read_L2_2_next = false;
-    CandidateMatch cm_L2_1_next(MC::cmzero);
-    CandidateMatch cm_L2_2_next(MC::cmzero);
-    CandidateMatch tmpA_L2_1_next(MC::cmzero);
-    CandidateMatch tmpA_L2_2_next(MC::cmzero);
-    CandidateMatch tmpB_L2_1_next(MC::cmzero);
-    CandidateMatch tmpB_L2_2_next(MC::cmzero);
-    bool valid_L2_1_next = false;
-    bool valid_L2_2_next = false;
-    bool vA_L2_1_next = false;
-    bool vA_L2_2_next = false;
-    bool vB_L2_1_next = false;
-    bool vB_L2_2_next = false;
-    bool sA_L2_1_next = false;
-    bool sA_L2_2_next = false;
-    bool sB_L2_1_next = false;
-    bool sB_L2_2_next = false;
+    CandidateMatch cm_L2_1_next(MC::cmhigh);
+    CandidateMatch cm_L2_2_next(MC::cmhigh);
+    CandidateMatch tmpA_L2_1_next(MC::cmhigh);
+    CandidateMatch tmpA_L2_2_next(MC::cmhigh);
+    CandidateMatch tmpB_L2_1_next(MC::cmhigh);
+    CandidateMatch tmpB_L2_2_next(MC::cmhigh);
+    bool valid_L2_1_next = false; 
+    bool valid_L2_2_next = false; 
+    bool vA_L2_1_next = false; 
+    bool vA_L2_2_next = false; 
+    bool vB_L2_1_next = false; 
+    bool vB_L2_2_next = false; 
+    bool sA_L2_1_next = false; 
+    bool sA_L2_2_next = false; 
+    bool sB_L2_1_next = false; 
+    bool sB_L2_2_next = false; 
 
-    CandidateMatch cm_L3_next(MC::cmzero);
-    CandidateMatch tmpA_L3_next(MC::cmzero);
-    CandidateMatch tmpB_L3_next(MC::cmzero);
+    CandidateMatch cm_L3_next(MC::cmhigh);
+    CandidateMatch tmpA_L3_next(MC::cmhigh);
+    CandidateMatch tmpB_L3_next(MC::cmhigh); 
     bool valid_L3_next = false;
     bool vA_L3_next = false;
     bool vB_L3_next = false;
@@ -1085,7 +1182,17 @@ void MatchCalculator(BXType bx,
     typename AllStub<ASTYPE>::ASR    stub_r    = stub.getR();
     typename AllStub<ASTYPE>::ASZ    stub_z    = stub.getZ();
     typename AllStub<ASTYPE>::ASPHI  stub_phi  = stub.getPhi();
-    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();
+    typename AllStub<ASTYPE>::ASBEND stub_bend = stub.getBend();       
+    typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
+    typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
+    typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
+    typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
+    ap_uint<12>    stub_2s_r    = stub_2s.getR();
+    typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
+    typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
+    typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
+    typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
+    auto isPSStub = stub.isPSStub();
 
     // Projection parameters
     typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
@@ -1094,7 +1201,8 @@ void MatchCalculator(BXType bx,
     typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
     typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
     typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
-    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer();
+    typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
+    bool isProjDisk = proj_seed >= TF::D1;
 
 
     // Calculate residuals
@@ -1108,7 +1216,7 @@ void MatchCalculator(BXType bx,
     else if(isDisk && !isPSStub)
       phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
     ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
-
+     
     // Apply the corrections
     const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
     ap_int<kProj_phi_len> proj_phi_corr = proj_phi + phi_corr;  // original proj phi plus phi correction
@@ -1180,9 +1288,21 @@ void MatchCalculator(BXType bx,
     // For first tracklet, pick up the phi cut value
     best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
     best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-
-    // Check that matches fall within the selection window of the projection
-    if ((delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+    if(newtracklet) {
+      if(isPSStub) {
+        best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
+        best_delta_r = LUT_matchcut_PSr[proj_seed];
+      }
+      else  {
+        best_delta_rphi = LUT_matchcut_2Srphi[proj_seed];
+        best_delta_r = LUT_matchcut_2Sr[proj_seed];
+      }
+    }
+  
+    // Check that matches fall within the selection window of the projection 
+    bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi);
+    bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+    if ((!isDisk && barrel_match) || (isDisk && disk_match)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
       if(isDisk) {
