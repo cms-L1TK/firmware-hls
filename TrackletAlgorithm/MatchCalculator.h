@@ -666,7 +666,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool F
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchCalculator_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, MC::imc PHISEC=MC::A>
+template<regionType ASTYPE, regionType APTYPE, regionType FMTYPE, int MaxMatchCopies, int MaxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      const CandidateMatchMemory match[MaxMatchCopies],
                      const AllStubMemory<ASTYPE>* allstub,
@@ -705,7 +705,7 @@ void MatchCalculator(BXType bx,
 
   const auto LUT_matchcut_phi_width = 17;
   const auto LUT_matchcut_phi_depth = 12;
-  const auto LUT_matchcut_z_width = 14;
+  const auto LUT_matchcut_z_width = 13;
   const auto LUT_matchcut_z_depth = 12;
   const auto LUT_matchcut_rphi_width = 20;
   const auto LUT_matchcut_rphi_depth = 12;
@@ -713,8 +713,8 @@ void MatchCalculator(BXType bx,
   const auto LUT_matchcut_alpha_depth = 10;
   const auto LUT_matchcut_r_width = 12;
   const auto LUT_matchcut_r_depth = 12;
-  const auto LUT_matchcut_rDSS_width = 13;
-  const auto LUT_matchcut_rDSS_depth = 12;
+  const auto LUT_matchcut_rDSS_width = 12;
+  const auto LUT_matchcut_rDSS_depth = 10;
 
   // Setup look up tables for match cuts
   ap_uint<LUT_matchcut_phi_width> LUT_matchcut_phi[LUT_matchcut_phi_depth];
