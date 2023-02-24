@@ -27,12 +27,13 @@ use unisim.vcomponents.all;
 --! User packages
 use work.tf_pkg.all;
 
-entity tf_mem_bin_cm4 is
+entity tf_mem_bin_cm4_new is
   generic (
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
     RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH_CM; --! Leave at default. RAM depth (no. of entries)
     NUM_MEM_BINS    : natural := 64;                --! Specify number of memory bins
+    BIN_ADDR_WIDTH  : natural := 4;                 --! Bits for address
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH_CM/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
@@ -49,7 +50,7 @@ entity tf_mem_bin_cm4 is
     enb3       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
     rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
     regceb    : in  std_logic;                                      --! Output register enable
-    addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
+    addra  : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write addres
     dina      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     addrb0     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     addrb1     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
@@ -60,18 +61,24 @@ entity tf_mem_bin_cm4 is
     doutb2     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     doutb3     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
-    nent_o    : out t_arr_64_4b(0 to NUM_PAGES-1) := (others => (others => (others => '0'))); --! entries(page)(bin)
+    enb_nentA  : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    enb_nentB  : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    addr_nentA : in std_logic_vector(4 downto 0); --! Addres for nentries 
+    addr_nentB : in std_logic_vector(4 downto 0); --! Addres for nentries 
+    dout_nentA    : out std_logic_vector(31 downto 0); --! entries output data
+    dout_nentB    : out std_logic_vector(31 downto 0); --! entries output data
     mask_o    : out t_arr_64_1b(0 to NUM_PAGES-1) := (others => (others => '0')) --! mask(page)(bin)
     );
-end tf_mem_bin_cm4;
+end tf_mem_bin_cm4_new;
 
-architecture rtl of tf_mem_bin_cm4 is
+architecture rtl of tf_mem_bin_cm4_new is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
+type t_arr_1d_slv_mem_nent is array(0 to 31) of std_logic_vector(3 downto 0); --! 1D array of slv
 
 -- ########################### Function ##########################
---! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4. Needed here because of variable slv width!
+--! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4_new. Needed here because of variable slv width!
 impure function read_tf_mem_data (
 file_path : string;      --! File path as string
 hex_val   : boolean)     --! Read file vales as hex or bin
@@ -116,6 +123,24 @@ signal sv_RAM_row1  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0'); 
 signal sv_RAM_row2  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row3  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
+signal sa_RAM_nentA0 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA1 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA2 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA3 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA4 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA5 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA6 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentA7 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+
+signal sa_RAM_nentB0 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB1 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB2 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB3 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB4 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB5 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB6 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB7 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 attribute ram_style of sa_RAM_data0 : signal is "block";
@@ -123,22 +148,44 @@ attribute ram_style of sa_RAM_data1 : signal is "block";
 attribute ram_style of sa_RAM_data2 : signal is "block";
 attribute ram_style of sa_RAM_data3 : signal is "block";
 
+attribute ram_style of sa_RAM_nentA0 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA1 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA2 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA3 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA4 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA5 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA6 : signal is "distributed";
+attribute ram_style of sa_RAM_nentA7 : signal is "distributed";
+
+attribute ram_style of sa_RAM_nentB0 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB1 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB2 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB3 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB4 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB5 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB6 : signal is "distributed";
+attribute ram_style of sa_RAM_nentB7 : signal is "distributed";
+
+
 begin
 
 -- Check user didn't change values of derived generics.
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH_CM) report "User changed RAM_DEPTH" severity FAILURE;
-assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH_CM/NUM_MEM_BINS) report "tf_mem_bin_cm4: User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
+assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH_CM/NUM_MEM_BINS) report "tf_mem_bin_cm4_new: User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
 
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter
-  variable vi_nent_idx  : integer := 0;  -- Bin index of nent
+  variable vi_nent_idx  : std_logic_vector(5 downto 0);  -- Bin index of nent
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
   variable written      : integer := 0;
+  variable addr_in_bin  : std_logic_vector(BIN_ADDR_WIDTH-1 downto 0);
+  variable upperbits, lowerbits : std_logic_vector(2 downto 0);
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
+    report "tm_mem_bin_cm4_new vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -146,7 +193,6 @@ begin
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      nent_o(vi_page_cnt) <= (others => (others => '0'));
       mask_o(vi_page_cnt) <= (others => '0'); 
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
@@ -162,21 +208,43 @@ begin
       sa_RAM_data2(to_integer(unsigned(addra))) <= dina; -- Write data
       sa_RAM_data3(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
-      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      -- vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      vi_nent_idx := addra(9 downto 4); -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
+      upperbits := vi_nent_idx(5 downto 3);
+      lowerbits := vi_nent_idx(2 downto 0);
+      
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
-      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH_CM)-1 downto 0)));
+      addr_in_bin := std_logic_vector(unsigned(addra(BIN_ADDR_WIDTH-1 downto 0)) + 1);
       assert (page < NUM_PAGES) report "page out of range" severity error;
-      mask_o(page)(vi_nent_idx) <= '1'; -- <= 1 (slv)
-      if (addr_in_page = 0) then
-        nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
-      else
-        nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
-      end if; 
-    elsif (written=0) then
-      mask_o <= (others => (others => '0'));
-      nent_o <= (others => (others => (others => '0')));
+      mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
+      case lowerbits is
+        when "000" =>
+          sa_RAM_nentA0(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB0(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when "001" =>
+          sa_RAM_nentA1(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB1(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when "010" =>
+          sa_RAM_nentA2(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB2(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when "011" =>
+          sa_RAM_nentA3(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB3(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when "100" =>
+          sa_RAM_nentA4(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB4(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when "101" =>
+          sa_RAM_nentA5(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB5(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when "110" =>
+          sa_RAM_nentA6(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB6(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+        when others =>
+          sa_RAM_nentA7(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+          sa_RAM_nentB7(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
+      end case;
     end if; -- (wea='1')
   end if;
 end process;
@@ -195,6 +263,12 @@ begin
     end if;
     if (enb3='1') then
       sv_RAM_row3 <= sa_RAM_data3(to_integer(unsigned(addrb3)));
+    end if;
+    if (enb_nentA='1') then
+      dout_nentA <= sa_RAM_nentA7(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA6(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA5(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA4(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA3(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA2(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA1(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA0(to_integer(unsigned(addr_nentA)));
+    end if;
+    if (enb_nentB='1') then
+      dout_nentB <= sa_RAM_nentB7(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB6(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB5(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB4(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB3(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB2(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB1(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB0(to_integer(unsigned(addr_nentB)));
     end if;
   end if;
 end process;
