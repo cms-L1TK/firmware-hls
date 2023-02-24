@@ -27,7 +27,7 @@ use unisim.vcomponents.all;
 --! User packages
 use work.tf_pkg.all;
 
-entity tf_mem_bin_cm4_new is
+entity tf_mem_bin_cm4 is
   generic (
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
@@ -69,16 +69,16 @@ entity tf_mem_bin_cm4_new is
     dout_nentB    : out std_logic_vector(31 downto 0); --! entries output data
     mask_o    : out t_arr_64_1b(0 to NUM_PAGES-1) := (others => (others => '0')) --! mask(page)(bin)
     );
-end tf_mem_bin_cm4_new;
+end tf_mem_bin_cm4;
 
-architecture rtl of tf_mem_bin_cm4_new is
+architecture rtl of tf_mem_bin_cm4 is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
 type t_arr_1d_slv_mem_nent is array(0 to 31) of std_logic_vector(3 downto 0); --! 1D array of slv
 
 -- ########################### Function ##########################
---! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4_new. Needed here because of variable slv width!
+--! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4. Needed here because of variable slv width!
 impure function read_tf_mem_data (
 file_path : string;      --! File path as string
 hex_val   : boolean)     --! Read file vales as hex or bin
@@ -171,7 +171,7 @@ begin
 
 -- Check user didn't change values of derived generics.
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH_CM) report "User changed RAM_DEPTH" severity FAILURE;
-assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH_CM/NUM_MEM_BINS) report "tf_mem_bin_cm4_new: User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
+assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH_CM/NUM_MEM_BINS) report "tf_mem_bin_cm4: User changed NUM_ENTRIES_PER_MEM_BINS" severity FAILURE;
 
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
@@ -185,7 +185,7 @@ process(clka)
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
-    report "tm_mem_bin_cm4_new vi_clk_cnt "&integer'image(vi_clk_cnt);
+    report "tm_mem_bin_cm4 vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
