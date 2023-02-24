@@ -55,7 +55,9 @@ begin
     if (RESET = '1') then
       DONE_LATCH(0) <= '0';
     else
-      DONE_LATCH(0) <= DONE;
+      if (DONE = '1') then
+        DONE_LATCH(0) <= DONE;
+      end if;
     end if;
     BX_LATCH(0) <= BX_OUT;
 
