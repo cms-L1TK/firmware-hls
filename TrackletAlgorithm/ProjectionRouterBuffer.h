@@ -12,7 +12,6 @@
 #include "DummyMessageLogger.h"
 #endif
 #endif
-#include <bitset>
 
 // ProjectionRouterBufferBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMProjType, int AllProjetionType> class ProjectionRouterBufferBase {};
@@ -122,21 +121,6 @@ public:
  ProjectionRouterBuffer(const ALLPROJ allproj, const PRPHI phi, const PHIPROJBIN phiProjBin, const TCID tcid, const PRNSTUB nstub, const ap_uint<4> maskstub, const VMPZBIN zbin, const VMProjection<BARREL> projdata, const bool ps):
   data_( (allproj, phi, tcid, phiProjBin, projdata.getIndex(), maskstub, nstub, projdata.raw(), zbin, ap_uint<1>(ps)) )
   {
-    /*
-    assert(usefirstMinus == getUseFirstMinus() && "usefirstMinus");
-    assert(usesecondMinus == getUseSecondMinus() && "usesecondMinus");
-    assert(usefirstPlus == getUseFirstPlus() && "usefirstPlus");
-    assert(usesecondPlus == getUseSecondPlus() && "usesecondPlus");
-    */
-#ifdef DEBUG
-    std::cout << std::hex << "PRBuffer proj=" << getAllProj() << std::endl;
-    std::cout << "usefirstMinus=" << usefirstMinus << "\t" <<  getUseFirstMinus();
-    std::cout << "usesecondMinus=" << usesecondMinus << "\t" <<  getUseSecondMinus();
-    std::cout << "usefirstPlus=" << usefirstPlus << "\t" <<  getUseFirstPlus();
-    std::cout << "usesecondPlus=" << usesecondPlus << "\t" <<  getUseSecondPlus() << std::endl;
-    std::cout << "zbinbits=" << ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize << std::endl;
-    edm::LogVerbatim("L1trackHLS") << std::hex << "PRBufer received " << "usefirstMinus=" << usefirstMinus << "\t" << "usesecondMinus=" << usesecondMinus << "\t" << "usefirstPlus=" << usefirstPlus << "\t" << "usesecondPlus=" << usesecondPlus << "\t" << "allproj=" << allproj << "\t" << "phi=" << phi << "\tivmPlus=" << ivmPlus << "\t" << "tcid=" << tcid << " shift=" << shift << " nstub=" << nstub << " zbin=" << zbin.range(zbin.length()-1,1) << " VMProj zbin=" << VMProjection<VMProjType>(getProjection()).getZBin() << " projid=" << projdata.getIndex() << " proj=" << projdata.raw() << " isPS=" << ps << std::endl;
-#endif
   }
 
   // This constructor is only used for projections in DISK
