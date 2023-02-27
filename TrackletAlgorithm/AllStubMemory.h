@@ -4,7 +4,6 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 #include "globalFunctions.h"
-#include <bitset>
 
 // AllStubBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubBase {};
@@ -134,12 +133,6 @@ public:
   {
     AllStubData newdata(datastr, base);
     data_ = newdata;
-  }
-  void Print()
-  {
-    std::cout << std::hex << data_ << std::endl;
-    if(ASType == DISK2S) std::cout << std::bitset<AllStubBase<ASType>::kASRSize>(getR()) << "|" << std::bitset<AllStubBase<ASType>::kASZSize>(getZ()) << "|" << std::bitset<AllStubBase<ASType>::kASPhiSize>(getPhi()) << "|" << std::bitset<AllStubBase<ASType>::kASAlphaSize>(getAlpha()) << "|" << std::bitset<AllStubBase<ASType>::kASBendSize>(getBend()) << std::endl;
-    else std::cout << std::bitset<AllStubBase<ASType>::kASRSize>(getR()) << "|" << std::bitset<AllStubBase<ASType>::kASZSize>(getZ()) << "|" << std::bitset<AllStubBase<ASType>::kASPhiSize>(getPhi()) << "|" << std::bitset<AllStubBase<ASType>::kASBendSize>(getBend()) << std::endl;
   }
   #endif
 
