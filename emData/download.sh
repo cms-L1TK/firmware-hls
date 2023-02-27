@@ -332,12 +332,6 @@ do
           find ${table_location} -type f -name "MP_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ls -lrth {} \;
-          #find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          #find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          #find ${table_location} -type f -name "${module}_alphainner" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          #find ${table_location} -type f -name "${module}_alphaouter" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          #find ${table_location} -type f -name "${module}_rDSSinner" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          #find ${table_location} -type f -name "${module}_rDSSouter" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`

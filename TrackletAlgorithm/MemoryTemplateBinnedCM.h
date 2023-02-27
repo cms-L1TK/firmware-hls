@@ -63,10 +63,6 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNbitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    if(ap_uint<NBIT_BIN+1>(slot) < slot || ireg < (slot>>kNBitsRZBinCM)) {
-      std::cout << "Warning: " << slot << " is too large!" << std::endl;
-      return 0;
-    }
     return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
@@ -242,10 +238,7 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNbitsphibinCM> ireg;
     (ireg,ibin)=slot;
     ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
-    
-    if(ap_uint<NBIT_BIN+1>(slot) < slot || ireg < (slot>>kNBitsRZBinCM)) {
-      return false;
-    }
+
     DataType data(datastr.c_str(), base);
 
     bool success = write_mem(ibx, slot, data, nentry_ibx);

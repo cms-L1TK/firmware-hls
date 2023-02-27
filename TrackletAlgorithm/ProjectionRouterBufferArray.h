@@ -67,7 +67,6 @@ private:
   ap_uint<kNBitsBuffer> readptr_ = 0;
   ap_uint<kNBitsBuffer> writeptr_ = 0;
   ProjectionRouterBuffer<VMProjType,AllProjectionType> projbuffer_[1<<kNBitsBuffer];
-  //ProjectionRouterBuffer<VMProjType,AllProjectionType> projbuffer_[1<<kNBitsBuffer];
   ap_uint<(1 << (2 * kNBitsBuffer))> nearFullLUT = nearFullUnit<kNBitsBuffer>();
   ap_uint<(1 << (2 * kNBitsBuffer))> emptyLUT = emptyUnit<kNBitsBuffer>();
 
