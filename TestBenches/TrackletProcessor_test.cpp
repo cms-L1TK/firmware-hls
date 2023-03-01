@@ -46,32 +46,24 @@ int main()
 {
 // these need to be customized according to the specific TP being tested
 #if SEED_ == L1L2_
-  ap_uint<10> innervmtable[2048] =
-#include "../emData/TP/tables/TP_L1L2.tab"
   const auto InnerStubType = BARRELPS;
   const auto OuterStubType = BARRELPS;
   const string innerStubPattern = "AllInnerStubs*_L1*";
   const string outerStubPattern = "AllStubs*_L2*";
   const int NTEUnits=5;
 #elif SEED_ == L2L3_
-  ap_uint<10> innervmtable[2048] =
-#include "../emData/TP/tables/TP_L2L3.tab"
   const auto InnerStubType = BARRELPS;
   const auto OuterStubType = BARRELPS;
   const string innerStubPattern = "AllInnerStubs*_L2*";
   const string outerStubPattern = "AllStubs*_L3*";
   const int NTEUnits=2;
 #elif SEED_ == L3L4_
-  ap_uint<10> innervmtable[2048] =
-#include "../emData/TP/tables/TP_L3L4.tab"
   const auto InnerStubType = BARRELPS;
   const auto OuterStubType = BARREL2S;
   const string innerStubPattern = "AllInnerStubs*_L3*";
   const string outerStubPattern = "AllStubs*_L4*";
   const int NTEUnits=5;
 #elif SEED_ == L5L6_
-  ap_uint<10> innervmtable[2048] =
-#include "../emData/TP/tables/TP_L5L6.tab"
   const auto InnerStubType = BARREL2S;
   const auto OuterStubType = BARREL2S;
   const string innerStubPattern = "AllInnerStubs*_L5*";
@@ -81,103 +73,6 @@ int main()
   #error "Undefined seed"
 #endif
 std::cout<<module_name[MODULE_];
-#if (SEED_==L1L2_) and (ITC_ == A_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2A_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == B_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2B_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == C_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2C_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == D_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2D_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == E_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2E_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == F_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2F_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == G_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2G_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == H_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2H_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == I_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2I_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == J_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2J_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == K_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2K_usereg.tab"
-
-#elif (SEED_==L1L2_) and (ITC_ == L_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L1L2L_usereg.tab"
-
-#elif (SEED_==L2L3_) and (ITC_ == A_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L2L3A_usereg.tab"
-
-#elif (SEED_==L2L3_) and (ITC_ == B_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L2L3B_usereg.tab"
-
-#elif (SEED_==L2L3_) and (ITC_ == C_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L2L3C_usereg.tab"
-
-#elif (SEED_==L2L3_) and (ITC_ == D_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L2L3D_usereg.tab"
-
-#elif (SEED_==L3L4_) and (ITC_ == A_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L3L4A_usereg.tab"
-
-#elif (SEED_==L3L4_) and (ITC_ == B_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L3L4B_usereg.tab"
-
-#elif (SEED_==L3L4_) and (ITC_ == C_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L3L4C_usereg.tab"
-
-#elif (SEED_==L3L4_) and (ITC_ == D_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L3L4D_usereg.tab"
-
-#elif (SEED_==L5L6_) and (ITC_ == A_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L5L6A_usereg.tab"
-
-#elif (SEED_==L5L6_) and (ITC_ == B_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L5L6B_usereg.tab"
-
-#elif (SEED_==L5L6_) and (ITC_ == C_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L5L6C_usereg.tab"
-
-#elif (SEED_==L5L6_) and (ITC_ == D_)
-  ap_uint<8> useregion[] =
-#include "../emData/TP/tables/TP_L5L6D_usereg.tab"
-
-#endif
 //
   TBHelper tb(std::string("TP/") + module_name[MODULE_]);
   // error counts
@@ -243,7 +138,7 @@ std::cout<<module_name[MODULE_];
     BXType bx_o;
 
     // Unit Under Test
-    TOP_FUNC_(bx, bx_o, innervmtable ,useregion, innerStubs.data(), outerStubs.data(), outervmStubs.data(),  &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    TOP_FUNC_(bx, bx_o, innerStubs.data(), outerStubs.data(), outervmStubs.data(),  &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 
     bool truncation = false;
 

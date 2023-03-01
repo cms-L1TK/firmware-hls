@@ -238,8 +238,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const ap_uint<1+2*TrackletEngineUnit<TF::"+seed+", TC::"+iTC+","+innerType[tpName]+","+outerType[tpName]+">::kNBitsRZFine+TrackletEngineUnit<TF::"+seed+", TC::"+iTC+","+innerType[tpName]+","+outerType[tpName]+">::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],\n"
-          "    const ap_uint<(1<<TrackletEngineUnit<TF::"+seed+", TC::"+iTC+","+innerType[tpName]+","+outerType[tpName]+">::kNBitsPhiBins)> regionlut[1<<(AllStubInner<"+innerType[tpName]+">::kASBendSize+AllStubInner<"+innerType[tpName]+">::kASFinePhiSize)],\n" 
           "    const AllStubInnerMemory<"+innerType[tpName]+"> innerStubs["+str(nASMemInner)+"],\n"
           "    const AllStubMemory<OuterRegion<TF::" + seed + ">()>* outerStubs,\n"
           "    const VMStubTEOuterMemoryCM<"+outerType[tpName]+", kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::"+seed+"]>* outerVMStubs,\n"
@@ -256,8 +254,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const ap_uint<10> lut[2048],\n"
-          "    const ap_uint<8> regionlut["+str(regionlutlen)+"],\n"
           "    const AllStubInnerMemory<"+innerType[tpName]+"> innerStubs[" + str(nASMemInner) + "],\n"
           "    const AllStubMemory<OuterRegion<TF::" + seed + ">()>* outerStubs ,\n"
           "    const VMStubTEOuterMemoryCM<" + outerType[tpName] + ", kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::"+ seed +"]>* outerVMStubs,\n"
@@ -270,6 +266,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS interface register port=bx_o\n"
           "#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2\n"
           "#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2\n"
+          "ap_uint<10> lut[2048]=\n"
+          '#include "../emData/TP/tables/TP_' + seed  +'.tab" \n'
+          "ap_uint<8> regionlut["+str(regionlutlen)+"]=\n"
+          '#include "../emData/TP/tables/TP_' + seed + iTC +'_usereg.tab" \n'
       )
       for i in range(0, nASMemInner):
           topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
