@@ -282,8 +282,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           ") {\n"
           "#pragma HLS inline recursive\n"
           "#pragma HLS interface register port=bx_o\n"
-          "#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2\n"
-          "#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2\n"
       )
       for i in range(0, nASMemInner):
           topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
