@@ -165,7 +165,7 @@ template<TF::seed Seed> constexpr regionType OuterRegion() {
     )
   );
 }
-//FIXME test putting this here instead of top function
+////// TE functions that used to live in top file
 
 inline ap_uint<1> nearFullTEBuff(const ap_uint<TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits>& writeptr,
         const ap_uint<TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits>& readptr) {
@@ -190,10 +190,6 @@ inline ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBi
   }
   return lut;
  }
-/////////
-
-//ap_uint<1> nearFullTEBuff(const ap_uint<3>&, const ap_uint<3>&);
-//ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::D,BARRELPS,BARRELPS>::kNBitsBuffer))> nearFullTEUnitInit();
 
 ////////////////////////////////////////////////////////////////////////////////
 
