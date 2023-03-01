@@ -15,15 +15,9 @@
 
 #ifdef CMSSW_GIT_HASH
 #define NBIT_BX 0
-<<<<<<< HEAD
 template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
 #else
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
-=======
-template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNbitsphibinCM, unsigned int NCOPY>
-#else
-template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNbitsphibinCM, unsigned int NCOPY>
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
 #endif
 
 // DataType: type of data object stored in the array
@@ -44,27 +38,18 @@ class MemoryTemplateBinnedCM{
     kNBxBins = 1<<NBIT_BX,
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
-<<<<<<< HEAD
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
     kNBinsRZ = (1<<kNBitsRZBinCM),
     slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM)),
     entries8 = 32
-=======
-    kNBitsRZBinCM = NBIT_BIN-kNbitsphibinCM
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
-<<<<<<< HEAD
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<entries8> nentries8A_[slots];
   ap_uint<entries8> nentries8B_[slots];
-=======
-  ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
-  ap_uint<36> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
   
  public:
 
@@ -76,11 +61,7 @@ class MemoryTemplateBinnedCM{
 
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
-<<<<<<< HEAD
     ap_uint<kNBitsphibinCM> ireg;
-=======
-    ap_uint<kNbitsphibinCM> ireg;
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
     (ireg,ibin)=slot;
     return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
   }
@@ -178,16 +159,15 @@ class MemoryTemplateBinnedCM{
       
       #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
-<<<<<<< HEAD
       ap_uint<kNBitsphibinCM> ireg;
-=======
-      ap_uint<kNbitsphibinCM> ireg;
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
       (ireg,ibin)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
+      std::cout << "ibin: " << ibin << ", ireg: " << ireg << ", slot: " << slot << ", nentries8_: " << nentries8_[ibx][ibin] << ",\nnentries8_[ibx][ibin].range(ireg*4+3,ireg*4): " <<
+		nentries8_[ibx][ibin].range(ireg*4+3,ireg*4) << ", nentry_ibx+1: " << nentry_ibx+1 << ", binmask8_: " << binmask8_[ibx][ibin] << 
+                "size of array: " << sizeof(nentries8_) / sizeof(nentries8_[0]) << " by " << sizeof(nentries8_[0]) / sizeof(ap_uint<32>) << std::endl;
       #endif
 
       return true;
@@ -257,17 +237,16 @@ class MemoryTemplateBinnedCM{
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
 
+    std::cout << "*************In memory template binned **************\nknBitsRZBinCM: " << kNBitsRZBinCM << ", kNbitsphibin: " << kNbitsphibin << std::endl;   
+
     ap_uint<kNBitsRZBinCM> ibin;
-<<<<<<< HEAD
     ap_uint<kNBitsphibinCM> ireg;
-=======
-    ap_uint<kNbitsphibinCM> ireg;
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
     (ireg,ibin)=slot;
     ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
     DataType data(datastr.c_str(), base);
-
+    std::cout << "pre second write mem" <<  std::endl;
     bool success = write_mem(ibx, slot, data, nentry_ibx);
+    std::cout << "write mem success: " << success << std::endl;
     #ifndef CMSSW_GIT_HASH
     if (success) {
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
@@ -276,7 +255,7 @@ class MemoryTemplateBinnedCM{
       binmask8_[ibx][ibin].set_bit(ireg,true);
     }
     #endif
-
+    std::cout << "returning..." << std::endl;
     return success;
   }
 
