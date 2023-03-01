@@ -166,8 +166,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "   }\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
-  
-  
+      "template<TF::seed Seed, TC::itc iTC> const int* getRegionLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const int* getLUT();\n"
   )
   topHeaderFile.write(
       "#ifndef TopFunctions_TrackletProcessorTop_h\n"
@@ -228,8 +228,26 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "}\n"
           "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n"
           "  return 0x%X;\n"
-          "}\n")
-          % (tprojMaskBarrel, tprojMaskDisk)
+          "}\n"
+          'template<> inline const int* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static int lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const int* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static int lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + '.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+)% (tprojMaskBarrel, tprojMaskDisk)
       )
   
       # Print out prototype for top function for this TC.
@@ -276,10 +294,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
           "\n"
-          "ap_uint<10> lut[2048]=\n"
-          '#include "../emData/TP/tables/TP_' + seed  +'.tab" \n'
-          "ap_uint<8> regionlut["+str(regionlutlen)+"]=\n"
-          '#include "../emData/TP/tables/TP_' + seed + iTC +'_usereg.tab" \n'
+          "static const int* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
+          "static const int* regionlut = getRegionLUT<TF::" + seed + ", TC::" + iTC +">();\n"
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"

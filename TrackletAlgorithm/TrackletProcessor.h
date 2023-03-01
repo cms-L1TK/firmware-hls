@@ -542,7 +542,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner], const AllStubMemory<OuterRegion>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
+		    const BXType bx,  BXType& bx_o, const int lut[], const int regionlut[], const AllStubInnerMemory<InnerRegion> innerStubs[NASMemInner], const AllStubMemory<OuterRegion>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion,RZBins,PhiBins,NTEUnits>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
 {
   static_assert(Seed == TF::L1L2||Seed==TF::L2L3||Seed==TF::L3L4||Seed==TF::L5L6, "Only L1L2 and L2L3  seeds have been implemented so far.");
 
