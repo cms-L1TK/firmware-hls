@@ -266,10 +266,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS interface register port=bx_o\n"
           "#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2\n"
           "#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2\n"
-          "ap_uint<10> lut[2048]=\n"
-          '#include "../emData/TP/tables/TP_' + seed  +'.tab" \n'
-          "ap_uint<8> regionlut["+str(regionlutlen)+"]=\n"
-          '#include "../emData/TP/tables/TP_' + seed + iTC +'_usereg.tab" \n'
       )
       for i in range(0, nASMemInner):
           topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
@@ -279,6 +275,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+          "\n"
+          "ap_uint<10> lut[2048]=\n"
+          '#include "../emData/TP/tables/TP_' + seed  +'.tab" \n'
+          "ap_uint<8> regionlut["+str(regionlutlen)+"]=\n"
+          '#include "../emData/TP/tables/TP_' + seed + iTC +'_usereg.tab" \n'
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
