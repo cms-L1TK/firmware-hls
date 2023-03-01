@@ -165,9 +165,35 @@ template<TF::seed Seed> constexpr regionType OuterRegion() {
     )
   );
 }
+//FIXME test putting this here instead of top function
 
-ap_uint<1> nearFullTEBuff(const ap_uint<3>&, const ap_uint<3>&);
-ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::D,BARRELPS,BARRELPS>::kNBitsBuffer))> nearFullTEUnitInit();
+inline ap_uint<1> nearFullTEBuff(const ap_uint<TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits>& writeptr,
+        const ap_uint<TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits>& readptr) {
+  ap_uint<3> writeptr1=writeptr+1;
+  ap_uint<3> writeptr2=writeptr+2;
+  ap_uint<3> writeptr3=writeptr+3;
+  ap_uint<1> result=writeptr1==readptr||writeptr2==readptr||writeptr3==readptr;
+  return result;
+}
+inline ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer))> nearFullTEUnitInit() {
+  ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer))> lut(0);
+  int i;
+  for(i=0;i<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer));i++) {
+    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr,rptr;
+    ap_uint<2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> address(i);
+    (rptr,wptr)=address;
+    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr1=wptr+1;
+    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr2=wptr+2;
+    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr3=wptr+3;
+    ap_uint<1> result=wptr1==rptr||wptr2==rptr||wptr3==rptr;
+    lut[i]=result;
+  }
+  return lut;
+ }
+/////////
+
+//ap_uint<1> nearFullTEBuff(const ap_uint<3>&, const ap_uint<3>&);
+//ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::D,BARRELPS,BARRELPS>::kNBitsBuffer))> nearFullTEUnitInit();
 
 ////////////////////////////////////////////////////////////////////////////////
 
