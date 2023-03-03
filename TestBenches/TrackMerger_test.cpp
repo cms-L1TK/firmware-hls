@@ -30,14 +30,14 @@ int main(){
   TrackFitType::DiskStubWord diskStubWords_o[kMaxTrack][4];
   TrackFitMemory<NBarrelStub, NDiskStub> outputTracks;
   // int outputNumber;
-
+ 
   TBHelper tb("../../../../../emData/PD/PD/");
 
   // Open input files
-  auto &fin_inputTracks = tb.files("old_TrackFit_TF_L1L2*");
+  auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("old_CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged or if no merge make a copy e.g. output_TrackFit_TF_L1L2*
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged or if no merge make a copy e.g. output_TrackFit_TF_L1L2*
   // Loop over events
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) { 
     cout << "Event: " << dec << ievt << endl;
@@ -111,10 +111,12 @@ int main(){
       
       outputTracks.write_mem(bx, track, nTracks );
       ++nTracks;
+      
     } 
 
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory<NBarrelStub, NDiskStub>>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
+    outputTracks.clear();
     
   }
 

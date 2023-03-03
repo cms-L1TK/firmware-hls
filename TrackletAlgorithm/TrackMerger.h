@@ -13,11 +13,7 @@ const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
 
 class ComparisonModule{
     public:
-    ComparisonModule()
-     {  tracksProcessed = 0;
-        masterTrack._trackWord = 0;
-
-      }
+    ComparisonModule(){};
     ~ComparisonModule(){};
 
     unsigned int getMatchFound(){return matchFound;}
@@ -32,13 +28,16 @@ class ComparisonModule{
     
     TrackStruct& getMasterTrackStruct();
 
+    void resetCM();
+
+
   private:
 
     unsigned int matchFound{0};
     unsigned int mergeCondition = 3;
-    unsigned int tracksProcessed{0};
     unsigned int endOfStream{0};
     unsigned int endOfModule{0};
+    unsigned int tracksProcessed{0};
 
     TrackStruct masterTrack;
     TrackHandler trackHandler;
@@ -71,8 +70,6 @@ void TrackMerger(const BXType bx,
   TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub], 
   TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub] 
   );
-
-
 
 
 #endif

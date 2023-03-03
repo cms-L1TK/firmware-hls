@@ -27,8 +27,18 @@ void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack
   return;
 }
 
+void ComparisonModule::resetCM(){
+  masterTrack.resetTracks();
+  tracksProcessed = 0;
+
+  return;
+}
+
 void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i){
-  outTrack[i] = inTrack;}
+  outTrack[i] = inTrack;
+  
+  return;
+}
 
 void loadTrack(
   const TrackFitType::TrackWord& trackWordIn,
@@ -89,16 +99,33 @@ void TrackMerger(const BXType bx,
   TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub]
   )
 {
-  static ComparisonModule comparisonModule[kNComparisonModules];
+  ComparisonModule comparisonModule[kNComparisonModules];
   #pragma HLS array_partition variable=comparisonModule dim=1
 
-  static TrackStruct unmergedTracks[kNLastTracks];
+  TrackStruct unmergedTracks[kNLastTracks];
   #pragma HLS data_pack variable=unmergedTracks
 
-  static TrackStruct cmTracks[kNComparisonModules];
+  TrackStruct cmTracks[kNComparisonModules];
   #pragma HLS data_pack variable=cmTracks
   
-  
+  LOOP_ResetUnmergedTrks:
+  for (unsigned int nTracks = 0; nTracks < kNLastTracks; nTracks++){
+    #pragma HLS unroll
+    unmergedTracks[nTracks].resetTracks();
+  }
+
+  LOOP_ResetCMTrks:
+  for (unsigned int nCMTracks = 0; nCMTracks < kNComparisonModules; nCMTracks++){
+    #pragma HLS unroll
+    cmTracks[nCMTracks].resetTracks();
+  }
+
+  LOOP_ResetCMs:
+  for (unsigned int nCM = 0; nCM < kNComparisonModules; nCM++){
+    #pragma HLS unroll
+    comparisonModule[nCM].resetCM();
+  }
+
   unsigned int unmergedIndx{0};
   
   // Looping over all tracks
@@ -117,11 +144,12 @@ void TrackMerger(const BXType bx,
     LOOP_ProcTracks:
     for (unsigned int j = 0; j < kNComparisonModules; j++){
       comparisonModule[j].process(tracks[j], tracks[j+1]);
-      tracks[j] = TrackStruct();
+      tracks[j].resetTracks();
     }
     // When the unmerged track reaches the end of the buffer - put in unmerged tracks array to be output
     if (tracks[kNComparisonModules].getTrkWord() != 0){
       fillTrackArray(tracks[kNComparisonModules], unmergedTracks, unmergedIndx);
+      tracks[kNComparisonModules].resetTracks();
       unmergedIndx++;
     }
 
@@ -132,7 +160,7 @@ void TrackMerger(const BXType bx,
   for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
     #pragma HLS pipeline II=1
     cmTracks[nModule] = comparisonModule[nModule].getMasterTrackStruct(); // This line fills CM array to be read out at same time as unmerged tracks
-    comparisonModule[nModule] = ComparisonModule(); // Resetting
+    comparisonModule[nModule].resetCM(); // Resetting
   }
 
   // Setting outputs in same loop
@@ -142,23 +170,20 @@ void TrackMerger(const BXType bx,
     TrackStruct trk;
     if (outputIndex < kNComparisonModules) {
       trk = cmTracks[outputIndex];
-      cmTracks[outputIndex] = TrackStruct(); // Resetting
+      cmTracks[outputIndex].resetTracks(); // Resetting
+    } else if ((outputIndex - kNComparisonModules) < kNLastTracks) {
+      trk = unmergedTracks[outputIndex-kNComparisonModules];
+      unmergedTracks[outputIndex-kNComparisonModules].resetTracks(); // Resetting      
     } else {
-      if ((outputIndex - kNComparisonModules) < kNLastTracks){
-        trk = unmergedTracks[outputIndex-kNComparisonModules];
-        unmergedTracks[outputIndex-kNComparisonModules] = TrackStruct(); // Resetting
-      }
-      
+      trk.resetTracks();
     }
     
-    // Check if trk is 0, if so do not unload
-    if (trk.getTrkWord() !=0){
-    // Sending to output
-      unloadTrack(trk, 
-                  trackWord_o[outputIndex], 
-                  barrelStubWords_o[outputIndex], 
-                  diskStubWords_o[outputIndex]);
-    }
+    // Send track to output
+    unloadTrack(trk, 
+                trackWord_o[outputIndex], 
+                barrelStubWords_o[outputIndex], 
+                diskStubWords_o[outputIndex]);
+
     
   }
   bx_o = bx;

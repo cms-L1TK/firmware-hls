@@ -1,5 +1,27 @@
 #include "TrackHandler.h"
 
+void TrackStruct::resetTracks(){
+  _trackWord = 0;
+  LOOP_BarrelStubReset: 
+  for (unsigned int nBarrelLayer = 0; nBarrelLayer < NBarrelStub; nBarrelLayer++){
+    #pragma HLS unroll
+    for (unsigned int nBarrelStubs = 0; nBarrelStubs < maxNumStubs; nBarrelStubs++){
+      #pragma HLS loop_flatten
+      _barrelStubArray[nBarrelLayer][nBarrelStubs] = 0;
+    }
+  }
+  LOOP_DiskStubReset:
+  for (unsigned int nDiskLayer = 0; nDiskLayer < NDiskStub; nDiskLayer++){
+    #pragma HLS unroll
+    for (unsigned int nDiskStubs = 0; nDiskStubs < maxNumStubs; nDiskStubs++){
+      #pragma HLS loop_flatten
+      _diskStubArray[nDiskLayer][nDiskStubs] = 0;
+    }
+  }
+
+  return;
+}
+
 bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, unsigned int& matchFound, unsigned int mergeCondition){
   // Compare the two tracks, masterTrack and trk
   #pragma HLS array_partition variable=matchesFoundBarrel complete dim=0
@@ -14,7 +36,8 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
     ap_uint<TrackFitType::kTFStubIndexSize> masterBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
     ap_uint<TrackFitType::kTFStubIndexSize> inputBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
     
-    matchesFoundBarrel[barrelStubNum][0] = ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ?  1 : 0;  }
+    matchesFoundBarrel[barrelStubNum][0] = ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ?  1 : 0; 
+  }
   LOOP_CompareDiskStubs:
   for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
     #pragma HLS unroll
@@ -67,7 +90,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
   for (unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){ 
     #pragma HLS unroll
     LOOP_MergeBarrelStubs:
-    for (unsigned int barrelStubIndex = 1; barrelStubIndex < layerStubIndexSize; barrelStubIndex++){
+    for (unsigned int barrelStubIndex = 1; barrelStubIndex < maxNumStubs; barrelStubIndex++){
        #pragma HLS loop_flatten
       if((masterTrk._barrelStubArray[barrelStubNum][barrelStubIndex] == 0) && (trk._barrelStubArray[barrelStubNum][barrelStubIndex] != 0)){
         masterTrk._barrelStubArray[barrelStubNum][barrelStubIndex] = trk._barrelStubArray[barrelStubNum][barrelStubIndex];
@@ -83,7 +106,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
   for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
     #pragma HLS unroll
     LOOP_MergeDiskStubs:
-    for (unsigned int diskStubIndex = 1; diskStubIndex < layerStubIndexSize; diskStubIndex++){
+    for (unsigned int diskStubIndex = 1; diskStubIndex < maxNumStubs; diskStubIndex++){
       #pragma HLS loop_flatten
       if((masterTrk._diskStubArray[diskStubNum][diskStubIndex] == 0) && (trk._diskStubArray[diskStubNum][diskStubIndex] != 0)){
         masterTrk._diskStubArray[diskStubNum][diskStubIndex] = trk._diskStubArray[diskStubNum][diskStubIndex];
@@ -96,4 +119,5 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
       }
     }
   }
+  return;
 }
