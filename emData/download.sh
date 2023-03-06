@@ -9,11 +9,11 @@ luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/h1x7phQ9EKvj7gx/LU
 memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/s7nv7Qy2tiKKX3m/MemPrints.tar.gz"
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/uYQJKob271Lwq0i/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/ZBDuNJHAnRFt7X0/MemPrints.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/2aoxmZbYPFk4Jut/LUTs.tar.gz"
-# Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/U2xZnaexKwmmJn8/MemPrints.tar.gz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY9VJZjEc/LUTs.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/s/CWHJuTNGMfOYVlb/download"
+luts_url_cm="https://cernbox.cern.ch/s/CWHJuTNGMfOYVlb/download"
+# Reduced Combined modules                                                      
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
+luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
 # Reduced Combined modules2
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
 luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
@@ -86,7 +86,7 @@ then
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
-  tar -xzmf LUTs.tgz
+  tar -xzf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm2}
@@ -327,11 +327,10 @@ do
   elif [[ ${module_type} == "MP" ]]
   then
           layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
-          find ${table_location} -type f -name "ProjectionDiskRadius.tab" -exec ls -lrth {} \;
+          find ${table_location} -type f -name "ProjectionDiskRadius.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "MP_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "${module}_*.tab" -exec ls -lrth {} \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
