@@ -9,8 +9,8 @@ luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/i0kr2DI0SFY5m1A/LU
 memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/6pM48rxtsxrN9tg/MemPrints.tar.gz"
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/U84ZI1vGnVKkQKc/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/Nk0VWN7kRMZSFWm/MemPrints.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/LoqjBIg2ARZav8u/LUTs.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/s/CWHJuTNGMfOYVlb/download"
+luts_url_cm="https://cernbox.cern.ch/s/CWHJuTNGMfOYVlb/download"
 # Reduced Combined modules                                                      
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
@@ -86,7 +86,7 @@ then
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm}
-  tar -xzmf LUTs.tgz
+  tar -xzf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm2}
@@ -327,11 +327,10 @@ do
   elif [[ ${module_type} == "MP" ]]
   then
           layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
-          find ${table_location} -type f -name "ProjectionDiskRadius.tab" -exec ls -lrth {} \;
+          find ${table_location} -type f -name "ProjectionDiskRadius.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "MP_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "${module}_*.tab" -exec ls -lrth {} \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
