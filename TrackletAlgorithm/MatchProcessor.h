@@ -1289,6 +1289,8 @@ void MatchProcessor(BXType bx,
   */
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
+    if (hasMatch)
+      matchengine[bestiMEU].advance();
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -1340,9 +1342,11 @@ void MatchProcessor(BXType bx,
 
     projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
     
-    ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+    bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+    //ap_uint<2> bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
 
-    ap_uint<1> hasMatch = !emptys[bestiMEU];
+    hasMatch = !emptys[bestiMEU];
+    //ap_uint<1> hasMatch = !emptys[bestiMEU];
     
 /*
     // old code - keep for now
