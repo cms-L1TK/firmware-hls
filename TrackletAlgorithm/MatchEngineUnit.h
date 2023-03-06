@@ -212,11 +212,15 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
     //auto isPSStub=stubdata___.isPSStub();
+    /*
     bool isPSStub = VMProjType==BARREL ?
                         LAYER <= TF::D3 ? true : false
                     : allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
+    */
     //const ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize-2> absz = -1;
     const int absz = 7;
+    VMProjection<VMProjType> data(projbuffer_.getProjection());
+    zbin = data.getZBinNoFlag();
     /*
     bool isPSStub;
     if (VMProjType==BARREL) {
@@ -224,19 +228,18 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     } else {
       //if (layerdisk_ < N_LAYER + 2) {
       if (LAYER <= TF::D2) {
-        isPSStub = ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3);
-        isPSStub = (zbin___ < 3) || (zbin___ == 3 && stubfinez <= 3);
+        isPSStub = ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 3);
+        isPSStub = (zbin < 3) || (zbin == 3 && stubfinez <= 3);
       } else {
-        isPSStub = ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
-        isPSStub = (zbin___ < 3) || (zbin___ == 3 && stubfinez <= 2);
+        isPSStub = ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 2);
+        isPSStub = (zbin < 3) || (zbin == 3 && stubfinez <= 2);
       }
     }
     */
-    /*
     const bool isPSStub = VMProjType==BARREL ? LAYER <= TF::L3 : 
-                                               LAYER <= TF::D2 ? ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3) :
-                                                                 ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
-    const bool isPSStub = (zbin___ <=3);
+                                               LAYER <= TF::D2 ? ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 3) :
+                                                                 ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 2);
+    /*
     */
     auto stubbendReduced=stubdata___.getBendPSDisk();
 
