@@ -10,7 +10,7 @@ memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/s7nv7
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/uYQJKob271Lwq0i/LUTs.tar.gz"
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/s/luEENjQBPTGNSYd/download"
-luts_url_cm="https://cernbox.cern.ch/s/yndReEKYIXciSfd/download"
+luts_url_cm="https://cernbox.cern.ch/s/YrntTfrxwIasgxV/download"
 # Reduced Combined modules                                                      
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
