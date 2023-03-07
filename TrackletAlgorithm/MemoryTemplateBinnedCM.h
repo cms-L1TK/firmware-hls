@@ -15,9 +15,9 @@
 
 #ifdef CMSSW_GIT_HASH
 #define NBIT_BX 0
-template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNbitsphibinCM, unsigned int NCOPY>
+template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
 #else
-template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNbitsphibinCM, unsigned int NCOPY>
+template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
 #endif
 
 // DataType: type of data object stored in the array
@@ -38,7 +38,7 @@ class MemoryTemplateBinnedCM{
     kNBxBins = 1<<NBIT_BX,
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
-    kNBitsRZBinCM = NBIT_BIN-kNbitsphibinCM
+    kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
@@ -56,7 +56,7 @@ class MemoryTemplateBinnedCM{
 
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNbitsphibinCM> ireg;
+    ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
     return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
   }
@@ -119,7 +119,7 @@ class MemoryTemplateBinnedCM{
       
       #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
-      ap_uint<kNbitsphibinCM> ireg;
+      ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
@@ -189,7 +189,7 @@ class MemoryTemplateBinnedCM{
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
 
     ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNbitsphibinCM> ireg;
+    ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
     ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
 
