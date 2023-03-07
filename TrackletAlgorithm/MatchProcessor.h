@@ -176,7 +176,7 @@ void readTable(ap_uint<1> table[]){
 
   if (L==TF::L5) {
     bool tmp[512]=
-#include "../emData/ME/tables/METable_L5.tab"
+#include "../emData/MP/tables/METable_L5.tab"
     for (int i=0;i<512;++i){
 #pragma HLS unroll
       table[i]=tmp[i];
@@ -185,7 +185,7 @@ void readTable(ap_uint<1> table[]){
 
   if (L==TF::L6) {
     bool tmp[512]=
-#include "../emData/ME/tables/METable_L6.tab"
+#include "../emData/MP/tables/METable_L6.tab"
     for (int i=0;i<512;++i){
 #pragma HLS unroll
       table[i]=tmp[i];
@@ -1431,14 +1431,14 @@ void MatchProcessor(BXType bx,
       
       // PS seed
       // top 3 bits of tracklet index indicate the seeding pair
-      ap_uint<nbits_seed> iseed = trackletid.range(trackletid.length()-1,trackletid.length()-nbits_seed);
+      const ap_uint<nbits_seed> iseed = trackletid.range(trackletid.length()-1,trackletid.length()-nbits_seed);
       // Cf. https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATrackletCalculator.hh#L166
       // and here?
       // https://github.com/cms-tracklet/fpga_emulation_longVM/blob/fw_synch/FPGATracklet.hh#L1621
       // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
       
       // All seeding pairs are PS modules except L3L4 and L5L6
-      bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
+      const bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
       
       
       // vmproj index
