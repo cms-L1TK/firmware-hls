@@ -1059,7 +1059,6 @@ void MatchCalculator(BXType bx,
   const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid  = stubid;
   const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = isDisk ? (isPSStub ? ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_ps_r) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_2s_r)) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_r);
   const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
-  //const typename FullMatch<FMTYPE>::FMZRES          fm_z     = delta_z;
   const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : ap_int<12>(delta_r);
   
   // Full match  
@@ -1473,18 +1472,13 @@ void MatchProcessor(BXType bx,
       ap_uint<nZbinBits> zfirst, zlast, rtmp, rfirst;
       ap_uint<1> rsecond;
 
-      //(zfirst, zlast) = zbinLUT[(psseed,zbin6)];
       ap_uint<nRbinBits> rbin = rbinLUT[rbin8];
       typename VMProjection<VMPTYPE>::VMPFINEZ finer = rbin >> nZbinBits;
       rtmp = rbin.range(nZbinBits, 0);
       rfirst = rtmp >> 1;
       rsecond = rtmp & 1;
-      //(finer,rfirst,rsecond) = rbin;//.range(nZbinBits, 0);
-      //rfirst = izder < 0 ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       rfirst = (izder.range(izder.length()-1, izder.length()-1)  == 1) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
       (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
-      //rfirst = (projdata_.getRZDer()>0) ? rfirst : ap_uint<nZbinBits>(rfirst + (1<<nRbinBits));
-      //rbin.range(nZbinBits+1, 1) = (projdata_.getRZDer()>0) ? rbin.range(nZbinBits, 1) : rbin.range(nZbinBits+1, 1) + (1<<kNbitsrzbinMP);
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (LAYER < trklet::N_LAYER) ? (zfirst, zfirst!=zlast) : (rfirst,rsecond);
 
@@ -1509,7 +1503,6 @@ void MatchProcessor(BXType bx,
         int phiderindex = (phiprojder >> (AllProjectionBase<APTYPE>::kAProjPhiDSize - nphiderbits_)) & ((1 << nphiderbits_) - 1);
         int bendindex = (signindex << (nphiderbits_ + nrbits_)) + (rindex << (nphiderbits_)) + phiderindex;
         rinv = LUT_matchcut_rbend[bendindex];
-        //projdata_.setRZ(rinv);
       }
       
       ///////////////////////////////////
