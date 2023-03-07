@@ -141,7 +141,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     VMProjection<VMProjType> data(projbuffer_.getProjection());
 
     //FIXME is this valid? Only using range(3,1) instead of full range, zfirst in MatchProcessor.h
-    zbin = data.getZBinNoFlag();
+    zbin_ = data.getZBinNoFlag();
 
     auto projfinez = data.getFineZ();
     projfinephi__ = data.getFinePhi();
@@ -163,9 +163,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     projrinv__ = data.getRInv();
 
   }
-  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iusetmp].range(0,0)) * nbins + zbin + use_[iusetmp].range(1,1);
+  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iusetmp].range(0,0)) * nbins + zbin_ + use_[iusetmp].range(1,1);
+  zbin__ = zbin_ + use_[iusetmp].range(1,1);
   //Read stub memory and extract data fields
-  auto stubtmp=(iphiSave,zbin);
+  auto stubtmp=(iphiSave,zbin_);
   auto stubadd=(slot,istubtmp);
   stubdata__ = stubmem[bx_&3][stubadd];
    
@@ -204,43 +205,18 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
 
 
-  inline void processPipeLine(ap_uint<1> *table, const AllStubMemory<ASTYPE>* allstub) {
+  inline void processPipeLine(ap_uint<1> *table) {
 #pragma HLS inline
 
     auto stubindex=stubdata___.getIndex();
     auto stubfinez=stubdata___.getFineZ();
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
-    //auto isPSStub=stubdata___.isPSStub();
-    /*
-    bool isPSStub = VMProjType==BARREL ?
-                        LAYER <= TF::D3 ? true : false
-                    : allstub->read_mem(bx_,stubdata___.getIndex()).isPSStub();
-    */
     //const ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize-2> absz = -1;
     const int absz = 7;
-    VMProjection<VMProjType> data(projbuffer_.getProjection());
-    zbin = data.getZBinNoFlag();
-    /*
-    bool isPSStub;
-    if (VMProjType==BARREL) {
-        isPSStub = LAYER <= TF::D3;
-    } else {
-      //if (layerdisk_ < N_LAYER + 2) {
-      if (LAYER <= TF::D2) {
-        isPSStub = ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 3);
-        isPSStub = (zbin < 3) || (zbin == 3 && stubfinez <= 3);
-      } else {
-        isPSStub = ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 2);
-        isPSStub = (zbin < 3) || (zbin == 3 && stubfinez <= 2);
-      }
-    }
-    */
     const bool isPSStub = VMProjType==BARREL ? LAYER <= TF::L3 : 
-                                               LAYER <= TF::D2 ? ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 3) :
-                                                                 ((zbin & absz) < 3) || ((zbin & absz) == 3 && stubfinez <= 2);
-    /*
-    */
+                                               LAYER <= TF::D2 ? ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3) :
+                                                                 ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
     auto stubbendReduced=stubdata___.getBendPSDisk();
 
     const int projfinephibits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
@@ -297,6 +273,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     projrinv___ = projrinv__t;
     projbuffer___ = projbuffer__t;
     projseq___ = projseq__t;
+    zbin___ = zbin__t;
 
     good__t = good__;
     stubdata__t = stubdata__;
@@ -306,6 +283,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     projrinv__t = projrinv__;
     projbuffer__t = projbuffer__;
     projseq__t = projseq__;
+    zbin__t = zbin__;
   }
 
 #ifndef __SYNTHESIS__
@@ -486,7 +464,7 @@ inline void advance() {
  ap_uint<2> use_[kNuse];
 
 
- typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::VMPZBINNOFLAG zbin;
+ typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::VMPZBINNOFLAG zbin_, zbin__, zbin___, zbin__t;
 
  //Pipeline variables
  bool good__, good__t, good___;
