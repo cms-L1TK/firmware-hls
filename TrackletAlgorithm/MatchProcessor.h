@@ -1447,7 +1447,11 @@ void MatchProcessor(BXType bx,
       // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
       
       // All seeding pairs are PS modules except L3L4 and L5L6
-      const bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6);
+      const bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6); 
+      
+      
+      // vmproj index
+      const typename VMProjection<VMPTYPE>::VMPID &index = nallproj;
       
       // vmproj z
       // Separate the vm projections into zbins
