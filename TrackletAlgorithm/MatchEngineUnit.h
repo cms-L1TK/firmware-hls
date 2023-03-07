@@ -125,7 +125,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   NSTUB istubtmp=istub_;
   NSTUB iusetmp=iuse_;
 
-  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);//phiPlus_;
+  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
   auto secondSave = second_;
 
   VMProjection<VMProjType> data(projbuffer_.getProjection());
@@ -228,8 +228,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     auto stubfinez=stubdata___.getFineZ();
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
-    //const ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize-2> absz = -1;
-    const int absz = 7;
+    constexpr int absz = (1 << MatchEngineUnitBase<VMProjType>::kNBitsBuffer) - 1;
     const bool isPSStub = VMProjType==BARREL ? LAYER <= TF::L3 : 
                                                LAYER <= TF::D2 ? ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3) :
                                                                  ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
@@ -260,10 +259,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
       pass = isPSStub ? isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)];
     }
 
-    //ap_uint<9> const index=projrinv___.concat(stubbend);
-    //auto const index=projrinv___.concat(stubbend);
-    //ap_uint<VMProjectionBase<VMProjType>::kVMProjRinvSize + VMStubMECMBase<VMSMEType>::kVMSMEBendSize> index = projrinv___.concat(stubbend);
-    //index.range(index.length()-1, index.length()-1) = (isDisk) && isPSseed___;
     //here we always use the larger number of bits for the bend
 	// Check if stub bend and proj rinv consistent
 	auto const index_part1 = (VMProjType == DISK && isPSseed___) ? projrinv___.concat(stubbendReduced) : projrinv___.concat(stubbend);
