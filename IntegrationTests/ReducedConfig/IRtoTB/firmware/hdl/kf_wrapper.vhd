@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-11-04
--- Last update: 2022-11-04
+-- Last update: 2023-02-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ begin  -- architecture rtl
       kf_dout => s_kf_dout
       );
 
-  kfout_top_1 : entity work.kfout_top
+  kfout_top_1 : entity work.kfout_top_conv
     port map (
       clk        => clk_i,
       kfout_din  => s_kf_dout,

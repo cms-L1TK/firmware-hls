@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-11-02
--- Last update: 2022-11-04
+-- Last update: 2023-02-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -46,6 +46,8 @@ package body tf_interface_pkg is
     for k in s'range loop
       s(k).valid          := l(k).valid;
       s(k).start_of_orbit := l(k).start_of_orbit;
+      s(k).start          := l(k).start;
+      s(k).last           := l(k).last;
     end loop;
     return s;
   end;

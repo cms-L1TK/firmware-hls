@@ -17,6 +17,7 @@ src common/hdl/tf_pkg_emp.vhd
 # KF
 include -c firmware-hls:KalmanFilter/kfin components.dep 
 include -c firmware-hls:KalmanFilter/kf components.dep 
+src kfout_top_conv.vhd
 src conv96to64.vhd
 include -c firmware-hls:KalmanFilter/kfout components.dep 
 include -c firmware-hls:KalmanFilter/tq components.dep 

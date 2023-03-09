@@ -6,7 +6,7 @@
 -- Author     : Filippo Marini  <filippo.marini@cern.ch>
 -- Company    : University of Colorado Boulder
 -- Created    : 2022-06-21
--- Last update: 2022-11-09
+-- Last update: 2023-02-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -170,11 +170,9 @@ begin  -- architecture rtl
       out_dout   => s_tfout
       );
 
-  q(0)        <= s_tfout(0);
-  q(1)        <= s_tfout(1);
-  q(0).strobe <= '1';
-  q(0).start  <= '0';
-  q(1).strobe <= '1';
-  q(1).start  <= '0';
+  q(4)        <= s_tfout(0);
+  q(5)        <= s_tfout(1);
+  q(4).strobe <= '1';
+  q(5).strobe <= '1';
 
 end architecture rtl;
