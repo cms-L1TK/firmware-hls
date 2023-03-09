@@ -14,12 +14,7 @@ template<int> class AllStub;
 #endif
 #endif
 
-#ifdef CMSSW_GIT_HASH
-#define NBIT_BX 0
-template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR>
-#else
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
-#endif
 
 // DataType: type of data object stored in the array
 // NBIT_BX: number of bits for BX;
