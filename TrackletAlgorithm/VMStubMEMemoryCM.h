@@ -147,10 +147,11 @@ public:
     data_.range(kVMSMEFineZMSB,kVMSMEFineZLSB) = finez;
   }
 
-#ifdef CMSSW_GIT_HVMSMEH
+#ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
     std::string str = decodeToBits(getIndex());
     str += "|"+decodeToBits(getBend());
+    str += "|"+decodeToBits(getFinePhi());
     str += "|"+decodeToBits(getFineZ());
     return str;
   }
