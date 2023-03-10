@@ -111,8 +111,6 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
-<<<<<<< HEAD
-=======
   bool isPSStub() const {
     if(VMSMEType == BARRELPS) return true;
     else if(VMSMEType == BARREL2S) return false;
@@ -120,15 +118,7 @@ public:
     static_assert(true, "Should not be possible!");
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> merge in files from mp_disk
-=======
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
->>>>>>> trying to rebase
-=======
->>>>>>> 8ceacc18cbbb13931e7f23bf7689b6156b34d0e0
->>>>>>> trying to rebase
+
   VMSMEBENDPSDISK getBendPSDisk() const {
     return data_.range(kVMSMEBendMSB - 1,kVMSMEBendLSB);
   }
