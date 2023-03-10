@@ -194,6 +194,15 @@ public:
     str += "|"+decodeToBits(getBend());
     return str;
   }
+
+  std::string getBitStrDisk2S() const {
+      std::string str = decodeToBits(getR());
+      str += "|"+decodeToBits(getZ());
+      str += "|"+decodeToBits(getPhi());
+      str += "|"+decodeToBits(getAlpha());
+      str += "|"+decodeToBits(getBend());
+      return str;
+  }
 #endif
 
 private:
