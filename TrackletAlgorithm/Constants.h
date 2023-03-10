@@ -19,6 +19,8 @@ constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Numbe
 // The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types (L1D1, L2D1), take the largest value for now...
 constexpr int kNbitsrzbin = 3;
 constexpr int kNbitsphibin = 3;
+constexpr unsigned kNbitsrzbinMP = kNbitsrzbin + 1;
+constexpr unsigned kNbitsphibinMP = kNbitsphibin + 1;
 
 constexpr int kMaxStubsFromLink = 256;
 
