@@ -925,11 +925,11 @@ void MatchCalculator(BXType bx,
   const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
   const auto kr_corr_shift       = (LAYER < TF::D1)? 0 : 7;                                  // shifttmp2 in emulation
 
-  constexpr auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
-  constexpr auto LUT_matchcut_phi_width = 17;
-  constexpr auto LUT_matchcut_phi_depth = 12;
-  constexpr auto LUT_matchcut_z_width = 13;
-  constexpr auto LUT_matchcut_z_depth = 12;
+  const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
+  const auto LUT_matchcut_phi_width = 17;
+  const auto LUT_matchcut_phi_depth = 12;
+  const auto LUT_matchcut_z_width = 13;
+  const auto LUT_matchcut_z_depth = 12;
 
   // Setup look up tables for match cuts
   ap_uint<MC::LUT_matchcut_phi_width> LUT_matchcut_phi[MC::LUT_matchcut_phi_depth];
@@ -975,30 +975,30 @@ void MatchCalculator(BXType bx,
 
   constexpr bool isDisk = LAYER >= TF::D1;
   // Stub parameters
-  const typename AllStub<ASTYPE>::ASR     stub_r     = stub.getR();
-  const typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
-  const typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
-  const typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
-  const typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
-  const typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
-  const typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
-  const typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
-  const ap_uint<12>                      stub_2s_r    = stub_2s.getR();
-  const typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
-  const typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
-  const typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
-  const typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
-  const auto isPSStub = stub_ps.isPSStub();
+  typename AllStub<ASTYPE>::ASR     stub_r     = stub.getR();
+  typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
+  typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
+  typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
+  typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
+  typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
+  typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
+  typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
+  ap_uint<12>                      stub_2s_r    = stub_2s.getR();
+  typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
+  typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
+  typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
+  typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
+  auto isPSStub = stub_ps.isPSStub();
 
   // Projection parameters
-  const typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
-  const typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
-  const typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
-  const typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
-  const typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
-  const typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
-  const typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
-  const bool isProjDisk = proj_seed >= TF::D1;
+  typename AllProjection<APTYPE>::AProjTCID          proj_tcid = proj.getTCID();
+  typename AllProjection<APTYPE>::AProjTrackletIndex proj_tkid = proj.getTrackletIndex();
+  typename AllProjection<APTYPE>::AProjTCSEED        proj_seed = proj.getSeed();
+  typename AllProjection<APTYPE>::AProjPHI           proj_phi  = proj.getPhi();
+  typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
+  typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
+  typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer(); 
+  bool isProjDisk = proj_seed >= TF::D1;
 
   // Calculate residuals
   // Get phi and z correction
@@ -1006,6 +1006,7 @@ void MatchCalculator(BXType bx,
   ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<18> full_r_corr   = stub_z * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
+  //ap_uint<3> shifttmp = 6;
   constexpr auto shifttmp = (LAYER < trklet::N_LAYER) ? log2barrel : log2disk;
   if(isDisk && isPSStub)
     phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
@@ -1460,29 +1461,29 @@ void MatchProcessor(BXType bx,
       // zbins_adjust (2) LSBs to get the lower & upper bins that we need to look in.
       
 
-      const ap_int<6> zbin6 = izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
+      ap_int<6> zbin6 = izproj.range(izproj.length()-1,izproj.length()-MEBinsBits-zbins_nbitsextra);
       //The -1 here is due to not using the full range of bits. Should be fixed.
-      const ap_uint<8> rbin8 = izproj >> (izproj.length()-8-1);//izproj.range(izproj.length()-1,izproj.length()-8-1);
+      ap_uint<8> rbin8 = izproj >> (izproj.length()-8-1);//izproj.range(izproj.length()-1,izproj.length()-8-1);
 
       //The first and last zbin the projection points to
       constexpr int nZbinBits = ProjectionRouterBuffer<VMPTYPE, APTYPE>::kPRBufferZBinSize - 1; // zbin = (zfirst,zflag)
+      ap_uint<nZbinBits> zfirst, zlast, rtmp, rfirst;
+      ap_uint<1> rsecond;
 
-      const ap_uint<nRbinBits> rbin = rbinLUT[rbin8];
+      ap_uint<nRbinBits> rbin = rbinLUT[rbin8];
       typename VMProjection<VMPTYPE>::VMPFINEZ finer = rbin >> nZbinBits;
-      const ap_uint<nZbinBits> rtmp = rbin.range(nZbinBits, 0);
-      ap_uint<nZbinBits> rfirst = rtmp >> 1;
-      const ap_uint<nZbinBits> rsecond = rtmp & 1;
+      rtmp = rbin.range(nZbinBits, 0);
+      rfirst = rtmp >> 1;
+      rsecond = rtmp & 1;
       rfirst = (izder.range(izder.length()-1, izder.length()-1)  == 1) ? ap_uint<nZbinBits>(rfirst + (1<<MEBinsBits)) : rfirst;
-      const auto tmp_zbin = zbinLUT[(psseed,zbin6)];
-      const ap_uint<nZbinBits> zfirst = tmp_zbin.range(tmp_zbin.length()-1, nZbinBits);
-      const ap_uint<nZbinBits> zlast = tmp_zbin.range(nZbinBits, 0);
+      (zfirst, zlast) = zbinLUT[(psseed,zbin6)];
 
       typename VMProjection<VMPTYPE>::VMPZBIN zbin = (LAYER < trklet::N_LAYER) ? (zfirst, zfirst!=zlast) : (rfirst,rsecond);
 
       // VM Projection
       typename VMProjection<VMPTYPE>::VMPFINEZ finez = ((1<<(MEBinsBits+2))+(izproj>>(izproj.length()-(MEBinsBits+3))))-(zfirst,ap_uint<3>(0));
       finez = (LAYER < trklet::N_LAYER) ?  finez : finer;
-     
+      
       //Extracts the rinv of the projection from the phider; recall phider = - rinv/2
       typename VMProjection<VMPTYPE>::VMPRINV rinv = (1<<(nbits_maxvm-1)) - 1 - iphider.range(iphider.length()-1,iphider.length()-nbits_maxvm);
       if (LAYER >= trklet::N_LAYER) {
