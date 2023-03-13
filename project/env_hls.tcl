@@ -15,7 +15,7 @@ if { ([string first "vitis" $exe] > -1) && ($year > 2019) } {
 
 
 if {[regexp Vivado $exepath tool]} {
-  set VitisOrVivado "_Vivado"
+  set VitisOrVivado ""
 } elseif {[regexp Vitis $exepath tool]} {
   set VitisOrVivado "_Vitis"
 } else {
