@@ -99,10 +99,6 @@ package tf_pkg is
   subtype t_arr8_7b is t_arr_7b(0 to 7);
   type t_arr8_2_7b is array(0 to 7) of t_arr2_7b;
 
-  type t_arr_8_4b  is array(integer range<>) of t_arr8_4b;
-  subtype t_arr2_8_4b is t_arr_8_4b(0 to 1);
-  subtype t_arr4_8_4b is t_arr_8_4b(0 to 3);
-
   type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;
   subtype t_arr2_8_5b is t_arr_8_5b(0 to 1);
   subtype t_arr8_8_5b is t_arr_8_5b(0 to 7);
