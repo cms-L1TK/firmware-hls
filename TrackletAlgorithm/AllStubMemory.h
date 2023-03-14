@@ -194,8 +194,17 @@ public:
     str += "|"+decodeToBits(getBend());
     return str;
   }
+#endif
 
-  std::string getBitStrDisk2S() const {
+private:
+
+  AllStubData data_;
+
+};
+
+#ifdef CMSSW_GIT_HASH
+  template<>
+  inline std::string AllStub<DISK2S>::getBitStr() const {
       std::string str = decodeToBits(getR());
       str += "|"+decodeToBits(getZ());
       str += "|"+decodeToBits(getPhi());
@@ -204,12 +213,6 @@ public:
       return str;
   }
 #endif
-
-private:
-
-  AllStubData data_;
-
-};
 
 // Special data object definition
 template<>
