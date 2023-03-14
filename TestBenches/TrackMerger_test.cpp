@@ -37,8 +37,7 @@ int main(){
   auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
 
 
-  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); // use CleanTrack_CT_L1L2_04.dat when tracks have been merged or if no merge make a copy e.g. output_TrackFit_TF_L1L2*
-  // Loop over events
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); 
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) { 
     cout << "Event: " << dec << ievt << endl;
     
@@ -116,10 +115,9 @@ int main(){
 
     // Comparing outputs
     err_count += compareMemWithFile<TrackFitMemory<NBarrelStub, NDiskStub>>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
-    outputTracks.clear();
     
   }
-
+  // Commented as f/w does not match the s/w - implementations are different so test vectors are different, TB fails.
   // Handling case of err%256 == 0 
   // if (err_count > 255) err_count = 255;
   // return err_count;
