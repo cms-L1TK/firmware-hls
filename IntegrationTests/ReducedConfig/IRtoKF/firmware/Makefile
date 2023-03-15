@@ -4,7 +4,7 @@ input_file = mem/in.txt
 proj_path = ../../../../proj
 hls_script_path = ../../IRtoTB/script
 
-all: $(core_file) hdl_add_files xciCreation kfin_adj
+all: $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) lut_inclusion
 
 $(core_dir):
 	@mkdir cgn mem

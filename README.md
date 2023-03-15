@@ -408,6 +408,7 @@ Currently the supported chain configurations for EMP builds are:
 * Xilinx Vivado 2020.1 (HLS build) and 2021.2 (project build)
 * ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb). Tested with dev/2022g
 * Python 3
+* Questasim v2021.1_2 for Questa simulation
 
 ### Quick instructions
 
@@ -418,7 +419,7 @@ First source Xilinx Vivado 2020.1
 ```
 ipbb init work
 cd work
-ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.2
+ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.3
 ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v1.2.2
 ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
 ipbb add git ssh://git@gitlab.cern.ch:7999/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
@@ -429,7 +430,7 @@ ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket.git -b v03.10
 ipbb add git https://gitlab.cern.ch/gbt-fpga/gbt-fpga.git -b gbt_fpga_6_1_0
 ipbb add git https://gitlab.cern.ch/gbt-fpga/lpgbt-fpga.git -b v.2.1
 ipbb add git https://:@gitlab.cern.ch:8443/gbtsc-fpga-support/gbt-sc.git -b gbt_sc_4_1
-ipbb add git https://github.com/FilMarini/firmware-hls -b emp_for_sc #LONG WAIT!
+ipbb add git https://github.com/FilMarini/firmware-hls -b emp_for_sc
 ```
 
 *Note: You need to be a member of the `cms-tcds2-users` egroup in order to clone the `cms-tcds2-firmware` repository. In order to add yourself to that egroup, go to the "Members" tab of [this page](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10380295), and click on the "Add me" button; you may need to wait ~ 24 hours to get access to the GitLab repo.*
@@ -437,13 +438,22 @@ ipbb add git https://github.com/FilMarini/firmware-hls -b emp_for_sc #LONG WAIT!
 ```
 cd src/firmware-hls
 make -C <EMP build path>/firmware
+cd -
 ```
+
+Source Xilinx Vivado 2021.2 for the following steps
 
 ### Vivado Simulation
 
 **Step 2: Create an ipbb project area**
 
-For vivado simulation testbench:
+* For questa simulation testbench:
+```
+ipbb proj create sim qsim firmware-hls:<EMP build path> 'qsim.dep'
+cd proj/qsim
+```
+
+* For vivado simulation testbench:
 ```
 ipbb proj create vivado vsim firmware-hls:<EMP build path> 'vsim.dep'
 cd proj/vsim
@@ -452,18 +462,18 @@ cd proj/vsim
 **Step 3: Simulation**
 
 * For questa simulation testbench:
+
 ```
-ipbb proj create sim qsim firmware-hls:<EMP build path> 'qsim.dep'
-cd proj/qsim
 ipbb sim setup-simlib
 ipbb sim ipcores
 ipbb sim fli-udp
 ipbb sim generate-project #(rerun this if you change VHDL)
 
-./run_sim -c work.top -Gsourcefile=<input.txt> -Gsinkfile=<out.txt> -Gplaylen=xyz -Gcaplen=xyz -do 'run 50.0us' -do quit 
+./run_sim -c xil_defaultlib.top -Gsourcefile=<input.txt> -Gsinkfile=<out.txt> -Gplaylen=xyz -Gcaplen=xyz -do 'run 50.0us' -do quit 
 ```
 where `xyz = number of events * 108`, where default is 9 events.
-where `input.txt` follows the standard EMP pattern file convention. 
+
+where `input.txt` follows the standard EMP pattern file convention. An input file is provided in `../../src/firmware-hls/<EMP build path>/firmware/mem/in.txt`
 
 * For vivado simulation testbench
 ```
@@ -476,8 +486,6 @@ and start the simulation from GUI (first time will take long).
 
 ### Implementation
 
-#### Apollo
-
 **Step 2: Create an ipbb project area**
 
 ```
@@ -487,21 +495,10 @@ cd proj/apollo
 
 **Step 3: Compile**
 
+*Note: Note: For the following commands, you need to ensure that can find & use the `gen_ipbus_addr_decode` script - e.g. for a standard uHAL installation:*
 ```
-ipbb ipbus gendecoders
-ipbb vivado generate-project synth -j8 impl -j8 package
+export PATH=/opt/cactus/bin/uhal/tools:$PATH LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
 ```
-
-#### Serenity
-
-**Step 2: Create an ipbb project area**
-
-```
-ipbb proj create vivado serenity firmware-hls:<EMP build path> 'serenity.dep'
-cd proj/serenity
-```
-
-**Step 3: Compile**
 
 ```
 ipbb ipbus gendecoders
