@@ -1,6 +1,16 @@
+import argparse
 from glob import iglob
 import glob
 import os
+
+# Create argument parser
+parser = argparse.ArgumentParser(description="Create xciMaker file.")
+
+# Optional arguments
+parser.add_argument("-s", "--script_path", dest="scriptPath", help="directory containing compiled HLS", type=str, default="../../IRtoTB/script")
+
+# Parse arguments
+args = parser.parse_args()
 
 # List of things to substitute to get the cores nickname
 sub_froms = ["solution_", "InputRouterTop_IR_DTC", "VMRouterTop", "TrackletEngine", "TrackletCalculator", "ProjectionRouterTop", "MatchEngineTop", "MatchCalculator", "TrackBuilder"]
@@ -13,7 +23,7 @@ dir_path = 'cgn'
 f = open(core_file, "w")
 
 # Get paths to the cores "component.xml" files
-core_dir = iglob('../script/*')
+core_dir = iglob(args.scriptPath + '/*')
 core_dirs_lup = []
 banned_folders = ["Work"]
 for x in (x for x in core_dir if os.path.isdir(x) and not os.path.islink(x)):

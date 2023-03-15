@@ -3,6 +3,7 @@
 
 # Dependancies
 include -c emp-fwk:boards/testbench top.dep
+setup ../scripts/pre_qsim.tcl
 
 include payload.dep
 src tb_decl.vhd
