@@ -116,6 +116,7 @@ process(clka)
   variable vi_nent_idx  : integer := 0;  -- Bin index of nent
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
+  variable written      : integer := 0;
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
@@ -136,6 +137,7 @@ begin
     end if;
 
     if (wea='1') then
+      written := 1;
       sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
       vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
@@ -149,6 +151,8 @@ begin
       else
         nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
       end if; 
+    elsif (written=0) then
+      nent_o <= (others => (others => (others => '0')));
     end if; -- (wea='1')
   end if;
 end process;
