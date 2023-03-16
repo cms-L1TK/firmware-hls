@@ -176,7 +176,7 @@ begin
       end if; 
     elsif (written=0) then
       mask_o <= (others => (others => '0'));
-      nent_o <= (others => ((others => (others => '0')));
+      nent_o <= (others => (others => (others => '0')));
     end if; -- (wea='1')
   end if;
 end process;
