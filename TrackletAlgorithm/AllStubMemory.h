@@ -202,6 +202,18 @@ private:
 
 };
 
+#ifdef CMSSW_GIT_HASH
+  template<>
+  inline std::string AllStub<DISK2S>::getBitStr() const {
+      std::string str = decodeToBits(getR());
+      str += "|"+decodeToBits(getZ());
+      str += "|"+decodeToBits(getPhi());
+      str += "|"+decodeToBits(getAlpha());
+      str += "|"+decodeToBits(getBend());
+      return str;
+  }
+#endif
+
 // Special data object definition
 template<>
 class AllStub<6> : public AllStubBase<DISK> // Can't generate cosim files if AllStub<DISK> for some reason...
