@@ -146,10 +146,6 @@ def getNumFEInputs(mem_list):
 
     mem_list_fe = [m[:-1] for m in mem_list]
 
-    print(mem_list)
-    print(mem_list_fe)
-    print(len(set(mem_list_fe)))
-
     return len(set(mem_list_fe))
 
 ##########################################
