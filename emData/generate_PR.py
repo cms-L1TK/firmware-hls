@@ -72,14 +72,9 @@ def writeSourceModuleInstance(module, wiresFileName):
     strSource += "                         VMProjectionMemory<" + VMProjRegion + "> vmprojout[" + str(VMProjCount) + "])\n"
     strSource += "{\n"
     strSource += "#pragma HLS inline off\n"
-    strSource += "#pragma HLS interface register port=bx_o\n"
+    strSource += "#pragma HLS interface mode=ap_vld register port=bx_o\n"
     for i in range(TProjCount):
-        strSource += "#ifdef  __VITIS_HLS__\n"
-        strSource += "\t// For use with Vitis >=2020.1\n"
-        strSource += "#pragma HLS resource variable=projin[" + str(i) + "].get_mem() latency=2\n"
-        strSource += "#else\n"
-        strSource += "#pragma HLS resource variable=projin[" + str(i) + "]->get_mem() latency=2\n"
-        strSource += "#endif\n"
+
     strSource += "  constexpr unsigned int nInMem = " + str(TProjCount) + ";\n"
     strSource += "  constexpr unsigned int nOutMem = " + str(VMProjCount) + ";\n"
     strSource += "  constexpr int layer = " + str(layer) + ";\n"

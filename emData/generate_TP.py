@@ -290,14 +290,14 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
           ") {\n"
           "#pragma HLS inline recursive\n"
-          "#pragma HLS interface register port=bx_o\n"
-          "#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2\n"
-          "#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2\n"
+          "#pragma HLS interface mode=ap_vld register port=bx_o\n"
+          "#pragma HLS interface mode=ap_memory port=lut storage_type=ROM_2P  latency=2\n"
+          "#pragma HLS interface mode=ap_memory port=regionlut storage_type=ROM_2P latency=2\n"
       )
       for i in range(0, nASMemInner):
-          topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
-      topFile.write("#pragma HLS resource variable=outerStubs->get_mem() latency=2\n")
-      topFile.write("#pragma HLS resource variable=outerVMStubs.get_mem() latency=2\n")
+          topFile.write("#pragma HLS interface mode=ap_memory port=innerStubs[" + str(i) + "].get_mem() latency=2\n")
+      topFile.write("#pragma HLS interface mode=ap_memory port=outerStubs->get_mem() latency=2\n")
+      topFile.write("#pragma HLS interface mode=ap_memory port=outerVMStubs->get_mem() latency=2\n")
       topFile.write(
           "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
