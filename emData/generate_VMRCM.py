@@ -142,6 +142,9 @@ def getAllStubInnerMaskString(mem_list):
 ###################################
 # Returns the number of input memories for the Future Emulation
 
+# Ignores the final character (A and B) in the memory names
+# E.g. memory_A and memory_B are considered the same
+
 def getNumFEInputs(mem_list):
 
     mem_list_fe = [m[:-1] for m in mem_list]
