@@ -413,6 +413,79 @@ class TBHelper {
     }
 };
 
+// Needed to compare IRProducer / IRFakeProducer memories with files, as need two files for each index, can also be used in other cases
+template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
+unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifstream*>& foutVec,
+                                int ievt, const std::string& label,
+                                const bool truncated = false, int maxProc = kMaxProc)
+{
+  unsigned int err_count = 0;
+
+  ////////////////////////////////////////
+  // Read from file
+  MemType memory_ref;
+  MemType memory_ref1;
+  MemType memory_ref2;
+  writeMemFromFile<MemType>(memory_ref1, *foutVec[0], ievt, InputBase);
+  if (foutVec.size() > 1){
+  writeMemFromFile<MemType>(memory_ref2, *foutVec[1], ievt, InputBase);
+  }
+  for (int i = 0; i<memory_ref1.getEntries(0); ++i){
+    auto data_ref1 = memory_ref1.read_mem(0, i);
+    memory_ref.write_mem(0, data_ref1, i);
+  }
+  if (foutVec.size() > 1){
+  for (int j = 0; j < memory_ref2.getEntries(0); ++j){
+    auto data_ref2 = memory_ref2.read_mem(0, j);
+    memory_ref.write_mem(0, data_ref2, j + memory_ref1.getEntries(0));
+  }
+  }
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
+  constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
+  constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
+
+  for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
+    auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
+    auto data_com_raw = memory.read_mem(ievt,i).raw();
+    auto data_ref = data_ref_raw.range(msb,lsb);
+    auto data_com = data_com_raw.range(msb,lsb);
+    if (i==0) {
+      // If both reference and computed memories are completely empty, skip it
+      if (data_com == 0 && data_ref == 0) break;
+      std::cout << label << ":" << std::endl;
+      std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+    }
+    // If have reached the end of valid entries in both computed and reference, don't bother printing further
+    if (data_com == 0 && data_ref == 0) continue;
+
+    std::cout << i << "\t";
+    if (OutputBase == 2) std::cout << std::bitset<width>(data_ref) << "\t";
+    else                 std::cout << std::hex << data_ref << "\t";
+    
+    if (OutputBase == 2) std::cout << std::bitset<width>(data_com);
+    else                 std::cout << std::hex << data_com; // << std::endl;
+
+    // If there is extra entries in reference
+    if (data_com == 0) {
+      std::cout << "\t" << "<=== missing";
+      if (!truncated) err_count++;
+    // If there is extra entries in computed
+    } else if (data_ref == 0) {
+      std::cout << "\t" << "<=== EXTRA";
+      err_count++;
+    // If reference and computed entry are inconsistent
+    } else if (data_com != data_ref) {
+      std::cout << "\t" << "<=== INCONSISTENT";
+      err_count++;
+    }
+
+    std::cout << std::endl;
+  }
+  
+  return err_count;
+  
+}
+
 #endif // TestBenches_FileReadUtility_h
 
 #endif // __SYNTHESIS__
