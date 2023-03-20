@@ -139,6 +139,17 @@ def getAllStubInnerMaskString(mem_list):
 
     return mask
 
+###################################
+# Returns the number of input memories for the Future Emulation
+
+# Ignores the final character (A and B) in the memory names
+# E.g. memory_A and memory_B are considered the same
+
+def getNumFEInputs(mem_list):
+
+    mem_list_fe = [m[:-1] for m in mem_list]
+
+    return len(set(mem_list_fe))
 
 ##########################################
 # Writes the VMRouterCM_parameters.h file
@@ -173,6 +184,9 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
         "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumASInnerCopies();\n"
         "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumTEOCopies();\n"
         "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getAllStubInnerMask();\n"
+        "// For Future Emulation\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumInputsFE();\n"
+        "template<TF::layerDisk LayerDisk, TF::phiRegion Phi> constexpr int getNumInputsDisk2SFE();\n"
         "\n"
         "// VMPhiCorr LUTs\n"
     )
@@ -285,6 +299,13 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
             "}\n"
             "template<> constexpr int getAllStubInnerMask<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){\n"
             "  return " + getAllStubInnerMaskString(mem_dict["ASI_"+vmr]) + ";\n"
+            "}\n"
+            "// For Future Emulation\n"
+            "template<> constexpr int getNumInputsFE<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // Number of input memories, EXCLUDING DISK2S\n"
+            "  return " + str(getNumFEInputs(mem_dict["IL_"+vmr])) + ";\n"
+            "}\n"
+            "template<> constexpr int getNumInputsDisk2SFE<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // Number of DISK2S input memories\n"
+            "  return " + str(getNumFEInputs(mem_dict["IL_DISK2S_"+vmr])) + ";\n"
             "}\n"
         )
 
