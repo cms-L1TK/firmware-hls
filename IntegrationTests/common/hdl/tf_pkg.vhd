@@ -85,7 +85,6 @@ package tf_pkg is
   type t_arr8_8_1b is array(0 to 7) of t_arr8_1b;
   type t_arr8_8_4b is array(0 to 7) of t_arr8_4b;
   -- 4D
-  type t_arr4_8_8_4b is array(0 to 3) of t_arr8_8_4b;
   type t_arr8_8_8_1b is array(0 to 7) of t_arr8_8_1b;
   type t_arr8_8_8_4b is array(0 to 7) of t_arr8_8_4b;
   -- Others
