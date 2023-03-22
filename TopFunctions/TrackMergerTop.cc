@@ -1,8 +1,8 @@
 #include "TrackMergerTop.h"
 
 void TrackMergerTop(
-  const ap_uint<trackWordSize> (trackWord)[kMaxTrack],
-  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  const ap_uint<trackWordSize> trackWord[kMaxTrack],
+  const ap_uint<stubWordSize> stubWords[kMaxTrack][NStub],
   ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
   ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   ){
@@ -13,8 +13,7 @@ void TrackMergerTop(
     #pragma HLS stream variable=stubWords_o
 
 
-    TrackMerger(
-                trackWord,
+    TrackMerger(trackWord,
                 stubWords,
                 trackWord_o,
                 stubWords_o);

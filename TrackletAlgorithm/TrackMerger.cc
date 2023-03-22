@@ -1,6 +1,4 @@
 #include "TrackMerger.h"
-#include "TrackHandler.h"
-#include <bitset>
 
 TrackStruct& ComparisonModule::getMasterTrackStruct(){
   return masterTrack;
@@ -8,13 +6,12 @@ TrackStruct& ComparisonModule::getMasterTrackStruct(){
 
 void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack){
   tracksProcessed++;
-  trackHandler = TrackHandler();
   if (inTrack._trackWord != 0 && tracksProcessed <= kMaxTrack){
-    if (!getTrackValid(masterTrack._trackWord)){
+    if (!masterTrack.getTrackValid()){
       masterTrack = inTrack;
     } else {
-      if(getTrackValid(inTrack._trackWord)){
-        if (!trackHandler.compareTrack(inTrack, masterTrack)) {
+      if(inTrack.getTrackValid()){
+        if (!masterTrack.compareTrack(inTrack)) {
           // trackHandler.mergeTrack(inTrack, masterTrack);
         // } else {
           outTrack = inTrack;
@@ -39,45 +36,9 @@ void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned 
   return;
 }
 
-void loadTrack(
-  const ap_uint<trackWordSize> trackWordIn,
-  const ap_uint<stubWordSize> (stubWordsIn)[NStub],
-  TrackStruct& aTrack
-) {
-
-  #pragma HLS array_partition variable=stubWordsIn
-  aTrack._trackWord = trackWordIn;
-
-  for (unsigned int i = 0; i < NStub; i++){
-    #pragma HLS unroll
-    aTrack._stubArray[i][0] = stubWordsIn[i];
-  }
-
- 
-  return;      
-}  
-
-
-void unloadTrack(
-  TrackStruct& aTrack,
-  ap_uint<trackWordSize>& trackWordOut,
-  ap_uint<stubWordSize> (&stubWordsOut)[NStub]
-) {
-
-  #pragma HLS array_partition variable=stubWordsOut
-
-  trackWordOut = aTrack.getTrkWord(); 
-  for (unsigned int i = 0; i < NStub; i++){
-    #pragma HLS unroll
-    stubWordsOut[i] = aTrack.getStub(i);
-    }
-
-  return;
-}
-
 void TrackMerger(
-  const ap_uint<trackWordSize> (trackWord)[kMaxTrack],
-  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  const ap_uint<trackWordSize> trackWord[kMaxTrack],
+  const ap_uint<stubWordSize> stubWords[kMaxTrack][NStub],
   ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
   ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   )
@@ -118,9 +79,8 @@ void TrackMerger(
     TrackStruct tracks[kNBuffers];
     #pragma HLS data_pack variable=tracks
     // Filling first element of the buffer with module input
-    loadTrack(trackWord[i],
-              stubWords[i],
-              tracks[0]);
+    tracks[0].loadTrack(trackWord[i],
+              stubWords[i]);
 
     // CM processing loop
     LOOP_ProcTracks:
@@ -129,7 +89,7 @@ void TrackMerger(
       tracks[j].resetTracks();
     }
     // When the unmerged track reaches the end of the buffer - put in unmerged tracks array to be output
-    if (tracks[kNComparisonModules].getTrkWord() != 0){
+    if (tracks[kNComparisonModules].getTrackValid()){
       fillTrackArray(tracks[kNComparisonModules], unmergedTracks, unmergedIndx);
       tracks[kNComparisonModules].resetTracks();
       unmergedIndx++;
@@ -161,9 +121,7 @@ void TrackMerger(
     }
     
     // Send track to output
-    unloadTrack(trk, 
-                trackWord_o[outputIndex], 
-                stubWords_o[outputIndex]);
+    trk.unloadTrack(trackWord_o[outputIndex], stubWords_o[outputIndex]);
 
     
   }

@@ -8,7 +8,7 @@ set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
 set_top TrackMergerTop
 add_files ../TopFunctions/TrackMergerTop.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/TrackMerger.cc -cflags "$CFLAGS"
-add_files ../TrackletAlgorithm/TrackHandler.cc -cflags "$CFLAGS"
+#add_files ../TrackletAlgorithm/TrackHandler.cc -cflags "$CFLAGS"
 #add_files -tb ../TestBenches/TrackMerger_test.cpp -cflags "$CFLAGS"
 
 open_solution "soln_df1"
@@ -22,7 +22,7 @@ source settings_hls.tcl
 csynth_design
 #cosim_design 
 #-trace_level all -rtl verilog -verbose
-#export_design -format ip_catalog
+export_design -format ip_catalog
 #export_design -flow impl -rtl vhdl
 
 exit

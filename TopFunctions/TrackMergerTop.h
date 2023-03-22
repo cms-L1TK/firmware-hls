@@ -2,11 +2,10 @@
 #define TrackletAlgorithm_TrackMergerTop_h
 
 #include "../TrackletAlgorithm/TrackMerger.h"
-#include "../TrackletAlgorithm/TrackHandler.h"
 
 void TrackMergerTop(
-  const ap_uint<trackWordSize> (trackWord)[kMaxTrack],
-  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  const ap_uint<trackWordSize> trackWord[kMaxTrack],
+  const ap_uint<stubWordSize> stubWords[kMaxTrack][NStub],
   ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
   ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   );
