@@ -1,28 +1,21 @@
 #include "TrackMergerTop.h"
 
-void TrackMergerTop(const BXType bx,
-  const TrackFitType::TrackWord trackWord[kMaxTrack],
-  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][NBarrelStub],
-  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][NDiskStub],
-  BXType bx_o,
-  TrackFitType::TrackWord (&trackWord_o)[kMaxTrack],
-  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub],
-  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub]
+void TrackMergerTop(
+  const ap_uint<trackWordSize> (trackWord)[kMaxTrack],
+  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
+  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   ){
     #pragma HLS inline recursive
     #pragma HLS stream variable=trackWord
-    #pragma HLS stream variable=barrelStubWords
-    #pragma HLS stream variable=diskStubWords
+    #pragma HLS stream variable=stubWords
     #pragma HLS stream variable=trackWord_o
-    #pragma HLS stream variable=barrelStubWords_o
-    #pragma HLS stream variable=diskStubWords_o
+    #pragma HLS stream variable=stubWords_o
 
-    TrackMerger(bx,
+
+    TrackMerger(
                 trackWord,
-                barrelStubWords,
-                diskStubWords,
-                bx_o,
+                stubWords,
                 trackWord_o,
-                barrelStubWords_o,
-                diskStubWords_o);
+                stubWords_o);
 }

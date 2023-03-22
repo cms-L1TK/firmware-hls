@@ -4,14 +4,11 @@
 #include "../TrackletAlgorithm/TrackMerger.h"
 #include "../TrackletAlgorithm/TrackHandler.h"
 
-void TrackMergerTop(const BXType bx,
-  const TrackFitType::TrackWord trackWord[kMaxTrack],
-  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][NBarrelStub],
-  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][NDiskStub],
-  BXType bx_o,
-  TrackFitType::TrackWord (&trackWord_o)[kMaxTrack],
-  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub],
-  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub]
+void TrackMergerTop(
+  const ap_uint<trackWordSize> (trackWord)[kMaxTrack],
+  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
+  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   );
 
 #endif

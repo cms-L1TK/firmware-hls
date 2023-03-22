@@ -10,15 +10,14 @@ void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack
   tracksProcessed++;
   trackHandler = TrackHandler();
   if (inTrack._trackWord != 0 && tracksProcessed <= kMaxTrack){
-    if (masterTrack._trackWord == 0){
+    if (!getTrackValid(masterTrack._trackWord)){
       masterTrack = inTrack;
     } else {
-      if(masterTrack._trackWord != inTrack._trackWord){
-        trackHandler.compareTrack(inTrack, masterTrack, matchFound, mergeCondition);
-        if (matchFound) {
-          trackHandler.mergeTrack(inTrack, masterTrack);
-        } else {
-        outTrack = inTrack;
+      if(getTrackValid(inTrack._trackWord)){
+        if (!trackHandler.compareTrack(inTrack, masterTrack)) {
+          // trackHandler.mergeTrack(inTrack, masterTrack);
+        // } else {
+          outTrack = inTrack;
         }
       }
     }
@@ -41,25 +40,19 @@ void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned 
 }
 
 void loadTrack(
-  const TrackFitType::TrackWord& trackWordIn,
-  const TrackFitType::BarrelStubWord (&barrelStubWordsIn)[NBarrelStub],
-  const TrackFitType::DiskStubWord (&diskStubWordsIn)[NDiskStub],
+  const ap_uint<trackWordSize> trackWordIn,
+  const ap_uint<stubWordSize> (stubWordsIn)[NStub],
   TrackStruct& aTrack
 ) {
 
-  #pragma HLS array_partition variable=barrelStubWordsIn
-  #pragma HLS array_partition variable=diskStubWordsIn
+  #pragma HLS array_partition variable=stubWordsIn
   aTrack._trackWord = trackWordIn;
 
-  for (unsigned int i = 0; i < NBarrelStub; i++){
+  for (unsigned int i = 0; i < NStub; i++){
     #pragma HLS unroll
-    aTrack._barrelStubArray[i][0] = barrelStubWordsIn[i];
+    aTrack._stubArray[i][0] = stubWordsIn[i];
   }
 
-  for (unsigned int j = 0; j < NDiskStub; j++){
-    #pragma HLS unroll
-    aTrack._diskStubArray[j][0] = diskStubWordsIn[j];
-  }
  
   return;      
 }  
@@ -67,36 +60,26 @@ void loadTrack(
 
 void unloadTrack(
   TrackStruct& aTrack,
-  TrackFitType::TrackWord& trackWordOut,
-  TrackFitType::BarrelStubWord (&barrelStubWordsOut)[NBarrelStub], 
-  TrackFitType::DiskStubWord (&diskStubWordsOut)[NDiskStub]
+  ap_uint<trackWordSize>& trackWordOut,
+  ap_uint<stubWordSize> (&stubWordsOut)[NStub]
 ) {
 
-  #pragma HLS array_partition variable=barrelStubWordsOut
-  #pragma HLS array_partition variable=diskStubWordsOut
+  #pragma HLS array_partition variable=stubWordsOut
 
   trackWordOut = aTrack.getTrkWord(); 
-  for (unsigned int i = 0; i < NBarrelStub; i++){
+  for (unsigned int i = 0; i < NStub; i++){
     #pragma HLS unroll
-    barrelStubWordsOut[i] = aTrack.getBarrelStub(i, 0);
+    stubWordsOut[i] = aTrack.getStub(i);
     }
-
-  for (unsigned int j = 0; j < NDiskStub; j++){
-    #pragma HLS unroll
-    diskStubWordsOut[j]= aTrack.getDiskStub(j, 0);
-  }
 
   return;
 }
 
-void TrackMerger(const BXType bx,
-  const TrackFitType::TrackWord trackWord[kMaxTrack],
-  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][NBarrelStub],
-  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][NDiskStub],
-  BXType bx_o,
-  TrackFitType::TrackWord (&trackWord_o)[kMaxTrack],
-  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub],
-  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub]
+void TrackMerger(
+  const ap_uint<trackWordSize> (trackWord)[kMaxTrack],
+  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
+  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   )
 {
   ComparisonModule comparisonModule[kNComparisonModules];
@@ -136,8 +119,7 @@ void TrackMerger(const BXType bx,
     #pragma HLS data_pack variable=tracks
     // Filling first element of the buffer with module input
     loadTrack(trackWord[i],
-              barrelStubWords[i],
-              diskStubWords[i],
+              stubWords[i],
               tracks[0]);
 
     // CM processing loop
@@ -181,12 +163,10 @@ void TrackMerger(const BXType bx,
     // Send track to output
     unloadTrack(trk, 
                 trackWord_o[outputIndex], 
-                barrelStubWords_o[outputIndex], 
-                diskStubWords_o[outputIndex]);
+                stubWords_o[outputIndex]);
 
     
   }
-  bx_o = bx;
 
   return;
 }

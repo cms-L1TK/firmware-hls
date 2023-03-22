@@ -9,7 +9,7 @@ set_top TrackMergerTop
 add_files ../TopFunctions/TrackMergerTop.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/TrackMerger.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/TrackHandler.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/TrackMerger_test.cpp -cflags "$CFLAGS"
+#add_files -tb ../TestBenches/TrackMerger_test.cpp -cflags "$CFLAGS"
 
 open_solution "soln_df1"
 
@@ -17,12 +17,12 @@ open_solution "soln_df1"
 source settings_hls.tcl
 
 # data files
-add_files -tb ../emData/PD/
-csim_design -compiler gcc -mflags "-j8"
+#add_files -tb ../emData/PD/
+#csim_design -compiler gcc -mflags "-j8"
 csynth_design
-cosim_design 
+#cosim_design 
 #-trace_level all -rtl verilog -verbose
 #export_design -format ip_catalog
-export_design -flow impl -rtl vhdl
+#export_design -flow impl -rtl vhdl
 
 exit

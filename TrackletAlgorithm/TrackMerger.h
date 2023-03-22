@@ -6,10 +6,10 @@
 #include "TrackFitMemory.h"
 #include "TrackHandler.h"
 
-const unsigned int kNComparisonModules = 16;
-const unsigned int kNBuffers = kNComparisonModules + 1;
-const unsigned int kMaxTrack = 50;
-const unsigned int kNLastTracks = kMaxTrack - kNComparisonModules;
+constexpr int kNComparisonModules = 16;
+constexpr int kNBuffers = kNComparisonModules + 1;
+constexpr int kMaxTrack = 50;
+constexpr int kNLastTracks = kMaxTrack - kNComparisonModules;
 
 class ComparisonModule{
     public:
@@ -22,7 +22,7 @@ class ComparisonModule{
 
     unsigned int getEndOfStream(){return endOfStream;}
 
-    TrackFitType::TrackWord getMasterTrackWord(){return masterTrack._trackWord;}
+    ap_uint<trackWordSize> getMasterTrackWord(){return masterTrack._trackWord;}
 
     void process(const TrackStruct &inTrack, TrackStruct &outTrack);
     
@@ -34,7 +34,6 @@ class ComparisonModule{
   private:
 
     unsigned int matchFound{0};
-    unsigned int mergeCondition = 3;
     unsigned int endOfStream{0};
     unsigned int endOfModule{0};
     unsigned int tracksProcessed{0};
@@ -45,30 +44,25 @@ class ComparisonModule{
     void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i);
 
     void loadTrack(
-      const TrackFitType::TrackWord& trackWordIn,
-      const TrackFitType::BarrelStubWord (&barrelStubWordsIn)[NBarrelStub],
-      const TrackFitType::DiskStubWord (&diskStubWordsIn)[NDiskStub],
+      const ap_uint<trackWordSize> trackWordIn,
+      const ap_uint<stubWordSize> (stubWordsIn)[NStub],
       TrackStruct& aTrack
     );
 
     void unloadTrack(
       TrackStruct& aTrack,
-      TrackFitType::TrackWord& trackWordOut,
-      TrackFitType::BarrelStubWord (&barrelStubWordsOut)[NBarrelStub],  
-      TrackFitType::DiskStubWord (&diskStubWordsOut)[NDiskStub]
+      ap_uint<trackWordSize>& trackWordOut,
+      ap_uint<stubWordSize> (&stubWordsOut)[NStub]  
     );
 
 
 };
 
-void TrackMerger(const BXType bx,
-  const TrackFitType::TrackWord trackWord[kMaxTrack],
-  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][NBarrelStub],
-  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][NDiskStub],
-  BXType bx_o,
-  TrackFitType::TrackWord (&trackWord_o)[kMaxTrack],
-  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub], 
-  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub] 
+void TrackMerger(
+  const ap_uint<trackWordSize>(trackWord)[kMaxTrack],
+  const ap_uint<stubWordSize> (stubWords)[kMaxTrack][NStub],
+  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
+  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
   );
 
 
