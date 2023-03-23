@@ -443,7 +443,7 @@ cd -
 
 Source Xilinx Vivado 2021.2 for the following steps
 
-### Vivado Simulation
+### Vivado/Questa Simulation
 
 **Step 2: Create an ipbb project area**
 

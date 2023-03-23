@@ -395,7 +395,7 @@ package body tf_pkg is
   procedure write_header_line (
     file_path       : in string;  --! File path as string
     signal_name     : in string;  --! Signal name that will be printed in output file
-    N_PAGES         : in integer  --! Number of pages
+    N_PAGES         : in natural  --! Number of pages
   ) is
   file     file_out : text is file_path; -- Text - a file of character strings
   variable line_out : line;              -- Line - one string from a text file
