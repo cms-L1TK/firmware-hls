@@ -168,6 +168,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
       "template<TF::seed Seed, TC::itc iTC> const int* getRegionLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const int* getLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
   )
   topHeaderFile.write(
       "#ifndef TopFunctions_TrackletProcessorTop_h\n"
@@ -242,6 +244,24 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static int lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + '.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<1> lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<1> lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
