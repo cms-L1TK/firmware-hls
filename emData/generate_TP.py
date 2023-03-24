@@ -166,8 +166,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "   }\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
-      "template<TF::seed Seed, TC::itc iTC> const int* getRegionLUT();\n"
-      "template<TF::seed Seed, TC::itc iTC> const int* getLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<8>* getRegionLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
   )
@@ -231,8 +231,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n"
           "  return 0x%X;\n"
           "}\n"
-          'template<> inline const int* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
-          '  static int lut[] =\n'
+          'template<> inline const ap_uint<8>* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<8> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab"\n'
           '#else\n'
@@ -240,8 +240,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '#endif\n'
           '  return lut;\n'
           '}\n'
-          'template<> inline const int* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
-          '  static int lut[] =\n'
+          'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<10> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + '.tab"\n'
           '#else\n'
@@ -312,8 +312,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
           "\n"
-          "static const int* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
-          "static const int* regionlut = getRegionLUT<TF::" + seed + ", TC::" + iTC +">();\n"
+          "static const ap_uint<10>* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
+          "static const ap_uint<8>* regionlut = getRegionLUT<TF::" + seed + ", TC::" + iTC +">();\n"
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
