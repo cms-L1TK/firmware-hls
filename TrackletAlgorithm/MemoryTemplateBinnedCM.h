@@ -63,7 +63,7 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
+    return nentries8_[bx][ibin].range(ireg*kNBxBins+(kNBxBins-1),ireg*kNBxBins);
   }
 
   ap_uint<entries8> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
@@ -237,7 +237,7 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
+    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*kNBxBins+(kNBxBins-1),ireg*kNBxBins);
 
     DataType data(datastr.c_str(), base);
 
@@ -271,7 +271,7 @@ class MemoryTemplateBinnedCM{
   {
 	for(unsigned int slot=0;slot<8;slot++) {
       //std::cout << "slot "<<slot<<" entries "
-      //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
+      //		<<nentries_[bx%NBX].range((slot+1)*kNBxBins-1,slot*kNBxBins)<<endl;
       for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
 	edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
 	print_entry(bx, i + slot*getNEntryPerBin() );
