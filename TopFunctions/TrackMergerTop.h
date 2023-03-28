@@ -4,10 +4,8 @@
 #include "../TrackletAlgorithm/TrackMerger.h"
 
 void TrackMergerTop(
-  const ap_uint<trackWordSize> trackWord[kMaxTrack],
-  const ap_uint<stubWordSize> stubWords[kMaxTrack][NStub],
-  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
-  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
-  );
+  const ap_uint<dinSize> din[kMaxTrack],
+  ap_uint<doutSize> (&dout)[kMaxTrack]
+);
 
 #endif

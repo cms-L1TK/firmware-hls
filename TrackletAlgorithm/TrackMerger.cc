@@ -37,11 +37,8 @@ void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned 
 }
 
 void TrackMerger(
-  const ap_uint<trackWordSize> trackWord[kMaxTrack],
-  const ap_uint<stubWordSize> stubWords[kMaxTrack][NStub],
-  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
-  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
-  )
+    const ap_uint<dinSize> din[kMaxTrack],
+    ap_uint<doutSize> (&dout)[kMaxTrack])
 {
   ComparisonModule comparisonModule[kNComparisonModules];
   #pragma HLS array_partition variable=comparisonModule dim=1
@@ -79,8 +76,7 @@ void TrackMerger(
     TrackStruct tracks[kNBuffers];
     #pragma HLS data_pack variable=tracks
     // Filling first element of the buffer with module input
-    tracks[0].loadTrack(trackWord[i],
-              stubWords[i]);
+    tracks[0].loadTrack(din[i]);
 
     // CM processing loop
     LOOP_ProcTracks:
@@ -121,7 +117,7 @@ void TrackMerger(
     }
     
     // Send track to output
-    trk.unloadTrack(trackWord_o[outputIndex], stubWords_o[outputIndex]);
+    trk.unloadTrack(dout[outputIndex]);
 
     
   }

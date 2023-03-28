@@ -18,7 +18,16 @@ constexpr int stubVld = stubWordSize-1;
 constexpr int stubIDSize = 7;
 constexpr int mergeCondition = 3;
 
+constexpr int dinSize = trackWordSize + NStub * stubWordSize;
+constexpr int doutSize = dinSize;
 
+inline constexpr int getStubIndexHigher(int i){
+  return dinSize - trackWordSize - (i+1) * stubWordSize -1;
+}
+
+inline constexpr int getStubIndexLower(int i){
+  return dinSize - trackWordSize - (i+1) * stubWordSize - stubWordSize ;
+}
 
 struct TrackStruct {
   
@@ -63,26 +72,31 @@ struct TrackStruct {
     return matchesFound >= mergeCondition;
   }
 
-  void loadTrack(const ap_uint<trackWordSize> trackWordIn, const ap_uint<stubWordSize> (stubWordsIn)[NStub]) {
-    #pragma HLS array_partition variable=stubWordsIn
-    _trackWord = trackWordIn;
-    for (unsigned int i = 0; i < NStub; i++){
+  void loadTrack(const ap_uint<dinSize>& din){
+    #pragma HLS array_partition variable _stubArray
+    // extract trackWord from din
+     _trackWord = din.range(dinSize-1, dinSize-trackWordSize);
+
+    // extract stubWord from din;
+    for (int i = 0; i < NStub; i++) {
       #pragma HLS unroll
-      _stubArray[i] = stubWordsIn[i];
-    }   
-  }  
+       _stubArray[i] = din.range(getStubIndexHigher(i), getStubIndexLower(i));
+      }
+  }
+    
 
-  void unloadTrack(ap_uint<trackWordSize>& trackWordOut, ap_uint<stubWordSize> (&stubWordsOut)[NStub]) {
-  #pragma HLS array_partition variable=stubWordsOut
-  trackWordOut = _trackWord; 
-  for (unsigned int i = 0; i < NStub; i++){
-    #pragma HLS unroll
-    stubWordsOut[i] = _stubArray[i];
+  void unloadTrack(ap_uint<doutSize>& dout) {
+    #pragma HLS array_partition variable=_stubArray
+    // set dout from trackWord
+      dout.range(doutSize-1, doutSize-trackWordSize) = _trackWord;
+
+    // set dout to stubWord
+    for (int i = 0; i < NStub; i++) {
+      #pragma HLS unroll
+      dout.range(getStubIndexHigher(i), getStubIndexLower(i)) = _stubArray[i];
     }
-
-  return;
-}
-
+    return;
+  }
 
 };
 
@@ -111,11 +125,8 @@ class ComparisonModule{
 };
 
 void TrackMerger(
-  const ap_uint<trackWordSize> trackWord[kMaxTrack],
-  const ap_uint<stubWordSize> stubWords[kMaxTrack][NStub],
-  ap_uint<trackWordSize> (&trackWord_o)[kMaxTrack],
-  ap_uint<stubWordSize> (&stubWords_o)[kMaxTrack][NStub]
-  );
+    const ap_uint<dinSize> din[kMaxTrack],
+    ap_uint<doutSize> (&dout)[kMaxTrack]);
 
 
 #endif
