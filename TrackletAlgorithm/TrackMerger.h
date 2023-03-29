@@ -19,7 +19,7 @@ constexpr int stubIDSize = 7;
 constexpr int mergeCondition = 3;
 
 constexpr int dinSize = rst + trackWordSize + NStub * stubWordSize;
-constexpr int doutSize = dinSize-stubIDSize;
+constexpr int doutSize = dinSize-stubIDSize*NStub;
 
 inline constexpr int getdinStubIdxHigh(int i){
   return dinSize - trackWordSize - (i+1) * stubWordSize -1;
