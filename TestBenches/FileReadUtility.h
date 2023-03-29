@@ -125,17 +125,11 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   
 }
 
-template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
-unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
-                                int ievt, const std::string& label,
-                                const bool truncated = false, int maxProc = kMaxProc)
+template<class MemType, int OutputBase=16, int LSB=-1, int MSB=-1>
+unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory, int ievt,
+                               const std::string& label, const bool truncated = false)
 {
   unsigned int err_count = 0;
-
-  ////////////////////////////////////////
-  // Read from file
-  MemType memory_ref;
-  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
   constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
@@ -180,6 +174,19 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   }
   
   return err_count;
+}                                
+
+template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
+unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
+                                int ievt, const std::string& label,
+                                const bool truncated = false, int maxProc = kMaxProc)
+{
+  ////////////////////////////////////////
+  // Read from file
+  MemType memory_ref;
+  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
+
+  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated);
   
 }
 
@@ -412,6 +419,37 @@ class TBHelper {
       }
     }
 };
+
+// Needed to compare IRProducer / IRFakeProducer memories with files, as need two files for each index, can also be used in other cases
+template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
+unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifstream*>& foutVec,
+                                int ievt, const std::string& label,
+                                const bool truncated = false, int maxProc = kMaxProc)
+{
+  ////////////////////////////////////////
+  // Read from file
+  MemType memory_ref;
+  MemType memory_ref1;
+  MemType memory_ref2;
+  writeMemFromFile<MemType>(memory_ref1, *foutVec[0], ievt, InputBase);
+
+  if (foutVec.size() > 1){
+    writeMemFromFile<MemType>(memory_ref2, *foutVec[1], ievt, InputBase);
+  }
+  for (int i = 0; i<memory_ref1.getEntries(0); ++i){
+    auto data_ref1 = memory_ref1.read_mem(0, i);
+    memory_ref.write_mem(0, data_ref1, i);
+  }
+  if (foutVec.size() > 1){
+    for (int j = 0; j < memory_ref2.getEntries(0); ++j){
+      auto data_ref2 = memory_ref2.read_mem(0, j);
+      memory_ref.write_mem(0, data_ref2, j + memory_ref1.getEntries(0));
+    }
+  }
+
+  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated);
+  
+}
 
 #endif // TestBenches_FileReadUtility_h
 
