@@ -7,7 +7,7 @@ constexpr int kNComparisonModules = 16;
 constexpr int kNBuffers = kNComparisonModules + 1;
 constexpr int kMaxTrack = 108;
 constexpr int kNLastTracks = kMaxTrack - kNComparisonModules;
-
+constexpr int rst = 1;
 constexpr int NStub = 7;
 constexpr int trackWordSize = 27; // known at compile time
 constexpr int trkVld = trackWordSize -1;
@@ -18,15 +18,23 @@ constexpr int stubVld = stubWordSize-1;
 constexpr int stubIDSize = 7;
 constexpr int mergeCondition = 3;
 
-constexpr int dinSize = trackWordSize + NStub * stubWordSize;
-constexpr int doutSize = dinSize;
+constexpr int dinSize = rst + trackWordSize + NStub * stubWordSize;
+constexpr int doutSize = dinSize-stubIDSize;
 
-inline constexpr int getStubIndexHigher(int i){
+inline constexpr int getdinStubIdxHigh(int i){
   return dinSize - trackWordSize - (i+1) * stubWordSize -1;
 }
 
-inline constexpr int getStubIndexLower(int i){
+inline constexpr int getdinStubIdxLow(int i){
   return dinSize - trackWordSize - (i+1) * stubWordSize - stubWordSize ;
+}
+
+inline constexpr int getdoutStubIdxHigh(int i){
+  return doutSize - trackWordSize - (i+1) * stubWordSize -1;
+}
+
+inline constexpr int getdoutStubIdxLow(int i){
+  return doutSize - trackWordSize - (i+1) * stubWordSize - stubWordSize ;
 }
 
 struct TrackStruct {
@@ -80,21 +88,23 @@ struct TrackStruct {
     // extract stubWord from din;
     for (int i = 0; i < NStub; i++) {
       #pragma HLS unroll
-       _stubArray[i] = din.range(getStubIndexHigher(i), getStubIndexLower(i));
+       _stubArray[i] = din.range(getdinStubIdxHigh(i), getdinStubIdxLow(i));
       }
   }
     
 
   void unloadTrack(ap_uint<doutSize>& dout) {
     #pragma HLS array_partition variable=_stubArray
-    // set dout from trackWord
-      dout.range(doutSize-1, doutSize-trackWordSize) = _trackWord;
-
-    // set dout to stubWord
+    ap_uint<doutSize> tmp(0);
+    // extract trackWord from dout
+    tmp(doutSize-1, doutSize-trackWordSize) = _trackWord;
+    // extract stubWord from dout
     for (int i = 0; i < NStub; i++) {
       #pragma HLS unroll
-      dout.range(getStubIndexHigher(i), getStubIndexLower(i)) = _stubArray[i];
-    }
+      tmp(getdoutStubIdxHigh(i), getdoutStubIdxLow(i)) =  _stubArray[i];
+      }
+      dout=tmp;
+    
     return;
   }
 

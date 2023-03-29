@@ -6,8 +6,8 @@ void TrackMergerTop(
 ){
 
     #pragma HLS inline recursive
-    // #pragma HLS stream variable=din
-    // #pragma HLS stream variable=dout
+    #pragma HLS stream variable=din
+    #pragma HLS stream variable=dout
 
 
 
