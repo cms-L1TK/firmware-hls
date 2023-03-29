@@ -10,13 +10,10 @@ constexpr int kNLastTracks = kMaxTrack - kNComparisonModules;
 constexpr int rst = 1;
 constexpr int NStub = 7;
 constexpr int trackWordSize = 22; // known at compile time
-constexpr int trkVld = trackWordSize -1;
-constexpr int stubWordSize = 1+1+4+7+12+13+12; // the stub Id is 7
-constexpr int stubIdMSB = 7+12+13+12-1;
-constexpr int stubIdLSB = 12+13+12;
-constexpr int stubVld = stubWordSize-1;
+constexpr int stubWordSize = 1+1+4+12+13+12+7; // the stub Id is 7
 constexpr int stubIDSize = 7;
 constexpr int mergeCondition = 3;
+constexpr int stubWordSizeOut = 1+1+4+12+13+12; // the stub Id is 7
 
 constexpr int dinSize = rst + trackWordSize + NStub * stubWordSize;
 constexpr int doutSize = dinSize-stubIDSize*NStub;
@@ -26,15 +23,15 @@ inline constexpr int getdinStubIdxHigh(int i){
 }
 
 inline constexpr int getdinStubIdxLow(int i){
-  return dinSize - trackWordSize - (i+1) * stubWordSize - stubWordSize ;
+  return dinSize - trackWordSize - i * stubWordSize ;
 }
 
 inline constexpr int getdoutStubIdxHigh(int i){
-  return doutSize - trackWordSize - (i+1) * stubWordSize -1;
+  return doutSize - trackWordSize - (i+1) * stubWordSizeOut -1;
 }
 
 inline constexpr int getdoutStubIdxLow(int i){
-  return doutSize - trackWordSize - (i+1) * stubWordSize - stubWordSize ;
+  return doutSize - trackWordSize - i * stubWordSizeOut ;
 }
 
 struct TrackStruct {
@@ -52,13 +49,13 @@ struct TrackStruct {
   }
 
   ap_uint<stubIDSize> getStubId(int layer) const {
-    return _stubArray[layer].range(stubIdMSB, stubIdLSB);
+    return _stubArray[layer](stubIDSize - 1, 0);
   }
   ap_uint<stubIDSize> getStubValid(int layer) const {
-    return _stubArray[layer].range(stubVld, stubVld);
+    return _stubArray[layer][stubWordSize - 1];
   }
   bool getTrackValid() const {
-    return _trackWord.range(trkVld, trkVld) == 1;
+    return _trackWord[trackWordSize -1] == 1;
   }
 
   bool compareTrack(const TrackStruct &trk) {
@@ -71,8 +68,8 @@ struct TrackStruct {
       #pragma HLS unroll
       ap_uint<stubIDSize> masterStubIndex = getStubId(stubNum);
       ap_uint<stubIDSize> inputStubIndex = trk.getStubId(stubNum);
-      ap_uint<stubVld> masterStubValid = getStubValid(stubNum);
-      ap_uint<stubVld> inputStubValid = trk.getStubValid(stubNum);
+      ap_uint<1> masterStubValid = getStubValid(stubNum);
+      ap_uint<1> inputStubValid = trk.getStubValid(stubNum);
       
       if((masterStubIndex == inputStubIndex) && masterStubValid == 1 && inputStubValid == 1)
         matchesFound++;
@@ -101,7 +98,7 @@ struct TrackStruct {
     // extract stubWord from dout
     for (int i = 0; i < NStub; i++) {
       #pragma HLS unroll
-      tmp(getdoutStubIdxHigh(i), getdoutStubIdxLow(i)) =  _stubArray[i];
+      tmp(getdoutStubIdxHigh(i), getdoutStubIdxLow(i)) =  _stubArray[i](stubWordSize - 1, stubIDSize);
       }
       dout=tmp;
     
