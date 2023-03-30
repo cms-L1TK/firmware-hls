@@ -1269,15 +1269,6 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=rbinLUT complete dim=0
   readRbin_LUT<LAYER,nRbinBits,256>(rbinLUT);
 
-  ap_uint<4> nvmstubs[8][8]; 
-#pragma HLS ARRAY_PARTITION variable=nvmstubs complete dim=0
-  
- nstubsloop: for (unsigned int izbin=0;izbin<8;izbin++) {
-#pragma HLS unroll      
-    (nvmstubs[izbin][7],nvmstubs[izbin][6],nvmstubs[izbin][5],nvmstubs[izbin][4],
-     nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
-  }
-
   const auto LUT_matchcut_rbend_width = 5;
   const auto LUT_matchcut_rbend_depth = 4096;
   ap_uint<LUT_matchcut_rbend_width> LUT_matchcut_rbend[LUT_matchcut_rbend_depth];
@@ -1540,17 +1531,16 @@ void MatchProcessor(BXType bx,
       ///////////////
       // VMProjection
       
-      ap_uint<4> nstubfirstMinus= (LAYER < trklet::N_LAYER) ? nvmstubs[zfirst][ivmMinus] : nvmstubs[rfirst][ivmMinus];
-      ap_uint<4> nstublastMinus= (LAYER < trklet::N_LAYER) ? nvmstubs[zlast][ivmMinus] : nvmstubs[rfirst+rsecond][ivmMinus];
-      ap_uint<4> nstubfirstPlus= (LAYER < trklet::N_LAYER) ? nvmstubs[zfirst][ivmPlus] : nvmstubs[rfirst][ivmPlus];
-      ap_uint<4> nstublastPlus= (LAYER < trklet::N_LAYER) ? nvmstubs[zlast][ivmPlus] : nvmstubs[rfirst+rsecond][ivmPlus];
       constexpr bool isDisk = LAYER > TF::L6;
       constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
       auto slot = zbin.range(zbin.length()-1, 1);
-      nstubfirstMinus = instubdata.getEntries(bx, ivmMinus*nbins + slot);
-      nstublastMinus = instubdata.getEntries(bx, ivmMinus*nbins + slot + 1);
-      nstubfirstPlus = instubdata.getEntries(bx, ivmPlus*nbins + slot);
-      nstublastPlus = instubdata.getEntries(bx, ivmPlus*nbins + slot + 1);
+      ap_uint<4> ibin,ireg;
+      (ireg,ibin) = ivmMinus*nbins + slot;
+      ap_uint<4> nstubfirstMinus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstublastMinus = instubdata.getEntries8B(bx, ibin+1).range(4*ireg+3, 4*ireg);
+      (ireg,ibin) = ivmPlus*nbins + slot;
+      ap_uint<4> nstubfirstPlus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstublastPlus = instubdata.getEntries8B(bx, ibin+1).range(4*ireg+3, 4*ireg);
       
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
@@ -1570,10 +1560,10 @@ void MatchProcessor(BXType bx,
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
       ap_uint<1> useSecond = zbin.range(0,0) == 1;
-      ap_uint<1> usefirstMinus = instubdata.getEntries(bx, ivmMinus*nbins + slot) != 0;
-      ap_uint<1> usesecondMinus = useSecond && (instubdata.getEntries(bx, ivmMinus*nbins + slot + 1) != 0);
-      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (instubdata.getEntries(bx, ivmPlus*nbins + slot) != 0);
-      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && (useSecond && (instubdata.getEntries(bx, ivmPlus*nbins + slot + 1) != 0));
+      ap_uint<1> usefirstMinus = nstubfirstMinus != 0;
+      ap_uint<1> usesecondMinus = useSecond && (nstublastMinus != 0);
+      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (nstubfirstPlus != 0);
+      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && (nstublastPlus != 0);
 
       ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, shift, trackletid, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
       projbufferarray.saveProjection(projbuffertmp);
