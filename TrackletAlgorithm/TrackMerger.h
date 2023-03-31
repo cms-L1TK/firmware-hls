@@ -37,6 +37,7 @@ struct TrackStruct {
   
   ap_uint<trackWordSize> _trackWord; 
   ap_uint<stubWordSize> _stubArray[NStub]; 
+  ap_uint<1> _cm = 0;
 
   void resetTracks() {
     _trackWord = 0;

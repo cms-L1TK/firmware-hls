@@ -7,8 +7,10 @@ TrackStruct& ComparisonModule::getMasterTrackStruct(){
 void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack){
   tracksProcessed++;
   if (inTrack._trackWord != 0 && tracksProcessed <= kMaxTrack){
-    if (!masterTrack.getTrackValid()){
+    if (!masterTrack.getTrackValid() && inTrack._cm == 0){
       masterTrack = inTrack;
+      inTrack.cm_ = 1;
+      outTrack = inTrack;
     } else {
       if(inTrack.getTrackValid()){
         if (!masterTrack.compareTrack(inTrack)) {
