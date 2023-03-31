@@ -1536,11 +1536,13 @@ void MatchProcessor(BXType bx,
       auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<4> ibin,ireg;
       (ireg,ibin) = ivmMinus*nbins + slot;
-      ap_uint<4> nstubfirstMinus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
-      ap_uint<4> nstublastMinus = instubdata.getEntries8B(bx, ibin+1).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstubfirstMinus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
+      (ireg,ibin) = ivmMinus*nbins + slot + 1;
+      ap_uint<4> nstublastMinus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
       (ireg,ibin) = ivmPlus*nbins + slot;
-      ap_uint<4> nstubfirstPlus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
-      ap_uint<4> nstublastPlus = instubdata.getEntries8B(bx, ibin+1).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstubfirstPlus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
+      (ireg,ibin) = ivmPlus*nbins + slot + 1;
+      ap_uint<4> nstublastPlus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
       
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
