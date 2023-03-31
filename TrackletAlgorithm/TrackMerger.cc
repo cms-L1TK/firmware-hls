@@ -23,6 +23,8 @@ void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack
   return;
 }
 
+
+
 void ComparisonModule::resetCM(){
   masterTrack.resetTracks();
   tracksProcessed = 0;
@@ -30,92 +32,81 @@ void ComparisonModule::resetCM(){
   return;
 }
 
-void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i){
-  outTrack[i] = inTrack;
-  
-  return;
+void fillTrackArray(TrackStruct& inTrack, TrackStruct* outTrack, unsigned int &i){
+  outTrack[i] = inTrack; 
 }
+
+
 
 void TrackMerger(
     const ap_uint<dinSize> din[kMaxTrack],
     ap_uint<doutSize> (&dout)[kMaxTrack])
 {
   ComparisonModule comparisonModule[kNComparisonModules];
-  #pragma HLS array_partition variable=comparisonModule dim=1
+  #pragma HLS array_partition variable=comparisonModule complete dim=1
 
   TrackStruct unmergedTracks[kNLastTracks];
   #pragma HLS data_pack variable=unmergedTracks
+  // #pragma HLS array_partition variable=unmergedTracks complete dim=0
 
-  TrackStruct cmTracks[kNComparisonModules];
-  #pragma HLS data_pack variable=cmTracks
+  unsigned int unmergedIndx{0};
   
   LOOP_ResetUnmergedTrks:
-  for (unsigned int nTracks = 0; nTracks < kNLastTracks; nTracks++){
+  for (int nTracks = 0; nTracks < kNLastTracks; nTracks++){
     #pragma HLS unroll
     unmergedTracks[nTracks].resetTracks();
   }
 
-  LOOP_ResetCMTrks:
-  for (unsigned int nCMTracks = 0; nCMTracks < kNComparisonModules; nCMTracks++){
-    #pragma HLS unroll
-    cmTracks[nCMTracks].resetTracks();
-  }
 
-  LOOP_ResetCMs:
-  for (unsigned int nCM = 0; nCM < kNComparisonModules; nCM++){
+  LOOP_ResetCM:
+  for (int nCM = 0; nCM < kNComparisonModules; nCM++){
     #pragma HLS unroll
     comparisonModule[nCM].resetCM();
   }
 
-  unsigned int unmergedIndx{0};
   
   // Looping over all tracks
   LOOP_Input:
-  for (unsigned int i = 0; i < kMaxTrack; i++){ 
+  for (int i = 0; i < kMaxTrack; i++){ 
     #pragma HLS pipeline II=1
     TrackStruct tracks[kNBuffers];
+    // #pragma HLS array_partition variable=tracks complete dim=1
     #pragma HLS data_pack variable=tracks
     // Filling first element of the buffer with module input
     tracks[0].loadTrack(din[i]);
 
     // CM processing loop
     LOOP_ProcTracks:
-    for (unsigned int j = 0; j < kNComparisonModules; j++){
+    for (int j = 0; j < kNComparisonModules; j++){
       comparisonModule[j].process(tracks[j], tracks[j+1]);
       tracks[j].resetTracks();
     }
+
     // When the unmerged track reaches the end of the buffer - put in unmerged tracks array to be output
-    if (tracks[kNComparisonModules].getTrackValid()){
+    if(tracks[kNComparisonModules].getTrackValid()){
       fillTrackArray(tracks[kNComparisonModules], unmergedTracks, unmergedIndx);
-      tracks[kNComparisonModules].resetTracks();
       unmergedIndx++;
     }
 
-  }
 
-  // Getting CM master tracks
-  LOOP_CMTracks:
-  for (unsigned int nModule = 0; nModule < kNComparisonModules; nModule++){
-    #pragma HLS pipeline II=1
-    cmTracks[nModule] = comparisonModule[nModule].getMasterTrackStruct(); // This line fills CM array to be read out at same time as unmerged tracks
-    comparisonModule[nModule].resetCM(); // Resetting
   }
 
   // Setting outputs in same loop
   LOOP_SetOutputs:
-  for (unsigned int outputIndex = 0; outputIndex < kMaxTrack; outputIndex++){
+  for (int outputIndex = 0; outputIndex < kMaxTrack; outputIndex++){
     #pragma HLS pipeline II=1 
     TrackStruct trk;
     if (outputIndex < kNComparisonModules) {
-      trk = cmTracks[outputIndex];
-      cmTracks[outputIndex].resetTracks(); // Resetting
+      trk = comparisonModule[outputIndex].getMasterTrackStruct();
+      comparisonModule[outputIndex].resetCM(); // Resetting
     } else if ((outputIndex - kNComparisonModules) < kNLastTracks) {
       trk = unmergedTracks[outputIndex-kNComparisonModules];
       unmergedTracks[outputIndex-kNComparisonModules].resetTracks(); // Resetting      
     } else {
       trk.resetTracks();
     }
-    
+
+
     // Send track to output
     trk.unloadTrack(dout[outputIndex]);
 

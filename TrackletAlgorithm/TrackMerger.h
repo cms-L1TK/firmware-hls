@@ -2,7 +2,6 @@
 #define TrackletAlgorithm_TrackMerger_h
 
 #include "ap_int.h"
-
 constexpr int kNComparisonModules = 16;
 constexpr int kNBuffers = kNComparisonModules + 1;
 constexpr int kMaxTrack = 108;
@@ -42,7 +41,7 @@ struct TrackStruct {
   void resetTracks() {
     _trackWord = 0;
     LOOP_StubReset: 
-    for (unsigned int stubIdx= 0; stubIdx < NStub; stubIdx++){
+    for (int stubIdx= 0; stubIdx < NStub; stubIdx++){
       #pragma HLS unroll
       _stubArray[stubIdx]= 0;
     }
@@ -60,11 +59,11 @@ struct TrackStruct {
 
   bool compareTrack(const TrackStruct &trk) {
     // Compare the two tracks, masterTrack and trk
-    #pragma HLS array_partition variable=_stubArray complete dim=0
-    #pragma HLS array_partition variable=trk._stubArray complete dim=0
+    #pragma HLS array_partition variable=_stubArray complete dim=1
+    #pragma HLS array_partition variable=trk._stubArray complete dim=1
     int matchesFound(0);
     LOOP_CompareStubs:
-    for (unsigned int stubNum = 0; stubNum < NStub; stubNum++){
+    for (int stubNum = 0; stubNum < NStub; stubNum++){
       #pragma HLS unroll
       ap_uint<stubIDSize> masterStubIndex = getStubId(stubNum);
       ap_uint<stubIDSize> inputStubIndex = trk.getStubId(stubNum);
@@ -78,20 +77,23 @@ struct TrackStruct {
   }
 
   void loadTrack(const ap_uint<dinSize>& din){
-    #pragma HLS array_partition variable _stubArray
+    #pragma HLS array_partition variable _stubArray complete dim=1
+    ap_uint<dinSize> tmp(0);
+    tmp = din;
     // extract trackWord from din
-     _trackWord = din.range(dinSize-1, dinSize-trackWordSize);
+     _trackWord = tmp.range(dinSize-1, dinSize-trackWordSize);
 
     // extract stubWord from din;
     for (int i = 0; i < NStub; i++) {
       #pragma HLS unroll
-       _stubArray[i] = din.range(getdinStubIdxHigh(i), getdinStubIdxLow(i));
+       _stubArray[i] = tmp.range(getdinStubIdxHigh(i), getdinStubIdxLow(i));
       }
+    
   }
     
 
   void unloadTrack(ap_uint<doutSize>& dout) {
-    #pragma HLS array_partition variable=_stubArray
+    #pragma HLS array_partition variable=_stubArray complete dim=1
     ap_uint<doutSize> tmp(0);
     // extract trackWord from dout
     tmp(doutSize-1, doutSize-trackWordSize) = _trackWord;
@@ -127,6 +129,7 @@ class ComparisonModule{
     TrackStruct masterTrack;
 
     void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned int i);
+
 
 
 };
