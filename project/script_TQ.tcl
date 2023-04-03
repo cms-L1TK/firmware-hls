@@ -26,7 +26,9 @@ if { [file exists ../TrackQuality/parameters.h ] == 1} {
     }
 
 # create new project (deleting any existing one of same name)
-open_project -reset trackquality
+set project_name "trackquality"
+append project_name $VitisOrVivado
+open_project -reset $project_name
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackQuality}

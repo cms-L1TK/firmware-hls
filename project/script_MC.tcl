@@ -19,7 +19,10 @@ set modules_to_test {
 set module_to_export MC_L3PHIC
 
 # create new project (deleting any existing one of same name)
-open_project -reset match_calc
+set project_name "match_calc"
+append project_name $VitisOrVivado
+open_project -reset $project_name
+
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}

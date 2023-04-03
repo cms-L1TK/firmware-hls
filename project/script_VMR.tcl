@@ -62,7 +62,10 @@ set modules_to_test {
 set module_to_export VMR_L2PHIA
 
 # create new project (deleting any existing one of same name)
-open_project -reset vmrouter
+set project_name "vmrouter"
+append project_name $VitisOrVivado
+open_project -reset $project_name
+
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions}
