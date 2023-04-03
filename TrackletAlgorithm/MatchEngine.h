@@ -169,7 +169,7 @@ void MatchEngine(const BXType bx, BXType& bx_o,
 	//
 	//Initialize table for bend-rinv consistency
 	//
-	static const ap_uint<1>* table = readTable<LayerDisk>();
+	const ap_uint<1>* table = readTable<LayerDisk>();
 
 	//
 	// Set up a FIFO based on a circular buffer structure.

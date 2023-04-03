@@ -26,7 +26,11 @@ set modules_to_test {
 set module_to_export ME_L3PHIC20
 
 # create new project (deleting any existing one of same name)
-open_project -reset matchengine
+#open_project -reset matchengine
+set project_name "matchengine" 
+append project_name $VitisOrVivado
+open_project -reset $project_name 
+
 
 # source files
 # Optional Flags: -DDEBUG
