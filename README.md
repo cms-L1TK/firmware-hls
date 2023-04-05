@@ -390,7 +390,7 @@ First source Xilinx Vivado 2020.1
 
 ```
 ipbb init <project name>
-cd <projct name>
+cd <project name>
 ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.3
 ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v1.2.2
 ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
