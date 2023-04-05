@@ -13,4 +13,4 @@ update_ip_catalog -rebuild
 
 create_ip -name DuplicateRemovalTop -module_name DuplicateRemoval -vendor xilinx.com -library hls -version 1.0 -dir "./"
 
-exec unzip duplicateRemoval/240VU13P-2/impl/ip/xilinx_com_hls_DuplicateRemovalTop_1_0.zip -d ./DuplicateRemoval
+exec unzip duplicateRemoval/solution1/impl/ip/xilinx_com_hls_DuplicateRemovalTop_1_0.zip -d ./DuplicateRemoval
