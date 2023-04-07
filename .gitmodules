@@ -1,3 +1,6 @@
 [submodule "emData/project_generation_scripts"]
 	path = emData/project_generation_scripts
 	url = https://github.com/cms-L1TK/project_generation_scripts.git
+[submodule "KalmanFilter"]
+	path = KalmanFilter
+	url = https://github.com/cms-L1TK/l1tk-for-emp.git

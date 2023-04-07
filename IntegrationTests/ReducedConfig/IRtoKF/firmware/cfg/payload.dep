@@ -1,0 +1,54 @@
+src payload.vhd
+src linktosecproc.vhd
+src secproctolink.vhd
+src SectorProcessor.vhd
+src tf_to_kf.vhd
+src pkgs/tf_interface_pkg.vhd
+src kf_wrapper.vhd
+src memUtil_pkg.vhd
+src pkgs/GCU_utils.vhd
+
+src common/hdl/CreateStartSignal.vhd
+src --vhdl2008 common/hdl/tf_lut.vhd
+src --vhdl2008 common/hdl/tf_mem_bin.vhd
+src --vhdl2008 common/hdl/tf_mem.vhd
+src common/hdl/tf_pkg.vhd
+
+# KF
+include -c firmware-hls:KalmanFilter/kfin components.dep 
+include -c firmware-hls:KalmanFilter/kf components.dep 
+src kfout_top_conv.vhd
+src conv96to64.vhd
+include -c firmware-hls:KalmanFilter/kfout components.dep 
+include -c firmware-hls:KalmanFilter/tq components.dep 
+include -c firmware-hls:KalmanFilter/common components.dep 
+
+# Surf subset
+src -l surf surf_subset/hdl/AxiStreamMux.vhd
+src -l surf surf_subset/hdl/AxiStreamFifoV2.vhd
+src -l surf surf_subset/hdl/AxiStreamFifo.vhd
+src -l surf surf_subset/hdl/AxiStreamGearbox.vhd
+src -l surf surf_subset/hdl/FifoCascade.vhd
+src -l surf surf_subset/hdl/Fifo.vhd
+src -l surf surf_subset/hdl/FifoSync.vhd
+src -l surf surf_subset/hdl/FifoAsync.vhd
+src -l surf surf_subset/hdl/FifoOutputPipeline.vhd
+src -l surf surf_subset/hdl/FifoWrFsm.vhd
+src -l surf surf_subset/hdl/FifoRdFsm.vhd
+src -l surf surf_subset/hdl/SynchronizerVector.vhd
+src -l surf surf_subset/hdl/SimpleDualPortRam.vhd
+src -l surf surf_subset/hdl/RstSync.vhd
+src -l surf surf_subset/hdl/Synchronizer.vhd
+src -l surf surf_subset/hdl/AxiStreamResizeBE.vhd
+src -l surf surf_subset/hdl/AxiStreamResize.vhd
+src -l surf surf_subset/hdl/AxiStreamPipeline.vhd
+
+src -l surf surf_subset/pkgs/ArbiterPkg.vhd
+src -l surf surf_subset/pkgs/AxiStreamPkg.vhd
+src -l surf surf_subset/pkgs/StdRtlPkg.vhd
+
+################
+# Include Cores
+################
+iprepo *
+src ../cgn/*/*/*.xci
