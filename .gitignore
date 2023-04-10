@@ -33,6 +33,8 @@ vmrouter_2
 emData
 IntegrationTests/PRMEMC/*.txt
 TopFunctions
+project
+IntegrationTests
 
 # Precompiled Headers
 *.gch
@@ -57,4 +59,3 @@ TopFunctions
 *.exe
 *.out
 *.app
-

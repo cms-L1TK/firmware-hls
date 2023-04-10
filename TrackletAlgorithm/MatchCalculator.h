@@ -45,10 +45,10 @@ void merger(
 ){
 
 #pragma HLS inline
-#pragma HLS pipeline II=1 rewind
-#pragma HLS interface ap_ctrl_none port=return
-#pragma HLS interface ap_ctrl_none port=inA,validA,inB,validB,out,vout,inread,A,vA,sA,B,vB,sB
-#pragma HLS interface ap_ctrl_none port=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,voutnext
+//#pragma HLS pipeline II=1 rewind
+#pragma HLS interface mode=ap_ctrl_none port=return
+#pragma HLS interface mode=ap_ctrl_none port=inA,validA,inB,validB,out,vout,inread,A,vA,sA,B,vB,sB
+#pragma HLS interface mode=ap_ctrl_none port=Anext,Bnext,vAnext,vBnext,sAnext,sBnext,voutnext
 
     // Set read enables for A and B
     *readA = (((inread || !vout) && sA) || !vA) && validA;

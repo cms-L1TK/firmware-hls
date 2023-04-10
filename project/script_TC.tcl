@@ -69,13 +69,13 @@ foreach i $modules_to_test {
 
   # Define FPGA, clock frequency & common HLS settings.
   source settings_hls.tcl
-  csim_design -mflags "-j8"
+  csim_design -mflags "-j8" -profile
 
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {
     csynth_design
-    cosim_design
-    export_design -format ip_catalog
+    #cosim_design
+    #export_design -format ip_catalog
     # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
     #export_design -format ip_catalog -flow impl
   }

@@ -1125,6 +1125,7 @@ switch (Seed) {
 #  include "../emData/TC/tables/TC_L1L2_invt.tab"
 #endif
       };
+#pragma HLS bind_storage variable=LUT_invt type=rom_1p impl=BRAM
       invt = LUT_invt[addr_invt];
       break;
     }
@@ -1135,6 +1136,7 @@ switch (Seed) {
 #  include "../emData/TC/tables/TC_L2L3_invt.tab"
 #endif
       };
+#pragma HLS bind_storage variable=LUT_invt type=rom_1p impl=BRAM
       invt = LUT_invt[addr_invt];
       break;
     }
@@ -1146,6 +1148,7 @@ switch (Seed) {
 #  include "../emData/TC/tables/TC_L3L4_invt.tab"
 #endif
       };
+#pragma HLS bind_storage variable=LUT_invt type=rom_1p impl=BRAM
       invt = LUT_invt[addr_invt];
       break;
     }
@@ -1156,6 +1159,7 @@ switch (Seed) {
 #  include "../emData/TC/tables/TC_L5L6_invt.tab"
 #endif
       };
+#pragma HLS bind_storage variable=LUT_invt type=rom_1p impl=BRAM
       invt = LUT_invt[addr_invt];
       break;
     }

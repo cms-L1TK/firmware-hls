@@ -556,10 +556,10 @@ void VMRouter(const BXType bx, BXType& bx_o, const int fineBinTable[], const int
 #pragma HLS array_partition variable=memoriesTEO complete dim=2
 
 // Take 2 clock cycles before on gets data, used at high frequencies
-#pragma HLS resource variable=fineBinTable latency=2
-#pragma HLS resource variable=rzbitsInnerTable latency=2
-#pragma HLS resource variable=rzbitsOverlapTable latency=2
-#pragma HLS resource variable=rzbitsOuterTable latency=2
+#pragma HLS bind_storage type=ROM_1P variable=fineBinTable latency=2
+#pragma HLS bind_storage type=ROM_1P variable=rzbitsInnerTable latency=2
+#pragma HLS bind_storage type=ROM_1P variable=rzbitsOverlapTable latency=2
+#pragma HLS bind_storage type=ROM_1P variable=rzbitsOuterTable latency=2
 
 	// The first memory numbers, the position of the first non-zero bit in the mask
 	// Do not change these to ap_uint as cosim will fail

@@ -105,8 +105,9 @@ void TrackletEngine(
   // Seven iterations are subtracted so that the total latency is 108 clock
   // cycles. Pipeline rewinding does not currently work.
  te_loop:for (unsigned int istep=0; istep<kMaxProc - kMaxProcOffset(module::TE); istep++) {
-    //#pragma HLS pipeline II=1 rewind
-#pragma HLS performance target_ti=1
+#pragma HLS pipeline II=1 rewind
+//#pragma HLS pipeline II=1 
+//#pragma HLS performance target_ti=1
 
 	  // pre-fetch element from buffer
 	  auto const bufdata = teBuffer[readindex];

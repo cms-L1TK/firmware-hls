@@ -450,13 +450,18 @@ TC::processStubPair(
   TC::Types::der_rD der_rD;
   TC::Types::flag valid_proj_disk[trklet::N_DISK - 1];
   bool success;
+  auto npar_local = npar;
 
 // Calculate the tracklet parameters and projections.
   success = TC::barrelSeeding<Seed>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
 
 // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(innerIndex, outerIndex, rinv, phi0, z0, t);
-  if (success) trackletParameters->write_mem(bx, tpar, npar++);
+  if (success) {
+    trackletParameters->write_mem(bx, tpar, npar_local);
+#pragma HLS bind_op variable=npar_local op=add latency=0
+    npar_local = npar_local + 1;
+  }
 
   bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 
@@ -535,6 +540,7 @@ TC::processStubPair(
   TC::addProj<DISK, nproj_D4, ((TPROJMaskDisk & mask_D4) >> shift_D4)> (tproj_D4, bx, &projout_disk[D4PHIA], &nproj_disk[D4PHIA], success && valid_proj_disk[3] && !addL3);
 
   if (success) trackletIndex++;
+  npar = npar_local;
 }
 
 // This is the primary interface for the TrackletCalculator.
@@ -558,7 +564,7 @@ TrackletCalculator(
 )
 {
   static_assert(Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L5L6, "Only L1L2, L2L3, L3L4, and L5L6 seeds have been implemented so far.");
-
+#pragma HLS inline recursive
   ap_uint<kNBits_MemAddr> npar = 0;
   ap_uint<kNBits_MemAddr> nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
   ap_uint<kNBits_MemAddr> nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
@@ -584,9 +590,12 @@ TrackletCalculator(
   const TrackletProjection<BARRELPS>::TProjTCID TCID = TC::ID<Seed, iTC>();
 
 // Loop over all stub pairs.
-  stub_pairs: for (TC::Types::nSP i = 0; i < kMaxProc - kMaxProcOffset(module::TC); i++) {
-//#pragma HLS pipeline II=1 rewind style=flp
-#pragma HLS PERFORMANCE target_ti=1
+  stub_pairs: 
+  for (TC::Types::nSP i = 0; i < kMaxProc - kMaxProcOffset(module::TC); i++) {
+#pragma HLS pipeline II=1 rewind 
+//#pragma HLS pipeline II=1 
+#pragma HLS dependence variable=npar type=inter false 
+    //#pragma HLS PERFORMANCE target_ti=1
 
 // The first iteration is sacrificed to clearing the output memories and
 // zeroing the number of tracklets and projections. Therefore, only

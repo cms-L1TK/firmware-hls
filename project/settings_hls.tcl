@@ -19,6 +19,8 @@ switch -glob -- $exe {
     *vitis* {
         # Set the FPGA part number
         set_part $FPGA
+	# these settings restore more like default vivado_hls performance.
+	# see the "VITIS HLS MIGRATION GUIDE" in UG1399
         # this used to be 12.5% in Vivado, now it's 27% in vitis.
         # set it back to 12.5 % for now
         set frac 0.125
@@ -26,6 +28,16 @@ switch -glob -- $exe {
         set unc [ expr {$curr_clock_period * $frac } ]
         set_clock_uncertainty $unc
         puts "manually set clock uncertainty to $unc"
+	# change the export settings
+	config_export -vivado_optimization_level 2
+	config_export -vivado_phys_opt place
+	config_compile -pipeline_loops 0 -pragma_strict_mode=true  
+#-unsafe_math_optimizations
+	config_schedule -enable_dsp_full_reg=false
+#        config_op mul -latency 3 
+#       config_op mul -latency 3 
+#	config_op add -latency 3
+	config_csim -profile -O
     }
     default {
         # Set the FPGA part number
