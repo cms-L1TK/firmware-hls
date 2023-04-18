@@ -1536,13 +1536,13 @@ void MatchProcessor(BXType bx,
       auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<4> ibin,ireg;
       (ireg,ibin) = ivmMinus*nbins + slot;
-      ap_uint<4> nstubfirstMinus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstubfirstMinus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
       (ireg,ibin) = ivmMinus*nbins + slot + 1;
-      ap_uint<4> nstublastMinus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstublastMinus = instubdata.getEntries8B(bx, ibin).range(4*ireg+3, 4*ireg);
       (ireg,ibin) = ivmPlus*nbins + slot;
-      ap_uint<4> nstubfirstPlus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstubfirstPlus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
       (ireg,ibin) = ivmPlus*nbins + slot + 1;
-      ap_uint<4> nstublastPlus = instubdata.getEntries8(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstublastPlus = instubdata.getEntries8B(bx, ibin).range(4*ireg+3, 4*ireg);
       
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
@@ -1565,7 +1565,7 @@ void MatchProcessor(BXType bx,
       ap_uint<1> usefirstMinus = nstubfirstMinus != 0;
       ap_uint<1> usesecondMinus = useSecond && (nstublastMinus != 0);
       ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (nstubfirstPlus != 0);
-      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && (nstublastPlus != 0);
+      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && (nstublastPlus != 0);
 
       ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, shift, trackletid, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
       projbufferarray.saveProjection(projbuffertmp);
