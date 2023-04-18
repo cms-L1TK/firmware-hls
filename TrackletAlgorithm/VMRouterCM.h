@@ -45,10 +45,10 @@ constexpr int maskASIsize = 12; // Allstub Inner memories
 enum allStubInnerVersions {A, B, C, D, E, F, L, M, R, OL, OM, OR};
 
 // Cuts for AllStub Inner memories
-constexpr float CUTZL1L3L5[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1L3L5/kz_cm[0], trklet::VMROUTERCUTZL1L3L5/kz_cm[1], trklet::VMROUTERCUTZL1L3L5/kz_cm[2], trklet::VMROUTERCUTZL1L3L5/kz_cm[3], trklet::VMROUTERCUTZL1L3L5/kz_cm[4], trklet::VMROUTERCUTZL1L3L5/kz_cm[5]};
-constexpr float CUTZL1[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1/kz_cm[0], trklet::VMROUTERCUTZL1/kz_cm[1], trklet::VMROUTERCUTZL1/kz_cm[2], trklet::VMROUTERCUTZL1/kz_cm[3], trklet::VMROUTERCUTZL1/kz_cm[4], trklet::VMROUTERCUTZL1/kz_cm[5]};
-constexpr float CUTZL2[trklet::N_LAYER] = {trklet::VMROUTERCUTZL2/kz_cm[0], trklet::VMROUTERCUTZL2/kz_cm[1], trklet::VMROUTERCUTZL2/kz_cm[2], trklet::VMROUTERCUTZL2/kz_cm[3], trklet::VMROUTERCUTZL2/kz_cm[4], trklet::VMROUTERCUTZL2/kz_cm[5]};
-constexpr float CUTRD1D3 = trklet::VMROUTERCUTRD1D3 / kr;
+constexpr double CUTZL1L3L5[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1L3L5/kz_cm[0], trklet::VMROUTERCUTZL1L3L5/kz_cm[1], trklet::VMROUTERCUTZL1L3L5/kz_cm[2], trklet::VMROUTERCUTZL1L3L5/kz_cm[3], trklet::VMROUTERCUTZL1L3L5/kz_cm[4], trklet::VMROUTERCUTZL1L3L5/kz_cm[5]};
+constexpr double CUTZL1[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1/kz_cm[0], trklet::VMROUTERCUTZL1/kz_cm[1], trklet::VMROUTERCUTZL1/kz_cm[2], trklet::VMROUTERCUTZL1/kz_cm[3], trklet::VMROUTERCUTZL1/kz_cm[4], trklet::VMROUTERCUTZL1/kz_cm[5]};
+constexpr double CUTZL2[trklet::N_LAYER] = {trklet::VMROUTERCUTZL2/kz_cm[0], trklet::VMROUTERCUTZL2/kz_cm[1], trklet::VMROUTERCUTZL2/kz_cm[2], trklet::VMROUTERCUTZL2/kz_cm[3], trklet::VMROUTERCUTZL2/kz_cm[4], trklet::VMROUTERCUTZL2/kz_cm[5]};
+constexpr double CUTRD1D3 = trklet::VMROUTERCUTRD1D3 / kr;
 
 //////////////////////////////////////
 // Functions used by the VMR CM
@@ -323,7 +323,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				passRZCut = !(comparison_rz > comparison_value);
 			} else if (Disk == 1 || Disk == 3) {
 			  auto comparison_value = CUTRD1D3;
-			  constexpr int comparison_value2 = 2 * trklet::N_DISK; // 2*int(N_DSS_MOD) in emulation
+			  constexpr int comparison_value2 = trklet::N_DISK << 1; // 2*int(N_DSS_MOD) in emulation
 				passRZCut = !(comparison_rz > comparison_value) && !(comparison_rz < comparison_value2);
 			}
 
