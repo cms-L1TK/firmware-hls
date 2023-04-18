@@ -205,8 +205,8 @@ class MemoryTemplateBinnedCM{
         binmask8_[ibx][ibin] = 0;
       }
       for (unsigned int ibin = 0; ibin < kNBxBins*8; ++ibin) {
-        nentries8A_[ibin] = 0;
-        nentries8B_[ibin] = 0;
+        nentries8A_[ibx*8+ibin] = 0;
+        nentries8B_[ibx*8+ibin] = 0;
       }
     }
   }
