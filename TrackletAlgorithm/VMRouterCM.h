@@ -44,6 +44,12 @@ constexpr int maskASIsize = 12; // Allstub Inner memories
 // Enum for the different versions of Allstub Inner memories. L,M,R can be used for both barrel and disks
 enum allStubInnerVersions {A, B, C, D, E, F, L, M, R, OL, OM, OR};
 
+// Cuts for AllStub Inner memories
+constexpr double CUTZL1L3L5[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1L3L5/kz_cm[0], trklet::VMROUTERCUTZL1L3L5/kz_cm[1], trklet::VMROUTERCUTZL1L3L5/kz_cm[2], trklet::VMROUTERCUTZL1L3L5/kz_cm[3], trklet::VMROUTERCUTZL1L3L5/kz_cm[4], trklet::VMROUTERCUTZL1L3L5/kz_cm[5]};
+constexpr double CUTZL1[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1/kz_cm[0], trklet::VMROUTERCUTZL1/kz_cm[1], trklet::VMROUTERCUTZL1/kz_cm[2], trklet::VMROUTERCUTZL1/kz_cm[3], trklet::VMROUTERCUTZL1/kz_cm[4], trklet::VMROUTERCUTZL1/kz_cm[5]};
+constexpr double CUTZL2[trklet::N_LAYER] = {trklet::VMROUTERCUTZL2/kz_cm[0], trklet::VMROUTERCUTZL2/kz_cm[1], trklet::VMROUTERCUTZL2/kz_cm[2], trklet::VMROUTERCUTZL2/kz_cm[3], trklet::VMROUTERCUTZL2/kz_cm[4], trklet::VMROUTERCUTZL2/kz_cm[5]};
+constexpr double CUTRD1D3 = trklet::VMROUTERCUTRD1D3 / kr;
+
 //////////////////////////////////////
 // Functions used by the VMR CM
 
@@ -305,19 +311,19 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 			// Use comparison_rz to check if they pass the RZ cuts
 			if (Layer == 1) { // TODO: use comparison value 2 for LMR memories
-			  constexpr float comparison_value = (Layer) ? trklet::VMROUTERCUTZL1L3L5 / kz_cm[Layer - 1] : 0;
-			  constexpr float comparison_valueLMR = (Layer) ? trklet::VMROUTERCUTZL1 / kz_cm[Layer - 1] : 0; // For LMR memories
+			  auto comparison_value = (Layer) ? CUTZL1L3L5[Layer-1] : 0;
+			  auto comparison_valueLMR = (Layer) ? CUTZL1[Layer-1] : 0; // For LMR memories
 				passRZCut = !(comparison_rz > comparison_value);
 				passRZSpecialCut = !(comparison_rz < comparison_valueLMR);
 			} else if (Layer == 2) {
-			  constexpr float comparison_value = (Layer) ? trklet::VMROUTERCUTZL2 / kz_cm[Layer - 1] : 0;
+			  auto comparison_value = (Layer) ? CUTZL2[Layer-1] : 0;
 				passRZCut = !(comparison_rz < comparison_value);
 			} else if (Layer == 3 || Layer == 5) {
-			  constexpr float comparison_value = (Layer) ? trklet::VMROUTERCUTZL1L3L5 / kz_cm[Layer - 1] : 0;
+			  auto comparison_value = (Layer) ? CUTZL1L3L5[Layer-1] : 0;
 				passRZCut = !(comparison_rz > comparison_value);
 			} else if (Disk == 1 || Disk == 3) {
-			  constexpr float comparison_value = trklet::VMROUTERCUTRD1D3 / kr;
-			  constexpr float comparison_value2 = 2 * trklet::N_DISK; // 2*int(N_DSS_MOD) in emulation
+			  auto comparison_value = CUTRD1D3;
+			  constexpr int comparison_value2 = trklet::N_DISK << 1; // 2*int(N_DSS_MOD) in emulation
 				passRZCut = !(comparison_rz > comparison_value) && !(comparison_rz < comparison_value2);
 			}
 
