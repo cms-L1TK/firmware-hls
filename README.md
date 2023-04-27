@@ -240,34 +240,42 @@ cmsRun L1TrackNtupleMaker_cfg.py
 
 ## Generation of LUTs and MemPrint files for the reduced combined module chain
 
-The steps needed to generate the configurations files for the reduced combined module chain is explained below.
+The steps needed to generate the configurations files for the reduced combined module chains is explained below.
 
 Step 1: Produce the reduced configuration
 
-Modify the makeReducedConfig.py script online 188 
+Copy over the wires.dat, memorymodules.dat, and processingmodules.dat from the full configuration for the reduced modules to the area where you are runing the makeReducedConfig.py. I will assume that the namdes of these files are cm_wires.dat, cm_processingmodules.dat, and cm_memorymodules.dat. 
 
--        print("Starting with node TC_%s%s"%(layers,tcs[tc_i]))
--        n = node("TC_%s%s"%(layers,tcs[tc_i]))
-+        print("Starting with node TP_%s%s"%(layers,tcs[tc_i]))
-+        n = node("TP_%s%s"%(layers,tcs[tc_i]))
+We have three different reduced combined module configurations:
 
-Copy over the wires.dat, memorymodules.dat, and processingmodules.dat from the full configuration for the reduced modules to the area where you are runing the makeReducedConfig.py
+1) The "CM_Reduced" configuration which is a skinny chain with on TP. To generate the configuation files for this configuration run the command:
 
-After doing this run the script with the options:
+./makeReducedConfig.py -w cm_wires.dat -p cm_processingmodules.dat -m cm_memorymodules.dat -s C -o CM_Reduced_ -t TP --no-graph
 
-./makeReducedConfig.py --no-graph --sector C
+2) The "CM_Reduced2" configuration which implementes all TP in L1L2 and all barrel MP is L3-L6. To generate this configuration run the command:
+
+./makeReducedConfig.py -w cm_wires.dat -p cm_processingmodules.dat -m cm_memorymodules.dat -s All -o CM_Reduced2_ -t TP --no-graph
+
+3) The "CM_Barrel" configuration which has all barrel TP and MP. To generate the configuation files for this configuration run the commands (removes all disk related modules):
+
+cat cm_memorymodules.dat | grep -v D1 | grep -v D2 | grep -v D3 | grep -v D4 | grep -v D5 > CM_Barrel_memorymodules.dat
+cat cm_processingmodules.dat | grep -v D1 | grep -v D2 | grep -v D3 | grep -v D4 | grep -v D5 > CM_Barrel_processingmodules.dat
+cat cm_wires.dat | grep -v D1 | grep -v D2 | grep -v D3 | grep -v D4 | grep -v D5 > CM_Barrel_wires.dat
+
 
 This should produce the three files
 
- - reduced_wires.dat
- - reduced_memorymodules.dat
- - reduced_processingmodules.dat 
+ - CM_{Reduced,Reduced2,Barrel}_wires.dat
+ - CM_{Reduced,Reduced2,Barrel}_memorymodules.dat
+ - CM_{Reduced,Reduced2,Barrel}_processingmodules.dat 
+
+respectively for the different configurations.
 
 Step 2: Run CMSSW to pruduce the test vectors
 
-NOTE - This has been tested in CMSSW_12_5_0_pre2 with the code in the PR #182 (Branch: ReducedCombinedModuleFixes) This PR was submitted on Aug. 7, 2022.
+NOTE - This has been tested in CMSSW_12_6_0_pre5 with the code in the PR #220
 
-Copy the three reduced_*.dat files produced in Step 1 above to the 'data' director where you run CMSSW (TrackletTrackFinding/data)
+Copy the three *.dat files produced in Step 1 for the relevant configuration above to the 'data' director where you run CMSSW (TrackletTrackFinding/data)
 
 
 Modify interface/Settings.h
@@ -297,7 +305,7 @@ Use combined modules
 +    bool combined_{true};
 
 
-Modify python/Tracklet_cfi.py
+Modify python/l1tTTTracksFromTrackletEmulation_cfi.py
 
 -    Reduced = cms.bool(False),
 +    Reduced = cms.bool(True),
@@ -307,40 +315,29 @@ and
 -    memoryModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/memorymodules_hourglassExtended.dat'),
 -    processingModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/processingmodules_hourglassExtended.dat'),
 -    wiresFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/wires_hourglassExtended.dat'),
-+    memoryModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/reduced_memorymodules.dat'),
-+    processingModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/reduced_processingmodules.dat'),
-+    wiresFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/reduced_wires.dat'),
++    memoryModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/CM_Reduced_memorymodules.dat'),
++    processingModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/CM_Reduced_processingmodules.dat'),
++    wiresFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/CM_Reduced_wires.dat'),
 
+(and similar for CM_Reduced2 and CM_Barrel configurations)
 
 Modify test/L1TrackNtupleMaker_cfg.py:
 
-We will start on event 60 and process 40 events as there is a few events in this file that has tracks in the region we are using for the CM chain between event 60 and 70:
-
 -process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
-+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(40))
++process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
  
- 
--process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*inputMC))
-+#process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*inputMC))
-
--#process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*inputMC), skipEvents = cms.untracked.uint32(11))
-+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*inputMC), skipEvents = cms.untracked.uint32(60))
-
 After runing (cmsRun L1TrackNtupleMaker_cfg.py) in the TrackFindingTracklet/test director copy the configuration files:
 
- cp reduced_wires.dat LUTs/wires.dat
- cp reduced_memorymodules.dat LUTs/memorymodules.dat
- cp reduced_processingmodules.dat LUTs/processingmodules.dat
+ cp CM_Reduced_wires.dat LUTs/wires.dat
+ cp CM_Reduced_memorymodules.dat LUTs/memorymodules.dat
+ cp CM_Reduced_processingmodules.dat LUTs/processingmodules.dat
 
 Then create the tar balls:
 
-tar czf MemPrints_CombinedReduced_220807.tgz MemPrints
-tar czf LUTs_CombinedReduced_220807.tgz LUTs
+tar czf MemPrints_CM_Reduced_230425.tgz MemPrints
+tar czf LUTs_CM_Reduced_230425.tgz LUTs
 
-                                                           
-
-
-
+(and similar for CM_Reduced2 and CM_Barrel)
 
 
 ## Continuous Integration (CI) 
