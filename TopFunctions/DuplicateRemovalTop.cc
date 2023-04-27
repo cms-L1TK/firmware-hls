@@ -2,7 +2,7 @@
 
 using namespace dr;
 
-void DuplicateRemovalTop(const TrackIn& tracksn, TrackOut& trackOut) {
+void DuplicateRemovalTop(const TrackIn& trackIn, TrackOut& trackOut) {
   #pragma HLS inline recursive
-  DuplicateRemoval(tracksIn, tracksOut);
+  DuplicateRemoval(trackIn, trackOut);
 }

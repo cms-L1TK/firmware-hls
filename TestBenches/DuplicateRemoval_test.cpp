@@ -2,6 +2,7 @@
 #include "../TopFunctions/DuplicateRemovalTop.h"
 
 #include <vector>
+#include <sstream>
 
 using namespace dr;
 using namespace std;
@@ -26,16 +27,16 @@ constexpr bool uniques[numTracks] = {
   true, true, false, true, false
 };
 
-void print(const vector<TrackOut>& tracks) {
+void print(const vector<TrackOut>& tracks, stringstream& ss) {
   for (const TrackOut& track : tracks) {
-    cout << track.reset_ << " ";
-    cout << track.valid_ << " ";
-    cout << setw(2) << track.data_ << " | ";
+    ss << track.reset_ << " ";
+    ss << track.valid_ << " ";
+    ss << setw(2) << track.data_ << " | ";
     for (const StubOut& stub : track.stubs_) {
-      cout << stub.valid_ << " ";
-      cout << setw(2) << stub.data_ << " | ";
+      ss << stub.valid_ << " ";
+      ss << setw(2) << stub.data_ << " | ";
     }
-    cout << endl;
+    ss << endl;
   }
 }
 
@@ -73,9 +74,13 @@ int main(){
     DuplicateRemovalTop(trackIn, trackOut);
   }
 
-  cout << "Expectation:" << endl;
-  print(tracksExp);
-  cout << "Simulation:" << endl;
-  print(tracksOut);
+  stringstream ssExp, ssSim;
+  print(tracksExp, ssExp);
+  print(tracksOut, ssSim);
+
+  cout << "Expectation:" << endl << ssExp.str();
+  cout << "Simulation:" << endl << ssSim.str();
+
+  return ssExp.str() == ssSim.str() ? 0 : 1;
 
 }

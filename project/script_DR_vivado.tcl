@@ -1,6 +1,6 @@
 # script to finalize ip core DuplicateRemoval
 # excecute in firmware-hls/project
-# excecute after vitis_hls -f script_DR_hls.tcl
+# excecute after vitis_hls -f script_DR.tcl
 # excecute with vivado -mode batch -source script_DR_vivado.tcl -nojournal -nolog
 
 source fpga.tcl

@@ -1,6 +1,6 @@
 # script to generate half ip core DuplicateRemoval
 # excecute in firmware-hls/project
-# excecute with vitis_hls -f script_DR_hls.tcl
+# excecute with vitis_hls -f script_DR.tcl
 
 source env_hls.tcl
 
@@ -16,14 +16,12 @@ set_top DuplicateRemovalTop
 open_solution "solution1"
 source settings_hls.tcl
 
-config_array_partition -complete_threshold 9999
-#config_unroll -tripcount_threshold 9999
-#config_interface -register_io  scalar_out
+config_array_partition -complete_threshold 128
 config_rtl -reset all
 
 csynth_design
-#csim_design
-#cosim_design
+csim_design
+cosim_design
 export_design -format ip_catalog
 
 exit
