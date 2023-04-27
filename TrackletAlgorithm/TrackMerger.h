@@ -117,7 +117,7 @@ class ComparisonModule{
 
     ap_uint<trackWordSize> getMasterTrackWord(){return masterTrack._trackWord;}
 
-    void process(const TrackStruct &inTrack, TrackStruct &outTrack);
+    void process(TrackStruct &inTrack, TrackStruct &outTrack);
     
     TrackStruct& getMasterTrackStruct();
 
