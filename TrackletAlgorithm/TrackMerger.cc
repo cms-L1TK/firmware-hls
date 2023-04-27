@@ -4,12 +4,12 @@ TrackStruct& ComparisonModule::getMasterTrackStruct(){
   return masterTrack;
 }
 
-void ComparisonModule::process(const TrackStruct &inTrack, TrackStruct &outTrack){
+void ComparisonModule::process(TrackStruct &inTrack, TrackStruct &outTrack){
   tracksProcessed++;
   if (inTrack._trackWord != 0 && tracksProcessed <= kMaxTrack){
     if (!masterTrack.getTrackValid() && inTrack._cm == 0){
       masterTrack = inTrack;
-      inTrack.cm_ = 1;
+      inTrack._cm = 1;
       outTrack = inTrack;
     } else {
       if(inTrack.getTrackValid()){
@@ -81,7 +81,7 @@ void TrackMerger(
     LOOP_ProcTracks:
     for (int j = 0; j < kNComparisonModules; j++){
       comparisonModule[j].process(tracks[j], tracks[j+1]);
-      tracks[j].resetTracks();
+      // tracks[j].resetTracks();
     }
 
     // When the unmerged track reaches the end of the buffer - put in unmerged tracks array to be output
@@ -100,10 +100,10 @@ void TrackMerger(
     TrackStruct trk;
     if (outputIndex < kNComparisonModules) {
       trk = comparisonModule[outputIndex].getMasterTrackStruct();
-      comparisonModule[outputIndex].resetCM(); // Resetting
+      // comparisonModule[outputIndex].resetCM(); // Resetting
     } else if ((outputIndex - kNComparisonModules) < kNLastTracks) {
       trk = unmergedTracks[outputIndex-kNComparisonModules];
-      unmergedTracks[outputIndex-kNComparisonModules].resetTracks(); // Resetting      
+      // unmergedTracks[outputIndex-kNComparisonModules].resetTracks(); // Resetting      
     } else {
       trk.resetTracks();
     }
