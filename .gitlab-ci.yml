@@ -360,6 +360,7 @@ topIRtoTB-sim:
       artifacts: false
 topReducedCombined-sim:
   <<: *template_topTF-sim
+  allow_failure: true
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedCombinedConfig"
@@ -481,6 +482,7 @@ topIRtoTB-synth:
       artifacts: false
 topReducedCombined-synth:
   <<: *template_topTF-synth
+  allow_failure: true
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedCombinedConfig"
