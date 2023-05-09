@@ -114,6 +114,7 @@ process(clka)
   variable vi_page_cnt  : integer := 0;  -- Page counter
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
+  variable written      : integer := 0;
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     if DEBUG then
@@ -135,6 +136,7 @@ begin
       end if;
     end if;
     if (wea='1') then
+      written := 1;
       if DEBUG then
         report "tm_mem "&NAME&" writeaddr "&to_bstring(addra)&" "&to_bstring(dina);
       end if;
@@ -148,6 +150,8 @@ begin
       else
         nent_o(page) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page))) + 1, nent_o(page)'length)); -- + 1 (slv)
       end if;	
+    elsif (written=0) then
+      nent_o <= (others => (others => '0'));
     end if;
   end if;
 end process;
