@@ -31,10 +31,12 @@ entity tf_mem_bin_cm4 is
   generic (
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
-    RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH_CM; --! Leave at default. RAM depth (no. of entries)
-    NUM_MEM_BINS    : natural := 64;                --! Specify number of memory bins
-    BIN_ADDR_WIDTH  : natural := 4;                 --! Bits for address
+    RAM_DEPTH       : natural := NUM_PAGES * PAGE_LENGTH_CM; --! Leave at default. RAM depth (no. of entries)
+    NUM_PHI_BINS    : natural := 8;                 --! Number of phi bins
+    NUM_RZ_BINS     : natural := 8;                 --! Number of r/z bins
+    NUM_MEM_BINS    : natural := NUM_PHI_BINS * NUM_RZ_BINS; --! Specify number of memory bins
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH_CM/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
+    BIN_ADDR_WIDTH  : natural := clogb2(NUM_ENTRIES_PER_MEM_BINS);   --! Bits for address
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
@@ -63,10 +65,10 @@ entity tf_mem_bin_cm4 is
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
     enb_nentA  : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
     enb_nentB  : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
-    addr_nentA : in std_logic_vector(4 downto 0); --! Addres for nentries 
-    addr_nentB : in std_logic_vector(4 downto 0); --! Addres for nentries 
-    dout_nentA    : out std_logic_vector(31 downto 0); --! entries output data
-    dout_nentB    : out std_logic_vector(31 downto 0); --! entries output data
+    addr_nentA : in std_logic_vector(clogb2(NUM_PAGES) + clogb2(NUM_RZ_BINS) - 1 downto 0); --! Address for nentries 
+    addr_nentB : in std_logic_vector(clogb2(NUM_PAGES) + clogb2(NUM_RZ_BINS) - 1 downto 0); --! Address for nentries 
+    dout_nentA : out std_logic_vector(NUM_PHI_BINS * BIN_ADDR_WIDTH - 1 downto 0); --! entries output data
+    dout_nentB : out std_logic_vector(NUM_PHI_BINS * BIN_ADDR_WIDTH - 1 downto 0); --! entries output data
     mask_o    : out t_arr_64_1b(0 to NUM_PAGES-1) := (others => (others => '0')) --! mask(page)(bin)
     );
 end tf_mem_bin_cm4;
@@ -74,8 +76,8 @@ end tf_mem_bin_cm4;
 architecture rtl of tf_mem_bin_cm4 is
 
 -- ########################### Types ###########################
-type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
-type t_arr_1d_slv_mem_nent is array(0 to 31) of std_logic_vector(3 downto 0); --! 1D array of slv
+type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH - 1 downto 0); --! 1D array of slv
+type t_arr_1d_slv_mem_nent is array(0 to NUM_PHI_BINS * BIN_ADDR_WIDTH - 1) of std_logic_vector(BIN_ADDR_WIDTH - 1 downto 0); --! 1D array of slv
 
 -- ########################### Function ##########################
 --! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4. Needed here because of variable slv width!
