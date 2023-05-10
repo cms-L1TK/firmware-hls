@@ -59,7 +59,11 @@ class ProjoutIndexDisk(Enum):
     D4PHIB = 13
     D4PHIC = 14
     D4PHID = 15
-    N_PROJOUT_DISK = 16
+    D5PHIA = 16
+    D5PHIB = 17
+    D5PHIC = 18
+    D5PHID = 19
+    N_PROJOUT_DISK = 20
 
 iAllStub_index = {
   "A" : 0,
@@ -75,12 +79,23 @@ iAllStub_index = {
   "Z" : 2,
   "W" : 3,
 }
-
+layerDisktoRegionType = {
+  "L1" : "BARRELPS",
+  "L2" : "BARRELPS",
+  "L3" : "BARRELPS",
+  "L4" : "BARREL2S",
+  "L5" : "BARREL2S",
+  "L6" : "BARREL2S",
+  "D1" : "DISKPS",
+  "D2" : "DISKPS",
+  "D3" : "DISKPS",
+  "D4" : "DISKPS"
+}
 parser = argparse.ArgumentParser(description="This script generates TrackletProcessorTop.h, TrackletProcessorTop.cc, and\
 TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
-parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
-parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/CombinedConfig/", type=str, help="The directory in which to write the output files (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTsCM/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
 arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with TPs in
@@ -98,36 +113,26 @@ with open(arguments.wiresFileName, "r") as wiresFile:
       if "TP_L1L2" not in line \
         and "TP_L2L3" not in line \
         and "TP_L3L4" not in line \
-        and "TP_L5L6" not in line:
-          continue      
+        and "TP_L5L6" not in line \
+        and "TP_L2D1" not in line \
+        and "TP_L1D1" not in line \
+        and "TP_D1D2" not in line \
+        and "TP_D3D4" not in line:
+          continue
       line = line.rstrip()
       tpName = re.sub(r".*TP_(.....).*", r"TP_\1", line)
-  
-      if "TP_L1L2" in line or "TP_L2L3" in line or "TP_L3L4" in line:
-        innerType[tpName] = "BARRELPS"
-      else:
-        innerType[tpName] = "BARREL2S"
-      if "TP_L1L2" in line or "TP_L2L3" in line:
-        outerType[tpName] = "BARRELPS"
-      else:
-        outerType[tpName] = "BARREL2S"
+      innerLayer = tpName[3:5]
+      outerLayer = tpName[5:7]
+      innerType[tpName] = layerDisktoRegionType[innerLayer]
+      outerType[tpName] = layerDisktoRegionType[outerLayer]
       memName = line.split()[0]
-  
-      if "TP_L2L3" in line:
-          if memName.startswith("AS_L2"):
+      if memName.startswith("AS_"):
+          memLayer= memName[3:5]
+          if memLayer == innerLayer:
               if tpName not in asInnerMems:
                   asInnerMems[tpName] = []
               asInnerMems[tpName].append(memName)
-          if memName.startswith("AS_L3"):
-              if tpName not in asOuterMems:
-                  asOuterMems[tpName] = []
-              asOuterMems[tpName].append(memName)
-      else:
-          if memName.startswith("AS_L1") or memName.startswith("AS_L3") or memName.startswith("AS_L5"):
-              if tpName not in asInnerMems:
-                  asInnerMems[tpName] = []
-              asInnerMems[tpName].append(memName)
-          if memName.startswith("AS_L2") or memName.startswith("AS_L4") or memName.startswith("AS_L6"):
+          elif memLayer == outerLayer:
               if tpName not in asOuterMems:
                   asOuterMems[tpName] = []
               asOuterMems[tpName].append(memName)
@@ -196,9 +201,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   for tpName in sorted(asInnerMems.keys()):
       seed = re.sub(r"TP_(....).", r"\1", tpName)
       iTC = re.sub(r"TP_....(.)", r"\1", tpName)
-      regionlutlen = 2048
-      if seed == "L5L6":
-        regionlutlen = 4096
       # numbers of memories
       nASMemInner = len(asInnerMems[tpName])
       nASMemOuter = len(asOuterMems[tpName])
