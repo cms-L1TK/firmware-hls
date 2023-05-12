@@ -232,36 +232,34 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
 
 #endif
 
- inline void set_empty() {
-   empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
- }
+  inline void set_empty() {
+    empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+  }
 
- inline bool empty() const {
-#pragma HLS inline  
+  inline bool empty() const {
+#pragma HLS inline
    return empty_;
- }
- 
- inline bool nearFull() {
+  }
+  inline bool nearFull() {
    return nearFull4Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
- }
+  }
 
- inline bool idle() {
-#pragma HLS inline  
-   return idle_;
- }
+  inline bool idle() {
+#pragma HLS inline
+    return idle_;
+  }
 
- inline INDEX readIndex() const {
-   return readindex_;
- }
+  inline INDEX readIndex() const {
+    return readindex_;
+  }
 
- inline INDEX writeIndex() const {
-   return writeindex_;
- }
-   
+  inline INDEX writeIndex() const {
+    return writeindex_;
+  }
 
-inline bool processing() {
-#pragma HLS inline  
-  return !idle_||good__||good__t||good___;
+  inline bool processing() {
+#pragma HLS inline
+    return !idle_||good__||good__t||good___;
   }
 
 // This method is no longer used, but kept for possible debugging etc.
