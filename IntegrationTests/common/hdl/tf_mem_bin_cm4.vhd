@@ -125,23 +125,10 @@ signal sv_RAM_row1  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0'); 
 signal sv_RAM_row2  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row3  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
-signal sa_RAM_nentA0 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA1 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA2 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA3 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA4 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA5 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA6 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentA7 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+type sa_RAM_nent_arr is array (0 to NUM_PHI_BINS-1) of t_arr_1d_slv_mem_nent;
+signal sa_RAM_nentA : sa_RAM_nent_arr;         --! RAM data content
 
-signal sa_RAM_nentB0 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB1 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB2 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB3 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB4 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB5 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB6 : t_arr_1d_slv_mem_nent ;         --! RAM data content
-signal sa_RAM_nentB7 : t_arr_1d_slv_mem_nent ;         --! RAM data content
+signal sa_RAM_nentB : sa_RAM_nent_arr;         --! RAM data content
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
@@ -150,24 +137,10 @@ attribute ram_style of sa_RAM_data1 : signal is "block";
 attribute ram_style of sa_RAM_data2 : signal is "block";
 attribute ram_style of sa_RAM_data3 : signal is "block";
 
-attribute ram_style of sa_RAM_nentA0 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA1 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA2 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA3 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA4 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA5 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA6 : signal is "distributed";
-attribute ram_style of sa_RAM_nentA7 : signal is "distributed";
-
-attribute ram_style of sa_RAM_nentB0 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB1 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB2 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB3 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB4 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB5 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB6 : signal is "distributed";
-attribute ram_style of sa_RAM_nentB7 : signal is "distributed";
-
+for i in 0 to NUM_PHI_BINS-1 generate
+  attribute ram_style of sa_RAM_nentA(i) : signal is "distributed";
+  attribute ram_style of sa_RAM_nentB(i) : signal is "distributed";
+end generate;
 
 begin
 
@@ -221,32 +194,10 @@ begin
       addr_in_bin := std_logic_vector(unsigned(addra(BIN_ADDR_WIDTH-1 downto 0)) + 1);
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
-      case lowerbits is
-        when "000" =>
-          sa_RAM_nentA0(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB0(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when "001" =>
-          sa_RAM_nentA1(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB1(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when "010" =>
-          sa_RAM_nentA2(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB2(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when "011" =>
-          sa_RAM_nentA3(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB3(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when "100" =>
-          sa_RAM_nentA4(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB4(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when "101" =>
-          sa_RAM_nentA5(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB5(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when "110" =>
-          sa_RAM_nentA6(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB6(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-        when others =>
-          sa_RAM_nentA7(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-          sa_RAM_nentB7(page*8+to_integer(unsigned(upperbits))) <= addr_in_bin; -- <= address
-      end case;
+
+      sa_RAM_nentA(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
+      sa_RAM_nentB(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
+
     end if; -- (wea='1')
   end if;
 end process;
@@ -267,10 +218,14 @@ begin
       sv_RAM_row3 <= sa_RAM_data3(to_integer(unsigned(addrb3)));
     end if;
     if (enb_nentA='1') then
-      dout_nentA <= sa_RAM_nentA7(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA6(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA5(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA4(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA3(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA2(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA1(to_integer(unsigned(addr_nentA))) & sa_RAM_nentA0(to_integer(unsigned(addr_nentA)));
+      for i in 1 to NUM_PHI_BINS
+        dout_nentA <= and sa_RAM_nentA(i)(to_integer(unsigned(addr_nentA)));
+      end loop;
     end if;
     if (enb_nentB='1') then
-      dout_nentB <= sa_RAM_nentB7(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB6(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB5(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB4(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB3(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB2(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB1(to_integer(unsigned(addr_nentB))) & sa_RAM_nentB0(to_integer(unsigned(addr_nentB)));
+      for i in 1 to NUM_PHI_BINS
+        dout_nentB <= and sa_RAM_nentB(i)(to_integer(unsigned(addr_nentA)));
+      end loop;
     end if;
   end if;
 end process;
