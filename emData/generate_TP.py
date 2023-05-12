@@ -166,8 +166,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "   }\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
-  
-  
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<8>* getRegionLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
   )
   topHeaderFile.write(
       "#ifndef TopFunctions_TrackletProcessorTop_h\n"
@@ -178,29 +180,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   topFile.write(
       "#include \"TrackletProcessorTop.h\"\n"
       "\n"
-      "ap_uint<1> nearFullTEBuff(const ap_uint<TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits>& writeptr,\n" 
-      "			  const ap_uint<TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits>& readptr) {\n"
-      "  ap_uint<3> writeptr1=writeptr+1;\n"
-      "  ap_uint<3> writeptr2=writeptr+2;\n"
-      "  ap_uint<3> writeptr3=writeptr+3;\n"
-      "  ap_uint<1> result=writeptr1==readptr||writeptr2==readptr||writeptr3==readptr;\n"
-      "  return result;\n"
-      "}\n"
-      "ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer))> nearFullTEUnitInit() {\n"
-      "  ap_uint<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer))> lut(0);\n"
-      "  int i;\n"
-      "  for(i=0;i<(1<<(2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer));i++) {\n"
-      "    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr,rptr;\n"
-      "    ap_uint<2*TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> address(i);\n"
-      "    (rptr,wptr)=address;\n"
-      "    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr1=wptr+1;\n"
-      "    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr2=wptr+2;\n"
-      "    ap_uint<TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer> wptr3=wptr+3;\n"
-      "    ap_uint<1> result=wptr1==rptr||wptr2==rptr||wptr3==rptr;\n"
-      "    lut[i]=result;\n"
-      "  }\n"
-      "  return lut;\n"
-      " }\n"
       "////////////////////////////////////////////////////////////////////////////////\n"
       "// Top functions for various TrackletProcessors (TP). For each iteration of\n"
       "// the main processing loop, a TC retrieves a pair of stub indices from one of\n"
@@ -251,8 +230,44 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "}\n"
           "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n"
           "  return 0x%X;\n"
-          "}\n")
-          % (tprojMaskBarrel, tprojMaskDisk)
+          "}\n"
+          'template<> inline const ap_uint<8>* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<8> lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<10> lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + '.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<1> lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '  static ap_uint<1> lut[] =\n'
+          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
+          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+)% (tprojMaskBarrel, tprojMaskDisk)
       )
   
       # Print out prototype for top function for this TC.
@@ -261,8 +276,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const ap_uint<1+2*TrackletEngineUnit<TF::"+seed+", TC::"+iTC+","+innerType[tpName]+","+outerType[tpName]+">::kNBitsRZFine+TrackletEngineUnit<TF::"+seed+", TC::"+iTC+","+innerType[tpName]+","+outerType[tpName]+">::kNBitsRZBin> lut[1<<(kNbitszfinebintable+kNbitsrfinebintable)],\n"
-          "    const ap_uint<(1<<TrackletEngineUnit<TF::"+seed+", TC::"+iTC+","+innerType[tpName]+","+outerType[tpName]+">::kNBitsPhiBins)> regionlut[1<<(AllStubInner<"+innerType[tpName]+">::kASBendSize+AllStubInner<"+innerType[tpName]+">::kASFinePhiSize)],\n" 
           "    const AllStubInnerMemory<"+innerType[tpName]+"> innerStubs["+str(nASMemInner)+"],\n"
           "    const AllStubMemory<OuterRegion<TF::" + seed + ">()>* outerStubs,\n"
           "    const VMStubTEOuterMemoryCM<"+outerType[tpName]+", kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::"+seed+"]>* outerVMStubs,\n"
@@ -279,8 +292,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const ap_uint<10> lut[2048],\n"
-          "    const ap_uint<8> regionlut["+str(regionlutlen)+"],\n"
           "    const AllStubInnerMemory<"+innerType[tpName]+"> innerStubs[" + str(nASMemInner) + "],\n"
           "    const AllStubMemory<OuterRegion<TF::" + seed + ">()>* outerStubs ,\n"
           "    const VMStubTEOuterMemoryCM<" + outerType[tpName] + ", kNbitsrzbin, kNbitsphibin, kNTEUnits[TF::"+ seed +"]>* outerVMStubs,\n"
@@ -291,8 +302,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           ") {\n"
           "#pragma HLS inline recursive\n"
           "#pragma HLS interface register port=bx_o\n"
-          "#pragma HLS resource variable=lut core=ROM_2P_BRAM  latency=2\n"
-          "#pragma HLS resource variable=regionlut core=ROM_2P_BRAM latency=2\n"
       )
       for i in range(0, nASMemInner):
           topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
@@ -302,6 +311,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+          "\n"
+          "static const ap_uint<10>* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
+          "static const ap_uint<8>* regionlut = getRegionLUT<TF::" + seed + ", TC::" + iTC +">();\n"
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
