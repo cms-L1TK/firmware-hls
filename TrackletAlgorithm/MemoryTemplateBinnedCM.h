@@ -115,7 +115,7 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][index];
   }
-  
+
   DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_BIN> slot,
 		    ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
@@ -123,17 +123,17 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
-  
+
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 
 #pragma HLS inline
-    
+
     if(!NBIT_BX) ibx = 0;
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
-  
-    writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {
+
+      writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {
 #pragma HLS unroll
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
@@ -160,7 +160,7 @@ class MemoryTemplateBinnedCM{
       return false;
     }
   }
-  
+
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
