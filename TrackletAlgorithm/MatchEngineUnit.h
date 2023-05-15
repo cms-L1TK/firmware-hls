@@ -377,7 +377,7 @@ inline void advance() {
  ap_uint<4> stubmask_;
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
- ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
+ typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
  bool idle_;
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;

@@ -824,7 +824,7 @@ void MatchProcessor(BXType bx,
       
       //If the projection goes to the first (ivmMinus) phiProjBin is zero but
       //if the projection goes to the second bin ivmMinus+1 phiProjBin is one
-      ProjectionRouterBuffer<BARREL, APTYPE>::PHIPROJBIN phiProjBin  = 0; 
+      typename ProjectionRouterBuffer<BARREL, APTYPE>::PHIPROJBIN phiProjBin  = 0; 
 
       if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
 	//shift = 1;
