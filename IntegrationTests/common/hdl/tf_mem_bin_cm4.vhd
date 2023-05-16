@@ -136,11 +136,8 @@ attribute ram_style of sa_RAM_data0 : signal is "block";
 attribute ram_style of sa_RAM_data1 : signal is "block";
 attribute ram_style of sa_RAM_data2 : signal is "block";
 attribute ram_style of sa_RAM_data3 : signal is "block";
-
-for i in 0 to NUM_PHI_BINS-1 generate
-  attribute ram_style of sa_RAM_nentA(i) : signal is "distributed";
-  attribute ram_style of sa_RAM_nentB(i) : signal is "distributed";
-end generate;
+attribute ram_style of sa_RAM_nentA : signal is "distributed";
+attribute ram_style of sa_RAM_nentB : signal is "distributed";
 
 begin
 
