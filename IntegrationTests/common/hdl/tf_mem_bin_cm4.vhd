@@ -215,12 +215,12 @@ begin
       sv_RAM_row3 <= sa_RAM_data3(to_integer(unsigned(addrb3)));
     end if;
     if (enb_nentA='1') then
-      for i in 1 to NUM_PHI_BINS
+      for i in 1 to NUM_PHI_BINS loop
         dout_nentA <= and sa_RAM_nentA(i)(to_integer(unsigned(addr_nentA)));
       end loop;
     end if;
     if (enb_nentB='1') then
-      for i in 1 to NUM_PHI_BINS
+      for i in 1 to NUM_PHI_BINS loop
         dout_nentB <= and sa_RAM_nentB(i)(to_integer(unsigned(addr_nentA)));
       end loop;
     end if;
