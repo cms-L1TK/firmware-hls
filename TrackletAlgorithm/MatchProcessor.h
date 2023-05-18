@@ -14,7 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <bitset>
-
+#include <cmath>
 
 namespace PR
 {
@@ -598,10 +598,15 @@ void MatchProcessor(BXType bx,
   ap_uint<8> vmstubsmask[8];
 #pragma HLS array_partition variable=vmstubsmask complete dim=1
 
- entriesloop:for(unsigned int i=0;i<8;i++) {
+  entriesloop:for(unsigned int i=0;i<8;i++) {
 #pragma HLS unroll
     vmstubsmask[i]=instubdata.getBinMask8(bx,i);
   }
+// constants used in reading VMSME memories
+  constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
+  constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
+  constexpr int PAGE_LENGTH_CM = 1024;
+  constexpr int BIN_ADDR_WIDTH = ceil(log2(PAGE_LENGTH_CM/(NUM_PHI_BINS*NUM_RZ_BINS)));
 
   /*
   ap_uint<4> nvmstubs[8][8]; 
@@ -840,22 +845,17 @@ void MatchProcessor(BXType bx,
       ///////////////
       // VMProjection
       // New code for using new VMSME memory module
-      ap_uint<4> entries_zfirst[8];
+
+      ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
-      ap_uint<4> entries_zlast[8];
+      ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zlast dim=0 complete
 
-      (entries_zfirst[7], entries_zfirst[6], entries_zfirst[5],
-       entries_zfirst[4], entries_zfirst[3], entries_zfirst[2],
-       entries_zfirst[1],entries_zfirst[0]) = 
-	//instubdata.get_mem_entries8A()[bx][zfirst];      
-	instubdata.get_mem_entries8A()[(bx&3)*8+zfirst];      
-
-      (entries_zlast[7], entries_zlast[6], entries_zlast[5],
-       entries_zlast[4], entries_zlast[3], entries_zlast[2],
-       entries_zlast[1],entries_zlast[0]) = 
-	//instubdata.get_mem_entries8B()[bx][zlast];      
-	instubdata.get_mem_entries8B()[(bx&3)*8+zlast];      
+      for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
+#pragma HLS unroll
+        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[bx&3][zfirst].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.get_mem_entries8A()[bx&3][zlast].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+      }
 
       /*
       std::cout << " z phi: " << zfirst << " " << ivmMinus << " "
@@ -871,10 +871,10 @@ void MatchProcessor(BXType bx,
       ap_uint<1> stublastPlus = vmstubsmask[zlast][ivmPlus]&&
                                  (zfirst!=zlast)&&(ivmMinus!=ivmPlus);;
       
-      ap_uint<4> nstubfirstMinus = entries_zfirst[ivmMinus];
-      ap_uint<4> nstubfirstPlus = entries_zfirst[ivmPlus];
-      ap_uint<4> nstublastMinus = entries_zlast[ivmMinus];
-      ap_uint<4> nstublastPlus = entries_zlast[ivmPlus];
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastPlus = entries_zlast[ivmPlus];
       
 
 
