@@ -606,7 +606,9 @@ void MatchProcessor(BXType bx,
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
   constexpr int PAGE_LENGTH_CM = 1024;
-  constexpr int BIN_ADDR_WIDTH = ceil(log2(PAGE_LENGTH_CM/(NUM_PHI_BINS*NUM_RZ_BINS)));
+  constexpr int BIN_ADDR_WIDTH = 4;
+  //Can't figure out how to do this calculation at compile
+  //constexpr int BIN_ADDR_WIDTH = ceil(log2(PAGE_LENGTH_CM/(NUM_PHI_BINS*NUM_RZ_BINS)));
 
   /*
   ap_uint<4> nvmstubs[8][8]; 
