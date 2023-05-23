@@ -1384,7 +1384,7 @@ void MatchProcessor(BXType bx,
       }
       //can not get to here on first cycle, but compile don't seem to realize 
       //this and fail to reach II=1
-      else if (istep != 0) meu.step(instubdata.getMem(iMEU), allstub);
+      else if (istep != 0) meu.step(instubdata.getMem(iMEU));
 
       meu.processPipeLine(table[iMEU]);
 
