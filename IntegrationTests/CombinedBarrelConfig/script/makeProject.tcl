@@ -2,7 +2,7 @@
 # Run this in IntegrationTests/xyz/script/ 
 
 # Create project
-set projName "Work"
+set projName "Work2022.1"
 set FPGA "xcvu13p-flga2577-2-e"
 create_project -force ${projName} ./${projName} -part $FPGA
 set_property target_language VHDL [current_project]
@@ -153,6 +153,7 @@ add_files -fileset utils_1 [glob ./pre.tcl]
 
 # Add constraints (clock etc.)
 add_files -fileset constrs_1 [glob common/hdl/constraints.xdc]
+add_files -fileset constrs_1 [glob floorplan.xdc]
 
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
