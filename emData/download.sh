@@ -245,8 +245,8 @@ mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../Integra
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig2/tb/
 ### Reduced Combined 2 IRtoTB
 echo "CM Barrel"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -x
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de -x
 mkdir -p ../../IntegrationTests/CombinedBarrelConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/

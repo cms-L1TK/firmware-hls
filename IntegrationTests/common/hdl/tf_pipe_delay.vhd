@@ -14,7 +14,7 @@ use work.tf_pkg.all;
 
 entity tf_pipe_delay is
   generic (
-    DELAY : natural := 6;
+    DELAY : natural := 1;
     RAM_WIDTH: natural := 14;
     NUM_PAGES: natural := 2;
     RAM_DEPTH: natural := NUM_PAGES*PAGE_LENGTH
@@ -32,10 +32,10 @@ end tf_pipe_delay;
 
 
 architecture behavior of tf_pipe_delay is
-  --attribute KEEP_HIERARCHY : string;
-  --attribute KEEP_HIERARCHY of tf_pipe_delay: entity is "TRUE";
-  --attribute DONT_TOUCH : string;
-  --attribute DONT_TOUCH of tf_pipe_delay: entity is "TRUE";
+  attribute KEEP_HIERARCHY : string;
+  attribute KEEP_HIERARCHY of tf_pipe_delay: entity is "TRUE";
+  attribute DONT_TOUCH : string;
+  attribute DONT_TOUCH of tf_pipe_delay: entity is "TRUE";
 
   type t_wea_pipe is array (0 to DELAY - 1) of std_logic;
   type t_addra_pipe is array (0 to DELAY - 1) of std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 );

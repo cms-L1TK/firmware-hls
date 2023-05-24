@@ -19,7 +19,7 @@ use work.tf_pkg.all;
 
 entity CreateStartSignal is
   generic (
-    DELAY : natural := 4
+    DELAY : natural := 1
   );
   port (
     CLK   : in  std_logic;
@@ -33,10 +33,10 @@ end CreateStartSignal;
 
 
 architecture behavior of CreateStartSignal is
-  attribute KEEP_HIERARCHY : string;
-  attribute KEEP_HIERARCHY of CreateStartSignal: entity is "TRUE";
-  attribute DONT_TOUCH : string;
-  attribute DONT_TOUCH of CreateStartSignal : entity is "TRUE";
+  --attribute KEEP_HIERARCHY : string;
+  --attribute KEEP_HIERARCHY of CreateStartSignal: entity is "TRUE";
+  --attribute DONT_TOUCH : string;
+  --attribute DONT_TOUCH of CreateStartSignal : entity is "TRUE";
   type t_DONE_LATCH is array(0 to DELAY-1) of std_logic;
   signal DONE_LATCH : t_DONE_LATCH := (others => '0');
   type t_BX_LATCH is array(0 to DELAY-1) of std_logic_vector(2 downto 0);
