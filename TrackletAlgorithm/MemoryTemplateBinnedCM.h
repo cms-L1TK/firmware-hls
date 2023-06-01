@@ -47,8 +47,8 @@ class MemoryTemplateBinnedCM{
 
   ap_uint<8> binmask8_[kNBxBins][kNPhiBins];
   ap_uint<32> nentries8_[kNBxBins][kNPhiBins];
-  ap_uint<32> nentries8A_[kNBxBins][kNPhiBins];
-  ap_uint<32> nentries8B_[kNBxBins][kNPhiBins];
+  ap_uint<32> nentries8A_[kNBxBins*kNPhiBins];
+  ap_uint<32> nentries8B_[kNBxBins*kNPhiBins];
 
  public:
 
@@ -66,11 +66,11 @@ class MemoryTemplateBinnedCM{
   }
 
   ap_uint<32> getEntries8A(BunchXingT bx, ap_uint<3> ibin) const {
-    return nentries8A_[bx][ibin];
+    return nentries8A_[bx*kNPhiBins+ibin];
   }
 
   ap_uint<32> getEntries8B(BunchXingT bx, ap_uint<3> ibin) const {
-    return nentries8B_[bx][ibin];
+    return nentries8B_[bx*kNPhiBins+ibin];
   }
 
   ap_uint<32> getEntries8(BunchXingT bx, ap_uint<3> ibin) const {
@@ -91,11 +91,11 @@ class MemoryTemplateBinnedCM{
     return val;
   }
 
-  const ap_uint<32> (&get_mem_entries8A() const)[kNBxBins][kNPhiBins] {
+  const ap_uint<32> (&get_mem_entries8A() const)[kNBxBins*kNPhiBins] {
     return nentries8A_;
   }
 
-  const ap_uint<32> (&get_mem_entries8B() const)[kNBxBins][kNPhiBins] {
+  const ap_uint<32> (&get_mem_entries8B() const)[kNBxBins*kNPhiBins] {
     return nentries8B_;
   }
 
@@ -144,8 +144,8 @@ class MemoryTemplateBinnedCM{
       (ireg,ibin)=slot;
       //(ibin,ireg)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8A_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8B_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
       #endif
 
@@ -223,8 +223,8 @@ class MemoryTemplateBinnedCM{
     #ifndef CMSSW_GIT_HASH
     if (success) {
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8A_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8B_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
     }
     #endif
