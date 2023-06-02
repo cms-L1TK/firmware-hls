@@ -2,7 +2,7 @@
 # Run this in IntegrationTests/xyz/script/ 
 
 # Create project
-set projName "Work2022.1"
+set projName "Work2022"
 set FPGA "xcvu13p-flga2577-2-e"
 create_project -force ${projName} ./${projName} -part $FPGA
 set_property target_language VHDL [current_project]
