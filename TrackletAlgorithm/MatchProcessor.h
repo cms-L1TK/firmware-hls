@@ -856,7 +856,7 @@ void MatchProcessor(BXType bx,
       for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
 #pragma HLS unroll
         entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+zfirst].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
-        entries_zlast[phibin]= instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+zlast].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*NUM_PHI_BINS+zlast].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
       }
 
       /*
