@@ -47,7 +47,11 @@ int main()
   const auto nAllStub = tb.nFiles(allStubPatternarray);
   vector<AllStubMemory<stubMemType>> allstub(nAllStub);
   const auto nVMStubs = tb.nFiles(vmStubPatternarray);
-  VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines> vmstub;
+  #if MODULE_ >= MP_L1PHIA
+    VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMPBarrel, kNbitsphibinMPBarrel, kNMatchEngines> vmstub;
+  #else
+    VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMPDisk, kNbitsphibinMPDisk, kNMatchEngines> vmstub;
+  #endif
 
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
@@ -78,7 +82,11 @@ int main()
     for (unsigned int i = 0; i < nAllStub; i++)
       writeMemFromFile<AllStubMemory<stubMemType>>(allstub[i], fin_AllStub.at(i), ievt);
     auto &fin_VMStubs = tb.files(vmStubPatternarray);
-    writeMemFromFile<VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMP, kNbitsphibinMP, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
+    #if MODULE_ >= MP_L1PHIA
+      writeMemFromFile<VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMPBarrel, kNbitsphibinMPBarrel, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
+    #else
+      writeMemFromFile<VMStubMEMemoryCM<vmStubMemType, kNbitsrzbinMPDisk, kNbitsphibinMPDisk, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt);
+    #endif
 
     // clear allarray, output memories before starting
     for (unsigned int i = 0; i < nFullMatches; i++)

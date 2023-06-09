@@ -34,7 +34,7 @@ class MatchEngineUnitBase<DISK> {
   };
 };
 
-template<int VMSMEType, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
+template<int VMSMEType, unsigned kNbitsrzbinMP, unsigned kNbitsphibinMP, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
 class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
