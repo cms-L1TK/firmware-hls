@@ -1172,9 +1172,14 @@ void MatchCalculator(BXType bx,
   
 } //end MC
 
+constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin + 1;
+constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
+constexpr unsigned kNbitsphibinMPBarrel = kNbitsphibin + 1;
+constexpr unsigned kNbitsphibinMPDisk = kNbitsphibin + 1;
+
 //////////////////////////////
 // MatchProcessor
-template<regionType PROJTYPE, regionType VMSMEType, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
+template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, unsigned kNbitsphibinMP, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
          TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, TF::phiRegion PHISEC=TF::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
@@ -1236,7 +1241,7 @@ void MatchProcessor(BXType bx,
   constexpr int nPRBAbits = 3;
   ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
 
-  MatchEngineUnit<VMSMEType, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
+  MatchEngineUnit<VMSMEType, kNbitsrzbinMP, kNbitsphibinMP, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
@@ -1308,7 +1313,7 @@ void MatchProcessor(BXType bx,
     ap_uint<kNMatchEngines> idles;
     ap_uint<kNMatchEngines> emptys;
 
-    typename MatchEngineUnit<VMSMEType, VMPTYPE, APTYPE, LAYER, ASTYPE>::MATCH matches[kNMatchEngines];
+    typename MatchEngineUnit<VMSMEType, kNbitsrzbinMP, kNbitsphibinMP, VMPTYPE, APTYPE, LAYER, ASTYPE>::MATCH matches[kNMatchEngines];
     #pragma HLS ARRAY_PARTITION variable=matches complete dim=0
     ap_uint<kNBits_MemAddr> projseqs[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
