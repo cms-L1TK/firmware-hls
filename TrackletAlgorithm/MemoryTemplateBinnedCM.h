@@ -90,6 +90,20 @@ class MemoryTemplateBinnedCM{
     return nentries8B_[bx*8+ibin].range(ireg*4+3,ireg*4);
   }
 
+  ap_uint<entries8> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+    ap_uint<kNBitsRZBinCM> ibin;
+    ap_uint<kNBitsphibinCM> ireg;
+    (ireg,ibin)=slot;
+    return nentries8A_[bx*8+ibin].range(ireg*4+3,ireg*4);
+  }
+
+  ap_uint<entries8> getEntries8BSlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+    ap_uint<kNBitsRZBinCM> ibin;
+    ap_uint<kNBitsphibinCM> ireg;
+    (ireg,ibin)=slot;
+    return nentries8B_[bx*8+ibin].range(ireg*4+3,ireg*4);
+  }
+
   ap_uint<32> getEntries8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
     #pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
     return nentries8_[bx][ibin];

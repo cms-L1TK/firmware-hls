@@ -1176,9 +1176,9 @@ void MatchCalculator(BXType bx,
   
 } //end MC
 
-constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin + 1;
+constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin + 0;
 constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
-constexpr unsigned kNbitsphibinMPBarrel = kNbitsphibin + 1;
+constexpr unsigned kNbitsphibinMPBarrel = kNbitsphibin + 0;
 constexpr unsigned kNbitsphibinMPDisk = kNbitsphibin + 1;
 
 //////////////////////////////
