@@ -1172,9 +1172,9 @@ void MatchCalculator(BXType bx,
   
 } //end MC
 
-constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin + 1;
+constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin + 0;
 constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
-constexpr unsigned kNbitsphibinMPBarrel = kNbitsphibin + 1;
+constexpr unsigned kNbitsphibinMPBarrel = kNbitsphibin + 0;
 constexpr unsigned kNbitsphibinMPDisk = kNbitsphibin + 1;
 
 //////////////////////////////
@@ -1539,15 +1539,10 @@ void MatchProcessor(BXType bx,
       constexpr bool isDisk = LAYER > TF::L6;
       constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
       auto slot = zbin.range(zbin.length()-1, 1);
-      ap_uint<4> ibin,ireg;
-      (ireg,ibin) = ivmMinus*nbins + slot;
-      ap_uint<4> nstubfirstMinus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
-      (ireg,ibin) = ivmMinus*nbins + slot + 1;
-      ap_uint<4> nstublastMinus = instubdata.getEntries8B(bx, ibin).range(4*ireg+3, 4*ireg);
-      (ireg,ibin) = ivmPlus*nbins + slot;
-      ap_uint<4> nstubfirstPlus = instubdata.getEntries8A(bx, ibin).range(4*ireg+3, 4*ireg);
-      (ireg,ibin) = ivmPlus*nbins + slot + 1;
-      ap_uint<4> nstublastPlus = instubdata.getEntries8B(bx, ibin).range(4*ireg+3, 4*ireg);
+      ap_uint<4> nstubfirstMinus = instubdata.getEntries8ASlot(bx, (ivmMinus*nbins + slot));
+      ap_uint<4> nstublastMinus = instubdata.getEntries8BSlot(bx, (ivmMinus*nbins + slot + 1));
+      ap_uint<4> nstubfirstPlus = instubdata.getEntries8ASlot(bx, (ivmPlus*nbins + slot));
+      ap_uint<4> nstublastPlus = instubdata.getEntries8BSlot(bx, (ivmPlus*nbins + slot + 1));
       
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
