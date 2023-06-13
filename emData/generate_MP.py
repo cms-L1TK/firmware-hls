@@ -209,7 +209,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
             "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
             " TF::" + seed + ", "
-            "TF::" + "D1" + ", "
             "TF::" + iMP + "> (\n"
             "    bx,\n"
             "    projin,\n"
