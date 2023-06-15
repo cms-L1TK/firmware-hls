@@ -11,6 +11,7 @@
 #include "AllStubMemory.h"
 #include "FullMatchMemory.h"
 #include "MatchEngineUnit.h"
+#include "MatchEngineUnit_parameters.h"
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -1172,7 +1173,7 @@ void MatchCalculator(BXType bx,
   
 } //end MC
 
-constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin;
+constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin
 constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
 
 //////////////////////////////
@@ -1244,6 +1245,17 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+
+  constexpr int nproc = kMaxProc - kMaxProcOffset(module::MP);
+  ap_uint<2> meu_queue[kNMatchEngines];
+  ap_uint<2> meu_queue_[kNMatchEngines];
+  int meu_read_ptr(2), meu_write_ptr(0);
+#pragma HLS ARRAY_PARTITION variable=meu_queue complete dim=0
+#pragma HLS ARRAY_PARTITION variable=meu_queue_ complete dim=0
+  for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll
+    meu_queue[iMEU] = iMEU;
+  }
   
 
 
@@ -1287,8 +1299,10 @@ void MatchProcessor(BXType bx,
 
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
-    if (hasMatch)
+    //bool nextEmpty = matchengine[bestiMEU].nextEmpty();
+    if (hasMatch) {
       matchengine[bestiMEU].advance();
+    }
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -1299,6 +1313,7 @@ void MatchProcessor(BXType bx,
 
     ap_uint<kNMatchEngines> idles;
     ap_uint<kNMatchEngines> emptys;
+    ap_uint<kNMatchEngines> done;
 
     typename MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE>::MATCH matches[kNMatchEngines];
     #pragma HLS ARRAY_PARTITION variable=matches complete dim=0
@@ -1316,7 +1331,52 @@ void MatchProcessor(BXType bx,
       emptys[iMEU] = matchengine[iMEU].empty();
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
+      done[iMEU] = idles[iMEU] && emptys[iMEU];
     }
+  /*
+    std::cout << std::endl;
+    //meu_read_ptr = matchengine[bestiMEU].idle() && !emptys[bestiMEU] ? meu_read_ptr+1 : meu_read_ptr;
+    //std::cout << "nextEmpty=" << nextEmpty << std::endl;
+    std::cout << "MATCH" << std::endl;
+    std::cout << "meu_read_ptr=" << meu_read_ptr << std::endl;
+  std::cout << meu_read_ptr << "\t" << meu_write_ptr << std::endl;
+  for(unsigned int iproc = 0; iproc < nproc; ++iproc) {
+    //for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll
+      else std::cout << "-";
+    //}
+    std::cout << "|";
+  }
+  std::cout << std::endl;
+  std::cout << meu_read_ptr << std::endl;
+  for(unsigned int iproc = 0; iproc < nproc; ++iproc) {
+    //for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll
+      if(iproc > istep) std::cout << "-";
+      else if(iproc == meu_read_ptr) std::cout << "^";
+      //if((iproc*kNMatchEngines + iMEU) == meu_read_ptr) std::cout << "^";
+      else if(iproc < meu_read_ptr) std::cout << "-";
+      else std::cout << "*";
+    //}
+    std::cout << "|";
+  }
+  std::cout << std::endl;
+  for(unsigned int iproc = 0; iproc < istep; iproc++) {
+    for(unsigned int ime = 0; ime < kNMatchEngines; ime++) {
+    }
+    std::cout << "|";
+  }
+  std::cout << std::endl;
+  std::cout << "Queue 3 ";
+  for(unsigned int ime = 0; ime < kNMatchEngines; ime++) {
+    std::cout << meu_queue[ime];
+  }
+  std::cout << std::endl;
+  */
+/*
+0010
+1302
+*/
 
     //This printout exactly matches printout in emulation for tracking code differences
     /*   
@@ -1341,10 +1401,21 @@ void MatchProcessor(BXType bx,
     projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
     
     bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+    /*
+    for(int i = 0; i < istep; i++)
+      std::cout << " ";
+    std::cout << bestiMEU << std::endl;
+    for(int i = 0; i < istep; i++)
+      std::cout << " ";
+    std::cout << meu_read_ptr << std::endl;
+    for(int i = 0; i < istep; i++)
+      std::cout << " ";
+    */
 
     hasMatch = !emptys[bestiMEU];
     
     if (hasMatch) {
+      //std::cout << bestiMEU << " MATCHED\t" << istep << std::endl;
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
       (stubindex,allprojdata) = matchengine[bestiMEU].peek();
@@ -1375,23 +1446,42 @@ void MatchProcessor(BXType bx,
     }
     
     bool init = false;
-  MEU_LOOP: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+    ap_uint<2> init_val = 0;
+    ap_uint<2> imeu_ptr = 0;
+  MEU_LOOP: for(unsigned int imeu = 0; imeu < kNMatchEngines; imeu++) {
+  //MEU_LOOP: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
+      //std::cout << "imeu=" << imeu << "\t" << istep << "\t"; 
+      auto iMEU = meu_queue[imeu];
+      //std::cout << "iMEU=" << iMEU << "\t" << std::endl;
       auto &meu = matchengine[iMEU];
       
       bool idle = idles[iMEU];
 
+      //std::cout << iMEU << "=" << matchengine[iMEU].getProjSeq() << (!emptys[iMEU] ? "+" : "") << (idles[iMEU] ? "(I)" : " ") << "\t";
+      //std::cout << "imeu_ptr=" << imeu_ptr << "\t" << meu_queue[imeu_ptr] << std::endl;
       if(idle && !empty && !init) {
         init =  true;
+        //std::cout << "REPLACING " << iMEU << " with " << istep << "\t init_val=" << init_val << std::endl;
         meu.init(bx, tmpprojbuff, istep);
+        imeu_ptr++;      // Skip this one
+        init_val = iMEU; // and place it at the end
+        //std::cout << "imeu_ptr=" << imeu_ptr << "\tinit_val=" << init_val << std::endl;
+        //meu_read_ptr = bestiMEU == iMEU && emptys[bestiMEU] ? meu_read_ptr+1 : meu_read_ptr;
       }
       //can not get to here on first cycle, but compile don't seem to realize 
       //this and fail to reach II=1
-      else if (istep != 0) meu.step(instubdata.getMem(iMEU));
+      else {
+        if (istep > 2)
+          meu.step(instubdata.getMem(iMEU));
+        meu_queue_[imeu-init] = meu_queue[imeu_ptr++];
+      }
 
       meu.processPipeLine(table[iMEU]);
 
     } //end MEU loop
+    if(init)
+        meu_queue_[kNMatchEngines-1] = init_val; // Place newest MEU at the end
     
     if(hasMatch) {
  
@@ -1576,6 +1666,10 @@ void MatchProcessor(BXType bx,
 
     projdata_ = projdata;
     validin_ = validin;
+    for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+#pragma HLS unroll
+      meu_queue[iMEU] = meu_queue_[iMEU];
+    }
 
     if (!projBuffNearFull){
       
