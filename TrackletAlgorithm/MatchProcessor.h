@@ -1173,7 +1173,7 @@ void MatchCalculator(BXType bx,
   
 } //end MC
 
-constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin
+constexpr unsigned kNbitsrzbinMPBarrel = kNbitsrzbin;
 constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
 
 //////////////////////////////
@@ -1472,7 +1472,7 @@ void MatchProcessor(BXType bx,
       //can not get to here on first cycle, but compile don't seem to realize 
       //this and fail to reach II=1
       else {
-        if (istep > 2)
+        if (istep != 0)
           meu.step(instubdata.getMem(iMEU));
         meu_queue_[imeu-init] = meu_queue[imeu_ptr++];
       }
