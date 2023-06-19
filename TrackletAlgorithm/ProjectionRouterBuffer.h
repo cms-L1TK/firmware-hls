@@ -134,7 +134,7 @@ public:
   void Print()
   {
     edm::LogVerbatim("L1trackHLS") << "Contents in buffer:" << std::endl;
-    edm::LogVerbatim("L1trackHLS") << std::hex << "tcid=" << getTCID() << " phiProjBin=" <<phiProjBin() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
+    edm::LogVerbatim("L1trackHLS") << std::hex << "tcid=" << getTCID() << " phiProjBin=" <<getPhiProjBin() << " nstub=" << getNStubs() << " zbin=" << getZBin() << " projid=" << getIndex() << " proj=" << getProjection() << " isPS=" << getIsPSSeed() << std::endl;
   }
   #endif
   
@@ -145,7 +145,7 @@ public:
     return data_.range(kPRBufferTCIDMSB,kPRBufferTCIDLSB);
   }
   
-  PHIPROJBIN phiProjBin() const {
+  PHIPROJBIN getPhiProjBin() const {
     return data_.range(kPRBufferPhiProjBinMSB,kPRBufferPhiProjBinLSB);
   }
 

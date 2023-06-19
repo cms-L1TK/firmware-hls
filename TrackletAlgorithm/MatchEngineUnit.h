@@ -61,7 +61,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
-  phiProjBin_ = projbuffer.phiProjBin();
+  phiProjBin_ = projbuffer.getPhiProjBin();
   stubmask_ = projbuffer.getMaskStubs();
   //stubmask_[0] = nstubsall_[0]!=0;
   //stubmask_[1] = nstubsall_[1]!=0;
