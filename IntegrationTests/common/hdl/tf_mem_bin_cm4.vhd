@@ -221,7 +221,7 @@ begin
     end if;
     if (enb_nentB='1') then
       for i in 0 to NUM_PHI_BINS-1 loop
-        dout_nentB(BIN_ADDR_WIDTH*(i+1)-1 downto BIN_ADDR_WIDTH*i) <= sa_RAM_nentB(i)(to_integer(unsigned(addr_nentA)));
+        dout_nentB(BIN_ADDR_WIDTH*(i+1)-1 downto BIN_ADDR_WIDTH*i) <= sa_RAM_nentB(i)(to_integer(unsigned(addr_nentB)));
       end loop;
     end if;
   end if;
