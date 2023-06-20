@@ -16,7 +16,7 @@ memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/U2x
 luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY9VJZjEc/LUTs.tar.gz"
 # Reduced Combined modules2
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
-luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/f5Rn7omdB3fuk89/LUTs.tar.gz"
+luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
