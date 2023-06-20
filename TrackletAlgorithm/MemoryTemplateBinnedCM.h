@@ -39,15 +39,14 @@ class MemoryTemplateBinnedCM{
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
-    kNBinsRZ = (1<<kNBitsRZBinCM),
-    slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM)),
-    entries8 = 32
+    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM,
+    entries8 = 36//8*(NBIT_ADDR-NBIT_BIN)+4
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
-  ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
-  ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
+  ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
+  ap_uint<36> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
   ap_uint<entries8> nentries8A_[slots];
   ap_uint<entries8> nentries8B_[slots];
   
@@ -67,27 +66,11 @@ class MemoryTemplateBinnedCM{
   }
 
   ap_uint<entries8> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    #pragma HLS ARRAY_PARTITION variable=nentries8A_ complete dim=0
     return nentries8A_[bx*8+ibin];
   }
 
   ap_uint<entries8> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    #pragma HLS ARRAY_PARTITION variable=nentries8B_ complete dim=0
     return nentries8B_[bx*8+ibin];
-  }
-
-  ap_uint<4> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
-    ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
-    (ireg,ibin)=slot;
-    return nentries8A_[bx*8+ibin].range(ireg*4+3,ireg*4);
-  }
-
-  ap_uint<4> getEntries8BSlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
-    ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
-    (ireg,ibin)=slot;
-    return nentries8B_[bx*8+ibin].range(ireg*4+3,ireg*4);
   }
 
   ap_uint<entries8> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
