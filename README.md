@@ -56,7 +56,7 @@ The files that are downloaded by emData/download.sh were created by the CMSSSW L
 cmsrel CMSSW_12_0_0_pre4
 cd CMSSW_12_0_0_pre4/src/
 cmsenv
-git cms-checkout-topic -u cms-L1TK:fw_synch_220523
+git cms-checkout-topic -u cms-L1TK:fw_synch_230620
 ```
 
 A few configuration changes were made in order to output test vectors and lookup tables and adjust truncation. This required editing parameter values in L1Trigger/TrackFindingTracklet/interface/Settings.h to match the following excerpts:
@@ -64,9 +64,10 @@ A few configuration changes were made in order to output test vectors and lookup
 ```c++
 …
     //IR should be set to 108 to match the FW for the summer chain, but ultimately should be at 156
-    std::unordered_map<std::string, unsigned int> maxstep_{{"IR", 108},  //IR will run at a higher clock speed to handle
-                                                                         //input links running at 25 Gbits/s
-                                                           //Set to 108 to match firmware project 240 MHz clock
+    std::unordered_map<std::string, unsigned int> maxstep_{
+        {"IR", 108},  //IR will run at a higher clock speed to handle
+                      //input links running at 25 Gbits/s
+        //Set to 108 to match firmware project 240 MHz clock
 …
     //--- These used to create files needed by HLS code.
     bool writeMem_{true};     //If true will print out content of memories (between algo steps) to files
@@ -158,7 +159,8 @@ also set to true in L1Trigger/TrackFindingTracklet/interface/Settings.h:
 
 ```c++
 …
-    bool combined_{true};  // use combined TP (TE+TC) and MP (PR+ME+MC) configuration
+    // Use combined TP (TE+TC) and MP (PR+ME+MC) configuration (with prompt tracking)
+    bool combined_{true};
 …
 ```
 
