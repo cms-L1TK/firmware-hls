@@ -14,9 +14,6 @@ luts_url_cm="https://cernbox.cern.ch/s/WSzRJvtSTBcpjhE/download"
 # Reduced Combined modules                                                      
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
-# Reduced Combined modules2
-memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced2_220829.tgz"
-luts_url_cm2="https://jafan.web.cern.ch/jafan/HLSFiles/LUTs_CombinedReduced2_230201.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -89,10 +86,6 @@ then
   tar -xzf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm2}
-  tar -xzmf LUTs.tgz
-  mv LUTs LUTsCM2
-  rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzmf LUTs.tar.gz
   rm -f LUTs.tar.gz
@@ -138,13 +131,6 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
-### reduced combined config 2
-mkdir -p ../TopFunctions/ReducedCombinedConfig2
-./generate_IR.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
-./generate_VMRCM.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
-./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
-./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
-./generate_TB.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -154,10 +140,6 @@ git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
-cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
-mv wires.dat reducedcm2_wires.dat
-mv memorymodules.dat reducedcm2_memorymodules.dat
-mv processingmodules.dat reducedcm2_processingmodules.dat
 cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
@@ -203,12 +185,6 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
-### Reduced Combined 2 IRtoTB
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
-mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig2/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig2/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -232,11 +208,6 @@ then
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsReducedCM2
-  rm -f MemPrints.tgz
-
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCM
@@ -253,7 +224,7 @@ unset LD_LIBRARY_PATH
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsCM2/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
@@ -263,8 +234,6 @@ do
   module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   memprint_location_reduced="MemPrintsReduced"
-  memprint_location_reducedcm="MemPrintsReducedCM"
-  memprint_location_reducedcm2="MemPrintsReducedCM2"
   memprint_location_barrel="MemPrintsBarrel"
   table_location="LUTs"
   if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
@@ -286,15 +255,11 @@ do
     rm -rf ${target_dir}
     mkdir -p ${target_dir}/ReducedConfig
     mkdir -p ${target_dir}/BarrelConfig
-    mkdir -p ${target_dir}/ReducedCombinedConfig
-    mkdir -p ${target_dir}/ReducedCombinedConfig2
 
     for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
     do
       find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
       find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
-      find ${memprint_location_reducedcm} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig/ \;
-      find ${memprint_location_reducedcm2} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig2/ \;
       find ${memprint_location_barrel} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/BarrelConfig/ \;
     done
   fi

@@ -34,7 +34,7 @@ class MatchEngineUnitBase<DISK> {
   };
 };
 
-template<int VMSMEType, unsigned kNbitsrzbinMP, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
+template<int VMSMEType, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
 class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
@@ -66,16 +66,11 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   bx_ = bxin;
   istub_ = 0;
 
-
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
-  phiProjBin_ = projbuffer.getPhiProjBin();
+  shift_ = projbuffer.shift();
   stubmask_ = projbuffer.getMaskStubs();
-  //stubmask_[0] = nstubsall_[0]!=0;
-  //stubmask_[1] = nstubsall_[1]!=0;
-  //stubmask_[2] = nstubsall_[2]!=0;
-  //stubmask_[3] = nstubsall_[3]!=0;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index[0];
@@ -110,7 +105,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
 
 
-inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin+4)]) {
+inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibinMP+4)]) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
@@ -150,6 +145,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     zbin_ = data.getZBinNoFlag();
 
     auto projfinez = data.getFineZ();
+    projfinephi__ = data.getFinePhi();
      
     //Calculate fine z position
     const int detectorshift(8);
@@ -159,20 +155,33 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
       projfinezadj__ = projfinez;
     }
 
-
     //The three lines of code below replaces this logic:
-    //projfinephi__ = data.getFinePhi();
-    //const int detectorshift(8);
-    //if (phiPlus_ && !phiProjBin_ ) {
-    //	projfinephi__ += detectorshift;      
+    //if (use_[iusetmp].range(0,0)==0) {
+    //  if (shift_==-1) {
+    //    projfinephi__ -= detectorshift;
+    //  }
+    //} else {
+    //  //When we get here shift_ is either 1 or -1
+    //  if (shift_==1) {
+    //    projfinephi__ += detectorshift;
+    //  }
     //}
-    //if (!phiPlus_ && phiProjBin_ ) {
-    //	projfinephi__ -= detectorshift;      
+    //int shift = 0;
+    //if (use_[iusetmp].range(0,0)==0) {
+    //  if (shift_==-1) {
+    //    shift -= detectorshift;
+    //  }
+    //} else {
+    //  //When we get here shift_ is either 1 or -1
+    //  if (shift_==1) {
+    //    shift += detectorshift;
+    //  }
     //}
+    bool phiProjBin_ = zbin_.range(0,0);
+    ap_uint<1> signBit(!use_[iusetmp].range(0,0) && shift_.range(1,1)); //high bit of shift is minus sign
+    ap_uint<1> addBit = (use_[iusetmp].range(0,0)==0 & shift_==-1) ? 1 : 
+                        (use_[iusetmp].range(0,0)==1 & shift_==1) ? 1 : 0;
 
-    ap_uint<1> signBit(!phiPlus_ && phiProjBin_);
-    ap_uint<1> addBit(phiPlus_!=phiProjBin_);
-    
     projfinephi__ = (signBit, addBit, data.getFinePhi());
 
     isPSseed__ = projbuffer_.getIsPSSeed();
@@ -304,35 +313,37 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
 #endif
 
-  inline void set_empty() {
-    empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
-  }
+ inline void set_empty() {
+   empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+ }
 
-  inline bool empty() const {
-#pragma HLS inline
+ inline bool empty() const {
+#pragma HLS inline  
    return empty_;
-  }
-  inline bool nearFull() {
-   return nearFull4Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
-  }
+ }
+ 
+ inline bool nearFull() {
+   return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+ }
 
-  inline bool idle() {
-#pragma HLS inline
-    return idle_;
-  }
+ inline bool idle() {
+#pragma HLS inline  
+   return idle_;
+ }
 
-  inline INDEX readIndex() const {
-    return readindex_;
-  }
+ inline INDEX readIndex() const {
+   return readindex_;
+ }
 
-  inline INDEX writeIndex() const {
-    return writeindex_;
-  }
+ inline INDEX writeIndex() const {
+   return writeindex_;
+ }
+   
 
-  inline bool processing() {
-#pragma HLS inline
-    return !idle_||good__||good__t||good___;
-  }
+inline bool processing() {
+#pragma HLS inline  
+  return !idle_||good__||good__t||good___;
+}
 
 // This method is no longer used, but kept for possible debugging etc.
 inline typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TCID getTCID() {
@@ -455,7 +466,7 @@ inline void advance() {
  ap_uint<kNBits_MemAddrBinned> stubmask_;
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
- typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
+ ap_int<2> shift_;
  bool idle_;
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;

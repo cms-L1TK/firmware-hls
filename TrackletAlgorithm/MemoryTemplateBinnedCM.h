@@ -38,17 +38,18 @@ class MemoryTemplateBinnedCM{
     kNBxBins = 1<<NBIT_BX,
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
-    kNBitsRZBinCM = NBIT_BIN-kNbitsphibin,
-    kNPhiBins = 1<<kNbitsphibin
+    kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
+    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM,
+    entries8 = 36//8*(NBIT_ADDR-NBIT_BIN)+4
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
-  ap_uint<8> binmask8_[kNBxBins][kNPhiBins];
-  ap_uint<32> nentries8_[kNBxBins][kNPhiBins];
-  ap_uint<32> nentries8A_[kNBxBins*kNPhiBins];
-  ap_uint<32> nentries8B_[kNBxBins*kNPhiBins];
-
+  ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
+  ap_uint<36> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
+  ap_uint<entries8> nentries8A_[slots];
+  ap_uint<entries8> nentries8B_[slots];
+  
  public:
 
   unsigned int getDepth() const {return kNMemDepth;}
@@ -64,12 +65,12 @@ class MemoryTemplateBinnedCM{
     return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<32> getEntries8A(BunchXingT bx, ap_uint<3> ibin) const {
-    return nentries8A_[bx*kNPhiBins+ibin];
+  ap_uint<entries8> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    return nentries8A_[bx*8+ibin];
   }
 
-  ap_uint<32> getEntries8B(BunchXingT bx, ap_uint<3> ibin) const {
-    return nentries8B_[bx*kNPhiBins+ibin];
+  ap_uint<entries8> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    return nentries8B_[bx*8+ibin];
   }
 
   ap_uint<entries8> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
@@ -103,12 +104,12 @@ class MemoryTemplateBinnedCM{
     }
     return val;
   }
-
-  const ap_uint<32> (&get_mem_entries8A() const)[kNBxBins*kNPhiBins] {
+  
+  const ap_uint<entries8> (&get_mem_entries8A() const)[slots] {
     return nentries8A_;
   }
 
-  const ap_uint<32> (&get_mem_entries8B() const)[kNBxBins*kNPhiBins] {
+  const ap_uint<entries8> (&get_mem_entries8B() const)[slots] {
     return nentries8B_;
   }
 
@@ -117,6 +118,7 @@ class MemoryTemplateBinnedCM{
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     return dataarray_[icopy];
   }
+
 
   const DataType (&get_mem() const)[NCOPY][1<<NBIT_BX][1<<NBIT_ADDR] {
     return dataarray_;
@@ -128,7 +130,7 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][index];
   }
-
+  
   DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_BIN> slot,
 		    ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
@@ -136,12 +138,12 @@ class MemoryTemplateBinnedCM{
     if(!NBIT_BX) ibx = 0;
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
-
+  
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 
 #pragma HLS inline
-
+    
     if(!NBIT_BX) ibx = 0;
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
@@ -149,17 +151,16 @@ class MemoryTemplateBinnedCM{
       //icopy comparison must be signed int or future SW fails
       writememloop:for (signed int icopy=0;icopy< (signed) NCOPY;icopy++) {
 #pragma HLS unroll
-	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
+        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
-
+      
       #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
-      //(ibin,ireg)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8A_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8B_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
       #endif
 
@@ -174,7 +175,7 @@ class MemoryTemplateBinnedCM{
       return false;
     }
   }
-
+  
 
   // Methods for C simulation only
 #ifndef __SYNTHESIS__
@@ -241,8 +242,8 @@ class MemoryTemplateBinnedCM{
     #ifndef CMSSW_GIT_HASH
     if (success) {
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx*kNPhiBins+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8A_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8B_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
     }
     #endif
