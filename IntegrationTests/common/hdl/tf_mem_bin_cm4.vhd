@@ -31,9 +31,12 @@ entity tf_mem_bin_cm4 is
   generic (
     RAM_WIDTH       : natural := 14;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
-    RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH_CM; --! Leave at default. RAM depth (no. of entries)
-    NUM_MEM_BINS    : natural := 64;                --! Specify number of memory bins
+    RAM_DEPTH       : natural := NUM_PAGES * PAGE_LENGTH_CM; --! Leave at default. RAM depth (no. of entries)
+    NUM_PHI_BINS    : natural := 8;                 --! Number of phi bins
+    NUM_RZ_BINS     : natural := 8;                 --! Number of r/z bins
+    NUM_MEM_BINS    : natural := NUM_PHI_BINS * NUM_RZ_BINS; --! Specify number of memory bins
     NUM_ENTRIES_PER_MEM_BINS : natural := PAGE_LENGTH_CM/NUM_MEM_BINS; --! Leave at default. Number of entries per memory bin
+    BIN_ADDR_WIDTH  : natural := clogb2(NUM_ENTRIES_PER_MEM_BINS);   --! Bits for address
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
@@ -49,7 +52,7 @@ entity tf_mem_bin_cm4 is
     enb3       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
     rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
     regceb    : in  std_logic;                                      --! Output register enable
-    addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
+    addra  : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write addres
     dina      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     addrb0     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     addrb1     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
@@ -60,7 +63,12 @@ entity tf_mem_bin_cm4 is
     doutb2     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     doutb3     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
-    nent_o    : out t_arr_64_4b(0 to NUM_PAGES-1) := (others => (others => (others => '0'))); --! entries(page)(bin)
+    enb_nentA  : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    enb_nentB  : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    addr_nentA : in std_logic_vector(clogb2(NUM_PAGES) + clogb2(NUM_RZ_BINS) - 1 downto 0); --! Address for nentries 
+    addr_nentB : in std_logic_vector(clogb2(NUM_PAGES) + clogb2(NUM_RZ_BINS) - 1 downto 0); --! Address for nentries 
+    dout_nentA : out std_logic_vector(NUM_PHI_BINS * BIN_ADDR_WIDTH - 1 downto 0); --! entries output data
+    dout_nentB : out std_logic_vector(NUM_PHI_BINS * BIN_ADDR_WIDTH - 1 downto 0); --! entries output data
     mask_o    : out t_arr_64_1b(0 to NUM_PAGES-1) := (others => (others => '0')) --! mask(page)(bin)
     );
 end tf_mem_bin_cm4;
@@ -68,7 +76,8 @@ end tf_mem_bin_cm4;
 architecture rtl of tf_mem_bin_cm4 is
 
 -- ########################### Types ###########################
-type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
+type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH - 1 downto 0); --! 1D array of slv
+type t_arr_1d_slv_mem_nent is array(0 to NUM_PHI_BINS * BIN_ADDR_WIDTH - 1) of std_logic_vector(BIN_ADDR_WIDTH - 1 downto 0); --! 1D array of slv
 
 -- ########################### Function ##########################
 --! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4. Needed here because of variable slv width!
@@ -116,12 +125,19 @@ signal sv_RAM_row1  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0'); 
 signal sv_RAM_row2  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal sv_RAM_row3  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
+type sa_RAM_nent_arr is array (0 to NUM_PHI_BINS-1) of t_arr_1d_slv_mem_nent;
+signal sa_RAM_nentA : sa_RAM_nent_arr;         --! RAM data content
+
+signal sa_RAM_nentB : sa_RAM_nent_arr;         --! RAM data content
+
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 attribute ram_style of sa_RAM_data0 : signal is "block";
 attribute ram_style of sa_RAM_data1 : signal is "block";
 attribute ram_style of sa_RAM_data2 : signal is "block";
 attribute ram_style of sa_RAM_data3 : signal is "block";
+attribute ram_style of sa_RAM_nentA : signal is "distributed";
+attribute ram_style of sa_RAM_nentB : signal is "distributed";
 
 begin
 
@@ -132,13 +148,16 @@ assert (NUM_ENTRIES_PER_MEM_BINS = PAGE_LENGTH_CM/NUM_MEM_BINS) report "tf_mem_b
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter
-  variable vi_nent_idx  : integer := 0;  -- Bin index of nent
+  variable vi_nent_idx  : std_logic_vector(5 downto 0);  -- Bin index of nent
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
   variable written      : integer := 0;
+  variable addr_in_bin  : std_logic_vector(BIN_ADDR_WIDTH-1 downto 0);
+  variable upperbits, lowerbits : std_logic_vector(2 downto 0);
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
+    report "tm_mem_bin_cm4 vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -146,7 +165,6 @@ begin
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      nent_o(vi_page_cnt) <= (others => (others => '0'));
       mask_o(vi_page_cnt) <= (others => '0'); 
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
@@ -162,21 +180,21 @@ begin
       sa_RAM_data2(to_integer(unsigned(addra))) <= dina; -- Write data
       sa_RAM_data3(to_integer(unsigned(addra))) <= dina; -- Write data
       -- Count entries
-      vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      -- vi_nent_idx := to_integer(shift_right(unsigned(addra), clogb2(NUM_ENTRIES_PER_MEM_BINS))) mod NUM_MEM_BINS; -- Calculate bin index
+      vi_nent_idx := addra(9 downto 4); -- Calculate bin index
       --if DEBUG=true then write(v_line_out, string'("vi_nent_idx: ")); write(v_line_out, vi_nent_idx); writeline(output, v_line_out); end if;
 
+      upperbits := vi_nent_idx(5 downto 3);
+      lowerbits := vi_nent_idx(2 downto 0);
+      
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
-      addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH_CM)-1 downto 0)));
+      addr_in_bin := std_logic_vector(unsigned(addra(BIN_ADDR_WIDTH-1 downto 0)) + 1);
       assert (page < NUM_PAGES) report "page out of range" severity error;
-      mask_o(page)(vi_nent_idx) <= '1'; -- <= 1 (slv)
-      if (addr_in_page = 0) then
-        nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(1, nent_o(page)(vi_nent_idx)'length)); -- <= 1 (slv)
-      else
-        nent_o(page)(vi_nent_idx) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page)(vi_nent_idx))) + 1, nent_o(page)(vi_nent_idx)'length)); -- + 1 (slv)
-      end if; 
-    elsif (written=0) then
-      mask_o <= (others => (others => '0'));
-      nent_o <= (others => (others => (others => '0')));
+      mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
+
+      sa_RAM_nentA(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
+      sa_RAM_nentB(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
+
     end if; -- (wea='1')
   end if;
 end process;
@@ -195,6 +213,16 @@ begin
     end if;
     if (enb3='1') then
       sv_RAM_row3 <= sa_RAM_data3(to_integer(unsigned(addrb3)));
+    end if;
+    if (enb_nentA='1') then
+      for i in 0 to NUM_PHI_BINS-1 loop
+        dout_nentA(BIN_ADDR_WIDTH*(i+1)-1 downto BIN_ADDR_WIDTH*i) <= sa_RAM_nentA(i)(to_integer(unsigned(addr_nentA)));
+      end loop;
+    end if;
+    if (enb_nentB='1') then
+      for i in 0 to NUM_PHI_BINS-1 loop
+        dout_nentB(BIN_ADDR_WIDTH*(i+1)-1 downto BIN_ADDR_WIDTH*i) <= sa_RAM_nentB(i)(to_integer(unsigned(addr_nentB)));
+      end loop;
     end if;
   end if;
 end process;

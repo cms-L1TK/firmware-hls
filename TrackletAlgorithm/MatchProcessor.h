@@ -14,7 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <bitset>
-
+#include <cmath>
 
 namespace PR
 {
@@ -525,7 +525,7 @@ void MatchProcessor(BXType bx,
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
-  //FIXME moved this into main loop - jf
+
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
@@ -536,7 +536,7 @@ void MatchProcessor(BXType bx,
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin, projin);
-
+  
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
 
@@ -591,6 +591,26 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
 
+  bool validproj__ = false;
+  ProjectionRouterBuffer<BARREL, APTYPE> projbuffer__;
+
+
+  ap_uint<8> vmstubsmask[8];
+#pragma HLS array_partition variable=vmstubsmask complete dim=1
+
+  entriesloop:for(unsigned int i=0;i<8;i++) {
+#pragma HLS unroll
+    vmstubsmask[i]=instubdata.getBinMask8(bx,i);
+  }
+// constants used in reading VMSME memories
+  constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
+  constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
+  constexpr int PAGE_LENGTH_CM = 1024;
+  constexpr int BIN_ADDR_WIDTH = 4;
+  //Can't figure out how to do this calculation at compile
+  //constexpr int BIN_ADDR_WIDTH = ceil(log2(PAGE_LENGTH_CM/(NUM_PHI_BINS*NUM_RZ_BINS)));
+
+  /*
   ap_uint<4> nvmstubs[8][8]; 
 #pragma HLS ARRAY_PARTITION variable=nvmstubs complete dim=0
   
@@ -599,14 +619,14 @@ void MatchProcessor(BXType bx,
     (nvmstubs[izbin][7],nvmstubs[izbin][6],nvmstubs[izbin][5],nvmstubs[izbin][4],
      nvmstubs[izbin][3],nvmstubs[izbin][2],nvmstubs[izbin][1],nvmstubs[izbin][0]) = instubdata.getEntries8(bx, izbin);
   }
-
+  */
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<kNBitsBuffer>()[(readptr,writeptr)];
-    bool projBuffNearFull = nearFull3Unit<kNBitsBuffer>()[(readptr,writeptr)];
+    bool projBuffNearFull = nearFull4Unit<kNBitsBuffer>()[(readptr,writeptr)];
     
     ap_uint<3> iphi = 0;
 
@@ -633,16 +653,15 @@ void MatchProcessor(BXType bx,
     }
 
     //This printout exactly matches printout in emulation for tracking code differences
-    /*   
+    /* 
     std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
     for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
+      std::cout << " MEU"<<iMEU<<": "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
 		<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
     }
     std::cout << std::endl;
     */
-
-     
+    
     //New code
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
     ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
@@ -659,11 +678,7 @@ void MatchProcessor(BXType bx,
 
     ap_uint<1> hasMatch = !emptys[bestiMEU];
     
-    if (hasMatch) {
-      matchengine[bestiMEU].advance();
-    }
-
-    /*
+/*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
@@ -680,8 +695,12 @@ void MatchProcessor(BXType bx,
       
     ap_uint<1> hasMatch = smallest.or_reduce();
     ap_uint<3> bestiMEU = __builtin_ctz(smallest);
+*/    
 
-    */
+    if (hasMatch) {
+      matchengine[bestiMEU].advance();
+    }
+
 
     ProjectionRouterBuffer<BARREL,APTYPE> tmpprojbuff = projbufferarray.peek();;
     if (anyidle && !empty) {
@@ -703,18 +722,18 @@ void MatchProcessor(BXType bx,
       //this and fail to reach II=1
       else if (istep != 0) meu.step(instubdata.getMem(iMEU));
       
-
       meu.processPipeLine(table[iMEU]);      
 
     } //end MEU loop
     
-    if(hasMatch) {
+    if (hasMatch) {
  
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
       
       (stubindex,allprojdata) = matches[bestiMEU];
       //matchengine[bestiMEU].advance();
+
       AllProjection<APTYPE> allproj(allprojdata);
 
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
@@ -728,7 +747,12 @@ void MatchProcessor(BXType bx,
 	 nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
 	 fullmatch);
     } //end MC if
-    
+    if (validproj__) {
+
+      projbufferarray.saveProjection(projbuffer__);
+      projbufferarray.incProjection();
+     
+    }
 
       
     if (validin_) {
@@ -803,35 +827,76 @@ void MatchProcessor(BXType bx,
 
       unsigned int ivmPlus = iphi;
 	
-      ap_int<2> shift = 0;
+      //ap_int<2> shift = 0;
       
+      //If the projection goes to the first (ivmMinus) phiProjBin is zero but
+      //if the projection goes to the second bin ivmMinus+1 phiProjBin is one
+      typename ProjectionRouterBuffer<BARREL, APTYPE>::PHIPROJBIN phiProjBin  = 0; 
+
       if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
-	shift = 1;
+	//shift = 1;
 	ivmPlus++;
       }
       unsigned int ivmMinus = iphi;
       if (extrabits == 0 && iphi != 0) {
-	shift = -1;
+	phiProjBin = 1; //projection is to next been, but we also search here
+	//shift = -1;
 	ivmMinus--;
       }
       
       ///////////////
       // VMProjection
-      
-      ap_uint<4> nstubfirstMinus=nvmstubs[zfirst][ivmMinus];
-      ap_uint<4> nstublastMinus=nvmstubs[zlast][ivmMinus];
-      ap_uint<4> nstubfirstPlus=nvmstubs[zfirst][ivmPlus];
-      ap_uint<4> nstublastPlus=nvmstubs[zlast][ivmPlus];
-      
-      if (ivmMinus==ivmPlus) {
-	nstubfirstPlus = 0;
-	nstublastPlus = 0;
-      }
-      if (zfirst==zlast) {
-	nstublastMinus = 0;
-	nstublastPlus = 0;
+      // New code for using new VMSME memory module
+
+      ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
+#pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
+      ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
+#pragma HLS ARRAY_PARTITION variable=entries_zlast dim=0 complete
+
+      for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
+#pragma HLS unroll
+        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+zfirst].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*NUM_PHI_BINS+zlast].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
       }
 
+      /*
+      std::cout << " z phi: " << zfirst << " " << ivmMinus << " "
+           << nvmstubs[zfirst][ivmMinus]<< " " << entries_zfirst[ivmMinus]
+      << std::endl;
+      */
+
+      ap_uint<1> stubfirstMinus = vmstubsmask[zfirst][ivmMinus];
+      ap_uint<1> stubfirstPlus = vmstubsmask[zfirst][ivmPlus]&&
+                                 (ivmMinus!=ivmPlus);
+      ap_uint<1> stublastMinus = vmstubsmask[zlast][ivmMinus]&&
+                                 (zfirst!=zlast);
+      ap_uint<1> stublastPlus = vmstubsmask[zlast][ivmPlus]&&
+                                 (zfirst!=zlast)&&(ivmMinus!=ivmPlus);;
+      
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastPlus = entries_zlast[ivmPlus];
+      
+
+
+      //if (ivmMinus==ivmPlus) {
+      //	nstubfirstPlus = 0;
+      //	nstublastPlus = 0;
+      //}
+      //if (zfirst==zlast) {
+      //	nstublastMinus = 0;
+      //	nstublastPlus = 0;
+      //}
+
+      ap_uint<4> maskstubs=(stublastPlus, stubfirstPlus, stublastMinus, stubfirstMinus);
+      
+/*
+      for (int i = 0; i<4; i++){
+        std::cout<<"maskstubs"<<i<<": "<<((maskstubs<<i)&1)<<" | ";
+      }
+      std::cout<<std::endl;
+*/
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       VMProjection<BARREL> vmproj(index, zbin, finez, finephi, rinv, psseed);
@@ -839,15 +904,22 @@ void MatchProcessor(BXType bx,
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
 				    projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
-      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, shift, trackletid, nstubs, zfirst, vmproj, psseed);
-      projbufferarray.saveProjection(projbuffertmp);
+      ProjectionRouterBuffer<BARREL, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, phiProjBin, trackletid, nstubs, maskstubs, zfirst, vmproj, psseed);
 
-      if (nstubs!=0) {
-	projbufferarray.incProjection();
-      }
+      projbuffer__ = projbuffertmp;
+
+      validproj__ = maskstubs != 0;
+
+      //projbufferarray.saveProjection(projbuffertmp);
+
+      //if (maskstubs!=0) {
+      //	projbufferarray.incProjection();
+      //}
       
-    } // end if(validin)
-
+    } else {
+      validproj__ = false;
+    }// end if(validin)
+    
     projdata_ = projdata;
     validin_ = validin;
 
@@ -863,7 +935,7 @@ void MatchProcessor(BXType bx,
     } else {
       validin = false;
     }// end if not near full
-
+     
   } //end loop
 
   bx_o = bx;
