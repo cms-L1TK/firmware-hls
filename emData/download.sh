@@ -92,11 +92,7 @@ then
   mv LUTs LUTsCM
   rm -f LUTs.tgz
   wget -O LUTs.tgz --quiet ${luts_url_cm2}
-<<<<<<< HEAD
   tar -xzmf LUTs.tgz
-=======
-  tar -xzf LUTs.tgz
->>>>>>> bc16d6d... updating download.sh with CombinedModule2
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
@@ -225,10 +221,7 @@ mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
 ### Reduced Combined 2 IRtoTB
-<<<<<<< HEAD
-=======
 echo "Reduced CM2"
->>>>>>> bc16d6d... updating download.sh with CombinedModule2
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
@@ -257,13 +250,8 @@ then
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
-<<<<<<< HEAD
   wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzmf MemPrints.tgz
-=======
-  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm2}
-  tar -xzf MemPrints.tgz
->>>>>>> bc16d6d... updating download.sh with CombinedModule2
   mv MemPrints MemPrintsReducedCM2
   rm -f MemPrints.tgz
 
@@ -275,6 +263,7 @@ then
   wget -O MemPrints.tar.gz --quiet ${memprints_url}
   tar -xzmf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
+
 fi
 
 # Needed in order for awk to run successfully:

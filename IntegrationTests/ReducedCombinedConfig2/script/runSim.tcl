@@ -10,7 +10,6 @@ file mkdir dataOut/
 
 # Run pre.tcl if it exists
 set_property -name {xsim.compile.tcl.pre} -value [get_files pre.tcl -of [get_fileset utils_1]] -objects [get_filesets sim_1]
-
 # Launch Simulation
 launch_simulation
 
