@@ -58,7 +58,7 @@ foreach i $modules_to_test {
   set top_func [join [list "ProjectionRouterTop_" [string range $i 3 8]] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"MODULE_=" $module "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
+  set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"MODULE_=" $module "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $top_func
