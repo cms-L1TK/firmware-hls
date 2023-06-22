@@ -64,7 +64,7 @@ foreach i $modules_to_test {
   }
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\" -D \"INNER_TABLE_=\\\"" $innerTable "\\\"\" -D \"OUTER_TABLE_=\\\"" $outerTable "\\\"\""] ""]
+  set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"SEED_=" $seed "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\" -D \"INNER_TABLE_=\\\"" $innerTable "\\\"\" -D \"OUTER_TABLE_=\\\"" $outerTable "\\\"\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $top_func

@@ -56,7 +56,7 @@ foreach i $modules_to_test {
   puts [join [list "top function = " $topfunction] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"KLAYERDISK=" $kLayerDisk "\" -D \"KMODULE=" $i "_\" -D \"TOPFUNCTION=" $topfunction "\""] ""]
+  set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"KLAYERDISK=" $kLayerDisk "\" -D \"KMODULE=" $i "_\" -D \"TOPFUNCTION=" $topfunction "\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $topfunction
