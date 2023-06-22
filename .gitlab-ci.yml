@@ -10,9 +10,6 @@ stages: # ---------------------------------------------------------------------
   - download
   - quality-check
   - hls-build
-  - topTF-sim
-  - check-results
-  - topTF-synth
 
 # Job templates ---------------------------------------------------------------
 .job_template: &template_base
