@@ -14,8 +14,8 @@ class TrackletEngineUnit {
     kNBitsRZBin=3,
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
-    kNBitsPTLutInner=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
-    kNBitsPTLutOuter=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
+    kNBitsPTLutInner=(Seed==TF::L5L6)?1024:((Seed==TF::L1L2)||(Seed==TF::L2L3)?256:512),
+    kNBitsPTLutOuter=(Seed==TF::L5L6)?1024:((Seed==TF::L1L2)||(Seed==TF::L2L3)||(Seed==TF::L3L4)?256:512)
   };
 
   typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;

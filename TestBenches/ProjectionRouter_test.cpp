@@ -92,7 +92,6 @@ int main()
     err += compareMemWithFile<AllProjectionMemory<projMemType> >(allproj, fout_aproj.at(0), ievt, "AllProjection", truncation);
 
     for (unsigned int i = 0; i < vmproj_names.size(); i++) {
-      const auto &vmproj_name = vmproj_names.at(i);
       auto &fout = fout_vmproj.at(i);
       string label = "VMProjection " + to_string(i);
       err += compareMemWithFile<VMProjectionMemory<vmProjMemType> >

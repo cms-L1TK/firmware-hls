@@ -8,9 +8,6 @@
 #include "FileReadUtility.h"
 #include "Macros.h"
 
-// HLS Headers
-#include "hls_math.h"
-
 // STL Headers
 #include <iostream>
 #include <fstream>

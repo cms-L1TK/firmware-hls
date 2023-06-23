@@ -574,8 +574,6 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   
 
 
-  bool trace=true;
-
   constexpr unsigned int NBitsPhiRegion=2;
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion>::kVMSTEOFinePhiSize;
 
@@ -586,9 +584,6 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   tebuffer.setIStub(0); 
 
   tebuffer.reset();
-
-  constexpr unsigned int kNBitsPTLutInner = (Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512);
-  constexpr unsigned int kNBitsPTLutOuter = (Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512);
 
   TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion> teunits[NTEUnits];
 #pragma HLS array_partition variable=teunits complete dim=1

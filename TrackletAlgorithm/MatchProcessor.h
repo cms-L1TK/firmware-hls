@@ -521,7 +521,7 @@ void MatchProcessor(BXType bx,
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
-  readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+  readtable: for(unsigned iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
   } 
@@ -604,10 +604,10 @@ void MatchProcessor(BXType bx,
   }
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
-  constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
-  constexpr int PAGE_LENGTH_CM = 1024;
   constexpr int BIN_ADDR_WIDTH = 4;
   //Can't figure out how to do this calculation at compile
+  //constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
+  //constexpr int PAGE_LENGTH_CM = 1024;
   //constexpr int BIN_ADDR_WIDTH = ceil(log2(PAGE_LENGTH_CM/(NUM_PHI_BINS*NUM_RZ_BINS)));
 
   /*
@@ -641,7 +641,7 @@ void MatchProcessor(BXType bx,
 
     bool anyidle = false;
 
-  MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+  MEU_get_trkids: for(unsigned iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
       matchengine[iMEU].set_empty();
       idles[iMEU] = matchengine[iMEU].idle();
