@@ -34,7 +34,11 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
 
-  inline MatchEngineUnit() {}
+ inline MatchEngineUnit() :
+   tab0_(isLessThanSize<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize,VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize,false,VMProjectionBase<BARREL>::kVMProjFinePhiWideSize,VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize>()),
+   tab1_(isLessThanSize<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize,1,true,VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize,VMProjectionBase<BARREL>::kVMProjFinePhiWideSize>()),
+   tab2_(isLessThanSize<VMProjectionBase<BARREL>::kVMProjFinePhiWideSize,VMProjectionBase<BARREL>::kVMProjFinePhiWideSize,true,VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize,VMProjectionBase<BARREL>::kVMProjFinePhiWideSize>())
+  {}
 
   inline void reset() {
 #pragma HLS inline
@@ -177,13 +181,10 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1024]) {
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
     
-    const int projfinebits(VMProjectionBase<BARREL>::kVMProjFinePhiWideSize);
-    const int stubfinebits(VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize);
-    bool passphi = isLessThanSize<projfinebits,stubfinebits,false,projfinebits,stubfinebits>()[(projfinephi___,stubfinephi)];
+    const bool passphi = tab0_[(projfinephi___,stubfinephi)];
     
     //Check if stub z position consistent
-    const int stub2Sfinebits(1);
-    bool pass = isPSseed___ ? isLessThanSize<projfinebits,stub2Sfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)] : isLessThanSize<projfinebits,projfinebits,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj___)];
+    const bool pass = isPSseed___ ? tab1_[(stubfinez,projfinezadj___)] : tab2_[(stubfinez,projfinezadj___)];
 
     auto const index=projrinv___.concat(stubbend);
 
@@ -399,6 +400,10 @@ inline void advance() {
  VMProjection<BARREL>::VMPRINV projrinv__, projrinv__t, projrinv___;
  ProjectionRouterBuffer<BARREL, AllProjectionType> projbuffer__, projbuffer__t,  projbuffer___;
  ap_uint<kNBits_MemAddr> projseq__, projseq__t, projseq___;
+
+ const ap_uint<1 << 2*VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> tab0_;
+ const ap_uint<1 << 2*VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> tab1_;
+ const ap_uint<1 << 2*VMProjectionBase<BARREL>::kVMProjFinePhiWideSize> tab2_;
 
 #ifndef __SYNTHESIS__
  // only used for debugging to identify MEU
