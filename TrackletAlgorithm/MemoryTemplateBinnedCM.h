@@ -133,7 +133,8 @@ class MemoryTemplateBinnedCM{
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
-      writememloop:for (unsigned int icopy=0;icopy<NCOPY;icopy++) {
+      //icopy comparison must be signed int or future SW fails
+      writememloop:for (signed int icopy=0;icopy< (signed) NCOPY;icopy++) {
 #pragma HLS unroll
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
