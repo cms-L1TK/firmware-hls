@@ -133,6 +133,7 @@ public:
 
   // This getter is only used for projections in BARREL
   bool getIsPSSeed() const {
+    static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
     return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
   }
   
