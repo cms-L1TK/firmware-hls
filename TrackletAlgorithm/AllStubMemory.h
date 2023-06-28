@@ -167,6 +167,9 @@ public:
     if(ASType == BARRELPS) return true;
     else if(ASType == BARREL2S) return false;
     else if(ASType == DISKPS || ASType == DISK2S) {
+      // Checks the radius 
+      // if these are zero it means that you have 2S stubs where the radius 
+      // just encodes the ring number and is less than 16
       return data_.range(getWidth()-1, getWidth()-3) > 0; // Check highest 3 bits regardless of template type
     }
   }
