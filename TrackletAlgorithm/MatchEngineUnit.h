@@ -118,7 +118,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   //process. 
   
   NSTUB istubtmp=istub_;
-  NSTUB iusetmp=iuse_;
+  ap_uint<2> iusetmp=iuse_;
 
   ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
   auto secondSave = second_;
@@ -478,7 +478,7 @@ inline void advance() {
  ap_uint<kNBits_MemAddr> projseq_;
  bool isPSseed_;
 
- NSTUB iuse_;
+ ap_uint<2> iuse_;
  static constexpr int kNuse = 4; // Only 4 options
  int nuse_;
  ap_uint<2> use_[kNuse];
