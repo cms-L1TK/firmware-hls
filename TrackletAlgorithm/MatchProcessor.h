@@ -919,7 +919,9 @@ void MatchCalculator(BXType bx,
   const auto kShift_phi0bit      = 1;                                                             // phi0bitshift in emulation defined in constants
   const ap_uint<10> kPhi_corr_shift_L123 = 7 + kNbitsdrinv + kShift_phi0bit - kShift_Rinv - kShift_Phider;                    // icorrshift for L123
   const ap_uint<10> kPhi_corr_shift_L456 = kPhi_corr_shift_L123 - 10 + kNbitsrL456;
-  const auto kPhi_corr_shift     = (LAYER < TF::D1) ? ((LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456) : ap_uint<10>(6);                            // icorrshift_/shifttmp  in emulation
+  const auto kPhi_corr_shift     = (LAYER < TF::D1) ? 
+                                   ((LAYER < TF::L4)? kPhi_corr_shift_L123 : kPhi_corr_shift_L456) // barrel
+                                   : ap_uint<10>(6); // disk                        // icorrshift_/shifttmp  in emulation
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
