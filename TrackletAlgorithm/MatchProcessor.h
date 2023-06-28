@@ -876,6 +876,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
+                     ap_uint<1>& isMatch,
                      ap_uint<1>& savedMatch,
                      ap_uint<MC::LUT_matchcut_z_width>& best_delta_z,
                      ap_uint<MC::LUT_matchcut_phi_width>& best_delta_phi,
@@ -1098,6 +1099,8 @@ void MatchCalculator(BXType bx,
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi < best_delta_phi);
   bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+  disk_match = isMatch ? disk_match && (abs_delta_phi < best_delta_phi) : disk_match;
+  isMatch |= disk_match;
   if ((!isDisk && barrel_match) || (isDisk && disk_match)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
@@ -1280,6 +1283,7 @@ void MatchProcessor(BXType bx,
   ap_uint<MC::LUT_matchcut_phi_width> best_delta_phi;
   ap_uint<MC::LUT_matchcut_rphi_width> best_delta_rphi;
   ap_uint<MC::LUT_matchcut_r_width> best_delta_r;
+  ap_uint<1> isMatch = 0;
   ap_uint<1> hasMatch = 0;
   ap_uint<2> bestiMEU = 0;
 
@@ -1407,11 +1411,12 @@ void MatchProcessor(BXType bx,
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
     
       ap_uint<1> newtracklet = lastTrkID != trkindex;
+      isMatch = newtracklet ? ap_uint<1>(0) : isMatch;
       
       lastTrkID = trkindex;
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
+        (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
