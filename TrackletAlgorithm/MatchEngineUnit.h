@@ -65,12 +65,10 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   idle_ = false;
   bx_ = bxin;
   istub_ = 0;
-
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   phiProjBin_ = projbuffer.getPhiProjBin();
-  shift_ = projbuffer.shift();
   stubmask_ = projbuffer.getMaskStubs();
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
@@ -153,36 +151,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
       projfinezadj__ = projfinez;
     }
 
-    //The three lines of code below replaces this logic:
-    //if (use_[iusetmp].range(0,0)==0) {
-    //  if (shift_==-1) {
-    //    projfinephi__ -= detectorshift;
-    //  }
-    //} else {
-    //  //When we get here shift_ is either 1 or -1
-    //  if (shift_==1) {
-    //    projfinephi__ += detectorshift;
-    //  }
-    //}
-    //int shift = 0;
-    //if (use_[iusetmp].range(0,0)==0) {
-    //  if (shift_==-1) {
-    //    shift -= detectorshift;
-    //  }
-    //} else {
-    //  //When we get here shift_ is either 1 or -1
-    //  if (shift_==1) {
-    //    shift += detectorshift;
-    //  }
-    //}
-    //bool phiProjBin_ = zbin_.range(0,0);
-    /*
-    ap_uint<1> signBit(!use_[iusetmp].range(0,0) && shift_.range(1,1)); //high bit of shift is minus sign
-    ap_uint<1> addBit = (use_[iusetmp].range(0,0)==0 & shift_==-1) ? 1 : 
-                        (use_[iusetmp].range(0,0)==1 & shift_==1) ? 1 : 0;
-    */
-    //ap_uint<1> signBit(!phiPlus_ && phiProjBin_);
-    ap_uint<1> signBit(!use_[iusetmp].range(0,0) && phiProjBin_); //high bit of shift is minus sign
+    ap_uint<1> signBit(!use_[iusetmp].range(0,0) && phiProjBin_);
     ap_uint<1> addBit(phiPlus_!=phiProjBin_);
 
     projfinephi__ = (signBit, addBit, data.getFinePhi());
@@ -471,7 +440,6 @@ inline void advance() {
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
- ap_int<2> shift_;
  bool idle_;
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
  BXType bx_;
