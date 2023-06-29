@@ -69,6 +69,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   projbuffer_ = projbuffer;
   projseq_ = projseq;
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
+  phiProjBin_ = projbuffer.getPhiProjBin();
   shift_ = projbuffer.shift();
   stubmask_ = projbuffer.getMaskStubs();
   ap_uint<2> index = __builtin_ctz(stubmask_);
@@ -174,10 +175,15 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     //    shift += detectorshift;
     //  }
     //}
-    bool phiProjBin_ = zbin_.range(0,0);
+    //bool phiProjBin_ = zbin_.range(0,0);
+    /*
     ap_uint<1> signBit(!use_[iusetmp].range(0,0) && shift_.range(1,1)); //high bit of shift is minus sign
     ap_uint<1> addBit = (use_[iusetmp].range(0,0)==0 & shift_==-1) ? 1 : 
                         (use_[iusetmp].range(0,0)==1 & shift_==1) ? 1 : 0;
+    */
+    //ap_uint<1> signBit(!phiPlus_ && phiProjBin_);
+    ap_uint<1> signBit(!use_[iusetmp].range(0,0) && phiProjBin_); //high bit of shift is minus sign
+    ap_uint<1> addBit(phiPlus_!=phiProjBin_);
 
     projfinephi__ = (signBit, addBit, data.getFinePhi());
 
@@ -464,6 +470,7 @@ inline void advance() {
  ap_uint<kNBits_MemAddrBinned> stubmask_;
  ap_uint<1> second_;
  ap_uint<1> phiPlus_;
+ typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
  ap_int<2> shift_;
  bool idle_;
  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
