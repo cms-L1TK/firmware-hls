@@ -1527,16 +1527,13 @@ void MatchProcessor(BXType bx,
       unsigned int ivmPlus = iphi;
 
       typename ProjectionRouterBuffer<BARREL, APTYPE>::PHIPROJBIN phiProjBin  = 0;
-      ap_int<2> shift = 0;
       
       if (extrabits == ((1U << nextrabits) - 1) && iphi != ((1U << nbits_vmme) - 1)) {
-        shift = 1;
         ivmPlus++;
       }
       unsigned int ivmMinus = iphi;
       if (extrabits == 0 && iphi != 0) {
         phiProjBin = 1;
-        shift = -1;
         ivmMinus--;
       }
       
@@ -1574,7 +1571,7 @@ void MatchProcessor(BXType bx,
       ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && (nstublastPlus != 0);
 
       ap_uint<4> mask = (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus);
-      ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, shift, trackletid, mask, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
+      ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, trackletid, mask, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
       projbufferarray.saveProjection(projbuffertmp);
 
       if (usefirstPlus || usesecondPlus || usefirstMinus || usesecondMinus) {
