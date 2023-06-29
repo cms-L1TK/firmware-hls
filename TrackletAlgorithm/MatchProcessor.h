@@ -1045,15 +1045,15 @@ void MatchCalculator(BXType bx,
   const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
   ap_uint<1> shiftr         = 1;
   ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
-  ap_uint<12> tmp_stubr = isProjDisk ? LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)] : LUT_matchcut_rDSS[ap_uint<12>(stub_r)];
+  ap_uint<12> disk_stubr = LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)];
 
   if(isDisk && isPSStub) {
     delta_r   = (ap_uint<12>(stub_ps_r) >> shiftr) - proj_r_long; // proj_z = RZ
   }
   else if(isDisk && !isPSStub) {
     auto alpha_fact = LUT_matchcut_alpha[ap_uint<12>(stub_2s_r)];
-    tmp_stubr = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
-    delta_r   = ((tmp_stubr >> shiftr) - proj_r_long); // proj_z = RZ
+    disk_stubr = LUT_matchcut_rDSS[ap_uint<4>(stub_2s_r)]; 
+    delta_r   = ((disk_stubr >> shiftr) - proj_r_long); // proj_z = RZ
     ap_uint<4> alpha_shift = 12;
     ap_uint<12> alpha_corr = ap_int<24>(ap_int<24>(delta_r) * stub_2s_alpha * alpha_fact) >> alpha_shift;
     delta_phi += alpha_corr;
@@ -1098,14 +1098,14 @@ void MatchCalculator(BXType bx,
 
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi < best_delta_phi);
-  bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(tmp_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+  bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(disk_stubr)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
   disk_match = isMatch ? disk_match && (abs_delta_phi < best_delta_phi) : disk_match;
   isMatch |= disk_match;
   if ((!isDisk && barrel_match) || (isDisk && disk_match)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     if(isDisk) {
-      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * tmp_stubr;
+      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * disk_stubr;
       best_delta_r    = abs_delta_r;
       best_delta_phi = abs_delta_phi;
     }
