@@ -1147,7 +1147,7 @@ void MatchCalculator(BXType bx,
     const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
     ap_uint<1> shiftr         = 1;
     ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
-    ap_uint<12> disk_stubr = isProjDisk ? LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)];
+    ap_uint<12> disk_stubr = LUT_matchcut_rDSS[ap_uint<12>(stub_2s_r)];
 
     if(isDisk && isPSStub) {
       delta_r   = (ap_uint<12>(stub_ps_r) >> shiftr) - proj_r_long; // proj_z = RZ
