@@ -84,16 +84,16 @@ switch (Seed){
   case(TF::L1D1):
   if (negZ){
     static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/TC/tables/TC_L1B1_drinv.tab")
-  #  include "../emData/TC/tables/TC_L1B1_drinv.tab"
+  #if __has_include("../emData/LUTs/TC_L1B1_drinv.tab")
+  #  include "../emData/LUTs/TC_L1B1_drinv.tab"
   #endif
     };
     drinv = LUT_drinv[addr_drinv];
   }
   else{
     static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/TC/tables/TC_L1F1_drinv.tab")
-  #  include "../emData/TC/tables/TC_L1F1_drinv.tab"
+  #if __has_include("../emData/LUTs/TC_L1F1_drinv.tab")
+  #  include "../emData/LUTs/TC_L1F1_drinv.tab"
   #endif
     };
     drinv = LUT_drinv[addr_drinv];
@@ -102,16 +102,16 @@ switch (Seed){
   case(TF::L2D1):
   if (negZ){
     static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/TC/tables/TC_L2B1_drinv.tab")
-  #  include "../emData/TC/tables/TC_L2B1_drinv.tab"
+  #if __has_include("../emData/LUTs/TC_L2B1_drinv.tab")
+  #  include "../emData/LUTs/TC_L2B1_drinv.tab"
   #endif
     };
     drinv = LUT_drinv[addr_drinv];
   }
   else{
     static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/TC/tables/TC_L2F1_drinv.tab")
-  #  include "../emData/TC/tables/TC_L2F1_drinv.tab"
+  #if __has_include("../emData/LUTs/TC_L2F1_drinv.tab")
+  #  include "../emData/LUTs/TC_L2F1_drinv.tab"
   #endif
     };
     drinv = LUT_drinv[addr_drinv];
@@ -983,16 +983,16 @@ switch(Seed){
   case(TF::L1D1):
     if (negZ){
       static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_L1B1_invt.tab")
-#  include "../emData/TC/tables/TC_L1B1_invt.tab"
+#if __has_include("../emData/LUTs/TC_L1B1_invt.tab")
+#  include "../emData/LUTs/TC_L1B1_invt.tab"
 #endif
       };
       invt = LUT_invt[addr_invt];
     }
     else{
       static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_L1F1_invt.tab")
-#  include "../emData/TC/tables/TC_L1F1_invt.tab"
+#if __has_include("../emData/LUTs/TC_L1F1_invt.tab")
+#  include "../emData/LUTs/TC_L1F1_invt.tab"
 #endif
       };
       invt = LUT_invt[addr_invt];
@@ -1001,16 +1001,16 @@ switch(Seed){
   case(TF::L2D1):
     if (negZ){
       static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_L2B1_invt.tab")
-#  include "../emData/TC/tables/TC_L2B1_invt.tab"
+#if __has_include("../emData/LUTs/TC_L2B1_invt.tab")
+#  include "../emData/LUTs/TC_L2B1_invt.tab"
 #endif
       };
       invt = LUT_invt[addr_invt];
     }
     else{
       static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_L2F1_invt.tab")
-#  include "../emData/TC/tables/TC_L2F1_invt.tab"
+#if __has_include("../emData/LUTs/TC_L2F1_invt.tab")
+#  include "../emData/LUTs/TC_L2F1_invt.tab"
 #endif
       };
       invt = LUT_invt[addr_invt];
