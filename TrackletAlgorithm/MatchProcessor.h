@@ -905,6 +905,7 @@ void MatchCalculator(BXType bx,
   // probably should move these to constants file
   const ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
   const ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
+  const ap_uint<4> kNbitsphiprojD  = 14; // nbitsphiprojD in emulation (defined in constants) 
   const ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
   const ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
   const ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
@@ -1007,9 +1008,12 @@ void MatchCalculator(BXType bx,
   ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<18> full_r_corr   = stub_z * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
+  //ap_uint<3> shifttmp = 6;
   constexpr auto shifttmp = (LAYER < trklet::N_LAYER) ? log2barrel : log2disk;
-  phi_corr = (isDisk && isPSStub) ? ap_int<11>((stub_ps_z * proj_phid) >> shifttmp) : phi_corr;
-  phi_corr = (isDisk && !isPSStub) ? ap_int<11>((stub_ps_z * proj_phid) >> shifttmp) : phi_corr;
+  if(isDisk && isPSStub)
+    phi_corr = (stub_ps_z * proj_phid) >> shifttmp;
+  else if(isDisk && !isPSStub)
+    phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
   ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
   ap_int<12> r_corr        = full_r_corr >> kr_corr_shift; // only keep needed bits
    
@@ -1024,13 +1028,20 @@ void MatchCalculator(BXType bx,
   const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = kPhi0_shift > 0 ? stub_phi_long << kPhi0_shift : stub_phi_long;                        // shift
-  shiftstubphi = (isDisk && isPSStub) ? ap_int<18>(kPhi0_shift > 0 ? stub_ps_phi << kPhi0_shift : stub_ps_phi) : shiftstubphi;                        // shift
-  shiftstubphi = (isDisk && !isPSStub) ? ap_int<18>(kPhi0_shift > 0 ? stub_2s_phi << kPhi0_shift : stub_2s_phi) : shiftstubphi;                        // shift
+  if(isDisk && isPSStub)
+    shiftstubphi = kPhi0_shift > 0 ? stub_ps_phi << kPhi0_shift : stub_ps_phi;                        // shift
+  else if(isDisk && !isPSStub) {
+    shiftstubphi = kPhi0_shift > 0 ? stub_2s_phi << kPhi0_shift : stub_2s_phi;                        // shift
+  }
   ap_int<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   constexpr int dphibit = 20;
   ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
   ap_uint<3> shiftprojz     = 7;
-  ap_int<7> proj_r_corr = isPSStub ? ap_int<7>(stub_ps_z * proj_zd) >> shiftprojz : ap_int<7>(stub_2s_z * proj_zd) >> shiftprojz;
+  ap_int<7> proj_r_corr    = (stub_z * proj_zd) >> shiftprojz;
+  if(isDisk && isPSStub)
+    proj_r_corr = (stub_ps_z * proj_zd) >> shiftprojz;
+  else if(isDisk)
+    proj_r_corr = (stub_2s_z * proj_zd) >> shiftprojz;
   const ap_uint<13> &proj_r_long  = proj_z + proj_r_corr;
   ap_uint<1> shiftr         = 1;
   ap_int<12> delta_r        = (stub_r >> shiftr) - proj_r_long; // proj_z = RZ
@@ -1168,8 +1179,8 @@ constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
 
 //////////////////////////////
 // MatchProcessor
-template<regionType PROJTYPE, regionType VMSMEType, unsigned int kNbitsrzbinMP, regionType VMPTYPE, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
-         TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
+template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType VMPTYPE, regionType ASTYPE, regionType APTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
+         TF::layerDisk LAYER=TF::L1, TF::layerDisk DISK=TF::D1, TF::phiRegion PHISEC=TF::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
                       // pointers that point to stuff other than scalar or
@@ -1184,7 +1195,6 @@ void MatchProcessor(BXType bx,
 
   
   using namespace PR;
-  constexpr regionType APTYPE = TF::layerDiskType[LAYER];
 
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
@@ -1279,7 +1289,7 @@ void MatchProcessor(BXType bx,
 
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
-  constexpr int NUM_RZ_BINS = 1 << kNbitsrzbinMP;
+  constexpr int NUM_RZ_BINS = 1 << kNbitsrzbin;
   constexpr int PAGE_LENGTH_CM = 1024;
   constexpr int BIN_ADDR_WIDTH = 4;
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
@@ -1340,7 +1350,7 @@ void MatchProcessor(BXType bx,
     bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
 
     hasMatch = !emptys[bestiMEU];
-
+    
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
@@ -1422,10 +1432,7 @@ void MatchProcessor(BXType bx,
       // NOTE: emulation fw_synch branch does not include L2L3 seeding; the master branch does
       
       // All seeding pairs are PS modules except L3L4 and L5L6
-      // LUT for faster decisions 
-      //                         L1L2  L2L3  L3L4   L5L6   D1D2  D3D4  L1D1  L2D2
-      constexpr bool psLUT[8] = {true, true, false, false, true, true, true, true};
-      const bool psseed = psLUT[iseed];
+      const bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6);
       
       // vmproj index
       const typename VMProjection<VMPTYPE>::VMPID &index = nallproj;

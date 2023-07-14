@@ -66,10 +66,12 @@ class MemoryTemplateBinnedCM{
   }
 
   ap_uint<entries8> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    #pragma HLS ARRAY_PARTITION variable=nentries8A_ complete dim=0
     return nentries8A_[bx*8+ibin];
   }
 
   ap_uint<entries8> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    #pragma HLS ARRAY_PARTITION variable=nentries8B_ complete dim=0
     return nentries8B_[bx*8+ibin];
   }
 
