@@ -129,9 +129,9 @@ public:
   typedef ap_uint<AllStubInnerBase<ASType>::kASBendSize> ASBEND;
   typedef ap_uint<AllStubInnerBase<ASType>::kASIndexSize> ASINDEX;
   typedef ap_uint<AllStubInnerBase<ASType>::kASFinePhiSize> ASFINEPHI;
-  typedef ap_uint<AllStubInnerBase<ASType>::kASNegDiskSize> ASNEGDISK;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize> AllStubInnerData;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASNegDiskSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
+  typedef ap_uint<1> ASNEGDISK;
 
   // Constructors
   AllStubInner(const AllStubInnerData& newdata):
@@ -208,7 +208,7 @@ public:
   }
 
   ASNEGDISK getNegDisk() const {
-    return data_.range(kASNegDiskMSB,kASNegDiskLSB);
+    return data_.range(kASNegDiskMSB,kASNegDiskLSB); //FIXME this +1 is a hack right now
   }
 
   // Setter
@@ -271,7 +271,7 @@ public:
   typedef ap_uint<AllStubInnerBase<DISK>::kAllStubInnerSize> AllStubInnerData;
   typedef ap_uint<AllStubInnerBase<DISK>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<DISK>::kASIndexSize> ASINDEX;
-  typedef ap_uint<AllStubInnerBase<DISK>::kASNegDiskSize> ASNEGDISK;
+  typedef ap_uint<1> ASNEGDISK;//FIXME remove 1
 
   AllStubInner(const AllStubInnerData& newdata):
     data_(newdata)

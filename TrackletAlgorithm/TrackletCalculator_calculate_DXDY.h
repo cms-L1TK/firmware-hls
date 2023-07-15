@@ -52,39 +52,41 @@ void TC::calculate_DXDY (
 // 10 bits 	 2^(-7)	0.0078125
 static const ap_int<10> plus2 = 256;
 // units 2^(0)Kr^(1)	0.0292969
-const ap_int<13> r1 = r1_input;
+const ap_uint<12> r1 = ap_uint<12>(r1_input);
 // units 2^(0)Kphi^(1)	7.84121e-06
 const ap_int<18> phi2 = ap_int<18>(phi2_input)<<3;
 // units 2^(0)Kphi^(1)	7.84121e-06
 const ap_int<18> phi1 = ap_int<18>(phi1_input)<<3;
 // units 2^(0)Kr^(1)	0.0292969
-const ap_int<13> r2 = r2_input;
+const ap_uint<12> r2 = ap_uint<12>(r2_input);
 //
 // STEP 1
-
 // 16 bits 	 2^(0)Kphi^(1)	7.84121e-06
 const ap_int<16> dphi = phi2 - phi1;
 // 11 bits 	 2^(0)Kr^(1)	0.0292969
 const ap_int<11> dr = r2 - r1;
 //
-// STEP 2
+std::cout<< "r1 phi1 z1: "<<r1<<" " <<phi1_input<< " "<<z1_input<<"r2 phi2 z2: "<< r2 <<" " <<phi2_input<< " "<<z2_input;
 bool negZ = z2mean_input < 0;
-ap_int<18> drinv;
+ap_int<2> sign = negZ ? ap_int<2>(-1) : ap_int<2>(1);
+std::cout<<"negz dr: "<< negZ << " "<<dr<<std::endl;
+// STEP 2
+ap_int<19> drinv;
 const ap_uint<10> addr_drinv = dr & 1023; // address for the LUT
 switch (Seed){
   case(TF::D1D2):
   if (negZ){
-    static const ap_int<18> LUT_drinv[1024] = {
-#if __has_include("../emData/TC/tables/TC_B1B2_drinv.tab")
-#  include "../emData/TC/tables/TC_B1B2_drinv.tab"
+    static const ap_int<19> LUT_drinv[1024] = {
+#if __has_include("../emData/LUTs/TC_B1B2_drinv.tab")
+#  include "../emData/LUTs/TC_B1B2_drinv.tab"
 #endif
     };
     drinv = LUT_drinv[addr_drinv];
   }
   else{
-    static const ap_int<18> LUT_drinv[1024] = {
-#if __has_include("../emData/TC/tables/TC_F1F2_drinv.tab")
-#  include "../emData/TC/tables/TC_F1F2_drinv.tab"
+    static const ap_int<19> LUT_drinv[1024] = {
+#if __has_include("../emData/LUTs/TC_F1F2_drinv.tab")
+#  include "../emData/LUTs/TC_F1F2_drinv.tab"
 #endif
     };
     drinv = LUT_drinv[addr_drinv];
@@ -92,17 +94,17 @@ switch (Seed){
   break;
   case(TF::D3D4):
   if (negZ){
-    static const ap_int<18> LUT_drinv[1024] = {
-#if __has_include("../emData/TC/tables/TC_B3B4_drinv.tab")
-#  include "../emData/TC/tables/TC_B3B4_drinv.tab"
+    static const ap_int<19> LUT_drinv[1024] = {
+#if __has_include("../emData/LUTs/TC_B3B4_drinv.tab")
+#  include "../emData/LUTs/TC_B3B4_drinv.tab"
 #endif
     };
     drinv = LUT_drinv[addr_drinv];
   }
   else{
-    static const ap_int<18> LUT_drinv[1024] = {
-#if __has_include("../emData/TC/tables/TC_F3F4_drinv.tab")
-#  include "../emData/TC/tables/TC_F3F4_drinv.tab"
+    static const ap_int<19> LUT_drinv[1024] = {
+#if __has_include("../emData/LUTs/TC_F3F4_drinv.tab")
+#  include "../emData/LUTs/TC_F3F4_drinv.tab"
 #endif
     };
     drinv = LUT_drinv[addr_drinv];
@@ -163,7 +165,7 @@ const ap_int<18> rinv = rinv_tmp >> 15;
 
 // 16 bits 	 2^(-8)Kphi^(1)Kr^(-1)	1.04549e-06
 const ap_int<16> rinv_final = rinv >> 2;
-
+std::cout<<"irinv"<< rinv_final<<"drinv: "<<drinv;
 //
 // calculating phi0_final
 //
@@ -238,25 +240,25 @@ const ap_int<18> phi0_final = phi0;
 // STEP 0
 
 // units 2^(0)Kz^(1)	0.0585938
-const ap_int<7> z2 = z2_input;
+const ap_int<7> z1 = ap_int<7>(z1_input);
+const ap_int<7> z2 = ap_int<7>(z2_input);
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
 static const ap_int<14> z2mean = z2mean_input;
 // units 2^(0)Kz^(1)	0.0585938
-const ap_int<7> z1 = z1_input;
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
 static const ap_int<14> z1mean = z1mean_input;
 //
 // STEP 1
 
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<14> z2abs = z2 + z2mean;
+const ap_int<14> z2abs = sign*z2 + z2mean;
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<14> z1abs = z1 + z1mean;
+const ap_int<14> z1abs = sign*z1 + z1mean;
 //
 // STEP 2
 
 // 11 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<11> dz = z2abs - z1abs;
+const ap_int<11> dz = sign*(z2abs - z1abs);
 //
 // STEP 3
 
@@ -266,6 +268,7 @@ const ap_int<11> dz = z2abs - z1abs;
 // 18 bits 	 2^(-14)Kr^(-1)Kz^(1)	0.00012207
 const ap_int<27> deltaZ_tmp = dz * drinv;
 const ap_int<18> deltaZ = deltaZ_tmp >> 9;
+std::cout<<"deltaz dz"<<deltaZ<<" "<<dz;
 //
 // STEP 5
 
@@ -336,13 +339,13 @@ const ap_int<18> z0b = z0b_tmp >> 15;
 // STEP 10
 
 // 15 bits 	 2^(-4)Kz^(1)	0.00366211
-const ap_int<15> z0 = (ap_int<15>(z1abs)<<4) + z0b;
+const ap_int<15> z0 = sign * (ap_int<15>(z1abs)<<4) + z0b;
 //
 // STEP 11
 
 // 11 bits 	 2^(0)Kz^(1)	0.0585938
 const ap_int<11> z0_final = z0 >> 4;
-
+std::cout<<"z0"<<z0_final;
 //
 // calculating phiL_0_final
 //
@@ -950,16 +953,16 @@ switch (Seed){
   case(TF::D1D2):
   if (negZ){
     static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_B1B2_invt.tab")
-#  include "../emData/TC/tables/TC_B1B2_invt.tab"
+#if __has_include("../emData/LUTs/TC_B1B2_invt.tab")
+#  include "../emData/LUTs/TC_B1B2_invt.tab"
 #endif
     };
     invt = LUT_invt[addr_invt];
   }
   else{
     static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_F1F2_invt.tab")
-#  include "../emData/TC/tables/TC_F1F2_invt.tab"
+#if __has_include("../emData/LUTs/TC_F1F2_invt.tab")
+#  include "../emData/LUTs/TC_F1F2_invt.tab"
 #endif
     };
     invt = LUT_invt[addr_invt];
@@ -968,16 +971,16 @@ switch (Seed){
   case(TF::D3D4):
   if (negZ){
     static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_B3B4_invt.tab")
-#  include "../emData/TC/tables/TC_B3B4_invt.tab"
+#if __has_include("../emData/LUTs/TC_B3B4_invt.tab")
+#  include "../emData/LUTs/TC_B3B4_invt.tab"
 #endif
     };
     invt = LUT_invt[addr_invt];
   }
   else{
     static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/TC/tables/TC_F3F4_invt.tab")
-#  include "../emData/TC/tables/TC_F3F4_invt.tab"
+#if __has_include("../emData/LUTs/TC_F3F4_invt.tab")
+#  include "../emData/LUTs/TC_F3F4_invt.tab"
 #endif
     };
     invt = LUT_invt[addr_invt];

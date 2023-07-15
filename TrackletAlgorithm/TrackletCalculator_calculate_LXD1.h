@@ -83,7 +83,7 @@ bool negZ = z2mean_input<=0;
 
 ap_int<19> drinv;
 const ap_uint<11> addr_drinv = dr & 2047; // address for the LUT
-std::cout<<"negZ dr: "<<negZ<<" "<<dr<<" "<<std::endl;
+
 switch (Seed){
   case(TF::L1D1):
     if (negZ){
@@ -174,7 +174,6 @@ const ap_int<18> rinv = rinv_tmp >> 14;
 
 // 17 bits 	 2^(-8)Kphi^(1)Kr^(-1)	1.04549e-06
 const ap_int<17> rinv_final = rinv >> 1;
-std::cout<< "rinv :" <<rinv_final;
 
 //
 // calculating phi0_final
@@ -267,7 +266,6 @@ const ap_int<14> z2abs = z2 + z2mean_input;
 
 // 12 bits 	 2^(0)Kz^(1)	0.0585938
 const ap_int<12> dz = z2abs - z1;
-//std::cout<<"dz: "<<dz<<std::endl;
 //
 // STEP 3
 

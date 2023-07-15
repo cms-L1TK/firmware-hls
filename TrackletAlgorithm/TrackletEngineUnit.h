@@ -11,14 +11,16 @@ class TrackletEngineUnit {
  public:
   enum BitWidths{
     kNBitsBuffer=3,
-    kNBitsRZBin=3,
+    kNBitsRZBin= 3,
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
+    kNBitsNegDiskSize=1,
     kNBitsPTLutInner=(Seed>=TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
     kNBitsPTLutOuter=(Seed>=TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
   };
 
   typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
+  typedef ap_uint<kNBitsNegDiskSize> NEGZ;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;
   typedef ap_uint<kNBitsRZBin> RZBIN;
@@ -60,32 +62,28 @@ class TrackletEngineUnit {
       }
     }
 //split the LUTs for overlaps/disks Vivado can only handle up to 1024 length LUT
-    else if ( Seed >= TF::L1D1){   //Split 4 ways for overlaps
+    else if ( Seed >= TF::D1D2){   //Split 4 ways for overlaps, 2 ways for disks
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll
         stubptinnerlutnew1_[i] = stubptinnertmp[i];
         stubptinnerlutnew2_[i] = stubptinnertmp[i+1024];
-        stubptinnerlutnew3_[i] = stubptinnertmp[i+2048];
-        stubptinnerlutnew4_[i] = stubptinnertmp[i+3072];
+        if (Seed >= TF::L1D1){
+          stubptinnerlutnew3_[i] = stubptinnertmp[i+2048];
+          stubptinnerlutnew4_[i] = stubptinnertmp[i+3072];
+        }
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
 #pragma HLS unroll
         stubptouterlutnew1_[i] = stubptoutertmp[i];
         stubptouterlutnew2_[i] = stubptoutertmp[i+1024];
-        stubptouterlutnew3_[i] = stubptoutertmp[i+2048];
-        stubptouterlutnew4_[i] = stubptoutertmp[i+3072];
+        if (Seed >= TF::L1D1){
+          stubptouterlutnew3_[i] = stubptoutertmp[i+2048];
+          stubptouterlutnew4_[i] = stubptoutertmp[i+3072];
+        }
       }
     }
-    else { //Split 2 ways for disks
-      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
-#pragma HLS unroll
-        stubptouterlutnew1_[i] = stubptoutertmp[i];
-        stubptouterlutnew2_[i] = stubptoutertmp[i+1024];
-      }
-    }
-
     idle_ = true;
-    }
+ }
 
 
  MEMSTUBS nstub16() const {
@@ -157,9 +155,19 @@ STUBID read() {
   return stubids_[readindex_++];
 }
 
+NEGZ readnegz() {
+#pragma HLS inline  
+  return negz_[readindex_++];
+}
+
 void write(STUBID stubs) {
 #pragma HLS inline  
   stubids_[writeindex_++]=stubs;
+}
+
+void writenegz(NEGZ negz) {
+#pragma HLS inline
+  negz_[writeindex_++]=negz;
 }
 
 
@@ -186,6 +194,7 @@ void write(STUBID stubs) {
  
  NSTUBS istub_;
  STUBID stubids_[1<<kNBitsBuffer];
+ NEGZ negz_[1<<kNBitsBuffer];
 
  int instance_;
 
