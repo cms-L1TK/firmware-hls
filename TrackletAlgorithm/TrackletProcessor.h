@@ -183,6 +183,7 @@ namespace TC {
     const Types::zmean zproj0_input,
     const Types::zmean zproj1_input,
     const Types::zmean zproj2_input,
+    const bool negZ,
 
     Types::rinv * const rinv_output,
     TrackletParameters::PHI0PAR * const phi0_output,
@@ -433,16 +434,16 @@ TC::diskSeeding(const bool negZ, const AllStub<InnerRegion> &innerStub, const Al
   rproj[2] = rmean[TF::L3];
 
   if (Seed==TF::D1D2){
-    z1mean = negZ ? (-zmean[TF::D1]) : zmean[TF::D1];
-    z2mean = negZ ? (-zmean[TF::D2]) : zmean[TF::D2];
+    z1mean = zmean[TF::D1];
+    z2mean = zmean[TF::D2];
     std::cout<<"z1mean z2:" <<z1mean<< " " <<z2mean;
     zproj[0] = zmean[TF::D3];
     zproj[1] = zmean[TF::D4];
     zproj[2] = zmean[TF::D5];
   }
   else{
-    z1mean = negZ ? (-zmean[TF::D3]) : zmean[TF::D3];
-    z2mean = negZ ? (-zmean[TF::D4]) : zmean[TF::D4];
+    z1mean = zmean[TF::D3];
+    z2mean = zmean[TF::D4];
     zproj[0] = zmean[TF::D1];
     zproj[1] = zmean[TF::D2];
     zproj[2] = zmean[TF::D5];
@@ -463,6 +464,7 @@ TC::diskSeeding(const bool negZ, const AllStub<InnerRegion> &innerStub, const Al
       zproj[0],
       zproj[1],
       zproj[2],
+      negZ,
 
       rinv,
       phi0,
@@ -761,10 +763,12 @@ bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
   }
   else if (Seed == TF::D3D4){
     const TrackletProjection<DISK> tproj_D1(TCID, trackletIndex, phiD[0], rD[0], der_phiD, der_rD);
-    const TrackletProjection<DISK> tproj_D5(TCID, trackletIndex, phiD[1], rD[1], der_phiD, der_rD);
+    const TrackletProjection<DISK> tproj_D2(TCID, trackletIndex, phiD[1], rD[1], der_phiD, der_rD);
+    const TrackletProjection<DISK> tproj_D5(TCID, trackletIndex, phiD[2], rD[2], der_phiD, der_rD);
     const TrackletProjection<BARRELPS> tproj_L1(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
     TC::addProj<BARRELPS, nproj_L1, ((TPROJMaskBarrel & mask_L1) >> shift_L1)> (tproj_L1, bx, &projout_barrel_ps[L1PHIA], &nproj_barrel_ps[L1PHIA], success && valid_proj[0]);
     TC::addProj<DISK, nproj_D1, ((TPROJMaskDisk & mask_D1) >> shift_D1)> (tproj_D1, bx, &projout_disk[D1PHIA], &nproj_disk[D1PHIA], success && valid_proj_disk[0]);
+    TC::addProj<DISK, nproj_D2, ((TPROJMaskDisk & mask_D2) >> shift_D2)> (tproj_D2, bx, &projout_disk[D2PHIA], &nproj_disk[D2PHIA], success && valid_proj_disk[0]);
     TC::addProj<DISK, nproj_D5, ((TPROJMaskDisk & mask_D5) >> shift_D5)> (tproj_D5, bx, &projout_disk[D5PHIA], &nproj_disk[D5PHIA], success && valid_proj_disk[1]);
   }
 //Overlap Seeds
@@ -865,8 +869,8 @@ bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 }
 
 
-//#define LUTTYPE ap_uint<1+2*TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZFine+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZBin>
-#define LUTTYPE ap_uint<10>
+#define LUTTYPE ap_uint<1+2*TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZFine+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZBin>
+//#define LUTTYPE ap_uint<10>
 #define REGIONLUTTYPE ap_uint<(1<<TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins)>
 #define lutsize  (1<<(kNbitszfinebintable+kNbitsrfinebintable))
 #define regionlutsize (1<<(AllStubInner<InnerRegion>::kASBendSize+AllStubInner<InnerRegion>::kASFinePhiSize))
@@ -1110,7 +1114,7 @@ teunits[k].idle_;
       ap_uint<1> rzcut= rzcut1 && rzcut2;
       
       const auto& outerbend = teunits[k].outervmstub___.getBend();
-      const ap_uint<3> innerbend = AllStubInner<InnerRegion>(teunits[k].innerstub___).getBend();
+      const auto& innerbend = AllStubInner<InnerRegion>(teunits[k].innerstub___).getBend();
       ap_uint<1> lutinner, lutouter;
       if (diskSeed||overlapSeed){ //Overlap and Disk Seeds
         ap_uint<3> ibin = teunits[k].ibin___;
@@ -1272,7 +1276,6 @@ teunits[k].idle_;
     typename VMStubTEOuter<OuterRegion>::VMSTEOFINEZ rzfinebinfirst,rzdiffmax;
     typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::RZBIN start;
     ap_uint<1> usenext;
-    //(rzdiffmax, start, usenext, rzfinebinfirst) = lutval___; //FIXME why does this go here?
     
     //Get the mask of bins that has non-zero number of hits
     typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK stubmask16 = vmstubsmask[start];
@@ -1280,7 +1283,6 @@ teunits[k].idle_;
     //Calculate the stub mask for which bins have hits _and_ are consistent with the inner stub
     typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK mask = ( (useregion___*usenext,useregion___) );
     typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK stubmask = stubmask16&mask;
-    
     //Find if there are _any_ bins with hits that needs to be tried. If so will store stub in buffer
     bool havestubs=stubmask.or_reduce();
     
@@ -1289,7 +1291,6 @@ teunits[k].idle_;
     //havestubs means that at least one memory bin has stubs
     //goodstub means that we had a valid inner stub
     ap_uint<1> addtedata=valid&&havestubs&&goodstub___;
-    
     //Create TEData and save in buffer - but only increment point if data good
     TEData<Seed,iTC,InnerRegion,OuterRegion> tedatatmp(stubmask, rzfinebinfirst,start, rzdiffmax,stub___.raw());
     tebuffer.buffer_[tebuffer.writeptr_] = tedatatmp.raw();
@@ -1321,8 +1322,8 @@ teunits[k].idle_;
     }
 
     //Get bend and fine phi for LUT
-    auto bend = stub__.getBend();
-    auto innerfinephi = stub__.getFinePhi();
+    ap_int<AllStubInnerBase<InnerRegion>::kASBendSize> bend = stub__.getBend();
+    ap_int<AllStubInnerBase<InnerRegion>::kASFinePhiSize> innerfinephi = stub__.getFinePhi();
     
     //This LUT tells us which range in r/z to look for stubs in the other layer/disk
     //FIXME dumb hack check if this can be removed
@@ -1333,7 +1334,7 @@ teunits[k].idle_;
       std::cout<< " negDisk start"<<negDisk << " "<<start<<std::endl;
     }
     else
-      (rzdiffmax , start, usenext, rzfinebinfirst) = lutval___;
+      (rzdiffmax, start, usenext, rzfinebinfirst) = lutval___; //FIXME why does this go here?
 
     auto useregindex = (innerfinephi,bend);
     ap_uint<3> ir;
@@ -1342,11 +1343,11 @@ teunits[k].idle_;
       ap_uint<2> nrbits = 3;
       ir = ((start & ((1 << (nrbits - 1)) - 1)) << 1) + (rzfinebinfirst >> (kNbitsrzbin - 1));
       useregion___ = regionlut[(useregindex,ir)];
+    std::cout<<"useregindex "<<(useregindex,ir)<<std::endl;
       }
     else{
       useregion___ = regionlut[useregindex];
     }
-    std::cout<<"useregindex "<<(useregindex,ir)<<std::endl;
 
     //This lut tells us which range in phi to loof for stubs the other layer/disk
    

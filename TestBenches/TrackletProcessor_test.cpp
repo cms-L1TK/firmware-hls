@@ -25,16 +25,16 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
-  #define SEED_ L1L2_
+  #define SEED_ L1D1_
 #endif
 #if !defined ITC_
   #define ITC_ C_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TP_L1L2C_
+  #define MODULE_ TP_L1D1C_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackletProcessor_L1L2C
+  #define TOP_FUNC_ TrackletProcessor_L1D1C
 #endif
 
 
@@ -69,6 +69,30 @@ int main()
   const string innerStubPattern = "AllInnerStubs*_L5*";
   const string outerStubPattern = "AllStubs*_L6*";
   const int NTEUnits=3;
+#elif SEED_ == L1D1_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = DISKPS;
+  const string innerStubPattern = "AllInnerStubs*_L1*";
+  const string outerStubPattern = "AllStubs*_D1*";
+  const int NTEUnits=3;
+#elif SEED_ == L2D1_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = DISKPS;
+  const string innerStubPattern = "AllInnerStubs*_L2*";
+  const string outerStubPattern = "AllStubs*_D1*";
+  const int NTEUnits=2;
+#elif SEED_ == D1D2_
+  const auto InnerStubType = DISKPS;
+  const auto OuterStubType = DISKPS;
+  const string innerStubPattern = "AllInnerStubs*_D1*";
+  const string outerStubPattern = "AllStubs*_D2*";
+  const int NTEUnits=3;
+#elif SEED_ == D3D4_
+  const auto InnerStubType = DISKPS;
+  const auto OuterStubType = DISKPS;
+  const string innerStubPattern = "AllInnerStubs*_D3*";
+  const string outerStubPattern = "AllStubs*_D4*";
+  const int NTEUnits=2;
 #else
   #error "Undefined seed"
 #endif

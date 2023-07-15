@@ -52,6 +52,21 @@ public:
   };
 };
 
+template<>
+class VMStubTEOuterBase<DISKPS>
+{
+public:
+  enum BitWidths {
+    // Bit sizes for VMStubTEOuterMemory fields
+    kVMSTEOFineZSize = 3,
+    kVMSTEOFinePhiSize = 3,
+    kVMSTEOBendSize = 3,
+    kVMSTEOIDSize = 7,
+    // Bit size for full VMStubTEOuterMemory
+    kVMStubTEOuterSize = kVMSTEOFineZSize + kVMSTEOFinePhiSize + kVMSTEOBendSize + kVMSTEOIDSize
+  };
+};
+
 // Data object definition
 template<int VMSTEOType>
 class VMStubTEOuter : public VMStubTEOuterBase<VMSTEOType>
