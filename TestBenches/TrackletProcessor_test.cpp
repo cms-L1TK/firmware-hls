@@ -31,7 +31,7 @@
   #define ITC_ C_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TP_L1L2A_
+  #define MODULE_ TP_L1L2C_
 #endif
 #if !defined TOP_FUNC_
   #define TOP_FUNC_ TrackletProcessor_L1L2C
