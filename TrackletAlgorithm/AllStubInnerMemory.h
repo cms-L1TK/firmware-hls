@@ -121,7 +121,6 @@ public:
     kASRLSB = kASZMSB + 1,
     kASRMSB = kASRLSB + AllStubInnerBase<ASType>::kASRSize - 1
   };
-
   typedef ap_int<AllStubInnerBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubInnerBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubInnerBase<ASType>::kASPhiSize> ASPHI;
@@ -131,7 +130,7 @@ public:
   typedef ap_uint<AllStubInnerBase<ASType>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize> AllStubInnerData;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASNegDiskSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
-  typedef ap_uint<1> ASNEGDISK;
+  typedef ap_uint<1> ASNEGDISK; //FIXME this is always ap_uint<1> because csynth fails if this is ever 0 wide
 
   // Constructors
   AllStubInner(const AllStubInnerData& newdata):
@@ -208,7 +207,7 @@ public:
   }
 
   ASNEGDISK getNegDisk() const {
-    return data_.range(kASNegDiskMSB,kASNegDiskLSB); //FIXME this +1 is a hack right now
+    return data_.range(kASNegDiskMSB,kASNegDiskLSB);
   }
 
   // Setter
@@ -300,7 +299,7 @@ public:
   }
 
   AllStubInnerData raw() const {return data_;}
-  
+
   // Setter
   void setIndex(const ASINDEX index) {
     data_.range(kASIndexMSB,kASIndexLSB) = index;

@@ -334,8 +334,8 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				allstubinner = (disk2S) ? 
 						static_cast<ap_uint<allstubinner.getWidth()>>(stubDisk2S.raw()) << (allstubinner.getWidth() - stubDisk2S.getWidth()) : 
 						static_cast<ap_uint<allstubinner.getWidth()>>(stub.raw()) << (allstubinner.getWidth() - stub.getWidth()); // shift by finephi and index
-        if (Disk){
-          allstubinner.setNegDisk(negDisk?1:0);
+        if (Disk){ //add negative disk information needed for disk TPs
+          allstubinner.setNegDisk(negDisk ? 1 : 0);
         }
 				allstubinner.setIndex(i);
 				auto phicorr = getPhiCorr<InType>(stub.getPhi(), stub.getR(), stub.getBend(), phiCorrTable); // Corrected phi, i.e. phi at nominal radius (what about disks?)

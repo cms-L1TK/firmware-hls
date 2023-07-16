@@ -11,7 +11,7 @@ class TrackletEngineUnit {
  public:
   enum BitWidths{
     kNBitsBuffer=3,
-    kNBitsRZBin= 3,
+    kNBitsRZBin=3,
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
     kNBitsNegDiskSize=1,

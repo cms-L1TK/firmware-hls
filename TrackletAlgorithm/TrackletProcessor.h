@@ -531,7 +531,7 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
   TC::Types::rmean r1mean, rproj[3];
   rproj[1] = rmean[TF::L3];
   rproj[2] = rmean[TF::L4];
-  ap_int<2> negZ = ((innerStub.getZ()<0) ? -1 : 1);
+  ap_int<2> negZ = ((innerStub.getZ()<0) ? -1 : 1);//find negative disk info from inner stub z
   TC::Types::zmean z2mean = negZ * zmean[TF::D1];
   TC::Types::zmean zproj[4] = {zmean[TF::D2], zmean[TF::D3], zmean[TF::D4], zmean[TF::D5]};
   if (Seed == TF::L1D1){
@@ -614,8 +614,8 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;}
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
+
   bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
-  //bool valid_z0=abs(*z0) < ((Seed == TF::L1L2 || Seed == TF::L1D1 || Seed ==TF ::L2D1 ) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
   bool valid_z0=abs(*z0) < floatToInt(z0cut, kz0) ;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
@@ -650,7 +650,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
-  
+
 // Fill correct TrackletProjectionMemory according to phi bin of projection.
   if (TProjType == BARRELPS && NProjOut == nproj_L1)
     phi >>= 2;
@@ -727,12 +727,12 @@ TC::processStubPair(
     success = TC::barrelSeeding<Seed, InnerRegion, OuterRegion>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
   else if (Seed == TF::L1D1 || Seed==TF::L2D1 ){
     success = TC::overlapSeeding<Seed, InnerRegion, OuterRegion>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
+    //stub indices are reversed on overlap seeds for some reason.
     stubIndex1 = outerIndex;
     stubIndex2 = innerIndex;
   }
   else //disk seeds
     success = TC::diskSeeding<Seed, InnerRegion, OuterRegion>(negDisk, innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
-    //stub indices are reversed on overlap seeds for some reason.
   // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(stubIndex1,stubIndex2, rinv, phi0, z0, t);
   if (success) trackletParameters->write_mem(bx, tpar, npar++);
@@ -861,7 +861,6 @@ bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 
 
 #define LUTTYPE ap_uint<1+2*TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZFine+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsRZBin>
-//#define LUTTYPE ap_uint<10>
 #define REGIONLUTTYPE ap_uint<(1<<TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins)>
 #define lutsize  (1<<(kNbitszfinebintable+kNbitsrfinebintable))
 #define regionlutsize (1<<(AllStubInner<InnerRegion>::kASBendSize+AllStubInner<InnerRegion>::kASFinePhiSize))
@@ -918,7 +917,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   bool trace=true;
 
   constexpr unsigned int NBitsPhiRegion=2;
-  constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins + VMStubTEOuterBase<OuterRegion>::kVMSTEOFinePhiSize;
+  constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion>::kVMSTEOFinePhiSize;
 
   static TEBuffer<Seed,iTC,InnerRegion,OuterRegion> tebuffer;
   static_assert(NASMemInner <= 3, "Only handling up to three inner AS memories");
@@ -997,16 +996,16 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
 #pragma HLS pipeline II=1 rewind
 
-/*    
+    /*
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
               << tebuffer.readptr()<<" "<<tebuffer.writeptr()<<std::endl;
-    
+
     for (unsigned k = 0; k < NTEUnits; k++){
       std::cout<<" ["<<k<<" "<<teunits[k].readindex_<<" "<<teunits[k].writeindex_<<" "<<teunits[k].idle_<<"]";
     }
     std::cout << std::endl;
-*/    
-   
+    */
+
 
     //
     // Step 0 -  zeroth step is to cache some of data
@@ -1091,7 +1090,7 @@ teunits[k].idle_;
       ap_uint<NdphiBits> idphi,idphitmp;
       ap_uint<NdphiBits+1> outerfinephitmp = outerfinephi&((1<<(NdphiBits+1))-1);
       ap_uint<NdphiBits+1> innerfinephitmp = AllStubInner<InnerRegion>(teunits[k].innerstub___).getFinePhi()&((1<<(NdphiBits+1))-1);
-      idphitmp = outerfinephitmp-innerfinephitmp; 
+      idphitmp = outerfinephitmp-innerfinephitmp;
       ap_uint<NfinephiBits-NdphiBits> overflow;
       (overflow,idphi) =  outerfinephi - AllStubInner<InnerRegion>(teunits[k].innerstub___).getFinePhi();
       
@@ -1109,8 +1108,7 @@ teunits[k].idle_;
       if (diskSeed||overlapSeed){ //Overlap and Disk Seeds
         ap_uint<3> ibin = teunits[k].ibin___;
         int ibinMask = 3;
-        //rzbin = teunits[k].next___?(rzbin-8) :rzbin;
-        ap_uint<3> ir = ((ibin & ibinMask) << 1) + ((rzbin&4) >> 2);
+        ap_uint<3> ir = ((ibin & ibinMask) << 1) + ((rzbin&4) >> (kNbitsrzbin-1));
 
         ap_uint<2> ptinnerindexfirst, ptouterindexfirst;
         ap_uint<10> ptinnerindexlast, ptouterindexlast;
@@ -1118,7 +1116,7 @@ teunits[k].idle_;
 
         (ptinnerindexfirst,ptinnerindexlast) = (idphitmp,ir,innerbend);
         (ptouterindexfirst,ptouterindexlast) = (idphitmp,ir,outerbend);
-        switch(ptinnerindexfirst){ //pt LUTs split into 4 since vivado has a 1024 bit limit, FIXME better way to do this?
+        switch(ptinnerindexfirst){ //pt LUTs split into 4 since vivado has a 1024 bit limit for csynth, FIXME better way to do this?
           case 0:
           lutinner = teunits[k].stubptinnerlutnew1_[ptinnerindexlast];
           break;
@@ -1231,7 +1229,7 @@ teunits[k].idle_;
       teunits[k].memmask_ = init?memmask_init:memmask_reg;
       teunits[k].lastmemindex = init?memindexlast_init:memindexlast_reg;
       teunits[k].setnstub16(init?memstubs_init:memstubs_reg);
-      
+
       teunits[k].istub_ = init?istub_init:istub_reg;
       teunits[k].rzbin_ = init?rzbin_init:rzbin_reg;
       teunits[k].idle_ = init?idle_init:idle_reg;
@@ -1265,6 +1263,7 @@ teunits[k].idle_;
     //Calculate the stub mask for which bins have hits _and_ are consistent with the inner stub
     typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK mask = ( (useregion___*usenext,useregion___) );
     typename TrackletEngineUnit<Seed,iTC,InnerRegion,OuterRegion>::MEMMASK stubmask = stubmask16&mask;
+
     //Find if there are _any_ bins with hits that needs to be tried. If so will store stub in buffer
     bool havestubs=stubmask.or_reduce();
     
@@ -1273,6 +1272,7 @@ teunits[k].idle_;
     //havestubs means that at least one memory bin has stubs
     //goodstub means that we had a valid inner stub
     ap_uint<1> addtedata=valid&&havestubs&&goodstub___;
+
     //Create TEData and save in buffer - but only increment point if data good
     TEData<Seed,iTC,InnerRegion,OuterRegion> tedatatmp(stubmask, rzfinebinfirst,start, rzdiffmax,stub___.raw());
     tebuffer.buffer_[tebuffer.writeptr_] = tedatatmp.raw();
@@ -1307,8 +1307,7 @@ teunits[k].idle_;
     ap_int<AllStubInnerBase<InnerRegion>::kASFinePhiSize> innerfinephi = stub__.getFinePhi();
     
     //This LUT tells us which range in r/z to look for stubs in the other layer/disk
-    //FIXME dumb hack check if this can be removed
-    if (diskSeed){
+    if (diskSeed){//disk seeds only read 2 bits of start from lut, last bit is from negative disk
       ap_uint<2> starttmp;
       (rzdiffmax , starttmp, usenext, rzfinebinfirst) = lutval___;
       start = negDisk ? ap_uint<3>(starttmp + (1 << (kNbitsrzbin-1))) : ap_uint<3>(starttmp);
