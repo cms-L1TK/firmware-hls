@@ -413,9 +413,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   return valid_rinv && valid_z0 && keep;
 }
 
-//////////////////////////////////////
-//FIXME WIP
-//////////////////////////////////////
 // This function calls calculate_DXDY, defined in
 // TrackletCalculator_calculate_DXDY.h, and applies cuts to the results.
 #include "TrackletCalculator_calculate_LXD1.h"
@@ -436,7 +433,6 @@ TC::diskSeeding(const bool negZ, const AllStub<InnerRegion> &innerStub, const Al
   if (Seed==TF::D1D2){
     z1mean = zmean[TF::D1];
     z2mean = zmean[TF::D2];
-    std::cout<<"z1mean z2:" <<z1mean<< " " <<z2mean;
     zproj[0] = zmean[TF::D3];
     zproj[1] = zmean[TF::D4];
     zproj[2] = zmean[TF::D5];
@@ -620,14 +616,10 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
 // impact parameter.
   bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
   //bool valid_z0=abs(*z0) < ((Seed == TF::L1L2 || Seed == TF::L1D1 || Seed ==TF ::L2D1 ) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
-  bool valid_z0=abs(*z0) < floatToInt(z0cut, kz0) ; //FIXME magic 11 here 
+  bool valid_z0=abs(*z0) < floatToInt(z0cut, kz0) ;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
-  
-  std::cout<< "RINV CUT "<< floatToInt(rinvcut, krinv) << " " << abs(*rinv)<<std::endl;
-  std::cout<< "z0 CUT" << floatToInt(z0cut, kz0) << " " << abs(*z0) <<std::endl;
-  std::cout<< "KEEP" << phicritmincut << " " << phicrit << " " << phicritmaxcut << std::endl; 
 
   return valid_rinv && valid_z0 && keep && valid_radii;
 }
@@ -742,8 +734,7 @@ TC::processStubPair(
     success = TC::diskSeeding<Seed, InnerRegion, OuterRegion>(negDisk, innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
     //stub indices are reversed on overlap seeds for some reason.
   // Write the tracklet parameters and projections to the output memories.
-  const TrackletParameters tpar(stubIndex1,stubIndex2, rinv, phi0, z0, t);//FIXME
-  std::cout<<std::hex<<"INDEX FOR PROCESSING: " << (stubIndex1,stubIndex2)<<std::dec<<std::endl;
+  const TrackletParameters tpar(stubIndex1,stubIndex2, rinv, phi0, z0, t);
   if (success) trackletParameters->write_mem(bx, tpar, npar++);
 
 bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
@@ -1006,7 +997,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
 #pragma HLS pipeline II=1 rewind
 
-    
+/*    
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
               << tebuffer.readptr()<<" "<<tebuffer.writeptr()<<std::endl;
     
@@ -1014,7 +1005,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
       std::cout<<" ["<<k<<" "<<teunits[k].readindex_<<" "<<teunits[k].writeindex_<<" "<<teunits[k].idle_<<"]";
     }
     std::cout << std::endl;
-    
+*/    
    
 
     //
@@ -1101,7 +1092,6 @@ teunits[k].idle_;
       ap_uint<NdphiBits+1> outerfinephitmp = outerfinephi&((1<<(NdphiBits+1))-1);
       ap_uint<NdphiBits+1> innerfinephitmp = AllStubInner<InnerRegion>(teunits[k].innerstub___).getFinePhi()&((1<<(NdphiBits+1))-1);
       idphitmp = outerfinephitmp-innerfinephitmp; 
-      //std::cout<< "idphi outer inner: "<<idphitmp<< " " <<outerfinephitmp<< " "<<innerfinephitmp<<std::endl;
       ap_uint<NfinephiBits-NdphiBits> overflow;
       (overflow,idphi) =  outerfinephi - AllStubInner<InnerRegion>(teunits[k].innerstub___).getFinePhi();
       
@@ -1156,13 +1146,6 @@ teunits[k].idle_;
           lutouter = teunits[k].stubptouterlutnew4_[ptouterindexlast];
           break;
         }
-        if(true){
-        std::cout<<"innerstubindex: "<< AllStubInner<InnerRegion>(teunits[k].innerstub___).getIndex()<<"outerstubindex: "<< teunits[k].outervmstub___.getIndex() <<std::endl;
-        std::cout<<"idphi: "<<newidphi<<" ir: "<<ir<< " bend: "<<innerbend <<" first: "<<ptinnerindexfirst <<" last: "<<ptinnerindexlast<<std::endl;
-        std::cout<<"lutinner: " << lutinner<<" lutouter: "<<lutouter<<std::endl;
-
-        }
-
       }
       else{ //Barrel Seeds
         auto ptinnerindex = (idphitmp, innerbend);
@@ -1171,7 +1154,6 @@ teunits[k].idle_;
         lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
       }
       ap_uint<1> savestub = teunits[k].good___ && inrange && lutinner && lutouter && rzcut;
-      //std::cout<<" teunits[k].good: "<<teunits[k].good___<<" savestub: "<<savestub<<" inrange: "<<inrange<<" lutinner:  "<<lutinner<<" lutouter: "<<lutouter<<" rzcut: "<<rzcut<<std::endl;
       teunits[k].stubids_[teuwriteindex[k]] = (teunits[k].outervmstub___.getIndex(),
 		    teunits[k].innerstub___.getAllStub(),
 			  teunits[k].innerstub___.getIndex());
@@ -1313,7 +1295,6 @@ teunits[k].idle_;
       negDisk = stub__.getNegDisk();
       indexz = negDisk ? ap_int<kNbitszfinebintable>(((1 << kNbitszfinebintableDisk) - 1) - indexz) : indexz;
       lutval___ = lut[(indexz,indexr)];
-      std::cout<<"index z r "<< indexz<< " " << indexr<< " lutval: "<< lutval___<< std::endl;
     }
     else{
       auto indexz = z.range(z.length()-1,z.length()-kNbitszfinebintable);
@@ -1331,19 +1312,17 @@ teunits[k].idle_;
       ap_uint<2> starttmp;
       (rzdiffmax , starttmp, usenext, rzfinebinfirst) = lutval___;
       start = negDisk ? ap_uint<3>(starttmp + (1 << (kNbitsrzbin-1))) : ap_uint<3>(starttmp);
-      std::cout<< " negDisk start"<<negDisk << " "<<start<<std::endl;
     }
     else
-      (rzdiffmax, start, usenext, rzfinebinfirst) = lutval___; //FIXME why does this go here?
+      (rzdiffmax, start, usenext, rzfinebinfirst) = lutval___; 
 
     auto useregindex = (innerfinephi,bend);
     ap_uint<3> ir;
     if (diskSeed || overlapSeed) {
-      //FIXME If the lookupbits were rationally organized this would be much simpler
+      //If the lookupbits were rationally organized this would be much simpler
       ap_uint<2> nrbits = 3;
       ir = ((start & ((1 << (nrbits - 1)) - 1)) << 1) + (rzfinebinfirst >> (kNbitsrzbin - 1));
       useregion___ = regionlut[(useregindex,ir)];
-    std::cout<<"useregindex "<<(useregindex,ir)<<std::endl;
       }
     else{
       useregion___ = regionlut[useregindex];

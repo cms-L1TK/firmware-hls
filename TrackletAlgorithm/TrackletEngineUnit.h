@@ -155,21 +155,10 @@ STUBID read() {
   return stubids_[readindex_++];
 }
 
-NEGZ readnegz() {
-#pragma HLS inline  
-  return negz_[readindex_++];
-}
-
 void write(STUBID stubs) {
 #pragma HLS inline  
   stubids_[writeindex_++]=stubs;
 }
-
-void writenegz(NEGZ negz) {
-#pragma HLS inline
-  negz_[writeindex_++]=negz;
-}
-
 
  MEMMASK memmask_;
 

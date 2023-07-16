@@ -15,8 +15,8 @@ void TC::calculate_DXDY (
   const TC::Types::zmean  zproj0_input,
   const TC::Types::zmean  zproj1_input,
   const TC::Types::zmean  zproj2_input,
-  
- 
+  const bool negZ,
+
   TC::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
   TrackletParameters::TPAR * const t_output,
@@ -66,10 +66,8 @@ const ap_int<16> dphi = phi2 - phi1;
 // 11 bits 	 2^(0)Kr^(1)	0.0292969
 const ap_int<11> dr = r2 - r1;
 //
-std::cout<< "r1 phi1 z1: "<<r1<<" " <<phi1_input<< " "<<z1_input<<"r2 phi2 z2: "<< r2 <<" " <<phi2_input<< " "<<z2_input;
-bool negZ = z2mean_input < 0;
 ap_int<2> sign = negZ ? ap_int<2>(-1) : ap_int<2>(1);
-std::cout<<"negz dr: "<< negZ << " "<<dr<<std::endl;
+
 // STEP 2
 ap_int<19> drinv;
 const ap_uint<10> addr_drinv = dr & 1023; // address for the LUT
@@ -165,7 +163,6 @@ const ap_int<18> rinv = rinv_tmp >> 15;
 
 // 16 bits 	 2^(-8)Kphi^(1)Kr^(-1)	1.04549e-06
 const ap_int<16> rinv_final = rinv >> 2;
-std::cout<<"irinv"<< rinv_final<<"drinv: "<<drinv;
 //
 // calculating phi0_final
 //
@@ -243,22 +240,24 @@ const ap_int<18> phi0_final = phi0;
 const ap_int<7> z1 = ap_int<7>(z1_input);
 const ap_int<7> z2 = ap_int<7>(z2_input);
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
-static const ap_int<14> z2mean = z2mean_input;
+static const ap_int<14> z2mean = ap_int<14>(z2mean_input);
 // units 2^(0)Kz^(1)	0.0585938
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
-static const ap_int<14> z1mean = z1mean_input;
+static const ap_int<14> z1mean = ap_int<14>(z1mean_input);
 //
 // STEP 1
 
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<14> z2abs = sign*z2 + z2mean;
+const ap_int<14> z2abs = (z2 + sign * z2mean);
 // 14 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<14> z1abs = sign*z1 + z1mean;
+const ap_int<14> z1abs = (z1 + sign * z1mean);
+
+
 //
 // STEP 2
 
 // 11 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<11> dz = sign*(z2abs - z1abs);
+const ap_int<11> dz = (z2abs - z1abs);
 //
 // STEP 3
 
@@ -268,7 +267,6 @@ const ap_int<11> dz = sign*(z2abs - z1abs);
 // 18 bits 	 2^(-14)Kr^(-1)Kz^(1)	0.00012207
 const ap_int<27> deltaZ_tmp = dz * drinv;
 const ap_int<18> deltaZ = deltaZ_tmp >> 9;
-std::cout<<"deltaz dz"<<deltaZ<<" "<<dz;
 //
 // STEP 5
 
@@ -339,13 +337,12 @@ const ap_int<18> z0b = z0b_tmp >> 15;
 // STEP 10
 
 // 15 bits 	 2^(-4)Kz^(1)	0.00366211
-const ap_int<15> z0 = sign * (ap_int<15>(z1abs)<<4) + z0b;
+const ap_int<16> z0 = (ap_int<16>(z1abs)<<4) + z0b;
 //
 // STEP 11
 
 // 11 bits 	 2^(0)Kz^(1)	0.0585938
-const ap_int<11> z0_final = z0 >> 4;
-std::cout<<"z0"<<z0_final;
+const ap_int<12> z0_final = z0 >> 4;
 //
 // calculating phiL_0_final
 //

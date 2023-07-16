@@ -61,7 +61,6 @@ const ap_int<18> phi2 = ap_int<18>(phi2_input)<<3;
 const ap_int<18> phi1 = ap_int<18>(phi1_input)<<3;
 // units 2^(0)Kr^(1)	0.0292969
 const ap_int<13> r2 = ap_uint<12>(r2_input); //cast r2 as unsigned since all disk radii are positive only
-std::cout<< "r1 phi1 z1: "<<r1<<" " <<phi1_input<< " "<<z1_input<<"r2 phi2 z2: "<<" " <<phi2_input<< " "<<z2_input;
 //
 // STEP 1
 
