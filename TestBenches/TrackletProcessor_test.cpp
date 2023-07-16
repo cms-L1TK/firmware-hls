@@ -25,16 +25,16 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
-  #define SEED_ L1D1_
+  #define SEED_ D1D2_
 #endif
 #if !defined ITC_
-  #define ITC_ C_
+  #define ITC_ A_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TP_L1D1C_
+  #define MODULE_ TP_D1D2A_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackletProcessor_L1D1C
+  #define TOP_FUNC_ TrackletProcessor_D1D2A
 #endif
 
 
