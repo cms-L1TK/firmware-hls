@@ -223,12 +223,11 @@ const ap_int<18> phi0a = phi0a_tmp >> 12;
 
 // 18 bits 	 2^(1)Kphi^(1)	1.56824e-05
 const ap_int<19> phi0_tmp = phi1 + phi0a;
-const ap_int<18> phi0 = phi0_tmp >> 1;
+const ap_int<18> phi0_final = phi0_tmp >> 1;
 //
 // STEP 11
 
 // 18 bits 	 2^(1)Kphi^(1)	1.56824e-05
-const ap_int<18> phi0_final = phi0;
 
 //
 // calculating t_final
@@ -350,7 +349,6 @@ const ap_int<12> z0_final = z0 >> 4;
 // STEP 0
 
 // units 2^(0)Kr^(1)	0.0292969
-const ap_int<13> rproj0 = rproj0_input;
 // 10 bits 	 2^(-8)	0.00390625
 static const ap_int<10> plus1 = 256;
 //
@@ -372,7 +370,7 @@ static const ap_int<10> plus1 = 256;
 const ap_int<17> x2 = delta0>>1;
 ;
 // 18 bits 	 2^(2)Kphi^(1)Kr^(0)	3.13648e-05
-const ap_int<30> x1_0_tmp = x2 * rproj0;
+const ap_int<30> x1_0_tmp = x2 * rproj0_input;
 const ap_int<18> x1_0 = x1_0_tmp >> 12;
 //
 // STEP 6
@@ -441,7 +439,6 @@ const ap_int<20> phiL_0_final = phiL_0 << 1;
 // STEP 0
 
 // units 2^(0)Kr^(1)	0.0292969
-const ap_int<13> rproj1 = rproj1_input;
 //
 // STEP 1
 
@@ -458,7 +455,7 @@ const ap_int<13> rproj1 = rproj1_input;
 // STEP 5
 
 // 18 bits 	 2^(2)Kphi^(1)Kr^(0)	3.13648e-05
-const ap_int<30> x1_1_tmp = x2 * rproj1;
+const ap_int<30> x1_1_tmp = x2 * rproj1_input;
 const ap_int<18> x1_1 = x1_1_tmp >> 12;
 //
 // STEP 6
@@ -527,7 +524,6 @@ const ap_int<20> phiL_1_final = phiL_1 << 1;
 // STEP 0
 
 // units 2^(0)Kr^(1)	0.0292969
-const ap_int<13> rproj2 = rproj2_input;
 //
 // STEP 1
 
@@ -544,7 +540,7 @@ const ap_int<13> rproj2 = rproj2_input;
 // STEP 5
 
 // 18 bits 	 2^(2)Kphi^(1)Kr^(0)	3.13648e-05
-const ap_int<30> x1_2_tmp = x2 * rproj2;
+const ap_int<30> x1_2_tmp = x2 * rproj2_input;
 const ap_int<18> x1_2 = x1_2_tmp >> 12;
 //
 // STEP 6

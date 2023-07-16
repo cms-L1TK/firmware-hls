@@ -973,7 +973,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   ap_uint<1> idlete = true;
   
   typename AllStub<InnerRegion>::AllStubData innerStub = 0;
-  bool negDisk_ = 0;
+  bool negDisk_ = false;
   typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS innerIndex = 0;
   typename TEBuffer<Seed,iTC,InnerRegion,OuterRegion>::NSTUBS outerIndex = 0;
 
