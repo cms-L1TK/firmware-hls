@@ -71,8 +71,7 @@ ap_int<2> sign = negZ ? ap_int<2>(-1) : ap_int<2>(1);
 // STEP 2
 ap_int<19> drinv;
 const ap_uint<10> addr_drinv = dr & 1023; // address for the LUT
-switch (Seed){
-  case(TF::D1D2):
+if (Seed == TF::D1D2){
   if (negZ){
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_B1B2_drinv.tab")
@@ -89,8 +88,8 @@ switch (Seed){
     };
     drinv = LUT_drinv[addr_drinv];
   }
-  break;
-  case(TF::D3D4):
+}
+else{
   if (negZ){
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_B3B4_drinv.tab")
@@ -107,7 +106,6 @@ switch (Seed){
     };
     drinv = LUT_drinv[addr_drinv];
   }
-  break;
 }
 
 //
@@ -942,8 +940,7 @@ const ap_int<18> x7 = x7_tmp >> 17;
 const ap_uint<11> addr_invt = (t_final>>1) & 2047; // address for the LUT
 ap_int<18> invt;
 
-switch (Seed){
-  case(TF::D1D2):
+if (Seed == TF::D1D2){
   if (negZ){
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_B1B2_invt.tab")
@@ -960,8 +957,8 @@ switch (Seed){
     };
     invt = LUT_invt[addr_invt];
   }
-  break;
-  case(TF::D3D4):
+}
+else{
   if (negZ){
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_B3B4_invt.tab")
@@ -978,7 +975,6 @@ switch (Seed){
     };
     invt = LUT_invt[addr_invt];
   }
-  break;
 }
 
 

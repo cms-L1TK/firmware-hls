@@ -124,6 +124,8 @@ switch (Seed) {
       drinv = LUT_drinv[addr_drinv];
       break;
     }
+  default:
+    break;
 }
 //
 // STEP 3
@@ -1159,6 +1161,8 @@ switch (Seed) {
       invt = LUT_invt[addr_invt];
       break;
     }
+  default:
+    break;
 }
 //
 // STEP 12
