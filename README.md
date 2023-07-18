@@ -374,7 +374,6 @@ Currently the supported chain configurations for EMP builds are:
   * InputRouter to KalmanFilter
     * Target: Apollo VU7P
     * Path: `IntegrationTests/ReducedConfig/IRtoKF`
-    * See [this README](https://github.com/cms-L1TK/firmware-hls/blob/doc_emp/IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md) for more details.
     
 * **Some info**
 
@@ -382,7 +381,7 @@ Currently the supported chain configurations for EMP builds are:
     More info on that in `IntegrationTests/common/hdl/surf_subset/README.md`
     
     * Some python and TCL script are needed to implement and simulate the EMP firmware.
-    More info on that in `IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md`
+    More info on that in [this README](https://github.com/cms-L1TK/firmware-hls/blob/doc_emp/IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md).
 
 ### Prerequisites
 
