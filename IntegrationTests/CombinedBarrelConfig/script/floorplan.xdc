@@ -1,15 +1,4 @@
-create_pblock pblock_MPS
-add_cells_to_pblock [get_pblocks pblock_MPS] [get_cells -quiet [list \
-          {TPROJ_58_loop[*].TPROJ_58}\
-          {TPROJ_60_loop[*].TPROJ_60} \    
-          {TPROJ_58_delay_loop[*].TPROJ_58}\
-          {TPROJ_60_delay_loop[*].TPROJ_60} \              
-          {VMSME_16_loop[*].VMSME_16} \
-          {VMSME_17_loop[*].VMSME_17 \
-          {VMSME_16_delay_loop[*].VMSME_16} \
-         {VMSME_17_delay_loop[*].VMSME_17}}]]
-resize_pblock [get_pblocks pblock_MPS] -add {CLOCKREGION_X7Y7:CLOCKREGION_X0Y4}
-
+#this XDC contains physical constraints for the out-of-context combined barrel chain
 create_pblock pblock_MPL3L4L5L6
 add_cells_to_pblock [get_pblocks pblock_MPL3L4L5L6] [get_cells -quiet [list \
           MP_L3PHIA \
@@ -44,14 +33,6 @@ add_cells_to_pblock [get_pblocks pblock_MPL1L2] [get_cells -quiet [list \
           MP_L2PHIC \
           MP_L2PHID]]
 resize_pblock [get_pblocks pblock_MPL1L2] -add {CLOCKREGION_X0Y4:CLOCKREGION_X7Y5}
-
-create_pblock pblock_TPs
-add_cells_to_pblock [get_pblocks pblock_TPs] [get_cells -quiet [list \
-          {AS_51_loop[*].AS_51} \
-          {VMSTE_16_loop[*].VMSTE_16} \
-         {VMSTE_17_loop[*].VMSTE_17}]]
-resize_pblock [get_pblocks pblock_TPs] -add {CLOCKREGION_X7Y11:CLOCKREGION_X0Y8}
-
 create_pblock pblock_TPL1L2
 add_cells_to_pblock [get_pblocks pblock_TPL1L2] [get_cells -quiet [list \
           TP_L1L2A \
