@@ -165,12 +165,31 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   //Read stub memory and extract data fields
   auto stubadd=(slot,istubtmp);
   stubdata__ = stubmem[bx_&3][stubadd];
+
+  ap_uint<2> index = __builtin_ctz(stubmask_);
+  bool istub_done = istubtmp+1>=nstubs_;
+  bool iuse_done = iusetmp+1>=nuse_;
+  ap_uint<2> iusenext = iuse_ + 1;
+  NSTUB istubnext = istub_ + 1;
+  bool finished = !stubmask_ && iusetmp+1 >= nuse_;
+
+  iuse_ = (good__ && istub_done) ? iusenext : iuse_;
+  istub_ = (good__ && istub_done) ? NSTUB(0) : istub_;
+  idle_ = (good__ && istub_done && finished) ? true : idle_;
+  phiPlus_ = (good__ && istub_done && !finished && stubmask_) ? index[1] : phiPlus_;
+  nstubs_ = (good__ && istub_done && !finished && stubmask_) ? NSTUBS(nstubsall_[index]) : nstubs_;
+  stubmask_[index] = (good__ && istub_done && !finished && stubmask_) ? ap_uint<1>(0) : stubmask_[index];
+
+  istub_ = (good__ && istub_done && !finished && !stubmask_ && !iuse_done) ? NSTUB(0) : istub_;
+  iuse_ = (good__ && iuse_done && !finished && !stubmask_ && iuse_done) ? ap_uint<2>(0) : iuse_;
+
+  istub_ = (good__ && !istub_done) ? istubnext : istub_;
    
+  /*
    if (good__) {
     if (istubtmp+1>=nstubs_) {
       iuse_++;
       istub_ = 0;
-      auto nstubstmp = nstubs_;
       if (!stubmask_ && iusetmp+1 >= nuse_) {
         idle_ = true;
       }
@@ -191,6 +210,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
       istub_++;
      }
    }
+  */
 
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
