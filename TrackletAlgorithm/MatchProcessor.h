@@ -972,8 +972,8 @@ void MatchCalculator(BXType bx,
   // Use the stub and projection indices to pick up the stub and projection
 
   AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
-  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allstub->read_mem(bx,stubid).raw());
-  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allstub->read_mem(bx,stubid).raw());
+  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(stub.raw());
+  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 
   constexpr bool isDisk = LAYER >= TF::D1;
   // Stub parameters

@@ -49,6 +49,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 #pragma HLS inline
     writeindex_ = 0;
     readindex_ = 0;
+    readindexnext = 1;
     stubmask_ = 0;
     nstubs_ = 0;
     idle_ = true;
@@ -440,13 +441,14 @@ inline MATCH peek() {
  
 inline void advance() {
 #pragma HLS inline  
-  readindex_++;  
+  readindex_ = readindexnext;
+  readindexnext = readindex_+1;  
 }
 
  private:
 
  //Buffers for the matches
- INDEX writeindex_, readindex_;
+ INDEX writeindex_, readindex_, readindexnext;
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
