@@ -71,6 +71,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   phiProjBin_ = projbuffer.getPhiProjBin();
   stubmask_ = projbuffer.getMaskStubs();
+  (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus) = stubmask_;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index[0];
@@ -82,10 +83,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   good__ = false;
 
   iuse_ = 0;
-  bool usefirstMinus = projbuffer_.getUseFirstMinus();
-  bool usesecondMinus = projbuffer_.getUseSecondMinus();
-  bool usefirstPlus = projbuffer_.getUseFirstPlus();
-  bool usesecondPlus = projbuffer_.getUseSecondPlus();
 #pragma HLS ARRAY_PARTITION variable=use_ dim=0 complete
   clearuse: for(int iuse = 0; iuse < kNuse; iuse++) {
 #pragma HLS unroll
@@ -129,10 +126,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
   constexpr regionType APTYPE = TF::layerDiskRegion[LAYER];
   int sign = isDisk ? (projbuffer_.getPhiDer() < 0 ? -1 : 1) : 0;
-  bool usefirstMinus = use_[iusetmp] == 0;
-  bool usesecondMinus = use_[iusetmp] == 2;
-  bool usefirstPlus = use_[iusetmp] == 1;
-  bool usesecondPlus = use_[iusetmp] == 3;
 
   if(istub_ == 0) {
      
@@ -186,33 +179,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
   istub_ = (good__ && !istub_done) ? istubnext : istub_;
    
-  /*
-   if (good__) {
-    if (istubtmp+1>=nstubs_) {
-      iuse_++;
-      istub_ = 0;
-      if (!stubmask_ && iusetmp+1 >= nuse_) {
-        idle_ = true;
-      }
-      else if (stubmask_) {
-           ap_uint<2> index = __builtin_ctz(stubmask_);
-           stubmask_[index]=0;
-           second_ =  index[0];
-           phiPlus_ =  index[1];
-           nstubs_ = nstubsall_[index];
-      }
-      if(iusetmp+1 < nuse_) {
-        istub_ = 0;
-      }
-      else {
-           iuse_ = 0;
-      }
-    } else {
-      istub_++;
-     }
-   }
-  */
-
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
 
@@ -470,6 +436,10 @@ inline void advance() {
  ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;
  bool isPSseed_;
+ ap_uint<1> usefirstMinus;
+ ap_uint<1> usesecondMinus;
+ ap_uint<1> usefirstPlus;
+ ap_uint<1> usesecondPlus;
 
  ap_uint<2> iuse_;
  int nuse_;
