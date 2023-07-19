@@ -230,22 +230,22 @@ mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../Integra
 mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 ### Reduced Combined IRtoTB
 echo "Reduced CM"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -x
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -de 1-x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
 ### Reduced Combined 2 IRtoTB
 echo "Reduced CM2"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig2/tb/
 ### Reduced Combined 2 IRtoTB
 echo "CM Barrel"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de -x
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/CombinedBarrelConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
