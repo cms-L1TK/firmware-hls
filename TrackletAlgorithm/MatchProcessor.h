@@ -1441,9 +1441,6 @@ void MatchProcessor(BXType bx,
       // All seeding pairs are PS modules except L3L4 and L5L6
       const bool psseed = not(iseed==TF::L3L4 or iseed==TF::L5L6);
       
-      // vmproj index
-      const typename VMProjection<VMPTYPE>::VMPID &index = nallproj;
-      
       // vmproj z
       // Separate the vm projections into zbins
       // To determine which zbin in VMStubsME the ME should look in to match this VMProjection,
@@ -1558,7 +1555,8 @@ void MatchProcessor(BXType bx,
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
       
-      VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv);
+                                                                                 // We dont keep track of the index, so just use 0
+      VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(0, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(0, zbin, finez, finephi, rinv);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
