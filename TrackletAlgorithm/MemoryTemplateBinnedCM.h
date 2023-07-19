@@ -39,16 +39,15 @@ class MemoryTemplateBinnedCM{
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
-    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM,
-    entries8 = 36//8*(NBIT_ADDR-NBIT_BIN)+4
+    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
   ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
-  ap_uint<36> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
-  ap_uint<entries8> nentries8A_[slots];
-  ap_uint<entries8> nentries8B_[slots];
+  ap_uint<36> nkNBits_MemAddrBinned_[kNBxBins][(1<<NBIT_BIN)/8];
+  ap_uint<36> nkNBits_MemAddrBinnedA_[slots];
+  ap_uint<36> nkNBits_MemAddrBinnedB_[slots];
   
  public:
 
@@ -62,36 +61,36 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
+    return nkNBits_MemAddrBinned_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<entries8> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    #pragma HLS ARRAY_PARTITION variable=nentries8A_ complete dim=0
-    return nentries8A_[bx*8+ibin];
+  ap_uint<36> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    #pragma HLS ARRAY_PARTITION variable=nkNBits_MemAddrBinnedA_ complete dim=0
+    return nkNBits_MemAddrBinnedA_[bx*8+ibin];
   }
 
-  ap_uint<entries8> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    #pragma HLS ARRAY_PARTITION variable=nentries8B_ complete dim=0
-    return nentries8B_[bx*8+ibin];
+  ap_uint<36> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    #pragma HLS ARRAY_PARTITION variable=nkNBits_MemAddrBinnedB_ complete dim=0
+    return nkNBits_MemAddrBinnedB_[bx*8+ibin];
   }
 
-  ap_uint<entries8> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+  ap_uint<kNBits_MemAddrBinned> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    return nentries8A_[bx*8+ibin].range(ireg*4+3,ireg*4);
+    return nkNBits_MemAddrBinnedA_[bx*8+ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<entries8> getEntries8BSlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+  ap_uint<kNBits_MemAddrBinned> getEntries8BSlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    return nentries8B_[bx*8+ibin].range(ireg*4+3,ireg*4);
+    return nkNBits_MemAddrBinnedB_[bx*8+ibin].range(ireg*4+3,ireg*4);
   }
 
   ap_uint<32> getEntries8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    #pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
-    return nentries8_[bx][ibin];
+    #pragma HLS ARRAY_PARTITION variable=nkNBits_MemAddrBinned_ complete dim=0
+    return nkNBits_MemAddrBinned_[bx][ibin];
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<3> ibin) const {
@@ -107,12 +106,12 @@ class MemoryTemplateBinnedCM{
     return val;
   }
   
-  const ap_uint<entries8> (&get_mem_entries8A() const)[slots] {
-    return nentries8A_;
+  const ap_uint<kNBits_MemAddrBinned> (&get_mem_kNBits_MemAddrBinnedA() const)[slots] {
+    return nkNBits_MemAddrBinnedA_;
   }
 
-  const ap_uint<entries8> (&get_mem_entries8B() const)[slots] {
-    return nentries8B_;
+  const ap_uint<kNBits_MemAddrBinned> (&get_mem_kNBits_MemAddrBinnedB() const)[slots] {
+    return nkNBits_MemAddrBinnedB_;
   }
 
 
@@ -160,9 +159,9 @@ class MemoryTemplateBinnedCM{
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nkNBits_MemAddrBinned_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nkNBits_MemAddrBinnedA_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nkNBits_MemAddrBinnedB_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
       #endif
 
@@ -198,14 +197,14 @@ class MemoryTemplateBinnedCM{
           write_mem(ibx, i, data, j);
         }
       }
-      // Clear nentries8 and binmask8
+      // Clear nkNBits_MemAddrBinned and binmask8
       for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
-        nentries8_[ibx][ibin] = 0;
+        nkNBits_MemAddrBinned_[ibx][ibin] = 0;
         binmask8_[ibx][ibin] = 0;
       }
       for (unsigned int ibin = 0; ibin < kNBxBins*8; ++ibin) {
-        nentries8A_[ibx*8+ibin] = 0;
-        nentries8B_[ibx*8+ibin] = 0;
+        nkNBits_MemAddrBinnedA_[ibx*8+ibin] = 0;
+        nkNBits_MemAddrBinnedB_[ibx*8+ibin] = 0;
       }
     }
   }
@@ -236,16 +235,16 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
+    ap_uint<4> nentry_ibx = nkNBits_MemAddrBinned_[ibx][ibin].range(ireg*4+3,ireg*4);
 
     DataType data(datastr.c_str(), base);
 
     bool success = write_mem(ibx, slot, data, nentry_ibx);
     #ifndef CMSSW_GIT_HASH
     if (success) {
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nkNBits_MemAddrBinned_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nkNBits_MemAddrBinnedA_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nkNBits_MemAddrBinnedB_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
     }
     #endif
@@ -271,7 +270,7 @@ class MemoryTemplateBinnedCM{
 	for(unsigned int slot=0;slot<8;slot++) {
       //std::cout << "slot "<<slot<<" entries "
       //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
-      for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
+      for (unsigned int i = 0; i < nkNBits_MemAddrBinned_[bx][slot]; ++i) {
 	edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
 	print_entry(bx, i + slot*getNEntryPerBin() );
       }
