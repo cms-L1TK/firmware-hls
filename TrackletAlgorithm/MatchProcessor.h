@@ -1028,11 +1028,8 @@ void MatchCalculator(BXType bx,
   const ap_int<18> &stub_phi_long  = stub_phi;         // make longer to allow for shifting
   const ap_int<18> &proj_phi_long  = proj_phi_corr;    // make longer to allow for shifting
   ap_int<18> shiftstubphi   = kPhi0_shift > 0 ? stub_phi_long << kPhi0_shift : stub_phi_long;                        // shift
-  if(isDisk && isPSStub)
-    shiftstubphi = kPhi0_shift > 0 ? stub_ps_phi << kPhi0_shift : stub_ps_phi;                        // shift
-  else if(isDisk && !isPSStub) {
-    shiftstubphi = kPhi0_shift > 0 ? stub_2s_phi << kPhi0_shift : stub_2s_phi;                        // shift
-  }
+  shiftstubphi = (isDisk && isPSStub) ? ap_int<18>(stub_ps_phi) : shiftstubphi;
+  shiftstubphi = (isDisk && !isPSStub) ? ap_int<18>(stub_2s_phi) : shiftstubphi;
   ap_int<18> shiftprojphi = proj_phi_long << (kShift_phi0bit - 1 + kPhi0_shift); // shift
   constexpr int dphibit = 20;
   ap_int<dphibit> delta_phi      = shiftstubphi - shiftprojphi;
