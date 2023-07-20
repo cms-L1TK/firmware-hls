@@ -251,13 +251,6 @@ template<TF::seed Seed> constexpr regionType OuterRegion() {
     )
   );
 }
-template<TF::seed Seed> constexpr regionType OuterRegionVMSTE() {
-  return (
-    (Seed == TF::L1L2 || Seed == TF::L2L3) ? BARRELPS : (
-      (Seed == TF::L3L4 || Seed == TF::L5L6) ? BARREL2S : DISK
-    )
-  );
-}
 // Constants used in TE functions assigned to constants here for readability, do not depend on template parameters
 const int kNBufferDepthBits = TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits;
 const int kNBitsBuffer = TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer;
@@ -894,6 +887,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
   constexpr bool overlapSeed = (Seed == TF::L1D1 || Seed == TF::L2D1);
+  //AS Memories are cast from DISK into DISKPS types in overlap and disk seeds
   constexpr regionType innerASType = diskSeed ? DISKPS : InnerRegion;
   constexpr regionType outerASType = (diskSeed || overlapSeed) ? DISKPS : InnerRegion;
   int npar = 0;
