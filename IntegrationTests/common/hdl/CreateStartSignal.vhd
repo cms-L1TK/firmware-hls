@@ -25,9 +25,9 @@ entity CreateStartSignal is
     CLK   : in  std_logic;
     RESET : in  std_logic;
     DONE  : in  std_logic; --! Done signal of last algo module in chain
-    BX_OUT  : in  std_logic_vector(2 downto 0);
+    BX_OUT  : in  std_logic_vector(2 downto 0) := (others => '0');
     START : out std_logic;  --! Start signal of next algo module in chain
-    BX : out std_logic_vector(2 downto 0)
+    BX : out std_logic_vector(2 downto 0) := (others => '0')
   ); 
 end CreateStartSignal;
 
