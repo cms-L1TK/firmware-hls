@@ -20,7 +20,7 @@ class TrackletEngineUnit {
   };
 
   typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
-  typedef ap_uint<kNBitsNegDiskSize> NEGZ;
+  typedef ap_uint<kNBitsNegDiskSize> NEGDISK;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;
   typedef ap_uint<kNBitsRZBin> RZBIN;
@@ -183,7 +183,7 @@ void write(STUBID stubs) {
  
  NSTUBS istub_;
  STUBID stubids_[1<<kNBitsBuffer];
- NEGZ negz_[1<<kNBitsBuffer];
+ NEGDISK negDisk_[1<<kNBitsBuffer];
 
  int instance_;
 

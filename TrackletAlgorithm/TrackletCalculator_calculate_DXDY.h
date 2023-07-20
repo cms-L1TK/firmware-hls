@@ -15,7 +15,7 @@ void TC::calculate_DXDY (
   const TC::Types::zmean  zproj0_input,
   const TC::Types::zmean  zproj1_input,
   const TC::Types::zmean  zproj2_input,
-  const bool negZ,
+  const bool negDisk,
 
   TC::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
@@ -66,13 +66,13 @@ const ap_int<16> dphi = phi2 - phi1;
 // 11 bits 	 2^(0)Kr^(1)	0.0292969
 const ap_int<11> dr = r2 - r1;
 //
-ap_int<2> sign = negZ ? ap_int<2>(-1) : ap_int<2>(1);
+ap_int<2> sign = negDisk ? ap_int<2>(-1) : ap_int<2>(1);
 
 // STEP 2
 ap_int<19> drinv;
 const ap_uint<10> addr_drinv = dr & 1023; // address for the LUT
 if (Seed == TF::D1D2){
-  if (negZ){
+  if (negDisk){
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_B1B2_drinv.tab")
 #  include "../emData/LUTs/TC_B1B2_drinv.tab"
@@ -90,7 +90,7 @@ if (Seed == TF::D1D2){
   }
 }
 else{
-  if (negZ){
+  if (negDisk){
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_B3B4_drinv.tab")
 #  include "../emData/LUTs/TC_B3B4_drinv.tab"
@@ -941,7 +941,7 @@ const ap_uint<11> addr_invt = (t_final>>1) & 2047; // address for the LUT
 ap_int<18> invt;
 
 if (Seed == TF::D1D2){
-  if (negZ){
+  if (negDisk){
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_B1B2_invt.tab")
 #  include "../emData/LUTs/TC_B1B2_invt.tab"
@@ -959,7 +959,7 @@ if (Seed == TF::D1D2){
   }
 }
 else{
-  if (negZ){
+  if (negDisk){
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_B3B4_invt.tab")
 #  include "../emData/LUTs/TC_B3B4_invt.tab"

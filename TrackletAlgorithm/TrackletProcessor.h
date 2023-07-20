@@ -183,7 +183,7 @@ namespace TC {
     const Types::zmean zproj0_input,
     const Types::zmean zproj1_input,
     const Types::zmean zproj2_input,
-    const bool negZ,
+    const bool negDisk,
 
     Types::rinv * const rinv_output,
     TrackletParameters::PHI0PAR * const phi0_output,
@@ -208,7 +208,7 @@ namespace TC {
   );
   template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
   template<TF::seed Seed,regionType InnerRegion, regionType OuterRegion> bool overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
-  template<TF::seed Seed,regionType InnerRegion, regionType OuterRegion> bool diskSeeding(const bool negZ, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
+  template<TF::seed Seed,regionType InnerRegion, regionType OuterRegion> bool diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, Types::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, Types::z0 * const z0, TrackletParameters::TPAR * const t, Types::phiL phiL[4], Types::zL zL[4], Types::der_phiL * const der_phiL, Types::der_zL * const der_zL, Types::flag valid_proj[4], Types::phiD phiD[4], Types::rD rD[4], Types::der_phiD * const der_phiD, Types::der_rD * const der_rD, Types::flag valid_proj_disk[4]);
 
   template<TF::seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID ID();
 
@@ -422,7 +422,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 #include "TrackletCalculator_calculate_DXDY.h"
 
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
-TC::diskSeeding(const bool negZ, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
+TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
 ::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
 {
   TC::Types::rmean r1mean, rproj[3];
@@ -462,7 +462,7 @@ TC::diskSeeding(const bool negZ, const AllStub<InnerRegion> &innerStub, const Al
       zproj[0],
       zproj[1],
       zproj[2],
-      negZ,
+      negDisk,
 
       rinv,
       phi0,
@@ -533,8 +533,8 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
   TC::Types::rmean r1mean, rproj[3];
   rproj[1] = rmean[TF::L3];
   rproj[2] = rmean[TF::L4];
-  ap_int<2> negZ = ((innerStub.getZ()<0) ? -1 : 1);//find negative disk info from inner stub z
-  TC::Types::zmean z2mean = negZ * zmean[TF::D1];
+  ap_int<2> negDisk = ((innerStub.getZ()<0) ? -1 : 1);//find negative disk info from inner stub z
+  TC::Types::zmean z2mean = negDisk * zmean[TF::D1];
   TC::Types::zmean zproj[4] = {zmean[TF::D2], zmean[TF::D3], zmean[TF::D4], zmean[TF::D5]};
   if (Seed == TF::L1D1){
   r1mean   = rmean[TF::L1];
@@ -1155,7 +1155,7 @@ teunits[k].idle_;
 		    teunits[k].innerstub___.getAllStub(),
 			  teunits[k].innerstub___.getIndex());
       if (diskSeed)
-        teunits[k].negz_[teuwriteindex[k]] = teunits[k].innerstub___.getNegDisk();
+        teunits[k].negDisk_[teuwriteindex[k]] = teunits[k].innerstub___.getNegDisk();
 
       teunits[k].writeindex_=savestub?writeindexnext:teuwriteindex[k];
       
@@ -1386,7 +1386,7 @@ teunits[k].idle_;
     idlete = teuidle.or_reduce();
     (outerIndex, innerStub, innerIndex)=teunits[iTE].stubids_[teureadindex[iTE]];
     if (diskSeed)
-      negDisk_ = teunits[iTE].negz_[teureadindex[iTE]];
+      negDisk_ = teunits[iTE].negDisk_[teureadindex[iTE]];
   } //end of istep
 
   bx_o = bx;
