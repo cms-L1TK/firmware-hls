@@ -39,15 +39,16 @@ class MemoryTemplateBinnedCM{
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
-    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM
+    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM,
+    entries8 = 36//8*(NBIT_ADDR-NBIT_BIN)+4
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
   ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
   ap_uint<36> nkNBits_MemAddrBinned_[kNBxBins][(1<<NBIT_BIN)/8];
-  ap_uint<36> nkNBits_MemAddrBinnedA_[slots];
-  ap_uint<36> nkNBits_MemAddrBinnedB_[slots];
+  ap_uint<entries8> nkNBits_MemAddrBinnedA_[slots];
+  ap_uint<entries8> nkNBits_MemAddrBinnedB_[slots];
   
  public:
 
@@ -64,24 +65,24 @@ class MemoryTemplateBinnedCM{
     return nkNBits_MemAddrBinned_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<36> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+  ap_uint<entries8> getEntries8A(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
     #pragma HLS ARRAY_PARTITION variable=nkNBits_MemAddrBinnedA_ complete dim=0
     return nkNBits_MemAddrBinnedA_[bx*8+ibin];
   }
 
-  ap_uint<36> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+  ap_uint<entries8> getEntries8B(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
     #pragma HLS ARRAY_PARTITION variable=nkNBits_MemAddrBinnedB_ complete dim=0
     return nkNBits_MemAddrBinnedB_[bx*8+ibin];
   }
 
-  ap_uint<kNBits_MemAddrBinned> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+  ap_uint<4> getEntries8ASlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
     return nkNBits_MemAddrBinnedA_[bx*8+ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<kNBits_MemAddrBinned> getEntries8BSlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+  ap_uint<4> getEntries8BSlot(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
@@ -106,11 +107,11 @@ class MemoryTemplateBinnedCM{
     return val;
   }
   
-  const ap_uint<kNBits_MemAddrBinned> (&get_mem_kNBits_MemAddrBinnedA() const)[slots] {
+  const ap_uint<entries8> (&get_mem_entries8A() const)[slots] {
     return nkNBits_MemAddrBinnedA_;
   }
 
-  const ap_uint<kNBits_MemAddrBinned> (&get_mem_kNBits_MemAddrBinnedB() const)[slots] {
+  const ap_uint<entries8> (&get_mem_entries8B() const)[slots] {
     return nkNBits_MemAddrBinnedB_;
   }
 
