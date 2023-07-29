@@ -1544,14 +1544,21 @@ void MatchProcessor(BXType bx,
       constexpr bool isDisk = LAYER > TF::L6;
       constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
       auto slot = zbin.range(zbin.length()-1, 1);
-      ap_uint<4> nstubfirstMinus = instubdata.getEntries8ASlot(bx, (ivmMinus*nbins + slot));
-      ap_uint<4> nstublastMinus = (zfirst==zlast) ? ap_uint<4>(0) : instubdata.getEntries8BSlot(bx, (ivmMinus*nbins + slot + 1));
-      ap_uint<4> nstubfirstPlus = (ivmMinus==ivmPlus) ? ap_uint<4>(0) : instubdata.getEntries8ASlot(bx, (ivmPlus*nbins + slot));
-      ap_uint<4> nstublastPlus = (ivmMinus==ivmPlus || zfirst==zlast) ? ap_uint<4>(0) : instubdata.getEntries8BSlot(bx, (ivmPlus*nbins + slot + 1));
+      ap_uint<kNbitsrzbinMP> ibin;
+      ap_uint<kNbitsphibin> ireg;
+      (ireg,ibin)=ivmMinus*nbins + slot;
+      ap_uint<4> nstubfirstMinus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
+      (ireg,ibin)=ivmMinus*nbins + slot + 1;
+      ap_uint<4> nstublastMinus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
+      (ireg,ibin)=ivmPlus*nbins + slot;
+      ap_uint<4> nstubfirstPlus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
+      (ireg,ibin)=ivmPlus*nbins + slot + 1;
+      ap_uint<4> nstublastPlus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);      
       
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
-      VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(index, zbin, finez, finephi, rinv);
+                                                                                 // We dont keep track of the index, so just use 0
+      VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(0, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(0, zbin, finez, finephi, rinv);
       
       AllProjection<APTYPE> allproj(projdata_.getTCID(), projdata_.getTrackletIndex(), projdata_.getPhi(),
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
