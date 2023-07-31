@@ -1542,18 +1542,22 @@ void MatchProcessor(BXType bx,
       ///////////////
       // VMProjection
       constexpr bool isDisk = LAYER > TF::L6;
-      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
-      auto slot = zbin.range(zbin.length()-1, 1);
-      ap_uint<kNbitsrzbinMP> ibin;
-      ap_uint<kNbitsphibin> ireg;
-      (ireg,ibin)=ivmMinus*nbins + slot;
-      ap_uint<4> nstubfirstMinus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
-      (ireg,ibin)=ivmMinus*nbins + slot + 1;
-      ap_uint<4> nstublastMinus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
-      (ireg,ibin)=ivmPlus*nbins + slot;
-      ap_uint<4> nstubfirstPlus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
-      (ireg,ibin)=ivmPlus*nbins + slot + 1;
-      ap_uint<4> nstublastPlus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);      
+      auto first = !isDisk ? zfirst : rfirst;
+      auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
+      ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
+#pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
+      ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
+#pragma HLS ARRAY_PARTITION variable=entries_zlast dim=0 complete
+
+      for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
+#pragma HLS unroll
+        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+first].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*NUM_PHI_BINS+last].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+      }
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastPlus = entries_zlast[ivmPlus];
       
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
