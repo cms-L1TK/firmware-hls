@@ -103,7 +103,7 @@ public:
   typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
-  typedef ap_uint<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
+  typedef ap_int<AllStubBase<ASType>::kASAlphaSize> ASALPHA;
   typedef ap_uint<AllStubBase<ASType>::kASBendSize> ASBEND;
   typedef ap_uint<AllStubBase<ASType>::kAllStubSize> AllStubData;
 
@@ -161,6 +161,17 @@ public:
 
   ASBEND getBend() const {
     return data_.range(kASBendMSB,kASBendLSB);
+  }
+
+  bool isPSStub() const {
+    if(ASType == BARRELPS) return true;
+    else if(ASType == BARREL2S) return false;
+    else if(ASType == DISKPS || ASType == DISK2S) {
+      // Checks the radius 
+      // if these are zero it means that you have 2S stubs where the radius 
+      // just encodes the ring number and is less than 16
+      return data_.range(getWidth()-1, getWidth()-3) > 0; // Check highest 3 bits regardless of template type
+    }
   }
 
   // Setter

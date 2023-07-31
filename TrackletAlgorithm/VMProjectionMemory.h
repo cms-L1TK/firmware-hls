@@ -83,14 +83,12 @@ public:
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv, const bool ps):
     data_( (id, zbin, finez, finephi, rinv, ps) )
   {
-    static_assert(VMProjType == BARREL, "Constructor should only be used for BARREL projections");
   }
 
   // This constructor is only used for projections in DISK
   VMProjection(const VMPID id, const VMPZBIN zbin, const VMPFINEZ finez, const VMPFINEPHI finephi, const VMPRINV rinv):
     data_( (id, zbin ,finez , finephi, rinv) )
   {
-    static_assert(VMProjType == DISK, "Constructor should only be used for DISK projections");
   }
   
   VMProjection()
@@ -135,7 +133,7 @@ public:
 
   // This getter is only used for projections in BARREL
   bool getIsPSSeed() const {
-    static_assert("VMProjType == BARREL", "Getter should only be used for BARREL projections");
+    static_assert("VMProjType == BARREL", "Setter should only be used for BARREL projections");
     return data_.range(kVMProjIsPSSeedLSB,kVMProjIsPSSeedMSB);
   }
   

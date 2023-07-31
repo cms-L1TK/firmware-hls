@@ -22,8 +22,10 @@ def ASRegion(region):
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
         return 'BARREL2S'
+    elif region in ['D1', 'D2']:
+        return 'DISKPS'
     else:
-        return 'DISK'
+        return 'DISK2S'
 
 def APRegion(region):
     if region in ['L1', 'L2', 'L3']:
@@ -75,9 +77,6 @@ with open(arguments.wiresFileName) as wiresFile:
     TPMems = {}
     FMMems = {}
     for line in wiresFile:
-        # Only barrel-only seeds are supported right now.
-        if "MP_D" in line:
-            continue # No disks for now
         line = line.rstrip()
         mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
         memName = line.split()[0]
@@ -159,6 +158,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         )
 
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)
+        nrz = 'kNbitsrzbinMPBarrel' if 'BARREL' in VMStubRegion else 'kNbitsrzbinMPDisk'
+        nphi = 'kNbitsphibinMPBarrel' if 'BARREL' in VMStubRegion else 'kNbitsphibinMPDisk'
         # Print out prototype for top function for this MP.
         topHeaderFile.write(
             "\n"
@@ -168,7 +169,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "void MatchProcessor_" + seed + "PHI" + iMP + "(\n"
             "    const BXType bx,\n"
             "    const TrackletProjectionMemory<" + TProjRegion + "> projin[" + seed + "PHI" + iMP + "maxTrackletProjections],\n"
-            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", 3, 3, kNMatchEngines>& instubdata,\n"
+            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", " + nrz + ", kNbitsphibin, kNMatchEngines>& instubdata,\n"
             "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
             "    BXType& bx_o,\n"
             "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
@@ -181,7 +182,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "void MatchProcessor_" + seed + "PHI" + iMP + "(\n"
             "    const BXType bx,\n"
             "    const TrackletProjectionMemory<" + TProjRegion + "> projin[" + seed + "PHI" + iMP + "maxTrackletProjections],\n"
-            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", 3, 3, kNMatchEngines>& instubdata,\n"
+            "    const VMStubMEMemoryCM<" + VMStubMERegion(seed) + ", " + nrz + ", kNbitsphibin, kNMatchEngines>& instubdata,\n"
             "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
             "    BXType& bx_o,\n"
             "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
@@ -204,11 +205,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
             "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
             "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
-            "\n"
+           "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
-            "" + TProjRegion + ", " + VMStubRegion + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + APRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
+            "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
             " TF::" + seed + ", "
-            "TF::" + "D1" + ", "
             "TF::" + iMP + "> (\n"
             "    bx,\n"
             "    projin,\n"

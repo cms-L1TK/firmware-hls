@@ -9,8 +9,8 @@ luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/i0kr2DI0SFY5m1A/LU
 memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/6pM48rxtsxrN9tg/MemPrints.tar.gz"
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/U84ZI1vGnVKkQKc/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/Nk0VWN7kRMZSFWm/MemPrints.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/LoqjBIg2ARZav8u/LUTs.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/s/xvgZRcVIfmvDgbe/download"
+luts_url_cm="https://cernbox.cern.ch/s/WSzRJvtSTBcpjhE/download"
 # Reduced Combined modules                                                      
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
@@ -253,7 +253,7 @@ unset LD_LIBRARY_PATH
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsCM2/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
@@ -326,10 +326,11 @@ do
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MP" ]]
   then
-          layer=`echo ${module} | sed "s/.*_\(L[1-9]\).*$/\1/g"`
+          layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
+          find ${table_location} -type f -name "ProjectionDiskRadius.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "${module}_phicut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-          find ${table_location} -type f -name "${module}_zcut.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "MP_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`

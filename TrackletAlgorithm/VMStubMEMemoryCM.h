@@ -72,8 +72,9 @@ public:
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> VMSMEID;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize> VMSMEBEND;
-  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEBendSize - 1> VMSMEBENDPSDISK;
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFineZSize> VMSMEFINEZ;
+  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> VMSMEFINEPHI;
 
   typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMStubMECMSize> VMStubMECMData;
 
@@ -110,6 +111,10 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
+  VMSMEBENDPSDISK getBendPSDisk() const {
+    return data_.range(kVMSMEBendMSB - 1,kVMSMEBendLSB);
+  }
+
   VMSMEFINEPHI getFinePhi() const {
     return data_.range(kVMSMEFinePhiMSB, kVMSMEFinePhiLSB);
   }
@@ -139,6 +144,7 @@ public:
   std::string getBitStr() const {
     std::string str = decodeToBits(getIndex());
     str += "|"+decodeToBits(getBend());
+    str += "|"+decodeToBits(getFinePhi());
     str += "|"+decodeToBits(getFineZ());
     return str;
   }
@@ -151,6 +157,6 @@ private:
 };
 
 // Memory definition
-template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 2, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, NCOPY>;
+template<int VMSMEType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMEMemoryCM = MemoryTemplateBinnedCM<VMStubMECM<VMSMEType>, 2, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, PhiRegSize, NCOPY>;
 
 #endif
