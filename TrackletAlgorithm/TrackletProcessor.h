@@ -913,9 +913,6 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   }
   
 
-
-  bool trace=true;
-
   constexpr unsigned int NBitsPhiRegion=2;
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFinePhiSize;
 
