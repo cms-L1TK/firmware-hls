@@ -379,7 +379,7 @@ Currently the supported chain configurations for EMP builds are:
 
     * The EMP firmware uses a subset of the [SURF library](https://github.com/slaclab/surf).
     More info on that in `IntegrationTests/common/hdl/surf_subset/README.md`
-    
+    * `firmware-hls/KalmanFilter` is a git sub-module link to the repo containing the [Kalman Filter firmware repo](https://github.com/cms-L1TK/l1tk-for-emp/tree/d0d3ba506bf77926862f0d7f3ebf781c041da6eb). (Action: Update to point to master, once it is compatible with EMP v0.7).   
     * Some python and TCL script are needed to implement and simulate the EMP firmware.
     More info on that in [this README](https://github.com/cms-L1TK/firmware-hls/blob/doc_emp/IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md).
 
