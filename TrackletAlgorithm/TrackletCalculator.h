@@ -153,7 +153,7 @@ namespace TC {
   template<uint8_t NSPMem> void
   getIndices(
       const BXType bx,
-      const StubPairMemory stubPairs[NSPMem],
+      TC::Types::nSP nentries[NSPMem],
       TC::Types::nSPMem &iSPMem,
       TC::Types::nSP &iSP,
       bool &done
@@ -393,7 +393,7 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 template<uint8_t NSPMem> void
 TC::getIndices(
     const BXType bx,
-    const StubPairMemory stubPairs[NSPMem],
+    TC::Types::nSP nentries[NSPMem],
     TC::Types::nSPMem &iSPMem,
     TC::Types::nSP &iSP,
     bool &done
@@ -405,8 +405,8 @@ TC::getIndices(
   done = false;
 
   index: for (TC::Types::nSPMem j = 0; j < NSPMem; j++) {
-    if (!set && iSP >= stubPairs[j].getEntries(bx))
-      iSP -= stubPairs[j].getEntries(bx), iSPMem++;
+    if (!set && iSP >= nentries[j])
+      iSP -= nentries[j], iSPMem++;
     else
       set = true;
   }
@@ -579,6 +579,17 @@ TrackletCalculator(
     nproj_disk[i] = 0;
   }
 
+
+  TC::Types::nSP nentries[NSPMem];
+#pragma HLS array_partition variable=nentries complete
+
+ entries: for (TC::Types::nSPMem j = 0; j < NSPMem; j++) {
+#pragma HLS unroll
+    nentries[j] = stubPairs[j].getEntries(bx);
+  }
+
+
+
   TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0;
 
   const TrackletProjection<BARRELPS>::TProjTCID TCID = TC::ID<Seed, iTC>();
@@ -593,7 +604,7 @@ TrackletCalculator(
     TC::Types::nSPMem iSPMem;
     TC::Types::nSP iSP = i;
     bool done;
-    TC::getIndices<NSPMem>(bx, stubPairs, iSPMem, iSP, done);
+    TC::getIndices<NSPMem>(bx, nentries, iSPMem, iSP, done);
 
     if (!done) {
 // Retrieve the inner and outer stubs for this stub pair, determining which
