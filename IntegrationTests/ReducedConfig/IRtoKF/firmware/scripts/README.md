@@ -1,5 +1,4 @@
-These scripts are all triggered by the [Makefile](https://github.com/cms-L1TK/firmware-hls/blob/master/IntegrationTests/ReducedConfig/IRtoKF/firmware/Makefile). There should be no need to use these manually. The EMP top-level is in `IRtoKF/firmware/hdl/payload.vhd`. `firmware-hls/KalmanFilter` is a git sub-module link to the repo containing the Kalman Filter firmware.
-
+These scripts are all triggered by the [Makefile](https://github.com/cms-L1TK/firmware-hls/blob/master/IntegrationTests/ReducedConfig/IRtoKF/firmware/Makefile). There should be no need to use these manually. The EMP top-level is in `IRtoKF/firmware/hdl/payload.vhd`.
 
 * **convert_emData2EMP_Link.py**
 
