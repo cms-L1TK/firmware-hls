@@ -67,11 +67,6 @@ class TrackletEngineUnit {
         stubptinnerlutnew2_[i] = stubptinnertmp[i+1024];
         stubptinnerlutnew3_[i] = stubptinnertmp[i+2048];
         stubptinnerlutnew4_[i] = stubptinnertmp[i+3072];
-        if (iTC==2){
-        std::cout<< " i :" << i << "|"<<stubptinnertmp[i]<<"|"<< stubptinnerlutnew1_[i]<<std::endl;
-
-        }
-
       }
       for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
 #pragma HLS unroll
@@ -81,9 +76,13 @@ class TrackletEngineUnit {
         stubptouterlutnew4_[i] = stubptoutertmp[i+3072];
       }
     }
-    //else { //Split 2 ways for disks
-    //    FIXME put this in
-    //}
+    else { //Split 2 ways for disks
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
+        stubptouterlutnew1_[i] = stubptoutertmp[i];
+        stubptouterlutnew2_[i] = stubptoutertmp[i+1024];
+      }
+    }
 
     idle_ = true;
     }

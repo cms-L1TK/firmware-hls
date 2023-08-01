@@ -1,4 +1,5 @@
 #include "ap_int.h"
+#include "Constants.h"
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion>
 void TC::calculate_LXD1 (
   const typename AllStub<InnerRegion>::ASR r1_input,
@@ -17,6 +18,7 @@ void TC::calculate_LXD1 (
   const TC::Types::zmean  zproj2_input,
   const TC::Types::zmean  zproj3_input,
 
+  bool * const valid_radii,
   TC::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
   TrackletParameters::TPAR * const t_output,
@@ -42,7 +44,6 @@ void TC::calculate_LXD1 (
 {
 #pragma HLS pipeline II=1
 #pragma HLS latency max=25
-
 //
 // calculating rinv_final
 //
@@ -59,7 +60,8 @@ const ap_int<18> phi2 = ap_int<18>(phi2_input)<<3;
 // units 2^(0)Kphi^(1)	7.84121e-06
 const ap_int<18> phi1 = ap_int<18>(phi1_input)<<3;
 // units 2^(0)Kr^(1)	0.0292969
-const ap_int<13> r2 = ap_int<13>(r2_input);
+const ap_int<13> r2 = ap_uint<12>(r2_input); //cast r2 as unsigned since all disk radii are positive only
+std::cout<< "r1 phi1 z1: "<<r1<<" " <<phi1_input<< " "<<z1_input<<"r2 phi2 z2: "<<" " <<phi2_input<< " "<<z2_input;
 //
 // STEP 1
 
@@ -74,48 +76,50 @@ const ap_int<16> dphi = phi2 - phi1;
 const ap_int<11> dr = r2 - r1abs;
 //
 // STEP 3
+//protection from wrong radii
+*valid_radii = dr > (floatToInt(1.5,kr)); //FIXME this 1.5 is a magic number in emulation too
 
-bool negZ = z2mean_input<0;
-std::cout<<"negz: "<<negZ<< "dr: "<<dr<<std::endl;
+bool negZ = z2mean_input<=0;
 
-ap_int<18> drinv;
+ap_int<19> drinv;
 const ap_uint<11> addr_drinv = dr & 2047; // address for the LUT
+std::cout<<"negZ dr: "<<negZ<<" "<<dr<<" "<<std::endl;
 switch (Seed){
   case(TF::L1D1):
-  if (negZ){
-    static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L1B1_drinv.tab")
-  #  include "../emData/LUTs/TC_L1B1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
-  else{
-    static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L1F1_drinv.tab")
-  #  include "../emData/LUTs/TC_L1F1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
+    if (negZ){
+      static const ap_int<19> LUT_drinv[2048] = {
+    #if __has_include("../emData/LUTs/TC_L1B1_drinv.tab")
+    #  include "../emData/LUTs/TC_L1B1_drinv.tab"
+    #endif
+      };
+      drinv = LUT_drinv[addr_drinv];
+    }
+    else{
+      static const ap_int<19> LUT_drinv[2048] = {
+    #if __has_include("../emData/LUTs/TC_L1F1_drinv.tab")
+    #  include "../emData/LUTs/TC_L1F1_drinv.tab"
+    #endif
+      };
+      drinv = LUT_drinv[addr_drinv];
+    }
   break;
   case(TF::L2D1):
-  if (negZ){
-    static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L2B1_drinv.tab")
-  #  include "../emData/LUTs/TC_L2B1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
+    if (negZ){
+      static const ap_int<19> LUT_drinv[2048] = {
+    #if __has_include("../emData/LUTs/TC_L2B1_drinv.tab")
+    #  include "../emData/LUTs/TC_L2B1_drinv.tab"
+    #endif
+      };
+      drinv = LUT_drinv[addr_drinv];
+    }
   else{
-    static const ap_int<18> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L2F1_drinv.tab")
-  #  include "../emData/LUTs/TC_L2F1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
+      static const ap_int<19> LUT_drinv[2048] = {
+    #if __has_include("../emData/LUTs/TC_L2F1_drinv.tab")
+    #  include "../emData/LUTs/TC_L2F1_drinv.tab"
+    #endif
+      };
+      drinv = LUT_drinv[addr_drinv];
+    }
   break;
 }
 //
@@ -170,6 +174,8 @@ const ap_int<18> rinv = rinv_tmp >> 14;
 
 // 17 bits 	 2^(-8)Kphi^(1)Kr^(-1)	1.04549e-06
 const ap_int<17> rinv_final = rinv >> 1;
+std::cout<< "rinv :" <<rinv_final;
+
 //
 // calculating phi0_final
 //
@@ -299,7 +305,7 @@ const ap_int<18> t = t_tmp >> 13;
 // STEP 11
 
 // 13 bits 	 2^(-10)Kr^(-1)Kz^(1)	0.00195312
-const ap_int<13> t_final = t>>5;
+const ap_int<14> t_final = t>>5;
 //
 // calculating z0_final
 //

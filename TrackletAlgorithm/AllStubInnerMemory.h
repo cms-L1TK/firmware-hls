@@ -131,7 +131,7 @@ public:
   typedef ap_uint<AllStubInnerBase<ASType>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<ASType>::kASNegDiskSize> ASNEGDISK;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize> AllStubInnerData;
-  typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize-AllStubInnerBase<ASType>::kAllStubInnerSize> AllStubData;
+  typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASNegDiskSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
 
   // Constructors
   AllStubInner(const AllStubInnerData& newdata):

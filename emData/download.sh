@@ -316,11 +316,14 @@ do
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then
-          seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
+          seed=`echo ${module} | sed "s/.*_\([L|D][1-6][L|D][1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "TP_${seed}.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TC_${seed}_invt.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TC_${seed}_drinv.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
