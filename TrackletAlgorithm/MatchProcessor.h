@@ -250,7 +250,9 @@ void readTable(ap_uint<1> table[]){
 template< int width >
 ap_uint<width> iabs( ap_int<width> value )
 {
-  ap_uint<width> absval = value < 0 ? ap_uint<width>(-value) : ap_uint<width>(value);
+  ap_uint<width> absval;
+  if (value < 0) absval = -value;
+  else           absval = value;
   return absval;
 };
 
@@ -1073,27 +1075,45 @@ void MatchCalculator(BXType bx,
   //-------------------------------------- BEST MATCH LOGIC BLOCK ---------------------------------------------
   //-----------------------------------------------------------------------------------------------------------
   
-  savedMatch = newtracklet ? ap_uint<1>(0) : savedMatch;
+  if (newtracklet) {
+    savedMatch = 0;
+  }
   
   // For first tracklet, pick up the phi cut value
   best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
   best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
-  best_delta_rphi = newtracklet ? (isPSStub ? LUT_matchcut_PSrphi[proj_seed] : LUT_matchcut_2Srphi[proj_seed]) : best_delta_rphi;
-  best_delta_r = newtracklet ? (isPSStub ? LUT_matchcut_PSr[proj_seed] : LUT_matchcut_2Sr[proj_seed]) : best_delta_r;
+  if(newtracklet) {
+    if(isPSStub) {
+      best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
+      best_delta_r = LUT_matchcut_PSr[proj_seed];
+    }
+    else  {
+      best_delta_rphi = LUT_matchcut_2Srphi[proj_seed];
+      best_delta_r = LUT_matchcut_2Sr[proj_seed];
+    }
+  }
 
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi < best_delta_phi);
   bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(disk_stubr2s)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
   disk_match = isMatch ? disk_match && (abs_delta_phi < best_delta_phi) : disk_match;
   isMatch |= disk_match;
-  // Update values of best phi parameters, so that the next match
-  // will be compared to this value instead of the original selection cut
-  best_delta_rphi = (isDisk && disk_match) ? ap_uint<MC::LUT_matchcut_rphi_width>(isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * disk_stubr2s) : best_delta_rphi;
-  best_delta_r    = (isDisk && disk_match) ?  ap_uint<MC::LUT_matchcut_r_width>(abs_delta_r) : best_delta_r;
-  best_delta_phi =  ((isDisk && disk_match) || (!isDisk && barrel_match)) ? ap_uint<MC::LUT_matchcut_phi_width>(abs_delta_phi) : best_delta_phi;
-  best_delta_z    = (!isDisk && barrel_match) ?  ap_uint<MC::LUT_matchcut_z_width>(delta_z_fact) : best_delta_z;
-  goodmatch = ((!isDisk && barrel_match) || (isDisk && disk_match)) ? true : goodmatch;
-   
+  if ((!isDisk && barrel_match) || (isDisk && disk_match)){
+    // Update values of best phi parameters, so that the next match
+    // will be compared to this value instead of the original selection cut
+    if(isDisk) {
+      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * disk_stubr2s;
+      best_delta_r    = abs_delta_r;
+      best_delta_phi = abs_delta_phi;
+    }
+    else {
+      best_delta_z = iabs<14>(delta_z_fact);
+      best_delta_phi = abs_delta_phi;
+    }
+
+    // Store bestmatch
+    goodmatch = true;
+  }
 
   if(goodmatch) { // Write out only the best match, based on the seeding 
     switch (proj_seed) {
