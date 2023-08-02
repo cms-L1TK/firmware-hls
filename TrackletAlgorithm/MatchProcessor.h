@@ -1205,7 +1205,6 @@ void MatchProcessor(BXType bx,
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
   ap_uint<nINMEM> mem_hasdata = 0;
-#pragma HLS dependence variable=mem_hasdata inter RAW true
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
