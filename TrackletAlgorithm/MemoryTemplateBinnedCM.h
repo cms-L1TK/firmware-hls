@@ -39,14 +39,15 @@ class MemoryTemplateBinnedCM{
     kNSlots = 1<<NBIT_BIN,
     kNMemDepth = 1<<NBIT_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
-    slots = (1<<(NBIT_BX+1))*8+kNBitsphibinCM,
-    entries8 = 32//8*(NBIT_ADDR-NBIT_BIN)+4
+    kNBinsRZ = (1<<kNBitsRZBinCM),
+    slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM)),
+    entries8 = 32
   };
 
   DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
 
-  ap_uint<8> binmask8_[kNBxBins][(1<<NBIT_BIN)/8];
-  ap_uint<32> nentries8_[kNBxBins][(1<<NBIT_BIN)/8];
+  ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
+  ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<entries8> nentries8A_[slots];
   ap_uint<entries8> nentries8B_[slots];
   
@@ -94,7 +95,7 @@ class MemoryTemplateBinnedCM{
     return nentries8_[bx][ibin];
   }
 
-  ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<3> ibin) const {
+  ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
     #pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
     return binmask8_[bx][ibin];
   }
@@ -161,8 +162,8 @@ class MemoryTemplateBinnedCM{
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
       #endif
 
@@ -203,9 +204,9 @@ class MemoryTemplateBinnedCM{
         nentries8_[ibx][ibin] = 0;
         binmask8_[ibx][ibin] = 0;
       }
-      for (unsigned int ibin = 0; ibin < kNBxBins*8; ++ibin) {
-        nentries8A_[ibx*8+ibin] = 0;
-        nentries8B_[ibx*8+ibin] = 0;
+      for (unsigned int i = 0; i < slots; ++i) {
+        nentries8A_[i] = 0;
+        nentries8B_[i] = 0;
       }
     }
   }
@@ -244,8 +245,8 @@ class MemoryTemplateBinnedCM{
     #ifndef CMSSW_GIT_HASH
     if (success) {
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8A_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      nentries8B_[ibx*8+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
     }
     #endif

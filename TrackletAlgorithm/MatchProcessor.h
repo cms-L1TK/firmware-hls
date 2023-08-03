@@ -1190,7 +1190,6 @@ void MatchProcessor(BXType bx,
 ){
 #pragma HLS inline
 
-  
   using namespace PR;
   constexpr regionType APTYPE = TF::layerDiskType[LAYER];
 
@@ -1231,6 +1230,15 @@ void MatchProcessor(BXType bx,
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
+
+  ap_uint<8> vmstubsmask[16];
+#pragma HLS array_partition variable=vmstubsmask complete dim=1
+
+ entriesloop:for(unsigned int i=0; i<16; i++) {
+#pragma HLS unroll
+    vmstubsmask[i]=instubdata.getBinMask8(bx,i);
+  }
+
 
   constexpr int nPRBAbits = 3;
   ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
@@ -1288,6 +1296,7 @@ void MatchProcessor(BXType bx,
   constexpr int BIN_ADDR_WIDTH = 4;
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
+
     if (hasMatch)
       matchengine[bestiMEU].advance();
 
@@ -1527,14 +1536,20 @@ void MatchProcessor(BXType bx,
       auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<kNbitsrzbinMP> ibin;
       ap_uint<kNbitsphibin> ireg;
+
       (ireg,ibin)=ivmMinus*nbins + slot;
-      ap_uint<4> nstubfirstMinus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
-      (ireg,ibin)=ivmMinus*nbins + slot + 1;
-      ap_uint<4> nstublastMinus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
+      ap_uint<7> addA = (bx&3)*nbins+ibin;
+      ap_uint<32> nentriesA = instubdata.get_mem_entries8A()[addA];
+      ap_uint<4> nstubfirstMinus = nentriesA.range(ireg*4+3,ireg*4);
       (ireg,ibin)=ivmPlus*nbins + slot;
-      ap_uint<4> nstubfirstPlus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);
+      ap_uint<4> nstubfirstPlus = nentriesA.range(ireg*4+3,ireg*4);
+
+      (ireg,ibin)=ivmMinus*nbins + slot + 1;
+      ap_uint<7> addB = (bx&3)*nbins+ibin;
+      ap_uint<32> nentriesB = instubdata.get_mem_entries8B()[addB];
+      ap_uint<4> nstublastMinus = nentriesB.range(ireg*4+3,ireg*4);
       (ireg,ibin)=ivmPlus*nbins + slot + 1;
-      ap_uint<4> nstublastPlus = instubdata.get_mem_entries8A()[(bx&3)*NUM_PHI_BINS+ibin].range(ireg*4+3,ireg*4);      
+      ap_uint<4> nstublastPlus = nentriesB.range(ireg*4+3,ireg*4);      
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
         nstublastPlus = 0;
@@ -1554,10 +1569,11 @@ void MatchProcessor(BXType bx,
                     projdata_.getZ(), projdata_.getPhiDer(), projdata_.getRZDer());
 
       ap_uint<1> useSecond = zbin.range(0,0) == 1;
-      ap_uint<1> usefirstMinus = nstubfirstMinus != 0;
-      ap_uint<1> usesecondMinus = useSecond && (nstublastMinus != 0);
-      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && (nstubfirstPlus != 0);
-      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && (nstublastPlus != 0);
+
+      ap_uint<1> usefirstMinus = vmstubsmask[slot][ivmMinus];
+      ap_uint<1> usesecondMinus = useSecond && vmstubsmask[slot+1][ivmMinus];
+      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && vmstubsmask[slot][ivmPlus];
+      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && vmstubsmask[slot+1][ivmPlus];
 
       ap_uint<4> mask = (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus);
       ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, trackletid, mask, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
