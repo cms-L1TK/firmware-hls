@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_220523 ####
+#### fw_synch_230620 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/pmcFjHWj2oPgESW/MemPrints.tar.gz"
-luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/i0kr2DI0SFY5m1A/LUTs.tar.gz"
+memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/H6ICoefkQU7Lzy5/MemPrints.tar.gz"
+luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/h1x7phQ9EKvj7gx/LUTs.tar.gz"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/6pM48rxtsxrN9tg/MemPrints.tar.gz"
-luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/U84ZI1vGnVKkQKc/LUTs.tar.gz"
+memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/s7nv7Qy2tiKKX3m/MemPrints.tar.gz"
+luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/uYQJKob271Lwq0i/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/s/xvgZRcVIfmvDgbe/download"
-luts_url_cm="https://cernbox.cern.ch/s/WSzRJvtSTBcpjhE/download"
-# Reduced Combined modules                                                      
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
-luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/ZBDuNJHAnRFt7X0/MemPrints.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/2aoxmZbYPFk4Jut/LUTs.tar.gz"
+# Reduced Combined modules
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/U2xZnaexKwmmJn8/MemPrints.tar.gz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY9VJZjEc/LUTs.tar.gz"
 # Reduced Combined modules2
-memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced2_220829.tgz"
-luts_url_cm2="https://jafan.web.cern.ch/jafan/HLSFiles/LUTs_CombinedReduced2_230201.tgz"
+memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
+luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -131,7 +131,7 @@ mkdir -p ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TB.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
-### reduced combined config                                                                                                                    
+### reduced combined config
 mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig

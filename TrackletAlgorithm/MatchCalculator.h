@@ -1189,10 +1189,13 @@ void MatchCalculator(BXType bx,
 
     // For first tracklet, pick up the phi cut value
     best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
-    best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
+
+    if (newtracklet) {
+      best_delta_phi = LUT_matchcut_phi[proj_seed];
+    }
 
     // Check that matches fall within the selection window of the projection
-    if ((delta_z_fact < LUT_matchcut_z[proj_seed]) && (delta_z_fact >= -LUT_matchcut_z[proj_seed]) && (abs_delta_phi <= best_delta_phi)){
+    if ((delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi <= best_delta_phi)){
       // Update values of best phi parameters, so that the next match
       // will be compared to this value instead of the original selection cut
       if(isDisk) {
