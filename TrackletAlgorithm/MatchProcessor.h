@@ -1542,6 +1542,7 @@ void MatchProcessor(BXType bx,
       constexpr bool isDisk = LAYER > TF::L6;
       auto first = !isDisk ? zfirst : rfirst;
       auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
+      auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
@@ -1556,6 +1557,14 @@ void MatchProcessor(BXType bx,
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstublastPlus = entries_zlast[ivmPlus];
+      if (ivmMinus==ivmPlus) {
+        nstubfirstPlus = 0;
+        nstublastPlus = 0;
+      }
+      if (zfirst==zlast) {
+        nstublastMinus = 0;
+        nstublastPlus = 0;
+      }
       
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
