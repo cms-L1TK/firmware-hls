@@ -370,10 +370,10 @@ Build the tracklet chain in EMP.
 
 Currently the supported chain configurations for EMP builds are:
 
-* **Skinny Chain**
+* **Skinny Chain (non-combined modules)**
   * InputRouter to KalmanFilter
-    * Target: Apollo VU7P
-    * Path: `IntegrationTests/ReducedConfig/IRtoKF`
+    * Target = Apollo VU7P
+    * EMP build path = `IntegrationTests/ReducedConfig/IRtoKF`
     
 * **Some info**
 
