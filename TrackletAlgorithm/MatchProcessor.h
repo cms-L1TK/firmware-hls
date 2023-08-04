@@ -1081,8 +1081,11 @@ void MatchCalculator(BXType bx,
   
   // For first tracklet, pick up the phi cut value
   best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
-  best_delta_phi = (newtracklet)? LUT_matchcut_phi[proj_seed] : best_delta_phi;
   if(newtracklet) {
+    //Initialize to LUT value +1. We accept matches with delta phi <= LUT value, but
+    //if we have multiple matches we only take a new, better, match if < old value. So
+    //by initializing to LUT+1 we can always use < in the test if we have a (better) match.
+    best_delta_phi = LUT_matchcut_phi[proj_seed]+1;
     if(isPSStub) {
       best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
       best_delta_r = LUT_matchcut_PSr[proj_seed];
@@ -1539,6 +1542,7 @@ void MatchProcessor(BXType bx,
       constexpr bool isDisk = LAYER > TF::L6;
       auto first = !isDisk ? zfirst : rfirst;
       auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
+      auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
@@ -1553,6 +1557,14 @@ void MatchProcessor(BXType bx,
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstublastPlus = entries_zlast[ivmPlus];
+      if (ivmMinus==ivmPlus) {
+        nstubfirstPlus = 0;
+        nstublastPlus = 0;
+      }
+      if (zfirst==zlast) {
+        nstublastMinus = 0;
+        nstublastPlus = 0;
+      }
       
       ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
