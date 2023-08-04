@@ -9,14 +9,14 @@ luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/h1x7phQ9EKvj7gx/LU
 memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/s7nv7Qy2tiKKX3m/MemPrints.tar.gz"
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/uYQJKob271Lwq0i/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/s/xvgZRcVIfmvDgbe/download"
-luts_url_cm="https://cernbox.cern.ch/s/WSzRJvtSTBcpjhE/download"
-# Reduced Combined modules                                                      
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced_220807.tgz"
-luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CombinedReduced_220807.tgz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/ZBDuNJHAnRFt7X0/MemPrints.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/2aoxmZbYPFk4Jut/LUTs.tar.gz"
+# Reduced Combined modules
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/U2xZnaexKwmmJn8/MemPrints.tar.gz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY9VJZjEc/LUTs.tar.gz"
 # Reduced Combined modules2
-memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CombinedReduced2_220829.tgz"
-luts_url_cm2="https://jafan.web.cern.ch/jafan/HLSFiles/LUTs_CombinedReduced2_230201.tgz"
+memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
+luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
