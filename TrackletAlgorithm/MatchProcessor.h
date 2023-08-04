@@ -1081,11 +1081,11 @@ void MatchCalculator(BXType bx,
   
   // For first tracklet, pick up the phi cut value
   best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
+  //Initialize to LUT value +1. We accept matches with delta phi <= LUT value, but
+  //if we have multiple matches we only take a new, better, match if < old value. So
+  //by initializing to LUT+1 we can always use < in the test if we have a (better) match.
+  best_delta_phi = (newtracklet)? ap_uint<MC::LUT_matchcut_phi_width>(LUT_matchcut_phi[proj_seed]+1) : best_delta_phi;
   if(newtracklet) {
-    //Initialize to LUT value +1. We accept matches with delta phi <= LUT value, but
-    //if we have multiple matches we only take a new, better, match if < old value. So
-    //by initializing to LUT+1 we can always use < in the test if we have a (better) match.
-    best_delta_phi = LUT_matchcut_phi[proj_seed]+1;
     if(isPSStub) {
       best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
       best_delta_r = LUT_matchcut_PSr[proj_seed];
