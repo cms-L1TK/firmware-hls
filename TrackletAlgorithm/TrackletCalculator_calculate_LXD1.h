@@ -1,3 +1,7 @@
+//
+// This code is auto generated in the emulation by imath and should
+// not be modified
+//
 #include "ap_int.h"
 #include "Constants.h"
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion>

@@ -10,7 +10,7 @@
 // Inline function to convert floating point values to integers, given a
 // digitization constant. The 1.0e-1 is a fudge factor needed to get the
 // floating point truncation to agree exactly with the emulation.
-inline const int floatToInt(const double x, const double k) {
+inline constexpr int floatToInt(const double x, const double k) {
   return static_cast<int>(x / k + 1.0e-1);
 }
 

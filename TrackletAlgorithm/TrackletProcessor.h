@@ -75,6 +75,15 @@ namespace TC {
   static const uint32_t mask_D4 = 0xF << shift_D4;
   static const uint32_t mask_D5 = 0xF << shift_D5;
 
+  constexpr int itcut = floatToInt(1.0, kt);
+  constexpr int irinvcut = floatToInt(rinvcut, krinv);
+  constexpr int iz0cut = floatToInt(z0cut, kz0);
+  constexpr int izmaxcut = floatToInt(zlength, kz); 
+  constexpr int irprojmincut = floatToInt(rmindisk, krprojdisk); 
+  constexpr int irprojmaxcut = floatToInt(rmaxdisk, krprojdisk); 
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,8 +380,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
       der_rD
   );
 
-  //return false; //ryd
-
 // Determine which layer projections are valid.
   valid_proj: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
@@ -384,7 +391,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
     valid_proj[i] = valid_zmin && valid_zmax && valid_phimax && valid_phimin;
 
-    if (rproj[i] < 2048) {
+    if (rproj[i] < irprojmaxcut) {
       phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
       if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
         phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
@@ -396,10 +403,10 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // Determine which disk projections are valid.
   valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>floatToInt(1.0, kt);
+    bool valid_t=abs(*t)>itcut;
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
-    bool valid_r=rD[i] >= 342 && rD[i] < 2048;
+    bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
 
   }
@@ -509,10 +516,10 @@ TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
 // Determine which disk projections are valid.
   valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>floatToInt(1.0, kt);
+    bool valid_t=abs(*t)>itcut;
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<DISK>::kTProjPhiSize) - 1;
-    bool valid_r=rD[i] >= 342 && rD[i] < 2048;
+    bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
     valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;}
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
@@ -597,7 +604,7 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
 
     valid_proj[i] = valid_zmin && valid_zmax && valid_phimax && valid_phimin;
 
-    if (rproj[i] < 2048) {
+    if (rproj[i] < irprojmaxcut) {
       phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
       if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
         phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
@@ -607,18 +614,19 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
   }
 
 // Determine which disk projections are valid.
-  valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
+ valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>floatToInt(1.0, kt);
+    bool valid_t=abs(*t) > itcut;
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<DISK>::kTProjPhiSize) - 1;
-    bool valid_r=rD[i] >= 342 && rD[i] < 2048;
-    valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;}
+    bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
+    valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
+  }
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
 
-  bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
-  bool valid_z0=abs(*z0) < floatToInt(z0cut, kz0) ;
+  bool valid_rinv=abs(*rinv) < irinvcut;
+  bool valid_z0=abs(*z0) < iz0cut;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
@@ -642,13 +650,15 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 
 // Reject projections with extreme r/z values.
   if (TProjType != DISK) {
-    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
+    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1)))) {
       proj_success = false;
-    if (abs(proj.getZ()) > 2048)
+    }
+    if (abs(proj.getZ()) > izmaxcut) {
       proj_success = false;
+    }
   }
   else {
-    if (proj.getR() < floatToInt(20.0, 2*kr) || proj.getR() >= floatToInt(120.0, 2*kr))
+    if (proj.getR() < irprojmincut || proj.getR() >= irprojmaxcut)
       proj_success = false;
   }
   TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);

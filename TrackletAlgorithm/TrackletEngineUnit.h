@@ -36,6 +36,11 @@ class TrackletEngineUnit {
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 
+   //
+   // The multiple copies 1_, 2_, .. _4 of the LUTs is due to an 
+   // HLS limit where we can only have 1024 entries and we work 
+   // around this by having four separate LUTs.
+   //
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew1_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew2_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew3_ complete dim=1
