@@ -972,8 +972,8 @@ void MatchCalculator(BXType bx,
   // Use the stub and projection indices to pick up the stub and projection
 
   AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
-  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allstub->read_mem(bx,stubid).raw());
-  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allstub->read_mem(bx,stubid).raw());
+  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(stub.raw());
+  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 
   constexpr bool isDisk = LAYER >= TF::D1;
   // Stub parameters
@@ -1081,11 +1081,11 @@ void MatchCalculator(BXType bx,
   
   // For first tracklet, pick up the phi cut value
   best_delta_z = (newtracklet)? LUT_matchcut_z[proj_seed] : best_delta_z;
+  //Initialize to LUT value +1. We accept matches with delta phi <= LUT value, but
+  //if we have multiple matches we only take a new, better, match if < old value. So
+  //by initializing to LUT+1 we can always use < in the test if we have a (better) match.
+  best_delta_phi = (newtracklet)? ap_uint<MC::LUT_matchcut_phi_width>(LUT_matchcut_phi[proj_seed]+1) : best_delta_phi;
   if(newtracklet) {
-    //Initialize to LUT value +1. We accept matches with delta phi <= LUT value, but
-    //if we have multiple matches we only take a new, better, match if < old value. So
-    //by initializing to LUT+1 we can always use < in the test if we have a (better) match.
-    best_delta_phi = LUT_matchcut_phi[proj_seed]+1;
     if(isPSStub) {
       best_delta_rphi = LUT_matchcut_PSrphi[proj_seed];
       best_delta_r = LUT_matchcut_PSr[proj_seed];
@@ -1208,7 +1208,6 @@ void MatchProcessor(BXType bx,
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
   ap_uint<nINMEM> mem_hasdata = 0;
-#pragma HLS dependence variable=mem_hasdata inter RAW true
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
 
@@ -1291,6 +1290,7 @@ void MatchProcessor(BXType bx,
   ap_uint<1> isMatch = 0;
   ap_uint<1> hasMatch = 0;
   ap_uint<2> bestiMEU = 0;
+  bool increase = false;
 
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
@@ -1302,6 +1302,11 @@ void MatchProcessor(BXType bx,
 
     if (hasMatch)
       matchengine[bestiMEU].advance();
+
+      if (increase) {
+        projbufferarray.incProjection();
+        increase = false;
+      }
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
@@ -1535,24 +1540,24 @@ void MatchProcessor(BXType bx,
       ///////////////
       // VMProjection
       constexpr bool isDisk = LAYER > TF::L6;
-      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
+      auto first = !isDisk ? zfirst : rfirst;
+      auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
       auto slot = zbin.range(zbin.length()-1, 1);
-      ap_uint<kNbitsrzbinMP> ibin;
-      ap_uint<kNbitsphibin> ireg;
+      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks
+      ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
+#pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
+      ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
+#pragma HLS ARRAY_PARTITION variable=entries_zlast dim=0 complete
 
-      (ireg,ibin)=ivmMinus*nbins + slot;
-      ap_uint<7> addA = (bx&3)*nbins+ibin;
-      ap_uint<32> nentriesA = instubdata.get_mem_entries8A()[addA];
-      ap_uint<4> nstubfirstMinus = nentriesA.range(ireg*4+3,ireg*4);
-      (ireg,ibin)=ivmPlus*nbins + slot;
-      ap_uint<4> nstubfirstPlus = nentriesA.range(ireg*4+3,ireg*4);
-
-      (ireg,ibin)=ivmMinus*nbins + slot + 1;
-      ap_uint<7> addB = (bx&3)*nbins+ibin;
-      ap_uint<32> nentriesB = instubdata.get_mem_entries8B()[addB];
-      ap_uint<4> nstublastMinus = nentriesB.range(ireg*4+3,ireg*4);
-      (ireg,ibin)=ivmPlus*nbins + slot + 1;
-      ap_uint<4> nstublastPlus = nentriesB.range(ireg*4+3,ireg*4);      
+      for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
+#pragma HLS unroll
+        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*nbins+first].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*nbins+last].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+      }
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
+      ap_uint<BIN_ADDR_WIDTH> nstublastPlus = entries_zlast[ivmPlus];
       if (ivmMinus==ivmPlus) {
         nstubfirstPlus = 0;
         nstublastPlus = 0;
@@ -1561,9 +1566,8 @@ void MatchProcessor(BXType bx,
         nstublastMinus = 0;
         nstublastPlus = 0;
       }
-
-      ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
+      ap_uint<16> nstubs=(nstublastPlus, nstubfirstPlus, nstublastMinus, nstubfirstMinus);
       
                                                                                  // We dont keep track of the index, so just use 0
       VMProjection<VMPTYPE> vmproj = (VMPTYPE == BARREL) ? VMProjection<VMPTYPE>(0, zbin, finez, finephi, rinv, psseed) : VMProjection<VMPTYPE>(0, zbin, finez, finephi, rinv);
@@ -1578,13 +1582,11 @@ void MatchProcessor(BXType bx,
       ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && vmstubsmask[slot][ivmPlus];
       ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && vmstubsmask[slot+1][ivmPlus];
 
-      ap_uint<4> mask = (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus);
-      ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, trackletid, mask, nstubs, zfirst, vmproj, psseed, usefirstMinus, usesecondMinus, usefirstPlus, usesecondPlus);
-      projbufferarray.saveProjection(projbuffertmp);
+      increase = usefirstPlus || usesecondPlus || usefirstMinus || usesecondMinus;
 
-      if (usefirstPlus || usesecondPlus || usefirstMinus || usesecondMinus) {
-        projbufferarray.incProjection();
-      }
+      ap_uint<4> mask = (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus);
+      ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, trackletid, mask, nstubs, zfirst, vmproj, psseed);
+      projbufferarray.saveProjection(projbuffertmp);
       
     } // end if(validin)
 

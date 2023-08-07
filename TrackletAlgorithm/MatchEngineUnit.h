@@ -49,6 +49,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 #pragma HLS inline
     writeindex_ = 0;
     readindex_ = 0;
+    readindexnext = 1;
     stubmask_ = 0;
     nstubs_ = 0;
     idle_ = true;
@@ -70,6 +71,11 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   phiProjBin_ = projbuffer.getPhiProjBin();
   stubmask_ = projbuffer.getMaskStubs();
+  ap_uint<1> usefirstMinus;
+  ap_uint<1> usesecondMinus;
+  ap_uint<1> usefirstPlus;
+  ap_uint<1> usesecondPlus;
+  (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus) = stubmask_;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
   second_ = index[0];
@@ -81,10 +87,6 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   good__ = false;
 
   iuse_ = 0;
-  bool usefirstMinus = projbuffer_.getUseFirstMinus();
-  bool usesecondMinus = projbuffer_.getUseSecondMinus();
-  bool usefirstPlus = projbuffer_.getUseFirstPlus();
-  bool usesecondPlus = projbuffer_.getUseSecondPlus();
 #pragma HLS ARRAY_PARTITION variable=use_ dim=0 complete
   clearuse: for(int iuse = 0; iuse < kNuse; iuse++) {
 #pragma HLS unroll
@@ -128,10 +130,6 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
   constexpr regionType APTYPE = TF::layerDiskRegion[LAYER];
   int sign = isDisk ? (projbuffer_.getPhiDer() < 0 ? -1 : 1) : 0;
-  bool usefirstMinus = use_[iusetmp] == 0;
-  bool usesecondMinus = use_[iusetmp] == 2;
-  bool usefirstPlus = use_[iusetmp] == 1;
-  bool usesecondPlus = use_[iusetmp] == 3;
 
   if(istub_ == 0) {
      
@@ -165,33 +163,26 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   //Read stub memory and extract data fields
   auto stubadd=(slot,istubtmp);
   stubdata__ = stubmem[bx_&3][stubadd];
-   
-   if (good__) {
-    if (istubtmp+1>=nstubs_) {
-      iuse_++;
-      istub_ = 0;
-      auto nstubstmp = nstubs_;
-      if (!stubmask_ && iusetmp+1 >= nuse_) {
-        idle_ = true;
-      }
-      else if (stubmask_) {
-           ap_uint<2> index = __builtin_ctz(stubmask_);
-           stubmask_[index]=0;
-           second_ =  index[0];
-           phiPlus_ =  index[1];
-           nstubs_ = nstubsall_[index];
-      }
-      if(iusetmp+1 < nuse_) {
-        istub_ = 0;
-      }
-      else {
-           iuse_ = 0;
-      }
-    } else {
-      istub_++;
-     }
-   }
 
+  ap_uint<2> index = __builtin_ctz(stubmask_);
+  bool istub_done = istubtmp+1>=nstubs_;
+  bool iuse_done = iusetmp+1>=nuse_;
+  ap_uint<2> iusenext = iuse_ + 1;
+  NSTUB istubnext = istub_ + 1;
+  bool finished = !stubmask_ && iusetmp+1 >= nuse_;
+
+  iuse_ = (good__ && istub_done) ? iusenext : iuse_;
+  istub_ = (good__ && istub_done) ? NSTUB(0) : istub_;
+  idle_ = (good__ && istub_done && finished) ? true : idle_;
+  phiPlus_ = (good__ && istub_done && !finished && stubmask_) ? index[1] : phiPlus_;
+  nstubs_ = (good__ && istub_done && !finished && stubmask_) ? NSTUBS(nstubsall_[index]) : nstubs_;
+  stubmask_[index] = (good__ && istub_done && !finished && stubmask_) ? ap_uint<1>(0) : stubmask_[index];
+
+  istub_ = (good__ && istub_done && !finished && !stubmask_ && !iuse_done) ? NSTUB(0) : istub_;
+  iuse_ = (good__ && iuse_done && !finished && !stubmask_ && iuse_done) ? ap_uint<2>(0) : iuse_;
+
+  istub_ = (good__ && !istub_done) ? istubnext : istub_;
+   
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
 
@@ -420,13 +411,14 @@ inline MATCH peek() {
  
 inline void advance() {
 #pragma HLS inline  
-  readindex_++;  
+  readindex_ = readindexnext;
+  readindexnext = readindex_+1;  
 }
 
  private:
 
  //Buffers for the matches
- INDEX writeindex_, readindex_;
+ INDEX writeindex_, readindex_, readindexnext;
  MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
  ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
