@@ -71,6 +71,10 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   (nstubsall_[3], nstubsall_[2], nstubsall_[1], nstubsall_[0]) = projbuffer.getNStubs();
   phiProjBin_ = projbuffer.getPhiProjBin();
   stubmask_ = projbuffer.getMaskStubs();
+  ap_uint<1> usefirstMinus;
+  ap_uint<1> usesecondMinus;
+  ap_uint<1> usefirstPlus;
+  ap_uint<1> usesecondPlus;
   (usesecondPlus, usefirstPlus, usesecondMinus, usefirstMinus) = stubmask_;
   ap_uint<2> index = __builtin_ctz(stubmask_);
   stubmask_[index]=0;
@@ -436,10 +440,6 @@ inline void advance() {
  ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;
  bool isPSseed_;
- ap_uint<1> usefirstMinus;
- ap_uint<1> usesecondMinus;
- ap_uint<1> usefirstPlus;
- ap_uint<1> usesecondPlus;
 
  ap_uint<2> iuse_;
  int nuse_;
