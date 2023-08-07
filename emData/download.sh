@@ -9,7 +9,8 @@ luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/h1x7phQ9EKvj7gx/LU
 memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/s7nv7Qy2tiKKX3m/MemPrints.tar.gz"
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/uYQJKob271Lwq0i/LUTs.tar.gz"
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/ZBDuNJHAnRFt7X0/MemPrints.tar.gz"
+# Updated files from Jason for TP disk with extra sign bit for disks in AllInnerStubs memories. This is in cmssw PR #230
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/G0AQPtbx74QMKQh/MemPrints.tar.gz"
 luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/2aoxmZbYPFk4Jut/LUTs.tar.gz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/U2xZnaexKwmmJn8/MemPrints.tar.gz"
@@ -316,11 +317,14 @@ do
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "TP" ]]
   then
-          seed=`echo ${module} | sed "s/.*_\(L[1-6]L[1-6]\).*$/\1/g"`
+          seed=`echo ${module} | sed "s/.*_\([L|D][1-6][L|D][1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "TP_${seed}.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TC_${seed}_invt.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "TC_${seed}_drinv.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
+
   elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
   then
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;

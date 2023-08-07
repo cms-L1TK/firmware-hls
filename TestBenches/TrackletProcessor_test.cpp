@@ -69,6 +69,30 @@ int main()
   const string innerStubPattern = "AllInnerStubs*_L5*";
   const string outerStubPattern = "AllStubs*_L6*";
   const int NTEUnits=3;
+#elif SEED_ == L1D1_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = DISK;
+  const string innerStubPattern = "AllInnerStubs*_L1*";
+  const string outerStubPattern = "AllStubs*_D1*";
+  const int NTEUnits=3;
+#elif SEED_ == L2D1_
+  const auto InnerStubType = BARRELPS;
+  const auto OuterStubType = DISK;
+  const string innerStubPattern = "AllInnerStubs*_L2*";
+  const string outerStubPattern = "AllStubs*_D1*";
+  const int NTEUnits=2;
+#elif SEED_ == D1D2_
+  const auto InnerStubType = DISK;
+  const auto OuterStubType = DISK;
+  const string innerStubPattern = "AllInnerStubs*_D1*";
+  const string outerStubPattern = "AllStubs*_D2*";
+  const int NTEUnits=3;
+#elif SEED_ == D3D4_
+  const auto InnerStubType = DISK;
+  const auto OuterStubType = DISK;
+  const string innerStubPattern = "AllInnerStubs*_D3*";
+  const string outerStubPattern = "AllStubs*_D4*";
+  const int NTEUnits=2;
 #else
   #error "Undefined seed"
 #endif

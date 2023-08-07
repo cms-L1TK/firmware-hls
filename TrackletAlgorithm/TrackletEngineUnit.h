@@ -14,11 +14,13 @@ class TrackletEngineUnit {
     kNBitsRZBin=3,
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
-    kNBitsPTLutInner=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
-    kNBitsPTLutOuter=(Seed==TF::L5L6)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
+    kNBitsNegDiskSize=1,
+    kNBitsPTLutInner=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
+    kNBitsPTLutOuter=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
   };
 
   typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
+  typedef ap_uint<kNBitsNegDiskSize> NEGDISK;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;
   typedef ap_uint<kNBitsRZBin> RZBIN;
@@ -34,23 +36,59 @@ class TrackletEngineUnit {
 #pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
 #pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
 
+   //
+   // The multiple copies 1_, 2_, .. _4 of the LUTs is due to an 
+   // HLS limit where we can only have 1024 entries and we work 
+   // around this by having four separate LUTs.
+   //
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew1_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew2_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew3_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew4_ complete dim=1
+
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew1_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew2_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew3_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew4_ complete dim=1
+
 /////  Grabs the appropriate lut based on seed and iTC
 
     const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
     const ap_uint<1>* stubptoutertmp = getPTOuterLUT<Seed,iTC>();
 
-    for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+    if ( Seed <= TF::L5L6 ){
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll
-      stubptinnerlutnew_[i] = stubptinnertmp[i];
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
+        stubptouterlutnew_[i] = stubptoutertmp[i];
+      }
     }
-    for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+//split the LUTs for overlaps/disks Vivado can only handle up to 1024 length LUT
+    else if ( Seed >= TF::D1D2){   //Split 4 ways for overlaps, 2 ways for disks
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll
-      stubptouterlutnew_[i] = stubptoutertmp[i];
-    } 
-
-////
+        stubptinnerlutnew1_[i] = stubptinnertmp[i];
+        stubptinnerlutnew2_[i] = stubptinnertmp[i+1024];
+        if (Seed >= TF::L1D1){
+          stubptinnerlutnew3_[i] = stubptinnertmp[i+2048];
+          stubptinnerlutnew4_[i] = stubptinnertmp[i+3072];
+        }
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
+        stubptouterlutnew1_[i] = stubptoutertmp[i];
+        stubptouterlutnew2_[i] = stubptoutertmp[i+1024];
+        if (Seed >= TF::L1D1){
+          stubptouterlutnew3_[i] = stubptoutertmp[i+2048];
+          stubptouterlutnew4_[i] = stubptoutertmp[i+3072];
+        }
+      }
+    }
     idle_ = true;
-    }
+ }
 
 
  MEMSTUBS nstub16() const {
@@ -127,13 +165,12 @@ void write(STUBID stubs) {
   stubids_[writeindex_++]=stubs;
 }
 
-
  MEMMASK memmask_;
 
  RZBIN rzbin_;
  RZFINE rzbinfirst__, rzbinfirst___;
  RZFINE rzbindiffmax__, rzbindiffmax___;
-
+ RZBIN ibin__, ibin___;
  MEMINDEX lastmemindex;
 
  AllStubInner<innerRegion> innerstub__, innerstub___;
@@ -151,11 +188,23 @@ void write(STUBID stubs) {
  
  NSTUBS istub_;
  STUBID stubids_[1<<kNBitsBuffer];
+ NEGDISK negDisk_[1<<kNBitsBuffer];
 
  int instance_;
 
- ap_uint<1> stubptinnerlutnew_[kNBitsPTLutInner];    
+ ap_uint<1> stubptinnerlutnew_[kNBitsPTLutInner];
  ap_uint<1> stubptouterlutnew_[kNBitsPTLutOuter];
+
+
+ ap_uint<1> stubptinnerlutnew1_[kNBitsPTLutInner];
+ ap_uint<1> stubptinnerlutnew2_[kNBitsPTLutInner];
+ ap_uint<1> stubptinnerlutnew3_[kNBitsPTLutInner];
+ ap_uint<1> stubptinnerlutnew4_[kNBitsPTLutInner];
+
+ ap_uint<1> stubptouterlutnew1_[kNBitsPTLutOuter];
+ ap_uint<1> stubptouterlutnew2_[kNBitsPTLutOuter];
+ ap_uint<1> stubptouterlutnew3_[kNBitsPTLutOuter];
+ ap_uint<1> stubptouterlutnew4_[kNBitsPTLutOuter];
 
 
  private:
