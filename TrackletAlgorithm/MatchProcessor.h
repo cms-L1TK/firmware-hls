@@ -1179,7 +1179,7 @@ constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
 
 //////////////////////////////
 // MatchProcessor
-template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType VMPTYPE, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
+template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
          TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
@@ -1195,6 +1195,7 @@ void MatchProcessor(BXType bx,
 
   using namespace PR;
   constexpr regionType APTYPE = TF::layerDiskType[LAYER];
+  constexpr regionType VMPTYPE = TF::layerDiskRegion[LAYER];
 
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
