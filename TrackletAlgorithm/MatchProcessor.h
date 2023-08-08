@@ -873,7 +873,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool F
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
 #include "MatchProcessor_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& isMatch,
@@ -893,7 +893,7 @@ void MatchCalculator(BXType bx,
                      int &nmcout6,
                      int &nmcout7,
                      int &nmcout8,
-                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
+                     FullMatchMemory<FMTYPE> fullmatch[]
 ){
 
 #pragma HLS inline
@@ -1179,7 +1179,7 @@ constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
 
 //////////////////////////////
 // MatchProcessor
-template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
+template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM,
          TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
@@ -1189,7 +1189,7 @@ void MatchProcessor(BXType bx,
                       const VMStubMEMemoryCM<VMSMEType, kNbitsrzbinMP, kNbitsphibin, kNMatchEngines>& instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       BXType& bx_o,
-                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
+                      FullMatchMemory<FMTYPE> fullmatch[]
 ){
 #pragma HLS inline
 
@@ -1420,7 +1420,7 @@ void MatchProcessor(BXType bx,
       
       lastTrkID = trkindex;
 
-      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
+      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, LAYER, PHISEC>
         (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);

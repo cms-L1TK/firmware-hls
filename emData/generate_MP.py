@@ -207,7 +207,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
            "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
-            "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
+            "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ",\n"
             " TF::" + seed + ", "
             "TF::" + iMP + "> (\n"
             "    bx,\n"
