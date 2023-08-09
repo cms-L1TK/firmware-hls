@@ -1,3 +1,8 @@
+--!
+--! Module that implementes a delay line to be used when
+--! writing to a memory. The delay module delays the write enable,
+--! the address, and the data for a fixed number of clocks.
+--!
 --! Using the IEEE Library
 library IEEE;
 --! Using STD_LOGIC
