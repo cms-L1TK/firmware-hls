@@ -57,6 +57,8 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     good__ = false;
     good___ = false;
     good____ = false;
+    static ap_uint<kNBits_MemAddr> tmp(0);
+    projseqcache_ = ~tmp;
   }
   
 
@@ -110,6 +112,17 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
 
+  if (idle_&&!good__&&!good___) {
+    ap_uint<kNBits_MemAddr> tmp(0);
+    projseqcache_ = ~tmp;
+  } else if (good___) {
+    projseqcache_ =  projseq___;
+  } else if (good__) {
+    projseqcache_ =  projseq__;
+  } else {
+    projseqcache_ =  projseq_;
+  }
+  
   bool nearfull = nearFull();
 
   good__ = (!idle_) && (!nearfull);
@@ -364,20 +377,9 @@ inline typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TRKID get
 
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
-  if (!empty()) {
-    return projseqs_[readindex_];
-  }
-  if (idle_&&!good__&&!good____) {
-    ap_uint<kNBits_MemAddr> tmp(0);
-    return ~tmp;
-  }
-  if (good____) {
-    return projseq____;
-  }
-  if (good__) {
-    return projseq__;
-  } 
-  return projseq_;
+ 
+  return empty()?projseqcache_:projseqs_[readindex_];
+
 }
 
 inline typename VMProjection<VMProjType>::VMPID getProjindex() {
@@ -440,6 +442,7 @@ inline void advance() {
  ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;
  bool isPSseed_;
+ ap_uint<kNBits_MemAddr> projseqcache_;
 
  ap_uint<2> iuse_;
  int nuse_;
