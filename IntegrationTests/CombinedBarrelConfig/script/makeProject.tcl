@@ -144,6 +144,8 @@ add_files -fileset sources_1 [glob ../hdl/SectorProcessorFull.vhd]
 add_files -fileset sources_1 [glob ../hdl/memUtil_pkg.vhd]
 add_files -fileset sources_1 [glob common/hdl/*.vhd]
 remove_files -fileset sources_1 [glob common/hdl/latency_monitor.vhd]
+remove_files -fileset sources_1 [glob common/hdl/tf_mem_new.vhd]
+
 
 # Add HDL for TB
 add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
