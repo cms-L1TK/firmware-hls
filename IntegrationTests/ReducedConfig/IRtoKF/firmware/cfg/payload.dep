@@ -24,28 +24,28 @@ include -c firmware-hls:KalmanFilter/tq components.dep
 include -c firmware-hls:KalmanFilter/common components.dep 
 
 # Surf subset
-src -l surf surf_subset/hdl/AxiStreamMux.vhd
-src -l surf surf_subset/hdl/AxiStreamFifoV2.vhd
-src -l surf surf_subset/hdl/AxiStreamFifo.vhd
-src -l surf surf_subset/hdl/AxiStreamGearbox.vhd
-src -l surf surf_subset/hdl/FifoCascade.vhd
-src -l surf surf_subset/hdl/Fifo.vhd
-src -l surf surf_subset/hdl/FifoSync.vhd
-src -l surf surf_subset/hdl/FifoAsync.vhd
-src -l surf surf_subset/hdl/FifoOutputPipeline.vhd
-src -l surf surf_subset/hdl/FifoWrFsm.vhd
-src -l surf surf_subset/hdl/FifoRdFsm.vhd
-src -l surf surf_subset/hdl/SynchronizerVector.vhd
-src -l surf surf_subset/hdl/SimpleDualPortRam.vhd
-src -l surf surf_subset/hdl/RstSync.vhd
-src -l surf surf_subset/hdl/Synchronizer.vhd
-src -l surf surf_subset/hdl/AxiStreamResizeBE.vhd
-src -l surf surf_subset/hdl/AxiStreamResize.vhd
-src -l surf surf_subset/hdl/AxiStreamPipeline.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamMux.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamFifoV2.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamFifo.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamGearbox.vhd
+src -l surf common/hdl/surf_subset/hdl/FifoCascade.vhd
+src -l surf common/hdl/surf_subset/hdl/Fifo.vhd
+src -l surf common/hdl/surf_subset/hdl/FifoSync.vhd
+src -l surf common/hdl/surf_subset/hdl/FifoAsync.vhd
+src -l surf common/hdl/surf_subset/hdl/FifoOutputPipeline.vhd
+src -l surf common/hdl/surf_subset/hdl/FifoWrFsm.vhd
+src -l surf common/hdl/surf_subset/hdl/FifoRdFsm.vhd
+src -l surf common/hdl/surf_subset/hdl/SynchronizerVector.vhd
+src -l surf common/hdl/surf_subset/hdl/SimpleDualPortRam.vhd
+src -l surf common/hdl/surf_subset/hdl/RstSync.vhd
+src -l surf common/hdl/surf_subset/hdl/Synchronizer.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamResizeBE.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamResize.vhd
+src -l surf common/hdl/surf_subset/hdl/AxiStreamPipeline.vhd
 
-src -l surf surf_subset/pkgs/ArbiterPkg.vhd
-src -l surf surf_subset/pkgs/AxiStreamPkg.vhd
-src -l surf surf_subset/pkgs/StdRtlPkg.vhd
+src -l surf common/hdl/surf_subset/pkgs/ArbiterPkg.vhd
+src -l surf common/hdl/surf_subset/pkgs/AxiStreamPkg.vhd
+src -l surf common/hdl/surf_subset/pkgs/StdRtlPkg.vhd
 
 ################
 # Include Cores
