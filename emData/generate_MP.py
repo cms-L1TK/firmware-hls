@@ -131,7 +131,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
     maxFMMems += str(len(TPMems.keys())) + "] = {"
 
     # Calculate parameters and print out parameters and top function for each MP.
-    for mpName in sorted(TPMems.keys()):
+    for mpName in sorted(TPMems.keys(), key = lambda x: x.startswith('L')):
         seed = re.sub(r"MP_(..)....", r"\1", mpName)
         iMP = re.sub(r"MP_.....(.)", r"\1", mpName)
 
@@ -144,7 +144,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
         maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
-        if mpName != sorted(TPMems.keys())[-1]:
+        if mpName != sorted(TPMems.keys(), key=lambda x: x.startswith('L'))[-1]:
             maxTPMems += ",\n				   "
             maxFMMems += ",\n				   " 
 
