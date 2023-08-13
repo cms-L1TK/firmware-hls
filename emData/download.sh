@@ -82,6 +82,7 @@ then
   wget -O LUTs.tgz --quiet ${luts_url_barrel}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsBarrel
+
   wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMReduced
@@ -252,16 +253,22 @@ fi
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
+mod_types=(IR VMR TE TC PR ME MC FT PD VMRCM TP MP)
+
+for module_type in ${mod_types[@]}
+do
+  echo "PROCESSING TYPE ${module_type}"
+(
+
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}_`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
 for module in ${processing_modules[@]}
 do
   echo ${module}
-  module_type=`echo ${module} | sed "s/^\([^_]*\)_.*$/\1/g"`
   memprint_location="MemPrints"
   memprint_location_reduced="MemPrintsReduced"
   memprint_location_reducedcm="MemPrintsReducedCM"
@@ -345,4 +352,9 @@ do
             find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           done
   fi
-done
+done # loop over module
+) & # Run entire loop as background process, so all loops run in parallel
+done # loop over module_type
+
+# Wait for all background processes to finish.
+wait
