@@ -211,6 +211,11 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     constexpr unsigned int kRInvSteps = 32;
     constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
     
+    static const ap_uint<1 << 2*projfinephibits> phiLUT = isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZBarrelPS = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrelPSMax,true,stubfinephibits,projfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZBarrel2S = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrel2SMax,true,stubfinephibits,projfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZDiskPS = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinephibits,projfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZDisk2S = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinephibits,projfinephibits>();
     bool passphi = phiLUT[(projfinephi____,stubfinephi)];//isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>()[(projfinephi____,stubfinephi)];
     
     //Check if stub z position consistent
@@ -467,11 +472,6 @@ inline void advance() {
  static constexpr int projfinezbits = VMProjectionBase<VMProjType>::kVMProjFineZSize;
  static constexpr int stubfinephibits = VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize;
  static constexpr int stubfinezbits = VMStubMECMBase<VMSMEType>::kVMSMEFineZSize;
- const ap_uint<1 << 2*projfinephibits> phiLUT = isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>();
- const ap_uint<1 << 2*projfinephibits> stubZBarrelPS = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrelPSMax,true,stubfinephibits,projfinephibits>();
- const ap_uint<1 << 2*projfinephibits> stubZBarrel2S = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrel2SMax,true,stubfinephibits,projfinephibits>();
- const ap_uint<1 << 2*projfinephibits> stubZDiskPS = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinephibits,projfinephibits>();
- const ap_uint<1 << 2*projfinephibits> stubZDisk2S = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinephibits,projfinephibits>();
 
 
 #ifndef __SYNTHESIS__
