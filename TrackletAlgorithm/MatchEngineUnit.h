@@ -205,35 +205,34 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
                                                                  ((zbin____ & absz) < 3) || ((zbin____ & absz) == 3 && stubfinez <= 2);
     auto stubbendReduced=stubdata____.getBendPSDisk();
 
-    const int projfinephibits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
-    const int projfinezbits(VMProjectionBase<VMProjType>::kVMProjFineZSize);
-    const int stubfinephibits(VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize);
-    const int stubfinezbits(VMStubMECMBase<VMSMEType>::kVMSMEFineZSize);
     constexpr bool isDisk = LAYER > TF::L6;
 
-	constexpr unsigned int kNBitBin = !isDisk ? 3 : 4;
-	constexpr unsigned int kRInvSteps = 32;
-	constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
+    constexpr unsigned int kNBitBin = !isDisk ? 3 : 4;
+    constexpr unsigned int kRInvSteps = 32;
+    constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
     
-    const int projfinebits(VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize);
-    const int stubfinebits(VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize);
-    bool passphi = isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>()[(projfinephi____,stubfinephi)];
+    static const ap_uint<1 << 2*projfinephibits> phiLUT = isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZBarrelPS = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrelPSMax,true,stubfinephibits,projfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZBarrel2S = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrel2SMax,true,stubfinephibits,projfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZDiskPS = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinephibits,projfinephibits>();
+    static const ap_uint<1 << 2*projfinephibits> stubZDisk2S = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinephibits,projfinephibits>();
+    bool passphi = phiLUT[(projfinephi____,stubfinephi)];//isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>()[(projfinephi____,stubfinephi)];
     
     //Check if stub z position consistent
     bool pass = false;
     if(!isDisk) {
       // check if abs(projfinezadj____ - stubfinez) < StubZPositionBarrelConsistency::kBarrel(PS|2S)Max
-      pass = isPSseed____ ? isLessThanSize<projfinebits,StubZPositionBarrelConsistency::kBarrelPSMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj____)] : isLessThanSize<projfinebits,StubZPositionBarrelConsistency::kBarrel2SMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj____)];
+      pass = isPSseed____ ? stubZBarrelPS[(stubfinez,projfinezadj____)] : stubZBarrel2S[(stubfinez,projfinezadj____)];
     }
     else {
       // check if abs(projfinezadj____ - stubfinez) < StubZPositionBarrelConsistency::kDisk(PS|2S)Max
-      pass = isPSStub ? isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj____)] : isLessThanSize<projfinebits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinebits,projfinebits>()[(stubfinez,projfinezadj____)];
+      pass = isPSStub ? stubZDiskPS[(stubfinez,projfinezadj____)] : stubZDisk2S[(stubfinez,projfinezadj____)];
     }
 
     //here we always use the larger number of bits for the bend
-	// Check if stub bend and proj rinv consistent
-	auto const index_part1 = (VMProjType == DISK && isPSseed____) ? projrinv____.concat(stubbendReduced) : projrinv____.concat(stubbend);
-	auto const index_part2 = ((VMProjType == DISK && isPSseed____) ? (1 << (kRInvBits + kNBitBin)) : 0);
+    // Check if stub bend and proj rinv consistent
+    auto const index_part1 = (VMProjType == DISK && isPSseed____) ? projrinv____.concat(stubbendReduced) : projrinv____.concat(stubbend);
+    auto const index_part2 = ((VMProjType == DISK && isPSseed____) ? (1 << (kRInvBits + kNBitBin)) : 0);
     const ap_int<1> diskps = isDisk && isPSStub;
     auto const index = diskps ? (diskps,projrinv____,stubbendReduced) : (diskps,projrinv____,stubbend);
 
@@ -457,18 +456,22 @@ inline void advance() {
  ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer__, projbuffer____, projbuffer___;
  ap_uint<kNBits_MemAddr> projseq__, projseq___, projseq____;
 
-enum StubZPositionBarrelConsistency {
-  kBarrelPSMax = 1,
-  kBarrel2SMax = 5
-};
- enum StubZPositionDiskConsistency {
-   kDiskPSMax = 1,
-   kDisk2SMax = 3
-};
- enum StubPhiPositionConsistency {
-   kMax = 3
+ enum StubZPositionBarrelConsistency {
+   kBarrelPSMax = 1,
+   kBarrel2SMax = 5
+ };
+  enum StubZPositionDiskConsistency {
+    kDiskPSMax = 1,
+    kDisk2SMax = 3
+ };
+  enum StubPhiPositionConsistency {
+    kMax = 3
  };
 
+ static constexpr int projfinephibits = VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize;
+ static constexpr int projfinezbits = VMProjectionBase<VMProjType>::kVMProjFineZSize;
+ static constexpr int stubfinephibits = VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize;
+ static constexpr int stubfinezbits = VMStubMECMBase<VMSMEType>::kVMSMEFineZSize;
 
 
 #ifndef __SYNTHESIS__
