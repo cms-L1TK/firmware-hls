@@ -3,27 +3,27 @@ set -e
 
 #### fw_synch_230620 ####
 # Standard configuration
-memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/H6ICoefkQU7Lzy5/MemPrints.tar.gz"
-luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/h1x7phQ9EKvj7gx/LUTs.tar.gz"
+memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/5TAFYMplp1HWf8c/MemPrints.tar.gz"
+luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/HMDbKJET05fkvT1/LUTs.tar.gz"
 # Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/s7nv7Qy2tiKKX3m/MemPrints.tar.gz"
-luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/uYQJKob271Lwq0i/LUTs.tar.gz"
+memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/4jZdhxfj02Ie21I/MemPrints.tar.gz"
+luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/mcGz25JNu19Oqzm/LUTs.tar.gz"
 # Combined modules
 # Updated files from Jason for TP disk with extra sign bit for disks in AllInnerStubs memories. This is in cmssw PR #230
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/G0AQPtbx74QMKQh/MemPrints.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/2aoxmZbYPFk4Jut/LUTs.tar.gz"
+memprints_url_cm="FIXME"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/uoKcrxMXtjVHagL/LUTs.tar.gz"
 # Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/U2xZnaexKwmmJn8/MemPrints.tar.gz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/1DGPWhXY9VJZjEc/LUTs.tar.gz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/g0EIkgWgie5mBob/MemPrints.tar.gz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HT8q7fk4UvhpdPK/LUTs.tar.gz"
 # Reduced Combined modules2
-memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/hAQSPKPZDs9BCq9/MemPrints.tar.gz"
-luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/KXjCYaFVkVXwiK3/LUTs.tar.gz"
+memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/VOictG2TTAaWD9c/MemPrints.tar.gz"
+luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/nbz2P7cxAOF15aB/LUTs.tar.gz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
 # e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
-memprints_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/2Ju0bMoBnRK1B8n/MemPrints.tar.gz"
-luts_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/DLJv9VGrjFrZUSQ/LUTs.tar.gz"
+memprints_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/eLA2Tx5nV9gYlco/MemPrints.tar.gz"
+luts_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/kg0KtrYfHKbkqbV/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
