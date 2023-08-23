@@ -1328,7 +1328,7 @@ void MatchProcessor(BXType bx,
 
   MEU_get_trkids: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
-      matchengine[iMEU].set_empty();
+      matchengine[iMEU].setNearFull();
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
@@ -1401,6 +1401,8 @@ void MatchProcessor(BXType bx,
       else if (istep != 0) meu.step(instubdata.getMem(iMEU));
 
       meu.processPipeLine(table[iMEU]);
+      
+      meu.cache();
 
     } //end MEU loop
     

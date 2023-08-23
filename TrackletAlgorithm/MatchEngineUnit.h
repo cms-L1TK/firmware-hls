@@ -10,6 +10,7 @@
 #include "AllStubMemory.h"
 #include "AllProjectionMemory.h"
 #include "FullMatchMemory.h"
+#include "CircularBuffer.h"
 #include <iostream>
 #include <fstream>
 #include <bitset>
@@ -47,9 +48,10 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
   inline void reset() {
 #pragma HLS inline
-    writeindex_ = 0;
-    readindex_ = 0;
-    readindexnext = 1;
+    matchBuffer_.reset();
+//writeindex_ = 0;
+//   readindex_ = 0;
+//  readindexnext = 1;
     stubmask_ = 0;
     nstubs_ = 0;
     idle_ = true;
@@ -248,13 +250,22 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     auto const index = diskps ? (diskps,projrinv____,stubbendReduced) : (diskps,projrinv____,stubbend);
 
     //Check if stub bend and proj rinv consistent
-    projseqs_[writeindex_] = projseq____;
-    matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
-    INDEX writeindexnext = writeindex_ + 1;
+    //projseqs_[writeindex_] = projseq____;
+    //matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
+    //INDEX writeindexnext = writeindex_ + 1;
     
+    matchBuffer_.save( (stubindex,projbuffer____.getAllProj(), projseq____));
+
     //Though we did write to matches_ above only now do we increment
     //the writeindex_ if we had a good stub that pass the various cuts
-    writeindex_ = (good____&passphi&pass&table[index]) ? writeindexnext : writeindex_;
+
+    bool goodMatch = good____&passphi&pass&table[index]; 
+
+    if (goodMatch) {
+      matchBuffer_.inc();
+    }
+
+    //writeindex_ = (good____&passphi&pass&table[index]) ? writeindexnext : writeindex_;
 
     //update pipeline variables
     good____ = good___;
@@ -285,17 +296,17 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
 #endif
 
- inline void set_empty() {
-   empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
- }
-
  inline bool empty() const {
 #pragma HLS inline  
-   return empty_;
+  return matchBuffer_.empty();
+ }
+
+inline void setNearFull() {
+   matchBuffer_.loopInit();
  }
  
  inline bool nearFull() {
-   return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
+   return matchBuffer_.nearFull();
  }
 
  inline bool idle() {
@@ -304,11 +315,11 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
  }
 
  inline INDEX readIndex() const {
-   return readindex_;
+   return  matchBuffer_.readptr();
  }
 
  inline INDEX writeIndex() const {
-   return writeindex_;
+   return matchBuffer_.writeptr();
  }
    
 
@@ -323,7 +334,8 @@ inline typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TCID getT
   if (!empty()) {
     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
     ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
-    (vmstub,allprojdata) = matches_[readindex_];
+    ap_uint<kNBits_MemAddr> projseq;
+    (vmstub,allprojdata,projseq) = matchBuffer_.peek();
     AllProjection<AllProjectionType> allproj(allprojdata);
     return allproj.getTCID();
   }
@@ -348,8 +360,9 @@ inline typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TRKID get
   if (!empty()) {
     ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> vmstub;
     ap_uint<AllProjection<AllProjectionType>::kAllProjectionSize> allprojdata;
-    (vmstub,allprojdata) = matches_[readindex_];
-    AllProjection<AllProjectionType> allproj(allprojdata);
+    ap_uint<kNBits_MemAddr> projseq;
+    (vmstub,allprojdata,projseq) = matchBuffer_.peek(); 
+     AllProjection<AllProjectionType> allproj(allprojdata);
     return (allproj.getTCID(), allproj.getTrackletIndex());
   }
   if (idle_&&!good__&&!good___&&!good____) {
@@ -379,7 +392,10 @@ inline typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TRKID get
 inline ap_uint<kNBits_MemAddr> getProjSeqOld() {
 #pragma HLS inline
   if (!empty()) {
-    return projseqs_[readindex_];
+    MATCH match;
+    ap_uint<kNBits_MemAddr> projseq;
+    (match, projseq) = matchBuffer_.peek();
+    return projseq;
   }
   if (idle_&&!good__&&!good____) {
     ap_uint<kNBits_MemAddr> tmp(0);
@@ -397,8 +413,10 @@ inline ap_uint<kNBits_MemAddr> getProjSeqOld() {
 
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
- 
-  return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
+  MATCH match;
+  ap_uint<kNBits_MemAddr> projseq;
+  (match, projseq) = matchBuffer_.peek();
+  return empty()?(good____?projseq____:projseqcache_):projseq;
 
 }
 
@@ -421,28 +439,37 @@ inline int getIPhi() {
   return iphi_;
 }
 
-inline MATCH read() {
-#pragma HLS inline  
-  return matches_[readindex_++];
-}
+  //inline MATCH read() {
+  //#pragma HLS inline  
+  // return matches_[readindex_++];
+  //}
 
 inline MATCH peek() {
 #pragma HLS inline  
-  return matches_[readindex_];
+  ap_uint<kNBits_MemAddr> projseq;
+  MATCH match;
+  (match, projseq) = matchBuffer_.peek();
+  return match;
 }
  
 inline void advance() {
+#pragma HLS inline
+  matchBuffer_.advance();
+}
+
+inline void cache() {
 #pragma HLS inline  
-  readindex_ = readindexnext;
-  readindexnext = readindex_+1;  
+  matchBuffer_.loopEnd();
 }
 
  private:
 
+   CircularBuffer<VMStubMECMBase<VMSMEType>::kVMSMEIDSize+AllProjection<AllProjectionType>::kAllProjectionSize+kNBits_MemAddr,MatchEngineUnitBase<VMProjType>::kNBitsBuffer,5> matchBuffer_;
+
  //Buffers for the matches
- INDEX writeindex_, readindex_, readindexnext;
- MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
- ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+ //INDEX writeindex_, readindex_, readindexnext;
+ //MATCH matches_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
+ //ap_uint<kNBits_MemAddr> projseqs_[1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer];
 
  static constexpr int kNuse = 4; // Only 4 options
  //Current projection
