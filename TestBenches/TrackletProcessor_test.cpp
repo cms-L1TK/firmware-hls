@@ -96,6 +96,12 @@ int main()
 #else
   #error "Undefined seed"
 #endif
+#if SEED_ == L2D1_
+  const int NCOPY = 3;
+#else
+  const int NCOPY = NTEUnits;
+
+#endif
 std::cout<<module_name[MODULE_];
 //
   TBHelper tb(std::string("TP/") + module_name[MODULE_]);
@@ -109,7 +115,7 @@ std::cout<<module_name[MODULE_];
   const auto nOuterStubMems = tb.nFiles(outerStubPattern);
   vector<AllStubInnerMemory<InnerStubType> > innerStubs(nInnerStubMems);
   vector<AllStubMemory<OuterStubType> > outerStubs(nOuterStubMems);
-  vector<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NTEUnits> > outervmStubs(nOuterVMStubMems);
+  vector<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY> > outervmStubs(nOuterVMStubMems);
 
   // output memories
   TrackletParameterMemory tpar;
@@ -146,7 +152,7 @@ std::cout<<module_name[MODULE_];
     for (unsigned i = 0; i < nOuterStubMems; i++)
       writeMemFromFile<AllStubMemory<OuterStubType> >(outerStubs[i], fin_outerStubs.at(i), ievt);
     for (unsigned i = 0; i < nOuterVMStubMems; i++)
-      writeMemFromFile<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NTEUnits>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
+      writeMemFromFile<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
 
     // clear all output memories before starting
     tpar.clear();
