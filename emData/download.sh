@@ -18,6 +18,9 @@ luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HT8q7fk4
 # Reduced Combined modules2
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/VOictG2TTAaWD9c/MemPrints.tar.gz"
 luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/nbz2P7cxAOF15aB/LUTs.tar.gz"
+# Combined barrel
+memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_230106.tgz"
+luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_230106.tgz"
 
 # Barrel-only configuration
 # N.B.: currently untagged but produced with following commit:
@@ -95,6 +98,10 @@ then
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
+  wget -O LUTs.tgz --quiet ${luts_url_cmbarrel}
+  tar -xzmf LUTs.tgz
+  mv LUTs LUTsCMBarrel
+  rm -f LUTs.tgz
   wget -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzmf LUTs.tar.gz
   rm -f LUTs.tar.gz
@@ -147,6 +154,13 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig2
 ./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_TB.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+### combined barrel config                      
+mkdir -p ../TopFunctions/CombinedBarrelConfig
+./generate_IR.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_VMRCM.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_TP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -155,6 +169,17 @@ git submodule init
 git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
+# Should these be auto generated? 
+cp ../LUTsCM/wires.dat reducedcm_wires.dat
+cp ../LUTsCM/processingmodules.dat reducedcm_processingmodules.dat
+cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
+cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
+cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
+cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
+cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
+cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
+cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
+
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
 mv wires.dat reducedcm2_wires.dat
@@ -164,53 +189,68 @@ cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat
 ./makeReducedConfig.py --no-graph
 ./makeBarrelConfig.py
 ### IRVMR
+echo "IRVMR"
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
 mkdir -p ../../IntegrationTests/IRVMR/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/IRVMR/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/IRVMR/tb/
 ### PRMEMC
+echo "PRMEMC"
 ./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2
 ./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2 -x
 mkdir -p ../../IntegrationTests/PRMEMC/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/PRMEMC/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/PRMEMC/tb/
 ### TETC
+echo "TETC"
 ./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0
 ./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0 -x
 mkdir -p ../../IntegrationTests/TETC/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/TETC/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/TETC/tb/
 ### Reduced IRtoTB
+echo "IRtoTB"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/tb/
 ### Reduced MCTB
+echo "MCTB"
 ./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 ### Barrel IRtoTB
+echo "Barrel ITtoTB"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 ### Reduced Combined IRtoTB
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -x
+echo "Reduced CM"
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig/tb/
 ### Reduced Combined 2 IRtoTB
+echo "Reduced CM2"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm2_wires.dat -p reducedcm2_processingmodules.dat -m reducedcm2_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig2/tb/
+### Reduced Combined 2 IRtoTB
+echo "CM Barrel"
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w cmbarrel_wires.dat -p cmbarrel_processingmodules.dat -m cmbarrel_memorymodules.dat -de 1 -x
+mkdir -p ../../IntegrationTests/CombinedBarrelConfig/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -237,6 +277,10 @@ then
   wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM2
+
+  wget -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
+  tar -xzmf MemPrints.tgz
+  mv MemPrints MemPrintsCMBarrel
   rm -f MemPrints.tgz
 
   wget -O MemPrints.tgz --quiet ${memprints_url_cm}
@@ -247,6 +291,7 @@ then
   wget -O MemPrints.tar.gz --quiet ${memprints_url}
   tar -xzmf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
+
 fi
 
 # Needed in order for awk to run successfully:
