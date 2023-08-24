@@ -958,14 +958,14 @@ void MatchCalculator(BXType bx,
   ap_uint<MC::LUT_matchcut_rDSS_width> LUT_matchcut_rDSS[MC::LUT_matchcut_rDSS_depth];
   constexpr enum MC::lutType RDSS = (LAYER < TF::D3) ? MC::RDSSINNERCUT : MC::RDSSOUTERCUT;
   readTable_rDSS<RDSS,LAYER,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha dim=0 complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS dim=0 complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS  complete
 
   bool goodmatch                   = false;
 
@@ -1198,6 +1198,7 @@ void MatchProcessor(BXType bx,
 
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
+  //Use of dim=0 seems to have small improvement on timing - not sure why
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
@@ -1209,7 +1210,7 @@ void MatchProcessor(BXType bx,
   // fill the bit mask indicating if memories are empty or not
   ap_uint<nINMEM> mem_hasdata = 0;
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
-#pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+#pragma HLS ARRAY_PARTITION variable=numbersin complete
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, mem_hasdata, numbersin, projin);
@@ -1246,10 +1247,10 @@ void MatchProcessor(BXType bx,
   ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
 
   MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
-#pragma HLS ARRAY_PARTITION variable=matchengine complete dim=0
+#pragma HLS ARRAY_PARTITION variable=matchengine complete
 #pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
-#pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
+#pragma HLS ARRAY_PARTITION variable=numbersin complete
   
 
 
@@ -1270,12 +1271,12 @@ void MatchProcessor(BXType bx,
   bool validin_ = false; 
 
   static ap_uint<2*MEBinsBits> zbinLUT[128];
-#pragma HLS ARRAY_PARTITION variable=zbinLUT complete dim=0
+#pragma HLS ARRAY_PARTITION variable=zbinLUT complete
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
   constexpr int nRbinBits = VMProjection<VMPTYPE>::kVMProjFineZSize + VMProjectionBase<VMPTYPE>::kVMProjZBinSize;
   constexpr int nRbin = 1<<TrackletProjection<PROJTYPE>::kTProjRZSize;
   static ap_uint<nRbinBits> rbinLUT[256];//1<<TrackletProjection<PROJTYPE>::kTProjRZSize];
-#pragma HLS ARRAY_PARTITION variable=rbinLUT complete dim=0
+#pragma HLS ARRAY_PARTITION variable=rbinLUT complete
   readRbin_LUT<LAYER,nRbinBits,256>(rbinLUT);
 
   const auto LUT_matchcut_rbend_width = 5;
@@ -1319,9 +1320,9 @@ void MatchProcessor(BXType bx,
     ap_uint<kNMatchEngines> emptys;
 
     typename MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE>::MATCH matches[kNMatchEngines];
-    #pragma HLS ARRAY_PARTITION variable=matches complete dim=0
+    #pragma HLS ARRAY_PARTITION variable=matches complete
     ap_uint<kNBits_MemAddr> projseqs[kNMatchEngines];
-#pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
+#pragma HLS ARRAY_PARTITION variable=projseqs complete
 
 
     bool anyidle = false;
@@ -1545,9 +1546,9 @@ void MatchProcessor(BXType bx,
       auto slot = zbin.range(zbin.length()-1, 1);
       constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
-#pragma HLS ARRAY_PARTITION variable=entries_zfirst dim=0 complete
+#pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
-#pragma HLS ARRAY_PARTITION variable=entries_zlast dim=0 complete
+#pragma HLS ARRAY_PARTITION variable=entries_zlast complete
 
       for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
 #pragma HLS unroll
