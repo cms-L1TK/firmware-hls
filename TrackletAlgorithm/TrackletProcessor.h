@@ -1004,7 +1004,10 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
     teuwriteindex[k] = 0;
     teureadindex[k] = 0;
   }
-
+  //quantities looked up in LUT
+  typename VMStubTEOuter<OuterRegion<Seed>()>::VMSTEOFINEZ rzfinebinfirst,rzdiffmax;
+  typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::RZBIN start;
+  ap_uint<1> usenext;
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
 #pragma HLS pipeline II=1 rewind
 
@@ -1262,11 +1265,6 @@ teunits[k].idle_;
     
     //LUT returns all 1's if not valid. (should change to returning zero.
     bool valid=!lutval___.and_reduce();
-    
-    //quantities looked up in LUT
-    typename VMStubTEOuter<OuterRegion<Seed>()>::VMSTEOFINEZ rzfinebinfirst,rzdiffmax;
-    typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::RZBIN start;
-    ap_uint<1> usenext;
     
     //Get the mask of bins that has non-zero number of hits
     typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK stubmask16 = vmstubsmask[start];
