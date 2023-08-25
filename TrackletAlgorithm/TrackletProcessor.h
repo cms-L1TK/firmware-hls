@@ -889,14 +889,11 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
 // the same iTC); generally indicates the region of the phi sector
              // being processed
-  uint8_t OuterPhiRegion, // outer phi region
-  uint8_t RZBins,         // number of RZ bins in outer layer/disk
-  uint8_t PhiBins,        // number of Phi bins in outer layer/dsik
   uint8_t NASMemInner, // number of inner all-stub memories
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),RZBins,PhiBins,kNTEUnitsLayerDisk[OuterLayerDisk<Seed>()]>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
+		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,kNTEUnitsLayerDisk[OuterLayerDisk<Seed>()]>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
   constexpr bool overlapSeed = (Seed == TF::L1D1 || Seed == TF::L2D1);
@@ -1098,7 +1095,7 @@ teunits[k].idle_;
       const typename VMStubTEOuter<OuterRegion<Seed>()>::VMSTEOFINEPHI& finephi = teunits[k].outervmstub___.getFinePhi();
       const ap_uint<1+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFineZSize>& rzbin = (teunits[k].next___, teunits[k].outervmstub___.getFineZ()); 
 
-      ap_uint<NBitsPhiRegion> iAllstub=OuterPhiRegion;
+      ap_uint<NBitsPhiRegion> iAllstub = iTC % 4;
       ap_uint<NfinephiBits> outerfinephi = (iAllstub, teunits[k].ireg___, finephi);
       
       constexpr unsigned int NdphiBits = (Seed==TF::L5L6 || overlapSeed) ? 6 : 5;
