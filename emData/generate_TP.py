@@ -292,6 +292,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
           "  TC::" + iTC + ",\n"
+          "  kNTEUnitsLayerDisk[TF::" +  seed[2:]+ "],\n"
+          "  nASMemInner<TF::"+seed+",TC::"+iTC+">(),\n"
           " 108>(\n"
           "    bx,\n"
           "    bx_o,\n"

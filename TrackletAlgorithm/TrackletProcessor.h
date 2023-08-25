@@ -887,10 +887,12 @@ bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 template<
 TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have the same iTC); generally indicates the region of the phi sector being processed
+  uint8_t NVMSTECopy, // Number of VMSTE copies
+  uint8_t NASMemInner, // Number of inner all-stub memories
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[nASMemInner<Seed,iTC>()], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,kNTEUnitsLayerDisk[OuterLayerDisk<Seed>()]>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
+		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
   )
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
