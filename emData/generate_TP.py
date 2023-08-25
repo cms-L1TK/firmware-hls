@@ -143,6 +143,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
+      "template<TF::seed Seed, TC::itc iTC> constexpr int nASMemInner();\n"
   )
   topHeaderFile.write(
       "#ifndef TopFunctions_TrackletProcessorTop_h\n"
@@ -237,6 +238,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '#endif\n'
           '  return lut;\n'
           '}\n'
+          'template<> constexpr int nASMemInner<TF::'+ seed + ', TC::' + iTC + '>(){\n'
+          '  return ' + str(nASMemInner) + ';\n'
+          '}\n'
 )% (tprojMaskBarrel, tprojMaskDisk)
       )
   
@@ -246,7 +250,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs["+str(nASMemInner)+"],\n"
+          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
           "    const AllStubMemory<OuterRegion<TF::" + str(seed) + ">()>* outerStubs,\n"
           "    const VMStubTEOuterMemoryCM<OuterRegion<TF::" + str(seed) + ">(), kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[TF::"+seed[2:]+"]>* outerVMStubs,\n"
           "    TrackletParameterMemory * trackletParameters,\n"
@@ -262,7 +266,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[" + str(nASMemInner) + "],\n"
+          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
           "    const AllStubMemory<OuterRegion<TF::" + str(seed) + ">()>* outerStubs ,\n"
           "    const VMStubTEOuterMemoryCM<OuterRegion<TF::" + str(seed) + ">(), kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[TF::"+ seed[2:] +"]>* outerVMStubs,\n"
           "    TrackletParameterMemory * trackletParameters,\n"
@@ -288,7 +292,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
           "  TC::" + iTC + ",\n"
-          "  "+str(nASMemInner)+",\n"
           " 108>(\n"
           "    bx,\n"
           "    bx_o,\n"
