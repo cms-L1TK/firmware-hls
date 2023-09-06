@@ -12,6 +12,7 @@ addProj(const TrackletProjection<TProjType> &, const BXType, TrackletProjectionM
 
 // Writes a tracklet projection to the appropriate tracklet projection memory.
 template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
+
 PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], const bool success)
 {
   bool proj_success = true;
@@ -221,7 +222,6 @@ template<
 #pragma HLS array_partition variable=nproj_barrel_ps complete
 #pragma HLS array_partition variable=nproj_barrel_2s complete
 #pragma HLS array_partition variable=nproj_disk complete
-
   for (unsigned int i = 0; i < TC::N_PROJOUT_BARRELPS; i++) {
 #pragma HLS unroll
     nproj_barrel_ps[i] = 0;

@@ -39,7 +39,6 @@ using namespace std;
 
 int main()
 {
-
   std::cout << "Module name:" << module_name[MODULE_] << std::endl;
 
   TBHelper tb(std::string("TP/") + module_name[MODULE_]);
@@ -79,8 +78,6 @@ int main()
     for (unsigned i = 0; i < TC::N_PROJOUT_DISK; i++)
       tproj_disk[i].clear();
 
-    cout << "Done with clear" << endl;
-
     // bx
     BXType bx = ievt;
     BXType bx_o;
@@ -95,7 +92,6 @@ int main()
     }
 
     cout << "Done with TOP_FUNC" << endl;
-
     bool truncation = false;
 
     // compare the computed outputs with the expected ones
