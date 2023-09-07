@@ -146,6 +146,7 @@ void TrackBuilder(
     TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
     const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
+    track.setPhiRegion(tpar.getPhiRegion());
     track.setStubIndexInner(tpar.getStubIndexInner());
     track.setStubIndexOuter(tpar.getStubIndexOuter());
     track.setRinv(tpar.getRinv());
