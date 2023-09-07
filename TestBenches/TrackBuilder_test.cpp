@@ -32,6 +32,18 @@ using namespace std;
 #elif SEED_ == L5L6_
   constexpr unsigned kNBarrelStubs = 4;
   constexpr unsigned kNDiskStubs = 0;
+#elif SEED_ == D1D2_
+  constexpr unsigned kNBarrelStubs = 2;
+  constexpr unsigned kNDiskStubs = 3;
+#elif SEED_ == D3D4_
+  constexpr unsigned kNBarrelStubs = 1;
+  constexpr unsigned kNDiskStubs = 3;
+#elif SEED_ == L1D1_
+  constexpr unsigned kNBarrelStubs = 0;
+  constexpr unsigned kNDiskStubs = 4;
+#elif SEED_ == L2D1_
+  constexpr unsigned kNBarrelStubs = 1;
+  constexpr unsigned kNDiskStubs = 3;
 #else
 #  error "Undefined seed"
 #endif
