@@ -31,7 +31,7 @@ public:
     kTFZResidSize = 9,
     kTFRResidSize = 7,
     // Bit size for track and stub words
-    kTrackWordSize =  kTFValidSize + kTFSeedTypeSize + kTFPhiRegionSize + 2 * kNBits_MemAddr + kTFRinvSize + kTFPhi0Size + kTFZ0Size + kTFTSize + kTFHitMapSize,
+    kTrackWordSize =  kTFValidSize + kTFSeedTypeSize + 2 * kTFPhiRegionSize + 2 * kNBits_MemAddr + kTFRinvSize + kTFPhi0Size + kTFZ0Size + kTFTSize + kTFHitMapSize,
     kBarrelStubSize = kTFValidSize + kTFTrackIndexSize + kTFStubIndexSize + kTFBarrelStubRSize + kTFPhiResidSize + kTFZResidSize,
     kDiskStubSize =   kTFValidSize + kTFTrackIndexSize + kTFStubIndexSize + kTFDiskStubRSize + kTFPhiResidSize + kTFRResidSize,
     // Bit size for full TrackFitMemory
@@ -116,9 +116,11 @@ public:
     kTFStubIndexOuterMSB = kTFStubIndexOuterLSB + kNBits_MemAddr - 1,
     kTFStubIndexInnerLSB = kTFStubIndexOuterMSB + 1,
     kTFStubIndexInnerMSB = kTFStubIndexInnerLSB + kNBits_MemAddr - 1,
-    kTFPhiRegionLSB = kTFStubIndexInnerMSB + 1,
-    kTFPhiRegionMSB = kTFPhiRegionLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhiRegionSize - 1,
-    kTFSeedTypeLSB = kTFPhiRegionMSB + 1,
+    kTFPhiRegionOuterLSB = kTFStubIndexInnerMSB + 1,
+    kTFPhiRegionOuterMSB = kTFPhiRegionOuterLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhiRegionSize - 1,
+    kTFPhiRegionInnerLSB = kTFPhiRegionOuterMSB + 1,
+    kTFPhiRegionInnerMSB = kTFPhiRegionInnerLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhiRegionSize - 1,
+    kTFSeedTypeLSB = kTFPhiRegionInnerMSB + 1,
     kTFSeedTypeMSB = kTFSeedTypeLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFSeedTypeSize - 1,
     kTFTrackValidLSB = kTFSeedTypeMSB + 1,
     kTFTrackValidMSB = kTFTrackValidLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1
@@ -182,8 +184,12 @@ public:
     return data_.range(kTFSeedTypeMSB,kTFSeedTypeLSB);
   }
 
-  TFPHIREGION getPhiRegion() const {
-    return data_.range(kTFPhiRegionMSB,kTFPhiRegionLSB);
+  TFPHIREGION getPhiRegionInner() const {
+    return data_.range(kTFPhiRegionInnerMSB,kTFPhiRegionInnerLSB);
+  }
+
+  TFPHIREGION getPhiRegionOuter() const {
+    return data_.range(kTFPhiRegionOuterMSB,kTFPhiRegionOuterLSB);
   }
 
   TFSEEDSTUBINDEX getStubIndexInner() const {
@@ -302,8 +308,12 @@ public:
     data_.range(kTFSeedTypeMSB,kTFSeedTypeLSB) = seedtype;
   }
 
-  void setPhiRegion(const TFPHIREGION phiRegion) {
-    data_.range(kTFPhiRegionMSB,kTFPhiRegionLSB) = phiRegion;
+  void setPhiRegionInner(const TFPHIREGION phiRegion) {
+    data_.range(kTFPhiRegionInnerMSB,kTFPhiRegionInnerLSB) = phiRegion;
+  }
+
+  void setPhiRegionOuter(const TFPHIREGION phiRegion) {
+    data_.range(kTFPhiRegionOuterMSB,kTFPhiRegionOuterLSB) = phiRegion;
   }
 
   void setStubIndexInner(const TFSEEDSTUBINDEX seedStubIndex) {

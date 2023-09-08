@@ -14,6 +14,7 @@ static const unsigned short kNBitsITC = FullMatchBase<BARREL>::kFMITCSize;
 static const unsigned short kNBitsTrackletID = kNBitsTCID + kNBits_MemAddr;
 
 typedef ap_uint<kNBitsTCID> TCIDType;
+typedef ap_uint<kNBitsITC> ITCType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
 typedef ap_uint<kNBitsTrackletID> TrackletIDType;
 
@@ -143,10 +144,14 @@ void TrackBuilder(
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(TPAROffset);
-    TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
+    const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
+    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : 1);
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
     const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
-    track.setPhiRegion(tpar.getPhiRegion());
+
+    TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
+    track.setPhiRegionInner(tpar.getPhiRegion());
+    track.setPhiRegionOuter(phiRegionOuter);
     track.setStubIndexInner(tpar.getStubIndexInner());
     track.setStubIndexOuter(tpar.getStubIndexOuter());
     track.setRinv(tpar.getRinv());
