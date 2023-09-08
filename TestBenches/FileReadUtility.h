@@ -186,7 +186,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
-  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated);
+  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
   
 }
 
@@ -447,7 +447,7 @@ unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifst
     }
   }
 
-  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated);
+  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
   
 }
 
