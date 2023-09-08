@@ -131,7 +131,7 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
 {
   unsigned int err_count = 0;
 
-  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB - LSB + 1) : MemType::getWidth();
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
