@@ -3,6 +3,7 @@
 
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
+
 #include "TrackletProcessor.h"
 
 namespace PC {
@@ -63,6 +64,7 @@ template<
   TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   TC::itc iTC    // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
   > void
+
   ProjectionCalculator(
     const BXType bx,
     BXType& bx_o,
