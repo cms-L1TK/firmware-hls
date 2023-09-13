@@ -83,7 +83,6 @@ int main()
     BXType bx_o;
 
     // Unit Under Test
-    std::cout << "Entries:" << trackletParameters.getEntries(bx) << std::endl;
 
     for (int ipar = 0; ipar < kMaxProc; ipar++) {
       const bool valid = ipar < trackletParameters.getEntries(bx);
