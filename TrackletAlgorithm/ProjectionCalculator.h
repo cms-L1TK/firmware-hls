@@ -3,14 +3,14 @@
 
 #include <cmath>
 
-// #include "AllStubMemory.h"
-// #include "AllStubInnerMemory.h"
+#include "AllStubMemory.h"
+#include "AllStubInnerMemory.h"
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
-//#include "VMStubTEOuterMemoryCM.h"
-// #include "TEBuffer.h"
+#include "VMStubTEOuterMemoryCM.h"
+#include "TEBuffer.h"
 #include "TrackletEngineUnit.h"
-// #include "TrackletProcessor_parameters.h"
+#include "TrackletProcessor.h"
 
 namespace PC {
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ namespace PC {
 // This is the primary interface for the ProjectionCalculator.
 template<
   TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
-  TP::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
+  TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
 // the same iTC); generally indicates the region of the phi sector
              // being processed
   uint8_t NTEUnits, //number of TE units

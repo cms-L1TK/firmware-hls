@@ -20,7 +20,6 @@ open_project -reset projectionCalculator
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/}
 add_files ../TopFunctions/ReducedCombinedConfig/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
-add_files ../TopFunctions/ReducedCombinedConfig/ProjectionCalculatorTop.h -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files

@@ -162,7 +162,7 @@ std::cout<<module_name[MODULE_];
     BXType bx_o;
 
     // Unit Under Test
-    TOP_FUNC_(bx, bx_o, innerStubs.data(), outerStubs.data(), outervmStubs.data(),  &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    TOP_FUNC_(bx, bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 
     bool truncation = false;
 
