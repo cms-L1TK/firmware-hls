@@ -39,7 +39,7 @@ jobs:
     - name: Trigger gitlab CI run
       # Communicate between gitlab & github, and trigger gitlab CI run.
       # (Forked from https://github.com/SvanBoxel/gitlab-mirror-and-ci-action).
-      uses: cms-L1TK/gitlab-mirror-and-ci-action@master
+      uses: aehart/gitlab-mirror-and-ci-action@safe_directory_fix
       env:
         GITLAB_HOSTNAME: "gitlab.cern.ch"
         GITLAB_USERNAME: "cms-l1tk"
