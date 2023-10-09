@@ -7,7 +7,7 @@
 source env_hls.tcl
 
 set modules_to_test {
-  {PC_L1L2C}
+  {TP_L1L2C}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
@@ -18,7 +18,7 @@ set module_to_export PC_L1L2C
 open_project -reset projectionCalculator
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/ReducedCombinedConfig/}
 add_files ../TopFunctions/ReducedCombinedConfig/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionCalculator_test.cpp -cflags "$CFLAGS"
 
