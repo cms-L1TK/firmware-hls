@@ -177,28 +177,25 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       ") {\n"
       "#pragma HLS inline recursive\n"
       "#pragma HLS interface register port=bx_o\n"
+      "#pragma HLS stream variable=trackletParameters depth=1\n"
+      "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
+      "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
+      "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+      "\n"
+      "PC_" + seed + iTC + ": ProjectionCalculator<\n"
+      "  TF::" + seed + ",\n"
+      "  TC::" + iTC + ",\n"
+      " 108>(\n"
+      "    bx,\n"
+      "    bx_o,\n"
+      "    trackletParameters,\n"
+      "    projout_barrel_ps,\n"
+      "    projout_barrel_2s,\n"
+      "    projout_disk\n"
+      "  );\n"
+      "}\n"
       )
-    # for i in range(0, nASMemInner):
-    #   topFile.write(
-    #     "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
-    #     "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
-    #     "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
-    #     "\n"
-    #     "TP_" + seed + iTC + ": ProjectionCalculator<\n"
-    #     "  TF::" + seed + ",\n"
-    #     "  TC::" + iTC + ",\n"
-    #     "  kNTEUnitsLayerDisk[TF::" +  seed[2:]+ "],\n"
-    #     "  nASMemInner<TF::"+seed+",TC::"+iTC+">(),\n"
-    #     " 108>(\n"
-    #     "    bx,\n"
-    #     "    bx_o,\n"
-    #     "    trackletParameters,\n"
-    #     "    projout_barrel_ps,\n"
-    #     "    projout_barrel_2s,\n"
-    #     "    projout_disk\n"
-    #     "  );\n"
-    #     "}\n"
-    #     )
+        
 
   # Print out endifs and close files.
   topHeaderFile.write(
