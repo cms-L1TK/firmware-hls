@@ -58,10 +58,10 @@ PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 
   return (success && proj_success);
 }
-
 // This is the primary interface for the ProjectionCalculator.
 template<
   TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
+
   TC::itc iTC    // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
   > void
 

@@ -116,7 +116,6 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "  );\n"
       "}\n"
       )
-
   topHeaderFile.write(
   "\n"
   "#endif\n"
