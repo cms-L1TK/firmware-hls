@@ -229,7 +229,7 @@ int main()
       else if (tproj_name.find("_L6PHID") != string::npos)
         err += compareProjMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHID], fout, ievt,
                                                        "\nTrackletProjection (L6PHID)", truncation);
-
+    
     }
 
     cout << endl;
