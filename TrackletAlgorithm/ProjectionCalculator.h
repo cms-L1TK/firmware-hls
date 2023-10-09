@@ -40,16 +40,17 @@ template<
   int TCID = 0; // TODO: unsure if this should be passed in or not 
 
   //for (int trackletCounter = 0, trackletCounter < 1, trackletCounter++) 
-  //{
-
+  for (TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0; trackletIndex < 1; trackletIndex++) 
+  {
+    std::cout << trackletIndex << std::endl;
   
-    TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0; // TODO: Unsure what this should be
+    //TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0; // TODO: Unsure what this should be
     // TODO: Make giant loop here
-    //  NEntries
+
     bool addL3 = false, addL4 = false, addL5 = false, addL6 = false; // whether a projection has been added successfully
 
     
-    // Read in tracklet parameters from the memory // TODO: can we test without reading from the memory? 
+    // Read in tracklet parameters from the memory //
     const auto &tpar = trackletParameters->read_mem(bx, trackletIndex);
     //std::cout<< tpar << std::endl; 
 
@@ -77,14 +78,10 @@ template<
     }
 
     // Create garbage projections
-    // const TrackletProjection<BARRELPS> tproj_L3(TCID, 0, 0.0, 0.0, 0.0, 0.0);
-    // const TrackletProjection<BARREL2S> tproj_L4(TCID, 0, 0.0, 0.0, 0.0, 0.0);
-    // const TrackletProjection<BARREL2S> tproj_L5(TCID, 0, 0.0, 0.0, 0.0, 0.0);
-    // const TrackletProjection<BARREL2S> tproj_L6(TCID, 0, 0.0, 0.0, 0.0, 0.0);
-    const TrackletProjection<BARRELPS> tproj_L3(TCID, 0, phiL, zL, der_phiL, der_zL);
-    const TrackletProjection<BARREL2S> tproj_L4(TCID, 0, phiL, zL, der_phiL, der_zL);
-    const TrackletProjection<BARREL2S> tproj_L5(TCID, 0, phiL, zL, der_phiL, der_zL);
-    const TrackletProjection<BARREL2S> tproj_L6(TCID, 0, phiL, zL, der_phiL, der_zL);
+    const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
+    const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
+    const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
+    const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
     //const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, phiL[0], zL[0], der_phiL, der_zL);
     //const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL[1], zL[1], der_phiL, der_zL);
     //const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL[2], zL[2], der_phiL, der_zL);
@@ -97,12 +94,12 @@ template<
     addL5 = TC::addProj<BARREL2S, TC::nproj_L5, ((TC::mask_L5) >> TC::shift_L5)> (tproj_L5, bx, &projout_barrel_2s[TC::L5PHIA], &nproj_barrel_2s[TC::L5PHIA], true);
     addL6 = TC::addProj<BARREL2S, TC::nproj_L6, ((TC::mask_L6) >> TC::shift_L6)> (tproj_L6, bx, &projout_barrel_2s[TC::L6PHIA], &nproj_barrel_2s[TC::L6PHIA], true);
     std::cout << addL3 << std::endl;
-    std::cout << "Testing -----------------------------------------------------------------" << std::endl; // TODO: Why not producing output? 
+    std::cout << "Testing -----------------------------------------------------------------" << std::endl; // Why not producing output? Had to add in generate statement
 
-    bx_o = bx; //TODO: What does this do? 
+    bx_o = bx; //Makes sure that bxs are aligned to make different "page" per bx in the system 
     
 
-  //}
+  }
 }
 
 #endif
