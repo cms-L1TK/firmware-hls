@@ -96,6 +96,7 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_PC.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TB.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ### reduced combined config 2

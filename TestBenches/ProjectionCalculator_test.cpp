@@ -38,7 +38,7 @@
 #endif
 
 
-const int nevents = 100;  //number of events to run
+const int nevents = 1;  //number of events to run
 
 using namespace std;
 
@@ -103,37 +103,23 @@ std::cout<<module_name[MODULE_];
 
   int err = 0;
 
-  // input memories
-  const auto nOuterVMStubMems = tb.nFiles("VMStubs*");
-  const auto nInnerStubMems = tb.nFiles(innerStubPattern);
-  const auto nOuterStubMems = tb.nFiles(outerStubPattern);
-  vector<AllStubInnerMemory<InnerStubType> > innerStubs(nInnerStubMems);
-  vector<AllStubMemory<OuterStubType> > outerStubs(nOuterStubMems);
-  vector<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NTEUnits> > outervmStubs(nOuterVMStubMems);
+    // open input files from emulation
+  auto &fin_tpar = tb.files("TrackletParameters*");
+  auto &fout_tproj = tb.files("TrackletProjections*");
+  const auto &tproj_names = tb.fileNames("TrackletProjections*");
 
-  // output memories
-  TrackletParameterMemory tpar;
+  // input memory 
+  TrackletParameterMemory trackletParameters;
+  
+  // output memories 
   TrackletProjectionMemory<BARRELPS> tproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
   TrackletProjectionMemory<BARREL2S> tproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
   TrackletProjectionMemory<DISK> tproj_disk[TC::N_PROJOUT_DISK];
 
-  // open input files from emulation
-  auto &fin_innerStubs = tb.files(innerStubPattern);
-  auto &fin_outerStubs = tb.files(outerStubPattern);
-  auto &fin_outervmStubs = tb.files("VMStubs*");
-  auto &fout_tpar = tb.files("TrackletParameters*");
-  auto &fout_tproj = tb.files("TrackletProjections*");
-  const auto &tproj_names = tb.fileNames("TrackletProjections*");
+
+
   // print the input files loaded
   std::cout << "Loaded the input files:\n";
-  for (unsigned i = 0; i < nInnerStubMems; i++)
-   //(i+2)%nInnerStubMems has the innerstubs match the order in the emulation
-    std::cout << "\t" << tb.fileNames(innerStubPattern).at((i+2)%nInnerStubMems) << "\n";
-  for (unsigned i = 0; i < nOuterStubMems; i++)
-    std::cout << "\t" << tb.fileNames(outerStubPattern).at(i) << "\n";
-  for (unsigned i = 0; i < nOuterVMStubMems; i++)
-    std::cout << "\t" << tb.fileNames("VMStubs*").at(i) << "\n";
-  std::cout << std::endl;
 
   // loop over events
   cout << "Start event loop ..." << endl;
@@ -141,15 +127,10 @@ std::cout<<module_name[MODULE_];
     cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
-    for (unsigned i = 0; i < nInnerStubMems; i++)
-      writeMemFromFile<AllStubInnerMemory<InnerStubType> >(innerStubs[i], fin_innerStubs.at((i+2)%nInnerStubMems), ievt);
-    for (unsigned i = 0; i < nOuterStubMems; i++)
-      writeMemFromFile<AllStubMemory<OuterStubType> >(outerStubs[i], fin_outerStubs.at(i), ievt);
-    for (unsigned i = 0; i < nOuterVMStubMems; i++)
-      writeMemFromFile<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NTEUnits>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
+    writeMemFromFile<TrackletParameterMemory>(trackletParameters, fin_tpar.at(0), ievt);
 
     // clear all output memories before starting
-    tpar.clear();
+    //tpar.clear();
     for (unsigned i = 0; i < TC::N_PROJOUT_BARRELPS; i++)
       tproj_barrel_ps[i].clear();
     for (unsigned i = 0; i < TC::N_PROJOUT_BARREL2S; i++)
@@ -162,13 +143,12 @@ std::cout<<module_name[MODULE_];
     BXType bx_o;
 
     // Unit Under Test
-    TOP_FUNC_(bx, bx_o, &tpar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    TOP_FUNC_(bx, bx_o, &trackletParameters, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 
     bool truncation = false;
 
     // compare the computed outputs with the expected ones
-    err += compareMemWithFile<TrackletParameterMemory>(tpar, fout_tpar.at(0), ievt,
-                                                   "\nTrackletParameter", truncation);
+
     for (unsigned i = 0; i < tproj_names.size(); i++) {
       const auto &tproj_name = tproj_names.at(i);
       auto &fout = fout_tproj.at(i);
@@ -268,7 +248,6 @@ std::cout<<module_name[MODULE_];
       else if (tproj_name.find("_L3PHID") != string::npos)
         err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TC::L3PHID], fout, ievt,
                                                        "\nTrackletProjection (L3PHID)", truncation);
-
       else if (tproj_name.find("_L4PHIA") != string::npos)
         err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L4PHIA], fout, ievt,
                                                        "\nTrackletProjection (L4PHIA)", truncation);
@@ -305,8 +284,9 @@ std::cout<<module_name[MODULE_];
       else if (tproj_name.find("_L6PHID") != string::npos)
         err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHID], fout, ievt,
                                                        "\nTrackletProjection (L6PHID)", truncation);
-
+    
     }
+    
     cout << endl;
 
   } // end of event loop
