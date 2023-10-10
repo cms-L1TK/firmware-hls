@@ -4,7 +4,68 @@
 # ProjectionCalculatorTop.cc in the TopFunctions/ directory.
 
 from __future__ import absolute_import, print_function
+<<<<<<< HEAD
 import re, os, argparse
+=======
+import sys, re, os, argparse
+from enum import Enum
+
+# These enums must match those defined in
+# TopFunctions/TrackletProcessor.h.
+# class ProjoutIndexBarrel(Enum):
+#   L1PHIA = 0
+#   L1PHIB = 1
+#   L1PHIC = 2
+#   L1PHID = 3
+#   L1PHIE = 4
+#   L1PHIF = 5
+#   L1PHIG = 6
+#   L1PHIH = 7
+#   L2PHIA = 8
+#   L2PHIB = 9
+#   L2PHIC = 10
+#   L2PHID = 11
+#   L3PHIA = 12
+#   L3PHIB = 13
+#   L3PHIC = 14
+#   L3PHID = 15
+#   L4PHIA = 16
+#   L4PHIB = 17
+#   L4PHIC = 18
+#   L4PHID = 19
+#   L5PHIA = 20
+#   L5PHIB = 21
+#   L5PHIC = 22
+#   L5PHID = 23
+#   L6PHIA = 24
+#   L6PHIB = 25
+#   L6PHIC = 26
+#   L6PHID = 27
+#   N_PROJOUT_BARREL = 28
+
+# class ProjoutIndexDisk(Enum):
+#   D1PHIA = 0
+#   D1PHIB = 1
+#   D1PHIC = 2
+#   D1PHID = 3
+#   D2PHIA = 4
+#   D2PHIB = 5
+#   D2PHIC = 6
+#   D2PHID = 7
+#   D3PHIA = 8
+#   D3PHIB = 9
+#   D3PHIC = 10
+#   D3PHID = 11
+#   D4PHIA = 12
+#   D4PHIB = 13
+#   D4PHIC = 14
+#   D4PHID = 15
+#   D5PHIA = 16
+#   D5PHIB = 17
+#   D5PHIC = 18
+#   D5PHID = 19
+#   N_PROJOUT_DISK = 20
+>>>>>>> 17f7d51 (Garbage being written out cleaner)
 
 parser = argparse.ArgumentParser(description="This script generates ProjectionCalculatorTop.h, ProjectionCalculatorTop.cc \
    in the TopFunctions/ directory.",
