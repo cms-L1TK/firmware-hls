@@ -126,9 +126,9 @@ signal sv_RAM_row2  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0'); 
 signal sv_RAM_row3  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
 type sa_RAM_nent_arr is array (0 to NUM_PHI_BINS-1) of t_arr_1d_slv_mem_nent;
-signal sa_RAM_nentA : sa_RAM_nent_arr;         --! RAM data content
+signal sa_RAM_nentA : sa_RAM_nent_arr := (others => (others => (others => '0')));         --! RAM data content
 
-signal sa_RAM_nentB : sa_RAM_nent_arr;         --! RAM data content
+signal sa_RAM_nentB : sa_RAM_nent_arr := (others => (others => (others => '0')));         --! RAM data content
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;

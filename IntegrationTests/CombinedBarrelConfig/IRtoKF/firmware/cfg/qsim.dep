@@ -1,0 +1,14 @@
+# Sim config
+@sim.library = "xil_defaultlib"
+
+# Dependancies
+include -c emp-fwk:boards/testbench top.dep
+setup ../scripts/pre_qsim.tcl
+
+include payload.dep
+src tb_decl.vhd
+src emp_project_decl.vhd 
+
+src -c emp-fwk:components/links/slink emp_slink_types.vhd
+
+include -c emp-fwk:boards/apollo/cm_v1/vu7p device.dep packages_cm_v1.dep

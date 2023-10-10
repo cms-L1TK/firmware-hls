@@ -1,0 +1,20 @@
+include payload.dep
+setup ../ucf/vsim.tcl
+
+include -c emp-fwk:boards/testbench top.dep
+
+#src -c emp-fwk:components/datapath emp_data_types.vhd
+#src -c emp-fwk:components/ttc emp_ttc_decl.vhd
+
+src tb_decl.vhd
+src emp_project_decl.vhd 
+src -c emp-fwk:components/links/slink emp_slink_types.vhd
+
+#src -c emp-fwk:components/framework emp_device_types.vhd
+#src -c emp-fwk:boards/testbench emp_device_decl.vhd
+#src -c emp-fwk:components/framework emp_framework_decl.vhd 
+
+#src -u sim ../mem/in.txt
+src -u sim ../scripts/pre_msim.tcl
+
+include -c emp-fwk:boards/apollo/cm_v2/vu13p device.dep packages_cm_v2.dep
