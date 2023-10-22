@@ -55,7 +55,7 @@ begin  -- architecture rtl
     signal s_track_reset   : std_logic;
     signal s_track_wr_en   : std_logic;
     signal s_rd_en         : std_logic;
-    signal s_wc            : unsigned(1 downto 0);
+    signal s_wc            : unsigned(1 downto 0) := "00";
     signal s_track_tmp_32  : std_logic_vector(31 downto 0);
     signal s_track_tmp_64  : std_logic_vector(63 downto 0);
     signal s_track         : std_logic_vector(LWORD_WIDTH - 1 downto 0);
