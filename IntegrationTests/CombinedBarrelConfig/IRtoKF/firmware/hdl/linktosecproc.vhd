@@ -57,8 +57,6 @@ architecture rtl of linktosecproc is
   signal s_ir_start_srff : std_logic;
   signal s_din_d         : ldata(4 * N_REGION - 1 downto 0);
   signal s_din_dd        : ldata(4 * N_REGION - 1 downto 0);
-  signal s_din_ddd       : ldata(4 * N_REGION - 1 downto 0);
-  signal s_din_dddd      : ldata(4 * N_REGION - 1 downto 0);
 
 begin  -- architecture rtl
 
@@ -85,8 +83,7 @@ begin  -- architecture rtl
       if rising_edge(clk_i) then     -- rising clock edge
         s_din_d(i).data <= din_i(i).data;
         s_din_dd(i).data <= s_din_d(i).data;
-        s_din_ddd(i).data <= s_din_dd(i).data;
-        s_din_dddd(i).data <= s_din_ddd(i).data;
+        s_din_d(i).valid <= din_i(i).valid;
       end if;
     end process p_delay_data;
   end generate GEN_DELAYED_DATA;
@@ -104,42 +101,42 @@ begin  -- architecture rtl
   --DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(7).data(38 downto 0);
   --DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(8).data(38 downto 0);
 
-  DL_39_link_AV_DOUT(PS10G_1_A)    <= s_din_dddd(68).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_1_B)    <= s_din_dddd(69).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_A)    <= s_din_dddd(70).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_B)    <= s_din_dddd(71).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_A)    <= s_din_dddd(72).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_B)    <= s_din_dddd(73).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_A)       <= s_din_dddd(74).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_B)       <= s_din_dddd(75).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_A)       <= s_din_dddd(76).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_B)       <= s_din_dddd(77).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_1_A) <= s_din_dddd(78).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_1_B) <= s_din_dddd(79).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_2_A) <= s_din_dddd(84).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_2_B) <= s_din_dddd(85).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_3_A) <= s_din_dddd(86).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_3_B) <= s_din_dddd(87).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_1_A)    <= s_din_dddd(88).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_1_B)    <= s_din_dddd(89).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_2_A)    <= s_din_dddd(90).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_2_B)    <= s_din_dddd(91).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_A)     <= s_din_dddd(92).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_B)     <= s_din_dddd(93).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_A)     <= s_din_dddd(94).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_B)     <= s_din_dddd(95).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_A)     <= s_din_dddd(96).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_B)     <= s_din_dddd(97).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_A)     <= s_din_dddd(98).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_B)     <= s_din_dddd(99).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_1_A)    <= s_din_dddd(100).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_1_B)    <= s_din_dddd(101).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_2_A)    <= s_din_dddd(102).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_2_B)    <= s_din_dddd(103).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_3_A)    <= s_din_dddd(104).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_3_B)    <= s_din_dddd(105).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_4_A)    <= s_din_dddd(106).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_4_B)    <= s_din_dddd(107).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_A)    <= s_din_dd(68).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_B)    <= s_din_dd(69).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_A)    <= s_din_dd(70).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_B)    <= s_din_dd(71).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_A)    <= s_din_dd(72).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_B)    <= s_din_dd(73).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_A)       <= s_din_dd(74).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_B)       <= s_din_dd(75).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_A)       <= s_din_dd(76).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_B)       <= s_din_dd(77).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_1_A) <= s_din_dd(78).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_1_B) <= s_din_dd(79).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_2_A) <= s_din_dd(84).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_2_B) <= s_din_dd(85).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_3_A) <= s_din_dd(86).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_3_B) <= s_din_dd(87).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_1_A)    <= s_din_dd(88).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_1_B)    <= s_din_dd(89).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_2_A)    <= s_din_dd(90).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_2_B)    <= s_din_dd(91).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_A)     <= s_din_dd(92).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_B)     <= s_din_dd(93).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_A)     <= s_din_dd(94).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_B)     <= s_din_dd(95).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_A)     <= s_din_dd(96).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_B)     <= s_din_dd(97).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_A)     <= s_din_dd(98).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_B)     <= s_din_dd(99).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_1_A)    <= s_din_dd(100).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_1_B)    <= s_din_dd(101).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_2_A)    <= s_din_dd(102).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_2_B)    <= s_din_dd(103).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_3_A)    <= s_din_dd(104).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_3_B)    <= s_din_dd(105).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_4_A)    <= s_din_dd(106).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_4_B)    <= s_din_dd(107).data(38 downto 0);
 
   -----------------------------------------------------------------------------
   -- Generate start signal
@@ -147,13 +144,13 @@ begin  -- architecture rtl
   set_reset_ffd_1 : entity work.set_reset_ffd
     port map (
       clk_i   => clk_i,
-      set_i   => s_din_ddd(0).valid,
+      set_i   => s_din_d(68).valid,
       reset_i => rst_i,
       q_o     => s_ir_start_srff
       );
 
 
-  s_ir_start <= s_din_ddd(0).valid or s_ir_start_srff;
+  s_ir_start <= s_din_d(68).valid or s_ir_start_srff;
   ir_start_o <= s_ir_start;
 
   p_bx_count : process (clk_i) is
