@@ -1197,7 +1197,7 @@ void MatchProcessor(BXType bx,
   constexpr regionType APTYPE = TF::layerDiskType[LAYER];
 
   //Initialize table for bend-rinv consistency
-  ap_uint<1> table[kNMatchEngines][(LAYER<TF::L4)?256:512]; //FIXME Need to figure out how to replace 256 with meaningful const.
+  ap_uint<1> table[kNMatchEngines][LAYER<TF::D1 ? (LAYER<TF::L4 ? 256 : 512) : 768]; //FIXME Need to figure out how to replace 256 with meaningful const.
   //Use of dim=0 seems to have small improvement on timing - not sure why
 #pragma HLS ARRAY_PARTITION variable=table dim=0 complete
   readtable: for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
