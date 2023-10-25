@@ -127,11 +127,8 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   auto secondSave = second_;
 
   VMProjection<VMProjType> data(projbuffer_.getProjection());
-  bool useSecond = data.getZBin().range(0,0)==1;
   constexpr bool isDisk = LAYER > TF::L6;
   constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
-  constexpr regionType APTYPE = TF::layerDiskRegion[LAYER];
-  int sign = isDisk ? (projbuffer_.getPhiDer() < 0 ? -1 : 1) : 0;
 
   if(istub_ == 0) {
      
