@@ -218,7 +218,9 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
     constexpr bool isDisk = LAYER > TF::L6;
 
-    constexpr unsigned int kNBitBin = !isDisk ? 3 : 4;
+    constexpr auto kNBitBinPS = 3;
+    constexpr auto kNBitBin2S = 4;
+    const unsigned int kNBitBin = isPSStub ? kNBitBinPS : kNBitBin2S;
     constexpr unsigned int kRInvSteps = 32;
     constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
     
@@ -242,10 +244,9 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
     //here we always use the larger number of bits for the bend
     // Check if stub bend and proj rinv consistent
-    auto const index_part1 = (VMProjType == DISK && isPSseed____) ? projrinv____.concat(stubbendReduced) : projrinv____.concat(stubbend);
-    auto const index_part2 = ((VMProjType == DISK && isPSseed____) ? (1 << (kRInvBits + kNBitBin)) : 0);
-    const ap_int<1> diskps = isDisk && isPSStub;
-    auto const index = diskps ? (diskps,projrinv____,stubbendReduced) : (diskps,projrinv____,stubbend);
+    ap_uint<kNBitBin2S+kRInvBits+1> diskps = isDisk && isPSStub;
+    ap_uint<kRInvBits+kNBitBin2S> projrinv_long = projrinv____;
+    const ap_uint<1+kNBitBin2S+kRInvBits> index = (diskps << (kNBitBin2S + kRInvBits)) + (projrinv_long << kNBitBin) + (diskps ? ap_uint<kNBitBin2S>(stubbendReduced) : ap_uint<kNBitBin2S>(stubbend));
 
     //Check if stub bend and proj rinv consistent
     projseqs_[writeindex_] = projseq____;
