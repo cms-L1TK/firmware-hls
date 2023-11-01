@@ -197,12 +197,14 @@ std::string return_splitted(std::string data_string, const int bit_widths[],
                             const std::string names[], const int num_splits,
                             int start_index=0)
 {
+  // This function splits the binary string along lines defined by the bit widths
+  // for the tracklet projection algorithm 
   std::string splitted = ""; 
 
-  // Used if we only want to print one column
   int end_index = num_splits;
-  if (start_index != 0) end_index = start_index+1;
+  if (start_index != 0) end_index = start_index+1; // If we only want to print one column
 
+  // Create the split string
   for(int i=start_index; i<end_index; i++){
     splitted += data_string.substr(0,bit_widths[i]);
     splitted += " \t|";
@@ -218,6 +220,9 @@ unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& mem
                                const int bit_widths[], const std::string names[],
                                const int num_splits, const bool truncated = false, int start_index=0)
 {
+  // This is a modification of compareMemWithMem to allow for outputting the data in binary format
+  // split by the various column types in the projections, AllProj
+  // Set start_index = 0 to see all columns, or any int between 1-5 to see only one at a time
   unsigned int err_count = 0;
 
   constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
@@ -229,37 +234,38 @@ unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& mem
     auto data_com_raw = memory.read_mem(ievt,i).raw();
     auto data_ref = data_ref_raw.range(msb,lsb);
     auto data_com = data_com_raw.range(msb,lsb);
-    if (i==0) {
+
+    // Print headers for the columns at start
+    if (i==0) 
+    {
       // If both reference and computed memories are completely empty, skip it
       if (data_com == 0 && data_ref == 0) break;
       std::cout << label << ":" << std::endl;
       std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
 
       // Print out column headers 
-      int end_index = num_splits;
-      if (start_index != 0) end_index = start_index+1;
+      int end_index = num_splits; 
+      if (start_index != 0) end_index = start_index+1; // allows for only printing one column
+      
       std::cout << " \t";
-
-      for (int i = start_index; i < end_index; i++){
-        //std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")" << "\t|"; 
-        int length = bit_widths[i]-names[i].length()-3; 
-        if (length < 0 ) length = 0;
-        std::string spaces(length,' ');
-        std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "\t|"; 
-      }
-      std::cout << "|";
-      for (int i = start_index; i < end_index; i++){
-        int length = bit_widths[i]-names[i].length()-3; 
-        if (length < 0 ) length = 0;
-        std::string spaces(length,' ');
-        std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")" << spaces << "\t|"; 
+      for (int j = 0; j < 2; j++)
+      {
+        for (int i = start_index; i < end_index; i++)
+        {
+          int length = bit_widths[i]-names[i].length()-3; 
+          if (length < 0 ) length = 0;
+          std::string spaces(length,' ');
+          std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "\t|"; 
+        }
+        if (j ==0) std::cout << "|";
       }
       std::cout << std::endl;
     }
+
     // If have reached the end of valid entries in both computed and reference, don't bother printing further
     if (data_com == 0 && data_ref == 0) continue;
 
-
+    // Print out the values 
     std::cout << i << " \t";
     if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_ref).to_string(), bit_widths, names, num_splits, start_index) << "|";
     else                 std::cout << std::hex << data_ref << "\t";
@@ -292,23 +298,18 @@ unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
                                 const bool truncated = false, int maxProc = kMaxProc)
 {
-  ////////////////////////////////////////
+  // This is a modification of compareMemWithFile to allow for outputting the data in binary format
+  // split by the various column types in the projections, AllProj
   // Read from file
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
+  // This part could potentially be modified in the future to debug other modules
   int num_splits = 6;
   int bit_widths[num_splits] = { MemType::BitWidths::kTProjTCIDSize, MemType::BitWidths::kTProjTrackletIndexSize, 
                          MemType::BitWidths::kTProjPhiSize, MemType::BitWidths::kTProjRZSize, 
                          MemType::BitWidths::kTProjPhiDSize, MemType::BitWidths::kTProjRZDSize };
   std::string names[num_splits] = {"TCID ", "Tproj", "phi", "z", "phid", "zder"};
-
-  // for (int i = 0; i < 6; i++){
-  //       std::cout << bit_widths[i] << "|"; 
-  //       std::cout << names[i] << "|"; 
-  //     }
-  //     std::cout << std::endl;
-
 
   return compareProjMemWithMem<MemType>(memory_ref, memory, ievt, label, bit_widths, names, num_splits, truncated);
   
