@@ -7,19 +7,14 @@
 source env_hls.tcl
 
 set modules_to_test {
-  {PC_L1L2C}
-  {PC_L2L3C}
-  {PC_L3L4C}
-  {PC_L5L6C}
-  {PC_L1D1C}
-  {PC_L2D1C}
-  {PC_D1D2C}
-  {PC_D3D4C}
+  {TP_L1L2C}
+  {TP_L3L4A}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export PC_L1L2C
+#set module_to_export PC_L1L2C
+set module_to_export PC_L3L4A
 
 # create new project (deleting any existing one of same name)
 open_project -reset projectionCalculator
