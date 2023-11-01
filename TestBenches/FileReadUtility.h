@@ -174,7 +174,9 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
   }
   
   return err_count;
-}                                
+}
+
+
 
 template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
@@ -189,6 +191,130 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
   
 }
+
+
+
+std::string return_splitted(std::string data_string, const int bit_widths[], 
+                            const std::string names[], const int num_splits,
+                            int start_index=0)
+{
+  std::string splitted = ""; 
+
+  // Used if we only want to print one column
+  int end_index = num_splits;
+  if (start_index != 0) end_index = start_index+1;
+
+  for(int i=start_index; i<end_index; i++){
+    splitted += data_string.substr(0,bit_widths[i]);
+    splitted += " \t|";
+    data_string = data_string.substr(bit_widths[i]);
+  }
+  return splitted; 
+}
+
+
+template<class MemType, int OutputBase=2, int LSB=-1, int MSB=-1>
+unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& memory, int ievt,
+                               const std::string& label, 
+                               const int bit_widths[], const std::string names[],
+                               const int num_splits, const bool truncated = false, int start_index=0)
+{
+  unsigned int err_count = 0;
+
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
+  constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
+  constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
+
+  for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
+    auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
+    auto data_com_raw = memory.read_mem(ievt,i).raw();
+    auto data_ref = data_ref_raw.range(msb,lsb);
+    auto data_com = data_com_raw.range(msb,lsb);
+    if (i==0) {
+      // If both reference and computed memories are completely empty, skip it
+      if (data_com == 0 && data_ref == 0) break;
+      std::cout << label << ":" << std::endl;
+      std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+
+      // Print out column headers 
+      int end_index = num_splits;
+      if (start_index != 0) end_index = start_index+1;
+      std::cout << " \t";
+
+      for (int i = start_index; i < end_index; i++){
+        //std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")" << "\t|"; 
+        int length = bit_widths[i]-names[i].length()-3; 
+        if (length < 0 ) length = 0;
+        std::string spaces(length,' ');
+        std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "\t|"; 
+      }
+      std::cout << "|";
+      for (int i = start_index; i < end_index; i++){
+        int length = bit_widths[i]-names[i].length()-3; 
+        if (length < 0 ) length = 0;
+        std::string spaces(length,' ');
+        std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")" << spaces << "\t|"; 
+      }
+      std::cout << std::endl;
+    }
+    // If have reached the end of valid entries in both computed and reference, don't bother printing further
+    if (data_com == 0 && data_ref == 0) continue;
+
+
+    std::cout << i << " \t";
+    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_ref).to_string(), bit_widths, names, num_splits, start_index) << "|";
+    else                 std::cout << std::hex << data_ref << "\t";
+    
+    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_com).to_string(), bit_widths, names, num_splits, start_index) ;
+    else                 std::cout << std::hex << data_com; // << std::endl;
+
+    // If there is extra entries in reference
+    if (data_com == 0) {
+      std::cout << "\t" << "<=== missing";
+      if (!truncated) err_count++;
+    // If there is extra entries in computed
+    } else if (data_ref == 0) {
+      std::cout << "\t" << "<=== EXTRA";
+      err_count++;
+    // If reference and computed entry are inconsistent
+    } else if (data_com != data_ref) {
+      std::cout << "\t" << "<=== INCONSISTENT";
+      err_count++;
+    }
+
+    std::cout << std::endl;
+  }
+  
+  return err_count;
+}
+
+template<class MemType, int InputBase=16, int OutputBase=2, int LSB=-1, int MSB=-1>
+unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
+                                int ievt, const std::string& label,
+                                const bool truncated = false, int maxProc = kMaxProc)
+{
+  ////////////////////////////////////////
+  // Read from file
+  MemType memory_ref;
+  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
+
+  int num_splits = 6;
+  int bit_widths[num_splits] = { MemType::BitWidths::kTProjTCIDSize, MemType::BitWidths::kTProjTrackletIndexSize, 
+                         MemType::BitWidths::kTProjPhiSize, MemType::BitWidths::kTProjRZSize, 
+                         MemType::BitWidths::kTProjPhiDSize, MemType::BitWidths::kTProjRZDSize };
+  std::string names[num_splits] = {"TCID ", "Tproj", "phi", "z", "phid", "zder"};
+
+  // for (int i = 0; i < 6; i++){
+  //       std::cout << bit_widths[i] << "|"; 
+  //       std::cout << names[i] << "|"; 
+  //     }
+  //     std::cout << std::endl;
+
+
+  return compareProjMemWithMem<MemType>(memory_ref, memory, ievt, label, bit_widths, names, num_splits, truncated);
+  
+}
+
 
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemWithFile(const MemType& memory, 
