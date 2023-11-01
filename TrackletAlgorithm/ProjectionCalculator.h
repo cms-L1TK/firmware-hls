@@ -55,7 +55,7 @@ template<
   }
 
   // Loop over all tracklets in event // TODO: Max number of tracklets? 
-  for (TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0; trackletIndex < 20; trackletIndex++) 
+  for (TrackletProjection<BARRELPS>::TProjTrackletIndex trackletIndex = 0; trackletIndex < N; trackletIndex++) 
   {
     #pragma HLS unroll
     std::cout << "Testing -----------------------------------------------------------------" << std::endl; // Why not producing output? Had to add in generate statement
@@ -65,20 +65,43 @@ template<
 
     // Read in tracklet parameters from the memory //
     const auto &tpar = trackletParameters->read_mem(bx, trackletIndex);
-    std::cout<< tpar.getPhi0() << std::endl; 
+    std::cout<<"tpar.getPhi0: " << tpar.getPhi0() << std::endl; 
+
     if (tpar.getPhi0() != 0)
     {
     // Calculate the projections TODO: actually calculate instead of dummies
       TC::Types::phiL phiL = tpar.getPhi0();
+      std::cout<<"phiL:         " << phiL << std::endl;  
       TC::Types::zL zL = tpar.getZ0();
+      //TC::Types::tL zL = tpar.getZ0();
       TC::Types::der_phiL der_phiL = tpar.getPhi0();
       TC::Types::der_zL der_zL = tpar.getZ0();
+
+
+    // typedef ap_int<15> rinv;
+    // typedef ap_int<12> z0;
+    // typedef ap_uint<20> phiL;
+    // typedef ap_int<15> zL;
+    // typedef ap_int<11> der_phiL;
+    // typedef ap_int<10> der_zL;
+    // typedef ap_uint<16> phiD;
+    // typedef ap_uint<14> rD;
+    // typedef ap_int<10> der_phiD;
+    // typedef ap_int<10> der_rD;
+    // typedef ap_uint<1> flag;
+
+    // Perform calculations  
+     std::cout<<"shift by:     " << (TrackletProjection<BARREL2S>::kTProjPhiSize - tpar.kTParPhi0Size) << std::endl;  
+     phiL = phiL >> (tpar.kTParPhi0Size-TrackletProjection<BARREL2S>::kTProjPhiSize);
+     zL = zL >> (tpar.kTParZ0Size - TrackletProjection<BARREL2S>::kTProjRZSize); 
+
 
     // Create garbage projections
       const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
       const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
       const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
       const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL, zL, der_phiL, der_zL);
+      std::cout<<"tproj phi:     " << tproj_L3.getPhi() << std::endl;
 
     // Write the projections 
       addL3 = TC::addProj<BARRELPS, TC::nproj_L3, ((MaskBarrel & TC::mask_L3) >> TC::shift_L3)> (tproj_L3, bx, &projout_barrel_ps[TC::L3PHIA], &nproj_barrel_ps[TC::L3PHIA], true);
