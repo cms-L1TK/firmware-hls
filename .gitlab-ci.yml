@@ -283,7 +283,7 @@ TB-vivado-hls-build:
 TM-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TM-quality-check"]
-  allow_failure: true # remove after regenerating test vectors
+  allow_failure: true # FIXME: testbench currently always passes
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
