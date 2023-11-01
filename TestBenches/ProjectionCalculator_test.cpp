@@ -37,6 +37,19 @@
   #define TOP_FUNC_ ProjectionCalculator_L1L2C
 #endif
 
+// #if !defined SEED_
+//   #define SEED_ L3L4_
+// #endif
+// #if !defined ITC_
+//   #define ITC_ A_
+// #endif
+// #if !defined MODULE_
+//   #define MODULE_ TP_L3L4A_
+// #endif
+// #if !defined TOP_FUNC_
+//   #define TOP_FUNC_ ProjectionCalculator_L3L4A
+// #endif
+
 
 const int nevents = 1;  //number of events to run
 
@@ -44,59 +57,8 @@ using namespace std;
 
 int main()
 {
-// these need to be customized according to the specific TP being tested
-#if SEED_ == L1L2_
-  const auto InnerStubType = BARRELPS;
-  const auto OuterStubType = BARRELPS;
-  const string innerStubPattern = "AllInnerStubs*_L1*";
-  const string outerStubPattern = "AllStubs*_L2*";
-  const int NTEUnits=5;
-#elif SEED_ == L2L3_
-  const auto InnerStubType = BARRELPS;
-  const auto OuterStubType = BARRELPS;
-  const string innerStubPattern = "AllInnerStubs*_L2*";
-  const string outerStubPattern = "AllStubs*_L3*";
-  const int NTEUnits=2;
-#elif SEED_ == L3L4_
-  const auto InnerStubType = BARRELPS;
-  const auto OuterStubType = BARREL2S;
-  const string innerStubPattern = "AllInnerStubs*_L3*";
-  const string outerStubPattern = "AllStubs*_L4*";
-  const int NTEUnits=5;
-#elif SEED_ == L5L6_
-  const auto InnerStubType = BARREL2S;
-  const auto OuterStubType = BARREL2S;
-  const string innerStubPattern = "AllInnerStubs*_L5*";
-  const string outerStubPattern = "AllStubs*_L6*";
-  const int NTEUnits=3;
-#elif SEED_ == L1D1_
-  const auto InnerStubType = BARRELPS;
-  const auto OuterStubType = DISK;
-  const string innerStubPattern = "AllInnerStubs*_L1*";
-  const string outerStubPattern = "AllStubs*_D1*";
-  const int NTEUnits=3;
-#elif SEED_ == L2D1_
-  const auto InnerStubType = BARRELPS;
-  const auto OuterStubType = DISK;
-  const string innerStubPattern = "AllInnerStubs*_L2*";
-  const string outerStubPattern = "AllStubs*_D1*";
-  const int NTEUnits=2;
-#elif SEED_ == D1D2_
-  const auto InnerStubType = DISK;
-  const auto OuterStubType = DISK;
-  const string innerStubPattern = "AllInnerStubs*_D1*";
-  const string outerStubPattern = "AllStubs*_D2*";
-  const int NTEUnits=3;
-#elif SEED_ == D3D4_
-  const auto InnerStubType = DISK;
-  const auto OuterStubType = DISK;
-  const string innerStubPattern = "AllInnerStubs*_D3*";
-  const string outerStubPattern = "AllStubs*_D4*";
-  const int NTEUnits=2;
-#else
-  #error "Undefined seed"
-#endif
-std::cout<<module_name[MODULE_];
+
+ std::cout<<"Module name:" << module_name[MODULE_]<<std::endl;
 //
   TBHelper tb(std::string("TP/") + module_name[MODULE_]);
   // error counts
@@ -115,8 +77,6 @@ std::cout<<module_name[MODULE_];
   TrackletProjectionMemory<BARRELPS> tproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
   TrackletProjectionMemory<BARREL2S> tproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
   TrackletProjectionMemory<DISK> tproj_disk[TC::N_PROJOUT_DISK];
-
-
 
   // print the input files loaded
   std::cout << "Loaded the input files:\n";
@@ -146,8 +106,6 @@ std::cout<<module_name[MODULE_];
     TOP_FUNC_(bx, bx_o, &trackletParameters, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
 
     bool truncation = false;
-
-
 
     // compare the computed outputs with the expected ones
     for (unsigned i = 0; i < tproj_names.size(); i++) {
