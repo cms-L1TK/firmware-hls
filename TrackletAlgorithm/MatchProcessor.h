@@ -1337,23 +1337,20 @@ void MatchProcessor(BXType bx,
     std::cout << std::endl;
     */
 
-     
-    //New code
+    //New code -- updated to reduce timing
     ap_uint<kNBits_MemAddr>  projseq01tmp, projseq23tmp, projseq0123tmp;
-    ap_uint<1> Bit01 = projseqs[0]<projseqs[1];
-    ap_uint<1> Bit23 = projseqs[2]<projseqs[3];
 
-    projseq01tmp = Bit01 ? projseqs[0] : projseqs[1];
-    projseq23tmp = Bit23 ? projseqs[2] : projseqs[3];
-    
-    ap_uint<1> Bit0123 = projseq01tmp < projseq23tmp;
+    ap_uint<1> Bit10 = projseqs[1]<projseqs[0];
+    ap_uint<1> Bit20 = projseqs[2]<projseqs[0];
+    ap_uint<1> Bit30 = projseqs[3]<projseqs[0];
+    ap_uint<1> Bit21 = projseqs[2]<projseqs[1];
+    ap_uint<1> Bit31 = projseqs[3]<projseqs[1];
+    ap_uint<1> Bit32 = projseqs[3]<projseqs[2];
 
-    projseq0123tmp = Bit0123 ? projseq01tmp : projseq23tmp;
-    
-    bestiMEU = (~Bit0123, Bit0123 ? ~Bit01 : ~Bit23 );
+    bestiMEU = ((Bit10|Bit20|Bit30)&(Bit31|Bit21|~Bit10) , (Bit10|Bit20|Bit30)&(Bit32|~Bit21|~Bit20) );
 
     hasMatch = !emptys[bestiMEU];
-    
+
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
