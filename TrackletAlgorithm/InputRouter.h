@@ -208,7 +208,7 @@ void ClearCounters(unsigned int nMemories
 #pragma HLS inline
 #pragma HLS array_partition variable = nEntries complete
   LOOP_ClearCounters:
-	for (int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
+	for (unsigned int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
   {
 #pragma HLS unroll
     nEntries[cIndx]=0; 
@@ -225,7 +225,7 @@ void CountMemories(const ap_uint<kBINMAPwidth> hPhBnWord
 #pragma HLS array_partition variable = nMemsPerLyr complete
   int cPrevSize=0; 
   LOOP_CountOutputMemories:
-  for (int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
+  for (unsigned int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
   {
 #pragma HLS unroll
     //auto hBnWrd = hPhBnWord.range(kSizeBinWord * cLyr + (kSizeBinWord-1), kSizeBinWord * cLyr);

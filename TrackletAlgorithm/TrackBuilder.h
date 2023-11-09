@@ -32,7 +32,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-template<unsigned Seed, unsigned NFMPerStubBarrel0, unsigned NFMPerStubBarrel, unsigned NFMPerStubDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
+template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -45,8 +45,8 @@ void TrackBuilder(
 )
 {
 
-  constexpr unsigned NFMBarrel = NFMPerStubBarrel0 + (NBarrelStubs - 1) * NFMPerStubBarrel;
-  constexpr unsigned NFMDisk = NDiskStubs * NFMPerStubDisk;
+  constexpr int NFMBarrel = NFMPerStubBarrel0 + (NBarrelStubs - 1) * NFMPerStubBarrel;
+  constexpr int NFMDisk = NDiskStubs * NFMPerStubDisk;
 
   // Circular buffers for each of the input full-match memories.
   FullMatch<BARREL> barrel_fm[NFMBarrel][1<<kNBitsTBBuffer];
@@ -160,7 +160,7 @@ void TrackBuilder(
 
     barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
-      const unsigned nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
+      const int nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
       const unsigned nFMCumulative = (j == 0 ? 0 : (j == 1 ? NFMPerStubBarrel0 : NFMPerStubBarrel0 + (j - 1) * NFMPerStubBarrel));
 
       ap_uint<1> barrel_stub_valid = false;

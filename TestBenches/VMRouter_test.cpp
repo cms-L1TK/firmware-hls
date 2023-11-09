@@ -24,8 +24,8 @@ using namespace std;
 const int nEvents = 100;  //number of events to run
 
 // Count the number of copies of each memory in a file name vector
-vector<int> countCopies(const vector<string> &fileNames) {
-  vector<int> numCopies; // Each element in vector corresponds to one memory, i.e. L1PHIE17
+vector<unsigned> countCopies(const vector<string> &fileNames) {
+  vector<unsigned> numCopies; // Each element in vector corresponds to one memory, i.e. L1PHIE17
   string fileName = "temporary file name";
   // Loop over all file names
   for (auto f = fileNames.begin(); f != fileNames.end(); ++f) {
@@ -42,7 +42,6 @@ vector<int> countCopies(const vector<string> &fileNames) {
 
 int main() {
 
-  constexpr int sector = 4; //  Specifies the sector
   constexpr char phi = 'A' + phiRegion; // Converts phiRegion to char
 
   char overlapPhiRegion[] = {'X', 'Y', 'Z', 'W', 'Q', 'R', 'S', 'T'}; // Special naming for the TE overlap memories, and outer memories in Disk 1
@@ -89,7 +88,7 @@ int main() {
   auto &fout_vmstubteo = tb.files(teoPattern);
 
   // Get the number of copies for each TE memory
-  vector<int> zero = {0};
+  vector<unsigned> zero = {0};
   auto numCopiesTEI = (nTotVMSTEI) ? countCopies(tb.fileNames(teiPattern)) : zero;
   auto numCopiesOL = (nTotVMSTEOL) ? countCopies(tb.fileNames(teolPattern)) : zero;
   auto numCopiesTEO = (nTotVMSTEO) ? countCopies(tb.fileNames(teoPattern)) : zero;
@@ -148,7 +147,7 @@ int main() {
     for (unsigned int i = 0; i < numInputs; i++) {
       writeMemFromFile<InputStubMemory<inputType>>(inputStubs[i], fin_inputstubs[i], ievt);
     }
-    for (unsigned int i = 0; i < numInputsDisk2S; i++) {
+    for (int i = 0; i < numInputsDisk2S; i++) {
       writeMemFromFile<InputStubMemory<DISK2S>>(inputStubsDisk2S[i], fin_inputstubs_disk2s[i], ievt);
     }
 
@@ -194,7 +193,7 @@ int main() {
 
     // TE Inner Memories
     if (nTotVMSTEI) {
-      int k = 0;
+      unsigned int k = 0;
       for (unsigned int i = 0; i < nvmTEI; i++) {
         for (unsigned int j = 0; j < numCopiesTEI[i]; j++) {
           if (k >= nTotVMSTEI) break;
@@ -206,7 +205,7 @@ int main() {
 
     // TE Inner Overlap memories
     if (nTotVMSTEOL) {
-      int k = 0;
+      unsigned int k = 0;
       for (unsigned int i = 0; i < nvmOL; i++) {
         for (unsigned int j = 0; j < numCopiesOL[i]; j++) {
           if (k >= nTotVMSTEOL) break;
@@ -218,7 +217,7 @@ int main() {
 
     // TE Outer memories
     if (nTotVMSTEO) {
-      int k = 0;
+      unsigned int k = 0;
       for (unsigned int i = 0; i < nvmTEO; i++) {
         for (unsigned int j = 0; j < numCopiesTEO[i]; j++) {
           if (k >= nTotVMSTEO) break;

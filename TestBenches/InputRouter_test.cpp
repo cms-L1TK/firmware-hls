@@ -42,18 +42,11 @@ CablingMap getMap( std::string pInputWiresMap )
     // read line 
     // and look for connections where 
     // VMR is the output 
-    bool cFoundInputLink=false;
     
     std::string cInputLink = "";
     std::string cVMRMemory = "";
     while (cStream >> cToken) 
     {
-      if( cPrevToken.find("input") != std::string::npos 
-        && cToken.find("output") != std::string::npos ) 
-      {
-        cFoundInputLink = true;
-      }
-
       if( cPrevToken.find("output") != std::string::npos 
         && cToken.find("VMR") != std::string::npos ) 
       {
@@ -168,18 +161,11 @@ DtcMap getCablingMap( std::string pInputWiresMap )
     // read line 
     // and look for connections where 
     // VMR is the output 
-    bool cFoundInputLink=false;
     
     std::string cInputLink = "";
     std::string cVMRMemory = "";
     while (cStream >> cToken) 
     {
-      if( cPrevToken.find("input") != std::string::npos 
-        && cToken.find("output") != std::string::npos ) 
-      {
-        cFoundInputLink = true;
-      }
-
       if( cPrevToken.find("output") != std::string::npos 
         && cToken.find("VMR") != std::string::npos ) 
       {
@@ -454,8 +440,8 @@ ap_uint<kLINKMAPwidth> getLnkWrd(CablingMap pDtcMap
 }
 void decodeLnkWrd(ap_uint<kLINKMAPwidth> pLnkWrd)
 {
-  int cNlyrs = pLnkWrd.range( kLINKMAPwidth-1, kLINKMAPwidth-1-(3-1));
-  int cIs2S = pLnkWrd.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
+  unsigned int cNlyrs = pLnkWrd.range( kLINKMAPwidth-1, kLINKMAPwidth-1-(3-1));
+  unsigned int cIs2S = pLnkWrd.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
   std::cout << "LnkWrd 0x" 
     << std::hex  << int(pLnkWrd) << std::dec 
     << "\t..."
@@ -497,7 +483,7 @@ void prepareInputStreams( ifstream * pInputStreams
   auto hLinkWord = getLnkWrd(pDtcMap,pLinkId);
   int cMemIndx=0;
   std::vector<uint8_t> cLyrs = getLyrs( pDtcMap , pLinkId );
-  for(int cLyrIndx=0; cLyrIndx< cLyrs.size(); cLyrIndx++)
+  for(unsigned int cLyrIndx=0; cLyrIndx< cLyrs.size(); cLyrIndx++)
   {
     ap_uint<kSizeLinkWord> hWrd = hLinkWord.range(kSizeLinkWord*cLyrIndx+kSizeLinkWord-1,kSizeLinkWord*cLyrIndx);
     //if( hWrd == 0) continue;

@@ -195,7 +195,6 @@ inline VMStubME<OutType> createStubME(const InputStub<InType> stub,
 
 	int nrBits = r.length(); // Number of bits for r
 	int nzBits = z.length(); // Number of bits for z
-	int nbendBits = bend.length(); // Number of bits for bend
 	int nfinerzbits = stubME.getFineZ().length(); // Number of bits for finer/z
 	int nFinePhiBits = stubME.getFinePhi().length(); // Number of bits used for fine phi
 
@@ -300,7 +299,6 @@ inline VMStubTEInner<OutType> createStubTEInner(const InputStub<InType> stub,
 
 	int nrBits = r.length(); // Number of bits for r
 	int nzBits = z.length(); // Number of bits for z
-	int nbendBits = bend.length(); // Number of bits for bend
 	int nFinePhiBits = stubTEI.getFinePhi().length(); // Number of bits used for fine phi
 
 	// Number of bits used for table indices
@@ -380,7 +378,6 @@ inline VMStubTEOuter<OutType> createStubTEOuter(const InputStub<InType> stub,
 
 	int nrBits = r.length(); // Number of bits for r
 	int nzBits = z.length(); // Number of bits for z
-	int nbendBits = bend.length(); // Number of bits for bend
 	int nfinerzbits = stubTEO.getFineZ().length(); // Number of bits for finer/z
 	int nFinePhiBits = stubTEO.getFinePhi().length();  // Number of bits for finephi
 
@@ -470,7 +467,6 @@ inline VMStubTEInner<BARRELOL> createStubTEOverlap(const InputStub<InType> stub,
 
 	int nrBits = r.length(); // Number of bits for r
 	int nzBits = z.length(); // Number of bits for z
-	int nbendBits = bend.length(); // Number of bits for bend
 
 	// Number of bits
 	constexpr auto vmbits = ((Layer == 1) || (Layer == 2)) ? nbitsallstubs[Layer - 1] + nbits_vmte_overlap[Layer - 1] : 0; // Number of bits used for VMs
