@@ -66,9 +66,12 @@ architecture rtl of emp_payload is
   signal s_BW_46_stream_data  : t_arr_BW_46_DATA;
   signal s_BW_46_stream_valid : t_arr_BW_46_1b;
   signal s_FT_bx_out_vld      : std_logic;
+  signal rst_p                : std_logic;
   signal s_tftokf             : t_channlesTB(numTW_98 - 1 downto 0);
   signal s_kfout              : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout              : ldata(numLinksTFP - 1 downto 0);
+  signal s_tfin               : ldata(4 * N_REGION - 1 downto 0);
+  signal s_tfoutout           : ldata(4 * N_REGION - 1 downto 0);
 
 begin  -- architecture rtl
 
@@ -81,15 +84,31 @@ begin  -- architecture rtl
   ipb_out <= IPB_RBUS_NULL;
   bc0     <= '0';
 
+  emp_cdc_1 : entity work.emp_cdc
+    generic map (
+      channel_first => 68,
+      channel_last  => 107
+      )
+    port map (
+      clk_i => clk_p,
+      clk_o => clk_payload(1),
+      rst_i => rst,
+      din_i => d,
+      din_o => s_tfin,
+      rst_o => rst_p
+      );
+
   -----------------------------------------------------------------------------
   -- Link to Sector Processor formatter
   -----------------------------------------------------------------------------
    linktosecproc_1 : entity work.linktosecproc
      port map (
-       clk_i                => clk_p,
-       rst_i                => rst,
+       clk_i                => clk_payload(1),
+       --clk_i                => clk_p,
+       rst_i                => rst_p,
+       --rst_i                => rst,
        ttc_i                => ctrs,
-       din_i                => d,
+       din_i                => s_tfin,
        ir_start_o           => s_ir_start,
        bx_o                 => s_bx,
        DL_39_link_AV_dout   => s_IR_data,
@@ -102,8 +121,10 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
    SectorProcessor_1 : entity work.SectorProcessor
      port map (
-       clk                     => clk_p,
-       reset                   => rst,
+       clk                     => clk_payload(1),
+       --clk                     => clk_p,
+       reset                   => rst_p,
+       --reset                   => rst,
        IR_start                => s_ir_start,
        IR_bx_in                => s_bx,
        FT_bx_out               => open,
@@ -140,7 +161,8 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
    tf_to_kf_1 : entity work.tf_to_kf
      port map (
-       clk_i         => clk_p,
+       clk_i         => clk_payload(1),
+       --clk_i         => clk_p,
        TW_98_data_i  => s_TW_98_stream_data,
        TW_98_valid_i => s_TW_98_stream_valid,
        BW_46_data_i  => s_BW_46_stream_data,
@@ -154,7 +176,8 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
    kf_wrapper_1 : entity work.kf_wrapper
      port map (
-       clk_i   => clk_p,
+       clk_i   => clk_payload(1),
+       --clk_i   => clk_p,
        kfin_i  => s_tftokf,
        kfout_o => s_kfout
        );
@@ -164,15 +187,30 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
    kfout_isolation_out_1 : entity work.kfout_isolation_out
      port map (
-       clk        => clk_p,
-       out_packet => conv(d),
+       clk        => clk_payload(1),
+       --clk        => clk_p,
+       out_packet => conv(s_tfin),
        out_din    => s_kfout,
        out_dout   => s_tfout
        );
 
-  q(120)        <= s_tfout(0);
-  q(121)        <= s_tfout(1);
+  s_tfoutout(120)        <= s_tfout(0);
+  s_tfoutout(121)        <= s_tfout(1);
   --q(120).strobe <= '1';
   --q(121).strobe <= '1';
+
+  emp_cdc_2 : entity work.emp_cdc
+    generic map (
+      channel_first => 120,
+      channel_last  => 121
+      )
+    port map (
+      clk_i => clk_payload(1),
+      clk_o => clk_p,
+      rst_i => rst_p,
+      din_i => s_tfoutout,
+      din_o => q,
+      rst_o => open
+      );
 
 end architecture rtl;

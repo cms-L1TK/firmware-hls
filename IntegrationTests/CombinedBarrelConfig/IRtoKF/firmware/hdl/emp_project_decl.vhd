@@ -53,7 +53,7 @@ package emp_project_decl is
     27     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
     28     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
     29     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
-    30     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
+    30     => (no_mgt, no_buf, no_fmt, buf, no_mgt),
     31     => kDummyRegion,                             --service/tcds
     others => kDummyRegion
     );
