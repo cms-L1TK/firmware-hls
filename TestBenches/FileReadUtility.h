@@ -202,7 +202,7 @@ std::string return_splitted(std::string data_string, const int bit_widths[],
   // for the tracklet projection algorithm 
   std::string splitted = ""; 
 
-  int end_index = num_splits;
+  int end_index = num_splits-3;
   if (start_index != 0) end_index = start_index+1; // If we only want to print one column
 
   // Create the split string
@@ -242,23 +242,27 @@ unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& mem
       // If both reference and computed memories are completely empty, skip it
       if (data_com == 0 && data_ref == 0) break;
       std::cout << label << ":" << std::endl;
-      std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+      if (OutputBase == 2) std::cout << "index" << "\t" << "reference" << "\t\t\t\t" << "computed" << std::endl;
+      else std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
 
-      // Print out column headers 
-      int end_index = num_splits; 
-      if (start_index != 0) end_index = start_index+1; // allows for only printing one column
-      
-      std::cout << " \t";
-      for (int j = 0; j < 2; j++)
+      if (OutputBase==2)
       {
-        for (int i = start_index; i < end_index; i++)
+        // Print out column headers 
+        int end_index = num_splits-3; 
+        if (start_index != 0) end_index = start_index+1; // allows for only printing one column
+        
+        std::cout << " \t";
+        for (int j = 0; j < 2; j++)
         {
-          int length = bit_widths[i]-names[i].length()-3; 
-          if (length < 0 ) length = 0;
-          std::string spaces(length,' ');
-          std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "\t|"; 
+          for (int i = start_index; i < end_index; i++)
+          {
+            int length = bit_widths[i]-names[i].length()-3; 
+            if (length < 0 ) length = 0;
+            std::string spaces(length,' ');
+            std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "\t|"; 
+          }
+          if (j ==0) std::cout << "|";
         }
-        if (j ==0) std::cout << "|";
       }
       std::cout << std::endl;
     }
