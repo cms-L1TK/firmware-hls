@@ -8,7 +8,6 @@ source env_hls.tcl
 
 set modules_to_test {
   {TP_L1L2C}
-  {TP_L3L4A}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
