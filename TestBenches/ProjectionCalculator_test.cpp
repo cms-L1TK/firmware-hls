@@ -86,6 +86,8 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+    // TODO: move loop over tracklet parameters from module to testbench 
+
     // read event and write to memories
     writeMemFromFile<TrackletParameterMemory>(trackletParameters, fin_tpar.at(0), ievt);
 
