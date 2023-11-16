@@ -221,22 +221,22 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     constexpr unsigned int kRInvSteps = 32;
     constexpr unsigned int kRInvBits = BITS_TO_REPRESENT(kRInvSteps - 1);
     
-    static const ap_uint<1 << 2*projfinephibits> phiLUT = isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>();
-    static const ap_uint<1 << 2*projfinephibits> stubZBarrelPS = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrelPSMax,true,stubfinephibits,projfinephibits>();
-    static const ap_uint<1 << 2*projfinephibits> stubZBarrel2S = isLessThanSize<projfinephibits,StubZPositionBarrelConsistency::kBarrel2SMax,true,stubfinephibits,projfinephibits>();
-    static const ap_uint<1 << 2*projfinephibits> stubZDiskPS = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinephibits,projfinephibits>();
-    static const ap_uint<1 << 2*projfinephibits> stubZDisk2S = isLessThanSize<projfinephibits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinephibits,projfinephibits>();
-    bool passphi = phiLUT[(projfinephi____,stubfinephi)];//isLessThanSize<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>()[(projfinephi____,stubfinephi)];
+    bool phiLUT = isLessThanSizeBool<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>(projfinephi____,stubfinephi);
+    bool stubZBarrelPS = isLessThanSizeBool<projfinephibits,StubZPositionBarrelConsistency::kBarrelPSMax,true,stubfinephibits,projfinephibits>(stubfinez,projfinezadj____);
+    bool stubZBarrel2S = isLessThanSizeBool<projfinephibits,StubZPositionBarrelConsistency::kBarrel2SMax,true,stubfinephibits,projfinephibits>(stubfinez,projfinezadj____);
+    bool stubZDiskPS = isLessThanSizeBool<projfinephibits,StubZPositionDiskConsistency::kDiskPSMax,true,stubfinephibits,projfinephibits>(stubfinez,projfinezadj____);
+    bool stubZDisk2S = isLessThanSizeBool<projfinephibits,StubZPositionDiskConsistency::kDisk2SMax,true,stubfinephibits,projfinephibits>(stubfinez,projfinezadj____);
+    bool passphi = phiLUT;//isLessThanSizeBool<projfinephibits,StubPhiPositionConsistency::kMax,false,projfinephibits,stubfinephibits>()(projfinephi____,stubfinephi);
     
     //Check if stub z position consistent
     bool pass = false;
     if(!isDisk) {
       // check if abs(projfinezadj____ - stubfinez) < StubZPositionBarrelConsistency::kBarrel(PS|2S)Max
-      pass = isPSseed____ ? stubZBarrelPS[(stubfinez,projfinezadj____)] : stubZBarrel2S[(stubfinez,projfinezadj____)];
+      pass = isPSseed____ ? stubZBarrelPS : stubZBarrel2S;
     }
     else {
       // check if abs(projfinezadj____ - stubfinez) < StubZPositionBarrelConsistency::kDisk(PS|2S)Max
-      pass = isPSStub ? stubZDiskPS[(stubfinez,projfinezadj____)] : stubZDisk2S[(stubfinez,projfinezadj____)];
+      pass = isPSStub ? stubZDiskPS : stubZDisk2S;
     }
 
     //here we always use the larger number of bits for the bend

@@ -133,4 +133,21 @@ static const ap_uint<1 << 2*nbits> isLessThanSize() {
   }
   return tab;
 }
+
+template<int nbits, int max, bool lessThan, int proj, int stub>
+bool isLessThanSizeBool(ap_uint<nbits> projphi, ap_uint<nbits> stubphi) {
+  ap_uint<nbits> Max(max);
+  ap_uint<nbits> Min(-max);
+  ap_uint<nbits> result = projphi - stubphi;
+  //for(int i = 0; i < 1<<2*nbits; ++i) {
+//#pragma HLS unroll
+    if(lessThan) {
+      if(result <= Max || result >= Min) return true;
+    }
+    else {
+      if(result < Max || result > Min) return true;
+    }
+  //}
+  return false;
+}
 #endif
