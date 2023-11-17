@@ -15,8 +15,8 @@ class TrackletEngineUnit {
     kNBitsRZFine=3,
     kNBitsPhiBins=3,
     kNBitsNegDiskSize=1,
-    kNBitsPTLutInner=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512),
-    kNBitsPTLutOuter=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512)
+    kNBitsPTLutInner=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3||TF::L3L4)?256:512),
+    kNBitsPTLutOuter=(Seed==TF::L5L6||TF::L1D1||TF::L2D1||TF::D1D2||TF::D3D4)?1024:(Seed==(TF::L1L2||TF::L2L3)?256:512)
   };
 
   typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
@@ -55,8 +55,18 @@ class TrackletEngineUnit {
 
     const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
     const ap_uint<1>* stubptoutertmp = getPTOuterLUT<Seed,iTC>();
-
-    if ( Seed <= TF::L5L6 ){
+    if ( Seed == TF::L3L4 ){//Split up Outer L3L4 table - reduced LUT usage for some reason 
+      for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
+#pragma HLS unroll
+        stubptinnerlutnew_[i] = stubptinnertmp[i];
+      }
+      for(unsigned int i=0;i<kNBitsPTLutOuter;i++) {
+#pragma HLS unroll
+        stubptouterlutnew1_[i] = stubptoutertmp[i];
+        stubptouterlutnew2_[i] = stubptoutertmp[i+256];
+      }
+    }
+    else if ( Seed <= TF::L5L6 ){
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll
         stubptinnerlutnew_[i] = stubptinnertmp[i];
