@@ -1,18 +1,17 @@
 #include <fstream>
 #include <string>
-template<int lutwidth, int lutsize> void readSWLUT(ap_uint<lutwidth> lut[lutsize], std::string lutpath){
+// The following function provides a more compiler efficient method for reading look up table arrays (currently used in TP), this is only used in C simulations and not synthesis
+template<class lutType, int lutsize> void readSWLUT(lutType lut[lutsize], std::string lutpath){
 
   std::ifstream LUTif(lutpath);
-  ap_uint<lutwidth> lutval;
+  lutType lutval;
   bool first = true;
   unsigned int lutIndex=0;
-  std::cout << "lutpath: " << lutpath<< "open: " << !LUTif.is_open();
   while (LUTif >> lutval){
     if (first && lutval == 0){
       first = false;
       continue;
     }
-    std::cout << "reglut push back value: " << std::dec << lutval << " at index: " << lutIndex << "\n";
     lut[lutIndex]=lutval;
     ++lutIndex;
   }

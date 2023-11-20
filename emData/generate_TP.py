@@ -64,7 +64,47 @@ class ProjoutIndexDisk(Enum):
     D5PHIC = 18
     D5PHID = 19
     N_PROJOUT_DISK = 20
-
+#FIXME magic numbers for array sizes:
+regLUTSize = {
+  "L1L2" : '2048',
+  "L2L3" : '2048',
+  "L3L4" : '2048',
+  "L5L6" : '4096',
+  "L1D1" : '16384',
+  "L2D1" : '16384',
+  "D1D2" : '16384',
+  "D3D4" : '16384'
+}
+LUTSize = {
+  "L1L2" : '2048',
+  "L2L3" : '2048',
+  "L3L4" : '2048',
+  "L5L6" : '2048',
+  "L1D1" : '2048',
+  "L2D1" : '2048',
+  "D1D2" : '2048',
+  "D3D4" : '2048'
+}
+innerPTLUTSize = {
+  "L1L2" : '256',
+  "L2L3" : '256',
+  "L3L4" : '256',
+  "L5L6" : '1024',
+  "L1D1" : '4096',
+  "L2D1" : '4096',
+  "D1D2" : '2048',
+  "D3D4" : '2048'
+}
+outerPTLUTSize = {
+  "L1L2" : '256',
+  "L2L3" : '256',
+  "L3L4" : '512',
+  "L5L6" : '1024',
+  "L1D1" : '4096',
+  "L2D1" : '4096',
+  "D1D2" : '2048',
+  "D3D4" : '2048'
+}
 parser = argparse.ArgumentParser(description="This script generates TrackletProcessorTop.h, TrackletProcessorTop.cc, and\
 TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
@@ -123,6 +163,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "#ifndef TopFunctions_TrackletProcessor_parameters_h\n"
       "#define TopFunctions_TrackletProcessor_parameters_h\n"
       "\n"
+      '#include "SWLUTReader.h"\n'
       "// This file contains numbers of memories and bit masks that are specific to\n"
       "// each TrackletProcessor and that come directly from the wiring.\n"
       "//\n"
@@ -203,38 +244,58 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "  return 0x%X;\n"
           "}\n"
           'template<> inline const ap_uint<8>* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_uint<8> lut[' + regLUTSize[seed] + '];\n'
+          '  readSWLUT<ap_uint<8>,' + regLUTSize[seed] + '>(lut,"../../../../../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab");\n'
+          '#else\n'
           '  static ap_uint<8> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
+          '#endif\n'
           '  return lut;\n'
           '}\n'
           'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_uint<10> lut[' + LUTSize[seed] + '];\n'
+          '  readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"../../../../../emData/TP/tables/TP_' + seed + '.tab");\n'
+          '#else\n'
           '  static ap_uint<10> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + '.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
+          '#endif\n'
           '  return lut;\n'
           '}\n'
           'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_uint<1> lut[' + innerPTLUTSize[seed] + '];\n'
+          '  readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"../../../../../emData/TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
+          '#else\n'
           '  static ap_uint<1> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
+          '#endif\n'
           '  return lut;\n'
           '}\n'
           'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_uint<1> lut[' + outerPTLUTSize[seed] + '];\n'
+          '  readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"../../../../../emData/TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
+          '#else\n'
           '  static ap_uint<1> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
           '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
           '#else\n'
           '  {};\n'
+          '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
