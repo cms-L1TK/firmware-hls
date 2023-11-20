@@ -1304,6 +1304,7 @@ void MatchProcessor(BXType bx,
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
     bool projBuffNearFull = nearFull3Unit<nPRBAbits>()[(readptr,writeptr)];
+    bool projBuffNearFullB = nearFull3UnitBool<nPRBAbits>(readptr,writeptr);
     
     ap_uint<3> iphi = 0;
 
