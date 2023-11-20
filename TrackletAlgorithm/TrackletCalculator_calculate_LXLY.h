@@ -85,42 +85,62 @@ ap_int<18> drinv;
 switch (Seed) {
   case TF::L1L2:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_drinv[512];
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L1L2_drinv.tab",false,true);
+#else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L1L2_drinv.tab")
 #  include "../emData/LUTs/TC_L1L2_drinv.tab"
 #endif
       };
+#endif
       drinv = LUT_drinv[addr_drinv];
       break;
     }
   case TF::L2L3:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_drinv[512];
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L2L3_drinv.tab",false,true);
+#else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L2L3_drinv.tab")
 #  include "../emData/LUTs/TC_L2L3_drinv.tab"
 #endif
       };
+#endif
       drinv = LUT_drinv[addr_drinv];
       break;
     }
 
   case TF::L3L4:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_drinv[512];
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L3L4_drinv.tab",false,true);
+#else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L3L4_drinv.tab")
 #  include "../emData/LUTs/TC_L3L4_drinv.tab"
 #endif
       };
+#endif
       drinv = LUT_drinv[addr_drinv];
       break;
     }
   case TF::L5L6:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_drinv[512];
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L5L6_drinv.tab",false,true);
+#else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L5L6_drinv.tab")
 #  include "../emData/LUTs/TC_L5L6_drinv.tab"
 #endif
       };
+#endif
       drinv = LUT_drinv[addr_drinv];
       break;
     }
@@ -1122,42 +1142,62 @@ ap_int<18> invt;
 switch (Seed) {
   case TF::L1L2:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_invt[4096];
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L1L2_invt.tab",false,true);
+#else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L1L2_invt.tab")
 #  include "../emData/LUTs/TC_L1L2_invt.tab"
 #endif
       };
+#endif
       invt = LUT_invt[addr_invt];
       break;
     }
   case TF::L2L3:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_invt[4096];
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L2L3_invt.tab",false,true);
+#else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L2L3_invt.tab")
 #  include "../emData/LUTs/TC_L2L3_invt.tab"
 #endif
       };
+#endif
       invt = LUT_invt[addr_invt];
       break;
     }
 
   case TF::L3L4:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_invt[4096];
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L3L4_invt.tab",false,true);
+#else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L3L4_invt.tab")
 #  include "../emData/LUTs/TC_L3L4_invt.tab"
 #endif
       };
+#endif
       invt = LUT_invt[addr_invt];
       break;
     }
   case TF::L5L6:
     {
+#if __SYNTHESIS__
+    static ap_int<18> LUT_invt[4096];
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L5L6_invt.tab",false,true);
+#else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L5L6_invt.tab")
 #  include "../emData/LUTs/TC_L5L6_invt.tab"
 #endif
       };
+#endif
       invt = LUT_invt[addr_invt];
       break;
     }

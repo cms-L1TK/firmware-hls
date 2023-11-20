@@ -77,37 +77,57 @@ ap_int<19> drinv;
 const ap_uint<10> addr_drinv = dr & 1023; // address for the LUT
 if (Seed == TF::D1D2){
   if (negDisk){
+#ifndef __SYNTHESIS__
+    static ap_int<19> LUT_drinv[1024];
+    readSWLUT<ap_int<19>,1024>(LUT_drinv,"../../../../../emData/LUTs/TC_B1B2_drinv.tab",false,true);
+#else
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_B1B2_drinv.tab")
 #  include "../emData/LUTs/TC_B1B2_drinv.tab"
 #endif
     };
+#endif
     drinv = LUT_drinv[addr_drinv];
   }
   else{
+#ifndef __SYNTHESIS__
+    static ap_int<19> LUT_drinv[1024];
+    readSWLUT<ap_int<19>,1024>(LUT_drinv,"../../../../../emData/LUTs/TC_F1F2_drinv.tab",false,true);
+#else
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_F1F2_drinv.tab")
 #  include "../emData/LUTs/TC_F1F2_drinv.tab"
 #endif
     };
+#endif
     drinv = LUT_drinv[addr_drinv];
   }
 }
 else{
   if (negDisk){
+#ifndef __SYNTHESIS__
+    static ap_int<19> LUT_drinv[1024];
+    readSWLUT<ap_int<19>,1024>(LUT_drinv,"../../../../../emData/LUTs/TC_B3B4_drinv.tab",false,true);
+#else
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_B3B4_drinv.tab")
 #  include "../emData/LUTs/TC_B3B4_drinv.tab"
 #endif
     };
+#endif
     drinv = LUT_drinv[addr_drinv];
   }
   else{
+#ifndef __SYNTHESIS__
+    static ap_int<19> LUT_drinv[1024];
+    readSWLUT<ap_int<19>,1024>(LUT_drinv,"../../../../../emData/LUTs/TC_F3F4_drinv.tab",false,true);
+#else
     static const ap_int<19> LUT_drinv[1024] = {
 #if __has_include("../emData/LUTs/TC_F3F4_drinv.tab")
 #  include "../emData/LUTs/TC_F3F4_drinv.tab"
 #endif
     };
+#endif
     drinv = LUT_drinv[addr_drinv];
   }
 }
@@ -946,37 +966,57 @@ ap_int<18> invt;
 
 if (Seed == TF::D1D2){
   if (negDisk){
+#ifndef __SYNTHESIS__
+    static ap_int<18> LUT_invt[2048];
+    readSWLUT<ap_int<18>,2048>(LUT_invt,"../../../../../emData/LUTs/TC_B1B2_invt.tab",false,true);
+#else
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_B1B2_invt.tab")
 #  include "../emData/LUTs/TC_B1B2_invt.tab"
 #endif
     };
+#endif
     invt = LUT_invt[addr_invt];
   }
   else{
+#ifndef __SYNTHESIS__
+    static ap_int<18> LUT_invt[2048];
+    readSWLUT<ap_int<18>,2048>(LUT_invt,"../../../../../emData/LUTs/TC_F1F2_invt.tab",false,true);
+#else
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_F1F2_invt.tab")
 #  include "../emData/LUTs/TC_F1F2_invt.tab"
 #endif
     };
+#endif
     invt = LUT_invt[addr_invt];
   }
 }
 else{
   if (negDisk){
+#ifndef __SYNTHESIS__
+    static ap_int<18> LUT_invt[2048];
+    readSWLUT<ap_int<18>,2048>(LUT_invt,"../../../../../emData/LUTs/TC_B3B4_invt.tab",false,true);
+#else
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_B3B4_invt.tab")
 #  include "../emData/LUTs/TC_B3B4_invt.tab"
 #endif
     };
+#endif
     invt = LUT_invt[addr_invt];
   }
   else{
+#ifndef __SYNTHESIS__
+    static ap_int<18> LUT_invt[2048];
+    readSWLUT<ap_int<18>,2048>(LUT_invt,"../../../../../emData/LUTs/TC_F3F4_invt.tab",false,true);
+#else
     static const ap_int<18> LUT_invt[2048] = {
 #if __has_include("../emData/LUTs/TC_F3F4_invt.tab")
 #  include "../emData/LUTs/TC_F3F4_invt.tab"
 #endif
     };
+#endif
     invt = LUT_invt[addr_invt];
   }
 }
