@@ -163,7 +163,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "#ifndef TopFunctions_TrackletProcessor_parameters_h\n"
       "#define TopFunctions_TrackletProcessor_parameters_h\n"
       "\n"
+      "#ifndef __SYNTHESIS__\n"
       '#include "SWLUTReader.h"\n'
+      "#endif\n"
       "// This file contains numbers of memories and bit masks that are specific to\n"
       "// each TrackletProcessor and that come directly from the wiring.\n"
       "//\n"

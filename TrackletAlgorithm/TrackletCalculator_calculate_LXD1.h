@@ -89,7 +89,7 @@ const ap_uint<11> addr_drinv = dr & 2047; // address for the LUT
 
 if (Seed == TF::L1D1){
   if (negDisk){
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<19> LUT_drinv[2048];
     readSWLUT<ap_int<19>,2048>(LUT_drinv, "../../../../../emData/LUTs/TC_L1B1_drinv.tab",false,true);
 #else
@@ -102,7 +102,7 @@ if (Seed == TF::L1D1){
     drinv = LUT_drinv[addr_drinv];
   }
   else{
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<19> LUT_drinv[2048];
     readSWLUT<ap_int<19>,2048>(LUT_drinv, "../../../../../emData/LUTs/TC_L1F1_drinv.tab",false,true);
 #else
@@ -117,7 +117,7 @@ if (Seed == TF::L1D1){
 }
 else{
   if (negDisk){
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<19> LUT_drinv[2048];
     readSWLUT<ap_int<19>,2048>(LUT_drinv, "../../../../../emData/LUTs/TC_L2B1_drinv.tab",false,true);
 #else
@@ -130,7 +130,7 @@ else{
     drinv = LUT_drinv[addr_drinv];
   }
   else{
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<19> LUT_drinv[2048];
     readSWLUT<ap_int<19>,2048>(LUT_drinv, "../../../../../emData/LUTs/TC_L2F1_drinv.tab",false,true);
 #else
@@ -1002,7 +1002,7 @@ const ap_uint<11> addr_invt = (t_final>>1) & 2047; // address for the LUT
 ap_int<18> invt;
 if (Seed==TF::L1D1){
   if (negDisk){
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[2048];
     readSWLUT<ap_int<18>,2048>(LUT_invt, "../../../../../emData/LUTs/TC_L1B1_invt.tab",false,true);
 #else
@@ -1015,7 +1015,7 @@ if (Seed==TF::L1D1){
     invt = LUT_invt[addr_invt];
   }
   else{
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[2048];
     readSWLUT<ap_int<18>,2048>(LUT_invt, "../../../../../emData/LUTs/TC_L1F1_invt.tab",false,true);
 #else
@@ -1030,7 +1030,7 @@ if (Seed==TF::L1D1){
 }
 else{
   if (negDisk){
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[2048];
     readSWLUT<ap_int<18>,2048>(LUT_invt, "../../../../../emData/LUTs/TC_L2B1_invt.tab",false,true);
 #else
@@ -1043,7 +1043,7 @@ else{
     invt = LUT_invt[addr_invt];
   }
   else{
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[2048];
     readSWLUT<ap_int<18>,2048>(LUT_invt, "../../../../../emData/LUTs/TC_L2F1_invt.tab",false,true);
 #else

@@ -85,7 +85,7 @@ ap_int<18> drinv;
 switch (Seed) {
   case TF::L1L2:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
     readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L1L2_drinv.tab",false,true);
 #else
@@ -100,7 +100,7 @@ switch (Seed) {
     }
   case TF::L2L3:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
     readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L2L3_drinv.tab",false,true);
 #else
@@ -116,7 +116,7 @@ switch (Seed) {
 
   case TF::L3L4:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
     readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L3L4_drinv.tab",false,true);
 #else
@@ -131,7 +131,7 @@ switch (Seed) {
     }
   case TF::L5L6:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
     readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L5L6_drinv.tab",false,true);
 #else
@@ -1142,7 +1142,7 @@ ap_int<18> invt;
 switch (Seed) {
   case TF::L1L2:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
     readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L1L2_invt.tab",false,true);
 #else
@@ -1157,7 +1157,7 @@ switch (Seed) {
     }
   case TF::L2L3:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
     readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L2L3_invt.tab",false,true);
 #else
@@ -1173,7 +1173,7 @@ switch (Seed) {
 
   case TF::L3L4:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
     readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L3L4_invt.tab",false,true);
 #else
@@ -1188,7 +1188,7 @@ switch (Seed) {
     }
   case TF::L5L6:
     {
-#if __SYNTHESIS__
+#ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
     readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L5L6_invt.tab",false,true);
 #else
