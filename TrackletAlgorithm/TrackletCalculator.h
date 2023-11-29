@@ -8,7 +8,9 @@
 #include "AllStubMemory.h"
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
-
+#ifndef __SYNTHESIS__
+#include "SWLUTReader.h"
+#endif
 template<TF::seed Seed> constexpr regionType InnerRegion() {
   return (
     (Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L1D1 || Seed == TF::L2D1) ? BARRELPS : (
