@@ -52,9 +52,9 @@ foreach i $modules_to_test {
 
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {
-    #csynth_design
-    #cosim_design
-    #export_design -format ip_catalog
+    csynth_design
+    cosim_design
+    export_design -format ip_catalog
     # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
     #export_design -format ip_catalog -flow impl
   }
