@@ -87,7 +87,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
-    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L1L2_drinv.tab",false,true);
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "LUTs/TC_L1L2_drinv.tab",false,true);
 #else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L1L2_drinv.tab")
@@ -102,7 +102,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
-    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L2L3_drinv.tab",false,true);
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "LUTs/TC_L2L3_drinv.tab",false,true);
 #else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L2L3_drinv.tab")
@@ -118,7 +118,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
-    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L3L4_drinv.tab",false,true);
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "LUTs/TC_L3L4_drinv.tab",false,true);
 #else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L3L4_drinv.tab")
@@ -133,7 +133,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_drinv[512];
-    readSWLUT<ap_int<18>,512>(LUT_drinv, "../../../../../emData/LUTs/TC_L5L6_drinv.tab",false,true);
+    readSWLUT<ap_int<18>,512>(LUT_drinv, "LUTs/TC_L5L6_drinv.tab",false,true);
 #else
       static const ap_int<18> LUT_drinv[512] = {
 #if __has_include("../emData/LUTs/TC_L5L6_drinv.tab")
@@ -1144,7 +1144,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
-    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L1L2_invt.tab",false,true);
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "LUTs/TC_L1L2_invt.tab",false,true);
 #else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L1L2_invt.tab")
@@ -1159,7 +1159,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
-    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L2L3_invt.tab",false,true);
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "LUTs/TC_L2L3_invt.tab",false,true);
 #else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L2L3_invt.tab")
@@ -1175,7 +1175,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
-    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L3L4_invt.tab",false,true);
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "LUTs/TC_L3L4_invt.tab",false,true);
 #else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L3L4_invt.tab")
@@ -1190,7 +1190,7 @@ switch (Seed) {
     {
 #ifndef __SYNTHESIS__
     static ap_int<18> LUT_invt[4096];
-    readSWLUT<ap_int<18>,4096>(LUT_invt, "../../../../../emData/LUTs/TC_L5L6_invt.tab",false,true);
+    readSWLUT<ap_int<18>,4096>(LUT_invt, "LUTs/TC_L5L6_invt.tab",false,true);
 #else
       static const ap_int<18> LUT_invt[4096] = {
 #if __has_include("../emData/LUTs/TC_L5L6_invt.tab")

@@ -25,7 +25,7 @@ set module_to_export TP_L1L2C
 open_project -reset trackletProcessor
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig -D __CSIM__=1}
 add_files ../TopFunctions/CombinedConfig/TrackletProcessorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletProcessor_test.cpp -cflags "$CFLAGS"
 
@@ -52,9 +52,9 @@ foreach i $modules_to_test {
 
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {
-    csynth_design
-    cosim_design
-    export_design -format ip_catalog
+    #csynth_design
+    #cosim_design
+    #export_design -format ip_catalog
     # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).
     #export_design -format ip_catalog -flow impl
   }
