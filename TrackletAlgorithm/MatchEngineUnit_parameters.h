@@ -5,6 +5,7 @@
 // each MEU and that come directly from the wiring.
 //
 
+/* REPLACED BY bool version
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFullUnit() {
   ap_uint<(1 << (2 * kNBitsBuffer))> lut;
@@ -20,6 +21,7 @@ static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFullUnit() {
   }
   return lut;
 }
+*/
 
 template<int kNBitsBuffer>
 static bool nearFullUnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> wptr) {
@@ -28,6 +30,7 @@ static bool nearFullUnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> w
   return wptr1==rptr || wptr2==rptr;
 }
 
+/* REPLACED BY bool version
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull3Unit() {
   ap_uint<(1 << (2 * kNBitsBuffer))> lut;
@@ -44,6 +47,7 @@ static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull3Unit() {
   }
   return lut;
 }
+*/
 
 template<int kNBitsBuffer>
 static bool nearFull3UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> wptr) {
@@ -53,6 +57,7 @@ static bool nearFull3UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> 
   return wptr1==rptr || wptr2==rptr || wptr3==rptr;
 }
 
+/* REPLACED BY bool version
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull4Unit() {
   ap_uint<(1 << (2 * kNBitsBuffer))> lut;
@@ -70,6 +75,7 @@ static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull4Unit() {
   }
   return lut;
 }
+*/
 
 template<int kNBitsBuffer>
 static bool nearFull4UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> wptr) {
@@ -80,6 +86,7 @@ static bool nearFull4UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> 
   return wptr1==rptr || wptr2==rptr || wptr3==rptr || wptr4==rptr;
 }
 
+/* REPLACED BY bool version
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> emptyUnit() {
   ap_uint<(1 << (2 * kNBitsBuffer))> lut;
@@ -93,6 +100,7 @@ static const ap_uint<(1 << (2 * kNBitsBuffer))> emptyUnit() {
   }
   return lut;
 }
+*/
 
 template<int kNBitsBuffer>
 static bool emptyUnitBool(ap_uint<kNBitsBuffer> wptr, ap_uint<kNBitsBuffer> rptr) {
@@ -144,6 +152,7 @@ static const ap_uint<1 << nbits> isLessThanSize() {
   return tab;
 }
 
+/* REPLACED BY bool version
 template<int nbits, int max, bool lessThan, int proj, int stub>
 static const ap_uint<1 << 2*nbits> isLessThanSize() {
   ap_uint<1 << 2*nbits> tab(0);
@@ -165,6 +174,7 @@ static const ap_uint<1 << 2*nbits> isLessThanSize() {
   }
   return tab;
 }
+*/
 
 template<int nbits, int max, bool lessThan, int proj, int stub>
 static bool isLessThanSizeBool(ap_uint<nbits> projphi, ap_uint<nbits> stubphi) {
