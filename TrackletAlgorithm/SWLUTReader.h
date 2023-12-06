@@ -2,7 +2,10 @@
 #include <string>
 // The following function provides a more compiler efficient method for reading
 //look up table arrays (currently used in TP), this is only used in C simulations and not synthesis
-template<class lutType, int lutsize> void readSWLUT(lutType lut[lutsize], std::string lutpath, bool skipfirst = true, bool hex = false){
+template<class lutType, int lutsize> bool readSWLUT(lutType lut[lutsize], std::string lutpath, bool skipfirst = true, bool hex = false){
+
+  //std::cout << "I'm reading : "<< lutpath <<std::endl;
+
   std::string emdatapath =
 #ifndef __CSIM__ //at run time the working directory differs between CSIM and future SW
   "../../../../../firmware-hls/emData/";
@@ -24,4 +27,5 @@ template<class lutType, int lutsize> void readSWLUT(lutType lut[lutsize], std::s
     lut[lutIndex]=lutval;
     ++lutIndex;
   }
+  return true;
 }

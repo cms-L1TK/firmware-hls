@@ -64,6 +64,7 @@ class ProjoutIndexDisk(Enum):
     D5PHIC = 18
     D5PHID = 19
     N_PROJOUT_DISK = 20
+
 #FIXME magic numbers for array sizes:
 regLUTSize = {
   "L1L2" : '2048',
@@ -105,6 +106,8 @@ outerPTLUTSize = {
   "D1D2" : '2048',
   "D3D4" : '2048'
 }
+drinvLUTSize = ['512','2048','1024']
+invtLUTSize = ['4096','2048','2048']
 parser = argparse.ArgumentParser(description="This script generates TrackletProcessorTop.h, TrackletProcessorTop.cc, and\
 TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
@@ -186,6 +189,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getDRinvLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getInvtLUT();\n"
+      "template<TF::seed Seed> const ap_int<19>* getDRinvForwardLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getInvtForwardLUT();\n"
+      "template<TF::seed Seed> const ap_int<19>* getDRinvBackwardLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getInvtBackwardLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr int nASMemInner();\n"
   )
   topHeaderFile.write(
@@ -213,6 +222,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   for tpName in sorted(asInnerMems.keys()):
       seed = re.sub(r"TP_(....).", r"\1", tpName)
       iTC = re.sub(r"TP_....(.)", r"\1", tpName)
+      barrelDisk = seed.count("D")
       # numbers of memories
       nASMemInner = len(asInnerMems[tpName])
       nASMemOuter = len(asOuterMems[tpName])
@@ -248,7 +258,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           'template<> inline const ap_uint<8>* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '  static ap_uint<8> lut[' + regLUTSize[seed] + '];\n'
-          '  readSWLUT<ap_uint<8>,' + regLUTSize[seed] + '>(lut,"TP/tables/TP_' + seed + iTC + '_usereg.tab");\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<8>,' + regLUTSize[seed] + '>(lut,"TP/tables/TP_' + seed + iTC + '_usereg.tab");\n'
           '#else\n'
           '  static ap_uint<8> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab")\n'
@@ -262,7 +274,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '  static ap_uint<10> lut[' + LUTSize[seed] + '];\n'
-          '  readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"TP/tables/TP_' + seed + '.tab");\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"TP/tables/TP_' + seed + '.tab");\n'
           '#else\n'
           '  static ap_uint<10> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
@@ -276,7 +290,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '  static ap_uint<1> lut[' + innerPTLUTSize[seed] + '];\n'
-          '  readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
           '#else\n'
           '  static ap_uint<1> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
@@ -290,7 +306,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '  static ap_uint<1> lut[' + outerPTLUTSize[seed] + '];\n'
-          '  readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
           '#else\n'
           '  static ap_uint<1> lut[] =\n'
           '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
@@ -306,7 +324,109 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '}\n'
 )% (tprojMaskBarrel, tprojMaskDisk)
       )
-  
+      if iTC == 'A':
+        if barrelDisk == 0:
+          parametersFile.write(
+          'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_int<18> lut[' + drinvLUTSize[barrelDisk] + '];\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + drinvLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed + '_drinv.tab",false,true);\n'
+          '#else\n'
+          '  static ap_uint<18> lut[] =\n'
+          '#if __has_include("../emData/LUTs/TC_' + seed +'_drinv.tab")\n'
+          '#  include "../emData/LUTs/TC_' + seed + '_drinv.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<18>* getInvtLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_int<18> lut[' + invtLUTSize[barrelDisk] + '];\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed + '_invt.tab",false,true);\n'
+          '#else\n'
+          '  static ap_uint<18> lut[] =\n'
+          '#if __has_include("../emData/LUTs/TC_' + seed +'_invt.tab")\n'
+          '#  include "../emData/LUTs/TC_' + seed + '_invt.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          )
+        else:
+          parametersFile.write(
+          'template<> inline const ap_int<19>* getDRinvForwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_int<19> lut[' + drinvLUTSize[barrelDisk] + '];\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","F") + '_drinv.tab",false,true);\n'
+          '#else\n'
+          '  static ap_uint<19> lut[] =\n'
+          '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","F") +'_drinv.tab")\n'
+          '#  include "../emData/LUTs/TC_' + seed.replace("D","F") + '_drinv.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<19>* getDRinvBackwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_int<19> lut[' + drinvLUTSize[barrelDisk] + '];\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","B") + '_drinv.tab",false,true);\n'
+          '#else\n'
+          '  static ap_uint<19> lut[] =\n'
+          '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","B") +'_drinv.tab")\n'
+          '#  include "../emData/LUTs/TC_' + seed.replace("D","B") + '_drinv.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<18>* getInvtForwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_int<18> lut[' + invtLUTSize[barrelDisk] + '];\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","F") + '_invt.tab",false,true);\n'
+          '#else\n'
+          '  static ap_uint<18> lut[] =\n'
+          '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","F") +'_invt.tab")\n'
+          '#  include "../emData/LUTs/TC_' + seed.replace("D","F") + '_invt.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<18>* getInvtBackwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '  static ap_int<18> lut[' + invtLUTSize[barrelDisk] + '];\n'
+          '  static bool init;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","B") + '_invt.tab",false,true);\n'
+          '#else\n'
+          '  static ap_uint<18> lut[] =\n'
+          '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","F") +'_invt.tab")\n'
+          '#  include "../emData/LUTs/TC_' + seed.replace("D","F") + '_invt.tab"\n'
+          '#else\n'
+          '  {};\n'
+          '#endif\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          )
       # Print out prototype for top function for this TC.
       topHeaderFile.write(
           "\n"
