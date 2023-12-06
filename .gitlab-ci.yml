@@ -136,7 +136,7 @@ IR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/InputRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/CombinedConfig/InputRouterTop.cc'
 VMRCM-quality-check:
   <<: *template_quality-check
   variables:
@@ -156,7 +156,7 @@ TB-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/TrackBuilderTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/CombinedConfig/TrackBuilderTop.cc'
 TM-quality-check:
   <<: *template_quality-check
   variables:
