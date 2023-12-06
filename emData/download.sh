@@ -13,7 +13,7 @@ memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/8dSZa6V93
 luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/xq9eMadmjeQPBVw/LUTs.tar.gz"
 # Combined barrel
 memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/THL7aPHzCNZp8cX/MemPrints.tar.gz"
-luts_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/smvtCGLpSlduSXi/LUTs.tar.gz"
+luts_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/O3I5qydfC6o6M87/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
