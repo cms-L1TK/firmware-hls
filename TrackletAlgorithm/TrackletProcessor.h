@@ -1149,18 +1149,9 @@ teunits[k].idle_;
       }
       else{ //Barrel Seeds
         auto ptinnerindex = (idphitmp, innerbend);
-        lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
-
         auto ptouterindex = (idphitmp, outerbend);
-        if (Seed == TF::L3L4){ //hack to get HLS to not use 20000 LUTs on outerptlut array
-          ap_uint<1> ptouterindexfirst;
-          ap_uint<8> ptouterindexlast;//FIXME magic numbers
-          (ptouterindexfirst, ptouterindexlast) = ptouterindex;
-          lutouter = ptouterindexfirst ? teunits[k].stubptouterlutnew2_[ptouterindexlast] : teunits[k].stubptouterlutnew1_[ptouterindexlast];
-        }
-        else{
-          lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
-        }
+        lutinner = teunits[k].stubptinnerlutnew_[ptinnerindex];
+        lutouter = teunits[k].stubptouterlutnew_[ptouterindex];
       }
       ap_uint<1> savestub = teunits[k].good___ && inrange && lutinner && lutouter && rzcut;
       teunits[k].stubids_[teuwriteindex[k]] = (teunits[k].outervmstub___.getIndex(),
