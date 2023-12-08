@@ -38,11 +38,11 @@ public:
   }
 
   inline bool empty() { 
-    return emptyLUT[(readptr_, writeptr_)];
+    return emptyUnitBool<kNBitsBuffer>(readptr_, writeptr_);
   }
 
   bool nearFull() {
-    return nearFullLUT[(readptr_, writeptr_)];
+    return nearFullUnitBool<kNBitsBuffer>(readptr_, writeptr_);
   }
 
   ap_uint<kNBitsBuffer> getReadPtr() {
