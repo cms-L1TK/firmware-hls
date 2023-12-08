@@ -347,7 +347,7 @@ DtcMemWrd getNMemories( CablingMap pDtcMap
       if( cBnWrd.range(cPhiBn,cPhiBn) == 1 ) cPhiBns.push_back(cPhiBn);
       /*
       // re-construct file name 
-      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      std::string cFileName = "InputStubs/"; 
       cFileName += getMemPrintName( cDtcName, pNonant, cLyr,  (int)cPhiBn);
       //std::cout << "\tLooking for memory print " << cFileName << "\n";
       std::ifstream fin_mem_prints;
@@ -389,7 +389,7 @@ BnDscs getBns( CablingMap pDtcMap
     for( size_t cPhiBn=0; cPhiBn<kMaxPhiBnsPrLyr; cPhiBn++)
     {
       // re-construct file name 
-      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      std::string cFileName = "InputStubs/"; 
       cFileName += getMemPrintName( cDtcName, pNonant, cLyr,  (int)cPhiBn);
       std::ifstream fin_mem_prints;
       bool cPrintError=false;
@@ -496,7 +496,7 @@ void prepareInputStreams( ifstream * pInputStreams
     {
       if( cBnWrd.range(cPhiBn,cPhiBn) == 0 ) continue;
       
-      std::string cFileName = "emData/MemPrints/InputStubs/"; 
+      std::string cFileName = "InputStubs/"; 
       std::string cMemPrint = getMemPrintName( cDtcName, pNonant, hLyrId + cLyrCorr, cPhiBn ); 
       cFileName += cMemPrint;
 
@@ -568,7 +568,7 @@ int main(int argc, char * argv[])
   std::cout << "Link#" << cLinkId << " fills " << +cTotalNmems << " output memories." << "\n";
   // link name
   std::string cLinkName = getLinkName( cMap, cLinkId , cNonant ); 
-  std::string cBaseName  = "emData/MemPrints/InputStubs/";
+  std::string cBaseName  = "InputStubs/";
   std::string cInputFile_Link = cBaseName + cLinkName + ".dat";
   std::cout << "Input file for Link# " << cLinkId << " is " <<  cInputFile_Link << std::endl;
   // link word

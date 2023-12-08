@@ -73,7 +73,7 @@ add_files ../TopFunctions/CombinedConfig/InputRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/
+add_files -tb ../emData/MemPrintsCM/InputStubs/
 
 set nProc [exec nproc]
 
