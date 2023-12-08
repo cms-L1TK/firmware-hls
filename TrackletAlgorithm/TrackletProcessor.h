@@ -1129,33 +1129,22 @@ teunits[k].idle_;
 
         (ptinnerindexfirst,ptinnerindexlast) = (idphitmp,ir,innerbend);
         (ptouterindexfirst,ptouterindexlast) = (idphitmp,ir,outerbend);
-        switch(ptinnerindexfirst){ //pt LUTs split into 4 since vivado has a 1024 bit limit for csynth, FIXME better way to do this?
-          case 0:
-          lutinner = teunits[k].stubptinnerlutnew1_[ptinnerindexlast];
-          break;
-          case 1:
-          lutinner = teunits[k].stubptinnerlutnew2_[ptinnerindexlast];
-          break;
-          case 2:
-          lutinner = teunits[k].stubptinnerlutnew3_[ptinnerindexlast];
-          break;
-          case 3:
-          lutinner = teunits[k].stubptinnerlutnew4_[ptinnerindexlast];
-          break;
+
+        if (diskSeed){ //for disk/overlap seeds, pt luts are split into 2/4 parts, due to vivado_hls limit on array sizes
+          lutinner = (ptinnerindexfirst == 0) ? teunits[k].stubptinnerlutnew1_[ptinnerindexlast] :
+                     teunits[k].stubptinnerlutnew2_[ptinnerindexlast];
+          lutouter = (ptouterindexfirst == 0) ? teunits[k].stubptouterlutnew1_[ptouterindexlast] :
+                     teunits[k].stubptouterlutnew2_[ptouterindexlast];
         }
-        switch(ptouterindexfirst){
-          case 0:
-          lutouter = teunits[k].stubptouterlutnew1_[ptouterindexlast];
-          break;
-          case 1:
-          lutouter = teunits[k].stubptouterlutnew2_[ptouterindexlast];
-          break;
-          case 2:
-          lutouter = teunits[k].stubptouterlutnew3_[ptouterindexlast];
-          break;
-          case 3:
-          lutouter = teunits[k].stubptouterlutnew4_[ptouterindexlast];
-          break;
+        else{
+          lutinner = (ptinnerindexfirst == 0) ? teunits[k].stubptinnerlutnew1_[ptinnerindexlast] :
+                     (ptinnerindexfirst == 1) ? teunits[k].stubptinnerlutnew2_[ptinnerindexlast] :
+                     (ptinnerindexfirst == 2) ? teunits[k].stubptinnerlutnew3_[ptinnerindexlast] :
+                     teunits[k].stubptinnerlutnew4_[ptinnerindexlast];
+          lutouter = (ptouterindexfirst == 0) ? teunits[k].stubptouterlutnew1_[ptouterindexlast] :
+                     (ptouterindexfirst == 1) ? teunits[k].stubptouterlutnew2_[ptouterindexlast] :
+                     (ptouterindexfirst == 2) ? teunits[k].stubptouterlutnew3_[ptouterindexlast] :
+                     teunits[k].stubptouterlutnew4_[ptouterindexlast];
         }
       }
       else{ //Barrel Seeds
