@@ -94,7 +94,7 @@ void compareStubsWithFile<0>(int &err, ifstream &fout, const int pos, const Trac
 
 int main()
 {
-  TBHelper tb(string("FT/") + module_name[MODULE_] + "/CombinedConfig");
+  TBHelper tb(string("FT/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
