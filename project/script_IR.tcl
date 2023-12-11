@@ -74,6 +74,7 @@ add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 
 # data files
 add_files -tb ../emData/MemPrintsCM/InputStubs/
+add_files -tb ../emData/LUTsCM/
 
 set nProc [exec nproc]
 
