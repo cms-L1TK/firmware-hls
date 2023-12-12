@@ -66,7 +66,7 @@ LUTs:
 # Dependency files are created following the example in the manual for GNU make:
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html
 
-$(DEPS)/%.d: $(EMDATA)/MemPrints
+$(DEPS)/%.d: $(EMDATA)/MemPrintsCM
 	@set -e; rm -f $@; mkdir -p $(DEPS); \
 	 TOP_FUNC=`echo $@ | sed 's,.*\/\([^/]*\)\.d,\1,g'`; \
 	 TOP_FILE=`grep -l $${TOP_FUNC} $(TOP_FUNCS)/*.cc`; \
@@ -80,7 +80,7 @@ include $(MODULES:%=$(DEPS)/%.d)
 
 ### Run emData/download.sh before anything else ###
 
-$(EMDATA)/MemPrints: $(EMDATA)/download.sh
+$(EMDATA)/MemPrintsCM: $(EMDATA)/download.sh
 	@cd $(EMDATA)/; \
 	  ./clean.sh; \
 	  ./download.sh
