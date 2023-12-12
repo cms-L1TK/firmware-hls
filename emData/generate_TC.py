@@ -112,6 +112,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
     parametersFile.write(
         "#ifndef TopFunctions_TrackletCalculator_parameters_h\n"
         "#define TopFunctions_TrackletCalculator_parameters_h\n"
+        "#ifndef __SYNTHESIS__\n"
+        '#include "SWLUTReader.h"\n'
+        "#endif\n"
         "\n"
         "// This file contains numbers of memories and bit masks that are specific to\n"
         "// each TrackletCalculator and that come directly from the wiring.\n"
@@ -132,6 +135,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
         "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
         "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
         "// in the same way.\n"
+        "template<TF::seed Seed> const ap_int<18>* getDRinvLUT();\n"
+        "template<TF::seed Seed> const ap_int<18>* getInvtLUT();\n"
     )
     topHeaderFile.write(
         "#ifndef TopFunctions_TrackletCalculatorTop_h\n"
@@ -232,7 +237,39 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "}\n")
             % (asInnerMask, asOuterMask, tprojMaskBarrel, tprojMaskDisk)
         )
-
+        if iTC == 'A':
+            parametersFile.write(
+                'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'
+                '#ifndef __SYNTHESIS__\n'
+                '  static ap_int<18> lut[512];\n'
+                '  static bool init;\n'
+                '  if (!init)\n'
+                '    init = readSWLUT<ap_int<18>,512>(lut,"LUTs/TC_' + seed + '_drinv.tab",false,true);\n'
+                '#else\n'
+                '  static ap_int<18> lut[] = {\n'
+                '#if __has_include("../emData/LUTs/TC_' + seed +'_drinv.tab")\n'
+                '#  include "../emData/LUTs/TC_' + seed + '_drinv.tab"\n'
+                '#endif\n'
+                '};\n'
+                '#endif\n'
+                '  return lut;\n'
+                '}\n'
+                'template<> inline const ap_int<18>* getInvtLUT<TF::'+ seed + '>(){\n'
+                '#ifndef __SYNTHESIS__\n'
+                '  static ap_int<18> lut[4096];\n'
+                '  static bool init;\n'
+                '  if (!init)\n'
+                '    init = readSWLUT<ap_int<18>,4096>(lut,"LUTs/TC_' + seed + '_invt.tab",false,true);\n'
+                '#else\n'
+                '  static ap_int<18> lut[] ={\n'
+                '#if __has_include("../emData/LUTs/TC_' + seed +'_invt.tab")\n'
+                '#  include "../emData/LUTs/TC_' + seed + '_invt.tab"\n'
+                '#endif\n'
+                '};\n'
+                '#endif\n'
+                '  return lut;\n'
+                '}\n'
+        )
         # Print out prototype for top function for this TC.
         topHeaderFile.write(
             "\n"
