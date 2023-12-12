@@ -8,9 +8,6 @@
 #include "AllStubMemory.h"
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
-#ifndef __SYNTHESIS__
-#include "SWLUTReader.h"
-#endif
 template<TF::seed Seed> constexpr regionType InnerRegion() {
   return (
     (Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L1D1 || Seed == TF::L2D1) ? BARRELPS : (
@@ -200,9 +197,8 @@ TrackletCalculator(
 );
 
 ////////////////////////////////////////////////////////////////////////////////
-
-#include "TrackletCalculator_calculate_LXLY.h"
 #include "TrackletCalculator_parameters.h"
+#include "TrackletCalculator_calculate_LXLY.h"
 
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
