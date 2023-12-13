@@ -160,6 +160,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
     )
 
     # Calculate parameters and print out parameters and top function for each TC.
+    seedlist = []
     for tcName in sorted(asInnerMems.keys()):
         seed = re.sub(r"TC_(....).", r"\1", tcName)
         iTC = re.sub(r"TC_....(.)", r"\1", tcName)
@@ -237,7 +238,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "}\n")
             % (asInnerMask, asOuterMask, tprojMaskBarrel, tprojMaskDisk)
         )
-        if iTC == 'A':
+        if seed in seedlist:
+            seedlist.append(seed)
             parametersFile.write(
                 'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'
                 '#ifndef __SYNTHESIS__\n'

@@ -219,6 +219,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   )
   
   # Calculate parameters and print out parameters and top function for each TP.
+  seedlist = []
   for tpName in sorted(asInnerMems.keys()):
       seed = re.sub(r"TP_(....).", r"\1", tpName)
       iTC = re.sub(r"TP_....(.)", r"\1", tpName)
@@ -324,7 +325,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '}\n'
 )% (tprojMaskBarrel, tprojMaskDisk)
       )
-      if iTC == 'A':
+      if seed in seedlist:
+        seedlist.append(seed)
         if barrelDisk == 0:
           parametersFile.write(
           'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'
