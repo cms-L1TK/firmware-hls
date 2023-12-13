@@ -25,8 +25,6 @@ const int nEvents = 100;  //number of events to run
 
 int main() {
 
-  constexpr int sector = 4; //  Specifies the sector/nonant
-
   ////////////////////////////////////////////////////////////////
   // Get the test vectors
 
@@ -49,7 +47,6 @@ int main() {
 
   const auto nASCopies = tb.nFiles(allStubPattern);
   const auto nASInnerCopies = tb.nFiles(allStubInnerPattern);
-  const auto nVMSME = tb.nFiles(mePattern);
   const auto nVMSTE = tb.nFiles(tePattern);
 
   // Make sure that the number of input and output memories are correct
@@ -93,25 +90,25 @@ int main() {
     cout << "Event: " << dec << ievt << endl;
 
     // Clear output memories
-    for (int i=0; i<nASCopies; ++i) {
+    for (unsigned int i=0; i<nASCopies; ++i) {
       memoriesAS[i].clear();
     }
-    for (int i=0; i<nASInnerCopies; ++i) {
+    for (unsigned int i=0; i<nASInnerCopies; ++i) {
       memoriesASInner[i].clear();
     }
     memoryME.clear();
     if (nVMSTE) {
-      for (int i=0; i<nVMSTE; ++i) {
+      for (unsigned int i=0; i<nVMSTE; ++i) {
         memoriesTEO[i].clear();
       }
 
     }
 
     // Read event and write to memories
-    for (unsigned int i = 0; i < numInputs; i++) {
+    for (int i = 0; i < numInputs; i++) {
       writeMemFromFile<InputStubMemory<inputType>>(inputStubs[i], fin_inputstubs[i], ievt);
     }
-    for (unsigned int i = 0; i < numInputsDisk2S; i++) {
+    for (int i = 0; i < numInputsDisk2S; i++) {
       writeMemFromFile<InputStubMemory<DISK2S>>(inputStubsDisk2S[i], fin_inputstubs_disk2s[i], ievt);
     }
 

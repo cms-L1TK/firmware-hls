@@ -97,7 +97,6 @@ int main()
     
     // compare the computed outputs with the expected ones
     for (unsigned int i = 0; i < fullmatch_names.size(); i++) {
-      const auto &fullmatch_name = fullmatch_names.at(i);
       auto &fout = fout_fullmatch.at(i);
       string label = "FullMatch " + to_string(i);
       err += compareMemWithFile<FullMatchMemory<fmProjMemType> >

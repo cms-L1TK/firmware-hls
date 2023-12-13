@@ -751,7 +751,6 @@ void MatchCalculator(BXType bx,
   // Full match shift register to store best match
   typename AllProjection<APTYPE>::AProjTCSEED projseed;
   FullMatch<FMTYPE> bestmatch;
-  bool goodmatch = false;
 
   ap_uint<1> inc_fm = 1;
 
@@ -846,14 +845,6 @@ void MatchCalculator(BXType bx,
     bool vB_L3_next = false;
     bool sA_L3_next = false;
     bool sB_L3_next = false;
-    bool read1_next = false;
-    bool read2_next = false;
-    bool read3_next = false;
-    bool read4_next = false;
-    bool read5_next = false;
-    bool read6_next = false;
-    bool read7_next = false;
-    bool read8_next = false;
     bool read_next[8];
     read_next_loop: for(int i = 0; i < totalMatchCopies; ++i) { // priority encoder ALWAYS expects 8
 #pragma HLS unroll
@@ -1104,7 +1095,6 @@ void MatchCalculator(BXType bx,
     typename AllProjection<APTYPE>::AProjRZ            proj_z    = proj.getRZ();
     typename AllProjection<APTYPE>::AProjPHIDER        proj_phid = proj.getPhiDer();
     typename AllProjection<APTYPE>::AProjRZDER         proj_zd   = proj.getRZDer();
-    bool isProjDisk = proj_seed >= TF::D1;
 
 
     // Calculate residuals
@@ -1270,7 +1260,6 @@ void MatchCalculator(BXType bx,
 
     // pipeline the bestmatch registers
     bestmatch      = bestmatch_next;
-    goodmatch      = goodmatch_next;
     projseed       = projseed_next;
 
   }// end MC_LOOP

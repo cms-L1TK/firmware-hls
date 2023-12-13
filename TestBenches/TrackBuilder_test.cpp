@@ -21,29 +21,29 @@ using namespace std;
 #endif
 
 #if SEED_ == L1L2_
-  constexpr unsigned kNBarrelStubs = 4;
-  constexpr unsigned kNDiskStubs = 4;
+  constexpr int kNBarrelStubs = 4;
+  constexpr int kNDiskStubs = 4;
 #elif SEED_ == L2L3_
-  constexpr unsigned kNBarrelStubs = 3;
-  constexpr unsigned kNDiskStubs = 4;
+  constexpr int kNBarrelStubs = 3;
+  constexpr int kNDiskStubs = 4;
 #elif SEED_ == L3L4_
-  constexpr unsigned kNBarrelStubs = 4;
-  constexpr unsigned kNDiskStubs = 2;
+  constexpr int kNBarrelStubs = 4;
+  constexpr int kNDiskStubs = 2;
 #elif SEED_ == L5L6_
-  constexpr unsigned kNBarrelStubs = 4;
-  constexpr unsigned kNDiskStubs = 0;
+  constexpr int kNBarrelStubs = 4;
+  constexpr int kNDiskStubs = 0;
 #elif SEED_ == D1D2_
-  constexpr unsigned kNBarrelStubs = 2;
-  constexpr unsigned kNDiskStubs = 3;
+  constexpr int kNBarrelStubs = 2;
+  constexpr int kNDiskStubs = 3;
 #elif SEED_ == D3D4_
-  constexpr unsigned kNBarrelStubs = 1;
-  constexpr unsigned kNDiskStubs = 3;
+  constexpr int kNBarrelStubs = 1;
+  constexpr int kNDiskStubs = 3;
 #elif SEED_ == L1D1_
-  constexpr unsigned kNBarrelStubs = 0;
-  constexpr unsigned kNDiskStubs = 4;
+  constexpr int kNBarrelStubs = 0;
+  constexpr int kNDiskStubs = 4;
 #elif SEED_ == L2D1_
-  constexpr unsigned kNBarrelStubs = 1;
-  constexpr unsigned kNDiskStubs = 3;
+  constexpr int kNBarrelStubs = 1;
+  constexpr int kNDiskStubs = 3;
 #else
 #  error "Undefined seed"
 #endif
@@ -138,9 +138,9 @@ int main()
     // Clear all output memories before starting.
     for (unsigned short i = 0; i < kMaxProc; i++) {
       trackWord[i] = TrackFit_t::TrackWord(0);
-      for (unsigned short j = 0; j < kNBarrelStubs; j++)
+      for (short j = 0; j < kNBarrelStubs; j++)
         barrelStubWords[j][i] = TrackFit_t::BarrelStubWord(0);
-      for (unsigned short j = 0; j < kNDiskStubs; j++)
+      for (short j = 0; j < kNDiskStubs; j++)
         diskStubWords[j][i] = TrackFit_t::DiskStubWord(0);
     }
     tracksMem.clear();

@@ -82,14 +82,14 @@ void ProjectionRouter(BXType bx,
   ap_uint<kNBits_MemAddr> numbersin[nINMEM];
   ap_uint<kNBits_MemAddr> mem_read_addr;
 
-  PROC_LOOP: for (int istep = 0; istep < kMaxProc - kMaxProcOffset(module::PR); ++istep) {
+  PROC_LOOP: for (unsigned int istep = 0; istep < kMaxProc - kMaxProcOffset(module::PR); ++istep) {
 #pragma HLS PIPELINE II=1 rewind
     if (istep == 0) {
 
       // reset output memories & counters
       nallproj = 0;
 #pragma HLS ARRAY_PARTITION variable=nvmprojout complete dim=0
-      for (int i=0; i<nOUTMEM; i++) {
+      for (unsigned int i=0; i<nOUTMEM; i++) {
 #pragma HLS unroll
         nvmprojout[i] = 0;
       }
@@ -98,7 +98,7 @@ void ProjectionRouter(BXType bx,
       // fill the bit mask indicating if memories are empty or not
       mem_hasdata = 0;
 #pragma HLS ARRAY_PARTITION variable=numbersin complete dim=0
-      for (int i=0; i<nINMEM; i++) {
+      for (unsigned int i=0; i<nINMEM; i++) {
 #pragma HLS unroll
         numbersin[i] = projin[i].getEntries(bx);
         if (numbersin[i] > 0) mem_hasdata.set(i);
