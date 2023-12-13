@@ -238,7 +238,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletCalculator_p
             "}\n")
             % (asInnerMask, asOuterMask, tprojMaskBarrel, tprojMaskDisk)
         )
-        if seed in seedlist:
+        if seed not in seedlist:
             seedlist.append(seed)
             parametersFile.write(
                 'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'

@@ -325,7 +325,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '}\n'
 )% (tprojMaskBarrel, tprojMaskDisk)
       )
-      if seed in seedlist:
+      if seed not in seedlist:
         seedlist.append(seed)
         if barrelDisk == 0:
           parametersFile.write(
