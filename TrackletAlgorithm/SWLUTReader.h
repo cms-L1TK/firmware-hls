@@ -1,14 +1,11 @@
 #include <fstream>
 #include <string>
-#include <mutex>
 
 // Define a global mutex for locking multi-threading
-std::mutex readSWLUTMutex_;
 
 // The following function provides a more compiler efficient method for reading
 // look up table arrays (currently used in TP), this is only used in C simulations and not synthesis
 template<class lutType, int lutsize> bool readSWLUT(lutType lut[lutsize],const std::string& lutpath, bool skipfirst = true, const bool hex = false){
-  std::lock_guard<std::mutex> lock(readSWLUTMutex_); // Lock the mutex
   const std::string emdatapath =
 #ifdef CMSSW_GIT_HASH //at run time the working directory differs between CSIM and future SW
   "../../../../../firmware-hls/emData/";
