@@ -65,49 +65,12 @@ class ProjoutIndexDisk(Enum):
     D5PHID = 19
     N_PROJOUT_DISK = 20
 
-#FIXME magic numbers for array sizes:
-regLUTSize = {
-  "L1L2" : '2048',
-  "L2L3" : '2048',
-  "L3L4" : '2048',
-  "L5L6" : '4096',
-  "L1D1" : '16384',
-  "L2D1" : '16384',
-  "D1D2" : '16384',
-  "D3D4" : '16384'
-}
-LUTSize = {
-  "L1L2" : '2048',
-  "L2L3" : '2048',
-  "L3L4" : '2048',
-  "L5L6" : '2048',
-  "L1D1" : '2048',
-  "L2D1" : '2048',
-  "D1D2" : '2048',
-  "D3D4" : '2048'
-}
-innerPTLUTSize = {
-  "L1L2" : '256',
-  "L2L3" : '256',
-  "L3L4" : '256',
-  "L5L6" : '1024',
-  "L1D1" : '4096',
-  "L2D1" : '4096',
-  "D1D2" : '2048',
-  "D3D4" : '2048'
-}
-outerPTLUTSize = {
-  "L1L2" : '256',
-  "L2L3" : '256',
-  "L3L4" : '512',
-  "L5L6" : '1024',
-  "L1D1" : '4096',
-  "L2D1" : '4096',
-  "D1D2" : '2048',
-  "D3D4" : '2048'
-}
-drinvLUTSize = ['512','2048','1024']
-invtLUTSize = ['4096','2048','2048']
+regLUTSize = {}
+LUTSize = {}
+innerPTLUTSize = {}
+outerPTLUTSize = {}
+drinvLUTSize = {}
+invtLUTSize = {}
 parser = argparse.ArgumentParser(description="This script generates TrackletProcessorTop.h, TrackletProcessorTop.cc, and\
 TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
@@ -222,11 +185,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   )
   
   # Calculate parameters and print out parameters and top function for each TP.
-  seedlist = []
+  seedlist = [] #keeps track of seeds that have been looped over for functions that only exist once per seed type
   for tpName in sorted(asInnerMems.keys()):
       seed = re.sub(r"TP_(....).", r"\1", tpName)
       iTC = re.sub(r"TP_....(.)", r"\1", tpName)
-      barrelDisk = seed.count("D")
       # numbers of memories
       nASMemInner = len(asInnerMems[tpName])
       nASMemOuter = len(asOuterMems[tpName])
@@ -236,7 +198,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       asOuterMask = 0
       asInnerMems[tpName].sort()
       asOuterMems[tpName].sort()
-  
+
       # TPROJ masks for barrel and disks
       tprojMaskBarrel = 0
       for projout in ProjoutIndexBarrel:
@@ -250,6 +212,14 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           projoutIndex = projout.value
           if projoutName in tprojMems[tpName]:
               tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
+      # figure out sizes of LUTs by reading .tab files, do once per seed type
+      if seed not in seedlist:
+        LUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}.tab".format(seed))) - 2)
+        regLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
+        innerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
+        outerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
+        drinvLUTSize[seed] = str(sum(1 for _ in open("LUTs/TC_{0}_drinv.tab".format(seed.replace("D","B")))))
+        invtLUTSize[seed] = str(sum(1 for _ in open("LUTs/TC_{0}_invt.tab".format(seed.replace("D","B")))))
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"
@@ -346,7 +316,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       )
       if seed not in seedlist:
         seedlist.append(seed)
-        if barrelDisk == 0:
+        if seed in ["L1L2","L2L3","L3L4","L5L6"]:
           parametersFile.write(
           'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'
           '#ifndef __SYNTHESIS__\n'
@@ -354,10 +324,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static std::mutex getLUTMutex_;\n'
           '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
           '#endif\n'
-          '  static ap_int<18> lut[' + drinvLUTSize[barrelDisk] + '];\n'
+          '  static ap_int<18> lut[' + drinvLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_int<18>,' + drinvLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed + '_drinv.tab",false,true);\n'
+          '    init = readSWLUT<ap_int<18>,' + drinvLUTSize[seed] + '>(lut,"LUTs/TC_' + seed + '_drinv.tab",false,true);\n'
           '#else\n'
           '  static ap_int<18> lut[] = {\n'
           '#if __has_include("../emData/LUTs/TC_' + seed +'_drinv.tab")\n'
@@ -373,10 +343,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static std::mutex getLUTMutex_;\n'
           '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
           '#endif\n'
-          '  static ap_int<18> lut[' + invtLUTSize[barrelDisk] + '];\n'
+          '  static ap_int<18> lut[' + invtLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed + '_invt.tab",false,true);\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[seed] + '>(lut,"LUTs/TC_' + seed + '_invt.tab",false,true);\n'
           '#else\n'
           '  static ap_int<18> lut[] ={\n'
           '#if __has_include("../emData/LUTs/TC_' + seed +'_invt.tab")\n'
@@ -395,10 +365,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static std::mutex getLUTMutex_;\n'
           '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
           '#endif\n'
-          '  static ap_int<19> lut[' + drinvLUTSize[barrelDisk] + '];\n'
+          '  static ap_int<19> lut[' + drinvLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","F") + '_drinv.tab",false,true);\n'
+          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[seed] + '>(lut,"LUTs/TC_' + seed.replace("D","F") + '_drinv.tab",false,true);\n'
           '#else\n'
         '  static ap_int<19> lut[] = {\n'
           '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","F") +'_drinv.tab")\n'
@@ -414,10 +384,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static std::mutex getLUTMutex_;\n'
           '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
           '#endif\n'
-          '  static ap_int<19> lut[' + drinvLUTSize[barrelDisk] + '];\n'
+          '  static ap_int<19> lut[' + drinvLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","B") + '_drinv.tab",false,true);\n'
+          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[seed] + '>(lut,"LUTs/TC_' + seed.replace("D","B") + '_drinv.tab",false,true);\n'
           '#else\n'
           '  static ap_int<19> lut[] ={\n'
           '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","B") +'_drinv.tab")\n'
@@ -433,10 +403,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static std::mutex getLUTMutex_;\n'
           '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
           '#endif\n'
-          '  static ap_int<18> lut[' + invtLUTSize[barrelDisk] + '];\n'
+          '  static ap_int<18> lut[' + invtLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","F") + '_invt.tab",false,true);\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[seed] + '>(lut,"LUTs/TC_' + seed.replace("D","F") + '_invt.tab",false,true);\n'
           '#else\n'
           '  static ap_int<18> lut[] ={\n'
           '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","F") +'_invt.tab")\n'
@@ -452,10 +422,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static std::mutex getLUTMutex_;\n'
           '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
           '#endif\n'
-          '  static ap_int<18> lut[' + invtLUTSize[barrelDisk] + '];\n'
+          '  static ap_int<18> lut[' + invtLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[barrelDisk] + '>(lut,"LUTs/TC_' + seed.replace("D","B") + '_invt.tab",false,true);\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[seed] + '>(lut,"LUTs/TC_' + seed.replace("D","B") + '_invt.tab",false,true);\n'
           '#else\n'
           '  static ap_int<18> lut[] ={\n'
           '#if __has_include("../emData/LUTs/TC_' + seed.replace("D","F") +'_invt.tab")\n'
