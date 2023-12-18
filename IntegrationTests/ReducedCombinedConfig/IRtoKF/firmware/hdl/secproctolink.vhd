@@ -69,7 +69,7 @@ architecture rtl of secproctolink is
   signal s_fifo_valid     : std_logic;
   signal s_fifo_valid_vec : std_logic_vector(4 downto 0);
   signal s_fifo_ready     : std_logic;
-  signal s_fifo_data      : std_logic_vector(319 downto 0);
+  signal s_fifo_data      : std_logic_vector(333 downto 0);
   signal s_sAxisMaster_sp : AxiStreamMasterType;
   signal s_sAxisSlave_sp  : AxiStreamSlaveType;
   signal s_mAxisMaster_l  : AxiStreamMasterType;
@@ -98,14 +98,14 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   -- FIFO
   -----------------------------------------------------------------------------
-  s_sAxisMaster_sp.tData(319 downto 0)                                 <= s_fifo_data;
-  s_sAxisMaster_sp.tData(s_sAxisMaster_sp.tData'length - 1 downto 320) <= (others => '0');
+  s_sAxisMaster_sp.tData(333 downto 0)                                 <= s_fifo_data;
+  s_sAxisMaster_sp.tData(s_sAxisMaster_sp.tData'length - 1 downto 334) <= (others => '0');
   s_sAxisMaster_sp.tValid                                              <= s_fifo_valid;
   s_sAxisMaster_sp.tKeep                                               <= x"000000FFFFFFFFFF";
   s_fifo_ready                                                         <= s_sAxisSlave_sp.tReady;
-  dout_o(0).data                                                       <= s_mAxisMaster_l.tData(63 downto 0);
-  dout_o(0).valid                                                      <= s_mAxisMaster_l.tValid;
-  dout_o(0).strobe                                                     <= '1';
+  dout_o(120).data                                                     <= s_mAxisMaster_l.tData(63 downto 0);
+  dout_o(120).valid                                                    <= s_mAxisMaster_l.tValid;
+  dout_o(120).strobe                                                   <= '1';
   s_mAxisSlave_l.tReady                                                <= '1';
 
   AxiStreamFifoV2_1 : entity surf.AxiStreamFifoV2
