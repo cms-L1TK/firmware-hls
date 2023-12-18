@@ -81,52 +81,7 @@ const ap_int<13> r2abs = r2 + r2mean_input;
 // STEP 2
 
 const ap_uint<9> addr_drinv = dr & 511; // address for the LUT
-ap_int<18> drinv;
-switch (Seed) {
-  case TF::L1L2:
-    {
-      static const ap_int<18> LUT_drinv[512] = {
-#if __has_include("../emData/LUTs/TC_L1L2_drinv.tab")
-#  include "../emData/LUTs/TC_L1L2_drinv.tab"
-#endif
-      };
-      drinv = LUT_drinv[addr_drinv];
-      break;
-    }
-  case TF::L2L3:
-    {
-      static const ap_int<18> LUT_drinv[512] = {
-#if __has_include("../emData/LUTs/TC_L2L3_drinv.tab")
-#  include "../emData/LUTs/TC_L2L3_drinv.tab"
-#endif
-      };
-      drinv = LUT_drinv[addr_drinv];
-      break;
-    }
-
-  case TF::L3L4:
-    {
-      static const ap_int<18> LUT_drinv[512] = {
-#if __has_include("../emData/LUTs/TC_L3L4_drinv.tab")
-#  include "../emData/LUTs/TC_L3L4_drinv.tab"
-#endif
-      };
-      drinv = LUT_drinv[addr_drinv];
-      break;
-    }
-  case TF::L5L6:
-    {
-      static const ap_int<18> LUT_drinv[512] = {
-#if __has_include("../emData/LUTs/TC_L5L6_drinv.tab")
-#  include "../emData/LUTs/TC_L5L6_drinv.tab"
-#endif
-      };
-      drinv = LUT_drinv[addr_drinv];
-      break;
-    }
-  default:
-    break;
-}
+ap_int<18> drinv = getDRinvLUT<Seed>()[addr_drinv];
 //
 // STEP 3
 
@@ -1118,52 +1073,7 @@ const ap_int<18> x7 = x7_tmp >> 17;
 const ap_int<20> x5_0_tmp = (ap_int<20>(zproj0)<<5) - z0;
 const ap_int<18> x5_0 = x5_0_tmp >> 2;
 const ap_uint<12> addr_invt = (t_final>>1) & 4095; // address for the LUT
-ap_int<18> invt;
-switch (Seed) {
-  case TF::L1L2:
-    {
-      static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/LUTs/TC_L1L2_invt.tab")
-#  include "../emData/LUTs/TC_L1L2_invt.tab"
-#endif
-      };
-      invt = LUT_invt[addr_invt];
-      break;
-    }
-  case TF::L2L3:
-    {
-      static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/LUTs/TC_L2L3_invt.tab")
-#  include "../emData/LUTs/TC_L2L3_invt.tab"
-#endif
-      };
-      invt = LUT_invt[addr_invt];
-      break;
-    }
-
-  case TF::L3L4:
-    {
-      static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/LUTs/TC_L3L4_invt.tab")
-#  include "../emData/LUTs/TC_L3L4_invt.tab"
-#endif
-      };
-      invt = LUT_invt[addr_invt];
-      break;
-    }
-  case TF::L5L6:
-    {
-      static const ap_int<18> LUT_invt[4096] = {
-#if __has_include("../emData/LUTs/TC_L5L6_invt.tab")
-#  include "../emData/LUTs/TC_L5L6_invt.tab"
-#endif
-      };
-      invt = LUT_invt[addr_invt];
-      break;
-    }
-  default:
-    break;
-}
+ap_int<18> invt = getInvtLUT<Seed>()[addr_invt];
 //
 // STEP 12
 

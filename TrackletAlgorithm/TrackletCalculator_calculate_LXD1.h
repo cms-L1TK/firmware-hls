@@ -84,45 +84,10 @@ const ap_int<11> dr = r2 - r1abs;
 
 bool negDisk = z2mean_input<=0;
 
-ap_int<19> drinv;
 const ap_uint<11> addr_drinv = dr & 2047; // address for the LUT
 
-if (Seed == TF::L1D1){
-  if (negDisk){
-    static const ap_int<19> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L1B1_drinv.tab")
-  #  include "../emData/LUTs/TC_L1B1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
-  else{
-    static const ap_int<19> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L1F1_drinv.tab")
-  #  include "../emData/LUTs/TC_L1F1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
-}
-else{
-  if (negDisk){
-    static const ap_int<19> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L2B1_drinv.tab")
-  #  include "../emData/LUTs/TC_L2B1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
-  else{
-    static const ap_int<19> LUT_drinv[2048] = {
-  #if __has_include("../emData/LUTs/TC_L2F1_drinv.tab")
-  #  include "../emData/LUTs/TC_L2F1_drinv.tab"
-  #endif
-    };
-    drinv = LUT_drinv[addr_drinv];
-  }
-}
+ap_int<19> drinv = negDisk ? getDRinvBackwardLUT<Seed>()[addr_drinv] : getDRinvForwardLUT<Seed>()[addr_drinv];
+
 //
 // STEP 4
 
@@ -979,43 +944,7 @@ const ap_int<18> x7 = x7_tmp >> 16;
 //
 // STEP 11
 const ap_uint<11> addr_invt = (t_final>>1) & 2047; // address for the LUT
-ap_int<18> invt;
-if (Seed==TF::L1D1){
-  if (negDisk){
-    static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/LUTs/TC_L1B1_invt.tab")
-#  include "../emData/LUTs/TC_L1B1_invt.tab"
-#endif
-    };
-    invt = LUT_invt[addr_invt];
-  }
-  else{
-    static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/LUTs/TC_L1F1_invt.tab")
-#  include "../emData/LUTs/TC_L1F1_invt.tab"
-#endif
-    };
-    invt = LUT_invt[addr_invt];
-  }
-}
-else{
-  if (negDisk){
-    static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/LUTs/TC_L2B1_invt.tab")
-#  include "../emData/LUTs/TC_L2B1_invt.tab"
-#endif
-    };
-    invt = LUT_invt[addr_invt];
-  }
-  else{
-    static const ap_int<18> LUT_invt[2048] = {
-#if __has_include("../emData/LUTs/TC_L2F1_invt.tab")
-#  include "../emData/LUTs/TC_L2F1_invt.tab"
-#endif
-    };
-    invt = LUT_invt[addr_invt];
-  }
-}
+ap_int<18> invt = negDisk ? getInvtBackwardLUT<Seed>()[addr_invt] : getInvtForwardLUT<Seed>()[addr_invt];
 //
 // STEP 12
 
