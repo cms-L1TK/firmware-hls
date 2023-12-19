@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // Data object definition
 class TrackletParameters
@@ -132,6 +133,19 @@ public:
     data_.range(kTParRinvMSB,kTParRinvLSB) = rinv;
   }
   
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getStubIndexInner());
+    str += "|"+decodeToBits(getStubIndexOuter());
+    str += "|"+decodeToBits(getRinv());
+    str += "|"+decodeToBits(getPhi0());
+    str += "|"+decodeToBits(getZ0());
+    str += "|"+decodeToBits(getT());
+
+    return str;
+  }
+#endif
+
 private:
   
   TrackletParameterData data_;

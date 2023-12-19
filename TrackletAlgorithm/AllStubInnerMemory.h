@@ -245,6 +245,19 @@ public:
     data_.range(kASNegDiskMSB,kASNegDiskLSB) = negdisk;
   }
 
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getR());
+    str += "|"+decodeToBits(getZ());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getBend());
+    if (ASType == DISKPS || ASType == DISK2S) str += "|"+decodeToBits(getNegDisk());
+    str += "|"+decodeToBits(getIndex());
+    str += "|"+decodeToBits(getFinePhi());
+    return str;
+  }
+#endif
+
 private:
 
   AllStubInnerData data_;
