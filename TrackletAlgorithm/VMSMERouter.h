@@ -1,12 +1,12 @@
-// VMStubRouter
+// VMSMERouter
 
 // Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs).
 // By writing VMStubME memories
-// Each VMStubRouter correspond to one phi/AllStub region.
+// Each VMSMERouter correspond to one phi/AllStub region.
 // Needed for when project is split over both PFGAs
 
-#ifndef TrackletAlgorithm_VMStubRouter_h
-#define TrackletAlgorithm_VMStubRouter_h
+#ifndef TrackletAlgorithm_VMSMERouter_h
+#define TrackletAlgorithm_VMSMERouter_h
 
 #include "ap_int.h"
 #include <cassert>
@@ -27,15 +27,40 @@
 
 
 //////////////////////////////////////
-// Functions used by the VMStubRouter
+// Functions used by the VMSMERouter
 
 // 
 // 
 // 
+
+// Get the corrected phi, i.e. phi at the average radius of the barrel
+// Corrected phi is used by ME memories in the barrel
+template<regionType InOutType>
+inline typename AllStub<InOutType>::ASPHI getPhiCorr(
+		const typename AllStub<InOutType>::ASPHI phi,
+		const typename AllStub<InOutType>::ASR r,
+		const typename AllStub<InOutType>::ASBEND bend, const int phiCorrTable[]) {
+
+	if (InOutType == DISKPS || InOutType == DISK2S) return phi; // Do nothing if disks
+
+	constexpr auto nrbins = 1 << kNbitsrzbin; // The number of bins for r
+
+	ap_uint<kNbitsrzbin> rbin = (r + (1 << (r.length() - 1))) >> (r.length() - kNbitsrzbin); // Which bin r belongs to. Note r = 0 is mid radius
+	auto index = bend * nrbins + rbin; // Index for where we find our correction value
+	auto corrValue = phiCorrTable[index]; // The amount we need to correct our phi
+
+	auto phicorr = phi - corrValue; // the corrected phi
+
+	// Check for overflow
+	if (phicorr < 0) phicorr = 0; // can't be less than 0
+	if (phicorr >= 1 << phi.length()) phicorr = (1 << phi.length()) - 1;  // can't be more than the max value
+
+	return phicorr;
+}
 
 // Returns a ME stub with all the values set
-template<class T, regionType InOutType, int Layer, int Disk, bool isMEStub>
-inline T createVMStubMEME(AllStub<InOutType> InputAS,
+template<class T, regionType InType, regionType OutType, int Layer, int Disk>
+inline T createVMStubME(AllStub<InOutType> allstub,
 		const int index, const bool negDisk, const int lutTable[],
 		const int phiCorrTable[], int& slot) {
 
@@ -43,11 +68,11 @@ inline T createVMStubMEME(AllStub<InOutType> InputAS,
 	T stub;
 
 	// Values from Input AllStub
-	auto z = InputAS.getZ();
-	auto r = InputAS.getR();
-	auto bend = InputAS.getBend();
-	auto phi = InputAS.getPhi();
-	auto phicorr = getPhiCorr<InOutType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
+	auto z = allstub.getZ();
+	auto r = allstub.getR();
+	auto bend = allstub.getBend();
+	auto phi = allstub.getPhi();
+	auto phicorr = getPhiCorr<InType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
 
 	int nbitsr = r.length(); // Number of bits for r
 	int nbitsz = z.length(); // Number of bits for z
@@ -57,16 +82,16 @@ inline T createVMStubMEME(AllStub<InOutType> InputAS,
 	// Number of bits for table indices
 	constexpr int nbitsztable = (Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of MSBs of z used in LUT table
 	constexpr int nbitsrtable = (Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of MSBs of r used in LUT table
-	constexpr auto vmbits = (Layer) ? nbits_vmmeall[Layer-1] : ((isMEStub) ? nbits_vmmeall[trklet::N_LAYER+Disk-1] : nbitsvmtedisk[Disk-1]); // Number of bits for standard VMs
+	constexpr auto vmbits = (Layer) ? nbits_vmmeall[Layer-1] : nbits_vmmeall[trklet::N_LAYER+Disk-1]; // Number of bits for standard VMs
 	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[trklet::N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Number of bits for the memory bins
-	constexpr int nbitsbin = (isMEStub) ? ((Layer) ? MEBinsBits : MEBinsBits + 1) : TEBinsBits; // ME in disks has double the amount of bins
+	constexpr int nbitsbin = (Layer) ? MEBinsBits : MEBinsBits + 1; // ME in disks has double the amount of bins
 
 	// Set values to VMStub
 	stub.setBend(bend);
 	stub.setIndex(index);
-	stub.setFinePhi(iphivmFineBins<InOutType>(phicorr, nbitsall + vmbits, nbitsfinephi));
+	stub.setFinePhi(iphivmFineBins<OutType>(phicorr, nbitsall + vmbits, nbitsfinephi));
 
 	// Indices used to find the rzfine value in LUT table
 	// LUT table returns the top 6 bits of a corrected z
@@ -81,7 +106,7 @@ inline T createVMStubMEME(AllStub<InOutType> InputAS,
 			indexz = (1 << nbitsztable) -1 - indexz;
 		}
 		indexr = r;
-		if (InOutType == DISKPS) {
+		if (InType == DISKPS) {
 			indexr = r >> (nbitsr - nbitsrtable); // Take the top "nbitsrtable" bits
 		}
 	} else { // Layer
@@ -115,38 +140,20 @@ inline T createVMStubMEME(AllStub<InOutType> InputAS,
 // Main function
 
 // Two input region types InOutType and DISK2S due to the disks having both 2S and PS inputs.
-template<int Layer, regionType InOutType, int rzSizeME, int phiRegSize>
+template<int Layer, int Disk, regionType InOutType, int rzSizeME, int phiRegSize>
 void VMSMERouter(const BXType bx, BXType& bx_o,
 		// LUTs
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStubMemory<InOutType> memoriesAS,
+		AllStubMemory<InOutType> allstub,
 		// ME memories
 		VMStubMEMemoryCM<InOutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=memoriesAS complete dim=1
 
-	// Number of data in each input memory
-	typename InputStubMemory<InOutType>::NEntryT nInputs[nInputMems
-			+ nInputDisk2SMems]; // Array containing the number of inputs
-#pragma HLS array_partition variable=nInputs complete dim=0
-
-	//Keeps track of input memories that still have stubs to process, one bit per memory
-	ap_uint<nInputMems + nInputDisk2SMems> hasStubs;
-
-	for (int i = 0; i < nInputMems; i++) {
-#pragma HLS UNROLL
-		nInputs[i] = inputStubs[i].getEntries(bx);
-		hasStubs[i] = nInputs[i];
-	}
-	// For DISK2S
-	for (int i = nInputMems; i < nInputMems + nInputDisk2SMems; i++) {
-#pragma HLS UNROLL
-		nInputs[i] = inputStubsDisk2S[i - nInputMems].getEntries(bx);
-		hasStubs[i] = nInputs[i];
-	}
+	int entries = allstub.getEntries(0);
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
@@ -166,44 +173,21 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
 #pragma HLS latency min = 12 //this ensures latencies of different vmrs match in a reduced configuration.
-		bool noStubsLeft = !hasStubs.or_reduce(); // Determines if we have processed all stubs. Is true if hasStubs is all 0s
 		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S
-		bool negDisk = false; // Used to determine if it's negative disk
+		bool negDisk = false; // Used to determine if it's negative disk // FIXME need this to actually change if negDisk 
 
-		AllStub<ASTYPE>       stub = allstub->read_mem(bx,stubid);
+		AllStub<ASTYPE>       stub = allstub->read_mem(bx,read_addr);
 		AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(stub.raw());
 		AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 
-		constexpr bool isDisk = LAYER >= TF::D1;
+		constexpr bool isDisk = (Disk > 0);
 
-		auto isPSStub = stub_ps.isPSStub();
-
-		// Read a stub. The input memories are in the order PS, negPS, 2S, neg2S
-		int mem_index = __builtin_ctz(hasStubs); // The first non-zero index
-
-		if (!noStubsLeft) {
-			if (mem_index < nInputMems) {
-				stub = inputStubs[mem_index].read_mem(bx, read_addr);
-				if (InOutType == DISKPS) {
-					negDisk = mem_index >= (nInputMems >> 1);
-				}
-			} else { // For DISK2S
-				stubDisk2S = inputStubsDisk2S[mem_index - nInputMems].read_mem(bx, read_addr);
-				disk2S = true;
-				negDisk = mem_index >= nInputMems + (nInputDisk2SMems >> 1);
-			}
-			resetNext = nInputs[mem_index] == 1;
-			hasStubs[mem_index] = !resetNext;
-			--nInputs[mem_index];
-		}
+		auto disk2S = ! stub_ps.isPSStub();
 
 		// Increment the read address, or reset it to zero when all stubs in a memory has been read
 		if (resetNext) read_addr = 0;
 		else ++read_addr;
-
-		if (noStubsLeft) continue; // End here if we already have processed all stubs
-		// Note: putting the continue here rather than at the start of the loop seems to yield better timing.
 
 		/////////////////////////////////////////////
 		// ME memories
@@ -211,22 +195,19 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		int slotME; // The bin the stub is going to be put in, in the memory
 
 		// Create the ME stub to save
-		VMStubMECM<InOutType> stubME = (disk2S) ? 
-				createVMStubME<VMStubMECM<InOutType>, DISK2S, InOutType, Layer, Disk, true>(stubDisk2S, i, negDisk,METable, phiCorrTable, slotME) :
-				createVMStubME<VMStubMECM<InOutType>, InOutType, InOutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slotME);
+		VMStubMECM<InOutType> stubME = (isDisk) ? 
+				createVMStubME<VMStubMECM<InOutType>, DISK2S, InOutType, Layer, Disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (disk2S) ?
+				createVMStubME<VMStubMECM<InOutType>, DISKPS, InOutType, Layer, Disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
+				createVMStubME<VMStubMECM<InOutType>, InOutType, InOutType, Layer, Disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
 		addrCountME[slotME] += 1;
-
-#if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
-		edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::dec << "       to slot " << slotME;
-#endif // VMRCM_DEBUG
+		if (read_addr > entries) break;
 		// End ME memories
-
 	} // Outside main loop
 
 	bx_o = bx;
-} // End VMRouterCM
+} // End VMSMERouter
 
-#endif // TrackletAlgorithm_VMRouterCM_h
+#endif // TrackletAlgorithm_VMSMERouter_h
