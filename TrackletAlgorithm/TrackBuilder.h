@@ -227,10 +227,10 @@ void TrackBuilder(
       }
     }
 
-    disk_stub_association : for (short j = 0; j < int(NDiskStubs); j++) { // casting NBarrelStubs as signed for loop to prevent compilation error due to comparing signed and unsigned values
+    disk_stub_association : for (short j = 0; j < int(NDiskStubs); j++) { // casting NDiskStubs as signed for loop to prevent compilation error due to comparing signed and unsigned values
 
       ap_uint<1> disk_stub_valid = false;
-      disk_stub_valid : for (short k = 0; k < int(NFMPerStubDisk); k++) // casting NBarrelStubs as signed for loop to prevent compilation error due to comparing signed and unsigned values
+      disk_stub_valid : for (short k = 0; k < int(NFMPerStubDisk); k++) // casting NFMPerStubDisk as signed for loop to prevent compilation error due to comparing signed and unsigned values
         disk_stub_valid = (disk_stub_valid || disk_valid[j * NFMPerStubDisk + k]);
       nMatches += (disk_stub_valid ? 1 : 0);
 
@@ -295,32 +295,32 @@ void TrackBuilder(
       barrel_stub_words: for (short j = 0 ; j < int(NBarrelStubs); j++) { // casting NBarrelStubs as signed for loop to prevent compilation error due to comparing signed and unsigned values
         switch (j) {
           case 0:
-            barrelStubWords[j][nTracks] = track.template getStubValid<0>() ? track.template getBarrelStubWord<0>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+            barrelStubWords[j][nTracks] = track.template getStubValid<0>() ? track.template getBarrelStubWord<0>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::BarrelStubWord(0);
             break;
           case 1:
-            barrelStubWords[j][nTracks] = track.template getStubValid<1>() ? track.template getBarrelStubWord<1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+            barrelStubWords[j][nTracks] = track.template getStubValid<1>() ? track.template getBarrelStubWord<1>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::BarrelStubWord(0);
             break;
           case 2:
-            barrelStubWords[j][nTracks] = track.template getStubValid<2>() ? track.template getBarrelStubWord<2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+            barrelStubWords[j][nTracks] = track.template getStubValid<2>() ? track.template getBarrelStubWord<2>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::BarrelStubWord(0);
             break;
           case 3:
-            barrelStubWords[j][nTracks] = track.template getStubValid<3>() ? track.template getBarrelStubWord<3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+            barrelStubWords[j][nTracks] = track.template getStubValid<3>() ? track.template getBarrelStubWord<3>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::BarrelStubWord(0);
             break;
         }
       }
-      disk_stub_words: for (short j = 0 ; j < int(NDiskStubs); j++) { // casting NBarrelStubs as signed for loop to prevent compilation error due to comparing signed and unsigned values
+      disk_stub_words: for (short j = 0 ; j < int(NDiskStubs); j++) { // casting NDiskStubs as signed for loop to prevent compilation error due to comparing signed and unsigned values
         switch (j) {
           case 0:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::DiskStubWord(0);
             break;
           case 1:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 1>() ? track.template getDiskStubWord<NBarrelStubs + 1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 1>() ? track.template getDiskStubWord<NBarrelStubs + 1>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::DiskStubWord(0);
             break;
           case 2:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 2>() ? track.template getDiskStubWord<NBarrelStubs + 2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 2>() ? track.template getDiskStubWord<NBarrelStubs + 2>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::DiskStubWord(0);
             break;
           case 3:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 3>() ? track.template getDiskStubWord<NBarrelStubs + 3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 3>() ? track.template getDiskStubWord<NBarrelStubs + 3>() : typename TrackFit<unsigned(NBarrelStubs), unsigned(NDiskStubs)>::DiskStubWord(0);
             break;
         }
       }
