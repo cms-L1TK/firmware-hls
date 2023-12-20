@@ -1,8 +1,7 @@
 // VMSMERouter
 
 // Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-// By writing VMStubME memories
-// Each VMSMERouter correspond to one phi/AllStub region.
+// By writing VMStubME memories, with each VMSMERouter correspond to one phi/AllStub region.
 // Needed for when project is split over both PFGAs
 
 #ifndef TrackletAlgorithm_VMSMERouter_h
@@ -25,23 +24,33 @@
 /////////////////////////////////////////
 // Constants
 
+// Number of rz bin bits for ME
+constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
+constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 
 //////////////////////////////////////
 // Functions used by the VMSMERouter
 
-// 
-// 
-// 
+// Returns the bits of phi corresponding to finephi, i.e. phi regions within a VM
+// vmbits is the number of bits for the VMs, i.e. coarse phi region. E.g. 32 VMs would use vmbits=5
+// finebits is the number of bits within the VM
+template<regionType InType>
+inline int iphivmFineBins(const typename AllStub<InType>::ASPHI phi, const int vmbits, const int finebits) {
+
+	auto finebin = (phi.range(phi.length() - vmbits - 1, phi.length() - vmbits - finebits));
+
+	return finebin;
+}
 
 // Get the corrected phi, i.e. phi at the average radius of the barrel
 // Corrected phi is used by ME memories in the barrel
-template<regionType InOutType>
-inline typename AllStub<InOutType>::ASPHI getPhiCorr(
-		const typename AllStub<InOutType>::ASPHI phi,
-		const typename AllStub<InOutType>::ASR r,
-		const typename AllStub<InOutType>::ASBEND bend, const int phiCorrTable[]) {
+template<regionType inOutType>
+inline typename AllStub<inOutType>::ASPHI getPhiCorr(
+		const typename AllStub<inOutType>::ASPHI phi,
+		const typename AllStub<inOutType>::ASR r,
+		const typename AllStub<inOutType>::ASBEND bend, const int phiCorrTable[]) {
 
-	if (InOutType == DISKPS || InOutType == DISK2S) return phi; // Do nothing if disks
+	if (inOutType == DISKPS || inOutType == DISK2S) return phi; // Do nothing if disks
 
 	constexpr auto nrbins = 1 << kNbitsrzbin; // The number of bins for r
 
@@ -59,8 +68,8 @@ inline typename AllStub<InOutType>::ASPHI getPhiCorr(
 }
 
 // Returns a ME stub with all the values set
-template<class T, regionType InType, regionType OutType, int Layer, int Disk>
-inline T createVMStubME(AllStub<InOutType> allstub,
+template<class T, regionType InType, regionType OutType, int layer, int disk>
+inline T createVMStubME(AllStub<InType> allstub,
 		const int index, const bool negDisk, const int lutTable[],
 		const int phiCorrTable[], int& slot) {
 
@@ -80,13 +89,13 @@ inline T createVMStubME(AllStub<InOutType> allstub,
 	int nbitsfinephi = stub.getFinePhi().length();  // Number of bits for finephi
 
 	// Number of bits for table indices
-	constexpr int nbitsztable = (Layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of MSBs of z used in LUT table
-	constexpr int nbitsrtable = (Layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of MSBs of r used in LUT table
-	constexpr auto vmbits = (Layer) ? nbits_vmmeall[Layer-1] : nbits_vmmeall[trklet::N_LAYER+Disk-1]; // Number of bits for standard VMs
-	constexpr unsigned int nbitsall = (Layer) ? nbitsallstubs[Layer-1] : nbitsallstubs[trklet::N_LAYER+Disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
+	constexpr int nbitsztable = (layer) ? kNbitszfinebintable : kNbitszfinebintableDisk; // Number of MSBs of z used in LUT table
+	constexpr int nbitsrtable = (layer) ? kNbitsrfinebintable : kNbitsrfinebintableDisk; // Number of MSBs of r used in LUT table
+	constexpr auto vmbits = (layer) ? nbits_vmmeall[layer-1] : nbits_vmmeall[trklet::N_LAYER+disk-1]; // Number of bits for standard VMs
+	constexpr unsigned int nbitsall = (layer) ? nbitsallstubs[layer-1] : nbitsallstubs[trklet::N_LAYER+disk-1]; // Number of bits for the number of Alltub memories in a layer/disk
 
 	// Number of bits for the memory bins
-	constexpr int nbitsbin = (Layer) ? MEBinsBits : MEBinsBits + 1; // ME in disks has double the amount of bins
+	constexpr int nbitsbin = (layer) ? MEBinsBits : MEBinsBits + 1; // ME in disks has double the amount of bins
 
 	// Set values to VMStub
 	stub.setBend(bend);
@@ -101,7 +110,7 @@ inline T createVMStubME(AllStub<InOutType> allstub,
 
 	constexpr int rbins = (1 << nbitsrtable); // Number of bins in r in LUT table
 
-	if (Disk) {
+	if (disk) {
 		if (negDisk) {
 			indexz = (1 << nbitsztable) -1 - indexz;
 		}
@@ -109,7 +118,7 @@ inline T createVMStubME(AllStub<InOutType> allstub,
 		if (InType == DISKPS) {
 			indexr = r >> (nbitsr - nbitsrtable); // Take the top "nbitsrtable" bits
 		}
-	} else { // Layer
+	} else { // layer
 		indexr = (r >> (nbitsr- nbitsrtable));// Make r unsigned and take the top "nbitsrtable" bits
 	}
 
@@ -139,16 +148,16 @@ inline T createVMStubME(AllStub<InOutType> allstub,
 /////////////////////////////////
 // Main function
 
-// Two input region types InOutType and DISK2S due to the disks having both 2S and PS inputs.
-template<int Layer, int Disk, regionType InOutType, int rzSizeME, int phiRegSize>
+// Two input region types inOutType and DISK2S due to the disks having both 2S and PS inputs.
+template<int layer, int disk, regionType inOutType, int rzSizeME, int phiRegSize>
 void VMSMERouter(const BXType bx, BXType& bx_o,
 		// LUTs
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStubMemory<InOutType> allstub,
+		AllStubMemory<inOutType> allstub,
 		// ME memories
-		VMStubMEMemoryCM<InOutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME) {
+		VMStubMEMemoryCM<inOutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=memoriesAS complete dim=1
@@ -156,7 +165,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 	int entries = allstub.getEntries(0);
 
 	//Create variables that keep track of which memory address to read and write to
-	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
+	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of AllStubs
 	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
 #pragma HLS array_partition variable=addrCountME complete dim=0
 
@@ -177,13 +186,13 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		bool disk2S = false; // Used to determine if DISK2S
 		bool negDisk = false; // Used to determine if it's negative disk // FIXME need this to actually change if negDisk 
 
-		AllStub<ASTYPE>       stub = allstub->read_mem(bx,read_addr);
+		AllStub<inOutType>       stub = allstub.read_mem(bx,read_addr);
 		AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(stub.raw());
 		AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 
-		constexpr bool isDisk = (Disk > 0);
+		constexpr bool isDisk = (disk > 0);
 
-		auto disk2S = ! stub_ps.isPSStub();
+		disk2S = ! stub_ps.isPSStub();
 
 		// Increment the read address, or reset it to zero when all stubs in a memory has been read
 		if (resetNext) read_addr = 0;
@@ -195,10 +204,10 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		int slotME; // The bin the stub is going to be put in, in the memory
 
 		// Create the ME stub to save
-		VMStubMECM<InOutType> stubME = (isDisk) ? 
-				createVMStubME<VMStubMECM<InOutType>, DISK2S, InOutType, Layer, Disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (disk2S) ?
-				createVMStubME<VMStubMECM<InOutType>, DISKPS, InOutType, Layer, Disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
-				createVMStubME<VMStubMECM<InOutType>, InOutType, InOutType, Layer, Disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
+		VMStubMECM<inOutType> stubME = (isDisk) ? 
+				createVMStubME<VMStubMECM<inOutType>, DISK2S, inOutType, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (disk2S) ?
+				createVMStubME<VMStubMECM<inOutType>, DISKPS, inOutType, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
+				createVMStubME<VMStubMECM<inOutType>, inOutType, inOutType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
