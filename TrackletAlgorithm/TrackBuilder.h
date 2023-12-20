@@ -308,7 +308,7 @@ void TrackBuilder(
             break;
         }
       }
-      disk_stub_words: for (short j = 0 ; j < static_cast<int>(NDiskStubs); j++) {
+      disk_stub_words: for (short j = 0 ; j < NDiskStubs; j++) {
         switch (j) {
           case 0:
             diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
