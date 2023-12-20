@@ -68,14 +68,14 @@ void TrackBuilder(
 #pragma HLS array_partition variable=barrel_write_index complete dim=0
 #pragma HLS array_partition variable=disk_write_index complete dim=0
 
-  initialize_barrel_indices : for (short i = 0; i < NFMBarrel; i++) {
+  initialize_barrel_indices : for (short i = 0; NFMBarrel > 0 && i < NFMBarrel; i++) {
 #pragma HLS unroll
     barrel_mem_index[i] = 0;
     barrel_read_index[i] = 0;
     barrel_write_index[i] = 0;
   }
 
-  initialize_disk_indices : for (short i = 0; i < NFMDisk; i++) {
+  initialize_disk_indices : for (short i = 0; NFMDisk > 0 && i < NFMDisk; i++) {
 #pragma HLS unroll
     disk_mem_index[i] = 0;
     disk_read_index[i] = 0;
@@ -292,7 +292,7 @@ void TrackBuilder(
     // object that was constructed.
     if (track.getTrackValid()) {
       trackWord[nTracks] = track.getTrackWord();
-      barrel_stub_words: for (short j = 0 ; j < NBarrelStubs; j++) {
+      barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) {
         switch (j) {
           case 0:
             barrelStubWords[j][nTracks] = track.template getStubValid<0>() ? track.template getBarrelStubWord<0>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
@@ -308,7 +308,7 @@ void TrackBuilder(
             break;
         }
       }
-      disk_stub_words: for (short j = 0 ; j < NDiskStubs; j++) {
+      disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) {
         switch (j) {
           case 0:
             diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
