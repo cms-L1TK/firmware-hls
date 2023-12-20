@@ -71,7 +71,7 @@ def writeTopHeader(vmr, output_dir):
         "constexpr TF::phiRegion phiRegion = TF::" + phi_region+ "; // Which AllStub/PhiRegion\n"
         "\n"
         "constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);\n"
-        "constexpr regionType inOutType = getInputType<layerdisk>();\n"
+        "constexpr regionType inOutType = (kDISK ==0) ? getInputType<layerdisk>() : DISK;\n"
         "// Number of bits for the RZ bins \n"
         "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
         "\n\n"

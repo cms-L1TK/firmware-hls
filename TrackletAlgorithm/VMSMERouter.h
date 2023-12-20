@@ -72,15 +72,19 @@ template<class T, regionType InType, regionType OutType, int layer, int disk>
 inline T createVMStubME(AllStub<InType> allstub,
 		const int index, const bool negDisk, const int lutTable[],
 		const int phiCorrTable[], int& slot) {
-
+	std::cout << "inType: " << InType << "\n";
 	// The stub that is going to be returned
 	T stub;
-
+	std::cout << "raw stub processed: " << std::hex << allstub.raw() << "\n";
 	// Values from Input AllStub
 	auto z = allstub.getZ();
+	std::cout << "z: " << std::dec << z << "\n";
 	auto r = allstub.getR();
+	std::cout << "r: " << std::dec << z << "\n";
 	auto bend = allstub.getBend();
+	std::cout << "bend: " << std::dec << z << "\n";
 	auto phi = allstub.getPhi();
+	std::cout << "phi: " << std::dec << z << "\n";
 	auto phicorr = getPhiCorr<InType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
 
 	int nbitsr = r.length(); // Number of bits for r
@@ -160,9 +164,9 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		VMStubMEMemoryCM<inOutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME) {
 
 #pragma HLS inline
-#pragma HLS array_partition variable=memoriesAS complete dim=1
+//#pragma HLS array_partition variable=memoriesAS complete dim=1
 
-	int entries = allstub.getEntries(0);
+	int entries = allstub.getEntries(bx);
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of AllStubs
@@ -182,21 +186,21 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind
 #pragma HLS latency min = 12 //this ensures latencies of different vmrs match in a reduced configuration.
-		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S
 		bool negDisk = false; // Used to determine if it's negative disk // FIXME need this to actually change if negDisk 
-
+		std::cout << "bx: " <<std::dec << bx << "\n";
+		std::cout << "read_addr: " << std::dec << read_addr << "\n";
 		AllStub<inOutType>       stub = allstub.read_mem(bx,read_addr);
 		AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(stub.raw());
 		AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 
 		constexpr bool isDisk = (disk > 0);
+		std::cout << "isDisk: " << std::dec << isDisk << "\n";
+		if (isDisk) disk2S = ! stub_ps.isPSStub();
+		
 
-		disk2S = ! stub_ps.isPSStub();
-
-		// Increment the read address, or reset it to zero when all stubs in a memory has been read
-		if (resetNext) read_addr = 0;
-		else ++read_addr;
+		// Increment the read address
+		++read_addr;
 
 		/////////////////////////////////////////////
 		// ME memories
@@ -204,15 +208,15 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		int slotME; // The bin the stub is going to be put in, in the memory
 
 		// Create the ME stub to save
-		VMStubMECM<inOutType> stubME = (isDisk) ? 
-				createVMStubME<VMStubMECM<inOutType>, DISK2S, inOutType, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (disk2S) ?
+		VMStubMECM<inOutType> stubME = (disk2S) ? 
+				createVMStubME<VMStubMECM<inOutType>, DISK2S, inOutType, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
 				createVMStubME<VMStubMECM<inOutType>, DISKPS, inOutType, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
 				createVMStubME<VMStubMECM<inOutType>, inOutType, inOutType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
 		addrCountME[slotME] += 1;
-		if (read_addr > entries) break;
+		if (read_addr >= entries) break; // FIXME probably shouldn't break here? 
 		// End ME memories
 	} // Outside main loop
 

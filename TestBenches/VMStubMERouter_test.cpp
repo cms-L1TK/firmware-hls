@@ -8,7 +8,7 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ VMRouterCMTop_L2PHIA
+  #define TOP_FUNC_ VMStubMERouterTop_L2PHIA
   #define HEADER_FILE_ "VMStubMERouterTop_L2PHIA.h"
 #endif
 
@@ -54,7 +54,7 @@ int main() {
   // Loop over events
 
   cout << "Start event loop ..." << endl;
-  std::cout << "test 0" << "\n";
+
   // Error count
   int err = 0;
 
@@ -63,25 +63,31 @@ int main() {
 
     // Clear output memories
     memoryME.clear();
-    std::cout << "test 1 " << "\n";
+
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
-
+    for (int i = 0; i < memoriesAS.getEntries(ievt); ++i){
+      std::cout << "AS RAW: " << std::hex << memoriesAS.read_mem(ievt, i).raw() << "\n";
+    }
     // bx - bunch crossing
     BXType bx = ievt;
     BXType bx_out;
-    std::cout << "test 2 " << "\n";
+
     // Unit Under Test
     TOP_FUNC_(bx, bx_out, 
               memoriesAS, 
               &memoryME);
-    std::cout << "test 3 " << "\n";
+
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect
     bool truncation = false;
 
     // ME memories
+    std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << "\n";
     err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<inOutType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
+    
+    // Clear input memories
+    memoriesAS.clear();
 
   } // End of event loop
 
