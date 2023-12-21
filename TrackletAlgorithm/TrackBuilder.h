@@ -90,6 +90,7 @@ void TrackBuilder(
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
+#pragma HLS latency min=5 max=5
 
     const ap_uint<1> empty = (i == 0);
     TrackletIDType min_id = kInvalidTrackletID;
