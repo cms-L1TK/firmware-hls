@@ -308,32 +308,32 @@ void TrackBuilder(
     barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
-          barrelStubWords[j][nTracks] = track.template getStubValid<0>() ? track.template getBarrelStubWord<0>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<0>();
           break;
         case 1:
-          barrelStubWords[j][nTracks] = track.template getStubValid<1>() ? track.template getBarrelStubWord<1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<1>();
           break;
         case 2:
-          barrelStubWords[j][nTracks] = track.template getStubValid<2>() ? track.template getBarrelStubWord<2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<2>();
           break;
         case 3:
-          barrelStubWords[j][nTracks] = track.template getStubValid<3>() ? track.template getBarrelStubWord<3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<3>();
           break;
       }
     }
     disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
-          diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs>();
           break;
         case 1:
-          diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 1>() ? track.template getDiskStubWord<NBarrelStubs + 1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 1>();
           break;
         case 2:
-          diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 2>() ? track.template getDiskStubWord<NBarrelStubs + 2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 2>();
           break;
         case 3:
-          diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 3>() ? track.template getDiskStubWord<NBarrelStubs + 3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 3>();
           break;
       }
     }

@@ -290,13 +290,17 @@ public:
   template<uint8_t Hit>
   BarrelStubWord getBarrelStubWord() const {
     //static_assert(Hit >= 0 && Hit <= NBarrelStubs - 1, "Invalid hit number.");
-    return data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubValidMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubRZResidLSB(Hit));
+    return ((getTrackValid() && getStubValid<Hit>())
+        ? data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubValidMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubRZResidLSB(Hit))
+        : BarrelStubWord(0));
   }
 
   template<uint8_t Hit>
   DiskStubWord getDiskStubWord() const {
     //static_assert(Hit >= NBarrelStubs && Hit <= TrackFitBase<NBarrelStubs, NDiskStubs>::kNStubs - 1, "Invalid hit number.");
-    return data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubValidMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubRZResidLSB(Hit));
+    return ((getTrackValid() && getStubValid<Hit>())
+        ? data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubValidMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubRZResidLSB(Hit))
+        : DiskStubWord(0));
   }
 
   // Setter
