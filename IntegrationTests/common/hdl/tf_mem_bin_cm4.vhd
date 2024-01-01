@@ -40,7 +40,8 @@ entity tf_mem_bin_cm4 is
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; --! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
-    NAME            : string := "MEMNAME"          --! Memory name
+    NAME            : string := "MEMNAME";          --! Memory name
+    DEBUG           : boolean := false
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -157,7 +158,6 @@ process(clka)
   --variable v_line_out   : line;          -- Line for debug
 begin
   if rising_edge(clka) then
-    report "tm_mem_bin_cm4 vi_clk_cnt "&integer'image(vi_clk_cnt);
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -186,14 +186,14 @@ begin
 
       upperbits := vi_nent_idx(5 downto 3);
       lowerbits := vi_nent_idx(2 downto 0);
-      
+
       page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH_CM))));
       addr_in_bin := std_logic_vector(unsigned(addra(BIN_ADDR_WIDTH-1 downto 0)) + 1);
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
 
-      sa_RAM_nentA(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
-      sa_RAM_nentB(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
+      sa_RAM_nentA(to_integer(unsigned(upperbits)))(page*NUM_RZ_BINS+to_integer(unsigned(lowerbits))) <= addr_in_bin;
+      sa_RAM_nentB(to_integer(unsigned(upperbits)))(page*NUM_RZ_BINS+to_integer(unsigned(lowerbits))) <= addr_in_bin;
 
     end if; -- (wea='1')
   end if;
@@ -216,6 +216,9 @@ begin
     end if;
     if (enb_nentA='1') then
       for i in 0 to NUM_PHI_BINS-1 loop
+        if DEBUG then
+          report "cm4_mem "&time'image(now)&" "&NAME&" addr_nentA "&to_bstring(addr_nentA)&" "&to_bstring(sa_RAM_nentA(i)(to_integer(unsigned(addr_nentA))))&" "&to_bstring(mask_o(to_integer(unsigned(addr_nentA(4 downto 3))))(i*8+to_integer(unsigned(addr_nentA(2 downto 0)))));
+        end if;
         dout_nentA(BIN_ADDR_WIDTH*(i+1)-1 downto BIN_ADDR_WIDTH*i) <= sa_RAM_nentA(i)(to_integer(unsigned(addr_nentA)));
       end loop;
     end if;

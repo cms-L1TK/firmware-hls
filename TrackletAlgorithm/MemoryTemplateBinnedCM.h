@@ -62,6 +62,7 @@ class MemoryTemplateBinnedCM{
 
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
+  ap_uint<64> nentries_[slots];
   ap_uint<entries8> nentries8A_[slots];
   ap_uint<entries8> nentries8B_[slots];
   
@@ -107,6 +108,10 @@ class MemoryTemplateBinnedCM{
   ap_uint<32> getEntries8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
     #pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
     return nentries8_[bx][ibin];
+  }
+
+  ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+    return nentries_[bx*8+ibin];
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
