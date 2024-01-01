@@ -64,7 +64,7 @@ class MemoryTemplateBinnedCM{
   ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
 
- public:
+public:
 
   unsigned int getDepth() const {return kNMemDepth;}
   unsigned int getNBX() const {return kNBxBins;}
@@ -89,7 +89,7 @@ class MemoryTemplateBinnedCM{
   }
 
   ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    return nentries_[bx*(1<<(NBIT_BIN-kNBitsphibinCM))+ibin];
+    return nentries_[bx*8+ibin];
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
@@ -103,7 +103,7 @@ class MemoryTemplateBinnedCM{
       val += getEntries(bx, i);
     }
     return val;
-  }
+  } 
 
   const DataType (&getMem(unsigned int icopy) const)[1<<NBIT_BX][1<<NBIT_ADDR] {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
