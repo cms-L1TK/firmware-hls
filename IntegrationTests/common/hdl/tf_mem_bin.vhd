@@ -141,7 +141,7 @@ architecture rtl of tf_mem_bin is
   type t_arr_2d_slv_mem_nent is array(0 to 2*NUM_PHI_BINS-1) of t_arr_1d_slv_mem_nent; --! 2D array of slv
 
 -- ########################### Function ##########################
---! @brief TextIO function to read memory data to initialize tf_mem_bin. Needed here because of variable slv width!
+--! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4_new. Needed here because of variable slv width!
 impure function read_tf_mem_data (
 file_path : string;      --! File path as string
 hex_val   : boolean)     --! Read file vales as hex or bin
