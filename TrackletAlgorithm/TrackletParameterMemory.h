@@ -15,8 +15,9 @@ public:
     kTParPhi0Size = 18, //phi0
     kTParZ0Size = 10, //z0
     kTParTSize = 14, //t
+    kTParPhiRegionSize = 3, //phi region size. Used for combined modules, set to zero for non-CM
     // Bit size for full TrackletParameterMemory
-    kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr
+    kTrackletParameterSize = kTParRinvSize + kTParPhi0Size + kTParZ0Size + kTParTSize + 2*kNBits_MemAddr + kTParPhiRegionSize
   };
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the TrackletParameterMemory word for different fields
@@ -31,9 +32,12 @@ public:
     kTParStubIndexOuterLSB = kTParRinvMSB + 1,
     kTParStubIndexOuterMSB = kTParStubIndexOuterLSB + kNBits_MemAddr - 1,
     kTParStubIndexInnerLSB = kTParStubIndexOuterMSB + 1,
-    kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1
+    kTParStubIndexInnerMSB = kTParStubIndexInnerLSB + kNBits_MemAddr - 1,
+    kTParPhiRegionLSB = kTParStubIndexInnerMSB + 1,
+    kTParPhiRegionMSB = kTParPhiRegionLSB + kTParPhiRegionSize - 1
   };
 
+  typedef ap_uint<kTParPhiRegionSize> PHIREGION;
   typedef ap_uint<kNBits_MemAddr> STUBINDEX;
   typedef ap_int<kTParTSize> TPAR;
   typedef ap_int<kTParZ0Size> Z0PAR;
@@ -49,6 +53,10 @@ public:
 
   TrackletParameters(const STUBINDEX id1, const STUBINDEX id2, const RINVPAR rinv, const PHI0PAR phi0, const Z0PAR z0, const TPAR t):
     data_( (((((id1,id2),rinv),phi0),z0),t) )
+  {}
+
+ TrackletParameters(const PHIREGION phireg, const STUBINDEX id1, const STUBINDEX id2, const RINVPAR rinv, const PHI0PAR phi0, const Z0PAR z0, const TPAR t):
+    data_( ((((((phireg,id1),id2),rinv),phi0),z0),t) )
   {}
   
   TrackletParameters()
@@ -66,6 +74,10 @@ public:
   static constexpr int getWidth() {return kTrackletParameterSize;}
 
   TrackletParameterData raw() const {return data_;}
+
+  PHIREGION getPhiRegion() const {
+    return data_.range(kTParPhiRegionMSB,kTParPhiRegionLSB);
+  }
 
   STUBINDEX getStubIndexOuter() const {
     return data_.range(kTParStubIndexOuterMSB,kTParStubIndexOuterLSB);
@@ -92,6 +104,10 @@ public:
   }
   
   // Setter
+  void setPhiRegion(const PHIREGION phiregion) {
+    data_.range(kTParPhiRegionMSB,kTParPhiRegionLSB) = phiregion;
+  }
+
   void setStubIndexInner(const STUBINDEX id) {
     data_.range(kTParStubIndexInnerMSB,kTParStubIndexInnerLSB) = id;
   }

@@ -131,7 +131,7 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
 {
   unsigned int err_count = 0;
 
-  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB - LSB + 1) : MemType::getWidth();
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
@@ -186,7 +186,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
-  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated);
+  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
   
 }
 
@@ -447,7 +447,7 @@ unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifst
     }
   }
 
-  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated);
+  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
   
 }
 

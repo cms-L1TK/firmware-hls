@@ -2,7 +2,6 @@
 #define MATCHENGINEUNIT_H
 
 #include "Constants.h"
-#include "CandidateMatchMemory.h"
 #include "TrackletProjectionMemory.h"
 #include "VMStubMEMemoryCM.h"
 #include "VMProjectionMemory.h"

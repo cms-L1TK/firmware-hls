@@ -1,32 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_230620 ####
-# Standard configuration
-memprints_url="https://cernbox.cern.ch/remote.php/dav/public-files/5TAFYMplp1HWf8c/MemPrints.tar.gz"
-luts_url="https://cernbox.cern.ch/remote.php/dav/public-files/HMDbKJET05fkvT1/LUTs.tar.gz"
-# Reduced configuration
-memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/4jZdhxfj02Ie21I/MemPrints.tar.gz"
-luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/mcGz25JNu19Oqzm/LUTs.tar.gz"
+#### fw_synch_231205 ####
 # Combined modules
-# Updated files from Jason for TP disk with extra sign bit for disks in AllInnerStubs memories. This is in cmssw PR #230
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/Gfv0lbIVWBdFsoa/MemPrints_10242023.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/CfDiIlwterSBOSZ/LUTs.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/xeMgwU9Lvnj1y9Z/MemPrints.tar.gz"
+luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/wSwhk7teb0RDObk/LUTs.tar.gz"
 # Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/g0EIkgWgie5mBob/MemPrints.tar.gz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HT8q7fk4UvhpdPK/LUTs.tar.gz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/dJ1ss4iczetRESZ/MemPrints.tar.gz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/UBaWeoHsWXDY9ex/LUTs.tar.gz"
 # Reduced Combined modules2
-memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/VOictG2TTAaWD9c/MemPrints.tar.gz"
-luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/nbz2P7cxAOF15aB/LUTs.tar.gz"
+memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/8dSZa6V93me4cHf/MemPrints.tar.gz"
+luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/xq9eMadmjeQPBVw/LUTs.tar.gz"
 # Combined barrel
-memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_CombinedBarrel_230106.tgz"
-luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_CombinedBarrel_230106.tgz"
-
-# Barrel-only configuration
-# N.B.: currently untagged but produced with following commit:
-# e5047997b33dc6cfb1d7ce35aa34dfc56c0fe9bf
-memprints_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/eLA2Tx5nV9gYlco/MemPrints.tar.gz"
-luts_url_barrel="https://cernbox.cern.ch/remote.php/dav/public-files/kg0KtrYfHKbkqbV/LUTs.tar.gz"
+memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/THL7aPHzCNZp8cX/MemPrints.tar.gz"
+luts_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/O3I5qydfC6o6M87/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
@@ -67,7 +54,7 @@ fi
 
 # If the MemPrints directory exists, assume the script has already been run,
 # and simply exit.
-if [ -d "MemPrints" ]
+if [ -d "MemPrintsCM" ]
 then
   echo "The emData directory must be cleaned for this script to work."
   exit 0
@@ -78,14 +65,6 @@ fi
 
 if [ ! -d "LUTs" ]
 then
-  wget -O LUTs.tgz --quiet ${luts_url_reduced}
-  tar -xzmf LUTs.tgz
-  mv LUTs LUTsReduced
-  rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_barrel}
-  tar -xzmf LUTs.tgz
-  mv LUTs LUTsBarrel
-
   wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMReduced
@@ -102,40 +81,12 @@ then
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
-  wget -O LUTs.tar.gz --quiet ${luts_url}
-  tar -xzmf LUTs.tar.gz
-  rm -f LUTs.tar.gz
 fi
 
 # Run scripts to generate top functions in TopFunctions/
-### full config
-./generate_IR.py     -w LUTs/wires.dat -o ../TopFunctions
-./generate_VMR.py -a -w LUTs/wires.dat -o ../TopFunctions
-./generate_TC.py     -w LUTs/wires.dat -o ../TopFunctions
-./generate_PR.py     -w LUTs/wires.dat -o ../TopFunctions
-./generate_ME.py -s  -w LUTs/wires.dat -o ../TopFunctions
-./generate_MC.py     -w LUTs/wires.dat -o ../TopFunctions
-./generate_TB.py     -w LUTs/wires.dat -o ../TopFunctions
-### reduced config
-mkdir -p ../TopFunctions/ReducedConfig
-./generate_IR.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-./generate_VMR.py -a -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-./generate_TC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-./generate_PR.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-./generate_ME.py -s  -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-./generate_MC.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-./generate_TB.py     -w LUTsReduced/wires.dat -o ../TopFunctions/ReducedConfig
-### barrel config
-mkdir -p ../TopFunctions/BarrelConfig
-./generate_IR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
-./generate_VMR.py -a -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
-./generate_TC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
-./generate_PR.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
-./generate_ME.py -s  -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
-./generate_MC.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
-./generate_TB.py     -w LUTsBarrel/wires.dat -o ../TopFunctions/BarrelConfig
 ### combined config
 mkdir -p ../TopFunctions/CombinedConfig
+./generate_IR.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
@@ -185,51 +136,6 @@ cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmo
 mv wires.dat reducedcm2_wires.dat
 mv memorymodules.dat reducedcm2_memorymodules.dat
 mv processingmodules.dat reducedcm2_processingmodules.dat
-cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
-./makeReducedConfig.py --no-graph
-./makeBarrelConfig.py
-### IRVMR
-echo "IRVMR"
-./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
-./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0 -x
-mkdir -p ../../IntegrationTests/IRVMR/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/IRVMR/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/IRVMR/tb/
-### PRMEMC
-echo "PRMEMC"
-./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2
-./generator_hdl.py ../../ --no_graph --uut PR_L3PHIC -u 0 -d 2 -x
-mkdir -p ../../IntegrationTests/PRMEMC/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/PRMEMC/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/PRMEMC/tb/
-### TETC
-echo "TETC"
-./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0
-./generator_hdl.py ../../ --no_graph --uut TC_L1L2E -u 1 -d 0 -x
-mkdir -p ../../IntegrationTests/TETC/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/TETC/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/TETC/tb/
-### Reduced IRtoTB
-echo "IRtoTB"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
-mkdir -p ../../IntegrationTests/ReducedConfig/IRtoTB/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/IRtoTB/tb/
-### Reduced MCTB
-echo "MCTB"
-./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut FT -u 1 -d 0 -w reduced_wires.dat -p reduced_processingmodules.dat -m reduced_memorymodules.dat -x
-mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
-### Barrel IRtoTB
-echo "Barrel ITtoTB"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat -x
-mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/BarrelConfig/IRtoTB/tb/
 ### Reduced Combined IRtoTB
 echo "Reduced CM"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 4 -w reducedcm_wires.dat -p reducedcm_processingmodules.dat -m reducedcm_memorymodules.dat -de 1
@@ -259,16 +165,6 @@ cd ../
 if [[ $tables_only == 0 ]]
 then
   # Get memory test data: download and unpack the tarball.
-  wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsReduced
-  rm -f MemPrints.tgz
-
-  wget -O MemPrints.tgz --quiet ${memprints_url_barrel}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsBarrel
-  rm -f MemPrints.tgz
-
   wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM
@@ -288,17 +184,13 @@ then
   mv MemPrints MemPrintsCM
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tar.gz --quiet ${memprints_url}
-  tar -xzmf MemPrints.tar.gz
-  rm -f MemPrints.tar.gz
-
 fi
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
-mod_types=(IR VMR TE TC PR ME MC FT PD VMRCM TP MP)
+mod_types=(IR FT PD VMRCM TP MP)
 
 for module_type in ${mod_types[@]}
 do
@@ -307,27 +199,20 @@ do
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTs/processingmodules.dat LUTsCM/processingmodules.dat LUTsReduced/processingmodules.dat LUTsBarrel/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTsCM/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
 for module in ${processing_modules[@]}
 do
   echo ${module}
-  memprint_location="MemPrints"
-  memprint_location_reduced="MemPrintsReduced"
+  memprint_location="MemPrintsCM"
   memprint_location_reducedcm="MemPrintsReducedCM"
   memprint_location_reducedcm2="MemPrintsReducedCM2"
-  memprint_location_barrel="MemPrintsBarrel"
-  table_location="LUTs"
-  if [[ ${module_type} == "TP" || ${module_type} == "MP" || ${module_type} == "VMRCM" ]]
+  table_location="LUTsCM"
+  if [[ ${module_type} == "VMRCM" ]]
   then
-    memprint_location="MemPrintsCM"
-    table_location="LUTsCM"
-    if [[ ${module_type} == "VMRCM" ]]
-    then
-      module=`echo ${module} | sed "s/CM//"`
-    fi
+    module=`echo ${module} | sed "s/CM//"`
   fi
   wires="${table_location}/wires.dat"
 
@@ -337,18 +222,14 @@ do
     target_dir=${module_type}/${module}
 
     rm -rf ${target_dir}
-    mkdir -p ${target_dir}/ReducedConfig
-    mkdir -p ${target_dir}/BarrelConfig
     mkdir -p ${target_dir}/ReducedCombinedConfig
     mkdir -p ${target_dir}/ReducedCombinedConfig2
 
     for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
     do
       find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
-      find ${memprint_location_reduced} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedConfig/ \;
       find ${memprint_location_reducedcm} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig/ \;
       find ${memprint_location_reducedcm2} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig2/ \;
-      find ${memprint_location_barrel} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/BarrelConfig/ \;
     done
   fi
 
@@ -359,15 +240,7 @@ do
           mkdir -p ${table_target_dir}
   fi
 
-  if [[ ${module_type} == "TC" ]]
-  then
-          layer_pair=`echo ${module} | sed "s/\(.*\)./\1/g"`
-          find ${table_location} -type f -name "${layer_pair}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-  elif [[ ${module_type} == "ME" ]]
-  then
-          layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
-          find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-  elif [[ ${module_type} == "TP" ]]
+  if [[ ${module_type} == "TP" ]]
   then
           seed=`echo ${module} | sed "s/.*_\([L|D][1-6][L|D][1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
@@ -377,9 +250,6 @@ do
           find ${table_location} -type f -name "TC_${seed}_invt.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "TC_${seed}_drinv.dat" -exec ln -sf ../../{} ${table_target_dir}/ \;
 
-  elif [[ ${module_type} == "MC" ]] || [[ ${module_type} == "TE" ]]
-  then
-          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
   elif [[ ${module_type} == "MP" ]]
   then
           layer=`echo ${module} | sed "s/.*_\([L|D][1-9]\).*$/\1/g"`
@@ -387,7 +257,7 @@ do
           find ${table_location} -type f -name "METable_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "MP_ProjectionBend_${layer}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
-  elif [[ ${module_type} == "VMR" ]] || [[ ${module_type} == "VMRCM" ]]
+  elif [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
