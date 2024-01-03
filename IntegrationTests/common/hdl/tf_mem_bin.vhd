@@ -277,9 +277,7 @@ begin
       page := to_integer(unsigned(addra(RAM_DEPTH_BITS-1 downto PAGE_LENGTH_BITS)));
       nentry_in_bin := std_logic_vector(unsigned(addra(ADDR_WIDTH-1 downto 0)) + 1);
 
-      --report "tf_mem_bin binaddr add_in_bin: " & to_bstring(vi_nent_idx) & " " & to_bstring(std_logic_vector(binaddr)) & " " & to_bstring(nentry_in_bin);
-
-      assert( binaddr = to_integer(unsigned(nentry_in_bin))) report "binaddr and nentry_in_bin does not agree" severity error;
+      assert( binaddr = to_integer(unsigned(nentry_in_bin))) report "tf_mem_bin vi_nent_idx binaddr nentry_in_bin: " & to_bstring(vi_nent_idx) & " " & to_bstring(std_logic_vector(binaddr)) & " " & to_bstring(nentry_in_bin) severity error;
       
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
