@@ -256,6 +256,7 @@ begin
 
     if (wea='1') then
       -- Write data to all copies
+      --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
       for icopy in 0 to NUM_COPY-1 loop
         sa_RAM_data(icopy)(to_integer(unsigned(addra))) <= dina; 
       end loop;
@@ -277,6 +278,8 @@ begin
       nentry_in_bin := std_logic_vector(unsigned(addra(ADDR_WIDTH-1 downto 0)) + 1);
 
       --report "tf_mem_bin binaddr add_in_bin: " & to_bstring(vi_nent_idx) & " " & to_bstring(std_logic_vector(binaddr)) & " " & to_bstring(nentry_in_bin);
+
+      assert( binaddr = to_integer(unsigned(nentry_in_bin))) report "binaddr and nentry_in_bin does not agree" severity error;
       
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
@@ -292,15 +295,16 @@ end process;
 process(clkb)
 begin
 
-  --Reading DRAM so should not be on clock edge
-  if (enb_nent='1') then
-    for i in 0 to 2*NUM_PHI_BINS-1 loop
-      --report "tf_mem_bin read nent " & " " &to_bstring(addr_nent) & " " & to_bstring(sa_RAM_nent(i)(to_integer(unsigned(addr_nent))));
-      dout_nent(ADDR_WIDTH*(i+1)-1 downto ADDR_WIDTH*i) <= sa_RAM_nent(i)(to_integer(unsigned(addr_nent)));
-    end loop;
-  end if; 
     
   if rising_edge(clkb) then
+    --Reading DRAM so should not be on clock edge ?
+    if (enb_nent='1') then
+      for i in 0 to 2*NUM_PHI_BINS-1 loop
+        --report "tf_mem_bin read nent " & NAME & " " &to_bstring(addr_nent) & " " & to_bstring(sa_RAM_nent(i)(to_integer(unsigned(addr_nent))));
+        dout_nent(ADDR_WIDTH*(i+1)-1 downto ADDR_WIDTH*i) <= sa_RAM_nent(i)(to_integer(unsigned(addr_nent)));
+      end loop;
+    end if; 
+
     for i in 0 to NUM_COPY-1 loop
       if (enb(i)='1') then
         --report "tf_mem_bin read addrb"&integer'image(i)&" "&to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS));
