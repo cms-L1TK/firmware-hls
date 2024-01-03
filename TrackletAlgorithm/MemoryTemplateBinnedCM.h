@@ -166,6 +166,10 @@ class MemoryTemplateBinnedCM{
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
+      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      if (ibin!=0) {
+      	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
+      }
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
@@ -249,6 +253,10 @@ class MemoryTemplateBinnedCM{
     bool success = write_mem(ibx, slot, data, nentry_ibx);
     #ifndef CMSSW_GIT_HASH
     if (success) {
+      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+      if (ibin!=0) {
+      	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
+      }
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;

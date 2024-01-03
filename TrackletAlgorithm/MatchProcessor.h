@@ -1240,7 +1240,6 @@ void MatchProcessor(BXType bx,
 
   MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete
-#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
   
@@ -1529,17 +1528,18 @@ void MatchProcessor(BXType bx,
       auto first = !isDisk ? zfirst : rfirst;
       auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
       auto slot = zbin.range(zbin.length()-1, 1);
-      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks
+
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zlast complete
 
-      for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
-#pragma HLS unroll
-        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*nbins+first].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
-        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*nbins+last].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
-      }
+      (entries_zlast[7], entries_zlast[6], entries_zlast[5], entries_zlast[4],
+       entries_zlast[3], entries_zlast[2], entries_zlast[1], entries_zlast[0],
+       entries_zfirst[7], entries_zfirst[6], entries_zfirst[5], entries_zfirst[4],
+       entries_zfirst[3], entries_zfirst[2], entries_zfirst[1], entries_zfirst[0]) =
+	instubdata.getEntries((bx&3),first);
+
       ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
