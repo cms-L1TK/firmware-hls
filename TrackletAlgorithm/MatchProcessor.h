@@ -1527,15 +1527,18 @@ void MatchProcessor(BXType bx,
       constexpr bool isDisk = LAYER > TF::L6;
       auto first = !isDisk ? zfirst : rfirst;
       auto slot = zbin.range(zbin.length()-1, 1);
+
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zlast complete
+
       for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
 #pragma HLS unroll
         entries_zfirst[phibin]= instubdata.getEntries(bx&3,first).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
         entries_zlast[phibin]= instubdata.getEntries(bx&3,first).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH+BIN_ADDR_WIDTH*NUM_PHI_BINS-1,phibin*BIN_ADDR_WIDTH + BIN_ADDR_WIDTH*NUM_PHI_BINS);
       }
+
       ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
