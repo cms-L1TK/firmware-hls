@@ -130,7 +130,7 @@ namespace trklet{
   constexpr int N_DISK = 5; // # of endcap disks assumed
 }
 #endif
-constexpr double bfield = 3.8112; // T
+constexpr double bfield = 3.8112; // 
 constexpr int rmean[trklet::N_LAYER + trklet::N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
 constexpr int zmean[trklet::N_LAYER + trklet::N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
 constexpr double zlength = 120.0; // cm
