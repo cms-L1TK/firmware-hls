@@ -1,3 +1,4 @@
+#include "TrackletProjectionCalculator.h"
 //
 static void init_idr_disk(ap_uint<20> *lut) {
 
