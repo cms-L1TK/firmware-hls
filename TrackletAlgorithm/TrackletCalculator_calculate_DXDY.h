@@ -27,14 +27,6 @@ void TC::calculate_DXDY (
   const typename AllStub<OuterRegion>::ASR r2_input,
   const typename AllStub<OuterRegion>::ASPHI phi2_input,
   const typename AllStub<OuterRegion>::ASZ z2_input,
-  //const TC::Types::zmean z1mean_input,
-  //const TC::Types::zmean z2mean_input,
-  //const TC::Types::rmean rproj0_input,
-  //const TC::Types::rmean rproj1_input,
-  //const TC::Types::rmean rproj2_input,
-  //const TC::Types::zmean  zproj0_input,
-  //const TC::Types::zmean  zproj1_input,
-  //const TC::Types::zmean  zproj2_input,
   const bool negDisk,
 
   TC::Types::rinv * const rinv_output,
@@ -62,8 +54,6 @@ void TC::calculate_DXDY (
 {
 #pragma HLS pipeline II=1
 #pragma HLS latency max=25
-
-  std::cout << "r1_input r2_input " << r1_input << " " << r2_input << std::endl;
 
   //First convert input to right bits
   ap_uint<12> ir1c = r1_input;
@@ -158,7 +148,6 @@ void TC::calculate_DXDY (
     *der_rD_output =  - *der_rD_output;
   }
 
-  std::cout << "Disk proj: " << *rD_0_output << " " << *phiD_0_output << " " << *der_phiD_output << " " << *der_rD_output << std::endl;
   
   //
   // wiring the outputs 
