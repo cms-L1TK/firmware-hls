@@ -95,7 +95,6 @@ class TPRegionLUT {
 
  public:
 
-
   inline TPRegionLUT(const ap_uint<1> *tplutinner,
 		     const ap_uint<2> iAllStub) {
 
