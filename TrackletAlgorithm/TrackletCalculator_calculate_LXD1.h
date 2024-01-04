@@ -1,6 +1,8 @@
 //
 #include "ap_int.h"
 #include "Constants.h"
+#include "TrackletProjectionCalculator.h"
+
 
 static void init_idr_overlap(ap_uint<18> *lut) {
 
@@ -82,7 +84,8 @@ void TC::calculate_LXD1 (
   ap_uint<12> idr = (ap_int<12>(ir2c - ir1c));
   ap_uint<18> invdr = lut_idrinv_overlap(idr);
 
-  *valid_radii = idr > floatToInt(1.5,kr); //FIXME this 1.5 is a magic number in emulation too
+  *valid_radii = idr > floatToInt(((Seed == TF::L1D1)?1.5:2.0),kr); 
+  //FIXME this 1.5 and 2.0 is a magic number
 
   ap_int<18> idelta0 = ((phi2c - phi1c)*invdr) >> n_delta0_Overlap_;
   ap_int<18> ideltaz = (idz*invdr) >> n_deltaz_Overlap_;
