@@ -3,8 +3,8 @@ set -e
 
 #### fw_synch_231205 ####
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/xeMgwU9Lvnj1y9Z/MemPrints.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/wSwhk7teb0RDObk/LUTs.tar.gz"
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_231208.tgz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/dJ1ss4iczetRESZ/MemPrints.tar.gz"
 luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/UBaWeoHsWXDY9ex/LUTs.tar.gz"

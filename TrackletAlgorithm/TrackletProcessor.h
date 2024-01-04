@@ -11,6 +11,7 @@
 #include "TEBuffer.h"
 #include "TrackletEngineUnit.h"
 #include "TrackletProcessor_parameters.h"
+#include "TrackletLUTs.h"
 
 namespace TC {
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,16 +99,6 @@ namespace TC {
     const typename AllStub<OuterRegion>::ASR r2_input,
     const typename AllStub<OuterRegion>::ASPHI phi2_input,
     const typename AllStub<OuterRegion>::ASZ z2_input,
-    const Types::rmean r1mean_input,
-    const Types::rmean r2mean_input,
-    const Types::rmean rproj0_input,
-    const Types::rmean rproj1_input,
-    const Types::rmean rproj2_input,
-    const Types::rmean rproj3_input,
-    const Types::zmean zproj0_input,
-    const Types::zmean zproj1_input,
-    const Types::zmean zproj2_input,
-    const Types::zmean zproj3_input,
 
     Types::rinv * const rinv_output,
     TrackletParameters::PHI0PAR * const phi0_output,
@@ -142,15 +133,6 @@ namespace TC {
     const typename AllStub<OuterRegion>::ASR r2_input,
     const typename AllStub<OuterRegion>::ASPHI phi2_input,
     const typename AllStub<OuterRegion>::ASZ z2_input,
-    const Types::rmean r1mean_input,
-    const Types::zmean z2mean_input,
-    const Types::rmean rproj0_input,
-    const Types::rmean rproj1_input,
-    const Types::rmean rproj2_input,
-    const Types::zmean zproj0_input,
-    const Types::zmean zproj1_input,
-    const Types::zmean zproj2_input,
-    const Types::zmean zproj3_input,
 
     bool * const valid_radii,
     Types::rinv * const rinv_output,
@@ -184,14 +166,6 @@ namespace TC {
     const typename AllStub<OuterRegion>::ASR r2_input,
     const typename AllStub<OuterRegion>::ASPHI phi2_input,
     const typename AllStub<OuterRegion>::ASZ z2_input,
-    const Types::zmean z1mean_input,
-    const Types::zmean z2mean_input,
-    const Types::rmean rproj0_input,
-    const Types::rmean rproj1_input,
-    const Types::rmean rproj2_input,
-    const Types::zmean zproj0_input,
-    const Types::zmean zproj1_input,
-    const Types::zmean zproj2_input,
     const bool negDisk,
 
     Types::rinv * const rinv_output,
@@ -305,44 +279,6 @@ template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
 TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
 ::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
 {
-  TC::Types::rmean r1mean, r2mean, rproj[4];
-  switch (Seed) {
-    case TF::L1L2:
-      r1mean   = rmean[TF::L1];
-      r2mean   = rmean[TF::L2];
-      rproj[0] = rmean[TF::L3];
-      rproj[1] = rmean[TF::L4];
-      rproj[2] = rmean[TF::L5];
-      rproj[3] = rmean[TF::L6];
-      break;
-    case TF::L2L3:
-      rproj[0] = rmean[TF::L1];
-      r1mean   = rmean[TF::L2];
-      r2mean   = rmean[TF::L3];
-      rproj[1] = rmean[TF::L4];
-      rproj[2] = rmean[TF::L5];
-      rproj[3] = rmean[TF::L6];
-      break;
-    case TF::L3L4:
-      rproj[0] = rmean[TF::L1];
-      rproj[1] = rmean[TF::L2];
-      r1mean   = rmean[TF::L3];
-      r2mean   = rmean[TF::L4];
-      rproj[2] = rmean[TF::L5];
-      rproj[3] = rmean[TF::L6];
-      break;
-    case TF::L5L6:
-      rproj[0] = rmean[TF::L1];
-      rproj[1] = rmean[TF::L2];
-      rproj[2] = rmean[TF::L3];
-      rproj[3] = rmean[TF::L4];
-      r1mean   = rmean[TF::L5];
-      r2mean   = rmean[TF::L6];
-      break;
-    default:
-      break;
-  }
-  TC::Types::zmean zproj[4] = {zmean[TF::D1], zmean[TF::D2], zmean[TF::D3], zmean[TF::D4]};
   calculate_LXLY<Seed, InnerRegion, OuterRegion>(
       innerStub.getR(),
       innerStub.getPhi(),
@@ -350,16 +286,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
       outerStub.getR(),
       outerStub.getPhi(),
       outerStub.getZ(),
-      r1mean,
-      r2mean,
-      rproj[0],
-      rproj[1],
-      rproj[2],
-      rproj[3],
-      zproj[0],
-      zproj[1],
-      zproj[2],
-      zproj[3],
 
       rinv,
       phi0,
@@ -398,7 +324,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
     valid_proj[i] = valid_zmin && valid_zmax && valid_phimax && valid_phimin;
 
-    if (rproj[i] < irprojmaxcut) {
+    if (projectionLayers[Seed][i]<3) {
       phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
       if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
         phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
@@ -439,28 +365,6 @@ template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
 TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
 ::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
 {
-  TC::Types::rmean r1mean, rproj[3];
-  TC::Types::zmean z1mean, z2mean;
-  TC::Types::zmean zproj[3];
-  rproj[0] = rmean[TF::L1];
-  rproj[1] = rmean[TF::L2];
-  rproj[2] = rmean[TF::L3];
-
-  if (Seed==TF::D1D2){
-    z1mean = zmean[TF::D1];
-    z2mean = zmean[TF::D2];
-    zproj[0] = zmean[TF::D3];
-    zproj[1] = zmean[TF::D4];
-    zproj[2] = zmean[TF::D5];
-  }
-  else{
-    z1mean = zmean[TF::D3];
-    z2mean = zmean[TF::D4];
-    zproj[0] = zmean[TF::D1];
-    zproj[1] = zmean[TF::D2];
-    zproj[2] = zmean[TF::D5];
-
-  }
   calculate_DXDY<Seed, InnerRegion, OuterRegion>(
       innerStub.getR(),
       innerStub.getPhi(),
@@ -468,14 +372,6 @@ TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
       outerStub.getR(),
       outerStub.getPhi(),
       outerStub.getZ(),
-      z1mean,
-      z2mean,
-      rproj[0],
-      rproj[1],
-      rproj[2],
-      zproj[0],
-      zproj[1],
-      zproj[2],
       negDisk,
 
       rinv,
@@ -510,13 +406,9 @@ TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
       valid_proj[i] = false;
     if (phiL[i] <= 0)
       valid_proj[i] = false;
-    if (rproj[i] < rmean[3]) {
-      phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
-      if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
-        phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
-    }
-    else
-      zL[i] >>= (TrackletProjection<BARRELPS>::kTProjRZSize - TrackletProjection<BARREL2S>::kTProjRZSize);
+    phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
+    if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
+      phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
   }
 
 
@@ -527,7 +419,8 @@ TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<DISK>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
-    valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;}
+    valid_proj_disk[i] = valid_t && valid_phimin && valid_phimax && valid_r;
+  }
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
   bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
@@ -535,6 +428,7 @@ TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
+
   return valid_rinv && valid_z0 && keep;
 }
 
@@ -544,20 +438,6 @@ template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
 TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
 ::rinv * const rinv, TrackletParameters::PHI0PAR * const phi0, TC::Types::z0 * const z0, TrackletParameters::TPAR * const t, TC::Types::phiL phiL[4], TC::Types::zL zL[4], TC::Types::der_phiL * const der_phiL, TC::Types::der_zL * const der_zL, TC::Types::flag valid_proj[4], TC::Types::phiD phiD[4], TC::Types::rD rD[4], TC::Types::der_phiD * const der_phiD, TC::Types::der_rD * const der_rD, TC::Types::flag valid_proj_disk[4])
 {
-  TC::Types::rmean r1mean, rproj[3];
-  rproj[1] = rmean[TF::L3];
-  rproj[2] = rmean[TF::L4];
-  ap_int<2> negDisk = ((innerStub.getZ()<0) ? -1 : 1);//find negative disk info from inner stub z
-  TC::Types::zmean z2mean = negDisk * zmean[TF::D1];
-  TC::Types::zmean zproj[4] = {zmean[TF::D2], zmean[TF::D3], zmean[TF::D4], zmean[TF::D5]};
-  if (Seed == TF::L1D1){
-  r1mean   = rmean[TF::L1];
-  rproj[0] = rmean[TF::L2];
-  }
-  else {
-  r1mean   = rmean[TF::L2];
-  rproj[0] = rmean[TF::L1];
-  }
   bool valid_radii;
   calculate_LXD1<Seed, InnerRegion, DISKPS>(
       innerStub.getR(),
@@ -566,15 +446,6 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
       outerStub.getR(),
       outerStub.getPhi(),
       outerStub.getZ(),
-      r1mean,
-      z2mean,
-      rproj[0],
-      rproj[1],
-      rproj[2],
-      zproj[0],
-      zproj[1],
-      zproj[2],
-      zproj[3],
 
       &valid_radii,
       rinv,
@@ -611,13 +482,9 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
 
     valid_proj[i] = valid_zmin && valid_zmax && valid_phimax && valid_phimin;
 
-    if (rproj[i] < irprojmaxcut) {
-      phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
-      if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
-        phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
-    }
-    else
-      zL[i] >>= (TrackletProjection<BARRELPS>::kTProjRZSize - TrackletProjection<BARREL2S>::kTProjRZSize);
+    phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
+    if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
+      phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
   }
 
 // Determine which disk projections are valid.
@@ -894,7 +761,9 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const REGIONLUTTYPE regionlut[regionlutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
+		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], 
+		    //const REGIONLUTTYPE regionlut[regionlutsize], 
+const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
   )
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
@@ -926,9 +795,15 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 #pragma HLS unroll
     nproj_disk[i] = 0;
   }
-  
 
-  constexpr unsigned int NBitsPhiRegion=2;
+  constexpr unsigned int NBitsPhiRegion = 2;
+  constexpr int numTPs = (Seed == TF::L1L2) ? 12 : (Seed == TF::L1D1 ? 8 : 4 );
+  constexpr int iAllstub = (iTC / (numTPs / 4) );
+
+  
+  const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
+  static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
+
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFinePhiSize;
 
   static TEBuffer<Seed,iTC,innerASType,OuterRegion<Seed>()> tebuffer;
@@ -1100,8 +975,6 @@ teunits[k].idle_;
       const ap_uint<1+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFineZSize>& rzbin = (teunits[k].next___, teunits[k].outervmstub___.getFineZ()); 
 
 
-      constexpr int numTPs = (Seed == TF::L1L2) ? 12 : (Seed == TF::L1D1 ? 8 : 4 );
-      ap_uint<NBitsPhiRegion> iAllstub = (iTC / (numTPs / 4) );
       ap_uint<NfinephiBits> outerfinephi = (iAllstub, teunits[k].ireg___, finephi);
       
       constexpr unsigned int NdphiBits = (Seed==TF::L5L6 || overlapSeed) ? 6 : 5;
@@ -1306,8 +1179,8 @@ teunits[k].idle_;
     }
 
     //Get bend and fine phi for LUT
-    ap_int<AllStubInnerBase<innerASType>::kASBendSize> bend = stub__.getBend();
-    ap_int<AllStubInnerBase<innerASType>::kASFinePhiSize> innerfinephi = stub__.getFinePhi();
+    ap_uint<AllStubInnerBase<innerASType>::kASBendSize> bend = stub__.getBend();
+    ap_uint<AllStubInnerBase<innerASType>::kASFinePhiSize> innerfinephi = stub__.getFinePhi();
     
     //This LUT tells us which range in r/z to look for stubs in the other layer/disk
     if (diskSeed){//disk seeds only read 2 bits of start from lut, last bit is from negative disk
@@ -1324,10 +1197,16 @@ teunits[k].idle_;
       //If the lookupbits were rationally organized this would be much simpler
       ap_uint<2> nrbits = 3;
       ir = ((start & ((1 << (nrbits - 1)) - 1)) << 1) + (rzfinebinfirst >> (kNbitsrzbin - 1));
-      useregion___ = regionlut[(useregindex,ir)];
+      //useregion___ = regionlut[(useregindex,ir)];
+      useregion___ = regionLUT.lookup((useregindex,ir));
+      //std::cout << "regionLUT: " <<  regionlut[(useregindex,ir)] << " " 
+      //	<< regionLUT.lookup((useregindex,ir))<<std::endl;
+      //assert(regionlut[(useregindex,ir)] == regionLUT.lookup((useregindex,ir)));
       }
     else{
-      useregion___ = regionlut[useregindex];
+      //useregion___ = regionlut[useregindex];
+      useregion___ = regionLUT.lookup(useregindex);
+      //assert(regionlut[useregindex] == regionLUT.lookup(useregindex));
     }
 
     //This lut tells us which range in phi to loof for stubs the other layer/disk

@@ -14,6 +14,89 @@ inline constexpr int floatToInt(const double x, const double k) {
   return static_cast<int>(x / k + 1.0e-1);
 }
 
+constexpr double sqrtsix = 2.4494897427831; //can not use sqrt for constexpr
+
+//phi width of sector - including the hourglass shape for overlaps
+//ideally this should be calculated, but C++ standard does not allow use of
+//asin in constexpr at this time.
+constexpr double phiHG_ = 1.02773;
+
+  //Constants for coordinates and track parameter definitions
+  const int n_phi_ = 17;
+  const int n_r_ = 12;
+  const int n_z_ = 11;
+  const int n_phi0_ = 16;
+  const int n_rinv_ = 13;
+  const int n_t_ = 9;
+  const int n_phidisk_ = n_phi_-3;
+  const int n_rdisk_ = n_r_-1;
+
+  //Constants used for tracklet parameter calculations
+  const int n_delta0_ = 13;
+  const int n_deltaz_ = 11;
+  const int n_delta1_ = 13;
+  const int n_delta2_ = 13;
+  const int n_delta12_ = 13;
+  const int n_a_ = 15;
+  const int n_r6_ = 4;
+  const int n_delta02_ = 14;
+  const int n_x6_ = 15;
+  const int n_HG_ = 15;  
+
+  //Constants used for projectison to disks
+  const int n_tinv_ = 12;
+  const int n_y_ = 14;
+  const int n_x_ = 14;
+  const int n_xx6_ = 14;
+
+  //L1L2 specific constants
+  constexpr int n_Deltar_ = 24;
+  constexpr int n_Deltar_Disk_ = 23;
+
+  constexpr int n_Deltar_Overlap_ = 23;
+  constexpr int n_delta0_Overlap_ = 14;
+  constexpr int n_deltaz_Overlap_ = 9;
+  constexpr int n_a_Overlap_ = 14;
+  constexpr int n_r6_Overlap_ = 6;
+
+
+
+  //Constants used for projectison to layers
+  const int n_s_ = 12;
+  const int n_s6_ = 14;
+
+
+//projection layers for different seeds. Note that unused layers are indicated by
+//10. This allows the use of templating to evaluate the radius for all seeds.
+
+constexpr int seedLayers[8][2] = { {0, 1},
+				   {1, 2},
+				   {2, 3},
+				   {4, 5},
+				   {6, 7},
+				   {8, 9},
+				   {0, 6},
+				   {1, 6}};
+
+constexpr int projectionLayers[8][4] = { {2, 3, 4, 5},
+					 {0, 3, 4, 5},
+					 {0, 1, 4, 5},
+					 {0, 1, 2, 3},
+					 {0, 1, 10, 10},
+					 {0, 10, 10, 10},
+					 {10, 10, 10, 10},
+					 {0, 10, 10, 10}};
+
+constexpr int projectionDisks[8][4] = { {6, 7, 8, 9},
+					{6, 7, 8, 9},
+					{6, 7, 8, 9},
+					{6, 7, 8, 9},
+					{8, 9, 10, 0},
+					{6, 7, 10, 0},
+					{7, 8, 9, 10},
+					{7, 8, 9, 10}};
+
+
 constexpr int kNTEUnits[8] = {5, 2, 5, 3, 3, 2, 3, 2}; // Number of TE units w.r.t. seed type
 constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Number of TE units w.r.t. the layer/disk number.
 // The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types (L1D1, L2D1), take the largest value for now...
@@ -75,7 +158,7 @@ namespace trklet{
   constexpr int N_DISK = 5; // # of endcap disks assumed
 }
 #endif
-constexpr double bfield = 3.8112; // T
+constexpr double bfield = 3.8112; // 
 constexpr int rmean[trklet::N_LAYER + trklet::N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
 constexpr int zmean[trklet::N_LAYER + trklet::N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
 constexpr double zlength = 120.0; // cm
