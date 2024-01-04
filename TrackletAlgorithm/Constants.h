@@ -8,10 +8,10 @@
 #endif
 
 // Inline function to convert floating point values to integers, given a
-// digitization constant. The 1.0e-1 is a fudge factor needed to get the
+// digitization constant. The 0.5 is needed to get the
 // floating point truncation to agree exactly with the emulation.
 inline constexpr int floatToInt(const double x, const double k) {
-  return static_cast<int>(x / k + 1.0e-1);
+  return static_cast<int>(x / k + 0.5);
 }
 
 constexpr double sqrtsix = 2.4494897427831; //can not use sqrt for constexpr
@@ -19,7 +19,7 @@ constexpr double sqrtsix = 2.4494897427831; //can not use sqrt for constexpr
 //phi width of sector - including the hourglass shape for overlaps
 //ideally this should be calculated, but C++ standard does not allow use of
 //asin in constexpr at this time.
-constexpr double phiHG_ = 1.02773;
+constexpr double phiHG_ = 1.02776;
 
   //Constants for coordinates and track parameter definitions
   const int n_phi_ = 17;
