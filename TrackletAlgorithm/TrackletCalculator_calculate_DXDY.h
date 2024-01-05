@@ -1,22 +1,5 @@
 #include "TrackletProjectionCalculator.h"
 #include "TrackletLUTs.h"
-//
-static void init_idr_disk(ap_uint<18> *lut) {
-
-  for(unsigned int idr=0; idr<512; idr++){
-    if (idr<10) {
-      lut[idr] = 0;
-    } else {
-      lut[idr] = (1<<n_Deltar_Disk_)/idr;
-    }
-  }
-}
-
-static ap_uint<18> lut_idrinv_disk(ap_uint<10> idr){
-  ap_uint<18> LUT_idrinv_[512];
-  init_idr_disk(LUT_idrinv_);
-  return LUT_idrinv_[idr];
-}
 
 
 #include "ap_int.h"
@@ -72,7 +55,9 @@ void TC::calculate_DXDY (
   ap_int<12> idz = z2c - z1c;
 
   ap_uint<12> idr = ap_int<12>(ir2c - ir1c);
-  ap_uint<18> invdr = lut_idrinv_disk(idr);
+
+  static const InvdrLUT<Seed> lut_idrinv;
+  ap_uint<18> invdr = lut_idrinv.lookup(idr);
 
   ap_int<18> idelta0 = ((phi2c - phi1c)*invdr) >> n_delta0_;
   ap_int<18> ideltaz = (idz*invdr) >> n_deltaz_;
@@ -129,9 +114,7 @@ void TC::calculate_DXDY (
 
   static const InvtLUT lut_itinv;
 
-  //ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
   ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
-
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
   constexpr int izproj1 = zmean[projectionDisks[Seed][1]];
