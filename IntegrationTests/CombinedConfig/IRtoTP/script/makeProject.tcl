@@ -174,7 +174,6 @@ add_files -fileset utils_1 [glob ./pre.tcl]
 
 # Add constraints (clock etc.)
 add_files -fileset constrs_1 [glob common/hdl/constraints.xdc]
-add_files -fileset constrs_1 [glob floorplan.xdc]
 
 # Set 'sim_1' fileset properties
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
