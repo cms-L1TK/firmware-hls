@@ -3,6 +3,57 @@
 
 #include "Constants.h"
 
+class InvtLUT{
+
+ public:
+
+  InvtLUT() {
+
+    int nbits = n_t_ + n_tinv_;
+  
+    for (int it = 0; it < 4096; it++) {
+      if (it<100) {
+	lut_[it] =  0;
+      } else {
+	lut_[it] = (1 << nbits) / it;
+      }
+    }
+
+  }
+
+ ap_uint<18> lookup(int address) const {
+   return lut_[address];
+ }
+
+ private:
+
+ ap_uint<18> lut_[4096];
+
+};
+
+  /*
+static void init_itinv(ap_uint<18> *lut) {
+
+  int nbits = n_t_ + n_tinv_;
+  
+  for (int it = 0; it < 4096; it++) {
+    if (it<100) {
+      lut[it] =  0;
+    } else {
+      lut[it] = (1 << nbits) / it;
+    }
+  }
+}
+
+
+static ap_uint<18> lut_itinv(ap_uint<14> it){
+  ap_uint<18> LUT_itinv_[4096];
+  init_itinv(LUT_itinv_);
+  return LUT_itinv_[it];
+}
+
+  */
+
 template<TF::seed iSeed>
 class TPRegionLUT {
 
