@@ -161,7 +161,7 @@ echo "CM Barrel"
 mkdir -p ../../IntegrationTests/CombinedBarrelConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
-### Reduced Combined IRtoTP
+### Combined IRtoTP
 echo "CombinedIRtoTP"
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1
