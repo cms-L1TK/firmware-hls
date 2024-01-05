@@ -1,6 +1,6 @@
 #include "TrackletProjectionCalculator.h"
 //
-static void init_idr_disk(ap_uint<20> *lut) {
+static void init_idr_disk(ap_uint<18> *lut) {
 
   for(unsigned int idr=0; idr<512; idr++){
     if (idr<10) {
@@ -11,8 +11,8 @@ static void init_idr_disk(ap_uint<20> *lut) {
   }
 }
 
-static ap_uint<20> lut_idrinv_disk(ap_uint<10> idr){
-  ap_uint<20> LUT_idrinv_[512];
+static ap_uint<18> lut_idrinv_disk(ap_uint<10> idr){
+  ap_uint<18> LUT_idrinv_[512];
   init_idr_disk(LUT_idrinv_);
   return LUT_idrinv_[idr];
 }
@@ -71,7 +71,7 @@ void TC::calculate_DXDY (
   ap_int<12> idz = z2c - z1c;
 
   ap_uint<12> idr = ap_int<12>(ir2c - ir1c);
-  ap_uint<20> invdr = lut_idrinv_disk(idr);
+  ap_uint<18> invdr = lut_idrinv_disk(idr);
 
   ap_int<18> idelta0 = ((phi2c - phi1c)*invdr) >> n_delta0_;
   ap_int<18> ideltaz = (idz*invdr) >> n_deltaz_;
