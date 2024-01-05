@@ -1,4 +1,5 @@
 #include "TrackletProjectionCalculator.h"
+#include "TrackletLUTs.h"
 //
 static void init_idr_disk(ap_uint<18> *lut) {
 
@@ -126,7 +127,11 @@ void TC::calculate_DXDY (
   *der_phiL_output = -(irinv_new >> (1+3));
   *der_zL_output = it_new >> 3;
 
-  ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
+  static const InvtLUT lut_itinv;
+
+  //ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
+  ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
+
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
   constexpr int izproj1 = zmean[projectionDisks[Seed][1]];
