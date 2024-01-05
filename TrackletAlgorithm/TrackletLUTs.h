@@ -3,6 +3,63 @@
 
 #include "Constants.h"
 
+template<TF::seed Seed>
+class InvdrLUT{
+
+ public: 
+
+  InvdrLUT() {
+
+    if (Seed <= TF::L5L6) {
+      for(int idr=-256; idr<256; idr++){
+	int uidr = idr;
+	if (uidr < 0) uidr += 512;
+	int idrabs = idr;
+	if (Seed == TF::L1L2 ) {
+	  idrabs += (rmean[1] - rmean[0]);
+	}
+	if (Seed == TF::L2L3 ) {
+	  idrabs += (rmean[2] - rmean[1]);
+	}
+	if (Seed == TF::L3L4 ) {
+	  idrabs += (rmean[3] - rmean[2]);
+	}
+	if (Seed == TF::L5L6 ) {
+	  idrabs += (rmean[5] - rmean[4]);
+	}
+	lut_[uidr] = (1<<n_Deltar_)/idrabs;
+      }
+    } else if (Seed <= TF::D3D4) {
+      for(unsigned int idr=0; idr<512; idr++){
+	if (idr<10) {
+	  lut_[idr] = 0;
+	} else {
+	  lut_[idr] = (1<<n_Deltar_Disk_)/idr;
+	}
+      }
+    } else {
+      for(unsigned int idr=0; idr<1024; idr++){
+	if (idr<10) {
+	  lut_[idr] = 0;
+	} else {
+	  lut_[idr] = (1<<n_Deltar_Overlap_)/idr;
+	}
+      }
+    }
+  }
+
+  ap_uint<18> lookup(int address) const {
+    return lut_[address];
+  }
+  
+ private:
+
+  ap_uint<18> lut_[(Seed<=TF::D3D4)?512:1024];
+  
+};
+
+
+
 class InvtLUT{
 
  public:
@@ -31,28 +88,7 @@ class InvtLUT{
 
 };
 
-  /*
-static void init_itinv(ap_uint<18> *lut) {
 
-  int nbits = n_t_ + n_tinv_;
-  
-  for (int it = 0; it < 4096; it++) {
-    if (it<100) {
-      lut[it] =  0;
-    } else {
-      lut[it] = (1 << nbits) / it;
-    }
-  }
-}
-
-
-static ap_uint<18> lut_itinv(ap_uint<14> it){
-  ap_uint<18> LUT_itinv_[4096];
-  init_itinv(LUT_itinv_);
-  return LUT_itinv_[it];
-}
-
-  */
 
 template<TF::seed iSeed>
 class TPRegionLUT {

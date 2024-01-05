@@ -4,25 +4,6 @@
 #include "TrackletProjectionCalculator.h"
 #include "TrackletLUTs.h"
 
-
-static void init_idr_overlap(ap_uint<18> *lut) {
-
-  for(unsigned int idr=0; idr<1024; idr++){
-    if (idr<10) {
-      lut[idr] = 0;
-    } else {
-      lut[idr] = (1<<n_Deltar_Overlap_)/idr;
-    }
-  }
-
-}
-
-static ap_uint<18> lut_idrinv_overlap(ap_uint<10> idr){
-  ap_uint<18> LUT_idrinv_[1024];
-  init_idr_overlap(LUT_idrinv_);
-  return LUT_idrinv_[idr];
-}
-
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion>
 void TC::calculate_LXD1 (
   const typename AllStub<InnerRegion>::ASR r1_input,
@@ -31,15 +12,6 @@ void TC::calculate_LXD1 (
   const typename AllStub<OuterRegion>::ASR r2_input,
   const typename AllStub<OuterRegion>::ASPHI phi2_input,
   const typename AllStub<OuterRegion>::ASZ z2_input,
-  //const TC::Types::rmean r1mean_input,
-  //const TC::Types::zmean z2mean_input,
-  //const TC::Types::rmean rproj0_input,
-  //const TC::Types::rmean rproj1_input,
-  //const TC::Types::rmean rproj2_input,
-  //const TC::Types::zmean  zproj0_input,
-  //const TC::Types::zmean  zproj1_input,
-  //const TC::Types::zmean  zproj2_input,
-  //const TC::Types::zmean  zproj3_input,
 
   bool * const valid_radii,
   TC::Types::rinv * const rinv_output,
@@ -83,7 +55,9 @@ void TC::calculate_LXD1 (
   ap_int<12> idz = z2c - z1c;
 
   ap_uint<12> idr = (ap_int<12>(ir2c - ir1c));
-  ap_uint<18> invdr = lut_idrinv_overlap(idr);
+
+  static const InvdrLUT<Seed> lut_idrinv;
+  ap_uint<18> invdr = lut_idrinv.lookup(idr);
 
   *valid_radii = idr > floatToInt(((Seed == TF::L1D1)?1.5:2.0),kr); 
   //FIXME this 1.5 and 2.0 is a magic number
@@ -116,11 +90,8 @@ void TC::calculate_LXD1 (
 
   ap_int<14> it_new = ((ideltaz*ia) >> (n_Deltar_Overlap_ + n_a_Overlap_ + n_z_ - n_t_ - n_deltaz_Overlap_ - n_r_));
 
-  ap_int<11> iz0_new = z1c+((it1*ix6) >> n_x6_);
+  ap_int<11> iz0_new = z1c + ((it1*ix6) >> n_x6_);
   
-  std::cout << "pars : " << irinv_new << " " << iphi0_new << " " << iz0_new << " " << it_new << std::endl; 
-
-
   constexpr int irproj0 = rmean[projectionLayers[Seed][0]];
   constexpr int irproj1 = rmean[projectionLayers[Seed][1]];
   constexpr int irproj2 = rmean[projectionLayers[Seed][2]];
@@ -146,7 +117,6 @@ void TC::calculate_LXD1 (
 
   static const InvtLUT lut_itinv;
 
-  //ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
   ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];

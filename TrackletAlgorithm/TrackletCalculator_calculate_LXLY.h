@@ -3,37 +3,6 @@
 #include "TrackletProjectionCalculator.h"
 #include "TrackletLUTs.h"
 
-template<TF::seed Seed>
-static void init_idr(ap_uint<18> *lut) {
-
-  for(int idr=-256; idr<256; idr++){
-    int uidr = idr;
-    if (uidr < 0) uidr += 512;
-    int idrabs = idr;
-    if (Seed == TF::L1L2 ) {
-      idrabs += (rmean[1] - rmean[0]);
-    }
-    if (Seed == TF::L2L3 ) {
-      idrabs += (rmean[2] - rmean[1]);
-    }
-    if (Seed == TF::L3L4 ) {
-      idrabs += (rmean[3] - rmean[2]);
-    }
-    if (Seed == TF::L5L6 ) {
-      idrabs += (rmean[5] - rmean[4]);
-    }
-    lut[uidr] = (1<<n_Deltar_)/idrabs;
-  }
-
-}
-
-template<TF::seed Seed>
-static ap_uint<18> lut_idrinv(ap_uint<10> idr){
-  ap_uint<18> LUT_idrinv_[512];
-  init_idr<Seed>(LUT_idrinv_);
-  return LUT_idrinv_[idr];
-}
-
 
 // This function does all the actual calculations in the TrackletCalculators
 // for the barrel-only seeds (L1L2, L2L3, L3L4, and L5L6).
@@ -87,7 +56,9 @@ void TC::calculate_LXLY (
 
   ap_int<10> idr = (ap_int<10>(r2_input - r1_input)) << 1;
   if (idr<0) idr+=512;
-  ap_uint<20> invdr = lut_idrinv<Seed>(idr);
+
+  static const InvdrLUT<Seed> lut_idrinv;
+  ap_uint<20> invdr = lut_idrinv.lookup(idr);
 
   ap_int<18> idelta0 = ((phi2c - phi1c)*invdr) >> n_delta0_;
   ap_int<18> ideltaz = (idz*invdr) >> n_deltaz_;
@@ -150,7 +121,6 @@ void TC::calculate_LXLY (
 
   static const InvtLUT lut_itinv;
 
-  //ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
   ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
