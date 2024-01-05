@@ -220,6 +220,8 @@ namespace TC {
 
 }
 
+#include "TrackletCalculator_calculate.h"
+
 template<TF::seed Seed> constexpr regionType InnerRegion() {
   return (
     (Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L1D1 || Seed == TF::L2D1) ? BARRELPS : (
@@ -270,7 +272,7 @@ inline ap_uint<(1<<(2*kNBitsBuffer))> nearFullTEUnitInit() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "TrackletCalculator_calculate_LXLY.h"
+//#include "TrackletCalculator_calculate_LXLY.h"
 
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
@@ -356,9 +358,9 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
 // This function calls calculate_DXDY, defined in
 // TrackletCalculator_calculate_DXDY.h, and applies cuts to the results.
-#include "TrackletCalculator_calculate_LXD1.h"
+//#include "TrackletCalculator_calculate_LXD1.h"
 
-#include "TrackletCalculator_calculate_DXDY.h"
+//#include "TrackletCalculator_calculate_DXDY.h"
 
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
 TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
