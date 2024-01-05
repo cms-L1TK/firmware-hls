@@ -1,6 +1,7 @@
 #ifndef TrackletAlgorithm_TrackletCalculator_calculate_LXLY_h
 #define TrackletAlgorithm_TrackletCalculator_calculate_LXLY_h
 #include "TrackletProjectionCalculator.h"
+#include "TrackletLUTs.h"
 
 template<TF::seed Seed>
 static void init_idr(ap_uint<18> *lut) {
@@ -33,27 +34,6 @@ static ap_uint<18> lut_idrinv(ap_uint<10> idr){
   return LUT_idrinv_[idr];
 }
 
-static void init_itinv(ap_uint<18> *lut) {
-
-  int nbits = n_t_ + n_tinv_;
-  
-  for (int it = 0; it < 4096; it++) {
-    if (it<100) {
-      lut[it] =  0;
-    } else {
-      lut[it] = (1 << nbits) / it;
-    }
-  }
-}
-
-
-static ap_uint<18> lut_itinv(ap_uint<14> it){
-  ap_uint<18> LUT_itinv_[4096];
-  init_itinv(LUT_itinv_);
-  return LUT_itinv_[it];
-}
-
-
 
 // This function does all the actual calculations in the TrackletCalculators
 // for the barrel-only seeds (L1L2, L2L3, L3L4, and L5L6).
@@ -65,16 +45,6 @@ void TC::calculate_LXLY (
   const typename AllStub<OuterRegion>::ASR r2_input,
   const typename AllStub<OuterRegion>::ASPHI phi2_input,
   const typename AllStub<OuterRegion>::ASZ z2_input,
-  //const TC::Types::rmean r1mean_input,
-  //const TC::Types::rmean r2mean_input,
-  //const TC::Types::rmean rproj0_input,
-  //const TC::Types::rmean rproj1_input,
-  //const TC::Types::rmean rproj2_input,
-  //const TC::Types::rmean rproj3_input,
-  //const TC::Types::zmean zproj0_input,
-  //const TC::Types::zmean zproj1_input,
-  //const TC::Types::zmean zproj2_input,
-  //const TC::Types::zmean zproj3_input,
 
   TC::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
@@ -178,7 +148,10 @@ void TC::calculate_LXLY (
   *der_phiL_output = -(irinv_new >> (1+3));
   *der_zL_output = it_new >> 3;
 
-  ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
+  static const InvtLUT lut_itinv;
+
+  //ap_uint<20> itinv = lut_itinv(abs(it_new)&4095);
+  ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
   constexpr int izproj1 = zmean[projectionDisks[Seed][1]];
