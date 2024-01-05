@@ -273,6 +273,7 @@ inline ap_uint<(1<<(2*kNBitsBuffer))> nearFullTEUnitInit() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
@@ -354,7 +355,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
   return valid_rinv && valid_z0 && keep;
 }
-
 
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
 TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types
