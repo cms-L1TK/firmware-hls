@@ -15,6 +15,7 @@ public:
     // Bit size for track word fields
     kTFValidSize = 1,
     kTFSeedTypeSize = 3,
+    kTFPhiRegionSize = 3, //phi region size. Used for combined modules, set to zero for non-CM
     kTFRinvSize = 14,
     kTFPhi0Size = 18,
     kTFZ0Size = 10,
@@ -30,7 +31,7 @@ public:
     kTFZResidSize = 9,
     kTFRResidSize = 7,
     // Bit size for track and stub words
-    kTrackWordSize =  kTFValidSize + kTFSeedTypeSize + 2 * kNBits_MemAddr + kTFRinvSize + kTFPhi0Size + kTFZ0Size + kTFTSize + kTFHitMapSize,
+    kTrackWordSize =  kTFValidSize + kTFSeedTypeSize + 2 * kTFPhiRegionSize + 2 * kNBits_MemAddr + kTFRinvSize + kTFPhi0Size + kTFZ0Size + kTFTSize + kTFHitMapSize,
     kBarrelStubSize = kTFValidSize + kTFTrackIndexSize + kTFStubIndexSize + kTFBarrelStubRSize + kTFPhiResidSize + kTFZResidSize,
     kDiskStubSize =   kTFValidSize + kTFTrackIndexSize + kTFStubIndexSize + kTFDiskStubRSize + kTFPhiResidSize + kTFRResidSize,
     // Bit size for full TrackFitMemory
@@ -115,7 +116,11 @@ public:
     kTFStubIndexOuterMSB = kTFStubIndexOuterLSB + kNBits_MemAddr - 1,
     kTFStubIndexInnerLSB = kTFStubIndexOuterMSB + 1,
     kTFStubIndexInnerMSB = kTFStubIndexInnerLSB + kNBits_MemAddr - 1,
-    kTFSeedTypeLSB = kTFStubIndexInnerMSB + 1,
+    kTFPhiRegionOuterLSB = kTFStubIndexInnerMSB + 1,
+    kTFPhiRegionOuterMSB = kTFPhiRegionOuterLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhiRegionSize - 1,
+    kTFPhiRegionInnerLSB = kTFPhiRegionOuterMSB + 1,
+    kTFPhiRegionInnerMSB = kTFPhiRegionInnerLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhiRegionSize - 1,
+    kTFSeedTypeLSB = kTFPhiRegionInnerMSB + 1,
     kTFSeedTypeMSB = kTFSeedTypeLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFSeedTypeSize - 1,
     kTFTrackValidLSB = kTFSeedTypeMSB + 1,
     kTFTrackValidMSB = kTFTrackValidLSB + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1
@@ -123,6 +128,7 @@ public:
 
   typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize> TFVALID;
   typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFSeedTypeSize> TFSEEDTYPE;
+  typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhiRegionSize> TFPHIREGION;
   typedef ap_uint<kNBits_MemAddr> TFSEEDSTUBINDEX;
   typedef ap_int<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFRinvSize> TFRINV;
   typedef ap_uint<TrackFitBase<NBarrelStubs, NDiskStubs>::kTFPhi0Size> TFPHI0;
@@ -176,6 +182,14 @@ public:
 
   TFSEEDTYPE getSeedType() const {
     return data_.range(kTFSeedTypeMSB,kTFSeedTypeLSB);
+  }
+
+  TFPHIREGION getPhiRegionInner() const {
+    return data_.range(kTFPhiRegionInnerMSB,kTFPhiRegionInnerLSB);
+  }
+
+  TFPHIREGION getPhiRegionOuter() const {
+    return data_.range(kTFPhiRegionOuterMSB,kTFPhiRegionOuterLSB);
   }
 
   TFSEEDSTUBINDEX getStubIndexInner() const {
@@ -292,6 +306,14 @@ public:
 
   void setSeedType(const TFSEEDTYPE seedtype) {
     data_.range(kTFSeedTypeMSB,kTFSeedTypeLSB) = seedtype;
+  }
+
+  void setPhiRegionInner(const TFPHIREGION phiRegion) {
+    data_.range(kTFPhiRegionInnerMSB,kTFPhiRegionInnerLSB) = phiRegion;
+  }
+
+  void setPhiRegionOuter(const TFPHIREGION phiRegion) {
+    data_.range(kTFPhiRegionOuterMSB,kTFPhiRegionOuterLSB) = phiRegion;
   }
 
   void setStubIndexInner(const TFSEEDSTUBINDEX seedStubIndex) {

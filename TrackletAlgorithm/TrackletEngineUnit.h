@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "VMStubTEOuterMemoryCM.h"
 #include "TrackletProcessor_parameters.h"
+#include "TrackletParameterMemory.h"
 
 template<TF::seed Seed, TC::itc iTC, regionType innerRegion,regionType VMSTEType>
 class TrackletEngineUnit {
@@ -19,7 +20,7 @@ class TrackletEngineUnit {
     kNBitsPTLutOuter=(Seed==TF::L5L6||Seed==TF::L1D1||Seed==TF::L2D1||Seed==TF::D1D2||Seed==TF::D3D4)?1024:(Seed==TF::L1L2||Seed==TF::L2L3)?256:512
   };
 
-  typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+kNBits_MemAddr+AllStub<innerRegion>::kAllStubSize> STUBID;
+  typedef ap_uint<VMStubTEOuter<VMSTEType>::kVMSTEOIDSize+AllStub<innerRegion>::kAllStubSize+TrackletParameters::kTParPhiRegionSize+kNBits_MemAddr> STUBID;
   typedef ap_uint<kNBitsNegDiskSize> NEGDISK;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;

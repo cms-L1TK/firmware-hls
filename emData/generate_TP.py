@@ -65,6 +65,12 @@ class ProjoutIndexDisk(Enum):
     D5PHID = 19
     N_PROJOUT_DISK = 20
 
+regLUTSize = {}
+LUTSize = {}
+innerPTLUTSize = {}
+outerPTLUTSize = {}
+drinvLUTSize = {}
+invtLUTSize = {}
 parser = argparse.ArgumentParser(description="This script generates TrackletProcessorTop.h, TrackletProcessorTop.cc, and\
 TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
@@ -123,6 +129,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "#ifndef TopFunctions_TrackletProcessor_parameters_h\n"
       "#define TopFunctions_TrackletProcessor_parameters_h\n"
       "\n"
+      "#ifndef __SYNTHESIS__\n"
+      '#include "SWLUTReader.h"\n'
+      '#ifdef CMSSW_GIT_HASH\n'
+      '#include <mutex>\n'
+      '#endif\n'
+      "#endif\n"
       "// This file contains numbers of memories and bit masks that are specific to\n"
       "// each TrackletProcessor and that come directly from the wiring.\n"
       "//\n"
@@ -143,6 +155,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getDRinvLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getInvtLUT();\n"
+      "template<TF::seed Seed> const ap_int<19>* getDRinvForwardLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getInvtForwardLUT();\n"
+      "template<TF::seed Seed> const ap_int<19>* getDRinvBackwardLUT();\n"
+      "template<TF::seed Seed> const ap_int<18>* getInvtBackwardLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr int nASMemInner();\n"
   )
   topHeaderFile.write(
@@ -167,6 +185,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   )
   
   # Calculate parameters and print out parameters and top function for each TP.
+  seedlist = [] #keeps track of seeds that have been looped over for functions that only exist once per seed type
   for tpName in sorted(asInnerMems.keys()):
       seed = re.sub(r"TP_(....).", r"\1", tpName)
       iTC = re.sub(r"TP_....(.)", r"\1", tpName)
@@ -179,7 +198,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       asOuterMask = 0
       asInnerMems[tpName].sort()
       asOuterMems[tpName].sort()
-  
+
       # TPROJ masks for barrel and disks
       tprojMaskBarrel = 0
       for projout in ProjoutIndexBarrel:
@@ -193,6 +212,14 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           projoutIndex = projout.value
           if projoutName in tprojMems[tpName]:
               tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
+      # figure out sizes of LUTs by reading .tab files, do once per seed type
+      if seed not in seedlist:
+        LUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}.tab".format(seed))) - 2)
+        regLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
+        innerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
+        outerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
+        drinvLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TC_{0}_drinv.tab".format(seed.replace("D","B")))))
+        invtLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TC_{0}_invt.tab".format(seed.replace("D","B")))))
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"
@@ -203,38 +230,82 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "  return 0x%X;\n"
           "}\n"
           'template<> inline const ap_uint<8>* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_uint<8> lut[' + regLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<8>,' + regLUTSize[seed] + '>(lut,"LUTsCM/TP_' + seed + iTC + '_usereg.tab");\n'
+          '#else\n'
           '  static ap_uint<8> lut[] =\n'
-          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab")\n'
-          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_usereg.tab"\n'
+          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC + '_usereg.tab")\n'
+          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_usereg.tab"\n'
           '#else\n'
           '  {};\n'
+          '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
           'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_uint<10> lut[' + LUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"LUTsCM/TP_' + seed + '.tab");\n'
+          '#else\n'
           '  static ap_uint<10> lut[] =\n'
-          '#if __has_include("../emData/TP/tables/TP_' + seed + '.tab")\n'
-          '#  include "../emData/TP/tables/TP_' + seed + '.tab"\n'
+          '#if __has_include("../emData/LUTsCM/TP_' + seed + '.tab")\n'
+          '#  include "../emData/LUTsCM/TP_' + seed + '.tab"\n'
           '#else\n'
           '  {};\n'
+          '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
           'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_uint<1> lut[' + innerPTLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"LUTsCM/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
+          '#else\n'
           '  static ap_uint<1> lut[] =\n'
-          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
-          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
+          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
+          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
           '#else\n'
           '  {};\n'
+          '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
           'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_uint<1> lut[' + outerPTLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"LUTsCM/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
+          '#else\n'
           '  static ap_uint<1> lut[] =\n'
-          '#if __has_include("../emData/TP/tables/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
-          '#  include "../emData/TP/tables/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
+          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
+          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
           '#else\n'
           '  {};\n'
+          '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
@@ -243,7 +314,128 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '}\n'
 )% (tprojMaskBarrel, tprojMaskDisk)
       )
-  
+      if seed not in seedlist:
+        seedlist.append(seed)
+        if seed in ["L1L2","L2L3","L3L4","L5L6"]:
+          parametersFile.write(
+          'template<> inline const ap_int<18>* getDRinvLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_int<18> lut[' + drinvLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + drinvLUTSize[seed] + '>(lut,"LUTsCM/TC_' + seed + '_drinv.tab",false,true);\n'
+          '#else\n'
+          '  static ap_int<18> lut[] = {\n'
+          '#if __has_include("../emData/LUTsCM/TC_' + seed +'_drinv.tab")\n'
+          '#  include "../emData/LUTsCM/TC_' + seed + '_drinv.tab"\n'
+          '#endif\n'
+          '};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<18>* getInvtLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_int<18> lut[' + invtLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[seed] + '>(lut,"LUTsCM/TC_' + seed + '_invt.tab",false,true);\n'
+          '#else\n'
+          '  static ap_int<18> lut[] ={\n'
+          '#if __has_include("../emData/LUTsCM/TC_' + seed +'_invt.tab")\n'
+          '#  include "../emData/LUTsCM/TC_' + seed + '_invt.tab"\n'
+          '#endif\n'
+          '};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          )
+        else:
+          parametersFile.write(
+          'template<> inline const ap_int<19>* getDRinvForwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_int<19> lut[' + drinvLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[seed] + '>(lut,"LUTsCM/TC_' + seed.replace("D","F") + '_drinv.tab",false,true);\n'
+          '#else\n'
+        '  static ap_int<19> lut[] = {\n'
+          '#if __has_include("../emData/LUTsCM/TC_' + seed.replace("D","F") +'_drinv.tab")\n'
+          '#  include "../emData/LUTsCM/TC_' + seed.replace("D","F") + '_drinv.tab"\n'
+          '#endif\n'
+          '};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<19>* getDRinvBackwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_int<19> lut[' + drinvLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<19>,' + drinvLUTSize[seed] + '>(lut,"LUTsCM/TC_' + seed.replace("D","B") + '_drinv.tab",false,true);\n'
+          '#else\n'
+          '  static ap_int<19> lut[] ={\n'
+          '#if __has_include("../emData/LUTsCM/TC_' + seed.replace("D","B") +'_drinv.tab")\n'
+          '#  include "../emData/LUTsCM/TC_' + seed.replace("D","B") + '_drinv.tab"\n'
+          '#endif\n'
+          '};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<18>* getInvtForwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_int<18> lut[' + invtLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[seed] + '>(lut,"LUTsCM/TC_' + seed.replace("D","F") + '_invt.tab",false,true);\n'
+          '#else\n'
+          '  static ap_int<18> lut[] ={\n'
+          '#if __has_include("../emData/LUTsCM/TC_' + seed.replace("D","F") +'_invt.tab")\n'
+          '#  include "../emData/LUTsCM/TC_' + seed.replace("D","F") + '_invt.tab"\n'
+          '#endif\n'
+          '};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          'template<> inline const ap_int<18>* getInvtBackwardLUT<TF::'+ seed + '>(){\n'
+          '#ifndef __SYNTHESIS__\n'
+          '#ifdef CMSSW_GIT_HASH\n'
+          '  static std::mutex getLUTMutex_;\n'
+          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
+          '#endif\n'
+          '  static ap_int<18> lut[' + invtLUTSize[seed] + '];\n'
+          '  static bool init = 0;\n'
+          '  if (!init)\n'
+          '    init = readSWLUT<ap_int<18>,' + invtLUTSize[seed] + '>(lut,"LUTsCM/TC_' + seed.replace("D","B") + '_invt.tab",false,true);\n'
+          '#else\n'
+          '  static ap_int<18> lut[] ={\n'
+          '#if __has_include("../emData/LUTsCM/TC_' + seed.replace("D","F") +'_invt.tab")\n'
+          '#  include "../emData/LUTsCM/TC_' + seed.replace("D","F") + '_invt.tab"\n'
+          '#endif\n'
+          '};\n'
+          '#endif\n'
+          '  return lut;\n'
+          '}\n'
+          )
       # Print out prototype for top function for this TC.
       topHeaderFile.write(
           "\n"

@@ -14,6 +14,7 @@ static const unsigned short kNBitsITC = FullMatchBase<BARREL>::kFMITCSize;
 static const unsigned short kNBitsTrackletID = kNBitsTCID + kNBits_MemAddr;
 
 typedef ap_uint<kNBitsTCID> TCIDType;
+typedef ap_uint<kNBitsITC> ITCType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
 typedef ap_uint<kNBitsTrackletID> TrackletIDType;
 
@@ -32,7 +33,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-template<unsigned Seed, unsigned NFMPerStubBarrel0, unsigned NFMPerStubBarrel, unsigned NFMPerStubDisk, unsigned NBarrelStubs, unsigned NDiskStubs, unsigned TPAROffset>
+template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -45,8 +46,8 @@ void TrackBuilder(
 )
 {
 
-  constexpr unsigned NFMBarrel = NFMPerStubBarrel0 + (NBarrelStubs - 1) * NFMPerStubBarrel;
-  constexpr unsigned NFMDisk = NDiskStubs * NFMPerStubDisk;
+  constexpr int NFMBarrel = NFMPerStubBarrel0 + (NBarrelStubs - 1) * NFMPerStubBarrel;
+  constexpr int NFMDisk = NDiskStubs * NFMPerStubDisk;
 
   // Circular buffers for each of the input full-match memories.
   FullMatch<BARREL> barrel_fm[NFMBarrel][1<<kNBitsTBBuffer];
@@ -68,14 +69,14 @@ void TrackBuilder(
 #pragma HLS array_partition variable=barrel_write_index complete dim=0
 #pragma HLS array_partition variable=disk_write_index complete dim=0
 
-  initialize_barrel_indices : for (unsigned short i = 0; i < NFMBarrel; i++) {
+  initialize_barrel_indices : for (short i = 0; NFMBarrel > 0 && i < NFMBarrel; i++) { // Note: need to have NFMBarrel > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
 #pragma HLS unroll
     barrel_mem_index[i] = 0;
     barrel_read_index[i] = 0;
     barrel_write_index[i] = 0;
   }
 
-  initialize_disk_indices : for (unsigned short i = 0; i < NFMDisk; i++) {
+  initialize_disk_indices : for (short i = 0; NFMDisk > 0 && i < NFMDisk; i++) { // Note: need to have NFMDisk > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
 #pragma HLS unroll
     disk_mem_index[i] = 0;
     disk_read_index[i] = 0;
@@ -96,20 +97,20 @@ void TrackBuilder(
 
     // First determine the minimum tracklet ID from the current set of full
     // matches.
-    barrel_min_id : for (unsigned short j = 0; j < NFMBarrel; j++) {
+    barrel_min_id : for (short j = 0; j < NFMBarrel; j++) { 
 
       const auto &barrel_stub_0 = barrel_fm[j][barrel_read_index[j]];
       const auto &barrel_id_0 = barrel_stub_0.getTrackletID();
       barrel_valid[j] = (!empty && barrel_id_0 != kInvalidTrackletID);
 
       // Compare the given barrel and disk IDs against each barrel ID.
-      barrel_barrel_id_comp : for (unsigned short k = 0; k < NFMBarrel; k++) {
+      barrel_barrel_id_comp : for (short k = 0; k < NFMBarrel; k++) {
         const auto &barrel_stub_1 = barrel_fm[k][barrel_read_index[k]];
         const auto &barrel_id_1 = barrel_stub_1.getTrackletID();
         barrel_valid[j] = (barrel_valid[j] && barrel_id_0 <= barrel_id_1);
       }
       // Compare the given barrel and disk IDs against each disk ID.
-      barrel_disk_id_comp : for (unsigned short k = 0; k < NFMDisk; k++) {
+      barrel_disk_id_comp : for (short k = 0; k < NFMDisk; k++) {
         const auto &disk_stub_1 = disk_fm[k][disk_read_index[k]];
         const auto &disk_id_1 = disk_stub_1.getTrackletID();
         barrel_valid[j] = (barrel_valid[j] && barrel_id_0 <= disk_id_1);
@@ -118,20 +119,20 @@ void TrackBuilder(
       min_id = (barrel_valid[j] ? barrel_id_0 : min_id);
     }
 
-    disk_min_id : for (unsigned short j = 0; j < NFMDisk; j++) {
+    disk_min_id : for (short j = 0; j < NFMDisk; j++) {
 
       const auto &disk_stub_0 = disk_fm[j][disk_read_index[j]];
       const auto &disk_id_0 = disk_stub_0.getTrackletID();
       disk_valid[j] = (!empty && disk_id_0 != kInvalidTrackletID);
 
       // Compare the given barrel and disk IDs against each barrel ID.
-      disk_barrel_id_comp : for (unsigned short k = 0; k < NFMBarrel; k++) {
+      disk_barrel_id_comp : for (short k = 0; k < NFMBarrel; k++) {
         const auto &barrel_stub_1 = barrel_fm[k][barrel_read_index[k]];
         const auto &barrel_id_1 = barrel_stub_1.getTrackletID();
         disk_valid[j] = (disk_valid[j] && disk_id_0 <= barrel_id_1);
       }
       // Compare the given barrel and disk IDs against each disk ID.
-      disk_disk_id_comp : for (unsigned short k = 0; k < NFMDisk; k++) {
+      disk_disk_id_comp : for (short k = 0; k < NFMDisk; k++) {
         const auto &disk_stub_1 = disk_fm[k][disk_read_index[k]];
         const auto &disk_id_1 = disk_stub_1.getTrackletID();
         disk_valid[j] = (disk_valid[j] && disk_id_0 <= disk_id_1);
@@ -143,9 +144,14 @@ void TrackBuilder(
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(TPAROffset);
-    TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
+    const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
+    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
     const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
+
+    TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
+    track.setPhiRegionInner(tpar.getPhiRegion());
+    track.setPhiRegionOuter(phiRegionOuter);
     track.setStubIndexInner(tpar.getStubIndexInner());
     track.setStubIndexOuter(tpar.getStubIndexOuter());
     track.setRinv(tpar.getRinv());
@@ -158,13 +164,13 @@ void TrackBuilder(
     // object.
     ap_uint<3> nMatches = 0; // there can be up to eight matches (3 bits)
 
-    barrel_stub_association : for (unsigned short j = 0; j < NBarrelStubs; j++) {
+    barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
-      const unsigned nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
+      const int nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
       const unsigned nFMCumulative = (j == 0 ? 0 : (j == 1 ? NFMPerStubBarrel0 : NFMPerStubBarrel0 + (j - 1) * NFMPerStubBarrel));
 
       ap_uint<1> barrel_stub_valid = false;
-      barrel_stub_valid : for (unsigned short k = 0; k < nFM; k++)
+      barrel_stub_valid : for (short k = 0; k < nFM; k++)
         barrel_stub_valid = (barrel_stub_valid || barrel_valid[nFMCumulative + k]);
       nMatches += (barrel_stub_valid ? 1 : 0);
 
@@ -227,10 +233,10 @@ void TrackBuilder(
       }
     }
 
-    disk_stub_association : for (unsigned short j = 0; j < NDiskStubs; j++) {
+    disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
 
       ap_uint<1> disk_stub_valid = false;
-      disk_stub_valid : for (unsigned short k = 0; k < NFMPerStubDisk; k++)
+      disk_stub_valid : for (short k = 0; k < NFMPerStubDisk; k++)
         disk_stub_valid = (disk_stub_valid || disk_valid[j * NFMPerStubDisk + k]);
       nMatches += (disk_stub_valid ? 1 : 0);
 
@@ -292,7 +298,7 @@ void TrackBuilder(
     // object that was constructed.
     if (track.getTrackValid()) {
       trackWord[nTracks] = track.getTrackWord();
-      barrel_stub_words: for (unsigned short j = 0 ; j < NBarrelStubs; j++) {
+      barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
         switch (j) {
           case 0:
             barrelStubWords[j][nTracks] = track.template getStubValid<0>() ? track.template getBarrelStubWord<0>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
@@ -308,7 +314,7 @@ void TrackBuilder(
             break;
         }
       }
-      disk_stub_words: for (unsigned short j = 0 ; j < NDiskStubs; j++) {
+      disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
         switch (j) {
           case 0:
             diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
@@ -329,7 +335,7 @@ void TrackBuilder(
 
     // Update the circular buffer indices and read a new element from each of
     // the input full-match memories.
-    barrel_circular_buffer_update : for (unsigned short j = 0; j < NFMBarrel; j++) {
+    barrel_circular_buffer_update : for (short j = 0; j < NFMBarrel; j++) {
       barrel_read_index[j] += (barrel_valid[j] ? 1 : 0);
       const ap_uint<kNBitsTBBuffer> barrel_next_write_index = barrel_write_index[j] + 1;
       const ap_uint<1> barrel_not_full = (barrel_next_write_index != barrel_read_index[j]);
@@ -338,7 +344,7 @@ void TrackBuilder(
       barrel_write_index[j] += ((empty || barrel_not_full) ? 1 : 0);
     }
 
-    disk_circular_buffer_update : for (unsigned short j = 0; j < NFMDisk; j++) {
+    disk_circular_buffer_update : for (short j = 0; j < NFMDisk; j++) {
       disk_read_index[j] += (disk_valid[j] ? 1 : 0);
       const ap_uint<kNBitsTBBuffer> disk_next_write_index = disk_write_index[j] + 1;
       const ap_uint<1> disk_not_full = (disk_next_write_index != disk_read_index[j]);
