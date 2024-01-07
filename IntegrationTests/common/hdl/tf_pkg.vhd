@@ -61,9 +61,12 @@ package tf_pkg is
   type t_arr2_1b  is array(0 to 1) of std_logic;
   type t_arr2_8b  is array(0 to 1) of std_logic_vector(7 downto 0);
   type t_arr4_12b  is array(0 to 3) of std_logic_vector(11 downto 0);
+  type t_arr4_13b  is array(0 to 3) of std_logic_vector(12 downto 0);
   type t_arr4_16b  is array(0 to 3) of std_logic_vector(15 downto 0);
   type t_arr4_17b  is array(0 to 3) of std_logic_vector(16 downto 0);
   type t_arr5_11b  is array(0 to 4) of std_logic_vector(10 downto 0);
+  type t_arr5_12b  is array(0 to 4) of std_logic_vector(11 downto 0);
+  type t_arr5_13b  is array(0 to 4) of std_logic_vector(12 downto 0);
   type t_arr5_16b  is array(0 to 4) of std_logic_vector(15 downto 0);
   type t_arr5_17b  is array(0 to 4) of std_logic_vector(16 downto 0);
   type t_arr8_1b  is array(0 to 7) of std_logic;
@@ -72,6 +75,7 @@ package tf_pkg is
   type t_arr8_4b  is array(0 to 7) of std_logic_vector(3 downto 0);
   type t_arr64_4b  is array(0 to 63) of std_logic_vector(3 downto 0);
   type t_arr64_1b  is array(0 to 63) of std_logic;
+  type t_arr128_1b  is array(0 to 127) of std_logic;
   type t_arr8_5b  is array(0 to 7) of std_logic_vector(4 downto 0);
   type t_arr8_8b  is array(0 to 7) of std_logic_vector(7 downto 0);
   type t_arr8_9b  is array(0 to 7) of std_logic_vector(8 downto 0);
@@ -111,6 +115,10 @@ package tf_pkg is
   type t_arr_64_1b  is array(integer range<>) of t_arr64_1b;
   subtype t_arr2_64_1b is t_arr_64_1b(0 to 1);
   subtype t_arr4_64_1b is t_arr_64_1b(0 to 3);
+
+  type t_arr_128_1b  is array(integer range<>) of t_arr128_1b;
+  subtype t_arr2_128_1b is t_arr_128_1b(0 to 1);
+  subtype t_arr4_128_1b is t_arr_128_1b(0 to 3);
   
   -- Could be used in place of t_arr_7b. 
   -- type t_arr_meb is array(integer range<>) of std_logic_vector(clogb2(MAX_ENTRIES)-1 downto 0);
