@@ -31,6 +31,7 @@ architecture rtl of vmstub16dout5 is
     end process;
       
 end rtl;
+
 --! Standard libraries
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -59,6 +60,64 @@ architecture rtl of vmstub16dout4 is
       dataout1 <= datain(31 downto 16);
       dataout2 <= datain(47 downto 32);
       dataout3 <= datain(63 downto 48);
+    end process;
+      
+end rtl;
+
+--! Standard libraries
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+--! User packages
+use work.tf_pkg.all;
+use work.memUtil_pkg.all;
+
+
+entity vmstub16dout3 is
+  port(
+    datain : in std_logic_vector(47 downto 0);
+    dataout0 : out std_logic_vector(15 downto 0);
+    dataout1 : out std_logic_vector(15 downto 0);
+    dataout2 : out std_logic_vector(15 downto 0)
+);
+  end vmstub16dout3;
+
+architecture rtl of vmstub16dout3 is
+
+  begin
+
+    process(datain)
+    begin  
+      dataout0 <= datain(15 downto 0);
+      dataout1 <= datain(31 downto 16);
+      dataout2 <= datain(47 downto 32);
+    end process;
+      
+end rtl;
+
+--! Standard libraries
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+--! User packages
+use work.tf_pkg.all;
+use work.memUtil_pkg.all;
+
+
+entity vmstub16dout2 is
+  port(
+    datain : in std_logic_vector(31 downto 0);
+    dataout0 : out std_logic_vector(15 downto 0);
+    dataout1 : out std_logic_vector(15 downto 0)
+);
+  end vmstub16dout2;
+
+architecture rtl of vmstub16dout2 is
+
+  begin
+
+    process(datain)
+    begin  
+      dataout0 <= datain(15 downto 0);
+      dataout1 <= datain(31 downto 16);
     end process;
       
 end rtl;
