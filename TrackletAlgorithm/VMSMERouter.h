@@ -75,22 +75,26 @@ inline T createVMStubME(AllStub<InType> allstub,
 	// The stub that is going to be returned
 	T stub;
 	// Values from Input AllStub
-
-	auto nd = allstub.getND();
-
-	negDisk = nd;
+	std::cout << "allstub.raw() : " << std::hex << allstub.raw() << "\n";
 
 	auto z = allstub.getZ();
-	ap_uint<AllStubBase<InType>::kASRSize> r = allstub.getR();
-	if (allstub.isPSStub()) r += 256; 
+	//ap_uint<AllStubBase<InType>::kASRSize> r = allstub.getR();
+	ap_uint<12> r = allstub.getR();
+	std::cout << "ispsstub: " << std::dec << allstub.isPSStub() << "\n";
+	std::cout << "r before: " << r << "\n";
+	if (allstub.isPSStub() && disk) {
+		if (r > 2500) r -= 2048;
+		r += 256; 
+	}
 	
+	std::cout << "r after: " <<  r << "\n";
 	auto bend = allstub.getBend();
 	auto phi = allstub.getPhi();
 	auto phicorr = getPhiCorr<InType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
 
 	int nbitsr = r.length(); // Number of bits for r
-	if (InType == DISKPS){
-		nbitsr = 12; // needed to get correct index for LUT 
+	if (InType != DISKPS){
+		nbitsr = 7; // needed to get correct index for LUT 
 	}
 
 	int nbitsz = z.length(); // Number of bits for z
@@ -199,7 +203,14 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 		
 		constexpr bool isDisk = (disk > 0);
-		if (isDisk) disk2S = !stub_ps.isPSStub();
+		if (isDisk) {
+			disk2S = !stub_ps.isPSStub();
+			if (disk2S) negDisk = stub_2s.getND();
+			else negDisk = stub_ps.getND();
+		}
+		
+		
+
 
 		// Increment the read address
 		++read_addr;
@@ -209,15 +220,10 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 
 		int slotME; // The bin the stub is going to be put in, in the memory
 		// Create the ME stub to save
-		/*VMStubMECM<inOutType> stubME = (disk2S) ? 
+		VMStubMECM<inOutType> stubME = (disk2S) ? 
 				createVMStubME<VMStubMECM<inOutType>, DISK2S, inOutType, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
 				createVMStubME<VMStubMECM<inOutType>, DISKPS, inOutType, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
-				createVMStubME<VMStubMECM<inOutType>, inOutType, inOutType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME);*/
-
-		VMStubMECM<inOutType> stubME = (disk <= 0) ? 
-				createVMStubME<VMStubMECM<inOutType>, inOutType, inOutType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME) : (disk2S) ?
-				createVMStubME<VMStubMECM<inOutType>, DISK2S, inOutType, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) :
-				createVMStubME<VMStubMECM<inOutType>, DISKPS, inOutType, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME);
+				createVMStubME<VMStubMECM<inOutType>, inOutType, inOutType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
