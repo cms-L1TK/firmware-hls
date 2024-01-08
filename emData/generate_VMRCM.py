@@ -381,7 +381,7 @@ def writeTopHeader(vmr, output_dir):
         "  AllStubMemory<outputType> memoriesAS[numASCopies],\n"
         + ("  AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],\n" if has_allstub_inner[layerdisk] else "") +\
         "  VMStubMEMemoryCM<outputType, kNbitsrzbinMETE, kNbitsphibin, kNMatchEngines> *memoryME" + (",\n" if has_vmste_outer[layerdisk] else "")
-        + ("  VMStubTEOuterMemoryCM<outputType, kNbitsrzbinNETE, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
+        + ("  VMStubTEOuterMemoryCM<outputType, kNbitsrzbinMETE, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
         "  );\n"
         "\n"
         "#endif // TopFunctions_%s_h\n" % file_name
