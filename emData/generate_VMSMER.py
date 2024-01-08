@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+## python 2/3 inter-compatibility
 from __future__ import absolute_import, print_function
 
 # This script generates VMStubMERouterTop.h and VMStubMERouterTop.cc in the TopFunctions/ directory.

@@ -88,7 +88,7 @@ fi
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_IR.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
-./generate_VMSMER.py -a -w LUTs/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_VMSMER.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TB.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
