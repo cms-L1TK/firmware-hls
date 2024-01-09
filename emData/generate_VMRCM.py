@@ -364,7 +364,7 @@ def writeTopHeader(vmr, output_dir):
         "constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory\n"
         "constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories\n"
         "// Number of bits for the RZ bins \n"
-        "constexpr int kNbitsrzbinMETE = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
+        "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
         "\n\n"
     )
 
@@ -380,8 +380,8 @@ def writeTopHeader(vmr, output_dir):
         "  // Output memories\n"
         "  AllStubMemory<outputType> memoriesAS[numASCopies],\n"
         + ("  AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],\n" if has_allstub_inner[layerdisk] else "") +\
-        "  VMStubMEMemoryCM<outputType, kNbitsrzbinMETE, kNbitsphibin, kNMatchEngines> *memoryME" + (",\n" if has_vmste_outer[layerdisk] else "")
-        + ("  VMStubTEOuterMemoryCM<outputType, kNbitsrzbinMETE, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
+        "  VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME" + (",\n" if has_vmste_outer[layerdisk] else "")
+        + ("  VMStubTEOuterMemoryCM<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
         "  );\n"
         "\n"
         "#endif // TopFunctions_%s_h\n" % file_name
