@@ -201,13 +201,13 @@ std::string return_splitted(std::string data_string, const int bit_widths[],
   // for the tracklet projection algorithm 
   std::string splitted = ""; 
 
-  int end_index = num_splits-3;
+  int end_index = num_splits;
   if (start_index != 0) end_index = start_index+1; // If we only want to print one column
 
   // Create the split string
   for(int i=start_index; i<end_index; i++){
     splitted += data_string.substr(0,bit_widths[i]);
-    splitted += " \t|";
+    splitted += "|";
     data_string = data_string.substr(bit_widths[i]);
   }
   return splitted; 
@@ -247,7 +247,7 @@ unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& mem
       if (OutputBase==2)
       {
         // Print out column headers 
-        int end_index = num_splits-3; 
+        int end_index = num_splits; 
         if (start_index != 0) end_index = start_index+1; // allows for only printing one column
         
         std::cout << " \t";
@@ -258,7 +258,7 @@ unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& mem
             int length = bit_widths[i]-names[i].length()-3; 
             if (length < 0 ) length = 0;
             std::string spaces(length,' ');
-            std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "\t|"; 
+            std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "|"; 
           }
           if (j ==0) std::cout << "|";
         }
