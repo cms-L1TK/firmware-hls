@@ -19,8 +19,8 @@ set module_to_export PC_L3L4A
 open_project -reset projectionCalculator
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/ReducedCombinedConfig/}
-add_files ../TopFunctions/ReducedCombinedConfig/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig/}
+add_files ../TopFunctions/CombinedConfig/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files

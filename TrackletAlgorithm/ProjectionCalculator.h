@@ -34,6 +34,8 @@ template<
   const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, iTC>();
   const uint32_t MaskDisk = TPROJMaskDisk<Seed, iTC>(); 
 
+  std::cout << "MaskBarrel: "<<std::hex<<MaskBarrel<<" "<<((MaskBarrel & TC::mask_L6) >> TC::shift_L6)<<std::dec<<" iTC: "<<iTC<<std::endl;
+
   // Set up writing to the projection memories 
   int nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];//  Number of projections written to the different parts
   int nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
@@ -155,25 +157,80 @@ template<
     phiL_2S_L6 =  phiL_2S-(corr_phi_2S_L6 >> corr_phi_shift_2S);
     std::cout<<"phiL_2S_L6: "<<phiL_2S_L6<<std::endl;
 
-    // Create projections no corrections
-      //const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, phiL_PS, zL_PS, der_phiL, der_zL);
-      //const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL_2S, zL_2S, der_phiL, der_zL);
-      //const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL_2S, zL_2S, der_phiL, der_zL);
-      //const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL_2S, zL_2S, der_phiL, der_zL);
-      // std::cout<<"tproj phi:     " << tproj_L4.getPhi() << std::endl;
+
+
+
+
+    TC::Types::zL iz_L3, iz_L4, iz_L5, iz_L6;
+    TC::Types::phiL iphi_L3, iphi_L4, iphi_L5, iphi_L6;
+
+
+    int ir = rmean[2];
+    int irtilde = ir*phiHG_/sqrtsix + 0.5;
+    projToLayer(ir, irtilde, rinv, phi0, t, z0, iz_L3, iphi_L3);
+    bool valid_zmin=iz_L3 >= -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    bool valid_zmax=iz_L3 < (1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    bool valid_phimax=iphi_L3 < ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 1);
+    bool valid_phimin=iphi_L3 > 0;
+    bool valid_L3 = valid_zmin & valid_zmax & valid_phimax & valid_phimin;
+
+    iphi_L3 = iphi_L3 >> 3;
+
+    ir = rmean[3];
+    irtilde = ir*phiHG_/sqrtsix + 0.5;
+    projToLayer(ir, irtilde, rinv, phi0, t, z0, iz_L4, iphi_L4);
+    valid_zmin=iz_L4 >= -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    valid_zmax=iz_L4 < (1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    valid_phimax=iphi_L4 < ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 1);
+    valid_phimin=iphi_L4 > 0;
+    bool valid_L4 = valid_zmin & valid_zmax & valid_phimax & valid_phimin;
+
+    iz_L4 = iz_L4 >> 4;
+
+    ir = rmean[4];
+    irtilde = ir*phiHG_/sqrtsix + 0.5;
+    projToLayer(ir, irtilde, rinv, phi0, t, z0, iz_L5, iphi_L5);
+    valid_zmin=iz_L5 >= -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    valid_zmax=iz_L5 < (1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    valid_phimax=iphi_L5 < ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 1);
+    valid_phimin=iphi_L5 > 0;
+    bool valid_L5 = valid_zmin & valid_zmax & valid_phimax & valid_phimin;
+
+    iz_L5 = iz_L5 >> 4;
+
+    ir = rmean[5];
+    irtilde = ir*phiHG_/sqrtsix + 0.5;
+    projToLayer(ir, irtilde, rinv, phi0, t, z0, iz_L6, iphi_L6);
+    valid_zmin=iz_L6 >= -(1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    valid_zmax=iz_L6 < (1 << (TrackletProjection<BARRELPS>::kTProjRZSize - 1));
+    valid_phimax=iphi_L6 < ((1 << TrackletProjection<BARREL2S>::kTProjPhiSize) - 1);
+    valid_phimin=iphi_L6 > 0;
+    bool valid_L6 = valid_zmin & valid_zmax & valid_phimax & valid_phimin;
+
+    iz_L6 = iz_L6 >> 4;
+
+
+    TC::Types::der_phiL ider_phiL = -(rinv >> (1+3));
+    TC::Types::der_zL ider_zL = t >> 3;
+
 
       // Create projections with corrections 
-      const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, phiL_PS_L3, zL_PS, der_phiL, der_zL);
-      const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, phiL_2S_L4, zL_2S, der_phiL, der_zL);
-      const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, phiL_2S_L5, zL_2S, der_phiL, der_zL);
-      const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, phiL_2S_L6, zL_2S, der_phiL, der_zL);
+      const TrackletProjection<BARRELPS> tproj_L3(TCID, trackletIndex, iphi_L3, iz_L3, ider_phiL, ider_zL);
+      const TrackletProjection<BARREL2S> tproj_L4(TCID, trackletIndex, iphi_L4, iz_L4, ider_phiL, ider_zL);
+      const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, iphi_L5, iz_L5, ider_phiL, ider_zL);
+      const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, iphi_L6, iz_L6, ider_phiL, ider_zL);
 
     // Write the projections 
       // addProj checks if the projection is valid in the phi region
-      addL3 = TC::addProj<BARRELPS, TC::nproj_L3, ((MaskBarrel & TC::mask_L3) >> TC::shift_L3)> (tproj_L3, bx, &projout_barrel_ps[TC::L3PHIA], &nproj_barrel_2s[TC::L3PHIA], true);
-      addL4 = TC::addProj<BARREL2S, TC::nproj_L4, ((MaskBarrel & TC::mask_L4) >> TC::shift_L4)> (tproj_L4, bx, &projout_barrel_2s[TC::L4PHIA], &nproj_barrel_2s[TC::L4PHIA], true);
-      addL5 = TC::addProj<BARREL2S, TC::nproj_L5, ((MaskBarrel & TC::mask_L5) >> TC::shift_L5)> (tproj_L5, bx, &projout_barrel_2s[TC::L5PHIA], &nproj_barrel_2s[TC::L5PHIA], true);
-      addL6 = TC::addProj<BARREL2S, TC::nproj_L6, ((MaskBarrel & TC::mask_L6) >> TC::shift_L6)> (tproj_L6, bx, &projout_barrel_2s[TC::L6PHIA], &nproj_barrel_2s[TC::L6PHIA], true);
+      addL3 = TC::addProj<BARRELPS, TC::nproj_L3, ((MaskBarrel & TC::mask_L3) >> TC::shift_L3)> (tproj_L3, bx, &projout_barrel_ps[TC::L3PHIA], &nproj_barrel_ps[TC::L3PHIA], valid_L3);
+
+      addL4 = TC::addProj<BARREL2S, TC::nproj_L4, ((MaskBarrel & TC::mask_L4) >> TC::shift_L4)> (tproj_L4, bx, &projout_barrel_2s[TC::L4PHIA], &nproj_barrel_2s[TC::L4PHIA], valid_L4);
+
+      std::cout << "Will add L5" << std::endl;
+      addL5 = TC::addProj<BARREL2S, TC::nproj_L5, ((MaskBarrel & TC::mask_L5) >> TC::shift_L5)> (tproj_L5, bx, &projout_barrel_2s[TC::L5PHIA], &nproj_barrel_2s[TC::L5PHIA], valid_L5);
+      std::cout << "Done add L5: " << nproj_barrel_2s[TC::L5PHIB] << std::endl;
+
+      addL6 = TC::addProj<BARREL2S, TC::nproj_L6, ((MaskBarrel & TC::mask_L6) >> TC::shift_L6)> (tproj_L6, bx, &projout_barrel_2s[TC::L6PHIA], &nproj_barrel_2s[TC::L6PHIA], valid_L6);
       std::cout << addL4 <<addL5 << addL6 << std::endl;
     } 
   }
