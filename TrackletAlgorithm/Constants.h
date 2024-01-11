@@ -200,6 +200,9 @@ constexpr int ifactor = 469;
 constexpr int phicritmincut=10190;
 constexpr int phicritmaxcut=55345;
 
+constexpr double irmindisk = rmindisk/krprojdisk; // cm
+constexpr double irmaxdisk = rmaxdisk/krprojdisk; // cm
+
 // cut constants
 constexpr double ptcut = 1.91; // GeV
 constexpr double rinvcut = 0.01 * c * bfield / ptcut; // 0.01 to convert to 1/cm
