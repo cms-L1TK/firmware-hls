@@ -111,12 +111,12 @@ public:
     return data_.range(kVMSMEBendMSB,kVMSMEBendLSB);
   }
 
-  bool isPSStub() const {
+  /*bool isPSStub() const {
     if(VMSMEType == BARRELPS) return true;
     else if(VMSMEType == BARREL2S) return false;
     else if(VMSMEType == DISK) return (getBend() & (1 << (VMStubMECMBase<VMSMEType>::kVMSMEBendSize-1))) == 0 && getBend() != 0; // Check highest 1 bits regardless of template type
     static_assert(true, "Should not be possible!");
-  }
+  }*/
 
 
   VMSMEBENDPSDISK getBendPSDisk() const {
