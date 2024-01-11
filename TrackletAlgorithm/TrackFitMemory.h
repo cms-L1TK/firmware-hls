@@ -436,6 +436,71 @@ public:
     data_.range(TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubValidMSB(Hit),TrackFitBits<NBarrelStubs, NDiskStubs>::kTFStubRZResidLSB(Hit)) = word;
   }
 
+#ifdef CMSSW_GIT_HASH
+  template<uint8_t Hit>
+  std::string hitStr(bool isDisk) const {
+    std::string str = decodeToBits(getStubValid<Hit>());
+    str += "|"+decodeToBits(getTrackIndex<Hit>());
+    str += "|"+decodeToBits(getStubIndex<Hit>());
+    if(isDisk) str += "|"+decodeToBits(getDiskStubR<Hit>());
+    else str += "|"+decodeToBits(getBarrelStubR<Hit>());
+    str += "|"+decodeToBits(getStubPhiResid<Hit>());
+    if(isDisk) str += "|"+decodeToBits(getStubRResid<Hit>());
+    else str += "|"+decodeToBits(getStubZResid<Hit>());
+    return str;
+  }
+
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getTrackValid());
+    str += "|"+decodeToBits(getSeedType());
+    str += "|"+decodeToBits(getPhiRegionInner());
+    str += "|"+decodeToBits(getPhiRegionOuter());
+    str += "|"+decodeToBits(getStubIndexInner());
+    str += "|"+decodeToBits(getStubIndexOuter());
+    str += "|"+decodeToBits(getRinv());
+    str += "|"+decodeToBits(getPhi0());
+    str += "|"+decodeToBits(getZ0());
+    str += "|"+decodeToBits(getT());
+    str += "|"+decodeToBits(getHitMap());
+    for(int i=0; i < NBarrelStubs; i++){
+      switch (i) {
+        case 0:
+          str += "|"+hitStr<0>(false);
+          break;
+        case 1:
+          str += "|"+hitStr<1>(false);
+          break;
+        case 2:
+          str += "|"+hitStr<2>(false);
+          break;
+        case 3:
+          str += "|"+hitStr<3>(false);
+          break;
+      }
+    }
+    for(int i=0; i < NDiskStubs; i++){
+      switch (i) {
+        case 0:
+          str += "|"+hitStr<NBarrelStubs+0>(true);
+          break;
+        case 1:
+          str += "|"+hitStr<NBarrelStubs+1>(true);
+          break;
+        case 2:
+          str += "|"+hitStr<NBarrelStubs+2>(true);
+          break;
+        case 3:
+          str += "|"+hitStr<NBarrelStubs+3>(true);
+          break;
+      }
+    }
+
+    return str;
+  }
+
+
+#endif
+
 private:
 
   TrackFitData data_;
