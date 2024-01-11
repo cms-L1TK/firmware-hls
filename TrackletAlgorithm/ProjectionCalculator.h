@@ -77,8 +77,6 @@ template<
   const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, iTC>();
   const uint32_t MaskDisk = TPROJMaskDisk<Seed, iTC>(); 
 
-  std::cout << "MaskBarrel: "<<std::hex<<MaskBarrel<<" "<<((MaskBarrel & TC::mask_L6) >> TC::shift_L6)<<std::dec<<" iTC: "<<iTC<<std::endl;
-
   // Set up writing to the projection memories 
   int nproj_barrel_ps[TC::N_PROJOUT_BARRELPS];//  Number of projections written to the different parts
   int nproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
@@ -110,103 +108,18 @@ template<
 
     // Read in tracklet parameters from the memory 
     const auto &tpar = trackletParameters->read_mem(bx, trackletIndex);
-    //std::cout<<"tpar.getPhi0: " << tpar.getPhi0() << std::endl; 
 
-    if (tpar.getPhi0() != 0) // TODO: better way of checking if is filled? 
-    {
-      std::cout << "Tracklet # "<< trackletIndex<< " -----------------------------------------------------------------" << std::endl; 
-
+    // TODO: better way of checking if is filled? 
+    if (tpar.getPhi0() != 0) {
+ 
     // Load the initial track parameters (phi0, z0, t, rinv) 
-      TrackletParameters::PHI0PAR phi0 = tpar.getPhi0();
-      std::cout<<"phi0:         " << phi0 << std::endl;  
+    TrackletParameters::PHI0PAR phi0 = tpar.getPhi0();
+    std::cout<<"phi0:         " << phi0 << std::endl;  
       TrackletParameters::Z0PAR z0 = tpar.getZ0();
       TrackletParameters::TPAR t = tpar.getT();
       TrackletParameters::RINVPAR rinv = tpar.getRinv();
 
-      // TODO: Access radius of each layer 
-
-      
-      TC::Types::phiL phiL_PS;
-      TC::Types::zL zL_PS;
-      TC::Types::phiL phiL_2S;
-      TC::Types::zL zL_2S;
-      // TODO: What should we do for derivatives? 
-      TC::Types::der_phiL der_phiL = 0;
-      TC::Types::der_zL der_zL = 0;
-
-      TC::Types::phiL phiL_PS_L3;
-      TC::Types::phiL phiL_2S_L4;
-      TC::Types::phiL phiL_2S_L5;
-      TC::Types::phiL phiL_2S_L6;
-
-      // Set up projections for barrel layer 
-
-
-      // TODO: Deal with over/underflows in phi bit 
-
-
-     // Transform the N bit trackletParameters into M bit trackletProjections in phi by multiplying by 2^(k_phi0/k_phi)
-     // E.g. a bitshift left << of n_phi-n_phi0, 
-      // n_phi0 = 18  n_phi = 17 for BARREL2S, n_phi-n_phi0=-1, because this is negative it becomes a bitshift right 
-     //std::cout<<"shift by:     " << (TrackletProjection<BARREL2S>::kTProjPhiSize - tpar.kTParPhi0Size) << std::endl;  
-     //phiL = phi0 >> (tpar.kTParPhi0Size-TrackletProjection<BARREL2S>::kTProjPhiSize);
-     //zL = z0 >> (tpar.kTParZ0Size - TrackletProjection<BARREL2S>::kTProjRZSize); 
-     // TODO: Somehow this is the correct amount of shifting for L3 ( >> 1) phi >> 1 and z >> 2
-
-
-     // Corrected. Apparently the two trackletParameter MSBs are used for under/overflow, they are usually 0 so we ignore them
-     // n_phi0 = 16, n_phi = 17, n_phi-n_phi0=1, this is positive, so keep the bitshift left. 
-     //int my_shift_L4 = TrackletProjection<BARREL2S>::kTProjPhiSize - (tpar.kTParPhi0Size-2) ;
-     //std::cout<<"shift by:     " << my_shift_L4 << std::endl;  
-     //phiL = phi0 << my_shift_L4;
-
-     // For PS  (things seems to work well for L3)
-     int phi_shift_PS = 2;
-     phiL_PS = phi0 >> phi_shift_PS;
-     std::cout<<"No correction, phiL_PS: "<<phiL_PS<<std::endl;
-
-     int z_shift_PS = 2;
-     zL_PS = z0 >> z_shift_PS; 
-
-      // For 2S (looks like it needs corrections a bit more, ordering gets funny)
-     int phi_shift_2S = 1;//TrackletProjection<BARREL2S>::kTProjPhiSize - (tpar.kTParPhi0Size-2) ;
-     phiL_2S = phi0 << phi_shift_2S;
-     std::cout<<"No correction, phiL_2S: "<<phiL_2S<<std::endl;
-
-     int z_shift_2S = 2;
-     zL_2S = z0 << z_shift_2S; 
-
-     // Calculate first order corrections // TODO: tidy up redundancy here
-     int corr_phi_PS_L3 = rmean[2]*rinv;
-     std::cout<<"rmean[2]: "<< rmean[2]<<std::endl;
-     std::cout<<"rinv: "<< rinv<<std::endl;
-     std::cout<<"corr_phi_PS_L3: "<< corr_phi_PS_L3 <<std::endl;
-
-     int corr_phi_shift_PS = TrackletProjection<BARRELPS>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjRZSize - tpar.kTParRinvSize - 1;
-     std::cout<<"corr_phi_shift_PS: "<< corr_phi_shift_PS <<std::endl;
-
-     phiL_PS_L3 =  phiL_PS-(corr_phi_PS_L3 >> 12);
-     std::cout<<"phiL_PS_L3: "<<phiL_PS_L3<<std::endl;
-
-     int corr_phi_2S_L4 = rmean[3]*rinv;
-     int corr_phi_shift_2S = 9;//TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARREL2S>::kTProjRZSize - tpar.kTParRinvSize - 1;
-     std::cout<<"corr_phi_shift_2S: "<< corr_phi_shift_2S <<std::endl;
-     phiL_2S_L4 =  phiL_2S-(corr_phi_2S_L4 >> corr_phi_shift_2S);
-     std::cout<<"phiL_2S_L4: "<<phiL_2S_L4<<std::endl;
-
-    int corr_phi_2S_L5 = rmean[4]*rinv;
-    phiL_2S_L5 =  phiL_2S-(corr_phi_2S_L5 >> corr_phi_shift_2S);
-    std::cout<<"phiL_2S_L5: "<<phiL_2S_L5<<std::endl;
-
-    int corr_phi_2S_L6 = rmean[5]*rinv;
-    phiL_2S_L6 =  phiL_2S-(corr_phi_2S_L6 >> corr_phi_shift_2S);
-    std::cout<<"phiL_2S_L6: "<<phiL_2S_L6<<std::endl;
-
-
-
-
-
-    TC::Types::zL iz_L3, iz_L4, iz_L5, iz_L6;
+     TC::Types::zL iz_L3, iz_L4, iz_L5, iz_L6;
     TC::Types::phiL iphi_L3, iphi_L4, iphi_L5, iphi_L6;
 
 
@@ -277,6 +190,61 @@ template<
 
       addL6 = TC::addProj<BARREL2S, TC::nproj_L6, ((MaskBarrel & TC::mask_L6) >> TC::shift_L6)> (tproj_L6, bx, &projout_barrel_2s[TC::L6PHIA], &nproj_barrel_2s[TC::L6PHIA], valid_L6);
       std::cout << addL4 <<addL5 << addL6 << std::endl;
+
+
+      TC::Types::rD ir_D1, ir_D2, ir_D3, ir_D4;
+      TC::Types::phiD iphi_D1, iphi_D2, iphi_D3, iphi_D4;
+
+      //constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
+      //constexpr int izproj1 = zmean[projectionDisks[Seed][1]];
+      //constexpr int izproj2 = zmean[projectionDisks[Seed][2]];
+      //constexpr int izproj3 = zmean[projectionDisks[Seed][3]];
+
+      constexpr int izproj0 = zmean[6];
+      constexpr int izproj1 = zmean[7];
+      constexpr int izproj2 = zmean[8];
+      constexpr int izproj3 = zmean[9];
+
+      const ap_int<14> zproj0 = izproj0;
+      const ap_int<14> zproj1 = izproj1;
+      const ap_int<14> zproj2 = izproj2;
+      const ap_int<14> zproj3 = izproj3;
+
+      static const InvtLUT lut_itinv;
+      ap_uint<20> itinv = lut_itinv.lookup(abs(t)&4095);
+
+      TC::Types::der_phiD ider_phiD = (-rinv*itinv) >> 17;
+      TC::Types::der_rD ider_rD = itinv >> 5;
+      
+      projToDisk(zproj0, itinv, rinv, phi0, t, z0, ir_D1, iphi_D1);
+      projToDisk(zproj1, itinv, rinv, phi0, t, z0, ir_D2, iphi_D2);
+      projToDisk(zproj2, itinv, rinv, phi0, t, z0, ir_D3, iphi_D3);
+      projToDisk(zproj3, itinv, rinv, phi0, t, z0, ir_D4, iphi_D4);
+
+      constexpr int itcut = 1.0/kt;
+
+      const TrackletProjection<DISK> tproj_D1(TCID, trackletIndex, iphi_D1, ir_D1, ider_phiD, ider_rD);
+      bool validD1 = true;
+
+      const TrackletProjection<DISK> tproj_D2(TCID, trackletIndex, iphi_D2, ir_D2, ider_phiD, ider_rD);
+      bool validD2 = true;
+
+      const TrackletProjection<DISK> tproj_D3(TCID, trackletIndex, iphi_D3, ir_D3, ider_phiD, ider_rD);
+      bool validD3 = ir_D3 >= irmindisk && ir_D3 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL4;
+
+      const TrackletProjection<DISK> tproj_D4(TCID, trackletIndex, iphi_D4, ir_D4, ider_phiD, ider_rD);
+      bool validD4 = ir_D4 >= irmindisk && ir_D4 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL3;
+
+      bool addD1 = TC::addProj<DISK, TC::nproj_D1, ((MaskDisk & TC::mask_D1) >> TC::shift_D1)> (tproj_D1, bx, &projout_disk[TC::D1PHIA], &nproj_disk[TC::D1PHIA], validD1);
+
+      bool addD2 = TC::addProj<DISK, TC::nproj_D2, ((MaskDisk & TC::mask_D2) >> TC::shift_D2)> (tproj_D2, bx, &projout_disk[TC::D2PHIA], &nproj_disk[TC::D2PHIA], validD2);
+
+      bool addD3 = TC::addProj<DISK, TC::nproj_D3, ((MaskDisk & TC::mask_D3) >> TC::shift_D3)> (tproj_D3, bx, &projout_disk[TC::D3PHIA], &nproj_disk[TC::D3PHIA], validD3);
+
+      bool addD4 = TC::addProj<DISK, TC::nproj_D4, ((MaskDisk & TC::mask_D4) >> TC::shift_D4)> (tproj_D4, bx, &projout_disk[TC::D4PHIA], &nproj_disk[TC::D4PHIA], validD4);
+
+
+
     } 
   }
 
