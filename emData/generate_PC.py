@@ -4,9 +4,7 @@
 # ProjectionCalculatorTop.cc in the TopFunctions/ directory.
 
 from __future__ import absolute_import, print_function
-<<<<<<< HEAD
-import re, os, argparse
-=======
+
 import sys, re, os, argparse
 from enum import Enum
 
@@ -65,7 +63,6 @@ from enum import Enum
 #   D5PHIC = 18
 #   D5PHID = 19
 #   N_PROJOUT_DISK = 20
->>>>>>> 17f7d51 (Garbage being written out cleaner)
 
 parser = argparse.ArgumentParser(description="This script generates ProjectionCalculatorTop.h, ProjectionCalculatorTop.cc \
    in the TopFunctions/ directory.",
@@ -159,7 +156,6 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "    BXType& bx_o,\n"
       "    TrackletParameters tPars,\n"
       "    int trackletIndex,\n"
-      "    bool valid,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[]\n"
@@ -174,7 +170,6 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "    BXType& bx_o,\n"
       "    TrackletParameters tPars,\n"
       "    int trackletIndex,\n"
-      "    bool valid,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
@@ -194,7 +189,6 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "    bx_o,\n"
       "    tPars,\n"
       "    trackletIndex,\n"
-      "    valid,\n"
       "    projout_barrel_ps,\n"
       "    projout_barrel_2s,\n"
       "    projout_disk\n"
