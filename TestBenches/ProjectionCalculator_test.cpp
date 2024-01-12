@@ -81,11 +81,20 @@ int main()
     for (unsigned i = 0; i < TC::N_PROJOUT_DISK; i++)
       tproj_disk[i].clear();
 
+    cout << "Done with clear" << endl;
+
     // bx
     BXType bx = ievt;
     BXType bx_o;
 
     // Unit Under Test
+    std::cout << "Entries:"<<trackletParameters.getEntries(bx) << std::endl;
+
+    for (int ipar=0; ipar < trackletParameters.getEntries(bx); ipar++) {
+      TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    }
+
+    cout << "Done with TOP_FUNC" << endl;
 
     for (int ipar = 0; ipar < kMaxProc; ipar++) {
       const bool valid = ipar < trackletParameters.getEntries(bx);
