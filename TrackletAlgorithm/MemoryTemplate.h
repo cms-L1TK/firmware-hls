@@ -76,8 +76,9 @@ public:
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
-      dataarray_[ibx][addr_index] = data;
-      
+      //dataarray_[ibx][addr_index] = data;
+      dataarray_[ibx][nentries_[ibx]++] = data;
+
       #ifdef CMSSW_GIT_HASH
       nentries_[ibx] = addr_index + 1;
       #endif
@@ -103,10 +104,27 @@ public:
     MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
       nentries_[ibx] = 0;
       for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {
-        write_mem(ibx,data,addr);
+        write_mem_clear(ibx,data,addr);
       }
     }
   }
+
+  bool write_mem_clear(BunchXingT ibx, DataType data, NEntryT addr_index)
+  {
+    if(!NBIT_BX) ibx = 0;
+    if (addr_index < (1<<NBIT_ADDR)) {
+      dataarray_[ibx][addr_index] = data;
+
+      #ifdef CMSSW_GIT_HASH
+      nentries_[ibx] = addr_index + 1;
+      #endif
+      
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
@@ -116,9 +134,10 @@ public:
 	NEntryT nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
 
-	#ifndef CMSSW_GIT_HASH
+	/*	#ifndef CMSSW_GIT_HASH
 	if (success) nentries_[ibx] ++;
 	#endif
+	*/
 	return success;
   }
 
@@ -129,9 +148,11 @@ public:
 	NEntryT nent = nentries_[ibx];
 	bool success = write_mem(ibx, data, nent);
 
+	/*
 	#ifndef CMSSW_GIT_HASH
 	if (success) nentries_[ibx] ++;
 	#endif
+	*/
 	return success;
   }
 
