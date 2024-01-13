@@ -95,83 +95,90 @@ class TPRegionLUT {
 
  public:
 
-  TPRegionLUT(const ap_uint<1> *tplutinner,
-	      const ap_uint<2> iAllStub) {
 
-    int nirbits = 0;
-    if (iSeed == TF::seed::D1D2 || iSeed == TF::seed::D3D4 || iSeed == TF::seed::L1D1 || iSeed == TF::seed::L2D1) {
-      nirbits = 3;
+  inline TPRegionLUT(const ap_uint<1> *tplutinner,
+		     const ap_uint<2> iAllStub) {
+
+    nirbits_ = 0;
+
+    if (iSeed == TF::seed::D1D2 || iSeed == TF::seed::D3D4 || 
+	iSeed == TF::seed::L1D1 || iSeed == TF::seed::L2D1) {
+      nirbits_ = 3;
     }
 
-    int nbitsfinephi = 8;
+    nbitsfinephi_ = 8;
 
-    unsigned int nbendbitsinner = 3;
+    nbendbitsinner_ = 3;
 
     if (iSeed == TF::seed::L5L6) {
-      nbendbitsinner = 4;
+      nbendbitsinner_ = 4;
     }
 
-    int nvmte = 8;
-    int nfinephi = 8;
-    //int iAllStub = 4;
-    int nbitsallstubs = 2;
-    int nbitsfinephidiff = 5;
+    nvmte_ = 8;
+    nfinephi_ = 8;
+    nbitsallstubs_ = 2;
+    nbitsfinephidiff_ = 5;
+
     if (iSeed ==  TF::seed::L5L6 || iSeed == TF::seed::L1D1 || iSeed == TF::seed::L2D1) {
-      nbitsfinephidiff = 6;
+      nbitsfinephidiff_ = 6;
     }
 
     int address = 0;
 
-    for (int innerfinephi = 0; innerfinephi < (1 << nbitsfinephi); innerfinephi++) {
-      for (int innerbend = 0; innerbend < (1 << nbendbitsinner); innerbend++) {
-	for (int ir = 0; ir < (1 << nirbits); ir++) {
-	  unsigned int usereg = 0;
-	  for (int ireg = 0; ireg < nvmte; ireg++) {
-	    bool match = false;
-	    for (int ifinephiouter = 0; ifinephiouter < nfinephi; ifinephiouter++) {
-	      int outerfinephi = iAllStub * (1 << (nbitsfinephi - nbitsallstubs)) +
-		ireg * nfinephi + ifinephiouter;
-	      int idphi = outerfinephi - innerfinephi;
-	      bool inrange = (idphi < (1 << (nbitsfinephidiff - 1))) && (idphi >= -(1 << (nbitsfinephidiff - 1)));
-	      if (idphi < 0)
-		idphi = idphi + (1 << nbitsfinephidiff);
-	      int idphi1 = idphi;
-	      if (iSeed >= 4)
-		idphi1 = (idphi << 3) + ir;
-	      int ptinnerindexnew = (idphi1 << nbendbitsinner) + innerbend;
-	      if (address == 8174) {
-		if (inrange) {
-		  std::cout << "inrange idphi nbitsfinephidiff ptinnerindexnew tplutinner : "<<
-		    inrange << " " << idphi << " " << nbitsfinephidiff 
-			    << " " << ptinnerindexnew << " " 
-			    << tplutinner[ptinnerindexnew]<<std::endl;
-		} else {
-		  std::cout << "inrange idphi ptinnerindexnew tplutinner : "<<
-		    inrange << " " << idphi << " " << ptinnerindexnew << " --------" <<std::endl;
-		}
-	      }
-	      match = match || (inrange && tplutinner[ptinnerindexnew]);
-	    }
-	    if (match) {
-	      usereg = usereg | (1 << ireg);
-	    }
-	  }
-	  if (address == 8173) {
-	    std::cout << "LUT address usereg : " << address << " " << usereg << std::endl;
-	  }
-	  lut_[address++] = usereg;
+    for (int innerfinephi = 0; innerfinephi < (1 << nbitsfinephi_); innerfinephi++) {
+      for (int innerbend = 0; innerbend < (1 << nbendbitsinner_); innerbend++) {
+	for (int ir = 0; ir < (1 << nirbits_); ir++) {
+	  lut_[address++] = get_usereg(innerfinephi, innerbend, ir, tplutinner, iAllStub); 
 	}
       }
     }
   }
 
- ap_uint<8> lookup(int address) const {
-   return lut_[address];
- }
+  ap_uint<8> lookup(int address) const {
+#pragma HLS resource variable=lut_ latency=1
+    return lut_[address];
+  }
 
  private:
 
- ap_uint<8> lut_[iSeed<4?(iSeed<3?2048:4096):16384];
+  int get_usereg(int innerfinephi, int innerbend, int ir,
+		 const ap_uint<1> *tplutinner,
+		 const ap_uint<2> iAllStub)  const {
+
+    unsigned int usereg = 0;
+    for (int ireg = 0; ireg < nvmte_; ireg++) {
+      bool match = false;
+      for (int ifinephiouter = 0; ifinephiouter < nfinephi_; ifinephiouter++) {
+	int outerfinephi = iAllStub * (1 << (nbitsfinephi_ - nbitsallstubs_)) +
+	  ireg * nfinephi_ + ifinephiouter;
+	int idphi = outerfinephi - innerfinephi;
+	bool inrange = (idphi < (1 << (nbitsfinephidiff_ - 1))) && (idphi >= -(1 << (nbitsfinephidiff_ - 1)));
+	if (idphi < 0)
+	  idphi = idphi + (1 << nbitsfinephidiff_);
+	int idphi1 = idphi;
+	if (iSeed >= 4)
+	  idphi1 = (idphi << 3) + ir;
+	int ptinnerindexnew = (idphi1 << nbendbitsinner_) + innerbend;
+	match = match || (inrange && tplutinner[ptinnerindexnew]);
+      }
+      if (match) {
+	usereg = usereg | (1 << ireg);
+      }
+    }
+
+    return usereg;
+
+  } 
+
+  int nirbits_;
+  int nbitsfinephi_;
+  unsigned int nbendbitsinner_;
+  int nvmte_;
+  int nfinephi_;
+  int nbitsallstubs_;
+  int nbitsfinephidiff_;
+   
+  ap_uint<8> lut_[iSeed<4?(iSeed<3?2048:4096):16384];
 
 };
 

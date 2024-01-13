@@ -151,7 +151,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "   }\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
-      "template<TF::seed Seed, TC::itc iTC> const ap_uint<8>* getRegionLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
@@ -229,26 +228,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n"
           "  return 0x%X;\n"
           "}\n"
-          'template<> inline const ap_uint<8>* getRegionLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
-          '#ifndef __SYNTHESIS__\n'
-          '#ifdef CMSSW_GIT_HASH\n'
-          '  static std::mutex getLUTMutex_;\n'
-          '  std::lock_guard<std::mutex> lock(getLUTMutex_);\n'
-          '#endif\n'
-          '  static ap_uint<8> lut[' + regLUTSize[seed] + '];\n'
-          '  static bool init = 0;\n'
-          '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<8>,' + regLUTSize[seed] + '>(lut,"LUTsCM/TP_' + seed + iTC + '_usereg.tab");\n'
-          '#else\n'
-          '  static ap_uint<8> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC + '_usereg.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_usereg.tab"\n'
-          '#else\n'
-          '  {};\n'
-          '#endif\n'
-          '#endif\n'
-          '  return lut;\n'
-          '}\n'
           'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '#ifdef CMSSW_GIT_HASH\n'
@@ -479,7 +458,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
           "\n"
           "static const ap_uint<10>* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
-          "static const ap_uint<8>* regionlut = getRegionLUT<TF::" + seed + ", TC::" + iTC +">();\n"
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
@@ -490,7 +468,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "    bx,\n"
           "    bx_o,\n"
           "    lut,\n"
-          "    regionlut,\n"
           "    innerStubs,\n"
           "    outerStubs,\n"
           "    outerVMStubs,\n"
