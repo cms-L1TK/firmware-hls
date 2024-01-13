@@ -90,8 +90,10 @@ int main()
     // Unit Under Test
     std::cout << "Entries:"<<trackletParameters.getEntries(bx) << std::endl;
 
-    for (int ipar=0; ipar < trackletParameters.getEntries(bx); ipar++) {
-      TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    for (int ipar=0; ipar < 108; ipar++) {
+      bool valid = ipar < trackletParameters.getEntries(bx);
+      TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, valid, 
+		tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
     }
 
     cout << "Done with TOP_FUNC" << endl;
