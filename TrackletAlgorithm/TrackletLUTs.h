@@ -108,7 +108,6 @@ class TPRegionLUT {
 
     if (iSeed ==  TF::seed::L5L6 || iSeed == TF::seed::L1D1 || iSeed == TF::seed::L2D1) {
       nbitsfinephidiff_ = 6;
-
     }
 
     int address = 0;
@@ -121,7 +120,6 @@ class TPRegionLUT {
       }
     }
   }
-
 
   ap_uint<8> lookup(int address) const {
 #pragma HLS resource variable=lut_ latency=1
