@@ -747,11 +747,7 @@ bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 
 
 #define LUTTYPE ap_uint<1+2*TrackletEngineUnit<Seed,iTC,InnerRegion<Seed>(), OuterRegion<Seed>()>::kNBitsRZFine+TrackletEngineUnit<Seed,iTC,InnerRegion<Seed>(),OuterRegion<Seed>()>::kNBitsRZBin>
-#define REGIONLUTTYPE ap_uint<(1<<TrackletEngineUnit<Seed,iTC,InnerRegion<Seed>(),OuterRegion<Seed>()>::kNBitsPhiBins)>
 #define lutsize  (1<<(kNbitszfinebintable+kNbitsrfinebintable))
-#define regionlutsize (1<<(AllStubInner<!(Seed==TF::D1D2||TF::D3D4) ? InnerRegion<Seed>() : DISKPS>::kASBendSize+AllStubInner<InnerRegion<Seed>()>::kASFinePhiSize))
-
-
 
 
 // This is the primary interface for the TrackletProcessor.
@@ -763,9 +759,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], 
-		    //const REGIONLUTTYPE regionlut[regionlutsize], 
-const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
+		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
   )
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
@@ -1195,20 +1189,15 @@ teunits[k].idle_;
 
     auto useregindex = (innerfinephi,bend);
     ap_uint<3> ir;
+    
     if (diskSeed || overlapSeed) {
       //If the lookupbits were rationally organized this would be much simpler
       ap_uint<2> nrbits = 3;
       ir = ((start & ((1 << (nrbits - 1)) - 1)) << 1) + (rzfinebinfirst >> (kNbitsrzbin - 1));
-      //useregion___ = regionlut[(useregindex,ir)];
       useregion___ = regionLUT.lookup((useregindex,ir));
-      //std::cout << "regionLUT: " <<  regionlut[(useregindex,ir)] << " " 
-      //	<< regionLUT.lookup((useregindex,ir))<<std::endl;
-      //assert(regionlut[(useregindex,ir)] == regionLUT.lookup((useregindex,ir)));
-      }
+    }
     else{
-      //useregion___ = regionlut[useregindex];
       useregion___ = regionLUT.lookup(useregindex);
-      //assert(regionlut[useregindex] == regionLUT.lookup(useregindex));
     }
 
     //This lut tells us which range in phi to loof for stubs the other layer/disk
