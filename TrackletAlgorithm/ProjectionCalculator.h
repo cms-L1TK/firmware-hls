@@ -68,10 +68,15 @@ template<
     const BXType bx,  
     BXType& bx_o,
     TrackletParameters const &tpar, int trackletIndex,
+    bool valid,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], 
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], 
     TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
   {
+
+    if (!valid) {
+      return;
+    }
 
   int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC); // TODO: unsure if this is okay
   const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, iTC>();
