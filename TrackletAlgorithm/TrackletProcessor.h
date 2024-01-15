@@ -790,8 +790,8 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   constexpr int iAllstub = (iTC / (numTPs / 4) );
 
   
-  const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
-  static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
+  //const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
+  //static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
 
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFinePhiSize;
 
