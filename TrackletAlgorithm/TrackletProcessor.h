@@ -762,7 +762,7 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
 > void
   TrackletProcessor(
 		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], 
-		    //const REGIONLUTTYPE regionlut[regionlutsize], 
+		    const REGIONLUTTYPE regionlut[regionlutsize], 
 const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]
   )
 {
@@ -800,8 +800,8 @@ const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const All
   constexpr int iAllstub = (iTC / (numTPs / 4) );
 
   
-  const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
-  static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
+  //const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
+  //static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
 
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFinePhiSize;
 
@@ -1193,15 +1193,15 @@ teunits[k].idle_;
       //If the lookupbits were rationally organized this would be much simpler
       ap_uint<2> nrbits = 3;
       ir = ((start & ((1 << (nrbits - 1)) - 1)) << 1) + (rzfinebinfirst >> (kNbitsrzbin - 1));
-      //useregion___ = regionlut[(useregindex,ir)];
-      useregion___ = regionLUT.lookup((useregindex,ir));
+      useregion___ = regionlut[(useregindex,ir)];
+      //useregion___ = regionLUT.lookup((useregindex,ir));
       //std::cout << "regionLUT: " <<  regionlut[(useregindex,ir)] << " " 
       //	<< regionLUT.lookup((useregindex,ir))<<std::endl;
       //assert(regionlut[(useregindex,ir)] == regionLUT.lookup((useregindex,ir)));
       }
     else{
-      //useregion___ = regionlut[useregindex];
-      useregion___ = regionLUT.lookup(useregindex);
+      useregion___ = regionlut[useregindex];
+      //useregion___ = regionLUT.lookup(useregindex);
       //assert(regionlut[useregindex] == regionLUT.lookup(useregindex));
     }
 
