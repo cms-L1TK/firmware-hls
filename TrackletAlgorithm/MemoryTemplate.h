@@ -105,7 +105,12 @@ public:
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
       //dataarray_[ibx][addr_index] = data;
+#ifdef __SYNTHESIS__
+      //The vhd memory implementation will write to the correct address!!
+      dataarray_[ibx][0] = data;
+#else
       dataarray_[ibx][nentries_[ibx]++] = data;
+#endif
 
       #ifdef CMSSW_GIT_HASH
       nentries_[ibx] = addr_index + 1;
