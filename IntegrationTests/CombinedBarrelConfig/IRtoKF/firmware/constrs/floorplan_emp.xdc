@@ -164,6 +164,11 @@ add_cells_to_pblock [get_pblocks pblock_IRsVMRs] [get_cells -quiet [list \
           payload/SectorProcessor_1/IR_negPS_2_B]]
 resize_pblock [get_pblocks pblock_IRsVMRs] -add {CLOCKREGION_X1Y12:CLOCKREGION_X6Y15}
 
+create_pblock pblock_KF
+add_cells_to_pblock [get_pblocks pblock_KF] [get_cells -quiet [list \
+          payload/kf_wrapper_1]]
+resize_pblock [get_pblocks pblock_KF] -add {CLOCKREGION_X0Y0:CLOCKREGION_X7Y3}
+
 create_pblock pblock_1
 resize_pblock [get_pblocks pblock_1] -add {CLOCKREGION_X0Y12:CLOCKREGION_X0Y15}
 #set_property EXCLUDE_PLACEMENT 1 [get_pblocks pblock_1]

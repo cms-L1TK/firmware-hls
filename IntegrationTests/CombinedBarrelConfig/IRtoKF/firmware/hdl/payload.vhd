@@ -170,8 +170,8 @@ begin  -- architecture rtl
        out_dout   => s_tfout
        );
 
-  q(120)        <= s_tfout(0);
-  q(121)        <= s_tfout(1);
+  q(108)        <= s_tfout(0);
+  q(109)        <= s_tfout(1);
   --q(120).strobe <= '1';
   --q(121).strobe <= '1';
 
