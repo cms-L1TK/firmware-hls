@@ -50,10 +50,10 @@ package emp_project_decl is
     24     => (gty25, buf, no_fmt, no_buf, no_mgt),
     25     => (gty25, buf, no_fmt, no_buf, no_mgt),
     26     => (gty25, buf, no_fmt, no_buf, no_mgt),
-    27     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
+    27     => (no_mgt, no_buf, no_fmt, buf, gty25),
     28     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
     29     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
-    30     => (no_mgt, no_buf, no_fmt, buf, no_mgt),
+    30     => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),
     31     => kDummyRegion,                             --service/tcds
     others => kDummyRegion
     );
