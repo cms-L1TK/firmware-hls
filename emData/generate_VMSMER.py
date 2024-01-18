@@ -114,6 +114,7 @@ def writeTopFile(vmr, output_dir):
     # Write the top function
     top_file.write(
         "#include \"" + file_name + ".h\"\n\n" +\
+        '#define IS_BARREL ' + ('true' if disk == 0 else 'false') + "\n"
         "// VMStubMERouter Top Function\n"
         "// Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs). By writing VMStubME memories.\n"
         "\n"

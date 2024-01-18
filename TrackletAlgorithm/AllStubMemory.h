@@ -80,16 +80,8 @@ template<>
 class AllStubBase<DISK> {
 public:
    enum BitWidths {
-    // Bit size for AllStubMemory fields
-    kASBendSize = 3,
-    kASAlphaSize = 0,
-    kASPhiSize = 14,
-    kASZSize = 7,
-    kASRSize = 11,
-    kASNegDiskSize = 1,
-    // Bit size for full AllStubMemory
-    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize + kASNegDiskSize
-  };
+     kAllStubSize = AllStubBase<DISKPS>::kAllStubSize
+   };
 };
 
 
@@ -250,29 +242,7 @@ class AllStub<6> : public AllStubBase<DISK> // Can't generate cosim files if All
 {
   static_assert(DISK == 6, "DISK is assumed to be 6 in this class specialization.");
 public:
-enum BitLocations {
-    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubMemory word for different fields
-    kASBendLSB = 0,
-    kASBendMSB = kASBendLSB + AllStubBase<DISKPS>::kASBendSize - 1,
-    kASAlphaLSB = kASBendMSB + 1,
-    kASAlphaMSB = kASAlphaLSB + AllStubBase<DISKPS>::kASAlphaSize - 1,
-    kASPhiLSB = kASAlphaMSB + 1,
-    kASPhiMSB = kASPhiLSB + AllStubBase<DISKPS>::kASPhiSize - 1,
-    kASZLSB = kASPhiMSB + 1,
-    kASZMSB = kASZLSB + AllStubBase<DISKPS>::kASZSize - 1,
-    kASRLSB = kASZMSB + 1,
-    kASRMSB = kASRLSB + AllStubBase<DISKPS>::kASRSize - 1, 
-    kASNDLSB = kASRMSB + 1, 
-    kASNDMSB = kASNDLSB + AllStubBase<DISKPS>::kASNegDiskSize - 1
-  };
-  
-  typedef ap_uint<AllStubBase<DISKPS>::kASNegDiskSize> ASND;
-  typedef ap_int<AllStubBase<DISKPS>::kASRSize> ASR;
-  typedef ap_int<AllStubBase<DISKPS>::kASZSize> ASZ;
-  typedef ap_uint<AllStubBase<DISKPS>::kASPhiSize> ASPHI;
-  typedef ap_int<AllStubBase<DISKPS>::kASAlphaSize> ASALPHA;
-  typedef ap_uint<AllStubBase<DISKPS>::kASBendSize> ASBEND;
-  typedef ap_uint<AllStubBase<DISKPS>::kAllStubSize> AllStubData;
+  typedef ap_uint<AllStubBase<DISK>::kAllStubSize> AllStubData;
 
   AllStub(const AllStubData& newdata):
     data_(newdata)
@@ -293,30 +263,6 @@ enum BitLocations {
   static constexpr int getWidth() {return AllStubBase<DISK>::kAllStubSize;}
 
   AllStubData raw() const {return data_;}
-
-  ASND getND() const {
-    return (data_.range(kASNDMSB, kASNDLSB));
-  }
-
-  ASR getR() const {
-    return (data_.range(kASRMSB,kASRLSB)); // + (1 << 8));
-  }
-
-  ASZ getZ() const {
-    return data_.range(kASZMSB,kASZLSB);
-  }
-
-  ASPHI getPhi() const {
-    return data_.range(kASPhiMSB,kASPhiLSB);
-  }
-
-  ASBEND getBend() const {
-    return data_.range(kASBendMSB,kASBendLSB);
-  }
-
-  bool isPSStub() const {
-    return 0;
-  }
 
 private:
 

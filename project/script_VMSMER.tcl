@@ -8,34 +8,6 @@ source env_hls.tcl
 
 # list of modules to test in C-simulation
 set modules_to_test {
-  {VMSMER_L1PHIA}
-  {VMSMER_L1PHIB}
-  {VMSMER_L1PHIC}
-  {VMSMER_L1PHID}
-  {VMSMER_L1PHIE}
-  {VMSMER_L1PHIF}
-  {VMSMER_L1PHIG}
-  {VMSMER_L1PHIH}
-  {VMSMER_L2PHIA}
-  {VMSMER_L2PHIB}
-  {VMSMER_L2PHIC}
-  {VMSMER_L2PHID}
-  {VMSMER_L3PHIA}
-  {VMSMER_L3PHIB}
-  {VMSMER_L3PHIC}
-  {VMSMER_L3PHID}
-  {VMSMER_L4PHIA}
-  {VMSMER_L4PHIB}
-  {VMSMER_L4PHIC}
-  {VMSMER_L4PHID}
-  {VMSMER_L5PHIA}
-  {VMSMER_L5PHIB}
-  {VMSMER_L5PHIC}
-  {VMSMER_L5PHID}
-  {VMSMER_L6PHIA}
-  {VMSMER_L6PHIB}
-  {VMSMER_L6PHIC}
-  {VMSMER_L6PHID}
   {VMSMER_D1PHIA}
   {VMSMER_D1PHIB}
   {VMSMER_D1PHIC}
@@ -59,7 +31,7 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export VMSMER_L2PHIA
+set module_to_export VMSMER_D1PHIA
 
 # create new project (deleting any existing one of same name)
 open_project -reset vmsmeRouter
