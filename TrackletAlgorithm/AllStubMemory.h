@@ -271,7 +271,7 @@ private:
 };
 
 template<>
-class AllStub<4> : public AllStubBase<DISKPS> // Can't generate cosim files if AllStub<DISK> for some reason...
+class AllStub<4> : public AllStubBase<DISKPS> // Defining separate methods for DISKPS due to new 'getND (negative disk)' method and 
 {
   static_assert(DISKPS == 4, "DISKPS is assumed to be 6 in this class specialization.");
 public:
@@ -292,7 +292,7 @@ public:
   };
   
   typedef ap_uint<AllStubBase<DISKPS>::kASNegDiskSize> ASND;
-  typedef ap_int<AllStubBase<DISKPS>::kASRSize> ASR;
+  typedef ap_uint<AllStubBase<DISKPS>::kASRSize + 1> ASR; // adding bit for bit reused into 'negDisk', to allow for addition of 256 to be defined within AllStub<DISKPS> getR() method 
   typedef ap_int<AllStubBase<DISKPS>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<DISKPS>::kASPhiSize> ASPHI;
   typedef ap_int<AllStubBase<DISKPS>::kASAlphaSize> ASALPHA;
@@ -330,7 +330,7 @@ public:
   }
 
   ASR getR() const {
-    return (data_.range(kASRMSB,kASRLSB)); // + (1 << 8));
+    return (data_.range(kASRMSB,kASRLSB) + (1 << 8)); // adding 256 for DISKPS stubs since when memories are written 256 was subtracted from the r value (to save an extra bit to determine if in the negative z side of detector)
   }
 
   ASZ getZ() const {

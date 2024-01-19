@@ -34,8 +34,8 @@ constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 // Returns the bits of phi corresponding to finephi, i.e. phi regions within a VM
 // vmbits is the number of bits for the VMs, i.e. coarse phi region. E.g. 32 VMs would use vmbits=5
 // finebits is the number of bits within the VM
-template<regionType InType>
-inline int iphivmFineBins(const typename AllStub<InType>::ASPHI phi, const int vmbits, const int finebits) {
+template<regionType inType>
+inline int iphivmFineBins(const typename AllStub<inType>::ASPHI phi, const int vmbits, const int finebits) {
 
 	auto finebin = (phi.range(phi.length() - vmbits - 1, phi.length() - vmbits - finebits));
 
@@ -44,13 +44,13 @@ inline int iphivmFineBins(const typename AllStub<InType>::ASPHI phi, const int v
 
 // Get the corrected phi, i.e. phi at the average radius of the barrel
 // Corrected phi is used by ME memories in the barrel
-template<regionType inOutType>
-inline typename AllStub<inOutType>::ASPHI getPhiCorr(
-		const typename AllStub<inOutType>::ASPHI phi,
-		const typename AllStub<inOutType>::ASR r,
-		const typename AllStub<inOutType>::ASBEND bend, const int phiCorrTable[]) {
+template<regionType inType>
+inline typename AllStub<inType>::ASPHI getPhiCorr(
+		const typename AllStub<inType>::ASPHI phi,
+		const typename AllStub<inType>::ASR r,
+		const typename AllStub<inType>::ASBEND bend, const int phiCorrTable[]) {
 
-	if (inOutType == DISKPS || inOutType == DISK2S) return phi; // Do nothing if disks
+	if (inType == DISKPS || inType == DISK2S) return phi; // Do nothing if disks
 
 	constexpr auto nrbins = 1 << kNbitsrzbin; // The number of bins for r
 
@@ -68,34 +68,20 @@ inline typename AllStub<inOutType>::ASPHI getPhiCorr(
 }
 
 // Returns a ME stub with all the values set
-template<class T, regionType InType, regionType OutType, int layer, int disk>
-inline T createVMStubME(AllStub<InType> allstub,
+template<class T, regionType inType, int layer, int disk>
+inline T createVMStubME(AllStub<inType> allstub,
 		const int index, bool negDisk, const int lutTable[],
 		const int phiCorrTable[], int& slot) {
 	// The stub that is going to be returned
 	T stub;
 	// Values from Input AllStub
-	std::cout << "allstub.raw() : " << std::hex << allstub.raw() << "\n";
-
 	auto z = allstub.getZ();
-	//ap_uint<AllStubBase<InType>::kASRSize> r = allstub.getR();
-	ap_uint<12> r = allstub.getR();
-	std::cout << "ispsstub: " << std::dec << allstub.isPSStub() << "\n";
-	std::cout << "r before: " << r << "\n";
-	if (allstub.isPSStub() && disk) {
-		if (r > 2500) r -= 2048;
-		r += 256; 
-	}
-	
-	std::cout << "r after: " <<  r << "\n";
+	typename AllStub<inType>::ASR r = allstub.getR(); // reading in as ap_uint<12> to prevent exceeding '2048' limit for ap_uint<11>, which will be the size when using 'auto' 
 	auto bend = allstub.getBend();
 	auto phi = allstub.getPhi();
-	auto phicorr = getPhiCorr<InType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
+	auto phicorr = getPhiCorr<inType>(phi, r, bend, phiCorrTable); // Corrected phi, i.e. phi at nominal radius
 
 	int nbitsr = r.length(); // Number of bits for r
-	if (InType != DISKPS){
-		nbitsr = 7; // needed to get correct index for LUT 
-	}
 
 	int nbitsz = z.length(); // Number of bits for z
 	int nbitsfinerz = stub.getFineZ().length(); // Number of bits for finer/z
@@ -113,7 +99,7 @@ inline T createVMStubME(AllStub<InType> allstub,
 	// Set values to VMStub
 	stub.setBend(bend);
 	stub.setIndex(index);
-	stub.setFinePhi(iphivmFineBins<InType>(phicorr, nbitsall + vmbits, nbitsfinephi));
+	stub.setFinePhi(iphivmFineBins<inType>(phicorr, nbitsall + vmbits, nbitsfinephi));
 
 	// Indices used to find the rzfine value in LUT table
 	// LUT table returns the top 6 bits of a corrected z
@@ -128,7 +114,7 @@ inline T createVMStubME(AllStub<InType> allstub,
 			indexz = (1 << nbitsztable) -1 - indexz;
 		}
 		indexr = r;
-		if (InType == DISKPS) {
+		if (inType == DISKPS) {
 			indexr = r >> (nbitsr - nbitsrtable); // Take the top "nbitsrtable" bits
 		}
 	} else { // layer
@@ -154,24 +140,23 @@ inline T createVMStubME(AllStub<InType> allstub,
 	stub.setFineZ(rzfine);
 
 	assert(rzfine >= 0);
-	std::cout << "vmstub raw: " << std::hex << stub.raw() << "\n";
 	return stub;
 };
 
 /////////////////////////////////
 // Main function
 
-// inOutType will be BARRELPS, BARREL2S, or DISK (since both DISKPS and DISK2S stubs contained in each AllStub memory)
-// and VMStubME memories are also written out as DISK so need only one region type template parameter
-template<int layer, int disk, regionType inOutType, int rzSizeME, int phiRegSize>
+// inType will be BARRELPS, BARREL2S, or DISKPS (since methods not defined for 'DISK' AllStubs, despite both DISKPS and 2S contained in each memory)
+// and outType will be BARRELPS, BARREL2S, or DISK (since both DISKPS and 2S contained in each VMStubME memory)
+template<int layer, int disk, regionType inType, regionType outType, int rzSizeME, int phiRegSize>
 void VMSMERouter(const BXType bx, BXType& bx_o,
 		// LUTs
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStubMemory<inOutType> allstub,
+		AllStubMemory<inType> allstub,
 		// ME memories
-		VMStubMEMemoryCM<inOutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME) {
+		VMStubMEMemoryCM<outType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME) {
 
 #pragma HLS inline
 //#pragma HLS array_partition variable=memoriesAS complete dim=1
@@ -198,7 +183,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		bool disk2S = false; // Used to determine if DISK2S
 		bool negDisk = false; // Used to determine if stub is in negative or positive Z region of detector
 
-		AllStub<inOutType>       stub = allstub.read_mem(bx,read_addr); // read stubs, and if disk cast from DISK to DISKPS/2S
+		AllStub<inType>       stub = allstub.read_mem(bx,read_addr); // read stubs, and if disk cast from DISK to DISKPS/2S
 		AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(stub.raw());
 		AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(stub.raw());
 		
@@ -208,26 +193,17 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 			if (disk2S) negDisk = stub_2s.getND();
 			else negDisk = stub_ps.getND();
 		}
-		
-		
-
 
 		// Increment the read address
 		++read_addr;
-
 		/////////////////////////////////////////////
 		// ME memories
-
 		int slotME; // The bin the stub is going to be put in, in the memory
 		// Create the ME stub to save
-		VMStubMECM<inOutType> stubME = (disk2S) ? 
-				createVMStubME<VMStubMECM<inOutType>, DISK2S, inOutType, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
-				createVMStubME<VMStubMECM<inOutType>, DISKPS, inOutType, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
-		#if IS_BARREL		
-			createVMStubME<VMStubMECM<inOutType>, inOutType, inOutType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
-		#else 	
-			createVMStubME<VMStubMECM<inOutType>, DISKPS, inOutType, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME);
-		#endif	
+		VMStubMECM<outType> stubME = (disk2S) ? 
+				createVMStubME<VMStubMECM<outType>, DISK2S, layer, disk>(stub_2s, i, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
+				createVMStubME<VMStubMECM<outType>, DISKPS, layer, disk>(stub_ps, i, negDisk, METable, phiCorrTable, slotME) : 
+				createVMStubME<VMStubMECM<outType>, inType, layer, disk>(stub, i, negDisk, METable, phiCorrTable, slotME);
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
 		addrCountME[slotME] += 1;

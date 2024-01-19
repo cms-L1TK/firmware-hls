@@ -45,10 +45,10 @@ int main() {
   // Declare memories
 
   // Input memories
-  static AllStubMemory<inOutType> memoriesAS;
+  static AllStubMemory<inType> memoriesAS;
 
   // Output memories
-  static VMStubMEMemoryCM<inOutType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
+  static VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
 
   ///////////////////////////
   // Loop over events
@@ -84,7 +84,7 @@ int main() {
 
     // ME memories
     std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << "\n";
-    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<inOutType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
+    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
     
     // Clear input memories
     memoriesAS.clear();

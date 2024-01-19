@@ -74,7 +74,8 @@ def writeTopHeader(vmr, output_dir):
         "constexpr TF::phiRegion phiRegion = TF::" + phi_region+ "; // Which AllStub/PhiRegion\n"
         "\n"
         "constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);\n"
-        "constexpr regionType inOutType = (kDISK ==0) ? getInputType<layerdisk>() : DISK;\n"
+        "constexpr regionType inType = (kDISK ==0) ? getInputType<layerdisk>() : DISKPS;\n"
+        "constexpr regionType outType = (kDISK ==0) ? getInputType<layerdisk>() : DISK;\n"
         "// Number of bits for the RZ bins \n"
         "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
         "\n\n"
@@ -87,9 +88,9 @@ def writeTopHeader(vmr, output_dir):
         "\n"
         "void %s(const BXType bx, BXType& bx_o,\n" % file_name +\
         "  // Input memories\n"
-        "  AllStubMemory<inOutType> memoriesAS,\n"
+        "  AllStubMemory<inType> memoriesAS,\n"
         "  // Output memories\n"
-        "  VMStubMEMemoryCM<inOutType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME"
+        "  VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME"
         "  );\n"
         "\n"
         "#endif // TopFunctions_%s_h\n" % file_name
@@ -114,16 +115,15 @@ def writeTopFile(vmr, output_dir):
     # Write the top function
     top_file.write(
         "#include \"" + file_name + ".h\"\n\n" +\
-        '#define IS_BARREL ' + ('true' if disk == 0 else 'false') + "\n"
         "// VMStubMERouter Top Function\n"
         "// Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs). By writing VMStubME memories.\n"
         "\n"
         "void %s(\n" % file_name +\
         "  const BXType bx, BXType& bx_o,\n"
         "  // Input memories\n"
-        "  AllStubMemory<inOutType> memoriesAS,\n"
+        "  AllStubMemory<inType> memoriesAS,\n"
         "  // Output memories\n"
-        "  VMStubMEMemoryCM<inOutType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME"
+        "  VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME"
         "  ) {\n"
         "\n"
         "// Takes 2 clock cycles before one gets data, used at high frequencies\n"
@@ -148,7 +148,7 @@ def writeTopFile(vmr, output_dir):
         "  /////////////////////////\n"
         "  // Main function\n"
         "\n"
-        "  VMSMERouter<kLAYER, kDISK, inOutType, kNbitsrzbinME, kNbitsphibin>(\n"
+        "  VMSMERouter<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin>(\n"
         "    bx, bx_o,\n"
         "    // LUTs\n"
         "    METable,\n"
