@@ -55,7 +55,7 @@ begin  -- architecture rtl
     signal s_track_reset   : std_logic;
     signal s_track_wr_en   : std_logic;
     signal s_rd_en         : std_logic;
-    signal s_wc            : unsigned(1 downto 0);
+    signal s_wc            : unsigned(1 downto 0) := "00";
     signal s_track_tmp_32  : std_logic_vector(31 downto 0);
     signal s_track_tmp_64  : std_logic_vector(63 downto 0);
     signal s_track         : std_logic_vector(LWORD_WIDTH - 1 downto 0);
@@ -64,7 +64,7 @@ begin  -- architecture rtl
     signal s_read_addr     : integer range 0 to 127;
 
     type mem_extendable is array(0 to 127) of std_logic_vector(widthTTTrack - 1 downto 0);
-    signal ram                 : mem_extendable;
+    signal ram                 : mem_extendable := (others => (others => '0'));
     attribute ram_style        : string;
     attribute ram_style of ram : signal is "block";
 

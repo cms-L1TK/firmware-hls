@@ -33,6 +33,7 @@ use work.emp_ttc_decl.all;
 -- emp US
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
+use work.memUtil_aux_pkg.all;
 
 entity linktosecproc is
   port (
@@ -56,6 +57,7 @@ architecture rtl of linktosecproc is
   signal s_ir_start      : std_logic;
   signal s_ir_start_srff : std_logic;
   signal s_din_d         : ldata(4 * N_REGION - 1 downto 0);
+  signal s_din_dd        : ldata(4 * N_REGION - 1 downto 0);
 
 begin  -- architecture rtl
 
@@ -76,11 +78,13 @@ begin  -- architecture rtl
   --     in_dout  => s_tracklet_data
   --     );
 
-  GEN_DELAYED_DATA: for i in 0 to 14 generate
+  GEN_DELAYED_DATA: for i in 68 to 76 generate
     p_delay_data: process (clk_i) is
     begin  -- process p_delay_data
       if rising_edge(clk_i) then     -- rising clock edge
         s_din_d(i).data <= din_i(i).data;
+        s_din_dd(i).data <= s_din_d(i).data;
+        s_din_d(i).valid <= din_i(i).valid;
       end if;
     end process p_delay_data;
   end generate GEN_DELAYED_DATA;
@@ -88,15 +92,15 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   -- Connect input link data to IR in Sector Processor
   -----------------------------------------------------------------------------
-  DL_39_link_AV_DOUT(PS10G_1_A) <= s_din_d(0).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_A) <= s_din_d(1).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_d(2).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_d(3).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_d(4).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_d(5).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_d(6).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_d(7).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_d(8).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_A) <= s_din_dd(68).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_A) <= s_din_dd(69).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_A) <= s_din_dd(70).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_A)    <= s_din_dd(71).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_A)    <= s_din_dd(72).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_A)  <= s_din_dd(73).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_A)  <= s_din_dd(74).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_A)  <= s_din_dd(75).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_A)  <= s_din_dd(76).data(38 downto 0);
 
   -----------------------------------------------------------------------------
   -- Generate start signal
@@ -104,13 +108,13 @@ begin  -- architecture rtl
   set_reset_ffd_1 : entity work.set_reset_ffd
     port map (
       clk_i   => clk_i,
-      set_i   => din_i(0).valid,
+      set_i   => s_din_d(68).valid,
       reset_i => rst_i,
       q_o     => s_ir_start_srff
       );
 
 
-  s_ir_start <= din_i(0).valid or s_ir_start_srff;
+  s_ir_start <= s_din_d(68).valid or s_ir_start_srff;
   ir_start_o <= s_ir_start;
 
   p_bx_count : process (clk_i) is
