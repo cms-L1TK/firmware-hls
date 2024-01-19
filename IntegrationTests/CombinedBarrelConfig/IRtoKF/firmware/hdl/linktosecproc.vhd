@@ -33,6 +33,7 @@ use work.emp_ttc_decl.all;
 -- emp US
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
+use work.memUtil_aux_pkg.all;
 
 entity linktosecproc is
   port (

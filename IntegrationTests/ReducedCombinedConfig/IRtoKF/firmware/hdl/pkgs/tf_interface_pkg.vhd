@@ -44,10 +44,10 @@ package body tf_interface_pkg is
     variable s : t_packets(numLinksTFP - 1 downto 0);
   begin
     for k in s'range loop
-      s(k).valid          := l(k).valid;
-      s(k).start_of_orbit := l(k).start_of_orbit;
-      s(k).start          := l(k).start;
-      s(k).last           := l(k).last;
+      s(k).valid          := l(k+68).valid;
+      s(k).start_of_orbit := l(k+68).start_of_orbit;
+      s(k).start          := l(k+68).start;
+      s(k).last           := l(k+68).last;
     end loop;
     return s;
   end;

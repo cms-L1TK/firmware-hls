@@ -5,7 +5,9 @@ src --vhdl2008 SectorProcessor.vhd
 src tf_to_kf.vhd
 src pkgs/tf_interface_pkg.vhd
 src kf_wrapper.vhd
+src tf_wrapper.vhd
 src memUtil_pkg.vhd
+src memUtil_aux_pkg.vhd
 src pkgs/GCU_utils.vhd
 
 src common/hdl/CreateStartSignal.vhd
