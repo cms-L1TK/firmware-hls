@@ -19,7 +19,7 @@ def parseArguments():
 
 # Files in order in which they are referred to in memUtil_pkg.vhd.
 # with key being channel number.
-channel_names = ["PS10G_1_A", "PS10G_2_A", "PS10G_3_A", "PS_1_A", "PS_2_A", , "2S_1_A", "2S_2_A", "2S_3_A", "2S_4_A"]
+channel_names = ["PS10G_1_A", "PS10G_2_A", "PS10G_3_A", "PS_1_A", "PS_2_A", "2S_1_A", "2S_2_A", "2S_3_A", "2S_4_A"]
 channel_numbers = [68, 69, 70, 71, 72, 73, 74, 75, 76]
 
 mapping = {}
