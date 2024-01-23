@@ -133,7 +133,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    BXType &bx_o,\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::TrackWord trackWord[],\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::BarrelStubWord barrelStubWords[][kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[][kMaxProc]\n"
+            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[][kMaxProc],\n"
+            "    bool &done\n"
             ");\n"
         )
 
@@ -182,7 +183,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    BXType &bx_o,\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::TrackWord trackWord[kMaxProc],\n"
             "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::BarrelStubWord barrelStubWords[" + str(nBarrelStubs) + "][kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[" + str(nDiskStubs) + "][kMaxProc]\n"
+            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[" + str(nDiskStubs) + "][kMaxProc],\n"
+            "    bool &done\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
             "#pragma HLS array_partition variable=trackletParameters complete dim=1\n"
@@ -202,6 +204,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=trackWord depth=1 dim=1\n"
             "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
+            "#pragma HLS interface register port=done\n"
             "\n"
             "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparOffset) + ">(\n"
             "    bx,\n"
@@ -211,7 +214,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    bx_o,\n"
             "    trackWord,\n"
             "    barrelStubWords,\n"
-            "    diskStubWords\n"
+            "    diskStubWords,\n"
+            "    done\n"
             "  );\n"
             "}\n"
         )
