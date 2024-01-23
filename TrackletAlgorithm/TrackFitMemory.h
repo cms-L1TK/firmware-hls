@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // TrackFitBase is where we define the bit widths.
 template<int NBarrelStubs, int NDiskStubs>

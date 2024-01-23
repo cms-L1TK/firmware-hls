@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // AllStubInnerBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubInnerBase {};
