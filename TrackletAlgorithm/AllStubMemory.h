@@ -199,11 +199,19 @@ public:
 
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getR());
-    str += "|"+decodeToBits(getZ());
-    str += "|"+decodeToBits(getPhi());
-    str += "|"+decodeToBits(getBend());
-    return str;
+      std::string str = decodeToBits(getR());
+      str += "|"+decodeToBits(getZ());
+      str += "|"+decodeToBits(getPhi());
+      str += "|"+decodeToBits(getBend());
+      return str;
+  }
+  std::string getBitStrDisk2S() const {
+      std::string str = decodeToBits(getR());
+      str += "|"+decodeToBits(getZ());
+      str += "|"+decodeToBits(getPhi());
+      str += "|"+decodeToBits(getAlpha());
+      str += "|"+decodeToBits(getBend());
+      return str;
   }
 #endif
 
