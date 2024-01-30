@@ -58,26 +58,37 @@ int main() {
   // Error count
   int err = 0;
 
+  
   for (unsigned int ievt = 0; ievt < nEvents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     // Clear output memories
     memoryME.clear();
 
+    //Create variables that keep track of which memory address to read and write to
+	  ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
+#pragma HLS array_partition variable=addrCountME complete dim=0
+    for (int i = 0; i < 1 << (kNbitsrzbinME + kNbitsphibin); i++) {
+#pragma HLS unroll
+		  addrCountME[i] = 0;
+	  }
+
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
-    for (int i = 0; i < memoriesAS.getEntries(ievt); ++i){
-      std::cout << "AS RAW: " << std::hex << memoriesAS.read_mem(ievt, i).raw() << "\n";
-    }
+    for (int index = 0; index < memoriesAS.getEntries(ievt); ++index){
+    std::cout << "AS Raw: " << std::hex << memoriesAS.read_mem(ievt, index).raw() << "\n";
     // bx - bunch crossing
     BXType bx = ievt;
     BXType bx_out;
-
+    AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
     // Unit Under Test
     TOP_FUNC_(bx, bx_out, 
-              memoriesAS, 
-              &memoryME);
-
+              allStub, 
+              &memoryME,
+              index,
+              addrCountME);
+    //if (allStub.raw() == 0) continue;
+    }
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect
     bool truncation = false;
@@ -85,9 +96,6 @@ int main() {
     // ME memories
     std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << "\n";
     err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
-    
-    // Clear input memories
-    memoriesAS.clear();
 
   } // End of event loop
 
