@@ -4,7 +4,8 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 
-// Data object definition
+// Memory written by the TrackletProcessor, containing the helix parameters of the tracklet seed.
+
 class TrackletParameters
 {
 public:
