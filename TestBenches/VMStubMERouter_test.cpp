@@ -49,7 +49,7 @@ int main() {
 
   // Output memories
   static VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
-  static AllStubMemory<inType> memoriesASCopy;
+  static AllStubMemory<outType> memoriesASCopy;
 
   ///////////////////////////
   // Loop over events
