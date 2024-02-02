@@ -3,7 +3,11 @@ set -e
 
 #### generated with commit 6e61462 ####
 # Combined modules
+<<<<<<< HEAD
 memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240310.tgz"
+=======
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
+>>>>>>> 385dfad (Update the MemPrints files as the doMultupleMatches was not set false in the earlier version)
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
