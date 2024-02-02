@@ -3,16 +3,16 @@ set -e
 
 #### fw_synch_231205 ####
 # Combined modules
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_231208.tgz"
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240121.tgz"
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"
 # Reduced Combined modules2
-memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced2_240121.tgz"
+memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced2_240202.tgz"
 luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CMReduced2_240121.tgz"
 # Combined barrel
-memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_Barrel_240121.tgz"
+memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_Barrel_240202.tgz"
 luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_Barrel_240121.tgz"
 
 # Function that prints information regarding the usage of this command
