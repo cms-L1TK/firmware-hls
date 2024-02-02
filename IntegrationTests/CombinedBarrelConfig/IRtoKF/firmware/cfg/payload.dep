@@ -1,6 +1,5 @@
 src payload.vhd
 src linktosecproc.vhd
-src secproctolink.vhd
 src --vhdl2008 SectorProcessor.vhd
 src tf_to_kf.vhd
 src pkgs/tf_interface_pkg.vhd
