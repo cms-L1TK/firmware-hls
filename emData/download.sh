@@ -10,8 +10,8 @@ memprints_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/4jZdh
 luts_url_reduced="https://cernbox.cern.ch/remote.php/dav/public-files/mcGz25JNu19Oqzm/LUTs.tar.gz"
 # Combined modules
 # Updated files from Jason for TP disk with extra sign bit for disks in AllInnerStubs memories. This is in cmssw PR #230
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_231208.tgz"
-luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240127.tgz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_240127.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/g0EIkgWgie5mBob/MemPrints.tar.gz"
 luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HT8q7fk4UvhpdPK/LUTs.tar.gz"
@@ -78,31 +78,31 @@ fi
 
 if [ ! -d "LUTs" ]
 then
-  wget -O LUTs.tgz --quiet ${luts_url_reduced}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_reduced}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsReduced
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_barrel}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_barrel}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsBarrel
 
-  wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_reducedcm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm2}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_cm2}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cmbarrel}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_cmbarrel}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
-  wget -O LUTs.tar.gz --quiet ${luts_url}
+  wget --no-check-certificate -O LUTs.tar.gz --quiet ${luts_url}
   tar -xzmf LUTs.tar.gz
   rm -f LUTs.tar.gz
 fi
@@ -172,9 +172,9 @@ git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 # Should these be auto generated? 
-cp ../LUTsCM/wires.dat reducedcm_wires.dat
-cp ../LUTsCM/processingmodules.dat reducedcm_processingmodules.dat
-cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
+cp ../LUTsCMReduced/wires.dat reducedcm_wires.dat
+cp ../LUTsCMReduced/processingmodules.dat reducedcm_processingmodules.dat
+cp ../LUTsCMReduced/memorymodules.dat reducedcm_memorymodules.dat
 cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
 cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
 cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
@@ -182,14 +182,14 @@ cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
 cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
 cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
 
-./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
-cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
-mv wires.dat reducedcm2_wires.dat
-mv memorymodules.dat reducedcm2_memorymodules.dat
-mv processingmodules.dat reducedcm2_processingmodules.dat
-cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
-./makeReducedConfig.py --no-graph
-./makeBarrelConfig.py
+#./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
+#cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
+#mv wires.dat reducedcm2_wires.dat
+#mv memorymodules.dat reducedcm2_memorymodules.dat
+#mv processingmodules.dat reducedcm2_processingmodules.dat
+#cp -fv ../LUTs/wires.dat ../LUTs/memorymodules.dat ../LUTs/processingmodules.dat ./
+#./makeReducedConfig.py --no-graph
+#./makeBarrelConfig.py
 ### IRVMR
 echo "IRVMR"
 ./generator_hdl.py ../../ --no_graph --uut VMR_L2PHIA -u 1 -d 0
@@ -226,7 +226,7 @@ mkdir -p ../../IntegrationTests/ReducedConfig/MCTB/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedConfig/MCTB/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedConfig/MCTB/tb/
 ### Barrel IRtoTB
-echo "Barrel ITtoTB"
+echo "Barrel IRtoTB"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 7 -w barrel_wires.dat -p barrel_processingmodules.dat -m barrel_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/BarrelConfig/IRtoTB/{hdl,tb}
@@ -261,36 +261,36 @@ cd ../
 if [[ $tables_only == 0 ]]
 then
   # Get memory test data: download and unpack the tarball.
-  wget -O MemPrints.tgz --quiet ${memprints_url_reduced}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reduced}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReduced
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_barrel}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_barrel}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsBarrel
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM2
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCMBarrel
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cm}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCM
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tar.gz --quiet ${memprints_url}
+  wget --no-check-certificate -O MemPrints.tar.gz --quiet ${memprints_url}
   tar -xzmf MemPrints.tar.gz
   rm -f MemPrints.tar.gz
 

@@ -19,14 +19,14 @@
   #define TOP_FUNC_ MatchProcessor_L3PHIC
 #endif
 
-const int nevents = 100;  //number of events to run
+const int nevents = 1;  //number of events to run
 
 using namespace std;
 
 int main()
 {
   // Define memory patterns
-  const string trackletProjectionPattern = "TrackletProjections*";
+  const string trackletProjectionPattern = "TrackletProjections_MPROJ*";
   const string allStubPatternarray = "AllStub*";
   const string vmStubPatternarray = "VMStubs_VMSME*";
   const string fullMatchPattern = "FullMatches*";
