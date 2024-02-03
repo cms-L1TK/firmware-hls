@@ -193,7 +193,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
 
 
 
-std::string return_splitted(std::string data_string, const int bit_widths[], 
+inline std::string return_splitted(std::string data_string, const int bit_widths[], 
                             const std::string names[], const int num_splits,
                             int start_index=0)
 {

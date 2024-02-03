@@ -123,9 +123,9 @@ git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 # Should these be auto generated? 
-cp ../LUTsCM/wires.dat reducedcm_wires.dat
-cp ../LUTsCM/processingmodules.dat reducedcm_processingmodules.dat
-cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
+cp ../LUTsCMReduced/wires.dat reducedcm_wires.dat
+cp ../LUTsCMReduced/processingmodules.dat reducedcm_processingmodules.dat
+cp ../LUTsCMReduced/memorymodules.dat reducedcm_memorymodules.dat
 cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
 cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
 cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
