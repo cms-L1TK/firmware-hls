@@ -80,7 +80,7 @@ with open(arguments.wiresFileName) as wiresFile:
         line = line.rstrip()
         mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
         memName = line.split()[0]
-        if memName.startswith("TPROJ_"):
+        if memName.startswith("MPROJ_"):
             if mpName not in TPMems:
                 TPMems[mpName] = []
             TPMems[mpName].append(memName)

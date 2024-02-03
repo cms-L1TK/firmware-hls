@@ -31,6 +31,7 @@ namespace PR
     for(int i = 0; i < nMEM; ++i) {
 #pragma HLS unroll
       ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
+      std::cout << "i num : " << i << " " << num << std::endl;
       nentries[i] = num;
       //if (num > 0) mem_hasdata.set(i);
       mem_hasdata[i] = (num > 0); //can't use if statement with rewind

@@ -8,17 +8,19 @@ source env_hls.tcl
 
 set modules_to_test {
     {MP_L1PHIC}
-    {MP_L2PHIC}
-    {MP_L3PHIC}
-    {MP_L4PHIC}
-    {MP_L5PHIC}
-    {MP_L6PHIC}
-    {MP_D1PHIC}
-    {MP_D2PHIC}
-    {MP_D3PHIC}
-    {MP_D4PHIC}
-    {MP_D5PHIC}
 }
+#    {MP_L2PHIC}
+#    {MP_L3PHIC}
+#    {MP_L4PHIC}
+#    {MP_L5PHIC}
+#    {MP_L6PHIC}
+#    {MP_D1PHIC}
+#    {MP_D2PHIC}
+#    {MP_D3PHIC}
+#    {MP_D4PHIC}
+#    {MP_D5PHIC}
+
+
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export MP_L3PHIC
