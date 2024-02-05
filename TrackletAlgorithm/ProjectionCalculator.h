@@ -163,7 +163,7 @@ template<
 
       const TrackletProjection<DISK> tproj_D1(TCID, trackletIndex, iphi_D1, ir_D1, ider_phiD, ider_rD);
       bool validD1 = ir_D1 >= irmindisk && ir_D1 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL6;
-      
+
       const TrackletProjection<DISK> tproj_D2(TCID, trackletIndex, iphi_D2, ir_D2, ider_phiD, ider_rD);
       bool validD2 = ir_D2 >= irmindisk && ir_D2 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL5;
 
