@@ -78,25 +78,18 @@ with open(arguments.wiresFileName, "r") as wiresFile:
   tprojMems = {}
   for line in wiresFile:
       # Only barrel-only seeds are supported right now.
-      if "TP_L1L2" not in line \
-      and "TP_L2L3" not in line \
-      and "TP_L3L4" not in line \
-      and "TP_L5L6" not in line \
-      and "TP_L2D1" not in line \
-      and "TP_L1D1" not in line \
-      and "TP_D1D2" not in line \
-      and "TP_D3D4" not in line:
+      if "PC_" not in line :
         continue
       line = line.rstrip()
-      tpName = re.sub(r".*TP_(.....).*", r"TP_\1", line)
-      innerLayer = tpName[3:5]
-      outerLayer = tpName[5:7]
+      pcName = line.split("PC_")[1].split(".")[0]
+      innerLayer = pcName[3:5]
+      outerLayer = pcName[5:7]
       memName = line.split()[0]
 
-      if memName.startswith("TPROJ_"):
-        if tpName not in tprojMems:
-          tprojMems[tpName] = []
-          tprojMems[tpName].append(memName)
+      if memName.startswith("MPROJ_"):
+        if pcName not in tprojMems:
+          tprojMems[pcName] = []
+          tprojMems[pcName].append(memName)
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
@@ -145,18 +138,19 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
     "////////////////////////////////////////////////////////////////////////////////\n"
     )
   # Calculate parameters and print out parameters and top function for each TP.
-  for tpName in sorted(tprojMems):
-    seed = re.sub(r"TP_(....).", r"\1", tpName)
-    iTC = re.sub(r"TP_....(.)", r"\1", tpName)
+  for pcName in sorted(tprojMems):
+    seed = pcName[0:4]
+    iTC = pcName[4:]
+    print("pcName:", pcName, seed, iTC) 
     # # numbers of memories
-    # nASMemInner = len(asInnerMems[tpName])
-    # nASMemOuter = len(asOuterMems[tpName])
-    # nVMSTEMem = len(vmsteMems[tpName])
+    # nASMemInner = len(asInnerMems[pcName])
+    # nASMemOuter = len(asOuterMems[pcName])
+    # nVMSTEMem = len(vmsteMems[pcName])
     # # AS inner and outer masks
     # asInnerMask = 0
     # asOuterMask = 0
-    # asInnerMems[tpName].sort()
-    # asOuterMems[tpName].sort()
+    # asInnerMems[pcName].sort()
+    # asOuterMems[pcName].sort()
 
 
     # Print out prototype for top function for this TC.
@@ -168,6 +162,7 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "    TrackletParameters tPars,\n"
       "    int trackletIndex,\n"
       "    bool valid,\n"
+      "    TrackletParameterMemory tparout,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[]\n"
@@ -183,26 +178,27 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "    TrackletParameters tPars,\n"
       "    int trackletIndex,\n"
       "    bool valid,\n"
+      "    TrackletParameterMemory tparout,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
       ") {\n"
       "#pragma HLS inline recursive\n"
       "#pragma HLS interface register port=bx_o\n"
-      "#pragma HLS stream variable=trackletParameters depth=1\n"
       "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
       "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
       "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
       "\n"
       "PC_" + seed + iTC + ": ProjectionCalculator<\n"
       "  TF::" + seed + ",\n"
-      "  TC::" + iTC + ",\n"
+      "  TC::" + iTC[0] + ",\n"
       " 108>(\n"
       "    bx,\n"
       "    bx_o,\n"
       "    tPars,\n"
       "    trackletIndex,\n"
       "    valid,\n"
+      "    tparout,\n"
       "    projout_barrel_ps,\n"
       "    projout_barrel_2s,\n"
       "    projout_disk\n"

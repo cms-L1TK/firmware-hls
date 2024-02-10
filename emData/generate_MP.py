@@ -141,7 +141,17 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         FMMask = 0
         for FM in FMMems[mpName]:
             FMMask = FMMask | (1 << TF_index[FM])
-        
+
+        NPage = 0
+        NPageSum = 0
+        index = 0
+        for TPROJ in TPMems[mpName]:
+            npage = len(TPROJ)-17
+            NPageSum += npage
+            print("TPROJ npage", TPROJ, npage)
+            NPage = NPage | (npage << (3*index))
+            index+=1
+            
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
         maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
         if mpName != sorted(TPMems.keys(), key=lambda x: x.startswith('L'))[-1]:
@@ -155,6 +165,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "template<> constexpr uint32_t FMMask<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
             "}\n" % FMMask
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint32_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPage
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint32_t NPageSum<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPageSum
         )
 
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)

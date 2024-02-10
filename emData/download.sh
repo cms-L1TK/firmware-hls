@@ -114,6 +114,12 @@ mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_TP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+### combined barrel config                      
+mkdir -p ../TopFunctions/CombinedConfig_FPGA2
+./generate_PC.py       -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_VMSMER.py   -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_MP.py       -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_TB.py       -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -132,6 +138,9 @@ cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
 cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
 cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
 cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
+cp ../../../../FPGA2_Config/wires.dat fpga2_wires.dat
+cp ../../../../FPGA2_Config/memorymodules.dat fpga2_memorymodules.dat
+cp ../../../../FPGA2_Config/processingmodules.dat fpga2_processingmodules.dat
 
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
@@ -159,6 +168,12 @@ echo "CM Barrel"
 mkdir -p ../../IntegrationTests/CombinedBarrelConfig/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
+echo "CM FPGA2"
+./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
+mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl

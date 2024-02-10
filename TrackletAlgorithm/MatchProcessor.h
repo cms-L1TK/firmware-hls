@@ -23,6 +23,8 @@ namespace PR
   // fill the bit mask indicating if memories are empty or not
   template<int nMEM, int NBits_Entries, class MemType>
   inline void init(BXType bx,
+		   const ap_uint<5> iMem[nMEM],
+		   const ap_uint<2> iPage[nMEM],
                    ap_uint<nMEM>& mem_hasdata,
                    ap_uint<NBits_Entries> nentries[nMEM],
                    const MemType mem[nMEM])
@@ -30,8 +32,7 @@ namespace PR
 #pragma HLS inline  
     for(int i = 0; i < nMEM; ++i) {
 #pragma HLS unroll
-      ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
-      std::cout << "i num : " << i << " " << num << std::endl;
+      ap_uint<kNBits_MemAddr+1> num = mem[iMem[i]].getEntries(bx, iPage[i]);
       nentries[i] = num;
       //if (num > 0) mem_hasdata.set(i);
       mem_hasdata[i] = (num > 0); //can't use if statement with rewind
@@ -43,12 +44,13 @@ namespace PR
   template<class DataType, class MemType, int nMEM>
   void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
                   ap_uint<kNBits_MemAddr>& read_addr,
+		  const ap_uint<5> iMem[nMEM],
+		  const ap_uint<2> iPage[nMEM],
                   const MemType inmem[nMEM])
   {
 #pragma HLS inline
 
-    data = inmem[read_imem].read_mem(bx, read_addr);
-
+    data = inmem[iMem[read_imem]].read_mem(bx, read_addr, iPage[read_imem]);
   }
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
@@ -57,6 +59,8 @@ namespace PR
                        ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // memory pointers
+		       const ap_uint<5> iMem[nMEM],
+		       const ap_uint<2> iPage[nMEM],
                        const MemType mem[nMEM],
                        DataType& data)
   {
@@ -70,7 +74,7 @@ namespace PR
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
     // read the memory "read_imem" with the address "read_addr"
-    read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, mem);
+    read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, iMem, iPage, mem);
 
     if (read_addr_next >= nentries[read_imem]) {
       // All entries in the memory[read_imem] have been read out
@@ -871,13 +875,15 @@ void readTable_rDSS(ap_uint<width> table[depth]){
 // MatchCalculator
 template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t NPage();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t NPageSum();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& isMatch,
-                     ap_uint<1>& savedMatch,
+                     bool& savedMatch,
                      ap_uint<MC::LUT_matchcut_z_width>& best_delta_z,
                      ap_uint<MC::LUT_matchcut_phi_width>& best_delta_phi,
                      ap_uint<MC::LUT_matchcut_rphi_width>& best_delta_rphi,
@@ -885,14 +891,6 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubid,
-                     int &nmcout1,
-                     int &nmcout2,
-                     int &nmcout3,
-                     int &nmcout4,
-                     int &nmcout5,
-                     int &nmcout6,
-                     int &nmcout7,
-                     int &nmcout8,
                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
 ){
 
@@ -1071,7 +1069,7 @@ void MatchCalculator(BXType bx,
   //-----------------------------------------------------------------------------------------------------------
   
   if (newtracklet) {
-    savedMatch = 0;
+    savedMatch = false;
   }
   
   // For first tracklet, pick up the phi cut value
@@ -1117,54 +1115,46 @@ void MatchCalculator(BXType bx,
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
-      nmcout1+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,fm, savedMatch); // L1L2 seed
     }
     break;
     case 1:
     if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
-      nmcout2+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,fm,savedMatch); // L2L3 seed
     }
     break;
     case 2:
     if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
-      nmcout3+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,fm,savedMatch); // L3L4 seed
     }
     break;
     case 3:
     if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
-      nmcout4+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,fm,savedMatch); // L5L6 seed
     }
     break;
     case 4:
     if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
-      nmcout5+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,fm,savedMatch); // D1D2 seed
     }
     break;
     case 5:
     if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
-      nmcout6+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,fm,savedMatch); // D3D4 seed
     }
     break;
     case 6:
     if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
-      nmcout7+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,fm,savedMatch); // L1D1 seed
     }
     break;
     case 7:
     if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
-      nmcout8+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,fm,savedMatch); // L2D1 seed
     }
     break;
     }
-    savedMatch = 1;
+    savedMatch = true;
   }
   
 } //end MC
@@ -1203,26 +1193,37 @@ void MatchProcessor(BXType bx,
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
-  ap_uint<nINMEM> mem_hasdata = 0;
-  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
-#pragma HLS ARRAY_PARTITION variable=numbersin complete
 
-  init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
-    (bx, mem_hasdata, numbersin, projin);
+  constexpr int nMEM = NPageSum<LAYER, PHISEC>();
+  
+  unsigned int iMEM = 0;
+  ap_uint<2> iPage[nMEM];
+  ap_uint<5> iMem[nMEM];
+
+  constexpr unsigned int npages = NPage<LAYER, PHISEC>();
+  for (unsigned int imem = 0; imem < nINMEM; imem++) {
+    unsigned int nPages = (npages >> (3*imem))&7;
+    for (unsigned int j = 0 ; j < nPages; j++){
+#pragma HLS unroll
+      iPage[iMEM + j] = j;
+      iMem[iMEM + j] = imem;
+    }
+    iMEM +=  nPages;
+  }
+  
+  //constexpr unsigned int nMEM = 22;
+  //const ap_uint<2> iPage[nMEM] = {0, 1, 2, 3, 0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  //const ap_uint<5> iMem[nMEM]  = {0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+
+  ap_uint<kNBits_MemAddr+1> numbersin[nMEM];
+  ap_uint<nMEM> mem_hasdata = 0;
+#pragma HLS ARRAY_PARTITION variable=numbersin complete
+ 
+  init<nMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
+    (bx, iMem, iPage, mem_hasdata, numbersin, projin);
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
-
-  // declare counters for each of the 8 different seeds.
-  //FIXME should have propoer seven bit type
-  int nmcout1 = 0;
-  int nmcout2 = 0;
-  int nmcout3 = 0;
-  int nmcout4 = 0;
-  int nmcout5 = 0;
-  int nmcout6 = 0;
-  int nmcout7 = 0;
-  int nmcout8 = 0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -1256,7 +1257,7 @@ void MatchProcessor(BXType bx,
   }
 
   //These are used inside the MatchCalculator method and needs to be retained between iterations
-  ap_uint<1> savedMatch;
+  bool savedMatch;
   typename ProjectionRouterBuffer<VMPTYPE, APTYPE>::TRKID lastTrkID(-1);
 
   TrackletProjection<PROJTYPE> projdata, projdata_;
@@ -1329,13 +1330,13 @@ void MatchProcessor(BXType bx,
     }
 
     //This printout exactly matches printout in emulation for tracking code differences
-    /*   
-    for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
-        <<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
-    }
-    std::cout << std::endl;
-    */
+       
+    //for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+    //  std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
+    //    <<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
+    //}
+    //std::cout << std::endl;
+    
 
     //New code -- updated to reduce timing, compare all projseqs in one stage instead of two
 
@@ -1409,7 +1410,6 @@ void MatchProcessor(BXType bx,
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
         (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
-         nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
     
@@ -1581,12 +1581,12 @@ void MatchProcessor(BXType bx,
     validin_ = validin;
 
     if (!projBuffNearFull){
-      
+
       // read inputs
       validin = read_input_mems<TrackletProjection<PROJTYPE>,
-      TrackletProjectionMemory<PROJTYPE>,
-      nINMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr,
+				TrackletProjectionMemory<PROJTYPE>,
+				nMEM, kNBits_MemAddr+1>
+	(bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
          projin, projdata);
  
     } else {
