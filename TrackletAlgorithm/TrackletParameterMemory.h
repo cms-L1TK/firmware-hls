@@ -2,8 +2,8 @@
 #define TrackletAlgorithm_TrackletParameterMemory_h
 
 #include "Constants.h"
-#include "MemoryTemplate.h"
 #include "globalFunctions.h"
+#include "MemoryTemplateTPROJ.h"
 
 // Data object definition
 class TrackletParameters
@@ -153,6 +153,6 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplate<TrackletParameters, 3, kNBits_MemAddr> TrackletParameterMemory;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr, 1> TrackletParameterMemory;
 
 #endif

@@ -33,7 +33,7 @@ with open(arguments.wiresFileName, "r") as wiresFile:
         tbName = re.sub(r".*FT_(....).*", r"FT_\1", line)
         seed = tbName.split("_")[1]
         memName = line.split()[0]
-        if memName.startswith("TPAR"):
+        if memName.startswith("TPAR") or memName.startswith("MPAR"):
             if tbName not in tparMems:
                 tparMems[tbName] = []
             tparMems[tbName].append(memName)
