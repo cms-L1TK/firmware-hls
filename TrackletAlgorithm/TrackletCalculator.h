@@ -2,9 +2,10 @@
 #define TrackletAlgorithm_TrackletCalculator_h
 
 #include <cmath>
-#include <cstring>
+//#include <cstring>
 
 #include "StubPairMemory.h"
+#include "Constants.h"
 #include "AllStubMemory.h"
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
@@ -28,31 +29,6 @@ namespace TC {
 ////////////////////////////////////////////////////////////////////////////////
 // Typedefs, enums, and constants needed by TrackletCalculator.
 ////////////////////////////////////////////////////////////////////////////////
-  namespace Types {
-    typedef ap_uint<2> nASMem;
-    typedef ap_uint<5> nSPMem; // needs to support up to 30 stub-pair memories
-                               // in the current wiring
-    typedef ap_uint<12> nSP;   // this should be large enough to index the entire
-                               // list of stub pairs, across all memories
-
-    typedef ap_int<13> rmean;
-    typedef ap_int<14> zmean;
-    typedef ap_int<15> rinv;
-    typedef ap_int<11> z0;
-    typedef ap_uint<20> phiL;
-    typedef ap_int<15> zL;
-    typedef ap_int<11> der_phiL;
-    typedef ap_int<10> der_zL;
-    typedef ap_uint<16> phiD;
-    typedef ap_uint<14> rD;
-    typedef ap_int<10> der_phiD;
-    typedef ap_int<10> der_rD;
-    typedef ap_uint<1> flag;
-  }
-
-  enum projout_index_barrel_ps {L1PHIA = 0, L1PHIB = 1, L1PHIC = 2, L1PHID = 3, L1PHIE = 4, L1PHIF = 5, L1PHIG = 6, L1PHIH = 7, L2PHIA = 8, L2PHIB = 9, L2PHIC = 10, L2PHID = 11, L3PHIA = 12, L3PHIB = 13, L3PHIC = 14, L3PHID = 15, N_PROJOUT_BARRELPS = 16};
-  enum projout_index_barrel_2s {L4PHIA = 0, L4PHIB = 1, L4PHIC = 2, L4PHID = 3, L5PHIA = 4, L5PHIB = 5, L5PHIC = 6, L5PHID = 7, L6PHIA = 8, L6PHIB = 9, L6PHIC = 10, L6PHID = 11, N_PROJOUT_BARREL2S = 12};
-  enum projout_index_disk      {D1PHIA = 0, D1PHIB = 1, D1PHIC = 2, D1PHID = 3, D2PHIA = 4, D2PHIB = 5, D2PHIC = 6, D2PHID = 7, D3PHIA = 8, D3PHIB = 9, D3PHIC = 10, D3PHID = 11, D4PHIA = 12, D4PHIB = 13, D4PHIC = 14, D4PHID = 15, N_PROJOUT_DISK = 16};
 
   static const uint8_t nproj_L1 = L1PHIH - L1PHIA + 1;
   static const uint8_t nproj_L2 = L2PHID - L2PHIA + 1;
@@ -199,7 +175,54 @@ TrackletCalculator(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "TrackletCalculator_calculate_LXLY.h"
+// Writes a tracklet projection to the appropriate tracklet projection memory.
+template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
+TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], ap_uint<kNBits_MemAddr> nproj[NProjOut], const bool success)
+{
+  bool proj_success = true;
+
+// Reject projections with extreme r/z values.
+  if (TProjType != DISK) {
+    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
+      proj_success = false;
+    if (abs(proj.getZ()) > floatToInt(zlength, kz))
+      proj_success = false;
+  }
+  else {
+    if (proj.getR() < floatToInt(rmindiskvm, krprojdisk) || proj.getR() >= floatToInt(rmaxdisk, krprojdisk))
+      proj_success = false;
+  }
+
+// Fill correct TrackletProjectionMemory according to phi bin of projection.
+  TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
+  if (TProjType == BARRELPS && NProjOut == nproj_L1) // layer 1
+    phi >>= (nbits_maxvm - nbitsallstubs[0]);
+  else // all other layers and disks
+    phi >>= (nbits_maxvm - nbitsallstubs[1]);
+
+  if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
+    projout[0].write_mem(bx, proj, nproj[0]++);
+  if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
+    projout[1].write_mem(bx, proj, nproj[1]++);
+  if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2)
+    projout[2].write_mem(bx, proj, nproj[2]++);
+  if (NProjOut > 3 && TPROJMask & (0x1 << 3) && success && proj_success && phi == 3)
+    projout[3].write_mem(bx, proj, nproj[3]++);
+  if (NProjOut > 4 && TPROJMask & (0x1 << 4) && success && proj_success && phi == 4)
+    projout[4].write_mem(bx, proj, nproj[4]++);
+  if (NProjOut > 5 && TPROJMask & (0x1 << 5) && success && proj_success && phi == 5)
+    projout[5].write_mem(bx, proj, nproj[5]++);
+  if (NProjOut > 6 && TPROJMask & (0x1 << 6) && success && proj_success && phi == 6)
+    projout[6].write_mem(bx, proj, nproj[6]++);
+  if (NProjOut > 7 && TPROJMask & (0x1 << 7) && success && proj_success && phi == 7)
+    projout[7].write_mem(bx, proj, nproj[7]++);
+
+  return (success && proj_success);
+}
+
+
+/*
+//#include "TrackletCalculator_calculate_LXLY.h"
 #include "TrackletCalculator_parameters.h"
 
 // This function calls calculate_LXLY, defined in
@@ -340,51 +363,6 @@ template<TF::seed Seed, TF::phiRegion iTC> const TrackletProjection<BARRELPS>::T
 TC::ID()
 {
   return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC);
-}
-
-// Writes a tracklet projection to the appropriate tracklet projection memory.
-template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
-TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], ap_uint<kNBits_MemAddr> nproj[NProjOut], const bool success)
-{
-  bool proj_success = true;
-
-// Reject projections with extreme r/z values.
-  if (TProjType != DISK) {
-    if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1))))
-      proj_success = false;
-    if (abs(proj.getZ()) > floatToInt(zlength, kz))
-      proj_success = false;
-  }
-  else {
-    if (proj.getR() < floatToInt(rmindiskvm, krprojdisk) || proj.getR() >= floatToInt(rmaxdisk, krprojdisk))
-      proj_success = false;
-  }
-
-// Fill correct TrackletProjectionMemory according to phi bin of projection.
-  TC::Types::phiL phi = proj.getPhi() >> (TrackletProjection<TProjType>::kTProjPhiSize - 5);
-  if (TProjType == BARRELPS && NProjOut == nproj_L1) // layer 1
-    phi >>= (nbits_maxvm - nbitsallstubs[0]);
-  else // all other layers and disks
-    phi >>= (nbits_maxvm - nbitsallstubs[1]);
-
-  if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
-    projout[0].write_mem(bx, proj, nproj[0]++);
-  if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
-    projout[1].write_mem(bx, proj, nproj[1]++);
-  if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2)
-    projout[2].write_mem(bx, proj, nproj[2]++);
-  if (NProjOut > 3 && TPROJMask & (0x1 << 3) && success && proj_success && phi == 3)
-    projout[3].write_mem(bx, proj, nproj[3]++);
-  if (NProjOut > 4 && TPROJMask & (0x1 << 4) && success && proj_success && phi == 4)
-    projout[4].write_mem(bx, proj, nproj[4]++);
-  if (NProjOut > 5 && TPROJMask & (0x1 << 5) && success && proj_success && phi == 5)
-    projout[5].write_mem(bx, proj, nproj[5]++);
-  if (NProjOut > 6 && TPROJMask & (0x1 << 6) && success && proj_success && phi == 6)
-    projout[6].write_mem(bx, proj, nproj[6]++);
-  if (NProjOut > 7 && TPROJMask & (0x1 << 7) && success && proj_success && phi == 7)
-    projout[7].write_mem(bx, proj, nproj[7]++);
-
-  return (success && proj_success);
 }
 
 
@@ -623,5 +601,5 @@ TrackletCalculator(
 
   bx_o = bx;
 }
-
+*/
 #endif

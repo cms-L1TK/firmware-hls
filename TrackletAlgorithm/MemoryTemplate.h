@@ -81,7 +81,36 @@ public:
       //The vhd memory implementation will write to the correct address!!
       dataarray_[ibx][0] = data;
 #else
+      std::cout << "write_mem: addr_index nentries " << addr_index << " " << nentries_[ibx] << std::endl;
       dataarray_[ibx][nentries_[ibx]++] = data;
+#endif
+
+      #ifdef CMSSW_GIT_HASH
+      nentries_[ibx] = addr_index + 1;
+      #endif
+      
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool write_mem(BunchXingT ibx, DataType data, bool overwrite)
+  {
+#pragma HLS inline
+    if(!NBIT_BX) ibx = 0;
+    if (nentries_[ibx] < (1<<NBIT_ADDR)) {
+      //dataarray_[ibx][addr_index] = data;
+#ifdef __SYNTHESIS__
+      //The vhd memory implementation will write to the correct address!!
+      dataarray_[ibx][0] = data;
+#else
+      std::cout << "write_mem: overwrite nentries " << overwrite << " " << nentries_[ibx] << std::endl;
+      if (overwrite) {
+	dataarray_[ibx][nentries_[ibx]-1] = data;
+      } else {
+	dataarray_[ibx][nentries_[ibx]++] = data;
+      }
 #endif
 
       #ifdef CMSSW_GIT_HASH

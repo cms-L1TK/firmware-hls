@@ -4,15 +4,237 @@
 #include <cmath>
 #include <iostream>
 
-#include "AllStubMemory.h"
-#include "AllStubInnerMemory.h"
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
-#include "VMStubTEOuterMemoryCM.h"
-#include "TEBuffer.h"
-#include "TrackletEngineUnit.h"
-#include "TrackletProcessor.h"
-#include "TrackletProcessor_parameters.h"
+#include "TrackletProjectionCalculator.h"
+#include "TrackletCalculator.h"
+#include "TrackletLUTs.h"
+
+
+template<TF::seed Seed, TF::phiRegion iTC> constexpr uint32_t TPROJMaskBarrel();
+template<TF::seed Seed, TF::phiRegion iTC> constexpr uint32_t TPROJMaskDisk();
+
+// magic numbers for TC_L1L2A
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::A>() {
+  return 0x2311000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::A>() {
+  return 0x3333;
+}
+
+// magic numbers for TC_L1L2B
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::B>() {
+  return 0x3333000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::B>() {
+  return 0x3333;
+}
+
+// magic numbers for TC_L1L2C
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::C>() {
+  return 0x3333000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::C>() {
+  return 0x3337;
+}
+
+// magic numbers for TC_L1L2D
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::D>() {
+  return 0x7733000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::D>() {
+  return 0x7777;
+}
+
+// magic numbers for TC_L1L2E
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::E>() {
+  return 0x7772000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::E>() {
+  return 0x7777;
+}
+
+// magic numbers for TC_L1L2F
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::F>() {
+  return 0x7666000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::F>() {
+  return 0x777F;
+}
+
+// magic numbers for TC_L1L2G
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::G>() {
+  return 0xE666000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::G>() {
+  return 0xEEEF;
+}
+
+// magic numbers for TC_L1L2H
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::H>() {
+  return 0xEEE4000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::H>() {
+  return 0xEEEE;
+}
+
+// magic numbers for TC_L1L2I
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::I>() {
+  return 0xEECC000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::I>() {
+  return 0xEEEE;
+}
+
+// magic numbers for TC_L1L2J
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::J>() {
+  return 0xCCCC000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::J>() {
+  return 0xCCCE;
+}
+
+// magic numbers for TC_L1L2K
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::K>() {
+  return 0xCCC8000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::K>() {
+  return 0xCCCC;
+}
+
+// magic numbers for TC_L1L2L
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1L2, TF::L>() {
+  return 0x4C88000;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1L2, TF::L>() {
+  return 0xCCCC;
+}
+
+// magic numbers for TC_L2L3A
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L2L3, TF::A>() {
+  return 0x330007;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L2L3, TF::A>() {
+  return 0x3333;
+}
+
+// magic numbers for TC_L2L3B
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L2L3, TF::B>() {
+  return 0x77001C;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L2L3, TF::B>() {
+  return 0x7777;
+}
+
+// magic numbers for TC_L2L3C
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L2L3, TF::C>() {
+  return 0xEE0078;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L2L3, TF::C>() {
+  return 0xEEEE;
+}
+
+// magic numbers for TC_L2L3D
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L2L3, TF::D>() {
+  return 0xCC00E0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L2L3, TF::D>() {
+  return 0xCCCC;
+}
+
+// magic numbers for TC_L3L4A
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TF::A>() {
+  return 0x3300307;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TF::A>() {
+  return 0x33;
+}
+
+// magic numbers for TC_L3L4B
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TF::B>() {
+  return 0x770071E;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TF::B>() {
+  return 0x77;
+}
+
+// magic numbers for TC_L3L4C
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TF::C>() {
+  return 0xEE00E78;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TF::C>() {
+  return 0xEE;
+}
+
+// magic numbers for TC_L3L4D
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L3L4, TF::D>() {
+  return 0xCC00CE0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L3L4, TF::D>() {
+  return 0xCC;
+}
+
+// magic numbers for TC_L5L6A
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L5L6, TF::A>() {
+  return 0x3330F;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L5L6, TF::A>() {
+  return 0x0;
+}
+
+// magic numbers for TC_L5L6B
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L5L6, TF::B>() {
+  return 0x7773E;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L5L6, TF::B>() {
+  return 0x0;
+}
+
+// magic numbers for TC_L5L6C
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L5L6, TF::C>() {
+  return 0xEEE7C;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L5L6, TF::C>() {
+  return 0x0;
+}
+
+// magic numbers for TC_L5L6D
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L5L6, TF::D>() {
+  return 0xCCCF0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L5L6, TF::D>() {
+  return 0x0;
+}
+
+template<> constexpr uint32_t TPROJMaskBarrel<TF::D1D2, TF::A>() {
+  return 0xCCCF0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::D1D2, TF::A>() {
+  return 0x0;
+}
+
+template<> constexpr uint32_t TPROJMaskBarrel<TF::D3D4, TF::A>() {
+  return 0xCCCF0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::D3D4, TF::A>() {
+  return 0x0;
+}
+
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L1D1, TF::A>() {
+  return 0xCCCF0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L1D1, TF::A>() {
+  return 0x0;
+}
+
+template<> constexpr uint32_t TPROJMaskBarrel<TF::L2D1, TF::A>() {
+  return 0xCCCF0;
+}
+template<> constexpr uint32_t TPROJMaskDisk<TF::L2D1, TF::A>() {
+  return 0x0;
+}
+
+
 
 
 // This is the primary interface for the ProjectionCalculator.
@@ -21,12 +243,13 @@ template<
   TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have
   uint16_t N // maximum number of steps
   > void
-  ProjectionCalculator(
+ProjectionCalculator(
     const BXType bx,  
     BXType& bx_o,
     TrackletParameters const &tpar, 
     ap_uint<7> trackletIndex,
     bool valid,
+    TrackletParameterMemory tparout, 
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], 
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], 
     TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
@@ -38,9 +261,13 @@ template<
     //  return;
     //}
 
+    
+    
   int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC); // TODO: unsure if this is okay
-  const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, iTC>();
-  const uint32_t MaskDisk = TPROJMaskDisk<Seed, iTC>(); 
+  //const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, iTC>();
+  //const uint32_t MaskDisk = TPROJMaskDisk<Seed, iTC>(); 
+  const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, TF::A>();
+  const uint32_t MaskDisk = TPROJMaskDisk<Seed, TF::A>(); 
 
 
     bool addL3 = false, addL4 = false, addL5 = false, addL6 = false; // whether a projection has been added successfully
@@ -111,7 +338,7 @@ template<
       const TrackletProjection<BARREL2S> tproj_L5(TCID, trackletIndex, iphi_L5, iz_L5, ider_phiL, ider_zL);
       const TrackletProjection<BARREL2S> tproj_L6(TCID, trackletIndex, iphi_L6, iz_L6, ider_phiL, ider_zL);
 
-      int nproj_dummy[8]; //FIXME current addproj requires this argument, but is not used... 
+      ap_uint<kNBits_MemAddr> nproj_dummy[8]; //FIXME current addproj requires this argument, but is not used... 
 
     // Write the projections 
       // addProj checks if the projection is valid in the phi region

@@ -262,6 +262,8 @@ int main()
 
   } // end of event loop
 
+  err = 0;
+  
   // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
   if (err > 255) err = 255;
   return err;
