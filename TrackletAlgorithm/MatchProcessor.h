@@ -1534,11 +1534,11 @@ void MatchProcessor(BXType bx,
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zlast complete
 
-      (entries_zlast[7], entries_zlast[6], entries_zlast[5], entries_zlast[4],
-       entries_zlast[3], entries_zlast[2], entries_zlast[1], entries_zlast[0],
-       entries_zfirst[7], entries_zfirst[6], entries_zfirst[5], entries_zfirst[4],
-       entries_zfirst[3], entries_zfirst[2], entries_zfirst[1], entries_zfirst[0]) =
-	instubdata.getEntries((bx&3),first);
+      for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
+#pragma HLS unroll
+        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*nbins+first].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*nbins+last].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+      }
 
       ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
