@@ -240,6 +240,24 @@ topReducedCombined-sim:
       artifacts: false
     - job: TB-vivado-hls-build
       artifacts: false
+topCombinedIRtoTP-sim:
+  <<: *template_topTF-sim
+  allow_failure: true
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "CombinedConfig/IRtoTP"
+  needs:
+    - job: download
+    - job: IR-vivado-hls-build
+      artifacts: false
+    - job: VMRCM-vivado-hls-build
+      artifacts: false
+    - job: TP-vivado-hls-build
+      artifacts: false
+    - job: MP-vivado-hls-build
+      artifacts: false
+    - job: TB-vivado-hls-build
+      artifacts: false
 # Check FW results ---------------
 topReducedCombined-check-results:
   <<: *template_check-results
@@ -250,6 +268,15 @@ topReducedCombined-check-results:
   needs:
     - download
     - topReducedCombined-sim
+topCombinedIRtoTP-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "CombinedConfig/IRtoTP"
+  needs:
+    - download
+    - topCombinedIRtoTP-sim
 # FW synthesis ---------------
 topReducedCombined-synth:
   <<: *template_topTF-synth
@@ -261,4 +288,15 @@ topReducedCombined-synth:
     - job: download
     - job: topReducedCombined-sim
     - job: topReducedCombined-check-results
+      artifacts: false
+topCombinedIRtoTP-synth:
+  <<: *template_topTF-synth
+  allow_failure: true
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "CombinedConfig/IRtoTP"
+  needs:
+    - job: download
+    - job: topCombinedIRtoTP-sim
+    - job: topCombinedIRtoTP-check-results
       artifacts: false
