@@ -1240,7 +1240,6 @@ void MatchProcessor(BXType bx,
 
   MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete
-#pragma HLS ARRAY_PARTITION variable=instubdata complete dim=1
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
   
