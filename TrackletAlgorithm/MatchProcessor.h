@@ -1528,16 +1528,14 @@ void MatchProcessor(BXType bx,
       auto first = !isDisk ? zfirst : rfirst;
       auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
       auto slot = zbin.range(zbin.length()-1, 1);
-      constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zlast complete
-
       for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
 #pragma HLS unroll
-        entries_zfirst[phibin]= instubdata.get_mem_entries8A()[(bx&3)*nbins+first].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
-        entries_zlast[phibin]= instubdata.get_mem_entries8B()[(bx&3)*nbins+last].range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zfirst[phibin]= instubdata.getEntries((bx&3),first).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
+        entries_zlast[phibin]= instubdata.getEntries((bx&3),last).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
       }
       ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
