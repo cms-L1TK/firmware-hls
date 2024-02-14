@@ -24,19 +24,16 @@ template<
   ProjectionCalculator(
     const BXType bx,  
     BXType& bx_o,
-    TrackletParameters const &tpar, 
-    ap_uint<7> trackletIndex,
+    TrackletParameters const &tpar, int trackletIndex,
     bool valid,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS], 
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S], 
     TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK])
   {
-#pragma HLS interface ap_ctrl_none port=return
-#pragma HLS pipeline II=1 rewind
 
-    //if (!valid) {
-    //  return;
-    //}
+    if (!valid) {
+      return;
+    }
 
   int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC); // TODO: unsure if this is okay
   const uint32_t MaskBarrel = TPROJMaskBarrel<Seed, iTC>();
@@ -115,13 +112,13 @@ template<
 
     // Write the projections 
       // addProj checks if the projection is valid in the phi region
-      addL3 = TC::addProj<BARRELPS, TC::nproj_L3, ((MaskBarrel & TC::mask_L3) >> TC::shift_L3)> (tproj_L3, bx, &projout_barrel_ps[TC::L3PHIA], nproj_dummy, valid&&valid_L3);
+      addL3 = TC::addProj<BARRELPS, TC::nproj_L3, ((MaskBarrel & TC::mask_L3) >> TC::shift_L3)> (tproj_L3, bx, &projout_barrel_ps[TC::L3PHIA], nproj_dummy, valid_L3);
 
-      addL4 = TC::addProj<BARREL2S, TC::nproj_L4, ((MaskBarrel & TC::mask_L4) >> TC::shift_L4)> (tproj_L4, bx, &projout_barrel_2s[TC::L4PHIA], nproj_dummy, valid&&valid_L4);
+      addL4 = TC::addProj<BARREL2S, TC::nproj_L4, ((MaskBarrel & TC::mask_L4) >> TC::shift_L4)> (tproj_L4, bx, &projout_barrel_2s[TC::L4PHIA], nproj_dummy, valid_L4);
 
-      addL5 = TC::addProj<BARREL2S, TC::nproj_L5, ((MaskBarrel & TC::mask_L5) >> TC::shift_L5)> (tproj_L5, bx, &projout_barrel_2s[TC::L5PHIA], nproj_dummy, valid&&valid_L5);
+      addL5 = TC::addProj<BARREL2S, TC::nproj_L5, ((MaskBarrel & TC::mask_L5) >> TC::shift_L5)> (tproj_L5, bx, &projout_barrel_2s[TC::L5PHIA], nproj_dummy, valid_L5);
 
-      addL6 = TC::addProj<BARREL2S, TC::nproj_L6, ((MaskBarrel & TC::mask_L6) >> TC::shift_L6)> (tproj_L6, bx, &projout_barrel_2s[TC::L6PHIA], nproj_dummy, valid&&valid_L6);
+      addL6 = TC::addProj<BARREL2S, TC::nproj_L6, ((MaskBarrel & TC::mask_L6) >> TC::shift_L6)> (tproj_L6, bx, &projout_barrel_2s[TC::L6PHIA], nproj_dummy, valid_L6);
       std::cout << addL4 <<addL5 << addL6 << std::endl;
 
 
@@ -173,13 +170,13 @@ template<
       const TrackletProjection<DISK> tproj_D4(TCID, trackletIndex, iphi_D4, ir_D4, ider_phiD, ider_rD);
       bool validD4 = ir_D4 >= irmindisk && ir_D4 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL3;
 
-      bool addD1 = TC::addProj<DISK, TC::nproj_D1, ((MaskDisk & TC::mask_D1) >> TC::shift_D1)> (tproj_D1, bx, &projout_disk[TC::D1PHIA], nproj_dummy, valid&&validD1);
+      bool addD1 = TC::addProj<DISK, TC::nproj_D1, ((MaskDisk & TC::mask_D1) >> TC::shift_D1)> (tproj_D1, bx, &projout_disk[TC::D1PHIA], nproj_dummy, validD1);
 
-      bool addD2 = TC::addProj<DISK, TC::nproj_D2, ((MaskDisk & TC::mask_D2) >> TC::shift_D2)> (tproj_D2, bx, &projout_disk[TC::D2PHIA], nproj_dummy, valid&&validD2);
+      bool addD2 = TC::addProj<DISK, TC::nproj_D2, ((MaskDisk & TC::mask_D2) >> TC::shift_D2)> (tproj_D2, bx, &projout_disk[TC::D2PHIA], nproj_dummy, validD2);
 
-      bool addD3 = TC::addProj<DISK, TC::nproj_D3, ((MaskDisk & TC::mask_D3) >> TC::shift_D3)> (tproj_D3, bx, &projout_disk[TC::D3PHIA], nproj_dummy, valid&&validD3);
+      bool addD3 = TC::addProj<DISK, TC::nproj_D3, ((MaskDisk & TC::mask_D3) >> TC::shift_D3)> (tproj_D3, bx, &projout_disk[TC::D3PHIA], nproj_dummy, validD3);
 
-      bool addD4 = TC::addProj<DISK, TC::nproj_D4, ((MaskDisk & TC::mask_D4) >> TC::shift_D4)> (tproj_D4, bx, &projout_disk[TC::D4PHIA], nproj_dummy, valid&&validD4);
+      bool addD4 = TC::addProj<DISK, TC::nproj_D4, ((MaskDisk & TC::mask_D4) >> TC::shift_D4)> (tproj_D4, bx, &projout_disk[TC::D4PHIA], nproj_dummy, validD4);
 
   bx_o = bx; //Makes sure that bxs are aligned to make different "page" per bx in the system 
 }
