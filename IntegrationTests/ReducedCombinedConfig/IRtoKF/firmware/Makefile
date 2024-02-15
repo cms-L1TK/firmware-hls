@@ -4,7 +4,7 @@ input_file = mem/in.txt
 proj_path = ../../../../proj
 hls_script_path = ../../script
 
-all: $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) lut_inclusion
+all: $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) apollo_input lut_inclusion
 
 $(core_dir):
 	@mkdir cgn mem
@@ -17,6 +17,7 @@ $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py -s $(hls_script_path)
 
 kfin_adj:
+	@cd ../../../../../KalmanFilter; git checkout d0d3ba5
 	@python3 scripts/kf_link_mod.py
 
 xciCreation: $(core_file)
@@ -31,6 +32,12 @@ lut_inclusion:
 $(input_file): $(core_dir)
 	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReduced/InputStubs -o $(input_file)
 
+apollo_input: $(input_file)
+	@ln -s ../../../common/scripts/compare_emp_outputs.py scripts/compare_emp_outputs.py
+	@ln -s ../../../common/scripts/merge_emp_output.py scripts/merge_emp_output.py
+	@ln -s ../../../common/scripts/split_emp_input.py scripts/split_emp_input.py
+	@python3 scripts/split_emp_input.py
+
 sim: $(input_file) $(core_file) $(core_dir)
 	@ln -s $(proj_path)/vsim/vsim/vsim.sim/sim_1/behav/xsim/out.txt mem/out.txt
 	@$(eval CORE_DIRS= $(wildcard $(core_dir)/*))
@@ -43,4 +50,4 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
 	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
-.PHONY: sim all hdl_add_files xciCreation kfin_adj lut_inclusion core_patch
+.PHONY: sim all hdl_add_files xciCreation kfin_adj apollo_input lut_inclusion core_patch
