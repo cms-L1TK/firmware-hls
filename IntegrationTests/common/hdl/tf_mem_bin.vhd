@@ -79,8 +79,8 @@ entity tf_mem_bin is
     );  
   port (
 
-    --! Write clock
-    clka      : in  std_logic;
+    --! Clock
+    clk       : in  std_logic;
     --! Write enable
     wea       : in  std_logic;
     --! Write Address (contains page, bin, and bin address)
@@ -89,16 +89,11 @@ entity tf_mem_bin is
     dina      : in  std_logic_vector(RAM_WIDTH-1 downto 0);
 
     
-    --! Read clock
-    clkb      : in  std_logic;                                      
     --! Read Enable, for additional power savings, disable when not in use
     enb       : in  std_logic_vector(NUM_COPY-1 downto 0);          
 
     --! Output reset (does not affect memory contents)
     rstb      : in  std_logic;
-
-    --! Output register enable
-    regceb    : in  std_logic;
 
     --! Read address bus, width determined from RAM_DEPTH and NCOPY   
     addrb      : in std_logic_vector(NUM_COPY*RAM_DEPTH_BITS-1 downto 0);
@@ -215,7 +210,7 @@ begin
 -- Check user didn't change values of derived generics.
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
-process(clka)
+process(clk)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter
   variable page         : integer := 0;
@@ -235,7 +230,7 @@ process(clka)
   --variable vi_nent_idx_new : std_logic_vector(5 downto 0);
   
 begin
-  if rising_edge(clka) then
+  if rising_edge(clk) then
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
     end if;
@@ -290,11 +285,11 @@ begin
   end if;
 end process;
 
-process(clkb)
+process(clk)
 begin
 
     
-  if rising_edge(clkb) then
+  if rising_edge(clk) then
     --Reading DRAM so should not be on clock edge ?
     if (enb_nent='1') then
       for i in 0 to 2*NUM_PHI_BINS-1 loop
@@ -315,19 +310,19 @@ end process;
 
 -- The following code generates HIGH_PERFORMANCE (use output register) or LOW_LATENCY (no output register)
 MODE : if (RAM_PERFORMANCE = "LOW_LATENCY") generate -- no_output_register; 1 clock cycle read latency at the cost of a longer clock-to-out timing
-  process(clkb)
+  process(clk)
   begin
     for i in 0 to NUM_COPY-1 loop
       doutb((i+1)*RAM_WIDTH-1 downto i*RAM_WIDTH) <= sv_RAM_row(i);
     end loop;
   end process;
 else generate -- output_register; 2 clock cycle read latency with improve clock-to-out timing
-  process(clkb)
+  process(clk)
   begin
-    if rising_edge(clkb) then
+    if rising_edge(clk) then
       if (rstb='1') then
         doutb <= (others => '0');
-      elsif (regceb='1') then
+      else
         for i in 0 to NUM_COPY-1 loop
           doutb((i+1)*RAM_WIDTH-1 downto i*RAM_WIDTH) <= sv_RAM_row(i);
         end loop;
