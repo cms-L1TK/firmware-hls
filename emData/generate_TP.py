@@ -217,8 +217,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         regLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
         innerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
         outerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
-        #drinvLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TC_{0}_drinv.tab".format(seed.replace("D","B")))))
-        #invtLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TC_{0}_invt.tab".format(seed.replace("D","B")))))
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"

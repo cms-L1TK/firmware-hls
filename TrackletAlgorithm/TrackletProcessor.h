@@ -273,8 +273,6 @@ inline ap_uint<(1<<(2*kNBitsBuffer))> nearFullTEUnitInit() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#include "TrackletCalculator_calculate_LXLY.h"
-
 // This function calls calculate_LXLY, defined in
 // TrackletCalculator_calculate_LXLY.h, and applies cuts to the results.
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
@@ -326,7 +324,7 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 
     valid_proj[i] = valid_zmin && valid_zmax && valid_phimax && valid_phimin;
 
-    if (projectionLayers[Seed][i]<3) {
+    if (projectionLayers[Seed][i]<=TF::L3) {
       phiL[i] >>= (TrackletProjection<BARREL2S>::kTProjPhiSize - TrackletProjection<BARRELPS>::kTProjPhiSize);
       if (phiL[i] >= (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1)
         phiL[i] = (1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 2;
@@ -357,11 +355,6 @@ TC::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
   return valid_rinv && valid_z0 && keep;
 }
 
-// This function calls calculate_DXDY, defined in
-// TrackletCalculator_calculate_DXDY.h, and applies cuts to the results.
-//#include "TrackletCalculator_calculate_LXD1.h"
-
-//#include "TrackletCalculator_calculate_DXDY.h"
 
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion> bool
 TC::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegion> &outerStub, TC::Types

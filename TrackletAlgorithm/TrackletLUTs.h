@@ -14,19 +14,7 @@ class InvdrLUT{
       for(int idr=-256; idr<256; idr++){
 	int uidr = idr;
 	if (uidr < 0) uidr += 512;
-	int idrabs = idr;
-	if (Seed == TF::L1L2 ) {
-	  idrabs += (rmean[1] - rmean[0]);
-	}
-	if (Seed == TF::L2L3 ) {
-	  idrabs += (rmean[2] - rmean[1]);
-	}
-	if (Seed == TF::L3L4 ) {
-	  idrabs += (rmean[3] - rmean[2]);
-	}
-	if (Seed == TF::L5L6 ) {
-	  idrabs += (rmean[5] - rmean[4]);
-	}
+	int idrabs = idr + rmean[seedLayers[Seed][1]]-rmean[seedLayers[Seed][0]];
 	lut_[uidr] = (1<<n_Deltar_)/idrabs;
       }
     } else if (Seed <= TF::D3D4) {

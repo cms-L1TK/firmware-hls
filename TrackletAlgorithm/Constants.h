@@ -69,34 +69,6 @@ constexpr double phiHG_ = 1.02776;
 //projection layers for different seeds. Note that unused layers are indicated by
 //10. This allows the use of templating to evaluate the radius for all seeds.
 
-constexpr int seedLayers[8][2] = { {0, 1},
-				   {1, 2},
-				   {2, 3},
-				   {4, 5},
-				   {6, 7},
-				   {8, 9},
-				   {0, 6},
-				   {1, 6}};
-
-constexpr int projectionLayers[8][4] = { {2, 3, 4, 5},
-					 {0, 3, 4, 5},
-					 {0, 1, 4, 5},
-					 {0, 1, 2, 3},
-					 {0, 1, 10, 10},
-					 {0, 10, 10, 10},
-					 {10, 10, 10, 10},
-					 {0, 10, 10, 10}};
-
-constexpr int projectionDisks[8][4] = { {6, 7, 8, 9},
-					{6, 7, 8, 9},
-					{6, 7, 8, 9},
-					{6, 7, 8, 9},
-					{8, 9, 10, 0},
-					{6, 7, 10, 0},
-					{7, 8, 9, 10},
-					{7, 8, 9, 10}};
-
-
 constexpr int kNTEUnits[8] = {5, 2, 5, 3, 3, 2, 3, 2}; // Number of TE units w.r.t. seed type
 constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Number of TE units w.r.t. the layer/disk number.
 // The outer layerDisk of the seed type is used as index, e.g. kNTEUnits[TF::L1L2] == kNTEUnitsLayerDisk[TF::L2]. N.B.: D1 actually has two seed types (L1D1, L2D1), take the largest value for now...
@@ -158,7 +130,7 @@ namespace trklet{
   constexpr int N_DISK = 5; // # of endcap disks assumed
 }
 #endif
-constexpr double bfield = 3.8112; // 
+constexpr double bfield = 3.8112; // T
 constexpr int rmean[trklet::N_LAYER + trklet::N_DISK] = { 851, 1269, 1784, 2347, 2936, 3697,   -1,   -1,   -1,   -1,   -1 }; // valid for layers
 constexpr int zmean[trklet::N_LAYER + trklet::N_DISK] = {  -1,   -1,   -1,   -1,   -1,   -1, 2239, 2645, 3163, 3782, 4523 }; // valid for disks
 constexpr double zlength = 120.0; // cm
@@ -245,6 +217,41 @@ namespace TF {
   // List of phi regions
   enum phiRegion {UNDEF_PHI, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
+
+// Layers used for each of the seeds
+constexpr int seedLayers[8][2] = { {TF::L1, TF::L2},
+				   {TF::L2, TF::L3},
+				   {TF::L3, TF::L4},
+				   {TF::L5, TF::L6},
+				   {TF::D1, TF::D2},
+				   {TF::D3, TF::D4},
+				   {TF::L1, TF::D1},
+				   {TF::L2, TF::D1}};
+
+// Layers each seed projects to; up to four projections. TF::D5 indicates an unused projection. (Unfortunately we
+// can not use a TF:Invalid as due to our templated code these will be used as indices into arrays for radial
+// positions and this will generate an array out-of-bounds error.)
+constexpr int projectionLayers[8][4] = { {TF::L3, TF::L4, TF::L5, TF::L6},
+					 {TF::L1, TF::L4, TF::L5, TF::L6},
+					 {TF::L1, TF::L2, TF::L5, TF::L6},
+					 {TF::L1, TF::L2, TF::L3, TF::L4},
+					 {TF::L1, TF::L2, TF::D5, TF::D5},
+					 {TF::L1, TF::D5, TF::D5, TF::D5},
+					 {TF::D5, TF::D5, TF::D5, TF::D5},
+					 {TF::L1, TF::D5, TF::D5, TF::D5}};
+
+// Disks each seed projects to; up to four projections. TF::L1 indicates an unused projection. (Unfortunately we
+// can not use a TF:Invalid as due to our templated code these will be used as indices into arrays for radial
+// positions and this will generate an array out-of-bounds error.)
+constexpr int projectionDisks[8][4] = { {TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D3, TF::D4, TF::D5, TF::L1},
+					{TF::D1, TF::D2, TF::D5, TF::L1},
+					{TF::D2, TF::D3, TF::D4, TF::D5},
+					{TF::D2, TF::D3, TF::D4, TF::D5}};
+
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited

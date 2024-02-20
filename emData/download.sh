@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_231205 ####
+#### generated with commit 6e61462 ####
 # Combined modules
 memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
