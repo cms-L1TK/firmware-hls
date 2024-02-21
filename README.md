@@ -56,7 +56,7 @@ The files that are downloaded by emData/download.sh were created by the CMSSSW L
 cmsrel CMSSW_13_3_0_pre2
 cd CMSSW_13_3_0_pre2/src/
 cmsenv
-git cms-checkout-topic -u cms-L1TK:fw_synch_231205  //used commit 6e61462
+git cms-checkout-topic -u cms-L1TK:6e61462f4f9a2028ddd6e1603a66b5ec477a40a5
 ```
 
 A few configuration changes were made in order to output test vectors and lookup tables and adjust truncation. This required editing L1Trigger/TrackFindingTracklet/interface/Settings.h as follows:
