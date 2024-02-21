@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
-#### fw_synch_231205 ####
+#### generated with commit 6e61462 ####
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/xeMgwU9Lvnj1y9Z/MemPrints.tar.gz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/wSwhk7teb0RDObk/LUTs.tar.gz"
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/dJ1ss4iczetRESZ/MemPrints.tar.gz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/UBaWeoHsWXDY9ex/LUTs.tar.gz"
+memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
+luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"
 # Reduced Combined modules2
-memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/8dSZa6V93me4cHf/MemPrints.tar.gz"
-luts_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/xq9eMadmjeQPBVw/LUTs.tar.gz"
+memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced2_240202.tgz"
+luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CMReduced2_240121.tgz"
 # Combined barrel
-memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/THL7aPHzCNZp8cX/MemPrints.tar.gz"
-luts_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/O3I5qydfC6o6M87/LUTs.tar.gz"
+memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_Barrel_240202.tgz"
+luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_Barrel_240121.tgz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
@@ -65,19 +65,19 @@ fi
 
 if [ ! -d "LUTs" ]
 then
-  wget -O LUTs.tgz --quiet ${luts_url_reducedcm}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_reducedcm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMReduced
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_cm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cm2}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_cm2}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCM2
   rm -f LUTs.tgz
-  wget -O LUTs.tgz --quiet ${luts_url_cmbarrel}
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_cmbarrel}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
@@ -165,21 +165,21 @@ cd ../
 if [[ $tables_only == 0 ]]
 then
   # Get memory test data: download and unpack the tarball.
-  wget -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cm2}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm2}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM2
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCMBarrel
   rm -f MemPrints.tgz
 
-  wget -O MemPrints.tgz --quiet ${memprints_url_cm}
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsCM
   rm -f MemPrints.tgz
