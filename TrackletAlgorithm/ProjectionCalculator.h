@@ -148,7 +148,12 @@ template<
 
       TC::Types::der_phiD ider_phiD = (-rinv*itinv) >> 17;
       TC::Types::der_rD ider_rD = itinv >> 5;
-      
+     
+      if (it<0) {
+        iderphi = -iderphi;
+        iderr = -iderr;
+      }
+	 
       projToDisk(zproj0, itinv, rinv, phi0, t, z0, ir_D1, iphi_D1);
       projToDisk(zproj1, itinv, rinv, phi0, t, z0, ir_D2, iphi_D2);
       projToDisk(zproj2, itinv, rinv, phi0, t, z0, ir_D3, iphi_D3);
