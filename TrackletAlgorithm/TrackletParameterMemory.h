@@ -135,7 +135,8 @@ public:
   
 #ifdef CMSSW_GIT_HASH
   std::string getBitStr() const {
-    std::string str = decodeToBits(getStubIndexInner());
+    std::string str = decodeToBits(getPhiRegion());
+    str += "|"+decodeToBits(getStubIndexInner());
     str += "|"+decodeToBits(getStubIndexOuter());
     str += "|"+decodeToBits(getRinv());
     str += "|"+decodeToBits(getPhi0());
