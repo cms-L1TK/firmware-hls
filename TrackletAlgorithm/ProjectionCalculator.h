@@ -145,7 +145,12 @@ template<
 
       TC::Types::der_phiD ider_phiD = (-rinv*itinv) >> 17;
       TC::Types::der_rD ider_rD = itinv >> 5;
-      
+     
+      if (it<0) {
+        iderphi = -iderphi;
+        iderr = -iderr;
+      }
+	 
       projToDisk(zproj0, itinv, rinv, phi0, t, z0, ir_D1, iphi_D1);
       projToDisk(zproj1, itinv, rinv, phi0, t, z0, ir_D2, iphi_D2);
       projToDisk(zproj2, itinv, rinv, phi0, t, z0, ir_D3, iphi_D3);
@@ -154,10 +159,10 @@ template<
       constexpr int itcut = 1.0/kt;
 
       const TrackletProjection<DISK> tproj_D1(TCID, trackletIndex, iphi_D1, ir_D1, ider_phiD, ider_rD);
-      bool validD1 = true;
-
+      bool validD1 = ir_D1 >= irmindisk && ir_D1 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL6;
+      
       const TrackletProjection<DISK> tproj_D2(TCID, trackletIndex, iphi_D2, ir_D2, ider_phiD, ider_rD);
-      bool validD2 = true;
+      bool validD2 = ir_D2 >= irmindisk && ir_D2 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL5;
 
       const TrackletProjection<DISK> tproj_D3(TCID, trackletIndex, iphi_D3, ir_D3, ider_phiD, ider_rD);
       bool validD3 = ir_D3 >= irmindisk && ir_D3 < irmaxdisk && ((t > itcut) || (t<-itcut)) && !addL4;
