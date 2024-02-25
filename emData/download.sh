@@ -116,8 +116,8 @@ mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ### combined barrel config                      
 mkdir -p ../TopFunctions/CombinedConfig_FPGA2
-./generate_PC.py       -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
-./generate_VMSMER.py   -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_PC.py       -w  ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_VMSMER.py   --all -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 ./generate_MP.py       -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 ./generate_TB.py       -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 
@@ -180,7 +180,7 @@ echo "CM FPGA2"
 ./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
 ./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedBarrelConfig/hdl/
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/
 
 # Remove untracked file and return to emData/

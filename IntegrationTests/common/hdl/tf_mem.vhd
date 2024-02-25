@@ -120,34 +120,34 @@ process(clka)
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     --if DEBUG then
-    if (NUM_PAGES = 2) then
-      report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
-    end if;
-    if (NUM_PAGES = 8) then
-      report "tm_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
-    end if;
+    --if (NUM_PAGES = 2) then
+    --  report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+    --end if;
+    --if (NUM_PAGES = 8) then
+    --  report "tm_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
+    --end if;
     --end if;
     --end if;
     if (sync_nent='1') and vi_clk_cnt=-1 then
-      report time'image(now)&" tm_mem "&NAME&" sync_nent";      
+      --report time'image(now)&" tm_mem "&NAME&" sync_nent";      
       vi_clk_cnt := 0;
       vi_page_cnt := 1;
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
-      report time'image(now)&" tm_mem "&NAME&" increment vi_clk_cnt";      
+      --report time'image(now)&" tm_mem "&NAME&" increment vi_clk_cnt";      
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
-      report time'image(now)&" tm_mem "&NAME&" goto next page";      
+      --report time'image(now)&" tm_mem "&NAME&" goto next page";      
       vi_clk_cnt := 0;
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
-        report time'image(now)&" tm_mem "&NAME&" increment vi_page_cnt";        
+        --report time'image(now)&" tm_mem "&NAME&" increment vi_page_cnt";        
         vi_page_cnt := vi_page_cnt +1;
       else
-        report time'image(now)&" tm_mem "&NAME&" resetting vi_page_cnt";      
+        --report time'image(now)&" tm_mem "&NAME&" resetting vi_page_cnt";      
         vi_page_cnt := 0;
       end if;
-      report time'image(now)&" tm_mem "&NAME&" will zero nent";      
+      --report time'image(now)&" tm_mem "&NAME&" will zero nent";      
       nent_o(vi_page_cnt) <= (others => '0');
     end if;
     if (wea='1') then
@@ -158,7 +158,7 @@ begin
       --sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
       address := vi_page_cnt_slv&nent_o(vi_page_cnt);
-      report time'image(now)&" tm_mem "&NAME&" addresss "&to_bstring(address)&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(nent_o(vi_page_cnt));      
+      --report time'image(now)&" tm_mem "&NAME&" addresss "&to_bstring(address)&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(nent_o(vi_page_cnt));      
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       nent_o(vi_page_cnt) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(vi_page_cnt))) + 1, nent_o(vi_page_cnt)'length)); -- + 1 (slv)
       -- Count entries

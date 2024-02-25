@@ -1,16 +1,20 @@
-// VMSMERouter
+// VMRouterCM
 
-// Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs).
-// By writing VMStubME memories, with each VMSMERouter correspond to one phi/AllStub region.
-// Needed for when project is split over both PFGAs
+// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).
+// Several types of memories depending on which module that is going to read it.
+// Each VMRouterCM correspond to one phi/AllStub region.
+// Each memory type contain different bits of the same stub.
 
-#ifndef TrackletAlgorithm_VMSMERouter_h
-#define TrackletAlgorithm_VMSMERouter_h
+// NOTE: Nothing in VMRouterCM.h needs to be changed to run a different phi region
+
+#ifndef TrackletAlgorithm_VMRouterCM_h
+#define TrackletAlgorithm_VMRouterCM_h
 
 #include "ap_int.h"
 #include <cassert>
 
 #include "Constants.h"
+#include "InputStubMemory.h"
 #include "AllStubMemory.h"
 #include "VMStubMEMemoryCM.h"
 #ifndef __SYNTHESIS__
@@ -20,22 +24,38 @@
 #include "DummyMessageLogger.h"
 #endif
 #endif
+// #define VMRCM_DEBUG
 
 /////////////////////////////////////////
 // Constants
+
+// Number of bits used for the TE in disks
+constexpr int nbitsvmtedisk[trklet::N_DISK] = { 3, 3, 0, 3, 0 };
 
 // Number of rz bin bits for ME
 constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
 constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 
+// The length of the masks used for the memories
+constexpr int maskASIsize = 12; // Allstub Inner memories
+
+// Enum for the different versions of Allstub Inner memories. L,M,R can be used for both barrel and disks
+enum allStubInnerVersions {A, B, C, D, E, F, L, M, R, OL, OM, OR};
+
+// Cuts for AllStub Inner memories
+constexpr double CUTZL1L3L5[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1L3L5/kz_cm[0], trklet::VMROUTERCUTZL1L3L5/kz_cm[1], trklet::VMROUTERCUTZL1L3L5/kz_cm[2], trklet::VMROUTERCUTZL1L3L5/kz_cm[3], trklet::VMROUTERCUTZL1L3L5/kz_cm[4], trklet::VMROUTERCUTZL1L3L5/kz_cm[5]};
+constexpr double CUTZL1[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1/kz_cm[0], trklet::VMROUTERCUTZL1/kz_cm[1], trklet::VMROUTERCUTZL1/kz_cm[2], trklet::VMROUTERCUTZL1/kz_cm[3], trklet::VMROUTERCUTZL1/kz_cm[4], trklet::VMROUTERCUTZL1/kz_cm[5]};
+constexpr double CUTZL2[trklet::N_LAYER] = {trklet::VMROUTERCUTZL2/kz_cm[0], trklet::VMROUTERCUTZL2/kz_cm[1], trklet::VMROUTERCUTZL2/kz_cm[2], trklet::VMROUTERCUTZL2/kz_cm[3], trklet::VMROUTERCUTZL2/kz_cm[4], trklet::VMROUTERCUTZL2/kz_cm[5]};
+constexpr double CUTRD1D3 = trklet::VMROUTERCUTRD1D3 / kr;
+
 //////////////////////////////////////
-// Functions used by the VMSMERouter
+// Functions used by the VMR CM
 
 // Returns the bits of phi corresponding to finephi, i.e. phi regions within a VM
 // vmbits is the number of bits for the VMs, i.e. coarse phi region. E.g. 32 VMs would use vmbits=5
 // finebits is the number of bits within the VM
-template<regionType inType>
-inline int iphivmFineBins(const typename AllStub<inType>::ASPHI phi, const int vmbits, const int finebits) {
+template<regionType InType>
+inline int iphivmFineBins(const typename AllStub<InType>::ASPHI phi, const int vmbits, const int finebits) {
 
 	auto finebin = (phi.range(phi.length() - vmbits - 1, phi.length() - vmbits - finebits));
 
@@ -43,14 +63,14 @@ inline int iphivmFineBins(const typename AllStub<inType>::ASPHI phi, const int v
 }
 
 // Get the corrected phi, i.e. phi at the average radius of the barrel
-// Corrected phi is used by ME memories in the barrel
-template<regionType inType>
-inline typename AllStub<inType>::ASPHI getPhiCorr(
-		const typename AllStub<inType>::ASPHI phi,
-		const typename AllStub<inType>::ASR r,
-		const typename AllStub<inType>::ASBEND bend, const int phiCorrTable[]) {
+// Corrected phi is used by ME and TE memories in the barrel
+template<regionType InType>
+inline typename AllStub<InType>::ASPHI getPhiCorr(
+		const typename AllStub<InType>::ASPHI phi,
+		const typename AllStub<InType>::ASR r,
+		const typename AllStub<InType>::ASBEND bend, const int phiCorrTable[]) {
 
-	if (inType == DISKPS || inType == DISK2S) return phi; // Do nothing if disks
+	if (InType == DISKPS || InType == DISK2S) return phi; // Do nothing if disks
 
 	constexpr auto nrbins = 1 << kNbitsrzbin; // The number of bins for r
 
@@ -66,6 +86,7 @@ inline typename AllStub<inType>::ASPHI getPhiCorr(
 
 	return phicorr;
 }
+
 
 // Returns a ME stub with all the values set
 template<class T, regionType inType, int layer, int disk>
@@ -144,67 +165,79 @@ inline T createVMStubME(AllStub<inType> allStub,
 	return stub;
 };
 
+
 /////////////////////////////////
 // Main function
 
-// inType will be BARRELPS, BARREL2S, or DISKPS (since methods not defined for 'DISK' AllStubs, despite both DISKPS and 2S contained in each memory)
-// and outType will be BARRELPS, BARREL2S, or DISK (since both DISKPS and 2S contained in each VMStubME memory)
-template<int layer, int disk, regionType inType, regionType outType, int rzSizeME, int phiRegSize>
+// Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
+template<int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int phiRegSize>
 void VMSMERouter(const BXType bx, BXType& bx_o,
 		// LUTs
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStub<inType> allStub,
-		// Output memories
-		VMStubMEMemoryCM<outType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
-		AllStubMemory<outType> allStubsCopy,
-		// Index of AllStub processed (used for setting 'index' in VMStub)
-		const unsigned int index,
+		AllStub<InType>& allStub,
+		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
+		AllStubMemory<OutType>& memoriesAS,
 		// Array to count how many VMStubs written in each slot
-		ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)],
-		// Bool if valid stub
-		bool valid) {
+		unsigned int index,
+		bool valid
+		) {
 
 #pragma HLS inline
-#pragma HLS array_partition variable=allStubsCopy complete dim=1
-#pragma HLS array_partition variable=addrCountME complete dim=0
 
-	/////////////////////////////////////
-	// Main Loop
-	bool disk2S = false; // Used to determine if DISK2S
-	bool negDisk = false; // Used to determine if stub is in negative or positive Z region of detector
+  
+  bool disk2S = false; // Used to determine if DISK2S
+  bool negDisk = false; // Used to determine if it's negative disk
+	
+  AllStub<InType>       stub = allStub; // read stubs, and if disk cast from DISK to DISKPS/2S
+  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw());
+  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allStub.raw());
+  AllStub<OutType>      stub_copy = AllStub<OutType>(allStub.raw());
 
-	AllStub<inType>       stub = allStub; // read stubs, and if disk cast from DISK to DISKPS/2S
-	AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw());
-	AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allStub.raw());
-	AllStub<outType>      stub_copy = AllStub<outType>(allStub.raw());
-	if (valid){
-		allStubsCopy.write_mem(bx, stub_copy, index); // write copy AllStub to be used later in chain 
-	}
-	constexpr bool isDisk = (disk > 0);
-	if (isDisk) {
-		disk2S = !stub_ps.isPSStub();
-		if (disk2S) negDisk = stub_2s.getND();
-		else negDisk = stub_ps.getND();
-	}
+  
+  ////////////////////////////////////////
+  // AllStub memories
+	
+  ///AllStub<OutType> allstub = allStub.raw();
 
-	/////////////////////////////////////////////
-	// ME memories
-	int slotME; // The bin the stub is going to be put in, in the memory
-	// Create the ME stub to save
-	if (valid){
-		VMStubMECM<outType> stubME = (disk2S) ? 
-			createVMStubME<VMStubMECM<outType>, DISK2S, layer, disk>(stub_2s, index, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
-			createVMStubME<VMStubMECM<outType>, DISKPS, layer, disk>(stub_ps, index, negDisk, METable, phiCorrTable, slotME) : 
-			createVMStubME<VMStubMECM<outType>, inType, layer, disk>(stub, index, negDisk, METable, phiCorrTable, slotME);
-		// Write the ME stub
-		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
-		addrCountME[slotME] += 1;
-	}
-		
-	// End ME memories
-	bx_o = bx;
-} // End VMSMERouter
+  
+  // Write stub to all memory copies
+  // It seems that the if (nAllCopies > 0) should not be needed,
+  // but if nAllCopies is zero it generates an error in vivado_hls
+  if (valid) {
+    memoriesAS.write_mem(bx, stub_copy, index);
+  }
 
-#endif // TrackletAlgorithm_VMSMERouter_h
+  constexpr bool isDisk = (Disk > 0);
+  if (isDisk) {
+    disk2S = !stub_ps.isPSStub();
+    if (disk2S) negDisk = stub_2s.getND();
+    else negDisk = stub_ps.getND();
+  }
+
+  /////////////////////////////////////////////
+  // ME memories
+  
+  int slotME; // The bin the stub is going to be put in, in the memory
+	
+  // Create the ME stub to save
+
+  if (valid) {
+    //VMStubMECM<OutType> stubME = (disk2S) ? 
+    //  createVMStubME<VMStubMECM<OutType>, DISK2S, Layer, Disk>(stubDisk2S, index, negDisk,METable, phiCorrTable, slotME) :
+    //  createVMStubME<VMStubMECM<OutType>, InType, Layer, Disk>(stub, index, negDisk, METable, phiCorrTable, slotME);
+    VMStubMECM<OutType> stubME = (disk2S) ? 
+      createVMStubME<VMStubMECM<OutType>, DISK2S, Layer, Disk>(stub_2s, index, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
+      createVMStubME<VMStubMECM<OutType>, DISKPS, Layer, Disk>(stub_ps, index, negDisk, METable, phiCorrTable, slotME) : 
+      createVMStubME<VMStubMECM<OutType>, InType, Layer, Disk>(stub, index, negDisk, METable, phiCorrTable, slotME);
+    
+    // Write the ME stub
+    memoryME->write_mem(bx, slotME, stubME, 0);
+  }
+  
+  
+  bx_o = bx;
+} // End VMRouterCM
+
+#endif // TrackletAlgorithm_VMRouterCM_h

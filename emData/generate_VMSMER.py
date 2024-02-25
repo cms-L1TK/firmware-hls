@@ -2,7 +2,6 @@
 
 ## python 2/3 inter-compatibility
 from __future__ import absolute_import, print_function
-import sys, re, os, argparse
 
 # This script generates VMStubMERouterTop.h and VMStubMERouterTop.cc in the TopFunctions/ directory.
 # Supports all VMRs, but creates separate top function files foe each VMR specified.
@@ -19,7 +18,7 @@ num_disks = 5
 
 def getAllVMRs(wireconfig):
 
-    vmsmer_list = []
+    vmr_list = []
 
     # Open wiring file
     wires_file = open(wireconfig)
@@ -27,13 +26,13 @@ def getAllVMRs(wireconfig):
     # Loop over each line in the wiring
     for line in wires_file:
         module_name = line.split(" ")[-1].split(".")[0]
-        # Add module name if not already in vmsmer_list
-        if "VMSMER" in module_name and module_name not in vmsmer_list:
-            vmsmer_list.append(module_name)
+        # Add module name if not already in vmr_list
+        if "VMSMER" in module_name and module_name not in vmr_list:
+            vmr_list.append(module_name)
 
     wires_file.close()
 
-    return vmsmer_list
+    return vmr_list
 
 #################################
 # Writes the VMStubMERouterTop.h file
@@ -89,14 +88,12 @@ def writeTopHeader(vmr, output_dir):
         "\n"
         "void %s(const BXType bx, BXType& bx_o,\n" % file_name +\
         "  // Input memories\n"
-        "  AllStub<inType> allStub,\n"
+        "  AllStub<inType>& allStub,\n"
         "  // Output memories\n"
         "  VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME,\n"
-        "  AllStubMemory<outType> allStubCopy,\n"
+        "  AllStubMemory<outType>& memoriesAS,\n"
         "  // Index of AllStub\n"
-        "  const unsigned int index,\n"
-        "  // Array to count how many VMStubs written in each slot\n"
-		"  ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)],\n"
+        "  unsigned int index,\n"
         "  // Bool if valid stub\n"
         "  bool valid\n"
         "  );\n"
@@ -115,6 +112,8 @@ def writeTopFile(vmr, output_dir):
     disk = int(0 if layer else vmr.split("_")[1][1])
     layerdisk = layer-1 if layer else disk+num_layers-1
 
+    LD = ""
+     
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
 
@@ -129,14 +128,12 @@ def writeTopFile(vmr, output_dir):
         "void %s(\n" % file_name +\
         "  const BXType bx, BXType& bx_o,\n"
         "  // Input memories\n"
-        "  AllStub<inType> allStub,\n"
+        "  AllStub<inType>& allStub,\n"
         "  // Output memories\n"
         "  VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME,\n"
-        "  AllStubMemory<outType> allStubCopy,\n"
+        "  AllStubMemory<outType>& memoriesAS,\n"
         "  // Index of AllStub\n"
-        "  const unsigned int index,\n"
-        "  // Array to count how many VMStubs written in each slot\n"
-		"  ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)],\n"
+        "  unsigned int index,\n"
         "  // Bool if valid stub\n"
         "  bool valid\n"
         "  ) {\n"
@@ -163,7 +160,7 @@ def writeTopFile(vmr, output_dir):
         "  /////////////////////////\n"
         "  // Main function\n"
         "\n"
-        "  VMSMERouter<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin>(\n"
+        "  VMSMERouter%s<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin>(\n" %LD +\
         "    bx, bx_o,\n"
         "    // LUTs\n"
         "    METable,\n"
@@ -172,10 +169,9 @@ def writeTopFile(vmr, output_dir):
         "    allStub,\n"
         "    // Output memories\n"
         "    memoryME,\n"
-        "    allStubCopy,\n"
+        "    memoriesAS,\n"
         "    // Index of AllStub\n"
         "    index,\n"
-        "    addrCountME,\n"
         "    valid\n"
         "  );\n"
         "\n"
@@ -189,144 +185,43 @@ def writeTopFile(vmr, output_dir):
 ###############################
 # Main execution
 
-parser = argparse.ArgumentParser(description="This script generates VMSMERouterTop.h, VMsMERouterTop.cc \
-   in the TopFunctions/ directory.", epilog="")
-parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/CombinedConfig/", type=str, help="The directory in which to write the output files (default=%(default)s)")
-parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTsCM/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
-arguments = parser.parse_args()
+if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(
+        description = """
+Generates top function and parameter files for the VMStubMERouter.
+VMStubMERouterTop*.h and VMStubMERouterTop*.cc contain the top function for the units under test specified (default VMSMER_L2PHIA).
+VMRouterCM_parameters.h contains the magic numbers for the specified units under test (since generating VMStubMERouter parameters file would be redundant).
 
-
-
-# First, parse the wires file and store the memory names associated with VMSMERs in
-# dictionaries with the VMSMER names as keys.
-with open(arguments.wiresFileName, "r") as wiresFile:
-  asMems = {}
-  for line in wiresFile:
-      if "VMSMER_" not in line :
-        continue
-      line = line.rstrip()
-      vmsmerName = line.split("VMSMER_")[1].split(".")[0]
-      memName = line.split()[0]
-
-      print("line:", line)
-      
-      if memName.startswith("AS"):
-        if vmsmerName not in asMems:
-          asMems[vmsmerName] = []
-          asMems[vmsmerName].append(memName)
-
-# Open and print out preambles for the parameters and top files.
-dirname = os.path.dirname(os.path.realpath('__file__'))
-with open(os.path.join(dirname, arguments.outputDirectory, "VMSMERouterTop.h"), "w") as topHeaderFile, \
-     open(os.path.join(dirname, arguments.outputDirectory, "VMSMERouterTop.cc"), "w") as topFile:
-    topHeaderFile.write(
-        "#ifndef TopFunctions_VMSMERouterTop_h\n"
-        "#define TopFunctions_VMSMERouterTop_h\n"
-        "\n"
-        "#include \"VMSMERouter.h\"\n"
-    )
-    topFile.write(
-        "#include \"VMSMERouterTop.h\"\n"
-        "#include \"VMSMER_parameters.h\"\n" 
-       "\n"
-        "////////////////////////////////////////////////////////////////////////////////\n"
-        "// Top functions for various VMSMERouters (VMSMER)."
-        "////////////////////////////////////////////////////////////////////////////////\n"
+Examples:
+python3 generate_VMRSMER.py
+python3 generate_VMRSMER.py --uut VMR_L1PHIE VMR_L1PHID
+python3 generate_VMRSMER.py -a
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    for vmsmerName in sorted(asMems):
-        layer = "0"
-        disk = "0"
-        if vmsmerName[0] == "L" :
-            layer = vmsmerName[1]
-        if vmsmerName[0] == "D" :
-            disk = vmsmerName[1]
-        asinType = "DISKPS"
-        asoutType = "DISK"
-        rzbinbits = "4"
-        if "L1" in vmsmerName or "L2" in vmsmerName or "L3" in vmsmerName:
-            asinType = "BARRELPS"
-            asoutType = "BARRELPS"
-            rzbinbits = "3"
-        if "L4" in vmsmerName or "L5" in vmsmerName or "L6" in vmsmerName:
-            asinType = "BARREL2S"
-            asoutType = "BARREL2S"
-            rzbinbits = "3"
-        topHeaderFile.write(
-            "\n"
-            "void VMSMERouter_%s(const BXType bx, BXType& bx_o,\n" % vmsmerName +\
-            "  // Input memories\n"
-            "  AllStub<%s> allStub,\n" % asinType +\
-            "  // Output memories\n"
-            "  VMStubMEMemoryCM<%s, %s, kNbitsphibin, kNMatchEngines> *memoryME,\n" % (asoutType, rzbinbits) +\
-            "  AllStubMemory<%s> allStubCopy,\n" % asoutType +\
-            "  // Index of AllStub\n"
-            "  const unsigned int index,\n"
-            "  // Array to count how many VMStubs written in each slot\n"
-	    "  ap_uint<5> addrCountME[1 << (%s + kNbitsphibin)],\n" % rzbinbits +\
-            "  // Bool if valid stub\n"
-            "  bool valid\n"
-            "  );\n"
-            "\n"
-        )
+    parser.add_argument("-a", "--all", default=False, action="store_true", help="Create files for all VMStubMERouters in a nonant.")
+    parser.add_argument("--uut", default=["VMSMER_L2PHIA"], nargs="+", help="Unit Under Test (default = %(default)s)")
+    parser.add_argument("-o", "--outputdir", type=str, default="../TopFunctions/", help="The directory in which to write the output files (default=%(default)s)")
+    parser.add_argument("-w", "--wireconfig", type=str, default="LUTsCM/wires.dat",
+                        help="Name and directory of the configuration file for wiring (default = %(default)s)")
 
-        topFile.write(
-            "\n"
-            "void VMSMERouter_%s(\n" % vmsmerName +\
-            "  const BXType bx, BXType& bx_o,\n"
-            "  // Input memories\n"
-            "  AllStub<%s> allStub,\n" %asinType +\
-            "  // Output memories\n"
-            "  VMStubMEMemoryCM<%s, %s, kNbitsphibin, kNMatchEngines> *memoryME,\n" %(asoutType, rzbinbits) +\
-            "  AllStubMemory<%s> allStubCopy,\n" %asoutType +\
-            "  // Index of AllStub\n"
-            "  const unsigned int index,\n"
-            "  // Array to count how many VMStubs written in each slot\n"
-            "  ap_uint<5> addrCountME[1 << (%s + kNbitsphibin)],\n" %rzbinbits +\
-            "  // Bool if valid stub\n"
-            "  bool valid\n"
-            "  ) {\n"
-            "\n"
-            "// Takes 2 clock cycles before one gets data, used at high frequencies\n"
+    args = parser.parse_args()
 
-            "#pragma HLS interface register port=bx_o\n"
-            "\n"
-            "  ///////////////////////////\n"
-            "  // Open Lookup tables\n"
-            "\n"
-            "  // LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).\n"
-            "  // Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.\n"
-            "  // Indexed using r and z position bits\n"
-            "  static const int* METable = getMETable<TF::%s>();\n" %vmsmerName[0:2] +\
-            "\n"
-            "  // LUT with phi corrections to project the stub to the average radius in a layer.\n"
-            "  // Only used by layers.\n"
-            "  // Indexed using phi and bend bits\n"
-            "  static const int* phiCorrTable = getPhiCorrTable<TF::%s>();\n" %vmsmerName[0:2] +\
-            "\n"
-            "  /////////////////////////\n"
-            "  // Main function\n"
-            "\n"
-            "  VMSMERouter< %s, %s, %s, %s, %s, kNbitsphibin>(\n" %(layer, disk, asinType, asoutType, rzbinbits) +\
-            "    bx, bx_o,\n"
-            "    // LUTs\n"
-            "    METable,\n"
-            "    phiCorrTable,\n"
-            "    // Input memories\n"
-            "    allStub,\n"
-            "    // Output memories\n"
-            "    memoryME,\n"
-            "    allStubCopy,\n"
-            "    // Index of AllStub\n"
-            "    index,\n"
-            "    addrCountME,\n"
-            "    valid\n"
-            "  );\n"
-            "\n"
-            "  return;\n"
-            "}\n"
-        )
-    topHeaderFile.write(
-        "#endif\n"
-    )
+    # Get a list of the Units Under Test
+    if args.all:
+        vmr_list = getAllVMRs(args.wireconfig)
+    else:
+        vmr_list = args.uut
+    vmr_list.sort()
+
+    # Loop over all Units Under Test
+    for vmr in vmr_list:
+        # Check that the Unit Under Test is a VMR
+        if "VMSMER" not in vmr:
+            raise IndexError("Unit under test has to be a VMSMER.")
+
+        # Create and write the files
+        writeTopHeader(vmr, args.outputdir)
+        writeTopFile(vmr, args.outputdir)

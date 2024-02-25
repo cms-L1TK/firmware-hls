@@ -11,59 +11,60 @@ from enum import Enum
 
 # These enums must match those defined in
 # TopFunctions/TrackletProcessor.h.
-# class ProjoutIndexBarrel(Enum):
-#   L1PHIA = 0
-#   L1PHIB = 1
-#   L1PHIC = 2
-#   L1PHID = 3
-#   L1PHIE = 4
-#   L1PHIF = 5
-#   L1PHIG = 6
-#   L1PHIH = 7
-#   L2PHIA = 8
-#   L2PHIB = 9
-#   L2PHIC = 10
-#   L2PHID = 11
-#   L3PHIA = 12
-#   L3PHIB = 13
-#   L3PHIC = 14
-#   L3PHID = 15
-#   L4PHIA = 16
-#   L4PHIB = 17
-#   L4PHIC = 18
-#   L4PHID = 19
-#   L5PHIA = 20
-#   L5PHIB = 21
-#   L5PHIC = 22
-#   L5PHID = 23
-#   L6PHIA = 24
-#   L6PHIB = 25
-#   L6PHIC = 26
-#   L6PHID = 27
-#   N_PROJOUT_BARREL = 28
+ProjoutIndexBarrel = {
+   "L1PHIA":0,
+   "L1PHIB":1,
+   "L1PHIC":2,
+   "L1PHID":3,
+   "L1PHIE":4,
+   "L1PHIF":5,
+   "L1PHIG":6,
+   "L1PHIH":7,
+   "L2PHIA":8,
+   "L2PHIB":9,
+   "L2PHIC":10,
+   "L2PHID":11,
+   "L3PHIA":12,
+   "L3PHIB":13,
+   "L3PHIC":14,
+   "L3PHID":15,
+   "L4PHIA":16,
+   "L4PHIB":17,
+   "L4PHIC":18,
+   "L4PHID":19,
+   "L5PHIA":20,
+   "L5PHIB":21,
+   "L5PHIC":22,
+   "L5PHID":23,
+   "L6PHIA":24,
+   "L6PHIB":25,
+   "L6PHIC":26,
+   "L6PHID":27
+}
 
-# class ProjoutIndexDisk(Enum):
-#   D1PHIA = 0
-#   D1PHIB = 1
-#   D1PHIC = 2
-#   D1PHID = 3
-#   D2PHIA = 4
-#   D2PHIB = 5
-#   D2PHIC = 6
-#   D2PHID = 7
-#   D3PHIA = 8
-#   D3PHIB = 9
-#   D3PHIC = 10
-#   D3PHID = 11
-#   D4PHIA = 12
-#   D4PHIB = 13
-#   D4PHIC = 14
-#   D4PHID = 15
-#   D5PHIA = 16
-#   D5PHIB = 17
-#   D5PHIC = 18
-#   D5PHID = 19
-#   N_PROJOUT_DISK = 20
+
+ProjoutIndexDisk = {
+   "D1PHIA":0,
+   "D1PHIB":1,
+   "D1PHIC":2,
+   "D1PHID":3,
+   "D2PHIA":4,
+   "D2PHIB":5,
+   "D2PHIC":6,
+   "D2PHID":7,
+   "D3PHIA":8,
+   "D3PHIB":9,
+   "D3PHIC":10,
+   "D3PHID":11,
+   "D4PHIA":12,
+   "D4PHIB":13,
+   "D4PHIC":14,
+   "D4PHID":15,
+   "D5PHIA":16,
+   "D5PHIB":17,
+   "D5PHIC":18,
+   "D5PHID":19
+}
 
 parser = argparse.ArgumentParser(description="This script generates ProjectionCalculatorTop.h, ProjectionCalculatorTop.cc \
    in the TopFunctions/ directory.",
@@ -77,7 +78,6 @@ arguments = parser.parse_args()
 with open(arguments.wiresFileName, "r") as wiresFile:
   tprojMems = {}
   for line in wiresFile:
-      # Only barrel-only seeds are supported right now.
       if "PC_" not in line :
         continue
       line = line.rstrip()
@@ -89,34 +89,34 @@ with open(arguments.wiresFileName, "r") as wiresFile:
       if memName.startswith("MPROJ_"):
         if pcName not in tprojMems:
           tprojMems[pcName] = []
-          tprojMems[pcName].append(memName)
+        tprojMems[pcName].append(memName)
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
 #with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator_parameters.h"), "w") as parametersFile, \
 with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.h"), "w") as topHeaderFile, \
-open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.cc"), "w") as topFile:
-  # parametersFile.write(
-  #     "#ifndef TopFunctions_TrackletProcessor_parameters_h\n"
-  #     "#define TopFunctions_TrackletProcessor_parameters_h\n"
-  #     "\n"
-  #     "// This file contains numbers of memories and bit masks that are specific to\n"
-  #     "// each TrackletProcessor and that come directly from the wiring.\n"
-  #     "//\n"
-  #     "// The validity of each of the barrel TPROJ memories is determined by\n"
-  #     "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
-  #     "// significant, represent the memories in the order they are passed to\n"
-  #     "// TrackletProcessor; e.g., the LSB corresponds to\n"
-  #     "// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n"
-  #     "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
-  #     "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
-  #     "// in the same way.\n"
-  #     "namespace PC{\n"
-  #     "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
-  #     "   }\n"
-  #     "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
-  #     "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
-  # )
+     open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.cc"), "w") as topFile:
+#  parametersFile.write(
+#    "#ifndef TopFunctions_ProjectionCalculator_parameters_h\n"
+#    "#define TopFunctions_ProjectionCalculator_parameters_h\n"
+#    "\n"
+#    "// This file contains numbers of memories and bit masks that are specific to\n"
+#    "// each ProjectionCalculator and that come directly from the wiring.\n"
+#    "//\n"
+#    "// The validity of each of the barrel TPROJ memories is determined by\n"
+#    "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
+#    "// significant, represent the memories in the order they are passed to\n"
+#    "// ProjectionCalculator; e.g., the LSB corresponds to\n"
+#    "// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n"
+#    "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
+#    "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
+#    "// in the same way.\n"
+#    "namespace PC{\n"
+#    "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
+#    "   }\n"
+#    "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
+#    "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
+#   )
   topHeaderFile.write(
     "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
     "#define TopFunctions_ProjectionCalculatorTop_h\n"
@@ -139,6 +139,7 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
     )
   # Calculate parameters and print out parameters and top function for each TP.
   for pcName in sorted(tprojMems):
+    print(pcName,tprojMems[pcName])
     seed = pcName[0:4]
     iTC = pcName[4:]
     print("pcName:", pcName, seed, iTC) 
@@ -152,17 +153,26 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
     # asInnerMems[pcName].sort()
     # asOuterMems[pcName].sort()
 
-
+    # TPROJ masks for barrel and disks
+    tprojMaskBarrel = 0
+    tprojMaskDisk = 0
+    for projmem in tprojMems[pcName]:
+      projlayreg = projmem.split("_")[2]
+      if projlayreg in ProjoutIndexBarrel:
+        tprojMaskBarrel = tprojMaskBarrel | (1 << ProjoutIndexBarrel[projlayreg])
+      if projlayreg in ProjoutIndexDisk:
+        tprojMaskDisk = tprojMaskDisk | (1 << ProjoutIndexDisk[projlayreg])
+      
     # Print out prototype for top function for this TC.
     topHeaderFile.write(
       "\n"
       "void ProjectionCalculator_" + seed + iTC + "(\n"
       "    const BXType bx,\n"
       "    BXType& bx_o,\n"
-      "    TrackletParameters tPars,\n"
+      "    TrackletParameters tPar,\n"
       "    int trackletIndex,\n"
       "    bool valid,\n"
-      "    TrackletParameterMemory tparout,\n"
+      "    TrackletParameterMemory& tparout,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[]\n"
@@ -175,10 +185,10 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "void ProjectionCalculator_" + seed + iTC + "(\n"
       "    const BXType bx,\n"
       "    BXType& bx_o,\n"
-      "    TrackletParameters tPars,\n"
+      "    TrackletParameters tPar,\n"
       "    int trackletIndex,\n"
       "    bool valid,\n"
-      "    TrackletParameterMemory tparout,\n"
+      "    TrackletParameterMemory& tparout,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
@@ -192,10 +202,11 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "PC_" + seed + iTC + ": ProjectionCalculator<\n"
       "  TF::" + seed + ",\n"
       "  TC::" + iTC[0] + ",\n"
-      " 108>(\n"
+      "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
+      " >(\n"
       "    bx,\n"
       "    bx_o,\n"
-      "    tPars,\n"
+      "    tPar,\n"
       "    trackletIndex,\n"
       "    valid,\n"
       "    tparout,\n"
