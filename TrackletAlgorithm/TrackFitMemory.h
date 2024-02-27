@@ -4,8 +4,8 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 
-// Memory written by the TrackBuilder, containing the track candidates found by the tracklet 
-// pattern reconstruction chain.
+// Memory written by the TrackBuilder, containing the track candidates found by
+// the tracklet pattern reconstruction chain.
 
 // TrackFitBase is where we define the bit widths.
 template<int NBarrelStubs, int NDiskStubs>
