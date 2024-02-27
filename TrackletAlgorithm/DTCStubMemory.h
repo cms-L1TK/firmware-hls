@@ -5,10 +5,12 @@
 #include "MemoryTemplate.h"
 
 // Memory containing stubs written by the InputRouter. 
-// (Unlike the stubs read by the InputRouter, these do not contain the "valid + layer id" bits).
-// N.B. Both class DTCStubMemory & InputStubMemory represent the same BRAM between InputRouter & VMRouter,
-// but DTCStubMemory does not describe the bit fields, so can hold stubs in any of disk/barrel/PS/2S,
-// so is used for the InputRouter output.
+// (Unlike the stubs read by the InputRouter, these do not contain the
+// "valid + layer id" bits).
+// N.B. Both class DTCStubMemory & InputStubMemory represent the same BRAM
+// between InputRouter & VMRouter, but DTCStubMemory does not describe the bit
+// fields, so can hold stubs in any of disk/barrel/PS/2S, so is used for the
+// InputRouter output.
 
 class DTCStubBase
 {
