@@ -5,8 +5,8 @@
 #include "MemoryTemplate.h"
 #include "globalFunctions.h"
 
-// Memory written by the TrackletProcessor, containing the intercepts of the tracklet seed projections 
-// to other tracker layers.
+// Memory written by the TrackletProcessor, containing the intercepts of the
+// tracklet seed projections to other tracker layers.
 
 // TrackletProjectionBase is where we define the bit widths, which depend on
 // the class template parameter.
