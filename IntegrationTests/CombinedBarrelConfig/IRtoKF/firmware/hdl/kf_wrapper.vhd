@@ -54,7 +54,7 @@ begin  -- architecture rtl
       kf_dout => s_kf_dout
       );
 
-  kfout_top_1 : entity work.kfout_top_conv
+  kfout_top_1 : entity work.kfout_top
     port map (
       clk        => clk_i,
       kfout_din  => s_kf_dout,

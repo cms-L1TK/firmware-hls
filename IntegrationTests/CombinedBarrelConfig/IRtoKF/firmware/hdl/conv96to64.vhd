@@ -115,6 +115,8 @@ begin  -- architecture rtl
         else
           if s_track_wr_en = '1' then
             ram(s_write_addr) <= s_track_in;
+	  else
+            ram(s_write_addr) <= x"000000000000000000000000";
           end if;
         end if;
       end if;

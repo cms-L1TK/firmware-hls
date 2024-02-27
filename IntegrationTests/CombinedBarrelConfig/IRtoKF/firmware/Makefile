@@ -33,9 +33,9 @@ $(input_file): $(core_dir)
 	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsCMBarrel/InputStubs -o $(input_file)
 
 apollo_input: $(input_file)
-	@ln -s ../../../common/scripts/compare_emp_outputs.py scripts/compare_emp_outputs.py
-	@ln -s ../../../common/scripts/merge_emp_output.py scripts/merge_emp_output.py
-	@ln -s ../../../common/scripts/split_emp_input.py scripts/split_emp_input.py
+	@cd scripts; ln -s ../../../../common/script/compare_emp_outputs.py compare_emp_outputs.py
+	@cd scripts; ln -s ../../../../common/script/merge_emp_output.py merge_emp_output.py
+	@cd scripts; ln -s ../../../../common/script/split_emp_input.py split_emp_input.py
 	@python3 scripts/split_emp_input.py
 
 sim: $(input_file) $(core_file) $(core_dir)

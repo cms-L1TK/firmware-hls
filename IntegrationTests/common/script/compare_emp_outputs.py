@@ -181,7 +181,7 @@ class KfTrack:
     '''
     self.bits = Bitmap(hex_string)
     valid = ((self.bits >> 95) & Bitmap('0x1'))
-    invr = ((self.bits >> 80) & Bitmap('0xEFFF'))
+    invr = ((self.bits >> 80) & Bitmap('0x7FFF'))
     phi0 = ((self.bits >> 68) & Bitmap('0xFFF'))
     chi2rphi = ((self.bits >> 64) & Bitmap('0xF'))
     tanl = ((self.bits >> 48) & Bitmap('0xFFFF'))
@@ -337,14 +337,21 @@ def empdata_to_kftracks(data):
     kf_tracks.append(KfTrack(data[-2]+data[-1][:8]))
     return kf_tracks
   else:
+    print(data)
     raise ValueError('Unexpected EMP data length.')
+
+def print_track_info(track):
+  '''Prints a the tuple (pt,eta,phi) of high-level track info'''
+  print('Track info: ('+str(track.pt)+','+str(track.eta)+','+str(track.phi0)+')')
 
 if __name__=='__main__':
   
   parser = argparse.ArgumentParser()
-  parser.add_argument('-s','--strict_compare',action='store_true')
-  parser.add_argument('-e','--emu_filename',default='pre.txt')
-  parser.add_argument('-c','--cmp_filename',default='/mnt/scratch1/mco62/emp_project_reduced/proj/vsim/vsim/vsim.sim/sim_1/behav/xsim/out.txt')
+  parser.add_argument('-s','--strictcompare',action='store_true')
+  parser.add_argument('-e','--emu_filename',default='mem/pre.txt')
+  parser.add_argument('-c','--cmp_filename',default='mem/out.txt')
+  parser.add_argument('-r','--reducedconfig',action='store_true')
+  parser.add_argument('-p','--printinfo',default='-1')
   args = parser.parse_args()
 
   n_event = 100
@@ -352,36 +359,79 @@ if __name__=='__main__':
   n_fail_event = 0
   n_fail_track = 0
 
-  for ievent in range(100):
-    #ievent = 91
-    initial_frame = ievent*108+6
-    final_frame = (ievent+1)*108-1
+  print_event = int(args.printinfo)
 
-    emu_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 7, initial_frame, final_frame)))
-    #emu_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 1, initial_frame, final_frame)))
-    sim_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 1, initial_frame, final_frame)))
+  #Do comparison
+  if (print_event < 0):
+    for ievent in range(100):
+      initial_frame = ievent*108+6
+      final_frame = (ievent+1)*108-1
 
-    n_event_fail_track = 0
-    fail_reason = ''
+      emu_tracks = []
+      sim_tracks = []
+      if not args.reducedconfig:
+        emu_tracks += empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 7, initial_frame, final_frame)))
+        emu_tracks += empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 6, initial_frame, final_frame)))
+        sim_tracks += empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 0, initial_frame, final_frame)))
+        sim_tracks += empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 1, initial_frame, final_frame)))
+      else:
+        emu_tracks += empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 7, initial_frame, final_frame)))
+        sim_tracks += empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 1, initial_frame, final_frame)))
 
-    if len(emu_tracks)!=len(sim_tracks):
-      fail_reason += ('Different number of tracks ('+str(len(emu_tracks))+','+str(len(sim_tracks))+'). ')
-      n_event_fail_track += len(emu_tracks)
-    else:
-      for itrack in range(len(emu_tracks)):
-        comp = (emu_tracks[itrack]==sim_tracks[itrack])
-        if not args.strict_compare:
-          comp = loose_compare(emu_tracks[itrack], sim_tracks[itrack], True)
-        if not comp:
-          fail_reason += ('Track '+str(itrack)+' differs. ')
-          n_event_fail_track += 1
+      n_event_fail_track = 0
+      fail_reason = ''
 
-    n_track += len(emu_tracks)
-    n_fail_track += n_event_fail_track
-    if (n_event_fail_track>0):
-      n_fail_event += 1
-      print('Event '+str(ievent)+' does not match. '+fail_reason)
-    
-  print('Failing events: '+str(n_fail_event)+'/'+str(n_event))
-  print('Failing tracks: '+str(n_fail_track)+'/'+str(n_track))
+      if len(emu_tracks)!=len(sim_tracks):
+        fail_reason += ('Different number of tracks ('+str(len(emu_tracks))+','+str(len(sim_tracks))+'). ')
+        n_event_fail_track += len(emu_tracks)
+      else:
+        for itrack in range(len(emu_tracks)):
+          comp = (emu_tracks[itrack]==sim_tracks[itrack])
+          if not args.strictcompare:
+            comp = loose_compare(emu_tracks[itrack], sim_tracks[itrack], True)
+          if not comp:
+            fail_reason += ('Track '+str(itrack)+' differs. ')
+            n_event_fail_track += 1
+
+      n_track += len(emu_tracks)
+      n_fail_track += n_event_fail_track
+      if (n_event_fail_track>0):
+        n_fail_event += 1
+        print('Event '+str(ievent)+' does not match. '+fail_reason)
+      
+    print('Failing events: '+str(n_fail_event)+'/'+str(n_event))
+    print('Failing tracks: '+str(n_fail_track)+'/'+str(n_track))
+   
+  #Do printout
+  else:
+    for ievent in range(print_event,print_event+1):
+      initial_frame = ievent*108+6
+      final_frame = (ievent+1)*108-1
+      if not args.reducedconfig:
+        emu_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 7, initial_frame, final_frame)))
+        sim_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 0, initial_frame, final_frame)))
+        print('Emu tracks (+eta):')
+        for track in emu_tracks:
+          print_track_info(track)
+        print('Sim tracks (+eta):')
+        for track in sim_tracks:
+          print_track_info(track)
+        emu_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 6, initial_frame, final_frame)))
+        sim_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 1, initial_frame, final_frame)))
+        print('Emu tracks (-eta):')
+        for track in emu_tracks:
+          print_track_info(track)
+        print('Sim tracks (-eta):')
+        for track in sim_tracks:
+          print_track_info(track)
+      else:
+        emu_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.emu_filename, 7, initial_frame, final_frame)))
+        sim_tracks = empdata_to_kftracks(trim_empdata(get_empdata(args.cmp_filename, 1, initial_frame, final_frame)))
+        print('Emu tracks:')
+        for track in emu_tracks:
+          print_track_info(track)
+        print('Sim tracks:')
+        for track in sim_tracks:
+          print_track_info(track)
+
     
