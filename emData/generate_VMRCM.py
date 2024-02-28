@@ -292,7 +292,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
             "  return " + str(len(mem_dict["AS_"+vmr])) + ";\n"
             "}\n"
             "template<> constexpr int getNumASInnerCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // Allstub Inner memory\n"
-            "  return " + str(len(mem_dict["ASI_"+vmr]) if mem_dict["ASI_"+vmr] else 1) + ";\n"
+            "  return " + str(len(mem_dict["ASI_"+vmr])) + ";\n"
             "}\n"
             "template<> constexpr int getNumTEOCopies<TF::" + layer_disk_char + str(layer_disk_num) + ", TF::" + phi_region + ">(){ // TE Outer memories\n"
             "  return " + str(max_copy_count) + ";\n"

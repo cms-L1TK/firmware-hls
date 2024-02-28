@@ -141,7 +141,7 @@ int main() {
     }
     // Allstub Inner memories
     if (nASInnerCopies) {
-      for (unsigned int i = 0; i < numASInnerCopies; i++) {
+      for (unsigned int i = 0; i < nASInnerCopies; i++) {
         err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
       }
     }
