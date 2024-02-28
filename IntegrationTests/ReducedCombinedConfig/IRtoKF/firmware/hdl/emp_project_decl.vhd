@@ -20,7 +20,7 @@ package emp_project_decl is
 
   -- Only used by nullalgo   
   --constant PAYLOAD_LATENCY : integer := 805;
-  constant PAYLOAD_LATENCY : integer := 824;
+  constant PAYLOAD_LATENCY : integer := 823;
 
   constant REGION_CONF : region_conf_array_t := (
     0      => kDummyRegion,                             --service/c2c
