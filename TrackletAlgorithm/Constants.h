@@ -8,11 +8,66 @@
 #endif
 
 // Inline function to convert floating point values to integers, given a
-// digitization constant. The 1.0e-1 is a fudge factor needed to get the
+// digitization constant. The 0.5 is needed to get the
 // floating point truncation to agree exactly with the emulation.
 inline constexpr int floatToInt(const double x, const double k) {
-  return static_cast<int>(x / k + 1.0e-1);
+  return static_cast<int>(x / k + 0.5);
 }
+
+constexpr double sqrtsix = 2.4494897427831; //can not use sqrt for constexpr
+
+//phi width of sector - including the hourglass shape for overlaps
+//ideally this should be calculated, but C++ standard does not allow use of
+//asin in constexpr at this time.
+constexpr double phiHG_ = 1.02776;
+
+  //Constants for coordinates and track parameter definitions
+  const int n_phi_ = 17;
+  const int n_r_ = 12;
+  const int n_z_ = 11;
+  const int n_phi0_ = 16;
+  const int n_rinv_ = 13;
+  const int n_t_ = 9;
+  const int n_phidisk_ = n_phi_-3;
+  const int n_rdisk_ = n_r_-1;
+
+  //Constants used for tracklet parameter calculations
+  const int n_delta0_ = 13;
+  const int n_deltaz_ = 11;
+  const int n_delta1_ = 13;
+  const int n_delta2_ = 13;
+  const int n_delta12_ = 13;
+  const int n_a_ = 15;
+  const int n_r6_ = 4;
+  const int n_delta02_ = 14;
+  const int n_x6_ = 15;
+  const int n_HG_ = 15;  
+
+  //Constants used for projectison to disks
+  const int n_tinv_ = 12;
+  const int n_y_ = 14;
+  const int n_x_ = 14;
+  const int n_xx6_ = 14;
+
+  //L1L2 specific constants
+  constexpr int n_Deltar_ = 24;
+  constexpr int n_Deltar_Disk_ = 23;
+
+  constexpr int n_Deltar_Overlap_ = 23;
+  constexpr int n_delta0_Overlap_ = 14;
+  constexpr int n_deltaz_Overlap_ = 9;
+  constexpr int n_a_Overlap_ = 14;
+  constexpr int n_r6_Overlap_ = 6;
+
+
+
+  //Constants used for projectison to layers
+  const int n_s_ = 12;
+  const int n_s6_ = 14;
+
+
+//projection layers for different seeds. Note that unused layers are indicated by
+//10. This allows the use of templating to evaluate the radius for all seeds.
 
 constexpr int kNTEUnits[8] = {5, 2, 5, 3, 3, 2, 3, 2}; // Number of TE units w.r.t. seed type
 constexpr int kNTEUnitsLayerDisk[] = {0, 5, 2, 5, 0, 3, 3, 3, 0, 2, 0}; // Number of TE units w.r.t. the layer/disk number.
@@ -162,6 +217,41 @@ namespace TF {
   // List of phi regions
   enum phiRegion {UNDEF_PHI, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
 }
+
+// Layers used for each of the seeds
+constexpr int seedLayers[8][2] = { {TF::L1, TF::L2},
+				   {TF::L2, TF::L3},
+				   {TF::L3, TF::L4},
+				   {TF::L5, TF::L6},
+				   {TF::D1, TF::D2},
+				   {TF::D3, TF::D4},
+				   {TF::L1, TF::D1},
+				   {TF::L2, TF::D1}};
+
+// Layers each seed projects to; up to four projections. TF::D5 indicates an unused projection. (Unfortunately we
+// can not use a TF:Invalid as due to our templated code these will be used as indices into arrays for radial
+// positions and this will generate an array out-of-bounds error.)
+constexpr int projectionLayers[8][4] = { {TF::L3, TF::L4, TF::L5, TF::L6},
+					 {TF::L1, TF::L4, TF::L5, TF::L6},
+					 {TF::L1, TF::L2, TF::L5, TF::L6},
+					 {TF::L1, TF::L2, TF::L3, TF::L4},
+					 {TF::L1, TF::L2, TF::D5, TF::D5},
+					 {TF::L1, TF::D5, TF::D5, TF::D5},
+					 {TF::D5, TF::D5, TF::D5, TF::D5},
+					 {TF::L1, TF::D5, TF::D5, TF::D5}};
+
+// Disks each seed projects to; up to four projections. TF::L1 indicates an unused projection. (Unfortunately we
+// can not use a TF:Invalid as due to our templated code these will be used as indices into arrays for radial
+// positions and this will generate an array out-of-bounds error.)
+constexpr int projectionDisks[8][4] = { {TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D1, TF::D2, TF::D3, TF::D4},
+					{TF::D3, TF::D4, TF::D5, TF::L1},
+					{TF::D1, TF::D2, TF::D5, TF::L1},
+					{TF::D2, TF::D3, TF::D4, TF::D5},
+					{TF::D2, TF::D3, TF::D4, TF::D5}};
+
 
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited

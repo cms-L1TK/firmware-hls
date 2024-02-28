@@ -42,7 +42,8 @@ void TrackBuilder(
     BXType &bx_o,
     typename TrackFit<NBarrelStubs, NDiskStubs>::TrackWord trackWord[],
     typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord barrelStubWords[][kMaxProc],
-    typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord diskStubWords[][kMaxProc]
+    typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord diskStubWords[][kMaxProc],
+    bool &done
 )
 {
 
@@ -84,9 +85,12 @@ void TrackBuilder(
   }
 
   IndexType nTracks = 0;
+  done = false;
+  bool done_latch = false;
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
+#pragma HLS latency min=5 max=5
 
     const ap_uint<1> empty = (i == 0);
     TrackletIDType min_id = kInvalidTrackletID;
@@ -140,6 +144,11 @@ void TrackBuilder(
 
       min_id = (disk_valid[j] ? disk_id_0 : min_id);
     }
+
+    // We are done if no valid ID was found; all subsequent output tracks are
+    // invalid
+    done = !done_latch && !empty && (min_id == kInvalidTrackletID);
+    done_latch = !empty && (min_id == kInvalidTrackletID);
 
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
@@ -292,46 +301,44 @@ void TrackBuilder(
     }
 
     // Only tracks with at least two matches are valid.
-    track.setTrackValid(nMatches >= kMinNMatches);
+    track.setTrackValid(!done && (nMatches >= kMinNMatches));
 
     // Output the track word and eight stub words associated with the TrackFit
     // object that was constructed.
-    if (track.getTrackValid()) {
-      trackWord[nTracks] = track.getTrackWord();
-      barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
-        switch (j) {
-          case 0:
-            barrelStubWords[j][nTracks] = track.template getStubValid<0>() ? track.template getBarrelStubWord<0>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
-            break;
-          case 1:
-            barrelStubWords[j][nTracks] = track.template getStubValid<1>() ? track.template getBarrelStubWord<1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
-            break;
-          case 2:
-            barrelStubWords[j][nTracks] = track.template getStubValid<2>() ? track.template getBarrelStubWord<2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
-            break;
-          case 3:
-            barrelStubWords[j][nTracks] = track.template getStubValid<3>() ? track.template getBarrelStubWord<3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord(0);
-            break;
-        }
-      }
-      disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
-        switch (j) {
-          case 0:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs>() ? track.template getDiskStubWord<NBarrelStubs>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
-            break;
-          case 1:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 1>() ? track.template getDiskStubWord<NBarrelStubs + 1>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
-            break;
-          case 2:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 2>() ? track.template getDiskStubWord<NBarrelStubs + 2>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
-            break;
-          case 3:
-            diskStubWords[j][nTracks] = track.template getStubValid<NBarrelStubs + 3>() ? track.template getDiskStubWord<NBarrelStubs + 3>() : typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord(0);
-            break;
-        }
+    trackWord[nTracks] = track.getTrackWord();
+    barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
+      switch (j) {
+        case 0:
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<0>();
+          break;
+        case 1:
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<1>();
+          break;
+        case 2:
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<2>();
+          break;
+        case 3:
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<3>();
+          break;
       }
     }
-    nTracks += (nMatches >= kMinNMatches ? 1 : 0);
+    disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
+      switch (j) {
+        case 0:
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs>();
+          break;
+        case 1:
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 1>();
+          break;
+        case 2:
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 2>();
+          break;
+        case 3:
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 3>();
+          break;
+      }
+    }
+    nTracks += (track.getTrackValid() ? 1 : 0);
 
     // Update the circular buffer indices and read a new element from each of
     // the input full-match memories.
@@ -355,6 +362,7 @@ void TrackBuilder(
   }
 
   bx_o = bx;
+  done = !done_latch;
 }
 
 #endif

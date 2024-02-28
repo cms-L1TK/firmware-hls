@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplate.h"
+#include "globalFunctions.h"
 
 // AllStubInnerBase is where we define the bit widths, which depend on the class template parameter
 template<int ASType> class AllStubInnerBase {};
@@ -244,6 +245,19 @@ public:
   void setNegDisk(const ASNEGDISK negdisk) {
     data_.range(kASNegDiskMSB,kASNegDiskLSB) = negdisk;
   }
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getR());
+    str += "|"+decodeToBits(getZ());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getBend());
+    if (ASType == DISKPS || ASType == DISK2S) str += "|"+decodeToBits(getNegDisk());
+    str += "|"+decodeToBits(getIndex());
+    str += "|"+decodeToBits(getFinePhi());
+    return str;
+  }
+#endif
 
 private:
 

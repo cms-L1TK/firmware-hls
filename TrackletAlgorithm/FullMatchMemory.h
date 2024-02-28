@@ -259,6 +259,7 @@ public:
     std::string str = decodeToBits(getTCID());
     str += "|"+decodeToBits(getTrackletIndex());
     str += "|"+decodeToBits(getStubIndex());
+    str += "|"+decodeToBits(getStubR());
     str += "|"+decodeToBits(getPhiRes());
     str += "|"+decodeToBits(getZRes());
     return str;

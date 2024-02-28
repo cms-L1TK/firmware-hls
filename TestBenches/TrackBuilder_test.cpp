@@ -156,6 +156,7 @@ int main()
     // bx
     BXType bx = ievt;
     BXType bx_o;
+    bool done;
 
     // Unit Under Test
     TOP_FUNC_(bx,
@@ -165,7 +166,8 @@ int main()
       bx_o,
       trackWord,
       barrelStubWords,
-      diskStubWords
+      diskStubWords,
+      done
     );
 
     unsigned nTracks = 0;

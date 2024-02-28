@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "MemoryTemplateBinnedCM.h"
+#include "globalFunctions.h"
 
 // VMStubTEOuterBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSTEOType> class VMStubTEOuterBase {};
@@ -133,6 +134,16 @@ public:
   void setFineZ(const VMSTEOFINEZ finez) {
     data_.range(kVMSTEOFineZMSB,kVMSTEOFineZLSB) = finez;
   }
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getIndex());
+    str += "|"+decodeToBits(getBend());
+    str += "|"+decodeToBits(getFinePhi());
+    str += "|"+decodeToBits(getFineZ());
+    return str;
+  }
+#endif
 
 private:
 
