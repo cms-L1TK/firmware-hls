@@ -280,23 +280,30 @@ Build the tracklet chain in EMP.
 
 Currently the supported chain configurations for EMP builds are:
 
-* **Skinny Chain (non-combined modules)**
+* **Skinny Chain (combined, unsplit modules)**
   * InputRouter to KalmanFilter
-    * Target = Apollo VU7P
-    * EMP build path = `IntegrationTests/ReducedConfig/IRtoKF`
+    * Target = Apollo VU13P (1 FPGA)
+    * EMP build path = `IntegrationTests/ReducedCombinedConfig/IRtoKF`
+
+* **Barrel Chain (combined, unsplit modules)**
+  * InputRouter to KalmanFilter
+    * Target = Apollo VU13P (1 FPGA)
+    * EMP build path = `IntegrationTests/CombinedBarrelConfig/IRtoKF`
     
 * **Some info**
 
     * The EMP firmware uses a subset of the [SURF library](https://github.com/slaclab/surf).
-    More info on that in `IntegrationTests/common/hdl/surf_subset/README.md`
-    * `firmware-hls/KalmanFilter` is a git sub-module link to the repo containing the [Kalman Filter firmware repo](https://github.com/cms-L1TK/l1tk-for-emp/tree/d0d3ba506bf77926862f0d7f3ebf781c041da6eb). (Action: Update to point to master, once it is compatible with EMP v0.7).   
-    * Some python and TCL script are needed to implement and simulate the EMP firmware.
+    More info on that in `IntegrationTests/common/hdl/surf_subset/README.md` (Note: this may be unused for the IRtoKF chain)
+    * `firmware-hls/KalmanFilter` is a git sub-module link to the repo containing the [Kalman Filter firmware repo](https://github.com/cms-L1TK/l1tk-for-emp/tree/d0d3ba506bf77926862f0d7f3ebf781c041da6eb). Note that different KalmanFilter configurations are needed for the reduced chain, the barrel chain, and the full chain. The Makefile updates this repository to point to the appropriate branch, but if possible, it could be useful for the KalmanFilter repository to support different configurations.
+    * Some python and TCL scripts are needed to implement and simulate the EMP firmware.
     More info on that in [this README](https://github.com/cms-L1TK/firmware-hls/blob/doc_emp/IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md).
+
+* **Note** See [here](https://apollo-lhc.gitlab.io/cornell-cm/Manual/TFFirmware/02-EMPTF/) for more detailed instructions, particularly with regards to installing the prerequisites noted below and for performing tests on Apollo hardware.
 
 ### Prerequisites
 
 * Xilinx Vivado 2020.1 (HLS build) and 2021.2 (project build)
-* ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb). Tested with dev/2022g
+* ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb) incl. uHAL. Tested with dev/2022g
 * Python 3
 * Questasim v2021.1_2 for Questa simulation
 
@@ -309,8 +316,8 @@ First source Xilinx Vivado 2020.1
 ```
 ipbb init <project name>
 cd <project name>
-ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.7.3
-ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v1.2.2
+ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.8.0
+ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v2.2.1
 ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
 ipbb add git ssh://git@gitlab.cern.ch:7999/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
 ipbb add git https://gitlab.cern.ch/HPTD/tclink.git -r fda0bcf
