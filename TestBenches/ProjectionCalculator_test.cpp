@@ -1,11 +1,6 @@
 // Test bench for ProjectionCalculator
 #include "ProjectionCalculatorTop.h"
 
-#include <vector>
-#include <algorithm>
-#include <iterator>
-#include <cstring>
-
 #include "Macros.h"
 #include "FileReadUtility.h"
 #include "Constants.h"
@@ -22,6 +17,7 @@
 #define J_ 9
 #define K_ 10
 #define L_ 11
+
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
@@ -37,20 +33,6 @@
   #define TOP_FUNC_ ProjectionCalculator_L1L2C
 #endif
 
-// #if !defined SEED_
-//   #define SEED_ L3L4_
-// #endif
-// #if !defined ITC_
-//   #define ITC_ A_
-// #endif
-// #if !defined MODULE_
-//   #define MODULE_ TP_L3L4A_
-// #endif
-// #if !defined TOP_FUNC_
-//   #define TOP_FUNC_ ProjectionCalculator_L3L4A
-// #endif
-
-
 const int nevents = 100;  //number of events to run
 
 using namespace std;
@@ -58,11 +40,11 @@ using namespace std;
 int main()
 {
 
- std::cout<<"Module name:" << module_name[MODULE_]<<std::endl;
-//
-  TBHelper tb(std::string("TP/") + module_name[MODULE_]);
-  // error counts
+  std::cout << "Module name:" << module_name[MODULE_] << std::endl;
 
+  TBHelper tb(std::string("TP/") + module_name[MODULE_]);
+
+  // error counts
   int err = 0;
 
     // open input files from emulation
@@ -70,10 +52,10 @@ int main()
   auto &fout_tproj = tb.files("TrackletProjections*");
   const auto &tproj_names = tb.fileNames("TrackletProjections*");
 
-  // input memory 
+  // input memory
   TrackletParameterMemory trackletParameters;
-  
-  // output memories 
+
+  // output memories
   TrackletProjectionMemory<BARRELPS> tproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
   TrackletProjectionMemory<BARREL2S> tproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
   TrackletProjectionMemory<DISK> tproj_disk[TC::N_PROJOUT_DISK];
@@ -86,13 +68,10 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
-    // TODO: move loop over tracklet parameters from module to testbench 
-
     // read event and write to memories
     writeMemFromFile<TrackletParameterMemory>(trackletParameters, fin_tpar.at(0), ievt);
 
     // clear all output memories before starting
-    //tpar.clear();
     for (unsigned i = 0; i < TC::N_PROJOUT_BARRELPS; i++)
       tproj_barrel_ps[i].clear();
     for (unsigned i = 0; i < TC::N_PROJOUT_BARREL2S; i++)
@@ -107,12 +86,12 @@ int main()
     BXType bx_o;
 
     // Unit Under Test
-    std::cout << "Entries:"<<trackletParameters.getEntries(bx) << std::endl;
+    std::cout << "Entries:" << trackletParameters.getEntries(bx) << std::endl;
 
-    for (int ipar=0; ipar < 108; ipar++) {
-      bool valid = ipar < trackletParameters.getEntries(bx);
-      TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, valid, 
-		tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    for (int ipar = 0; ipar < kMaxProc; ipar++) {
+      const bool valid = ipar < trackletParameters.getEntries(bx);
+      TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, valid,
+                tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
     }
 
     cout << "Done with TOP_FUNC" << endl;
@@ -255,9 +234,9 @@ int main()
       else if (tproj_name.find("_L6PHID") != string::npos)
         err += compareProjMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TC::L6PHID], fout, ievt,
                                                        "\nTrackletProjection (L6PHID)", truncation);
-    
+
     }
-    
+
     cout << endl;
 
   } // end of event loop
