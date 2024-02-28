@@ -15,7 +15,6 @@ template<int> class AllStub;
 #endif
 
 #ifdef CMSSW_GIT_HASH
-#define NBIT_BX 0
 template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR>
 #else
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
@@ -28,6 +27,10 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 // (1<<NBIT_ADDR): depth of the memory for each BX
 class MemoryTemplate
 {
+#ifdef CMSSW_GIT_HASH
+  static constexpr unsigned int NBIT_BX = 0;
+#endif
+
 public:
   typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;

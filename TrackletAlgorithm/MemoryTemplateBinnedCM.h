@@ -14,8 +14,7 @@
 #endif
 
 #ifdef CMSSW_GIT_HASH
-#define NBIT_BX 0
-template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
+template<class DataType, unsigned int DUMMYA, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
 #else
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
 #endif
@@ -27,7 +26,22 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned 
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
 // NCOPY: is the number of memory copies - same as number of TE used
+
+// N.B. The CMSSW version of this pretends to have NCOPY copies to anyone 
+// using this class, but doesn't actually instantiate them, to save memory.
+
 class MemoryTemplateBinnedCM{
+
+ private:
+
+#ifdef CMSSW_GIT_HASH
+  static constexpr bool isCMSSW = true;
+  static constexpr unsigned int NBIT_BX = 0;
+  static constexpr unsigned int NCP = 1;
+#else
+  static constexpr bool isCMSSW = false;
+  static constexpr unsigned int NCP = NCOPY;
+#endif
 
  public: 
   typedef ap_uint<NBIT_BX> BunchXingT;
@@ -44,7 +58,7 @@ class MemoryTemplateBinnedCM{
     entries8 = 32
   };
 
-  DataType dataarray_[NCOPY][kNBxBins][kNMemDepth];  // data array
+  DataType dataarray_[NCP][kNBxBins][kNMemDepth];  // data array
 
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
@@ -119,18 +133,21 @@ class MemoryTemplateBinnedCM{
 
   const DataType (&getMem(unsigned int icopy) const)[1<<NBIT_BX][1<<NBIT_ADDR] {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
+    if (isCMSSW) icopy = 0;
     return dataarray_[icopy];
   }
 
 
+#ifndef CMSSW_GIT_HASH
   const DataType (&get_mem() const)[NCOPY][1<<NBIT_BX][1<<NBIT_ADDR] {
     return dataarray_;
   }
+#endif
 
   DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
-    if(!NBIT_BX) ibx = 0;
+    if (isCMSSW) {ibx = 0; icopy = 0;}
     return dataarray_[icopy][ibx][index];
   }
   
@@ -138,21 +155,20 @@ class MemoryTemplateBinnedCM{
 		    ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
-    if(!NBIT_BX) ibx = 0;
+    if (isCMSSW) {ibx = 0; icopy = 0;}
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
   
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
-
 #pragma HLS inline
     
-    if(!NBIT_BX) ibx = 0;
+    if (isCMSSW) {ibx = 0;}
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
       //icopy comparison must be signed int or future SW fails
-      writememloop:for (signed int icopy=0;icopy< (signed) NCOPY;icopy++) {
+      writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
         dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
       }
@@ -229,7 +245,8 @@ class MemoryTemplateBinnedCM{
   bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
   {
 
-    if(!NBIT_BX) ibx = 0;
+    if (isCMSSW) {ibx = 0;}
+
     std::string datastr = split(line, ' ').back();
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
