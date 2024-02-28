@@ -3,7 +3,7 @@ set -e
 
 #### generated with commit 6e61462 ####
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/79MOVz8WGZAKCK8/MemPrints.tar.gz"
+memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
