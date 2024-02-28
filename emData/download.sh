@@ -105,6 +105,7 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig2
 ./generate_IR.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_VMRCM.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_PC.py       -w LUTsCM/wires.dat  -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_TB.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ### combined barrel config                      
@@ -112,6 +113,7 @@ mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_IR.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_VMRCM.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_PC.py       -w LUTsCM/wires.dat       -o ../TopFunctions/CombinedBarrelConfig
 ./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 
