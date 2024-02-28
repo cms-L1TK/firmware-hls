@@ -1,8 +1,6 @@
 #ifndef TrackletAlgorithm_ProjectionCalculator_h
 #define TrackletAlgorithm_ProjectionCalculator_h
 
-#include <iostream>
-
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
 #include "TrackletProcessor.h"
