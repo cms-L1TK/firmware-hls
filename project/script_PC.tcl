@@ -1,5 +1,5 @@
-# Script to generate project for TC
-#   vivado_hls -f script_TC.tcl
+# Script to generate project for PC
+#   vivado_hls -f script_PC.tcl
 #   vivado_hls -p trackletCalculator
 # WARNING: this will wipe out the original project by the same name
 
@@ -7,13 +7,19 @@
 source env_hls.tcl
 
 set modules_to_test {
-  {TP_L1L2C}
+  {PC_L1L2C}
+  {PC_L2L3C}
+  {PC_L3L4C}
+  {PC_L5L6C}
+  {PC_L1D1C}
+  {PC_L2D1C}
+  {PC_D1D2C}
+  {PC_D3D4C}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-#set module_to_export PC_L1L2C
-set module_to_export PC_L3L4A
+set module_to_export PC_L1L2C
 
 # create new project (deleting any existing one of same name)
 open_project -reset projectionCalculator
@@ -32,9 +38,10 @@ foreach i $modules_to_test {
   set seed [string range $i 3 6]
   set iTC [string range $i 7 7]
   set top_func [join [list "ProjectionCalculator_" $seed $iTC] ""]
+  set module [join [list "TP_" $seed $iTC] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"ITC_=" $iTC "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
+  set ::env(CCFLAG) [join [list "-D \"SEED_=" $seed "_\" -D \"ITC_=" $iTC "_\" -D \"MODULE_=" $module "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $top_func
