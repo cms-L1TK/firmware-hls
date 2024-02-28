@@ -1,69 +1,10 @@
 #!/usr/bin/env python3
 
-# This script generates 
-# ProjectionCalculatorTop.h, and ProjectionCalculatorTop.cc in the
-# TopFunctions/ directory. Currently supports all TPs for L1L2, as well as
-# TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
+# This script generates ProjectionCalculatorTop.h, and
+# ProjectionCalculatorTop.cc in the TopFunctions/ directory.
 
 from __future__ import absolute_import, print_function
-import sys, re, os, argparse
-from enum import Enum
-
-# These enums must match those defined in
-# TopFunctions/TrackletProcessor.h.
-# class ProjoutIndexBarrel(Enum):
-#   L1PHIA = 0
-#   L1PHIB = 1
-#   L1PHIC = 2
-#   L1PHID = 3
-#   L1PHIE = 4
-#   L1PHIF = 5
-#   L1PHIG = 6
-#   L1PHIH = 7
-#   L2PHIA = 8
-#   L2PHIB = 9
-#   L2PHIC = 10
-#   L2PHID = 11
-#   L3PHIA = 12
-#   L3PHIB = 13
-#   L3PHIC = 14
-#   L3PHID = 15
-#   L4PHIA = 16
-#   L4PHIB = 17
-#   L4PHIC = 18
-#   L4PHID = 19
-#   L5PHIA = 20
-#   L5PHIB = 21
-#   L5PHIC = 22
-#   L5PHID = 23
-#   L6PHIA = 24
-#   L6PHIB = 25
-#   L6PHIC = 26
-#   L6PHID = 27
-#   N_PROJOUT_BARREL = 28
-
-# class ProjoutIndexDisk(Enum):
-#   D1PHIA = 0
-#   D1PHIB = 1
-#   D1PHIC = 2
-#   D1PHID = 3
-#   D2PHIA = 4
-#   D2PHIB = 5
-#   D2PHIC = 6
-#   D2PHID = 7
-#   D3PHIA = 8
-#   D3PHIB = 9
-#   D3PHIC = 10
-#   D3PHID = 11
-#   D4PHIA = 12
-#   D4PHIB = 13
-#   D4PHIC = 14
-#   D4PHID = 15
-#   D5PHIA = 16
-#   D5PHIB = 17
-#   D5PHIC = 18
-#   D5PHID = 19
-#   N_PROJOUT_DISK = 20
+import re, os, argparse
 
 parser = argparse.ArgumentParser(description="This script generates ProjectionCalculatorTop.h, ProjectionCalculatorTop.cc \
    in the TopFunctions/ directory.",
@@ -100,30 +41,8 @@ with open(arguments.wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-#with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator_parameters.h"), "w") as parametersFile, \
 with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.h"), "w") as topHeaderFile, \
 open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.cc"), "w") as topFile:
-  # parametersFile.write(
-  #     "#ifndef TopFunctions_TrackletProcessor_parameters_h\n"
-  #     "#define TopFunctions_TrackletProcessor_parameters_h\n"
-  #     "\n"
-  #     "// This file contains numbers of memories and bit masks that are specific to\n"
-  #     "// each TrackletProcessor and that come directly from the wiring.\n"
-  #     "//\n"
-  #     "// The validity of each of the barrel TPROJ memories is determined by\n"
-  #     "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
-  #     "// significant, represent the memories in the order they are passed to\n"
-  #     "// TrackletProcessor; e.g., the LSB corresponds to\n"
-  #     "// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n"
-  #     "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
-  #     "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
-  #     "// in the same way.\n"
-  #     "namespace PC{\n"
-  #     "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
-  #     "   }\n"
-  #     "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
-  #     "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
-  # )
   topHeaderFile.write(
     "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
     "#define TopFunctions_ProjectionCalculatorTop_h\n"
@@ -148,16 +67,6 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
   for tpName in sorted(tprojMems):
     seed = re.sub(r"TP_(....).", r"\1", tpName)
     iTC = re.sub(r"TP_....(.)", r"\1", tpName)
-    # # numbers of memories
-    # nASMemInner = len(asInnerMems[tpName])
-    # nASMemOuter = len(asOuterMems[tpName])
-    # nVMSTEMem = len(vmsteMems[tpName])
-    # # AS inner and outer masks
-    # asInnerMask = 0
-    # asOuterMask = 0
-    # asInnerMems[tpName].sort()
-    # asOuterMems[tpName].sort()
-
 
     # Print out prototype for top function for this TC.
     topHeaderFile.write(
@@ -207,13 +116,7 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
       "  );\n"
       "}\n"
       )
-        
 
-  # Print out endifs and close files.
-  # parametersFile.write(
-  #     "\n"
-  #     "#endif\n"
-  # )
   topHeaderFile.write(
   "\n"
   "#endif\n"
@@ -222,4 +125,3 @@ open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.c
   "\n"
   "////////////////////////////////////////////////////////////////////////////////\n"
   )
-
