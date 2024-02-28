@@ -362,7 +362,7 @@ def writeTopHeader(vmr, output_dir):
         "// Maximum number of memory \"copies\" for this Phi region\n"
         "constexpr int numASCopies = getNumASCopies<layerdisk, phiRegion>(); // Allstub memory\n"
         "constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory\n"
-        "constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories, can be 0 when no TEOuter memories\n"
+        "constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories\n"
         "// Number of bits for the RZ bins \n"
         "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
         "\n\n"
