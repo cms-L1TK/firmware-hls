@@ -125,6 +125,29 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   
 }
 
+std::string return_splitted(const std::string &data_string, const std::vector<int>& bit_widths,
+                            const std::vector<std::string> names,
+                            const int start_index = 0)
+{
+  // This function splits the binary string along lines defined by the bit
+  // widths for the tracklet projection algorithm
+  std::string splitted = "";
+
+  int end_index = bit_widths.size();
+  if (start_index != 0)
+    end_index = start_index + 1; // If we only want to print one column
+
+  // Create the split string
+  unsigned start = 0;
+  for (int i = start_index; i < end_index; i++) {
+    splitted += data_string.substr(start, bit_widths[i]);
+    splitted += "|";
+    start += bit_widths[i];
+  }
+
+  return splitted;
+}
+
 template<class MemType, int OutputBase=2, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
                                    const int ievt, const std::string& label,
@@ -224,30 +247,6 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   
 }
 
-std::string return_splitted(const std::string &data_string, const std::vector<int>& bit_widths,
-                            const std::vector<std::string> names,
-                            const int start_index = 0)
-{
-  // This function splits the binary string along lines defined by the bit
-  // widths for the tracklet projection algorithm
-  std::string splitted = "";
-
-  int end_index = bit_widths.size();
-  if (start_index != 0)
-    end_index = start_index + 1; // If we only want to print one column
-
-  // Create the split string
-  for (int i = start_index; i < end_index; i++) {
-    splitted += data_string.substr(0, bit_widths[i]);
-    splitted += "|";
-    data_string = data_string.substr(bit_widths[i]);
-  }
-
-  return splitted;
-}
-
-
-
 template<class MemType, int InputBase=16, int OutputBase=2, int LSB=-1, int MSB=-1>
 unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
@@ -268,7 +267,6 @@ unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
   return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated, bit_widths, names);
 
 }
-
 
 template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemWithFile(const MemType& memory, 
