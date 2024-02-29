@@ -5,6 +5,9 @@
 #include "MemoryTemplateBinnedCM.h"
 #include "globalFunctions.h"
 
+// Memory containing stub data written by the VMRouter, consisting of coarse
+// stub data + a pointer to the full precision stub data in the AllStubMemory.
+
 // VMStubMECMBase is where we define the bit widths, which depend on the class template parameter.
 template<int VMSMEType> class VMStubMECMBase {};
 

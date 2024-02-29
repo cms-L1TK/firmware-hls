@@ -4,8 +4,14 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 
-// Stub coming from the DTC  
-// does not container header ... i.e. [without valid + layer id]
+// Memory containing stubs written by the InputRouter. 
+// (Unlike the stubs read by the InputRouter, these do not contain the
+// "valid + layer id" bits).
+// N.B. Both class DTCStubMemory & InputStubMemory represent the same BRAM
+// between InputRouter & VMRouter, but DTCStubMemory does not describe the bit
+// fields, so can hold stubs in any of disk/barrel/PS/2S, so is used for the
+// InputRouter output.
+
 class DTCStubBase
 {
 public:
