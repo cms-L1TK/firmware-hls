@@ -226,9 +226,11 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 #pragma HLS array_partition variable=addrCountME complete dim=0
 #pragma HLS array_partition variable=addrCountTE complete dim=0
 
-	for (int i = 0; i < nAllInnerCopies; i++) {
+	if (nAllInnerCopies) {
+		for (int i = 0; i < nAllInnerCopies; i++) {
 #pragma HLS unroll
-		addrCountASI[i] = 0;
+			addrCountASI[i] = 0;
+		}
 	}
 	for (int i = 0; i < 1 << (rzSizeME + phiRegSize); i++) {
 #pragma HLS unroll
