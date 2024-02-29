@@ -67,7 +67,7 @@ public:
 #else
       nentries_[ibx];
 #endif
-    return write_mem(ibx,sameData,addr_index);
+    return write_mem(ibx,data,addr_index);
   }
 
   template<class SpecType>
