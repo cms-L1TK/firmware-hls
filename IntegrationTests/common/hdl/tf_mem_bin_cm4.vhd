@@ -192,8 +192,8 @@ begin
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page)(to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
 
-      sa_RAM_nentA(to_integer(unsigned(upperbits)))(page*NUM_RZ_BINS+to_integer(unsigned(lowerbits))) <= addr_in_bin;
-      sa_RAM_nentB(to_integer(unsigned(upperbits)))(page*NUM_RZ_BINS+to_integer(unsigned(lowerbits))) <= addr_in_bin;
+      sa_RAM_nentA(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
+      sa_RAM_nentB(to_integer(unsigned(lowerbits)))(page*NUM_RZ_BINS+to_integer(unsigned(upperbits))) <= addr_in_bin;
 
     end if; -- (wea='1')
   end if;
