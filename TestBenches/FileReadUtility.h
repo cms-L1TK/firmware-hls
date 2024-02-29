@@ -222,7 +222,7 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
       std::cout << "\t" << "<=== EXTRA";
       err_count++;
     // If reference and computed entry are inconsistent
-    } else if (data_com != data_ref) {
+    } else if (data_com.to_long() != data_ref.to_long()) {
       std::cout << "\t" << "<=== INCONSISTENT";
       err_count++;
     }
