@@ -125,36 +125,93 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   
 }
 
-template<class MemType, int OutputBase=16, int LSB=-1, int MSB=-1>
-unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory, int ievt,
-                               const std::string& label, const bool truncated = false)
+std::string return_splitted(const std::string &data_string, const std::vector<int>& bit_widths,
+                            const std::vector<std::string> names,
+                            const int start_index = 0)
 {
+  // This function splits the binary string along lines defined by the bit
+  // widths for the tracklet projection algorithm
+  std::string splitted = "";
+
+  int end_index = bit_widths.size();
+  if (start_index != 0)
+    end_index = start_index + 1; // If we only want to print one column
+
+  // Create the split string
+  unsigned start = 0;
+  for (int i = start_index; i < end_index; i++) {
+    splitted += data_string.substr(start, bit_widths[i]);
+    splitted += "|";
+    start += bit_widths[i];
+  }
+
+  return splitted;
+}
+
+template<class MemType, int OutputBase=2, int LSB=-1, int MSB=-1>
+unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
+                                   const int ievt, const std::string& label,
+                                   const bool truncated = false,
+                                   const std::vector<int>& bit_widths = {}, const std::vector<std::string>& names = {},
+                                   const int start_index = 0)
+{
+  // This is a modification of compareMemWithMem to allow for outputting the
+  // data in binary format split by the various column types in the
+  // projections, AllProj.  Set start_index = 0 to see all columns, or any int
+  // between 1-5 to see only one at a time.
+
+  assert(bit_widths.size() == names.size());
+
   unsigned int err_count = 0;
 
-  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB - LSB + 1) : MemType::getWidth();
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
   for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
-    auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
-    auto data_com_raw = memory.read_mem(ievt,i).raw();
-    auto data_ref = data_ref_raw.range(msb,lsb);
-    auto data_com = data_com_raw.range(msb,lsb);
+    const auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
+    const auto data_com_raw = memory.read_mem(ievt,i).raw();
+    const auto data_ref = data_ref_raw.range(msb,lsb);
+    const auto data_com = data_com_raw.range(msb,lsb);
+
+    // Print headers for the columns at start
     if (i==0) {
       // If both reference and computed memories are completely empty, skip it
       if (data_com == 0 && data_ref == 0) break;
       std::cout << label << ":" << std::endl;
-      std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+      if (OutputBase == 2) std::cout << "index" << "\t" << "reference" << "\t\t\t\t" << "computed" << std::endl;
+      else std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+
+      if (OutputBase==2) {
+        // Print out column headers
+        int end_index = bit_widths.size();
+        if (start_index != 0)
+          end_index = start_index + 1; // allows for only printing one column
+
+        std::cout << " \t";
+        for (int j = 0; j < 2; j++) {
+          for (int i = start_index; i < end_index; i++) {
+            int length = bit_widths[i] - names[i].length() - 3;
+            if (length < 0 ) length = 0;
+            const std::string spaces(length,' ');
+            std::cout << names[i] << "(" << std::dec << bit_widths[i] << ")" << spaces << "|";
+          }
+          if (j == 0) std::cout << "|";
+        }
+      }
+      std::cout << std::endl;
     }
+
     // If have reached the end of valid entries in both computed and reference, don't bother printing further
     if (data_com == 0 && data_ref == 0) continue;
 
-    std::cout << i << "\t";
-    if (OutputBase == 2) std::cout << std::bitset<width>(data_ref) << "\t";
+    // Print out the values
+    std::cout << i << " \t";
+    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_ref).to_string(), bit_widths, names, start_index) << "|";
     else                 std::cout << std::hex << data_ref << "\t";
-    
-    if (OutputBase == 2) std::cout << std::bitset<width>(data_com);
-    else                 std::cout << std::hex << data_com; // << std::endl;
+
+    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_com).to_string(), bit_widths, names, start_index) ;
+    else                 std::cout << std::hex << data_com;
 
     // If there is extra entries in reference
     if (data_com == 0) {
@@ -165,16 +222,16 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
       std::cout << "\t" << "<=== EXTRA";
       err_count++;
     // If reference and computed entry are inconsistent
-    } else if (data_com != data_ref) {
+    } else if (data_com.to_long() != data_ref.to_long()) {
       std::cout << "\t" << "<=== INCONSISTENT";
       err_count++;
     }
 
     std::cout << std::endl;
   }
-  
+
   return err_count;
-}                                
+}
 
 template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
@@ -188,6 +245,27 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
 
   return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
   
+}
+
+template<class MemType, int InputBase=16, int OutputBase=2, int LSB=-1, int MSB=-1>
+unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
+                                int ievt, const std::string& label,
+                                const bool truncated = false)
+{
+  // This is a modification of compareMemWithFile to allow for outputting the data in binary format
+  // split by the various column types in the projections, AllProj
+  // Read from file
+  MemType memory_ref;
+  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
+
+  // This part could potentially be modified in the future to debug other modules
+  const std::vector<int> bit_widths = { MemType::BitWidths::kTProjTCIDSize, MemType::BitWidths::kTProjTrackletIndexSize,
+                                        MemType::BitWidths::kTProjPhiSize, MemType::BitWidths::kTProjRZSize,
+                                        MemType::BitWidths::kTProjPhiDSize, MemType::BitWidths::kTProjRZDSize };
+  const std::vector<std::string> names = {"TCID ", "Tproj", "phi", "z", "phid", "zder"};
+
+  return compareMemWithMem<MemType>(memory_ref, memory, ievt, label, truncated, bit_widths, names);
+
 }
 
 template<class MemType, int InputBase=16, int OutputBase=16>

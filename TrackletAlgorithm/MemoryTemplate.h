@@ -58,6 +58,19 @@ public:
   }
 
   template<class SpecType>
+  bool write_mem(BunchXingT ibx, SpecType data)
+  {
+#pragma HLS inline
+    const NEntryT addr_index =
+#ifdef __SYNTHESIS__
+      0;
+#else
+      nentries_[ibx];
+#endif
+    return write_mem(ibx,data,addr_index);
+  }
+
+  template<class SpecType>
   bool write_mem(BunchXingT ibx, SpecType data, NEntryT addr_index)
   {
 #pragma HLS inline
@@ -71,17 +84,29 @@ public:
     return write_mem(ibx,sameData,addr_index);
   }
 
+  bool write_mem(BunchXingT ibx, DataType data)
+  {
+#pragma HLS inline
+    const NEntryT addr_index =
+#ifdef __SYNTHESIS__
+      0;
+#else
+      nentries_[ibx];
+#endif
+    return write_mem(ibx,data,addr_index);
+  }
+
   bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index)
   {
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
       dataarray_[ibx][addr_index] = data;
-      
-      #ifdef CMSSW_GIT_HASH
+
+#ifndef __SYNTHESIS__
       nentries_[ibx] = addr_index + 1;
-      #endif
-      
+#endif
+
       return true;
     } else {
       return false;
@@ -116,23 +141,12 @@ public:
 	NEntryT nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
 
-	#ifndef CMSSW_GIT_HASH
-	if (success) nentries_[ibx] ++;
-	#endif
 	return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
   {
-	if(!NBIT_BX) ibx = 0;
-	DataType data(datastr.c_str(), base);
-	NEntryT nent = nentries_[ibx];
-	bool success = write_mem(ibx, data, nent);
-
-	#ifndef CMSSW_GIT_HASH
-	if (success) nentries_[ibx] ++;
-	#endif
-	return success;
+	return write_mem(ibx, datastr.c_str(), base);
   }
 
   // print memory contents
