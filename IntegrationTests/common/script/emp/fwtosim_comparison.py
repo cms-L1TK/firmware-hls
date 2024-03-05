@@ -33,9 +33,6 @@ elines = [[eline[x:x+hex_chars_per_track] for x in range(0,len(eline),hex_chars_
 elines = [track for event in elines for track in event] #flatten
 elines = [eline.upper() for eline in elines] #Change to capital letters
 elines = [eline.replace('8048D15A','2')[:-4] for eline in elines] #remove header and tailer
-print('DEBUG: elines')
-print(elines)
-print('DEBUG: elines')
 
 slines = [sline for sline in slines if '0x' in sline] #Remove sim header
 slines = [sline.split() for sline in slines]
@@ -43,9 +40,6 @@ slines = [sline[4:] for sline in slines]
 slines = [sline for sublist in slines for sline in sublist] #Recreate list
 slines = [sline.replace('0x','') for sline in slines]
 slines = [sline[:69] for sline in slines]
-print('DEBUG: slines')
-print(slines)
-print('DEBUG: slines')
 
 events = min(len(elines), len(slines))
 mismatches = 0

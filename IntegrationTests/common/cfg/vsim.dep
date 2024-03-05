@@ -6,7 +6,7 @@ include -c emp-fwk:boards/testbench top.dep
 #src -c emp-fwk:components/datapath emp_data_types.vhd
 #src -c emp-fwk:components/ttc emp_ttc_decl.vhd
 
-src tb_decl.vhd
+src common/hdl/emp/tb_decl.vhd
 src emp_project_decl.vhd 
 src -c emp-fwk:components/links/slink emp_slink_types.vhd
 
