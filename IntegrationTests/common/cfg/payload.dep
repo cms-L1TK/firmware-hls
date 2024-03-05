@@ -1,13 +1,13 @@
 src payload.vhd
 src linktosecproc.vhd
 src --vhdl2008 SectorProcessor.vhd
-src tf_to_kf.vhd
-src pkgs/tf_interface_pkg.vhd
+src common/hdl/emp/tf_to_kf.vhd
+src common/hdl/emp/pkgs/tf_interface_pkg.vhd
 src kf_wrapper.vhd
 src tf_wrapper.vhd
 src memUtil_pkg.vhd
-src memUtil_aux_pkg.vhd
-src pkgs/GCU_utils.vhd
+src common/hdl/emp/memUtil_aux_pkg.vhd
+src common/hdl/emp/pkgs/GCU_utils.vhd
 
 src common/hdl/CreateStartSignal.vhd
 src --vhdl2008 common/hdl/tf_lut.vhd
@@ -22,7 +22,7 @@ src --vhdl2008 common/hdl/tf_pipe_delay.vhd
 include -c firmware-hls:KalmanFilter/kfin components.dep 
 include -c firmware-hls:KalmanFilter/kf components.dep 
 src kfout_top_conv.vhd
-src conv96to64.vhd
+src common/hdl/emp/conv96to64.vhd
 include -c firmware-hls:KalmanFilter/kfout components.dep 
 include -c firmware-hls:KalmanFilter/tq components.dep 
 include -c firmware-hls:KalmanFilter/common components.dep 

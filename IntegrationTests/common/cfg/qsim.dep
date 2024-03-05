@@ -6,7 +6,7 @@ include -c emp-fwk:boards/testbench top.dep
 setup ../scripts/pre_qsim.tcl
 
 include payload.dep
-src tb_decl.vhd
+src common/hdl/emp/tb_decl.vhd
 src emp_project_decl.vhd 
 
 src -c emp-fwk:components/links/slink emp_slink_types.vhd

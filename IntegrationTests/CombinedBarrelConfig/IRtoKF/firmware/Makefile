@@ -4,7 +4,7 @@ input_file = mem/in.txt
 proj_path = ../../../../proj
 hls_script_path = ../../script
 
-all: $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) apollo_input lut_inclusion
+all: add_common_files $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) apollo_input lut_inclusion
 
 $(core_dir):
 	@mkdir cgn mem
@@ -22,6 +22,12 @@ kfin_adj:
 xciCreation: $(core_file)
 	make -f $(core_file) -j 8 all
 
+add_common_files:
+	@cd cfg; ln -s ../../../../common/cfg/*.dep .
+	@cd ufg; ln -s ../../../../common/ufg/*.tcl .
+	@cd scripts; ln -s ../../../../common/script/emp/*.py .
+	@cd scripts; ln -s ../../../../common/script/emp/*.tcl .
+
 hdl_add_files: $(core_file)
 	cd hdl; ln -s ../../../hdl/*.vhd .
 
@@ -32,9 +38,6 @@ $(input_file): $(core_dir)
 	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsCMBarrel/InputStubs -o $(input_file)
 
 apollo_input: $(input_file)
-	@cd scripts; ln -s ../../../../common/script/compare_emp_outputs.py compare_emp_outputs.py
-	@cd scripts; ln -s ../../../../common/script/merge_emp_output.py merge_emp_output.py
-	@cd scripts; ln -s ../../../../common/script/split_emp_input.py split_emp_input.py
 	@python3 scripts/split_emp_input.py
 
 sim: $(input_file) $(core_file) $(core_dir)
