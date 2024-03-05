@@ -147,6 +147,11 @@ TP-quality-check:
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/CombinedConfig/TrackletProcessorTop.cc'
+PC-quality-check:
+  <<: *template_quality-check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    CLANG_TIDY_FILES: '../TestBenches/ProjectionCalculator_test.cpp ../TopFunctions/CombinedConfig/ProjectionCalculatorTop.cc'
 MP-quality-check:
   <<: *template_quality-check
   variables:
@@ -184,6 +189,13 @@ TP-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TP"
+PC-vivado-hls-build:
+  <<: *template_hls-build
+  needs: ["download", "PC-quality-check"]
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "PC"
 MP-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "MP-quality-check"]
@@ -221,6 +233,8 @@ topReducedCombined-sim:
     - job: VMRCM-vivado-hls-build
       artifacts: false
     - job: TP-vivado-hls-build
+      artifacts: false
+    - job: PC-vivado-hls-build
       artifacts: false
     - job: MP-vivado-hls-build
       artifacts: false
