@@ -24,7 +24,7 @@ xciCreation: $(core_file)
 
 add_common_files:
 	@cd cfg; ln -s ../../../../common/cfg/*.dep .
-	@cd ufg; ln -s ../../../../common/ufg/*.tcl .
+	@cd ucf; ln -s ../../../../common/ucf/*.tcl .
 	@cd scripts; ln -s ../../../../common/script/emp/*.py .
 	@cd scripts; ln -s ../../../../common/script/emp/*.tcl .
 

@@ -9,8 +9,8 @@ all: add_common_files $(core_file) hdl_add_files xciCreation kfin_adj $(input_fi
 $(core_dir):
 	@mkdir cgn mem
 	make -C $(hls_script_path) -j 8 Work
-	ln -s ../../../../../emData/LUTsReduced mem/LUTs
-	ln -s ../../../../../emData/MemPrintsReducedCM mem/MemPrintsReduced
+	ln -s ../../../../../emData/LUTsCMReduced mem/LUTs
+	ln -s ../../../../../emData/MemPrintsReducedCM mem/MemPrintsReducedCM
 	ln -s ../../../../common hdl/common
 
 $(core_file): $(core_dir)
@@ -23,10 +23,9 @@ kfin_adj:
 xciCreation: $(core_file)
 	make -f $(core_file) -j 8 all
 
-
 add_common_files:
 	@cd cfg; ln -s ../../../../common/cfg/*.dep .
-	@cd ufg; ln -s ../../../../common/ufg/*.tcl .
+	@cd ucf; ln -s ../../../../common/ucf/*.tcl .
 	@cd scripts; ln -s ../../../../common/script/emp/*.py .
 	@cd scripts; ln -s ../../../../common/script/emp/*.tcl .
 
@@ -37,7 +36,7 @@ lut_inclusion:
 	@python3 scripts/lut_copy.py
 
 $(input_file): $(core_dir)
-	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReduced/InputStubs -o $(input_file)
+	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReducedCM/InputStubs -o $(input_file)
 
 apollo_input: $(input_file)
 	@python3 scripts/split_emp_input.py
@@ -47,8 +46,8 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@$(eval CORE_DIRS= $(wildcard $(core_dir)/*))
 	@$(foreach core_dir,$(CORE_DIRS),ln -s ../../../../firmware/$(core_dir) $(hls_script_path);)
 	@ln -s ../../../common $(hls_script_path)
-	@ln -s ../../../../emData/MemPrintsReduced $(hls_script_path)/MemPrints
-	@ln -s ../../../../emData/LUTsReduced $(hls_script_path)/LUTs
+	@ln -s ../../../../emData/MemPrintsReducedCM $(hls_script_path)/MemPrints
+	@ln -s ../../../../emData/LUTsCMReduced $(hls_script_path)/LUTs
 	@$(eval CORE_DIRS= $(wildcard $(core_dir)/*))
 	@cd $(hls_script_path); vivado -mode batch -source makeProject.tcl
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
