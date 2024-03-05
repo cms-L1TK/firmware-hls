@@ -125,7 +125,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   
 }
 
-std::string return_splitted(const std::string &data_string, const std::vector<int>& bit_widths,
+inline std::string return_splitted(const std::string &data_string, const std::vector<int>& bit_widths,
                             const std::vector<std::string> names,
                             const int start_index = 0)
 {
