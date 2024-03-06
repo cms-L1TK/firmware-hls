@@ -1,7 +1,7 @@
 
 include payload_f1.dep
 src emp_project_decl_f1.vhd
-setup ../ucf/ip.tcl
+#setup ../ucf/ip.tcl
 #src ../scripts/pre_synth.tcl
 #setup ../ucf/misc_synth.tcl
 
