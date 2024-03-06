@@ -21,9 +21,6 @@ reset_run synth_1
 # Needed if design doesn't connect to I/O pins of FPGA.
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
 
-# Run pre.tcl if it exists
-set_property -name {STEPS.SYNTH_DESIGN.TCL.PRE} -value [get_files pre.tcl -of [get_fileset utils_1]] -objects [get_runs synth_1]
-
 # Synthesis
 update_compile_order -fileset sources_1
 launch_runs synth_1 -jobs 4
