@@ -1,0 +1,8 @@
+src payload_f1.vhd
+
+################
+# Include Cores
+################
+iprepo *
+src ../cgn/*/*/*.xci
+
