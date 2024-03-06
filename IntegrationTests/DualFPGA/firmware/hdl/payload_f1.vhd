@@ -1,181 +1,87 @@
--------------------------------------------------------------------------------
--- Title      : payload_f1
--- Project    : 
--------------------------------------------------------------------------------
--- File       : payload_f1.vhd
--- Author     : Filippo Marini  <filippo.marini@cern.ch>
--- Company    : University of Colorado Boulder
--- Created    : 2022-06-21
--- Last update: 2024-03-05
--- Platform   : 
--- Standard   : VHDL'93/02
--------------------------------------------------------------------------------
--- Description: 
--------------------------------------------------------------------------------
--- Copyright (c) 2022 University of Colorado Boulder
--- Is it really though?
--------------------------------------------------------------------------------
--- Revisions  :
--- Date        Version  Author  Description
--- 2022-06-21  1.0      fmarini Created
--------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
 use work.ipbus.all;
 use work.emp_data_types.all;
+use work.emp_project_decl.all;
+
 use work.emp_device_decl.all;
 use work.emp_ttc_decl.all;
+
 use work.emp_slink_types.all;
--- tf
-use work.tf_pkg.all;
-use work.memUtil_pkg.all;
-use work.memUtil_aux_pkg.all;
-use work.tf_interface_pkg.all;
-use work.hybrid_data_types.all;
-use work.hybrid_config.all;
-use work.hybrid_data_formats.all;
 
 entity emp_payload is
-  port (
-    clk          : in  std_logic; --unused
-    rst          : in  std_logic;
-    ipb_in       : in  ipb_wbus;  --unused
-    clk40        : in  std_logic; --unused
-    clk_payload  : in  std_logic_vector(2 downto 0);
-    rst_payload  : in  std_logic_vector(2 downto 0); --unused
-    clk_p        : in  std_logic;
-    rst_loc      : in  std_logic_vector(N_REGION - 1 downto 0); --unused
-    clken_loc    : in  std_logic_vector(N_REGION - 1 downto 0); --unused
-    ctrs         : in  ttc_stuff_array(N_REGION - 1 downto 0);  --in linktosecproc, but unused
-    d            : in  ldata(4 * N_REGION - 1 downto 0);
-    ipb_out      : out ipb_rbus;  --unused
-    bc0          : out std_logic; --unused
-    q            : out ldata(4 * N_REGION - 1 downto 0); 
-    gpio         : out std_logic_vector(29 downto 0);    --unused
-    gpio_en      : out std_logic_vector(29 downto 0);    --unused
-    slink_q      : out slink_input_data_quad_array(SLINK_MAX_QUADS - 1 downto 0); --unused
-    backpressure : in  std_logic_vector(SLINK_MAX_QUADS - 1 downto 0) --unused
+  port(
+    clk         : in  std_logic;        -- ipbus signals
+    rst         : in  std_logic;
+    ipb_in      : in  ipb_wbus;
+    ipb_out     : out ipb_rbus;
+    clk40       : in  std_logic;
+    clk_payload : in  std_logic_vector(2 downto 0);
+    rst_payload : in  std_logic_vector(2 downto 0);
+    clk_p       : in  std_logic;        -- data clock
+    rst_loc     : in  std_logic_vector(N_REGION - 1 downto 0);
+    clken_loc   : in  std_logic_vector(N_REGION - 1 downto 0);
+    ctrs        : in  ttc_stuff_array;
+    bc0         : out std_logic;
+    d           : in  ldata(4 * N_REGION - 1 downto 0);  -- data in
+    q           : out ldata(4 * N_REGION - 1 downto 0);  -- data out
+    gpio        : out std_logic_vector(29 downto 0);  -- IO to mezzanine connector
+    gpio_en     : out std_logic_vector(29 downto 0);  -- IO to mezzanine connector (three-state enables)
+    slink_q : out slink_input_data_quad_array(SLINK_MAX_QUADS-1 downto 0);
+    backpressure : in std_logic_vector(SLINK_MAX_QUADS-1 downto 0)
     );
-end;
+
+end emp_payload;
 
 architecture rtl of emp_payload is
 
-  signal s_IR_data             : t_arr_DL_39_DATA;
-  signal s_ir_start            : std_logic;
-  signal s_bx                  : std_logic_vector(2 downto 0);
-  signal s_TW_104_stream_data  : t_arr_TW_104_DATA;
-  signal s_TW_104_stream_valid : t_arr_TW_104_1b;
-  signal s_BW_46_stream_data   : t_arr_BW_46_DATA;
-  signal s_BW_46_stream_valid  : t_arr_BW_46_1b;
-  signal s_FT_bx_out_vld       : std_logic;
-  signal s_tftokf              : t_channlesTB(numTW_104 - 1 downto 0);
-  signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
-  signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
+begin
 
-begin  -- architecture rtl
+  -- This example code sends 156-word-long TMUX18 packets (i.e. same packet length as track finder output)
+  -- with channel index, packet index, and word index embedded in the data word
+  gen : for i in N_REGION * 4 - 1 downto 0 generate
 
-  -----------------------------------------------------------------------------
-  -- EMP ports
-  -----------------------------------------------------------------------------
-  slink_q <= (others => SLINK_INPUT_DATA_ARRAY_NULL);
-  gpio    <= (others => '0');
-  gpio_en <= (others => '0');
-  ipb_out <= IPB_RBUS_NULL;
-  bc0     <= '0';
+    -- Index of word within a packet
+    signal word_index : std_logic_vector(7 downto 0) := x"00";
+    -- Index of packet within an orbit
+    signal packet_index : std_logic_vector(8 downto 0) := "000000000";
 
-  -----------------------------------------------------------------------------
-  -- Link to Sector Processor formatter
-  -----------------------------------------------------------------------------
-  linktosecproc_1 : entity work.linktosecproc
-    port map (
-      clk_i                => clk_p,
-      rst_i                => rst,
-      ttc_i                => ctrs,
-      din_i                => d,
-      ir_start_o           => s_ir_start,
-      bx_o                 => s_bx,
-      DL_39_link_AV_dout   => s_IR_data,
-      DL_39_link_empty_neg => open,
-      DL_39_link_read      => (others => '0')
-      );
+  begin
 
-  -----------------------------------------------------------------------------
-  -- Sector Processor
-  -----------------------------------------------------------------------------
-  tf_wrapper_1 : entity work.tf_wrapper
-    port map (
-      clk                      => clk_p,
-      reset                    => rst,
-      IR_start                 => s_ir_start,
-      IR_bx_in                 => s_bx,
-      FT_bx_out                => open,
-      FT_bx_out_vld            => s_FT_bx_out_vld,
-      FT_done                  => open,
-      DL_39_link_AV_dout       => s_IR_data,
-      DL_39_link_empty_neg     => (others => '1'),
-      DL_39_link_read          => open,
-      TW_104_stream_AV_din     => s_TW_104_stream_data,
-      TW_104_stream_A_full_neg => (others => '1'),
-      TW_104_stream_A_write    => s_TW_104_stream_valid,
-      BW_46_stream_AV_din      => s_BW_46_stream_data,
-      BW_46_stream_A_full_neg  => (others => '1'),
-      BW_46_stream_A_write     => s_BW_46_stream_valid
-      );
+    process (clk_p)
+    begin
+      if rising_edge(clk_p) then
+        -- Reset counters on receiving BC0 from TCDS
+        if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
+          word_index <= x"00";
+          packet_index <= "000000000";
+        -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
+        elsif word_index = x"A1" then
+          word_index <= x"00";
+          packet_index <= std_logic_vector(unsigned(packet_index) + 1);
+        else
+          word_index <= std_logic_vector(unsigned(word_index) + 1);
+        end if;
+      end if;
+    end process;
 
-  -----------------------------------------------------------------------------
-  -- Sector Processor to Link formatter
-  -----------------------------------------------------------------------------
-  -- secproctolink_1 : entity work.secproctolink
-  --   port map (
-  --     clk_i                   => clk_p,
-  --     TW_104_stream_data_i     => s_TW_104_stream_data,
-  --     TW_104_stream_write_i    => s_TW_104_stream_valid,
-  --     TW_104_stream_full_neg_o => open,
-  --     BW_46_stream_data_i     => s_BW_46_stream_data,
-  --     BW_46_stream_write_i    => s_BW_46_stream_valid,
-  --     BW_46_stream_full_neg_i => open,
-  --     dout_o                  => q
-  --     );
+    -- Set valid high for full duration of packet
+    q(i).valid <= '1' when word_index <= x"9B" else '0';
+    -- Start & last are only high for first & last clock cycle of packet
+    q(i).start <= '1' when word_index = x"00" else '0';
+    q(i).last <= '1' when word_index = x"9B" else '0';
 
-  -----------------------------------------------------------------------------
-  -- Sector Processor to KF formatter
-  -----------------------------------------------------------------------------
-  tf_to_kf_1 : entity work.tf_to_kf
-    port map (
-      clk_i          => clk_p,
-      TW_104_data_i  => s_TW_104_stream_data,
-      TW_104_valid_i => s_TW_104_stream_valid,
-      BW_46_data_i   => s_BW_46_stream_data,
-      BW_46_valid_i  => s_BW_46_stream_valid,
-      kf_reset_i     => s_FT_bx_out_vld,
-      tftokf_o       => s_tftokf
-      );
+    -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
+    -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
+    q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
 
-  -----------------------------------------------------------------------------
-  -- KF
-  -----------------------------------------------------------------------------
-  kf_wrapper_1 : entity work.kf_wrapper
-    port map (
-      clk_i   => clk_p,
-      kfin_i  => s_tftokf,
-      kfout_o => s_kfout
-      );
+    -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
+    q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
+    q(i).data(31 downto 16) <= "0000000" & packet_index;
+    q(i).data(15 downto 0) <= x"00" & word_index;
 
-  -----------------------------------------------------------------------------
-  -- Output step
-  -----------------------------------------------------------------------------
-  kfout_isolation_out_1 : entity work.kfout_isolation_out
-    port map (
-      clk        => clk_p,
-      out_packet => conv(d),
-      out_din    => s_kfout,
-      out_dout   => s_tfout
-      );
+  end generate gen;
 
-  q(108)        <= s_tfout(0);
-  q(109)        <= s_tfout(1);
-  --q(120).strobe <= '1';
-  --q(121).strobe <= '1';
-
-end architecture rtl;
-
+end rtl;
