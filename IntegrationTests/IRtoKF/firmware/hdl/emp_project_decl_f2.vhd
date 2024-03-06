@@ -21,24 +21,26 @@ package emp_project_decl is
   -- Only used by nullalgo   
   constant PAYLOAD_LATENCY : integer := 823;
 
+  -- F2 receives from F1 on inter-fpga links
   constant REGION_CONF : region_conf_array_t := (
      0   => kDummyRegion,                     -- service c2c
-     1   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-     2   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-     3   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
+     1   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     2   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     3   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
      4   => kDummyRegion,                     -- not routed
-     5   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-     6   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-     7   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-     8   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-     9   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-    10   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-    11   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-    12   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-    13   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
-    14   => (gty25, buf, no_fmt, buf, gty25), -- fpga-fpga
+     5   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     6   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     7   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     8   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     9   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    10   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    11   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    12   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    13   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    14   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
     15   => kDummyRegion,                     -- not routed
 ------cross
+----- all MGTs instantiated bidirectionally for now
     16  => kDummyRegion,                      -- not routed
     17  => (gty25, buf, no_fmt, buf, gty25),  -- firefly
     18  => (gty25, buf, no_fmt, buf, gty25),  -- firefly
