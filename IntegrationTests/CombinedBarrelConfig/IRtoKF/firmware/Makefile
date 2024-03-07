@@ -17,6 +17,7 @@ $(core_file): $(core_dir)
 	@python3 scripts/include_cores.py -s $(hls_script_path)
 
 kfin_adj:
+	@cd ../../../../KalmanFilter; git checkout 008f942
 	@python3 scripts/kf_link_mod.py
 
 xciCreation: $(core_file)

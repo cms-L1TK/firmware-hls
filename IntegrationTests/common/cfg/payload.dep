@@ -21,7 +21,7 @@ src --vhdl2008 common/hdl/tf_pipe_delay.vhd
 # KF
 include -c firmware-hls:KalmanFilter/kfin components.dep 
 include -c firmware-hls:KalmanFilter/kf components.dep 
-src kfout_top_conv.vhd
+src common/hdl/emp/kfout_top_conv.vhd
 src common/hdl/emp/conv96to64.vhd
 include -c firmware-hls:KalmanFilter/kfout components.dep 
 include -c firmware-hls:KalmanFilter/tq components.dep 
