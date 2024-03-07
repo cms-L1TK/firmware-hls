@@ -1,0 +1,12 @@
+# common for both FPGAs
+
+src -c emp-fwk:components/datapath emp_data_types.vhd
+#src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_v.vhd ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd ipbus_freq_
+include -c ipbus-firmware:components/ipbus_slaves ipbus_syncreg_v.dep ipbus_ctrlreg_v.dep ipbus_reg_v.dep ipbus_freq_ctr.dep
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd 
+src ../constrs/floorplan_emp.xdc
+
+addrtab -c emp-fwk:components/payload emp_payload.xml
+include -c emp-fwk:boards/apollo/cm_v2/vu13p cm_v2.dep
+
+
