@@ -28,7 +28,6 @@ create_ip -name VMRouterCMTop_L4PHIA -module_name VMR_L4PHIA -vendor xilinx.com 
 create_ip -name VMRouterCMTop_L5PHIA -module_name VMR_L5PHIA -vendor xilinx.com -library hls -version 1.0
 create_ip -name VMRouterCMTop_L6PHIA -module_name VMR_L6PHIA -vendor xilinx.com -library hls -version 1.0
 create_ip -name TrackletProcessor_L1L2C -module_name TP_L1L2C -vendor xilinx.com -library hls -version 1.0
-create_ip -name ProjectionCalculator_L1L2C -module_name PC_L1L2C -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchProcessor_L3PHIA -module_name MP_L3PHIA -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchProcessor_L4PHIA -module_name MP_L4PHIA -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchProcessor_L5PHIA -module_name MP_L5PHIA -vendor xilinx.com -library hls -version 1.0
