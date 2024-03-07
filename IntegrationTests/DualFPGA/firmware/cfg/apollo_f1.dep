@@ -1,14 +1,5 @@
 
 include payload_f1.dep
 src emp_project_decl_f1.vhd
-#setup ../ucf/ip.tcl
-#src ../scripts/pre_synth.tcl
-#setup ../ucf/misc_synth.tcl
 
-src -c emp-fwk:components/datapath emp_data_types.vhd
-src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_v.vhd ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
-src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd 
-
-
-addrtab -c emp-fwk:components/payload emp_payload.xml
-include -c emp-fwk:boards/apollo/cm_v2/vu13p cm_v2.dep
+include apollo.dep
