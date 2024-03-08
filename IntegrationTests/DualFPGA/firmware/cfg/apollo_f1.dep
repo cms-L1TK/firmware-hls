@@ -2,4 +2,6 @@
 include payload_f1.dep
 src emp_project_decl_f1.vhd
 
+include -c emp-fwk:boards/apollo/cm_v2/vu13p cm_v2_p1.dep
+
 include apollo.dep
