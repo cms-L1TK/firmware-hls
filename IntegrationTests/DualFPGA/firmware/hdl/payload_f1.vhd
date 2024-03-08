@@ -9,7 +9,7 @@ use work.emp_project_decl.all;
 use work.emp_device_decl.all;
 use work.emp_ttc_decl.all;
 
-use work.emp_slink_types.all;
+-- use work.emp_slink_types.all;
 
 entity emp_payload is
   port(
@@ -29,7 +29,7 @@ entity emp_payload is
     q           : out ldata(4 * N_REGION - 1 downto 0);  -- data out
     gpio        : out std_logic_vector(29 downto 0);  -- IO to mezzanine connector
     gpio_en     : out std_logic_vector(29 downto 0);  -- IO to mezzanine connector (three-state enables)
-    slink_q : out slink_input_data_quad_array(SLINK_MAX_QUADS-1 downto 0);
+--    slink_q : out slink_input_data_quad_array(SLINK_MAX_QUADS-1 downto 0);
     backpressure : in std_logic_vector(SLINK_MAX_QUADS-1 downto 0)
     );
 
