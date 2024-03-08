@@ -4,7 +4,7 @@ use IEEE.STD_LOGIC_1164.all;
 
 use work.emp_framework_decl.all;
 use work.emp_device_types.all;
---use work.emp_slink_types.all;
+use work.emp_slink_types.all;
 
 package emp_project_decl is
 
@@ -62,9 +62,9 @@ package emp_project_decl is
 
   -- Specify the slink quad using the corresponding region conf ID
   -- Specify slink channels to enable using the channel mask
-  --constant SLINK_CONF : slink_conf_array_t := (
-  --  others => kNoSlink
-  --  );
+  constant SLINK_CONF : slink_conf_array_t := (
+    others => kNoSlink
+    );
 
 
 end emp_project_decl;
