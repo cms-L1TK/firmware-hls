@@ -24,8 +24,16 @@ export PATH=/opt/cactus/bin/uhal/tools:$PATH
 export LD_LIBRARY_PATH=/opt/cactus/lib:${LD_LIBRARY_PATH}
 
 export COLUMNS=120
-ipbb proj create vivado tf_p1 firmware-hls:IntegrationTests/DualFPGA/ apollo_f1.dep
-cd proj/tf_p1/
+# F1
+ipbb proj create vivado tf_f1 firmware-hls:IntegrationTests/DualFPGA/ apollo_f1.dep
+cd proj/tf_f1/
+ipbb ipbus gendecoders
+ipbb vivado generate-project --single
+ipbb vivado synth -j16 impl -j16 package
+
+# F2
+ipbb proj create vivado tf_f2 firmware-hls:IntegrationTests/DualFPGA/ apollo_f2.dep
+cd proj/tf_f2/
 ipbb ipbus gendecoders
 ipbb vivado generate-project --single
 ipbb vivado synth -j16 impl -j16 package
