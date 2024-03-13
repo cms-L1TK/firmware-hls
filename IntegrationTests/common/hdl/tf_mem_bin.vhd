@@ -127,21 +127,21 @@ architecture rtl of tf_mem_bin is
 
 -- ########################### Types ###########################
 
-  type t_data_array is array(0 to NUM_COPY-1) of std_logic_vector(RAM_WIDTH-1 downto 0);            --! Array of
-                                                                  --data type for memory
-  type t_mem_1d_array is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0);         --! Memory 1d
-  type t_mem_2d_array is array(0 to NUM_COPY-1) of t_mem_1d_array;  --! Memory 2d
-                                                                  --for
-                                                                  --NUM_COPY instances
+--! Array of data type for memory
+  type t_data_array is array(0 to NUM_COPY-1) of std_logic_vector(RAM_WIDTH-1 downto 0);
+--! Memory 1d
+  type t_mem_1d_array is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0);
+--! Memory 2d for NUM_COPY instances
+  type t_mem_2d_array is array(0 to NUM_COPY-1) of t_mem_1d_array;
 
   type t_arr_1d_mem_nent_tmp is array(NUM_BINS -1 downto 0) of std_logic_vector(ADDR_WIDTH-1 downto 0);
-  
+
   type t_arr_1d_slv_mem_nent is array(0 to NUM_RZ_BINS*NUM_PAGES-1) of std_logic_vector(ADDR_WIDTH-1 downto 0);
 
   type t_arr_2d_slv_mem_nent is array(0 to 2*NUM_PHI_BINS-1) of t_arr_1d_slv_mem_nent; --! 2D array of slv
 
 -- ########################### Function ##########################
---! @brief TextIO function to read memory data to initialize tf_mem_bin_cm4_new. Needed here because of variable slv width!
+--! @brief TextIO function to read memory data to initialize tf_mem_bin. Needed here because of variable slv width!
 impure function read_tf_mem_data (
 file_path : string;      --! File path as string
 hex_val   : boolean)     --! Read file vales as hex or bin

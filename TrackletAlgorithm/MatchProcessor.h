@@ -1526,7 +1526,6 @@ void MatchProcessor(BXType bx,
       // VMProjection
       constexpr bool isDisk = LAYER > TF::L6;
       auto first = !isDisk ? zfirst : rfirst;
-      auto last = !isDisk ? zlast : ap_uint<nZbinBits>(rfirst+1);
       auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
