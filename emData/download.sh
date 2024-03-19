@@ -3,7 +3,7 @@ set -e
 
 #### generated with commit 6e61462 ####
 # Combined modules
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/hMDilsltLf0mX33/MemPrints.tar.gz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
@@ -88,6 +88,7 @@ fi
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_IR.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_VMSMER.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TB.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
