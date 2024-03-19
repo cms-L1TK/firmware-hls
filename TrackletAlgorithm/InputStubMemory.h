@@ -4,6 +4,12 @@
 #include "Constants.h"
 #include "MemoryTemplate.h"
 
+// Memory containing stubs read by the VMRouter.
+// N.B. Both class DTCStubMemory & InputStubMemory represent the same BRAM
+// between InputRouter & VMRouter, but DTCStubMemory does not describe the bit
+// fields, so can hold stubs in any of disk/barrel/PS/2S, so is used for the
+// InputRouter output.
+
 // InputStubBase is where we define the bit widths, which depend on the class template parameter
 template<int ISType> class InputStubBase {};
 

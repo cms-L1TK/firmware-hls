@@ -203,8 +203,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         topFile.write(
             "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
             "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
-            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
-            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
            "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
             "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"

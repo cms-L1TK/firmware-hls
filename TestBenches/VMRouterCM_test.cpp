@@ -50,7 +50,7 @@ int main() {
   const auto nVMSTE = tb.nFiles(tePattern);
 
   // Make sure that the number of input and output memories are correct
-  assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies) && (nVMSTE == numTEOCopies));
+  assert((nInputStubs == numInputs) && (nInputStubsDisk2S == numInputsDisk2S) && (nASCopies == numASCopies) && (nASInnerCopies == numASInnerCopies) && (nVMSTE == numTEOCopies));
 
   // Open the files
   cout << "Open files..." << endl;
@@ -141,7 +141,7 @@ int main() {
     }
     // Allstub Inner memories
     if (nASInnerCopies) {
-      for (unsigned int i = 0; i < numASInnerCopies; i++) {
+      for (unsigned int i = 0; i < nASInnerCopies; i++) {
         err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
       }
     }

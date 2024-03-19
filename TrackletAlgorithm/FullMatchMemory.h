@@ -5,6 +5,10 @@
 #include "MemoryTemplate.h"
 #include "globalFunctions.h"
 
+// Memory written by the MatchProcessor, containing the association between a
+// stub and a tracklet, in a layer that the tracklet seed has been projected to
+// and a matching stub found.
+
 // FullMatchBase is where we define the bit widths, which depend on the class template parameter.
 template<int FMType> class FullMatchBase {};
 

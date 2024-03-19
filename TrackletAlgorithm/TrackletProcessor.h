@@ -830,15 +830,11 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   constexpr int NRZBINS = (1<<TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsRZBin);
 
   typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK vmstubsmask[NRZBINS];
-  typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMSTUBS  vmstubsentries[NRZBINS];
-#pragma HLS array_partition variable=vmstubsentries complete dim=1
 #pragma HLS array_partition variable=vmstubsmask complete dim=1
  entriesloop:for(unsigned int i=0;i<NRZBINS-1;i++) {
 #pragma HLS unroll
-  vmstubsentries[i]=(outerVMStubs->getEntries8(bx,i+1),outerVMStubs->getEntries8(bx,i));
   vmstubsmask[i]=(outerVMStubs->getBinMask8(bx,i+1),outerVMStubs->getBinMask8(bx,i));
 }
-  vmstubsentries[NRZBINS-1]=(ap_uint<32>(0),outerVMStubs->getEntries8(bx,NRZBINS-1));
   vmstubsmask[NRZBINS-1]=(ap_uint<8>(0),outerVMStubs->getBinMask8(bx,NRZBINS-1));
 
   constexpr int NTEUBits=3; //ceil(log2(kNTEUnits[Seed]));
@@ -1053,7 +1049,7 @@ teunits[k].idle_;
       typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMINDEX memindex_init = __builtin_ctz(tedatatmp.getStubMask());
       typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMINDEX memindexlast_init = __builtin_clz(tedatatmp.getStubMask());
       memindexlast_init = ~memindexlast_init;
-      typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMSTUBS memstubs_init = vmstubsentries[tedatatmp.getStart()];
+      typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMSTUBS memstubs_init = outerVMStubs->getEntries(bx,tedatatmp.getStart());
       typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::NSTUBS nstubs_init(teunits[k].calcNStubs(memstubs_init,memmask_init));
       typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::PHIBIN rzbin_init=tedatatmp.getStart();
       ap_uint<1> next_init;
