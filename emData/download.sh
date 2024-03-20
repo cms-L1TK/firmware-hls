@@ -5,6 +5,7 @@ set -e
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
+#memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"
@@ -138,6 +139,9 @@ cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
 cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
 cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
 cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
+cp ../FPGA2_Config/wires.dat fpga2_wires.dat
+cp ../FPGA2_Config/memorymodules.dat fpga2_memorymodules.dat
+cp ../FPGA2_Config/processingmodules.dat fpga2_processingmodules.dat
 
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
