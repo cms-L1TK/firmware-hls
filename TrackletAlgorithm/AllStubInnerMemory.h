@@ -56,7 +56,7 @@ public:
     kASAlphaSize = 0,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 12,
+    kASRSize = 11,
     kASIndexSize = 7,
     kASFinePhiSize = 8,
     kASNegDiskSize = 1,
@@ -75,7 +75,7 @@ public:
     kASAlphaSize = 4,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 7,
+    kASRSize = 6,
     kASIndexSize = 7,
     kASFinePhiSize = 8,
     kASNegDiskSize = 1,
@@ -109,9 +109,7 @@ public:
     kASFinePhiMSB = kASFinePhiLSB + AllStubInnerBase<ASType>::kASFinePhiSize - 1,
     kASIndexLSB = kASFinePhiMSB +1,
     kASIndexMSB = kASIndexLSB + AllStubInnerBase<ASType>::kASIndexSize - 1,
-    kASNegDiskLSB = kASIndexMSB + 1,
-    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<ASType>::kASNegDiskSize - 1,
-    kASBendLSB = kASNegDiskMSB + 1,
+    kASBendLSB = kASIndexMSB + 1,
     kASBendMSB = kASBendLSB + AllStubInnerBase<ASType>::kASBendSize - 1,
     kASAlphaLSB = kASBendMSB + 1,
     kASAlphaMSB = kASAlphaLSB + AllStubInnerBase<ASType>::kASAlphaSize - 1,
@@ -120,7 +118,9 @@ public:
     kASZLSB = kASPhiMSB + 1,
     kASZMSB = kASZLSB + AllStubInnerBase<ASType>::kASZSize - 1,
     kASRLSB = kASZMSB + 1,
-    kASRMSB = kASRLSB + AllStubInnerBase<ASType>::kASRSize - 1
+    kASRMSB = kASRLSB + AllStubInnerBase<ASType>::kASRSize - 1,
+    kASNegDiskLSB = kASRMSB + 1,
+    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<ASType>::kASNegDiskSize - 1
   };
   typedef ap_int<AllStubInnerBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubInnerBase<ASType>::kASZSize> ASZ;
@@ -130,7 +130,7 @@ public:
   typedef ap_uint<AllStubInnerBase<ASType>::kASIndexSize> ASINDEX;
   typedef ap_uint<AllStubInnerBase<ASType>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize> AllStubInnerData;
-  typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASNegDiskSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
+  typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
   typedef ap_uint<1> ASNEGDISK; //FIXME this is always ap_uint<1> because csynth fails if this is ever 0 wide
 
   // Constructors
@@ -174,7 +174,7 @@ public:
   AllStubInnerData raw() const {return data_; }
 
   AllStubData getAllStub() const {
-    return data_.range(kASRMSB,kASBendLSB);
+    return data_.range(kASNegDiskMSB,kASBendLSB);
   }
 
   ASR getR() const {
@@ -345,9 +345,7 @@ public:
     kASFinePhiMSB = kASFinePhiLSB + AllStubInnerBase<DISKPS>::kASFinePhiSize - 1,
     kASIndexLSB = kASFinePhiMSB +1,
     kASIndexMSB = kASIndexLSB + AllStubInnerBase<DISKPS>::kASIndexSize - 1,
-    kASNegDiskLSB = kASIndexMSB + 1,
-    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<DISKPS>::kASNegDiskSize - 1,
-    kASBendLSB = kASNegDiskMSB + 1,
+    kASBendLSB = kASIndexMSB + 1,
     kASBendMSB = kASBendLSB + AllStubInnerBase<DISKPS>::kASBendSize - 1,
     kASAlphaLSB = kASBendMSB + 1,
     kASAlphaMSB = kASAlphaLSB + AllStubInnerBase<DISKPS>::kASAlphaSize - 1,
@@ -356,9 +354,11 @@ public:
     kASZLSB = kASPhiMSB + 1,
     kASZMSB = kASZLSB + AllStubInnerBase<DISKPS>::kASZSize - 1,
     kASRLSB = kASZMSB + 1,
-    kASRMSB = kASRLSB + AllStubInnerBase<DISKPS>::kASRSize - 1
+    kASRMSB = kASRLSB + AllStubInnerBase<DISKPS>::kASRSize - 1,
+    kASNegDiskLSB = kASRMSB + 1,
+    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<DISKPS>::kASNegDiskSize - 1
   };
-  typedef ap_int<AllStubInnerBase<DISKPS>::kASRSize> ASR;
+  typedef ap_int<AllStubInnerBase<DISKPS>::kASRSize + 1> ASR;
   typedef ap_int<AllStubInnerBase<DISKPS>::kASZSize> ASZ;
   typedef ap_uint<AllStubInnerBase<DISKPS>::kASPhiSize> ASPHI;
   typedef ap_uint<AllStubInnerBase<DISKPS>::kASAlphaSize> ASALPHA;
@@ -366,7 +366,7 @@ public:
   typedef ap_uint<AllStubInnerBase<DISKPS>::kASIndexSize> ASINDEX;
   typedef ap_uint<AllStubInnerBase<DISKPS>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize> AllStubInnerData;
-  typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize-AllStubInnerBase<DISKPS>::kASNegDiskSize-AllStubInnerBase<DISKPS>::kASIndexSize-AllStubInnerBase<DISKPS
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize-AllStubInnerBase<DISKPS>::kASIndexSize-AllStubInnerBase<DISKPS
   >::kASFinePhiSize> AllStubData;
   typedef ap_uint<1> ASNEGDISK; //FIXME this is always ap_uint<1> because csynth fails if this is ever 0 wide
 
@@ -397,7 +397,7 @@ public:
   AllStubInnerData raw() const {return data_; }
 
   AllStubData getAllStub() const {
-    return data_.range(kASRMSB,kASBendLSB);
+    return data_.range(kASNegDiskMSB,kASBendLSB);
   }
 
   ASR getR() const {
