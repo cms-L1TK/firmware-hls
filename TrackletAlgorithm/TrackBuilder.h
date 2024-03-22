@@ -32,6 +32,72 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
     fm.setTrackletID(kInvalidTrackletID);
 }
 
+template <class FM>
+class Merger {
+
+ public:
+
+  // Constructor
+  Merger() {}
+
+  void reset() {
+    valid_A_ = false;
+    valid_B_ = false;
+  }
+
+  // Extract the next element in the merger without advancing the merger
+  const FM &peek() const {
+    return first_A_ ? in_A_ : in_B_;
+  }
+
+  // Check if valid data
+  bool valid() const {
+    return valid_A_ || valid_B_;
+  }
+
+  void next(const FM &in_A, const bool valid_A, bool &read_A,
+            const FM &in_B, const bool valid_B, bool &read_B,
+            const bool read) {
+
+    if (read) {
+      if (first_A_) valid_A_ = false;
+      else          valid_B_ = false;
+    }
+
+    read_A = false;
+    read_B = false;
+
+    if (!valid_A_) {
+      in_A_    = in_A;
+      valid_A_ = valid_A;
+      read_A   = true;
+    }
+
+    if (!valid_B_) {
+      in_B_    = in_B;
+      valid_B_ = valid_B;
+      read_B   = true;
+    }
+
+    first_A_ = (valid_A_ && valid_B_
+            && (in_A_.getTrackletID() < in_B_.getTrackletID()))
+            || (valid_A_ && (!valid_B_));
+
+  }
+
+ private:
+
+  // valid data flags
+  bool valid_A_, valid_B_;
+
+  // flag to indicate if in_A is the next data to read
+  bool first_A_;
+
+  // data words
+  FM in_A_, in_B_;
+
+};
+
 // TrackBuilder top template function
 template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, unsigned TPAROffset>
 void TrackBuilder(
@@ -88,9 +154,31 @@ void TrackBuilder(
   done = false;
   bool done_latch = false;
 
+  Merger<FullMatch<BARREL> > merger_L_top[4], merger_L_b1[4], merger_L_b2[4];
+  int count_L_0[4], count_L_1[4], count_L_2[4], count_L_3[4];
+
+  initialize_barrel_mergers : for (short i = 0; i < 4; i++) {
+#pragma HLS unroll
+    merger_L_top[i].reset();
+    merger_L_b1[i].reset();
+    merger_L_b2[i].reset();
+    count_L_0[i] = count_L_1[i] = count_L_2[i] = count_L_3[i] = 0;
+  }
+
+  Merger<FullMatch<DISK> > merger_D_top[4], merger_D_b1[4], merger_D_b2[4];
+  int count_D_0[4], count_D_1[4], count_D_2[4], count_D_3[4];
+
+  initialize_disk_mergers : for (short i = 0; i < 4; i++) {
+#pragma HLS unroll
+    merger_D_top[i].reset();
+    merger_D_b1[i].reset();
+    merger_D_b2[i].reset();
+    count_D_0[i] = count_D_1[i] = count_D_2[i] = count_D_3[i] = 0;
+  }
+
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
-#pragma HLS latency min=5 max=5
+//#pragma HLS latency min=5 max=5
 
     const ap_uint<1> empty = (i == 0);
     TrackletIDType min_id = kInvalidTrackletID;
@@ -99,50 +187,38 @@ void TrackBuilder(
 #pragma HLS array_partition variable=barrel_valid complete dim=0
 #pragma HLS array_partition variable=disk_valid complete dim=0
 
-    // First determine the minimum tracklet ID from the current set of full
-    // matches.
-    barrel_min_id : for (short j = 0; j < NFMBarrel; j++) { 
+    bool smallest[8];
 
-      const auto &barrel_stub_0 = barrel_fm[j][barrel_read_index[j]];
-      const auto &barrel_id_0 = barrel_stub_0.getTrackletID();
-      barrel_valid[j] = (!empty && barrel_id_0 != kInvalidTrackletID);
+    for (unsigned int ii = 0 ; ii < 8; ii++) {
 
-      // Compare the given barrel and disk IDs against each barrel ID.
-      barrel_barrel_id_comp : for (short k = 0; k < NFMBarrel; k++) {
-        const auto &barrel_stub_1 = barrel_fm[k][barrel_read_index[k]];
-        const auto &barrel_id_1 = barrel_stub_1.getTrackletID();
-        barrel_valid[j] = (barrel_valid[j] && barrel_id_0 <= barrel_id_1);
-      }
-      // Compare the given barrel and disk IDs against each disk ID.
-      barrel_disk_id_comp : for (short k = 0; k < NFMDisk; k++) {
-        const auto &disk_stub_1 = disk_fm[k][disk_read_index[k]];
-        const auto &disk_id_1 = disk_stub_1.getTrackletID();
-        barrel_valid[j] = (barrel_valid[j] && barrel_id_0 <= disk_id_1);
+      int tid = kInvalidTrackletID;
+
+      if (ii < 4) {
+        if (merger_L_top[ii].valid())
+          tid =  merger_L_top[ii].peek().getTrackletID();
+      } else {
+        if (merger_D_top[ii-4].valid())
+          tid =  merger_D_top[ii-4].peek().getTrackletID();
       }
 
-      min_id = (barrel_valid[j] ? barrel_id_0 : min_id);
-    }
+      smallest[ii] = true;
 
-    disk_min_id : for (short j = 0; j < NFMDisk; j++) {
+      for (unsigned int jj = 0 ; jj < 8; jj++) {
 
-      const auto &disk_stub_0 = disk_fm[j][disk_read_index[j]];
-      const auto &disk_id_0 = disk_stub_0.getTrackletID();
-      disk_valid[j] = (!empty && disk_id_0 != kInvalidTrackletID);
+        int tid2 = kInvalidTrackletID;
 
-      // Compare the given barrel and disk IDs against each barrel ID.
-      disk_barrel_id_comp : for (short k = 0; k < NFMBarrel; k++) {
-        const auto &barrel_stub_1 = barrel_fm[k][barrel_read_index[k]];
-        const auto &barrel_id_1 = barrel_stub_1.getTrackletID();
-        disk_valid[j] = (disk_valid[j] && disk_id_0 <= barrel_id_1);
-      }
-      // Compare the given barrel and disk IDs against each disk ID.
-      disk_disk_id_comp : for (short k = 0; k < NFMDisk; k++) {
-        const auto &disk_stub_1 = disk_fm[k][disk_read_index[k]];
-        const auto &disk_id_1 = disk_stub_1.getTrackletID();
-        disk_valid[j] = (disk_valid[j] && disk_id_0 <= disk_id_1);
+        if (jj < 4) {
+          if (merger_L_top[jj].valid())
+            tid2 =  merger_L_top[jj].peek().getTrackletID();
+        } else {
+          if (merger_D_top[jj-4].valid())
+            tid2 =  merger_D_top[jj-4].peek().getTrackletID();
+        }
+
+        if (tid2 < tid) smallest[ii] = false;
       }
 
-      min_id = (disk_valid[j] ? disk_id_0 : min_id);
+      if (smallest[ii]) min_id = tid;
     }
 
     // We are done if no valid ID was found; all subsequent output tracks are
@@ -175,31 +251,9 @@ void TrackBuilder(
 
     barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
-      const int nFM = (j == 0 ? NFMPerStubBarrel0 : NFMPerStubBarrel);
-      const unsigned nFMCumulative = (j == 0 ? 0 : (j == 1 ? NFMPerStubBarrel0 : NFMPerStubBarrel0 + (j - 1) * NFMPerStubBarrel));
-
-      ap_uint<1> barrel_stub_valid = false;
-      barrel_stub_valid : for (short k = 0; k < nFM; k++)
-        barrel_stub_valid = (barrel_stub_valid || barrel_valid[nFMCumulative + k]);
-      nMatches += (barrel_stub_valid ? 1 : 0);
-
-      const auto &i_mem = ((nFM > 7 && barrel_valid[nFMCumulative + 7]) ? (nFMCumulative + 7) :
-                          ((nFM > 6 && barrel_valid[nFMCumulative + 6]) ? (nFMCumulative + 6) :
-                          ((nFM > 5 && barrel_valid[nFMCumulative + 5]) ? (nFMCumulative + 5) :
-                          ((nFM > 4 && barrel_valid[nFMCumulative + 4]) ? (nFMCumulative + 4) :
-                          ((nFM > 3 && barrel_valid[nFMCumulative + 3]) ? (nFMCumulative + 3) :
-                          ((nFM > 2 && barrel_valid[nFMCumulative + 2]) ? (nFMCumulative + 2) :
-                          ((nFM > 1 && barrel_valid[nFMCumulative + 1]) ? (nFMCumulative + 1) :
-                                                                          (nFMCumulative))))))));
-      const auto &i_fm = ((nFM > 7 && barrel_valid[nFMCumulative + 7]) ? (barrel_read_index[nFMCumulative + 7]) :
-                         ((nFM > 6 && barrel_valid[nFMCumulative + 6]) ? (barrel_read_index[nFMCumulative + 6]) :
-                         ((nFM > 5 && barrel_valid[nFMCumulative + 5]) ? (barrel_read_index[nFMCumulative + 5]) :
-                         ((nFM > 4 && barrel_valid[nFMCumulative + 4]) ? (barrel_read_index[nFMCumulative + 4]) :
-                         ((nFM > 3 && barrel_valid[nFMCumulative + 3]) ? (barrel_read_index[nFMCumulative + 3]) :
-                         ((nFM > 2 && barrel_valid[nFMCumulative + 2]) ? (barrel_read_index[nFMCumulative + 2]) :
-                         ((nFM > 1 && barrel_valid[nFMCumulative + 1]) ? (barrel_read_index[nFMCumulative + 1]) :
-                                                                         (barrel_read_index[nFMCumulative]))))))));
-      const auto &barrel_stub = barrel_fm[i_mem][i_fm];
+      const auto &barrel_stub = merger_L_top[j].peek();
+      const bool barrel_stub_valid = merger_L_top[j].valid() && smallest[j];
+      if (barrel_stub_valid) nMatches++;
 
       const auto &barrel_stub_index = (barrel_stub_valid ? barrel_stub.getStubIndex() : FullMatch<BARREL>::FMSTUBINDEX(0));
       const auto &barrel_stub_r = (barrel_stub_valid ? barrel_stub.getStubR() : FullMatch<BARREL>::FMSTUBR(0));
@@ -244,20 +298,9 @@ void TrackBuilder(
 
     disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
 
-      ap_uint<1> disk_stub_valid = false;
-      disk_stub_valid : for (short k = 0; k < NFMPerStubDisk; k++)
-        disk_stub_valid = (disk_stub_valid || disk_valid[j * NFMPerStubDisk + k]);
-      nMatches += (disk_stub_valid ? 1 : 0);
-
-      const auto &i_mem = ((disk_valid[j * NFMPerStubDisk + 3]) ? (j * NFMPerStubDisk + 3) :
-                          ((disk_valid[j * NFMPerStubDisk + 2]) ? (j * NFMPerStubDisk + 2) :
-                          ((disk_valid[j * NFMPerStubDisk + 1]) ? (j * NFMPerStubDisk + 1) :
-                                                                  (j * NFMPerStubDisk))));
-      const auto &i_fm = ((disk_valid[j * NFMPerStubDisk + 3]) ? (disk_read_index[j * NFMPerStubDisk + 3]) :
-                         ((disk_valid[j * NFMPerStubDisk + 2]) ? (disk_read_index[j * NFMPerStubDisk + 2]) :
-                         ((disk_valid[j * NFMPerStubDisk + 1]) ? (disk_read_index[j * NFMPerStubDisk + 1]) :
-                                                                 (disk_read_index[j * NFMPerStubDisk]))));
-      const auto &disk_stub = disk_fm[i_mem][i_fm];
+      const auto &disk_stub = merger_D_top[j].peek();
+      const bool disk_stub_valid = merger_D_top[j].valid() && smallest[j+4];
+      if (disk_stub_valid) nMatches++;
 
       const auto &disk_stub_index = (disk_stub_valid ? disk_stub.getStubIndex() : FullMatch<DISK>::FMSTUBINDEX(0));
       const auto &disk_stub_r = (disk_stub_valid ? disk_stub.getStubR() : FullMatch<DISK>::FMSTUBR(0));
@@ -340,24 +383,72 @@ void TrackBuilder(
     }
     nTracks += (track.getTrackValid() ? 1 : 0);
 
-    // Update the circular buffer indices and read a new element from each of
-    // the input full-match memories.
-    barrel_circular_buffer_update : for (short j = 0; j < NFMBarrel; j++) {
-      barrel_read_index[j] += (barrel_valid[j] ? 1 : 0);
-      const ap_uint<kNBitsTBBuffer> barrel_next_write_index = barrel_write_index[j] + 1;
-      const ap_uint<1> barrel_not_full = (barrel_next_write_index != barrel_read_index[j]);
-      getFM<BARREL>(bx, barrelFullMatches[j], barrel_mem_index[j], barrel_fm[j][barrel_write_index[j]]);
-      barrel_mem_index[j] += ((empty || barrel_not_full) ? 1 : 0);
-      barrel_write_index[j] += ((empty || barrel_not_full) ? 1 : 0);
+    //Next step
+
+    barrel_merger : for (unsigned short ii = 0; ii < 4; ii++) {
+
+      bool read_1, read_2;
+
+      merger_L_top[ii].next(merger_L_b1[ii].peek(), merger_L_b1[ii].valid(), read_1,
+                            merger_L_b2[ii].peek(), merger_L_b2[ii].valid(), read_2,
+                            smallest[ii]);
+
+      bool read_b1_1, read_b1_2, read_b2_1, read_b2_2;
+
+      merger_L_b1[ii].next(barrelFullMatches[0+4*ii].read_mem(bx,count_L_0[ii]),
+                           count_L_0[ii] < barrelFullMatches[0+4*ii].getEntries(bx),
+                           read_b1_1,
+                           barrelFullMatches[1+ii*4].read_mem(bx,count_L_1[ii]),
+                           count_L_1[ii] < barrelFullMatches[1+ii*4].getEntries(bx),
+                           read_b1_2,
+                           read_1);
+
+      if (read_b1_1) count_L_0[ii]++;
+      if (read_b1_2) count_L_1[ii]++;
+
+      merger_L_b2[ii].next(barrelFullMatches[2+ii*4].read_mem(bx,count_L_2[ii]),
+                           count_L_2[ii] < barrelFullMatches[2+ii*4].getEntries(bx),
+                           read_b2_1,
+                           barrelFullMatches[3+ii*4].read_mem(bx,count_L_3[ii]),
+                           count_L_3[ii] < barrelFullMatches[3+ii*4].getEntries(bx),
+                           read_b2_2,
+                           read_2);
+
+      if (read_b2_1) count_L_2[ii]++;
+      if (read_b2_2) count_L_3[ii]++;
     }
 
-    disk_circular_buffer_update : for (short j = 0; j < NFMDisk; j++) {
-      disk_read_index[j] += (disk_valid[j] ? 1 : 0);
-      const ap_uint<kNBitsTBBuffer> disk_next_write_index = disk_write_index[j] + 1;
-      const ap_uint<1> disk_not_full = (disk_next_write_index != disk_read_index[j]);
-      getFM<DISK>(bx, diskFullMatches[j], disk_mem_index[j], disk_fm[j][disk_write_index[j]]);
-      disk_mem_index[j] += ((empty || disk_not_full) ? 1 : 0);
-      disk_write_index[j] += ((empty || disk_not_full) ? 1 : 0);
+    disk_merger : for (unsigned int ii = 0 ; ii < 4; ii++) {
+
+      bool read_1, read_2;
+
+      merger_D_top[ii].next(merger_D_b1[ii].peek(), merger_D_b1[ii].valid(), read_1,
+                            merger_D_b2[ii].peek(), merger_D_b2[ii].valid(), read_2,
+                            smallest[ii+4]);
+
+      bool read_b1_1, read_b1_2, read_b2_1, read_b2_2;
+
+      merger_D_b1[ii].next(diskFullMatches[0+4*ii].read_mem(bx,count_D_0[ii]),
+                           count_D_0[ii] < diskFullMatches[0+4*ii].getEntries(bx),
+                           read_b1_1,
+                           diskFullMatches[1+ii*4].read_mem(bx,count_D_1[ii]),
+                           count_D_1[ii] < diskFullMatches[1+ii*4].getEntries(bx),
+                           read_b1_2,
+                           read_1);
+
+      if (read_b1_1) count_D_0[ii]++;
+      if (read_b1_2) count_D_1[ii]++;
+
+      merger_D_b2[ii].next(diskFullMatches[2+ii*4].read_mem(bx,count_D_2[ii]),
+                           count_D_2[ii] < diskFullMatches[2+ii*4].getEntries(bx),
+                           read_b2_1,
+                           diskFullMatches[3+ii*4].read_mem(bx,count_D_3[ii]),
+                           count_D_3[ii] < diskFullMatches[3+ii*4].getEntries(bx),
+                           read_b2_2,
+                           read_2);
+
+      if (read_b2_1) count_D_2[ii]++;
+      if (read_b2_2) count_D_3[ii]++;
     }
   }
 
