@@ -59,10 +59,6 @@ int main() {
   // Error count
   int err = 0;
 
-  //Create variables that keep track of which memory address to read and write to
-	ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
-
-  
   for (unsigned int ievt = 0; ievt < nEvents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
@@ -70,28 +66,22 @@ int main() {
     memoryME.clear();
     memoriesASCopy.clear();
 
-    for (int i = 0; i < 1 << (kNbitsrzbinME + kNbitsphibin); i++) {
-      addrCountME[i] = 0;
-    }
-
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
     for (int index = 0; index < kMaxProc; ++index){
 
-      // bx - bunch crossing
-      BXType bx = ievt;
-      BXType bx_out;
-      AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
-      bool valid = index < memoriesAS.getEntries(ievt);
-      // Unit Under Test
-      TOP_FUNC_(bx, bx_out, 
-                allStub,
-                &memoryME,
-                memoriesASCopy,
-                index,
-                addrCountME,
-                valid);
-
+    // bx - bunch crossing
+    BXType bx = ievt;
+    BXType bx_out;
+    AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
+    bool valid = index < memoriesAS.getEntries(ievt);
+    // Unit Under Test
+    TOP_FUNC_(bx, bx_out, 
+              allStub,
+              &memoryME,
+              memoriesASCopy,
+              index,
+              valid);
     }
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect
@@ -103,7 +93,6 @@ int main() {
 
   } // End of event loop
 
-  cerr << "Exiting with return value " << err << endl;
   // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
   if (err > 255) err = 255;
   return err;

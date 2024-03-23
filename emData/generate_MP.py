@@ -157,6 +157,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "}\n" % FMMask
         )
 
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint64_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPage
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint32_t NPageSum<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPageSum
+        )
+
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)
         nrz = 'kNbitsrzbinMPBarrel' if 'BARREL' in VMStubRegion else 'kNbitsrzbinMPDisk'
         nphi = 'kNbitsphibinMPBarrel' if 'BARREL' in VMStubRegion else 'kNbitsphibinMPDisk'

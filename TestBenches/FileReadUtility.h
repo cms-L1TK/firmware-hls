@@ -561,8 +561,9 @@ class TBHelper {
         glob_t globbuf;
         globbuf.gl_offs = 0;
         glob((baseDir_ + "/" + query).c_str(), 0, nullptr, &globbuf);
-        for (unsigned i = 0; i < globbuf.gl_pathc; i++)
+        for (unsigned i = 0; i < globbuf.gl_pathc; i++){
           fileNames.emplace_back(globbuf.gl_pathv[i]);
+	}
 
         // define functions needed to get file order to match the wiring
 
@@ -612,16 +613,20 @@ class TBHelper {
         // And finally, we remove the padding added in the first step:
         //   "StubPairs_SP_L3PHIC9_L4PHIC20_04.dat"
         //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
+
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padBySeed);
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padNumbers);
         std::sort(fileNames.begin(), fileNames.end());
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removePadding);
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removeSeedPad);
-
-        for (const auto &fileName : fileNames)
+	
+        for (const auto &fileName : fileNames){
+	  std::cout << "FileName:"<<fileName<< std::endl;
           files.emplace_back(fileName);
+	}
         globfree(&globbuf);
       }
+
     }
 };
 

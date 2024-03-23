@@ -870,6 +870,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
 // MatchCalculator
 template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint64_t NPage();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t NPageSum();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
@@ -1202,8 +1204,31 @@ void MatchProcessor(BXType bx,
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
-  ap_uint<nINMEM> mem_hasdata = 0;
-  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
+
+  constexpr int nMEM = NPageSum<LAYER, PHISEC>();
+  
+  unsigned int iMEM = 0;
+  ap_uint<2> iPage[nMEM];
+  ap_uint<5> iMem[nMEM];
+
+  constexpr uint64_t npages = NPage<LAYER, PHISEC>();
+  for (unsigned int imem = 0; imem < nINMEM; imem++) {
+    unsigned int nPages = (npages >> (3*imem))&7;
+    for (unsigned int j = 0 ; j < nPages; j++){
+#pragma HLS unroll
+      iPage[iMEM + j] = j;
+      iMem[iMEM + j] = imem;
+    }
+    iMEM +=  nPages;
+  }
+  
+  //constexpr unsigned int nMEM = 22;
+  //const ap_uint<2> iPage[nMEM] = {0, 1, 2, 3, 0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  //const ap_uint<5> iMem[nMEM]  = {0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+
+  ap_uint<kNBits_MemAddr+1> numbersin[nMEM];
+  ap_uint<nMEM> mem_hasdata = 0;
+
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
 
   init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
