@@ -131,7 +131,7 @@ begin
     if (sync_nent='1') and vi_clk_cnt=-1 then
       --report time'image(now)&" tm_mem "&NAME&" sync_nent";      
       vi_clk_cnt := 0;
-      vi_page_cnt := 1;
+      vi_page_cnt := 0;
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
       --report time'image(now)&" tm_mem "&NAME&" increment vi_clk_cnt";      
@@ -152,24 +152,11 @@ begin
     end if;
     if (wea='1') then
       written := 1;
-      if DEBUG then
-        report "tm_mem "&NAME&" writeaddr "&to_bstring(addra)&" "&to_bstring(dina);
-      end if;
-      --sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
       address := vi_page_cnt_slv&nent_o(vi_page_cnt);
-      --report time'image(now)&" tm_mem "&NAME&" addresss "&to_bstring(address)&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(nent_o(vi_page_cnt));      
+        --report "tf_mem "&time'image(now)&NAME&" writeaddr "&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       nent_o(vi_page_cnt) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(vi_page_cnt))) + 1, nent_o(vi_page_cnt)'length)); -- + 1 (slv)
-      -- Count entries
-      --page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      --addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
-      --assert (page < NUM_PAGES) report "page out of range" severity error;
-      --if (addr_in_page = 0) then
-      --  nent_o(page) <= std_logic_vector(to_unsigned(1, nent_o(page)'length)); -- <= 1 (slv)
-      --else
-      --  nent_o(page) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page))) + 1, nent_o(page)'length)); -- + 1 (slv)
-      --end if;	
     elsif (written=0) then
       nent_o <= (others => (others => '0'));
     end if;
@@ -181,7 +168,7 @@ begin
   if rising_edge(clkb) then
     if (enb='1') then
       if DEBUG then
-        report "tm_mem "&NAME&" readaddr "&to_bstring(addrb);
+        report "tm_mem "&time'image(now)&" "&NAME&" readaddr "&to_bstring(addrb)&" "&to_bstring(sa_RAM_data(to_integer(unsigned(addrb))));
       end if;
       sv_RAM_row <= sa_RAM_data(to_integer(unsigned(addrb)));
     end if;

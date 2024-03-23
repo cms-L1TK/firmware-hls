@@ -32,7 +32,7 @@ entity tf_mem_tproj is
     RAM_WIDTH       : natural := 18;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
     NUM_TPAGES      : natural := 1;                --! TPROJ pages
-    RAM_DEPTH       : natural := NUM_PAGES*NUM_TPAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
+    RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
@@ -113,9 +113,9 @@ assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" seve
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter
-  variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES*NUM_TPAGES)-1 downto 0); 
+  variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0); 
   variable page         : integer := 0;
-  variable tpage         : integer := 0;
+  variable tpage        : integer := 0;
   variable addr_in_page : integer := 0;
   variable written      : integer := 0;
   variable nentaddress  : integer := 0;
@@ -132,25 +132,19 @@ begin
     --end if;
     --end if;
     if (sync_nent='1') and vi_clk_cnt=-1 then
-      report time'image(now)&" tf_mem_tproj "&NAME&" sync_nent";      
       vi_clk_cnt := 0;
-      vi_page_cnt := 1;
+      vi_page_cnt := 0;
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
-      report time'image(now)&" tf_mem_tproj "&NAME&" increment vi_clk_cnt";      
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
-      report time'image(now)&" tf_mem_tproj "&NAME&" goto next page";      
       vi_clk_cnt := 0;
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
-        report time'image(now)&" tf_mem_tproj "&NAME&" increment vi_page_cnt "&integer'image(vi_page_cnt);        
         vi_page_cnt := vi_page_cnt +1;
       else
-        report time'image(now)&" tf_mem_tproj "&NAME&" resetting vi_page_cnt "&integer'image(vi_page_cnt);        
         vi_page_cnt := 0;
       end if;
-      report time'image(now)&" tf_mem_tproj "&NAME&" will zero nent";
       for tpage in 0 to NUM_TPAGES-1 loop
         nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
         nent_o(nentaddress) <= (others => '0');
@@ -158,27 +152,15 @@ begin
     end if;
     if (wea='1') then
       written := 1;
-      --sa_RAM_data(to_integer(unsigned(addra))) <= dina; -- Write data
-      tpage := 0; --to_integer(unsigned(addra(1 downto 0)));
+      tpage := to_integer(unsigned(addra(5+clogb2(NUM_TPAGES)-1 downto 5)));
       nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
-      --vi_page_cnt_slv := std_logic_vector(to_unsigned(nentaddress,vi_page_cnt_slv'length));
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
-      address := vi_page_cnt_slv&nent_o(vi_page_cnt)(clogb2(PAGE_LENGTH)-1 downto 0);
-      report time'image(now)&" tf_mem "&NAME&" addresss "&to_bstring(address)&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(nent_o(vi_page_cnt));      
-      --if DEBUG then
-        report "tf_mem_tproj "&NAME&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" "&to_bstring(dina);
-      --end if;
+      address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(4 downto 0);
+      if DEBUG then
+        report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress:"&integer'image(nentaddress)&" "&to_bstring(dina);
+      end if;
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
-      -- Count entries
-      --page := to_integer(unsigned(addra(clogb2(RAM_DEPTH)-1 downto clogb2(PAGE_LENGTH))));
-      --addr_in_page := to_integer(unsigned(addra(clogb2(PAGE_LENGTH)-1 downto 0)));
-      --assert (page < NUM_PAGES) report "page out of range" severity error;
-      --if (addr_in_page = 0) then
-      --  nent_o(page) <= std_logic_vector(to_unsigned(1, nent_o(page)'length)); -- <= 1 (slv)
-      --else
-      --  nent_o(page) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(page))) + 1, nent_o(page)'length)); -- + 1 (slv)
-      --end if;	
     elsif (written=0) then
       nent_o <= (others => (others => '0'));
     end if;
@@ -190,7 +172,8 @@ begin
   if rising_edge(clkb) then
     if (enb='1') then
       if DEBUG then
-        report "tm_mem "&NAME&" readaddr "&to_bstring(addrb);
+      report "tf_mem_tproj "&time'image(now)&" "&NAME&" readaddr "&to_bstring(addrb)
+          &" "&to_bstring(sa_RAM_data(to_integer(unsigned(addrb))));
       end if;
       sv_RAM_row <= sa_RAM_data(to_integer(unsigned(addrb)));
     end if;

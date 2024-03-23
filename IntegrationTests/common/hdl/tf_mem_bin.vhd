@@ -220,7 +220,8 @@ process(clka)
   variable vi_page_cnt  : integer := 0;  -- Page counter
   variable page         : integer := 0;
   variable nentry_in_bin   : std_logic_vector(ADDR_WIDTH-1 downto 0);
-
+  variable writeaddr    : std_logic_vector(RAM_DEPTH_BITS-1 downto 0);
+  
   --! Extract phi and rz bin address
   alias vi_nent_idx  : std_logic_vector(NUM_PHI_BITS+NUM_RZ_BITS-1 downto 0) is addra(ADDR_WIDTH + NUM_PHI_BITS + NUM_RZ_BITS - 1 downto ADDR_WIDTH);
 
@@ -256,41 +257,47 @@ begin
 
     if (wea='1') then
       -- Write data to all copies
-      --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
-      for icopy in 0 to NUM_COPY-1 loop
-        sa_RAM_data(icopy)(to_integer(unsigned(addra))) <= dina; 
-      end loop;
 
       --vi_nent_idx_new := rzbits & phibits; 
       --report "tf_mem_bin vi_nent_idx vi_nent_idx_new: " & to_bstring(vi_nent_idx) & " " & to_bstring(vi_nent_idx_new) & " " & to_bstring(rzbits) & " " & to_bstring(phibits);
   
-      binaddr := unsigned(nentry_tmp(to_integer(unsigned(vi_nent_idx))))+1;
+      binaddr := unsigned(nentry_tmp(to_integer(unsigned(vi_nent_idx))));
 
       if (nentry_mask_tmp(to_integer(unsigned(vi_nent_idx)))='0') then
-        binaddr := "0001";
+        binaddr := "0000";
       end if; 
 
-      nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(binaddr);
+      writeaddr := addra(RAM_DEPTH_BITS-1 downto 4) & std_logic_vector(binaddr);
+      
+      --report "tf_mem_bin " & time'image(now) & " "  & NAME & " writeaddr " & to_bstring(std_logic_vector(writeaddr))
+      --  &" "&to_bstring(dina);
+      for icopy in 0 to NUM_COPY-1 loop
+        sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina; 
+      end loop;
+      
+      
+      nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(binaddr+1);
       nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
       
       -- Count entries
       page := to_integer(unsigned(addra(RAM_DEPTH_BITS-1 downto PAGE_LENGTH_BITS)));
-      nentry_in_bin := std_logic_vector(unsigned(addra(ADDR_WIDTH-1 downto 0)) + 1);
+      nentry_in_bin := std_logic_vector(binaddr+1);
 
-      assert( binaddr = to_integer(unsigned(nentry_in_bin))) report "tf_mem_bin vi_nent_idx binaddr nentry_in_bin: " & to_bstring(vi_nent_idx) & " " & to_bstring(std_logic_vector(binaddr)) & " " & to_bstring(nentry_in_bin) severity error;
-      
-      assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
     
       sa_RAM_nent(to_integer(unsigned(phibits)))(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= nentry_in_bin; -- <= address
       if (unsigned(rzbits) /= 0) then
         sa_RAM_nent(to_integer(unsigned(phibits))+NUM_PHI_BINS)(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= nentry_in_bin; -- <= address
       end if;
+
+      
     end if;
   end if;
 end process;
 
 process(clkb)
+  variable maskaddr     : integer := 0;
+
 begin
 
     
@@ -298,14 +305,19 @@ begin
     --Reading DRAM so should not be on clock edge ?
     if (enb_nent='1') then
       for i in 0 to 2*NUM_PHI_BINS-1 loop
-        --report "tf_mem_bin read nent " & NAME & " " &to_bstring(addr_nent) & " " & to_bstring(sa_RAM_nent(i)(to_integer(unsigned(addr_nent))));
+        maskaddr:=to_integer(unsigned(addr_nent(3 downto 3)))*64+i*8+to_integer(unsigned(addr_nent(2 downto 0)));
+        if (i>=8) then
+          maskaddr:=to_integer(unsigned(addr_nent(3 downto 3)))*64+(i-8)*8+to_integer(unsigned(addr_nent(2 downto 0)))+1;
+        end if;
+        --report "tf_mem_bin readnent " &time'image(now)&" "& NAME & " " &to_bstring(addr_nent) & " " & to_bstring(sa_RAM_nent(i)(to_integer(unsigned(addr_nent))))&" "&to_bstring(mask_o(maskaddr));
         dout_nent(ADDR_WIDTH*(i+1)-1 downto ADDR_WIDTH*i) <= sa_RAM_nent(i)(to_integer(unsigned(addr_nent)));
       end loop;
     end if; 
 
     for i in 0 to NUM_COPY-1 loop
       if (enb(i)='1') then
-        --report "tf_mem_bin read addrb"&integer'image(i)&" "&to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS));
+        --report "tf_mem_bin read addrb"&integer'image(i)&" "& NAME & " " & to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))
+        --  &" "&to_bstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))));
         sv_RAM_row(i) <= sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))));
       end if;
     end loop;  
