@@ -38,7 +38,7 @@ public:
   
 protected:
 
-  DataType dataarray_[1<<NBIT_BX][NPAGE][1<<NBIT_ADDR];  // data array
+  DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
   NEntryT nentries_[(1<<NBIT_BX)*NPAGE];                  // number of entries
   
 public:
@@ -52,13 +52,13 @@ public:
 	return nentries_[bx*NPAGE+page];
   }
 
-  const DataType (&get_mem() const)[1<<NBIT_BX][NPAGE][1<<NBIT_ADDR] {return dataarray_;}
+  const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
   {
 	// TODO: check if valid
 	if(!NBIT_BX) ibx = 0;
-	return dataarray_[ibx][page][index];
+	return dataarray_[ibx][32*page+index];
   }
 
   template<class SpecType>
@@ -83,9 +83,9 @@ public:
       //dataarray_[ibx][addr_index] = data;
 #ifdef __SYNTHESIS__
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][page][0] = data;
+      dataarray_[ibx][32*page+addr_index] = data;
 #else
-      dataarray_[ibx][page][nentries_[ibx*NPAGE+page]++] = data;
+      dataarray_[ibx][32*page+nentries_[ibx*NPAGE+page]++] = data;
 #endif
 
       #ifdef CMSSW_GIT_HASH
@@ -102,7 +102,7 @@ public:
 #ifndef __SYNTHESIS__
   MemoryTemplateTPROJ()
   {
-       clear();
+    clear();
   }
 
   ~MemoryTemplateTPROJ(){}
@@ -114,6 +114,7 @@ public:
       for (size_t page = 0; page < NPAGE; page++) {
 	nentries_[ibx*NPAGE+page] = 0;
 	for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {
+	  dataarray_[ibx][addr] = data;
 	  write_mem_clear(ibx,data,addr,page);
 	}
       }
@@ -124,7 +125,8 @@ public:
   {
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
-      dataarray_[ibx][page][addr_index] = data;
+      //FIXME - shoudl this method be removed?
+      //dataarray_[ibx][32*page+addr_index] = data;
       return true;
     } else {
       return false;
@@ -191,7 +193,7 @@ public:
 
   void print_entry(BunchXingT bx, NEntryT index, unsigned int page = 0) const
   {
-	print_data(dataarray_[bx][page][index]);
+	print_data(dataarray_[bx][32*page+index]);
   }
 
   void print_mem(BunchXingT bx) const {

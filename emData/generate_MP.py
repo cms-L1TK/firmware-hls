@@ -170,7 +170,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         parametersFile.write(
             "\n"
             "// magic numbers for " + mpName + "\n"
-            "template<> constexpr uint32_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "template<> constexpr uint64_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
             "}\n" % NPage
         )
