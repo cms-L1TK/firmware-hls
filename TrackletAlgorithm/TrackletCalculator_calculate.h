@@ -194,8 +194,6 @@ void TC::calculate_DXDY (
 #pragma HLS latency max=25
 
   //First convert input to right bits
-  ap_uint<12> ir1c = r1_input;
-  ap_uint<12> ir2c = r2_input;
 
   const ap_int<18> phi1c = ap_int<18>(phi1_input)<<3;
   const ap_int<18> phi2c = ap_int<18>(phi2_input)<<3;
@@ -208,7 +206,7 @@ void TC::calculate_DXDY (
 
   ap_int<12> idz = z2c - z1c;
 
-  ap_uint<12> idr = ap_int<12>(ir2c - ir1c);
+  ap_uint<12> idr = ap_int<12>(r2_input - r1_input);
 
   static const InvdrLUT<Seed> lut_idrinv;
   ap_uint<18> invdr = lut_idrinv.lookup(idr);
@@ -216,8 +214,8 @@ void TC::calculate_DXDY (
   ap_int<18> idelta0 = ((phi2c - phi1c)*invdr) >> n_delta0_;
   ap_int<18> ideltaz = (idz*invdr) >> n_deltaz_;
 
-  ap_int<20> idelta1 = (ir1c*idelta0) >> n_delta1_;  
-  ap_int<20> idelta2 = (ir2c*idelta0) >> n_delta2_;
+  ap_int<20> idelta1 = (r1_input*idelta0) >> n_delta1_;  
+  ap_int<20> idelta2 = (r2_input*idelta0) >> n_delta2_;
 
   ap_int<20> idelta12 = (idelta1*idelta2) >> n_delta12_;
 
@@ -226,13 +224,13 @@ void TC::calculate_DXDY (
   ap_uint<n_a_+1> ia = ((1 << n_a_) - ((idelta12*iHG) >> (2*n_Deltar_Disk_ + 2*n_phi_ + n_HG_ - 2*n_delta0_ - n_delta1_ - n_delta2_ - n_delta12_ + 1 - n_a_)));
 
   constexpr int ir6fact = (1<<n_r6_)*phiHG_*phiHG_/6.0;
-  ap_int<24> ir6 = (ir1c+ir2c)*ir6fact;
+  ap_int<24> ir6 = (r1_input+r2_input)*ir6fact;
 
   ap_int<18> idelta02 = (idelta0*idelta2) >> n_delta02_;
   
   ap_int<n_x6_+2> ix6 = (-(1 << n_x6_)+((ir6*idelta02) >> (n_r6_ + 2*n_Deltar_Disk_ + 2*n_phi_ - n_x6_ - n_delta2_- n_delta02_ - 2*n_delta0_)));
   
-  ap_int<18> it1 = (ir1c*ideltaz) >> (n_Deltar_Disk_ - n_deltaz_);
+  ap_int<18> it1 = (r1_input*ideltaz) >> (n_Deltar_Disk_ - n_deltaz_);
 
   
   ap_int<15> irinv_new = ((-idelta0*ia) >> (n_phi_ + n_a_ - n_rinv_ + n_Deltar_Disk_ - n_delta0_ - n_r_ - 1));
@@ -340,7 +338,6 @@ void TC::calculate_LXD1 (
 
   //First convert input to right bits
   ap_uint<12> ir1c = (ap_int<10>(r1_input) << 1) + rmean[seedLayers[Seed][0]];
-  ap_uint<12> ir2c = r2_input;
 
   const ap_int<18> phi1c = ap_int<18>(phi1_input)<<3;
   const ap_int<18> phi2c = ap_int<18>(phi2_input)<<3;
@@ -352,7 +349,7 @@ void TC::calculate_LXD1 (
 
   ap_int<12> idz = z2c - z1c;
 
-  ap_uint<12> idr = (ap_int<12>(ir2c - ir1c));
+  ap_uint<12> idr = (ap_int<12>(r2_input - ir1c));
 
   static const InvdrLUT<Seed> lut_idrinv;
   ap_uint<18> invdr = lut_idrinv.lookup(idr);
@@ -364,7 +361,7 @@ void TC::calculate_LXD1 (
   ap_int<18> ideltaz = (idz*invdr) >> n_deltaz_Overlap_;
 
   ap_int<20> idelta1 = (ir1c*idelta0) >> n_delta1_;  
-  ap_int<20> idelta2 = (ir2c*idelta0) >> n_delta2_;
+  ap_int<20> idelta2 = (r2_input*idelta0) >> n_delta2_;
 
   ap_int<20> idelta12 = (idelta1*idelta2) >> n_delta12_;
 
@@ -373,7 +370,7 @@ void TC::calculate_LXD1 (
   ap_uint<n_a_Overlap_+1> ia = ((1 << n_a_Overlap_) - ((idelta12*iHG) >> (2*n_Deltar_Overlap_ + 2*n_phi_ + n_HG_ - 2*n_delta0_Overlap_ - n_delta1_ - n_delta2_ - n_delta12_ + 1 - n_a_Overlap_)));
 
   constexpr int ir6fact = (1<<n_r6_Overlap_)*phiHG_*phiHG_/6.0;
-  ap_int<24> ir6 = (ir1c+ir2c)*ir6fact;
+  ap_int<24> ir6 = (ir1c+r2_input)*ir6fact;
 
   ap_int<18> idelta02 = (idelta0*idelta2) >> n_delta02_;
   

@@ -3,7 +3,7 @@ set -e
 
 #### generated with commit 6e61462 ####
 # Combined modules
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/KTmfwnlCk4aUWcE/MemPrints.tar.gz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
@@ -88,6 +88,7 @@ fi
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_IR.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_VMSMER.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_PC.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
@@ -96,6 +97,7 @@ mkdir -p ../TopFunctions/CombinedConfig
 mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_VMSMER.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_PC.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
@@ -104,6 +106,7 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig
 mkdir -p ../TopFunctions/ReducedCombinedConfig2
 ./generate_IR.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_VMRCM.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_VMSMER.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_PC.py       -w LUTsCM/wires.dat  -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
@@ -112,6 +115,7 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig2
 mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_IR.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_VMRCM.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_VMSMER.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_PC.py       -w LUTsCM/wires.dat       -o ../TopFunctions/CombinedBarrelConfig
 ./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig

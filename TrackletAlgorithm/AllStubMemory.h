@@ -21,8 +21,9 @@ public:
     kASPhiSize = 14,
     kASZSize = 12,
     kASRSize = 7,
+    kASNegDiskSize = 0,
     // Bit size for full AllStubMemory
-    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
+    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize + kASNegDiskSize
   };
 };
 
@@ -37,8 +38,9 @@ public:
     kASPhiSize = 17,
     kASZSize = 8,
     kASRSize = 7,
+    kASNegDiskSize = 0,
     // Bit size for full AllStubMemory
-    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
+    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize + kASNegDiskSize
   };
 };
 
@@ -52,9 +54,10 @@ public:
     kASAlphaSize = 0,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 12,
+    kASRSize = 11,
+    kASNegDiskSize = 1,
     // Bit size for full AllStubMemory
-    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
+    kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize + kASNegDiskSize
   };
 };
 
@@ -68,9 +71,10 @@ public:
     kASAlphaSize = 4,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 7,
+    kASRSize = 6,
+    kASNegDiskSize = 1,
     // Bit size for full AllStubMemory
-   kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize
+   kAllStubSize = kASBendSize + kASAlphaSize + kASPhiSize + kASZSize + kASRSize + kASNegDiskSize
   };
 };
 
@@ -99,9 +103,12 @@ public:
     kASZLSB = kASPhiMSB + 1,
     kASZMSB = kASZLSB + AllStubBase<ASType>::kASZSize - 1,
     kASRLSB = kASZMSB + 1,
-    kASRMSB = kASRLSB + AllStubBase<ASType>::kASRSize - 1
+    kASRMSB = kASRLSB + AllStubBase<ASType>::kASRSize - 1, 
+    kASNDLSB = kASRMSB + 1, 
+    kASNDMSB = kASNDLSB + AllStubBase<ASType>::kASNegDiskSize - 1
   };
   
+  typedef ap_uint<AllStubBase<ASType>::kASNegDiskSize> ASND;
   typedef ap_int<AllStubBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubBase<ASType>::kASZSize> ASZ;
   typedef ap_uint<AllStubBase<ASType>::kASPhiSize> ASPHI;
@@ -143,6 +150,10 @@ public:
 
   AllStubData raw() const {return data_; }
 
+  ASND getND() const {
+    return (data_.range(kASNDMSB, kASNDLSB));
+  }
+
   ASR getR() const {
     return data_.range(kASRMSB,kASRLSB);
   }
@@ -172,7 +183,7 @@ public:
       // Checks the radius 
       // if these are zero it means that you have 2S stubs where the radius 
       // just encodes the ring number and is less than 16
-      return data_.range(getWidth()-1, getWidth()-3) > 0; // Check highest 3 bits regardless of template type
+      return data_.range(getWidth()-2, getWidth()-3) > 0; // Check second and third highest bits regardless of template type
     }
   }
 
@@ -262,6 +273,121 @@ public:
   static constexpr int getWidth() {return AllStubBase<DISK>::kAllStubSize;}
 
   AllStubData raw() const {return data_;}
+
+private:
+
+  AllStubData data_;
+
+};
+
+template<>
+class AllStub<4> : public AllStubBase<DISKPS> // Defining separate methods for DISKPS due to new 'getND (negative disk)' method and 
+{
+  static_assert(DISKPS == 4, "DISKPS is assumed to be 6 in this class specialization.");
+public:
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubMemory word for different fields
+    kASBendLSB = 0,
+    kASBendMSB = kASBendLSB + AllStubBase<DISKPS>::kASBendSize - 1,
+    kASAlphaLSB = kASBendMSB + 1,
+    kASAlphaMSB = kASAlphaLSB + AllStubBase<DISKPS>::kASAlphaSize - 1,
+    kASPhiLSB = kASAlphaMSB + 1,
+    kASPhiMSB = kASPhiLSB + AllStubBase<DISKPS>::kASPhiSize - 1,
+    kASZLSB = kASPhiMSB + 1,
+    kASZMSB = kASZLSB + AllStubBase<DISKPS>::kASZSize - 1,
+    kASRLSB = kASZMSB + 1,
+    kASRMSB = kASRLSB + AllStubBase<DISKPS>::kASRSize - 1, 
+    kASNDLSB = kASRMSB + 1, 
+    kASNDMSB = kASNDLSB + AllStubBase<DISKPS>::kASNegDiskSize - 1
+  };
+  
+  typedef ap_uint<AllStubBase<DISKPS>::kASNegDiskSize> ASND;
+  typedef ap_uint<AllStubBase<DISKPS>::kASRSize + 1> ASR; // adding bit for bit reused into 'negDisk', to allow for addition of 256 to be defined within AllStub<DISKPS> getR() method 
+  typedef ap_int<AllStubBase<DISKPS>::kASZSize> ASZ;
+  typedef ap_uint<AllStubBase<DISKPS>::kASPhiSize> ASPHI;
+  typedef ap_int<AllStubBase<DISKPS>::kASAlphaSize> ASALPHA;
+  typedef ap_uint<AllStubBase<DISKPS>::kASBendSize> ASBEND;
+  typedef ap_uint<AllStubBase<DISKPS>::kAllStubSize> AllStubData;
+
+  // Constructors
+  AllStub(const AllStubData& newdata):
+    data_(newdata)
+  {}
+
+  AllStub(const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend):
+    data_( (((r,z),phi),bend) )
+  {
+  }
+
+  AllStub()
+  {}
+
+  #ifndef __SYNTHESIS__
+  AllStub(const char* datastr, int base=16)
+  {
+    AllStubData newdata(datastr, base);
+    data_ = newdata;
+  }
+  #endif
+
+  // Getter
+  static constexpr int getWidth() {return AllStubBase<DISKPS>::kAllStubSize;}
+
+  AllStubData raw() const {return data_; }
+
+  ASND getND() const {
+    return (data_.range(kASNDMSB, kASNDLSB));
+  }
+
+  ASR getR() const {
+    return (data_.range(kASRMSB,kASRLSB) + (1 << 8)); // adding 256 for DISKPS stubs since when memories are written 256 was subtracted from the r value (to save an extra bit to determine if in the negative z side of detector)
+  }
+
+  ASZ getZ() const {
+    return data_.range(kASZMSB,kASZLSB);
+  }
+
+  ASPHI getPhi() const {
+    return data_.range(kASPhiMSB,kASPhiLSB);
+  }
+
+  ASBEND getBend() const {
+    return data_.range(kASBendMSB,kASBendLSB);
+  }
+
+  bool isPSStub() const {
+    // Checks the radius 
+    // if these are zero it means that you have 2S stubs where the radius 
+    // just encodes the ring number and is less than 16
+      return data_.range(getWidth()-2, getWidth()-3) > 0; // Check second and third highest bits regardless of template type
+  }
+
+  // Setter
+  void setR(const ASR r) {
+    data_.range(kASRMSB,kASRLSB) = r;
+  }
+
+  void setZ(const ASZ z) {
+    data_.range(kASZMSB,kASZLSB) = z;
+  }
+
+  void setPhi(const ASPHI phi) {
+    data_.range(kASPhiMSB,kASPhiLSB) = phi;
+  }
+
+  void setBend(const ASBEND bend) {
+    data_.range(kASBendMSB,kASBendLSB) = bend;
+  }
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getR());
+    str += "|"+decodeToBits(getZ());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getBend());
+    return str;
+  }
+#endif
 
 private:
 
