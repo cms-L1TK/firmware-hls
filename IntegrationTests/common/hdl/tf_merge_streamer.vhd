@@ -40,7 +40,6 @@ entity tf_merge_streamer is
 	enb_arr: out std_logic_vector(NUM_INPUTS-1 downto 0); -- output read enable
 	bx_out : out std_logic_vector(2 downto 0);
 	merged_dout : out std_logic_vector(RAM_WIDTH+NUM_EXTRA_BITS downto 0); --output stream of merged memories with a valid bit
-  we : out std_logic;
 	din0: in std_logic_vector(RAM_WIDTH-1 downto 0); --din/nent should be arrays but Vivado sim does not support unconstrained array
 	din1: in std_logic_vector(RAM_WIDTH-1 downto 0);
 	din2: in std_logic_vector(RAM_WIDTH-1 downto 0);
@@ -111,14 +110,11 @@ begin
 			if valid(3) ='1' then
 			     if (NUM_EXTRA_BITS > 0) then
 			         merged_dout <= '1' & std_logic_vector(to_unsigned(toread3,NUM_EXTRA_BITS)) & din_arr(toread3);
-               we <= '1';
 			     else
 			         merged_dout <= '1' & din_arr(toread2);
-               we<= '1';
 			     end if ;
 			else
 			     merged_dout <= (others => '0');
-           we <= '0';
 			end if;
 			bx_last := to_integer(unsigned(bx_in));
 			bx_out <= bx_in; -- FIXME do i need this?
