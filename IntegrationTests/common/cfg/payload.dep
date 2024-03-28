@@ -12,6 +12,7 @@ src common/hdl/emp/pkgs/GCU_utils.vhd
 src common/hdl/CreateStartSignal.vhd
 src --vhdl2008 common/hdl/tf_lut.vhd
 src --vhdl2008 common/hdl/tf_mem_bin.vhd
+src --vhdl2008 common/hdl/tf_mem_format.vhd
 #src --vhdl2008 common/hdl/tf_mem_bin_cm4.vhd
 #src --vhdl2008 common/hdl/tf_mem_bin_cm5.vhd
 src --vhdl2008 common/hdl/tf_mem.vhd
