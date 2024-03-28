@@ -24,7 +24,7 @@ library unisim;
 use unisim.vcomponents.all;
 use work.tf_pkg.all;
 
-entity TFMergeAndStreamer is
+entity tf_merge_streamer is
 	generic (
 		RAM_WIDTH	:	natural := 72;
 		NUM_PAGES   :   natural := 8;
@@ -37,7 +37,10 @@ entity TFMergeAndStreamer is
 	bx_in : in std_logic_vector(2 downto 0 );
 	rst: in std_logic;
 	clk : in std_logic;
-	din0: in std_logic_vector(RAM_WIDTH-1 downto 0); --din/nent should be arrays but Vivado sim does not support unconstrained arrays
+	enb_arr: out std_logic_vector(NUM_INPUTS-1 downto 0); -- output read enable
+	bx_out : out std_logic_vector(2 downto 0);
+	merged_dout : out std_logic_vector(RAM_WIDTH+NUM_EXTRA_BITS downto 0); --output stream of merged memories with a valid bit
+	din0: in std_logic_vector(RAM_WIDTH-1 downto 0); --din/nent should be arrays but Vivado sim does not support unconstrained array
 	din1: in std_logic_vector(RAM_WIDTH-1 downto 0);
 	din2: in std_logic_vector(RAM_WIDTH-1 downto 0);
 	din3: in std_logic_vector(RAM_WIDTH-1 downto 0);
@@ -45,17 +48,14 @@ entity TFMergeAndStreamer is
 	nent1: in t_arr_7b(0 to NUM_PAGES-1);
 	nent2: in t_arr_7b(0 to NUM_PAGES-1);
 	nent3: in t_arr_7b(0 to NUM_PAGES-1);
-	addr_arr: out std_logic_vector(NUM_INPUTS*CLOGB2(RAM_DEPTH)-1 downto 0); -- this should be an array but Vivado does not support unconstrained arrays
-	enb_arr: out std_logic_vector(NUM_INPUTS-1 downto 0); -- output read enable
-	bx_out : out std_logic_vector(2 downto 0);
-	merged_dout : out std_logic_vector(RAM_WIDTH+NUM_EXTRA_BITS downto 0) --output stream of merged memories with a valid bit
+	addr_arr: out std_logic_vector(NUM_INPUTS*CLOGB2(RAM_DEPTH)-1 downto 0) -- this should be an array but Vivado does not support unconstrained arrays
 ) ;
-end entity TFMergeAndStreamer;
+end entity tf_merge_streamer;
 
-architecture RTL of TFMergeAndStreamer is
+architecture RTL of tf_merge_streamer is
 	type mem_count_arr is array(0 to NUM_INPUTS-1) of integer;
-	type nent_array is array(NUM_INPUTS-1 downto 0) of t_arr_7b(0 to NUM_PAGES-1);
-	type din_array is array(NUM_INPUTS-1 downto 0) of std_logic_vector(RAM_WIDTH-1 downto 0);
+	type nent_array is array(4-1 downto 0) of t_arr_7b(0 to NUM_PAGES-1);
+	type din_array is array(4-1 downto 0) of std_logic_vector(RAM_WIDTH-1 downto 0);
 
 	signal valid : std_logic_vector(3 downto 0) := (others => '0');
 	signal readmask : std_logic_vector(NUM_INPUTS-1 downto 0) := (others => '0'); --tracks which inputs have an available word to read
@@ -76,7 +76,7 @@ begin
 
 	begin
     if rising_edge(clk) then
-		  nent_arr := (nent3,nent2,nent1,nent0); --repackage nent and din as arrays
+   		  nent_arr := (nent3,nent2,nent1,nent0); --repackage nent and din as arrays
 			din_arr := (din3, din2, din1, din0);
 			bx_change := (bx_last /= to_integer(unsigned(bx_in)));
 			if (bx_change) then --reset with rst signal or a change in bx
@@ -103,8 +103,8 @@ begin
 			        end if;
 			    end loop;
 			    addr_arr(((toread+1)*clogb2(RAM_DEPTH))-1 downto (toread)*clogb2(RAM_DEPTH)) <= std_logic_vector(to_unsigned(current_page*page_length + mem_count(toread), clogb2(RAM_DEPTH)));
-          valid(0) <= '1';
-          mem_count(toread) := mem_count(toread) + 1;
+                valid(0) <= '1';
+                mem_count(toread) := mem_count(toread) + 1;
 			end if;
 
 			if valid(3) ='1' then
