@@ -3,7 +3,7 @@ set -e -x
 
 # uses ssh key authentication for gitlab.cern.ch, make sure you have that set up
 
-PROJ_DIR=dual_fpga
+PROJ_DIR=dual_fpga_2
 
 [ -d ${PROJ_DIR} ] && rm -rf ${PROJ_DIR}
 ipbb init ${PROJ_DIR}
@@ -23,6 +23,8 @@ ipbb add git ssh://git@github.com/cms-l1tk/firmware-hls.git -b dual_fpga
 export PATH=/opt/cactus/bin/uhal/tools:$PATH 
 export LD_LIBRARY_PATH=/opt/cactus/lib:${LD_LIBRARY_PATH}
 
+BASEDIR=`pwd`
+
 export COLUMNS=120
 # F1
 ipbb proj create vivado tf_f1 firmware-hls:IntegrationTests/DualFPGA/ apollo_f1.dep
@@ -31,6 +33,7 @@ ipbb ipbus gendecoders
 ipbb vivado generate-project --single
 ipbb vivado synth -j16 impl -j16 package
 
+cd $BASEDIR
 # F2
 ipbb proj create vivado tf_f2 firmware-hls:IntegrationTests/DualFPGA/ apollo_f2.dep
 cd proj/tf_f2/
