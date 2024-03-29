@@ -8,7 +8,7 @@ PROJ_DIR=dual_fpga
 [ -d ${PROJ_DIR} ] && rm -rf ${PROJ_DIR}
 ipbb init ${PROJ_DIR}
 cd ${PROJ_DIR}
-ipbb -e add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.9.0-alpha1
+ipbb -e add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.9.0-alpha2
 ipbb -e add git https://github.com/apollo-lhc/CM_FPGA_FW -b v3.0.0
 
 
