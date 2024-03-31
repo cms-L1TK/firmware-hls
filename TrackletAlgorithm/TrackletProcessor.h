@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include "Constants.h"
 #include "AllStubMemory.h"
 #include "AllStubInnerMemory.h"
 #include "TrackletParameterMemory.h"
@@ -244,8 +245,8 @@ template<TF::seed Seed> constexpr TF::layerDisk OuterLayerDisk() {
   );
 }
 // Constants used in TE functions assigned to constants here for readability, do not depend on template parameters
-const int kNBufferDepthBits = TEBuffer<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBufferDepthBits;
-const int kNBitsBuffer = TrackletEngineUnit<TF::L1L2,TC::C,BARRELPS,BARRELPS>::kNBitsBuffer;
+const int kNBufferDepthBits = TEBuffer<TF::L1L2,C,BARRELPS,BARRELPS>::kNBufferDepthBits;
+const int kNBitsBuffer = TrackletEngineUnit<TF::L1L2,C,BARRELPS,BARRELPS>::kNBitsBuffer;
 // TE functions that used to live in top file
 inline ap_uint<1> nearFullTEBuff(const ap_uint<kNBufferDepthBits>& writeptr,
         const ap_uint<kNBufferDepthBits>& readptr) {
@@ -505,7 +506,7 @@ TC::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
 
 
 // Returns a unique identifier assigned to each TC.
-template<TF::seed Seed, TC::itc iTC> const TrackletProjection<BARRELPS>::TProjTCID
+template<TF::seed Seed, itc iTC> const TrackletProjection<BARRELPS>::TProjTCID
 ID()
 {
   return ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC);
@@ -746,7 +747,7 @@ bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 // This is the primary interface for the TrackletProcessor.
 template<
 TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
-  TC::itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have the same iTC); generally indicates the region of the phi sector being processed
+  itc iTC, // letter at the end of the TC name (TC_L1L2A and TC_L5L6A have the same iTC); generally indicates the region of the phi sector being processed
   uint8_t NVMSTECopy, // Number of VMSTE copies
   uint8_t NASMemInner, // Number of inner all-stub memories
   uint16_t N // maximum number of steps
@@ -790,8 +791,8 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
   constexpr int iAllstub = (iTC / (numTPs / 4) );
 
   
-  //const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
-  //static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
+  const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
+  static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
 
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFinePhiSize;
 

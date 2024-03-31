@@ -69,6 +69,7 @@ MatchCalculator_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
 parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
 parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPROJ - not TPROJ memories")
 arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with MPs in
@@ -80,7 +81,9 @@ with open(arguments.wiresFileName) as wiresFile:
         line = line.rstrip()
         mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
         memName = line.split()[0]
-        if memName.startswith("MPROJ_"):
+        projtype = "TPROJ_"
+        if arguments.split : projtype = "MPROJ_"
+        if memName.startswith(projtype):
             if mpName not in TPMems:
                 TPMems[mpName] = []
             TPMems[mpName].append(memName)
@@ -229,8 +232,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         topFile.write(
             "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
             "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
-            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
-            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
+#            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
+#            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
            "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
             "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
