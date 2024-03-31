@@ -97,16 +97,18 @@ void writeArrayFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
 template<class MemType>
 void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16)
 {
+
   std::string line;
 
   if (ievt==0) {
     getline(fin, line);
   }
-  
+
+   
   memory.clear();
   
   while (getline(fin, line)) {
-    
+
     if (!fin.good()) {
       return;
     }
@@ -244,133 +246,6 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
   return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
-}
-
-
-
-std::string return_splitted(std::string data_string, const int bit_widths[], 
-                            const std::string names[], const int num_splits,
-                            int start_index=0)
-{
-  // This function splits the binary string along lines defined by the bit widths
-  // for the tracklet projection algorithm 
-  std::string splitted = ""; 
-
-  int end_index = num_splits;
-  if (start_index != 0) end_index = start_index+1; // If we only want to print one column
-
-  // Create the split string
-  for(int i=start_index; i<end_index; i++){
-    splitted += data_string.substr(0,bit_widths[i]);
-    splitted += "|";
-    data_string = data_string.substr(bit_widths[i]);
-  }
-  return splitted; 
-}
-
-
-template<class MemType, int OutputBase=2, int LSB=-1, int MSB=-1>
-unsigned int compareProjMemWithMem(const MemType& memory_ref, const MemType& memory, int ievt,
-                               const std::string& label, 
-                               const int bit_widths[], const std::string names[],
-                               const int num_splits, const bool truncated = false, int start_index=0)
-{
-  // This is a modification of compareMemWithMem to allow for outputting the data in binary format
-  // split by the various column types in the projections, AllProj
-  // Set start_index = 0 to see all columns, or any int between 1-5 to see only one at a time
-  unsigned int err_count = 0;
-
-  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
-  constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
-  constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
-
-  for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
-    auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
-    auto data_com_raw = memory.read_mem(ievt,i).raw();
-    auto data_ref = data_ref_raw.range(msb,lsb);
-    auto data_com = data_com_raw.range(msb,lsb);
-
-    // Print headers for the columns at start
-    if (i==0) 
-    {
-      // If both reference and computed memories are completely empty, skip it
-      if (data_com == 0 && data_ref == 0) break;
-      std::cout << label << ":" << std::endl;
-      if (OutputBase == 2) std::cout << "index" << "\t" << "reference" << "\t\t\t\t" << "computed" << std::endl;
-      else std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
-
-      if (OutputBase==2)
-      {
-        // Print out column headers 
-        int end_index = num_splits; 
-        if (start_index != 0) end_index = start_index+1; // allows for only printing one column
-        
-        std::cout << " \t";
-        for (int j = 0; j < 2; j++)
-        {
-          for (int i = start_index; i < end_index; i++)
-          {
-            int length = bit_widths[i]-names[i].length()-3; 
-            if (length < 0 ) length = 0;
-            std::string spaces(length,' ');
-            std::cout  << names[i] << "(" << std::dec << bit_widths[i] << ")"  << spaces << "|"; 
-          }
-          if (j ==0) std::cout << "|";
-        }
-      }
-      std::cout << std::endl;
-    }
-
-    // If have reached the end of valid entries in both computed and reference, don't bother printing further
-    if (data_com == 0 && data_ref == 0) continue;
-
-    // Print out the values 
-    std::cout << i << " \t";
-    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_ref).to_string(), bit_widths, names, num_splits, start_index) << "|";
-    else                 std::cout << std::hex << data_ref << "\t";
-    
-    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_com).to_string(), bit_widths, names, num_splits, start_index) ;
-    else                 std::cout << std::hex << data_com; // << std::endl;
-
-    // If there is extra entries in reference
-    if (data_com == 0) {
-      std::cout << "\t" << "<=== missing";
-      if (!truncated) err_count++;
-    // If there is extra entries in computed
-    } else if (data_ref == 0) {
-      std::cout << "\t" << "<=== EXTRA";
-      err_count++;
-    // If reference and computed entry are inconsistent
-    } else if (data_com != data_ref) {
-      std::cout << "\t" << "<=== INCONSISTENT";
-      err_count++;
-    }
-
-    std::cout << std::endl;
-  }
-  
-  return err_count;
-}
-
-template<class MemType, int InputBase=16, int OutputBase=2, int LSB=-1, int MSB=-1>
-unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
-                                int ievt, const std::string& label,
-                                const bool truncated = false, int maxProc = kMaxProc)
-{
-  // This is a modification of compareMemWithFile to allow for outputting the data in binary format
-  // split by the various column types in the projections, AllProj
-  // Read from file
-  MemType memory_ref;
-  writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
-
-  // This part could potentially be modified in the future to debug other modules
-  int num_splits = 6;
-  int bit_widths[num_splits] = { MemType::BitWidths::kTProjTCIDSize, MemType::BitWidths::kTProjTrackletIndexSize, 
-                         MemType::BitWidths::kTProjPhiSize, MemType::BitWidths::kTProjRZSize, 
-                         MemType::BitWidths::kTProjPhiDSize, MemType::BitWidths::kTProjRZDSize };
-  std::string names[num_splits] = {"TCID ", "Tproj", "phi", "z", "phid", "zder"};
-
-  return compareProjMemWithMem<MemType>(memory_ref, memory, ievt, label, bit_widths, names, num_splits, truncated);
   
 }
 
@@ -561,9 +436,8 @@ class TBHelper {
         glob_t globbuf;
         globbuf.gl_offs = 0;
         glob((baseDir_ + "/" + query).c_str(), 0, nullptr, &globbuf);
-        for (unsigned i = 0; i < globbuf.gl_pathc; i++){
+        for (unsigned i = 0; i < globbuf.gl_pathc; i++)
           fileNames.emplace_back(globbuf.gl_pathv[i]);
-	}
 
         // define functions needed to get file order to match the wiring
 
@@ -613,20 +487,16 @@ class TBHelper {
         // And finally, we remove the padding added in the first step:
         //   "StubPairs_SP_L3PHIC9_L4PHIC20_04.dat"
         //   "StubPairs_SP_L3PHIC10_L4PHIC17_04.dat"
-
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padBySeed);
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), padNumbers);
         std::sort(fileNames.begin(), fileNames.end());
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removePadding);
         std::transform(fileNames.begin(), fileNames.end(), fileNames.begin(), removeSeedPad);
-	
-        for (const auto &fileName : fileNames){
-	  std::cout << "FileName:"<<fileName<< std::endl;
+
+        for (const auto &fileName : fileNames)
           files.emplace_back(fileName);
-	}
         globfree(&globbuf);
       }
-
     }
 };
 

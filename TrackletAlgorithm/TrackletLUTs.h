@@ -76,8 +76,6 @@ class InvtLUT{
 };
 
 
-static void init_itinv(ap_uint<18> *lut) {
-
 template<TF::seed iSeed>
 class TPRegionLUT {
 

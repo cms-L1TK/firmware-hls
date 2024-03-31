@@ -147,8 +147,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
       "// in the same way.\n"
       "namespace TC{\n"
-      "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
-      "   }\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
       "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
       "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"

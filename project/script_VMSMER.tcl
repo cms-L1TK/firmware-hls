@@ -61,11 +61,12 @@ set modules_to_test {
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export VMSMER_D1PHIA
 
+
 # create new project (deleting any existing one of same name)
 open_project -reset vmsmeRouter
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig_FPGA2}
 add_files -tb ../TestBenches/VMStubMERouter_test.cpp -cflags "$CFLAGS"
 
 # data files
@@ -83,7 +84,8 @@ foreach i $modules_to_test {
   set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"TOP_FUNC_=" $top_func "\" -D \"HEADER_FILE_=" $header_file "\""] ""]
 
   # run C-simulation for each module in modules_to_test
-  add_files ../TopFunctions/CombinedConfig/$top_func.cc -cflags "$CFLAGS"
+  add_files ../TopFunctions/CombinedConfig_FPGA2/$top_func.cc -cflags "$CFLAGS"
+
   set_top $top_func
   open_solution [join [list "solution_" $top_func] ""]
 

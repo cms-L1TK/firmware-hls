@@ -148,7 +148,6 @@ public:
 	ap_uint<kNBitsphibinCM> ireg;
 	(ireg,ibin)=slot;
 	unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
-	std::cout << "Here " << std::hex << slot << std::dec << " " << nentry << std::endl;
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
 	//FIXME ugly hack...
 	if (icopy==NCOPY-1) {
@@ -157,8 +156,6 @@ public:
 	    nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
 	  }
 	  nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
-	  nentries8A_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-	  nentries8B_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
 	  binmask8_[ibx][ibin].set_bit(ireg,true);
 	}
 #endif      

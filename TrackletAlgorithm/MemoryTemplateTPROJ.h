@@ -173,9 +173,6 @@ public:
     NEntryT nent = nentries_[ibx*NPAGE+page];
     bool success = write_mem(ibx, data, nent, page);
     
-    std::cout << "Writing to page, address data : " << page << " " 
-	      << nent << " " << datastr << std::endl;
-
     /*
       #ifndef CMSSW_GIT_HASH
       if (success) nentries_[ibx] ++;
