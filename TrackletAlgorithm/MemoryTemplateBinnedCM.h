@@ -141,7 +141,24 @@ class MemoryTemplateBinnedCM{
       //icopy comparison must be signed int or future SW fails
       writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
-        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
+#ifdef __SYNTHESIS__
+        dataarray_[icopy][ibx][getNEntryPerBin()*slot] = data;
+#else
+	ap_uint<kNBitsRZBinCM> ibin;
+	ap_uint<kNBitsphibinCM> ireg;
+	(ireg,ibin)=slot;
+	unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
+	//FIXME ugly hack...
+	if (icopy==NCOPY-1) {
+	  nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	  if (ibin!=0) {
+	    nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+	  }
+	  nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	  binmask8_[ibx][ibin].set_bit(ireg,true);
+	}
+#endif      
       }
 
       #ifdef CMSSW_GIT_HASH

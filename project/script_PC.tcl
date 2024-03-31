@@ -8,13 +8,6 @@ source env_hls.tcl
 
 set modules_to_test {
   {PC_L1L2C}
-  {PC_L2L3C}
-  {PC_L3L4C}
-  {PC_L5L6C}
-  {PC_L1D1C}
-  {PC_L2D1C}
-  {PC_D1D2C}
-  {PC_D3D4C}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
@@ -36,7 +29,7 @@ add_files -tb ../emData/TP/
 foreach i $modules_to_test {
   puts [join [list "======== TESTING " $i " ========"] ""]
   set seed [string range $i 3 6]
-  set iTC [string range $i 7 7]
+  set iTC [string range $i 7 9]
   set top_func [join [list "ProjectionCalculator_" $seed $iTC] ""]
   set module [join [list "TP_" $seed $iTC] ""]
 

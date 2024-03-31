@@ -23,6 +23,8 @@ namespace PR
   // fill the bit mask indicating if memories are empty or not
   template<int nMEM, int NBits_Entries, class MemType>
   inline void init(BXType bx,
+		   const ap_uint<5> iMem[nMEM],
+		   const ap_uint<2> iPage[nMEM],
                    ap_uint<nMEM>& mem_hasdata,
                    ap_uint<NBits_Entries> nentries[nMEM],
                    const MemType mem[nMEM])
@@ -30,25 +32,29 @@ namespace PR
 #pragma HLS inline  
     for(int i = 0; i < nMEM; ++i) {
 #pragma HLS unroll
-      ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
+      ap_uint<kNBits_MemAddr+1> num = mem[iMem[i]].getEntries(bx, iPage[i]);
       nentries[i] = num;
       //if (num > 0) mem_hasdata.set(i);
       mem_hasdata[i] = (num > 0); //can't use if statement with rewind
     }
   }
   
+
+  
   //////////////////////////////
   // Priority encoder based input memory reading logic
   template<class DataType, class MemType, int nMEM>
   void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
                   ap_uint<kNBits_MemAddr>& read_addr,
+		  const ap_uint<5> iMem[nMEM],
+		  const ap_uint<2> iPage[nMEM],
                   const MemType inmem[nMEM])
   {
 #pragma HLS inline
 
-    data = inmem[read_imem].read_mem(bx, read_addr);
-
+    data = inmem[iMem[read_imem]].read_mem(bx, read_addr, iPage[read_imem]);
   }
+
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
   bool read_input_mems(BXType bx,
@@ -56,6 +62,8 @@ namespace PR
                        ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // memory pointers
+		       const ap_uint<5> iMem[nMEM],
+		       const ap_uint<2> iPage[nMEM],
                        const MemType mem[nMEM],
                        DataType& data)
   {
@@ -69,7 +77,7 @@ namespace PR
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
     // read the memory "read_imem" with the address "read_addr"
-    read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, mem);
+    read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, iMem, iPage, mem);
 
     if (read_addr_next >= nentries[read_imem]) {
       // All entries in the memory[read_imem] have been read out
@@ -1206,8 +1214,8 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
 
-  init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
-    (bx, mem_hasdata, numbersin, projin);
+  init<nMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
+    (bx, iMem, iPage, mem_hasdata, numbersin, projin);
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
@@ -1580,8 +1588,8 @@ void MatchProcessor(BXType bx,
       // read inputs
       validin = read_input_mems<TrackletProjection<PROJTYPE>,
       TrackletProjectionMemory<PROJTYPE>,
-      nINMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr,
+      nMEM, kNBits_MemAddr+1>
+      (bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
          projin, projdata);
  
     } else {

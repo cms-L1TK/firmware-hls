@@ -40,8 +40,6 @@ using namespace std;
 int main()
 {
 
-  std::cout << "Module name:" << module_name[MODULE_] << std::endl;
-
   TBHelper tb(std::string("TP/") + module_name[MODULE_]);
 
   // error counts
@@ -59,14 +57,12 @@ int main()
   TrackletProjectionMemory<BARRELPS> tproj_barrel_ps[TC::N_PROJOUT_BARRELPS];
   TrackletProjectionMemory<BARREL2S> tproj_barrel_2s[TC::N_PROJOUT_BARREL2S];
   TrackletProjectionMemory<DISK> tproj_disk[TC::N_PROJOUT_DISK];
+  TrackletParameterMemory trackletParametersOut;
 
   // print the input files loaded
-  std::cout << "Loaded the input files:\n";
 
   // loop over events
-  cout << "Start event loop ..." << endl;
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
-    cout << "Event: " << dec << ievt << endl;
 
     // read event and write to memories
     writeMemFromFile<TrackletParameterMemory>(trackletParameters, fin_tpar.at(0), ievt);
@@ -79,22 +75,19 @@ int main()
     for (unsigned i = 0; i < TC::N_PROJOUT_DISK; i++)
       tproj_disk[i].clear();
 
-    cout << "Done with clear" << endl;
-
     // bx
     BXType bx = ievt;
     BXType bx_o;
 
     // Unit Under Test
+
     std::cout << "Entries:" << trackletParameters.getEntries(bx) << std::endl;
 
     for (int ipar = 0; ipar < kMaxProc; ipar++) {
       const bool valid = ipar < trackletParameters.getEntries(bx);
       TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, valid,
-                tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+                trackletParametersOut, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
     }
-
-    cout << "Done with TOP_FUNC" << endl;
 
     bool truncation = false;
 

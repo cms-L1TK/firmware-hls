@@ -120,6 +120,12 @@ mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_PC.py       -w LUTsCM/wires.dat       -o ../TopFunctions/CombinedBarrelConfig
 ./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+### combined barrel config                      
+mkdir -p ../TopFunctions/CombinedConfig_FPGA2
+./generate_PC.py       -sp -w  ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_VMSMER.py   --all -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_MP.py       -sp -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_TB.py       -sp -w ../../../FPGA2_Config/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -129,9 +135,9 @@ git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 # Should these be auto generated? 
-cp ../LUTsCM/wires.dat reducedcm_wires.dat
-cp ../LUTsCM/processingmodules.dat reducedcm_processingmodules.dat
-cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
+cp ../LUTsCMReduced/wires.dat reducedcm_wires.dat
+cp ../LUTsCMReduced/processingmodules.dat reducedcm_processingmodules.dat
+cp ../LUTsCMReduced/memorymodules.dat reducedcm_memorymodules.dat
 cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
 cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
 cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
@@ -173,6 +179,13 @@ cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodul
 mkdir -p ../../IntegrationTests/CombinedConfig/IRtoTP/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/tb/
+### Combined PC/VMSMER to TB
+echo "CM FPGA2"
+./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
+mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl

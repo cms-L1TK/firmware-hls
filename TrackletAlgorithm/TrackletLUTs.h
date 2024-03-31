@@ -77,7 +77,6 @@ class InvtLUT{
 };
 
 
-
 template<TF::seed iSeed>
 class TPRegionLUT {
 
