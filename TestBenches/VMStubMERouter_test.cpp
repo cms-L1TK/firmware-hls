@@ -71,8 +71,8 @@ int main() {
     memoriesASCopy.clear();
 
     for (int i = 0; i < 1 << (kNbitsrzbinME + kNbitsphibin); i++) {
-		  addrCountME[i] = 0;
-	  }
+      addrCountME[i] = 0;
+    }
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
