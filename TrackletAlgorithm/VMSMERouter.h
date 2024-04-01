@@ -175,10 +175,11 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 	bool disk2S = false; // Used to determine if DISK2S
 	bool negDisk = false; // Used to determine if stub is in negative or positive Z region of detector
 
-	AllStub<inType>       stub = allStub; // read stubs, and if disk cast from DISK to DISKPS/2S
-	AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw());
+	// read stubs, and if disk cast from DISK to DISKPS/2S
+	AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw()); 
 	AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allStub.raw());
 	AllStub<outType>      stub_copy = AllStub<outType>(allStub.raw());
+
 	if (valid){
 		allStubsCopy.write_mem(bx, stub_copy, index); // write copy AllStub to be used later in chain 
 	}
@@ -197,7 +198,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		VMStubMECM<outType> stubME = (disk2S) ? 
 			createVMStubME<VMStubMECM<outType>, DISK2S, layer, disk>(stub_2s, index, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
 			createVMStubME<VMStubMECM<outType>, DISKPS, layer, disk>(stub_ps, index, negDisk, METable, phiCorrTable, slotME) : 
-			createVMStubME<VMStubMECM<outType>, inType, layer, disk>(stub, index, negDisk, METable, phiCorrTable, slotME);
+			createVMStubME<VMStubMECM<outType>, inType, layer, disk>(allStub, index, negDisk, METable, phiCorrTable, slotME);
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
 		addrCountME[slotME] += 1;
