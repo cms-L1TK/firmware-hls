@@ -21,7 +21,7 @@
 
 using namespace std;
 
-const int nEvents = 5;  //number of events to run
+const int nEvents = 100;  //number of events to run
 
 int main() {
 
@@ -59,8 +59,8 @@ int main() {
   // Error count
   int err = 0;
 
-      //Create variables that keep track of which memory address to read and write to
-	  ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
+  //Create variables that keep track of which memory address to read and write to
+	ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
 
   
   for (unsigned int ievt = 0; ievt < nEvents; ++ievt) {
@@ -78,20 +78,20 @@ int main() {
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
     for (int index = 0; index < kMaxProc; ++index){
 
-    // bx - bunch crossing
-    BXType bx = ievt;
-    BXType bx_out;
-    AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
-    bool valid = index < memoriesAS.getEntries(ievt);
-    // Unit Under Test
-    TOP_FUNC_(bx, bx_out, 
-              allStub,
-              &memoryME,
-              memoriesASCopy,
-              index,
-              addrCountME,
-              valid);
-    //if (allStub.raw() == 0) continue;
+      // bx - bunch crossing
+      BXType bx = ievt;
+      BXType bx_out;
+      AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
+      bool valid = index < memoriesAS.getEntries(ievt);
+      // Unit Under Test
+      TOP_FUNC_(bx, bx_out, 
+                allStub,
+                &memoryME,
+                memoriesASCopy,
+                index,
+                addrCountME,
+                valid);
+
     }
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect

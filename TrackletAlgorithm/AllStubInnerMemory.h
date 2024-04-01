@@ -366,8 +366,7 @@ public:
   typedef ap_uint<AllStubInnerBase<DISKPS>::kASIndexSize> ASINDEX;
   typedef ap_uint<AllStubInnerBase<DISKPS>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize> AllStubInnerData;
-  typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize-AllStubInnerBase<DISKPS>::kASIndexSize-AllStubInnerBase<DISKPS
-  >::kASFinePhiSize> AllStubData;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize-AllStubInnerBase<DISKPS>::kASIndexSize-AllStubInnerBase<DISKPS>::kASFinePhiSize> AllStubData;
   typedef ap_uint<1> ASNEGDISK; //FIXME this is always ap_uint<1> because csynth fails if this is ever 0 wide
 
   // Constructors
@@ -375,7 +374,7 @@ public:
     data_(newdata)
   {}
 
- AllStubInner(const ASNEGDISK negdisk, const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend, const ASINDEX index, const ASFINEPHI finephi):
+  AllStubInner(const ASNEGDISK negdisk, const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend, const ASINDEX index, const ASFINEPHI finephi):
     data_( (negdisk,r,z,phi,bend,index,finephi) )
   {
   }

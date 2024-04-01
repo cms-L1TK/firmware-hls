@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-#### generated with commit 6e61462 ####
+#### generated with branch VMSMERouterCMSSW13, commit a2c799d ####
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/KTmfwnlCk4aUWcE/MemPrints.tar.gz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040124.tar.gz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"
 # Reduced Combined modules2
-memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced2_240202.tgz"
+memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/MDQXOUkSMEM1KkH/MemPrints_CMReduced2_040124.tar.gz"
 luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CMReduced2_240121.tgz"
 # Combined barrel
-memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_Barrel_240202.tgz"
+memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/4NplJj5FIQ1YFMV/MemPrints_Barrel_040124.tar.gz"
 luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_Barrel_240121.tgz"
 
 # Function that prints information regarding the usage of this command

@@ -69,8 +69,8 @@ inline typename AllStub<inType>::ASPHI getPhiCorr(
 
 // Returns a ME stub with all the values set
 template<class T, regionType inType, int layer, int disk>
-inline T createVMStubME(AllStub<inType> allStub,
-		const unsigned int index, bool negDisk, const int lutTable[],
+inline T createVMStubME(const AllStub<inType>& allStub,
+		const unsigned int index, const bool negDisk, const int lutTable[],
 		const int phiCorrTable[], int& slot) {
 	// The stub that is going to be returned
 	T stub;
@@ -155,16 +155,16 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStub<inType>& allStub,
+		const AllStub<inType>& allStub,
 		// Output memories
-		VMStubMEMemoryCM<outType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
-		AllStubMemory<outType> allStubsCopy,
+		VMStubMEMemoryCM<outType, rzSizeME, phiRegSize, kNMatchEngines> * const memoryME,
+		AllStubMemory<outType>& allStubsCopy,
 		// Index of AllStub processed (used for setting 'index' in VMStub)
-		unsigned int index,
+		const unsigned int index,
 		// Array to count how many VMStubs written in each slot
 		ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)],
 		// Bool if valid stub
-		bool valid) {
+		const bool valid) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=allStubsCopy complete dim=1
