@@ -23,7 +23,7 @@ ipbb add git ssh://git@github.com/cms-l1tk/firmware-hls.git -b dual_fpga
 export PATH=/opt/cactus/bin/uhal/tools:$PATH 
 export LD_LIBRARY_PATH=/opt/cactus/lib:${LD_LIBRARY_PATH}
 
-BASEDIR=`pwd`
+BASEDIR=$(pwd)
 
 export COLUMNS=120
 # F1
