@@ -3,7 +3,7 @@ set -e
 
 #### generated with branch VMSMERouterCMSSW13, commit a2c799d ####
 # Combined modules
-memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/KTmfwnlCk4aUWcE/MemPrints.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040124.tar.gz"
