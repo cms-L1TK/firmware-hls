@@ -82,14 +82,14 @@ void compareStubsWithFile(int &err, ifstream &fout, const int pos, const TrackFi
   fout.clear(), fout.seekg(pos);
   stringstream ss("");
   ss << "\nStub " << (I) << " word";
-  err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFStubRZResidLSB(I),TrackFit_t::kTFStubValidMSB(I)>(tracksMem, fout, ievt, ss.str(), true);
+  err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFStubRZResidLSB(I),TrackFit_t::kTFStubValidMSB(I)>(tracksMem, fout, ievt, ss.str(), true, true);
   compareStubsWithFile<I - 1>(err, fout, pos, tracksMem, ievt);
 }
 
 template<>
 void compareStubsWithFile<0>(int &err, ifstream &fout, const int pos, const TrackFitMemory_t &tracksMem, const unsigned ievt) {
   fout.clear(), fout.seekg(pos);
-  err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFStubRZResidLSB(0),TrackFit_t::kTFStubValidMSB(0)>(tracksMem, fout, ievt, "\nStub 0 word", true);
+  err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFStubRZResidLSB(0),TrackFit_t::kTFStubValidMSB(0)>(tracksMem, fout, ievt, "\nStub 0 word", true, true);
 }
 
 int main()
