@@ -10,10 +10,7 @@ use work.emp_slink_types.all;
 -- TF
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
-use work.memUtil_aux_pkg.all;
---use work.hybrid_data_types.all;
---use work.hybrid_config.all;
---use work.hybrid_data_formats.all;
+use work.memUtil_aux_pkg_f1.all;
 
 entity emp_payload is
   port(

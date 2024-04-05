@@ -9,7 +9,7 @@ all: add_common_files $(core_file) hdl_add_files xciCreation $(input_file) apoll
 
 $(core_dir):
 	@mkdir cgn mem
-	make -C $(hls_script_path) -j 8 Work
+	make -C $(hls_script_path) -j 24 Work
 	@cd mem; ln -s ../../../../emData/LUTsCM LUTs
 	@cd mem; ln -s ../../../../emData/MemPrintsCM MemPrintsCM
 	@cd hdl; ln -s ../../../common common

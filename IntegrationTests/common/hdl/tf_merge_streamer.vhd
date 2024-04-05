@@ -28,7 +28,7 @@ entity tf_merge_streamer is
 	generic (
 		RAM_WIDTH	:	natural := 72;
 		NUM_PAGES   :   natural := 8;
-		RAM_DEPTH 	: natural := NUM_PAGES * PAGE_LENGTH;
+		RAM_DEPTH 	: natural := 8 * PAGE_LENGTH;
 		NUM_INPUTS 		: natural := 4;
 		NUM_EXTRA_BITS: natural := 2;
 		ADDR_WIDTH : natural := 7
