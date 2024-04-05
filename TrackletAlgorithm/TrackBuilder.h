@@ -119,7 +119,7 @@ void TrackBuilder(
       count_L_6[NBarrelStubs],
       count_L_7[NBarrelStubs];
 
-  initialize_barrel_mergers : for (short i = 0; i < NBarrelStubs; i++) {
+  initialize_barrel_mergers : for (short i = 0; NBarrelStubs > 0 && i < NBarrelStubs; i++) {
 #pragma HLS unroll
     merger_L_top[i].reset();
     merger_L_b1[i].reset();
@@ -140,7 +140,7 @@ void TrackBuilder(
       count_D_2[NDiskStubs],
       count_D_3[NDiskStubs];
 
-  initialize_disk_mergers : for (short i = 0; i < NDiskStubs; i++) {
+  initialize_disk_mergers : for (short i = 0; NDiskStubs > 0 && i < NDiskStubs; i++) {
 #pragma HLS unroll
     merger_D_top[i].reset();
     merger_D_b1[i].reset();
