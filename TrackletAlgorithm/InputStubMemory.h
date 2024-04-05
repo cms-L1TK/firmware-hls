@@ -24,8 +24,9 @@ public:
     kISPhiSize = 14,
     kISZSize = 12,
     kISRSize = 7,
+    kISNegDiskSize = 0,
     // Bit size for full InputStubMemory
-    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize
+    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize + kISNegDiskSize
   };
 };
 
@@ -40,8 +41,9 @@ public:
     kISPhiSize = 17,
     kISZSize = 8,
     kISRSize = 7,
+    kISNegDiskSize = 0,
     // Bit size for full InputStubMemory
-    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize
+    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize + kISNegDiskSize
   };
 };
 
@@ -55,9 +57,10 @@ public:
     kISAlphaSize = 0,
     kISPhiSize = 14,
     kISZSize = 7,
-    kISRSize = 12,
+    kISRSize = 11,
+    kISNegDiskSize = 1,
     // Bit size for full InputStubMemory
-    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize
+    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize + kISNegDiskSize
   };
 };
 
@@ -71,9 +74,10 @@ public:
     kISAlphaSize = 4,
     kISPhiSize = 14,
     kISZSize = 7,
-    kISRSize = 7,
+    kISRSize = 6,
+    kISNegDiskSize = 1,
     // Bit size for full InputStubMemory
-    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize
+    kInputStubSize = kISBendSize + kISAlphaSize + kISPhiSize + kISZSize + kISRSize + kISNegDiskSize
   };
 };
 
@@ -189,6 +193,99 @@ private:
   InputStubData data_;
 
 };
+
+template<>
+class InputStub<DISKPS> : public InputStubBase<DISKPS>
+{
+
+public:
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the InputStubMemory word for different fields
+    kISBendLSB = 0,
+    kISBendMSB = kISBendLSB + InputStubBase<DISKPS>::kISBendSize - 1,
+    kISAlphaLSB = kISBendMSB + 1,
+    kISAlphaMSB = kISAlphaLSB + InputStubBase<DISKPS>::kISAlphaSize - 1,
+    kISPhiLSB = kISAlphaMSB + 1,
+    kISPhiMSB = kISPhiLSB + InputStubBase<DISKPS>::kISPhiSize - 1,
+    kISZLSB = kISPhiMSB + 1,
+    kISZMSB = kISZLSB + InputStubBase<DISKPS>::kISZSize - 1,
+    kISRLSB = kISZMSB + 1,
+    kISRMSB = kISRLSB + InputStubBase<DISKPS>::kISRSize - 1
+  };
+
+  typedef ap_uint<InputStubBase<DISKPS>::kISRSize + 1> ISR;
+  typedef ap_int<InputStubBase<DISKPS>::kISZSize> ISZ;
+  typedef ap_uint<InputStubBase<DISKPS>::kISPhiSize> ISPHI;
+  typedef ap_uint<InputStubBase<DISKPS>::kISAlphaSize> ISALPHA;
+  typedef ap_uint<InputStubBase<DISKPS>::kISBendSize> ISBEND;
+  
+  typedef ap_uint<InputStubBase<DISKPS>::kInputStubSize> InputStubData;
+
+  // Constructors
+  InputStub(const InputStubData& newdata):
+    data_(newdata)
+  {}
+
+  // This constructor is only used for stubs in DISKPS
+  InputStub(const ISR r, const ISZ z, const ISPHI phi, const ISBEND bend):
+    data_( (((r,z),phi),bend) )
+  {}
+
+  InputStub()
+  {}
+
+  #ifndef __SYNTHESIS__
+  InputStub(const char* datastr, int base=16)
+  {
+    InputStubData newdata(datastr, base);
+    data_ = newdata;
+  }
+  #endif
+
+  // Getter
+  static constexpr int getWidth() {return InputStubBase<DISKPS>::kInputStubSize;}
+
+  InputStubData raw() const {return data_; }
+
+  ISR getR() const {
+    return data_.range(kISRMSB,kISRLSB) + (1 << 8); // Specialized getR() method to account for DISKPS memories being written with (r - 256)
+  }
+
+  ISZ getZ() const {
+    return data_.range(kISZMSB,kISZLSB);
+  }
+
+  ISPHI getPhi() const {
+    return data_.range(kISPhiMSB,kISPhiLSB);
+  }
+
+  ISBEND getBend() const {
+    return data_.range(kISBendMSB,kISBendLSB);
+  }
+
+  // Setter
+  void setR(const ISR r) {
+    data_.range(kISRMSB,kISRLSB) = r;
+  }
+
+  void setZ(const ISZ z) {
+    data_.range(kISZMSB,kISZLSB) = z;
+  }
+
+  void setPhi(const ISPHI phi) {
+    data_.range(kISPhiMSB,kISPhiLSB) = phi;
+  }
+
+  void setBend(const ISBEND bend) {
+    data_.range(kISBendMSB,kISBendLSB) = bend;
+  }
+
+private:
+
+  InputStubData data_;
+
+};
+
 
 // Memory definition
 template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 1, kNBits_MemAddr>;
