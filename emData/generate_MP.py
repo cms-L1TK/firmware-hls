@@ -149,10 +149,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         NPageSum = 0
         index = 0
         for TPROJ in TPMems[mpName]:
+            print(mpName, TPROJ)
             npage = len(TPROJ)-17
             NPageSum += npage
             print("TPROJ npage", TPROJ, npage)
-            NPage = NPage | (npage << (3*index))
+            NPage = NPage | ((npage-1) << (2*index))
             index+=1
             
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
