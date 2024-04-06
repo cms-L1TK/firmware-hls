@@ -144,7 +144,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         FMMask = 0
         for FM in FMMems[mpName]:
             FMMask = FMMask | (1 << TF_index[FM])
-        
+
+        NPage = 0
+        NPageSum = 0
+        index = 0
+        for TPROJ in TPMems[mpName]:
+            print(mpName, TPROJ)
+            npage = len(TPROJ)-17
+            NPageSum += npage
+            print("TPROJ npage", TPROJ, npage)
+            NPage = NPage | ((npage-1) << (2*index))
+            index+=1
+
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
         maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
         if mpName != sorted(TPMems.keys(), key=lambda x: x.startswith('L'))[-1]:
