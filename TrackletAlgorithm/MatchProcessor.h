@@ -1221,7 +1221,7 @@ void MatchProcessor(BXType bx,
 
   constexpr uint64_t npages = NPage<LAYER, PHISEC>();
   for (unsigned int imem = 0; imem < nINMEM; imem++) {
-    unsigned int nPages = (npages >> (3*imem))&7;
+    unsigned int nPages = 1 + (npages >> (2*imem))&3;
     for (unsigned int j = 0 ; j < nPages; j++){
 #pragma HLS unroll
       iPage[iMEM + j] = j;
