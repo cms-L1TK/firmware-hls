@@ -101,13 +101,15 @@ public:
 
   bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index)
   {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
       //dataarray_[ibx][addr_index] = data;
 #ifdef __SYNTHESIS__
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][0] = data;
+      //dataarray_[ibx][0] = data;
+      dataarray_[ibx][nentries_[ibx]++] = data;
 #else
       dataarray_[ibx][nentries_[ibx]++] = data;
 #endif
