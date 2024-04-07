@@ -107,7 +107,7 @@ public:
     if (addr_index < (1<<NBIT_ADDR)) {
 #ifdef __SYNTHESIS__
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][nentries_[ibx]++] = data;
+      dataarray_[ibx][0] = data;
 #else
       dataarray_[ibx][nentries_[ibx]++] = data;
 #endif

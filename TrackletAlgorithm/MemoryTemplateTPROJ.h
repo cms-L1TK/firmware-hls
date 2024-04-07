@@ -49,7 +49,8 @@ public:
 
   NEntryT getEntries(BunchXingT bx, unsigned int page = 0) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	return nentries_[bx*NPAGE+page];
+#pragma HLS inline
+    return nentries_[bx*NPAGE+page];
   }
 
   const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
