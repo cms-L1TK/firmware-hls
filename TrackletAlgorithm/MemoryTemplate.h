@@ -108,8 +108,8 @@ public:
       //dataarray_[ibx][addr_index] = data;
 #ifdef __SYNTHESIS__
       //The vhd memory implementation will write to the correct address!!
-      //dataarray_[ibx][0] = data;
-      dataarray_[ibx][nentries_[ibx]++] = data;
+      dataarray_[ibx][0] = data;
+      //dataarray_[ibx][nentries_[ibx]++] = data;
 #else
       dataarray_[ibx][nentries_[ibx]++] = data;
 #endif

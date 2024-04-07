@@ -1215,19 +1215,31 @@ void MatchProcessor(BXType bx,
 
   constexpr int nMEM = NPageSum<LAYER, PHISEC>();
   
-  unsigned int iMEM = 0;
+  ap_uint<3> nPages[nINMEM];
   ap_uint<2> iPage[nMEM];
-  ap_uint<5> iMem[nMEM];
-
+  ap_uint<5> iMem[nMEM]; 
+#pragma HLS ARRAY_PARTITION variable=nPages complete
+#pragma HLS ARRAY_PARTITION variable=iPage complete
+#pragma HLS ARRAY_PARTITION variable=iMem complete
+ 
   constexpr uint64_t npages = NPage<LAYER, PHISEC>();
+
   for (unsigned int imem = 0; imem < nINMEM; imem++) {
-    unsigned int nPages = 1 + (npages >> (2*imem))&3;
-    for (unsigned int j = 0 ; j < nPages; j++){
 #pragma HLS unroll
-      iPage[iMEM + j] = j;
-      iMem[iMEM + j] = imem;
+    nPages[imem] = 1 + ((npages >> (2*imem))&3);
+  }
+
+  int imem = 0;
+  int ipage = 0;
+  for (unsigned int j = 0 ; j < nMEM; j++){
+#pragma HLS unroll
+    iPage[j] = ipage;
+    iMem[j] = imem%nINMEM;
+    ipage++;
+    if (ipage>=nPages[imem]) {
+      ipage=0;
+      imem++;
     }
-    iMEM +=  nPages;
   }
   
   //constexpr unsigned int nMEM = 22;
