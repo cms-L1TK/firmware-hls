@@ -98,6 +98,15 @@ void TrackBuilder(
 )
 {
 
+  // The ordered merges are currently configured assuming four FM memories per
+  // layer/disk or potentially eight in the first layer. Other numbers would
+  // require setting up the code differently.
+  static_assert(NFMPerStubBarrel0 == 4
+             || NFMPerStubBarrel0 == 8
+             || NFMPerStubBarrel  == 4
+             || NFMPerStubDisk    == 4,
+             "Ordered merges require 4 or 8 FM memories per layer/disk.");
+
   constexpr int NStubs = NBarrelStubs + NDiskStubs;
 
   IndexType nTracks = 0;
