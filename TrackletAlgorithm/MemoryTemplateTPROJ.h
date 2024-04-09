@@ -40,6 +40,7 @@ protected:
 
   DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
   NEntryT nentries_[(1<<NBIT_BX)*NPAGE];                  // number of entries
+  ap_uint<NPAGE> mask_[1<<NBIT_BX]; //bitmask for hits
   
 public:
 
@@ -53,6 +54,12 @@ public:
     return nentries_[bx*NPAGE+page];
   }
 
+  ap_uint<NPAGE> getMask(BunchXingT bx) const {
+#pragma HLS ARRAY_PARTITION variable=mask__ complete dim=0
+#pragma HLS inline
+    return mask_[bx];
+  }
+  
   const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
@@ -87,6 +94,7 @@ public:
       dataarray_[ibx][32*page+addr_index] = data;
 #else
       dataarray_[ibx][32*page+nentries_[ibx*NPAGE+page]++] = data;
+      mask_[ibx].set(page);
 #endif
 
       #ifdef CMSSW_GIT_HASH
@@ -145,10 +153,13 @@ public:
     NEntryT nent = nentries_[ibx*NPAGE+page]; 
     bool success = write_mem(ibx, data, nent, page);
 
-    /*	#ifndef CMSSW_GIT_HASH
-	if (success) nentries_[ibx] ++;
-	#endif
-    */
+#ifndef CMSSW_GIT_HASH
+    if (success) {
+      nentries_[ibx*NPAGE+page]++;
+      mask_[ibx].set(page);
+    }
+#endif
+    
     return success;
   }
 
