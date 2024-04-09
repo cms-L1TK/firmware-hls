@@ -38,51 +38,63 @@ end emp_payload;
 
 architecture rtl of emp_payload is
 
+  constant dataword_length : integer := 64;
+  constant n_interfpga_links : integer := 64;
+  signal AS_signals : std_logic_vector(dataword_length * 27 - 1 downto 0);
+  signal MTPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0);
+  signal bx_out : std_logic_vector(2 downto 0);
+  
 begin
 
-  -- This example code sends 156-word-long TMUX18 packets (i.e. same packet length as track finder output)
-  -- with channel index, packet index, and word index embedded in the data word
-  gen : for i in N_REGION * 4 - 1 downto 0 generate
-
-    -- Index of word within a packet
-    signal word_index : std_logic_vector(7 downto 0) := x"00";
-    -- Index of packet within an orbit
-    signal packet_index : std_logic_vector(8 downto 0) := "000000000";
+  gen : for i in n_interfpga_links - 1 downto 0 generate
 
   begin
+    --How exactly do these connect to the 1st fpga: 4,5,6,7 to 56,57,58,59 or 59,58,57,56
+    --Quad0:  0, 1, 2, 3  Dummy
+    --Quad1:  4, 5, 6, 7
+    --Quad2:  8, 9, *10*,*11
+    --Quad3:  12,13,14,15
+    --Quad4:  16,17,18,19
+    --Quad5:  20,21,22,23
+    --Quad6:  24,25,26,27
+    --Quad7:  28*,*29,30,31
+    --Quad8:  32,33,34,35
+    --Quad9:  36,37,38,39
+    --Quad10: 40,41,42,43
+    --Quad11: 44,45,46,47 Dummy
+    --Quad12: 48,49,50,51
+    --Quad13: 52,53,54,55
+    --Quad14: 56,57,58,59*
+    --Quad15: 60,61,62,63 Dummy
+    if (i<4) then
 
-    process (clk_p)
-    begin
-      if rising_edge(clk_p) then
-        -- Reset counters on receiving BC0 from TCDS
-        if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
-          word_index <= x"00";
-          packet_index <= "000000000";
-        -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
-        elsif word_index = x"A1" then
-          word_index <= x"00";
-          packet_index <= std_logic_vector(unsigned(packet_index) + 1);
-        else
-          word_index <= std_logic_vector(unsigned(word_index) + 1);
-        end if;
-      end if;
-    end process;
+    elsif (i<44 and i>47) then
 
-    -- Set valid high for full duration of packet
-    q(i).valid <= '1' when word_index <= x"9B" else '0';
-    -- Start & last are only high for first & last clock cycle of packet
-    q(i).start <= '1' when word_index = x"00" else '0';
-    q(i).last <= '1' when word_index = x"9B" else '0';
+    elsif (i>59) then
 
-    -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
-    -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
-    q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
+    elsif (i>28) then
+      --9 64-bit channels exactly accomodates 16 of the 36-bit signals, since
+      --there are 48 of the 36-bit signals, 27 64-bit channels will perfectly
+      --accomodate all of the 36-bit signals
+      AS_signals(63 + AS_counter*64 downto 0 + AS_counter*64) <= d(i).data(63 downto 0);
+      AS_counter <= AS_counter + 1;
 
-    -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
-    q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
-    q(i).data(31 downto 16) <= "0000000" & packet_index;
-    q(i).data(15 downto 0) <= x"00" & word_index;
+    elsif (i<29 and i>11) then
+      --15 75-bit signals can be accomodated by 18 64-bit words, the final
+      --64-bit word will only use 37 of the bits
+      MTPAR_signals(63 + MTPAR_counter*64 downto 0 + MTPAR_counter*64) <= d(i).data(63 downto 0);
+      MTPAR_counter <= MTPAR_counter + 1;
+      
+    elsif (i=11) then
+      MTPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38) <= d(i).data(36 downto 0);
+      
+    elsif (i=10) then
+      bx_out <= d(i).data(2 downto 0);
 
+    else
+      AS_counter <= 0;
+      MTPAR_counter <= 0;
+    
   end generate gen;
 
 end rtl;

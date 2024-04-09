@@ -37,51 +37,192 @@ end emp_payload;
 
 architecture rtl of emp_payload is
 
+  signal AS_D5PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"0";
+  signal AS_D5PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1";
+  signal AS_D5PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2";
+  signal AS_D5PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"3";
+  signal AS_D4PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"4";
+  signal AS_D4PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"5";
+  signal AS_D4PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"6";
+  signal AS_D4PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"7";
+  signal AS_D3PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"8";
+  signal AS_D3PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"9";
+  signal AS_D3PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"A";
+  signal AS_D3PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"B";
+  signal AS_D2PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"C";
+  signal AS_D2PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"D";
+  signal AS_D2PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"E";
+  signal AS_D2PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"F";
+  signal AS_D1PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"10";
+  signal AS_D1PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"11";
+  signal AS_D1PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"12";
+  signal AS_D1PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"13";
+  signal AS_L6PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"14";
+  signal AS_L6PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"15";
+  signal AS_L6PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"16";
+  signal AS_L6PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"17";
+  signal AS_L5PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"18";
+  signal AS_L5PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"19";
+  signal AS_L5PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1A";
+  signal AS_L5PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1B";
+  signal AS_L4PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1C";
+  signal AS_L4PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1D";
+  signal AS_L4PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1E";
+  signal AS_L4PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"1F";
+  signal AS_L3PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"20";
+  signal AS_L3PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"21";
+  signal AS_L3PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"22";
+  signal AS_L3PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"23";
+  signal AS_L2PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"24";
+  signal AS_L2PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"25";
+  signal AS_L2PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"26";
+  signal AS_L2PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"27";
+  signal AS_L1PHIHn1_stream_V_dout : std_logic_vector(35 downto 0) := x"28";
+  signal AS_L1PHIGn1_stream_V_dout : std_logic_vector(35 downto 0) := x"29";
+  signal AS_L1PHIFn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2A";
+  signal AS_L1PHIEn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2B";
+  signal AS_L1PHIDn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2C";
+  signal AS_L1PHICn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2D";
+  signal AS_L1PHIBn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2E";
+  signal AS_L1PHIAn1_stream_V_dout : std_logic_vector(35 downto 0) := x"2F";
+
+  signal MTPAR_L1L2H_stream_V_dout    : std_logic_vector(74 downto 0) := x"30";
+  signal MTPAR_L1L2E_stream_V_dout    : std_logic_vector(74 downto 0) := x"31";
+  signal MTPAR_L1L2GI_stream_V_dout   : std_logic_vector(74 downto 0) := x"32";
+  signal MTPAR_L1L2DF_stream_V_dout   : std_logic_vector(74 downto 0) := x"33";
+  signal MTPAR_L1L2JLK_stream_V_dout  : std_logic_vector(74 downto 0) := x"34";
+  signal MTPAR_L1L2ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"35";
+  signal MTPAR_D3D4ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"36";
+  signal MTPAR_D1D2ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"37";
+  signal MTPAR_L1D1EFGH_stream_V_dout : std_logic_vector(74 downto 0) := x"38";
+  signal MTPAR_L1D1ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"39";
+  signal MTPAR_L2D1ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"3A";
+  signal MTPAR_L3L4CD_stream_V_dout   : std_logic_vector(74 downto 0) := x"3B";
+  signal MTPAR_L3L4AB_stream_V_dout   : std_logic_vector(74 downto 0) := x"3C";
+  signal MTPAR_L2L3ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"3D";
+  signal MTPAR_L5L6ABCD_stream_V_dout : std_logic_vector(74 downto 0) := x"3E";
+
+  signal bx_out : std_logic_vector(2 downto 0) := "111";  
+  
+  constant dataword_length : integer := 64;
+  constant n_interfpga_links : integer := 64;
+  signal AS_counter : integer := 0;
+  signal MTPAR_counter : integer := 0;
+  signal AS_signals : std_logic_vector(dataword_length * 27 - 1 downto 0) := AS_D5PHIDn1_stream_V_dout &
+                                                                             AS_D5PHICn1_stream_V_dout &
+                                                                             AS_D5PHIBn1_stream_V_dout &
+                                                                             AS_D5PHIAn1_stream_V_dout &
+                                                                             AS_D4PHIDn1_stream_V_dout &
+                                                                             AS_D4PHICn1_stream_V_dout &
+                                                                             AS_D4PHIBn1_stream_V_dout &
+                                                                             AS_D4PHIAn1_stream_V_dout &
+                                                                             AS_D3PHIDn1_stream_V_dout &
+                                                                             AS_D3PHICn1_stream_V_dout &
+                                                                             AS_D3PHIBn1_stream_V_dout &
+                                                                             AS_D3PHIAn1_stream_V_dout &
+                                                                             AS_D2PHIDn1_stream_V_dout &
+                                                                             AS_D2PHICn1_stream_V_dout &
+                                                                             AS_D2PHIBn1_stream_V_dout &
+                                                                             AS_D2PHIAn1_stream_V_dout &
+                                                                             AS_D1PHIDn1_stream_V_dout &
+                                                                             AS_D1PHICn1_stream_V_dout &
+                                                                             AS_D1PHIBn1_stream_V_dout &
+                                                                             AS_D1PHIAn1_stream_V_dout &
+                                                                             AS_L6PHIDn1_stream_V_dout &
+                                                                             AS_L6PHICn1_stream_V_dout &
+                                                                             AS_L6PHIBn1_stream_V_dout &
+                                                                             AS_L6PHIAn1_stream_V_dout &
+                                                                             AS_L5PHIDn1_stream_V_dout &
+                                                                             AS_L5PHICn1_stream_V_dout &
+                                                                             AS_L5PHIBn1_stream_V_dout &
+                                                                             AS_L5PHIAn1_stream_V_dout &
+                                                                             AS_L4PHIDn1_stream_V_dout &
+                                                                             AS_L4PHICn1_stream_V_dout &
+                                                                             AS_L4PHIBn1_stream_V_dout &
+                                                                             AS_L4PHIAn1_stream_V_dout &
+                                                                             AS_L3PHIDn1_stream_V_dout &
+                                                                             AS_L3PHICn1_stream_V_dout &
+                                                                             AS_L3PHIBn1_stream_V_dout &
+                                                                             AS_L3PHIAn1_stream_V_dout &
+                                                                             AS_L2PHIDn1_stream_V_dout &
+                                                                             AS_L2PHICn1_stream_V_dout &
+                                                                             AS_L2PHIBn1_stream_V_dout &
+                                                                             AS_L2PHIAn1_stream_V_dout &
+                                                                             AS_L1PHIHn1_stream_V_dout &
+                                                                             AS_L1PHIGn1_stream_V_dout &
+                                                                             AS_L1PHIFn1_stream_V_dout &
+                                                                             AS_L1PHIEn1_stream_V_dout &
+                                                                             AS_L1PHIDn1_stream_V_dout &
+                                                                             AS_L1PHICn1_stream_V_dout &
+                                                                             AS_L1PHIBn1_stream_V_dout &
+                                                                             AS_L1PHIAn1_stream_V_dout;
+  
+  signal MTPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0) := MTPAR_L1L2H_stream_V_dout &
+                                                                                MTPAR_L1L2E_stream_V_dout &
+                                                                                MTPAR_L1L2GI_stream_V_dout &
+                                                                                MTPAR_L1L2DF_stream_V_dout &
+                                                                                MTPAR_L1L2JLK_stream_V_dout &
+                                                                                MTPAR_L1L2ABCD_stream_V_dout &
+                                                                                MTPAR_D3D4ABCD_stream_V_dout &
+                                                                                MTPAR_D1D2ABCD_stream_V_dout &
+                                                                                MTPAR_L1D1EFGH_stream_V_dout &
+                                                                                MTPAR_L1D1ABCD_stream_V_dout &
+                                                                                MTPAR_L2D1ABCD_stream_V_dout &
+                                                                                MTPAR_L3L4CD_stream_V_dout &
+                                                                                MTPAR_L3L4AB_stream_V_dout &
+                                                                                MTPAR_L2L3ABCD_stream_V_dout &
+                                                                                MTPAR_L5L6ABCD_stream_V_dout;
+
 begin
 
-  -- This example code sends 156-word-long TMUX18 packets (i.e. same packet length as track finder output)
-  -- with channel index, packet index, and word index embedded in the data word
-  gen : for i in N_REGION * 4 - 1 downto 0 generate
-
-    -- Index of word within a packet
-    signal word_index : std_logic_vector(7 downto 0) := x"00";
-    -- Index of packet within an orbit
-    signal packet_index : std_logic_vector(8 downto 0) := "000000000";
+  gen : for i in n_interfpga_links - 1 downto 0 generate
 
   begin
+    --Quad0:  0, 1, 2, 3  Dummy
+    --Quad1:  *4, 5, 6, 7
+    --Quad2:  8, 9, 10,11
+    --Quad3:  12,13,14,15
+    --Quad4:  16,17,18,19 Dummy
+    --Quad5:  20,21,22,23
+    --Quad6:  24,25,26,27
+    --Quad7:  28,29,30,31
+    --Quad8:  32,33,34*,*35
+    --Quad9:  36,37,38,39
+    --Quad10: 40,41,42,43
+    --Quad11: 44,45,46,47
+    --Quad12: 48,49,50,51
+    --Quad13: 52*,*53*,54,55
+    --Quad14: 56,57,58,59
+    --Quad15: 60,61,62,63 Dummy
+    if (i<4) then
+      
+    elsif (i>11 and i<16) then
 
-    process (clk_p)
-    begin
-      if rising_edge(clk_p) then
-        -- Reset counters on receiving BC0 from TCDS
-        if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
-          word_index <= x"00";
-          packet_index <= "000000000";
-        -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
-        elsif word_index = x"A1" then
-          word_index <= x"00";
-          packet_index <= std_logic_vector(unsigned(packet_index) + 1);
-        else
-          word_index <= std_logic_vector(unsigned(word_index) + 1);
-        end if;
-      end if;
-    end process;
+    elsif (i>59) then
 
-    -- Set valid high for full duration of packet
-    q(i).valid <= '1' when word_index <= x"9B" else '0';
-    -- Start & last are only high for first & last clock cycle of packet
-    q(i).start <= '1' when word_index = x"00" else '0';
-    q(i).last <= '1' when word_index = x"9B" else '0';
+    elsif (i>3 and i<35) then
+      --9 64-bit channels exactly accomodates 16 of the 36-bit signals, since
+      --there are 48 of the 36-bit signals, 27 64-bit channels will perfectly
+      --accomodate all of the 36-bit signals
+      q(i).data(63 downto 0) <= AS_signals(63 + AS_counter*64 downto 0 + AS_counter*64);
+      AS_counter <= AS_counter + 1;
 
-    -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
-    -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
-    q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
+    elsif (i>34 and i<52) then
+      --15 75-bit signals can be accomodated by 18 64-bit words, the final
+      --64-bit word will only use 37 of the bits 
+      q(i).data(63 downto 0) <= MTPAR_signals(63 + MTPAR_counter*64 downto 0 + MTPAR_counter*64);
+      MTPAR_counter <= MTPAR_counter + 1;
 
-    -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
-    q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
-    q(i).data(31 downto 16) <= "0000000" & packet_index;
-    q(i).data(15 downto 0) <= x"00" & word_index;
+    elsif i=52 then
+      q(i).data(36 downto 0) <= MTPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38);
 
+    elsif i=53 then
+      q(i).data(2 downto 0) <= bx_out;
+
+    else
+      AS_counter <= 0;
+      MTPAR_counter <=0;
+      
   end generate gen;
-
+    
 end rtl;
