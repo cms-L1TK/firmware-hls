@@ -285,10 +285,10 @@ processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTsCM/processingmodules.dat |
 for module in ${processing_modules[@]}
 do
   echo ${module}
-  memprint_location="MemPrintsCM"
+  memprint_location="MemPrintsSplit"
   memprint_location_reducedcm="MemPrintsReducedCM"
   memprint_location_reducedcm2="MemPrintsReducedCM2"
-  table_location="LUTsCM"
+  table_location="LUTsSplit"
   if [[ ${module_type} == "VMRCM" ]]
   then
     module=`echo ${module} | sed "s/CM//"`

@@ -51,8 +51,8 @@ entity tf_mem_tproj is
     addrb     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
-    --nent_o    : out t_arr_meb(0 to NUM_PAGES-1) := (others => (others => '0'))
-    nent_o    : out t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1) := (others => (others => '0')) --! entries per page
+    nent_o    : out t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1) := (others => (others => '0')); --! entries per page
+    mask_o    : out t_arr_4b(0 to NUM_PAGES-1) := (others => (others => '0')) --! entries per page
     );
 end tf_mem_tproj;
 
@@ -145,6 +145,7 @@ begin
       else
         vi_page_cnt := 0;
       end if;
+      mask_o(vi_page_cnt) <= (others => '0');
       for tpage in 0 to NUM_TPAGES-1 loop
         nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
         nent_o(nentaddress) <= (others => '0');
@@ -161,8 +162,11 @@ begin
       end if;
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
+      mask_o(vi_page_cnt)(tpage) <= '1';
     elsif (written=0) then
+      -- this is not needed?
       nent_o <= (others => (others => '0'));
+      mask_o <= (others => (others => '0'));
     end if;
   end if;
 end process;
