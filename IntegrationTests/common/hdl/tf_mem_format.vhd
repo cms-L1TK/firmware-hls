@@ -232,7 +232,8 @@ entity vmstub2mask is
     dataout0 : out t_arr64_1b;
     dataout1 : out t_arr64_1b
 );
-  end vmstub2mask;
+
+end vmstub2mask;
 
 architecture rtl of vmstub2mask is
 

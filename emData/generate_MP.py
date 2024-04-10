@@ -69,6 +69,7 @@ MatchCalculator_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
 parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
 parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPROJ - not TPROJ memories")
 arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with MPs in
@@ -80,7 +81,9 @@ with open(arguments.wiresFileName) as wiresFile:
         line = line.rstrip()
         mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
         memName = line.split()[0]
-        if memName.startswith("TPROJ_"):
+        projtype = "TPROJ_"
+        if arguments.split : projtype = "MPROJ_"
+        if memName.startswith(projtype):
             if mpName not in TPMems:
                 TPMems[mpName] = []
             TPMems[mpName].append(memName)
@@ -141,7 +144,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         FMMask = 0
         for FM in FMMems[mpName]:
             FMMask = FMMask | (1 << TF_index[FM])
-        
+
+        NPage = 0
+        NPageSum = 0
+        index = 0
+        for TPROJ in TPMems[mpName]:
+            print(mpName, TPROJ)
+            npage = len(TPROJ)-17
+            NPageSum += npage
+            print("TPROJ npage", TPROJ, npage)
+            NPage = NPage | ((npage-1) << (2*index))
+            index+=1
+            
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
         maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
         if mpName != sorted(TPMems.keys(), key=lambda x: x.startswith('L'))[-1]:
@@ -155,6 +169,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "template<> constexpr uint32_t FMMask<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
             "}\n" % FMMask
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint64_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPage
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint32_t NPageSum<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPageSum
         )
 
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)
@@ -203,6 +233,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         topFile.write(
             "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
             "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
+#            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
+#            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
            "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
             "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"

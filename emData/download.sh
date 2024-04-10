@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 set -e
 
-#### generated with commit 6e61462 ####
+
+#### generated with branch VMSMERouterCMSSW13, commit a2c799d ####
 # Combined modules
-memprints_url_cm="https://aryd.web.cern.ch/aryd/MemPrints_Combined_240202.tgz"
-luts_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/5zTYWH46jxJGi7C/LUTs_Combined_3222024.tar.gz"
+memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
+luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
+# Split modules - i.e. with PC and VMSMER
+memprints_url_split="https://aryd.web.cern.ch/aryd/MemPrints_Split_240405.tgz"
+luts_url_split="https://aryd.web.cern.ch/aryd/LUTs_Split_240405.tgz"
 # Reduced Combined modules
-memprints_url_reducedcm="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced_240202.tgz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"
 # Reduced Combined modules2
-memprints_url_cm2="https://aryd.web.cern.ch/aryd/MemPrints_CMReduced2_240202.tgz"
+memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/MDQXOUkSMEM1KkH/MemPrints_CMReduced2_040424.tar.gz"
 luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CMReduced2_240121.tgz"
 # Combined barrel
-memprints_url_cmbarrel="https://aryd.web.cern.ch/aryd/MemPrints_Barrel_240202.tgz"
+memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/lVII5Ho0VX7nwFA/MemPrints_Barrel_040424.tar.gz"
 luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_Barrel_240121.tgz"
 
 # Function that prints information regarding the usage of this command
@@ -65,6 +69,10 @@ fi
 
 if [ ! -d "LUTs" ]
 then
+  wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_split}
+  tar -xzmf LUTs.tgz
+  mv LUTs LUTsSplit
+  rm -f LUTs.tgz
   wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_reducedcm}
   tar -xzmf LUTs.tgz
   mv LUTs LUTsCMReduced
@@ -88,6 +96,7 @@ fi
 mkdir -p ../TopFunctions/CombinedConfig
 ./generate_IR.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_VMRCM.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
+./generate_VMSMER.py -a -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_TP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_PC.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
 ./generate_MP.py       -w LUTsCM/wires.dat -o ../TopFunctions/CombinedConfig
@@ -96,6 +105,7 @@ mkdir -p ../TopFunctions/CombinedConfig
 mkdir -p ../TopFunctions/ReducedCombinedConfig
 ./generate_IR.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_VMRCM.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
+./generate_VMSMER.py -a -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_TP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_PC.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
 ./generate_MP.py       -w LUTsCMReduced/wires.dat -o ../TopFunctions/ReducedCombinedConfig
@@ -104,6 +114,7 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig
 mkdir -p ../TopFunctions/ReducedCombinedConfig2
 ./generate_IR.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_VMRCM.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
+./generate_VMSMER.py -a -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_TP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_PC.py       -w LUTsCM/wires.dat  -o ../TopFunctions/ReducedCombinedConfig2
 ./generate_MP.py       -w LUTsCM2/wires.dat -o ../TopFunctions/ReducedCombinedConfig2
@@ -112,10 +123,17 @@ mkdir -p ../TopFunctions/ReducedCombinedConfig2
 mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_IR.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_VMRCM.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+./generate_VMSMER.py -a -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_PC.py       -w LUTsCM/wires.dat       -o ../TopFunctions/CombinedBarrelConfig
 ./generate_MP.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
+### combined barrel config                      
+mkdir -p ../TopFunctions/CombinedConfig_FPGA2
+./generate_PC.py       -sp -w  LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_VMSMER.py   --all -w LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_MP.py       -sp -w LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
+./generate_TB.py       -sp -w LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 
 
 # Run scripts to generate HDL top modules and test benches in IntegrationTests/
@@ -125,15 +143,57 @@ git submodule update
 cd emData/project_generation_scripts/
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
 # Should these be auto generated? 
-cp ../LUTsCM/wires.dat reducedcm_wires.dat
-cp ../LUTsCM/processingmodules.dat reducedcm_processingmodules.dat
-cp ../LUTsCM/memorymodules.dat reducedcm_memorymodules.dat
+cp ../LUTsCMReduced/wires.dat reducedcm_wires.dat
+cp ../LUTsCMReduced/processingmodules.dat reducedcm_processingmodules.dat
+cp ../LUTsCMReduced/memorymodules.dat reducedcm_memorymodules.dat
 cp ../LUTsCM2/wires.dat reducedcm2_wires.dat
 cp ../LUTsCM2/processingmodules.dat reducedcm2_processingmodules.dat
 cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
 cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
 cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
 cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
+# grep, awk, and sed should be fixed in CMSSW - no we can use the config from
+# CMSSW instead of a hand made configuration. But it still needs tweaking...
+grep -v vmstuboutPHI ../LUTsSplit/wires.dat | grep -v TP_ | grep -v IR_ > fpga2_wires.dat
+echo "MPAR_L1L2ABCin input=> output=> PC_L1L2ABC.tparin" >> fpga2_wires.dat
+echo "MPAR_L1L2DEin input=> output=> PC_L1L2DE.tparin" >> fpga2_wires.dat
+echo "MPAR_L1L2Fin input=> output=> PC_L1L2F.tparin" >> fpga2_wires.dat
+echo "MPAR_L1L2Gin input=> output=> PC_L1L2G.tparin" >> fpga2_wires.dat
+echo "MPAR_L1L2HIin input=> output=> PC_L1L2HI.tparin" >> fpga2_wires.dat
+echo "MPAR_L1L2JKLin input=> output=> PC_L1L2JKL.tparin" >> fpga2_wires.dat
+echo "MPAR_L2L3ABCDin input=> output=> PC_L2L3ABCD.tparin" >> fpga2_wires.dat
+echo "MPAR_L3L4ABin input=> output=> PC_L3L4AB.tparin" >> fpga2_wires.dat
+echo "MPAR_L3L4CDin input=> output=> PC_L3L4CD.tparin" >> fpga2_wires.dat
+echo "MPAR_L5L6ABCDin input=> output=> PC_L5L6ABCD.tparin" >> fpga2_wires.dat
+echo "MPAR_D1D2ABCDin input=> output=> PC_D1D2ABCD.tparin" >> fpga2_wires.dat
+echo "MPAR_D3D4ABCDin input=> output=> PC_D3D4ABCD.tparin" >> fpga2_wires.dat
+echo "MPAR_L1D1ABCDin input=> output=> PC_L1D1ABCD.tparin" >> fpga2_wires.dat
+echo "MPAR_L1D1EFGHin input=> output=> PC_L1D1EFGH.tparin" >> fpga2_wires.dat
+echo "MPAR_L2D1ABCDin input=> output=> PC_L2D1ABCD.tparin" >> fpga2_wires.dat
+sed -i 's/VMR_[L|D][1-9]PHI[A|B|C|D|E|F|G|H].allstubout//g' fpga2_wires.dat
+sed -i 's/n1 input/in input/g' fpga2_wires.dat
+grep -v VMR_ fpga2_wires.dat > tmp.dat
+mv tmp.dat fpga2_wires.dat
+cp ../LUTsSplit/memorymodules.dat fpga2_memorymodules.dat
+sed -i 's/n1 \[42\]/in \[42\]/g' fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1L2ABCin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1L2DEin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1L2Fin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1L2Gin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1L2HIin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1L2JKLin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L2L3ABCDin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L3L4ABin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L3L4CDin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L5L6ABCDin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_D1D2ABCDin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_D3D4ABCDin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1D1ABCDin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L1D1EFGHin [73]" >> fpga2_memorymodules.dat
+echo "TrackletParameters: MPAR_L2D1ABCDin [73]" >> fpga2_memorymodules.dat
+
+grep -v TP_ ../LUTsSplit/processingmodules.dat | grep -v VMR_ | grep -v IR_ > fpga2_processingmodules.dat
+sed -i 's/VMStubMERouter/VMSMERouter/g' fpga2_processingmodules.dat
 
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
@@ -169,6 +229,13 @@ cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodul
 mkdir -p ../../IntegrationTests/CombinedConfig/IRtoTP/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/tb/
+### Combined PC/VMSMER to TB
+echo "CM FPGA2"
+./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
+mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/
 
 # Remove untracked file and return to emData/
 rm -fv script_sectproc.tcl
@@ -177,6 +244,11 @@ cd ../
 if [[ $tables_only == 0 ]]
 then
   # Get memory test data: download and unpack the tarball.
+  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_split}
+  tar -xzmf MemPrints.tgz
+  mv MemPrints MemPrintsSplit
+  rm -f MemPrints.tgz
+
   wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
   tar -xzmf MemPrints.tgz
   mv MemPrints MemPrintsReducedCM
@@ -218,10 +290,10 @@ processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTsCM/processingmodules.dat |
 for module in ${processing_modules[@]}
 do
   echo ${module}
-  memprint_location="MemPrintsCM"
+  memprint_location="MemPrintsSplit"
   memprint_location_reducedcm="MemPrintsReducedCM"
   memprint_location_reducedcm2="MemPrintsReducedCM2"
-  table_location="LUTsCM"
+  table_location="LUTsSplit"
   if [[ ${module_type} == "VMRCM" ]]
   then
     module=`echo ${module} | sed "s/CM//"`

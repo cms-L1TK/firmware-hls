@@ -21,45 +21,63 @@ namespace PR
   // Initialization
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
-  template<int nMEM, int NBits_Entries, class MemType>
+  template<int nMEM, unsigned int nINMEM, int NBits_Entries, class MemType>
   inline void init(BXType bx,
+		   const ap_uint<5> iMem[nMEM],
+		   const ap_uint<2> iPage[nMEM],
+		   const ap_uint<3> nPages[nINMEM],
                    ap_uint<nMEM>& mem_hasdata,
                    ap_uint<NBits_Entries> nentries[nMEM],
                    const MemType mem[nMEM])
   {    
-#pragma HLS inline  
+#pragma HLS inline
+#pragma HLS ARRAY_PARTITION variable=iPage complete
+#pragma HLS ARRAY_PARTITION variable=iMem complete
+
+    unsigned int imem = 0;
+    for(unsigned int i = 0; i < nINMEM; i++) {
+#pragma HLS unroll
+      mem_hasdata.range(imem+nPages[i]-1,imem) = mem[i].getMask(bx).range(nPages[i]-1,0);
+      imem+=nPages[i];
+    }
+
     for(int i = 0; i < nMEM; ++i) {
 #pragma HLS unroll
-      ap_uint<kNBits_MemAddr+1> num = mem[i].getEntries(bx);
+      ap_uint<kNBits_MemAddr+1> num = mem[iMem[i]].getEntries(bx, iPage[i]);
       nentries[i] = num;
-      //if (num > 0) mem_hasdata.set(i);
-      mem_hasdata[i] = (num > 0); //can't use if statement with rewind
     }
   }
+  
+
   
   //////////////////////////////
   // Priority encoder based input memory reading logic
   template<class DataType, class MemType, int nMEM>
-  void read_inmem(DataType& data, BXType bx, ap_uint<5> read_imem,
+  void read_inmem(DataType& data, BXType bx, //ap_uint<5> read_imem,
                   ap_uint<kNBits_MemAddr>& read_addr,
+		  const ap_uint<5> iMem,
+		  const ap_uint<2> iPage,
                   const MemType inmem[nMEM])
   {
 #pragma HLS inline
-
-    data = inmem[read_imem].read_mem(bx, read_addr);
-
+    data = inmem[iMem].read_mem(bx, read_addr, iPage);
   }
+
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
   bool read_input_mems(BXType bx,
                        ap_uint<nMEM>& mem_hasdata,
                        ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
-                       // memory pointers
+                       // Memory pointers
+		       const ap_uint<5> iMem[nMEM],
+		       const ap_uint<2> iPage[nMEM],
                        const MemType mem[nMEM],
                        DataType& data)
   {
 #pragma HLS inline
+#pragma HLS ARRAY_PARTITION variable=iPage complete
+#pragma HLS ARRAY_PARTITION variable=iMem complete
     if (mem_hasdata == 0) return false;
 
     ap_uint<kNBits_MemAddr> read_addr_next = read_addr + 1;
@@ -69,7 +87,8 @@ namespace PR
     ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
 
     // read the memory "read_imem" with the address "read_addr"
-    read_inmem<DataType, MemType, nMEM>(data, bx, read_imem, read_addr, mem);
+    read_inmem<DataType, MemType, nMEM>(data, bx, //read_imem,
+					read_addr, iMem[read_imem], iPage[read_imem], mem);
 
     if (read_addr_next >= nentries[read_imem]) {
       // All entries in the memory[read_imem] have been read out
@@ -870,6 +889,8 @@ void readTable_rDSS(ap_uint<width> table[depth]){
 // MatchCalculator
 template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint64_t NPage();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t NPageSum();
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
@@ -1202,12 +1223,44 @@ void MatchProcessor(BXType bx,
   // initialization:
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
-  ap_uint<nINMEM> mem_hasdata = 0;
-  ap_uint<kNBits_MemAddr+1> numbersin[nINMEM];
+
+  constexpr int nMEM = NPageSum<LAYER, PHISEC>();
+  
+  
+  ap_uint<3> nPages[nINMEM];
+  ap_uint<2> iPage[nMEM];
+  ap_uint<5> iMem[nMEM]; 
+#pragma HLS ARRAY_PARTITION variable=nPages complete
+#pragma HLS ARRAY_PARTITION variable=iPage complete
+#pragma HLS ARRAY_PARTITION variable=iMem complete
+
+  constexpr uint64_t npages = NPage<LAYER, PHISEC>();
+
+  for (unsigned int imem = 0; imem < nINMEM; imem++) {
+#pragma HLS unroll
+    nPages[imem] = 1 + ((npages >> (2*imem))&3);
+  }
+  
+  int imem = 0;
+  int ipage = 0;
+  for (unsigned int j = 0 ; j < nMEM; j++){
+#pragma HLS unroll
+    iPage[j] = ipage;
+    iMem[j] = imem%nINMEM;
+    ipage++;
+    if (ipage>=nPages[imem]) {
+      ipage=0;
+      imem++;
+    }
+  }
+  
+  ap_uint<kNBits_MemAddr+1> numbersin[nMEM];
+  ap_uint<nMEM> mem_hasdata = 0;
+
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
 
-  init<nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
-    (bx, mem_hasdata, numbersin, projin);
+  init<nMEM, nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
+    (bx, iMem, iPage, nPages, mem_hasdata, numbersin, projin);
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
@@ -1527,15 +1580,18 @@ void MatchProcessor(BXType bx,
       constexpr bool isDisk = LAYER > TF::L6;
       auto first = !isDisk ? zfirst : rfirst;
       auto slot = zbin.range(zbin.length()-1, 1);
+
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
 #pragma HLS ARRAY_PARTITION variable=entries_zlast complete
+
       for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
 #pragma HLS unroll
         entries_zfirst[phibin]= instubdata.getEntries(bx&3,first).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
         entries_zlast[phibin]= instubdata.getEntries(bx&3,first).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH+BIN_ADDR_WIDTH*NUM_PHI_BINS-1,phibin*BIN_ADDR_WIDTH + BIN_ADDR_WIDTH*NUM_PHI_BINS);
       }
+
       ap_uint<BIN_ADDR_WIDTH> nstubfirstMinus = entries_zfirst[ivmMinus];
       ap_uint<BIN_ADDR_WIDTH> nstubfirstPlus = entries_zfirst[ivmPlus];
       ap_uint<BIN_ADDR_WIDTH> nstublastMinus = entries_zlast[ivmMinus];
@@ -1580,8 +1636,8 @@ void MatchProcessor(BXType bx,
       // read inputs
       validin = read_input_mems<TrackletProjection<PROJTYPE>,
       TrackletProjectionMemory<PROJTYPE>,
-      nINMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr,
+      nMEM, kNBits_MemAddr+1>
+      (bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
          projin, projdata);
  
     } else {

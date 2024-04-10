@@ -97,16 +97,18 @@ void writeArrayFromFile(DataType* hData, std::ifstream& pInputStream, int pEvent
 template<class MemType>
 void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16)
 {
+
   std::string line;
 
   if (ievt==0) {
     getline(fin, line);
   }
-  
+
+   
   memory.clear();
   
   while (getline(fin, line)) {
-    
+
     if (!fin.good()) {
       return;
     }

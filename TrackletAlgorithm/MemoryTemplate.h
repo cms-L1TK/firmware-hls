@@ -101,12 +101,20 @@ public:
 
   bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index)
   {
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
-      dataarray_[ibx][addr_index] = data;
+      //dataarray_[ibx][addr_index] = data;
+#ifdef __SYNTHESIS__
+      //The vhd memory implementation will write to the correct address!!
+      dataarray_[ibx][0] = data;
+      //dataarray_[ibx][nentries_[ibx]++] = data;
+#else
+      dataarray_[ibx][nentries_[ibx]++] = data;
+#endif
 
-#ifndef __SYNTHESIS__
+      #ifdef CMSSW_GIT_HASH
       nentries_[ibx] = addr_index + 1;
 #endif
 
@@ -131,10 +139,27 @@ public:
     MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
       nentries_[ibx] = 0;
       for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {
-        write_mem(ibx,data,addr);
+        write_mem_clear(ibx,data,addr);
       }
     }
   }
+
+  bool write_mem_clear(BunchXingT ibx, DataType data, NEntryT addr_index)
+  {
+    if(!NBIT_BX) ibx = 0;
+    if (addr_index < (1<<NBIT_ADDR)) {
+      dataarray_[ibx][addr_index] = data;
+
+      #ifdef CMSSW_GIT_HASH
+      nentries_[ibx] = addr_index + 1;
+      #endif
+      
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
@@ -144,12 +169,26 @@ public:
 	NEntryT nent = nentries_[ibx]; 
 	bool success = write_mem(ibx, data, nent);
 
+	/*	#ifndef CMSSW_GIT_HASH
+	if (success) nentries_[ibx] ++;
+	#endif
+	*/
 	return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
   {
-	return write_mem(ibx, datastr.c_str(), base);
+	if(!NBIT_BX) ibx = 0;
+	DataType data(datastr.c_str(), base);
+	NEntryT nent = nentries_[ibx];
+	bool success = write_mem(ibx, data, nent);
+
+	/*
+	#ifndef CMSSW_GIT_HASH
+	if (success) nentries_[ibx] ++;
+	#endif
+	*/
+	return success;
   }
 
   // print memory contents

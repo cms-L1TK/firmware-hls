@@ -64,7 +64,7 @@ class MemoryTemplateBinnedCM{
   ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
 
- public:
+public:
 
   unsigned int getDepth() const {return kNMemDepth;}
   unsigned int getNBX() const {return kNBxBins;}
@@ -89,7 +89,7 @@ class MemoryTemplateBinnedCM{
   }
 
   ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    return nentries_[bx*(1<<(NBIT_BIN-kNBitsphibinCM))+ibin];
+    return nentries_[bx*8+ibin];
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
@@ -103,7 +103,7 @@ class MemoryTemplateBinnedCM{
       val += getEntries(bx, i);
     }
     return val;
-  }
+  } 
 
   const DataType (&getMem(unsigned int icopy) const)[1<<NBIT_BX][1<<NBIT_ADDR] {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
@@ -141,10 +141,26 @@ class MemoryTemplateBinnedCM{
       //icopy comparison must be signed int or future SW fails
       writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
-        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry_ibx] = data;
+#ifdef __SYNTHESIS__
+        dataarray_[icopy][ibx][getNEntryPerBin()*slot] = data;
+#else
+	ap_uint<kNBitsRZBinCM> ibin;
+	ap_uint<kNBitsphibinCM> ireg;
+	(ireg,ibin)=slot;
+	unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
+	//FIXME ugly hack...
+	if (icopy==NCOPY-1) {
+	  nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	  if (ibin!=0) {
+	    nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+	  }
+	  nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	  binmask8_[ibx][ibin].set_bit(ireg,true);
+	}
+#endif      
       }
-
-      #ifdef CMSSW_GIT_HASH
+#ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
@@ -154,7 +170,7 @@ class MemoryTemplateBinnedCM{
       }
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
-      #endif
+#endif
 
       return true;
     }
@@ -189,6 +205,7 @@ class MemoryTemplateBinnedCM{
       }
       // Clear nentries8 and binmask8
       for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
+	nentries_[ibx*kNBinsRZ+ibin] = 0;
         nentries8_[ibx][ibin] = 0;
         binmask8_[ibx][ibin] = 0;
       }
@@ -219,25 +236,9 @@ class MemoryTemplateBinnedCM{
 
     int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
 
-    ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
-    (ireg,ibin)=slot;
-    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
-
     DataType data(datastr.c_str(), base);
 
-    bool success = write_mem(ibx, slot, data, nentry_ibx);
-    #ifndef CMSSW_GIT_HASH
-    if (success) {
-      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      if (ibin!=0) {
-      	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
-      }
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      binmask8_[ibx][ibin].set_bit(ireg,true);
-    }
-    #endif
-
+    bool success = write_mem(ibx, slot, data, 0);
     return success;
   }
 
@@ -256,9 +257,7 @@ class MemoryTemplateBinnedCM{
 
   void print_mem(BunchXingT bx) const
   {
-	for(unsigned int slot=0;slot<8;slot++) {
-      //std::cout << "slot "<<slot<<" entries "
-      //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
+    for(unsigned int slot=0;slot<8;slot++) {
       for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
 	edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
 	print_entry(bx, i + slot*getNEntryPerBin() );
@@ -268,12 +267,12 @@ class MemoryTemplateBinnedCM{
 
   void print_mem() const
   {
-	for (unsigned int ibx = 0; ibx < kNBxBins; ++ibx) {
-	  for (unsigned int i = 0; i < 8; ++i) {
-	    edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
-	    print_entry(ibx,i);
-	  }
-	}
+    for (unsigned int ibx = 0; ibx < kNBxBins; ++ibx) {
+      for (unsigned int i = 0; i < 8; ++i) {
+	edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
+	print_entry(ibx,i);
+      }
+    }
   }
 
   static constexpr int getWidth() {return DataType::getWidth();}

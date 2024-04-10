@@ -42,8 +42,11 @@ MemPrints:
 	 elif [[ $${BASE_DIR} == "CombinedBarrelConfig" ]]; \
 	 then \
 	   ln -sf $(EMDATA)/MemPrintsCMBarrel MemPrints; \
+	 elif [[ $${BASE_DIR} == "CombinedConfig_FPGA2" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/MemPrintsSplit MemPrints; \
 	 else \
-	   ln -sf $(EMDATA)/MemPrintsCM MemPrints; \
+	   ln -sf $(EMDATA)/MemPrints MemPrints; \
 	 fi
 
 LUTs:
@@ -57,6 +60,9 @@ LUTs:
 	 elif [[ $${BASE_DIR} == "CombinedBarrelConfig" ]]; \
 	 then \
 	   ln -sf $(EMDATA)/LUTsCMBarrel LUTs; \
+	 elif [[ $${BASE_DIR} == "CombinedConfig_FPGA2" ]]; \
+	 then \
+	   ln -sf $(EMDATA)/LUTsSplit LUTs; \
 	 else \
 	   ln -sf $(EMDATA)/LUTsCM LUTs; \
 	 fi

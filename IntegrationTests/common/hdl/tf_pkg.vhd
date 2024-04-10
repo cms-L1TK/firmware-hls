@@ -34,7 +34,7 @@ package tf_pkg is
   constant DEBUG                  : boolean := true; --! Debug off/on
   constant MAX_EVENTS             : natural := 100;  --! Max. number of BX events
   constant MAX_ENTRIES            : natural := 108;  --! Max. number of entries: 108 = BX period with 240 MHz
-  constant EMDATA_WIDTH           : natural := 72;   --! Max. bit width of emData
+  constant EMDATA_WIDTH           : natural := 80;   --! Max. bit width of emData
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
   constant N_MEM_BINS_ME_DISK     : natural := 16;   --! Number of memory bins for ME disk
@@ -60,6 +60,7 @@ package tf_pkg is
   -- 2D
   type t_arr2_1b  is array(0 to 1) of std_logic;
   type t_arr2_8b  is array(0 to 1) of std_logic_vector(7 downto 0);
+  type t_arr4_11b  is array(0 to 3) of std_logic_vector(10 downto 0);
   type t_arr4_12b  is array(0 to 3) of std_logic_vector(11 downto 0);
   type t_arr4_13b  is array(0 to 3) of std_logic_vector(12 downto 0);
   type t_arr4_16b  is array(0 to 3) of std_logic_vector(15 downto 0);
@@ -98,9 +99,12 @@ package tf_pkg is
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
 
   -- Used for memories
+  type t_arr_4b  is array(integer range<>) of std_logic_vector(3 downto 0);
   type t_arr_7b  is array(integer range<>) of std_logic_vector(6 downto 0);
   subtype t_arr2_7b is t_arr_7b(0 to 1);
+  subtype t_arr2_4b is t_arr_4b(0 to 1);
   subtype t_arr8_7b is t_arr_7b(0 to 7);
+  subtype t_arr32_7b is t_arr_7b(0 to 31);
   type t_arr8_2_7b is array(0 to 7) of t_arr2_7b;
 
   type t_arr_8_5b  is array(integer range<>) of t_arr8_5b;

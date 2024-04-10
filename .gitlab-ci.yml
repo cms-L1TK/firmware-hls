@@ -142,6 +142,11 @@ VMRCM-quality-check:
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig/VMRouterCMTop_L2PHIA.cc'
+VMSMER-quality-check:
+  <<: *template_quality-check
+  variables:
+    VIVADO_VERSION: "2019.2"
+    CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig/VMStubMERouterTop_D1PHIA.cc'    
 TP-quality-check:
   <<: *template_quality-check
   variables:
@@ -182,6 +187,13 @@ VMRCM-vivado-hls-build:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMRCM"
+VMSMER-vivado-hls-build:
+  <<: *template_hls-build
+  needs: ["download", "VMSMER-quality-check"]
+  variables:
+    EXECUTABLE: 'vivado_hls'
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "VMSMER"
 TP-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TP-quality-check"]
@@ -232,6 +244,8 @@ topReducedCombined-sim:
       artifacts: false
     - job: VMRCM-vivado-hls-build
       artifacts: false
+    - job: VMSMER-vivado-hls-build
+      artifacts: false  
     - job: TP-vivado-hls-build
       artifacts: false
     - job: PC-vivado-hls-build

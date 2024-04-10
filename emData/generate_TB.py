@@ -13,6 +13,7 @@ TopFunctions/ directory.",
                                  epilog="")
 parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
 parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPROJ - not TPROJ memories")
 arguments = parser.parse_args()
 
 # Keep in sync with
@@ -33,7 +34,9 @@ with open(arguments.wiresFileName, "r") as wiresFile:
         tbName = re.sub(r".*FT_(....).*", r"FT_\1", line)
         seed = tbName.split("_")[1]
         memName = line.split()[0]
-        if memName.startswith("TPAR"):
+        partype = "TPAR"
+        if arguments.split : partype = "MPAR"
+        if memName.startswith(partype):
             if tbName not in tparMems:
                 tparMems[tbName] = []
             tparMems[tbName].append(memName)

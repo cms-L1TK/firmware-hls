@@ -56,7 +56,7 @@ public:
     kASAlphaSize = 0,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 12,
+    kASRSize = 11,
     kASIndexSize = 7,
     kASFinePhiSize = 8,
     kASNegDiskSize = 1,
@@ -75,7 +75,7 @@ public:
     kASAlphaSize = 4,
     kASPhiSize = 14,
     kASZSize = 7,
-    kASRSize = 7,
+    kASRSize = 6,
     kASIndexSize = 7,
     kASFinePhiSize = 8,
     kASNegDiskSize = 1,
@@ -109,9 +109,7 @@ public:
     kASFinePhiMSB = kASFinePhiLSB + AllStubInnerBase<ASType>::kASFinePhiSize - 1,
     kASIndexLSB = kASFinePhiMSB +1,
     kASIndexMSB = kASIndexLSB + AllStubInnerBase<ASType>::kASIndexSize - 1,
-    kASNegDiskLSB = kASIndexMSB + 1,
-    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<ASType>::kASNegDiskSize - 1,
-    kASBendLSB = kASNegDiskMSB + 1,
+    kASBendLSB = kASIndexMSB + 1,
     kASBendMSB = kASBendLSB + AllStubInnerBase<ASType>::kASBendSize - 1,
     kASAlphaLSB = kASBendMSB + 1,
     kASAlphaMSB = kASAlphaLSB + AllStubInnerBase<ASType>::kASAlphaSize - 1,
@@ -120,7 +118,9 @@ public:
     kASZLSB = kASPhiMSB + 1,
     kASZMSB = kASZLSB + AllStubInnerBase<ASType>::kASZSize - 1,
     kASRLSB = kASZMSB + 1,
-    kASRMSB = kASRLSB + AllStubInnerBase<ASType>::kASRSize - 1
+    kASRMSB = kASRLSB + AllStubInnerBase<ASType>::kASRSize - 1,
+    kASNegDiskLSB = kASRMSB + 1,
+    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<ASType>::kASNegDiskSize - 1
   };
   typedef ap_int<AllStubInnerBase<ASType>::kASRSize> ASR;
   typedef ap_int<AllStubInnerBase<ASType>::kASZSize> ASZ;
@@ -130,7 +130,7 @@ public:
   typedef ap_uint<AllStubInnerBase<ASType>::kASIndexSize> ASINDEX;
   typedef ap_uint<AllStubInnerBase<ASType>::kASFinePhiSize> ASFINEPHI;
   typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize> AllStubInnerData;
-  typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASNegDiskSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
+  typedef ap_uint<AllStubInnerBase<ASType>::kAllStubInnerSize-AllStubInnerBase<ASType>::kASIndexSize-AllStubInnerBase<ASType>::kASFinePhiSize> AllStubData;
   typedef ap_uint<1> ASNEGDISK; //FIXME this is always ap_uint<1> because csynth fails if this is ever 0 wide
 
   // Constructors
@@ -174,7 +174,7 @@ public:
   AllStubInnerData raw() const {return data_; }
 
   AllStubData getAllStub() const {
-    return data_.range(kASRMSB,kASBendLSB);
+    return data_.range(kASNegDiskMSB,kASBendLSB);
   }
 
   ASR getR() const {
@@ -333,6 +333,147 @@ private:
 
 };
 
+// Data object definition
+template<>
+class AllStubInner<4> : public AllStubInnerBase<DISKPS>
+{
+  static_assert(DISKPS == 4, "DISKPS is assumed to be 4 in this class specialization.");
+public:
+  enum BitLocations {
+    // The location of the least significant bit (LSB) and most significant bit (MSB) in the AllStubInnerMemory word for different fields
+    kASFinePhiLSB = 0,
+    kASFinePhiMSB = kASFinePhiLSB + AllStubInnerBase<DISKPS>::kASFinePhiSize - 1,
+    kASIndexLSB = kASFinePhiMSB +1,
+    kASIndexMSB = kASIndexLSB + AllStubInnerBase<DISKPS>::kASIndexSize - 1,
+    kASBendLSB = kASIndexMSB + 1,
+    kASBendMSB = kASBendLSB + AllStubInnerBase<DISKPS>::kASBendSize - 1,
+    kASAlphaLSB = kASBendMSB + 1,
+    kASAlphaMSB = kASAlphaLSB + AllStubInnerBase<DISKPS>::kASAlphaSize - 1,
+    kASPhiLSB = kASAlphaMSB + 1,
+    kASPhiMSB = kASPhiLSB + AllStubInnerBase<DISKPS>::kASPhiSize - 1,
+    kASZLSB = kASPhiMSB + 1,
+    kASZMSB = kASZLSB + AllStubInnerBase<DISKPS>::kASZSize - 1,
+    kASRLSB = kASZMSB + 1,
+    kASRMSB = kASRLSB + AllStubInnerBase<DISKPS>::kASRSize - 1,
+    kASNegDiskLSB = kASRMSB + 1,
+    kASNegDiskMSB = kASNegDiskLSB + AllStubInnerBase<DISKPS>::kASNegDiskSize - 1
+  };
+  typedef ap_int<AllStubInnerBase<DISKPS>::kASRSize + 1> ASR;
+  typedef ap_int<AllStubInnerBase<DISKPS>::kASZSize> ASZ;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kASPhiSize> ASPHI;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kASAlphaSize> ASALPHA;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kASBendSize> ASBEND;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kASIndexSize> ASINDEX;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kASFinePhiSize> ASFINEPHI;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize> AllStubInnerData;
+  typedef ap_uint<AllStubInnerBase<DISKPS>::kAllStubInnerSize-AllStubInnerBase<DISKPS>::kASIndexSize-AllStubInnerBase<DISKPS>::kASFinePhiSize> AllStubData;
+  typedef ap_uint<1> ASNEGDISK; //FIXME this is always ap_uint<1> because csynth fails if this is ever 0 wide
+
+  // Constructors
+  AllStubInner(const AllStubInnerData& newdata):
+    data_(newdata)
+  {}
+
+  AllStubInner(const ASNEGDISK negdisk, const ASR r, const ASZ z, const ASPHI phi, const ASBEND bend, const ASINDEX index, const ASFINEPHI finephi):
+    data_( (negdisk,r,z,phi,bend,index,finephi) )
+  {
+  }
+
+  AllStubInner()
+  {}
+
+  #ifndef __SYNTHESIS__
+  AllStubInner(const char* datastr, int base=16)
+  {
+    AllStubInnerData newdata(datastr, base);
+    data_ = newdata;
+  }
+  #endif
+
+  // Getter
+  static constexpr int getWidth() {return AllStubInnerBase<DISKPS>::kAllStubInnerSize;}
+
+  AllStubInnerData raw() const {return data_; }
+
+  AllStubData getAllStub() const {
+    return data_.range(kASNegDiskMSB,kASBendLSB);
+  }
+
+  ASR getR() const {
+    return data_.range(kASRMSB,kASRLSB) + (1 << 8);
+  }
+
+  ASZ getZ() const {
+    return data_.range(kASZMSB,kASZLSB);
+  }
+
+  ASPHI getPhi() const {
+    return data_.range(kASPhiMSB,kASPhiLSB);
+  }
+
+  ASBEND getBend() const {
+    return data_.range(kASBendMSB,kASBendLSB);
+  }
+
+  ASINDEX getIndex() const {
+    return data_.range(kASIndexMSB,kASIndexLSB);
+  }
+
+  ASFINEPHI getFinePhi() const {
+    return data_.range(kASFinePhiMSB,kASFinePhiLSB);
+  }
+
+  ASNEGDISK getNegDisk() const {
+    return data_.range(kASNegDiskMSB,kASNegDiskLSB);
+  }
+
+  // Setter
+  void setR(const ASR r) {
+    data_.range(kASRMSB,kASRLSB) = r;
+  }
+
+  void setZ(const ASZ z) {
+    data_.range(kASZMSB,kASZLSB) = z;
+  }
+
+  void setPhi(const ASPHI phi) {
+    data_.range(kASPhiMSB,kASPhiLSB) = phi;
+  }
+
+  void setBend(const ASBEND bend) {
+    data_.range(kASBendMSB,kASBendLSB) = bend;
+  }
+
+  void setIndex(const ASINDEX index) {
+    data_.range(kASIndexMSB,kASIndexLSB) = index;
+  }
+
+  void setFinePhi(const ASFINEPHI finephi) {
+    data_.range(kASFinePhiMSB,kASFinePhiLSB) = finephi;
+  }
+
+  void setNegDisk(const ASNEGDISK negdisk) {
+    data_.range(kASNegDiskMSB,kASNegDiskLSB) = negdisk;
+  }
+
+#ifdef CMSSW_GIT_HASH
+  std::string getBitStr() const {
+    std::string str = decodeToBits(getR());
+    str += "|"+decodeToBits(getZ());
+    str += "|"+decodeToBits(getPhi());
+    str += "|"+decodeToBits(getBend());
+    if (ASType == DISKPS || ASType == DISK2S) str += "|"+decodeToBits(getNegDisk());
+    str += "|"+decodeToBits(getIndex());
+    str += "|"+decodeToBits(getFinePhi());
+    return str;
+  }
+#endif
+
+private:
+
+  AllStubInnerData data_;
+
+};
 // Memory definition
 template<int ASType> using AllStubInnerMemory = MemoryTemplate<AllStubInner<ASType>, 1, kNBits_MemAddr>;
 

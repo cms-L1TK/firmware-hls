@@ -47,7 +47,6 @@ class InvdrLUT{
 };
 
 
-
 class InvtLUT{
 
  public:
@@ -77,12 +76,10 @@ class InvtLUT{
 };
 
 
-
 template<TF::seed iSeed>
 class TPRegionLUT {
 
  public:
-
 
   inline TPRegionLUT(const ap_uint<1> *tplutinner,
 		     const ap_uint<2> iAllStub) {
