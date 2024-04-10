@@ -143,7 +143,7 @@ def writeTopFile(vmr, output_dir):
 
     top_file.write(
         "#pragma HLS interface ap_ctrl_none port=return\n"
-        "#pragma HLS pipeline II=1 rewind\n"
+        "#pragma HLS pipeline II=1\n"
 #        "#pragma HLS interface register port=bx_o\n"
         "\n"
         "  ///////////////////////////\n"
