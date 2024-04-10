@@ -3,23 +3,25 @@ core_dir = cgn
 input_file = mem/in.txt
 proj_path = ../../../proj
 #currently just build FPGA1 project
-hls_script_path = ../../CombinedConfig/IRtoTP/script 
+fpga1_hls_script_path = ../../CombinedConfig/IRtoTP/script 
+fpga2_hls_script_path = ../../CombinedConfig_FPGA2/script
 
-all: add_common_files $(core_file) hdl_add_files xciCreation $(input_file) apollo_input lut_inclusion
+all: add_common_files $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) apollo_input lut_inclusion
 
 $(core_dir):
 	@mkdir cgn mem
-	make -C $(hls_script_path) -j 24 Work
+	#make -C $(fpga1_hls_script_path) -j 24 Work
+	make -C $(fpga2_hls_script_path) -j 24 Work
 	@cd mem; ln -s ../../../../emData/LUTsCM LUTs
 	@cd mem; ln -s ../../../../emData/MemPrintsCM MemPrintsCM
 	@cd hdl; ln -s ../../../common common
 
 $(core_file): $(core_dir)
-	@python3 scripts/include_cores.py -s $(hls_script_path)
+	#@python3 scripts/include_cores.py -s $(fpga1_hls_script_path)
+	@python3 scripts/include_cores.py -s $(fpga2_hls_script_path)
 
-#not used for FPGA 1
-#kfin_adj:
-#	@python3 scripts/kf_link_mod.py
+kfin_adj:
+	@python3 scripts/kf_link_mod.py
 
 xciCreation: $(core_file)
 	make -f $(core_file) -j 8 all
