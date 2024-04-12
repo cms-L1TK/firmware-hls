@@ -462,7 +462,7 @@ public:
     str += "|"+decodeToBits(getZ());
     str += "|"+decodeToBits(getPhi());
     str += "|"+decodeToBits(getBend());
-    if (ASType == DISKPS || ASType == DISK2S) str += "|"+decodeToBits(getNegDisk());
+    str += "|"+decodeToBits(getNegDisk());
     str += "|"+decodeToBits(getIndex());
     str += "|"+decodeToBits(getFinePhi());
     return str;
