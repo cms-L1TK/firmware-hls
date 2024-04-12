@@ -222,6 +222,7 @@ begin
     else
       AS_counter <= 0;
       MTPAR_counter <=0;
+    end if;
       
   end generate gen;
     
