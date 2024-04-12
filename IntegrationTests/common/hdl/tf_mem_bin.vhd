@@ -239,6 +239,7 @@ begin
   if rising_edge(clka) then
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
+      vi_page_cnt := 1;
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
       vi_clk_cnt := vi_clk_cnt+1;

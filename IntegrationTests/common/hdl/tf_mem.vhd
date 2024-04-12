@@ -50,7 +50,6 @@ entity tf_mem is
     addrb     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
-    --nent_o    : out t_arr_meb(0 to NUM_PAGES-1) := (others => (others => '0'))
     nent_o    : out t_arr_7b(0 to NUM_PAGES-1) := (others => (others => '0')) --! entries per page
     );
 end tf_mem;
@@ -119,35 +118,34 @@ process(clka)
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
-    --if DEBUG then
-    if (NUM_PAGES = 2) then
-      report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+    if DEBUG then
+      if (NUM_PAGES = 2) then
+        report "tf_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+      end if;
+      if (NUM_PAGES = 8) then
+        report "tf_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
+      end if;
     end if;
-    if (NUM_PAGES = 8) then
-      report "tm_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
-    end if;
-    --end if;
-    --end if;
     if (sync_nent='1') and vi_clk_cnt=-1 then
-      --report time'image(now)&" tm_mem "&NAME&" sync_nent";      
+      --report time'image(now)&" tf_mem "&NAME&" sync_nent";
       vi_clk_cnt := 0;
-      vi_page_cnt := 0;
+      vi_page_cnt := 1;
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
-      --report time'image(now)&" tm_mem "&NAME&" increment vi_clk_cnt";      
       vi_clk_cnt := vi_clk_cnt+1;
+      --report time'image(now)&" tf_mem "&NAME&" increment vi_clk_cnt:"&integer'image(vi_clk_cnt);
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
-      --report time'image(now)&" tm_mem "&NAME&" goto next page";      
+      --report time'image(now)&" tf_mem "&NAME&" goto next page";
       vi_clk_cnt := 0;
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
-        --report time'image(now)&" tm_mem "&NAME&" increment vi_page_cnt";        
         vi_page_cnt := vi_page_cnt +1;
+        --report time'image(now)&" tf_mem "&NAME&" increment vi_page_cnt:"&integer'image(vi_page_cnt);
       else
-        --report time'image(now)&" tm_mem "&NAME&" resetting vi_page_cnt";      
+        --report time'image(now)&" tf_mem "&NAME&" resetting vi_page_cnt";
         vi_page_cnt := 0;
       end if;
-      --report time'image(now)&" tm_mem "&NAME&" will zero nent";      
+      --report time'image(now)&" tf_mem "&NAME&" will zero nent";
       nent_o(vi_page_cnt) <= (others => '0');
     end if;
     if (wea='1') then
