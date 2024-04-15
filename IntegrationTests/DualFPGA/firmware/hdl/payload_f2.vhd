@@ -46,9 +46,9 @@ architecture rtl of emp_payload is
   
 begin
 
-  gen : for i in n_interfpga_links - 1 downto 0 generate
+  --gen : for i in n_interfpga_links - 1 downto 0 generate
 
-  begin
+  --begin
     --How exactly do these connect to the 1st fpga: 4,5,6,7 to 56,57,58,59 or 59,58,57,56
     --Quad0:  0, 1, 2, 3  Dummy
     --Quad1:  4, 5, 6, 7
@@ -66,36 +66,87 @@ begin
     --Quad13: 52,53,54,55
     --Quad14: 56,57,58,59*
     --Quad15: 60,61,62,63 Dummy
-    if (i<4) then
 
-    elsif (i<44 and i>47) then
+    AS_signals(63 + 0*64 downto 0 + 0*64) <= d(59).data(63 downto 0);
+    AS_signals(63 + 1*64 downto 0 + 1*64) <= d(58).data(63 downto 0);
+    AS_signals(63 + 2*64 downto 0 + 2*64) <= d(57).data(63 downto 0);
+    AS_signals(63 + 3*64 downto 0 + 3*64) <= d(56).data(63 downto 0);
+    AS_signals(63 + 4*64 downto 0 + 4*64) <= d(55).data(63 downto 0);
+    AS_signals(63 + 5*64 downto 0 + 5*64) <= d(54).data(63 downto 0);
+    AS_signals(63 + 6*64 downto 0 + 6*64) <= d(53).data(63 downto 0);
+    AS_signals(63 + 7*64 downto 0 + 7*64) <= d(52).data(63 downto 0);
+    AS_signals(63 + 8*64 downto 0 + 8*64) <= d(51).data(63 downto 0);
+    AS_signals(63 + 9*64 downto 0 + 9*64) <= d(50).data(63 downto 0);
+    AS_signals(63 + 10*64 downto 0 + 10*64) <= d(49).data(63 downto 0);
+    AS_signals(63 + 11*64 downto 0 + 11*64) <= d(48).data(63 downto 0);
+    
+    AS_signals(63 + 12*64 downto 0 + 12*64) <= d(43).data(63 downto 0);
+    AS_signals(63 + 13*64 downto 0 + 13*64) <= d(42).data(63 downto 0);
+    AS_signals(63 + 14*64 downto 0 + 14*64) <= d(41).data(63 downto 0);
+    AS_signals(63 + 15*64 downto 0 + 15*64) <= d(40).data(63 downto 0);
+    AS_signals(63 + 16*64 downto 0 + 16*64) <= d(39).data(63 downto 0);
+    AS_signals(63 + 17*64 downto 0 + 17*64) <= d(38).data(63 downto 0);
+    AS_signals(63 + 18*64 downto 0 + 18*64) <= d(37).data(63 downto 0);
+    AS_signals(63 + 19*64 downto 0 + 19*64) <= d(36).data(63 downto 0);
+    AS_signals(63 + 20*64 downto 0 + 20*64) <= d(35).data(63 downto 0);
+    AS_signals(63 + 21*64 downto 0 + 21*64) <= d(34).data(63 downto 0);
+    AS_signals(63 + 22*64 downto 0 + 22*64) <= d(33).data(63 downto 0);
+    AS_signals(63 + 23*64 downto 0 + 23*64) <= d(32).data(63 downto 0);
+    AS_signals(63 + 24*64 downto 0 + 24*64) <= d(31).data(63 downto 0);
+    AS_signals(63 + 25*64 downto 0 + 25*64) <= d(30).data(63 downto 0);
+    AS_signals(63 + 26*64 downto 0 + 26*64) <= d(29).data(63 downto 0);
 
-    elsif (i>59) then
+    MTPAR_signals(63 + 0*64 downto 0 + 0*64) <= d(28).data(63 downto 0);
+    MTPAR_signals(63 + 1*64 downto 0 + 1*64) <= d(27).data(63 downto 0);
+    MTPAR_signals(63 + 2*64 downto 0 + 2*64) <= d(26).data(63 downto 0);
+    MTPAR_signals(63 + 3*64 downto 0 + 3*64) <= d(25).data(63 downto 0);
+    MTPAR_signals(63 + 4*64 downto 0 + 4*64) <= d(24).data(63 downto 0);
+    MTPAR_signals(63 + 5*64 downto 0 + 5*64) <= d(23).data(63 downto 0);
+    MTPAR_signals(63 + 6*64 downto 0 + 6*64) <= d(22).data(63 downto 0);
+    MTPAR_signals(63 + 7*64 downto 0 + 7*64) <= d(21).data(63 downto 0);
+    MTPAR_signals(63 + 8*64 downto 0 + 8*64) <= d(20).data(63 downto 0);
+    MTPAR_signals(63 + 9*64 downto 0 + 9*64) <= d(19).data(63 downto 0);
+    MTPAR_signals(63 + 10*64 downto 0 + 10*64) <= d(18).data(63 downto 0);
+    MTPAR_signals(63 + 11*64 downto 0 + 11*64) <= d(17).data(63 downto 0);
+    MTPAR_signals(63 + 12*64 downto 0 + 12*64) <= d(16).data(63 downto 0);
+    MTPAR_signals(63 + 13*64 downto 0 + 13*64) <= d(15).data(63 downto 0);
+    MTPAR_signals(63 + 14*64 downto 0 + 14*64) <= d(14).data(63 downto 0);
+    MTPAR_signals(63 + 15*64 downto 0 + 15*64) <= d(13).data(63 downto 0);
+    MTPAR_signals(63 + 16*64 downto 0 + 16*64) <= d(12).data(63 downto 0);
+    MTPAR_signals(63 + 17*64 downto 0 + 17*64) <= d(11).data(63 downto 0);
+    
+    bx_out <= d(10).data(2 downto 0);
+    
+    --if (i<4) then
 
-    elsif (i>28) then
+    --elsif (i<44 and i>47) then
+
+    --elsif (i>59) then
+
+    --elsif (i>28) then
       --9 64-bit channels exactly accomodates 16 of the 36-bit signals, since
       --there are 48 of the 36-bit signals, 27 64-bit channels will perfectly
       --accomodate all of the 36-bit signals
-      AS_signals(63 + AS_counter*64 downto 0 + AS_counter*64) <= d(i).data(63 downto 0);
-      AS_counter <= AS_counter + 1;
+      --AS_signals(63 + AS_counter*64 downto 0 + AS_counter*64) <= d(i).data(63 downto 0);
+      --AS_counter <= AS_counter + 1;
 
-    elsif (i<29 and i>11) then
+    --elsif (i<29 and i>11) then
       --15 75-bit signals can be accomodated by 18 64-bit words, the final
       --64-bit word will only use 37 of the bits
-      MTPAR_signals(63 + MTPAR_counter*64 downto 0 + MTPAR_counter*64) <= d(i).data(63 downto 0);
-      MTPAR_counter <= MTPAR_counter + 1;
+      --MTPAR_signals(63 + MTPAR_counter*64 downto 0 + MTPAR_counter*64) <= d(i).data(63 downto 0);
+      --MTPAR_counter <= MTPAR_counter + 1;
       
-    elsif (i=11) then
-      MTPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38) <= d(i).data(36 downto 0);
+    --elsif (i=11) then
+      --MTPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38) <= d(i).data(36 downto 0);
       
-    elsif (i=10) then
-      bx_out <= d(i).data(2 downto 0);
+    --elsif (i=10) then
+      --bx_out <= d(i).data(2 downto 0);
 
-    else
-      AS_counter <= 0;
-      MTPAR_counter <= 0;
-    end if;
+    --else
+      --AS_counter <= 0;
+      --MTPAR_counter <= 0;
+    --end if;
       
-  end generate gen;
+  --end generate gen;
 
 end rtl;
