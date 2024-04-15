@@ -157,7 +157,7 @@ architecture rtl of emp_payload is
                                                                              AS_L1PHIBn1_stream_V_dout &
                                                                              AS_L1PHIAn1_stream_V_dout;
   
-  signal MTPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0) := MTPAR_L1L2H_stream_V_dout &
+  signal MTPAR_signals : std_logic_vector(75 * 15 - 1 downto 0) := MTPAR_L1L2H_stream_V_dout &
                                                                                 MTPAR_L1L2E_stream_V_dout &
                                                                                 MTPAR_L1L2GI_stream_V_dout &
                                                                                 MTPAR_L1L2DF_stream_V_dout &
@@ -241,7 +241,7 @@ begin
     q(49).data(63 downto 0) <= MTPAR_signals(63 + 14*64 downto 0 + 14*64);
     q(50).data(63 downto 0) <= MTPAR_signals(63 + 15*64 downto 0 + 15*64);
     q(51).data(63 downto 0) <= MTPAR_signals(63 + 16*64 downto 0 + 16*64);
-    q(52).data(63 downto 0) <= MTPAR_signals(63 + 17*64 downto 0 + 17*64);
+    q(52).data(63 downto 0) <= "000000000000000000000000000" & MTPAR_signals(36 + 17*64 downto 0 + 17*64);
     
     q(53).data(2 downto 0) <= bx_out;
     
