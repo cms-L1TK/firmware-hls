@@ -2,19 +2,17 @@
 #define TrackletAlgorithm_TrackBuilder_h
 
 #include "TrackletParameterMemory.h"
-#include "FullMatchMemory.h"
 #include "TrackFitMemory.h"
+#include "TrackBuilder_parameters.h"
 
 static const unsigned short kNBitsTBBuffer = 1;
 static const unsigned short kMinNMatches = 2;
 static const unsigned short kInvalidTrackletID = 0x3FFF;
 
 static const unsigned short kNBitsTCID = FullMatchBase<BARREL>::kFMTCIDSize;
-static const unsigned short kNBitsITC = FullMatchBase<BARREL>::kFMITCSize;
 static const unsigned short kNBitsTrackletID = kNBitsTCID + kNBits_MemAddr;
 
 typedef ap_uint<kNBitsTCID> TCIDType;
-typedef ap_uint<kNBitsITC> ITCType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
 typedef ap_uint<kNBitsTrackletID> TrackletIDType;
 
@@ -33,7 +31,7 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, unsigned TPAROffset>
+template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory trackletParameters[],
@@ -152,11 +150,14 @@ void TrackBuilder(
 
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
-    const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(TPAROffset);
+    const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
-    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
+    const auto mparMem = getMPARMem<Seed>(iTC);
+    const auto mparPage = getMPARPage<Seed>(iTC);
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
+    const auto &tpar = trackletParameters[mparMem].read_mem(bx, trackletIndex, mparPage);
+
+    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
 
     TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
     track.setPhiRegionInner(tpar.getPhiRegion());
@@ -301,7 +302,7 @@ void TrackBuilder(
     }
 
     // Only tracks with at least two matches are valid.
-    track.setTrackValid(!done && (nMatches >= kMinNMatches));
+    track.setTrackValid(!done && (trackletIndex < 32) && (nMatches >= kMinNMatches));
 
     // Output the track word and eight stub words associated with the TrackFit
     // object that was constructed.
