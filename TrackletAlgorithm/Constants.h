@@ -1,7 +1,7 @@
 #ifndef TrackletAlgorithm_Constants_h
 #define TrackletAlgorithm_Constants_h
 
-#include <stdint.h>
+#include <cstdint>
 #include "ap_int.h"
 
 #ifdef CMSSW_GIT_HASH

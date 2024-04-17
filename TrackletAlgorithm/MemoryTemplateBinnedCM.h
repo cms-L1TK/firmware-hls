@@ -150,7 +150,7 @@ class MemoryTemplateBinnedCM{
 	unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
 	//FIXME ugly hack...
-	if (icopy==NCOPY-1) {
+	if (icopy==(signed)(NCOPY-1)) {
 	  nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
 	  if (ibin!=0) {
 	    nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
