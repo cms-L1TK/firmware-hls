@@ -126,8 +126,16 @@ begin
     --if (NUM_PAGES = 2) then
     --  report "tf_mem_tproj "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
     --end if;
-    --if (NUM_PAGES = 8) then
-    --  report "tf_mem_tproj "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
+    --if (NUM_PAGES = 8 and NUM_TPAGES = 4) then
+    --  report "tf_mem_tproj "&time'image(now)&" "&NAME&" nent_0 "
+    --    &to_bstring(nent_o(0))&" "
+    --    &to_bstring(nent_o(1))&" "
+    --    &to_bstring(nent_o(2))&" "
+    --    &to_bstring(nent_o(3))&" "
+    --    &to_bstring(nent_o(4))&" "
+    --    &to_bstring(nent_o(5))&" "
+    --    &to_bstring(nent_o(6))&" "
+    --    &to_bstring(nent_o(7));
     --end if;
     --end if;
     --end if;
@@ -146,6 +154,7 @@ begin
         vi_page_cnt := 0;
       end if;
       mask_o(vi_page_cnt) <= (others => '0');
+      --FIXME is this needed???
       for tpage in 0 to NUM_TPAGES-1 loop
         nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
         nent_o(nentaddress) <= (others => '0');
@@ -158,7 +167,7 @@ begin
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
       address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(4 downto 0);
       if DEBUG then
-        report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress:"&integer'image(nentaddress)&" "&to_bstring(dina);
+        report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
       end if;
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)

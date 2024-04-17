@@ -240,20 +240,22 @@ begin
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
       vi_page_cnt := 1;
+      nentry_mask_tmp <= (others => '0'); -- Why do we need this??? FIXME
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      mask_o(NUM_BINS*(vi_page_cnt+1)-1 downto NUM_BINS*vi_page_cnt) <= (others => '0');
       nentry_mask_tmp <= (others => '0'); -- Why do we need this??? FIXME
-      --report "tf_mem_bin setting nentry_mask_tmp to zero";
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
         vi_page_cnt := vi_page_cnt+1;
       else
         vi_page_cnt := 0;
       end if;
+      mask_o(NUM_BINS*(vi_page_cnt+1)-1 downto NUM_BINS*vi_page_cnt) <= (others => '0');
     end if;
 
     if (wea='1') then
@@ -285,7 +287,10 @@ begin
       nentry_in_bin := std_logic_vector(binaddr+1);
 
       mask_o(page*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
-    
+
+      --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)
+      --  &" "&to_bstring(nentry_in_bin)&" "&to_bstring(addra);
+
       sa_RAM_nent(to_integer(unsigned(phibits)))(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= nentry_in_bin; -- <= address
       if (unsigned(rzbits) /= 0) then
         sa_RAM_nent(to_integer(unsigned(phibits))+NUM_PHI_BINS)(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= nentry_in_bin; -- <= address
@@ -305,6 +310,17 @@ begin
   if rising_edge(clkb) then
     --Reading DRAM so should not be on clock edge ?
     if (enb_nent='1') then
+      --for i in 0 to NUM_PHI_BINS-1 loop
+      --  report "tf_mem_bin read_nent "&NAME&" "&time'image(now)&" "&integer'image(i)&"  : "
+      --  &to_bstring(sa_RAM_nent(i)(8))&" "
+      --  &to_bstring(sa_RAM_nent(i)(9))&" "
+      --  &to_bstring(sa_RAM_nent(i)(10))&" "
+      --  &to_bstring(sa_RAM_nent(i)(11))&" "
+      --  &to_bstring(sa_RAM_nent(i)(12))&" "
+      --  &to_bstring(sa_RAM_nent(i)(13))&" "
+      --  &to_bstring(sa_RAM_nent(i)(14))&" "
+      --  &to_bstring(sa_RAM_nent(i)(15));
+      --end loop;
       for i in 0 to 2*NUM_PHI_BINS-1 loop
         maskaddr:=to_integer(unsigned(addr_nent(3 downto 3)))*64+i*8+to_integer(unsigned(addr_nent(2 downto 0)));
         if (i>=8) then
@@ -317,7 +333,7 @@ begin
 
     for i in 0 to NUM_COPY-1 loop
       if (enb(i)='1') then
-        --report "tf_mem_bin read addrb"&integer'image(i)&" "& NAME & " " & to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))
+        --report "tf_mem_bin read addrb"&integer'image(i)&" "&time'image(now)&" "& NAME & " " & to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))
         --  &" "&to_bstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))));
         sv_RAM_row(i) <= sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))));
       end if;

@@ -75,24 +75,54 @@ assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" seve
 
 process(clk)
   variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');
+  variable addrP1var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP2var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP3var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP4var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable maxval : std_logic_vector(4+2-clogb2(NUM_TPAGES) downto 0) := (others =>'1');
 begin
   if rising_edge(clk) then -- ######################################### Start counter initially
 
 
     if (start='1') then
-      --report "mem_reader:"&NAME&" start  bx="&to_bstring(bx)&" nent="
-      --  &to_bstring(nent(to_integer(unsigned(bx))*NUM_TPAGES))&" "
-      --  &to_bstring(nent(to_integer(unsigned(bx))*NUM_TPAGES+1))&" "
-      --  &to_bstring(nent(to_integer(unsigned(bx))*NUM_TPAGES+2))&" "
-      --  &to_bstring(nent(to_integer(unsigned(bx))*NUM_TPAGES+3))
-      --  ;
+      --if (NUM_TPAGES = 4) then
+      --  report "mem_reader: "&time'image(now)&" "&NAME&" start  bx="&to_bstring(bx)&" nent="
+      --    &to_bstring(nent(0))&" "
+      --    &to_bstring(nent(1))&" "
+      --    &to_bstring(nent(2))&" "
+      --    &to_bstring(nent(3))&" "
+      --    &to_bstring(nent(4))&" "
+      --    &to_bstring(nent(5))&" "
+      --    &to_bstring(nent(6))&" "
+      --    &to_bstring(nent(7))&" "
+      --    &to_bstring(nent(8))&" "
+      --    ;
+      --  end if;
+
+      addrP1var := addrP1;
+      addrP2var := addrP2;
+      addrP3var := addrP3;
+      addrP4var := addrP4;
 
       if (bx /= vi_page_cnt_slv) then
+        --report "mem_reader: "&time'image(now)&" "&NAME&" resetting counters bx = " & to_bstring(bx);
+        --if (NUM_TPAGES = 1) then
+        --  report "mem_reader: "&time'image(now)&" "&NAME&" bx="&to_bstring(bx)&" nent="
+        --    &to_bstring(nent(0))&" "
+        --    &to_bstring(nent(1))&" "
+        --    &to_bstring(nent(2))&" "
+        --    &to_bstring(nent(3))&" "
+        --    &to_bstring(nent(4))&" "
+        --    &to_bstring(nent(5))&" "
+        --    &to_bstring(nent(6))&" "
+        --    &to_bstring(nent(7));
+        --end if;
+
         vi_page_cnt_slv := bx;
-        addrP1 <= (others => '0');
-        addrP2 <= (others => '0');
-        addrP3 <= (others => '0');
-        addrP4 <= (others => '0');
+        addrP1var := (others => '0');
+        addrP2var := (others => '0');
+        addrP3var := (others => '0');
+        addrP4var := (others => '0');
         addr_counter <= (others => '0');
       end if;
 
@@ -106,30 +136,40 @@ begin
       
       valid2 <= valid1;
       
-      if (addrP1 < nent(to_integer(unsigned(bx))*NUM_TPAGES)) then
-        addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1(4 downto 0);
-        addrP1 <= std_logic_vector(to_unsigned(to_integer(unsigned(addrP1)) + 1, addrP1'length));
+      if (addrP1var < nent(to_integer(unsigned(bx))*NUM_TPAGES) and addrP1var < maxval) then
+        if (NUM_TPAGES>1) then
+          addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var(4 downto 0);
+          addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var(4 downto 0);
+        else
+          addr_counter <= addrP1var(6 downto 0);
+          addra <= bx&addrP1var(6 downto 0);
+        end if;
+        addrP1var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP1var)) + 1, addrP1var'length));
         valid1 <= '1'; 
-      elsif ((addrP2 < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (NUM_TPAGES > 1)) then
-        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2(4 downto 0);
-        addrP2 <= std_logic_vector(to_unsigned(to_integer(unsigned(addrP2)) + 1, addrP2'length));
+      elsif ((addrP2var < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (NUM_TPAGES > 1) and addrP2var < maxval) then
+        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var(4 downto 0);
+        addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var(4 downto 0);
+        addrP2var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP2var)) + 1, addrP2var'length));
         valid1 <= '1'; 
-      elsif ((addrP3 < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (NUM_TPAGES > 2)) then
-        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3(4 downto 0);
-        addrP3 <= std_logic_vector(to_unsigned(to_integer(unsigned(addrP3)) + 1, addrP3'length));
+      elsif ((addrP3var < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (NUM_TPAGES > 2) and addrP3var < maxval) then
+        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var(4 downto 0);
+        addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var(4 downto 0);
+        addrP3var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP3var)) + 1, addrP3var'length));
         valid1 <= '1';       
-      elsif ((addrP4 < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (NUM_TPAGES > 3)) then
-        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4(4 downto 0);
-        addrP4 <= std_logic_vector(to_unsigned(to_integer(unsigned(addrP4)) + 1, addrP4'length));
+      elsif ((addrP4var < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (NUM_TPAGES > 3) and addrP4var < maxval) then
+        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var(4 downto 0);
+        addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var(4 downto 0);
+        addrP4var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP4var)) + 1, addrP4var'length));
         valid1 <= '1'; 
       else
         valid1 <= '0';
       end if;
-        
+
+      addrP1 <= addrP1var;
+      addrP2 <= addrP2var;
+      addrP3 <= addrP3var;
+      addrP4 <= addrP4var;
+
       enb <= '1';       
 
       index <= addr_counter2;
@@ -137,7 +177,7 @@ begin
       dout <= din;
 
       --if (valid3='1') then
-      --  report "mem_reader:"&NAME&" addr="&to_bstring(addr_counter2)&"  din="&to_bstring(din)&" valid="&to_bstring(valid3);
+      --  report "mem_reader: "&time'image(now)&" "&NAME&" addr="&to_bstring(addr_counter2)&"  din="&to_bstring(din)&" valid="&to_bstring(valid3);
       --end if;
         
     end if;    
