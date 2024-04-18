@@ -83,6 +83,9 @@ foreach i [lsort -integer [array names modules_to_test]] {
     set module $modules_to_test($i)
     puts "======== TESTING IR_$module ========"
 
+    # set macros for this module in CCFLAG environment variable
+    set ::env(CCFLAG) $::env(CCFLAG_CMSSW)
+
     # run C-simulation for each module in modules_to_test
     set top_func "InputRouterTop_IR_DTC_$module"
     set_top $top_func
