@@ -146,7 +146,7 @@ VMSMER-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig/VMStubMERouterTop_D1PHIA.cc'    
+    CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMStubMERouterTop_D1PHIA.cc'    
 TP-quality-check:
   <<: *template_quality-check
   variables:
