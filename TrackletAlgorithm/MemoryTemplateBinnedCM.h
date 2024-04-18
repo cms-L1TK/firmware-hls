@@ -133,32 +133,34 @@ class MemoryTemplateBinnedCM{
   }
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
+#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
 #pragma HLS inline
     if (isCMSSW && !NBIT_BX) {ibx = 0;}
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
+      ap_uint<kNBitsRZBinCM> ibin;
+      ap_uint<kNBitsphibinCM> ireg;
+      (ireg,ibin)=slot;
+      unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+      if (ibin!=0) {
+      	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+      }
+      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
+      binmask8_[ibx][ibin].set_bit(ireg,true);
+
       //icopy comparison must be signed int or future SW fails
       writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
-#ifdef __SYNTHESIS__
-        dataarray_[icopy][ibx][getNEntryPerBin()*slot] = data;
-#else
-	ap_uint<kNBitsRZBinCM> ibin;
-	ap_uint<kNBitsphibinCM> ireg;
-	(ireg,ibin)=slot;
-	unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
-	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
+	//#if defined __SYNTHESIS__ && !defined CSYNTH
+        //dataarray_[icopy][ibx][getNEntryPerBin()*slot] = data;
+	//#else
 	//FIXME ugly hack...
-	if (icopy==(signed)(NCOPY-1)) {
-	  nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-	  if (ibin!=0) {
-	    nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
-	  }
-	  nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
-	  binmask8_[ibx][ibin].set_bit(ireg,true);
-	}
-#endif      
+	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
+	//#endif      
       }
 
       #ifdef CMSSW_GIT_HASH

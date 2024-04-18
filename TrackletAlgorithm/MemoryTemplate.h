@@ -105,9 +105,11 @@ public:
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
-#ifdef __SYNTHESIS__
+      //dataarray_[ibx][addr_index] = data;
+#if defined __SYNTHESIS__ && !defined CSYNTH
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][0] = data;
+      //dataarray_[ibx][0] = data;
+      dataarray_[ibx][nentries_[ibx]++] = data;
 #else
       dataarray_[ibx][nentries_[ibx]++] = data;
 #endif
