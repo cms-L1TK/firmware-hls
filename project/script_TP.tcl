@@ -40,7 +40,7 @@ foreach i $modules_to_test {
   set top_func [join [list "TrackletProcessor_" $seed $iTC] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"SEED_=" $seed "_\" -D \"ITC_=" $iTC "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
+  set ::env(CCFLAG) [join [list $::env(CCFLAG_CMSSW) " -D \"SEED_=" $seed "_\" -D \"ITC_=" $iTC "_\" -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
 
   # run C-simulation for each module in modules_to_test
   set_top $top_func
