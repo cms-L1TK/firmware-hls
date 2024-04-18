@@ -8,8 +8,8 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ VMStubMERouterTop_D1PHIA
-  #define HEADER_FILE_ "VMStubMERouterTop_D1PHIA.h"
+  #define TOP_FUNC_ VMStubMERouterTop_L1PHIA
+  #define HEADER_FILE_ "VMStubMERouterTop_L1PHIA.h"
 #endif
 
 #include HEADER_FILE_
