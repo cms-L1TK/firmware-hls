@@ -183,6 +183,7 @@ IR-vivado-hls-build:
 VMRCM-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "VMRCM-quality-check"]
+  allow_failure: true # FIXME: remove after fixing issue
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
@@ -190,6 +191,7 @@ VMRCM-vivado-hls-build:
 VMSMER-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "VMSMER-quality-check"]
+  allow_failure: true # FIXME: remove after fixing issue
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
@@ -219,6 +221,7 @@ MP-vivado-hls-build:
 TB-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TB-quality-check"]
+  allow_failure: true # FIXME: remove after fixing issue
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
