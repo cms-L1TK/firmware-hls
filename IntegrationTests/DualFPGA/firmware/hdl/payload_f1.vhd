@@ -73,7 +73,7 @@ begin
   -----------------------------------------------------------------------------
   -- Sector Processor (and InterFPGA link formatter?)
   -----------------------------------------------------------------------------
-  tf_wrapper_1 : entity work.tf_wrapper
+  tf1_wrapper_1 : entity work.tf1_wrapper
     port map (
       clk                      => clk_p,
       reset                    => rst,

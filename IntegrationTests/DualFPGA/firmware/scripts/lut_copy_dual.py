@@ -4,7 +4,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Add pre synth instructions.")
 
 # Optional arguments
-parser.add_argument("-s", "--pre_synth_file", dest="preSynthPath", help="pre-synth file", type=str, default="../../../emp-fwk/components/info/firmware/cfg/set_generics_presynth.tcl")
+parser.add_argument("-s", "--pre_synth_file", dest="preSynthPath", help="pre-synth file", type=str, default="../../../../emp-fwk/components/info/firmware/cfg/set_generics_presynth.tcl")
 
 # Parse arguments
 args = parser.parse_args()

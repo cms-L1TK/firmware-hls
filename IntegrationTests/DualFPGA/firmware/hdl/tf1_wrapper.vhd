@@ -37,9 +37,9 @@ entity tf_wrapper is
     DL_39_link_empty_neg     : in  t_arr_DL_39_1b;
     DL_39_link_read          : out t_arr_DL_39_1b
     );
-end entity tf_wrapper;
+end entity tf1_wrapper;
 
-architecture rtl of tf_wrapper is
+architecture rtl of tf1_wrapper is
 
 begin  -- architecture rtl
 
