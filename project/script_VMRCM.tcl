@@ -61,15 +61,7 @@ set modules_to_test {
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export VMRCM_L2PHIA
 
-# create new project (deleting any existing one of same name)
-open_project -reset vmrouterCM
-
-# source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
-add_files -tb ../TestBenches/VMRouterCM_test.cpp -cflags "$CFLAGS"
-
-# data files
-add_files -tb ../emData/VMRCM/
 
 foreach i $modules_to_test {
 
@@ -80,7 +72,16 @@ foreach i $modules_to_test {
   set header_file [join [list "\\\"" $top_func ".h\\\""] ""]
 
   # set macros for this module in CCFLAG environment variable
-  set ::env(CCFLAG) [join [list $::env(CCFLAG) " -D \"TOP_FUNC_=" $top_func "\" -D \"HEADER_FILE_=" $header_file "\""] ""]
+  set ::env(CCFLAG) [join [list $::env(CCFLAG_CMSSW) " -D \"TOP_FUNC_=" $top_func "\" -D \"HEADER_FILE_=" $header_file "\""] ""]
+
+  # create new project (deleting any existing one of same name)
+  open_project -reset vmrouterCM_$region
+
+  # source files
+  add_files -tb ../TestBenches/VMRouterCM_test.cpp -cflags "$CFLAGS"
+
+  # data files
+  add_files -tb ../emData/VMRCM/
 
   # run C-simulation for each module in modules_to_test
   add_files ../TopFunctions/CombinedConfig/$top_func.cc -cflags "$CFLAGS"
