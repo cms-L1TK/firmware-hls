@@ -156,6 +156,12 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr,4> TrackletParameterMemory;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr, 4> TrackletParameterMemory;
+
+// Memory definitions for various numbers of pages
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr, 1> TrackletParameterMemory1;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr, 2> TrackletParameterMemory2;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr, 3> TrackletParameterMemory3;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr, 4> TrackletParameterMemory4;
 
 #endif
