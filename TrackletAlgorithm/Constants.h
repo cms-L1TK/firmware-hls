@@ -338,6 +338,8 @@ constexpr int projectionDisks[8][4] = { {TF::D1, TF::D2, TF::D3, TF::D4},
 // Global BX type
 typedef ap_uint<kNBits_BX> BXType;  // temporary definition. need to be revisited
 
+// Memory index type
+typedef ap_uint<kNBits_MemAddr> IndexType;
 
 // FPGA constants
 constexpr unsigned kBRAMwidth = 36;
