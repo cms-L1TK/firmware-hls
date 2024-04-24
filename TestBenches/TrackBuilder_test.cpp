@@ -103,10 +103,17 @@ int main()
   // open input files
   cout << "Open files..." << endl;
 
+  const string tpar1_query = "TrackletParameters_MPAR_?????_*";
+  const string tpar2_query = "TrackletParameters_MPAR_??????_*";
+  const string tpar3_query = "TrackletParameters_MPAR_???????_*";
+  const string tpar4_query = "TrackletParameters_MPAR_????????_*";
   const string barrelFM_query = "FullMatches_FM_*_L*";
   const string diskFM_query = "FullMatches_FM_*_D*";
 
-  auto &fin_tpar = tb.files("TrackletParameters*");
+  auto &fin_tpar1 = tb.files(tpar1_query);
+  auto &fin_tpar2 = tb.files(tpar2_query);
+  auto &fin_tpar3 = tb.files(tpar3_query);
+  auto &fin_tpar4 = tb.files(tpar4_query);
   auto &fin_barrelFM = tb.files(barrelFM_query);
   auto &fin_diskFM = tb.files(diskFM_query);
 
@@ -116,10 +123,16 @@ int main()
 
   ///////////////////////////
   // input memories
-  const auto nTParMems = fin_tpar.size();
+  const auto nTPar1Mems = fin_tpar1.size();
+  const auto nTPar2Mems = fin_tpar2.size();
+  const auto nTPar3Mems = fin_tpar3.size();
+  const auto nTPar4Mems = fin_tpar4.size();
   const auto nFMBarrelMems = fin_barrelFM.size();
   const auto nFMDiskMems = fin_diskFM.size();
-  vector<TrackletParameterMemory> trackletParameters(nTParMems);
+  vector<TrackletParameterMemory1> trackletParameters1(nTPar1Mems);
+  vector<TrackletParameterMemory2> trackletParameters2(nTPar2Mems);
+  vector<TrackletParameterMemory3> trackletParameters3(nTPar3Mems);
+  vector<TrackletParameterMemory4> trackletParameters4(nTPar4Mems);
   vector<FullMatchMemory<BARREL>> barrelFullMatches(nFMBarrelMems);
   vector<FullMatchMemory<DISK>> diskFullMatches(nFMDiskMems);
 
@@ -146,8 +159,14 @@ int main()
     tracksMem.clear();
 
     // read event and write to memories
-    for (unsigned i = 0; i < nTParMems; i++)
-      writeMemFromFile<TrackletParameterMemory>(trackletParameters[i], fin_tpar.at(i), ievt);
+    for (unsigned i = 0; i < nTPar1Mems; i++)
+      writeMemFromFile<TrackletParameterMemory1>(trackletParameters1[i], fin_tpar1.at(i), ievt);
+    for (unsigned i = 0; i < nTPar2Mems; i++)
+      writeMemFromFile<TrackletParameterMemory2>(trackletParameters2[i], fin_tpar2.at(i), ievt);
+    for (unsigned i = 0; i < nTPar3Mems; i++)
+      writeMemFromFile<TrackletParameterMemory3>(trackletParameters3[i], fin_tpar3.at(i), ievt);
+    for (unsigned i = 0; i < nTPar4Mems; i++)
+      writeMemFromFile<TrackletParameterMemory4>(trackletParameters4[i], fin_tpar4.at(i), ievt);
     for (unsigned i = 0; i < nFMBarrelMems; i++)
       writeMemFromFile<FullMatchMemory<BARREL> >(barrelFullMatches[i], fin_barrelFM.at(i), ievt);
     for (unsigned i = 0; i < nFMDiskMems; i++)
@@ -160,7 +179,10 @@ int main()
 
     // Unit Under Test
     TOP_FUNC_(bx,
-      trackletParameters.data(),
+      trackletParameters1.data(),
+      trackletParameters2.data(),
+      trackletParameters3.data(),
+      trackletParameters4.data(),
       barrelFullMatches.data(),
       diskFullMatches.data(),
       bx_o,
