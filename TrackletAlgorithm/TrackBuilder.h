@@ -16,6 +16,18 @@ typedef ap_uint<kNBitsTCID> TCIDType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
 typedef ap_uint<kNBitsTrackletID> TrackletIDType;
 
+template<int NBarrelStubs, int NDiskStubs> void
+setTrackPars(TrackFit<NBarrelStubs, NDiskStubs> &track, const TrackletParameters &tpar)
+{
+  track.setPhiRegionInner(tpar.getPhiRegion());
+  track.setStubIndexInner(tpar.getStubIndexInner());
+  track.setStubIndexOuter(tpar.getStubIndexOuter());
+  track.setRinv(tpar.getRinv());
+  track.setPhi0(tpar.getPhi0());
+  track.setZ0(tpar.getZ0());
+  track.setT(tpar.getT());
+}
+
 // Function to retrieve a full match and store the associated index and
 // tracklet ID in one element of a circular buffer.
 template<regionType RegionType> void
@@ -31,10 +43,13 @@ getFM(const BXType bx, const FullMatchMemory<RegionType> &fullMatches, const uns
 }
 
 // TrackBuilder top template function
-template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs>
+template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, int TPARMask>
 void TrackBuilder(
     const BXType bx,
-    const TrackletParameterMemory trackletParameters[],
+    const TrackletParameterMemory1 trackletParameters1[],
+    const TrackletParameterMemory2 trackletParameters2[],
+    const TrackletParameterMemory3 trackletParameters3[],
+    const TrackletParameterMemory4 trackletParameters4[],
     const FullMatchMemory<BARREL> barrelFullMatches[],
     const FullMatchMemory<DISK> diskFullMatches[],
     BXType &bx_o,
@@ -88,7 +103,7 @@ void TrackBuilder(
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
-#pragma HLS latency min=5 max=5
+#pragma HLS latency min=10 max=10
 
     const ap_uint<1> empty = (i == 0);
     TrackletIDType min_id = kInvalidTrackletID;
@@ -152,22 +167,30 @@ void TrackBuilder(
     // with the minimum tracklet ID.
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
+    const auto mparNPages = getMPARNPages<Seed>(iTC);
     const auto mparMem = getMPARMem<Seed>(iTC);
     const auto mparPage = getMPARPage<Seed>(iTC);
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const auto &tpar = trackletParameters[mparMem].read_mem(bx, trackletIndex, mparPage);
-
     const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
 
     TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
-    track.setPhiRegionInner(tpar.getPhiRegion());
     track.setPhiRegionOuter(phiRegionOuter);
-    track.setStubIndexInner(tpar.getStubIndexInner());
-    track.setStubIndexOuter(tpar.getStubIndexOuter());
-    track.setRinv(tpar.getRinv());
-    track.setPhi0(tpar.getPhi0());
-    track.setZ0(tpar.getZ0());
-    track.setT(tpar.getT());
+    if ((TPARMask & 0x1) && mparNPages == 1) {
+      const auto &tpar = trackletParameters1[mparMem].read_mem(bx, trackletIndex);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
+    else if ((TPARMask & 0x2) && mparNPages == 2) {
+      const auto &tpar = trackletParameters2[mparMem].read_mem(bx, trackletIndex, mparPage);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
+    else if ((TPARMask & 0x4) && mparNPages == 3) {
+      const auto &tpar = trackletParameters3[mparMem].read_mem(bx, trackletIndex, mparPage);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
+    else if ((TPARMask & 0x8) && mparNPages == 4) {
+      const auto &tpar = trackletParameters4[mparMem].read_mem(bx, trackletIndex, mparPage);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
 
     // Retrieve the full information for each full match that has the minimum
     // tracklet ID and assign it to the appropriate field of the TrackFit
@@ -302,7 +325,7 @@ void TrackBuilder(
     }
 
     // Only tracks with at least two matches are valid.
-    track.setTrackValid(!done && (trackletIndex < 32) && (nMatches >= kMinNMatches));
+    track.setTrackValid(!done && (nMatches >= kMinNMatches));
 
     // Output the track word and eight stub words associated with the TrackFit
     // object that was constructed.
@@ -310,32 +333,32 @@ void TrackBuilder(
     barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
-          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<0>();
+          barrelStubWords[0][nTracks] = track.template getBarrelStubWord<0>();
           break;
         case 1:
-          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<1>();
+          barrelStubWords[1][nTracks] = track.template getBarrelStubWord<1>();
           break;
         case 2:
-          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<2>();
+          barrelStubWords[2][nTracks] = track.template getBarrelStubWord<2>();
           break;
         case 3:
-          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<3>();
+          barrelStubWords[3][nTracks] = track.template getBarrelStubWord<3>();
           break;
       }
     }
     disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
-          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs>();
+          diskStubWords[0][nTracks] = track.template getDiskStubWord<NBarrelStubs>();
           break;
         case 1:
-          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 1>();
+          diskStubWords[1][nTracks] = track.template getDiskStubWord<NBarrelStubs + 1>();
           break;
         case 2:
-          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 2>();
+          diskStubWords[2][nTracks] = track.template getDiskStubWord<NBarrelStubs + 2>();
           break;
         case 3:
-          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 3>();
+          diskStubWords[3][nTracks] = track.template getDiskStubWord<NBarrelStubs + 3>();
           break;
       }
     }
