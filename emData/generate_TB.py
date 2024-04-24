@@ -7,6 +7,42 @@ from __future__ import absolute_import
 import os
 import re
 import argparse
+from enum import Enum
+
+class ITC(Enum):
+    A = 0
+    B = 1
+    C = 2
+    D = 3
+    E = 4
+    F = 5
+    G = 6
+    H = 7
+    I = 8
+    J = 9
+    K = 10
+    L = 11
+    M = 12
+    N = 13
+    O = 14
+    P = 15
+    Q = 16
+    R = 17
+    S = 18
+    T = 19
+    U = 20
+    V = 21
+    W = 22
+    X = 23
+    Y = 24
+    Z = 25
+
+memNameLength = [
+    len("MPAR_L1L2X"),    # one page
+    len("MPAR_L1L2XX"),   # two pages
+    len("MPAR_L1L2XXX"),  # three pages
+    len("MPAR_L1L2XXXX"), # four pages
+]
 
 parser = argparse.ArgumentParser(description="This script generates TrackBuilderTop.h and TrackBuilderTop.cc in the\
 TopFunctions/ directory.",
@@ -86,6 +122,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         "template<TF::seed Seed> constexpr int getNumDiskFMMemPerStub();\n"
         "template<TF::seed Seed> constexpr int getNumBarrelStub();\n"
         "template<TF::seed Seed> constexpr int getNumDiskStub();\n"
+        "template<unsigned Seed> int getMPARNPages(const ITCType &);\n"
         "template<unsigned Seed> int getMPARMem(const ITCType &);\n"
         "template<unsigned Seed> int getMPARPage(const ITCType &);\n"
     )
@@ -112,7 +149,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             seedNumber = 7
 
         # numbers of memories
-        nTPARMem = len(tparMems[tbName])
+        nTPARMem = []
+        for i in range(0, 4):
+          nTPARMem.append(len([tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i]]))
         nBarrelFMMem = len(barrelFMMems[tbName])
         nDiskFMMem = len(diskFMMems[tbName])
 
@@ -128,56 +167,79 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         nBarrelFMMemPerStub = int(len(barrelFMs) / (nBarrelStubs - 1)) if nBarrelStubs > 1 else 0
         nDiskFMMemPerStub = int(nDiskFMMem / nDiskStubs) if nDiskStubs > 0 else 0
 
+        # mask for enabling/disabling arrays of TPAR memories
+        tparMask = 0
+        for i in range(0, 4):
+          if nTPARMem[i] > 0:
+            tparMask = tparMask | (1 << i)
+
+        # definition of getMPARNPages function
+        nParentheses = 0
+        first = True
+        maxNPages = max([len(tpar) - len("MPAR_L1L2") for tpar in tparMems[tbName]])
+        getMPARNPages = "template<> int\n"
+        getMPARNPages += "getMPARNPages<TF::" + seed + ">(const ITCType &iTC) {\n"
+        getMPARNPages += "  return "
+        for i in range(1, maxNPages):
+          if nTPARMem[i - 1] == 0:
+            continue
+          if not first:
+            getMPARNPages += "(\n         "
+            nParentheses += 1
+          mems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i - 1]]
+          pages = "".join([tpar[9:] for tpar in mems])
+          pages = [ITC[page].value for page in pages]
+          getMPARNPages += "(iTC == " + str(pages[0])
+          for page in pages[1:]:
+            getMPARNPages += " || iTC == " + str(page)
+          getMPARNPages += ") ? " + str(i) + " : "
+          first = False
+        getMPARNPages += str(maxNPages)
+        for i in range(0, nParentheses):
+          getMPARNPages += ")"
+        getMPARNPages += ";\n}\n"
+
         # definition of getMPARMem function
         nParentheses = 0
-        iTC = 0
         getMPARMem = "template<> int\n"
         getMPARMem += "getMPARMem<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARMem += "  return "
-        for i in range(0, nTPARMem - 1):
+        for i in range(0, max(nTPARMem) - 1):
           if i != 0:
             getMPARMem += "(\n         "
             nParentheses += 1
-          getMPARMem += "(iTC == " + str(iTC)
-          iTC += 1
-          for j in range(0, len(tparMems[tbName][i]) - len("MPAR_L1L2X")):
-            getMPARMem += " || iTC == " + str(iTC)
-            iTC += 1
+          mems = []
+          for j in range(0, 4):
+            allMems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[j]]
+            if len(allMems) > i:
+              mems.append(allMems[i])
+          pages = "".join([tpar[9:] for tpar in mems])
+          pages = [ITC[page].value for page in pages]
+          getMPARMem += "(iTC == " + str(pages[0])
+          for page in pages[1:]:
+            getMPARMem += " || iTC == " + str(page)
           getMPARMem += ") ? " + str(i) + " : "
-        getMPARMem += str(nTPARMem - 1)
+        getMPARMem += str(max(nTPARMem) - 1)
         for i in range(0, nParentheses):
           getMPARMem += ")"
         getMPARMem += ";\n}\n"
-
-        # calculate which iTC numbers belong to each possible page in the MPAR
-        # memories
-        iTC = 0
-        lastPage = 0
-        pages = {0: [], 1: [], 2: [], 3: [], 4: []}
-        for i in range(0, nTPARMem):
-          page = 0
-          for j in range(0, len(tparMems[tbName][i]) - len("MPAR_L1L2")):
-            pages[page].append(iTC)
-            lastPage = page
-            page += 1
-            iTC += 1
 
         # definition of getMPARPage function
         nParentheses = 0
         getMPARPage = "template<> int\n"
         getMPARPage += "getMPARPage<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARPage += "  return "
-        for page in pages:
-          if page == lastPage:
-            break
-          if page != 0:
+        for i in range(0, maxNPages - 1):
+          if i != 0:
             getMPARPage += "(\n         "
             nParentheses += 1
-          getMPARPage += "(iTC == " + str(pages[page][0])
-          for i in range(1, len(pages[page])):
-            getMPARPage += " || iTC == " + str(pages[page][i])
-          getMPARPage += ") ? " + str(page) + " : "
-        getMPARPage += str(lastPage)
+          pages = "".join([tpar[9 + i] for tpar in tparMems[tbName] if len(tpar) > 9 + i])
+          pages = [ITC[page].value for page in pages]
+          getMPARPage += "(iTC == " + str(pages[0])
+          for page in pages[1:]:
+            getMPARPage += " || iTC == " + str(page)
+          getMPARPage += ") ? " + str(i) + " : "
+        getMPARPage += str(maxNPages - 1)
         for i in range(0, nParentheses):
           getMPARPage += ")"
         getMPARPage += ";\n}\n"
@@ -187,7 +249,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "\n"
             "void TrackBuilder_" + seed + "(\n"
             "    const BXType bx,\n"
-            "    const TrackletParameterMemory trackletParameters[],\n"
+            "    const TrackletParameterMemory1 trackletParameters1[],\n"
+            "    const TrackletParameterMemory2 trackletParameters2[],\n"
+            "    const TrackletParameterMemory3 trackletParameters3[],\n"
+            "    const TrackletParameterMemory4 trackletParameters4[],\n"
             "    const FullMatchMemory<BARREL> barrelFullMatches[],\n"
             "    const FullMatchMemory<DISK> diskFullMatches[],\n"
             "    BXType &bx_o,\n"
@@ -203,7 +268,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "\n"
              "\n////////////////\n// " + seed + " //\n////////////////\n"
              "template<> constexpr int getNumTParMem<TF::" + seed + ">(){ // Number of input tpar mem\n"
-                "  return " + str(nTPARMem) + ";\n"
+                "  return " + str(sum(nTPARMem)) + ";\n"
              "}\n"
              "template<> constexpr int getNumBarrelFMMem<TF::" + seed + ">(){ \n"
                 "  return " + str(nBarrelFMMem) + ";\n"
@@ -226,6 +291,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
              "template<> constexpr int getNumDiskStub<TF::" + seed + ">(){ \n"
                 "  return " + str(nDiskStubs) + ";\n"
              "}\n"+
+             getMPARNPages+
              getMPARMem+
              getMPARPage
         )
@@ -235,7 +301,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "\n"
             "void TrackBuilder_" + seed + "(\n"
             "    const BXType bx,\n"
-            "    const TrackletParameterMemory trackletParameters[" + str(nTPARMem) + "],\n"
+            "    const TrackletParameterMemory1 trackletParameters1[" + str(nTPARMem[0]) + "],\n"
+            "    const TrackletParameterMemory2 trackletParameters2[" + str(nTPARMem[1]) + "],\n"
+            "    const TrackletParameterMemory3 trackletParameters3[" + str(nTPARMem[2]) + "],\n"
+            "    const TrackletParameterMemory4 trackletParameters4[" + str(nTPARMem[3]) + "],\n"
             "    const FullMatchMemory<BARREL> barrelFullMatches[" + str(nBarrelFMMem) + "],\n"
             "    const FullMatchMemory<DISK> diskFullMatches[" + str(nDiskFMMem) + "],\n"
             "    BXType &bx_o,\n"
@@ -245,12 +314,16 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    bool &done\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
-            "#pragma HLS array_partition variable=trackletParameters complete dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters1 complete dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters2 complete dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters3 complete dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters4 complete dim=1\n"
             "#pragma HLS array_partition variable=barrelFullMatches complete dim=1\n"
             "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
         )
-        for i in range(0, nTPARMem):
-            topFile.write("#pragma HLS resource variable=trackletParameters[" + str(i) + "].get_mem() latency=2\n")
+        for i in range(0, 4):
+          for j in range(0, nTPARMem[i]):
+              topFile.write("#pragma HLS resource variable=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
         for i in range(0, nBarrelFMMem):
             topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
         for i in range(0, nDiskFMMem):
@@ -264,9 +337,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "#pragma HLS interface register port=done\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
             "    bx,\n"
-            "    trackletParameters,\n"
+            "    trackletParameters1,\n"
+            "    trackletParameters2,\n"
+            "    trackletParameters3,\n"
+            "    trackletParameters4,\n"
             "    barrelFullMatches,\n"
             "    diskFullMatches,\n"
             "    bx_o,\n"
