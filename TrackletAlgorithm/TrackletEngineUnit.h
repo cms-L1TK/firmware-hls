@@ -54,8 +54,8 @@ class TrackletEngineUnit {
 
 /////  Grabs the appropriate lut based on seed and iTC
 
-    const ap_uint<1>* stubptinnertmp = getPTInnerLUT<Seed,iTC>();
-    const ap_uint<1>* stubptoutertmp = getPTOuterLUT<Seed,iTC>();
+   const ap_uint<1>* stubptinnertmp = TC::getPTInnerLUT<Seed,iTC>();
+   const ap_uint<1>* stubptoutertmp = TC::getPTOuterLUT<Seed,iTC>();
     if ( Seed <= TF::L5L6 ){
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll

@@ -185,7 +185,6 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
   bool disk2S = false; // Used to determine if DISK2S
   bool negDisk = false; // Used to determine if it's negative disk
 	
-  AllStub<InType>       stub = allStub; // read stubs, and if disk cast from DISK to DISKPS/2S
   AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw());
   AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allStub.raw());
   AllStub<OutType>      stub_copy = AllStub<OutType>(allStub.raw());
@@ -219,13 +218,10 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
   // Create the ME stub to save
 
   if (valid) {
-    //VMStubMECM<OutType> stubME = (disk2S) ? 
-    //  createVMStubME<VMStubMECM<OutType>, DISK2S, Layer, Disk>(stubDisk2S, index, negDisk,METable, phiCorrTable, slotME) :
-    //  createVMStubME<VMStubMECM<OutType>, InType, Layer, Disk>(stub, index, negDisk, METable, phiCorrTable, slotME);
     VMStubMECM<OutType> stubME = (disk2S) ? 
       createVMStubME<VMStubMECM<OutType>, DISK2S, Layer, Disk>(stub_2s, index, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
       createVMStubME<VMStubMECM<OutType>, DISKPS, Layer, Disk>(stub_ps, index, negDisk, METable, phiCorrTable, slotME) : 
-      createVMStubME<VMStubMECM<OutType>, InType, Layer, Disk>(stub, index, negDisk, METable, phiCorrTable, slotME);
+      createVMStubME<VMStubMECM<OutType>, InType, Layer, Disk>(allStub, index, negDisk, METable, phiCorrTable, slotME);
     
     // Write the ME stub
     memoryME->write_mem(bx, slotME, stubME, 0);

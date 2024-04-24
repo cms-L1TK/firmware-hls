@@ -297,7 +297,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
+          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[TC::nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
           "    const AllStubMemory<OuterRegion<TF::" + str(seed) + ">()>* outerStubs,\n"
           "    const VMStubTEOuterMemoryCM<OuterRegion<TF::" + str(seed) + ">(), kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[TF::"+seed[2:]+"]>* outerVMStubs,\n"
           "    TrackletParameterMemory * trackletParameters,\n"
@@ -313,7 +313,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
+          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[TC::nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
           "    const AllStubMemory<OuterRegion<TF::" + str(seed) + ">()>* outerStubs ,\n"
           "    const VMStubTEOuterMemoryCM<OuterRegion<TF::" + str(seed) + ">(), kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[TF::"+ seed[2:] +"]>* outerVMStubs,\n"
           "    TrackletParameterMemory * trackletParameters,\n"
@@ -333,13 +333,13 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
           "\n"
-          "static const ap_uint<10>* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
+          "static const ap_uint<10>* lut = TC::getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
           "  TC::" + iTC + ",\n"
           "  kNTEUnitsLayerDisk[TF::" +  seed[2:]+ "],\n"
-          "  nASMemInner<TF::"+seed+",TC::"+iTC+">(),\n"
+          "  TC::nASMemInner<TF::"+seed+",TC::"+iTC+">(),\n"
           " 108>(\n"
           "    bx,\n"
           "    bx_o,\n"
@@ -357,7 +357,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   
   # Print out endifs and close files.
   parametersFile.write(
-      "\n"
+      "}\n"
       "#endif\n"
   )
   topHeaderFile.write(
