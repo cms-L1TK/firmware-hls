@@ -3,7 +3,7 @@ src payload_f1.vhd
 src linktosecproc.vhd
 src --vhdl2008 SectorProcessor.vhd
 #src common/hdl/emp/pkgs/tf_interface_pkg.vhd
-src tf_wrapper.vhd
+src tf1_wrapper.vhd
 src memUtil_pkg.vhd
 src memUtil_aux_pkg_f1.vhd
 src common/hdl/emp/pkgs/GCU_utils.vhd

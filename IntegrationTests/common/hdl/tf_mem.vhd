@@ -119,14 +119,14 @@ process(clka)
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
-    --if DEBUG then
-    if (NUM_PAGES = 2) then
-      report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+    if DEBUG then
+      if (NUM_PAGES = 2) then
+        report "tm_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+      end if;
+      if (NUM_PAGES = 8) then
+        report "tm_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
+      end if;
     end if;
-    if (NUM_PAGES = 8) then
-      report "tm_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
-    end if;
-    --end if;
     --end if;
     if (sync_nent='1') and vi_clk_cnt=-1 then
       --report time'image(now)&" tm_mem "&NAME&" sync_nent";      

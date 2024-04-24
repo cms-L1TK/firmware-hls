@@ -20,5 +20,5 @@ if (last_line != "# LUTs added"):
     with open(args.preSynthPath, "a") as presynth_file:
         presynth_file.write("\n# Copy LUTs to xsim or synth_1 directory")
         presynth_file.write("\nfile delete -force ./LUTs")
-        presynth_file.write("\nfile copy -force ../../../src/firmware-hls/emData/LUTsCM ./LUTs")
+        presynth_file.write("\nfile copy -force ../../../../../src/firmware-hls/emData/LUTsCM ./LUTs")
         presynth_file.write("\n# LUTs added")

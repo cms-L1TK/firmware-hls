@@ -13,7 +13,7 @@ entity linktosecproc2 is
   port(
     clk               : in std_logic;
     rst               : in std_logic;
-    d                 : in ldata(4 * N_REGION - 1 downto 0)
+    d                 : in ldata(4 * N_REGION - 1 downto 0);
     AS_36_link_data   : out t_arr_AS_36_37b;
     MPAR_73_link_data : out t_arr_MTPAR_73_76b;
     bx_link_data      : out std_logic_vector(2 downto 0)
@@ -146,11 +146,11 @@ begin
   AS_36_link_data(D5PHIDn1) <= AS_signals(1775 downto 1739);
 
   MPAR_73_link_data(L1L2ABC)  <= MTPAR_signals(75 downto 0);
-  MPAR_73_link_data(L1L2DF)   <= MTPAR_signals(151 downto 76);
-  MPAR_73_link_data(L1L2E)    <= MTPAR_signals(227 downto 152);
-  MPAR_73_link_data(L1L2GI)   <= MTPAR_signals(303 downto 228);
-  MPAR_73_link_data(L1L2H)    <= MTPAR_signals(379 downto 304);
-  MPAR_73_link_data(L1L2JLK)  <= MTPAR_signals(455 downto 380);
+  MPAR_73_link_data(L1L2DE)   <= MTPAR_signals(151 downto 76);
+  MPAR_73_link_data(L1L2F)    <= MTPAR_signals(227 downto 152);
+  MPAR_73_link_data(L1L2G)    <= MTPAR_signals(303 downto 228);
+  MPAR_73_link_data(L1L2HI)   <= MTPAR_signals(379 downto 304);
+  MPAR_73_link_data(L1L2JKL)  <= MTPAR_signals(455 downto 380);
   MPAR_73_link_data(L2L3ABCD) <= MTPAR_signals(531 downto 456);
   MPAR_73_link_data(L3L4AB)   <= MTPAR_signals(607 downto 532);
   MPAR_73_link_data(L3L4CD)   <= MTPAR_signals(683 downto 608);

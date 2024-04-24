@@ -24,7 +24,7 @@ use ieee.std_logic_1164.all;
 
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
-use work.memUtil_aux_pkg.all;
+use work.memUtil_aux_pkg_f2.all;
 use work.tf_interface_pkg.all;
 
 use work.hybrid_data_types.all;
@@ -61,39 +61,41 @@ architecture rtl of tf_to_kf is
   --10 indicates barrel, 11 disk, 0X invalid        
   constant disk_stub_valid : t_arr_seed_arr_stub_1b := (('1','1','1','1'), --L1L2
                                                         ('1','1','1','1'), --L2L3
-						        ('1','1','0','0'), --L3L4
-						        ('0','0','0','0'), --L5L6
-						        ('1','1','1','0'), --D1D2
-						        ('1','1','1','0'), --D3D4
-						        ('1','1','1','1'), --L1D1
-						        ('1','1','1','0')  --L2D1
+                                                        ('1','1','0','0'), --L3L4
+                                                        ('0','0','0','0'), --L5L6
+                                                        ('1','1','1','0'), --D1D2
+                                                        ('1','1','1','0'), --D3D4
+                                                        ('1','1','1','1'), --L1D1
+                                                        ('1','1','1','0')  --L2D1
                                                        );
+        
+        
   constant disk_stub_lut : t_arr_seed_arr_stub_DW := ((L1L2_D1,L1L2_D2,L1L2_D3,L1L2_D4), --L1L2
                                                       (L2L3_D1,L2L3_D2,L2L3_D3,L2L3_D4), --L2L3
-						      (L3L4_D1,L3L4_D2,L1L2_D1,L1L2_D1), --L3L4
-						      (L1L2_D1,L1L2_D1,L1L2_D1,L1L2_D1), --L5L6
-						      (D1D2_D3,D1D2_D4,D1D2_D5,L1L2_D1), --D1D2
-						      (D3D4_D1,D3D4_D2,D3D4_D5,L1L2_D1), --D3D4
-						      (L1D1_D2,L1D1_D3,L1D1_D4,L1D1_D5), --L1D1
-						      (L2D1_D2,L2D1_D3,L2D1_D4,L1L2_D1)  --L2D1
+                                                      (L3L4_D1,L3L4_D2,L1L2_D1,L1L2_D1), --L3L4
+                                                      (L1L2_D1,L1L2_D1,L1L2_D1,L1L2_D1), --L5L6
+                                                      (D1D2_D3,D1D2_D4,D1D2_D5,L1L2_D1), --D1D2
+                                                      (D3D4_D1,D3D4_D2,D3D4_D5,L1L2_D1), --D3D4
+                                                      (L1D1_D2,L1D1_D3,L1D1_D4,L1D1_D5), --L1D1
+                                                      (L2D1_D2,L2D1_D3,L2D1_D4,L1L2_D1)  --L2D1
                                                      );
   constant barrel_stub_valid : t_arr_seed_arr_stub_1b := (('1','1','1','1'), --L1L2
                                                           ('1','1','1','0'), --L2L3
-						          ('1','1','1','1'), --L3L4
-						          ('1','1','1','1'), --L5L6
-						          ('1','1','0','0'), --D1D2
-						          ('1','0','0','0'), --D3D4
-						          ('0','0','0','0'), --L1D1
-						          ('1','0','0','0')  --L2D1
+                                                          ('1','1','1','1'), --L3L4
+                                                          ('1','1','1','1'), --L5L6
+                                                          ('1','1','0','0'), --D1D2
+                                                          ('1','0','0','0'), --D3D4
+                                                          ('0','0','0','0'), --L1D1
+                                                          ('1','0','0','0')  --L2D1
                                                          );
   constant barrel_stub_lut : t_arr_seed_arr_stub_BW := ((L1L2_L3,L1L2_L4,L1L2_L5,L1L2_L6), --L1L2
                                                         (L2L3_L1,L2L3_L4,L2L3_L5,L1L2_L3), --L2L3
-						        (L3L4_L1,L3L4_L2,L3L4_L5,L3L4_L6), --L3L4
-						        (L5L6_L1,L5L6_L2,L5L6_L3,L5L6_L4), --L5L6
-						        (D1D2_L1,D1D2_L2,L1L2_L3,L1L2_L3), --D1D2
-						        (D3D4_L1,L1L2_L3,L1L2_L3,L1L2_L3), --D3D4
-						        (L1L2_L3,L1L2_L3,L1L2_L3,L1L2_L3), --L1D1
-						        (L2D1_L1,L1L2_L3,L1L2_L3,L1L2_L3)  --L2D1
+                                                        (L3L4_L1,L3L4_L2,L3L4_L5,L3L4_L6), --L3L4
+                                                        (L5L6_L1,L5L6_L2,L5L6_L3,L5L6_L4), --L5L6
+                                                        (D1D2_L1,D1D2_L2,L1L2_L3,L1L2_L3), --D1D2
+                                                        (D3D4_L1,L1L2_L3,L1L2_L3,L1L2_L3), --D3D4
+                                                        (L1L2_L3,L1L2_L3,L1L2_L3,L1L2_L3), --L1D1
+                                                        (L2D1_L1,L1L2_L3,L1L2_L3,L1L2_L3)  --L2D1
                                                        );
 
 begin  -- architecture rtl
@@ -114,36 +116,37 @@ begin  -- architecture rtl
           tftokf_o(enum_TW_104'pos(i)).track.phi0     <= TW_104_data_i(i)(widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBz0 + widthTBcot + widthTrackletLmap);
           tftokf_o(enum_TW_104'pos(i)).track.z0       <= TW_104_data_i(i)(widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBcot + widthTrackletLmap);
           tftokf_o(enum_TW_104'pos(i)).track.cot      <= TW_104_data_i(i)(widthTBcot + widthTrackletLmap - 1 downto widthTrackletLmap);
-	  --barrel
-	  for j in 0 to 3 loop
-	    if (barrel_stub_valid(enum_TW_104'pos(i))(j) = '1') then
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).reset   <= kf_reset_i;
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).valid   <= BW_46_data_i(j)(1 + widthTBtrackId + widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1);
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).trackId <= BW_46_data_i(j)(widthTBtrackId + widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1 downto widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0));
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).stubId  <= BW_46_data_i(j)(widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1 downto widthsTBr(0) + widthsTBphi(0) + widthsTBz(0));
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).r       <= resize(BW_46_data_i(j)(widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1 downto widthsTBphi(0) + widthsTBz(0)), widthTBr);
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).phi     <= resize(BW_46_data_i(j)(widthsTBphi(0) + widthsTBz(0) - 1 downto widthsTBz(0)), widthTBphi);
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i))(j)).z       <= resize(BW_46_data_i(j)(widthsTBz(0) - 1 downto 0), widthTBz);
-	    else
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i)(j)).reset   <= kf_reset_i;
-              tftokf_o(enum_TW_104'pos(i)).stubs(barrel_stub_lut(enum_TW_104'pos(i)(j)).valid   <= '0';
-	    end if;
+          --barrel
+          for j in 0 to 3 loop
+            if (barrel_stub_valid(i)(j) = '1') then
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).reset   <= kf_reset_i;
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).valid   <= BW_46_data_i(barrel_stub_lut(i)(j))(1 + widthTBtrackId + widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1);
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).trackId <= BW_46_data_i(barrel_stub_lut(i)(j))(widthTBtrackId + widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1 downto widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0));
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).stubId  <= BW_46_data_i(barrel_stub_lut(i)(j))(widthTBstubId + widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1 downto widthsTBr(0) + widthsTBphi(0) + widthsTBz(0));
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).r       <= resize(BW_46_data_i(barrel_stub_lut(i)(j))(widthsTBr(0) + widthsTBphi(0) + widthsTBz(0) - 1 downto widthsTBphi(0) + widthsTBz(0)), widthTBr);
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).phi     <= resize(BW_46_data_i(barrel_stub_lut(i)(j))(widthsTBphi(0) + widthsTBz(0) - 1 downto widthsTBz(0)), widthTBphi);
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).z       <= resize(BW_46_data_i(barrel_stub_lut(i)(j))(widthsTBz(0) - 1 downto 0), widthTBz);
+            else
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).reset   <= kf_reset_i;
+              tftokf_o(enum_TW_104'pos(i)).stubs(j).valid   <= '0';
+            end if;
           end loop;
-	  --disk
-	  for j in 0 to 3 loop
-	    if (disk_stub_valid(enum_TW_104'pos(i))(j) = '1') then
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).reset   <= kf_reset_i;
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).valid   <= DW_49_data_i(j)(1 + widthTBtrackId + widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1);
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).trackId <= DW_49_data_i(j)(widthTBtrackId + widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1 downto widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2));
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).stubId  <= DW_49_data_i(j)(widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1 downto widthsTBr(2) + widthsTBphi(2) + widthsTBz(2));
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).r       <= resize(DW_49_data_i(j)(widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1 downto widthsTBphi(2) + widthsTBz(2)), widthTBr);
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).phi     <= resize(DW_49_data_i(j)(widthsTBphi(2) + widthsTBz(2) - 1 downto widthsTBz(2)), widthTBphi);
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i))(j)).z       <= resize(DW_49_data_i(j)(widthsTBz(2) - 1 downto 0), widthTBz);
-	    else
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i)(j)).reset   <= kf_reset_i;
-              tftokf_o(enum_TW_104'pos(i)).stubs(disk_stub_lut(enum_TW_104'pos(i)(j)).valid   <= '0';
-	    end if;
+          --disk
+          for j in 0 to 3 loop
+            if (disk_stub_valid(i)(j) = '1') then
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).reset   <= kf_reset_i;
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).valid   <= DW_49_data_i(disk_stub_lut(i)(j))(1 + widthTBtrackId + widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1);
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).trackId <= DW_49_data_i(disk_stub_lut(i)(j))(widthTBtrackId + widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1 downto widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2));
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).stubId  <= DW_49_data_i(disk_stub_lut(i)(j))(widthTBstubId + widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1 downto widthsTBr(2) + widthsTBphi(2) + widthsTBz(2));
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).r       <= resize(DW_49_data_i(disk_stub_lut(i)(j))(widthsTBr(2) + widthsTBphi(2) + widthsTBz(2) - 1 downto widthsTBphi(2) + widthsTBz(2)), widthTBr);
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).phi     <= resize(DW_49_data_i(disk_stub_lut(i)(j))(widthsTBphi(2) + widthsTBz(2) - 1 downto widthsTBz(2)), widthTBphi);
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).z       <= resize(DW_49_data_i(disk_stub_lut(i)(j))(widthsTBz(2) - 1 downto 0), widthTBz);
+            else
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).reset   <= kf_reset_i;
+              tftokf_o(enum_TW_104'pos(i)).stubs(j+4).valid   <= '0';
+            end if;
           end loop;
+        end if;
       end loop; -- i
     end if;
   end process p_tf_to_kf;

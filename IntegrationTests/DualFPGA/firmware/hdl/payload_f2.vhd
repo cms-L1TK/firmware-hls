@@ -12,6 +12,14 @@ use work.emp_ttc_decl.all;
 
 use work.emp_slink_types.all;
 
+use work.tf_pkg.all;
+use work.memUtil_pkg.all;
+use work.memUtil_aux_pkg_f2.all;
+use work.tf_interface_pkg.all;
+use work.hybrid_data_types.all;
+use work.hybrid_config.all;
+use work.hybrid_data_formats.all;
+
 entity emp_payload is
   port(
     clk          : in  std_logic;        -- ipbus signals
@@ -53,6 +61,17 @@ architecture rtl of emp_payload is
   signal s_tftokf          : t_channlesTB(numTW_104 - 1 downto 0);
   signal s_kfout           : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout           : ldata(numLinksTFP - 1 downto 0);
+  signal FT_bx_out_0       : std_logic_vector(2 downto 0);
+  signal FT_bx_out_vld     : std_logic;
+  signal FT_done           : std_logic;
+  signal FT_last_track     : std_logic;
+  signal FT_last_track_vld : std_logic;
+  signal TW_104_stream_AV_din  : t_arr_TW_104_DATA;
+  signal TW_104_stream_A_write : t_arr_TW_104_1b;
+  signal DW_49_stream_AV_din   : t_arr_DW_49_DATA;
+  signal DW_49_stream_A_write  : t_arr_DW_49_1b;
+  signal BW_46_stream_AV_din   : t_arr_BW_46_DATA;
+  signal BW_46_stream_A_write  : t_arr_BW_46_1b;
 
 begin
 
@@ -86,7 +105,7 @@ begin
       MPAR_73_writeaddr => MPAR_73_writeaddr,
       MPAR_73_din       => MPAR_73_din,
       PC_start          => PC_start,
-      PC_bx_in          => PX_bx_in
+      PC_bx_in          => PC_bx_in
       );
 
   -----------------------------------------------------------------------------
@@ -111,14 +130,14 @@ begin
       MPAR_73_writeaddr         => MPAR_73_writeaddr,
       MPAR_73_din               => MPAR_73_din,
       TW_104_stream_AV_din      => TW_104_stream_AV_din,
-      TW_104_stream_AV_full_neg => (others => '1'),
-      TW_104_stream_AV_write    => TW_104_stream_AV_write,
+      TW_104_stream_A_full_neg  => (others => '1'),
+      TW_104_stream_A_write     => TW_104_stream_A_write,
       DW_49_stream_AV_din       => DW_49_stream_AV_din,
-      DW_49_stream_AV_full_neg  => (others => '1'),
-      DW_49_stream_AV_write     => DW_49_stream_AV_write,
+      DW_49_stream_A_full_neg   => (others => '1'),
+      DW_49_stream_A_write      => DW_49_stream_A_write,
       BW_46_stream_AV_din       => BW_46_stream_AV_din,
-      BW_46_stream_AV_full_neg  => (others => '1'),
-      BW_46_stream_AV_write     => BW_46_stream_AV_write
+      BW_46_stream_A_full_neg   => (others => '1'),
+      BW_46_stream_A_write      => BW_46_stream_A_write
       );
 
   -----------------------------------------------------------------------------
@@ -128,11 +147,11 @@ begin
     port map (
       clk_i          => clk_p,
       TW_104_data_i  => TW_104_stream_AV_din,
-      TW_104_valid_i => TW_104_stream_AV_write,
+      TW_104_valid_i => TW_104_stream_A_write,
       DW_49_data_i   => DW_49_stream_AV_din,
-      DW_49_valid_i  => DW_49_stream_AV_write,
+      DW_49_valid_i  => DW_49_stream_A_write,
       BW_46_data_i   => BW_46_stream_AV_din,
-      BW_46_valid_i  => BW_46_stream_AV_write,
+      BW_46_valid_i  => BW_46_stream_A_write,
       kf_reset_i     => FT_bx_out_vld,
       tftokf_o       => s_tftokf
       );
