@@ -100,15 +100,58 @@ begin
                                   MTPAR_76_stream_V_dout(L2D1ABCD);
   
   --debugging just send some signals for now -MO
-  q(4).data <= AS_signals(63 downto 0);
-  q(5).data <= AS_signals(127 downto 64);
-  q(6).data <= AS_signals(191 downto 128);
-  q(7).data <= AS_signals(255 downto 192);
+  q(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
+  q(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
+  q(6).data(63 downto 0) <= AS_signals(63 + 2*64 downto 0 + 2*64);
+  q(7).data(63 downto 0) <= AS_signals(63 + 3*64 downto 0 + 3*64);
+  q(8).data(63 downto 0) <= AS_signals(63 + 4*64 downto 0 + 4*64);
+  q(9).data(63 downto 0) <= AS_signals(63 + 5*64 downto 0 + 5*64);
+  q(10).data(63 downto 0) <= AS_signals(63 + 6*64 downto 0 + 6*64);
+  q(11).data(63 downto 0) <= AS_signals(63 + 7*64 downto 0 + 7*64);
+  q(12).data(63 downto 0) <= AS_signals(63 + 8*64 downto 0 + 8*64);
+  q(13).data(63 downto 0) <= AS_signals(63 + 9*64 downto 0 + 9*64);
+  q(14).data(63 downto 0) <= AS_signals(63 + 10*64 downto 0 + 10*64);
+  q(15).data(63 downto 0) <= AS_signals(63 + 11*64 downto 0 + 11*64);
+  
+  q(20).data(63 downto 0) <= AS_signals(63 + 12*64 downto 0 + 12*64);
+  q(21).data(63 downto 0) <= AS_signals(63 + 13*64 downto 0 + 13*64);
+  q(22).data(63 downto 0) <= AS_signals(63 + 14*64 downto 0 + 14*64);
+  q(23).data(63 downto 0) <= AS_signals(63 + 15*64 downto 0 + 15*64);
+  q(24).data(63 downto 0) <= AS_signals(63 + 16*64 downto 0 + 16*64);
+  q(25).data(63 downto 0) <= AS_signals(63 + 17*64 downto 0 + 17*64);
+  q(26).data(63 downto 0) <= AS_signals(63 + 18*64 downto 0 + 18*64);
+  q(27).data(63 downto 0) <= AS_signals(63 + 19*64 downto 0 + 19*64);
+  q(28).data(63 downto 0) <= AS_signals(63 + 20*64 downto 0 + 20*64);
+  q(29).data(63 downto 0) <= AS_signals(63 + 21*64 downto 0 + 21*64);
+  q(30).data(63 downto 0) <= AS_signals(63 + 22*64 downto 0 + 22*64);
+  q(31).data(63 downto 0) <= AS_signals(63 + 23*64 downto 0 + 23*64);
+  q(32).data(63 downto 0) <= AS_signals(63 + 24*64 downto 0 + 24*64);
+  q(33).data(63 downto 0) <= AS_signals(63 + 25*64 downto 0 + 25*64);
+  q(34).data(63 downto 0) <= AS_signals(63 + 26*64 downto 0 + 26*64);
+  q(35).data(63 - 16 downto 0) <= AS_signals(63 + 27*64 - 16 downto 0 + 27*64);
 
-  q(8).data <= MTPAR_signals(63 downto 0);
-  q(9).data <= MTPAR_signals(127 downto 64);
-  q(10).data <= MTPAR_signals(191 downto 128);
-  q(11).data <= MTPAR_signals(255 downto 192);
+  --15 76bit signals can be accomodated by 18 64bit signals, this will leave
+  --12 empty bits in the last data word
+  q(36).data(63 downto 0) <= MTPAR_signals(63 + 0*64 downto 0 + 0*64);
+  q(37).data(63 downto 0) <= MTPAR_signals(63 + 1*64 downto 0 + 1*64);
+  q(38).data(63 downto 0) <= MTPAR_signals(63 + 2*64 downto 0 + 2*64);
+  q(39).data(63 downto 0) <= MTPAR_signals(63 + 3*64 downto 0 + 3*64);
+  q(40).data(63 downto 0) <= MTPAR_signals(63 + 4*64 downto 0 + 4*64);
+  q(41).data(63 downto 0) <= MTPAR_signals(63 + 5*64 downto 0 + 5*64);
+  q(42).data(63 downto 0) <= MTPAR_signals(63 + 6*64 downto 0 + 6*64);
+  q(43).data(63 downto 0) <= MTPAR_signals(63 + 7*64 downto 0 + 7*64);
+  q(44).data(63 downto 0) <= MTPAR_signals(63 + 8*64 downto 0 + 8*64);
+  q(45).data(63 downto 0) <= MTPAR_signals(63 + 9*64 downto 0 + 9*64);
+  q(46).data(63 downto 0) <= MTPAR_signals(63 + 10*64 downto 0 + 10*64);
+  q(47).data(63 downto 0) <= MTPAR_signals(63 + 11*64 downto 0 + 11*64);
+  q(48).data(63 downto 0) <= MTPAR_signals(63 + 12*64 downto 0 + 12*64);
+  q(49).data(63 downto 0) <= MTPAR_signals(63 + 13*64 downto 0 + 13*64);
+  q(50).data(63 downto 0) <= MTPAR_signals(63 + 14*64 downto 0 + 14*64);
+  q(51).data(63 downto 0) <= MTPAR_signals(63 + 15*64 downto 0 + 15*64);
+  q(52).data(63 downto 0) <= MTPAR_signals(63 + 16*64 downto 0 + 16*64);
+  q(53).data(63 - 12 downto 0) <= MTPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
+  
+  q(54).data(2 downto 0) <= bx_out;
 
   --gen : for i in n_interfpga_links - 1 downto 0 generate
 

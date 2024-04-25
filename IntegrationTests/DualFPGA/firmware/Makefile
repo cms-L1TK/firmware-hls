@@ -11,7 +11,7 @@ all: add_common_files $(core_file) hdl_add_files xciCreation kfin_adj $(input_fi
 $(core_dir):
 	@mkdir cgn mem
 	#make -C $(fpga1_hls_script_path) -j 24 Work
-	#make -C $(fpga2_hls_script_path) -j 24 Work
+	@make -C $(fpga2_hls_script_path) -j 24 Work
 	@cd mem; ln -s ../../../../emData/LUTsCM LUTs
 	@cd mem; ln -s ../../../../emData/MemPrintsCM MemPrintsCM
 	@cd hdl; ln -s ../../../common common
