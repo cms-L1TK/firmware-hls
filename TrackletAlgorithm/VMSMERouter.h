@@ -200,7 +200,8 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
   // It seems that the if (nAllCopies > 0) should not be needed,
   // but if nAllCopies is zero it generates an error in vivado_hls
   if (valid) {
-    memoriesAS.write_mem(bx, stub_copy, index);
+    ap_uint<7> ap_index(index);
+    memoriesAS.write_mem(bx, stub_copy, ap_index);
   }
 
   constexpr bool isDisk = (Disk > 0);
