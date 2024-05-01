@@ -63,6 +63,9 @@ class MemoryTemplateBinnedCM{
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
+  ap_uint<32> nentriesA_[slots];
+  ap_uint<32> nentriesB_[slots];
+  ap_uint<4> nentriestmp_[1<<NBIT_BIN];
 
 public:
 
@@ -90,6 +93,7 @@ public:
 
   ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
     return nentries_[bx*8+ibin];
+    //return (nentriesB_[bx*8+ibin],nentriesA_[bx*8+ibin]);
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
@@ -135,19 +139,32 @@ public:
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 #pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentriesA_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentriesB_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentriestmp_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
 #pragma HLS inline
     if (isCMSSW && !NBIT_BX) {ibx = 0;}
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
+#ifndef __SYNTHESIS__ 
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
-      unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+
+      unsigned int nentry = nentriestmp_[slot];
+      nntriestmp_[slot]++;
+      //unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+      //if (nentry2!=nentry) {
+      //	std::cout << "nentry:"<<nentry<<" "<< nentry2 << " " << slot << std::endl;
+      //}
       nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+      nentriesA_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
       if (ibin!=0) {
+      	//unsigned int nentry2 = nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4);
       	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+      	nentriesB_[ibx*kNBinsRZ+ibin-1].range((ireg+0)*4+3,(ireg+0)*4)=nentry+1;
       }
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
@@ -157,11 +174,12 @@ public:
 #pragma HLS unroll
 	//#if defined __SYNTHESIS__ && !defined CSYNTH
         //dataarray_[icopy][ibx][getNEntryPerBin()*slot] = data;
-	//#else
 	//FIXME ugly hack...
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
-	//#endif      
       }
+#else
+    dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
+#endif      
 #ifdef CMSSW_GIT_HASH
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
@@ -199,15 +217,27 @@ public:
 
     DataType data("0",16);
     for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
+      for (size_t icopy=0; icopy < NCOPY; icopy++) {
+	for (size_t ibin=0; ibin < kNMemDepth; ibin++) {
+	  //std::cout << ibx << " " << icopy << " "<< ibin << std::endl;
+	  dataarray_[icopy][ibx][ibin] = data;
+	  //std::cout << "Done" <<std::endl;
       // Clear data
-      for (unsigned int i = 0; i < getNBins(); ++i ) {
-        for (unsigned int j = 0; j < getNEntryPerBin(); ++j) {
-          write_mem(ibx, i, data, j);
-        }
+      //for (unsigned int i = 0; i < getNBins(); ++i ) {
+      //  for (unsigned int j = 0; j < getNEntryPerBin(); ++j) {
+      //    write_mem(ibx, i, data, j);
+      //  }
+      //}
+	}
       }
       // Clear nentries8 and binmask8
+      for (unsigned int ibin = 0; ibin < (1<<NBIT_BIN) ; ++ibin) {
+	nentriestmp_[ibin] = 0;
+      }
       for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
 	nentries_[ibx*kNBinsRZ+ibin] = 0;
+	nentriesA_[ibx*kNBinsRZ+ibin] = 0;
+	nentriesB_[ibx*kNBinsRZ+ibin] = 0;
         nentries8_[ibx][ibin] = 0;
         binmask8_[ibx][ibin] = 0;
       }
