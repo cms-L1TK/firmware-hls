@@ -40,12 +40,50 @@ architecture rtl of emp_payload is
 
   constant dataword_length : integer := 64;
   constant n_interfpga_links : integer := 64;
-  signal AS_signals : std_logic_vector(dataword_length * 27 - 1 downto 0);
-  signal MTPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0);
+  signal AS_signals : std_logic_vector(48*37 - 1 downto 0);
+  signal MTPAR_signals : std_logic_vector(15*76 - 1 downto 0);
   signal bx_out : std_logic_vector(2 downto 0);
   
 begin
 
+  gen : for i in N_REGION * 4 - 1 downto 0 generate
+
+    -- Index of word within a packet
+    signal word_index : std_logic_vector(7 downto 0) := x"00";
+    -- Index of packet within an orbit
+    signal packet_index : std_logic_vector(8 downto 0) := "000000000";
+
+  begin
+
+    process (clk_p)
+    begin
+      if rising_edge(clk_p) then
+        -- Reset counters on receiving BC0 from TCDS
+        if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
+          word_index <= x"00";
+          packet_index <= "000000000";
+        -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
+        elsif word_index = x"A1" then
+          word_index <= x"00";
+          packet_index <= std_logic_vector(unsigned(packet_index) + 1);
+        else
+          word_index <= std_logic_vector(unsigned(word_index) + 1);
+        end if;
+      end if;
+    end process;
+
+    -- Set valid high for full duration of packet
+    q(i).valid <= '1' when word_index <= x"66" else '0'; --x"9B" -> x"66"
+    -- Start & last are only high for first & last clock cycle of packet
+    q(i).start <= '1' when word_index = x"00" else '0';
+    q(i).last <= '1' when word_index = x"66" else '0';
+
+    -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
+    -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
+    q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
+
+  end generate gen;
+    
   --gen : for i in n_interfpga_links - 1 downto 0 generate
 
   --begin
@@ -95,27 +133,28 @@ begin
     AS_signals(63 + 24*64 downto 0 + 24*64) <= d(31).data(63 downto 0);
     AS_signals(63 + 25*64 downto 0 + 25*64) <= d(30).data(63 downto 0);
     AS_signals(63 + 26*64 downto 0 + 26*64) <= d(29).data(63 downto 0);
+    AS_signals(63 + 27*64 - 16 downto 0 + 27*64) <= d(28).data(63 - 16 downto 0);
 
-    MTPAR_signals(63 + 0*64 downto 0 + 0*64) <= d(28).data(63 downto 0);
-    MTPAR_signals(63 + 1*64 downto 0 + 1*64) <= d(27).data(63 downto 0);
-    MTPAR_signals(63 + 2*64 downto 0 + 2*64) <= d(26).data(63 downto 0);
-    MTPAR_signals(63 + 3*64 downto 0 + 3*64) <= d(25).data(63 downto 0);
-    MTPAR_signals(63 + 4*64 downto 0 + 4*64) <= d(24).data(63 downto 0);
-    MTPAR_signals(63 + 5*64 downto 0 + 5*64) <= d(23).data(63 downto 0);
-    MTPAR_signals(63 + 6*64 downto 0 + 6*64) <= d(22).data(63 downto 0);
-    MTPAR_signals(63 + 7*64 downto 0 + 7*64) <= d(21).data(63 downto 0);
-    MTPAR_signals(63 + 8*64 downto 0 + 8*64) <= d(20).data(63 downto 0);
-    MTPAR_signals(63 + 9*64 downto 0 + 9*64) <= d(19).data(63 downto 0);
-    MTPAR_signals(63 + 10*64 downto 0 + 10*64) <= d(18).data(63 downto 0);
-    MTPAR_signals(63 + 11*64 downto 0 + 11*64) <= d(17).data(63 downto 0);
-    MTPAR_signals(63 + 12*64 downto 0 + 12*64) <= d(16).data(63 downto 0);
-    MTPAR_signals(63 + 13*64 downto 0 + 13*64) <= d(15).data(63 downto 0);
-    MTPAR_signals(63 + 14*64 downto 0 + 14*64) <= d(14).data(63 downto 0);
-    MTPAR_signals(63 + 15*64 downto 0 + 15*64) <= d(13).data(63 downto 0);
-    MTPAR_signals(63 + 16*64 downto 0 + 16*64) <= d(12).data(63 downto 0);
-    MTPAR_signals(63 + 17*64 downto 0 + 17*64) <= d(11).data(63 downto 0);
+    MTPAR_signals(63 + 0*64 downto 0 + 0*64) <= d(27).data(63 downto 0);
+    MTPAR_signals(63 + 1*64 downto 0 + 1*64) <= d(26).data(63 downto 0);
+    MTPAR_signals(63 + 2*64 downto 0 + 2*64) <= d(25).data(63 downto 0);
+    MTPAR_signals(63 + 3*64 downto 0 + 3*64) <= d(24).data(63 downto 0);
+    MTPAR_signals(63 + 4*64 downto 0 + 4*64) <= d(23).data(63 downto 0);
+    MTPAR_signals(63 + 5*64 downto 0 + 5*64) <= d(22).data(63 downto 0);
+    MTPAR_signals(63 + 6*64 downto 0 + 6*64) <= d(21).data(63 downto 0);
+    MTPAR_signals(63 + 7*64 downto 0 + 7*64) <= d(20).data(63 downto 0);
+    MTPAR_signals(63 + 8*64 downto 0 + 8*64) <= d(19).data(63 downto 0);
+    MTPAR_signals(63 + 9*64 downto 0 + 9*64) <= d(18).data(63 downto 0);
+    MTPAR_signals(63 + 10*64 downto 0 + 10*64) <= d(17).data(63 downto 0);
+    MTPAR_signals(63 + 11*64 downto 0 + 11*64) <= d(16).data(63 downto 0);
+    MTPAR_signals(63 + 12*64 downto 0 + 12*64) <= d(15).data(63 downto 0);
+    MTPAR_signals(63 + 13*64 downto 0 + 13*64) <= d(14).data(63 downto 0);
+    MTPAR_signals(63 + 14*64 downto 0 + 14*64) <= d(13).data(63 downto 0);
+    MTPAR_signals(63 + 15*64 downto 0 + 15*64) <= d(12).data(63 downto 0);
+    MTPAR_signals(63 + 16*64 downto 0 + 16*64) <= d(11).data(63 downto 0);
+    MTPAR_signals(63 + 17*64 - 12 downto 0 + 17*64) <= d(10).data(63 - 12 downto 0);
     
-    bx_out <= d(10).data(2 downto 0);
+    bx_out <= d(9).data(2 downto 0);
     
     --if (i<4) then
 
