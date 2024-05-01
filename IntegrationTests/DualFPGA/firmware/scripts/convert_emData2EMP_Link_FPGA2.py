@@ -88,10 +88,8 @@ def get_word_or_empty(words, type_index, word_index, length):
     return words[type_index][word_index]
   return ''.join(['0' for i in range(length)])
 
-if __name__ == '__main__':
-
-  args = parseArguments()
-
+def write_emp_input(args):
+  '''Write input for second FPGA'''
   output_file = open(args.outFile, 'w')
 
   output_file.write("ID: x0\n")
@@ -180,4 +178,14 @@ if __name__ == '__main__':
   output_file.close()
 
   print("Output written to file ",args.outFile)
+
+def check_emp_output(args):
+  '''Check output from first FPGA project'''
+  #TODO write this, for now, manually check output is permutation of the first FPGA output
+
+if __name__ == '__main__':
+
+  args = parseArguments()
+  write_emp_input(args)
+
     
