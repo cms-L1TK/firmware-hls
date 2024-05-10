@@ -394,7 +394,7 @@ inline ap_uint<kNBits_MemAddr> getProjSeqOld() {
 
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
- 
+#pragma HLS array_partition variable=projseqs_ complete
   return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
 
 }
@@ -425,6 +425,7 @@ inline MATCH read() {
 
 inline MATCH peek() {
 #pragma HLS inline  
+#pragma HLS array_partition variable=matches_ complete
   return matches_[readindex_];
 }
  
