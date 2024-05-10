@@ -6,7 +6,6 @@
 # TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
 from __future__ import absolute_import, print_function
-import sys
 import re
 import os
 import argparse
