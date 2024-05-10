@@ -37,70 +37,70 @@ end emp_payload;
 
 architecture rtl of emp_payload is
 
-  signal AS_D5PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000000";
-  signal AS_D5PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000001";
-  signal AS_D5PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000002";
-  signal AS_D5PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000003";
-  signal AS_D4PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000004";
-  signal AS_D4PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000005";
-  signal AS_D4PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000006";
-  signal AS_D4PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000007";
-  signal AS_D3PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000008";
-  signal AS_D3PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000009";
-  signal AS_D3PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000000A";
-  signal AS_D3PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000000B";
-  signal AS_D2PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000000C";
-  signal AS_D2PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000000D";
-  signal AS_D2PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000000E";
-  signal AS_D2PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000000F";
-  signal AS_D1PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000010";
-  signal AS_D1PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000011";
-  signal AS_D1PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000012";
-  signal AS_D1PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000013";
-  signal AS_L6PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000014";
-  signal AS_L6PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000015";
-  signal AS_L6PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000016";
-  signal AS_L6PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000017";
-  signal AS_L5PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000018";
-  signal AS_L5PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000019";
-  signal AS_L5PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000001A";
-  signal AS_L5PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000001B";
-  signal AS_L4PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000001C";
-  signal AS_L4PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000001D";
-  signal AS_L4PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000001E";
-  signal AS_L4PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000001F";
-  signal AS_L3PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000020";
-  signal AS_L3PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000021";
-  signal AS_L3PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000022";
-  signal AS_L3PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000023";
-  signal AS_L2PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000024";
-  signal AS_L2PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000025";
-  signal AS_L2PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000026";
-  signal AS_L2PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000027";
-  signal AS_L1PHIHn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000028";
-  signal AS_L1PHIGn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"000000029";
-  signal AS_L1PHIFn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000002A";
-  signal AS_L1PHIEn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000002B";
-  signal AS_L1PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000002C";
-  signal AS_L1PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000002D";
-  signal AS_L1PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000002E";
-  signal AS_L1PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "0" & x"00000002F";
-
-  signal MTPAR_L1L2H_stream_V_dout    : std_logic_vector(75 downto 0) := x"0000000000000000030";
-  signal MTPAR_L1L2E_stream_V_dout    : std_logic_vector(75 downto 0) := x"0000000000000000031";
-  signal MTPAR_L1L2GI_stream_V_dout   : std_logic_vector(75 downto 0) := x"0000000000000000032";
-  signal MTPAR_L1L2DF_stream_V_dout   : std_logic_vector(75 downto 0) := x"0000000000000000033";
-  signal MTPAR_L1L2JLK_stream_V_dout  : std_logic_vector(75 downto 0) := x"0000000000000000034";
-  signal MTPAR_L1L2ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"0000000000000000035";
-  signal MTPAR_D3D4ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"0000000000000000036";
-  signal MTPAR_D1D2ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"0000000000000000037";
-  signal MTPAR_L1D1EFGH_stream_V_dout : std_logic_vector(75 downto 0) := x"0000000000000000038";
-  signal MTPAR_L1D1ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"0000000000000000039";
-  signal MTPAR_L2D1ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"000000000000000003A";
-  signal MTPAR_L3L4CD_stream_V_dout   : std_logic_vector(75 downto 0) := x"000000000000000003B";
-  signal MTPAR_L3L4AB_stream_V_dout   : std_logic_vector(75 downto 0) := x"000000000000000003C";
-  signal MTPAR_L2L3ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"000000000000000003D";
-  signal MTPAR_L5L6ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"000000000000000003E";
+  signal AS_D5PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000000";
+  signal AS_D5PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000001";
+  signal AS_D5PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000002";
+  signal AS_D5PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000003";
+  signal AS_D4PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000004";
+  signal AS_D4PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000005";
+  signal AS_D4PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000006";
+  signal AS_D4PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000007";
+  signal AS_D3PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000008";
+  signal AS_D3PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000009";
+  signal AS_D3PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000000A";
+  signal AS_D3PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000000B";
+  signal AS_D2PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000000C";
+  signal AS_D2PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000000D";
+  signal AS_D2PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000000E";
+  signal AS_D2PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000000F";
+  signal AS_D1PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000010";
+  signal AS_D1PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000011";
+  signal AS_D1PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000012";
+  signal AS_D1PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000013";
+  signal AS_L6PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000014";
+  signal AS_L6PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000015";
+  signal AS_L6PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000016";
+  signal AS_L6PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000017";
+  signal AS_L5PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000018";
+  signal AS_L5PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000019";
+  signal AS_L5PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000001A";
+  signal AS_L5PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000001B";
+  signal AS_L4PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000001C";
+  signal AS_L4PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000001D";
+  signal AS_L4PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000001E";
+  signal AS_L4PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000001F";
+  signal AS_L3PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000020";
+  signal AS_L3PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000021";
+  signal AS_L3PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000022";
+  signal AS_L3PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000023";
+  signal AS_L2PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000024";
+  signal AS_L2PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000025";
+  signal AS_L2PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000026";
+  signal AS_L2PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000027";
+  signal AS_L1PHIHn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000028";
+  signal AS_L1PHIGn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"000000029";
+  signal AS_L1PHIFn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000002A";
+  signal AS_L1PHIEn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000002B";
+  signal AS_L1PHIDn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000002C";
+  signal AS_L1PHICn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000002D";
+  signal AS_L1PHIBn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000002E";
+  signal AS_L1PHIAn1_stream_V_dout : std_logic_vector(36 downto 0) := "1" & x"00000002F";
+  
+  signal MTPAR_L1L2H_stream_V_dout    : std_logic_vector(75 downto 0) := x"1000000000000000030";
+  signal MTPAR_L1L2E_stream_V_dout    : std_logic_vector(75 downto 0) := x"1000000000000000031";
+  signal MTPAR_L1L2GI_stream_V_dout   : std_logic_vector(75 downto 0) := x"1000000000000000032";
+  signal MTPAR_L1L2DF_stream_V_dout   : std_logic_vector(75 downto 0) := x"1000000000000000033";
+  signal MTPAR_L1L2JLK_stream_V_dout  : std_logic_vector(75 downto 0) := x"1000000000000000034";
+  signal MTPAR_L1L2ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"1000000000000000035";
+  signal MTPAR_D3D4ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"1000000000000000036";
+  signal MTPAR_D1D2ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"1000000000000000037";
+  signal MTPAR_L1D1EFGH_stream_V_dout : std_logic_vector(75 downto 0) := x"1000000000000000038";
+  signal MTPAR_L1D1ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"1000000000000000039";
+  signal MTPAR_L2D1ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"100000000000000003A";
+  signal MTPAR_L3L4CD_stream_V_dout   : std_logic_vector(75 downto 0) := x"100000000000000003B";
+  signal MTPAR_L3L4AB_stream_V_dout   : std_logic_vector(75 downto 0) := x"100000000000000003C";
+  signal MTPAR_L2L3ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"100000000000000003D";
+  signal MTPAR_L5L6ABCD_stream_V_dout : std_logic_vector(75 downto 0) := x"100000000000000003E";
 
   signal bx_out : std_logic_vector(2 downto 0) := "111";  
   
@@ -205,6 +205,7 @@ begin
     q(i).valid <= '1' when word_index <= x"66" else '0'; --x"9B" -> x"66"
     -- Start & last are only high for first & last clock cycle of packet
     q(i).start <= '1' when word_index = x"00" else '0';
+    q(i).strobe <= '0' when word_index = x"00";
     q(i).last <= '1' when word_index = x"66" else '0';
 
     -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
@@ -233,61 +234,66 @@ begin
     --Quad14: 56,57,58,59
     --Quad15: 60,61,62,63 Dummy
 
-    --48 37bit signals can be accomodated by 28 64bit signals, this will leave
-    --16 empty bits in the last data word
-    q(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
-    q(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
-    q(6).data(63 downto 0) <= AS_signals(63 + 2*64 downto 0 + 2*64);
-    q(7).data(63 downto 0) <= AS_signals(63 + 3*64 downto 0 + 3*64);
-    q(8).data(63 downto 0) <= AS_signals(63 + 4*64 downto 0 + 4*64);
-    q(9).data(63 downto 0) <= AS_signals(63 + 5*64 downto 0 + 5*64);
-    q(10).data(63 downto 0) <= AS_signals(63 + 6*64 downto 0 + 6*64);
-    q(11).data(63 downto 0) <= AS_signals(63 + 7*64 downto 0 + 7*64);
-    q(12).data(63 downto 0) <= AS_signals(63 + 8*64 downto 0 + 8*64);
-    q(13).data(63 downto 0) <= AS_signals(63 + 9*64 downto 0 + 9*64);
-    q(14).data(63 downto 0) <= AS_signals(63 + 10*64 downto 0 + 10*64);
-    q(15).data(63 downto 0) <= AS_signals(63 + 11*64 downto 0 + 11*64);
+  process (clk_p)
+  begin
+    if rising_edge(clk_p) then
+      --48 37bit signals can be accomodated by 28 64bit signals, this will leave
+      --16 empty bits in the last data word
+      q(4).data(63 downto 0) <= AS_signals((63 + 0*64) downto 0);
+      q(5).data(63 downto 0) <= AS_signals((63 + 1*64) downto 1*64);
+      q(6).data(63 downto 0) <= AS_signals((63 + 2*64) downto 2*64);
+      q(7).data(63 downto 0) <= AS_signals((63 + 3*64) downto 3*64);
+      q(8).data(63 downto 0) <= AS_signals((63 + 4*64) downto 4*64);
+      q(9).data(63 downto 0) <= AS_signals((63 + 5*64) downto 5*64);
+      q(10).data(63 downto 0) <= AS_signals((63 + 6*64) downto 6*64);
+      q(11).data(63 downto 0) <= AS_signals((63 + 7*64) downto 7*64);
+      q(12).data(63 downto 0) <= AS_signals((63 + 8*64) downto 8*64);
+      q(13).data(63 downto 0) <= AS_signals((63 + 9*64) downto 9*64);
+      q(14).data(63 downto 0) <= AS_signals((63 + 10*64) downto 10*64);
+      q(15).data(63 downto 0) <= AS_signals((63 + 11*64) downto 11*64);
     
-    q(20).data(63 downto 0) <= AS_signals(63 + 12*64 downto 0 + 12*64);
-    q(21).data(63 downto 0) <= AS_signals(63 + 13*64 downto 0 + 13*64);
-    q(22).data(63 downto 0) <= AS_signals(63 + 14*64 downto 0 + 14*64);
-    q(23).data(63 downto 0) <= AS_signals(63 + 15*64 downto 0 + 15*64);
-    q(24).data(63 downto 0) <= AS_signals(63 + 16*64 downto 0 + 16*64);
-    q(25).data(63 downto 0) <= AS_signals(63 + 17*64 downto 0 + 17*64);
-    q(26).data(63 downto 0) <= AS_signals(63 + 18*64 downto 0 + 18*64);
-    q(27).data(63 downto 0) <= AS_signals(63 + 19*64 downto 0 + 19*64);
-    q(28).data(63 downto 0) <= AS_signals(63 + 20*64 downto 0 + 20*64);
-    q(29).data(63 downto 0) <= AS_signals(63 + 21*64 downto 0 + 21*64);
-    q(30).data(63 downto 0) <= AS_signals(63 + 22*64 downto 0 + 22*64);
-    q(31).data(63 downto 0) <= AS_signals(63 + 23*64 downto 0 + 23*64);
-    q(32).data(63 downto 0) <= AS_signals(63 + 24*64 downto 0 + 24*64);
-    q(33).data(63 downto 0) <= AS_signals(63 + 25*64 downto 0 + 25*64);
-    q(34).data(63 downto 0) <= AS_signals(63 + 26*64 downto 0 + 26*64);
-    q(35).data(63 - 16 downto 0) <= AS_signals(63 + 27*64 - 16 downto 0 + 27*64);
+      q(20).data(63 downto 0) <= AS_signals((63 + 12*64) downto 12*64);
+      q(21).data(63 downto 0) <= AS_signals((63 + 13*64) downto 13*64);
+      q(22).data(63 downto 0) <= AS_signals((63 + 14*64) downto 14*64);
+      q(23).data(63 downto 0) <= AS_signals((63 + 15*64) downto 15*64);
+      q(24).data(63 downto 0) <= AS_signals((63 + 16*64) downto 16*64);
+      q(25).data(63 downto 0) <= AS_signals((63 + 17*64) downto 17*64);
+      q(26).data(63 downto 0) <= AS_signals((63 + 18*64) downto 18*64);
+      q(27).data(63 downto 0) <= AS_signals((63 + 19*64) downto 19*64);
+      q(28).data(63 downto 0) <= AS_signals((63 + 20*64) downto 20*64);
+      q(29).data(63 downto 0) <= AS_signals((63 + 21*64) downto 21*64);
+      q(30).data(63 downto 0) <= AS_signals((63 + 22*64) downto 22*64);
+      q(31).data(63 downto 0) <= AS_signals((63 + 23*64) downto 23*64);
+      q(32).data(63 downto 0) <= AS_signals((63 + 24*64) downto 24*64);
+      q(33).data(63 downto 0) <= AS_signals((63 + 25*64) downto 25*64);
+      q(34).data(63 downto 0) <= AS_signals((63 + 26*64) downto 26*64);
+      q(35).data(63 downto 0) <= x"0000" & AS_signals((63 + 27*64 - 16) downto 27*64);
 
-    --15 76bit signals can be accomodated by 18 64bit signals, this will leave
-    --12 empty bits in the last data word
-    q(36).data(63 downto 0) <= MTPAR_signals(63 + 0*64 downto 0 + 0*64);
-    q(37).data(63 downto 0) <= MTPAR_signals(63 + 1*64 downto 0 + 1*64);
-    q(38).data(63 downto 0) <= MTPAR_signals(63 + 2*64 downto 0 + 2*64);
-    q(39).data(63 downto 0) <= MTPAR_signals(63 + 3*64 downto 0 + 3*64);
-    q(40).data(63 downto 0) <= MTPAR_signals(63 + 4*64 downto 0 + 4*64);
-    q(41).data(63 downto 0) <= MTPAR_signals(63 + 5*64 downto 0 + 5*64);
-    q(42).data(63 downto 0) <= MTPAR_signals(63 + 6*64 downto 0 + 6*64);
-    q(43).data(63 downto 0) <= MTPAR_signals(63 + 7*64 downto 0 + 7*64);
-    q(44).data(63 downto 0) <= MTPAR_signals(63 + 8*64 downto 0 + 8*64);
-    q(45).data(63 downto 0) <= MTPAR_signals(63 + 9*64 downto 0 + 9*64);
-    q(46).data(63 downto 0) <= MTPAR_signals(63 + 10*64 downto 0 + 10*64);
-    q(47).data(63 downto 0) <= MTPAR_signals(63 + 11*64 downto 0 + 11*64);
-    q(48).data(63 downto 0) <= MTPAR_signals(63 + 12*64 downto 0 + 12*64);
-    q(49).data(63 downto 0) <= MTPAR_signals(63 + 13*64 downto 0 + 13*64);
-    q(50).data(63 downto 0) <= MTPAR_signals(63 + 14*64 downto 0 + 14*64);
-    q(51).data(63 downto 0) <= MTPAR_signals(63 + 15*64 downto 0 + 15*64);
-    q(52).data(63 downto 0) <= MTPAR_signals(63 + 16*64 downto 0 + 16*64);
-    q(53).data(63 - 12 downto 0) <= MTPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
+      --15 76bit signals can be accomodated by 18 64bit signals, this will leave
+      --12 empty bits in the last data word
+      q(36).data(63 downto 0) <= MTPAR_signals((63 + 0*64) downto 0*64);
+      q(37).data(63 downto 0) <= MTPAR_signals((63 + 1*64) downto 1*64);
+      q(38).data(63 downto 0) <= MTPAR_signals((63 + 2*64) downto 2*64);
+      q(39).data(63 downto 0) <= MTPAR_signals((63 + 3*64) downto 3*64);
+      q(40).data(63 downto 0) <= MTPAR_signals((63 + 4*64) downto 4*64);
+      q(41).data(63 downto 0) <= MTPAR_signals((63 + 5*64) downto 5*64);
+      q(42).data(63 downto 0) <= MTPAR_signals((63 + 6*64) downto 6*64);
+      q(43).data(63 downto 0) <= MTPAR_signals((63 + 7*64) downto 7*64);
+      q(44).data(63 downto 0) <= MTPAR_signals((63 + 8*64) downto 8*64);
+      q(45).data(63 downto 0) <= MTPAR_signals((63 + 9*64) downto 9*64);
+      q(46).data(63 downto 0) <= MTPAR_signals((63 + 10*64) downto 10*64);
+      q(47).data(63 downto 0) <= MTPAR_signals((63 + 11*64) downto 11*64);
+      q(48).data(63 downto 0) <= MTPAR_signals((63 + 12*64) downto 12*64);
+      q(49).data(63 downto 0) <= MTPAR_signals((63 + 13*64) downto 13*64);
+      q(50).data(63 downto 0) <= MTPAR_signals((63 + 14*64) downto 14*64);
+      q(51).data(63 downto 0) <= MTPAR_signals((63 + 15*64) downto 15*64);
+      q(52).data(63 downto 0) <= MTPAR_signals((63 + 16*64) downto 16*64);
+      q(53).data(63 downto 0) <= x"000" & MTPAR_signals((63 + 17*64 - 12) downto (17*64));
     
-    q(54).data(2 downto 0) <= bx_out;
-    
+      q(54).data(63 downto 0) <= x"000000000000000" & "0" & bx_out;
+    end if;
+  end process;
+
     --if (i<4) then
       
     --elsif (i>15 and i<20) then
