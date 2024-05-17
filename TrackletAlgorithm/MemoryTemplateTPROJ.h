@@ -125,6 +125,7 @@ public:
   {
     DataType data("0",16);
     MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
+      mask_[ibx]=0;
       for (size_t page = 0; page < NPAGE; page++) {
 	nentries_[ibx*NPAGE+page] = 0;
 	for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {

@@ -7,8 +7,8 @@ set -e
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://aryd.web.cern.ch/aryd/MemPrints_Split_240405.tgz"
-luts_url_split="https://aryd.web.cern.ch/aryd/LUTs_Split_240405.tgz"
+memprints_url_split="https://aryd.web.cern.ch/aryd/MemPrints_Split_240512.tgz"
+luts_url_split="https://aryd.web.cern.ch/aryd/LUTs_Split_240512.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"

@@ -160,8 +160,15 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   zbin__ = zbin_ + use_[iusetmp].range(1,1);
   //Read stub memory and extract data fields
   auto stubadd=(slot,istubtmp);
-  stubdata__ = stubmem[bx_&3][stubadd];
+  stubdata__ = stubmem[bx_&1][stubadd];
 
+  //if (good__) {
+  //  std::cout << "Read vmstub MEU: " << unit_ << " " << slot << " "
+  //	      << iphi_ + use_[iusetmp].range(0,0) << " "
+  //	      << zbin_ + use_[iusetmp].range(1,1) << " "
+  //	      << (stubadd&15) << " " << stubdata__.getBend() <<std::endl;
+  //}
+  
   ap_uint<2> index = __builtin_ctz(stubmask_);
   bool istub_done = istubtmp+1>=nstubs_;
   bool iuse_done = iusetmp+1>=nuse_;
@@ -253,6 +260,11 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     //the writeindex_ if we had a good stub that pass the various cuts
     writeindex_ = (good____&passphi&pass&table[index]) ? writeindexnext : writeindex_;
 
+    //if (good____) {
+    //  std::cout << "CAndidateMatc: " << unit_ << " " << index << " "
+    //		<< table[index] << " " << pass << " "  << passphi << std::endl;
+    //}
+    
     //update pipeline variables
     good____ = good___;
     stubdata____ = stubdata___;
