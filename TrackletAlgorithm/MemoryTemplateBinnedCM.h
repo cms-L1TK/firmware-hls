@@ -13,6 +13,11 @@
 #endif
 #endif
 
+//This is a bit of a hack, but until we find a cleaner
+//way to implement this we will use this...
+#include "SynthesisOptions.h"
+
+
 #ifdef CMSSW_GIT_HASH
 template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NBIT_BIN, unsigned int kNBitsphibinCM, unsigned int NCOPY>
 #else
@@ -145,7 +150,13 @@ class MemoryTemplateBinnedCM{
 #pragma HLS inline
     if (isCMSSW && !NBIT_BX) {ibx = 0;}
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
-#ifndef __SYNTHESIS__ 
+
+#if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
+
+      dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
+
+#else
+
       // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
       ap_uint<kNBitsRZBinCM> ibin;
@@ -153,7 +164,7 @@ class MemoryTemplateBinnedCM{
       (ireg,ibin)=slot;
 
       unsigned int nentry = nentriestmp_[slot];
-      nntriestmp_[slot]++;
+      nentriestmp_[slot]++;
       //unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
       //if (nentry2!=nentry) {
       //	std::cout << "nentry:"<<nentry<<" "<< nentry2 << " " << slot << std::endl;
@@ -176,15 +187,10 @@ class MemoryTemplateBinnedCM{
 	//FIXME ugly hack...
 	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
       }
-<<<<<<< HEAD
 
-      #ifdef CMSSW_GIT_HASH
-=======
-#else
-    dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
 #endif      
+
 #ifdef CMSSW_GIT_HASH
->>>>>>> 54f13ce (Restore functionality of combined module FPGA2 project - but breaks test benches)
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
@@ -239,12 +245,9 @@ class MemoryTemplateBinnedCM{
 	nentriestmp_[ibin] = 0;
       }
       for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
-<<<<<<< HEAD
-=======
 	nentries_[ibx*kNBinsRZ+ibin] = 0;
 	nentriesA_[ibx*kNBinsRZ+ibin] = 0;
 	nentriesB_[ibx*kNBinsRZ+ibin] = 0;
->>>>>>> 54f13ce (Restore functionality of combined module FPGA2 project - but breaks test benches)
         nentries8_[ibx][ibin] = 0;
         binmask8_[ibx][ibin] = 0;
       }

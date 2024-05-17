@@ -20,7 +20,7 @@ reset_run impl_1
 
 # Implementation
 update_compile_order -fileset sources_1
-launch_runs impl_1 -jobs 4
+launch_runs impl_1 -jobs 32
 wait_on_run impl_1
 
 # Make reports

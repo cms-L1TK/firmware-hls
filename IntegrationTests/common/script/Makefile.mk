@@ -76,7 +76,7 @@ $(DEPS)/%.d: $(EMDATA)/MemPrintsCM
 	@set -e; rm -f $@; mkdir -p $(DEPS); \
 	 TOP_FUNC=`echo $@ | sed 's,.*\/\([^/]*\)\.d,\1,g'`; \
 	 TOP_FILE=`grep -l $${TOP_FUNC} $(TOP_FUNCS)/*.cc`; \
-	 $(XILINX_GCC) -MM -I$(TRK_ALGO) -I$(TOP_FUNCS) -I$(XILINX_VIVADO)/include $${TOP_FILE} > $@.$$$$; \
+	 $(XILINX_GCC) -MM -I$(TRK_ALGO) -I$(TRK_ALGO)/Project -I$(TOP_FUNCS) -I$(XILINX_VIVADO)/include $${TOP_FILE} > $@.$$$$; \
 	 sed "s,.*:,$${TOP_FUNC} $@ :,g" < $@.$$$$ > $@; \
 	 echo "	@rm -rfv $${TOP_FUNC}; \\" >> $@; \
 	 echo "	 vivado_hls -f $(COMPILE_HLS) $${TOP_FILE} $${TOP_FUNC}" >> $@; \

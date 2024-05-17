@@ -5,6 +5,11 @@
 #include <iostream>
 #include "../TestBenches/FileReadUtility.h"
 
+//This is a bit of a hack, but until we find a cleaner
+//way to implement this we will use this...
+#include "SynthesisOptions.h"
+
+
 template<int> class AllStub;
 
 #ifndef __SYNTHESIS__
@@ -89,7 +94,7 @@ public:
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
       //dataarray_[ibx][addr_index] = data;
-#ifdef __SYNTHESIS__
+#if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
       dataarray_[ibx][32*page+addr_index] = data;
 #else

@@ -889,6 +889,9 @@ void readTable_rDSS(ap_uint<width> table[depth]){
 // MatchCalculator
 template<TF::layerDisk Layer, TF::phiRegion PHI, TF::seed Seed> constexpr bool FMMask();
 template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t FMMask();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint64_t NPage();
+template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t NPageSum();
+
 #include "MatchProcessor_parameters.h"
 
 template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
@@ -903,14 +906,6 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubid,
-                     int &nmcout1,
-                     int &nmcout2,
-                     int &nmcout3,
-                     int &nmcout4,
-                     int &nmcout5,
-                     int &nmcout6,
-                     int &nmcout7,
-                     int &nmcout8,
                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
 ){
 
@@ -1111,14 +1106,14 @@ void MatchCalculator(BXType bx,
 
   // Check that matches fall within the selection window of the projection 
   bool barrel_match = (delta_z_fact < best_delta_z) && (delta_z_fact >= -best_delta_z) && (abs_delta_phi < best_delta_phi);
-  bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < best_delta_rphi) && (abs_delta_r < best_delta_r) : ((abs_delta_phi * ap_uint<12>(disk_stubr2s)) < best_delta_rphi) && (abs_delta_r < best_delta_r);
+  bool disk_match = isPSStub ? ((abs_delta_phi * ap_uint<12>(stub_ps_r)) < LUT_matchcut_PSrphi[proj_seed]) && (abs_delta_r < LUT_matchcut_PSr[proj_seed]) : ((abs_delta_phi * ap_uint<12>(disk_stubr2s)) < LUT_matchcut_2Srphi[proj_seed]) && (abs_delta_r < LUT_matchcut_2Sr[proj_seed]);
   disk_match = isMatch ? disk_match && (abs_delta_phi < best_delta_phi) : disk_match;
   isMatch |= disk_match;
   if ((!isDisk && barrel_match) || (isDisk && disk_match)){
     // Update values of best phi parameters, so that the next match
     // will be compared to this value instead of the original selection cut
     if(isDisk) {
-      best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * disk_stubr2s;
+      //best_delta_rphi = isPSStub ? ap_uint<20>(abs_delta_phi) * ap_uint<12>(stub_ps_r) : ap_uint<20>(abs_delta_phi) * disk_stubr2s;
       best_delta_r    = abs_delta_r;
       best_delta_phi = abs_delta_phi;
     }
@@ -1135,50 +1130,42 @@ void MatchCalculator(BXType bx,
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem(bx,fm,nmcout1-savedMatch); // L1L2 seed
-      nmcout1+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem_new(bx,fm,savedMatch); // L1L2 seed
     }
     break;
     case 1:
     if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem(bx,fm,nmcout2-savedMatch); // L2L3 seed
-      nmcout2+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem_new(bx,fm,savedMatch); // L2L3 seed
     }
     break;
     case 2:
     if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem(bx,fm,nmcout3-savedMatch); // L3L4 seed
-      nmcout3+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem_new(bx,fm,savedMatch); // L3L4 seed
     }
     break;
     case 3:
     if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem(bx,fm,nmcout4-savedMatch); // L5L6 seed
-      nmcout4+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem_new(bx,fm,savedMatch); // L5L6 seed
     }
     break;
     case 4:
     if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem(bx,fm,nmcout5-savedMatch); // D1D2 seed
-      nmcout5+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem_new(bx,fm,savedMatch); // D1D2 seed
     }
     break;
     case 5:
     if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem(bx,fm,nmcout6-savedMatch); // D3D4 seed
-      nmcout6+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem_new(bx,fm,savedMatch); // D3D4 seed
     }
     break;
     case 6:
     if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem(bx,fm,nmcout7-savedMatch); // L1D1 seed
-      nmcout7+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem_new(bx,fm,savedMatch); // L1D1 seed
     }
     break;
     case 7:
     if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem(bx,fm,nmcout8-savedMatch); // L2D1 seed
-      nmcout8+=1-savedMatch;
+      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem_new(bx,fm,savedMatch); // L2D1 seed
     }
     break;
     }
@@ -1262,17 +1249,6 @@ void MatchProcessor(BXType bx,
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
-
-  // declare counters for each of the 8 different seeds.
-  //FIXME should have propoer seven bit type
-  int nmcout1 = 0;
-  int nmcout2 = 0;
-  int nmcout3 = 0;
-  int nmcout4 = 0;
-  int nmcout5 = 0;
-  int nmcout6 = 0;
-  int nmcout7 = 0;
-  int nmcout8 = 0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -1458,7 +1434,6 @@ void MatchProcessor(BXType bx,
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
         (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
-         nmcout1, nmcout2, nmcout3, nmcout4, nmcout5, nmcout6, nmcout7, nmcout8,
          fullmatch);
     } //end MC if
     

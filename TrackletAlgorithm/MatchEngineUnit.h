@@ -394,7 +394,8 @@ inline ap_uint<kNBits_MemAddr> getProjSeqOld() {
 
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
-#pragma HLS array_partition variable=projseqs_ complete
+#pragma HLS array_partition variable=projseqs_ complete 
+
   return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
 
 }
