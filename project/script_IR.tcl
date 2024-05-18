@@ -68,7 +68,7 @@ set module_to_export InputRouterTop_IR_DTC_PS10G_3_A
 open_project -reset inputrouter
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm  -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig}
 add_files ../TopFunctions/CombinedConfig/InputRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 

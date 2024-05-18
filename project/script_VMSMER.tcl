@@ -9,6 +9,53 @@ source env_hls.tcl
 # list of modules to test in C-simulation
 set modules_to_test {
   {VMSMER_L1PHIA}
+  {VMSMER_L1PHIB}
+  {VMSMER_L1PHIC}
+  {VMSMER_L1PHID}
+  {VMSMER_L1PHIE}
+  {VMSMER_L1PHIF}
+  {VMSMER_L1PHIG}
+  {VMSMER_L1PHIH}
+  {VMSMER_L2PHIA}
+  {VMSMER_L2PHIB}
+  {VMSMER_L2PHIC}
+  {VMSMER_L2PHID}
+  {VMSMER_L3PHIA}
+  {VMSMER_L3PHIB}
+  {VMSMER_L3PHIC}
+  {VMSMER_L3PHID}
+  {VMSMER_L4PHIA}
+  {VMSMER_L4PHIB}
+  {VMSMER_L4PHIC}
+  {VMSMER_L4PHID}
+  {VMSMER_L5PHIA}
+  {VMSMER_L5PHIB}
+  {VMSMER_L5PHIC}
+  {VMSMER_L5PHID}
+  {VMSMER_L6PHIA}
+  {VMSMER_L6PHIB}
+  {VMSMER_L6PHIC}
+  {VMSMER_L6PHID}
+  {VMSMER_D1PHIA}
+  {VMSMER_D1PHIB}
+  {VMSMER_D1PHIC}
+  {VMSMER_D1PHID}
+  {VMSMER_D2PHIA}
+  {VMSMER_D2PHIB}
+  {VMSMER_D2PHIC}
+  {VMSMER_D2PHID}
+  {VMSMER_D3PHIA}
+  {VMSMER_D3PHIB}
+  {VMSMER_D3PHIC}
+  {VMSMER_D3PHID}
+  {VMSMER_D4PHIA}
+  {VMSMER_D4PHIB}
+  {VMSMER_D4PHIC}
+  {VMSMER_D4PHID}
+  {VMSMER_D5PHIA}
+  {VMSMER_D5PHIB}
+  {VMSMER_D5PHIC}
+  {VMSMER_D5PHID}
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
@@ -18,7 +65,7 @@ set module_to_export VMSMER_L1PHIA
 open_project -reset vmsmeRouter
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig_FPGA2}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
 add_files -tb ../TestBenches/VMStubMERouter_test.cpp -cflags "$CFLAGS"
 
 # data files

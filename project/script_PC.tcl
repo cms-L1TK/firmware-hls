@@ -18,7 +18,7 @@ set module_to_export PC_L1L2C
 open_project -reset projectionCalculator
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig/}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2/}
 add_files ../TopFunctions/CombinedConfig/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionCalculator_test.cpp -cflags "$CFLAGS"
 

@@ -7,7 +7,7 @@ source env_hls.tcl
 open_project -reset duplicateRemoval
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm/}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm/ -I../TrackletAlgorithm/TestBench}
 add_files ../TopFunctions/DuplicateRemovalTop.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/DuplicateRemoval.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/DuplicateRemoval_test.cpp -cflags "$CFLAGS"

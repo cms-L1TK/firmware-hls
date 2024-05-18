@@ -21,7 +21,7 @@
 
 using namespace std;
 
-const int nEvents = 5;  //number of events to run
+const int nEvents = 100;  //number of events to run
 
 int main() {
 
@@ -59,20 +59,12 @@ int main() {
   // Error count
   int err = 0;
 
-  //Create variables that keep track of which memory address to read and write to
-	ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
-
-  
   for (unsigned int ievt = 0; ievt < nEvents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     // Clear output memories
     memoryME.clear();
     memoriesASCopy.clear();
-
-    for (int i = 0; i < 1 << (kNbitsrzbinME + kNbitsphibin); i++) {
-      addrCountME[i] = 0;
-    }
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
@@ -89,7 +81,6 @@ int main() {
                 &memoryME,
                 memoriesASCopy,
                 index,
-                addrCountME,
                 valid);
 
     }
