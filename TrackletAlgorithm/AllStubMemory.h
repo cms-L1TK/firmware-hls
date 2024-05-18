@@ -338,7 +338,9 @@ public:
   }
 
   ASR getR() const {
-    return (data_.range(kASRMSB,kASRLSB) + (1 << 8)); // adding 256 for DISKPS stubs since when memories are written 256 was subtracted from the r value (to save an extra bit to determine if in the negative z side of detector)
+    //FIXME - need to use offset when updating memory files
+    return (data_.range(kASRMSB+1,kASRLSB));
+    //return (data_.range(kASRMSB,kASRLSB) + (1 << 8)); // adding 256 for DISKPS stubs since when memories are written 256 was subtracted from the r value (to save an extra bit to determine if in the negative z side of detector)
   }
 
   ASZ getZ() const {
@@ -357,7 +359,10 @@ public:
     // Checks the radius 
     // if these are zero it means that you have 2S stubs where the radius 
     // just encodes the ring number and is less than 16
-      return data_.range(getWidth()-2, getWidth()-3) > 0; // Check second and third highest bits regardless of template type
+
+    //FIXME should use -2 to -3 when using input with offset for radius
+    return data_.range(getWidth()-1, getWidth()-3) > 0; 
+    //return data_.range(getWidth()-2, getWidth()-3) > 0; // Check second and third highest bits regardless of template type
   }
 
   // Setter

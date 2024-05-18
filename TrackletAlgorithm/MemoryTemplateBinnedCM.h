@@ -97,7 +97,7 @@ class MemoryTemplateBinnedCM{
   }
 
   ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    return nentries_[bx*8+ibin];
+    return nentries_[bx*(1<<kNBitsRZBinCM)+ibin];
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
