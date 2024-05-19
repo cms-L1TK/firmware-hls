@@ -171,66 +171,69 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
-  for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
-    const auto data_ref_raw = memory_ref.read_mem(ievt,i).raw();
-    const auto data_com_raw = memory.read_mem(ievt,i).raw();
-    const auto data_ref = data_ref_raw.range(msb,lsb);
-    const auto data_com = data_com_raw.range(msb,lsb);
+  for (unsigned int ipage = 0; ipage < 4; ++ipage) {
+    //FIXME
+    for (unsigned int i = 0; i < memory_ref.getDepth()/4; ++i) {
+      const auto data_ref_raw = memory_ref.read_mem(ievt,i,ipage).raw();
+      const auto data_com_raw = memory.read_mem(ievt,i,ipage).raw();
+      const auto data_ref = data_ref_raw.range(msb,lsb);
+      const auto data_com = data_com_raw.range(msb,lsb);
 
-    // Print headers for the columns at start
-    if (i==0) {
-      // If both reference and computed memories are completely empty, skip it
-      if (!print_empty && data_com == 0 && data_ref == 0) break;
-      std::cout << label << ":" << std::endl;
-      if (OutputBase == 2) std::cout << "index" << "\t" << "reference" << "\t\t\t\t" << "computed" << std::endl;
-      else std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
+      // Print headers for the columns at start
+      if (i==0) {
+	if (data_com == 0 && data_ref == 0) {
+	  break;
+	}
+	std::cout << label << " [page = " << ipage << "]:" << std::endl;
+	if (OutputBase == 2) std::cout << "index" << "\t" << "reference" << "\t\t\t\t" << "computed" << std::endl;
+	else std::cout << "index" << "\t" << "reference" << "\t" << "computed" << std::endl;
 
-      if (OutputBase==2) {
-        // Print out column headers
-        int end_index = bit_widths.size();
-        if (start_index != 0)
-          end_index = start_index + 1; // allows for only printing one column
+	if (OutputBase==2) {
+	  // Print out column headers
+	  int end_index = bit_widths.size();
+	  if (start_index != 0)
+	    end_index = start_index + 1; // allows for only printing one column
 
-        std::cout << " \t";
-        for (int j = 0; j < 2; j++) {
-          for (int i = start_index; i < end_index; i++) {
-            int length = bit_widths[i] - names[i].length() - 3;
-            if (length < 0 ) length = 0;
-            const std::string spaces(length,' ');
-            std::cout << names[i] << "(" << std::dec << bit_widths[i] << ")" << spaces << "|";
-          }
-          if (j == 0) std::cout << "|";
-        }
+	  std::cout << " \t";
+	  for (int j = 0; j < 2; j++) {
+	    for (int i = start_index; i < end_index; i++) {
+	      int length = bit_widths[i] - names[i].length() - 3;
+	      if (length < 0 ) length = 0;
+	      const std::string spaces(length,' ');
+	      std::cout << names[i] << "(" << std::dec << bit_widths[i] << ")" << spaces << "|";
+	    }
+	    if (j == 0) std::cout << "|";
+	  }
+	}
+	std::cout << std::endl;
+      }
+
+      // If have reached the end of valid entries in both computed and reference, don't bother printing further
+      if (data_com == 0 && data_ref == 0) continue;
+
+      // Print out the values
+      std::cout << i << " \t";
+      if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_ref).to_string(), bit_widths, names, start_index) << "|";
+      else                 std::cout << std::hex << data_ref << "\t";
+
+      if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_com).to_string(), bit_widths, names, start_index) ;
+      else                 std::cout << std::hex << data_com;
+
+      // If there is extra entries in reference
+      if (data_com == 0) {
+	std::cout << "\t" << "<=== missing";
+	if (!truncated) err_count++;
+	// If there is extra entries in computed
+      } else if (data_ref == 0) {
+	std::cout << "\t" << "<=== EXTRA";
+	err_count++;
+	// If reference and computed entry are inconsistent
+      } else if (data_com.to_long() != data_ref.to_long()) {
+	std::cout << "\t" << "<=== INCONSISTENT";
+	err_count++;
       }
       std::cout << std::endl;
     }
-
-    // If have reached the end of valid entries in both computed and reference, don't bother printing further
-    if (data_com == 0 && data_ref == 0) continue;
-
-    // Print out the values
-    std::cout << i << " \t";
-    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_ref).to_string(), bit_widths, names, start_index) << "|";
-    else                 std::cout << std::hex << data_ref << "\t";
-
-    if (OutputBase == 2) std::cout << return_splitted(std::bitset<width>(data_com).to_string(), bit_widths, names, start_index) ;
-    else                 std::cout << std::hex << data_com;
-
-    // If there is extra entries in reference
-    if (data_com == 0) {
-      std::cout << "\t" << "<=== missing";
-      if (!truncated) err_count++;
-    // If there is extra entries in computed
-    } else if (data_ref == 0) {
-      std::cout << "\t" << "<=== EXTRA";
-      err_count++;
-    // If reference and computed entry are inconsistent
-    } else if (data_com.to_long() != data_ref.to_long()) {
-      std::cout << "\t" << "<=== INCONSISTENT";
-      err_count++;
-    }
-
-    std::cout << std::endl;
   }
 
   return err_count;
@@ -438,8 +441,9 @@ class TBHelper {
         glob_t globbuf;
         globbuf.gl_offs = 0;
         glob((baseDir_ + "/" + query).c_str(), 0, nullptr, &globbuf);
-        for (unsigned i = 0; i < globbuf.gl_pathc; i++)
+        for (unsigned i = 0; i < globbuf.gl_pathc; i++){
           fileNames.emplace_back(globbuf.gl_pathv[i]);
+	}
 
         // define functions needed to get file order to match the wiring
 

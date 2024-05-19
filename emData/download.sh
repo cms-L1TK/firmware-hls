@@ -277,7 +277,7 @@ fi
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
-mod_types=(IR FT PD VMRCM TP MP)
+mod_types=(IR FT PD VMRCM TP MP PC)
 
 for module_type in ${mod_types[@]}
 do
@@ -286,7 +286,7 @@ do
 
 # Create a list of all processing modules. The VMRs in the combined config get
 # a special name.
-processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTsCM/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}`
+processing_modules=`sed "s/VMRouterCM: VMR/&CM/g" LUTsSplit/processingmodules.dat | awk '{print $2}' | sort -u | grep ${module_type}`
 
 # For each of the desired modules, create a dedicated directory with symbolic
 # links to the associated test-bench files.
@@ -327,7 +327,11 @@ do
           mkdir -p ${table_target_dir}
   fi
 
-  if [[ ${module_type} == "TP" ]]
+  if [[ ${module_type} == "PC" ]]
+  then
+          seed=`echo ${module} | sed "s/.*_\([L|D][1-6][L|D][1-6]\).*$/\1/g"`
+
+  elif [[ ${module_type} == "TP" ]]
   then
           seed=`echo ${module} | sed "s/.*_\([L|D][1-6][L|D][1-6]\).*$/\1/g"`
           find ${table_location} -type f -name "TP_${seed}.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;

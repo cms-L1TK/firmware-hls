@@ -198,6 +198,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
       "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
       ") {\n"
+      "#pragma HLS latency min=13 max=13\n"
+#       "#pragma HLS interface ap_ctrl_none port=return\n"
       "#pragma HLS pipeline II=1\n"
       "#pragma HLS latency min=13 max=13\n"
       "#pragma HLS inline recursive\n"

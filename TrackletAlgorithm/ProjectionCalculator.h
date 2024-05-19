@@ -39,22 +39,24 @@ PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
   else
     phi >>= 3;
 
+  int ipage = trackletIndex >> 5;
+  
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
-    projout[0].write_mem(bx, proj, trackletIndex);
+    projout[0].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
-    projout[1].write_mem(bx, proj, trackletIndex);
+    projout[1].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2)
-    projout[2].write_mem(bx, proj, trackletIndex);
+    projout[2].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 3 && TPROJMask & (0x1 << 3) && success && proj_success && phi == 3)
-    projout[3].write_mem(bx, proj, trackletIndex);
+    projout[3].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 4 && TPROJMask & (0x1 << 4) && success && proj_success && phi == 4)
-    projout[4].write_mem(bx, proj, trackletIndex);
+    projout[4].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 5 && TPROJMask & (0x1 << 5) && success && proj_success && phi == 5)
-    projout[5].write_mem(bx, proj, trackletIndex);
+    projout[5].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 6 && TPROJMask & (0x1 << 6) && success && proj_success && phi == 6)
-    projout[6].write_mem(bx, proj, trackletIndex);
+    projout[6].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 7 && TPROJMask & (0x1 << 7) && success && proj_success && phi == 7)
-    projout[7].write_mem(bx, proj, trackletIndex);
+    projout[7].write_mem(bx, proj, trackletIndex, ipage);
 
   return (success && proj_success);
 }
@@ -79,7 +81,9 @@ template<
 
   if (!valid) return;
 
-  tparout.write_mem(bx, tpar, trackletIndex);
+  int ipage =  trackletIndex >> 5;
+  
+  tparout.write_mem(bx, tpar, trackletIndex, ipage);
 
   // Load the initial track parameters (phi0, z0, t, rinv)
   TrackletParameters::PHI0PAR phi0 = tpar.getPhi0();
@@ -244,10 +248,14 @@ template<
     nproj_disk[i] = 0;
   }
 
-  const int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC);
+  //iTC gives you the first TCID in e.g. ABC, ipage gives you corrected TCID for B and C
+  const int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC + ipage);
   bool addL3 = false, addL4 = false, addL5 = false, addL6 = false; // whether a projection has been added successfully
 
-  ap_uint<7> trackletId = trackletIndex&31;
+  //FIXME
+  //ap_uint<7> trackletId = trackletIndex&31;
+  ap_uint<7> trackletId = trackletIndex;
+  trackletIndex =  trackletIndex&31;
   
   // Disk-only seeds
   if (Seed == TF::D1D2){

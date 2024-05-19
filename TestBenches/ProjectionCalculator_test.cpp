@@ -24,31 +24,31 @@
   #define SEED_ L1L2_
 #endif
 #if !defined ITC_
-  #define ITC_ C_
+  #define ITC_ ABC_
 #endif
 #if !defined MODULE_
-  #define MODULE_ TP_L1L2C_
+  #define MODULE_ PC_L1L2ABC_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ ProjectionCalculator_L1L2C
+  #define TOP_FUNC_ ProjectionCalculator_L1L2ABC
 #endif
 
-const int nevents = 100;  //number of events to run
+const int nevents = 5;  //number of events to run
 
 using namespace std;
 
 int main()
 {
 
-  TBHelper tb(std::string("TP/") + module_name[MODULE_]);
+  TBHelper tb(std::string("PC/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
 
     // open input files from emulation
-  auto &fin_tpar = tb.files("TrackletParameters*");
-  auto &fout_tproj = tb.files("TrackletProjections*");
-  const auto &tproj_names = tb.fileNames("TrackletProjections*");
+  auto &fin_tpar = tb.files("TrackletParameters_MPAR*");
+  auto &fout_tproj = tb.files("TrackletProjections_MPROJ*");
+  const auto &tproj_names = tb.fileNames("TrackletProjections_MPROJ*");
 
   // input memory
   TrackletParameterMemory trackletParameters;
@@ -81,12 +81,22 @@ int main()
 
     // Unit Under Test
 
-    std::cout << "Entries:" << trackletParameters.getEntries(bx) << std::endl;
+    std::cout << "Entries:"
+	      << trackletParameters.getEntries(bx,0) << " "
+	      << trackletParameters.getEntries(bx,1) << " "
+	      << trackletParameters.getEntries(bx,2) << " "
+	      << trackletParameters.getEntries(bx,3) << " "
+	      << std::endl;
 
-    for (int ipar = 0; ipar < kMaxProc; ipar++) {
-      const bool valid = ipar < trackletParameters.getEntries(bx);
-      TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx,ipar), ipar, valid,
-                trackletParametersOut, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+    
+    const int NPAGE = 4;
+    
+    for (int ipage = 0; ipage < NPAGE; ipage++) {
+      for (int ipar = 0; ipar < kMaxProc; ipar++) {
+	const bool valid = ipar < trackletParameters.getEntries(bx, ipage);
+	TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx, ipar, ipage), ipage*32+ipar, valid,
+		  trackletParametersOut, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
+      }
     }
 
     bool truncation = false;
