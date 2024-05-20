@@ -26,7 +26,7 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned 
 
 // DataType: type of data object stored in the array
 // NBIT_BX: number of bits for BX;
-// (1<<NBIT_BIN): number of BXs the memory is keeping track of
+// (1<<NBIT_BX): number of BXs the memory is keeping track of
 // NBIT_ADDR: number of bits for memory address space per BX
 // (1<<NBIT_ADDR): depth of the memory for each BX
 // NBIT_BIN: number of bits used for binning; (1<<NBIT_BIN): number of bins
@@ -164,30 +164,26 @@ class MemoryTemplateBinnedCM{
       (ireg,ibin)=slot;
 
       unsigned int nentry = nentriestmp_[slot];
-      nentriestmp_[slot]++;
-      //unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
-      //if (nentry2!=nentry) {
-      //	std::cout << "nentry:"<<nentry<<" "<< nentry2 << " " << slot << std::endl;
-      //}
-      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-      nentriesA_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-      if (ibin!=0) {
-      	//unsigned int nentry2 = nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4);
-      	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
-      	nentriesB_[ibx*kNBinsRZ+ibin-1].range((ireg+0)*4+3,(ireg+0)*4)=nentry+1;
-      }
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
-      binmask8_[ibx][ibin].set_bit(ireg,true);
 
-      //icopy comparison must be signed int or future SW fails
-      writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
+      //if (nentry < (1<<(NBIT_ADDR-NBIT_BIN))-1) {
+      
+	nentriestmp_[slot]++;
+
+	nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	nentriesA_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	if (ibin!=0) {
+	  nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+	  nentriesB_[ibx*kNBinsRZ+ibin-1].range((ireg+0)*4+3,(ireg+0)*4)=nentry+1;
+	}
+	nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
+	binmask8_[ibx][ibin].set_bit(ireg,true);
+
+	//icopy comparison must be signed int or future SW fails
+        writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
-	//#if defined __SYNTHESIS__ && !defined CSYNTH
-        //dataarray_[icopy][ibx][getNEntryPerBin()*slot] = data;
-	//FIXME ugly hack...
-	dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
-      }
-
+	  dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
+	}
+	//}
 #endif      
 
 #ifdef CMSSW_GIT_HASH
@@ -196,11 +192,11 @@ class MemoryTemplateBinnedCM{
       (ireg,ibin)=slot;
       nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       if (ibin!=0) {
-      	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
+	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
       }
       nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
-      #endif
+#endif
 
       return true;
     }
