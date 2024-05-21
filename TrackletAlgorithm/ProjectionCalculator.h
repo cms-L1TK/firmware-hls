@@ -9,12 +9,12 @@
 
 namespace PC {
 template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
-addProj(const TrackletProjection<TProjType> &, const BXType, TrackletProjectionMemory<TProjType>[], int[], ap_uint<7>, const bool);
+addProj(const TrackletProjection<TProjType> &, const BXType, TrackletProjectionMemory<TProjType>[], int[], ap_uint<9>, const bool);
 }
 
 // Writes a tracklet projection to the appropriate tracklet projection memory.
 template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
-PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], ap_uint<7> trackletIndex, const bool success)
+PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], ap_uint<9> trackletIndex, const bool success)
 {
   bool proj_success = true;
 
@@ -39,8 +39,10 @@ PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
   else
     phi >>= 3;
 
-  int ipage = trackletIndex >> 5;
-  
+  int ipage = trackletIndex >> 7;
+
+  trackletIndex = trackletIndex&127;
+
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
     projout[0].write_mem(bx, proj, trackletIndex, ipage);
   if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
@@ -81,9 +83,9 @@ template<
 
   if (!valid) return;
 
-  int ipage =  trackletIndex >> 5;
+  int ipage =  trackletIndex >> 7;
   
-  tparout.write_mem(bx, tpar, trackletIndex, ipage);
+  tparout.write_mem(bx, tpar, trackletIndex&127, ipage);
 
   // Load the initial track parameters (phi0, z0, t, rinv)
   TrackletParameters::PHI0PAR phi0 = tpar.getPhi0();
@@ -254,8 +256,8 @@ template<
 
   //FIXME
   //ap_uint<7> trackletId = trackletIndex&31;
-  ap_uint<7> trackletId = trackletIndex;
-  trackletIndex =  trackletIndex&31;
+  ap_uint<9> trackletId = trackletIndex;
+  trackletIndex =  trackletIndex&127;
   
   // Disk-only seeds
   if (Seed == TF::D1D2){

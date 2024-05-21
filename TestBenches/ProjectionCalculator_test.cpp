@@ -33,7 +33,7 @@
   #define TOP_FUNC_ ProjectionCalculator_L1L2ABC
 #endif
 
-const int nevents = 5;  //number of events to run
+const int nevents = 100;  //number of events to run
 
 using namespace std;
 
@@ -94,7 +94,7 @@ int main()
     for (int ipage = 0; ipage < NPAGE; ipage++) {
       for (int ipar = 0; ipar < kMaxProc; ipar++) {
 	const bool valid = ipar < trackletParameters.getEntries(bx, ipage);
-	TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx, ipar, ipage), ipage*32+ipar, valid,
+	TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx, ipar, ipage), ipage*128+ipar, valid,
 		  trackletParametersOut, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);
       }
     }
