@@ -26,7 +26,7 @@ open_project -reset trackBuilder
 
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
-add_files ../TopFunctions/CombinedConfig/TrackBuilderTop.cc -cflags "$CFLAGS"
+add_files ../TopFunctions/CombinedConfig_FPGA2/TrackBuilderTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackBuilder_test.cpp -cflags "$CFLAGS"
 
 # data files

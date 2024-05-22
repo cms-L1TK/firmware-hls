@@ -130,6 +130,7 @@ mkdir -p ../TopFunctions/CombinedBarrelConfig
 ./generate_TB.py       -w LUTsCMBarrel/wires.dat -o ../TopFunctions/CombinedBarrelConfig
 ### combined barrel config                      
 mkdir -p ../TopFunctions/CombinedConfig_FPGA2
+./generate_TP.py       -w LUTsSplit/wires.dat -l LUTsSplit -o ../TopFunctions/CombinedConfig_FPGA2
 ./generate_PC.py       -sp -w  LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 ./generate_VMSMER.py   --all -w LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2
 ./generate_MP.py       -sp -w LUTsSplit/wires.dat -o ../TopFunctions/CombinedConfig_FPGA2

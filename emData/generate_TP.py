@@ -76,6 +76,7 @@ TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
 parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/CombinedConfig/", type=str, help="The directory in which to write the output files (default=%(default)s)")
 parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTsCM/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+parser.add_argument("-l", "--LUTsDir", metavar="LUTS_DIR", default="LUTsCM", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
 arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with TPs in
@@ -211,10 +212,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
               tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
       # figure out sizes of LUTs by reading .tab files, do once per seed type
       if seed not in seedlist:
-        LUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}.tab".format(seed))) - 2)
-        regLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
-        innerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
-        outerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
+        LUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}.tab".format(seed))) - 2)
+        regLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
+        innerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
+        outerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"
@@ -233,11 +234,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static ap_uint<10> lut[' + LUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"LUTsCM/TP_' + seed + '.tab");\n'
+          '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"'+arguments.LUTsDir+'/TP_' + seed + '.tab");\n'
           '#else\n'
           '  static ap_uint<10> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + '.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + '.tab"\n'
+          '#if __has_include("../emData/"+arguments.LUTsDir+"/TP_' + seed + '.tab")\n'
+          '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + '.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
@@ -253,11 +254,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static ap_uint<1> lut[' + innerPTLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"LUTsCM/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
+          '    init = readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
           '#else\n'
           '  static ap_uint<1> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
+          '#if __has_include("../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
+          '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
@@ -273,11 +274,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static ap_uint<1> lut[' + outerPTLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"LUTsCM/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
+          '    init = readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
           '#else\n'
           '  static ap_uint<1> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
+          '#if __has_include("../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
+          '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'

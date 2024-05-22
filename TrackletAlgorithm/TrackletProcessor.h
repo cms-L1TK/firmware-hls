@@ -477,21 +477,21 @@ TC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
     phi >>= 3;
 
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
-    projout[0].write_mem(bx, proj, nproj[0]++);
+    projout[0].write_mem(bx, proj, 0);
   if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
-    projout[1].write_mem(bx, proj, nproj[1]++);
+    projout[1].write_mem(bx, proj, 0);
   if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2)
-    projout[2].write_mem(bx, proj, nproj[2]++);
+    projout[2].write_mem(bx, proj, 0);
   if (NProjOut > 3 && TPROJMask & (0x1 << 3) && success && proj_success && phi == 3)
-    projout[3].write_mem(bx, proj, nproj[3]++);
+    projout[3].write_mem(bx, proj, 0);
   if (NProjOut > 4 && TPROJMask & (0x1 << 4) && success && proj_success && phi == 4)
-    projout[4].write_mem(bx, proj, nproj[4]++);
+    projout[4].write_mem(bx, proj, 0);
   if (NProjOut > 5 && TPROJMask & (0x1 << 5) && success && proj_success && phi == 5)
-    projout[5].write_mem(bx, proj, nproj[5]++);
+    projout[5].write_mem(bx, proj, 0);
   if (NProjOut > 6 && TPROJMask & (0x1 << 6) && success && proj_success && phi == 6)
-    projout[6].write_mem(bx, proj, nproj[6]++);
+    projout[6].write_mem(bx, proj, 0);
   if (NProjOut > 7 && TPROJMask & (0x1 << 7) && success && proj_success && phi == 7)
-    projout[7].write_mem(bx, proj, nproj[7]++);
+    projout[7].write_mem(bx, proj, 0);
 
   return (success && proj_success);
 }
@@ -536,15 +536,13 @@ TC::processStubPair(
   bool success;
 #pragma HLS array_partition variable=rD complete
 
-  //std::cout << "barrelSeeding: innerStub phi z r : "<<innerStub.getPhi()<<" "<<innerStub.getZ()<<" "<<innerStub.getR()<<std::endl;
-  //std::cout << "barrelSeeding: outerStub phi z r : "<<outerStub.getPhi()<<" "<<outerStub.getZ()<<" "<<outerStub.getR()<<std::endl;
-
 // Calculate the tracklet parameters and projections.
   auto stubIndex1 = innerIndex;
   auto stubIndex2 =  outerIndex;
 
-  if (Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L5L6)
+  if (Seed == TF::L1L2 || Seed == TF::L2L3 || Seed == TF::L3L4 || Seed == TF::L5L6) {
     success = TC::barrelSeeding<Seed, InnerRegion, OuterRegion>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
+  }
   else if (Seed == TF::L1D1 || Seed==TF::L2D1 ){
     success = TC::overlapSeeding<Seed, InnerRegion, OuterRegion>(innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
     //stub indices are reversed on overlap seeds for some reason.
@@ -555,7 +553,10 @@ TC::processStubPair(
     success = TC::diskSeeding<Seed, InnerRegion, OuterRegion>(negDisk, innerStub, outerStub, &rinv, &phi0, &z0, &t, phiL, zL, &der_phiL, &der_zL, valid_proj, phiD, rD, &der_phiD, &der_rD, valid_proj_disk);
   // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(phiRegion, stubIndex1, stubIndex2, rinv, phi0, z0, t);
-  if (success) trackletParameters->write_mem(bx, tpar, npar++);
+  if (success) {
+    npar++;
+    trackletParameters->write_mem(bx, tpar, 0);
+  }
 
 bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;
 //Disk Seeds
@@ -810,9 +811,9 @@ TF::seed Seed, // seed layer combination (TC::L1L2, TC::L3L4, etc.)
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
 #pragma HLS pipeline II=1 rewind
 
-    /*
+    /*    
     std::cout << "istep="<<istep<<" TEBuffer: "<<tebuffer.getIStub()<<" "<<tebuffer.getMem()<<" "
-              << tebuffer.readptr()<<" "<<tebuffer.writeptr()<<std::endl;
+              << tebuffer.readptr()<<" "<<tebuffer.writeptr()<<"  ";
 
     for (unsigned k = 0; k < kNTEUnits[Seed]; k++){
       std::cout<<" ["<<k<<" "<<teunits[k].readindex_<<" "<<teunits[k].writeindex_<<" "<<teunits[k].idle_<<"]";
@@ -1065,7 +1066,7 @@ teunits[k].idle_;
 
     //Find if there are _any_ bins with hits that needs to be tried. If so will store stub in buffer
     bool havestubs=stubmask.or_reduce();
-    
+
     //addtedata is the criteria for saving stub to TE buffer:
     //valid means that r/z project is in valid range
     //havestubs means that at least one memory bin has stubs
@@ -1149,6 +1150,7 @@ teunits[k].idle_;
     //Extract the current stub - check if valid. Calculate next stub. Check if valid
     istub__ = tebuffer.getIStub();
     bool validstub = istub__ < innerStubs[imem].getEntries(bx);
+
     
     ap_uint<kNBits_MemAddr> istubnext = istub__+1;
     bool validstubnext=istubnext<innerStubs[imem].getEntries(bx);
@@ -1165,7 +1167,6 @@ teunits[k].idle_;
     
     //Read stub from memory - BRAM with latency of one or two clks
     stub__ = AllStubInner<innerASType>(innerStubs[imem].read_mem(bx,istub__).raw());
-
 
     //Update TEUnit data for next loop
 

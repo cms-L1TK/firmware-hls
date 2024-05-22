@@ -65,7 +65,7 @@ public:
     return mask_[bx];
   }
   
-  const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
+  const DataType (&get_mem() const)[1<<NBIT_BX][(1<<NBIT_ADDR)*NPAGE] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
   {
