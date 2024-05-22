@@ -230,8 +230,8 @@ void readTable(ap_uint<1> table[]){
   if (L==TF::D5) {
     bool tmp[768]=
 #include "../emData/MP/tables/METable_D5.tab"
-#pragma HLS unroll
     for (int i=0;i<768;++i){
+#pragma HLS unroll
       table[i]=tmp[i];
     }
   }
