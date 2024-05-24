@@ -1072,7 +1072,9 @@ void MatchCalculator(BXType bx,
   const typename FullMatch<FMTYPE>::FMTrackletIndex &fm_tkid  = proj_tkid;
   const typename FullMatch<FMTYPE>::FMSTUBPHIID     fm_asphi = PHISEC;
   const typename FullMatch<FMTYPE>::FMSTUBID        &fm_asid  = stubid;
-  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = isDisk ? (isPSStub ? ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_ps_r) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_2s_r)) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_r);
+  //The subtraction of (1 << 8) fpr the PS stubs is made to match how we store the PS stubs in the emulation
+  //this should probably be revisited at some point.
+  const typename FullMatch<FMTYPE>::FMSTUBR         &fm_stubr = isDisk ? (isPSStub ? ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_ps_r - (1 << 8)) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_2s_r)) : ap_int<FullMatch<FMTYPE>::kFMStubRSize>(stub_r);
   const typename FullMatch<FMTYPE>::FMPHIRES        fm_phi   = delta_phi;
   const typename FullMatch<FMTYPE>::FMZRES          fm_z     = (!isDisk) ? delta_z : ap_int<12>(delta_r);
   
