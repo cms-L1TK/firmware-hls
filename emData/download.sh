@@ -153,8 +153,6 @@ cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
 cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
 cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
 cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
-<<<<<<< HEAD
-=======
 # grep, awk, and sed should be fixed in CMSSW - no we can use the config from
 # CMSSW instead of a hand made configuration. But it still needs tweaking...
 grep -v vmstuboutPHI ../LUTsSplit/wires.dat | grep -v TP_ | grep -v IR_ > fpga2_wires.dat
@@ -197,7 +195,6 @@ echo "TrackletParameters: MPAR_L2D1ABCDin [73]" >> fpga2_memorymodules.dat
 
 grep -v TP_ ../LUTsSplit/processingmodules.dat | grep -v VMR_ | grep -v IR_ > fpga2_processingmodules.dat
 sed -i 's/VMStubMERouter/VMSMERouter/g' fpga2_processingmodules.dat
->>>>>>> 0a2ec65 (Updates to configuration file from CMSSW for the FPGA2 project)
 
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
