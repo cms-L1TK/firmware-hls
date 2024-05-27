@@ -244,6 +244,7 @@ cd ../
 
 if [[ $tables_only == 0 ]]
 then
+  echo "Getting MemPrints tar balls"
   # Get memory test data: download and unpack the tarball.
   wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_split}
   tar -xzmf MemPrints.tgz
@@ -269,13 +270,15 @@ then
   mv MemPrints MemPrintsCM
   rm -f MemPrints.tgz
 
+  echo "Done getting MemPrints tar balls"
+
 fi
 
 # Needed in order for awk to run successfully:
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
-mod_types=(IR FT PD VMRCM TP MP PC)
+mod_types=(IR FT PD VMRCM VMSMER TP MP PC)
 
 for module_type in ${mod_types[@]}
 do
@@ -349,6 +352,15 @@ do
   elif [[ ${module_type} == "VMRCM" ]]
   then
           layer=`echo ${module} | sed "s/VMR_\(..\).*/\1/g"`
+          find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
+          do
+            find ${table_location} -type f -name "${mem}*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
+          done
+  elif [[ ${module_type} == "VMSMER" ]]
+  then
+          layer=`echo ${module} | sed "s/VMSMER_\(..\).*/\1/g"`
           find ${table_location} -type f -name "${module}_*.tab" -exec ln -sf ../../{} ${table_target_dir}/ \;
           find ${table_location} -type f -name "VM*${layer}*" ! -name "*PHI*" -exec ln -sf ../../{} ${table_target_dir}/ \;
           for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;

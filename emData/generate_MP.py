@@ -155,7 +155,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             print("TPROJ npage", TPROJ, npage)
             NPage = NPage | ((npage-1) << (2*index))
             index+=1
-
+            
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
         maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
         if mpName != sorted(TPMems.keys(), key=lambda x: x.startswith('L'))[-1]:
@@ -169,6 +169,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "template<> constexpr uint32_t FMMask<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
             "}\n" % FMMask
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint64_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPage
+        )
+
+        parametersFile.write(
+            "\n"
+            "// magic numbers for " + mpName + "\n"
+            "template<> constexpr uint32_t NPageSum<TF::" + seed + ", TF::" + iMP + ">() {\n"
+            "  return 0x%X;\n"
+            "}\n" % NPageSum
         )
 
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)
@@ -217,7 +233,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         topFile.write(
             "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
             "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
-            "\n"
+#            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
+#            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
+           "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
             "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
             " TF::" + seed + ", "

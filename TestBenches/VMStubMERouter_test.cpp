@@ -30,7 +30,7 @@ int main() {
 
   constexpr char phi = 'A' + phiRegion; // Converts phiRegion to char
   const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phi;
-  TBHelper tb("VMRCM/VMR_" + vmrID);
+  TBHelper tb("VMSMER/VMSMER_" + vmrID);
 
   const string allStubPattern = "AllStubs*";
   const string mePattern = "VMStubs_VMSME*";
@@ -89,7 +89,7 @@ int main() {
     bool truncation = false;
 
     // ME memories
-    std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << "\n";
+    std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << std::endl;
     err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
 
   } // End of event loop

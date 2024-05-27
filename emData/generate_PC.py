@@ -6,7 +6,6 @@
 # TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
 
 from __future__ import absolute_import, print_function
-
 import sys, re, os, argparse
 from enum import Enum
 
@@ -99,6 +98,7 @@ with open(arguments.wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
+#with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator_parameters.h"), "w") as parametersFile, \
 with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.h"), "w") as topHeaderFile, \
      open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.cc"), "w") as topFile:
 #  parametersFile.write(
@@ -174,8 +174,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "void ProjectionCalculator_" + seed + iTC + "(\n"
       "    const BXType bx,\n"
       "    BXType& bx_o,\n"
-      "    TrackletParameters tPars,\n"
-      "    int trackletIndex,\n"
+      "    TrackletParameters tPar,\n"
+      "    ap_uint<7> trackletIndex,\n"
       "    bool valid,\n"
       "    TrackletParameterMemory& tparout,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
@@ -190,8 +190,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "void ProjectionCalculator_" + seed + iTC + "(\n"
       "    const BXType bx,\n"
       "    BXType& bx_o,\n"
-      "    TrackletParameters tPars,\n"
-      "    int trackletIndex,\n"
+      "    TrackletParameters tPar,\n"
+      "    ap_uint<7> trackletIndex,\n"
       "    bool valid,\n"
       "    TrackletParameterMemory& tparout,\n"
       "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
@@ -201,9 +201,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "#pragma HLS latency min=13 max=13\n"
 #       "#pragma HLS interface ap_ctrl_none port=return\n"
       "#pragma HLS pipeline II=1\n"
-      "#pragma HLS latency min=13 max=13\n"
       "#pragma HLS inline recursive\n"
-      "#pragma HLS interface register port=bx_o\n"
+#      "#pragma HLS interface register port=bx_o\n"
       "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
       "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
       "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
@@ -225,7 +224,13 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "  );\n"
       "}\n"
       )
+        
 
+  # Print out endifs and close files.
+  # parametersFile.write(
+  #     "\n"
+  #     "#endif\n"
+  # )
   topHeaderFile.write(
   "\n"
   "#endif\n"
