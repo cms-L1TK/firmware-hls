@@ -32,7 +32,7 @@ entity mem_reader is
     NUM_PAGES       : natural := 8;                --! Specify no. Pages in RAM
                                                    --memory --FIXME should be 2
     NUM_TPAGES      : natural := 1;                 --! subpages
-    RAM_DEPTH       : natural := NUM_PAGES*PAGE_LENGTH; --! memory depth 
+    RAM_DEPTH       : natural := NUM_TPAGES*NUM_PAGES*PAGE_LENGTH; --! memory depth 
     DEBUG           : boolean := false;             --! If true prints debug info
     NAME            : string  := ""                     --! Name for debug 
     );
@@ -45,7 +45,7 @@ entity mem_reader is
     din       : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     dout      : out  std_logic_vector(RAM_WIDTH-1 downto 0);        --! output data
     valid     : out  std_logic;                                     --! data valid
-    index     : out  std_logic_vector(6 downto 0);                         --!index
+    index     : out  std_logic_vector(6+clogb2(NUM_TPAGES) downto 0);                         --!index
     nent      : in t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1)
     );
 end mem_reader;
@@ -55,30 +55,30 @@ architecture rtl of mem_reader is
 -- ########################### Types ###########################
 
 signal current_BX  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others =>'0');          --! RAM data row
-signal addr_counter  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
-signal addr_counter1  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
-signal addr_counter2  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
+signal addr_counter  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
+signal addr_counter1  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
+signal addr_counter2  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
 signal valid1 : std_logic := '0';
 signal valid2 : std_logic := '0';
 signal valid3 : std_logic := '0';
-signal addrP1  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
-signal addrP2  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
-signal addrP3  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
-signal addrP4  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP1  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP2  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP3  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP4  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
 
 -- ########################### Attributes ###########################
 
 begin
 
 -- Check user didn't change values of derived generics.
-assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
+assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clk)
   variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');
-  variable addrP1var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable addrP2var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable addrP3var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable addrP4var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP1var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP2var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP3var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP4var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
   variable maxval : std_logic_vector(4+2-clogb2(NUM_TPAGES) downto 0) := (others =>'1');
 begin
   if rising_edge(clk) then -- ######################################### Start counter initially
@@ -138,8 +138,8 @@ begin
       
       if (addrP1var < nent(to_integer(unsigned(bx))*NUM_TPAGES) and addrP1var < maxval) then
         if (NUM_TPAGES>1) then
-          addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var(4 downto 0);
-          addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var(4 downto 0);
+          addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var(6 downto 0);
+          addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var(6 downto 0);
         else
           addr_counter <= addrP1var(6 downto 0);
           addra <= bx&addrP1var(6 downto 0);
@@ -147,18 +147,18 @@ begin
         addrP1var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP1var)) + 1, addrP1var'length));
         valid1 <= '1'; 
       elsif ((addrP2var < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (NUM_TPAGES > 1) and addrP2var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var(4 downto 0);
+        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var(6 downto 0);
+        addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var(6 downto 0);
         addrP2var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP2var)) + 1, addrP2var'length));
         valid1 <= '1'; 
       elsif ((addrP3var < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (NUM_TPAGES > 2) and addrP3var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var(4 downto 0);
+        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var(6 downto 0);
+        addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var(6 downto 0);
         addrP3var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP3var)) + 1, addrP3var'length));
         valid1 <= '1';       
       elsif ((addrP4var < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (NUM_TPAGES > 3) and addrP4var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var(4 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var(4 downto 0);
+        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var(6 downto 0);
+        addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var(6 downto 0);
         addrP4var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP4var)) + 1, addrP4var'length));
         valid1 <= '1'; 
       else

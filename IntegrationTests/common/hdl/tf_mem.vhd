@@ -111,9 +111,11 @@ assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" seve
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter
+  variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0); 
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
   variable written      : integer := 0;
+  variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     if DEBUG then
@@ -135,7 +137,6 @@ begin
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       --report time'image(now)&" tf_mem "&NAME&" goto next page";
       vi_clk_cnt := 0;
-      nent_o(vi_page_cnt) <= (others => '0');
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
         vi_page_cnt := vi_page_cnt +1;
