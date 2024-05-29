@@ -127,7 +127,6 @@ std::cout<<module_name[MODULE_];
   // print the input files loaded
   std::cout << "Loaded the input files:\n";
   for (unsigned i = 0; i < nInnerStubMems; i++)
-   //(i+2)%nInnerStubMems has the innerstubs match the order in the emulation
     std::cout << "\t" << tb.fileNames(innerStubPattern).at(i) << "\n";
   for (unsigned i = 0; i < nOuterStubMems; i++)
     std::cout << "\t" << tb.fileNames(outerStubPattern).at(i) << "\n";
