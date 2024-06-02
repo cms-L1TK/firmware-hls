@@ -61,10 +61,10 @@ signal addr_counter2  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto
 signal valid1 : std_logic := '0';
 signal valid2 : std_logic := '0';
 signal valid3 : std_logic := '0';
-signal addrP1  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
-signal addrP2  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
-signal addrP3  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
-signal addrP4  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP1  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP2  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP3  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+signal addrP4  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
 
 -- ########################### Attributes ###########################
 
@@ -75,29 +75,35 @@ assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_
 
 process(clk)
   variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');
-  variable addrP1var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable addrP2var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable addrP3var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable addrP4var : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP1var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP2var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP3var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
+  variable addrP4var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
   variable maxval : std_logic_vector(4+2-clogb2(NUM_TPAGES) downto 0) := (others =>'1');
 begin
   if rising_edge(clk) then -- ######################################### Start counter initially
 
 
     if (start='1') then
-      --if (NUM_TPAGES = 4) then
-      --  report "mem_reader: "&time'image(now)&" "&NAME&" start  bx="&to_bstring(bx)&" nent="
-      --    &to_bstring(nent(0))&" "
-      --    &to_bstring(nent(1))&" "
-      --    &to_bstring(nent(2))&" "
-      --    &to_bstring(nent(3))&" "
-      --    &to_bstring(nent(4))&" "
-      --    &to_bstring(nent(5))&" "
-      --    &to_bstring(nent(6))&" "
-      --    &to_bstring(nent(7))&" "
-      --    &to_bstring(nent(8))&" "
-      --    ;
-      --  end if;
+      if (NUM_TPAGES = 4) then
+        --report "mem_reader: "&time'image(now)&" "&NAME&" start  bx="&to_bstring(bx)&" nent="
+        --  &to_bstring(nent(0))&" "
+        --  &to_bstring(nent(1))&" "
+        --  &to_bstring(nent(2))&" "
+        --  &to_bstring(nent(3))&" "
+        --  &to_bstring(nent(4))&" "
+        --  &to_bstring(nent(5))&" "
+        --  &to_bstring(nent(6))&" "
+        --  &to_bstring(nent(7))&" "
+        --  &to_bstring(nent(8))&" "
+        --  ;
+        --  report "mem_reader: "&time'image(now)&" "&NAME&" addrPX="
+        --  &to_bstring(addrP1)&" "
+        --  &to_bstring(addrP2)&" "
+        --  &to_bstring(addrP3)&" "
+        --  &to_bstring(addrP4)&"     "&to_bstring(nent(to_integer(unsigned(bx))*NUM_TPAGES+1))
+        --  ;
+       end if;
 
       addrP1var := addrP1;
       addrP2var := addrP2;
