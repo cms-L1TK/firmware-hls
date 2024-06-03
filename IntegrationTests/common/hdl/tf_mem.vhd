@@ -114,7 +114,6 @@ process(clka)
   variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0); 
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
-  variable written      : integer := 0;
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
@@ -149,14 +148,11 @@ begin
       nent_o(vi_page_cnt) <= (others => '0');
     end if;
     if (wea='1') then
-      written := 1;
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
       address := vi_page_cnt_slv&nent_o(vi_page_cnt);
       --report "tf_mem "&time'image(now)&" "&NAME&" page writeaddr "&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       nent_o(vi_page_cnt) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(vi_page_cnt))) + 1, nent_o(vi_page_cnt)'length)); -- + 1 (slv)
-    elsif (written=0) then
-      nent_o <= (others => (others => '0'));
     end if;
   end if;
 end process;
