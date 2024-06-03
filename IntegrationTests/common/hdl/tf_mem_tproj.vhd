@@ -117,7 +117,6 @@ process(clka)
   variable page         : integer := 0;
   variable tpage        : integer := 0;
   variable addr_in_page : integer := 0;
-  variable written      : integer := 0;
   variable nentaddress  : integer := 0;
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
 begin
@@ -143,13 +142,13 @@ begin
       vi_clk_cnt := 0;
       vi_page_cnt := 1;
     end if;
-    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
-      vi_clk_cnt := vi_clk_cnt+1;
-    elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
+    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES - 1) then -- ####### Counter nent
+      vi_clk_cnt := vi_clk_cnt + 1;
+    elsif (vi_clk_cnt >= MAX_ENTRIES - 1) then -- -1 not included
       vi_clk_cnt := 0;
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
-      if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
-        vi_page_cnt := vi_page_cnt +1;
+      if (vi_page_cnt < NUM_PAGES - 1) then -- Assuming linear continuous page access
+        vi_page_cnt := vi_page_cnt + 1;
       else
         vi_page_cnt := 0;
       end if;
@@ -158,11 +157,10 @@ begin
       -- reset the nent_o counter if the mask is zero
     end if;
     if (wea='1') then
-      written := 1;
-      tpage := to_integer(unsigned(addra(7+clogb2(NUM_TPAGES)-1 downto 7)));
+      tpage := to_integer(unsigned(addra(clogb2(PAGE_LENGTH*NUM_TPAGES)-1 downto clogb2(PAGE_LENGTH))));
       nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
-      address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(6 downto 0);
+      address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(clogb2(PAGE_LENGTH) - 1 downto 0);
       --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       if (mask_o(vi_page_cnt)(tpage)='1') then
@@ -171,10 +169,6 @@ begin
         nent_o(nentaddress) <= std_logic_vector(to_unsigned(1, nent_o(nentaddress)'length));
       end if;
       mask_o(vi_page_cnt)(tpage) <= '1';
-    elsif (written=0) then
-      -- this is not needed?
-      nent_o <= (others => (others => '0'));
-      mask_o <= (others => (others => '0'));
     end if;
   end if;
 end process;
