@@ -154,11 +154,8 @@ begin
         vi_page_cnt := 0;
       end if;
       mask_o(vi_page_cnt) <= (others => '0');
-      --FIXME is this needed???
-      for tpage in 0 to NUM_TPAGES-1 loop
-        nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
-        nent_o(nentaddress) <= (others => '0');
-      end loop;
+      -- Note that we don't zero the nent_o counters here. When adding entry we
+      -- reset the nent_o counter if the mask is zero
     end if;
     if (wea='1') then
       written := 1;
@@ -168,7 +165,11 @@ begin
       address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(6 downto 0);
       --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
-      nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
+      if (mask_o(vi_page_cnt)(tpage)='1') then
+        nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
+      else
+        nent_o(nentaddress) <= std_logic_vector(to_unsigned(1, nent_o(nentaddress)'length));
+      end if;
       mask_o(vi_page_cnt)(tpage) <= '1';
     elsif (written=0) then
       -- this is not needed?
