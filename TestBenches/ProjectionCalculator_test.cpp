@@ -59,11 +59,11 @@ int main()
   TrackletProjectionMemory<DISK> tproj_disk[TC::N_PROJOUT_DISK];
   TrackletParameterMemory trackletParametersOut;
 
-  // print the input files loaded
-
   // loop over events
+  cout << "Start event loop ..." << endl;
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
-
+    cout << "Event: " << dec << ievt << endl;
+ 
     // read event and write to memories
     writeMemFromFile<TrackletParameterMemory>(trackletParameters, fin_tpar.at(0), ievt);
 

@@ -54,7 +54,6 @@ architecture rtl of mem_reader is
 
 -- ########################### Types ###########################
 
-signal current_BX  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others =>'0');          --! RAM data row
 signal addr_counter  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
 signal addr_counter1  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
 signal addr_counter2  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row

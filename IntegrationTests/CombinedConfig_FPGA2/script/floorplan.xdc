@@ -1,4 +1,4 @@
-#this XDC contains physical constraints for the out-of-context combined barrel chain
+#this XDC contains physical constraints for the out-of-context second FPGA project
 create_pblock pblock_PCVMSMERs
 add_cells_to_pblock [get_pblocks pblock_PCVMSMERs] [get_cells -quiet [list \
           PC_L1L2ABC \
