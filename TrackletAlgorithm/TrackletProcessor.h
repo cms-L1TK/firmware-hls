@@ -149,7 +149,6 @@ namespace TP {
 		    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[N_PROJOUT_BARRELPS],
 		    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[N_PROJOUT_BARREL2S],
 		    TrackletProjectionMemory<DISK> projout_disk[N_PROJOUT_DISK],
-		    int &npar,
 		    int nproj_barrel_ps[N_PROJOUT_BARRELPS],
 		    int nproj_barrel_2s[N_PROJOUT_BARREL2S],
 		    int nproj_disk[N_PROJOUT_DISK],
@@ -512,7 +511,6 @@ TP::processStubPair(
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[N_PROJOUT_BARRELPS],
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[N_PROJOUT_BARREL2S],
     TrackletProjectionMemory<DISK> projout_disk[N_PROJOUT_DISK],
-    int &npar,
     int nproj_barrel_ps[N_PROJOUT_BARRELPS],
     int nproj_barrel_2s[N_PROJOUT_BARREL2S],
     int nproj_disk[N_PROJOUT_DISK],
@@ -554,7 +552,6 @@ TP::processStubPair(
   // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(phiRegion, stubIndex1, stubIndex2, rinv, phi0, z0, t);
   if (success) {
-    npar++;
     trackletParameters->write_mem(bx, tpar, 0);
   }
 
@@ -700,7 +697,6 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
   //AS Memories are cast from DISK into DISKPS types in overlap and disk seeds
   constexpr regionType innerASType = diskSeed ? DISKPS : InnerRegion<Seed>();
   constexpr regionType outerASType = (diskSeed || overlapSeed) ? DISKPS : OuterRegion<Seed>();
-  int npar = 0;
   int nproj_barrel_ps[TP::N_PROJOUT_BARRELPS];
   int nproj_barrel_2s[TP::N_PROJOUT_BARREL2S];
   int nproj_disk[TP::N_PROJOUT_DISK];
@@ -875,9 +871,9 @@ teunits[k].idle_;
 
     if (HaveTEData) {
       if (diskSeed) //pass in negdisk if disk seed
-        TP::processStubPair<Seed, innerASType, outerASType, TP::TPROJMaskBarrel<Seed, iTC>(), TP::TPROJMaskDisk<Seed, iTC>()>(bx, phiRegion, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk, negDisk_);
+        TP::processStubPair<Seed, innerASType, outerASType, TP::TPROJMaskBarrel<Seed, iTC>(), TP::TPROJMaskDisk<Seed, iTC>()>(bx, phiRegion, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, nproj_barrel_ps, nproj_barrel_2s, nproj_disk, negDisk_);
       else
-        TP::processStubPair<Seed, innerASType, outerASType, TP::TPROJMaskBarrel<Seed, iTC>(), TP::TPROJMaskDisk<Seed, iTC>()>(bx, phiRegion, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, npar, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
+        TP::processStubPair<Seed, innerASType, outerASType, TP::TPROJMaskBarrel<Seed, iTC>(), TP::TPROJMaskDisk<Seed, iTC>()>(bx, phiRegion, innerIndex, innerStub, outerIndex, outerStub, TCId, trackletIndex, trackletParameters, projout_barrel_ps, projout_barrel_2s, projout_disk, nproj_barrel_ps, nproj_barrel_2s, nproj_disk);
     }
     
 
