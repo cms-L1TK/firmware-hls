@@ -2,8 +2,8 @@
 
 # This script generates 
 # ProjectionCalculatorTop.h, and ProjectionCalculatorTop.cc in the
-# TopFunctions/ directory. Currently supports all TPs for L1L2, as well as
-# TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
+# TopFunctions/ directory. Currently supports all TPs 
+#
 
 from __future__ import absolute_import, print_function
 import sys, re, os, argparse
@@ -112,15 +112,15 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
 #    "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
 #    "// significant, represent the memories in the order they are passed to\n"
 #    "// ProjectionCalculator; e.g., the LSB corresponds to\n"
-#    "// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n"
+#    "// projout_barrel_ps[TP::L1PHIA]. If a bit is set, the corresponding memory is\n"
 #    "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
 #    "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
 #    "// in the same way.\n"
 #    "namespace PC{\n"
 #    "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
 #    "   }\n"
-#    "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
-#    "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
+#    "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
+#    "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
 #   )
   topHeaderFile.write(
     "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
@@ -133,7 +133,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
     "\n"
     "////////////////////////////////////////////////////////////////////////////////\n"
     "// Top functions for various ProjectionCalculators (PC). For each iteration of\n"
-    "// the main processing loop, a TC retrieves a pair of stub indices from one of\n"
+    "// the main processing loop, a TP retrieves a pair of stub indices from one of\n"
     "// the stub-pair memories, and in turn, these indices are used to retrieve one\n"
     "// stub each from an inner and an outer all-stub memory. This pair of stubs is\n"
     "// used to calculate a rough set of helix parameters, which are written to the\n"
@@ -168,7 +168,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       if projlayreg in ProjoutIndexDisk:
         tprojMaskDisk = tprojMaskDisk | (1 << ProjoutIndexDisk[projlayreg])
       
-    # Print out prototype for top function for this TC.
+    # Print out prototype for top function for this PC.
     topHeaderFile.write(
       "\n"
       "void ProjectionCalculator_" + seed + iTC + "(\n"
@@ -194,9 +194,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "    ap_uint<9> trackletIndex,\n"
       "    bool valid,\n"
       "    TrackletParameterMemory& tparout,\n"
-      "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
-      "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
-      "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
+      "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],\n"
+      "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],\n"
+      "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
       ") {\n"
       "#pragma HLS latency min=13 max=13\n"
       "#pragma HLS interface ap_ctrl_none port=return\n"
@@ -209,7 +209,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "\n"
       "PC_" + seed + iTC + ": ProjectionCalculator<\n"
       "  TF::" + seed + ",\n"
-      "  TC::" + iTC[0] + ",\n"
+      "  TP::" + iTC[0] + ",\n"
       "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
       " >(\n"
       "    bx,\n"

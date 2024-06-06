@@ -46,7 +46,7 @@ MemPrints:
 	 then \
 	   ln -sf $(EMDATA)/MemPrintsSplit MemPrints; \
 	 else \
-	   ln -sf $(EMDATA)/MemPrints MemPrintsCM; \
+	   ln -sf $(EMDATA)/MemPrintsCM MemPrints; \
 	 fi
 
 LUTs:

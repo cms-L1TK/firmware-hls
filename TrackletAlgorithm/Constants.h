@@ -108,6 +108,7 @@ constexpr unsigned kMaxProcOffset(const module::type m) {
 
 // Memory
 constexpr int kNBits_MemAddr = 7;
+constexpr int kNBits_MemTPage = 2; //Max number of bits for the paged memory
 constexpr int kMemDepth = (1<<kNBits_MemAddr);
 constexpr int kNBits_BX = 3;
 constexpr unsigned int kNMatchEngines=4;
