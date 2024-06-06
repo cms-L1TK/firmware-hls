@@ -17,15 +17,20 @@
 
 namespace PR
 {
+
+  typedef ap_uint<5> IMemType;
+  typedef ap_uint<2> IPageType;
+  typedef ap_uint<3> NPageType;
+  
   //////////////////////////////
   // Initialization
   // check the number of entries in the input memories
   // fill the bit mask indicating if memories are empty or not
   template<int nMEM, unsigned int nINMEM, int NBits_Entries, class MemType>
   inline void init(BXType bx,
-		   const ap_uint<5> iMem[nMEM],
-		   const ap_uint<2> iPage[nMEM],
-		   const ap_uint<3> nPages[nINMEM],
+		   const IMemType iMem[nMEM],
+		   const IPageType iPage[nMEM],
+		   const NPageType nPages[nINMEM],
                    ap_uint<nMEM>& mem_hasdata,
                    ap_uint<NBits_Entries> nentries[nMEM],
                    const MemType mem[nMEM])
@@ -53,10 +58,10 @@ namespace PR
   //////////////////////////////
   // Priority encoder based input memory reading logic
   template<class DataType, class MemType, int nMEM>
-  void read_inmem(DataType& data, BXType bx, //ap_uint<5> read_imem,
+  void read_inmem(DataType& data, BXType bx,
                   ap_uint<kNBits_MemAddr>& read_addr,
-		  const ap_uint<5> iMem,
-		  const ap_uint<2> iPage,
+		  const IMemType iMem,
+		  const IPageType iPage,
                   const MemType inmem[nMEM])
   {
 #pragma HLS inline
@@ -70,8 +75,8 @@ namespace PR
                        ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // Memory pointers
-		       const ap_uint<5> iMem[nMEM],
-		       const ap_uint<2> iPage[nMEM],
+		       const IMemType iMem[nMEM],
+		       const IPageType iPage[nMEM],
                        const MemType mem[nMEM],
                        DataType& data)
   {
@@ -84,7 +89,7 @@ namespace PR
 
     // 5 bits memory index for up to 32 input memories
     // priority encoder
-    ap_uint<5> read_imem = __builtin_ctz(mem_hasdata);
+    IMemType read_imem = __builtin_ctz(mem_hasdata);
 
     // read the memory "read_imem" with the address "read_addr"
     read_inmem<DataType, MemType, nMEM>(data, bx, //read_imem,
@@ -1214,9 +1219,9 @@ void MatchProcessor(BXType bx,
   constexpr int nMEM = NPageSum<LAYER, PHISEC>();
   
   
-  ap_uint<3> nPages[nINMEM];
-  ap_uint<2> iPage[nMEM];
-  ap_uint<5> iMem[nMEM]; 
+  NPageType nPages[nINMEM];
+  IPageType iPage[nMEM];
+  IMemType iMem[nMEM]; 
 #pragma HLS ARRAY_PARTITION variable=nPages complete
 #pragma HLS ARRAY_PARTITION variable=iPage complete
 #pragma HLS ARRAY_PARTITION variable=iMem complete
