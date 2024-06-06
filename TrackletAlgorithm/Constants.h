@@ -205,7 +205,7 @@ constexpr unsigned int nbits_vmte_extra[trklet::N_LAYER + trklet::N_DISK] = {0, 
 constexpr unsigned int nbits_maxvm = 5; // number of bits needed for max number of VMs per layer/disk (max number is 32)
 constexpr unsigned int nbits_maxvm_overlap = 4; // Overlap
 
-namespace TC {
+namespace TP {
 ////////////////////////////////////////////////////////////////////////////////
 // Typedefs, enums, and constants needed by TrackletCalculator.
 ////////////////////////////////////////////////////////////////////////////////

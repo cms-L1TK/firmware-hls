@@ -153,6 +153,7 @@ template<class MemType, int OutputBase=2, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
                                    const int ievt, const std::string& label,
                                    const bool truncated = false,
+                                   const bool print_empty = false,
                                    const std::vector<int>& bit_widths = {}, const std::vector<std::string>& names = {},
                                    const int start_index = 0)
 {
@@ -165,7 +166,7 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
 
   unsigned int err_count = 0;
 
-  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB + 1) : MemType::getWidth();
+  constexpr int width = (LSB >= 0 && MSB >= LSB) ? (MSB - LSB + 1) : MemType::getWidth();
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
@@ -177,7 +178,7 @@ unsigned int compareMemWithMem(const MemType& memory_ref, const MemType& memory,
 
     // Print headers for the columns at start
     if (i==0) {
-      if (data_com == 0 && data_ref == 0) {
+      if (!print_empty && data_com == 0 && data_ref == 0) {
 	break;
       }
       std::cout << label << ": " << std::endl;
@@ -238,6 +239,7 @@ template<class MemType, int OutputBase=2, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithMemPage(const MemType& memory_ref, const MemType& memory,
                                    const int ievt, const std::string& label,
                                    const bool truncated = false,
+                                   const bool print_empty = false,
                                    const std::vector<int>& bit_widths = {}, const std::vector<std::string>& names = {},
                                    const int start_index = 0)
 {
@@ -325,21 +327,23 @@ unsigned int compareMemWithMemPage(const MemType& memory_ref, const MemType& mem
 template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
-                                const bool truncated = false, int maxProc = kMaxProc)
+                                const bool truncated = false,
+				const bool print_empty = false,
+				int maxProc = kMaxProc)
 {
   ////////////////////////////////////////
   // Read from file
   MemType memory_ref;
   writeMemFromFile<MemType>(memory_ref, fout, ievt, InputBase);
 
-  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
+  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated, print_empty);
   
 }
 
 template<class MemType, int InputBase=16, int OutputBase=2, int LSB=-1, int MSB=-1>
 unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
-                                const bool truncated = false)
+                                const bool truncated = false, const bool print_empty = false)
 {
   // This is a modification of compareMemWithFile to allow for outputting the data in binary format
   // split by the various column types in the projections, AllProj
@@ -353,7 +357,7 @@ unsigned int compareProjMemWithFile(const MemType& memory, std::ifstream& fout,
                                         MemType::BitWidths::kTProjPhiDSize, MemType::BitWidths::kTProjRZDSize };
   const std::vector<std::string> names = {"TCID ", "Tproj", "phi", "z", "phid", "zder"};
 
-  return compareMemWithMemPage<MemType>(memory_ref, memory, ievt, label, truncated, bit_widths, names);
+  return compareMemWithMemPage<MemType>(memory_ref, memory, ievt, label, truncated, print_empty, bit_widths, names);
 
 }
 
@@ -592,7 +596,8 @@ class TBHelper {
 template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB=-1>
 unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifstream*>& foutVec,
                                 int ievt, const std::string& label,
-                                const bool truncated = false, int maxProc = kMaxProc)
+                                const bool truncated = false, const bool print_empty = false,
+				int maxProc = kMaxProc)
 {
   ////////////////////////////////////////
   // Read from file
@@ -615,7 +620,7 @@ unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifst
     }
   }
 
-  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated);
+  return compareMemWithMem<MemType, OutputBase, LSB, MSB>(memory_ref, memory, ievt, label, truncated, print_empty);
   
 }
 

@@ -6,7 +6,7 @@
 #include "TrackletProcessor_parameters.h"
 #include "TrackletParameterMemory.h"
 
-template<TF::seed Seed, TC::itc iTC, regionType innerRegion,regionType VMSTEType>
+template<TF::seed Seed, TP::itc iTC, regionType innerRegion,regionType VMSTEType>
 class TrackletEngineUnit {
 
  public:
@@ -54,8 +54,8 @@ class TrackletEngineUnit {
 
 /////  Grabs the appropriate lut based on seed and iTC
 
-   const ap_uint<1>* stubptinnertmp = TC::getPTInnerLUT<Seed,iTC>();
-   const ap_uint<1>* stubptoutertmp = TC::getPTOuterLUT<Seed,iTC>();
+   const ap_uint<1>* stubptinnertmp = TP::getPTInnerLUT<Seed,iTC>();
+   const ap_uint<1>* stubptoutertmp = TP::getPTOuterLUT<Seed,iTC>();
     if ( Seed <= TF::L5L6 ){
       for(unsigned int i=0;i<kNBitsPTLutInner;i++) {
 #pragma HLS unroll

@@ -78,7 +78,7 @@ process(clk)
   variable addrP2var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
   variable addrP3var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
   variable addrP4var : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');
-  variable maxval : std_logic_vector(4+2-clogb2(NUM_TPAGES) downto 0) := (others =>'1');
+  constant maxval : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'1');
 begin
   if rising_edge(clk) then -- ######################################### Start counter initially
 

@@ -7,7 +7,7 @@
 // This function does all the actual calculations in the TrackletCalculators
 // for the barrel-only seeds (L1L2, L2L3, L3L4, and L5L6).
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion>
-void TC::calculate_LXLY (
+void TP::calculate_LXLY (
   const typename AllStub<InnerRegion>::ASR r1_input,
   const typename AllStub<InnerRegion>::ASPHI phi1_input,
   const typename AllStub<InnerRegion>::ASZ z1_input,
@@ -15,30 +15,30 @@ void TC::calculate_LXLY (
   const typename AllStub<OuterRegion>::ASPHI phi2_input,
   const typename AllStub<OuterRegion>::ASZ z2_input,
 
-  TC::Types::rinv * const rinv_output,
+  TP::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
   TrackletParameters::TPAR * const t_output,
-  TC::Types::z0 * const z0_output,
-  TC::Types::phiL * const phiL_0_output,
-  TC::Types::phiL * const phiL_1_output,
-  TC::Types::phiL * const phiL_2_output,
-  TC::Types::phiL * const phiL_3_output,
-  TC::Types::zL * const zL_0_output,
-  TC::Types::zL * const zL_1_output,
-  TC::Types::zL * const zL_2_output,
-  TC::Types::zL * const zL_3_output,
-  TC::Types::der_phiL * const der_phiL_output,
-  TC::Types::der_zL * const der_zL_output,
-  TC::Types::phiD * const phiD_0_output,
-  TC::Types::phiD * const phiD_1_output,
-  TC::Types::phiD * const phiD_2_output,
-  TC::Types::phiD * const phiD_3_output,
-  TC::Types::rD * const rD_0_output,
-  TC::Types::rD * const rD_1_output,
-  TC::Types::rD * const rD_2_output,
-  TC::Types::rD * const rD_3_output,
-  TC::Types::der_phiD * const der_phiD_output,
-  TC::Types::der_rD * const der_rD_output
+  TP::Types::z0 * const z0_output,
+  TP::Types::phiL * const phiL_0_output,
+  TP::Types::phiL * const phiL_1_output,
+  TP::Types::phiL * const phiL_2_output,
+  TP::Types::phiL * const phiL_3_output,
+  TP::Types::zL * const zL_0_output,
+  TP::Types::zL * const zL_1_output,
+  TP::Types::zL * const zL_2_output,
+  TP::Types::zL * const zL_3_output,
+  TP::Types::der_phiL * const der_phiL_output,
+  TP::Types::der_zL * const der_zL_output,
+  TP::Types::phiD * const phiD_0_output,
+  TP::Types::phiD * const phiD_1_output,
+  TP::Types::phiD * const phiD_2_output,
+  TP::Types::phiD * const phiD_3_output,
+  TP::Types::rD * const rD_0_output,
+  TP::Types::rD * const rD_1_output,
+  TP::Types::rD * const rD_2_output,
+  TP::Types::rD * const rD_3_output,
+  TP::Types::der_phiD * const der_phiD_output,
+  TP::Types::der_rD * const der_rD_output
 )
 {
 
@@ -158,7 +158,7 @@ void TC::calculate_LXLY (
 }
 
 template <TF::seed Seed, regionType InnerRegion, regionType OuterRegion>
-void TC::calculate_DXDY (
+void TP::calculate_DXDY (
   const typename AllStub<InnerRegion>::ASR r1_input,
   const typename AllStub<InnerRegion>::ASPHI phi1_input,
   const typename AllStub<InnerRegion>::ASZ z1_input,
@@ -167,26 +167,26 @@ void TC::calculate_DXDY (
   const typename AllStub<OuterRegion>::ASZ z2_input,
   const bool negDisk,
 
-  TC::Types::rinv * const rinv_output,
+  TP::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
   TrackletParameters::TPAR * const t_output,
-  TC::Types::z0 * const z0_output,
-  TC::Types::phiL * const phiL_0_output,
-  TC::Types::phiL * const phiL_1_output,
-  TC::Types::phiL * const phiL_2_output,
-  TC::Types::zL * const zL_0_output,
-  TC::Types::zL * const zL_1_output,
-  TC::Types::zL * const zL_2_output,
-  TC::Types::der_phiL * const der_phiL_output,
-  TC::Types::der_zL * const der_zL_output,
-  TC::Types::phiD * const phiD_0_output,
-  TC::Types::phiD * const phiD_1_output,
-  TC::Types::phiD * const phiD_2_output,
-  TC::Types::rD * const rD_0_output,
-  TC::Types::rD * const rD_1_output,
-  TC::Types::rD * const rD_2_output,
-  TC::Types::der_phiD * const der_phiD_output,
-  TC::Types::der_rD * const der_rD_output
+  TP::Types::z0 * const z0_output,
+  TP::Types::phiL * const phiL_0_output,
+  TP::Types::phiL * const phiL_1_output,
+  TP::Types::phiL * const phiL_2_output,
+  TP::Types::zL * const zL_0_output,
+  TP::Types::zL * const zL_1_output,
+  TP::Types::zL * const zL_2_output,
+  TP::Types::der_phiL * const der_phiL_output,
+  TP::Types::der_zL * const der_zL_output,
+  TP::Types::phiD * const phiD_0_output,
+  TP::Types::phiD * const phiD_1_output,
+  TP::Types::phiD * const phiD_2_output,
+  TP::Types::rD * const rD_0_output,
+  TP::Types::rD * const rD_1_output,
+  TP::Types::rD * const rD_2_output,
+  TP::Types::der_phiD * const der_phiD_output,
+  TP::Types::der_rD * const der_rD_output
 
 )
 {
@@ -198,8 +198,8 @@ void TC::calculate_DXDY (
   const ap_int<18> phi1c = ap_int<18>(phi1_input)<<3;
   const ap_int<18> phi2c = ap_int<18>(phi2_input)<<3;
 
-  const TC::Types::zmean z1mean = zmean[seedLayers[Seed][0]];
-  const TC::Types::zmean z2mean = zmean[seedLayers[Seed][1]];
+  const TP::Types::zmean z1mean = zmean[seedLayers[Seed][0]];
+  const TP::Types::zmean z2mean = zmean[seedLayers[Seed][1]];
 
   const ap_int<14> z1c = z1_input + (negDisk ? ap_int<14>(-z1mean) : ap_int<14>(z1mean));
   const ap_int<14> z2c = z2_input + (negDisk ? ap_int<14>(-z2mean) : ap_int<14>(z2mean));
@@ -301,7 +301,7 @@ void TC::calculate_DXDY (
 
 
 template<TF::seed Seed, regionType InnerRegion, regionType OuterRegion>
-void TC::calculate_LXD1 (
+void TP::calculate_LXD1 (
   const typename AllStub<InnerRegion>::ASR r1_input,
   const typename AllStub<InnerRegion>::ASPHI phi1_input,
   const typename AllStub<InnerRegion>::ASZ z1_input,
@@ -310,28 +310,28 @@ void TC::calculate_LXD1 (
   const typename AllStub<OuterRegion>::ASZ z2_input,
 
   bool * const valid_radii,
-  TC::Types::rinv * const rinv_output,
+  TP::Types::rinv * const rinv_output,
   TrackletParameters::PHI0PAR * const phi0_output,
   TrackletParameters::TPAR * const t_output,
-  TC::Types::z0 * const z0_output,
-  TC::Types::phiL * const phiL_0_output,
-  TC::Types::phiL * const phiL_1_output,
-  TC::Types::phiL * const phiL_2_output,
-  TC::Types::zL * const zL_0_output,
-  TC::Types::zL * const zL_1_output,
-  TC::Types::zL * const zL_2_output,
-  TC::Types::der_phiL * const der_phiL_output,
-  TC::Types::der_zL * const der_zL_output,
-  TC::Types::phiD * const phiD_0_output,
-  TC::Types::phiD * const phiD_1_output,
-  TC::Types::phiD * const phiD_2_output,
-  TC::Types::phiD * const phiD_3_output,
-  TC::Types::rD * const rD_0_output,
-  TC::Types::rD * const rD_1_output,
-  TC::Types::rD * const rD_2_output,
-  TC::Types::rD * const rD_3_output,
-  TC::Types::der_phiD * const der_phiD_output,
-  TC::Types::der_rD * const der_rD_output)
+  TP::Types::z0 * const z0_output,
+  TP::Types::phiL * const phiL_0_output,
+  TP::Types::phiL * const phiL_1_output,
+  TP::Types::phiL * const phiL_2_output,
+  TP::Types::zL * const zL_0_output,
+  TP::Types::zL * const zL_1_output,
+  TP::Types::zL * const zL_2_output,
+  TP::Types::der_phiL * const der_phiL_output,
+  TP::Types::der_zL * const der_zL_output,
+  TP::Types::phiD * const phiD_0_output,
+  TP::Types::phiD * const phiD_1_output,
+  TP::Types::phiD * const phiD_2_output,
+  TP::Types::phiD * const phiD_3_output,
+  TP::Types::rD * const rD_0_output,
+  TP::Types::rD * const rD_1_output,
+  TP::Types::rD * const rD_2_output,
+  TP::Types::rD * const rD_3_output,
+  TP::Types::der_phiD * const der_phiD_output,
+  TP::Types::der_rD * const der_rD_output)
 {
 #pragma HLS pipeline II=1
 #pragma HLS latency max=25
@@ -342,7 +342,7 @@ void TC::calculate_LXD1 (
   const ap_int<18> phi1c = ap_int<18>(phi1_input)<<3;
   const ap_int<18> phi2c = ap_int<18>(phi2_input)<<3;
 
-  const TC::Types::zmean z2mean = zmean[seedLayers[Seed][1]];
+  const TP::Types::zmean z2mean = zmean[seedLayers[Seed][1]];
 
   const ap_int<14> z1c = z1_input;
   const ap_int<14> z2c = ap_int<7>(z2_input) + (z1c > 0 ? ap_int<14>(z2mean) : ap_int<14>(-z2mean));

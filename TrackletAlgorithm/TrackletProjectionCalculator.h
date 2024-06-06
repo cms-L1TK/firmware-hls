@@ -4,7 +4,7 @@
 
 inline void projToLayer(ap_uint<13> ir, ap_uint<13> irtilde, 
 			int irinv, int iphi0, int it,int iz0, 
-			TC::Types::zL &iz, TC::Types::phiL &iphi) {
+			TP::Types::zL &iz, TP::Types::phiL &iphi) {
 
   ap_int<20> is =  (irtilde*irinv) >> n_s_;
 
@@ -21,8 +21,8 @@ inline void projToLayer(ap_uint<13> ir, ap_uint<13> irtilde,
 }
 
 inline void projToDisk(int iz, int itinv, int irinv, int iphi0,
-		       int it,int iz0, TC::Types::rD  &ir, 
-		       TC::Types::phiD  &iphi) {
+		       int it,int iz0, TP::Types::rD  &ir, 
+		       TP::Types::phiD  &iphi) {
 
   ap_int<14> iz0_sign = (it>0)?iz0:-iz0;
   
