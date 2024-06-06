@@ -60,7 +60,6 @@ int main() {
 
   auto &fout_allstubs = tb.files(allStubPattern);
   auto &fout_allstubs_inner = tb.files(allStubInnerPattern);
-  auto &fout_vmstubme = tb.files(mePattern);
   auto &fout_vmstubte = tb.files(tePattern);
 
 
@@ -145,8 +144,6 @@ int main() {
         err += compareMemWithFile<AllStubInnerMemory<outputType>>(memoriesASInner[i], fout_allstubs_inner[i], ievt, "AllStubInner", truncation);
       }
     }
-    // ME memories
-    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
     //TE Outer memories
     if (nVMSTE) {
       for (unsigned int i = 0; i < nVMSTE; i++) {

@@ -14,7 +14,7 @@ set modules_to_test {
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export VMRCM_L2PHIA
 
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
 
 foreach i $modules_to_test {
 
@@ -38,7 +38,7 @@ foreach i $modules_to_test {
   add_files -tb ../emData/VMRCM/
 
   # run C-simulation for each module in modules_to_test
-  add_files ../TopFunctions/CombinedConfig/$top_func.cc -cflags "$CFLAGS"
+  add_files ../TopFunctions/CombinedConfig_FPGA2/$top_func.cc -cflags "$CFLAGS"
   set_top $top_func
   open_solution [join [list "solution_" $top_func] ""]
 
