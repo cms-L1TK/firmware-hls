@@ -257,6 +257,8 @@ begin
     end if;
 
     if (wea='1') then
+      -- FIXME - this code is not yet protected from "wrapping" if there are
+      -- more than 16 (or 15) entries.      
       -- Write data to all copies
       --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
       for icopy in 0 to NUM_COPY-1 loop

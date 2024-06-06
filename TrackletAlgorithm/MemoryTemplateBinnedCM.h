@@ -165,8 +165,8 @@ class MemoryTemplateBinnedCM{
 
       unsigned int nentry = nentriestmp_[slot];
 
-      //if (nentry < (1<<(NBIT_ADDR-NBIT_BIN))-1) {
-      
+      if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
+
 	nentriestmp_[slot]++;
 
 	nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
