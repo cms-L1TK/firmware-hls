@@ -129,8 +129,8 @@ begin
 			bx_last := to_integer(unsigned(bx_in));
 			bx_out <= bx_in;
       for j in 0 to pipe_stages-2 loop
-	  		toread(j) := toread(j+1);
-  			valid(j) <= valid(j+1);
+	  		toread(j+1) := toread(j);
+  			valid(j+1) <= valid(j);
       end loop;
 		end if;
 	end process;
