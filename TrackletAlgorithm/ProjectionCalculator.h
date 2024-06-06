@@ -14,7 +14,7 @@ addProj(const TrackletProjection<TProjType> &, const BXType, TrackletProjectionM
 
 // Writes a tracklet projection to the appropriate tracklet projection memory.
 template<regionType TProjType, uint8_t NProjOut, uint32_t TPROJMask> bool
-PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], ap_uint<9> trackletIndex, const bool success)
+PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, TrackletProjectionMemory<TProjType> projout[NProjOut], int nproj[NProjOut], ap_uint<kNBits_MemTPage + kNBits_MemAddr> trackletIndex, const bool success)
 {
   bool proj_success = true;
 
@@ -39,9 +39,9 @@ PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
   else
     phi >>= 3;
 
-  int ipage = trackletIndex >> 7;
+  int ipage = trackletIndex >> kNBits_MemAddr;
 
-  trackletIndex = trackletIndex&127;
+  trackletIndex = trackletIndex& ((1 << kNBits_MemAddr) -1);
 
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
     projout[0].write_mem(bx, proj, trackletIndex, ipage);
@@ -73,7 +73,7 @@ template<
   ProjectionCalculator(
     const BXType bx,
     BXType& bx_o,
-    TrackletParameters const &tpar, int trackletIndex,
+    TrackletParameters const &tpar, ap_uint<kNBits_MemTPage + kNBits_MemAddr> trackletIndex,
     bool valid,
     TrackletParameterMemory& tparout,
     TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],
@@ -256,7 +256,7 @@ template<
 
   //FIXME
   //ap_uint<7> trackletId = trackletIndex&31;
-  ap_uint<9> trackletId = trackletIndex;
+  ap_uint<kNBits_MemTPage + kNBits_MemAddr> trackletId = trackletIndex;
   trackletIndex =  trackletIndex&127;
   
   // Disk-only seeds
