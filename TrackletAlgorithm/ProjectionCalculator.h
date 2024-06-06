@@ -41,7 +41,7 @@ PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
 
   int ipage = trackletIndex >> kNBits_MemAddr;
 
-  trackletIndex = trackletIndex& ((1 << kNBits_MemAddr) -1);
+  trackletIndex = trackletIndex&((1 << kNBits_MemAddr) -1);
 
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
     projout[0].write_mem(bx, proj, trackletIndex, ipage);
@@ -85,7 +85,7 @@ template<
 
   int ipage =  trackletIndex >> 7;
   
-  tparout.write_mem(bx, tpar, trackletIndex&127, ipage);
+  tparout.write_mem(bx, tpar, trackletIndex&((1 << kNBits_MemAddr) -1), ipage);
 
   // Load the initial track parameters (phi0, z0, t, rinv)
   TrackletParameters::PHI0PAR phi0 = tpar.getPhi0();
@@ -251,13 +251,13 @@ template<
   }
 
   //iTC gives you the first TCID in e.g. ABC, ipage gives you corrected TCID for B and C
-  const int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << 4) + iTC + ipage);
+  const int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC + ipage);
   bool addL3 = false, addL4 = false, addL5 = false, addL6 = false; // whether a projection has been added successfully
 
   //FIXME
   //ap_uint<7> trackletId = trackletIndex&31;
-  ap_uint<kNBits_MemTPage + kNBits_MemAddr> trackletId = trackletIndex;
-  trackletIndex =  trackletIndex&127;
+  const auto trackletId = trackletIndex;
+  trackletIndex =  trackletIndex&((1 << kNBits_MemAddr) -1);
   
   // Disk-only seeds
   if (Seed == TF::D1D2){
