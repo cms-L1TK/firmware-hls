@@ -237,7 +237,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"'+arguments.LUTsDir+'/TP_' + seed + '.tab");\n'
           '#else\n'
           '  static ap_uint<10> lut[] =\n'
-          '#if __has_include("../emData/"+arguments.LUTsDir+"/TP_' + seed + '.tab")\n'
+          '#if __has_include("../emData/'+arguments.LUTsDir+'/TP_' + seed + '.tab")\n'
           '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + '.tab"\n'
           '#else\n'
           '  {};\n'
