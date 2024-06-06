@@ -61,9 +61,6 @@ set modules_to_test {
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export VMSMER_L1PHIA
 
-# create new project (deleting any existing one of same name)
-open_project -reset vmsmeRouter
-
 # source files
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
 

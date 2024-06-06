@@ -6,7 +6,6 @@
 #include "TrackFitMemory.h"
 #include "TrackBuilder_parameters.h"
 
-static const unsigned short kNBitsTBBuffer = 1;
 static const unsigned short kMinNMatches = 2;
 static const unsigned short kInvalidTrackletID = 0x3FFF;
 

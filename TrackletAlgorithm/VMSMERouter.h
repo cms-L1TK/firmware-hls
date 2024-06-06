@@ -29,7 +29,7 @@ constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
 constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
 
 //////////////////////////////////////
-// Functions used by the VMR CM
+// Functions used by the VMSMER
 
 // Returns the bits of phi corresponding to finephi, i.e. phi regions within a VM
 // vmbits is the number of bits for the VMs, i.e. coarse phi region. E.g. 32 VMs would use vmbits=5

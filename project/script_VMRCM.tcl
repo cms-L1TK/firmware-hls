@@ -95,7 +95,7 @@ foreach i $modules_to_test {
   puts [join [list $::env(CCFLAG) ] ""]  
 
   # run C-simulation
-  csim_design -mflags "-j1"
+  csim_design -mflags "-j8"
 
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {
