@@ -24,25 +24,9 @@
 /////////////////////////////////////////
 // Constants
 
-// Number of bits used for the TE in disks
-constexpr int nbitsvmtedisk[trklet::N_DISK] = { 3, 3, 0, 3, 0 };
-
 // Number of rz bin bits for ME
 constexpr unsigned kNbitsrzbinMELayer = kNbitsrzbin;
 constexpr unsigned kNbitsrzbinMEDisk = kNbitsrzbin + 1;
-
-
-// The length of the masks used for the memories
-constexpr int maskASIsize = 12; // Allstub Inner memories
-
-// Enum for the different versions of Allstub Inner memories. L,M,R can be used for both barrel and disks
-enum allStubInnerVersions {A, B, C, D, E, F, L, M, R, OL, OM, OR};
-
-// Cuts for AllStub Inner memories
-constexpr double CUTZL1L3L5[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1L3L5/kz_cm[0], trklet::VMROUTERCUTZL1L3L5/kz_cm[1], trklet::VMROUTERCUTZL1L3L5/kz_cm[2], trklet::VMROUTERCUTZL1L3L5/kz_cm[3], trklet::VMROUTERCUTZL1L3L5/kz_cm[4], trklet::VMROUTERCUTZL1L3L5/kz_cm[5]};
-constexpr double CUTZL1[trklet::N_LAYER] = {trklet::VMROUTERCUTZL1/kz_cm[0], trklet::VMROUTERCUTZL1/kz_cm[1], trklet::VMROUTERCUTZL1/kz_cm[2], trklet::VMROUTERCUTZL1/kz_cm[3], trklet::VMROUTERCUTZL1/kz_cm[4], trklet::VMROUTERCUTZL1/kz_cm[5]};
-constexpr double CUTZL2[trklet::N_LAYER] = {trklet::VMROUTERCUTZL2/kz_cm[0], trklet::VMROUTERCUTZL2/kz_cm[1], trklet::VMROUTERCUTZL2/kz_cm[2], trklet::VMROUTERCUTZL2/kz_cm[3], trklet::VMROUTERCUTZL2/kz_cm[4], trklet::VMROUTERCUTZL2/kz_cm[5]};
-constexpr double CUTRD1D3 = trklet::VMROUTERCUTRD1D3 / kr;
 
 //////////////////////////////////////
 // Functions used by the VMR CM
