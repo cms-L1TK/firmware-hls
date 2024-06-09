@@ -553,7 +553,7 @@ int main(int argc, char * argv[])
 
   // allow for truncation memory check [i.e. missing entries can pass check]
   bool cTruncation=false;
-  std::string cInputFile_Wires = "LUTsCM/wires.dat";
+  std::string cInputFile_Wires = "LUTsSplit/wires.dat";
   
   auto cMap = getMap( cInputFile_Wires ); 
   // for( uint8_t cLinkIndx=0; cLinkIndx < 20; cLinkIndx++)

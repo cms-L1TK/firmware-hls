@@ -68,13 +68,13 @@ set module_to_export InputRouterTop_IR_DTC_PS10G_3_A
 open_project -reset inputrouter
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm  -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig}
-add_files ../TopFunctions/CombinedConfig/InputRouterTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm  -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
+add_files ../TopFunctions/CombinedConfig_FPGA2/InputRouterTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/InputRouter_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/MemPrintsCM/InputStubs/
-add_files -tb ../emData/LUTsCM/
+add_files -tb ../emData/MemPrintsSplit/InputStubs/
+add_files -tb ../emData/LUTsSplit/
 
 set nProc [exec nproc]
 
