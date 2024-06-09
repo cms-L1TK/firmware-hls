@@ -35,7 +35,7 @@ add_files -tb ../emData/PC/
 foreach i $modules_to_test {
   puts [join [list "======== TESTING " $i " ========"] ""]
   set seed [string range $i 3 6]
-  set iTC [string range $i 7 9]
+  set iTC [string range $i 7 10]
   set top_func [join [list "ProjectionCalculator_" $seed $iTC] ""]
   set module [join [list "PC_" $seed $iTC] ""]
 

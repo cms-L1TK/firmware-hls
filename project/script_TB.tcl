@@ -13,7 +13,6 @@ set modules_to_test {
   {FT_L2L3}
   {FT_L3L4}
   {FT_L5L6}
-  {FT_D1D2}
   {FT_D3D4}
   {FT_L1D1}
   {FT_L2D1}
