@@ -18,7 +18,7 @@
 namespace PR
 {
 
-  typedef ap_uint<5> IMemType;
+  typedef ap_uint<6> IMemType;
   typedef ap_uint<2> IPageType;
   typedef ap_uint<3> NPageType;
   
@@ -87,10 +87,9 @@ namespace PR
 
     ap_uint<kNBits_MemAddr> read_addr_next = read_addr + 1;
 
-    // 5 bits memory index for up to 32 input memories
     // priority encoder
     IMemType read_imem = __builtin_ctz(mem_hasdata);
-
+    
     // read the memory "read_imem" with the address "read_addr"
     read_inmem<DataType, MemType, nMEM>(data, bx, //read_imem,
 					read_addr, iMem[read_imem], iPage[read_imem], mem);
