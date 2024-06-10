@@ -59,7 +59,7 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export VMRCM_L2PHIA
+set module_to_export VMRCM_L1PHIA
 
 set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
 
