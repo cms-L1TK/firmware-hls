@@ -21,7 +21,7 @@
 
 using namespace std;
 
-const int nEvents = 100;  //number of events to run
+const int nEvents = 10;  //number of events to run
 
 int main() {
 
