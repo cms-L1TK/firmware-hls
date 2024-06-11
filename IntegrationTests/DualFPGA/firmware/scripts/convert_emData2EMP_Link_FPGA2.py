@@ -69,9 +69,11 @@ def get_words_for_event(filename, event_number, word_length):
   with open(filename) as input_file:
     lines = input_file.readlines()
     current_event = False
+    past_event = False
     for line in lines:
       if not current_event:
-        if ('Event : '+str(event_number)) in line:
+        #N.B. past_event is used to avoid matching later events ex. Event : 11 to Event : 1
+        if (('Event : '+str(event_number)) in line) and not past_event:
           current_event = True
       elif current_event:
         if not ('Event : ' in line):
@@ -79,6 +81,7 @@ def get_words_for_event(filename, event_number, word_length):
           words.append(bit_string)
         else:
           current_event = False
+          past_event = True
 
   return words
 
@@ -132,9 +135,15 @@ def write_emp_input(args):
       as_string = ''
       tpar_string = ''
       for ias in range(len(AS_NAMES)):
-        as_string = get_word_or_empty(as_words, ias, iword, 37) + as_string
+        if (iword >= 6):
+          as_string = get_word_or_empty(as_words, ias, iword-6, 37) + as_string
+        else:
+          as_string = ''.join(['0' for i in range(37)]) + as_string
       for itpar in range(len(TPAR_NAMES)):
-        tpar_string = get_word_or_empty(tpar_words, itpar, iword, 76) + tpar_string
+        if (iword >= 6):
+          tpar_string = get_word_or_empty(tpar_words, itpar, iword-6, 76) + tpar_string
+        else:
+          tpar_string = ''.join(['0' for i in range(76)]) + tpar_string
 
       link_data = {}
       
@@ -157,16 +166,22 @@ def write_emp_input(args):
           end_idx = len(tpar_string)-ilink*64
           padding = ''.join(['0' for i in range(64-end_idx)])
           link_data[TPAR_LINK_INDICES[ilink]] = padding+tpar_string[:end_idx]
-      link_data[9]=''.join(['0' for i in range(61)])+bin(ievent % 4)[2:]
+      if (iword >= 6):
+        link_data[9]=''.join(['0' for i in range(61)])+bin(ievent % 4)[2:]
+      else:
+        link_data[9]=''.join(['0' for i in range(64)])
 
       #Convert link data to hex and write
       #
       output_file.write('Frame %s    ' %(str(word_index).zfill(4)))
       for link in LINKS_USED:
-        if word_index == 0:
-          output_file.write('%s ' %'1101')
-        elif (word_index % 108) == 0:
-          output_file.write('%s ' %'0101')
+        if (word_index % 108) < 6:
+          output_file.write('%s ' %'0000')
+        elif (word_index % 108) == 6:
+          if (word_index == 6):
+            output_file.write('%s ' %'1101')
+          else:
+            output_file.write('%s ' %'0101')
         elif (word_index % 108) == 107:
           output_file.write('%s ' %'0011')
         else:

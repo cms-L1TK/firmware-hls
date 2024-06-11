@@ -99,7 +99,6 @@ begin
                                   MTPAR_76_stream_V_dout(L1D1EFGH) &
                                   MTPAR_76_stream_V_dout(L2D1ABCD);
   
-  --debugging just send some signals for now -MO
   q(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
   q(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
   q(6).data(63 downto 0) <= AS_signals(63 + 2*64 downto 0 + 2*64);

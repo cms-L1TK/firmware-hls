@@ -28,14 +28,14 @@ use work.hybrid_data_types.all;
 entity kf_wrapper is
   port (
     clk_i   : in  std_logic;
-    kfin_i  : in  t_channlesTB(numSeedTypes - 1 downto 0);
+    kfin_i  : in  t_channlesTB(numNodesKF - 1 downto 0);
     kfout_o : out t_frames(numLinksTFP - 1 downto 0)
     );
 end entity kf_wrapper;
 
 architecture rtl of kf_wrapper is
 
-  signal s_kfin_dout : t_channelsZHT(numSeedTypes - 1 downto 0);
+  signal s_kfin_dout : t_channelsZHT(numNodesKF - 1 downto 0);
   signal s_kf_dout   : t_channelsKF(numNodesKF - 1 downto 0);
 
 begin  -- architecture rtl

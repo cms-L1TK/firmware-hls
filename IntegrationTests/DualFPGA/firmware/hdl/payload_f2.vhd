@@ -59,6 +59,7 @@ architecture rtl of emp_payload is
   signal MPAR_73_writeaddr : t_arr_MTPAR_73_ADDR;
   signal MPAR_73_din       : t_arr_MTPAR_73_DATA;
   signal s_tftokf          : t_channlesTB(numTW_104 - 1 downto 0);
+  signal s_kfin            : t_channlesTB(numNodesKF - 1 downto 0);
   signal s_kfout           : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout           : ldata(numLinksTFP - 1 downto 0);
   signal FT_bx_out_0       : std_logic_vector(2 downto 0);
@@ -157,12 +158,22 @@ begin
       );
 
   -----------------------------------------------------------------------------
+  -- KF Input merger (to be replaced by DR)
+  -----------------------------------------------------------------------------
+  kf_input_merger_1 : entity work.kf_input_merger
+    port map (
+      clk            => clk_p,
+      din            => s_tftokf,
+      dout           => s_kfin
+      );
+
+  -----------------------------------------------------------------------------
   -- KF
   -----------------------------------------------------------------------------
   kf_wrapper_1 : entity work.kf_wrapper
     port map (
       clk_i   => clk_p,
-      kfin_i  => s_tftokf,
+      kfin_i  => s_kfin,
       kfout_o => s_kfout
       );
 

@@ -8,6 +8,7 @@ src --vhdl2008 SectorProcessor.vhd
 src tf_to_kf.vhd
 src kf_wrapper.vhd
 src common/hdl/emp/pkgs/tf_interface_pkg.vhd
+src kf_input_merger.vhd
 
 # KF
 include -c firmware-hls:KalmanFilter/kfin components.dep 
