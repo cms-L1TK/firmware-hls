@@ -1,0 +1,17 @@
+#don't include cm_v2_p1_2 since without decoder, it will have unresolved tcds2 dependencies
+@fpga_position = "2"
+@fpga_speed_grade = "-2-e"
+
+include payload_f2.dep
+setup ../ucf/vsim.tcl
+
+include -c emp-fwk:boards/testbench top.dep
+
+src common/hdl/emp/tb_decl.vhd
+src emp_project_decl_f2.vhd 
+src -c emp-fwk:components/links/slink emp_slink_types.vhd
+
+src -u sim ../scripts/pre_msim.tcl
+
+include -c emp-fwk:boards/apollo/cm_v2/vu13p device.dep packages_cm_v2_p2.dep
+#include -c emp-fwk:boards/apollo/cm_v2/vu13p cm_v2_p1_2.dep device.dep packages_cm_v2_p1.dep
