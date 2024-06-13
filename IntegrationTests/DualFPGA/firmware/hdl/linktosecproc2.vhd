@@ -23,8 +23,9 @@ end linktosecproc2;
 
 architecture rtl of linktosecproc2 is
 
-  signal AS_signals : std_logic_vector(48*37 - 1 downto 0);
-  signal MTPAR_signals : std_logic_vector(15*76 - 1 downto 0);
+  signal bx_link_data_int : std_logic_vector(2 downto 0) := "000";
+  signal AS_signals       : std_logic_vector(48*37 - 1 downto 0);
+  signal MTPAR_signals    : std_logic_vector(15*76 - 1 downto 0);
 
 begin
 
@@ -94,7 +95,9 @@ begin
   MTPAR_signals(63 + 16*64 downto 0 + 16*64) <= d(11).data(63 downto 0);
   MTPAR_signals(63 + 17*64 - 12 downto 0 + 17*64) <= d(10).data(63 - 12 downto 0);
   
-  bx_link_data <= d(9).data(2 downto 0);
+  --latch bx_link_data when not valid
+  bx_link_data_int <= d(9).data(2 downto 0) when (d(9).valid='1') else bx_link_data_int;
+  bx_link_data <= bx_link_data_int;
 
   AS_36_link_data(L1PHIAn1) <= AS_signals(36 downto 0);
   AS_36_link_data(L1PHIBn1) <= AS_signals(73 downto 37);

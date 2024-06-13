@@ -118,7 +118,7 @@ begin -- architecture rtl
   bx_change <= bx_prev xor bx_link_data;
   AS_36_wea <= AS_36_wea_int;
   MPAR_73_wea <= MPAR_73_wea_int;
-  --PC_bx_in <= std_logic_vector(unsigned(bx_prev)-1);
-  PC_bx_in <= bx_prev;
+  PC_bx_in <= std_logic_vector(unsigned(bx_prev)-1);
+  --PC_bx_in <= bx_prev;
 
 end architecture rtl;
