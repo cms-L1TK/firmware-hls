@@ -1,8 +1,26 @@
+#Payload and top level
 src payload_f1.vhd
+src linktosecproc.vhd
+src --vhdl2008 SectorProcessor.vhd
+#src common/hdl/emp/pkgs/tf_interface_pkg.vhd
+src tf1_wrapper.vhd
+src memUtil_pkg.vhd
+src memUtil_aux_pkg_f1.vhd
+src common/hdl/emp/pkgs/GCU_utils.vhd
+
+#Track Builder dependencies
+src common/hdl/CreateStartSignal.vhd
+src --vhdl2008 common/hdl/tf_lut.vhd
+src --vhdl2008 common/hdl/tf_mem_bin.vhd
+src --vhdl2008 common/hdl/tf_mem_format.vhd
+src --vhdl2008 common/hdl/tf_mem.vhd
+src --vhdl2008 common/hdl/tf_merge_streamer.vhd
+src common/hdl/tf_pkg.vhd
+src --vhdl2008 common/hdl/tf_pipe_delay.vhd
 
 ################
 # Include Cores
 ################
 iprepo *
-# src ../cgn/*/*/*.xci
+src ../cgn/*/*/*.xci
 
