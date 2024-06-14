@@ -4,16 +4,16 @@ set -e
 #### generated with branch VMSMERouterCMSSW13, commit a2c799d ####
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
-luts_url_cm="https://aryd.web.cern.ch/aryd/LUTs_Combined_231208.tgz"
+luts_url_cm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Combined_231208.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
-luts_url_reducedcm="https://aryd.web.cern.ch/aryd/LUTs_CMReduced_240121.tgz"
+luts_url_reducedcm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced_240121.tgz"
 # Reduced Combined modules2
 memprints_url_cm2="https://cernbox.cern.ch/remote.php/dav/public-files/MDQXOUkSMEM1KkH/MemPrints_CMReduced2_040424.tar.gz"
-luts_url_cm2="https://aryd.web.cern.ch/aryd/LUTs_CMReduced2_240121.tgz"
+luts_url_cm2="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced2_240121.tgz"
 # Combined barrel
 memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/lVII5Ho0VX7nwFA/MemPrints_Barrel_040424.tar.gz"
-luts_url_cmbarrel="https://aryd.web.cern.ch/aryd/LUTs_Barrel_240121.tgz"
+luts_url_cmbarrel="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Barrel_240121.tgz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
