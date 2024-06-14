@@ -22,9 +22,10 @@ entity FileWriter is
     FILE_NAME  : string;   --! Name of .txt file to be written
     RAM_WIDTH  : natural := 18;    --! RAM data width
     NUM_PAGES  : natural := 2;     --! Number of pages in RAM memory
+    NUM_TPAGES  : natural := 1;     --! Number of pages in RAM memory
     PAGE_LENGTH : natural := PAGE_LENGTH;     --! Page length
     -- Leave following parameters at their default values.
-    RAM_DEPTH  : natural := NUM_PAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
+    RAM_DEPTH  : natural := NUM_TPAGES*NUM_PAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
     ADDR_WIDTH : natural := clogb2(RAM_DEPTH)      --! RAM address
   );
   port (
@@ -60,7 +61,7 @@ procFile : process(CLK)
 begin
 
   -- Check user didn't change values of derived generics.
-  assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
+  assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
   assert (ADDR_WIDTH = clogb2(RAM_DEPTH)) report "User changed ADDR_WIDTH" severity FAILURE;
 
   if rising_edge(CLK) then

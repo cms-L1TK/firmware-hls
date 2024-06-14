@@ -27,7 +27,7 @@ def getAllVMRs(wireconfig):
     for line in wires_file:
         module_name = line.split(" ")[-1].split(".")[0]
         # Add module name if not already in vmr_list
-        if "VMR" in module_name and module_name not in vmr_list:
+        if "VMSMER" in module_name and module_name not in vmr_list:
             vmr_list.append(module_name)
 
     wires_file.close()
@@ -91,11 +91,9 @@ def writeTopHeader(vmr, output_dir):
         "  AllStub<inType>& allStub,\n"
         "  // Output memories\n"
         "  VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME,\n"
-        "  AllStubMemory<outType> allStubCopy,\n"
+        "  AllStubMemory<outType>& memoriesAS,\n"
         "  // Index of AllStub\n"
         "  unsigned int index,\n"
-        "  // Array to count how many VMStubs written in each slot\n"
-		"  ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)],\n"
         "  // Bool if valid stub\n"
         "  bool valid\n"
         "  );\n"
@@ -114,6 +112,8 @@ def writeTopFile(vmr, output_dir):
     disk = int(0 if layer else vmr.split("_")[1][1])
     layerdisk = layer-1 if layer else disk+num_layers-1
 
+    LD = ""
+     
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
 
@@ -131,11 +131,9 @@ def writeTopFile(vmr, output_dir):
         "  AllStub<inType>& allStub,\n"
         "  // Output memories\n"
         "  VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME,\n"
-        "  AllStubMemory<outType> allStubCopy,\n"
+        "  AllStubMemory<outType>& memoriesAS,\n"
         "  // Index of AllStub\n"
         "  unsigned int index,\n"
-        "  // Array to count how many VMStubs written in each slot\n"
-		"  ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)],\n"
         "  // Bool if valid stub\n"
         "  bool valid\n"
         "  ) {\n"
@@ -144,7 +142,9 @@ def writeTopFile(vmr, output_dir):
     )
 
     top_file.write(
-        "#pragma HLS interface register port=bx_o\n"
+        "#pragma HLS interface ap_ctrl_none port=return\n"
+        "#pragma HLS pipeline II=1\n"
+#        "#pragma HLS interface register port=bx_o\n"
         "\n"
         "  ///////////////////////////\n"
         "  // Open Lookup tables\n"
@@ -162,7 +162,7 @@ def writeTopFile(vmr, output_dir):
         "  /////////////////////////\n"
         "  // Main function\n"
         "\n"
-        "  VMSMERouter<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin>(\n"
+        "  VMSMERouter%s<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin>(\n" %LD +\
         "    bx, bx_o,\n"
         "    // LUTs\n"
         "    METable,\n"
@@ -171,10 +171,9 @@ def writeTopFile(vmr, output_dir):
         "    allStub,\n"
         "    // Output memories\n"
         "    memoryME,\n"
-        "    allStubCopy,\n"
+        "    memoriesAS,\n"
         "    // Index of AllStub\n"
         "    index,\n"
-        "    addrCountME,\n"
         "    valid\n"
         "  );\n"
         "\n"
@@ -222,8 +221,8 @@ python3 generate_VMRSMER.py -a
     # Loop over all Units Under Test
     for vmr in vmr_list:
         # Check that the Unit Under Test is a VMR
-        if "VMR" not in vmr:
-            raise IndexError("Unit under test has to be a VMR.")
+        if "VMSMER" not in vmr:
+            raise IndexError("Unit under test has to be a VMSMER.")
 
         # Create and write the files
         writeTopHeader(vmr, args.outputdir)

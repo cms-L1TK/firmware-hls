@@ -21,14 +21,14 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export MP_L3PHIC
+set module_to_export MP_D1PHIC
 
 # create new project (deleting any existing one of same name)
 open_project -reset match_processor
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
-add_files ../TopFunctions/CombinedConfig/MatchProcessorTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
+add_files ../TopFunctions/CombinedConfig_FPGA2/MatchProcessorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/MatchProcessor_test.cpp -cflags "$CFLAGS"
 
 # data files

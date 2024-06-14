@@ -8,8 +8,8 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ VMStubMERouterTop_D1PHIA
-  #define HEADER_FILE_ "VMStubMERouterTop_D1PHIA.h"
+  #define TOP_FUNC_ VMStubMERouterTop_L1PHIA
+  #define HEADER_FILE_ "VMStubMERouterTop_L1PHIA.h"
 #endif
 
 #include HEADER_FILE_
@@ -21,7 +21,7 @@
 
 using namespace std;
 
-const int nEvents = 100;  //number of events to run
+const int nEvents = 10;  //number of events to run
 
 int main() {
 
@@ -30,7 +30,7 @@ int main() {
 
   constexpr char phi = 'A' + phiRegion; // Converts phiRegion to char
   const string vmrID = ((kLAYER) ? "L" + to_string(kLAYER) : "D" + to_string(kDISK)) + "PHI" + phi;
-  TBHelper tb("VMRCM/VMR_" + vmrID);
+  TBHelper tb("VMSMER/VMSMER_" + vmrID);
 
   const string allStubPattern = "AllStubs*";
   const string mePattern = "VMStubs_VMSME*";
@@ -59,20 +59,12 @@ int main() {
   // Error count
   int err = 0;
 
-  //Create variables that keep track of which memory address to read and write to
-	ap_uint<5> addrCountME[1 << (kNbitsrzbinME + kNbitsphibin)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
-
-  
   for (unsigned int ievt = 0; ievt < nEvents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
     // Clear output memories
     memoryME.clear();
     memoriesASCopy.clear();
-
-    for (int i = 0; i < 1 << (kNbitsrzbinME + kNbitsphibin); i++) {
-      addrCountME[i] = 0;
-    }
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
@@ -89,7 +81,6 @@ int main() {
                 &memoryME,
                 memoriesASCopy,
                 index,
-                addrCountME,
                 valid);
 
     }
@@ -98,7 +89,7 @@ int main() {
     bool truncation = false;
 
     // ME memories
-    std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << "\n";
+    std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << std::endl;
     err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
 
   } // End of event loop

@@ -4,7 +4,7 @@ open_project -reset trackMerger
 
 # source files
 # Optional Flags: -DDEBUG
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench}
 set_top TrackMergerTop
 add_files ../TopFunctions/TrackMergerTop.cc -cflags "$CFLAGS"
 add_files ../TrackletAlgorithm/TrackMerger.cc -cflags "$CFLAGS"

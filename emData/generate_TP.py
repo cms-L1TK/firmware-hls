@@ -2,8 +2,8 @@
 
 # This script generates TrackletParameter_parameters.h,
 # TrackletParameterTop.h, and TrackletParameterTop.cc in the
-# TopFunctions/ directory. Currently supports all TPs for L1L2, as well as
-# TC_L3L4A, TC_L3L4D, TC_L5L6A, and TC_L5L6D.
+# TopFunctions/ directory. Supports all TPs.
+
 
 from __future__ import absolute_import, print_function
 import sys, re, os, argparse
@@ -76,6 +76,7 @@ TrackletProcessor_parameters.h in the TopFunctions/ directory.",
                                  epilog="")
 parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/CombinedConfig/", type=str, help="The directory in which to write the output files (default=%(default)s)")
 parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTsCM/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
+parser.add_argument("-l", "--LUTsDir", metavar="LUTS_DIR", default="LUTsCM", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
 arguments = parser.parse_args()
 
 # First, parse the wires file and store the memory names associated with TPs in
@@ -142,25 +143,23 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
       "// significant, represent the memories in the order they are passed to\n"
       "// TrackletProcessor; e.g., the LSB corresponds to\n"
-      "// projout_barrel_ps[TC::L1PHIA]. If a bit is set, the corresponding memory is\n"
+      "// projout_barrel_ps[TP::L1PHIA]. If a bit is set, the corresponding memory is\n"
       "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
       "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
       "// in the same way.\n"
-      "namespace TC{\n"
-      "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
-      "   }\n"
-      "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
-      "template<TF::seed Seed, TC::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
-      "template<TF::seed Seed, TC::itc iTC> const ap_uint<10>* getLUT();\n"
-      "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
-      "template<TF::seed Seed, TC::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
+      "namespace TP{\n"
+      "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t TPROJMaskBarrel();\n"
+      "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t TPROJMaskDisk();\n"
+      "template<TF::seed Seed, TP::itc iTC> const ap_uint<10>* getLUT();\n"
+      "template<TF::seed Seed, TP::itc iTC> const ap_uint<1>* getPTInnerLUT();\n"
+      "template<TF::seed Seed, TP::itc iTC> const ap_uint<1>* getPTOuterLUT();\n"
       "template<TF::seed Seed> const ap_int<18>* getDRinvLUT();\n"
       "template<TF::seed Seed> const ap_int<18>* getInvtLUT();\n"
       "template<TF::seed Seed> const ap_int<19>* getDRinvForwardLUT();\n"
       "template<TF::seed Seed> const ap_int<18>* getInvtForwardLUT();\n"
       "template<TF::seed Seed> const ap_int<19>* getDRinvBackwardLUT();\n"
       "template<TF::seed Seed> const ap_int<18>* getInvtBackwardLUT();\n"
-      "template<TF::seed Seed, TC::itc iTC> constexpr int nASMemInner();\n"
+      "template<TF::seed Seed, TP::itc iTC> constexpr int nASMemInner();\n"
   )
   topHeaderFile.write(
       "#ifndef TopFunctions_TrackletProcessorTop_h\n"
@@ -213,20 +212,20 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
               tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
       # figure out sizes of LUTs by reading .tab files, do once per seed type
       if seed not in seedlist:
-        LUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}.tab".format(seed))) - 2)
-        regLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
-        innerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
-        outerPTLUTSize[seed] = str(sum(1 for _ in open("LUTsCM/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
+        LUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}.tab".format(seed))) - 2)
+        regLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
+        innerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
+        outerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"
-          "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TC::" + iTC + ">() {\n"
+          "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TP::" + iTC + ">() {\n"
           "  return 0x%X;\n"
           "}\n"
-          "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TC::" + iTC + ">() {\n"
+          "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TP::" + iTC + ">() {\n"
           "  return 0x%X;\n"
           "}\n"
-          'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TP::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '#ifdef CMSSW_GIT_HASH\n'
           '  static std::mutex getLUTMutex_;\n'
@@ -235,18 +234,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static ap_uint<10> lut[' + LUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"LUTsCM/TP_' + seed + '.tab");\n'
+          '    init = readSWLUT<ap_uint<10>,' + LUTSize[seed] +'>(lut,"'+arguments.LUTsDir+'/TP_' + seed + '.tab");\n'
           '#else\n'
           '  static ap_uint<10> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + '.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + '.tab"\n'
+          '#if __has_include("../emData/'+arguments.LUTsDir+'/TP_' + seed + '.tab")\n'
+          '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + '.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
-          'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          'template<> inline const ap_uint<1>* getPTInnerLUT<TF::'+ seed + ', TP::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '#ifdef CMSSW_GIT_HASH\n'
           '  static std::mutex getLUTMutex_;\n'
@@ -255,18 +254,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static ap_uint<1> lut[' + innerPTLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"LUTsCM/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
+          '    init = readSWLUT<ap_uint<1>,' + innerPTLUTSize[seed] + ' >(lut,"'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptinnercut.tab");\n'
           '#else\n'
           '  static ap_uint<1> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
+          '#if __has_include("../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC +'_stubptinnercut.tab")\n'
+          '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptinnercut.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
-          'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TC::' + iTC + ' >(){\n'
+          'template<> inline const ap_uint<1>* getPTOuterLUT<TF::'+ seed + ', TP::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '#ifdef CMSSW_GIT_HASH\n'
           '  static std::mutex getLUTMutex_;\n'
@@ -275,18 +274,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           '  static ap_uint<1> lut[' + outerPTLUTSize[seed] + '];\n'
           '  static bool init = 0;\n'
           '  if (!init)\n'
-          '    init = readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"LUTsCM/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
+          '    init = readSWLUT<ap_uint<1>,' + outerPTLUTSize[seed] + '>(lut,"'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptoutercut.tab");\n'
           '#else\n'
           '  static ap_uint<1> lut[] =\n'
-          '#if __has_include("../emData/LUTsCM/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
-          '#  include "../emData/LUTsCM/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
+          '#if __has_include("../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC +'_stubptoutercut.tab")\n'
+          '#  include "../emData/'+arguments.LUTsDir+'/TP_' + seed + iTC + '_stubptoutercut.tab"\n'
           '#else\n'
           '  {};\n'
           '#endif\n'
           '#endif\n'
           '  return lut;\n'
           '}\n'
-          'template<> constexpr int nASMemInner<TF::'+ seed + ', TC::' + iTC + '>(){\n'
+          'template<> constexpr int nASMemInner<TF::'+ seed + ', TP::' + iTC + '>(){\n'
           '  return ' + str(nASMemInner) + ';\n'
           '}\n'
 )% (tprojMaskBarrel, tprojMaskDisk)
@@ -299,7 +298,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
+          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[TP::nASMemInner<TF::" + str(seed) + ", TP::" + iTC + ">()],\n"
           "    const AllStubMemory<OuterRegion<TF::" + str(seed) + ">()>* outerStubs,\n"
           "    const VMStubTEOuterMemoryCM<OuterRegion<TF::" + str(seed) + ">(), kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[TF::"+seed[2:]+"]>* outerVMStubs,\n"
           "    TrackletParameterMemory * trackletParameters,\n"
@@ -315,13 +314,13 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "void TrackletProcessor_" + seed + iTC + "(\n"
           "    const BXType bx,\n"
           "    BXType& bx_o,\n"
-          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[nASMemInner<TF::" + str(seed) + ", TC::" + iTC + ">()],\n"
+          "    const AllStubInnerMemory<InnerRegion<TF::" + str(seed) + ">()> innerStubs[TP::nASMemInner<TF::" + str(seed) + ", TP::" + iTC + ">()],\n"
           "    const AllStubMemory<OuterRegion<TF::" + str(seed) + ">()>* outerStubs ,\n"
           "    const VMStubTEOuterMemoryCM<OuterRegion<TF::" + str(seed) + ">(), kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[TF::"+ seed[2:] +"]>* outerVMStubs,\n"
           "    TrackletParameterMemory * trackletParameters,\n"
-          "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TC::N_PROJOUT_BARRELPS],\n"
-          "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TC::N_PROJOUT_BARREL2S],\n"
-          "    TrackletProjectionMemory<DISK> projout_disk[TC::N_PROJOUT_DISK]\n"
+          "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],\n"
+          "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],\n"
+          "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
           ") {\n"
           "#pragma HLS inline recursive\n"
           "#pragma HLS interface register port=bx_o\n"
@@ -335,13 +334,13 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
           "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
           "\n"
-          "static const ap_uint<10>* lut = getLUT<TF::" + seed + ",TC::" +  iTC + ">();\n"
+          "static const ap_uint<10>* lut = TP::getLUT<TF::" + seed + ",TP::" +  iTC + ">();\n"
           "\n"
           "TP_" + seed + iTC + ": TrackletProcessor<\n"
           "  TF::" + seed + ",\n"
-          "  TC::" + iTC + ",\n"
+          "  TP::" + iTC + ",\n"
           "  kNTEUnitsLayerDisk[TF::" +  seed[2:]+ "],\n"
-          "  nASMemInner<TF::"+seed+",TC::"+iTC+">(),\n"
+          "  TP::nASMemInner<TF::"+seed+",TP::"+iTC+">(),\n"
           " 108>(\n"
           "    bx,\n"
           "    bx_o,\n"
@@ -359,7 +358,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
   
   # Print out endifs and close files.
   parametersFile.write(
-      "\n"
+      "}\n"
       "#endif\n"
   )
   topHeaderFile.write(

@@ -11,11 +11,12 @@ set modules_to_test {
   {TP_L2L3C}
   {TP_L3L4C}
   {TP_L5L6C}
-  {TP_L1D1C}
-  {TP_L2D1C}
   {TP_D1D2C}
   {TP_D3D4C}
+  {TP_L1D1C}
+  {TP_L2D1C}
 }
+
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
@@ -25,8 +26,8 @@ set module_to_export TP_L1L2C
 open_project -reset trackletProcessor
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
-add_files ../TopFunctions/CombinedConfig/TrackletProcessorTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
+add_files ../TopFunctions/CombinedConfig_FPGA2/TrackletProcessorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/TrackletProcessor_test.cpp -cflags "$CFLAGS"
 
 # data files

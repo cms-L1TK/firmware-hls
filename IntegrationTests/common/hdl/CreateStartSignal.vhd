@@ -43,13 +43,13 @@ architecture behavior of CreateStartSignal is
   signal BX_LATCH : t_BX_LATCH;
 begin
 
-START <= DONE_LATCH(DELAY-1);
-BX <= BX_LATCH(DELAY-1);
-
 procLatch : process(CLK)
 begin
 
   if rising_edge(CLK) then
+
+    START <= DONE_LATCH(DELAY-1);
+    BX <= BX_LATCH(DELAY-1);
 
     for ii in 1 to DELAY-1 loop
       DONE_LATCH(ii) <= DONE_LATCH(ii-1);

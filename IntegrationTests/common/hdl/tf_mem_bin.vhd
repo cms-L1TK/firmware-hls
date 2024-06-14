@@ -238,30 +238,33 @@ begin
   if rising_edge(clka) then
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
+      vi_page_cnt := 1;
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
     end if;
     if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
       vi_clk_cnt := vi_clk_cnt+1;
     elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       vi_clk_cnt := 0;
-      mask_o(NUM_BINS*(vi_page_cnt+1)-1 downto NUM_BINS*vi_page_cnt) <= (others => '0');
       nentry_mask_tmp <= (others => '0'); -- Why do we need this??? FIXME
-      --report "tf_mem_bin setting nentry_mask_tmp to zero";
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
       assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
       if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
         vi_page_cnt := vi_page_cnt+1;
       else
         vi_page_cnt := 0;
       end if;
+      mask_o(NUM_BINS*(vi_page_cnt+1)-1 downto NUM_BINS*vi_page_cnt) <= (others => '0');
     end if;
 
     if (wea='1') then
+      -- FIXME - this code is not yet protected from "wrapping" if there are
+      -- more than 16 (or 15) entries.      
       -- Write data to all copies
       --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
       for icopy in 0 to NUM_COPY-1 loop
         sa_RAM_data(icopy)(to_integer(unsigned(addra))) <= dina; 
       end loop;
 
-      --vi_nent_idx_new := rzbits & phibits; 
       --report "tf_mem_bin vi_nent_idx vi_nent_idx_new: " & to_bstring(vi_nent_idx) & " " & to_bstring(vi_nent_idx_new) & " " & to_bstring(rzbits) & " " & to_bstring(phibits);
   
       binaddr := unsigned(nentry_tmp(to_integer(unsigned(vi_nent_idx))))+1;
@@ -276,12 +279,13 @@ begin
       -- Count entries
       page := to_integer(unsigned(addra(RAM_DEPTH_BITS-1 downto PAGE_LENGTH_BITS)));
       nentry_in_bin := std_logic_vector(unsigned(addra(ADDR_WIDTH-1 downto 0)) + 1);
-      --FIXME sync_nent signal not arriving on correct clock, for now the address from the processing module is used
-      --assert( binaddr = to_integer(unsigned(nentry_in_bin))) report "tf_mem_bin vi_nent_idx binaddr nentry_in_bin: " & to_bstring(vi_nent_idx) & " " & to_bstring(std_logic_vector(binaddr)) & " " & to_bstring(nentry_in_bin) severity error;
       
       assert (page < NUM_PAGES) report "page out of range" severity error;
       mask_o(page*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
-    
+
+      --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)
+      --  &" "&to_bstring(nentry_in_bin)&" "&to_bstring(addra);
+
       sa_RAM_nent(to_integer(unsigned(phibits)))(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= nentry_in_bin; -- <= address
       if (unsigned(rzbits) /= 0) then
         sa_RAM_nent(to_integer(unsigned(phibits))+NUM_PHI_BINS)(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= nentry_in_bin; -- <= address
@@ -297,6 +301,17 @@ begin
   if rising_edge(clkb) then
     --Reading DRAM so should not be on clock edge ?
     if (enb_nent='1') then
+      --for i in 0 to NUM_PHI_BINS-1 loop
+      --  report "tf_mem_bin read_nent "&NAME&" "&time'image(now)&" "&integer'image(i)&"  : "
+      --  &to_bstring(sa_RAM_nent(i)(8))&" "
+      --  &to_bstring(sa_RAM_nent(i)(9))&" "
+      --  &to_bstring(sa_RAM_nent(i)(10))&" "
+      --  &to_bstring(sa_RAM_nent(i)(11))&" "
+      --  &to_bstring(sa_RAM_nent(i)(12))&" "
+      --  &to_bstring(sa_RAM_nent(i)(13))&" "
+      --  &to_bstring(sa_RAM_nent(i)(14))&" "
+      --  &to_bstring(sa_RAM_nent(i)(15));
+      --end loop;
       for i in 0 to 2*NUM_PHI_BINS-1 loop
         --report "tf_mem_bin read nent " & NAME & " " &to_bstring(addr_nent) & " " & to_bstring(sa_RAM_nent(i)(to_integer(unsigned(addr_nent))));
         dout_nent(ADDR_WIDTH*(i+1)-1 downto ADDR_WIDTH*i) <= sa_RAM_nent(i)(to_integer(unsigned(addr_nent)));
@@ -305,7 +320,8 @@ begin
 
     for i in 0 to NUM_COPY-1 loop
       if (enb(i)='1') then
-        --report "tf_mem_bin read addrb"&integer'image(i)&" "&to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS));
+        --report "tf_mem_bin read addrb"&integer'image(i)&" "&time'image(now)&" "& NAME & " " & to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))
+        --  &" "&to_bstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))));
         sv_RAM_row(i) <= sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))));
       end if;
     end loop;  

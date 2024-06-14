@@ -7,38 +7,37 @@
 source env_hls.tcl
 
 set modules_to_test {
-  {PC_L1L2C}
-  {PC_L2L3C}
-  {PC_L3L4C}
-  {PC_L5L6C}
-  {PC_L1D1C}
-  {PC_L2D1C}
-  {PC_D1D2C}
-  {PC_D3D4C}
+  {PC_L1L2ABC}
+  {PC_L1L2DE}
+  {PC_L1L2F}
+  {PC_L1L2G}
+  {PC_L1L2HI}
+  {PC_L1L2JKL}
+  {PC_L2L3ABCD}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export PC_L1L2C
+set module_to_export PC_L1L2ABC
 
 # create new project (deleting any existing one of same name)
 open_project -reset projectionCalculator
 
 # source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig/}
-add_files ../TopFunctions/CombinedConfig/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2/}
+add_files ../TopFunctions/CombinedConfig_FPGA2/ProjectionCalculatorTop.cc -cflags "$CFLAGS"
 add_files -tb ../TestBenches/ProjectionCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/TP/tables/
-add_files -tb ../emData/TP/
+add_files -tb ../emData/PC/tables/
+add_files -tb ../emData/PC/
 
 foreach i $modules_to_test {
   puts [join [list "======== TESTING " $i " ========"] ""]
   set seed [string range $i 3 6]
-  set iTC [string range $i 7 7]
+  set iTC [string range $i 7 10]
   set top_func [join [list "ProjectionCalculator_" $seed $iTC] ""]
-  set module [join [list "TP_" $seed $iTC] ""]
+  set module [join [list "PC_" $seed $iTC] ""]
 
   # set macros for this module in CCFLAG environment variable
   set ::env(CCFLAG) [join [list $::env(CCFLAG_CMSSW) " -D \"SEED_=" $seed "_\" -D \"ITC_=" $iTC "_\" -D \"MODULE_=" $module "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]

@@ -359,7 +359,8 @@ public:
     // Checks the radius 
     // if these are zero it means that you have 2S stubs where the radius 
     // just encodes the ring number and is less than 16
-      return data_.range(getWidth()-2, getWidth()-3) > 0; // Check second and third highest bits regardless of template type
+
+    return data_.range(getWidth()-2, getWidth()-3) > 0; // Check second and third highest bits regardless of template type
   }
 
   // Setter

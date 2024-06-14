@@ -28,13 +28,14 @@ entity FileReader is
     DELAY      : natural := 0;     --! Delay output signals by this many clocks.
     RAM_WIDTH  : natural := 18;    --! RAM data width
     NUM_PAGES  : natural := 2;     --! Number of pages in RAM memory
+    NUM_TPAGES : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
     NUM_BINS   : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
     DEBUG      : boolean := false; --! Debug printout
     FILE_NAME_DEBUG : string  := "";  --! Name of .txt file for debug printout.
     -- Leave following parameters at their default values.
-    RAM_DEPTH  : natural := NUM_PAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
+    RAM_DEPTH  : natural := NUM_PAGES*NUM_TPAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
     ADDR_WIDTH : natural := clogb2(RAM_DEPTH);     --! RAM address
-    BIN_SIZE   : natural := PAGE_LENGTH/NUM_BINS   --! Max. entries per RAM bin
+    BIN_SIZE   : natural := NUM_TPAGES*PAGE_LENGTH/NUM_BINS   --! Max. entries per RAM bin
   );
   port (
     CLK      : in  std_logic;
@@ -74,9 +75,9 @@ procFile : process(CLK)
 begin
 
   -- Check user didn't change values of derived generics.
-  assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
+  assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
   assert (ADDR_WIDTH = clogb2(RAM_DEPTH)) report "User changed ADDR_WIDTH" severity FAILURE;
-  assert (BIN_SIZE = PAGE_LENGTH/NUM_BINS) report "User changed BIN_SIZE" severity FAILURE;
+  assert (BIN_SIZE = NUM_TPAGES*PAGE_LENGTH/NUM_BINS) report "User changed BIN_SIZE" severity FAILURE;
 
   if rising_edge(CLK) then
   

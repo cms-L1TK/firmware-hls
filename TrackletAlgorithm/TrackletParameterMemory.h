@@ -2,7 +2,7 @@
 #define TrackletAlgorithm_TrackletParameterMemory_h
 
 #include "Constants.h"
-#include "MemoryTemplate.h"
+#include "MemoryTemplateTPROJ.h"
 #include "globalFunctions.h"
 
 // Memory written by the TrackletProcessor, containing the helix parameters of
@@ -156,6 +156,13 @@ private:
 };
 
 // Memory definition
-typedef MemoryTemplate<TrackletParameters, 3, kNBits_MemAddr> TrackletParameterMemory;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr,4> TrackletParameterMemory;
+
+// Memory definitions for various numbers of pages
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr,4> TrackletParameterMemory1;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr,4> TrackletParameterMemory2;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr,4> TrackletParameterMemory3;
+typedef MemoryTemplateTPROJ<TrackletParameters, 3, kNBits_MemAddr,4> TrackletParameterMemory4;
+
 
 #endif

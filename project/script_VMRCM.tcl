@@ -59,9 +59,9 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export VMRCM_L2PHIA
+set module_to_export VMRCM_L1PHIA
 
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
 
 foreach i $modules_to_test {
 
@@ -72,6 +72,7 @@ foreach i $modules_to_test {
   set header_file [join [list "\\\"" $top_func ".h\\\""] ""]
 
   # set macros for this module in CCFLAG environment variable
+
   set ::env(CCFLAG) [join [list $::env(CCFLAG_CMSSW) " -D \"TOP_FUNC_=" $top_func "\" -D \"HEADER_FILE_=" $header_file "\""] ""]
 
   # create new project (deleting any existing one of same name)
@@ -84,12 +85,14 @@ foreach i $modules_to_test {
   add_files -tb ../emData/VMRCM/
 
   # run C-simulation for each module in modules_to_test
-  add_files ../TopFunctions/CombinedConfig/$top_func.cc -cflags "$CFLAGS"
+  add_files ../TopFunctions/CombinedConfig_FPGA2/$top_func.cc -cflags "$CFLAGS"
   set_top $top_func
   open_solution [join [list "solution_" $top_func] ""]
 
   # Define FPGA, clock frequency & common HLS settings.
   source settings_hls.tcl
+
+  puts [join [list $::env(CCFLAG) ] ""]  
 
   # run C-simulation
   csim_design -mflags "-j8"
@@ -97,6 +100,7 @@ foreach i $modules_to_test {
   # only run C-synthesis, C/RTL cosimulation, and export for module_to_export
   if { $i == $module_to_export } {
     csynth_design
+    puts [join [list "======== Done with csynth ========"] ""]
     cosim_design
     export_design -format ip_catalog
     # Adding "-flow impl" runs full Vivado implementation, providing accurate resource use numbers (very slow).

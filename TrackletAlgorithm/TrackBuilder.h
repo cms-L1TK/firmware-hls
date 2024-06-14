@@ -4,18 +4,30 @@
 #include "TrackletParameterMemory.h"
 #include "FullMatchMemory.h"
 #include "TrackFitMemory.h"
+#include "TrackBuilder_parameters.h"
 
 static const unsigned short kMinNMatches = 2;
 static const unsigned short kInvalidTrackletID = 0x3FFF;
 
 static const unsigned short kNBitsTCID = FullMatchBase<BARREL>::kFMTCIDSize;
-static const unsigned short kNBitsITC = FullMatchBase<BARREL>::kFMITCSize;
 static const unsigned short kNBitsTrackletID = kNBitsTCID + kNBits_MemAddr;
 
 typedef ap_uint<kNBitsTCID> TCIDType;
 typedef ap_uint<kNBitsITC> ITCType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
 typedef ap_uint<kNBitsTrackletID> TrackletIDType;
+
+template<int NBarrelStubs, int NDiskStubs> void
+setTrackPars(TrackFit<NBarrelStubs, NDiskStubs> &track, const TrackletParameters &tpar)
+{
+  track.setPhiRegionInner(tpar.getPhiRegion());
+  track.setStubIndexInner(tpar.getStubIndexInner());
+  track.setStubIndexOuter(tpar.getStubIndexOuter());
+  track.setRinv(tpar.getRinv());
+  track.setPhi0(tpar.getPhi0());
+  track.setZ0(tpar.getZ0());
+  track.setT(tpar.getT());
+}
 
 template <class FM>
 class Merger {
@@ -84,10 +96,13 @@ class Merger {
 };
 
 // TrackBuilder top template function
-template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, unsigned TPAROffset>
+template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, int TPARMask>
 void TrackBuilder(
     const BXType bx,
-    const TrackletParameterMemory trackletParameters[],
+    const TrackletParameterMemory1 trackletParameters1[],
+    const TrackletParameterMemory2 trackletParameters2[],
+    const TrackletParameterMemory3 trackletParameters3[],
+    const TrackletParameterMemory4 trackletParameters4[],
     const FullMatchMemory<BARREL> barrelFullMatches[],
     const FullMatchMemory<DISK> diskFullMatches[],
     BXType &bx_o,
@@ -205,22 +220,33 @@ void TrackBuilder(
 
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
-    const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(TPAROffset);
+    const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
-    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
+    const auto mparNPages = getMPARNPages<Seed>(iTC);
+    const auto mparMem = getMPARMem<Seed>(iTC);
+    const auto mparPage = getMPARPage<Seed>(iTC);
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const auto &tpar = trackletParameters[TCID - TPAROffset].read_mem(bx, trackletIndex);
-
+    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
+ 
     TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
-    track.setPhiRegionInner(tpar.getPhiRegion());
     track.setPhiRegionOuter(phiRegionOuter);
-    track.setStubIndexInner(tpar.getStubIndexInner());
-    track.setStubIndexOuter(tpar.getStubIndexOuter());
-    track.setRinv(tpar.getRinv());
-    track.setPhi0(tpar.getPhi0());
-    track.setZ0(tpar.getZ0());
-    track.setT(tpar.getT());
-
+    if ((TPARMask & 0x1) && mparNPages == 1) {
+      const auto &tpar = trackletParameters1[mparMem].read_mem(bx, trackletIndex);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
+    else if ((TPARMask & 0x2) && mparNPages == 2) {
+      const auto &tpar = trackletParameters2[mparMem].read_mem(bx, trackletIndex, mparPage);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
+    else if ((TPARMask & 0x4) && mparNPages == 3) {
+      const auto &tpar = trackletParameters3[mparMem].read_mem(bx, trackletIndex, mparPage);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }
+    else if ((TPARMask & 0x8) && mparNPages == 4) {
+      const auto &tpar = trackletParameters4[mparMem].read_mem(bx, trackletIndex, mparPage);
+      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+    }   
+    
     // Retrieve the full information for each full match that has the minimum
     // tracklet ID and assign it to the appropriate field of the TrackFit
     // object.

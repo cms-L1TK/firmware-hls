@@ -59,9 +59,10 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export VMSMER_D1PHIA
+set module_to_export VMSMER_L1PHIA
 
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig}
+# source files
+set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
 
 foreach i $modules_to_test {
 
@@ -81,10 +82,11 @@ foreach i $modules_to_test {
   add_files -tb ../TestBenches/VMStubMERouter_test.cpp -cflags "$CFLAGS"
 
   # data files
-  add_files -tb ../emData/VMRCM/
+  add_files -tb ../emData/VMSMER/
 
   # run C-simulation for each module in modules_to_test
-  add_files ../TopFunctions/CombinedConfig/$top_func.cc -cflags "$CFLAGS"
+  add_files ../TopFunctions/CombinedConfig_FPGA2/$top_func.cc -cflags "$CFLAGS"
+
   set_top $top_func
   open_solution [join [list "solution_" $top_func] ""]
 

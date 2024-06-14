@@ -3,7 +3,7 @@ variables:
   VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
   CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7.0/root/bin/clang-tidy'
   CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
-  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TopFunctions/CombinedConfig -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
+  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2 -I../TopFunctions/CombinedConfig -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
 
 stages: # ---------------------------------------------------------------------
   - lint
@@ -146,7 +146,7 @@ VMSMER-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig/VMStubMERouterTop_D1PHIA.cc'    
+    CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMStubMERouterTop_D1PHIA.cc'    
 TP-quality-check:
   <<: *template_quality-check
   variables:
@@ -156,17 +156,17 @@ PC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/ProjectionCalculator_test.cpp ../TopFunctions/CombinedConfig/ProjectionCalculatorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/ProjectionCalculator_test.cpp ../TopFunctions/CombinedConfig_FPGA2/ProjectionCalculatorTop.cc'
 MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessor_test.cpp ../TopFunctions/CombinedConfig/MatchProcessorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/MatchProcessor_test.cpp ../TopFunctions/CombinedConfig_FPGA2/MatchProcessorTop.cc'
 TB-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/CombinedConfig/TrackBuilderTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/CombinedConfig_FPGA2/TrackBuilderTop.cc'
 TM-quality-check:
   <<: *template_quality-check
   variables:
@@ -211,7 +211,6 @@ PC-vivado-hls-build:
 MP-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "MP-quality-check"]
-  allow_failure: true # FIXME: remove after regenerating test vectors
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
