@@ -27,9 +27,11 @@ xciCreation: $(core_file)
 	make -f $(core_file) -j 8 all
 
 add_common_files:
+	@if [ ! -d ucf ]; then mkdir ucf; fi
 	@cd ucf; ln -s ../../../common/ucf/*.tcl .
-	@cd scripts; ln -s ../../../common/script/emp/*.py .
-	@cd scripts; ln -s ../../../common/script/emp/*.tcl .
+	@cd scripts; ln -s ../../../common/script/emp/* .
+	#@cd scripts; ln -s ../../../common/script/emp/*.py .
+	#@cd scripts; ln -s ../../../common/script/emp/*.tcl .
 
 hdl_add_files: $(core_file)
 	#cd hdl; ln -s ../../../CombinedConfig/IRtoTP/hdl/*.vhd .
