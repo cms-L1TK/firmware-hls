@@ -19,7 +19,7 @@ include -c firmware-hls:KalmanFilter/common components.dep
 
 #Track Builder dependencies
 src common/hdl/CreateStartSignal.vhd
-src --vhdl2008 common/hdl/tf_lut.vhd
+#src --vhdl2008 common/hdl/tf_lut.vhd
 src --vhdl2008 common/hdl/tf_mem_bin.vhd
 src --vhdl2008 common/hdl/tf_mem_format.vhd
 src --vhdl2008 common/hdl/tf_mem.vhd
