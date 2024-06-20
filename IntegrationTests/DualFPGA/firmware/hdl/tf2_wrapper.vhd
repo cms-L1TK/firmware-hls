@@ -28,10 +28,12 @@ entity tf2_wrapper is
   port (
     clk                       : in  std_logic;
     reset                     : in  std_logic;
-    start_first_write         : in  std_logic;
     PC_start                  : in  std_logic;
     PC_bx_in                  : in  std_logic_vector(2 downto 0);
-    FT_bx_out_0               : out std_logic_vector(2 downto 0); 
+    PC_bx_out                 : out std_logic_vector(2 downto 0);
+    PC_bx_out_vld             : out std_logic;
+    PC_done                   : out std_logic;
+    FT_bx_out                 : out std_logic_vector(2 downto 0); 
     FT_bx_out_vld             : out std_logic;
     FT_done                   : out std_logic;
     FT_last_track             : out std_logic;
@@ -62,10 +64,12 @@ begin  -- architecture rtl
     port map (
       clk                     => clk,
       reset                   => reset,
-      start_first_write       => start_first_write,
       PC_start                => PC_start,
       PC_bx_in                => PC_bx_in,
-      FT_bx_out_0             => FT_bx_out_0,
+      PC_bx_out               => PC_bx_out,
+      PC_bx_out_vld           => PC_bx_out_vld,
+      PC_done                 => PC_done,
+      FT_bx_out               => FT_bx_out,
       FT_bx_out_vld           => FT_bx_out_vld,
       FT_done                 => FT_done,
       FT_L1L2_last_track      => FT_last_track,
