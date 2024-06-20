@@ -33,12 +33,12 @@ end entity sp2_mem_writer;
 architecture rtl of sp2_mem_writer is
 
   type t_arr_AS_36_7b is array(enum_AS_36_f1) of std_logic_vector(6 downto 0);
-  type t_arr4_5b is array(0 to 3) of std_logic_vector(4 downto 0);
-  type t_arr_MTPAR_73_arr4_5b is array(enum_MTPAR_73) of t_arr4_5b;
+  type t_arr4_7b is array(0 to 3) of std_logic_vector(6 downto 0);
+  type t_arr_MTPAR_73_arr4_7b is array(enum_MTPAR_73) of t_arr4_7b;
   type t_arr_MTPAR_73_2b is array(enum_MTPAR_73) of std_logic_vector(1 downto 0);
 
   signal AS_36_adr       : t_arr_AS_36_7b               := (others => "0000000");
-  signal MPAR_73_adr     : t_arr_MTPAR_73_arr4_5b       := (others => (others => "00000"));
+  signal MPAR_73_adr     : t_arr_MTPAR_73_arr4_7b       := (others => (others => "0000000"));
   signal MPAR_73_pge     : t_arr_MTPAR_73_2b            := (others => "00");
   signal bx_prev         : std_logic_vector(2 downto 0) := "000";
   signal bx_change       : std_logic_vector(2 downto 0) := "000";
@@ -85,10 +85,10 @@ begin -- architecture rtl
         end if;
 
         if (bx_change /= "000") then
-          MPAR_73_adr(i)(0) <= "00000";
-          MPAR_73_adr(i)(1) <= "00000";
-          MPAR_73_adr(i)(2) <= "00000";
-          MPAR_73_adr(i)(3) <= "00000";
+          MPAR_73_adr(i)(0) <= "0000000";
+          MPAR_73_adr(i)(1) <= "0000000";
+          MPAR_73_adr(i)(2) <= "0000000";
+          MPAR_73_adr(i)(3) <= "0000000";
         elsif (MPAR_73_wea_int(i) = '1') then
           MPAR_73_adr(i)(to_integer(unsigned(MPAR_73_pge(i)))) 
               <= std_logic_vector(unsigned(MPAR_73_adr(i)(to_integer(unsigned(MPAR_73_pge(i)))))+1);
