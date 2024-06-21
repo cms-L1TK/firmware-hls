@@ -89,7 +89,7 @@ public:
   }
 
   ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=binmask8_ dim=0
     return binmask8_[bx][ibin];
   }
 
@@ -130,8 +130,8 @@ public:
 
   bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
-#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=binmask8_ dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
 
     if (isCMSSW && !NBIT_BX) {ibx = 0;}
