@@ -10,6 +10,12 @@
 #if !defined TOP_FUNC_
   #define TOP_FUNC_ VMStubMERouterTop_L1PHIA
   #define HEADER_FILE_ "VMStubMERouterTop_L1PHIA.h"
+
+  // number of events to run during C/RTL cosimulation
+  const int nEvents = 10;
+#else
+  // number of events to run during C-simulation
+  const int nEvents = 100;
 #endif
 
 #include HEADER_FILE_
@@ -20,8 +26,6 @@
 #include "FileReadUtility.h"
 
 using namespace std;
-
-const int nEvents = 10;  //number of events to run
 
 int main() {
 

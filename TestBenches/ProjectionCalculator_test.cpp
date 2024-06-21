@@ -31,9 +31,13 @@
 #endif
 #if !defined TOP_FUNC_
   #define TOP_FUNC_ ProjectionCalculator_L1L2ABC
-#endif
 
-const int nevents = 10;  //number of events to run
+  // number of events to run during C/RTL cosimulation
+  const int nevents = 10;
+#else
+  // number of events to run during C-simulation
+  const int nevents = 100;
+#endif
 
 using namespace std;
 
