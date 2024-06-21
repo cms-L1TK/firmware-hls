@@ -124,7 +124,7 @@ void getCorrectedPhiBin(ap_uint<kBRAMwidth> hStbWrd
 		, int &phiBn ) 
 {
 #pragma HLS inline
-//#pragma HLS array_partition variable = phicorrtable complete
+//#pragma HLS array_partition variable = phicorrtable
 
   	AllStub<InType> hAStub(hStbWrd);
   	auto hPhi = hAStub.getPhi();
@@ -202,11 +202,10 @@ void getPhiBin( ap_uint<kBRAMwidth> hStbWrd
 
 // clear internal counters 
 template<unsigned int nEntriesSize>
-void ClearCounters(unsigned int nMemories
-	, ap_uint<kNBits_MemAddr> nEntries[nEntriesSize]) 
+void ClearCounters(ap_uint<kNBits_MemAddr> nEntries[nEntriesSize])
 {
 #pragma HLS inline
-#pragma HLS array_partition variable = nEntries complete
+#pragma HLS array_partition variable = nEntries
   LOOP_ClearCounters:
 	for (unsigned int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
   {
@@ -222,7 +221,7 @@ void CountMemories(const ap_uint<kBINMAPwidth> hPhBnWord
 	, unsigned int nMemsPerLyr[nLyrs]) 
 {
 #pragma HLS inline
-#pragma HLS array_partition variable = nMemsPerLyr complete
+#pragma HLS array_partition variable = nMemsPerLyr
   int cPrevSize=0; 
   LOOP_CountOutputMemories:
   for (unsigned int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
@@ -301,7 +300,7 @@ void InputRouter( const BXType bx
 {
 	
 #pragma HLS inline
-#pragma HLS array_partition variable = hOutputStubs complete
+#pragma HLS array_partition variable = hOutputStubs
 
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	#ifndef __SYNTHESIS__
@@ -316,13 +315,12 @@ void InputRouter( const BXType bx
 	CountMemories<kMaxLyrsPerDTC>(hPhBnWord, nMems, nMemsPerLyr);
 	// clear stub counters
 	ap_uint<kNBits_MemAddr> hNStubs[nOMems];
-	ClearCounters<nOMems>(nMems,  hNStubs);
+	ClearCounters<nOMems>(hNStubs);
 
 	LOOP_ProcessIR:
 	for (int cStubCounter = 0; cStubCounter < kMaxProc; cStubCounter++) 
 	{
-#pragma HLS pipeline II = 1
-#pragma HLS PIPELINE rewind
+#pragma HLS pipeline II = 1 rewind
 	  // decode stub
 	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 
