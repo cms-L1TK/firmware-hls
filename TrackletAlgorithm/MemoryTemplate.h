@@ -51,7 +51,7 @@ public:
   unsigned int getNBX() const {return (1<<NBIT_BX);}
 
   NEntryT getEntries(BunchXingT bx) const {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 	return nentries_[bx];
   }
 
@@ -105,7 +105,7 @@ public:
 
   bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index)
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
@@ -128,7 +128,7 @@ public:
 
     bool write_mem_new(BunchXingT ibx, DataType data, NEntryT addr_index)
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < (1<<NBIT_ADDR)) {
