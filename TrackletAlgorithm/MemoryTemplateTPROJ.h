@@ -74,7 +74,7 @@ public:
   {
 	// TODO: check if valid
 	if(!NBIT_BX) ibx = 0;
-	return dataarray_[ibx][128*page+index];
+	return dataarray_[ibx][(1<<NBIT_ADDR)*page+index];
   }
 
   template<class SpecType>
@@ -99,9 +99,9 @@ public:
       //dataarray_[ibx][addr_index] = data;
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][128*page+addr_index] = data;
+      dataarray_[ibx][(1<<NBIT_ADDR)*page+addr_index] = data;
 #else
-      dataarray_[ibx][128*page+nentries_[ibx*NPAGE+page]++] = data;
+      dataarray_[ibx][(1<<NBIT_ADDR)*page+nentries_[ibx*NPAGE+page]++] = data;
       mask_[ibx].set(page);
 #endif
 
@@ -132,7 +132,7 @@ public:
       for (size_t page = 0; page < NPAGE; page++) {
 	nentries_[ibx*NPAGE+page] = 0;
 	for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {
-	  dataarray_[ibx][128*page+addr] = data;
+	  dataarray_[ibx][(1<<NBIT_ADDR)*page+addr] = data;
 	}
       }
     }
@@ -209,7 +209,7 @@ public:
 
   void print_entry(BunchXingT bx, NEntryT index, unsigned int page = 0) const
   {
-	print_data(dataarray_[bx][128*page+index]);
+	print_data(dataarray_[bx][(1<<NBIT_ADDR)*page+index]);
   }
 
   void print_mem(BunchXingT bx) const {

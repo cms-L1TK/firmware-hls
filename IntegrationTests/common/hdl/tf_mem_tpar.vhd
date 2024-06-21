@@ -27,12 +27,12 @@ use unisim.vcomponents.all;
 --! User packages
 use work.tf_pkg.all;
 
-entity tf_mem_tproj is
+entity tf_mem_tpar is
   generic (
     PAGE_LENGTH     : natural := PAGE_LENGTH;      --! Page length
     RAM_WIDTH       : natural := 18;               --! Specify RAM data width
     NUM_PAGES       : natural := 2;                --! Specify no. Pages in RAM memory
-    NUM_TPAGES      : natural := 1;                --! TPROJ pages
+    NUM_TPAGES      : natural := 1;                --! TPAR pages
     RAM_DEPTH       : natural := NUM_PAGES*NUM_TPAGES*PAGE_LENGTH; --! Leave at default. RAM depth (no. of entries)
     INIT_FILE       : string := "";                --! Specify name/location of RAM initialization file if using one (leave blank if not)
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
@@ -52,19 +52,19 @@ entity tf_mem_tproj is
     addrb     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
     doutb     : out std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM output data
     sync_nent : in  std_logic;                                      --! Synchronize nent counter; Connect to start of reading module
-    nent_o    : out t_arr_6b(0 to NUM_PAGES*NUM_TPAGES-1) := (others => (others => '0')); --! entries per page
+    nent_o    : out t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1) := (others => (others => '0')); --! entries per page
     mask_o    : out t_arr_4b(0 to NUM_PAGES-1) := (others => (others => '0')) --! entries per page
     );
-end tf_mem_tproj;
+end tf_mem_tpar;
 
-architecture rtl of tf_mem_tproj is
+architecture rtl of tf_mem_tpar is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
 
 -- ########################### Function ##########################
 --! @brief TextIO function to read memory data to initialize tf_mem. Needed here because of variable slv width!
-impure function read_tf_mem_tproj_data (
+impure function read_tf_mem_tpar_data (
 file_path : string;      --! File path as string
 hex_val   : boolean)     --! Read file vales as hex or bin
 return t_arr_1d_slv_mem is --! Dataarray with read values
@@ -96,15 +96,15 @@ begin
     data_arr := (others => (others => '0'));
   end if;
   return data_arr;
-end read_tf_mem_tproj_data;
+end read_tf_mem_tpar_data;
 
 -- ########################### Signals ###########################
-signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_tproj_data(INIT_FILE, INIT_HEX);         --! RAM data content
+signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_tpar_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
-attribute ram_style of sa_RAM_data : signal is "block";
+attribute ram_style of sa_RAM_data : signal is "ultra";
 
 begin
 
@@ -124,10 +124,10 @@ begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     --if DEBUG then
     --if (NUM_PAGES = 2) then
-    --  report "tf_mem_tproj "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+    --  report "tf_mem_tpar "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
     --end if;
     --if (NUM_PAGES = 8 and NUM_TPAGES = 4) then
-    --  report "tf_mem_tproj "&time'image(now)&" "&NAME&" nent_0 "
+    --  report "tf_mem_tpar "&time'image(now)&" "&NAME&" nent_0 "
     --    &to_bstring(nent_o(0))&" "
     --    &to_bstring(nent_o(1))&" "
     --    &to_bstring(nent_o(2))&" "
@@ -162,7 +162,7 @@ begin
       nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
       vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
       address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(clogb2(PAGE_LENGTH) - 1 downto 0);
-      --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
+      --report time'image(now)&" tf_mem_tpar "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       if (mask_o(vi_page_cnt)(tpage)='1') then
         nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
@@ -179,7 +179,7 @@ begin
   if rising_edge(clkb) then
     if (enb='1') then
       if DEBUG then
-      report "tf_mem_tproj "&time'image(now)&" "&NAME&" readaddr "&to_bstring(addrb)
+      report "tf_mem_tpar "&time'image(now)&" "&NAME&" readaddr "&to_bstring(addrb)
           &" "&to_bstring(sa_RAM_data(to_integer(unsigned(addrb))));
       end if;
       sv_RAM_row <= sa_RAM_data(to_integer(unsigned(addrb)));

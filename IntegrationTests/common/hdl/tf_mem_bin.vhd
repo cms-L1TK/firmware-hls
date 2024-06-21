@@ -62,6 +62,7 @@ entity tf_mem_bin is
 
     NUM_PHI_BITS    : natural := clogb2(NUM_PHI_BINS);      --! Number of phi bits
     NUM_RZ_BITS     : natural := clogb2(NUM_RZ_BINS);      --! Number r/z bits (4 for disks VM)
+    MEM_TYPE        : string := "ultra";       --! "block" or "ultra" 
 
     --! Specify name/location of RAM initialization file if using one
     --! (leave blank if not)
@@ -205,7 +206,7 @@ signal nentry_mask_tmp : std_logic_vector(NUM_BINS-1 downto 0) := (others => '0'
 -- ########################### Attributes ###########################
 attribute ram_style : string;
 
-attribute ram_style of sa_RAM_data : signal is "block";
+attribute ram_style of sa_RAM_data : signal is MEM_TYPE;
 attribute ram_style of sa_RAM_nent : signal is "distributed";
 
 attribute ram_style of nentry_tmp : signal is "distributed";
