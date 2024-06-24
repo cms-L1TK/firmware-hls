@@ -77,7 +77,12 @@ def get_words_for_event(filename, event_number, word_length):
           current_event = True
       elif current_event:
         if not ('Event : ' in line):
-          bit_string = (line.split(' ')[1]).replace('|','')
+          line_terms = line.split(' ')
+          bit_string = ''
+          if len(line_terms)==3:
+            bit_string = (line_terms[1]).replace('|','')
+          else:
+            bit_string = (line_terms[2]).replace('|','')
           words.append(bit_string)
         else:
           current_event = False

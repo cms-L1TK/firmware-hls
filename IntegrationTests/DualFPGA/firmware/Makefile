@@ -12,8 +12,8 @@ $(core_dir):
 	@mkdir cgn mem
 	#make -C $(fpga1_hls_script_path) -j 24 Work
 	@make -C $(fpga2_hls_script_path) -j 24 Work
-	@cd mem; ln -s ../../../../emData/LUTsCM LUTs
-	@cd mem; ln -s ../../../../emData/MemPrintsCM MemPrintsCM
+	@cd mem; ln -s ../../../../emData/LUTsSplit LUTs
+	@cd mem; ln -s ../../../../emData/MemPrintsSplit MemPrintsSplit
 	@cd hdl; ln -s ../../../common common
 
 $(core_file): $(core_dir)
@@ -41,7 +41,8 @@ lut_inclusion:
 	@python3 scripts/lut_copy_dual.py
 
 $(input_file): $(core_dir)
-	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsCM/InputStubs -o $(input_file)
+	#@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsSplit/InputStubs -o $(input_file)
+	@python3 scripts/convert_emData2EMP_Link_FPGA2.py -d mem/MemPrintsSplit/ -o $(input_file)
 
 apollo_input: $(input_file)
 	@python3 scripts/split_emp_input.py

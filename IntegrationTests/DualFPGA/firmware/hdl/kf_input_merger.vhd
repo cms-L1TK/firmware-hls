@@ -85,8 +85,12 @@ begin
         write_address <= write_address + 1;
         read_address <= write_address;
       elsif (read_enable and not write_enable) then
-        write_address <= write_address - 1;
-        read_address <= write_address;
+        if (write_address /= 0) then
+          write_address <= write_address - 1;
+        end if;
+        if (read_address /= 0) then
+          read_address <= read_address - 1;
+        end if;
       end if; 
 
       --assign dout 
@@ -242,7 +246,8 @@ begin
   begin
     if (rising_edge(clk)) then
       for iseedtype in 0 to (din'length-1) loop
-        if (din(iseedtype).track.valid = '1') then
+        if (din(iseedtype).track.valid = '1' or
+            (din(iseedtype).track.reset = '1' and (iseedtype = 0 or iseedtype = 4))) then
           ram_in(iseedtype)       <= din(iseedtype);
           write_enable(iseedtype) <= true;
         else
