@@ -57,13 +57,13 @@ public:
   unsigned int getNPage() const {return NPAGE;}
 
   NEntryT getEntries(BunchXingT bx, unsigned int page = 0) const {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
     return nentries_[bx*NPAGE+page];
   }
 
   ap_uint<NPAGE> getMask(BunchXingT bx) const {
-#pragma HLS ARRAY_PARTITION variable=mask__ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=mask_ dim=0
 #pragma HLS inline
     return mask_[bx];
   }
