@@ -314,28 +314,30 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    bool &done\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
-            "#pragma HLS array_partition variable=trackletParameters1 complete dim=1\n"
-            "#pragma HLS array_partition variable=trackletParameters2 complete dim=1\n"
-            "#pragma HLS array_partition variable=trackletParameters3 complete dim=1\n"
-            "#pragma HLS array_partition variable=trackletParameters4 complete dim=1\n"
-            "#pragma HLS array_partition variable=barrelFullMatches complete dim=1\n"
-            "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters1 dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters2 dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters3 dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters4 dim=1\n"
+            "#pragma HLS array_partition variable=barrelFullMatches dim=1\n"
+            "#pragma HLS array_partition variable=diskFullMatches dim=1\n"
         )
         for i in range(0, 4):
           for j in range(0, nTPARMem[i]):
-              topFile.write("#pragma HLS resource variable=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
+              topFile.write("#pragma HLS interface mode=ap_memory port=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
         for i in range(0, nBarrelFMMem):
-            topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
         for i in range(0, nDiskFMMem):
-            topFile.write("#pragma HLS resource variable=diskFullMatches[" + str(i) + "].get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=diskFullMatches[" + str(i) + "].get_mem() latency=2\n")
         topFile.write(
-            "#pragma HLS interface register port=bx_o\n"
-            "#pragma HLS array_partition variable=barrelStubWords complete dim=1\n"
-            "#pragma HLS array_partition variable=diskStubWords complete dim=1\n"
-            "#pragma HLS stream variable=trackWord depth=1 dim=1\n"
-            "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
-            "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
-            "#pragma HLS interface register port=done\n"
+            "#pragma HLS array_partition variable=barrelStubWords dim=1\n"
+            "#pragma HLS array_partition variable=diskStubWords dim=1\n"
+            "#pragma HLS interface mode=ap_fifo port=trackWord\n"
+        )
+        for i in range(0, nBarrelStubs):
+            topFile.write("#pragma HLS interface mode=ap_fifo port=barrelStubWords[" + str(i) + "]\n")
+        for i in range(0, nDiskStubs):
+            topFile.write("#pragma HLS interface mode=ap_fifo port=diskStubWords[" + str(i) + "]\n")
+        topFile.write(
             "\n"
             "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
             "    bx,\n"
