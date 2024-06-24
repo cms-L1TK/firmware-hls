@@ -49,7 +49,7 @@ architecture rtl of emp_payload is
   signal AS_36_link_data   : t_arr_AS_36_37b;
   signal MPAR_73_link_data : t_arr_MTPAR_73_76b;
   signal bx_link_data      : std_logic_vector(2 downto 0);
-
+  signal link_data_valid   : std_logic;
   signal PC_start          : std_logic;
   signal PC_bx_in          : std_logic_vector(2 downto 0);
   signal AS_36_wea         : t_arr_AS_36_1b;
@@ -86,7 +86,8 @@ begin
       d                 => d,
       AS_36_link_data   => AS_36_link_data,
       MPAR_73_link_data => MPAR_73_link_data,
-      bx_link_data      => bx_link_data
+      bx_link_data      => bx_link_data,
+      valid             => link_data_valid
       );
 
   -----------------------------------------------------------------------------
@@ -99,6 +100,7 @@ begin
       bx_link_data      => bx_link_data,
       AS_36_link_data   => AS_36_link_data,
       MPAR_73_link_data => MPAR_73_link_data,
+      link_data_valid   => link_data_valid,
       AS_36_wea         => AS_36_wea,
       AS_36_writeaddr   => AS_36_writeaddr,
       AS_36_din         => AS_36_din,
@@ -185,7 +187,7 @@ begin
   kfout_isolation_out_1 : entity work.kfout_isolation_out
     port map (
       clk        => clk_p,
-      out_packet => conv(d),
+      out_packet => conv_f2(d),
       out_din    => s_kfout,
       out_dout   => s_tfout
       );

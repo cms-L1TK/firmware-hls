@@ -16,7 +16,8 @@ entity linktosecproc2 is
     d                 : in ldata(4 * N_REGION - 1 downto 0);
     AS_36_link_data   : out t_arr_AS_36_37b;
     MPAR_73_link_data : out t_arr_MTPAR_73_76b;
-    bx_link_data      : out std_logic_vector(2 downto 0)
+    bx_link_data      : out std_logic_vector(2 downto 0);
+    valid             : out std_logic
     );
 
 end linktosecproc2;
@@ -163,5 +164,8 @@ begin
   MPAR_73_link_data(L1D1ABCD) <= MTPAR_signals(987 downto 912);
   MPAR_73_link_data(L1D1EFGH) <= MTPAR_signals(1063 downto 988);
   MPAR_73_link_data(L2D1ABCD) <= MTPAR_signals(1139 downto 1064);
+
+  --for now assume valid bit on all links is identical, may need to add "when d(#).valid" on many above lines to latch if valid is not universal
+  valid <= d(9).valid;
     
 end rtl;
