@@ -36,6 +36,9 @@ package tf_interface_pkg is
   function conv (l : ldata)
     return t_packets;
 
+  function conv_f2 (l : ldata)
+    return t_packets;
+
 end package tf_interface_pkg;
 
 package body tf_interface_pkg is
@@ -48,6 +51,18 @@ package body tf_interface_pkg is
       s(k).start_of_orbit := l(k+68).start_of_orbit;
       s(k).start          := l(k+68).start;
       s(k).last           := l(k+68).last;
+    end loop;
+    return s;
+  end;
+
+  function conv_f2(l : ldata) return t_packets is
+    variable s : t_packets(numLinksTFP - 1 downto 0);
+  begin
+    for k in s'range loop
+      s(k).valid          := l(k+10).valid;
+      s(k).start_of_orbit := l(k+10).start_of_orbit;
+      s(k).start          := l(k+10).start;
+      s(k).last           := l(k+10).last;
     end loop;
     return s;
   end;
