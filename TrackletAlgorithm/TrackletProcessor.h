@@ -1145,11 +1145,10 @@ teunits[k].idle_;
     
     //Extract the current stub - check if valid. Calculate next stub. Check if valid
     istub__ = tebuffer.getIStub();
-    bool validstub = istub__ < innerStubs[imem].getEntries(bx);
-
+    bool validstub = istub__ < innerStubs[(imem+2)%NASMemInner].getEntries(bx);
     
     ap_uint<kNBits_MemAddr> istubnext = istub__+1;
-    bool validstubnext=istubnext<innerStubs[imem].getEntries(bx);
+    bool validstubnext=istubnext<innerStubs[(imem+2)%NASMemInner].getEntries(bx);
     
     //Calculate good stub - true if:
     //validmem is true - meaning thart we have not exhausted all stub memories
@@ -1159,10 +1158,10 @@ teunits[k].idle_;
     //Update istub if goodstub
     tebuffer.getIStub()=goodstub__?(validstubnext?istubnext:ap_uint<kNBits_MemAddr>(0)):istub__; 
     //Update imem if the next stub is not valid
-    tebuffer.getMem()=((goodstub__&&(!validstubnext))||(innerStubs[imem].getEntries(bx) == 0&&validmem))?imemnext:imem;
+    tebuffer.getMem()=((goodstub__&&(!validstubnext))||(innerStubs[(imem+2)%NASMemInner].getEntries(bx) == 0&&validmem))?imemnext:imem;
     
     //Read stub from memory - BRAM with latency of one or two clks
-    stub__ = AllStubInner<innerASType>(innerStubs[imem].read_mem(bx,istub__).raw());
+    stub__ = AllStubInner<innerASType>(innerStubs[(imem+2)%NASMemInner].read_mem(bx,istub__).raw());
 
     //Update TEUnit data for next loop
 
