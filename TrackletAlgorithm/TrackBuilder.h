@@ -40,21 +40,28 @@ class Merger {
   void reset() {
     valid_A_ = false;
     valid_B_ = false;
+    valid_ = false;
   }
 
   // Extract the next element in the merger without advancing the merger
   const FM &peek() const {
-    return first_A_ ? in_A_ : in_B_;
+    return out_;
   }
 
   // Check if valid data
   bool valid() const {
-    return valid_A_ || valid_B_;
+    return valid_;
   }
 
   void next(const FM &in_A, const bool valid_A, bool &read_A,
             const FM &in_B, const bool valid_B, bool &read_B,
             const bool read) {
+
+
+    if (read or !valid_) {
+      out_ = first_A_ ? in_A_ : in_B_;
+      valid_ = valid_A_ || valid_B_;
+    }
 
     if (read) {
       if (first_A_) valid_A_ = false;
@@ -85,13 +92,14 @@ class Merger {
  private:
 
   // valid data flags
-  bool valid_A_, valid_B_;
+  bool valid_, valid_A_, valid_B_;
 
   // flag to indicate if in_A is the next data to read
   bool first_A_;
 
   // data words
   FM in_A_, in_B_;
+  FM out_;
 
 };
 
@@ -174,7 +182,7 @@ void TrackBuilder(
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
-#pragma HLS latency min=4 max=4
+#pragma HLS latency min=6 max=6
 
     TrackletIDType min_id = kInvalidTrackletID;
     bool smallest[NStubs];
