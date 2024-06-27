@@ -1319,6 +1319,43 @@ void MatchProcessor(BXType bx,
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int BIN_ADDR_WIDTH = 4;
+
+  constexpr int kNPipeline = 3;
+  ap_uint<kNBits_MemAddr> currentMEU[kNMatchEngines][kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=currentMEU complete
+  ap_uint<kNBits_MemAddr> valueMEU[kNMatchEngines][kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=valueMEU complete
+  for(size_t i = 0; i < kNMatchEngines; i++){
+    for(size_t j = 0; j < kNPipeline; j++) {
+        currentMEU[i][j] = 0;
+        valueMEU[i][j] = 0;
+    }
+  }
+  ap_uint<kNBits_MemAddr> bestMEU[kNMatchEngines/2][kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=bestMEU complete
+  for(size_t i = 0; i < kNMatchEngines/2; i++){
+    for(size_t j = 0; j < kNPipeline; j++) {
+        bestMEU[i][j] = 0;
+    }
+  }
+  ap_uint<kNBits_MemAddr> thebestMEU[kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=thebestMEU complete
+  ap_uint<kNBits_MemAddr> tmp_thebestMEU[kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=tmp_thebestMEU complete
+  for(size_t j = 0; j < kNPipeline; j++) {
+      thebestMEU[j] = 0;
+      tmp_thebestMEU[j] = 0;
+  }
+  /*
+  ap_uint<kNBits_MemAddr> thebestMEU_queue[kMaxProc - kMaxProcOffset(module::MP)];
+  #pragma HLS ARRAY_PARTeITION variable=thebestMEU_queue complete
+  for(size_t j = 0; j < kMaxProc - kMaxProcOffset(module::MP); j++) {
+      thebestMEU_queue[j] = 0;
+  }
+  */
+  ap_uint<2> npip = 0;
+  ap_uint<kNBits_MemAddr> thebestMEU_read = 0;
+  ap_uint<kNBits_MemAddr> thebestMEU_write = 0;
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
@@ -1378,6 +1415,44 @@ void MatchProcessor(BXType bx,
     ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
 
     bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
+    //TODO read first ProjSeq from each MEU
+    auto const ttmp_thebestMEU = (valueMEU[bestMEU[0][1]][1] <= valueMEU[bestMEU[1][1]][1]) ? bestMEU[0][1] : bestMEU[1][1];
+    tmp_thebestMEU[1] = ttmp_thebestMEU;
+    //tmp_thebestMEU[2] = !emptys[thebestMEU[1]] ? tmp_thebestMEU[2] : ttmp_thebestMEU; // Hold on to previous
+    //thebestMEU_queue[thebestMEU_write] = ttmp_thebestMEU;
+    switch (npip) {
+      case 0:
+        std::cout << npip << ":\t" << currentMEU[0][npip] << "\t\t" << currentMEU[1][npip] << "\t\t" << currentMEU[2][npip] << "\t\t" << currentMEU[3][npip] << std::endl;
+        std::cout << "\t\t" << currentMEU[0][npip] << " < " << currentMEU[1][npip] << "\t\t\t" << currentMEU[2][npip] << " < " << currentMEU[3][npip] << std::endl;
+        //std::cout << npip << ":\t" << "\t" << bestMEU[0][npip] << "\t\t\t\t" << bestMEU[1][npip] << std::endl;
+        npip++;
+        break;
+      case 1:
+        //std::cout << npip << ":\t" << currentMEU[0][npip] << "\t\t" << currentMEU[1][npip] << "\t\t" << currentMEU[2][npip] << "\t\t" << currentMEU[3][npip] << std::endl;
+        //std::cout << npip << ":\t" << "\t" << bestMEU[0][npip] << "\t\t\t\t" << bestMEU[1][npip] << std::endl;
+        std::cout << npip << ":\t" << "\t" << bestMEU[0][npip] << "\t\t\t\t" << bestMEU[1][npip] << std::endl;
+        std::cout << "\t\t\t" << valueMEU[bestMEU[0][1]][1] << " < " << valueMEU[bestMEU[1][1]][1] << std::endl;
+        npip++;
+        break;
+      case 2:
+        std::cout << npip << ":\t" << "\t\t\t" << tmp_thebestMEU[npip] << "(" << valueMEU[tmp_thebestMEU[npip]][npip] << ")" << std::endl;
+        npip++;
+        break;
+      //case 3:
+      //  std::cout << npip << ":\t" << "\t\t\t" << tmp_thebestMEU[npip] << std::endl;
+      //  npip++;
+      //  break;
+      default:
+        std::cout << npip << ":\t" << "\t\t\t" << tmp_thebestMEU[npip] << "(" << valueMEU[tmp_thebestMEU[npip]][npip] << ")" << std::endl;
+        npip++;
+    }
+    //thebestMEU_write++;
+    //thebestMEU_read = !emptys[thebestMEU[1]] ? thebestMEU_read : ap_uint<kNBits_MemAddr>(thebestMEU_read+1);
+    //thebestMEU[1] = !emptys[thebestMEU[1]] ? thebestMEU[1] : thebestMEU_queue[thebestMEU_read];
+    //std::cout << istep << ": queue[" << thebestMEU_read << "]=" << thebestMEU_queue << std::endl;
+    //thebestMEU[1] = !emptys[thebestMEU[1]] ? thebestMEU[1] : tmp_thebestMEU;
+    bestiMEU = tmp_thebestMEU[kNPipeline-1];
+    std::cout << bestiMEU << "==" << tmp_thebestMEU[kNPipeline-1] << std::endl;
 
     hasMatch = !emptys[bestiMEU];
 
@@ -1414,14 +1489,24 @@ void MatchProcessor(BXType bx,
       if(idle && !empty && !init) {
         init =  true;
         meu.init(bx, tmpprojbuff, istep);
+        //std::cout << "Inserted MEU=" << iMEU << "[0]=" << istep << std::endl;
+        currentMEU[iMEU][0] = istep;
+        valueMEU[iMEU][0] = istep;
       }
       //can not get to here on first cycle, but compile don't seem to realize 
       //this and fail to reach II=1
       else if (istep != 0) meu.step(instubdata.getMem(iMEU));
+      if(!init && false) {
+        //std::cout << "Kepeing MEU=" << iMEU << "[0]=" << currentMEU[iMEU][1] << std::endl;
+        currentMEU[iMEU][0] = currentMEU[iMEU][1]; //Keep stacking previous step
+        valueMEU[iMEU][0] = valueMEU[iMEU][1]; //Keep stacking previous step
+      }
 
       meu.processPipeLine(table[iMEU]);
 
     } //end MEU loop
+    bestMEU[0][0] = (currentMEU[0][0] <= currentMEU[1][0]) ? 0 : 1;
+    bestMEU[1][0] = (currentMEU[2][0] <= currentMEU[3][0]) ? 2 : 3;
     
     if(hasMatch) {
  
@@ -1606,6 +1691,56 @@ void MatchProcessor(BXType bx,
 
     projdata_ = projdata;
     validin_ = validin;
+    /*
+    std::cout << "istep=" << istep << std::endl;
+    for(size_t i = 0; i < kNMatchEngines; i++){
+      std::cout << "current " << "MEU=" << i << std::endl;
+      for(size_t j = 0; j < kNPipeline; j++) {
+        std::cout << currentMEU[i][j];
+      }
+      for(size_t j = kNPipeline; j > 0; j--) {
+        std::cout << "pip=" << j << ", MEU=" << i << ": " << currentMEU[i][j] << "->" << currentMEU[i][j-1] << std::endl;
+      }
+      std::cout << std::endl;
+    }
+    */
+    for(size_t i = 0; i < kNMatchEngines; i++){
+#pragma HLS unroll
+      for(size_t j = kNPipeline-1; j > 0; j--) {
+        //std::cout << "pip=" << j << ", MEU=" << i << ": " << currentMEU[i][j] << "->" << currentMEU[i][j-1] << std::endl;
+        //currentMEU[j][j] = currentMEU[j-1][i];
+        currentMEU[i][j] = currentMEU[i][j-1];
+        valueMEU[i][j] = valueMEU[i][j-1];
+        //std::cout << "pip=" << j << ", MEU=" << i << ": " << currentMEU[i][j] << std::endl;
+      }
+    }
+    /*
+    for(size_t i = 0; i < kNMatchEngines/2; i++){
+      std::cout << "best " << "MEU=" << i << std::endl;
+      for(size_t j = 0; j < kNPipeline; j++) {
+        std::cout << bestMEU[i][j];
+      }
+      std::cout << std::endl;
+    }
+    */
+    for(size_t i = 0; i < kNMatchEngines/2; i++){
+#pragma HLS unroll
+      for(size_t j = kNPipeline-1; j > 0; j--) {
+        //std::cout << "bestMEU[" << i << "][" << j << "]=" << bestMEU[i][j] << "->" << bestMEU[i][j-1] << std::endl;
+        bestMEU[i][j] = bestMEU[i][j-1];
+      }
+    }
+    /*
+    std::cout << "the best " << "MEU" << std::endl;
+    for(size_t j = 0; j < kNPipeline; j++) {
+      std::cout << thebestMEU[j];
+    }
+    */
+    for(size_t j = kNPipeline-1; j > 0; j--) {
+      thebestMEU[j] = thebestMEU[j-1];
+      //std::cout << "tmp_thebestMEU[" << j << "]=" << tmp_thebestMEU[j] << "->" << tmp_thebestMEU[j-1] << std::endl;
+      tmp_thebestMEU[j] = tmp_thebestMEU[j-1];
+    }
 
     if (!projBuffNearFull){
       
