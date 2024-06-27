@@ -18,7 +18,7 @@ ipbb add git ssh://git@gitlab.cern.ch:7999/hptd/tclink.git -r fda0bcf
 ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.9
 ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket_ips.git -b v03.12
 ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket.git -b v03.12
-ipbb add git ssh://git@github.com/cms-l1tk/firmware-hls.git -b dual_fpga
+ipbb add git ssh://git@github.com/cms-l1tk/firmware-hls.git -b dual_fpga_secproc_sigs2
 
 export PATH=/opt/cactus/bin/uhal/tools:$PATH 
 export LD_LIBRARY_PATH=/opt/cactus/lib:${LD_LIBRARY_PATH}
