@@ -34,23 +34,23 @@ class TrackletEngineUnit {
 
  TrackletEngineUnit() {
 
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew_ dim=1
 
    //
    // The multiple copies 1_, 2_, .. _4 of the LUTs is due to an 
    // HLS limit where we can only have 1024 entries and we work 
    // around this by having four separate LUTs.
    //
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew1_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew2_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew3_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew4_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew1_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew2_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew3_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptinnerlutnew4_ dim=1
 
-#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew1_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew2_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew3_ complete dim=1
-#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew4_ complete dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew1_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew2_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew3_ dim=1
+#pragma HLS ARRAY_PARTITION variable=stubptouterlutnew4_ dim=1
 
 /////  Grabs the appropriate lut based on seed and iTC
 
@@ -92,19 +92,19 @@ class TrackletEngineUnit {
 
 
  MEMSTUBS nstub16() const {
-#pragma HLS array_partition variable=ns complete dim=1
+#pragma HLS array_partition variable=ns dim=1
    return (ns[15],ns[14],ns[13],ns[12],ns[11],ns[10],ns[9],ns[8],ns[7],ns[6],ns[5],ns[4],ns[3],ns[2],ns[1],ns[0]);
  }
 
  void setnstub16(MEMSTUBS nstubs) {
-#pragma HLS array_partition variable=ns complete dim=1
+#pragma HLS array_partition variable=ns dim=1
    (ns[15],ns[14],ns[13],ns[12],ns[11],ns[10],ns[9],ns[8],ns[7],ns[6],ns[5],ns[4],ns[3],ns[2],ns[1],ns[0]) = nstubs;
  }
 
  NSTUBS calcNStubs(MEMSTUBS nstubs, MEMMASK mask) {
 
  NSTUBS n[16];
-#pragma HLS array_partition variable=n complete dim=1
+#pragma HLS array_partition variable=n dim=1
    (n[15],n[14],n[13],n[12],n[11],n[10],n[9],n[8],n[7],n[6],n[5],n[4],n[3],n[2],n[1],n[0]) = nstubs;
    
    return mask.test(0) ? n[0] :
