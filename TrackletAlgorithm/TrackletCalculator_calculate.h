@@ -121,7 +121,7 @@ void TP::calculate_LXLY (
 
   static const InvtLUT lut_itinv;
 
-  ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
+  ap_uint<20> itinv = lut_itinv.lookup(std::abs(it_new)&4095);
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
   constexpr int izproj1 = zmean[projectionDisks[Seed][1]];
@@ -266,7 +266,7 @@ void TP::calculate_DXDY (
 
   static const InvtLUT lut_itinv;
 
-  ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
+  ap_uint<20> itinv = lut_itinv.lookup(std::abs(it_new)&4095);
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
   constexpr int izproj1 = zmean[projectionDisks[Seed][1]];
@@ -412,7 +412,7 @@ void TP::calculate_LXD1 (
 
   static const InvtLUT lut_itinv;
 
-  ap_uint<20> itinv = lut_itinv.lookup(abs(it_new)&4095);
+  ap_uint<20> itinv = lut_itinv.lookup(std::abs(it_new)&4095);
 
   constexpr int izproj0 = zmean[projectionDisks[Seed][0]];
   constexpr int izproj1 = zmean[projectionDisks[Seed][1]];

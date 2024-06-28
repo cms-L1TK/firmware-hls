@@ -97,7 +97,7 @@ class TEBuffer {
  TEBuffer():
   writeptr_(0), readptr_(0), istub_(0), imem_(0), imembegin_(0), imemend_(0)
     {
-#pragma HLS array_partition variable=buffer_ complete dim=0
+#pragma HLS array_partition variable=buffer_ dim=0
 }
 	
   void setMemBegin(const typename TEData<Seed,iTC,innerRegion,VMSTEType>::IMEM& begin) {
