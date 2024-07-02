@@ -307,7 +307,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 		if (maskASI && !disk2S) {
 
-			int comparison_rz = (Layer) ? static_cast<int>(abs(stub.getZ())) : static_cast<int>(stub.getR());
+			int comparison_rz = (Layer) ? static_cast<int>(std::abs(stub.getZ())) : static_cast<int>(stub.getR());
 			bool passRZCut = false;
 			bool passRZSpecialCut = false;
 
