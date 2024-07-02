@@ -117,25 +117,21 @@ public:
     //assert(page < NPAGE);        
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < DEPTH_ADDR) {
-      //dataarray_[ibx][addr_index] = data;
+    //dataarray_[ibx][addr_index] = data;
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-      //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][DEPTH_ADDR*page+addr_index] = data;
+    //The vhd memory implementation will write to the correct address!!
+    dataarray_[ibx][DEPTH_ADDR*page+addr_index] = data;
 #else
-      //NBIT_BX==1 is to identify the projection memories
-      if (NBIT_BX==1 && nentries_[ibx*NPAGE+page]>=MAX_TPROJ_PAGE_SIZE) {
-	return false;
-      }
-      dataarray_[ibx][DEPTH_ADDR*page+nentries_[ibx*NPAGE+page]++] = data;
-      mask_[ibx].set(page);
-      
-#endif
-      
-      return true;
-    } else {
+    //NBIT_BX==1 is to identify the projection memories
+    if (NBIT_BX==1 && nentries_[ibx*NPAGE+page]>=MAX_TPROJ_PAGE_SIZE) {
       return false;
     }
+    dataarray_[ibx][DEPTH_ADDR*page+nentries_[ibx*NPAGE+page]++] = data;
+    mask_[ibx].set(page);
+
+#endif
+      
+    return true;
   }
 
   // Methods for C simulation only

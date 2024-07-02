@@ -112,22 +112,18 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < DEPTH_ADDR) {
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-      //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][0] = data;
+    //The vhd memory implementation will write to the correct address!!
+    dataarray_[ibx][0] = data;
 #else
-      dataarray_[ibx][nentries_[ibx]++] = data;
+    dataarray_[ibx][nentries_[ibx]++] = data;
 #endif
 
 #ifndef __SYNTHESIS__
-      nentries_[ibx] = addr_index + 1;
+    nentries_[ibx] = addr_index + 1;
 #endif
 
-      return true;
-    } else {
-      return false;
-    }
+    return true;
   }
 
   bool write_mem_new(BunchXingT ibx, DataType data, ap_uint<1> overwrite)
@@ -135,22 +131,18 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (nentries_[ibx] < DEPTH_ADDR) {
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-      //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][0] = data;
+    //The vhd memory implementation will write to the correct address!!
+    dataarray_[ibx][0] = data;
 #else
-      if(overwrite == 0) {
-        dataarray_[ibx][nentries_[ibx]++] = data;
-      } else {
-        dataarray_[ibx][nentries_[ibx]-1] = data;
-      }
+    if(overwrite == 0) {
+      dataarray_[ibx][nentries_[ibx]++] = data;
+    } else {
+      dataarray_[ibx][nentries_[ibx]-1] = data;
+    }
 #endif
 
-      return true;
-    } else {
-      return false;
-    }
+    return true;
   }
 
   // Methods for C simulation only
