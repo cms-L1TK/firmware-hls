@@ -23,7 +23,7 @@ PC::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
     if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1)))) {
       proj_success = false;
     }
-    if (abs(proj.getZ()) > TP::izmaxcut) {
+    if (std::abs(proj.getZ()) > TP::izmaxcut) {
       proj_success = false;
     }
   }
@@ -182,7 +182,7 @@ template<
   TP::Types::rD ir_D1, ir_D2, ir_D3, ir_D4, ir_D5;
   TP::Types::phiD iphi_D1, iphi_D2, iphi_D3, iphi_D4, iphi_D5;
   static const InvtLUT lut_itinv;
-  ap_uint<20> itinv = lut_itinv.lookup(abs(t)&4095);
+  ap_uint<20> itinv = lut_itinv.lookup(std::abs(t)&4095);
   constexpr int itcut = 1.0/kt;
 
   // D1

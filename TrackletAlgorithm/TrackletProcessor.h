@@ -270,7 +270,7 @@ TP::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // Determine which disk projections are valid.
   valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>itcut;
+    bool valid_t=std::abs(*t)>itcut;
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<BARRELPS>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
@@ -280,8 +280,8 @@ TP::barrelSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterRegi
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
 
-  bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
-  bool valid_z0=abs(*z0) < ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
+  bool valid_rinv=std::abs(*rinv) < floatToInt(rinvcut, krinv);
+  bool valid_z0=std::abs(*z0) < ((Seed == TF::L1L2) ? floatToInt(z0cut, kz0) : floatToInt(1.5*z0cut,kz0));
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
@@ -344,7 +344,7 @@ TP::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
 // Determine which disk projections are valid.
   valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t)>itcut;
+    bool valid_t=std::abs(*t)>itcut;
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<DISK>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
@@ -352,8 +352,8 @@ TP::diskSeeding(const bool negDisk, const AllStub<InnerRegion> &innerStub, const
   }
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
-  bool valid_rinv=abs(*rinv) < floatToInt(rinvcut, krinv);
-  bool valid_z0= abs(*z0) < floatToInt(z0cut, kz0);
+  bool valid_rinv=std::abs(*rinv) < floatToInt(rinvcut, krinv);
+  bool valid_z0= std::abs(*z0) < floatToInt(z0cut, kz0);
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
@@ -419,7 +419,7 @@ TP::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
 // Determine which disk projections are valid.
  valid_proj_disk: for (ap_uint<3> i = 0; i < 4; i++) {
 #pragma HLS unroll
-    bool valid_t=abs(*t) > itcut;
+    bool valid_t=std::abs(*t) > itcut;
     bool valid_phimin=phiD[i]>0;
     bool valid_phimax=phiD[i]<(1 << TrackletProjection<DISK>::kTProjPhiSize) - 1;
     bool valid_r=rD[i] >= irprojmincut && rD[i] < irprojmaxcut;
@@ -428,8 +428,8 @@ TP::overlapSeeding(const AllStub<InnerRegion> &innerStub, const AllStub<OuterReg
 // Reject tracklets with too high a curvature or with too large a longitudinal
 // impact parameter.
 
-  bool valid_rinv=abs(*rinv) < irinvcut;
-  bool valid_z0=abs(*z0) < iz0cut;
+  bool valid_rinv=std::abs(*rinv) < irinvcut;
+  bool valid_z0=std::abs(*z0) < iz0cut;
 
   const ap_int<TrackletParameters::kTParPhi0Size + 2> phicrit = *phi0 - (*rinv>>8)*ifactor;
   const bool keep = (phicrit > phicritmincut) && (phicrit < phicritmaxcut);
@@ -456,7 +456,7 @@ TP::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
     if ((proj.getZ() == (-(1 << (TrackletProjection<TProjType>::kTProjRZSize - 1))) || (proj.getZ() == ((1 << (TrackletProjection<TProjType>::kTProjRZSize - 1)) - 1)))) {
       proj_success = false;
     }
-    if (abs(proj.getZ()) > izmaxcut) {
+    if (std::abs(proj.getZ()) > izmaxcut) {
       proj_success = false;
     }
   }
