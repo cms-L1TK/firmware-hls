@@ -95,24 +95,20 @@ public:
   {
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < (1<<NBIT_ADDR)) {
-      //dataarray_[ibx][addr_index] = data;
+    //dataarray_[ibx][addr_index] = data;
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-      //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][(1<<NBIT_ADDR)*page+addr_index] = data;
+    //The vhd memory implementation will write to the correct address!!
+    dataarray_[ibx][(1<<NBIT_ADDR)*page+addr_index] = data;
 #else
-      dataarray_[ibx][(1<<NBIT_ADDR)*page+nentries_[ibx*NPAGE+page]++] = data;
-      mask_[ibx].set(page);
+    dataarray_[ibx][(1<<NBIT_ADDR)*page+nentries_[ibx*NPAGE+page]++] = data;
+    mask_[ibx].set(page);
 #endif
 
-      #ifdef CMSSW_GIT_HASH
-      nentries_[ibx] = addr_index + 1;
-      #endif
+    #ifdef CMSSW_GIT_HASH
+    nentries_[ibx] = addr_index + 1;
+    #endif
       
-      return true;
-    } else {
-      return false;
-    }
+    return true;
   }
 
   // Methods for C simulation only

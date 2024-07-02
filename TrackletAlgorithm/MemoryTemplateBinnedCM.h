@@ -125,65 +125,55 @@ class MemoryTemplateBinnedCM{
     if (isCMSSW) {ibx = 0; icopy = 0;}
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
-  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
+  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, ap_uint<NBIT_ADDR-NBIT_BIN> nentry_ibx) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 #pragma HLS ARRAY_PARTITION variable=binmask8_ dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
 
     if (isCMSSW && !NBIT_BX) {ibx = 0;}
-    if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
 
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
 
-      dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
+    dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
 
 #else
 
-      // write address for slot: getNEntryPerBin() * slot + nentry_ibx
+    // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
-      ap_uint<kNBitsRZBinCM> ibin;
-      ap_uint<kNBitsphibinCM> ireg;
-      (ireg,ibin)=slot;
+    ap_uint<kNBitsRZBinCM> ibin;
+    ap_uint<kNBitsphibinCM> ireg;
+    (ireg,ibin)=slot;
 
-      unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+    unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
-      if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
+    if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
 
-	nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-	if (ibin!=0) {
-	  nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
-	}
-	binmask8_[ibx][ibin].set_bit(ireg,true);
+    nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+    if (ibin!=0) {
+      nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+    }
+    binmask8_[ibx][ibin].set_bit(ireg,true);
 
-	//icopy comparison must be signed int or future SW fails
-        writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
+      //icopy comparison must be signed int or future SW fails
+      writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
-	  dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
-	}
-#endif      
+        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
+      }
+#endif
 
 #ifdef CMSSW_GIT_HASH
-      ap_uint<kNBitsRZBinCM> ibin;
-      ap_uint<kNBitsphibinCM> ireg;
-      (ireg,ibin)=slot;
-      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
-      if (ibin!=0) {
-	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
-      }
-      binmask8_[ibx][ibin].set_bit(ireg,true);
+    ap_uint<kNBitsRZBinCM> ibin;
+    ap_uint<kNBitsphibinCM> ireg;
+    (ireg,ibin)=slot;
+    nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
+    if (ibin!=0) {
+      nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
+    }
+    binmask8_[ibx][ibin].set_bit(ireg,true);
 #endif
 
-      return true;
-    }
-    else {
-#ifndef __SYNTHESIS__
-      if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-	edm::LogVerbatim("L1trackHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
-      }
-#endif
-      return false;
-    }
+    return true;
   }
 
   // Methods for C simulation only
