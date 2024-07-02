@@ -218,23 +218,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
             ") {\n"
             "#pragma HLS inline off\n"
-            "#pragma HLS interface register port=bx_o\n"
         )
         if nTPMem == 1:
-            topFile.write("#pragma HLS resource variable=projin.get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=projin.get_mem() latency=2\n")
         else:
             for i in range(nTPMem):
-                topFile.write("#pragma HLS resource variable=projin[" + str(i) + "].get_mem() latency=2\n")
+                topFile.write("#pragma HLS interface mode=ap_memory port=projin[" + str(i) + "].get_mem() latency=2\n")
         if nFMMem == 1:
-            topFile.write("#pragma HLS resource variable=fullmatch.get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=fullmatch.get_mem() latency=2\n")
         else:
             for i in range(nFMMem):
-                topFile.write("#pragma HLS resource variable=fullmatch[" + str(i) + "].get_mem() latency=2\n")
+                topFile.write("#pragma HLS interface mode=ap_memory port=fullmatch[" + str(i) + "].get_mem() latency=2\n")
         topFile.write(
-            "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
-            "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
-#            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
-#            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
+            "#pragma HLS interface mode=ap_memory port=allstub->get_mem() latency=2\n"
+            "#pragma HLS interface mode=ap_memory port=instubdata.get_mem() latency=2\n"
+#            "#pragma HLS interface mode=ap_memory port=instubdata.get_mem_entries8A() latency=1\n"
+#            "#pragma HLS interface mode=ap_memory port=instubdata.get_mem_entries8B() latency=1\n"
            "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
             "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"

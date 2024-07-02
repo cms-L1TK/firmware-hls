@@ -36,8 +36,8 @@ namespace PR
                    const MemType mem[nMEM])
   {    
 #pragma HLS inline
-#pragma HLS ARRAY_PARTITION variable=iPage complete
-#pragma HLS ARRAY_PARTITION variable=iMem complete
+#pragma HLS ARRAY_PARTITION variable=iPage
+#pragma HLS ARRAY_PARTITION variable=iMem
 
     unsigned int imem = 0;
     for(unsigned int i = 0; i < nINMEM; i++) {
@@ -81,8 +81,8 @@ namespace PR
                        DataType& data)
   {
 #pragma HLS inline
-#pragma HLS ARRAY_PARTITION variable=iPage complete
-#pragma HLS ARRAY_PARTITION variable=iMem complete
+#pragma HLS ARRAY_PARTITION variable=iPage
+#pragma HLS ARRAY_PARTITION variable=iMem
     if (mem_hasdata == 0) return false;
 
     ap_uint<kNBits_MemAddr> read_addr_next = read_addr + 1;
@@ -914,7 +914,7 @@ void MatchCalculator(BXType bx,
 ){
 
 #pragma HLS inline
-#pragma HLS array_partition variable=fullmatch complete dim=1
+#pragma HLS array_partition variable=fullmatch dim=1
 
   using namespace PR;
 
@@ -922,7 +922,6 @@ void MatchCalculator(BXType bx,
   // probably should move these to constants file
   const ap_uint<4> kNbitszprojL123 = 12; // nbitszprojL123 in emulation (defined in constants) 
   const ap_uint<4> kNbitszprojL456 = 8;  // nbitszprojL456 in emulation (defined in constants)
-  const ap_uint<4> kNbitsphiprojD  = 14; // nbitsphiprojD in emulation (defined in constants) 
   const ap_uint<5> kNbitsdrinv = 19;     // idrinvbits     in emulation (defined in constants)
   const ap_uint<4> kShift_Rinv = 13;     // rinvbitshift   in emulation (defined in constants)
   const ap_uint<3> kShift_Phider = 7;    // phiderbitshift in emulation (defined in constants)
@@ -942,7 +941,6 @@ void MatchCalculator(BXType bx,
   const ap_uint<10> kZ_corr_shiftL123 = (-1-kShift_PS_zderL);                                                                 // icorzshift for L123 (6 in L3)
   const ap_uint<10> kZ_corr_shiftL456 = (-1-kShift_2S_zderL + kNbitszprojL123 - kNbitszprojL456 + kNbitsrL456 - kNbitsrL123); // icorzshift for L456
   const auto kZ_corr_shift       = (LAYER < TF::L4)? kZ_corr_shiftL123 : kZ_corr_shiftL456;                                  // icorzshift_ in emulation
-  const auto kr_corr_shift       = (LAYER < TF::D1)? 0 : 7;                                  // shifttmp2 in emulation
 
   const auto LUT_matchcut_alpha_width = (LAYER < TF::D3) ? 9 : 10;
 
@@ -971,14 +969,14 @@ void MatchCalculator(BXType bx,
   ap_uint<MC::LUT_matchcut_rDSS_width> LUT_matchcut_rDSS[MC::LUT_matchcut_rDSS_depth];
   constexpr enum MC::lutType RDSS = (LAYER < TF::D3) ? MC::RDSSINNERCUT : MC::RDSSOUTERCUT;
   readTable_rDSS<RDSS,LAYER,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS  complete
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha
+#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS 
 
   bool goodmatch                   = false;
 
@@ -993,15 +991,12 @@ void MatchCalculator(BXType bx,
   typename AllStub<ASTYPE>::ASR     stub_r     = stub.getR();
   typename AllStub<ASTYPE>::ASZ     stub_z     = stub.getZ();
   typename AllStub<ASTYPE>::ASPHI   stub_phi   = stub.getPhi();
-  typename AllStub<ASTYPE>::ASBEND  stub_bend  = stub.getBend();       
   typename AllStub<DISKPS>::ASR    stub_ps_r    = stub_ps.getR();
   typename AllStub<DISKPS>::ASZ    stub_ps_z    = stub_ps.getZ();
   typename AllStub<DISKPS>::ASPHI  stub_ps_phi  = stub_ps.getPhi();
-  typename AllStub<DISKPS>::ASBEND stub_ps_bend = stub_ps.getBend();       
   ap_uint<12>                      stub_2s_r    = stub_2s.getR();
   typename AllStub<DISK2S>::ASZ    stub_2s_z    = stub_2s.getZ();
   typename AllStub<DISK2S>::ASPHI  stub_2s_phi  = stub_2s.getPhi();
-  typename AllStub<DISK2S>::ASBEND stub_2s_bend = stub_2s.getBend();       
   typename AllStub<DISK2S>::ASALPHA stub_2s_alpha = stub_2s.getAlpha();       
   auto isPSStub = stub_ps.isPSStub();
 
@@ -1018,7 +1013,6 @@ void MatchCalculator(BXType bx,
   // Get phi and z correction
   ap_int<22> full_phi_corr = stub_r * proj_phid; // full corr has enough bits for full multiplication
   ap_int<18> full_z_corr   = stub_r * proj_zd;   // full corr has enough bits for full multiplication
-  ap_int<18> full_r_corr   = stub_z * proj_zd;   // full corr has enough bits for full multiplication
   ap_int<11> phi_corr      = full_phi_corr >> kPhi_corr_shift;                        // only keep needed bits
   //ap_uint<3> shifttmp = 6;
   constexpr auto shifttmp = (LAYER < trklet::N_LAYER) ? log2barrel : log2disk;
@@ -1027,7 +1021,6 @@ void MatchCalculator(BXType bx,
   else if(isDisk && !isPSStub)
     phi_corr = (stub_2s_z * proj_phid) >> shifttmp;
   ap_int<12> z_corr        = (full_z_corr + (1<<(kZ_corr_shift-1))) >> kZ_corr_shift; // only keep needed bits
-  ap_int<12> r_corr        = full_r_corr >> kr_corr_shift; // only keep needed bits
    
   // Apply the corrections
   const int kProj_phi_len = AllProjection<APTYPE>::kAProjPhiSize + 1;
@@ -1205,7 +1198,7 @@ void MatchProcessor(BXType bx,
   //Initialize table for bend-rinv consistency
   ap_uint<1> table[kNMatchEngines][LAYER<TF::D1 ? (LAYER<TF::L4 ? 256 : 512) : 768]; //FIXME Need to figure out how to replace 256 with meaningful const.
   //Use of dim=0 seems to have small improvement on timing - not sure why
-#pragma HLS ARRAY_PARTITION variable=table dim=0 complete
+#pragma HLS ARRAY_PARTITION variable=table dim=0
   readtable: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
     readTable<LAYER>(table[iMEU]); 
@@ -1221,9 +1214,9 @@ void MatchProcessor(BXType bx,
   NPageType nPages[nINMEM];
   IPageType iPage[nMEM];
   IMemType iMem[nMEM]; 
-#pragma HLS ARRAY_PARTITION variable=nPages complete
-#pragma HLS ARRAY_PARTITION variable=iPage complete
-#pragma HLS ARRAY_PARTITION variable=iMem complete
+#pragma HLS ARRAY_PARTITION variable=nPages
+#pragma HLS ARRAY_PARTITION variable=iPage
+#pragma HLS ARRAY_PARTITION variable=iMem
 
   constexpr uint64_t npages = NPage<LAYER, PHISEC>();
 
@@ -1248,7 +1241,7 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddr+1> numbersin[nMEM];
   ap_uint<nMEM> mem_hasdata = 0;
 
-#pragma HLS ARRAY_PARTITION variable=numbersin complete
+#pragma HLS ARRAY_PARTITION variable=numbersin
 
   init<nMEM, nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, iMem, iPage, nPages, mem_hasdata, numbersin, projin);
@@ -1260,7 +1253,7 @@ void MatchProcessor(BXType bx,
   //more projections to read
 
   ap_uint<8> vmstubsmask[16];
-#pragma HLS array_partition variable=vmstubsmask complete dim=1
+#pragma HLS array_partition variable=vmstubsmask dim=1
 
  entriesloop:for(unsigned int i=0; i<16; i++) {
 #pragma HLS unroll
@@ -1272,9 +1265,9 @@ void MatchProcessor(BXType bx,
   ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
 
   MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
-#pragma HLS ARRAY_PARTITION variable=matchengine complete
+#pragma HLS ARRAY_PARTITION variable=matchengine
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
-#pragma HLS ARRAY_PARTITION variable=numbersin complete
+#pragma HLS ARRAY_PARTITION variable=numbersin
   
 
 
@@ -1295,11 +1288,11 @@ void MatchProcessor(BXType bx,
   bool validin_ = false; 
 
   static ap_uint<2*MEBinsBits> zbinLUT[128];
-#pragma HLS ARRAY_PARTITION variable=zbinLUT complete
+#pragma HLS ARRAY_PARTITION variable=zbinLUT
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
   constexpr int nRbinBits = VMProjection<VMPTYPE>::kVMProjFineZSize + VMProjectionBase<VMPTYPE>::kVMProjZBinSize;
   static ap_uint<nRbinBits> rbinLUT[256];//1<<TrackletProjection<PROJTYPE>::kTProjRZSize];
-#pragma HLS ARRAY_PARTITION variable=rbinLUT complete
+#pragma HLS ARRAY_PARTITION variable=rbinLUT
   readRbin_LUT<LAYER,nRbinBits,256>(rbinLUT);
 
   const auto LUT_matchcut_rbend_width = 5;
@@ -1342,9 +1335,9 @@ void MatchProcessor(BXType bx,
     ap_uint<kNMatchEngines> emptys;
 
     typename MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE>::MATCH matches[kNMatchEngines];
-    #pragma HLS ARRAY_PARTITION variable=matches complete
+    #pragma HLS ARRAY_PARTITION variable=matches
     ap_uint<kNBits_MemAddr> projseqs[kNMatchEngines];
-#pragma HLS ARRAY_PARTITION variable=projseqs complete
+#pragma HLS ARRAY_PARTITION variable=projseqs
 
 
     bool anyidle = false;
@@ -1384,7 +1377,7 @@ void MatchProcessor(BXType bx,
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
-#pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
+#pragma HLS ARRAY_PARTITION variable=projseqs dim=0
   MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
   MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
@@ -1560,9 +1553,9 @@ void MatchProcessor(BXType bx,
       auto first = !isDisk ? zfirst : rfirst;
       auto slot = zbin.range(zbin.length()-1, 1);
       ap_uint<BIN_ADDR_WIDTH> entries_zfirst[NUM_PHI_BINS];
-#pragma HLS ARRAY_PARTITION variable=entries_zfirst complete
+#pragma HLS ARRAY_PARTITION variable=entries_zfirst
       ap_uint<BIN_ADDR_WIDTH> entries_zlast[NUM_PHI_BINS];
-#pragma HLS ARRAY_PARTITION variable=entries_zlast complete
+#pragma HLS ARRAY_PARTITION variable=entries_zlast
       for (int phibin = 0; phibin < NUM_PHI_BINS; phibin++){
 #pragma HLS unroll
         entries_zfirst[phibin]= instubdata.getEntries(bx&3,first).range(phibin*BIN_ADDR_WIDTH+BIN_ADDR_WIDTH-1,phibin*BIN_ADDR_WIDTH);
