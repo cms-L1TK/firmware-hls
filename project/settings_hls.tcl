@@ -19,6 +19,9 @@ switch -glob -- $exe {
     *vitis* {
         # Set the FPGA part number
         set_part $FPGA
+
+        # Register all scalar ports on the top function
+        config_interface -register_io scalar_all
     }
     default {
         # Set the FPGA part number
