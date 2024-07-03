@@ -408,10 +408,10 @@ inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
 #pragma HLS array_partition variable=projseqs_ complete 
 
+  return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
   //Temporary hack to see how this improves timing
-  //return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
-  ap_uint<kNBits_MemAddr> tmp(0);
-  return empty()?(~tmp):projseqs_[readindex_];
+  //ap_uint<kNBits_MemAddr> tmp(0);
+  //return empty()?(~tmp):projseqs_[readindex_];
 }
 
 inline typename VMProjection<VMProjType>::VMPID getProjindex() {
