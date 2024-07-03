@@ -114,6 +114,7 @@ assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_
 process(clka)
   variable vi_clk_cnt   : integer := -1; -- Clock counter
   variable vi_page_cnt  : integer := 0;  -- Page counter
+  variable vi_page_cnt_save  : integer := 0;  -- Page counter save
   variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0); 
   variable page         : integer := 0;
   variable tpage        : integer := 0;
@@ -139,6 +140,7 @@ begin
     --end if;
     --end if;
     --end if;
+    vi_page_cnt_save :=  vi_page_cnt;
     if (sync_nent='1') and vi_clk_cnt=-1 then
       vi_clk_cnt := 0;
       vi_page_cnt := 1;
@@ -159,17 +161,17 @@ begin
     end if;
     if (wea='1') then
       tpage := to_integer(unsigned(addra(clogb2(PAGE_LENGTH*NUM_TPAGES)-1 downto clogb2(PAGE_LENGTH))));
-      nentaddress := vi_page_cnt*NUM_TPAGES+tpage;
-      vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt,vi_page_cnt_slv'length));
+      nentaddress := vi_page_cnt_save*NUM_TPAGES+tpage;
+      vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
       address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(clogb2(PAGE_LENGTH) - 1 downto 0);
       --report time'image(now)&" tf_mem_tpar "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
-      if (mask_o(vi_page_cnt)(tpage)='1') then
+      if (mask_o(vi_page_cnt_save)(tpage)='1') then
         nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
       else
         nent_o(nentaddress) <= std_logic_vector(to_unsigned(1, nent_o(nentaddress)'length));
       end if;
-      mask_o(vi_page_cnt)(tpage) <= '1';
+      mask_o(vi_page_cnt_save)(tpage) <= '1';
     end if;
   end if;
 end process;
