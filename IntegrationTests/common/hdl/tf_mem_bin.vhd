@@ -217,8 +217,10 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
-  variable vi_clk_cnt   : integer := -1; -- Clock counter
-  variable vi_page_cnt  : integer := 0;  -- Page counter
+  variable init   : std_logic := '1'; -- Clock counter
+  --FIXME hardcoded number
+  variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
+  variable slv_page_cnt  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
   variable page         : integer := 0;
   variable nentry_in_bin   : std_logic_vector(ADDR_WIDTH-1 downto 0);
 
@@ -237,24 +239,24 @@ process(clka)
   
 begin
   if rising_edge(clka) then
-    if (sync_nent='1') and vi_clk_cnt=-1 then
-      vi_clk_cnt := 0;
-      vi_page_cnt := 1;
+    if (sync_nent='1') and init='1' then
+      init := '0';
+      slv_clk_cnt := (others => '0');
+      slv_page_cnt := (0 => '1', others => '0');
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
     end if;
-    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
-      vi_clk_cnt := vi_clk_cnt+1;
-    elsif (vi_clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
-      vi_clk_cnt := 0;
+    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
+      slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);
+    elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
+      slv_clk_cnt := (others => '0');
       nentry_mask_tmp <= (others => '0'); -- Why do we need this??? FIXME
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
-      assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
-      if (vi_page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
-        vi_page_cnt := vi_page_cnt+1;
+      if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then 
+        slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
       else
-        vi_page_cnt := 0;
+        slv_page_cnt := (others => '0');
       end if;
-      mask_o(NUM_BINS*(vi_page_cnt+1)-1 downto NUM_BINS*vi_page_cnt) <= (others => '0');
+      mask_o(NUM_BINS*(to_integer(unsigned(slv_page_cnt))+1)-1 downto NUM_BINS*to_integer(unsigned(slv_page_cnt))) <= (others => '0');
     end if;
 
     if (wea='1') then
