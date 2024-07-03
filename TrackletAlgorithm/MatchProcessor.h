@@ -1294,6 +1294,13 @@ void MatchProcessor(BXType bx,
   ap_uint<1> savedMatch;
   typename ProjectionRouterBuffer<VMPTYPE, APTYPE>::TRKID lastTrkID(-1);
 
+  //Used to add one pipeline stage before calculating the match
+  ap_uint<1> hasMatch_save = false;;
+  ap_uint<1> newtracklet_save;
+  ap_uint<1> isMatch_save;
+  AllProjection<APTYPE> allproj_save;
+  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex_save;
+  
   TrackletProjection<PROJTYPE> projdata, projdata_;
   bool validin = false; 
   bool validin_ = false; 
@@ -1426,6 +1433,14 @@ void MatchProcessor(BXType bx,
       meu.processPipeLine(table[iMEU]);
 
     } //end MEU loop
+
+    if (hasMatch_save) {
+      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
+        (bx, newtracklet_save, isMatch_save, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
+         fullmatch);
+    }
+    
+    hasMatch_save = hasMatch;
     
     if(hasMatch) {
  
@@ -1442,9 +1457,11 @@ void MatchProcessor(BXType bx,
       
       lastTrkID = trkindex;
 
-      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
-         fullmatch);
+      newtracklet_save = newtracklet;
+      isMatch_save = isMatch;
+      allproj_save = allproj;
+      stubindex_save = stubindex;
+
     } //end MC if
     
 
