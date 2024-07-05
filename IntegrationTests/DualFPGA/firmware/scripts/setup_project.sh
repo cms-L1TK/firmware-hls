@@ -26,7 +26,14 @@ export LD_LIBRARY_PATH=/opt/cactus/lib:${LD_LIBRARY_PATH}
 BASEDIR=$(pwd)
 
 export COLUMNS=120
-# F1
+
+# FPGA 1 Simulation
+ipbb proj create vivado vsim_f1 firmware-hls:IntegrationTests/DualFPGA/ vsim_f1.dep
+cd proj/vsim_f1/
+ipbb vivado generate-project --single
+
+cd $BASEDIR
+# FPGA 1
 ipbb proj create vivado tf_f1 firmware-hls:IntegrationTests/DualFPGA/ apollo_f1.dep
 cd proj/tf_f1/
 ipbb ipbus gendecoders
@@ -34,7 +41,13 @@ ipbb vivado generate-project --single
 ipbb vivado synth -j16 impl -j16 package
 
 cd $BASEDIR
-# F2
+# FPGA 2 Simulation
+ipbb proj create vivado vsim_f2 firmware-hls:IntegrationTests/DualFPGA/ vsim_f2.dep
+cd proj/vsim_f2/
+ipbb vivado generate-project --single
+
+cd $BASEDIR
+# FPGA 2
 ipbb proj create vivado tf_f2 firmware-hls:IntegrationTests/DualFPGA/ apollo_f2.dep
 cd proj/tf_f2/
 ipbb ipbus gendecoders
