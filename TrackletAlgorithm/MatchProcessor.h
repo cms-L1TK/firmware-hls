@@ -971,14 +971,6 @@ void MatchCalculator(BXType bx,
   ap_uint<MC::LUT_matchcut_rDSS_width> LUT_matchcut_rDSS[MC::LUT_matchcut_rDSS_depth];
   constexpr enum MC::lutType RDSS = (LAYER < TF::D3) ? MC::RDSSINNERCUT : MC::RDSSOUTERCUT;
   readTable_rDSS<RDSS,LAYER,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS  complete
 
   bool goodmatch                   = false;
 
@@ -1396,17 +1388,17 @@ void MatchProcessor(BXType bx,
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
-  MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
+  MEU_smallest1: for(unsigned int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
-  MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
+  MEU_smallest2: for(unsigned int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
 #pragma HLS unroll
-        smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
-        smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
+        smallest[iMEU1] = smallest[iMEU1] & (projseqs[iMEU1]<projseqs[iMEU2]);
+        smallest[iMEU2] = smallest[iMEU2] & (projseqs[iMEU2]<projseqs[iMEU1]);
       }
     }
       
-    ap_uint<1> hasMatch = smallest.or_reduce();
-    ap_uint<3> bestiMEU = __builtin_ctz(smallest);
+    hasMatch = smallest.or_reduce();
+    bestiMEU = __builtin_ctz(smallest);
 
     */
 

@@ -440,7 +440,6 @@ inline MATCH read() {
 
 inline MATCH peek() {
 #pragma HLS inline  
-#pragma HLS array_partition variable=matches_ complete
   return matches_[readindex_];
 }
  
