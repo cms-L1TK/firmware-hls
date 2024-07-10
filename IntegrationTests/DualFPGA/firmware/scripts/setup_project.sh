@@ -8,13 +8,13 @@ PROJ_DIR=dual_fpga_2
 [ -d ${PROJ_DIR} ] && rm -rf ${PROJ_DIR}
 ipbb init ${PROJ_DIR}
 cd ${PROJ_DIR}
-ipbb -e add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.9.0-alpha2
+ipbb -e add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b 42ffe5528afa9f012fdb05dac3d8e6fb952295dd
 ipbb -e add git https://github.com/apollo-lhc/CM_FPGA_FW -b v3.0.0
 
 
 ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
 ipbb add git ssh://git@gitlab.cern.ch:7999/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
-ipbb add git ssh://git@gitlab.cern.ch:7999/hptd/tclink.git -r fda0bcf
+ipbb add git ssh://git@gitlab.cern.ch:7999/hptd/tclink.git -r fda0bcf07c501f81daeec1421ffdfb46f828f823
 ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.9
 ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket_ips.git -b v03.12
 ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket.git -b v03.12

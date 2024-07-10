@@ -91,9 +91,9 @@ begin
 
   end generate gen;
 
-  process (clk_p)
-  begin
-    if rising_edge(clk_p) then
+  --process (clk_p)
+  --begin
+    --if rising_edge(clk_p) then
       AS_signals(63 + 0*64 downto 0*64) <= d(59).data(63 downto 0);
       AS_signals(63 + 1*64 downto 1*64) <= d(58).data(63 downto 0);
       AS_signals(63 + 2*64 downto 2*64) <= d(57).data(63 downto 0);
@@ -144,7 +144,7 @@ begin
       MTPAR_signals(63 + 17*64 - 12 downto 17*64) <= d(10).data(63 - 12 downto 0);
     
       bx_out <= d(9).data(2 downto 0);
-    end if;
-  end process;
+    --end if;
+  --end process;
   
 end rtl;

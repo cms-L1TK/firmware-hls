@@ -220,9 +220,9 @@ begin
 
   end generate gen;
 
-  process (clk_p)
-  begin
-    if rising_edge(clk_p) then
+  --process (clk_p)
+  --begin
+    --if rising_edge(clk_p) then
       --48 37bit signals can be accomodated by 28 64bit signals, this will leave
       --16 empty bits in the last data word
       q(4).data(63 downto 0) <= AS_signals((63 + 0*64) downto 0);
@@ -277,7 +277,7 @@ begin
       q(53).data(63 downto 0) <= x"000" & MTPAR_signals((63 + 17*64 - 12) downto (17*64));
     
       q(54).data(63 downto 0) <= x"000000000000000" & "0" & bx_out;
-    end if;
-  end process;
+    --end if;
+  --end process;
   
 end rtl;
