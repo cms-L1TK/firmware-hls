@@ -21,6 +21,7 @@ include -c firmware-hls:KalmanFilter/common components.dep
 src common/hdl/CreateStartSignal.vhd
 #src --vhdl2008 common/hdl/tf_lut.vhd
 src --vhdl2008 common/hdl/tf_mem_bin.vhd
+src --vhdl2008 common/hdl/tf_mem_tpar.vhd
 src --vhdl2008 common/hdl/tf_mem_format.vhd
 src --vhdl2008 common/hdl/tf_mem.vhd
 src --vhdl2008 common/hdl/tf_mem_tproj.vhd
