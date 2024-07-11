@@ -12,6 +12,10 @@ static const unsigned short kInvalidTrackletID = 0x3FFF;
 static const unsigned short kNBitsTCID = FullMatchBase<BARREL>::kFMTCIDSize;
 static const unsigned short kNBitsTrackletID = kNBitsTCID + kNBits_MemAddr;
 
+//First clock at which we allow to find a match. This allows the mergers of both depth 2 and 3
+//to have the results
+constexpr unsigned int min_istep = 6;
+
 typedef ap_uint<kNBitsTCID> TCIDType;
 typedef ap_uint<kNBitsITC> ITCType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
@@ -57,13 +61,9 @@ class Merger {
             const FM &in_B, const bool valid_B, bool &read_B,
             const bool read) {
 
-
     if (read or !valid_) {
       out_ = first_A_ ? in_A_ : in_B_;
       valid_ = valid_A_ || valid_B_;
-    }
-
-    if (read) {
       if (first_A_) valid_A_ = false;
       else          valid_B_ = false;
     }
@@ -189,6 +189,7 @@ void TrackBuilder(
 
     // First determine the minimum tracklet ID from the current set of full
     // matches.
+
     min_id_outer : for (unsigned int j = 0; j < NStubs; j++) {
 
       int tid = kInvalidTrackletID;
@@ -202,6 +203,7 @@ void TrackBuilder(
       }
 
       smallest[j] = true;
+
 
       min_id_inner : for (unsigned int k = 0 ; k < NStubs; k++) {
 
@@ -218,13 +220,15 @@ void TrackBuilder(
         if (tid2 < tid) smallest[j] = false;
       }
 
+      if (i < min_istep) smallest[j] = false;
+
       if (smallest[j]) min_id = tid;
     }
 
     // We are done if no valid ID was found; all subsequent output tracks are
     // invalid
-    done = !done_latch && (i != 0) && (min_id == kInvalidTrackletID);
-    done_latch = (i != 0) && (min_id == kInvalidTrackletID);
+    done = !done_latch && (i >= min_istep) && (min_id == kInvalidTrackletID);
+    done_latch = (i >= min_istep) && (min_id == kInvalidTrackletID);
 
     // Initialize a TrackFit object using the tracklet parameters associated
     // with the minimum tracklet ID.
