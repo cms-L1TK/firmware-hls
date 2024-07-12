@@ -910,6 +910,7 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubid,
+                     ap_uint<kNBits_MemAddr> projseq,
                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
 ){
 
@@ -1133,6 +1134,7 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding 
+    std::cout << std::hex << "FullMatch=" << fm.raw() << " at projseq=" << std::dec << projseq << std::endl;
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
@@ -1280,6 +1282,7 @@ void MatchProcessor(BXType bx,
 
   for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
+  matchengine[iMEU].init(bx, ProjectionRouterBuffer<VMPTYPE,APTYPE>(-1), 0);
   matchengine[iMEU].reset();
 #ifndef __SYNTHESIS__
     matchengine[iMEU].setUnit(iMEU);
@@ -1321,14 +1324,31 @@ void MatchProcessor(BXType bx,
   constexpr int BIN_ADDR_WIDTH = 4;
 
   constexpr int kNPipeline = 3;
+  ap_uint<kNBits_MemAddr> meu_queue[kMaxProc - kMaxProcOffset(module::MP)];
+  #pragma HLS ARRAY_PARTITION variable=meu_queue complete
+  for(size_t i = 0; i < kMaxProc - kMaxProcOffset(module::MP); i++) {
+#pragma HLS unroll
+    meu_queue[i] = 0;
+  }
+  ap_uint<kNBits_MemAddr> meu_read=0;
+  ap_uint<kNBits_MemAddr> meu_write=0;
   ap_uint<kNBits_MemAddr> currentMEU[kNMatchEngines][kNPipeline];
   #pragma HLS ARRAY_PARTITION variable=currentMEU complete
+  typename MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE>::MATCH matchesMEU[kNMatchEngines][kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=matchesMEU complete
   ap_uint<kNBits_MemAddr> valueMEU[kNMatchEngines][kNPipeline];
   #pragma HLS ARRAY_PARTITION variable=valueMEU complete
+  bool emptyMEU[kNMatchEngines][kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=valueMEU complete
+  bool idleMEU[kNMatchEngines][kNPipeline];
+  #pragma HLS ARRAY_PARTITION variable=idleMEU complete
   for(size_t i = 0; i < kNMatchEngines; i++){
     for(size_t j = 0; j < kNPipeline; j++) {
-        currentMEU[i][j] = 0;
-        valueMEU[i][j] = 0;
+        currentMEU[i][j] = -1;
+        matchesMEU[i][j] = -1;
+        valueMEU[i][j] = -1;
+        emptyMEU[i][j] = false;
+        idleMEU[i][j] = true;
     }
   }
   ap_uint<kNBits_MemAddr> bestMEU[kNMatchEngines/2][kNPipeline];
@@ -1340,11 +1360,8 @@ void MatchProcessor(BXType bx,
   }
   ap_uint<kNBits_MemAddr> thebestMEU[kNPipeline];
   #pragma HLS ARRAY_PARTITION variable=thebestMEU complete
-  ap_uint<kNBits_MemAddr> tmp_thebestMEU[kNPipeline];
-  #pragma HLS ARRAY_PARTITION variable=tmp_thebestMEU complete
   for(size_t j = 0; j < kNPipeline; j++) {
       thebestMEU[j] = 0;
-      tmp_thebestMEU[j] = 0;
   }
   /*
   ap_uint<kNBits_MemAddr> thebestMEU_queue[kMaxProc - kMaxProcOffset(module::MP)];
@@ -1386,15 +1403,30 @@ void MatchProcessor(BXType bx,
 
     bool anyidle = false;
 
+    std::cout << "Queuing " << bestMEU[0][1] << "(" << valueMEU[bestMEU[0][1]][1] << ") and " << bestMEU[1][0] << "(" << valueMEU[bestMEU[1][1]][1] << ")" << std::endl;
   MEU_get_trkids: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll      
+      std::cout << "MEU " << iMEU << "\t" << matchengine[iMEU].getProjSeqNoPipeline() << std::endl;
       matchengine[iMEU].set_empty();
       idles[iMEU] = matchengine[iMEU].idle();
       anyidle = idles[iMEU] ? true : anyidle;
       emptys[iMEU] = matchengine[iMEU].empty();
       projseqs[iMEU] = matchengine[iMEU].getProjSeq();
       matches[iMEU] =  matchengine[iMEU].peek();
+      matchesMEU[iMEU][0] =  matchengine[iMEU].peek();
+      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
+      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
+      (stubindex,allprojdata) = matchesMEU[iMEU][0];
+      std::cout << "MEU[" << iMEU << "] matches " << std::hex << allprojdata << " stubIdx=" << stubindex << std::dec << std::endl;
+      std::cout << "MEU " << iMEU << "(" << projseqs[iMEU] << ") empty? " << emptys[iMEU] << " has " << (matchengine[iMEU].writeIndex() - matchengine[iMEU].readIndex()) << " matches left!" << std::endl;
+      currentMEU[iMEU][0] = matchengine[iMEU].getProjSeqNoPipeline();
+      valueMEU[iMEU][0] = matchengine[iMEU].getProjSeqNoPipeline();
+      emptyMEU[iMEU][0] = matchengine[iMEU].empty();
+      idleMEU[iMEU][0] = matchengine[iMEU].idle();
     }
+    bestMEU[0][0] = (currentMEU[0][1] <= currentMEU[1][1]) ? 0 : 1;
+    bestMEU[1][0] = (currentMEU[2][1] <= currentMEU[3][1]) ? 2 : 3;
+    std::cout << "Current MEU porjseqs: " << currentMEU[0][0] << "\t" << currentMEU[1][0] << "\t" << currentMEU[2][0] << "\t" << currentMEU[3][0] << std::endl;
 
     //This printout exactly matches printout in emulation for tracking code differences
     /*   
@@ -1416,11 +1448,10 @@ void MatchProcessor(BXType bx,
 
     bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
     //TODO read first ProjSeq from each MEU
-    auto const ttmp_thebestMEU = (valueMEU[bestMEU[0][1]][1] <= valueMEU[bestMEU[1][1]][1]) ? bestMEU[0][1] : bestMEU[1][1];
-    tmp_thebestMEU[1] = ttmp_thebestMEU;
-    //tmp_thebestMEU[2] = !emptys[thebestMEU[1]] ? tmp_thebestMEU[2] : ttmp_thebestMEU; // Hold on to previous
-    //thebestMEU_queue[thebestMEU_write] = ttmp_thebestMEU;
+    thebestMEU[0] = (valueMEU[bestMEU[0][1]][kNPipeline-1] <= valueMEU[bestMEU[1][1]][kNPipeline-1]) ? bestMEU[0][kNPipeline-1] : bestMEU[1][kNPipeline-1];
+    meu_queue[meu_write++] = thebestMEU[kNPipeline-1]; // enqueue
     switch (npip) {
+      /*
       case 0:
         std::cout << npip << ":\t" << currentMEU[0][npip] << "\t\t" << currentMEU[1][npip] << "\t\t" << currentMEU[2][npip] << "\t\t" << currentMEU[3][npip] << std::endl;
         std::cout << "\t\t" << currentMEU[0][npip] << " < " << currentMEU[1][npip] << "\t\t\t" << currentMEU[2][npip] << " < " << currentMEU[3][npip] << std::endl;
@@ -1435,24 +1466,27 @@ void MatchProcessor(BXType bx,
         npip++;
         break;
       case 2:
-        std::cout << npip << ":\t" << "\t\t\t" << tmp_thebestMEU[npip] << "(" << valueMEU[tmp_thebestMEU[npip]][npip] << ")" << std::endl;
+        std::cout << npip << ":\t" << "\t\t\t" << thebestMEU[npip] << "(" << valueMEU[thebestMEU[npip]][npip] << ")" << std::endl;
         npip++;
         break;
       //case 3:
-      //  std::cout << npip << ":\t" << "\t\t\t" << tmp_thebestMEU[npip] << std::endl;
+      //  std::cout << npip << ":\t" << "\t\t\t" << thebestMEU[npip] << std::endl;
       //  npip++;
       //  break;
       default:
-        std::cout << npip << ":\t" << "\t\t\t" << tmp_thebestMEU[npip] << "(" << valueMEU[tmp_thebestMEU[npip]][npip] << ")" << std::endl;
+        std::cout << npip << ":\t" << "\t\t\t" << thebestMEU[npip] << "(" << valueMEU[thebestMEU[npip]][npip] << ")" << std::endl;
         npip++;
+      */
     }
     //thebestMEU_write++;
     //thebestMEU_read = !emptys[thebestMEU[1]] ? thebestMEU_read : ap_uint<kNBits_MemAddr>(thebestMEU_read+1);
     //thebestMEU[1] = !emptys[thebestMEU[1]] ? thebestMEU[1] : thebestMEU_queue[thebestMEU_read];
     //std::cout << istep << ": queue[" << thebestMEU_read << "]=" << thebestMEU_queue << std::endl;
-    //thebestMEU[1] = !emptys[thebestMEU[1]] ? thebestMEU[1] : tmp_thebestMEU;
-    bestiMEU = tmp_thebestMEU[kNPipeline-1];
-    std::cout << bestiMEU << "==" << tmp_thebestMEU[kNPipeline-1] << std::endl;
+    bestiMEU = thebestMEU[0];
+    //bestiMEU = thebestMEU[kNPipeline-1];
+    std::cout << bestiMEU << "==" << thebestMEU[kNPipeline-1] << std::endl;
+    for(size_t i = 0; i < kNMatchEngines; i++)
+      std::cout << "MEU " << i << " empty=" << emptys[i] << " (" << projseqs[i] << "\t" << currentMEU[i][0] << "\t" << valueMEU[i][0] << ")" << std::endl;
 
     hasMatch = !emptys[bestiMEU];
 
@@ -1485,28 +1519,42 @@ void MatchProcessor(BXType bx,
       auto &meu = matchengine[iMEU];
       
       bool idle = idles[iMEU];
+      //idle = idleMEU[iMEU][2];
+      //empty = !emptyMEU[iMEU][2];
 
+      //bool moreMatches = (matchengine[iMEU].writeIndex() - matchengine[iMEU].readIndex()) > 1;
       if(idle && !empty && !init) {
+        auto old = currentMEU[iMEU][2];//meu.getProjSeq();
         init =  true;
         meu.init(bx, tmpprojbuff, istep);
-        //std::cout << "Inserted MEU=" << iMEU << "[0]=" << istep << std::endl;
-        currentMEU[iMEU][0] = istep;
-        valueMEU[iMEU][0] = istep;
+        matchesMEU[iMEU][0] =  0;
+        std::cout << "Inserted MEU[" << iMEU << "]=" << istep << "(replaced " << old << " with " << (matchengine[iMEU].writeIndex() - matchengine[iMEU].readIndex()) << " matches left) tmpprojbuff=" << std::hex <<  tmpprojbuff.raw() << " proj=" << tmpprojbuff.getAllProj() << std::dec << std::endl;
+        meu_read++;
+        idleMEU[iMEU][0] = false;
+        emptyMEU[iMEU][0] = true;
       }
       //can not get to here on first cycle, but compile don't seem to realize 
       //this and fail to reach II=1
       else if (istep != 0) meu.step(instubdata.getMem(iMEU));
+      /*
       if(!init && false) {
         //std::cout << "Kepeing MEU=" << iMEU << "[0]=" << currentMEU[iMEU][1] << std::endl;
         currentMEU[iMEU][0] = currentMEU[iMEU][1]; //Keep stacking previous step
         valueMEU[iMEU][0] = valueMEU[iMEU][1]; //Keep stacking previous step
       }
+      */
 
       meu.processPipeLine(table[iMEU]);
 
     } //end MEU loop
-    bestMEU[0][0] = (currentMEU[0][0] <= currentMEU[1][0]) ? 0 : 1;
-    bestMEU[1][0] = (currentMEU[2][0] <= currentMEU[3][0]) ? 2 : 3;
+    std::cout << "projseq:\t" << projseqs[0] << "\t\t" << projseqs[1] << "\t\t" << projseqs[2] << "\t\t" << projseqs[3] << std::endl;
+    std::cout << 0 << ":\t" << currentMEU[0][0] << "\t\t" << currentMEU[1][0] << "\t\t" << currentMEU[2][0] << "\t\t" << currentMEU[3][0] << std::endl;
+    std::cout << 0 << "\t\t" << currentMEU[0][0] << " < " << currentMEU[1][0] << "\t\t\t" << currentMEU[2][0] << " < " << currentMEU[3][0] << std::endl;
+    std::cout << 1 << "\t\t" << currentMEU[0][1] << " < " << currentMEU[1][1] << "\t\t\t" << currentMEU[2][1] << " < " << currentMEU[3][1] << std::endl;
+    std::cout << 1 << ":\t" << "\t" << bestMEU[0][0] << "(" << valueMEU[bestMEU[0][0]][0] << ")" << "\t\t\t\t" << bestMEU[1][0] << "(" << valueMEU[bestMEU[1][0]][1] << ")" << std::endl;
+    std::cout << 2 << ":\t" << "\t\t\t" << thebestMEU[0] << "(" << valueMEU[thebestMEU[0]][2] << ")" << std::endl;
+    if(npip < kNPipeline-1) npip++;
+    else npip = 0;
     
     if(hasMatch) {
  
@@ -1514,6 +1562,8 @@ void MatchProcessor(BXType bx,
       ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
       
       (stubindex,allprojdata) = matches[bestiMEU];
+      std::cout << "Sending MEU=" << bestiMEU << "(" << valueMEU[bestiMEU][kNPipeline-1] << ") to MC porj="
+                << std::hex << allprojdata << " stubIdx=" << stubindex << std::dec << std::endl;
       AllProjection<APTYPE> allproj(allprojdata);
 
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
@@ -1525,6 +1575,7 @@ void MatchProcessor(BXType bx,
 
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
         (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
+         projseqs[bestiMEU],
          fullmatch);
     } //end MC if
     
@@ -1706,11 +1757,22 @@ void MatchProcessor(BXType bx,
     */
     for(size_t i = 0; i < kNMatchEngines; i++){
 #pragma HLS unroll
+      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
+      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
+
       for(size_t j = kNPipeline-1; j > 0; j--) {
         //std::cout << "pip=" << j << ", MEU=" << i << ": " << currentMEU[i][j] << "->" << currentMEU[i][j-1] << std::endl;
         //currentMEU[j][j] = currentMEU[j-1][i];
         currentMEU[i][j] = currentMEU[i][j-1];
+        (stubindex,allprojdata) = matchesMEU[i][j];
+        std::cout << "matchesMEU pip=" << j << ", MEU=" << i << ": "
+                  << std::hex << allprojdata << " stubIdx=" << stubindex << "->";
+        (stubindex,allprojdata) = matchesMEU[i][j-1];
+        std::cout << std::hex << allprojdata << " stubIdx=" << stubindex << std::dec << std::endl;
+        matchesMEU[i][j] = matchesMEU[i][j-1];
         valueMEU[i][j] = valueMEU[i][j-1];
+        emptyMEU[i][j] = emptyMEU[i][j-1];
+        idleMEU[i][j] = idleMEU[i][j-1];
         //std::cout << "pip=" << j << ", MEU=" << i << ": " << currentMEU[i][j] << std::endl;
       }
     }
@@ -1738,8 +1800,6 @@ void MatchProcessor(BXType bx,
     */
     for(size_t j = kNPipeline-1; j > 0; j--) {
       thebestMEU[j] = thebestMEU[j-1];
-      //std::cout << "tmp_thebestMEU[" << j << "]=" << tmp_thebestMEU[j] << "->" << tmp_thebestMEU[j-1] << std::endl;
-      tmp_thebestMEU[j] = tmp_thebestMEU[j-1];
     }
 
     if (!projBuffNearFull){

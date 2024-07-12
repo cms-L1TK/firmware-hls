@@ -61,6 +61,8 @@ public:
 
   ProjectionRouterBufferArray() {
     reset();
+  for(int i = 0; i < 1<< kNBitsBuffer; i++)
+    projbuffer_[i] = ProjectionRouterBuffer<VMProjType,AllProjectionType>(-1);
   }
 
 private:

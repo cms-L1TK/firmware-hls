@@ -58,6 +58,17 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
     good____ = false;
     static ap_uint<kNBits_MemAddr> tmp(0);
     projseqcache_ = ~tmp;
+    projseq_ = ~tmp;
+    projbuffer_ = ProjectionRouterBuffer<VMProjType,AllProjectionType>(-1);
+    projbuffer__ = ProjectionRouterBuffer<VMProjType,AllProjectionType>(-1);
+    projbuffer___ = ProjectionRouterBuffer<VMProjType,AllProjectionType>(-1);
+    projbuffer____ = ProjectionRouterBuffer<VMProjType,AllProjectionType>(-1);
+    stubdata__ = VMStubMECM<VMSMEType>(-1);
+    stubdata___ = VMStubMECM<VMSMEType>(-1);
+    stubdata____ = VMStubMECM<VMSMEType>(-1);
+    for(int i = 0; i < 1<<MatchEngineUnitBase<VMProjType>::kNBitsBuffer; i++)
+#pragma HLS unroll
+      matches_[i] = MATCH(0);
   }
   
 
@@ -188,6 +199,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
   istub_ = (good__ && !istub_done) ? istubnext : istub_;
    
+  //std::cout << "projbuffer__=" << std::hex << projbuffer__.raw() << " -> projbuffer_=" << projbuffer_.raw() << std::dec << std::endl;
   projbuffer__ = projbuffer_;
   projseq__ = projseq_;
 
@@ -253,6 +265,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
 
     //Check if stub bend and proj rinv consistent
     projseqs_[writeindex_] = projseq____;
+    std::cout << "MEU[" << unit_ << "] queueing " << stubindex << "\t" << std::hex << projbuffer____.getAllProj() << std::dec << std::endl;
     matches_[writeindex_] = (stubindex,projbuffer____.getAllProj());
     INDEX writeindexnext = writeindex_ + 1;
     
@@ -272,6 +285,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     projfinezadj____ = projfinezadj___;
     isPSseed____ = isPSseed___;
     projrinv____ = projrinv___;
+    //std::cout << "projbuffer____=" << std::hex << projbuffer____.raw() << " -> projbuffer___=" << projbuffer___.raw() << std::dec << std::endl;
     projbuffer____ = projbuffer___;
     projseq____ = projseq___;
     zbin____ = zbin___;
@@ -282,6 +296,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     projfinezadj___ = projfinezadj__;
     isPSseed___ = isPSseed__;
     projrinv___ = projrinv__;
+    //std::cout << "projbuffer___=" << std::hex << projbuffer___.raw() << " -> projbuffer__=" << projbuffer__.raw() << std::dec << std::endl;
     projbuffer___ = projbuffer__;
     projseq___ = projseq__;
     zbin___ = zbin__;
@@ -400,6 +415,11 @@ inline ap_uint<kNBits_MemAddr> getProjSeqOld() {
   if (good__) {
     return projseq__;
   } 
+  return projseq_;
+}
+
+inline ap_uint<kNBits_MemAddr> getProjSeqNoPipeline() {
+#pragma HLS inline
   return projseq_;
 }
 
