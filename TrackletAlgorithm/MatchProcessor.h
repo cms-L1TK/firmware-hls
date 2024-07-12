@@ -1426,11 +1426,14 @@ void MatchProcessor(BXType bx,
 
     } //end MEU loop
 
+
     if (hasMatch_save) {
+      isMatch = newtracklet_save ? ap_uint<1>(0) : isMatch;
       MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet_save, isMatch_save, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
+        (bx, newtracklet_save, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
          fullmatch);
     }
+
     
     hasMatch_save = hasMatch;
     
@@ -1445,12 +1448,10 @@ void MatchProcessor(BXType bx,
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
     
       ap_uint<1> newtracklet = lastTrkID != trkindex;
-      isMatch = newtracklet ? ap_uint<1>(0) : isMatch;
       
       lastTrkID = trkindex;
 
       newtracklet_save = newtracklet;
-      isMatch_save = isMatch;
       allproj_save = allproj;
       stubindex_save = stubindex;
 
