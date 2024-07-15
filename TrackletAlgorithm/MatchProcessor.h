@@ -1319,6 +1319,12 @@ void MatchProcessor(BXType bx,
   ap_uint<2> bestiMEU = 0;
   bool increase = false;
 
+  ap_uint<kNBits_MemAddr> tmp(0);
+  ap_uint<kNBits_MemAddr> projseq0123 = ~tmp;
+  ap_uint<kNBits_MemAddr> projseq01 = ~tmp; 
+  ap_uint<kNBits_MemAddr> projseq23 = ~tmp; 
+
+  
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int BIN_ADDR_WIDTH = 4;
@@ -1380,10 +1386,21 @@ void MatchProcessor(BXType bx,
     ap_uint<1> Bit31 = projseqs[3] < projseqs[1];
     ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
 
+    bool cleanpipeline[4] = {projseqs[0] <= projseq0123, projseqs[1] <= projseq0123, projseqs[2] <= projseq0123, projseqs[3] <= projseq0123};
+
+    //  std::cout << "cleapipeline projseq0123_ : " << cleanpipeline << " " << projseq0123_ << " " << matchengine[0].nearFull() << " " << matchengine[1].nearFull() << " " << matchengine[2].nearFull() << " " << matchengine[3].nearFull() << " | " << matchengine[0].getProjSeqStart() << " " << matchengine[1].getProjSeqStart() << " " << matchengine[2].getProjSeqStart() << " " << matchengine[3].getProjSeqStart() << " | " << matchengine[0].getProjSeq() << " " << matchengine[1].getProjSeq() << " " << matchengine[2].getProjSeq() << " " << matchengine[3].getProjSeq() << std::endl;
+    
     bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
 
-    hasMatch = !emptys[bestiMEU];
+    hasMatch = (!emptys[bestiMEU]) && cleanpipeline[bestiMEU];
 
+    projseq0123 = (projseq01 < projseq23) ? projseq01 : projseq23;
+    
+    projseq01 = (matchengine[0].getProjSeqStart() < matchengine[1].getProjSeqStart()) ? matchengine[0].getProjSeqStart() : matchengine[1].getProjSeqStart();
+    projseq23 = (matchengine[2].getProjSeqStart() < matchengine[3].getProjSeqStart()) ? matchengine[2].getProjSeqStart() : matchengine[3].getProjSeqStart();
+    
+
+    
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
