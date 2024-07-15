@@ -403,15 +403,28 @@ inline ap_uint<kNBits_MemAddr> getProjSeqOld() {
   return projseq_;
 }
 
+//
+// Get start of projseq pipeline 
+//
+inline ap_uint<kNBits_MemAddr> getProjSeqStart() {
+#pragma HLS inline
+  if (idle_) {
+    ap_uint<kNBits_MemAddr> tmp(0);
+    return ~tmp;
+  }
+  return projseq_;
+}
 
+
+  
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
 #pragma HLS array_partition variable=projseqs_ complete 
 
-  return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
+  //return empty()?(good____?projseq____:projseqcache_):projseqs_[readindex_];
   //Temporary hack to see how this improves timing
-  //ap_uint<kNBits_MemAddr> tmp(0);
-  //return empty()?(~tmp):projseqs_[readindex_];
+  ap_uint<kNBits_MemAddr> tmp(0);
+  return empty()?(~tmp):projseqs_[readindex_];
 }
 
 inline typename VMProjection<VMProjType>::VMPID getProjindex() {
