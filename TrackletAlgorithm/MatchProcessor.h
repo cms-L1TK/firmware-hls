@@ -77,8 +77,9 @@ namespace PR
                        // Memory pointers
 		       const IMemType iMem[nMEM],
 		       const IPageType iPage[nMEM],
-                       const MemType mem[nMEM],
-                       DataType& data)
+		       IMemType& imem,
+		       IPageType& ipage
+		       )
   {
 #pragma HLS inline
 #pragma HLS ARRAY_PARTITION variable=iPage complete
@@ -90,9 +91,8 @@ namespace PR
     // priority encoder
     IMemType read_imem = __builtin_ctz(mem_hasdata);
     
-    // read the memory "read_imem" with the address "read_addr"
-    read_inmem<DataType, MemType, nMEM>(data, bx, //read_imem,
-					read_addr, iMem[read_imem], iPage[read_imem], mem);
+    imem = iMem[read_imem];
+    ipage = iPage[read_imem];
 
     if (read_addr_next >= nentries[read_imem]) {
       // All entries in the memory[read_imem] have been read out
@@ -1228,16 +1228,16 @@ void MatchProcessor(BXType bx,
     nPages[imem] = 1 + ((npages >> (2*imem))&3);
   }
   
-  int imem = 0;
-  int ipage = 0;
+  int imemtmp = 0;
+  int ipagetmp = 0;
   for (unsigned int j = 0 ; j < nMEM; j++){
 #pragma HLS unroll
-    iPage[j] = ipage;
-    iMem[j] = imem%nINMEM;
-    ipage++;
-    if (ipage>=nPages[imem]) {
-      ipage=0;
-      imem++;
+    iPage[j] = ipagetmp;
+    iMem[j] = imemtmp%nINMEM;
+    ipagetmp++;
+    if (ipagetmp>=nPages[imemtmp]) {
+      ipagetmp=0;
+      imemtmp++;
     }
   }
   
@@ -1251,6 +1251,7 @@ void MatchProcessor(BXType bx,
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
+  ap_uint<kNBits_MemAddr> read_address = 0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -1296,6 +1297,9 @@ void MatchProcessor(BXType bx,
   TrackletProjection<PROJTYPE> projdata, projdata_;
   bool validin = false; 
   bool validin_ = false; 
+  bool validmem = false;
+  IMemType imem = 0;
+  IPageType ipage = 0;
 
   static ap_uint<2*MEBinsBits> zbinLUT[128];
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete
@@ -1343,7 +1347,7 @@ void MatchProcessor(BXType bx,
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
-    bool projBuffNearFull = nearFull3Unit<nPRBAbits>()[(readptr,writeptr)];
+    bool projBuffNearFull = nearFull4Unit<nPRBAbits>()[(readptr,writeptr)];
     
     ap_uint<3> iphi = 0;
 
@@ -1633,22 +1637,26 @@ void MatchProcessor(BXType bx,
       ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, trackletid, mask, nstubs, zfirst, vmproj, psseed);
       projbufferarray.saveProjection(projbuffertmp);
       
-    } // end if(validin)
+    } // end if(validin_)
 
     projdata_ = projdata;
     validin_ = validin;
 
+    validin = validmem;
+    read_inmem<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM>(projdata, bx, read_address, imem, ipage, projin);
+
     if (!projBuffNearFull){
       
       // read inputs
-      validin = read_input_mems<TrackletProjection<PROJTYPE>,
-      TrackletProjectionMemory<PROJTYPE>,
-      nMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
-         projin, projdata);
- 
+      //validin = read_input_mems<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM, kNBits_MemAddr+1>
+      //(bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, projin, projdata);
+
+      read_address =  mem_read_addr;
+      validmem = read_input_mems<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM, kNBits_MemAddr+1>
+	(bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, imem, ipage);
+
     } else {
-      validin = false;
+      validmem = false;
     }// end if not near full
 
   } //end loop
