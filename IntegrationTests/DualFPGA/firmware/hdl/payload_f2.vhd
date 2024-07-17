@@ -85,9 +85,9 @@ begin
     q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
 
     -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
-    --q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
-    --q(i).data(31 downto 16) <= "0000000" & packet_index;
-    --q(i).data(15 downto 0) <= x"00" & word_index;
+    q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
+    q(i).data(31 downto 16) <= "0000000" & packet_index;
+    q(i).data(15 downto 0) <= x"00" & word_index;
 
   end generate gen;
 
