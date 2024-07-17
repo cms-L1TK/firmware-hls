@@ -192,8 +192,8 @@ begin
       out_dout   => s_tfout
       );
 
-  q(108)        <= s_tfout(0);
-  q(109)        <= s_tfout(1);
+  q(92)        <= s_tfout(0);
+  q(93)        <= s_tfout(1);
 
   ---- This example code sends 156-word-long TMUX18 packets (i.e. same packet length as track finder output)
   ---- with channel index, packet index, and word index embedded in the data word

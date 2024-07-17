@@ -48,11 +48,11 @@ package emp_project_decl is
     20  => kDummyRegion,                      -- not routed                  
     21  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
     22  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    23  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
+    23  => (gty25, no_buf, no_fmt, buf, gty25),  -- firefly
     24  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
     25  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
     26  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    27  => (gty25, no_buf, no_fmt, buf, gty25),  -- firefly
+    27  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
     28  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
     29  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
     30  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly     
