@@ -110,17 +110,18 @@ begin
 
 -- Check user didn't change values of derived generics.
 assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
+assert (PAGE_LENGTH = 128) report "PAGE_LENGTH in tf_mem_tpar has to be 128" severity FAILURE;
+
 
 process(clka)
-  variable vi_clk_cnt   : integer := -1; -- Clock counter
-  variable vi_page_cnt  : integer := 0;  -- Page counter
-  variable vi_page_cnt_save  : integer := 0;  -- Page counter save
-  variable vi_page_cnt_slv  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0); 
-  variable page         : integer := 0;
-  variable tpage        : integer := 0;
-  variable addr_in_page : integer := 0;
-  variable nentaddress  : integer := 0;
+  variable init   : std_logic := '1'; -- Clock counter
+  variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others => '0'); -- Clock counter
+  variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
+  variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
+  variable tpage        : std_logic_vector(clogb2(NUM_TPAGES)-1 downto 0)  := (others => '0');
+  variable nentaddress  : std_logic_vector(clogb2(NUM_TPAGES*NUM_PAGES)-1 downto 0) := (others => '0');
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     --if DEBUG then
@@ -140,38 +141,39 @@ begin
     --end if;
     --end if;
     --end if;
-    vi_page_cnt_save :=  vi_page_cnt;
-    if (sync_nent='1') and vi_clk_cnt=-1 then
-      vi_clk_cnt := 0;
-      vi_page_cnt := 1;
+
+    slv_page_cnt_save := slv_page_cnt;
+    if (sync_nent='1') and (init='1') then
+      init := '0';
+      slv_clk_cnt := (others => '0');
+      slv_page_cnt := (0 => '1', others => '0');
     end if;
-    if (vi_clk_cnt >=0) and (vi_clk_cnt < MAX_ENTRIES - 1) then -- ####### Counter nent
-      vi_clk_cnt := vi_clk_cnt + 1;
-    elsif (vi_clk_cnt >= MAX_ENTRIES - 1) then -- -1 not included
-      vi_clk_cnt := 0;
-      assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
-      if (vi_page_cnt < NUM_PAGES - 1) then -- Assuming linear continuous page access
-        vi_page_cnt := vi_page_cnt + 1;
+    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
+      slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
+    elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
+      slv_clk_cnt := (others => '0');
+      if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then
+        slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
       else
-        vi_page_cnt := 0;
+         slv_page_cnt := (others => '0');
       end if;
-      mask_o(vi_page_cnt) <= (others => '0');
+      mask_o(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
       -- Note that we don't zero the nent_o counters here. When adding entry we
       -- reset the nent_o counter if the mask is zero
     end if;
     if (wea='1') then
-      tpage := to_integer(unsigned(addra(clogb2(PAGE_LENGTH*NUM_TPAGES)-1 downto clogb2(PAGE_LENGTH))));
-      nentaddress := vi_page_cnt_save*NUM_TPAGES+tpage;
-      vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
-      address := vi_page_cnt_slv&std_logic_vector(to_unsigned(tpage,clogb2(NUM_TPAGES)))&nent_o(nentaddress)(clogb2(PAGE_LENGTH) - 1 downto 0);
-      --report time'image(now)&" tf_mem_tpar "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
-      sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
-      if (mask_o(vi_page_cnt_save)(tpage)='1') then
-        nent_o(nentaddress) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(nentaddress))) + 1, nent_o(nentaddress)'length)); -- + 1 (slv)
+      tpage := addra(clogb2(PAGE_LENGTH*NUM_TPAGES)-1 downto clogb2(PAGE_LENGTH));
+      nentaddress := slv_page_cnt_save&tpage;
+      if (mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage)))='1') then
+        address := nentaddress&nent_o(to_integer(unsigned(nentaddress)));
+        nent_o(to_integer(unsigned(nentaddress))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(nentaddress))))) + 1, nent_o(to_integer(unsigned(nentaddress)))'length)); -- + 1 (slv)
       else
-        nent_o(nentaddress) <= std_logic_vector(to_unsigned(1, nent_o(nentaddress)'length));
+        address := nentaddress&std_logic_vector(to_unsigned(0, nent_o(to_integer(unsigned(nentaddress)))'length));
+        nent_o(to_integer(unsigned(nentaddress))) <= std_logic_vector(to_unsigned(1, nent_o(to_integer(unsigned(nentaddress)))'length));
       end if;
-      mask_o(vi_page_cnt_save)(tpage) <= '1';
+      --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
+      sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
+      mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) <= '1';
     end if;
   end if;
 end process;
