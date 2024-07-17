@@ -75,10 +75,10 @@ begin
     end process;
 
     -- Set valid high for full duration of packet
-    q(i).valid <= '1' when word_index <= x"66" else '0'; --x"9B" -> x"66"
+    q(i).valid <= '1' when word_index <= x"9B" else '0'; --x"9B" -> x"66"
     -- Start & last are only high for first & last clock cycle of packet
     q(i).start <= '1' when word_index = x"00" else '0';
-    q(i).last <= '1' when word_index = x"66" else '0'; --x"9B" -> x"66"
+    q(i).last <= '1' when word_index = x"9B" else '0'; --x"9B" -> x"66"
 
     -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
     -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
