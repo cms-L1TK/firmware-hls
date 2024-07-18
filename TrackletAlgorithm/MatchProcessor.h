@@ -1133,6 +1133,7 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding 
+    std::cout << std::hex << fm.raw() << ": " << std::bitset<7>(fm_tcid) << "|" << std::bitset<7>(fm_tkid) << "|" << std::bitset<3>(fm_asphi) << "|" << std::bitset<7>(fm_asid) << "|" << std::bitset<7>(fm_stubr) << "|" << std::bitset<12>(fm_phi) << "|" << std::bitset<9>(fm_z) << std::endl;
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
@@ -1319,6 +1320,17 @@ void MatchProcessor(BXType bx,
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int BIN_ADDR_WIDTH = 4;
+  ap_uint<kNBits_MemAddr> meu_queue[kMaxProc - kMaxProcOffset(module::MP)];
+  #pragma HLS ARRAY_PARTITION variable=meuqueue complete
+  ap_uint<kNBits_MemAddr> meu_map[kMaxProc - kMaxProcOffset(module::MP)];
+  #pragma HLS ARRAY_PARTITION variable=meumap complete
+  ap_uint<kNBits_MemAddr> meu_write = 0;
+  ap_uint<kNBits_MemAddr> meu_read = 0;
+  for(size_t i = 0; i < (kMaxProc - kMaxProcOffset(module::MP)); i++) {
+    meu_queue[i] = ap_uint<kNBits_MemAddr>(-1);
+    meu_map[i] = 0;
+  }
+  for(size_t i = 0; i < kNMatchEngines; i++)
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
@@ -1378,6 +1390,7 @@ void MatchProcessor(BXType bx,
     ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
 
     bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
+    bestiMEU = meu_map[meu_queue[meu_read]];
 
     hasMatch = !emptys[bestiMEU];
 
@@ -1414,6 +1427,8 @@ void MatchProcessor(BXType bx,
       if(idle && !empty && !init) {
         init =  true;
         meu.init(bx, tmpprojbuff, istep);
+        meu_map[meu_write] = iMEU;
+        meu_queue[meu_write++] = istep;
       }
       //can not get to here on first cycle, but compile don't seem to realize 
       //this and fail to reach II=1
@@ -1442,6 +1457,7 @@ void MatchProcessor(BXType bx,
         (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
          fullmatch);
     } //end MC if
+    if(idles[bestiMEU] && emptys[bestiMEU]) meu_read++;
     
 
       
