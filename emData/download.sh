@@ -227,15 +227,15 @@ mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
 ### Combined IRtoTP
 echo "CombinedIRtoTP"
 cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1 -sp
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1 -x -sp
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1 -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1 -x -sp 1
 mkdir -p ../../IntegrationTests/CombinedConfig/IRtoTP/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/tb/
 ### Combined PC/VMSMER to TB
 echo "CM FPGA2"
-./generator_hdl.py ../../ --no_graph --split --fpga2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
-./generator_hdl.py ../../ --no_graph --split --fpga2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
+./generator_hdl.py ../../ --no_graph --sp 2 --fpga2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --sp 2 --fpga2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/
