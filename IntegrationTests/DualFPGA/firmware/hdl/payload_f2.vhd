@@ -85,65 +85,65 @@ begin
     q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
 
     -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
-    q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
-    q(i).data(31 downto 16) <= "0000000" & packet_index;
-    q(i).data(15 downto 0) <= x"00" & word_index;
+    --q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
+    --q(i).data(31 downto 16) <= "0000000" & packet_index;
+    --q(i).data(15 downto 0) <= x"00" & word_index;
 
   end generate gen;
 
   --process (clk_p)
   --begin
     --if rising_edge(clk_p) then
-      --AS_signals(63 + 0*64 downto 0*64) <= d(59).data(63 downto 0);
-      --AS_signals(63 + 1*64 downto 1*64) <= d(58).data(63 downto 0);
-      --AS_signals(63 + 2*64 downto 2*64) <= d(57).data(63 downto 0);
-      --AS_signals(63 + 3*64 downto 3*64) <= d(56).data(63 downto 0);
-      --AS_signals(63 + 4*64 downto 4*64) <= d(55).data(63 downto 0);
-      --AS_signals(63 + 5*64 downto 5*64) <= d(54).data(63 downto 0);
-      --AS_signals(63 + 6*64 downto 6*64) <= d(53).data(63 downto 0);
-      --AS_signals(63 + 7*64 downto 7*64) <= d(52).data(63 downto 0);
-      --AS_signals(63 + 8*64 downto 8*64) <= d(51).data(63 downto 0);
-      --AS_signals(63 + 9*64 downto 9*64) <= d(50).data(63 downto 0);
-      --AS_signals(63 + 10*64 downto 10*64) <= d(49).data(63 downto 0);
-      --AS_signals(63 + 11*64 downto 11*64) <= d(48).data(63 downto 0);
+      AS_signals(63 + 0*64 downto 0*64) <= d(59).data(63 downto 0);
+      AS_signals(63 + 1*64 downto 1*64) <= d(58).data(63 downto 0);
+      AS_signals(63 + 2*64 downto 2*64) <= d(57).data(63 downto 0);
+      AS_signals(63 + 3*64 downto 3*64) <= d(56).data(63 downto 0);
+      AS_signals(63 + 4*64 downto 4*64) <= d(55).data(63 downto 0);
+      AS_signals(63 + 5*64 downto 5*64) <= d(54).data(63 downto 0);
+      AS_signals(63 + 6*64 downto 6*64) <= d(53).data(63 downto 0);
+      AS_signals(63 + 7*64 downto 7*64) <= d(52).data(63 downto 0);
+      AS_signals(63 + 8*64 downto 8*64) <= d(51).data(63 downto 0);
+      AS_signals(63 + 9*64 downto 9*64) <= d(50).data(63 downto 0);
+      AS_signals(63 + 10*64 downto 10*64) <= d(49).data(63 downto 0);
+      AS_signals(63 + 11*64 downto 11*64) <= d(48).data(63 downto 0);
     
-      --AS_signals(63 + 12*64 downto 12*64) <= d(43).data(63 downto 0);
-      --AS_signals(63 + 13*64 downto 13*64) <= d(42).data(63 downto 0);
-      --AS_signals(63 + 14*64 downto 14*64) <= d(41).data(63 downto 0);
-      --AS_signals(63 + 15*64 downto 15*64) <= d(40).data(63 downto 0);
-      --AS_signals(63 + 16*64 downto 16*64) <= d(39).data(63 downto 0);
-      --AS_signals(63 + 17*64 downto 17*64) <= d(38).data(63 downto 0);
-      --AS_signals(63 + 18*64 downto 18*64) <= d(37).data(63 downto 0);
-      --AS_signals(63 + 19*64 downto 19*64) <= d(36).data(63 downto 0);
-      --AS_signals(63 + 20*64 downto 20*64) <= d(35).data(63 downto 0);
-      --AS_signals(63 + 21*64 downto 21*64) <= d(34).data(63 downto 0);
-      --AS_signals(63 + 22*64 downto 22*64) <= d(33).data(63 downto 0);
-      --AS_signals(63 + 23*64 downto 23*64) <= d(32).data(63 downto 0);
-      --AS_signals(63 + 24*64 downto 24*64) <= d(31).data(63 downto 0);
-      --AS_signals(63 + 25*64 downto 25*64) <= d(30).data(63 downto 0);
-      --AS_signals(63 + 26*64 downto 26*64) <= d(29).data(63 downto 0);
-      --AS_signals((63 + 27*64 - 16) downto 27*64) <= d(28).data((63 - 16) downto 0);
+      AS_signals(63 + 12*64 downto 12*64) <= d(43).data(63 downto 0);
+      AS_signals(63 + 13*64 downto 13*64) <= d(42).data(63 downto 0);
+      AS_signals(63 + 14*64 downto 14*64) <= d(41).data(63 downto 0);
+      AS_signals(63 + 15*64 downto 15*64) <= d(40).data(63 downto 0);
+      AS_signals(63 + 16*64 downto 16*64) <= d(39).data(63 downto 0);
+      AS_signals(63 + 17*64 downto 17*64) <= d(38).data(63 downto 0);
+      AS_signals(63 + 18*64 downto 18*64) <= d(37).data(63 downto 0);
+      AS_signals(63 + 19*64 downto 19*64) <= d(36).data(63 downto 0);
+      AS_signals(63 + 20*64 downto 20*64) <= d(35).data(63 downto 0);
+      AS_signals(63 + 21*64 downto 21*64) <= d(34).data(63 downto 0);
+      AS_signals(63 + 22*64 downto 22*64) <= d(33).data(63 downto 0);
+      AS_signals(63 + 23*64 downto 23*64) <= d(32).data(63 downto 0);
+      AS_signals(63 + 24*64 downto 24*64) <= d(31).data(63 downto 0);
+      AS_signals(63 + 25*64 downto 25*64) <= d(30).data(63 downto 0);
+      AS_signals(63 + 26*64 downto 26*64) <= d(29).data(63 downto 0);
+      AS_signals((63 + 27*64 - 16) downto 27*64) <= d(28).data((63 - 16) downto 0);
 
-      --MTPAR_signals(63 + 0*64 downto 0*64) <= d(27).data(63 downto 0);
-      --MTPAR_signals(63 + 1*64 downto 1*64) <= d(26).data(63 downto 0);
-      --MTPAR_signals(63 + 2*64 downto 2*64) <= d(25).data(63 downto 0);
-      --MTPAR_signals(63 + 3*64 downto 3*64) <= d(24).data(63 downto 0);
-      --MTPAR_signals(63 + 4*64 downto 4*64) <= d(23).data(63 downto 0);
-      --MTPAR_signals(63 + 5*64 downto 5*64) <= d(22).data(63 downto 0);
-      --MTPAR_signals(63 + 6*64 downto 6*64) <= d(21).data(63 downto 0);
-      --MTPAR_signals(63 + 7*64 downto 7*64) <= d(20).data(63 downto 0);
-      --MTPAR_signals(63 + 8*64 downto 8*64) <= d(19).data(63 downto 0);
-      --MTPAR_signals(63 + 9*64 downto 9*64) <= d(18).data(63 downto 0);
-      --MTPAR_signals(63 + 10*64 downto 10*64) <= d(17).data(63 downto 0);
-      --MTPAR_signals(63 + 11*64 downto 11*64) <= d(16).data(63 downto 0);
-      --MTPAR_signals(63 + 12*64 downto 12*64) <= d(15).data(63 downto 0);
-      --MTPAR_signals(63 + 13*64 downto 13*64) <= d(14).data(63 downto 0);
-      --MTPAR_signals(63 + 14*64 downto 14*64) <= d(13).data(63 downto 0);
-      --MTPAR_signals(63 + 15*64 downto 15*64) <= d(12).data(63 downto 0);
-      --MTPAR_signals(63 + 16*64 downto 16*64) <= d(11).data(63 downto 0);
-      --MTPAR_signals(63 + 17*64 - 12 downto 17*64) <= d(10).data(63 - 12 downto 0);
+      MTPAR_signals(63 + 0*64 downto 0*64) <= d(27).data(63 downto 0);
+      MTPAR_signals(63 + 1*64 downto 1*64) <= d(26).data(63 downto 0);
+      MTPAR_signals(63 + 2*64 downto 2*64) <= d(25).data(63 downto 0);
+      MTPAR_signals(63 + 3*64 downto 3*64) <= d(24).data(63 downto 0);
+      MTPAR_signals(63 + 4*64 downto 4*64) <= d(23).data(63 downto 0);
+      MTPAR_signals(63 + 5*64 downto 5*64) <= d(22).data(63 downto 0);
+      MTPAR_signals(63 + 6*64 downto 6*64) <= d(21).data(63 downto 0);
+      MTPAR_signals(63 + 7*64 downto 7*64) <= d(20).data(63 downto 0);
+      MTPAR_signals(63 + 8*64 downto 8*64) <= d(19).data(63 downto 0);
+      MTPAR_signals(63 + 9*64 downto 9*64) <= d(18).data(63 downto 0);
+      MTPAR_signals(63 + 10*64 downto 10*64) <= d(17).data(63 downto 0);
+      MTPAR_signals(63 + 11*64 downto 11*64) <= d(16).data(63 downto 0);
+      MTPAR_signals(63 + 12*64 downto 12*64) <= d(15).data(63 downto 0);
+      MTPAR_signals(63 + 13*64 downto 13*64) <= d(14).data(63 downto 0);
+      MTPAR_signals(63 + 14*64 downto 14*64) <= d(13).data(63 downto 0);
+      MTPAR_signals(63 + 15*64 downto 15*64) <= d(12).data(63 downto 0);
+      MTPAR_signals(63 + 16*64 downto 16*64) <= d(11).data(63 downto 0);
+      MTPAR_signals(63 + 17*64 - 12 downto 17*64) <= d(10).data(63 - 12 downto 0);
     
-      --bx_out <= d(9).data(2 downto 0);
+      bx_out <= d(9).data(2 downto 0);
     --end if;
   --end process;
   
