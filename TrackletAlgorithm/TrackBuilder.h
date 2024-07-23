@@ -198,7 +198,7 @@ void TrackBuilder(
         if (merger_L_top[j].valid())
           tid = merger_L_top[j].peek().getTrackletID();
       } else {
-        if (merger_D_top[j-NBarrelStubs].valid())
+        if (NDiskStubs > 0 && merger_D_top[j-NBarrelStubs].valid())
           tid = merger_D_top[j-NBarrelStubs].peek().getTrackletID();
       }
 
@@ -213,7 +213,7 @@ void TrackBuilder(
           if (merger_L_top[k].valid())
             tid2 = merger_L_top[k].peek().getTrackletID();
         } else {
-          if (merger_D_top[k-NBarrelStubs].valid())
+          if (NDiskStubs > 0 && merger_D_top[k-NBarrelStubs].valid())
             tid2 = merger_D_top[k-NBarrelStubs].peek().getTrackletID();
         }
 
@@ -467,32 +467,30 @@ void TrackBuilder(
         if (read_b2_b2_2) count_L_7[j]++;
 
       }
-      else {
-        if (NFMPerStubBarrel0 != 8 || i > 0) {
-          bool read_b1_1, read_b1_2, read_b2_1, read_b2_2;
+      else if (NFMPerStubBarrel0 != 8 || (NBarrelStubs > 1 && i > 0)) {
+        bool read_b1_1, read_b1_2, read_b2_1, read_b2_2;
 
-          merger_L_b1[j].next(barrelFullMatches[NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_0[j]),
-                               count_L_0[j] < barrelFullMatches[NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b1_1,
-                               barrelFullMatches[1+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_1[j]),
-                               count_L_1[j] < barrelFullMatches[1+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b1_2,
-                               read_1);
+        merger_L_b1[j].next(barrelFullMatches[NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_0[j]),
+                             count_L_0[j] < barrelFullMatches[NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
+                             read_b1_1,
+                             barrelFullMatches[1+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_1[j]),
+                             count_L_1[j] < barrelFullMatches[1+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
+                             read_b1_2,
+                             read_1);
 
-          if (read_b1_1) count_L_0[j]++;
-          if (read_b1_2) count_L_1[j]++;
+        if (read_b1_1) count_L_0[j]++;
+        if (read_b1_2) count_L_1[j]++;
 
-          merger_L_b2[j].next(barrelFullMatches[2+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_2[j]),
-                               count_L_2[j] < barrelFullMatches[2+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b2_1,
-                               barrelFullMatches[3+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_3[j]),
-                               count_L_3[j] < barrelFullMatches[3+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b2_2,
-                               read_2);
+        merger_L_b2[j].next(barrelFullMatches[2+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_2[j]),
+                             count_L_2[j] < barrelFullMatches[2+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
+                             read_b2_1,
+                             barrelFullMatches[3+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_3[j]),
+                             count_L_3[j] < barrelFullMatches[3+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
+                             read_b2_2,
+                             read_2);
 
-          if (read_b2_1) count_L_2[j]++;
-          if (read_b2_2) count_L_3[j]++;
-        }
+        if (read_b2_1) count_L_2[j]++;
+        if (read_b2_2) count_L_3[j]++;
       }
     }
     disk_merger : for (unsigned int j = 0 ; j < NDiskStubs; j++) {
