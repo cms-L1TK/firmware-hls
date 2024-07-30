@@ -1327,7 +1327,9 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddr> projseq0123 = ~tmp;
   ap_uint<kNBits_MemAddr> projseq01 = ~tmp; 
   ap_uint<kNBits_MemAddr> projseq23 = ~tmp; 
+  ap_uint<kNBits_MemAddr> bestProjSeq(0); 
 
+  ap_uint<AllProjection<APTYPE>::kAllProjectionSize> projBuffer[1<<kNBits_MemAddr];
   
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
@@ -1398,6 +1400,8 @@ void MatchProcessor(BXType bx,
 
     hasMatch = (!emptys[bestiMEU]) && cleanpipeline[bestiMEU];
 
+    bestProjSeq = projseqs[bestiMEU];
+    
     projseq0123 = (projseq01 < projseq23) ? projseq01 : projseq23;
     
     projseq01 = (matchengine[0].getProjSeqStart() < matchengine[1].getProjSeqStart()) ? matchengine[0].getProjSeqStart() : matchengine[1].getProjSeqStart();
@@ -1427,6 +1431,8 @@ void MatchProcessor(BXType bx,
     if (anyidle && !empty) {
       projbufferarray.advance();
     }
+
+    projBuffer[istep] = tmpprojbuff.getAllProj();
     
     bool init = false;
   MEU_LOOP: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
@@ -1461,10 +1467,10 @@ void MatchProcessor(BXType bx,
     if(hasMatch) {
  
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
-      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
-      
-      (stubindex,allprojdata) = matches[bestiMEU];
-      AllProjection<APTYPE> allproj(allprojdata);
+
+      stubindex = matches[bestiMEU];
+
+      AllProjection<APTYPE> allproj = projBuffer[bestProjSeq];
 
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
     
