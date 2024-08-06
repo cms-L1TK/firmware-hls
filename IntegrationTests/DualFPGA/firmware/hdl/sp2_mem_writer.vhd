@@ -49,6 +49,15 @@ architecture rtl of sp2_mem_writer is
   signal MPAR_73_din_int : t_arr_MTPAR_73_DATA          := (others => (others => '0'));
   signal PC_start_int    : std_logic                    := '0';
 
+  signal AS_36_wea_pipeline         : t_arr_AS_36_1b               := (others => '0');
+  signal AS_36_writeaddr_pipeline   : t_arr_AS_36_ADDR             := (others => (others => '0'));
+  signal AS_36_din_pipeline         : t_arr_AS_36_DATA             := (others => (others => '0'));
+  signal MPAR_73_wea_pipeline       : t_arr_MTPAR_73_1b            := (others => '0');
+  signal MPAR_73_writeaddr_pipeline : t_arr_MTPAR_73_ADDR          := (others => (others => '0'));
+  signal MPAR_73_din_pipeline       : t_arr_MTPAR_73_DATA          := (others => (others => '0'));
+  signal PC_bx_in_pipeline          : std_logic_vector(2 downto 0) := "000";
+  signal PC_start_pipeline          : std_logic                    := '0';
+
 begin -- architecture rtl
   
   p_writemem : process (clk) is
@@ -112,20 +121,34 @@ begin -- architecture rtl
 
   --build full memory addresses based on word, page, and BX
   g_as_address : for i in AS_36_writeaddr'range generate
-    AS_36_writeaddr(i) <= bx_prev & AS_36_adr(i);
+    AS_36_writeaddr_pipeline(i) <= bx_prev & AS_36_adr(i);
   end generate g_as_address;
 
   g_mpar_address : for i in MPAR_73_writeaddr'range generate
-    MPAR_73_writeaddr(i) <= bx_prev & MPAR_73_pge(i) & MPAR_73_adr(i)(to_integer(unsigned(MPAR_73_pge(i))));
+    MPAR_73_writeaddr_pipeline(i) <= bx_prev & MPAR_73_pge(i) & MPAR_73_adr(i)(to_integer(unsigned(MPAR_73_pge(i))));
   end generate g_mpar_address;
   
   bx_change <= bx_prev xor bx_link_data;
-  AS_36_wea <= AS_36_wea_int;
-  MPAR_73_wea <= MPAR_73_wea_int;
-  AS_36_din <= AS_36_din_int;
-  MPAR_73_din <= MPAR_73_din_int;
-  PC_bx_in <= std_logic_vector(unsigned(bx_prev)-1);
-  PC_start <= PC_start_int;
+  AS_36_wea_pipeline <= AS_36_wea_int;
+  MPAR_73_wea_pipeline <= MPAR_73_wea_int;
+  AS_36_din_pipeline <= AS_36_din_int;
+  MPAR_73_din_pipeline <= MPAR_73_din_int;
+  PC_bx_in_pipeline <= std_logic_vector(unsigned(bx_prev)-1);
+  PC_start_pipeline <= PC_start_int;
   --PC_bx_in <= bx_prev;
+
+  p_pipeline : process (clk) is
+  begin -- process p_pipeline
+    if rising_edge(clk) then -- rising clock edge
+      AS_36_wea         <= AS_36_wea_pipeline;
+      AS_36_writeaddr   <= AS_36_writeaddr_pipeline;
+      AS_36_din         <= AS_36_din_pipeline;
+      MPAR_73_wea       <= MPAR_73_wea_pipeline;
+      MPAR_73_writeaddr <= MPAR_73_writeaddr_pipeline;
+      MPAR_73_din       <= MPAR_73_din_pipeline;
+      PC_bx_in          <= PC_bx_in_pipeline;
+      PC_start          <= PC_start_pipeline;
+    end if;
+  end process;
 
 end architecture rtl;
