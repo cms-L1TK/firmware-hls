@@ -44,6 +44,71 @@ architecture rtl of emp_payload is
   signal MTPAR_signals : std_logic_vector(15*76 - 1 downto 0);
   signal bx_out : std_logic_vector(2 downto 0);
   
+  signal AS_L1PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHIEn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHIFn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHIGn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L1PHIHn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L2PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L2PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L2PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L2PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L3PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L3PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L3PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L3PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L4PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L4PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L4PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L4PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L5PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L5PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L5PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L5PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L6PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L6PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L6PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_L6PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D1PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D1PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D1PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D1PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D2PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D2PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D2PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D2PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D3PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D3PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D3PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D3PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D4PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D4PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D4PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D4PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D5PHIAn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D5PHIBn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D5PHICn1_stream_V_dout : std_logic_vector(36 downto 0);
+  signal AS_D5PHIDn1_stream_V_dout : std_logic_vector(36 downto 0);
+
+  signal MTPAR_L5L6ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_L2L3ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_L3L4AB_stream_V_dout   : std_logic_vector(75 downto 0);
+  signal MTPAR_L3L4CD_stream_V_dout   : std_logic_vector(75 downto 0);
+  signal MTPAR_L2D1ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_L1D1ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_L1D1EFGH_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_D1D2ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_D3D4ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_L1L2ABCD_stream_V_dout : std_logic_vector(75 downto 0);
+  signal MTPAR_L1L2JLK_stream_V_dout  : std_logic_vector(75 downto 0);
+  signal MTPAR_L1L2DF_stream_V_dout   : std_logic_vector(75 downto 0);
+  signal MTPAR_L1L2GI_stream_V_dout   : std_logic_vector(75 downto 0);
+  signal MTPAR_L1L2E_stream_V_dout    : std_logic_vector(75 downto 0);
+  signal MTPAR_L1L2H_stream_V_dout    : std_logic_vector(75 downto 0);
+  
 begin
 
   -- This example code sends 156-word-long TMUX18 packets (i.e. same packet length as track finder output)
@@ -144,7 +209,74 @@ begin
       MTPAR_signals(63 + 17*64 - 12 downto 17*64) <= d(10).data(63 - 12 downto 0);
     
       bx_out <= d(9).data(2 downto 0);
+      
+      --reassemble sector processor signals
+      AS_L1PHIAn1_stream_V_dout <= AS_signals(36 downto 0);
+      AS_L1PHIBn1_stream_V_dout <= AS_signals(36 + 1*37 downto 1*37);
+      AS_L1PHICn1_stream_V_dout <= AS_signals(36 + 2*37 downto 2*37);
+      AS_L1PHIDn1_stream_V_dout <= AS_signals(36 + 3*37 downto 3*37);
+      AS_L1PHIEn1_stream_V_dout <= AS_signals(36 + 4*37 downto 4*37);
+      AS_L1PHIFn1_stream_V_dout <= AS_signals(36 + 5*37 downto 5*37);
+      AS_L1PHIGn1_stream_V_dout <= AS_signals(36 + 6*37 downto 6*37);
+      AS_L1PHIHn1_stream_V_dout <= AS_signals(36 + 7*37 downto 7*37);
+      AS_L2PHIAn1_stream_V_dout <= AS_signals(36 + 8*37 downto 8*37);
+      AS_L2PHIBn1_stream_V_dout <= AS_signals(36 + 9*37 downto 9*37);
+      AS_L2PHICn1_stream_V_dout <= AS_signals(36 + 10*37 downto 10*37);
+      AS_L2PHIDn1_stream_V_dout <= AS_signals(36 + 11*37 downto 11*37);
+      AS_L3PHIAn1_stream_V_dout <= AS_signals(36 + 12*37 downto 12*37);
+      AS_L3PHIBn1_stream_V_dout <= AS_signals(36 + 13*37 downto 13*37);
+      AS_L3PHICn1_stream_V_dout <= AS_signals(36 + 14*37 downto 14*37);
+      AS_L3PHIDn1_stream_V_dout <= AS_signals(36 + 15*37 downto 15*37);
+      AS_L4PHIAn1_stream_V_dout <= AS_signals(36 + 16*37 downto 16*37);
+      AS_L4PHIBn1_stream_V_dout <= AS_signals(36 + 17*37 downto 17*37);
+      AS_L4PHICn1_stream_V_dout <= AS_signals(36 + 18*37 downto 18*37);
+      AS_L4PHIDn1_stream_V_dout <= AS_signals(36 + 19*37 downto 19*37);
+      AS_L5PHIAn1_stream_V_dout <= AS_signals(36 + 20*37 downto 20*37);
+      AS_L5PHIBn1_stream_V_dout <= AS_signals(36 + 21*37 downto 21*37);
+      AS_L5PHICn1_stream_V_dout <= AS_signals(36 + 22*37 downto 22*37);
+      AS_L5PHIDn1_stream_V_dout <= AS_signals(36 + 23*37 downto 23*37);
+      AS_L6PHIAn1_stream_V_dout <= AS_signals(36 + 24*37 downto 24*37);
+      AS_L6PHIBn1_stream_V_dout <= AS_signals(36 + 25*37 downto 25*37);
+      AS_L6PHICn1_stream_V_dout <= AS_signals(36 + 26*37 downto 26*37);
+      AS_L6PHIDn1_stream_V_dout <= AS_signals(36 + 27*37 downto 27*37);
+      AS_D1PHIAn1_stream_V_dout <= AS_signals(36 + 28*37 downto 28*37);
+      AS_D1PHIBn1_stream_V_dout <= AS_signals(36 + 29*37 downto 29*37);
+      AS_D1PHICn1_stream_V_dout <= AS_signals(36 + 30*37 downto 30*37);
+      AS_D1PHIDn1_stream_V_dout <= AS_signals(36 + 31*37 downto 31*37);
+      AS_D2PHIAn1_stream_V_dout <= AS_signals(36 + 32*37 downto 32*37);
+      AS_D2PHIBn1_stream_V_dout <= AS_signals(36 + 33*37 downto 33*37);
+      AS_D2PHICn1_stream_V_dout <= AS_signals(36 + 34*37 downto 34*37);
+      AS_D2PHIDn1_stream_V_dout <= AS_signals(36 + 35*37 downto 35*37);
+      AS_D3PHIAn1_stream_V_dout <= AS_signals(36 + 36*37 downto 36*37);
+      AS_D3PHIBn1_stream_V_dout <= AS_signals(36 + 37*37 downto 37*37);
+      AS_D3PHICn1_stream_V_dout <= AS_signals(36 + 38*37 downto 38*37);
+      AS_D3PHIDn1_stream_V_dout <= AS_signals(36 + 39*37 downto 39*37);
+      AS_D4PHIAn1_stream_V_dout <= AS_signals(36 + 40*37 downto 40*37);
+      AS_D4PHIBn1_stream_V_dout <= AS_signals(36 + 41*37 downto 41*37);
+      AS_D4PHICn1_stream_V_dout <= AS_signals(36 + 42*37 downto 42*37);
+      AS_D4PHIDn1_stream_V_dout <= AS_signals(36 + 43*37 downto 43*37);
+      AS_D5PHIAn1_stream_V_dout <= AS_signals(36 + 44*37 downto 44*37);
+      AS_D5PHIBn1_stream_V_dout <= AS_signals(36 + 45*37 downto 45*37);
+      AS_D5PHICn1_stream_V_dout <= AS_signals(36 + 46*37 downto 46*37);
+      AS_D5PHIDn1_stream_V_dout <= AS_signals(36 + 47*37 downto 47*37);
+
+      MTPAR_L5L6ABCD_stream_V_dout <= MTPAR_signals(75 downto 0);
+      MTPAR_L2L3ABCD_stream_V_dout <= MTPAR_signals(75 + 76*1 downto 76*1);
+      MTPAR_L3L4AB_stream_V_dout   <= MTPAR_signals(75 + 76*2 downto 76*2);
+      MTPAR_L3L4CD_stream_V_dout   <= MTPAR_signals(75 + 76*3 downto 76*3);
+      MTPAR_L2D1ABCD_stream_V_dout <= MTPAR_signals(75 + 76*4 downto 76*4);
+      MTPAR_L1D1ABCD_stream_V_dout <= MTPAR_signals(75 + 76*5 downto 76*5);
+      MTPAR_L1D1EFGH_stream_V_dout <= MTPAR_signals(75 + 76*6 downto 76*6);
+      MTPAR_D1D2ABCD_stream_V_dout <= MTPAR_signals(75 + 76*7 downto 76*7);
+      MTPAR_D3D4ABCD_stream_V_dout <= MTPAR_signals(75 + 76*8 downto 76*8);
+      MTPAR_L1L2ABCD_stream_V_dout <= MTPAR_signals(75 + 76*9 downto 76*9);
+      MTPAR_L1L2JLK_stream_V_dout  <= MTPAR_signals(75 + 76*10 downto 76*10);
+      MTPAR_L1L2DF_stream_V_dout   <= MTPAR_signals(75 + 76*11 downto 76*11);
+      MTPAR_L1L2GI_stream_V_dout   <= MTPAR_signals(75 + 76*12 downto 76*12);
+      MTPAR_L1L2E_stream_V_dout    <= MTPAR_signals(75 + 76*13 downto 76*13);
+      MTPAR_L1L2H_stream_V_dout    <= MTPAR_signals(75 + 76*14 downto 76*14);
+       
     --end if;
-  --end process;
-  
+  --end process
+       
 end rtl;
