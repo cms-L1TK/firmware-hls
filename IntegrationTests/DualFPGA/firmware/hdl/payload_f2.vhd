@@ -297,7 +297,7 @@ begin
           probe_out15 => MTPAR_L1L2H_stream_V_dout
         );
 
-  ipb_out <= AS_L1PHIAn1_stream_V_dout;
+  ipb_out.ipb_rdata <= AS_L1PHIAn1_stream_V_dout;
   
     --end if;
   --end process
