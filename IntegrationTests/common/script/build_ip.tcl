@@ -14,4 +14,5 @@ proc build_ip {top_function} {
     cd $cwd
     csynth_design
     export_design -format ip_catalog
+    exec common/script/trim_dangling_ports.py $top_function/solution
 }
