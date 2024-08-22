@@ -12,7 +12,13 @@ def getDanglingPorts():
       if "is left dangling" not in line:
         continue
       portName = line.split()[4].split("/")[1][0:-1]
-      danglingPorts.append(portName)
+
+      # FIXME: A subset of the projin_nentries_* ports of the MPs are marked as
+      # dangling, and it is unclear why these particular subsets would be
+      # dangling. For now, they are left in the designs.
+      if not portName.startswith("projin_nentries_"):
+        danglingPorts.append(portName)
+
   return (topFunction, danglingPorts)
 
 def trimVHDLFile(fileName):
