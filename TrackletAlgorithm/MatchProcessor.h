@@ -70,9 +70,10 @@ namespace PR
 
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
-  bool read_input_mems(BXType bx,
+  void read_input_mems(BXType bx,
+                       bool &read_is_valid,
                        ap_uint<nMEM>& mem_hasdata,
-                       ap_uint<NBits_Entries> nentries[nMEM],
+                       const ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // Memory pointers
 		       const IMemType iMem[nMEM],
@@ -83,7 +84,8 @@ namespace PR
 #pragma HLS inline
 #pragma HLS ARRAY_PARTITION variable=iPage
 #pragma HLS ARRAY_PARTITION variable=iMem
-    if (mem_hasdata == 0) return false;
+
+    const bool any_mem_hasdata = (mem_hasdata != 0);
 
     ap_uint<kNBits_MemAddr> read_addr_next = read_addr + 1;
 
@@ -94,16 +96,18 @@ namespace PR
     read_inmem<DataType, MemType, nMEM>(data, bx, //read_imem,
 					read_addr, iMem[read_imem], iPage[read_imem], mem);
 
-    if (read_addr_next >= nentries[read_imem]) {
-      // All entries in the memory[read_imem] have been read out
-      // Prepare to move to the next non-empty memory
-      read_addr = 0;
-      mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
-    } else {
-      read_addr = read_addr_next;
+    if (read_is_valid) {
+      if (read_addr_next >= nentries[read_imem]) {
+        // All entries in the memory[read_imem] have been read out
+        // Prepare to move to the next non-empty memory
+        read_addr = 0;
+        mem_hasdata.clear(any_mem_hasdata ? read_imem : IMemType(0));  // set the current lowest 1 bit to 0
+      } else {
+        read_addr = read_addr_next;
+      }
     }
 
-    return true;
+    read_is_valid = read_is_valid && any_mem_hasdata;
     
   } // read_input_mems
 
@@ -1600,18 +1604,13 @@ void MatchProcessor(BXType bx,
     projdata_ = projdata;
     validin_ = validin;
 
-    if (!projBuffNearFull){
-      
-      // read inputs
-      validin = read_input_mems<TrackletProjection<PROJTYPE>,
-      TrackletProjectionMemory<PROJTYPE>,
-      nMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
-         projin, projdata);
- 
-    } else {
-      validin = false;
-    }// end if not near full
+    // read inputs
+    validin = !projBuffNearFull;
+    read_input_mems<TrackletProjection<PROJTYPE>,
+    TrackletProjectionMemory<PROJTYPE>,
+    nMEM, kNBits_MemAddr+1>
+    (bx, validin, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
+       projin, projdata);
 
   } //end loop
 
