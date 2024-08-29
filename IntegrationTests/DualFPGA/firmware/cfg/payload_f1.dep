@@ -17,6 +17,7 @@ src --vhdl2008 common/hdl/tf_mem.vhd
 src --vhdl2008 common/hdl/tf_merge_streamer.vhd
 src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/tf_pipe_delay.vhd
+src --vhdl2008 common/hdl/tf_pipe_delay_single.vhd
 
 ################
 # Include Cores

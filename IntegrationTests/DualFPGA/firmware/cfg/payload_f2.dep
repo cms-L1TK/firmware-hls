@@ -28,6 +28,7 @@ src --vhdl2008 common/hdl/tf_mem_tproj.vhd
 src --vhdl2008 common/hdl/mem_reader.vhd
 src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/tf_pipe_delay.vhd
+src --vhdl2008 common/hdl/tf_pipe_delay_single.vhd
 
 #floorplan
 src ../ucf/floorplan.tcl
