@@ -1654,9 +1654,6 @@ void MatchProcessor(BXType bx,
     read_inmem<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM>(projdata, bx, read_address, imem, ipage, projin);
 
     // read inputs
-    //validin = read_input_mems<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM, kNBits_MemAddr+1>
-    //(bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, projin, projdata);
-
     validmem = !projBuffNearFull;
     read_address =  mem_read_addr;
     read_input_mems<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM, kNBits_MemAddr+1>
