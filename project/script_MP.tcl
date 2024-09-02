@@ -12,7 +12,6 @@ set modules_to_test {
     {MP_L4PHIC}
     {MP_L6PHIC}
     {MP_D1PHIC}
-    {MP_D2PHIC}
     {MP_D4PHIC}
     {MP_D5PHIC}
 }
@@ -23,6 +22,7 @@ set modules_to_test {
 # pipelining step before the match calculator. Will undo once the emulation
 # is upddated
 #    {MP_L5PHIC}
+#    {MP_D2PHIC}
 #    {MP_D3PHIC}
 
 
