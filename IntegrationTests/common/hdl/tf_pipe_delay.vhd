@@ -19,6 +19,7 @@ use work.tf_pkg.all;
 
 entity tf_pipe_delay is
   generic (
+    PAGE_LENGTH : natural := PAGE_LENGTH;
     DELAY : natural := 1;
     RAM_WIDTH: natural := 14;
     NUM_PAGES: natural := 2;

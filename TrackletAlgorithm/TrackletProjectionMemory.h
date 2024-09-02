@@ -243,7 +243,7 @@ private:
 };
 
 // Memory definition
-template<int TProjType> using TrackletProjectionMemory = MemoryTemplateTPROJ<TrackletProjection<TProjType>, 1, kNBits_MemAddr, 4>;
+template<int TProjType> using TrackletProjectionMemory = MemoryTemplateTPROJ<TrackletProjection<TProjType>, 1, kNBits_MemAddr-1, 4>;
 // FIXME: double check number of bits for bx and for memory address
 
 #endif
