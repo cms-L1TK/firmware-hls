@@ -8863,5 +8863,5 @@ set_property USER_CLUSTER cluster_payload_MPD5PHID [get_cells -quiet [list \
 #          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHID_DELAY0/dina_pipe_reg[1]* \
 #          ]]
 
-set_property MAX_FANOUT 10000 [get_nets payload/kf_wrapper_1/kfout_top_1/OutObjectsToPacketsInstance/g1[0].RAMreset*]
-set_property MAX_FANOUT 10000 [get_nets payload/kf_wrapper_1/kfout_top_1/OutObjectsToPacketsInstance/g1[1].RAMreset*]
+#set_property MAX_FANOUT 10000 [get_nets payload/kf_wrapper_1/kfout_top_1/OutObjectsToPacketsInstance/g1[0].RAMreset*]
+#set_property MAX_FANOUT 10000 [get_nets payload/kf_wrapper_1/kfout_top_1/OutObjectsToPacketsInstance/g1[1].RAMreset*]
