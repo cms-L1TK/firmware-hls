@@ -127,6 +127,20 @@ static const ap_uint<(1 << kNBitsBuffer)> nextUnit() {
   return lut;
 }
 
+template<int kNBitsBuffer>
+static const ap_uint<(1 << (2 * kNBitsBuffer))> isLessThan() {
+  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
+#pragma HLS unroll
+    ap_uint<kNBitsBuffer> wptr, rptr;
+    ap_uint<2 * kNBitsBuffer> address(i);
+    (rptr,wptr) = address;
+    bool result = rptr<wptr;
+    lut[i] = result;
+  }
+  return lut;
+}
+
 template<int nbits, int max, bool lessThan>
 static const ap_uint<1 << nbits> isLessThanSize() {
   ap_uint<1 << nbits> tab(0);

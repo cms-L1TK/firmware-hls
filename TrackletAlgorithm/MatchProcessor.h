@@ -1370,12 +1370,18 @@ void MatchProcessor(BXType bx,
 
     //New code -- updated to reduce timing, compare all projseqs in one stage instead of two
 
-    ap_uint<1> Bit10 = projseqs[1] < projseqs[0];
-    ap_uint<1> Bit20 = projseqs[2] < projseqs[0];
-    ap_uint<1> Bit30 = projseqs[3] < projseqs[0];
-    ap_uint<1> Bit21 = projseqs[2] < projseqs[1];
-    ap_uint<1> Bit31 = projseqs[3] < projseqs[1];
-    ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
+    //ap_uint<1> Bit10 = projseqs[1] < projseqs[0];
+    //ap_uint<1> Bit20 = projseqs[2] < projseqs[0];
+    //ap_uint<1> Bit30 = projseqs[3] < projseqs[0];
+    //ap_uint<1> Bit21 = projseqs[2] < projseqs[1];
+    //ap_uint<1> Bit31 = projseqs[3] < projseqs[1];
+    //ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
+    const ap_uint<1> Bit10 = isLessThan<kNBits_MemAddr>()[(projseqs[1], projseqs[0])];
+    const ap_uint<1> Bit20 = isLessThan<kNBits_MemAddr>()[(projseqs[2], projseqs[0])];
+    const ap_uint<1> Bit30 = isLessThan<kNBits_MemAddr>()[(projseqs[3], projseqs[0])];
+    const ap_uint<1> Bit21 = isLessThan<kNBits_MemAddr>()[(projseqs[2], projseqs[1])];
+    const ap_uint<1> Bit31 = isLessThan<kNBits_MemAddr>()[(projseqs[3], projseqs[1])];
+    const ap_uint<1> Bit32 = isLessThan<kNBits_MemAddr>()[(projseqs[3], projseqs[2])];
 
     bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
 
