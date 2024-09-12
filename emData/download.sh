@@ -155,6 +155,9 @@ cp ../LUTsCM2/memorymodules.dat reducedcm2_memorymodules.dat
 cp ../LUTsCMBarrel/wires.dat cmbarrel_wires.dat
 cp ../LUTsCMBarrel/processingmodules.dat cmbarrel_processingmodules.dat
 cp ../LUTsCMBarrel/memorymodules.dat cmbarrel_memorymodules.dat
+cp ../LUTsSplit/wires.dat fpga1_wires.dat
+cp ../LUTsSplit/processingmodules.dat fpga1_processingmodules.dat
+cp ../LUTsSplit/memorymodules.dat fpga1_memorymodules.dat
 # grep, awk, and sed should be fixed in CMSSW - no we can use the config from
 # CMSSW instead of a hand made configuration. But it still needs tweaking...
 grep -v vmstuboutPHI ../LUTsSplit/wires.dat | grep -v TP_ | grep -v IR_ > fpga2_wires.dat
@@ -197,6 +200,7 @@ echo "TrackletParameters: MPAR_L2D1ABCDin [73]" >> fpga2_memorymodules.dat
 
 grep -v TP_ ../LUTsSplit/processingmodules.dat | grep -v VMR_ | grep -v IR_ > fpga2_processingmodules.dat
 sed -i 's/VMStubMERouter/VMSMERouter/g' fpga2_processingmodules.dat
+sed -i 's/VMStubMERouter/VMSMERouter/g' fpga1_processingmodules.dat
 
 ./makeReducedConfig.py --no-graph -t "TP" -s "C" -o "reducedcm_"
 cp -fv ../LUTsCM2/wires.dat ../LUTsCM2/memorymodules.dat ../LUTsCM2/processingmodules.dat ./
@@ -226,16 +230,15 @@ mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../Integra
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedBarrelConfig/tb/
 ### Combined IRtoTP
 echo "CombinedIRtoTP"
-cp -fv ../LUTsCM/wires.dat ../LUTsCM/memorymodules.dat ../LUTsCM/processingmodules.dat ./
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1 -sp
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w wires.dat -p processingmodules.dat -m memorymodules.dat -de 1 -x -sp
-mkdir -p ../../IntegrationTests/CombinedConfig/IRtoTP/{hdl,tb}
-mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/hdl/
-mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig/IRtoTP/tb/
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -de 1 -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -de 1 -x -sp 1
+mkdir -p ../../IntegrationTests/CombinedConfig_FPGA1/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA1/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA1/tb/
 ### Combined PC/VMSMER to TB
 echo "CM FPGA2"
-./generator_hdl.py ../../ --no_graph --split --fpga2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
-./generator_hdl.py ../../ --no_graph --split --fpga2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/

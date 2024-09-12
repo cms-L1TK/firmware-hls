@@ -127,8 +127,7 @@ std::cout<<module_name[MODULE_];
   // print the input files loaded
   std::cout << "Loaded the input files:\n";
   for (unsigned i = 0; i < nInnerStubMems; i++)
-   //(i+2)%nInnerStubMems has the innerstubs match the order in the emulation
-    std::cout << "\t" << tb.fileNames(innerStubPattern).at((i+2)%nInnerStubMems) << "\n";
+    std::cout << "\t" << tb.fileNames(innerStubPattern).at(i) << "\n";
   for (unsigned i = 0; i < nOuterStubMems; i++)
     std::cout << "\t" << tb.fileNames(outerStubPattern).at(i) << "\n";
   for (unsigned i = 0; i < nOuterVMStubMems; i++)
@@ -142,7 +141,7 @@ std::cout<<module_name[MODULE_];
 
     // read event and write to memories
     for (unsigned i = 0; i < nInnerStubMems; i++)
-      writeMemFromFile<AllStubInnerMemory<InnerStubType> >(innerStubs[i], fin_innerStubs.at((i+2)%nInnerStubMems), ievt);
+      writeMemFromFile<AllStubInnerMemory<InnerStubType> >(innerStubs[i], fin_innerStubs.at(i), ievt);
     for (unsigned i = 0; i < nOuterStubMems; i++)
       writeMemFromFile<AllStubMemory<OuterStubType> >(outerStubs[i], fin_outerStubs.at(i), ievt);
     for (unsigned i = 0; i < nOuterVMStubMems; i++)
