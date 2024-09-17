@@ -280,23 +280,23 @@ begin
   vio_0 : entity work.vio_0
         port map(
           clk => clk,
-          probe_out0 => AS_L1PHIAn1_stream_V_dout,
-          probe_out1 => AS_L1PHIBn1_stream_V_dout,
-          probe_out2 => AS_L1PHICn1_stream_V_dout,
-          probe_out3 => AS_L1PHIDn1_stream_V_dout,
-          probe_out4 => AS_L3PHIAn1_stream_V_dout,
-          probe_out5 => AS_L5PHIDn1_stream_V_dout,
-          probe_out6 => AS_L6PHICn1_stream_V_dout,
-          probe_out7 => AS_D1PHIAn1_stream_V_dout,
-          probe_out8 => AS_D2PHIAn1_stream_V_dout,
-          probe_out9 => AS_D4PHIDn1_stream_V_dout,
-          probe_out10 => MTPAR_L5L6ABCD_stream_V_dout,
-          probe_out11 => MTPAR_L2L3ABCD_stream_V_dout,
-          probe_out12 => MTPAR_L3L4AB_stream_V_dout,
-          probe_out13 => MTPAR_L3L4CD_stream_V_dout,
-          probe_out14 => MTPAR_D1D2ABCD_stream_V_dout,
-          probe_out15 => MTPAR_L1L2H_stream_V_dout,
-          probe_out16 => clk40
+          probe_in0 => AS_L1PHIAn1_stream_V_dout,
+          probe_in1 => AS_L1PHIBn1_stream_V_dout,
+          probe_in2 => AS_L1PHICn1_stream_V_dout,
+          probe_in3 => AS_L1PHIDn1_stream_V_dout,
+          probe_in4 => AS_L3PHIAn1_stream_V_dout,
+          probe_in5 => AS_L5PHIDn1_stream_V_dout,
+          probe_in6 => AS_L6PHICn1_stream_V_dout,
+          probe_in7 => AS_D1PHIAn1_stream_V_dout,
+          probe_in8 => AS_D2PHIAn1_stream_V_dout,
+          probe_in9 => AS_D4PHIDn1_stream_V_dout,
+          probe_in10 => MTPAR_L5L6ABCD_stream_V_dout,
+          probe_in11 => MTPAR_L2L3ABCD_stream_V_dout,
+          probe_in12 => MTPAR_L3L4AB_stream_V_dout,
+          probe_in13 => MTPAR_L3L4CD_stream_V_dout,
+          probe_in14 => MTPAR_D1D2ABCD_stream_V_dout,
+          probe_in15 => MTPAR_L1L2H_stream_V_dout,
+          probe_in16 => clk40
         );
 
     ila_0 : entity work.ila_0
