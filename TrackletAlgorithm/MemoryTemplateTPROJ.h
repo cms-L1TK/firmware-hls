@@ -35,9 +35,12 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned 
 // ordering of the different TP outputs
 class MemoryTemplateTPROJ
 {
+private:
 #ifdef CMSSW_GIT_HASH
   static constexpr unsigned int NBIT_BX = 0;
 #endif
+  constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
+  constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
 
 public:
   typedef typename DataType::BitWidths BitWidths;
@@ -46,14 +49,14 @@ public:
   
 protected:
 
-  DataType dataarray_[1<<NBIT_BX][NPAGE*(1<<NBIT_ADDR)];  // data array
-  NEntryT nentries_[(1<<NBIT_BX)*NPAGE];                  // number of entries
-  ap_uint<NPAGE> mask_[1<<NBIT_BX]; //bitmask for hits
+  DataType dataarray_[DEPTH_BX][NPAGE*DEPTH_ADDR];  // data array
+  NEntryT nentries_[DEPTH_BX*NPAGE];                  // number of entries
+  ap_uint<NPAGE> mask_[DEPTH_BX]; //bitmask for hits
   
 public:
 
-  unsigned int getDepth() const {return (1<<NBIT_ADDR);}
-  unsigned int getNBX() const {return (1<<NBIT_BX);}
+  unsigned int getDepth() const {return DEPTH_ADDR;}
+  unsigned int getNBX() const {return DEPTH_BX;}
   unsigned int getNPage() const {return NPAGE;}
 
   NEntryT getEntries(BunchXingT bx, unsigned int page = 0) const {
@@ -68,13 +71,13 @@ public:
     return mask_[bx];
   }
   
-  const DataType (&get_mem() const)[1<<NBIT_BX][(1<<NBIT_ADDR)*NPAGE] {return dataarray_;}
+  const DataType (&get_mem() const)[DEPTH_BX][(DEPTH_ADDR)*NPAGE] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
   {
 	// TODO: check if valid
 	if(!NBIT_BX) ibx = 0;
-	return dataarray_[ibx][(1<<NBIT_ADDR)*page+index];
+	return dataarray_[ibx][DEPTH_ADDR*page+index];
   }
 
   template<class SpecType>
@@ -95,19 +98,15 @@ public:
   {
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < (1<<NBIT_ADDR)) {
+    if (addr_index < DEPTH_ADDR) {
       //dataarray_[ibx][addr_index] = data;
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][(1<<NBIT_ADDR)*page+addr_index] = data;
+      dataarray_[ibx][DEPTH_ADDR*page+addr_index] = data;
 #else
-      dataarray_[ibx][(1<<NBIT_ADDR)*page+nentries_[ibx*NPAGE+page]++] = data;
+      dataarray_[ibx][DEPTH_ADDR*page+nentries_[ibx*NPAGE+page]++] = data;
       mask_[ibx].set(page);
 #endif
-
-      #ifdef CMSSW_GIT_HASH
-      nentries_[ibx] = addr_index + 1;
-      #endif
       
       return true;
     } else {
@@ -127,13 +126,13 @@ public:
   void clear()
   {
     DataType data("0",16);
-    MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
+    MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
       mask_[ibx]=0;
       for (size_t page = 0; page < NPAGE; page++) {
-	nentries_[ibx*NPAGE+page] = 0;
-	for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {
-	  dataarray_[ibx][(1<<NBIT_ADDR)*page+addr] = data;
-	}
+      	nentries_[ibx*NPAGE+page] = 0;
+      	for (size_t addr=0; addr<DEPTH_ADDR; ++addr) {
+	        dataarray_[ibx][DEPTH_ADDR*page+addr] = data;
+      	}
       }
     }
   }
@@ -141,7 +140,7 @@ public:
   bool write_mem_clear(BunchXingT ibx, DataType data, NEntryT addr_index, unsigned int page)
   {
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < (1<<NBIT_ADDR)) {
+    if (addr_index < DEPTH_ADDR) {
       //FIXME - shoudl this method be removed?
       return true;
     } else {
@@ -159,13 +158,6 @@ public:
     DataType data(datastr, base);
     NEntryT nent = nentries_[ibx*NPAGE+page]; 
     bool success = write_mem(ibx, data, nent, page);
-
-#ifndef CMSSW_GIT_HASH
-    if (success) {
-      nentries_[ibx*NPAGE+page]++;
-      mask_[ibx].set(page);
-    }
-#endif
     
     return success;
   }
@@ -179,12 +171,10 @@ public:
     const std::string pagestr = split(line,' ').front();
 
     unsigned int page=4;
-
     if (pagestr=="0x00") page = 0;
     if (pagestr=="0x01") page = 1;
     if (pagestr=="0x02") page = 2;
     if (pagestr=="0x03") page = 3;
-
     assert(page<4);
 
     if(!NBIT_BX) ibx = 0;
@@ -192,11 +182,6 @@ public:
     NEntryT nent = nentries_[ibx*NPAGE+page];
     bool success = write_mem(ibx, data, nent, page);
 
-    /*
-      #ifndef CMSSW_GIT_HASH
-      if (success) nentries_[ibx] ++;
-      #endif
-    */
     return success;
   }
 
@@ -209,7 +194,7 @@ public:
 
   void print_entry(BunchXingT bx, NEntryT index, unsigned int page = 0) const
   {
-	print_data(dataarray_[bx][(1<<NBIT_ADDR)*page+index]);
+  	print_data(dataarray_[bx][DEPTH_ADDR*page+index]);
   }
 
   void print_mem(BunchXingT bx) const {
@@ -223,7 +208,7 @@ public:
 
   void print_mem() const
   {
-    for (unsigned int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
+    for (unsigned int ibx = 0; ibx < DEPTH_BX; ++ibx) {
       for (unsigned int page = 0; page < NPAGE; ++page) {
 	for (unsigned int i = 0; i < nentries_[ibx*NPAGE+page]; ++i) {
 	  edm::LogVerbatim("L1trackHLS") << ibx << " " << page << " " << i << " ";

@@ -31,10 +31,14 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR>
 // (1<<NBIT_ADDR): depth of the memory for each BX
 class MemoryTemplate
 {
+private:
 #ifdef CMSSW_GIT_HASH
   static constexpr unsigned int NBIT_BX = 0;
 #endif
 
+  constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
+  constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
+  
 public:
   typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
@@ -42,20 +46,20 @@ public:
   
 protected:
 
-  DataType dataarray_[1<<NBIT_BX][1<<NBIT_ADDR];  // data array
-  NEntryT nentries_[1<<NBIT_BX];                  // number of entries
+  DataType dataarray_[DEPTH_BX][DEPTH_ADDR];  // data array
+  NEntryT nentries_[DEPTH_BX];                  // number of entries
   
 public:
 
-  unsigned int getDepth() const {return (1<<NBIT_ADDR);}
-  unsigned int getNBX() const {return (1<<NBIT_BX);}
+  unsigned int getDepth() const {return DEPTH_ADDR;}
+  unsigned int getNBX() const {return DEPTH_BX;}
 
   NEntryT getEntries(BunchXingT bx) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 	return nentries_[bx];
   }
 
-  const DataType (&get_mem() const)[1<<NBIT_BX][1<<NBIT_ADDR] {return dataarray_;}
+  const DataType (&get_mem() const)[DEPTH_BX][DEPTH_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
@@ -108,7 +112,7 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < (1<<NBIT_ADDR)) {
+    if (addr_index < DEPTH_ADDR) {
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
       dataarray_[ibx][0] = data;
@@ -126,26 +130,21 @@ public:
     }
   }
 
-    bool write_mem_new(BunchXingT ibx, DataType data, NEntryT addr_index)
+    bool write_mem_new(BunchXingT ibx, DataType data, ap_uint<1> overwrite)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
-    if (addr_index < (1<<NBIT_ADDR)) {
-      //dataarray_[ibx][addr_index] = data;
+    if (nentries_[ibx] < DEPTH_ADDR) {
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
       dataarray_[ibx][0] = data;
 #else
-      if(addr_index == 0) {
+      if(overwrite == 0) {
 	dataarray_[ibx][nentries_[ibx]++] = data;
       } else {
 	dataarray_[ibx][nentries_[ibx]-1] = data;
       }
-#endif
-
-      #ifdef CMSSW_GIT_HASH
-      nentries_[ibx] = addr_index + 1;
 #endif
 
       return true;
@@ -166,9 +165,9 @@ public:
   void clear()
   {
     DataType data("0",16);
-    MEM_RST: for (size_t ibx=0; ibx<(1<<NBIT_BX); ++ibx) {
+    MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
       nentries_[ibx] = 0;
-      for (size_t addr=0; addr<(1<<NBIT_ADDR); ++addr) {
+      for (size_t addr=0; addr<DEPTH_ADDR; ++addr) {
         write_mem(ibx,data,addr);
       }
     }
@@ -212,7 +211,7 @@ public:
 
   void print_mem() const
   {
-	for (unsigned int ibx = 0; ibx < (1<<NBIT_BX); ++ibx) {
+	for (unsigned int ibx = 0; ibx < DEPTH_BX; ++ibx) {
 	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
 	    edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
 	    print_entry(ibx,i);
