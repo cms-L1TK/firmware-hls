@@ -37,7 +37,6 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned 
 class MemoryTemplateBinnedCM{
 
  private:
-
 #ifdef CMSSW_GIT_HASH
   static constexpr bool isCMSSW = true;
   static constexpr unsigned int NBIT_BX = 0;
@@ -47,11 +46,11 @@ class MemoryTemplateBinnedCM{
   static constexpr unsigned int NCP = NCOPY;
 #endif
 
-  constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
-  constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
-  constexpr unsigned int DEPTH_BIN = 1<<NBIT_BIN;
- 
  public:
+  static constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
+  static constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
+  static constexpr unsigned int DEPTH_BIN = 1<<NBIT_BIN;
+ 
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR-NBIT_BIN> NEntryT;
 

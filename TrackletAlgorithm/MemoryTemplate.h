@@ -35,11 +35,11 @@ private:
 #ifdef CMSSW_GIT_HASH
   static constexpr unsigned int NBIT_BX = 0;
 #endif
-
-  constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
-  constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
   
 public:
+  static constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
+  static constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
+
   typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR> NEntryT;
