@@ -2,6 +2,10 @@
 #ifndef TrackletAlgorithm_MemoryTemplateTPROJ_h
 #define TrackletAlgorithm_MemoryTemplateTPROJ_h
 
+// L1 Track CMSSW Future SW currently assumes only 1 FPGA used,
+// and hence 1 page of memory.
+#define CMSSW_1FPGA
+
 #include <iostream>
 #include "../TestBenches/FileReadUtility.h"
 
@@ -21,7 +25,11 @@ template<int> class AllStub;
 #endif
 
 #ifdef CMSSW_GIT_HASH
+#ifdef CMSSW_1FPGA
+template<class DataType, unsigned int DUMMYA, unsigned int NBIT_ADDR, unsigned int DUMMYB >
+#else
 template<class DataType, unsigned int DUMMY, unsigned int NBIT_ADDR, unsigned int NPAGE = 4 >
+#endif
 #else
 template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned int NPAGE = 4 >
 #endif
@@ -38,11 +46,15 @@ class MemoryTemplateTPROJ
 private:
 #ifdef CMSSW_GIT_HASH
   static constexpr unsigned int NBIT_BX = 0;
+#ifdef CMSSW_1FPGA
+  static constexpr unsigned int NPAGE = 1;
 #endif
-  constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
-  constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
+#endif
 
 public:
+  static constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
+  static constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
+
   typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR> NEntryT;
@@ -164,18 +176,23 @@ public:
 
   bool write_mem(BunchXingT ibx, const std::string line, int base=16)
   {
+#ifdef CMSSW_1FPGA
+    const std::string datastr = line;
+    unsigned int page = 0;
+#else
     assert(split(line,' ').size()==4);
 
     const std::string datastr = split(line,' ').back();
 
     const std::string pagestr = split(line,' ').front();
 
-    unsigned int page=4;
+    unsigned int page = 4;
     if (pagestr=="0x00") page = 0;
     if (pagestr=="0x01") page = 1;
     if (pagestr=="0x02") page = 2;
     if (pagestr=="0x03") page = 3;
     assert(page<4);
+#endif
 
     if(!NBIT_BX) ibx = 0;
     DataType data(datastr.c_str(), base);
