@@ -1500,10 +1500,10 @@ set_property USER_CLUSTER cluster_payload_FTL2D1 [get_cells -quiet [list \
 #set constraints
 
 #
-set pblock_payload_MPL1to6Lrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3 && COLUMN_INDEX<=3}] -f "RPM_X <= 4200 && RPM_X >= 800"]]
+set pblock_payload_MPL1to6Lrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3 && COLUMN_INDEX<=3}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
 add_rects_to_pblock_mod $lpblock_payload_MPL1to6L $pblock_payload_MPL1to6Lrect
 #
-set pblock_payload_MPL1to6Hrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3 && COLUMN_INDEX>=4}] -f "RPM_X <= 4200 && RPM_X >= 800"]]
+set pblock_payload_MPL1to6Hrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
 add_rects_to_pblock_mod $lpblock_payload_MPL1to6H $pblock_payload_MPL1to6Hrect
 #
 #set pblock_payload_MPD1to5Arect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=4}] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
@@ -1558,10 +1558,10 @@ set pblock_payload_MPD3Crect [find_rects [get_sites -of [get_clock_regions -f {R
 add_rects_to_pblock_mod $lpblock_payload_MPD3C $pblock_payload_MPD3Crect
 #
 #
-set pblock_payload_MPD4Arect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=6 && ROW_INDEX<=6 && COLUMN_INDEX>=1 }] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
+set pblock_payload_MPD4Arect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=6 && ROW_INDEX<=6 && COLUMN_INDEX>=1 && COLUMN_INDEX<=2 }] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
 add_rects_to_pblock_mod $lpblock_payload_MPD4A $pblock_payload_MPD4Arect
 #
-set pblock_payload_MPD4Drect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=7 && ROW_INDEX<=7 && COLUMN_INDEX>=1 }] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
+set pblock_payload_MPD4Drect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=7 && ROW_INDEX<=7 && COLUMN_INDEX>=1 && COLUMN_INDEX<=2 }] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
 add_rects_to_pblock_mod $lpblock_payload_MPD4D $pblock_payload_MPD4Drect
 #
 set pblock_payload_MPD4Brect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=4 && COLUMN_INDEX>=1 && COLUMN_INDEX<=2 }] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
