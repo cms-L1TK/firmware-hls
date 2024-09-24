@@ -246,7 +246,7 @@ begin
 
           MTPAR_L1L2H_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2H_stream_V_dout)) + 1, 76));
           MTPAR_L1L2E_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2E_stream_V_dout)) + 1, 76));
-          MTPAR_L1L2GI_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2GI_stream_V_dout)) + 1, 76);
+          MTPAR_L1L2GI_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2GI_stream_V_dout)) + 1, 76));
           MTPAR_L1L2DF_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2DF_stream_V_dout)) + 1, 76));
           MTPAR_L1L2JLK_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2JLK_stream_V_dout)) + 1, 76));
           MTPAR_L1L2ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2ABCD_stream_V_dout)) + 1, 76));
