@@ -172,6 +172,8 @@ architecture rtl of emp_payload is
   --                                                               MTPAR_L3L4AB_stream_V_dout &
   --                                                               MTPAR_L2L3ABCD_stream_V_dout &
   --                                                               MTPAR_L5L6ABCD_stream_V_dout;
+  signal AS_signals : std_logic_vector(48*37 - 1 downto 0);
+  signal MTPAR_signals : std_logic_vector(76*15 - 1 downto 0);
   
 begin
 
@@ -259,70 +261,70 @@ begin
           MTPAR_L5L6ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L5L6ABCD_stream_V_dout)) + 1, 76));
         end if;
 
-        variable AS_signals : std_logic_vector(48*37 - 1 downto 0) := AS_D5PHIDn1_stream_V_dout &
-                                                                      AS_D5PHICn1_stream_V_dout &
-                                                                      AS_D5PHIBn1_stream_V_dout &
-                                                                      AS_D5PHIAn1_stream_V_dout &
-                                                                      AS_D4PHIDn1_stream_V_dout &
-                                                                      AS_D4PHICn1_stream_V_dout &
-                                                                      AS_D4PHIBn1_stream_V_dout &
-                                                                      AS_D4PHIAn1_stream_V_dout &
-                                                                      AS_D3PHIDn1_stream_V_dout &
-                                                                      AS_D3PHICn1_stream_V_dout &
-                                                                      AS_D3PHIBn1_stream_V_dout &
-                                                                      AS_D3PHIAn1_stream_V_dout &
-                                                                      AS_D2PHIDn1_stream_V_dout &
-                                                                      AS_D2PHICn1_stream_V_dout &
-                                                                      AS_D2PHIBn1_stream_V_dout &
-                                                                      AS_D2PHIAn1_stream_V_dout &
-                                                                      AS_D1PHIDn1_stream_V_dout &
-                                                                      AS_D1PHICn1_stream_V_dout &
-                                                                      AS_D1PHIBn1_stream_V_dout &
-                                                                      AS_D1PHIAn1_stream_V_dout &
-                                                                      AS_L6PHIDn1_stream_V_dout &
-                                                                      AS_L6PHICn1_stream_V_dout &
-                                                                      AS_L6PHIBn1_stream_V_dout &
-                                                                      AS_L6PHIAn1_stream_V_dout &
-                                                                      AS_L5PHIDn1_stream_V_dout &
-                                                                      AS_L5PHICn1_stream_V_dout &
-                                                                      AS_L5PHIBn1_stream_V_dout &
-                                                                      AS_L5PHIAn1_stream_V_dout &
-                                                                      AS_L4PHIDn1_stream_V_dout &
-                                                                      AS_L4PHICn1_stream_V_dout &
-                                                                      AS_L4PHIBn1_stream_V_dout &
-                                                                      AS_L4PHIAn1_stream_V_dout &
-                                                                      AS_L3PHIDn1_stream_V_dout &
-                                                                      AS_L3PHICn1_stream_V_dout &
-                                                                      AS_L3PHIBn1_stream_V_dout &
-                                                                      AS_L3PHIAn1_stream_V_dout &
-                                                                      AS_L2PHIDn1_stream_V_dout &
-                                                                      AS_L2PHICn1_stream_V_dout &
-                                                                      AS_L2PHIBn1_stream_V_dout &
-                                                                      AS_L2PHIAn1_stream_V_dout &
-                                                                      AS_L1PHIHn1_stream_V_dout &
-                                                                      AS_L1PHIGn1_stream_V_dout &
-                                                                      AS_L1PHIFn1_stream_V_dout &
-                                                                      AS_L1PHIEn1_stream_V_dout &
-                                                                      AS_L1PHIDn1_stream_V_dout &
-                                                                      AS_L1PHICn1_stream_V_dout &
-                                                                      AS_L1PHIBn1_stream_V_dout &
-                                                                      AS_L1PHIAn1_stream_V_dout;
+        AS_signals <= AS_D5PHIDn1_stream_V_dout &
+                      AS_D5PHICn1_stream_V_dout &
+                      AS_D5PHIBn1_stream_V_dout &
+                      AS_D5PHIAn1_stream_V_dout &
+                      AS_D4PHIDn1_stream_V_dout &
+                      AS_D4PHICn1_stream_V_dout &
+                      AS_D4PHIBn1_stream_V_dout &
+                      AS_D4PHIAn1_stream_V_dout &
+                      AS_D3PHIDn1_stream_V_dout &
+                      AS_D3PHICn1_stream_V_dout &
+                      AS_D3PHIBn1_stream_V_dout &
+                      AS_D3PHIAn1_stream_V_dout &
+                      AS_D2PHIDn1_stream_V_dout &
+                      AS_D2PHICn1_stream_V_dout &
+                      AS_D2PHIBn1_stream_V_dout &
+                      AS_D2PHIAn1_stream_V_dout &
+                      AS_D1PHIDn1_stream_V_dout &
+                      AS_D1PHICn1_stream_V_dout &
+                      AS_D1PHIBn1_stream_V_dout &
+                      AS_D1PHIAn1_stream_V_dout &
+                      AS_L6PHIDn1_stream_V_dout &
+                      AS_L6PHICn1_stream_V_dout &
+                      AS_L6PHIBn1_stream_V_dout &
+                      AS_L6PHIAn1_stream_V_dout &
+                      AS_L5PHIDn1_stream_V_dout &
+                      AS_L5PHICn1_stream_V_dout &
+                      AS_L5PHIBn1_stream_V_dout &
+                      AS_L5PHIAn1_stream_V_dout &
+                      AS_L4PHIDn1_stream_V_dout &
+                      AS_L4PHICn1_stream_V_dout &
+                      AS_L4PHIBn1_stream_V_dout &
+                      AS_L4PHIAn1_stream_V_dout &
+                      AS_L3PHIDn1_stream_V_dout &
+                      AS_L3PHICn1_stream_V_dout &
+                      AS_L3PHIBn1_stream_V_dout &
+                      AS_L3PHIAn1_stream_V_dout &
+                      AS_L2PHIDn1_stream_V_dout &
+                      AS_L2PHICn1_stream_V_dout &
+                      AS_L2PHIBn1_stream_V_dout &
+                      AS_L2PHIAn1_stream_V_dout &
+                      AS_L1PHIHn1_stream_V_dout &
+                      AS_L1PHIGn1_stream_V_dout &
+                      AS_L1PHIFn1_stream_V_dout &
+                      AS_L1PHIEn1_stream_V_dout &
+                      AS_L1PHIDn1_stream_V_dout &
+                      AS_L1PHICn1_stream_V_dout &
+                      AS_L1PHIBn1_stream_V_dout &
+                      AS_L1PHIAn1_stream_V_dout;
         
-        variable MTPAR_signals : std_logic_vector(76*15 - 1 downto 0) := MTPAR_L1L2H_stream_V_dout &
-                                                                       MTPAR_L1L2E_stream_V_dout &
-                                                                       MTPAR_L1L2GI_stream_V_dout &
-                                                                       MTPAR_L1L2DF_stream_V_dout &
-                                                                       MTPAR_L1L2JLK_stream_V_dout &
-                                                                       MTPAR_L1L2ABCD_stream_V_dout &
-                                                                       MTPAR_D3D4ABCD_stream_V_dout &
-                                                                       MTPAR_D1D2ABCD_stream_V_dout &
-                                                                       MTPAR_L1D1EFGH_stream_V_dout &
-                                                                       MTPAR_L1D1ABCD_stream_V_dout &
-                                                                       MTPAR_L2D1ABCD_stream_V_dout &
-                                                                       MTPAR_L3L4CD_stream_V_dout &
-                                                                       MTPAR_L3L4AB_stream_V_dout &
-                                                                       MTPAR_L2L3ABCD_stream_V_dout &
-                                                                       MTPAR_L5L6ABCD_stream_V_dout;
+        MTPAR_signals <= MTPAR_L1L2H_stream_V_dout &
+                         MTPAR_L1L2E_stream_V_dout &
+                         MTPAR_L1L2GI_stream_V_dout &
+                         MTPAR_L1L2DF_stream_V_dout &
+                         MTPAR_L1L2JLK_stream_V_dout &
+                         MTPAR_L1L2ABCD_stream_V_dout &
+                         MTPAR_D3D4ABCD_stream_V_dout &
+                         MTPAR_D1D2ABCD_stream_V_dout &
+                         MTPAR_L1D1EFGH_stream_V_dout &
+                         MTPAR_L1D1ABCD_stream_V_dout &
+                         MTPAR_L2D1ABCD_stream_V_dout &
+                         MTPAR_L3L4CD_stream_V_dout &
+                         MTPAR_L3L4AB_stream_V_dout &
+                         MTPAR_L2L3ABCD_stream_V_dout &
+                         MTPAR_L5L6ABCD_stream_V_dout;
 
       end if;
     end process;
