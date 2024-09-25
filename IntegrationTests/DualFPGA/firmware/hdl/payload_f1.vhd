@@ -106,6 +106,8 @@ architecture rtl of emp_payload is
   
   constant dataword_length : integer := 64;
   constant n_interfpga_links : integer := 64;
+  signal counter : std_logic_vector(3 downto 0) := "0000";
+  signal counter_trigger : std_logic_vector(3 downto 0) := "1111";
   --signal AS_counter : integer := 0;
   --signal MTPAR_counter : integer := 0;
   --signal AS_signals : std_logic_vector(48*37 - 1 downto 0) := AS_D5PHIDn1_stream_V_dout & add back in when done with increment test
@@ -185,8 +187,8 @@ begin
     signal word_index : std_logic_vector(7 downto 0) := x"00";
     -- Index of packet within an orbit
     signal packet_index : std_logic_vector(8 downto 0) := "000000000";
-    signal counter : std_logic_vector(3 downto 0) := "0000";
-    signal counter_trigger : std_logic_vector(3 downto 0) := "1111";
+    --signal counter : std_logic_vector(3 downto 0) := "0000";
+    --signal counter_trigger : std_logic_vector(3 downto 0) := "1111";
 
   begin
     --comment out this process when done testing incrementing signal test
