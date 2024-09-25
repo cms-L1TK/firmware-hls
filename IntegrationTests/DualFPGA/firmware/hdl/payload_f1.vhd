@@ -190,7 +190,180 @@ begin
 
   begin
     --comment out this process when done testing incrementing signal test
+    --process (clk_p)
+    --begin
+    --  if rising_edge(clk_p) then
+    --    counter <= std_logic_vector(to_unsigned(to_integer(unsigned(counter)) + 1, 4));
+    --    if counter = counter_trigger then
+    --      AS_D5PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_D5PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_D5PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_D5PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_D4PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D4PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_D4PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D4PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_D4PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D4PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_D4PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D4PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_D3PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D3PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_D3PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D3PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_D3PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D3PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_D3PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D3PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_D2PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D2PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_D2PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D2PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_D2PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D2PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_D2PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D2PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_D1PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D1PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_D1PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D1PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_D1PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D1PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_D1PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D1PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_L6PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L6PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_L6PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L6PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_L6PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L6PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_L6PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L6PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_L5PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L5PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_L5PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L5PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_L5PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L5PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_L5PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L5PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_L4PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L4PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_L4PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L4PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_L4PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L4PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_L4PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L4PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_L3PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L3PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_L3PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L3PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_L3PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L3PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_L3PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L3PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_L2PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L2PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_L2PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L2PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_L2PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L2PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_L2PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L2PHIAn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIHn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIHn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIGn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIGn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIFn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIFn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIEn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIEn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIDn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHICn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIBn1_stream_V_dout)) + 1, 37));
+    --      AS_L1PHIAn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_L1PHIAn1_stream_V_dout)) + 1, 37));
+
+    --      MTPAR_L1L2H_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2H_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1L2E_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2E_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1L2GI_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2GI_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1L2DF_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2DF_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1L2JLK_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2JLK_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1L2ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1L2ABCD_stream_V_dout)) + 1, 76));
+    --      MTPAR_D3D4ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_D3D4ABCD_stream_V_dout)) + 1, 76));
+    --      MTPAR_D1D2ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_D1D2ABCD_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1D1EFGH_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1D1EFGH_stream_V_dout)) + 1, 76));
+    --      MTPAR_L1D1ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L1D1ABCD_stream_V_dout)) + 1, 76));
+    --      MTPAR_L2D1ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L2D1ABCD_stream_V_dout)) + 1, 76));
+    --      MTPAR_L3L4CD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L3L4CD_stream_V_dout)) + 1, 76));
+    --      MTPAR_L3L4AB_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L3L4AB_stream_V_dout)) + 1, 76));
+    --      MTPAR_L2L3ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L2L3ABCD_stream_V_dout)) + 1, 76));
+    --      MTPAR_L5L6ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L5L6ABCD_stream_V_dout)) + 1, 76));
+    --    end if;
+
+    --    AS_signals <= AS_D5PHIDn1_stream_V_dout &
+    --                  AS_D5PHICn1_stream_V_dout &
+    --                  AS_D5PHIBn1_stream_V_dout &
+    --                  AS_D5PHIAn1_stream_V_dout &
+    --                  AS_D4PHIDn1_stream_V_dout &
+    --                  AS_D4PHICn1_stream_V_dout &
+    --                  AS_D4PHIBn1_stream_V_dout &
+    --                  AS_D4PHIAn1_stream_V_dout &
+    --                  AS_D3PHIDn1_stream_V_dout &
+    --                  AS_D3PHICn1_stream_V_dout &
+    --                  AS_D3PHIBn1_stream_V_dout &
+    --                  AS_D3PHIAn1_stream_V_dout &
+    --                  AS_D2PHIDn1_stream_V_dout &
+    --                  AS_D2PHICn1_stream_V_dout &
+    --                  AS_D2PHIBn1_stream_V_dout &
+    --                  AS_D2PHIAn1_stream_V_dout &
+    --                  AS_D1PHIDn1_stream_V_dout &
+    --                  AS_D1PHICn1_stream_V_dout &
+    --                  AS_D1PHIBn1_stream_V_dout &
+    --                  AS_D1PHIAn1_stream_V_dout &
+    --                  AS_L6PHIDn1_stream_V_dout &
+    --                  AS_L6PHICn1_stream_V_dout &
+    --                  AS_L6PHIBn1_stream_V_dout &
+    --                  AS_L6PHIAn1_stream_V_dout &
+    --                  AS_L5PHIDn1_stream_V_dout &
+    --                  AS_L5PHICn1_stream_V_dout &
+    --                  AS_L5PHIBn1_stream_V_dout &
+    --                  AS_L5PHIAn1_stream_V_dout &
+    --                  AS_L4PHIDn1_stream_V_dout &
+    --                  AS_L4PHICn1_stream_V_dout &
+    --                  AS_L4PHIBn1_stream_V_dout &
+    --                  AS_L4PHIAn1_stream_V_dout &
+    --                  AS_L3PHIDn1_stream_V_dout &
+    --                  AS_L3PHICn1_stream_V_dout &
+    --                  AS_L3PHIBn1_stream_V_dout &
+    --                  AS_L3PHIAn1_stream_V_dout &
+    --                  AS_L2PHIDn1_stream_V_dout &
+    --                  AS_L2PHICn1_stream_V_dout &
+    --                  AS_L2PHIBn1_stream_V_dout &
+    --                  AS_L2PHIAn1_stream_V_dout &
+    --                  AS_L1PHIHn1_stream_V_dout &
+    --                  AS_L1PHIGn1_stream_V_dout &
+    --                  AS_L1PHIFn1_stream_V_dout &
+    --                  AS_L1PHIEn1_stream_V_dout &
+    --                  AS_L1PHIDn1_stream_V_dout &
+    --                  AS_L1PHICn1_stream_V_dout &
+    --                  AS_L1PHIBn1_stream_V_dout &
+    --                  AS_L1PHIAn1_stream_V_dout;
+        
+    --    MTPAR_signals <= MTPAR_L1L2H_stream_V_dout &
+    --                     MTPAR_L1L2E_stream_V_dout &
+    --                     MTPAR_L1L2GI_stream_V_dout &
+    --                     MTPAR_L1L2DF_stream_V_dout &
+    --                     MTPAR_L1L2JLK_stream_V_dout &
+    --                     MTPAR_L1L2ABCD_stream_V_dout &
+    --                     MTPAR_D3D4ABCD_stream_V_dout &
+    --                     MTPAR_D1D2ABCD_stream_V_dout &
+    --                     MTPAR_L1D1EFGH_stream_V_dout &
+    --                     MTPAR_L1D1ABCD_stream_V_dout &
+    --                     MTPAR_L2D1ABCD_stream_V_dout &
+    --                     MTPAR_L3L4CD_stream_V_dout &
+    --                     MTPAR_L3L4AB_stream_V_dout &
+    --                     MTPAR_L2L3ABCD_stream_V_dout &
+    --                     MTPAR_L5L6ABCD_stream_V_dout;
+
+    --  end if;
+    --end process;
+    
     process (clk_p)
+    begin
+      if rising_edge(clk_p) then
+        -- Reset counters on receiving BC0 from TCDS
+        if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
+          word_index <= x"00";
+          packet_index <= "000000000";
+        -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
+        elsif word_index = x"A1" then
+          word_index <= x"00";
+          packet_index <= std_logic_vector(unsigned(packet_index) + 1);
+        else
+          word_index <= std_logic_vector(unsigned(word_index) + 1);
+        end if;
+      end if;
+    end process;
+
+    -- Set valid high for full duration of packet
+    q(i).valid <= '1' when word_index <= x"9B" else '0'; --x"9B" -> x"66"
+    -- Start & last are only high for first & last clock cycle of packet
+    q(i).start <= '1' when word_index = x"00" else '0';
+    q(i).last <= '1' when word_index = x"9B" else '0'; --x"9B" -> x"66"
+
+    -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
+    -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
+    q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
+
+    -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
+    --q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
+    --q(i).data(31 downto 16) <= "0000000" & packet_index;
+    --q(i).data(15 downto 0) <= x"00" & word_index;
+
+  end generate gen;
+
+  process (clk_p)
     begin
       if rising_edge(clk_p) then
         counter <= std_logic_vector(to_unsigned(to_integer(unsigned(counter)) + 1, 4));
@@ -328,41 +501,7 @@ begin
 
       end if;
     end process;
-    
-    process (clk_p)
-    begin
-      if rising_edge(clk_p) then
-        -- Reset counters on receiving BC0 from TCDS
-        if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
-          word_index <= x"00";
-          packet_index <= "000000000";
-        -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
-        elsif word_index = x"A1" then
-          word_index <= x"00";
-          packet_index <= std_logic_vector(unsigned(packet_index) + 1);
-        else
-          word_index <= std_logic_vector(unsigned(word_index) + 1);
-        end if;
-      end if;
-    end process;
-
-    -- Set valid high for full duration of packet
-    q(i).valid <= '1' when word_index <= x"9B" else '0'; --x"9B" -> x"66"
-    -- Start & last are only high for first & last clock cycle of packet
-    q(i).start <= '1' when word_index = x"00" else '0';
-    q(i).last <= '1' when word_index = x"9B" else '0'; --x"9B" -> x"66"
-
-    -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
-    -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
-    q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
-
-    -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
-    --q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
-    --q(i).data(31 downto 16) <= "0000000" & packet_index;
-    --q(i).data(15 downto 0) <= x"00" & word_index;
-
-  end generate gen;
-
+  
   --process (clk_p)
   --begin
     --if rising_edge(clk_p) then
