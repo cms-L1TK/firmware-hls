@@ -1,5 +1,6 @@
 #include <fstream>
 #include <string>
+#include <iostream>
 
 // The following function provides a more compiler efficient method for reading
 // look up table arrays (currently used in TP), this is only used in C simulations and not synthesis
@@ -25,8 +26,9 @@ template<class lutType, int lutsize> bool readSWLUT(lutType lut[lutsize],const s
       skipfirst = false;
       continue;
     }
-    lut[lutIndex]=lutval;
+    if (lutIndex < lutsize) lut[lutIndex]=lutval;
     ++lutIndex;
   }
+  assert(lutIndex == lutsize + 1); // Allows for final bracket.
   return true;
 }
