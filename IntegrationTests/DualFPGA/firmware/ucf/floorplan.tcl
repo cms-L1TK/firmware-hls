@@ -532,6 +532,13 @@ add_cells_to_pblock [get_pblocks pblock_payload_MPD5D] [get_cells -quiet [list \
           payload/tf2_wrapper_1/SectorProcessor_1/MPROJ_*_D5PHID \
           ]]
 
+set lpblock_payload_ASin [create_pblock pblock_payload_ASin]
+add_cells_to_pblock [get_pblocks pblock_payload_ASin] [get_cells -quiet [list \
+          payload/tf2_wrapper_1/SectorProcessor_1/AS_*in \
+          payload/tf2_wrapper_1/SectorProcessor_1/AS_*in_DELAY \
+          payload/tf2_wrapper_1/SectorProcessor_1/AS_*in_DELAY0 \
+          ]]
+
 #FT pblocks
 
 set lpblock_payload_FTL1L2 [create_pblock pblock_payload_FTL1L2]
@@ -794,6 +801,7 @@ add_cells_to_pblock [get_pblocks pblock_payload_FTL2D1] [get_cells -quiet [list 
 set lpblock_payload_KF [create_pblock pblock_payload_KF]
 add_cells_to_pblock [get_pblocks pblock_payload_KF] [get_cells -quiet [list \
           payload/kf_wrapper_1 \
+          payload/kfout_isolation_out_1 \
           ]]
 
 
@@ -1796,6 +1804,9 @@ add_rects_to_pblock_mod $lpblock_payload_FTL5L6 $pblock_payload_FTL5L6rect
 
 set pblock_payload_KFrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=8}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
 add_rects_to_pblock_mod $lpblock_payload_KF $pblock_payload_KFrect
+
+set pblock_payload_ASinrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX<=7}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
+add_rects_to_pblock_mod $lpblock_payload_ASin $pblock_payload_ASinrect
 
 
 
