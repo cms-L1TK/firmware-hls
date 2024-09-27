@@ -105,6 +105,15 @@ set lpblock_payload_MPD1to5B [create_pblock pblock_payload_MPD1to5B]
 set lpblock_payload_MPD1to5C [create_pblock pblock_payload_MPD1to5C]
 set lpblock_payload_MPD1to5D [create_pblock pblock_payload_MPD1to5D]
 
+set lpblock_payload_MPL1to6AL [create_pblock pblock_payload_MPL1to6AL]
+set lpblock_payload_MPL1to6BL [create_pblock pblock_payload_MPL1to6BL]
+set lpblock_payload_MPL1to6CL [create_pblock pblock_payload_MPL1to6CL]
+set lpblock_payload_MPL1to6DL [create_pblock pblock_payload_MPL1to6DL]
+set lpblock_payload_MPL1to6AH [create_pblock pblock_payload_MPL1to6AH]
+set lpblock_payload_MPL1to6BH [create_pblock pblock_payload_MPL1to6BH]
+set lpblock_payload_MPL1to6CH [create_pblock pblock_payload_MPL1to6CH]
+set lpblock_payload_MPL1to6DH [create_pblock pblock_payload_MPL1to6DH]
+
 
 #PC/VMSMER pblock
 
@@ -123,6 +132,9 @@ add_cells_to_pblock [get_pblocks pblock_payload_PCVMSMERLs] [get_cells -quiet [l
           payload/tf2_wrapper_1/SectorProcessor_1/PC_L1L2* \
           payload/tf2_wrapper_1/SectorProcessor_1/PC_L3L4* \
           payload/tf2_wrapper_1/SectorProcessor_1/PC_L5L6* \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2*in \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4*in \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L5L6*in \
           payload/tf2_wrapper_1/SectorProcessor_1/VMSMER_L* \
           ]]
 
@@ -841,29 +853,13 @@ set_property PARENT pblock_payload_MPL1to6BL [get_pblocks [list \
           pblock_payload_MPL1F \
           pblock_payload_MPL2B \
           pblock_payload_MPL3B \
-          pblock_payload_MPL4B \
+							     ]]
+set_property PARENT pblock_payload_MPL1to6BH [get_pblocks [list \
+          pblock_payload_MPL1B \
           pblock_payload_MPL5B \
           pblock_payload_MPL6B \
-							     ]]
-set_property PARENT pblock_payload_MPL1to6AH [get_pblocks [list \
-          pblock_payload_MPL4A \
-          pblock_payload_MPL5A \
-          pblock_payload_MPL6A \
           ]]
 
-
-set_property PARENT pblock_payload_MPL1to6BL [get_pblocks [list \
-          pblock_payload_MPL1B \
-          pblock_payload_MPL1F \
-          pblock_payload_MPL2B \
-          pblock_payload_MPL3B \
-							     ]]
-
-set_property PARENT pblock_payload_MPL1to6BH [get_pblocks [list \
-          pblock_payload_MPL4B \
-          pblock_payload_MPL5B \
-          pblock_payload_MPL6B \
-							     ]]
 
 set_property PARENT pblock_payload_MPL1to6CL [get_pblocks [list \
           pblock_payload_MPL1C \
@@ -873,15 +869,14 @@ set_property PARENT pblock_payload_MPL1to6CL [get_pblocks [list \
           ]]
 
 set_property PARENT pblock_payload_MPL1to6CH [get_pblocks [list \
-          pblock_payload_MPL1C \
-          pblock_payload_MPL1G \
-          pblock_payload_MPL2C \
-          pblock_payload_MPL3C \
+          pblock_payload_MPL4C \
+          pblock_payload_MPL5C \
+          pblock_payload_MPL6C \
           ]]
 
 set_property PARENT pblock_payload_MPL1to6DL [get_pblocks [list \
           pblock_payload_MPL1D \
-          pblock_payload_MPL1G \
+          pblock_payload_MPL1H \
           pblock_payload_MPL2D \
           pblock_payload_MPL3D \
           ]]
@@ -1582,29 +1577,113 @@ set_property USER_CLUSTER cluster_payload_FTL2D1 [get_cells -quiet [list \
 #set pblock_payload_MPL1to6Hrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
 #add_rects_to_pblock_mod $lpblock_payload_MPL1to6H $pblock_payload_MPL1to6Hrect
 #
-set pblock_payload_MPALrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==0 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6AL $pblock_payload_MPALrect
+#set pblock_payload_MPALrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==0 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6AL $pblock_payload_MPALrect
 #
-set pblock_payload_MPBLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==1 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6BL $pblock_payload_MPBLrect
+#set pblock_payload_MPBLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==1 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6BL $pblock_payload_MPBLrect
 #
-set pblock_payload_MPCLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==2 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6CL $pblock_payload_MPCLrect
+#set pblock_payload_MPCLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==2 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6CL $pblock_payload_MPCLrect
 #
-set pblock_payload_MPDLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==3 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6DL $pblock_payload_MPDLrect
+#set pblock_payload_MPDLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==3 && COLUMN_INDEX<=3 && COLUMN_INDEX>=1}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6DL $pblock_payload_MPDLrect
 #
-set pblock_payload_MPAHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==0 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6AH $pblock_payload_MPAHrect
+#set pblock_payload_MPAHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==0 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6AH $pblock_payload_MPAHrect
 #
-set pblock_payload_MPBHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==1 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6BH $pblock_payload_MPBHrect
+#set pblock_payload_MPBHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==1 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6BH $pblock_payload_MPBHrect
 #
-set pblock_payload_MPCLrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==2 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6CH $pblock_payload_MPCHrect
+#set pblock_payload_MPCHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==2 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6CH $pblock_payload_MPCHrect
 #
-set pblock_payload_MPDHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==3 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
-add_rects_to_pblock_mod $lpblock_payload_MPL1to6DH $pblock_payload_MPDHrect
+#set pblock_payload_MPDHrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==3 && COLUMN_INDEX<=5 && COLUMN_INDEX>=4}] -f "RPM_X <= 4000 && RPM_X >= 1000"]]
+#add_rects_to_pblock_mod $lpblock_payload_MPL1to6DH $pblock_payload_MPDHrect
+#
+set pblock_payload_MPL1Arect [find_rects [get_sites -f "RPM_Y >= 0 && RPM_Y <= 62 && RPM_X >= 800 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1A $pblock_payload_MPL1Arect
+#
+set pblock_payload_MPL1Brect [find_rects [get_sites -f "RPM_Y >= 62 && RPM_Y <=124 && RPM_X >= 800 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1B $pblock_payload_MPL1Brect
+#
+set pblock_payload_MPL1Crect [find_rects [get_sites -f "RPM_Y >=124 && RPM_Y <= 186 && RPM_X >= 900 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1C $pblock_payload_MPL1Crect
+#
+set pblock_payload_MPL1Drect [find_rects [get_sites -f "RPM_Y >= 186 && RPM_Y <= 248 && RPM_X >= 900 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1D $pblock_payload_MPL1Drect
+#
+set pblock_payload_MPL1Erect [find_rects [get_sites -f "RPM_Y >= 248 && RPM_Y <= 310 && RPM_X >= 900 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1E $pblock_payload_MPL1Erect
+#
+set pblock_payload_MPL1Frect [find_rects [get_sites -f "RPM_Y >= 310 && RPM_Y <= 372 && RPM_X >= 900 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1F $pblock_payload_MPL1Frect
+#
+set pblock_payload_MPL1Grect [find_rects [get_sites -f "RPM_Y >= 372 && RPM_Y <= 434 && RPM_X >= 900 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1G $pblock_payload_MPL1Grect
+#
+set pblock_payload_MPL1Hrect [find_rects [get_sites -f "RPM_Y >= 434 && RPM_Y <= 496 && RPM_X >= 900 && RPM_X <= 1700"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL1H $pblock_payload_MPL1Hrect
+#
+set pblock_payload_MPL2Arect [find_rects [get_sites -f "RPM_Y >= 0 && RPM_Y <= 62 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL2A $pblock_payload_MPL2Arect
+#
+set pblock_payload_MPL2Brect [find_rects [get_sites -f "RPM_Y >= 62 && RPM_Y <=124 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL2B $pblock_payload_MPL2Brect
+#
+set pblock_payload_MPL2Crect [find_rects [get_sites -f "RPM_Y >=124 && RPM_Y <= 186 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL2C $pblock_payload_MPL2Crect
+#
+set pblock_payload_MPL2Drect [find_rects [get_sites -f "RPM_Y >= 186 && RPM_Y <= 248 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL2D $pblock_payload_MPL2Drect
+#
+set pblock_payload_MPL3Arect [find_rects [get_sites -f "RPM_Y >= 248 && RPM_Y <= 310 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL3A $pblock_payload_MPL3Arect
+#
+set pblock_payload_MPL3Brect [find_rects [get_sites -f "RPM_Y >= 310 && RPM_Y <= 372 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL3B $pblock_payload_MPL3Brect
+#
+set pblock_payload_MPL3Crect [find_rects [get_sites -f "RPM_Y >= 372 && RPM_Y <= 434 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL3C $pblock_payload_MPL3Crect
+#
+set pblock_payload_MPL3Drect [find_rects [get_sites -f "RPM_Y >= 434 && RPM_Y <= 496 && RPM_X >= 1700 && RPM_X <= 2500"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL3D $pblock_payload_MPL3Drect
+#
+set pblock_payload_MPL4Arect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==0}] -f "RPM_X >= 2500 && RPM_X <= 3000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL4A $pblock_payload_MPL4Arect
+#
+set pblock_payload_MPL4Brect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==1}] -f "RPM_X >= 2500 && RPM_X <= 3000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL4B $pblock_payload_MPL4Brect
+#
+set pblock_payload_MPL4Crect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==2}] -f "RPM_X >= 2500 && RPM_X <= 3000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL4C $pblock_payload_MPL4Crect
+#
+set pblock_payload_MPL4Drect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX==3}] -f "RPM_X >= 2500 && RPM_X <= 3000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL4D $pblock_payload_MPL4Drect
+#
+set pblock_payload_MPL5Arect [find_rects [get_sites -f "RPM_Y >= 0 && RPM_Y <= 62 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL5A $pblock_payload_MPL5Arect
+#
+set pblock_payload_MPL5Brect [find_rects [get_sites -f "RPM_Y >= 62 && RPM_Y <=124 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL5B $pblock_payload_MPL5Brect
+#
+set pblock_payload_MPL5Crect [find_rects [get_sites -f "RPM_Y >=124 && RPM_Y <= 186 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL5C $pblock_payload_MPL5Crect
+#
+set pblock_payload_MPL5Drect [find_rects [get_sites -f "RPM_Y >= 186 && RPM_Y <= 248 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL5D $pblock_payload_MPL5Drect
+#
+set pblock_payload_MPL6Arect [find_rects [get_sites -f "RPM_Y >= 248 && RPM_Y <= 310 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL6A $pblock_payload_MPL6Arect
+#
+set pblock_payload_MPL6Brect [find_rects [get_sites -f "RPM_Y >= 310 && RPM_Y <= 372 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL6B $pblock_payload_MPL6Brect
+#
+set pblock_payload_MPL6Crect [find_rects [get_sites -f "RPM_Y >= 372 && RPM_Y <= 434 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL6C $pblock_payload_MPL6Crect
+#
+set pblock_payload_MPL6Drect [find_rects [get_sites -f "RPM_Y >= 434 && RPM_Y <= 496 && RPM_X >= 3000 && RPM_X <= 4000"]]
+add_rects_to_pblock_mod $lpblock_payload_MPL6D $pblock_payload_MPL6Drect
 #
 #set pblock_payload_MPD1to5Arect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=4}] -f "RPM_X <= 4200 &&  RPM_X >= 800"]]
 #add_rects_to_pblock_mod $lpblock_payload_MPD1to5A $pblock_payload_MPD1to5Arect
@@ -1723,7 +1802,7 @@ add_rects_to_pblock_mod $lpblock_payload_KF $pblock_payload_KFrect
 set pblock_payload_PCVMSMERDsrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=7}] -f "RPM_X >= 4200"]]
 add_rects_to_pblock_mod $lpblock_payload_PCVMSMERDs $pblock_payload_PCVMSMERDsrect
 
-set pblock_payload_PCVMSMERLsrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3}] -f "RPM_X >= 4200"]]
+set pblock_payload_PCVMSMERLsrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3}] -f "RPM_X >= 4000"]]
 add_rects_to_pblock_mod $lpblock_payload_PCVMSMERLs $pblock_payload_PCVMSMERLsrect
 
 set pblock_payload_sp2_mem_writerrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=7}] -f "RPM_X >= 800"]]
