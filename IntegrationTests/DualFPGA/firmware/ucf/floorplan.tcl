@@ -1819,7 +1819,7 @@ add_rects_to_pblock_mod $lpblock_payload_KF $pblock_payload_KFrect
 set pblock_payload_KFoutrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=10 && ROW_INDEX<=11}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
 add_rects_to_pblock_mod $lpblock_payload_KFout $pblock_payload_KFoutrect
 
-set pblock_payload_ASinrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX<=7}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
+set pblock_payload_ASinrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX<=7}] -f "RPM_X >= 4000"]]
 add_rects_to_pblock_mod $lpblock_payload_ASin $pblock_payload_ASinrect
 
 set pblock_payload_KFinputmergerrect [find_rects [get_sites -f "RPM_X <= 1200 && RPM_Y>=496 && RPM_Y <= 992"]]
@@ -1832,7 +1832,7 @@ add_rects_to_pblock_mod $lpblock_payload_PCVMSMERDs $pblock_payload_PCVMSMERDsre
 set pblock_payload_PCVMSMERLsrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3}] -f "RPM_X >= 4000"]]
 add_rects_to_pblock_mod $lpblock_payload_PCVMSMERLs $pblock_payload_PCVMSMERLsrect
 
-set pblock_payload_sp2_mem_writerrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=7}] -f "RPM_X >= 800"]]
+set pblock_payload_sp2_mem_writerrect [find_rects [get_sites -f "RPM_X >= 800 && RPM_Y <= 1040"]]
 add_rects_to_pblock_mod $lpblock_payload_sp2_mem_writer $pblock_payload_sp2_mem_writerrect
 
 #change only payload pblocks to be hard constraints
