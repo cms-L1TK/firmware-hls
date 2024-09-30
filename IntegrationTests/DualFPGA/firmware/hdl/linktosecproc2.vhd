@@ -11,13 +11,15 @@ use work.memUtil_aux_pkg_f2.all;
 
 entity linktosecproc2 is
   port(
-    clk               : in std_logic;
-    rst               : in std_logic;
-    d                 : in ldata(4 * N_REGION - 1 downto 0);
-    AS_36_link_data   : out t_arr_AS_36_37b;
-    MPAR_73_link_data : out t_arr_MTPAR_73_76b;
-    bx_link_data      : out std_logic_vector(2 downto 0);
-    valid             : out std_logic
+    clk                : in std_logic;
+    rst                : in std_logic;
+    d                  : in ldata(4 * N_REGION - 1 downto 0);
+    AS_36_link_data    : out t_arr_AS_36_37b;
+    MPAR_73_link_data  : out t_arr_MTPAR_73_76b;
+    bx_link_data       : out std_logic_vector(2 downto 0);
+    AS_36_link_valid   : out t_arr_AS_36_1b;
+    MPAR_73_link_valid : out t_arr_MTPAR_73_1b;
+    bx_link_valid      : out std_logic
     );
 
 end linktosecproc2;
@@ -95,10 +97,6 @@ begin
   MTPAR_signals(63 + 15*64 downto 0 + 15*64) <= d(12).data(63 downto 0);
   MTPAR_signals(63 + 16*64 downto 0 + 16*64) <= d(11).data(63 downto 0);
   MTPAR_signals(63 + 17*64 - 12 downto 0 + 17*64) <= d(10).data(63 - 12 downto 0);
-  
-  --latch bx_link_data when not valid
-  bx_link_data_int <= d(9).data(2 downto 0) when (d(9).valid='1') else bx_link_data_int;
-  bx_link_data <= bx_link_data_int;
 
   AS_36_link_data(L1PHIAn1) <= AS_signals(36 downto 0);
   AS_36_link_data(L1PHIBn1) <= AS_signals(73 downto 37);
@@ -149,6 +147,57 @@ begin
   AS_36_link_data(D5PHICn1) <= AS_signals(1738 downto 1702);
   AS_36_link_data(D5PHIDn1) <= AS_signals(1775 downto 1739);
 
+  --Note that since some AS words are built from data on multiple input links, 
+  --only the valid from the first input is used
+  AS_36_link_valid(L1PHIAn1) <= d(59).valid;
+  AS_36_link_valid(L1PHIBn1) <= d(59).valid;
+  AS_36_link_valid(L1PHICn1) <= d(58).valid;
+  AS_36_link_valid(L1PHIDn1) <= d(58).valid;
+  AS_36_link_valid(L1PHIEn1) <= d(57).valid;
+  AS_36_link_valid(L1PHIFn1) <= d(57).valid;
+  AS_36_link_valid(L1PHIGn1) <= d(56).valid;
+  AS_36_link_valid(L1PHIHn1) <= d(55).valid;
+  AS_36_link_valid(L2PHIAn1) <= d(55).valid;
+  AS_36_link_valid(L2PHIBn1) <= d(54).valid;
+  AS_36_link_valid(L2PHICn1) <= d(54).valid;
+  AS_36_link_valid(L2PHIDn1) <= d(53).valid;
+  AS_36_link_valid(L3PHIAn1) <= d(53).valid;
+  AS_36_link_valid(L3PHIBn1) <= d(52).valid;
+  AS_36_link_valid(L3PHICn1) <= d(51).valid;
+  AS_36_link_valid(L3PHIDn1) <= d(51).valid;
+  AS_36_link_valid(L4PHIAn1) <= d(50).valid;
+  AS_36_link_valid(L4PHIBn1) <= d(50).valid;
+  AS_36_link_valid(L4PHICn1) <= d(49).valid;
+  AS_36_link_valid(L4PHIDn1) <= d(49).valid;
+  AS_36_link_valid(L5PHIAn1) <= d(48).valid;
+  AS_36_link_valid(L5PHIBn1) <= d(43).valid;
+  AS_36_link_valid(L5PHICn1) <= d(43).valid;
+  AS_36_link_valid(L5PHIDn1) <= d(42).valid;
+  AS_36_link_valid(L6PHIAn1) <= d(42).valid;
+  AS_36_link_valid(L6PHIBn1) <= d(41).valid;
+  AS_36_link_valid(L6PHICn1) <= d(40).valid;
+  AS_36_link_valid(L6PHIDn1) <= d(40).valid;
+  AS_36_link_valid(D1PHIAn1) <= d(39).valid;
+  AS_36_link_valid(D1PHIBn1) <= d(39).valid;
+  AS_36_link_valid(D1PHICn1) <= d(38).valid;
+  AS_36_link_valid(D1PHIDn1) <= d(38).valid;
+  AS_36_link_valid(D2PHIAn1) <= d(37).valid;
+  AS_36_link_valid(D2PHIBn1) <= d(36).valid;
+  AS_36_link_valid(D2PHICn1) <= d(36).valid;
+  AS_36_link_valid(D2PHIDn1) <= d(35).valid;
+  AS_36_link_valid(D3PHIAn1) <= d(35).valid;
+  AS_36_link_valid(D3PHIBn1) <= d(34).valid;
+  AS_36_link_valid(D3PHICn1) <= d(34).valid;
+  AS_36_link_valid(D3PHIDn1) <= d(33).valid;
+  AS_36_link_valid(D4PHIAn1) <= d(32).valid;
+  AS_36_link_valid(D4PHIBn1) <= d(32).valid;
+  AS_36_link_valid(D4PHICn1) <= d(31).valid;
+  AS_36_link_valid(D4PHIDn1) <= d(31).valid;
+  AS_36_link_valid(D5PHIAn1) <= d(30).valid;
+  AS_36_link_valid(D5PHIBn1) <= d(29).valid;
+  AS_36_link_valid(D5PHICn1) <= d(29).valid;
+  AS_36_link_valid(D5PHIDn1) <= d(28).valid;
+
   MPAR_73_link_data(L1L2ABC)  <= MTPAR_signals(75 downto 0);
   MPAR_73_link_data(L1L2DE)   <= MTPAR_signals(151 downto 76);
   MPAR_73_link_data(L1L2F)    <= MTPAR_signals(227 downto 152);
@@ -165,7 +214,25 @@ begin
   MPAR_73_link_data(L1D1EFGH) <= MTPAR_signals(1063 downto 988);
   MPAR_73_link_data(L2D1ABCD) <= MTPAR_signals(1139 downto 1064);
 
-  --for now assume valid bit on all links is identical, may need to add "when d(#).valid" on many above lines to latch if valid is not universal
-  valid <= d(9).valid;
+  MPAR_73_link_valid(L1L2ABC)  <= d(27).valid;
+  MPAR_73_link_valid(L1L2DE)   <= d(26).valid;
+  MPAR_73_link_valid(L1L2F)    <= d(25).valid;
+  MPAR_73_link_valid(L1L2G)    <= d(24).valid;
+  MPAR_73_link_valid(L1L2HI)   <= d(23).valid;
+  MPAR_73_link_valid(L1L2JKL)  <= d(22).valid;
+  MPAR_73_link_valid(L2L3ABCD) <= d(20).valid;
+  MPAR_73_link_valid(L3L4AB)   <= d(19).valid;
+  MPAR_73_link_valid(L3L4CD)   <= d(18).valid;
+  MPAR_73_link_valid(L5L6ABCD) <= d(17).valid;
+  MPAR_73_link_valid(D1D2ABCD) <= d(16).valid;
+  MPAR_73_link_valid(D3D4ABCD) <= d(14).valid;
+  MPAR_73_link_valid(L1D1ABCD) <= d(13).valid;
+  MPAR_73_link_valid(L1D1EFGH) <= d(12).valid;
+  MPAR_73_link_valid(L2D1ABCD) <= d(11).valid;
+
+  --latch bx_link_data when not valid
+  bx_link_data_int <= d(9).data(2 downto 0) when (d(9).valid='1') else bx_link_data_int;
+  bx_link_data <= bx_link_data_int;
+  bx_link_valid <= d(9).valid;
     
 end rtl;

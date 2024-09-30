@@ -16,10 +16,12 @@ entity sp2_mem_writer is
   port (
     clk                       : in std_logic;
     reset                     : in std_logic;
-    bx_link_data              : in std_logic_vector(2 downto 0);
     AS_36_link_data           : in t_arr_AS_36_37b;
     MPAR_73_link_data         : in t_arr_MTPAR_73_76b;
-    link_data_valid           : in std_logic;
+    bx_link_data              : in std_logic_vector(2 downto 0);
+    AS_36_link_valid          : in t_arr_AS_36_1b;
+    MPAR_73_link_valid        : in t_arr_MTPAR_73_1b;
+    bx_link_valid             : in std_logic;
     AS_36_wea                 : out t_arr_AS_36_1b;
     AS_36_writeaddr           : out t_arr_AS_36_ADDR;
     AS_36_din                 : out t_arr_AS_36_DATA;
@@ -78,7 +80,7 @@ begin -- architecture rtl
       --write enable and data in are set directly from link data
       --address is updated on next clock after each write and set to 0 after BX change
       for i in AS_36_link_data'range loop 
-        if (link_data_valid = '1' and AS_36_link_data(i)(36) = '1') then
+        if (AS_36_link_valid(i) = '1' and AS_36_link_data(i)(36) = '1') then
           AS_36_wea_int(i) <= '1';
           AS_36_din_int(i) <= AS_36_link_data(i)(35 downto 0);
         else
@@ -97,7 +99,7 @@ begin -- architecture rtl
       --addresses for each of the four "pages" are managed by separate counters, which are
       --updated after each write and reset on BX change
       for i in MPAR_73_link_data'range loop 
-        if (link_data_valid = '1' and MPAR_73_link_data(i)(75) = '1') then
+        if (MPAR_73_link_valid(i) = '1' and MPAR_73_link_data(i)(75) = '1') then
           MPAR_73_wea_int(i) <= '1';
           MPAR_73_din_int(i) <= MPAR_73_link_data(i)(72 downto 0);
           MPAR_73_pge(i) <= MPAR_73_link_data(i)(74 downto 73);
