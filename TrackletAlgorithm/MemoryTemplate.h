@@ -184,7 +184,7 @@ public:
 	return success;
   }
 
-  bool write_mem(BunchXingT ibx, const std::string datastr, int base=16)
+  bool write_mem(BunchXingT ibx, const std::string& datastr, int base=16)
   {
 	return write_mem(ibx, datastr.c_str(), base);
   }
