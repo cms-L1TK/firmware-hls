@@ -123,8 +123,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         "template<TF::seed Seed> constexpr int getNumBarrelStub();\n"
         "template<TF::seed Seed> constexpr int getNumDiskStub();\n"
         "template<TF::seed Seed> constexpr int getMPARNPages(const ITCType &);\n"
-        "template<TF::seed Seed> inline int getMPARMem(const ITCType &);\n"
-        "template<TF::seed Seed> constexpr int getMPARPage(const ITCType &);\n"
+        "template<TF::seed Seed> inline    int getMPARMem(const ITCType &);\n"
+        "template<TF::seed Seed> inline    int getMPARPage(const ITCType &);\n"
     )
 
     # Calculate parameters and print out top function for each TB.
