@@ -1,4 +1,4 @@
-# firmware-hls : HLS implementation of the hybrid L1 track firmware
+# firmware-hls : HLS implementation of the hybrid L1 track firmware 
 
 ## Repo directory contents:
 
