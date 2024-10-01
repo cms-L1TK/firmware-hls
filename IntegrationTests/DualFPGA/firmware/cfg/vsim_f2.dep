@@ -7,7 +7,7 @@ setup ../ucf/vsim.tcl
 
 include -c emp-fwk:boards/testbench top.dep
 
-src common/hdl/emp/tb_decl.vhd
+src common/hdl/emp/tb_decl_f2.vhd
 src emp_project_decl_f2.vhd 
 src -c emp-fwk:components/links/slink emp_slink_types.vhd
 
