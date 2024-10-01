@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser(description="Create xciMaker file.")
 
 # Optional arguments
 parser.add_argument("-s", "--script_path", dest="scriptPath", help="directory containing compiled HLS", type=str, default="../../IRtoTB/script")
+parser.add_argument("-o", "--output_file", dest="outputFile", help="script that will add HLS to project", type=str, default="scripts/xciMaker")
 
 # Parse arguments
 args = parser.parse_args()
@@ -17,7 +18,7 @@ sub_froms = ["solution_", "InputRouterTop_IR_DTC",  "VMRouterCMTop", "VMRouterTo
 sub_tos = ["", "IR", "VMR", "VMR", "TE", "TC", "TP", "PR", "ME", "MC", "MP", "FT","PC","VMSMER"]
 
 #create file and write first line
-core_file = 'scripts/xciMaker'
+core_file = args.outputFile
 part = 'xcvu7p-flvb2104-2-e'
 dir_path = 'cgn'
 f = open(core_file, "w")
