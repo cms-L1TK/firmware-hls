@@ -89,10 +89,10 @@ public:
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
   {
-  assert(page < NPAGE);    
-	// TODO: check if valid
-	if(!NBIT_BX) ibx = 0;
- 	return dataarray_[ibx][DEPTH_ADDR*page+index];
+    //assert(page < NPAGE);    
+  	// TODO: check if valid  
+	  if(!NBIT_BX) ibx = 0;
+ 	  return dataarray_[ibx][DEPTH_ADDR*page+index];
   }
 
   template<class SpecType>
@@ -111,7 +111,7 @@ public:
 
   bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index, unsigned int page = 0)
   {
-  assert(page < NPAGE);        
+    //assert(page < NPAGE);        
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     if (addr_index < DEPTH_ADDR) {
