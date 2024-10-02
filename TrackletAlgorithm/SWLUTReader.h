@@ -1,6 +1,5 @@
 #include <fstream>
 #include <string>
-#include <iostream>
 
 // The following function provides a more compiler efficient method for reading
 // look up table arrays (currently used in TP), this is only used in C simulations and not synthesis
