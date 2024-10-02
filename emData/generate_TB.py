@@ -122,7 +122,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         "template<TF::seed Seed> constexpr int getNumDiskFMMemPerStub();\n"
         "template<TF::seed Seed> constexpr int getNumBarrelStub();\n"
         "template<TF::seed Seed> constexpr int getNumDiskStub();\n"
-        "template<TF::seed Seed> constexpr int getMPARNPages(const ITCType &);\n"
+        "template<TF::seed Seed> inline    int getMPARNPages(const ITCType &);\n"
         "template<TF::seed Seed> inline    int getMPARMem(const ITCType &);\n"
         "template<TF::seed Seed> inline    int getMPARPage(const ITCType &);\n"
     )
@@ -177,7 +177,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         nParentheses = 0
         first = True
         maxNPages = max([len(tpar) - len("MPAR_L1L2") for tpar in tparMems[tbName]])
-        getMPARNPages = "template<> constexpr int\n"
+        getMPARNPages = "template<> inline int\n"
         getMPARNPages += "getMPARNPages<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARNPages += "  return "
         for i in range(1, maxNPages):
