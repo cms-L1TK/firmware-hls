@@ -2,10 +2,6 @@
 #ifndef TrackletAlgorithm_MemoryTemplateTPROJ_h
 #define TrackletAlgorithm_MemoryTemplateTPROJ_h
 
-// L1 Track CMSSW Future SW currently assumes only 1 FPGA used,
-// and hence 1 page of memory.
-#define CMSSW_1FPGA
-
 #include <iostream>
 #include "../TestBenches/FileReadUtility.h"
 
@@ -25,6 +21,12 @@ template<int> class AllStub;
 #endif
 
 #ifdef CMSSW_GIT_HASH
+// L1 Track CMSSW Future SW currently assumes only 1 FPGA used,
+// and hence 1 page of memory.
+#define CMSSW_1FPGA
+#endif
+
+#ifdef CMSSW_GIT_HASH
 #ifdef CMSSW_1FPGA
 template<class DataType, unsigned int DUMMYA, unsigned int NBIT_ADDR, unsigned int DUMMYB >
 #else
@@ -39,8 +41,8 @@ template<class DataType, unsigned int NBIT_BX, unsigned int NBIT_ADDR, unsigned 
 // (1<<NBIT_BIN): number of BXs the memory is keeping track of
 // NBIT_ADDR: number of bits for memory address space per BX;
 // (1<<NBIT_ADDR): depth of the memory for each BX
-// NPAGE is number of pages used within BX. This is used for the TPROJ memory to allow
-// ordering of the different TP outputs
+// NPAGE is number of pages used within BX. This is used for the TPROJ memory
+// to allow ordering of the different TP outputs
 class MemoryTemplateTPROJ
 {
 private:
