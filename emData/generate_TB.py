@@ -226,7 +226,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
         # definition of getMPARPage function
         nParentheses = 0
-        getMPARPage = "template<> constexpr int\n"
+        getMPARPage = "template<> inline int\n"
         getMPARPage += "getMPARPage<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARPage += "  return "
         for i in range(0, maxNPages - 1):
