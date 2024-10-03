@@ -309,7 +309,9 @@ begin
         probe4 => MTPAR_L5L6ABCD_stream_V_dout,
         probe5 => MTPAR_L3L4AB_stream_V_dout,
         probe6 => MTPAR_D1D2ABCD_stream_V_dout,
-        probe7 => MTPAR_L1L2H_stream_V_dout
+        probe7 => MTPAR_L1L2H_stream_V_dout,
+        probe8 => d(11).start,
+        probe9 => d(11).last
       );
   
   --ipb_out.ipb_rdata <= AS_L1PHIAn1_stream_V_dout;
