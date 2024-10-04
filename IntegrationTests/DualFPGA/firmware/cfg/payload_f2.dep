@@ -1,10 +1,10 @@
-src memUtil_pkg.vhd
+src memUtil_pkg_f2.vhd
 src memUtil_aux_pkg_f2.vhd
 src payload_f2.vhd
 src linktosecproc2.vhd
 src sp2_mem_writer.vhd
 src tf2_wrapper.vhd
-src --vhdl2008 SectorProcessor.vhd
+src --vhdl2008 SectorProcessor_f2.vhd
 src tf_to_kf.vhd
 src kf_wrapper.vhd
 src common/hdl/emp/pkgs/tf_interface_pkg.vhd
@@ -32,5 +32,5 @@ src --vhdl2008 common/hdl/tf_pipe_delay.vhd
 # Include Cores
 ################
 iprepo *
-src ../cgn/*/*/*.xci
+src ../cgn/f2/*/*/*.xci
 

@@ -15,7 +15,7 @@ entity secproc1tolink is
     rst                    : in std_logic;
     TP_bx_out              : in std_logic_vector(2 downto 0);
     AS_37_stream_V_dout    : in t_arr_AS_37_DATA;
-    MTPAR_76_stream_V_dout : in t_arr_MTPAR_76_DATA;
+    MPAR_76_stream_V_dout : in t_arr_MPAR_76_DATA;
     q                      : out ldata(4 * N_REGION - 1 downto 0)
     );
 
@@ -28,9 +28,9 @@ architecture rtl of secproc1tolink is
   constant dataword_length : integer := 64;
   constant n_interfpga_links : integer := 64;
   signal AS_counter : integer := 0;
-  signal MTPAR_counter : integer := 0;
+  signal MPAR_counter : integer := 0;
   signal AS_signals : std_logic_vector(dataword_length * 28 - 1 downto 0);
-  signal MTPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0);
+  signal MPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0);
 
 begin
 
@@ -83,21 +83,21 @@ begin
                                AS_37_stream_V_dout(D5PHICn1) &
                                AS_37_stream_V_dout(D5PHIDn1);
 
-  MTPAR_signals(1139 downto 0) <= MTPAR_76_stream_V_dout(L1L2ABC) &
-                                  MTPAR_76_stream_V_dout(L1L2DF) &
-                                  MTPAR_76_stream_V_dout(L1L2E) &
-                                  MTPAR_76_stream_V_dout(L1L2GI) &
-                                  MTPAR_76_stream_V_dout(L1L2H) &
-                                  MTPAR_76_stream_V_dout(L1L2JLK) &
-                                  MTPAR_76_stream_V_dout(L2L3ABCD) &
-                                  MTPAR_76_stream_V_dout(L3L4AB) &
-                                  MTPAR_76_stream_V_dout(L3L4CD) &
-                                  MTPAR_76_stream_V_dout(L5L6ABCD) &
-                                  MTPAR_76_stream_V_dout(D1D2ABCD) &
-                                  MTPAR_76_stream_V_dout(D3D4ABCD) &
-                                  MTPAR_76_stream_V_dout(L1D1ABCD) &
-                                  MTPAR_76_stream_V_dout(L1D1EFGH) &
-                                  MTPAR_76_stream_V_dout(L2D1ABCD);
+  MPAR_signals(1139 downto 0) <= MPAR_76_stream_V_dout(L1L2ABC) &
+                                  MPAR_76_stream_V_dout(L1L2DE) &
+                                  MPAR_76_stream_V_dout(L1L2F) &
+                                  MPAR_76_stream_V_dout(L1L2G) &
+                                  MPAR_76_stream_V_dout(L1L2HI) &
+                                  MPAR_76_stream_V_dout(L1L2JKL) &
+                                  MPAR_76_stream_V_dout(L2L3ABCD) &
+                                  MPAR_76_stream_V_dout(L3L4AB) &
+                                  MPAR_76_stream_V_dout(L3L4CD) &
+                                  MPAR_76_stream_V_dout(L5L6ABCD) &
+                                  MPAR_76_stream_V_dout(D1D2ABCD) &
+                                  MPAR_76_stream_V_dout(D3D4ABCD) &
+                                  MPAR_76_stream_V_dout(L1D1ABCD) &
+                                  MPAR_76_stream_V_dout(L1D1EFGH) &
+                                  MPAR_76_stream_V_dout(L2D1ABCD);
   
   q(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
   q(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
@@ -128,29 +128,32 @@ begin
   q(33).data(63 downto 0) <= AS_signals(63 + 25*64 downto 0 + 25*64);
   q(34).data(63 downto 0) <= AS_signals(63 + 26*64 downto 0 + 26*64);
   q(35).data(63 - 16 downto 0) <= AS_signals(63 + 27*64 - 16 downto 0 + 27*64);
+  q(35).data(63 downto 63-15) <= (others => '0');
 
   --15 76bit signals can be accomodated by 18 64bit signals, this will leave
   --12 empty bits in the last data word
-  q(36).data(63 downto 0) <= MTPAR_signals(63 + 0*64 downto 0 + 0*64);
-  q(37).data(63 downto 0) <= MTPAR_signals(63 + 1*64 downto 0 + 1*64);
-  q(38).data(63 downto 0) <= MTPAR_signals(63 + 2*64 downto 0 + 2*64);
-  q(39).data(63 downto 0) <= MTPAR_signals(63 + 3*64 downto 0 + 3*64);
-  q(40).data(63 downto 0) <= MTPAR_signals(63 + 4*64 downto 0 + 4*64);
-  q(41).data(63 downto 0) <= MTPAR_signals(63 + 5*64 downto 0 + 5*64);
-  q(42).data(63 downto 0) <= MTPAR_signals(63 + 6*64 downto 0 + 6*64);
-  q(43).data(63 downto 0) <= MTPAR_signals(63 + 7*64 downto 0 + 7*64);
-  q(44).data(63 downto 0) <= MTPAR_signals(63 + 8*64 downto 0 + 8*64);
-  q(45).data(63 downto 0) <= MTPAR_signals(63 + 9*64 downto 0 + 9*64);
-  q(46).data(63 downto 0) <= MTPAR_signals(63 + 10*64 downto 0 + 10*64);
-  q(47).data(63 downto 0) <= MTPAR_signals(63 + 11*64 downto 0 + 11*64);
-  q(48).data(63 downto 0) <= MTPAR_signals(63 + 12*64 downto 0 + 12*64);
-  q(49).data(63 downto 0) <= MTPAR_signals(63 + 13*64 downto 0 + 13*64);
-  q(50).data(63 downto 0) <= MTPAR_signals(63 + 14*64 downto 0 + 14*64);
-  q(51).data(63 downto 0) <= MTPAR_signals(63 + 15*64 downto 0 + 15*64);
-  q(52).data(63 downto 0) <= MTPAR_signals(63 + 16*64 downto 0 + 16*64);
-  q(53).data(63 - 12 downto 0) <= MTPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
+  q(36).data(63 downto 0) <= MPAR_signals(63 + 0*64 downto 0 + 0*64);
+  q(37).data(63 downto 0) <= MPAR_signals(63 + 1*64 downto 0 + 1*64);
+  q(38).data(63 downto 0) <= MPAR_signals(63 + 2*64 downto 0 + 2*64);
+  q(39).data(63 downto 0) <= MPAR_signals(63 + 3*64 downto 0 + 3*64);
+  q(40).data(63 downto 0) <= MPAR_signals(63 + 4*64 downto 0 + 4*64);
+  q(41).data(63 downto 0) <= MPAR_signals(63 + 5*64 downto 0 + 5*64);
+  q(42).data(63 downto 0) <= MPAR_signals(63 + 6*64 downto 0 + 6*64);
+  q(43).data(63 downto 0) <= MPAR_signals(63 + 7*64 downto 0 + 7*64);
+  q(44).data(63 downto 0) <= MPAR_signals(63 + 8*64 downto 0 + 8*64);
+  q(45).data(63 downto 0) <= MPAR_signals(63 + 9*64 downto 0 + 9*64);
+  q(46).data(63 downto 0) <= MPAR_signals(63 + 10*64 downto 0 + 10*64);
+  q(47).data(63 downto 0) <= MPAR_signals(63 + 11*64 downto 0 + 11*64);
+  q(48).data(63 downto 0) <= MPAR_signals(63 + 12*64 downto 0 + 12*64);
+  q(49).data(63 downto 0) <= MPAR_signals(63 + 13*64 downto 0 + 13*64);
+  q(50).data(63 downto 0) <= MPAR_signals(63 + 14*64 downto 0 + 14*64);
+  q(51).data(63 downto 0) <= MPAR_signals(63 + 15*64 downto 0 + 15*64);
+  q(52).data(63 downto 0) <= MPAR_signals(63 + 16*64 downto 0 + 16*64);
+  q(53).data(63 - 12 downto 0) <= MPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
+  q(53).data(63 downto 63-11) <= (others => '0');
   
   q(54).data(2 downto 0) <= bx_out;
+  q(54).data(63 downto 3) <= (others => '0');
 
   --gen : for i in n_interfpga_links - 1 downto 0 generate
 
@@ -187,11 +190,11 @@ begin
   --  elsif (i>34 and i<52) then
   --    --15 75-bit signals can be accomodated by 18 64-bit words, the final
   --    --64-bit word will only use 37 of the bits 
-  --    q(i).data(63 downto 0) <= MTPAR_signals(63 + MTPAR_counter*64 downto 0 + MTPAR_counter*64);
-  --    MTPAR_counter <= MTPAR_counter + 1;
+  --    q(i).data(63 downto 0) <= MPAR_signals(63 + MPAR_counter*64 downto 0 + MPAR_counter*64);
+  --    MPAR_counter <= MPAR_counter + 1;
 
   --  elsif i=52 then
-  --    q(i).data(36 downto 0) <= MTPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38);
+  --    q(i).data(36 downto 0) <= MPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38);
 
   --  elsif i=53 then
   --    q(i).data(2 downto 0) <= bx_out;

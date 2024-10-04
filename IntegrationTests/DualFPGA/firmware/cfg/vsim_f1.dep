@@ -3,11 +3,11 @@
 @fpga_speed_grade = "-2-e"
 
 include payload_f1.dep
-setup ../ucf/vsim.tcl
+setup ../ucf/vsim_f1.tcl
 
 include -c emp-fwk:boards/testbench top.dep
 
-src common/hdl/emp/tb_decl_f1.vhd
+src tb_decl_f1.vhd
 src emp_project_decl_f1.vhd 
 src -c emp-fwk:components/links/slink emp_slink_types.vhd
 

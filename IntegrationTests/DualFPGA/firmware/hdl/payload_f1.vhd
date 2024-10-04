@@ -41,7 +41,10 @@ architecture rtl of emp_payload is
   signal s_IR_data             : t_arr_DL_39_DATA;
   signal s_ir_start            : std_logic;
   signal s_bx                  : std_logic_vector(2 downto 0);
+  signal tp_bx                 : std_logic_vector(2 downto 0);
   signal s_TP_bx_out_vld       : std_logic;
+  signal AS_37_stream          : t_arr_AS_37_DATA;
+  signal MPAR_76_stream        : t_arr_MPAR_76_DATA;
 
 begin
 
@@ -71,7 +74,7 @@ begin
       );
 
   -----------------------------------------------------------------------------
-  -- Sector Processor (and InterFPGA link formatter?)
+  -- Sector Processor 
   -----------------------------------------------------------------------------
   tf1_wrapper_1 : entity work.tf1_wrapper
     port map (
@@ -79,57 +82,27 @@ begin
       reset                    => rst,
       IR_start                 => s_ir_start,
       IR_bx_in                 => s_bx,
-      TP_bx_out_0              => open,
+      TP_bx_out_0              => tp_bx,
       TP_bx_out_vld            => s_TP_bx_out_vld,
       TP_done                  => open,
       DL_39_link_AV_dout       => s_IR_data,
       DL_39_link_empty_neg     => (others => '1'),
-      DL_39_link_read          => open
+      DL_39_link_read          => open,
+      AS_37_stream_V_dout      => AS_37_stream,
+      MPAR_76_stream_V_dout    => MPAR_76_stream
       );
 
-  ---- This example code sends 156-word-long TMUX18 packets (i.e. same packet length as track finder output)
-  ---- with channel index, packet index, and word index embedded in the data word
-  --gen : for i in N_REGION * 4 - 1 downto 0 generate
-
-  --  -- Index of word within a packet
-  --  signal word_index : std_logic_vector(7 downto 0) := x"00";
-  --  -- Index of packet within an orbit
-  --  signal packet_index : std_logic_vector(8 downto 0) := "000000000";
-
-  --begin
-
-  --  process (clk_p)
-  --  begin
-  --    if rising_edge(clk_p) then
-  --      -- Reset counters on receiving BC0 from TCDS
-  --      if (ctrs(i/4).bctr = x"000") and (ctrs(i/4).pctr = "0000") then
-  --        word_index <= x"00";
-  --        packet_index <= "000000000";
-  --      -- Reset word index and increment packet index every 162 clock cycles (TMUX18: 18BX * 9 clocks/BX)
-  --      elsif word_index = x"A1" then
-  --        word_index <= x"00";
-  --        packet_index <= std_logic_vector(unsigned(packet_index) + 1);
-  --      else
-  --        word_index <= std_logic_vector(unsigned(word_index) + 1);
-  --      end if;
-  --    end if;
-  --  end process;
-
-  --  -- Set valid high for full duration of packet
-  --  q(i).valid <= '1' when word_index <= x"9B" else '0';
-  --  -- Start & last are only high for first & last clock cycle of packet
-  --  q(i).start <= '1' when word_index = x"00" else '0';
-  --  q(i).last <= '1' when word_index = x"9B" else '0';
-
-  --  -- Start of orbit is high in the first clock cycle of the first packet in orbit - though in final system this should instead
-  --  -- be high in the first clock cycle of the packet containing the data from BX0 (or BXn in time slice n of a TMUX system)
-  --  q(i).start_of_orbit <= '1' when ((word_index = x"00") and (packet_index = "000000000")) else '0';
-
-  --  -- Data word: Bits 63 to 32 = channel index; bits 31 to 16 = packet index; bits 15 to 0 = word index.
-  --  q(i).data(63 downto 32) <= std_logic_vector(to_unsigned(i, 32));
-  --  q(i).data(31 downto 16) <= "0000000" & packet_index;
-  --  q(i).data(15 downto 0) <= x"00" & word_index;
-
-  --end generate gen;
+  -----------------------------------------------------------------------------
+  -- Link formatter
+  -----------------------------------------------------------------------------
+  secproc1tolink_1 : entity work.secproc1tolink
+    port map (
+      clk                      => clk_p,
+      rst                      => rst,
+      TP_bx_out                => tp_bx,
+      AS_37_stream_V_dout      => AS_37_stream,
+      MPAR_76_stream_V_dout    => MPAR_76_stream,
+      q                        => q
+      );
 
 end rtl;
