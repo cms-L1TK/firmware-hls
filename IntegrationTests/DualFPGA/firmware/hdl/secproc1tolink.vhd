@@ -8,6 +8,7 @@ use work.emp_device_decl.all;
 
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f1.all;
+use work.hybrid_data_types.all;
 
 entity secproc1tolink is
   port(
@@ -15,7 +16,8 @@ entity secproc1tolink is
     rst                    : in std_logic;
     TP_bx_out              : in std_logic_vector(2 downto 0);
     AS_37_stream_V_dout    : in t_arr_AS_37_DATA;
-    MPAR_76_stream_V_dout : in t_arr_MPAR_76_DATA;
+    MPAR_76_stream_V_dout  : in t_arr_MPAR_76_DATA;
+    node_packet            : in t_packet;
     q                      : out ldata(4 * N_REGION - 1 downto 0)
     );
 
@@ -31,6 +33,7 @@ architecture rtl of secproc1tolink is
   signal MPAR_counter : integer := 0;
   signal AS_signals : std_logic_vector(dataword_length * 28 - 1 downto 0);
   signal MPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0);
+  signal sr : t_packets( PAYLOAD_LATENCY - 1 downto 0 ) := ( others => ( others => '0' ) );
 
 begin
 
@@ -98,6 +101,13 @@ begin
                                   MPAR_76_stream_V_dout(L1D1ABCD) &
                                   MPAR_76_stream_V_dout(L1D1EFGH) &
                                   MPAR_76_stream_V_dout(L2D1ABCD);
+
+  process( clk ) is
+  begin
+  if rising_edge( clk ) then
+    sr <= sr( sr'high - 1 downto 0 ) & node_packet;
+  end if;
+  end process;
   
   q(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
   q(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
@@ -130,6 +140,21 @@ begin
   q(35).data(63 - 16 downto 0) <= AS_signals(63 + 27*64 - 16 downto 0 + 27*64);
   q(35).data(63 downto 63-15) <= (others => '0');
 
+  --although we are just sending this to FPGA2, FPGA2 uses the control signals
+  --to determine its outputs control signals, so we should synchronize these
+  control_signals1 : for i in 4 to 15 generate
+    q(i).start_of_orbit <= sr(sr'high).start_of_orbit;
+    q(i).start <= sr(sr'high).start;
+    q(i).last <= sr(sr'high).last;
+    q(i).valid <= sr(sr'high).valid;
+  end generate;
+  control_signals2 : for i in 20 to 54 generate
+    q(i).start_of_orbit <= sr(sr'high).start_of_orbit;
+    q(i).start <= sr(sr'high).start;
+    q(i).last <= sr(sr'high).last;
+    q(i).valid <= sr(sr'high).valid;
+  end generate;
+
   --15 76bit signals can be accomodated by 18 64bit signals, this will leave
   --12 empty bits in the last data word
   q(36).data(63 downto 0) <= MPAR_signals(63 + 0*64 downto 0 + 0*64);
@@ -154,51 +179,5 @@ begin
   
   q(54).data(2 downto 0) <= bx_out;
   q(54).data(63 downto 3) <= (others => '0');
-
-  --gen : for i in n_interfpga_links - 1 downto 0 generate
-
-  --begin
-  --  --Quad0:  0, 1, 2, 3  Dummy
-  --  --Quad1:  *4, 5, 6, 7
-  --  --Quad2:  8, 9, 10,11
-  --  --Quad3:  12,13,14,15
-  --  --Quad4:  16,17,18,19 Dummy
-  --  --Quad5:  20,21,22,23
-  --  --Quad6:  24,25,26,27
-  --  --Quad7:  28,29,30,31
-  --  --Quad8:  32,33,34*,*35
-  --  --Quad9:  36,37,38,39
-  --  --Quad10: 40,41,42,43
-  --  --Quad11: 44,45,46,47
-  --  --Quad12: 48,49,50,51
-  --  --Quad13: 52*,*53*,54,55
-  --  --Quad14: 56,57,58,59
-  --  --Quad15: 60,61,62,63 Dummy
-  --  if (i<4) then
-  --    
-  --  elsif (i>11 and i<16) then
-
-  --  elsif (i>59) then
-
-  --  elsif (i>3 and i<35) then
-  --    --9 64-bit channels exactly accomodates 16 of the 36-bit signals, since
-  --    --there are 48 of the 36-bit signals, 27 64-bit channels will perfectly
-  --    --accomodate all of the 36-bit signals
-  --    q(i).data(63 downto 0) <= AS_signals(63 + AS_counter*64 downto 0 + AS_counter*64);
-  --    AS_counter <= AS_counter + 1;
-
-  --  elsif (i>34 and i<52) then
-  --    --15 75-bit signals can be accomodated by 18 64-bit words, the final
-  --    --64-bit word will only use 37 of the bits 
-  --    q(i).data(63 downto 0) <= MPAR_signals(63 + MPAR_counter*64 downto 0 + MPAR_counter*64);
-  --    MPAR_counter <= MPAR_counter + 1;
-
-  --  elsif i=52 then
-  --    q(i).data(36 downto 0) <= MPAR_signals(dataword_length * 18 - 1 downto dataword_length * 18 - 38);
-
-  --  elsif i=53 then
-  --    q(i).data(2 downto 0) <= bx_out;
-  --    
-  --end generate gen;
     
 end rtl;

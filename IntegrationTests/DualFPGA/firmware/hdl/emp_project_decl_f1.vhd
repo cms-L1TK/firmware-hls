@@ -18,8 +18,9 @@ package emp_project_decl is
   constant CLOCK_RATIO        : integer               := 6;
   constant CLOCK_AUX_DIV      : clock_divisor_array_t := (18, 9, 4);  -- Dividers of CLOCK_COMMON_RATIO * 40 MHz
 
-  -- Only used by nullalgo   
-  constant PAYLOAD_LATENCY : integer := 823;
+  -- Readdjust if latency changes for FPGA1 algorithm
+  constant PAYLOAD_LATENCY : integer := 140;
+
   -- F1 transmits to F2 on inter-fpga links
   constant REGION_CONF : region_conf_array_t := (
      0   => kDummyRegion,                     -- service c2c

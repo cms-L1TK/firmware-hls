@@ -11,6 +11,8 @@ use work.emp_slink_types.all;
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f1.all;
+use work.hybrid_data_types.all;
+use work.conv_pkg_f1.all;
 
 entity emp_payload is
   port(
@@ -102,6 +104,7 @@ begin
       TP_bx_out                => tp_bx,
       AS_37_stream_V_dout      => AS_37_stream,
       MPAR_76_stream_V_dout    => MPAR_76_stream,
+      node_packet              => conv_single(d),
       q                        => q
       );
 
