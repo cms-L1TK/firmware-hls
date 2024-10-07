@@ -1832,7 +1832,7 @@ add_rects_to_pblock_mod $lpblock_payload_PCVMSMERDs $pblock_payload_PCVMSMERDsre
 set pblock_payload_PCVMSMERLsrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3}] -f "RPM_X >= 4000"]]
 add_rects_to_pblock_mod $lpblock_payload_PCVMSMERLs $pblock_payload_PCVMSMERLsrect
 
-set pblock_payload_sp2_mem_writerrect [find_rects [get_sites -f "RPM_X >= 800 && RPM_Y <= 1040"]]
+set pblock_payload_sp2_mem_writerrect [find_rects [get_sites -f "RPM_X >= 800 ]]
 add_rects_to_pblock_mod $lpblock_payload_sp2_mem_writer $pblock_payload_sp2_mem_writerrect
 
 #change only payload pblocks to be hard constraints
