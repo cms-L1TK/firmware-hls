@@ -8,6 +8,8 @@ src --vhdl2008 SectorProcessor_f1.vhd
 src memUtil_pkg_f1.vhd
 src memUtil_aux_pkg_f1.vhd
 src common/hdl/emp/pkgs/GCU_utils.vhd
+src conv_pkg_f1.vhd
+include -c firmware-hls:KalmanFilter/common components.dep 
 
 #Track Builder dependencies
 src common/hdl/CreateStartSignal.vhd
