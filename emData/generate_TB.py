@@ -122,9 +122,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         "template<TF::seed Seed> constexpr int getNumDiskFMMemPerStub();\n"
         "template<TF::seed Seed> constexpr int getNumBarrelStub();\n"
         "template<TF::seed Seed> constexpr int getNumDiskStub();\n"
-        "template<unsigned Seed> int getMPARNPages(const ITCType &);\n"
-        "template<unsigned Seed> int getMPARMem(const ITCType &);\n"
-        "template<unsigned Seed> int getMPARPage(const ITCType &);\n"
+        "template<TF::seed Seed> inline    int getMPARNPages(const ITCType &);\n"
+        "template<TF::seed Seed> inline    int getMPARMem(const ITCType &);\n"
+        "template<TF::seed Seed> inline    int getMPARPage(const ITCType &);\n"
     )
 
     # Calculate parameters and print out top function for each TB.
@@ -177,7 +177,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         nParentheses = 0
         first = True
         maxNPages = max([len(tpar) - len("MPAR_L1L2") for tpar in tparMems[tbName]])
-        getMPARNPages = "template<> int\n"
+        getMPARNPages = "template<> inline int\n"
         getMPARNPages += "getMPARNPages<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARNPages += "  return "
         for i in range(1, maxNPages):
@@ -201,7 +201,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
         # definition of getMPARMem function
         nParentheses = 0
-        getMPARMem = "template<> int\n"
+        getMPARMem = "template<> inline int\n"
         getMPARMem += "getMPARMem<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARMem += "  return "
         for i in range(0, max(nTPARMem) - 1):
@@ -226,7 +226,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
         # definition of getMPARPage function
         nParentheses = 0
-        getMPARPage = "template<> int\n"
+        getMPARPage = "template<> inline int\n"
         getMPARPage += "getMPARPage<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARPage += "  return "
         for i in range(0, maxNPages - 1):

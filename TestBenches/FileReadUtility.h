@@ -256,9 +256,9 @@ unsigned int compareMemWithMemPage(const MemType& memory_ref, const MemType& mem
   constexpr int lsb = (LSB >= 0 && MSB >= LSB) ? LSB : 0;
   constexpr int msb = (LSB >= 0 && MSB >= LSB) ? MSB : MemType::getWidth() - 1;
 
-  for (unsigned int ipage = 0; ipage < 4; ++ipage) {
+  for (unsigned int ipage = 0; ipage < memory_ref.getNPage(); ++ipage) {
     //FIXME
-    for (unsigned int i = 0; i < memory_ref.getDepth()/4; ++i) {
+    for (unsigned int i = 0; i < memory_ref.getDepth(); ++i) {
       const auto data_ref_raw = memory_ref.read_mem(ievt,i,ipage).raw();
       const auto data_com_raw = memory.read_mem(ievt,i,ipage).raw();
       const auto data_ref = data_ref_raw.range(msb,lsb);
