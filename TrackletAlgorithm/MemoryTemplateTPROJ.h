@@ -180,23 +180,18 @@ public:
 
   bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
   {
-#ifdef CMSSW_1FPGA
-    const std::string& datastr = line;
-    unsigned int page = 0;
-#else
     assert(split(line,' ').size()==4);
 
     const std::string datastr = split(line,' ').back();
 
     const std::string pagestr = split(line,' ').front();
 
-    unsigned int page = 4;
+    unsigned int page = NPAGE;
     if (pagestr=="0x00") page = 0;
     if (pagestr=="0x01") page = 1;
     if (pagestr=="0x02") page = 2;
     if (pagestr=="0x03") page = 3;
-    assert(page<4);
-#endif
+    assert(page < NPAGE);
 
     if(!NBIT_BX) ibx = 0;
     DataType data(datastr.c_str(), base);
