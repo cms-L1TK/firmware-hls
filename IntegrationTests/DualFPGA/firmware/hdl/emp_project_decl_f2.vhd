@@ -42,20 +42,20 @@ package emp_project_decl is
 ------cross
 ----- all MGTs instantiated bidirectionally for now
     16  => kDummyRegion,                      -- not routed
-    17  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    18  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    19  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
+    17  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    18  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    19  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
     20  => kDummyRegion,                      -- not routed                  
-    21  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    22  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    23  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    24  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    25  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    26  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    27  => (gty25, no_buf, no_fmt, buf, gty25),  -- firefly
-    28  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    29  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly
-    30  => (gty25, no_buf, no_fmt, no_buf, gty25),  -- firefly     
+    21  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    22  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    23  => (no_mgt, no_buf, no_fmt, buf,    gty25),  -- firefly
+    24  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    25  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    26  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    27  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    28  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    29  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
+    30  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly     
     31  => kDummyRegion,                      -- service tcds
 
     others => kDummyRegion
