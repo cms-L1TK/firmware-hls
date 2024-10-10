@@ -8,9 +8,9 @@ fpga2_hls_script_path = ../../CombinedConfig_FPGA2/script
 
 all: add_common_files $(core_file_fpga1) $(core_file_fpga2) hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj $(input_file_fpga1) $(input_file_fpga2) apollo_input_fpga1 apollo_input_fpga2 lut_inclusion
 
-fpga1: add_common_files $(core_file_fpga1) hdl_add_files_fpga1 xciCreation_fpga1 kfin_adj $(input_file_fpga1) apollo_input lut_inclusion
+fpga1: add_common_files $(core_file_fpga1) hdl_add_files_fpga1 xciCreation_fpga1 kfin_adj $(input_file_fpga1) apollo_input_fpga1 lut_inclusion
 
-fpga2: add_common_files $(core_file_fpga2) hdl_add_files_fpga2 xciCreation_fpga2 kfin_adj $(input_file_fpga2) apollo_input lut_inclusion
+fpga2: add_common_files $(core_file_fpga2) hdl_add_files_fpga2 xciCreation_fpga2 kfin_adj $(input_file_fpga2) apollo_input_fpga2 lut_inclusion
 
 $(core_dir):
 	@mkdir cgn mem
