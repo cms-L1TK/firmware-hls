@@ -301,7 +301,7 @@ begin
 
     ila_0 : entity work.ila_0
       port map(
-        clk => clk40,
+        clk => clk_p,
         probe0 => AS_L1PHIAn1_stream_V_dout,
         probe1 => AS_L1PHICn1_stream_V_dout,
         probe2 => AS_L6PHICn1_stream_V_dout,
