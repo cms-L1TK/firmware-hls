@@ -8,16 +8,18 @@ parser = argparse.ArgumentParser(description="Create xciMaker file.")
 
 # Optional arguments
 parser.add_argument("-s", "--script_path", dest="scriptPath", help="directory containing compiled HLS", type=str, default="../../IRtoTB/script")
+parser.add_argument("-o", "--output_file", dest="outputFile", help="script that will add HLS to project", type=str, default="scripts/xciMaker")
+parser.add_argument("-f", "--sub_path", dest="subPath", help="location within cgn to copy HLS IPs", type=str, default="")
 
 # Parse arguments
 args = parser.parse_args()
 
 # List of things to substitute to get the cores nickname
-sub_froms = ["solution_", "InputRouterTop_IR_DTC",  "VMRouterCMTop", "VMRouterTop", "TrackletEngine", "TrackletCalculator", "TrackletProcessor", "ProjectionRouterTop", "MatchEngineTop", "MatchCalculator", "MatchProcessor", "TrackBuilder"]
-sub_tos = ["", "IR", "VMR", "VMR", "TE", "TC", "TP", "PR", "ME", "MC", "MP", "FT"]
+sub_froms = ["solution_", "InputRouterTop_IR_DTC",  "VMRouterCMTop", "VMRouterTop", "TrackletEngine", "TrackletCalculator", "TrackletProcessor", "ProjectionRouterTop", "MatchEngineTop", "MatchCalculator", "MatchProcessor", "TrackBuilder","ProjectionCalculator", "VMStubMERouterTop"]
+sub_tos = ["", "IR", "VMR", "VMR", "TE", "TC", "TP", "PR", "ME", "MC", "MP", "FT","PC","VMSMER"]
 
 #create file and write first line
-core_file = 'scripts/xciMaker'
+core_file = args.outputFile
 part = 'xcvu7p-flvb2104-2-e'
 dir_path = 'cgn'
 f = open(core_file, "w")
@@ -49,7 +51,7 @@ for core_folder in core_dirs_lup:
     #if (core_name.find('ME') != -1):
     #    core_name = core_name + "PHIB"
     #f.write("tool_add_core -level 0 -inst " + core_name + " " + core_dir_complete + "\n")
-    os.symlink('../' + core_dir_folder, dir_path + '/' + core_name)
+    os.symlink('../../' + core_dir_folder, dir_path + '/' + args.subPath + '/' + core_name)
     core_names.append(core_name)
     f.write(core_name + ":\n")
     f.write("\tvivado -nolog -nojou -mode batch -source scripts/ip_tools.tcl -tclargs " + core_name + " " + core_dir_folder + " " + part + " " + core_dir_complete + "\n")

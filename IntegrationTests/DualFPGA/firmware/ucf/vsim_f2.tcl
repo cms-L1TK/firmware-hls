@@ -1,6 +1,6 @@
 set_property SOURCE_SET sources_1 [get_filesets sim_1]
-add_files -fileset sim_1 -norecurse ../../src/firmware-hls/IntegrationTests/ReducedCombinedConfig/IRtoKF/firmware/mem/in.txt
-set lut_script [file dirname [file normalize ../../src/firmware-hls/IntegrationTests/ReducedCombinedConfig/IRtoKF/firmware/scripts/pre_msim.tcl ]]
+add_files -fileset sim_1 -norecurse ../../src/firmware-hls/IntegrationTests/DualFPGA/firmware/mem/in_fpga2.txt
+set lut_script [file dirname [file normalize ../../src/firmware-hls/IntegrationTests/DualFPGA/firmware/scripts/pre_msim.tcl ]]
 append lut_script "/pre_msim.tcl"
 add_files -fileset utils_1 -norecurse $lut_script
 #set_property STEPS.SYNTH_DESIGN.TCL.PRE $lut_script [get_runs sim_1]

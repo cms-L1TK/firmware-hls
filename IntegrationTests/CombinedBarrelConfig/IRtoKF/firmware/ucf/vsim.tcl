@@ -12,5 +12,7 @@ eval ${pre_path}
 set_property source_mgmt_mode None [current_project]
 set_property top top [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
+set_property target_language VHDL [current_project]
+set_property simulator_language VHDL [current_project]
 # Re-enabling previously disabled source management mode.
 set_property source_mgmt_mode All [current_project]
