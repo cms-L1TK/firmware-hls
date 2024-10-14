@@ -25,8 +25,9 @@ template<class lutType, int lutsize> bool readSWLUT(lutType lut[lutsize],const s
       skipfirst = false;
       continue;
     }
-    lut[lutIndex]=lutval;
+    if (lutIndex < lutsize) lut[lutIndex]=lutval;
     ++lutIndex;
   }
+  assert(lutIndex == lutsize || lutIndex == lutsize + 1); // Allow for optional final bracket.
   return true;
 }
