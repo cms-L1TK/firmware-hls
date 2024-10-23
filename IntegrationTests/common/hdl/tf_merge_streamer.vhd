@@ -65,9 +65,10 @@ architecture RTL of tf_merge_streamer is
   constant pipe_stages : integer := 3;
   constant LOG2_RAM_DEPTH : integer := CLOGB2(RAM_DEPTH);
 
-  type mem_count_arr is array(NUM_INPUTS-1 downto 0) of integer;
-  type toread_arr is array(pipe_stages downto 0) of integer;
+  type mem_count_arr is array(MAX_INPUTS-1 downto 0) of integer;
+  type toread_arr is array(pipe_stages-1 downto 0) of integer range 0 to 3;
   type bx_arr is array(pipe_stages downto 0) of std_logic_vector(2 downto 0);
+  type addr_arr_arr is array(MAX_INPUTS-1 downto 0) of std_logic_vector(LOG2_RAM_DEPTH-1 downto 0);
 
   --nent and din are repackaged from odd input type into
   --arrays
@@ -76,66 +77,127 @@ architecture RTL of tf_merge_streamer is
 
   signal valid : std_logic_vector(pipe_stages-1 downto 0) := (others => '0');
   signal bx_pipe : bx_arr := (others => (others => '0'));
-  signal addr_arr_int : std_logic_vector(NUM_INPUTS*LOG2_RAM_DEPTH-1 downto 0) := (others => '0');
+  --signal addr_arr_int : std_logic_vector(NUM_INPUTS*LOG2_RAM_DEPTH-1 downto 0) := (others => '0');
+  signal addr_arr_int : addr_arr_arr := (others => (others => '0'));
+  signal bx_last : std_logic_vector(2 downto 0) := "111";
+  signal bx_in_latch : std_logic_vector(2 downto 0) := "111"; --since output triggered by BX change, initializing bx_in_latch to 7 will start write on first valid bx (0)
+  signal mem_count : mem_count_arr := (others => 0);
+  signal toread : toread_arr := (others => 0);
+  signal current_page: natural := 7 mod NUM_PAGES;
+  signal readmask : std_logic_vector(MAX_INPUTS-1 downto 0) := (others => '0');
 
 begin
   process(clk)
   variable nent_arr: nent_array;
   variable din_arr: din_array;
-  variable bx_last :integer :=0;
-  variable bx_in_latch : std_logic_vector(2 downto 0) := "111"; --since output triggered by BX change, initializing bx_in_latch to 7 will start write on first valid bx (0)
-  variable mem_count : mem_count_arr := (others => 0);
-  variable current_page: natural := 0;
   variable bx_change : boolean := false; -- indicates to the module whether or not the bx has changed compared to the previous clock
-  variable readmask : std_logic_vector(NUM_INPUTS-1 downto 0) := (others => '0');
-
-  variable toread : toread_arr := (others => 0);
+  variable nextread : integer range 0 to 3 := 0;
+  variable mem_count_next : mem_count_arr := (others => 0);
 
   begin
     if rising_edge(clk) then
       if (bx_in_vld = '1') then
-        bx_in_latch := bx_in;
+        bx_in_latch <= bx_in;
+        current_page <= to_integer(unsigned(bx_in)) mod NUM_PAGES;
       end if;
 
       nent_arr := (nent3,nent2,nent1,nent0); --repackage nent and din as arrays
       din_arr := (din3, din2, din1, din0);
-      bx_change := (bx_last /= to_integer(unsigned(bx_in_latch)));
+      bx_change := (bx_last /= bx_in_latch);
+
       if (bx_change) then --reset with rst signal or a change in bx
-        -- check if bx changes and update page to read from
-        mem_count := (others => 0);
-        toread(0) := (NUM_INPUTS-1) mod NUM_INPUTS;
-      end if ;
-      current_page := to_integer(unsigned(bx_in_latch)) mod NUM_PAGES;
-
-      --check if memory read counter is less than nentries
-      --this sets readmask to 1 for any inputs that still have words to read
-      for i in 0 to NUM_INPUTS-1 loop
-        if ((mem_count(i)) < to_integer(unsigned(nent_arr(i)(current_page)))) then
-          readmask(i) := '1';
-        else
-          readmask(i) := '0';
-        end if;
-      end loop;
-
-      if (to_integer(unsigned(readmask)) = 0) then
+        mem_count <= (others => 0);
+        toread(0) <= (NUM_INPUTS-1) mod NUM_INPUTS;
         valid(0) <= '0';
-      else
-        --loop through starting with the next input in front of the current to-read (round-robin)
-        for j in 0 to NUM_INPUTS-1 loop
-          if readmask((j + toread(0) + 1) mod NUM_INPUTS) = '1' then
-            toread(0) := (j + toread(0) + 1 ) mod NUM_INPUTS;
-            exit;
+
+        --check if memory read counter is less than nentries
+        --this sets readmask to 1 for any inputs that still have words to read
+        for i in 0 to NUM_INPUTS-1 loop
+          if (0 < to_integer(unsigned(nent_arr(i)(current_page)))) then
+            readmask(i) <= '1';
+          else
+            readmask(i) <= '0';
           end if;
         end loop;
-        addr_arr_int(((toread(0)+1)*LOG2_RAM_DEPTH)-1 downto (toread(0))*LOG2_RAM_DEPTH) <= std_logic_vector(to_unsigned(current_page*page_length + mem_count(toread(0)), LOG2_RAM_DEPTH));
-        valid(0) <= '1';
-        mem_count(toread(0)) := mem_count(toread(0)) + 1;
-      end if;
+        
+      else
+        --only check for valid reads on non BX change clocks
+        --this gives up a clock cycle, but reduces logic levels downstream
+
+        for i in 0 to NUM_INPUTS-1 loop
+          mem_count_next(i) := mem_count(i);
+        end loop;
+
+        if (to_integer(unsigned(readmask)) = 0) then
+          valid(0) <= '0';
+        else
+          valid(0) <= '1';
+          --loop through starting with the next input in front of the current to-read (round-robin)
+          --the giant if block is gross, but for loop with exit seems to generate way too many logic levels
+          --hope: this figures out nextread in a single lookup
+          if (toread(0) = 0) then
+            if (readmask(1) = '1') then
+              nextread := 1;
+            elsif (readmask(2) = '1') then
+              nextread := 2;
+            elsif (readmask(3) = '1') then
+              nextread := 3;
+            elsif (readmask(0) = '1') then
+              nextread := 0;
+            end if;
+          elsif (toread(0) = 1) then
+            if (readmask(2) = '1') then
+              nextread := 2;
+            elsif (readmask(3) = '1') then
+              nextread := 3;
+            elsif (readmask(0) = '1') then
+              nextread := 0;
+            elsif (readmask(1) = '1') then
+              nextread := 1;
+            end if;
+          elsif (toread(0) = 2) then
+            if (readmask(3) = '1') then
+              nextread := 3;
+            elsif (readmask(0) = '1') then
+              nextread := 0;
+            elsif (readmask(1) = '1') then
+              nextread := 1;
+            elsif (readmask(2) = '1') then
+              nextread := 2;
+            end if;
+          elsif (toread(0) = 3) then
+            if (readmask(0) = '1') then
+              nextread := 0;
+            elsif (readmask(1) = '1') then
+              nextread := 1;
+            elsif (readmask(2) = '1') then
+              nextread := 2;
+            elsif (readmask(3) = '1') then
+              nextread := 3;
+            end if;
+          end if;
+          addr_arr_int(nextread) <= std_logic_vector(to_unsigned(current_page*page_length + mem_count(nextread), LOG2_RAM_DEPTH));
+          mem_count(nextread) <= mem_count(nextread) + 1;
+          toread(0) <= nextread;
+          mem_count_next(nextread) := mem_count_next(nextread)+1;
+        end if;
+
+        --check if memory read counter is less than nentries
+        --this sets readmask to 1 for any inputs that still have words to read
+        for i in 0 to NUM_INPUTS-1 loop
+          if ((mem_count_next(i)) < to_integer(unsigned(nent_arr(i)(current_page)))) then
+            readmask(i) <= '1';
+          else
+            readmask(i) <= '0';
+          end if;
+        end loop;
+
+      end if ;
 
       --generate output a few clocks after address is set to account for delay in RAMs
       if valid(pipe_stages-1) ='1' then
         if (NUM_EXTRA_BITS > 0) then
-          merged_dout <= '1' & std_logic_vector(to_unsigned(toread(pipe_stages),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages));
+          merged_dout <= '1' & std_logic_vector(to_unsigned(toread(pipe_stages-1),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages-1));
         else
           merged_dout <= '1' & din_arr(toread(pipe_stages-1));
         end if ;
@@ -143,18 +205,22 @@ begin
         merged_dout <= (others => '0');
       end if;
 
-      bx_last := to_integer(unsigned(bx_in_latch));
+      bx_last <= bx_in_latch;
       bx_pipe(0) <= bx_in_latch;
-      bx_out <= bx_pipe(pipe_stages-1);
-      toread(pipe_stages) := toread(pipe_stages-1);
+      bx_out <= bx_pipe(pipe_stages);
       for j in pipe_stages-2 downto 0 loop
-        toread(j+1) := toread(j);
         valid(j+1) <= valid(j);
+        toread(j+1) <= toread(j);
+      end loop;
+      for j in pipe_stages-1 downto 0 loop
         bx_pipe(j+1) <= bx_pipe(j);
       end loop;
     end if;
   end process;
 
-  addr_arr <= addr_arr_int;
+  GEN_ADDR: for i in 0 to NUM_INPUTS-1 generate
+  begin
+    addr_arr(LOG2_RAM_DEPTH*(i+1)-1 downto LOG2_RAM_DEPTH*i) <= addr_arr_int(i);
+  end generate;
 
 end RTL;
