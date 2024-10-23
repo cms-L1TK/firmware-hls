@@ -36,7 +36,8 @@ entity tf_mem is
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
-    DEBUG           : boolean := false             --! If true prints debug info
+    DEBUG           : boolean := false;            --! If true prints debug info
+    MEM_TYPE        : string := "block"            --! specifies RAM type (block/ultra)
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -101,7 +102,7 @@ signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');  
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
-attribute ram_style of sa_RAM_data : signal is "block";
+attribute ram_style of sa_RAM_data : signal is MEM_TYPE;
 
 begin
 
