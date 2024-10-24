@@ -6,11 +6,11 @@ input_file_fpga2 = mem/in_fpga2.txt
 fpga1_hls_script_path = ../../CombinedConfig_FPGA1/script 
 fpga2_hls_script_path = ../../CombinedConfig_FPGA2/script
 
-all: add_common_files $(core_file_fpga1) $(core_file_fpga2) hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj $(input_file_fpga1) $(input_file_fpga2) apollo_input_fpga1 apollo_input_fpga2 lut_inclusion
+all: add_common_files $(core_file_fpga1) $(core_file_fpga2) hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj $(input_file_fpga1) $(input_file_fpga2) apollo_input_fpga1 apollo_input_fpga2 
 
-fpga1: add_common_files $(core_file_fpga1) hdl_add_files_fpga1 xciCreation_fpga1 kfin_adj $(input_file_fpga1) apollo_input_fpga1 lut_inclusion
+fpga1: add_common_files $(core_file_fpga1) hdl_add_files_fpga1 xciCreation_fpga1 kfin_adj $(input_file_fpga1) apollo_input_fpga1
 
-fpga2: add_common_files $(core_file_fpga2) hdl_add_files_fpga2 xciCreation_fpga2 kfin_adj $(input_file_fpga2) apollo_input_fpga2 lut_inclusion
+fpga2: add_common_files $(core_file_fpga2) hdl_add_files_fpga2 xciCreation_fpga2 kfin_adj $(input_file_fpga2) apollo_input_fpga2 
 
 $(core_dir):
 	@mkdir cgn mem
@@ -50,9 +50,6 @@ hdl_add_files_fpga2: $(core_file)
 	cd hdl; ln -s ../../../CombinedConfig_FPGA2/hdl/SectorProcessor.vhd SectorProcessor_f2.vhd
 	cd hdl; ln -s ../../../CombinedConfig_FPGA2/hdl/memUtil_pkg.vhd memUtil_pkg_f2.vhd
 
-lut_inclusion:
-	@python3 scripts/lut_copy_dual.py
-
 $(input_file_fpga1): $(core_dir)
 	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsSplit/InputStubs -o $(input_file_fpga1)
 
@@ -65,4 +62,4 @@ apollo_input_fpga1: $(input_file_fpga1)
 apollo_input_fpga2: $(input_file_fpga2)
 	@python3 scripts/split_emp_input.py -i $(input_file_fpga2) -o mem/in_fpga2_
 
-.PHONY: all fpga1 fpga2 add_common_files hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj apollo_input_fpga1 apollo_input_fpga2 lut_inclusion 
+.PHONY: all fpga1 fpga2 add_common_files hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj apollo_input_fpga1 apollo_input_fpga2 

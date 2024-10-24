@@ -276,128 +276,14 @@ In order to keep the GitHub repository public we use GitHub Actions and GitLab C
 
 ## EMP
 
-Build the tracklet chain in EMP.
+This section details how to the track finder firmware can be integrated in the EMP framework and deployed on an Apollo board.
 
-Currently the supported chain configurations for EMP builds are:
+### Building EMP
 
-* **Skinny Chain (combined, unsplit modules)**
-  * InputRouter to KalmanFilter
-    * Target = Apollo VU13P (1 FPGA)
-    * EMP build path = `IntegrationTests/ReducedCombinedConfig/IRtoKF`
+In order to reduce the number of redundant locations for EMP build instructions (and thus to reduce out-of-date information), please find the most recent EMP build instructions on the [apollo site](https://apollo-lhc.gitlab.io/cornell-cm/Manual/TFFirmware/02-EMPTF/).
 
-* **Barrel Chain (combined, unsplit modules)**
-  * InputRouter to KalmanFilter
-    * Target = Apollo VU13P (1 FPGA)
-    * EMP build path = `IntegrationTests/CombinedBarrelConfig/IRtoKF`
-    
-* **Some info**
+### Information for developers
 
-    * The EMP firmware uses a subset of the [SURF library](https://github.com/slaclab/surf).
-    More info on that in `IntegrationTests/common/hdl/surf_subset/README.md` (Note: this may be unused for the IRtoKF chain)
-    * `firmware-hls/KalmanFilter` is a git sub-module link to the repo containing the [Kalman Filter firmware repo](https://github.com/cms-L1TK/l1tk-for-emp/tree/d0d3ba506bf77926862f0d7f3ebf781c041da6eb). Note that different KalmanFilter configurations are needed for the reduced chain, the barrel chain, and the full chain. The Makefile updates this repository to point to the appropriate branch, but if possible, it could be useful for the KalmanFilter repository to support different configurations.
-    * Some python and TCL scripts are needed to implement and simulate the EMP firmware.
-    More info on that in [this README](https://github.com/cms-L1TK/firmware-hls/blob/doc_emp/IntegrationTests/ReducedConfig/IRtoKF/firmware/scripts/README.md).
+Currently, the EMP build is created in multiple steps. First, one runs the fpga1, fpga2, or all rule in [this makefile](IntegrationTests/DualFPGA/firmware/Makefile), which in turns runs the makefiles in the `CombinedConfig_FPGA1` or `CombinedConfig_FPGA2` integration tests to download necessary LUTs/MemPrints, generate the pattern recognition VHDL wrapper, and compile the pattern recognition HLS modules. This is currently done with Vivado 2020 or earlier since the pattern recognition HLS is incompatible with Vitis, the successor to Vivado HLS.
 
-* **Note** See [here](https://apollo-lhc.gitlab.io/cornell-cm/Manual/TFFirmware/02-EMPTF/) for more detailed instructions, particularly with regards to installing the prerequisites noted below and for performing tests on Apollo hardware.
-
-### Prerequisites
-
-* Xilinx Vivado 2020.1 (HLS build) and 2021.2 (project build)
-* ipbb: The [IPbus Builder Tool](https://github.com/ipbus/ipbb) incl. uHAL. Tested with dev/2022g
-* Python 3
-* Questasim v2021.1_2 for Questa simulation
-
-### Quick instructions
-
-**Step 1: Setup the work area**
-
-First source Xilinx Vivado 2020.1
-
-```
-ipbb init <project name>
-cd <project name>
-ipbb add git ssh://git@gitlab.cern.ch:7999/p2-xware/firmware/emp-fwk.git -b v0.8.0
-ipbb add git https://github.com/apollo-lhc/CM_FPGA_FW -b v2.2.1
-ipbb add git https://gitlab.cern.ch/ttc/legacy_ttc.git -b v2.1
-ipbb add git ssh://git@gitlab.cern.ch:7999/cms-tcds/cms-tcds2-firmware.git -b v0_1_1
-ipbb add git https://gitlab.cern.ch/HPTD/tclink.git -r fda0bcf
-ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.9
-ipbb add git https://gitlab.cern.ch/dth_p1-v2/slinkrocket_ips.git -b v03.09
-ipbb add git ssh://git@gitlab.cern.ch:7999/dth_p1-v2/slinkrocket.git -b v03.10
-ipbb add git https://gitlab.cern.ch/gbt-fpga/gbt-fpga.git -b gbt_fpga_6_1_0
-ipbb add git https://gitlab.cern.ch/gbt-fpga/lpgbt-fpga.git -b v.2.1
-ipbb add git https://:@gitlab.cern.ch:8443/gbtsc-fpga-support/gbt-sc.git -b gbt_sc_4_1
-ipbb add git https://github.com/cms-L1TK/firmware-hls.git
-```
-
-*Note: You need to be a member of the `cms-tcds2-users` egroup in order to clone the `cms-tcds2-firmware` repository. In order to add yourself to that egroup, go to the "Members" tab of [this page](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10380295), and click on the "Add me" button; you may need to wait ~ 24 hours to get access to the GitLab repo.*
-
-```
-cd src/firmware-hls
-make -C <EMP build path>/firmware
-cd -
-```
-
-Source Xilinx Vivado 2021.2 for the following steps
-
-### Vivado/Questa Simulation
-
-**Step 2: Create an ipbb project area**
-
-* For questa simulation testbench:
-```
-ipbb proj create sim qsim firmware-hls:<EMP build path> 'qsim.dep'
-cd proj/qsim
-```
-
-* For vivado simulation testbench:
-```
-ipbb proj create vivado vsim firmware-hls:<EMP build path> 'vsim.dep'
-cd proj/vsim
-```
-
-**Step 3: Simulation**
-
-* For questa simulation testbench:
-
-```
-ipbb sim setup-simlib
-ipbb sim ipcores
-ipbb sim fli-udp
-ipbb sim generate-project #(rerun this if you change VHDL)
-
-./run_sim -c xil_defaultlib.top -Gsourcefile=<input.txt> -Gsinkfile=<out.txt> -Gplaylen=xyz -Gcaplen=xyz -do 'run 50.0us' -do quit 
-```
-where `xyz = number of events * 108`, where default is 9 events.
-
-where `input.txt` follows the standard EMP pattern file convention. An input file is provided in `../../src/firmware-hls/<EMP build path>/firmware/mem/in.txt`
-
-* For vivado simulation testbench
-```
-ipbb vivado generate-project
-cd vsim
-vivado vsim.xpr
-```
-
-and start the simulation from GUI (first time will take long).
-
-### Implementation
-
-**Step 2: Create an ipbb project area**
-
-```
-ipbb proj create vivado apollo firmware-hls:<EMP build path> 'apollo.dep'
-cd proj/apollo
-```
-
-**Step 3: Compile**
-
-*Note: Note: For the following commands, you need to ensure that can find & use the `gen_ipbus_addr_decode` script - e.g. for a standard uHAL installation:*
-```
-export PATH=/opt/cactus/bin/uhal/tools:$PATH LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
-```
-
-```
-ipbb ipbus gendecoders
-ipbb vivado generate-project synth -j8 impl -j8 package
-```
+Next, the project is generated using the ipbb tool. One points ipbb to one of the configuration files in [this directory](IntegrationTests/DualFPGA/firmware/cfg/), which ipbb uses to generate the project. This includes adding relevant source and constraint files, running any setup tcl scripts, and recursively calling other configuration files in other dependencies such as `emp-fwk` and the KalmanFilter fit, which is currently included as a submodule in this repository.

@@ -4,7 +4,7 @@ input_file = mem/in.txt
 proj_path = ../../../../proj
 hls_script_path = ../../script
 
-all: add_common_files $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) apollo_input lut_inclusion
+all: add_common_files $(core_file) hdl_add_files xciCreation kfin_adj $(input_file) apollo_input
 
 $(core_dir):
 	@mkdir cgn mem
@@ -32,9 +32,6 @@ add_common_files:
 hdl_add_files: $(core_file)
 	cd hdl; ln -s ../../../hdl/*.vhd .
 
-lut_inclusion:
-	@python3 scripts/lut_copy.py
-
 $(input_file): $(core_dir)
 	@python3 scripts/convert_emData2EMP_Link.py -d mem/MemPrintsReducedCM/InputStubs -o $(input_file)
 
@@ -53,4 +50,4 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
 	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
-.PHONY: sim all hdl_add_files xciCreation kfin_adj apollo_input lut_inclusion core_patch
+.PHONY: sim all hdl_add_files xciCreation kfin_adj apollo_input core_patch
