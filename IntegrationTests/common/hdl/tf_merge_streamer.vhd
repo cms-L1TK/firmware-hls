@@ -77,7 +77,6 @@ architecture RTL of tf_merge_streamer is
 
   signal valid : std_logic_vector(pipe_stages-1 downto 0) := (others => '0');
   signal bx_pipe : bx_arr := (others => (others => '0'));
-  --signal addr_arr_int : std_logic_vector(NUM_INPUTS*LOG2_RAM_DEPTH-1 downto 0) := (others => '0');
   signal addr_arr_int : addr_arr_arr := (others => (others => '0'));
   signal bx_last : std_logic_vector(2 downto 0) := "111";
   signal bx_in_latch : std_logic_vector(2 downto 0) := "111"; --since output triggered by BX change, initializing bx_in_latch to 7 will start write on first valid bx (0)
@@ -133,49 +132,11 @@ begin
         else
           valid(0) <= '1';
           --loop through starting with the next input in front of the current to-read (round-robin)
-          --the giant if block is gross, but for loop with exit seems to generate way too many logic levels
-          --hope: this figures out nextread in a single lookup
-          if (toread(0) = 0) then
-            if (readmask(1) = '1') then
-              nextread := 1;
-            elsif (readmask(2) = '1') then
-              nextread := 2;
-            elsif (readmask(3) = '1') then
-              nextread := 3;
-            elsif (readmask(0) = '1') then
-              nextread := 0;
+          for i in 0 to 3 loop
+            if (readmask((toread(0) - i) mod 4) = '1') then
+              nextread := (toread(0) - i) mod 4;
             end if;
-          elsif (toread(0) = 1) then
-            if (readmask(2) = '1') then
-              nextread := 2;
-            elsif (readmask(3) = '1') then
-              nextread := 3;
-            elsif (readmask(0) = '1') then
-              nextread := 0;
-            elsif (readmask(1) = '1') then
-              nextread := 1;
-            end if;
-          elsif (toread(0) = 2) then
-            if (readmask(3) = '1') then
-              nextread := 3;
-            elsif (readmask(0) = '1') then
-              nextread := 0;
-            elsif (readmask(1) = '1') then
-              nextread := 1;
-            elsif (readmask(2) = '1') then
-              nextread := 2;
-            end if;
-          elsif (toread(0) = 3) then
-            if (readmask(0) = '1') then
-              nextread := 0;
-            elsif (readmask(1) = '1') then
-              nextread := 1;
-            elsif (readmask(2) = '1') then
-              nextread := 2;
-            elsif (readmask(3) = '1') then
-              nextread := 3;
-            end if;
-          end if;
+          end loop;
           addr_arr_int(nextread) <= std_logic_vector(to_unsigned(current_page*page_length + mem_count(nextread), LOG2_RAM_DEPTH));
           mem_count(nextread) <= mem_count(nextread) + 1;
           toread(0) <= nextread;
