@@ -200,6 +200,12 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
     auto stubfinephi=stubdata___.getFinePhi();
     auto stubbend=stubdata___.getBend();
     constexpr int absz = (1 << MatchEngineUnitBase<VMProjType>::kNBitsBuffer) - 1;
+    //
+    // The geometry for D1 and D2 vs the other 3 disks is slightly different. In the code segment below we use the
+    // rbin and finer (confusingly named zbin and stubfinez as the same code is used for both barrel and disks).
+    // In D1 and D2 we have PS modules if the zbin<3 or if zbin=3 and the fine r position <=3
+    // In D3, D4, and D5 the same is true with the difference that the fine r position <=2
+    //
     const bool isPSStub = VMProjType==BARREL ? LAYER <= TF::L3 : 
                                                LAYER <= TF::D2 ? ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 3) :
                                                                  ((zbin___ & absz) < 3) || ((zbin___ & absz) == 3 && stubfinez <= 2);
