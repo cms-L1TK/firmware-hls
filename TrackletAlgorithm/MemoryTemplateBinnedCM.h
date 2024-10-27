@@ -59,18 +59,13 @@ class MemoryTemplateBinnedCM{
     kNMemDepth = 1<<NBIT_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
     kNBinsRZ = (1<<kNBitsRZBinCM),
-    slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM)),
-    entries8 = 32
+    slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM))
   };
 
   DataType dataarray_[NCP][kNBxBins][kNMemDepth];  // data array
 
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
-  ap_uint<32> nentries8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
-  ap_uint<32> nentriesA_[slots];
-  ap_uint<32> nentriesB_[slots];
-  ap_uint<4> nentriestmp_[1<<NBIT_BIN];
 
  public:
 
@@ -84,16 +79,7 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    return nentries8_[bx][ibin].range(ireg*4+3,ireg*4);
-  }
-
-
-
-
-
-  ap_uint<32> getEntries8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-    #pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
-    return nentries8_[bx][ibin];
+    return nentries_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
   ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
@@ -143,11 +129,8 @@ class MemoryTemplateBinnedCM{
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 #pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS ARRAY_PARTITION variable=nentriesA_ complete dim=0
-#pragma HLS ARRAY_PARTITION variable=nentriesB_ complete dim=0
-#pragma HLS ARRAY_PARTITION variable=nentriestmp_ complete dim=0
-#pragma HLS ARRAY_PARTITION variable=nentries8_ complete dim=0
 #pragma HLS inline
+
     if (isCMSSW && !NBIT_BX) {ibx = 0;}
     if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
 
@@ -163,19 +146,14 @@ class MemoryTemplateBinnedCM{
       ap_uint<kNBitsphibinCM> ireg;
       (ireg,ibin)=slot;
 
-      unsigned int nentry = nentriestmp_[slot];
+      unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
       if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
 
-	nentriestmp_[slot]++;
-
 	nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-	nentriesA_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
 	if (ibin!=0) {
 	  nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
-	  nentriesB_[ibx*kNBinsRZ+ibin-1].range((ireg+0)*4+3,(ireg+0)*4)=nentry+1;
 	}
-	nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry+1;
 	binmask8_[ibx][ibin].set_bit(ireg,true);
 
 	//icopy comparison must be signed int or future SW fails
@@ -183,7 +161,6 @@ class MemoryTemplateBinnedCM{
 #pragma HLS unroll
 	  dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
 	}
-	//}
 #endif      
 
 #ifdef CMSSW_GIT_HASH
@@ -194,7 +171,6 @@ class MemoryTemplateBinnedCM{
       if (ibin!=0) {
 	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
       }
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
 #endif
 
@@ -225,26 +201,12 @@ class MemoryTemplateBinnedCM{
     for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
       for (size_t icopy=0; icopy < NCOPY; icopy++) {
 	for (size_t ibin=0; ibin < kNMemDepth; ibin++) {
-	  //std::cout << ibx << " " << icopy << " "<< ibin << std::endl;
 	  dataarray_[icopy][ibx][ibin] = data;
-	  //std::cout << "Done" <<std::endl;
-      // Clear data
-      //for (unsigned int i = 0; i < getNBins(); ++i ) {
-      //  for (unsigned int j = 0; j < getNEntryPerBin(); ++j) {
-      //    write_mem(ibx, i, data, j);
-      //  }
-      //}
 	}
       }
-      // Clear nentries8 and binmask8
-      for (unsigned int ibin = 0; ibin < (1<<NBIT_BIN) ; ++ibin) {
-	nentriestmp_[ibin] = 0;
-      }
+      // Clear nentries and binmask8
       for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
 	nentries_[ibx*kNBinsRZ+ibin] = 0;
-	nentriesA_[ibx*kNBinsRZ+ibin] = 0;
-	nentriesB_[ibx*kNBinsRZ+ibin] = 0;
-        nentries8_[ibx][ibin] = 0;
         binmask8_[ibx][ibin] = 0;
       }
     }
@@ -277,7 +239,7 @@ class MemoryTemplateBinnedCM{
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
-    ap_uint<4> nentry_ibx = nentries8_[ibx][ibin].range(ireg*4+3,ireg*4);
+    ap_uint<4> nentry_ibx = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
     DataType data(datastr.c_str(), base);
 
@@ -288,7 +250,6 @@ class MemoryTemplateBinnedCM{
       if (ibin!=0) {
       	nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry_ibx+1;
       }
-      nentries8_[ibx][ibin].range(ireg*4+3,ireg*4)=nentry_ibx+1;
       binmask8_[ibx][ibin].set_bit(ireg,true);
     }
     #endif
@@ -309,14 +270,16 @@ class MemoryTemplateBinnedCM{
 	print_data(dataarray_[bx][index]);
   }
 
+  //These are broken - comment out for now (ryd, 2024-10-27)
+  /*
   void print_mem(BunchXingT bx) const
   {
-	for(unsigned int slot=0;slot<8;slot++) {
-      //std::cout << "slot "<<slot<<" entries "
-      //		<<nentries_[bx%NBX].range((slot+1)*4-1,slot*4)<<endl;
-      for (unsigned int i = 0; i < nentries8_[bx][slot]; ++i) {
-	edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
-	print_entry(bx, i + slot*getNEntryPerBin() );
+    for(unsigned int ibin=0;ibin<8;ibin++) {
+      for(unsigned int ireg=0;ireg<8;ireg++) {
+	for (unsigned int i = 0; i < nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4); ++i) {
+	  edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
+	  print_entry(bx, i + slot*getNEntryPerBin() );
+	}
       }
     }
   }
@@ -330,7 +293,8 @@ class MemoryTemplateBinnedCM{
 	  }
 	}
   }
-
+  */
+  
   static constexpr int getWidth() {return DataType::getWidth();}
 
 #endif
