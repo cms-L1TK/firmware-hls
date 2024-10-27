@@ -221,8 +221,7 @@ process(clka)
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
-  variable page         : integer := 0;
-  variable nentry_in_bin   : std_logic_vector(ADDR_WIDTH-1 downto 0);
+  variable slv_page_cnt_save  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
 
   --! Extract phi and rz bin address
   alias vi_nent_idx  : std_logic_vector(NUM_PHI_BITS+NUM_RZ_BITS-1 downto 0) is addra(ADDR_WIDTH + NUM_PHI_BITS + NUM_RZ_BITS - 1 downto ADDR_WIDTH);
@@ -234,11 +233,13 @@ process(clka)
   alias rzbits: std_logic_vector(NUM_RZ_BITS-1 downto 0) is vi_nent_idx(NUM_RZ_BITS-1 downto 0); --rz position
 
   variable binaddr   : unsigned(ADDR_WIDTH-1 downto 0) := (others => '0');
+  variable nentry   : unsigned(ADDR_WIDTH-1 downto 0) := (others => '0');
 
-  --variable vi_nent_idx_new : std_logic_vector(5 downto 0);
+  variable writeaddr : std_logic_vector(RAM_DEPTH_BITS-1 downto 0);
   
 begin
   if rising_edge(clka) then
+    slv_page_cnt_save := slv_page_cnt;
     if (sync_nent='1') and init='1' then
       init := '0';
       slv_clk_cnt := (others => '0');
@@ -263,35 +264,36 @@ begin
       -- FIXME - this code is not yet protected from "wrapping" if there are
       -- more than 16 (or 15) entries.      
       -- Write data to all copies
-      --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
-      for icopy in 0 to NUM_COPY-1 loop
-        sa_RAM_data(icopy)(to_integer(unsigned(addra))) <= dina; 
-      end loop;
 
       --report "tf_mem_bin vi_nent_idx vi_nent_idx_new: " & to_bstring(vi_nent_idx) & " " & to_bstring(vi_nent_idx_new) & " " & to_bstring(rzbits) & " " & to_bstring(phibits);
   
-      binaddr := unsigned(nentry_tmp(to_integer(unsigned(vi_nent_idx))))+1;
+      binaddr := unsigned(nentry_tmp(to_integer(unsigned(vi_nent_idx))));
+      nentry := binaddr+1;
 
       if (nentry_mask_tmp(to_integer(unsigned(vi_nent_idx)))='0') then
-        binaddr := "0001";
+        nentry := "0001";
+        binaddr := "0000";
       end if; 
 
-      nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(binaddr);
+      nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
       nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
       
-      -- Count entries
-      page := to_integer(unsigned(addra(RAM_DEPTH_BITS-1 downto PAGE_LENGTH_BITS)));
-      nentry_in_bin := std_logic_vector(unsigned(addra(ADDR_WIDTH-1 downto 0)) + 1);
+      writeaddr := slv_page_cnt_save & vi_nent_idx & std_logic_vector(binaddr);
+      --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
+      for icopy in 0 to NUM_COPY-1 loop
+        sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina; 
+      end loop;
       
-      assert (page < NUM_PAGES) report "page out of range" severity error;
-      mask_o(page*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
+      --assert (page < NUM_PAGES) report "page out of range" severity error;
+      mask_o(to_integer(unsigned(slv_page_cnt_save))*NUM_BINS+to_integer(unsigned(vi_nent_idx))) <= '1'; -- <= 1 (slv)
 
-      --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)
-      --  &" "&to_bstring(nentry_in_bin)&" "&to_bstring(addra);
+      --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)&" "&to_bstring(nentry)&" "&to_bstring(writeaddr);
 
-      sa_RAM_nent(to_integer(unsigned(phibits)))(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= nentry_in_bin; -- <= address
+      sa_RAM_nent(to_integer(unsigned(phibits)))(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
       if (unsigned(rzbits) /= 0) then
-        sa_RAM_nent(to_integer(unsigned(phibits))+NUM_PHI_BINS)(page*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= nentry_in_bin; -- <= address
+        --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)
+        --  &" "&to_bstring(nentry_in_bin)&" "&to_bstring(addra);
+        sa_RAM_nent(to_integer(unsigned(phibits))+NUM_PHI_BINS)(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+(to_integer(unsigned(rzbits))-1)) <= std_logic_vector(nentry); -- <= address
       end if;
     end if;
   end if;
