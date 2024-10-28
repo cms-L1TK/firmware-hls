@@ -368,8 +368,8 @@ begin
   process (clk_p)
     begin
       if rising_edge(clk_p) then
-        counter <= std_logic_vector(to_unsigned(to_integer(unsigned(counter)) + 1, 4));
-        if counter = counter_trigger then
+        --counter <= std_logic_vector(to_unsigned(to_integer(unsigned(counter)) + 1, 4));
+        --if counter = counter_trigger then
           AS_D5PHIDn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHIDn1_stream_V_dout)) + 1, 37));
           AS_D5PHICn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHICn1_stream_V_dout)) + 1, 37));
           AS_D5PHIBn1_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(AS_D5PHIBn1_stream_V_dout)) + 1, 37));
@@ -434,7 +434,7 @@ begin
           MTPAR_L3L4AB_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L3L4AB_stream_V_dout)) + 1, 76));
           MTPAR_L2L3ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L2L3ABCD_stream_V_dout)) + 1, 76));
           MTPAR_L5L6ABCD_stream_V_dout <= std_logic_vector(to_unsigned(to_integer(unsigned(MTPAR_L5L6ABCD_stream_V_dout)) + 1, 76));
-        end if;
+        --end if;
 
         AS_signals <= AS_D5PHIDn1_stream_V_dout &
                       AS_D5PHICn1_stream_V_dout &

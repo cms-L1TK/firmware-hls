@@ -108,6 +108,11 @@ architecture rtl of emp_payload is
   signal MTPAR_L1L2GI_stream_V_dout   : std_logic_vector(75 downto 0);
   signal MTPAR_L1L2E_stream_V_dout    : std_logic_vector(75 downto 0);
   signal MTPAR_L1L2H_stream_V_dout    : std_logic_vector(75 downto 0);
+
+  signal d11_start : std_logic_vector(0 downto 0);
+  signal d11_last : std_logic_vector(0 downto 0);
+  signal d11_valid : std_logic_vector(0 downto 0);
+  signal d11_start_of_orbit : std_logic_vector(0 downto 0);
   
 begin
 
@@ -277,28 +282,33 @@ begin
       MTPAR_L1L2H_stream_V_dout    <= MTPAR_signals(75 + 76*14 downto 76*14);
 
   --This block of code is to be used when someone generates the corresponding vio in the vivado gui
-  vio_0 : entity work.vio_0
-        port map(
-          clk => clk,
-          probe_in0 => AS_L1PHIAn1_stream_V_dout,
-          probe_in1 => AS_L1PHIBn1_stream_V_dout,
-          probe_in2 => AS_L1PHICn1_stream_V_dout,
-          probe_in3 => AS_L1PHIDn1_stream_V_dout,
-          probe_in4 => AS_L3PHIAn1_stream_V_dout,
-          probe_in5 => AS_L5PHIDn1_stream_V_dout,
-          probe_in6 => AS_L6PHICn1_stream_V_dout,
-          probe_in7 => AS_D1PHIAn1_stream_V_dout,
-          probe_in8 => AS_D2PHIAn1_stream_V_dout,
-          probe_in9 => AS_D4PHIDn1_stream_V_dout,
-          probe_in10 => MTPAR_L5L6ABCD_stream_V_dout,
-          probe_in11 => MTPAR_L2L3ABCD_stream_V_dout,
-          probe_in12 => MTPAR_L3L4AB_stream_V_dout,
-          probe_in13 => MTPAR_L3L4CD_stream_V_dout,
-          probe_in14 => MTPAR_D1D2ABCD_stream_V_dout,
-          probe_in15 => MTPAR_L1L2H_stream_V_dout,
-          probe_in16 => clk40
-        );
+  --vio_0 : entity work.vio_0
+  --      port map(
+  --        clk => clk,
+  --        probe_in0 => AS_L1PHIAn1_stream_V_dout,
+  --        probe_in1 => AS_L1PHIBn1_stream_V_dout,
+  --        probe_in2 => AS_L1PHICn1_stream_V_dout,
+  --        probe_in3 => AS_L1PHIDn1_stream_V_dout,
+  --        probe_in4 => AS_L3PHIAn1_stream_V_dout,
+  --        probe_in5 => AS_L5PHIDn1_stream_V_dout,
+  --        probe_in6 => AS_L6PHICn1_stream_V_dout,
+  --        probe_in7 => AS_D1PHIAn1_stream_V_dout,
+  --        probe_in8 => AS_D2PHIAn1_stream_V_dout,
+  --        probe_in9 => AS_D4PHIDn1_stream_V_dout,
+  --        probe_in10 => MTPAR_L5L6ABCD_stream_V_dout,
+  --        probe_in11 => MTPAR_L2L3ABCD_stream_V_dout,
+  --        probe_in12 => MTPAR_L3L4AB_stream_V_dout,
+  --        probe_in13 => MTPAR_L3L4CD_stream_V_dout,
+  --        probe_in14 => MTPAR_D1D2ABCD_stream_V_dout,
+  --        probe_in15 => MTPAR_L1L2H_stream_V_dout,
+  --        probe_in16 => clk40
+  --      );
 
+    d11_start(0) <= d(11).start;
+    d11_last(0) <= d(11).last;
+    d11_valid(0) <= d(11).valid;
+    d11_start_of_orbit <= d(11).start_of_orbit;
+  
     ila_0 : entity work.ila_0
       port map(
         clk => clk_p,
@@ -310,8 +320,10 @@ begin
         probe5 => MTPAR_L3L4AB_stream_V_dout,
         probe6 => MTPAR_D1D2ABCD_stream_V_dout,
         probe7 => MTPAR_L1L2H_stream_V_dout,
-        probe8 => d(11).start,
-        probe9 => d(11).last
+        probe8 => d11_start,
+        probe9 => d11_last,
+        probe10 => d11_valid,
+        probe11=>d11_start_of_orbit
       );
   
   --ipb_out.ipb_rdata <= AS_L1PHIAn1_stream_V_dout;
