@@ -50,4 +50,4 @@ sim: $(input_file) $(core_file) $(core_dir)
 	@cd $(hls_script_path); vivado -mode batch -source runSim.tcl
 	@python3 scripts/fwtosim_comparison.py -e mem/out.txt -s $(hls_script_path)/dataOut/TF_L1L2.txt
 
-.PHONY: sim all hdl_add_files xciCreation kfin_adj apollo_input lut_inclusion core_patch
+.PHONY: sim all hdl_add_files xciCreation kfin_adj apollo_input core_patch
