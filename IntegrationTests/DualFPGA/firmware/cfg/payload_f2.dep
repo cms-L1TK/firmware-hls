@@ -1,0 +1,40 @@
+src memUtil_pkg_f2.vhd
+src memUtil_aux_pkg_f2.vhd
+src payload_f2.vhd
+src linktosecproc2.vhd
+src sp2_mem_writer.vhd
+src tf2_wrapper.vhd
+src --vhdl2008 SectorProcessor_f2.vhd
+src tf_to_kf.vhd
+src kf_wrapper.vhd
+src common/hdl/emp/pkgs/tf_interface_pkg.vhd
+src kf_input_merger.vhd
+
+# KF
+include -c firmware-hls:KalmanFilter/kfin components.dep 
+include -c firmware-hls:KalmanFilter/kf components.dep 
+include -c firmware-hls:KalmanFilter/kfout components.dep 
+include -c firmware-hls:KalmanFilter/tq components.dep 
+include -c firmware-hls:KalmanFilter/common components.dep 
+
+#Tracklet dependencies
+src common/hdl/CreateStartSignal.vhd
+#src --vhdl2008 common/hdl/tf_lut.vhd
+src --vhdl2008 common/hdl/tf_mem_bin.vhd
+src --vhdl2008 common/hdl/tf_mem_format.vhd
+src --vhdl2008 common/hdl/tf_mem.vhd
+src --vhdl2008 common/hdl/tf_mem_tproj.vhd
+src --vhdl2008 common/hdl/tf_mem_tpar.vhd
+src --vhdl2008 common/hdl/mem_reader.vhd
+src common/hdl/tf_pkg.vhd
+src --vhdl2008 common/hdl/tf_pipe_delay.vhd
+
+#Floorplan
+src ../ucf/floorplan_f2.tcl
+
+################
+# Include Cores
+################
+iprepo *
+src ../cgn/f2/*/*/*.xci
+
