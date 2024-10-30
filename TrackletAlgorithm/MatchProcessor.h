@@ -70,40 +70,43 @@ namespace PR
 
 
   template<class DataType, class MemType, int nMEM, int NBits_Entries>
-  bool read_input_mems(BXType bx,
+  void read_input_mems(BXType bx,
+                       bool &read_is_valid,
                        ap_uint<nMEM>& mem_hasdata,
-                       ap_uint<NBits_Entries> nentries[nMEM],
+                       const ap_uint<NBits_Entries> nentries[nMEM],
                        ap_uint<kNBits_MemAddr>& read_addr,
                        // Memory pointers
 		       const IMemType iMem[nMEM],
 		       const IPageType iPage[nMEM],
-                       const MemType mem[nMEM],
-                       DataType& data)
+		       IMemType& imem,
+		       IPageType& ipage
+		       )
   {
 #pragma HLS inline
 #pragma HLS ARRAY_PARTITION variable=iPage complete
 #pragma HLS ARRAY_PARTITION variable=iMem complete
-    if (mem_hasdata == 0) return false;
+    const bool any_mem_hasdata = (mem_hasdata != 0);
 
     ap_uint<kNBits_MemAddr> read_addr_next = read_addr + 1;
 
     // priority encoder
     IMemType read_imem = __builtin_ctz(mem_hasdata);
     
-    // read the memory "read_imem" with the address "read_addr"
-    read_inmem<DataType, MemType, nMEM>(data, bx, //read_imem,
-					read_addr, iMem[read_imem], iPage[read_imem], mem);
+    imem = iMem[read_imem];
+    ipage = iPage[read_imem];
 
-    if (read_addr_next >= nentries[read_imem]) {
-      // All entries in the memory[read_imem] have been read out
-      // Prepare to move to the next non-empty memory
-      read_addr = 0;
-      mem_hasdata.clear(read_imem);  // set the current lowest 1 bit to 0
-    } else {
-      read_addr = read_addr_next;
+    if (read_is_valid) {
+      if (read_addr_next >= nentries[read_imem]) {
+        // All entries in the memory[read_imem] have been read out
+        // Prepare to move to the next non-empty memory
+        read_addr = 0;
+        mem_hasdata.clear(any_mem_hasdata ? read_imem : IMemType(0));  // set the current lowest 1 bit to 0
+      } else {
+        read_addr = read_addr_next;
+      }
     }
 
-    return true;
+    read_is_valid = read_is_valid && any_mem_hasdata;
     
   } // read_input_mems
 
@@ -971,14 +974,6 @@ void MatchCalculator(BXType bx,
   ap_uint<MC::LUT_matchcut_rDSS_width> LUT_matchcut_rDSS[MC::LUT_matchcut_rDSS_depth];
   constexpr enum MC::lutType RDSS = (LAYER < TF::D3) ? MC::RDSSINNERCUT : MC::RDSSOUTERCUT;
   readTable_rDSS<RDSS,LAYER,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_phi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_z complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSrphi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Srphi complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_PSr complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_2Sr complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_alpha complete
-#pragma HLS ARRAY_PARTITION variable=LUT_matchcut_rDSS  complete
 
   bool goodmatch                   = false;
 
@@ -1227,21 +1222,25 @@ void MatchProcessor(BXType bx,
 
   constexpr uint64_t npages = NPage<LAYER, PHISEC>();
 
+  //
+  // Code in this and next loop should be implemented at 
+  // compile time as it only depends on NPage
+  //
   for (unsigned int imem = 0; imem < nINMEM; imem++) {
 #pragma HLS unroll
     nPages[imem] = 1 + ((npages >> (2*imem))&3);
   }
   
-  int imem = 0;
-  int ipage = 0;
+  int imemtmp = 0;
+  int ipagetmp = 0;
   for (unsigned int j = 0 ; j < nMEM; j++){
 #pragma HLS unroll
-    iPage[j] = ipage;
-    iMem[j] = imem%nINMEM;
-    ipage++;
-    if (ipage>=nPages[imem]) {
-      ipage=0;
-      imem++;
+    iPage[j] = ipagetmp;
+    iMem[j] = imemtmp%nINMEM;
+    ipagetmp++;
+    if (ipagetmp>=nPages[imemtmp]) {
+      ipagetmp=0;
+      imemtmp++;
     }
   }
   
@@ -1255,6 +1254,7 @@ void MatchProcessor(BXType bx,
 
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
+  ap_uint<kNBits_MemAddr> read_address = 0;
 
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
@@ -1274,7 +1274,6 @@ void MatchProcessor(BXType bx,
   MatchEngineUnit<VMSMEType, kNbitsrzbinMP, VMPTYPE, APTYPE, LAYER, ASTYPE> matchengine[kNMatchEngines];
 #pragma HLS ARRAY_PARTITION variable=matchengine complete
 #pragma HLS ARRAY_PARTITION variable=projin dim=1
-#pragma HLS ARRAY_PARTITION variable=numbersin complete
   
 
 
@@ -1290,9 +1289,19 @@ void MatchProcessor(BXType bx,
   ap_uint<1> savedMatch;
   typename ProjectionRouterBuffer<VMPTYPE, APTYPE>::TRKID lastTrkID(-1);
 
+  //Used to add one pipeline stage before calculating the match
+  ap_uint<1> hasMatch_save = false;;
+  ap_uint<1> newtracklet_save;
+  ap_uint<1> isMatch_save;
+  AllProjection<APTYPE> allproj_save;
+  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex_save;
+  
   TrackletProjection<PROJTYPE> projdata, projdata_;
   bool validin = false; 
   bool validin_ = false; 
+  bool validmem = false;
+  IMemType imem = 0;
+  IPageType ipage = 0;
 
   static ap_uint<2*MEBinsBits> zbinLUT[128];
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete
@@ -1316,6 +1325,14 @@ void MatchProcessor(BXType bx,
   ap_uint<2> bestiMEU = 0;
   bool increase = false;
 
+  ap_uint<kNBits_MemAddr> tmp(0);
+  ap_uint<kNBits_MemAddr> projseq0123 = ~tmp;
+  ap_uint<kNBits_MemAddr> projseq01 = ~tmp; 
+  ap_uint<kNBits_MemAddr> projseq23 = ~tmp; 
+  ap_uint<kNBits_MemAddr> bestProjSeq(0); 
+
+  ap_uint<AllProjection<APTYPE>::kAllProjectionSize> projBuffer[1<<kNBits_MemAddr];
+  
 // constants used in reading VMSME memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int BIN_ADDR_WIDTH = 4;
@@ -1334,7 +1351,7 @@ void MatchProcessor(BXType bx,
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
-    bool projBuffNearFull = nearFull3Unit<nPRBAbits>()[(readptr,writeptr)];
+    bool projBuffNearFull = nearFull4Unit<nPRBAbits>()[(readptr,writeptr)];
     
     ap_uint<3> iphi = 0;
 
@@ -1377,25 +1394,38 @@ void MatchProcessor(BXType bx,
     ap_uint<1> Bit31 = projseqs[3] < projseqs[1];
     ap_uint<1> Bit32 = projseqs[3] < projseqs[2];
 
+    bool cleanpipeline[4] = {projseqs[0] <= projseq0123, projseqs[1] <= projseq0123, projseqs[2] <= projseq0123, projseqs[3] <= projseq0123};
+
+    //  std::cout << "cleapipeline projseq0123_ : " << cleanpipeline << " " << projseq0123_ << " " << matchengine[0].nearFull() << " " << matchengine[1].nearFull() << " " << matchengine[2].nearFull() << " " << matchengine[3].nearFull() << " | " << matchengine[0].getProjSeqStart() << " " << matchengine[1].getProjSeqStart() << " " << matchengine[2].getProjSeqStart() << " " << matchengine[3].getProjSeqStart() << " | " << matchengine[0].getProjSeq() << " " << matchengine[1].getProjSeq() << " " << matchengine[2].getProjSeq() << " " << matchengine[3].getProjSeq() << std::endl;
+    
     bestiMEU = ((Bit10 | Bit20 | Bit30) & (Bit31 | Bit21 | ~Bit10) , (Bit10 | Bit20 | Bit30) & (Bit32 | ~Bit21 | ~Bit20));
 
-    hasMatch = !emptys[bestiMEU];
+    hasMatch = (!emptys[bestiMEU]) && cleanpipeline[bestiMEU];
 
+    bestProjSeq = projseqs[bestiMEU];
+    
+    projseq0123 = (projseq01 < projseq23) ? projseq01 : projseq23;
+    
+    projseq01 = (matchengine[0].getProjSeqStart() < matchengine[1].getProjSeqStart()) ? matchengine[0].getProjSeqStart() : matchengine[1].getProjSeqStart();
+    projseq23 = (matchengine[2].getProjSeqStart() < matchengine[3].getProjSeqStart()) ? matchengine[2].getProjSeqStart() : matchengine[3].getProjSeqStart();
+    
+
+    
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
 #pragma HLS ARRAY_PARTITION variable=projseqs complete dim=0
-  MEU_smallest1: for(int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
+  MEU_smallest1: for(unsigned int iMEU1 = 0; iMEU1 < kNMatchEngines-1; ++iMEU1) {
 #pragma HLS unroll
-  MEU_smallest2: for(int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
+  MEU_smallest2: for(unsigned int iMEU2 = iMEU1+1; iMEU2 < kNMatchEngines; ++iMEU2) {
 #pragma HLS unroll
-        smallest[iMEU1] = smallest[iMEU1] & (trkids[iMEU1]<trkids[iMEU2]);
-        smallest[iMEU2] = smallest[iMEU2] & (trkids[iMEU2]<trkids[iMEU1]);
+        smallest[iMEU1] = smallest[iMEU1] & (projseqs[iMEU1]<projseqs[iMEU2]);
+        smallest[iMEU2] = smallest[iMEU2] & (projseqs[iMEU2]<projseqs[iMEU1]);
       }
     }
       
-    ap_uint<1> hasMatch = smallest.or_reduce();
-    ap_uint<3> bestiMEU = __builtin_ctz(smallest);
+    hasMatch = smallest.or_reduce();
+    bestiMEU = __builtin_ctz(smallest);
 
     */
 
@@ -1403,6 +1433,8 @@ void MatchProcessor(BXType bx,
     if (anyidle && !empty) {
       projbufferarray.advance();
     }
+
+    projBuffer[istep] = tmpprojbuff.getAllProj();
     
     bool init = false;
   MEU_LOOP: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
@@ -1422,25 +1454,36 @@ void MatchProcessor(BXType bx,
       meu.processPipeLine(table[iMEU]);
 
     } //end MEU loop
+
+
+    if (hasMatch_save) {
+      isMatch = newtracklet_save ? ap_uint<1>(0) : isMatch;
+      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
+        (bx, newtracklet_save, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
+         fullmatch);
+    }
+
+    
+    hasMatch_save = hasMatch;
     
     if(hasMatch) {
  
       ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubindex;
-      ap_uint<AllProjection<APTYPE>::kAllProjectionSize> allprojdata;
-      
-      (stubindex,allprojdata) = matches[bestiMEU];
-      AllProjection<APTYPE> allproj(allprojdata);
+
+      stubindex = matches[bestiMEU];
+
+      AllProjection<APTYPE> allproj = projBuffer[bestProjSeq];
 
       auto trkindex=(allproj.getTCID(), allproj.getTrackletIndex());
     
       ap_uint<1> newtracklet = lastTrkID != trkindex;
-      isMatch = newtracklet ? ap_uint<1>(0) : isMatch;
       
       lastTrkID = trkindex;
 
-      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
-        (bx, newtracklet, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj, stubindex,
-         fullmatch);
+      newtracklet_save = newtracklet;
+      allproj_save = allproj;
+      stubindex_save = stubindex;
+
     } //end MC if
     
 
@@ -1602,23 +1645,19 @@ void MatchProcessor(BXType bx,
       ProjectionRouterBuffer<VMPTYPE, APTYPE> projbuffertmp(allproj.raw(), ivmMinus, ivmPlus, phiProjBin, trackletid, mask, nstubs, zfirst, vmproj, psseed);
       projbufferarray.saveProjection(projbuffertmp);
       
-    } // end if(validin)
+    } // end if(validin_)
 
     projdata_ = projdata;
     validin_ = validin;
 
-    if (!projBuffNearFull){
-      
-      // read inputs
-      validin = read_input_mems<TrackletProjection<PROJTYPE>,
-      TrackletProjectionMemory<PROJTYPE>,
-      nMEM, kNBits_MemAddr+1>
-      (bx, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, 
-         projin, projdata);
- 
-    } else {
-      validin = false;
-    }// end if not near full
+    validin = validmem;
+    read_inmem<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM>(projdata, bx, read_address, imem, ipage, projin);
+
+    // read inputs
+    validmem = !projBuffNearFull;
+    read_address =  mem_read_addr;
+    read_input_mems<TrackletProjection<PROJTYPE>, TrackletProjectionMemory<PROJTYPE>, nMEM, kNBits_MemAddr+1>
+      (bx, validmem, mem_hasdata, numbersin, mem_read_addr, iMem, iPage, imem, ipage);
 
   } //end loop
 

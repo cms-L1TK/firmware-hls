@@ -66,7 +66,7 @@ add_cells_to_pblock [get_pblocks pblock_PCVMSMERs] [get_cells -quiet [list \
           VMSMER_D5PHID \
 	  MPROJ_*_DELAY0 \
 	  ]]
-resize_pblock [get_pblocks pblock_PCVMSMERs] -add {CLOCKREGION_X0Y4:CLOCKREGION_X7Y7}
+resize_pblock [get_pblocks pblock_PCVMSMERs] -add {CLOCKREGION_X6Y0:CLOCKREGION_X6Y7}
 
 create_pblock pblock_MPL1A
 add_cells_to_pblock [get_pblocks pblock_MPL1A] [get_cells -quiet [list \
@@ -186,6 +186,8 @@ add_cells_to_pblock [get_pblocks pblock_MPL1F] [get_cells -quiet [list \
           VMSME_L1PHIFn2 \
           MPROJ_L2L3ABCD_L1PHIF_DELAY \
           MPROJ_L2L3ABCD_L1PHIF \
+          MPROJ_L3L4AB_L1PHIF_DELAY \
+          MPROJ_L3L4AB_L1PHIF \
           MPROJ_L3L4CD_L1PHIF_DELAY \
           MPROJ_L3L4CD_L1PHIF \
           MPROJ_L5L6ABCD_L1PHIF_DELAY \
@@ -387,6 +389,8 @@ add_cells_to_pblock [get_pblocks pblock_MPL4A] [get_cells -quiet [list \
           MPROJ_L1L2ABC_L4PHIA \
           MPROJ_L1L2DE_L4PHIA_DELAY \
           MPROJ_L1L2DE_L4PHIA \
+          MPROJ_L1L2F_L4PHIA_DELAY \
+          MPROJ_L1L2F_L4PHIA \
           MPROJ_L2L3ABCD_L4PHIA_DELAY \
           MPROJ_L2L3ABCD_L4PHIA \
           MPROJ_L5L6ABCD_L4PHIA_DELAY \
@@ -624,39 +628,40 @@ add_cells_to_pblock [get_pblocks pblock_MPL6D] [get_cells -quiet [list \
           MPROJ_L3L4CD_L6PHID \
 	  ]]
 	  
-resize_pblock [get_pblocks pblock_MPL1A] -add {CLOCKREGION_X0Y0:CLOCKREGION_X0Y0}
-resize_pblock [get_pblocks pblock_MPL1B] -add {CLOCKREGION_X0Y1:CLOCKREGION_X0Y1}
-resize_pblock [get_pblocks pblock_MPL1C] -add {CLOCKREGION_X0Y2:CLOCKREGION_X0Y2}
-resize_pblock [get_pblocks pblock_MPL1D] -add {CLOCKREGION_X0Y3:CLOCKREGION_X0Y3}
-resize_pblock [get_pblocks pblock_MPL1E] -add {CLOCKREGION_X1Y0:CLOCKREGION_X1Y0}
-resize_pblock [get_pblocks pblock_MPL1F] -add {CLOCKREGION_X1Y1:CLOCKREGION_X1Y1}
-resize_pblock [get_pblocks pblock_MPL1G] -add {CLOCKREGION_X1Y2:CLOCKREGION_X1Y2}
-resize_pblock [get_pblocks pblock_MPL1H] -add {CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
+resize_pblock [get_pblocks pblock_MPL1A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3}
+resize_pblock [get_pblocks pblock_MPL1B] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3}
+resize_pblock [get_pblocks pblock_MPL1C] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3}
+resize_pblock [get_pblocks pblock_MPL1D] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3}
 
-resize_pblock [get_pblocks pblock_MPL2A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X2Y0}
-resize_pblock [get_pblocks pblock_MPL2B] -add {CLOCKREGION_X2Y1:CLOCKREGION_X2Y1}
-resize_pblock [get_pblocks pblock_MPL2C] -add {CLOCKREGION_X2Y2:CLOCKREGION_X2Y2}
-resize_pblock [get_pblocks pblock_MPL2D] -add {CLOCKREGION_X2Y3:CLOCKREGION_X2Y3}
+resize_pblock [get_pblocks pblock_MPL1E] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL1F] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL1G] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL1H] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
 
-resize_pblock [get_pblocks pblock_MPL3A] -add {CLOCKREGION_X3Y0:CLOCKREGION_X3Y0}
-resize_pblock [get_pblocks pblock_MPL3B] -add {CLOCKREGION_X3Y1:CLOCKREGION_X3Y1}
-resize_pblock [get_pblocks pblock_MPL3C] -add {CLOCKREGION_X3Y2:CLOCKREGION_X3Y2}
-resize_pblock [get_pblocks pblock_MPL3D] -add {CLOCKREGION_X3Y3:CLOCKREGION_X3Y3}
+resize_pblock [get_pblocks pblock_MPL2A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL2B] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL2C] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL2D] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
 
-resize_pblock [get_pblocks pblock_MPL4A] -add {CLOCKREGION_X4Y0:CLOCKREGION_X4Y0}
-resize_pblock [get_pblocks pblock_MPL4B] -add {CLOCKREGION_X4Y1:CLOCKREGION_X4Y1}
-resize_pblock [get_pblocks pblock_MPL4C] -add {CLOCKREGION_X4Y2:CLOCKREGION_X4Y2}
-resize_pblock [get_pblocks pblock_MPL4D] -add {CLOCKREGION_X4Y3:CLOCKREGION_X4Y3}
+resize_pblock [get_pblocks pblock_MPL3A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL3B] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL3C] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL3D] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
 
-resize_pblock [get_pblocks pblock_MPL5A] -add {CLOCKREGION_X6Y0:CLOCKREGION_X6Y0}
-resize_pblock [get_pblocks pblock_MPL5B] -add {CLOCKREGION_X5Y1:CLOCKREGION_X6Y1}
-resize_pblock [get_pblocks pblock_MPL5C] -add {CLOCKREGION_X5Y2:CLOCKREGION_X6Y2}
-resize_pblock [get_pblocks pblock_MPL5D] -add {CLOCKREGION_X6Y3:CLOCKREGION_X6Y3}
+resize_pblock [get_pblocks pblock_MPL4A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL4B] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL4C] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL4D] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
 
-resize_pblock [get_pblocks pblock_MPL6A] -add {CLOCKREGION_X7Y0:CLOCKREGION_X7Y0}
-resize_pblock [get_pblocks pblock_MPL6B] -add {CLOCKREGION_X7Y1:CLOCKREGION_X7Y1}
-resize_pblock [get_pblocks pblock_MPL6C] -add {CLOCKREGION_X7Y2:CLOCKREGION_X7Y2}
-resize_pblock [get_pblocks pblock_MPL6D] -add {CLOCKREGION_X7Y3:CLOCKREGION_X7Y3}
+resize_pblock [get_pblocks pblock_MPL5A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL5B] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL5C] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL5D] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+
+resize_pblock [get_pblocks pblock_MPL6A] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL6B] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL6C] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
+resize_pblock [get_pblocks pblock_MPL6D] -add {CLOCKREGION_X2Y0:CLOCKREGION_X6Y3} 
 
 
 create_pblock pblock_MPD1A
@@ -1143,27 +1148,30 @@ add_cells_to_pblock [get_pblocks pblock_MPD5D] [get_cells -quiet [list \
           MPROJ_L1D1EFGH_D5PHID \
 	  ]]
 	  
-resize_pblock [get_pblocks pblock_MPD1A] -add {CLOCKREGION_X1Y8:CLOCKREGION_X1Y8}
-resize_pblock [get_pblocks pblock_MPD1B] -add {CLOCKREGION_X1Y9:CLOCKREGION_X1Y9}
-resize_pblock [get_pblocks pblock_MPD1C] -add {CLOCKREGION_X1Y10:CLOCKREGION_X1Y10}
-resize_pblock [get_pblocks pblock_MPD1D] -add {CLOCKREGION_X1Y11:CLOCKREGION_X1Y11}
-resize_pblock [get_pblocks pblock_MPD2A] -add {CLOCKREGION_X2Y8:CLOCKREGION_X2Y8}
-resize_pblock [get_pblocks pblock_MPD2B] -add {CLOCKREGION_X2Y9:CLOCKREGION_X2Y9}
-resize_pblock [get_pblocks pblock_MPD2C] -add {CLOCKREGION_X2Y10:CLOCKREGION_X2Y10}
-resize_pblock [get_pblocks pblock_MPD2D] -add {CLOCKREGION_X2Y11:CLOCKREGION_X2Y11}
-resize_pblock [get_pblocks pblock_MPD3A] -add {CLOCKREGION_X4Y8:CLOCKREGION_X4Y8}
-resize_pblock [get_pblocks pblock_MPD3B] -add {CLOCKREGION_X4Y9:CLOCKREGION_X4Y9}
-resize_pblock [get_pblocks pblock_MPD3C] -add {CLOCKREGION_X4Y10:CLOCKREGION_X4Y10}
-resize_pblock [get_pblocks pblock_MPD3D] -add {CLOCKREGION_X4Y11:CLOCKREGION_X4Y11}
-resize_pblock [get_pblocks pblock_MPD4A] -add {CLOCKREGION_X5Y8:CLOCKREGION_X6Y8}
-resize_pblock [get_pblocks pblock_MPD4B] -add {CLOCKREGION_X5Y9:CLOCKREGION_X6Y9}
-resize_pblock [get_pblocks pblock_MPD4C] -add {CLOCKREGION_X5Y10:CLOCKREGION_X6Y10}
-resize_pblock [get_pblocks pblock_MPD4D] -add {CLOCKREGION_X5Y11:CLOCKREGION_X6Y11}
-resize_pblock [get_pblocks pblock_MPD5A] -add {CLOCKREGION_X7Y8:CLOCKREGION_X7Y8}
-resize_pblock [get_pblocks pblock_MPD5B] -add {CLOCKREGION_X7Y9:CLOCKREGION_X7Y9}
-resize_pblock [get_pblocks pblock_MPD5C] -add {CLOCKREGION_X7Y10:CLOCKREGION_X7Y10}
-resize_pblock [get_pblocks pblock_MPD5D] -add {CLOCKREGION_X7Y11:CLOCKREGION_X7Y11}
+resize_pblock [get_pblocks pblock_MPD1A] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD1B] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD1C] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD1D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
 
+resize_pblock [get_pblocks pblock_MPD2A] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD2B] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD2C] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD2D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+
+resize_pblock [get_pblocks pblock_MPD3A] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD3B] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD3C] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD3D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+
+resize_pblock [get_pblocks pblock_MPD4A] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD4B] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD4C] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD4D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+
+resize_pblock [get_pblocks pblock_MPD5A] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD5B] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD5C] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
+resize_pblock [get_pblocks pblock_MPD5D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
 
 create_pblock pblock_FTL1L2
 add_cells_to_pblock [get_pblocks pblock_FTL1L2] [get_cells -quiet [list \
@@ -1619,14 +1627,14 @@ add_cells_to_pblock [get_pblocks pblock_FTL2D1] [get_cells -quiet [list \
           MPAR_L2D1ABCD \
 	  ]]
 	  
-resize_pblock [get_pblocks pblock_FTL1L2] -add {CLOCKREGION_X6Y4:CLOCKREGION_X6Y7}
-resize_pblock [get_pblocks pblock_FTL2L3] -add {CLOCKREGION_X1Y4:CLOCKREGION_X1Y7}
-resize_pblock [get_pblocks pblock_FTL3L4] -add {CLOCKREGION_X2Y4:CLOCKREGION_X2Y7}
-resize_pblock [get_pblocks pblock_FTL5L6] -add {CLOCKREGION_X3Y4:CLOCKREGION_X3Y7}
-resize_pblock [get_pblocks pblock_FTD1D2] -add {CLOCKREGION_X4Y4:CLOCKREGION_X4Y7}
-resize_pblock [get_pblocks pblock_FTD3D4] -add {CLOCKREGION_X5Y4:CLOCKREGION_X5Y7}
-resize_pblock [get_pblocks pblock_FTL1D1] -add {CLOCKREGION_X0Y4:CLOCKREGION_X0Y7}
-resize_pblock [get_pblocks pblock_FTL2D1] -add {CLOCKREGION_X7Y4:CLOCKREGION_X7Y7}
+resize_pblock [get_pblocks pblock_FTL2L3] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
+resize_pblock [get_pblocks pblock_FTL3L4] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
+resize_pblock [get_pblocks pblock_FTL5L6] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
+resize_pblock [get_pblocks pblock_FTL1D1] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
+resize_pblock [get_pblocks pblock_FTL1L2] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
+resize_pblock [get_pblocks pblock_FTD1D2] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
+resize_pblock [get_pblocks pblock_FTD3D4] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
+resize_pblock [get_pblocks pblock_FTL2D1] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
 
 set_property IS_SOFT FALSE [get_pblocks pblock_*]
 
