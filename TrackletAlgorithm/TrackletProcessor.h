@@ -8,7 +8,7 @@
 #include "AllStubInnerMemory.h"
 #include "TrackletParameterMemory.h"
 #include "TrackletProjectionMemory.h"
-#include "VMStubTEOuterMemoryCM.h"
+#include "VMStubMemory.h"
 #include "TEBuffer.h"
 #include "TrackletEngineUnit.h"
 #include "TrackletProcessor_parameters.h"
@@ -688,7 +688,7 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
   uint16_t N // maximum number of steps
 > void
   TrackletProcessor(
-		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubTEOuterMemoryCM<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]
+		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubMemory<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]
   )
 {
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
@@ -728,7 +728,7 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
   const ap_uint<1>* stubptinnertmp = TP::getPTInnerLUT<Seed,iTC>();
   static const TPRegionLUT<Seed> regionLUT(stubptinnertmp, iAllstub);
 
-  constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFinePhiSize;
+  constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubBase<OuterRegion<Seed>()>::kVMSFinePhiSize;
 
   static TEBuffer<Seed,iTC,innerASType,OuterRegion<Seed>()> tebuffer;
   static_assert(TP::nASMemInner<Seed, iTC>() <= 3, "Only handling up to three inner AS memories");
@@ -801,7 +801,7 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
     teureadindex[k] = 0;
   }
   //quantities looked up in LUT
-  typename VMStubTEOuter<OuterRegion<Seed>()>::VMSTEOFINEZ rzfinebinfirst,rzdiffmax;
+  typename VMStub<OuterRegion<Seed>()>::VMSFINEZ rzfinebinfirst,rzdiffmax;
   typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::RZBIN start;
   ap_uint<1> usenext;
  istep_loop: for(unsigned istep=0;istep<N;istep++) {
@@ -891,8 +891,8 @@ teunits[k].idle_;
 
       typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::INDEX writeindexnext=teuwriteindex[k]+1;
 
-      const typename VMStubTEOuter<OuterRegion<Seed>()>::VMSTEOFINEPHI& finephi = teunits[k].outervmstub___.getFinePhi();
-      const ap_uint<1+VMStubTEOuterBase<OuterRegion<Seed>()>::kVMSTEOFineZSize>& rzbin = (teunits[k].next___, teunits[k].outervmstub___.getFineZ()); 
+      const typename VMStub<OuterRegion<Seed>()>::VMSFINEPHI& finephi = teunits[k].outervmstub___.getFinePhi();
+      const ap_uint<1+VMStubBase<OuterRegion<Seed>()>::kVMSFineZSize>& rzbin = (teunits[k].next___, teunits[k].outervmstub___.getFineZ()); 
 
 
       ap_uint<NfinephiBits> outerfinephi = (iAllstub, teunits[k].ireg___, finephi);

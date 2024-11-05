@@ -52,7 +52,7 @@ int main() {
   static AllStubMemory<inType> memoriesAS;
 
   // Output memories
-  static VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
+  static VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
   static AllStubMemory<outType> memoriesASCopy;
 
   ///////////////////////////
@@ -94,7 +94,7 @@ int main() {
 
     // ME memories
     std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << std::endl;
-    err += compareBinnedMemCMWithFile<VMStubMEMemoryCM<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
+    err += compareBinnedMemCMWithFile<VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
 
   } // End of event loop
 

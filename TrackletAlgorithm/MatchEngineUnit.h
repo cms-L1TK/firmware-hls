@@ -3,7 +3,7 @@
 
 #include "Constants.h"
 #include "TrackletProjectionMemory.h"
-#include "VMStubMEMemoryCM.h"
+#include "VMStubMemory.h"
 #include "VMProjectionMemory.h"
 #include "ProjectionRouterBuffer.h"
 #include "AllStubMemory.h"
@@ -33,11 +33,11 @@ class MatchEngineUnitBase<DISK> {
   };
 };
 
-template<int VMSMEType, unsigned kNbitsrzbinMP, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
+template<int VMSType, unsigned kNbitsrzbinMP, int VMProjType, int AllProjectionType, TF::layerDisk LAYER, int ASTYPE>
 class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
  public:
-  typedef ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> MATCH;
+  typedef ap_uint<VMStubBase<VMSType>::kVMSIDSize> MATCH;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUB;
   typedef ap_uint<kNBits_MemAddrBinned*4> NSTUBS;
   typedef ap_uint<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> INDEX;
@@ -104,7 +104,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
 
 
-inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin+4)]) {
+inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin+4)]) {
 #pragma HLS inline
 #pragma HLS array_partition variable=nstubsall_ complete dim=1
   
@@ -119,7 +119,7 @@ inline void step(const VMStubMECM<VMSMEType> stubmem[4][1<<(kNbitsrzbinMP+kNbits
   NSTUB istubtmp=istub_;
   ap_uint<2> iusetmp=iuse_;
 
-  ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
+  ap_uint<VMStubBase<VMSType>::kVMSFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
   auto secondSave = second_;
 
   VMProjection<VMProjType> data(projbuffer_.getProjection());
@@ -381,10 +381,10 @@ inline void advance() {
  ap_uint<1> phiPlus_;
  typename ProjectionRouterBuffer<BARREL, AllProjectionType>::PHIPROJBIN phiProjBin_;
  bool idle_;
- ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize> iphi_;
+ ap_uint<VMStubBase<VMSType>::kVMSFinePhiSize> iphi_;
  BXType bx_;
  bool empty_;
- VMStubMECM<VMSMEType> stubdata__, stubdata___; 
+ VMStub<VMSType> stubdata__, stubdata___; 
  typename ProjectionRouterBuffer<VMProjType, AllProjectionType>::TCID tcid_;
  ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer_;
  ap_uint<kNBits_MemAddr> projseq_;
@@ -419,8 +419,8 @@ inline void advance() {
 
  static constexpr int projfinephibits = VMProjectionBase<VMProjType>::kVMProjFinePhiWideSize;
  static constexpr int projfinezbits = VMProjectionBase<VMProjType>::kVMProjFineZSize;
- static constexpr int stubfinephibits = VMStubMECMBase<VMSMEType>::kVMSMEFinePhiSize;
- static constexpr int stubfinezbits = VMStubMECMBase<VMSMEType>::kVMSMEFineZSize;
+ static constexpr int stubfinephibits = VMStubBase<VMSType>::kVMSFinePhiSize;
+ static constexpr int stubfinezbits = VMStubBase<VMSType>::kVMSFineZSize;
 
 
 #ifndef __SYNTHESIS__

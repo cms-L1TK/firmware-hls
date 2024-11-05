@@ -17,8 +17,7 @@
 #include "InputStubMemory.h"
 #include "AllStubMemory.h"
 #include "AllStubInnerMemory.h"
-#include "VMStubMEMemoryCM.h"
-#include "VMStubTEOuterMemoryCM.h"
+#include "VMStubMemory.h"
 #ifndef __SYNTHESIS__
 #ifdef CMSSW_GIT_HASH
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -186,9 +185,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		const ap_uint<maskASIsize>& maskASI,
 		AllStubInnerMemory<OutType> memoriesASInner[],
 		// ME memories
-		VMStubMEMemoryCM<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
+		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
 		// TE Outer memories
-		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[(Layer) ? Layer-1 : Disk+5]> memoriesTEO[]) {
+		VMStubMemory<OutType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[(Layer) ? Layer-1 : Disk+5]> memoriesTEO[]) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
@@ -391,9 +390,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		int slotME; // The bin the stub is going to be put in, in the memory
 
 		// Create the ME stub to save
-		VMStubMECM<OutType> stubME = (disk2S) ? 
-				createVMStub<VMStubMECM<OutType>, DISK2S, OutType, Layer, Disk, true>(stubDisk2S, i, negDisk,METable, phiCorrTable, slotME) :
-				createVMStub<VMStubMECM<OutType>, InType, OutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slotME);
+		VMStub<OutType> stubME = (disk2S) ? 
+				createVMStub<VMStub<OutType>, DISK2S, OutType, Layer, Disk, true>(stubDisk2S, i, negDisk,METable, phiCorrTable, slotME) :
+				createVMStub<VMStub<OutType>, InType, OutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
 		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
@@ -412,9 +411,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			int slotTE; // The bin the stub is going to be put in, in the memory
 
 			// Create the TE Outer stub to save
-			VMStubTEOuter<OutType> stubTEO = (Layer) ?
-					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slotTE) :
-					createVMStub<VMStubTEOuter<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
+			VMStub<OutType> stubTEO = (Layer) ?
+					createVMStub<VMStub<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slotTE) :
+					createVMStub<VMStub<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
 
 			// Write stub to all TE memory copies
 			for (int n = 0; n < nTEOCopies; n++) {
