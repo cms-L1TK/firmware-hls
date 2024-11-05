@@ -21,6 +21,9 @@ src --vhdl2008 common/hdl/tf_merge_streamer.vhd
 src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/tf_pipe_delay.vhd
 
+#Floorplan
+src ../ucf/floorplan_f1.tcl
+
 ################
 # Include Cores
 ################
