@@ -9,10 +9,10 @@
 // stub data + a pointer to the full precision stub data in the AllStubMemory.
 
 // VMStubBase is where we define the bit widths, which depend on the class template parameter.
-template<int VMSType> class VMStubBase {};
+template<int VMSType, bool TE = false> class VMStubBase {};
 
-template<>
-class VMStubBase<BARRELPS>
+template<bool TE>
+class VMStubBase<BARRELPS, TE>
 {
 public:
   enum BitWidths {
@@ -26,8 +26,8 @@ public:
   };
 };
 
-template<>
-class VMStubBase<BARREL2S>
+template<bool TE>
+class VMStubBase<BARREL2S, TE>
 {
 public:
   enum BitWidths {
@@ -41,15 +41,15 @@ public:
   };
 };
 
-template<>
-class VMStubBase<DISK>
+template<bool TE>
+class VMStubBase<DISK, TE>
 {
 public:
   enum BitWidths {
     // Bit sizes for VMStubMemory fields
     kVMSFineZSize = 3,
     kVMSFinePhiSize = 3,
-    kVMSBendSize = 4,
+    kVMSBendSize = TE ? 3 : 4,
     kVMSIDSize = 7,
     // Bit size for full VMStubMemory
     kVMStubSize = kVMSFineZSize + kVMSFinePhiSize + kVMSBendSize + kVMSIDSize
@@ -57,29 +57,29 @@ public:
 };
 
 // Data object definition
-template<int VMSType>
-class VMStub : public VMStubBase<VMSType>
+template<int VMSType, bool TE = false>
+class VMStub : public VMStubBase<VMSType, TE>
 {
 public:
   enum BitLocations {
     // The location of the least significant bit (LSB) and most significant bit (MSB) in the VMStubMemory word for different fields
     kVMSFineZLSB = 0,
-    kVMSFineZMSB = kVMSFineZLSB + VMStubBase<VMSType>::kVMSFineZSize - 1,
+    kVMSFineZMSB = kVMSFineZLSB + VMStubBase<VMSType, TE>::kVMSFineZSize - 1,
     kVMSFinePhiLSB = kVMSFineZMSB + 1,
-    kVMSFinePhiMSB = kVMSFinePhiLSB + VMStubBase<VMSType>::kVMSFinePhiSize - 1,
+    kVMSFinePhiMSB = kVMSFinePhiLSB + VMStubBase<VMSType, TE>::kVMSFinePhiSize - 1,
     kVMSBendLSB = kVMSFinePhiMSB + 1,
-    kVMSBendMSB = kVMSBendLSB + VMStubBase<VMSType>::kVMSBendSize - 1,
+    kVMSBendMSB = kVMSBendLSB + VMStubBase<VMSType, TE>::kVMSBendSize - 1,
     kVMSIDLSB = kVMSBendMSB + 1,
-    kVMSIDMSB = kVMSIDLSB + VMStubBase<VMSType>::kVMSIDSize - 1
+    kVMSIDMSB = kVMSIDLSB + VMStubBase<VMSType, TE>::kVMSIDSize - 1
   };
 
-  typedef ap_uint<VMStubBase<VMSType>::kVMSIDSize> VMSID;
-  typedef ap_uint<VMStubBase<VMSType>::kVMSBendSize> VMSBEND;
-  typedef ap_uint<VMStubBase<VMSType>::kVMSBendSize - 1> VMSBENDPSDISK;
-  typedef ap_uint<VMStubBase<VMSType>::kVMSFineZSize> VMSFINEZ;
-  typedef ap_uint<VMStubBase<VMSType>::kVMSFinePhiSize> VMSFINEPHI;
+  typedef ap_uint<VMStubBase<VMSType, TE>::kVMSIDSize> VMSID;
+  typedef ap_uint<VMStubBase<VMSType, TE>::kVMSBendSize> VMSBEND;
+  typedef ap_uint<VMStubBase<VMSType, TE>::kVMSBendSize - 1> VMSBENDPSDISK;
+  typedef ap_uint<VMStubBase<VMSType, TE>::kVMSFineZSize> VMSFINEZ;
+  typedef ap_uint<VMStubBase<VMSType, TE>::kVMSFinePhiSize> VMSFINEPHI;
 
-  typedef ap_uint<VMStubBase<VMSType>::kVMStubSize> VMStubData;
+  typedef ap_uint<VMStubBase<VMSType, TE>::kVMStubSize> VMStubData;
 
   // Constructors
   VMStub(const VMStubData& newdata):
@@ -102,7 +102,7 @@ public:
   #endif
 
   // Getter
-  static constexpr int getWidth() {return VMStubBase<VMSType>::kVMStubSize;}
+  static constexpr int getWidth() {return VMStubBase<VMSType, TE>::kVMStubSize;}
 
   VMStubData raw() const {return data_;}
 
@@ -160,6 +160,6 @@ private:
 };
 
 // Memory definition
-template<int VMSType, int RZSize, int PhiRegSize, unsigned int NCOPY > using VMStubMemory = MemoryTemplateBinnedCM<VMStub<VMSType>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, PhiRegSize, NCOPY>;
+template<int VMSType, int RZSize, int PhiRegSize, unsigned int NCOPY, bool TE = false > using VMStubMemory = MemoryTemplateBinnedCM<VMStub<VMSType, TE>, 1, 4+RZSize+PhiRegSize, RZSize+PhiRegSize, PhiRegSize, NCOPY>;
 
 #endif

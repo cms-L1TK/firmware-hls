@@ -20,7 +20,7 @@ class TrackletEngineUnit {
     kNBitsPTLutOuter=(Seed==TF::L5L6||Seed==TF::L1D1||Seed==TF::L2D1||Seed==TF::D1D2||Seed==TF::D3D4)?1024:(Seed==TF::L1L2||Seed==TF::L2L3)?256:512
   };
 
-  typedef ap_uint<VMStub<VMSType>::kVMSIDSize+AllStub<innerRegion>::kAllStubSize+TrackletParameters::kTParPhiRegionSize+kNBits_MemAddr> STUBID;
+  typedef ap_uint<VMStub<VMSType, true>::kVMSIDSize+AllStub<innerRegion>::kAllStubSize+TrackletParameters::kTParPhiRegionSize+kNBits_MemAddr> STUBID;
   typedef ap_uint<kNBitsNegDiskSize> NEGDISK;
   typedef ap_uint<kNBits_MemAddrBinned> NSTUBS;
   typedef ap_uint<kNBitsBuffer> INDEX;
@@ -178,7 +178,7 @@ void write(STUBID stubs) {
  ap_uint<1> next__, next___;
  PHIBIN ireg__, ireg___;
 
- VMStub<VMSType> outervmstub__, outervmstub___;
+ VMStub<VMSType, true> outervmstub__, outervmstub___;
 
  NSTUBS ns[16];
 

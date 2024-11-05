@@ -381,7 +381,7 @@ def writeTopHeader(vmr, output_dir):
         "  AllStubMemory<outputType> memoriesAS[numASCopies],\n"
         + ("  AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],\n" if has_allstub_inner[layerdisk] else "") +\
         "  VMStubMemory<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME" + (",\n" if has_vmste_outer[layerdisk] else "")
-        + ("  VMStubMemory<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
+        + ("  VMStubMemory<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk], true> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
         "  );\n"
         "\n"
         "#endif // TopFunctions_%s_h\n" % file_name
@@ -418,7 +418,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
         "  AllStubMemory<outputType> memoriesAS[numASCopies],\n"
         + ("  AllStubInnerMemory<outputType> memoriesASInner[numASInnerCopies],\n" if has_allstub_inner[layerdisk] else "") +\
         "  VMStubMemory<outputType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME" + (",\n" if has_vmste_outer[layerdisk] else "")
-        + ("  VMStubMemory<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk]> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
+        + ("  VMStubMemory<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk], true> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
         "  ) {\n"
         "\n"
         "// Takes 2 clock cycles before one gets data, used at high frequencies\n"

@@ -109,7 +109,7 @@ std::cout<<module_name[MODULE_];
   const auto nOuterStubMems = tb.nFiles(outerStubPattern);
   vector<AllStubInnerMemory<InnerStubType> > innerStubs(nInnerStubMems);
   vector<AllStubMemory<OuterStubType> > outerStubs(nOuterStubMems);
-  vector<VMStubMemory<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY> > outervmStubs(nOuterVMStubMems);
+  vector<VMStubMemory<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY, true> > outervmStubs(nOuterVMStubMems);
 
   // output memories
   TrackletParameterMemory tpar;
@@ -145,7 +145,7 @@ std::cout<<module_name[MODULE_];
     for (unsigned i = 0; i < nOuterStubMems; i++)
       writeMemFromFile<AllStubMemory<OuterStubType> >(outerStubs[i], fin_outerStubs.at(i), ievt);
     for (unsigned i = 0; i < nOuterVMStubMems; i++)
-      writeMemFromFile<VMStubMemory<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
+      writeMemFromFile<VMStubMemory<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY, true>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
 
     // clear all output memories before starting
     tpar.clear();

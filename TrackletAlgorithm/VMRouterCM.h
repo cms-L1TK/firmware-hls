@@ -187,7 +187,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		// ME memories
 		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
 		// TE Outer memories
-		VMStubMemory<OutType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[(Layer) ? Layer-1 : Disk+5]> memoriesTEO[]) {
+		VMStubMemory<OutType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[(Layer) ? Layer-1 : Disk+5], true> memoriesTEO[]) {
 
 #pragma HLS inline
 #pragma HLS array_partition variable=inputStubs complete dim=1
@@ -411,9 +411,9 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			int slotTE; // The bin the stub is going to be put in, in the memory
 
 			// Create the TE Outer stub to save
-			VMStub<OutType> stubTEO = (Layer) ?
-					createVMStub<VMStub<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slotTE) :
-					createVMStub<VMStub<OutType>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
+			VMStub<OutType, true> stubTEO = (Layer) ?
+			  createVMStub<VMStub<OutType, true>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, METable, phiCorrTable, slotTE) :
+			  createVMStub<VMStub<OutType, true>, InType, OutType, Layer, Disk, false>(stub, i, negDisk, TEDiskTable, phiCorrTable, slotTE);
 
 			// Write stub to all TE memory copies
 			for (int n = 0; n < nTEOCopies; n++) {
