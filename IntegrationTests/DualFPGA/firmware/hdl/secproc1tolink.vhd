@@ -24,8 +24,6 @@ entity secproc1tolink is
 end secproc1tolink;
 
 architecture rtl of secproc1tolink is
-
-  signal bx_out : std_logic_vector(2 downto 0) := "111";  
   
   constant dataword_length : integer := 64;
   constant n_interfpga_links : integer := 64;
@@ -37,70 +35,70 @@ architecture rtl of secproc1tolink is
 
 begin
 
-  AS_signals(1775 downto 0) <= AS_37_stream_V_dout(L1PHIAn1) &
-                               AS_37_stream_V_dout(L1PHIBn1) &
-                               AS_37_stream_V_dout(L1PHICn1) &
-                               AS_37_stream_V_dout(L1PHIDn1) &
-                               AS_37_stream_V_dout(L1PHIEn1) &
-                               AS_37_stream_V_dout(L1PHIFn1) &
-                               AS_37_stream_V_dout(L1PHIGn1) &
-                               AS_37_stream_V_dout(L1PHIHn1) &
-                               AS_37_stream_V_dout(L2PHIAn1) &
-                               AS_37_stream_V_dout(L2PHIBn1) &
-                               AS_37_stream_V_dout(L2PHICn1) &
-                               AS_37_stream_V_dout(L2PHIDn1) &
-                               AS_37_stream_V_dout(L3PHIAn1) &
-                               AS_37_stream_V_dout(L3PHIBn1) &
-                               AS_37_stream_V_dout(L3PHICn1) &
-                               AS_37_stream_V_dout(L3PHIDn1) &
-                               AS_37_stream_V_dout(L4PHIAn1) &
-                               AS_37_stream_V_dout(L4PHIBn1) &
-                               AS_37_stream_V_dout(L4PHICn1) &
-                               AS_37_stream_V_dout(L4PHIDn1) &
-                               AS_37_stream_V_dout(L5PHIAn1) &
-                               AS_37_stream_V_dout(L5PHIBn1) &
-                               AS_37_stream_V_dout(L5PHICn1) &
-                               AS_37_stream_V_dout(L5PHIDn1) &
-                               AS_37_stream_V_dout(L6PHIAn1) &
-                               AS_37_stream_V_dout(L6PHIBn1) &
-                               AS_37_stream_V_dout(L6PHICn1) &
-                               AS_37_stream_V_dout(L6PHIDn1) &
-                               AS_37_stream_V_dout(D1PHIAn1) &
-                               AS_37_stream_V_dout(D1PHIBn1) &
-                               AS_37_stream_V_dout(D1PHICn1) &
-                               AS_37_stream_V_dout(D1PHIDn1) &
-                               AS_37_stream_V_dout(D2PHIAn1) &
-                               AS_37_stream_V_dout(D2PHIBn1) &
-                               AS_37_stream_V_dout(D2PHICn1) &
-                               AS_37_stream_V_dout(D2PHIDn1) &
-                               AS_37_stream_V_dout(D3PHIAn1) &
-                               AS_37_stream_V_dout(D3PHIBn1) &
-                               AS_37_stream_V_dout(D3PHICn1) &
-                               AS_37_stream_V_dout(D3PHIDn1) &
-                               AS_37_stream_V_dout(D4PHIAn1) &
-                               AS_37_stream_V_dout(D4PHIBn1) &
-                               AS_37_stream_V_dout(D4PHICn1) &
-                               AS_37_stream_V_dout(D4PHIDn1) &
-                               AS_37_stream_V_dout(D5PHIAn1) &
-                               AS_37_stream_V_dout(D5PHIBn1) &
+  AS_signals(1775 downto 0) <= AS_37_stream_V_dout(D5PHIDn1) &
                                AS_37_stream_V_dout(D5PHICn1) &
-                               AS_37_stream_V_dout(D5PHIDn1);
+                               AS_37_stream_V_dout(D5PHIBn1) &
+                               AS_37_stream_V_dout(D5PHIAn1) &
+                               AS_37_stream_V_dout(D4PHIDn1) &
+                               AS_37_stream_V_dout(D4PHICn1) &
+                               AS_37_stream_V_dout(D4PHIBn1) &
+                               AS_37_stream_V_dout(D4PHIAn1) &
+                               AS_37_stream_V_dout(D3PHIDn1) &
+                               AS_37_stream_V_dout(D3PHICn1) &
+                               AS_37_stream_V_dout(D3PHIBn1) &
+                               AS_37_stream_V_dout(D3PHIAn1) &
+                               AS_37_stream_V_dout(D2PHIDn1) &
+                               AS_37_stream_V_dout(D2PHICn1) &
+                               AS_37_stream_V_dout(D2PHIBn1) &
+                               AS_37_stream_V_dout(D2PHIAn1) &
+                               AS_37_stream_V_dout(D1PHIDn1) &
+                               AS_37_stream_V_dout(D1PHICn1) &
+                               AS_37_stream_V_dout(D1PHIBn1) &
+                               AS_37_stream_V_dout(D1PHIAn1) &
+                               AS_37_stream_V_dout(L6PHIDn1) &
+                               AS_37_stream_V_dout(L6PHICn1) &
+                               AS_37_stream_V_dout(L6PHIBn1) &
+                               AS_37_stream_V_dout(L6PHIAn1) &
+                               AS_37_stream_V_dout(L5PHIDn1) &
+                               AS_37_stream_V_dout(L5PHICn1) &
+                               AS_37_stream_V_dout(L5PHIBn1) &
+                               AS_37_stream_V_dout(L5PHIAn1) &
+                               AS_37_stream_V_dout(L4PHIDn1) &
+                               AS_37_stream_V_dout(L4PHICn1) &
+                               AS_37_stream_V_dout(L4PHIBn1) &
+                               AS_37_stream_V_dout(L4PHIAn1) &
+                               AS_37_stream_V_dout(L3PHIDn1) &
+                               AS_37_stream_V_dout(L3PHICn1) &
+                               AS_37_stream_V_dout(L3PHIBn1) &
+                               AS_37_stream_V_dout(L3PHIAn1) &
+                               AS_37_stream_V_dout(L2PHIDn1) &
+                               AS_37_stream_V_dout(L2PHICn1) &
+                               AS_37_stream_V_dout(L2PHIBn1) &
+                               AS_37_stream_V_dout(L2PHIAn1) &
+                               AS_37_stream_V_dout(L1PHIHn1) &
+                               AS_37_stream_V_dout(L1PHIGn1) &
+                               AS_37_stream_V_dout(L1PHIFn1) &
+                               AS_37_stream_V_dout(L1PHIEn1) &
+                               AS_37_stream_V_dout(L1PHIDn1) &
+                               AS_37_stream_V_dout(L1PHICn1) &
+                               AS_37_stream_V_dout(L1PHIBn1) &
+                               AS_37_stream_V_dout(L1PHIAn1);
 
-  MPAR_signals(1139 downto 0) <= MPAR_76_stream_V_dout(L1L2ABC) &
-                                  MPAR_76_stream_V_dout(L1L2DE) &
-                                  MPAR_76_stream_V_dout(L1L2F) &
-                                  MPAR_76_stream_V_dout(L1L2G) &
-                                  MPAR_76_stream_V_dout(L1L2HI) &
-                                  MPAR_76_stream_V_dout(L1L2JKL) &
-                                  MPAR_76_stream_V_dout(L2L3ABCD) &
-                                  MPAR_76_stream_V_dout(L3L4AB) &
-                                  MPAR_76_stream_V_dout(L3L4CD) &
-                                  MPAR_76_stream_V_dout(L5L6ABCD) &
-                                  MPAR_76_stream_V_dout(D1D2ABCD) &
-                                  MPAR_76_stream_V_dout(D3D4ABCD) &
-                                  MPAR_76_stream_V_dout(L1D1ABCD) &
-                                  MPAR_76_stream_V_dout(L1D1EFGH) &
-                                  MPAR_76_stream_V_dout(L2D1ABCD);
+  MPAR_signals(1139 downto 0) <= MPAR_76_stream_V_dout(L2D1ABCD) &
+                                 MPAR_76_stream_V_dout(L1D1EFGH) &
+                                 MPAR_76_stream_V_dout(L1D1ABCD) &
+                                 MPAR_76_stream_V_dout(D3D4ABCD) &
+                                 MPAR_76_stream_V_dout(D1D2ABCD) &
+                                 MPAR_76_stream_V_dout(L5L6ABCD) &
+                                 MPAR_76_stream_V_dout(L3L4CD) &
+                                 MPAR_76_stream_V_dout(L3L4AB) &
+                                 MPAR_76_stream_V_dout(L2L3ABCD) &
+                                 MPAR_76_stream_V_dout(L1L2JKL) &
+                                 MPAR_76_stream_V_dout(L1L2HI) &
+                                 MPAR_76_stream_V_dout(L1L2G) &
+                                 MPAR_76_stream_V_dout(L1L2F) &
+                                 MPAR_76_stream_V_dout(L1L2DE) &
+                                 MPAR_76_stream_V_dout(L1L2ABC);
 
   process( clk ) is
   begin
@@ -177,7 +175,7 @@ begin
   q(53).data(63 - 12 downto 0) <= MPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
   q(53).data(63 downto 63-11) <= (others => '0');
   
-  q(54).data(2 downto 0) <= bx_out;
+  q(54).data(2 downto 0) <= TP_bx_out;
   q(54).data(63 downto 3) <= (others => '0');
     
 end rtl;
