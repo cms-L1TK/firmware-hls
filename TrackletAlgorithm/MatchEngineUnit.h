@@ -123,8 +123,6 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
   auto secondSave = second_;
 
   VMProjection<VMProjType> data(projbuffer_.getProjection());
-  constexpr bool isDisk = LAYER > TF::L6;
-  constexpr int nbins = isDisk ? (1 << kNbitsrzbin)*2 : (1 << kNbitsrzbin); //twice as many bins in disks (since there are two disks)
 
   if(istub_ == 0) {
      
@@ -153,7 +151,13 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
     projrinv__ = data.getRInv();
 
   }
-  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = (iphi_ + use_[iusetmp].range(0,0)) * nbins + zbin_ + use_[iusetmp].range(1,1);
+  const int nphibins = 3; //number of bits for phi bins in VM memory not that L1 actually only uses 2 bits
+  ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = iphi_ + use_[iusetmp].range(0,0) + (zbin_ + use_[iusetmp].range(1,1)) * (1 << nphibins);
+
+  //The previous line should be like below after L1 is fixed to use four phi bins in the memories
+  //ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = iphi_ + use_[iusetmp].range(0,0) + (zbin_ + use_[iusetmp].range(1,1)) * (1 << nbits_vmmeall[LAYER]);
+
+  zbin__ = zbin_ + use_[iusetmp].range(1,1);
   zbin__ = zbin_ + use_[iusetmp].range(1,1);
   //Read stub memory and extract data fields
   auto stubadd=(slot,istubtmp);

@@ -1020,8 +1020,8 @@ teunits[k].idle_;
       //Fill the result
 
       teunits[k].outervmstub__ = outerVMStubs->read_mem(k, bx, init?
-						       (ireg_init, ibin_init,typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::NSTUBS(0)):
-						       (ireg_reg, ibin_reg, istub_tmp_reg));
+						       (ibin_init, ireg_init, typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::NSTUBS(0)):
+						       (ibin_reg, ireg_reg, istub_tmp_reg));
       teunits[k].next__ = init?next_init:next_reg;
       teunits[k].ireg__ = init?ireg_init:ireg_reg;
       teunits[k].good__ = init?good_init:good_reg;

@@ -147,7 +147,7 @@ public:
 
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
-      (ireg,ibin)=slot;
+      (ibin,ireg)=slot;
 
       unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
@@ -234,8 +234,10 @@ public:
 
     DataType data(datastr.c_str(), base);
 
-    bool success = write_mem(ibx, slot, data, nentry_ibx);
+    int slot2 = (ibin,ireg); //swap order, should be changed in the input files
 
+    bool success = write_mem(ibx, slot2, data, nentry_ibx);
+    
     return success;
   }
 
