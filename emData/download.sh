@@ -70,11 +70,8 @@ fi
 
 if [ ! -d "LUTs" ]
 then
-  echo "Here10"
   wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_split}
-  echo "Here11"
   tar -xzmf LUTs.tgz
-  echo "Here12"
   mv LUTs LUTsSplit
   rm -f LUTs.tgz
   wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_reducedcm}
@@ -94,8 +91,6 @@ then
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
 fi
-
-echo "Here2"
 
 
 # Run scripts to generate top functions in TopFunctions/

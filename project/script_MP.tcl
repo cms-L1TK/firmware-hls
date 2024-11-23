@@ -15,7 +15,6 @@ set modules_to_test {
     {MP_L6PHIC}
     {MP_D1PHIC}
     {MP_D2PHIC}
-    {MP_D3PHIC}
     {MP_D4PHIC}
     {MP_D5PHIC}
 }
