@@ -229,14 +229,12 @@ public:
 
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
-    (ireg,ibin)=slot;
+    (ibin, ireg)=slot;
     ap_uint<4> nentry_ibx = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
     DataType data(datastr.c_str(), base);
 
-    int slot2 = (ibin,ireg); //swap order, should be changed in the input files
-
-    bool success = write_mem(ibx, slot2, data, nentry_ibx);
+    bool success = write_mem(ibx, slot, data, nentry_ibx);
     
     return success;
   }

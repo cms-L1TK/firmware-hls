@@ -9,22 +9,16 @@ source env_hls.tcl
 set modules_to_test {
     {MP_L1PHIC}
     {MP_L2PHIC}
+    {MP_L3PHIC}
     {MP_L4PHIC}
+    {MP_L5PHIC}
     {MP_L6PHIC}
     {MP_D1PHIC}
+    {MP_D2PHIC}
+    {MP_D3PHIC}
     {MP_D4PHIC}
     {MP_D5PHIC}
 }
-
-# Skipping L3 because of inconsistency in L3
-#    {MP_L3PHIC}
-# Skipping these because of diagreement due to truncation with the extra
-# pipelining step before the match calculator. Will undo once the emulation
-# is upddated
-#    {MP_L5PHIC}
-#    {MP_D2PHIC}
-#    {MP_D3PHIC}
-
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail

@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-
 #### generated with branch VMSMERouterCMSSW13, commit a2c799d ####
 # Combined modules
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Combined_231208.tgz"
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://ahart.web.cern.ch/ahart/tf/test_vectors/MemPrints_Split_240607.tgz"
-luts_url_split="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Split_240607.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/MUMRM6yWEBSDWiQ/MemPrints_Split_241116.tgz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/lKAs7GNBTXKfR9d/LUTs_Split_241116.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced_240121.tgz"
@@ -18,6 +17,7 @@ luts_url_cm2="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced2_24
 # Combined barrel
 memprints_url_cmbarrel="https://cernbox.cern.ch/remote.php/dav/public-files/lVII5Ho0VX7nwFA/MemPrints_Barrel_040424.tar.gz"
 luts_url_cmbarrel="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Barrel_240121.tgz"
+
 
 # Function that prints information regarding the usage of this command
 function usage() {
@@ -67,10 +67,14 @@ fi
 # Download and unpack LUTs.tar.gz,
 # unless LUTS directory already exists (due to previous "download.sh -t" run).
 
+
 if [ ! -d "LUTs" ]
 then
+  echo "Here10"
   wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_split}
+  echo "Here11"
   tar -xzmf LUTs.tgz
+  echo "Here12"
   mv LUTs LUTsSplit
   rm -f LUTs.tgz
   wget --no-check-certificate -O LUTs.tgz --quiet ${luts_url_reducedcm}
@@ -90,6 +94,9 @@ then
   mv LUTs LUTsCMBarrel
   rm -f LUTs.tgz
 fi
+
+echo "Here2"
+
 
 # Run scripts to generate top functions in TopFunctions/
 ### combined config

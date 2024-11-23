@@ -913,7 +913,8 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubBase<VMSType>::kVMSIDSize> stubid,
-                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants]
+                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants],
+		     int istep
 ){
 
 #pragma HLS inline
@@ -1127,7 +1128,7 @@ void MatchCalculator(BXType bx,
     goodmatch = true;
   }
 
-  if(goodmatch) { // Write out only the best match, based on the seeding 
+  if(goodmatch) { // Write out only the best match, based on the seeding
     switch (proj_seed) {
     case 0:
     if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
@@ -1352,7 +1353,7 @@ void MatchProcessor(BXType bx,
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
     bool projBuffNearFull = nearFull4Unit<nPRBAbits>()[(readptr,writeptr)];
-    
+
     ap_uint<3> iphi = 0;
 
     ap_uint<kNMatchEngines> idles;
@@ -1377,10 +1378,11 @@ void MatchProcessor(BXType bx,
     }
 
     //This printout exactly matches printout in emulation for tracking code differences
-    /*   
-    for(int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
-      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "<<matchengine[iMEU].idle()
-        <<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getTrkID();
+    /*
+    std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
+    for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
+      std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "
+		<<matchengine[iMEU].idle()<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getProjSeq();
     }
     std::cout << std::endl;
     */
@@ -1403,14 +1405,12 @@ void MatchProcessor(BXType bx,
     hasMatch = (!emptys[bestiMEU]) && cleanpipeline[bestiMEU];
 
     bestProjSeq = projseqs[bestiMEU];
-    
-    projseq0123 = (projseq01 < projseq23) ? projseq01 : projseq23;
-    
+        
     projseq01 = (matchengine[0].getProjSeqStart() < matchengine[1].getProjSeqStart()) ? matchengine[0].getProjSeqStart() : matchengine[1].getProjSeqStart();
     projseq23 = (matchengine[2].getProjSeqStart() < matchengine[3].getProjSeqStart()) ? matchengine[2].getProjSeqStart() : matchengine[3].getProjSeqStart();
     
+    projseq0123 = (projseq01 < projseq23) ? projseq01 : projseq23;
 
-    
     /*
     // old code - keep for now
     ap_uint<kNMatchEngines> smallest = ~emptys;
@@ -1458,9 +1458,10 @@ void MatchProcessor(BXType bx,
 
     if (hasMatch_save) {
       isMatch = newtracklet_save ? ap_uint<1>(0) : isMatch;
+      
       MatchCalculator<ASTYPE, APTYPE, VMSType, FMTYPE, maxFullMatchVariants, LAYER, PHISEC>
         (bx, newtracklet_save, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
-         fullmatch);
+         fullmatch, istep);
     }
 
     

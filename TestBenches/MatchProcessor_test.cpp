@@ -26,7 +26,7 @@ using namespace std;
 int main()
 {
   // Define memory patterns
-  const string trackletProjectionPattern = "TrackletProjections*";
+  const string trackletProjectionPattern = "TrackletProjections_MPROJ*";
   const string allStubPatternarray = "AllStub*";
   const string vmStubPatternarray = "VMStubs_VMSME*";
   const string fullMatchPattern = "FullMatches*";
@@ -71,6 +71,11 @@ int main()
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) {
     cout << "Event: " << dec << ievt << endl;
 
+    // bx
+    BXType bx = ievt;
+    BXType bx_out;
+
+
     // read event and write to memories
     auto &fin_TrackletProjections = tb.files(trackletProjectionPattern);
     for (unsigned int i = 0; i < nTrackletProjections; i++)
@@ -84,10 +89,6 @@ int main()
     // clear allarray, output memories before starting
     for (unsigned int i = 0; i < nFullMatches; i++)
       fullmatcharray[i].clear();
-
-    // bx
-    BXType bx = ievt;
-    BXType bx_out;
 
     // Unit Under Test
     TOP_FUNC_(bx, tprojarray.data(), vmstub, allstub.data(), bx_out, fullmatcharray.data());
@@ -106,10 +107,9 @@ int main()
     
   } // end of event loop
   
-  // This is necessary because HLS seems to only return an 8-bit error count, so if err%256==0, the test bench can falsely pass
+  // This is necessary because HLS seems to only return an 8-bit error count,
+  // so if err%256==0, the test bench can falsely pass
   if (err > 255) err = 255;
-//  cout << "Module actually has " << err << " errors." << endl;
-//  return 0;
   return err;
   
 }
