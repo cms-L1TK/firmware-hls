@@ -23,7 +23,8 @@ set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_c
 
 # Synthesis
 update_compile_order -fileset sources_1
-launch_runs synth_1 -jobs 64
+set ncpus [exec nproc]
+launch_runs synth_1 -jobs $ncpus
 wait_on_run synth_1
 
 # Make reports

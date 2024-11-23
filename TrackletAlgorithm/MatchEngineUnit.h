@@ -158,7 +158,7 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
   //ap_uint<ProjectionRouterBufferBase<VMProjType, AllProjectionType>::kPRBufferZBinSize -1 + kNBits_MemAddrBinned> slot = iphi_ + use_[iusetmp].range(0,0) + (zbin_ + use_[iusetmp].range(1,1)) * (1 << nbits_vmmeall[LAYER]);
 
   zbin__ = zbin_ + use_[iusetmp].range(1,1);
-  zbin__ = zbin_ + use_[iusetmp].range(1,1);
+
   //Read stub memory and extract data fields
   auto stubadd=(slot,istubtmp);
   stubdata__ = stubmem[bx_&1][stubadd];

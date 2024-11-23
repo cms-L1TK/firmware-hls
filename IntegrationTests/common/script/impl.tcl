@@ -20,7 +20,8 @@ reset_run impl_1
 
 # Implementation
 update_compile_order -fileset sources_1
-launch_runs impl_1 -jobs 64
+set ncpus [exec nproc]
+launch_runs impl_1 -jobs $ncpus
 wait_on_run impl_1
 
 # Make reports
