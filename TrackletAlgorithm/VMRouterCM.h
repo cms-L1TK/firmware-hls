@@ -11,6 +11,7 @@
 #define TrackletAlgorithm_VMRouterCM_h
 
 #include "ap_int.h"
+#include "hls_stream.h"
 #include <cassert>
 
 #include "Constants.h"
@@ -173,14 +174,14 @@ inline T createVMStub(const InputStub<InType> inputStub,
 
 // Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
 template<int nInputMems, int nInputDisk2SMems, int nAllCopies, int nAllInnerCopies, int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int rzSizeTE, int phiRegSize, int nTEOCopies>
-void VMRouterCM(const BXType bx, BXType& bx_o,
+void VMRouterCM(const BXType bx,
 		// LUTs
 		const int METable[],
 		const int TEDiskTable[], 
 		const int phiCorrTable[],
 		// Input memories
-		const InputStubMemory<InType> inputStubs[],
-		const InputStubMemory<DISK2S> inputStubsDisk2S[],
+		hls::stream<InputStub<InType> > &inputStubs_0,
+		hls::stream<InputStub<InType> > &inputStubs_1,
 		// AllStub memory
 		AllStubMemory<OutType> memoriesAS[],
 		const ap_uint<maskASIsize>& maskASI,
@@ -191,34 +192,17 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		VMStubTEOuterMemoryCM<OutType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[(Layer) ? Layer-1 : Disk+5]> memoriesTEO[]) {
 
 #pragma HLS inline
-#pragma HLS array_partition variable=inputStubs dim=1
-#pragma HLS array_partition variable=inputStubsDisk2S dim=1
 #pragma HLS array_partition variable=memoriesAS dim=1
 #pragma HLS array_partition variable=memoriesASInner dim=1
 #pragma HLS array_partition variable=memoriesTEO dim=1
 
-	// Number of data in each input memory
-	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems
-			+ nInputDisk2SMems]; // Array containing the number of inputs
-#pragma HLS array_partition variable=nInputs dim=0
-
 	//Keeps track of input memories that still have stubs to process, one bit per memory
 	ap_uint<nInputMems + nInputDisk2SMems> hasStubs;
 
-	for (int i = 0; i < nInputMems; i++) {
-#pragma HLS UNROLL
-		nInputs[i] = inputStubs[i].getEntries(bx);
-		hasStubs[i] = nInputs[i];
-	}
-	// For DISK2S
-	for (int i = nInputMems; i < nInputMems + nInputDisk2SMems; i++) {
-#pragma HLS UNROLL
-		nInputs[i] = inputStubsDisk2S[i - nInputMems].getEntries(bx);
-		hasStubs[i] = nInputs[i];
-	}
+        hasStubs[0] = !inputStubs_0.empty();
+        hasStubs[1] = !inputStubs_1.empty();
 
 	//Create variables that keep track of which memory address to read and write to
-	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
 	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerCopies]; // Writing of Inner Allstubs
 	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
 	ap_uint<5> addrCountTE[1 << (rzSizeTE + phiRegSize)]; // Writing of TE stubs
@@ -250,7 +234,6 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 #pragma HLS PIPELINE II=1 rewind
 #pragma HLS latency min = 12 //this ensures latencies of different vmrs match in a reduced configuration.
 		bool noStubsLeft = !hasStubs.or_reduce(); // Determines if we have processed all stubs. Is true if hasStubs is all 0s
-		bool resetNext = false; // Used to reset read_addr
 		bool disk2S = false; // Used to determine if DISK2S
 		bool negDisk = false; // Used to determine if it's negative disk
 
@@ -261,24 +244,18 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		int mem_index = __builtin_ctz(hasStubs); // The first non-zero index
 
 		if (!noStubsLeft) {
-			if (mem_index < nInputMems) {
-				stub = inputStubs[mem_index].read_mem(bx, read_addr);
-				if (InType == DISKPS) {
-					negDisk = mem_index >= (nInputMems >> 1);
-				}
-			} else { // For DISK2S
-				stubDisk2S = inputStubsDisk2S[mem_index - nInputMems].read_mem(bx, read_addr);
-				disk2S = true;
-				negDisk = mem_index >= nInputMems + (nInputDisk2SMems >> 1);
-			}
-			resetNext = nInputs[mem_index] == 1;
-			hasStubs[mem_index] = !resetNext;
-			--nInputs[mem_index];
+                        if (InType == DISKPS) {
+                                negDisk = mem_index >= (nInputMems >> 1);
+                        }
+                        if (mem_index == 0) {
+                          inputStubs_0.read(stub);
+                          hasStubs[0] = !inputStubs_0.empty();
+                        }
+                        else {
+                          inputStubs_1.read(stub);
+                          hasStubs[1] = !inputStubs_1.empty();
+                        }
 		}
-
-		// Increment the read address, or reset it to zero when all stubs in a memory has been read
-		if (resetNext) read_addr = 0;
-		else ++read_addr;
 
 		if (noStubsLeft) continue; // End here if we already have processed all stubs
 		// Note: putting the continue here rather than at the start of the loop seems to yield better timing.
@@ -430,8 +407,6 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		} // End TE Outer memories
 
 	} // Outside main loop
-
-	bx_o = bx;
 } // End VMRouterCM
 
 #endif // TrackletAlgorithm_VMRouterCM_h

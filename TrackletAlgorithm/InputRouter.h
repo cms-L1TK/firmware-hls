@@ -3,9 +3,10 @@
 
 
 #include <cassert>
+#include "hls_stream.h"
 #include "Constants.h"
 #include "AllStubMemory.h"
-#include "DTCStubMemory.h"
+#include "InputStubMemory.h"
 #ifndef __SYNTHESIS__
 #ifdef CMSSW_GIT_HASH
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -295,12 +296,11 @@ void InputRouter( const BXType bx
 	, const ap_uint<kLINKMAPwidth> hLinkWord
 	, const ap_uint<kBINMAPwidth> hPhBnWord 
 	, ap_uint<kNBits_DTC>* hInputStubs
-	, BXType & bx_o // output bx 
-	, DTCStubMemory hOutputStubs[nOMems])
+	, hls::stream<InputStub<BARRELPS> > &hOutputStubs_0
+	, hls::stream<InputStub<BARRELPS> > &hOutputStubs_1)
 {
 	
 #pragma HLS inline
-#pragma HLS array_partition variable = hOutputStubs
 
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	#ifndef __SYNTHESIS__
@@ -345,7 +345,7 @@ void InputRouter( const BXType bx
 	  // old data format 
 	  // discard MSBs
 	  //auto hStbWrd = ap_uint<kBRAMwidth>(hStub.range(kBRAMwidth - 1, 0));
-	  DTCStub hMemWord(hStbWrd);
+	  InputStub<BARRELPS> hMemWord(hStbWrd);
 	    
 	  // decode link wrd for this layer
 	  auto hIsBrl= hLinkWord.range((kNBitsBrlBit-1) + kSizeLinkWord * hEncLyr, kSizeLinkWord * hEncLyr);
@@ -399,10 +399,11 @@ void InputRouter( const BXType bx
 	  auto hEntries = hNStubs[cMemIndx];
 	  hNStubs[cMemIndx] = hEntries + 1;
 	  // fill memory 
-	  (&hOutputStubs[cMemIndx])->write_mem(bx, hMemWord, hEntries);
+          if (cMemIndx == 0)
+            (&hOutputStubs_0)->write(hMemWord);
+          else
+            (&hOutputStubs_1)->write(hMemWord);
 	}
-	// update output bx port 
-	bx_o = bx;
 }
 
 
