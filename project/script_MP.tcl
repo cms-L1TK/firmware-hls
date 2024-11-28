@@ -7,6 +7,17 @@
 source env_hls.tcl
 
 set modules_to_test {
+    {MP_L1PHIB}
+    {MP_L2PHIB}
+    {MP_L3PHIB}
+    {MP_L4PHIB}
+    {MP_L5PHIB}
+    {MP_L6PHIB}
+    {MP_D1PHIB}
+    {MP_D2PHIB}
+    {MP_D3PHIB}
+    {MP_D4PHIB}
+    {MP_D5PHIB}
     {MP_L1PHIC}
     {MP_L2PHIC}
     {MP_L3PHIC}
