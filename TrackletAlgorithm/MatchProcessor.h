@@ -1337,6 +1337,7 @@ void MatchProcessor(BXType bx,
 // constants used in reading VMS memories
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int BIN_ADDR_WIDTH = 4;
+
  PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
@@ -1352,6 +1353,7 @@ void MatchProcessor(BXType bx,
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
     bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
+
     bool projBuffNearFull = nearFull4Unit<nPRBAbits>()[(readptr,writeptr)];
 
     ap_uint<3> iphi = 0;
@@ -1380,6 +1382,7 @@ void MatchProcessor(BXType bx,
     //This printout exactly matches printout in emulation for tracking code differences
     /*
     std::cout << "istep = " << istep << " projBuff: " << readptr << " " << writeptr << " " << projBuffNearFull;
+    std::cout << " " << validin << " " << validin_ << " " << validmem;
     for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
       std::cout << " MEU"<<iMEU<<" "<<matchengine[iMEU].readIndex()<<" "<<matchengine[iMEU].writeIndex()<<" "
 		<<matchengine[iMEU].idle()<<" "<<matchengine[iMEU].empty()<<" "<<matchengine[iMEU].getProjSeq();

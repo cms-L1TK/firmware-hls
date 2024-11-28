@@ -258,7 +258,8 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
 
     //if (good___) {
     //  std::cout << "CAndidateMatc: " << unit_ << " " << index << " "
-    //		<< table[index] << " " << pass << " "  << passphi << std::endl;
+    //		<< table[index] << " " << pass << " "  << passphi << " "
+    //		<< stubfinephi << " " << projfinephi___ << std::endl;
     //}
     
     good___ = good__;
