@@ -913,8 +913,7 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubBase<VMSType>::kVMSIDSize> stubid,
-                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants],
-		     int istep
+                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants]
 ){
 
 #pragma HLS inline
@@ -1464,7 +1463,7 @@ void MatchProcessor(BXType bx,
       
       MatchCalculator<ASTYPE, APTYPE, VMSType, FMTYPE, maxFullMatchVariants, LAYER, PHISEC>
         (bx, newtracklet_save, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
-         fullmatch, istep);
+         fullmatch);
     }
 
     
