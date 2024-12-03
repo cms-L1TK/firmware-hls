@@ -56,16 +56,16 @@ public:
 
   NEntryT getEntries(BunchXingT bx) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-	return nentries_[bx];
+    return nentries_[bx];
   }
 
   const DataType (&get_mem() const)[DEPTH_BX][DEPTH_ADDR] {return dataarray_;}
 
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
   {
-	// TODO: check if valid
-	if(!NBIT_BX) ibx = 0;
-	return dataarray_[ibx][index];
+    // TODO: check if valid
+    if(!NBIT_BX) ibx = 0;
+    return dataarray_[ibx][index];
   }
 
   template<class SpecType>
@@ -76,7 +76,7 @@ public:
 #ifdef __SYNTHESIS__
       0;
 #else
-      nentries_[ibx];
+    nentries_[ibx];
 #endif
     return write_mem(ibx,data,addr_index);
   }
@@ -87,10 +87,10 @@ public:
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     static_assert(
-      std::is_same<DataType, SpecType>::value
-      || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
-      || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
-      , "Invalid conversion between data types");
+                  std::is_same<DataType, SpecType>::value
+                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
+                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
+                  , "Invalid conversion between data types");
     DataType sameData(data.raw());
     return write_mem(ibx,sameData,addr_index);
   }
@@ -102,7 +102,7 @@ public:
 #ifdef __SYNTHESIS__
       0;
 #else
-      nentries_[ibx];
+    nentries_[ibx];
 #endif
     return write_mem(ibx,data,addr_index);
   }
@@ -130,7 +130,7 @@ public:
     }
   }
 
-    bool write_mem_new(BunchXingT ibx, DataType data, ap_uint<1> overwrite)
+  bool write_mem_new(BunchXingT ibx, DataType data, ap_uint<1> overwrite)
   {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
@@ -141,9 +141,9 @@ public:
       dataarray_[ibx][0] = data;
 #else
       if(overwrite == 0) {
-	dataarray_[ibx][nentries_[ibx]++] = data;
+        dataarray_[ibx][nentries_[ibx]++] = data;
       } else {
-	dataarray_[ibx][nentries_[ibx]-1] = data;
+        dataarray_[ibx][nentries_[ibx]-1] = data;
       }
 #endif
 
@@ -157,7 +157,7 @@ public:
 #ifndef __SYNTHESIS__
   MemoryTemplate()
   {
-       clear();
+    clear();
   }
 
   ~MemoryTemplate(){}
@@ -165,7 +165,7 @@ public:
   void clear()
   {
     DataType data("0",16);
-    MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
+  MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
       nentries_[ibx] = 0;
       for (size_t addr=0; addr<DEPTH_ADDR; ++addr) {
         write_mem(ibx,data,addr);
@@ -176,47 +176,47 @@ public:
   // write memory from text file
   bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
   { 
-        if(!NBIT_BX) ibx = 0;
-	DataType data(datastr, base);
-	NEntryT nent = nentries_[ibx]; 
-	bool success = write_mem(ibx, data, nent);
+    if(!NBIT_BX) ibx = 0;
+    DataType data(datastr, base);
+    NEntryT nent = nentries_[ibx]; 
+    bool success = write_mem(ibx, data, nent);
 
-	return success;
+    return success;
   }
 
   bool write_mem(BunchXingT ibx, const std::string& datastr, int base=16)
   {
-	return write_mem(ibx, datastr.c_str(), base);
+    return write_mem(ibx, datastr.c_str(), base);
   }
 
   // print memory contents
   void print_data(const DataType data) const
   {
     edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
-        // TODO: overload '<<' in data class
+    // TODO: overload '<<' in data class
   }
 
   void print_entry(BunchXingT bx, NEntryT index) const
   {
-	print_data(dataarray_[bx][index]);
+    print_data(dataarray_[bx][index]);
   }
 
   void print_mem(BunchXingT bx) const
   {
-	for (unsigned int i = 0; i <  nentries_[bx]; ++i) {
-	  edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
-	  print_entry(bx,i);
-	}
+    for (unsigned int i = 0; i <  nentries_[bx]; ++i) {
+      edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
+      print_entry(bx,i);
+    }
   }
 
   void print_mem() const
   {
-	for (unsigned int ibx = 0; ibx < DEPTH_BX; ++ibx) {
-	  for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
-	    edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
-	    print_entry(ibx,i);
-	  }
-	}
+    for (unsigned int ibx = 0; ibx < DEPTH_BX; ++ibx) {
+      for (unsigned int i = 0; i < nentries_[ibx]; ++i) {
+        edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
+        print_entry(ibx,i);
+      }
+    }
   }
 
   static constexpr int getWidth() {return DataType::getWidth();}

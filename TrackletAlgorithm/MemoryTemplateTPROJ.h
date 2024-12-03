@@ -90,21 +90,21 @@ public:
   DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
   {
     //assert(page < NPAGE);    
-  	// TODO: check if valid  
-	  if(!NBIT_BX) ibx = 0;
- 	  return dataarray_[ibx][DEPTH_ADDR*page+index];
+    // TODO: check if valid  
+    if(!NBIT_BX) ibx = 0;
+    return dataarray_[ibx][DEPTH_ADDR*page+index];
   }
 
   template<class SpecType>
-    bool write_mem(BunchXingT ibx, SpecType data, NEntryT addr_index, unsigned int page)
+  bool write_mem(BunchXingT ibx, SpecType data, NEntryT addr_index, unsigned int page)
   {
 #pragma HLS inline
     if(!NBIT_BX) ibx = 0;
     static_assert(
-      std::is_same<DataType, SpecType>::value
-      || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
-      || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
-      , "Invalid conversion between data types");
+                  std::is_same<DataType, SpecType>::value
+                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
+                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
+                  , "Invalid conversion between data types");
     DataType sameData(data.raw());
     return write_mem(ibx, sameData, addr_index, page);
   }
@@ -142,13 +142,13 @@ public:
   void clear()
   {
     DataType data("0",16);
-    MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
+  MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
       mask_[ibx]=0;
       for (size_t page = 0; page < NPAGE; page++) {
-      	nentries_[ibx*NPAGE+page] = 0;
-      	for (size_t addr=0; addr<DEPTH_ADDR; ++addr) {
-	        dataarray_[ibx][DEPTH_ADDR*page+addr] = data;
-      	}
+        nentries_[ibx*NPAGE+page] = 0;
+        for (size_t addr=0; addr<DEPTH_ADDR; ++addr) {
+          dataarray_[ibx][DEPTH_ADDR*page+addr] = data;
+        }
       }
     }
   }
@@ -205,19 +205,19 @@ public:
   void print_data(const DataType data) const
   {
     edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
-        // TODO: overload '<<' in data class
+    // TODO: overload '<<' in data class
   }
 
   void print_entry(BunchXingT bx, NEntryT index, unsigned int page = 0) const
   {
-  	print_data(dataarray_[bx][DEPTH_ADDR*page+index]);
+    print_data(dataarray_[bx][DEPTH_ADDR*page+index]);
   }
 
   void print_mem(BunchXingT bx) const {
     for (unsigned int page = 0; page < NPAGE; ++page) {
       for (unsigned int i = 0; i <  nentries_[bx*NPAGE+page]; ++i) {
-	edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
-	print_entry(bx, i, page);
+        edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
+        print_entry(bx, i, page);
       }
     }
   }
@@ -226,10 +226,10 @@ public:
   {
     for (unsigned int ibx = 0; ibx < DEPTH_BX; ++ibx) {
       for (unsigned int page = 0; page < NPAGE; ++page) {
-	for (unsigned int i = 0; i < nentries_[ibx*NPAGE+page]; ++i) {
-	  edm::LogVerbatim("L1trackHLS") << ibx << " " << page << " " << i << " ";
-	  print_entry(ibx, i, page);
-	}
+        for (unsigned int i = 0; i < nentries_[ibx*NPAGE+page]; ++i) {
+          edm::LogVerbatim("L1trackHLS") << ibx << " " << page << " " << i << " ";
+          print_entry(ibx, i, page);
+        }
       }
     }
   }
