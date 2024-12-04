@@ -901,7 +901,7 @@ template<TF::layerDisk Layer, TF::phiRegion PHI> constexpr uint32_t NPageSum();
 
 #include "MatchProcessor_parameters.h"
 
-template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchCopies, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
+template<regionType ASTYPE, regionType APTYPE, regionType VMSMEType, regionType FMTYPE, int maxFullMatchVariants, TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchCalculator(BXType bx,
                      ap_uint<1> newtracklet,
                      ap_uint<1>& isMatch,
@@ -913,7 +913,7 @@ void MatchCalculator(BXType bx,
                      const AllStubMemory<ASTYPE>* allstub,
                      const AllProjection<APTYPE>& proj,
                      ap_uint<VMStubMECMBase<VMSMEType>::kVMSMEIDSize> stubid,
-                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
+                     FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants]
 ){
 
 #pragma HLS inline
@@ -1180,7 +1180,7 @@ constexpr unsigned kNbitsrzbinMPDisk = kNbitsrzbin + 1;
 
 //////////////////////////////
 // MatchProcessor
-template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType VMPTYPE, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchCopies,
+template<regionType PROJTYPE, regionType VMSMEType, unsigned kNbitsrzbinMP, regionType VMPTYPE, regionType ASTYPE, regionType FMTYPE, unsigned int nINMEM, int maxFullMatchVariants,
          TF::layerDisk LAYER=TF::L1, TF::phiRegion PHISEC=TF::A>
 void MatchProcessor(BXType bx,
                       // because Vivado HLS cannot synthesize an array of
@@ -1190,7 +1190,7 @@ void MatchProcessor(BXType bx,
                       const VMStubMEMemoryCM<VMSMEType, kNbitsrzbinMP, kNbitsphibin, kNMatchEngines>& instubdata,
                       const AllStubMemory<ASTYPE>* allstub,
                       BXType& bx_o,
-                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchCopies]
+                      FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants]
 ){
 #pragma HLS inline
 
@@ -1458,7 +1458,7 @@ void MatchProcessor(BXType bx,
 
     if (hasMatch_save) {
       isMatch = newtracklet_save ? ap_uint<1>(0) : isMatch;
-      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchCopies, LAYER, PHISEC>
+      MatchCalculator<ASTYPE, APTYPE, VMSMEType, FMTYPE, maxFullMatchVariants, LAYER, PHISEC>
         (bx, newtracklet_save, isMatch, savedMatch, best_delta_z, best_delta_phi, best_delta_rphi, best_delta_r, allstub, allproj_save, stubindex_save,
          fullmatch);
     }
@@ -1483,7 +1483,6 @@ void MatchProcessor(BXType bx,
       newtracklet_save = newtracklet;
       allproj_save = allproj;
       stubindex_save = stubindex;
-
     } //end MC if
     
 

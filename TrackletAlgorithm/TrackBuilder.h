@@ -104,7 +104,7 @@ class Merger {
 };
 
 // TrackBuilder top template function
-template<unsigned Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, int TPARMask>
+template<TF::seed Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, int TPARMask>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory1 trackletParameters1[],

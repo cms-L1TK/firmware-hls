@@ -172,7 +172,7 @@ inline T createVMStub(const InputStub<InType> inputStub,
 // Main function
 
 // Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
-template<int nInputMems, int nInputDisk2SMems, int nAllCopies, int nAllInnerCopies, int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int rzSizeTE, int phiRegSize, int nTEOCopies>
+template<int nInputMems, int nInputDisk2SMems, int nAllCopies, int nAllInnerVariants, int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int rzSizeTE, int phiRegSize, int nTEOCopies>
 void VMRouterCM(const BXType bx, BXType& bx_o,
 		// LUTs
 		const int METable[],
@@ -219,15 +219,15 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerCopies]; // Writing of Inner Allstubs
+	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerVariants]; // Writing of Inner Allstubs
 	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
 	ap_uint<5> addrCountTE[1 << (rzSizeTE + phiRegSize)]; // Writing of TE stubs
 #pragma HLS array_partition variable=addrCountASI complete dim=0
 #pragma HLS array_partition variable=addrCountME complete dim=0
 #pragma HLS array_partition variable=addrCountTE complete dim=0
 
-	if (nAllInnerCopies) {
-		for (int i = 0; i < nAllInnerCopies; i++) {
+	if (nAllInnerVariants) {
+		for (int i = 0; i < nAllInnerVariants; i++) {
 #pragma HLS unroll
 			addrCountASI[i] = 0;
 		}
