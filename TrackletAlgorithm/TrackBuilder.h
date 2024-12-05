@@ -264,17 +264,25 @@ void TrackBuilder(
     // object.
     ap_uint<3> nMatches = 0; // there can be up to eight matches (3 bits)
 
+    //This is a hack to match the emulation where for D1D2 seeds
+    //We don't use both L2 and D3 matches
+    bool barrelD1D2Match1 = false;
+    
     barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
       const auto &barrel_stub = merger_L_top[j].peek();
       const bool barrel_stub_valid = merger_L_top[j].valid() && smallest[j];
-      if (barrel_stub_valid) nMatches++;
+      if (barrel_stub_valid) {
+	nMatches++;
+	barrelD1D2Match1 = Seed == TF::D1D2 && j == 1;
+      }
 
       const auto &barrel_stub_index = (barrel_stub_valid ? barrel_stub.getStubIndex() : FullMatch<BARREL>::FMSTUBINDEX(0));
       const auto &barrel_stub_r = (barrel_stub_valid ? barrel_stub.getStubR() : FullMatch<BARREL>::FMSTUBR(0));
       const auto &barrel_phi_res = (barrel_stub_valid ? barrel_stub.getPhiRes() : FullMatch<BARREL>::FMPHIRES(0));
       const auto &barrel_z_res = (barrel_stub_valid ? barrel_stub.getZRes() : FullMatch<BARREL>::FMZRES(0));
 
+      
       switch (j) {
         case 0:
           track.template setBarrelStub<0>(barrel_stub_valid, barrel_stub_index, barrel_stub_r, barrel_phi_res, barrel_z_res);
@@ -313,8 +321,14 @@ void TrackBuilder(
     disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
 
       const auto &disk_stub = merger_D_top[j].peek();
-      const bool disk_stub_valid = merger_D_top[j].valid() && smallest[j+NBarrelStubs];
-      if (disk_stub_valid) nMatches++;
+      bool disk_stub_valid = merger_D_top[j].valid() && smallest[j+NBarrelStubs];
+      if (disk_stub_valid) {
+	nMatches++;
+	if (Seed == TF::D1D2 and j==0 && barrelD1D2Match1) {
+	  //Hack to not allow D1D2 seed with L2 and D3 match - skip disk match
+	  nMatches--;
+	}
+      }
 
       const auto &disk_stub_index = (disk_stub_valid ? disk_stub.getStubIndex() : FullMatch<DISK>::FMSTUBINDEX(0));
       const auto &disk_stub_r = (disk_stub_valid ? disk_stub.getStubR() : FullMatch<DISK>::FMSTUBR(0));
