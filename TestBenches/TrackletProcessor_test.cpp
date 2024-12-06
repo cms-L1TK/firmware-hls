@@ -109,7 +109,7 @@ std::cout<<module_name[MODULE_];
   const auto nOuterStubMems = tb.nFiles(outerStubPattern);
   vector<AllStubInnerMemory<InnerStubType> > innerStubs(nInnerStubMems);
   vector<AllStubMemory<OuterStubType> > outerStubs(nOuterStubMems);
-  vector<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY> > outervmStubs(nOuterVMStubMems);
+  vector<VMStubMemory<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY, true> > outervmStubs(nOuterVMStubMems);
 
   // output memories
   TrackletParameterMemory tpar;
@@ -122,8 +122,6 @@ std::cout<<module_name[MODULE_];
   auto &fin_outerStubs = tb.files(outerStubPattern);
   auto &fin_outervmStubs = tb.files("VMStubs*");
   auto &fout_tpar = tb.files("TrackletParameters*");
-  auto &fout_tproj = tb.files("TrackletProjections*");
-  const auto &tproj_names = tb.fileNames("TrackletProjections*");
   // print the input files loaded
   std::cout << "Loaded the input files:\n";
   for (unsigned i = 0; i < nInnerStubMems; i++)
@@ -145,7 +143,7 @@ std::cout<<module_name[MODULE_];
     for (unsigned i = 0; i < nOuterStubMems; i++)
       writeMemFromFile<AllStubMemory<OuterStubType> >(outerStubs[i], fin_outerStubs.at(i), ievt);
     for (unsigned i = 0; i < nOuterVMStubMems; i++)
-      writeMemFromFile<VMStubTEOuterMemoryCM<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
+      writeMemFromFile<VMStubMemory<OuterStubType, kNbitsrzbin, kNbitsphibin, NCOPY, true>>(outervmStubs[i], fin_outervmStubs.at(i), ievt);
 
     // clear all output memories before starting
     tpar.clear();
@@ -168,144 +166,6 @@ std::cout<<module_name[MODULE_];
     // compare the computed outputs with the expected ones
     err += compareMemWithFile<TrackletParameterMemory>(tpar, fout_tpar.at(0), ievt,
                                                    "\nTrackletParameter", truncation);
-    for (unsigned i = 0; i < tproj_names.size(); i++) {
-      const auto &tproj_name = tproj_names.at(i);
-      auto &fout = fout_tproj.at(i);
-      if (tproj_name.find("_D1PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D1PHIA], fout, ievt,
-                                                       "\nTrackletProjection (D1PHIA)", truncation);
-      else if (tproj_name.find("_D1PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D1PHIB], fout, ievt,
-                                                       "\nTrackletProjection (D1PHIB)", truncation);
-      else if (tproj_name.find("_D1PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D1PHIC], fout, ievt,
-                                                       "\nTrackletProjection (D1PHIC)", truncation);
-      else if (tproj_name.find("_D1PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D1PHID], fout, ievt,
-                                                       "\nTrackletProjection (D1PHID)", truncation);
-      else if (tproj_name.find("_D2PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D2PHIA], fout, ievt,
-                                                       "\nTrackletProjection (D2PHIA)", truncation);
-      else if (tproj_name.find("_D2PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D2PHIB], fout, ievt,
-                                                       "\nTrackletProjection (D2PHIB)", truncation);
-      else if (tproj_name.find("_D2PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D2PHIC], fout, ievt,
-                                                       "\nTrackletProjection (D2PHIC)", truncation);
-      else if (tproj_name.find("_D2PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D2PHID], fout, ievt,
-                                                       "\nTrackletProjection (D2PHID)", truncation);
-      else if (tproj_name.find("_D3PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D3PHIA], fout, ievt,
-                                                       "\nTrackletProjection (D3PHIA)", truncation);
-      else if (tproj_name.find("_D3PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D3PHIB], fout, ievt,
-                                                       "\nTrackletProjection (D3PHIB)", truncation);
-      else if (tproj_name.find("_D3PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D3PHIC], fout, ievt,
-                                                       "\nTrackletProjection (D3PHIC)", truncation);
-      else if (tproj_name.find("_D3PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D3PHID], fout, ievt,
-                                                       "\nTrackletProjection (D3PHID)", truncation);
-      else if (tproj_name.find("_D4PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D4PHIA], fout, ievt,
-                                                       "\nTrackletProjection (D4PHIA)", truncation);
-      else if (tproj_name.find("_D4PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D4PHIB], fout, ievt,
-                                                       "\nTrackletProjection (D4PHIB)", truncation);
-      else if (tproj_name.find("_D4PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D4PHIC], fout, ievt,
-                                                       "\nTrackletProjection (D4PHIC)", truncation);
-      else if (tproj_name.find("_D4PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<DISK> >(tproj_disk[TP::D4PHID], fout, ievt,
-                                                       "\nTrackletProjection (D4PHID)", truncation);
-      else if (tproj_name.find("_L1PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIA], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIA)", truncation);
-      else if (tproj_name.find("_L1PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIB], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIB)", truncation);
-      else if (tproj_name.find("_L1PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIC], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIC)", truncation);
-      else if (tproj_name.find("_L1PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHID], fout, ievt,
-                                                       "\nTrackletProjection (L1PHID)", truncation);
-      else if (tproj_name.find("_L1PHIE") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIE], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIE)", truncation);
-      else if (tproj_name.find("_L1PHIF") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIF], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIF)", truncation);
-      else if (tproj_name.find("_L1PHIG") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIG], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIG)", truncation);
-      else if (tproj_name.find("_L1PHIH") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L1PHIH], fout, ievt,
-                                                       "\nTrackletProjection (L1PHIH)", truncation);
-      else if (tproj_name.find("_L2PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L2PHIA], fout, ievt,
-                                                       "\nTrackletProjection (L2PHIA)", truncation);
-      else if (tproj_name.find("_L2PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L2PHIB], fout, ievt,
-                                                       "\nTrackletProjection (L2PHIB)", truncation);
-      else if (tproj_name.find("_L2PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L2PHIC], fout, ievt,
-                                                       "\nTrackletProjection (L2PHIC)", truncation);
-      else if (tproj_name.find("_L2PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L2PHID], fout, ievt,
-                                                       "\nTrackletProjection (L2PHID)", truncation);
-      else if (tproj_name.find("_L3PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L3PHIA], fout, ievt,
-                                                       "\nTrackletProjection (L3PHIA)", truncation);
-      else if (tproj_name.find("_L3PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L3PHIB], fout, ievt,
-                                                       "\nTrackletProjection (L3PHIB)", truncation);
-      else if (tproj_name.find("_L3PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L3PHIC], fout, ievt,
-                                                       "\nTrackletProjection (L3PHIC)", truncation);
-      else if (tproj_name.find("_L3PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARRELPS> >(tproj_barrel_ps[TP::L3PHID], fout, ievt,
-                                                       "\nTrackletProjection (L3PHID)", truncation);
-
-      else if (tproj_name.find("_L4PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L4PHIA], fout, ievt,
-                                                       "\nTrackletProjection (L4PHIA)", truncation);
-      else if (tproj_name.find("_L4PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L4PHIB], fout, ievt,
-                                                       "\nTrackletProjection (L4PHIB)", truncation);
-      else if (tproj_name.find("_L4PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L4PHIC], fout, ievt,
-                                                       "\nTrackletProjection (L4PHIC)", truncation);
-      else if (tproj_name.find("_L4PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L4PHID], fout, ievt,
-                                                       "\nTrackletProjection (L4PHID)", truncation);
-      else if (tproj_name.find("_L5PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L5PHIA], fout, ievt,
-                                                       "\nTrackletProjection (L5PHIA)", truncation);
-      else if (tproj_name.find("_L5PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L5PHIB], fout, ievt,
-                                                       "\nTrackletProjection (L5PHIB)", truncation);
-      else if (tproj_name.find("_L5PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L5PHIC], fout, ievt,
-                                                       "\nTrackletProjection (L5PHIC)", truncation);
-      else if (tproj_name.find("_L5PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L5PHID], fout, ievt,
-                                                       "\nTrackletProjection (L5PHID)", truncation);
-      else if (tproj_name.find("_L6PHIA") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L6PHIA], fout, ievt,
-                                                       "\nTrackletProjection (L6PHIA)", truncation);
-      else if (tproj_name.find("_L6PHIB") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L6PHIB], fout, ievt,
-                                                       "\nTrackletProjection (L6PHIB)", truncation);
-      else if (tproj_name.find("_L6PHIC") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L6PHIC], fout, ievt,
-                                                       "\nTrackletProjection (L6PHIC)", truncation);
-      else if (tproj_name.find("_L6PHID") != string::npos)
-        err += compareMemWithFile<TrackletProjectionMemory<BARREL2S> >(tproj_barrel_2s[TP::L6PHID], fout, ievt,
-                                                       "\nTrackletProjection (L6PHID)", truncation);
-
-    }
     cout << endl;
 
   } // end of event loop

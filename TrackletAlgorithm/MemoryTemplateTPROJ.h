@@ -57,6 +57,9 @@ public:
   static constexpr unsigned int DEPTH_BX = 1<<NBIT_BX;
   static constexpr unsigned int DEPTH_ADDR = 1<<NBIT_ADDR;
 
+  //Reduced to 63 to avoid nentry counter wrapping to zero
+  static constexpr unsigned int MAX_TPROJ_PAGE_SIZE = 63;
+
   typedef typename DataType::BitWidths BitWidths;
   typedef ap_uint<NBIT_BX> BunchXingT;
   typedef ap_uint<NBIT_ADDR> NEntryT;
@@ -120,8 +123,13 @@ public:
       //The vhd memory implementation will write to the correct address!!
       dataarray_[ibx][DEPTH_ADDR*page+addr_index] = data;
 #else
+      //NBIT_BX==1 is to identify the projection memories
+      if (NBIT_BX==1 && nentries_[ibx*NPAGE+page]>=MAX_TPROJ_PAGE_SIZE) {
+	return false;
+      }
       dataarray_[ibx][DEPTH_ADDR*page+nentries_[ibx*NPAGE+page]++] = data;
       mask_[ibx].set(page);
+      
 #endif
       
       return true;

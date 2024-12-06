@@ -147,7 +147,7 @@ public:
 
       ap_uint<kNBitsRZBinCM> ibin;
       ap_uint<kNBitsphibinCM> ireg;
-      (ireg,ibin)=slot;
+      (ibin,ireg)=slot;
 
       unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
@@ -229,13 +229,13 @@ public:
 
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
-    (ireg,ibin)=slot;
+    (ibin, ireg)=slot;
     ap_uint<4> nentry_ibx = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
     DataType data(datastr.c_str(), base);
 
     bool success = write_mem(ibx, slot, data, nentry_ibx);
-
+    
     return success;
   }
 

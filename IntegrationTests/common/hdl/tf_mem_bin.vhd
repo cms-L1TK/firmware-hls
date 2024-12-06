@@ -227,10 +227,10 @@ process(clka)
   alias vi_nent_idx  : std_logic_vector(NUM_PHI_BITS+NUM_RZ_BITS-1 downto 0) is addra(ADDR_WIDTH + NUM_PHI_BITS + NUM_RZ_BITS - 1 downto ADDR_WIDTH);
 
   --! Extract phi bin from bin address
-  alias phibits: std_logic_vector(NUM_PHI_BITS-1 downto 0) is vi_nent_idx(NUM_PHI_BITS + NUM_RZ_BITS - 1 downto NUM_RZ_BITS);
+  alias phibits: std_logic_vector(NUM_PHI_BITS-1 downto 0) is vi_nent_idx(NUM_PHI_BITS - 1 downto 0);
   
   --! Extract rz bin from binaddress
-  alias rzbits: std_logic_vector(NUM_RZ_BITS-1 downto 0) is vi_nent_idx(NUM_RZ_BITS-1 downto 0); --rz position
+  alias rzbits: std_logic_vector(NUM_RZ_BITS-1 downto 0) is vi_nent_idx(NUM_PHI_BITS + NUM_RZ_BITS-1 downto NUM_PHI_BITS); --rz position
 
   variable binaddr   : unsigned(ADDR_WIDTH-1 downto 0) := (others => '0');
   variable nentry   : unsigned(ADDR_WIDTH-1 downto 0) := (others => '0');
@@ -244,13 +244,14 @@ begin
       init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
-      --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
+      nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" sync_nent set";
     end if;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
       slv_clk_cnt := (others => '0');
-      nentry_mask_tmp <= (others => '0'); -- Why do we need this??? FIXME
+      nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
       if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then 
         slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
@@ -266,7 +267,7 @@ begin
       -- Write data to all copies
 
       --report "tf_mem_bin vi_nent_idx vi_nent_idx_new: " & to_bstring(vi_nent_idx) & " " & to_bstring(vi_nent_idx_new) & " " & to_bstring(rzbits) & " " & to_bstring(phibits);
-  
+
       binaddr := unsigned(nentry_tmp(to_integer(unsigned(vi_nent_idx))));
       nentry := binaddr+1;
 
@@ -279,7 +280,7 @@ begin
       nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
       
       writeaddr := slv_page_cnt_save & vi_nent_idx & std_logic_vector(binaddr);
-      --report "tf_mem_bin addra: " & NAME & " " & to_bstring(std_logic_vector(addra));
+      --report "tf_mem_bin writeaddr data: " & NAME & " " & to_bstring(writeaddr) & " " & to_bstring(dina);
       for icopy in 0 to NUM_COPY-1 loop
         sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina; 
       end loop;
