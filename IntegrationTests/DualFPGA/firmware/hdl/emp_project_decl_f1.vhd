@@ -19,7 +19,7 @@ package emp_project_decl is
   constant CLOCK_AUX_DIV      : clock_divisor_array_t := (18, 9, 4);  -- Dividers of CLOCK_COMMON_RATIO * 40 MHz
 
   -- Readdjust if latency changes for FPGA1 algorithm
-  constant PAYLOAD_LATENCY : integer := 389;
+  constant PAYLOAD_LATENCY : integer := 388;
 
   -- F1 transmits to F2 on inter-fpga links
   constant REGION_CONF : region_conf_array_t := (
