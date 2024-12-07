@@ -6,8 +6,8 @@ set -e
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Combined_231208.tgz"
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/MUMRM6yWEBSDWiQ/MemPrints_Split_241116.tgz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/lKAs7GNBTXKfR9d/LUTs_Split_241116.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/l6gnLJvrUqy2PFB/MemPrints_Split_241207.tgz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/k8e3BOB6RPwN4Ym/LUTs_Split_241207.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced_240121.tgz"
@@ -286,7 +286,7 @@ fi
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
-mod_types=(IR FT PD VMRCM VMSMER TP MP PC)
+mod_types=(IR TB PD VMRCM VMSMER TP MP PC)
 
 for module_type in ${mod_types[@]}
 do

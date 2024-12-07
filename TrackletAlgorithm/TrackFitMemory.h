@@ -25,7 +25,7 @@ public:
     kTFZ0Size = 10,
     kTFTSize = 14,
     kTFHitCountSize = 3,
-    kTFHitMapSize = kTFHitCountSize * 8,
+    kTFHitMapSize = kTFHitCountSize * kNStubs,
     // Bit size for stub word fields
     kTFTrackIndexSize = 7,
     kTFStubIndexSize = 10,
@@ -89,7 +89,7 @@ public:
     return (kTFStubValidLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1);
   }
   static constexpr unsigned kTFHitCountSizeLSB(const int i) {
-    return (kTFStubValidMSB(0) + (7 - i) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
+    return (kTFStubValidMSB(0) + (kNStubs -1 - i) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
   }
   static constexpr unsigned kTFHitCountSizeMSB(const int i) {
     return (kTFHitCountSizeLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize - 1);

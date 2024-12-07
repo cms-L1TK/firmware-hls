@@ -64,10 +64,10 @@ with open(arguments.wiresFileName, "r") as wiresFile:
     barrelFMMems = {}
     diskFMMems = {}
     for line in wiresFile:
-        if " FT_" not in line:
+        if " TB_" not in line:
             continue
         line = line.rstrip()
-        tbName = re.sub(r".*FT_(....).*", r"FT_\1", line)
+        tbName = re.sub(r".*TB_(....).*", r"TB_\1", line)
         seed = tbName.split("_")[1]
         memName = line.split()[0]
         partype = "TPAR"
@@ -129,7 +129,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
     # Calculate parameters and print out top function for each TB.
     for tbName in sorted(tparMems.keys()):
-        seed = re.sub(r"FT_(....)", r"\1", tbName)
+        seed = re.sub(r"TB_(....)", r"\1", tbName)
         seedNumber = None
         if seed == "L1L2":
             seedNumber = 0

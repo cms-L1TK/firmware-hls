@@ -9,14 +9,8 @@ source env_hls.tcl
 # FIXME: FT_D1D2 is excluded for now because it currently produces extra
 # entries compared to the emulation
 set modules_to_test {
-  {FT_L1L2}
-  {FT_L2L3}
-  {FT_L3L4}
-  {FT_L5L6}
-  {FT_D1D2}
-  {FT_D3D4}
-  {FT_L1D1}
-  {FT_L2D1}
+  {TB_AAAA}
+  {TB_BBBB}
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
@@ -31,7 +25,7 @@ add_files ../TopFunctions/CombinedConfig_FPGA2/TrackBuilderTop.cc -cflags "$CFLA
 add_files -tb ../TestBenches/TrackBuilder_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/FT/
+add_files -tb ../emData/TB/
 
 foreach i $modules_to_test {
   puts [join [list "======== TESTING " $i " ========"] ""]

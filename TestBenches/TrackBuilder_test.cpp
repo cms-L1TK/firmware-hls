@@ -4,49 +4,24 @@
 #include "Macros.h"
 #include "FileReadUtility.h"
 
-const int nevents = 100;  //number of events to run
+const int nevents = 5;  //number of events to run
 
 using namespace std;
 
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined SEED_
-  #define SEED_ L1L2_
+  #define SEED_ AAAA_
 #endif
 #if !defined MODULE_
-  #define MODULE_ FT_L1L2_
+  #define MODULE_ TB_AAAA_
 #endif
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ TrackBuilder_L1L2
+  #define TOP_FUNC_ TrackBuilder_AAAA
 #endif
 
-#if SEED_ == L1L2_
-  constexpr int kNBarrelStubs = 4;
-  constexpr int kNDiskStubs = 4;
-#elif SEED_ == L2L3_
-  constexpr int kNBarrelStubs = 3;
-  constexpr int kNDiskStubs = 4;
-#elif SEED_ == L3L4_
-  constexpr int kNBarrelStubs = 4;
-  constexpr int kNDiskStubs = 2;
-#elif SEED_ == L5L6_
-  constexpr int kNBarrelStubs = 4;
-  constexpr int kNDiskStubs = 0;
-#elif SEED_ == D1D2_
-  constexpr int kNBarrelStubs = 2;
-  constexpr int kNDiskStubs = 3;
-#elif SEED_ == D3D4_
-  constexpr int kNBarrelStubs = 1;
-  constexpr int kNDiskStubs = 3;
-#elif SEED_ == L1D1_
-  constexpr int kNBarrelStubs = 0;
-  constexpr int kNDiskStubs = 4;
-#elif SEED_ == L2D1_
-  constexpr int kNBarrelStubs = 1;
-  constexpr int kNDiskStubs = 3;
-#else
-#  error "Undefined seed"
-#endif
+  constexpr int kNBarrelStubs = 6;
+  constexpr int kNDiskStubs = 5;
 
 typedef TrackFit<kNBarrelStubs, kNDiskStubs> TrackFit_t;
 typedef TrackFitMemory<kNBarrelStubs, kNDiskStubs> TrackFitMemory_t;
@@ -94,7 +69,7 @@ void compareStubsWithFile<0>(int &err, ifstream &fout, const int pos, const Trac
 
 int main()
 {
-  TBHelper tb(string("FT/") + module_name[MODULE_]);
+  TBHelper tb(string("TB/") + module_name[MODULE_]);
 
   // error counts
   int err = 0;
