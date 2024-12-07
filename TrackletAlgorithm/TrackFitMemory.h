@@ -89,7 +89,7 @@ public:
     return (kTFStubValidLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFValidSize - 1);
   }
   static constexpr unsigned kTFHitCountSizeLSB(const int i) {
-    return (kTFStubValidMSB(0) + (kNStubs -1 - i) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
+    return (kTFStubValidMSB(0) + (NBarrelStubs + NDiskStubs -1 - i) * TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize + 1);
   }
   static constexpr unsigned kTFHitCountSizeMSB(const int i) {
     return (kTFHitCountSizeLSB(i) + TrackFitBase<NBarrelStubs, NDiskStubs>::kTFHitCountSize - 1);
