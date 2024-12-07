@@ -19,7 +19,7 @@
   #define TOP_FUNC_ MatchProcessor_D1PHIC
 #endif
 
-const int nevents = 100;  //number of events to run
+const int nevents = 5;  //number of events to run
 
 using namespace std;
 

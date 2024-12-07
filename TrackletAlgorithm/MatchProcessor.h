@@ -1128,47 +1128,11 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding
-    switch (proj_seed) {
-    case 0:
-    if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem_new(bx,fm,savedMatch); // L1L2 seed
-    }
-    break;
-    case 1:
-    if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem_new(bx,fm,savedMatch); // L2L3 seed
-    }
-    break;
-    case 2:
-    if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem_new(bx,fm,savedMatch); // L3L4 seed
-    }
-    break;
-    case 3:
-    if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem_new(bx,fm,savedMatch); // L5L6 seed
-    }
-    break;
-    case 4:
-    if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem_new(bx,fm,savedMatch); // D1D2 seed
-    }
-    break;
-    case 5:
-    if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem_new(bx,fm,savedMatch); // D3D4 seed
-    }
-    break;
-    case 6:
-    if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem_new(bx,fm,savedMatch); // L1D1 seed
-    }
-    break;
-    case 7:
-    if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem_new(bx,fm,savedMatch); // L2D1 seed
-    }
-    break;
+
+    if (proj_seed == TF::L1L2 || proj_seed == TF::L2L3 || proj_seed == TF::L5L6 || proj_seed == TF::L2D1 ) {
+      fullmatch[0].write_mem_new(bx,fm,savedMatch); // AAAA FM
+    } else {
+      fullmatch[1].write_mem_new(bx,fm,savedMatch); // BBBB FM
     }
     savedMatch = 1;
   }
