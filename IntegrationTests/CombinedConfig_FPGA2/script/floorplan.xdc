@@ -1173,73 +1173,105 @@ resize_pblock [get_pblocks pblock_MPD5B] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7
 resize_pblock [get_pblocks pblock_MPD5C] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
 resize_pblock [get_pblocks pblock_MPD5D] -add {CLOCKREGION_X2Y4:CLOCKREGION_X6Y7}
 
-create_pblock pblock_FTL1L2
-add_cells_to_pblock [get_pblocks pblock_FTL1L2] [get_cells -quiet [list \
-          FT_L1L2 \
-          FM_L1L2_L3PHIA_DELAY \
-          FM_L1L2_L3PHIA \
-          FM_L1L2_L3PHIB_DELAY \
-          FM_L1L2_L3PHIB \
-          FM_L1L2_L3PHIC_DELAY \
-          FM_L1L2_L3PHIC \
-          FM_L1L2_L3PHID_DELAY \
-          FM_L1L2_L3PHID \
-          FM_L1L2_L4PHIA_DELAY \
-          FM_L1L2_L4PHIA \
-          FM_L1L2_L4PHIB_DELAY \
-          FM_L1L2_L4PHIB \
-          FM_L1L2_L4PHIC_DELAY \
-          FM_L1L2_L4PHIC \
-          FM_L1L2_L4PHID_DELAY \
-          FM_L1L2_L4PHID \
-          FM_L1L2_L5PHIA_DELAY \
-          FM_L1L2_L5PHIA \
-          FM_L1L2_L5PHIB_DELAY \
-          FM_L1L2_L5PHIB \
-          FM_L1L2_L5PHIC_DELAY \
-          FM_L1L2_L5PHIC \
-          FM_L1L2_L5PHID_DELAY \
-          FM_L1L2_L5PHID \
-          FM_L1L2_L6PHIA_DELAY \
-          FM_L1L2_L6PHIA \
-          FM_L1L2_L6PHIB_DELAY \
-          FM_L1L2_L6PHIB \
-          FM_L1L2_L6PHIC_DELAY \
-          FM_L1L2_L6PHIC \
-          FM_L1L2_L6PHID_DELAY \
-          FM_L1L2_L6PHID \
-          FM_L1L2_D1PHIA_DELAY \
-          FM_L1L2_D1PHIA \
-          FM_L1L2_D1PHIB_DELAY \
-          FM_L1L2_D1PHIB \
-          FM_L1L2_D1PHIC_DELAY \
-          FM_L1L2_D1PHIC \
-          FM_L1L2_D1PHID_DELAY \
-          FM_L1L2_D1PHID \
-          FM_L1L2_D2PHIA_DELAY \
-          FM_L1L2_D2PHIA \
-          FM_L1L2_D2PHIB_DELAY \
-          FM_L1L2_D2PHIB \
-          FM_L1L2_D2PHIC_DELAY \
-          FM_L1L2_D2PHIC \
-          FM_L1L2_D2PHID_DELAY \
-          FM_L1L2_D2PHID \
-          FM_L1L2_D3PHIA_DELAY \
-          FM_L1L2_D3PHIA \
-          FM_L1L2_D3PHIB_DELAY \
-          FM_L1L2_D3PHIB \
-          FM_L1L2_D3PHIC_DELAY \
-          FM_L1L2_D3PHIC \
-          FM_L1L2_D3PHID_DELAY \
-          FM_L1L2_D3PHID \
-          FM_L1L2_D4PHIA_DELAY \
-          FM_L1L2_D4PHIA \
-          FM_L1L2_D4PHIB_DELAY \
-          FM_L1L2_D4PHIB \
-          FM_L1L2_D4PHIC_DELAY \
-          FM_L1L2_D4PHIC \
-          FM_L1L2_D4PHID_DELAY \
-          FM_L1L2_D4PHID \
+create_pblock pblock_TBAAAA
+add_cells_to_pblock [get_pblocks pblock_TBAAAA] [get_cells -quiet [list \
+          TB_AAAA \
+          FM_AAAA_L1PHIA_DELAY \
+          FM_AAAA_L1PHIA \
+          FM_AAAA_L1PHIB_DELAY \
+          FM_AAAA_L1PHIB \
+          FM_AAAA_L1PHIC_DELAY \
+          FM_AAAA_L1PHIC \
+          FM_AAAA_L1PHID_DELAY \
+          FM_AAAA_L1PHID \
+          FM_AAAA_L1PHIE_DELAY \
+          FM_AAAA_L1PHIE \
+          FM_AAAA_L1PHIF_DELAY \
+          FM_AAAA_L1PHIF \
+          FM_AAAA_L1PHIG_DELAY \
+          FM_AAAA_L1PHIG \
+          FM_AAAA_L1PHIH_DELAY \
+          FM_AAAA_L1PHIH \
+          FM_AAAA_L2PHIA_DELAY \
+          FM_AAAA_L2PHIA \
+          FM_AAAA_L2PHIB_DELAY \
+          FM_AAAA_L2PHIB \
+          FM_AAAA_L2PHIC_DELAY \
+          FM_AAAA_L2PHIC \
+          FM_AAAA_L2PHID_DELAY \
+          FM_AAAA_L2PHID \
+          FM_AAAA_L3PHIA_DELAY \
+          FM_AAAA_L3PHIA \
+          FM_AAAA_L3PHIB_DELAY \
+          FM_AAAA_L3PHIB \
+          FM_AAAA_L3PHIC_DELAY \
+          FM_AAAA_L3PHIC \
+          FM_AAAA_L3PHID_DELAY \
+          FM_AAAA_L3PHID \
+          FM_AAAA_L4PHIA_DELAY \
+          FM_AAAA_L4PHIA \
+          FM_AAAA_L4PHIB_DELAY \
+          FM_AAAA_L4PHIB \
+          FM_AAAA_L4PHIC_DELAY \
+          FM_AAAA_L4PHIC \
+          FM_AAAA_L4PHID_DELAY \
+          FM_AAAA_L4PHID \
+          FM_AAAA_L5PHIA_DELAY \
+          FM_AAAA_L5PHIA \
+          FM_AAAA_L5PHIB_DELAY \
+          FM_AAAA_L5PHIB \
+          FM_AAAA_L5PHIC_DELAY \
+          FM_AAAA_L5PHIC \
+          FM_AAAA_L5PHID_DELAY \
+          FM_AAAA_L5PHID \
+          FM_AAAA_L6PHIA_DELAY \
+          FM_AAAA_L6PHIA \
+          FM_AAAA_L6PHIB_DELAY \
+          FM_AAAA_L6PHIB \
+          FM_AAAA_L6PHIC_DELAY \
+          FM_AAAA_L6PHIC \
+          FM_AAAA_L6PHID_DELAY \
+          FM_AAAA_L6PHID \
+          FM_AAAA_D1PHIA_DELAY \
+          FM_AAAA_D1PHIA \
+          FM_AAAA_D1PHIB_DELAY \
+          FM_AAAA_D1PHIB \
+          FM_AAAA_D1PHIC_DELAY \
+          FM_AAAA_D1PHIC \
+          FM_AAAA_D1PHID_DELAY \
+          FM_AAAA_D1PHID \
+          FM_AAAA_D2PHIA_DELAY \
+          FM_AAAA_D2PHIA \
+          FM_AAAA_D2PHIB_DELAY \
+          FM_AAAA_D2PHIB \
+          FM_AAAA_D2PHIC_DELAY \
+          FM_AAAA_D2PHIC \
+          FM_AAAA_D2PHID_DELAY \
+          FM_AAAA_D2PHID \
+          FM_AAAA_D3PHIA_DELAY \
+          FM_AAAA_D3PHIA \
+          FM_AAAA_D3PHIB_DELAY \
+          FM_AAAA_D3PHIB \
+          FM_AAAA_D3PHIC_DELAY \
+          FM_AAAA_D3PHIC \
+          FM_AAAA_D3PHID_DELAY \
+          FM_AAAA_D3PHID \
+          FM_AAAA_D4PHIA_DELAY \
+          FM_AAAA_D4PHIA \
+          FM_AAAA_D4PHIB_DELAY \
+          FM_AAAA_D4PHIB \
+          FM_AAAA_D4PHIC_DELAY \
+          FM_AAAA_D4PHIC \
+          FM_AAAA_D4PHID_DELAY \
+          FM_AAAA_D4PHID \
+          FM_AAAA_D5PHIA_DELAY \
+          FM_AAAA_D5PHIA \
+          FM_AAAA_D5PHIB_DELAY \
+          FM_AAAA_D5PHIB \
+          FM_AAAA_D5PHIC_DELAY \
+          FM_AAAA_D5PHIC \
+          FM_AAAA_D5PHID_DELAY \
+          FM_AAAA_D5PHID \
           MPAR_L1L2ABC_DELAY \
           MPAR_L1L2ABC \
           MPAR_L1L2DE_DELAY \
@@ -1252,389 +1284,130 @@ add_cells_to_pblock [get_pblocks pblock_FTL1L2] [get_cells -quiet [list \
           MPAR_L1L2HI \
           MPAR_L1L2JKL_DELAY \
           MPAR_L1L2JKL \
-	  ]]
-
-create_pblock pblock_FTL2L3
-add_cells_to_pblock [get_pblocks pblock_FTL2L3] [get_cells -quiet [list \
-	  FT_L2L3 \
-          FM_L2L3_L1PHIA_DELAY \
-          FM_L2L3_L1PHIA \
-          FM_L2L3_L1PHIB_DELAY \
-          FM_L2L3_L1PHIB \
-          FM_L2L3_L1PHIC_DELAY \
-          FM_L2L3_L1PHIC \
-          FM_L2L3_L1PHID_DELAY \
-          FM_L2L3_L1PHID \
-          FM_L2L3_L1PHIE_DELAY \
-          FM_L2L3_L1PHIE \
-          FM_L2L3_L1PHIF_DELAY \
-          FM_L2L3_L1PHIF \
-          FM_L2L3_L1PHIG_DELAY \
-          FM_L2L3_L1PHIG \
-          FM_L2L3_L1PHIH_DELAY \
-          FM_L2L3_L1PHIH \
-          FM_L2L3_L4PHIA_DELAY \
-          FM_L2L3_L4PHIA \
-          FM_L2L3_L4PHIB_DELAY \
-          FM_L2L3_L4PHIB \
-          FM_L2L3_L4PHIC_DELAY \
-          FM_L2L3_L4PHIC \
-          FM_L2L3_L4PHID_DELAY \
-          FM_L2L3_L4PHID \
-          FM_L2L3_L5PHIA_DELAY \
-          FM_L2L3_L5PHIA \
-          FM_L2L3_L5PHIB_DELAY \
-          FM_L2L3_L5PHIB \
-          FM_L2L3_L5PHIC_DELAY \
-          FM_L2L3_L5PHIC \
-          FM_L2L3_L5PHID_DELAY \
-          FM_L2L3_L5PHID \
-          FM_L2L3_D1PHIA_DELAY \
-          FM_L2L3_D1PHIA \
-          FM_L2L3_D1PHIB_DELAY \
-          FM_L2L3_D1PHIB \
-          FM_L2L3_D1PHIC_DELAY \
-          FM_L2L3_D1PHIC \
-          FM_L2L3_D1PHID_DELAY \
-          FM_L2L3_D1PHID \
-          FM_L2L3_D2PHIA_DELAY \
-          FM_L2L3_D2PHIA \
-          FM_L2L3_D2PHIB_DELAY \
-          FM_L2L3_D2PHIB \
-          FM_L2L3_D2PHIC_DELAY \
-          FM_L2L3_D2PHIC \
-          FM_L2L3_D2PHID_DELAY \
-          FM_L2L3_D2PHID \
-          FM_L2L3_D3PHIA_DELAY \
-          FM_L2L3_D3PHIA \
-          FM_L2L3_D3PHIB_DELAY \
-          FM_L2L3_D3PHIB \
-          FM_L2L3_D3PHIC_DELAY \
-          FM_L2L3_D3PHIC \
-          FM_L2L3_D3PHID_DELAY \
-          FM_L2L3_D3PHID \
-          FM_L2L3_D4PHIA_DELAY \
-          FM_L2L3_D4PHIA \
-          FM_L2L3_D4PHIB_DELAY \
-          FM_L2L3_D4PHIB \
-          FM_L2L3_D4PHIC_DELAY \
-          FM_L2L3_D4PHIC \
-          FM_L2L3_D4PHID_DELAY \
-          FM_L2L3_D4PHID \
           MPAR_L2L3ABCD_DELAY \
           MPAR_L2L3ABCD \
+          MPAR_L5L6ABCD_DELAY \
+          MPAR_L5L6ABCD \
+          MPAR_L2D1ABCD_DELAY \
+          MPAR_L2D1ABCD \
 	  ]]
-
-create_pblock pblock_FTL3L4
-add_cells_to_pblock [get_pblocks pblock_FTL3L4] [get_cells -quiet [list \
-	  FT_L3L4 \
-          FM_L3L4_L1PHIA_DELAY \
-          FM_L3L4_L1PHIA \
-          FM_L3L4_L1PHIB_DELAY \
-          FM_L3L4_L1PHIB \
-          FM_L3L4_L1PHIC_DELAY \
-          FM_L3L4_L1PHIC \
-          FM_L3L4_L1PHID_DELAY \
-          FM_L3L4_L1PHID \
-          FM_L3L4_L1PHIE_DELAY \
-          FM_L3L4_L1PHIE \
-          FM_L3L4_L1PHIF_DELAY \
-          FM_L3L4_L1PHIF \
-          FM_L3L4_L1PHIG_DELAY \
-          FM_L3L4_L1PHIG \
-          FM_L3L4_L1PHIH_DELAY \
-          FM_L3L4_L1PHIH \
-          FM_L3L4_L2PHIA_DELAY \
-          FM_L3L4_L2PHIA \
-          FM_L3L4_L2PHIB_DELAY \
-          FM_L3L4_L2PHIB \
-          FM_L3L4_L2PHIC_DELAY \
-          FM_L3L4_L2PHIC \
-          FM_L3L4_L2PHID_DELAY \
-          FM_L3L4_L2PHID \
-          FM_L3L4_L5PHIA_DELAY \
-          FM_L3L4_L5PHIA \
-          FM_L3L4_L5PHIB_DELAY \
-          FM_L3L4_L5PHIB \
-          FM_L3L4_L5PHIC_DELAY \
-          FM_L3L4_L5PHIC \
-          FM_L3L4_L5PHID_DELAY \
-          FM_L3L4_L5PHID \
-          FM_L3L4_L6PHIA_DELAY \
-          FM_L3L4_L6PHIA \
-          FM_L3L4_L6PHIB_DELAY \
-          FM_L3L4_L6PHIB \
-          FM_L3L4_L6PHIC_DELAY \
-          FM_L3L4_L6PHIC \
-          FM_L3L4_L6PHID_DELAY \
-          FM_L3L4_L6PHID \
-          FM_L3L4_D1PHIA_DELAY \
-          FM_L3L4_D1PHIA \
-          FM_L3L4_D1PHIB_DELAY \
-          FM_L3L4_D1PHIB \
-          FM_L3L4_D1PHIC_DELAY \
-          FM_L3L4_D1PHIC \
-          FM_L3L4_D1PHID_DELAY \
-          FM_L3L4_D1PHID \
-          FM_L3L4_D2PHIA_DELAY \
-          FM_L3L4_D2PHIA \
-          FM_L3L4_D2PHIB_DELAY \
-          FM_L3L4_D2PHIB \
-          FM_L3L4_D2PHIC_DELAY \
-          FM_L3L4_D2PHIC \
-          FM_L3L4_D2PHID_DELAY \
-          FM_L3L4_D2PHID \
+	
+create_pblock pblock_TBBBBB
+add_cells_to_pblock [get_pblocks pblock_TBBBBB] [get_cells -quiet [list \
+          TB_BBBB \
+          FM_BBBB_L1PHIA_DELAY \
+          FM_BBBB_L1PHIA \
+          FM_BBBB_L1PHIB_DELAY \
+          FM_BBBB_L1PHIB \
+          FM_BBBB_L1PHIC_DELAY \
+          FM_BBBB_L1PHIC \
+          FM_BBBB_L1PHID_DELAY \
+          FM_BBBB_L1PHID \
+          FM_BBBB_L1PHIE_DELAY \
+          FM_BBBB_L1PHIE \
+          FM_BBBB_L1PHIF_DELAY \
+          FM_BBBB_L1PHIF \
+          FM_BBBB_L1PHIG_DELAY \
+          FM_BBBB_L1PHIG \
+          FM_BBBB_L1PHIH_DELAY \
+          FM_BBBB_L1PHIH \
+          FM_BBBB_L2PHIA_DELAY \
+          FM_BBBB_L2PHIA \
+          FM_BBBB_L2PHIB_DELAY \
+          FM_BBBB_L2PHIB \
+          FM_BBBB_L2PHIC_DELAY \
+          FM_BBBB_L2PHIC \
+          FM_BBBB_L2PHID_DELAY \
+          FM_BBBB_L2PHID \
+          FM_BBBB_L3PHIA_DELAY \
+          FM_BBBB_L3PHIA \
+          FM_BBBB_L3PHIB_DELAY \
+          FM_BBBB_L3PHIB \
+          FM_BBBB_L3PHIC_DELAY \
+          FM_BBBB_L3PHIC \
+          FM_BBBB_L3PHID_DELAY \
+          FM_BBBB_L3PHID \
+          FM_BBBB_L4PHIA_DELAY \
+          FM_BBBB_L4PHIA \
+          FM_BBBB_L4PHIB_DELAY \
+          FM_BBBB_L4PHIB \
+          FM_BBBB_L4PHIC_DELAY \
+          FM_BBBB_L4PHIC \
+          FM_BBBB_L4PHID_DELAY \
+          FM_BBBB_L4PHID \
+          FM_BBBB_L5PHIA_DELAY \
+          FM_BBBB_L5PHIA \
+          FM_BBBB_L5PHIB_DELAY \
+          FM_BBBB_L5PHIB \
+          FM_BBBB_L5PHIC_DELAY \
+          FM_BBBB_L5PHIC \
+          FM_BBBB_L5PHID_DELAY \
+          FM_BBBB_L5PHID \
+          FM_BBBB_L6PHIA_DELAY \
+          FM_BBBB_L6PHIA \
+          FM_BBBB_L6PHIB_DELAY \
+          FM_BBBB_L6PHIB \
+          FM_BBBB_L6PHIC_DELAY \
+          FM_BBBB_L6PHIC \
+          FM_BBBB_L6PHID_DELAY \
+          FM_BBBB_L6PHID \
+          FM_BBBB_D1PHIA_DELAY \
+          FM_BBBB_D1PHIA \
+          FM_BBBB_D1PHIB_DELAY \
+          FM_BBBB_D1PHIB \
+          FM_BBBB_D1PHIC_DELAY \
+          FM_BBBB_D1PHIC \
+          FM_BBBB_D1PHID_DELAY \
+          FM_BBBB_D1PHID \
+          FM_BBBB_D2PHIA_DELAY \
+          FM_BBBB_D2PHIA \
+          FM_BBBB_D2PHIB_DELAY \
+          FM_BBBB_D2PHIB \
+          FM_BBBB_D2PHIC_DELAY \
+          FM_BBBB_D2PHIC \
+          FM_BBBB_D2PHID_DELAY \
+          FM_BBBB_D2PHID \
+          FM_BBBB_D3PHIA_DELAY \
+          FM_BBBB_D3PHIA \
+          FM_BBBB_D3PHIB_DELAY \
+          FM_BBBB_D3PHIB \
+          FM_BBBB_D3PHIC_DELAY \
+          FM_BBBB_D3PHIC \
+          FM_BBBB_D3PHID_DELAY \
+          FM_BBBB_D3PHID \
+          FM_BBBB_D4PHIA_DELAY \
+          FM_BBBB_D4PHIA \
+          FM_BBBB_D4PHIB_DELAY \
+          FM_BBBB_D4PHIB \
+          FM_BBBB_D4PHIC_DELAY \
+          FM_BBBB_D4PHIC \
+          FM_BBBB_D4PHID_DELAY \
+          FM_BBBB_D4PHID \
+          FM_BBBB_D5PHIA_DELAY \
+          FM_BBBB_D5PHIA \
+          FM_BBBB_D5PHIB_DELAY \
+          FM_BBBB_D5PHIB \
+          FM_BBBB_D5PHIC_DELAY \
+          FM_BBBB_D5PHIC \
+          FM_BBBB_D5PHID_DELAY \
+          FM_BBBB_D5PHID \
           MPAR_L3L4AB_DELAY \
           MPAR_L3L4AB \
           MPAR_L3L4CD_DELAY \
           MPAR_L3L4CD \
-	  ]]
-
-create_pblock pblock_FTL5L6
-add_cells_to_pblock [get_pblocks pblock_FTL5L6] [get_cells -quiet [list \
-	  FT_L5L6 \
-          FM_L5L6_L1PHIA_DELAY \
-          FM_L5L6_L1PHIA \
-          FM_L5L6_L1PHIB_DELAY \
-          FM_L5L6_L1PHIB \
-          FM_L5L6_L1PHIC_DELAY \
-          FM_L5L6_L1PHIC \
-          FM_L5L6_L1PHID_DELAY \
-          FM_L5L6_L1PHID \
-          FM_L5L6_L1PHIE_DELAY \
-          FM_L5L6_L1PHIE \
-          FM_L5L6_L1PHIF_DELAY \
-          FM_L5L6_L1PHIF \
-          FM_L5L6_L1PHIG_DELAY \
-          FM_L5L6_L1PHIG \
-          FM_L5L6_L1PHIH_DELAY \
-          FM_L5L6_L1PHIH \
-          FM_L5L6_L2PHIA_DELAY \
-          FM_L5L6_L2PHIA \
-          FM_L5L6_L2PHIB_DELAY \
-          FM_L5L6_L2PHIB \
-          FM_L5L6_L2PHIC_DELAY \
-          FM_L5L6_L2PHIC \
-          FM_L5L6_L2PHID_DELAY \
-          FM_L5L6_L2PHID \
-          FM_L5L6_L3PHIA_DELAY \
-          FM_L5L6_L3PHIA \
-          FM_L5L6_L3PHIB_DELAY \
-          FM_L5L6_L3PHIB \
-          FM_L5L6_L3PHIC_DELAY \
-          FM_L5L6_L3PHIC \
-          FM_L5L6_L3PHID_DELAY \
-          FM_L5L6_L3PHID \
-          FM_L5L6_L4PHIA_DELAY \
-          FM_L5L6_L4PHIA \
-          FM_L5L6_L4PHIB_DELAY \
-          FM_L5L6_L4PHIB \
-          FM_L5L6_L4PHIC_DELAY \
-          FM_L5L6_L4PHIC \
-          FM_L5L6_L4PHID_DELAY \
-          FM_L5L6_L4PHID \
-          MPAR_L5L6ABCD_DELAY \
-          MPAR_L5L6ABCD \
-	  ]]
-
-create_pblock pblock_FTD1D2
-add_cells_to_pblock [get_pblocks pblock_FTD1D2] [get_cells -quiet [list \
-	  FT_D1D2 \
-          FM_D1D2_L1PHIA_DELAY \
-          FM_D1D2_L1PHIA \
-          FM_D1D2_L1PHIB_DELAY \
-          FM_D1D2_L1PHIB \
-          FM_D1D2_L1PHIC_DELAY \
-          FM_D1D2_L1PHIC \
-          FM_D1D2_L1PHID_DELAY \
-          FM_D1D2_L1PHID \
-          FM_D1D2_L1PHIE_DELAY \
-          FM_D1D2_L1PHIE \
-          FM_D1D2_L1PHIF_DELAY \
-          FM_D1D2_L1PHIF \
-          FM_D1D2_L1PHIG_DELAY \
-          FM_D1D2_L1PHIG \
-          FM_D1D2_L1PHIH_DELAY \
-          FM_D1D2_L1PHIH \
-          FM_D1D2_L2PHIA_DELAY \
-          FM_D1D2_L2PHIA \
-          FM_D1D2_L2PHIB_DELAY \
-          FM_D1D2_L2PHIB \
-          FM_D1D2_L2PHIC_DELAY \
-          FM_D1D2_L2PHIC \
-          FM_D1D2_L2PHID_DELAY \
-          FM_D1D2_L2PHID \
-          FM_D1D2_D3PHIA_DELAY \
-          FM_D1D2_D3PHIA \
-          FM_D1D2_D3PHIB_DELAY \
-          FM_D1D2_D3PHIB \
-          FM_D1D2_D3PHIC_DELAY \
-          FM_D1D2_D3PHIC \
-          FM_D1D2_D3PHID_DELAY \
-          FM_D1D2_D3PHID \
-          FM_D1D2_D4PHIA_DELAY \
-          FM_D1D2_D4PHIA \
-          FM_D1D2_D4PHIB_DELAY \
-          FM_D1D2_D4PHIB \
-          FM_D1D2_D4PHIC_DELAY \
-          FM_D1D2_D4PHIC \
-          FM_D1D2_D4PHID_DELAY \
-          FM_D1D2_D4PHID \
-          FM_D1D2_D5PHIA_DELAY \
-          FM_D1D2_D5PHIA \
-          FM_D1D2_D5PHIB_DELAY \
-          FM_D1D2_D5PHIB \
-          FM_D1D2_D5PHIC_DELAY \
-          FM_D1D2_D5PHIC \
-          FM_D1D2_D5PHID_DELAY \
-          FM_D1D2_D5PHID \
           MPAR_D1D2ABCD_DELAY \
           MPAR_D1D2ABCD \
-	  ]]
-
-create_pblock pblock_FTD3D4
-add_cells_to_pblock [get_pblocks pblock_FTD3D4] [get_cells -quiet [list \
-	  FT_D3D4 \
-          FM_D3D4_L1PHIA_DELAY \
-          FM_D3D4_L1PHIA \
-          FM_D3D4_L1PHIB_DELAY \
-          FM_D3D4_L1PHIB \
-          FM_D3D4_L1PHIC_DELAY \
-          FM_D3D4_L1PHIC \
-          FM_D3D4_L1PHID_DELAY \
-          FM_D3D4_L1PHID \
-          FM_D3D4_L1PHIE_DELAY \
-          FM_D3D4_L1PHIE \
-          FM_D3D4_L1PHIF_DELAY \
-          FM_D3D4_L1PHIF \
-          FM_D3D4_L1PHIG_DELAY \
-          FM_D3D4_L1PHIG \
-          FM_D3D4_L1PHIH_DELAY \
-          FM_D3D4_L1PHIH \
-          FM_D3D4_D1PHIA_DELAY \
-          FM_D3D4_D1PHIA \
-          FM_D3D4_D1PHIB_DELAY \
-          FM_D3D4_D1PHIB \
-          FM_D3D4_D1PHIC_DELAY \
-          FM_D3D4_D1PHIC \
-          FM_D3D4_D1PHID_DELAY \
-          FM_D3D4_D1PHID \
-          FM_D3D4_D2PHIA_DELAY \
-          FM_D3D4_D2PHIA \
-          FM_D3D4_D2PHIB_DELAY \
-          FM_D3D4_D2PHIB \
-          FM_D3D4_D2PHIC_DELAY \
-          FM_D3D4_D2PHIC \
-          FM_D3D4_D2PHID_DELAY \
-          FM_D3D4_D2PHID \
-          FM_D3D4_D5PHIA_DELAY \
-          FM_D3D4_D5PHIA \
-          FM_D3D4_D5PHIB_DELAY \
-          FM_D3D4_D5PHIB \
-          FM_D3D4_D5PHIC_DELAY \
-          FM_D3D4_D5PHIC \
-          FM_D3D4_D5PHID_DELAY \
-          FM_D3D4_D5PHID \
           MPAR_D3D4ABCD_DELAY \
           MPAR_D3D4ABCD \
+          MPAR_L1D1AB_DELAY \
+          MPAR_L1D1AB \
+          MPAR_L1D1CD_DELAY \
+          MPAR_L1D1CD \
 	  ]]
 
-create_pblock pblock_FTL1D1
-add_cells_to_pblock [get_pblocks pblock_FTL1D1] [get_cells -quiet [list \
-	  FT_L1D1 \
-          FM_L1D1_D2PHIA_DELAY \
-          FM_L1D1_D2PHIA \
-          FM_L1D1_D2PHIB_DELAY \
-          FM_L1D1_D2PHIB \
-          FM_L1D1_D2PHIC_DELAY \
-          FM_L1D1_D2PHIC \
-          FM_L1D1_D2PHID_DELAY \
-          FM_L1D1_D2PHID \
-          FM_L1D1_D3PHIA_DELAY \
-          FM_L1D1_D3PHIA \
-          FM_L1D1_D3PHIB_DELAY \
-          FM_L1D1_D3PHIB \
-          FM_L1D1_D3PHIC_DELAY \
-          FM_L1D1_D3PHIC \
-          FM_L1D1_D3PHID_DELAY \
-          FM_L1D1_D3PHID \
-          FM_L1D1_D4PHIA_DELAY \
-          FM_L1D1_D4PHIA \
-          FM_L1D1_D4PHIB_DELAY \
-          FM_L1D1_D4PHIB \
-          FM_L1D1_D4PHIC_DELAY \
-          FM_L1D1_D4PHIC \
-          FM_L1D1_D4PHID_DELAY \
-          FM_L1D1_D4PHID \
-          FM_L1D1_D5PHIA_DELAY \
-          FM_L1D1_D5PHIA \
-          FM_L1D1_D5PHIB_DELAY \
-          FM_L1D1_D5PHIB \
-          FM_L1D1_D5PHIC_DELAY \
-          FM_L1D1_D5PHIC \
-          FM_L1D1_D5PHID_DELAY \
-          FM_L1D1_D5PHID \
-          MPAR_L1D1ABCD_DELAY \
-          MPAR_L1D1ABCD \
-          MPAR_L1D1EFGH_DELAY \
-          MPAR_L1D1EFGH \
-	  ]]
-	  
-create_pblock pblock_FTL2D1
-add_cells_to_pblock [get_pblocks pblock_FTL2D1] [get_cells -quiet [list \
-	  FT_L2D1 \
-          FM_L2D1_L1PHIA_DELAY \
-          FM_L2D1_L1PHIA \
-          FM_L2D1_L1PHIB_DELAY \
-          FM_L2D1_L1PHIB \
-          FM_L2D1_L1PHIC_DELAY \
-          FM_L2D1_L1PHIC \
-          FM_L2D1_L1PHID_DELAY \
-          FM_L2D1_L1PHID \
-          FM_L2D1_L1PHIE_DELAY \
-          FM_L2D1_L1PHIE \
-          FM_L2D1_L1PHIF_DELAY \
-          FM_L2D1_L1PHIF \
-          FM_L2D1_L1PHIG_DELAY \
-          FM_L2D1_L1PHIG \
-          FM_L2D1_L1PHIH_DELAY \
-          FM_L2D1_L1PHIH \
-          FM_L2D1_D2PHIA_DELAY \
-          FM_L2D1_D2PHIA \
-          FM_L2D1_D2PHIB_DELAY \
-          FM_L2D1_D2PHIB \
-          FM_L2D1_D2PHIC_DELAY \
-          FM_L2D1_D2PHIC \
-          FM_L2D1_D2PHID_DELAY \
-          FM_L2D1_D2PHID \
-          FM_L2D1_D3PHIA_DELAY \
-          FM_L2D1_D3PHIA \
-          FM_L2D1_D3PHIB_DELAY \
-          FM_L2D1_D3PHIB \
-          FM_L2D1_D3PHIC_DELAY \
-          FM_L2D1_D3PHIC \
-          FM_L2D1_D3PHID_DELAY \
-          FM_L2D1_D3PHID \
-          FM_L2D1_D4PHIA_DELAY \
-          FM_L2D1_D4PHIA \
-          FM_L2D1_D4PHIB_DELAY \
-          FM_L2D1_D4PHIB \
-          FM_L2D1_D4PHIC_DELAY \
-          FM_L2D1_D4PHIC \
-          FM_L2D1_D4PHID_DELAY \
-          FM_L2D1_D4PHID \
-          MPAR_L2D1ABCD_DELAY \
-          MPAR_L2D1ABCD \
-	  ]]
-	  
-resize_pblock [get_pblocks pblock_FTL2L3] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
-resize_pblock [get_pblocks pblock_FTL3L4] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
-resize_pblock [get_pblocks pblock_FTL5L6] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
-resize_pblock [get_pblocks pblock_FTL1D1] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y3}
-resize_pblock [get_pblocks pblock_FTL1L2] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
-resize_pblock [get_pblocks pblock_FTD1D2] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
-resize_pblock [get_pblocks pblock_FTD3D4] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
-resize_pblock [get_pblocks pblock_FTL2D1] -add {CLOCKREGION_X1Y4:CLOCKREGION_X2Y7}
+  
+resize_pblock [get_pblocks pblock_TBAAAA] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y7}
+resize_pblock [get_pblocks pblock_TBBBBB] -add {CLOCKREGION_X1Y0:CLOCKREGION_X2Y7}
 
 set_property IS_SOFT FALSE [get_pblocks pblock_*]
 
