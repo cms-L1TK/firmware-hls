@@ -14,7 +14,7 @@ set modules_to_test {
 }
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
-set module_to_export FT_L1L2
+set module_to_export TB_AAAA
 
 # create new project (deleting any existing one of same name)
 open_project -reset trackBuilder
