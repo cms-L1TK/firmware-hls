@@ -282,7 +282,8 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
 #endif
 
  inline void set_empty() {
-   empty_ = EmptyUnit[(readindex_,writeindex_)];
+   static const emptyUnitClass<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> EmptyUnitClass;
+   empty_ = EmptyUnitClass.lut[(readindex_,writeindex_)];
    //empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
@@ -292,7 +293,8 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
  }
  
  inline bool nearFull() {
-   return NearFull[(readindex_,writeindex_)];
+   static const nearFull3Class<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> NearFull3Class;
+   return NearFull3Class.lut[(readindex_,writeindex_)];
    //return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
 
@@ -428,8 +430,6 @@ inline void advance() {
  static constexpr int projfinezbits = VMProjectionBase<VMProjType>::kVMProjFineZSize;
  static constexpr int stubfinephibits = VMStubBase<VMSType>::kVMSFinePhiSize;
  static constexpr int stubfinezbits = VMStubBase<VMSType>::kVMSFineZSize;
- const ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> EmptyUnit = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
- const ap_uint<(1 << (2 * MatchEngineUnitBase<VMProjType>::kNBitsBuffer))> NearFull = nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>();
 
 
 #ifndef __SYNTHESIS__
