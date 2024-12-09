@@ -7,7 +7,7 @@ if __name__=='__main__':
 
   parser = ArgumentParser(
       description='Converts emData/memory data file into a EMP format file.')
-  parser.add_argument('-d', '--directory', dest='input_dir', 
+  parser.add_argument('-i', '--input', dest='input_dir', 
                       help='MemPrints directory', type=str, 
                       default='emData/MemPrintsReduced/')
   parser.add_argument('-o','--outFile', dest='out_file', 
