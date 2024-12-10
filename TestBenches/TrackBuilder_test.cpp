@@ -132,6 +132,7 @@ int main()
         diskStubWords[j][i] = TrackFit_t::DiskStubWord(0);
     }
     tracksMem.clear();
+    tracksMem.setWriteBX(ievt);
 
     // read event and write to memories
     for (unsigned i = 0; i < nTPar1Mems; i++)
@@ -167,14 +168,13 @@ int main()
       done
     );
 
-    unsigned nTracks = 0;
     for (unsigned short i = 0; i < kMaxProc; i++) {
       TrackFit_t track;
       track.setTrackWord(trackWord[i]);
       setBarrelStubs<kNBarrelStubs - 1>(track, barrelStubWords, i);
       setDiskStubs<kNDiskStubs - 1>(track, diskStubWords, i);
       if (track.getTrackValid())
-        tracksMem.write_mem(bx, track, nTracks++);
+        tracksMem.write_mem(track);
     }
 
     const auto &pos = fout_tracks.at(0).tellg();

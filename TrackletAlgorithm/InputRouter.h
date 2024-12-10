@@ -200,21 +200,6 @@ void getPhiBin( ap_uint<kBRAMwidth> hStbWrd
 	phiBn = cBn;
 }
 
-// clear internal counters 
-template<unsigned int nEntriesSize>
-void ClearCounters(unsigned int nMemories
-	, ap_uint<kNBits_MemAddr> nEntries[nEntriesSize]) 
-{
-#pragma HLS inline
-#pragma HLS array_partition variable = nEntries complete
-  LOOP_ClearCounters:
-	for (unsigned int cIndx = 0; cIndx < nEntriesSize ; cIndx++) 
-  {
-#pragma HLS unroll
-    nEntries[cIndx]=0; 
-  }
-}
-
 // internal memory counter
 template<unsigned int nLyrs>
 void CountMemories(const ap_uint<kBINMAPwidth> hPhBnWord 
@@ -314,9 +299,6 @@ void InputRouter( const BXType bx
 	unsigned int nMems=0;
 	unsigned int nMemsPerLyr[kMaxLyrsPerDTC]; 
 	CountMemories<kMaxLyrsPerDTC>(hPhBnWord, nMems, nMemsPerLyr);
-	// clear stub counters
-	ap_uint<kNBits_MemAddr> hNStubs[nOMems];
-	ClearCounters<nOMems>(nMems,  hNStubs);
 
 	LOOP_ProcessIR:
 	for (int cStubCounter = 0; cStubCounter < kMaxProc; cStubCounter++) 
@@ -397,11 +379,8 @@ void InputRouter( const BXType bx
 #endif
 #endif
 	  
-	  // update  counters 
-	  auto hEntries = hNStubs[cMemIndx];
-	  hNStubs[cMemIndx] = hEntries + 1;
 	  // fill memory 
-	  (&hOutputStubs[cMemIndx])->write_mem(bx, hMemWord, hEntries);
+	  (&hOutputStubs[cMemIndx])->write_mem(hMemWord);
 	}
 	// update output bx port 
 	bx_o = bx;

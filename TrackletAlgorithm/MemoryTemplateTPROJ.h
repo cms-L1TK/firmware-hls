@@ -69,6 +69,7 @@ protected:
   DataType dataarray_[DEPTH_BX][NPAGE*DEPTH_ADDR];  // data array
   NEntryT nentries_[DEPTH_BX*NPAGE];                  // number of entries
   ap_uint<NPAGE> mask_[DEPTH_BX]; //bitmask for hits
+  BunchXingT write_bx_;                //BX for writing 
   
 public:
 
@@ -76,6 +77,10 @@ public:
   unsigned int getNBX() const {return DEPTH_BX;}
   unsigned int getNPage() const {return NPAGE;}
 
+  void setWriteBX(const BunchXingT& ibx) {
+    write_bx_ = ibx;
+  }
+  
   NEntryT getEntries(BunchXingT bx, unsigned int page = 0) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
@@ -98,44 +103,24 @@ public:
     return dataarray_[ibx][DEPTH_ADDR*page+index];
   }
 
-  template<class SpecType>
-  bool write_mem(BunchXingT ibx, SpecType data, NEntryT addr_index, unsigned int page)
-  {
-#pragma HLS inline
-    if(!NBIT_BX) ibx = 0;
-    static_assert(
-                  std::is_same<DataType, SpecType>::value
-                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
-                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
-                  , "Invalid conversion between data types");
-    DataType sameData(data.raw());
-    return write_mem(ibx, sameData, addr_index, page);
-  }
-
-  bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index, unsigned int page = 0)
+  bool write_mem(DataType data, unsigned int page)
   {
     //assert(page < NPAGE);        
 #pragma HLS inline
-    if(!NBIT_BX) ibx = 0;
-    if (addr_index < DEPTH_ADDR) {
-      //dataarray_[ibx][addr_index] = data;
+    if(!NBIT_BX) write_bx_ = 0;
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-      //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][DEPTH_ADDR*page+addr_index] = data;
+    //The vhd memory implementation will write to the correct address!!
+    dataarray_[write_bx_][0] = data;
 #else
-      //NBIT_BX==1 is to identify the projection memories
-      if (NBIT_BX==1 && nentries_[ibx*NPAGE+page]>=MAX_TPROJ_PAGE_SIZE) {
-	return false;
-      }
-      dataarray_[ibx][DEPTH_ADDR*page+nentries_[ibx*NPAGE+page]++] = data;
-      mask_[ibx].set(page);
-      
-#endif
-      
-      return true;
-    } else {
+    //NBIT_BX==1 is to identify the projection memories
+    if (NBIT_BX==1 && nentries_[write_bx_*NPAGE+page]>=MAX_TPROJ_PAGE_SIZE) {
       return false;
     }
+    dataarray_[write_bx_][DEPTH_ADDR*page+nentries_[write_bx_*NPAGE+page]++] = data;
+    mask_[write_bx_].set(page);
+#endif
+    return true;
+
   }
 
   // Methods for C simulation only
@@ -161,50 +146,18 @@ public:
     }
   }
 
-  bool write_mem_clear(BunchXingT ibx, DataType data, NEntryT addr_index, unsigned int page)
+  bool write_mem(const std::vector<std::string>& split_line, int base=16)
   {
-    if(!NBIT_BX) ibx = 0;
-    if (addr_index < DEPTH_ADDR) {
-      //FIXME - shoudl this method be removed?
-      return true;
-    } else {
-      return false;
-    }
-  }
+    assert(split_line.size()==4);
 
+    const std::string datastr = split_line.back();
 
-  // write memory from text file
-  bool write_mem(BunchXingT ibx, const char* datastr, int base=16, unsigned int page = 0 ) { 
-
-
-    if(!NBIT_BX) ibx = 0;
-
-    DataType data(datastr, base);
-    NEntryT nent = nentries_[ibx*NPAGE+page]; 
-    bool success = write_mem(ibx, data, nent, page);
+    unsigned int page = (int)strtol(split_line.front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
     
-    return success;
-  }
-
-  bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
-  {
-    assert(split(line,' ').size()==4);
-
-    const std::string datastr = split(line,' ').back();
-
-    const std::string pagestr = split(line,' ').front();
-
-    unsigned int page = NPAGE;
-    if (pagestr=="0x00") page = 0;
-    if (pagestr=="0x01") page = 1;
-    if (pagestr=="0x02") page = 2;
-    if (pagestr=="0x03") page = 3;
-    assert(page < NPAGE);
-
-    if(!NBIT_BX) ibx = 0;
+    if(!NBIT_BX) write_bx_ = 0;
     DataType data(datastr.c_str(), base);
-    NEntryT nent = nentries_[ibx*NPAGE+page];
-    bool success = write_mem(ibx, data, nent, page);
+
+    bool success = write_mem(data, page);
 
     return success;
   }

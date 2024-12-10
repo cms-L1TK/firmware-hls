@@ -45,11 +45,11 @@ int main()
   // input memories
   const auto nTrackletProjections = tb.nFiles(trackletProjectionPattern);
   vector<TrackletProjectionMemory<tprojMemType>> tprojarray(nTrackletProjections);
+
   const auto nAllStub = tb.nFiles(allStubPatternarray);
   vector<AllStubMemory<stubMemType>> allstub(nAllStub);
   const auto nVMStubs = tb.nFiles(vmStubPatternarray);
   VMStubMemory<vmStubMemType, vmStubMemRZ, kNbitsphibin, kNMatchEngines> vmstub; // barrel
-
   // output memories
   const auto nFullMatches = tb.nFiles(fullMatchPattern);
   vector<FullMatchMemory<fmProjMemType> > fullmatcharray(nFullMatches);
@@ -87,9 +87,11 @@ int main()
     writeMemFromFile<VMStubMemory<vmStubMemType, vmStubMemRZ, kNbitsphibin, kNMatchEngines>>(vmstub, fin_VMStubs.at(0), ievt); // barrel
 
     // clear allarray, output memories before starting
-    for (unsigned int i = 0; i < nFullMatches; i++)
+    for (unsigned int i = 0; i < nFullMatches; i++){
       fullmatcharray[i].clear();
-
+      fullmatcharray[i].setWriteBX(ievt);
+    }
+      
     // Unit Under Test
     TOP_FUNC_(bx, tprojarray.data(), vmstub, allstub.data(), bx_out, fullmatcharray.data());
 

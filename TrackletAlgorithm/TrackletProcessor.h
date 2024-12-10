@@ -476,21 +476,21 @@ TP::addProj(const TrackletProjection<TProjType> &proj, const BXType bx, Tracklet
     phi >>= 3;
 
   if (NProjOut > 0 && TPROJMask & (0x1 << 0) && success && proj_success && phi == 0)
-    projout[0].write_mem(bx, proj, 0);
+    projout[0].write_mem(proj,0);
   if (NProjOut > 1 && TPROJMask & (0x1 << 1) && success && proj_success && phi == 1)
-    projout[1].write_mem(bx, proj, 0);
+    projout[1].write_mem(proj,0);
   if (NProjOut > 2 && TPROJMask & (0x1 << 2) && success && proj_success && phi == 2)
-    projout[2].write_mem(bx, proj, 0);
+    projout[2].write_mem(proj,0);
   if (NProjOut > 3 && TPROJMask & (0x1 << 3) && success && proj_success && phi == 3)
-    projout[3].write_mem(bx, proj, 0);
+    projout[3].write_mem(proj,0);
   if (NProjOut > 4 && TPROJMask & (0x1 << 4) && success && proj_success && phi == 4)
-    projout[4].write_mem(bx, proj, 0);
+    projout[4].write_mem(proj,0);
   if (NProjOut > 5 && TPROJMask & (0x1 << 5) && success && proj_success && phi == 5)
-    projout[5].write_mem(bx, proj, 0);
+    projout[5].write_mem(proj,0);
   if (NProjOut > 6 && TPROJMask & (0x1 << 6) && success && proj_success && phi == 6)
-    projout[6].write_mem(bx, proj, 0);
+    projout[6].write_mem(proj,0);
   if (NProjOut > 7 && TPROJMask & (0x1 << 7) && success && proj_success && phi == 7)
-    projout[7].write_mem(bx, proj, 0);
+    projout[7].write_mem(proj,0);
 
   return (success && proj_success);
 }
@@ -552,7 +552,7 @@ TP::processStubPair(
   // Write the tracklet parameters and projections to the output memories.
   const TrackletParameters tpar(phiRegion, stubIndex1, stubIndex2, rinv, phi0, z0, t);
   if (success) {
-    trackletParameters->write_mem(bx, tpar, 0);
+    trackletParameters->write_mem(tpar,0);
   }
 
 bool addL3 = false, addL4 = false, addL5 = false, addL6 = false;

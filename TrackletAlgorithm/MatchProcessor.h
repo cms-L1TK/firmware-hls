@@ -1130,9 +1130,9 @@ void MatchCalculator(BXType bx,
   if(goodmatch) { // Write out only the best match, based on the seeding
 
     if (proj_seed == TF::L1L2 || proj_seed == TF::L2L3 || proj_seed == TF::L5L6 || proj_seed == TF::L2D1 ) {
-      fullmatch[0].write_mem_new(bx,fm,savedMatch); // AAAA FM
+      fullmatch[0].write_mem(fm,savedMatch); // AAAA FM
     } else {
-      fullmatch[1].write_mem_new(bx,fm,savedMatch); // BBBB FM
+      fullmatch[1].write_mem(fm,savedMatch); // BBBB FM
     }
     savedMatch = 1;
   }

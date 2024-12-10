@@ -147,12 +147,19 @@ std::cout<<module_name[MODULE_];
 
     // clear all output memories before starting
     tpar.clear();
-    for (unsigned i = 0; i < TP::N_PROJOUT_BARRELPS; i++)
+    tpar.setWriteBX(ievt);
+    for (unsigned i = 0; i < TP::N_PROJOUT_BARRELPS; i++) {
       tproj_barrel_ps[i].clear();
-    for (unsigned i = 0; i < TP::N_PROJOUT_BARREL2S; i++)
+      tproj_barrel_ps[i].setWriteBX(ievt);
+    }
+    for (unsigned i = 0; i < TP::N_PROJOUT_BARREL2S; i++) {
       tproj_barrel_2s[i].clear();
-    for (unsigned i = 0; i < TP::N_PROJOUT_DISK; i++)
+      tproj_barrel_2s[i].setWriteBX(ievt);
+    }
+    for (unsigned i = 0; i < TP::N_PROJOUT_DISK; i++) {
       tproj_disk[i].clear();
+      tproj_disk[i].setWriteBX(ievt);
+    }
 
     // bx
     BXType bx = ievt;

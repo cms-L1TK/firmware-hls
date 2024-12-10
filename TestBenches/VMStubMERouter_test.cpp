@@ -68,7 +68,9 @@ int main() {
 
     // Clear output memories
     memoryME.clear();
+    memoryME.setWriteBX(ievt);
     memoriesASCopy.clear();
+    memoriesASCopy.setWriteBX(ievt);
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);

@@ -91,14 +91,17 @@ int main() {
     // Clear output memories
     for (unsigned int i=0; i<nASCopies; ++i) {
       memoriesAS[i].clear();
+      memoriesAS[i].setWriteBX(ievt);
     }
     for (unsigned int i=0; i<nASInnerCopies; ++i) {
       memoriesASInner[i].clear();
+      memoriesASInner[i].setWriteBX(ievt);
     }
     memoryME.clear();
     if (nVMSTE) {
       for (unsigned int i=0; i<nVMSTE; ++i) {
         memoriesTEO[i].clear();
+        memoriesTEO[i].setWriteBX(ievt);
       }
 
     }

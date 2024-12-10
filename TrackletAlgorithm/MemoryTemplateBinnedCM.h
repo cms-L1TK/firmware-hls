@@ -65,6 +65,7 @@ protected:
   };
 
   DataType dataarray_[NCP][kNBxBins][kNMemDepth];  // data array
+  BunchXingT write_bx_;                //BX for writing 
 
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
@@ -77,6 +78,10 @@ public:
   unsigned int getNEntryPerBin() const {return (1<<(NBIT_ADDR-NBIT_BIN));}
   unsigned int getNCopy() const {return NCOPY;}
 
+  void setWriteBX(const BunchXingT& ibx) {
+    write_bx_ = ibx;
+  }
+  
   NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
@@ -128,53 +133,43 @@ public:
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
 
-  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
+  bool write_mem(ap_uint<NBIT_BIN> slot, DataType data) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
 #pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
 
-    if (isCMSSW && !NBIT_BX) {ibx = 0;}
-    if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
+    if (isCMSSW && !NBIT_BX) {write_bx_ = 0;}
 
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
 
-      dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
+    dataarray_[0][write_bx_][getNEntryPerBin()*slot] = data;
 
 #else
 
-      // write address for slot: getNEntryPerBin() * slot + nentry_ibx
+    // write address for slot: getNEntryPerBin() * slot + nentry_ibx
 
-      ap_uint<kNBitsRZBinCM> ibin;
-      ap_uint<kNBitsphibinCM> ireg;
-      (ibin,ireg)=slot;
+    ap_uint<kNBitsRZBinCM> ibin;
+    ap_uint<kNBitsphibinCM> ireg;
+    (ibin,ireg)=slot;
 
-      unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+    unsigned int nentry = nentries_[write_bx_*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
 
-      if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
+    if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
 
-      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-      if (ibin!=0) {
-        nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
-      }
-      binmask8_[ibx][ibin].set_bit(ireg,true);
+    nentries_[write_bx_*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+    if (ibin!=0) {
+      nentries_[write_bx_*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
+    }
+    binmask8_[write_bx_][ibin].set_bit(ireg,true);
 
-      //icopy comparison must be signed int or future SW fails
-    writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
+    //icopy comparison must be signed int or future SW fails
+  writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
-        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
-      }
+      dataarray_[icopy][write_bx_][getNEntryPerBin()*slot+nentry] = data;
+    }
+    return true;
 #endif      
-      return true;
-    }
-    else {
-#ifndef __SYNTHESIS__
-      if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-        edm::LogVerbatim("L1trackHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
-      }
-#endif
-      return false;
-    }
   }
 
   // Methods for C simulation only
@@ -203,43 +198,25 @@ public:
     }
   }
 
-
-  ///////////////////////////////////
-  std::vector<std::string> split(const std::string& s, char delimiter)
-  {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream sstream(s);
-    while (getline(sstream, token, delimiter))
-      {
-        tokens.push_back(token);
-      }
-    return tokens;
-  }
-
   // write memory from text file
-  bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
-  {
+  bool write_mem(const std::vector<std::string>& split_line, int base=16) {
 
-    if (isCMSSW) {ibx = 0;}
+    assert(split_line.size()==4);
 
-    std::string datastr = split(line, ' ').back();
+    if (isCMSSW) {write_bx_ = 0;}
 
-    int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
+    std::string datastr = split_line.back();
 
-    ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
-    (ibin, ireg)=slot;
-    ap_uint<4> nentry_ibx = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+    int slot = (int)strtol(split_line.front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
 
     DataType data(datastr.c_str(), base);
 
-    bool success = write_mem(ibx, slot, data, nentry_ibx);
+    bool success = write_mem(slot, data);
     
     return success;
   }
 
-
+  
   // print memory contents
   void print_data(const DataType data) const
   {
