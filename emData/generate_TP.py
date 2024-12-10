@@ -197,19 +197,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       asInnerMems[tpName].sort()
       asOuterMems[tpName].sort()
 
-      # TPROJ masks for barrel and disks
-      tprojMaskBarrel = 0
-      for projout in ProjoutIndexBarrel:
-          projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
-          projoutIndex = projout.value
-          if projoutName in tprojMems[tpName]:
-              tprojMaskBarrel = tprojMaskBarrel | (1 << projoutIndex)
-      tprojMaskDisk = 0
-      for projout in ProjoutIndexDisk:
-          projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
-          projoutIndex = projout.value
-          if projoutName in tprojMems[tpName]:
-              tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
       # figure out sizes of LUTs by reading .tab files, do once per seed type
       if seed not in seedlist:
         LUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}.tab".format(seed))) - 2)
@@ -219,12 +206,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"
-          "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TP::" + iTC + ">() {\n"
-          "  return 0x%X;\n"
-          "}\n"
-          "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TP::" + iTC + ">() {\n"
-          "  return 0x%X;\n"
-          "}\n"
           'template<> inline const ap_uint<10>* getLUT<TF::'+ seed + ', TP::' + iTC + ' >(){\n'
           '#ifndef __SYNTHESIS__\n'
           '#ifdef CMSSW_GIT_HASH\n'
@@ -288,7 +269,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
           'template<> constexpr int nASMemInner<TF::'+ seed + ', TP::' + iTC + '>(){\n'
           '  return ' + str(nASMemInner) + ';\n'
           '}\n'
-)% (tprojMaskBarrel, tprojMaskDisk)
+)
       )
       if seed not in seedlist:
         seedlist.append(seed)

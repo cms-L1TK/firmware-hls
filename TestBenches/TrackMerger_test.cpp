@@ -20,24 +20,24 @@ int main(){
     
   // Input memories
   TrackFitType::TrackWord trackWord[kMaxTrack];
-  TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][4];
-  TrackFitType::DiskStubWord diskStubWords[kMaxTrack][4];
+  TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][6];
+  TrackFitType::DiskStubWord diskStubWords[kMaxTrack][5];
   TrackFitMemory<NBarrelStub, NDiskStub> inputTracks;
 
   // Output memories
   TrackFitType::TrackWord trackWord_o[kMaxTrack];
-  TrackFitType::BarrelStubWord barrelStubWords_o[kMaxTrack][4];
-  TrackFitType::DiskStubWord diskStubWords_o[kMaxTrack][4];
+  TrackFitType::BarrelStubWord barrelStubWords_o[kMaxTrack][6];
+  TrackFitType::DiskStubWord diskStubWords_o[kMaxTrack][5];
   TrackFitMemory<NBarrelStub, NDiskStub> outputTracks;
   // int outputNumber;
  
   TBHelper tb("../../../../../emData/PD/PD/");
 
   // Open input files
-  auto &fin_inputTracks = tb.files("TrackFit_TF_L1L2*");
+  auto &fin_inputTracks = tb.files("TrackFit_TF_AAAA*");
 
 
-  auto &fout_outputTracks = tb.files("CleanTrack_CT_L1L2*"); 
+  auto &fout_outputTracks = tb.files("CleanTrack_CT_AAAA*"); 
   for (unsigned int ievt = 0; ievt < nevents; ++ievt) { 
     cout << "Event: " << dec << ievt << endl;
     
@@ -45,15 +45,18 @@ int main(){
       trackWord[i] = TrackFitType::TrackWord(0);
       trackWord_o[i] = TrackFitType::TrackWord(0);
 
-      for (unsigned short nStub = 0; nStub < 4; nStub++){
+      for (unsigned short nStub = 0; nStub < 6; nStub++){
         barrelStubWords[i][nStub] = TrackFitType::BarrelStubWord(0);
-        diskStubWords[i][nStub] = TrackFitType::DiskStubWord(0);
         barrelStubWords_o[i][nStub] = TrackFitType::BarrelStubWord(0);
-        diskStubWords_o[i][nStub] = TrackFitType::DiskStubWord(0);
+	if ( nStub != 5 ) { 
+	  diskStubWords[i][nStub] = TrackFitType::DiskStubWord(0);
+	  diskStubWords_o[i][nStub] = TrackFitType::DiskStubWord(0);
+	}
       }
     }
 
     outputTracks.clear();
+    outputTracks.setWriteBX(ievt);
 
     // Read in next event from input
     writeMemFromFile<TrackFitMemory<NBarrelStub, NDiskStub>> (inputTracks, fin_inputTracks.at(0), ievt);
@@ -75,10 +78,13 @@ int main(){
       barrelStubWords[i][1] = track.getBarrelStubWord<1>();
       barrelStubWords[i][2] = track.getBarrelStubWord<2>();
       barrelStubWords[i][3] = track.getBarrelStubWord<3>();
-      diskStubWords[i][0] = track.getDiskStubWord<4>();
-      diskStubWords[i][1] = track.getDiskStubWord<5>();
-      diskStubWords[i][2] = track.getDiskStubWord<6>();
-      diskStubWords[i][3] = track.getDiskStubWord<7>();
+      barrelStubWords[i][4] = track.getBarrelStubWord<4>();
+      barrelStubWords[i][5] = track.getBarrelStubWord<5>();
+      diskStubWords[i][0] = track.getDiskStubWord<6>();
+      diskStubWords[i][1] = track.getDiskStubWord<7>();
+      diskStubWords[i][2] = track.getDiskStubWord<8>();
+      diskStubWords[i][3] = track.getDiskStubWord<9>();
+      diskStubWords[i][4] = track.getDiskStubWord<10>();
     }
 
     // Unit under test
@@ -95,7 +101,6 @@ int main(){
     bool truncation = false;
 
     // Filling outputs
-    unsigned nTracks = 0;
     for (unsigned short i = 0; i < kMaxTrack; i++){ 
       TrackFitType track;
       track.setTrackWord(trackWord_o[i]);
@@ -103,13 +108,15 @@ int main(){
       track.setBarrelStubWord<1>(barrelStubWords_o[i][1]);
       track.setBarrelStubWord<2>(barrelStubWords_o[i][2]);
       track.setBarrelStubWord<3>(barrelStubWords_o[i][3]);
-      track.setDiskStubWord<4>(diskStubWords_o[i][0]);
-      track.setDiskStubWord<5>(diskStubWords_o[i][1]);
-      track.setDiskStubWord<6>(diskStubWords_o[i][2]);
-      track.setDiskStubWord<7>(diskStubWords_o[i][3]);
+      track.setBarrelStubWord<4>(barrelStubWords_o[i][4]);
+      track.setBarrelStubWord<5>(barrelStubWords_o[i][5]);
+      track.setDiskStubWord<6>(diskStubWords_o[i][0]);
+      track.setDiskStubWord<7>(diskStubWords_o[i][1]);
+      track.setDiskStubWord<8>(diskStubWords_o[i][2]);
+      track.setDiskStubWord<9>(diskStubWords_o[i][3]);
+      track.setDiskStubWord<10>(diskStubWords_o[i][4]);
       
-      outputTracks.write_mem(bx, track, nTracks );
-      ++nTracks;
+      outputTracks.write_mem(track);
       
     } 
 
