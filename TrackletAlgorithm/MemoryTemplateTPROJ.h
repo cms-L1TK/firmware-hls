@@ -1,16 +1,16 @@
-// Class template for memory module
+// Class template for memory module with pages
 #ifndef TrackletAlgorithm_MemoryTemplateTPROJ_h
 #define TrackletAlgorithm_MemoryTemplateTPROJ_h
 
 #include <iostream>
-#include "../TestBenches/FileReadUtility.h"
+#include <string>
+#include <vector>
+
 
 //This is a bit of a hack, but until we find a cleaner
 //way to implement this we will use this...
 #include "SynthesisOptions.h"
 
-
-template<int> class AllStub;
 
 #ifndef __SYNTHESIS__
 #ifdef CMSSW_GIT_HASH
@@ -81,13 +81,13 @@ public:
     write_bx_ = ibx;
   }
   
-  NEntryT getEntries(BunchXingT bx, unsigned int page = 0) const {
+  NEntryT getEntries(const BunchXingT& bx, unsigned int page = 0) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
     return nentries_[bx*NPAGE+page];
   }
 
-  ap_uint<NPAGE> getMask(BunchXingT bx) const {
+  ap_uint<NPAGE> getMask(const BunchXingT& bx) const {
 #pragma HLS ARRAY_PARTITION variable=mask__ complete dim=0
 #pragma HLS inline
     return mask_[bx];
@@ -95,19 +95,17 @@ public:
   
   const DataType (&get_mem() const)[DEPTH_BX][(DEPTH_ADDR)*NPAGE] {return dataarray_;}
 
-  DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
+  DataType read_mem(const BunchXingT& ibx, ap_uint<NBIT_ADDR> index, unsigned int page = 0) const
   {
-    //assert(page < NPAGE);    
     // TODO: check if valid  
-    if(!NBIT_BX) ibx = 0;
+    if(!NBIT_BX) assert(ibx == 0);
     return dataarray_[ibx][DEPTH_ADDR*page+index];
   }
 
-  bool write_mem(DataType data, unsigned int page)
+  bool write_mem(const DataType& data, unsigned int page)
   {
-    //assert(page < NPAGE);        
 #pragma HLS inline
-    if(!NBIT_BX) write_bx_ = 0;
+    if(!NBIT_BX) assert(write_bx_ == 0);
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
     //The vhd memory implementation will write to the correct address!!
     dataarray_[write_bx_][0] = data;
@@ -154,7 +152,6 @@ public:
 
     unsigned int page = (int)strtol(split_line.front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
     
-    if(!NBIT_BX) write_bx_ = 0;
     DataType data(datastr.c_str(), base);
 
     bool success = write_mem(data, page);
@@ -163,18 +160,18 @@ public:
   }
 
   // print memory contents
-  void print_data(const DataType data) const
+  void print_data(const DataType& data) const
   {
     edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
     // TODO: overload '<<' in data class
   }
 
-  void print_entry(BunchXingT bx, NEntryT index, unsigned int page = 0) const
+  void print_entry(const BunchXingT& bx, NEntryT index, unsigned int page = 0) const
   {
     print_data(dataarray_[bx][DEPTH_ADDR*page+index]);
   }
 
-  void print_mem(BunchXingT bx) const {
+  void print_mem(const BunchXingT& bx) const {
     for (unsigned int page = 0; page < NPAGE; ++page) {
       for (unsigned int i = 0; i <  nentries_[bx*NPAGE+page]; ++i) {
         edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
