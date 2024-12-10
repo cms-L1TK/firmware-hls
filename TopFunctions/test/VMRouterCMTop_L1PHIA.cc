@@ -19,13 +19,15 @@ void VMRouterCMTop_L1PHIA(
   // LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).
   // Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.
   // Indexed using r and z position bits
-  static const int* METable = getMETable<layerdisk_A>();
-  static const int* TETable = getTETable<layerdisk_A>();
+  static const int METable[] =
+#include "../emData/VMRCM/tables/VMRME_L1.tab"
+  static const int *TETable = nullptr;
 
   // LUT with phi corrections to project the stub to the average radius in a layer.
   // Only used by layers.
   // Indexed using phi and bend bits
-  static const int* phiCorrTable = getPhiCorrTable<layerdisk_A>();
+  static const int phiCorrTable[] =
+#include "../emData/VMRCM/tables/VMPhiCorrL1.tab"
 
   // Masks of which AllStubInner memories that are being used in this phi region; represented by a "1"
   // First three bits (LSB) are the six A-F for Barrel, then the three after that are L,M,R for Barrel and disk, last three are L,M,R for Overlap
