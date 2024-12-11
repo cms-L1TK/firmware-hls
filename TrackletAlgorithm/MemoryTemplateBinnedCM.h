@@ -16,6 +16,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cassert>
 
 //This is a bit of a hack, but until we find a cleaner
 //way to implement this we will use this...
