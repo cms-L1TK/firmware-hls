@@ -234,13 +234,73 @@ void TrackBuilder(
     // with the minimum tracklet ID.
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
-    const auto mparNPages = getMPARNPages<Seed>(iTC);
-    const auto mparMem = getMPARMem<Seed>(iTC);
-    const auto mparPage = getMPARPage<Seed>(iTC);
+    typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE iseed = TCID >> kNBitsITC; //TCID.range(3+kNBitsITC-1,kNBitsITC);
+    auto mparNPages = getMPARNPages<Seed>(iTC);
+    auto mparMem = getMPARMem<Seed>(iTC);
+    auto mparPage = getMPARPage<Seed>(iTC);
+    //This block is for AAAA
+    if (iseed==0) {
+      if (iTC==0) {mparNPages=3; mparMem=0; mparPage=0;}
+      if (iTC==1) {mparNPages=3; mparMem=0; mparPage=1;}
+      if (iTC==2) {mparNPages=3; mparMem=0; mparPage=2;}
+      if (iTC==3) {mparNPages=2; mparMem=0; mparPage=0;}
+      if (iTC==4) {mparNPages=2; mparMem=0; mparPage=1;}
+      if (iTC==5) {mparNPages=1; mparMem=0; mparPage=0;}
+      if (iTC==6) {mparNPages=1; mparMem=1; mparPage=0;}
+      if (iTC==7) {mparNPages=2; mparMem=1; mparPage=0;}
+      if (iTC==8) {mparNPages=2; mparMem=1; mparPage=1;}
+      if (iTC==9) {mparNPages=3; mparMem=1; mparPage=0;}
+      if (iTC==10) {mparNPages=3; mparMem=1; mparPage=1;}
+      if (iTC==11) {mparNPages=3; mparMem=1; mparPage=2;}
+    }
+    if (iseed==1) {
+      if (iTC==0) {mparNPages=4; mparMem=0; mparPage=0;}
+      if (iTC==1) {mparNPages=4; mparMem=0; mparPage=1;}
+      if (iTC==2) {mparNPages=4; mparMem=0; mparPage=2;}
+      if (iTC==3) {mparNPages=4; mparMem=0; mparPage=3;}
+    }
+    if (iseed==3) {
+      if (iTC==0) {mparNPages=4; mparMem=1; mparPage=0;}
+      if (iTC==1) {mparNPages=4; mparMem=1; mparPage=1;}
+      if (iTC==2) {mparNPages=4; mparMem=1; mparPage=2;}
+      if (iTC==3) {mparNPages=4; mparMem=1; mparPage=3;}
+    }
+    if (iseed==7) {
+      if (iTC==0) {mparNPages=4; mparMem=2; mparPage=0;}
+      if (iTC==1) {mparNPages=4; mparMem=2; mparPage=1;}
+      if (iTC==2) {mparNPages=4; mparMem=2; mparPage=2;}
+      if (iTC==3) {mparNPages=4; mparMem=2; mparPage=3;}
+    }
+    //This block is for BBBB
+    if (iseed==2) {
+      if (iTC==0) {mparNPages=2; mparMem=0; mparPage=0;}
+      if (iTC==1) {mparNPages=2; mparMem=0; mparPage=1;}
+      if (iTC==2) {mparNPages=2; mparMem=1; mparPage=0;}
+      if (iTC==3) {mparNPages=2; mparMem=1; mparPage=1;}
+    }
+    if (iseed==4) {
+      if (iTC==0) {mparNPages=4; mparMem=0; mparPage=0;}
+      if (iTC==1) {mparNPages=4; mparMem=0; mparPage=1;}
+      if (iTC==2) {mparNPages=4; mparMem=0; mparPage=2;}
+      if (iTC==3) {mparNPages=4; mparMem=0; mparPage=3;}
+    }
+    if (iseed==5) {
+      if (iTC==0) {mparNPages=4; mparMem=1; mparPage=0;}
+      if (iTC==1) {mparNPages=4; mparMem=1; mparPage=1;}
+      if (iTC==2) {mparNPages=4; mparMem=1; mparPage=2;}
+      if (iTC==3) {mparNPages=4; mparMem=1; mparPage=3;}
+    }
+    if (iseed==6) {
+      if (iTC==0) {mparNPages=4; mparMem=2; mparPage=0;}
+      if (iTC==1) {mparNPages=4; mparMem=2; mparPage=1;}
+      if (iTC==2) {mparNPages=4; mparMem=2; mparPage=2;}
+      if (iTC==3) {mparNPages=4; mparMem=2; mparPage=3;}
+    }
+
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (Seed == TF::L1L2 ? 3 : (Seed == TF::L1D1 ? 2 : 1));
- 
-    TrackFit<NBarrelStubs, NDiskStubs> track(typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE(TCID >> kNBitsITC));
+    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (iseed == TF::L1L2 ? 3 : (iseed == TF::L1D1 ? 2 : 1));
+
+    TrackFit<NBarrelStubs, NDiskStubs> track(iseed);
     track.setPhiRegionOuter(phiRegionOuter);
     if ((TPARMask & 0x1) && mparNPages == 1) {
       const auto &tpar = trackletParameters1[mparMem].read_mem(bx, trackletIndex);
@@ -267,7 +327,7 @@ void TrackBuilder(
     //This is a hack to match the emulation where for D1D2 seeds
     //We don't use both L2 and D3 matches
     bool barrelD1D2Match1 = false;
-    
+
     barrel_stub_association : for (short j = 0; j < NBarrelStubs; j++) {
 
       const auto &barrel_stub = merger_L_top[j].peek();
@@ -374,7 +434,7 @@ void TrackBuilder(
     // Only tracks with at least two matches are valid.
     track.setTrackValid(!done && (nMatches >= kMinNMatches));
 
-    // Output the track word and eight stub words associated with the TrackFit
+    // Output the track word and eleven stub words associated with the TrackFit
     // object that was constructed.
     trackWord[nTracks] = track.getTrackWord();
     barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
@@ -391,6 +451,12 @@ void TrackBuilder(
         case 3:
           barrelStubWords[j][nTracks] = track.template getBarrelStubWord<3>();
           break;
+        case 4:
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<4>();
+          break;
+        case 5:
+          barrelStubWords[j][nTracks] = track.template getBarrelStubWord<5>();
+          break;
       }
     }
     disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
@@ -406,6 +472,9 @@ void TrackBuilder(
           break;
         case 3:
           diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 3>();
+          break;
+        case 4:
+          diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs + 4>();
           break;
       }
     }

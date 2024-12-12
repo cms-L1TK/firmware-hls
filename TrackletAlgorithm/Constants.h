@@ -286,7 +286,7 @@ enum regionType {BARRELPS, BARREL2S, BARRELOL, BARREL, DISKPS, DISK2S, DISK, BAR
 
 namespace TF {
   // List of seeds
-  enum seed {UNDEF_SEED, L1L2 = 0, L2L3 = 1, L3L4 = 2, L5L6 = 3, D1D2 = 4, D3D4 = 5, L1D1 = 6, L2D1 = 7};
+  enum seed {UNDEF_SEED, L1L2 = 0, L2L3 = 1, L3L4 = 2, L5L6 = 3, D1D2 = 4, D3D4 = 5, L1D1 = 6, L2D1 = 7, AAAA = 8, BBBB = 9};
 
   // List of layers and disks
   enum layerDisk {L1 = 0, L2 = 1, L3 = 2, L4 = 3, L5 = 4, L6 = 5, D1 = 6, D2 = 7, D3 = 8, D4 = 9, D5 = 10};

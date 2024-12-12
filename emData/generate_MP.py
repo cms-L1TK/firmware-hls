@@ -11,8 +11,18 @@ import re
 import sys
 import argparse
 
-TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
-TF_index = {k:v for v,k in enumerate(TF_index)}
+TF_index = {}
+TF_index['L1L2'] = 0
+TF_index['L2L3'] = 0
+TF_index['L3L4'] = 1
+TF_index['L5L6'] = 0
+TF_index['D1D2'] = 1
+TF_index['D3D4'] = 1
+TF_index['L1D1'] = 1
+TF_index['L2D1'] = 0
+TF_index['AAAA'] = 0
+TF_index['BBBB'] = 1
+
 
 maxTPMems = "constexpr int maxTPMemories["
 maxFMMems = "constexpr int maxFMMemories["

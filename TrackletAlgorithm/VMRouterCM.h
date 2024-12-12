@@ -219,27 +219,6 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 	//Create variables that keep track of which memory address to read and write to
 	ap_uint<kNBits_MemAddr> read_addr(0); // Reading of input stubs
-	ap_uint<kNBits_MemAddr> addrCountASI[nAllInnerVariants]; // Writing of Inner Allstubs
-	ap_uint<5> addrCountME[1 << (rzSizeME + phiRegSize)]; // Writing of ME stubs, number of bits taken from whatever is defined in the memories: (4+rzSize + phiRegSize)-(rzSize + phiRegSize)+1
-	ap_uint<5> addrCountTE[1 << (rzSizeTE + phiRegSize)]; // Writing of TE stubs
-#pragma HLS array_partition variable=addrCountASI complete dim=0
-#pragma HLS array_partition variable=addrCountME complete dim=0
-#pragma HLS array_partition variable=addrCountTE complete dim=0
-
-	if (nAllInnerVariants) {
-		for (int i = 0; i < nAllInnerVariants; i++) {
-#pragma HLS unroll
-			addrCountASI[i] = 0;
-		}
-	}
-	for (int i = 0; i < 1 << (rzSizeME + phiRegSize); i++) {
-#pragma HLS unroll
-		addrCountME[i] = 0;
-	}
-	for (int i = 0; i < 1 << (rzSizeTE + phiRegSize); i++) {
-#pragma HLS unroll
-		addrCountTE[i] = 0;
-	}
 
 	/////////////////////////////////////
 	// Main Loop
@@ -294,7 +273,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		if (nAllCopies > 0) {
 		  for (int n = 0; n < nAllCopies; n++) {
 #pragma HLS UNROLL
-		    memoriesAS[n].write_mem(bx, allstub, i);
+		    memoriesAS[n].write_mem(allstub);
 		  }
 		}
 
@@ -370,8 +349,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 						}
 
 						if (passPhiCut && passSpecialCut) {
-							memoriesASInner[inner_mem_index].write_mem(bx, allstubinner, addrCountASI[inner_mem_index]);
-							addrCountASI[inner_mem_index]++;
+							memoriesASInner[inner_mem_index].write_mem(allstubinner);
 						}
 
 						inner_mem_index++;
@@ -396,8 +374,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 				createVMStub<VMStub<OutType>, InType, OutType, Layer, Disk, true>(stub, i, negDisk, METable, phiCorrTable, slotME);
 
 		// Write the ME stub
-		memoryME->write_mem(bx, slotME, stubME, addrCountME[slotME]);
-		addrCountME[slotME] += 1;
+		memoryME->write_mem(slotME, stubME);
 
 #if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
 		edm::LogVerbatim("L1trackHLS") << "ME stub " << std::hex << stubME.raw() << std::dec << "       to slot " << slotME;
@@ -419,9 +396,8 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 			// Write stub to all TE memory copies
 			for (int n = 0; n < nTEOCopies; n++) {
 #pragma HLS UNROLL
-				memoriesTEO[n].write_mem(bx, slotTE, stubTEO, addrCountTE[slotTE]);
+				memoriesTEO[n].write_mem(slotTE, stubTEO);
 			}
-			addrCountTE[slotTE] += 1;
 
 #if !defined(__SYNTHESIS__) && defined(VMRCM_DEBUG)
 			edm::LogVerbatim("L1trackHLS") << "TEOuter stub " << std::hex << stubTEO.raw() << std::dec << "       to slot " << slotTE;
