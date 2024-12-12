@@ -88,7 +88,6 @@ public:
   }
 
   ap_uint<NPAGE> getMask(const BunchXingT& bx) const {
-#pragma HLS ARRAY_PARTITION variable=mask__ complete dim=0
 #pragma HLS inline
     return mask_[bx];
   }
@@ -104,6 +103,8 @@ public:
 
   bool write_mem(const DataType& data, unsigned int page)
   {
+#pragma HLS ARRAY_PARTITION variable=mask_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
     if(!NBIT_BX) assert(write_bx_ == 0);
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
@@ -115,7 +116,7 @@ public:
       return false;
     }
     dataarray_[write_bx_][DEPTH_ADDR*page+nentries_[write_bx_*NPAGE+page]++] = data;
-    mask_[write_bx_].set(page);
+    mask_[write_bx_].set_bit(page,true);
 #endif
     return true;
 
