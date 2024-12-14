@@ -89,7 +89,9 @@ with open(arguments.wiresFileName) as wiresFile:
     FMMems = {}
     for line in wiresFile:
         line = line.rstrip()
-        mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
+        mpName = line.split()[-1].split(".")[0]
+        if not mpName.startswith("MP_"):
+            mpName = line.split()[-3].split(".")[0]
         memName = line.split()[0]
         projtype = "TPROJ_"
         if arguments.split : projtype = "MPROJ_"
@@ -98,7 +100,7 @@ with open(arguments.wiresFileName) as wiresFile:
                 TPMems[mpName] = []
             TPMems[mpName].append(memName)
         if memName.startswith("FM_"):
-            FM = re.sub(r"FM_(....)_......", r"\1", memName)
+            FM = re.sub(r"FM_(....)_......*", r"\1", memName)
             if mpName not in FMMems:
                 FMMems[mpName] = []
             FMMems[mpName].append(FM)
@@ -145,7 +147,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
 
     # Calculate parameters and print out parameters and top function for each MP.
     for mpName in sorted(TPMems.keys(), key = lambda x: x.startswith('L')):
-        seed = re.sub(r"MP_(..)....", r"\1", mpName)
+        seed = mpName[3:5]
         iMP = re.sub(r"MP_.....(.)", r"\1", mpName)
 
         # numbers of memories
@@ -161,6 +163,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         for TPROJ in TPMems[mpName]:
             print(mpName, TPROJ)
             npage = len(TPROJ)-17
+            if TPROJ.endswith("_E"):
+                npage = len(TPROJ)-19
             NPageSum += npage
             print("TPROJ npage", TPROJ, npage)
             NPage = NPage | ((npage-1) << (2*index))

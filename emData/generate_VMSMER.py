@@ -14,8 +14,28 @@ num_layers = 6
 num_disks = 5
 
 ###################################
-# Returns a list of all VMRs in the given wiring
+# Returns number of allstubs outputs a VMSMER has
 
+def getNAllStubMem(wireconfig, vmr):
+
+    AllStubCount = 0;
+
+    # Open wiring file
+    wires_file = open(wireconfig)
+
+    # Loop over each line in the wiring
+    for line in wires_file:
+        module_name = line.split(" ")[-3].split(".")[0]
+        if module_name == vmr and "AS" in line:
+            AllStubCount+=1
+
+    wires_file.close()
+
+    return AllStubCount
+
+###################################
+# Returns a list of all VMSMER in the given wiring
+    
 def getAllVMRs(wireconfig):
 
     vmr_list = []
@@ -37,7 +57,7 @@ def getAllVMRs(wireconfig):
 #################################
 # Writes the VMStubMERouterTop.h file
 
-def writeTopHeader(vmr, output_dir):
+def writeTopHeader(vmr, noutcopy, output_dir):
 
     # Get layer/disk number and phi region
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
@@ -71,6 +91,7 @@ def writeTopHeader(vmr, output_dir):
     header_file.write(
         "#define kLAYER " + str(layer) + " // Which barrel layer number the data is coming from\n"
         "#define kDISK " + str(disk) + " // Which disk number the data is coming from, 0 if not disk\n"
+        "#define NOutCopy " + str(noutcopy) + " // Numberof copies of AS and VMSMER memories (assumed to be the same)\n"
         "constexpr TF::phiRegion phiRegion = TF::" + phi_region+ "; // Which AllStub/PhiRegion\n"
         "\n"
         "constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);\n"
@@ -90,8 +111,8 @@ def writeTopHeader(vmr, output_dir):
         "  // Input memories\n"
         "  AllStub<inType>& allStub,\n"
         "  // Output memories\n"
-        "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME,\n"
-        "  AllStubMemory<outType>& memoriesAS,\n"
+        "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[],\n"
+        "  AllStubMemory<outType> memoriesAS[],\n"
         "  // Index of AllStub\n"
         "  unsigned int index,\n"
         "  // Bool if valid stub\n"
@@ -130,8 +151,8 @@ def writeTopFile(vmr, output_dir):
         "  // Input memories\n"
         "  AllStub<inType>& allStub,\n"
         "  // Output memories\n"
-        "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> *memoryME,\n"
-        "  AllStubMemory<outType>& memoriesAS,\n"
+        "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[],\n"
+        "  AllStubMemory<outType> memoriesAS[],\n"
         "  // Index of AllStub\n"
         "  unsigned int index,\n"
         "  // Bool if valid stub\n"
@@ -162,7 +183,7 @@ def writeTopFile(vmr, output_dir):
         "  /////////////////////////\n"
         "  // Main function\n"
         "\n"
-        "  VMSMERouter%s<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin>(\n" %LD +\
+        "  VMSMERouter%s<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin, NOutCopy>(\n" %LD +\
         "    bx, bx_o,\n"
         "    // LUTs\n"
         "    METable,\n"
@@ -224,6 +245,8 @@ python3 generate_VMRSMER.py -a
         if "VMSMER" not in vmr:
             raise IndexError("Unit under test has to be a VMSMER.")
 
+        nallstubmem = getNAllStubMem(args.wireconfig, vmr)
+
         # Create and write the files
-        writeTopHeader(vmr, args.outputdir)
+        writeTopHeader(vmr, nallstubmem, args.outputdir)
         writeTopFile(vmr, args.outputdir)

@@ -297,8 +297,8 @@ namespace TF {
   // List of layer and disk regions
   constexpr regionType layerDiskRegion[trklet::N_LAYER + trklet::N_DISK] = {BARREL, BARREL, BARREL, BARREL, BARREL, BARREL, DISK, DISK, DISK, DISK, DISK};
 
-  // List of phi regions
-  enum phiRegion {UNDEF_PHI, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};
+  // List of phi regions  //WARNING B_E and C_E should be B and C + 16!!!
+  enum phiRegion {UNDEF_PHI, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14, B_E = 17, C_E = 18};
 }
 
 // Layers used for each of the seeds

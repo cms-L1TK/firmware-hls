@@ -45,6 +45,10 @@ int main() {
   auto &fin_allstubs = tb.files(allStubPattern);
   auto &fout_vmstubme = tb.files(mePattern);
 
+  const auto nMECopies = tb.nFiles(mePattern);
+
+  assert(nMECopies==NOutCopy);
+
   ///////////////////////////
   // Declare memories
 
@@ -52,8 +56,8 @@ int main() {
   static AllStubMemory<inType> memoriesAS;
 
   // Output memories
-  static VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME;
-  static AllStubMemory<outType> memoriesASCopy;
+  static VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[NOutCopy];
+  static AllStubMemory<outType> memoriesASCopy[NOutCopy];
 
   ///////////////////////////
   // Loop over events
@@ -67,10 +71,12 @@ int main() {
     cout << "Event: " << dec << ievt << endl;
 
     // Clear output memories
-    memoryME.clear();
-    memoryME.setWriteBX(ievt);
-    memoriesASCopy.clear();
-    memoriesASCopy.setWriteBX(ievt);
+    for(unsigned int i=0; i<NOutCopy; i++) {
+      memoryME[i].clear();
+      memoryME[i].setWriteBX(ievt);
+      memoriesASCopy[i].clear();
+      memoriesASCopy[i].setWriteBX(ievt);
+    }
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
@@ -84,7 +90,7 @@ int main() {
       // Unit Under Test
       TOP_FUNC_(bx, bx_out, 
                 allStub,
-                &memoryME,
+                memoryME,
                 memoriesASCopy,
                 index,
                 valid);
@@ -96,7 +102,9 @@ int main() {
 
     // ME memories
     std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << std::endl;
-    err += compareBinnedMemCMWithFile<VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME, fout_vmstubme[0], ievt, "VMStubME", truncation);
+    for(unsigned int i=0; i<NOutCopy; i++) {
+      err += compareBinnedMemCMWithFile<VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines>>(memoryME[i], fout_vmstubme[i], ievt, "VMStubME", truncation);
+    }
 
   } // End of event loop
 

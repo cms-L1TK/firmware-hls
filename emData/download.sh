@@ -6,8 +6,8 @@ set -e
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Combined_231208.tgz"
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/l6gnLJvrUqy2PFB/MemPrints_Split_241207.tgz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/k8e3BOB6RPwN4Ym/LUTs_Split_241207.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/OQ2KBOdsn9McbGq/MemPrints_Split_241213.tgz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/Y86N9sy98BsBRJe/LUTs_Split_241213.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced_240121.tgz"

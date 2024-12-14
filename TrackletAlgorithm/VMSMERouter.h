@@ -150,15 +150,15 @@ inline T createVMStubME(const AllStub<inType>& allStub,
 // Main function
 
 // Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
-template<int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int phiRegSize>
+template<int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int phiRegSize, int NOutCopy=1>
 void VMSMERouter(const BXType bx, BXType& bx_o,
 		// LUTs
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
 		AllStub<InType>& allStub,
-		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> *memoryME,
-		AllStubMemory<OutType>& memoriesAS,
+		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
+		AllStubMemory<OutType> memoriesAS[],
 		// Array to count how many VMStubs written in each slot
 		unsigned int index,
 		bool valid
@@ -185,7 +185,10 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
   // It seems that the if (nAllCopies > 0) should not be needed,
   // but if nAllCopies is zero it generates an error in vivado_hls
   if (valid) {
-    memoriesAS.write_mem(stub_copy);
+    for (unsigned int i=0; i<NOutCopy; i++) {
+#pragma HLS UNROLL
+      memoriesAS[i].write_mem(stub_copy);
+    }
   }
 
   constexpr bool isDisk = (Disk > 0);
@@ -209,7 +212,10 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
       createVMStubME<VMStub<OutType>, InType, Layer, Disk>(allStub, index, negDisk, METable, phiCorrTable, slotME);
     
     // Write the ME stub
-    memoryME->write_mem(slotME, stubME);
+    for (unsigned int i=0; i<NOutCopy; i++) {
+#pragma HLS UNROLL
+      memoryME[i].write_mem(slotME, stubME);
+    }
   }
   
   
