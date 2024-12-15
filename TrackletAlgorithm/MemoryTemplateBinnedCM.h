@@ -151,6 +151,7 @@ public:
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
     //The vhdl implementation will write to the correct address
     dataarray_[0][write_bx_][getNEntryPerBin()*slot] = data;
+    return true;
 
 #else
 
