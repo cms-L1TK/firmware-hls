@@ -60,8 +60,9 @@ add_files -tb ../emData/MP/
 
 foreach i $modules_to_test {
   set layerDisk [string range $i 3 4]
-  set iMP [string range $i 8 9]
-  set top_func [join [list "MatchProcessor_" $layerDisk "PHI" $iMP] ""]
+  set iMP [string range $i 8 8]
+  set extra [string range $i 9 10]
+  set top_func [join [list "MatchProcessor_" $layerDisk "PHI" $iMP $extra] ""]
   puts [join [list "======== TESTING " $i " ========"] ""]
   puts [join [list "layerDisk = " $layerDisk] ""]
   puts [join [list "iMP = " $iMP] ""]
