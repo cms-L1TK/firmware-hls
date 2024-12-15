@@ -74,13 +74,13 @@ class Merger {
     if (!valid_A_) {
       in_A_    = in_A;
       valid_A_ = valid_A;
-      read_A   = true;
+      read_A   = valid_A;
     }
 
     if (!valid_B_) {
       in_B_    = in_B;
       valid_B_ = valid_B;
-      read_B   = true;
+      read_B   = valid_B;
     }
 
     first_A_ = (valid_A_ && valid_B_
@@ -104,7 +104,9 @@ class Merger {
 };
 
 // TrackBuilder top template function
-template<TF::seed Seed, int NFMPerStubBarrel0, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, int TPARMask>
+// NFMPerStubBarrel/Disk uses 3 bits for each layer and disk
+//
+template<TF::seed Seed, int NFMPerStubBarrel, int NFMPerStubDisk, int NBarrelStubs, int NDiskStubs, int TPARMask>
 void TrackBuilder(
     const BXType bx,
     const TrackletParameterMemory1 trackletParameters1[],
@@ -121,63 +123,127 @@ void TrackBuilder(
 )
 {
 
-  // The ordered merges are currently configured assuming four FM memories per
-  // layer/disk or potentially eight in the first layer. Other numbers would
-  // require setting up the code differently.
-  static_assert(NFMPerStubBarrel0 == 4
-             || NFMPerStubBarrel0 == 8
-             || NFMPerStubBarrel  == 4
-             || NFMPerStubDisk    == 4,
-             "Ordered merges require 4 or 8 FM memories per layer/disk.");
+  constexpr unsigned int mergerDepth = 3;
+  constexpr unsigned int maxFMLayer = (1<<mergerDepth);
 
   constexpr int NStubs = NBarrelStubs + NDiskStubs;
 
+  constexpr unsigned int NFMBarrel[NBarrelStubs] = {
+    NFMPerStubBarrel&15,
+    (NFMPerStubBarrel>>4)&15, 
+    (NFMPerStubBarrel>>8)&15, 
+    (NFMPerStubBarrel>>12)&15,
+    (NFMPerStubBarrel>>16)&15,
+    (NFMPerStubBarrel>>20)&15
+  };
+
+  constexpr unsigned int NFMDisk[NDiskStubs] = {
+    NFMPerStubDisk&15,
+    (NFMPerStubDisk>>4)&15,
+    (NFMPerStubDisk>>8)&15,
+    (NFMPerStubDisk>>12)&15,
+    (NFMPerStubDisk>>16)&15};
+
+  constexpr unsigned int FMBarrelStart[NBarrelStubs] = {
+    0,
+    NFMBarrel[0],
+    NFMBarrel[0]+NFMBarrel[1],
+    NFMBarrel[0]+NFMBarrel[1]+NFMBarrel[2],
+    NFMBarrel[0]+NFMBarrel[1]+NFMBarrel[2]+NFMBarrel[3],
+    NFMBarrel[0]+NFMBarrel[1]+NFMBarrel[2]+NFMBarrel[3]+NFMBarrel[4]};
+  
+  constexpr unsigned int FMDiskStart[NDiskStubs] = {
+    0,
+    NFMDisk[0],
+    NFMDisk[0]+NFMDisk[1],
+    NFMDisk[0]+NFMDisk[1]+NFMDisk[2],
+    NFMDisk[0]+NFMDisk[1]+NFMDisk[2]+NFMDisk[3]};
+
+  /*
+  std::cout << "NFMBarrel:";
+  for(unsigned int i=0; i<NBarrelStubs; i++) {
+    std::cout << " " << NFMBarrel[i];
+  }
+  std::cout << std::endl;
+
+  std::cout << "NFMDisk:";
+  for(unsigned int i=0; i<NDiskStubs; i++) {
+    std::cout << " " << NFMDisk[i];
+  }
+  std::cout << std::endl;
+
+  std::cout << "FMBarrelStart:";
+  for(unsigned int i=0; i<NBarrelStubs; i++) {
+    std::cout << " " << FMBarrelStart[i];
+  }
+  std::cout << std::endl;
+  
+  std::cout << "FMDiskStart:";
+  for(unsigned int i=0; i<NDiskStubs; i++) {
+    std::cout << " " << FMDiskStart[i];
+  }
+  std::cout << std::endl;
+  */
+  
   IndexType nTracks = 0;
   done = false;
   bool done_latch = false;
 
-  Merger<FullMatch<BARREL> > merger_L_top[NBarrelStubs], // root node
-                             merger_L_b1[NBarrelStubs], merger_L_b2[NBarrelStubs], // first level
-                             merger_L_b1_b1, merger_L_b1_b2, merger_L_b2_b1, merger_L_b2_b2; // second level (only used for the first layer)
+  Merger<FullMatch<BARREL> >
+    merger_L_top[NBarrelStubs], // root node
+    merger_L_b1[NBarrelStubs],
+    merger_L_b2[NBarrelStubs], // first level
+    merger_L_b1_b1[NBarrelStubs],
+    merger_L_b1_b2[NBarrelStubs],
+    merger_L_b2_b1[NBarrelStubs],
+    merger_L_b2_b2[NBarrelStubs];
+  
+  Merger<FullMatch<DISK> >
+    merger_D_top[NDiskStubs], // root node
+    merger_D_b1[NDiskStubs],
+    merger_D_b2[NDiskStubs], // first level
+    merger_D_b1_b1[NDiskStubs],
+    merger_D_b1_b2[NDiskStubs],
+    merger_D_b2_b1[NDiskStubs],
+    merger_D_b2_b2[NDiskStubs];
 
+  
   // counters for each possible leaf node in the merge tree
   // (up to eight for stub 0)
-  int count_L_0[NBarrelStubs],
-      count_L_1[NBarrelStubs],
-      count_L_2[NBarrelStubs],
-      count_L_3[NBarrelStubs],
-      count_L_4[NBarrelStubs],
-      count_L_5[NBarrelStubs],
-      count_L_6[NBarrelStubs],
-      count_L_7[NBarrelStubs];
+  int count_barrel[NBarrelStubs][maxFMLayer];
 
   initialize_barrel_mergers : for (short i = 0; NBarrelStubs > 0 && i < NBarrelStubs; i++) {
 #pragma HLS unroll
     merger_L_top[i].reset();
     merger_L_b1[i].reset();
     merger_L_b2[i].reset();
-    count_L_0[i] = count_L_1[i] = count_L_2[i] = count_L_3[i] = count_L_4[i] = count_L_5[i] = count_L_6[i] = count_L_7[i] = 0;
+    merger_L_b1_b1[i].reset();
+    merger_L_b1_b2[i].reset();
+    merger_L_b2_b1[i].reset();
+    merger_L_b2_b2[i].reset();
+    for(unsigned int j=0; j<maxFMLayer; j++) {
+#pragma HLS unroll
+      count_barrel[i][j]=0;
+    }
   }
-  merger_L_b1_b1.reset();
-  merger_L_b1_b2.reset();
-  merger_L_b2_b1.reset();
-  merger_L_b2_b2.reset();
-
-  Merger<FullMatch<DISK> > merger_D_top[NDiskStubs], // root node
-                           merger_D_b1[NDiskStubs], merger_D_b2[NDiskStubs]; // first level
-
+ 
   // counters for each possible leaf node in the merge tree
-  int count_D_0[NDiskStubs],
-      count_D_1[NDiskStubs],
-      count_D_2[NDiskStubs],
-      count_D_3[NDiskStubs];
+  int count_disk[NDiskStubs][maxFMLayer];
 
   initialize_disk_mergers : for (short i = 0; NDiskStubs > 0 && i < NDiskStubs; i++) {
 #pragma HLS unroll
     merger_D_top[i].reset();
     merger_D_b1[i].reset();
     merger_D_b2[i].reset();
-    count_D_0[i] = count_D_1[i] = count_D_2[i] = count_D_3[i] = 0;
+    merger_D_b1_b1[i].reset();
+    merger_D_b1_b2[i].reset();
+    merger_D_b2_b1[i].reset();
+    merger_D_b2_b2[i].reset();
+    for(unsigned int j=0; j<maxFMLayer; j++) {
+#pragma HLS unroll
+      count_disk[i][j]=0;
+    }
+
   }
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
@@ -195,11 +261,13 @@ void TrackBuilder(
       int tid = kInvalidTrackletID;
 
       if (j < NBarrelStubs) {
-        if (merger_L_top[j].valid())
+        if (merger_L_top[j].valid()){
           tid = merger_L_top[j].peek().getTrackletID();
+	}
       } else {
-        if (merger_D_top[j-NBarrelStubs].valid())
+        if (merger_D_top[j-NBarrelStubs].valid()){
           tid = merger_D_top[j-NBarrelStubs].peek().getTrackletID();
+	}
       }
 
       smallest[j] = true;
@@ -235,10 +303,13 @@ void TrackBuilder(
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
     typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE iseed = TCID >> kNBitsITC; //TCID.range(3+kNBitsITC-1,kNBitsITC);
+
+    //These are actually not needed any more...
     auto mparNPages = getMPARNPages<Seed>(iTC);
     auto mparMem = getMPARMem<Seed>(iTC);
     auto mparPage = getMPARPage<Seed>(iTC);
     //This block is for AAAA
+    //This should be automatically generate by the generate_TB.py script...
     if (iseed==0) {
       if (iTC==0) {mparNPages=3; mparMem=0; mparPage=0;}
       if (iTC==1) {mparNPages=3; mparMem=0; mparPage=1;}
@@ -378,7 +449,8 @@ void TrackBuilder(
           break;
       }
     }
-    disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
+    
+  disk_stub_association : for (short j = 0; j < NDiskStubs; j++) {
 
       const auto &disk_stub = merger_D_top[j].peek();
       bool disk_stub_valid = merger_D_top[j].valid() && smallest[j+NBarrelStubs];
@@ -416,7 +488,7 @@ void TrackBuilder(
           track.template setDiskStub<NBarrelStubs + 4>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
           track.template setTrackIndex<NBarrelStubs + 4>(nTracks);
           break;
-        case 5:
+      case 5: //should never get here?
           track.template setDiskStub<NBarrelStubs + 5>(disk_stub_valid, disk_stub_index, disk_stub_r, disk_phi_res, disk_z_res);
           track.template setTrackIndex<NBarrelStubs + 5>(nTracks);
           break;
@@ -459,6 +531,7 @@ void TrackBuilder(
           break;
       }
     }
+
     disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
@@ -482,6 +555,7 @@ void TrackBuilder(
 
     // Do the next set of pairwise comparisons in the merge trees.
     barrel_merger : for (unsigned short j = 0; j < NBarrelStubs; j++) {
+#pragma HLS unroll
 
       bool read_1, read_2;
 
@@ -489,96 +563,74 @@ void TrackBuilder(
                             merger_L_b2[j].peek(), merger_L_b2[j].valid(), read_2,
                             smallest[j]);
 
-      // We use the second layer of the merge tree only when there are eight FM
-      // memories per layer, which should only occur for the first layer.
-      if (NFMPerStubBarrel0 == 8 && j == 0) {
+      bool read_b1_1, read_b1_2, read_b2_1, read_b2_2,
+	read_b1_b1_1, read_b1_b1_2, read_b1_b2_1, read_b1_b2_2,
+	read_b2_b1_1, read_b2_b1_2, read_b2_b2_1, read_b2_b2_2;
+      
+      merger_L_b1[j].next(merger_L_b1_b1[j].peek(), merger_L_b1_b1[j].valid(), read_b1_1,
+			  merger_L_b1_b2[j].peek(), merger_L_b1_b2[j].valid(), read_b1_2,
+			  read_1);
 
-        bool read_b1_1, read_b1_2, read_b2_1, read_b2_2,
-             read_b1_b1_1, read_b1_b1_2, read_b1_b2_1, read_b1_b2_2,
-             read_b2_b1_1, read_b2_b1_2, read_b2_b2_1, read_b2_b2_2;
-
-        merger_L_b1[0].next(merger_L_b1_b1.peek(), merger_L_b1_b1.valid(), read_b1_1,
-                            merger_L_b1_b2.peek(), merger_L_b1_b2.valid(), read_b1_2,
-                            read_1);
-
-        merger_L_b1_b1.next(barrelFullMatches[0].read_mem(bx,count_L_0[j]),
-                            count_L_0[j] < barrelFullMatches[0].getEntries(bx),
-                            read_b1_b1_1,
-                            barrelFullMatches[1].read_mem(bx,count_L_1[j]),
-                            count_L_1[j] < barrelFullMatches[1].getEntries(bx),
-                            read_b1_b1_2,
-                            read_b1_1);
-
-        if (read_b1_b1_1) count_L_0[j]++;
-        if (read_b1_b1_2) count_L_1[j]++;
-
-        merger_L_b1_b2.next(barrelFullMatches[2].read_mem(bx,count_L_2[j]),
-                            count_L_2[j] < barrelFullMatches[2].getEntries(bx),
-                            read_b1_b2_1,
-                            barrelFullMatches[3].read_mem(bx,count_L_3[j]),
-                            count_L_3[j] < barrelFullMatches[3].getEntries(bx),
-                            read_b1_b2_2,
-                            read_b1_2);
-
-        if (read_b1_b2_1) count_L_2[j]++;
-        if (read_b1_b2_2) count_L_3[j]++;
-
-        merger_L_b2[0].next(merger_L_b2_b1.peek(), merger_L_b2_b1.valid(), read_b2_1,
-                            merger_L_b2_b2.peek(), merger_L_b2_b2.valid(), read_b2_2,
-                            read_2);
-
-        merger_L_b2_b1.next(barrelFullMatches[4].read_mem(bx,count_L_4[j]),
-                            count_L_4[j] < barrelFullMatches[4].getEntries(bx),
-                            read_b2_b1_1,
-                            barrelFullMatches[5].read_mem(bx,count_L_5[j]),
-                            count_L_5[j] < barrelFullMatches[5].getEntries(bx),
-                            read_b2_b1_2,
-                            read_b2_1);
-
-        if (read_b2_b1_1) count_L_4[j]++;
-        if (read_b2_b1_2) count_L_5[j]++;
-
-        merger_L_b2_b2.next(barrelFullMatches[6].read_mem(bx,count_L_6[j]),
-                            count_L_6[j] < barrelFullMatches[6].getEntries(bx),
-                            read_b2_b2_1,
-                            barrelFullMatches[7].read_mem(bx,count_L_7[j]),
-                            count_L_7[j] < barrelFullMatches[7].getEntries(bx),
-                            read_b2_b2_2,
-                            read_b2_2);
-
-        if (read_b2_b2_1) count_L_6[j]++;
-        if (read_b2_b2_2) count_L_7[j]++;
-
+      bool validmatch[maxFMLayer]={false};
+      FullMatch<BARREL> fullmatch[maxFMLayer];
+      for (unsigned int k=0; k < NFMBarrel[j]; k++) {
+#pragma HLS unroll
+	validmatch[k] = count_barrel[j][k] < barrelFullMatches[k+FMBarrelStart[j]].getEntries(bx);
+	fullmatch[k] = barrelFullMatches[k+FMBarrelStart[j]].read_mem(bx,count_barrel[j][k]);
       }
-      else {
-        if (NFMPerStubBarrel0 != 8 || i > 0) {
-          bool read_b1_1, read_b1_2, read_b2_1, read_b2_2;
 
-          merger_L_b1[j].next(barrelFullMatches[NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_0[j]),
-                               count_L_0[j] < barrelFullMatches[NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b1_1,
-                               barrelFullMatches[1+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_1[j]),
-                               count_L_1[j] < barrelFullMatches[1+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b1_2,
-                               read_1);
+      merger_L_b1_b1[j].next(fullmatch[0],
+			  validmatch[0],
+			  read_b1_b1_1,
+			  fullmatch[1],
+			  validmatch[1],
+			  read_b1_b1_2,
+			  read_b1_1);
 
-          if (read_b1_1) count_L_0[j]++;
-          if (read_b1_2) count_L_1[j]++;
+      if (read_b1_b1_1) count_barrel[j][0]++;
+      if (read_b1_b1_2) count_barrel[j][1]++;
 
-          merger_L_b2[j].next(barrelFullMatches[2+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_2[j]),
-                               count_L_2[j] < barrelFullMatches[2+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b2_1,
-                               barrelFullMatches[3+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].read_mem(bx,count_L_3[j]),
-                               count_L_3[j] < barrelFullMatches[3+NFMPerStubBarrel0-NFMPerStubBarrel+j*NFMPerStubBarrel].getEntries(bx),
-                               read_b2_2,
-                               read_2);
+      merger_L_b1_b2[j].next(fullmatch[2],
+			  validmatch[2],
+			  read_b1_b2_1,
+			  fullmatch[3],
+			  validmatch[3],
+			  read_b1_b2_2,
+			  read_b1_2);
+      
+      if (read_b1_b2_1) count_barrel[j][2]++;
+      if (read_b1_b2_2) count_barrel[j][3]++;
 
-          if (read_b2_1) count_L_2[j]++;
-          if (read_b2_2) count_L_3[j]++;
-        }
-      }
+      merger_L_b2[j].next(merger_L_b2_b1[j].peek(), merger_L_b2_b1[j].valid(), read_b2_1,
+			  merger_L_b2_b2[j].peek(), merger_L_b2_b2[j].valid(), read_b2_2,
+			  read_2);
+
+      merger_L_b2_b1[j].next(fullmatch[4],
+			  validmatch[4],
+			  read_b2_b1_1,
+			  fullmatch[5],
+			  validmatch[5],
+			  read_b2_b1_2,
+			  read_b2_1);
+
+      if (read_b2_b1_1) count_barrel[j][4]++;
+      if (read_b2_b1_2) count_barrel[j][5]++;
+
+      merger_L_b2_b2[j].next(fullmatch[6],
+			  validmatch[6],
+			  read_b2_b2_1,
+			  fullmatch[7],
+			  validmatch[7],
+			  read_b2_b2_2,
+			  read_b2_2);
+
+      if (read_b2_b2_1) count_barrel[j][6]++;
+      if (read_b2_b2_2) count_barrel[j][7]++;
+
     }
-    disk_merger : for (unsigned int j = 0 ; j < NDiskStubs; j++) {
+
+  disk_merger : for (unsigned int j = 0 ; j < NDiskStubs; j++) {
+#pragma HLS unroll
 
       bool read_1, read_2;
 
@@ -586,32 +638,72 @@ void TrackBuilder(
                             merger_D_b2[j].peek(), merger_D_b2[j].valid(), read_2,
                             smallest[j+NBarrelStubs]);
 
-      if (NFMPerStubBarrel0 != 8 || i > 0) {
-        bool read_b1_1, read_b1_2, read_b2_1, read_b2_2;
+      bool read_b1_1, read_b1_2, read_b2_1, read_b2_2,
+	read_b1_b1_1, read_b1_b1_2, read_b1_b2_1, read_b1_b2_2,
+	read_b2_b1_1, read_b2_b1_2, read_b2_b2_1, read_b2_b2_2;
+      
+      merger_D_b1[j].next(merger_D_b1_b1[j].peek(), merger_D_b1_b1[j].valid(), read_b1_1,
+			  merger_D_b1_b2[j].peek(), merger_D_b1_b2[j].valid(), read_b1_2,
+			  read_1);
 
-        merger_D_b1[j].next(diskFullMatches[0+j*NFMPerStubDisk].read_mem(bx,count_D_0[j]),
-                             count_D_0[j] < diskFullMatches[0+j*NFMPerStubDisk].getEntries(bx),
-                             read_b1_1,
-                             diskFullMatches[1+j*NFMPerStubDisk].read_mem(bx,count_D_1[j]),
-                             count_D_1[j] < diskFullMatches[1+j*NFMPerStubDisk].getEntries(bx),
-                             read_b1_2,
-                             read_1);
-
-        if (read_b1_1) count_D_0[j]++;
-        if (read_b1_2) count_D_1[j]++;
-
-        merger_D_b2[j].next(diskFullMatches[2+j*NFMPerStubDisk].read_mem(bx,count_D_2[j]),
-                             count_D_2[j] < diskFullMatches[2+j*NFMPerStubDisk].getEntries(bx),
-                             read_b2_1,
-                             diskFullMatches[3+j*NFMPerStubDisk].read_mem(bx,count_D_3[j]),
-                             count_D_3[j] < diskFullMatches[3+j*NFMPerStubDisk].getEntries(bx),
-                             read_b2_2,
-                             read_2);
-
-        if (read_b2_1) count_D_2[j]++;
-        if (read_b2_2) count_D_3[j]++;
+      bool validmatch[maxFMLayer]={false};
+      FullMatch<DISK> fullmatch[maxFMLayer];
+      for (unsigned int k=0; k<NFMDisk[j]; k++) {
+#pragma HLS unroll
+	validmatch[k] = count_disk[j][k] < diskFullMatches[k+FMDiskStart[j]].getEntries(bx);
+	fullmatch[k] = diskFullMatches[k+FMDiskStart[j]].read_mem(bx,count_disk[j][k]);
       }
+      
+      merger_D_b1_b1[j].next(fullmatch[0],
+			  validmatch[0],
+			  read_b1_b1_1,
+			  fullmatch[1],
+			  validmatch[1],
+			  read_b1_b1_2,
+			  read_b1_1);
+
+      if (read_b1_b1_1) count_disk[j][0]++;
+      if (read_b1_b1_2) count_disk[j][1]++;
+      
+      merger_D_b1_b2[j].next(fullmatch[2],
+			  validmatch[2],
+			  read_b1_b2_1,
+			  fullmatch[3],
+			  validmatch[3],
+			  read_b1_b2_2,
+			  read_b1_2);
+      
+      if (read_b1_b2_1) count_disk[j][2]++;
+      if (read_b1_b2_2) count_disk[j][3]++;
+      
+      merger_D_b2[j].next(merger_D_b2_b1[j].peek(), merger_D_b2_b1[j].valid(), read_b2_1,
+			  merger_D_b2_b2[j].peek(), merger_D_b2_b2[j].valid(), read_b2_2,
+			  read_2);
+
+      merger_D_b2_b1[j].next(fullmatch[4],
+			  validmatch[4],
+			  read_b2_b1_1,
+			  fullmatch[5],
+			  validmatch[5],
+			  read_b2_b1_2,
+			  read_b2_1);
+      
+      if (read_b2_b1_1) count_disk[j][4]++;
+      if (read_b2_b1_2) count_disk[j][5]++;
+
+      merger_D_b2_b2[j].next(fullmatch[6],
+			  validmatch[6],
+			  read_b2_b2_1,
+			  fullmatch[7],
+			  validmatch[7],
+			  read_b2_b2_2,
+			  read_b2_2);
+      
+      if (read_b2_b2_1) count_disk[j][6]++;
+      if (read_b2_b2_2) count_disk[j][7]++;
+
     }
+
   }
 
   bx_o = bx;
