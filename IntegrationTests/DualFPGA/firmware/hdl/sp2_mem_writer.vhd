@@ -69,6 +69,8 @@ architecture rtl of sp2_mem_writer is
   signal PC_bx_in_pipeline          : std_logic_vector(2 downto 0) := "000";
   signal PC_start_pipeline          : std_logic                    := '0';
 
+  signal PC_start_hack              : std_logic                    := '0';
+
 begin -- architecture rtl
   
   p_writemem : process (clk) is
@@ -170,5 +172,16 @@ begin -- architecture rtl
       PC_start          <= PC_start_pipeline;
     end if;
   end process;
+
+  --temporary hack to check problems with alignment
+  --PC_start <= PC_start_hack;
+  --p_latch_pc_start : process (clk) is
+  --begin
+  --  if rising_edge(clk) then
+  --    if AS_36_din_pipeline(L1PHIAn1) = x"ee9c8349d" then
+  --      PC_start_hack <= '1';
+  --    end if;
+  --  end if;
+  --end process;
 
 end architecture rtl;
