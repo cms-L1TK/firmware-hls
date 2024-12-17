@@ -109,7 +109,7 @@ begin  -- architecture rtl
       for i in TW_104_data_i'range loop 
         tftokf_o(enum_TW_104'pos(i))             <= nulll;
         tftokf_o(enum_TW_104'pos(i)).track.reset <= kf_reset_i;
-        if TW_104_valid_i(i) = '1' then
+        if (TW_104_valid_i(i) = '1') and (TW_104_data_i(i)(103) = '1') then
           tftokf_o(enum_TW_104'pos(i)).track.valid    <= TW_104_data_i(i)(1 + widthTBseedType + WidthTBInOutIndex + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1);
           tftokf_o(enum_TW_104'pos(i)).track.seedtype <= TW_104_data_i(i)(widthTBseedType + widthTBInOutIndex + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBInOutIndex + widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap);
           tftokf_o(enum_TW_104'pos(i)).track.inv2R    <= TW_104_data_i(i)(widthTBinv2R + widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap - 1 downto widthTBphi0 + widthTBz0 + widthTBcot + widthTrackletLmap);
