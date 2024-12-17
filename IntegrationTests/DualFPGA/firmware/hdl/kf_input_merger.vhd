@@ -103,7 +103,9 @@ begin
     end if; --rising_edge(clk)
   end process;
 
-  empty <= true when write_address = 0 else false;
+  empty <= true when ((write_address = 0) and (not write_enable)) else 
+           true when ((write_address = 1) and read_enable and (not write_enable)) else
+           false;
   full <= true when write_address = (depth-1) else false;
   
 end architecture rtl;
@@ -211,6 +213,10 @@ architecture rtl of kf_input_merger is
 
  signal bx_change    : std_logic;
 
+ type t_arr_channelindex is array(0 to 1) of integer range 0 to 4;
+ signal stream_to_read : t_arr_channelindex := (others => 4);
+ signal stream_to_read_pipe : t_arr_channelindex := (others => 4);
+
  --this defines merging scheme
  --currently merge first 4 seeds (L1L2, L2L3, L3L4, L5L6) 
  --and second 4 seeds (D1D2, D3D4, L1D1, L2D1)
@@ -263,36 +269,42 @@ begin
     if (rising_edge(clk)) then
       for ikfchannel in 0 to (numNodesKF-1) loop 
         if not ram_empty(seed_merge(ikfchannel)(0)) then
-          dout(ikfchannel)                       <= ram_out(seed_merge(ikfchannel)(0));
+          stream_to_read(ikfchannel)             <= 0;
           read_enable(seed_merge(ikfchannel)(0)) <= true;
           read_enable(seed_merge(ikfchannel)(1)) <= false;
           read_enable(seed_merge(ikfchannel)(2)) <= false;
           read_enable(seed_merge(ikfchannel)(3)) <= false;
         elsif not ram_empty(seed_merge(ikfchannel)(1)) then
-          dout(ikfchannel)                       <= ram_out(seed_merge(ikfchannel)(1));
+          stream_to_read(ikfchannel)             <= 1;
           read_enable(seed_merge(ikfchannel)(0)) <= false;
           read_enable(seed_merge(ikfchannel)(1)) <= true;
           read_enable(seed_merge(ikfchannel)(2)) <= false;
           read_enable(seed_merge(ikfchannel)(3)) <= false;
         elsif not ram_empty(seed_merge(ikfchannel)(2)) then
-          dout(ikfchannel)                       <= ram_out(seed_merge(ikfchannel)(2));
+          stream_to_read(ikfchannel)             <= 2;
           read_enable(seed_merge(ikfchannel)(0)) <= false;
           read_enable(seed_merge(ikfchannel)(1)) <= false;
           read_enable(seed_merge(ikfchannel)(2)) <= true;
           read_enable(seed_merge(ikfchannel)(3)) <= false;
         elsif not ram_empty(seed_merge(ikfchannel)(3)) then
-          dout(ikfchannel)                       <= ram_out(seed_merge(ikfchannel)(3));
+          stream_to_read(ikfchannel)             <= 3;
           read_enable(seed_merge(ikfchannel)(0)) <= false;
           read_enable(seed_merge(ikfchannel)(1)) <= false;
           read_enable(seed_merge(ikfchannel)(2)) <= false;
           read_enable(seed_merge(ikfchannel)(3)) <= true;
         else
-          dout(ikfchannel)                       <= nulll;
+          stream_to_read(ikfchannel)             <= 4;
           read_enable(seed_merge(ikfchannel)(0)) <= false;
           read_enable(seed_merge(ikfchannel)(1)) <= false;
           read_enable(seed_merge(ikfchannel)(2)) <= false;
           read_enable(seed_merge(ikfchannel)(3)) <= false;
         end if;
+        if (stream_to_read_pipe(ikfchannel) /= 4) then
+          dout(ikfchannel) <= ram_out(seed_merge(ikfchannel)(stream_to_read_pipe(ikfchannel)));
+        else
+          dout(ikfchannel) <= nulll;
+        end if;
+        stream_to_read_pipe <= stream_to_read;
       end loop;
     end if;
   end process;
