@@ -252,33 +252,37 @@ cd ../
 
 if [[ $tables_only == 0 ]]
 then
-  echo "Getting MemPrints tar balls"
-  # Get memory test data: download and unpack the tarball.
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_split}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsSplit
-  rm -f MemPrints.tgz
+    # Get memory test data: download and unpack the tarball.
+    echo "Getting MemPrints tar balls Split"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_split}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsSplit
+    rm -f MemPrints.tgz
+  
+    echo "Getting MemPrints tar balls Reduced CM"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsReducedCM
+    rm -f MemPrints.tgz
+    
+    echo "Getting MemPrints tar balls Reduced CM2"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm2}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsReducedCM2
+    
+    echo "Getting MemPrints tar balls Reduced CM Barrel"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsCMBarrel
+    rm -f MemPrints.tgz
 
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsReducedCM
-  rm -f MemPrints.tgz
-
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm2}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsReducedCM2
-
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsCMBarrel
-  rm -f MemPrints.tgz
-
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsCM
-  rm -f MemPrints.tgz
-
-  echo "Done getting MemPrints tar balls"
+    echo "Getting MemPrints tar balls Reduced CM"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsCM
+    rm -f MemPrints.tgz
+  
+    echo "Done getting MemPrints tar balls"
 
 fi
 
