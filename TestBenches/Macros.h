@@ -244,7 +244,7 @@ X(MP_L6PHIA_, "MP_L6PHIA") \
 X(MP_L6PHIB_, "MP_L6PHIB") \
 X(MP_L6PHIB_E_, "MP_L6PHIB_E") \
 X(MP_L6PHIC_, "MP_L6PHIC") \
-X(MP_L6PHIC_E_, "MP_L6PHIC_E_") \
+X(MP_L6PHIC_E_, "MP_L6PHIC_E") \
 X(MP_L6PHID_, "MP_L6PHID")
 
 #define X(module, name) module,
