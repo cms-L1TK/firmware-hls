@@ -51,7 +51,9 @@ protected:
 
   DataType dataarray_[DEPTH_BX][DEPTH_ADDR];  // data array
   NEntryT nentries_[DEPTH_BX];                  // number of entries
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   BunchXingT write_bx_;                //BX for writing 
+#endif
   
 public:
 
@@ -63,9 +65,11 @@ public:
     return nentries_[bx];
   }
 
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   void setWriteBX(const BunchXingT& ibx) {
     write_bx_ = ibx;
   }
+#endif
   
   const DataType (&get_mem() const)[DEPTH_BX][DEPTH_ADDR] {return dataarray_;}
 
@@ -78,24 +82,25 @@ public:
   
   bool write_mem(const DataType& data, ap_uint<1> overwrite=0)
   {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-    if(!NBIT_BX) write_bx_ = 0;
-    if (nentries_[write_bx_] < DEPTH_ADDR) {
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[write_bx_][0] = data;
+      dataarray_[0][0] = data;
+      return true;
 #else
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+    if(!NBIT_BX) write_bx_ = 0;
+    if (nentries_[write_bx_] < DEPTH_ADDR) {
       if(overwrite == 0) {
         dataarray_[write_bx_][nentries_[write_bx_]++] = data;
       } else {
         dataarray_[write_bx_][nentries_[write_bx_]-1] = data;
       }
-#endif
       return true;
     } else {
       return false;
     }
+#endif
   }
 
   // Methods for C simulation only

@@ -69,7 +69,9 @@ protected:
   DataType dataarray_[DEPTH_BX][NPAGE*DEPTH_ADDR];  // data array
   NEntryT nentries_[DEPTH_BX*NPAGE];                  // number of entries
   ap_uint<NPAGE> mask_[DEPTH_BX]; //bitmask for hits
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   BunchXingT write_bx_;                //BX for writing 
+#endif
   
 public:
 
@@ -77,9 +79,11 @@ public:
   unsigned int getNBX() const {return DEPTH_BX;}
   unsigned int getNPage() const {return NPAGE;}
 
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   void setWriteBX(const BunchXingT& ibx) {
     write_bx_ = ibx;
   }
+#endif
   
   NEntryT getEntries(const BunchXingT& bx, unsigned int page = 0) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
@@ -106,11 +110,11 @@ public:
 #pragma HLS ARRAY_PARTITION variable=mask_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
-    if(!NBIT_BX) assert(write_bx_ == 0);
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
     //The vhd memory implementation will write to the correct address!!
-    dataarray_[write_bx_][0] = data;
+    dataarray_[0][0] = data;
 #else
+    if(!NBIT_BX) assert(write_bx_ == 0);
     //NBIT_BX==1 is to identify the projection memories
     if (NBIT_BX==1 && nentries_[write_bx_*NPAGE+page]>=MAX_TPROJ_PAGE_SIZE) {
       return false;
