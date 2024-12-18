@@ -11,8 +11,18 @@ import re
 import sys
 import argparse
 
-TF_index = ['L1L2', 'L2L3', 'L3L4', 'L5L6', 'D1D2', 'D3D4', 'L1D1', 'L2D1']
-TF_index = {k:v for v,k in enumerate(TF_index)}
+TF_index = {}
+TF_index['L1L2'] = 0
+TF_index['L2L3'] = 0
+TF_index['L3L4'] = 1
+TF_index['L5L6'] = 0
+TF_index['D1D2'] = 1
+TF_index['D3D4'] = 1
+TF_index['L1D1'] = 1
+TF_index['L2D1'] = 0
+TF_index['AAAA'] = 0
+TF_index['BBBB'] = 1
+
 
 maxTPMems = "constexpr int maxTPMemories["
 maxFMMems = "constexpr int maxFMMemories["
@@ -79,7 +89,9 @@ with open(arguments.wiresFileName) as wiresFile:
     FMMems = {}
     for line in wiresFile:
         line = line.rstrip()
-        mpName = re.sub(r".*MP_(......).*", r"MP_\1", line)
+        mpName = line.split()[-1].split(".")[0]
+        if not mpName.startswith("MP_"):
+            mpName = line.split()[-3].split(".")[0]
         memName = line.split()[0]
         projtype = "TPROJ_"
         if arguments.split : projtype = "MPROJ_"
@@ -88,7 +100,7 @@ with open(arguments.wiresFileName) as wiresFile:
                 TPMems[mpName] = []
             TPMems[mpName].append(memName)
         if memName.startswith("FM_"):
-            FM = re.sub(r"FM_(....)_......", r"\1", memName)
+            FM = re.sub(r"FM_(....)_......*", r"\1", memName)
             if mpName not in FMMems:
                 FMMems[mpName] = []
             FMMems[mpName].append(FM)
@@ -135,7 +147,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
 
     # Calculate parameters and print out parameters and top function for each MP.
     for mpName in sorted(TPMems.keys(), key = lambda x: x.startswith('L')):
-        seed = re.sub(r"MP_(..)....", r"\1", mpName)
+        seed = mpName[3:5]
         iMP = re.sub(r"MP_.....(.)", r"\1", mpName)
 
         # numbers of memories
@@ -149,10 +161,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         NPageSum = 0
         index = 0
         for TPROJ in TPMems[mpName]:
-            print(mpName, TPROJ)
             npage = len(TPROJ)-17
+            if TPROJ.endswith("_E"):
+                npage = len(TPROJ)-19
             NPageSum += npage
-            print("TPROJ npage", TPROJ, npage)
             NPage = NPage | ((npage-1) << (2*index))
             index+=1
             

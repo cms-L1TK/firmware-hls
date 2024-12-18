@@ -196,20 +196,31 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       asOuterMask = 0
       asInnerMems[tpName].sort()
       asOuterMems[tpName].sort()
-
+      
       # TPROJ masks for barrel and disks
       tprojMaskBarrel = 0
-      for projout in ProjoutIndexBarrel:
-          projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
-          projoutIndex = projout.value
-          if projoutName in tprojMems[tpName]:
-              tprojMaskBarrel = tprojMaskBarrel | (1 << projoutIndex)
       tprojMaskDisk = 0
-      for projout in ProjoutIndexDisk:
-          projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
-          projoutIndex = projout.value
-          if projoutName in tprojMems[tpName]:
-              tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
+      if tpName in tprojMems :
+          for projout in ProjoutIndexBarrel:
+              projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
+              projoutIndex = projout.value
+              if projoutName in tprojMems[tpName]:
+                  tprojMaskBarrel = tprojMaskBarrel | (1 << projoutIndex)
+          for projout in ProjoutIndexDisk:
+              projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
+              projoutIndex = projout.value
+              if projoutName in tprojMems[tpName]:
+                  tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)      
+      else:
+          #This corresponds to the case where we don't have projections the
+          #configuration because they are now done in the PC. However, we are
+          #maintaining the possibility to have projections for compatibility
+          #with the new emulation code. In any rational world we would set
+          #these masks below to zero, but this leads to a hard crash in vivado
+          #documented in email between ryd and ahart on Dec. 10&11 2024.
+          tprojMaskBarrel = 1
+          tprojMaskDisk = 1
+
       # figure out sizes of LUTs by reading .tab files, do once per seed type
       if seed not in seedlist:
         LUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}.tab".format(seed))) - 2)
@@ -219,7 +230,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
       # Print out parameters for this TP.
       parametersFile.write(
           ("\n"
-          "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TP::" + iTC + ">() {\n"
+           "template<> constexpr uint32_t TPROJMaskBarrel<TF::" + seed + ", TP::" + iTC + ">() {\n"
           "  return 0x%X;\n"
           "}\n"
           "template<> constexpr uint32_t TPROJMaskDisk<TF::" + seed + ", TP::" + iTC + ">() {\n"

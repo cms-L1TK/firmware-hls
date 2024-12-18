@@ -64,10 +64,10 @@ with open(arguments.wiresFileName, "r") as wiresFile:
     barrelFMMems = {}
     diskFMMems = {}
     for line in wiresFile:
-        if " FT_" not in line:
+        if " TB_" not in line:
             continue
         line = line.rstrip()
-        tbName = re.sub(r".*FT_(....).*", r"FT_\1", line)
+        tbName = re.sub(r".*TB_(....).*", r"TB_\1", line)
         seed = tbName.split("_")[1]
         memName = line.split()[0]
         partype = "TPAR"
@@ -129,7 +129,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
     # Calculate parameters and print out top function for each TB.
     for tbName in sorted(tparMems.keys()):
-        seed = re.sub(r"FT_(....)", r"\1", tbName)
+        seed = re.sub(r"TB_(....)", r"\1", tbName)
         seedNumber = None
         if seed == "L1L2":
             seedNumber = 0
@@ -157,10 +157,31 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
         # numbers of output stubs
         barrelFMs = sorted([fm[0:10] for fm in barrelFMMems[tbName]])
+        diskFMs = sorted([fm[0:10] for fm in diskFMMems[tbName]])
         nBarrelStubs = len(set(barrelFMs))
         nDiskStubs = len({fm[0:10] for fm in diskFMMems[tbName]})
 
         # numbers of memories per stub
+        layercount = {}
+        for fm in barrelFMs :
+            if fm not in layercount:
+                layercount[fm]=0;
+            layercount[fm]+=1;
+        NFMBarrel=0
+        for layer in layercount:
+            shift=int(layer[-1])-1
+            NFMBarrel+=(layercount[layer]<<(4*shift))
+
+        diskcount = {}
+        for fm in diskFMs :
+            if fm not in diskcount:
+                diskcount[fm]=0;
+            diskcount[fm]+=1;
+        NFMDisk=0
+        for disk in diskcount:
+            shift=int(disk[-1])-1
+            NFMDisk+=(diskcount[disk]<<(4*shift))
+
         barrelFM0 = barrelFMs[0] if len(barrelFMs) > 0 else ""
         nBarrelFMMemPerStub0 = barrelFMs.count(barrelFM0)
         barrelFMs = [fm for fm in barrelFMs if fm != barrelFM0]
@@ -337,7 +358,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "#pragma HLS interface register port=done\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(NFMBarrel) + ", " + str(NFMDisk) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
             "    bx,\n"
             "    trackletParameters1,\n"
             "    trackletParameters2,\n"

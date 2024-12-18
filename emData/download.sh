@@ -6,8 +6,8 @@ set -e
 memprints_url_cm="https://cernbox.cern.ch/remote.php/dav/public-files/P2URd03nlGDfpDt/MemPrints.tar.gz"
 luts_url_cm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_Combined_231208.tgz"
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/MUMRM6yWEBSDWiQ/MemPrints_Split_241116.tgz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/lKAs7GNBTXKfR9d/LUTs_Split_241116.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/OQ2KBOdsn9McbGq/MemPrints_Split_241213.tgz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/Y86N9sy98BsBRJe/LUTs_Split_241213.tgz"
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/kv2U49bw93chvZG/MemPrints_CMReduced_040424.tar.gz"
 luts_url_reducedcm="https://ahart.web.cern.ch/ahart/tf/test_vectors/LUTs_CMReduced_240121.tgz"
@@ -252,33 +252,37 @@ cd ../
 
 if [[ $tables_only == 0 ]]
 then
-  echo "Getting MemPrints tar balls"
-  # Get memory test data: download and unpack the tarball.
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_split}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsSplit
-  rm -f MemPrints.tgz
+    # Get memory test data: download and unpack the tarball.
+    echo "Getting MemPrints tar balls Split"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_split}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsSplit
+    rm -f MemPrints.tgz
+  
+    echo "Getting MemPrints tar balls Reduced CM"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsReducedCM
+    rm -f MemPrints.tgz
+    
+    echo "Getting MemPrints tar balls Reduced CM2"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm2}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsReducedCM2
+    
+    echo "Getting MemPrints tar balls Reduced CM Barrel"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsCMBarrel
+    rm -f MemPrints.tgz
 
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_reducedcm}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsReducedCM
-  rm -f MemPrints.tgz
-
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm2}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsReducedCM2
-
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cmbarrel}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsCMBarrel
-  rm -f MemPrints.tgz
-
-  wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm}
-  tar -xzmf MemPrints.tgz
-  mv MemPrints MemPrintsCM
-  rm -f MemPrints.tgz
-
-  echo "Done getting MemPrints tar balls"
+    echo "Getting MemPrints tar balls Reduced CM"
+    wget --no-check-certificate -O MemPrints.tgz --quiet ${memprints_url_cm}
+    tar -xzmf MemPrints.tgz
+    mv MemPrints MemPrintsCM
+    rm -f MemPrints.tgz
+  
+    echo "Done getting MemPrints tar balls"
 
 fi
 
@@ -286,7 +290,7 @@ fi
 # https://forums.xilinx.com/t5/Installation-and-Licensing/Vivado-2016-4-on-Ubuntu-16-04-LTS-quot-awk-symbol-lookup-error/td-p/747165
 unset LD_LIBRARY_PATH
 
-mod_types=(IR FT PD VMRCM VMSMER TP MP PC)
+mod_types=(IR TB PD VMRCM VMSMER TP MP PC)
 
 for module_type in ${mod_types[@]}
 do
