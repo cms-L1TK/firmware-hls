@@ -70,12 +70,14 @@ protected:
   };
 
   DataType dataarray_[NCP][kNBxBins][kNMemDepth];  // data array
-  BunchXingT write_bx_;                //BX for writing 
 
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
 
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   ap_uint<4> nentriestmp_[1<<NBIT_BIN];
+  BunchXingT write_bx_;                //BX for writing
+#endif
 
 public:
 
@@ -85,9 +87,11 @@ public:
   unsigned int getNEntryPerBin() const {return (1<<(NBIT_ADDR-NBIT_BIN));}
   unsigned int getNCopy() const {return NCOPY;}
 
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   void setWriteBX(const BunchXingT& ibx) {
     write_bx_ = ibx;
   }
+#endif
   
   NEntryT getEntries(const BunchXingT& bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
@@ -146,16 +150,17 @@ public:
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
 
-    if (isCMSSW && !NBIT_BX) {write_bx_ = 0;}
 
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
     //The vhdl implementation will write to the correct address
-    dataarray_[0][write_bx_][getNEntryPerBin()*slot] = data;
+    dataarray_[0][0][getNEntryPerBin()*slot] = data;
     return true;
 
 #else
 
 #pragma HLS ARRAY_PARTITION variable=nentriestmp_ complete dim=0
+
+    if (isCMSSW && !NBIT_BX) {write_bx_ = 0;}
 
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
