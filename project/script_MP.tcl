@@ -10,24 +10,36 @@ set modules_to_test {
     {MP_L1PHIB}
     {MP_L2PHIB}
     {MP_L3PHIB}
+    {MP_L3PHIB_E}
     {MP_L4PHIB}
+    {MP_L4PHIB_E}
     {MP_L5PHIB}
+    {MP_L5PHIB_E}
     {MP_L6PHIB}
+    {MP_L6PHIB_E}
     {MP_D1PHIB}
     {MP_D2PHIB}
     {MP_D3PHIB}
+    {MP_D3PHIB_E}
     {MP_D4PHIB}
+    {MP_D4PHIB_E}
     {MP_D5PHIB}
     {MP_L1PHIC}
     {MP_L2PHIC}
     {MP_L3PHIC}
+    {MP_L3PHIC_E}
     {MP_L4PHIC}
+    {MP_L4PHIC_E}
     {MP_L5PHIC}
+    {MP_L5PHIC_E}
     {MP_L6PHIC}
+    {MP_L6PHIC_E}
     {MP_D1PHIC}
     {MP_D2PHIC}
     {MP_D3PHIC}
+    {MP_D3PHIC_E}
     {MP_D4PHIC}
+    {MP_D4PHIC_E}
     {MP_D5PHIC}
 }
 
@@ -48,8 +60,9 @@ add_files -tb ../emData/MP/
 
 foreach i $modules_to_test {
   set layerDisk [string range $i 3 4]
-  set iMP [string range $i 8 9]
-  set top_func [join [list "MatchProcessor_" $layerDisk "PHI" $iMP] ""]
+  set iMP [string range $i 8 8]
+  set extra [string range $i 9 10]
+  set top_func [join [list "MatchProcessor_" $layerDisk "PHI" $iMP $extra] ""]
   puts [join [list "======== TESTING " $i " ========"] ""]
   puts [join [list "layerDisk = " $layerDisk] ""]
   puts [join [list "iMP = " $iMP] ""]

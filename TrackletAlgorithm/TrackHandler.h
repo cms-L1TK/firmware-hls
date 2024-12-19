@@ -2,8 +2,8 @@
 #define TrackletAlgorithm_TrackHandler_h
 #include "TrackFitMemory.h"
 #include "hls_stream.h"
-const int NBarrelStub = 4;
-const int NDiskStub = 4;
+const int NBarrelStub = 6;
+const int NDiskStub = 5;
 typedef TrackFit<NBarrelStub, NDiskStub> TrackFitType;
 const unsigned int kFullBarrelStubSize = TrackFitType::kBarrelStubSize * NBarrelStub;
 const unsigned int kFullDiskStubSize = TrackFitType::kDiskStubSize * NDiskStub;
