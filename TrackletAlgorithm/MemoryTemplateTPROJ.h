@@ -92,6 +92,7 @@ public:
   }
 
   ap_uint<NPAGE> getMask(const BunchXingT& bx) const {
+#pragma HLS ARRAY_PARTITION variable=mask_ complete dim=0
 #pragma HLS inline
     return mask_[bx];
   }
