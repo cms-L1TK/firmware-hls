@@ -10,38 +10,41 @@ set modules_to_test {
     {MP_L1PHIB}
     {MP_L2PHIB}
     {MP_L3PHIB}
-    {MP_L3PHIB_E}
     {MP_L4PHIB}
-    {MP_L4PHIB_E}
     {MP_L5PHIB}
-    {MP_L5PHIB_E}
     {MP_L6PHIB}
-    {MP_L6PHIB_E}
     {MP_D1PHIB}
     {MP_D2PHIB}
     {MP_D3PHIB}
-    {MP_D3PHIB_E}
     {MP_D4PHIB}
-    {MP_D4PHIB_E}
     {MP_D5PHIB}
     {MP_L1PHIC}
     {MP_L2PHIC}
     {MP_L3PHIC}
-    {MP_L3PHIC_E}
     {MP_L4PHIC}
-    {MP_L4PHIC_E}
     {MP_L5PHIC}
-    {MP_L5PHIC_E}
     {MP_L6PHIC}
-    {MP_L6PHIC_E}
     {MP_D1PHIC}
     {MP_D2PHIC}
     {MP_D3PHIC}
-    {MP_D3PHIC_E}
     {MP_D4PHIC}
-    {MP_D4PHIC_E}
     {MP_D5PHIC}
 }
+
+#Add these if using extra MPs
+#    {MP_L3PHIB_E}
+#    {MP_L4PHIB_E}
+#    {MP_L5PHIB_E}
+#    {MP_L6PHIB_E}
+#    {MP_D3PHIB_E}
+#    {MP_D4PHIB_E}
+#    {MP_L3PHIC_E}
+#    {MP_L4PHIC_E}
+#    {MP_L5PHIC_E}
+#    {MP_L6PHIC_E}
+#    {MP_D3PHIC_E}
+#    {MP_D4PHIC_E}
+
 
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
