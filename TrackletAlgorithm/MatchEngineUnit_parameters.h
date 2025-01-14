@@ -32,7 +32,7 @@ template<int kNBitsBuffer>
 class NearFull3Class {
   public:
     ap_uint<(1 << (2 * kNBitsBuffer))> lut;
-    nearFull3Class() {
+    NearFull3Class() {
       for (unsigned int i = 0; i < (1 << (2 * kNBitsBuffer)); i++)  {
          // Store complicated calculation in LUT array
          ap_uint<kNBitsBuffer> wptr, rptr;
@@ -103,7 +103,7 @@ template<int kNBitsBuffer>
 class EmptyUnitClass {
   public:
     ap_uint<(1 << (2 * kNBitsBuffer))> lut;
-    emptyUnitClass() {
+    EmptyUnitClass() {
       for (unsigned int i = 0; i < (1 << (2 * kNBitsBuffer)); i++)  {
          // Store complicated calculation in LUT array
          ap_uint<kNBitsBuffer> wptr, rptr;
