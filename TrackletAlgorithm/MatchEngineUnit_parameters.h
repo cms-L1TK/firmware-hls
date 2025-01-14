@@ -7,7 +7,7 @@
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFullUnit() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  static ap_uint<(1 << (2 * kNBitsBuffer))> lut;
   for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
 #pragma HLS unroll
     ap_uint<kNBitsBuffer> wptr, rptr;
@@ -30,7 +30,7 @@ static bool nearFullUnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> w
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull3Unit() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  static ap_uint<(1 << (2 * kNBitsBuffer))> lut;
   for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
 #pragma HLS unroll
     ap_uint<kNBitsBuffer> wptr, rptr;
@@ -55,7 +55,7 @@ static bool nearFull3UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> 
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull4Unit() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  static ap_uint<(1 << (2 * kNBitsBuffer))> lut;
   for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
 #pragma HLS unroll
     ap_uint<kNBitsBuffer> wptr, rptr;
@@ -82,7 +82,7 @@ static bool nearFull4UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> 
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> emptyUnit() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  static ap_uint<(1 << (2 * kNBitsBuffer))> lut;
   for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
 #pragma HLS unroll
     ap_uint<kNBitsBuffer> wptr, rptr;
@@ -104,7 +104,7 @@ static bool emptyUnitBool(ap_uint<kNBitsBuffer> wptr, ap_uint<kNBitsBuffer> rptr
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << (2 * kNBitsBuffer))> geq() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+  static ap_uint<(1 << (2 * kNBitsBuffer))> lut;
   for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
 #pragma HLS unroll
     ap_uint<kNBitsBuffer> istub, nstubs;
@@ -118,7 +118,7 @@ static const ap_uint<(1 << (2 * kNBitsBuffer))> geq() {
 
 template<int kNBitsBuffer>
 static const ap_uint<(1 << kNBitsBuffer)> nextUnit() {
-  ap_uint<(1 << kNBitsBuffer)> lut;
+  static ap_uint<(1 << kNBitsBuffer)> lut;
   for(int i = 0; i < (1 << kNBitsBuffer); ++i) {
 #pragma HLS unroll
     ap_uint<kNBitsBuffer> ptr(i);
