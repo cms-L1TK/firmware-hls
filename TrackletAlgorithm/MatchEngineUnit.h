@@ -282,7 +282,7 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
 #endif
 
  inline void set_empty() {
-   static const emptyUnitClass<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> EmptyUnitClass;
+   static const EmptyUnitClass<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> EmptyUnitClass;
    empty_ = EmptyUnitClass.lut[(readindex_,writeindex_)];
    //empty_ = emptyUnit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }
@@ -293,7 +293,7 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
  }
  
  inline bool nearFull() {
-   static const nearFull3Class<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> NearFull3Class;
+   static const NearFull3Class<MatchEngineUnitBase<VMProjType>::kNBitsBuffer> NearFull3Class;
    return NearFull3Class.lut[(readindex_,writeindex_)];
    //return nearFull3Unit<MatchEngineUnitBase<VMProjType>::kNBitsBuffer>()[(readindex_,writeindex_)];
  }

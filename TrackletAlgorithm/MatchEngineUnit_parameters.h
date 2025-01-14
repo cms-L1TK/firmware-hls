@@ -29,7 +29,7 @@ static bool nearFullUnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> w
 }
 
 template<int kNBitsBuffer>
-class nearFull3Class {
+class NearFull3Class {
   public:
     ap_uint<(1 << (2 * kNBitsBuffer))> lut;
     nearFull3Class() {
@@ -100,7 +100,7 @@ static bool nearFull4UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> 
 }
 
 template<int kNBitsBuffer>
-class emptyUnitClass {
+class EmptyUnitClass {
   public:
     ap_uint<(1 << (2 * kNBitsBuffer))> lut;
     emptyUnitClass() {
