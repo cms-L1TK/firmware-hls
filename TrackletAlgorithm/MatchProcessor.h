@@ -917,7 +917,6 @@ void MatchCalculator(BXType bx,
 ){
 
 #pragma HLS inline
-#pragma HLS array_partition variable=fullmatch complete dim=1
 
   using namespace PR;
 
@@ -1129,7 +1128,7 @@ void MatchCalculator(BXType bx,
 
   if(goodmatch) { // Write out only the best match, based on the seeding
 
-    if (proj_seed == TF::L1L2 || proj_seed == TF::L2L3 || proj_seed == TF::L5L6 || proj_seed == TF::L2D1 ) {
+    if (proj_seed == TF::L1L2 || proj_seed == TF::L2L3 || proj_seed == TF::L5L6 || proj_seed == TF::L2D1 || maxFullMatchVariants == 1) {
       fullmatch[0].write_mem(fm,savedMatch); // AAAA FM
     } else {
       fullmatch[1].write_mem(fm,savedMatch); // BBBB FM
@@ -1212,6 +1211,7 @@ void MatchProcessor(BXType bx,
   ap_uint<nMEM> mem_hasdata = 0;
 
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
+#pragma HLS array_partition variable=fullmatch
 
   init<nMEM, nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, iMem, iPage, nPages, mem_hasdata, numbersin, projin);

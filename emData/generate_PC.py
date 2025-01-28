@@ -79,8 +79,7 @@ arguments = parser.parse_args()
 with open(arguments.wiresFileName, "r") as wiresFile:
   tprojMems = {}
   for line in wiresFile:
-      proctype = "TP_"
-      if arguments.split : proctype = "PC_"
+      proctype = "PC_"
       if proctype not in line :
         continue
       line = line.rstrip()
@@ -89,8 +88,7 @@ with open(arguments.wiresFileName, "r") as wiresFile:
       outerLayer = pcName[5:7]
       memName = line.split()[0]
 
-      projtype = "TPROJ_"
-      if arguments.split : projtype = "MPROJ_"
+      projtype = "MPROJ_"
       if memName.startswith(projtype):
         if pcName not in tprojMems:
           tprojMems[pcName] = []

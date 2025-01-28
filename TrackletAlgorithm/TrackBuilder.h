@@ -1,6 +1,7 @@
 #ifndef TrackletAlgorithm_TrackBuilder_h
 #define TrackletAlgorithm_TrackBuilder_h
 
+#include "Constants.h"
 #include "TrackletParameterMemory.h"
 #include "FullMatchMemory.h"
 #include "TrackFitMemory.h"
@@ -21,8 +22,7 @@ typedef ap_uint<kNBitsITC> ITCType;
 typedef ap_uint<kNBits_MemAddr> IndexType;
 typedef ap_uint<kNBitsTrackletID> TrackletIDType;
 
-template<int NBarrelStubs, int NDiskStubs> void
-setTrackPars(TrackFit<NBarrelStubs, NDiskStubs> &track, const TrackletParameters &tpar)
+void setTrackPars(TrackFit<trklet::N_LAYER, trklet::N_DISK> &track, const TrackletParameters &tpar)
 {
   track.setPhiRegionInner(tpar.getPhiRegion());
   track.setStubIndexInner(tpar.getStubIndexInner());
@@ -116,9 +116,9 @@ void TrackBuilder(
     const FullMatchMemory<BARREL> barrelFullMatches[],
     const FullMatchMemory<DISK> diskFullMatches[],
     BXType &bx_o,
-    typename TrackFit<NBarrelStubs, NDiskStubs>::TrackWord trackWord[],
-    typename TrackFit<NBarrelStubs, NDiskStubs>::BarrelStubWord barrelStubWords[][kMaxProc],
-    typename TrackFit<NBarrelStubs, NDiskStubs>::DiskStubWord diskStubWords[][kMaxProc],
+    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::TrackWord trackWord[],
+    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::BarrelStubWord barrelStubWords[][kMaxProc],
+    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::DiskStubWord diskStubWords[][kMaxProc],
     bool &done
 )
 {
@@ -128,7 +128,7 @@ void TrackBuilder(
 
   constexpr int NStubs = NBarrelStubs + NDiskStubs;
 
-  constexpr unsigned int NFMBarrel[NBarrelStubs] = {
+  constexpr unsigned int NFMBarrel[trklet::N_LAYER] = {
     NFMPerStubBarrel&15,
     (NFMPerStubBarrel>>4)&15, 
     (NFMPerStubBarrel>>8)&15, 
@@ -137,14 +137,14 @@ void TrackBuilder(
     (NFMPerStubBarrel>>20)&15
   };
 
-  constexpr unsigned int NFMDisk[NDiskStubs] = {
+  constexpr unsigned int NFMDisk[trklet::N_DISK] = {
     NFMPerStubDisk&15,
     (NFMPerStubDisk>>4)&15,
     (NFMPerStubDisk>>8)&15,
     (NFMPerStubDisk>>12)&15,
     (NFMPerStubDisk>>16)&15};
 
-  constexpr unsigned int FMBarrelStart[NBarrelStubs] = {
+  constexpr unsigned int FMBarrelStart[trklet::N_LAYER] = {
     0,
     NFMBarrel[0],
     NFMBarrel[0]+NFMBarrel[1],
@@ -152,7 +152,7 @@ void TrackBuilder(
     NFMBarrel[0]+NFMBarrel[1]+NFMBarrel[2]+NFMBarrel[3],
     NFMBarrel[0]+NFMBarrel[1]+NFMBarrel[2]+NFMBarrel[3]+NFMBarrel[4]};
   
-  constexpr unsigned int FMDiskStart[NDiskStubs] = {
+  constexpr unsigned int FMDiskStart[trklet::N_DISK] = {
     0,
     NFMDisk[0],
     NFMDisk[0]+NFMDisk[1],
@@ -302,7 +302,7 @@ void TrackBuilder(
     // with the minimum tracklet ID.
     const TCIDType &TCID = (min_id != kInvalidTrackletID) ? (min_id >> kNBits_MemAddr) : TrackletIDType(0);
     const ITCType &iTC = TCID.range(kNBitsITC - 1, 0);
-    typename TrackFit<NBarrelStubs, NDiskStubs>::TFSEEDTYPE iseed = TCID >> kNBitsITC; //TCID.range(3+kNBitsITC-1,kNBitsITC);
+    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::TFSEEDTYPE iseed = TCID >> kNBitsITC; //TCID.range(3+kNBitsITC-1,kNBitsITC);
 
     //These are actually not needed any more...
     auto mparNPages = getMPARNPages<Seed>(iTC);
@@ -369,25 +369,25 @@ void TrackBuilder(
     }
 
     const IndexType &trackletIndex = (min_id != kInvalidTrackletID) ? (min_id & TrackletIDType(0x7F)) : TrackletIDType(0);
-    const typename TrackFit<NBarrelStubs, NDiskStubs>::TFPHIREGION phiRegionOuter = iTC / (iseed == TF::L1L2 ? 3 : (iseed == TF::L1D1 ? 2 : 1));
+    const typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::TFPHIREGION phiRegionOuter = iTC / (iseed == TF::L1L2 ? 3 : (iseed == TF::L1D1 ? 2 : 1));
 
-    TrackFit<NBarrelStubs, NDiskStubs> track(iseed);
+    TrackFit<trklet::N_LAYER, trklet::N_DISK> track(iseed);
     track.setPhiRegionOuter(phiRegionOuter);
     if ((TPARMask & 0x1) && mparNPages == 1) {
       const auto &tpar = trackletParameters1[mparMem].read_mem(bx, trackletIndex);
-      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+      setTrackPars(track, tpar);
     }
     else if ((TPARMask & 0x2) && mparNPages == 2) {
       const auto &tpar = trackletParameters2[mparMem].read_mem(bx, trackletIndex, mparPage);
-      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+      setTrackPars(track, tpar);
     }
     else if ((TPARMask & 0x4) && mparNPages == 3) {
       const auto &tpar = trackletParameters3[mparMem].read_mem(bx, trackletIndex, mparPage);
-      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+      setTrackPars(track, tpar);
     }
     else if ((TPARMask & 0x8) && mparNPages == 4) {
       const auto &tpar = trackletParameters4[mparMem].read_mem(bx, trackletIndex, mparPage);
-      setTrackPars<NBarrelStubs, NDiskStubs>(track, tpar);
+      setTrackPars(track, tpar);
     }   
     
     // Retrieve the full information for each full match that has the minimum
@@ -509,7 +509,7 @@ void TrackBuilder(
     // Output the track word and eleven stub words associated with the TrackFit
     // object that was constructed.
     trackWord[nTracks] = track.getTrackWord();
-    barrel_stub_words: for (short j = 0 ; NBarrelStubs > 0 && j < NBarrelStubs; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
+  barrel_stub_words: for (short j = 0 ; j < trklet::N_LAYER; j++) { // Note: need to have NBarrelStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
           barrelStubWords[j][nTracks] = track.template getBarrelStubWord<0>();
@@ -532,7 +532,7 @@ void TrackBuilder(
       }
     }
 
-    disk_stub_words: for (short j = 0 ; NDiskStubs > 0 && j < NDiskStubs; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
+  disk_stub_words: for (short j = 0 ; j < trklet::N_DISK; j++) { // Note: need to have NDiskStubs > 0 to prevent compilation error due to -Werror=type-limits flag in CMSSW
       switch (j) {
         case 0:
           diskStubWords[j][nTracks] = track.template getDiskStubWord<NBarrelStubs>();

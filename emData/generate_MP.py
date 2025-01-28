@@ -232,12 +232,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "#pragma HLS inline off\n"
             "#pragma HLS interface register port=bx_o\n"
         )
-        if nTPMem == 1:
+        if nTPMem == 0:
             topFile.write("#pragma HLS resource variable=projin.get_mem() latency=2\n")
         else:
             for i in range(nTPMem):
                 topFile.write("#pragma HLS resource variable=projin[" + str(i) + "].get_mem() latency=2\n")
-        if nFMMem == 1:
+        if nFMMem == 0:
             topFile.write("#pragma HLS resource variable=fullmatch.get_mem() latency=2\n")
         else:
             for i in range(nFMMem):
