@@ -64,13 +64,13 @@ architecture rtl of emp_payload is
   signal s_kfin                : t_channlesTB(numNodesKF - 1 downto 0);
   signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
-  signal FT_bx_out_0           : std_logic_vector(2 downto 0);
-  signal FT_bx_out_vld         : std_logic;
-  signal FT_done               : std_logic;
-  signal FT_last_track         : std_logic;
-  signal FT_last_track_vld     : std_logic;
-  signal TW_104_stream_AV_din  : t_arr_TW_104_DATA;
-  signal TW_104_stream_A_write : t_arr_TW_104_1b;
+  signal TB_bx_out_0           : std_logic_vector(2 downto 0);
+  signal TB_bx_out_vld         : std_logic;
+  signal TB_done               : std_logic;
+  signal TB_last_track         : std_logic;
+  signal TB_last_track_vld     : std_logic;
+  signal TW_113_stream_AV_din  : t_arr_TW_113_DATA;
+  signal TW_113_stream_A_write : t_arr_TW_113_1b;
   signal DW_49_stream_AV_din   : t_arr_DW_49_DATA;
   signal DW_49_stream_A_write  : t_arr_DW_49_1b;
   signal BW_46_stream_AV_din   : t_arr_BW_46_DATA;
@@ -129,20 +129,20 @@ begin
       PC_bx_out                 => open,
       PC_bx_out_vld             => open,
       PC_done                   => open,
-      FT_bx_out                 => FT_bx_out_0,
-      FT_bx_out_vld             => FT_bx_out_vld,
-      FT_done                   => FT_done,
-      FT_last_track             => FT_last_track,
-      FT_last_track_vld         => FT_last_track_vld,
+      TB_bx_out                 => TB_bx_out_0,
+      TB_bx_out_vld             => TB_bx_out_vld,
+      TB_done                   => TB_done,
+      TB_last_track             => TB_last_track,
+      TB_last_track_vld         => TB_last_track_vld,
       AS_36_wea                 => AS_36_wea,
       AS_36_writeaddr           => AS_36_writeaddr,
       AS_36_din                 => AS_36_din,
       MPAR_73_wea               => MPAR_73_wea,
       MPAR_73_writeaddr         => MPAR_73_writeaddr,
       MPAR_73_din               => MPAR_73_din,
-      TW_104_stream_AV_din      => TW_104_stream_AV_din,
-      TW_104_stream_A_full_neg  => (others => '1'),
-      TW_104_stream_A_write     => TW_104_stream_A_write,
+      TW_113_stream_AV_din      => TW_113_stream_AV_din,
+      TW_113_stream_A_full_neg  => (others => '1'),
+      TW_113_stream_A_write     => TW_113_stream_A_write,
       DW_49_stream_AV_din       => DW_49_stream_AV_din,
       DW_49_stream_A_full_neg   => (others => '1'),
       DW_49_stream_A_write      => DW_49_stream_A_write,
@@ -157,24 +157,14 @@ begin
   tf_to_kf_1 : entity work.tf_to_kf
     port map (
       clk_i          => clk_p,
-      TW_104_data_i  => TW_104_stream_AV_din,
-      TW_104_valid_i => TW_104_stream_A_write,
+      TW_113_data_i  => TW_113_stream_AV_din,
+      TW_113_valid_i => TW_113_stream_A_write,
       DW_49_data_i   => DW_49_stream_AV_din,
       DW_49_valid_i  => DW_49_stream_A_write,
       BW_46_data_i   => BW_46_stream_AV_din,
       BW_46_valid_i  => BW_46_stream_A_write,
-      kf_reset_i     => FT_bx_out_vld,
-      tftokf_o       => s_tftokf
-      );
-
-  -----------------------------------------------------------------------------
-  -- KF Input merger (to be replaced by DR)
-  -----------------------------------------------------------------------------
-  kf_input_merger_1 : entity work.kf_input_merger
-    port map (
-      clk            => clk_p,
-      din            => s_tftokf,
-      dout           => s_kfin
+      kf_reset_i     => TB_bx_out_vld,
+      tftokf_o       => s_kfin
       );
 
   -----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ use work.hybrid_data_types.all;
 
 package tf_interface_pkg is
 
-  constant numTW_104 : natural := enum_TW_104'pos(enum_TW_104'high) + 1;
+  constant numTW_104 : natural := enum_TW_113'pos(enum_TW_113'high) + 1;
   constant numBW_46 : natural := enum_BW_46'pos(enum_BW_46'high) + 1;
 
   function conv (l : ldata)
