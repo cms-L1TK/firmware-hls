@@ -762,16 +762,6 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
 
   static const ap_uint<(1<<(2*TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsBuffer))> TENearFullUINT=nearFullTEUnitInit();
 
-  constexpr int NRZBINS = (1<<TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsRZBin);
-
-  typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK vmstubsmask[NRZBINS];
-#pragma HLS array_partition variable=vmstubsmask complete dim=1
- entriesloop:for(unsigned int i=0;i<NRZBINS-1;i++) {
-#pragma HLS unroll
-  vmstubsmask[i]=(outerVMStubs->getBinMask8(bx,i+1),outerVMStubs->getBinMask8(bx,i));
-}
-  vmstubsmask[NRZBINS-1]=(ap_uint<8>(0),outerVMStubs->getBinMask8(bx,NRZBINS-1));
-
   constexpr int NTEUBits=3; //ceil(log2(kNTEUnits[Seed]));
 
   ap_uint<NTEUBits> iTEfirstidle = 0;
@@ -1054,8 +1044,11 @@ teunits[k].idle_;
     bool valid=!lutval___.and_reduce();
     
     //Get the mask of bins that has non-zero number of hits
-    typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK stubmask16 = vmstubsmask[start];
-    
+    ap_uint<1 + kNbitsrzbin> tmp((bx&1)*(1<<kNbitsrzbin) + start);
+    ap_uint<1 + kNbitsrzbin> tmpplusone((bx&1)*(1<<kNbitsrzbin) + start + 1);
+    typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK stubmask16 =
+      (outerVMStubs->getBinMaskB(tmpplusone), outerVMStubs->getBinMaskA(tmp));
+ 
     //Calculate the stub mask for which bins have hits _and_ are consistent with the inner stub
     typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK mask = ( (useregion___*usenext,useregion___) );
     typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::MEMMASK stubmask = stubmask16&mask;

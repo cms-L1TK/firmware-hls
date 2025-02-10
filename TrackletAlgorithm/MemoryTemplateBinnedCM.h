@@ -65,7 +65,7 @@ protected:
     kNSlots = DEPTH_BIN,
     kNMemDepth = DEPTH_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
-    kNBinsRZ = (1<<kNBitsRZBinCM),
+    kNBinsRZ = (1<<kNBitsRZBinCM),  //FIXME is this wrong?
     slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM))
   };
 
@@ -74,6 +74,10 @@ protected:
   ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
 
+  ap_uint<8> binmaskA_[slots];
+  ap_uint<8> binmaskB_[slots]; 
+ 
+  
 #if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   ap_uint<4> nentriestmp_[1<<NBIT_BIN];
   BunchXingT write_bx_;                //BX for writing
@@ -87,6 +91,15 @@ public:
   unsigned int getNEntryPerBin() const {return (1<<(NBIT_ADDR-NBIT_BIN));}
   unsigned int getNCopy() const {return NCOPY;}
 
+  ap_uint<8> getBinMaskA(const ap_uint<NBIT_BX+NBIT_BIN-kNBitsphibinCM>& addrbinmaskA) const {
+    // std::cout << "getBinMaskA:" << addrbinmaskA << std::endl;
+    return binmaskA_[addrbinmaskA];
+  }
+  
+  ap_uint<8> getBinMaskB(const ap_uint<NBIT_BX+NBIT_BIN-kNBitsphibinCM>& addrbinmaskB) const {
+    return binmaskB_[addrbinmaskB];
+  }
+  
 #if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
   void setWriteBX(const BunchXingT& ibx) {
     write_bx_ = ibx;
@@ -186,6 +199,11 @@ public:
 
     binmask8_[write_bx_][ibin].set_bit(ireg,true);
 
+    //std::cout << "write_bx_:" << write_bx_ << std::endl;
+    
+    binmaskA_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+    binmaskB_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+
     //icopy comparison must be signed int or future SW fails
   writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
@@ -207,9 +225,12 @@ public:
   void clear() {
 
     DataType data("0",16);
+    //std::cout << "Clear: " << kNBxBins << "  " << (1<<kNBitsRZBinCM) << std::endl;
     for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
       for (size_t ibin=0; ibin < (1<<kNBitsRZBinCM); ibin++) {
 	      binmask8_[ibx][ibin] = 0;
+	      binmaskA_[ibx*kNBinsRZ+ibin] = 0;
+	      binmaskB_[ibx*kNBinsRZ+ibin] = 0;
       }
       for (size_t ibin=0; ibin < kNMemDepth; ibin++) {
 	for (size_t icopy=0; icopy < NCP; icopy++) {

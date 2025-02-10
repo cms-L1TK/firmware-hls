@@ -1223,13 +1223,13 @@ void MatchProcessor(BXType bx,
   //The next projection to read, the number of projections and flag if we have
   //more projections to read
 
-  ap_uint<8> vmstubsmask[16];
-#pragma HLS array_partition variable=vmstubsmask complete dim=1
+  //  ap_uint<8> vmstubsmask[16];
+  //#pragma HLS array_partition variable=vmstubsmask complete dim=1
 
- entriesloop:for(unsigned int i=0; i<16; i++) {
-#pragma HLS unroll
-    vmstubsmask[i]=instubdata.getBinMask8(bx,i);
-  }
+  // entriesloop:for(unsigned int i=0; i<16; i++) {
+  //#pragma HLS unroll
+  //  vmstubsmask[i]=instubdata.getBinMask8(bx,i);
+  //}
 
 
   constexpr int nPRBAbits = 3;
@@ -1600,10 +1600,15 @@ void MatchProcessor(BXType bx,
 
       ap_uint<1> useSecond = zbin.range(0,0) == 1;
 
-      ap_uint<1> usefirstMinus = vmstubsmask[slot][ivmMinus];
-      ap_uint<1> usesecondMinus = useSecond && vmstubsmask[slot+1][ivmMinus];
-      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && vmstubsmask[slot][ivmPlus];
-      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && vmstubsmask[slot+1][ivmPlus];
+      ap_uint<1 + nZbinBits> tmp((bx&1)*(1<<nZbinBits) + slot);
+      ap_uint<1 + nZbinBits> tmpplusone((bx&1)*(1<<nZbinBits) + slot + 1);
+      ap_uint<8> vmstubsmasktmpA = instubdata.getBinMaskA(tmp);
+      ap_uint<8> vmstubsmasktmpB = instubdata.getBinMaskB(tmpplusone);
+      
+      ap_uint<1> usefirstMinus = vmstubsmasktmpA[ivmMinus];
+      ap_uint<1> usesecondMinus = useSecond && vmstubsmasktmpB[ivmMinus];
+      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && vmstubsmasktmpA[ivmPlus];
+      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && vmstubsmasktmpB[ivmPlus];
 
       increase = usefirstPlus || usesecondPlus || usefirstMinus || usesecondMinus;
 
