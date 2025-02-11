@@ -201,8 +201,10 @@ public:
 
     //std::cout << "write_bx_:" << write_bx_ << std::endl;
     
-    binmaskA_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
-    binmaskB_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+    //binmaskA_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+    //binmaskB_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+    binmaskA_[write_bx_*kNBinsRZ+ibin] = 0;
+    binmaskB_[write_bx_*kNBinsRZ+ibin] = 0;
 
     //icopy comparison must be signed int or future SW fails
   writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
