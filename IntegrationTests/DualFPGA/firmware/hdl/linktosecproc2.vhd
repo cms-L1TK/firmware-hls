@@ -230,8 +230,7 @@ begin
   MPAR_73_link_valid(L1D1EFGH) <= d(12).valid;
   MPAR_73_link_valid(L2D1ABCD) <= d(11).valid;
 
-  --latch bx_link_data when not valid
-  bx_link_data_int <= d(9).data(2 downto 0) when (d(9).valid='1') else bx_link_data_int;
+  bx_link_data_int <= d(9).data(2 downto 0);
   bx_link_data <= bx_link_data_int;
   bx_link_valid <= d(9).valid;
     

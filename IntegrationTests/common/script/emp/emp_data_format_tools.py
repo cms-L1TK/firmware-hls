@@ -96,6 +96,17 @@ def zero_pad(bitstring: str, length: int) -> str:
     new_bitstring = ''.join(['0' for i in range(len_difference)]) + bitstring
   return new_bitstring
 
+def r_to_pt(r: float) -> float:
+  """Converts track radius of curvature (in cm) to transverse momentum (in GeV)
+
+  Args:
+    r: Track radius of curvature in cm
+
+  Returns:
+    pT, track transverse momentum in GeV
+  """
+  return 0.299792458*3.8112*0.01*r
+
 class Bitmap:
   """Class to work with bit data
 
@@ -415,6 +426,164 @@ class EmpData:
     for channel in range(len(self.channels)):
       data.append(self.data[channel][frame])
     return data
+
+class TBWord:
+  """Class to interpret tracks output by TB
+
+  Attributes:
+    bitmap: raw bitmap representation of word
+  """
+
+  def __init__(self, bitmap: Bitmap):
+    """Constructor
+
+    Args:
+      bitmap: bitmap of track word data
+    """
+    self.bitmap = bitmap
+
+  def valid(self) -> bool:
+    """Returns valid bit
+
+    Returns:
+      true if word is valid, false otherwise
+    """
+    return (self.bitmap.substring(103,103).to_int()==1)
+
+  def invr(self) -> float:
+    """Returns 1/track curvature radius in /cm
+
+    Returns:
+      1/R where R is track curvature radius in cm
+    """
+    return self.bitmap.substring(79,66).undigitize(True,1.04549e-6)
+
+  def phi0(self) -> float:
+    """Returns track azimuthal angle at origin
+
+    Returns:
+      phi0, azimuthal angle at origin (rel to sector?)
+    """
+    return self.bitmap.substring(65,48).undigitize(True,1.56824e-5)
+
+  def z0(self) -> float:
+    """Returns track longitudinal displacement in cm
+
+    Returns:
+      z0, longitudinal displacement in cm
+    """
+    return self.bitmap.substring(47,38).undigitize(True,0.0585938)
+
+  def tanl(self) -> float:
+    """Returns tan(lambda)=cot(theta)
+
+    Returns:
+      cotangent of polar angle
+    """
+    return self.bitmap.substring(37,24).undigitize(True,0.00195312)
+
+  def pt(self) -> float:
+    """Returns track pT in GeV
+
+    Returns:
+      pT, transerve momentum in GeV
+    """
+    return r_to_pt(1.0/self.invr())
+
+  def eta(self) -> float:
+    """Returns pseudorapidity
+
+    Returns:
+      eta, pseudorapidity
+    """
+    return math.asinh(self.tanl())
+
+  def print(self):
+    """Prints track properties
+    """
+    print(('TW {}: valid: {}, 1/R: {} cm-1, pT: {} GeV, phi: {}, z0: {}, '
+           +'cottheta: {}, eta: {}').format(self.bitmap.to_hexstring(),
+           self.valid(),self.invr(),self.pt(),self.phi0(),self.z0(),self.tanl(),
+           self.eta()))
+
+class TQWord:
+  """Class to interpret tracks output by KF/TQ
+
+  Attributes:
+    bitmap: raw bitmap representation of word
+  """
+
+  def __init__(self, bitmap: Bitmap):
+    """Constructor
+
+    Args:
+      bitmap: bitmap of track word data
+    """
+    self.bitmap = bitmap
+
+  def valid(self) -> bool:
+    """Returns valid bit
+
+    Returns:
+      true if word is valid, false otherwise
+    """
+    return (self.bitmap.substring(95,95).to_int()==1)
+
+  def invr(self) -> float:
+    """Returns 1/(2x?)track curvature radius in /cm
+
+    Returns:
+      1/R (1/2R?) where R is track curvature radius in cm
+    """
+    return self.bitmap.substring(94,80).undigitize(True,2.60212e-07 )
+
+  def phi0(self) -> float:
+    """Returns track azimuthal angle at origin
+
+    Returns:
+      phi0, azimuthal angle at origin rel to sector center
+    """
+    return self.bitmap.substring(79,68).undigitize(True,0.000340885)
+
+  def z0(self) -> float:
+    """Returns track longitudinal displacement in cm
+
+    Returns:
+      z0, longitudinal displacement in cm
+    """
+    return self.bitmap.substring(47,36).undigitize(True,0.00999469)
+
+  def tanl(self) -> float:
+    """Returns tan(lambda)=cot(theta)
+
+    Returns:
+      cotangent of polar angle
+    """
+    return self.bitmap.substring(63,48).undigitize(True,0.000244141)
+
+  def pt(self) -> float:
+    """Returns track pT in GeV
+
+    Returns:
+      pT, transerve momentum in GeV
+    """
+    return r_to_pt(1.0/self.invr())
+
+  def eta(self) -> float:
+    """Returns pseudorapidity
+
+    Returns:
+      eta, pseudorapidity
+    """
+    return math.asinh(self.tanl())
+
+  def print(self):
+    """Prints track properties
+    """
+    print(('TW {}: valid: {}, 1/R: {} cm-1, pT: {} GeV, phi: {}, z0: {}, '
+           +'cottheta: {}, eta: {}').format(self.bitmap.to_hexstring(),
+           self.valid(),self.invr(),self.pt(),self.phi0(),self.z0(),self.tanl(),
+           self.eta()))
 
 def load_emp_data(filename: str) -> EmpData:
   """Reads data from EMP file and stores result as EmpData object
