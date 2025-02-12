@@ -189,10 +189,16 @@ public:
     //array. This works because the test benches does not check the nentries_
     //However, in a testbench when we read in a VM memory we need the
     //nentries_ to be properly set for use in the TP or MP modules
+
 #if !defined __SYNTHESIS__
     if (ibin!=0) {
       nentries_[write_bx_*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
     }
+    binmaskA_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+    binmaskB_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+#else
+    binmaskA_[write_bx_*kNBinsRZ+ibin] = 0;
+    binmaskB_[write_bx_*kNBinsRZ+ibin] = 0;
 #endif
 
     nentriestmp_[slot] = nentry+1;
@@ -201,11 +207,6 @@ public:
 
     //std::cout << "write_bx_:" << write_bx_ << std::endl;
     
-    //binmaskA_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
-    //binmaskB_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
-    binmaskA_[write_bx_*kNBinsRZ+ibin] = 0;
-    binmaskB_[write_bx_*kNBinsRZ+ibin] = 0;
-
     //icopy comparison must be signed int or future SW fails
   writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
