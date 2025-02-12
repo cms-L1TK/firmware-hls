@@ -14,6 +14,16 @@
 --!        PAGE_LENGTH =  BIN_DEPTH * NBIN total memory depth
 --!
 --!        This memory inplements the binned, VMStubs, memories
+--!
+--! This memory stores VMStubs in bins of phi and r/z. When writing to
+--! a memory the counter of the number of entries in each bin is incremented
+--! and the bit mask for occupacy in the bin is set true. Note that when we
+--! start writing to a new BX the number of entries are not reset to zero -
+--! this can not be done in one clock as this is implemented as DRAM. The values
+--! in the number of entries are only correct if the bin mask indicates that
+--! there are stubs in a bin. Furthermore, the bin mask is also implemented
+--! as a DRAM - we do have an array of registers for each r/z bin that is reset
+--! when a new BX is processed.
 --!        
 --! @author anders.ryd@cornell.edu (based on code from robert.glein@colorado.edu)
 --! @date 2023-02-02 (Groundhog day!)
