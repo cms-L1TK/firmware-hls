@@ -236,7 +236,7 @@ topReducedCombined-sim:
   allow_failure: true
   variables:
     VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - job: download
     - job: IR-vivado-hls-build
@@ -259,7 +259,7 @@ topReducedCombined-check-results:
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
-    PROJ_NAME: "ReducedCombinedConfig"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - download
     - topReducedCombined-sim
@@ -269,7 +269,7 @@ topReducedCombined-synth:
   allow_failure: true
   variables:
     VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - job: download
     - job: topReducedCombined-sim
