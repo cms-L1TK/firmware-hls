@@ -71,7 +71,6 @@ protected:
 
   DataType dataarray_[NCP][kNBxBins][kNMemDepth];  // data array
 
-  ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
 
   ap_uint<8> binmaskA_[slots];
@@ -117,11 +116,6 @@ public:
     return nentries_[bx*(1<<kNBitsRZBinCM)+ibin];
   }
 
-  ap_uint<8> getBinMask8(const BunchXingT& bx, ap_uint<kNBitsRZBinCM> ibin) const {
-#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
-    return binmask8_[bx][ibin];
-  }
-
   NEntryT getEntries(const BunchXingT& bx) const {
     NEntryT val = 0;
     for ( auto i = 0; i < getDepth(); ++i ) {
@@ -159,7 +153,6 @@ public:
 
   bool write_mem(ap_uint<NBIT_BIN> slot, const DataType& data) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
-#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
 
@@ -203,10 +196,6 @@ public:
 
     nentriestmp_[slot] = nentry+1;
 
-    binmask8_[write_bx_][ibin].set_bit(ireg,true);
-
-    //std::cout << "write_bx_:" << write_bx_ << std::endl;
-    
     //icopy comparison must be signed int or future SW fails
   writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
 #pragma HLS unroll
@@ -231,9 +220,8 @@ public:
     //std::cout << "Clear: " << kNBxBins << "  " << (1<<kNBitsRZBinCM) << std::endl;
     for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
       for (size_t ibin=0; ibin < (1<<kNBitsRZBinCM); ibin++) {
-	      binmask8_[ibx][ibin] = 0;
-	      binmaskA_[ibx*kNBinsRZ+ibin] = 0;
-	      binmaskB_[ibx*kNBinsRZ+ibin] = 0;
+	binmaskA_[ibx*kNBinsRZ+ibin] = 0;
+	binmaskB_[ibx*kNBinsRZ+ibin] = 0;
       }
       for (size_t ibin=0; ibin < kNMemDepth; ibin++) {
 	for (size_t icopy=0; icopy < NCP; icopy++) {
