@@ -249,7 +249,12 @@ def comparePredefined(args):
     # Find the lists of filenames
     comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
+    print("comparison_filename_list")
+    print(comparison_filename_list)
     reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
+    print("reference_filename_list")
+    print(reference_filename_list)
+    print("Done"
     try:
         reference_filename_list = [glob.glob(reference_dir+"*/*"+f+"*.dat")[0] for f in reference_filename_list] # Find the corresponding reference filenames
     except IndexError :
