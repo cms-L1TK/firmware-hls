@@ -94,6 +94,8 @@ package tf_pkg is
   type t_arr8_8_8_1b is array(0 to 7) of t_arr8_8_1b;
   type t_arr8_8_8_4b is array(0 to 7) of t_arr8_8_4b;
   -- Others
+  type t_arr_1d_bol is array(natural range <>) of boolean;                   --! 1D array of boolean
+  type t_arr_1d_nat is array(natural range <>) of natural;                  --! 1D array of natural
   type t_arr_1d_int is array(natural range <>) of integer;                  --! 1D array of int
   type t_arr_2d_int is array(natural range <>,natural range <>) of integer; --! 2D array of int
   type t_arr_2d_slv is array(natural range <>, natural range <>) of std_logic_vector(EMDATA_WIDTH-1 downto 0); --! 2D array of slv
