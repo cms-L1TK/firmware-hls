@@ -31,8 +31,13 @@ switch -glob -- $exe {
         config_schedule -relax_ii_for_timing=0 -verbose
     }
 }
+
+# Register all scalar ports
+config_interface -register_io scalar_all
+
 #enable HLS to use fully registered DSPs
 config_schedule -enable_dsp_full_reg
+
 # Encourage HLS to make more effort to find best solution.
 # (Worth trying, but increases CPU use, so not enabled by default)
 #config_bind -effort high -enable_dsp_full_reg
