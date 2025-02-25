@@ -10,7 +10,7 @@ cd $settings_cwd
 config_compile -name_max_length 100
 
 # Set clock frequency
-create_clock -period 250MHz -name default
+create_clock -period 400MHz -name default
 
 # Set FPGA variable with part number
 source fpga.tcl
