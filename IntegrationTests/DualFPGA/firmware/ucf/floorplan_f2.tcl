@@ -1,5 +1,9 @@
 #this XDC contains physical constraints for the second FPGA project
 
+#Payload false paths - should this be moved?
+
+set_false_path -through [get_nets payload/sp2_mem_writer_1/HLS_reset]
+
 #temporary delete_pblocks for pblocks in previous versions of this script to avoid left-over shenanigans that will confuse vivado
 
 delete_pblocks -quiet pblock_payload_MPD4BD5B pblock_payload_MPD4CD5C pblock_payload_FMpipeline1 pblock_payload_MPL6AL6B pblock_payload_MPL6CL6D 
@@ -798,22 +802,18 @@ add_cells_to_pblock [get_pblocks pblock_payload_FTL2D1] [get_cells -quiet [list 
 
 #KF pblocks
 
-set lpblock_payload_kf_input_merger [create_pblock pblock_payload_kf_input_merger]
-add_cells_to_pblock [get_pblocks pblock_payload_kf_input_merger] [get_cells -quiet [list \
-          payload/kf_input_merger_1 \
-          ]]
-
 set lpblock_payload_KF [create_pblock pblock_payload_KF]
 add_cells_to_pblock [get_pblocks pblock_payload_KF] [get_cells -quiet [list \
           payload/kf_wrapper_1/kf_top_1 \
           payload/kf_wrapper_1/kfin_top_1 \
+          payload/kf_wrapper_1/kf_input_merger_1 \
           payload/kfout_isolation_out_1 \
           ]]
 
-set lpblock_payload_KFout [create_pblock pblock_payload_KFout]
-add_cells_to_pblock [get_pblocks pblock_payload_KFout] [get_cells -quiet [list \
-          payload/kf_wrapper_1/kfout_top_1 \
-          ]]
+#set lpblock_payload_KFout [create_pblock pblock_payload_KFout]
+#add_cells_to_pblock [get_pblocks pblock_payload_KFout] [get_cells -quiet [list \
+#          payload/kf_wrapper_1/kfout_top_1 \
+#          ]]
 
 
 #set parents
@@ -1836,14 +1836,14 @@ add_rects_to_pblock_mod $lpblock_payload_FTL5L6 $pblock_payload_FTL5L6rect
 set pblock_payload_KFrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=8 && ROW_INDEX<=9}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
 add_rects_to_pblock_mod $lpblock_payload_KF $pblock_payload_KFrect
 
-set pblock_payload_KFoutrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=10 && ROW_INDEX<=11}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
-add_rects_to_pblock_mod $lpblock_payload_KFout $pblock_payload_KFoutrect
+#set pblock_payload_KFoutrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=10 && ROW_INDEX<=11}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
+#add_rects_to_pblock_mod $lpblock_payload_KFout $pblock_payload_KFoutrect
 
 set pblock_payload_ASinrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX<=7}] -f "RPM_X >= 4000"]]
 add_rects_to_pblock_mod $lpblock_payload_ASin $pblock_payload_ASinrect
 
-set pblock_payload_KFinputmergerrect [find_rects [get_sites -f "RPM_X <= 1200 && RPM_Y>=496 && RPM_Y <= 992"]]
-add_rects_to_pblock_mod $lpblock_payload_kf_input_merger $pblock_payload_KFinputmergerrect
+#set pblock_payload_KFinputmergerrect [find_rects [get_sites -f "RPM_X <= 1200 && RPM_Y>=496 && RPM_Y <= 992"]]
+#add_rects_to_pblock_mod $lpblock_payload_kf_input_merger $pblock_payload_KFinputmergerrect
 
 
 set pblock_payload_PCVMSMERDsrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=7}] -f "RPM_X >= 4200"]]
