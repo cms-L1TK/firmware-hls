@@ -12,11 +12,11 @@ use work.memUtil_aux_pkg_f2.all;
 entity linktosecproc2 is
   port(
     clk                : in std_logic;
-    rst                : in std_logic;
     d                  : in ldata(4 * N_REGION - 1 downto 0);
     AS_36_link_data    : out t_arr_AS_36_37b;
     MPAR_73_link_data  : out t_arr_MTPAR_73_76b;
     bx_link_data       : out std_logic_vector(2 downto 0);
+    ctl_link_data      : out std_logic_vector(60 downto 0);
     AS_36_link_valid   : out t_arr_AS_36_1b;
     MPAR_73_link_valid : out t_arr_MTPAR_73_1b;
     bx_link_valid      : out std_logic
@@ -26,7 +26,6 @@ end linktosecproc2;
 
 architecture rtl of linktosecproc2 is
 
-  signal bx_link_data_int : std_logic_vector(2 downto 0) := "000";
   signal AS_signals       : std_logic_vector(48*37 - 1 downto 0);
   signal MTPAR_signals    : std_logic_vector(15*76 - 1 downto 0);
 
@@ -230,8 +229,8 @@ begin
   MPAR_73_link_valid(L1D1EFGH) <= d(12).valid;
   MPAR_73_link_valid(L2D1ABCD) <= d(11).valid;
 
-  bx_link_data_int <= d(9).data(2 downto 0);
-  bx_link_data <= bx_link_data_int;
+  bx_link_data <= d(9).data(2 downto 0);
+  ctl_link_data <= d(9).data(63 downto 3);
   bx_link_valid <= d(9).valid;
     
 end rtl;

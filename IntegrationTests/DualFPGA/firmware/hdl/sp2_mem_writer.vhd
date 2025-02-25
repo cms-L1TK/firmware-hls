@@ -15,10 +15,10 @@ use work.memUtil_aux_pkg_f2.all;
 entity sp2_mem_writer is
   port (
     clk                       : in std_logic;
-    reset                     : in std_logic;
     AS_36_link_data           : in t_arr_AS_36_37b;
     MPAR_73_link_data         : in t_arr_MTPAR_73_76b;
     bx_link_data              : in std_logic_vector(2 downto 0);
+    ctl_link_data             : in std_logic_vector(60 downto 0);
     AS_36_link_valid          : in t_arr_AS_36_1b;
     MPAR_73_link_valid        : in t_arr_MTPAR_73_1b;
     bx_link_valid             : in std_logic;
@@ -29,7 +29,8 @@ entity sp2_mem_writer is
     MPAR_73_writeaddr         : out t_arr_MTPAR_73_ADDR;
     MPAR_73_din               : out t_arr_MTPAR_73_DATA;
     PC_start                  : out std_logic;
-    PC_bx_in                  : out std_logic_vector(2 downto 0)
+    PC_bx_in                  : out std_logic_vector(2 downto 0);
+    HLS_reset                 : out std_logic
     );
 end entity sp2_mem_writer;
 
@@ -72,7 +73,7 @@ architecture rtl of sp2_mem_writer is
   signal PC_bx_in_pipeline          : std_logic_vector(2 downto 0) := "000";
   signal PC_start_pipeline          : std_logic                    := '0';
 
-  signal PC_start_hack              : std_logic                    := '0';
+  signal HLS_reset_int              : std_logic                    := '0';
 
 begin -- architecture rtl
   
@@ -137,10 +138,16 @@ begin -- architecture rtl
       if (bx_link_valid='1') then
         bx_prev <= bx_link_data;
       end if;
-      if (reset='1') then
+      --rely on control signals for start management
+      if (bx_link_valid = '1' 
+             and ctl_link_data(60 downto 1) = x"00000000D02E5E7") then
         PC_start_int <= '0';
-      elsif (bx_link_valid_prev='0' and bx_link_valid='1' 
-             and bx_link_data="001") then --temporary test
+        HLS_reset_int <= '1';
+      elsif (bx_link_valid = '1' 
+             and ctl_link_data(60 downto 1) = x"0000000E2D2E5E7") then
+        HLS_reset_int <= '0';
+      elsif (bx_link_valid = '1' 
+             and ctl_link_data(60 downto 1) = x"00000000D057A27") then
         PC_start_int <= '1';
       end if;
 
@@ -163,6 +170,7 @@ begin -- architecture rtl
   MPAR_73_din_pipeline0 <= MPAR_73_din_int;
   PC_bx_in_pipeline0 <= std_logic_vector(unsigned(bx_prev)-1);
   PC_start_pipeline0 <= PC_start_int;
+  HLS_reset <= HLS_reset_int;
 
   p_pipeline : process (clk) is
   begin -- process p_pipeline
@@ -186,16 +194,5 @@ begin -- architecture rtl
       PC_start          <= PC_start_pipeline;
     end if;
   end process;
-
-  --temporary hack to check problems with alignment
-  --PC_start <= PC_start_hack;
-  --p_latch_pc_start : process (clk) is
-  --begin
-  --  if rising_edge(clk) then
-  --    if AS_36_din_pipeline(L1PHIAn1) = x"ee9c8349d" then
-  --      PC_start_hack <= '1';
-  --    end if;
-  --  end if;
-  --end process;
 
 end architecture rtl;
