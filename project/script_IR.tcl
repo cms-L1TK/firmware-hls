@@ -20,18 +20,6 @@ array set modules_to_test {
     9 {PS_1_B}
     10 {PS_2_A}
     11 {PS_2_B}
-    12 {negPS10G_1_A}
-    13 {negPS10G_1_B}
-    14 {negPS10G_2_A}
-    15 {negPS10G_2_B}
-    16 {negPS10G_3_A}
-    17 {negPS10G_3_B}
-    18 {negPS10G_4_A}
-    19 {negPS10G_4_B}
-    20 {negPS_1_A}
-    21 {negPS_1_B}
-    22 {negPS_2_A}
-    23 {negPS_2_B}
     24 {2S_1_A}
     25 {2S_1_B}
     26 {2S_2_A}
@@ -44,19 +32,33 @@ array set modules_to_test {
     33 {2S_5_B}
     34 {2S_6_A}
     35 {2S_6_B}
-    36 {neg2S_1_A}
-    37 {neg2S_1_B}
-    38 {neg2S_2_A}
-    39 {neg2S_2_B}
-    40 {neg2S_3_A}
-    41 {neg2S_3_B}
-    42 {neg2S_4_A}
-    43 {neg2S_4_B}
-    44 {neg2S_5_A}
-    45 {neg2S_5_B}
-    46 {neg2S_6_A}
-    47 {neg2S_6_B}
 }
+
+    #12 {negPS10G_1_A}
+    #13 {negPS10G_1_B}
+    #14 {negPS10G_2_A}
+    #15 {negPS10G_2_B}
+    #16 {negPS10G_3_A}
+    #17 {negPS10G_3_B}
+    #18 {negPS10G_4_A}
+    #19 {negPS10G_4_B}
+    #20 {negPS_1_A}
+    #21 {negPS_1_B}
+    #22 {negPS_2_A}
+    #23 {negPS_2_B}
+
+    #36 {neg2S_1_A}
+    #37 {neg2S_1_B}
+    #38 {neg2S_2_A}
+    #39 {neg2S_2_B}
+    #40 {neg2S_3_A}
+    #41 {neg2S_3_B}
+    #42 {neg2S_4_A}
+    #43 {neg2S_4_B}
+    #44 {neg2S_5_A}
+    #45 {neg2S_5_B}
+    #46 {neg2S_6_A}
+    #47 {neg2S_6_B}
 
 
 # module_to_export must correspond to the default macros set at the top of the
