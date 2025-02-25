@@ -28,6 +28,8 @@ use work.tf_pkg.all;
 
 entity mem_reader is
   generic (
+    PAGE_LENGTH     : natural := PAGE_LENGTH;      --! 64 for paged MPROJ memories,
+                                                   --! otherwise 128 
     RAM_WIDTH       : natural := 36;               --! Specify RAM data width
     NUM_PAGES       : natural := 8;                --! Specify no. Pages in RAM
                                                    --memory --FIXME should be 2
@@ -45,7 +47,7 @@ entity mem_reader is
     din       : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     dout      : out  std_logic_vector(RAM_WIDTH-1 downto 0);        --! output data
     valid     : out  std_logic;                                     --! data valid
-    index     : out  std_logic_vector(6+clogb2(NUM_TPAGES) downto 0);                         --!index
+    index     : out  std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0);                         --!index
     nent      : in t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1)
     );
 end mem_reader;
@@ -143,8 +145,8 @@ begin
       
       if (addrP1var < nent(to_integer(unsigned(bx))*NUM_TPAGES) and addrP1var < maxval) then
         if (NUM_TPAGES>1) then
-          addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var(6 downto 0);
-          addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var(6 downto 0);
+          addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var;
+          addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var;
         else
           addr_counter <= addrP1var(6 downto 0);
           addra <= bx&addrP1var(6 downto 0);
@@ -152,18 +154,18 @@ begin
         addrP1var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP1var)) + 1, addrP1var'length));
         valid1 <= '1'; 
       elsif ((addrP2var < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (NUM_TPAGES > 1) and addrP2var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var(6 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var(6 downto 0);
+        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var;
+        addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var;
         addrP2var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP2var)) + 1, addrP2var'length));
         valid1 <= '1'; 
       elsif ((addrP3var < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (NUM_TPAGES > 2) and addrP3var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var(6 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var(6 downto 0);
+        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var;
+        addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var;
         addrP3var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP3var)) + 1, addrP3var'length));
         valid1 <= '1';       
       elsif ((addrP4var < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (NUM_TPAGES > 3) and addrP4var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var(6 downto 0);
-        addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var(6 downto 0);
+        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var;
+        addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var;
         addrP4var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP4var)) + 1, addrP4var'length));
         valid1 <= '1'; 
       else

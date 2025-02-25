@@ -19,11 +19,11 @@ import sys
 import glob
 from enum import Enum
 
-# Python 2-3 compatibility
-try:
-        import future, builtins, past, six
-except ImportError as error:
-        raise ImportError("Unable to import the python2/3 compatibility modules (future, builtins, past, six)")
+# Python 2-3 compatibility - commented out by Ryd as it did not seem to work?
+#try:
+#        import future, builtins, past, six
+#except ImportError as error:
+#        raise ImportError("Unable to import the python2/3 compatibility modules (future, builtins, past, six)")
 
 # Based on: https://stackoverflow.com/questions/14906764/how-to-redirect-stdout-to-both-file-and-console-with-scripting/14906787
 class Logger(object):
@@ -53,6 +53,7 @@ class ReferenceType(Enum):
     AS     = 'AllStubs'
     SP     = 'StubPairs'
     TPAR   = 'TrackletParameters'
+    MPROJ  = 'TrackletProjections'
     TPROJ  = 'TrackletProjections'
     VMPROJ = 'VMProjections'
     AP     = 'AllProjections'
@@ -133,23 +134,31 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         print("Comparing TB results "+str(comparison_filename)+" to ref. file "+str(reference_filename)+" ... ")
 
         # Read column names from file
-        column_names = list(pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,nrows=1))
+        column_names = list(pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',nrows=1))
         if verbose: print(column_names)
 
         # Check if binned memory
-        if ('BIN' in column_names):
+        if ('VMS' in comparison_filename):
             is_binned = True
-            column_selections = ['BX','ADDR','BIN','DATA']
         else:
             is_binned = False
-            column_selections = ['BX','ADDR','DATA']
+
+        column_selections = ['TIME', 'BX', 'ADDR', 'DATA']
 
         # Open the comparison (= VHDL test-bench output) data
-        data = pd.read_csv(file_location+"/"+comparison_filename,delim_whitespace=True,header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
+        data = pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
+        #Need to figure out how to handle the memory "overwrite"...
+        #if not is_binned:
+        #    print("before:")
+        #    print(data)
+        #    #pd.drop([0])
+        #    print("after:")
+        #    print(data)
+        
         # Sort data by ascending address
-        data.sort_values(by=['BX','ADDR'], inplace = True)
+        data.sort_values(by=['BX','ADDR','DATA'], inplace = True)
         data.reset_index(drop = True, inplace = True)
 
         selected_columns = data[column_selections]
@@ -158,6 +167,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         reference_data = parse_reference_file(file_location+"/"+reference_filename, is_binned)
 
         for ievent,event in enumerate(reference_data):
+
             print("Doing event "+str(ievent)+"/"+str(len(reference_data))+" ... ")
             good = True
 
@@ -190,6 +200,8 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
             offset = selected_rows['DATA'].index[0]
 
+            event.sort()
+
             for ival,val in enumerate(event):
                 # In case there are fewer entries in the comparison data than in the reference data
                 if offset+ival not in selected_rows['DATA']: continue
@@ -211,11 +223,13 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
                 # Raise exception if the bin number of a given entry don't match
                 elif is_binned:
-                    if selected_rows['BIN'][offset+ival] != int(bin):
+                    ref_add = selected_rows['ADDR'][offset+ival][2:-1]
+                    data_add = bin.upper()
+                    if ref_add != data_add:
                         good = False
                         number_of_value_mismatches += 1
                         message = "The bin for event "+str(ievent)+" stub "+str(selected_rows['DATA'][offset+ival])+" do not match!"\
-                                  "\n\treference="+bin+" comparison="+str(selected_rows['BIN'][offset+ival])
+                                  "\n\treference="+bin+" comparison="+str(selected_rows['ADDR'][offset+ival])
                         if fail_on_error: raise Exception(message)
                         else:             print("\t\t"+message.replace("\n","\n\t\t"))
 
@@ -247,14 +261,9 @@ def comparePredefined(args):
         raise FileNotFoundError(comparison_dir + " is empty. No files to compare.")
 
     # Find the lists of filenames
-    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
+    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f and "DW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
-    print("comparison_filename_list")
-    print(comparison_filename_list)
     reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
-    print("reference_filename_list")
-    print(reference_filename_list)
-    print("Done"
     try:
         reference_filename_list = [glob.glob(reference_dir+"*/*"+f+"*.dat")[0] for f in reference_filename_list] # Find the corresponding reference filenames
     except IndexError :
@@ -269,7 +278,7 @@ def comparePredefined(args):
       print("Summary of memories with errors")
       print("=================================")
       sys.stdout.flush()
-      os.system('\grep "Bad events: [1-9]" dataOut/*cmp.txt')
+      os.system('grep "Bad events: [1-9]" dataOut/*cmp.txt')
 
     print("\n Accumulated number of errors =",ret_sum)
 

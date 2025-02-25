@@ -113,7 +113,7 @@ public:
 #pragma HLS inline
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
     //The vhd memory implementation will write to the correct address!!
-    dataarray_[0][0] = data;
+    dataarray_[0][page] = data;
 #else
     if(!NBIT_BX) assert(write_bx_ == 0);
     //NBIT_BX==1 is to identify the projection memories

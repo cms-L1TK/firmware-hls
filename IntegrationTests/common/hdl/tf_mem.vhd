@@ -118,6 +118,7 @@ process(clka)
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+  variable overwrite    : std_logic := '1';
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     if DEBUG then
@@ -153,11 +154,18 @@ begin
       nent_o(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
     end if;
     if (wea='1') then
+      overwrite := addra(0);
       --vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
-      address := slv_page_cnt_save&nent_o(to_integer(unsigned(slv_page_cnt_save)));
-      --report "tf_mem "&time'image(now)&" "&NAME&" page writeaddr "&" "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" "&to_bstring(dina);
+      if (overwrite = '0') then
+        address := slv_page_cnt_save&nent_o(to_integer(unsigned(slv_page_cnt_save)));
+      else
+        address := slv_page_cnt_save&std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(slv_page_cnt_save)))))-1,nent_o(to_integer(unsigned(slv_page_cnt_save)))'length));
+      end if;
+      --report "tf_mem "&time'image(now)&" "&NAME&" page writeaddr "&" "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" "&to_bstring(overwrite)&" "&to_bstring(dina)&" addra "&to_bstring(addra);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
-      nent_o(to_integer(unsigned(slv_page_cnt_save))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(slv_page_cnt_save))))) + 1, nent_o(to_integer(unsigned(slv_page_cnt_save)))'length)); -- + 1 (slv)
+      if (overwrite = '0') then
+        nent_o(to_integer(unsigned(slv_page_cnt_save))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(slv_page_cnt_save))))) + 1, nent_o(to_integer(unsigned(slv_page_cnt_save)))'length)); -- + 1 (slv)
+      end if;
     end if;
   end if;
 end process;

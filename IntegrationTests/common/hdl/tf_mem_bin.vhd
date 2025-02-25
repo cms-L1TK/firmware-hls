@@ -326,7 +326,6 @@ begin
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
       slv_clk_cnt := (others => '0');
       validbinmasktmp <= (others => '0');
-      --FIXME need to reset validbinmask!!!
       nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
       if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then 
@@ -334,7 +333,8 @@ begin
       else
         slv_page_cnt := (others => '0');
       end if;
-      validbinmask(NUM_RZ_BINS*(to_integer(unsigned(slv_clk_cnt))+1) downto NUM_RZ_BINS*(to_integer(unsigned(slv_clk_cnt)))) <= (others => '0');
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" validbinmask: "&to_bstring(slv_page_cnt);
+      validbinmask(NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt))+1)-1 downto NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt)))) <= (others => '0');
     end if;
 
     if (wea='1') then
@@ -372,7 +372,7 @@ begin
       
       
       writeaddr := slv_page_cnt_save & vi_nent_idx & std_logic_vector(binaddr);
-      --report "tf_mem_bin writeaddr data: " & NAME & " " & to_bstring(writeaddr) & " " & to_bstring(dina);
+      --report time'image(now)&" tf_mem_bin: " & NAME & " writeaddr: " & to_bstring(writeaddr) & " data: " & to_bstring(dina);
       for icopy in 0 to NUM_COPY-1 loop
         sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina; 
       end loop;
@@ -480,21 +480,20 @@ process(clkb)
   
 begin
 
-  if (enb_binmaskA = '1') then
-    binmaskvalueA := binmaskA(to_integer(unsigned(addr_binmaskA))) and validbinmask(to_integer(unsigned(addr_binmaskA)));
-    binmaskA_o <= binmaskvalueA;
-  end if;
-                             
-  if (enb_binmaskA = '1') then
-    if (to_integer(unsigned(addr_binmaskB and overflowmask)) = 7) then
-      binmaskvalueB := (others => '0');
-    else
-      binmaskvalueB := binmaskB(to_integer(unsigned(addr_binmaskB))+1) and validbinmask(to_integer(unsigned(addr_binmaskB))+1);
+  if rising_edge(clkb) then
+    if (enb_binmaskA = '1') then
+      binmaskvalueA := binmaskA(to_integer(unsigned(addr_binmaskA))) and validbinmask(to_integer(unsigned(addr_binmaskA)));
+      --report "tf_mem_bin binmaskvalueA "&time'image(now)&" "& NAME & " " & to_bstring(binmaskvalueA) & " " & to_bstring(binmaskA(to_integer(unsigned(addr_binmaskA)))) & " " & to_bstring(validbinmask(to_integer(unsigned(addr_binmaskA)))) & " " & to_bstring(validbinmask) & " " & to_bstring(addr_binmaskA)  & " " & to_bstring(addr_binmaskB);  
+      binmaskA_o <= binmaskvalueA;
     end if;
-    binmaskB_o <= binmaskvalueB;
+                             
+    if (enb_binmaskA = '1') then
+      binmaskvalueB := binmaskB(to_integer(unsigned(addr_binmaskB))) and validbinmask(to_integer(unsigned(addr_binmaskB)));
+      binmaskB_o <= binmaskvalueB;
+    end if;
   end if;
   
-  report "tf_mem_bin addr_binmask "&time'image(now)&" "& NAME & " " & to_bstring(addr_binmaskA) & " " & to_bstring(binmaskvalueA);
+  --report "tf_mem_bin addr_binmask "&time'image(now)&" "& NAME & " " & to_bstring(addr_binmaskA) & " " & to_bstring(binmaskvalueA);
   
 end process;
 

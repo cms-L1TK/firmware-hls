@@ -85,7 +85,7 @@ public:
 #pragma HLS inline
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[0][0] = data;
+      dataarray_[0][overwrite] = data;
       return true;
 #else
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0

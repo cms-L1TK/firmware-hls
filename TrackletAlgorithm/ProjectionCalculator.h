@@ -81,7 +81,7 @@ template<
 
   if (!valid) return;
 
-  int ipage =  trackletIndex >> 7;
+  int ipage =  trackletIndex >> 7; //FIXME hardcoded values
   
   tparout.write_mem(tpar, ipage);
 
@@ -247,6 +247,8 @@ template<
 #pragma HLS unroll
     nproj_disk[i] = 0;
   }
+
+  ipage = ipage & 3;
 
   //iTC gives you the first TCID in e.g. ABC, ipage gives you corrected TCID for B and C
   const int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC + ipage);
