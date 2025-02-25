@@ -3,10 +3,8 @@
 --! @brief Temporary module to merge input to KF until DR is ready
 --! @author Michael Oshiro <mco62@cornell.edu>
 --! @date 2024-05-14
---! @version v.1.0
+--! @version v.1.1
 --===========================================================================
-
- --TODO: move some of this kludge to separate files
 
 --BEGIN Common Types
 
@@ -20,12 +18,17 @@ use work.hybrid_data_formats.all;
 use work.hybrid_config.all;
 
 package KfMergeTypes is
- constant width_tracktb   : natural := (2 + widthTBseedType + widthTBinv2R +
-                                        widthTBphi0 + widthTBz0 + widthTBcot);
- constant width_stubtb    : natural := (2 + widthTBtrackId + widthTBstubId +
-                                        widthTBr + widthTBphi + widthTBz);
- constant width_channeltb : natural := (width_tracktb + (width_stubtb * maxNumProjectionLayers));
- constant width_stubstb   : natural := width_stubtb * maxNumProjectionLayers;
+
+ constant width_trackzht   : natural := (2 + widthZHTmaybe + widthZHTsector 
+                                         + widthZHTphiT + widthZHTinv2R 
+                                         + widthZHTzT + widthZHTcot);
+ constant width_stubzht    : natural := (2 + widthZHTr + widthZHTphi 
+                                         + widthZHTz + widthZHTdPhi 
+                                         + widthZHTdZ);
+ constant width_stubszht   : natural := width_stubzht*numLayers;
+ constant width_channelzht : natural := (width_trackzht + (width_stubzht 
+                                         * numLayers));
+
 end KfMergeTypes;
 
 --END Common Types
@@ -51,17 +54,17 @@ entity kf_merge_ram is
   port (
     clk          : in std_logic;
     rst          : in std_logic;
-    din          : in std_logic_vector(width_channeltb-1 downto 0);
+    din          : in std_logic_vector(width_channelzht-1 downto 0);
     write_enable : in boolean;
     read_enable  : in boolean;
     empty        : out boolean;
-    dout         : out std_logic_vector(width_channeltb-1 downto 0)
+    dout         : out std_logic_vector(width_channelzht-1 downto 0)
     );
 end entity kf_merge_ram;
 
 architecture rtl of kf_merge_ram is
 
-  type t_ram is array(0 to depth-1) of std_logic_vector(width_channeltb-1 downto 0);
+  type t_ram is array(0 to depth-1) of std_logic_vector(width_channelzht-1 downto 0);
 
   signal ram                 : t_ram := (others => (others => '0' ));
   attribute ram_style        : string;
@@ -128,68 +131,96 @@ use work.KfMergeTypes.all;
 entity kf_input_merger is
   port (
     clk       : in std_logic;
-    din       : in t_channlesTB(numTW_104 - 1 downto 0);
-    dout      : out t_channlesTB(numNodesKF - 1 downto 0)
+    din       : in t_channelsZHT(numTW_104 - 1 downto 0);
+    dout      : out t_channelsZHT(numNodesKF - 1 downto 0)
     );
 end entity kf_input_merger;
 
 architecture rtl of kf_input_merger is
 
- constant loc_cot          : natural := width_stubstb;
- constant loc_z0           : natural := width_stubstb+widthTBcot; 
- constant loc_phi0         : natural := width_stubstb+widthTBcot+widthTBz0; 
- constant loc_inv2r        : natural := width_stubstb+widthTBcot+widthTBz0+widthTBphi0;
- constant loc_seedtype     : natural := width_stubstb+widthTBcot+widthTBz0+widthTBphi0+widthTBinv2R;
- constant loc_valid        : natural := width_stubstb+widthTBcot+widthTBz0+widthTBphi0+widthTBinv2R+widthTBseedType;
- constant loc_reset        : natural := width_stubstb+widthTBcot+widthTBz0+widthTBphi0+widthTBinv2R+widthTBseedType+1;
+ constant loc_cot        : natural := width_stubszht;
+ constant loc_zT         : natural := width_stubszht+widthZHTcot;
+ constant loc_inv2R      : natural := width_stubszht+widthZHTcot+widthZHTzT;
+ constant loc_phiT       : natural := width_stubszht+widthZHTcot+widthZHTzT
+                                      +widthZHTinv2R;
+ constant loc_sector     : natural := width_stubszht+widthZHTcot+widthZHTzT
+                                      +widthZHTinv2R+widthZHTphiT;
+ constant loc_maybe      : natural := width_stubszht+widthZHTcot+widthZHTzT
+                                      +widthZHTinv2R+widthZHTphiT
+                                      +widthZHTsector;
+ constant loc_valid      : natural := width_stubszht+widthZHTcot+widthZHTzT
+                                      +widthZHTinv2R+widthZHTphiT
+                                      +widthZHTsector+widthZHTmaybe;
+ constant loc_reset      : natural := width_stubszht+widthZHTcot+widthZHTzT
+                                      +widthZHTinv2R+widthZHTphiT
+                                      +widthZHTsector+widthZHTmaybe+1;
+ constant loc_stub_dPhi  : natural := widthZHTdZ;
+ constant loc_stub_z     : natural := widthZHTdZ+widthZHTdPhi;
+ constant loc_stub_phi   : natural := widthZHTdZ+widthZHTdPhi+widthZHTz;
+ constant loc_stub_r     : natural := widthZHTdZ+widthZHTdPhi+widthZHTz
+                                      +widthZHTphi;
+ constant loc_stub_valid : natural := widthZHTdZ+widthZHTdPhi+widthZHTz
+                                      +widthZHTphi+widthZHTr;
+ constant loc_stub_reset : natural := widthZHTdZ+widthZHTdPhi+widthZHTz
+                                      +widthZHTphi+widthZHTr+1;
 
- constant loc_stub_phi     : natural := widthTBz;
- constant loc_stub_r       : natural := widthTBz+widthTBphi;
- constant loc_stub_stubid  : natural := widthTBz+widthTBphi+widthTBr;
- constant loc_stub_trackid : natural := widthTBz+widthTBphi+widthTBr+widthTBstubId;
- constant loc_stub_valid   : natural := widthTBz+widthTBphi+widthTBr+widthTBstubId+widthTBtrackId;
- constant loc_stub_reset   : natural := widthTBz+widthTBphi+widthTBr+widthTBstubId+widthTBtrackId+1;
-
- function tchanneltb_to_stdlogicvector (tb_data : t_channelTB) return std_logic_vector is
-   variable ret : std_logic_vector(width_channeltb-1 downto 0) := (others => '0');
+ function tchannelzht_to_stdlogicvector (zht_data : t_channelZHT) return std_logic_vector is
+   variable ret : std_logic_vector(width_channelzht-1 downto 0) := (others => '0');
  begin
-   ret(loc_reset)                       := tb_data.track.reset;
-   ret(loc_valid)                       := tb_data.track.valid;
-   ret(loc_valid-1 downto loc_seedtype) := tb_data.track.seedType;
-   ret(loc_seedtype-1 downto loc_inv2r) := tb_data.track.inv2R;
-   ret(loc_inv2r-1 downto loc_phi0)     := tb_data.track.phi0;
-   ret(loc_phi0-1 downto loc_z0)        := tb_data.track.z0;
-   ret(loc_z0-1 downto loc_cot)         := tb_data.track.cot;
-   for istub in 0 to maxNumProjectionLayers-1 loop
-     ret(loc_stub_reset+(istub*width_stubtb))                                             := tb_data.stubs(istub).reset;
-     ret(loc_stub_valid+(istub*width_stubtb))                                             := tb_data.stubs(istub).valid;
-     ret(loc_stub_valid-1+istub*width_stubtb downto loc_stub_trackid+istub*width_stubtb)  := tb_data.stubs(istub).trackId;
-     ret(loc_stub_trackid-1+istub*width_stubtb downto loc_stub_stubid+istub*width_stubtb) := tb_data.stubs(istub).stubId;
-     ret(loc_stub_stubid-1+istub*width_stubtb downto loc_stub_r+istub*width_stubtb)       := tb_data.stubs(istub).r;
-     ret(loc_stub_r-1+istub*width_stubtb downto loc_stub_phi+istub*width_stubtb)          := tb_data.stubs(istub).phi;
-     ret(loc_stub_phi-1+istub*width_stubtb downto istub*width_stubtb)                     := tb_data.stubs(istub).z;
+   ret(loc_reset)                     := zht_data.track.reset;
+   ret(loc_valid)                     := zht_data.track.valid;
+   ret(loc_valid-1 downto loc_maybe)  := zht_data.track.maybe;
+   ret(loc_maybe-1 downto loc_sector) := zht_data.track.sector;
+   ret(loc_sector-1 downto loc_phiT)  := zht_data.track.phiT;
+   ret(loc_phiT-1 downto loc_inv2R)   := zht_data.track.inv2R;
+   ret(loc_inv2R-1 downto loc_zT)     := zht_data.track.zT;
+   ret(loc_zT-1 downto loc_cot)       := zht_data.track.cot;
+
+   for istub in 0 to numLayers-1 loop
+     ret(loc_stub_reset+(istub*width_stubzht)) := zht_data.stubs(istub).reset;
+     ret(loc_stub_valid+(istub*width_stubzht)) := zht_data.stubs(istub).valid;
+     ret(loc_stub_valid-1+istub*width_stubzht 
+         downto loc_stub_r+istub*width_stubzht) := zht_data.stubs(istub).r;
+     ret(loc_stub_r-1+istub*width_stubzht 
+         downto loc_stub_phi+istub*width_stubzht) 
+         := zht_data.stubs(istub).phi;
+     ret(loc_stub_phi-1+istub*width_stubzht 
+         downto loc_stub_z+istub*width_stubzht) 
+         := zht_data.stubs(istub).z;
+     ret(loc_stub_z-1+istub*width_stubzht 
+         downto loc_stub_dPhi+istub*width_stubzht) 
+         := zht_data.stubs(istub).dPhi;
+     ret(loc_stub_dPhi-1+istub*width_stubzht 
+         downto istub*width_stubzht)
+         := zht_data.stubs(istub).dZ;
    end loop;
    return ret;
  end function;
 
- function stdlogicvector_to_tchanneltb (ram_data : std_logic_vector) return t_channelTB is
-   variable ret : t_channelTB;
+ function stdlogicvector_to_tchannelzht (ram_data : std_logic_vector) return t_channelZHT is
+   variable ret : t_channelZHT;
  begin
-   ret.track.reset    := ram_data(loc_reset);
-   ret.track.valid    := ram_data(loc_valid);
-   ret.track.seedType := ram_data(loc_valid-1 downto loc_seedtype);
-   ret.track.inv2R    := ram_data(loc_seedtype-1 downto loc_inv2r);
-   ret.track.phi0     := ram_data(loc_inv2r-1 downto loc_phi0);
-   ret.track.z0       := ram_data(loc_phi0-1 downto loc_z0);
-   ret.track.cot      := ram_data(loc_z0-1 downto loc_cot);
-   for istub in 0 to maxNumProjectionLayers-1 loop
-     ret.stubs(istub).reset   := ram_data(loc_stub_reset+(istub*width_stubtb));
-     ret.stubs(istub).valid   := ram_data(loc_stub_valid+(istub*width_stubtb));
-     ret.stubs(istub).trackId := ram_data(loc_stub_valid-1+istub*width_stubtb downto loc_stub_trackid+istub*width_stubtb);
-     ret.stubs(istub).stubId  := ram_data(loc_stub_trackid-1+istub*width_stubtb downto loc_stub_stubid+istub*width_stubtb);
-     ret.stubs(istub).r       := ram_data(loc_stub_stubid-1+istub*width_stubtb downto loc_stub_r+istub*width_stubtb);
-     ret.stubs(istub).phi     := ram_data(loc_stub_r-1+istub*width_stubtb downto loc_stub_phi+istub*width_stubtb);
-     ret.stubs(istub).z       := ram_data(loc_stub_phi-1+istub*width_stubtb downto istub*width_stubtb);
+   ret.track.reset  := ram_data(loc_reset);
+   ret.track.valid  := ram_data(loc_valid);
+   ret.track.maybe  := ram_data(loc_valid-1 downto loc_maybe);
+   ret.track.sector := ram_data(loc_maybe-1 downto loc_sector);
+   ret.track.phiT   := ram_data(loc_sector-1 downto loc_phiT);
+   ret.track.inv2R  := ram_data(loc_phiT-1 downto loc_inv2R);
+   ret.track.zT     := ram_data(loc_inv2R-1 downto loc_zT);
+   ret.track.cot    := ram_data(loc_zT-1 downto loc_cot);
+   for istub in 0 to numLayers-1 loop
+     ret.stubs(istub).reset := ram_data(loc_stub_reset+(istub*width_stubzht));
+     ret.stubs(istub).valid := ram_data(loc_stub_valid+(istub*width_stubzht));
+     ret.stubs(istub).r     := ram_data(loc_stub_valid-1+istub*width_stubzht 
+         downto loc_stub_r+istub*width_stubzht);
+     ret.stubs(istub).phi   := ram_data(loc_stub_r-1+istub*width_stubzht 
+         downto loc_stub_phi+istub*width_stubzht);
+     ret.stubs(istub).z     := ram_data(loc_stub_phi-1+istub*width_stubzht 
+         downto loc_stub_z+istub*width_stubzht);
+     ret.stubs(istub).dPhi  := ram_data(loc_stub_z-1+istub*width_stubzht 
+         downto loc_stub_dPhi+istub*width_stubzht);
+     ret.stubs(istub).dZ    := ram_data(loc_stub_dPhi-1+istub*width_stubzht 
+         downto istub*width_stubzht);
    end loop;
    return ret;
  end function;
@@ -199,7 +230,7 @@ architecture rtl of kf_input_merger is
  subtype t_address is integer range 0 to ram_depth-1;
  type t_arr_address is array(0 to din'length-1) of t_address;
  type t_arr_bool is array(0 to din'length-1) of boolean;
- type t_arr_ramdata is array(0 to din'length-1) of std_logic_vector(width_channeltb-1 downto 0);
+ type t_arr_ramdata is array(0 to din'length-1) of std_logic_vector(width_channelzht-1 downto 0);
 
  signal write_enable : t_arr_bool;
  signal read_enable  : t_arr_bool;
@@ -207,9 +238,9 @@ architecture rtl of kf_input_merger is
 
  --signal write_addr   : t_arr_address;
  --signal read_addr    : t_arr_address;
- signal ram_in       : t_channlesTB(numTW_104 - 1 downto 0);
+ signal ram_in       : t_channelsZHT(numTW_104 - 1 downto 0);
  signal ram_out_raw  : t_arr_ramdata;
- signal ram_out      : t_channlesTB(numTW_104 - 1 downto 0);
+ signal ram_out      : t_channelsZHT(numTW_104 - 1 downto 0);
 
  signal bx_change    : std_logic;
 
@@ -238,13 +269,13 @@ begin
     port map(
       clk          => clk,
       rst          => bx_change,
-      din          => tchanneltb_to_stdlogicvector(ram_in(iseedtype)),
+      din          => tchannelzht_to_stdlogicvector(ram_in(iseedtype)),
       write_enable => write_enable(iseedtype),
       read_enable  => read_enable(iseedtype),
       empty        => ram_empty(iseedtype),
       dout         => ram_out_raw(iseedtype)
       );
-    ram_out(iseedtype) <= stdlogicvector_to_tchanneltb(ram_out_raw(iseedtype));
+    ram_out(iseedtype) <= stdlogicvector_to_tchannelzht(ram_out_raw(iseedtype));
   end generate generate_ram;
 
   -- handle writing to RAMs
@@ -253,7 +284,8 @@ begin
     if (rising_edge(clk)) then
       for iseedtype in 0 to (din'length-1) loop
         if (din(iseedtype).track.valid = '1' or
-            (din(iseedtype).track.reset = '1' and (iseedtype = 0 or iseedtype = 4))) then
+            (din(iseedtype).track.reset = '1' and (iseedtype = 0 
+            or iseedtype = 4))) then
           ram_in(iseedtype)       <= din(iseedtype);
           write_enable(iseedtype) <= true;
         else

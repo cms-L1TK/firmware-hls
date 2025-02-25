@@ -51,9 +51,11 @@ architecture rtl of emp_payload is
   signal AS_36_link_valid      : t_arr_AS_36_1b;
   signal MPAR_73_link_valid    : t_arr_MTPAR_73_1b;
   signal bx_link_data          : std_logic_vector(2 downto 0);
+  signal ctl_link_data         : std_logic_vector(60 downto 0);
   signal bx_link_valid         : std_logic;
   signal PC_start              : std_logic;
   signal PC_bx_in              : std_logic_vector(2 downto 0);
+  signal HLS_reset             : std_logic;
   signal AS_36_wea             : t_arr_AS_36_1b;
   signal AS_36_writeaddr       : t_arr_AS_36_ADDR;
   signal AS_36_din             : t_arr_AS_36_DATA;
@@ -61,7 +63,6 @@ architecture rtl of emp_payload is
   signal MPAR_73_writeaddr     : t_arr_MTPAR_73_ADDR;
   signal MPAR_73_din           : t_arr_MTPAR_73_DATA;
   signal s_tftokf              : t_channlesTB(numTW_104 - 1 downto 0);
-  signal s_kfin                : t_channlesTB(numNodesKF - 1 downto 0);
   signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
   signal FT_bx_out_0           : std_logic_vector(2 downto 0);
@@ -84,11 +85,11 @@ begin
   linktosecproc2_1 : entity work.linktosecproc2
     port map (
       clk                => clk_p,
-      rst                => rst,
       d                  => d,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
       bx_link_data       => bx_link_data,
+      ctl_link_data      => ctl_link_data,
       AS_36_link_valid   => AS_36_link_valid,
       MPAR_73_link_valid => MPAR_73_link_valid,
       bx_link_valid      => bx_link_valid
@@ -100,10 +101,10 @@ begin
   sp2_mem_writer_1 : entity work.sp2_mem_writer
     port map (
       clk                => clk_p,
-      reset              => rst,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
       bx_link_data       => bx_link_data,
+      ctl_link_data      => ctl_link_data,
       AS_36_link_valid   => AS_36_link_valid,
       MPAR_73_link_valid => MPAR_73_link_valid,
       bx_link_valid      => bx_link_valid,
@@ -114,7 +115,8 @@ begin
       MPAR_73_writeaddr  => MPAR_73_writeaddr,
       MPAR_73_din        => MPAR_73_din,
       PC_start           => PC_start,
-      PC_bx_in           => PC_bx_in
+      PC_bx_in           => PC_bx_in,
+      HLS_reset          => HLS_reset
       );
 
   -----------------------------------------------------------------------------
@@ -123,7 +125,7 @@ begin
   tf2_wrapper_1 : entity work.tf2_wrapper
     port map (
       clk                       => clk_p,
-      reset                     => rst,
+      reset                     => HLS_reset,
       PC_start                  => PC_start,
       PC_bx_in                  => PC_bx_in,
       PC_bx_out                 => open,
@@ -168,22 +170,12 @@ begin
       );
 
   -----------------------------------------------------------------------------
-  -- KF Input merger (to be replaced by DR)
-  -----------------------------------------------------------------------------
-  kf_input_merger_1 : entity work.kf_input_merger
-    port map (
-      clk            => clk_p,
-      din            => s_tftokf,
-      dout           => s_kfin
-      );
-
-  -----------------------------------------------------------------------------
   -- KF
   -----------------------------------------------------------------------------
   kf_wrapper_1 : entity work.kf_wrapper
     port map (
       clk_i   => clk_p,
-      kfin_i  => s_kfin,
+      kfin_i  => s_tftokf,
       kfout_o => s_kfout
       );
 
