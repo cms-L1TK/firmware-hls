@@ -21,6 +21,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use work.tf_interface_pkg.all;
 use work.hybrid_data_formats.all;
 use work.hybrid_config.all;
 use work.hybrid_data_types.all;
@@ -28,14 +29,15 @@ use work.hybrid_data_types.all;
 entity kf_wrapper is
   port (
     clk_i   : in  std_logic;
-    kfin_i  : in  t_channlesTB(numNodesKF - 1 downto 0);
+    kfin_i  : in  t_channlesTB(numTW_104 - 1 downto 0);
     kfout_o : out t_frames(numLinksTFP - 1 downto 0)
     );
 end entity kf_wrapper;
 
 architecture rtl of kf_wrapper is
 
-  signal s_kfin_dout : t_channelsZHT(numNodesKF - 1 downto 0);
+  signal s_kfin_dout : t_channelsZHT(numTW_104 - 1 downto 0);
+  signal s_kfmerge_dout : t_channelsZHT(numNodesKF - 1 downto 0);
   signal s_kf_dout   : t_channelsKF(numNodesKF - 1 downto 0);
 
 begin  -- architecture rtl
@@ -47,10 +49,17 @@ begin  -- architecture rtl
       kfin_dout => s_kfin_dout
       );
 
+  kf_input_merger_1 : entity work.kf_input_merger
+    port map (
+      clk  => clk_i,
+      din  => s_kfin_dout,
+      dout => s_kfmerge_dout
+      );
+
   kf_top_1 : entity work.kf_top
     port map (
       clk     => clk_i,
-      kf_din  => s_kfin_dout,
+      kf_din  => s_kfmerge_dout,
       kf_dout => s_kf_dout
       );
 
