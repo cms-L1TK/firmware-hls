@@ -149,16 +149,26 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         data = pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
-        #Need to figure out how to handle the memory "overwrite"...
-        #if not is_binned:
-        #    print("before:")
-        #    print(data)
-        #    #pd.drop([0])
-        #    print("after:")
-        #    print(data)
+        #Need to figure out how to handle the memory "overwrite" - this is a bit of a hack...
+        if (not is_binned) and ("TF_" not in comparison_filename):
+            print("before:")
+            print(data)
+            rows = []
+            for index, row in data.iterrows():
+                print("Index: ", index, row['ADDR'])
+                if row['ADDR'] == "0x01":
+                    rows.append(index-1)
+            print("rows: ", rows)
+            data=data.drop(rows)
+            print("after:")
+            print(data)
         
         # Sort data by ascending address
-        data.sort_values(by=['BX','ADDR','DATA'], inplace = True)
+        if is_binned:
+            data.sort_values(by=['BX','ADDR','DATA'], inplace = True)
+        else:
+            data.sort_values(by=['BX','DATA'], inplace = True)
+            
         data.reset_index(drop = True, inplace = True)
 
         selected_columns = data[column_selections]
