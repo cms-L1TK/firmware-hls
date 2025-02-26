@@ -223,7 +223,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
                 # Raise exception if the bin number of a given entry don't match
                 elif is_binned:
-                    ref_add = selected_rows['ADDR'][offset+ival][2:-1]
+                    ref_add = selected_rows['ADDR'][offset+ival][3:]
                     data_add = bin.upper()
                     if ref_add != data_add:
                         good = False

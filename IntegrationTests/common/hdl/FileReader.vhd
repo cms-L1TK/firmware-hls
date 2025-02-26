@@ -193,7 +193,7 @@ begin
           DATA <= emDATA(RAM_WIDTH-1 downto 0);
           if (NUM_BINS > 1) then
             -- Binned memory
-            ADDR <= std_logic_vector(to_unsigned(PAGE_LENGTH*MEM_BIN, ADDR_WIDTH));
+            ADDR <= std_logic_vector(to_unsigned(MEM_BIN, ADDR_WIDTH));
           end if;
           WRITE_EN <= '1';
           DATA_CNT := DATA_CNT + 1;

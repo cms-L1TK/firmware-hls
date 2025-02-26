@@ -162,7 +162,7 @@ begin
       -- reset the nent_o counter if the mask is zero
     end if;
     if (wea='1') then
-      tpage := addra(clogb2(PAGE_LENGTH*NUM_TPAGES)-1 downto clogb2(PAGE_LENGTH));
+      tpage := addra(clogb2(NUM_TPAGES)-1 downto 0);
       nentaddress := slv_page_cnt_save&tpage;
       if (mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage)))='1') then
         address := nentaddress&nent_o(to_integer(unsigned(nentaddress)));
@@ -171,7 +171,7 @@ begin
         address := nentaddress&std_logic_vector(to_unsigned(0, nent_o(to_integer(unsigned(nentaddress)))'length));
         nent_o(to_integer(unsigned(nentaddress))) <= std_logic_vector(to_unsigned(1, nent_o(to_integer(unsigned(nentaddress)))'length));
       end if;
-      -- report time'image(now)&" tf_mem_tpar "&NAME&" tpage:"&to_bstring(tpage)&" writeaddr "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" nentaddress nent:"&to_bstring(nentaddress)&" "&to_bstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_bstring(dina);
+      --report time'image(now)&" tf_mem_tpar "&NAME&" tpage:"&to_bstring(tpage)&" writeaddr "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" nentaddress nent:"&to_bstring(nentaddress)&" "&to_bstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) <= '1';
     end if;

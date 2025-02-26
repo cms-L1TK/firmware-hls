@@ -291,7 +291,7 @@ process(clka)
   variable slv_page_cnt_save  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
 
   --! Extract phi and rz bin address
-  alias vi_nent_idx  : std_logic_vector(NUM_PHI_BITS+NUM_RZ_BITS-1 downto 0) is addra(ADDR_WIDTH + NUM_PHI_BITS + NUM_RZ_BITS - 1 downto ADDR_WIDTH);
+  alias vi_nent_idx  : std_logic_vector(NUM_PHI_BITS+NUM_RZ_BITS-1 downto 0) is addra(NUM_PHI_BITS + NUM_RZ_BITS - 1 downto 0);
 
   --! Extract phi bin from bin address
   alias phibits: std_logic_vector(NUM_PHI_BITS-1 downto 0) is vi_nent_idx(NUM_PHI_BITS - 1 downto 0);
