@@ -143,12 +143,6 @@ begin
     --end if;
 
     slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent='1') and (init='1') then
-      --report time'image(now)&" tf_mem_tpar "&NAME&" sync_nent";
-      init := '0';
-      slv_clk_cnt := (others => '0');
-      slv_page_cnt := (0 => '1', others => '0');
-    end if;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
@@ -162,6 +156,13 @@ begin
       -- Note that we don't zero the nent_o counters here. When adding entry we
       -- reset the nent_o counter if the mask is zero
     end if;
+    if (sync_nent='1') and (init='1') then
+      --report time'image(now)&" tf_mem_tpar "&NAME&" sync_nent";
+      init := '0';
+      slv_clk_cnt := (others => '0');
+      slv_page_cnt := (0 => '1', others => '0');
+    end if;
+
     if (wea='1') then
       tpage := addra(clogb2(NUM_TPAGES)-1 downto 0);
       nentaddress := slv_page_cnt_save&tpage;

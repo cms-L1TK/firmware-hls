@@ -313,15 +313,6 @@ process(clka)
 begin
   if rising_edge(clka) then
     slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent='1') and init='1' then
-      --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
-      init := '0';
-      slv_clk_cnt := (others => '0');
-      slv_page_cnt := (0 => '1', others => '0');
-      validbinmasktmp <= (others => '0');
-      nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
-      --report "tf_mem_bin "&time'image(now)&" "&NAME&" sync_nent set";
-    end if;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
@@ -336,6 +327,15 @@ begin
       end if;
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" validbinmask: "&to_bstring(slv_page_cnt);
       validbinmask(NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt))+1)-1 downto NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt)))) <= (others => '0');
+    end if;
+    if (sync_nent='1') and init='1' then
+      --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
+      init := '0';
+      slv_clk_cnt := (others => '0');
+      slv_page_cnt := (0 => '1', others => '0');
+      validbinmasktmp <= (others => '0');
+      nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
+      --report "tf_mem_bin "&time'image(now)&" "&NAME&" sync_nent set";
     end if;
 
     if (wea='1') then
