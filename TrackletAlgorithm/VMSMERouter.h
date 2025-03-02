@@ -167,6 +167,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 #pragma HLS inline
 #pragma HLS array_partition variable=memoryME complete dim=1
 #pragma HLS array_partition variable=memoriesAS complete dim=1
+#pragma HLS latency min=13 max=13
 
   
   bool disk2S = false; // Used to determine if DISK2S

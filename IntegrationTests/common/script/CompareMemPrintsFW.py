@@ -151,17 +151,11 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
         #Need to figure out how to handle the memory "overwrite" - this is a bit of a hack...
         if (not is_binned) and ("TF_" not in comparison_filename):
-            print("before:")
-            print(data)
             rows = []
             for index, row in data.iterrows():
-                print("Index: ", index, row['ADDR'])
                 if row['ADDR'] == "0x01":
                     rows.append(index-1)
-            print("rows: ", rows)
             data=data.drop(rows)
-            print("after:")
-            print(data)
         
         # Sort data by ascending address
         if is_binned:

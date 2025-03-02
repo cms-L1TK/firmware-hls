@@ -130,12 +130,6 @@ begin
       end if;
     end if;
     slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent='1') and (init='1') then
-      --report time'image(now)&" tf_mem "&NAME&" sync_nent";
-      init := '0';
-      slv_clk_cnt := (others => '0');
-      slv_page_cnt := (0 => '1', others => '0');
-    end if;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
       --report time'image(now)&" tf_mem "&NAME&" increment vi_clk_cnt:"&integer'image(vi_clk_cnt);
@@ -152,6 +146,12 @@ begin
       end if;
       --report time'image(now)&" tf_mem "&NAME&" will zero nent";
       nent_o(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
+    end if;
+    if (sync_nent='1') and (init='1') then
+      --report time'image(now)&" tf_mem "&NAME&" sync_nent";
+      init := '0';
+      slv_clk_cnt := (others => '0');
+      slv_page_cnt := (0 => '1', others => '0');
     end if;
     if (wea='1') then
       overwrite := addra(0);

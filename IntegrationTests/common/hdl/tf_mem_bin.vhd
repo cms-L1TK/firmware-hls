@@ -314,6 +314,7 @@ begin
   if rising_edge(clka) then
     slv_page_cnt_save := slv_page_cnt;
     if (sync_nent='1') and init='1' then
+      --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
       init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');

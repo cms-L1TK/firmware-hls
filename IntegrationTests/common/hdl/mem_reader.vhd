@@ -86,6 +86,12 @@ begin
 
 
     if (start='1') then
+      --report "mem_reader: "&time'image(now)&" "&NAME&" start  bx="&to_bstring(bx);
+      if (NUM_TPAGES = 1) then
+        --report "mem_reader: "&time'image(now)&" "&NAME&" start  bx="&to_bstring(bx)&" nent="
+        --  &to_bstring(nent(0))&" "
+        --  &to_bstring(nent(1));
+       end if;
       if (NUM_TPAGES = 4) then
         --report "mem_reader: "&time'image(now)&" "&NAME&" start  bx="&to_bstring(bx)&" nent="
         --  &to_bstring(nent(0))&" "
