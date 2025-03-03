@@ -235,8 +235,8 @@ python3 generate_VMRSMER.py -a
         if "VMSMER" not in aVMR:
             raise IndexError("Unit under test has to be a VMSMER.")
 
-        nallstubmem = getNAllStubMem(args.wireconfig, vmr)
+        nallstubmem = getNAllStubMem(args.wireconfig, aVMR)
 
         # Create and write the files
-        writeTopHeader(vmr, nallstubmem, args.outputdir)
-        writeTopFile(vmr, args.outputdir)
+        writeTopHeader(aVMR, nallstubmem, args.outputdir)
+        writeTopFile(aVMR, args.outputdir)
