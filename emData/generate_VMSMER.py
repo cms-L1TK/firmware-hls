@@ -13,7 +13,7 @@ import argparse
 
 def getNAllStubMem(wireconfig, vmr):
 
-    AllStubCount = 0
+    allStubCount = 0
 
     # Open wiring file
     wires_file = open(wireconfig)
@@ -22,11 +22,11 @@ def getNAllStubMem(wireconfig, vmr):
     for line in wires_file:
         module_name = line.split(" ")[-3].split(".")[0]
         if module_name == vmr and "AS" in line:
-            AllStubCount+=1
+            allStubCount+=1
 
     wires_file.close()
 
-    return AllStubCount
+    return allStubCount
 
 ###################################
 # Returns a list of all VMSMER in the given wiring
@@ -121,9 +121,6 @@ def writeTopHeader(vmr, noutcopy, output_dir):
 
 # Writes the VMRouterCMTop.cc file
 def writeTopFile(vmr, output_dir):
-
-    # Get layer/disk number
-    layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
 
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
@@ -224,13 +221,13 @@ python3 generate_VMRSMER.py -a
 
     # Get a list of the Units Under Test
     if args.all:
-        vmr_list = getAllVMRs(args.wireconfig)
+        vmrList = getAllVMRs(args.wireconfig)
     else:
-        vmr_list = args.uut
-    vmr_list.sort()
+        vmrList = args.uut
+    vmrList.sort()
 
     # Loop over all Units Under Test
-    for aVMR in vmr_list:
+    for aVMR in vmrList:
         # Check that the Unit Under Test is a VMR
         if "VMSMER" not in aVMR:
             raise IndexError("Unit under test has to be a VMSMER.")

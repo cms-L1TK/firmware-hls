@@ -46,22 +46,22 @@ def vmStubMERegion(region):
 
 def getTProjAndVMRegions(module):
 
-    tprojRegion = ""
-    vmProjRegion = ""
-    vmStubRegion = ""
-    
-    if any(psword in module for psword in ["L1","L2","L3"]): tprojRegion = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]): tprojRegion = "BARREL2S"
-    else: tprojRegion = "DISK"
+    tproj_region = ""
+    vmproj_region = ""
+    vmstub_region = ""
 
-    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]): vmProjRegion = "BARREL"
-    else: vmProjRegion = "DISK"
+    if any(psword in module for psword in ["L1","L2","L3"]): tproj_region = "BARRELPS"
+    elif any(psword in module for psword in ["L4","L5","L6"]): tproj_region = "BARREL2S"
+    else: tproj_region = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3"]): vmStubRegion = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]): vmStubRegion = "BARREL2S"
-    else: vmStubRegion = "DISK"
+    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]): vmproj_region = "BARREL"
+    else: vmproj_region = "DISK"
 
-    return tprojRegion, vmProjRegion, vmStubRegion
+    if any(psword in module for psword in ["L1","L2","L3"]): vmstub_region = "BARRELPS"
+    elif any(psword in module for psword in ["L4","L5","L6"]): vmstub_region = "BARREL2S"
+    else: vmstub_region = "DISK"
+
+    return tproj_region, vmproj_region, vmstub_region
 
 def fmRegion(region):
     if region in ['L1', 'L2', 'L3', 'L4', 'L5', 'L6']:
