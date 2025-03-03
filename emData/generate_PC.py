@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# This script generates 
+# This script generates
 # ProjectionCalculatorTop.h, and ProjectionCalculatorTop.cc in the
-# TopFunctions/ directory. Currently supports all TPs 
+# TopFunctions/ directory. Currently supports all TPs
 #
 
 from __future__ import absolute_import, print_function
@@ -77,22 +77,22 @@ arguments = parser.parse_args()
 # First, parse the wires file and store the memory names associated with PCs in
 # dictionaries with the PC names as keys.
 with open(arguments.wiresFileName, "r") as wiresFile:
-  tprojMems = {}
-  for line in wiresFile:
-      proctype = "PC_"
-      if proctype not in line :
-        continue
-      line = line.rstrip()
-      pcName = line.split(proctype)[1].split(".")[0]
-      innerLayer = pcName[3:5]
-      outerLayer = pcName[5:7]
-      memName = line.split()[0]
+    tprojMems = {}
+    for line in wiresFile:
+        proctype = "PC_"
+        if proctype not in line :
+            continue
+        line = line.rstrip()
+        pcName = line.split(proctype)[1].split(".")[0]
+        innerLayer = pcName[3:5]
+        outerLayer = pcName[5:7]
+        memName = line.split()[0]
 
-      projtype = "MPROJ_"
-      if memName.startswith(projtype):
-        if pcName not in tprojMems:
-          tprojMems[pcName] = []
-        tprojMems[pcName].append(memName)
+        projtype = "MPROJ_"
+        if memName.startswith(projtype):
+            if pcName not in tprojMems:
+                tprojMems[pcName] = []
+            tprojMems[pcName].append(memName)
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
@@ -120,104 +120,104 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
 #    "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
 #    "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
 #   )
-  topHeaderFile.write(
-    "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
-    "#define TopFunctions_ProjectionCalculatorTop_h\n"
-    "\n"
-    "#include \"ProjectionCalculator.h\"\n"
+    topHeaderFile.write(
+        "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
+        "#define TopFunctions_ProjectionCalculatorTop_h\n"
+        "\n"
+        "#include \"ProjectionCalculator.h\"\n"
     )
-  topFile.write(
-    "#include \"ProjectionCalculatorTop.h\"\n"
-    "\n"
-    "////////////////////////////////////////////////////////////////////////////////\n"
-    "// Top functions for various ProjectionCalculators (PC). For each iteration of\n"
-    "// the main processing loop, a TP retrieves a pair of stub indices from one of\n"
-    "// the stub-pair memories, and in turn, these indices are used to retrieve one\n"
-    "// stub each from an inner and an outer all-stub memory. This pair of stubs is\n"
-    "// used to calculate a rough set of helix parameters, which are written to the\n"
-    "// tracklet-parameter memory if the tracklet passes cuts on rinv and z0. Rough\n"
-    "// projections to additional layers and disks are also calculated and are\n"
-    "// written to the appropriate tracklet-projection memories.\n"
-    "////////////////////////////////////////////////////////////////////////////////\n"
+    topFile.write(
+        "#include \"ProjectionCalculatorTop.h\"\n"
+        "\n"
+        "////////////////////////////////////////////////////////////////////////////////\n"
+        "// Top functions for various ProjectionCalculators (PC). For each iteration of\n"
+        "// the main processing loop, a TP retrieves a pair of stub indices from one of\n"
+        "// the stub-pair memories, and in turn, these indices are used to retrieve one\n"
+        "// stub each from an inner and an outer all-stub memory. This pair of stubs is\n"
+        "// used to calculate a rough set of helix parameters, which are written to the\n"
+        "// tracklet-parameter memory if the tracklet passes cuts on rinv and z0. Rough\n"
+        "// projections to additional layers and disks are also calculated and are\n"
+        "// written to the appropriate tracklet-projection memories.\n"
+        "////////////////////////////////////////////////////////////////////////////////\n"
     )
-  # Calculate parameters and print out parameters and top function for each TP.
-  for pcName in sorted(tprojMems):
-    seed = pcName[0:4]
-    iTC = pcName[4:]
-    # # numbers of memories
-    # nASMemInner = len(asInnerMems[pcName])
-    # nASMemOuter = len(asOuterMems[pcName])
-    # nVMSTEMem = len(vmsteMems[pcName])
-    # # AS inner and outer masks
-    # asInnerMask = 0
-    # asOuterMask = 0
-    # asInnerMems[pcName].sort()
-    # asOuterMems[pcName].sort()
+    # Calculate parameters and print out parameters and top function for each TP.
+    for pcName in sorted(tprojMems):
+        seed = pcName[0:4]
+        iTC = pcName[4:]
+        # # numbers of memories
+        # nASMemInner = len(asInnerMems[pcName])
+        # nASMemOuter = len(asOuterMems[pcName])
+        # nVMSTEMem = len(vmsteMems[pcName])
+        # # AS inner and outer masks
+        # asInnerMask = 0
+        # asOuterMask = 0
+        # asInnerMems[pcName].sort()
+        # asOuterMems[pcName].sort()
 
-    # TPROJ masks for barrel and disks
-    tprojMaskBarrel = 0
-    tprojMaskDisk = 0
-    for projmem in tprojMems[pcName]:
-      projlayreg = projmem.split("_")[2]
-      if projlayreg in ProjoutIndexBarrel:
-        tprojMaskBarrel = tprojMaskBarrel | (1 << ProjoutIndexBarrel[projlayreg])
-      if projlayreg in ProjoutIndexDisk:
-        tprojMaskDisk = tprojMaskDisk | (1 << ProjoutIndexDisk[projlayreg])
+        # TPROJ masks for barrel and disks
+        tprojMaskBarrel = 0
+        tprojMaskDisk = 0
+        for projmem in tprojMems[pcName]:
+            projlayreg = projmem.split("_")[2]
+            if projlayreg in ProjoutIndexBarrel:
+                tprojMaskBarrel = tprojMaskBarrel | (1 << ProjoutIndexBarrel[projlayreg])
+            if projlayreg in ProjoutIndexDisk:
+                tprojMaskDisk = tprojMaskDisk | (1 << ProjoutIndexDisk[projlayreg])
       
     # Print out prototype for top function for this PC.
     topHeaderFile.write(
-      "\n"
-      "void ProjectionCalculator_" + seed + iTC + "(\n"
-      "    const BXType bx,\n"
-      "    BXType& bx_o,\n"
-      "    TrackletParameters tPar,\n"
-      "    ap_uint<9> trackletIndex,\n"
-      "    bool valid,\n"
-      "    TrackletParameterMemory& tparout,\n"
-      "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
-      "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
-      "    TrackletProjectionMemory<DISK> projout_disk[]\n"
-      ");\n"
-      )
+        "\n"
+        "void ProjectionCalculator_" + seed + iTC + "(\n"
+        "    const BXType bx,\n"
+        "    BXType& bx_o,\n"
+        "    TrackletParameters tPar,\n"
+        "    ap_uint<9> trackletIndex,\n"
+        "    bool valid,\n"
+        "    TrackletParameterMemory& tparout,\n"
+        "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
+        "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
+        "    TrackletProjectionMemory<DISK> projout_disk[]\n"
+        ");\n"
+    )
 
     # Print out definition of top function for this TP.
     topFile.write(
-      "\n"
-      "void ProjectionCalculator_" + seed + iTC + "(\n"
-      "    const BXType bx,\n"
-      "    BXType& bx_o,\n"
-      "    TrackletParameters tPar,\n"
-      "    ap_uint<9> trackletIndex,\n"
-      "    bool valid,\n"
-      "    TrackletParameterMemory& tparout,\n"
-      "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],\n"
-      "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],\n"
-      "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
-      ") {\n"
-      "#pragma HLS latency min=13 max=13\n"
-      "#pragma HLS pipeline II=1\n"
-      "#pragma HLS inline recursive\n"
-      "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
-      "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
-      "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
-      "\n"
-      "PC_" + seed + iTC + ": ProjectionCalculator<\n"
-      "  TF::" + seed + ",\n"
-      "  TP::" + iTC[0] + ",\n"
-      "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
-      " >(\n"
-      "    bx,\n"
-      "    bx_o,\n"
-      "    tPar,\n"
-      "    trackletIndex,\n"
-      "    valid,\n"
-      "    tparout,\n"
-      "    projout_barrel_ps,\n"
-      "    projout_barrel_2s,\n"
-      "    projout_disk\n"
-      "  );\n"
-      "}\n"
-      )
+        "\n"
+        "void ProjectionCalculator_" + seed + iTC + "(\n"
+        "    const BXType bx,\n"
+        "    BXType& bx_o,\n"
+        "    TrackletParameters tPar,\n"
+        "    ap_uint<9> trackletIndex,\n"
+        "    bool valid,\n"
+        "    TrackletParameterMemory& tparout,\n"
+        "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],\n"
+        "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],\n"
+        "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
+        ") {\n"
+        "#pragma HLS latency min=13 max=13\n"
+        "#pragma HLS pipeline II=1\n"
+        "#pragma HLS inline recursive\n"
+        "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
+        "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
+        "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+        "\n"
+        "PC_" + seed + iTC + ": ProjectionCalculator<\n"
+        "  TF::" + seed + ",\n"
+        "  TP::" + iTC[0] + ",\n"
+        "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
+        " >(\n"
+        "    bx,\n"
+        "    bx_o,\n"
+        "    tPar,\n"
+        "    trackletIndex,\n"
+        "    valid,\n"
+        "    tparout,\n"
+        "    projout_barrel_ps,\n"
+        "    projout_barrel_2s,\n"
+        "    projout_disk\n"
+        "  );\n"
+        "}\n"
+    )
         
 
   # Print out endifs and close files.
@@ -226,11 +226,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
   #     "#endif\n"
   # )
   topHeaderFile.write(
-  "\n"
-  "#endif\n"
+      "\n"
+      "#endif\n"
   )
   topFile.write(
-  "\n"
-  "////////////////////////////////////////////////////////////////////////////////\n"
+      "\n"
+      "////////////////////////////////////////////////////////////////////////////////\n"
   )
 

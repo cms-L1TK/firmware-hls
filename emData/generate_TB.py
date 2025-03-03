@@ -151,7 +151,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # numbers of memories
         nTPARMem = []
         for i in range(0, 4):
-          nTPARMem.append(len([tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i]]))
+            nTPARMem.append(len([tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i]]))
         nBarrelFMMem = len(barrelFMMems[tbName])
         nDiskFMMem = len(diskFMMems[tbName])
 
@@ -165,8 +165,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         layercount = {}
         for fm in barrelFMs :
             if fm not in layercount:
-                layercount[fm]=0;
-            layercount[fm]+=1;
+                layercount[fm]=0
+            layercount[fm]+=1
         NFMBarrel=0
         for layer in layercount:
             shift=int(layer[-1])-1
@@ -175,8 +175,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         diskcount = {}
         for fm in diskFMs :
             if fm not in diskcount:
-                diskcount[fm]=0;
-            diskcount[fm]+=1;
+                diskcount[fm]=0
+            diskcount[fm]+=1
         NFMDisk=0
         for disk in diskcount:
             shift=int(disk[-1])-1
@@ -191,8 +191,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # mask for enabling/disabling arrays of TPAR memories
         tparMask = 0
         for i in range(0, 4):
-          if nTPARMem[i] > 0:
-            tparMask = tparMask | (1 << i)
+            if nTPARMem[i] > 0:
+                tparMask = tparMask | (1 << i)
 
         # definition of getMPARNPages function
         nParentheses = 0
@@ -202,22 +202,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         getMPARNPages += "getMPARNPages<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARNPages += "  return "
         for i in range(1, maxNPages):
-          if nTPARMem[i - 1] == 0:
-            continue
-          if not first:
-            getMPARNPages += "(\n         "
-            nParentheses += 1
-          mems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i - 1]]
-          pages = "".join([tpar[9:] for tpar in mems])
-          pages = [ITC[page].value for page in pages]
-          getMPARNPages += "(iTC == " + str(pages[0])
-          for page in pages[1:]:
-            getMPARNPages += " || iTC == " + str(page)
-          getMPARNPages += ") ? " + str(i) + " : "
-          first = False
+            if nTPARMem[i - 1] == 0:
+                continue
+            if not first:
+                getMPARNPages += "(\n         "
+                nParentheses += 1
+            mems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i - 1]]
+            pages = "".join([tpar[9:] for tpar in mems])
+            pages = [ITC[page].value for page in pages]
+            getMPARNPages += "(iTC == " + str(pages[0])
+            for page in pages[1:]:
+                getMPARNPages += " || iTC == " + str(page)
+            getMPARNPages += ") ? " + str(i) + " : "
+            first = False
         getMPARNPages += str(maxNPages)
         for i in range(0, nParentheses):
-          getMPARNPages += ")"
+            getMPARNPages += ")"
         getMPARNPages += ";\n}\n"
 
         # definition of getMPARMem function
@@ -226,23 +226,23 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         getMPARMem += "getMPARMem<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARMem += "  return "
         for i in range(0, max(nTPARMem) - 1):
-          if i != 0:
-            getMPARMem += "(\n         "
-            nParentheses += 1
-          mems = []
-          for j in range(0, 4):
-            allMems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[j]]
-            if len(allMems) > i:
-              mems.append(allMems[i])
-          pages = "".join([tpar[9:] for tpar in mems])
-          pages = [ITC[page].value for page in pages]
-          getMPARMem += "(iTC == " + str(pages[0])
-          for page in pages[1:]:
-            getMPARMem += " || iTC == " + str(page)
-          getMPARMem += ") ? " + str(i) + " : "
+            if i != 0:
+                getMPARMem += "(\n         "
+                nParentheses += 1
+            mems = []
+            for j in range(0, 4):
+                allMems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[j]]
+                if len(allMems) > i:
+                    mems.append(allMems[i])
+            pages = "".join([tpar[9:] for tpar in mems])
+            pages = [ITC[page].value for page in pages]
+            getMPARMem += "(iTC == " + str(pages[0])
+            for page in pages[1:]:
+                getMPARMem += " || iTC == " + str(page)
+            getMPARMem += ") ? " + str(i) + " : "
         getMPARMem += str(max(nTPARMem) - 1)
         for i in range(0, nParentheses):
-          getMPARMem += ")"
+            getMPARMem += ")"
         getMPARMem += ";\n}\n"
 
         # definition of getMPARPage function
@@ -251,18 +251,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         getMPARPage += "getMPARPage<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARPage += "  return "
         for i in range(0, maxNPages - 1):
-          if i != 0:
-            getMPARPage += "(\n         "
-            nParentheses += 1
-          pages = "".join([tpar[9 + i] for tpar in tparMems[tbName] if len(tpar) > 9 + i])
-          pages = [ITC[page].value for page in pages]
-          getMPARPage += "(iTC == " + str(pages[0])
-          for page in pages[1:]:
-            getMPARPage += " || iTC == " + str(page)
-          getMPARPage += ") ? " + str(i) + " : "
+            if i != 0:
+                getMPARPage += "(\n         "
+                nParentheses += 1
+            pages = "".join([tpar[9 + i] for tpar in tparMems[tbName] if len(tpar) > 9 + i])
+            pages = [ITC[page].value for page in pages]
+            getMPARPage += "(iTC == " + str(pages[0])
+            for page in pages[1:]:
+                getMPARPage += " || iTC == " + str(page)
+            getMPARPage += ") ? " + str(i) + " : "
         getMPARPage += str(maxNPages - 1)
         for i in range(0, nParentheses):
-          getMPARPage += ")"
+            getMPARPage += ")"
         getMPARPage += ";\n}\n"
 
         # Print out prototype for top function for this TB.
@@ -343,8 +343,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
         )
         for i in range(0, 4):
-          for j in range(0, nTPARMem[i]):
-              topFile.write("#pragma HLS resource variable=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
+            for j in range(0, nTPARMem[i]):
+                topFile.write("#pragma HLS resource variable=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
         for i in range(0, nBarrelFMMem):
             topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
         for i in range(0, nDiskFMMem):
@@ -384,4 +384,3 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         "\n"
         "\n#endif\n"
     )
-

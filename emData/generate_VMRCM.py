@@ -123,7 +123,7 @@ def getAllVMRs(wireconfig):
 def getAllStubInnerMaskString(mem_list):
 
     as_inner_list = ["OR", "OM", "OL", "BR/DR", "BM/DM", "BL/DL", "BF", "BE", "BD", "BC", "BB", "BA"]
-    mask = "0b";
+    mask = "0b"
 
     # Loop over all the different AllStub Inner type
     for mem_type in as_inner_list:

@@ -7,7 +7,6 @@ from __future__ import absolute_import, print_function
 # Supports all VMRs, but creates separate top function files foe each VMR specified.
 
 import argparse
-import collections
 
 # Constants
 num_layers = 6
@@ -18,7 +17,7 @@ num_disks = 5
 
 def getNAllStubMem(wireconfig, vmr):
 
-    AllStubCount = 0;
+    AllStubCount = 0
 
     # Open wiring file
     wires_file = open(wireconfig)
@@ -35,7 +34,7 @@ def getNAllStubMem(wireconfig, vmr):
 
 ###################################
 # Returns a list of all VMSMER in the given wiring
-    
+
 def getAllVMRs(wireconfig):
 
     vmr_list = []
@@ -62,7 +61,6 @@ def writeTopHeader(vmr, noutcopy, output_dir):
     # Get layer/disk number and phi region
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
     disk = int(0 if layer else vmr.split("_")[1][1])
-    layerdisk = layer-1 if layer else disk+num_layers-1
     phi_region = vmr.split("PHI")[1]
 
     # Top file name
@@ -131,10 +129,9 @@ def writeTopFile(vmr, output_dir):
     # Get layer/disk number
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
     disk = int(0 if layer else vmr.split("_")[1][1])
-    layerdisk = layer-1 if layer else disk+num_layers-1
 
     LD = ""
-     
+
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
 
