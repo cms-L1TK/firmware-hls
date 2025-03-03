@@ -97,6 +97,7 @@ with open(arguments.wiresFileName, "r") as wiresFile:
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
 #with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator_parameters.h"), "w") as parametersFile, \
+print("outputDirectory:",  arguments.outputDirectory)
 with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.h"), "w") as topHeaderFile, \
      open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.cc"), "w") as topFile:
 #  parametersFile.write(
@@ -142,6 +143,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
     )
     # Calculate parameters and print out parameters and top function for each TP.
     for pcName in sorted(tprojMems):
+        print("pcNames:", pcName)
         seed = pcName[0:4]
         iTC = pcName[4:]
         # # numbers of memories
@@ -164,60 +166,60 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
             if projlayreg in ProjoutIndexDisk:
                 tprojMaskDisk = tprojMaskDisk | (1 << ProjoutIndexDisk[projlayreg])
       
-    # Print out prototype for top function for this PC.
-    topHeaderFile.write(
-        "\n"
-        "void ProjectionCalculator_" + seed + iTC + "(\n"
-        "    const BXType bx,\n"
-        "    BXType& bx_o,\n"
-        "    TrackletParameters tPar,\n"
-        "    ap_uint<9> trackletIndex,\n"
-        "    bool valid,\n"
-        "    TrackletParameterMemory& tparout,\n"
-        "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
-        "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
-        "    TrackletProjectionMemory<DISK> projout_disk[]\n"
-        ");\n"
-    )
+        # Print out prototype for top function for this PC.
+        topHeaderFile.write(
+          "\n"
+          "void ProjectionCalculator_" + seed + iTC + "(\n"
+          "    const BXType bx,\n"
+          "    BXType& bx_o,\n"
+          "    TrackletParameters tPar,\n"
+          "    ap_uint<9> trackletIndex,\n"
+          "    bool valid,\n"
+          "    TrackletParameterMemory& tparout,\n"
+          "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
+          "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
+          "    TrackletProjectionMemory<DISK> projout_disk[]\n"
+          ");\n"
+        )
 
-    # Print out definition of top function for this TP.
-    topFile.write(
-        "\n"
-        "void ProjectionCalculator_" + seed + iTC + "(\n"
-        "    const BXType bx,\n"
-        "    BXType& bx_o,\n"
-        "    TrackletParameters tPar,\n"
-        "    ap_uint<9> trackletIndex,\n"
-        "    bool valid,\n"
-        "    TrackletParameterMemory& tparout,\n"
-        "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],\n"
-        "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],\n"
-        "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
-        ") {\n"
-        "#pragma HLS latency min=13 max=13\n"
-        "#pragma HLS pipeline II=1\n"
-        "#pragma HLS inline recursive\n"
-        "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
-        "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
-        "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
-        "\n"
-        "PC_" + seed + iTC + ": ProjectionCalculator<\n"
-        "  TF::" + seed + ",\n"
-        "  TP::" + iTC[0] + ",\n"
-        "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
-        " >(\n"
-        "    bx,\n"
-        "    bx_o,\n"
-        "    tPar,\n"
-        "    trackletIndex,\n"
-        "    valid,\n"
-        "    tparout,\n"
-        "    projout_barrel_ps,\n"
-        "    projout_barrel_2s,\n"
-        "    projout_disk\n"
-        "  );\n"
-        "}\n"
-    )
+        # Print out definition of top function for this TP.
+        topFile.write(
+          "\n"
+          "void ProjectionCalculator_" + seed + iTC + "(\n"
+          "    const BXType bx,\n"
+          "    BXType& bx_o,\n"
+          "    TrackletParameters tPar,\n"
+          "    ap_uint<9> trackletIndex,\n"
+          "    bool valid,\n"
+          "    TrackletParameterMemory& tparout,\n"
+          "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS],\n"
+          "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],\n"
+          "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
+          ") {\n"
+          "#pragma HLS latency min=13 max=13\n"
+          "#pragma HLS pipeline II=1\n"
+          "#pragma HLS inline recursive\n"
+          "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
+          "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
+          "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+          "\n"
+          "PC_" + seed + iTC + ": ProjectionCalculator<\n"
+          "  TF::" + seed + ",\n"
+          "  TP::" + iTC[0] + ",\n"
+          "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
+          " >(\n"
+          "    bx,\n"
+          "    bx_o,\n"
+          "    tPar,\n"
+          "    trackletIndex,\n"
+          "    valid,\n"
+          "    tparout,\n"
+          "    projout_barrel_ps,\n"
+          "    projout_barrel_2s,\n"
+          "    projout_disk\n"
+          "  );\n"
+          "}\n"
+        )
         
 
     # Print out endifs and close files.
@@ -226,11 +228,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
     #     "#endif\n"
     # )
     topHeaderFile.write(
-        "\n"
-        "#endif\n"
+      "\n"
+      "#endif\n"
     )
     topFile.write(
-        "\n"
-        "////////////////////////////////////////////////////////////////////////////////\n"
-     )
+      "\n"
+      "////////////////////////////////////////////////////////////////////////////////\n"
+    )
 
