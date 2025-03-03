@@ -6,8 +6,8 @@
 #
 
 from __future__ import absolute_import, print_function
-import sys, re, os, argparse
-from enum import Enum
+import os
+import argparse
 
 # These enums must match those defined in
 # TopFunctions/TrackletProcessor.h.
@@ -165,7 +165,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
                 tprojMaskBarrel = tprojMaskBarrel | (1 << ProjoutIndexBarrel[projlayreg])
             if projlayreg in ProjoutIndexDisk:
                 tprojMaskDisk = tprojMaskDisk | (1 << ProjoutIndexDisk[projlayreg])
-      
+
         # Print out prototype for top function for this PC.
         topHeaderFile.write(
           "\n"
@@ -220,7 +220,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
           "  );\n"
           "}\n"
         )
-        
+
 
     # Print out endifs and close files.
     # parametersFile.write(
@@ -235,4 +235,3 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
       "\n"
       "////////////////////////////////////////////////////////////////////////////////\n"
     )
-

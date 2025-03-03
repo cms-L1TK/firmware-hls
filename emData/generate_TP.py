@@ -6,7 +6,9 @@
 
 
 from __future__ import absolute_import, print_function
-import sys, re, os, argparse
+import re
+import os
+import argparse
 from enum import Enum
 
 # These enums must match those defined in
@@ -166,7 +168,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         "#define TopFunctions_TrackletProcessorTop_h\n"
         "\n"
         "#include \"TrackletProcessor.h\"\n"
-    ) 
+    )
     topFile.write(
         "#include \"TrackletProcessorTop.h\"\n"
         "\n"
@@ -181,7 +183,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         "// written to the appropriate tracklet-projection memories.\n"
         "////////////////////////////////////////////////////////////////////////////////\n"
     )
-  
+
     # Calculate parameters and print out parameters and top function for each TP.
     seedlist = [] #keeps track of seeds that have been looped over for functions that only exist once per seed type
     for tpName in sorted(asInnerMems.keys()):
@@ -196,7 +198,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         asOuterMask = 0
         asInnerMems[tpName].sort()
         asOuterMems[tpName].sort()
-      
+
         # TPROJ masks for barrel and disks
         tprojMaskBarrel = 0
         tprojMaskDisk = 0
@@ -210,7 +212,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
                 projoutName = "TPROJ_" + seed + iTC + "_" + projout.name
                 projoutIndex = projout.value
                 if projoutName in tprojMems[tpName]:
-                    tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)      
+                    tprojMaskDisk = tprojMaskDisk | (1 << projoutIndex)
         else:
             #This corresponds to the case where we don't have projections the
             #configuration because they are now done in the PC. However, we are
@@ -302,7 +304,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
              )% (tprojMaskBarrel, tprojMaskDisk)
          )
         if seed not in seedlist:
-             seedlist.append(seed)
+            seedlist.append(seed)
         # Print out prototype for top function for this TC.
         topHeaderFile.write(
             "\n"
@@ -318,7 +320,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
             "    TrackletProjectionMemory<DISK> projout_disk[]\n"
             ");\n"
          )
-  
+
         # Print out definition of top function for this TP.
         topFile.write(
             "\n"
@@ -366,7 +368,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
             "  );\n"
             "}\n"
          )
-  
+
     # Print out endifs and close files.
     parametersFile.write(
         "}\n"
@@ -380,4 +382,3 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         "\n"
         "////////////////////////////////////////////////////////////////////////////////\n"
      )
-  

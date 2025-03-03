@@ -8,7 +8,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 import os
 import re
-import sys
 import argparse
 
 TF_index = {}
@@ -167,12 +166,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             NPageSum += npage
             NPage = NPage | ((npage-1) << (2*index))
             index+=1
-            
+
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
         maxFMMems += seed + "PHI" + iMP + "maxFullMatchCopies"
         if mpName != sorted(TPMems.keys(), key=lambda x: x.startswith('L'))[-1]:
             maxTPMems += ",\n				   "
-            maxFMMems += ",\n				   " 
+            maxFMMems += ",\n				   "
 
         # Print out parameters for this MP.
         parametersFile.write(

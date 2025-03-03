@@ -128,7 +128,6 @@ def writeTopFile(vmr, output_dir):
 
     # Get layer/disk number
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
-    disk = int(0 if layer else vmr.split("_")[1][1])
 
     LD = ""
 
