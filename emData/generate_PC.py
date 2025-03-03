@@ -220,17 +220,17 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
     )
         
 
-  # Print out endifs and close files.
-  # parametersFile.write(
-  #     "\n"
-  #     "#endif\n"
-  # )
-  topHeaderFile.write(
-      "\n"
-      "#endif\n"
-  )
-  topFile.write(
-      "\n"
-      "////////////////////////////////////////////////////////////////////////////////\n"
-  )
+    # Print out endifs and close files.
+    # parametersFile.write(
+    #     "\n"
+    #     "#endif\n"
+    # )
+    topHeaderFile.write(
+        "\n"
+        "#endif\n"
+    )
+    topFile.write(
+        "\n"
+        "////////////////////////////////////////////////////////////////////////////////\n"
+     )
 
