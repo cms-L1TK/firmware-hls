@@ -12,8 +12,8 @@ import argparse
 import collections
 
 # Constants
-num_layers = 6
-num_disks = 5
+numLayers = 6
+numDisks = 5
 
 # Lists of which layer/disk has AllStubInner ans VMSTE memories
 has_allstub_inner = [True, True, True, False, True, False, True, False, True, False, False]
@@ -26,7 +26,7 @@ has_vmste_outer = [False, True, True, True, False, True, True, True, False, True
 # One key for every memory type in each layer/disk
 # Value is a list of all memory names for that key
 
-def getDictOfMemories(wireconfig, vmr_list):
+def getDictOfMemories(wireconfig, vmrlist):
 
     # Dictionary of all the input and output memories
     mem_dict = {}
@@ -37,7 +37,7 @@ def getDictOfMemories(wireconfig, vmr_list):
     # Loop over each line in the wiring
     for line in wires_file:
         # Check if any of the VMRs exist in the line
-        for vmr in vmr_list:
+        for vmr in vmrlist:
             if vmr in line:
                 mem_name = line.split()[0]
                 mem_type = mem_name.split("_")[0]
@@ -56,7 +56,7 @@ def getDictOfMemories(wireconfig, vmr_list):
                 break
 
     # Loop over all memories and add an empty IL DISK2S, AllStub Inner, and VMSTE memory lists if missing in dictionary
-    for vmr in vmr_list:
+    for vmr in vmrlist:
         if "IL_DISK2S_" + vmr not in mem_dict:
             mem_dict["IL_DISK2S_" + vmr] = []
         if "VMSTE_" + vmr not in mem_dict:
@@ -97,7 +97,7 @@ def getDictOfCopies(mem_list):
 
 def getAllVMRs(wireconfig):
 
-    vmr_list = []
+    vmrlist = []
 
     # Open wiring file
     wires_file = open(wireconfig)
@@ -106,12 +106,12 @@ def getAllVMRs(wireconfig):
     for line in wires_file:
         module_name = line.split(" ")[-1].split(".")[0]
         # Add module name if not already in vmr_list
-        if "VMR" in module_name and module_name not in vmr_list:
-            vmr_list.append(module_name)
+        if "VMR" in module_name and module_name not in vmrlist:
+            vmrlist.append(module_name)
 
     wires_file.close()
 
-    return vmr_list
+    return vmrlist
 
 ###################################
 # Returns a string of the AllStub Inner memory mask
@@ -192,7 +192,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
     )
 
     # Write phi correction LUTs functions
-    for i in range(num_layers):
+    for i in range(numLayers):
         parameter_file.write(
             "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
             "  static int lut[] = \n"
@@ -200,7 +200,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
             "  return lut;\n"
             "}\n"
         )
-    for i in range(num_disks):
+    for i in range(numDisks):
         parameter_file.write(
             "template<> inline const int* getPhiCorrTable<TF::D" + str(i+1) + ">(){\n"
             "  return nullptr;\n"
@@ -209,14 +209,14 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
     # Write ME Tables
     parameter_file.write("\n// ME Tables\n")
-    for i in range(num_layers):
+    for i in range(numLayers):
         parameter_file.write(
             "template<> inline const int* getMETable<TF::L" + str(i+1) + ">(){\n"
             "  static int lut[] =\n"
             "#if __has_include(\"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
             "}\n"
         )
-    for i in range(num_disks):
+    for i in range(numDisks):
         parameter_file.write(
             "template<> inline const int* getMETable<TF::D" + str(i+1) + ">(){\n"
             "  static int lut[] =\n"
@@ -226,28 +226,28 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
     # Write TE Tables
     parameter_file.write("\n// TE Tables\n")
-    for i in range(num_layers):
+    for i in range(numLayers):
         parameter_file.write(
             "template<> inline const int* getTETable<TF::L" + str(i+1) + ">(){\n"
             "  return nullptr;\n"
             "}\n"
         )
-    for i in range(num_disks):
+    for i in range(numDisks):
         parameter_file.write(
             "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
+            +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+numLayers] else "  return nullptr;\n")+
             "}\n"
         )
 
     # Write InputType functions
     parameter_file.write("\n// InputType\n")
-    for i in range(num_layers):
+    for i in range(numLayers):
         parameter_file.write(
             "template<> constexpr regionType getInputType<TF::L" + str(i+1) + ">(){\n"
             "  return " + ("BARRELPS" if i < 3 else "BARREL2S") + ";\n"
             "}\n"
         )
-    for i in range(num_disks):
+    for i in range(numDisks):
         parameter_file.write(
             "template<> constexpr regionType getInputType<TF::D" + str(i+1) + ">(){\n"
             "  return DISKPS;\n"
@@ -256,13 +256,13 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
 
     # Write OutputType functions
     parameter_file.write("\n// OutputType\n")
-    for i in range(num_layers):
+    for i in range(numLayers):
         parameter_file.write(
             "template<> constexpr regionType getOutputType<TF::L" + str(i+1) + ">(){\n"
             "  return " + ("BARRELPS" if i < 3 else "BARREL2S") + ";\n"
             "}\n"
         )
-    for i in range(num_disks):
+    for i in range(numDisks):
         parameter_file.write(
             "template<> constexpr regionType getOutputType<TF::D" + str(i+1) + ">(){\n"
             "  return DISK;\n"
@@ -322,7 +322,7 @@ def writeTopHeader(vmr, output_dir):
     # Get layer/disk number and phi region
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
     disk = int(0 if layer else vmr.split("_")[1][1])
-    layerdisk = layer-1 if layer else disk+num_layers-1
+    layerdisk = layer-1 if layer else disk+numLayers-1
     phi_region = vmr.split("PHI")[1]
 
     # Top file name
@@ -396,7 +396,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
     # Get layer/disk number
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
     disk = int(0 if layer else vmr.split("_")[1][1])
-    layerdisk = layer-1 if layer else disk+num_layers-1
+    layerdisk = layer-1 if layer else disk+numLayers-1
 
     # Top file name
     file_name = "VMRouterCMTop_" + vmr.split("_")[1]
@@ -510,23 +510,23 @@ python3 generate_VMRCM.py -a
 
     # Get a list of the Units Under Test
     if args.all:
-        vmr_list = getAllVMRs(args.wireconfig)
+        vmrList = getAllVMRs(args.wireconfig)
     else:
-        vmr_list = args.uut
-    vmr_list.sort()
+        vmrList = args.uut
+    vmrList.sort()
 
     # Dictionary of all memories sorted by type and Unit Under Test
-    mem_dict = getDictOfMemories(args.wireconfig, vmr_list)
+    memDict = getDictOfMemories(args.wireconfig, vmrList)
 
     # Loop over all Units Under Test
-    for vmr in vmr_list:
+    for aVMR in vmrList:
         # Check that the Unit Under Test is a VMR
-        if "VMR" not in vmr:
+        if "VMR" not in aVMR:
             raise IndexError("Unit under test has to be a VMR.")
 
         # Create and write the files
-        writeTopHeader(vmr, args.outputdir)
-        writeTopFile(vmr, len(mem_dict["IL_"+vmr]), len(mem_dict["IL_DISK2S_"+vmr]), args.outputdir)
+        writeTopHeader(aVMR, args.outputdir)
+        writeTopFile(aVMR, len(memDict["IL_"+aVMR]), len(memDict["IL_DISK2S_"+aVMR]), args.outputdir)
 
     # Write parameters file
-    writeParameterFile(vmr_list, mem_dict, args.outputdir)
+    writeParameterFile(vmrList, memDict, args.outputdir)

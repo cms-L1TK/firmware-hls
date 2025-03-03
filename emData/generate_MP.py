@@ -26,7 +26,7 @@ TF_index['BBBB'] = 1
 maxTPMems = "constexpr int maxTPMemories["
 maxFMMems = "constexpr int maxFMMemories["
 
-def ASRegion(region):
+def asRegion(region):
     if region in ['L1', 'L2', 'L3']:
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
@@ -36,16 +36,7 @@ def ASRegion(region):
     else:
         return 'DISK2S'
 
-def APRegion(region):
-    if region in ['L1', 'L2', 'L3']:
-        return 'BARRELPS'
-    elif region in ['L4', 'L5', 'L6']:
-        return 'BARREL2S'
-    else:
-        return 'DISK'
-
-
-def VMStubMERegion(region):
+def vmStubMERegion(region):
     if region in ['L1', 'L2', 'L3']:
         return 'BARRELPS'
     elif region in ['L4', 'L5', 'L6']:
@@ -54,20 +45,25 @@ def VMStubMERegion(region):
         return 'DISK'
 
 def getTProjAndVMRegions(module):
-    if any(psword in module for psword in ["L1","L2","L3"]): TProjRegion = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]): TProjRegion = "BARREL2S"
-    else: TProjRegion = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]): VMProjRegion = "BARREL"
-    else: VMProjRegion = "DISK"
+    tprojRegion = ""
+    vmProjRegion = ""
+    vmStubRegion = ""
+    
+    if any(psword in module for psword in ["L1","L2","L3"]): tprojRegion = "BARRELPS"
+    elif any(psword in module for psword in ["L4","L5","L6"]): tprojRegion = "BARREL2S"
+    else: tprojRegion = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3"]): VMStubRegion = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]): VMStubRegion = "BARREL2S"
-    else: VMStubRegion = "DISK"
+    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]): vmProjRegion = "BARREL"
+    else: vmProjRegion = "DISK"
 
-    return TProjRegion, VMProjRegion, VMStubRegion
+    if any(psword in module for psword in ["L1","L2","L3"]): vmStubRegion = "BARRELPS"
+    elif any(psword in module for psword in ["L4","L5","L6"]): vmStubRegion = "BARREL2S"
+    else: vmStubRegion = "DISK"
 
-def FMRegion(region):
+    return tprojRegion, vmProjRegion, vmStubRegion
+
+def fmRegion(region):
     if region in ['L1', 'L2', 'L3', 'L4', 'L5', 'L6']:
         return 'BARREL'
     else:
@@ -152,19 +148,19 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         # numbers of memories
         nTPMem = len(TPMems[mpName])
         nFMMem = len(FMMems[mpName])
-        FMMask = 0
+        fmMask = 0
         for FM in FMMems[mpName]:
-            FMMask = FMMask | (1 << TF_index[FM])
+            fmMask = fmMask | (1 << TF_index[FM])
 
-        NPage = 0
-        NPageSum = 0
+        nPage = 0
+        nPageSum = 0
         index = 0
         for TPROJ in TPMems[mpName]:
             npage = len(TPROJ)-17
             if TPROJ.endswith("_E"):
                 npage = len(TPROJ)-19
-            NPageSum += npage
-            NPage = NPage | ((npage-1) << (2*index))
+            nPageSum += npage
+            nPage = nPage | ((npage-1) << (2*index))
             index+=1
 
         maxTPMems += seed + "PHI" + iMP + "maxTrackletProjections"
@@ -179,7 +175,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "// magic numbers for " + mpName + "\n"
             "template<> constexpr uint32_t FMMask<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
-            "}\n" % FMMask
+            "}\n" % fmMask
         )
 
         parametersFile.write(
@@ -187,7 +183,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "// magic numbers for " + mpName + "\n"
             "template<> constexpr uint64_t NPage<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
-            "}\n" % NPage
+            "}\n" % nPage
         )
 
         parametersFile.write(
@@ -195,7 +191,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "// magic numbers for " + mpName + "\n"
             "template<> constexpr uint32_t NPageSum<TF::" + seed + ", TF::" + iMP + ">() {\n"
             "  return 0x%X;\n"
-            "}\n" % NPageSum
+            "}\n" % nPageSum
         )
 
         TProjRegion, VMProjRegion, VMStubRegion = getTProjAndVMRegions(seed)
@@ -210,10 +206,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "void MatchProcessor_" + seed + "PHI" + iMP + "(\n"
             "    const BXType bx,\n"
             "    const TrackletProjectionMemory<" + TProjRegion + "> projin[" + seed + "PHI" + iMP + "maxTrackletProjections],\n"
-            "    const VMStubMemory<" + VMStubMERegion(seed) + ", " + nrz + ", kNbitsphibin, kNMatchEngines>& instubdata,\n"
-            "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
+            "    const VMStubMemory<" + vmStubMERegion(seed) + ", " + nrz + ", kNbitsphibin, kNMatchEngines>& instubdata,\n"
+            "    const AllStubMemory<" + asRegion(seed) + ">* allstub,\n"
             "    BXType& bx_o,\n"
-            "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
+            "    FullMatchMemory<" + fmRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
             ");\n"
         )
 
@@ -223,10 +219,10 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
             "void MatchProcessor_" + seed + "PHI" + iMP + "(\n"
             "    const BXType bx,\n"
             "    const TrackletProjectionMemory<" + TProjRegion + "> projin[" + seed + "PHI" + iMP + "maxTrackletProjections],\n"
-            "    const VMStubMemory<" + VMStubMERegion(seed) + ", " + nrz + ", kNbitsphibin, kNMatchEngines>& instubdata,\n"
-            "    const AllStubMemory<" + ASRegion(seed) + ">* allstub,\n"
+            "    const VMStubMemory<" + vmStubMERegion(seed) + ", " + nrz + ", kNbitsphibin, kNMatchEngines>& instubdata,\n"
+            "    const AllStubMemory<" + asRegion(seed) + ">* allstub,\n"
             "    BXType& bx_o,\n"
-            "    FullMatchMemory<" + FMRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
+            "    FullMatchMemory<" + fmRegion(seed) + "> fullmatch[" + seed + "PHI" + iMP + "maxFullMatchCopies]\n"
             ") {\n"
             "#pragma HLS inline off\n"
             "#pragma HLS interface register port=bx_o\n"
@@ -244,11 +240,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "MatchProcessor_param
         topFile.write(
             "#pragma HLS resource variable=allstub->get_mem() latency=2\n"
             "#pragma HLS resource variable=instubdata.get_mem() latency=2\n"
-#            "#pragma HLS resource variable=instubdata.get_mem_entries8A() latency=1\n"
-#            "#pragma HLS resource variable=instubdata.get_mem_entries8B() latency=1\n"
            "\n"
             "MP_" + seed + "PHI" + iMP + ": MatchProcessor<"
-            "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + ASRegion(seed) + ", " + FMRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
+            "" + TProjRegion + ", " + VMStubRegion + ", " + nrz + ", " + VMProjRegion + ", "  + asRegion(seed) + ", " + fmRegion(seed) + ", " + seed + "PHI" + iMP + "maxTrackletProjections" + ", " + seed + "PHI" + iMP + "maxFullMatchCopies" + ",\n"
             " TF::" + seed + ", "
             "TF::" + iMP + "> (\n"
             "    bx,\n"

@@ -16,7 +16,7 @@ def getNmemsPerIR(wiresFiles='./LUTs/wires.dat'):
         my_regex = 'input=> IR_'
         if re.search(my_regex, line, re.IGNORECASE):
             lines.append(line)
-    lines =list(set(lines))
+    lines = list(set(lines))
     dtcNames = list(set(dtcNames))
     nMemories = []
     for dtcName in dtcNames:

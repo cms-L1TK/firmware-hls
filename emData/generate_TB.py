@@ -55,7 +55,6 @@ arguments = parser.parse_args()
 # Keep in sync with
 # kTProjITCSize in TrackletAlgorithm/TrackletProjectionMemory.h and
 # kFMITCSize in TrackletAlgorithm/FullMatchMemory.h
-ITC_SIZE = 4
 
 # First, parse the wires file and store the memory names associated with TBs in
 # dictionaries with the TB names as keys.
@@ -167,20 +166,20 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             if fm not in layercount:
                 layercount[fm]=0
             layercount[fm]+=1
-        NFMBarrel=0
+        nFMBarrel=0
         for layer in layercount:
             shift=int(layer[-1])-1
-            NFMBarrel+=(layercount[layer]<<(4*shift))
+            nFMBarrel+=(layercount[layer]<<(4*shift))
 
         diskcount = {}
         for fm in diskFMs :
             if fm not in diskcount:
                 diskcount[fm]=0
             diskcount[fm]+=1
-        NFMDisk=0
+        nFMDisk=0
         for disk in diskcount:
             shift=int(disk[-1])-1
-            NFMDisk+=(diskcount[disk]<<(4*shift))
+            nFMDisk+=(diskcount[disk]<<(4*shift))
 
         barrelFM0 = barrelFMs[0] if len(barrelFMs) > 0 else ""
         nBarrelFMMemPerStub0 = barrelFMs.count(barrelFM0)
@@ -358,7 +357,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "#pragma HLS interface register port=done\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(NFMBarrel) + ", " + str(NFMDisk) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nFMBarrel) + ", " + str(nFMDisk) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
             "    bx,\n"
             "    trackletParameters1,\n"
             "    trackletParameters2,\n"

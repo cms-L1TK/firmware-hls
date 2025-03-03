@@ -8,10 +8,6 @@ from __future__ import absolute_import, print_function
 
 import argparse
 
-# Constants
-num_layers = 6
-num_disks = 5
-
 ###################################
 # Returns number of allstubs outputs a VMSMER has
 
@@ -129,8 +125,6 @@ def writeTopFile(vmr, output_dir):
     # Get layer/disk number
     layer = int(vmr.split("_")[1][1] if vmr.split("_")[1][0] == "L" else 0)
 
-    LD = ""
-
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
 
@@ -179,7 +173,7 @@ def writeTopFile(vmr, output_dir):
         "  /////////////////////////\n"
         "  // Main function\n"
         "\n"
-        "  VMSMERouter%s<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin, NOutCopy>(\n" %LD +\
+        "  VMSMERouter<kLAYER, kDISK, inType, outType, kNbitsrzbinME, kNbitsphibin, NOutCopy>(\n"
         "    bx, bx_o,\n"
         "    // LUTs\n"
         "    METable,\n"
@@ -236,9 +230,9 @@ python3 generate_VMRSMER.py -a
     vmr_list.sort()
 
     # Loop over all Units Under Test
-    for vmr in vmr_list:
+    for aVMR in vmr_list:
         # Check that the Unit Under Test is a VMR
-        if "VMSMER" not in vmr:
+        if "VMSMER" not in aVMR:
             raise IndexError("Unit under test has to be a VMSMER.")
 
         nallstubmem = getNAllStubMem(args.wireconfig, vmr)
