@@ -157,7 +157,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
           ");\n"
         )
 
-        # Print out definition of top function for this PC.
+        # Print top function definition for this PC.
         topFile.write(
           "\n"
           "void ProjectionCalculator_" + seed + iTC + "(\n"
@@ -193,7 +193,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
           "    projout_barrel_2s,\n"
           "    projout_disk\n"
           "  );\n"
-          "}\n"
+          "}\n\n"
         )
 
     # Print out endif

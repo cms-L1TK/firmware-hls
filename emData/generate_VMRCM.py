@@ -474,7 +474,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
         )
 
 ###############################
-# Main execution
+# Main execution generate_VMRCM
 
 if __name__ == "__main__":
 

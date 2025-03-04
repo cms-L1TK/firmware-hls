@@ -88,7 +88,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "constexpr TF::layerDisk layerdisk = static_cast<TF::layerDisk>((kLAYER) ? kLAYER-1 : trklet::N_LAYER+kDISK-1);\n"
             "constexpr regionType inType = (kDISK ==0) ? getInputType<layerdisk>() : DISKPS;\n"
             "constexpr regionType outType = (kDISK ==0) ? getInputType<layerdisk>() : DISK;\n"
-            "// Number of bits for the RZ bins \n"
+            "// Number of bits for the RZ bins used but VMSMER\n"
             "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
             "\n\n"
         )
@@ -155,7 +155,7 @@ def writeTopFile(vmr, output_dir):
             "  // Indexed using r and z position bits\n"
             "  static const int* METable = getMETable<layerdisk>();\n"
             "\n"
-            "  // LUT with phi corrections to project the stub to the average radius in a layer.\n"
+            "  // LUT with phi corrections for VMSMER to project the stub to the average radius in a layer.\n"
             "  // Only used by layers.\n"
             "  // Indexed using phi and bend bits\n"
             "  static const int* phiCorrTable = getPhiCorrTable<layerdisk>();\n"
