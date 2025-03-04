@@ -70,7 +70,8 @@ with open(arguments.wiresFileName, "r") as wiresFile:
         seed = tbName.split("_")[1]
         memName = line.split()[0]
         partype = "TPAR"
-        if arguments.split : partype = "MPAR"
+        if arguments.split:
+            partype = "MPAR"
         if memName.startswith(partype):
             if tbName not in tparMems:
                 tparMems[tbName] = []

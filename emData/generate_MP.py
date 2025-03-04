@@ -50,16 +50,24 @@ def getTProjAndVMRegions(module):
     vmproj_region = ""
     vmstub_region = ""
 
-    if any(psword in module for psword in ["L1","L2","L3"]): tproj_region = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]): tproj_region = "BARREL2S"
-    else: tproj_region = "DISK"
+    if any(psword in module for psword in ["L1","L2","L3"]):
+        tproj_region = "BARRELPS"
+    elif any(psword in module for psword in ["L4","L5","L6"]):
+        tproj_region = "BARREL2S"
+    else:
+        tproj_region = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]): vmproj_region = "BARREL"
-    else: vmproj_region = "DISK"
+    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]):
+        vmproj_region = "BARREL"
+    else:
+        vmproj_region = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3"]): vmstub_region = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]): vmstub_region = "BARREL2S"
-    else: vmstub_region = "DISK"
+    if any(psword in module for psword in ["L1","L2","L3"]):
+        vmstub_region = "BARRELPS"
+    elif any(psword in module for psword in ["L4","L5","L6"]):
+        vmstub_region = "BARREL2S"
+    else:
+        vmstub_region = "DISK"
 
     return tproj_region, vmproj_region, vmstub_region
 
@@ -89,7 +97,8 @@ with open(arguments.wiresFileName) as wiresFile:
             mpName = line.split()[-3].split(".")[0]
         memName = line.split()[0]
         projtype = "TPROJ_"
-        if arguments.split : projtype = "MPROJ_"
+        if arguments.split :
+            projtype = "MPROJ_"
         if memName.startswith(projtype):
             if mpName not in TPMems:
                 TPMems[mpName] = []
