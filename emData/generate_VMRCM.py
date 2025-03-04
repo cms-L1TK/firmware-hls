@@ -233,7 +233,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
         for idisk in range(numDisks):
             parameter_file.write(
                 "template<> inline const int* getTETable<TF::D" + str(idisk+1) + ">(){\n"
-                +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(idisk+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[idisk+numLayers] else "  return nullptr;\n")+
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(idisk+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(idisk+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[idisk+numLayers] else "  return nullptr;\n")+
                 "}\n"
             )
 
@@ -340,7 +340,7 @@ def writeTopHeader(vmr, output_dir):
             "// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).\n"
             "\n"
             "////////////////////////////////////////////\n"
-            "// Variables for that are specified with regards to the VMR region\n"
+            "// Variables for that are specified with regards to the VMRCM region\n"
             "// Some are used by the Test Bench\n"
             "\n"
         )
@@ -429,7 +429,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             "#pragma HLS interface register port=bx_o\n"
             "\n"
             "  ///////////////////////////\n"
-            "  // Open Lookup tables\n"
+            "  // Open Lookup tables for VMRCM\n"
             "\n"
             "  // LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).\n"
             "  // Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.\n"

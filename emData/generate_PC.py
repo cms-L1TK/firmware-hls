@@ -104,6 +104,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
         "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
         "#define TopFunctions_ProjectionCalculatorTop_h\n"
         "\n"
+        "\n"
         "#include \"ProjectionCalculator.h\"\n"
     )
 
@@ -111,13 +112,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
         "#include \"ProjectionCalculatorTop.h\"\n"
         "\n"
         "////////////////////////////////////////////////////////////////////////////////\n"
-        "// Top functions for various ProjectionCalculators (PC). For each iteration of\n"
-        "// the main processing loop, a TP retrieves a pair of stub indices from one of\n"
-        "// the stub-pair memories, and in turn, these indices are used to retrieve one\n"
-        "// stub each from an inner and an outer all-stub memory. This pair of stubs is\n"
-        "// used to calculate a rough set of helix parameters, which are written to the\n"
-        "// tracklet-parameter memory if the tracklet passes cuts on rinv and z0. Rough\n"
-        "// projections to additional layers and disks are also calculated and are\n"
+        "// Top functions for various ProjectionCalculators (PC). For each track parameter\n"
+        "// the projections to additional layers and disks are also calculated and are\n"
         "// written to the appropriate tracklet-projection memories.\n"
         "////////////////////////////////////////////////////////////////////////////////\n"
     )
@@ -161,7 +157,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
           ");\n"
         )
 
-        # Print out definition of top function for this TP.
+        # Print out definition of top function for this PC.
         topFile.write(
           "\n"
           "void ProjectionCalculator_" + seed + iTC + "(\n"
@@ -200,12 +196,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
           "}\n"
         )
 
-
-    # Print out endifs and close files.
-    # parametersFile.write(
-    #     "\n"
-    #     "#endif\n"
-    # )
+    # Print out endif
     topHeaderFile.write(
       "\n"
       "#endif\n"

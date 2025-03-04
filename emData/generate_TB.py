@@ -47,9 +47,9 @@ memNameLength = [
 parser = argparse.ArgumentParser(description="This script generates TrackBuilderTop.h and TrackBuilderTop.cc in the\
 TopFunctions/ directory.",
                                  epilog="")
-parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
-parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
-parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPROJ - not TPROJ memories")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files for the TB (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring for the TB (default = %(default)s)")
+parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPAR not TPAR")
 arguments = parser.parse_args()
 
 # Keep in sync with

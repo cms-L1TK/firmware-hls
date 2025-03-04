@@ -73,7 +73,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "// Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs). By writing VMStubME memories.\n"
             "\n"
             "////////////////////////////////////////////\n"
-            "// Variables for that are specified with regards to the VMR region\n"
+            "// Variables for that are specified with regards to the VMSMER region\n"
             "// Some are used by the Test Bench\n"
             "\n"
         )
@@ -93,7 +93,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "\n\n"
         )
 
-        # Write the top function
+        # Write the top function for VMStubMERouter
         header_file.write(
             "/////////////////////////////////////////////////////\n"
             "// VMStubMERouter Top Function \n"
@@ -150,7 +150,7 @@ def writeTopFile(vmr, output_dir):
             "  ///////////////////////////\n"
             "  // Open Lookup tables\n"
             "\n"
-            "  // LUT with the corrected r/z. It is corrected for the average r (z) of the barrel (disk).\n"
+            "  // LUT with the corrected r/z for VMSMER. It is corrected for the average r (z) of the barrel (disk).\n"
             "  // Includes both coarse r/z position (bin), and finer region each r/z bin is divided into.\n"
             "  // Indexed using r and z position bits\n"
             "  static const int* METable = getMETable<layerdisk>();\n"
@@ -183,7 +183,7 @@ def writeTopFile(vmr, output_dir):
         )
 
 ###############################
-# Main execution
+# Main execution generate_VMSMER
 
 if __name__ == "__main__":
 
