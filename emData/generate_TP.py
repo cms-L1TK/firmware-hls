@@ -93,8 +93,9 @@ with open(arguments.wiresFileName, "r") as wiresFile:
         if "TP_L1L2" not in line \
           and "TP_L2L3" not in line \
           and "TP_L3L4" not in line \
-          and "TP_L5L6" not in line \
-          and "TP_L2D1" not in line \
+          and "TP_L5L6" not in line:
+            continue
+        if "TP_L2D1" not in line \
           and "TP_L1D1" not in line \
           and "TP_D1D2" not in line \
           and "TP_D3D4" not in line:
@@ -326,7 +327,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
             "    TrackletProjectionMemory<BARRELPS> projout_barrel_ps[],\n"
             "    TrackletProjectionMemory<BARREL2S> projout_barrel_2s[],\n"
             "    TrackletProjectionMemory<DISK> projout_disk[]\n"
-            ");\n"
+            ");\n\n"
          )
 
         # Print out definition of top function for this TP.

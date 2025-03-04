@@ -124,7 +124,7 @@ def createDefinitions(wiresfiles='./LUTs/wires.dat', output_directory='../TopFun
             dtcs['LinkName'] = "DTC_" + dtc_name
             with open(template_name, 'r') as ftemp:
                 template_string = ftemp.read()
-        file.write(template_string.format(**dtcs))
+            file.write(template_string.format(**dtcs))
     os.remove(template_name)
 
 parser = argparse.ArgumentParser(description="This script generates InputRouterTop.h, InputRouterTop.cc, and\

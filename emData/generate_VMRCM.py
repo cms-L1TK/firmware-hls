@@ -126,7 +126,7 @@ def getAllStubInnerMaskString(mem_list):
         if any(mem_type in mem for mem in mem_list):
             mask += "1"
         elif "/" in mem_type:
-            if any(mem_type.split("/")[0] in mem for mem in mem_list) or any(mem_type.split("/")[1] in mem for mem in mem_list):
+            if any(mem_type.split("/", maxsplit = 1)[0] in mem for mem in mem_list) or any(mem_type.split("/")[1] in mem for mem in mem_list):
                 mask += "1"
             else:
                 mask += "0"
@@ -468,14 +468,14 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             "    // TEOuter memories\n"
             + ("    memoriesTEO\n" if has_vmste_outer[layerdisk] else "    nullptr\n") +\
             "  );\n"
-            "\n"
+            "\n\n"
             "  return;\n"
             "}\n"
         )
 
 ###############################
 # Main execution generate_VMRCM
-
+###############################
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(

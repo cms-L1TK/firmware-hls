@@ -168,9 +168,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
                 layercount[fm]=0
             layercount[fm]+=1
         nFMBarrel=0
-        for layer in layercount:
+        for layer, count in layercount.items():
             shift=int(layer[-1])-1
-            nFMBarrel+=(layercount[layer]<<(4*shift))
+            nFMBarrel+=(count<<(4*shift))
 
         diskcount = {}
         for fm in diskFMs :
@@ -178,9 +178,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
                 diskcount[fm]=0
             diskcount[fm]+=1
         nFMDisk=0
-        for disk in diskcount:
+        for disk, count in diskcount.items():
             shift=int(disk[-1])-1
-            nFMDisk+=(diskcount[disk]<<(4*shift))
+            nFMDisk+=(count<<(4*shift))
 
         barrelFM0 = barrelFMs[0] if len(barrelFMs) > 0 else ""
         nBarrelFMMemPerStub0 = barrelFMs.count(barrelFM0)
