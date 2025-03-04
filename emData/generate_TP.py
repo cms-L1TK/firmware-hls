@@ -90,12 +90,12 @@ with open(arguments.wiresFileName, "r") as wiresFile:
     tprojMems = {}
     for line in wiresFile:
         # Only barrel-only seeds are supported right now.
-        tps = ("TP_L1L2", "TP_L2L3", "TP_L3L4", "TP_L5L6", 
+        tps = ("TP_L1L2", "TP_L2L3", "TP_L3L4", "TP_L5L6",
                "TP_L2D1", "TP_L1D1", "TP_D1D2", "TP_D3D4")
-        noTP = True;
+        noTP = True
         for tp in tps:
             if tp in line:
-                noTP = False;
+                noTP = False
         if noTP:
             continue
         line = line.rstrip()
