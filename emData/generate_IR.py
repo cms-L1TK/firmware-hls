@@ -81,52 +81,49 @@ def createParametersTemplate():
 def createParameters(wiresfiles='./LUTs/wires.dat', output_directory='../TopFunctions/'):
     irs = getNmemsPerIR(wiresfiles)
     template_name = createParametersTemplate()
-    file = open(output_directory + '/InputRouter_parameters.h', 'w')
-    file.write('#ifndef TopFunctions_InputRouter_parameters_h\n')
-    file.write('#define TopFunctions_InputRouter_parameters_h\n')
-    for dtc_name, nmemories in irs:
-        dtcs = {}
-        dtcs['LinkName'] = "DTC_" + dtc_name
-        dtcs['Noutputs'] = str(nmemories)
-        with open(template_name, 'r') as ftemp:
-            template_string = ftemp.read()
-        file.write(template_string.format(**dtcs))
-    file.write('#endif\n')
-    file.close()
+    with open(output_directory + '/InputRouter_parameters.h', 'w') as file:
+        file.write('#ifndef TopFunctions_InputRouter_parameters_h\n')
+        file.write('#define TopFunctions_InputRouter_parameters_h\n')
+        for dtc_name, nmemories in irs:
+            dtcs = {}
+            dtcs['LinkName'] = "DTC_" + dtc_name
+            dtcs['Noutputs'] = str(nmemories)
+            with open(template_name, 'r') as ftemp:
+                template_string = ftemp.read()
+            file.write(template_string.format(**dtcs))
+        file.write('#endif\n')
     os.remove(template_name)
 
 # generate all TopLevel declarations InputRouterTop.cc
 def createDeclarations(wiresfiles='./LUTs/wires.dat', output_directory='../TopFunctions/'):
     irs = getNmemsPerIR(wiresfiles)
     template_name = createDeclarationTemplate()
-    file = open(output_directory + '/InputRouterTop.h', 'w')
-    file.write('#ifndef TopFunctions_InputRouterTop_h\n')
-    file.write('#define TopFunctions_InputRouterTop_h\n')
-    file.write('#include \"InputRouter.h\"\n')
-    file.write('#include \"InputRouter_parameters.h\"\n')
-    for dtc_name, _ in irs:
-        d = {}
-        d['LinkName'] = "DTC_" + dtc_name
-        with open(template_name, 'r') as ftemp:
-            template_string = ftemp.read()
-        file.write(template_string.format(**d))
-    file.write('#endif\n')
-    file.close()
+    with open(output_directory + '/InputRouterTop.h', 'w') as file:
+        file.write('#ifndef TopFunctions_InputRouterTop_h\n')
+        file.write('#define TopFunctions_InputRouterTop_h\n')
+        file.write('#include \"InputRouter.h\"\n')
+        file.write('#include \"InputRouter_parameters.h\"\n')
+        for dtc_name, _ in irs:
+            dtcs = {}
+            dtcs['LinkName'] = "DTC_" + dtc_name
+            with open(template_name, 'r') as ftemp:
+                template_string = ftemp.read()
+            file.write(template_string.format(**dtcs))
+        file.write('#endif\n')
     os.remove(template_name)
 
 # generate all TopLevel definitions InputRouterTop.h
 def createDefinitions(wiresfiles='./LUTs/wires.dat', output_directory='../TopFunctions/'):
     irs = getNmemsPerIR(wiresfiles)
     template_name = createDefinitionsTemplate()
-    file = open(output_directory + '/InputRouterTop.cc', 'w')
-    file.write('#include \"InputRouterTop.h\"\n')
-    for dtc_name, _ in irs:
-        d = {}
-        d['LinkName'] = "DTC_" + dtc_name
-        with open(template_name, 'r') as ftemp:
-            templateString = ftemp.read()
-        file.write(templateString.format(**d))
-    file.close()
+    with open(output_directory + '/InputRouterTop.cc', 'w') as file:
+        file.write('#include \"InputRouterTop.h\"\n')
+        for dtc_name, _ in irs:
+            dtcs = {}
+            dtcs['LinkName'] = "DTC_" + dtc_name
+            with open(template_name, 'r') as ftemp:
+                template_string = ftemp.read()
+        file.write(template_string.format(**dtcs))
     os.remove(template_name)
 
 parser = argparse.ArgumentParser(description="This script generates InputRouterTop.h, InputRouterTop.cc, and\

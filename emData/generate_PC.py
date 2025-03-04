@@ -143,7 +143,6 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
     )
     # Calculate parameters and print out parameters and top function for each TP.
     for pcName in sorted(tprojMems):
-        print("pcNames:", pcName)
         seed = pcName[0:4]
         iTC = pcName[4:]
         # # numbers of memories
