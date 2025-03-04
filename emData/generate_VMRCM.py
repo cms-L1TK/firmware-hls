@@ -203,68 +203,68 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
                 "}\n"
             )
 
-            # Write ME Tables
-            parameter_file.write("\n// ME Tables\n")
-            for i in range(numLayers):
-                parameter_file.write(
-                    "template<> inline const int* getMETable<TF::L" + str(i+1) + ">(){\n"
-                    "  static int lut[] =\n"
-                "#if __has_include(\"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
-                    "}\n"
-                )
-                
-            for i in range(numDisks):
-                parameter_file.write(
-                    "template<> inline const int* getMETable<TF::D" + str(i+1) + ">(){\n"
-                    "  static int lut[] =\n"
-                    "#if __has_include(\"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
-                    "}\n"
-                )
-
-            # Write TE Tables
-            parameter_file.write("\n// TE Tables\n")
-            for i in range(numLayers):
-                parameter_file.write(
-                    "template<> inline const int* getTETable<TF::L" + str(i+1) + ">(){\n"
-                    "  return nullptr;\n"
-                    "}\n"
-                )
-                
-        for i in range(numDisks):
+        # Write ME Tables
+        parameter_file.write("\n// ME Tables\n")
+        for ilayer in range(numLayers):
             parameter_file.write(
-                "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
-                +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+numLayers] else "  return nullptr;\n")+
+                "template<> inline const int* getMETable<TF::L" + str(ilayer+1) + ">(){\n"
+                "  static int lut[] =\n"
+                "#if __has_include(\"../emData/VMRCM/tables/VMRME_L" + str(ilayer+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_L" + str(ilayer+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
+                "}\n"
+            )
+
+        for idisk in range(numDisks):
+            parameter_file.write(
+                "template<> inline const int* getMETable<TF::D" + str(idisk+1) + ">(){\n"
+                "  static int lut[] =\n"
+                "#if __has_include(\"../emData/VMRCM/tables/VMRME_D" + str(idisk+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_D" + str(idisk+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
+                "}\n"
+            )
+
+        # Write TE Tables
+        parameter_file.write("\n// TE Tables\n")
+        for ilayer in range(numLayers):
+            parameter_file.write(
+                "template<> inline const int* getTETable<TF::L" + str(ilayer+1) + ">(){\n"
+                "  return nullptr;\n"
+                "}\n"
+            )
+
+        for idisk in range(numDisks):
+            parameter_file.write(
+                "template<> inline const int* getTETable<TF::D" + str(idisk+1) + ">(){\n"
+                +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(idisk+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[idisk+numLayers] else "  return nullptr;\n")+
                 "}\n"
             )
 
         # Write InputType functions
         parameter_file.write("\n// InputType\n")
-        for i in range(numLayers):
+        for ilayer in range(numLayers):
             parameter_file.write(
-                "template<> constexpr regionType getInputType<TF::L" + str(i+1) + ">(){\n"
-                "  return " + ("BARRELPS" if i < 3 else "BARREL2S") + ";\n"
+                "template<> constexpr regionType getInputType<TF::L" + str(ilayer+1) + ">(){\n"
+                "  return " + ("BARRELPS" if ilayer < 3 else "BARREL2S") + ";\n"
                 "}\n"
             )
-            
-        for i in range(numDisks):
+
+        for idisk in range(numDisks):
             parameter_file.write(
-                "template<> constexpr regionType getInputType<TF::D" + str(i+1) + ">(){\n"
+                "template<> constexpr regionType getInputType<TF::D" + str(idisk+1) + ">(){\n"
                 "  return DISKPS;\n"
                 "}\n"
             )
 
         # Write OutputType functions
         parameter_file.write("\n// OutputType\n")
-        for i in range(numLayers):
+        for ilayer in range(numLayers):
             parameter_file.write(
-                "template<> constexpr regionType getOutputType<TF::L" + str(i+1) + ">(){\n"
-                "  return " + ("BARRELPS" if i < 3 else "BARREL2S") + ";\n"
+                "template<> constexpr regionType getOutputType<TF::L" + str(ilayer+1) + ">(){\n"
+                "  return " + ("BARRELPS" if ilayer < 3 else "BARREL2S") + ";\n"
                 "}\n"
             )
-            
-        for i in range(numDisks):
+
+        for idisk in range(numDisks):
             parameter_file.write(
-                "template<> constexpr regionType getOutputType<TF::D" + str(i+1) + ">(){\n"
+                "template<> constexpr regionType getOutputType<TF::D" + str(idisk+1) + ">(){\n"
                 "  return DISK;\n"
                 "}\n"
             )

@@ -96,37 +96,17 @@ with open(arguments.wiresFileName, "r") as wiresFile:
 
 # Open and print out preambles for the parameters and top files.
 dirname = os.path.dirname(os.path.realpath('__file__'))
-#with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator_parameters.h"), "w") as parametersFile, \
-print("outputDirectory:",  arguments.outputDirectory)
+
 with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.h"), "w") as topHeaderFile, \
      open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculatorTop.cc"), "w") as topFile:
-#  parametersFile.write(
-#    "#ifndef TopFunctions_ProjectionCalculator_parameters_h\n"
-#    "#define TopFunctions_ProjectionCalculator_parameters_h\n"
-#    "\n"
-#    "// This file contains numbers of memories and bit masks that are specific to\n"
-#    "// each ProjectionCalculator and that come directly from the wiring.\n"
-#    "//\n"
-#    "// The validity of each of the barrel TPROJ memories is determined by\n"
-#    "// TPROJMaskBarrel. The bits of this mask, from least significant to most\n"
-#    "// significant, represent the memories in the order they are passed to\n"
-#    "// ProjectionCalculator; e.g., the LSB corresponds to\n"
-#    "// projout_barrel_ps[TP::L1PHIA]. If a bit is set, the corresponding memory is\n"
-#    "// valid, if it is not, the corresponding memory is not valid. Likewise, the\n"
-#    "// validity of each of the disk TPROJ memories is determined by TPROJMaskDisk\n"
-#    "// in the same way.\n"
-#    "namespace PC{\n"
-#    "  enum itc {UNDEF_ITC, A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, L = 11, M = 12, N = 13, O = 14};\n"
-#    "   }\n"
-#    "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t PCPROJMaskBarrel();\n"
-#    "template<TF::seed Seed, TP::itc iTC> constexpr uint32_t PCPROJMaskDisk();\n"
-#   )
+
     topHeaderFile.write(
         "#ifndef TopFunctions_ProjectionCalculatorTop_h\n"
         "#define TopFunctions_ProjectionCalculatorTop_h\n"
         "\n"
         "#include \"ProjectionCalculator.h\"\n"
     )
+
     topFile.write(
         "#include \"ProjectionCalculatorTop.h\"\n"
         "\n"

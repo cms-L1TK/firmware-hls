@@ -225,10 +225,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
 
         # figure out sizes of LUTs by reading .tab files, do once per seed type
         if seed not in seedlist:
-            LUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}.tab".format(seed))) - 2)
-            regLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
-            innerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
-            outerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
+            #LUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}.tab".format(seed))) - 2)
+            #regLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_usereg.tab".format(seed,iTC))) - 2)
+            #innerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC))) - 2)
+            #outerPTLUTSize[seed] = str(sum(1 for _ in open(arguments.LUTsDir+"/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC))) - 2)
+            with open(arguments.LUTsDir+"/TP_{0}.tab".format(seed)) as f_tp:
+                LUTSize[seed] = str(sum(1 for _ in f_tp) - 2)
+            with open(arguments.LUTsDir+"/TP_{0}{1}_usereg.tab".format(seed,iTC)) as f_usereg:
+                regLUTSize[seed] = str(sum(1 for _ in f_usereg) - 2)
+            with open(arguments.LUTsDir+"/TP_{0}{1}_stubptinnercut.tab".format(seed,iTC)) as f_stubptinnercut:
+                innerPTLUTSize[seed] = str(sum(1 for _ in f_stubptinnercut) - 2)
+            with open(arguments.LUTsDir+"/TP_{0}{1}_stubptoutercut.tab".format(seed,iTC)) as f_stubptoutercut:
+                outerPTLUTSize[seed] = str(sum(1 for _ in f_stubptoutercut) - 2)
         # Print out parameters for this TP.
         parametersFile.write(
             ("\n"

@@ -9,13 +9,14 @@ import argparse
 def getNmemsPerIR(wiresfiles='./LUTs/wires.dat'):
     dtc_names=[]
     lines=[]
-    for line in open(wiresfiles,'r'):
-        my_regex = 'output=> IR_'
-        if re.search(my_regex, line, re.IGNORECASE):
-            dtc_names.append(line.split()[0].split('DL_')[1])
-        my_regex = 'input=> IR_'
-        if re.search(my_regex, line, re.IGNORECASE):
-            lines.append(line)
+    with open(wiresfiles,'r') as fin:
+        for line in fin:
+            my_regex = 'output=> IR_'
+            if re.search(my_regex, line, re.IGNORECASE):
+                dtc_names.append(line.split()[0].split('DL_')[1])
+            my_regex = 'input=> IR_'
+            if re.search(my_regex, line, re.IGNORECASE):
+                lines.append(line)
     lines = list(set(lines))
     dtc_names = list(set(dtc_names))
     nmemories = []

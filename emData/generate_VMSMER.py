@@ -119,7 +119,7 @@ def writeTopFile(vmr, output_dir):
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
 
-    with open(output_dir + "/" + file_name  + ".cc", "w") as top_file: 
+    with open(output_dir + "/" + file_name  + ".cc", "w") as top_file:
 
         # Write the top function
         top_file.write(
