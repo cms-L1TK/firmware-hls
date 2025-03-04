@@ -176,10 +176,9 @@ def writeTopFile(vmr, output_dir):
             "    // Index of AllStub\n"
             "    index,\n"
             "    valid\n"
-            "  );\n"
-            "\n"
+            "  );\n\n"
             "  return;\n"
-            "}\n"
+            "}\n\n"
         )
 
 ###############################
