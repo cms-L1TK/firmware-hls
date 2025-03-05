@@ -1303,11 +1303,11 @@ void MatchProcessor(BXType bx,
   IMemType imem = 0;
   IPageType ipage = 0;
 
-  static ap_uint<2*MEBinsBits> zbinLUT[128];
+  ap_uint<2*MEBinsBits> zbinLUT[128];
 #pragma HLS ARRAY_PARTITION variable=zbinLUT complete
   zbinLUTinit(zbinLUT, zbins_adjust_PSseed, zbins_adjust_2Sseed);
   constexpr int nRbinBits = VMProjection<VMPTYPE>::kVMProjFineZSize + VMProjectionBase<VMPTYPE>::kVMProjZBinSize;
-  static ap_uint<nRbinBits> rbinLUT[256];//1<<TrackletProjection<PROJTYPE>::kTProjRZSize];
+  ap_uint<nRbinBits> rbinLUT[256];//1<<TrackletProjection<PROJTYPE>::kTProjRZSize];
 #pragma HLS ARRAY_PARTITION variable=rbinLUT complete
   readRbin_LUT<LAYER,nRbinBits,256>(rbinLUT);
 
