@@ -7,8 +7,8 @@ memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/eDZdLpG
 luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/0VlJN4Qro7OL4Y2/LUTs_Split_250110.tgz"
 
 # Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/96n9G6Q2EchfZbe/MemPrints_Reduced_250118.tgz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/y2Rxy2Djtg5Pclc/LUTs_Reduced_250118.tgz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/ugnTSt0Qh3L8wXe/MemPrints_Reduced_250306.tgz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/K0xZgZKp86OUBoe/LUTs_Reduced_250306.tgz"
 
 # Function that prints information regarding the usage of this command
 function usage() {

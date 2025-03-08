@@ -48,7 +48,8 @@ entity mem_reader is
     dout      : out  std_logic_vector(RAM_WIDTH-1 downto 0);        --! output data
     valid     : out  std_logic;                                     --! data valid
     index     : out  std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0);                         --!index
-    nent      : in t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1)
+    nent      : in t_arr_7b(0 to NUM_PAGES*NUM_TPAGES-1);
+    mask      : in t_arr_4b(0 to NUM_PAGES-1)
     );
 end mem_reader;
 
@@ -149,7 +150,7 @@ begin
       
       valid2 <= valid1;
       
-      if (addrP1var < nent(to_integer(unsigned(bx))*NUM_TPAGES) and addrP1var < maxval) then
+      if (addrP1var < nent(to_integer(unsigned(bx))*NUM_TPAGES) and (mask(to_integer(unsigned(bx)))(0)='1') and addrP1var < maxval) then
         if (NUM_TPAGES>1) then
           addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var;
           addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var;
@@ -159,17 +160,17 @@ begin
         end if;
         addrP1var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP1var)) + 1, addrP1var'length));
         valid1 <= '1'; 
-      elsif ((addrP2var < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (NUM_TPAGES > 1) and addrP2var < maxval) then
+      elsif ((addrP2var < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (mask(to_integer(unsigned(bx)))(1)='1') and (NUM_TPAGES > 1) and addrP2var < maxval) then
         addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var;
         addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var;
         addrP2var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP2var)) + 1, addrP2var'length));
         valid1 <= '1'; 
-      elsif ((addrP3var < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (NUM_TPAGES > 2) and addrP3var < maxval) then
+      elsif ((addrP3var < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (mask(to_integer(unsigned(bx)))(2)='1') and (NUM_TPAGES > 2) and addrP3var < maxval) then
         addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var;
         addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var;
         addrP3var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP3var)) + 1, addrP3var'length));
         valid1 <= '1';       
-      elsif ((addrP4var < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (NUM_TPAGES > 3) and addrP4var < maxval) then
+      elsif ((addrP4var < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (mask(to_integer(unsigned(bx)))(3)='1') and (NUM_TPAGES > 3) and addrP4var < maxval) then
         addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var;
         addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var;
         addrP4var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP4var)) + 1, addrP4var'length));

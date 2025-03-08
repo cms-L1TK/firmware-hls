@@ -16,4 +16,4 @@ open_wave_config {../tb/start_bx.wcfg}
 
 restart
 # Need 4us + 0.45us per event (50us for 100 events, but 10us for quick test).
-run 5.0 us
+run 50.0 us
