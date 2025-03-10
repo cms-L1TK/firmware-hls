@@ -353,85 +353,88 @@ begin
         binaddr := "0000";
       end if; 
 
-      nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
-      nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
+      if (binaddr /= "1111") then
 
-      phimask := ( 0 => '1', others => '0');
-      phimask := std_logic_vector(shift_left(unsigned(phimask), to_integer(unsigned(phibits))));
-      
-      binmaskvalue := (binmasktmp(to_integer(unsigned(rzbits))) and validbinmasktmp(to_integer(unsigned(rzbits)))) or phimask; 
+        nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
+        nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
 
-      binmasktmp(to_integer(unsigned(rzbits))) <= binmaskvalue;
+        phimask := ( 0 => '1', others => '0');
+        phimask := std_logic_vector(shift_left(unsigned(phimask), to_integer(unsigned(phibits))));
+      
+        binmaskvalue := (binmasktmp(to_integer(unsigned(rzbits))) and validbinmasktmp(to_integer(unsigned(rzbits)))) or phimask;
 
-      page_rzbits := slv_page_cnt_save & rzbits;
-      
-      binmaskA(to_integer(unsigned(page_rzbits))) <= binmaskvalue;
-      binmaskB(to_integer(unsigned(page_rzbits))) <= binmaskvalue;
+        binmasktmp(to_integer(unsigned(rzbits))) <= binmaskvalue;
 
-      validbinmasktmp(to_integer(unsigned(rzbits))) <= '1';
-      validbinmask(to_integer(unsigned(page_rzbits))) <= '1';
+        page_rzbits := slv_page_cnt_save & rzbits;
       
-      
-      writeaddr := slv_page_cnt_save & vi_nent_idx & std_logic_vector(binaddr);
-      --report time'image(now)&" tf_mem_bin: " & NAME & " writeaddr: " & to_bstring(writeaddr) & " data: " & to_bstring(dina);
-      for icopy in 0 to NUM_COPY-1 loop
-        sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina; 
-      end loop;
-      
-      --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)&" "&to_bstring(nentry)&" "&to_bstring(writeaddr);
+        binmaskA(to_integer(unsigned(page_rzbits))) <= binmaskvalue;
+        binmaskB(to_integer(unsigned(page_rzbits))) <= binmaskvalue;
 
-      if (to_integer(unsigned(phibits)) = 0) then
-        sa_RAM_numentriesA0(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 1) then
-        sa_RAM_numentriesA1(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 2) then
-        sa_RAM_numentriesA2(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 3) then
-        sa_RAM_numentriesA3(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 4) then
-        sa_RAM_numentriesA4(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 5) then
-        sa_RAM_numentriesA5(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 6) then
-        sa_RAM_numentriesA6(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (to_integer(unsigned(phibits)) = 7) then
-        sa_RAM_numentriesA7(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
-      end if;
-      if (unsigned(rzbits) /= 0) then
-        --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)
-        --  &" "&to_bstring(nentry_in_bin)&" "&to_bstring(addra);
+        validbinmasktmp(to_integer(unsigned(rzbits))) <= '1';
+        validbinmask(to_integer(unsigned(page_rzbits))) <= '1';
+      
+      
+        writeaddr := slv_page_cnt_save & vi_nent_idx & std_logic_vector(binaddr);
+        --report time'image(now)&" tf_mem_bin: " & NAME & " writeaddr: " & to_bstring(writeaddr) & " data: " & to_bstring(dina);
+        for icopy in 0 to NUM_COPY-1 loop
+          sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina;
+        end loop;
+      
+        --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)&" "&to_bstring(nentry)&" "&to_bstring(writeaddr);
+
         if (to_integer(unsigned(phibits)) = 0) then
-          sa_RAM_numentriesB0(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA0(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 1) then
-          sa_RAM_numentriesB1(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA1(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 2) then
-          sa_RAM_numentriesB2(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA2(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 3) then
-          sa_RAM_numentriesB3(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA3(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 4) then
-          sa_RAM_numentriesB4(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA4(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 5) then
-          sa_RAM_numentriesB5(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA5(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 6) then
-          sa_RAM_numentriesB6(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA6(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
         if (to_integer(unsigned(phibits)) = 7) then
-          sa_RAM_numentriesB7(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          sa_RAM_numentriesA7(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))) <= std_logic_vector(nentry); -- <= address
         end if;
-      --  sa_RAM_numentriesB(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1)(4*to_integer(unsigned(phibits))-1 downto (to_integer(unsigned(phibits)))) <= std_logic_vector(nentry); -- <= address
+        if (unsigned(rzbits) /= 0) then
+          --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)
+          --  &" "&to_bstring(nentry_in_bin)&" "&to_bstring(addra);
+          if (to_integer(unsigned(phibits)) = 0) then
+            sa_RAM_numentriesB0(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 1) then
+            sa_RAM_numentriesB1(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 2) then
+            sa_RAM_numentriesB2(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 3) then
+            sa_RAM_numentriesB3(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 4) then
+            sa_RAM_numentriesB4(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 5) then
+            sa_RAM_numentriesB5(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 6) then
+            sa_RAM_numentriesB6(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+          if (to_integer(unsigned(phibits)) = 7) then
+            sa_RAM_numentriesB7(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1) <= std_logic_vector(nentry); -- <= address
+          end if;
+        --  sa_RAM_numentriesB(to_integer(unsigned(slv_page_cnt_save))*NUM_RZ_BINS+to_integer(unsigned(rzbits))-1)(4*to_integer(unsigned(phibits))-1 downto (to_integer(unsigned(phibits)))) <= std_logic_vector(nentry); -- <= address
+        end if;
       end if;
     end if;
   end if;

@@ -3,7 +3,7 @@ set -e
 
 
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/eDZdLpG02odPlzS/MemPrints_Split_250110.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/hZwU8UnJcSk6mKl/MemPrints_Split_250110.tgz"
 luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/0VlJN4Qro7OL4Y2/LUTs_Split_250110.tgz"
 
 # Reduced Combined modules
