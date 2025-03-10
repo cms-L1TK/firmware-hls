@@ -133,7 +133,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
         print("Comparing TB results "+str(comparison_filename)+" to ref. file "+str(reference_filename)+" ... ")
 
-        # Read column names from file
+        # Read column names from comparison file
         column_names = list(pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',nrows=1))
         if verbose: print(column_names)
 
@@ -154,7 +154,21 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             rows = []
             for index, row in data.iterrows():
                 if row['ADDR'] == "0x01":
-                    rows.append(index-1)
+                    rows.append(index-1) # -1 to remove previos entry
+            data=data.drop(rows)
+
+        #This is a hack to work around over flows in VMStub memories
+        if is_binned:
+            rows = []
+            count = {}
+            for index, row in data.iterrows():
+                entry = str(row['BX'])+row['ADDR']
+                if entry not in count:
+                    count[entry]=1
+                else:
+                    count[entry]+=1
+                if count[entry]>15:
+                    rows.append(index)
             data=data.drop(rows)
         
         # Sort data by ascending address
