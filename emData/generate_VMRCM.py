@@ -195,7 +195,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
     for i in range(num_layers):
         parameter_file.write(
             "template<> inline const int* getPhiCorrTable<TF::L" + str(i+1) + ">(){\n"
-            "  static int lut[] = \n"
+            "  static const int lut[] = \n"
             "#if __has_include(\"../emData/VMRCM/tables/VMPhiCorrL" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMPhiCorrL" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n"
             "  return lut;\n"
             "}\n"
@@ -212,14 +212,14 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
     for i in range(num_layers):
         parameter_file.write(
             "template<> inline const int* getMETable<TF::L" + str(i+1) + ">(){\n"
-            "  static int lut[] =\n"
+            "  static const int lut[] =\n"
             "#if __has_include(\"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_L" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
             "}\n"
         )
     for i in range(num_disks):
         parameter_file.write(
             "template<> inline const int* getMETable<TF::D" + str(i+1) + ">(){\n"
-            "  static int lut[] =\n"
+            "  static const int lut[] =\n"
             "#if __has_include(\"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRME_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n"
             "}\n"
         )
@@ -235,7 +235,7 @@ def writeParameterFile(vmr_list, mem_dict, output_dir):
     for i in range(num_disks):
         parameter_file.write(
             "template<> inline const int* getTETable<TF::D" + str(i+1) + ">(){\n"
-            +("  static int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
+            +("  static const int lut[] =\n#if __has_include(\"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\")\n#  include \"../emData/VMRCM/tables/VMRTE_D" + str(i+1) + ".tab\"\n#else\n  {};\n#endif\n  return lut;\n" if has_vmste_outer[i+num_layers] else "  return nullptr;\n")+
             "}\n"
         )
 
