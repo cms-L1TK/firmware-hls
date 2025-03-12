@@ -170,7 +170,21 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 if count[entry]>15:
                     rows.append(index)
             data=data.drop(rows)
-        
+
+        #This is a hack to work around over flows in MPROJ memories
+        if "MPROJ_" in comparison_filename:
+            rows = []
+            count = {}
+            for index, row in data.iterrows():
+                entry = str(row['BX'])+row['ADDR']
+                if entry not in count:
+                    count[entry]=1
+                else:
+                    count[entry]+=1
+                if count[entry]>63:
+                    rows.append(index)
+            data=data.drop(rows)
+
         # Sort data by ascending address
         if is_binned:
             data.sort_values(by=['BX','ADDR','DATA'], inplace = True)

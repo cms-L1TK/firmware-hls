@@ -1155,6 +1155,7 @@ void MatchProcessor(BXType bx,
                       BXType& bx_o,
                       FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants]
 ){
+#pragma HLS latency min=11 max=11
 #pragma HLS inline
 
   using namespace PR;
