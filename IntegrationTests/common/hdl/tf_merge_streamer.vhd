@@ -38,8 +38,6 @@ entity tf_merge_streamer is
   bx_in_vld : in std_logic;
   rst: in std_logic;
   clk : in std_logic;
-  --output read enable to tf_mem modules
-  enb_arr: out std_logic_vector(NUM_INPUTS-1 downto 0);
   bx_out : out std_logic_vector(2 downto 0);
   --output merged stream, includes input word, up to 2 bits that encode the
   --original module, and a valid bit (from LSB to MSB)
