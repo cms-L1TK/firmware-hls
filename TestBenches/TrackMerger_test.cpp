@@ -20,14 +20,14 @@ int main(){
     
   // Input memories
   TrackFitType::TrackWord trackWord[kMaxTrack];
-  TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][6];
-  TrackFitType::DiskStubWord diskStubWords[kMaxTrack][5];
+  TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][trklet::N_LAYER];
+  TrackFitType::DiskStubWord diskStubWords[kMaxTrack][trklet::N_DISK];
   TrackFitMemory<NBarrelStub, NDiskStub> inputTracks;
 
   // Output memories
   TrackFitType::TrackWord trackWord_o[kMaxTrack];
-  TrackFitType::BarrelStubWord barrelStubWords_o[kMaxTrack][6];
-  TrackFitType::DiskStubWord diskStubWords_o[kMaxTrack][5];
+  TrackFitType::BarrelStubWord barrelStubWords_o[kMaxTrack][trklet::N_LAYER];
+  TrackFitType::DiskStubWord diskStubWords_o[kMaxTrack][trklet::N_DISK];
   TrackFitMemory<NBarrelStub, NDiskStub> outputTracks;
   // int outputNumber;
  
@@ -45,10 +45,10 @@ int main(){
       trackWord[i] = TrackFitType::TrackWord(0);
       trackWord_o[i] = TrackFitType::TrackWord(0);
 
-      for (unsigned short nStub = 0; nStub < 6; nStub++){
+      for (unsigned short nStub = 0; nStub < trklet::N_LAYER; nStub++){
         barrelStubWords[i][nStub] = TrackFitType::BarrelStubWord(0);
         barrelStubWords_o[i][nStub] = TrackFitType::BarrelStubWord(0);
-	if ( nStub != 5 ) { 
+	if ( nStub != trklet::N_DISK ) {  //FIXME this is written in a very confusing way....
 	  diskStubWords[i][nStub] = TrackFitType::DiskStubWord(0);
 	  diskStubWords_o[i][nStub] = TrackFitType::DiskStubWord(0);
 	}

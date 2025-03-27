@@ -82,7 +82,7 @@ template<
   
   if (!valid) return;
 
-  int ipage =  trackletIndex >> 7; //FIXME hardcoded values
+  int ipage =  trackletIndex >> kNBits_MemAddr;
   
   tparout.write_mem(tpar, ipage);
 
@@ -249,7 +249,7 @@ template<
     nproj_disk[i] = 0;
   }
 
-  ipage = ipage & 3;
+  ipage = ipage & ((1 << kNBits_MemTPage) - 1);
 
   //iTC gives you the first TCID in e.g. ABC, ipage gives you corrected TCID for B and C
   const int TCID = ((TrackletProjection<BARRELPS>::TProjTCID(Seed) << TrackletProjection<BARRELPS>::kTProjITCSize) + iTC + ipage);

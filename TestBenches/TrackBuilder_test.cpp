@@ -20,11 +20,8 @@ using namespace std;
   #define TOP_FUNC_ TrackBuilder_AAAA
 #endif
 
-  constexpr int kNBarrelStubs = 6;
-  constexpr int kNDiskStubs = 5;
-
-typedef TrackFit<kNBarrelStubs, kNDiskStubs> TrackFit_t;
-typedef TrackFitMemory<kNBarrelStubs, kNDiskStubs> TrackFitMemory_t;
+typedef TrackFit<trklet::N_LAYER, trklet::N_DISK> TrackFit_t;
+typedef TrackFitMemory<trklet::N_LAYER, trklet::N_DISK> TrackFitMemory_t;
 
 // Base assumed for input test vector files
 constexpr int InputBase = 16;
@@ -44,7 +41,7 @@ void setBarrelStubs<-1>(TrackFit_t &track, const TrackFit_t::BarrelStubWord stub
 
 template<int I>
 void setDiskStubs(TrackFit_t &track, const TrackFit_t::DiskStubWord stubWords[][kMaxProc], const unsigned i) {
-  track.setDiskStubWord<I + kNBarrelStubs>(stubWords[I][i]);
+  track.setDiskStubWord<I + trklet::N_LAYER>(stubWords[I][i]);
   setDiskStubs<I - 1>(track, stubWords, i);
 }
 
@@ -113,8 +110,8 @@ int main()
 
   // output memories
   TrackFit_t::TrackWord trackWord[kMaxProc];
-  TrackFit_t::BarrelStubWord barrelStubWords[kNBarrelStubs][kMaxProc];
-  TrackFit_t::DiskStubWord diskStubWords[kNDiskStubs][kMaxProc];
+  TrackFit_t::BarrelStubWord barrelStubWords[trklet::N_LAYER][kMaxProc];
+  TrackFit_t::DiskStubWord diskStubWords[trklet::N_DISK][kMaxProc];
   TrackFitMemory_t tracksMem;
 
   ///////////////////////////
@@ -126,9 +123,9 @@ int main()
     // Clear all output memories before starting.
     for (unsigned short i = 0; i < kMaxProc; i++) {
       trackWord[i] = TrackFit_t::TrackWord(0);
-      for (short j = 0; j < kNBarrelStubs; j++)
+      for (short j = 0; j < trklet::N_LAYER; j++)
         barrelStubWords[j][i] = TrackFit_t::BarrelStubWord(0);
-      for (short j = 0; j < kNDiskStubs; j++)
+      for (short j = 0; j < trklet::N_DISK; j++)
         diskStubWords[j][i] = TrackFit_t::DiskStubWord(0);
     }
     tracksMem.clear();
@@ -171,8 +168,8 @@ int main()
     for (unsigned short i = 0; i < kMaxProc; i++) {
       TrackFit_t track;
       track.setTrackWord(trackWord[i]);
-      setBarrelStubs<kNBarrelStubs - 1>(track, barrelStubWords, i);
-      setDiskStubs<kNDiskStubs - 1>(track, diskStubWords, i);
+      setBarrelStubs<trklet::N_LAYER - 1>(track, barrelStubWords, i);
+      setDiskStubs<trklet::N_DISK - 1>(track, diskStubWords, i);
       if (track.getTrackValid())
         tracksMem.write_mem(track);
     }
@@ -181,7 +178,7 @@ int main()
 
     // compare the computed outputs with the expected ones
     err += compareMemWithFile<TrackFitMemory_t,InputBase,OutputBase,TrackFit_t::kTFHitMapLSB,TrackFit_t::kTFTrackValidMSB>(tracksMem, fout_tracks.at(0), ievt, "\nTrack word", true);
-    compareStubsWithFile<kNBarrelStubs + kNDiskStubs - 1>(err, fout_tracks.at(0), pos, tracksMem, ievt);
+    compareStubsWithFile<trklet::N_LAYER + trklet::N_DISK - 1>(err, fout_tracks.at(0), pos, tracksMem, ievt);
     cout << endl;
 
   } // end of event loop

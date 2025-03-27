@@ -169,7 +169,15 @@ grep -v TP_ ../LUTsSplit/processingmodules.dat | grep -v VMR_ | grep -v IR_ > fp
 sed -i 's/VMStubMERouter/VMSMERouter/g' fpga2_processingmodules.dat
 sed -i 's/VMStubMERouter/VMSMERouter/g' fpga1_processingmodules.dat
 
-echo "Reduced CM"
+
+echo "CM FPGA1"
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -de 1 -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -de 1 -x -sp 1
+mkdir -p ../../IntegrationTests/CombinedConfig_FPGA1/{hdl,tb}
+mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA1/hdl/
+mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA1/tb/
+
+echo "Reduced CM FPGA2"
 ./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_reducedcm_wires.dat -p fpga2_reducedcm_processingmodules.dat -m fpga2_reducedcm_memorymodules.dat -de 1
 ./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_reducedcm_wires.dat -p fpga2_reducedcm_processingmodules.dat -m fpga2_reducedcm_memorymodules.dat -de 1 -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig_FPGA2/{hdl,tb}
@@ -228,7 +236,6 @@ do
   echo ${module}
   memprint_location="MemPrintsSplit"
   memprint_location_reducedcm="MemPrintsReducedCM"
-  ##memprint_location_reducedcm2="MemPrintsReducedCM2"
   table_location="LUTsSplit"
   if [[ ${module_type} == "VMRCM" ]]
   then
@@ -243,13 +250,11 @@ do
 
     rm -rf ${target_dir}
     mkdir -p ${target_dir}/ReducedCombinedConfig
-    ##mkdir -p ${target_dir}/ReducedCombinedConfig2
 
     for mem in `grep "${module}\." ${wires} | awk '{print $1}' | sort -u`;
     do
       find ${memprint_location} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../{} ${target_dir}/ \;
       find ${memprint_location_reducedcm} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig/ \;
-      #find ${memprint_location_reducedcm2} -type f -regex ".*_${mem}_04\.dat$" -exec ln -s ../../../{} ${target_dir}/ReducedCombinedConfig2/ \;
     done
   fi
 

@@ -1221,18 +1221,6 @@ void MatchProcessor(BXType bx,
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
   ap_uint<kNBits_MemAddr> read_address = 0;
 
-  //The next projection to read, the number of projections and flag if we have
-  //more projections to read
-
-  //  ap_uint<8> vmstubsmask[16];
-  //#pragma HLS array_partition variable=vmstubsmask complete dim=1
-
-  // entriesloop:for(unsigned int i=0; i<16; i++) {
-  //#pragma HLS unroll
-  //  vmstubsmask[i]=instubdata.getBinMask8(bx,i);
-  //}
-
-
   constexpr int nPRBAbits = 3;
   ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
 
