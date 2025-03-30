@@ -42,8 +42,8 @@ void fillTrackArray(const TrackStruct& inTrack, TrackStruct* outTrack, unsigned 
 
 void loadTrack(
   const TrackFitType::TrackWord& trackWordIn,
-  const TrackFitType::BarrelStubWord (&barrelStubWordsIn)[NBarrelStub],
-  const TrackFitType::DiskStubWord (&diskStubWordsIn)[NDiskStub],
+  const TrackFitType::BarrelStubWord (&barrelStubWordsIn)[trklet::N_LAYER],
+  const TrackFitType::DiskStubWord (&diskStubWordsIn)[trklet::N_DISK],
   TrackStruct& aTrack
 ) {
 
@@ -51,12 +51,12 @@ void loadTrack(
   #pragma HLS array_partition variable=diskStubWordsIn
   aTrack._trackWord = trackWordIn;
 
-  for (unsigned int i = 0; i < NBarrelStub; i++){
+  for (unsigned int i = 0; i < trklet::N_LAYER; i++){
     #pragma HLS unroll
     aTrack._barrelStubArray[i][0] = barrelStubWordsIn[i];
   }
 
-  for (unsigned int j = 0; j < NDiskStub; j++){
+  for (unsigned int j = 0; j < trklet::N_DISK; j++){
     #pragma HLS unroll
     aTrack._diskStubArray[j][0] = diskStubWordsIn[j];
   }
@@ -68,20 +68,20 @@ void loadTrack(
 void unloadTrack(
   TrackStruct& aTrack,
   TrackFitType::TrackWord& trackWordOut,
-  TrackFitType::BarrelStubWord (&barrelStubWordsOut)[NBarrelStub], 
-  TrackFitType::DiskStubWord (&diskStubWordsOut)[NDiskStub]
+  TrackFitType::BarrelStubWord (&barrelStubWordsOut)[trklet::N_LAYER], 
+  TrackFitType::DiskStubWord (&diskStubWordsOut)[trklet::N_DISK]
 ) {
 
   #pragma HLS array_partition variable=barrelStubWordsOut
   #pragma HLS array_partition variable=diskStubWordsOut
 
   trackWordOut = aTrack.getTrkWord(); 
-  for (unsigned int i = 0; i < NBarrelStub; i++){
+  for (unsigned int i = 0; i < trklet::N_LAYER; i++){
     #pragma HLS unroll
     barrelStubWordsOut[i] = aTrack.getBarrelStub(i, 0);
     }
 
-  for (unsigned int j = 0; j < NDiskStub; j++){
+  for (unsigned int j = 0; j < trklet::N_DISK; j++){
     #pragma HLS unroll
     diskStubWordsOut[j]= aTrack.getDiskStub(j, 0);
   }
@@ -91,12 +91,12 @@ void unloadTrack(
 
 void TrackMerger(const BXType bx,
   const TrackFitType::TrackWord trackWord[kMaxTrack],
-  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][NBarrelStub],
-  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][NDiskStub],
+  const TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][trklet::N_LAYER],
+  const TrackFitType::DiskStubWord diskStubWords[kMaxTrack][trklet::N_DISK],
   BXType bx_o,
   TrackFitType::TrackWord (&trackWord_o)[kMaxTrack],
-  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][NBarrelStub],
-  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][NDiskStub]
+  TrackFitType::BarrelStubWord (&barrelStubWords_o)[kMaxTrack][trklet::N_LAYER],
+  TrackFitType::DiskStubWord (&diskStubWords_o)[kMaxTrack][trklet::N_DISK]
   )
 {
   ComparisonModule comparisonModule[kNComparisonModules];

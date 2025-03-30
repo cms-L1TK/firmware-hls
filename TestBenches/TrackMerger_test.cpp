@@ -22,13 +22,13 @@ int main(){
   TrackFitType::TrackWord trackWord[kMaxTrack];
   TrackFitType::BarrelStubWord barrelStubWords[kMaxTrack][trklet::N_LAYER];
   TrackFitType::DiskStubWord diskStubWords[kMaxTrack][trklet::N_DISK];
-  TrackFitMemory<NBarrelStub, NDiskStub> inputTracks;
+  TrackFitMemory<trklet::N_LAYER, trklet::N_DISK> inputTracks;
 
   // Output memories
   TrackFitType::TrackWord trackWord_o[kMaxTrack];
   TrackFitType::BarrelStubWord barrelStubWords_o[kMaxTrack][trklet::N_LAYER];
   TrackFitType::DiskStubWord diskStubWords_o[kMaxTrack][trklet::N_DISK];
-  TrackFitMemory<NBarrelStub, NDiskStub> outputTracks;
+  TrackFitMemory<trklet::N_LAYER, trklet::N_DISK> outputTracks;
   // int outputNumber;
  
   TBHelper tb("../../../../../emData/PD/PD/");
@@ -59,7 +59,7 @@ int main(){
     outputTracks.setWriteBX(ievt);
 
     // Read in next event from input
-    writeMemFromFile<TrackFitMemory<NBarrelStub, NDiskStub>> (inputTracks, fin_inputTracks.at(0), ievt);
+    writeMemFromFile<TrackFitMemory<trklet::N_LAYER, trklet::N_DISK>> (inputTracks, fin_inputTracks.at(0), ievt);
     
     // Set bunch crossing
     BXType bx = ievt;
@@ -121,7 +121,7 @@ int main(){
     } 
 
     // Comparing outputs
-    err_count += compareMemWithFile<TrackFitMemory<NBarrelStub, NDiskStub>>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
+    err_count += compareMemWithFile<TrackFitMemory<trklet::N_LAYER, trklet::N_DISK>>(outputTracks, fout_outputTracks.at(0), ievt, "Tracks", truncation);
     
   }
   // Commented as f/w does not match the s/w - implementations are different so test vectors are different, TB fails.
