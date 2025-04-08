@@ -124,15 +124,20 @@ create_ip -name MatchProcessor_D5PHIA -module_name MP_D5PHIA -vendor xilinx.com 
 create_ip -name MatchProcessor_D5PHIB -module_name MP_D5PHIB -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchProcessor_D5PHIC -module_name MP_D5PHIC -vendor xilinx.com -library hls -version 1.0
 create_ip -name MatchProcessor_D5PHID -module_name MP_D5PHID -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_L1L2 -module_name FT_L1L2 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_L2L3 -module_name FT_L2L3 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_L3L4 -module_name FT_L3L4 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_L5L6 -module_name FT_L5L6 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_D1D2 -module_name FT_D1D2 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_D3D4 -module_name FT_D3D4 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_L1D1 -module_name FT_L1D1 -vendor xilinx.com -library hls -version 1.0
-create_ip -name TrackBuilder_L2D1 -module_name FT_L2D1 -vendor xilinx.com -library hls -version 1.0
-
+#create_ip -name MatchProcessor_L3PHIB_E -module_name MP_L3PHIB_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L3PHIC_E -module_name MP_L3PHIC_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L4PHIB_E -module_name MP_L4PHIB_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L4PHIC_E -module_name MP_L4PHIC_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L5PHIB_E -module_name MP_L5PHIB_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L5PHIC_E -module_name MP_L5PHIC_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L6PHIB_E -module_name MP_L6PHIB_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_L6PHIC_E -module_name MP_L6PHIC_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_D3PHIB_E -module_name MP_D3PHIB_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_D3PHIC_E -module_name MP_D3PHIC_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_D4PHIB_E -module_name MP_D4PHIB_E -vendor xilinx.com -library hls -version 1.0
+#create_ip -name MatchProcessor_D4PHIC_E -module_name MP_D4PHIC_E -vendor xilinx.com -library hls -version 1.0
+create_ip -name TrackBuilder_AAAA -module_name TB_AAAA -vendor xilinx.com -library hls -version 1.0
+create_ip -name TrackBuilder_BBBB -module_name TB_BBBB -vendor xilinx.com -library hls -version 1.0
 
 # Provide name of top-level HDL (without .vhd extension).
 #set topLevelHDL "SectorProcessor"

@@ -3,7 +3,7 @@
 void TrackStruct::resetTracks(){
   _trackWord = 0;
   LOOP_BarrelStubReset: 
-  for (unsigned int nBarrelLayer = 0; nBarrelLayer < NBarrelStub; nBarrelLayer++){
+  for (unsigned int nBarrelLayer = 0; nBarrelLayer < trklet::N_LAYER; nBarrelLayer++){
     #pragma HLS unroll
     for (unsigned int nBarrelStubs = 0; nBarrelStubs < maxNumStubs; nBarrelStubs++){
       #pragma HLS loop_flatten
@@ -11,7 +11,7 @@ void TrackStruct::resetTracks(){
     }
   }
   LOOP_DiskStubReset:
-  for (unsigned int nDiskLayer = 0; nDiskLayer < NDiskStub; nDiskLayer++){
+  for (unsigned int nDiskLayer = 0; nDiskLayer < trklet::N_DISK; nDiskLayer++){
     #pragma HLS unroll
     for (unsigned int nDiskStubs = 0; nDiskStubs < maxNumStubs; nDiskStubs++){
       #pragma HLS loop_flatten
@@ -31,7 +31,7 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
   #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
   #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
   LOOP_CompareBarrelStubs:
-  for (unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){
+  for (unsigned int barrelStubNum = 0; barrelStubNum < trklet::N_LAYER; barrelStubNum++){
     #pragma HLS unroll
     ap_uint<TrackFitType::kTFStubIndexSize> masterBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
     ap_uint<TrackFitType::kTFStubIndexSize> inputBarrelStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._barrelStubArray[barrelStubNum][0].range(kBarrelStubIndexSizeMSB, kBarrelStubIndexSizeLSB));
@@ -39,7 +39,7 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
     matchesFoundBarrel[barrelStubNum][0] = ((masterBarrelStubIndex == inputBarrelStubIndex) && (masterBarrelStubIndex > 0)) ?  1 : 0; 
   }
   LOOP_CompareDiskStubs:
-  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
+  for (unsigned int diskStubNum = 0; diskStubNum < trklet::N_DISK; diskStubNum++){
     #pragma HLS unroll
     ap_uint<TrackFitType::kTFStubIndexSize> masterDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(masterTrk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
     ap_uint<TrackFitType::kTFStubIndexSize> inputDiskStubIndex = ap_uint<TrackFitType::kTFStubIndexSize>(trk._diskStubArray[diskStubNum][0].range(kDiskStubIndexSizeMSB, kDiskStubIndexSizeLSB));
@@ -68,7 +68,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
   // Check whether the stub word is non-zero in the compared track
   // Then add stub into master track if share > 3 stubs in common
   LOOP_SetInputBarrelStubToMaster:
-  for(unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){
+  for(unsigned int barrelStubNum = 0; barrelStubNum < trklet::N_LAYER; barrelStubNum++){
     #pragma HLS unroll
     if((masterTrk._barrelStubArray[barrelStubNum][0] == 0) && (trk._barrelStubArray[barrelStubNum][0] != 0)){
       masterTrk._barrelStubArray[barrelStubNum][0] = trk._barrelStubArray[barrelStubNum][0];
@@ -76,7 +76,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
     }
   }
   LOOP_SetInputDiskStubToMaster:
-  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
+  for (unsigned int diskStubNum = 0; diskStubNum < trklet::N_DISK; diskStubNum++){
     #pragma HLS unroll
     if((masterTrk._diskStubArray[diskStubNum][0] == 0) && (trk._diskStubArray[diskStubNum][0] !=0 )){
       masterTrk._diskStubArray[diskStubNum][0] = trk._diskStubArray[diskStubNum][0];
@@ -87,7 +87,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
   totalHitMap = mergedBarrelStubsMap + mergedDiskStubsMap;
   masterTrk._trackWord | totalHitMap;
   LOOP_BarrelStubs:
-  for (unsigned int barrelStubNum = 0; barrelStubNum < NBarrelStub; barrelStubNum++){ 
+  for (unsigned int barrelStubNum = 0; barrelStubNum < trklet::N_LAYER; barrelStubNum++){ 
     #pragma HLS unroll
     LOOP_MergeBarrelStubs:
     for (unsigned int barrelStubIndex = 1; barrelStubIndex < maxNumStubs; barrelStubIndex++){
@@ -103,7 +103,7 @@ void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
     }
   }
   LOOP_DiskStubs:
-  for (unsigned int diskStubNum = 0; diskStubNum < NDiskStub; diskStubNum++){
+  for (unsigned int diskStubNum = 0; diskStubNum < trklet::N_DISK; diskStubNum++){
     #pragma HLS unroll
     LOOP_MergeDiskStubs:
     for (unsigned int diskStubIndex = 1; diskStubIndex < maxNumStubs; diskStubIndex++){

@@ -917,7 +917,6 @@ void MatchCalculator(BXType bx,
 ){
 
 #pragma HLS inline
-#pragma HLS array_partition variable=fullmatch complete dim=1
 
   using namespace PR;
 
@@ -1128,47 +1127,11 @@ void MatchCalculator(BXType bx,
   }
 
   if(goodmatch) { // Write out only the best match, based on the seeding
-    switch (proj_seed) {
-    case 0:
-    if(FMMask<LAYER, PHISEC, TF::L1L2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1L2>()].write_mem_new(bx,fm,savedMatch); // L1L2 seed
-    }
-    break;
-    case 1:
-    if(FMMask<LAYER, PHISEC, TF::L2L3>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2L3>()].write_mem_new(bx,fm,savedMatch); // L2L3 seed
-    }
-    break;
-    case 2:
-    if(FMMask<LAYER, PHISEC, TF::L3L4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L3L4>()].write_mem_new(bx,fm,savedMatch); // L3L4 seed
-    }
-    break;
-    case 3:
-    if(FMMask<LAYER, PHISEC, TF::L5L6>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L5L6>()].write_mem_new(bx,fm,savedMatch); // L5L6 seed
-    }
-    break;
-    case 4:
-    if(FMMask<LAYER, PHISEC, TF::D1D2>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D1D2>()].write_mem_new(bx,fm,savedMatch); // D1D2 seed
-    }
-    break;
-    case 5:
-    if(FMMask<LAYER, PHISEC, TF::D3D4>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::D3D4>()].write_mem_new(bx,fm,savedMatch); // D3D4 seed
-    }
-    break;
-    case 6:
-    if(FMMask<LAYER, PHISEC, TF::L1D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L1D1>()].write_mem_new(bx,fm,savedMatch); // L1D1 seed
-    }
-    break;
-    case 7:
-    if(FMMask<LAYER, PHISEC, TF::L2D1>()) {
-      fullmatch[FMCount<LAYER, PHISEC, TF::L2D1>()].write_mem_new(bx,fm,savedMatch); // L2D1 seed
-    }
-    break;
+
+    if (proj_seed == TF::L1L2 || proj_seed == TF::L2L3 || proj_seed == TF::L5L6 || proj_seed == TF::L2D1 || maxFullMatchVariants == 1) {
+      fullmatch[0].write_mem(fm,savedMatch); // AAAA FM
+    } else {
+      fullmatch[1].write_mem(fm,savedMatch); // BBBB FM
     }
     savedMatch = 1;
   }
@@ -1192,6 +1155,7 @@ void MatchProcessor(BXType bx,
                       BXType& bx_o,
                       FullMatchMemory<FMTYPE> fullmatch[maxFullMatchVariants]
 ){
+#pragma HLS latency min=11 max=11
 #pragma HLS inline
 
   using namespace PR;
@@ -1248,6 +1212,7 @@ void MatchProcessor(BXType bx,
   ap_uint<nMEM> mem_hasdata = 0;
 
 #pragma HLS ARRAY_PARTITION variable=numbersin complete
+#pragma HLS array_partition variable=fullmatch
 
   init<nMEM, nINMEM, kNBits_MemAddr+1, TrackletProjectionMemory<PROJTYPE>>
     (bx, iMem, iPage, nPages, mem_hasdata, numbersin, projin);
@@ -1255,18 +1220,6 @@ void MatchProcessor(BXType bx,
   // declare index of input memory to be read
   ap_uint<kNBits_MemAddr> mem_read_addr = 0;
   ap_uint<kNBits_MemAddr> read_address = 0;
-
-  //The next projection to read, the number of projections and flag if we have
-  //more projections to read
-
-  ap_uint<8> vmstubsmask[16];
-#pragma HLS array_partition variable=vmstubsmask complete dim=1
-
- entriesloop:for(unsigned int i=0; i<16; i++) {
-#pragma HLS unroll
-    vmstubsmask[i]=instubdata.getBinMask8(bx,i);
-  }
-
 
   constexpr int nPRBAbits = 3;
   ProjectionRouterBufferArray<nPRBAbits,VMPTYPE,APTYPE> projbufferarray;
@@ -1636,10 +1589,15 @@ void MatchProcessor(BXType bx,
 
       ap_uint<1> useSecond = zbin.range(0,0) == 1;
 
-      ap_uint<1> usefirstMinus = vmstubsmask[slot][ivmMinus];
-      ap_uint<1> usesecondMinus = useSecond && vmstubsmask[slot+1][ivmMinus];
-      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && vmstubsmask[slot][ivmPlus];
-      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && vmstubsmask[slot+1][ivmPlus];
+      ap_uint<1 + nZbinBits> tmp((bx&1)*(1<<nZbinBits) + slot);
+      ap_uint<1 + nZbinBits> tmpplusone((bx&1)*(1<<nZbinBits) + slot + 1);
+      ap_uint<8> vmstubsmasktmpA = instubdata.getBinMaskA(tmp);
+      ap_uint<8> vmstubsmasktmpB = instubdata.getBinMaskB(tmpplusone);
+      
+      ap_uint<1> usefirstMinus = vmstubsmasktmpA[ivmMinus];
+      ap_uint<1> usesecondMinus = useSecond && vmstubsmasktmpB[ivmMinus];
+      ap_uint<1> usefirstPlus = ivmPlus != ivmMinus && vmstubsmasktmpA[ivmPlus];
+      ap_uint<1> usesecondPlus = ivmPlus != ivmMinus && useSecond && vmstubsmasktmpB[ivmPlus];
 
       increase = usefirstPlus || usesecondPlus || usefirstMinus || usesecondMinus;
 

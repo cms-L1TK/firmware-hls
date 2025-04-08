@@ -65,7 +65,7 @@ begin
       write(LINE_OUT, string'("TIME (ns)"), right, TXT_WIDTH);
       write(LINE_OUT, string'("BX")       , right, TXT_WIDTH);
       write(LINE_OUT, string'("ADDR")     , right, TXT_WIDTH);
-      write(LINE_OUT, string'("DATA")     , right, 11*TXT_WIDTH);
+      write(LINE_OUT, string'("DATA")     , right, TXT_WIDTH);
       writeline(FILE_OUT, LINE_OUT);      
     end if;
 
@@ -75,8 +75,8 @@ begin
       -- Valid data, so write it to file.
       write(LINE_OUT, NOW   , right, TXT_WIDTH); 
       write(LINE_OUT, BX_CNT, right, TXT_WIDTH);
-      write(LINE_OUT, to_hexstring(ADDR), right, TXT_WIDTH);
-      write(LINE_OUT, to_hexstring(DATA), right, 11*TXT_WIDTH);
+      write(LINE_OUT, to_hexstring(ADDR)&" ", right, TXT_WIDTH);
+      write(LINE_OUT, to_hexstring(DATA), right, 1+to_hexstring(DATA)'length);
       writeline(FILE_OUT, LINE_OUT);      
       ADDR := std_logic_vector(unsigned(ADDR) + "1");
     end if;

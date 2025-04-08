@@ -26,6 +26,8 @@ entity FileWriter is
     PAGE_LENGTH : natural := PAGE_LENGTH;     --! Page length
     -- Leave following parameters at their default values.
     RAM_DEPTH  : natural := NUM_TPAGES*NUM_PAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
+    CLK_CNT_INIT : integer := 0; --! allows to set offset to allign with BX
+                                   --change
     ADDR_WIDTH : natural := clogb2(RAM_DEPTH)      --! RAM address
   );
   port (
@@ -50,6 +52,7 @@ procFile : process(CLK)
   file     FILE_OUT    : text;   
   variable LINE_OUT    : line;                              
   variable BX_CNT      : natural := 0;  --! Event counter
+  variable CLK_CNT     : integer := CLK_CNT_INIT;  --! Clock counter
   constant TXT_WIDTH   : natural := 11; --! Column width in output .txt file
 
   function to_hexstring ( VAR : std_logic_vector) return string is
@@ -97,14 +100,17 @@ begin
         writeline(FILE_OUT, LINE_OUT);      
       end if;
 
-      if (DONE = '1') then
+      if (CLK_CNT = MAX_ENTRIES - 1) then
         -- Module has finished event, so increment event counter.
         BX_CNT := BX_CNT + 1;
+        CLK_CNT := 0;
 
         if (BX_CNT = MAX_EVENTS) then
           -- All events processed, so close file.
           file_close(FILE_OUT);
         end if;
+      else
+        CLK_CNT := CLK_CNT + 1;
       end if;
     end if;
   end if;

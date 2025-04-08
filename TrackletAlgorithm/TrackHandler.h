@@ -2,26 +2,25 @@
 #define TrackletAlgorithm_TrackHandler_h
 #include "TrackFitMemory.h"
 #include "hls_stream.h"
-const int NBarrelStub = 4;
-const int NDiskStub = 4;
-typedef TrackFit<NBarrelStub, NDiskStub> TrackFitType;
-const unsigned int kFullBarrelStubSize = TrackFitType::kBarrelStubSize * NBarrelStub;
-const unsigned int kFullDiskStubSize = TrackFitType::kDiskStubSize * NDiskStub;
+
+typedef TrackFit<trklet::N_LAYER, trklet::N_DISK> TrackFitType;
+const unsigned int kFullBarrelStubSize = TrackFitType::kBarrelStubSize * trklet::N_LAYER;
+const unsigned int kFullDiskStubSize = TrackFitType::kDiskStubSize * trklet::N_DISK;
 const unsigned int kFullTrackWordSize = TrackFitType::kTrackWordSize;
 const unsigned int kBarrelStubIndexSizeMSB = TrackFitType::kTFBarrelStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFZResidSize + TrackFitType::kTFStubIndexSize;
 const unsigned int kBarrelStubIndexSizeLSB = TrackFitType::kTFBarrelStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFZResidSize;
 const unsigned int kDiskStubIndexSizeMSB = TrackFitType::kTFDiskStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFRResidSize + TrackFitType::kTFStubIndexSize;
 const unsigned int kDiskStubIndexSizeLSB = TrackFitType::kTFDiskStubRSize + TrackFitType::kTFPhiResidSize + TrackFitType::kTFRResidSize;
 const unsigned int maxNumStubs = 1; // 4 stubs per layer
-const unsigned int kBarrelStubMap = TrackFitType::kTFHitCountSize * NBarrelStub;
-const unsigned int kDiskStubMap = TrackFitType::kTFHitCountSize * NBarrelStub;
+const unsigned int kBarrelStubMap = TrackFitType::kTFHitCountSize * trklet::N_LAYER;
+const unsigned int kDiskStubMap = TrackFitType::kTFHitCountSize * trklet::N_LAYER;
 const unsigned int kTotHitMap = kBarrelStubMap + kDiskStubMap;
 
 struct TrackStruct {
   
   TrackFitType::TrackWord _trackWord; 
-  TrackFitType::BarrelStubWord _barrelStubArray[NBarrelStub][maxNumStubs]; 
-  TrackFitType::DiskStubWord _diskStubArray[NDiskStub][maxNumStubs];
+  TrackFitType::BarrelStubWord _barrelStubArray[trklet::N_LAYER][maxNumStubs]; 
+  TrackFitType::DiskStubWord _diskStubArray[trklet::N_DISK][maxNumStubs];
 
   TrackFitType::TrackWord getTrkWord() const {return _trackWord;};
   
@@ -54,8 +53,8 @@ class TrackHandler {
 
     
   private:
-    ap_uint<1> matchesFoundBarrel[NBarrelStub][maxNumStubs];
-    ap_uint<1> matchesFoundDisk[NDiskStub][maxNumStubs];
+    ap_uint<1> matchesFoundBarrel[trklet::N_LAYER][maxNumStubs];
+    ap_uint<1> matchesFoundDisk[trklet::N_DISK][maxNumStubs];
     ap_uint<1> stubPadding = 0;
     unsigned int debug = 0;
     ap_uint<kBarrelStubMap> mergedBarrelStubsMap;

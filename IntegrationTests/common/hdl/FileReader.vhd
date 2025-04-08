@@ -24,18 +24,19 @@ use work.tf_pkg.all;
 
 entity FileReader is
   generic (
-    FILE_NAME  : string;   --! Name of .txt file corresponding to memory content
-    DELAY      : natural := 0;     --! Delay output signals by this many clocks.
-    RAM_WIDTH  : natural := 18;    --! RAM data width
-    NUM_PAGES  : natural := 2;     --! Number of pages in RAM memory
-    NUM_TPAGES : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
-    NUM_BINS   : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
-    DEBUG      : boolean := false; --! Debug printout
+    FILE_NAME   : string;   --! Name of .txt file corresponding to memory content
+    PAGE_LENGTH : natural := PAGE_LENGTH; --! Page size
+    DELAY       : natural := 0;     --! Delay output signals by this many clocks.
+    RAM_WIDTH   : natural := 18;    --! RAM data width
+    NUM_PAGES   : natural := 2;     --! Number of pages in RAM memory
+    NUM_TPAGES  : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
+    NUM_BINS    : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
+    DEBUG       : boolean := false; --! Debug printout
     FILE_NAME_DEBUG : string  := "";  --! Name of .txt file for debug printout.
     -- Leave following parameters at their default values.
-    RAM_DEPTH  : natural := NUM_PAGES*NUM_TPAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
-    ADDR_WIDTH : natural := clogb2(RAM_DEPTH);     --! RAM address
-    BIN_SIZE   : natural := NUM_TPAGES*PAGE_LENGTH/NUM_BINS   --! Max. entries per RAM bin
+    RAM_DEPTH   : natural := NUM_PAGES*NUM_TPAGES*PAGE_LENGTH; --! RAM depth (no. of entries)
+    ADDR_WIDTH  : natural := clogb2(RAM_DEPTH);     --! RAM address
+    BIN_SIZE    : natural := NUM_TPAGES*PAGE_LENGTH/NUM_BINS   --! Max. entries per RAM bin
   );
   port (
     CLK      : in  std_logic;
@@ -192,10 +193,7 @@ begin
           DATA <= emDATA(RAM_WIDTH-1 downto 0);
           if (NUM_BINS > 1) then
             -- Binned memory
-            ADDR <= std_logic_vector(to_unsigned(POS_IN_MEM_BIN + BIN_SIZE*MEM_BIN + PAGE_LENGTH*PAGE, ADDR_WIDTH));
-          else
-            -- Unbinned memory
-            ADDR <= std_logic_vector(to_unsigned(DATA_CNT + PAGE_LENGTH*PAGE, ADDR_WIDTH));
+            ADDR <= std_logic_vector(to_unsigned(MEM_BIN, ADDR_WIDTH));
           end if;
           WRITE_EN <= '1';
           DATA_CNT := DATA_CNT + 1;

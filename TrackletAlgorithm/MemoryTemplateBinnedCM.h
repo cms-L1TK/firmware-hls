@@ -13,6 +13,11 @@
 #endif
 #endif
 
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
 //This is a bit of a hack, but until we find a cleaner
 //way to implement this we will use this...
 #include "SynthesisOptions.h"
@@ -60,14 +65,22 @@ protected:
     kNSlots = DEPTH_BIN,
     kNMemDepth = DEPTH_ADDR,
     kNBitsRZBinCM = NBIT_BIN-kNBitsphibinCM,
-    kNBinsRZ = (1<<kNBitsRZBinCM),
+    kNBinsRZ = (1<<kNBitsRZBinCM),  //FIXME is this wrong?
     slots = (1<<(NBIT_BX+NBIT_BIN-kNBitsphibinCM))
   };
 
   DataType dataarray_[NCP][kNBxBins][kNMemDepth];  // data array
 
-  ap_uint<8> binmask8_[kNBxBins][1<<kNBitsRZBinCM];
   ap_uint<64> nentries_[slots];
+
+  ap_uint<8> binmaskA_[slots];
+  ap_uint<8> binmaskB_[slots]; 
+ 
+  
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
+  ap_uint<4> nentriestmp_[1<<NBIT_BIN];
+  BunchXingT write_bx_;                //BX for writing
+#endif
 
 public:
 
@@ -77,23 +90,33 @@ public:
   unsigned int getNEntryPerBin() const {return (1<<(NBIT_ADDR-NBIT_BIN));}
   unsigned int getNCopy() const {return NCOPY;}
 
-  NEntryT getEntries(BunchXingT bx, ap_uint<NBIT_BIN> slot) const {
+  ap_uint<8> getBinMaskA(const ap_uint<NBIT_BX+NBIT_BIN-kNBitsphibinCM>& addrbinmaskA) const {
+    // std::cout << "getBinMaskA:" << addrbinmaskA << std::endl;
+    return binmaskA_[addrbinmaskA];
+  }
+  
+  ap_uint<8> getBinMaskB(const ap_uint<NBIT_BX+NBIT_BIN-kNBitsphibinCM>& addrbinmaskB) const {
+    return binmaskB_[addrbinmaskB];
+  }
+  
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
+  void setWriteBX(const BunchXingT& ibx) {
+    write_bx_ = ibx;
+  }
+#endif
+  
+  NEntryT getEntries(const BunchXingT& bx, ap_uint<NBIT_BIN> slot) const {
     ap_uint<kNBitsRZBinCM> ibin;
     ap_uint<kNBitsphibinCM> ireg;
     (ireg,ibin)=slot;
     return nentries_[bx][ibin].range(ireg*4+3,ireg*4);
   }
 
-  ap_uint<64> getEntries(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
+  ap_uint<64> getEntries(const BunchXingT& bx, ap_uint<kNBitsRZBinCM> ibin) const {
     return nentries_[bx*(1<<kNBitsRZBinCM)+ibin];
   }
 
-  ap_uint<8> getBinMask8(BunchXingT bx, ap_uint<kNBitsRZBinCM> ibin) const {
-#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
-    return binmask8_[bx][ibin];
-  }
-
-  NEntryT getEntries(BunchXingT bx) const {
+  NEntryT getEntries(const BunchXingT& bx) const {
     NEntryT val = 0;
     for ( auto i = 0; i < getDepth(); ++i ) {
       val += getEntries(bx, i);
@@ -113,68 +136,73 @@ public:
   }
 #endif
 
-  DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_ADDR> index) const {
+  DataType read_mem(unsigned int icopy, const BunchXingT& ibx, ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
-    if (isCMSSW) {ibx = 0; icopy = 0;}
+    if (isCMSSW) {assert(ibx == 0 && icopy == 0);}
     return dataarray_[icopy][ibx][index];
   }
   
-  DataType read_mem(unsigned int icopy, BunchXingT ibx, ap_uint<NBIT_BIN> slot,
-                    ap_uint<NBIT_ADDR> index) const {
+  DataType read_mem(unsigned int icopy, const BunchXingT& ibx,
+		    ap_uint<NBIT_BIN> slot, ap_uint<NBIT_ADDR> index) const {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
     // TODO: check if valid
-    if (isCMSSW) {ibx = 0; icopy = 0;}
+    if (isCMSSW) {assert(ibx == 0 && icopy == 0);}
     return dataarray_[icopy][ibx][getNEntryPerBin()*slot+index];
   }
 
-  bool write_mem(BunchXingT ibx, ap_uint<NBIT_BIN> slot, DataType data, unsigned int nentry_ibx) {
+  bool write_mem(ap_uint<NBIT_BIN> slot, const DataType& data) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
-#pragma HLS ARRAY_PARTITION variable=binmask8_ complete dim=0
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
 #pragma HLS inline
 
-    if (isCMSSW && !NBIT_BX) {ibx = 0;}
-    if (nentry_ibx < getNEntryPerBin()-1) { // Max 15 stubs in each memory due to 4 bit nentries
 
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-
-      dataarray_[0][ibx][getNEntryPerBin()*slot] = data;
+    //The vhdl implementation will write to the correct address
+    dataarray_[0][0][slot] = data;
+    return true;
 
 #else
 
-      // write address for slot: getNEntryPerBin() * slot + nentry_ibx
+#pragma HLS ARRAY_PARTITION variable=nentriestmp_ complete dim=0
 
-      ap_uint<kNBitsRZBinCM> ibin;
-      ap_uint<kNBitsphibinCM> ireg;
-      (ibin,ireg)=slot;
+    if (isCMSSW && !NBIT_BX) {write_bx_ = 0;}
 
-      unsigned int nentry = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+    ap_uint<kNBitsRZBinCM> ibin;
+    ap_uint<kNBitsphibinCM> ireg;
+    (ibin,ireg)=slot;
 
-      if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
+    unsigned int nentry = nentriestmp_[slot];
 
-      nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
-      if (ibin!=0) {
-        nentries_[ibx*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
-      }
-      binmask8_[ibx][ibin].set_bit(ireg,true);
+    if (nentry == ((1 << (NBIT_ADDR-NBIT_BIN)) - 1)) return false;
 
-      //icopy comparison must be signed int or future SW fails
-    writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
-#pragma HLS unroll
-        dataarray_[icopy][ibx][getNEntryPerBin()*slot+nentry] = data;
-      }
-#endif      
-      return true;
+    nentries_[write_bx_*kNBinsRZ+ibin].range(ireg*4+3,ireg*4)=nentry+1;
+    //The next ifdef is a real hack. In order to meet II=1 for test benches
+    //where we write to a VM memory we don't properly fill the nentries_
+    //array. This works because the test benches does not check the nentries_
+    //However, in a testbench when we read in a VM memory we need the
+    //nentries_ to be properly set for use in the TP or MP modules
+
+#if !defined __SYNTHESIS__
+    if (ibin!=0) {
+      nentries_[write_bx_*kNBinsRZ+ibin-1].range((ireg+8)*4+3,(ireg+8)*4)=nentry+1;
     }
-    else {
-#ifndef __SYNTHESIS__
-      if (data.raw() != 0) { // To avoid lots of prints when we're clearing the memories
-        edm::LogVerbatim("L1trackHLS") << "Warning out of range. nentry_ibx = "<<nentry_ibx<<" NBIT_ADDR-NBIT_BIN = "<<NBIT_ADDR-NBIT_BIN << std::endl;
-      }
+    binmaskA_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+    binmaskB_[write_bx_*kNBinsRZ+ibin].set_bit(ireg,true);
+#else
+    binmaskA_[write_bx_*kNBinsRZ+ibin] = 0;
+    binmaskB_[write_bx_*kNBinsRZ+ibin] = 0;
 #endif
-      return false;
+
+    nentriestmp_[slot] = nentry+1;
+
+    //icopy comparison must be signed int or future SW fails
+  writememloop:for (signed int icopy=0;icopy< (signed) NCP;icopy++) {
+#pragma HLS unroll
+      dataarray_[icopy][write_bx_][getNEntryPerBin()*slot+nentry] = data;
     }
+    return true;
+#endif      
   }
 
   // Methods for C simulation only
@@ -189,92 +217,60 @@ public:
   void clear() {
 
     DataType data("0",16);
+    //std::cout << "Clear: " << kNBxBins << "  " << (1<<kNBitsRZBinCM) << std::endl;
     for (size_t ibx=0; ibx<(kNBxBins); ++ibx) {
-      for (size_t icopy=0; icopy < NCP; icopy++) {
-        for (size_t ibin=0; ibin < kNMemDepth; ibin++) {
+      for (size_t ibin=0; ibin < (1<<kNBitsRZBinCM); ibin++) {
+	binmaskA_[ibx*kNBinsRZ+ibin] = 0;
+	binmaskB_[ibx*kNBinsRZ+ibin] = 0;
+      }
+      for (size_t ibin=0; ibin < kNMemDepth; ibin++) {
+	for (size_t icopy=0; icopy < NCP; icopy++) {
           dataarray_[icopy][ibx][ibin] = data;
         }
       }
-      // Clear nentries and binmask8
-      for (unsigned int ibin = 0; ibin < getNBins()/8; ++ibin) {
-        nentries_[ibx*kNBinsRZ+ibin] = 0;
-        binmask8_[ibx][ibin] = 0;
-      }
     }
-  }
 
+    for (size_t ibin=0; ibin < (1<<NBIT_BIN); ibin++) {
+      nentriestmp_[ibin] = 0;
+    }
 
-  ///////////////////////////////////
-  std::vector<std::string> split(const std::string& s, char delimiter)
-  {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream sstream(s);
-    while (getline(sstream, token, delimiter))
-      {
-        tokens.push_back(token);
-      }
-    return tokens;
+    for (size_t ibin=0; ibin < slots; ibin++) {
+      nentries_[ibin] = 0;
+    }
+    
   }
 
   // write memory from text file
-  bool write_mem(BunchXingT ibx, const std::string& line, int base=16)
-  {
+  bool write_mem(const std::vector<std::string>& split_line, int base=16) {
 
-    if (isCMSSW) {ibx = 0;}
+    assert(split_line.size()==4);
 
-    std::string datastr = split(line, ' ').back();
+    if (isCMSSW) {write_bx_ = 0;}
 
-    int slot = (int)strtol(split(line, ' ').front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
+    std::string datastr = split_line.back();
 
-    ap_uint<kNBitsRZBinCM> ibin;
-    ap_uint<kNBitsphibinCM> ireg;
-    (ibin, ireg)=slot;
-    ap_uint<4> nentry_ibx = nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4);
+    int slot = (int)strtol(split_line.front().c_str(), nullptr, base); // Convert string (in hexadecimal) to int
 
     DataType data(datastr.c_str(), base);
 
-    bool success = write_mem(ibx, slot, data, nentry_ibx);
+    bool success = write_mem(slot, data);
     
     return success;
   }
 
-
+  
   // print memory contents
-  void print_data(const DataType data) const
+  void print_data(const DataType& data) const
   {
     edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
     // TODO: overload '<<' in data class
   }
 
-  void print_entry(BunchXingT bx, ap_uint<NBIT_ADDR> index) const
+  void print_entry(const BunchXingT& bx, ap_uint<NBIT_ADDR> index) const
   {
     print_data(dataarray_[bx][index]);
   }
 
-  //These are broken - comment out for now (ryd, 2024-10-27)
-  /*
-    void print_mem(BunchXingT bx) const {
-      for(unsigned int ibin=0;ibin<8;ibin++) {
-        for(unsigned int ireg=0;ireg<8;ireg++) {
-          for (unsigned int i = 0; i < nentries_[ibx*kNBinsRZ+ibin].range(ireg*4+3,ireg*4); ++i) {
-            edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
-            print_entry(bx, i + slot*getNEntryPerBin() );
-          }
-        }
-      }
-    }
-
-    void print_mem() const {
-      for (unsigned int ibx = 0; ibx < kNBxBins; ++ibx) {
-        for (unsigned int i = 0; i < 8; ++i) {
-          edm::LogVerbatim("L1trackHLS") << ibx << " " << i << " ";
-          print_entry(ibx,i);
-        }
-      }
-    }
-  */
-  
   static constexpr int getWidth() {return DataType::getWidth();}
 
 #endif

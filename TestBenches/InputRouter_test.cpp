@@ -660,6 +660,7 @@ int main(int argc, char * argv[])
     for( unsigned int cIndx=0; cIndx < (unsigned int)hNmemories ; cIndx++)
     { 
        hMemories[cIndx].clear();
+       hMemories[cIndx].setWriteBX(cEvId);
     }
     BXType hBx = cEvId&0x7;
     BXType hBx_o; 

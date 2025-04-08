@@ -47,15 +47,14 @@ memNameLength = [
 parser = argparse.ArgumentParser(description="This script generates TrackBuilderTop.h and TrackBuilderTop.cc in the\
 TopFunctions/ directory.",
                                  epilog="")
-parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files (default=%(default)s)")
-parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring (default = %(default)s)")
-parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPROJ - not TPROJ memories")
+parser.add_argument("-o", "--outputDirectory", metavar="DIR", default="../TopFunctions/", type=str, help="The directory in which to write the output files for the TB (default=%(default)s)")
+parser.add_argument("-w", "--wiresFileName", metavar="WIRES_FILE", default="LUTs/wires.dat", type=str, help="Name and directory of the configuration file for wiring for the TB (default = %(default)s)")
+parser.add_argument("-sp", "--split", action='store_true', help="Split project so use MPAR not TPAR")
 arguments = parser.parse_args()
 
 # Keep in sync with
 # kTProjITCSize in TrackletAlgorithm/TrackletProjectionMemory.h and
 # kFMITCSize in TrackletAlgorithm/FullMatchMemory.h
-ITC_SIZE = 4
 
 # First, parse the wires file and store the memory names associated with TBs in
 # dictionaries with the TB names as keys.
@@ -64,14 +63,15 @@ with open(arguments.wiresFileName, "r") as wiresFile:
     barrelFMMems = {}
     diskFMMems = {}
     for line in wiresFile:
-        if " FT_" not in line:
+        if " TB_" not in line:
             continue
         line = line.rstrip()
-        tbName = re.sub(r".*FT_(....).*", r"FT_\1", line)
+        tbName = re.sub(r".*TB_(....).*", r"TB_\1", line)
         seed = tbName.split("_")[1]
         memName = line.split()[0]
         partype = "TPAR"
-        if arguments.split : partype = "MPAR"
+        if arguments.split:
+            partype = "MPAR"
         if memName.startswith(partype):
             if tbName not in tparMems:
                 tparMems[tbName] = []
@@ -129,7 +129,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
 
     # Calculate parameters and print out top function for each TB.
     for tbName in sorted(tparMems.keys()):
-        seed = re.sub(r"FT_(....)", r"\1", tbName)
+        seed = re.sub(r"TB_(....)", r"\1", tbName)
         seedNumber = None
         if seed == "L1L2":
             seedNumber = 0
@@ -151,16 +151,37 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # numbers of memories
         nTPARMem = []
         for i in range(0, 4):
-          nTPARMem.append(len([tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i]]))
+            nTPARMem.append(len([tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i]]))
         nBarrelFMMem = len(barrelFMMems[tbName])
         nDiskFMMem = len(diskFMMems[tbName])
 
         # numbers of output stubs
         barrelFMs = sorted([fm[0:10] for fm in barrelFMMems[tbName]])
+        diskFMs = sorted([fm[0:10] for fm in diskFMMems[tbName]])
         nBarrelStubs = len(set(barrelFMs))
         nDiskStubs = len({fm[0:10] for fm in diskFMMems[tbName]})
 
         # numbers of memories per stub
+        layercount = {}
+        for fm in barrelFMs :
+            if fm not in layercount:
+                layercount[fm]=0
+            layercount[fm]+=1
+        nFMBarrel=0
+        for layer, count in layercount.items():
+            shift=int(layer[-1])-1
+            nFMBarrel+=(count<<(4*shift))
+
+        diskcount = {}
+        for fm in diskFMs :
+            if fm not in diskcount:
+                diskcount[fm]=0
+            diskcount[fm]+=1
+        nFMDisk=0
+        for disk, count in diskcount.items():
+            shift=int(disk[-1])-1
+            nFMDisk+=(count<<(4*shift))
+
         barrelFM0 = barrelFMs[0] if len(barrelFMs) > 0 else ""
         nBarrelFMMemPerStub0 = barrelFMs.count(barrelFM0)
         barrelFMs = [fm for fm in barrelFMs if fm != barrelFM0]
@@ -170,8 +191,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # mask for enabling/disabling arrays of TPAR memories
         tparMask = 0
         for i in range(0, 4):
-          if nTPARMem[i] > 0:
-            tparMask = tparMask | (1 << i)
+            if nTPARMem[i] > 0:
+                tparMask = tparMask | (1 << i)
 
         # definition of getMPARNPages function
         nParentheses = 0
@@ -181,22 +202,22 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         getMPARNPages += "getMPARNPages<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARNPages += "  return "
         for i in range(1, maxNPages):
-          if nTPARMem[i - 1] == 0:
-            continue
-          if not first:
-            getMPARNPages += "(\n         "
-            nParentheses += 1
-          mems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i - 1]]
-          pages = "".join([tpar[9:] for tpar in mems])
-          pages = [ITC[page].value for page in pages]
-          getMPARNPages += "(iTC == " + str(pages[0])
-          for page in pages[1:]:
-            getMPARNPages += " || iTC == " + str(page)
-          getMPARNPages += ") ? " + str(i) + " : "
-          first = False
+            if nTPARMem[i - 1] == 0:
+                continue
+            if not first:
+                getMPARNPages += "(\n         "
+                nParentheses += 1
+            mems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[i - 1]]
+            pages = "".join([tpar[9:] for tpar in mems])
+            pages = [ITC[page].value for page in pages]
+            getMPARNPages += "(iTC == " + str(pages[0])
+            for page in pages[1:]:
+                getMPARNPages += " || iTC == " + str(page)
+            getMPARNPages += ") ? " + str(i) + " : "
+            first = False
         getMPARNPages += str(maxNPages)
         for i in range(0, nParentheses):
-          getMPARNPages += ")"
+            getMPARNPages += ")"
         getMPARNPages += ";\n}\n"
 
         # definition of getMPARMem function
@@ -205,23 +226,23 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         getMPARMem += "getMPARMem<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARMem += "  return "
         for i in range(0, max(nTPARMem) - 1):
-          if i != 0:
-            getMPARMem += "(\n         "
-            nParentheses += 1
-          mems = []
-          for j in range(0, 4):
-            allMems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[j]]
-            if len(allMems) > i:
-              mems.append(allMems[i])
-          pages = "".join([tpar[9:] for tpar in mems])
-          pages = [ITC[page].value for page in pages]
-          getMPARMem += "(iTC == " + str(pages[0])
-          for page in pages[1:]:
-            getMPARMem += " || iTC == " + str(page)
-          getMPARMem += ") ? " + str(i) + " : "
+            if i != 0:
+                getMPARMem += "(\n         "
+                nParentheses += 1
+            mems = []
+            for j in range(0, 4):
+                allMems = [tpar for tpar in tparMems[tbName] if len(tpar) == memNameLength[j]]
+                if len(allMems) > i:
+                    mems.append(allMems[i])
+            pages = "".join([tpar[9:] for tpar in mems])
+            pages = [ITC[page].value for page in pages]
+            getMPARMem += "(iTC == " + str(pages[0])
+            for page in pages[1:]:
+                getMPARMem += " || iTC == " + str(page)
+            getMPARMem += ") ? " + str(i) + " : "
         getMPARMem += str(max(nTPARMem) - 1)
         for i in range(0, nParentheses):
-          getMPARMem += ")"
+            getMPARMem += ")"
         getMPARMem += ";\n}\n"
 
         # definition of getMPARPage function
@@ -230,18 +251,18 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         getMPARPage += "getMPARPage<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARPage += "  return "
         for i in range(0, maxNPages - 1):
-          if i != 0:
-            getMPARPage += "(\n         "
-            nParentheses += 1
-          pages = "".join([tpar[9 + i] for tpar in tparMems[tbName] if len(tpar) > 9 + i])
-          pages = [ITC[page].value for page in pages]
-          getMPARPage += "(iTC == " + str(pages[0])
-          for page in pages[1:]:
-            getMPARPage += " || iTC == " + str(page)
-          getMPARPage += ") ? " + str(i) + " : "
+            if i != 0:
+                getMPARPage += "(\n         "
+                nParentheses += 1
+            pages = "".join([tpar[9 + i] for tpar in tparMems[tbName] if len(tpar) > 9 + i])
+            pages = [ITC[page].value for page in pages]
+            getMPARPage += "(iTC == " + str(pages[0])
+            for page in pages[1:]:
+                getMPARPage += " || iTC == " + str(page)
+            getMPARPage += ") ? " + str(i) + " : "
         getMPARPage += str(maxNPages - 1)
         for i in range(0, nParentheses):
-          getMPARPage += ")"
+            getMPARPage += ")"
         getMPARPage += ";\n}\n"
 
         # Print out prototype for top function for this TB.
@@ -256,9 +277,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    const FullMatchMemory<BARREL> barrelFullMatches[],\n"
             "    const FullMatchMemory<DISK> diskFullMatches[],\n"
             "    BXType &bx_o,\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::TrackWord trackWord[],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::BarrelStubWord barrelStubWords[][kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[][kMaxProc],\n"
+            "    TrackFit<trklet::N_LAYER, trklet::N_DISK>::TrackWord trackWord[],\n"
+            "    TrackFit<trklet::N_LAYER, trklet::N_DISK>::BarrelStubWord barrelStubWords[][kMaxProc],\n"
+            "    TrackFit<trklet::N_LAYER, trklet::N_DISK>::DiskStubWord diskStubWords[][kMaxProc],\n"
             "    bool &done\n"
             ");\n"
         )
@@ -308,9 +329,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    const FullMatchMemory<BARREL> barrelFullMatches[" + str(nBarrelFMMem) + "],\n"
             "    const FullMatchMemory<DISK> diskFullMatches[" + str(nDiskFMMem) + "],\n"
             "    BXType &bx_o,\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::TrackWord trackWord[kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::BarrelStubWord barrelStubWords[" + str(nBarrelStubs) + "][kMaxProc],\n"
-            "    TrackFit<" + str(nBarrelStubs) + ", " + str(nDiskStubs) + ">::DiskStubWord diskStubWords[" + str(nDiskStubs) + "][kMaxProc],\n"
+            "    TrackFit<trklet::N_LAYER, trklet::N_DISK>::TrackWord trackWord[kMaxProc],\n"
+            "    TrackFit<trklet::N_LAYER, trklet::N_DISK>::BarrelStubWord barrelStubWords[trklet::N_LAYER][kMaxProc],\n"
+            "    TrackFit<trklet::N_LAYER, trklet::N_DISK>::DiskStubWord diskStubWords[trklet::N_DISK][kMaxProc],\n"
             "    bool &done\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
@@ -322,8 +343,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
         )
         for i in range(0, 4):
-          for j in range(0, nTPARMem[i]):
-              topFile.write("#pragma HLS resource variable=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
+            for j in range(0, nTPARMem[i]):
+                topFile.write("#pragma HLS resource variable=trackletParameters" + str(i + 1) + "[" + str(j) + "].get_mem() latency=2\n")
         for i in range(0, nBarrelFMMem):
             topFile.write("#pragma HLS resource variable=barrelFullMatches[" + str(i) + "].get_mem() latency=2\n")
         for i in range(0, nDiskFMMem):
@@ -337,7 +358,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"
             "#pragma HLS interface register port=done\n"
             "\n"
-            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nBarrelFMMemPerStub0) + ", " + str(nBarrelFMMemPerStub) + ", " + str(nDiskFMMemPerStub) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
+            "TB_" + seed + ": TrackBuilder<TF::" + seed + ", " + str(nFMBarrel) + ", " + str(nFMDisk) + ", " + str(nBarrelStubs) + ", " + str(nDiskStubs) + ", " + str(tparMask) + ">(\n"
             "    bx,\n"
             "    trackletParameters1,\n"
             "    trackletParameters2,\n"
@@ -363,4 +384,3 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         "\n"
         "\n#endif\n"
     )
-

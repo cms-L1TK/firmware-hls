@@ -31,6 +31,21 @@ set modules_to_test {
     {MP_D5PHIC}
 }
 
+#Add these if using extra MPs
+#    {MP_L3PHIB_E}
+#    {MP_L4PHIB_E}
+#    {MP_L5PHIB_E}
+#    {MP_L6PHIB_E}
+#    {MP_D3PHIB_E}
+#    {MP_D4PHIB_E}
+#    {MP_L3PHIC_E}
+#    {MP_L4PHIC_E}
+#    {MP_L5PHIC_E}
+#    {MP_L6PHIC_E}
+#    {MP_D3PHIC_E}
+#    {MP_D4PHIC_E}
+
+
 # module_to_export must correspond to the default macros set at the top of the
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export MP_D1PHIC
@@ -48,8 +63,9 @@ add_files -tb ../emData/MP/
 
 foreach i $modules_to_test {
   set layerDisk [string range $i 3 4]
-  set iMP [string range $i 8 9]
-  set top_func [join [list "MatchProcessor_" $layerDisk "PHI" $iMP] ""]
+  set iMP [string range $i 8 8]
+  set extra [string range $i 9 10]
+  set top_func [join [list "MatchProcessor_" $layerDisk "PHI" $iMP $extra] ""]
   puts [join [list "======== TESTING " $i " ========"] ""]
   puts [join [list "layerDisk = " $layerDisk] ""]
   puts [join [list "iMP = " $iMP] ""]

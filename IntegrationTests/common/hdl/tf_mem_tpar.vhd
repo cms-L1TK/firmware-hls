@@ -143,11 +143,6 @@ begin
     --end if;
 
     slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent='1') and (init='1') then
-      init := '0';
-      slv_clk_cnt := (others => '0');
-      slv_page_cnt := (0 => '1', others => '0');
-    end if;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
@@ -161,8 +156,15 @@ begin
       -- Note that we don't zero the nent_o counters here. When adding entry we
       -- reset the nent_o counter if the mask is zero
     end if;
+    if (sync_nent='1') and (init='1') then
+      --report time'image(now)&" tf_mem_tpar "&NAME&" sync_nent";
+      init := '0';
+      slv_clk_cnt := (others => '0');
+      slv_page_cnt := (0 => '1', others => '0');
+    end if;
+
     if (wea='1') then
-      tpage := addra(clogb2(PAGE_LENGTH*NUM_TPAGES)-1 downto clogb2(PAGE_LENGTH));
+      tpage := addra(clogb2(NUM_TPAGES)-1 downto 0);
       nentaddress := slv_page_cnt_save&tpage;
       if (mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage)))='1') then
         address := nentaddress&nent_o(to_integer(unsigned(nentaddress)));
@@ -171,7 +173,7 @@ begin
         address := nentaddress&std_logic_vector(to_unsigned(0, nent_o(to_integer(unsigned(nentaddress)))'length));
         nent_o(to_integer(unsigned(nentaddress))) <= std_logic_vector(to_unsigned(1, nent_o(to_integer(unsigned(nentaddress)))'length));
       end if;
-      --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&integer'image(tpage)&" writeaddr "&to_bstring(vi_page_cnt_slv)&" "&to_bstring(address)&" nentaddress nent:"&integer'image(nentaddress)&" "&to_bstring(nent_o(nentaddress))&" "&to_bstring(dina);
+      --report time'image(now)&" tf_mem_tpar "&NAME&" tpage:"&to_bstring(tpage)&" writeaddr "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" nentaddress nent:"&to_bstring(nentaddress)&" "&to_bstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) <= '1';
     end if;

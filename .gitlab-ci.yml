@@ -136,12 +136,12 @@ IR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/CombinedConfig/InputRouterTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/InputRouterTop.cc'
 VMRCM-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig/VMRouterCMTop_L2PHIA.cc'
+    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMRouterCMTop_L2PHIA.cc'
 VMSMER-quality-check:
   <<: *template_quality-check
   variables:
@@ -151,7 +151,7 @@ TP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/CombinedConfig/TrackletProcessorTop.cc'
+    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/CombinedConfig_FPGA2/TrackletProcessorTop.cc'
 PC-quality-check:
   <<: *template_quality-check
   variables:
@@ -236,7 +236,7 @@ topReducedCombined-sim:
   allow_failure: true
   variables:
     VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - job: download
     - job: IR-vivado-hls-build
@@ -259,7 +259,7 @@ topReducedCombined-check-results:
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
-    PROJ_NAME: "ReducedCombinedConfig"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - download
     - topReducedCombined-sim
@@ -269,7 +269,7 @@ topReducedCombined-synth:
   allow_failure: true
   variables:
     VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - job: download
     - job: topReducedCombined-sim

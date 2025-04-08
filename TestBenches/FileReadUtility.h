@@ -105,6 +105,7 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
   }
 
   memory.clear();
+  memory.setWriteBX(ievt);
   
   while (getline(fin, line)) {
 
@@ -115,12 +116,8 @@ void writeMemFromFile(MemType& memory, std::ifstream& fin, int ievt, int base=16
     if (line.find("Event") != std::string::npos) {
       return;
     } else {
-      if (split(line,' ').size()==4) {
-       memory.write_mem(ievt, line, base);
-      } else {
-	const std::string datastr = split(line, ' ').back();
-	memory.write_mem(ievt, datastr, base);
-      }
+      std::vector<std::string> split_line = split(line, ' ');
+      memory.write_mem(split_line, base);
     }	
   }
   
@@ -611,12 +608,12 @@ unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifst
   }
   for (int i = 0; i<memory_ref1.getEntries(0); ++i){
     auto data_ref1 = memory_ref1.read_mem(0, i);
-    memory_ref.write_mem(0, data_ref1, i);
+    memory_ref.write_mem(data_ref1, i);
   }
   if (foutVec.size() > 1){
     for (int j = 0; j < memory_ref2.getEntries(0); ++j){
       auto data_ref2 = memory_ref2.read_mem(0, j);
-      memory_ref.write_mem(0, data_ref2, j + memory_ref1.getEntries(0));
+      memory_ref.write_mem(data_ref2, j + memory_ref1.getEntries(0));
     }
   }
 

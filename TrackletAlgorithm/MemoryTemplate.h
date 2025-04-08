@@ -3,6 +3,9 @@
 #define TrackletAlgorithm_MemoryTemplate_h
 
 #include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
 
 //This is a bit of a hack, but until we find a cleaner
 //way to implement this we will use this...
@@ -48,109 +51,56 @@ protected:
 
   DataType dataarray_[DEPTH_BX][DEPTH_ADDR];  // data array
   NEntryT nentries_[DEPTH_BX];                  // number of entries
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
+  BunchXingT write_bx_;                //BX for writing 
+#endif
   
 public:
 
   unsigned int getDepth() const {return DEPTH_ADDR;}
   unsigned int getNBX() const {return DEPTH_BX;}
 
-  NEntryT getEntries(BunchXingT bx) const {
+  NEntryT getEntries(const BunchXingT& bx) const {
 #pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
     return nentries_[bx];
   }
 
+#if !(defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH)
+  void setWriteBX(const BunchXingT& ibx) {
+    write_bx_ = ibx;
+  }
+#endif
+  
   const DataType (&get_mem() const)[DEPTH_BX][DEPTH_ADDR] {return dataarray_;}
 
-  DataType read_mem(BunchXingT ibx, ap_uint<NBIT_ADDR> index) const
+  DataType read_mem(const BunchXingT& ibx, const ap_uint<NBIT_ADDR> &index) const
   {
     // TODO: check if valid
-    if(!NBIT_BX) ibx = 0;
+    if(!NBIT_BX) assert(ibx == 0);
     return dataarray_[ibx][index];
   }
-
-  template<class SpecType>
-  bool write_mem(BunchXingT ibx, SpecType data)
+  
+  bool write_mem(const DataType& data, ap_uint<1> overwrite=0)
   {
 #pragma HLS inline
-    const NEntryT addr_index =
-#ifdef __SYNTHESIS__
-      0;
-#else
-    nentries_[ibx];
-#endif
-    return write_mem(ibx,data,addr_index);
-  }
-
-  template<class SpecType>
-  bool write_mem(BunchXingT ibx, SpecType data, NEntryT addr_index)
-  {
-#pragma HLS inline
-    if(!NBIT_BX) ibx = 0;
-    static_assert(
-                  std::is_same<DataType, SpecType>::value
-                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISKPS> >::value)
-                  || (std::is_same<DataType, AllStub<DISK> >::value && std::is_same<SpecType, AllStub<DISK2S> >::value)
-                  , "Invalid conversion between data types");
-    DataType sameData(data.raw());
-    return write_mem(ibx,sameData,addr_index);
-  }
-
-  bool write_mem(BunchXingT ibx, DataType data)
-  {
-#pragma HLS inline
-    const NEntryT addr_index =
-#ifdef __SYNTHESIS__
-      0;
-#else
-    nentries_[ibx];
-#endif
-    return write_mem(ibx,data,addr_index);
-  }
-
-  bool write_mem(BunchXingT ibx, DataType data, NEntryT addr_index)
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS inline
-    if(!NBIT_BX) ibx = 0;
-    if (addr_index < DEPTH_ADDR) {
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
       //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][0] = data;
-#else
-      dataarray_[ibx][nentries_[ibx]++] = data;
-#endif
-
-#ifndef __SYNTHESIS__
-      nentries_[ibx] = addr_index + 1;
-#endif
-
+      dataarray_[0][overwrite] = data;
       return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool write_mem_new(BunchXingT ibx, DataType data, ap_uint<1> overwrite)
-  {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
-#pragma HLS inline
-    if(!NBIT_BX) ibx = 0;
-    if (nentries_[ibx] < DEPTH_ADDR) {
-#if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
-      //The vhd memory implementation will write to the correct address!!
-      dataarray_[ibx][0] = data;
 #else
+#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+    if(!NBIT_BX) write_bx_ = 0;
+    if (nentries_[write_bx_] < DEPTH_ADDR) {
       if(overwrite == 0) {
-        dataarray_[ibx][nentries_[ibx]++] = data;
+        dataarray_[write_bx_][nentries_[write_bx_]++] = data;
       } else {
-        dataarray_[ibx][nentries_[ibx]-1] = data;
+        dataarray_[write_bx_][nentries_[write_bx_]-1] = data;
       }
-#endif
-
       return true;
     } else {
       return false;
     }
+#endif
   }
 
   // Methods for C simulation only
@@ -165,43 +115,35 @@ public:
   void clear()
   {
     DataType data("0",16);
+    setWriteBX(0);
   MEM_RST: for (size_t ibx=0; ibx<DEPTH_BX; ++ibx) {
       nentries_[ibx] = 0;
       for (size_t addr=0; addr<DEPTH_ADDR; ++addr) {
-        write_mem(ibx,data,addr);
+        dataarray_[ibx][addr]=data;
       }
     }
   }
 
-  // write memory from text file
-  bool write_mem(BunchXingT ibx, const char* datastr, int base=16)
-  { 
-    if(!NBIT_BX) ibx = 0;
-    DataType data(datastr, base);
-    NEntryT nent = nentries_[ibx]; 
-    bool success = write_mem(ibx, data, nent);
+  bool write_mem(const std::vector<std::string>& split_line, int base=16) {
+    assert(split_line.size()==3);
+    DataType data(split_line.back().c_str(), base);
 
-    return success;
-  }
-
-  bool write_mem(BunchXingT ibx, const std::string& datastr, int base=16)
-  {
-    return write_mem(ibx, datastr.c_str(), base);
+    return write_mem(data);
   }
 
   // print memory contents
-  void print_data(const DataType data) const
+  void print_data(const DataType& data) const
   {
     edm::LogVerbatim("L1trackHLS") << std::hex << data.raw() << std::endl;
     // TODO: overload '<<' in data class
   }
 
-  void print_entry(BunchXingT bx, NEntryT index) const
+  void print_entry(const BunchXingT& bx, NEntryT index) const
   {
     print_data(dataarray_[bx][index]);
   }
 
-  void print_mem(BunchXingT bx) const
+  void print_mem(const BunchXingT& bx) const
   {
     for (unsigned int i = 0; i <  nentries_[bx]; ++i) {
       edm::LogVerbatim("L1trackHLS") << bx << " " << i << " ";
