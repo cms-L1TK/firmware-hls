@@ -38,7 +38,9 @@ public:
   }
 
   inline bool empty() { 
-    return emptyUnitBool<kNBitsBuffer>(readptr_, writeptr_);
+    static const EmptyUnitClass<kNBitsBuffer> EmptyUnitClass;
+    return EmptyUnitClass.lut[(readptr_, writeptr_)];
+    //return emptyUnitBool<kNBitsBuffer>(readptr_, writeptr_);
   }
 
   bool nearFull() {
@@ -68,7 +70,6 @@ private:
   ap_uint<kNBitsBuffer> writeptr_ = 0;
   ProjectionRouterBuffer<VMProjType,AllProjectionType> projbuffer_[1<<kNBitsBuffer];
   ap_uint<(1 << (2 * kNBitsBuffer))> nearFullLUT = nearFullUnit<kNBitsBuffer>();
-  ap_uint<(1 << (2 * kNBitsBuffer))> emptyLUT = emptyUnit<kNBitsBuffer>();
 
 };
 

@@ -1351,7 +1351,9 @@ void MatchProcessor(BXType bx,
 
     auto readptr = projbufferarray.getReadPtr();
     auto writeptr = projbufferarray.getWritePtr();
-    bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
+    //bool empty = emptyUnit<nPRBAbits>()[(readptr,writeptr)];
+    static const EmptyUnitClass<nPRBAbits> EmptyUnitClass;
+    bool empty = EmptyUnitClass.lut[(readptr,writeptr)];
 
     bool projBuffNearFull = nearFull4Unit<nPRBAbits>()[(readptr,writeptr)];
 
