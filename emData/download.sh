@@ -194,8 +194,8 @@ mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../Integra
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA2/tb/
 
 echo "CM FPGA2"
-./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1
-./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 1 -x
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 2
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 2 -x
 mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/

@@ -18,25 +18,25 @@ package emp_project_decl is
   constant CLOCK_RATIO        : integer               := 6;
   constant CLOCK_AUX_DIV      : clock_divisor_array_t := (18, 9, 4);  -- Dividers of CLOCK_COMMON_RATIO * 40 MHz
 
-  constant PAYLOAD_LATENCY : integer := 680; 
+  constant PAYLOAD_LATENCY : integer := 704; 
 
   -- F2 receives from F1 on inter-fpga links
   constant REGION_CONF : region_conf_array_t := (
      0   => kDummyRegion,                     -- service c2c
-     1   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     2   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     3   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     4   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     5   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     6   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     7   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     8   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-     9   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-    10   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     1   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     2   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     3   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     4   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     5   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     6   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     7   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     8   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+     9   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    10   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
     11   => kDummyRegion,                         -- not routed
-    12   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-    13   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
-    14   => (gty25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    12   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    13   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
+    14   => (csp25, buf, no_fmt, no_buf, no_mgt), -- fpga-fpga
     15   => kDummyRegion,                         -- not routed
 ------cross
 ----- all MGTs instantiated bidirectionally for now
@@ -47,7 +47,7 @@ package emp_project_decl is
     20  => kDummyRegion,                      -- not routed                  
     21  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
     22  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
-    23  => (no_mgt, no_buf, no_fmt, buf,    gty25),  -- firefly
+    23  => (no_mgt, no_buf, no_fmt, buf,    csp25),  -- firefly
     24  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
     25  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
     26  => (no_mgt, no_buf, no_fmt, no_buf, no_mgt),  -- firefly
