@@ -30,7 +30,9 @@ use work.hybrid_data_types.all;
 
 package tf_interface_pkg is
 
-  constant numTW_104 : natural := enum_TW_104'pos(enum_TW_104'high) + 1;
+  --numTW_104 should reflect number of seed types (no longer length of 
+  --TW_113 since now only 2 TBs). TODO fix this hack
+  constant numTW_104 : natural := 8;
   constant numBW_46 : natural := enum_BW_46'pos(enum_BW_46'high) + 1;
 
   function conv (l : ldata)

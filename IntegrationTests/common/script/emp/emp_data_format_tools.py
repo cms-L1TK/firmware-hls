@@ -125,10 +125,11 @@ class Bitmap:
     """
     if (value[:3]=='bin'):
       value = value[3:]
-      if not ((value.count('0')+value.count('1'))==len(value)):
+      n_valid_chars = value.count('0')+value.count('1')+value.count('U')
+      if n_valid_chars != len(value):
         raise ValueError('Binary string contains characters other than '
-                         '0 and 1')
-      self.value = value
+                         '0, 1, and U')
+      self.value = value.replace('U','0')
     else:
       if value[:2] in ['0x']:
         value = value[2:]
@@ -318,8 +319,8 @@ class Bitmap:
 
     Returns:
       sub-bitmap from start to end inclusively and counting from the LSB.
-      For example Bitmap('10111010').substring(3,0) is equal to Bitmap('1010')
-      This is similar to ex. VHDL bitmap(3 downto 0)
+      For example Bitmap('bin10111010').substring(3,0) is equal to 
+      Bitmap('bin1010'). This is similar to ex. VHDL bitmap(3 downto 0)
 
     Raises:
       ValueError if either start or end is out of range
@@ -420,11 +421,25 @@ class EmpData:
       frame: frame to retreive
 
     Returns:
-      concatenation of all channel data for frame
+      data for given frame, indexed by channel
     """
     data = []
     for channel in range(len(self.channels)):
       data.append(self.data[channel][frame])
+    return data
+
+  def frame_metadata(self, frame: int) -> list[Bitmap]:
+    """Returns list of bitmaps for a given frame
+
+    Args:
+      frame: frame to retreive
+
+    Returns:
+      metadata for given frame, indexed by channel
+    """
+    data = []
+    for channel in range(len(self.channels)):
+      data.append(self.metadata[channel][frame])
     return data
 
 class TBWord:
@@ -614,6 +629,25 @@ def load_emp_data(filename: str) -> EmpData:
       line_content = input_file.readline()
   return emp_data
 
+def get_first_valid_nonempty_word(emp_data: EmpData, channel_idx: int) -> int:
+  """Finds row of first nonempty valid data word for given column 
+
+  Arg: 
+    emp_data: emp data to search through
+    channel_idx: target channel (column) index (NOT channel name)
+
+  Returns:
+    frame (row) index of first nonempty valid data word. If no nonempty valid
+    words in channel, returns 0
+  """
+  for iframe in range(len(emp_data.data[0])):
+    channel_data = emp_data.frame_data(iframe)[channel_idx]
+    channel_metadata = emp_data.frame_metadata(iframe)[channel_idx]
+    if ((channel_data.to_int() != 0) 
+        and (channel_metadata.substring(3,3).to_int() == 1)):
+      return iframe
+  return -1
+
 def fpga1_link_to_words(link_data: list[Bitmap]) -> dict[str,Bitmap]:
   """Converts FPGA1 output from EMP style links into TF words
 
@@ -728,7 +762,10 @@ def create_empdata_fpga2_input(data: list[dict[str,list[Bitmap]]]) -> EmpData:
       frame_link_data = fpga2_words_to_link(frame_words)
       #first channel is BX
       link_data.metadata[0].append(default_metadata(abs_frame))
-      link_data.data[0].append(Bitmap(zero_pad(hex(ievent%8)[2:],16)))
+      if iframe == 0 and event==1:
+        link_data.data[0].append(Bitmap('00000000D057A271'))
+      else:
+        link_data.data[0].append(Bitmap(zero_pad(hex(ievent%8)[2:],16)))
       for ichannel in range(46):
         link_data.metadata[ichannel+1].append(default_metadata(abs_frame))
         link_data.data[ichannel+1].append(frame_link_data[ichannel])
@@ -752,6 +789,7 @@ def get_words_fpga1_empdata(emp_data: EmpData,
     all_names.append('AS'+as_name)
   for mpar_name in MPAR_NAMES:
     all_names.append('MPAR'+mpar_name)
+  all_names.append('BX')
 
   for name in all_names:
     tf_words[name] = []

@@ -35,12 +35,14 @@ def get_f1output_words(f1_empdata: EmpData, first_event: int = 0,
     words as Bitmaps
   """
   tf_words_simu = []
+  offset = get_first_valid_nonempty_word(f1_empdata, 1)
   for event in range(first_event,last_event):
-    event_words = get_words_fpga1_empdata(f1_empdata,5+108*event)
+    event_words = get_words_fpga1_empdata(f1_empdata,offset+108*event)
     #remove valid bits
     for memory in event_words:
-      event_words[memory] = remove_empty_bitmaps_in_list(event_words[memory])
-      event_words[memory] = strip_leading_bits(event_words[memory],1)
+      if memory != 'BX':
+        event_words[memory] = remove_empty_bitmaps_in_list(event_words[memory])
+        event_words[memory] = strip_leading_bits(event_words[memory],1)
     tf_words_simu.append(event_words)
   return tf_words_simu
 
