@@ -262,7 +262,7 @@ topReducedCombinedFPGA1-check-results:
     PROJ_NAME: "ReducedCombinedConfig_FPGA1"
   needs:
     - download
-    - topReducedCombined-sim
+    - topReducedCombinedFPGA1-sim
 # FW synthesis ---------------
 topReducedCombinedFPGA1-synth:
   <<: *template_topTF-synth
@@ -272,8 +272,8 @@ topReducedCombinedFPGA1-synth:
     PROJ_NAME: "ReducedCombinedConfig_FPGA1"
   needs:
     - job: download
-    - job: topReducedCombined-sim
-    - job: topReducedCombined-check-results
+    - job: topReducedCombinedFPGA1-sim
+    - job: topReducedCombinedFPGA1-check-results
       artifacts: false
 # FW simulation ---------------
 topReducedCombinedFPGA2-sim:
@@ -307,7 +307,7 @@ topReducedCombinedFPGA2-check-results:
     PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - download
-    - topReducedCombined-sim
+    - topReducedCombinedFPGA2-sim
 # FW synthesis ---------------
 topReducedCombinedFPGA2-synth:
   <<: *template_topTF-synth
@@ -317,6 +317,6 @@ topReducedCombinedFPGA2-synth:
     PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - job: download
-    - job: topReducedCombined-sim
-    - job: topReducedCombined-check-results
+    - job: topReducedCombinedFPGA2-sim
+    - job: topReducedCombinedFPGA2-check-results
       artifacts: false
