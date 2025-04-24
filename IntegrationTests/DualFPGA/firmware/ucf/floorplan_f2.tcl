@@ -4,15 +4,10 @@
 
 set_false_path -through [get_nets payload/sp2_mem_writer_1/HLS_reset]
 
-#temporary delete_pblocks for pblocks in previous versions of this script to avoid left-over shenanigans that will confuse vivado
-
-delete_pblocks -quiet pblock_payload_MPD4BD5B pblock_payload_MPD4CD5C pblock_payload_FMpipeline1 pblock_payload_MPL6AL6B pblock_payload_MPL6CL6D 
-delete_pblocks -quiet pblock_payload_MPL1to6 pblock_payload_MPD1to5 pblock_payload_FTset1 pblock_payload_FTset2 pblock_payload_FTMPset1 pblock_payload_FTMPset2
-
 #normal delete_pblocks
 delete_pblocks -quiet pblock_payload_MPL1A pblock_payload_MPL1B pblock_payload_MPL1C pblock_payload_MPL1D pblock_payload_MPL1E pblock_payload_MPL1F pblock_payload_MPL1G pblock_payload_MPL1H pblock_payload_MPL2A pblock_payload_MPL2B pblock_payload_MPL2C pblock_payload_MPL2D pblock_payload_MPL3A pblock_payload_MPL3B pblock_payload_MPL3C pblock_payload_MPL3D pblock_payload_MPL4A pblock_payload_MPL4B pblock_payload_MPL4C pblock_payload_MPL4D pblock_payload_MPL5A pblock_payload_MPL5B pblock_payload_MPL5C pblock_payload_MPL5D pblock_payload_MPL6A pblock_payload_MPL6B pblock_payload_MPL6C pblock_payload_MPL6D pblock_payload_MPD1A pblock_payload_MPD1B pblock_payload_MPD1C pblock_payload_MPD1D pblock_payload_MPD2A pblock_payload_MPD2B pblock_payload_MPD2C pblock_payload_MPD2D pblock_payload_MPD3A pblock_payload_MPD3B pblock_payload_MPD3C pblock_payload_MPD3D pblock_payload_MPD4A pblock_payload_MPD4B pblock_payload_MPD4C pblock_payload_MPD4D pblock_payload_MPD5A pblock_payload_MPD5B pblock_payload_MPD5C pblock_payload_MPD5D 
 delete_pblocks -quiet pblock_payload_MPD4AD5AMem pblock_payload_MPD4BD5BMem pblock_payload_MPD4CD5CMem pblock_payload_MPD4DD5DMem pblock_payload_MPL1AL2AMem pblock_payload_MPL1BL2BMem pblock_payload_MPL1CL2CMem pblock_payload_MPL1DL2DMem
-delete_pblocks -quiet pblock_payload_FTL1L2 pblock_payload_FTL2L3 pblock_payload_FTL3L4 pblock_payload_FTL5L6 pblock_payload_FTD1D2 pblock_payload_FTD3D4 pblock_payload_FTL1D1 pblock_payload_FTL2D1 pblock_payload_KF pblock_payload_KFout
+delete_pblocks -quiet pblock_payload_FTAAAA pblock_payload_FTBBBB pblock_payload_KF pblock_payload_KFout
 delete_pblocks -quiet pblock_payload_PCVMSMERs
 delete_pblocks -quiet pblock_payload_MPA1 pblock_payload_MPB1 pblock_payload_MPC1 pblock_payload_MPD1 pblock_payload_MPA2 pblock_payload_MPB2 pblock_payload_MPC2 pblock_payload_MPD2 
 
@@ -99,8 +94,8 @@ set lRightBoundary 4278
 
 set lpblock_payload_MPL1to6 [create_pblock pblock_payload_MPL1to6]
 set lpblock_payload_MPD1to5 [create_pblock pblock_payload_MPD1to5]
-set lpblock_payload_FTset1 [create_pblock pblock_payload_FTset1]
-set lpblock_payload_FTset2 [create_pblock pblock_payload_FTset2]
+#set lpblock_payload_FTset1 [create_pblock pblock_payload_FTset1]
+#set lpblock_payload_FTset2 [create_pblock pblock_payload_FTset2]
 
 set lpblock_payload_MPL1to6L [create_pblock pblock_payload_MPL1to6L]
 set lpblock_payload_MPL1to6H [create_pblock pblock_payload_MPL1to6H]
@@ -545,259 +540,127 @@ add_cells_to_pblock [get_pblocks pblock_payload_ASin] [get_cells -quiet [list \
 
 #FT pblocks
 
-set lpblock_payload_FTL1L2 [create_pblock pblock_payload_FTL1L2]
-add_cells_to_pblock [get_pblocks pblock_payload_FTL1L2] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L1L2 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_*_DELAY \
+set lpblock_payload_FTAAAA [create_pblock pblock_payload_FTAAAA]
+add_cells_to_pblock [get_pblocks pblock_payload_FTAAAA] [get_cells -quiet [list \
+          payload/tf2_wrapper_1/SectorProcessor_1/FT_AAAA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIE \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIF \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIG \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIH \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2ABC \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2DE \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2F \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2G \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2HI \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2JKL \
-          ]]
-
-set lpblock_payload_FTL2L3 [create_pblock pblock_payload_FTL2L3]
-add_cells_to_pblock [get_pblocks pblock_payload_FTL2L3] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L2L3 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2L3ABCD \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L5L6ABCD \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2D1ABCD \
           ]]
 
-set lpblock_payload_FTL3L4 [create_pblock pblock_payload_FTL3L4]
-add_cells_to_pblock [get_pblocks pblock_payload_FTL3L4] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L3L4 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_*_DELAY \
+set lpblock_payload_FTBBBB [create_pblock pblock_payload_FTBBBB]
+add_cells_to_pblock [get_pblocks pblock_payload_FTBBBB] [get_cells -quiet [list \
+          payload/tf2_wrapper_1/SectorProcessor_1/FT_BBBB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIE \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIF \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIG \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIH \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4AB \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4CD \
-          ]]
-
-set lpblock_payload_FTL5L6 [create_pblock pblock_payload_FTL5L6]
-add_cells_to_pblock [get_pblocks pblock_payload_FTL5L6] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L5L6 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_*_DELAY \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L5L6ABCD \
-          ]]
-
-set lpblock_payload_FTD1D2 [create_pblock pblock_payload_FTD1D2]
-add_cells_to_pblock [get_pblocks pblock_payload_FTD1D2] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_D1D2 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D1D2ABCD \
-          ]]
-
-set lpblock_payload_FTD3D4 [create_pblock pblock_payload_FTD3D4]
-add_cells_to_pblock [get_pblocks pblock_payload_FTD3D4] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_D3D4 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D3D4ABCD \
-          ]]
-
-set lpblock_payload_FTL1D1 [create_pblock pblock_payload_FTL1D1]
-add_cells_to_pblock [get_pblocks pblock_payload_FTL1D1] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L1D1 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1ABCD \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1EFGH \
-          ]]
-          
-set lpblock_payload_FTL2D1 [create_pblock pblock_payload_FTL2D1]
-add_cells_to_pblock [get_pblocks pblock_payload_FTL2D1] [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L2D1 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_*_DELAY \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2D1ABCD \
           ]]
 
 #KF pblocks
@@ -938,19 +801,19 @@ set_property PARENT pblock_payload_MPD1to5D [get_pblocks [list \
           pblock_payload_MPD5D \
           ]]
           
-set_property PARENT pblock_payload_FTset1 [get_pblocks [list \
-          pblock_payload_FTL1L2 \
-          pblock_payload_FTL3L4 \
-          pblock_payload_FTL5L6 \
-          ]]
-
-set_property PARENT pblock_payload_FTset2 [get_pblocks [list \
-          pblock_payload_FTL2L3 \
-          pblock_payload_FTD1D2 \
-          pblock_payload_FTD3D4 \
-          pblock_payload_FTL1D1 \
-          pblock_payload_FTL2D1 \
-							   ]]
+#set_property PARENT pblock_payload_FTset1 [get_pblocks [list \
+#          pblock_payload_FTL1L2 \
+#          pblock_payload_FTL3L4 \
+#          pblock_payload_FTL5L6 \
+#          ]]
+#
+#set_property PARENT pblock_payload_FTset2 [get_pblocks [list \
+#          pblock_payload_FTL2L3 \
+#          pblock_payload_FTD1D2 \
+#          pblock_payload_FTD3D4 \
+#          pblock_payload_FTL1D1 \
+#          pblock_payload_FTL2D1 \
+#							   ]]
 
 
 set_property USER_CLUSTER cluster_payload_MPL1PHIA [get_cells -quiet [list \
@@ -1337,253 +1200,373 @@ set_property USER_CLUSTER cluster_payload_MPL6PHID [get_cells -quiet [list \
 #          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHID_DELAY0 \
 #          ]]
 
-set_property USER_CLUSTER cluster_payload_FTL1L2 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L1L2 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_*_DELAY \
+#set_property USER_CLUSTER cluster_payload_FTL1L2 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_L1L2 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L5PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_L6PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_D4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1L2_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2ABC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2DE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2F \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2G \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2HI \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2JKL \
+#          ]]
+#
+#set_property USER_CLUSTER cluster_payload_FTL2L3 [get_cells -quiet [list \
+#	  payload/tf2_wrapper_1/SectorProcessor_1/FT_L2L3 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIF \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIG \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIH \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2L3ABCD \
+#          ]]
+#
+#set_property USER_CLUSTER cluster_payload_FTL3L4 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_L3L4 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIF \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIG \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIH \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4AB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4CD \
+#          ]]
+#
+#set_property USER_CLUSTER cluster_payload_FTL5L6 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_L5L6 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIF \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIG \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIH \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L5L6ABCD \
+#          ]]
+#
+#set_property USER_CLUSTER cluster_payload_FTD1D2 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_D1D2 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIF \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIG \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIH \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D1D2ABCD \
+#          ]]
+#
+#set_property USER_CLUSTER cluster_payload_FTD3D4 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_D3D4 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIF \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIG \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIH \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D3D4ABCD \
+#          ]]
+#
+#set_property USER_CLUSTER cluster_payload_FTL1D1 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_L1D1 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1ABCD \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1EFGH \
+#          ]]
+#          
+#set_property USER_CLUSTER cluster_payload_FTL2D1 [get_cells -quiet [list \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FT_L2D1 \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIE \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIF \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIG \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIH \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIA \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIB \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIC \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHID \
+#          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_*_DELAY \
+#          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2D1ABCD \
+#          ]]
+
+set_property USER_CLUSTER cluster_payload_FTAAAA [get_cells -quiet [list \
+          payload/tf2_wrapper_1/SectorProcessor_1/FT_AAAA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIE \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIF \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIG \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L1PHIH \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_L6PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_D5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_AAAA_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2ABC \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2DE \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2F \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2G \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2HI \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1L2JKL \
-          ]]
-
-set_property USER_CLUSTER cluster_payload_FTL2L3 [get_cells -quiet [list \
-	  payload/tf2_wrapper_1/SectorProcessor_1/FT_L2L3 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_L5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2L3_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2L3ABCD \
-          ]]
-
-set_property USER_CLUSTER cluster_payload_FTL3L4 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L3L4 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_L6PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L3L4_*_DELAY \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4AB \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4CD \
-          ]]
-
-set_property USER_CLUSTER cluster_payload_FTL5L6 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L5L6 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_L4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L5L6_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L5L6ABCD \
-          ]]
-
-set_property USER_CLUSTER cluster_payload_FTD1D2 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_D1D2 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_L2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_D5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D1D2_*_DELAY \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D1D2ABCD \
-          ]]
-
-set_property USER_CLUSTER cluster_payload_FTD3D4 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_D3D4 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_D5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_D3D4_*_DELAY \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D3D4ABCD \
-          ]]
-
-set_property USER_CLUSTER cluster_payload_FTL1D1 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L1D1 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_D5PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L1D1_*_DELAY \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1ABCD \
-          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1EFGH \
-          ]]
-          
-set_property USER_CLUSTER cluster_payload_FTL2D1 [get_cells -quiet [list \
-          payload/tf2_wrapper_1/SectorProcessor_1/FT_L2D1 \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIE \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIF \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIG \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_L1PHIH \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D2PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D3PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIA \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIB \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHIC \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_D4PHID \
-          payload/tf2_wrapper_1/SectorProcessor_1/FM_L2D1_*_DELAY \
           payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L2D1ABCD \
           ]]
 
+set_property USER_CLUSTER cluster_payload_FTBBBB [get_cells -quiet [list \
+          payload/tf2_wrapper_1/SectorProcessor_1/FT_BBBB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIE \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIF \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIG \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L1PHIH \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_L6PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D1PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D2PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D3PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D4PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHIA \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHIB \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHIC \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_D5PHID \
+          payload/tf2_wrapper_1/SectorProcessor_1/FM_BBBB_*_DELAY \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4AB \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L3L4CD \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D1D2ABCD \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_D3D4ABCD \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1ABCD \
+          payload/tf2_wrapper_1/SectorProcessor_1/MPAR_L1D1EFGH \
+          ]]
 
 
 #
@@ -1807,31 +1790,13 @@ add_rects_to_pblock_mod $lpblock_payload_MPD5D $pblock_payload_MPD5Drect
 #
 #set pblock_payload_FTset2rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=7}] -f "RPM_X <= 800"]]
 #add_rects_to_pblock_mod $lpblock_payload_FTset2 $pblock_payload_FTset2rect
+#
 
-set pblock_payload_FTL1L2rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=4}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTL1L2 $pblock_payload_FTL1L2rect
+set pblock_payload_FTAAAArect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=0 && ROW_INDEX<=3}] -f "RPM_X <= 800"]]
+add_rects_to_pblock_mod $lpblock_payload_FTAAAA $pblock_payload_FTAAAArect
 
-set pblock_payload_FTD1D2rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=5 && ROW_INDEX<=5}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTD1D2 $pblock_payload_FTD1D2rect
-
-set pblock_payload_FTD3D4rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=6 && ROW_INDEX<=6}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTD3D4 $pblock_payload_FTD3D4rect
-
-set pblock_payload_FTL1D1rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=7 && ROW_INDEX<=7}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTL1D1 $pblock_payload_FTL1D1rect
-
-set pblock_payload_FTL2D1rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=7 && ROW_INDEX<=7}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTL2D1 $pblock_payload_FTL2D1rect
-
-set pblock_payload_FTL2L3rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=3 && ROW_INDEX<=3}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTL2L3 $pblock_payload_FTL2L3rect
-
-set pblock_payload_FTL3L4rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=2 && ROW_INDEX<=2}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTL3L4 $pblock_payload_FTL3L4rect
-
-set pblock_payload_FTL5L6rect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=1 && ROW_INDEX<=1}] -f "RPM_X <= $MP_XBOUNDARY1"]]
-add_rects_to_pblock_mod $lpblock_payload_FTL5L6 $pblock_payload_FTL5L6rect
-
+set pblock_payload_FTBBBBrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=4 && ROW_INDEX<=7}] -f "RPM_X <= 800"]]
+add_rects_to_pblock_mod $lpblock_payload_FTBBBB $pblock_payload_FTBBBBrect
 
 set pblock_payload_KFrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=8 && ROW_INDEX<=9}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
 add_rects_to_pblock_mod $lpblock_payload_KF $pblock_payload_KFrect
