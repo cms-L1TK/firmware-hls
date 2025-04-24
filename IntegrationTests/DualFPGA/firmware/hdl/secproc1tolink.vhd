@@ -35,6 +35,9 @@ architecture rtl of secproc1tolink is
   signal AS_signals : std_logic_vector(dataword_length * 28 - 1 downto 0);
   signal MPAR_signals : std_logic_vector(dataword_length * 18 - 1 downto 0);
   signal sr : t_packets( PAYLOAD_LATENCY - 1 downto 0 ) := ( others => ( others => '0' ) );
+  signal link_ctl_signal : std_logic_vector(59 downto 0) := ( others => '0' );
+  signal sr_valid : std_logic := '0';
+  signal sr_valid_prev : std_logic := '0';
 
 begin
 
@@ -107,6 +110,7 @@ begin
   begin
   if rising_edge( clk ) then
     sr <= sr( sr'high - 1 downto 0 ) & node_packet;
+    sr_valid_prev <= sr_valid;
   end if;
   end process;
   
@@ -179,14 +183,21 @@ begin
   q(53).data(63 downto 63-11) <= (others => '0');
   
   q(54).data(2 downto 0) <= TP_bx_out;
-  q(54).data(63 downto 3) <= (others => '0');
+  q(54).data(3) <= '0';
+  q(54).data(63 downto 4) <= link_ctl_signal;
+
+  sr_valid <= sr(sr'high).valid;
+  link_ctl_signal <= x"00000000D057A27" when (TP_bx_out = "001" 
+                                              and sr_valid='1' 
+                                              and sr_valid_prev='0') else
+                     x"000000000000000";
 
   --debug
-  q(55).data(2 downto 0) <= bx_in;
-  q(55).data(3) <= '0';
-  q(55).data(4) <= ir_start;
-  q(55).data(7 downto 5) <= (others => '0');
-  q(55).data(8) <= dvalid;
-  q(55).data(63 downto 9) <= (others => '0');
+  --q(55).data(2 downto 0) <= bx_in;
+  --q(55).data(3) <= '0';
+  --q(55).data(4) <= ir_start;
+  --q(55).data(7 downto 5) <= (others => '0');
+  --q(55).data(8) <= dvalid;
+  --q(55).data(63 downto 9) <= (others => '0');
     
 end rtl;
