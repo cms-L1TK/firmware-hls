@@ -231,7 +231,52 @@ TM-vivado-hls-build:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TM"
 # FW simulation ---------------
-topReducedCombined-sim:
+topReducedCombinedFPGA1-sim:
+  <<: *template_topTF-sim
+  allow_failure: true
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA1"
+  needs:
+    - job: download
+    - job: IR-vivado-hls-build
+      artifacts: false
+    - job: VMRCM-vivado-hls-build
+      artifacts: false
+    - job: VMSMER-vivado-hls-build
+      artifacts: false  
+    - job: TP-vivado-hls-build
+      artifacts: false
+    - job: PC-vivado-hls-build
+      artifacts: false
+    - job: MP-vivado-hls-build
+      artifacts: false
+    - job: TB-vivado-hls-build
+      artifacts: false
+# Check FW results ---------------
+topReducedCombinedFPGA1-check-results:
+  <<: *template_check-results
+  allow_failure: true # FIXME: remove after all errors are fixed
+  variables:
+    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
+    PROJ_NAME: "ReducedCombinedConfig_FPGA1"
+  needs:
+    - download
+    - topReducedCombined-sim
+# FW synthesis ---------------
+topReducedCombinedFPGA1-synth:
+  <<: *template_topTF-synth
+  allow_failure: true
+  variables:
+    VIVADO_VERSION: "2019.2"
+    PROJ_NAME: "ReducedCombinedConfig_FPGA1"
+  needs:
+    - job: download
+    - job: topReducedCombined-sim
+    - job: topReducedCombined-check-results
+      artifacts: false
+# FW simulation ---------------
+topReducedCombinedFPGA2-sim:
   <<: *template_topTF-sim
   allow_failure: true
   variables:
@@ -254,7 +299,7 @@ topReducedCombined-sim:
     - job: TB-vivado-hls-build
       artifacts: false
 # Check FW results ---------------
-topReducedCombined-check-results:
+topReducedCombinedFPGA2-check-results:
   <<: *template_check-results
   allow_failure: true # FIXME: remove after all errors are fixed
   variables:
@@ -264,7 +309,7 @@ topReducedCombined-check-results:
     - download
     - topReducedCombined-sim
 # FW synthesis ---------------
-topReducedCombined-synth:
+topReducedCombinedFPGA2-synth:
   <<: *template_topTF-synth
   allow_failure: true
   variables:
