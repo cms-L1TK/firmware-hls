@@ -3,9 +3,6 @@
 from argparse import ArgumentParser
 from emp_data_format_tools import *
 
-BOARD_OFFSET = 36 #hard-coded for now, change once we automate testing?
-SIMU_OFFSET = 5
-
 if __name__=='__main__':
 
   parser = ArgumentParser(
@@ -26,21 +23,23 @@ if __name__=='__main__':
     memprint_ref = False
 
   comp_empdata = load_emp_data(args.comparison)
+  comp_offset = get_first_valid_nonempty_word(comp_empdata, 0)
   ref_empdata = EmpData([0])
   if not memprint_ref:
     ref_empdata = load_emp_data(args.reference)
+    ref_offset = get_first_valid_nonempty_word(ref_empdata, 0)
 
   event_list = range_string_to_list(args.events)
   for ievent in event_list:
     print('Event {}'.format(ievent))
     tf_words_board = get_words_fpga1_empdata(comp_empdata,
-                                             BOARD_OFFSET+108*ievent)
+                                             comp_offset+108*ievent)
     tf_words_ref = {}
     if memprint_ref:
       tf_words_ref = get_output_fpga1_memprints(args.reference,ievent)
     else:
       tf_words_ref = get_words_fpga1_empdata(ref_empdata,
-                                             SIMU_OFFSET+108*ievent)
+                                             ref_offset+108*ievent)
     for memory in tf_words_board:
       print(memory)
       compare_bitmap_list(tf_words_ref[memory],
