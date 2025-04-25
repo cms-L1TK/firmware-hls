@@ -703,7 +703,7 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
 
   constexpr unsigned int NfinephiBits=NBitsPhiRegion+TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::kNBitsPhiBins+VMStubBase<OuterRegion<Seed>(), true>::kVMSFinePhiSize;
 
-  TEBuffer<Seed,iTC,innerASType,OuterRegion<Seed>()> tebuffer;
+  static TEBuffer<Seed,iTC,innerASType,OuterRegion<Seed>()> tebuffer;
   static_assert(TP::nASMemInner<Seed, iTC>() <= 3, "Only handling up to three inner AS memories");
   tebuffer.setMemBegin(0);
   tebuffer.setMemEnd(TP::nASMemInner<Seed, iTC>());
