@@ -174,6 +174,7 @@ sed -i 's/VMStubMERouter/VMSMERouter/g' fpga1_processingmodules.dat
 echo "Reduced CM FPGA1"
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_reducedcm_wires.dat -p fpga1_reducedcm_processingmodules.dat -m fpga1_reducedcm_memorymodules.dat -de 1 -sp 1
 ./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_reducedcm_wires.dat -p fpga1_reducedcm_processingmodules.dat -m fpga1_reducedcm_memorymodules.dat -de 1 -x -sp 1
+ls -ltr *.vhd
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig_FPGA1/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA1/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA1/tb/
