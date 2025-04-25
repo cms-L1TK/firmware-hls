@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_tf_top_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="memutil_pkg" />
+            <top_module name="tb_tf_top" />
+            <top_module name="tf_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="77882fs"></ZoomEndTime>
+      <Cursor1Time time="2000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="185"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="12" />
+   <wvobject type="logic" fp_name="/tb_tf_top/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/MP_done">
+      <obj_property name="ElementShortName">MP_done</obj_property>
+      <obj_property name="ObjectShortName">MP_done</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/sectorprocfull/uut/MP_L3PHIC/ap_start">
+      <obj_property name="ElementShortName">ap_start</obj_property>
+      <obj_property name="ObjectShortName">ap_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/sectorprocfull/uut/MP_L3PHIC/ap_done">
+      <obj_property name="ElementShortName">ap_done</obj_property>
+      <obj_property name="ObjectShortName">ap_done</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/sectorprocfull/uut/MP_L3PHIC/instubdata_dataarray_0_data_V_address0">
+      <obj_property name="ElementShortName">instubdata_dataarray_0_data_V_address0[10:0]</obj_property>
+      <obj_property name="ObjectShortName">instubdata_dataarray_0_data_V_address0[10:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/sectorprocfull/uut/MP_L3PHIC/projin_0_dataarray_data_V_address0">
+      <obj_property name="ElementShortName">projin_0_dataarray_data_V_address0[9:0]</obj_property>
+      <obj_property name="ObjectShortName">projin_0_dataarray_data_V_address0[9:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/sectorprocfull/uut/MP_L1PHIA/ap_start">
+      <obj_property name="ElementShortName">ap_start</obj_property>
+      <obj_property name="ObjectShortName">ap_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/sectorprocfull/uut/FT_L1L2/U0/ap_start">
+      <obj_property name="ElementShortName">ap_start</obj_property>
+      <obj_property name="ObjectShortName">ap_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/PC_start">
+      <obj_property name="ElementShortName">PC_start</obj_property>
+      <obj_property name="ObjectShortName">PC_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_tf_top/sectorprocfull/uut/MP_start">
+      <obj_property name="ElementShortName">MP_start</obj_property>
+      <obj_property name="ObjectShortName">MP_start</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/PC_bx_out">
+      <obj_property name="ElementShortName">PC_bx_out[2:0]</obj_property>
+      <obj_property name="ObjectShortName">PC_bx_out[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb_tf_top/sectorprocfull/uut/MP_L1PHIA/U0/bx_V">
+      <obj_property name="ElementShortName">bx_V[2:0]</obj_property>
+      <obj_property name="ObjectShortName">bx_V[2:0]</obj_property>
+   </wvobject>
+</wave_config>
