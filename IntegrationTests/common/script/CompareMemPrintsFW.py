@@ -53,6 +53,7 @@ class ReferenceType(Enum):
     AS     = 'AllStubs'
     SP     = 'StubPairs'
     TPAR   = 'TrackletParameters'
+    MPAR   = 'TrackletParameters'
     MPROJ  = 'TrackletProjections'
     TPROJ  = 'TrackletProjections'
     VMPROJ = 'VMProjections'
