@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+### Test vectors correspond to fw_synch_250521 tag in cms-L1TK/cmssw repo ###
 
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/hZwU8UnJcSk6mKl/MemPrints_Split_250110.tgz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/0VlJN4Qro7OL4Y2/LUTs_Split_250110.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/jlPYrdAzZKH2Hef/MemPrints.tar.gz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/MrZF59yg89zt9Mt/LUTs.tar.gz"
 
 # Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/ugnTSt0Qh3L8wXe/MemPrints_Reduced_250306.tgz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/K0xZgZKp86OUBoe/LUTs_Reduced_250306.tgz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/JeX9dhSb31WQUkF/MemPrints.tar.gz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/eKTHUTJpDoiAScW/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
