@@ -16,7 +16,7 @@ args = parser.parse_args()
 
 # List of things to substitute to get the cores nickname
 sub_froms = ["solution_", "InputRouterTop_IR_DTC",  "VMRouterCMTop", "VMRouterTop", "TrackletEngine", "TrackletCalculator", "TrackletProcessor", "ProjectionRouterTop", "MatchEngineTop", "MatchCalculator", "MatchProcessor", "TrackBuilder","ProjectionCalculator", "VMStubMERouterTop"]
-sub_tos = ["", "IR", "VMR", "VMR", "TE", "TC", "TP", "PR", "ME", "MC", "MP", "FT","PC","VMSMER"]
+sub_tos = ["", "IR", "VMR", "VMR", "TE", "TC", "TP", "PR", "ME", "MC", "MP", "TB","PC","VMSMER"]
 
 #create file and write first line
 core_file = args.outputFile
