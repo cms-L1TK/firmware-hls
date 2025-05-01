@@ -186,6 +186,9 @@ set_property STEPS.SYNTH_DESIGN.TCL.POST [get_files post.tcl -of [get_fileset ut
 
 update_compile_order -fileset sources_1 
 
+# Create all the out-of-context runs for HLS modules
+launch_runs impl_1 -scripts_only
+
 puts "INFO: Project created: ${projName}"
 
 exit
