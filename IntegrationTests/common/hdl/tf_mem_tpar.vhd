@@ -101,6 +101,7 @@ end read_tf_mem_tpar_data;
 -- ########################### Signals ###########################
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_tpar_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
+signal enb_reg : std_logic;
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
@@ -193,6 +194,13 @@ begin
   end if;
 end process;
 
+process(clkb)
+begin
+  if rising_edge(clkb) then
+    enb_reg <= enb;
+  end if;
+end process;
+
 -- The following code generates HIGH_PERFORMANCE (use output register) or LOW_LATENCY (no output register)
 MODE : if (RAM_PERFORMANCE = "LOW_LATENCY") generate -- no_output_register; 1 clock cycle read latency at the cost of a longer clock-to-out timing
   doutb <= sv_RAM_row;
@@ -202,8 +210,10 @@ else generate -- output_register; 2 clock cycle read latency with improve clock-
     if rising_edge(clkb) then
       if (rstb='1') then
         doutb <= (others => '0');
-      elsif (regceb='1') then
-        doutb <= sv_RAM_row;
+      else
+        if (enb_reg='1') then
+          doutb <= sv_RAM_row;
+        end if;
       end if;
     end if;
   end process;
