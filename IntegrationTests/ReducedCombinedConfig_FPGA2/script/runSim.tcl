@@ -2,6 +2,7 @@
 set projName "Work"
 open_project $projName/$projName.xpr
 
+set_property simulator_language VHDL [current_project]
 reset_simulation sim_1
 
 # Create directory for output .txt file

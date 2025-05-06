@@ -84,6 +84,9 @@ set_property xsim.simulate.runtime -value "0us" -objects  [get_filesets sim_1]
 
 update_compile_order -fileset sources_1 
 
+# Create all the out-of-context runs for HLS modules
+launch_runs impl_1 -scripts_only
+
 puts "INFO: Project created: ${projName}"
 
 exit
