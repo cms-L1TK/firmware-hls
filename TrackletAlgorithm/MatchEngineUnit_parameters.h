@@ -29,21 +29,23 @@ static bool nearFullUnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> w
 }
 
 template<int kNBitsBuffer>
-static const ap_uint<(1 << (2 * kNBitsBuffer))> nearFull3Unit() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
-  for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
-#pragma HLS unroll
-    ap_uint<kNBitsBuffer> wptr, rptr;
-    ap_uint<2 * kNBitsBuffer> address(i);
-    (rptr,wptr) = address;
-    ap_uint<kNBitsBuffer> wptr1 = wptr+1;
-    ap_uint<kNBitsBuffer> wptr2 = wptr+2;
-    ap_uint<kNBitsBuffer> wptr3 = wptr+3;
-    bool result = wptr1==rptr || wptr2==rptr || wptr3==rptr;
-    lut[i] = result;
-  }
-  return lut;
-}
+class NearFull3Class {
+  public:
+    ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+    NearFull3Class() {
+      for (unsigned int i = 0; i < (1 << (2 * kNBitsBuffer)); i++)  {
+         // Store complicated calculation in LUT array
+         ap_uint<kNBitsBuffer> wptr, rptr;
+         ap_uint<2 * kNBitsBuffer> address(i);
+         (rptr,wptr) = address;
+         ap_uint<kNBitsBuffer> wptr1 = wptr+1;
+         ap_uint<kNBitsBuffer> wptr2 = wptr+2;
+         ap_uint<kNBitsBuffer> wptr3 = wptr+3;
+         bool result = wptr1==rptr || wptr2==rptr || wptr3==rptr;
+         lut[i] = result;
+      }
+    }
+};
 
 template<int kNBitsBuffer>
 static bool nearFull3UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> wptr) {
@@ -81,18 +83,20 @@ static bool nearFull4UnitBool(ap_uint<kNBitsBuffer> rptr, ap_uint<kNBitsBuffer> 
 }
 
 template<int kNBitsBuffer>
-static const ap_uint<(1 << (2 * kNBitsBuffer))> emptyUnit() {
-  ap_uint<(1 << (2 * kNBitsBuffer))> lut;
-  for(int i = 0; i < (1 << (2 * kNBitsBuffer)); ++i) {
-#pragma HLS unroll
-    ap_uint<kNBitsBuffer> wptr, rptr;
-    ap_uint<2 * kNBitsBuffer> address(i);
-    (rptr,wptr) = address;
-    bool result = wptr==rptr;
-    lut[i] = result;
-  }
-  return lut;
-}
+class EmptyUnitClass {
+  public:
+    ap_uint<(1 << (2 * kNBitsBuffer))> lut;
+    EmptyUnitClass() {
+      for (unsigned int i = 0; i < (1 << (2 * kNBitsBuffer)); i++)  {
+         // Store complicated calculation in LUT array
+         ap_uint<kNBitsBuffer> wptr, rptr;
+         ap_uint<2 * kNBitsBuffer> address(i);
+         (rptr,wptr) = address;
+         bool result = wptr==rptr;
+         lut[i] = result;
+      }
+    }
+};
 
 template<int kNBitsBuffer>
 static bool emptyUnitBool(ap_uint<kNBitsBuffer> wptr, ap_uint<kNBitsBuffer> rptr) {
