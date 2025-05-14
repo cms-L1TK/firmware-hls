@@ -4,12 +4,12 @@ set -e
 ### Test vectors correspond to fw_synch_250430 tag in cms-L1TK/cmssw repo ###
 
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/a1X1B5vj1lZElbf/MemPrints.tar.gz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/zOfeNaFOrIjW2js/LUTs.tar.gz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/jlPYrdAzZKH2Hef/MemPrints.tar.gz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/MrZF59yg89zt9Mt/LUTs.tar.gz"
 
 # Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/eO7VXKuR0dlHXiJ/MemPrints.tar.gz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/e6JzndJryc7Tggs/LUTs.tar.gz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/JeX9dhSb31WQUkF/MemPrints.tar.gz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/eKTHUTJpDoiAScW/LUTs.tar.gz"
 
 # Function that prints information regarding the usage of this command
 function usage() {
