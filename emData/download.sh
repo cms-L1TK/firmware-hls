@@ -50,7 +50,7 @@ fi
 
 # If the MemPrints directory exists, assume the script has already been run,
 # and simply exit.
-if [ -d "MemPrintsCM" ]
+if [ -d "MemPrintsSplit" ]
 then
   echo "The emData directory must be cleaned for this script to work."
   exit 0
