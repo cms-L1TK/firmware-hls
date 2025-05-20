@@ -3775,3 +3775,12 @@ set_property USER_SLR_ASSIGNMENT VMSME_L6PHIDn2_DELAY_MEM_2 [get_cells {payload/
 set_property USER_SLR_ASSIGNMENT VMSME_L6PHIDn2_DELAY_START_BX_2 [get_cells {payload/tf2_wrapper_1/SectorProcessor_1/VMSME_L6PHIDn2_DELAY/PIPELINE_SLR_XING[2].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_START_BX}]
 ######################################################
 
+################################################################################
+set_property USER_SLR_ASSIGNMENT F2_IN_1 [get_cells payload/tf2_wrapper_1/f2_in_1/PIPELINE_SLR_XING[1].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_EMP_WRAPPER]
+set_property USER_SLR_ASSIGNMENT F2_IN_2 [get_cells payload/tf2_wrapper_1/f2_in_1/PIPELINE_SLR_XING[2].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_EMP_WRAPPER]
+set_property USER_SLR_ASSIGNMENT F2_IN_3 [get_cells payload/tf2_wrapper_1/f2_in_1/PIPELINE_SLR_XING[3].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_EMP_WRAPPER]
+set_property USER_SLR_ASSIGNMENT F2_IN_4 [get_cells payload/tf2_wrapper_1/f2_in_1/PIPELINE_SLR_XING[4].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_EMP_WRAPPER]
+
+set_property USER_SLR_ASSIGNMENT F2_OUT_1 [get_cells payload/tf2_wrapper_1/f2_out_1/PIPELINE_SLR_XING[1].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_EMP_WRAPPER]
+set_property USER_SLR_ASSIGNMENT F2_OUT_2 [get_cells payload/tf2_wrapper_1/f2_out_1/PIPELINE_SLR_XING[2].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_EMP_WRAPPER]
+################################################################################
