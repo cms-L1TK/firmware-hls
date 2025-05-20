@@ -21,21 +21,21 @@ $(core_dir):
 	@cd hdl; ln -s ../../../common common
 
 $(core_file_fpga1): $(core_dir)
-	make -C $(fpga1_hls_script_path) -j 24 Work
+	make -C $(fpga1_hls_script_path) -j 64 Work
 	@python3 scripts/include_cores.py -s $(fpga1_hls_script_path) -o $(core_file_fpga1) -f f1
 
 $(core_file_fpga2): $(core_dir)
-	make -C $(fpga2_hls_script_path) -j 24 Work
+	make -C $(fpga2_hls_script_path) -j 64 Work
 	@python3 scripts/include_cores.py -s $(fpga2_hls_script_path) -o $(core_file_fpga2) -f f2
 
 kfin_adj:
 	@python3 scripts/kf_link_mod.py
 
 xciCreation_fpga1: $(core_file_fpga1)
-	make -f $(core_file_fpga1) -j 8 all
+	make -f $(core_file_fpga1) -j 64 all
 
 xciCreation_fpga2: $(core_file_fpga2)
-	make -f $(core_file_fpga2) -j 8 all
+	make -f $(core_file_fpga2) -j 64 all
 
 add_common_files:
 	@if [ ! -d ucf ]; then mkdir ucf; fi
