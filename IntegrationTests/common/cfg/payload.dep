@@ -9,7 +9,6 @@ src memUtil_pkg.vhd
 src common/hdl/emp/memUtil_aux_pkg.vhd
 src common/hdl/emp/pkgs/GCU_utils.vhd
 
-src common/hdl/CreateStartSignal.vhd
 src --vhdl2008 common/hdl/tf_lut.vhd
 src --vhdl2008 common/hdl/tf_mem_bin.vhd
 src --vhdl2008 common/hdl/tf_mem_format.vhd
@@ -17,7 +16,7 @@ src --vhdl2008 common/hdl/tf_mem_format.vhd
 #src --vhdl2008 common/hdl/tf_mem_bin_cm5.vhd
 src --vhdl2008 common/hdl/tf_mem.vhd
 src common/hdl/tf_pkg.vhd
-src --vhdl2008 common/hdl/tf_pipe_delay.vhd
+src --vhdl2008 common/hdl/pipelining.vhd
 
 # KF
 include -c firmware-hls:KalmanFilter/kfin components.dep 
