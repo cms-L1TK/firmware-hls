@@ -30,6 +30,8 @@ src --vhdl2008 common/hdl/pipelining.vhd
 
 #Floorplan
 src ../ucf/floorplan_f2.tcl
+src ../ucf/soft_floorplan_f2.xdc
+src ../ucf/hard_floorplan_f2.xdc
 
 ################
 # Include Cores

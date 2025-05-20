@@ -49,6 +49,8 @@ hdl_add_files_fpga1: $(core_file)
 hdl_add_files_fpga2: $(core_file)
 	cd hdl; ln -s ../../../CombinedConfig_FPGA2/hdl/SectorProcessor.vhd SectorProcessor_f2.vhd
 	cd hdl; ln -s ../../../CombinedConfig_FPGA2/hdl/memUtil_pkg.vhd memUtil_pkg_f2.vhd
+	cd ucf; ln -s ../../../CombinedConfig_FPGA2/script/soft_floorplan.xdc soft_floorplan_f2.xdc
+	cd ucf; ln -s ../../../CombinedConfig_FPGA2/script/floorplan.xdc hard_floorplan_f2.xdc
 
 $(input_file_fpga1): $(core_dir)
 	@python3 scripts/generate_fpga1_input.py -i mem/MemPrintsSplit/ -o $(input_file_fpga1)
