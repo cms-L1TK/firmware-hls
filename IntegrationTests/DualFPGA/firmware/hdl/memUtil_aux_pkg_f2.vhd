@@ -31,5 +31,61 @@ package memUtil_aux_pkg_f2 is
   type t_arr_DW_49_1b is array(enum_DW_49) of std_logic;
   type t_arr_DW_49_DATA is array(enum_DW_49) of std_logic_vector(48 downto 0);
 
+  type t_f2_in is record
+    PC_start                  :  std_logic;
+    PC_bx_in                  :  std_logic_vector(2 downto 0);
+    AS_36_wea                 :  t_arr_AS_36_1b;
+    AS_36_writeaddr           :  t_arr_AS_36_ADDR;
+    AS_36_din                 :  t_arr_AS_36_DATA;
+    MPAR_73_wea               :  t_arr_MTPAR_73_1b;
+    MPAR_73_writeaddr         :  t_arr_MTPAR_73_ADDR;
+    MPAR_73_din               :  t_arr_MTPAR_73_DATA;
+  end record t_f2_in;
+
+  constant c_f2_in_init : t_f2_in := (
+    PC_start                  =>  '0',
+    PC_bx_in                  =>  (others => '0'),
+    AS_36_wea                 =>  (others => '0'),
+    AS_36_writeaddr           =>  (others => (others => '0')),
+    AS_36_din                 =>  (others => (others => '0')),
+    MPAR_73_wea               =>  (others => '0'),
+    MPAR_73_writeaddr         =>  (others => (others => '0')),
+    MPAR_73_din               =>  (others => (others => '0'))
+  );
+
+  type t_f2_out is record
+    PC_bx_out              :  std_logic_vector(2 downto 0);
+    PC_bx_out_vld          :  std_logic;
+    PC_done                :  std_logic;
+    TB_bx_out              :  std_logic_vector(2 downto 0);
+    TB_bx_out_vld          :  std_logic;
+    TB_done                :  std_logic;
+    TB_last_track          :  std_logic;
+    TB_last_track_vld      :  std_logic;
+    TW_113_stream_AV_din   :  t_arr_TW_113_DATA;
+    TW_113_stream_A_write  :  t_arr_TW_113_1b;
+    DW_49_stream_AV_din    :  t_arr_DW_49_DATA;
+    DW_49_stream_A_write   :  t_arr_DW_49_1b;
+    BW_46_stream_AV_din    :  t_arr_BW_46_DATA;
+    BW_46_stream_A_write   :  t_arr_BW_46_1b;
+  end record t_f2_out;
+
+  constant c_f2_out_init : t_f2_out := (
+    PC_bx_out              =>  (others => '0'),
+    PC_bx_out_vld          =>  '0',
+    PC_done                =>  '0',
+    TB_bx_out              =>  (others => '0'),
+    TB_bx_out_vld          =>  '0',
+    TB_done                =>  '0',
+    TB_last_track          =>  '0',
+    TB_last_track_vld      =>  '0',
+    TW_113_stream_AV_din   =>  (others => (others => '0')),
+    TW_113_stream_A_write  =>  (others => '0'),
+    DW_49_stream_AV_din    =>  (others => (others => '0')),
+    DW_49_stream_A_write   =>  (others => '0'),
+    BW_46_stream_AV_din    =>  (others => (others => '0')),
+    BW_46_stream_A_write   =>  (others => '0')
+  );
+
 end package memUtil_aux_pkg_f2;
 
