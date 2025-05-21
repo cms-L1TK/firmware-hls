@@ -343,12 +343,11 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
             "    TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
-            "#pragma HLS interface register port=bx_o\n"
         )
         for i in range(0, nASMemInner):
-            topFile.write("#pragma HLS resource variable=innerStubs[" + str(i) + "].get_mem() latency=2\n")
-        topFile.write("#pragma HLS resource variable=outerStubs->get_mem() latency=2\n")
-        topFile.write("#pragma HLS resource variable=outerVMStubs.get_mem() latency=2\n")
+            topFile.write("#pragma HLS interface mode=ap_memory port=innerStubs[" + str(i) + "].get_mem() latency=2\n")
+        topFile.write("#pragma HLS interface mode=ap_memory port=outerStubs->get_mem() latency=2\n")
+        topFile.write("#pragma HLS interface mode=ap_memory port=outerVMStubs->get_mem() latency=2\n")
         topFile.write(
             "#pragma HLS array_partition variable=projout_barrel_ps dim=1\n"
             "#pragma HLS array_partition variable=projout_barrel_2s dim=1\n"
@@ -389,3 +388,4 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         "\n"
         "////////////////////////////////////////////////////////////////////////////////\n"
      )
+
