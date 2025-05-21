@@ -190,6 +190,7 @@ public:
   }
 
   FMTrackletID getTrackletID() const {
+#pragma HLS inline
     return data_.range(kFMTCIDMSB,kFMTrackletIndexLSB);
   }
 
