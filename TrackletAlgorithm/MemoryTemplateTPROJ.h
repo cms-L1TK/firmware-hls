@@ -86,13 +86,13 @@ public:
 #endif
   
   NEntryT getEntries(const BunchXingT& bx, unsigned int page = 0) const {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
     return nentries_[bx*NPAGE+page];
   }
 
   ap_uint<NPAGE> getMask(const BunchXingT& bx) const {
-#pragma HLS ARRAY_PARTITION variable=mask_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=mask_ dim=0
 #pragma HLS inline
     return mask_[bx];
   }
@@ -108,8 +108,8 @@ public:
 
   bool write_mem(const DataType& data, unsigned int page)
   {
-#pragma HLS ARRAY_PARTITION variable=mask_ complete dim=0
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=mask_ dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
 #if defined __SYNTHESIS__  && !defined SYNTHESIS_TEST_BENCH
     //The vhd memory implementation will write to the correct address!!

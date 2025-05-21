@@ -124,7 +124,7 @@ void getCorrectedPhiBin(ap_uint<kBRAMwidth> hStbWrd
 		, int &phiBn ) 
 {
 #pragma HLS inline
-//#pragma HLS array_partition variable = phicorrtable complete
+//#pragma HLS array_partition variable = phicorrtable
 
   	AllStub<InType> hAStub(hStbWrd);
   	auto hPhi = hAStub.getPhi();
@@ -207,7 +207,7 @@ void CountMemories(const ap_uint<kBINMAPwidth> hPhBnWord
 	, unsigned int nMemsPerLyr[nLyrs]) 
 {
 #pragma HLS inline
-#pragma HLS array_partition variable = nMemsPerLyr complete
+#pragma HLS array_partition variable = nMemsPerLyr
   int cPrevSize=0; 
   LOOP_CountOutputMemories:
   for (unsigned int cLyr = 0; cLyr < kMaxLyrsPerDTC ; cLyr++) 
@@ -286,7 +286,7 @@ void InputRouter( const BXType bx
 {
 	
 #pragma HLS inline
-#pragma HLS array_partition variable = hOutputStubs complete
+#pragma HLS array_partition variable = hOutputStubs
 
 	ap_uint<1> hIs2S= hLinkWord.range(kLINKMAPwidth-4,kLINKMAPwidth-4);
 	#ifndef __SYNTHESIS__
@@ -303,8 +303,7 @@ void InputRouter( const BXType bx
 	LOOP_ProcessIR:
 	for (int cStubCounter = 0; cStubCounter < kMaxProc; cStubCounter++) 
 	{
-#pragma HLS pipeline II = 1
-#pragma HLS PIPELINE rewind
+#pragma HLS pipeline II = 1 rewind
 	  // decode stub
 	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 

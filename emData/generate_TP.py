@@ -350,9 +350,9 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackletProcessor_pa
         topFile.write("#pragma HLS resource variable=outerStubs->get_mem() latency=2\n")
         topFile.write("#pragma HLS resource variable=outerVMStubs.get_mem() latency=2\n")
         topFile.write(
-            "#pragma HLS array_partition variable=projout_barrel_ps complete dim=1\n"
-            "#pragma HLS array_partition variable=projout_barrel_2s complete dim=1\n"
-            "#pragma HLS array_partition variable=projout_disk complete dim=1\n"
+            "#pragma HLS array_partition variable=projout_barrel_ps dim=1\n"
+            "#pragma HLS array_partition variable=projout_barrel_2s dim=1\n"
+            "#pragma HLS array_partition variable=projout_disk dim=1\n"
             "\n"
             "static const ap_uint<10>* lut = TP::getLUT<TF::" + seed + ",TP::" +  iTC + ">();\n"
             "\n"

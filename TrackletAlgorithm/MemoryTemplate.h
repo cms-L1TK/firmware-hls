@@ -61,7 +61,7 @@ public:
   unsigned int getNBX() const {return DEPTH_BX;}
 
   NEntryT getEntries(const BunchXingT& bx) const {
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
     return nentries_[bx];
   }
 
@@ -88,7 +88,7 @@ public:
       dataarray_[0][overwrite] = data;
       return true;
 #else
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
     if(!NBIT_BX) write_bx_ = 0;
     if (nentries_[write_bx_] < DEPTH_ADDR) {
       if(overwrite == 0) {
