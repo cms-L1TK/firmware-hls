@@ -421,9 +421,9 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
 
         # Write pragmas
         for i in range(num_inputs):
-            top_file.write("#pragma HLS resource variable=inputStubs[%s].get_mem() latency=2\n" % str(i))
+            top_file.write("#pragma HLS interface mode=ap_memory port=inputStubs[%s].get_mem() latency=2\n" % str(i))
         for i in range(num_inputs_disk2s):
-            top_file.write("#pragma HLS resource variable=inputStubsDisk2S[%s].get_mem() latency=2\n" % str(i))
+            top_file.write("#pragma HLS interface mode=ap_memory port=inputStubsDisk2S[%s].get_mem() latency=2\n" % str(i))
 
         top_file.write(
             "#pragma HLS interface register port=bx_o\n"
