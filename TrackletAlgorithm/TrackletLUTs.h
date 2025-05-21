@@ -122,7 +122,6 @@ class TPRegionLUT {
   }
 
   ap_uint<8> lookup(int address) const {
-#pragma HLS resource variable=lut_ latency=1
     return lut_[address];
   }
 
