@@ -24,12 +24,12 @@ void TrackStruct::resetTracks(){
 
 bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, unsigned int& matchFound, unsigned int mergeCondition){
   // Compare the two tracks, masterTrack and trk
-  #pragma HLS array_partition variable=matchesFoundBarrel complete dim=0
-  #pragma HLS array_partition variable=matchesFoundDisk complete dim=0
-  #pragma HLS array_partition variable=masterTrk._barrelStubArray complete dim=0
-  #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
-  #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
-  #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
+  #pragma HLS array_partition variable=matchesFoundBarrel dim=0
+  #pragma HLS array_partition variable=matchesFoundDisk dim=0
+  #pragma HLS array_partition variable=masterTrk._barrelStubArray dim=0
+  #pragma HLS array_partition variable=trk._barrelStubArray dim=0
+  #pragma HLS array_partition variable=masterTrk._diskStubArray dim=0
+  #pragma HLS array_partition variable=trk._diskStubArray dim=0
   LOOP_CompareBarrelStubs:
   for (unsigned int barrelStubNum = 0; barrelStubNum < trklet::N_LAYER; barrelStubNum++){
     #pragma HLS unroll
@@ -60,10 +60,10 @@ bool TrackHandler::compareTrack(const TrackStruct &trk, TrackStruct &masterTrk, 
 }
 
 void TrackHandler::mergeTrack(const TrackStruct &trk, TrackStruct &masterTrk){
-  #pragma HLS array_partition variable=masterTrk._barrelStubArray complete dim=0
-  #pragma HLS array_partition variable=trk._barrelStubArray complete dim=0
-  #pragma HLS array_partition variable=masterTrk._diskStubArray complete dim=0
-  #pragma HLS array_partition variable=trk._diskStubArray complete dim=0
+  #pragma HLS array_partition variable=masterTrk._barrelStubArray dim=0
+  #pragma HLS array_partition variable=trk._barrelStubArray dim=0
+  #pragma HLS array_partition variable=masterTrk._diskStubArray dim=0
+  #pragma HLS array_partition variable=trk._diskStubArray dim=0
   // Update master track
   // Check whether the stub word is non-zero in the compared track
   // Then add stub into master track if share > 3 stubs in common

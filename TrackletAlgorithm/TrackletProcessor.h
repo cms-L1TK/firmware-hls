@@ -526,7 +526,7 @@ TP::processStubPair(
   TP::Types::der_rD der_rD;
   TP::Types::flag valid_proj_disk[4];
   bool success;
-#pragma HLS array_partition variable=rD complete
+#pragma HLS array_partition variable=rD
 
 // Calculate the tracklet parameters and projections.
   auto stubIndex1 = innerIndex;
@@ -691,7 +691,7 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
   //AS Memories are cast from DISK into DISKPS types in overlap and disk seeds
   constexpr regionType innerASType = diskSeed ? DISKPS : InnerRegion<Seed>();
   constexpr regionType outerASType = (diskSeed || overlapSeed) ? DISKPS : OuterRegion<Seed>();
-#pragma HLS array_partition variable=innerStubs complete dim=1
+#pragma HLS array_partition variable=innerStubs dim=1
   
   constexpr unsigned int NBitsPhiRegion = 2;
   constexpr int numTPs = (Seed == TF::L1L2) ? 12 : (Seed == TF::L1D1 ? 8 : 4 );
@@ -713,7 +713,7 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
 
 
   TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()> teunits[kNTEUnits[Seed]];
-#pragma HLS array_partition variable=teunits complete dim=1
+#pragma HLS array_partition variable=teunits dim=1
 
  reset_teunits: for (unsigned i = 0; i < kNTEUnits[Seed]; i++) {
 #pragma HLS unroll
@@ -753,10 +753,10 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
   teuidle = ~teuidle;
 
   typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::INDEX teuwriteindex[kNTEUnits[Seed]];
-#pragma HLS array_partition variable=teuwriteindex complete dim=1
+#pragma HLS array_partition variable=teuwriteindex dim=1
 
   typename TrackletEngineUnit<Seed,iTC,innerASType,OuterRegion<Seed>()>::INDEX teureadindex[kNTEUnits[Seed]];
-#pragma HLS array_partition variable=teureadindex complete dim=1
+#pragma HLS array_partition variable=teureadindex dim=1
 
   for (unsigned k = 0; k < kNTEUnits[Seed]; k++){
 #pragma HLS unroll
