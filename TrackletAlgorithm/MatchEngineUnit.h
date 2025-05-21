@@ -119,9 +119,6 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
   NSTUB istubtmp=istub_;
   ap_uint<2> iusetmp=iuse_;
 
-  ap_uint<VMStubBase<VMSType>::kVMSFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
-  auto secondSave = second_;
-
   VMProjection<VMProjType> data(projbuffer_.getProjection());
 
   if(istub_ == 0) {
