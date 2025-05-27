@@ -33,13 +33,13 @@ if __name__=='__main__':
   event_list = range_string_to_list(args.events)
   for ievent in event_list:
     print('Event {}'.format(ievent))
-    tf_words_board = get_words_fpga1_empdata(comp_empdata,
+    tf_words_board = get_words_fpga2_empdata(comp_empdata,
                                              BOARD_OFFSET+108*ievent)
     tf_words_ref = {}
-    if memprint_ref:
-      tf_words_ref = get_output_fpga1_memprints(args.reference,ievent)
+    #if memprint_ref:
+    #  tf_words_ref = get_output_fpga2_memprints(args.reference,ievent)
     else:
-      tf_words_ref = get_words_fpga1_empdata(ref_empdata,
+      tf_words_ref = get_words_fpga2_empdata(ref_empdata,
                                              SIMU_OFFSET+108*ievent)
     for memory in tf_words_board:
       print(memory)

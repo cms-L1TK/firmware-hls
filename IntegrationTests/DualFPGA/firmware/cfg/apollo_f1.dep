@@ -1,3 +1,5 @@
+@tcds2_clk40_source = "recovered"
+@tcds2_interface_implementation = "full"
 
 include payload_f1.dep
 src emp_project_decl_f1.vhd

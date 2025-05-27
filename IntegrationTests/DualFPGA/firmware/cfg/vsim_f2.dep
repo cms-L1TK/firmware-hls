@@ -1,6 +1,8 @@
 #don't include cm_v2_p1_2 since without decoder, it will have unresolved tcds2 dependencies
 @fpga_position = "2"
 @fpga_speed_grade = "-2-e"
+@tcds2_clk40_source = "recovered"
+@tcds2_interface_implementation = "lw"
 
 include payload_f2.dep
 setup ../ucf/vsim_f2.tcl
