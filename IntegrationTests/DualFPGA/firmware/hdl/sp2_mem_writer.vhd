@@ -75,6 +75,12 @@ architecture rtl of sp2_mem_writer is
 
   signal HLS_reset_int              : std_logic                    := '0';
 
+  attribute dont_touch : string;
+  attribute dont_touch of AS_36_writeaddr_pipeline0 : signal is "yes";
+  attribute dont_touch of AS_36_writeaddr_pipeline : signal is "yes";
+  attribute dont_touch of MPAR_73_writeaddr_pipeline0 : signal is "yes";
+  attribute dont_touch of MPAR_73_writeaddr_pipeline : signal is "yes";
+
 begin -- architecture rtl
   
   p_writemem : process (clk) is
