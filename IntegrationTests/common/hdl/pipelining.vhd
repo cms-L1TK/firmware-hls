@@ -43,8 +43,8 @@ end tf_pipeline;
 
 architecture behavior of tf_pipeline is
 
-  attribute dont_touch : string;
-  attribute dont_touch of behavior : architecture is "yes";
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of behavior : architecture is "yes";
 
   type t_wea_pipe is array (0 to DELAY - 1) of std_logic;
   type t_addra_pipe is array (0 to DELAY - 1) of std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 );
@@ -64,6 +64,14 @@ architecture behavior of tf_pipeline is
   attribute shreg_extract of dina_pipe : signal is USE_SRL;
   attribute shreg_extract of start_pipe : signal is USE_SRL;
   attribute shreg_extract of bx_pipe : signal is USE_SRL;
+
+  attribute keep : string;
+  attribute keep of wea_pipe : signal is "yes";
+  attribute keep of addra_pipe : signal is "yes";
+  attribute keep of dina_pipe : signal is "yes";
+  attribute keep of start_pipe : signal is "yes";
+  attribute keep of bx_pipe : signal is "yes";
+  attribute keep of bx_vld_pipe : signal is "yes";
 
 begin
 
@@ -140,14 +148,22 @@ end tf_auto_pipeline;
 
 architecture behavior of tf_auto_pipeline is
 
-  attribute dont_touch : string;
-  attribute dont_touch of behavior : architecture is "yes";
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of behavior : architecture is "yes";
 
   signal wea_reg : std_logic := '0';
   signal addra_reg : std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 ) := (others => '0');
   signal dina_reg : std_logic_vector( RAM_WIDTH - 1 downto 0 ) := (others => '0');
   signal start_reg : std_logic := '0';
   signal bx_reg : std_logic_vector(2 downto 0) := (others => '0');
+
+  attribute keep : string;
+  attribute keep of wea_reg : signal is "yes";
+  attribute keep of addra_reg : signal is "yes";
+  attribute keep of dina_reg : signal is "yes";
+  attribute keep of start_reg : signal is "yes";
+  attribute keep of bx_reg : signal is "yes";
+  attribute keep of bx_vld_reg : signal is "yes";
 
 begin
 
@@ -220,8 +236,8 @@ end tf_pipeline_slr_xing;
 
 architecture behavior of tf_pipeline_slr_xing is
 
-  attribute dont_touch : string;
-  attribute dont_touch of behavior : architecture is "yes";
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of behavior : architecture is "yes";
 
   type t_wea_intra is array (0 to NUM_SLR) of std_logic;
   type t_addra_intra is array (0 to NUM_SLR) of std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 );
