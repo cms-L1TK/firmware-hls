@@ -92,7 +92,7 @@ architecture rtl of tf_to_kf is
   constant DW_z_pos       : natural := 0;
 
   signal TW_113_data_pipe_2 : t_arr_TW_113_data;
-  signal TW_113_valid_pipe_2 : t_arr_TW_113_1b;More actions
+  signal TW_113_valid_pipe_2 : t_arr_TW_113_1b;
   signal DW_49_data_pipe_2 : t_arr_DW_49_data;
   signal DW_49_valid_pipe_2 : t_arr_DW_49_1b;
   signal BW_46_data_pipe_2 : t_arr_BW_46_data;
