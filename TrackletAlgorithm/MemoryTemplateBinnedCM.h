@@ -153,7 +153,7 @@ public:
 
   bool write_mem(ap_uint<NBIT_BIN> slot, const DataType& data) {
 #pragma HLS ARRAY_PARTITION variable=dataarray_ dim=1
-#pragma HLS ARRAY_PARTITION variable=nentries_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentries_ dim=0
 #pragma HLS inline
 
 
@@ -164,7 +164,7 @@ public:
 
 #else
 
-#pragma HLS ARRAY_PARTITION variable=nentriestmp_ complete dim=0
+#pragma HLS ARRAY_PARTITION variable=nentriestmp_ dim=0
 
     if (isCMSSW && !NBIT_BX) {write_bx_ = 0;}
 

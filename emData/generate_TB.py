@@ -335,12 +335,12 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             "    bool &done\n"
             ") {\n"
             "#pragma HLS inline recursive\n"
-            "#pragma HLS array_partition variable=trackletParameters1 complete dim=1\n"
-            "#pragma HLS array_partition variable=trackletParameters2 complete dim=1\n"
-            "#pragma HLS array_partition variable=trackletParameters3 complete dim=1\n"
-            "#pragma HLS array_partition variable=trackletParameters4 complete dim=1\n"
-            "#pragma HLS array_partition variable=barrelFullMatches complete dim=1\n"
-            "#pragma HLS array_partition variable=diskFullMatches complete dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters1 dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters2 dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters3 dim=1\n"
+            "#pragma HLS array_partition variable=trackletParameters4 dim=1\n"
+            "#pragma HLS array_partition variable=barrelFullMatches dim=1\n"
+            "#pragma HLS array_partition variable=diskFullMatches dim=1\n"
         )
         for i in range(0, 4):
             for j in range(0, nTPARMem[i]):
@@ -351,8 +351,8 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
             topFile.write("#pragma HLS resource variable=diskFullMatches[" + str(i) + "].get_mem() latency=2\n")
         topFile.write(
             "#pragma HLS interface register port=bx_o\n"
-            "#pragma HLS array_partition variable=barrelStubWords complete dim=1\n"
-            "#pragma HLS array_partition variable=diskStubWords complete dim=1\n"
+            "#pragma HLS array_partition variable=barrelStubWords dim=1\n"
+            "#pragma HLS array_partition variable=diskStubWords dim=1\n"
             "#pragma HLS stream variable=trackWord depth=1 dim=1\n"
             "#pragma HLS stream variable=barrelStubWords depth=1 dim=2\n"
             "#pragma HLS stream variable=diskStubWords depth=1 dim=2\n"

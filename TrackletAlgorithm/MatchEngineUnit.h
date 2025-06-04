@@ -60,7 +60,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
   inline void init(BXType bxin, ProjectionRouterBuffer<VMProjType, AllProjectionType> projbuffer, ap_uint<kNBits_MemAddr> projseq) {
 #pragma HLS inline
-#pragma HLS array_partition variable=nstubsall_ complete dim=1
+#pragma HLS array_partition variable=nstubsall_ dim=1
   idle_ = false;
   bx_ = bxin;
   istub_ = 0;
@@ -85,7 +85,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
   good__ = false;
 
   iuse_ = 0;
-#pragma HLS ARRAY_PARTITION variable=use_ dim=0 complete
+#pragma HLS ARRAY_PARTITION variable=use_ dim=0
   clearuse: for(int iuse = 0; iuse < kNuse; iuse++) {
 #pragma HLS unroll
     use_[iuse] = 0;
@@ -106,7 +106,7 @@ class MatchEngineUnit : public MatchEngineUnitBase<VMProjType> {
 
 inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin+4)]) {
 #pragma HLS inline
-#pragma HLS array_partition variable=nstubsall_ complete dim=1
+#pragma HLS array_partition variable=nstubsall_ dim=1
   
   bool nearfull = nearFull();
 
@@ -118,9 +118,6 @@ inline void step(const VMStub<VMSType> stubmem[4][1<<(kNbitsrzbinMP+kNbitsphibin
   
   NSTUB istubtmp=istub_;
   ap_uint<2> iusetmp=iuse_;
-
-  ap_uint<VMStubBase<VMSType>::kVMSFinePhiSize> iphiSave = iphi_ + use_[iusetmp].range(0,0);
-  auto secondSave = second_;
 
   VMProjection<VMProjType> data(projbuffer_.getProjection());
 
@@ -331,7 +328,7 @@ inline ap_uint<kNBits_MemAddr> getProjSeqStart() {
   
 inline ap_uint<kNBits_MemAddr> getProjSeq() {
 #pragma HLS inline
-#pragma HLS array_partition variable=projseqs_ complete 
+#pragma HLS array_partition variable=projseqs_
   ap_uint<kNBits_MemAddr> tmp(0);
   return empty()?(~tmp):projseqs_[readindex_];
 }

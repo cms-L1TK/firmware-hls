@@ -265,7 +265,7 @@ void TrackBuilder(
           tid = merger_L_top[j].peek().getTrackletID();
 	}
       } else {
-        if (merger_D_top[j-NBarrelStubs].valid()){
+        if (NDiskStubs > 0 && merger_D_top[j-NBarrelStubs].valid()){
           tid = merger_D_top[j-NBarrelStubs].peek().getTrackletID();
 	}
       }
@@ -281,7 +281,7 @@ void TrackBuilder(
           if (merger_L_top[k].valid())
             tid2 = merger_L_top[k].peek().getTrackletID();
         } else {
-          if (merger_D_top[k-NBarrelStubs].valid())
+          if (NDiskStubs > 0 && merger_D_top[k-NBarrelStubs].valid())
             tid2 = merger_D_top[k-NBarrelStubs].peek().getTrackletID();
         }
 

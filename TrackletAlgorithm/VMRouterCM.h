@@ -191,16 +191,16 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 		VMStubMemory<OutType, rzSizeTE, phiRegSize, kNTEUnitsLayerDisk[(Layer) ? Layer-1 : Disk+5], true> memoriesTEO[]) {
 
 #pragma HLS inline
-#pragma HLS array_partition variable=inputStubs complete dim=1
-#pragma HLS array_partition variable=inputStubsDisk2S complete dim=1
-#pragma HLS array_partition variable=memoriesAS complete dim=1
-#pragma HLS array_partition variable=memoriesASInner complete dim=1
-#pragma HLS array_partition variable=memoriesTEO complete dim=1
+#pragma HLS array_partition variable=inputStubs dim=1
+#pragma HLS array_partition variable=inputStubsDisk2S dim=1
+#pragma HLS array_partition variable=memoriesAS dim=1
+#pragma HLS array_partition variable=memoriesASInner dim=1
+#pragma HLS array_partition variable=memoriesTEO dim=1
 
 	// Number of data in each input memory
 	typename InputStubMemory<InType>::NEntryT nInputs[nInputMems
 			+ nInputDisk2SMems]; // Array containing the number of inputs
-#pragma HLS array_partition variable=nInputs complete dim=0
+#pragma HLS array_partition variable=nInputs dim=0
 
 	//Keeps track of input memories that still have stubs to process, one bit per memory
 	ap_uint<nInputMems + nInputDisk2SMems> hasStubs;
@@ -286,7 +286,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 
 		if (maskASI && !disk2S) {
 
-			int comparison_rz = (Layer) ? static_cast<int>(abs(stub.getZ())) : static_cast<int>(stub.getR());
+			int comparison_rz = (Layer) ? static_cast<int>(std::abs(stub.getZ())) : static_cast<int>(stub.getR());
 			bool passRZCut = false;
 			bool passRZSpecialCut = false;
 
