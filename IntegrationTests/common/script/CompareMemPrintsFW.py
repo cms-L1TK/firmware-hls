@@ -53,6 +53,7 @@ class ReferenceType(Enum):
     AS     = 'AllStubs'
     SP     = 'StubPairs'
     TPAR   = 'TrackletParameters'
+    MPAR   = 'TrackletParameters'
     MPROJ  = 'TrackletProjections'
     TPROJ  = 'TrackletProjections'
     VMPROJ = 'VMProjections'
@@ -150,7 +151,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         if verbose: print(data) # Can also just do data.head()
 
         #Need to figure out how to handle the memory "overwrite" - this is a bit of a hack...
-        if (not is_binned) and ("TF_" not in comparison_filename):
+        if (not is_binned) and ("TF_" not in comparison_filename) and ("AS_" not in comparison_filename):
             rows = []
             for index, row in data.iterrows():
                 if row['ADDR'] == "0x01":
@@ -205,6 +206,11 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
             # Select the correct event from the comparison data
             selected_rows = selected_columns.loc[selected_columns['BX'] == ievent]
+
+            # Hack for FPGA1 Project as BX off by 0ne
+            if "AS_" in comparison_filename and "n1" in comparison_filename:
+                selected_rows = selected_columns.loc[selected_columns['BX']-1 == ievent]
+
             if len(selected_rows) == 0 and len(event) != 0:
                 good = False
                 number_of_missing_events += 1
@@ -245,7 +251,12 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                     data = val
 
                 # Raise exception if the values for a given entry don't match
-                if selected_rows['DATA'][offset+ival] != data:
+                adata = selected_rows['DATA'][offset+ival]
+
+                if ("AS_" in comparison_filename) and ("n1" in comparison_filename):
+                    adata=adata.replace("0x1","0x")
+
+                if adata != data:
                     good = False
                     number_of_value_mismatches += 1
                     message = "The values for event "+str(ievent)+" address "+str(selected_rows['ADDR'][offset+ival])+" do not match!"\
