@@ -114,7 +114,7 @@ assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_
 assert (PAGE_LENGTH = 64) report "PAGE_LENGTH in tf_mem_tproj has to be 64" severity FAILURE;
 
 process(clka)
-  variable init   : std_logic := '1'; -- Clock counter
+  variable sync_nent_prev : std_logic := '0';
   variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH*2)-1 downto 0) := (others => '0'); -- Hack...
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  
   variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
@@ -141,7 +141,7 @@ begin
     --end if;
     --end if;
     slv_page_cnt_save := slv_page_cnt;
-    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
+    if (sync_nent = '1' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
       slv_clk_cnt := (others => '0');
@@ -154,12 +154,13 @@ begin
       -- Note that we don't zero the nent_o counters here. When adding entry we
       -- reset the nent_o counter if the mask is zero
     end if;
-    if (sync_nent='1') and (init='1') then
+    --use sync_nent transition to synchronize at BX (page) 1
+    if (sync_nent='1') and (sync_nent_prev='0') then
       --report time'image(now)&" tf_mem_tproj "&NAME&" sync_nent";
-      init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
+    sync_nent_prev := sync_nent;
 
     if (wea='1') then
       tpage := addra(clogb2(NUM_TPAGES)-1 downto 0);
