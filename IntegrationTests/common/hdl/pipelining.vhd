@@ -23,6 +23,7 @@ entity tf_pipeline is
   );
   port (
     clk : in std_logic;
+    reset : in std_logic;
 
     -- Memory interface
     wea : in std_logic := '0';
@@ -88,7 +89,9 @@ begin
       wea_pipe(0) <= wea;
       addra_pipe(0) <= addra;
       dina_pipe(0) <= dina;
-      if done = '1' then
+      if reset = '1' then
+        start_pipe(0) <= '0';
+      elsif done = '1' then
         start_pipe(0) <= done;
       end if;
       bx_pipe(0) <= bx_out;
@@ -117,6 +120,7 @@ entity tf_auto_pipeline is
   );
   port (
     clk : in std_logic;
+    reset : in std_logic;
 
     -- Memory interface
     wea : in std_logic := '0';
@@ -161,7 +165,9 @@ begin
       wea_reg <= wea;
       addra_reg <= addra;
       dina_reg <= dina;
-      if done = '1' then
+      if reset = '1' then
+        start_reg <= '0';
+      elsif done = '1' then
         start_reg <= done;
       end if;
       bx_reg <= bx_out;
@@ -194,6 +200,7 @@ entity tf_pipeline_slr_xing is
   );
   port (
     clk : in std_logic;
+    reset : in std_logic;
 
     -- Memory interface
     wea : in std_logic := '0';
@@ -249,6 +256,7 @@ begin
         )
         port map (
           clk => clk,
+          reset => reset,
           wea => wea_intra(ii - 1),
           addra => addra_intra(ii - 1),
           dina => dina_intra(ii - 1),
@@ -260,6 +268,7 @@ begin
       AUTO_PIPELINE_START_BX : entity work.tf_auto_pipeline
         port map (
           clk => clk,
+          reset => reset,
           done => start_intra(ii - 1),
           bx_out => bx_intra(ii - 1),
           start => start_intra(ii),
@@ -283,6 +292,7 @@ begin
             )
             port map (
               clk => clk,
+              reset => reset,
               wea => wea_intra(ii - 1),
               addra => addra_intra(ii - 1),
               dina => dina_intra(ii - 1),
@@ -298,6 +308,7 @@ begin
             )
             port map (
               clk => clk,
+              reset => reset,
               done => start_intra(ii - 1),
               bx_out => bx_intra(ii - 1),
               start => start_intra(ii),
@@ -319,6 +330,7 @@ begin
             )
             port map (
               clk => clk,
+              reset => reset,
               wea => wea_intra(ii - 1),
               addra => addra_intra(ii - 1),
               dina => dina_intra(ii - 1),
@@ -334,6 +346,7 @@ begin
             )
             port map (
               clk => clk,
+              reset => reset,
               done => start_intra(ii - 1),
               bx_out => bx_intra(ii - 1),
               start => start_intra(ii),
