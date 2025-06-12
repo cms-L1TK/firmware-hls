@@ -801,6 +801,29 @@ def get_words_fpga1_empdata(emp_data: EmpData,
 
   return tf_words
 
+def get_words_fpga2_empdata(emp_data: EmpData, 
+    offset: int) -> (list[Bitmap],list[Bitmap]):
+  """Gets TF words for a given event from EMP data
+
+  Args:
+    emp_data: EMP data to process in FPGA2 output format
+    offset: event offset in frames from the beginning of the data
+
+  Returns:
+    tuple (indexed by channel = eta sign) of lists of TF track bitmaps
+  """
+  eta_lists = ([],[])
+
+  for frame in range(34):
+    f1 = emp_data.frame_data(frame*3+offset)
+    f2 = emp_data.frame_data(frame*3+offset+1)
+    f3 = emp_data.frame_data(frame*3+offset+2)
+    for ieta in range(2):
+      eta_lists[ieta].append(f1[ieta].append(f2[ieta].substring(63,32)))
+      eta_lists[ieta].append(f2[ieta].substring(31,0).append(f3[ieta]))
+
+  return eta_lists
+
 def get_memprints_words(filename: str, event: int) -> list[Bitmap]:
   """Get list of words for given event from MemPrints file
 
