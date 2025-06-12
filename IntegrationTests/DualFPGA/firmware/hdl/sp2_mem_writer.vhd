@@ -40,10 +40,14 @@ architecture rtl of sp2_mem_writer is
   type t_arr4_7b is array(0 to 3) of std_logic_vector(6 downto 0);
   type t_arr_MTPAR_73_arr4_7b is array(enum_MTPAR_73) of t_arr4_7b;
   type t_arr_MTPAR_73_2b is array(enum_MTPAR_73) of std_logic_vector(1 downto 0);
+  type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET);
 
   signal AS_36_link_valid_prev   : t_arr_AS_36_1b    := (others => '0');
   signal MPAR_73_link_valid_prev : t_arr_MTPAR_73_1b := (others => '0');
   signal bx_link_valid_prev      : std_logic         := '0';
+
+  signal sectorprocessor_ctrl    : enum_RESET_STATE  := S_IDLE;
+  signal sync_counter            : unsigned(7 downto 0) := (others => '0');
 
   signal AS_36_adr       : t_arr_AS_36_7b               := (others => "0000000");
   signal MPAR_73_adr     : t_arr_MTPAR_73_arr4_7b       := (others => (others => "0000000"));
@@ -144,18 +148,43 @@ begin -- architecture rtl
       if (bx_link_valid='1') then
         bx_prev <= bx_link_data;
       end if;
-      --rely on control signals for start management
-      if (bx_link_valid = '1' 
-             and ctl_link_data(60 downto 1) = x"00000000D02E5E7") then
-        PC_start_int <= '0';
-        HLS_reset_int <= '1';
-      elsif (bx_link_valid = '1' 
-             and ctl_link_data(60 downto 1) = x"0000000E2D2E5E7") then
-        HLS_reset_int <= '0';
-      elsif (bx_link_valid = '1' 
-             and ctl_link_data(60 downto 1) = x"00000000D057A27") then
-        PC_start_int <= '1';
-      end if;
+
+      --FSM to control start/reset signals to SectorProcessor
+      case sectorprocessor_ctrl is
+        when S_IDLE =>
+          --generate start when BX rolls from 0 to 1
+          if (bx_link_valid='1' and bx_link_data="001" and bx_prev="000") then
+            sync_counter <= (others => '0');
+            PC_start_int <= '1';
+            sectorprocessor_ctrl <= S_ACTIVE;
+          end if;
+
+        when S_ACTIVE =>
+          --generate reset if BX change is not sync'd w/ counter
+          if (to_integer(sync_counter) = 107) then 
+            sync_counter <= (others => '0');
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+          if (bx_link_valid='1' and bx_link_data /= bx_prev
+              and to_integer(sync_counter) /= 107) then 
+            sync_counter <= (others => '0');
+            PC_start_int <= '0';
+            HLS_reset_int <= '1';
+            sectorprocessor_ctrl <= S_RESET;
+          end if;
+
+        when S_RESET =>
+          --return to idle after reset has been asserted for 2 BXs
+          if (to_integer(sync_counter) = 215) then 
+            sync_counter <= (others => '0');
+            HLS_reset_int <= '0';
+            sectorprocessor_ctrl <= S_IDLE;
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+
+      end case;
 
     end if; --rising clock edge
   end process p_writemem;
