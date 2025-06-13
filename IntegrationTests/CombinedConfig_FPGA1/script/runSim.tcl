@@ -13,7 +13,7 @@ file mkdir dataOut/
 launch_simulation
 
 # Set default wave viewer cfg
-open_wave_config {../tb/start_bx.wcfg}
+#open_wave_config {../tb/start_bx.wcfg}
 
 restart
 # Need 4us + 0.45us per event (50us for 100 events, but 10us for quick test).

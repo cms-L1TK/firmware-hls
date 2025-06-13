@@ -287,7 +287,7 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
-  variable init   : std_logic := '1'; 
+  variable sync_nent_prev : std_logic := '0'; 
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
@@ -316,7 +316,7 @@ process(clka)
 begin
   if rising_edge(clka) then
     slv_page_cnt_save := slv_page_cnt;
-    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
+    if (sync_nent = '1' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
       slv_clk_cnt := (others => '0');
@@ -331,15 +331,16 @@ begin
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" validbinmask: "&to_bstring(slv_page_cnt);
       validbinmask(NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt))+1)-1 downto NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt)))) <= (others => '0');
     end if;
-    if (sync_nent='1') and init='1' then
+    --use sync_nent transition to synchronize at BX (page) 1
+    if (sync_nent='1') and (sync_nent_prev='0') then
       --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
-      init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
       validbinmasktmp <= (others => '0');
       nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" sync_nent set";
     end if;
+    sync_nent_prev := sync_nent;
 
     if (wea='1') then
       -- FIXME - this code is not yet protected from "wrapping" if there are
