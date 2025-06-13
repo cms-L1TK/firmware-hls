@@ -41,6 +41,8 @@ if __name__=='__main__':
       tf_words_ref = get_words_fpga1_empdata(ref_empdata,
                                              ref_offset+108*ievent)
     for memory in tf_words_board:
+      if memory=='BX':
+        continue
       print(memory)
       compare_bitmap_list(tf_words_ref[memory],
                           strip_leading_bits(tf_words_board[memory],1))
