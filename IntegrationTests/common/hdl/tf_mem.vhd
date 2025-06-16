@@ -37,7 +37,8 @@ entity tf_mem is
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
     DEBUG           : boolean := false;            --! If true prints debug info
-    MEM_TYPE        : string := "block"            --! specifies RAM type (block/ultra)
+    MEM_TYPE        : string := "block";           --! specifies RAM type (block/ultra)
+    NENT_SYNC       : boolean := false             --! Enable synchronizer for nent_o
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -59,6 +60,7 @@ architecture rtl of tf_mem is
 
 -- ########################### Types ###########################
 type t_arr_1d_slv_mem is array(0 to RAM_DEPTH-1) of std_logic_vector(RAM_WIDTH-1 downto 0); --! 1D array of slv
+type t_arr_2d_7b is array(0 to 1) of t_arr_7b(0 to NUM_PAGES-1);
 
 -- ########################### Function ##########################
 --! @brief TextIO function to read memory data to initialize tf_mem. Needed here because of variable slv width!
@@ -100,6 +102,7 @@ end read_tf_mem_data;
 signal sa_RAM_data : t_arr_1d_slv_mem := read_tf_mem_data(INIT_FILE, INIT_HEX);         --! RAM data content
 signal sv_RAM_row  : std_logic_vector(RAM_WIDTH-1 downto 0) := (others =>'0');          --! RAM data row
 signal enb_reg : std_logic;                                                             --! Enable register
+signal nent_reg : t_arr_2d_7b := (others => (others => (others => '0')));
 
 -- ########################### Attributes ###########################
 attribute ram_style : string;
@@ -146,7 +149,7 @@ begin
          slv_page_cnt := (others => '0');
       end if;
       --report time'image(now)&" tf_mem "&NAME&" will zero nent";
-      nent_o(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
+      nent_reg(0)(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
     end if;
     --use sync_nent transition to synchronize at BX (page) 1
     if (sync_nent='1') and (sync_nent_prev='0') then
@@ -159,14 +162,14 @@ begin
       overwrite := addra(0);
       --vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
       if (overwrite = '0') then
-        address := slv_page_cnt_save&nent_o(to_integer(unsigned(slv_page_cnt_save)));
+        address := slv_page_cnt_save&nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)));
       else
-        address := slv_page_cnt_save&std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(slv_page_cnt_save)))))-1,nent_o(to_integer(unsigned(slv_page_cnt_save)))'length));
+        address := slv_page_cnt_save&std_logic_vector(to_unsigned(to_integer(unsigned(nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)))))-1,nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)))'length));
       end if;
       --report "tf_mem "&time'image(now)&" "&NAME&" page writeaddr "&" "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" "&to_bstring(overwrite)&" "&to_bstring(dina)&" addra "&to_bstring(addra);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       if (overwrite = '0') then
-        nent_o(to_integer(unsigned(slv_page_cnt_save))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(slv_page_cnt_save))))) + 1, nent_o(to_integer(unsigned(slv_page_cnt_save)))'length)); -- + 1 (slv)
+        nent_reg(0)(to_integer(unsigned(slv_page_cnt_save))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_reg(0)(to_integer(unsigned(slv_page_cnt_save))))) + 1, nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)))'length)); -- + 1 (slv)
       end if;
     end if;
   end if;
@@ -190,6 +193,18 @@ begin
     enb_reg <= enb;
   end if;
 end process;
+
+SYNCHRONIZER : if NENT_SYNC generate
+  process(clkb)
+  begin
+    if rising_edge(clkb) then
+      nent_reg(1) <= nent_reg(0);
+      nent_o <= nent_reg(1);
+    end if;
+  end process;
+else generate
+  nent_o <= nent_reg(0);
+end generate SYNCHRONIZER;
 
 -- The following code generates HIGH_PERFORMANCE (use output register) or LOW_LATENCY (no output register)
 MODE : if (RAM_PERFORMANCE = "LOW_LATENCY") generate -- no_output_register; 1 clock cycle read latency at the cost of a longer clock-to-out timing
