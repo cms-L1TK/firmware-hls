@@ -111,7 +111,7 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
-  variable init   : std_logic := '1'; -- Clock counter
+  variable sync_nent_prev : std_logic := '0';
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
@@ -131,7 +131,7 @@ begin
       end if;
     end if;
     slv_page_cnt_save := slv_page_cnt;
-    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
+    if (sync_nent='1' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
       --report time'image(now)&" tf_mem "&NAME&" increment vi_clk_cnt:"&integer'image(vi_clk_cnt);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
@@ -148,12 +148,13 @@ begin
       --report time'image(now)&" tf_mem "&NAME&" will zero nent";
       nent_o(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
     end if;
-    if (sync_nent='1') and (init='1') then
+    --use sync_nent transition to synchronize at BX (page) 1
+    if (sync_nent='1') and (sync_nent_prev='0') then
       --report time'image(now)&" tf_mem "&NAME&" sync_nent";
-      init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
+    sync_nent_prev := sync_nent;
     if (wea='1') then
       overwrite := addra(0);
       --vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
