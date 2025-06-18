@@ -30,23 +30,23 @@ constexpr int InputBase = 16;
 constexpr int OutputBase = 16;
 
 template<int I>
-void setBarrelStubs(TrackFit_t &track, const TrackFit_t::BarrelStubWord stubWords[][kMaxProc], const unsigned i) {
+void setBarrelStubs(TrackFit_t &track, const TrackFit_t::BarrelStubWord stubWords[][kMaxProc()], const unsigned i) {
   track.setBarrelStubWord<I>(stubWords[I][i]);
   setBarrelStubs<I - 1>(track, stubWords, i);
 }
 
 template<>
-void setBarrelStubs<-1>(TrackFit_t &track, const TrackFit_t::BarrelStubWord stubWords[][kMaxProc], const unsigned i) {
+void setBarrelStubs<-1>(TrackFit_t &track, const TrackFit_t::BarrelStubWord stubWords[][kMaxProc()], const unsigned i) {
 }
 
 template<int I>
-void setDiskStubs(TrackFit_t &track, const TrackFit_t::DiskStubWord stubWords[][kMaxProc], const unsigned i) {
+void setDiskStubs(TrackFit_t &track, const TrackFit_t::DiskStubWord stubWords[][kMaxProc()], const unsigned i) {
   track.setDiskStubWord<I + trklet::N_LAYER>(stubWords[I][i]);
   setDiskStubs<I - 1>(track, stubWords, i);
 }
 
 template<>
-void setDiskStubs<-1>(TrackFit_t &track, const TrackFit_t::DiskStubWord stubWords[][kMaxProc], const unsigned i) {
+void setDiskStubs<-1>(TrackFit_t &track, const TrackFit_t::DiskStubWord stubWords[][kMaxProc()], const unsigned i) {
 }
 
 template<int I>
@@ -109,9 +109,9 @@ int main()
   vector<FullMatchMemory<DISK>> diskFullMatches(nFMDiskMems);
 
   // output memories
-  TrackFit_t::TrackWord trackWord[kMaxProc];
-  TrackFit_t::BarrelStubWord barrelStubWords[trklet::N_LAYER][kMaxProc];
-  TrackFit_t::DiskStubWord diskStubWords[trklet::N_DISK][kMaxProc];
+  TrackFit_t::TrackWord trackWord[kMaxProc()];
+  TrackFit_t::BarrelStubWord barrelStubWords[trklet::N_LAYER][kMaxProc()];
+  TrackFit_t::DiskStubWord diskStubWords[trklet::N_DISK][kMaxProc()];
   TrackFitMemory_t tracksMem;
 
   ///////////////////////////
@@ -121,7 +121,7 @@ int main()
     cout << "Event: " << dec << ievt << endl;
 
     // Clear all output memories before starting.
-    for (unsigned short i = 0; i < kMaxProc; i++) {
+    for (unsigned short i = 0; i < kMaxProc(); i++) {
       trackWord[i] = TrackFit_t::TrackWord(0);
       for (short j = 0; j < trklet::N_LAYER; j++)
         barrelStubWords[j][i] = TrackFit_t::BarrelStubWord(0);
@@ -165,7 +165,7 @@ int main()
       done
     );
 
-    for (unsigned short i = 0; i < kMaxProc; i++) {
+    for (unsigned short i = 0; i < kMaxProc(); i++) {
       TrackFit_t track;
       track.setTrackWord(trackWord[i]);
       setBarrelStubs<trklet::N_LAYER - 1>(track, barrelStubWords, i);

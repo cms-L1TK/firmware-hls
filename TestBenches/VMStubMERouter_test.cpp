@@ -80,7 +80,7 @@ int main() {
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
-    for (int index = 0; index < kMaxProc; ++index){
+    for (int index = 0; index < kMaxProc(); ++index){
 
       // bx - bunch crossing
       BXType bx = ievt;

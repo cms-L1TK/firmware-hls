@@ -223,7 +223,7 @@ void VMRouterCM(const BXType bx, BXType& bx_o,
 	/////////////////////////////////////
 	// Main Loop
 
-	constexpr int maxLoop = kMaxProc;
+	constexpr int maxLoop = kMaxProc();
 
 	TOPLEVEL: for (int i = 0; i < maxLoop; ++i) {
 #pragma HLS PIPELINE II=1 rewind

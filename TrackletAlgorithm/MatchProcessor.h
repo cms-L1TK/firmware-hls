@@ -1283,7 +1283,7 @@ void MatchProcessor(BXType bx,
   constexpr int NUM_PHI_BINS = 1 << kNbitsphibin;
   constexpr int BIN_ADDR_WIDTH = 4;
 
- PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc - kMaxProcOffset(module::MP); istep++) {
+ PROC_LOOP: for (ap_uint<kNBits_MemAddr> istep = 0; istep < kMaxProc() - kMaxProcOffset(module::MP); istep++) {
 #pragma HLS PIPELINE II=1 rewind
 
     if (hasMatch) {

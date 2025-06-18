@@ -38,7 +38,7 @@ def createDefinitionsTemplate():
                    "    const BXType bx\n"
                    "    , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT \n"
                    "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
-                   "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc]//input stubs \n"
+                   "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc()]//input stubs \n"
                    "    , BXType & bx_o // output bx  \n"
                    "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}])"
                    "\n{{\n"
@@ -64,7 +64,7 @@ def createDeclarationTemplate():
                    "    const BXType bx\n"
                    "    , const ap_uint<kLINKMAPwidth> hLinkWord // input link LUT \n"
                    "    , const ap_uint<kBINMAPwidth> hPhBnWord  // n phi bins LUT \n"
-                   "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc]//input stubs \n"
+                   "    , ap_uint<kNBits_DTC> hInputStubs[kMaxProc()]//input stubs \n"
                    "    , BXType & bx_o // output bx  \n"
                    "    , DTCStubMemory hOutputStubs[cNMemories_IR_{LinkName}]"
                    ");\n")
