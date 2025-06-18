@@ -326,7 +326,7 @@ unsigned int compareMemWithFile(const MemType& memory, std::ifstream& fout,
                                 int ievt, const std::string& label,
                                 const bool truncated = false,
 				const bool print_empty = false,
-				int maxProc = kMaxProc)
+				int maxProc = kMaxProc())
 {
   ////////////////////////////////////////
   // Read from file
@@ -362,7 +362,7 @@ template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemWithFile(const MemType& memory, 
                                       std::ifstream& fout,
                                       int ievt, const std::string& label,
-                                      const bool truncated = false, int maxProc = kMaxProc)
+                                      const bool truncated = false, int maxProc = kMaxProc())
 {
   unsigned int err_count = 0;
 
@@ -419,7 +419,7 @@ template<class MemType, int InputBase=16, int OutputBase=16>
 unsigned int compareBinnedMemCMWithFile(const MemType& memory,
                                       std::ifstream& fout,
                                       int ievt, const std::string& label,
-                                      const bool truncated = false, int maxProc = kMaxProc)
+                                      const bool truncated = false, int maxProc = kMaxProc())
 {
   unsigned int err_count = 0;
 
@@ -594,7 +594,7 @@ template<class MemType, int InputBase=16, int OutputBase=16, int LSB=-1, int MSB
 unsigned int compareMemWithTwoFiles(const MemType& memory, std::vector<std::ifstream*>& foutVec,
                                 int ievt, const std::string& label,
                                 const bool truncated = false, const bool print_empty = false,
-				int maxProc = kMaxProc)
+				int maxProc = kMaxProc())
 {
   ////////////////////////////////////////
   // Read from file
