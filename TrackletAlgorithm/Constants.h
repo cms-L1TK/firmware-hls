@@ -79,7 +79,9 @@ constexpr int kNbitsphibin = 3;
 constexpr int kMaxStubsFromLink = 256;
 
 constexpr int kTMUX = 18;   //For hourglass project
-constexpr int kMaxProc = kTMUX * 6;
+constexpr int kMaxProc(const int clockMult = 6) {
+  return (kTMUX * clockMult);
+}
 
 constexpr unsigned int kNbitszfinebintable = 7;
 constexpr unsigned int kNbitsrfinebintable = 4;

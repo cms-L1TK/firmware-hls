@@ -117,8 +117,8 @@ void TrackBuilder(
     const FullMatchMemory<DISK> diskFullMatches[],
     BXType &bx_o,
     typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::TrackWord trackWord[],
-    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::BarrelStubWord barrelStubWords[][kMaxProc],
-    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::DiskStubWord diskStubWords[][kMaxProc],
+    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::BarrelStubWord barrelStubWords[][kMaxProc()],
+    typename TrackFit<trklet::N_LAYER, trklet::N_DISK>::DiskStubWord diskStubWords[][kMaxProc()],
     bool &done
 )
 {
@@ -246,7 +246,7 @@ void TrackBuilder(
 
   }
 
-  full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
+  full_matches : for (unsigned short i = 0; i < kMaxProc(); i++) {
 #pragma HLS pipeline II=1 rewind
 #pragma HLS latency min=6 max=6
 
