@@ -301,7 +301,7 @@ void InputRouter( const BXType bx
 	CountMemories<kMaxLyrsPerDTC>(hPhBnWord, nMems, nMemsPerLyr);
 
 	LOOP_ProcessIR:
-	for (int cStubCounter = 0; cStubCounter < kMaxProc(); cStubCounter++) 
+	for (int cStubCounter = 0; cStubCounter < kMaxProc(9); cStubCounter++) 
 	{
 #pragma HLS pipeline II = 1 rewind
 	  // decode stub
