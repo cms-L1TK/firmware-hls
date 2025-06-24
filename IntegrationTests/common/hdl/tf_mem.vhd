@@ -38,7 +38,8 @@ entity tf_mem is
     NAME            : string := "MEMNAME";          --! Name of mem for printout
     DEBUG           : boolean := false;            --! If true prints debug info
     MEM_TYPE        : string := "block";           --! specifies RAM type (block/ultra)
-    NENT_SYNC       : boolean := false             --! Enable synchronizer for nent_o
+    NENT_SYNC       : boolean := false;            --! Enable synchronizer for nent_o
+    MAX_ENTRIES     : natural := MAX_ENTRIES       --! Period in clock ticks for switching pages
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -116,9 +117,10 @@ assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" seve
 process(clka)
   variable sync_nent_prev : std_logic := '0';
   --FIXME hardcoded number
-  variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
-  variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
-  variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
+  variable clk_cnt   : natural range 0 to MAX_ENTRIES := 0; -- Clock counter
+  variable page_cnt_save  :  natural range 0 to NUM_PAGES := 0;  -- Page counter save
+  variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');
+  variable page_cnt  : natural range 0 to NUM_PAGES := 0;
   variable page         : integer := 0;
   variable addr_in_page : integer := 0;
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
@@ -127,49 +129,50 @@ begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     if DEBUG then
       if (NUM_PAGES = 2) then
-        report "tf_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1));
+        report "tf_mem "&NAME&" nent(0) nent(1) "&to_bstring(nent_reg(0)(0))&" "&to_bstring(nent_reg(0)(1));
       end if;
       if (NUM_PAGES = 8) then
-        report "tf_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_o(0))&" "&to_bstring(nent_o(1))&" "&to_bstring(nent_o(2))&" "&to_bstring(nent_o(3))&" "&to_bstring(nent_o(4))&" "&to_bstring(nent_o(5))&" "&to_bstring(nent_o(6))&" "&to_bstring(nent_o(7));
+        report "tf_mem "&NAME&" nent(0)...nent(7) "&to_bstring(nent_reg(0)(0))&" "&to_bstring(nent_reg(0)(1))&" "&to_bstring(nent_reg(0)(2))&" "&to_bstring(nent_reg(0)(3))&" "&to_bstring(nent_reg(0)(4))&" "&to_bstring(nent_reg(0)(5))&" "&to_bstring(nent_reg(0)(6))&" "&to_bstring(nent_reg(0)(7));
       end if;
     end if;
-    slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent='1' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
-      slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
+    page_cnt_save := page_cnt;
+    slv_page_cnt_save := std_logic_vector(to_unsigned(page_cnt_save, slv_page_cnt_save'length));
+    if (sync_nent='1' and clk_cnt < MAX_ENTRIES-1) then -- ####### Counter nent
+      clk_cnt := clk_cnt+1;
       --report time'image(now)&" tf_mem "&NAME&" increment vi_clk_cnt:"&integer'image(vi_clk_cnt);
-    elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
+    elsif (clk_cnt >= MAX_ENTRIES-1) then -- -1 not included
       --report time'image(now)&" tf_mem "&NAME&" goto next page";
-      slv_clk_cnt := (others => '0');
+      clk_cnt := 0;
       --assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
-      if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then -- Assuming linear continuous page access
-        slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
+      if (page_cnt < NUM_PAGES-1) then -- Assuming linear continuous page access
+        page_cnt := page_cnt+1;
         --report time'image(now)&" tf_mem "&NAME&" increment vi_page_cnt:"&integer'image(vi_page_cnt);
       else
         --report time'image(now)&" tf_mem "&NAME&" resetting vi_page_cnt";
-         slv_page_cnt := (others => '0');
+         page_cnt := 0;
       end if;
       --report time'image(now)&" tf_mem "&NAME&" will zero nent";
-      nent_reg(0)(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
+      nent_reg(0)(page_cnt) <= (others => '0');
     end if;
     --use sync_nent transition to synchronize at BX (page) 1
     if (sync_nent='1') and (sync_nent_prev='0') then
       --report time'image(now)&" tf_mem "&NAME&" sync_nent";
-      slv_clk_cnt := (others => '0');
-      slv_page_cnt := (0 => '1', others => '0');
+      clk_cnt := 0;
+      page_cnt := 1;
     end if;
     sync_nent_prev := sync_nent;
     if (wea='1') then
       overwrite := addra(0);
       --vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
       if (overwrite = '0') then
-        address := slv_page_cnt_save&nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)));
+        address := slv_page_cnt_save&nent_reg(0)(page_cnt_save);
       else
-        address := slv_page_cnt_save&std_logic_vector(to_unsigned(to_integer(unsigned(nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)))))-1,nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)))'length));
+        address := slv_page_cnt_save&std_logic_vector(to_unsigned(to_integer(unsigned(nent_reg(0)(page_cnt_save)))-1,nent_reg(0)(page_cnt_save)'length));
       end if;
       --report "tf_mem "&time'image(now)&" "&NAME&" page writeaddr "&" "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" "&to_bstring(overwrite)&" "&to_bstring(dina)&" addra "&to_bstring(addra);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
       if (overwrite = '0') then
-        nent_reg(0)(to_integer(unsigned(slv_page_cnt_save))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_reg(0)(to_integer(unsigned(slv_page_cnt_save))))) + 1, nent_reg(0)(to_integer(unsigned(slv_page_cnt_save)))'length)); -- + 1 (slv)
+        nent_reg(0)(page_cnt_save) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_reg(0)(page_cnt_save))) + 1, nent_reg(0)(page_cnt_save)'length)); -- + 1 (slv)
       end if;
     end if;
   end if;
