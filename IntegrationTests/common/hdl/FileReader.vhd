@@ -26,7 +26,6 @@ entity FileReader is
   generic (
     FILE_NAME   : string;   --! Name of .txt file corresponding to memory content
     PAGE_LENGTH : natural := PAGE_LENGTH; --! Page size
-    DELAY       : natural := 0;     --! Delay output signals by this many clocks.
     RAM_WIDTH   : natural := 18;    --! RAM data width
     NUM_PAGES   : natural := 2;     --! Number of pages in RAM memory
     NUM_TPAGES  : natural := 1;     --! Number of bins in RAM memory (1 if unbinned)
@@ -40,6 +39,7 @@ entity FileReader is
   );
   port (
     CLK      : in  std_logic;
+    LOCKED   : in  std_logic;
     ADDR     : out std_logic_vector(ADDR_WIDTH-1 downto 0);
     DATA     : out std_logic_vector(RAM_WIDTH-1 downto 0);
     START    : out std_logic;
@@ -221,14 +221,10 @@ end process procFile;
 
 procDelay : process(CLK)
   -- Process to delay start of first event output by required amount.   
-  variable COUNT : natural := 0;
 begin
 
   if rising_edge(CLK) then
-    if (COUNT < DELAY) then
-      COUNT := COUNT + 1;
-      WAITING <= true;
-    else
+    if (LOCKED = '1') then
       WAITING <= false;
     end if;
   end if;

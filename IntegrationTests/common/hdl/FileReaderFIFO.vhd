@@ -25,7 +25,6 @@ use work.tf_pkg.all;
 entity FileReaderFIFO is
   generic (
     FILE_NAME  : string;   --! Name of .txt file corresponding to memory content
-    DELAY      : natural := 0;     --! Delay output signals by this many clocks.
     FIFO_WIDTH  : natural := 39;    --! Data width
     DEBUG      : boolean := false; --! Debug printout
     FILE_NAME_DEBUG : string  := ""; --! Name of .txt file for debug printout.
@@ -33,6 +32,7 @@ entity FileReaderFIFO is
   );
   port (
     CLK       : in  std_logic;
+    LOCKED    : in  std_logic;
     READ_EN : in std_logic;
     EMPTY_NEG : out std_logic;
     DATA      : out std_logic_vector(FIFO_WIDTH-1 downto 0);
@@ -202,15 +202,11 @@ end process procFile;
 
 
 procDelay : process(CLK)
-  -- Process to delay start of first event output by required amount.   
-  variable COUNT : natural := 0;
+  -- Process to delay start of first event output until clocks locked
 begin
 
   if rising_edge(CLK) then
-    if (COUNT < DELAY) then
-      COUNT := COUNT + 1;
-      WAITING <= true;
-    else
+    if (LOCKED = '1') then
       WAITING <= false;
     end if;
   end if;
