@@ -28,7 +28,8 @@ entity FileReaderFIFO is
     DELAY      : natural := 0;     --! Delay output signals by this many clocks.
     FIFO_WIDTH  : natural := 39;    --! Data width
     DEBUG      : boolean := false; --! Debug printout
-    FILE_NAME_DEBUG : string  := ""  --! Name of .txt file for debug printout.
+    FILE_NAME_DEBUG : string  := ""; --! Name of .txt file for debug printout.
+    MAX_ENTRIES     : natural := MAX_ENTRIES --! Period in clock ticks for switching pages
   );
   port (
     CLK       : in  std_logic;
