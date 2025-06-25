@@ -80,7 +80,10 @@ begin
   -----------------------------------------------------------------------------
   tf1_wrapper_1 : entity work.tf1_wrapper
     port map (
-      clk                      => clk_p,
+      -- FIXME: for now, the same 240 MHz clock goes to both ports; should be
+      -- updated with 360 MHz clock from EMP framework
+      clk240                   => clk_p,
+      clk360                   => clk_p,
       reset                    => rst,
       IR_start                 => s_ir_start,
       IR_bx_in                 => s_bx,
