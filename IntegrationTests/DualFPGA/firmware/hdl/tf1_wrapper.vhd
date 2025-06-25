@@ -26,7 +26,8 @@ use work.memUtil_aux_pkg_f1.all;
 
 entity tf1_wrapper is
   port (
-    clk                      : in  std_logic;
+    clk240                   : in  std_logic;
+    clk360                   : in  std_logic;
     reset                    : in  std_logic;
     IR_start                 : in  std_logic;
     IR_bx_in                 : in  std_logic_vector(2 downto 0);
@@ -47,7 +48,8 @@ begin  -- architecture rtl
 
   SectorProcessor_1 : entity work.SectorProcessor
     port map (
-      clk                            => clk,
+      clk240                         => clk240,
+      clk360                         => clk360,
       reset                          => reset,
       IR_start                       => IR_start,
       IR_bx_in                       => IR_bx_in,
