@@ -161,9 +161,14 @@ set topLevelHDL "SectorProcessorFull"
 add_files -fileset sources_1 [glob ../hdl/SectorProcessor.vhd]
 add_files -fileset sources_1 [glob ../hdl/SectorProcessorFull.vhd]
 add_files -fileset sources_1 [glob ../hdl/memUtil_pkg.vhd]
-add_files -fileset sources_1 [glob common/hdl/*.vhd]
-remove_files -fileset sources_1 [glob common/hdl/latency_monitor.vhd]
-remove_files -fileset sources_1 [glob common/hdl/tf_mem_new.vhd]
+add_files -fileset sources_1 [glob common/hdl/FileReaderFIFO.vhd]
+add_files -fileset sources_1 [glob common/hdl/FileWriterFIFO.vhd]
+add_files -fileset sources_1 [glob common/hdl/pipelining.vhd]
+add_files -fileset sources_1 [glob common/hdl/tf_mem_bin.vhd]
+add_files -fileset sources_1 [glob common/hdl/tf_mem.vhd]
+add_files -fileset sources_1 [glob common/hdl/tf_mem_format.vhd]
+add_files -fileset sources_1 [glob common/hdl/tf_merge_streamer.vhd]
+add_files -fileset sources_1 [glob common/hdl/tf_pkg.vhd]
 
 # Add post-synthesis script
 add_files -fileset utils_1 [glob common/script/post.tcl]
@@ -179,6 +184,8 @@ add_files -fileset constrs_1 [glob soft_floorplan.xdc]
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
 set_property top -value ${topLevelHDL} -objects [get_filesets sim_1]
 set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
+set_property used_in_synthesis false [get_files FileReaderFIFO.vhd]
+set_property used_in_synthesis false [get_files FileWriterFIFO.vhd]
 set_property xsim.simulate.runtime -value "0us" -objects  [get_filesets sim_1]
 
 # Set 'synth_1` fileset properties
