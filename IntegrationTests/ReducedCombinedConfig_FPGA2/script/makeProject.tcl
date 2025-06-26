@@ -71,6 +71,7 @@ remove_files -fileset sources_1 [glob common/hdl/tf_mem_new.vhd]
 
 # Add HDL for TB
 add_files -fileset sim_1 [glob ../tb/tb_tf_top.vhd]
+import_ip [glob common/ip/*.xci]
 
 # Add constraints (clock etc.)
 add_files -fileset constrs_1 [glob common/hdl/constraints.xdc]
@@ -81,6 +82,7 @@ add_files -fileset constrs_1 [glob soft_floorplan.xdc]
 set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
 set_property top -value ${topLevelHDL} -objects [get_filesets sim_1]
 set_property top -value "tb_tf_top" -objects [get_filesets sim_1]
+set_property used_in_implementation false [get_files clk_wiz_240_360.xci]
 set_property xsim.simulate.runtime -value "0us" -objects  [get_filesets sim_1]
 
 update_compile_order -fileset sources_1 
