@@ -47,9 +47,13 @@ architecture rtl of emp_payload is
   signal s_TP_bx_out_vld       : std_logic;
   signal AS_37_stream          : t_arr_AS_37_DATA;
   signal MPAR_76_stream        : t_arr_MPAR_76_DATA;
-
+  signal q_secproc1tolink     : ldata(4 * N_REGION - 1 downto 0);
+  signal clk_360MHz            : std_logic;
+  signal clk_240MHz            : std_logic;
 begin
 
+  clk_240MHz    <=      clk_payload(0);
+  clk_360MHz    <=      clk_p;
   -----------------------------------------------------------------------------
   -- EMP ports
   -----------------------------------------------------------------------------
@@ -64,7 +68,7 @@ begin
   -----------------------------------------------------------------------------
   linktosecproc_1 : entity work.linktosecproc
     port map (
-      clk_i                => clk_p,
+      clk_i                => clk_360MHz,
       rst_i                => rst,
       ttc_i                => ctrs,
       din_i                => d,
@@ -82,8 +86,8 @@ begin
     port map (
       -- FIXME: for now, the same 240 MHz clock goes to both ports; should be
       -- updated with 360 MHz clock from EMP framework
-      clk240                   => clk_p,
-      clk360                   => clk_p,
+      clk240                   => clk_240MHz,
+      clk360                   => clk_360MHz,
       reset                    => rst,
       IR_start                 => s_ir_start,
       IR_bx_in                 => s_bx,
@@ -102,7 +106,7 @@ begin
   -----------------------------------------------------------------------------
   secproc1tolink_1 : entity work.secproc1tolink
     port map (
-      clk                      => clk_p,
+      clk                      => clk_240MHz,
       rst                      => rst,
       TP_bx_out                => tp_bx,
       bx_in                    => s_bx,
@@ -111,7 +115,19 @@ begin
       AS_37_stream_V_dout      => AS_37_stream,
       MPAR_76_stream_V_dout    => MPAR_76_stream,
       node_packet              => conv_single(d),
-      q                        => q
+      q                        => q_secproc1tolink
       );
+
+  -----------------------------------------------------------------------------
+  -- 240/360 MHz CDC
+  -----------------------------------------------------------------------------
+    cdc_240_360_MHz  :  entity work.tf_cdc_240_360MHz_wr
+      port map (
+        clk_240MHz_i            => clk_240MHz,
+        clk_360MHz_i            => clk_360MHz,
+        din_i                   => q_secproc1tolink,
+        dout_o                  => q
+        );
+
 
 end rtl;
