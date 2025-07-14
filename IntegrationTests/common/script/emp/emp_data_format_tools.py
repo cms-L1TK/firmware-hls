@@ -910,7 +910,7 @@ def make_zero_bitmap(length: int) -> Bitmap:
   """
   return Bitmap('bin'+''.join(['0' for i in range(length)]))
   
-def default_metadata(frame: int) -> Bitmap:
+def default_metadata(frame: int, ii: int = 108) -> Bitmap:
   """Returns default metadata for given frame
 
   Args:
@@ -918,18 +918,18 @@ def default_metadata(frame: int) -> Bitmap:
 
   Returns
     0b1101 if frame = 6
-    0b0000 if frame < 6 mod 108
-    0b0101 if frame = 6 mod 108
-    0b0001 if 6 < frame < 107 mod 108
-    0b0011 if frame = 107 mod 108
+    0b0000 if frame < 6 mod ii
+    0b0101 if frame = 6 mod ii
+    0b0001 if 6 < frame < ii-1 mod ii
+    0b0011 if frame = ii-1 mod ii
   """
   if frame==6:
     return Bitmap('bin1101')
-  elif (frame%108)<6:
+  elif (frame%ii)<6:
     return Bitmap('bin0000')
-  elif (frame%108)==6:
+  elif (frame%ii)==6:
     return Bitmap('bin0101')
-  elif (frame%108)<107:
+  elif (frame%ii)<ii-1:
     return Bitmap('bin0001')
   else:
     return Bitmap('bin0011')
@@ -950,20 +950,20 @@ def create_empdata_fpga1_input(memprints_dir: str, event_start: int,
   ievent = 0
   for event in range(event_start, event_end):
     dl_data = get_input_fpga1_memprints(memprints_dir, event)
-    #truncate or pad each list to 102 entries, then pad to 108
+    #truncate or pad each list to 102 entries, then pad to 162
     for idl in range(len(DL_NAMES)):
       dl_name = 'DL'+DL_NAMES[idl]
-      if len(dl_data[dl_name])>102:
-        dl_data[dl_name] = dl_data[dl_name][:108]
-      while len(dl_data[dl_name])<102:
+      if len(dl_data[dl_name])>156:
+        dl_data[dl_name] = dl_data[dl_name][:162]
+      while len(dl_data[dl_name])<156:
         dl_data[dl_name].append(make_zero_bitmap(39))
       for i in range(6):
         dl_data[dl_name].insert(0,make_zero_bitmap(39))
     #add words to EmpData object
-    for iframe in range(108):
+    for iframe in range(162):
       for idl in range(len(DL_NAMES)):
         dl_name = 'DL'+DL_NAMES[idl]
-        data.metadata[idl].append(default_metadata(iframe+ievent*108))
+        data.metadata[idl].append(default_metadata(iframe+ievent*162,162))
         data.data[idl].append(Bitmap('bin'+zero_pad(
             dl_data[dl_name][iframe].value,64)))
     ievent += 1
