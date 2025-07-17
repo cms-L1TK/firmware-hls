@@ -63,9 +63,7 @@ if rising_edge( clk_360MHz_i ) then
 
   dout <= din;
   if state = reset then
-    dout <= LWORD_NULL;
-  else
-    dout.strobe <= valid ;
+    dout.data <= (others => '0');
   end if;
 end if;
 end process;
