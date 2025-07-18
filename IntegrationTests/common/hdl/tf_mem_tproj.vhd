@@ -50,7 +50,6 @@ entity tf_mem_tproj is
     enb       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
     rsta      : in  std_logic;                                      --! Input reset
     rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
-    regceb    : in  std_logic;                                      --! Output register enable
     addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
     dina      : in  std_logic_vector(RAM_WIDTH-1 downto 0);         --! RAM input data
     addrb     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Read address bus, width determined from RAM_DEPTH
