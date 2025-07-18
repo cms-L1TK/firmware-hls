@@ -16,6 +16,7 @@ entity tf_pipeline is
   generic (
     DELAY : natural := 2;
     USE_SRL : string := "no";
+    LATCH_START : boolean := false;
     RAM_WIDTH : natural := 14;
     NUM_PAGES : natural := 2;
     PAGE_LENGTH : natural := PAGE_LENGTH;
@@ -96,7 +97,6 @@ begin
         wea_pipe(ii) <= wea_pipe(ii - 1);
         addra_pipe(ii) <= addra_pipe(ii - 1);
         dina_pipe(ii) <= dina_pipe(ii - 1);
-        start_pipe(ii) <= start_pipe(ii - 1);
         bx_pipe(ii) <= bx_pipe(ii - 1);
         bx_vld_pipe(ii) <= bx_vld_pipe(ii - 1);
       end loop;
@@ -104,17 +104,40 @@ begin
       wea_pipe(0) <= wea;
       addra_pipe(0) <= addra;
       dina_pipe(0) <= dina;
-      if reset = '1' then
-        start_pipe(0) <= '0';
-      elsif done = '1' then
-        start_pipe(0) <= done;
-      end if;
       bx_pipe(0) <= bx_out;
       bx_vld_pipe(0) <= bx_out_vld;
 
     end if;
 
   end process;
+
+  START_LATCH : if LATCH_START generate
+    START_LATCH_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        for ii in 1 to DELAY - 1 loop
+          start_pipe(ii) <= start_pipe(ii - 1);
+        end loop;
+        if reset = '1' then
+          start_pipe(0) <= '0';
+        elsif done = '1' then
+          start_pipe(0) <= '1';
+        end if;
+      end if;
+    end process;
+  end generate START_LATCH;
+
+  NO_START_LATCH : if not LATCH_START generate
+    START_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        for ii in 1 to DELAY - 1 loop
+          start_pipe(ii) <= start_pipe(ii - 1);
+        end loop;
+        start_pipe(0) <= done;
+      end if;
+    end process;
+  end generate NO_START_LATCH;
 
 end behavior;
 
@@ -129,6 +152,7 @@ use work.tf_pkg.all;
 
 entity tf_auto_pipeline is
   generic (
+    LATCH_START : boolean := false;
     RAM_WIDTH : natural := 14;
     NUM_PAGES : natural := 2;
     PAGE_LENGTH : natural := PAGE_LENGTH;
@@ -193,17 +217,34 @@ begin
       wea_reg <= wea;
       addra_reg <= addra;
       dina_reg <= dina;
-      if reset = '1' then
-        start_reg <= '0';
-      elsif done = '1' then
-        start_reg <= done;
-      end if;
       bx_reg <= bx_out;
       bx_vld_reg <= bx_out_vld;
 
     end if;
 
   end process;
+
+  START_LATCH : if LATCH_START generate
+    START_LATCH_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        if reset = '1' then
+          start_reg <= '0';
+        elsif done = '1' then
+          start_reg <= '1';
+        end if;
+      end if;
+    end process;
+  end generate START_LATCH;
+
+  NO_START_LATCH : if not LATCH_START generate
+    START_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        start_reg <= done;
+      end if;
+    end process;
+  end generate NO_START_LATCH;
 
 end behavior;
 
@@ -222,6 +263,7 @@ entity tf_pipeline_slr_xing is
     NUM_SLR : natural := 2;
     DELAY : t_arr_1d_nat(0 to NUM_SLR - 1) := (others => 2);
     USE_SRL : t_arr_1d_bol(0 to NUM_SLR - 1) := (others => false);
+    LATCH_START : boolean := true;
     RAM_WIDTH : natural := 14;
     NUM_PAGES : natural := 2;
     PAGE_LENGTH : natural := PAGE_LENGTH;
@@ -253,6 +295,9 @@ architecture behavior of tf_pipeline_slr_xing is
 
   attribute keep_hierarchy : string;
   attribute keep_hierarchy of behavior : architecture is "yes";
+
+  type t_latch_start_map is array (1 to NUM_SLR) of boolean;
+  constant latch_start_map : t_latch_start_map := (1 => LATCH_START, others => false);
 
   type t_wea_intra is array (0 to NUM_SLR) of std_logic;
   type t_addra_intra is array (0 to NUM_SLR) of std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 );
@@ -300,6 +345,9 @@ begin
         );
 
       AUTO_PIPELINE_START_BX : entity work.tf_auto_pipeline
+        generic map (
+            LATCH_START => latch_start_map(ii)
+        )
         port map (
           clk => clk,
           reset => reset,
@@ -340,7 +388,8 @@ begin
           PIPELINE_START_BX : entity work.tf_pipeline
             generic map (
               DELAY => DELAY(ii - 1),
-              USE_SRL => "yes"
+              USE_SRL => "yes",
+              LATCH_START => latch_start_map(ii)
             )
             port map (
               clk => clk,
@@ -380,7 +429,8 @@ begin
           PIPELINE_START_BX : entity work.tf_pipeline
             generic map (
               DELAY => DELAY(ii - 1),
-              USE_SRL => "no"
+              USE_SRL => "no",
+              LATCH_START => latch_start_map(ii)
             )
             port map (
               clk => clk,
