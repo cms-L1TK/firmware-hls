@@ -172,30 +172,30 @@ sed -i 's/VMStubMERouter/VMSMERouter/g' fpga1_processingmodules.dat
 
 
 echo "Reduced CM FPGA1"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_reducedcm_wires.dat -p fpga1_reducedcm_processingmodules.dat -m fpga1_reducedcm_memorymodules.dat -de 1 -sp 1
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_reducedcm_wires.dat -p fpga1_reducedcm_processingmodules.dat -m fpga1_reducedcm_memorymodules.dat -de 1 -x -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_reducedcm_wires.dat -p fpga1_reducedcm_processingmodules.dat -m fpga1_reducedcm_memorymodules.dat -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_reducedcm_wires.dat -p fpga1_reducedcm_processingmodules.dat -m fpga1_reducedcm_memorymodules.dat -x -sp 1
 ls -ltr *.vhd
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig_FPGA1/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA1/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA1/tb/
 
 echo "CM FPGA1"
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -de 1 -sp 1
-./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -de 1 -x -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -sp 1
+./generator_hdl.py ../../ --no_graph --mut IR -u 0 -d 2 -w fpga1_wires.dat -p fpga1_processingmodules.dat -m fpga1_memorymodules.dat -x -sp 1
 mkdir -p ../../IntegrationTests/CombinedConfig_FPGA1/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA1/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA1/tb/
 
 echo "Reduced CM FPGA2"
-./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_reducedcm_wires.dat -p fpga2_reducedcm_processingmodules.dat -m fpga2_reducedcm_memorymodules.dat -de 1
-./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_reducedcm_wires.dat -p fpga2_reducedcm_processingmodules.dat -m fpga2_reducedcm_memorymodules.dat -de 1 -x
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_reducedcm_wires.dat -p fpga2_reducedcm_processingmodules.dat -m fpga2_reducedcm_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_reducedcm_wires.dat -p fpga2_reducedcm_processingmodules.dat -m fpga2_reducedcm_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/ReducedCombinedConfig_FPGA2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/ReducedCombinedConfig_FPGA2/tb/
 
 echo "CM FPGA2"
-./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 2
-./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -de 2 -x
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat
+./generator_hdl.py ../../ --no_graph --sp 2 --mut PC -u 0 -d 2 -w fpga2_wires.dat -p fpga2_processingmodules.dat -m fpga2_memorymodules.dat -x
 mkdir -p ../../IntegrationTests/CombinedConfig_FPGA2/{hdl,tb}
 mv -fv memUtil_pkg.vhd SectorProcessor.vhd SectorProcessorFull.vhd ../../IntegrationTests/CombinedConfig_FPGA2/hdl/
 mv -fv tb_tf_top.vhd ../../IntegrationTests/CombinedConfig_FPGA2/tb/
