@@ -51,16 +51,23 @@ end entity linktosecproc;
 
 architecture rtl of linktosecproc is
 
-  constant IR_LATENCY : natural := 4;
+  constant START_LATENCY : natural := 1;
+  constant IR_LATENCY : natural := (START_LATENCY + 1) + 7;
 
-  type t_arr_ldata is array(IR_LATENCY-1 downto 0) of ldata(119 downto 68); 
+  type t_arr_ldata is array(natural range <>) of ldata(119 downto 68);
 
   -- signal s_tracklet_reset : t_resets(numPPquads - 1 downto 0);
   -- signal s_tracklet_isol  : t_stubsDTC;
   -- signal s_tracklet_data  : t_datas(numInputsIR - 1 downto 0);
-  signal s_ir_start      : std_logic;
-  signal s_ir_start_srff : std_logic;
-  signal s_din_d         : t_arr_ldata := (others => (others => LWORD_NULL));
+  signal s_ir_start      : std_logic := '0';
+  signal s_ir_start_d    : std_logic_vector(START_LATENCY-1 downto 0) := (others => '0');
+  signal s_din           : t_arr_ldata(0 downto 0) := (others => (others => LWORD_NULL));
+  signal s_din_d         : t_arr_ldata(IR_LATENCY-1 downto 1) := (others => (others => LWORD_NULL));
+
+  attribute shreg_extract : string;
+  attribute shreg_extract of s_ir_start_d : signal is "no";
+  attribute shreg_extract of s_din : signal is "no";
+  attribute shreg_extract of s_din_d : signal is "yes";
 
 begin  -- architecture rtl
 
@@ -85,10 +92,11 @@ begin  -- architecture rtl
     p_delay_data: process (clk_i) is
     begin  -- process p_delay_data
       if rising_edge(clk_i) then     -- rising clock edge
-        s_din_d(0)(i).data <= din_i(i).data;
+        s_din(0)(i).data <= din_i(i).data;
+        s_din_d(1)(i).data <= s_din(0)(i).data;
       end if;
     end process p_delay_data;
-    GEN_DIN_PIPE : for j in 1 to IR_LATENCY-1 generate
+    GEN_DIN_PIPE : for j in 2 to IR_LATENCY-1 generate
       p_delay_data_pipe: process (clk_i) is
       begin  
         if rising_edge(clk_i) then     -- rising clock edge
@@ -158,13 +166,18 @@ begin  -- architecture rtl
       clk_i   => clk_i,
       set_i   => din_i(68).valid,
       reset_i => rst_i,
-      q_o     => s_ir_start_srff
+      q_o     => s_ir_start
       );
 
   --With current IR setup latency, IR_Start needs to come up 4 clock cycles
   --before first data
-  s_ir_start <= din_i(68).valid or s_ir_start_srff;
-  ir_start_o <= s_ir_start;
+  p_delay_start : process (clk_i) is
+  begin
+    if rising_edge(clk_i) then
+      s_ir_start_d <= s_ir_start_d(s_ir_start_d'high - 1 downto 0) & s_ir_start;
+    end if;
+  end process p_delay_start;
+  ir_start_o <= s_ir_start_d(s_ir_start_d'high);
 
   p_bx_count : process (clk_i) is
     variable v_bx         : natural;

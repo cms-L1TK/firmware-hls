@@ -38,6 +38,10 @@ architecture rtl of secproc1tolink is
   signal link_ctl_signal : std_logic_vector(59 downto 0) := ( others => '0' );
   signal sr_valid : std_logic := '0';
   signal sr_valid_prev : std_logic := '0';
+  signal q_reg : ldata(4 * N_REGION - 1 downto 0);
+
+  attribute keep : string;
+  attribute keep of q_reg : signal is "yes";
 
 begin
 
@@ -111,86 +115,89 @@ begin
   if rising_edge( clk ) then
     sr <= sr( sr'high - 1 downto 0 ) & node_packet;
     sr_valid_prev <= sr_valid;
+    
+    q_reg(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
+    q_reg(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
+    q_reg(6).data(63 downto 0) <= AS_signals(63 + 2*64 downto 0 + 2*64);
+    q_reg(7).data(63 downto 0) <= AS_signals(63 + 3*64 downto 0 + 3*64);
+    q_reg(8).data(63 downto 0) <= AS_signals(63 + 4*64 downto 0 + 4*64);
+    q_reg(9).data(63 downto 0) <= AS_signals(63 + 5*64 downto 0 + 5*64);
+    q_reg(10).data(63 downto 0) <= AS_signals(63 + 6*64 downto 0 + 6*64);
+    q_reg(11).data(63 downto 0) <= AS_signals(63 + 7*64 downto 0 + 7*64);
+    q_reg(12).data(63 downto 0) <= AS_signals(63 + 8*64 downto 0 + 8*64);
+    q_reg(13).data(63 downto 0) <= AS_signals(63 + 9*64 downto 0 + 9*64);
+    q_reg(14).data(63 downto 0) <= AS_signals(63 + 10*64 downto 0 + 10*64);
+    q_reg(15).data(63 downto 0) <= AS_signals(63 + 11*64 downto 0 + 11*64);
+    
+    q_reg(20).data(63 downto 0) <= AS_signals(63 + 12*64 downto 0 + 12*64);
+    q_reg(21).data(63 downto 0) <= AS_signals(63 + 13*64 downto 0 + 13*64);
+    q_reg(22).data(63 downto 0) <= AS_signals(63 + 14*64 downto 0 + 14*64);
+    q_reg(23).data(63 downto 0) <= AS_signals(63 + 15*64 downto 0 + 15*64);
+    q_reg(24).data(63 downto 0) <= AS_signals(63 + 16*64 downto 0 + 16*64);
+    q_reg(25).data(63 downto 0) <= AS_signals(63 + 17*64 downto 0 + 17*64);
+    q_reg(26).data(63 downto 0) <= AS_signals(63 + 18*64 downto 0 + 18*64);
+    q_reg(27).data(63 downto 0) <= AS_signals(63 + 19*64 downto 0 + 19*64);
+    q_reg(28).data(63 downto 0) <= AS_signals(63 + 20*64 downto 0 + 20*64);
+    q_reg(29).data(63 downto 0) <= AS_signals(63 + 21*64 downto 0 + 21*64);
+    q_reg(30).data(63 downto 0) <= AS_signals(63 + 22*64 downto 0 + 22*64);
+    q_reg(31).data(63 downto 0) <= AS_signals(63 + 23*64 downto 0 + 23*64);
+    q_reg(32).data(63 downto 0) <= AS_signals(63 + 24*64 downto 0 + 24*64);
+    q_reg(33).data(63 downto 0) <= AS_signals(63 + 25*64 downto 0 + 25*64);
+    q_reg(34).data(63 downto 0) <= AS_signals(63 + 26*64 downto 0 + 26*64);
+    q_reg(35).data(63 - 16 downto 0) <= AS_signals(63 + 27*64 - 16 downto 0 + 27*64);
+    q_reg(35).data(63 downto 63-15) <= (others => '0');
+
+    --although we are just sending this to FPGA2, FPGA2 uses the control signals
+    --to determine its outputs control signals, so we should synchronize these
+    for i in 4 to 15 loop
+      q_reg(i).start_of_orbit <= sr(sr'high).start_of_orbit;
+      q_reg(i).start <= sr(sr'high).start;
+      q_reg(i).last <= sr(sr'high).last;
+      q_reg(i).valid <= sr(sr'high).valid;
+    end loop;
+    for i in 20 to 54 loop
+      q_reg(i).start_of_orbit <= sr(sr'high).start_of_orbit;
+      q_reg(i).start <= sr(sr'high).start;
+      q_reg(i).last <= sr(sr'high).last;
+      q_reg(i).valid <= sr(sr'high).valid;
+    end loop;
+
+    --15 76bit signals can be accomodated by 18 64bit signals, this will leave
+    --12 empty bits in the last data word
+    q_reg(36).data(63 downto 0) <= MPAR_signals(63 + 0*64 downto 0 + 0*64);
+    q_reg(37).data(63 downto 0) <= MPAR_signals(63 + 1*64 downto 0 + 1*64);
+    q_reg(38).data(63 downto 0) <= MPAR_signals(63 + 2*64 downto 0 + 2*64);
+    q_reg(39).data(63 downto 0) <= MPAR_signals(63 + 3*64 downto 0 + 3*64);
+    q_reg(40).data(63 downto 0) <= MPAR_signals(63 + 4*64 downto 0 + 4*64);
+    q_reg(41).data(63 downto 0) <= MPAR_signals(63 + 5*64 downto 0 + 5*64);
+    q_reg(42).data(63 downto 0) <= MPAR_signals(63 + 6*64 downto 0 + 6*64);
+    q_reg(43).data(63 downto 0) <= MPAR_signals(63 + 7*64 downto 0 + 7*64);
+    q_reg(44).data(63 downto 0) <= MPAR_signals(63 + 8*64 downto 0 + 8*64);
+    q_reg(45).data(63 downto 0) <= MPAR_signals(63 + 9*64 downto 0 + 9*64);
+    q_reg(46).data(63 downto 0) <= MPAR_signals(63 + 10*64 downto 0 + 10*64);
+    q_reg(47).data(63 downto 0) <= MPAR_signals(63 + 11*64 downto 0 + 11*64);
+    q_reg(48).data(63 downto 0) <= MPAR_signals(63 + 12*64 downto 0 + 12*64);
+    q_reg(49).data(63 downto 0) <= MPAR_signals(63 + 13*64 downto 0 + 13*64);
+    q_reg(50).data(63 downto 0) <= MPAR_signals(63 + 14*64 downto 0 + 14*64);
+    q_reg(51).data(63 downto 0) <= MPAR_signals(63 + 15*64 downto 0 + 15*64);
+    q_reg(52).data(63 downto 0) <= MPAR_signals(63 + 16*64 downto 0 + 16*64);
+    q_reg(53).data(63 - 12 downto 0) <= MPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
+    q_reg(53).data(63 downto 63-11) <= (others => '0');
+    
+    q_reg(54).data(2 downto 0) <= TP_bx_out;
+    q_reg(54).data(3) <= '0';
+    q_reg(54).data(63 downto 4) <= link_ctl_signal;
+
   end if;
   end process;
-  
-  q(4).data(63 downto 0) <= AS_signals(63 + 0*64 downto 0 + 0*64);
-  q(5).data(63 downto 0) <= AS_signals(63 + 1*64 downto 0 + 1*64);
-  q(6).data(63 downto 0) <= AS_signals(63 + 2*64 downto 0 + 2*64);
-  q(7).data(63 downto 0) <= AS_signals(63 + 3*64 downto 0 + 3*64);
-  q(8).data(63 downto 0) <= AS_signals(63 + 4*64 downto 0 + 4*64);
-  q(9).data(63 downto 0) <= AS_signals(63 + 5*64 downto 0 + 5*64);
-  q(10).data(63 downto 0) <= AS_signals(63 + 6*64 downto 0 + 6*64);
-  q(11).data(63 downto 0) <= AS_signals(63 + 7*64 downto 0 + 7*64);
-  q(12).data(63 downto 0) <= AS_signals(63 + 8*64 downto 0 + 8*64);
-  q(13).data(63 downto 0) <= AS_signals(63 + 9*64 downto 0 + 9*64);
-  q(14).data(63 downto 0) <= AS_signals(63 + 10*64 downto 0 + 10*64);
-  q(15).data(63 downto 0) <= AS_signals(63 + 11*64 downto 0 + 11*64);
-  
-  q(20).data(63 downto 0) <= AS_signals(63 + 12*64 downto 0 + 12*64);
-  q(21).data(63 downto 0) <= AS_signals(63 + 13*64 downto 0 + 13*64);
-  q(22).data(63 downto 0) <= AS_signals(63 + 14*64 downto 0 + 14*64);
-  q(23).data(63 downto 0) <= AS_signals(63 + 15*64 downto 0 + 15*64);
-  q(24).data(63 downto 0) <= AS_signals(63 + 16*64 downto 0 + 16*64);
-  q(25).data(63 downto 0) <= AS_signals(63 + 17*64 downto 0 + 17*64);
-  q(26).data(63 downto 0) <= AS_signals(63 + 18*64 downto 0 + 18*64);
-  q(27).data(63 downto 0) <= AS_signals(63 + 19*64 downto 0 + 19*64);
-  q(28).data(63 downto 0) <= AS_signals(63 + 20*64 downto 0 + 20*64);
-  q(29).data(63 downto 0) <= AS_signals(63 + 21*64 downto 0 + 21*64);
-  q(30).data(63 downto 0) <= AS_signals(63 + 22*64 downto 0 + 22*64);
-  q(31).data(63 downto 0) <= AS_signals(63 + 23*64 downto 0 + 23*64);
-  q(32).data(63 downto 0) <= AS_signals(63 + 24*64 downto 0 + 24*64);
-  q(33).data(63 downto 0) <= AS_signals(63 + 25*64 downto 0 + 25*64);
-  q(34).data(63 downto 0) <= AS_signals(63 + 26*64 downto 0 + 26*64);
-  q(35).data(63 - 16 downto 0) <= AS_signals(63 + 27*64 - 16 downto 0 + 27*64);
-  q(35).data(63 downto 63-15) <= (others => '0');
-
-  --although we are just sending this to FPGA2, FPGA2 uses the control signals
-  --to determine its outputs control signals, so we should synchronize these
-  control_signals1 : for i in 4 to 15 generate
-    q(i).start_of_orbit <= sr(sr'high).start_of_orbit;
-    q(i).start <= sr(sr'high).start;
-    q(i).last <= sr(sr'high).last;
-    q(i).valid <= sr(sr'high).valid;
-  end generate;
-  control_signals2 : for i in 20 to 54 generate
-    q(i).start_of_orbit <= sr(sr'high).start_of_orbit;
-    q(i).start <= sr(sr'high).start;
-    q(i).last <= sr(sr'high).last;
-    q(i).valid <= sr(sr'high).valid;
-  end generate;
-
-  --15 76bit signals can be accomodated by 18 64bit signals, this will leave
-  --12 empty bits in the last data word
-  q(36).data(63 downto 0) <= MPAR_signals(63 + 0*64 downto 0 + 0*64);
-  q(37).data(63 downto 0) <= MPAR_signals(63 + 1*64 downto 0 + 1*64);
-  q(38).data(63 downto 0) <= MPAR_signals(63 + 2*64 downto 0 + 2*64);
-  q(39).data(63 downto 0) <= MPAR_signals(63 + 3*64 downto 0 + 3*64);
-  q(40).data(63 downto 0) <= MPAR_signals(63 + 4*64 downto 0 + 4*64);
-  q(41).data(63 downto 0) <= MPAR_signals(63 + 5*64 downto 0 + 5*64);
-  q(42).data(63 downto 0) <= MPAR_signals(63 + 6*64 downto 0 + 6*64);
-  q(43).data(63 downto 0) <= MPAR_signals(63 + 7*64 downto 0 + 7*64);
-  q(44).data(63 downto 0) <= MPAR_signals(63 + 8*64 downto 0 + 8*64);
-  q(45).data(63 downto 0) <= MPAR_signals(63 + 9*64 downto 0 + 9*64);
-  q(46).data(63 downto 0) <= MPAR_signals(63 + 10*64 downto 0 + 10*64);
-  q(47).data(63 downto 0) <= MPAR_signals(63 + 11*64 downto 0 + 11*64);
-  q(48).data(63 downto 0) <= MPAR_signals(63 + 12*64 downto 0 + 12*64);
-  q(49).data(63 downto 0) <= MPAR_signals(63 + 13*64 downto 0 + 13*64);
-  q(50).data(63 downto 0) <= MPAR_signals(63 + 14*64 downto 0 + 14*64);
-  q(51).data(63 downto 0) <= MPAR_signals(63 + 15*64 downto 0 + 15*64);
-  q(52).data(63 downto 0) <= MPAR_signals(63 + 16*64 downto 0 + 16*64);
-  q(53).data(63 - 12 downto 0) <= MPAR_signals(63 + 17*64 - 12 downto 0 + 17*64);
-  q(53).data(63 downto 63-11) <= (others => '0');
-  
-  q(54).data(2 downto 0) <= TP_bx_out;
-  q(54).data(3) <= '0';
-  q(54).data(63 downto 4) <= link_ctl_signal;
 
   sr_valid <= sr(sr'high).valid;
   link_ctl_signal <= x"00000000D057A27" when (TP_bx_out = "001" 
                                               and sr_valid='1' 
                                               and sr_valid_prev='0') else
                      x"000000000000000";
+
+  q <= q_reg;
 
   --debug
   --q(55).data(2 downto 0) <= bx_in;
