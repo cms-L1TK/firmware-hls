@@ -185,7 +185,7 @@ begin  -- architecture rtl
   begin  -- process p_bx_count
     if rising_edge(clk_i) then          -- rising clock edge
       if s_ir_start = '1' then
-        if v_word_count < MAX_ENTRIES then
+        if v_word_count < MAX_ENTRIES_360 then
           v_word_count := v_word_count + 1;
         else
           v_word_count := 1;
