@@ -68,6 +68,9 @@ begin
   -- Link to Sector Processor formatter
   -----------------------------------------------------------------------------
   linktosecproc_1 : entity work.linktosecproc
+    generic map (
+      MAX_ENTRIES => MAX_ENTRIES_360
+    )
     port map (
       clk_i                => clk_360MHz,
       ttc_i                => ctrs,

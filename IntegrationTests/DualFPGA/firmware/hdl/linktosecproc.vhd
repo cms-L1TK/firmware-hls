@@ -36,6 +36,9 @@ use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f1.all;
 
 entity linktosecproc is
+  generic (
+    MAX_ENTRIES : natural := MAX_ENTRIES
+  );
   port (
     clk_i                : in  std_logic;
     ttc_i                : in  ttc_stuff_array(N_REGION - 1 downto 0);
@@ -181,14 +184,14 @@ begin  -- architecture rtl
 
         when S_ACTIVE =>
           --generate reset if beginning of EMP packet is not sync'd w/ counter
-          if (to_integer(sync_counter) = 107) then 
+          if (to_integer(sync_counter) = MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
             bx_int <= bx_int+1;
           else
             sync_counter <= sync_counter+1;
           end if;
           if (din_i(68).valid = '1' and valid_prev = '0'
-              and to_integer(sync_counter) /= 107) then 
+              and to_integer(sync_counter) /= MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
             s_ir_start <= '0';
             sp_reset_int <= '1';
@@ -197,7 +200,7 @@ begin  -- architecture rtl
 
         when S_RESET =>
           --return to idle after reset has been asserted for 2 BXs
-          if (to_integer(sync_counter) = 215) then 
+          if (to_integer(sync_counter) = 2*MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
             sp_reset_int <= '0';
             sectorprocessor_ctrl <= S_IDLE;
