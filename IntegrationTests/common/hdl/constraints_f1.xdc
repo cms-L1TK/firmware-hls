@@ -17,5 +17,7 @@ set_multicycle_path 2 -setup -start -from [get_clocks clk_360] -to [get_clocks c
 set_multicycle_path 1 -hold -from [get_clocks clk_360] -to [get_clocks clk_240]
 
 # Constraints from 240 to 360 MHz
-set_max_delay 2.778 -from [get_clocks clk_240] -to [get_clocks clk_360]
-set_min_delay 0.000 -from [get_clocks clk_240] -to [get_clocks clk_360]
+#set_max_delay 2.778 -from [get_clocks clk_240] -to [get_clocks clk_360] #-datapath_only
+#set_min_delay 0.000 -from [get_clocks clk_240] -to [get_clocks clk_360]
+set_multicycle_path 2 -setup -from [get_clocks clk_240] -to [get_clocks clk_360]
+set_multicycle_path 1 -hold -end -from [get_clocks clk_240] -to [get_clocks clk_360]
