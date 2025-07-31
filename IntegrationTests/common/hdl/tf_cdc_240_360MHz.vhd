@@ -24,7 +24,10 @@ constant number_of_frames  : integer  := 162;
 type t_state is ( reset, wordA, wordB );
 signal state: t_state := reset;
 
+type t_arr_lword is array(natural range <>) of lword;
+
 signal din: lword := LWORD_NULL;
+signal dout_reg: t_arr_lword(0 to 1) := (others => LWORD_NULL);
 signal dout: lword := LWORD_NULL;
 
 
@@ -54,10 +57,12 @@ if rising_edge( clk_360MHz_i ) then
 
   -- cdc
 
-  dout <= din;
+  dout_reg(0) <= din;
   if state = reset then
-    dout.data <= (others => '0');
+    dout_reg(0).data <= (others => '0');
   end if;
+  dout_reg(1) <= dout_reg(0);
+  dout <= dout_reg(1);
 end if;
 end process;
 
