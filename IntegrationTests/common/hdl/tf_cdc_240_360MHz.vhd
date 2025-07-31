@@ -24,10 +24,6 @@ constant number_of_frames  : integer  := 162;
 type t_state is ( reset, wordA, wordB );
 signal state: t_state := reset;
 
-signal valid: std_logic := '0';
-
-signal sr: std_logic_vector( 0 to number_of_frames - 1 ) := ( others => '0' );
-
 signal din: lword := LWORD_NULL;
 signal dout: lword := LWORD_NULL;
 
@@ -49,9 +45,6 @@ end process;
 process ( clk_360MHz_i ) is
 begin
 if rising_edge( clk_360MHz_i ) then
-
-  valid <= din_i.valid;
-  sr <= '0' & sr( sr'low to sr'high - 1 );
 
   -- state
   state <= t_state'low;
