@@ -21,3 +21,8 @@ set_multicycle_path 1 -hold -from [get_clocks clk_360] -to [get_clocks clk_240]
 #set_min_delay 0.000 -from [get_clocks clk_240] -to [get_clocks clk_360]
 set_multicycle_path 2 -setup -from [get_clocks clk_240] -to [get_clocks clk_360]
 set_multicycle_path 1 -hold -end -from [get_clocks clk_240] -to [get_clocks clk_360]
+
+set_property EQUIVALENT_DRIVER_OPT KEEP [get_cells payload/tf1_wrapper_1/SectorProcessor_1/*/PIPELINE_SLR_XING[*].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_*/*pipe*]
+set_property EQUIVALENT_DRIVER_OPT KEEP [get_cells payload/tf1_wrapper_1/SectorProcessor_1/*/PIPELINE_SLR_XING[*].AUTO_PIPELINE_OFF.USE_SRL_OFF.PIPELINE_*]
+set_property EQUIVALENT_DRIVER_OPT KEEP [get_cells payload/tf1_wrapper_1/SectorProcessor_1/LATCH_*]
+set_property EQUIVALENT_DRIVER_OPT KEEP [get_cells payload/tf1_wrapper_1/SectorProcessor_1/*_DELAY]
