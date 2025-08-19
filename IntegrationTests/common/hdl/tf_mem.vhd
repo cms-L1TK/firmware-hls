@@ -44,6 +44,7 @@ entity tf_mem is
     clkb      : in  std_logic;                                      --! Read clock
     wea       : in  std_logic;                                      --! Write enable
     enb       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    rsta      : in  std_logic;                                      --! Input reset
     rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
     regceb    : in  std_logic;                                      --! Output register enable
     addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
@@ -111,7 +112,7 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
-  variable sync_nent_prev : std_logic := '0';
+  variable init   : std_logic := '1'; -- Clock counter
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
@@ -131,7 +132,7 @@ begin
       end if;
     end if;
     slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent='1' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
+    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
       --report time'image(now)&" tf_mem "&NAME&" increment vi_clk_cnt:"&integer'image(vi_clk_cnt);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
@@ -149,12 +150,15 @@ begin
       nent_o(to_integer(unsigned(slv_page_cnt))) <= (others => '0');
     end if;
     --use sync_nent transition to synchronize at BX (page) 1
-    if (sync_nent='1') and (sync_nent_prev='0') then
+    if (rsta='1') then
+      init := '1';
+      slv_page_cnt := (others => '0');
+    elsif (sync_nent='1') and (init='1') then
       --report time'image(now)&" tf_mem "&NAME&" sync_nent";
+      init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
-    sync_nent_prev := sync_nent;
     if (wea='1') then
       overwrite := addra(0);
       --vi_page_cnt_slv := std_logic_vector(to_unsigned(vi_page_cnt_save,vi_page_cnt_slv'length));
