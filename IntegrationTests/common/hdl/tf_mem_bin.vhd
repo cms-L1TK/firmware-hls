@@ -289,7 +289,7 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
-  variable init   : std_logic := '1'; -- Clock counter
+  variable init   : std_logic := '1'; 
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
@@ -333,11 +333,11 @@ begin
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" validbinmask: "&to_bstring(slv_page_cnt);
       validbinmask(NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt))+1)-1 downto NUM_RZ_BINS*(to_integer(unsigned(slv_page_cnt)))) <= (others => '0');
     end if;
-    --use sync_nent transition to synchronize at BX (page) 1
     if (rsta='1') then
       init := '1';
       slv_page_cnt := (others => '0');
     elsif (sync_nent='1') and (init='1') then
+      --use sync_nent transition to synchronize at BX (page) 1
       --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
       init := '0';
       slv_clk_cnt := (others => '0');
