@@ -45,6 +45,7 @@ entity tf_mem_tpar is
     clkb      : in  std_logic;                                      --! Read clock
     wea       : in  std_logic;                                      --! Write enable
     enb       : in  std_logic;                                      --! Read Enable, for additional power savings, disable when not in use
+    rsta      : in  std_logic;                                      --! Input reset
     rstb      : in  std_logic;                                      --! Output reset (does not affect memory contents)
     regceb    : in  std_logic;                                      --! Output register enable
     addra     : in  std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0); --! Write address bus, width determined from RAM_DEPTH
@@ -115,7 +116,7 @@ assert (PAGE_LENGTH = 128) report "PAGE_LENGTH in tf_mem_tpar has to be 128" sev
 
 
 process(clka)
-  variable sync_nent_prev : std_logic := '0';
+  variable init   : std_logic := '1'; 
   variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
   variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
@@ -144,7 +145,7 @@ begin
     --end if;
 
     slv_page_cnt_save := slv_page_cnt;
-    if (sync_nent = '1' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
+    if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
       slv_clk_cnt := (others => '0');
@@ -157,13 +158,16 @@ begin
       -- Note that we don't zero the nent_o counters here. When adding entry we
       -- reset the nent_o counter if the mask is zero
     end if;
-    --use sync_nent transition to synchronize at BX (page) 1
-    if (sync_nent='1') and (sync_nent_prev='0') then
-      --report time'image(now)&" tf_mem_tpar "&NAME&" sync_nent";
+    if (rsta='1') then
+      init := '1';
+      slv_page_cnt := (others => '0');
+    elsif (sync_nent='1') and (init='1') then
+      --use sync_nent transition to synchronize at BX (page) 1
+      --report time'image(now)&" tf_mem "&NAME&" sync_nent";
+      init := '0';
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
-    sync_nent_prev := sync_nent;
 
     if (wea='1') then
       tpage := addra(clogb2(NUM_TPAGES)-1 downto 0);
