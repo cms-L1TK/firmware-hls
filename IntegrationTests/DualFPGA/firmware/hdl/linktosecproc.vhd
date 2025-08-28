@@ -38,10 +38,10 @@ use work.memUtil_aux_pkg_f1.all;
 entity linktosecproc is
   port (
     clk_i                : in  std_logic;
-    rst_i                : in  std_logic;
     ttc_i                : in  ttc_stuff_array(N_REGION - 1 downto 0);
     din_i                : in  ldata(4 * N_REGION - 1 downto 0);
     ir_start_o           : out std_logic;
+    sp_reset             : out std_logic;
     bx_o                 : out std_logic_vector(2 downto 0);
     DL_39_link_AV_dout   : out t_arr_DL_39_DATA;
     DL_39_link_empty_neg : out t_arr_DL_39_1b;
@@ -58,9 +58,16 @@ architecture rtl of linktosecproc is
   -- signal s_tracklet_reset : t_resets(numPPquads - 1 downto 0);
   -- signal s_tracklet_isol  : t_stubsDTC;
   -- signal s_tracklet_data  : t_datas(numInputsIR - 1 downto 0);
+  signal s_din_d         : t_arr_ldata := (others => (others => LWORD_NULL));
+
+  type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET);
+  signal valid_prev      : std_logic := '0';
+  signal sectorprocessor_ctrl    : enum_RESET_STATE  := S_IDLE;
+  signal sync_counter    : unsigned(7 downto 0) := (others => '0');
   signal s_ir_start      : std_logic;
   signal s_ir_start_srff : std_logic;
-  signal s_din_d         : t_arr_ldata := (others => (others => LWORD_NULL));
+  signal bx_int          : unsigned(2 downto 0) := (others => '0');
+  signal sp_reset_int    : std_Logic := '0';
 
 begin  -- architecture rtl
 
@@ -151,36 +158,59 @@ begin  -- architecture rtl
   DL_39_link_AV_DOUT(neg2S_6_B)    <= s_din_d(IR_LATENCY-1)(119).data(38 downto 0);
 
   -----------------------------------------------------------------------------
-  -- Generate start signal
+  -- Generate start signal, reset signal, and BX
   -----------------------------------------------------------------------------
-  set_reset_ffd_1 : entity work.set_reset_ffd
-    port map (
-      clk_i   => clk_i,
-      set_i   => din_i(68).valid,
-      reset_i => rst_i,
-      q_o     => s_ir_start_srff
-      );
+
+  p_sectorprocessor_ctrl : process (clk_i) is
+  begin 
+    if rising_edge(clk_i) then 
+      valid_prev <= din_i(68).valid;
+
+      --FSM to control start/reset signals to SectorProcessor
+      case sectorprocessor_ctrl is
+        when S_IDLE =>
+          --generate start upon beginning of EMP valid
+          if (din_i(68).valid = '1' and valid_prev = '0') then
+            sync_counter <= (others => '0');
+            bx_int <= (others => '0');
+            s_ir_start <= '1';
+            sectorprocessor_ctrl <= S_ACTIVE;
+          end if;
+
+        when S_ACTIVE =>
+          --generate reset if beginning of EMP packet is not sync'd w/ counter
+          if (to_integer(sync_counter) = 107) then 
+            sync_counter <= (others => '0');
+            bx_int <= bx_int+1;
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+          if (din_i(68).valid = '1' and valid_prev = '0'
+              and to_integer(sync_counter) /= 107) then 
+            sync_counter <= (others => '0');
+            s_ir_start <= '0';
+            sp_reset_int <= '1';
+            sectorprocessor_ctrl <= S_RESET;
+          end if;
+
+        when S_RESET =>
+          --return to idle after reset has been asserted for 2 BXs
+          if (to_integer(sync_counter) = 215) then 
+            sync_counter <= (others => '0');
+            sp_reset_int <= '0';
+            sectorprocessor_ctrl <= S_IDLE;
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+
+      end case;
+
+    end if; --rising clock edge
+  end process p_sectorprocessor_ctrl;
 
   --With current IR setup latency, IR_Start needs to come up 4 clock cycles
   --before first data
-  s_ir_start <= din_i(68).valid or s_ir_start_srff;
   ir_start_o <= s_ir_start;
-
-  p_bx_count : process (clk_i) is
-    variable v_bx         : natural;
-    variable v_word_count : natural := 1;
-  begin  -- process p_bx_count
-    if rising_edge(clk_i) then          -- rising clock edge
-      if s_ir_start = '1' then
-        if v_word_count < MAX_ENTRIES then
-          v_word_count := v_word_count + 1;
-        else
-          v_word_count := 1;
-          v_bx         := v_bx + 1;
-        end if;
-      end if;
-      bx_o <= std_logic_vector(to_unsigned(v_bx, bx_o'length));
-    end if;
-  end process p_bx_count;
+  bx_o <= std_logic_vector(bx_int);
 
 end architecture rtl;

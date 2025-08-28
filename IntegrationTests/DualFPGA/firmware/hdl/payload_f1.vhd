@@ -42,6 +42,7 @@ architecture rtl of emp_payload is
 
   signal s_IR_data             : t_arr_DL_39_DATA;
   signal s_ir_start            : std_logic;
+  signal sp_reset              : std_logic;
   signal s_bx                  : std_logic_vector(2 downto 0);
   signal tp_bx                 : std_logic_vector(2 downto 0);
   signal s_TP_bx_out_vld       : std_logic;
@@ -65,10 +66,10 @@ begin
   linktosecproc_1 : entity work.linktosecproc
     port map (
       clk_i                => clk_p,
-      rst_i                => rst,
       ttc_i                => ctrs,
       din_i                => d,
       ir_start_o           => s_ir_start,
+      sp_reset             => sp_reset,
       bx_o                 => s_bx,
       DL_39_link_AV_dout   => s_IR_data,
       DL_39_link_empty_neg => open,
@@ -81,7 +82,7 @@ begin
   tf1_wrapper_1 : entity work.tf1_wrapper
     port map (
       clk                      => clk_p,
-      reset                    => rst,
+      reset                    => sp_reset,
       IR_start                 => s_ir_start,
       IR_bx_in                 => s_bx,
       TP_bx_out_0              => tp_bx,
