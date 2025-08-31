@@ -44,5 +44,9 @@ if __name__=='__main__':
       if memory=='BX':
         continue
       print(memory)
-      compare_bitmap_list(tf_words_ref[memory],
-                          strip_leading_bits(tf_words_board[memory],1))
+      if memprint_ref:
+        compare_bitmap_list(tf_words_ref[memory],
+                            strip_leading_bits(tf_words_board[memory],1))
+      else:
+        compare_bitmap_list(strip_leading_bits(tf_words_ref[memory],1),
+                            strip_leading_bits(tf_words_board[memory],1))
