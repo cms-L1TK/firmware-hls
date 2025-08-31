@@ -51,7 +51,7 @@ end entity linktosecproc;
 
 architecture rtl of linktosecproc is
 
-  constant IR_LATENCY : natural := 4;
+  constant IR_LATENCY : natural := 6;
 
   type t_arr_ldata is array(IR_LATENCY-1 downto 0) of ldata(119 downto 68); 
 
