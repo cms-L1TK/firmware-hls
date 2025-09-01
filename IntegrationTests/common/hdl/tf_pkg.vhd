@@ -105,6 +105,7 @@ package tf_pkg is
   type t_arr_7b  is array(integer range<>) of std_logic_vector(6 downto 0);
   type t_arr_6b  is array(integer range<>) of std_logic_vector(5 downto 0);
   subtype t_arr2_7b is t_arr_7b(0 to 1);
+  subtype t_arr4_7b is t_arr_7b(0 to 3);
   subtype t_arr2_6b is t_arr_6b(0 to 1);
   subtype t_arr2_4b is t_arr_4b(0 to 1);
   subtype t_arr8_7b is t_arr_7b(0 to 7);
