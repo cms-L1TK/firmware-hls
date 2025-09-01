@@ -26,6 +26,7 @@ use work.tf_pkg.all;
 
 entity tf_merge_streamer is
   generic (
+    NAME            : string := "MERGERNAME";          --! Name of mem for printout
     RAM_WIDTH:  natural := 72;
     NUM_PAGES   :   natural := 8;
     RAM_DEPTH   : natural := NUM_PAGES * PAGE_LENGTH;
@@ -80,7 +81,6 @@ architecture RTL of tf_merge_streamer is
   signal bx_in_latch : std_logic_vector(2 downto 0) := "111"; --since output triggered by BX change, initializing bx_in_latch to 7 will start write on first valid bx (0)
   signal mem_count : mem_count_arr := (others => 0);
   signal toread : toread_arr := (others => 0);
-  signal current_page: natural := 7 mod NUM_PAGES;
   signal readmask : std_logic_vector(MAX_INPUTS-1 downto 0) := (others => '0');
 
 begin
@@ -90,22 +90,71 @@ begin
   variable bx_change : boolean := false; -- indicates to the module whether or not the bx has changed compared to the previous clock
   variable nextread : integer range 0 to 3 := 0;
   variable mem_count_next : mem_count_arr := (others => 0);
+  variable current_page: natural := 7 mod NUM_PAGES;
+  variable current_page_save: natural := 7 mod NUM_PAGES;
+  variable bx_in_latch : std_logic_vector(2 downto 0) := "111"; --since output triggered by BX change, initializing bx_in_latch to 7 will start write on first valid bx (0)
+
+  variable bx_in_vld_1 : std_logic := '0';
+  variable bx_in_vld_2 : std_logic := '0';
+  variable bx_in_vld_3 : std_logic := '0';
 
   begin
     if rising_edge(clk) then
-      if (bx_in_vld = '1') then
-        bx_in_latch <= bx_in;
-        current_page <= to_integer(unsigned(bx_in)) mod NUM_PAGES;
+
+      bx_in_vld_3 := bx_in_vld_2;
+      bx_in_vld_2 := bx_in_vld_1;
+      bx_in_vld_1 := bx_in_vld;
+
+      current_page_save := current_page;
+
+      if (bx_in_vld_3 = '1') then
+        bx_in_latch := bx_in;
+        current_page := to_integer(unsigned(bx_in)) mod NUM_PAGES;
       end if;
+
+      bx_change := (bx_last /= bx_in_latch);
+
+      --report "tf_merge_streamer "&time'image(now)&" "&NAME&" bx_in_vld="&to_bstring(bx_in_vld)&" bx_in_vld_3="&to_bstring(bx_in_vld_3)&" bx_in="&to_bstring(bx_in)&" bx_change="&boolean'image(bx_change)&" current_page="&natural'image(current_page)&" nent0="&to_bstring(nent0(current_page));
 
       nent_arr := (nent3,nent2,nent1,nent0); --repackage nent and din as arrays
       din_arr := (din3, din2, din1, din0);
-      bx_change := (bx_last /= bx_in_latch);
+
+
+      for i in 0 to NUM_INPUTS-1 loop
+        mem_count_next(i) := mem_count(i);
+      end loop;
+
+      if (to_integer(unsigned(readmask)) = 0) then
+        valid(0) <= '0';
+      else
+        --report "tf_merge_streamer "&time'image(now)&" "&NAME&" readmask="&to_bstring(readmask)&" nextread="&integer'image(nextread)&" mem_count(nextread)="&integer'image(mem_count(nextread));
+        valid(0) <= '1';
+        --loop through starting with the next input in front of the current to-read (round-robin)
+        for i in 0 to 3 loop
+          if (readmask((toread(0) - i) mod 4) = '1') then
+            nextread := (toread(0) - i) mod 4;
+          end if;
+        end loop;
+        addr_arr_int(nextread) <= std_logic_vector(to_unsigned(current_page_save*page_length + mem_count(nextread), LOG2_RAM_DEPTH));
+        mem_count(nextread) <= mem_count(nextread) + 1;
+        toread(0) <= nextread;
+        mem_count_next(nextread) := mem_count_next(nextread)+1;
+      end if;
+
+      --check if memory read counter is less than nentries
+      --this sets readmask to 1 for any inputs that still have words to read
+      for i in 0 to NUM_INPUTS-1 loop
+        if ((mem_count_next(i)) < to_integer(unsigned(nent_arr(i)(current_page)))) then
+          readmask(i) <= '1';
+        else
+          readmask(i) <= '0';
+        end if;
+      end loop;
 
       if (bx_change) then --reset with rst signal or a change in bx
         mem_count <= (others => 0);
-        toread(0) <= (NUM_INPUTS-1) mod NUM_INPUTS;
-        valid(0) <= '0';
+        --toread(0) <= (NUM_INPUTS-1) mod NUM_INPUTS;
+        --valid(0) <= '0';
 
         --check if memory read counter is less than nentries
         --this sets readmask to 1 for any inputs that still have words to read
@@ -116,41 +165,6 @@ begin
             readmask(i) <= '0';
           end if;
         end loop;
-        
-      else
-        --only check for valid reads on non BX change clocks
-        --this gives up a clock cycle, but reduces logic levels downstream
-
-        for i in 0 to NUM_INPUTS-1 loop
-          mem_count_next(i) := mem_count(i);
-        end loop;
-
-        if (to_integer(unsigned(readmask)) = 0) then
-          valid(0) <= '0';
-        else
-          valid(0) <= '1';
-          --loop through starting with the next input in front of the current to-read (round-robin)
-          for i in 0 to 3 loop
-            if (readmask((toread(0) - i) mod 4) = '1') then
-              nextread := (toread(0) - i) mod 4;
-            end if;
-          end loop;
-          addr_arr_int(nextread) <= std_logic_vector(to_unsigned(current_page*page_length + mem_count(nextread), LOG2_RAM_DEPTH));
-          mem_count(nextread) <= mem_count(nextread) + 1;
-          toread(0) <= nextread;
-          mem_count_next(nextread) := mem_count_next(nextread)+1;
-        end if;
-
-        --check if memory read counter is less than nentries
-        --this sets readmask to 1 for any inputs that still have words to read
-        for i in 0 to NUM_INPUTS-1 loop
-          if ((mem_count_next(i)) < to_integer(unsigned(nent_arr(i)(current_page)))) then
-            readmask(i) <= '1';
-          else
-            readmask(i) <= '0';
-          end if;
-        end loop;
-
       end if ;
 
       --generate output a few clocks after address is set to account for delay in RAMs

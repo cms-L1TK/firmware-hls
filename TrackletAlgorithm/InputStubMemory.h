@@ -288,6 +288,6 @@ private:
 
 
 // Memory definition
-template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 1, kNBits_MemAddr>;
+template<int ISType> using InputStubMemory = MemoryTemplate<InputStub<ISType>, 2, kNBits_MemAddr>;
 
 #endif

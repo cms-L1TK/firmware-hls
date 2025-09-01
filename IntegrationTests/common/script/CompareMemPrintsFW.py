@@ -151,7 +151,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         if verbose: print(data) # Can also just do data.head()
 
         #Need to figure out how to handle the memory "overwrite" - this is a bit of a hack...
-        if (not is_binned) and ("TF_" not in comparison_filename) and ("AS_" not in comparison_filename):
+        if (not is_binned) and ("TF_" not in comparison_filename) and ("AS_" not in comparison_filename) and ("MPAR_" not in comparison_filename):
             rows = []
             for index, row in data.iterrows():
                 if row['ADDR'] == "0x01":
@@ -186,6 +186,16 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                     rows.append(index)
             data=data.drop(rows)
 
+        # Hack to remove bin address
+        if "MPAR_" in comparison_filename:
+            for index, row in data.iterrows():
+                adata = row['DATA']
+                adata=adata.replace("0x8", "0x0")
+                adata=adata.replace("0xA", "0x0")
+                adata=adata.replace("0xC", "0x0")
+                adata=adata.replace("0xE", "0x0")
+                data.loc[index, 'DATA'] = adata
+
         # Sort data by ascending address
         if is_binned:
             data.sort_values(by=['BX','ADDR','DATA'], inplace = True)
@@ -208,7 +218,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             selected_rows = selected_columns.loc[selected_columns['BX'] == ievent]
 
             # Hack for FPGA1 Project as BX off by 0ne
-            if "AS_" in comparison_filename and "n1" in comparison_filename:
+            if ("AS_" in comparison_filename and "n1" in comparison_filename)  or "MPAR_" in comparison_filename:
                 selected_rows = selected_columns.loc[selected_columns['BX']-1 == ievent]
 
             if len(selected_rows) == 0 and len(event) != 0:
@@ -260,7 +270,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                     good = False
                     number_of_value_mismatches += 1
                     message = "The values for event "+str(ievent)+" address "+str(selected_rows['ADDR'][offset+ival])+" do not match!"\
-                              "\n\treference="+str(data)+" comparison="+str(selected_rows['DATA'][offset+ival])
+                              "\n\treference="+str(data)+" comparison="+str(adata)
                     if fail_on_error: raise Exception(message)
                     else:             print("\t\t"+message.replace("\n","\n\t\t"))
 
