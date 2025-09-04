@@ -191,9 +191,13 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             for index, row in data.iterrows():
                 adata = row['DATA']
                 adata=adata.replace("0x8", "0x0")
+                adata=adata.replace("0x9", "0x1")
                 adata=adata.replace("0xA", "0x0")
+                adata=adata.replace("0xB", "0x1")
                 adata=adata.replace("0xC", "0x0")
+                adata=adata.replace("0xD", "0x1")
                 adata=adata.replace("0xE", "0x0")
+                adata=adata.replace("0xF", "0x1")
                 data.loc[index, 'DATA'] = adata
 
         # Sort data by ascending address

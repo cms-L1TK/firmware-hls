@@ -685,6 +685,8 @@ TF::seed Seed, // seed layer combination (TP::L1L2, TP::L3L4, etc.)
 		    const BXType bx,  BXType& bx_o, const LUTTYPE lut[lutsize], const AllStubInnerMemory<InnerRegion<Seed>()> innerStubs[NASMemInner], const AllStubMemory<OuterRegion<Seed>()>* outerStubs, const VMStubMemory<OuterRegion<Seed>(),kNbitsrzbin,kNbitsphibin,NVMSTECopy, true>* outerVMStubs, TrackletParameterMemory * const trackletParameters, TrackletProjectionMemory<BARRELPS> projout_barrel_ps[TP::N_PROJOUT_BARRELPS], TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S], TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK]
   )
 {
+#pragma HLS latency min=37 max=37
+  
   constexpr bool diskSeed = (Seed == TF::D1D2 || Seed == TF::D3D4);
   constexpr bool overlapSeed = (Seed == TF::L1D1 || Seed == TF::L2D1);
   constexpr bool L1InnerSeed = (Seed == TF::L1L2 || Seed == TF::L1D1) ;
