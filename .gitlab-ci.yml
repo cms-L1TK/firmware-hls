@@ -233,7 +233,7 @@ TM-vivado-hls-build:
 # FW simulation ---------------
 topReducedCombinedFPGA1-sim:
   <<: *template_topTF-sim
-  allow_failure: true
+  allow_failure: false
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedCombinedConfig_FPGA1"
@@ -256,7 +256,7 @@ topReducedCombinedFPGA1-sim:
 # Check FW results ---------------
 topReducedCombinedFPGA1-check-results:
   <<: *template_check-results
-  allow_failure: true # FIXME: remove after all errors are fixed
+  allow_failure: false
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "ReducedCombinedConfig_FPGA1"
@@ -266,7 +266,7 @@ topReducedCombinedFPGA1-check-results:
 # FW synthesis ---------------
 topReducedCombinedFPGA1-synth:
   <<: *template_topTF-synth
-  allow_failure: true
+  allow_failure: false
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedCombinedConfig_FPGA1"
@@ -278,7 +278,7 @@ topReducedCombinedFPGA1-synth:
 # FW simulation ---------------
 topReducedCombinedFPGA2-sim:
   <<: *template_topTF-sim
-  allow_failure: true
+  allow_failure: false
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedCombinedConfig_FPGA2"
@@ -301,7 +301,7 @@ topReducedCombinedFPGA2-sim:
 # Check FW results ---------------
 topReducedCombinedFPGA2-check-results:
   <<: *template_check-results
-  allow_failure: true # FIXME: remove after all errors are fixed
+  allow_failure: false
   variables:
     VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
     PROJ_NAME: "ReducedCombinedConfig_FPGA2"
@@ -311,7 +311,7 @@ topReducedCombinedFPGA2-check-results:
 # FW synthesis ---------------
 topReducedCombinedFPGA2-synth:
   <<: *template_topTF-synth
-  allow_failure: true
+  allow_failure: false
   variables:
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "ReducedCombinedConfig_FPGA2"
