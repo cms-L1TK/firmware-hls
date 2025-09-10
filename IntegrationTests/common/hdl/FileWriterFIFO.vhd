@@ -20,7 +20,9 @@ use work.tf_pkg.all;
 entity FileWriterFIFO is
   generic (
     FILE_NAME  : string;   --! Name of .txt file to be written
-    FIFO_WIDTH  : natural    --! Data width
+    FIFO_WIDTH  : natural;    --! Data width
+    BX_CNT_INIT : integer := 0; --! allows to set offset to allign with BX
+    DONE_DELAY  : natural := 0    --! Delay for DONE signal to update BX_CNT
   );
   port (
     CLK      : in  std_logic;
@@ -40,9 +42,10 @@ procFile : process(CLK)
   variable FILE_STATUS : file_open_status;
   file     FILE_OUT    : text;   
   variable LINE_OUT    : line;                              
-  variable BX_CNT      : natural := 0;  --! Event counter
+  variable BX_CNT      : integer := 0;  --! Event counter
   variable ADDR        : std_logic_vector(7 downto 0) := (others => '0');  --! Entry counter
   constant TXT_WIDTH   : natural := 11; --! Column width in output .txt file
+  variable delay       : std_logic_vector(DONE_DELAY downto 0) := (others => '0');
 
   function to_hexstring ( VAR : std_logic_vector) return string is
   -- Convert to string, with "0x" prefix.
@@ -71,7 +74,7 @@ begin
 
     -- Write data from events
 
-    if (WRITE_EN = '1' and BX_CNT < MAX_EVENTS) then 
+    if (WRITE_EN = '1' and (BX_CNT+BX_CNT_INIT) < MAX_EVENTS) then
       -- Valid data, so write it to file.
       write(LINE_OUT, NOW   , right, TXT_WIDTH); 
       write(LINE_OUT, BX_CNT, right, TXT_WIDTH);
@@ -81,16 +84,22 @@ begin
       ADDR := std_logic_vector(unsigned(ADDR) + "1");
     end if;
 
-    if (DONE = '1') then
+    delay(DONE_DELAY) := DONE;
+
+    if (delay(0) = '1') then
       -- Module has finished event, so increment event counter.
       BX_CNT := BX_CNT + 1;
       ADDR := (others => '0');
 
-      if (BX_CNT = MAX_EVENTS) then
+      if ((BX_CNT+BX_CNT_INIT) = MAX_EVENTS) then
         -- All events processed, so close file.
         file_close(FILE_OUT);
       end if;
     end if;
+    for i in 0 to DONE_DELAY-1 loop
+      delay(i) := delay(i+1);
+    end loop;
+
   end if;
 
 end process procFile;

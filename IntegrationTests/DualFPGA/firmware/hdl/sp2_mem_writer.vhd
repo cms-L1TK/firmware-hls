@@ -36,7 +36,6 @@ end entity sp2_mem_writer;
 architecture rtl of sp2_mem_writer is
 
   type t_arr_AS_36_7b is array(enum_AS_36_f1) of std_logic_vector(6 downto 0);
-  type t_arr4_7b is array(0 to 3) of std_logic_vector(6 downto 0);
   type t_arr_MTPAR_73_arr4_7b is array(enum_MTPAR_73) of t_arr4_7b;
   type t_arr_MTPAR_73_2b is array(enum_MTPAR_73) of std_logic_vector(1 downto 0);
 

@@ -290,6 +290,7 @@ assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" seve
 
 process(clka)
   variable init   : std_logic := '1'; 
+  variable new_bx   : boolean := false; 
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
@@ -317,11 +318,13 @@ process(clka)
   
 begin
   if rising_edge(clka) then
+    new_bx := false;
     slv_page_cnt_save := slv_page_cnt;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
       slv_clk_cnt := (others => '0');
+      new_bx := true;
       validbinmasktmp <= (others => '0');
       nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
       --report "tf_mem_bin "&time'image(now)&" "&NAME&" setting nentry_mask_tmp to zero";
@@ -364,8 +367,12 @@ begin
 
       if (binaddr /= "1111") then
 
-        nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
-        nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
+        -- Protect against over writing nentry_tmp and nentry_mask_tmp if reset
+        -- earlier due to going to new BX. Can this be done more cleanly?
+        if (new_bx = false) then
+          nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
+          nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
+        end if;
 
         phimask := ( 0 => '1', others => '0');
         phimask := std_logic_vector(shift_left(unsigned(phimask), to_integer(unsigned(phibits))));
@@ -384,7 +391,7 @@ begin
       
       
         writeaddr := slv_page_cnt_save & vi_nent_idx & std_logic_vector(binaddr);
-        --report time'image(now)&" tf_mem_bin: " & NAME & " writeaddr: " & to_bstring(writeaddr) & " data: " & to_bstring(dina);
+        --report time'image(now)&" tf_mem_bin: " & NAME & " vi_nent_idx=" & to_hstring(vi_nent_idx) & " nentry_mask_tmp(vi_nent_idx)=" & to_bstring(nentry_mask_tmp(to_integer(unsigned(vi_nent_idx)))) & " nentry_tmp(vi_nent_idx)=" & to_hstring(nentry_tmp(to_integer(unsigned(vi_nent_idx)))) & " writeaddr: " & to_hstring(writeaddr) & " data: " & to_hstring(dina);
         for icopy in 0 to NUM_COPY-1 loop
           sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina;
         end loop;
@@ -476,8 +483,7 @@ begin
 
     for i in 0 to NUM_COPY-1 loop
       if (enb(i)='1') then
-        --report "tf_mem_bin read addrb"&integer'image(i)&" "&time'image(now)&" "& NAME & " " & to_bstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))
-        --  &" "&to_bstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))));
+       -- report "tf_mem_bin read addrb "&NAME&" "&integer'image(i)&" "&time'image(now)&" "& NAME & " " & to_hstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))&" "&to_hstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))))&" "&to_bstring(validbinmask(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7)))))&" "&to_bstring(binmaskA(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7))))(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-5 downto i*RAM_DEPTH_BITS+4)))));
         sv_RAM_row(i) <= sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))));
       end if;
     end loop;  
