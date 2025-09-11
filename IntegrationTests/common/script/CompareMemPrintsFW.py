@@ -135,7 +135,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         print("Comparing TB results "+str(comparison_filename)+" to ref. file "+str(reference_filename)+" ... ")
 
         # Read column names from comparison file
-        column_names = list(pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',nrows=1))
+        column_names = list(pd.read_csv(file_location+"/"+comparison_filename,sep='\\s+',nrows=1))
         if verbose: print(column_names)
 
         # Check if binned memory
@@ -147,7 +147,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         column_selections = ['TIME', '(ns)', 'BX', 'CLK', 'ADDR', 'DATA']
 
         # Open the comparison (= VHDL test-bench output) data
-        data = pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
+        data = pd.read_csv(file_location+"/"+comparison_filename,sep='\\s+',header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
         #Remove duplicate addresses - this means we overwrote data, e.g. in the FM
@@ -327,7 +327,6 @@ def comparePredefined(args):
     comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.dat") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f and "DW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
     reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
-    print(reference_filename_list)
     try:
         reference_filename_list = [glob.glob(reference_dir+"*/*"+f+"*.dat")[0] for f in reference_filename_list] # Find the corresponding reference filenames
     except IndexError :
