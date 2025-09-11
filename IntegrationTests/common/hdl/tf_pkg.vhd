@@ -193,6 +193,15 @@ package tf_pkg is
     n_entries_p2    : in t_arr8_8b;    --! Number of entries per page
     n_entries_p2_we : in t_arr8_1b     --! Number of entries per page write enable
   );
+  procedure write_data(
+    INITIALIZED : in boolean;
+    file_path : in string;
+    tm : in string;
+    bx : in string;
+    clk : in string;
+    addr : in string;
+    data : in string
+  );
 
 end package tf_pkg;
 
@@ -513,5 +522,35 @@ package body tf_pkg is
     writeline (file_out, line_out); -- Write line
     file_close(file_out);
   end write_emData_line_8p;
+
+  procedure write_data(
+    INITIALIZED : boolean;
+    file_path : string;
+    tm : string;
+    bx : string;
+    clk : string;
+    addr : string;
+    data : string) is
+    file file_out : text ;
+    variable line_out : line;
+    variable FILE_STATUS : file_open_status;
+  begin
+    if (not INITIALIZED) then
+      file_open(FILE_STATUS, file_out, file_path, WRITE_MODE);
+      assert (FILE_STATUS = open_ok) report "Failed to open file "&file_path severity FAILURE;
+      write(line_out, string'(" TIME (ns)      BX     CLK    ADDR                     DATA"));
+      writeline(file_out, line_out);
+    else
+      file_open(FILE_STATUS, file_out, file_path, APPEND_MODE);
+      assert (FILE_STATUS = open_ok) report "Failed to open file "&file_path severity FAILURE;
+    end if;
+    write(line_out, NOW, right, 10);
+    write(line_out, bx, right, 8);
+    write(line_out, string'("0x")&clk, right, 8);
+    write(line_out, string'("0x")&addr, right, 8);
+    write(line_out, string'("0x")&data, right, 25);
+    writeline(file_out, line_out);
+    file_close(file_out);
+  end write_data;
 
 end package body tf_pkg;

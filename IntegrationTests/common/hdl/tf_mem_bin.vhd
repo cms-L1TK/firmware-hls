@@ -86,7 +86,10 @@ entity tf_mem_bin is
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; 
 
     --! Memory name - used for debugging
-    NAME            : string := "MEMNAME"
+    NAME            : string := "MEMNAME";
+    FILE_WRITE      : boolean := true              --! If set to true will
+                                                   --write debug output for memory
+
     );  
   port (
 
@@ -289,12 +292,18 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
+  file file_out : text;
+  variable initialized   : boolean := false;
+
   variable init   : std_logic := '1'; 
   variable new_bx   : boolean := false; 
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
+  variable slv_clk_cnt_save   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
   variable slv_page_cnt_save  : std_logic_vector(NUM_PAGES_BITS-1 downto 0) := (others => '0');  -- Page counter
+  variable bx                   : integer := 0;
+  variable bx_save              : integer := 0;
 
   --! Extract phi and rz bin address
   alias vi_nent_idx  : std_logic_vector(NUM_PHI_BITS+NUM_RZ_BITS-1 downto 0) is addra(NUM_PHI_BITS + NUM_RZ_BITS - 1 downto 0);
@@ -320,10 +329,13 @@ begin
   if rising_edge(clka) then
     new_bx := false;
     slv_page_cnt_save := slv_page_cnt;
+    slv_clk_cnt_save := slv_clk_cnt;
+    bx_save := bx;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
       slv_clk_cnt := (others => '0');
+      bx := bx + 1;
       new_bx := true;
       validbinmasktmp <= (others => '0');
       nentry_mask_tmp <= (others => '0'); -- Do we need this??? FIXME
@@ -343,6 +355,7 @@ begin
       --use sync_nent transition to synchronize at BX (page) 1
       --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
       init := '0';
+      bx := 1;
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
       validbinmasktmp <= (others => '0');
@@ -395,7 +408,11 @@ begin
         for icopy in 0 to NUM_COPY-1 loop
           sa_RAM_data(icopy)(to_integer(unsigned(writeaddr))) <= dina;
         end loop;
-      
+        if FILE_WRITE then
+          write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), to_hstring(slv_clk_cnt_save), to_hstring(vi_nent_idx), to_hstring(dina) );
+        end if;
+        initialized := true;
+
         --report "tf_mem_bin write nent :"&time'image(now)&" "&NAME&" phi:"&to_bstring(phibits)&" rz:"&to_bstring(rzbits)&" "&to_bstring(nentry)&" "&to_bstring(writeaddr);
 
         if (to_integer(unsigned(phibits)) = 0) then
