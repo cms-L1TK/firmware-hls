@@ -191,8 +191,10 @@ begin
         address := nentaddress&std_logic_vector(to_unsigned(0, nent_o(to_integer(unsigned(nentaddress)))'length));
         nent_o(to_integer(unsigned(nentaddress))) <= std_logic_vector(to_unsigned(1, nent_o(to_integer(unsigned(nentaddress)))'length));
       end if;
-      --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&to_bstring(tpage)&" writeaddr "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" nentaddress nent:"&to_bstring(nentaddress)&" "&to_bstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_bstring(dina);
-      if (to_integer(unsigned(nent_o(to_integer(unsigned(nentaddress))))) /= 63) then
+      if DEBUG then
+        report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_hstring(addra)&" tpage:"&to_hstring(tpage)&" writeaddr "&to_hstring(slv_page_cnt_save)&" "&to_hstring(address)&" nentaddress nent:"&to_hstring(nentaddress)&" "&to_hstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_hstring(dina);
+      end if;
+      if (to_integer(unsigned(nent_o(to_integer(unsigned(nentaddress))))) /= 63  or mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) /= '1') then
         sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
         mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) <= '1';
         if FILE_WRITE then
