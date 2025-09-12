@@ -164,21 +164,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 addresses[row['ADDR']] = index
             data = data.drop(rows)
 
-        #This is a hack to work around over flows in MPROJ memories
-        if "MPROJ_" in comparison_filename:
-            rows = []
-            count = {}
-            for index, row in data.iterrows():
-                entry = str(row['BX'])+row['ADDR']
-                if entry not in count:
-                    count[entry]=1
-                else:
-                    count[entry]+=1
-                if count[entry]>63:
-                    rows.append(index)
-            data=data.drop(rows)
-
-        # Hack to remove bin address
+        # Hack to remove bin address fix in emulation code printout?
         if "MPAR_" in comparison_filename:
             for index, row in data.iterrows():
                 adata = row['DATA']
