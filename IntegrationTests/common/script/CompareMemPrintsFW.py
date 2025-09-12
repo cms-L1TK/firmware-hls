@@ -164,20 +164,6 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                 addresses[row['ADDR']] = index
             data = data.drop(rows)
 
-        #This is a hack to work around over flows in VMStub memories
-        if is_binned:
-            rows = []
-            count = {}
-            for index, row in data.iterrows():
-                entry = str(row['BX'])+row['ADDR']
-                if entry not in count:
-                    count[entry]=1
-                else:
-                    count[entry]+=1
-                if count[entry]>15:
-                    rows.append(index)
-            data=data.drop(rows)
-
         #This is a hack to work around over flows in MPROJ memories
         if "MPROJ_" in comparison_filename:
             rows = []
@@ -227,19 +213,12 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             # Select the correct event from the comparison data
             selected_rows = selected_columns.loc[selected_columns['BX'] == ievent]
 
-            # Hack for FPGA1 Project as BX off by 0ne
-            #if ("AS_" in comparison_filename and "n1" in comparison_filename)  or "MPAR_" in comparison_filename:
-            #    selected_rows = selected_columns.loc[selected_columns['BX']-1 == ievent]
-
             if len(selected_rows) == 0 and len(event) != 0:
                 good = False
                 number_of_missing_events += 1
                 message = "Event "+str(ievent)+" does not exist in the comparison data!"
                 if fail_on_error: raise Exception(message)
                 else:             print("\t"+message)
-
-            # Select only the comparison data where the valid bit is set
-            #selected_rows = selected_rows.loc[selected_rows[selected_rows.columns[1]] == '0b1']
 
             # Check the length of the two sets
             # Raise an exception if the are fewer entries for a given event in the comparison data than in the reference data
@@ -272,9 +251,6 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
                 # Raise exception if the values for a given entry don't match
                 adata = selected_rows['DATA'][offset+ival]
-
-                #if ("AS_" in comparison_filename) and ("n1" in comparison_filename):
-                #    adata=adata.replace("0x1","0x")
 
                 if adata != data:
                     good = False
