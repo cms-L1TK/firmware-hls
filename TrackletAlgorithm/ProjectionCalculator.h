@@ -207,7 +207,8 @@ template<
   constexpr int izproj3 = zmean[9];
   const ap_int<14> zproj3 = izproj3;
   projToDisk(zproj3, itinv, rinv, phi0, t, z0, ir_D4, iphi_D4);
-  const bool valid_D4 = ir_D4 >= irmindisk && ir_D4 < irmaxdisk && ((t > itcut) || (t<-itcut));
+  constexpr int iphi_max = (1<<14); //Should have propper constant for 14 
+  const bool valid_D4 = ir_D4 >= irmindisk && ir_D4 < irmaxdisk && ((t > itcut) || (t<-itcut)) & iphi_D4<iphi_max;
 
   // D5
   constexpr int izproj4 = zmean[10];
