@@ -14,6 +14,14 @@ set modules_to_test {
   {PC_L1L2HI}
   {PC_L1L2JKL}
   {PC_L2L3ABCD}
+  {PC_L3L4AB}
+  {PC_L3L4CD}
+  {PC_L5L6ABCD}
+  {PC_D1D2ABCD}
+  {PC_D3D4ABCD}
+  {PC_L1D1ABCD}
+  {PC_L1D1EFGH}
+  {PC_L2D1ABCD}
 }
 
 # module_to_export must correspond to the default macros set at the top of the
