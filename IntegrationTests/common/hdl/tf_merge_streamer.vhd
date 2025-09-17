@@ -26,13 +26,14 @@ use work.tf_pkg.all;
 
 entity tf_merge_streamer is
   generic (
-    NAME            : string := "MERGERNAME";          --! Name of mem for printout
-    RAM_WIDTH:  natural := 72;
-    NUM_PAGES   :   natural := 8;
-    RAM_DEPTH   : natural := NUM_PAGES * PAGE_LENGTH;
-    NUM_INPUTS     : natural := 4;
-    NUM_EXTRA_BITS: natural := 2;
-    ADDR_WIDTH : natural := 7
+    NAME                : string  := "MERGERNAME";          --! Name of mem for printout
+    RAM_WIDTH           : natural := 72;
+    NUM_PAGES           : natural := 8;
+    RAM_DEPTH           : natural := NUM_PAGES * PAGE_LENGTH;
+    NUM_INPUTS          : natural := 4;
+    NUM_EXTRA_BITS      : natural := 2;
+    FILE_WRITE          : boolean := true              --! If set to true will
+                                                    --write debug output for memory
   );
   port (
   bx_in : in std_logic_vector(2 downto 0 );
@@ -85,6 +86,9 @@ architecture RTL of tf_merge_streamer is
 
 begin
   process(clk)
+  variable initialized : boolean := false;
+  variable bx : integer := -1;
+  variable bx_save : integer := -1;
   variable nent_arr: nent_array;
   variable din_arr: din_array;
   variable bx_change : boolean := false; -- indicates to the module whether or not the bx has changed compared to the previous clock
@@ -100,7 +104,7 @@ begin
 
   begin
     if rising_edge(clk) then
-
+      bx_save := bx;
       bx_in_vld_3 := bx_in_vld_2;
       bx_in_vld_2 := bx_in_vld_1;
       bx_in_vld_1 := bx_in_vld;
@@ -108,6 +112,7 @@ begin
       current_page_save := current_page;
 
       if (bx_in_vld_3 = '1') then
+        bx := bx + 1;
         bx_in_latch := bx_in;
         current_page := to_integer(unsigned(bx_in)) mod NUM_PAGES;
       end if;
@@ -171,8 +176,16 @@ begin
       if valid(pipe_stages-1) ='1' then
         if (NUM_EXTRA_BITS > 0) then
           merged_dout <= '1' & std_logic_vector(to_unsigned(toread(pipe_stages-1),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages-1));
+          if FILE_WRITE then
+            write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), " ", " ", to_hstring('1' & std_logic_vector(to_unsigned(toread(pipe_stages-1),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages-1))));
+          end if;
+          initialized := true;
         else
           merged_dout <= '1' & din_arr(toread(pipe_stages-1));
+          if FILE_WRITE then
+            write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), " ", " ", to_hstring(din_arr(toread(pipe_stages-1))));
+          end if;
+          initialized := true;
         end if ;
       else
         merged_dout <= (others => '0');

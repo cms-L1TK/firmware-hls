@@ -190,9 +190,11 @@ begin
     
       dout <= din;
 
-      --if (valid3='1') then
-      --  report "mem_reader: "&time'image(now)&" "&NAME&" addr="&to_bstring(addr_counter2)&"  din="&to_bstring(din)&" valid="&to_bstring(valid3);
-      --end if;
+      if (DEBUG) then
+        if (valid3='1') then
+          report "mem_reader: "&time'image(now)&" "&NAME&" addr="&to_hstring(addr_counter2)&"  din="&to_hstring(din)&" valid="&to_bstring(valid3);
+        end if;
+      end if; 
         
     end if;    
 

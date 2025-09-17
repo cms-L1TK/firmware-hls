@@ -37,7 +37,9 @@ entity tf_mem is
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
     DEBUG           : boolean := false;            --! If true prints debug info
-    MEM_TYPE        : string := "block"            --! specifies RAM type (block/ultra)
+    MEM_TYPE        : string := "block";            --! specifies RAM type (block/ultra)
+    FILE_WRITE      : boolean := true              --! If set to true will
+                                                    --write debug output for memory
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -112,15 +114,19 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
+
+  file file_out : text;
+  variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   --FIXME hardcoded number
   variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
+  variable slv_clk_cnt_save   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
   variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
-  variable page         : integer := 0;
-  variable addr_in_page : integer := 0;
-  variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
-  variable overwrite    : std_logic := '1';
+  variable bx                   : integer := 0;
+  variable bx_save              : integer := 0;
+  variable address              : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+  variable overwrite            : std_logic := '1';
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     if DEBUG then
@@ -132,15 +138,18 @@ begin
       end if;
     end if;
     slv_page_cnt_save := slv_page_cnt;
+    slv_clk_cnt_save := slv_clk_cnt;
+    bx_save := bx;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then -- ####### Counter nent
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
       --report time'image(now)&" tf_mem "&NAME&" increment vi_clk_cnt:"&integer'image(vi_clk_cnt);
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then -- -1 not included
       --report time'image(now)&" tf_mem "&NAME&" goto next page";
       slv_clk_cnt := (others => '0');
+      bx :=  bx + 1;
       --assert (vi_page_cnt < NUM_PAGES) report "vi_page_cnt out of range" severity error;
-      if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then -- Assuming linear continuous page access
-        slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
+      if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES - 1) then -- Assuming linear continuous page access
+        slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt) + 1);
         --report time'image(now)&" tf_mem "&NAME&" increment vi_page_cnt:"&integer'image(vi_page_cnt);
       else
         --report time'image(now)&" tf_mem "&NAME&" resetting vi_page_cnt";
@@ -156,6 +165,7 @@ begin
       --use sync_nent transition to synchronize at BX (page) 1
       --report time'image(now)&" tf_mem "&NAME&" sync_nent";
       init := '0';
+      bx := 1;
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
@@ -169,6 +179,11 @@ begin
       end if;
       --report "tf_mem "&time'image(now)&" "&NAME&" page writeaddr "&" "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" "&to_bstring(overwrite)&" "&to_bstring(dina)&" addra "&to_bstring(addra);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
+      if FILE_WRITE then
+        write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), to_hstring(slv_clk_cnt_save), to_hstring(address(clogb2(RAM_DEPTH)-clogb2(NUM_PAGES)-1 downto 0)), to_hstring(dina) );
+      end if;
+      initialized := true;
+
       if (overwrite = '0') then
         nent_o(to_integer(unsigned(slv_page_cnt_save))) <= std_logic_vector(to_unsigned(to_integer(unsigned(nent_o(to_integer(unsigned(slv_page_cnt_save))))) + 1, nent_o(to_integer(unsigned(slv_page_cnt_save)))'length)); -- + 1 (slv)
       end if;

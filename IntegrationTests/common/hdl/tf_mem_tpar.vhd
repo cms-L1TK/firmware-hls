@@ -38,7 +38,10 @@ entity tf_mem_tpar is
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
-    DEBUG           : boolean := false             --! If true prints debug info
+    DEBUG           : boolean := false;             --! If true prints debug info
+    FILE_WRITE      : boolean := true               --! If set to true will
+                                                    --write debug output for memory
+
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -116,13 +119,19 @@ assert (PAGE_LENGTH = 128) report "PAGE_LENGTH in tf_mem_tpar has to be 128" sev
 
 
 process(clka)
+
+  file file_out : text;
+  variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others => '0'); -- Clock counter
+  variable slv_clk_cnt_save   : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
   variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
   variable tpage        : std_logic_vector(clogb2(NUM_TPAGES)-1 downto 0)  := (others => '0');
   variable nentaddress  : std_logic_vector(clogb2(NUM_TPAGES*NUM_PAGES)-1 downto 0) := (others => '0');
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+  variable bx                   : integer := 0;
+  variable bx_save              : integer := 0;
 
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
@@ -145,10 +154,13 @@ begin
     --end if;
 
     slv_page_cnt_save := slv_page_cnt;
+    slv_clk_cnt_save := slv_clk_cnt;
+    bx_save := bx;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
       slv_clk_cnt := (others => '0');
+      bx := bx + 1;
       if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then
         slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
       else
@@ -165,6 +177,7 @@ begin
       --use sync_nent transition to synchronize at BX (page) 1
       --report time'image(now)&" tf_mem "&NAME&" sync_nent";
       init := '0';
+      bx := 1;
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
@@ -181,6 +194,10 @@ begin
       end if;
       --report time'image(now)&" tf_mem_tpar "&NAME&" tpage:"&to_bstring(tpage)&" writeaddr "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" nentaddress nent:"&to_bstring(nentaddress)&" "&to_bstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_bstring(dina);
       sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
+      if FILE_WRITE then
+        write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), to_hstring(slv_clk_cnt_save), to_hstring(address(clogb2(NUM_TPAGES)+ 7 - 1 downto 0)), to_hstring(dina) );
+      end if;
+      initialized := true;
       mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) <= '1';
     end if;
   end if;
