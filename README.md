@@ -53,10 +53,10 @@ These correspond to LUT used internally by the algo steps. The .tab file are in 
 The files that are downloaded by emData/download.sh were created by the CMSSSW L1 track emulation, with the the following recipe (adapted from the [L1TrackSoftware TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/L1TrackSoftware)).
 
 ```bash
-cmsrel CMSSW_14_2_0_pre4
-cd CMSSW_14_2_0_pre4/src/
+cmsrel CMSSW_15_1_0_pre4
+cd CMSSW_15_1_0_pre4/src/
 cmsenv
-git cms-checkout-topic -u cms-L1TK:fw_synch_250521
+git cms-checkout-topic -u cms-L1TK:fw_synch_250903
 git clone https://github.com/cms-L1TK/MCsamples.git
 ```
 
@@ -65,7 +65,7 @@ A few configuration changes were made in order to output test vectors and lookup
 ```diff
 --- a/L1Trigger/TrackFindingTracklet/interface/Settings.h
 +++ b/L1Trigger/TrackFindingTracklet/interface/Settings.h
-@@ -871,7 +871,7 @@ namespace trklet {
+@@ -860,7 +860,7 @@ namespace trklet {
 
      //IR should be set to 108 to match the FW for the summer chain, but ultimately should be at 156
      std::unordered_map<std::string, unsigned int> maxstep_{
@@ -74,7 +74,7 @@ A few configuration changes were made in order to output test vectors and lookup
                        //input links running at 25 Gbits/s
          //Set to 108 to match firmware project 240 MHz clock
          {"VMR", 108},
-@@ -930,11 +930,11 @@ namespace trklet {
+@@ -919,11 +919,11 @@ namespace trklet {
      bool warnNoDer_{false};  //If true will print out warnings about missing track fit derivatives
 
      //--- These used to create files needed by HLS code.
@@ -91,7 +91,7 @@ A few configuration changes were made in order to output test vectors and lookup
 
      unsigned int writememsect_{3};  //writemem only for this sector (note that the files will have _4 extension)
 
-@@ -1011,7 +1011,7 @@ namespace trklet {
+@@ -1000,7 +1000,7 @@ namespace trklet {
 
      // Use chain with duplicated MPs for L3,L4 to reduce truncation issue
      // Balances load from projections roughly in half for each of the two MPs
@@ -113,35 +113,14 @@ The algorithm was set to HYBRID_NEWKF and the maximum number of events was set t
 ```diff
 --- a/L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py
 +++ b/L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py
-@@ -23,7 +23,7 @@ GEOMETRY = "D98"
- # 'HYBRID_NEWKF' (baseline, 4par fit, with bit-accurate KF emulation),
- # 'HYBRID_REDUCED' to use the "L5L6" seeding only reduced configuration.
+@@ -25,7 +25,7 @@ GEOMETRY = "D98"
+ # 'HYBRID_DISPLACED_NEWKF_KILL' displaced tracklet followed by DR emulation and 5 param fit sim
+ # 'HYBRID_DISPLACED_NEWKF_MERGE' displaced tracklet followed by DR simulation and 5 param fit sim
  # (Or legacy algos 'TMTT' or 'TRACKLET').
 -L1TRKALGO = 'HYBRID'
 +L1TRKALGO = 'HYBRID_NEWKF'
 
  WRITE_DATA = False
-
-@@ -71,8 +71,8 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
- if GEOMETRY == "D98":
-
-   # Read data from card files (defines getCMSdataFromCards()):
--  #from MCsamples.RelVal_1400_D98.PU200_TTbar_14TeV_cfi import *
--  #inputMC = getCMSdataFromCards()
-+  from MCsamples.RelVal_1400_D98.PU200_TTbar_14TeV_cfi import *
-+  inputMC = getCMSdataFromCards()
-
-   # Or read .root files from directory on local computer:
-   #dirName = "$scratchmc/MCsamples1400_D98/RelVal/TTbar/PU0/"
-@@ -82,7 +82,7 @@ if GEOMETRY == "D98":
-   #dataName="/RelValTTbar_14TeV/CMSSW_14_0_0_pre2-PU_133X_mcRun4_realistic_v1_STD_2026D98_PU200_RV229-v1/GEN-SIM-DIGI-RAW"
-   #inputMC=getCMSdata(dataName)
-
--  inputMC = ["/store/relval/CMSSW_14_0_0_pre2/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU_133X_mcRun4_realistic_v1_STD_2026D98_PU200_RV229-v1/2580000/0b2b0b0b-f312-48a8-9d46-ccbadc69bbfd.root"]
-+  #inputMC = ["/store/relval/CMSSW_14_0_0_pre2/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU_133X_mcRun4_realistic_v1_STD_2026D98_PU200_RV229-v1/2580000/0b2b0b0b-f312-48a8-9d46-ccbadc69bbfd.root"]
-
- elif GEOMETRY == "D88":
-
 
 ```
 
@@ -154,22 +133,21 @@ cmsRun L1TrackNtupleMaker_cfg.py
 
 ### Reduced configuration with combined modules
 
-The wires files for the reduced configuration are currently [stored in the cms-L1TK/cmssw repo](https://github.com/cms-L1TK/cmssw/tree/fw_synch_250521/L1Trigger/TrackFindingTracklet/data) (see next section for instructions for generating these).
+The wires files for the reduced configuration are currently [stored in the cms-L1TK/cmssw repo](https://github.com/cms-L1TK/cmssw/tree/fw_synch_250903/L1Trigger/TrackFindingTracklet/data) (see next section for instructions for generating these).
 
 If interface/Settings.h and test/L1TrackNtupleMaker_cfg.py have already been modified as for the full configuration above, then only one additional change is required before running with cmsRun:
 
 ```diff
 --- a/L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py
 +++ b/L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py
-@@ -23,7 +23,7 @@ GEOMETRY = "D98"
- # 'HYBRID_NEWKF' (baseline, 4par fit, with bit-accurate KF emulation),
- # 'HYBRID_REDUCED' to use the "L5L6" seeding only reduced configuration.
+@@ -25,7 +25,7 @@ GEOMETRY = "D98"
+ # 'HYBRID_DISPLACED_NEWKF_KILL' displaced tracklet followed by DR emulation and 5 param fit sim
+ # 'HYBRID_DISPLACED_NEWKF_MERGE' displaced tracklet followed by DR simulation and 5 param fit sim
  # (Or legacy algos 'TMTT' or 'TRACKLET').
 -L1TRKALGO = 'HYBRID_NEWKF'
 +L1TRKALGO = 'HYBRID_REDUCED'
 
  WRITE_DATA = False
-
 
 ```
 
@@ -181,6 +159,27 @@ cp wires_reduced.dat LUTs/wires.dat
 cp memorymodules_reduced.dat LUTs/memorymodules.dat
 cp processingmodules_reduced.dat LUTs/processingmodules.dat
 ```
+
+### Full or reduced configuration with D110 geometry
+
+By default, the emulation currently uses the D98 detector geometry. However, if the recommended D110 geometry is desired, only one line needs to change in test/L1TrackNtupleMaker_cfg.py:
+
+```diff
+--- a/L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py
++++ b/L1Trigger/TrackFindingTracklet/test/L1TrackNtupleMaker_cfg.py
+@@ -15,8 +15,8 @@ process = cms.Process("L1TrackNtuple")
+ ############################################################
+
+ # D110 recommended (but D98 still works)
+ GEOMETRY = "D98"
+-#GEOMETRY = "D110"
++GEOMETRY = "D110"
+
+ # Set L1 tracking algorithm:
+ # 'HYBRID' (baseline, 4par fit) or 'HYBRID_DISPLACED' (extended, 5par fit).
+```
+
+This geometry can be used to generate test vectors for either the full or reduced configuration.
 
 ### Generation of LUTs and MemPrint files for the reduced combined module chain
 

@@ -184,36 +184,37 @@ template<
   static const InvtLUT lut_itinv;
   ap_uint<20> itinv = lut_itinv.lookup(std::abs(t)&4095);
   constexpr int itcut = 1.0/kt;
+  constexpr int iphi_max = (1<<n_phidisk_)-1;
 
   // D1
   constexpr int izproj0 = zmean[6];
   const ap_int<14> zproj0 = izproj0;
   projToDisk(zproj0, itinv, rinv, phi0, t, z0, ir_D1, iphi_D1);
-  const bool valid_D1 = ir_D1 >= irmindisk && ir_D1 < irmaxdisk && ((t > itcut) || (t<-itcut));
+  const bool valid_D1 = ir_D1 >= irmindisk && ir_D1 < irmaxdisk && ((t > itcut) || (t<-itcut)) && iphi_D1>0 && iphi_D1<iphi_max;
 
   // D2
   constexpr int izproj1 = zmean[7];
   const ap_int<14> zproj1 = izproj1;
   projToDisk(zproj1, itinv, rinv, phi0, t, z0, ir_D2, iphi_D2);
-  const bool valid_D2 = ir_D2 >= irmindisk && ir_D2 < irmaxdisk && ((t > itcut) || (t<-itcut));
+  const bool valid_D2 = ir_D2 >= irmindisk && ir_D2 < irmaxdisk && ((t > itcut) || (t<-itcut)) && iphi_D2>0 && iphi_D2<iphi_max;
 
   // D3
   constexpr int izproj2 = zmean[8];
   const ap_int<14> zproj2 = izproj2;
   projToDisk(zproj2, itinv, rinv, phi0, t, z0, ir_D3, iphi_D3);
-  const bool valid_D3 = ir_D3 >= irmindisk && ir_D3 < irmaxdisk && ((t > itcut) || (t<-itcut));
+  const bool valid_D3 = ir_D3 >= irmindisk && ir_D3 < irmaxdisk && ((t > itcut) || (t<-itcut)) && iphi_D3>0 && iphi_D3<iphi_max;
 
   // D4
   constexpr int izproj3 = zmean[9];
   const ap_int<14> zproj3 = izproj3;
   projToDisk(zproj3, itinv, rinv, phi0, t, z0, ir_D4, iphi_D4);
-  const bool valid_D4 = ir_D4 >= irmindisk && ir_D4 < irmaxdisk && ((t > itcut) || (t<-itcut));
+  const bool valid_D4 = ir_D4 >= irmindisk && ir_D4 < irmaxdisk && ((t > itcut) || (t<-itcut)) && iphi_D4>0 && iphi_D4<iphi_max;
 
   // D5
   constexpr int izproj4 = zmean[10];
   const ap_int<14> zproj4 = izproj4;
   projToDisk(zproj4, itinv, rinv, phi0, t, z0, ir_D5, iphi_D5);
-  const bool valid_D5 = ir_D5 >= irmindisk && ir_D5 < irmaxdisk && ((t > itcut) || (t<-itcut));
+  const bool valid_D5 = ir_D5 >= irmindisk && ir_D5 < irmaxdisk && ((t > itcut) || (t<-itcut)) && iphi_D5>0 && iphi_D5<iphi_max;
 
   // Derivatives
   TP::Types::der_phiD ider_phiD = (-rinv*itinv) >> 17;
