@@ -16,7 +16,6 @@ entity linktosecproc2 is
     AS_36_link_data    : out t_arr_AS_36_37b;
     MPAR_73_link_data  : out t_arr_MTPAR_73_76b;
     bx_link_data       : out std_logic_vector(2 downto 0);
-    ctl_link_data      : out std_logic_vector(60 downto 0);
     AS_36_link_valid   : out t_arr_AS_36_1b;
     MPAR_73_link_valid : out t_arr_MTPAR_73_1b;
     bx_link_valid      : out std_logic
@@ -230,7 +229,6 @@ begin
   MPAR_73_link_valid(L2D1ABCD) <= d(11).valid;
 
   bx_link_data <= d(9).data(2 downto 0);
-  ctl_link_data <= d(9).data(63 downto 3);
   bx_link_valid <= d(9).valid;
     
 end rtl;

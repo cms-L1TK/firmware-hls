@@ -9,6 +9,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.tf_pkg.all;
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f2.all;
 
@@ -18,7 +19,6 @@ entity sp2_mem_writer is
     AS_36_link_data           : in t_arr_AS_36_37b;
     MPAR_73_link_data         : in t_arr_MTPAR_73_76b;
     bx_link_data              : in std_logic_vector(2 downto 0);
-    ctl_link_data             : in std_logic_vector(60 downto 0);
     AS_36_link_valid          : in t_arr_AS_36_1b;
     MPAR_73_link_valid        : in t_arr_MTPAR_73_1b;
     bx_link_valid             : in std_logic;

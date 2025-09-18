@@ -52,8 +52,10 @@ end entity linktosecproc;
 architecture rtl of linktosecproc is
 
   constant IR_LATENCY : natural := 6;
+  constant inlink_low : natural := 68;
+  constant inlink_high : natural := 119;
 
-  type t_arr_ldata is array(IR_LATENCY-1 downto 0) of ldata(119 downto 68); 
+  type t_arr_ldata is array(IR_LATENCY-1 downto 0) of ldata(inlink_high downto inlink_low); 
 
   -- signal s_tracklet_reset : t_resets(numPPquads - 1 downto 0);
   -- signal s_tracklet_isol  : t_stubsDTC;
@@ -88,7 +90,7 @@ begin  -- architecture rtl
   --     in_dout  => s_tracklet_data
   --     );
 
-  GEN_DELAYED_DATA: for i in 68 to 119 generate
+  GEN_DELAYED_DATA: for i in inlink_low to inlink_high generate
     p_delay_data: process (clk_i) is
     begin  -- process p_delay_data
       if rising_edge(clk_i) then     -- rising clock edge
@@ -211,6 +213,7 @@ begin  -- architecture rtl
   --With current IR setup latency, IR_Start needs to come up 4 clock cycles
   --before first data
   ir_start_o <= s_ir_start;
+  sp_reset <= sp_reset_int;
   bx_o <= std_logic_vector(bx_int);
 
 end architecture rtl;

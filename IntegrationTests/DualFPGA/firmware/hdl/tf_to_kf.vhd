@@ -51,7 +51,6 @@ architecture rtl of tf_to_kf is
 
   constant widthTrackletLmap : natural := 33;
   constant widthTBInOutIndex : natural := 20;
-  constant nMaxTypeStubs : natural := 4;
 
   constant TW_valid_pos    : natural := widthTBseedType + WidthTBInOutIndex
                                         + widthTBinv2R + widthTBphi0 
