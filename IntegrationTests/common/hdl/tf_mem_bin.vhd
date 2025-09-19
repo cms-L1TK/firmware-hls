@@ -85,6 +85,8 @@ entity tf_mem_bin is
     --! (1 clk latency)
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE"; 
 
+    DEBUG           : boolean := false;              --! Debug printout
+    
     --! Memory name - used for debugging
     NAME            : string := "MEMNAME";
     FILE_WRITE      : boolean := true              --! If set to true will
@@ -392,14 +394,20 @@ begin
       
         binmaskvalue := (binmasktmp(to_integer(unsigned(rzbits))) and validbinmasktmp(to_integer(unsigned(rzbits)))) or phimask;
 
-        binmasktmp(to_integer(unsigned(rzbits))) <= binmaskvalue;
+        if (DEBUG) then
+          report time'image(now)&" tf_mem_bin: " & NAME & " rzbits=" & to_hstring(rzbits) & " phibits=" & to_hstring(phibits) & " phimask=" & to_bstring(phimask) & " binmasktmp=" & to_bstring(binmasktmp(to_integer(unsigned(rzbits)))) & " validbinmasktmp=" & to_bstring(validbinmasktmp(to_integer(unsigned(rzbits)))) & " " & to_bstring(validbinmasktmp) & " binmaskvalue=" & to_bstring(binmaskvalue);
+        end if;
+
+        if (new_bx = false) then
+          binmasktmp(to_integer(unsigned(rzbits))) <= binmaskvalue;
+          validbinmasktmp(to_integer(unsigned(rzbits))) <= '1';
+        end if;
 
         page_rzbits := slv_page_cnt_save & rzbits;
       
         binmaskA(to_integer(unsigned(page_rzbits))) <= binmaskvalue;
         binmaskB(to_integer(unsigned(page_rzbits))) <= binmaskvalue;
 
-        validbinmasktmp(to_integer(unsigned(rzbits))) <= '1';
         validbinmask(to_integer(unsigned(page_rzbits))) <= '1';
       
       
@@ -500,7 +508,9 @@ begin
 
     for i in 0 to NUM_COPY-1 loop
       if (enb(i)='1') then
-       -- report "tf_mem_bin read addrb "&NAME&" "&integer'image(i)&" "&time'image(now)&" "& NAME & " " & to_hstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))&" "&to_hstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))))&" "&to_bstring(validbinmask(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7)))))&" "&to_bstring(binmaskA(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7))))(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-5 downto i*RAM_DEPTH_BITS+4)))));
+        if (DEBUG) then
+          report "tf_mem_bin read addrb "&NAME&" "&integer'image(i)&" "&time'image(now)&" "& NAME & " " & to_hstring(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))&" "&to_hstring(sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS)))))&" "&to_bstring(validbinmask(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7)))))&" "&to_bstring(binmaskA(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7))))(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-5 downto i*RAM_DEPTH_BITS+4)))))&" "&to_bstring(binmaskA(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS+7)))));
+        end if;
         sv_RAM_row(i) <= sa_RAM_data(i)(to_integer(unsigned(addrb((i+1)*RAM_DEPTH_BITS-1 downto i*RAM_DEPTH_BITS))));
       end if;
     end loop;  
