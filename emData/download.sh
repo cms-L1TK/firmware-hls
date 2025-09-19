@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-### Test vectors correspond to fw_synch_250521 tag in cms-L1TK/cmssw repo ###
+### Test vectors updated to fix configuration for missing allstub inner memories ###
 
 # Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/jlPYrdAzZKH2Hef/MemPrints.tar.gz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/MrZF59yg89zt9Mt/LUTs.tar.gz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/bqqT3NRWwD25QI8/LUTs_250918.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/FoYh3CsYHKUlGNc/MemPrints_250918.tgz"
 
 # Reduced Combined modules
 memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/JeX9dhSb31WQUkF/MemPrints.tar.gz"
