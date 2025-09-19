@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-### Test vectors correspond to fw_synch_250903 tag in cms-L1TK/cmssw repo ###
-
-## D98 detector geometry
+### Test vectors updated to fix configuration for missing allstub inner memories ###
 
 # Split modules - i.e. with PC and VMSMER
-#memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/cAUD1B6sVbouL1P/MemPrints.tar.gz"
-#luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/O4binjyc9tEFGFH/LUTs.tar.gz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/bqqT3NRWwD25QI8/LUTs_250918.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/FoYh3CsYHKUlGNc/MemPrints_250918.tgz"
+
 
 # Reduced Combined modules
 #memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/ECMF704hrDY8sjO/MemPrints.tar.gz"
