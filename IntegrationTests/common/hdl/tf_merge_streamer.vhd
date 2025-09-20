@@ -67,6 +67,7 @@ architecture RTL of tf_merge_streamer is
 
   type mem_count_arr is array(MAX_INPUTS-1 downto 0) of integer;
   type toread_arr is array(pipe_stages-1 downto 0) of integer range 0 to 3;
+  type bx_array is array(pipe_stages downto 0) of integer;
   type bx_arr is array(pipe_stages downto 0) of std_logic_vector(2 downto 0);
   type addr_arr_arr is array(MAX_INPUTS-1 downto 0) of std_logic_vector(LOG2_RAM_DEPTH-1 downto 0);
 
@@ -77,6 +78,7 @@ architecture RTL of tf_merge_streamer is
 
   signal valid : std_logic_vector(pipe_stages-1 downto 0) := (others => '0');
   signal bx_pipe : bx_arr := (others => (others => '0'));
+  signal bx_save : bx_array;
   signal addr_arr_int : addr_arr_arr := (others => (others => '0'));
   signal bx_last : std_logic_vector(2 downto 0) := "111";
   signal bx_in_latch : std_logic_vector(2 downto 0) := "111"; --since output triggered by BX change, initializing bx_in_latch to 7 will start write on first valid bx (0)
@@ -88,7 +90,6 @@ begin
   process(clk)
   variable initialized : boolean := false;
   variable bx : integer := -1;
-  variable bx_save : integer := -1;
   variable nent_arr: nent_array;
   variable din_arr: din_array;
   variable bx_change : boolean := false; -- indicates to the module whether or not the bx has changed compared to the previous clock
@@ -104,7 +105,7 @@ begin
 
   begin
     if rising_edge(clk) then
-      bx_save := bx;
+      bx_save(0) <= bx;
       bx_in_vld_3 := bx_in_vld_2;
       bx_in_vld_2 := bx_in_vld_1;
       bx_in_vld_1 := bx_in_vld;
@@ -135,9 +136,9 @@ begin
         --report "tf_merge_streamer "&time'image(now)&" "&NAME&" readmask="&to_bstring(readmask)&" nextread="&integer'image(nextread)&" mem_count(nextread)="&integer'image(mem_count(nextread));
         valid(0) <= '1';
         --loop through starting with the next input in front of the current to-read (round-robin)
-        for i in 0 to 3 loop
-          if (readmask((toread(0) - i) mod 4) = '1') then
-            nextread := (toread(0) - i) mod 4;
+        for i in 3 downto 0 loop
+          if (readmask(i) = '1') then
+            nextread := i;
           end if;
         end loop;
         addr_arr_int(nextread) <= std_logic_vector(to_unsigned(current_page_save*page_length + mem_count(nextread), LOG2_RAM_DEPTH));
@@ -177,13 +178,13 @@ begin
         if (NUM_EXTRA_BITS > 0) then
           merged_dout <= '1' & std_logic_vector(to_unsigned(toread(pipe_stages-1),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages-1));
           if FILE_WRITE then
-            write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), " ", " ", to_hstring('1' & std_logic_vector(to_unsigned(toread(pipe_stages-1),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages-1))));
+            write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save(pipe_stages-1)), " ", " ", to_hstring('1' & std_logic_vector(to_unsigned(toread(pipe_stages-1),NUM_EXTRA_BITS)) & din_arr(toread(pipe_stages-1))));
           end if;
           initialized := true;
         else
           merged_dout <= '1' & din_arr(toread(pipe_stages-1));
           if FILE_WRITE then
-            write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), " ", " ", to_hstring(din_arr(toread(pipe_stages-1))));
+            write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save(pipe_stages-1)), " ", " ", to_hstring(din_arr(toread(pipe_stages-1))));
           end if;
           initialized := true;
         end if ;
@@ -195,6 +196,7 @@ begin
       bx_pipe(0) <= bx_in_latch;
       bx_out <= bx_pipe(pipe_stages);
       for j in pipe_stages-2 downto 0 loop
+        bx_save(j+1) <= bx_save(j);
         valid(j+1) <= valid(j);
         toread(j+1) <= toread(j);
       end loop;
