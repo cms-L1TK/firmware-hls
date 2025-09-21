@@ -1,7 +1,7 @@
 #minimal script to run synthesis
 
 set origin_dir "."
-set proj_name "tf_1"
+set proj_name "tf_f1"
 
 open_project $origin_dir/$proj_name.xpr
 update_compile_order -fileset sources_1
