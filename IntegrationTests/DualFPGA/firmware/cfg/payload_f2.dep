@@ -5,17 +5,19 @@ src linktosecproc2.vhd
 src sp2_mem_writer.vhd
 src tf2_wrapper.vhd
 src --vhdl2008 SectorProcessor_f2.vhd
-src tf_to_kf.vhd
+src tb_to_kf.vhd
 src kf_wrapper.vhd
 src common/hdl/emp/pkgs/tf_interface_pkg.vhd
 src kf_input_merger.vhd
 
 # KF
-include -c firmware-hls:KalmanFilter/kfin components.dep 
-include -c firmware-hls:KalmanFilter/kf components.dep 
-include -c firmware-hls:KalmanFilter/kfout components.dep 
-include -c firmware-hls:KalmanFilter/tq components.dep 
-include -c firmware-hls:KalmanFilter/common components.dep 
+src -c l1tk-for-emp:tm tm_isolation.vhd
+src -c l1tk-for-emp:kf kf_isolation.vhd
+
+include -c l1tk-for-emp:tm components.dep 
+include -c l1tk-for-emp:dr components.dep 
+include -c l1tk-for-emp:kf components.dep 
+include -c l1tk-for-emp:common components.dep 
 
 #Tracklet dependencies
 #src --vhdl2008 common/hdl/tf_lut.vhd
