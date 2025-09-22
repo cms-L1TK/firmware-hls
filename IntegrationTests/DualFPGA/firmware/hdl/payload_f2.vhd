@@ -61,9 +61,11 @@ architecture rtl of emp_payload is
   signal MPAR_73_wea           : t_arr_MTPAR_73_1b;
   signal MPAR_73_writeaddr     : t_arr_MTPAR_73_ADDR;
   signal MPAR_73_din           : t_arr_MTPAR_73_DATA;
-  signal s_tftokf              : t_channlesTB(numTW_104 - 1 downto 0);
-  signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
-  signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
+  signal s_tbout               : t_tracksTB(0 to tbNumSeedTypes - 1);
+  signal s_tmout               : t_trackTM := nulll;
+  signal s_drout               : t_trackDR := nulll;
+  signal s_kfout               : t_trackKF := nulll;
+  --signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
   signal FT_bx_out_0           : std_logic_vector(2 downto 0);
   signal FT_bx_out_vld         : std_logic;
   signal FT_done               : std_logic;
@@ -75,6 +77,8 @@ architecture rtl of emp_payload is
   signal DW_49_stream_A_write  : t_arr_DW_49_1b;
   signal BW_46_stream_AV_din   : t_arr_BW_46_DATA;
   signal BW_46_stream_A_write  : t_arr_BW_46_1b;
+  signal s_tmpacket            : t_packets(0 to tbNumSeedTypes - 1);
+  signal s_kfpacket            : t_packets(0 to numLinksTrack - 1);
 
 begin
 
@@ -154,7 +158,7 @@ begin
   -----------------------------------------------------------------------------
   -- Sector Processor to KF formatter
   -----------------------------------------------------------------------------
-  tf_to_kf_1 : entity work.tf_to_kf
+  tb_to_kf_1 : entity work.tb_to_kf
     port map (
       clk_i          => clk_p,
       TW_113_data_i  => TW_113_stream_AV_din,
@@ -164,31 +168,47 @@ begin
       BW_46_data_i   => BW_46_stream_AV_din,
       BW_46_valid_i  => BW_46_stream_A_write,
       kf_reset_i     => FT_bx_out_vld,
-      tftokf_o       => s_tftokf
+      start_of_orbit => d(10).start_of_orbit,
+      tmpacket_o     => s_tmpacket,
+      kfpacket_o     => s_kfpacket,
+      tbtokf_o       => s_tbout
       );
 
   -----------------------------------------------------------------------------
-  -- KF
+  -- KF to output
   -----------------------------------------------------------------------------
-  kf_wrapper_1 : entity work.kf_wrapper
+  tm_top_1 : entity work.tm_top
     port map (
-      clk_i   => clk_p,
-      kfin_i  => s_tftokf,
-      kfout_o => s_kfout
+      clk240    => clk_p,
+      clk360    => clk_payload(0),
+      tm_packet => s_tmpacket,
+      tm_din    => s_tbout,
+      tm_dout   => s_tmout
       );
 
-  -----------------------------------------------------------------------------
-  -- Output step
-  -----------------------------------------------------------------------------
-  kfout_isolation_out_1 : entity work.kfout_isolation_out
+  dr_top_1 : entity work.dr_top
     port map (
-      clk        => clk_p,
-      out_packet => conv_f2(d),
+      clk     => clk_payload(0),
+      dr_din  => s_tmout,
+      dr_dout => s_drout
+      );
+
+  kf_top_1 : entity work.kf_top
+    port map (
+      clk     => clk_payload(0),
+      kf_din  => s_drout,
+      kf_dout => s_kfout
+      );
+
+  kf_isolation_out_1 : entity work.kf_isolation_out
+    port map (
+      clk        => clk_payload(0),
+      out_packet => s_kfpacket,
       out_din    => s_kfout,
-      out_dout   => s_tfout
+      out_dout   => open --TODO: fix
       );
 
-  q(92)        <= s_tfout(0);
-  q(93)        <= s_tfout(1);
+  --q(92)        <= s_tfout(0);
+  --q(93)        <= s_tfout(1);
 
 end rtl;
