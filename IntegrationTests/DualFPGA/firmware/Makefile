@@ -6,11 +6,11 @@ input_file_fpga2 = mem/in_fpga2.txt
 fpga1_hls_script_path = ../../CombinedConfig_FPGA1/script 
 fpga2_hls_script_path = ../../CombinedConfig_FPGA2/script
 
-all: add_common_files $(core_file_fpga1) $(core_file_fpga2) hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj $(input_file_fpga1) $(input_file_fpga2)
+all: add_common_files $(core_file_fpga1) $(core_file_fpga2) hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 $(input_file_fpga1) $(input_file_fpga2)
 
-fpga1: add_common_files $(core_file_fpga1) hdl_add_files_fpga1 xciCreation_fpga1 kfin_adj $(input_file_fpga1)
+fpga1: add_common_files $(core_file_fpga1) hdl_add_files_fpga1 xciCreation_fpga1 $(input_file_fpga1)
 
-fpga2: add_common_files $(core_file_fpga2) hdl_add_files_fpga2 xciCreation_fpga2 kfin_adj $(input_file_fpga2)
+fpga2: add_common_files $(core_file_fpga2) hdl_add_files_fpga2 xciCreation_fpga2 $(input_file_fpga2)
 
 $(core_dir):
 	@mkdir cgn mem
@@ -27,9 +27,6 @@ $(core_file_fpga1): $(core_dir)
 $(core_file_fpga2): $(core_dir)
 	make -C $(fpga2_hls_script_path) -j 24 Work
 	@python3 scripts/include_cores.py -s $(fpga2_hls_script_path) -o $(core_file_fpga2) -f f2
-
-kfin_adj:
-	@python3 scripts/kf_link_mod.py
 
 xciCreation_fpga1: $(core_file_fpga1)
 	make -f $(core_file_fpga1) -j 8 all
@@ -56,4 +53,4 @@ $(input_file_fpga1): $(core_dir)
 $(input_file_fpga2): $(core_dir)
 	@python3 scripts/generate_fpga2_input.py -i mem/MemPrintsSplit/ -o $(input_file_fpga2)
 
-.PHONY: all fpga1 fpga2 add_common_files hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 kfin_adj
+.PHONY: all fpga1 fpga2 add_common_files hdl_add_files_fpga1 hdl_add_files_fpga2 xciCreation_fpga1 xciCreation_fpga2 
