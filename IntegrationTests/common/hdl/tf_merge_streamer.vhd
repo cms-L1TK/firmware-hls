@@ -32,7 +32,7 @@ entity tf_merge_streamer is
     RAM_DEPTH           : natural := NUM_PAGES * PAGE_LENGTH;
     NUM_INPUTS          : natural := 4;
     NUM_EXTRA_BITS      : natural := 2;
-    FILE_WRITE          : boolean := true              --! If set to true will
+    FILE_WRITE          : boolean := false             --! If set to true will
                                                     --write debug output for memory
   );
   port (
