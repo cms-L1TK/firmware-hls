@@ -294,7 +294,7 @@ begin
 assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" severity FAILURE;
 
 process(clka)
-  file file_out : text;
+
   variable initialized   : boolean := false;
 
   variable init   : std_logic := '1'; 
@@ -384,11 +384,6 @@ begin
 
         -- Protect against over writing nentry_tmp and nentry_mask_tmp if reset
         -- earlier due to going to new BX. Can this be done more cleanly?
-        if (new_bx = false) then
-          nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
-          nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
-        end if;
-
         phimask := ( 0 => '1', others => '0');
         phimask := std_logic_vector(shift_left(unsigned(phimask), to_integer(unsigned(phibits))));
       
@@ -399,6 +394,8 @@ begin
         end if;
 
         if (new_bx = false) then
+          nentry_tmp(to_integer(unsigned(vi_nent_idx))) <= std_logic_vector(nentry);
+          nentry_mask_tmp(to_integer(unsigned(vi_nent_idx))) <= '1';
           binmasktmp(to_integer(unsigned(rzbits))) <= binmaskvalue;
           validbinmasktmp(to_integer(unsigned(rzbits))) <= '1';
         end if;

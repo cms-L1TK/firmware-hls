@@ -160,7 +160,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
                     bx_old = row['BX']
                     addresses = {}
                 if row['ADDR'] in addresses:
-                    rows.append(addresses[row['ADDR']]) # -1 to remove previos entry
+                    rows.append(addresses[row['ADDR']])
                 addresses[row['ADDR']] = index
             data = data.drop(rows)
 

@@ -118,7 +118,7 @@ assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_
 assert (PAGE_LENGTH = 64) report "PAGE_LENGTH in tf_mem_tproj has to be 64" severity FAILURE;
 
 process(clka)
-  file file_out : text ;
+
   variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH*2)-1 downto 0) := (others => '0'); -- Hack...

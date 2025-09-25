@@ -120,7 +120,6 @@ assert (PAGE_LENGTH = 128) report "PAGE_LENGTH in tf_mem_tpar has to be 128" sev
 
 process(clka)
 
-  file file_out : text;
   variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others => '0'); -- Clock counter

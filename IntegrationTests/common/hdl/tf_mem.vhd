@@ -115,7 +115,6 @@ assert (RAM_DEPTH  = NUM_PAGES*PAGE_LENGTH) report "User changed RAM_DEPTH" seve
 
 process(clka)
 
-  file file_out : text;
   variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   --FIXME hardcoded number
