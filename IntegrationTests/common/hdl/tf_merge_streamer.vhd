@@ -67,7 +67,7 @@ architecture RTL of tf_merge_streamer is
 
   type mem_count_arr is array(MAX_INPUTS-1 downto 0) of integer;
   type toread_arr is array(pipe_stages-1 downto 0) of integer range 0 to 3;
-  type bx_array is array(pipe_stages-i downto 0) of integer;
+  type bx_array is array(pipe_stages-1 downto 0) of integer;
   type bx_arr is array(pipe_stages downto 0) of std_logic_vector(2 downto 0);
   type addr_arr_arr is array(MAX_INPUTS-1 downto 0) of std_logic_vector(LOG2_RAM_DEPTH-1 downto 0);
 
