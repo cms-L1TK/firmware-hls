@@ -1,27 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-### Test vectors correspond to fw_synch_250903 tag in cms-L1TK/cmssw repo ###
-
-## D98 detector geometry
+### Test vectors updated to fix configuration for missing allstub inner memoriesusing D110 geometry ###
 
 # Split modules - i.e. with PC and VMSMER
-#memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/cAUD1B6sVbouL1P/MemPrints.tar.gz"
-#luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/O4binjyc9tEFGFH/LUTs.tar.gz"
+luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/bqqT3NRWwD25QI8/LUTs_250918.tgz"
+memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/FoYh3CsYHKUlGNc/MemPrints_250918.tgz"
 
 # Reduced Combined modules
-#memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/ECMF704hrDY8sjO/MemPrints.tar.gz"
-#luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/UAMg2u9EWz9iI3Z/LUTs.tar.gz"
-
-## D110 detector geometry (C-simulation for PC_L2L3ABCD currently fails)
-
-# Split modules - i.e. with PC and VMSMER
-memprints_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/rTMtu6T9vKXBmou/MemPrints.tar.gz"
-luts_url_split="https://cernbox.cern.ch/remote.php/dav/public-files/RsXG1BOwjb4cAQN/LUTs.tar.gz"
-
-# Reduced Combined modules
-memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/HyFZX9shXIhA8ix/MemPrints.tar.gz"
-luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/MSJUMj9fYVm00Bx/LUTs.tar.gz"
+memprints_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/C8cmkVcIX67sGgP/MemPrints_Reduced_250918.tgz"
+luts_url_reducedcm="https://cernbox.cern.ch/remote.php/dav/public-files/T4mnc4UXYXdKqxy/LUTs_Reduced_250918.tgz"
 
 # Function that prints information regarding the usage of this command
 function usage() {

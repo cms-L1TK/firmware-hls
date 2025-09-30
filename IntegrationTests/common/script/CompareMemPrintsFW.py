@@ -135,7 +135,7 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         print("Comparing TB results "+str(comparison_filename)+" to ref. file "+str(reference_filename)+" ... ")
 
         # Read column names from comparison file
-        column_names = list(pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',nrows=1))
+        column_names = list(pd.read_csv(file_location+"/"+comparison_filename,sep='\\s+',nrows=1))
         if verbose: print(column_names)
 
         # Check if binned memory
@@ -144,49 +144,27 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
         else:
             is_binned = False
 
-        column_selections = ['TIME', 'BX', 'ADDR', 'DATA']
+        column_selections = ['TIME', '(ns)', 'BX', 'CLK', 'ADDR', 'DATA']
 
         # Open the comparison (= VHDL test-bench output) data
-        data = pd.read_csv(file_location+"/"+comparison_filename,sep='\s+',header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
+        data = pd.read_csv(file_location+"/"+comparison_filename,sep='\\s+',header=0,names=column_names,usecols=[i for i in column_names if any(select in i for select in column_selections)])
         if verbose: print(data) # Can also just do data.head()
 
-        #Need to figure out how to handle the memory "overwrite" - this is a bit of a hack...
-        if (not is_binned) and ("TF_" not in comparison_filename) and ("AS_" not in comparison_filename) and ("MPAR_" not in comparison_filename):
+        #Remove duplicate addresses - this means we overwrote data, e.g. in the FM
+        if "FM_" in comparison_filename:
+            addresses = {}
             rows = []
+            bx_old = -1;
             for index, row in data.iterrows():
-                if row['ADDR'] == "0x01":
-                    rows.append(index-1) # -1 to remove previos entry
-            data=data.drop(rows)
+                if row['BX'] != bx_old :
+                    bx_old = row['BX']
+                    addresses = {}
+                if row['ADDR'] in addresses:
+                    rows.append(addresses[row['ADDR']])
+                addresses[row['ADDR']] = index
+            data = data.drop(rows)
 
-        #This is a hack to work around over flows in VMStub memories
-        if is_binned:
-            rows = []
-            count = {}
-            for index, row in data.iterrows():
-                entry = str(row['BX'])+row['ADDR']
-                if entry not in count:
-                    count[entry]=1
-                else:
-                    count[entry]+=1
-                if count[entry]>15:
-                    rows.append(index)
-            data=data.drop(rows)
-
-        #This is a hack to work around over flows in MPROJ memories
-        if "MPROJ_" in comparison_filename:
-            rows = []
-            count = {}
-            for index, row in data.iterrows():
-                entry = str(row['BX'])+row['ADDR']
-                if entry not in count:
-                    count[entry]=1
-                else:
-                    count[entry]+=1
-                if count[entry]>63:
-                    rows.append(index)
-            data=data.drop(rows)
-
-        # Hack to remove bin address
+        # Hack to remove bin address fix in emulation code printout?
         if "MPAR_" in comparison_filename:
             for index, row in data.iterrows():
                 adata = row['DATA']
@@ -221,19 +199,12 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
             # Select the correct event from the comparison data
             selected_rows = selected_columns.loc[selected_columns['BX'] == ievent]
 
-            # Hack for FPGA1 Project as BX off by 0ne
-            if ("AS_" in comparison_filename and "n1" in comparison_filename)  or "MPAR_" in comparison_filename:
-                selected_rows = selected_columns.loc[selected_columns['BX']-1 == ievent]
-
             if len(selected_rows) == 0 and len(event) != 0:
                 good = False
                 number_of_missing_events += 1
                 message = "Event "+str(ievent)+" does not exist in the comparison data!"
                 if fail_on_error: raise Exception(message)
                 else:             print("\t"+message)
-
-            # Select only the comparison data where the valid bit is set
-            #selected_rows = selected_rows.loc[selected_rows[selected_rows.columns[1]] == '0b1']
 
             # Check the length of the two sets
             # Raise an exception if the are fewer entries for a given event in the comparison data than in the reference data
@@ -260,15 +231,12 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
                 if is_binned:
                     bin, data = val
-                    bin = bin.replace("0x","")
+                    #bin = bin.replace("0x","")
                 else:
                     data = val
 
                 # Raise exception if the values for a given entry don't match
                 adata = selected_rows['DATA'][offset+ival]
-
-                if ("AS_" in comparison_filename) and ("n1" in comparison_filename):
-                    adata=adata.replace("0x1","0x")
 
                 if adata != data:
                     good = False
@@ -280,13 +248,13 @@ def compare(comparison_filename="", fail_on_error=False, file_location='./', pre
 
                 # Raise exception if the bin number of a given entry don't match
                 elif is_binned:
-                    ref_add = selected_rows['ADDR'][offset+ival][3:]
-                    data_add = bin.upper()
+                    ref_add = selected_rows['ADDR'][offset+ival]
+                    data_add = bin.upper().replace('0X','0x')
                     if ref_add != data_add:
                         good = False
                         number_of_value_mismatches += 1
                         message = "The bin for event "+str(ievent)+" stub "+str(selected_rows['DATA'][offset+ival])+" do not match!"\
-                                  "\n\treference="+bin+" comparison="+str(selected_rows['ADDR'][offset+ival])
+                                  "\n\treference="+str(ref_add)+" comparison="+str(data_add)
                         if fail_on_error: raise Exception(message)
                         else:             print("\t\t"+message.replace("\n","\n\t\t"))
 
@@ -318,7 +286,7 @@ def comparePredefined(args):
         raise FileNotFoundError(comparison_dir + " is empty. No files to compare.")
 
     # Find the lists of filenames
-    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.txt") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f and "DW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
+    comparison_filename_list = [f for f in glob.glob(comparison_dir+"*.dat") if "debug" not in f and "cmp" not in f and "TW" not in f and "BW" not in f and "DW" not in f] # Remove debug and comparison files from file list, also also TW/BW output from TB (since TF output used instead).
     comparison_filename_list.sort()
     reference_filename_list = [f.split('/')[-1].split('.')[0].replace("TEO", "TE").replace("TEI", "TE") for f in comparison_filename_list] # Remove file extension from comparison_filename_list and replace TEO/TEI with TE
     try:
@@ -335,7 +303,7 @@ def comparePredefined(args):
       print("Summary of memories with errors")
       print("=================================")
       sys.stdout.flush()
-      os.system('grep "Bad events: [1-9]" dataOut/*cmp.txt')
+      os.system('grep "Bad events: [1-9]" dataOut/*cmp.dat')
 
     print("\n Accumulated number of errors =",ret_sum)
 

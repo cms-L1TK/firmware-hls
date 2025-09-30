@@ -38,7 +38,10 @@ entity tf_mem_tproj is
     INIT_HEX        : boolean := true;             --! Read init file in hex (default) or bin
     RAM_PERFORMANCE : string := "HIGH_PERFORMANCE";--! Select "HIGH_PERFORMANCE" (2 clk latency) or "LOW_LATENCY" (1 clk latency)
     NAME            : string := "MEMNAME";          --! Name of mem for printout
-    DEBUG           : boolean := false             --! If true prints debug info
+    DEBUG           : boolean := false;             --! If true prints debug info
+    FILE_WRITE      : boolean := true               --! If set to true will
+                                                    --write debug output for memory
+
     );
   port (
     clka      : in  std_logic;                                      --! Write clock
@@ -115,13 +118,19 @@ assert (RAM_DEPTH  = NUM_TPAGES*NUM_PAGES*PAGE_LENGTH) report "User changed RAM_
 assert (PAGE_LENGTH = 64) report "PAGE_LENGTH in tf_mem_tproj has to be 64" severity FAILURE;
 
 process(clka)
+
+  variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   variable slv_clk_cnt   : std_logic_vector(clogb2(PAGE_LENGTH*2)-1 downto 0) := (others => '0'); -- Hack...
+  variable slv_clk_cnt_save   : std_logic_vector(clogb2(PAGE_LENGTH*2)-1 downto 0) := (others => '0'); -- Hack...
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  
   variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
   variable tpage        : std_logic_vector(clogb2(NUM_TPAGES)-1 downto 0)  := (others => '0');
   variable nentaddress  : std_logic_vector(clogb2(NUM_TPAGES*NUM_PAGES)-1 downto 0) := (others => '0');
   variable address      : std_logic_vector(clogb2(RAM_DEPTH)-1 downto 0);
+  variable bx                   : integer := 0;
+  variable bx_save              : integer := 0;
+
 begin
   if rising_edge(clka) then -- ######################################### Start counter initially
     --if DEBUG then
@@ -142,10 +151,13 @@ begin
     --end if;
     --end if;
     slv_page_cnt_save := slv_page_cnt;
+    slv_clk_cnt_save := slv_clk_cnt;
+    bx_save := bx;
     if (init = '0' and to_integer(unsigned(slv_clk_cnt)) < MAX_ENTRIES-1) then
       slv_clk_cnt := std_logic_vector(unsigned(slv_clk_cnt)+1);     
     elsif (to_integer(unsigned(slv_clk_cnt)) >= MAX_ENTRIES-1) then 
       slv_clk_cnt := (others => '0');
+      bx := bx + 1;
       if (to_integer(unsigned(slv_page_cnt)) < NUM_PAGES-1) then
         slv_page_cnt := std_logic_vector(unsigned(slv_page_cnt)+1);
       else
@@ -162,6 +174,7 @@ begin
       --use sync_nent transition to synchronize at BX (page) 1
       --report time'image(now)&" tf_mem "&NAME&" sync_nent";
       init := '0';
+      bx := 1;
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
     end if;
@@ -178,10 +191,16 @@ begin
         address := nentaddress&std_logic_vector(to_unsigned(0, nent_o(to_integer(unsigned(nentaddress)))'length));
         nent_o(to_integer(unsigned(nentaddress))) <= std_logic_vector(to_unsigned(1, nent_o(to_integer(unsigned(nentaddress)))'length));
       end if;
-      --report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_bstring(addra)&" tpage:"&to_bstring(tpage)&" writeaddr "&to_bstring(slv_page_cnt_save)&" "&to_bstring(address)&" nentaddress nent:"&to_bstring(nentaddress)&" "&to_bstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_bstring(dina);
-      if (to_integer(unsigned(nent_o(to_integer(unsigned(nentaddress))))) /= 63) then
+      if DEBUG then
+        report time'image(now)&" tf_mem_tproj "&NAME&" addra:"&to_hstring(addra)&" tpage:"&to_hstring(tpage)&" writeaddr "&to_hstring(slv_page_cnt_save)&" "&to_hstring(address)&" nentaddress nent:"&to_hstring(nentaddress)&" "&to_hstring(nent_o(to_integer(unsigned(nentaddress))))&" "&to_hstring(dina);
+      end if;
+      if (to_integer(unsigned(nent_o(to_integer(unsigned(nentaddress))))) /= 63  or mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) /= '1') then
         sa_RAM_data(to_integer(unsigned(address))) <= dina; -- Write data
         mask_o(to_integer(unsigned(slv_page_cnt_save)))(to_integer(unsigned(tpage))) <= '1';
+        if FILE_WRITE then
+          write_data(initialized, "../../../../../dataOut/"&NAME&".dat",time'image(now), integer'image(bx_save), to_hstring(slv_clk_cnt_save), to_hstring(address(clogb2(NUM_TPAGES)+ 6 - 1 downto 0)), to_hstring(dina) );
+        end if;
+        initialized := true;
       end if;
     end if;
   end if;
