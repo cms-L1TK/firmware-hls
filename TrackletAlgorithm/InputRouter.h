@@ -304,6 +304,7 @@ void InputRouter( const BXType bx
 	for (int cStubCounter = 0; cStubCounter < kMaxProc; cStubCounter++) 
 	{
 #pragma HLS pipeline II = 1 rewind
+#pragma HLS latency min=6 max=6
 	  // decode stub
 	  auto hStub = hInputStubs[cStubCounter];
 	  // add check of valid bit here 
