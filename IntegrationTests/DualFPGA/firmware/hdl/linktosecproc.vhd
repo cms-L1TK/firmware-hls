@@ -38,10 +38,10 @@ use work.memUtil_aux_pkg_f1.all;
 entity linktosecproc is
   port (
     clk_i                : in  std_logic;
-    rst_i                : in  std_logic;
     ttc_i                : in  ttc_stuff_array(N_REGION - 1 downto 0);
     din_i                : in  ldata(4 * N_REGION - 1 downto 0);
     ir_start_o           : out std_logic;
+    sp_reset             : out std_logic;
     bx_o                 : out std_logic_vector(2 downto 0);
     DL_39_link_AV_dout   : out t_arr_DL_39_DATA;
     DL_39_link_empty_neg : out t_arr_DL_39_1b;
@@ -51,13 +51,25 @@ end entity linktosecproc;
 
 architecture rtl of linktosecproc is
 
+  constant IR_LATENCY : natural := 6;
+  constant inlink_low : natural := 68;
+  constant inlink_high : natural := 119;
+
+  type t_arr_ldata is array(IR_LATENCY-1 downto 0) of ldata(inlink_high downto inlink_low); 
+
   -- signal s_tracklet_reset : t_resets(numPPquads - 1 downto 0);
   -- signal s_tracklet_isol  : t_stubsDTC;
   -- signal s_tracklet_data  : t_datas(numInputsIR - 1 downto 0);
+  signal s_din_d         : t_arr_ldata := (others => (others => LWORD_NULL));
+
+  type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET);
+  signal valid_prev      : std_logic := '0';
+  signal sectorprocessor_ctrl    : enum_RESET_STATE  := S_IDLE;
+  signal sync_counter    : unsigned(7 downto 0) := (others => '0');
   signal s_ir_start      : std_logic;
   signal s_ir_start_srff : std_logic;
-  signal s_din_d         : ldata(4 * N_REGION - 1 downto 0);
-  signal s_din_dd        : ldata(4 * N_REGION - 1 downto 0);
+  signal bx_int          : unsigned(2 downto 0) := (others => '0');
+  signal sp_reset_int    : std_Logic := '0';
 
 begin  -- architecture rtl
 
@@ -78,99 +90,130 @@ begin  -- architecture rtl
   --     in_dout  => s_tracklet_data
   --     );
 
-  GEN_DELAYED_DATA: for i in 68 to 107 generate
+  GEN_DELAYED_DATA: for i in inlink_low to inlink_high generate
     p_delay_data: process (clk_i) is
     begin  -- process p_delay_data
       if rising_edge(clk_i) then     -- rising clock edge
-        s_din_d(i).data <= din_i(i).data;
-        s_din_dd(i).data <= s_din_d(i).data;
-        s_din_d(i).valid <= din_i(i).valid;
+        s_din_d(0)(i).data <= din_i(i).data;
       end if;
     end process p_delay_data;
+    GEN_DIN_PIPE : for j in 1 to IR_LATENCY-1 generate
+      p_delay_data_pipe: process (clk_i) is
+      begin  
+        if rising_edge(clk_i) then     -- rising clock edge
+          s_din_d(j)(i).data <= s_din_d(j-1)(i).data;
+        end if;
+      end process p_delay_data_pipe;
+    end generate GEN_DIN_PIPE;
   end generate GEN_DELAYED_DATA;
 
   -----------------------------------------------------------------------------
   -- Connect input link data to IR in Sector Processor
   -----------------------------------------------------------------------------
-  DL_39_link_AV_DOUT(PS10G_1_A)    <= s_din_dd(68).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_1_B)    <= s_din_dd(69).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_A)    <= s_din_dd(70).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_2_B)    <= s_din_dd(71).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_A)    <= s_din_dd(72).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_3_B)    <= s_din_dd(73).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_4_A)    <= s_din_dd(74).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS10G_4_B)    <= s_din_dd(75).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_A)       <= s_din_dd(76).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_1_B)       <= s_din_dd(77).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_A)       <= s_din_dd(78).data(38 downto 0);
-  DL_39_link_AV_DOUT(PS_2_B)       <= s_din_dd(79).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_1_A) <= s_din_dd(84).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_1_B) <= s_din_dd(85).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_2_A) <= s_din_dd(86).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_2_B) <= s_din_dd(87).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_3_A) <= s_din_dd(88).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_3_B) <= s_din_dd(89).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_4_A) <= s_din_dd(90).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS10G_4_B) <= s_din_dd(91).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_1_A)    <= s_din_dd(92).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_1_B)    <= s_din_dd(93).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_2_A)    <= s_din_dd(94).data(38 downto 0);
-  DL_39_link_AV_DOUT(negPS_2_B)    <= s_din_dd(95).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_A)     <= s_din_dd(96).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_1_B)     <= s_din_dd(97).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_A)     <= s_din_dd(98).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_2_B)     <= s_din_dd(99).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_A)     <= s_din_dd(100).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_3_B)     <= s_din_dd(101).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_A)     <= s_din_dd(102).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_4_B)     <= s_din_dd(103).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_5_A)     <= s_din_dd(104).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_5_B)     <= s_din_dd(105).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_6_A)     <= s_din_dd(106).data(38 downto 0);
-  DL_39_link_AV_DOUT(twoS_6_B)     <= s_din_dd(107).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_1_A)    <= s_din_dd(108).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_1_B)    <= s_din_dd(109).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_2_A)    <= s_din_dd(110).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_2_B)    <= s_din_dd(111).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_3_A)    <= s_din_dd(112).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_3_B)    <= s_din_dd(113).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_4_A)    <= s_din_dd(114).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_4_B)    <= s_din_dd(115).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_5_A)    <= s_din_dd(116).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_5_B)    <= s_din_dd(117).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_6_A)    <= s_din_dd(118).data(38 downto 0);
-  DL_39_link_AV_DOUT(neg2S_6_B)    <= s_din_dd(119).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_A)    <= s_din_d(IR_LATENCY-1)(68).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_1_B)    <= s_din_d(IR_LATENCY-1)(69).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_A)    <= s_din_d(IR_LATENCY-1)(70).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_2_B)    <= s_din_d(IR_LATENCY-1)(71).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_A)    <= s_din_d(IR_LATENCY-1)(72).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_3_B)    <= s_din_d(IR_LATENCY-1)(73).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_4_A)    <= s_din_d(IR_LATENCY-1)(74).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS10G_4_B)    <= s_din_d(IR_LATENCY-1)(75).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_A)       <= s_din_d(IR_LATENCY-1)(76).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_1_B)       <= s_din_d(IR_LATENCY-1)(77).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_A)       <= s_din_d(IR_LATENCY-1)(78).data(38 downto 0);
+  DL_39_link_AV_DOUT(PS_2_B)       <= s_din_d(IR_LATENCY-1)(79).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_1_A) <= s_din_d(IR_LATENCY-1)(84).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_1_B) <= s_din_d(IR_LATENCY-1)(85).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_2_A) <= s_din_d(IR_LATENCY-1)(86).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_2_B) <= s_din_d(IR_LATENCY-1)(87).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_3_A) <= s_din_d(IR_LATENCY-1)(88).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_3_B) <= s_din_d(IR_LATENCY-1)(89).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_4_A) <= s_din_d(IR_LATENCY-1)(90).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS10G_4_B) <= s_din_d(IR_LATENCY-1)(91).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_1_A)    <= s_din_d(IR_LATENCY-1)(92).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_1_B)    <= s_din_d(IR_LATENCY-1)(93).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_2_A)    <= s_din_d(IR_LATENCY-1)(94).data(38 downto 0);
+  DL_39_link_AV_DOUT(negPS_2_B)    <= s_din_d(IR_LATENCY-1)(95).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_A)     <= s_din_d(IR_LATENCY-1)(96).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_1_B)     <= s_din_d(IR_LATENCY-1)(97).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_A)     <= s_din_d(IR_LATENCY-1)(98).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_2_B)     <= s_din_d(IR_LATENCY-1)(99).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_A)     <= s_din_d(IR_LATENCY-1)(100).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_3_B)     <= s_din_d(IR_LATENCY-1)(101).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_A)     <= s_din_d(IR_LATENCY-1)(102).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_4_B)     <= s_din_d(IR_LATENCY-1)(103).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_5_A)     <= s_din_d(IR_LATENCY-1)(104).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_5_B)     <= s_din_d(IR_LATENCY-1)(105).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_6_A)     <= s_din_d(IR_LATENCY-1)(106).data(38 downto 0);
+  DL_39_link_AV_DOUT(twoS_6_B)     <= s_din_d(IR_LATENCY-1)(107).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_1_A)    <= s_din_d(IR_LATENCY-1)(108).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_1_B)    <= s_din_d(IR_LATENCY-1)(109).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_2_A)    <= s_din_d(IR_LATENCY-1)(110).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_2_B)    <= s_din_d(IR_LATENCY-1)(111).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_3_A)    <= s_din_d(IR_LATENCY-1)(112).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_3_B)    <= s_din_d(IR_LATENCY-1)(113).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_4_A)    <= s_din_d(IR_LATENCY-1)(114).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_4_B)    <= s_din_d(IR_LATENCY-1)(115).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_5_A)    <= s_din_d(IR_LATENCY-1)(116).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_5_B)    <= s_din_d(IR_LATENCY-1)(117).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_6_A)    <= s_din_d(IR_LATENCY-1)(118).data(38 downto 0);
+  DL_39_link_AV_DOUT(neg2S_6_B)    <= s_din_d(IR_LATENCY-1)(119).data(38 downto 0);
 
   -----------------------------------------------------------------------------
-  -- Generate start signal
+  -- Generate start signal, reset signal, and BX
   -----------------------------------------------------------------------------
-  set_reset_ffd_1 : entity work.set_reset_ffd
-    port map (
-      clk_i   => clk_i,
-      set_i   => s_din_d(68).valid,
-      reset_i => rst_i,
-      q_o     => s_ir_start_srff
-      );
 
+  p_sectorprocessor_ctrl : process (clk_i) is
+  begin 
+    if rising_edge(clk_i) then 
+      valid_prev <= din_i(68).valid;
 
-  s_ir_start <= s_din_d(68).valid or s_ir_start_srff;
+      --FSM to control start/reset signals to SectorProcessor
+      case sectorprocessor_ctrl is
+        when S_IDLE =>
+          --generate start upon beginning of EMP valid
+          if (din_i(68).valid = '1' and valid_prev = '0') then
+            sync_counter <= (others => '0');
+            bx_int <= (others => '0');
+            s_ir_start <= '1';
+            sectorprocessor_ctrl <= S_ACTIVE;
+          end if;
+
+        when S_ACTIVE =>
+          --generate reset if beginning of EMP packet is not sync'd w/ counter
+          if (to_integer(sync_counter) = 107) then 
+            sync_counter <= (others => '0');
+            bx_int <= bx_int+1;
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+          if (din_i(68).valid = '1' and valid_prev = '0'
+              and to_integer(sync_counter) /= 107) then 
+            sync_counter <= (others => '0');
+            s_ir_start <= '0';
+            sp_reset_int <= '1';
+            sectorprocessor_ctrl <= S_RESET;
+          end if;
+
+        when S_RESET =>
+          --return to idle after reset has been asserted for 2 BXs
+          if (to_integer(sync_counter) = 215) then 
+            sync_counter <= (others => '0');
+            sp_reset_int <= '0';
+            sectorprocessor_ctrl <= S_IDLE;
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+
+      end case;
+
+    end if; --rising clock edge
+  end process p_sectorprocessor_ctrl;
+
+  --With current IR setup latency, IR_Start needs to come up 4 clock cycles
+  --before first data
   ir_start_o <= s_ir_start;
-
-  p_bx_count : process (clk_i) is
-    variable v_bx         : natural;
-    variable v_word_count : natural := 1;
-  begin  -- process p_bx_count
-    if rising_edge(clk_i) then          -- rising clock edge
-      if s_ir_start = '1' then
-        if v_word_count < MAX_ENTRIES then
-          v_word_count := v_word_count + 1;
-        else
-          v_word_count := 1;
-          v_bx         := v_bx + 1;
-        end if;
-      end if;
-      bx_o <= std_logic_vector(to_unsigned(v_bx, bx_o'length));
-    end if;
-  end process p_bx_count;
+  sp_reset <= sp_reset_int;
+  bx_o <= std_logic_vector(bx_int);
 
 end architecture rtl;

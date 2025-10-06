@@ -54,6 +54,7 @@ architecture rtl of emp_payload is
   signal bx_link_valid         : std_logic;
   signal PC_start              : std_logic;
   signal PC_bx_in              : std_logic_vector(2 downto 0);
+  signal HLS_reset             : std_logic;
   signal AS_36_wea             : t_arr_AS_36_1b;
   signal AS_36_writeaddr       : t_arr_AS_36_ADDR;
   signal AS_36_din             : t_arr_AS_36_DATA;
@@ -61,7 +62,6 @@ architecture rtl of emp_payload is
   signal MPAR_73_writeaddr     : t_arr_MTPAR_73_ADDR;
   signal MPAR_73_din           : t_arr_MTPAR_73_DATA;
   signal s_tftokf              : t_channlesTB(numTW_104 - 1 downto 0);
-  signal s_kfin                : t_channlesTB(numNodesKF - 1 downto 0);
   signal s_kfout               : t_frames(numLinksTFP - 1 downto 0);
   signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
   signal FT_bx_out_0           : std_logic_vector(2 downto 0);
@@ -69,8 +69,8 @@ architecture rtl of emp_payload is
   signal FT_done               : std_logic;
   signal FT_last_track         : std_logic;
   signal FT_last_track_vld     : std_logic;
-  signal TW_104_stream_AV_din  : t_arr_TW_104_DATA;
-  signal TW_104_stream_A_write : t_arr_TW_104_1b;
+  signal TW_113_stream_AV_din  : t_arr_TW_113_DATA;
+  signal TW_113_stream_A_write : t_arr_TW_113_1b;
   signal DW_49_stream_AV_din   : t_arr_DW_49_DATA;
   signal DW_49_stream_A_write  : t_arr_DW_49_1b;
   signal BW_46_stream_AV_din   : t_arr_BW_46_DATA;
@@ -84,7 +84,6 @@ begin
   linktosecproc2_1 : entity work.linktosecproc2
     port map (
       clk                => clk_p,
-      rst                => rst,
       d                  => d,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
@@ -100,7 +99,6 @@ begin
   sp2_mem_writer_1 : entity work.sp2_mem_writer
     port map (
       clk                => clk_p,
-      reset              => rst,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
       bx_link_data       => bx_link_data,
@@ -114,7 +112,8 @@ begin
       MPAR_73_writeaddr  => MPAR_73_writeaddr,
       MPAR_73_din        => MPAR_73_din,
       PC_start           => PC_start,
-      PC_bx_in           => PC_bx_in
+      PC_bx_in           => PC_bx_in,
+      HLS_reset          => HLS_reset
       );
 
   -----------------------------------------------------------------------------
@@ -123,26 +122,26 @@ begin
   tf2_wrapper_1 : entity work.tf2_wrapper
     port map (
       clk                       => clk_p,
-      reset                     => rst,
+      reset                     => HLS_reset,
       PC_start                  => PC_start,
       PC_bx_in                  => PC_bx_in,
       PC_bx_out                 => open,
       PC_bx_out_vld             => open,
       PC_done                   => open,
-      FT_bx_out                 => FT_bx_out_0,
-      FT_bx_out_vld             => FT_bx_out_vld,
-      FT_done                   => FT_done,
-      FT_last_track             => FT_last_track,
-      FT_last_track_vld         => FT_last_track_vld,
+      TB_bx_out                 => FT_bx_out_0,
+      TB_bx_out_vld             => FT_bx_out_vld,
+      TB_done                   => FT_done,
+      TB_last_track             => FT_last_track,
+      TB_last_track_vld         => FT_last_track_vld,
       AS_36_wea                 => AS_36_wea,
       AS_36_writeaddr           => AS_36_writeaddr,
       AS_36_din                 => AS_36_din,
       MPAR_73_wea               => MPAR_73_wea,
       MPAR_73_writeaddr         => MPAR_73_writeaddr,
       MPAR_73_din               => MPAR_73_din,
-      TW_104_stream_AV_din      => TW_104_stream_AV_din,
-      TW_104_stream_A_full_neg  => (others => '1'),
-      TW_104_stream_A_write     => TW_104_stream_A_write,
+      TW_113_stream_AV_din      => TW_113_stream_AV_din,
+      TW_113_stream_A_full_neg  => (others => '1'),
+      TW_113_stream_A_write     => TW_113_stream_A_write,
       DW_49_stream_AV_din       => DW_49_stream_AV_din,
       DW_49_stream_A_full_neg   => (others => '1'),
       DW_49_stream_A_write      => DW_49_stream_A_write,
@@ -157,8 +156,8 @@ begin
   tf_to_kf_1 : entity work.tf_to_kf
     port map (
       clk_i          => clk_p,
-      TW_104_data_i  => TW_104_stream_AV_din,
-      TW_104_valid_i => TW_104_stream_A_write,
+      TW_113_data_i  => TW_113_stream_AV_din,
+      TW_113_valid_i => TW_113_stream_A_write,
       DW_49_data_i   => DW_49_stream_AV_din,
       DW_49_valid_i  => DW_49_stream_A_write,
       BW_46_data_i   => BW_46_stream_AV_din,
@@ -168,22 +167,12 @@ begin
       );
 
   -----------------------------------------------------------------------------
-  -- KF Input merger (to be replaced by DR)
-  -----------------------------------------------------------------------------
-  kf_input_merger_1 : entity work.kf_input_merger
-    port map (
-      clk            => clk_p,
-      din            => s_tftokf,
-      dout           => s_kfin
-      );
-
-  -----------------------------------------------------------------------------
   -- KF
   -----------------------------------------------------------------------------
   kf_wrapper_1 : entity work.kf_wrapper
     port map (
       clk_i   => clk_p,
-      kfin_i  => s_kfin,
+      kfin_i  => s_tftokf,
       kfout_o => s_kfout
       );
 
