@@ -39,6 +39,7 @@ entity tf_mem is
     DEBUG           : boolean := false;            --! If true prints debug info
     MEM_TYPE        : string := "block";            --! specifies RAM type (block/ultra)
     NENT_SYNC       : boolean := false;             --! Enable synchronizer for nent_o
+    MAX_ENTRIES     : natural := MAX_ENTRIES;       --! Period in clock ticks for switching pages
     FILE_WRITE      : boolean := true              --! If set to true will
                                                     --write debug output for memory
     );
@@ -121,8 +122,8 @@ process(clka)
   variable initialized   : boolean := false;
   variable init   : std_logic := '1'; 
   --FIXME hardcoded number
-  variable slv_clk_cnt   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
-  variable slv_clk_cnt_save   : std_logic_vector(6 downto 0) := (others => '0'); -- Clock counter
+  variable slv_clk_cnt   : std_logic_vector(7 downto 0) := (others => '0'); -- Clock counter
+  variable slv_clk_cnt_save   : std_logic_vector(7 downto 0) := (others => '0'); -- Clock counter
   variable slv_page_cnt_save  :  std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0');  -- Page counter save
   variable slv_page_cnt  : std_logic_vector(clogb2(NUM_PAGES)-1 downto 0) := (others => '0'); 
   variable bx                   : integer := 0;

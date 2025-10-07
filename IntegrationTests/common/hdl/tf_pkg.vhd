@@ -34,6 +34,7 @@ package tf_pkg is
   constant DEBUG                  : boolean := true; --! Debug off/on
   constant MAX_EVENTS             : natural := 100;  --! Max. number of BX events
   constant MAX_ENTRIES            : natural := 108;  --! Max. number of entries: 108 = BX period with 240 MHz
+  constant MAX_ENTRIES_360        : natural := 162;  --! Max. number of entries: 162 = BX period with 360 MHz
   constant EMDATA_WIDTH           : natural := 80;   --! Max. bit width of emData
   constant N_MEM_BINS             : natural := 8;    --! Number of memory bins
   constant N_ENTRIES_PER_MEM_BINS : natural := 16;   --! Number of entries per memory bin
