@@ -115,9 +115,6 @@ entity tf_mem_bin is
     --! Output reset (does not affect memory contents)
     rstb      : in  std_logic;
 
-    --! Output register enable
-    regceb    : in  std_logic;
-
     --! Read address bus, width determined from RAM_DEPTH and NCOPY   
     addrb      : in std_logic_vector(NUM_COPY*RAM_DEPTH_BITS-1 downto 0);
 

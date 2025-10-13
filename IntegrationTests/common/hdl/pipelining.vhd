@@ -16,6 +16,7 @@ entity tf_pipeline is
   generic (
     DELAY : natural := 2;
     USE_SRL : string := "no";
+    LATCH_START : boolean := false;
     RAM_WIDTH : natural := 14;
     NUM_PAGES : natural := 2;
     PAGE_LENGTH : natural := PAGE_LENGTH;
@@ -36,27 +37,31 @@ entity tf_pipeline is
     -- Start/BX signals
     done : in std_logic := '0';
     bx_out : in std_logic_vector(2 downto 0) := (others => '0');
+    bx_out_vld : in std_logic := '0';
     start : out std_logic;
-    bx : out std_logic_vector(2 downto 0)
+    bx : out std_logic_vector(2 downto 0);
+    bx_vld : out std_logic
   );
 end tf_pipeline;
 
 architecture behavior of tf_pipeline is
 
-  attribute dont_touch : string;
-  attribute dont_touch of behavior : architecture is "yes";
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of behavior : architecture is "yes";
 
   type t_wea_pipe is array (0 to DELAY - 1) of std_logic;
   type t_addra_pipe is array (0 to DELAY - 1) of std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 );
   type t_dina_pipe is array (0 to DELAY - 1) of std_logic_vector( RAM_WIDTH - 1 downto 0 );
   type t_start_pipe is array(0 to DELAY - 1) of std_logic;
   type t_bx_pipe is array(0 to DELAY - 1) of std_logic_vector(2 downto 0);
+  type t_bx_vld_pipe is array(0 to DELAY - 1) of std_logic;
 
   signal wea_pipe : t_wea_pipe := (others => '0');
   signal addra_pipe : t_addra_pipe := (others => (others => '0') );
   signal dina_pipe : t_dina_pipe := (others => (others => '0') );
   signal start_pipe : t_start_pipe := (others => '0');
   signal bx_pipe : t_bx_pipe := (others => (others => '0') );
+  signal bx_vld_pipe : t_bx_vld_pipe := (others => '0');
 
   attribute shreg_extract : string;
   attribute shreg_extract of wea_pipe : signal is USE_SRL;
@@ -64,6 +69,15 @@ architecture behavior of tf_pipeline is
   attribute shreg_extract of dina_pipe : signal is USE_SRL;
   attribute shreg_extract of start_pipe : signal is USE_SRL;
   attribute shreg_extract of bx_pipe : signal is USE_SRL;
+  attribute shreg_extract of bx_vld_pipe : signal is USE_SRL;
+
+  attribute keep : string;
+  attribute keep of wea_pipe : signal is "yes";
+  attribute keep of addra_pipe : signal is "yes";
+  attribute keep of dina_pipe : signal is "yes";
+  attribute keep of start_pipe : signal is "yes";
+  attribute keep of bx_pipe : signal is "yes";
+  attribute keep of bx_vld_pipe : signal is "yes";
 
 begin
 
@@ -72,6 +86,7 @@ begin
   dina_out <= dina_pipe(DELAY - 1);
   start <= start_pipe(DELAY - 1);
   bx <= bx_pipe(DELAY - 1);
+  bx_vld <= bx_vld_pipe(DELAY - 1);
 
   PIPELINE : process (clk) is
   begin
@@ -82,23 +97,47 @@ begin
         wea_pipe(ii) <= wea_pipe(ii - 1);
         addra_pipe(ii) <= addra_pipe(ii - 1);
         dina_pipe(ii) <= dina_pipe(ii - 1);
-        start_pipe(ii) <= start_pipe(ii - 1);
         bx_pipe(ii) <= bx_pipe(ii - 1);
+        bx_vld_pipe(ii) <= bx_vld_pipe(ii - 1);
       end loop;
 
       wea_pipe(0) <= wea;
       addra_pipe(0) <= addra;
       dina_pipe(0) <= dina;
-      if reset = '1' then
-        start_pipe(0) <= '0';
-      elsif done = '1' then
-        start_pipe(0) <= done;
-      end if;
       bx_pipe(0) <= bx_out;
+      bx_vld_pipe(0) <= bx_out_vld;
 
     end if;
 
   end process;
+
+  START_LATCH : if LATCH_START generate
+    START_LATCH_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        for ii in 1 to DELAY - 1 loop
+          start_pipe(ii) <= start_pipe(ii - 1);
+        end loop;
+        if reset = '1' then
+          start_pipe(0) <= '0';
+        elsif done = '1' then
+          start_pipe(0) <= '1';
+        end if;
+      end if;
+    end process;
+  end generate START_LATCH;
+
+  NO_START_LATCH : if not LATCH_START generate
+    START_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        for ii in 1 to DELAY - 1 loop
+          start_pipe(ii) <= start_pipe(ii - 1);
+        end loop;
+        start_pipe(0) <= done;
+      end if;
+    end process;
+  end generate NO_START_LATCH;
 
 end behavior;
 
@@ -113,6 +152,7 @@ use work.tf_pkg.all;
 
 entity tf_auto_pipeline is
   generic (
+    LATCH_START : boolean := false;
     RAM_WIDTH : natural := 14;
     NUM_PAGES : natural := 2;
     PAGE_LENGTH : natural := PAGE_LENGTH;
@@ -133,21 +173,32 @@ entity tf_auto_pipeline is
     -- Start/BX signals
     done : in std_logic := '0';
     bx_out : in std_logic_vector(2 downto 0) := (others => '0');
+    bx_out_vld : in std_logic := '0';
     start : out std_logic;
-    bx : out std_logic_vector(2 downto 0)
+    bx : out std_logic_vector(2 downto 0);
+    bx_vld : out std_logic
   );
 end tf_auto_pipeline;
 
 architecture behavior of tf_auto_pipeline is
 
-  attribute dont_touch : string;
-  attribute dont_touch of behavior : architecture is "yes";
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of behavior : architecture is "yes";
 
   signal wea_reg : std_logic := '0';
   signal addra_reg : std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 ) := (others => '0');
   signal dina_reg : std_logic_vector( RAM_WIDTH - 1 downto 0 ) := (others => '0');
   signal start_reg : std_logic := '0';
   signal bx_reg : std_logic_vector(2 downto 0) := (others => '0');
+  signal bx_vld_reg : std_logic := '0';
+
+  attribute keep : string;
+  attribute keep of wea_reg : signal is "yes";
+  attribute keep of addra_reg : signal is "yes";
+  attribute keep of dina_reg : signal is "yes";
+  attribute keep of start_reg : signal is "yes";
+  attribute keep of bx_reg : signal is "yes";
+  attribute keep of bx_vld_reg : signal is "yes";
 
 begin
 
@@ -156,6 +207,7 @@ begin
   dina_out <= dina_reg;
   start <= start_reg;
   bx <= bx_reg;
+  bx_vld <= bx_vld_reg;
 
   AUTO_PIPELINE : process (clk) is
   begin
@@ -165,16 +217,34 @@ begin
       wea_reg <= wea;
       addra_reg <= addra;
       dina_reg <= dina;
-      if reset = '1' then
-        start_reg <= '0';
-      elsif done = '1' then
-        start_reg <= done;
-      end if;
       bx_reg <= bx_out;
+      bx_vld_reg <= bx_out_vld;
 
     end if;
 
   end process;
+
+  START_LATCH : if LATCH_START generate
+    START_LATCH_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        if reset = '1' then
+          start_reg <= '0';
+        elsif done = '1' then
+          start_reg <= '1';
+        end if;
+      end if;
+    end process;
+  end generate START_LATCH;
+
+  NO_START_LATCH : if not LATCH_START generate
+    START_PIPELINE : process (clk) is
+    begin
+      if rising_edge(clk) then
+        start_reg <= done;
+      end if;
+    end process;
+  end generate NO_START_LATCH;
 
 end behavior;
 
@@ -193,6 +263,7 @@ entity tf_pipeline_slr_xing is
     NUM_SLR : natural := 2;
     DELAY : t_arr_1d_nat(0 to NUM_SLR - 1) := (others => 2);
     USE_SRL : t_arr_1d_bol(0 to NUM_SLR - 1) := (others => false);
+    LATCH_START : boolean := true;
     RAM_WIDTH : natural := 14;
     NUM_PAGES : natural := 2;
     PAGE_LENGTH : natural := PAGE_LENGTH;
@@ -213,27 +284,34 @@ entity tf_pipeline_slr_xing is
     -- Start/BX signals
     done : in std_logic := '0';
     bx_out : in std_logic_vector(2 downto 0) := (others => '0');
+    bx_out_vld : in std_logic := '0';
     start : out std_logic;
-    bx : out std_logic_vector(2 downto 0)
+    bx : out std_logic_vector(2 downto 0);
+    bx_vld : out std_logic
   );
 end tf_pipeline_slr_xing;
 
 architecture behavior of tf_pipeline_slr_xing is
 
-  attribute dont_touch : string;
-  attribute dont_touch of behavior : architecture is "yes";
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of behavior : architecture is "yes";
+
+  type t_latch_start_map is array (1 to NUM_SLR) of boolean;
+  constant latch_start_map : t_latch_start_map := (1 => LATCH_START, others => false);
 
   type t_wea_intra is array (0 to NUM_SLR) of std_logic;
   type t_addra_intra is array (0 to NUM_SLR) of std_logic_vector( clogb2(RAM_DEPTH) - 1 downto 0 );
   type t_dina_intra is array (0 to NUM_SLR) of std_logic_vector( RAM_WIDTH - 1 downto 0 );
   type t_start_intra is array(0 to NUM_SLR) of std_logic;
   type t_bx_intra is array(0 to NUM_SLR) of std_logic_vector(2 downto 0);
+  type t_bx_vld_intra is array(0 to NUM_SLR) of std_logic;
 
   signal wea_intra : t_wea_intra := (others => '0');
   signal addra_intra : t_addra_intra := (others => (others => '0'));
   signal dina_intra : t_dina_intra := (others => (others => '0'));
   signal start_intra : t_start_intra := (others => '0');
   signal bx_intra : t_bx_intra := (others => (others => '0'));
+  signal bx_vld_intra : t_bx_vld_intra := (others => '0');
 
 begin
 
@@ -242,6 +320,7 @@ begin
   dina_out <= dina_intra(NUM_SLR);
   start <= start_intra(NUM_SLR);
   bx <= bx_intra(NUM_SLR);
+  bx_vld <= bx_vld_intra(NUM_SLR);
 
   PIPELINE_SLR_XING : for ii in 1 to NUM_SLR generate
 
@@ -266,13 +345,18 @@ begin
         );
 
       AUTO_PIPELINE_START_BX : entity work.tf_auto_pipeline
+        generic map (
+            LATCH_START => latch_start_map(ii)
+        )
         port map (
           clk => clk,
           reset => reset,
           done => start_intra(ii - 1),
           bx_out => bx_intra(ii - 1),
+          bx_out_vld => bx_vld_intra(ii - 1),
           start => start_intra(ii),
-          bx => bx_intra(ii)
+          bx => bx_intra(ii),
+          bx_vld => bx_vld_intra(ii)
         );
 
     end generate AUTO_PIPELINE_ON;
@@ -304,15 +388,18 @@ begin
           PIPELINE_START_BX : entity work.tf_pipeline
             generic map (
               DELAY => DELAY(ii - 1),
-              USE_SRL => "yes"
+              USE_SRL => "yes",
+              LATCH_START => latch_start_map(ii)
             )
             port map (
               clk => clk,
               reset => reset,
               done => start_intra(ii - 1),
               bx_out => bx_intra(ii - 1),
+              bx_out_vld => bx_vld_intra(ii - 1),
               start => start_intra(ii),
-              bx => bx_intra(ii)
+              bx => bx_intra(ii),
+              bx_vld => bx_vld_intra(ii)
             );
 
       end generate USE_SRL_ON;
@@ -342,15 +429,18 @@ begin
           PIPELINE_START_BX : entity work.tf_pipeline
             generic map (
               DELAY => DELAY(ii - 1),
-              USE_SRL => "no"
+              USE_SRL => "no",
+              LATCH_START => latch_start_map(ii)
             )
             port map (
               clk => clk,
               reset => reset,
               done => start_intra(ii - 1),
               bx_out => bx_intra(ii - 1),
+              bx_out_vld => bx_vld_intra(ii - 1),
               start => start_intra(ii),
-              bx => bx_intra(ii)
+              bx => bx_intra(ii),
+              bx_vld => bx_vld_intra(ii)
             );
 
       end generate USE_SRL_OFF;
@@ -364,5 +454,6 @@ begin
   dina_intra(0) <= dina;
   start_intra(0) <= done;
   bx_intra(0) <= bx_out;
+  bx_vld_intra(0) <= bx_out_vld;
 
 end behavior;

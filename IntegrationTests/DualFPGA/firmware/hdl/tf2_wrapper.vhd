@@ -62,7 +62,10 @@ begin  -- architecture rtl
 
   SectorProcessor_1 : entity work.SectorProcessor
     port map (
-      clk                     => clk,
+      -- Two clock ports are available on the SectorProcessor for FPGA2,
+      -- although only the 240-MHz clock is currently used.
+      clk240                  => clk,
+      clk360                  => clk,
       reset                   => reset,
       PC_start                => PC_start,
       PC_bx_in                => PC_bx_in,

@@ -102,7 +102,7 @@ int main()
     const int NPAGE = 4;
     
     for (int ipage = 0; ipage < NPAGE; ipage++) {
-      for (int ipar = 0; ipar < kMaxProc; ipar++) {
+      for (int ipar = 0; ipar < kMaxProc(); ipar++) {
 	const bool valid = ipar < trackletParameters.getEntries(bx, ipage);
 	TOP_FUNC_(bx, bx_o, trackletParameters.read_mem(bx, ipar, ipage), ipage*128+ipar, valid,
 		  trackletParametersOut, tproj_barrel_ps, tproj_barrel_2s, tproj_disk);

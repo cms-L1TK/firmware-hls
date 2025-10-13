@@ -651,8 +651,8 @@ int main(int argc, char * argv[])
     
     std::cout << "Event#" << std::dec << +cEvId << "\n";
     // prepare input stub stream 
-    ap_uint<kNBits_DTC> hInputStubs[kMaxProc];
-    for( size_t cStubIndx=0; cStubIndx < kMaxProc; cStubIndx++)
+    ap_uint<kNBits_DTC> hInputStubs[kMaxProc()];
+    for( size_t cStubIndx=0; cStubIndx < kMaxProc(); cStubIndx++)
       hInputStubs[cStubIndx]=ap_uint<kNBits_DTC>(0);
     writeArrayFromFile<ap_uint<kNBits_DTC>>(hInputStubs , cLinkDataStream, cEvId);
     
