@@ -19,10 +19,14 @@ src --vhdl2008 common/hdl/tf_mem.vhd
 src --vhdl2008 common/hdl/tf_merge_streamer.vhd
 src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/pipelining.vhd
+src common/hdl/tf_cdc_240_360MHz.vhd
+src common/hdl/tf_cdc_240_360MHz_wr.vhd
+
+#Clock constraints
 
 #Floorplan
 src ../ucf/floorplan_f1.tcl
-
+src common/hdl/constraints_f1.xdc
 ################
 # Include Cores
 ################
