@@ -132,97 +132,97 @@ download:
       - ./IntegrationTests/
     expire_in: 1 week
 # Quality checks ------------
-IR-quality-check:
+.IR-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/InputRouterTop.cc'
-VMRCM-quality-check:
+.VMRCM-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMRouterCMTop_L2PHIA.cc'
-VMSMER-quality-check:
+.VMSMER-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMStubMERouterTop_D1PHIA.cc'    
-TP-quality-check:
+.TP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/CombinedConfig_FPGA2/TrackletProcessorTop.cc'
-PC-quality-check:
+.PC-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/ProjectionCalculator_test.cpp ../TopFunctions/CombinedConfig_FPGA2/ProjectionCalculatorTop.cc'
-MP-quality-check:
+.MP-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/MatchProcessor_test.cpp ../TopFunctions/CombinedConfig_FPGA2/MatchProcessorTop.cc'
-TB-quality-check:
+.TB-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/CombinedConfig_FPGA2/TrackBuilderTop.cc'
-TM-quality-check:
+.TM-quality-check:
   <<: *template_quality-check
   variables:
     VIVADO_VERSION: "2019.2"
     CLANG_TIDY_FILES: '../TestBenches/TrackMerger_test.cpp ../TopFunctions/TrackMergerTop.cc'
 # HLS builds ---------------
-IR-vivado-hls-build:
+.IR-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "IR-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "IR"
-VMRCM-vivado-hls-build:
+.VMRCM-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "VMRCM-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMRCM"
-VMSMER-vivado-hls-build:
+.VMSMER-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "VMSMER-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "VMSMER"
-TP-vivado-hls-build:
+.TP-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TP-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TP"
-PC-vivado-hls-build:
+.PC-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "PC-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "PC"
-MP-vivado-hls-build:
+.MP-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "MP-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "MP"
-TB-vivado-hls-build:
+.TB-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TB-quality-check"]
   variables:
     EXECUTABLE: 'vivado_hls'
     VIVADO_VERSION: "2019.2"
     PROJ_NAME: "TB"
-TM-vivado-hls-build:
+.TM-vivado-hls-build:
   <<: *template_hls-build
   needs: ["download", "TM-quality-check"]
   allow_failure: false # FIXME: testbench currently always passes
@@ -239,20 +239,6 @@ topReducedCombinedFPGA1-sim:
     PROJ_NAME: "ReducedCombinedConfig_FPGA1"
   needs:
     - job: download
-    - job: IR-vivado-hls-build
-      artifacts: false
-    - job: VMRCM-vivado-hls-build
-      artifacts: false
-    - job: VMSMER-vivado-hls-build
-      artifacts: false  
-    - job: TP-vivado-hls-build
-      artifacts: false
-    - job: PC-vivado-hls-build
-      artifacts: false
-    - job: MP-vivado-hls-build
-      artifacts: false
-    - job: TB-vivado-hls-build
-      artifacts: false
 # Check FW results ---------------
 topReducedCombinedFPGA1-check-results:
   <<: *template_check-results
@@ -264,7 +250,7 @@ topReducedCombinedFPGA1-check-results:
     - download
     - topReducedCombinedFPGA1-sim
 # FW synthesis ---------------
-topReducedCombinedFPGA1-synth:
+.topReducedCombinedFPGA1-synth:
   <<: *template_topTF-synth
   allow_failure: false
   variables:
@@ -284,20 +270,6 @@ topReducedCombinedFPGA2-sim:
     PROJ_NAME: "ReducedCombinedConfig_FPGA2"
   needs:
     - job: download
-    - job: IR-vivado-hls-build
-      artifacts: false
-    - job: VMRCM-vivado-hls-build
-      artifacts: false
-    - job: VMSMER-vivado-hls-build
-      artifacts: false  
-    - job: TP-vivado-hls-build
-      artifacts: false
-    - job: PC-vivado-hls-build
-      artifacts: false
-    - job: MP-vivado-hls-build
-      artifacts: false
-    - job: TB-vivado-hls-build
-      artifacts: false
 # Check FW results ---------------
 topReducedCombinedFPGA2-check-results:
   <<: *template_check-results
@@ -309,7 +281,7 @@ topReducedCombinedFPGA2-check-results:
     - download
     - topReducedCombinedFPGA2-sim
 # FW synthesis ---------------
-topReducedCombinedFPGA2-synth:
+.topReducedCombinedFPGA2-synth:
   <<: *template_topTF-synth
   allow_failure: false
   variables:
