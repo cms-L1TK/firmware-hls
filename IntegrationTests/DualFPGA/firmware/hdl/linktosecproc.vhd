@@ -54,7 +54,7 @@ end entity linktosecproc;
 
 architecture rtl of linktosecproc is
 
-  constant IR_LATENCY : natural := 6;
+  constant IR_LATENCY : natural := 8;
   constant inlink_low : natural := 68;
   constant inlink_high : natural := 119;
 
