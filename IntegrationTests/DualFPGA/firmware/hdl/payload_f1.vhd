@@ -123,7 +123,6 @@ begin
   secproc1tolink_1 : entity work.secproc1tolink
     port map (
       clk                      => clk_240MHz,
-      rst                      => rst,
       TP_bx_out                => tp_bx,
       AS_37_stream_V_dout      => AS_37_stream,
       MPAR_76_stream_V_dout    => MPAR_76_stream,

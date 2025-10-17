@@ -13,7 +13,6 @@ use work.hybrid_data_types.all;
 entity secproc1tolink is
   port(
     clk                    : in std_logic;
-    rst                    : in std_logic;
     TP_bx_out              : in std_logic_vector(2 downto 0);
     AS_37_stream_V_dout    : in t_arr_AS_37_DATA;
     MPAR_76_stream_V_dout  : in t_arr_MPAR_76_DATA;
