@@ -15,9 +15,6 @@ entity secproc1tolink is
     clk                    : in std_logic;
     rst                    : in std_logic;
     TP_bx_out              : in std_logic_vector(2 downto 0);
-    bx_in                  : in std_logic_vector(2 downto 0);
-    ir_start               : in std_logic;
-    dvalid                 : in std_logic;
     AS_37_stream_V_dout    : in t_arr_AS_37_DATA;
     MPAR_76_stream_V_dout  : in t_arr_MPAR_76_DATA;
     node_packet            : in t_packet;
@@ -199,12 +196,4 @@ begin
 
   q <= q_reg;
 
-  --debug
-  --q(55).data(2 downto 0) <= bx_in;
-  --q(55).data(3) <= '0';
-  --q(55).data(4) <= ir_start;
-  --q(55).data(7 downto 5) <= (others => '0');
-  --q(55).data(8) <= dvalid;
-  --q(55).data(63 downto 9) <= (others => '0');
-    
 end rtl;
