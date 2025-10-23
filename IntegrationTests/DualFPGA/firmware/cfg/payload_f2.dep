@@ -6,9 +6,7 @@ src sp2_mem_writer.vhd
 src tf2_wrapper.vhd
 src --vhdl2008 SectorProcessor_f2.vhd
 src tb_to_kf.vhd
-src kf_wrapper.vhd
 src common/hdl/emp/pkgs/tf_interface_pkg.vhd
-src kf_input_merger.vhd
 
 # KF
 src -c l1tk-for-emp:tm tm_isolation.vhd
