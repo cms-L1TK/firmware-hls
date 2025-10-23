@@ -41,7 +41,6 @@ entity emp_payload is
     slink_q      : out slink_input_data_quad_array(SLINK_MAX_QUADS-1 downto 0);
     backpressure : in std_logic_vector(SLINK_MAX_QUADS-1 downto 0)
     );
-
 end emp_payload;
 
 architecture rtl of emp_payload is
@@ -79,6 +78,12 @@ architecture rtl of emp_payload is
   signal BW_46_stream_A_write  : t_arr_BW_46_1b;
   signal s_tmpacket            : t_packets(0 to tbNumSeedTypes - 1);
   signal s_kfpacket            : t_packets(0 to numLinksTrack - 1);
+
+  -- Temporary signals to get vivado to not optimize away output while we have
+  -- not yet connected the output
+  signal out_dout              : ldata( 4 * N_REGION - 1 downto 0 );
+  attribute dont_touch : string;
+  attribute dont_touch of out_dout : signal is "true";
 
 begin
 
@@ -205,7 +210,7 @@ begin
       clk        => clk_payload(0),
       out_packet => s_kfpacket,
       out_din    => s_kfout,
-      out_dout   => open --TODO: fix
+      out_dout   => out_dout --TODO: fix
       );
 
   --q(92)        <= s_tfout(0);

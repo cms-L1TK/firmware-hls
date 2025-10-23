@@ -644,14 +644,14 @@ add_cells_to_pblock [get_pblocks pblock_payload_FTBBBB] [get_cells -quiet [list 
 
 set lpblock_payload_KF [create_pblock pblock_payload_KF]
 add_cells_to_pblock [get_pblocks pblock_payload_KF] [get_cells -quiet [list \
-          payload/kf_wrapper_1/kf_top_1 \
-          payload/kf_wrapper_1/kfin_top_1 \
-          payload/kf_wrapper_1/kf_input_merger_1 \
+          payload/tm_top_1 \
+          payload/dr_top_1 \
+          payload/kf_top_1 \
           ]]
 
 set lpblock_payload_KFout [create_pblock pblock_payload_KFout]
 add_cells_to_pblock [get_pblocks pblock_payload_KFout] [get_cells -quiet [list \
-          payload/kf_wrapper_1/kfout_top_1 \
+          payload/kf_isolation_out_1 \
           ]]
 
 #### Avoid splitting submodules in SectorProcessor across SLRs ####
