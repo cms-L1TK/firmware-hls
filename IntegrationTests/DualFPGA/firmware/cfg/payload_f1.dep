@@ -26,7 +26,7 @@ src common/hdl/tf_cdc_360_240MHz_sidebandBits.vhd
 
 #Floorplan
 src ../ucf/floorplan_f1.tcl
-src ../ucf/placement_f1.tcl
+#src ../ucf/placement_f1.tcl
 src common/hdl/constraints_f1.xdc
 ################
 # Include Cores
