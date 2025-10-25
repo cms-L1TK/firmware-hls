@@ -21,7 +21,7 @@ src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/pipelining.vhd
 src common/hdl/tf_cdc_240_360MHz.vhd
 src common/hdl/tf_cdc_240_360MHz_wr.vhd
-
+src common/hdl/tf_cdc_360_240MHz_sidebandBits.vhd
 #Clock constraints
 
 #Floorplan
