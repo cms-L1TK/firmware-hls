@@ -66,7 +66,8 @@ architecture rtl of linktosecproc is
   signal s_din_d         : t_arr_ldata := (others => (others => LWORD_NULL));
 
   type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET);
-  signal valid_prev      : std_logic := '0';
+  signal valid_sync0      : std_logic := '0';
+  signal valid_sync1      : std_logic := '0';
   signal sectorprocessor_ctrl    : enum_RESET_STATE  := S_IDLE;
   signal sync_counter    : unsigned(7 downto 0) := (others => '0');
   signal s_ir_start      : std_logic;
@@ -169,13 +170,13 @@ begin  -- architecture rtl
   p_sectorprocessor_ctrl : process (clk_i) is
   begin 
     if rising_edge(clk_i) then 
-      valid_prev <= din_i(68).valid;
-
+      valid_sync0 <= din_i(68).valid;
+      valid_sync1 <= valid_sync0;
       --FSM to control start/reset signals to SectorProcessor
       case sectorprocessor_ctrl is
         when S_IDLE =>
           --generate start upon beginning of EMP valid
-          if (din_i(68).valid = '1' and valid_prev = '0') then
+          if (valid_sync0 = '1' and valid_sync1 = '0') then
             sync_counter <= (others => '0');
             bx_int <= (others => '0');
             s_ir_start <= '1';
@@ -190,7 +191,7 @@ begin  -- architecture rtl
           else
             sync_counter <= sync_counter+1;
           end if;
-          if (din_i(68).valid = '1' and valid_prev = '0'
+          if (valid_sync0 = '1' and valid_sync1 = '0'
               and to_integer(sync_counter) /= MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
             s_ir_start <= '0';

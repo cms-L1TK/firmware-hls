@@ -51,6 +51,7 @@ architecture rtl of emp_payload is
   signal q_secproc1tolink     : ldata(4 * N_REGION - 1 downto 0);
   signal clk_360MHz            : std_logic;
   signal clk_240MHz            : std_logic;
+  signal d_ctrl_signals_240    : t_packet;
 begin
 
   clk_240MHz    <=      clk_payload(0);
@@ -104,6 +105,19 @@ begin
       );
 
   -----------------------------------------------------------------------------
+  -- CDC for control signals
+  -----------------------------------------------------------------------------
+  -- Sideband bits or control signals (valid start, valid, etc) are currently
+  -- from a different clock domain, so a CDC is needed:
+  control_signals_cdc_1 : entity work.tf_cdc_360_240MHz_sideband_bits
+    port map (
+      clk_240MHz_i  =>  clk_240MHz,
+      clk_360MHz_i  =>  clk_360MHz,
+      din_i         =>  conv_single(d),
+      dout_o        =>  d_ctrl_signals_240
+      );
+
+  -----------------------------------------------------------------------------
   -- Link formatter
   -----------------------------------------------------------------------------
   secproc1tolink_1 : entity work.secproc1tolink
@@ -116,7 +130,7 @@ begin
       dvalid                   => d(68).valid,
       AS_37_stream_V_dout      => AS_37_stream,
       MPAR_76_stream_V_dout    => MPAR_76_stream,
-      node_packet              => conv_single(d),
+      node_packet              => d_ctrl_signals_240,
       q                        => q_secproc1tolink
       );
 
