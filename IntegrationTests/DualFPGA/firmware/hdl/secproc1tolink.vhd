@@ -148,12 +148,14 @@ begin
     --to determine its outputs control signals, so we should synchronize these
     for i in 4 to 15 loop
       q_reg(i).start_of_orbit <= sr(sr'high).start_of_orbit;
+      q_reg(i).strobe <= '1';
       q_reg(i).start <= sr(sr'high).start;
       q_reg(i).last <= sr(sr'high).last;
       q_reg(i).valid <= sr(sr'high).valid;
     end loop;
     for i in 20 to 54 loop
       q_reg(i).start_of_orbit <= sr(sr'high).start_of_orbit;
+      q_reg(i).strobe <= '1';
       q_reg(i).start <= sr(sr'high).start;
       q_reg(i).last <= sr(sr'high).last;
       q_reg(i).valid <= sr(sr'high).valid;
