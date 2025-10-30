@@ -58,22 +58,26 @@ architecture rtl of linktosecproc is
   constant inlink_low : natural := 68;
   constant inlink_high : natural := 119;
 
-  type t_arr_ldata is array(IR_LATENCY-1 downto 0) of ldata(inlink_high downto inlink_low); 
+  type t_arr_ldata is array(natural range <>) of ldata(inlink_high downto inlink_low); 
 
   -- signal s_tracklet_reset : t_resets(numPPquads - 1 downto 0);
   -- signal s_tracklet_isol  : t_stubsDTC;
   -- signal s_tracklet_data  : t_datas(numInputsIR - 1 downto 0);
-  signal s_din_d         : t_arr_ldata := (others => (others => LWORD_NULL));
+  signal s_din           : t_arr_ldata(1 downto 0) := (others => (others => LWORD_NULL));
+  signal s_din_d         : t_arr_ldata(IR_LATENCY-1 downto 0) := (others => (others => LWORD_NULL));
 
   type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET);
-  signal valid_sync0      : std_logic := '0';
-  signal valid_sync1      : std_logic := '0';
   signal sectorprocessor_ctrl    : enum_RESET_STATE  := S_IDLE;
   signal sync_counter    : unsigned(7 downto 0) := (others => '0');
-  signal s_ir_start      : std_logic;
-  signal s_ir_start_srff : std_logic;
-  signal bx_int          : unsigned(2 downto 0) := (others => '0');
-  signal sp_reset_int    : std_Logic := '0';
+  signal ir_start_int : std_logic;
+  signal bx_int       : unsigned(2 downto 0) := (others => '0');
+  signal sp_reset_int : std_Logic := '0';
+  signal ir_start_reg : std_logic;
+  signal bx_reg       : unsigned(2 downto 0) := (others => '0');
+  signal sp_reset_reg : std_Logic := '0';
+
+  attribute shreg_extract : string;
+  attribute shreg_extract of s_din : signal is "no";
 
 begin  -- architecture rtl
 
@@ -98,14 +102,16 @@ begin  -- architecture rtl
     p_delay_data: process (clk_i) is
     begin  -- process p_delay_data
       if rising_edge(clk_i) then     -- rising clock edge
-        s_din_d(0)(i).data <= din_i(i).data;
+        s_din(0)(i) <= din_i(i);
+        s_din(1)(i) <= s_din(0)(i);
+        s_din_d(0)(i) <= s_din(1)(i);
       end if;
     end process p_delay_data;
     GEN_DIN_PIPE : for j in 1 to IR_LATENCY-1 generate
       p_delay_data_pipe: process (clk_i) is
       begin  
         if rising_edge(clk_i) then     -- rising clock edge
-          s_din_d(j)(i).data <= s_din_d(j-1)(i).data;
+          s_din_d(j)(i) <= s_din_d(j-1)(i);
         end if;
       end process p_delay_data_pipe;
     end generate GEN_DIN_PIPE;
@@ -170,16 +176,15 @@ begin  -- architecture rtl
   p_sectorprocessor_ctrl : process (clk_i) is
   begin 
     if rising_edge(clk_i) then 
-      valid_sync0 <= din_i(68).valid;
-      valid_sync1 <= valid_sync0;
+
       --FSM to control start/reset signals to SectorProcessor
       case sectorprocessor_ctrl is
         when S_IDLE =>
           --generate start upon beginning of EMP valid
-          if (valid_sync0 = '1' and valid_sync1 = '0') then
+          if (s_din(0)(68).valid = '1' and s_din(1)(68).valid = '0') then
             sync_counter <= (others => '0');
             bx_int <= (others => '0');
-            s_ir_start <= '1';
+            ir_start_int <= '1';
             sectorprocessor_ctrl <= S_ACTIVE;
           end if;
 
@@ -191,10 +196,10 @@ begin  -- architecture rtl
           else
             sync_counter <= sync_counter+1;
           end if;
-          if (valid_sync0 = '1' and valid_sync1 = '0'
+          if (s_din(0)(68).valid = '1' and s_din(1)(68).valid = '0'
               and to_integer(sync_counter) /= MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
-            s_ir_start <= '0';
+            ir_start_int <= '0';
             sp_reset_int <= '1';
             sectorprocessor_ctrl <= S_RESET;
           end if;
@@ -214,10 +219,19 @@ begin  -- architecture rtl
     end if; --rising clock edge
   end process p_sectorprocessor_ctrl;
 
+  p_reg_ctrl : process (clk_i) is
+  begin
+    if rising_edge(clk_i) then
+      ir_start_reg <= ir_start_int;
+      sp_reset_reg <= sp_reset_int;
+      bx_reg <= bx_int;
+    end if;
+  end process p_reg_ctrl;
+
   --With current IR setup latency, IR_Start needs to come up 4 clock cycles
   --before first data
-  ir_start_o <= s_ir_start;
-  sp_reset <= sp_reset_int;
-  bx_o <= std_logic_vector(bx_int);
+  ir_start_o <= ir_start_reg;
+  sp_reset <= sp_reset_reg;
+  bx_o <= std_logic_vector(bx_reg);
 
 end architecture rtl;
