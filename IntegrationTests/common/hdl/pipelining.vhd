@@ -11,10 +11,6 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 --! User packages
 use work.tf_pkg.all;
---! Using UNISIM component for FDRE instantiation
-library UNISIM;
-use UNISIM.VComponents.all;
-
 
 entity tf_pipeline is
   generic (
@@ -115,27 +111,18 @@ begin
 
   end process;
 
-
-
-START_LATCH : if LATCH_START generate
-    start_pipe_0 : FDRE
-    generic map (
-        INIT => '0'
-    )
-    port map (
-        Q  => start_pipe(0),
-        C  => clk,
-        CE => done,
-        D  => done,
-        R  => reset
-    );
-
+  START_LATCH : if LATCH_START generate
     START_LATCH_PIPELINE : process (clk) is
     begin
       if rising_edge(clk) then
         for ii in 1 to DELAY - 1 loop
           start_pipe(ii) <= start_pipe(ii - 1);
         end loop;
+        if reset = '1' then
+          start_pipe(0) <= '0';
+        elsif done = '1' then
+          start_pipe(0) <= '1';
+        end if;
       end if;
     end process;
   end generate START_LATCH;
