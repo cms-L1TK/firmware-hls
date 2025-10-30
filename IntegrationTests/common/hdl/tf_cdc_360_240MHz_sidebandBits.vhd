@@ -25,13 +25,13 @@ end tf_cdc_360_240MHz_sideband_bits;
 architecture rtl of tf_cdc_360_240MHz_sideband_bits is
 
 -- DEMUX signals
-signal din: t_packet := nulll;
+signal din: t_packet := (others => '0');
 -- Signal for simulation purposes only
--- signal din_0: t_packet := nulll;
+-- signal din_0: t_packet := (others => '0');
 -- Signals for DEMUX
-signal din_1: t_packet := nulll;
-signal din_2: t_packet := nulll;
-signal din_3: t_packet := nulll;
+signal din_1: t_packet := (others => '0');
+signal din_2: t_packet := (others => '0');
+signal din_3: t_packet := (others => '0');
 constant DEMUX_FACTOR_CDC_IN : integer:= 3;
 signal cntr:  std_logic_vector( DEMUX_FACTOR_CDC_IN - 1  downto 0 ):= "001";
 signal cntr_240MHz:  std_logic_vector( DEMUX_FACTOR_CDC_IN - 1  downto 0 ):= "001";
@@ -39,16 +39,16 @@ signal cntr_240MHz:  std_logic_vector( DEMUX_FACTOR_CDC_IN - 1  downto 0 ):= "00
 -- output
 attribute dont_touch : string;
 
-signal dout: t_packet := nulll;
-signal dout_1: t_packet := nulll;
-signal dout_2: t_packet := nulll;
-signal dout_3: t_packet := nulll;
-signal dout_1_reg0: t_packet := nulll;
-signal dout_2_reg0: t_packet := nulll;
-signal dout_3_reg0: t_packet := nulll;
-signal dout_1_reg1: t_packet := nulll;
-signal dout_2_reg1: t_packet := nulll;
-signal dout_3_reg1: t_packet := nulll;
+signal dout: t_packet := (others => '0');
+signal dout_1: t_packet := (others => '0');
+signal dout_2: t_packet := (others => '0');
+signal dout_3: t_packet := (others => '0');
+signal dout_1_reg0: t_packet := (others => '0');
+signal dout_2_reg0: t_packet := (others => '0');
+signal dout_3_reg0: t_packet := (others => '0');
+signal dout_1_reg1: t_packet := (others => '0');
+signal dout_2_reg1: t_packet := (others => '0');
+signal dout_3_reg1: t_packet := (others => '0');
 signal sticky_valid : std_logic := '0';
 signal sticky_valid_240 : std_logic := '0';
 attribute dont_touch of din_1      : signal is "true";
@@ -176,7 +176,7 @@ if rising_edge( clk_240MHz_i ) then
   case cntr_240MHz is
     when "001" =>
 --      if dout_1.valid = '0' then
---        dout <= nulll;
+--        dout <= (others => '0');
 --      else
         dout <= dout_1_reg1;
 --      end if;
@@ -185,7 +185,7 @@ if rising_edge( clk_240MHz_i ) then
     when "100" =>
       dout <= dout_3_reg1;
     when others =>
-      dout <= nulll;
+      dout <= (others => '0');
   end case;
 
 end if;
