@@ -16,6 +16,7 @@ use work.memUtil_aux_pkg_f2.all;
 entity sp2_mem_writer is
   port (
     clk                       : in std_logic;
+    rst                       : in std_logic;
     AS_36_link_data           : in t_arr_AS_36_37b;
     MPAR_73_link_data         : in t_arr_MTPAR_73_76b;
     bx_link_data              : in std_logic_vector(2 downto 0);
@@ -48,8 +49,6 @@ architecture rtl of sp2_mem_writer is
   signal sectorprocessor_ctrl    : enum_RESET_STATE  := S_IDLE;
   signal sync_counter            : unsigned(7 downto 0) := (others => '0');
 
-  signal AS_36_adr       : t_arr_AS_36_7b               := (others => "0000000");
-  signal MPAR_73_adr     : t_arr_MTPAR_73_arr4_7b       := (others => (others => "0000000"));
   signal MPAR_73_pge     : t_arr_MTPAR_73_2b            := (others => "00");
   signal bx_prev         : std_logic_vector(2 downto 0) := "000";
   signal AS_36_wea_int   : t_arr_AS_36_1b               := (others => '0');
@@ -59,13 +58,10 @@ architecture rtl of sp2_mem_writer is
   signal PC_start_int    : std_logic                    := '0';
 
   signal AS_36_wea_pipeline0         : t_arr_AS_36_1b               := (others => '0');
-  signal AS_36_writeaddr_pipeline0   : t_arr_AS_36_ADDR             := (others => (others => '0'));
   signal AS_36_din_pipeline0         : t_arr_AS_36_DATA             := (others => (others => '0'));
   signal MPAR_73_wea_pipeline0       : t_arr_MTPAR_73_1b            := (others => '0');
   signal MPAR_73_writeaddr_pipeline0 : t_arr_MTPAR_73_ADDR          := (others => (others => '0'));
   signal MPAR_73_din_pipeline0       : t_arr_MTPAR_73_DATA          := (others => (others => '0'));
-  signal PC_bx_in_pipeline0          : std_logic_vector(2 downto 0) := "000";
-  signal PC_start_pipeline0          : std_logic                    := '0';
 
   signal AS_36_wea_pipeline         : t_arr_AS_36_1b               := (others => '0');
   signal AS_36_writeaddr_pipeline   : t_arr_AS_36_ADDR             := (others => (others => '0'));
@@ -79,8 +75,6 @@ architecture rtl of sp2_mem_writer is
   signal HLS_reset_int              : std_logic                    := '0';
 
   attribute dont_touch : string;
-  attribute dont_touch of AS_36_writeaddr_pipeline0 : signal is "yes";
-  attribute dont_touch of AS_36_writeaddr_pipeline : signal is "yes";
   attribute dont_touch of MPAR_73_writeaddr_pipeline0 : signal is "yes";
   attribute dont_touch of MPAR_73_writeaddr_pipeline : signal is "yes";
 
@@ -102,14 +96,6 @@ begin -- architecture rtl
         else
           AS_36_wea_int(i) <= '0';
         end if;
-
-        if (AS_36_link_valid_prev(i)='0' and AS_36_link_valid(i)='1') then
-          --beginning of event packet
-          AS_36_adr(i) <= "0000000";
-        elsif (AS_36_wea_int(i) = '1') then 
-          --wrote on previous clock
-          AS_36_adr(i) <= std_logic_vector(unsigned(AS_36_adr(i))+1);
-        end if;
       end loop; --AS_36 loop
 
       --Convert streamed MergedParameters data into memory inputs for 
@@ -127,18 +113,6 @@ begin -- architecture rtl
           MPAR_73_wea_int(i) <= '0';
         end if;
 
-        if (MPAR_73_link_valid_prev(i)='0' and MPAR_73_link_valid(i)='1') then
-          --beginning of event packet
-          MPAR_73_adr(i)(0) <= "0000000";
-          MPAR_73_adr(i)(1) <= "0000000";
-          MPAR_73_adr(i)(2) <= "0000000";
-          MPAR_73_adr(i)(3) <= "0000000";
-        elsif (MPAR_73_wea_int(i) = '1') then
-          --wrote on previous clock
-          MPAR_73_adr(i)(to_integer(unsigned(MPAR_73_pge(i)))) 
-              <= std_logic_vector(unsigned(MPAR_73_adr(i)(to_integer(
-              unsigned(MPAR_73_pge(i)))))+1);
-        end if;
       end loop; --MPAR_73 loop
 
       --latch BX when input not valid
@@ -165,8 +139,8 @@ begin -- architecture rtl
           else
             sync_counter <= sync_counter+1;
           end if;
-          if (bx_link_valid='1' and bx_link_data /= bx_prev
-              and to_integer(sync_counter) /= 107) then 
+          if ((bx_link_valid='1' and bx_link_data /= bx_prev
+              and to_integer(sync_counter) /= 107) or rst = '1') then 
             sync_counter <= (others => '0');
             PC_start_int <= '0';
             HLS_reset_int <= '1';
@@ -189,37 +163,29 @@ begin -- architecture rtl
   end process p_writemem;
 
   --build full memory addresses based on word, page, and BX
-  g_as_address : for i in AS_36_writeaddr'range generate
-    AS_36_writeaddr_pipeline0(i) <= bx_prev & AS_36_adr(i);
-  end generate g_as_address;
-
   g_mpar_address : for i in MPAR_73_writeaddr'range generate
-    MPAR_73_writeaddr_pipeline0(i) <= bx_prev & MPAR_73_pge(i) 
-        & MPAR_73_adr(i)(to_integer(unsigned(MPAR_73_pge(i))));
+    MPAR_73_writeaddr_pipeline0(i) <= "0000000000" & MPAR_73_pge(i);
   end generate g_mpar_address;
   
   AS_36_wea_pipeline0 <= AS_36_wea_int;
   MPAR_73_wea_pipeline0 <= MPAR_73_wea_int;
   AS_36_din_pipeline0 <= AS_36_din_int;
   MPAR_73_din_pipeline0 <= MPAR_73_din_int;
-  PC_bx_in_pipeline0 <= std_logic_vector(unsigned(bx_prev)-1);
-  PC_start_pipeline0 <= PC_start_int;
+  PC_bx_in_pipeline <= std_logic_vector(unsigned(bx_prev)-1);
+  PC_start_pipeline <= PC_start_int;
   HLS_reset <= HLS_reset_int;
+  AS_36_writeaddr <= AS_36_writeaddr_pipeline;
 
   p_pipeline : process (clk) is
   begin -- process p_pipeline
     if rising_edge(clk) then -- rising clock edge
       AS_36_wea_pipeline         <= AS_36_wea_pipeline0;
-      AS_36_writeaddr_pipeline   <= AS_36_writeaddr_pipeline0;
       AS_36_din_pipeline         <= AS_36_din_pipeline0;
       MPAR_73_wea_pipeline       <= MPAR_73_wea_pipeline0;
       MPAR_73_writeaddr_pipeline <= MPAR_73_writeaddr_pipeline0;
       MPAR_73_din_pipeline       <= MPAR_73_din_pipeline0;
-      PC_bx_in_pipeline          <= PC_bx_in_pipeline0;
-      PC_start_pipeline          <= PC_start_pipeline0;
 
       AS_36_wea         <= AS_36_wea_pipeline;
-      AS_36_writeaddr   <= AS_36_writeaddr_pipeline;
       AS_36_din         <= AS_36_din_pipeline;
       MPAR_73_wea       <= MPAR_73_wea_pipeline;
       MPAR_73_writeaddr <= MPAR_73_writeaddr_pipeline;

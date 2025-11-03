@@ -355,6 +355,7 @@ begin
       --report time'image(now)&" tf_mem_bin "&NAME&" sync_nent";
       init := '0';
       bx := 1;
+      new_bx := true;
       slv_clk_cnt := (others => '0');
       slv_page_cnt := (0 => '1', others => '0');
       validbinmasktmp <= (others => '0');

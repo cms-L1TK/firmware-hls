@@ -99,6 +99,7 @@ begin
   sp2_mem_writer_1 : entity work.sp2_mem_writer
     port map (
       clk                => clk_p,
+      rst                => rst,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
       bx_link_data       => bx_link_data,
