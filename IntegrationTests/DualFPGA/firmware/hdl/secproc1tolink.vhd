@@ -8,7 +8,7 @@ use work.emp_device_decl.all;
 
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f1.all;
-use work.hybrid_data_types.all;
+use work.tf_data_types.all;
 
 entity secproc1tolink is
   port(

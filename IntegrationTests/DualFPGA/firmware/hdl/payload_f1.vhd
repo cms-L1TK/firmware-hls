@@ -11,7 +11,7 @@ use work.emp_slink_types.all;
 use work.tf_pkg.all;
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f1.all;
-use work.hybrid_data_types.all;
+use work.tf_data_types.all;
 use work.conv_pkg_f1.all;
 
 entity emp_payload is

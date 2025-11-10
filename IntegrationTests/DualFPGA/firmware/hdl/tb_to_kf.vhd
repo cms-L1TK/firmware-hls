@@ -27,14 +27,16 @@ use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f2.all;
 use work.tf_interface_pkg.all;
 
-use work.hybrid_data_types.all;
-use work.hybrid_data_formats.all;
-use work.hybrid_tools.all;
-use work.hybrid_config.all;
+use work.tf_data_types.all;
+use work.tf_data_formats.all;
+use work.tf_tools.all;
+use work.tf_config.all;
 
 entity tb_to_kf is
   port (
-    clk_i          : in  std_logic;
+    clk240         : in  std_logic;
+    clk360         : in  std_logic;
+    rst            : in  std_logic;
     TW_113_data_i  : in  t_arr_TW_113_data;
     TW_113_valid_i : in  t_arr_TW_113_1b;
     DW_49_data_i   : in  t_arr_DW_49_DATA;
@@ -42,9 +44,8 @@ entity tb_to_kf is
     BW_46_data_i   : in  t_arr_BW_46_DATA;
     BW_46_valid_i  : in  t_arr_BW_46_1b;
     kf_reset_i     : in  std_logic;
-    start_of_orbit : in  std_logic;
+    packet_valid   : in  std_logic;
     tmpacket_o     : out t_packets(0 to tbNumSeedTypes - 1);
-    kfpacket_o     : out t_packets(0 to numLinksTrack - 1);
     tbtokf_o       : out t_tracksTB(0 to tbNumSeedTypes - 1)
     );
 end entity tb_to_kf;
@@ -112,7 +113,7 @@ architecture rtl of tb_to_kf is
   constant DW_r_pos       : natural := widthsTBphi(2) + widthsTBz(2);
   constant DW_phi_pos     : natural := widthsTBz(2);
   constant DW_z_pos       : natural := 0;
-  constant tb_latency     : natural := 320;
+  constant tb_latency     : natural := 570;
 
   signal TW_113_data_pipe_2 : t_arr_TW_113_data;
   signal TW_113_valid_pipe_2 : t_arr_TW_113_1b;
@@ -128,8 +129,12 @@ architecture rtl of tb_to_kf is
   signal BW_46_data_pipe_1 : t_arr_BW_46_data;
   signal BW_46_valid_pipe_1 : t_arr_BW_46_1b;
 
-  signal sr_orbit : std_logic_vector(0 to tb_latency-1) := (others => '0');
-  signal evt_counter : integer range 0 to 107 := 0;
+  signal sr_packet    : std_logic_vector(0 to tb_latency-1) := (others => '0');
+  signal packet_start : std_logic := '0';
+  signal packet_valid_prev : std_logic := '0';
+  signal evt_counter : integer range 0 to 161 := 0;
+  signal bx_counter  : integer range 0 to 3564 := 0; --temp until input @360
+  signal packet_int  : t_packets(0 to tbNumSeedTypes - 1) := (others => nulll);
 
   type t_arr_stub_DW is array(0 to tbMaxNumProjectionLayers - 1) of enum_DW_49;
   type t_arr_stub_BW is array(0 to tbMaxNumProjectionLayers - 1) of enum_BW_46;
@@ -161,24 +166,73 @@ architecture rtl of tb_to_kf is
 
 begin  -- architecture rtl
 
-  p_tf_to_kf : process (clk_i) is
+  --process that propagates packet signals; currently acts as CDC from 240 to
+  --360, but will be entirely in 360 once input is updated to 360 MHz
+  --in EMP simulation with frame 6 convention (first 6 frames empty), the
+  --240 MHz edge with start of orbit is aligned with an edge of 360 MHz, so
+  --we can sample on this edge and the next one, but we should skip the third
+  --This probably is not the case in hardware (depends on FPGA1 latency, we
+  --can adjust pipeline stages once we measure when start_of_orbit arrives)
+  p_packet : process (clk360) is
+  begin
+    if rising_edge(clk360) then
+      --in sim, valid only changes on common edge, so always safe to sample
+      packet_valid_prev <= packet_valid; 
+      sr_packet <= '0' & sr_packet(sr_packet'low to sr_packet'high - 1);
+      if packet_valid = '1' and packet_valid_prev = '0' then
+        sr_packet(0) <= '1';
+      end if;
+
+      --TODO need false path constraint or similar for reset to cross domain
+      if rst = '1' then
+        packet_start <= '0';
+        evt_counter <= 0;
+        bx_counter <= 0;
+      elsif packet_start = '0' and sr_packet(sr_packet'high - 1) = '1' then
+        evt_counter <= 0;
+        packet_start <= '1';
+      elsif packet_start = '1' and evt_counter = 161 then
+        evt_counter <= 0;
+        if bx_counter = 3563 then
+          bx_counter <= 0;
+        else
+          bx_counter <= bx_counter + 1;
+        end if;
+      elsif packet_start = '1' then
+        evt_counter <= evt_counter + 1;
+      end if;
+
+      for i in 0 to (tbNumSeedTypes-1) loop
+        if packet_start = '1' then
+
+          if evt_counter = 0 and bx_counter = 0 then
+            packet_int(i).start_of_orbit <= '1';
+          else
+            packet_int(i).start_of_orbit <= '0';
+          end if;
+
+          if evt_counter < 156 then
+            packet_int(i).valid <= '1';
+          else 
+            packet_int(i).valid <= '0';
+          end if;
+
+        end if;
+      end loop;
+    end if;
+  end process p_packet;
+  tmpacket_o <= packet_int;
+
+  --process that formats TB data for TM
+  p_tf_to_kf : process (clk240) is
 
     variable TW_idx : natural range 0 to 7;
     variable proj_idx : natural range 0 to 15;
     variable iBW_enum : enum_BW_46;
     variable iDW_enum : enum_DW_49;
 
-  begin  -- process p_tf_to_kf
-    if rising_edge(clk_i) then          -- rising clock edge
-
-      sr_orbit <= start_of_orbit & sr_orbit(sr_orbit'low to sr_orbit'high - 1);
-      if start_of_orbit = '1' then
-        evt_counter <= 0;
-      elsif evt_counter = 107 then
-        evt_counter <= 0;
-      else
-        evt_counter <= evt_counter + 1;
-      end if;
+  begin -- process p_tf_to_kf
+    if rising_edge(clk240) then          -- rising clock edge
 
       -- pipeline input
       TW_113_data_pipe_2 <= TW_113_data_pipe_1;
@@ -194,25 +248,10 @@ begin  -- architecture rtl
       BW_46_valid_pipe_2 <= BW_46_valid_pipe_1;
       BW_46_valid_pipe_1 <= BW_46_valid_i;
 
-      for i in 0 to (numLinksTrack-1) loop
-        kfpacket_o(i).start_of_orbit <= sr_orbit(sr_orbit'high - 1);
-        if evt_counter < 102 then
-          kfpacket_o(i).valid <= '1';
-        else 
-          kfpacket_o(i).valid <= '0';
-        end if;
-      end loop;
-
       --initialize all links to null values by default
       for i in 0 to (tbNumSeedTypes-1) loop
         tbtokf_o(i)            <= nulll;
         tbtokf_o(i).meta.reset <= kf_reset_i;
-        tmpacket_o(i).start_of_orbit <= sr_orbit(sr_orbit'high - 1);
-        if evt_counter < 102 then
-          tmpacket_o(i).valid <= '1';
-        else 
-          tmpacket_o(i).valid <= '0';
-        end if;
       end loop;
 
       --set relevant links to non-null values if valid output from TB

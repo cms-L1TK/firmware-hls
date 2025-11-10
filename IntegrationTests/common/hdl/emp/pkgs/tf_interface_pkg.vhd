@@ -25,8 +25,8 @@ use ieee.std_logic_1164.all;
 use work.memUtil_pkg.all;
 use work.emp_data_types.all;
 
-use work.hybrid_config.all;
-use work.hybrid_data_types.all;
+use work.tf_config.all;
+use work.tf_data_types.all;
 
 package tf_interface_pkg is
 

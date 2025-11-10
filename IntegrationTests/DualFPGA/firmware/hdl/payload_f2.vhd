@@ -16,9 +16,9 @@ use work.tf_pkg.all;
 use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f2.all;
 use work.tf_interface_pkg.all;
-use work.hybrid_data_types.all;
-use work.hybrid_config.all;
-use work.hybrid_data_formats.all;
+use work.tf_data_types.all;
+use work.tf_config.all;
+use work.tf_data_formats.all;
 
 entity emp_payload is
   port(
@@ -64,6 +64,8 @@ architecture rtl of emp_payload is
   signal s_tmout               : t_trackTM := nulll;
   signal s_drout               : t_trackDR := nulll;
   signal s_kfout               : t_trackKF := nulll;
+  signal s_tqout               : t_trackTQ := nulll;
+  signal s_tfpout              : ldata( 0 to tfpNumLinks - 1 ) := ( others => nulll );
   --signal s_tfout               : ldata(numLinksTFP - 1 downto 0);
   signal FT_bx_out_0           : std_logic_vector(2 downto 0);
   signal FT_bx_out_vld         : std_logic;
@@ -77,13 +79,11 @@ architecture rtl of emp_payload is
   signal BW_46_stream_AV_din   : t_arr_BW_46_DATA;
   signal BW_46_stream_A_write  : t_arr_BW_46_1b;
   signal s_tmpacket            : t_packets(0 to tbNumSeedTypes - 1);
-  signal s_kfpacket            : t_packets(0 to numLinksTrack - 1);
 
   -- Temporary signals to get vivado to not optimize away output while we have
   -- not yet connected the output
-  signal out_dout              : ldata( 4 * N_REGION - 1 downto 0 );
   attribute dont_touch : string;
-  attribute dont_touch of out_dout : signal is "true";
+  attribute dont_touch of s_tfpout : signal is "true";
 
 begin
 
@@ -165,7 +165,9 @@ begin
   -----------------------------------------------------------------------------
   tb_to_kf_1 : entity work.tb_to_kf
     port map (
-      clk_i          => clk_p,
+      clk240         => clk_p,
+      clk360         => clk_payload(0),
+      rst            => HLS_reset,
       TW_113_data_i  => TW_113_stream_AV_din,
       TW_113_valid_i => TW_113_stream_A_write,
       DW_49_data_i   => DW_49_stream_AV_din,
@@ -173,9 +175,8 @@ begin
       BW_46_data_i   => BW_46_stream_AV_din,
       BW_46_valid_i  => BW_46_stream_A_write,
       kf_reset_i     => FT_bx_out_vld,
-      start_of_orbit => d(10).start_of_orbit,
+      packet_valid   => d(10).valid,
       tmpacket_o     => s_tmpacket,
-      kfpacket_o     => s_kfpacket,
       tbtokf_o       => s_tbout
       );
 
@@ -193,24 +194,31 @@ begin
 
   dr_top_1 : entity work.dr_top
     port map (
-      clk     => clk_payload(0),
+      clk360  => clk_payload(0),
       dr_din  => s_tmout,
       dr_dout => s_drout
       );
 
   kf_top_1 : entity work.kf_top
     port map (
-      clk     => clk_payload(0),
+      clk360  => clk_payload(0),
       kf_din  => s_drout,
       kf_dout => s_kfout
       );
 
-  kf_isolation_out_1 : entity work.kf_isolation_out
+  tq_top_1 : entity work.tq_top
     port map (
-      clk        => clk_payload(0),
-      out_packet => s_kfpacket,
-      out_din    => s_kfout,
-      out_dout   => out_dout --TODO: fix
+      clk360  => clk_payload(0),
+      tq_din  => s_kfout,
+      tq_dout => s_tqout
+      );
+
+  tfp_top_1 : entity work.tfp_top
+    port map (
+      clk360  => clk_payload(0),
+      tfp_packet => s_tmpacket(0),
+      tfp_din  => s_tqout,
+      tfp_dout => s_tfpout
       );
 
   --q(92)        <= s_tfout(0);

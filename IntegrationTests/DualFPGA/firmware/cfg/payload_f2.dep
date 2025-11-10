@@ -9,13 +9,12 @@ src tb_to_kf.vhd
 src common/hdl/emp/pkgs/tf_interface_pkg.vhd
 
 # KF
-src -c l1tk-for-emp:tm tm_isolation.vhd
-src -c l1tk-for-emp:kf kf_isolation.vhd
-
-include -c l1tk-for-emp:tm components.dep 
-include -c l1tk-for-emp:dr components.dep 
-include -c l1tk-for-emp:kf components.dep 
-include -c l1tk-for-emp:common components.dep 
+include -c trackfinder:tm components.dep 
+include -c trackfinder:dr components.dep 
+include -c trackfinder:kf components.dep 
+include -c trackfinder:tq components.dep 
+include -c trackfinder:tfp components.dep 
+include -c trackfinder:common components.dep 
 
 #Tracklet dependencies
 #src --vhdl2008 common/hdl/tf_lut.vhd

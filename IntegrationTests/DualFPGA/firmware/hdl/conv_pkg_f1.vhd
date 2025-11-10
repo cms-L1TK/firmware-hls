@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 use work.emp_data_types.all;
-use work.hybrid_data_types.all;
+use work.tf_data_types.all;
 
 package conv_pkg_f1 is
 
