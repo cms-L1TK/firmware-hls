@@ -595,10 +595,10 @@ class TQWord:
   def print(self):
     """Prints track properties
     """
-    print(('TW {}: valid: {}, 1/R: {} cm-1, pT: {} GeV, phi: {}, z0: {}, '
-           +'cottheta: {}, eta: {}').format(self.bitmap.to_hexstring(),
-           self.valid(),self.invr(),self.pt(),self.phi0(),self.z0(),self.tanl(),
-           self.eta()))
+    print(('TW {}: valid: {}, 1/R: {:.5f} cm-1, pT: {:.3f} GeV, phi: {:.3f},'
+           'z0: {:.3f}, cottheta: {:.3f}, eta: {:.3f}').format(
+           self.bitmap.to_hexstring(), self.valid(), self.invr(), self.pt(),
+           self.phi0(), self.z0(), self.tanl(), self.eta()))
 
 def load_emp_data(filename: str) -> EmpData:
   """Reads data from EMP file and stores result as EmpData object

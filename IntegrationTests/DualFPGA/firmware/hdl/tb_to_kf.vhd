@@ -114,6 +114,7 @@ architecture rtl of tb_to_kf is
   constant DW_phi_pos     : natural := widthsTBz(2);
   constant DW_z_pos       : natural := 0;
   constant tb_latency     : natural := 570;
+  constant tb_latency240  : natural := 378; --378?
 
   signal TW_113_data_pipe_2 : t_arr_TW_113_data;
   signal TW_113_valid_pipe_2 : t_arr_TW_113_1b;
@@ -129,9 +130,14 @@ architecture rtl of tb_to_kf is
   signal BW_46_data_pipe_1 : t_arr_BW_46_data;
   signal BW_46_valid_pipe_1 : t_arr_BW_46_1b;
 
-  signal sr_packet    : std_logic_vector(0 to tb_latency-1) := (others => '0');
+  signal sr_packet : std_logic_vector(0 to tb_latency-1) := (others => '0');
+  signal sr_reset  : std_logic_vector(0 to tb_latency240-1) := (others => '0');
+  signal reset_start : std_logic := '0';
+  signal reset_counter : integer range 0 to 107 := 0;
+  signal start_evt : std_logic := '0';
   signal packet_start : std_logic := '0';
   signal packet_valid_prev : std_logic := '0';
+  signal packet_valid_prev240 : std_logic := '0';
   signal evt_counter : integer range 0 to 161 := 0;
   signal bx_counter  : integer range 0 to 3564 := 0; --temp until input @360
   signal packet_int  : t_packets(0 to tbNumSeedTypes - 1) := (others => nulll);
@@ -234,6 +240,27 @@ begin  -- architecture rtl
   begin -- process p_tf_to_kf
     if rising_edge(clk240) then          -- rising clock edge
 
+      -- test logic for reset
+      packet_valid_prev240 <= packet_valid; 
+      sr_reset <= '0' & sr_reset(sr_reset'low to sr_reset'high - 1);
+      if packet_valid = '1' and packet_valid_prev240 = '0' then
+        sr_reset(0) <= '1';
+      end if;
+      if rst = '1' then
+        reset_counter <= 0;
+        reset_start <= '0';
+        start_evt <= '0';
+      elsif reset_start = '0' and sr_reset(sr_reset'high -1) = '1' then
+        reset_start <= '1';
+        start_evt <= '1';
+      elsif reset_start = '1' and reset_counter = 107 then
+        reset_counter <= 0;
+        start_evt <= '1';
+      elsif reset_start = '1' then
+        reset_counter <= reset_counter + 1;
+        start_evt <= '0';
+      end if;
+
       -- pipeline input
       TW_113_data_pipe_2 <= TW_113_data_pipe_1;
       TW_113_data_pipe_1 <= TW_113_data_i;
@@ -251,7 +278,8 @@ begin  -- architecture rtl
       --initialize all links to null values by default
       for i in 0 to (tbNumSeedTypes-1) loop
         tbtokf_o(i)            <= nulll;
-        tbtokf_o(i).meta.reset <= kf_reset_i;
+        --tbtokf_o(i).meta.reset <= kf_reset_i;
+        tbtokf_o(i).meta.reset <= start_evt;
       end loop;
 
       --set relevant links to non-null values if valid output from TB
