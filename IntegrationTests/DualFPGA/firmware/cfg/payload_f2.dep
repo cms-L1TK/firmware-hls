@@ -5,16 +5,18 @@ src linktosecproc2.vhd
 src sp2_mem_writer.vhd
 src tf2_wrapper.vhd
 src --vhdl2008 SectorProcessor_f2.vhd
-src tb_to_kf.vhd
+src tb_to_tm.vhd
 src common/hdl/emp/pkgs/tf_interface_pkg.vhd
 
 # KF
-include -c trackfinder:tm components.dep 
-include -c trackfinder:dr components.dep 
-include -c trackfinder:kf components.dep 
-include -c trackfinder:tq components.dep 
-include -c trackfinder:tfp components.dep 
-include -c trackfinder:common components.dep 
+src -c trackfinder:TrackProcessor tp_top.vhd
+src -c trackfinder:common tf_isolation.vhd
+include -c trackfinder:tfp components.dep
+include -c trackfinder:tq components.dep
+include -c trackfinder:kf components.dep
+include -c trackfinder:dr components.dep
+include -c trackfinder:tm components.dep
+include -c trackfinder:common components.dep
 
 #Tracklet dependencies
 #src --vhdl2008 common/hdl/tf_lut.vhd
