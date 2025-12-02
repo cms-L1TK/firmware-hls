@@ -78,7 +78,6 @@ template<
     TrackletProjectionMemory<BARREL2S> projout_barrel_2s[TP::N_PROJOUT_BARREL2S],
     TrackletProjectionMemory<DISK> projout_disk[TP::N_PROJOUT_DISK])
 {
-#pragma HLS latency min=13 max=13
   
   if (!valid) return;
 

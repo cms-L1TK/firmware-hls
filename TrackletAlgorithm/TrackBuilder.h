@@ -248,7 +248,6 @@ void TrackBuilder(
 
   full_matches : for (unsigned short i = 0; i < kMaxProc; i++) {
 #pragma HLS pipeline II=1 rewind
-#pragma HLS latency min=6 max=6
 
     TrackletIDType min_id = kInvalidTrackletID;
     bool smallest[NStubs];

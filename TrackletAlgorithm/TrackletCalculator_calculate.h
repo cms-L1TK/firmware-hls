@@ -191,7 +191,6 @@ void TP::calculate_DXDY (
 )
 {
 #pragma HLS pipeline II=1
-#pragma HLS latency max=25
 
   //First convert input to right bits
 
@@ -334,7 +333,6 @@ void TP::calculate_LXD1 (
   TP::Types::der_rD * const der_rD_output)
 {
 #pragma HLS pipeline II=1
-#pragma HLS latency max=25
 
   //First convert input to right bits
   ap_uint<12> ir1c = (ap_int<10>(r1_input) << 1) + rmean[seedLayers[Seed][0]];
