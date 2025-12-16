@@ -28,9 +28,14 @@ src --vhdl2008 common/hdl/tf_mem_tpar.vhd
 src --vhdl2008 common/hdl/mem_reader.vhd
 src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/pipelining.vhd
+src common/hdl/tf_cdc_360_240MHz.vhd
+src common/hdl/tf_cdc_360_240MHz_wr.vhd
 
 #Floorplan
 src ../ucf/floorplan_f2.tcl
+
+# CDC clock constraints
+#src common/hdl/constraints_f2.xdc
 
 ################
 # Include Cores
