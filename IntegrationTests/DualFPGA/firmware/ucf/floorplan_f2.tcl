@@ -5,7 +5,7 @@ set_false_path -through [get_nets payload/sp2_mem_writer_1/HLS_reset]
 
 #normal delete_pblocks
 delete_pblocks -quiet pblock_payload_MPL1A pblock_payload_MPL1B pblock_payload_MPL1C pblock_payload_MPL1D pblock_payload_MPL1E pblock_payload_MPL1F pblock_payload_MPL1G pblock_payload_MPL1H pblock_payload_MPL2A pblock_payload_MPL2B pblock_payload_MPL2C pblock_payload_MPL2D pblock_payload_MPL3A pblock_payload_MPL3B pblock_payload_MPL3C pblock_payload_MPL3D pblock_payload_MPL4A pblock_payload_MPL4B pblock_payload_MPL4C pblock_payload_MPL4D pblock_payload_MPL5A pblock_payload_MPL5B pblock_payload_MPL5C pblock_payload_MPL5D pblock_payload_MPL6A pblock_payload_MPL6B pblock_payload_MPL6C pblock_payload_MPL6D pblock_payload_MPD1A pblock_payload_MPD1B pblock_payload_MPD1C pblock_payload_MPD1D pblock_payload_MPD2A pblock_payload_MPD2B pblock_payload_MPD2C pblock_payload_MPD2D pblock_payload_MPD3A pblock_payload_MPD3B pblock_payload_MPD3C pblock_payload_MPD3D pblock_payload_MPD4A pblock_payload_MPD4B pblock_payload_MPD4C pblock_payload_MPD4D pblock_payload_MPD5A pblock_payload_MPD5B pblock_payload_MPD5C pblock_payload_MPD5D pblock_payload_ASin
-delete_pblocks -quiet pblock_payload_FTAAAA pblock_payload_FTBBBB pblock_payload_KF pblock_payload_KFout
+delete_pblocks -quiet pblock_payload_FTAAAA pblock_payload_FTBBBB pblock_payload_KF
 delete_pblocks -quiet pblock_payload_PCVMSMERDs pblock_payload_PCVMSMERLs pblock_payload_sp2_mem_writer
 
 # -----------------------------------------------------------------------------
@@ -644,14 +644,7 @@ add_cells_to_pblock [get_pblocks pblock_payload_FTBBBB] [get_cells -quiet [list 
 
 set lpblock_payload_KF [create_pblock pblock_payload_KF]
 add_cells_to_pblock [get_pblocks pblock_payload_KF] [get_cells -quiet [list \
-          payload/tm_top_1 \
-          payload/dr_top_1 \
-          payload/kf_top_1 \
-          ]]
-
-set lpblock_payload_KFout [create_pblock pblock_payload_KFout]
-add_cells_to_pblock [get_pblocks pblock_payload_KFout] [get_cells -quiet [list \
-          payload/kf_isolation_out_1 \
+          payload/tp_top_1 \
           ]]
 
 #### Avoid splitting submodules in SectorProcessor across SLRs ####
@@ -4673,9 +4666,6 @@ add_rects_to_pblock_mod $lpblock_payload_SectorProcessor $pblock_payload_SectorP
 #
 set pblock_payload_KFrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=8 && ROW_INDEX<=11}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
 add_rects_to_pblock_mod $lpblock_payload_KF $pblock_payload_KFrect
-
-#set pblock_payload_KFoutrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX>=10 && ROW_INDEX<=11}] -f "RPM_X >= $lLeftBoundary && RPM_X <= $lRightBoundary"]]
-#add_rects_to_pblock_mod $lpblock_payload_KFout $pblock_payload_KFoutrect
 
 #set pblock_payload_ASinrect [find_rects [get_sites -of [get_clock_regions -f {ROW_INDEX<=7}] -f "RPM_X >= 4000"]]
 #add_rects_to_pblock_mod $lpblock_payload_ASin $pblock_payload_ASinrect
