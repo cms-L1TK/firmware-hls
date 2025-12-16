@@ -14,6 +14,9 @@ use work.memUtil_pkg.all;
 use work.memUtil_aux_pkg_f2.all;
 
 entity sp2_mem_writer is
+  generic (
+    MAX_ENTRIES : natural := MAX_ENTRIES
+  );
   port (
     clk                       : in std_logic;
     rst                       : in std_logic;
@@ -134,13 +137,13 @@ begin -- architecture rtl
 
         when S_ACTIVE =>
           --generate reset if BX change is not sync'd w/ counter
-          if (to_integer(sync_counter) = 107) then 
+          if (to_integer(sync_counter) = MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
           else
             sync_counter <= sync_counter+1;
           end if;
           if ((bx_link_valid='1' and bx_link_data /= bx_prev
-              and to_integer(sync_counter) /= 107) or rst = '1') then 
+              and to_integer(sync_counter) /= MAX_ENTRIES-1) or rst = '1') then 
             sync_counter <= (others => '0');
             PC_start_int <= '0';
             HLS_reset_int <= '1';
@@ -149,7 +152,7 @@ begin -- architecture rtl
 
         when S_RESET =>
           --return to idle after reset has been asserted for 2 BXs
-          if (to_integer(sync_counter) = 215) then 
+          if (to_integer(sync_counter) = 2*MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
             HLS_reset_int <= '0';
             sectorprocessor_ctrl <= S_IDLE;
