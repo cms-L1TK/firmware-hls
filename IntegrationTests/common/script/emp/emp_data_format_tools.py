@@ -739,12 +739,12 @@ def create_empdata_fpga2_input(data: list[dict[str,list[Bitmap]]]) -> EmpData:
   for event in range(len(data)):
     event_data = data[event]
     for iframe in range(6):
-      abs_frame = iframe+ievent*108
+      abs_frame = iframe+ievent*162
       for ichannel in range(47):
         link_data.metadata[ichannel].append(default_metadata(abs_frame))
         link_data.data[ichannel].append(make_zero_bitmap(64))
-    for iframe in range(102):
-      abs_frame = iframe+6+ievent*108
+    for iframe in range(156):
+      abs_frame = iframe+6+ievent*162
       frame_words = {}
       for ias in range(len(AS_NAMES)):
         as_name = 'AS'+AS_NAMES[ias]
@@ -910,7 +910,7 @@ def make_zero_bitmap(length: int) -> Bitmap:
   """
   return Bitmap('bin'+''.join(['0' for i in range(length)]))
   
-def default_metadata(frame: int, ii: int = 108) -> Bitmap:
+def default_metadata(frame: int, ii: int = 162) -> Bitmap:
   """Returns default metadata for given frame
 
   Args:
@@ -963,7 +963,7 @@ def create_empdata_fpga1_input(memprints_dir: str, event_start: int,
     for iframe in range(162):
       for idl in range(len(DL_NAMES)):
         dl_name = 'DL'+DL_NAMES[idl]
-        data.metadata[idl].append(default_metadata(iframe+ievent*162,162))
+        data.metadata[idl].append(default_metadata(iframe+ievent*162))
         data.data[idl].append(Bitmap('bin'+zero_pad(
             dl_data[dl_name][iframe].value,64)))
     ievent += 1
