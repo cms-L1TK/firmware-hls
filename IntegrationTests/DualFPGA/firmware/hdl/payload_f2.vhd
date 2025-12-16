@@ -45,6 +45,8 @@ end emp_payload;
 
 architecture rtl of emp_payload is
 
+  signal clk_360MHz            : std_logic;
+  signal clk_240MHz            : std_logic;
   signal AS_36_link_data       : t_arr_AS_36_37b;
   signal MPAR_73_link_data     : t_arr_MTPAR_73_76b;
   signal AS_36_link_valid      : t_arr_AS_36_1b;
@@ -80,19 +82,17 @@ architecture rtl of emp_payload is
   signal BW_46_stream_AV_din   : t_arr_BW_46_DATA;
   signal BW_46_stream_A_write  : t_arr_BW_46_1b;
 
-  -- Temporary signals to get vivado to not optimize away output while we have
-  -- not yet connected the output
-  attribute dont_touch : string;
-  attribute dont_touch of s_tfpout : signal is "true";
-
 begin
+
+  clk_240MHz <= clk_payload(0);
+  clk_360MHz <= clk_p;
 
   -----------------------------------------------------------------------------
   -- Link to Sector Processor Formatter
   -----------------------------------------------------------------------------
   linktosecproc2_1 : entity work.linktosecproc2
     port map (
-      clk                => clk_p,
+      clk                => clk_240MHz,
       d                  => d,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
@@ -107,7 +107,7 @@ begin
   -----------------------------------------------------------------------------
   sp2_mem_writer_1 : entity work.sp2_mem_writer
     port map (
-      clk                => clk_p,
+      clk                => clk_240MHz,
       rst                => rst,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
@@ -131,7 +131,7 @@ begin
   -----------------------------------------------------------------------------
   tf2_wrapper_1 : entity work.tf2_wrapper
     port map (
-      clk                       => clk_p,
+      clk                       => clk_240MHz,
       reset                     => HLS_reset,
       PC_start                  => PC_start,
       PC_bx_in                  => PC_bx_in,
@@ -165,8 +165,8 @@ begin
   -----------------------------------------------------------------------------
   tb_to_tm_1 : entity work.tb_to_tm
     port map (
-      clk240         => clk_p,
-      clk360         => clk_payload(0),
+      clk240         => clk_240MHz,
+      clk360         => clk_360MHz,
       rst            => HLS_reset,
       TW_113_data    => TW_113_stream_AV_din,
       TW_113_valid   => TW_113_stream_A_write,
@@ -187,8 +187,8 @@ begin
 
   tp_top_1 : entity work.tp_top
     port map (
-      clk240    => clk_p,
-      clk360    => clk_payload(0),
+      clk240    => clk_240MHz,
+      clk360    => clk_360MHz,
       orbit360  => orbit360,
       tp_din    => s_tbout,
       tp_dout   => open
