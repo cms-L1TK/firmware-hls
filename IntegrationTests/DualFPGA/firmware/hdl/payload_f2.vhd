@@ -203,12 +203,10 @@ begin
       clk360    => clk_360MHz,
       orbit360  => orbit360,
       tp_din    => s_tbout,
-      tp_dout   => open
+      tp_dout   => s_tfpout
       );
 
-  --TODO once 1st CDC is implemented, route/fan out output from tp to intended 
-  --MGT links
-  --q(92)        <= s_tfout(0);
-  --q(93)        <= s_tfout(1);
+  q(92)        <= s_tfpout(0);
+  q(93)        <= s_tfpout(1);
 
 end rtl;
