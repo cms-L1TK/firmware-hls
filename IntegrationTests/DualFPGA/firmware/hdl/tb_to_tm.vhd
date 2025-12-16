@@ -264,8 +264,11 @@ begin  -- architecture rtl
           --We want Vivado to unroll these loops over seed types and projection
           --layers, but it is unclear if it will do so correctly. May need
           --optimization for implementation
-          for iprojection in 0 to tbNumsProjectionLayers(seed_type)-1 loop
-          --for iprojection in 0 to tbMaxNumProjectionLayers-1 loop
+          for iprojection in 0 to tbMaxNumProjectionLayers-1 loop
+            if iprojection > tbNumsProjectionLayers(seed_type)-1 then
+              next;
+            end if;
+
             proj_idx := seedTypesProjectionLayers(seed_type)(iprojection);
 
             --L2L3_L6 projection doesn't exist
