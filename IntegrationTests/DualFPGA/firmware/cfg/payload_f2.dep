@@ -35,7 +35,7 @@ src common/hdl/tf_cdc_360_240MHz_wr.vhd
 src ../ucf/floorplan_f2.tcl
 
 # CDC clock constraints
-#src common/hdl/constraints_f2.xdc
+src common/hdl/constraints_f2.xdc
 
 ################
 # Include Cores
