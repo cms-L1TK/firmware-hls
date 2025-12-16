@@ -47,6 +47,7 @@ architecture rtl of emp_payload is
 
   signal clk_360MHz            : std_logic;
   signal clk_240MHz            : std_logic;
+  signal d_linktosecproc2      : ldata(4 * N_REGION - 1 downto 0);
   signal AS_36_link_data       : t_arr_AS_36_37b;
   signal MPAR_73_link_data     : t_arr_MTPAR_73_76b;
   signal AS_36_link_valid      : t_arr_AS_36_1b;
@@ -88,12 +89,23 @@ begin
   clk_360MHz <= clk_p;
 
   -----------------------------------------------------------------------------
+  -- Clock domain crossing for input data (360→240 MHz)
+  -----------------------------------------------------------------------------
+  cdc_360_240_MHz : entity work.tf_cdc_360_240MHz_wr
+    port map (
+      clk_240MHz_i => clk_240MHz,
+      clk_360MHz_i => clk_360MHz,
+      din_i        => d,
+      dout_o       => d_linktosecproc2
+      );
+
+  -----------------------------------------------------------------------------
   -- Link to Sector Processor Formatter
   -----------------------------------------------------------------------------
   linktosecproc2_1 : entity work.linktosecproc2
     port map (
       clk                => clk_240MHz,
-      d                  => d,
+      d                  => d_linktosecproc2,
       AS_36_link_data    => AS_36_link_data,
       MPAR_73_link_data  => MPAR_73_link_data,
       bx_link_data       => bx_link_data,
