@@ -23,6 +23,7 @@ package memUtil_aux_pkg_f2 is
   type t_arr_MTPAR_73_DATA is array(enum_MTPAR_73) of std_logic_vector(72 downto 0);
 
   type t_arr_TW_113_1b is array(enum_TW_113) of std_logic;
+  type t_arr_TW_113_SEED is array(enum_TW_113) of natural range 0 to 7;
   type t_arr_TW_113_DATA is array(enum_TW_113) of std_logic_vector(112 downto 0);
 
   type t_arr_BW_46_1b is array(enum_BW_46) of std_logic;
