@@ -743,20 +743,23 @@ def create_empdata_fpga2_input(data: list[dict[str,list[Bitmap]]]) -> EmpData:
       for ichannel in range(47):
         link_data.metadata[ichannel].append(default_metadata(abs_frame))
         link_data.data[ichannel].append(make_zero_bitmap(64))
+    strobe = True
+    strobe_iframe = 0
     for iframe in range(156):
+      strobe = ((iframe-2)%3 != 0)
       abs_frame = iframe+6+ievent*162
       frame_words = {}
       for ias in range(len(AS_NAMES)):
         as_name = 'AS'+AS_NAMES[ias]
-        if iframe<len(event_data[as_name]):
-          frame_words[as_name] = bitmap_one.append(event_data[as_name][iframe])
+        if strobe and strobe_iframe<len(event_data[as_name]):
+          frame_words[as_name] = bitmap_one.append(event_data[as_name][strobe_iframe])
         else:
           frame_words[as_name] = make_zero_bitmap(37)
       for impar in range(len(MPAR_NAMES)):
         mpar_name = 'MPAR'+MPAR_NAMES[impar]
-        if iframe<len(event_data[mpar_name]):
+        if strobe and strobe_iframe<len(event_data[mpar_name]):
           frame_words[mpar_name] = bitmap_one.append(
-              event_data[mpar_name][iframe])
+              event_data[mpar_name][strobe_iframe])
         else:
           frame_words[mpar_name] = make_zero_bitmap(76)
       frame_link_data = fpga2_words_to_link(frame_words)
@@ -769,6 +772,8 @@ def create_empdata_fpga2_input(data: list[dict[str,list[Bitmap]]]) -> EmpData:
       for ichannel in range(46):
         link_data.metadata[ichannel+1].append(default_metadata(abs_frame))
         link_data.data[ichannel+1].append(frame_link_data[ichannel])
+      if strobe:
+        strobe_iframe += 1
     ievent += 1
   return link_data
 
