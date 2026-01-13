@@ -26,9 +26,19 @@ entity SectorProcessorFull is
     MP_bx_out : out std_logic_vector(2 downto 0);
     MP_bx_out_vld : out std_logic;
     MP_done   : out std_logic;
+
+    -- ####### Legacy port #####
     AS_L1PHIAin_wea        : in t_AS_36_1b;
     AS_L1PHIAin_writeaddr : in t_AS_36_ADDR;
     AS_L1PHIAin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHIAin_read_en_FIFO   : out std_logic;  -- or fancier? like t_AS_36_1b which is still std_logic?
+    AS_L1PHIAin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIAin_data_FIFO : in t_AS_36_DATA;  
+    readAS_L1PHIAin_start_FIFO : out std_logic;
+    
+    -- ####### Legacy port ##########
     AS_L1PHIBin_wea        : in t_AS_36_1b;
     AS_L1PHIBin_writeaddr : in t_AS_36_ADDR;
     AS_L1PHIBin_din       : in t_AS_36_DATA;
@@ -310,6 +320,7 @@ end SectorProcessorFull;
 
 architecture rtl of SectorProcessorFull is
 
+
   signal AS_L1PHIAin_start                   : std_logic;
   signal AS_L1PHIAin_wea_delay          : t_AS_36_1b;
   signal AS_L1PHIAin_writeaddr_delay   : t_AS_36_ADDR;
@@ -321,6 +332,11 @@ architecture rtl of SectorProcessorFull is
   signal AS_L1PHIAin_valid        : STD_LOGIC;
   signal AS_L1PHIAin_index        : STD_LOGIC_VECTOR(31 downto 0);
   signal AS_L1PHIAin_AV_dout_nent  : t_AS_36_NENT; -- (#page)
+
+-- ############ New signal ##########
+  signal AS_L1PHIAin_DELAY_wea_FIFO : std_logic := 1;
+  signal AS_L1PHIAin_DELAY_wea_FIFO_delay : std_logic;
+
   signal AS_L1PHIBin_start                   : std_logic;
   signal AS_L1PHIBin_wea_delay          : t_AS_36_1b;
   signal AS_L1PHIBin_writeaddr_delay   : t_AS_36_ADDR;
@@ -1600,6 +1616,7 @@ architecture rtl of SectorProcessorFull is
 
 begin
 
+-- ####### Legacy connection : port -> delay -> tf_mem 
     AS_L1PHIAin : entity work.tf_mem
       generic map (
         RAM_WIDTH       => 36,
@@ -1638,11 +1655,29 @@ begin
         dina      => AS_L1PHIAin_din,
         wea_out       => AS_L1PHIAin_wea_delay,
         addra_out     => AS_L1PHIAin_writeaddr_delay,
-        dina_out      => AS_L1PHIAin_din_delay,
+        dina_out      => AS_L1PHIAin_din_delay,  -- data
         done       => PC_start,
         start      => AS_L1PHIAin_start
       );
 
+-- ###### New connection: port -> delay
+    AS_L1PHIAin_DELAY_FIFO : entity work.tf_pipeline_slr_xing
+      generic map (
+        RAM_WIDTH     => 36   -- not sure here, also other generics
+      )
+      port map (
+        clk        => clk240,
+        reset      => reset,
+        wea        => AS_L1PHIAin_DELAY_wea_FIFO,  -- establish new signal std_logic := '1' earlier, no wea since no ram
+        addra      => (others => '0'),   -- there is no addr 
+        dina       => AS_L1PHIAin_data_FIFO,
+        wea_out    => AS_L1PHIAin_DELAY_wea_FIFO_delay,  -- my new data
+        addra_out  => open,
+        done       => PC_start,  -- copied from Legacy
+        start      => readAS_L1PHIAin_start_FIFO  -- no tf_mem to provide AS_L1PHIAin_start, use the start from FileReaderFIFO
+      );
+
+-- ####### Legacy connection : port -> delay -> tf_mem 
     AS_L1PHIBin : entity work.tf_mem
       generic map (
         RAM_WIDTH       => 36,
@@ -6546,6 +6581,8 @@ begin
       bx => VMSMER_L1PHIA_bx
   );
 
+-- ####### Legacy VMSMER_L1PHIA ######
+
   VMSMER_L1PHIA : entity work.VMSMER_L1PHIA
     port map (
       ap_clk   => clk240,
@@ -6553,7 +6590,7 @@ begin
       bx_V          => VMSMER_L1PHIA_bx,
       valid        => AS_L1PHIAin_valid,
       index        => AS_L1PHIAin_index,
-      allStub_data_V        => AS_L1PHIAin_V_as,
+      allStub_data_V        => AS_L1PHIAin_V_as,  -- legacy data
       memoryME_0_dataarray_0_data_V_ce0       => open,
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIAn2_wea,
       memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIAn2_writeaddr,
@@ -6563,6 +6600,28 @@ begin
       memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIAn2_writeaddr,
       memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIAn2_din
   );
+
+-- ####### New VMSMER_L1PHIA #######
+  VMSMER_L1PHIA_FIFO : entity work.VMSMER_L1PHIA
+    port map (
+      ap_clk   => clk240,
+      ap_rst   => reset,
+      bx_V          => VMSMER_L1PHIA_bx,  -- Same as legacy, in port
+      valid        =>       -- ?? Legacy from mem_reader
+      index        =>       -- ?? Legacy from mem_reader
+      allStub_data_V        => AS_L1PHIAin_DELAY_wea_FIFO_delay,  -- my new data
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIAn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIAn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIAn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIAn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIAn2_din   -- same as legacy, used later
+  );
+
+
+
 
   VMSMER_L1PHIB_mem_reader : entity work.mem_reader
     generic map (

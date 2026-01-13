@@ -100,9 +100,20 @@ constant FILE_OUT_TF          : string := dataOutDir&"TF_";
   signal TB_AAAA_last_track_vld     : std_logic := '0';
 
   -- Signals matching ports of top-level VHDL
+
+  -- ######### Legacy signals FileReader -> tf_mem
   signal AS_L1PHIAin_wea            : t_AS_36_1b           := '0';
   signal AS_L1PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
   signal AS_L1PHIAin_din            : t_AS_36_DATA         := (others => '0');
+
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIAin_read_en_FIFO   : std_logic := '1';  -- What value should it take?? from out port of SectorProcessorFull?
+  signal AS_L1PHIAin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIAin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader out port
+
+
+
+  -- ######### Legacy signals FileReader -> tf_mem
   signal AS_L1PHIBin_wea            : t_AS_36_1b           := '0';
   signal AS_L1PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
   signal AS_L1PHIBin_din            : t_AS_36_DATA         := (others => '0');
@@ -472,6 +483,8 @@ begin
 
   -- Get signals from input .txt files
 
+-- ###### Legacy instantiation using FileReader
+
     readAS_L1PHIAin : entity work.FileReader
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIAn1"&inputFileNameEnding,
@@ -488,6 +501,28 @@ begin
       START => open,
       WRITE_EN        => AS_L1PHIAin_wea
     );
+
+-- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIAin_FIFO : entity work.FileReaderFIFO
+  generic map (
+    FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIAn1"&inputFileNameEnding,
+    FIFO_WIDTH      => 36,  -- ?? 36 or 39 here? default is 39 but
+            --  in VMSMER_L1PHIA : entity work.VMSMER_L1PHIA, allStub_data_V => AS_L1PHIAin_V_as,
+            -- signal AS_L1PHIAin_V_as : t_AS_36_DATA;
+            -- subtype t_AS_36_DATA is std_logic_vector(35 downto 0)
+    DEBUG           => true,
+    FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIAin_debug"&debugFileNameEnding
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => AS_L1PHIAin_read_en_FIFO, -- decleared a signal earlier, but what default value?
+      EMPTY_NEG       => AS_L1PHIAin_empty_neg_FIFO, -- decleared a signal earlier
+      DATA            => AS_L1PHIAin_data_FIFO,  -- decleared a signal earlier
+      START           => readAS_L1PHIAin_start_FIFO   -- same as readAS_L1PHIAin
+  );
+
+-- ###### Legacy instantiation using FileReader
     readAS_L1PHIBin : entity work.FileReader
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIBn1"&inputFileNameEnding,
@@ -992,9 +1027,19 @@ begin
         MP_bx_out_vld              => MP_bx_out_vld,
         MP_done                    => MP_done,
         -- Input data
+
+        -- ######### Legacy port
         AS_L1PHIAin_wea            => AS_L1PHIAin_wea,
         AS_L1PHIAin_writeaddr      => AS_L1PHIAin_writeaddr,
         AS_L1PHIAin_din            => AS_L1PHIAin_din,
+        
+        -- ######### New port
+        AS_L1PHIAin_read_en_FIFO         => AS_L1PHIAin_read_en_FIFO,   -- out port, for debug?
+        AS_L1PHIAin_empty_neg_FIFO       => AS_L1PHIAin_empty_neg_FIFO,    -- in port
+        AS_L1PHIAin_data_FIFO            => AS_L1PHIAin_data_FIFO,  -- in port
+        readAS_L1PHIAin_start_FIFO       => readAS_L1PHIAin_start_FIFO -- out port, to drive the first delay
+
+        -- ###### Legacy port
         AS_L1PHIBin_wea            => AS_L1PHIBin_wea,
         AS_L1PHIBin_writeaddr      => AS_L1PHIBin_writeaddr,
         AS_L1PHIBin_din            => AS_L1PHIBin_din,
