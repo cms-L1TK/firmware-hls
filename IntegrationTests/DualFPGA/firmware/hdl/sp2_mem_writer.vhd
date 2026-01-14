@@ -45,7 +45,7 @@ architecture rtl of sp2_mem_writer is
   type t_arr_t_arr_MTPAR_73_1b is array(1 downto 0) of t_arr_MTPAR_73_1b;
   type t_arr_t_arr_MTPAR_73_DATA is array(1 downto 0) of t_arr_MTPAR_73_DATA;
   type t_arr_t_arr_MTPAR_73_ADDR is array(1 downto 0) of t_arr_MTPAR_73_ADDR;
-  type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET);
+  type enum_RESET_STATE is (S_IDLE, S_ACTIVE, S_RESET, S_WAIT);
 
   signal AS_36_link_valid_prev   : t_arr_AS_36_1b    := (others => '0');
   signal MPAR_73_link_valid_prev : t_arr_MTPAR_73_1b := (others => '0');
@@ -150,15 +150,24 @@ begin -- architecture rtl
               and to_integer(sync_counter) /= MAX_ENTRIES-1) or rst = '1') then 
             sync_counter <= (others => '0');
             PC_start_int <= '0';
-            HLS_reset <= '1';
+            HLS_reset_int <= '1';
             sectorprocessor_ctrl <= S_RESET;
           end if;
 
         when S_RESET =>
-          --return to idle after reset has been asserted for 2 BXs
-          if (to_integer(sync_counter) = 2*MAX_ENTRIES-1) then 
+          --after reset has been asserted for one BX, deassert reset and wait one BX
+          if (to_integer(sync_counter) = MAX_ENTRIES-1) then 
             sync_counter <= (others => '0');
-            HLS_reset <= '0';
+            HLS_reset_int <= '0';
+            sectorprocessor_ctrl <= S_WAIT;
+          else
+            sync_counter <= sync_counter+1;
+          end if;
+
+        when S_WAIT =>
+          --wait one more BX before returning to idle
+          if (to_integer(sync_counter) = MAX_ENTRIES-1) then 
+            sync_counter <= (others => '0');
             sectorprocessor_ctrl <= S_IDLE;
           else
             sync_counter <= sync_counter+1;
