@@ -186,9 +186,10 @@ begin
       DW_49_valid    => DW_49_stream_A_write,
       BW_46_data     => BW_46_stream_AV_din,
       BW_46_valid    => BW_46_stream_A_write,
-      start_of_orbit => d(10).start_of_orbit,
-      start          => d(10).start,
-      valid          => d(10).valid,
+      start_of_orbit360 => d(10).start_of_orbit,
+      valid360          => d(10).valid,
+      start_of_orbit240 => d_linktosecproc2(10).start_of_orbit,
+      valid240          => d_linktosecproc2(10).valid,
       dout           => s_tbout,
       orbit360       => orbit360
       );

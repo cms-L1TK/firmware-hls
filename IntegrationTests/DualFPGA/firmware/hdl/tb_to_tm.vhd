@@ -32,9 +32,10 @@ entity tb_to_tm is
     DW_49_valid    : in  t_arr_DW_49_1b;
     BW_46_data     : in  t_arr_BW_46_DATA;
     BW_46_valid    : in  t_arr_BW_46_1b;
-    start_of_orbit : in  std_logic;
-    start          : in  std_logic;
-    valid          : in  std_logic;
+    start_of_orbit360 : in  std_logic;
+    valid360          : in  std_logic;
+    start_of_orbit240 : in  std_logic;
+    valid240          : in  std_logic;
     dout           : out ldata(0 to tbNumLinks - 1);
     orbit360       : out std_logic_vector( 0 to tbNumSeedTypes - 1 )
     );
@@ -185,8 +186,8 @@ begin  -- architecture rtl
   --signal should only change on common 240/360 clock edges, making it safe to
   --sample in either domain
   --WARNING THIS MAY NOT WORK IN HARDWARE (depends on alignment of input)
-  start_of_orbit_latch <= '1' when start_of_orbit='1' else
-                          '0' when valid='0' else
+  start_of_orbit_latch <= '1' when start_of_orbit360='1' else
+                          '0' when valid360='0' else
                           start_of_orbit_latch;
 
   p_orbit : process (clk360) is
@@ -268,8 +269,8 @@ begin  -- architecture rtl
 
       -- propagate start and valid from input using pattern recognition latency
       -- and default all channels to null
-      sr_start <= start_of_orbit & sr_start(sr_start'low to sr_start'high - 1);
-      sr_valid <= valid & sr_valid(sr_valid'low to sr_valid'high - 1);
+      sr_start <= start_of_orbit240 & sr_start(sr_start'low to sr_start'high - 1);
+      sr_valid <= valid240 & sr_valid(sr_valid'low to sr_valid'high - 1);
       for ichannel in 0 to tbNumLinks-1 loop
         dout(ichannel) <= nulll;
         dout(ichannel).start_of_orbit <= sr_start(sr_start'high-1);
