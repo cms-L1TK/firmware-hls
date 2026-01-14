@@ -102,8 +102,8 @@ architecture rtl of tb_to_tm is
   constant DW_r_pos       : natural := widthsTBphi(2) + widthsTBz(2);
   constant DW_phi_pos     : natural := widthsTBz(2);
   constant DW_z_pos       : natural := 0;
-  constant TB_LATENCY360  : natural := 571;
-  constant TB_LATENCY240  : natural := 378;
+  constant TB_LATENCY360  : natural := 585;
+  constant TB_LATENCY240  : natural := 389;
 
   constant widthTW_TM     : natural := 1 + widthTBseedType + widthTBinv2R 
                                        + widthTBphi0 + widthTBz0 
@@ -115,7 +115,7 @@ architecture rtl of tb_to_tm is
   constant widthSeed_TM   : natural := 1 + widthTBStubPhiRegion 
                                        + widthTBStubIndex; --11
 
-  constant PIPELINE_STAGES : natural := 2;
+  constant PIPELINE_STAGES : natural := 3;
   type t_arr_t_arr_TW_113_1b is array(PIPELINE_STAGES-1 downto 0) of t_arr_TW_113_1b;
   type t_arr_t_arr_TW_113_seed is array(0 to tbMaxNumProjectionLayers - 1) of t_arr_TW_113_seed;
   type t_arr_t_arr_t_arr_TW_113_seed is array(PIPELINE_STAGES-1 downto 0) of t_arr_t_arr_TW_113_seed;
