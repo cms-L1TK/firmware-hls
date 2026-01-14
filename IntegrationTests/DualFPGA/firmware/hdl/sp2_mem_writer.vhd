@@ -61,6 +61,7 @@ architecture rtl of sp2_mem_writer is
   signal MPAR_73_din_pipe : t_arr_t_arr_MTPAR_73_DATA          := (others => (others => (others => '0')));
   signal MPAR_73_writeaddr_pipe : t_arr_t_arr_MTPAR_73_ADDR          := (others => (others => (others => '0')));
   signal PC_start_int    : std_logic                    := '0';
+  signal HLS_reset_int    : std_logic                    := '0';
 
   attribute shreg_extract : string;
   attribute shreg_extract of AS_36_wea_pipe : signal is "no";
@@ -68,6 +69,9 @@ architecture rtl of sp2_mem_writer is
   attribute shreg_extract of MPAR_73_wea_pipe : signal is "no";
   attribute shreg_extract of MPAR_73_din_pipe : signal is "no";
   attribute shreg_extract of MPAR_73_writeaddr_pipe : signal is "no";
+
+  attribute max_fanout : integer;
+  attribute max_fanout of HLS_reset_int : signal is 100;
 
 begin -- architecture rtl
   
@@ -169,5 +173,6 @@ begin -- architecture rtl
   end process p_writemem;
 
   AS_36_writeaddr <= (others => (others => '0'));
+  HLS_reset <= HLS_reset_int;
 
 end architecture rtl;
