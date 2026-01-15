@@ -18,7 +18,8 @@ entity linktosecproc2 is
     bx_link_data       : out std_logic_vector(2 downto 0);
     AS_36_link_valid   : out t_arr_AS_36_1b;
     MPAR_73_link_valid : out t_arr_MTPAR_73_1b;
-    bx_link_valid      : out std_logic
+    bx_link_valid      : out std_logic;
+    bx_src_internal     : out std_logic
     );
 
 end linktosecproc2;
@@ -27,6 +28,10 @@ architecture rtl of linktosecproc2 is
 
   signal AS_signals       : std_logic_vector(48*37 - 1 downto 0);
   signal MTPAR_signals    : std_logic_vector(15*76 - 1 downto 0);
+
+  signal bx_src_valid        : std_logic := '0';
+  signal bx_src_internal_in   : std_logic := '0';
+  signal bx_src_internal_lock : std_logic := '0';
 
 begin
 
@@ -230,5 +235,11 @@ begin
 
   bx_link_data <= d(9).data(2 downto 0);
   bx_link_valid <= d(9).valid;
-    
+
+  bx_src_valid <= d(8).data(1);
+  bx_src_internal_in <= d(8).data(0);
+
+  bx_src_internal_lock <= bx_src_internal_in when bx_src_valid = '1' else bx_src_internal_lock;
+  bx_src_internal <= bx_src_internal_lock;
+
 end rtl;

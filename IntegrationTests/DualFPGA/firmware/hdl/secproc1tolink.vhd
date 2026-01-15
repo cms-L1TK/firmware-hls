@@ -192,6 +192,9 @@ begin
                                               and sr_valid_prev='0') else
                      x"000000000000000";
 
+  -- Configure FPGA2 to read BX value from data stream
+  q(55).data(1 downto 0) <= "10";
+
   --debug
   --q(55).data(2 downto 0) <= bx_in;
   --q(55).data(3) <= '0';
