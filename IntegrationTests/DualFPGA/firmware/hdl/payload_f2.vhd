@@ -63,7 +63,7 @@ architecture rtl of emp_payload is
   signal MPAR_73_wea           : t_arr_MTPAR_73_1b;
   signal MPAR_73_writeaddr     : t_arr_MTPAR_73_ADDR;
   signal MPAR_73_din           : t_arr_MTPAR_73_DATA;
-  signal orbit360              : std_logic_vector(0 to tbNumSeedTypes - 1);
+  signal orbit360              : std_logic;
   signal s_tbout               : ldata( 0 to tbNumLinks - 1);
   signal s_tmout               : t_trackTM := nulll;
   signal s_drout               : t_trackDR := nulll;
@@ -187,7 +187,6 @@ begin
       BW_46_data     => BW_46_stream_AV_din,
       BW_46_valid    => BW_46_stream_A_write,
       start_of_orbit360 => d(10).start_of_orbit,
-      valid360          => d(10).valid,
       start_of_orbit240 => d_linktosecproc2(10).start_of_orbit,
       valid240          => d_linktosecproc2(10).valid,
       dout           => s_tbout,
@@ -202,7 +201,7 @@ begin
     port map (
       clk240    => clk_240MHz,
       clk360    => clk_360MHz,
-      orbit360  => orbit360,
+      orbit360  => (others => orbit360),
       tp_din    => s_tbout,
       tp_dout   => s_tfpout
       );

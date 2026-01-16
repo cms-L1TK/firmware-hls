@@ -33,11 +33,10 @@ entity tb_to_tm is
     BW_46_data     : in  t_arr_BW_46_DATA;
     BW_46_valid    : in  t_arr_BW_46_1b;
     start_of_orbit360 : in  std_logic;
-    valid360          : in  std_logic;
     start_of_orbit240 : in  std_logic;
     valid240          : in  std_logic;
     dout           : out ldata(0 to tbNumLinks - 1);
-    orbit360       : out std_logic_vector( 0 to tbNumSeedTypes - 1 )
+    orbit360       : out std_logic
     );
 end entity tb_to_tm;
 
@@ -179,29 +178,14 @@ architecture rtl of tb_to_tm is
 begin  -- architecture rtl
 
   --propagate start_of_orbit signal
-  --eventually, this should just be something like a long shift register
-  --currently, it is also a 240 MHz to 360 MHz CDC
-
-  --using frame 6 convention (first 6 frames empty in simulation) the following
-  --signal should only change on common 240/360 clock edges, making it safe to
-  --sample in either domain
-  --WARNING THIS MAY NOT WORK IN HARDWARE (depends on alignment of input)
-  start_of_orbit_latch <= '1' when start_of_orbit360='1' else
-                          '0' when valid360='0' else
-                          start_of_orbit_latch;
-
   p_orbit : process (clk360) is
   begin
     if rising_edge(clk360) then
 
-      start_of_orbit_latch_prev <= start_of_orbit_latch; 
-
-      sr_orbit <= (start_of_orbit_latch and (not start_of_orbit_latch_prev)) 
+      sr_orbit <= start_of_orbit360
                   & sr_orbit(sr_orbit'low to sr_orbit'high - 1);
 
-      for iseedtype in 0 to (tbNumSeedTypes-1) loop
-        orbit360(iseedtype) <= sr_orbit(sr_orbit'high-1);
-      end loop; 
+      orbit360 <= sr_orbit(sr_orbit'high-1);
 
     end if; --rising 360 edge
   end process p_orbit;

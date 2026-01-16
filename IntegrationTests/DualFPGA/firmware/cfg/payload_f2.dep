@@ -1,6 +1,6 @@
 src memUtil_pkg_f2.vhd
 src memUtil_aux_pkg_f2.vhd
-src payload_f2.vhd
+src --vhdl2008 payload_f2.vhd
 src linktosecproc2.vhd
 src sp2_mem_writer.vhd
 src tf2_wrapper.vhd
