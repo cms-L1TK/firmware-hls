@@ -10,39 +10,38 @@ import os
 import re
 import argparse
 
-TF_index = {}
-TF_index['L1L2'] = 0
-TF_index['L2L3'] = 0
-TF_index['L3L4'] = 1
-TF_index['L5L6'] = 0
-TF_index['D1D2'] = 1
-TF_index['D3D4'] = 1
-TF_index['L1D1'] = 1
-TF_index['L2D1'] = 0
-TF_index['AAAA'] = 0
-TF_index['BBBB'] = 1
+TF_index = {
+    'L1L2' : 0,
+    'L2L3' : 0,
+    'L3L4' : 1,
+    'L5L6' : 0,
+    'D1D2' : 1,
+    'D3D4' : 1,
+    'L1D1' : 1,
+    'L2D1' : 0,
+    'AAAA' : 0,
+    'BBBB' : 1
+}
 
 
 maxTPMems = "constexpr int maxTPMemories["
 maxFMMems = "constexpr int maxFMMemories["
 
 def asRegion(region):
-    if region in ['L1', 'L2', 'L3']:
+    if region in {'L1', 'L2', 'L3'}:
         return 'BARRELPS'
-    elif region in ['L4', 'L5', 'L6']:
+    if region in {'L4', 'L5', 'L6'}:
         return 'BARREL2S'
-    elif region in ['D1', 'D2']:
+    if region in {'D1', 'D2'}:
         return 'DISKPS'
-    else:
-        return 'DISK2S'
+    return 'DISK2S'
 
 def vmStubMERegion(region):
-    if region in ['L1', 'L2', 'L3']:
+    if region in {'L1', 'L2', 'L3'}:
         return 'BARRELPS'
-    elif region in ['L4', 'L5', 'L6']:
+    if region in {'L4', 'L5', 'L6'}:
         return 'BARREL2S'
-    else:
-        return 'DISK'
+    return 'DISK'
 
 def getTProjAndVMRegions(module):
 
@@ -50,21 +49,21 @@ def getTProjAndVMRegions(module):
     vmproj_region = ""
     vmstub_region = ""
 
-    if any(psword in module for psword in ["L1","L2","L3"]):
+    if any(psword in module for psword in ("L1","L2","L3")):
         tproj_region = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]):
+    elif any(psword in module for psword in ("L4","L5","L6")):
         tproj_region = "BARREL2S"
     else:
         tproj_region = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3","L4","L5","L6"]):
+    if any(psword in module for psword in ("L1","L2","L3","L4","L5","L6")):
         vmproj_region = "BARREL"
     else:
         vmproj_region = "DISK"
 
-    if any(psword in module for psword in ["L1","L2","L3"]):
+    if any(psword in module for psword in ("L1","L2","L3")):
         vmstub_region = "BARRELPS"
-    elif any(psword in module for psword in ["L4","L5","L6"]):
+    elif any(psword in module for psword in ("L4","L5","L6")):
         vmstub_region = "BARREL2S"
     else:
         vmstub_region = "DISK"
@@ -72,10 +71,9 @@ def getTProjAndVMRegions(module):
     return tproj_region, vmproj_region, vmstub_region
 
 def fmRegion(region):
-    if region in ['L1', 'L2', 'L3', 'L4', 'L5', 'L6']:
+    if region in {'L1', 'L2', 'L3', 'L4', 'L5', 'L6'}:
         return 'BARREL'
-    else:
-        return 'DISK'
+    return 'DISK'
 
 parser = argparse.ArgumentParser(description="This script generates MatchCalculatorTop.h, MatchCalculatorTop.cc, and\
 MatchCalculator_parameters.h in the TopFunctions/ directory.",

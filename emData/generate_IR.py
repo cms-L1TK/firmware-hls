@@ -86,9 +86,10 @@ def createParameters(wiresfiles='./LUTs/wires.dat', output_directory='../TopFunc
         file.write('#ifndef TopFunctions_InputRouter_parameters_h\n')
         file.write('#define TopFunctions_InputRouter_parameters_h\n')
         for dtc_name, nmemories in irs:
-            dtcs = {}
-            dtcs['LinkName'] = "DTC_" + dtc_name
-            dtcs['Noutputs'] = str(nmemories)
+            dtcs = {
+                'LinkName' : "DTC_" + dtc_name,
+                'Noutputs' : str(nmemories)
+            }
             with open(template_name, 'r') as ftemp:
                 template_string = ftemp.read()
             file.write(template_string.format(**dtcs))
@@ -105,8 +106,9 @@ def createDeclarations(wiresfiles='./LUTs/wires.dat', output_directory='../TopFu
         file.write('#include \"InputRouter.h\"\n')
         file.write('#include \"InputRouter_parameters.h\"\n')
         for dtc_name, _ in irs:
-            dtcs = {}
-            dtcs['LinkName'] = "DTC_" + dtc_name
+            dtcs = {
+                'LinkName' : "DTC_" + dtc_name
+            }
             with open(template_name, 'r') as ftemp:
                 template_string = ftemp.read()
             file.write(template_string.format(**dtcs))
@@ -120,8 +122,9 @@ def createDefinitions(wiresfiles='./LUTs/wires.dat', output_directory='../TopFun
     with open(output_directory + '/InputRouterTop.cc', 'w') as file:
         file.write('#include \"InputRouterTop.h\"\n')
         for dtc_name, _ in irs:
-            dtcs = {}
-            dtcs['LinkName'] = "DTC_" + dtc_name
+            dtcs = {
+                'LinkName' : "DTC_" + dtc_name
+            }
             with open(template_name, 'r') as ftemp:
                 template_string = ftemp.read()
             file.write(template_string.format(**dtcs))

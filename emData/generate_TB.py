@@ -197,7 +197,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "TrackBuilderTop.h"),
         # definition of getMPARNPages function
         nParentheses = 0
         first = True
-        maxNPages = max([len(tpar) - len("MPAR_L1L2") for tpar in tparMems[tbName]])
+        maxNPages = max(len(tpar) - len("MPAR_L1L2") for tpar in tparMems[tbName])
         getMPARNPages = "template<> inline int\n"
         getMPARNPages += "getMPARNPages<TF::" + seed + ">(const ITCType &iTC) {\n"
         getMPARNPages += "  return "

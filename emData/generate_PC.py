@@ -181,7 +181,7 @@ with open(os.path.join(dirname, arguments.outputDirectory, "ProjectionCalculator
           "PC_" + seed + iTC + ": ProjectionCalculator<\n"
           "  TF::" + seed + ",\n"
           "  TP::" + iTC[0] + ",\n"
-          "  0x%x, \n  0x%x" %(tprojMaskBarrel, tprojMaskDisk) +\
+          f"  0x{tprojMaskBarrel:x}, \n  0x{tprojMaskDisk:x}"
           " >(\n"
           "    bx,\n"
           "    bx_o,\n"
