@@ -14,6 +14,9 @@
 #include <fstream>
 #include <bitset>
 
+#if defined(__D1__) || defined(__D2__) || defined(__D3__) || defined(__D4__) || defined(__D5__)
+#  define __DISK__
+#endif
 
 namespace PR
 {
@@ -163,106 +166,84 @@ namespace PR
 template<int L>
 void readTable(ap_uint<1> table[]){
 
-  if (L==TF::L1) {
-    bool tmp[256]=
+#if defined(__L1__)
+  bool tmp[256]=
 #include "../emData/MP/tables/METable_L1.tab"
-    for (int i=0;i<256;++i){
+  for (int i=0;i<256;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::L2) {
-    bool tmp[256]=
+#elif defined(__L2__)
+  bool tmp[256]=
 #include "../emData/MP/tables/METable_L2.tab"
-    for (int i=0;i<256;++i){
+  for (int i=0;i<256;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::L3) {
-    bool tmp[256]=
+#elif defined(__L3__)
+  bool tmp[256]=
 #include "../emData/MP/tables/METable_L3.tab"
-    for (int i=0;i<256;++i){
+  for (int i=0;i<256;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::L4) {
-    bool tmp[512]=
+#elif defined(__L4__)
+  bool tmp[512]=
 #include "../emData/MP/tables/METable_L4.tab"
-    for (int i=0;i<512;++i){
+  for (int i=0;i<512;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::L5) {
-    bool tmp[512]=
+#elif defined(__L5__)
+  bool tmp[512]=
 #include "../emData/MP/tables/METable_L5.tab"
-    for (int i=0;i<512;++i){
+  for (int i=0;i<512;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::L6) {
-    bool tmp[512]=
+#elif defined(__L6__)
+  bool tmp[512]=
 #include "../emData/MP/tables/METable_L6.tab"
-    for (int i=0;i<512;++i){
+  for (int i=0;i<512;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::D1) {
-    bool tmp[768]=
+#elif defined(__D1__)
+  bool tmp[768]=
 #include "../emData/MP/tables/METable_D1.tab"
-    for (int i=0;i<768;++i){
+  for (int i=0;i<768;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::D2) {
-    bool tmp[768]=
+#elif defined(__D2__)
+  bool tmp[768]=
 #include "../emData/MP/tables/METable_D2.tab"
-    for (int i=0;i<768;++i){
+  for (int i=0;i<768;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::D3) {
-    bool tmp[768]=
+#elif defined(__D3__)
+  bool tmp[768]=
 #include "../emData/MP/tables/METable_D3.tab"
-    for (int i=0;i<768;++i){
+  for (int i=0;i<768;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::D4) {
-    bool tmp[768]=
+#elif defined(__D4__)
+  bool tmp[768]=
 #include "../emData/MP/tables/METable_D4.tab"
-    for (int i=0;i<768;++i){
+  for (int i=0;i<768;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-  if (L==TF::D5) {
-    bool tmp[768]=
+#elif defined(__D5__)
+  bool tmp[768]=
 #include "../emData/MP/tables/METable_D5.tab"
-    for (int i=0;i<768;++i){
+  for (int i=0;i<768;++i){
 #pragma HLS unroll
-      table[i]=tmp[i];
-    }
+    table[i]=tmp[i];
   }
-
-
+#endif
 
 }
 
@@ -305,588 +286,502 @@ namespace MC {
 // Template to get look up tables
 
 // Table for phi or z cuts
-template<TF::layerDisk L, int width, int depth>
+template<int width, int depth>
 void readRbin_LUT(ap_uint<width> table[depth]) {
-  if (L>=TF::D1){
-    ap_uint<width> tmp[depth] =
+#if defined(__DISK__)
+  ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/ProjectionDiskRadius.tab")
 #  include "../emData/MP/tables/ProjectionDiskRadius.tab"
+#else
+  {};
+#endif
+  for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
+}
+
+template<MC::lutType type, int width, int depth>
+void readTable_Cuts(ap_uint<width> table[depth]){
+
+  if (type==MC::PHICUT){ // phi cuts
+#if defined(__L1__)
+    ap_uint<width> tmp[depth] =
+#if __has_include("../emData/MP/tables/MP_L1PHIC_phicut.tab")
+#  include "../emData/MP/tables/MP_L1PHIC_phicut.tab"
 #else
     {};
 #endif
     for (int i = 0; i < depth; i++) table[i] = tmp[i];
-  }
-  else {
-      static_assert(true, "Only DISKS 1 to 5 are valid");
-  }
-}
-
-template<MC::lutType type, TF::layerDisk L, int width, int depth>
-void readTable_Cuts(ap_uint<width> table[depth]){
-  if (type==MC::PHICUT){ // phi cuts
-    if (L==TF::L1){
-      ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_L1PHIC_phicut.tab")
-#  include "../emData/MP/tables/MP_L1PHIC_phicut.tab"
-#else
-      {};
-#endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L2){
-      ap_uint<width> tmp[depth] =
+#elif defined(__L2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L2PHIC_phicut.tab")
 #  include "../emData/MP/tables/MP_L2PHIC_phicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L3PHIC_phicut.tab")
 #  include "../emData/MP/tables/MP_L3PHIC_phicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L4PHIC_phicut.tab")
 #  include "../emData/MP/tables/MP_L4PHIC_phicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L5PHIC_phicut.tab")
 #  include "../emData/MP/tables/MP_L5PHIC_phicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L6){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L6__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L6PHIC_phicut.tab")
 #  include "../emData/MP/tables/MP_L6PHIC_phicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only LAYERS 1 to 6 are valid");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   } // end phi cuts
   else if(type==MC::PSPHICUT) { // PSphi cuts
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_PSphicut.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_PSphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_PSphicut.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_PSphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_PSphicut.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_PSphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D4PHIC_PSphicut.tab")
 #  include "../emData/MP/tables/MP_D4PHIC_PSphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D5PHIC_PSphicut.tab")
 #  include "../emData/MP/tables/MP_D5PHIC_PSphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only LAYERS 1 to 6 are valid");
-    }
- 
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   } // end PSphi
   else if(type==MC::SSPHICUT) { // 2Sphi cuts
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_2Sphicut.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_2Sphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_2Sphicut.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_2Sphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_2Sphicut.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_2Sphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D4PHIC_2Sphicut.tab")
 #  include "../emData/MP/tables/MP_D4PHIC_2Sphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D5PHIC_2Sphicut.tab")
 #  include "../emData/MP/tables/MP_D5PHIC_2Sphicut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only LAYERS 1 to 6 are valid");
-    }
- 
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   } // end SSphi
   else if (type==MC::ZCUT) { // z cuts
-    if (L==TF::L1){
-      ap_uint<width> tmp[depth] =
+#if defined(__L1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L1PHIC_zcut.tab")
 #  include "../emData/MP/tables/MP_L1PHIC_zcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L2PHIC_zcut.tab")
 #  include "../emData/MP/tables/MP_L2PHIC_zcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L3PHIC_zcut.tab")
 #  include "../emData/MP/tables/MP_L3PHIC_zcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L4PHIC_zcut.tab")
 #  include "../emData/MP/tables/MP_L4PHIC_zcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L5PHIC_zcut.tab")
 #  include "../emData/MP/tables/MP_L5PHIC_zcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::L6){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__L6__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_L6PHIC_zcut.tab")
 #  include "../emData/MP/tables/MP_L6PHIC_zcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   } // end z cuts
   else if(type==MC::PSRCUT) { // PSr cuts
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_PSrcut.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_PSrcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_PSrcut.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_PSrcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_PSrcut.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_PSrcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D4PHIC_PSrcut.tab")
 #  include "../emData/MP/tables/MP_D4PHIC_PSrcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D5PHIC_PSrcut.tab")
 #  include "../emData/MP/tables/MP_D5PHIC_PSrcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only LAYERS 1 to 6 are valid");
-    }
- 
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   } // end PSr
   else if(type==MC::SSRCUT) { // 2Sr cuts
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_2Srcut.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_2Srcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_2Srcut.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_2Srcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_2Srcut.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_2Srcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D4PHIC_2Srcut.tab")
 #  include "../emData/MP/tables/MP_D4PHIC_2Srcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D5PHIC_2Srcut.tab")
 #  include "../emData/MP/tables/MP_D5PHIC_2Srcut.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only LAYERS 1 to 6 are valid");
-    }
- 
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   } // end 2Sr
   else if(type==MC::ALPHAINNERCUT) { // alphainner cuts (//for disks only)
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_alphainner.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_alphainner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_alphainner.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_alphainner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS 1 and 2 are valid for alpha inner");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
   else if(type==MC::ALPHAOUTERCUT) { // alphaouter cuts (//for disks only)
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_alphaouter.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_alphaouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_alphaouter.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_alphaouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS 1 and 2 are valid for alpha outer");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
 
 } // end readTable_Cuts
 
-template<MC::lutType type, TF::layerDisk L, int width, int depth>
+template<MC::lutType type, int width, int depth>
 void readTable_disk(ap_uint<width> table[depth]){
+
   if(type==MC::ALPHAINNERCUT) { // alphainner cuts (//for disks only)
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_alphainner.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_alphainner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_alphainner.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_alphainner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_alphainner.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_alphainner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS 1 and 2 are valid for alpha inner");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
   else if(type==MC::ALPHAOUTERCUT) { // alphaouter cuts (//for disks only)
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+#if defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_alphaouter.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_alphaouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D4PHIC_alphaouter.tab")
 #  include "../emData/MP/tables/MP_D4PHIC_alphaouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D5PHIC_alphaouter.tab")
 #  include "../emData/MP/tables/MP_D5PHIC_alphaouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS 3 to 5 are valid for alpha outer");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
+
 } // end readTable_disk()
 
-template<MC::lutType type, TF::layerDisk L, int width, int depth>
+template<MC::lutType type, int width, int depth>
 void readTable_rbend(ap_uint<width> table[depth]){
+
   if(type==MC::RBEND) { // alphainner cuts (//for disks only)
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_ProjectionBend_D1.tab")
 #  include "../emData/MP/tables/MP_ProjectionBend_D1.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_ProjectionBend_D2.tab")
 #  include "../emData/MP/tables/MP_ProjectionBend_D2.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_ProjectionBend_D3.tab")
 #  include "../emData/MP/tables/MP_ProjectionBend_D3.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
-#if __has_include("../emData/MP/tables/MP_ProjectionBend_D3.tab")
-#  include "../emData/MP/tables/MP_ProjectionBend_D3.tab"
-#else
-      {};
-#endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_ProjectionBend_D4.tab")
 #  include "../emData/MP/tables/MP_ProjectionBend_D4.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_ProjectionBend_D5.tab")
 #  include "../emData/MP/tables/MP_ProjectionBend_D5.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS for rinv bend");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
+
 } // end readTable_rbend()
 
-template<MC::lutType type, TF::layerDisk L, int width, int depth>
+template<MC::lutType type, int width, int depth>
 void readTable_rDSS(ap_uint<width> table[depth]){
+
   if(type==MC::RDSSINNERCUT) { // rDSSinner cuts (//for disks only)
-    if (L==TF::D1){
-      ap_uint<width> tmp[depth] =
+#if defined(__D1__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D1PHIC_rDSSinner.tab")
 #  include "../emData/MP/tables/MP_D1PHIC_rDSSinner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D2){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D2__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D2PHIC_rDSSinner.tab")
 #  include "../emData/MP/tables/MP_D2PHIC_rDSSinner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_rDSSinner.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_rDSSinner.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS 1 and 2 are valid for rDSS inner");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
   else if(type==MC::RDSSOUTERCUT) { // rDSSouter cuts (//for disks only)
-    if (L==TF::D3){
-      ap_uint<width> tmp[depth] =
+#if defined(__D3__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D3PHIC_rDSSouter.tab")
 #  include "../emData/MP/tables/MP_D3PHIC_rDSSouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D4){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D4__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D4PHIC_rDSSouter.tab")
 #  include "../emData/MP/tables/MP_D4PHIC_rDSSouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else if (L==TF::D5){
-      ap_uint<width> tmp[depth] =
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#elif defined(__D5__)
+    ap_uint<width> tmp[depth] =
 #if __has_include("../emData/MP/tables/MP_D5PHIC_rDSSouter.tab")
 #  include "../emData/MP/tables/MP_D5PHIC_rDSSouter.tab"
 #else
-      {};
+    {};
 #endif
-      for (int i = 0; i < depth; i++) table[i] = tmp[i];
-    }
-    else {
-      static_assert(true, "Only DISKS 3 to 5 are valid for rDSS outer");
-    }
+    for (int i = 0; i < depth; i++) table[i] = tmp[i];
+#endif
   }
 } // end readTable_rDSS()
 //-----------------------------------------------------------------------------------------------------------
@@ -948,29 +843,29 @@ void MatchCalculator(BXType bx,
 
   // Setup look up tables for match cuts
   ap_uint<MC::LUT_matchcut_phi_width> LUT_matchcut_phi[MC::LUT_matchcut_phi_depth];
-  readTable_Cuts<MC::PHICUT,LAYER,MC::LUT_matchcut_phi_width,MC::LUT_matchcut_phi_depth>(LUT_matchcut_phi);
+  readTable_Cuts<MC::PHICUT,MC::LUT_matchcut_phi_width,MC::LUT_matchcut_phi_depth>(LUT_matchcut_phi);
   ap_uint<MC::LUT_matchcut_z_width> LUT_matchcut_z[MC::LUT_matchcut_z_depth];
-  readTable_Cuts<MC::ZCUT,LAYER,MC::LUT_matchcut_z_width,MC::LUT_matchcut_z_depth>(LUT_matchcut_z);
+  readTable_Cuts<MC::ZCUT,MC::LUT_matchcut_z_width,MC::LUT_matchcut_z_depth>(LUT_matchcut_z);
 
   ap_uint<MC::LUT_matchcut_rphi_width> LUT_matchcut_PSrphi[MC::LUT_matchcut_rphi_depth];
-  readTable_Cuts<MC::PSPHICUT,LAYER,MC::LUT_matchcut_rphi_width,MC::LUT_matchcut_rphi_depth>(LUT_matchcut_PSrphi);
+  readTable_Cuts<MC::PSPHICUT,MC::LUT_matchcut_rphi_width,MC::LUT_matchcut_rphi_depth>(LUT_matchcut_PSrphi);
 
   ap_uint<MC::LUT_matchcut_rphi_width> LUT_matchcut_2Srphi[MC::LUT_matchcut_rphi_depth];
-  readTable_Cuts<MC::SSPHICUT,LAYER,MC::LUT_matchcut_rphi_width,MC::LUT_matchcut_rphi_depth>(LUT_matchcut_2Srphi);
+  readTable_Cuts<MC::SSPHICUT,MC::LUT_matchcut_rphi_width,MC::LUT_matchcut_rphi_depth>(LUT_matchcut_2Srphi);
 
   ap_uint<MC::LUT_matchcut_r_width> LUT_matchcut_PSr[MC::LUT_matchcut_r_depth];
-  readTable_Cuts<MC::PSRCUT,LAYER,MC::LUT_matchcut_r_width,MC::LUT_matchcut_r_depth>(LUT_matchcut_PSr);
+  readTable_Cuts<MC::PSRCUT,MC::LUT_matchcut_r_width,MC::LUT_matchcut_r_depth>(LUT_matchcut_PSr);
 
   ap_uint<MC::LUT_matchcut_r_width> LUT_matchcut_2Sr[MC::LUT_matchcut_r_depth];
-  readTable_Cuts<MC::SSRCUT,LAYER,MC::LUT_matchcut_r_width,MC::LUT_matchcut_r_depth>(LUT_matchcut_2Sr);
+  readTable_Cuts<MC::SSRCUT,MC::LUT_matchcut_r_width,MC::LUT_matchcut_r_depth>(LUT_matchcut_2Sr);
 
   ap_uint<LUT_matchcut_alpha_width> LUT_matchcut_alpha[MC::LUT_matchcut_alpha_depth];
   constexpr enum MC::lutType ALPHA = (LAYER < TF::D3) ? MC::ALPHAINNERCUT : MC::ALPHAOUTERCUT;
-  readTable_disk<ALPHA,LAYER,LUT_matchcut_alpha_width,MC::LUT_matchcut_alpha_depth>(LUT_matchcut_alpha);
+  readTable_disk<ALPHA,LUT_matchcut_alpha_width,MC::LUT_matchcut_alpha_depth>(LUT_matchcut_alpha);
 
   ap_uint<MC::LUT_matchcut_rDSS_width> LUT_matchcut_rDSS[MC::LUT_matchcut_rDSS_depth];
   constexpr enum MC::lutType RDSS = (LAYER < TF::D3) ? MC::RDSSINNERCUT : MC::RDSSOUTERCUT;
-  readTable_rDSS<RDSS,LAYER,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
+  readTable_rDSS<RDSS,MC::LUT_matchcut_rDSS_width,MC::LUT_matchcut_rDSS_depth>(LUT_matchcut_rDSS);
 
   bool goodmatch                   = false;
 
@@ -1160,8 +1055,8 @@ void MatchProcessor(BXType bx,
 #pragma HLS ARRAY_PARTITION variable=table dim=0
   readtable: for(unsigned int iMEU = 0; iMEU < kNMatchEngines; ++iMEU) {
 #pragma HLS unroll
-    readTable<LAYER>(table[iMEU]); 
-  } 
+    readTable<LAYER>(table[iMEU]);
+  }
   //FIXME moved this into main loop - jf
   // initialization:
   // check the number of entries in the input memories
@@ -1255,12 +1150,12 @@ void MatchProcessor(BXType bx,
   constexpr int nRbinBits = VMProjection<VMPTYPE>::kVMProjFineZSize + VMProjectionBase<VMPTYPE>::kVMProjZBinSize;
   ap_uint<nRbinBits> rbinLUT[256];//1<<TrackletProjection<PROJTYPE>::kTProjRZSize];
 #pragma HLS ARRAY_PARTITION variable=rbinLUT
-  readRbin_LUT<LAYER,nRbinBits,256>(rbinLUT);
+  readRbin_LUT<nRbinBits,256>(rbinLUT);
 
   const auto LUT_matchcut_rbend_width = 5;
   const auto LUT_matchcut_rbend_depth = 4096;
   ap_uint<LUT_matchcut_rbend_width> LUT_matchcut_rbend[LUT_matchcut_rbend_depth];
-  readTable_rbend<MC::RBEND,LAYER,LUT_matchcut_rbend_width,LUT_matchcut_rbend_depth>(LUT_matchcut_rbend);
+  readTable_rbend<MC::RBEND,LUT_matchcut_rbend_width,LUT_matchcut_rbend_depth>(LUT_matchcut_rbend);
   // Initialize MC delta phi cut variables
   ap_uint<MC::LUT_matchcut_z_width> best_delta_z;
   ap_uint<MC::LUT_matchcut_phi_width> best_delta_phi;
