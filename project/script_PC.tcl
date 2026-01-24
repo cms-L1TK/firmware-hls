@@ -37,7 +37,6 @@ add_files ../TopFunctions/CombinedConfig_FPGA2/ProjectionCalculatorTop.cc -cflag
 add_files -tb ../TestBenches/ProjectionCalculator_test.cpp -cflags "$CFLAGS"
 
 # data files
-add_files -tb ../emData/PC/tables/
 add_files -tb ../emData/PC/
 
 foreach i $modules_to_test {
