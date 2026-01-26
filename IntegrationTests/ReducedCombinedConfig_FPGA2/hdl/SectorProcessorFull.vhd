@@ -469,8 +469,8 @@ architecture rtl of SectorProcessorFull is
   signal AS_L1PHIAin_AV_dout_nent  : t_AS_36_NENT; -- (#page)
 
 -- ############ New signal ##########
-  signal AS_L1PHIAin_DELAY_wea_FIFO : std_logic := 1;
-  signal AS_L1PHIAin_DELAY_wea_FIFO_delay : std_logic;
+  -- signal AS_L1PHIAin_DELAY_wea_FIFO : std_logic := '1';
+  -- signal AS_L1PHIAin_DELAY_wea_FIFO_delay : std_logic;
 
   signal AS_L1PHIBin_start                   : std_logic;
   signal AS_L1PHIBin_wea_delay          : t_AS_36_1b;
@@ -1797,21 +1797,21 @@ begin
     --   );
 
 -- ###### New connection: port -> delay
-    AS_L1PHIAin_DELAY_FIFO : entity work.tf_pipeline_slr_xing
-      generic map (
-        RAM_WIDTH     => 36   -- not sure here, also other generics
-      )
-      port map (
-        clk        => clk240,
-        reset      => reset,
-        wea        => AS_L1PHIAin_DELAY_wea_FIFO,  -- establish new signal std_logic := '1' earlier, no wea since no ram
-        addra      => (others => '0'),   -- there is no addr 
-        dina       => AS_L1PHIAin_data_FIFO,
-        wea_out    => AS_L1PHIAin_DELAY_wea_FIFO_delay,  -- my new data
-        addra_out  => open,
-        done       => PC_start,  -- copied from Legacy
-        start      => readAS_L1PHIAin_start_FIFO  -- no tf_mem to provide AS_L1PHIAin_start, use the start from FileReaderFIFO
-      );
+    -- AS_L1PHIAin_DELAY_FIFO : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     RAM_WIDTH     => 36   -- not sure here, also other generics
+    --   )
+    --   port map (
+    --     clk        => clk240,
+    --     reset      => reset,
+    --     wea        => AS_L1PHIAin_DELAY_wea_FIFO,  -- establish new signal std_logic := '1' earlier, no wea since no ram
+    --     addra      => (others => '0'),   -- there is no addr 
+    --     dina       => AS_L1PHIAin_data_FIFO,
+    --     wea_out    => AS_L1PHIAin_DELAY_wea_FIFO_delay,  -- my new data
+    --     addra_out  => open,
+    --     done       => PC_start,  -- copied from Legacy
+    --     start      => readAS_L1PHIAin_start_FIFO  -- no tf_mem to provide AS_L1PHIAin_start, use the start from FileReaderFIFO
+    --   );
 
 -- ####### Legacy connection : port -> delay -> tf_mem 
     -- AS_L1PHIBin : entity work.tf_mem
@@ -7309,7 +7309,7 @@ begin
   --     bx_out => PC_bx_in,
   --     bx => VMSMER_L2PHIA_bx_in,
   --     start => VMSMER_L2PHIA_start
-  );
+  -- );
 
   LATCH_VMSMER_L2PHIA_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
