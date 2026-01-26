@@ -102,75 +102,170 @@ constant FILE_OUT_TF          : string := dataOutDir&"TF_";
   -- Signals matching ports of top-level VHDL
 
   -- ######### Legacy signals FileReader -> tf_mem
-  signal AS_L1PHIAin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIAin_din            : t_AS_36_DATA         := (others => '0');
+  -- signal AS_L1PHIAin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIAin_din            : t_AS_36_DATA         := (others => '0');
 
   -- ######### New signals FileReaderFIFO
-  signal AS_L1PHIAin_read_en_FIFO   : std_logic := '1';  -- What value should it take?? from out port of SectorProcessorFull?
   signal AS_L1PHIAin_empty_neg_FIFO : std_logic;
-  signal AS_L1PHIAin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader out port
-
-
+  signal AS_L1PHIAin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
 
   -- ######### Legacy signals FileReader -> tf_mem
-  signal AS_L1PHIBin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIBin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L1PHICin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHICin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L1PHIDin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIDin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L1PHIEin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIEin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIEin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L1PHIFin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIFin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIFin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L1PHIGin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIGin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIGin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L1PHIHin_wea            : t_AS_36_1b           := '0';
-  signal AS_L1PHIHin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L1PHIHin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L2PHIAin_wea            : t_AS_36_1b           := '0';
-  signal AS_L2PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L2PHIAin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L2PHIBin_wea            : t_AS_36_1b           := '0';
-  signal AS_L2PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L2PHIBin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L2PHICin_wea            : t_AS_36_1b           := '0';
-  signal AS_L2PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L2PHICin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L2PHIDin_wea            : t_AS_36_1b           := '0';
-  signal AS_L2PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L2PHIDin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L3PHIAin_wea            : t_AS_36_1b           := '0';
-  signal AS_L3PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L3PHIAin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L3PHIBin_wea            : t_AS_36_1b           := '0';
-  signal AS_L3PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L3PHIBin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L3PHICin_wea            : t_AS_36_1b           := '0';
-  signal AS_L3PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L3PHICin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L3PHIDin_wea            : t_AS_36_1b           := '0';
-  signal AS_L3PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L3PHIDin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L4PHIAin_wea            : t_AS_36_1b           := '0';
-  signal AS_L4PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L4PHIAin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L4PHIBin_wea            : t_AS_36_1b           := '0';
-  signal AS_L4PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L4PHIBin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L4PHICin_wea            : t_AS_36_1b           := '0';
-  signal AS_L4PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L4PHICin_din            : t_AS_36_DATA         := (others => '0');
-  signal AS_L4PHIDin_wea            : t_AS_36_1b           := '0';
-  signal AS_L4PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
-  signal AS_L4PHIDin_din            : t_AS_36_DATA         := (others => '0');
+  -- signal AS_L1PHIBin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIBin_din            : t_AS_36_DATA         := (others => '0');
+
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIBin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIBin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+  -- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L1PHICin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHICin_din            : t_AS_36_DATA         := (others => '0');
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHICin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHICin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+  -- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L1PHIDin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIDin_din            : t_AS_36_DATA         := (others => '0');
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIDin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIDin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+ -- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L1PHIEin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIEin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIEin_din            : t_AS_36_DATA         := (others => '0');
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIEin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIEin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+ -- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L1PHIFin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIFin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIFin_din            : t_AS_36_DATA         := (others => '0');
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIFin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIFin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+ -- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L1PHIGin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIGin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIGin_din            : t_AS_36_DATA         := (others => '0');
+  -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIGin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIGin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+ -- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L1PHIHin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L1PHIHin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L1PHIHin_din            : t_AS_36_DATA         := (others => '0');
+    -- ######### New signals FileReaderFIFO
+  signal AS_L1PHIHin_empty_neg_FIFO : std_logic;
+  signal AS_L1PHIHin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L2PHIAin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L2PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L2PHIAin_din            : t_AS_36_DATA         := (others => '0');
+    -- ######### New signals FileReaderFIFO
+  signal AS_L2PHIAin_empty_neg_FIFO : std_logic;
+  signal AS_L2PHIAin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L2PHIBin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L2PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L2PHIBin_din            : t_AS_36_DATA         := (others => '0');
+ -- ######### New signals FileReaderFIFO
+  signal AS_L2PHIBin_empty_neg_FIFO : std_logic;
+  signal AS_L2PHIBin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+ 
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L2PHICin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L2PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L2PHICin_din            : t_AS_36_DATA         := (others => '0');
+ -- ######### New signals FileReaderFIFO
+  signal AS_L2PHICin_empty_neg_FIFO : std_logic;
+  signal AS_L2PHICin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L2PHIDin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L2PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L2PHIDin_din            : t_AS_36_DATA         := (others => '0');
+
+ -- ######### New signals FileReaderFIFO
+  signal AS_L2PHIDin_empty_neg_FIFO : std_logic;
+  signal AS_L2PHIDin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L3PHIAin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L3PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L3PHIAin_din            : t_AS_36_DATA         := (others => '0');
+   -- ######### New signals FileReaderFIFO
+  signal AS_L3PHIAin_empty_neg_FIFO : std_logic;
+  signal AS_L3PHIAin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L3PHIBin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L3PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L3PHIBin_din            : t_AS_36_DATA         := (others => '0');
+   -- ######### New signals FileReaderFIFO
+  signal AS_L3PHIBin_empty_neg_FIFO : std_logic;
+  signal AS_L3PHIBin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L3PHICin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L3PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L3PHICin_din            : t_AS_36_DATA         := (others => '0');
+-- ######### New signals FileReaderFIFO
+  signal AS_L3PHICin_empty_neg_FIFO : std_logic;
+  signal AS_L3PHICin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L3PHIDin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L3PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L3PHIDin_din            : t_AS_36_DATA         := (others => '0');
+-- ######### New signals FileReaderFIFO
+  signal AS_L3PHIDin_empty_neg_FIFO : std_logic;
+  signal AS_L3PHIDin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L4PHIAin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L4PHIAin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L4PHIAin_din            : t_AS_36_DATA         := (others => '0');
+-- ######### New signals FileReaderFIFO
+  signal AS_L4PHIAin_empty_neg_FIFO : std_logic;
+  signal AS_L4PHIAin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L4PHIBin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L4PHIBin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L4PHIBin_din            : t_AS_36_DATA         := (others => '0');
+-- ######### New signals FileReaderFIFO
+  signal AS_L4PHIBin_empty_neg_FIFO : std_logic;
+  signal AS_L4PHIBin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L4PHICin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L4PHICin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L4PHICin_din            : t_AS_36_DATA         := (others => '0');
+-- ######### New signals FileReaderFIFO
+  signal AS_L4PHICin_empty_neg_FIFO : std_logic;
+  signal AS_L4PHICin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
+-- ######### Legacy signals FileReader -> tf_mem
+  -- signal AS_L4PHIDin_wea            : t_AS_36_1b           := '0';
+  -- signal AS_L4PHIDin_writeaddr      : t_AS_36_ADDR         := (others => '0');
+  -- signal AS_L4PHIDin_din            : t_AS_36_DATA         := (others => '0');
+-- ######### New signals FileReaderFIFO
+  signal AS_L4PHIDin_empty_neg_FIFO : std_logic;
+  signal AS_L4PHIDin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
+
   signal AS_L1PHIAn2_wea            : t_AS_36_1b           := '0';
   signal AS_L1PHIAn2_writeaddr      : t_AS_36_ADDR         := (others => '0');
   signal AS_L1PHIAn2_din            : t_AS_36_DATA         := (others => '0');
@@ -485,348 +580,733 @@ begin
 
 -- ###### Legacy instantiation using FileReader
 
-    readAS_L1PHIAin : entity work.FileReader
-  generic map (
-      FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIAn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
-      FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIAin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIAin_writeaddr,
-      DATA            => AS_L1PHIAin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIAin_wea
-    );
+  --   readAS_L1PHIAin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIAn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIAin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIAin_writeaddr,
+  --     DATA            => AS_L1PHIAin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIAin_wea
+  --   );
 
 -- ###### New instantiation using FileReaderFIFO
     readAS_L1PHIAin_FIFO : entity work.FileReaderFIFO
   generic map (
     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIAn1"&inputFileNameEnding,
-    FIFO_WIDTH      => 36,  -- ?? 36 or 39 here? default is 39 but
-            --  in VMSMER_L1PHIA : entity work.VMSMER_L1PHIA, allStub_data_V => AS_L1PHIAin_V_as,
-            -- signal AS_L1PHIAin_V_as : t_AS_36_DATA;
-            -- subtype t_AS_36_DATA is std_logic_vector(35 downto 0)
+    FIFO_WIDTH      => 36,  
     DEBUG           => true,
     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIAin_debug"&debugFileNameEnding
   )
   port map(
       CLK             => CLK240,  -- same as readAS_L1PHIAin
       LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
-      READ_EN         => AS_L1PHIAin_read_en_FIFO, -- decleared a signal earlier, but what default value?
-      EMPTY_NEG       => AS_L1PHIAin_empty_neg_FIFO, -- decleared a signal earlier
-      DATA            => AS_L1PHIAin_data_FIFO,  -- decleared a signal earlier
-      START           => readAS_L1PHIAin_start_FIFO   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIAin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIAin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open  -- OUT same as legacy
   );
 
 -- ###### Legacy instantiation using FileReader
-    readAS_L1PHIBin : entity work.FileReader
+  --   readAS_L1PHIBin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIBn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIBin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIBin_writeaddr,
+  --     DATA            => AS_L1PHIBin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIBin_wea
+  --   );
+
+-- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIBin_FIFO : entity work.FileReaderFIFO
   generic map (
-      FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIBn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
-      FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIBin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIBin_writeaddr,
-      DATA            => AS_L1PHIBin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIBin_wea
-    );
-    readAS_L1PHICin : entity work.FileReader
+    FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIBn1"&inputFileNameEnding,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
+    FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIBin_debug"&debugFileNameEnding
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIBin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIBin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L1PHICin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHICn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHICin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHICin_writeaddr,
+  --     DATA            => AS_L1PHICin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHICin_wea
+  --   );
+
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHICin_FIFO : entity work.FileReaderFIFO
   generic map (
-      FILE_NAME       => FILE_IN_AS_36&"AS_L1PHICn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
-      FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHICin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHICin_writeaddr,
-      DATA            => AS_L1PHICin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHICin_wea
-    );
-    readAS_L1PHIDin : entity work.FileReader
+    FILE_NAME       => FILE_IN_AS_36&"AS_L1PHICn1"&inputFileNameEnding,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
+    FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIBin_debug"&debugFileNameEnding
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHICin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHICin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L1PHIDin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIDn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIDin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIDin_writeaddr,
+  --     DATA            => AS_L1PHIDin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIDin_wea
+  --   );
+
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIDin_FIFO : entity work.FileReaderFIFO
   generic map (
-      FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIDn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
-      FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIDin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIDin_writeaddr,
-      DATA            => AS_L1PHIDin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIDin_wea
-    );
-    readAS_L1PHIEin : entity work.FileReader
+    FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIDn1"&inputFileNameEnding,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
+    FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIDin_debug"&debugFileNameEnding
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIDin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIDin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+  
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L1PHIEin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIEn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIEin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIEin_writeaddr,
+  --     DATA            => AS_L1PHIEin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIEin_wea
+  --   );
+
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIEin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIEn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIEin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIEin_writeaddr,
-      DATA            => AS_L1PHIEin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIEin_wea
-    );
-    readAS_L1PHIFin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIEin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIEin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+  
+  
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L1PHIFin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIFn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIFin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIFin_writeaddr,
+  --     DATA            => AS_L1PHIFin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIFin_wea
+  --   );
+
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIFin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIFn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIFin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIFin_writeaddr,
-      DATA            => AS_L1PHIFin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIFin_wea
-    );
-    readAS_L1PHIGin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIFin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIFin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+  -- ###### Legacy instantiation using FileReader
+  --   readAS_L1PHIGin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIGn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIGin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIGin_writeaddr,
+  --     DATA            => AS_L1PHIGin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIGin_wea
+  --   );
+  
+    -- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIGin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIGn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIGin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIGin_writeaddr,
-      DATA            => AS_L1PHIGin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIGin_wea
-    );
-    readAS_L1PHIHin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIGin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIGin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+  -- ###### Legacy instantiation using FileReader
+  --   readAS_L1PHIHin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIHn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIHin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L1PHIHin_writeaddr,
+  --     DATA            => AS_L1PHIHin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L1PHIHin_wea
+  --   );
+
+    -- ###### New instantiation using FileReaderFIFO
+    readAS_L1PHIHin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L1PHIHn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L1PHIHin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L1PHIHin_writeaddr,
-      DATA            => AS_L1PHIHin_din,
-      START => open,
-      WRITE_EN        => AS_L1PHIHin_wea
-    );
-    readAS_L2PHIAin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L1PHIHin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L1PHIHin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+  -- ###### Legacy instantiation using FileReader
+  --   readAS_L2PHIAin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L2PHIAn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHIAin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L2PHIAin_writeaddr,
+  --     DATA            => AS_L2PHIAin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L2PHIAin_wea
+  --   );
+  
+    -- ###### New instantiation using FileReaderFIFO
+    readAS_L2PHIAin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L2PHIAn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHIAin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L2PHIAin_writeaddr,
-      DATA            => AS_L2PHIAin_din,
-      START => open,
-      WRITE_EN        => AS_L2PHIAin_wea
-    );
-    readAS_L2PHIBin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L2PHIAin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L2PHIAin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L2PHIBin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L2PHIBn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHIBin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L2PHIBin_writeaddr,
+  --     DATA            => AS_L2PHIBin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L2PHIBin_wea
+  --   );
+
+      -- ###### New instantiation using FileReaderFIFO
+    readAS_L2PHIBin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L2PHIBn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHIBin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L2PHIBin_writeaddr,
-      DATA            => AS_L2PHIBin_din,
-      START => open,
-      WRITE_EN        => AS_L2PHIBin_wea
-    );
-    readAS_L2PHICin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L2PHIBin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L2PHIBin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L2PHICin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L2PHICn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHICin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L2PHICin_writeaddr,
+  --     DATA            => AS_L2PHICin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L2PHICin_wea
+  --   );
+
+       -- ###### New instantiation using FileReaderFIFO
+    readAS_L2PHICin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L2PHICn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHICin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L2PHICin_writeaddr,
-      DATA            => AS_L2PHICin_din,
-      START => open,
-      WRITE_EN        => AS_L2PHICin_wea
-    );
-    readAS_L2PHIDin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L2PHICin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L2PHICin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L2PHIDin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L2PHIDn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHIDin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L2PHIDin_writeaddr,
+  --     DATA            => AS_L2PHIDin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L2PHIDin_wea
+  --   );
+  
+       -- ###### New instantiation using FileReaderFIFO
+    readAS_L2PHIDin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L2PHIDn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L2PHIDin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L2PHIDin_writeaddr,
-      DATA            => AS_L2PHIDin_din,
-      START => open,
-      WRITE_EN        => AS_L2PHIDin_wea
-    );
-    readAS_L3PHIAin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L2PHIDin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L2PHIDin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+
+  --   readAS_L3PHIAin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L3PHIAn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHIAin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L3PHIAin_writeaddr,
+  --     DATA            => AS_L3PHIAin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L3PHIAin_wea
+  --   );
+  
+
+       -- ###### New instantiation using FileReaderFIFO
+    readAS_L3PHIAin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L3PHIAn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHIAin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L3PHIAin_writeaddr,
-      DATA            => AS_L3PHIAin_din,
-      START => open,
-      WRITE_EN        => AS_L3PHIAin_wea
-    );
-    readAS_L3PHIBin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L3PHIAin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L3PHIAin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L3PHIBin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L3PHIBn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHIBin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L3PHIBin_writeaddr,
+  --     DATA            => AS_L3PHIBin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L3PHIBin_wea
+  --   );
+  
+         -- ###### New instantiation using FileReaderFIFO
+    readAS_L3PHIBin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L3PHIBn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHIBin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L3PHIBin_writeaddr,
-      DATA            => AS_L3PHIBin_din,
-      START => open,
-      WRITE_EN        => AS_L3PHIBin_wea
-    );
-    readAS_L3PHICin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L3PHIBin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L3PHIBin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+
+  --   readAS_L3PHICin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L3PHICn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHICin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L3PHICin_writeaddr,
+  --     DATA            => AS_L3PHICin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L3PHICin_wea
+  --   );
+  
+         -- ###### New instantiation using FileReaderFIFO
+    readAS_L3PHICin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L3PHICn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHICin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L3PHICin_writeaddr,
-      DATA            => AS_L3PHICin_din,
-      START => open,
-      WRITE_EN        => AS_L3PHICin_wea
-    );
-    readAS_L3PHIDin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L3PHICin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L3PHICin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L3PHIDin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L3PHIDn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHIDin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L3PHIDin_writeaddr,
+  --     DATA            => AS_L3PHIDin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L3PHIDin_wea
+  --   );
+
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L3PHIDin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L3PHIDn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L3PHIDin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L3PHIDin_writeaddr,
-      DATA            => AS_L3PHIDin_din,
-      START => open,
-      WRITE_EN        => AS_L3PHIDin_wea
-    );
-    readAS_L4PHIAin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L3PHIDin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L3PHIDin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L4PHIAin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIAn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIAin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L4PHIAin_writeaddr,
+  --     DATA            => AS_L4PHIAin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L4PHIAin_wea
+  --   );
+    
+
+-- ###### New instantiation using FileReaderFIFO
+    readAS_L4PHIAin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIAn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIAin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L4PHIAin_writeaddr,
-      DATA            => AS_L4PHIAin_din,
-      START => open,
-      WRITE_EN        => AS_L4PHIAin_wea
-    );
-    readAS_L4PHIBin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L4PHIAin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L4PHIAin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L4PHIBin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIBn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIBin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L4PHIBin_writeaddr,
+  --     DATA            => AS_L4PHIBin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L4PHIBin_wea
+  --   );
+-- ###### New instantiation using FileReaderFIFO
+    readAS_L4PHIBin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIBn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIBin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L4PHIBin_writeaddr,
-      DATA            => AS_L4PHIBin_din,
-      START => open,
-      WRITE_EN        => AS_L4PHIBin_wea
-    );
-    readAS_L4PHICin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L4PHIBin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L4PHIBin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L4PHICin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L4PHICn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHICin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L4PHICin_writeaddr,
+  --     DATA            => AS_L4PHICin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L4PHICin_wea
+  --   );
+  
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L4PHICin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L4PHICn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHICin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L4PHICin_writeaddr,
-      DATA            => AS_L4PHICin_din,
-      START => open,
-      WRITE_EN        => AS_L4PHICin_wea
-    );
-    readAS_L4PHIDin : entity work.FileReader
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L4PHICin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L4PHICin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
+  --   readAS_L4PHIDin : entity work.FileReader
+  -- generic map (
+  --     FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIDn1"&inputFileNameEnding,
+  --     RAM_WIDTH       => 36,
+  --     NUM_PAGES       => 8,
+  --     DEBUG           => true,
+  --     FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIDin_debug"&debugFileNameEnding
+  --   )
+  --   port map (
+  --     CLK             => CLK240,
+  --     LOCKED          => LOCKED,
+  --     ADDR            => AS_L4PHIDin_writeaddr,
+  --     DATA            => AS_L4PHIDin_din,
+  --     START => open,
+  --     WRITE_EN        => AS_L4PHIDin_wea
+  --   );
+  -- ###### New instantiation using FileReaderFIFO
+    readAS_L4PHIDin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIDn1"&inputFileNameEnding,
-      RAM_WIDTH       => 36,
-      NUM_PAGES       => 8,
-      DEBUG           => true,
+    FIFO_WIDTH      => 36,  
+    DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIDin_debug"&debugFileNameEnding
-    )
-    port map (
-      CLK             => CLK240,
-      LOCKED          => LOCKED,
-      ADDR            => AS_L4PHIDin_writeaddr,
-      DATA            => AS_L4PHIDin_din,
-      START => open,
-      WRITE_EN        => AS_L4PHIDin_wea
-    );
+  )
+  port map(
+      CLK             => CLK240,  -- same as readAS_L1PHIAin
+      LOCKED          => LOCKED,   -- same as readAS_L1PHIAin
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => AS_L4PHIDin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => AS_L4PHIDin_data_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
+
+
+-- ###### Legacy instantiation using FileReader
     readMPAR_L5L6ABCDin : entity work.FileReader
   generic map (
       FILE_NAME       => FILE_IN_MPAR_73&"MPAR_L5L6ABCD"&inputFileNameEnding,
@@ -868,7 +1348,7 @@ begin
 
           -- PC should start one TM period after time when first event starting being 
           -- written to first memory in chain, as it takes this long to write full event.
-          PC_START <= '1';
+          PC_START <= '1';       -- @@@@@@@ read_en
           PC_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, PC_BX_IN'length));
 
           write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
@@ -1029,77 +1509,190 @@ begin
         -- Input data
 
         -- ######### Legacy port
-        AS_L1PHIAin_wea            => AS_L1PHIAin_wea,
-        AS_L1PHIAin_writeaddr      => AS_L1PHIAin_writeaddr,
-        AS_L1PHIAin_din            => AS_L1PHIAin_din,
+        -- AS_L1PHIAin_wea            => AS_L1PHIAin_wea,
+        -- AS_L1PHIAin_writeaddr      => AS_L1PHIAin_writeaddr,
+        -- AS_L1PHIAin_din            => AS_L1PHIAin_din,
         
         -- ######### New port
-        AS_L1PHIAin_read_en_FIFO         => AS_L1PHIAin_read_en_FIFO,   -- out port, for debug?
-        AS_L1PHIAin_empty_neg_FIFO       => AS_L1PHIAin_empty_neg_FIFO,    -- in port
+        AS_L1PHIAin_empty_neg_FIFO       => AS_L1PHIAin_empty_neg_FIFO,    --  in port
         AS_L1PHIAin_data_FIFO            => AS_L1PHIAin_data_FIFO,  -- in port
-        readAS_L1PHIAin_start_FIFO       => readAS_L1PHIAin_start_FIFO -- out port, to drive the first delay
+        -- readAS_L1PHIAin_start_FIFO       => readAS_L1PHIAin_start_FIFO -- out port, to drive the first delay
 
         -- ###### Legacy port
-        AS_L1PHIBin_wea            => AS_L1PHIBin_wea,
-        AS_L1PHIBin_writeaddr      => AS_L1PHIBin_writeaddr,
-        AS_L1PHIBin_din            => AS_L1PHIBin_din,
-        AS_L1PHICin_wea            => AS_L1PHICin_wea,
-        AS_L1PHICin_writeaddr      => AS_L1PHICin_writeaddr,
-        AS_L1PHICin_din            => AS_L1PHICin_din,
-        AS_L1PHIDin_wea            => AS_L1PHIDin_wea,
-        AS_L1PHIDin_writeaddr      => AS_L1PHIDin_writeaddr,
-        AS_L1PHIDin_din            => AS_L1PHIDin_din,
-        AS_L1PHIEin_wea            => AS_L1PHIEin_wea,
-        AS_L1PHIEin_writeaddr      => AS_L1PHIEin_writeaddr,
-        AS_L1PHIEin_din            => AS_L1PHIEin_din,
-        AS_L1PHIFin_wea            => AS_L1PHIFin_wea,
-        AS_L1PHIFin_writeaddr      => AS_L1PHIFin_writeaddr,
-        AS_L1PHIFin_din            => AS_L1PHIFin_din,
-        AS_L1PHIGin_wea            => AS_L1PHIGin_wea,
-        AS_L1PHIGin_writeaddr      => AS_L1PHIGin_writeaddr,
-        AS_L1PHIGin_din            => AS_L1PHIGin_din,
-        AS_L1PHIHin_wea            => AS_L1PHIHin_wea,
-        AS_L1PHIHin_writeaddr      => AS_L1PHIHin_writeaddr,
-        AS_L1PHIHin_din            => AS_L1PHIHin_din,
-        AS_L2PHIAin_wea            => AS_L2PHIAin_wea,
-        AS_L2PHIAin_writeaddr      => AS_L2PHIAin_writeaddr,
-        AS_L2PHIAin_din            => AS_L2PHIAin_din,
-        AS_L2PHIBin_wea            => AS_L2PHIBin_wea,
-        AS_L2PHIBin_writeaddr      => AS_L2PHIBin_writeaddr,
-        AS_L2PHIBin_din            => AS_L2PHIBin_din,
-        AS_L2PHICin_wea            => AS_L2PHICin_wea,
-        AS_L2PHICin_writeaddr      => AS_L2PHICin_writeaddr,
-        AS_L2PHICin_din            => AS_L2PHICin_din,
-        AS_L2PHIDin_wea            => AS_L2PHIDin_wea,
-        AS_L2PHIDin_writeaddr      => AS_L2PHIDin_writeaddr,
-        AS_L2PHIDin_din            => AS_L2PHIDin_din,
-        AS_L3PHIAin_wea            => AS_L3PHIAin_wea,
-        AS_L3PHIAin_writeaddr      => AS_L3PHIAin_writeaddr,
-        AS_L3PHIAin_din            => AS_L3PHIAin_din,
-        AS_L3PHIBin_wea            => AS_L3PHIBin_wea,
-        AS_L3PHIBin_writeaddr      => AS_L3PHIBin_writeaddr,
-        AS_L3PHIBin_din            => AS_L3PHIBin_din,
-        AS_L3PHICin_wea            => AS_L3PHICin_wea,
-        AS_L3PHICin_writeaddr      => AS_L3PHICin_writeaddr,
-        AS_L3PHICin_din            => AS_L3PHICin_din,
-        AS_L3PHIDin_wea            => AS_L3PHIDin_wea,
-        AS_L3PHIDin_writeaddr      => AS_L3PHIDin_writeaddr,
-        AS_L3PHIDin_din            => AS_L3PHIDin_din,
-        AS_L4PHIAin_wea            => AS_L4PHIAin_wea,
-        AS_L4PHIAin_writeaddr      => AS_L4PHIAin_writeaddr,
-        AS_L4PHIAin_din            => AS_L4PHIAin_din,
-        AS_L4PHIBin_wea            => AS_L4PHIBin_wea,
-        AS_L4PHIBin_writeaddr      => AS_L4PHIBin_writeaddr,
-        AS_L4PHIBin_din            => AS_L4PHIBin_din,
-        AS_L4PHICin_wea            => AS_L4PHICin_wea,
-        AS_L4PHICin_writeaddr      => AS_L4PHICin_writeaddr,
-        AS_L4PHICin_din            => AS_L4PHICin_din,
-        AS_L4PHIDin_wea            => AS_L4PHIDin_wea,
-        AS_L4PHIDin_writeaddr      => AS_L4PHIDin_writeaddr,
-        AS_L4PHIDin_din            => AS_L4PHIDin_din,
-        MPAR_L5L6ABCDin_wea        => MPAR_L5L6ABCDin_wea,
-        MPAR_L5L6ABCDin_writeaddr  => MPAR_L5L6ABCDin_writeaddr,
-        MPAR_L5L6ABCDin_din        => MPAR_L5L6ABCDin_din,
+        -- AS_L1PHIBin_wea            => AS_L1PHIBin_wea,
+        -- AS_L1PHIBin_writeaddr      => AS_L1PHIBin_writeaddr,
+        -- AS_L1PHIBin_din            => AS_L1PHIBin_din,
+
+        -- ######### New port
+        AS_L1PHIBin_empty_neg_FIFO       => AS_L1PHIBin_empty_neg_FIFO,    -- in port
+        AS_L1PHIBin_data_FIFO            => AS_L1PHIBin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L1PHICin_wea            => AS_L1PHICin_wea,
+        -- AS_L1PHICin_writeaddr      => AS_L1PHICin_writeaddr,
+        -- AS_L1PHICin_din            => AS_L1PHICin_din,
+
+        -- ######### New port
+        AS_L1PHICin_empty_neg_FIFO       => AS_L1PHICin_empty_neg_FIFO,    -- in port
+        AS_L1PHICin_data_FIFO            => AS_L1PHICin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L1PHIDin_wea            => AS_L1PHIDin_wea,
+        -- AS_L1PHIDin_writeaddr      => AS_L1PHIDin_writeaddr,
+        -- AS_L1PHIDin_din            => AS_L1PHIDin_din,
+
+        -- ######### New port
+        AS_L1PHIDin_empty_neg_FIFO       => AS_L1PHIDin_empty_neg_FIFO,    -- in port
+        AS_L1PHIDin_data_FIFO            => AS_L1PHIDin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L1PHIEin_wea            => AS_L1PHIEin_wea,
+        -- AS_L1PHIEin_writeaddr      => AS_L1PHIEin_writeaddr,
+        -- AS_L1PHIEin_din            => AS_L1PHIEin_din,
+
+        -- ######### New port
+        AS_L1PHIEin_empty_neg_FIFO       => AS_L1PHIEin_empty_neg_FIFO,    -- in port
+        AS_L1PHIEin_data_FIFO            => AS_L1PHIEin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L1PHIFin_wea            => AS_L1PHIFin_wea,
+        -- AS_L1PHIFin_writeaddr      => AS_L1PHIFin_writeaddr,
+        -- AS_L1PHIFin_din            => AS_L1PHIFin_din,
+
+        -- ######### New port
+        AS_L1PHIFin_empty_neg_FIFO       => AS_L1PHIFin_empty_neg_FIFO,    -- in port
+        AS_L1PHIFin_data_FIFO            => AS_L1PHIFin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L1PHIGin_wea            => AS_L1PHIGin_wea,
+        -- AS_L1PHIGin_writeaddr      => AS_L1PHIGin_writeaddr,
+        -- AS_L1PHIGin_din            => AS_L1PHIGin_din,
+
+        -- ######### New port
+        AS_L1PHIGin_empty_neg_FIFO       => AS_L1PHIGin_empty_neg_FIFO,    -- in port
+        AS_L1PHIGin_data_FIFO            => AS_L1PHIGin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L1PHIHin_wea            => AS_L1PHIHin_wea,
+        -- AS_L1PHIHin_writeaddr      => AS_L1PHIHin_writeaddr,
+        -- AS_L1PHIHin_din            => AS_L1PHIHin_din,
+
+        -- ######### New port
+        AS_L1PHIHin_empty_neg_FIFO       => AS_L1PHIHin_empty_neg_FIFO,    -- in port
+        AS_L1PHIHin_data_FIFO            => AS_L1PHIHin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L2PHIAin_wea            => AS_L2PHIAin_wea,
+        -- AS_L2PHIAin_writeaddr      => AS_L2PHIAin_writeaddr,
+        -- AS_L2PHIAin_din            => AS_L2PHIAin_din,
+
+        -- ######### New port
+        AS_L2PHIAin_empty_neg_FIFO       => AS_L2PHIAin_empty_neg_FIFO,    -- in port
+        AS_L2PHIAin_data_FIFO            => AS_L2PHIAin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L2PHIBin_wea            => AS_L2PHIBin_wea,
+        -- AS_L2PHIBin_writeaddr      => AS_L2PHIBin_writeaddr,
+        -- AS_L2PHIBin_din            => AS_L2PHIBin_din,
+
+        -- ######### New port
+        AS_L2PHIBin_empty_neg_FIFO       => AS_L2PHIBin_empty_neg_FIFO,    -- in port
+        AS_L2PHIBin_data_FIFO            => AS_L2PHIBin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L2PHICin_wea            => AS_L2PHICin_wea,
+        -- AS_L2PHICin_writeaddr      => AS_L2PHICin_writeaddr,
+        -- AS_L2PHICin_din            => AS_L2PHICin_din,
+
+        -- ######### New port
+        AS_L2PHICin_empty_neg_FIFO       => AS_L2PHICin_empty_neg_FIFO,    -- in port
+        AS_L2PHICin_data_FIFO            => AS_L2PHICin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L2PHIDin_wea            => AS_L2PHIDin_wea,
+        -- AS_L2PHIDin_writeaddr      => AS_L2PHIDin_writeaddr,
+        -- AS_L2PHIDin_din            => AS_L2PHIDin_din,
+
+        -- ######### New port
+        AS_L2PHIDin_empty_neg_FIFO       => AS_L2PHIDin_empty_neg_FIFO,    -- in port
+        AS_L2PHIDin_data_FIFO            => AS_L2PHIDin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L3PHIAin_wea            => AS_L3PHIAin_wea,
+        -- AS_L3PHIAin_writeaddr      => AS_L3PHIAin_writeaddr,
+        -- AS_L3PHIAin_din            => AS_L3PHIAin_din,
+
+        -- ######### New port
+        AS_L3PHIAin_empty_neg_FIFO       => AS_L3PHIAin_empty_neg_FIFO,    -- in port
+        AS_L3PHIAin_data_FIFO            => AS_L3PHIAin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L3PHIBin_wea            => AS_L3PHIBin_wea,
+        -- AS_L3PHIBin_writeaddr      => AS_L3PHIBin_writeaddr,
+        -- AS_L3PHIBin_din            => AS_L3PHIBin_din,
+
+        -- ######### New port
+        AS_L3PHIBin_empty_neg_FIFO       => AS_L3PHIBin_empty_neg_FIFO,    -- in port
+        AS_L3PHIBin_data_FIFO            => AS_L3PHIBin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L3PHICin_wea            => AS_L3PHICin_wea,
+        -- AS_L3PHICin_writeaddr      => AS_L3PHICin_writeaddr,
+        -- AS_L3PHICin_din            => AS_L3PHICin_din,
+
+        -- ######### New port
+        AS_L3PHICin_empty_neg_FIFO       => AS_L3PHICin_empty_neg_FIFO,    -- in port
+        AS_L3PHICin_data_FIFO            => AS_L3PHICin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L3PHIDin_wea            => AS_L3PHIDin_wea,
+        -- AS_L3PHIDin_writeaddr      => AS_L3PHIDin_writeaddr,
+        -- AS_L3PHIDin_din            => AS_L3PHIDin_din,
+
+        -- ######### New port
+        AS_L3PHIDin_empty_neg_FIFO       => AS_L3PHIDin_empty_neg_FIFO,    -- in port
+        AS_L3PHIDin_data_FIFO            => AS_L3PHIDin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L4PHIAin_wea            => AS_L4PHIAin_wea,
+        -- AS_L4PHIAin_writeaddr      => AS_L4PHIAin_writeaddr,
+        -- AS_L4PHIAin_din            => AS_L4PHIAin_din,
+
+        -- ######### New port
+        AS_L4PHIAin_empty_neg_FIFO       => AS_L4PHIAin_empty_neg_FIFO,    -- in port
+        AS_L4PHIAin_data_FIFO            => AS_L4PHIAin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L4PHIBin_wea            => AS_L4PHIBin_wea,
+        -- AS_L4PHIBin_writeaddr      => AS_L4PHIBin_writeaddr,
+        -- AS_L4PHIBin_din            => AS_L4PHIBin_din,
+
+        -- ######### New port
+        AS_L4PHIBin_empty_neg_FIFO       => AS_L4PHIBin_empty_neg_FIFO,    -- in port
+        AS_L4PHIBin_data_FIFO            => AS_L4PHIBin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L4PHICin_wea            => AS_L4PHICin_wea,
+        -- AS_L4PHICin_writeaddr      => AS_L4PHICin_writeaddr,
+        -- AS_L4PHICin_din            => AS_L4PHICin_din,
+
+        -- ######### New port
+        AS_L4PHICin_empty_neg_FIFO       => AS_L4PHICin_empty_neg_FIFO,    -- in port
+        AS_L4PHICin_data_FIFO            => AS_L4PHICin_data_FIFO,  -- in port
+
+        -- ###### Legacy port
+        -- AS_L4PHIDin_wea            => AS_L4PHIDin_wea,
+        -- AS_L4PHIDin_writeaddr      => AS_L4PHIDin_writeaddr,
+        -- AS_L4PHIDin_din            => AS_L4PHIDin_din,
+
+        -- ######### New port
+        AS_L4PHIDin_empty_neg_FIFO       => AS_L4PHIDin_empty_neg_FIFO,    -- in port
+        AS_L4PHIDin_data_FIFO            => AS_L4PHIDin_data_FIFO,  -- in port
+
+        -- ###### 
+        -- MPAR_L5L6ABCDin_wea        => MPAR_L5L6ABCDin_wea,
+        -- MPAR_L5L6ABCDin_writeaddr  => MPAR_L5L6ABCDin_writeaddr,
+        -- MPAR_L5L6ABCDin_din        => MPAR_L5L6ABCDin_din,
         -- Debug output data
         VMSME_L1PHIAn2_wea         => VMSME_L1PHIAn2_wea,
         VMSME_L1PHIAn2_writeaddr   => VMSME_L1PHIAn2_writeaddr,

@@ -28,74 +28,207 @@ entity SectorProcessorFull is
     MP_done   : out std_logic;
 
     -- ####### Legacy port #####
-    AS_L1PHIAin_wea        : in t_AS_36_1b;
-    AS_L1PHIAin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIAin_din       : in t_AS_36_DATA;
+    -- AS_L1PHIAin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIAin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIAin_din       : in t_AS_36_DATA;
 
     -- ######## New port ########
-    AS_L1PHIAin_read_en_FIFO   : out std_logic;  -- or fancier? like t_AS_36_1b which is still std_logic?
+    -- AS_L1PHIAin_read_en_FIFO   : out std_logic;  -- or fancier? like t_AS_36_1b which is still std_logic?
     AS_L1PHIAin_empty_neg_FIFO : in std_logic;
     AS_L1PHIAin_data_FIFO : in t_AS_36_DATA;  
-    readAS_L1PHIAin_start_FIFO : out std_logic;
+    -- readAS_L1PHIAin_start_FIFO : out std_logic;
     
     -- ####### Legacy port ##########
-    AS_L1PHIBin_wea        : in t_AS_36_1b;
-    AS_L1PHIBin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIBin_din       : in t_AS_36_DATA;
-    AS_L1PHICin_wea        : in t_AS_36_1b;
-    AS_L1PHICin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHICin_din       : in t_AS_36_DATA;
-    AS_L1PHIDin_wea        : in t_AS_36_1b;
-    AS_L1PHIDin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIDin_din       : in t_AS_36_DATA;
-    AS_L1PHIEin_wea        : in t_AS_36_1b;
-    AS_L1PHIEin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIEin_din       : in t_AS_36_DATA;
-    AS_L1PHIFin_wea        : in t_AS_36_1b;
-    AS_L1PHIFin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIFin_din       : in t_AS_36_DATA;
-    AS_L1PHIGin_wea        : in t_AS_36_1b;
-    AS_L1PHIGin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIGin_din       : in t_AS_36_DATA;
-    AS_L1PHIHin_wea        : in t_AS_36_1b;
-    AS_L1PHIHin_writeaddr : in t_AS_36_ADDR;
-    AS_L1PHIHin_din       : in t_AS_36_DATA;
-    AS_L2PHIAin_wea        : in t_AS_36_1b;
-    AS_L2PHIAin_writeaddr : in t_AS_36_ADDR;
-    AS_L2PHIAin_din       : in t_AS_36_DATA;
-    AS_L2PHIBin_wea        : in t_AS_36_1b;
-    AS_L2PHIBin_writeaddr : in t_AS_36_ADDR;
-    AS_L2PHIBin_din       : in t_AS_36_DATA;
-    AS_L2PHICin_wea        : in t_AS_36_1b;
-    AS_L2PHICin_writeaddr : in t_AS_36_ADDR;
-    AS_L2PHICin_din       : in t_AS_36_DATA;
-    AS_L2PHIDin_wea        : in t_AS_36_1b;
-    AS_L2PHIDin_writeaddr : in t_AS_36_ADDR;
-    AS_L2PHIDin_din       : in t_AS_36_DATA;
-    AS_L3PHIAin_wea        : in t_AS_36_1b;
-    AS_L3PHIAin_writeaddr : in t_AS_36_ADDR;
-    AS_L3PHIAin_din       : in t_AS_36_DATA;
-    AS_L3PHIBin_wea        : in t_AS_36_1b;
-    AS_L3PHIBin_writeaddr : in t_AS_36_ADDR;
-    AS_L3PHIBin_din       : in t_AS_36_DATA;
-    AS_L3PHICin_wea        : in t_AS_36_1b;
-    AS_L3PHICin_writeaddr : in t_AS_36_ADDR;
-    AS_L3PHICin_din       : in t_AS_36_DATA;
-    AS_L3PHIDin_wea        : in t_AS_36_1b;
-    AS_L3PHIDin_writeaddr : in t_AS_36_ADDR;
-    AS_L3PHIDin_din       : in t_AS_36_DATA;
-    AS_L4PHIAin_wea        : in t_AS_36_1b;
-    AS_L4PHIAin_writeaddr : in t_AS_36_ADDR;
-    AS_L4PHIAin_din       : in t_AS_36_DATA;
-    AS_L4PHIBin_wea        : in t_AS_36_1b;
-    AS_L4PHIBin_writeaddr : in t_AS_36_ADDR;
-    AS_L4PHIBin_din       : in t_AS_36_DATA;
-    AS_L4PHICin_wea        : in t_AS_36_1b;
-    AS_L4PHICin_writeaddr : in t_AS_36_ADDR;
-    AS_L4PHICin_din       : in t_AS_36_DATA;
-    AS_L4PHIDin_wea        : in t_AS_36_1b;
-    AS_L4PHIDin_writeaddr : in t_AS_36_ADDR;
-    AS_L4PHIDin_din       : in t_AS_36_DATA;
+    -- AS_L1PHIBin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIBin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIBin_din       : in t_AS_36_DATA;
+    -- ######## New port ########
+    AS_L1PHIBin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIBin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L1PHICin_wea        : in t_AS_36_1b;
+    -- AS_L1PHICin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHICin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHICin_empty_neg_FIFO : in std_logic;
+    AS_L1PHICin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L1PHIDin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIDin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIDin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHIDin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIDin_data_FIFO : in t_AS_36_DATA;  
+
+    
+
+    -- ####### Legacy port ##########
+    -- AS_L1PHIEin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIEin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIEin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHIEin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIEin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L1PHIFin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIFin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIFin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHIFin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIFin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L1PHIGin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIGin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIGin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHIGin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIGin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L1PHIHin_wea        : in t_AS_36_1b;
+    -- AS_L1PHIHin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L1PHIHin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L1PHIHin_empty_neg_FIFO : in std_logic;
+    AS_L1PHIHin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L2PHIAin_wea        : in t_AS_36_1b;
+    -- AS_L2PHIAin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L2PHIAin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L2PHIAin_empty_neg_FIFO : in std_logic;
+    AS_L2PHIAin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L2PHIBin_wea        : in t_AS_36_1b;
+    -- AS_L2PHIBin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L2PHIBin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L2PHIBin_empty_neg_FIFO : in std_logic;
+    AS_L2PHIBin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L2PHICin_wea        : in t_AS_36_1b;
+    -- AS_L2PHICin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L2PHICin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L2PHICin_empty_neg_FIFO : in std_logic;
+    AS_L2PHICin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L2PHIDin_wea        : in t_AS_36_1b;
+    -- AS_L2PHIDin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L2PHIDin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L2PHIDin_empty_neg_FIFO : in std_logic;
+    AS_L2PHIDin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L3PHIAin_wea        : in t_AS_36_1b;
+    -- AS_L3PHIAin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L3PHIAin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L3PHIAin_empty_neg_FIFO : in std_logic;
+    AS_L3PHIAin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L3PHIBin_wea        : in t_AS_36_1b;
+    -- AS_L3PHIBin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L3PHIBin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L3PHIBin_empty_neg_FIFO : in std_logic;
+    AS_L3PHIBin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L3PHICin_wea        : in t_AS_36_1b;
+    -- AS_L3PHICin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L3PHICin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L3PHICin_empty_neg_FIFO : in std_logic;
+    AS_L3PHICin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L3PHIDin_wea        : in t_AS_36_1b;
+    -- AS_L3PHIDin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L3PHIDin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L3PHIDin_empty_neg_FIFO : in std_logic;
+    AS_L3PHIDin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L4PHIAin_wea        : in t_AS_36_1b;
+    -- AS_L4PHIAin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L4PHIAin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L4PHIAin_empty_neg_FIFO : in std_logic;
+    AS_L4PHIAin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L4PHIBin_wea        : in t_AS_36_1b;
+    -- AS_L4PHIBin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L4PHIBin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L4PHIBin_empty_neg_FIFO : in std_logic;
+    AS_L4PHIBin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L4PHICin_wea        : in t_AS_36_1b;
+    -- AS_L4PHICin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L4PHICin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L4PHICin_empty_neg_FIFO : in std_logic;
+    AS_L4PHICin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
+    -- AS_L4PHIDin_wea        : in t_AS_36_1b;
+    -- AS_L4PHIDin_writeaddr : in t_AS_36_ADDR;
+    -- AS_L4PHIDin_din       : in t_AS_36_DATA;
+
+    -- ######## New port ########
+    AS_L4PHIDin_empty_neg_FIFO : in std_logic;
+    AS_L4PHIDin_data_FIFO : in t_AS_36_DATA;  
+
+    
+    -- ####### Legacy port ##########
     VMSME_L1PHIAn2_wea        : out t_VMSME_16_1b;
     VMSME_L1PHIAn2_writeaddr : out t_VMSME_16_ADDR;
     VMSME_L1PHIAn2_din       : out t_VMSME_16_DATA;
@@ -321,16 +454,18 @@ end SectorProcessorFull;
 architecture rtl of SectorProcessorFull is
 
 
-  signal AS_L1PHIAin_start                   : std_logic;
-  signal AS_L1PHIAin_wea_delay          : t_AS_36_1b;
-  signal AS_L1PHIAin_writeaddr_delay   : t_AS_36_ADDR;
-  signal AS_L1PHIAin_din_delay         : t_AS_36_DATA;
-  signal AS_L1PHIAin_enb          : t_AS_36_1b := '1';
-  signal AS_L1PHIAin_V_readaddr    : t_AS_36_ADDR;
-  signal AS_L1PHIAin_V_dout        : t_AS_36_DATA;
-  signal AS_L1PHIAin_V_as        : t_AS_36_DATA;
-  signal AS_L1PHIAin_valid        : STD_LOGIC;
-  signal AS_L1PHIAin_index        : STD_LOGIC_VECTOR(31 downto 0);
+  -- signal AS_L1PHIAin_start                   : std_logic;
+  -- signal AS_L1PHIAin_wea_delay          : t_AS_36_1b;
+  -- signal AS_L1PHIAin_writeaddr_delay   : t_AS_36_ADDR;
+
+  -- ######## Legacy signal########
+  -- signal AS_L1PHIAin_din_delay         : t_AS_36_DATA;
+  -- signal AS_L1PHIAin_enb          : t_AS_36_1b := '1';
+  -- signal AS_L1PHIAin_V_readaddr    : t_AS_36_ADDR;
+  -- signal AS_L1PHIAin_V_dout        : t_AS_36_DATA;
+  -- signal AS_L1PHIAin_V_as        : t_AS_36_DATA;
+  -- signal AS_L1PHIAin_valid        : STD_LOGIC;
+  -- signal AS_L1PHIAin_index        : STD_LOGIC_VECTOR(31 downto 0);
   signal AS_L1PHIAin_AV_dout_nent  : t_AS_36_NENT; -- (#page)
 
 -- ############ New signal ##########
@@ -1510,7 +1645,8 @@ architecture rtl of SectorProcessorFull is
   signal FM_AAAA_L4PHID_AV_dout_nent  : t_FM_52_NENT; -- (#page)
   signal VMSMER_L1PHIA_bx : std_logic_vector(2 downto 0);
   signal VMSMER_L1PHIA_start : std_logic := '0';
-  signal VMSMER_L1PHIA_bx_in : std_logic_vector(2 downto 0);
+  -- ###### Legacy signal
+  -- signal VMSMER_L1PHIA_bx_in : std_logic_vector(2 downto 0);
   signal VMSMER_L1PHIB_bx : std_logic_vector(2 downto 0);
   signal VMSMER_L1PHIB_start : std_logic := '0';
   signal VMSMER_L1PHIB_bx_in : std_logic_vector(2 downto 0);
@@ -1617,48 +1753,48 @@ architecture rtl of SectorProcessorFull is
 begin
 
 -- ####### Legacy connection : port -> delay -> tf_mem 
-    AS_L1PHIAin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIAin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIAin_wea_delay,
-        addra     => AS_L1PHIAin_writeaddr_delay,
-        dina      => AS_L1PHIAin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIAin_V_readaddr,
-        doutb     => AS_L1PHIAin_V_dout,
-        sync_nent => AS_L1PHIAin_start,
-        nent_o    => AS_L1PHIAin_AV_dout_nent
-      );
+    -- AS_L1PHIAin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIAin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIAin_wea_delay,
+    --     addra     => AS_L1PHIAin_writeaddr_delay,
+    --     dina      => AS_L1PHIAin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIAin_V_readaddr,
+    --     doutb     => AS_L1PHIAin_V_dout,
+    --     sync_nent => AS_L1PHIAin_start,
+    --     nent_o    => AS_L1PHIAin_AV_dout_nent
+    --   );
 
-    AS_L1PHIAin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIAin_wea,
-        addra     => AS_L1PHIAin_writeaddr,
-        dina      => AS_L1PHIAin_din,
-        wea_out       => AS_L1PHIAin_wea_delay,
-        addra_out     => AS_L1PHIAin_writeaddr_delay,
-        dina_out      => AS_L1PHIAin_din_delay,  -- data
-        done       => PC_start,
-        start      => AS_L1PHIAin_start
-      );
+    -- AS_L1PHIAin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIAin_wea,
+    --     addra     => AS_L1PHIAin_writeaddr,
+    --     dina      => AS_L1PHIAin_din,
+    --     wea_out       => AS_L1PHIAin_wea_delay,
+    --     addra_out     => AS_L1PHIAin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIAin_din_delay,  -- data
+    --     done       => PC_start,
+    --     start      => AS_L1PHIAin_start
+    --   );
 
 -- ###### New connection: port -> delay
     AS_L1PHIAin_DELAY_FIFO : entity work.tf_pipeline_slr_xing
@@ -1678,822 +1814,822 @@ begin
       );
 
 -- ####### Legacy connection : port -> delay -> tf_mem 
-    AS_L1PHIBin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIBin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIBin_wea_delay,
-        addra     => AS_L1PHIBin_writeaddr_delay,
-        dina      => AS_L1PHIBin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIBin_V_readaddr,
-        doutb     => AS_L1PHIBin_V_dout,
-        sync_nent => AS_L1PHIBin_start,
-        nent_o    => AS_L1PHIBin_AV_dout_nent
-      );
+    -- AS_L1PHIBin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIBin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIBin_wea_delay,
+    --     addra     => AS_L1PHIBin_writeaddr_delay,
+    --     dina      => AS_L1PHIBin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIBin_V_readaddr,
+    --     doutb     => AS_L1PHIBin_V_dout,
+    --     sync_nent => AS_L1PHIBin_start,
+    --     nent_o    => AS_L1PHIBin_AV_dout_nent
+    --   );
 
-    AS_L1PHIBin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIBin_wea,
-        addra     => AS_L1PHIBin_writeaddr,
-        dina      => AS_L1PHIBin_din,
-        wea_out       => AS_L1PHIBin_wea_delay,
-        addra_out     => AS_L1PHIBin_writeaddr_delay,
-        dina_out      => AS_L1PHIBin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHIBin_start
-      );
+    -- AS_L1PHIBin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIBin_wea,
+    --     addra     => AS_L1PHIBin_writeaddr,
+    --     dina      => AS_L1PHIBin_din,
+    --     wea_out       => AS_L1PHIBin_wea_delay,
+    --     addra_out     => AS_L1PHIBin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIBin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHIBin_start
+    --   );
 
-    AS_L1PHICin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHICin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHICin_wea_delay,
-        addra     => AS_L1PHICin_writeaddr_delay,
-        dina      => AS_L1PHICin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHICin_V_readaddr,
-        doutb     => AS_L1PHICin_V_dout,
-        sync_nent => AS_L1PHICin_start,
-        nent_o    => AS_L1PHICin_AV_dout_nent
-      );
+    -- AS_L1PHICin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHICin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHICin_wea_delay,
+    --     addra     => AS_L1PHICin_writeaddr_delay,
+    --     dina      => AS_L1PHICin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHICin_V_readaddr,
+    --     doutb     => AS_L1PHICin_V_dout,
+    --     sync_nent => AS_L1PHICin_start,
+    --     nent_o    => AS_L1PHICin_AV_dout_nent
+    --   );
 
-    AS_L1PHICin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHICin_wea,
-        addra     => AS_L1PHICin_writeaddr,
-        dina      => AS_L1PHICin_din,
-        wea_out       => AS_L1PHICin_wea_delay,
-        addra_out     => AS_L1PHICin_writeaddr_delay,
-        dina_out      => AS_L1PHICin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHICin_start
-      );
+    -- AS_L1PHICin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHICin_wea,
+    --     addra     => AS_L1PHICin_writeaddr,
+    --     dina      => AS_L1PHICin_din,
+    --     wea_out       => AS_L1PHICin_wea_delay,
+    --     addra_out     => AS_L1PHICin_writeaddr_delay,
+    --     dina_out      => AS_L1PHICin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHICin_start
+    --   );
 
-    AS_L1PHIDin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIDin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIDin_wea_delay,
-        addra     => AS_L1PHIDin_writeaddr_delay,
-        dina      => AS_L1PHIDin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIDin_V_readaddr,
-        doutb     => AS_L1PHIDin_V_dout,
-        sync_nent => AS_L1PHIDin_start,
-        nent_o    => AS_L1PHIDin_AV_dout_nent
-      );
+    -- AS_L1PHIDin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIDin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIDin_wea_delay,
+    --     addra     => AS_L1PHIDin_writeaddr_delay,
+    --     dina      => AS_L1PHIDin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIDin_V_readaddr,
+    --     doutb     => AS_L1PHIDin_V_dout,
+    --     sync_nent => AS_L1PHIDin_start,
+    --     nent_o    => AS_L1PHIDin_AV_dout_nent
+    --   );
 
-    AS_L1PHIDin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIDin_wea,
-        addra     => AS_L1PHIDin_writeaddr,
-        dina      => AS_L1PHIDin_din,
-        wea_out       => AS_L1PHIDin_wea_delay,
-        addra_out     => AS_L1PHIDin_writeaddr_delay,
-        dina_out      => AS_L1PHIDin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHIDin_start
-      );
+    -- AS_L1PHIDin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIDin_wea,
+    --     addra     => AS_L1PHIDin_writeaddr,
+    --     dina      => AS_L1PHIDin_din,
+    --     wea_out       => AS_L1PHIDin_wea_delay,
+    --     addra_out     => AS_L1PHIDin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIDin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHIDin_start
+    --   );
 
-    AS_L1PHIEin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIEin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIEin_wea_delay,
-        addra     => AS_L1PHIEin_writeaddr_delay,
-        dina      => AS_L1PHIEin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIEin_V_readaddr,
-        doutb     => AS_L1PHIEin_V_dout,
-        sync_nent => AS_L1PHIEin_start,
-        nent_o    => AS_L1PHIEin_AV_dout_nent
-      );
+    -- AS_L1PHIEin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIEin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIEin_wea_delay,
+    --     addra     => AS_L1PHIEin_writeaddr_delay,
+    --     dina      => AS_L1PHIEin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIEin_V_readaddr,
+    --     doutb     => AS_L1PHIEin_V_dout,
+    --     sync_nent => AS_L1PHIEin_start,
+    --     nent_o    => AS_L1PHIEin_AV_dout_nent
+    --   );
 
-    AS_L1PHIEin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIEin_wea,
-        addra     => AS_L1PHIEin_writeaddr,
-        dina      => AS_L1PHIEin_din,
-        wea_out       => AS_L1PHIEin_wea_delay,
-        addra_out     => AS_L1PHIEin_writeaddr_delay,
-        dina_out      => AS_L1PHIEin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHIEin_start
-      );
+    -- AS_L1PHIEin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIEin_wea,
+    --     addra     => AS_L1PHIEin_writeaddr,
+    --     dina      => AS_L1PHIEin_din,
+    --     wea_out       => AS_L1PHIEin_wea_delay,
+    --     addra_out     => AS_L1PHIEin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIEin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHIEin_start
+    --   );
 
-    AS_L1PHIFin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIFin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIFin_wea_delay,
-        addra     => AS_L1PHIFin_writeaddr_delay,
-        dina      => AS_L1PHIFin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIFin_V_readaddr,
-        doutb     => AS_L1PHIFin_V_dout,
-        sync_nent => AS_L1PHIFin_start,
-        nent_o    => AS_L1PHIFin_AV_dout_nent
-      );
+    -- AS_L1PHIFin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIFin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIFin_wea_delay,
+    --     addra     => AS_L1PHIFin_writeaddr_delay,
+    --     dina      => AS_L1PHIFin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIFin_V_readaddr,
+    --     doutb     => AS_L1PHIFin_V_dout,
+    --     sync_nent => AS_L1PHIFin_start,
+    --     nent_o    => AS_L1PHIFin_AV_dout_nent
+    --   );
 
-    AS_L1PHIFin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIFin_wea,
-        addra     => AS_L1PHIFin_writeaddr,
-        dina      => AS_L1PHIFin_din,
-        wea_out       => AS_L1PHIFin_wea_delay,
-        addra_out     => AS_L1PHIFin_writeaddr_delay,
-        dina_out      => AS_L1PHIFin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHIFin_start
-      );
+    -- AS_L1PHIFin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIFin_wea,
+    --     addra     => AS_L1PHIFin_writeaddr,
+    --     dina      => AS_L1PHIFin_din,
+    --     wea_out       => AS_L1PHIFin_wea_delay,
+    --     addra_out     => AS_L1PHIFin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIFin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHIFin_start
+    --   );
 
-    AS_L1PHIGin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIGin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIGin_wea_delay,
-        addra     => AS_L1PHIGin_writeaddr_delay,
-        dina      => AS_L1PHIGin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIGin_V_readaddr,
-        doutb     => AS_L1PHIGin_V_dout,
-        sync_nent => AS_L1PHIGin_start,
-        nent_o    => AS_L1PHIGin_AV_dout_nent
-      );
+    -- AS_L1PHIGin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIGin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIGin_wea_delay,
+    --     addra     => AS_L1PHIGin_writeaddr_delay,
+    --     dina      => AS_L1PHIGin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIGin_V_readaddr,
+    --     doutb     => AS_L1PHIGin_V_dout,
+    --     sync_nent => AS_L1PHIGin_start,
+    --     nent_o    => AS_L1PHIGin_AV_dout_nent
+    --   );
 
-    AS_L1PHIGin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIGin_wea,
-        addra     => AS_L1PHIGin_writeaddr,
-        dina      => AS_L1PHIGin_din,
-        wea_out       => AS_L1PHIGin_wea_delay,
-        addra_out     => AS_L1PHIGin_writeaddr_delay,
-        dina_out      => AS_L1PHIGin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHIGin_start
-      );
+    -- AS_L1PHIGin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIGin_wea,
+    --     addra     => AS_L1PHIGin_writeaddr,
+    --     dina      => AS_L1PHIGin_din,
+    --     wea_out       => AS_L1PHIGin_wea_delay,
+    --     addra_out     => AS_L1PHIGin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIGin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHIGin_start
+    --   );
 
-    AS_L1PHIHin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L1PHIHin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L1PHIHin_wea_delay,
-        addra     => AS_L1PHIHin_writeaddr_delay,
-        dina      => AS_L1PHIHin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L1PHIHin_V_readaddr,
-        doutb     => AS_L1PHIHin_V_dout,
-        sync_nent => AS_L1PHIHin_start,
-        nent_o    => AS_L1PHIHin_AV_dout_nent
-      );
+    -- AS_L1PHIHin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L1PHIHin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L1PHIHin_wea_delay,
+    --     addra     => AS_L1PHIHin_writeaddr_delay,
+    --     dina      => AS_L1PHIHin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L1PHIHin_V_readaddr,
+    --     doutb     => AS_L1PHIHin_V_dout,
+    --     sync_nent => AS_L1PHIHin_start,
+    --     nent_o    => AS_L1PHIHin_AV_dout_nent
+    --   );
 
-    AS_L1PHIHin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L1PHIHin_wea,
-        addra     => AS_L1PHIHin_writeaddr,
-        dina      => AS_L1PHIHin_din,
-        wea_out       => AS_L1PHIHin_wea_delay,
-        addra_out     => AS_L1PHIHin_writeaddr_delay,
-        dina_out      => AS_L1PHIHin_din_delay,
-        done       => PC_start,
-        start      => AS_L1PHIHin_start
-      );
+    -- AS_L1PHIHin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L1PHIHin_wea,
+    --     addra     => AS_L1PHIHin_writeaddr,
+    --     dina      => AS_L1PHIHin_din,
+    --     wea_out       => AS_L1PHIHin_wea_delay,
+    --     addra_out     => AS_L1PHIHin_writeaddr_delay,
+    --     dina_out      => AS_L1PHIHin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L1PHIHin_start
+    --   );
 
-    AS_L2PHIAin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L2PHIAin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L2PHIAin_wea_delay,
-        addra     => AS_L2PHIAin_writeaddr_delay,
-        dina      => AS_L2PHIAin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L2PHIAin_V_readaddr,
-        doutb     => AS_L2PHIAin_V_dout,
-        sync_nent => AS_L2PHIAin_start,
-        nent_o    => AS_L2PHIAin_AV_dout_nent
-      );
+    -- AS_L2PHIAin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L2PHIAin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L2PHIAin_wea_delay,
+    --     addra     => AS_L2PHIAin_writeaddr_delay,
+    --     dina      => AS_L2PHIAin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L2PHIAin_V_readaddr,
+    --     doutb     => AS_L2PHIAin_V_dout,
+    --     sync_nent => AS_L2PHIAin_start,
+    --     nent_o    => AS_L2PHIAin_AV_dout_nent
+    --   );
 
-    AS_L2PHIAin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L2PHIAin_wea,
-        addra     => AS_L2PHIAin_writeaddr,
-        dina      => AS_L2PHIAin_din,
-        wea_out       => AS_L2PHIAin_wea_delay,
-        addra_out     => AS_L2PHIAin_writeaddr_delay,
-        dina_out      => AS_L2PHIAin_din_delay,
-        done       => PC_start,
-        start      => AS_L2PHIAin_start
-      );
+    -- AS_L2PHIAin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L2PHIAin_wea,
+    --     addra     => AS_L2PHIAin_writeaddr,
+    --     dina      => AS_L2PHIAin_din,
+    --     wea_out       => AS_L2PHIAin_wea_delay,
+    --     addra_out     => AS_L2PHIAin_writeaddr_delay,
+    --     dina_out      => AS_L2PHIAin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L2PHIAin_start
+    --   );
 
-    AS_L2PHIBin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L2PHIBin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L2PHIBin_wea_delay,
-        addra     => AS_L2PHIBin_writeaddr_delay,
-        dina      => AS_L2PHIBin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L2PHIBin_V_readaddr,
-        doutb     => AS_L2PHIBin_V_dout,
-        sync_nent => AS_L2PHIBin_start,
-        nent_o    => AS_L2PHIBin_AV_dout_nent
-      );
+    -- AS_L2PHIBin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L2PHIBin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L2PHIBin_wea_delay,
+    --     addra     => AS_L2PHIBin_writeaddr_delay,
+    --     dina      => AS_L2PHIBin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L2PHIBin_V_readaddr,
+    --     doutb     => AS_L2PHIBin_V_dout,
+    --     sync_nent => AS_L2PHIBin_start,
+    --     nent_o    => AS_L2PHIBin_AV_dout_nent
+    --   );
 
-    AS_L2PHIBin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L2PHIBin_wea,
-        addra     => AS_L2PHIBin_writeaddr,
-        dina      => AS_L2PHIBin_din,
-        wea_out       => AS_L2PHIBin_wea_delay,
-        addra_out     => AS_L2PHIBin_writeaddr_delay,
-        dina_out      => AS_L2PHIBin_din_delay,
-        done       => PC_start,
-        start      => AS_L2PHIBin_start
-      );
+    -- AS_L2PHIBin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L2PHIBin_wea,
+    --     addra     => AS_L2PHIBin_writeaddr,
+    --     dina      => AS_L2PHIBin_din,
+    --     wea_out       => AS_L2PHIBin_wea_delay,
+    --     addra_out     => AS_L2PHIBin_writeaddr_delay,
+    --     dina_out      => AS_L2PHIBin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L2PHIBin_start
+    --   );
 
-    AS_L2PHICin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L2PHICin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L2PHICin_wea_delay,
-        addra     => AS_L2PHICin_writeaddr_delay,
-        dina      => AS_L2PHICin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L2PHICin_V_readaddr,
-        doutb     => AS_L2PHICin_V_dout,
-        sync_nent => AS_L2PHICin_start,
-        nent_o    => AS_L2PHICin_AV_dout_nent
-      );
+    -- AS_L2PHICin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L2PHICin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L2PHICin_wea_delay,
+    --     addra     => AS_L2PHICin_writeaddr_delay,
+    --     dina      => AS_L2PHICin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L2PHICin_V_readaddr,
+    --     doutb     => AS_L2PHICin_V_dout,
+    --     sync_nent => AS_L2PHICin_start,
+    --     nent_o    => AS_L2PHICin_AV_dout_nent
+    --   );
 
-    AS_L2PHICin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L2PHICin_wea,
-        addra     => AS_L2PHICin_writeaddr,
-        dina      => AS_L2PHICin_din,
-        wea_out       => AS_L2PHICin_wea_delay,
-        addra_out     => AS_L2PHICin_writeaddr_delay,
-        dina_out      => AS_L2PHICin_din_delay,
-        done       => PC_start,
-        start      => AS_L2PHICin_start
-      );
+    -- AS_L2PHICin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L2PHICin_wea,
+    --     addra     => AS_L2PHICin_writeaddr,
+    --     dina      => AS_L2PHICin_din,
+    --     wea_out       => AS_L2PHICin_wea_delay,
+    --     addra_out     => AS_L2PHICin_writeaddr_delay,
+    --     dina_out      => AS_L2PHICin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L2PHICin_start
+    --   );
 
-    AS_L2PHIDin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L2PHIDin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L2PHIDin_wea_delay,
-        addra     => AS_L2PHIDin_writeaddr_delay,
-        dina      => AS_L2PHIDin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L2PHIDin_V_readaddr,
-        doutb     => AS_L2PHIDin_V_dout,
-        sync_nent => AS_L2PHIDin_start,
-        nent_o    => AS_L2PHIDin_AV_dout_nent
-      );
+    -- AS_L2PHIDin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L2PHIDin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L2PHIDin_wea_delay,
+    --     addra     => AS_L2PHIDin_writeaddr_delay,
+    --     dina      => AS_L2PHIDin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L2PHIDin_V_readaddr,
+    --     doutb     => AS_L2PHIDin_V_dout,
+    --     sync_nent => AS_L2PHIDin_start,
+    --     nent_o    => AS_L2PHIDin_AV_dout_nent
+    --   );
 
-    AS_L2PHIDin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L2PHIDin_wea,
-        addra     => AS_L2PHIDin_writeaddr,
-        dina      => AS_L2PHIDin_din,
-        wea_out       => AS_L2PHIDin_wea_delay,
-        addra_out     => AS_L2PHIDin_writeaddr_delay,
-        dina_out      => AS_L2PHIDin_din_delay,
-        done       => PC_start,
-        start      => AS_L2PHIDin_start
-      );
+    -- AS_L2PHIDin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L2PHIDin_wea,
+    --     addra     => AS_L2PHIDin_writeaddr,
+    --     dina      => AS_L2PHIDin_din,
+    --     wea_out       => AS_L2PHIDin_wea_delay,
+    --     addra_out     => AS_L2PHIDin_writeaddr_delay,
+    --     dina_out      => AS_L2PHIDin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L2PHIDin_start
+    --   );
 
-    AS_L3PHIAin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L3PHIAin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L3PHIAin_wea_delay,
-        addra     => AS_L3PHIAin_writeaddr_delay,
-        dina      => AS_L3PHIAin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L3PHIAin_V_readaddr,
-        doutb     => AS_L3PHIAin_V_dout,
-        sync_nent => AS_L3PHIAin_start,
-        nent_o    => AS_L3PHIAin_AV_dout_nent
-      );
+    -- AS_L3PHIAin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L3PHIAin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L3PHIAin_wea_delay,
+    --     addra     => AS_L3PHIAin_writeaddr_delay,
+    --     dina      => AS_L3PHIAin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L3PHIAin_V_readaddr,
+    --     doutb     => AS_L3PHIAin_V_dout,
+    --     sync_nent => AS_L3PHIAin_start,
+    --     nent_o    => AS_L3PHIAin_AV_dout_nent
+    --   );
 
-    AS_L3PHIAin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L3PHIAin_wea,
-        addra     => AS_L3PHIAin_writeaddr,
-        dina      => AS_L3PHIAin_din,
-        wea_out       => AS_L3PHIAin_wea_delay,
-        addra_out     => AS_L3PHIAin_writeaddr_delay,
-        dina_out      => AS_L3PHIAin_din_delay,
-        done       => PC_start,
-        start      => AS_L3PHIAin_start
-      );
+    -- AS_L3PHIAin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L3PHIAin_wea,
+    --     addra     => AS_L3PHIAin_writeaddr,
+    --     dina      => AS_L3PHIAin_din,
+    --     wea_out       => AS_L3PHIAin_wea_delay,
+    --     addra_out     => AS_L3PHIAin_writeaddr_delay,
+    --     dina_out      => AS_L3PHIAin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L3PHIAin_start
+    --   );
 
-    AS_L3PHIBin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L3PHIBin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L3PHIBin_wea_delay,
-        addra     => AS_L3PHIBin_writeaddr_delay,
-        dina      => AS_L3PHIBin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L3PHIBin_V_readaddr,
-        doutb     => AS_L3PHIBin_V_dout,
-        sync_nent => AS_L3PHIBin_start,
-        nent_o    => AS_L3PHIBin_AV_dout_nent
-      );
+    -- AS_L3PHIBin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L3PHIBin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L3PHIBin_wea_delay,
+    --     addra     => AS_L3PHIBin_writeaddr_delay,
+    --     dina      => AS_L3PHIBin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L3PHIBin_V_readaddr,
+    --     doutb     => AS_L3PHIBin_V_dout,
+    --     sync_nent => AS_L3PHIBin_start,
+    --     nent_o    => AS_L3PHIBin_AV_dout_nent
+    --   );
 
-    AS_L3PHIBin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L3PHIBin_wea,
-        addra     => AS_L3PHIBin_writeaddr,
-        dina      => AS_L3PHIBin_din,
-        wea_out       => AS_L3PHIBin_wea_delay,
-        addra_out     => AS_L3PHIBin_writeaddr_delay,
-        dina_out      => AS_L3PHIBin_din_delay,
-        done       => PC_start,
-        start      => AS_L3PHIBin_start
-      );
+    -- AS_L3PHIBin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L3PHIBin_wea,
+    --     addra     => AS_L3PHIBin_writeaddr,
+    --     dina      => AS_L3PHIBin_din,
+    --     wea_out       => AS_L3PHIBin_wea_delay,
+    --     addra_out     => AS_L3PHIBin_writeaddr_delay,
+    --     dina_out      => AS_L3PHIBin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L3PHIBin_start
+    --   );
 
-    AS_L3PHICin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L3PHICin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L3PHICin_wea_delay,
-        addra     => AS_L3PHICin_writeaddr_delay,
-        dina      => AS_L3PHICin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L3PHICin_V_readaddr,
-        doutb     => AS_L3PHICin_V_dout,
-        sync_nent => AS_L3PHICin_start,
-        nent_o    => AS_L3PHICin_AV_dout_nent
-      );
+    -- AS_L3PHICin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L3PHICin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L3PHICin_wea_delay,
+    --     addra     => AS_L3PHICin_writeaddr_delay,
+    --     dina      => AS_L3PHICin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L3PHICin_V_readaddr,
+    --     doutb     => AS_L3PHICin_V_dout,
+    --     sync_nent => AS_L3PHICin_start,
+    --     nent_o    => AS_L3PHICin_AV_dout_nent
+    --   );
 
-    AS_L3PHICin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L3PHICin_wea,
-        addra     => AS_L3PHICin_writeaddr,
-        dina      => AS_L3PHICin_din,
-        wea_out       => AS_L3PHICin_wea_delay,
-        addra_out     => AS_L3PHICin_writeaddr_delay,
-        dina_out      => AS_L3PHICin_din_delay,
-        done       => PC_start,
-        start      => AS_L3PHICin_start
-      );
+    -- AS_L3PHICin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L3PHICin_wea,
+    --     addra     => AS_L3PHICin_writeaddr,
+    --     dina      => AS_L3PHICin_din,
+    --     wea_out       => AS_L3PHICin_wea_delay,
+    --     addra_out     => AS_L3PHICin_writeaddr_delay,
+    --     dina_out      => AS_L3PHICin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L3PHICin_start
+    --   );
 
-    AS_L3PHIDin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L3PHIDin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L3PHIDin_wea_delay,
-        addra     => AS_L3PHIDin_writeaddr_delay,
-        dina      => AS_L3PHIDin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L3PHIDin_V_readaddr,
-        doutb     => AS_L3PHIDin_V_dout,
-        sync_nent => AS_L3PHIDin_start,
-        nent_o    => AS_L3PHIDin_AV_dout_nent
-      );
+    -- AS_L3PHIDin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L3PHIDin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L3PHIDin_wea_delay,
+    --     addra     => AS_L3PHIDin_writeaddr_delay,
+    --     dina      => AS_L3PHIDin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L3PHIDin_V_readaddr,
+    --     doutb     => AS_L3PHIDin_V_dout,
+    --     sync_nent => AS_L3PHIDin_start,
+    --     nent_o    => AS_L3PHIDin_AV_dout_nent
+    --   );
 
-    AS_L3PHIDin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L3PHIDin_wea,
-        addra     => AS_L3PHIDin_writeaddr,
-        dina      => AS_L3PHIDin_din,
-        wea_out       => AS_L3PHIDin_wea_delay,
-        addra_out     => AS_L3PHIDin_writeaddr_delay,
-        dina_out      => AS_L3PHIDin_din_delay,
-        done       => PC_start,
-        start      => AS_L3PHIDin_start
-      );
+    -- AS_L3PHIDin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L3PHIDin_wea,
+    --     addra     => AS_L3PHIDin_writeaddr,
+    --     dina      => AS_L3PHIDin_din,
+    --     wea_out       => AS_L3PHIDin_wea_delay,
+    --     addra_out     => AS_L3PHIDin_writeaddr_delay,
+    --     dina_out      => AS_L3PHIDin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L3PHIDin_start
+    --   );
 
-    AS_L4PHIAin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L4PHIAin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L4PHIAin_wea_delay,
-        addra     => AS_L4PHIAin_writeaddr_delay,
-        dina      => AS_L4PHIAin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L4PHIAin_V_readaddr,
-        doutb     => AS_L4PHIAin_V_dout,
-        sync_nent => AS_L4PHIAin_start,
-        nent_o    => AS_L4PHIAin_AV_dout_nent
-      );
+    -- AS_L4PHIAin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L4PHIAin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L4PHIAin_wea_delay,
+    --     addra     => AS_L4PHIAin_writeaddr_delay,
+    --     dina      => AS_L4PHIAin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L4PHIAin_V_readaddr,
+    --     doutb     => AS_L4PHIAin_V_dout,
+    --     sync_nent => AS_L4PHIAin_start,
+    --     nent_o    => AS_L4PHIAin_AV_dout_nent
+    --   );
 
-    AS_L4PHIAin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L4PHIAin_wea,
-        addra     => AS_L4PHIAin_writeaddr,
-        dina      => AS_L4PHIAin_din,
-        wea_out       => AS_L4PHIAin_wea_delay,
-        addra_out     => AS_L4PHIAin_writeaddr_delay,
-        dina_out      => AS_L4PHIAin_din_delay,
-        done       => PC_start,
-        start      => AS_L4PHIAin_start
-      );
+    -- AS_L4PHIAin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L4PHIAin_wea,
+    --     addra     => AS_L4PHIAin_writeaddr,
+    --     dina      => AS_L4PHIAin_din,
+    --     wea_out       => AS_L4PHIAin_wea_delay,
+    --     addra_out     => AS_L4PHIAin_writeaddr_delay,
+    --     dina_out      => AS_L4PHIAin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L4PHIAin_start
+    --   );
 
-    AS_L4PHIBin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L4PHIBin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L4PHIBin_wea_delay,
-        addra     => AS_L4PHIBin_writeaddr_delay,
-        dina      => AS_L4PHIBin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L4PHIBin_V_readaddr,
-        doutb     => AS_L4PHIBin_V_dout,
-        sync_nent => AS_L4PHIBin_start,
-        nent_o    => AS_L4PHIBin_AV_dout_nent
-      );
+    -- AS_L4PHIBin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L4PHIBin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L4PHIBin_wea_delay,
+    --     addra     => AS_L4PHIBin_writeaddr_delay,
+    --     dina      => AS_L4PHIBin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L4PHIBin_V_readaddr,
+    --     doutb     => AS_L4PHIBin_V_dout,
+    --     sync_nent => AS_L4PHIBin_start,
+    --     nent_o    => AS_L4PHIBin_AV_dout_nent
+    --   );
 
-    AS_L4PHIBin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L4PHIBin_wea,
-        addra     => AS_L4PHIBin_writeaddr,
-        dina      => AS_L4PHIBin_din,
-        wea_out       => AS_L4PHIBin_wea_delay,
-        addra_out     => AS_L4PHIBin_writeaddr_delay,
-        dina_out      => AS_L4PHIBin_din_delay,
-        done       => PC_start,
-        start      => AS_L4PHIBin_start
-      );
+    -- AS_L4PHIBin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L4PHIBin_wea,
+    --     addra     => AS_L4PHIBin_writeaddr,
+    --     dina      => AS_L4PHIBin_din,
+    --     wea_out       => AS_L4PHIBin_wea_delay,
+    --     addra_out     => AS_L4PHIBin_writeaddr_delay,
+    --     dina_out      => AS_L4PHIBin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L4PHIBin_start
+    --   );
 
-    AS_L4PHICin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L4PHICin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L4PHICin_wea_delay,
-        addra     => AS_L4PHICin_writeaddr_delay,
-        dina      => AS_L4PHICin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L4PHICin_V_readaddr,
-        doutb     => AS_L4PHICin_V_dout,
-        sync_nent => AS_L4PHICin_start,
-        nent_o    => AS_L4PHICin_AV_dout_nent
-      );
+    -- AS_L4PHICin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L4PHICin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L4PHICin_wea_delay,
+    --     addra     => AS_L4PHICin_writeaddr_delay,
+    --     dina      => AS_L4PHICin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L4PHICin_V_readaddr,
+    --     doutb     => AS_L4PHICin_V_dout,
+    --     sync_nent => AS_L4PHICin_start,
+    --     nent_o    => AS_L4PHICin_AV_dout_nent
+    --   );
 
-    AS_L4PHICin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L4PHICin_wea,
-        addra     => AS_L4PHICin_writeaddr,
-        dina      => AS_L4PHICin_din,
-        wea_out       => AS_L4PHICin_wea_delay,
-        addra_out     => AS_L4PHICin_writeaddr_delay,
-        dina_out      => AS_L4PHICin_din_delay,
-        done       => PC_start,
-        start      => AS_L4PHICin_start
-      );
+    -- AS_L4PHICin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L4PHICin_wea,
+    --     addra     => AS_L4PHICin_writeaddr,
+    --     dina      => AS_L4PHICin_din,
+    --     wea_out       => AS_L4PHICin_wea_delay,
+    --     addra_out     => AS_L4PHICin_writeaddr_delay,
+    --     dina_out      => AS_L4PHICin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L4PHICin_start
+    --   );
 
-    AS_L4PHIDin : entity work.tf_mem
-      generic map (
-        RAM_WIDTH       => 36,
-        NUM_PAGES       => 8,
-        INIT_FILE       => "",
-        INIT_HEX        => true,
-        RAM_PERFORMANCE => "HIGH_PERFORMANCE",
-        NAME            => "AS_L4PHIDin",
-        FILE_WRITE            => false
-      )
-      port map (
-        clka      => clk240,
-        wea       => AS_L4PHIDin_wea_delay,
-        addra     => AS_L4PHIDin_writeaddr_delay,
-        dina      => AS_L4PHIDin_din_delay,
-        clkb      => clk240,
-        rsta      => reset,
-        rstb      => '0',
-        enb       => '1',
-        addrb     => AS_L4PHIDin_V_readaddr,
-        doutb     => AS_L4PHIDin_V_dout,
-        sync_nent => AS_L4PHIDin_start,
-        nent_o    => AS_L4PHIDin_AV_dout_nent
-      );
+    -- AS_L4PHIDin : entity work.tf_mem
+    --   generic map (
+    --     RAM_WIDTH       => 36,
+    --     NUM_PAGES       => 8,
+    --     INIT_FILE       => "",
+    --     INIT_HEX        => true,
+    --     RAM_PERFORMANCE => "HIGH_PERFORMANCE",
+    --     NAME            => "AS_L4PHIDin",
+    --     FILE_WRITE            => false
+    --   )
+    --   port map (
+    --     clka      => clk240,
+    --     wea       => AS_L4PHIDin_wea_delay,
+    --     addra     => AS_L4PHIDin_writeaddr_delay,
+    --     dina      => AS_L4PHIDin_din_delay,
+    --     clkb      => clk240,
+    --     rsta      => reset,
+    --     rstb      => '0',
+    --     enb       => '1',
+    --     addrb     => AS_L4PHIDin_V_readaddr,
+    --     doutb     => AS_L4PHIDin_V_dout,
+    --     sync_nent => AS_L4PHIDin_start,
+    --     nent_o    => AS_L4PHIDin_AV_dout_nent
+    --   );
 
-    AS_L4PHIDin_DELAY : entity work.tf_pipeline_slr_xing
-      generic map (
-        NUM_PAGES       => 8,
-        RAM_WIDTH       => 36
-      )
-      port map (
-        clk      => clk240,
-        reset    => reset,
-        wea       => AS_L4PHIDin_wea,
-        addra     => AS_L4PHIDin_writeaddr,
-        dina      => AS_L4PHIDin_din,
-        wea_out       => AS_L4PHIDin_wea_delay,
-        addra_out     => AS_L4PHIDin_writeaddr_delay,
-        dina_out      => AS_L4PHIDin_din_delay,
-        done       => PC_start,
-        start      => AS_L4PHIDin_start
-      );
+    -- AS_L4PHIDin_DELAY : entity work.tf_pipeline_slr_xing
+    --   generic map (
+    --     NUM_PAGES       => 8,
+    --     RAM_WIDTH       => 36
+    --   )
+    --   port map (
+    --     clk      => clk240,
+    --     reset    => reset,
+    --     wea       => AS_L4PHIDin_wea,
+    --     addra     => AS_L4PHIDin_writeaddr,
+    --     dina      => AS_L4PHIDin_din,
+    --     wea_out       => AS_L4PHIDin_wea_delay,
+    --     addra_out     => AS_L4PHIDin_writeaddr_delay,
+    --     dina_out      => AS_L4PHIDin_din_delay,
+    --     done       => PC_start,
+    --     start      => AS_L4PHIDin_start
+    --   );
 
     AS_L1PHIAn2 : entity work.tf_mem
       generic map (
@@ -6544,72 +6680,73 @@ begin
         start      => FM_AAAA_L4PHID_start
       );
 
-  VMSMER_L1PHIA_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIA_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIA_bx_in,
-      start => VMSMER_L1PHIA_start,
-      enb   => AS_L1PHIAin_enb,
-      addra => AS_L1PHIAin_V_readaddr,
-      din   => AS_L1PHIAin_V_dout,
-      dout  => AS_L1PHIAin_V_as,
-      valid  => AS_L1PHIAin_valid,
-      index  => AS_L1PHIAin_index(6 downto 0),
-      nent  => AS_L1PHIAin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- ######## Legacy mem_reader
+  -- VMSMER_L1PHIA_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIA_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIA_bx_in,
+  --     start => VMSMER_L1PHIA_start,
+  --     enb   => AS_L1PHIAin_enb,
+  --     addra => AS_L1PHIAin_V_readaddr,
+  --     din   => AS_L1PHIAin_V_dout,
+  --     dout  => AS_L1PHIAin_V_as,
+  --     valid  => AS_L1PHIAin_valid,
+  --     index  => AS_L1PHIAin_index(6 downto 0),
+  --     nent  => AS_L1PHIAin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L1PHIA: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIA_bx_in,
-      start => VMSMER_L1PHIA_start
-  );
+  -- LATCH_VMSMER_L1PHIA: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIA_bx_in,
+  --     start => VMSMER_L1PHIA_start
+  -- );
 
   LATCH_VMSMER_L1PHIA_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
       clk   => clk240,
       reset => reset,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIA_bx
+      bx_out => PC_bx_in,  -- in port
+      bx => VMSMER_L1PHIA_bx  -- needed later, so keep
   );
 
 -- ####### Legacy VMSMER_L1PHIA ######
 
-  VMSMER_L1PHIA : entity work.VMSMER_L1PHIA
-    port map (
-      ap_clk   => clk240,
-      ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIA_bx,
-      valid        => AS_L1PHIAin_valid,
-      index        => AS_L1PHIAin_index,
-      allStub_data_V        => AS_L1PHIAin_V_as,  -- legacy data
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIAn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIAn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIAn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIAn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIAn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIAn2_din
-  );
+  -- VMSMER_L1PHIA : entity work.VMSMER_L1PHIA
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIA_bx,
+  --     valid        => AS_L1PHIAin_valid,
+  --     index        => AS_L1PHIAin_index,
+  --     allStub_data_V        => AS_L1PHIAin_V_as,  -- legacy data
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIAn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIAn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIAn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIAn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIAn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIAn2_din
+  -- );
 
 -- ####### New VMSMER_L1PHIA #######
   VMSMER_L1PHIA_FIFO : entity work.VMSMER_L1PHIA
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIA_bx,  -- Same as legacy, in port
-      valid        =>       -- ?? Legacy from mem_reader
-      index        =>       -- ?? Legacy from mem_reader
-      allStub_data_V        => AS_L1PHIAin_DELAY_wea_FIFO_delay,  -- my new data
+      bx_V         => VMSMER_L1PHIA_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIAin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIAin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
       memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIAn2_writeaddr,  -- out port
@@ -6622,35 +6759,35 @@ begin
 
 
 
+-- ####### Legacy VMSMER_L1PHIB ######
+  -- VMSMER_L1PHIB_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIB_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIB_bx_in,
+  --     start => VMSMER_L1PHIB_start,
+  --     enb   => AS_L1PHIBin_enb,
+  --     addra => AS_L1PHIBin_V_readaddr,
+  --     din   => AS_L1PHIBin_V_dout,
+  --     dout  => AS_L1PHIBin_V_as,
+  --     valid  => AS_L1PHIBin_valid,
+  --     index  => AS_L1PHIBin_index(6 downto 0),
+  --     nent  => AS_L1PHIBin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  VMSMER_L1PHIB_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIB_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIB_bx_in,
-      start => VMSMER_L1PHIB_start,
-      enb   => AS_L1PHIBin_enb,
-      addra => AS_L1PHIBin_V_readaddr,
-      din   => AS_L1PHIBin_V_dout,
-      dout  => AS_L1PHIBin_V_as,
-      valid  => AS_L1PHIBin_valid,
-      index  => AS_L1PHIBin_index(6 downto 0),
-      nent  => AS_L1PHIBin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
-
-  LATCH_VMSMER_L1PHIB: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIB_bx_in,
-      start => VMSMER_L1PHIB_start
-  );
+  -- LATCH_VMSMER_L1PHIB: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIB_bx_in,
+  --     start => VMSMER_L1PHIB_start
+  -- );
 
   LATCH_VMSMER_L1PHIB_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6660,52 +6797,72 @@ begin
       bx => VMSMER_L1PHIB_bx
   );
 
-  VMSMER_L1PHIB : entity work.VMSMER_L1PHIB
+  -- VMSMER_L1PHIB : entity work.VMSMER_L1PHIB
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIB_bx,
+  --     valid        => AS_L1PHIBin_valid,
+  --     index        => AS_L1PHIBin_index,
+  --     allStub_data_V        => AS_L1PHIBin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIBn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIBn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIBn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIBn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIBn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIBn2_din
+  -- );
+
+  -- ####### New VMSMER #######
+  VMSMER_L1PHIB_FIFO : entity work.VMSMER_L1PHIB
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIB_bx,
-      valid        => AS_L1PHIBin_valid,
-      index        => AS_L1PHIBin_index,
-      allStub_data_V        => AS_L1PHIBin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIBn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIBn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIBn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIBn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIBn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIBn2_din
+      bx_V         => VMSMER_L1PHIB_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIBin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIBin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIBn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIBn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIBn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIBn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIBn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L1PHIC_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIC_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIC_bx_in,
-      start => VMSMER_L1PHIC_start,
-      enb   => AS_L1PHICin_enb,
-      addra => AS_L1PHICin_V_readaddr,
-      din   => AS_L1PHICin_V_dout,
-      dout  => AS_L1PHICin_V_as,
-      valid  => AS_L1PHICin_valid,
-      index  => AS_L1PHICin_index(6 downto 0),
-      nent  => AS_L1PHICin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- ######## Legacy mem_reader
+  -- VMSMER_L1PHIC_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIC_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIC_bx_in,
+  --     start => VMSMER_L1PHIC_start,
+  --     enb   => AS_L1PHICin_enb,
+  --     addra => AS_L1PHICin_V_readaddr,
+  --     din   => AS_L1PHICin_V_dout,
+  --     dout  => AS_L1PHICin_V_as,
+  --     valid  => AS_L1PHICin_valid,
+  --     index  => AS_L1PHICin_index(6 downto 0),
+  --     nent  => AS_L1PHICin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L1PHIC: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIC_bx_in,
-      start => VMSMER_L1PHIC_start
-  );
+  -- LATCH_VMSMER_L1PHIC: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIC_bx_in,
+  --     start => VMSMER_L1PHIC_start
+  -- );
 
   LATCH_VMSMER_L1PHIC_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6715,52 +6872,72 @@ begin
       bx => VMSMER_L1PHIC_bx
   );
 
-  VMSMER_L1PHIC : entity work.VMSMER_L1PHIC
+  -- VMSMER_L1PHIC : entity work.VMSMER_L1PHIC
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIC_bx,
+  --     valid        => AS_L1PHICin_valid,
+  --     index        => AS_L1PHICin_index,
+  --     allStub_data_V        => AS_L1PHICin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHICn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHICn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHICn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHICn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHICn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHICn2_din
+  -- );
+
+  -- ####### New VMSMER #######
+  VMSMER_L1PHIC_FIFO : entity work.VMSMER_L1PHIC
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIC_bx,
-      valid        => AS_L1PHICin_valid,
-      index        => AS_L1PHICin_index,
-      allStub_data_V        => AS_L1PHICin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHICn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHICn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHICn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHICn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHICn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHICn2_din
+      bx_V         => VMSMER_L1PHIC_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHICin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHICin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHICn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHICn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHICn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHICn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHICn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L1PHID_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHID_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHID_bx_in,
-      start => VMSMER_L1PHID_start,
-      enb   => AS_L1PHIDin_enb,
-      addra => AS_L1PHIDin_V_readaddr,
-      din   => AS_L1PHIDin_V_dout,
-      dout  => AS_L1PHIDin_V_as,
-      valid  => AS_L1PHIDin_valid,
-      index  => AS_L1PHIDin_index(6 downto 0),
-      nent  => AS_L1PHIDin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- ######## Legacy mem_reader
+  -- VMSMER_L1PHID_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHID_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHID_bx_in,
+  --     start => VMSMER_L1PHID_start,
+  --     enb   => AS_L1PHIDin_enb,
+  --     addra => AS_L1PHIDin_V_readaddr,
+  --     din   => AS_L1PHIDin_V_dout,
+  --     dout  => AS_L1PHIDin_V_as,
+  --     valid  => AS_L1PHIDin_valid,
+  --     index  => AS_L1PHIDin_index(6 downto 0),
+  --     nent  => AS_L1PHIDin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L1PHID: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHID_bx_in,
-      start => VMSMER_L1PHID_start
-  );
+  -- LATCH_VMSMER_L1PHID: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHID_bx_in,
+  --     start => VMSMER_L1PHID_start
+  -- );
 
   LATCH_VMSMER_L1PHID_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6770,52 +6947,72 @@ begin
       bx => VMSMER_L1PHID_bx
   );
 
-  VMSMER_L1PHID : entity work.VMSMER_L1PHID
+  -- VMSMER_L1PHID : entity work.VMSMER_L1PHID
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHID_bx,
+  --     valid        => AS_L1PHIDin_valid,
+  --     index        => AS_L1PHIDin_index,
+  --     allStub_data_V        => AS_L1PHIDin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIDn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIDn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIDn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIDn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIDn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIDn2_din
+  -- );
+
+
+-- ####### New VMSMER #######
+  VMSMER_L1PHID_FIFO : entity work.VMSMER_L1PHID
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHID_bx,
-      valid        => AS_L1PHIDin_valid,
-      index        => AS_L1PHIDin_index,
-      allStub_data_V        => AS_L1PHIDin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIDn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIDn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIDn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIDn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIDn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIDn2_din
+      bx_V         => VMSMER_L1PHID_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIDin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIDin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIDn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIDn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIDn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIDn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIDn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L1PHIE_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIE_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIE_bx_in,
-      start => VMSMER_L1PHIE_start,
-      enb   => AS_L1PHIEin_enb,
-      addra => AS_L1PHIEin_V_readaddr,
-      din   => AS_L1PHIEin_V_dout,
-      dout  => AS_L1PHIEin_V_as,
-      valid  => AS_L1PHIEin_valid,
-      index  => AS_L1PHIEin_index(6 downto 0),
-      nent  => AS_L1PHIEin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L1PHIE_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIE_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIE_bx_in,
+  --     start => VMSMER_L1PHIE_start,
+  --     enb   => AS_L1PHIEin_enb,
+  --     addra => AS_L1PHIEin_V_readaddr,
+  --     din   => AS_L1PHIEin_V_dout,
+  --     dout  => AS_L1PHIEin_V_as,
+  --     valid  => AS_L1PHIEin_valid,
+  --     index  => AS_L1PHIEin_index(6 downto 0),
+  --     nent  => AS_L1PHIEin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L1PHIE: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIE_bx_in,
-      start => VMSMER_L1PHIE_start
-  );
+  -- LATCH_VMSMER_L1PHIE: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIE_bx_in,
+  --     start => VMSMER_L1PHIE_start
+  -- );
 
   LATCH_VMSMER_L1PHIE_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6825,52 +7022,72 @@ begin
       bx => VMSMER_L1PHIE_bx
   );
 
-  VMSMER_L1PHIE : entity work.VMSMER_L1PHIE
+  -- VMSMER_L1PHIE : entity work.VMSMER_L1PHIE
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIE_bx,
+  --     valid        => AS_L1PHIEin_valid,
+  --     index        => AS_L1PHIEin_index,
+  --     allStub_data_V        => AS_L1PHIEin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIEn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIEn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIEn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIEn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIEn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIEn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L1PHIE_FIFO : entity work.VMSMER_L1PHIE
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIE_bx,
-      valid        => AS_L1PHIEin_valid,
-      index        => AS_L1PHIEin_index,
-      allStub_data_V        => AS_L1PHIEin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIEn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIEn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIEn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIEn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIEn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIEn2_din
+      bx_V         => VMSMER_L1PHIE_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIEin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIEin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIEn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIEn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIEn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIEn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIEn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIEn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L1PHIF_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIF_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIF_bx_in,
-      start => VMSMER_L1PHIF_start,
-      enb   => AS_L1PHIFin_enb,
-      addra => AS_L1PHIFin_V_readaddr,
-      din   => AS_L1PHIFin_V_dout,
-      dout  => AS_L1PHIFin_V_as,
-      valid  => AS_L1PHIFin_valid,
-      index  => AS_L1PHIFin_index(6 downto 0),
-      nent  => AS_L1PHIFin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
 
-  LATCH_VMSMER_L1PHIF: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIF_bx_in,
-      start => VMSMER_L1PHIF_start
-  );
+  -- VMSMER_L1PHIF_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIF_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIF_bx_in,
+  --     start => VMSMER_L1PHIF_start,
+  --     enb   => AS_L1PHIFin_enb,
+  --     addra => AS_L1PHIFin_V_readaddr,
+  --     din   => AS_L1PHIFin_V_dout,
+  --     dout  => AS_L1PHIFin_V_as,
+  --     valid  => AS_L1PHIFin_valid,
+  --     index  => AS_L1PHIFin_index(6 downto 0),
+  --     nent  => AS_L1PHIFin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
+
+  -- LATCH_VMSMER_L1PHIF: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIF_bx_in,
+  --     start => VMSMER_L1PHIF_start
+  -- );
 
   LATCH_VMSMER_L1PHIF_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6880,52 +7097,71 @@ begin
       bx => VMSMER_L1PHIF_bx
   );
 
-  VMSMER_L1PHIF : entity work.VMSMER_L1PHIF
+  -- VMSMER_L1PHIF : entity work.VMSMER_L1PHIF
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIF_bx,
+  --     valid        => AS_L1PHIFin_valid,
+  --     index        => AS_L1PHIFin_index,
+  --     allStub_data_V        => AS_L1PHIFin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIFn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIFn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIFn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIFn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIFn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIFn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L1PHIF_FIFO : entity work.VMSMER_L1PHIF
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIF_bx,
-      valid        => AS_L1PHIFin_valid,
-      index        => AS_L1PHIFin_index,
-      allStub_data_V        => AS_L1PHIFin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIFn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIFn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIFn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIFn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIFn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIFn2_din
+      bx_V         => VMSMER_L1PHIF_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIFin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIFin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIFn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIFn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIFn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIFn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIFn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIFn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L1PHIG_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIG_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIG_bx_in,
-      start => VMSMER_L1PHIG_start,
-      enb   => AS_L1PHIGin_enb,
-      addra => AS_L1PHIGin_V_readaddr,
-      din   => AS_L1PHIGin_V_dout,
-      dout  => AS_L1PHIGin_V_as,
-      valid  => AS_L1PHIGin_valid,
-      index  => AS_L1PHIGin_index(6 downto 0),
-      nent  => AS_L1PHIGin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L1PHIG_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIG_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIG_bx_in,
+  --     start => VMSMER_L1PHIG_start,
+  --     enb   => AS_L1PHIGin_enb,
+  --     addra => AS_L1PHIGin_V_readaddr,
+  --     din   => AS_L1PHIGin_V_dout,
+  --     dout  => AS_L1PHIGin_V_as,
+  --     valid  => AS_L1PHIGin_valid,
+  --     index  => AS_L1PHIGin_index(6 downto 0),
+  --     nent  => AS_L1PHIGin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L1PHIG: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIG_bx_in,
-      start => VMSMER_L1PHIG_start
-  );
+  -- LATCH_VMSMER_L1PHIG: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIG_bx_in,
+  --     start => VMSMER_L1PHIG_start
+  -- );
 
   LATCH_VMSMER_L1PHIG_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6935,52 +7171,71 @@ begin
       bx => VMSMER_L1PHIG_bx
   );
 
-  VMSMER_L1PHIG : entity work.VMSMER_L1PHIG
+  -- VMSMER_L1PHIG : entity work.VMSMER_L1PHIG
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIG_bx,
+  --     valid        => AS_L1PHIGin_valid,
+  --     index        => AS_L1PHIGin_index,
+  --     allStub_data_V        => AS_L1PHIGin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIGn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIGn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIGn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIGn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIGn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIGn2_din
+  -- );
+
+  -- ####### New VMSMER #######
+  VMSMER_L1PHIG_FIFO : entity work.VMSMER_L1PHIG
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIG_bx,
-      valid        => AS_L1PHIGin_valid,
-      index        => AS_L1PHIGin_index,
-      allStub_data_V        => AS_L1PHIGin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIGn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIGn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIGn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIGn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIGn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIGn2_din
+      bx_V         => VMSMER_L1PHIG_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIGin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIGin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIGn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIGn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIGn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIGn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIGn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIGn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L1PHIH_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L1PHIH_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L1PHIH_bx_in,
-      start => VMSMER_L1PHIH_start,
-      enb   => AS_L1PHIHin_enb,
-      addra => AS_L1PHIHin_V_readaddr,
-      din   => AS_L1PHIHin_V_dout,
-      dout  => AS_L1PHIHin_V_as,
-      valid  => AS_L1PHIHin_valid,
-      index  => AS_L1PHIHin_index(6 downto 0),
-      nent  => AS_L1PHIHin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L1PHIH_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L1PHIH_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L1PHIH_bx_in,
+  --     start => VMSMER_L1PHIH_start,
+  --     enb   => AS_L1PHIHin_enb,
+  --     addra => AS_L1PHIHin_V_readaddr,
+  --     din   => AS_L1PHIHin_V_dout,
+  --     dout  => AS_L1PHIHin_V_as,
+  --     valid  => AS_L1PHIHin_valid,
+  --     index  => AS_L1PHIHin_index(6 downto 0),
+  --     nent  => AS_L1PHIHin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L1PHIH: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L1PHIH_bx_in,
-      start => VMSMER_L1PHIH_start
-  );
+  -- LATCH_VMSMER_L1PHIH: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L1PHIH_bx_in,
+  --     start => VMSMER_L1PHIH_start
+  -- );
 
   LATCH_VMSMER_L1PHIH_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -6990,51 +7245,70 @@ begin
       bx => VMSMER_L1PHIH_bx
   );
 
-  VMSMER_L1PHIH : entity work.VMSMER_L1PHIH
+  -- VMSMER_L1PHIH : entity work.VMSMER_L1PHIH
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L1PHIH_bx,
+  --     valid        => AS_L1PHIHin_valid,
+  --     index        => AS_L1PHIHin_index,
+  --     allStub_data_V        => AS_L1PHIHin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIHn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIHn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIHn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIHn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIHn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIHn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L1PHIH_FIFO : entity work.VMSMER_L1PHIH
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L1PHIH_bx,
-      valid        => AS_L1PHIHin_valid,
-      index        => AS_L1PHIHin_index,
-      allStub_data_V        => AS_L1PHIHin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIHn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIHn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIHn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIHn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIHn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIHn2_din
+      bx_V         => VMSMER_L1PHIH_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L1PHIHin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L1PHIHin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIHn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L1PHIHn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L1PHIHn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L1PHIHn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L1PHIHn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L1PHIHn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L2PHIA_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L2PHIA_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L2PHIA_bx_in,
-      start => VMSMER_L2PHIA_start,
-      enb   => AS_L2PHIAin_enb,
-      addra => AS_L2PHIAin_V_readaddr,
-      din   => AS_L2PHIAin_V_dout,
-      dout  => AS_L2PHIAin_V_as,
-      valid  => AS_L2PHIAin_valid,
-      index  => AS_L2PHIAin_index(6 downto 0),
-      nent  => AS_L2PHIAin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L2PHIA_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L2PHIA_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L2PHIA_bx_in,
+  --     start => VMSMER_L2PHIA_start,
+  --     enb   => AS_L2PHIAin_enb,
+  --     addra => AS_L2PHIAin_V_readaddr,
+  --     din   => AS_L2PHIAin_V_dout,
+  --     dout  => AS_L2PHIAin_V_as,
+  --     valid  => AS_L2PHIAin_valid,
+  --     index  => AS_L2PHIAin_index(6 downto 0),
+  --     nent  => AS_L2PHIAin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L2PHIA: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L2PHIA_bx_in,
-      start => VMSMER_L2PHIA_start
+  -- LATCH_VMSMER_L2PHIA: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L2PHIA_bx_in,
+  --     start => VMSMER_L2PHIA_start
   );
 
   LATCH_VMSMER_L2PHIA_BX_GEN: entity work.tf_pipeline_slr_xing
@@ -7045,52 +7319,72 @@ begin
       bx => VMSMER_L2PHIA_bx
   );
 
-  VMSMER_L2PHIA : entity work.VMSMER_L2PHIA
+  -- VMSMER_L2PHIA : entity work.VMSMER_L2PHIA
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L2PHIA_bx,
+  --     valid        => AS_L2PHIAin_valid,
+  --     index        => AS_L2PHIAin_index,
+  --     allStub_data_V        => AS_L2PHIAin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIAn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIAn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIAn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIAn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIAn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIAn2_din
+  -- );
+
+
+-- ####### New VMSMER #######
+  VMSMER_L2PHIA_FIFO : entity work.VMSMER_L2PHIA
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L2PHIA_bx,
-      valid        => AS_L2PHIAin_valid,
-      index        => AS_L2PHIAin_index,
-      allStub_data_V        => AS_L2PHIAin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIAn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIAn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIAn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIAn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIAn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIAn2_din
+      bx_V         => VMSMER_L2PHIA_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L2PHIAin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L2PHIAin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIAn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIAn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIAn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIAn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIAn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L2PHIB_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L2PHIB_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L2PHIB_bx_in,
-      start => VMSMER_L2PHIB_start,
-      enb   => AS_L2PHIBin_enb,
-      addra => AS_L2PHIBin_V_readaddr,
-      din   => AS_L2PHIBin_V_dout,
-      dout  => AS_L2PHIBin_V_as,
-      valid  => AS_L2PHIBin_valid,
-      index  => AS_L2PHIBin_index(6 downto 0),
-      nent  => AS_L2PHIBin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L2PHIB_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L2PHIB_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L2PHIB_bx_in,
+  --     start => VMSMER_L2PHIB_start,
+  --     enb   => AS_L2PHIBin_enb,
+  --     addra => AS_L2PHIBin_V_readaddr,
+  --     din   => AS_L2PHIBin_V_dout,
+  --     dout  => AS_L2PHIBin_V_as,
+  --     valid  => AS_L2PHIBin_valid,
+  --     index  => AS_L2PHIBin_index(6 downto 0),
+  --     nent  => AS_L2PHIBin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L2PHIB: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L2PHIB_bx_in,
-      start => VMSMER_L2PHIB_start
-  );
+  -- LATCH_VMSMER_L2PHIB: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L2PHIB_bx_in,
+  --     start => VMSMER_L2PHIB_start
+  -- );
 
   LATCH_VMSMER_L2PHIB_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7100,52 +7394,73 @@ begin
       bx => VMSMER_L2PHIB_bx
   );
 
-  VMSMER_L2PHIB : entity work.VMSMER_L2PHIB
+  -- VMSMER_L2PHIB : entity work.VMSMER_L2PHIB
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L2PHIB_bx,
+  --     valid        => AS_L2PHIBin_valid,
+  --     index        => AS_L2PHIBin_index,
+  --     allStub_data_V        => AS_L2PHIBin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIBn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIBn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIBn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIBn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIBn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIBn2_din
+  -- );
+
+
+-- ####### New VMSMER #######
+  VMSMER_L2PHIB_FIFO : entity work.VMSMER_L2PHIB
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L2PHIB_bx,
-      valid        => AS_L2PHIBin_valid,
-      index        => AS_L2PHIBin_index,
-      allStub_data_V        => AS_L2PHIBin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIBn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIBn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIBn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIBn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIBn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIBn2_din
+      bx_V         => VMSMER_L2PHIB_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L2PHIBin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L2PHIBin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIBn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIBn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIBn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIBn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIBn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L2PHIC_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L2PHIC_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L2PHIC_bx_in,
-      start => VMSMER_L2PHIC_start,
-      enb   => AS_L2PHICin_enb,
-      addra => AS_L2PHICin_V_readaddr,
-      din   => AS_L2PHICin_V_dout,
-      dout  => AS_L2PHICin_V_as,
-      valid  => AS_L2PHICin_valid,
-      index  => AS_L2PHICin_index(6 downto 0),
-      nent  => AS_L2PHICin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
 
-  LATCH_VMSMER_L2PHIC: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L2PHIC_bx_in,
-      start => VMSMER_L2PHIC_start
-  );
+  -- VMSMER_L2PHIC_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L2PHIC_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L2PHIC_bx_in,
+  --     start => VMSMER_L2PHIC_start,
+  --     enb   => AS_L2PHICin_enb,
+  --     addra => AS_L2PHICin_V_readaddr,
+  --     din   => AS_L2PHICin_V_dout,
+  --     dout  => AS_L2PHICin_V_as,
+  --     valid  => AS_L2PHICin_valid,
+  --     index  => AS_L2PHICin_index(6 downto 0),
+  --     nent  => AS_L2PHICin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
+
+  -- LATCH_VMSMER_L2PHIC: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L2PHIC_bx_in,
+  --     start => VMSMER_L2PHIC_start
+  -- );
 
   LATCH_VMSMER_L2PHIC_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7155,52 +7470,71 @@ begin
       bx => VMSMER_L2PHIC_bx
   );
 
-  VMSMER_L2PHIC : entity work.VMSMER_L2PHIC
+  -- VMSMER_L2PHIC : entity work.VMSMER_L2PHIC
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L2PHIC_bx,
+  --     valid        => AS_L2PHICin_valid,
+  --     index        => AS_L2PHICin_index,
+  --     allStub_data_V        => AS_L2PHICin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHICn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHICn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHICn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L2PHICn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L2PHICn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L2PHICn2_din
+  -- );
+
+  -- ####### New VMSMER #######
+  VMSMER_L2PHIC_FIFO : entity work.VMSMER_L2PHIC
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L2PHIC_bx,
-      valid        => AS_L2PHICin_valid,
-      index        => AS_L2PHICin_index,
-      allStub_data_V        => AS_L2PHICin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHICn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHICn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHICn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHICn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHICn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHICn2_din
+      bx_V         => VMSMER_L2PHIC_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L2PHICin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L2PHICin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHICn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHICn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHICn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHICn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHICn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L2PHID_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L2PHID_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L2PHID_bx_in,
-      start => VMSMER_L2PHID_start,
-      enb   => AS_L2PHIDin_enb,
-      addra => AS_L2PHIDin_V_readaddr,
-      din   => AS_L2PHIDin_V_dout,
-      dout  => AS_L2PHIDin_V_as,
-      valid  => AS_L2PHIDin_valid,
-      index  => AS_L2PHIDin_index(6 downto 0),
-      nent  => AS_L2PHIDin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L2PHID_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L2PHID_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L2PHID_bx_in,
+  --     start => VMSMER_L2PHID_start,
+  --     enb   => AS_L2PHIDin_enb,
+  --     addra => AS_L2PHIDin_V_readaddr,
+  --     din   => AS_L2PHIDin_V_dout,
+  --     dout  => AS_L2PHIDin_V_as,
+  --     valid  => AS_L2PHIDin_valid,
+  --     index  => AS_L2PHIDin_index(6 downto 0),
+  --     nent  => AS_L2PHIDin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L2PHID: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L2PHID_bx_in,
-      start => VMSMER_L2PHID_start
-  );
+  -- LATCH_VMSMER_L2PHID: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L2PHID_bx_in,
+  --     start => VMSMER_L2PHID_start
+  -- );
 
   LATCH_VMSMER_L2PHID_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7210,52 +7544,73 @@ begin
       bx => VMSMER_L2PHID_bx
   );
 
-  VMSMER_L2PHID : entity work.VMSMER_L2PHID
+  -- VMSMER_L2PHID : entity work.VMSMER_L2PHID
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L2PHID_bx,
+  --     valid        => AS_L2PHIDin_valid,
+  --     index        => AS_L2PHIDin_index,
+  --     allStub_data_V        => AS_L2PHIDin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIDn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIDn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIDn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIDn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIDn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIDn2_din
+  -- );
+
+
+-- ####### New VMSMER #######
+  VMSMER_L2PHID_FIFO : entity work.VMSMER_L2PHID
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L2PHID_bx,
-      valid        => AS_L2PHIDin_valid,
-      index        => AS_L2PHIDin_index,
-      allStub_data_V        => AS_L2PHIDin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIDn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIDn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIDn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIDn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIDn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIDn2_din
+      bx_V         => VMSMER_L2PHID_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L2PHIDin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L2PHIDin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L2PHIDn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L2PHIdn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L2PHIDn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L2PHIDn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L2PHIDn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L3PHIA_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L3PHIA_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L3PHIA_bx_in,
-      start => VMSMER_L3PHIA_start,
-      enb   => AS_L3PHIAin_enb,
-      addra => AS_L3PHIAin_V_readaddr,
-      din   => AS_L3PHIAin_V_dout,
-      dout  => AS_L3PHIAin_V_as,
-      valid  => AS_L3PHIAin_valid,
-      index  => AS_L3PHIAin_index(6 downto 0),
-      nent  => AS_L3PHIAin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
 
-  LATCH_VMSMER_L3PHIA: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L3PHIA_bx_in,
-      start => VMSMER_L3PHIA_start
-  );
+  -- VMSMER_L3PHIA_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L3PHIA_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L3PHIA_bx_in,
+  --     start => VMSMER_L3PHIA_start,
+  --     enb   => AS_L3PHIAin_enb,
+  --     addra => AS_L3PHIAin_V_readaddr,
+  --     din   => AS_L3PHIAin_V_dout,
+  --     dout  => AS_L3PHIAin_V_as,
+  --     valid  => AS_L3PHIAin_valid,
+  --     index  => AS_L3PHIAin_index(6 downto 0),
+  --     nent  => AS_L3PHIAin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
+
+  -- LATCH_VMSMER_L3PHIA: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L3PHIA_bx_in,
+  --     start => VMSMER_L3PHIA_start
+  -- );
 
   LATCH_VMSMER_L3PHIA_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7265,52 +7620,71 @@ begin
       bx => VMSMER_L3PHIA_bx
   );
 
-  VMSMER_L3PHIA : entity work.VMSMER_L3PHIA
+  -- VMSMER_L3PHIA : entity work.VMSMER_L3PHIA
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L3PHIA_bx,
+  --     valid        => AS_L3PHIAin_valid,
+  --     index        => AS_L3PHIAin_index,
+  --     allStub_data_V        => AS_L3PHIAin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIAn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIAn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIAn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIAn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIAn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIAn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L3PHIA_FIFO : entity work.VMSMER_L3PHIA
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L3PHIA_bx,
-      valid        => AS_L3PHIAin_valid,
-      index        => AS_L3PHIAin_index,
-      allStub_data_V        => AS_L3PHIAin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIAn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIAn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIAn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIAn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIAn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIAn2_din
+      bx_V         => VMSMER_L3PHIA_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L3PHIAin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L3PHIAin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIAn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIAn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIAn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIAn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIAn2_din   -- same as legacy, used later
   );
 
-  VMSMER_L3PHIB_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L3PHIB_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L3PHIB_bx_in,
-      start => VMSMER_L3PHIB_start,
-      enb   => AS_L3PHIBin_enb,
-      addra => AS_L3PHIBin_V_readaddr,
-      din   => AS_L3PHIBin_V_dout,
-      dout  => AS_L3PHIBin_V_as,
-      valid  => AS_L3PHIBin_valid,
-      index  => AS_L3PHIBin_index(6 downto 0),
-      nent  => AS_L3PHIBin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L3PHIB_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L3PHIB_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L3PHIB_bx_in,
+  --     start => VMSMER_L3PHIB_start,
+  --     enb   => AS_L3PHIBin_enb,
+  --     addra => AS_L3PHIBin_V_readaddr,
+  --     din   => AS_L3PHIBin_V_dout,
+  --     dout  => AS_L3PHIBin_V_as,
+  --     valid  => AS_L3PHIBin_valid,
+  --     index  => AS_L3PHIBin_index(6 downto 0),
+  --     nent  => AS_L3PHIBin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L3PHIB: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L3PHIB_bx_in,
-      start => VMSMER_L3PHIB_start
-  );
+  -- LATCH_VMSMER_L3PHIB: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L3PHIB_bx_in,
+  --     start => VMSMER_L3PHIB_start
+  -- );
 
   LATCH_VMSMER_L3PHIB_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7320,52 +7694,73 @@ begin
       bx => VMSMER_L3PHIB_bx
   );
 
-  VMSMER_L3PHIB : entity work.VMSMER_L3PHIB
+  -- VMSMER_L3PHIB : entity work.VMSMER_L3PHIB
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L3PHIB_bx,
+  --     valid        => AS_L3PHIBin_valid,
+  --     index        => AS_L3PHIBin_index,
+  --     allStub_data_V        => AS_L3PHIBin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIBn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIBn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIBn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIBn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIBn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIBn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L3PHIB_FIFO : entity work.VMSMER_L3PHIB
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L3PHIB_bx,
-      valid        => AS_L3PHIBin_valid,
-      index        => AS_L3PHIBin_index,
-      allStub_data_V        => AS_L3PHIBin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIBn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIBn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIBn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIBn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIBn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIBn2_din
+      bx_V         => VMSMER_L3PHIB_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L3PHIBin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L3PHIBin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIBn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIBn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIBn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIBn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIBn2_din   -- same as legacy, used later
   );
+  
 
-  VMSMER_L3PHIC_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L3PHIC_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L3PHIC_bx_in,
-      start => VMSMER_L3PHIC_start,
-      enb   => AS_L3PHICin_enb,
-      addra => AS_L3PHICin_V_readaddr,
-      din   => AS_L3PHICin_V_dout,
-      dout  => AS_L3PHICin_V_as,
-      valid  => AS_L3PHICin_valid,
-      index  => AS_L3PHICin_index(6 downto 0),
-      nent  => AS_L3PHICin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
 
-  LATCH_VMSMER_L3PHIC: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L3PHIC_bx_in,
-      start => VMSMER_L3PHIC_start
-  );
+  -- VMSMER_L3PHIC_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L3PHIC_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L3PHIC_bx_in,
+  --     start => VMSMER_L3PHIC_start,
+  --     enb   => AS_L3PHICin_enb,
+  --     addra => AS_L3PHICin_V_readaddr,
+  --     din   => AS_L3PHICin_V_dout,
+  --     dout  => AS_L3PHICin_V_as,
+  --     valid  => AS_L3PHICin_valid,
+  --     index  => AS_L3PHICin_index(6 downto 0),
+  --     nent  => AS_L3PHICin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
+
+  -- LATCH_VMSMER_L3PHIC: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L3PHIC_bx_in,
+  --     start => VMSMER_L3PHIC_start
+  -- );
 
   LATCH_VMSMER_L3PHIC_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7375,52 +7770,73 @@ begin
       bx => VMSMER_L3PHIC_bx
   );
 
-  VMSMER_L3PHIC : entity work.VMSMER_L3PHIC
+  -- VMSMER_L3PHIC : entity work.VMSMER_L3PHIC
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L3PHIC_bx,
+  --     valid        => AS_L3PHICin_valid,
+  --     index        => AS_L3PHICin_index,
+  --     allStub_data_V        => AS_L3PHICin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHICn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHICn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHICn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L3PHICn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L3PHICn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L3PHICn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L3PHIC_FIFO : entity work.VMSMER_L3PHIC
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L3PHIC_bx,
-      valid        => AS_L3PHICin_valid,
-      index        => AS_L3PHICin_index,
-      allStub_data_V        => AS_L3PHICin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHICn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHICn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHICn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHICn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHICn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHICn2_din
+      bx_V         => VMSMER_L3PHIC_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L3PHICin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L3PHICin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHICn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHICn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHICn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHICn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHICn2_din   -- same as legacy, used later
   );
+  
 
-  VMSMER_L3PHID_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L3PHID_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L3PHID_bx_in,
-      start => VMSMER_L3PHID_start,
-      enb   => AS_L3PHIDin_enb,
-      addra => AS_L3PHIDin_V_readaddr,
-      din   => AS_L3PHIDin_V_dout,
-      dout  => AS_L3PHIDin_V_as,
-      valid  => AS_L3PHIDin_valid,
-      index  => AS_L3PHIDin_index(6 downto 0),
-      nent  => AS_L3PHIDin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
 
-  LATCH_VMSMER_L3PHID: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L3PHID_bx_in,
-      start => VMSMER_L3PHID_start
-  );
+  -- VMSMER_L3PHID_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L3PHID_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L3PHID_bx_in,
+  --     start => VMSMER_L3PHID_start,
+  --     enb   => AS_L3PHIDin_enb,
+  --     addra => AS_L3PHIDin_V_readaddr,
+  --     din   => AS_L3PHIDin_V_dout,
+  --     dout  => AS_L3PHIDin_V_as,
+  --     valid  => AS_L3PHIDin_valid,
+  --     index  => AS_L3PHIDin_index(6 downto 0),
+  --     nent  => AS_L3PHIDin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
+
+  -- LATCH_VMSMER_L3PHID: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L3PHID_bx_in,
+  --     start => VMSMER_L3PHID_start
+  -- );
 
   LATCH_VMSMER_L3PHID_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7430,52 +7846,73 @@ begin
       bx => VMSMER_L3PHID_bx
   );
 
-  VMSMER_L3PHID : entity work.VMSMER_L3PHID
+  -- VMSMER_L3PHID : entity work.VMSMER_L3PHID
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L3PHID_bx,
+  --     valid        => AS_L3PHIDin_valid,
+  --     index        => AS_L3PHIDin_index,
+  --     allStub_data_V        => AS_L3PHIDin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIDn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIDn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIDn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIDn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIDn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIDn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L3PHID_FIFO : entity work.VMSMER_L3PHID
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L3PHID_bx,
-      valid        => AS_L3PHIDin_valid,
-      index        => AS_L3PHIDin_index,
-      allStub_data_V        => AS_L3PHIDin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIDn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIDn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIDn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIDn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIDn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIDn2_din
+      bx_V         => VMSMER_L3PHID_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L3PHIDin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L3PHIDin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L3PHIDn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L3PHIDn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L3PHIDn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L3PHIDn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L3PHIDn2_din   -- same as legacy, used later
   );
+  
 
-  VMSMER_L4PHIA_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L4PHIA_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L4PHIA_bx_in,
-      start => VMSMER_L4PHIA_start,
-      enb   => AS_L4PHIAin_enb,
-      addra => AS_L4PHIAin_V_readaddr,
-      din   => AS_L4PHIAin_V_dout,
-      dout  => AS_L4PHIAin_V_as,
-      valid  => AS_L4PHIAin_valid,
-      index  => AS_L4PHIAin_index(6 downto 0),
-      nent  => AS_L4PHIAin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
 
-  LATCH_VMSMER_L4PHIA: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L4PHIA_bx_in,
-      start => VMSMER_L4PHIA_start
-  );
+  -- VMSMER_L4PHIA_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L4PHIA_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L4PHIA_bx_in,
+  --     start => VMSMER_L4PHIA_start,
+  --     enb   => AS_L4PHIAin_enb,
+  --     addra => AS_L4PHIAin_V_readaddr,
+  --     din   => AS_L4PHIAin_V_dout,
+  --     dout  => AS_L4PHIAin_V_as,
+  --     valid  => AS_L4PHIAin_valid,
+  --     index  => AS_L4PHIAin_index(6 downto 0),
+  --     nent  => AS_L4PHIAin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
+
+  -- LATCH_VMSMER_L4PHIA: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L4PHIA_bx_in,
+  --     start => VMSMER_L4PHIA_start
+  -- );
 
   LATCH_VMSMER_L4PHIA_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7485,52 +7922,72 @@ begin
       bx => VMSMER_L4PHIA_bx
   );
 
-  VMSMER_L4PHIA : entity work.VMSMER_L4PHIA
+  -- VMSMER_L4PHIA : entity work.VMSMER_L4PHIA
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L4PHIA_bx,
+  --     valid        => AS_L4PHIAin_valid,
+  --     index        => AS_L4PHIAin_index,
+  --     allStub_data_V        => AS_L4PHIAin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIAn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIAn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIAn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIAn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIAn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIAn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L4PHIA_FIFO : entity work.VMSMER_L4PHIA
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L4PHIA_bx,
-      valid        => AS_L4PHIAin_valid,
-      index        => AS_L4PHIAin_index,
-      allStub_data_V        => AS_L4PHIAin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIAn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIAn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIAn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIAn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIAn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIAn2_din
+      bx_V         => VMSMER_L4PHIA_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L4PHIAin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L4PHIAin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIAn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIAn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIAn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIAn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIAn2_din   -- same as legacy, used later
   );
+  
 
-  VMSMER_L4PHIB_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L4PHIB_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L4PHIB_bx_in,
-      start => VMSMER_L4PHIB_start,
-      enb   => AS_L4PHIBin_enb,
-      addra => AS_L4PHIBin_V_readaddr,
-      din   => AS_L4PHIBin_V_dout,
-      dout  => AS_L4PHIBin_V_as,
-      valid  => AS_L4PHIBin_valid,
-      index  => AS_L4PHIBin_index(6 downto 0),
-      nent  => AS_L4PHIBin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
+  -- VMSMER_L4PHIB_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L4PHIB_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L4PHIB_bx_in,
+  --     start => VMSMER_L4PHIB_start,
+  --     enb   => AS_L4PHIBin_enb,
+  --     addra => AS_L4PHIBin_V_readaddr,
+  --     din   => AS_L4PHIBin_V_dout,
+  --     dout  => AS_L4PHIBin_V_as,
+  --     valid  => AS_L4PHIBin_valid,
+  --     index  => AS_L4PHIBin_index(6 downto 0),
+  --     nent  => AS_L4PHIBin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  LATCH_VMSMER_L4PHIB: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L4PHIB_bx_in,
-      start => VMSMER_L4PHIB_start
-  );
+  -- LATCH_VMSMER_L4PHIB: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L4PHIB_bx_in,
+  --     start => VMSMER_L4PHIB_start
+  -- );
 
   LATCH_VMSMER_L4PHIB_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7540,52 +7997,72 @@ begin
       bx => VMSMER_L4PHIB_bx
   );
 
-  VMSMER_L4PHIB : entity work.VMSMER_L4PHIB
+  -- VMSMER_L4PHIB : entity work.VMSMER_L4PHIB
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L4PHIB_bx,
+  --     valid        => AS_L4PHIBin_valid,
+  --     index        => AS_L4PHIBin_index,
+  --     allStub_data_V        => AS_L4PHIBin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIBn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIBn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIBn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIBn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIBn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIBn2_din
+  -- );
+
+
+-- ####### New VMSMER #######
+  VMSMER_L4PHIB_FIFO : entity work.VMSMER_L4PHIB
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L4PHIB_bx,
-      valid        => AS_L4PHIBin_valid,
-      index        => AS_L4PHIBin_index,
-      allStub_data_V        => AS_L4PHIBin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIBn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIBn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIBn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIBn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIBn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIBn2_din
+      bx_V         => VMSMER_L4PHIB_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L4PHIBin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L4PHIBin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIBn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIBn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIBn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIBn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIBn2_din   -- same as legacy, used later
   );
+  
+  -- VMSMER_L4PHIC_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L4PHIC_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L4PHIC_bx_in,
+  --     start => VMSMER_L4PHIC_start,
+  --     enb   => AS_L4PHICin_enb,
+  --     addra => AS_L4PHICin_V_readaddr,
+  --     din   => AS_L4PHICin_V_dout,
+  --     dout  => AS_L4PHICin_V_as,
+  --     valid  => AS_L4PHICin_valid,
+  --     index  => AS_L4PHICin_index(6 downto 0),
+  --     nent  => AS_L4PHICin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  VMSMER_L4PHIC_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L4PHIC_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L4PHIC_bx_in,
-      start => VMSMER_L4PHIC_start,
-      enb   => AS_L4PHICin_enb,
-      addra => AS_L4PHICin_V_readaddr,
-      din   => AS_L4PHICin_V_dout,
-      dout  => AS_L4PHICin_V_as,
-      valid  => AS_L4PHICin_valid,
-      index  => AS_L4PHICin_index(6 downto 0),
-      nent  => AS_L4PHICin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
-
-  LATCH_VMSMER_L4PHIC: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L4PHIC_bx_in,
-      start => VMSMER_L4PHIC_start
-  );
+  -- LATCH_VMSMER_L4PHIC: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L4PHIC_bx_in,
+  --     start => VMSMER_L4PHIC_start
+  -- );
 
   LATCH_VMSMER_L4PHIC_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7595,52 +8072,71 @@ begin
       bx => VMSMER_L4PHIC_bx
   );
 
-  VMSMER_L4PHIC : entity work.VMSMER_L4PHIC
+  -- VMSMER_L4PHIC : entity work.VMSMER_L4PHIC
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L4PHIC_bx,
+  --     valid        => AS_L4PHICin_valid,
+  --     index        => AS_L4PHICin_index,
+  --     allStub_data_V        => AS_L4PHICin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHICn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHICn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHICn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L4PHICn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L4PHICn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L4PHICn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L4PHIC_FIFO : entity work.VMSMER_L4PHIC
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L4PHIC_bx,
-      valid        => AS_L4PHICin_valid,
-      index        => AS_L4PHICin_index,
-      allStub_data_V        => AS_L4PHICin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHICn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHICn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHICn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHICn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHICn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHICn2_din
+      bx_V         => VMSMER_L4PHIC_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L4PHICin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L4PHICin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHICn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHICn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHICn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHICn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHICn2_din   -- same as legacy, used later
   );
+  
+  -- VMSMER_L4PHID_mem_reader : entity work.mem_reader
+  --   generic map (
+  --     RAM_WIDTH    => 36,
+  --     NAME    => "VMSMER_L4PHID_mem_reader"
+  --   )
+  --   port map (
+  --     clk    => clk240,
+  --     bx    => VMSMER_L4PHID_bx_in,
+  --     start => VMSMER_L4PHID_start,
+  --     enb   => AS_L4PHIDin_enb,
+  --     addra => AS_L4PHIDin_V_readaddr,
+  --     din   => AS_L4PHIDin_V_dout,
+  --     dout  => AS_L4PHIDin_V_as,
+  --     valid  => AS_L4PHIDin_valid,
+  --     index  => AS_L4PHIDin_index(6 downto 0),
+  --     nent  => AS_L4PHIDin_AV_dout_nent,
+  --     mask  => (others => (others => '1'))
+  --   );
 
-  VMSMER_L4PHID_mem_reader : entity work.mem_reader
-    generic map (
-      RAM_WIDTH    => 36,
-      NAME    => "VMSMER_L4PHID_mem_reader"
-    )
-    port map (
-      clk    => clk240,
-      bx    => VMSMER_L4PHID_bx_in,
-      start => VMSMER_L4PHID_start,
-      enb   => AS_L4PHIDin_enb,
-      addra => AS_L4PHIDin_V_readaddr,
-      din   => AS_L4PHIDin_V_dout,
-      dout  => AS_L4PHIDin_V_as,
-      valid  => AS_L4PHIDin_valid,
-      index  => AS_L4PHIDin_index(6 downto 0),
-      nent  => AS_L4PHIDin_AV_dout_nent,
-      mask  => (others => (others => '1'))
-    );
-
-  LATCH_VMSMER_L4PHID: entity work.tf_pipeline_slr_xing
-    port map (
-      clk   => clk240,
-      reset => reset,
-      done  => PC_start,
-      bx_out => PC_bx_in,
-      bx => VMSMER_L4PHID_bx_in,
-      start => VMSMER_L4PHID_start
-  );
+  -- LATCH_VMSMER_L4PHID: entity work.tf_pipeline_slr_xing
+  --   port map (
+  --     clk   => clk240,
+  --     reset => reset,
+  --     done  => PC_start,
+  --     bx_out => PC_bx_in,
+  --     bx => VMSMER_L4PHID_bx_in,
+  --     start => VMSMER_L4PHID_start
+  -- );
 
   LATCH_VMSMER_L4PHID_BX_GEN: entity work.tf_pipeline_slr_xing
     port map (
@@ -7650,24 +8146,43 @@ begin
       bx => VMSMER_L4PHID_bx
   );
 
-  VMSMER_L4PHID : entity work.VMSMER_L4PHID
+  -- VMSMER_L4PHID : entity work.VMSMER_L4PHID
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     bx_V          => VMSMER_L4PHID_bx,
+  --     valid        => AS_L4PHIDin_valid,
+  --     index        => AS_L4PHIDin_index,
+  --     allStub_data_V        => AS_L4PHIDin_V_as,
+  --     memoryME_0_dataarray_0_data_V_ce0       => open,
+  --     memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIDn2_wea,
+  --     memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIDn2_writeaddr,
+  --     memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIDn2_din,
+  --     memoriesAS_0_dataarray_data_V_ce0       => open,
+  --     memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIDn2_wea,
+  --     memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIDn2_writeaddr,
+  --     memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIDn2_din
+  -- );
+
+-- ####### New VMSMER #######
+  VMSMER_L4PHID_FIFO : entity work.VMSMER_L4PHID
     port map (
       ap_clk   => clk240,
       ap_rst   => reset,
-      bx_V          => VMSMER_L4PHID_bx,
-      valid        => AS_L4PHIDin_valid,
-      index        => AS_L4PHIDin_index,
-      allStub_data_V        => AS_L4PHIDin_V_as,
-      memoryME_0_dataarray_0_data_V_ce0       => open,
-      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIDn2_wea,
-      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIDn2_writeaddr,
-      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIDn2_din,
-      memoriesAS_0_dataarray_data_V_ce0       => open,
-      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIDn2_wea,
-      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIDn2_writeaddr,
-      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIDn2_din
+      bx_V         => VMSMER_L4PHID_bx,  -- Same as legacy, in port
+      valid        =>     or(AS_L4PHIDin_data_FIFO),
+      index        =>     (others => '0'),  
+      allStub_data_V    => AS_L4PHIDin_data_FIFO,  -- my new data, no delay
+      memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
+      memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
+      memoryME_0_dataarray_0_data_V_address0  => VMSME_L4PHIDn2_writeaddr,  -- out port
+      memoryME_0_dataarray_0_data_V_d0        => VMSME_L4PHIDn2_din,  -- out port
+      memoriesAS_0_dataarray_data_V_ce0       => open,  -- same as legacy
+      memoriesAS_0_dataarray_data_V_we0       => AS_L4PHIDn2_wea,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_address0  => AS_L4PHIDn2_writeaddr,  -- same as legacy, used later
+      memoriesAS_0_dataarray_data_V_d0        => AS_L4PHIDn2_din   -- same as legacy, used later
   );
-
+  
   PC_L5L6ABCD_mem_reader : entity work.mem_reader
     generic map (
       RAM_WIDTH    => 73,
