@@ -57,16 +57,19 @@ architecture rtl of mem_reader is
 
 -- ########################### Types ###########################
 
-signal addr_counter  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
-signal addr_counter1  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
-signal addr_counter2  : std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0) := (others =>'0');          --! RAM data row
-signal valid1 : std_logic := '0';
-signal valid2 : std_logic := '0';
-signal valid3 : std_logic := '0';
+type t_addr_counter_pipe is array (2 downto 0) of std_logic_vector(clogb2(NUM_TPAGES*PAGE_LENGTH)-1 downto 0);
+signal addr_counter_pipe : t_addr_counter_pipe := (others => (others => '0'));
+
+signal valid_pipe : std_logic_vector(2 downto 0) := (others => '0');
+
 signal addrP1  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
 signal addrP2  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
 signal addrP3  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
 signal addrP4  : std_logic_vector(clogb2(PAGE_LENGTH)-1 downto 0) := (others =>'0');          
+
+attribute shreg_extract : string;
+attribute shreg_extract of addr_counter_pipe : signal is "no";
+attribute shreg_extract of valid_pipe : signal is "no";
 
 -- ########################### Attributes ###########################
 
@@ -137,46 +140,41 @@ begin
         addrP2var := (others => '0');
         addrP3var := (others => '0');
         addrP4var := (others => '0');
-        addr_counter <= (others => '0');
+        addr_counter_pipe(0) <= (others => '0');
       end if;
 
-      addr_counter2 <= addr_counter1;
-
-      addr_counter1 <= addr_counter;
+      addr_counter_pipe(addr_counter_pipe'high downto 1) <= addr_counter_pipe(addr_counter_pipe'high-1 downto 0);
       
-      valid <= valid3;
-
-      valid3 <= valid2;
-      
-      valid2 <= valid1;
+      valid <= valid_pipe(valid_pipe'high);
+      valid_pipe(valid_pipe'high downto 1) <= valid_pipe(valid_pipe'high-1 downto 0);
       
       if (addrP1var < nent(to_integer(unsigned(bx))*NUM_TPAGES) and (mask(to_integer(unsigned(bx)))(0)='1') and addrP1var < maxval) then
         if (NUM_TPAGES>1) then
-          addr_counter <= std_logic_vector(to_unsigned(0,2))&addrP1var;
+          addr_counter_pipe(0) <= std_logic_vector(to_unsigned(0,2))&addrP1var;
           addra <= bx&std_logic_vector(to_unsigned(0,2))&addrP1var;
         else
-          addr_counter <= addrP1var(6 downto 0);
+          addr_counter_pipe(0) <= addrP1var(6 downto 0);
           addra <= bx&addrP1var(6 downto 0);
         end if;
         addrP1var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP1var)) + 1, addrP1var'length));
-        valid1 <= '1'; 
+        valid_pipe(0) <= '1'; 
       elsif ((addrP2var < nent(to_integer(unsigned(bx))*NUM_TPAGES+1)) and (mask(to_integer(unsigned(bx)))(1)='1') and (NUM_TPAGES > 1) and addrP2var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(1,2))&addrP2var;
+        addr_counter_pipe(0) <= std_logic_vector(to_unsigned(1,2))&addrP2var;
         addra <= bx&std_logic_vector(to_unsigned(1,2))&addrP2var;
         addrP2var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP2var)) + 1, addrP2var'length));
-        valid1 <= '1'; 
+        valid_pipe(0) <= '1'; 
       elsif ((addrP3var < nent(to_integer(unsigned(bx))*NUM_TPAGES+2)) and (mask(to_integer(unsigned(bx)))(2)='1') and (NUM_TPAGES > 2) and addrP3var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(2,2))&addrP3var;
+        addr_counter_pipe(0) <= std_logic_vector(to_unsigned(2,2))&addrP3var;
         addra <= bx&std_logic_vector(to_unsigned(2,2))&addrP3var;
         addrP3var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP3var)) + 1, addrP3var'length));
-        valid1 <= '1';       
+        valid_pipe(0) <= '1';       
       elsif ((addrP4var < nent(to_integer(unsigned(bx))*NUM_TPAGES+3)) and (mask(to_integer(unsigned(bx)))(3)='1') and (NUM_TPAGES > 3) and addrP4var < maxval) then
-        addr_counter <= std_logic_vector(to_unsigned(3,2))&addrP4var;
+        addr_counter_pipe(0) <= std_logic_vector(to_unsigned(3,2))&addrP4var;
         addra <= bx&std_logic_vector(to_unsigned(3,2))&addrP4var;
         addrP4var := std_logic_vector(to_unsigned(to_integer(unsigned(addrP4var)) + 1, addrP4var'length));
-        valid1 <= '1'; 
+        valid_pipe(0) <= '1'; 
       else
-        valid1 <= '0';
+        valid_pipe(0) <= '0';
       end if;
 
       addrP1 <= addrP1var;
@@ -186,13 +184,13 @@ begin
 
       enb <= '1';       
 
-      index <= addr_counter2;
+      index <= addr_counter_pipe(addr_counter_pipe'high);
     
       dout <= din;
 
       if (DEBUG) then
-        if (valid3='1') then
-          report "mem_reader: "&time'image(now)&" "&NAME&" addr="&to_hstring(addr_counter2)&"  din="&to_hstring(din)&" valid="&to_bstring(valid3);
+        if (valid_pipe(valid_pipe'high)='1') then
+          report "mem_reader: "&time'image(now)&" "&NAME&" addr="&to_hstring(addr_counter_pipe(addr_counter_pipe'high))&"  din="&to_hstring(din)&" valid="&to_bstring(valid_pipe(valid_pipe'high));
         end if;
       end if; 
         

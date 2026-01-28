@@ -1,0 +1,1 @@
+set_property strategy Performance_Auto_3 [get_runs impl_1]

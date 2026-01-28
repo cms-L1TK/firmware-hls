@@ -32,11 +32,11 @@ entity tb_to_tm is
     DW_49_valid    : in  t_arr_DW_49_1b;
     BW_46_data     : in  t_arr_BW_46_DATA;
     BW_46_valid    : in  t_arr_BW_46_1b;
-    start_of_orbit : in  std_logic;
-    start          : in  std_logic;
-    valid          : in  std_logic;
+    start_of_orbit360 : in  std_logic;
+    start_of_orbit240 : in  std_logic;
+    valid240          : in  std_logic;
     dout           : out ldata(0 to tbNumLinks - 1);
-    orbit360       : out std_logic_vector( 0 to tbNumSeedTypes - 1 )
+    orbit360       : out std_logic
     );
 end entity tb_to_tm;
 
@@ -101,8 +101,8 @@ architecture rtl of tb_to_tm is
   constant DW_r_pos       : natural := widthsTBphi(2) + widthsTBz(2);
   constant DW_phi_pos     : natural := widthsTBz(2);
   constant DW_z_pos       : natural := 0;
-  constant TB_LATENCY360  : natural := 571;
-  constant TB_LATENCY240  : natural := 378;
+  constant TB_LATENCY360  : natural := 585;
+  constant TB_LATENCY240  : natural := 389;
 
   constant widthTW_TM     : natural := 1 + widthTBseedType + widthTBinv2R 
                                        + widthTBphi0 + widthTBz0 
@@ -114,11 +114,19 @@ architecture rtl of tb_to_tm is
   constant widthSeed_TM   : natural := 1 + widthTBStubPhiRegion 
                                        + widthTBStubIndex; --11
 
-  constant PIPELINE_STAGES : natural := 2;
+  constant PIPELINE_STAGES : natural := 3;
+  type t_arr_t_arr_TW_113_1b is array(PIPELINE_STAGES-1 downto 0) of t_arr_TW_113_1b;
+  type t_arr_t_arr_TW_113_seed is array(0 to tbMaxNumProjectionLayers - 1) of t_arr_TW_113_seed;
+  type t_arr_t_arr_t_arr_TW_113_seed is array(PIPELINE_STAGES-1 downto 0) of t_arr_t_arr_TW_113_seed;
   type t_arr_t_arr_TW_113_data is array(PIPELINE_STAGES-1 downto 0) of t_arr_TW_113_data;
   type t_arr_t_arr_BW_46_data is array(PIPELINE_STAGES-1 downto 0) of t_arr_BW_46_data;
   type t_arr_t_arr_DW_49_data is array(PIPELINE_STAGES-1 downto 0) of t_arr_DW_49_data;
 
+  signal TW_113_valid_pipeline_0 : t_arr_t_arr_TW_113_1b := (others => (others => '0'));
+  signal TW_113_valid_pipeline_1 : t_arr_t_arr_TW_113_1b := (others => (others => '0'));
+  signal TW_113_valid_pipeline_2 : t_arr_t_arr_TW_113_1b := (others => (others => '0'));
+  signal TW_113_seed_pipeline : t_arr_t_arr_TW_113_seed := (others => (others => 0));
+  signal TW_113_proj_seed_pipeline : t_arr_t_arr_t_arr_TW_113_seed := (others => (others => (others => 0)));
   signal TW_113_data_pipeline : t_arr_t_arr_TW_113_data := (others => (others => (others => '0')));
   signal DW_49_data_pipeline  : t_arr_t_arr_DW_49_data := (others => (others => (others => '0')));
   signal BW_46_data_pipeline  : t_arr_t_arr_BW_46_data := (others => (others => (others => '0')));
@@ -157,32 +165,27 @@ architecture rtl of tb_to_tm is
       (AAAA_L1,AAAA_L3,AAAA_L3,AAAA_L3,AAAA_L3,AAAA_L3,AAAA_L3,AAAA_L3)  --L2D1
       );
 
+  attribute keep : string;
+  attribute keep of TW_113_valid_pipeline_0 : signal is "true";
+  attribute keep of TW_113_valid_pipeline_1 : signal is "true";
+  attribute keep of TW_113_valid_pipeline_2 : signal is "true";
+  attribute keep of TW_113_seed_pipeline : signal is "true";
+  attribute keep of TW_113_proj_seed_pipeline : signal is "true";
+  attribute keep of TW_113_data_pipeline : signal is "true";
+  attribute keep of DW_49_data_pipeline : signal is "true";
+  attribute keep of BW_46_data_pipeline : signal is "true";
+
 begin  -- architecture rtl
 
   --propagate start_of_orbit signal
-  --eventually, this should just be something like a long shift register
-  --currently, it is also a 240 MHz to 360 MHz CDC
-
-  --using frame 6 convention (first 6 frames empty in simulation) the following
-  --signal should only change on common 240/360 clock edges, making it safe to
-  --sample in either domain
-  --WARNING THIS MAY NOT WORK IN HARDWARE (depends on alignment of input)
-  start_of_orbit_latch <= '1' when start_of_orbit='1' else
-                          '0' when valid='0' else
-                          start_of_orbit_latch;
-
   p_orbit : process (clk360) is
   begin
     if rising_edge(clk360) then
 
-      start_of_orbit_latch_prev <= start_of_orbit_latch; 
-
-      sr_orbit <= (start_of_orbit_latch and (not start_of_orbit_latch_prev)) 
+      sr_orbit <= start_of_orbit360
                   & sr_orbit(sr_orbit'low to sr_orbit'high - 1);
 
-      for iseedtype in 0 to (tbNumSeedTypes-1) loop
-        orbit360(iseedtype) <= sr_orbit(sr_orbit'high-1);
-      end loop; 
+      orbit360 <= sr_orbit(sr_orbit'high-1);
 
     end if; --rising 360 edge
   end process p_orbit;
@@ -191,6 +194,7 @@ begin  -- architecture rtl
   p_demultiplex : process (clk240) is
 
     variable seed_type : natural range 0 to 7;
+    variable proj_seed_type : natural range 0 to 7;
     variable proj_idx : natural range 0 to 15;
     variable base_channel : natural range 0 to tbNumLinks-1;
     variable iBW_enum : enum_BW_46;
@@ -202,6 +206,13 @@ begin  -- architecture rtl
       --propagate pipelining
      
       for itw in TW_113_data'range loop
+        TW_113_valid_pipeline_0(0)(itw) <= (TW_113_valid(itw) and TW_113_data(itw)(TW_113_data(itw)'high));
+        TW_113_valid_pipeline_1(0)(itw) <= (TW_113_valid(itw) and TW_113_data(itw)(TW_113_data(itw)'high));
+        TW_113_valid_pipeline_2(0)(itw) <= (TW_113_valid(itw) and TW_113_data(itw)(TW_113_data(itw)'high));
+        TW_113_seed_pipeline(0)(itw) <= to_integer(unsigned(TW_113_data(itw)(widthTBseedType - 1 + TW_seedtype_pos downto TW_seedtype_pos)));
+        for iprojection in 0 to tbMaxNumProjectionLayers-1 loop
+          TW_113_proj_seed_pipeline(0)(iprojection)(itw) <= to_integer(unsigned(TW_113_data(itw)(widthTBseedType - 1 + TW_seedtype_pos downto TW_seedtype_pos)));
+        end loop;
         TW_113_data_pipeline(0)(itw) <= 
             (TW_113_valid(itw) and TW_113_data(itw)(TW_113_data(itw)'high)) 
             & TW_113_data(itw)(TW_113_data(itw)'high - 1 downto 0);
@@ -221,6 +232,13 @@ begin  -- architecture rtl
 
       for ipipe in 1 to PIPELINE_STAGES-1 loop
         for itw in TW_113_data'range loop
+          TW_113_valid_pipeline_0(ipipe)(itw) <= TW_113_valid_pipeline_0(ipipe-1)(itw);
+          TW_113_valid_pipeline_1(ipipe)(itw) <= TW_113_valid_pipeline_1(ipipe-1)(itw);
+          TW_113_valid_pipeline_2(ipipe)(itw) <= TW_113_valid_pipeline_2(ipipe-1)(itw);
+          TW_113_seed_pipeline(ipipe)(itw) <= TW_113_seed_pipeline(ipipe-1)(itw);
+          for iprojection in 0 to tbMaxNumProjectionLayers-1 loop
+            TW_113_proj_seed_pipeline(ipipe)(iprojection)(itw) <= TW_113_proj_seed_pipeline(ipipe-1)(iprojection)(itw);
+          end loop;
           TW_113_data_pipeline(ipipe)(itw) <= TW_113_data_pipeline(ipipe-1)(itw);
         end loop;
 
@@ -235,8 +253,8 @@ begin  -- architecture rtl
 
       -- propagate start and valid from input using pattern recognition latency
       -- and default all channels to null
-      sr_start <= start_of_orbit & sr_start(sr_start'low to sr_start'high - 1);
-      sr_valid <= valid & sr_valid(sr_valid'low to sr_valid'high - 1);
+      sr_start <= start_of_orbit240 & sr_start(sr_start'low to sr_start'high - 1);
+      sr_valid <= valid240 & sr_valid(sr_valid'low to sr_valid'high - 1);
       for ichannel in 0 to tbNumLinks-1 loop
         dout(ichannel) <= nulll;
         dout(ichannel).start_of_orbit <= sr_start(sr_start'high-1);
@@ -246,14 +264,14 @@ begin  -- architecture rtl
       --demultiplex track builder output into track processor channels
       --NB this style of loop not recommended for synthesis, but used elsewhere
       for itw in TW_113_data'range loop 
-        seed_type := to_integer(unsigned(TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBseedType - 1 + TW_seedtype_pos downto TW_seedtype_pos)));
+        seed_type := TW_113_seed_pipeline(PIPELINE_STAGES-1)(itw);
         base_channel := tbLimitsChannel(seed_type);
-        if (TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(TW_valid_pos)='1') then
+        if TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(TW_valid_pos) = '1' then
 
           --TM expects track, stubs, seeds, track, stubs, seeds, ...
           --assign track
           dout(base_channel).data(widthTW_TM - 1 downto 0) <= 
-              TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(TW_valid_pos)
+              TW_113_valid_pipeline_0(PIPELINE_STAGES-1)(itw)
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBseedType - 1 + TW_seedtype_pos downto TW_seedtype_pos)
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBinv2R - 1 + TW_inv2r_pos downto TW_inv2r_pos)
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBphi0 - 1 + TW_phi0_pos downto TW_phi0_pos)
@@ -264,18 +282,22 @@ begin  -- architecture rtl
           --We want Vivado to unroll these loops over seed types and projection
           --layers, but it is unclear if it will do so correctly. May need
           --optimization for implementation
-          for iprojection in 0 to tbNumsProjectionLayers(seed_type)-1 loop
-          --for iprojection in 0 to tbMaxNumProjectionLayers-1 loop
-            proj_idx := seedTypesProjectionLayers(seed_type)(iprojection);
+          for iprojection in 0 to tbMaxNumProjectionLayers-1 loop
+            proj_seed_type := TW_113_proj_seed_pipeline(PIPELINE_STAGES-1)(iprojection)(itw);
+            if iprojection > tbNumsProjectionLayers(proj_seed_type)-1 then
+              next;
+            end if;
+
+            proj_idx := seedTypesProjectionLayers(proj_seed_type)(iprojection);
 
             --L2L3_L6 projection doesn't exist
             --hacky fix for now, eventually modify either KF or tracklet
-            if seed_type = 1 and proj_idx = 6 then
+            if proj_seed_type = 1 and proj_idx = 6 then
               dout(base_channel+1+iprojection).data(widthBW_TM - 1 downto 0) <= (others => '0');
 
             --barrel
             elsif proj_idx >= 1 and proj_idx <= 6 then
-              iBW_enum := barrel_stub_lut(seed_type)(iprojection);
+              iBW_enum := barrel_stub_lut(proj_seed_type)(iprojection);
 
               dout(base_channel+1+iprojection).data(widthBW_TM - 1 downto 0) <= 
                   BW_46_data_pipeline(PIPELINE_STAGES-1)(iBW_enum)(BW_valid_pos)
@@ -286,7 +308,7 @@ begin  -- architecture rtl
 
             --disk
             elsif proj_idx >= 11 then
-              iDW_enum := disk_stub_lut(seed_type)(iprojection);
+              iDW_enum := disk_stub_lut(proj_seed_type)(iprojection);
 
               dout(base_channel+1+iprojection).data(widthDW_TM - 1 downto 0) <= 
                   DW_49_data_pipeline(PIPELINE_STAGES-1)(iDW_enum)(DW_valid_pos)
@@ -300,12 +322,12 @@ begin  -- architecture rtl
 
           --assign seeds
           dout(base_channel+tbNumsProjectionLayers(seed_type)+1).data(widthSeed_TM - 1 downto 0) <= 
-              TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(TW_valid_pos)
+              TW_113_valid_pipeline_1(PIPELINE_STAGES-1)(itw)
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBStubPhiRegion - 1 + TW_inPhiRegion_pos downto TW_inPhiRegion_pos) 
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBStubIndex - 1 + TW_inIndex_pos downto TW_inIndex_pos);
 
           dout(base_channel+tbNumsProjectionLayers(seed_type)+2).data(widthSeed_TM - 1 downto 0) <= 
-              TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(TW_valid_pos)
+              TW_113_valid_pipeline_2(PIPELINE_STAGES-1)(itw)
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBStubPhiRegion - 1 + TW_outPhiRegion_pos downto TW_outPhiRegion_pos) 
               & TW_113_data_pipeline(PIPELINE_STAGES-1)(itw)(widthTBStubIndex - 1 + TW_outIndex_pos downto TW_outIndex_pos);
 

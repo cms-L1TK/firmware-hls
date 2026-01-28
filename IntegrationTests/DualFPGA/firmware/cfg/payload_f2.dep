@@ -1,6 +1,6 @@
 src memUtil_pkg_f2.vhd
 src memUtil_aux_pkg_f2.vhd
-src payload_f2.vhd
+src --vhdl2008 payload_f2.vhd
 src linktosecproc2.vhd
 src sp2_mem_writer.vhd
 src tf2_wrapper.vhd
@@ -28,9 +28,14 @@ src --vhdl2008 common/hdl/tf_mem_tpar.vhd
 src --vhdl2008 common/hdl/mem_reader.vhd
 src common/hdl/tf_pkg.vhd
 src --vhdl2008 common/hdl/pipelining.vhd
+src common/hdl/tf_cdc_360_240MHz.vhd
+src common/hdl/tf_cdc_360_240MHz_wr.vhd
 
 #Floorplan
 src ../ucf/floorplan_f2.tcl
+
+# CDC clock constraints
+src common/hdl/constraints_f2.xdc
 
 ################
 # Include Cores
