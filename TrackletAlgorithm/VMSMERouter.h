@@ -156,11 +156,11 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStub<InType>& allStub,
+		AllStub<InType>& allStub, //////// change to allstubs, and use allstub
 		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
 		AllStubMemory<OutType> memoriesAS[],
 		// Array to count how many VMStubs written in each slot
-		unsigned int index,
+		unsigned int index, //////// dont need index, but need an index from the for loop
 		bool valid
 		) {
 

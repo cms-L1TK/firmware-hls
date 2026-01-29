@@ -100,11 +100,11 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "\n"
             "void %s(const BXType bx, BXType& bx_o,\n" % file_name +\
             "  // Input memories\n"
-            "  AllStub<inType>& allStub,\n"
+            "  AllStub<inType>& allStub,\n" ######### change to allstubs
             "  // Output memories\n"
             "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[NOutCopy],\n"
             "  AllStubMemory<outType> memoriesAS[NOutCopy],\n"
-            "  // Index of AllStub\n"
+            "  // Index of AllStub\n" ###### remove index
             "  unsigned int index,\n"
             "  // Bool if valid stub\n"
             "  bool valid\n"
@@ -130,12 +130,12 @@ def writeTopFile(vmr, output_dir):
             "void %s(\n" % file_name +\
             "  const BXType bx, BXType& bx_o,\n"
             "  // Input memories\n"
-            "  AllStub<inType>& allStub,\n"
+            "  AllStub<inType>& allStub,\n" ######
             "  // Output memories\n"
             "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[NOutCopy],\n"
             "  AllStubMemory<outType> memoriesAS[NOutCopy],\n"
             "  // Index of AllStub\n"
-            "  unsigned int index,\n"
+            "  unsigned int index,\n" #########
             "  // Bool if valid stub\n"
             "  bool valid\n"
             "  ) {\n"
