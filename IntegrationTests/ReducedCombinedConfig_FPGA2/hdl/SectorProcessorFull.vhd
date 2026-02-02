@@ -6745,7 +6745,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIA_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIAin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIAin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -6822,7 +6822,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIB_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIBin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIBin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -6897,7 +6897,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIC_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHICin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHICin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -6973,7 +6973,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHID_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIDin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIDin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7047,7 +7047,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIE_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIEin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIEin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIEn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7122,7 +7122,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIF_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIFin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIFin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIFn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7196,7 +7196,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIG_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIGin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIGin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIGn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7270,7 +7270,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L1PHIH_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L1PHIHin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L1PHIHin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L1PHIHn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7345,7 +7345,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L2PHIA_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L2PHIAin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L2PHIAin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7420,7 +7420,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L2PHIB_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L2PHIBin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L2PHIBin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7495,7 +7495,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L2PHIC_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L2PHICin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L2PHICin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7570,7 +7570,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L2PHID_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L2PHIDin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L2PHIDin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L2PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7645,7 +7645,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L3PHIA_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L3PHIAin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L3PHIAin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7719,7 +7719,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L3PHIB_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L3PHIBin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L3PHIBin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7795,7 +7795,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L3PHIC_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L3PHICin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L3PHICin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7871,7 +7871,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L3PHID_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L3PHIDin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L3PHIDin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L3PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -7947,7 +7947,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L4PHIA_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L4PHIAin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L4PHIAin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIAn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -8023,7 +8023,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L4PHIB_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L4PHIBin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L4PHIBin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIBn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -8097,7 +8097,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L4PHIC_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L4PHICin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L4PHICin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHICn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
@@ -8171,7 +8171,7 @@ begin
       ap_rst   => reset,
       bx_V         => VMSMER_L4PHID_bx,  -- Same as legacy, in port
       valid        =>     or(AS_L4PHIDin_data_FIFO),
-      index        =>     (others => '0'),  
+      -- index        =>     (others => '0'),  
       allStub_data_V    => AS_L4PHIDin_data_FIFO,  -- my new data, no delay
       memoryME_0_dataarray_0_data_V_ce0       => open,  -- same as legacy
       memoryME_0_dataarray_0_data_V_we0       => VMSME_L4PHIDn2_wea,  -- same as legacy, since out port anyway, remove legacy block to avoid conflict
