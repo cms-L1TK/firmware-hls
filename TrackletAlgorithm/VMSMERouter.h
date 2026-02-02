@@ -160,7 +160,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
 		AllStubMemory<OutType> memoriesAS[],
 		// Array to count how many VMStubs written in each slot
-		unsigned int index, //////// dont need index, but need an index from the for loop
+		// unsigned int index, //////// legacy port, connected from mem_reader
 		bool valid
 		) {
 
@@ -168,6 +168,15 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 #pragma HLS array_partition variable=memoryME dim=1
 #pragma HLS array_partition variable=memoriesAS dim=1
 #pragma HLS latency min=13 max=13
+
+  ////////////////////////////////////////
+  //  Reconstruct index here
+  static BXType bx_prev = 0;
+  static ap_uint<7> index = 0;
+  if (valid && bx != bx_prev){
+	bx_prev = bx;
+	index = 0;
+  }
 
   
   bool disk2S = false; // Used to determine if DISK2S
@@ -219,6 +228,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 #pragma HLS UNROLL
       memoryME[i].write_mem(slotME, stubME);
     }
+  index++;
   }
   
   

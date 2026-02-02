@@ -92,7 +92,7 @@ int main() {
                 allStub,
                 memoryME,
                 memoriesASCopy,
-                index,
+                // index,
                 valid);
 
     }
