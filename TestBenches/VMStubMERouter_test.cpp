@@ -80,22 +80,33 @@ int main() {
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
-    for (int index = 0; index < kMaxProc(); ++index){
+    cout << "number entries = " << memoriesAS.getEntries(ievt)<< endl;
+    AllStub<inType> hInputStubs[kMaxProc()];
+    for( size_t cStubIndx=0; cStubIndx < kMaxProc(); cStubIndx++){
+      cout << "cStubIndx"<< cStubIndx << endl;
+      if (cStubIndx < memoriesAS.getEntries(ievt)){
+        hInputStubs[cStubIndx]=memoriesAS.read_mem(ievt, cStubIndx);
+      } else {
+        hInputStubs[cStubIndx]=AllStub<inType>();
+      }
+    }
+    cout << "copy data to hinput" << endl;
 
       // bx - bunch crossing
-      BXType bx = ievt;
-      BXType bx_out;
-      AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
-      bool valid = index < memoriesAS.getEntries(ievt);
+    BXType bx = ievt;
+    BXType bx_out;
+
+      // AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
+      // bool valid = index < memoriesAS.getEntries(ievt);
       // Unit Under Test
-      TOP_FUNC_(bx, bx_out, 
-                allStub,
+    TOP_FUNC_(bx, bx_out, 
+                hInputStubs,
                 memoryME,
                 memoriesASCopy,
                 // index,
-                valid);
-
-    }
+                true);
+    cout << "called vmsmer" << endl;
+    
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect
     bool truncation = false;

@@ -156,7 +156,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 		const int METable[],
 		const int phiCorrTable[],
 		// Input memories
-		AllStub<InType>& allStub, //////// change to allstubs, and use allstub
+		AllStub<InType>* allStubs, //////// 
 		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
 		AllStubMemory<OutType> memoriesAS[],
 		// Array to count how many VMStubs written in each slot
@@ -169,68 +169,67 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 #pragma HLS array_partition variable=memoriesAS dim=1
 #pragma HLS latency min=13 max=13
 
-  ////////////////////////////////////////
-  //  Reconstruct index here
-  static BXType bx_prev = 0;
-  static ap_uint<7> index = 0;
-  if (valid && bx != bx_prev){
-	bx_prev = bx;
-	index = 0;
-  }
 
-  
-  bool disk2S = false; // Used to determine if DISK2S
-  bool negDisk = false; // Used to determine if it's negative disk
-	
-  AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw());
-  AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allStub.raw());
-  AllStub<OutType>      stub_copy = AllStub<OutType>(allStub.raw());
+  LOOP_ProcessVMSMER:
+  	for (int cStubCounter = 0; cStubCounter < kMaxProc(); cStubCounter++) {
+        AllStub<InType> allStub = allStubs[cStubCounter];
+		if (allStub.raw() == 0) 
+		  continue;
 
-  
-  ////////////////////////////////////////
-  // AllStub memories
+  		bool disk2S = false; // Used to determine if DISK2S
+  		bool negDisk = false; // Used to determine if it's negative disk
 	
-  ///AllStub<OutType> allstub = allStub.raw();
+
+
+
+  		AllStub<DISKPS>       stub_ps = AllStub<DISKPS>(allStub.raw());
+  		AllStub<DISK2S>       stub_2s = AllStub<DISK2S>(allStub.raw());
+  		AllStub<OutType>      stub_copy = AllStub<OutType>(allStub.raw());
+
+////////////////////////////////////////
+// AllStub memories
+	
+///AllStub<OutType> allstub = allStub.raw();
 
   
   // Write stub to all memory copies
   // It seems that the if (nAllCopies > 0) should not be needed,
   // but if nAllCopies is zero it generates an error in vivado_hls
-  if (valid) {
-    for (unsigned int i=0; i<NOutCopy; i++) {
-#pragma HLS UNROLL
-      memoriesAS[i].write_mem(stub_copy);
-    }
-  }
+		if (valid) {
+			for (unsigned int i=0; i<NOutCopy; i++) {
+		#pragma HLS UNROLL
+			memoriesAS[i].write_mem(stub_copy);
+			}
+		}
 
-  constexpr bool isDisk = (Disk > 0);
-  if (isDisk) {
-    disk2S = !stub_ps.isPSStub();
-    if (disk2S) negDisk = stub_2s.getND();
-    else negDisk = stub_ps.getND();
-  }
+		constexpr bool isDisk = (Disk > 0);
+		if (isDisk) {
+			disk2S = !stub_ps.isPSStub();
+			if (disk2S) negDisk = stub_2s.getND();
+			else negDisk = stub_ps.getND();
+		}
 
   /////////////////////////////////////////////
   // ME memories
-  
-  int slotME; // The bin the stub is going to be put in, in the memory
-	
-  // Create the ME stub to save
+		
+		int slotME; // The bin the stub is going to be put in, in the memory
+			
+		// Create the ME stub to save
 
-  if (valid) {
-    VMStub<OutType> stubME = (disk2S) ? 
-      createVMStubME<VMStub<OutType>, DISK2S, Layer, Disk>(stub_2s, index, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
-      createVMStubME<VMStub<OutType>, DISKPS, Layer, Disk>(stub_ps, index, negDisk, METable, phiCorrTable, slotME) : 
-      createVMStubME<VMStub<OutType>, InType, Layer, Disk>(allStub, index, negDisk, METable, phiCorrTable, slotME);
-    
-    // Write the ME stub
-    for (unsigned int i=0; i<NOutCopy; i++) {
-#pragma HLS UNROLL
-      memoryME[i].write_mem(slotME, stubME);
-    }
-  index++;
-  }
-  
+		if (valid) {
+			VMStub<OutType> stubME = (disk2S) ? 
+			createVMStubME<VMStub<OutType>, DISK2S, Layer, Disk>(stub_2s, cStubCounter, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
+			createVMStubME<VMStub<OutType>, DISKPS, Layer, Disk>(stub_ps, cStubCounter, negDisk, METable, phiCorrTable, slotME) : 
+			createVMStubME<VMStub<OutType>, InType, Layer, Disk>(allStub, cStubCounter, negDisk, METable, phiCorrTable, slotME);
+			
+			// Write the ME stub
+			for (unsigned int i=0; i<NOutCopy; i++) {
+		#pragma HLS UNROLL
+			memoryME[i].write_mem(slotME, stubME);
+			}
+		
+		}
+}
   
   bx_o = bx;
 } // End VMRouterCM

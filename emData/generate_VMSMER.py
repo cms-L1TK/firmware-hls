@@ -100,7 +100,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "\n"
             "void %s(const BXType bx, BXType& bx_o,\n" % file_name +\
             "  // Input memories\n"
-            "  AllStub<inType>& allStub,\n" ######### change to allstubs?? but we only receive one entry per clock
+            "  AllStub<inType> allStubs[kMaxProc()],\n" 
             "  // Output memories\n"
             "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[NOutCopy],\n"
             "  AllStubMemory<outType> memoriesAS[NOutCopy],\n"
@@ -130,7 +130,7 @@ def writeTopFile(vmr, output_dir):
             "void %s(\n" % file_name +\
             "  const BXType bx, BXType& bx_o,\n"
             "  // Input memories\n"
-            "  AllStub<inType>& allStub,\n" ######??
+            "  AllStub<inType> allStubs[kMaxProc()],\n" 
             "  // Output memories\n"
             "  VMStubMemory<outType, kNbitsrzbinME, kNbitsphibin, kNMatchEngines> memoryME[NOutCopy],\n"
             "  AllStubMemory<outType> memoriesAS[NOutCopy],\n"
@@ -169,7 +169,7 @@ def writeTopFile(vmr, output_dir):
             "    METable,\n"
             "    phiCorrTable,\n"
             "    // Input memories\n"
-            "    allStub,\n"
+            "    allStubs,\n"
             "    // Output memories\n"
             "    memoryME,\n"
             "    memoriesAS,\n"
