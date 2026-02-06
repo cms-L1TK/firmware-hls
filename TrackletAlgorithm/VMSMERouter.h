@@ -153,8 +153,8 @@ inline T createVMStubME(const AllStub<inType>& allStub,
 template<int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int phiRegSize, int NOutCopy=1>
 void VMSMERouter(const BXType bx, BXType& bx_o,
 		// LUTs
-		const int METable[],
-		const int phiCorrTable[],
+	    const int METable[],
+        const int phiCorrTable[],
 		// Input memories
 		AllStub<InType>* allStubs, //////// 
 		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
