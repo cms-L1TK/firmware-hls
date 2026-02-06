@@ -266,6 +266,11 @@ constant FILE_OUT_TF          : string := dataOutDir&"TF_";
   signal AS_L4PHIDin_empty_neg_FIFO : std_logic;
   signal AS_L4PHIDin_data_FIFO      :  t_AS_36_DATA := (others => '0');   -- same as mem_reader 
 
+
+  -- ######### New signals FileReaderFIFO
+  signal MPAR_L5L6ABCDin_empty_neg_FIFO : std_logic;
+  signal MPAR_L5L6ABCDin_din_FIFO      : t_MPAR_73_DATA       := (others => '0');   -- same as mem_reader 
+
   signal AS_L1PHIAn2_wea            : t_AS_36_1b           := '0';
   signal AS_L1PHIAn2_writeaddr      : t_AS_36_ADDR         := (others => '0');
   signal AS_L1PHIAn2_din            : t_AS_36_DATA         := (others => '0');
@@ -388,7 +393,7 @@ constant FILE_OUT_TF          : string := dataOutDir&"TF_";
   signal VMSME_L4PHIDn2_din         : t_VMSME_17_DATA      := (others => '0');
   signal MPAR_L5L6ABCDin_wea        : t_MPAR_73_1b         := '0';
   signal MPAR_L5L6ABCDin_writeaddr  : t_MPAR_73_ADDR       := (others => '0');
-  signal MPAR_L5L6ABCDin_din        : t_MPAR_73_DATA       := (others => '0');
+  signal MPAR_L5L6ABCDin_din        : t_MPAR_73_DATA       := (others => '0');  -- ########### can remove
   signal MPAR_L5L6ABCD_wea          : t_MPAR_73_1b         := '0';
   signal MPAR_L5L6ABCD_writeaddr    : t_MPAR_73_ADDR       := (others => '0');
   signal MPAR_L5L6ABCD_din          : t_MPAR_73_DATA       := (others => '0');
@@ -1291,8 +1296,8 @@ begin
     readAS_L4PHIDin_FIFO : entity work.FileReaderFIFO
   generic map (
       FILE_NAME       => FILE_IN_AS_36&"AS_L4PHIDn1"&inputFileNameEnding,
-    FIFO_WIDTH      => 36,  
-    DEBUG           => true,
+      FIFO_WIDTH      => 36,  
+      DEBUG           => true,
       FILE_NAME_DEBUG => FILE_OUT_AS_36&"AS_L4PHIDin_debug"&debugFileNameEnding
   )
   port map(
@@ -1325,6 +1330,24 @@ begin
       START           => START_MPAR_L5L6ABCDin,
       WRITE_EN        => MPAR_L5L6ABCDin_wea
     );
+
+  -- ###### New instantiation using FileReaderFIFO
+    readMPAR_L5L6ABCDin_FIFO : entity work.FileReaderFIFO
+  generic map (
+      FILE_NAME       => FILE_IN_MPAR_73&"MPAR_L5L6ABCD"&inputFileNameEnding,
+      FIFO_WIDTH      => 73,  
+      DEBUG           => true,
+      FILE_NAME_DEBUG => FILE_OUT_MPAR_73&"MPAR_L5L6ABCDin_debug"&debugFileNameEnding
+  )
+  port map(
+      CLK             => CLK240,  -- same as before
+      LOCKED          => LOCKED,   -- same as before
+      READ_EN         => PC_start, 
+      EMPTY_NEG       => MPAR_L5L6ABCDin_empty_neg_FIFO, -- OUT decleared a signal earlier
+      DATA            => MPAR_L5L6ABCDin_din_FIFO,  -- OUT decleared a signal earlier
+      START           => open   -- OUT same as legacy
+  );
+
   -- As all MPAR signals start together, take first one, to determine when
   -- first event starts being written to first memory in chain.
   START_FIRST_WRITE <= START_MPAR_L5L6ABCDin;
@@ -1348,7 +1371,7 @@ begin
 
           -- PC should start one TM period after time when first event starting being 
           -- written to first memory in chain, as it takes this long to write full event.
-          PC_START <= '1';       -- @@@@@@@ read_en
+          PC_START <= '1';      
           PC_BX_IN <= std_logic_vector(to_unsigned(EVENT_COUNT, PC_BX_IN'length));
 
           write(v_line, string'("=== Processing event ")); write(v_line,EVENT_COUNT); write(v_line, string'(" at SIM time ")); write(v_line, NOW); writeline(output, v_line);
@@ -1692,7 +1715,12 @@ begin
         -- ###### 
         MPAR_L5L6ABCDin_wea        => MPAR_L5L6ABCDin_wea,
         MPAR_L5L6ABCDin_writeaddr  => MPAR_L5L6ABCDin_writeaddr,
-        MPAR_L5L6ABCDin_din        => MPAR_L5L6ABCDin_din,
+
+        -- ###### Legacy port
+        -- MPAR_L5L6ABCDin_din        => MPAR_L5L6ABCDin_din,
+
+        -- ######### New port
+        MPAR_L5L6ABCDin_din   => MPAR_L5L6ABCDin_din_FIFO,
         -- Debug output data
         VMSME_L1PHIAn2_wea         => VMSME_L1PHIAn2_wea,
         VMSME_L1PHIAn2_writeaddr   => VMSME_L1PHIAn2_writeaddr,

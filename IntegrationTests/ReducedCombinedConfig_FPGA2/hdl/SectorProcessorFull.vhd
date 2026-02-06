@@ -4791,7 +4791,7 @@ begin
         start      => VMSME_L4PHIDn2_start
       );
 
-    MPAR_L5L6ABCDin : entity work.tf_mem_tpar
+    MPAR_L5L6ABCDin : entity work.tf_mem_tpar -- do we still want this ???? 
       generic map (
         RAM_WIDTH       => 73,
         NUM_PAGES       => 8,
@@ -8236,15 +8236,113 @@ begin
       bx => PC_L5L6ABCD_bx
   );
 
-  PC_L5L6ABCD : entity work.PC_L5L6ABCD
+  -- ######## legacy pc ########
+  -- PC_L5L6ABCD : entity work.PC_L5L6ABCD
+  --   port map (
+  --     ap_clk   => clk240,
+  --     ap_rst   => reset,
+  --     ap_start => '1',
+  --     bx_V          => PC_L5L6ABCD_bx,
+  --     valid        => MPAR_L5L6ABCDin_valid,
+  --     trackletindex_V        => MPAR_L5L6ABCDin_trackletindex,
+  --     tpar_data_V        => MPAR_L5L6ABCDin_V_tpar,
+  --     tparout_dataarray_data_V_ce0       => open,
+  --     tparout_dataarray_data_V_we0       => MPAR_L5L6ABCD_wea,
+  --     tparout_dataarray_data_V_address0  => MPAR_L5L6ABCD_writeaddr,
+  --     tparout_dataarray_data_V_d0        => MPAR_L5L6ABCD_din,
+  --     projout_barrel_ps_0_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_0_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIA_wea,
+  --     projout_barrel_ps_0_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIA_writeaddr,
+  --     projout_barrel_ps_0_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIA_din,
+  --     projout_barrel_ps_1_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_1_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIB_wea,
+  --     projout_barrel_ps_1_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIB_writeaddr,
+  --     projout_barrel_ps_1_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIB_din,
+  --     projout_barrel_ps_2_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_2_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIC_wea,
+  --     projout_barrel_ps_2_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIC_writeaddr,
+  --     projout_barrel_ps_2_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIC_din,
+  --     projout_barrel_ps_3_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_3_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHID_wea,
+  --     projout_barrel_ps_3_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHID_writeaddr,
+  --     projout_barrel_ps_3_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHID_din,
+  --     projout_barrel_ps_4_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_4_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIE_wea,
+  --     projout_barrel_ps_4_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIE_writeaddr,
+  --     projout_barrel_ps_4_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIE_din,
+  --     projout_barrel_ps_5_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_5_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIF_wea,
+  --     projout_barrel_ps_5_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIF_writeaddr,
+  --     projout_barrel_ps_5_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIF_din,
+  --     projout_barrel_ps_6_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_6_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIG_wea,
+  --     projout_barrel_ps_6_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIG_writeaddr,
+  --     projout_barrel_ps_6_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIG_din,
+  --     projout_barrel_ps_7_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_7_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L1PHIH_wea,
+  --     projout_barrel_ps_7_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L1PHIH_writeaddr,
+  --     projout_barrel_ps_7_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L1PHIH_din,
+  --     projout_barrel_ps_8_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_8_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L2PHIA_wea,
+  --     projout_barrel_ps_8_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L2PHIA_writeaddr,
+  --     projout_barrel_ps_8_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L2PHIA_din,
+  --     projout_barrel_ps_9_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_9_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L2PHIB_wea,
+  --     projout_barrel_ps_9_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L2PHIB_writeaddr,
+  --     projout_barrel_ps_9_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L2PHIB_din,
+  --     projout_barrel_ps_10_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_10_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L2PHIC_wea,
+  --     projout_barrel_ps_10_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L2PHIC_writeaddr,
+  --     projout_barrel_ps_10_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L2PHIC_din,
+  --     projout_barrel_ps_11_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_11_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L2PHID_wea,
+  --     projout_barrel_ps_11_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L2PHID_writeaddr,
+  --     projout_barrel_ps_11_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L2PHID_din,
+  --     projout_barrel_ps_12_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_12_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L3PHIA_wea,
+  --     projout_barrel_ps_12_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L3PHIA_writeaddr,
+  --     projout_barrel_ps_12_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L3PHIA_din,
+  --     projout_barrel_ps_13_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_13_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L3PHIB_wea,
+  --     projout_barrel_ps_13_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L3PHIB_writeaddr,
+  --     projout_barrel_ps_13_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L3PHIB_din,
+  --     projout_barrel_ps_14_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_14_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L3PHIC_wea,
+  --     projout_barrel_ps_14_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L3PHIC_writeaddr,
+  --     projout_barrel_ps_14_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L3PHIC_din,
+  --     projout_barrel_ps_15_dataarray_data_V_ce0       => open,
+  --     projout_barrel_ps_15_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L3PHID_wea,
+  --     projout_barrel_ps_15_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L3PHID_writeaddr,
+  --     projout_barrel_ps_15_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L3PHID_din,
+  --     projout_barrel_2s_0_dataarray_data_V_ce0       => open,
+  --     projout_barrel_2s_0_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L4PHIA_wea,
+  --     projout_barrel_2s_0_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L4PHIA_writeaddr,
+  --     projout_barrel_2s_0_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L4PHIA_din,
+  --     projout_barrel_2s_1_dataarray_data_V_ce0       => open,
+  --     projout_barrel_2s_1_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L4PHIB_wea,
+  --     projout_barrel_2s_1_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L4PHIB_writeaddr,
+  --     projout_barrel_2s_1_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L4PHIB_din,
+  --     projout_barrel_2s_2_dataarray_data_V_ce0       => open,
+  --     projout_barrel_2s_2_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L4PHIC_wea,
+  --     projout_barrel_2s_2_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L4PHIC_writeaddr,
+  --     projout_barrel_2s_2_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L4PHIC_din,
+  --     projout_barrel_2s_3_dataarray_data_V_ce0       => open,
+  --     projout_barrel_2s_3_dataarray_data_V_we0       => MPROJ_L5L6ABCD_L4PHID_wea,
+  --     projout_barrel_2s_3_dataarray_data_V_address0  => MPROJ_L5L6ABCD_L4PHID_writeaddr,
+  --     projout_barrel_2s_3_dataarray_data_V_d0        => MPROJ_L5L6ABCD_L4PHID_din
+  -- );
+
+
+    -- ######## new pc ########
+  PC_L5L6ABCD_FIFO : entity work.PC_L5L6ABCD
     port map (
-      ap_clk   => clk240,
-      ap_rst   => reset,
-      ap_start => '1',
-      bx_V          => PC_L5L6ABCD_bx,
+      ap_clk   => clk240,  -- same
+      ap_rst   => reset,  --same
+      ap_start => '1',  -- same
+      bx_V          => PC_L5L6ABCD_bx,  -- from a delay and earlier from the in port of the SectorProcessor
       valid        => MPAR_L5L6ABCDin_valid,
-      trackletindex_V        => MPAR_L5L6ABCDin_trackletindex,
-      tpar_data_V        => MPAR_L5L6ABCDin_V_tpar,
+      trackletindex_V        => MPAR_L5L6ABCDin_trackletindex,  -- need to change in the ProjectionCalculator.h
+      tpar_data_V        => MPAR_L5L6ABCDin_din,  -- changed, directly from the in port
       tparout_dataarray_data_V_ce0       => open,
       tparout_dataarray_data_V_we0       => MPAR_L5L6ABCD_wea,
       tparout_dataarray_data_V_address0  => MPAR_L5L6ABCD_writeaddr,
