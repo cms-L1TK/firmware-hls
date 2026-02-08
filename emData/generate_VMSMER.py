@@ -144,9 +144,8 @@ def writeTopFile(vmr, output_dir):
         )
 
         top_file.write(
-            "#pragma HLS interface ap_ctrl_none port=return\n"
+            "#pragma HLS interface register port = bx_o\n"
             "#pragma HLS stream variable = allStubs depth = 108\n"
-            "#pragma HLS pipeline II=1\n"
             "\n"
             "  ///////////////////////////\n"
             "  // Open Lookup tables\n"
