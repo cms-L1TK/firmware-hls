@@ -153,7 +153,7 @@ begin
     q(i).last <= sr(sr'high).last;
     q(i).valid <= sr(sr'high).valid;
   end generate;
-  control_signals2 : for i in 20 to 54 generate
+  control_signals2 : for i in 20 to 55 generate
     q(i).start_of_orbit <= sr(sr'high).start_of_orbit;
     q(i).start <= sr(sr'high).start;
     q(i).last <= sr(sr'high).last;
@@ -191,6 +191,9 @@ begin
                                               and sr_valid='1' 
                                               and sr_valid_prev='0') else
                      x"000000000000000";
+
+  -- Configure FPGA2 to read BX value from data stream
+  q(55).data(1 downto 0) <= "10";
 
   --debug
   --q(55).data(2 downto 0) <= bx_in;

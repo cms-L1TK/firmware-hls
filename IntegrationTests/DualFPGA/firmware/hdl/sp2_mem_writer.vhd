@@ -23,6 +23,7 @@ entity sp2_mem_writer is
     AS_36_link_valid          : in t_arr_AS_36_1b;
     MPAR_73_link_valid        : in t_arr_MTPAR_73_1b;
     bx_link_valid             : in std_logic;
+    bx_src_internal           : in std_logic;
     AS_36_wea                 : out t_arr_AS_36_1b;
     AS_36_writeaddr           : out t_arr_AS_36_ADDR;
     AS_36_din                 : out t_arr_AS_36_DATA;
@@ -51,6 +52,8 @@ architecture rtl of sp2_mem_writer is
 
   signal MPAR_73_pge     : t_arr_MTPAR_73_2b            := (others => "00");
   signal bx_prev         : std_logic_vector(2 downto 0) := "000";
+  signal bx_counter      : unsigned(2 downto 0)         := (others => '0');
+  signal bx_next         : unsigned(2 downto 0)         := (others => '0');
   signal AS_36_wea_int   : t_arr_AS_36_1b               := (others => '0');
   signal MPAR_73_wea_int : t_arr_MTPAR_73_1b            := (others => '0');
   signal AS_36_din_int   : t_arr_AS_36_DATA             := (others => (others => '0'));
@@ -128,19 +131,21 @@ begin -- architecture rtl
           --generate start when BX rolls from 0 to 1
           if (bx_link_valid='1' and bx_link_data="001" and bx_prev="000") then
             sync_counter <= (others => '0');
+            bx_counter <= to_unsigned(1, 3);
             PC_start_int <= '1';
             sectorprocessor_ctrl <= S_ACTIVE;
           end if;
 
         when S_ACTIVE =>
           --generate reset if BX change is not sync'd w/ counter
-          if (to_integer(sync_counter) = 107) then 
+          if (to_integer(sync_counter) = 107) then
             sync_counter <= (others => '0');
+            bx_counter <= bx_counter + 1;
           else
             sync_counter <= sync_counter+1;
           end if;
           if ((bx_link_valid='1' and bx_link_data /= bx_prev
-              and to_integer(sync_counter) /= 107) or rst = '1') then 
+              and to_integer(sync_counter) /= 107) or rst = '1') then
             sync_counter <= (others => '0');
             PC_start_int <= '0';
             HLS_reset_int <= '1';
@@ -159,6 +164,12 @@ begin -- architecture rtl
 
       end case;
 
+      if (bx_src_internal = '1') then
+        bx_next <= bx_counter - 1;
+      else
+        bx_next <= unsigned(bx_prev) - 1;
+      end if;
+
     end if; --rising clock edge
   end process p_writemem;
 
@@ -171,7 +182,7 @@ begin -- architecture rtl
   MPAR_73_wea_pipeline0 <= MPAR_73_wea_int;
   AS_36_din_pipeline0 <= AS_36_din_int;
   MPAR_73_din_pipeline0 <= MPAR_73_din_int;
-  PC_bx_in_pipeline <= std_logic_vector(unsigned(bx_prev)-1);
+  PC_bx_in_pipeline <= std_logic_vector(bx_next);
   PC_start_pipeline <= PC_start_int;
   HLS_reset <= HLS_reset_int;
   AS_36_writeaddr <= AS_36_writeaddr_pipeline;

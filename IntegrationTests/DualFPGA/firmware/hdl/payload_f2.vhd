@@ -52,6 +52,7 @@ architecture rtl of emp_payload is
   signal MPAR_73_link_valid    : t_arr_MTPAR_73_1b;
   signal bx_link_data          : std_logic_vector(2 downto 0);
   signal bx_link_valid         : std_logic;
+  signal bx_src_internal        : std_logic;
   signal PC_start              : std_logic;
   signal PC_bx_in              : std_logic_vector(2 downto 0);
   signal HLS_reset             : std_logic;
@@ -90,7 +91,8 @@ begin
       bx_link_data       => bx_link_data,
       AS_36_link_valid   => AS_36_link_valid,
       MPAR_73_link_valid => MPAR_73_link_valid,
-      bx_link_valid      => bx_link_valid
+      bx_link_valid      => bx_link_valid,
+      bx_src_internal     => bx_src_internal
       );
 
   -----------------------------------------------------------------------------
@@ -106,6 +108,7 @@ begin
       AS_36_link_valid   => AS_36_link_valid,
       MPAR_73_link_valid => MPAR_73_link_valid,
       bx_link_valid      => bx_link_valid,
+      bx_src_internal     => bx_src_internal,
       AS_36_wea          => AS_36_wea,
       AS_36_writeaddr    => AS_36_writeaddr,
       AS_36_din          => AS_36_din,
