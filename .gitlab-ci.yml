@@ -1,322 +1,282 @@
+################################################################################
+# Global definitions
+#-------------------------------------------------------------------------------
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-  VIVADO_PATH_SH: '/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh'
-  CLANG_TIDY_PATH: '/opt/rh/llvm-toolset-7.0/root/bin/clang-tidy'
-  CLANG_TIDY_OPTIONS: '-format-style=file' #-config='' does not work because of the quotes; -header-filter in .clang-tidy
-  CLANG_TIDY_COMP_OPTIONS: '-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2 -I../TopFunctions/CombinedConfig -I../TestBenches -I/nfs/data41/software/Xilinx/Vivado/${VIVADO_VERSION}/include'
+  VIVADO_VERSION: "2019.2"
+  HLS_COMMAND: "vivado_hls"
 
-stages: # ---------------------------------------------------------------------
-  - lint
-  - download
-  - quality-check
-  - hls-build
-  - topTF-sim
-  - check-results
-  - topTF-synth
+stages:
+  - Python checks
+  - Setup
+  - HLS checks
+  - Create projects
+  - Simulate
+  - Check simulation results
+  - Synthesize
+  - Implement
+################################################################################
 
-# Job templates ---------------------------------------------------------------
-.job_template: &template_base
+################################################################################
+# Job templates
+#-------------------------------------------------------------------------------
+.vivado-job:
+  image: registry.cern.ch/ci4fpga/vivado:$VIVADO_VERSION
   tags:
-    - xilinx-tools
-  before_script:
-    - source $VIVADO_PATH_SH
-
-.job_template: &template_static-check-python
-  tags:
-    - xilinx-tools
-  stage: lint
-  before_script:
-    - which python3
-    - python3 --version
-    - python3 -m pylint --version
-
-.job_template: &template_quality-check
-  needs: ["download"]
-  tags:
-    - xilinx-tools
-  stage: quality-check
-  before_script:
-    # Needed for new tool version
-    - source /opt/rh/llvm-toolset-7.0/enable
-  script:
-    - pwd; ls -la; ls -la TrackletAlgorithm/;
-    - cd project
-    - pwd; ls -la; # Debug
-    # Hard coded -config='' because the quotes do not work in the variable
-    - ${CLANG_TIDY_PATH} -config='' ${CLANG_TIDY_OPTIONS} ${CLANG_TIDY_FILES} -- ${CLANG_TIDY_COMP_OPTIONS} ${CLANG_TIDY_INCLUDES}
-
-.job_template: &template_hls-build
-  <<: *template_base
-  stage: hls-build
-  script:
-    - cd project
-    - pwd; ls -la; # Debug
-    - ${EXECUTABLE} -f "script_${PROJ_NAME}.tcl"
+    - fpga-mid
+  dependencies:
+    - download
+  after_script:
+    - cd emData/
+    - ./clean.sh > /dev/null 2>&1
   artifacts:
-    when: on_success
-    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
-    paths:
-      - ./project/
+    name: "$CI_JOB_STAGE-$CI_JOB_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    untracked: true
     expire_in: 1 week
 
-.job_template: &template_topTF-sim
-  <<: *template_base
-  stage: topTF-sim
+.hls-job:
+  extends: .vivado-job
+  stage: HLS checks
+  variables:
+    NOUSE: Synthesis,Implementation
   script:
-    - cd IntegrationTests/${PROJ_NAME}/script
-    - pwd; ls -la; #debug
+    - cd project/
+    - $HLS_COMMAND -f script_$MODULE.tcl
+
+.create-project:
+  extends: .vivado-job
+  stage: Create projects
+  tags:
+    - fpga-large
+  variables:
+    NOUSE: Synthesis,Implementation
+  script:
+    - cd IntegrationTests/$PROJECT/script/
     - make -j`nproc` Work
-    - vivado -mode batch -source ./runSim.tcl | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
-  artifacts:
-    when: on_success
-    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
-    paths:
-      - ./IntegrationTests/${PROJ_NAME}/script/
-    expire_in: 1 week
+  after_script:
+    - cd IntegrationTests/$PROJECT/script/
+    - rm -rf Work vivado*
+    - cd -
+    - cd emData/
+    - ./clean.sh > /dev/null 2>&1
 
-.job_template: &template_check-results
-  <<: *template_base
-  stage: check-results
+.sim-project:
+  extends: .vivado-job
+  stage: Simulate
+  variables:
+    NOUSE: Synthesis,Implementation
   script:
-    - cd IntegrationTests/${PROJ_NAME}/script
-    # Compare HDL sim output with Mem/Prints
+    - cd IntegrationTests/$PROJECT/script/
+    - vivado -mode batch -source ./makeProject.tcl
+    - vivado -mode batch -source ./runSim.tcl
+  after_script:
+    - cd IntegrationTests/$PROJECT/script/
+    - find -mindepth 1 -maxdepth 1 -type d ! -regex ".*\/dataOut$" -exec rm -rf {} \;
+    - cd -
+    - cd emData/
+    - ./clean.sh > /dev/null 2>&1
+
+.check-project:
+  stage: Check simulation results
+  image: registry.cern.ch/docker.io/library/python
+  before_script:
+    - pip install --root-user-action=ignore pandas
+  script:
+    - cd IntegrationTests/$PROJECT/script/
     - python3 common/script/CompareMemPrintsFW.py -p -s
+  after_script:
+    - cd IntegrationTests/$PROJECT/script/
+    - find -mindepth 1 -maxdepth 1 -type l -exec rm -f {} \;
+    - rm -f vivado*
+    - cd -
+    - cd emData/
+    - ./clean.sh > /dev/null 2>&1
   artifacts:
-    when: on_success
-    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
-    paths:
-      - ./IntegrationTests/${PROJ_NAME}/script/dataOut/*.txt
-    expire_in: 10 week
-
-.job_template: &template_topTF-synth
-  <<: *template_base
-  stage: topTF-synth
-  script:
-    - cd IntegrationTests/${PROJ_NAME}/script
-    - pwd; ls -la; #debug
-    - make Work/Work.runs/synth_1 | awk 'BEGIN{IGNORECASE=1} /^error/ {exit_code=1;} // {print $0;} END{exit exit_code}'
-  artifacts:
-    when: on_success
-    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
-    paths:
-      - ./IntegrationTests/${PROJ_NAME}/script/Work/Work.runs/synth_1/*.rpt
+    name: "$CI_JOB_STAGE-$CI_JOB_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    untracked: true
     expire_in: 1 week
-    
-# Jobs ------------------------------------------------------------------------
-# Lint ------------
-py3check:
-  <<: *template_static-check-python
-  script:
-    # If changes need to be made you might refer to: https://portingguide.readthedocs.io/en/latest/tools.html#automated-fixer-python-modernize
-    - python3 -m pylint --py3k emData/*.py # Check for python3 compatibility
-lint:
-  <<: *template_static-check-python
-  allow_failure: true
-  script:
-    - python3 -m pylint emData/*.py # Static code checker
-# Download ------------
-download:
+
+.synth-project:
+  extends: .vivado-job
+  stage: Synthesize
   tags:
-    - xilinx-tools
-  stage: download
-  needs: ["py3check", "lint"]
+    - fpga-large
+  variables:
+    NOUSE: Implementation
   script:
-    - cd emData
+    - cd IntegrationTests/$PROJECT/script/
+    - vivado -mode batch -source ./makeProject.tcl
+    - vivado -mode batch -source ./common/script/synth.tcl
+  after_script:
+    - cd IntegrationTests/$PROJECT/script/
+    - find -mindepth 1 -maxdepth 1 -type d ! -regex ".*\/Work$" -exec rm -rf {} \;
+    - find -mindepth 1 -maxdepth 1 -type l -exec rm -f {} \;
+    - cd -
+    - cd emData/
+    - ./clean.sh > /dev/null 2>&1
+
+.impl-project:
+  extends: .vivado-job
+  stage: Implement
+  tags:
+    - fpga-large
+  variables:
+    NOUSE: Synthesis
+  script:
+    - cd IntegrationTests/$PROJECT/script/
+    - vivado -mode batch -source ./common/script/impl.tcl
+  after_script:
+    - cd IntegrationTests/$PROJECT/script/
+    - find -mindepth 1 -maxdepth 1 -type d ! -regex ".*\/Work$" -exec rm -rf {} \;
+    - find -mindepth 1 -maxdepth 1 -type l -exec rm -f {} \;
+    - cd -
+    - cd emData/
+    - ./clean.sh > /dev/null 2>&1
+################################################################################
+
+################################################################################
+# Job definitions
+#-------------------------------------------------------------------------------
+pylint:
+  stage: Python checks
+  image: registry.cern.ch/docker.io/library/python
+  before_script:
+    - pip install --root-user-action=ignore pylint
+  script:
+    - python3 -m pylint emData/*.py
+
+download:
+  stage: Setup
+  image: registry.cern.ch/docker.io/library/python
+  script:
+    - cd emData/
     - ./download.sh
   artifacts:
-    when: on_success
-    name: "$CI_JOB_NAME-$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
-    paths:
-      - ./emData/
-      - ./TopFunctions/
-      - ./IntegrationTests/
+    name: "$CI_JOB_STAGE-$CI_JOB_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    untracked: true
     expire_in: 1 week
-# Quality checks ------------
-IR-quality-check:
-  <<: *template_quality-check
+
+### HLS checks
+
+build-IR:
+  extends: .hls-job
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/InputRouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/InputRouterTop.cc'
-VMRCM-quality-check:
-  <<: *template_quality-check
+    MODULE: "IR"
+
+build-MP:
+  extends: .hls-job
+  tags:
+    - fpga-large
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMRouterCM_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMRouterCMTop_L2PHIA.cc'
-VMSMER-quality-check:
-  <<: *template_quality-check
+    MODULE: "MP"
+
+build-PC:
+  extends: .hls-job
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/VMStubMERouter_test.cpp ../TopFunctions/CombinedConfig_FPGA2/VMStubMERouterTop_D1PHIA.cc'    
-TP-quality-check:
-  <<: *template_quality-check
+    MODULE: "PC"
+
+build-TB:
+  extends: .hls-job
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackletProcessor_test.cpp ../TopFunctions/CombinedConfig_FPGA2/TrackletProcessorTop.cc'
-PC-quality-check:
-  <<: *template_quality-check
+    MODULE: "TB"
+
+build-TP:
+  extends: .hls-job
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/ProjectionCalculator_test.cpp ../TopFunctions/CombinedConfig_FPGA2/ProjectionCalculatorTop.cc'
-MP-quality-check:
-  <<: *template_quality-check
+    MODULE: "TP"
+
+build-VMRCM:
+  extends: .hls-job
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/MatchProcessor_test.cpp ../TopFunctions/CombinedConfig_FPGA2/MatchProcessorTop.cc'
-TB-quality-check:
-  <<: *template_quality-check
+    MODULE: "VMRCM"
+
+build-VMSMER:
+  extends: .hls-job
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackBuilder_test.cpp ../TopFunctions/CombinedConfig_FPGA2/TrackBuilderTop.cc'
-TM-quality-check:
-  <<: *template_quality-check
+    MODULE: "VMSMER"
+
+### Create projects
+
+create-ReducedCombinedConfig_FPGA1:
+  extends: .create-project
   variables:
-    VIVADO_VERSION: "2019.2"
-    CLANG_TIDY_FILES: '../TestBenches/TrackMerger_test.cpp ../TopFunctions/TrackMergerTop.cc'
-# HLS builds ---------------
-IR-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "IR-quality-check"]
+    PROJECT: "ReducedCombinedConfig_FPGA1"
+
+create-ReducedCombinedConfig_FPGA2:
+  extends: .create-project
   variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "IR"
-VMRCM-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "VMRCM-quality-check"]
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "VMRCM"
-VMSMER-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "VMSMER-quality-check"]
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "VMSMER"
-TP-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "TP-quality-check"]
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "TP"
-PC-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "PC-quality-check"]
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "PC"
-MP-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "MP-quality-check"]
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "MP"
-TB-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "TB-quality-check"]
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "TB"
-TM-vivado-hls-build:
-  <<: *template_hls-build
-  needs: ["download", "TM-quality-check"]
-  allow_failure: false # FIXME: testbench currently always passes
-  variables:
-    EXECUTABLE: 'vivado_hls'
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "TM"
-# FW simulation ---------------
-topReducedCombinedFPGA1-sim:
-  <<: *template_topTF-sim
-  allow_failure: false
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig_FPGA1"
-  needs:
-    - job: download
-    - job: IR-vivado-hls-build
-      artifacts: false
-    - job: VMRCM-vivado-hls-build
-      artifacts: false
-    - job: VMSMER-vivado-hls-build
-      artifacts: false  
-    - job: TP-vivado-hls-build
-      artifacts: false
-    - job: PC-vivado-hls-build
-      artifacts: false
-    - job: MP-vivado-hls-build
-      artifacts: false
-    - job: TB-vivado-hls-build
-      artifacts: false
-# Check FW results ---------------
-topReducedCombinedFPGA1-check-results:
-  <<: *template_check-results
-  allow_failure: false
-  variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
-    PROJ_NAME: "ReducedCombinedConfig_FPGA1"
-  needs:
+    PROJECT: "ReducedCombinedConfig_FPGA2"
+
+### Simulate
+
+sim-ReducedCombinedConfig_FPGA1:
+  extends: .sim-project
+  dependencies:
     - download
-    - topReducedCombinedFPGA1-sim
-# FW synthesis ---------------
-topReducedCombinedFPGA1-synth:
-  <<: *template_topTF-synth
-  allow_failure: false
+    - create-ReducedCombinedConfig_FPGA1
   variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig_FPGA1"
-  needs:
-    - job: download
-    - job: topReducedCombinedFPGA1-sim
-    - job: topReducedCombinedFPGA1-check-results
-      artifacts: false
-# FW simulation ---------------
-topReducedCombinedFPGA2-sim:
-  <<: *template_topTF-sim
-  allow_failure: false
-  variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
-  needs:
-    - job: download
-    - job: IR-vivado-hls-build
-      artifacts: false
-    - job: VMRCM-vivado-hls-build
-      artifacts: false
-    - job: VMSMER-vivado-hls-build
-      artifacts: false  
-    - job: TP-vivado-hls-build
-      artifacts: false
-    - job: PC-vivado-hls-build
-      artifacts: false
-    - job: MP-vivado-hls-build
-      artifacts: false
-    - job: TB-vivado-hls-build
-      artifacts: false
-# Check FW results ---------------
-topReducedCombinedFPGA2-check-results:
-  <<: *template_check-results
-  allow_failure: false
-  variables:
-    VIVADO_VERSION: "2019.2" # Vivado not needed but it is part of the path that is called
-    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
-  needs:
+    PROJECT: "ReducedCombinedConfig_FPGA1"
+
+sim-ReducedCombinedConfig_FPGA2:
+  extends: .sim-project
+  dependencies:
     - download
-    - topReducedCombinedFPGA2-sim
-# FW synthesis ---------------
-topReducedCombinedFPGA2-synth:
-  <<: *template_topTF-synth
-  allow_failure: false
+    - create-ReducedCombinedConfig_FPGA2
   variables:
-    VIVADO_VERSION: "2019.2"
-    PROJ_NAME: "ReducedCombinedConfig_FPGA2"
-  needs:
-    - job: download
-    - job: topReducedCombinedFPGA2-sim
-    - job: topReducedCombinedFPGA2-check-results
-      artifacts: false
+    PROJECT: "ReducedCombinedConfig_FPGA2"
+
+### Check simulation results
+
+check-ReducedCombinedConfig_FPGA1:
+  extends: .check-project
+  dependencies:
+    - download
+    - sim-ReducedCombinedConfig_FPGA1
+  variables:
+    PROJECT: "ReducedCombinedConfig_FPGA1"
+
+check-ReducedCombinedConfig_FPGA2:
+  extends: .check-project
+  dependencies:
+    - download
+    - sim-ReducedCombinedConfig_FPGA2
+  variables:
+    PROJECT: "ReducedCombinedConfig_FPGA2"
+
+### Synthesize
+
+synth-ReducedCombinedConfig_FPGA1:
+  extends: .synth-project
+  dependencies:
+    - download
+    - create-ReducedCombinedConfig_FPGA1
+  variables:
+    PROJECT: "ReducedCombinedConfig_FPGA1"
+
+synth-ReducedCombinedConfig_FPGA2:
+  extends: .synth-project
+  dependencies:
+    - download
+    - create-ReducedCombinedConfig_FPGA2
+  variables:
+    PROJECT: "ReducedCombinedConfig_FPGA2"
+
+### Implement
+
+impl-ReducedCombinedConfig_FPGA1:
+  extends: .impl-project
+  dependencies:
+    - download
+    - create-ReducedCombinedConfig_FPGA1
+    - synth-ReducedCombinedConfig_FPGA1
+  variables:
+    PROJECT: "ReducedCombinedConfig_FPGA1"
+
+impl-ReducedCombinedConfig_FPGA2:
+  extends: .impl-project
+  dependencies:
+    - download
+    - create-ReducedCombinedConfig_FPGA2
+    - synth-ReducedCombinedConfig_FPGA2
+  variables:
+    PROJECT: "ReducedCombinedConfig_FPGA2"
+################################################################################

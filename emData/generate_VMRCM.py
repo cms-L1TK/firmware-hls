@@ -326,6 +326,9 @@ def writeTopHeader(vmr, output_dir):
     # Top file name
     file_name = "VMRouterCMTop_" + vmr.split("_")[1]
 
+    # Suffix for kNbitsrzbin
+    suffix = "Layer" if layer else "Disk"
+
     with open(output_dir + "/" + file_name  + ".h", "w") as header_file:
 
         # Write preamble
@@ -362,7 +365,7 @@ def writeTopHeader(vmr, output_dir):
             "constexpr int numASInnerCopies = getNumASInnerCopies<layerdisk, phiRegion>(); // Allstub Inner memory\n"
             "constexpr int numTEOCopies = getNumTEOCopies<layerdisk, phiRegion>(); // TE Outer memories\n"
             "// Number of bits for the RZ bins \n"
-            "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
+            f"constexpr int kNbitsrzbinME = kNbitsrzbinME{suffix}; // For the VMSME memories\n" +\
             "\n\n"
         )
 
@@ -371,7 +374,7 @@ def writeTopHeader(vmr, output_dir):
             "/////////////////////////////////////////////////////\n"
             "// VMRouterCM Top Function\n"
             "\n"
-            "void %s(const BXType bx, BXType& bx_o,\n" % file_name +\
+            f"void {file_name}(const BXType bx, BXType& bx_o,\n" +\
             "  // Input memories\n"
             "  const InputStubMemory<inputType> inputStubs[numInputs],\n"
             + ("  const InputStubMemory<DISK2S> inputStubsDisk2S[numInputsDisk2S],\n" if disk else "") +\
@@ -382,7 +385,7 @@ def writeTopHeader(vmr, output_dir):
             + ("  VMStubMemory<outputType, kNbitsrzbin, kNbitsphibin, kNTEUnitsLayerDisk[layerdisk], true> memoriesTEO[numTEOCopies]\n" if has_vmste_outer[layerdisk] else "") +\
             "  );\n"
             "\n"
-            "#endif // TopFunctions_%s_h\n" % file_name
+            f"#endif // TopFunctions_{file_name}_h\n"
         )
 
 # Writes the VMRouterCMTop.cc file
@@ -404,7 +407,7 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
             "// VMRouterCM Top Function\n"
             "// Sort stubs into smaller regions in phi, i.e. Virtual Modules (VMs).\n"
             "\n"
-            "void %s(\n" % file_name +\
+            f"void {file_name}(\n" +\
             "  const BXType bx, BXType& bx_o,\n"
             "  // Input memories\n"
             "  const InputStubMemory<inputType> inputStubs[numInputs],\n"
@@ -421,9 +424,9 @@ def writeTopFile(vmr, num_inputs, num_inputs_disk2s, output_dir):
 
         # Write pragmas
         for i in range(num_inputs):
-            top_file.write("#pragma HLS resource variable=inputStubs[%s].get_mem() latency=2\n" % str(i))
+            top_file.write(f"#pragma HLS resource variable=inputStubs[{str(i)}].get_mem() latency=2\n")
         for i in range(num_inputs_disk2s):
-            top_file.write("#pragma HLS resource variable=inputStubsDisk2S[%s].get_mem() latency=2\n" % str(i))
+            top_file.write(f"#pragma HLS resource variable=inputStubsDisk2S[{str(i)}].get_mem() latency=2\n")
 
         top_file.write(
             "#pragma HLS interface register port=bx_o\n"

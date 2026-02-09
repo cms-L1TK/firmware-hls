@@ -59,6 +59,9 @@ def writeTopHeader(vmr, noutcopy, output_dir):
     # Top file name
     file_name = "VMStubMERouterTop_" + vmr.split("_")[1]
 
+    # Suffix for kNbitsrzbin
+    suffix = "Layer" if layer else "Disk"
+
     with open(output_dir + "/" + file_name  + ".h", "w") as header_file:
 
         # Write preamble
@@ -89,7 +92,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "constexpr regionType inType = (kDISK ==0) ? getInputType<layerdisk>() : DISKPS;\n"
             "constexpr regionType outType = (kDISK ==0) ? getInputType<layerdisk>() : DISK;\n"
             "// Number of bits for the RZ bins used but VMSMER\n"
-            "constexpr int kNbitsrzbinME = kNbitsrzbin%s; // For the VMSME memories\n" % ("MELayer" if layer else "MEDisk") +\
+            f"constexpr int kNbitsrzbinME = kNbitsrzbinME{suffix}; // For the VMSME memories\n" +\
             "\n\n"
         )
 
@@ -98,7 +101,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "/////////////////////////////////////////////////////\n"
             "// VMStubMERouter Top Function \n"
             "\n"
-            "void %s(const BXType bx, BXType& bx_o,\n" % file_name +\
+            f"void {file_name}(const BXType bx, BXType& bx_o,\n" +\
             "  // Input memories\n"
             "  AllStub<inType>& allStub,\n"
             "  // Output memories\n"
@@ -110,7 +113,7 @@ def writeTopHeader(vmr, noutcopy, output_dir):
             "  bool valid\n"
             "  );\n"
             "\n"
-            "#endif // TopFunctions_%s_h\n" % file_name
+            f"#endif // TopFunctions_{file_name}_h\n"
         )
 
 # Writes the VMRouterCMTop.cc file
@@ -127,7 +130,7 @@ def writeTopFile(vmr, output_dir):
             "// VMStubMERouter Top Function\n"
             "// Sort AllStubs into smaller regions in phi, i.e. Virtual Modules (VMs). By writing VMStubME memories.\n"
             "\n"
-            "void %s(\n" % file_name +\
+            f"void {file_name}(\n" +\
             "  const BXType bx, BXType& bx_o,\n"
             "  // Input memories\n"
             "  AllStub<inType>& allStub,\n"

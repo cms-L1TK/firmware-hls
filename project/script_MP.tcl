@@ -50,16 +50,6 @@ set modules_to_test {
 # test bench; otherwise, the C/RTL cosimulation will fail
 set module_to_export MP_D1PHIC
 
-# create new project (deleting any existing one of same name)
-open_project -reset match_processor
-
-# source files
-set CFLAGS {-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2}
-add_files ../TopFunctions/CombinedConfig_FPGA2/MatchProcessorTop.cc -cflags "$CFLAGS"
-add_files -tb ../TestBenches/MatchProcessor_test.cpp -cflags "$CFLAGS"
-
-# data files
-add_files -tb ../emData/MP/
 
 foreach i $modules_to_test {
   set layerDisk [string range $i 3 4]
@@ -70,6 +60,17 @@ foreach i $modules_to_test {
   puts [join [list "layerDisk = " $layerDisk] ""]
   puts [join [list "iMP = " $iMP] ""]
   puts [join [list "top function = " $top_func] ""]
+
+  # create new project (deleting any existing one of same name)
+  open_project -reset [join [list "match_processor_" $layerDisk "PHI" $iMP $extra] ""]
+
+  # source files
+  set CFLAGS [join [list "-std=c++11 -I../TrackletAlgorithm -I../TrackletAlgorithm/TestBench -I../TopFunctions/CombinedConfig_FPGA2 -D__" $layerDisk "__"] ""]
+  add_files ../TopFunctions/CombinedConfig_FPGA2/MatchProcessorTop.cc -cflags "$CFLAGS"
+  add_files -tb ../TestBenches/MatchProcessor_test.cpp -cflags "$CFLAGS"
+
+  # data files
+  add_files -tb ../emData/MP/
 
    # set macros for this module in CCFLAG environment variable
   set ::env(CCFLAG) [join [list $::env(CCFLAG_CMSSW) " -D \"MODULE_=" $i "_\" -D \"TOP_FUNC_=" $top_func "\""] ""]
