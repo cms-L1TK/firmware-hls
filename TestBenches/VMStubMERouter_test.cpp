@@ -8,8 +8,8 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ VMStubMERouterTop_L1PHIA
-  #define HEADER_FILE_ "VMStubMERouterTop_L1PHIA.h"
+  #define TOP_FUNC_ VMStubMERouterTop_L2PHIA
+  #define HEADER_FILE_ "VMStubMERouterTop_L2PHIA.h"
 
   // number of events to run during C/RTL cosimulation
   const int nEvents = 10;
@@ -80,17 +80,15 @@ int main() {
 
     // Read event and write to memories
     writeMemFromFile(memoriesAS, fin_allstubs[0], ievt);
-    cout << "number entries = " << memoriesAS.getEntries(ievt)<< endl;
     AllStub<inType> hInputStubs[kMaxProc()];
     for( size_t cStubIndx=0; cStubIndx < kMaxProc(); cStubIndx++){
-      cout << "cStubIndx"<< cStubIndx << endl;
+      hInputStubs[cStubIndx]=AllStub<inType>();
       if (cStubIndx < memoriesAS.getEntries(ievt)){
         hInputStubs[cStubIndx]=memoriesAS.read_mem(ievt, cStubIndx);
-      } else {
-        hInputStubs[cStubIndx]=AllStub<inType>();
-      }
+      } 
+      //cout << "cStubIndx"<< cStubIndx << " " << hInputStubs[cStubIndx].raw()<< endl;
     }
-    cout << "copy data to hinput" << endl;
+    cout << "copied data to hinput" << endl;
 
       // bx - bunch crossing
     BXType bx = ievt;
@@ -111,6 +109,10 @@ int main() {
     // Add 1 to the error count per stub that is incorrect
     bool truncation = false;
 
+    for(unsigned int i=0;i<64;i++) {
+      std::cout << "after bin: " << i << " " << std::hex << memoryME[0].read_mem(0,bx,i*16).raw() << std::dec << std::endl;
+    }
+    
     // ME memories
     std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << std::endl;
     for(unsigned int i=0; i<NOutCopy; i++) {
