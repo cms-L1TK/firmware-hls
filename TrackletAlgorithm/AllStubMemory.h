@@ -135,7 +135,9 @@ public:
   }
 
   AllStub()
-  {}
+  {
+    data_ = 0;
+  }
 
   #ifndef __SYNTHESIS__
   AllStub(const char* datastr, int base=16)

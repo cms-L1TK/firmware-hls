@@ -152,17 +152,14 @@ inline T createVMStubME(const AllStub<inType>& allStub,
 // Two input region types InType and DISK2S due to the disks having both 2S and PS inputs.
 template<int Layer, int Disk, regionType InType, regionType OutType, int rzSizeME, int phiRegSize, int NOutCopy=1>
 void VMSMERouter(const BXType bx, BXType& bx_o,
-		// LUTs
-	    const int METable[],
-        const int phiCorrTable[],
-		// Input memories
-		AllStub<InType>* allStubs, //////// 
-		VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
-		AllStubMemory<OutType> memoriesAS[],
-		// Array to count how many VMStubs written in each slot
-		// unsigned int index, //////// legacy port, connected from mem_reader
-		bool valid
-		) {
+		 // LUTs
+		 const int METable[],
+		 const int phiCorrTable[],
+		 // Input memories
+		 AllStub<InType>* allStubs,
+		 VMStubMemory<OutType, rzSizeME, phiRegSize, kNMatchEngines> memoryME[],
+		 AllStubMemory<OutType> memoriesAS[])
+{
 
 #pragma HLS inline
 #pragma HLS array_partition variable=memoryME dim=1
@@ -170,10 +167,10 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
 #pragma HLS array_partition variable = allStubs
 
 
-  LOOP_ProcessVMSMER:
+ LOOP_ProcessVMSMER:
   for (int cStubCounter = 0; cStubCounter < kMaxProc(); cStubCounter++) {
 #pragma HLS pipeline II = 1 rewind
-    //#pragma HLS latency min=13 max=13
+    //#pragma HLS latency min=13 max=13 //might need to enable
     AllStub<InType> allStub = allStubs[cStubCounter];
     if (allStub.raw() == 0) 
       continue;
@@ -188,12 +185,7 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
     ////////////////////////////////////////
     // AllStub memories
 	
-    ///AllStub<OutType> allstub = allStub.raw();
-
-  
     // Write stub to all memory copies
-    // It seems that the if (nAllCopies > 0) should not be needed,
-    // but if nAllCopies is zero it generates an error in vivado_hls
     for (unsigned int i=0; i<NOutCopy; i++) {
 #pragma HLS UNROLL
       memoriesAS[i].write_mem(stub_copy);
@@ -211,23 +203,20 @@ void VMSMERouter(const BXType bx, BXType& bx_o,
     
     int slotME; // The bin the stub is going to be put in, in the memory
     
-		// Create the ME stub to save
+    // Create the ME stub to save
 
     VMStub<OutType> stubME = (disk2S) ? 
       createVMStubME<VMStub<OutType>, DISK2S, Layer, Disk>(stub_2s, cStubCounter, negDisk, METable, phiCorrTable, slotME) : (isDisk) ?
       createVMStubME<VMStub<OutType>, DISKPS, Layer, Disk>(stub_ps, cStubCounter, negDisk, METable, phiCorrTable, slotME) : 
       createVMStubME<VMStub<OutType>, InType, Layer, Disk>(allStub, cStubCounter, negDisk, METable, phiCorrTable, slotME);
 
-    std::cout << "Writing index = " << cStubCounter << " " << allStub.raw() << std::endl;
-    
     // Write the ME stub
     for (unsigned int i=0; i<NOutCopy; i++) {
 #pragma HLS UNROLL
       memoryME[i].write_mem(slotME, stubME);
     }
-      
   }
-  
+
   bx_o = bx;
 } // End VMRouterCM
 

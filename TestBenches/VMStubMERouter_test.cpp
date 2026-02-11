@@ -8,8 +8,8 @@
 // No macros can be defined from the command line in the case of C/RTL
 // cosimulation, so we define defaults here.
 #if !defined TOP_FUNC_
-  #define TOP_FUNC_ VMStubMERouterTop_L2PHIA
-  #define HEADER_FILE_ "VMStubMERouterTop_L2PHIA.h"
+  #define TOP_FUNC_ VMStubMERouterTop_L1PHIA
+  #define HEADER_FILE_ "VMStubMERouterTop_L1PHIA.h"
 
   // number of events to run during C/RTL cosimulation
   const int nEvents = 10;
@@ -86,33 +86,23 @@ int main() {
       if (cStubIndx < memoriesAS.getEntries(ievt)){
         hInputStubs[cStubIndx]=memoriesAS.read_mem(ievt, cStubIndx);
       } 
-      //cout << "cStubIndx"<< cStubIndx << " " << hInputStubs[cStubIndx].raw()<< endl;
     }
-    cout << "copied data to hinput" << endl;
 
-      // bx - bunch crossing
+    // bx - bunch crossing
     BXType bx = ievt;
     BXType bx_out;
 
-      // AllStub<inType> allStub = memoriesAS.read_mem(ievt, index);
-      // bool valid = index < memoriesAS.getEntries(ievt);
-      // Unit Under Test
+    
+    // Unit Under Test
     TOP_FUNC_(bx, bx_out, 
                 hInputStubs,
                 memoryME,
-                memoriesASCopy,
-                // index,
-                true);
-    cout << "called vmsmer" << endl;
+                memoriesASCopy);
     
     // Compare the computed outputs with the expected ones
     // Add 1 to the error count per stub that is incorrect
     bool truncation = false;
 
-    for(unsigned int i=0;i<64;i++) {
-      std::cout << "after bin: " << i << " " << std::hex << memoryME[0].read_mem(0,bx,i*16).raw() << std::dec << std::endl;
-    }
-    
     // ME memories
     std::cout << "comparing memories for layer/disk: " << dec << kLAYER << "/" << kDISK << " and region: " << phiRegion << std::endl;
     for(unsigned int i=0; i<NOutCopy; i++) {
